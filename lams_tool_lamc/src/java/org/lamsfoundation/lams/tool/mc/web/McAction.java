@@ -41,12 +41,12 @@ import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McApplicationException;
 import org.lamsfoundation.lams.tool.mc.McAttachmentDTO;
 import org.lamsfoundation.lams.tool.mc.McComparator;
-import org.lamsfoundation.lams.tool.mc.McContent;
-import org.lamsfoundation.lams.tool.mc.McOptsContent;
-import org.lamsfoundation.lams.tool.mc.McQueContent;
-import org.lamsfoundation.lams.tool.mc.McQueUsr;
-import org.lamsfoundation.lams.tool.mc.McUsrAttempt;
 import org.lamsfoundation.lams.tool.mc.McUtils;
+import org.lamsfoundation.lams.tool.mc.pojos.McContent;
+import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
+import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
+import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
+import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 
@@ -1042,37 +1042,40 @@ public class McAction extends LamsDispatchAction implements McAppConstants
         	String movableQuestionEntry=(String)mapQuestionsContent.get(questionIndex);
         	logger.debug("movableQuestionEntry:" + movableQuestionEntry);
         	
-        	mapQuestionsContent= AuthoringUtil.shiftMap(mapQuestionsContent, questionIndex,movableQuestionEntry,  "down");
-        	logger.debug("mapQuestionsContent after move down: " + mapQuestionsContent);
-        	request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
-        	logger.debug("updated Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
-        	
-        	Map mapGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_OPTIONS_CONTENT);
-        	if (mapGeneralOptionsContent.size() > 0)
+        	if (movableQuestionEntry != null && (!movableQuestionEntry.equals("")))
         	{
-        		logger.debug("initial test: current mapGeneralOptionsContent: " + mapGeneralOptionsContent);
-            	mapGeneralOptionsContent= AuthoringUtil.shiftOptionsMap(mapGeneralOptionsContent, questionIndex, "down");
-            	logger.debug("mapGeneralOptionsContent after move down: " + mapGeneralOptionsContent);
-            	request.getSession().setAttribute(MAP_GENERAL_OPTIONS_CONTENT, mapGeneralOptionsContent);	
+            	mapQuestionsContent= AuthoringUtil.shiftMap(mapQuestionsContent, questionIndex,movableQuestionEntry,  "down");
+            	logger.debug("mapQuestionsContent after move down: " + mapQuestionsContent);
+            	request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
+            	logger.debug("updated Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
+            	
+            	Map mapGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_OPTIONS_CONTENT);
+            	if (mapGeneralOptionsContent.size() > 0)
+            	{
+            		logger.debug("initial test: current mapGeneralOptionsContent: " + mapGeneralOptionsContent);
+                	mapGeneralOptionsContent= AuthoringUtil.shiftOptionsMap(mapGeneralOptionsContent, questionIndex, "down");
+                	logger.debug("mapGeneralOptionsContent after move down: " + mapGeneralOptionsContent);
+                	request.getSession().setAttribute(MAP_GENERAL_OPTIONS_CONTENT, mapGeneralOptionsContent);	
+            	}
+            	
+            	Map mapGeneralSelectedOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT);
+            	if (mapGeneralSelectedOptionsContent.size() > 0)
+            	{
+            		logger.debug("initial test: current mapGeneralSelectedOptionsContent: " + mapGeneralSelectedOptionsContent);
+            		mapGeneralSelectedOptionsContent= AuthoringUtil.shiftOptionsMap(mapGeneralSelectedOptionsContent, questionIndex, "down");
+                	logger.debug("mapGeneralSelectedOptionsContent after move down: " + mapGeneralSelectedOptionsContent);
+                	request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapGeneralSelectedOptionsContent);	
+            	}
+            	
+            	Map mapWeights= AuthoringUtil.repopulateCurrentWeightsMap(request, "questionWeight");
+            	if (mapWeights.size() > 0)
+            	{
+            		logger.debug("initial test: current mapWeights: " + mapWeights);
+            		mapWeights= AuthoringUtil.shiftWeightsMap(mapWeights, questionIndex, "down");
+                	logger.debug("mapWeights after move down: " + mapWeights);
+                	request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);	
+            	}
         	}
-        	
-        	Map mapGeneralSelectedOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT);
-        	if (mapGeneralSelectedOptionsContent.size() > 0)
-        	{
-        		logger.debug("initial test: current mapGeneralSelectedOptionsContent: " + mapGeneralSelectedOptionsContent);
-        		mapGeneralSelectedOptionsContent= AuthoringUtil.shiftOptionsMap(mapGeneralSelectedOptionsContent, questionIndex, "down");
-            	logger.debug("mapGeneralSelectedOptionsContent after move down: " + mapGeneralSelectedOptionsContent);
-            	request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapGeneralSelectedOptionsContent);	
-        	}
-        	
-        	Map mapWeights= AuthoringUtil.repopulateCurrentWeightsMap(request, "questionWeight");
-        	if (mapWeights.size() > 0)
-        	{
-        		logger.debug("initial test: current mapWeights: " + mapWeights);
-        		mapWeights= AuthoringUtil.shiftWeightsMap(mapWeights, questionIndex, "down");
-            	logger.debug("mapWeights after move down: " + mapWeights);
-            	request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);	
-        	}	
      	}
     	
     	mcAuthoringForm.resetUserAction();
@@ -1141,36 +1144,39 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     		String movableQuestionEntry=(String)mapQuestionsContent.get(questionIndex);
     		logger.debug("movableQuestionEntry:" + movableQuestionEntry);
     		
-    		mapQuestionsContent= AuthoringUtil.shiftMap(mapQuestionsContent, questionIndex,movableQuestionEntry,  "up");
-    		logger.debug("mapQuestionsContent after move down: " + mapQuestionsContent);
-    		request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
-    		logger.debug("updated Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
-    		
-    		Map mapGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_OPTIONS_CONTENT);
-    		if (mapGeneralOptionsContent.size() > 0)
+        	if (movableQuestionEntry != null && (!movableQuestionEntry.equals("")))
         	{
-    			logger.debug("initial test: current mapGeneralOptionsContent: " + mapGeneralOptionsContent);
-    	    	mapGeneralOptionsContent= AuthoringUtil.shiftOptionsMap(mapGeneralOptionsContent, questionIndex, "up");
-    	    	logger.debug("mapGeneralOptionsContent after move up: " + mapGeneralOptionsContent);
-    	    	request.getSession().setAttribute(MAP_GENERAL_OPTIONS_CONTENT, mapGeneralOptionsContent);	
-        	}
-    		
-    		Map mapGeneralSelectedOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT);
-        	if (mapGeneralSelectedOptionsContent.size() > 0)
-        	{
-        		logger.debug("initial test: current mapGeneralSelectedOptionsContent: " + mapGeneralSelectedOptionsContent);
-        		mapGeneralSelectedOptionsContent= AuthoringUtil.shiftOptionsMap(mapGeneralSelectedOptionsContent, questionIndex, "up");
-            	logger.debug("mapGeneralSelectedOptionsContent after move down: " + mapGeneralSelectedOptionsContent);
-            	request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapGeneralSelectedOptionsContent);	
-        	}
-        	
-        	Map mapWeights= AuthoringUtil.repopulateCurrentWeightsMap(request, "questionWeight");
-        	if (mapWeights.size() > 0)
-        	{
-        		logger.debug("initial test: current mapWeights: " + mapWeights);
-        		mapWeights= AuthoringUtil.shiftWeightsMap(mapWeights, questionIndex, "up");
-            	logger.debug("mapWeights after move down: " + mapWeights);
-            	request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);	
+        		mapQuestionsContent= AuthoringUtil.shiftMap(mapQuestionsContent, questionIndex,movableQuestionEntry,  "up");
+        		logger.debug("mapQuestionsContent after move down: " + mapQuestionsContent);
+        		request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
+        		logger.debug("updated Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
+        		
+        		Map mapGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_OPTIONS_CONTENT);
+        		if (mapGeneralOptionsContent.size() > 0)
+            	{
+        			logger.debug("initial test: current mapGeneralOptionsContent: " + mapGeneralOptionsContent);
+        	    	mapGeneralOptionsContent= AuthoringUtil.shiftOptionsMap(mapGeneralOptionsContent, questionIndex, "up");
+        	    	logger.debug("mapGeneralOptionsContent after move up: " + mapGeneralOptionsContent);
+        	    	request.getSession().setAttribute(MAP_GENERAL_OPTIONS_CONTENT, mapGeneralOptionsContent);	
+            	}
+        		
+        		Map mapGeneralSelectedOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT);
+            	if (mapGeneralSelectedOptionsContent.size() > 0)
+            	{
+            		logger.debug("initial test: current mapGeneralSelectedOptionsContent: " + mapGeneralSelectedOptionsContent);
+            		mapGeneralSelectedOptionsContent= AuthoringUtil.shiftOptionsMap(mapGeneralSelectedOptionsContent, questionIndex, "up");
+                	logger.debug("mapGeneralSelectedOptionsContent after move down: " + mapGeneralSelectedOptionsContent);
+                	request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapGeneralSelectedOptionsContent);	
+            	}
+            	
+            	Map mapWeights= AuthoringUtil.repopulateCurrentWeightsMap(request, "questionWeight");
+            	if (mapWeights.size() > 0)
+            	{
+            		logger.debug("initial test: current mapWeights: " + mapWeights);
+            		mapWeights= AuthoringUtil.shiftWeightsMap(mapWeights, questionIndex, "up");
+                	logger.debug("mapWeights after move down: " + mapWeights);
+                	request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);	
+            	}        		
         	}
      	}
 
