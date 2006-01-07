@@ -22,11 +22,12 @@
 package org.lamsfoundation.lams.tool.mc.dao.hibernate;
 
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.hibernate.FlushMode;
-import org.lamsfoundation.lams.tool.mc.McOptsContent;
+import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.dao.IMcOptionsContentDAO;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
@@ -66,6 +67,28 @@ public class McOptionsContentDAO extends HibernateDaoSupport implements IMcOptio
 			return null;
 	    }
 
+	 	public List findMcOptionNamesByQueId(Long mcQueContentId)
+	    {
+	 		
+	 		List listOptionNames= new LinkedList();
+	 		
+			HibernateTemplate templ = this.getHibernateTemplate();
+			if ( mcQueContentId != null) {
+				List list = getSession().createQuery(FIND_MC_OPTIONS_CONTENT)
+					.setLong(0,mcQueContentId.longValue())
+					.list();
+				
+				if(list != null && list.size() > 0){
+					Iterator listIterator=list.iterator();
+			    	while (listIterator.hasNext())
+			    	{
+			    		McOptsContent mcOptsContent=(McOptsContent)listIterator.next();
+			    		listOptionNames.add(mcOptsContent.getMcQueOptionText());
+			    	}
+				}
+			}
+			return listOptionNames;
+	    }
 	 	
 	 	public McOptsContent getOptionContentByOptionText(final String option, final Long mcQueContentUid)
 	    {
