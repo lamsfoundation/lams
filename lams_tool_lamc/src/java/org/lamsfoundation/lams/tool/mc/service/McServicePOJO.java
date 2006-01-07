@@ -343,6 +343,21 @@ public class McServicePOJO implements
     }
     
     
+    public List getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long mcQueContentId) throws McApplicationException
+	{
+        try
+        {
+        	return mcUsrAttemptDAO.getAttemptsForUserAndQuestionContent(queUsrId, mcQueContentId);
+        }
+        catch (DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is getting mc UsrAttempt by user id and que content id: "
+                                                         + e.getMessage(),
+														   e);
+        }
+	}
+    
+    
 	public void updateMcUsrAttempt(McUsrAttempt mcUsrAttempt) throws McApplicationException
     {
         try
