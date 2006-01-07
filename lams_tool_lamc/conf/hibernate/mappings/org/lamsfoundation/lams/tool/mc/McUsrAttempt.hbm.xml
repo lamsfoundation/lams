@@ -6,7 +6,7 @@
 <hibernate-mapping>
 
 <class 
-    name="org.lamsfoundation.lams.tool.mc.McUsrAttempt" 
+    name="org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt" 
     table="tl_lamc11_usr_attempt"
 >
     <id
@@ -92,7 +92,7 @@
 
     <many-to-one
         name="mcQueContent"
-        class="org.lamsfoundation.lams.tool.mc.McQueContent"
+        class="org.lamsfoundation.lams.tool.mc.pojos.McQueContent"
         not-null="true"        
    	    cascade="none"
 	    outer-join="auto"
@@ -105,7 +105,7 @@
     
     <many-to-one
         name="mcQueUsr"
-        class="org.lamsfoundation.lams.tool.mc.McQueUsr"
+        class="org.lamsfoundation.lams.tool.mc.pojos.McQueUsr"
         not-null="true"        
 	    cascade="none"
 	    outer-join="auto"
@@ -118,7 +118,7 @@
     
     <many-to-one
         name="mcOptionsContent"
-        class="org.lamsfoundation.lams.tool.mc.McOptsContent"
+        class="org.lamsfoundation.lams.tool.mc.pojos.McOptsContent"
         not-null="true"                
 	    cascade="none"
 	    outer-join="auto"

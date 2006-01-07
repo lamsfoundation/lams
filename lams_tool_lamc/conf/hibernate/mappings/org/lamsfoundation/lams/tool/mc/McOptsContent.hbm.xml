@@ -12,7 +12,7 @@
 -->
 
 <class 
-    name="org.lamsfoundation.lams.tool.mc.McOptsContent" 
+    name="org.lamsfoundation.lams.tool.mc.pojos.McOptsContent" 
     table="tl_lamc11_options_content"
 >
     <id
@@ -52,11 +52,9 @@
     
 
     <!-- Associations -->
-  
-    <!-- bi-directional many-to-one association to TlLamc11QueContent -->
     <many-to-one
         name="mcQueContent"
-        class="org.lamsfoundation.lams.tool.mc.McQueContent"
+        class="org.lamsfoundation.lams.tool.mc.pojos.McQueContent"
         not-null="true"        
         cascade="none"
         outer-join="auto"
@@ -77,7 +75,7 @@
             <column name="mc_que_option_id" />
         </key>
         <one-to-many 
-            class="org.lamsfoundation.lams.tool.mc.McUsrAttempt"
+            class="org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt"
         />
     </set>
    

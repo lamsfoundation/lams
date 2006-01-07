@@ -6,7 +6,7 @@
 <hibernate-mapping>
 
 <class 
-    name="org.lamsfoundation.lams.tool.mc.McQueUsr" 
+    name="org.lamsfoundation.lams.tool.mc.pojos.McQueUsr" 
     table="tl_lamc11_que_usr"
 >
     <id
@@ -42,9 +42,21 @@
     >
     </property>
 
+    <property
+        name="mcSessionId"
+        type="java.lang.Long"
+        update="false"
+        insert="false"
+        access="property"
+        column="mc_session_id"
+        length="20"
+    >
+    </property>
+
+
     <many-to-one
         name="mcSession"
-        class="org.lamsfoundation.lams.tool.mc.McSession"
+        class="org.lamsfoundation.lams.tool.mc.pojos.McSession"
         not-null="true"        
         cascade="none"
         outer-join="auto"
@@ -68,7 +80,7 @@
               </key>
 
               <one-to-many
-                  class="org.lamsfoundation.lams.tool.mc.McUsrAttempt"
+                  class="org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt"
               />
     </set>
 
