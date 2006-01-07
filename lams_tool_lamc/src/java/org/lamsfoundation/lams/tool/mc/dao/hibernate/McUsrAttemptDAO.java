@@ -26,8 +26,8 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.hibernate.FlushMode;
-import org.lamsfoundation.lams.tool.mc.McUsrAttempt;
 import org.lamsfoundation.lams.tool.mc.dao.IMcUsrAttemptDAO;
+import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
@@ -43,6 +43,8 @@ public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemp
 	 	private static final String LOAD_HIGHEST_ATTEMPT_ORDER_BY_USER_ID = "from mcUsrAttempt in class McUsrAttempt where mcUsrAttempt.queUsrId=:queUsrId";
 	 	
 	 	private static final String LOAD_ATTEMPT_FOR_QUE_CONTENT = "from mcUsrAttempt in class McUsrAttempt where mcUsrAttempt.queUsrId=:queUsrId and mcUsrAttempt.mcQueContentId=:mcQueContentId";
+	 	
+	 	private static final String LOAD_ATTEMPT_FOR_USER		 = "from mcUsrAttempt in class McUsrAttempt where mcUsrAttempt.queUsrId=:queUsrId";
 	 	
 	 	private static final String LOAD_ATTEMPT_BY_ATTEMPT_ORDER = "from mcUsrAttempt in class McUsrAttempt where mcUsrAttempt.queUsrId=:queUsrId and mcUsrAttempt.mcQueContentId=:mcQueContentId and attemptOrder=:attemptOrder";
 	 	
@@ -86,6 +88,16 @@ public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemp
 			List list = getSession().createQuery(LOAD_HIGHEST_ATTEMPT_ORDER_BY_USER_ID)
 				.setLong("queUsrId", queUsrId.longValue())
 				.list();
+			return list;
+	    }
+		
+		
+		public List getAttemptsForUser(final Long queUsrId)
+	    {
+	        HibernateTemplate templ = this.getHibernateTemplate();
+	        List list = getSession().createQuery(LOAD_ATTEMPT_FOR_USER)
+			.setLong("queUsrId", queUsrId.longValue())
+			.list();
 			return list;
 	    }
 		
