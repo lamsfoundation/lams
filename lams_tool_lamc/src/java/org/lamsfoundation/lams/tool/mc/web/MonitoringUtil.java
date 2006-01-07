@@ -99,7 +99,7 @@ public class MonitoringUtil implements McAppConstants{
 				logger.debug("listCandidateAnswers:..." + listCandidateAnswers);
 				mcMonitoredAnswersDTO.setCandidateAnswers(listCandidateAnswers);
 				
-				Map questionAttemptData= buildGroupsAttemptData(request, mcContent, mcQueContent);
+				Map questionAttemptData= buildGroupsAttemptData(request, mcContent, mcQueContent, mcQueContent.getUid().toString());
 				logger.debug("questionAttemptData:..." + questionAttemptData);
 				mcMonitoredAnswersDTO.setQuestionAttempts(questionAttemptData);
 				listMonitoredAnswersContainerDTO.add(mcMonitoredAnswersDTO);
@@ -119,9 +119,9 @@ public class MonitoringUtil implements McAppConstants{
 	 * @param mcQueContent
 	 * @return Map
 	 */
-	public static Map buildGroupsAttemptData(HttpServletRequest request, McContent mcContent, McQueContent mcQueContent)
+	public static Map buildGroupsAttemptData(HttpServletRequest request, McContent mcContent, McQueContent mcQueContent, String questionUid)
 	{
-		logger.debug("will be building groups attempt data  for mcQueContent:..." + mcQueContent);
+		logger.debug("will be building groups attempt data  for mcQueContent:..." + mcQueContent + " questionUid:" + questionUid);
     	IMcService mcService =McUtils.getToolService(request);
     	Map mapMonitoredAttemptsContainerDTO= new TreeMap(new McStringComparator());
     	List listMonitoredAttemptsContainerDTO= new LinkedList();
@@ -144,7 +144,7 @@ public class MonitoringUtil implements McAppConstants{
             	{
             		List listMcUsers=mcService.getMcUserBySessionOnly(mcSession);	
             		logger.debug("listMcUsers for session id:"  + mcSession.getMcSessionId() +  " = " + listMcUsers);
-            		Map sessionUsersAttempts=populateSessionUsersAttempts(request,listMcUsers);
+            		Map sessionUsersAttempts=populateSessionUsersAttempts(request,mcSession.getMcSessionId(), listMcUsers, questionUid);
             		
             		listMonitoredAttemptsContainerDTO.add(sessionUsersAttempts);
             	}
@@ -168,8 +168,10 @@ public class MonitoringUtil implements McAppConstants{
 	 * @param listMcUsers
 	 * @return List
 	 */
-	public static Map populateSessionUsersAttempts(HttpServletRequest request,List listMcUsers)
+	public static Map populateSessionUsersAttempts(HttpServletRequest request,Long sessionId, List listMcUsers, String questionUid)
 	{
+		logger.debug("will be populating users attempt history for session id: " + sessionId);
+		
 		IMcService mcService =McUtils.getToolService(request);
 		
 		Map mapMonitoredUserContainerDTO= new TreeMap(new McStringComparator());
@@ -183,8 +185,9 @@ public class MonitoringUtil implements McAppConstants{
     		
     		if (mcQueUsr != null)
     		{
-    			logger.debug("getting listUserAttempts for user id: " + mcQueUsr.getUid());
-    			List listUserAttempts=mcService.getAttemptsForUser(mcQueUsr.getUid());
+    			logger.debug("getting listUserAttempts for user id: " + mcQueUsr.getUid() + " and que content id: " + questionUid);
+    			//List listUserAttempts=mcService.getAttemptsForUser(mcQueUsr.getUid());
+    			List listUserAttempts=mcService.getAttemptsForUserAndQuestionContent(mcQueUsr.getUid(), new Long(questionUid));
     			logger.debug("listUserAttempts: " + listUserAttempts);
 
     			Iterator itAttempts=listUserAttempts.iterator();
@@ -201,8 +204,10 @@ public class MonitoringUtil implements McAppConstants{
     	    			mcMonitoredUserDTO.setResponse(mcUsrAttempt.getMcOptionsContent().getMcQueOptionText().toString());
     	    			mcMonitoredUserDTO.setTimeZone(mcUsrAttempt.getTimeZone());
     	    			mcMonitoredUserDTO.setUid(mcUsrAttempt.getUid().toString());
-    	    			mcMonitoredUserDTO.setUserName(mcUsrAttempt.getQueUsrId().toString());
+    	    			mcMonitoredUserDTO.setUserName(mcQueUsr.getUsername());
     	    			mcMonitoredUserDTO.setQueUsrId(mcQueUsr.getUid().toString());
+    	    			mcMonitoredUserDTO.setSessionId(sessionId.toString());
+    	    			mcMonitoredUserDTO.setQuestionUid(questionUid);
     	    			listMonitoredUserContainerDTO.add(mcMonitoredUserDTO);
     	    		}
     			}
