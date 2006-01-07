@@ -55,13 +55,6 @@ import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McApplicationException;
-import org.lamsfoundation.lams.tool.mc.McContent;
-import org.lamsfoundation.lams.tool.mc.McOptsContent;
-import org.lamsfoundation.lams.tool.mc.McQueContent;
-import org.lamsfoundation.lams.tool.mc.McQueUsr;
-import org.lamsfoundation.lams.tool.mc.McSession;
-import org.lamsfoundation.lams.tool.mc.McUploadedFile;
-import org.lamsfoundation.lams.tool.mc.McUsrAttempt;
 import org.lamsfoundation.lams.tool.mc.dao.IMcContentDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcOptionsContentDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcQueContentDAO;
@@ -69,6 +62,13 @@ import org.lamsfoundation.lams.tool.mc.dao.IMcSessionDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcUploadedFileDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcUserDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcUsrAttemptDAO;
+import org.lamsfoundation.lams.tool.mc.pojos.McContent;
+import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
+import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
+import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
+import org.lamsfoundation.lams.tool.mc.pojos.McSession;
+import org.lamsfoundation.lams.tool.mc.pojos.McUploadedFile;
+import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -388,6 +388,22 @@ public class McServicePOJO implements
 	}
 
 	
+	public List getAttemptsForUser(final Long queUsrId) throws McApplicationException
+	{
+        try
+        {
+        	return mcUsrAttemptDAO.getAttemptsForUser(queUsrId);
+        }
+        catch (DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is getting the attempts by user id: "
+                                                         + e.getMessage(),
+														   e);
+        }
+		
+	}
+	
+	
 	public List getAttemptForQueContent(final Long queUsrId, final Long mcQueContentId) throws McApplicationException
 	{
         try
@@ -566,6 +582,35 @@ public class McServicePOJO implements
         }
     }
     
+    
+    public McSession findMcSessionById(Long mcSessionId) throws McApplicationException
+	{
+    	try
+        {
+            return mcSessionDAO.findMcSessionById(mcSessionId);
+        }
+        catch (DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is retrieving by id mc session : "
+                                                         + e.getMessage(),
+														   e);
+        }
+    	
+	}
+   
+    public List getMcUserBySessionOnly(final McSession mcSession) throws McApplicationException
+    {
+     	try
+        {
+            return mcUserDAO.getMcUserBySessionOnly(mcSession);
+        }
+        catch (DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is retrieving users by session: "
+                                                         + e.getMessage(),
+														   e);
+        }
+    }
     
     
     public McContent retrieveMcBySessionId(Long mcSessionId) throws McApplicationException
@@ -853,6 +898,22 @@ public class McServicePOJO implements
                                                  + " the mc options content: "
                                                  + e.getMessage(),e);
         }
+	}
+    
+    
+    public List findMcOptionNamesByQueId(Long mcQueContentId) throws McApplicationException
+	{
+    	try
+        {
+            return mcOptionsContentDAO.findMcOptionNamesByQueId(mcQueContentId);
+        }
+        catch (DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is finding"
+                                                 + " the mc options name: "
+                                                 + e.getMessage(),e);
+        }
+    	
 	}
     
     
