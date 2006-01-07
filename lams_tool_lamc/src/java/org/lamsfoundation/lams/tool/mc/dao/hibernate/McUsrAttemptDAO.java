@@ -46,6 +46,8 @@ public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemp
 	 	
 	 	private static final String LOAD_ATTEMPT_FOR_USER		 = "from mcUsrAttempt in class McUsrAttempt where mcUsrAttempt.queUsrId=:queUsrId";
 	 	
+	 	private static final String LOAD_ATTEMPT_FOR_USER_AND_QUESTION_CONTENT	 = "from mcUsrAttempt in class McUsrAttempt where mcUsrAttempt.queUsrId=:queUsrId and mcUsrAttempt.mcQueContentId=:mcQueContentId";
+	 	
 	 	private static final String LOAD_ATTEMPT_BY_ATTEMPT_ORDER = "from mcUsrAttempt in class McUsrAttempt where mcUsrAttempt.queUsrId=:queUsrId and mcUsrAttempt.mcQueContentId=:mcQueContentId and attemptOrder=:attemptOrder";
 	 	
 	 	private static final String LOAD_MARK = "from mcUsrAttempt in class McUsrAttempt";
@@ -100,6 +102,18 @@ public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemp
 			.list();
 			return list;
 	    }
+		
+		public List getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long mcQueContentId)
+	    {
+	        HibernateTemplate templ = this.getHibernateTemplate();
+	        List list = getSession().createQuery(LOAD_ATTEMPT_FOR_USER_AND_QUESTION_CONTENT)
+			.setLong("queUsrId", queUsrId.longValue())
+			.setLong("mcQueContentId", mcQueContentId.longValue())
+			.list();
+	        
+			return list;
+	    }
+		
 		
 		public List getAttemptForQueContent(final Long queUsrId, final Long mcQueContentId)
 	    {
