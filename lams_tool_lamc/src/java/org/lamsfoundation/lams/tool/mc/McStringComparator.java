@@ -45,7 +45,6 @@ public class McStringComparator implements Comparator, Serializable {
 	  }                                    
 
 	 public boolean equals(Object o) {
-	    String s = (String)o;
 	  	return compare(this, o)==0;
 	  }
 }
