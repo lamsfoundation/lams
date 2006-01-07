@@ -11,6 +11,10 @@ package org.lamsfoundation.lams.tool.mc;
 
 import java.util.Date;
 
+import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
+import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
+import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
+import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 
 

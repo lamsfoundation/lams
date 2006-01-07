@@ -9,9 +9,7 @@
 
 package org.lamsfoundation.lams.tool.mc;
 
-import java.util.Date;
-import java.util.HashSet;
-
+import org.lamsfoundation.lams.tool.mc.pojos.McSession;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 
 

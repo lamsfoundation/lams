@@ -6,7 +6,7 @@
 <hibernate-mapping>
 
 <class 
-    name="org.lamsfoundation.lams.tool.mc.McUsrAttempt" 
+    name="org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt" 
     table="tl_lamc11_usr_attempt"
 >
     <id
@@ -35,9 +35,64 @@
     >
     </property>
 
+    <property
+        name="mark"
+        type="java.lang.Integer"
+        access="property"        
+        column="mark"
+    />
+
+    <property
+        name="passed"
+        type="boolean"
+        access="property"        
+        column="passed"
+        length="1"
+    />
+
+
+    <property
+        name="attemptCorrect"
+        type="boolean"
+        access="property"        
+        column="isAttemptCorrect"
+        length="1"
+    />
+
+    <property
+    name="attemptOrder"
+    type="java.lang.Integer"
+    access="property"        
+    column="attemptOrder"
+    />
+     
+     
+ 	<property
+        name="mcQueContentId"
+        type="java.lang.Long"
+        column="mc_que_content_id"
+        not-null="true"
+   	    update="false"
+	    insert="false"
+        length="20"
+    >
+    </property>
+     
+
+ 	<property
+        name="queUsrId"
+        type="java.lang.Long"
+        column="que_usr_id"
+        not-null="true"
+   	    update="false"
+	    insert="false"
+        length="20"
+    >
+    </property>
+
     <many-to-one
         name="mcQueContent"
-        class="org.lamsfoundation.lams.tool.mc.McQueContent"
+        class="org.lamsfoundation.lams.tool.mc.pojos.McQueContent"
         not-null="true"        
    	    cascade="none"
 	    outer-join="auto"
@@ -50,7 +105,7 @@
     
     <many-to-one
         name="mcQueUsr"
-        class="org.lamsfoundation.lams.tool.mc.McQueUsr"
+        class="org.lamsfoundation.lams.tool.mc.pojos.McQueUsr"
         not-null="true"        
 	    cascade="none"
 	    outer-join="auto"
@@ -63,7 +118,7 @@
     
     <many-to-one
         name="mcOptionsContent"
-        class="org.lamsfoundation.lams.tool.mc.McOptsContent"
+        class="org.lamsfoundation.lams.tool.mc.pojos.McOptsContent"
         not-null="true"                
 	    cascade="none"
 	    outer-join="auto"

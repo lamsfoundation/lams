@@ -11,6 +11,9 @@ package org.lamsfoundation.lams.tool.mc;
 
 import java.util.HashSet;
 
+import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
+import org.lamsfoundation.lams.tool.mc.pojos.McSession;
+
 
 /**
  * This test is designed to test all service provided by SurveyQueUsr domain 

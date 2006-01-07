@@ -6,7 +6,7 @@
 <hibernate-mapping>
 
 <class 
-    name="org.lamsfoundation.lams.tool.mc.McContent" 
+    name="org.lamsfoundation.lams.tool.mc.pojos.McContent" 
     table="tl_lamc11_content"
 >
     <id
@@ -188,6 +188,7 @@
     
    	 <set
             name="mcQueContents"
+            order-by="display_order"
             lazy="true"
             inverse="true"
             cascade="all-delete-orphan"
@@ -199,7 +200,7 @@
               </key>
 
               <one-to-many
-                  class="org.lamsfoundation.lams.tool.mc.McQueContent"
+                  class="org.lamsfoundation.lams.tool.mc.pojos.McQueContent"
               />
     </set>
 
@@ -217,7 +218,25 @@
               </key>
 
               <one-to-many
-                  class="org.lamsfoundation.lams.tool.mc.McSession"
+                  class="org.lamsfoundation.lams.tool.mc.pojos.McSession"
+              />
+
+    </set>
+    
+    	<set
+            name="mcAttachments"
+            lazy="true"
+            inverse="true"
+            cascade="all-delete-orphan"
+            sort="unsorted"
+        >
+              <key
+                  column="mc_content_id"
+              >
+              </key>
+
+              <one-to-many
+                  class="org.lamsfoundation.lams.tool.mc.pojos.McUploadedFile"
               />
 
     </set>

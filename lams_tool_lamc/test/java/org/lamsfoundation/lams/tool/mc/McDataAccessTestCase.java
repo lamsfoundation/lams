@@ -9,6 +9,10 @@ import org.lamsfoundation.lams.tool.mc.dao.hibernate.McQueContentDAO;
 import org.lamsfoundation.lams.tool.mc.dao.hibernate.McSessionDAO;
 import org.lamsfoundation.lams.tool.mc.dao.hibernate.McUserDAO;
 import org.lamsfoundation.lams.tool.mc.dao.hibernate.McUsrAttemptDAO;
+import org.lamsfoundation.lams.tool.mc.pojos.McContent;
+import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
+import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
+import org.lamsfoundation.lams.tool.mc.pojos.McSession;
 
 /**
  * @author ozgurd

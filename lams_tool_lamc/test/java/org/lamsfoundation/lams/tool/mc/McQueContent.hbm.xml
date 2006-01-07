@@ -12,7 +12,7 @@
 -->
 
 <class 
-    name="org.lamsfoundation.lams.tool.mc.McQueContent" 
+    name="org.lamsfoundation.lams.tool.mc.pojos.McQueContent" 
     table="tl_lamc11_que_content"
 >
     <id
@@ -82,7 +82,7 @@
     
     <many-to-one
         name="mcContent"
-        class="org.lamsfoundation.lams.tool.mc.McContent"
+        class="org.lamsfoundation.lams.tool.mc.pojos.McContent"
         not-null="true"        
 	    cascade="none"
 	    outer-join="auto"
@@ -94,7 +94,6 @@
     </many-to-one>
     
     
-    <!-- bi-directional one-to-many association to TlLamc11OptionsContent -->
     <set
         name="mcOptionsContents"
         lazy="true"
@@ -105,7 +104,7 @@
             <column name="mc_que_content_id" />
         </key>
         <one-to-many 
-            class="org.lamsfoundation.lams.tool.mc.McOptsContent"
+            class="org.lamsfoundation.lams.tool.mc.pojos.McOptsContent"
         />
     </set>
     
@@ -121,11 +120,9 @@
             <column name="mc_que_content_id" />
         </key>
         <one-to-many 
-            class="org.lamsfoundation.lams.tool.mc.McUsrAttempt"
+            class="org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt"
         />
     </set>
-    
-    
     
 </class>
 </hibernate-mapping>
