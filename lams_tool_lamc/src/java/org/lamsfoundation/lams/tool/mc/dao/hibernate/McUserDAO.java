@@ -24,9 +24,9 @@ package org.lamsfoundation.lams.tool.mc.dao.hibernate;
 import java.util.List;
 
 import org.hibernate.FlushMode;
-import org.lamsfoundation.lams.tool.mc.McQueUsr;
-import org.lamsfoundation.lams.tool.mc.McSession;
 import org.lamsfoundation.lams.tool.mc.dao.IMcUserDAO;
+import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
+import org.lamsfoundation.lams.tool.mc.pojos.McSession;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
@@ -39,6 +39,8 @@ public class McUserDAO extends HibernateDaoSupport implements IMcUserDAO {
 	private static final String FIND_MC_USR_CONTENT = "from " + McQueUsr.class.getName() + " as mcu where que_usr_id=?";
 	
 	private static final String COUNT_USERS_IN_SESSION = "select mu.queUsrId from McQueUsr mu where mu.mcSession= :mcSession";
+	
+	private static final String LOAD_USER_FOR_SESSION = "from mcQueUsr in class McQueUsr where  mcQueUsr.mcSessionId= :mcSessionId";
    
     
    public McQueUsr getMcUserByUID(Long uid)
@@ -64,6 +66,15 @@ public class McUserDAO extends HibernateDaoSupport implements IMcUserDAO {
 		return null;
 	}
 	
+	
+	public List getMcUserBySessionOnly(final McSession mcSession)
+    {
+        HibernateTemplate templ = this.getHibernateTemplate();
+        List list = getSession().createQuery(LOAD_USER_FOR_SESSION)
+		.setLong("mcSessionId", mcSession.getUid().longValue())				
+		.list();
+		return list;
+    }
 	
 	public McQueUsr getMcUserBySession(Long userId, Long sessionId)
 	{
