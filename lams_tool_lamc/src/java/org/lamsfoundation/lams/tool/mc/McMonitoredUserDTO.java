@@ -46,6 +46,10 @@ public class McMonitoredUserDTO implements Comparable
 	private String isCorrect;
 	
 	private String response;
+	
+	private String sessionId;
+	
+	private String questionUid;
     
     private Map usersAttempts;
 	
@@ -160,5 +164,29 @@ public class McMonitoredUserDTO implements Comparable
 	 */
 	public void setUserName(String userName) {
 		this.userName = userName;
+	}
+	/**
+	 * @return Returns the sessionId.
+	 */
+	public String getSessionId() {
+		return sessionId;
+	}
+	/**
+	 * @param sessionId The sessionId to set.
+	 */
+	public void setSessionId(String sessionId) {
+		this.sessionId = sessionId;
+	}
+	/**
+	 * @return Returns the questionUid.
+	 */
+	public String getQuestionUid() {
+		return questionUid;
+	}
+	/**
+	 * @param questionUid The questionUid to set.
+	 */
+	public void setQuestionUid(String questionUid) {
+		this.questionUid = questionUid;
 	}
 }
