@@ -15,13 +15,13 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McComparator;
-import org.lamsfoundation.lams.tool.mc.McContent;
-import org.lamsfoundation.lams.tool.mc.McOptsContent;
-import org.lamsfoundation.lams.tool.mc.McQueContent;
-import org.lamsfoundation.lams.tool.mc.McQueUsr;
-import org.lamsfoundation.lams.tool.mc.McSession;
-import org.lamsfoundation.lams.tool.mc.McUsrAttempt;
 import org.lamsfoundation.lams.tool.mc.McUtils;
+import org.lamsfoundation.lams.tool.mc.pojos.McContent;
+import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
+import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
+import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
+import org.lamsfoundation.lams.tool.mc.pojos.McSession;
+import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 
 /**
