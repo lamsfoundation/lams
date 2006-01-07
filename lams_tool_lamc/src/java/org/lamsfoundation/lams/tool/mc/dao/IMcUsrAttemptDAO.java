@@ -127,6 +127,8 @@ public interface IMcUsrAttemptDAO
 	
 	public List getAttemptsForUser(final Long queUsrId);
 	
+	public List getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long mcQueContentId);
+	
 	public List getMarks();
 }
 
