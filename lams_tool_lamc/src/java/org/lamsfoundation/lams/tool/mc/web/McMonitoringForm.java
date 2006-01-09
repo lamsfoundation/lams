@@ -10,22 +10,13 @@ import org.lamsfoundation.lams.tool.mc.McAppConstants;
  * ActionForm for the Monitoring environment
  */
 public class McMonitoringForm extends ActionForm implements McAppConstants {
-	// dispatch controls which method is called by the Lookup map */
-	protected String dispatch;
+	// dsp controls which method is called by the Lookup map */
+	protected String dsp;
+	
+	protected String selectedToolSessionId;
 	
 	protected String isToolSessionChanged;
-	/**
-	 * @return Returns the dispatch.
-	 */
-	public String getDispatch() {
-		return dispatch;
-	}
-	/**
-	 * @param dispatch The dispatch to set.
-	 */
-	public void setDispatch(String dispatch) {
-		this.dispatch = dispatch;
-	}
+	
 	/**
 	 * @return Returns the isToolSessionChanged.
 	 */
@@ -37,5 +28,30 @@ public class McMonitoringForm extends ActionForm implements McAppConstants {
 	 */
 	public void setIsToolSessionChanged(String isToolSessionChanged) {
 		this.isToolSessionChanged = isToolSessionChanged;
+	}
+	/**
+	 * @return Returns the selectedToolSessionId.
+	 */
+	public String getSelectedToolSessionId() {
+		return selectedToolSessionId;
+	}
+	/**
+	 * @param selectedToolSessionId The selectedToolSessionId to set.
+	 */
+	public void setSelectedToolSessionId(String selectedToolSessionId) {
+		this.selectedToolSessionId = selectedToolSessionId;
+	}
+	
+	/**
+	 * @return Returns the dsp.
+	 */
+	public String getDsp() {
+		return dsp;
+	}
+	/**
+	 * @param dsp The dsp to set.
+	 */
+	public void setDsp(String dsp) {
+		this.dsp = dsp;
 	}
 }
