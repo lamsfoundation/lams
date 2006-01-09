@@ -85,6 +85,7 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 		}
 		
 		
+		/* this section is related to summary tab. Starts here. */ 
 		request.getSession().setAttribute(SUMMARY_TOOL_SESSIONS, summaryToolSessions);
 	    logger.debug("SUMMARY_TOOL_SESSIONS: " + request.getSession().getAttribute(SUMMARY_TOOL_SESSIONS));
 	    
@@ -100,8 +101,42 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 	    
 	    request.getSession().setAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO, listMonitoredAnswersContainerDTO);
 	    logger.debug("LIST_MONITORED_ANSWERS_CONTAINER_DTO: " + request.getSession().getAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO));
+	    /* ends here*/
 	    
-	    //MonitoringUtil.buildGroupsSessionData(request, mcContent);
+
+	    /* this section is related to instructions tab. Starts here. */
+	    request.getSession().setAttribute(RICHTEXT_ONLINEINSTRUCTIONS,mcContent.getOnlineInstructions());
+	    request.getSession().setAttribute(RICHTEXT_OFFLINEINSTRUCTIONS,mcContent.getOfflineInstructions());
+	    /* ends here. */
+
+	    
+	    /* this section is related to Stats tab. Starts here. */
+	    int countAllUsers=mcService.getTotalNumberOfUsers();
+		logger.debug("countAllUsers: " + countAllUsers);
+	    
+		int countSessionComplete=mcService.countSessionComplete();
+		logger.debug("countSessionComplete: " + countSessionComplete);
+		
+		int countMaxAttempt=1;
+		logger.debug("countMaxAttempt: " + countMaxAttempt);
+		
+		int topMark=LearningUtil.getTopMark(request);
+		logger.debug("topMark: " + topMark);
+		
+		int lowestMark=LearningUtil.getLowestMark(request);
+		logger.debug("lowestMark: " + lowestMark);
+		
+		int averageMark=LearningUtil.getAverageMark(request);
+		logger.debug("averageMark: " + averageMark);
+		
+		request.getSession().setAttribute(COUNT_ALL_USERS, new Integer(countAllUsers).toString());
+		request.getSession().setAttribute(COUNT_SESSION_COMPLETE, new Integer(countSessionComplete).toString());
+		request.getSession().setAttribute(COUNT_MAX_ATTEMPT, new Integer(countMaxAttempt).toString());
+		request.getSession().setAttribute(TOP_MARK, new Integer(topMark).toString());
+		request.getSession().setAttribute(LOWEST_MARK, new Integer(lowestMark).toString());
+		request.getSession().setAttribute(AVERAGE_MARK, new Integer(averageMark).toString());
+		/* ends here. */
+	    
 	    
 	    logger.debug("forwarding to: " + LOAD_MONITORING);
 	    return (mapping.findForward(LOAD_MONITORING));	
