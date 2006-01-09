@@ -247,7 +247,10 @@ public interface McAppConstants {
     public static final String LIST_ONLINEFILES_METADATA				="listOnlineFilesMetadata";
     public static final String POPULATED_UPLOADED_FILESDATA				="populateUploadedFilesData";
     
+    
     public static final String COUNT_SESSION_COMPLETE					="countSessionComplete";
+    public static final String COUNT_ALL_USERS							="countAllUsers";
+    public static final String COUNT_MAX_ATTEMPT						="countMaxAttempt";
     public static final String TOP_MARK									="topMark";
     public static final String LOWEST_MARK								="lowestMark";
     public static final String AVERAGE_MARK								="averageMark";
