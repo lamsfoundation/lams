@@ -6,4 +6,30 @@
 <%@ taglib uri="tags-fck-editor" prefix="FCK" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
-This is instructions content
+		<table align="left">
+			<tr> 
+				<td NOWRAP class="formlabel" valign=top>
+	  				<b> <bean:message key="label.offlineInstructions.col" /> </b>
+	  			</td>
+				<td NOWRAP class="formlabel" valign=top>
+					  <c:out value="${richTextOfflineInstructions}" escapeXml="false" />						  
+				</td> 
+			</tr>
+			
+			<tr>
+				<td colspan=2> &nbsp&nbsp&nbsp </td>
+			</tr>
+			<tr>
+				<td colspan=2> &nbsp&nbsp&nbsp </td>
+			</tr>
+	
+			<tr> 
+				<td NOWRAP class="formlabel" valign=top>
+	  				<b> <bean:message key="label.onlineInstructions.col" /> </b>
+	  			</td>
+				<td NOWRAP class="formlabel" valign=top>
+					  <c:out value="${sessionScope.richTextOnlineInstructions}" escapeXml="false" />						  
+				</td> 
+			</tr>
+		</table>
+
