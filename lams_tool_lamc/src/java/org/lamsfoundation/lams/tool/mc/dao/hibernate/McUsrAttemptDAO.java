@@ -52,6 +52,8 @@ public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemp
 	 	
 	 	private static final String LOAD_MARK = "from mcUsrAttempt in class McUsrAttempt";
 	 	
+	 	private static final String LOAD_HIGHEST_MARK = "from mcUsrAttempt in class McUsrAttempt";
+	 	
 	 	public McUsrAttempt getMcUserAttemptByUID(Long uid)
 		{
 			 return (McUsrAttempt) this.getHibernateTemplate()
@@ -73,7 +75,6 @@ public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemp
 			return list;
 	    }
 		
-
 		public List getMarks()
 	    {
 	        HibernateTemplate templ = this.getHibernateTemplate();
