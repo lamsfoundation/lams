@@ -89,5 +89,7 @@ public interface IMcUserDAO {
     public int getNumberOfUsers(McSession mcSession);
     
     public List getMcUserBySessionOnly(final McSession mcSession);
+    
+    public int getTotalNumberOfUsers();
    
 }
