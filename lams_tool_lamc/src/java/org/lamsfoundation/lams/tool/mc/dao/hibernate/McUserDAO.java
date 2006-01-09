@@ -40,6 +40,8 @@ public class McUserDAO extends HibernateDaoSupport implements IMcUserDAO {
 	
 	private static final String COUNT_USERS_IN_SESSION = "select mu.queUsrId from McQueUsr mu where mu.mcSession= :mcSession";
 	
+	private static final String COUNT_USERS = "select mu.queUsrId from McQueUsr";
+	
 	private static final String LOAD_USER_FOR_SESSION = "from mcQueUsr in class McQueUsr where  mcQueUsr.mcSessionId= :mcSessionId";
    
     
@@ -142,5 +144,11 @@ public class McUserDAO extends HibernateDaoSupport implements IMcUserDAO {
 	            "mcSession",
 				mcSession)).size();
     }  
+    
+    
+    public int getTotalNumberOfUsers() {
+		String query="from obj in class McQueUsr"; 
+		return this.getHibernateTemplate().find(query).size();
+	}
     
 }
