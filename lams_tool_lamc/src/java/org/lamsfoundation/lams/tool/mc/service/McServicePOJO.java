@@ -962,6 +962,21 @@ public class McServicePOJO implements
 	}
 
     
+    public int getTotalNumberOfUsers() throws McApplicationException
+	{
+ 	   try
+       {
+	   		return mcUserDAO.getTotalNumberOfUsers();
+       }
+       catch (DataAccessException e)
+       {
+           throw new McApplicationException("Exception occured when lams is retrieving total number of McQueUsr: "
+                                                        + e.getMessage(),
+														   e);
+       }
+    	
+	}
+    
     public User getCurrentUserData(String username) throws McApplicationException
     {
         try
