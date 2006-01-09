@@ -63,7 +63,7 @@
     <!-- bi-directional one-to-many association to Activity -->
     <set
         name="activities"
-        lazy="false"
+        lazy="true"
         inverse="true"
 		cascade="none"
     >
