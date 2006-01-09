@@ -28,6 +28,20 @@
 	<lams:css/>
 	<script language="JavaScript" type="text/JavaScript">
 
+		// general submit
+		// actionMethod: name of the method to be called in the DispatchAction
+		function submitMonitoringMethod(actionMethod) 
+		{
+			document.McMonitoringForm.dsp.value=actionMethod; 
+			document.McMonitoringForm.submit();
+		}
+		
+		function submitSession(selectedToolSessionId, actionMethod) {
+			document.McMonitoringForm.selectedToolSessionId.value=selectedToolSessionId; 
+			alert(actionMethod);
+			submitMonitoringMethod(actionMethod);
+		}
+		
 		function MM_reloadPage(init) {  //reloads the window if Nav4 resized
 		  if (init==true) with (navigator) {if ((appName=="Netscape")&&(parseInt(appVersion)==4)) {
 		    document.MM_pgW=innerWidth; document.MM_pgH=innerHeight; onresize=MM_reloadPage; }}
@@ -35,7 +49,8 @@
 		}
 		MM_reloadPage(true);
 		//-->
-	</script>
+	</script>	
+	
 </head>
 <body onLoad="initTabs()">
 
@@ -93,8 +108,7 @@
 	
 	<!-- end tab buttons -->
 	<html:form  action="/monitoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">
-	 
-		<html:hidden property="dispatch"/>
+	<html:hidden property="dsp"/>	 
 		<div id='content_b' class="tabbody content_b" >
 		
 				<h2><bean:message key="button.summary"/></h2>
