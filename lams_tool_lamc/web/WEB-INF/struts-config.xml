@@ -207,7 +207,11 @@
    <action 	path="/monitoring" 
    			type="org.lamsfoundation.lams.tool.mc.web.McMonitoringAction" 
    			name="McMonitoringForm" 
-   			input=".monitoringContent"> 
+	      	scope="session"
+   			input=".monitoringContent"
+      		parameter="dsp"
+      		unknown="false"
+      		validate="true"> 
 
 	  	<forward
 		    name="loadMonitoring"
