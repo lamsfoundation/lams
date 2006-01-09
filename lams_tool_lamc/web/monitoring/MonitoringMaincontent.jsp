@@ -38,7 +38,6 @@
 		
 		function submitSession(selectedToolSessionId, actionMethod) {
 			document.McMonitoringForm.selectedToolSessionId.value=selectedToolSessionId; 
-			alert(actionMethod);
 			submitMonitoringMethod(actionMethod);
 		}
 		
