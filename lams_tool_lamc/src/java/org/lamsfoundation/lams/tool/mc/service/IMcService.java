@@ -142,6 +142,8 @@ public interface IMcService
     public void deleteMcOptionsContentByUID(Long uid) throws McApplicationException;
 	
 	public User getCurrentUserData(String username) throws McApplicationException;
+	
+	public int getTotalNumberOfUsers() throws McApplicationException;
     
     public Lesson getCurrentLesson(long lessonId) throws McApplicationException;
     
