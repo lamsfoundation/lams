@@ -268,8 +268,8 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
     	  public ActionForward save(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws NbApplicationException {
     			
     			NbAuthoringForm nbForm = (NbAuthoringForm)form;
-    			copyAuthoringFormValuesIntoFormBean(request, nbForm);
-
+    			//copyAuthoringFormValuesIntoFormBean(request, nbForm);
+    		
     			INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
     			String idAsString = nbForm.getToolContentID();
     			if (idAsString == null)
@@ -385,7 +385,7 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
     		    	//set up the values in the map
     		    	//call the uploadFile method from toolContentHandler
     		    	NbAuthoringForm nbForm = (NbAuthoringForm)form;
-    		    	copyAuthoringFormValuesIntoFormBean(request, nbForm);
+    		    	//copyAuthoringFormValuesIntoFormBean(request, nbForm);
     		    	FormFile theFile;
     		    	INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
     				
@@ -403,7 +403,7 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
     				{
     			    	boolean isOnlineFile = ((nbForm.getOnlineFile() != null && (nbForm.getOnlineFile().getFileName().trim().length() != 0)) ? true: false );
     			    	theFile = (isOnlineFile ? nbForm.getOnlineFile() : nbForm.getOfflineFile());
-    			    	String fileType = isOnlineFile ? NoticeboardAttachment.TYPE_ONLINE : NoticeboardAttachment.TYPE_OFFLINE;
+    			    	String fileType = isOnlineFile ? IToolContentHandler.TYPE_ONLINE : IToolContentHandler.TYPE_OFFLINE;
 
     					List attachmentList = (List) request.getSession().getAttribute(NoticeboardConstants.ATTACHMENT_LIST);
     			    	List deletedAttachmentList = (List) request.getSession().getAttribute(NoticeboardConstants.DELETED_ATTACHMENT_LIST);
@@ -543,7 +543,7 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
     		 * @param request HttpServlet request
     		 * @param form The ActionForm class containing data submitted by the forms.
     		 */
-    		private void copyAuthoringFormValuesIntoFormBean(HttpServletRequest request, NbAuthoringForm form)
+    	/*	private void copyAuthoringFormValuesIntoFormBean(HttpServletRequest request, NbAuthoringForm form)
     		{
     		    String onlineInstruction = WebUtil.readStrParam(request, NoticeboardConstants.RICH_TEXT_ONLINE_INSTRN, true);
     		    String offlineInstruction = WebUtil.readStrParam(request, NoticeboardConstants.RICH_TEXT_OFFLINE_INSTRN, true);
@@ -559,7 +559,7 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
     		  	
     		  	    form.setOfflineInstructions(offlineInstruction);
     		  
-    		} 
+    		}  */
     		
     	/*	private void copyFormValuesIntoNbContent(HttpServletRequest request, NoticeboardContent nbContent)
     		{
