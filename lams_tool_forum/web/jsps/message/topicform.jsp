@@ -21,10 +21,10 @@
 	</tr>
 		<td>&nbsp;&nbsp;
 			<html:submit>
-				<bean:message key="button.submit" />
+				<bean:message key="button.add" />
 			</html:submit>
 			<html:button property="cancel" onclick="javascript:window.parent.hideMessage()">
-				<bean:message key="button.submit" />
+				<bean:message key="button.cancel" />
 			</html:button>
 		</td>
 	</tr>

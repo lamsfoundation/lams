@@ -2,7 +2,7 @@
 <%@ taglib uri="tags-tiles" prefix="tiles"%>
 <html>
 <tiles:insert attribute="header" />
-<body>
+<body >
 
 	<tiles:useAttribute name="pageTitleKey" scope="request" />
 	<bean:define name="pageTitleKey" id="pTitleKey" type="String" />

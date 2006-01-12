@@ -8,13 +8,15 @@
 	function showMessage(url) {
 		var area=document.getElementById("messageArea");
 		area.style.width="100%";
-		area.style.height="500px";
+		area.style.height="100%";
 		area.src=url;
+		area.style.display="block";
 	}
 	function hideMessage(){
 		var area=document.getElementById("messageArea");
 		area.style.width="0px";
 		area.style.height="0px";
+		area.style.display="none";
 	}
 </script>
 <!---------------------------Basic Tab Content ------------------------>
@@ -66,7 +68,8 @@
 	</tr>
 		<tr>
 	<td colspan="2">
-		<iframe id="messageArea" name="messageArea" style="width:0px;height:0px;border:0px" scrolling="no">
+		<iframe onload="javascript:this.style.height=this.contentWindow.document.body.scrollHeight+'px'" 
+		id="messageArea" name="messageArea" style="width:0px;height:0px;border:0px;display:none" frameborder="no"  scrolling="no">
 		</iframe>
 	</td>
 	</tr>

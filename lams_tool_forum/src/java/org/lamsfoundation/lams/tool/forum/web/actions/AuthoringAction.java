@@ -21,7 +21,6 @@
 package org.lamsfoundation.lams.tool.forum.web.actions;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Date;
@@ -45,7 +44,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.upload.FormFile;
-import org.apache.struts.upload.MultipartRequestWrapper;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.forum.dto.MessageDTO;
 import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
@@ -623,7 +621,7 @@ public class AuthoringAction extends Action {
     	}
 		
 		request.setAttribute(ForumConstants.SUCCESS_FLAG,"DELETE_SUCCESS");
-		return mapping.getInputForward();
+		return mapping.findForward("success");
 	}
     /**
      * Diplay a special topic information. Only display author created root message content,  even this topic already
@@ -656,7 +654,7 @@ public class AuthoringAction extends Action {
 			request.setAttribute(ForumConstants.AUTHORING_TOPIC,topic);
     	}
 		
-    	return ajaxExecute(mapping.findForward("success"),null,request,response);
+    	return mapping.findForward("success");
     	
     }
     /**
@@ -688,7 +686,7 @@ public class AuthoringAction extends Action {
 					UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 					Long topicAuthorId = topic.getMessage().getCreatedBy().getUserId();
 					if(!(new Long(user.getUserID().intValue()).equals(topicAuthorId)))
-						return ajaxExecute(mapping.findForward("forbiden"),null,request,response);
+						return mapping.findForward("forbiden");
 				}
 				//update message to HTML Form to echo back to web page: for subject, body display
 				msgForm.setMessage(topic.getMessage());
@@ -698,7 +696,7 @@ public class AuthoringAction extends Action {
     	}
 		
 		request.setAttribute(ForumConstants.AUTHORING_TOPICS_INDEX,topicIndex);
-    	return ajaxExecute(mapping.findForward("success"),form,request,response);
+    	return mapping.findForward("success");
     }
     
     /**
@@ -746,7 +744,7 @@ public class AuthoringAction extends Action {
 		
 		request.setAttribute(ForumConstants.AUTHORING_TOPICS_INDEX,topicIndex);
 		request.setAttribute(ForumConstants.SUCCESS_FLAG,"EDIT_SUCCESS");
-    	return ajaxExecute(mapping.findForward("success"),null,request,response);
+		return mapping.findForward("success");
     }
     /**
      * Delete a topic's attachment file. This update will be submit to database only when user
@@ -798,7 +796,7 @@ public class AuthoringAction extends Action {
 
     	String mode = (String) request.getSession().getAttribute(ForumConstants.MODE);
     	if(StringUtils.equals(mode,ForumConstants.AUTHOR_MODE))
-    		return ajaxExecute(mapping.findForward("author"),null,request,response);
+    		return mapping.findForward("author");
     	else
     		return mapping.findForward("monitor");
     	
@@ -886,38 +884,5 @@ public class AuthoringAction extends Action {
 		}
 		return list;
 	}
-	
-	/**
-	 * @param request
-	 * @param response
-	 * @param path
-	 * 		The relative URL path infomation to response
-	 */
-	private ActionForward ajaxExecute(ActionForward forward, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) {
-		if(form != null)
-			request.setAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY,form);
-		
-		//MutlipartRequestWrapper is special for STRUTS, get back the original HttpServletRequest
-		// to avoid exception in dispatcher.forward() method.
-		if(request instanceof MultipartRequestWrapper){
-			request = ((MultipartRequestWrapper) request).getRequest();
-		}
-		try {
-			if (forward != null) {
-				return forward;
-//				String path = forward.getPath();
-//				RequestDispatcher dispatcher = request.getRequestDispatcher(path);
-//				dispatcher.forward(request, response);
-			} else {
-				OutputStream out = response.getOutputStream();
-				out.write(new byte[0]);
-				out.flush();
-			}
-		} catch (IOException e) {
-			log.error(e);
-		}
-		//it always return null
-		return null;
-	}
+
 }

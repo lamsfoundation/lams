@@ -43,14 +43,17 @@
 				</c:set> 
 				<html:link href="${edittopic}">
 					<b><fmt:message key="label.edit" /></b>
-				</html:link>
+				</html:link>&nbsp;&nbsp;
 				
 				<c:set var="deletetopic">
 					<html:rewrite page="/authoring/deleteTopic.do?topicIndex=${topicIndex}" />
 				</c:set> 
 				<html:link href="${deletetopic}">
-					<b><fmt:message key="label.delete" /></b>
-				</html:link>
+					<b><fmt:message key="label.delete" />
+				</html:link> &nbsp;&nbsp;
+				<html:link href="javascript:window.parent.hideMessage()">
+					<fmt:message key="button.cancel" />
+				</html:link></b>
 			</td>
 		</tr>
 	</table>

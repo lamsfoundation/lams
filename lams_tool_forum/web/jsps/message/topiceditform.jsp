@@ -46,6 +46,9 @@
 			</html:submit>
 		</td>
 		<td>
+			<html:button property="cancel" onclick="javascript:window.parent.hideMessage()">
+				<bean:message key="button.cancel" />
+			</html:button>
 		</td>
 	</tr>
 </table>

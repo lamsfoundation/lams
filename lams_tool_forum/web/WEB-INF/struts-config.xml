@@ -126,8 +126,8 @@
 		</action>
 		<action path="/authoring/deleteTopic"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
-			input="tiles:/authoring/forum/viewTopic" 
 			parameter="deleteTopic">
+			<forward name="success" path="/jsps/authoring/message/delete.jsp" />
 		</action>
 		<action path="/authoring/viewTopic"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
