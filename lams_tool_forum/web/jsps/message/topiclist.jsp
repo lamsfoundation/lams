@@ -1,15 +1,5 @@
+<%@ include file="/includes/taglibs.jsp" %>
 <div align="center">
-<script type="text/javascript">
-	function popupable(url,name){
-	if(window.opener != null || (typeof popFobidden != "undefined"))
-		//it is already a popup window, then just load it
-//		location.href=url;
-		launchPopup(url,name);
-	else
-		//it is not in popup window, so pops it up
-		launchPopup(url,name);
-	}
-</script>
 <div id="topiclist">
 	<div id="datatablecontainer">
 	<table width="100%" align="CENTER" 	class="form">
@@ -28,7 +18,7 @@
 					<c:set var="viewtopic">
 						<html:rewrite page="/authoring/viewTopic.do?topicIndex=${status.index}&create=${topic.message.created.time}" />
 					</c:set> 
-					<html:link href="javascript:popupable('${viewtopic}','topiclist')">
+					<html:link href="javascript:showMessage('${viewtopic}')">
 						<c:out value="${topic.message.subject}" />
 					</html:link>
 				</td>

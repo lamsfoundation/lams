@@ -5,18 +5,16 @@
 	/**
 	 * Launches the popup window for the instruction files
 	 */
-	function launchPopup(url) {
-		var instructionsWindow = null;
-// add the mac test back in when we have the platform detection working.
-//		if(mac){
-//			window.open(url,'instructions','resizable,width=796,height=570,scrollbars');
-//		}else{
-			if(instructionsWindow && instructionsWindow.open && !instructionsWindow.closed){
-				instructionsWindow.close();
-			}
-			instructionsWindow = window.open(url,'newtopic','resizable,width=796,height=570,scrollbars');
-			instructionsWindow.window.focus();
-//		}	
+	function showMessage(url) {
+		var area=document.getElementById("messageArea");
+		area.style.width="100%";
+		area.style.height="500px";
+		area.src=url;
+	}
+	function hideMessage(){
+		var area=document.getElementById("messageArea");
+		area.style.width="0px";
+		area.style.height="0px";
 	}
 </script>
 <!---------------------------Basic Tab Content ------------------------>
@@ -38,12 +36,12 @@
 	</tr>
 	<!-- Topics List Row -->
 	<tr>
-		<td colspan="2" class="formcontrol"><c:if test="${!empty topicList}">
-			<%@ include file="/jsps/message/topiclist.jsp" %>
-		</c:if></td>
+		<td colspan="2" class="formlabel">
+		<div id="messageListArea"></div>
+		</td>
 	</tr>
 	<td colspan="2" align="left">
-			<a href="javascript:launchPopup('<html:rewrite page="/authoring/newTopic.do"/>');">
+			<a href="javascript:showMessage('<html:rewrite page="/authoring/newTopic.do"/>');">
 				<fmt:message key="label.authoring.create.new.topic" />
 			</a>
 		</td>
@@ -51,19 +49,27 @@
 	<tr>
 		<td colspan="2"><html:errors /></td>
 	</tr>
+	<tr>
+	<td colspan="2">
+	<!-- Button Row -->
+	<HR>
+	<p align="right">
+		<html:submit property="save" styleClass="a.button">
+			<fmt:message key="label.authoring.save.button" />
+		</html:submit>
+		<html:button property="cancel"
+			onclick="window.close()" styleClass="a.button">
+			<fmt:message key="label.authoring.cancel.button" />
+		</html:button>
+	</p>
+	</td>
+	</tr>
+		<tr>
+	<td colspan="2">
+		<iframe id="messageArea" name="messageArea" style="width:0px;height:0px;border:0px" scrolling="no">
+		</iframe>
+	</td>
+	</tr>
 	</table>
-
-		<!-- Button Row -->
-		<HR>
-		<p align="right">
-			<html:submit property="save" styleClass="a.button">
-				<fmt:message key="label.authoring.save.button" />
-			</html:submit>
-			<html:button property="cancel"
-				onclick="window.close()" styleClass="a.button">
-				<fmt:message key="label.authoring.cancel.button" />
-			</html:button>
-		</p>
-</table>
 
 </div>

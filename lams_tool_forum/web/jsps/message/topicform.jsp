@@ -23,6 +23,9 @@
 			<html:submit>
 				<bean:message key="button.submit" />
 			</html:submit>
+			<html:button property="cancel" onclick="javascript:window.parent.hideMessage()">
+				<bean:message key="button.submit" />
+			</html:button>
 		</td>
 	</tr>
 </table>

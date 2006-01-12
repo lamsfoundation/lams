@@ -1,14 +1,4 @@
 <div align="center">
-<script type="text/javascript" src="<html:rewrite page='/includes/scripts.jsp'/>"></script>
-<script type="text/javascript">
-	function success(){
-		var flag = "<c:out value="${SUCCESS_FLAG}"/>";
-		if(flag == "DELETE_SUCCESS"){
-			closeWin();
-		}
-	}
-	success();
-</script>
 
 <div id="topicview">
 	<div id="datatablecontainer">

@@ -35,7 +35,12 @@ function processReqChange(target) {
     if (req.readyState == 4) {
         // only if "OK"
         if (req.status == 200) {
-			var select = document.getElementById(target);
+	        var select;
+        	if(typeof target.id != "undefined")
+        		select = target;
+        	else
+				select = document.getElementById(target);
+				
 			select.innerHTML = req.responseText;
          } else {
             alert("There was a problem retrieving the XML data:\n" +

@@ -124,6 +124,12 @@
 			<forward name="success" path="/authoring/viewTopic.do" />
 		</action>
 		
+		<action path="/authoring/refreshTopic"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
+			parameter="refreshTopic" >
+			<forward name="author" path="/jsps/message/topiclist.jsp" />
+			<forward name="monitor" path="tiles:/monitoring/forum/defineLater" />
+		</action>
 		<action path="/authoring/finishTopic"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
 			input="tiles:/authoring/forum/create" 

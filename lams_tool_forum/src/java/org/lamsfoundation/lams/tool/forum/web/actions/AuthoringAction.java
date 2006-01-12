@@ -21,6 +21,7 @@
 package org.lamsfoundation.lams.tool.forum.web.actions;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Date;
@@ -44,6 +45,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.upload.FormFile;
+import org.apache.struts.upload.MultipartRequestWrapper;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.forum.dto.MessageDTO;
 import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
@@ -120,6 +122,9 @@ public class AuthoringAction extends Action {
         }
         if (param.equals("deleteAttachment")) {
         	return deleteAttachment(mapping, form, request, response);
+        }
+        if (param.equals("refreshTopic")) {
+        	return refreshTopic(mapping, form, request, response);
         }
         if (param.equals("finishTopic")) {
        		return finishTopic(mapping, form, request, response);
@@ -219,7 +224,7 @@ public class AuthoringAction extends Action {
 				forumService.createUser(forumUser);
 			}
 			
-			//**********************************Handle Attachement*********************
+			//**********************************Get Forum PO*********************
 			Forum forumPO = forumService.getForumByContentId(forumForm.getToolContentID());
 			if(forumPO == null || !forumForm.getToolContentID().equals(forum.getContentId()) ){
 				//new Forum, create it.
@@ -233,6 +238,7 @@ public class AuthoringAction extends Action {
 			}
 			forumPO.setCreatedBy(forumUser);
 			
+			//**********************************Handle Attachement*********************
 	    	//merge attachment info
 			Set attPOSet = forumPO.getAttachments();
 			if(attPOSet == null)
@@ -650,7 +656,7 @@ public class AuthoringAction extends Action {
 			request.setAttribute(ForumConstants.AUTHORING_TOPIC,topic);
     	}
 		
-    	return mapping.findForward("success");
+    	return ajaxExecute(mapping.findForward("success"),null,request,response);
     	
     }
     /**
@@ -682,7 +688,7 @@ public class AuthoringAction extends Action {
 					UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 					Long topicAuthorId = topic.getMessage().getCreatedBy().getUserId();
 					if(!(new Long(user.getUserID().intValue()).equals(topicAuthorId)))
-						return mapping.findForward("forbiden");
+						return ajaxExecute(mapping.findForward("forbiden"),null,request,response);
 				}
 				//update message to HTML Form to echo back to web page: for subject, body display
 				msgForm.setMessage(topic.getMessage());
@@ -692,7 +698,7 @@ public class AuthoringAction extends Action {
     	}
 		
 		request.setAttribute(ForumConstants.AUTHORING_TOPICS_INDEX,topicIndex);
-    	return mapping.findForward("success");
+    	return ajaxExecute(mapping.findForward("success"),form,request,response);
     }
     
     /**
@@ -740,7 +746,7 @@ public class AuthoringAction extends Action {
 		
 		request.setAttribute(ForumConstants.AUTHORING_TOPICS_INDEX,topicIndex);
 		request.setAttribute(ForumConstants.SUCCESS_FLAG,"EDIT_SUCCESS");
-		return mapping.findForward("success");
+    	return ajaxExecute(mapping.findForward("success"),null,request,response);
     }
     /**
      * Delete a topic's attachment file. This update will be submit to database only when user
@@ -785,6 +791,17 @@ public class AuthoringAction extends Action {
 		request.setAttribute(ForumConstants.SUCCESS_FLAG,"ATT_SUCCESS_FLAG");
 		request.setAttribute(ForumConstants.AUTHORING_TOPICS_INDEX,topicIndex);
     	return mapping.findForward("success");
+    }
+    
+    public ActionForward refreshTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    		HttpServletResponse response) throws PersistenceException {
+
+    	String mode = (String) request.getSession().getAttribute(ForumConstants.MODE);
+    	if(StringUtils.equals(mode,ForumConstants.AUTHOR_MODE))
+    		return ajaxExecute(mapping.findForward("author"),null,request,response);
+    	else
+    		return mapping.findForward("monitor");
+    	
     }
     
     public ActionForward finishTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -868,5 +885,39 @@ public class AuthoringAction extends Action {
 			request.getSession().setAttribute(name,list);
 		}
 		return list;
+	}
+	
+	/**
+	 * @param request
+	 * @param response
+	 * @param path
+	 * 		The relative URL path infomation to response
+	 */
+	private ActionForward ajaxExecute(ActionForward forward, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response) {
+		if(form != null)
+			request.setAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY,form);
+		
+		//MutlipartRequestWrapper is special for STRUTS, get back the original HttpServletRequest
+		// to avoid exception in dispatcher.forward() method.
+		if(request instanceof MultipartRequestWrapper){
+			request = ((MultipartRequestWrapper) request).getRequest();
+		}
+		try {
+			if (forward != null) {
+				return forward;
+//				String path = forward.getPath();
+//				RequestDispatcher dispatcher = request.getRequestDispatcher(path);
+//				dispatcher.forward(request, response);
+			} else {
+				OutputStream out = response.getOutputStream();
+				out.write(new byte[0]);
+				out.flush();
+			}
+		} catch (IOException e) {
+			log.error(e);
+		}
+		//it always return null
+		return null;
 	}
 }
