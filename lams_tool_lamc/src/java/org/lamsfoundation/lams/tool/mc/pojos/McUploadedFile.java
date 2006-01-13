@@ -22,14 +22,12 @@ package org.lamsfoundation.lams.tool.mc.pojos;
 
 import java.io.Serializable;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
-import org.lamsfoundation.lams.tool.mc.McUtils;
-import org.lamsfoundation.lams.tool.mc.service.IMcService;
+import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 
 /**
  * <p>Persistent  object/bean that defines the uploaded file for the MCQ tool.
@@ -100,17 +98,17 @@ public class McUploadedFile implements Serializable, Comparable
     }
     
     
-    public static McUploadedFile newInstance(McUploadedFile mcUploadedFile,
-			McContent newMcContent, HttpServletRequest request)
+    public static McUploadedFile newInstance(IToolContentHandler toolContentHandler, McUploadedFile mcUploadedFile,
+			McContent newMcContent) throws ItemNotFoundException, RepositoryCheckedException
 			
 	{
-    	IMcService mcService =McUtils.getToolService(request);
     	McUploadedFile newMcUploadedFile=null;
-    	
+
     	try
 		{
-    		NodeKey copiedNodeKey = mcService.copyFile(new Long(mcUploadedFile.getUuid()));
-        	logger.debug("copiedNodeKey: " + copiedNodeKey);
+    		NodeKey copiedNodeKey =  toolContentHandler.copyFile(new Long(mcUploadedFile.getUuid()));
+        	logger.debug("copied NodeKey: " + copiedNodeKey);
+        	logger.debug("copied NodeKey uuid: " + copiedNodeKey.getUuid().toString());
         	newMcUploadedFile = new McUploadedFile(copiedNodeKey.getUuid().toString(),
 					mcUploadedFile.isFileOnline(),
 					mcUploadedFile.getFilename(),
