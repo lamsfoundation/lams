@@ -7,7 +7,6 @@
 package org.lamsfoundation.lams.tool.dao;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
-import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.usermanagement.User;
 
@@ -29,9 +28,14 @@ public interface IToolSessionDAO
 
     public void removeToolSession(ToolSession toolSession);
     
+	/**
+	 * Get the tool session by learner and activity. Will attempted to get an appropriate grouped
+	 * tool session (the most common case as this covers a normal group or a whole of class group) 
+	 * and then attempts to get a non-grouped base tool session. The non-grouped tool session
+	 * is meant to be unique against the user and activity. 
+	 * @returns toolSession may be of subclass NonGroupedToolSession or GroupedToolSession
+	 */
 	public ToolSession getToolSessionByLearner(final User learner,final Activity activity);
-
-	public ToolSession getToolSessionByGroup(final Group group, final Activity activity);
 
 	public void updateToolSession(ToolSession toolSession);
 }

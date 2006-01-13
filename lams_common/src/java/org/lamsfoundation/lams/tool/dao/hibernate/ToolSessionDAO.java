@@ -6,15 +6,14 @@
 
 package org.lamsfoundation.lams.tool.dao.hibernate;
 
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
+import org.hibernate.Query;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.Group;
+import org.lamsfoundation.lams.tool.GroupedToolSession;
+import org.lamsfoundation.lams.tool.NonGroupedToolSession;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.dao.IToolSessionDAO;
 import org.lamsfoundation.lams.usermanagement.User;
-import org.springframework.orm.hibernate3.HibernateCallback;
-import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
@@ -26,8 +25,12 @@ public class ToolSessionDAO extends HibernateDaoSupport implements IToolSessionD
 
     protected static final String LOAD_NONGROUPED_TOOL_SESSION_BY_LEARNER = 
         "from NonGroupedToolSession s where s.user = :learner and s.toolActivity = :activity";
-    protected static final String LOAD_NONGROUPED_TOOL_SESSION_BY_GROUP = 
-        "from GroupedToolSession s where s.group = :group and s.toolActivity = :activity";
+    protected static final String LOAD_GROUPED_TOOL_SESSION_BY_GROUP = 
+        "from GroupedToolSession s where s.sessionGroup = :inputgroup and s.toolActivity = :activity";
+    protected static final String LOAD_GROUPED_TOOL_SESSION_BY_GROUP2 = 
+        "select s from GroupedToolSession as s inner join s.sessionGroup as sg inner join sg.users as u "
+    	+" where :learner = u and s.toolActivity = :activity";
+
     /**
      * Retrieves the ToolSession
      * @param toolSessionId identifies the ToolSession to get
@@ -35,53 +38,35 @@ public class ToolSessionDAO extends HibernateDaoSupport implements IToolSessionD
      */
 	public ToolSession getToolSession(Long toolSessionId)
     {
-        return (ToolSession)getHibernateTemplate().get(ToolSession.class, toolSessionId);
+        ToolSession session = (ToolSession) getHibernateTemplate().get(ToolSession.class, toolSessionId);
+        return session;
     }
 
 	/**
-	 * Get the tool session by learner and activity. Non-grouped base tool session
-	 * meant to be unique against the user and activity.
+	 * Get the tool session by learner and activity. Will attempted to get an appropriate grouped
+	 * tool session (the most common case as this covers a normal group or a whole of class group) 
+	 * and then attempts to get a non-grouped base tool session. The non-grouped tool session
+	 * is meant to be unique against the user and activity. 
 	 * @see org.lamsfoundation.lams.tool.dao.IToolSessionDAO#getToolSessionByLearner(org.lamsfoundation.lams.usermanagement.User, org.lamsfoundation.lams.learningdesign.Activity)
+	 * @returns toolSession may be of subclass NonGroupedToolSession or GroupedToolSession
 	 */
 	public ToolSession getToolSessionByLearner(final User learner,final Activity activity)
 	{
-        HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
+		Query query = this.getSession().createQuery(LOAD_GROUPED_TOOL_SESSION_BY_GROUP2);
+		query.setParameter("learner",learner);
+		query.setParameter("activity",activity);
+		GroupedToolSession groupedToolSession = (GroupedToolSession) query.uniqueResult();
+		if ( groupedToolSession != null ) 
+			return groupedToolSession;
 
-        return (ToolSession)hibernateTemplate.execute(
-             new HibernateCallback() 
-             {
-                 public Object doInHibernate(Session session) throws HibernateException 
-                 {
-                     return session.createQuery(LOAD_NONGROUPED_TOOL_SESSION_BY_LEARNER)
-                     			   .setEntity("learner",learner)
-                     			   .setEntity("activity",activity)
-                     			   .uniqueResult();
-                 }
-             }
-       );   	    
+		query = this.getSession().createQuery(LOAD_NONGROUPED_TOOL_SESSION_BY_LEARNER);
+		query.setParameter("learner",learner);
+		query.setParameter("activity",activity);
+		NonGroupedToolSession nonGroupedSession = (NonGroupedToolSession) query.uniqueResult();
+		return nonGroupedSession;
+		
 	}
 
-    /**
-     * @see org.lamsfoundation.lams.tool.dao.IToolSessionDAO#getToolSessionByGroup(org.lamsfoundation.lams.learningdesign.Group, org.lamsfoundation.lams.learningdesign.Activity)
-     */
-    public ToolSession getToolSessionByGroup(final Group group, final Activity activity)
-    {
-        HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
-
-        return (ToolSession)hibernateTemplate.execute(
-             new HibernateCallback() 
-             {
-                 public Object doInHibernate(Session session) throws HibernateException 
-                 {
-                     return session.createQuery(LOAD_NONGROUPED_TOOL_SESSION_BY_GROUP)
-                     			   .setEntity("group",group)
-                     			   .setEntity("activity",activity)
-                     			   .uniqueResult();
-                 }
-             }
-       );  
-    }	
-	
     public void saveToolSession(ToolSession toolSession)
     {
         getHibernateTemplate().save(toolSession);

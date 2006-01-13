@@ -70,15 +70,27 @@ public class TestToolSessionDAO extends ToolDataAccessTestCase
         ToolSession toolSession = toolSessionDao.getToolSessionByLearner(testUser,testNonGroupedActivity);
         
         assertNotNull(toolSession);
+        assertEquals("verify tool session state",ToolSession.STARTED_STATE,toolSession.getToolSessionStateId());
+        assertEquals("verify tool session type",ToolSession.NON_GROUPED_TYPE,toolSession.getToolSessionTypeId());
     }
     
     public void testGetToolSessionByGroup()
     {
-        ToolSession toolSession = toolSessionDao.getToolSessionByGroup(testGroup,testGroupedActivity);
+        ToolSession toolSession = toolSessionDao.getToolSessionByLearner(testUser,testGroupedActivity);
+        
         
         assertNotNull(toolSession);
+        assertEquals("verify tool session state",ToolSession.STARTED_STATE,toolSession.getToolSessionStateId());
+        assertEquals("verify tool session type",ToolSession.GROUPED_TYPE,toolSession.getToolSessionTypeId());
     }
     
+/*    public void testGetToolSessionByClassGroup()
+    {
+        ToolSession toolSession = toolSessionDao.getToolSessionByClassGroup(testGroup,testGroupedActivity);
+        
+        assertNotNull(toolSession);
+    } */
+
     public void testSaveNonGroupedToolSession()
     {
         ToolSession testToolSession=initNGToolSession();
@@ -87,12 +99,12 @@ public class TestToolSessionDAO extends ToolDataAccessTestCase
 
     public void testUpdateToolSession()
     {
-        ToolSession toolSession = toolSessionDao.getToolSessionByGroup(testGroup,testGroupedActivity);
+        ToolSession toolSession = toolSessionDao.getToolSessionByLearner(testUser,testGroupedActivity);
         assertEquals("verify original state",ToolSession.STARTED_STATE,toolSession.getToolSessionStateId());
         
         toolSession.setToolSessionStateId(ToolSession.ENDED_STATE);
         toolSessionDao.updateToolSession(toolSession);
-        ToolSession updatedToolSession = toolSessionDao.getToolSessionByGroup(testGroup,testGroupedActivity);
+        ToolSession updatedToolSession = toolSessionDao.getToolSessionByLearner(testUser,testGroupedActivity);
         
         assertEquals("verify new state",ToolSession.ENDED_STATE,updatedToolSession.getToolSessionStateId());
 
