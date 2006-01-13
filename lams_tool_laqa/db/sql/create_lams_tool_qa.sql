@@ -89,5 +89,5 @@ CREATE TABLE tl_laqa11_uploadedFile (
 INSERT INTO tl_laqa11_content (qa_content_id, 	creation_date)  VALUES (${default_content_id}, NOW());
 
 -- data for content questions table
- INSERT INTO tl_laqa11_que_content (question, display_order, qa_content_id) VALUES ('What is the capital of Russia?',1,${default_content_id});
+INSERT INTO tl_laqa11_que_content (question, display_order, qa_content_id) VALUES ('What is the capital of Russia?',1,${default_content_id});
 

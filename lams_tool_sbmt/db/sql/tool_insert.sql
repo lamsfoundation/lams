@@ -38,7 +38,7 @@ VALUES
 NULL,
 NULL,
 0,
-1,
+2,
 1,
 1,
 1,
