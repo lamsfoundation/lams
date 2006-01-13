@@ -10,7 +10,6 @@
 
 		<html:hidden property="selectedToolSessionId"/>							
 		<input type="hidden" name="isToolSessionChanged"/>
-		<tr> <td NOWRAP class="formlabel" valign=top align=left> 
 			<table align=left>
 				<tr> 
 					<td NOWRAP class="formlabel" valign=top align=center> <b> <bean:message key="label.selectGroup"/> </b>
@@ -36,8 +35,6 @@
 							</select>
 					</td> 
 				<tr>
-			
-			
 			
 				<c:forEach var="currentDto" items="${sessionScope.listMonitoredAnswersContainerDto}">
 		  	 		<c:set var="currentQuestionId" scope="request" value="${currentDto.questionUid}"/>
