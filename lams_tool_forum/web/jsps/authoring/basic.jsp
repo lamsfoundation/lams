@@ -39,7 +39,9 @@
 	<!-- Topics List Row -->
 	<tr>
 		<td colspan="2" class="formlabel">
-		<div id="messageListArea"></div>
+		<div id="messageListArea">
+		<%@ include file="/jsps/message/topiclist.jsp"%>
+		</div>
 		</td>
 	</tr>
 	<td colspan="2" align="left">

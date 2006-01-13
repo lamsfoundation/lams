@@ -34,6 +34,8 @@ create table tl_lafrum11_forum (
    content_id bigint unique,
    allow_edit bit,
    allow_rich_editor bit,
+   limited_of_chars integer,
+   limited_input_flag bit,
    primary key (uid)
 );
 create table tl_lafrum11_forum_user (
@@ -89,6 +91,7 @@ create table tl_lafrum11_tool_session (
 );
 alter table tl_lafrum11_attachment add index FK389AD9A2FE939F2A (message_uid), add constraint FK389AD9A2FE939F2A foreign key (message_uid) references tl_lafrum11_message (uid);
 alter table tl_lafrum11_attachment add index FK389AD9A2131CE31E (forum_uid), add constraint FK389AD9A2131CE31E foreign key (forum_uid) references tl_lafrum11_forum (uid);
+alter table tl_lafrum11_forum add index FK87917942E42F4351 (create_by), add constraint FK87917942E42F4351 foreign key (create_by) references tl_lafrum11_forum_user (uid);
 alter table tl_lafrum11_forum_user add index FK7B83A4A85F0116B6 (session_id), add constraint FK7B83A4A85F0116B6 foreign key (session_id) references tl_lafrum11_tool_session (uid);
 alter table tl_lafrum11_message add index FK4A6067E8E42F4351 (create_by), add constraint FK4A6067E8E42F4351 foreign key (create_by) references tl_lafrum11_forum_user (uid);
 alter table tl_lafrum11_message add index FK4A6067E897F0DB46 (report_id), add constraint FK4A6067E897F0DB46 foreign key (report_id) references tl_lafrum11_report (uid);
@@ -100,5 +103,6 @@ alter table tl_lafrum11_message_seq add index FKD2C71F88FE939F2A (message_uid), 
 alter table tl_lafrum11_message_seq add index FKD2C71F8845213B4D (root_message_uid), add constraint FKD2C71F8845213B4D foreign key (root_message_uid) references tl_lafrum11_message (uid);
 alter table tl_lafrum11_tool_session add index FK5A04D7AE131CE31E (forum_uid), add constraint FK5A04D7AE131CE31E foreign key (forum_uid) references tl_lafrum11_forum (uid);
 
-INSERT INTO tl_lafrum11_forum (title,instructions,online_instructions,offline_instructions,content_id,allow_anonym,run_offline,lock_on_finished,content_in_use,define_later,allow_edit,allow_rich_editor) VALUES("LAMS Forum","Instruction","Online instruction","Offline instruction",${default_content_id},0,0,0,0,0,1,0);
+
+INSERT INTO tl_lafrum11_forum (title,instructions,online_instructions,offline_instructions,content_id,allow_anonym,run_offline,lock_on_finished,content_in_use,define_later,allow_edit,allow_rich_editor,limited_input_flag,limited_of_chars) VALUES("LAMS Forum","Instruction","Online instruction","Offline instruction",${default_content_id},0,0,0,0,0,1,0,1,5000);
 SET FOREIGN_KEY_CHECKS=1;

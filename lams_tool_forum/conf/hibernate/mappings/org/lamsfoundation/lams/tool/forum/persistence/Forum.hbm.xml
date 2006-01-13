@@ -188,6 +188,22 @@
             column="allow_rich_editor"
         />
 
+        <property
+            name="limitedChar"
+            type="int"
+            update="true"
+            insert="true"
+            column="limited_of_chars"
+        />
+
+        <property
+            name="limitedInput"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="limited_input_flag"
+        />
+
         <!--
             To add non XDoclet property mappings, create a file named
                 hibernate-properties-Forum.xml

@@ -46,6 +46,8 @@ create table tl_lafrum11_forum (
    content_id bigint unique,
    allow_edit bit,
    allow_rich_editor bit,
+   limited_of_chars integer,
+   limited_input_flag bit,
    primary key (uid)
 );
 create table tl_lafrum11_forum_user (

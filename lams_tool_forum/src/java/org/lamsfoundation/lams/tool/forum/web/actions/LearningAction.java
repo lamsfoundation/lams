@@ -134,9 +134,11 @@ public class LearningAction extends Action {
 		Long forumId = session.getForum().getUid();
 		Boolean allowEdit = new Boolean(session.getForum().isAllowEdit());
 		Boolean allowRichEditor = new Boolean(session.getForum().isAllowRichEditor());
+		int allowNumber = session.getForum().getLimitedChar();
 		request.getSession().setAttribute(ForumConstants.FORUM_ID, forumId);
 		request.getSession().setAttribute(ForumConstants.ALLOW_EDIT, allowEdit);
 		request.getSession().setAttribute(ForumConstants.ALLOW_RICH_EDITOR, allowRichEditor);
+		request.getSession().setAttribute(ForumConstants.LIMITED_CHARS, new Integer(allowNumber));
 		
 		//get all root topic to display on init page
 		List rootTopics = forumService.getRootTopics(sessionId);

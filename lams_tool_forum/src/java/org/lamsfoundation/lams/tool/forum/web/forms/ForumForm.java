@@ -5,6 +5,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionErrors;
@@ -37,6 +39,7 @@ public class ForumForm extends ValidatorForm {
     private FormFile onlineFile;
     private List onlineFileList;
     private List offlineFileList;
+
     private Forum forum;
 
     /**
@@ -103,6 +106,13 @@ public class ForumForm extends ValidatorForm {
 		return errors;
 	}
 
+    public void reset(ActionMapping mapping, HttpServletRequest request){
+    	forum.setAllowEdit(false);
+    	forum.setAllowAnonym(false);
+    	forum.setAllowRichEditor(false);
+    	forum.setLimitedInput(false);
+    	forum.setLockWhenFinished(false);
+    }
     //-------------------------get/set methods----------------
     public Forum getForum() {
         return forum;
@@ -161,4 +171,5 @@ public class ForumForm extends ValidatorForm {
 	public void setOnlineFileList(List onlineFileList) {
 		this.onlineFileList = onlineFileList;
 	}
+
 }

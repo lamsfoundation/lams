@@ -30,6 +30,7 @@ public interface ForumConstants {
 	public static final int SESSION_STATUS_FINISHED = 1;
 	public static final String ALLOW_EDIT = "allowEdit";
 	public static final String ALLOW_RICH_EDITOR = "allowRichEditor";
+	public static final String LIMITED_CHARS = "limitedChars";
 
 	public static final String ONLINE_ATTACHMENT = "online_att";
 	public static final String OFFLINE_ATTACHMENT = "offline_att";
@@ -48,6 +49,7 @@ public interface ForumConstants {
 	public static final String MODE = "mode";
 	public static final String AUTHOR_MODE = "author_mode";
 	public static final String MONITOR_MODE = "monitor_mode";
+
 
 
 	

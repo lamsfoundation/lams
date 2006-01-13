@@ -1,3 +1,5 @@
+
+<c_rt:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 <table width="80%" cellspacing="8" align="CENTER" class="forms">
 	<tr>
 		<td valign="MIDDLE"><b><bean:message key="message.label.subject" /></b></td>
@@ -7,9 +9,7 @@
 	</tr>
 	<tr>
 		<td valign="MIDDLE"><b><bean:message key="message.label.body" /></b></td>
-		<td valign="TOP"><b class="required">*</b><lams:STRUTS-textarea rows="10" cols="60"
-			tabindex="2" property="message.body"/> 
-			<BR><html:errors property="message.body" /></td>
+		<td valign="TOP"><%@include file="bodyarea.jsp"%></td>
 	</tr>
 	<tr>
 		<td valign="MIDDLE"><b><bean:message key="message.label.attachment" /></b></td>

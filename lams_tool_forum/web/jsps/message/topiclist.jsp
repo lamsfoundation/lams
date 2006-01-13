@@ -16,7 +16,7 @@
 			<tr>
 				<td valign="MIDDLE" width="48%">
 					<c:set var="viewtopic">
-						<html:rewrite page="/authoring/viewTopic.do?topicIndex=${status.index}&create=${topic.message.created.time}" />
+						<html:rewrite page="/authoring/viewTopic.do?topicIndex=${status.index}&create=${topic.message.updated.time}" />
 					</c:set> 
 					<html:link href="javascript:showMessage('${viewtopic}')">
 						<c:out value="${topic.message.subject}" />

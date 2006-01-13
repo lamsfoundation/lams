@@ -207,6 +207,7 @@ public class AuthoringAction extends Action {
 			HttpServletRequest request, HttpServletResponse response) {
 
 		ForumForm forumForm = (ForumForm)(form);
+		
 		Forum forum = forumForm.getForum();
 		try {
 			forumService = getForumManager();
