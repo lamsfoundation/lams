@@ -274,7 +274,7 @@ public class LearnerService implements ILearnerService
             learnerProgress = progressEngine.calculateProgress(learner, lesson, completedActivity,learnerProgress);
             learnerProgressDAO.updateLearnerProgress(learnerProgress);
             
-            //createToolSessionsIfNecessary(learnerProgress);
+            // createToolSessionsIfNecessary(learnerProgress);
         }
         catch (ProgressException e)
         {
@@ -409,9 +409,8 @@ public class LearnerService implements ILearnerService
         {
             for(Iterator i = nextActivity.getAllToolActivities().iterator();i.hasNext();)
             {
-                ToolActivity toolActivity = (ToolActivity)i.next();
-                if(shouldCreateToolSession(learnerProgress,toolActivity))
-                    createToolSessionFor(toolActivity, learnerProgress.getUser(),learnerProgress.getLesson());
+            	ToolActivity toolActivity =  (ToolActivity)i.next();
+           		createToolSessionFor(toolActivity, learnerProgress.getUser(),learnerProgress.getLesson());
             }
         }
         catch (LamsToolServiceException e)
@@ -424,25 +423,6 @@ public class LearnerService implements ILearnerService
             log.error("error occurred in 'createToolSessionFor':"+e.getMessage());
     		throw new LearnerServiceException(e.getMessage());
         }
-    }
-    
-    /**
-     * Check up the database to see whether there is an existing tool session
-     * has been created already.
-     * @return the check up result.
-     */
-    private boolean shouldCreateToolSession(LearnerProgress learnerProgress,
-                                            ToolActivity toolActivity)
-    {
-        ToolSession targetSession = null;
-
-        if(!toolActivity.getApplyGrouping().booleanValue())
-            targetSession = toolSessionDAO.getToolSessionByLearner(learnerProgress.getUser(),
-                                                                   toolActivity);
-        else
-            targetSession = toolSessionDAO.getToolSessionByGroup(toolActivity.getGroupFor(learnerProgress.getUser()),
-                                                                 toolActivity);
-        return targetSession!=null?false:true;
     }
     
     /**
@@ -464,9 +444,11 @@ public class LearnerService implements ILearnerService
     {
         ToolSession toolSession = lamsCoreToolService.createToolSession(learner,toolActivity,lesson);
         
-        toolActivity.getToolSessions().add(toolSession);
-        
-        lamsCoreToolService.notifyToolsToCreateSession(toolSession.getToolSessionId(), toolActivity);
+        // if the tool session already exists, will return null
+        if ( toolSession !=null ) {
+	        toolActivity.getToolSessions().add(toolSession);
+	        lamsCoreToolService.notifyToolsToCreateSession(toolSession.getToolSessionId(), toolActivity);
+        }
     }
     
     
