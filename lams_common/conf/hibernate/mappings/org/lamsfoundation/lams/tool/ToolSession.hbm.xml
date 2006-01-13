@@ -58,7 +58,7 @@
         
 		<subclass name="org.lamsfoundation.lams.tool.GroupedToolSession"
 			discriminator-value="1">
-			<many-to-one name="group"
+			<many-to-one name="sessionGroup"
 				class="org.lamsfoundation.lams.learningdesign.Group"
 				column="group_id" />
 		</subclass>
