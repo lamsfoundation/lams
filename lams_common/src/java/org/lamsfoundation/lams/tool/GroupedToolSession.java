@@ -18,7 +18,7 @@ import org.lamsfoundation.lams.lesson.Lesson;
 public class GroupedToolSession extends ToolSession {
 
     /** persistent field */
-    private Group group;
+    private Group sessionGroup;
 
     /**default constructor*/
     public GroupedToolSession(){ }
@@ -33,21 +33,23 @@ public class GroupedToolSession extends ToolSession {
     public GroupedToolSession(ToolActivity toolActivity,
                               Date createDateTime,
                               int toolSessionStateId,
-                              Group group,
+                              Group sessionGroup,
                               Lesson lesson)
     {
         super(null,toolActivity,createDateTime,toolSessionStateId,lesson);
         super.setUniqueKey(UNIQUE_KEY_PREFIX
+        				   +"_"
                            +toolActivity.getActivityId().toString()
-                           +group.getGroupId().toString());
-        this.group=group;
+        				   +"_"
+                           +sessionGroup.getGroupId().toString());
+        this.sessionGroup=sessionGroup;
     }
     
-	public Group getGroup() {
-		return group;
+	public Group getSessionGroup() {
+		return sessionGroup;
 	}
 	
-	public void setGroup(Group group) {
-		this.group = group;
+	public void setSessionGroup(Group sessionGroup) {
+		this.sessionGroup = sessionGroup;
 	}
 }
