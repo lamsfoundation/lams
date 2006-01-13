@@ -641,20 +641,36 @@ public abstract class Activity implements Serializable,Nullable {
 	
 	/**
 	 * Return the group information for the requested user when he is running
-	 * current activity instance.
+	 * current activity instance, based on the grouping data in the activity.
 	 * @param learner the requested user	
 	 * @return the group that this user belongs to.
 	 */
 	public Group getGroupFor(User learner)
 	{
-	    if(this.getGrouping()==null)
+		return getGroupFor(learner, this.getGrouping());
+	}
+	
+	/**
+	 * Return the group information for the requested user when he is running
+	 * current activity instance, based on the given grouping.
+	 * <P>
+	 * If we are using the grouping set up in the activity, the grouping will be 
+	 * this.getGrouping(). If the activity isn't grouped, then it should use
+	 * the class grouping.
+	 * 
+	 * @param learner the requested user	
+	 * @return the group that this user belongs to.
+	 */
+	protected Group getGroupFor(User learner, Grouping inGrouping)
+	{
+	    if(inGrouping==null)
 	        throw new IllegalArgumentException("Exception occured in " +
 	        		"getGroupFor, no grouping has been defined");
 	    
-	    for(Iterator i=this.getGrouping().getGroups().iterator();i.hasNext();)
+	    for(Iterator i=inGrouping.getGroups().iterator();i.hasNext();)
 	    {
 	        Group group = (Group)i.next();
-	        if(this.getGrouping().isLearnerGroup(group)&&group.hasLearner(learner))
+	        if(inGrouping.isLearnerGroup(group)&&group.hasLearner(learner))
 	            return group;
 	    }
 	    
