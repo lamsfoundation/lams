@@ -806,14 +806,6 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
      * all the learners in the lesson. After the creation of lams tool session, 
      * it delegates to the tool instances to create tool's own tool session. 
      * <p>
-     * This method assumes that all the learners go into one tool session.
-     * If we ever support indivualised sessions or we use this for grouped
-     * users, then we need to change it to iterator over all the users. If
-     * we change it to iterate over each user, make sure that you only call the tool
-     * to create the tool session the _first_ time you get a tool session - not
-     * everytime. If a suitable tool session already exists,  createToolSession()
-     * will return an existing tool session.
-     * <p>
      * @param activity the tool activity that all tool session reference to.
      * @param lesson the target lesson that these tool sessions belongs to.
      * @throws LamsToolServiceException the exception when lams is talking to tool.
