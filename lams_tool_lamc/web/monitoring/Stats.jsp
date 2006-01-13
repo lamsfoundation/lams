@@ -7,7 +7,7 @@
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
 
-		<table class="forms" align="left">
+		<table align="left">
 			<tr> 
 				<td NOWRAP class="formlabel" align="right" valign=top>
 	  				<b> <bean:message key="count.total.user" /> </b>
