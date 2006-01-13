@@ -33,6 +33,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
+import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
+import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 
 /**
  * <p>Persistent  object/bean that defines the content for the MCQ tool.
@@ -175,8 +178,9 @@ public class McContent implements Serializable {
      * @param newContentId the new mc content id.
      * @return the new mc content object.
      */
-    public static McContent newInstance(McContent mc,
-            Long newContentId, HttpServletRequest request)
+    public static McContent newInstance(IToolContentHandler toolContentHandler, McContent mc,
+            Long newContentId)
+    throws ItemNotFoundException, RepositoryCheckedException
     {
     	McContent newContent = new McContent(
     				 newContentId,
@@ -205,7 +209,7 @@ public class McContent implements Serializable {
                      new TreeSet()
 					 );
     	newContent.setMcQueContents(mc.deepCopyMcQueContent(newContent));
-    	newContent.setMcAttachments(mc.deepCopyMcAttachments(newContent, request));
+    	newContent.setMcAttachments(mc.deepCopyMcAttachments(toolContentHandler, newContent));
     	
     	 
     	
@@ -240,7 +244,8 @@ public class McContent implements Serializable {
      * @param newMcContent
      * @return Set
      */
-    public Set deepCopyMcAttachments(McContent newMcContent, HttpServletRequest request)
+    public Set deepCopyMcAttachments(IToolContentHandler toolContentHandler,McContent newMcContent)
+    throws ItemNotFoundException, RepositoryCheckedException
     {
     	Set newMcQueContent = new TreeSet();
         for (Iterator i = this.getMcAttachments().iterator(); i.hasNext();)
@@ -248,8 +253,8 @@ public class McContent implements Serializable {
         	McUploadedFile mcUploadedFile = (McUploadedFile) i.next();
             if (mcUploadedFile.getMcContent() != null)
             {
-            	McUploadedFile newMcUploadedFile=McUploadedFile.newInstance(mcUploadedFile,
-															newMcContent, request);
+            	McUploadedFile newMcUploadedFile=McUploadedFile.newInstance(toolContentHandler, mcUploadedFile,
+															newMcContent);
             	newMcQueContent.add(newMcUploadedFile);
             }
         }
