@@ -320,12 +320,10 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         for (Iterator i = activities.iterator(); i.hasNext();)
         {
             Activity activity = (Activity) i.next();
-            if ( activity.getActivityTypeId().intValue() == Activity.TOOL_ACTIVITY_TYPE ) {
+            // if it is a non-grouped Tool Activity, create the tool sessions now
+            if ( activity.isToolActivity() ) {
             	ToolActivity toolActivity = (ToolActivity) activityDAO.getActivityByActivityId(activity.getActivityId()); 
-				if (shouldInitToolSessionFor(toolActivity))
-					initToolSessionFor((ToolActivity) activity,
-                                   requestedLesson.getAllLearners(),
-                                   requestedLesson);
+				initToolSessionIfSuitable(toolActivity, requestedLesson);
             }
             //if it is schedule gate, we need to initialize the sheduler for it.
             if(activity.getActivityTypeId().intValue() == Activity.SCHEDULE_GATE_ACTIVITY_TYPE) {
@@ -804,64 +802,55 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     // Helper Methods - start lesson
     //---------------------------------------------------------------------
     /**
-     * Create lams tool session for requested learner in the lesson. After the
-     * creation of lams tool session, it delegates to the tool instances to 
-     * create tool's own tool session.
-     * 
+     * If the activity is not grouped, then it create lams tool session for 
+     * all the learners in the lesson. After the creation of lams tool session, 
+     * it delegates to the tool instances to create tool's own tool session. 
+     * <p>
+     * This method assumes that all the learners go into one tool session.
+     * If we ever support indivualised sessions or we use this for grouped
+     * users, then we need to change it to iterator over all the users. If
+     * we change it to iterate over each user, make sure that you only call the tool
+     * to create the tool session the _first_ time you get a tool session - not
+     * everytime. If a suitable tool session already exists,  createToolSession()
+     * will return an existing tool session.
+     * <p>
      * @param activity the tool activity that all tool session reference to.
-     * @param learners the set of learners that needs to have tool session
-     * 				   initialized.
      * @param lesson the target lesson that these tool sessions belongs to.
      * @throws LamsToolServiceException the exception when lams is talking to tool.
      */
-    private void initToolSessionFor(ToolActivity activity, Set learners,Lesson lesson) 
+    private void initToolSessionIfSuitable(ToolActivity activity, Lesson lesson) 
     {
-        activity.setToolSessions(new HashSet());
-        try
-        {
-            for (Iterator i = learners.iterator(); i.hasNext();)
-            {
-                User learner = (User) i.next();
-
-                ToolSession toolSession;
-
-                toolSession = lamsCoreToolService.createToolSession(learner,activity,lesson);
-
-                //ask tool to create their own tool sessions using the given id.
-                lamsCoreToolService.notifyToolsToCreateSession(toolSession.getToolSessionId(), activity);
-                //update the hibernate persistent object
-                activity.getToolSessions().add(toolSession);
-            }
-        }
-        catch (LamsToolServiceException e)
-        {
-	        String error = "Unable to initialise tool session. Fail to call tool services. Error was "
-	             +e.getMessage();
-	         log.error(error,e);
-	         throw new MonitoringServiceException(error,e);
-		 }
-		 catch (ToolException e)
-		 {
-		     String error = "Unable to initialise tool session. Tool encountered an error. Error was "
-		         +e.getMessage();
-		     log.error(error,e);
-		     throw new MonitoringServiceException(error,e);
-		 }   
+    	if ( ! activity.getApplyGrouping().booleanValue() ) {
+    		activity.setToolSessions(new HashSet());
+    		try {
+    		
+    		Set newToolSessions = lamsCoreToolService.createToolSessions(lesson.getAllLearners(), activity,lesson);
+    		Iterator iter = newToolSessions.iterator();
+    		while (iter.hasNext()) {
+    			// core has set up a new tool session, we need to ask tool to create their own 
+    			// tool sessions using the given id and attach the session to the activity.
+    			ToolSession toolSession = (ToolSession) iter.next();
+	            lamsCoreToolService.notifyToolsToCreateSession(toolSession.getToolSessionId(), activity);
+	            activity.getToolSessions().add(toolSession);
+        		}
+    		}
+	        catch (LamsToolServiceException e)
+	        {
+		        String error = "Unable to initialise tool session. Fail to call tool services. Error was "
+		             +e.getMessage();
+		         log.error(error,e);
+		         throw new MonitoringServiceException(error,e);
+			 }
+			 catch (ToolException e)
+			 {
+			     String error = "Unable to initialise tool session. Tool encountered an error. Error was "
+			         +e.getMessage();
+			     log.error(error,e);
+			     throw new MonitoringServiceException(error,e);
+			 }
+    	}
      }
     
-
-    /**
-     * Returns whether we should initialize tool session or not. Tool sessions
-     * can be initialized if the activity is tool activity and it doesn't 
-     * involve any grouping.
-     * 
-     * @param tool activity the activity that needs to be inspected.
-     * @return the result.
-     */
-    private boolean shouldInitToolSessionFor(ToolActivity activity)
-    {
-        return ! activity.getApplyGrouping().booleanValue();
-    }
 
     /**
      * This method returns the list of lessons in WDDX format
