@@ -164,7 +164,7 @@ public class McStarterAction extends Action implements McAppConstants {
 		    	
 		    	try
 				{
-		    		mcService.copyToolContent(fromContentId, toContentId, request);	
+		    		mcService.copyToolContent(fromContentId, toContentId);	
 				}
 		    	catch(ToolException e)
 				{
