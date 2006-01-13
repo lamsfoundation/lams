@@ -1341,7 +1341,26 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     }
 
    
-    
+    /**
+     * In the define later mode swithes the content view from view-only to editable and sets the defineLater flag of the content. 
+     * 
+     * ActionForward editActivityQuestions(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException,
+                                         ToolException
+     * 
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     * @throws ToolException
+     */
     public ActionForward editActivityQuestions(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
