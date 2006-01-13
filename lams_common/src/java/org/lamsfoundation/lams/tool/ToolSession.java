@@ -19,7 +19,7 @@ public abstract class ToolSession implements Serializable {
     
     /** Tool session type id for grouped */
     public static final int GROUPED_TYPE = 1;
-    /** Tool session type id for non-grouped */
+    /** Tool session type id for non-grouped - all learners in a separate session */
     public static final int NON_GROUPED_TYPE = 2;
     
     /** Tool session state id for started tool session */
@@ -27,7 +27,7 @@ public abstract class ToolSession implements Serializable {
     /** Tool session state id for completed tool session */
     public static final int ENDED_STATE = 2;
 
-    public static final String UNIQUE_KEY_PREFIX = "uq_";
+    public static final String UNIQUE_KEY_PREFIX = "uq";
     /** identifier field */
     private Long toolSessionId;
 
@@ -157,7 +157,7 @@ public abstract class ToolSession implements Serializable {
 	    else
 	        return GROUPED_TYPE;
 	}
-    public Lesson getLesson() {
+	public Lesson getLesson() {
         return lesson;
     }
     public void setLesson(Lesson lesson) {

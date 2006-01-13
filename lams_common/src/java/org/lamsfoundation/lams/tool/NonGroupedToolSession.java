@@ -29,6 +29,10 @@ import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.User;
 
 /**
+ * Not used at present - creates a separate ToolSession for each learner.
+ * When we have a user interface that allows the author to select the whole of the class
+ * vs an individual learner for the tool session, then it will be used.
+ * 
  * @author daveg
  */
 public class NonGroupedToolSession extends ToolSession {
@@ -44,7 +48,9 @@ public class NonGroupedToolSession extends ToolSession {
     {
         super(null,toolActivity,createDateTime,toolSessionStateId,lesson);
         super.setUniqueKey(UNIQUE_KEY_PREFIX
+        				   +"_"
                            +toolActivity.getActivityId().toString()
+        				   +"_"
                            +user.getUserId().toString());
         this.user=user;
     }
