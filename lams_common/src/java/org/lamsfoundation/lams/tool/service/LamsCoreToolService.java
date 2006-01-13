@@ -20,11 +20,13 @@
 */
 package org.lamsfoundation.lams.tool.service;
 
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.Activity;
-import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
-import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolContentIDGenerator;
@@ -58,7 +60,6 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
     //---------------------------------------------------------------------
     private ApplicationContext context;
     private IToolSessionDAO toolSessionDAO;
-    private IActivityDAO activityDAO;
     private ToolContentIDGenerator contentIDGenerator;
     //---------------------------------------------------------------------
     // Inversion of Control Methods - Method injection
@@ -96,11 +97,40 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
      */
     public ToolSession createToolSession(User learner, ToolActivity activity,Lesson lesson) throws LamsToolServiceException
     {
-        ToolSession toolSession = activity.createToolSessionForActivity(learner,lesson);
+        // look for an existing applicable tool session
+		// could be either a grouped (class group or standard group) or an individual.
+        // more likely to be grouped (more tools work that way!)
+        ToolSession toolSession = toolSessionDAO.getToolSessionByLearner(learner, activity);
+
+        // if haven't found an existing tool session then create one
+        if( toolSession == null ) {
+        	toolSession = activity.createToolSessionForActivity(learner,lesson);
+            toolSessionDAO.saveToolSession(toolSession);
+            return toolSession;
+        }
         
-        toolSessionDAO.saveToolSession(toolSession);
+        // indicate that we found an existing tool session by returning null
+        return null;
+    }
+
+
+    /**
+     * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#createToolSession(java.util.Set, org.lamsfoundation.lams.learningdesign.Activity)
+     */
+    public Set createToolSessions(Set learners, ToolActivity activity,Lesson lesson) throws LamsToolServiceException
+    {
+		Iterator iter = learners.iterator();
+		Set newToolSessions = new HashSet();
+		while (iter.hasNext()) {
+			// set up the new tool session. createToolSession() will see if it really
+			// needs to be created - if not will return an existing session.
+			User learner = (User) iter.next();
+        	ToolSession toolSession = createToolSession(learner, activity,lesson);
+        	if ( toolSession != null )
+        		newToolSessions.add(toolSession);
+    	}
         
-        return toolSession;
+        return newToolSessions;
     }
 
     /**
@@ -126,17 +156,7 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
      */
     public ToolSession getToolSessionByActivity(User learner, ToolActivity toolActivity) throws LamsToolServiceException
     {
-        if(toolActivity.getApplyGrouping().booleanValue())
-        {
-            Group learnerGroup = toolActivity.getGrouping().getGroupBy(learner);
-            
-            if(learnerGroup.isNull())
-                throw new LamsToolServiceException("Fail to get grouped tool session: No group found for this learner.");
-
-            return this.toolSessionDAO.getToolSessionByGroup(learnerGroup,toolActivity);
-        }
-        else
-            return this.toolSessionDAO.getToolSessionByLearner(learner,toolActivity);
+    	return this.toolSessionDAO.getToolSessionByLearner(learner,toolActivity);
     }
     
     /**
