@@ -392,6 +392,11 @@ public class LearningUtil implements McAppConstants {
     		if (currentMark < lowestMark)
     			lowestMark= currentMark;
 		}
+    	
+    	//in case there was no attempts
+    	if (lowestMark == 100)
+    		lowestMark=0;
+    	
     	return lowestMark;
     }
     
