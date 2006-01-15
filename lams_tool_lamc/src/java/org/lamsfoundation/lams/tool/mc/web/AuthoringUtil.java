@@ -79,6 +79,83 @@ public class AuthoringUtil implements McAppConstants {
     		logger.debug("updated SELECTED_QUESTION");
     	}
     }
+    
+	/**
+	 * setRadioboxes(McContent mcContent, McAuthoringForm mcAuthoringForm)
+	 * 
+	 * set values of radioboxes for an existing content
+	 * @param mcContent
+	 * @param mcAuthoringForm
+	 */
+	protected static void setRadioboxes(McContent mcContent, McAuthoringForm mcAuthoringForm)
+	{
+		if (mcContent.isUsernameVisible())
+		{
+			mcAuthoringForm.setUsernameVisible(ON);
+			logger.debug("setting userNameVisible to true");
+		}
+		else
+		{
+			mcAuthoringForm.setUsernameVisible(OFF);	
+			logger.debug("setting userNameVisible to false");				
+		}
+	    
+		
+		if (mcContent.isQuestionsSequenced())
+		{
+			mcAuthoringForm.setQuestionsSequenced(ON);
+			logger.debug("setting questionsSequenced to true");
+		}
+		else
+		{
+			mcAuthoringForm.setQuestionsSequenced(OFF);	
+			logger.debug("setting questionsSequenced to false");				
+		}
+
+		if (mcContent.isSynchInMonitor())
+		{
+			mcAuthoringForm.setSynchInMonitor(ON);	
+			logger.debug("setting SynchInMonitor to true");
+		}
+		else
+		{
+			mcAuthoringForm.setSynchInMonitor(OFF);	
+			logger.debug("setting SynchInMonitor to false");				
+		}
+
+		if (mcContent.isRetries())
+		{
+			mcAuthoringForm.setRetries(ON);	
+			logger.debug("setting retries to true");
+		}
+		else
+		{
+			mcAuthoringForm.setRetries(OFF);	
+			logger.debug("setting retries to false");				
+		}
+
+		if (mcContent.isShowFeedback())
+		{
+			mcAuthoringForm.setShowFeedback(ON);	
+			logger.debug("setting showFeedback to true");
+		}
+		else
+		{
+			mcAuthoringForm.setShowFeedback(OFF);	
+			logger.debug("setting showFeedback to false");				
+		}
+		
+		if (mcContent.isShowReport())
+		{
+			mcAuthoringForm.setSln(ON);	
+			logger.debug("setting sln to true");
+		}
+		else
+		{
+			mcAuthoringForm.setSln(OFF);	
+			logger.debug("setting sln to false");				
+		}
+	}
 
     
 	/**
