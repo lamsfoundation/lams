@@ -67,34 +67,51 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
  * <code>CustomStrutsExceptionHandler<code>.
  * 
  
-		<action
-      path="/authoring"
-      type="org.lamsfoundation.lams.tool.mc.web.McAction"
-      name="McAuthoringForm"
-      scope="session"
-      input=".questions"
-      parameter="dispatch"
-      unknown="false"
-      validate="true"
-    >
-      <forward
-        name="load"
-        path=".questions"
-        redirect="true"
-      />
-    
-      <forward
-        name="starter"
-        path=".starter"
-        redirect="true"
-      />
-      
-      <forward
-        name="editOptsContent"
-        path=".editOptsContent"
-        redirect="true"
-      />
+	<!--Authoring Main Action : interacts with the authoring module user-->
+	<action path="/authoring"
+	      	type="org.lamsfoundation.lams.tool.mc.web.McAction"
+    	  	name="McAuthoringForm"
+	      	scope="session"
+    	  	input=".questions"
+      		parameter="dispatch"
+      		unknown="false"
+      		validate="true">
+	
+		<exception
+	        key="error.exception.McApplication"
+	        type="org.lamsfoundation.lams.tool.mc.McApplicationException"
+	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
+	        path=".mcErrorBox"
+	        scope="request"
+	      />
+
+		<exception
+	        key="error.exception.McApplication"
+	        type="java.lang.NullPointerException"
+	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
+	        path=".mcErrorBox"
+	        scope="request"
+	      />	         			      		
+    	
+	      <forward
+	        name="load"
+	        path=".questions"
+	        redirect="true"
+	      />
+	    
+	      <forward
+	        name="starter"
+	        path=".starter"
+	        redirect="true"
+	      />
+	      
+	      <forward
+	        name="editOptsContent"
+	        path=".editOptsContent"
+	        redirect="true"
+	      />
     </action>
+
 */
 public class McAction extends LamsDispatchAction implements McAppConstants
 {
@@ -267,7 +284,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		
 		Map mapGeneralSelectedOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT);
 		logger.debug("mapGeneralSelectedOptionsContent " +  mapGeneralSelectedOptionsContent);
-		
 		
 		logger.debug("sequencing final maps...");
 		mapGeneralOptionsContent=AuthoringUtil.sequenceMap(mapGeneralOptionsContent);
@@ -2195,16 +2211,31 @@ public class McAction extends LamsDispatchAction implements McAppConstants
      * @throws IOException
      * @throws ServletException
 
-	<action
-      path="/learning"
-      type="org.lamsfoundation.lams.tool.mc.web.McAction"
-      name="McLearningForm"
-      scope="session"
-      input=".answers"
-      parameter="method"
-      unknown="false"
-      validate="true"
-    >
+   <!--Learning Main Action: interacts with the Learning module user -->
+	<action	path="/learning"
+		    type="org.lamsfoundation.lams.tool.mc.web.McAction"
+			name="McLearningForm"
+      		scope="session"
+      		input=".answers"
+      		parameter="method"
+      		unknown="false"
+      		validate="true">
+	
+		<exception
+	        key="error.exception.McApplication"
+	        type="org.lamsfoundation.lams.tool.mc.McApplicationException"
+	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
+	        path=".mcErrorBox"
+	        scope="request"
+	      />
+
+		<exception
+	        key="error.exception.McApplication"
+	        type="java.lang.NullPointerException"
+	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
+	        path=".mcErrorBox"
+	        scope="request"
+	      />	         			      		
 
 	  	<forward
 		    name="loadLearner"
@@ -2231,18 +2262,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 	  	/>
 
 	  	<forward
-		    name="viewSummary"
-		    path=".viewSummary"
-		    redirect="true"
-	  	/>
-	  	
-	  	<forward
-		    name="singleQuestionAnswers"
-		    path=".singleQuestionAnswers"
-		    redirect="true"
-	  	/>
-
-	  	<forward
 		    name="resultsSummary"
 		    path=".resultsSummary"
 		    redirect="true"
@@ -2250,12 +2269,10 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 
 	  	<forward
 		    name="errorList"
-		    path=".errorList"
+		    path=".mcErrorBox"
 		    redirect="true"
 	  	/>
-
-     * </action>
-     *  responds to learner activity in learner mode.
+    </action>
      * 
      * ActionForward displayMc(ActionMapping mapping,
             ActionForm form,
