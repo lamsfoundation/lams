@@ -41,7 +41,14 @@ http://www.gnu.org/licenses/gpl.txt
 		<put name="pageHeader" value = "System Exception"/>
 		<put name="content" value="/SystemErrorContent.jsp" />	
 	</definition>
+	
+	<definition name=".mcErrorBox" extends=".baseDef" >
+		<put name="title" value="Error Page"/>
+		<put name="pageHeader" value = "Exception"/>
+		<put name="content" value="/McErrorBox.jsp" />	
+	</definition>
 
+	
 <!-- ============= Mc Authoring Module Definitions ====================== -->	
 	<definition name=".questions" extends=".baseDef" >
 		<put name="title" value="MCQ Tool Questions"/>
