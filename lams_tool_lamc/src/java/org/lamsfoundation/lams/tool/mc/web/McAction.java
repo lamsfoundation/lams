@@ -2292,34 +2292,41 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     	
     	if (mcLearningForm.getContinueOptionsCombined() != null)
     	{
+    		setContentInUse(request);
     		return continueOptionsCombined(mapping, form, request, response);
     	}
     	else if (mcLearningForm.getNextOptions() != null)
 	 	{
+    		setContentInUse(request);
 	 		return getNextOptions(mapping, form, request, response);
 	 	}
     	else if (mcLearningForm.getOptionCheckBoxSelected() != null)
     	{
+    		setContentInUse(request);
     		logger.debug("requested selectOptionsCheckBox...");
     		mcLearningForm.resetCommands();
     		LearningUtil.selectOptionsCheckBox(request,mcLearningForm, mcLearningForm.getQuestionIndex());
     	}
     	else if (mcLearningForm.getRedoQuestions() != null)
     	{
+    		setContentInUse(request);
     		return redoQuestions(mapping, form, request, response);
     	}
     	else if (mcLearningForm.getRedoQuestionsOk() != null)
     	{
+    		setContentInUse(request);
     		logger.debug("requested redoQuestionsOk, user is sure to redo the questions.");
     		mcLearningForm.resetCommands();
     		return redoQuestions(request, mcLearningForm, mapping);
     	}
     	else if (mcLearningForm.getViewAnswers() != null)
     	{
+    		setContentInUse(request);
     		return viewAnswers(mapping, form, request, response);
     	}
     	else if (mcLearningForm.getViewSummary() != null)
     	{
+    		setContentInUse(request);
 			return viewSummary(mapping, form, request, response);
     	}
     	else if (mcLearningForm.getLearnerFinished() != null)
@@ -2665,6 +2672,27 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		return (mapping.findForward(RESULTS_SUMMARY));	
     }
         
+    
+    /**
+     * marks the content as used content
+     * setContentInUse(HttpServletRequest request)
+     * 
+     * @param request
+     */
+    protected void setContentInUse(HttpServletRequest request)
+    {
+    	IMcService mcService =McUtils.getToolService(request);
+    	Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
+    	logger.debug("toolContentId:" + toolContentId);
+    	
+    	McContent mcContent=mcService.retrieveMc(toolContentId);
+    	logger.debug("mcContent:" + mcContent);
+    	mcContent.setContentInUse(true);
+    	logger.debug("content has been set to inuse");
+    	mcService.saveMcContent(mcContent);
+    }
+	
+	
         
     /**
      * redoQuestions(HttpServletRequest request, McLearningForm mcLearningForm, ActionMapping mapping)
