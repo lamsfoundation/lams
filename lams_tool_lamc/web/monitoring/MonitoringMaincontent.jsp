@@ -92,33 +92,27 @@
 					</table>
 				</td>
 
+<!--
 			    <td valign="bottom">
-					<!-- table for tab 4 (statistics) -->
 					<table border="0" cellspacing="0" cellpadding="0">
 					  <tr>
 						<td ><a href="#" onClick="showTab('s');return false;"><img border="0" src="author_page/images/aqua_tab_left.gif" width="8" height="22" id="tab_left_s"   name="tab_left_s" /></a></td>
-						<td class="tab tabcentre" width="90" id="tab_tbl_centre_s"  onClick="showTab('s');return false;" ><label for="s" accesskey="s"><a href="#" onClick="showTab('s');return false;" id="s" >Statistics</a></label></td>
+						<td class="tab tabcentre" width="90" id="tab_tbl_centre_s"  onClick="showTab('s');return false;" ><label for="s" accesskey="s"><a href="#" onClick="showTab('s');return false;" id="s" >Stats</a></label></td>
 						<td ><a href="#" onClick="showTab('s');return false;"><img src="author_page/images/aqua_tab_right.gif"  width="9" height="22" border="0" id="tab_right_s"  name="tab_right_s"/></a></td>
 					  </tr>
 					</table>
 				</td>
+-->
+
 		  </tr>
 		</table>
 	
 	<!-- end tab buttons -->
 	<html:form  action="/monitoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">
 	<html:hidden property="dsp"/>	 
+
 		<div id='content_b' class="tabbody content_b" >
-		
 				<h2><bean:message key="button.summary"/></h2>
-					<table align=center> 	  
-					<tr>   
-					<td NOWRAP class=error>
-						<%@ include file="/Errorbox.jsp" %> <!-- show any error messages here -->
-					</td>
-					</tr> 
-					</table>
-		
 				<div id="formtablecontainer1">
 							<jsp:include page="/monitoring/SummaryContent.jsp" />
 				</div>
@@ -126,15 +120,6 @@
 			
 		<div id='content_a'  class="tabbody content_a">
 			<h2><bean:message key="button.instructions"/></h2>
-			
-			<table align=center> 	  
-			<tr>   
-			<td NOWRAP class=error>
-				<%@ include file="/Errorbox.jsp" %> <!-- show any error messages here -->
-			</td>
-			</tr> 
-			</table>
-			
 			<div id="formtablecontainer2">
 						<jsp:include page="/monitoring/InstructionsContent.jsp" />
 			</div>
@@ -143,35 +128,20 @@
 		
 		<div id='content_i'  class="tabbody content_i">
 				<h2><bean:message key="button.editActivity"/></h2>
-				
-				<table align=center> 	  
-				<tr>   
-				<td NOWRAP class=error>
-					<%@ include file="/Errorbox.jsp" %> <!-- show any error messages here -->
-				</td>
-				</tr> 
-				</table>
-				
 				<div id="formtablecontainer3">
 						<jsp:include page="/monitoring/EditActivityContent.jsp" />
 				</div>
 		</div>
-		
-		<div id='content_s'  class="tabbody content_i">
+
+
+<!--		
+		<div id='content_s'  class="tabbody content_s">
 				<h2><bean:message key="button.stats"/></h2>
-				
-				<table align=center> 	  
-				<tr>   
-				<td NOWRAP class=error>
-					<%@ include file="/Errorbox.jsp" %> <!-- show any error messages here -->
-				</td>
-				</tr> 
-				</table>
-				
 				<div id="formtablecontainer4">
 						<jsp:include page="/monitoring/Stats.jsp" />
 				</div>
 		</div>
+-->
 	
 	</html:form>
 	<p></p>
