@@ -3,13 +3,73 @@
  * 
  * McStarterAction loads the default content and initializes the presentation Map.
  * Initializes the tool's authoring mode
- * Requests can come either from authoring environment or from the monitoring environment for Edit Activity screen
+ * Requests can come either from authoring environment or from the monitoring environment for Edit Activity screen.
+ * 
+ * 
+ * <THIS SECTION IS COPIED FROM: http://lamscvs.melcoe.mq.edu.au:8090/display/lams/Tool+Contract>
+ * Authoring URL 
+ *
+ * The tool must supply an authoring module, which will be called to create new content or edit existing content. It will be called by an authoring URL using the following format:
+
+    * <lams base path>/<tool's authoringurl>&toolContentID=123
+
+
+ * The initial data displayed on the authoring screen for a new tool content id may be the default tool content.
+ *
+ * Authoring UI data consists of general Activity data fields and the Tool specific data fields.
+ * The authoring interface will have three tabs. The mandatory (and suggested) fields are given. 
+ * Each tool will have its own fields which it will add on any of the three tabs, as appropriate to the tabs' function.
+
+ * Basic: Displays the basic set of fields that are needed for the tool, and it could be expected that a new LAMS user would use. 
+ * Mandatory fields: Title, Instructions.
+ * 
+ * Advanced: Displays the extra fields that would be used by experienced LAMS users. Optional fields: Lock On Finish, Make Responses Anonymous
+ * Instructions: Displays the "instructions" fields for teachers. Mandatory fields: Online instructions, Offline instructions, Document upload. 
+ * See Instructions. The standard LAMS tools will use a DHTML layout for the Authoring tabs. For consistency of look and feel, 
+ * we prefer all tools to use the DHTML, or at least make the tabs look and behave like the DHTML layout. The javascript for the tabs is 
+ * available as "/include/javascript/tabcontroller.js" from the central web app (e.g. http://blah.org/lams/include/javascript/tabcontroller.js).
+ *
+ * The "Define Later" and "Run Offline" options are set on the Flash authoring part, and not on the tool's authoring screens.
+ * Preview The tool must be able to show the specified content as if it was running in a lesson. It will be the learner url with tool access 
+ * mode set to ToolAccessMode.AUTHOR.
+ *
+ * Export The tool must be able to export its tool content for part of the overall learning design export.
+ * The format of the serialization for export is XML. Tool will define extra namespace inside the <Content> element to add a new data element (type).
+ *  Inside the data element, it can further define more structures and types as it seems fit.
+
+ * The data elements must be "version" aware. The data elements must be "type" aware if they are to be shared between Tools.
+ * LAMS Xpress (Ernie, could you put something in here. You explain it better than I do!)
+ *
+ * Data Exchange At present, there is no data exchange format between tools. Therefore if 
+ * 
+ * 
+ * 
+ * 
  * 
  * Tool path The URL path for the tool should be <lamsroot>/tool/$TOOL_SIG.  
  * 
-	<!--Authoring Starter  -->
-   <action path="/authoringStarter" type="org.lamsfoundation.lams.tool.mc.web.McStarterAction" 
-   			name="McAuthoringForm" input=".starter"> 
+	<!--Authoring Starter Action: initializes the authoring module -->
+   <action path="/authoringStarter" 
+   			type="org.lamsfoundation.lams.tool.mc.web.McStarterAction" 
+   			name="McAuthoringForm" 
+   			input=".starter"> 
+	
+		<exception
+	        key="error.exception.McApplication"
+	        type="org.lamsfoundation.lams.tool.mc.McApplicationException"
+	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
+	        path=".mcErrorBox"
+	        scope="request"
+	      />
+
+		<exception
+	        key="error.exception.McApplication"
+	        type="java.lang.NullPointerException"
+	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
+	        path=".mcErrorBox"
+	        scope="request"
+	      />	         			
+
 	  	<forward
 		    name="load"
 		    path=".questions"
@@ -17,18 +77,13 @@
 	  	/>
 	  	
 	  	<forward
-		    name="error"
-		    path=".error"
-		    redirect="true"
-	  	/>
-
-	  	<forward
 		    name="errorList"
-		    path=".errorList"
+		    path=".mcErrorBox"
 		    redirect="true"
 	  	/>
 	</action>  
-  
+
+	The author is given warnings when the content in use by learners OR when the content is being edited in the Monitoring interface.  
 */
 
 package org.lamsfoundation.lams.tool.mc.web;
@@ -67,10 +122,8 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 public class McStarterAction extends Action implements McAppConstants {
 	/*
 	 * CONTENT_LOCKED refers to content being in use or not: Any students answered that content?
-	 * For future CONTENT_LOCKED ->CONTENT_IN_USE
-	 *  
-	 * may use org.lamsfoundation.lams.web.util.AttributeNames  
-	 * check back McUtils.configureContentRepository(request);
+	 * Currently CONTENT_LOCKED ->CONTENT_IN_USE
+	 * 
 	 */
 	static Logger logger = Logger.getLogger(McStarterAction.class.getName());
 
@@ -89,7 +142,6 @@ public class McStarterAction extends Action implements McAppConstants {
 		{
 			request.getSession().setAttribute(ACTIVE_MODULE, AUTHORING);
 			logger.debug("activeModule set to Authoring: "  + activeModule);
-			//request.getSession().setAttribute(IS_DEFINE_LATER_URL, new Boolean(true));
 		}
 		logger.debug("final active activeModule is: "  + request.getSession().getAttribute(ACTIVE_MODULE));
 		
@@ -106,7 +158,7 @@ public class McStarterAction extends Action implements McAppConstants {
 		McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 		mcAuthoringForm.resetRadioBoxes();
 		
-		ActionForward validateParameters=populateParameters(request,mapping);
+		ActionForward validateParameters=readSignature(request,mapping);
 		logger.debug("validateParameters:  " + validateParameters);
 		if (validateParameters != null)
 		{
@@ -118,15 +170,18 @@ public class McStarterAction extends Action implements McAppConstants {
 			/* mark the http session as an authoring activity */
 		    request.getSession().setAttribute(TARGET_MODE,TARGET_MODE_AUTHORING);
 		    
-		    /* define tab controllers for jsp */
-		    request.getSession().setAttribute(CHOICE_TYPE_BASIC,CHOICE_TYPE_BASIC);
-		    request.getSession().setAttribute(CHOICE_TYPE_ADVANCED,CHOICE_TYPE_ADVANCED);
-		    request.getSession().setAttribute(CHOICE_TYPE_INSTRUCTIONS,CHOICE_TYPE_INSTRUCTIONS);
-		
 		    logger.debug("will render authoring screen");
 		    String strToolContentId="";
-		    //strToolContentId=request.getParameter(TOOL_CONTENT_ID);
 		    strToolContentId=request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
+		    logger.debug("strToolContentId: " + strToolContentId);
+		    
+		    if ((strToolContentId == null) || (strToolContentId.equals(""))) 
+		    {
+		    	persistError(request,"error.contentId.required");
+				request.setAttribute(USER_EXCEPTION_CONTENTID_REQUIRED, new Boolean(true));
+				logger.debug("forwarding to: " + ERROR_LIST);
+				return (mapping.findForward(ERROR_LIST));
+		    }
 		    
 		    /* Process incoming tool content id. 
 		     * Either exists or not exists in the db yet, a toolContentId must be passed to the tool from the container */
@@ -139,10 +194,10 @@ public class McStarterAction extends Action implements McAppConstants {
 	    	}
 	    	catch(NumberFormatException e)
 			{
-		    	persistError(request,"error.numberFormatException");
+		    	persistError(request,"error.ids.numberFormatException");
 				request.setAttribute(USER_EXCEPTION_NUMBERFORMAT, new Boolean(true));
-				logger.debug("forwarding to: " + LOAD_QUESTIONS);
-				return (mapping.findForward(LOAD_QUESTIONS));
+				logger.debug("forwarding to: " + ERROR_LIST);
+				return (mapping.findForward(ERROR_LIST));
 			}
 	
 	    	
@@ -201,15 +256,50 @@ public class McStarterAction extends Action implements McAppConstants {
 			else
 			{
 				logger.debug("retrieving existing content for: " + toolContentId);
-				retrieveExistingContent(request, mcAuthoringForm, toolContentId);
+				McContent mcContent=mcService.retrieveMc(new Long(toolContentId));
+				logger.debug("existing mcContent:" + mcContent);
+				
+				/* it is possible that the content is being used by some learners. In this situation, the content  is marked as "in use" and 
+				  a content in use is not modifiable*/ 
+				boolean isContentInUse=isContentInUse(mcContent);
+				logger.debug("isContentInUse:" + isContentInUse);
+				
+				if (isContentInUse == true)
+				{
+			    	persistError(request,"error.content.inUse");
+					logger.debug("forwarding to: " + ERROR_LIST);
+					return (mapping.findForward(ERROR_LIST));
+				}
+				
+				/* it is possible that the content is being EDITED in the monitoring interface. In this situation, the content is not modifiable*/ 
+				boolean isDefineLater=isDefineLater(mcContent);
+				logger.debug("isDefineLater:" + isDefineLater);
+				
+				if (isDefineLater == true)
+				{
+			    	persistError(request,"error.content.beingModified");
+					logger.debug("forwarding to: " + ERROR_LIST);
+					return (mapping.findForward(ERROR_LIST));
+				}
+				
+				retrieveExistingContent(request, mcAuthoringForm, toolContentId, mcContent);
 			}
 		}
 		mcAuthoringForm.resetUserAction();
 		logger.debug("return to: " + LOAD_QUESTIONS);
 		return (mapping.findForward(LOAD_QUESTIONS));
 	} 
-	
-	public ActionForward populateParameters(HttpServletRequest request, ActionMapping mapping)
+
+	/**
+	 * each tool has a signature. MCQ tool's signature is stored in MY_SIGNATURE. The default tool content id and 
+	 * other depending content ids are obtained in this method.
+	 * 
+	 * readSignature(HttpServletRequest request, ActionMapping mapping)
+	 * @param request
+	 * @param mapping
+	 * @return ActionForward
+	 */
+	public ActionForward readSignature(HttpServletRequest request, ActionMapping mapping)
 	{
 		IMcService mcService =McUtils.getToolService(request);
 		/* retrieve the default content id based on tool signature */
@@ -333,11 +423,13 @@ public class McStarterAction extends Action implements McAppConstants {
 	}
 	
 	/**
-	 * find out if the content is locked or not. If it is a locked content, the author can not modify it.
-	 * The idea of content being locked is, once any one learner starts using a particular content
+	 * find out if the content is in use or not. If it is in use, the author can not modify it.
+	 * The idea of content being in use is, once any one learner starts using a particular content
 	 * that content should become unmodifiable. 
+	 * 
+	 * isContentInUse(McContent mcContent)
 	 * @param mcContent
-	 * @return
+	 * @return boolean
 	 */
 	protected boolean isContentInUse(McContent mcContent)
 	{
@@ -347,6 +439,20 @@ public class McStarterAction extends Action implements McAppConstants {
 	
 	
 	/**
+	 * find out if the content is being edited in monitoring interface or not. If it is, the author can not modify it.
+	 * 
+	 * isDefineLater(McContent mcContent)
+	 * @param mcContent
+	 * @return boolean
+	 */
+	protected boolean isDefineLater(McContent mcContent)
+	{
+		logger.debug("is define later: " + mcContent.isDefineLater());
+		return  mcContent.isDefineLater();
+	}
+
+	
+	/**
 	 * retrieves the contents of an existing content from the db and prepares it for presentation
 	 * retrieveExistingContent(HttpServletRequest request, McAuthoringForm mcAuthoringForm, long toolContentId)
 	 * 
@@ -354,15 +460,11 @@ public class McStarterAction extends Action implements McAppConstants {
 	 * @param mcAuthoringForm
 	 * @param toolContentId
 	 */
-	protected void retrieveExistingContent(HttpServletRequest request, McAuthoringForm mcAuthoringForm, long toolContentId)
+	protected void retrieveExistingContent(HttpServletRequest request, McAuthoringForm mcAuthoringForm, long toolContentId, McContent mcContent)
 	{
 		IMcService mcService =McUtils.getToolService(request);
 		
 		request.getSession().setAttribute(IS_REVISITING_USER, new Boolean(true));
-		
-		logger.debug("getting existing content with id:" + toolContentId);
-		McContent mcContent=mcService.retrieveMc(new Long(toolContentId));
-		logger.debug("existing mcContent:" + mcContent);
 		
 		request.getSession().setAttribute(RICHTEXT_TITLE,mcContent.getTitle());
 		request.getSession().setAttribute(RICHTEXT_INSTRUCTIONS,mcContent.getInstructions());
@@ -386,6 +488,7 @@ public class McStarterAction extends Action implements McAppConstants {
 		request.getSession().setAttribute(PASSMARK, mcContent.getPassMark()); //Integer
 		request.getSession().setAttribute(SHOW_FEEDBACK, new Boolean(mcContent.isShowFeedback())); 
 		
+		
 		McUtils.setDefaultSessionAttributes(request, mcContent, mcAuthoringForm);
 		logger.debug("RICHTEXT_TITLE:" + request.getSession().getAttribute(RICHTEXT_TITLE));
 		
@@ -402,79 +505,9 @@ public class McStarterAction extends Action implements McAppConstants {
 		logger.debug("existing listUploadedOnlineFileNames:" + listUploadedOnFiles);
 		request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILENAMES,listUploadedOnFiles);
 		
-		/*
-		List listUploadedOffFilesUuidPlusFilename= mcService.retrieveMcUploadedOfflineFilesUuidPlusFilename(mcContent.getUid());
-		logger.debug("existing listUploadedOffFilesUuidPlusFilename:" + listUploadedOffFilesUuidPlusFilename);
-		request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILES,listUploadedOffFilesUuidPlusFilename);
-		*/
-		
-		if (mcContent.isUsernameVisible())
-		{
-			mcAuthoringForm.setUsernameVisible(ON);
-			logger.debug("setting userNameVisible to true");
-		}
-		else
-		{
-			mcAuthoringForm.setUsernameVisible(OFF);	
-			logger.debug("setting userNameVisible to false");				
-		}
-	    
-		
-		if (mcContent.isQuestionsSequenced())
-		{
-			mcAuthoringForm.setQuestionsSequenced(ON);
-			logger.debug("setting questionsSequenced to true");
-		}
-		else
-		{
-			mcAuthoringForm.setQuestionsSequenced(OFF);	
-			logger.debug("setting questionsSequenced to false");				
-		}
-
-		if (mcContent.isSynchInMonitor())
-		{
-			mcAuthoringForm.setSynchInMonitor(ON);	
-			logger.debug("setting SynchInMonitor to true");
-		}
-		else
-		{
-			mcAuthoringForm.setSynchInMonitor(OFF);	
-			logger.debug("setting SynchInMonitor to false");				
-		}
-
-		if (mcContent.isRetries())
-		{
-			mcAuthoringForm.setRetries(ON);	
-			logger.debug("setting retries to true");
-		}
-		else
-		{
-			mcAuthoringForm.setRetries(OFF);	
-			logger.debug("setting retries to false");				
-		}
-
-		if (mcContent.isShowFeedback())
-		{
-			mcAuthoringForm.setShowFeedback(ON);	
-			logger.debug("setting showFeedback to true");
-		}
-		else
-		{
-			mcAuthoringForm.setShowFeedback(OFF);	
-			logger.debug("setting showFeedback to false");				
-		}
-		
-		if (mcContent.isShowReport())
-		{
-			mcAuthoringForm.setSln(ON);	
-			logger.debug("setting sln to true");
-		}
-		else
-		{
-			mcAuthoringForm.setSln(OFF);	
-			logger.debug("setting sln to false");				
-		}
-		
+		/* set radioboxes in Advanced tab*/
+		AuthoringUtil.setRadioboxes(mcContent, mcAuthoringForm);
+				
 		McUtils.populateUploadedFilesData(request, mcContent);
 	    logger.debug("populated UploadedFilesData");
 	    Map mapWeights= AuthoringUtil.rebuildWeightsMapfromDB(request, new Long(toolContentId));
@@ -634,22 +667,13 @@ public class McStarterAction extends Action implements McAppConstants {
 	protected void initialiseAttributes(HttpServletRequest request)
 	{
 		logger.debug("starting initialiseAttributes...");
-		/*  CURRENT_TAB == 1 defines Basic Tab
-		 *  CURRENT_TAB == 2 defines Avanced Tab
-		 *  CURRENT_TAB == 3 defines Instructions Tab
-		 */ 
 		request.getSession().setAttribute(CURRENT_TAB, new Long(1));
 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 		
 		/* needs to run only once per tool*/ 
 		/* McUtils.configureContentRepository(request, mcService); */
 		
-		/* these two are for repository access */
-		/* holds the final offline files  list */
-		//LinkedList listUploadedOfflineFiles= new LinkedList();
-		//LinkedList listUploadedOnlineFiles= new LinkedList();
-		
-		/* these two are for jsp */
+		/* these two are for Instructions jsp */
 		LinkedList listUploadedOfflineFileNames= new LinkedList();
 		LinkedList listUploadedOnlineFileNames= new LinkedList();
 		
@@ -711,14 +735,15 @@ public class McStarterAction extends Action implements McAppConstants {
 		logger.debug("passed mcService: " + mcService);
 		request.getSession().setAttribute(TOOL_SERVICE, mcService);
 
-		//to indicate that Edit button is enabled in the define later screen
+		/* to indicate that Edit button is enabled in the define later screen */
 		request.getSession().setAttribute(DEFINE_LATER_EDIT_ACTIVITY, new Boolean(true));
 		
 		request.getSession().setAttribute(ACTIVE_MODULE, DEFINE_LATER);
-		//present the view-only screen first
+		/* present the view-only screen first */
 		request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(false));
 		return execute(mapping, form, request, response);
 	}
+	
 	
 	
 	/**
