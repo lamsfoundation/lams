@@ -62,12 +62,6 @@ http://www.gnu.org/licenses/gpl.txt
 		<put name="content" value="/index.jsp" />	
 	</definition>
 	
-	<definition name=".error" extends=".baseDef" >
-		<put name="title" value="Error"/>
-		<put name="pageHeader" value = "Error"/>
-		<put name="content" value="/Errorbox.jsp" />	
-	</definition>
-	
 	<definition name=".errorList" extends=".baseDef" >
 		<put name="title" value="Error"/>
 		<put name="pageHeader" value = "Error"/>
