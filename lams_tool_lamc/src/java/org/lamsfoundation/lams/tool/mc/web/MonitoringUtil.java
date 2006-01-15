@@ -157,7 +157,22 @@ public class MonitoringUtil implements McAppConstants{
 		return mapMonitoredAttemptsContainerDTO;
 	}
 
-	
+
+	/**
+	 * return total attempt count from all the users
+	 * getTotalAttemptCount(HttpServletRequest request)
+	 * 
+	 * @param request
+	 * @return int
+	 */
+    public static int getTotalAttemptCount(HttpServletRequest request)
+    {
+    	IMcService mcService =McUtils.getToolService(request);
+    	List listMarks=mcService.getMarks();
+    	logger.debug("total attempt count: " + listMarks.size());
+    	return listMarks.size();
+    }
+
 	
 	
 	/**
