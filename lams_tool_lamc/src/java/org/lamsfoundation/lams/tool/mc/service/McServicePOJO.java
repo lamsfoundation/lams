@@ -27,8 +27,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.TreeSet;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
 import org.lamsfoundation.lams.contentrepository.FileException;
@@ -1084,113 +1082,9 @@ public class McServicePOJO implements
 	}
 	
 	
-	/**
-	 * 
-	 * gets called ONLY when a lesson is being created in monitoring mode. 
-	 * Should create the new content(toContent) based on what the author has created her content with. In q/a tool's case
-	 * that is content + question's content but not user responses. The deep copy should go only as far as
-	 * default content (or author created content) already goes.
-	 * ToolContentManager CONTRACT
-	 * 
-	 * 
-	 * similar to public void removeToolContent(Long toolContentId)
-	 * gets called by Container+Flash
-	 * 
-	 */
-
-	public void copyToolContent(Long fromContentId, Long toContentId, HttpServletRequest request) throws ToolException
-    {
-    	logger.debug("start of copyToolContent with ids: " + fromContentId + " and " + toContentId);
-
-    	if (fromContentId == null)
-        {
-        	logger.debug("fromContentId is null.");
-        	logger.debug("attempt retrieving tool's default content id with signatute : " + MY_SIGNATURE);
-        	long defaultContentId=0;
-			try
-			{
-				defaultContentId=getToolDefaultContentIdBySignature(MY_SIGNATURE);
-				fromContentId= new Long(defaultContentId);
-			}
-			catch(Exception e)
-			{
-				logger.debug("default content id has not been setup for signature: " +  MY_SIGNATURE);
-				throw new ToolException("WARNING! default content has not been setup for signature" + MY_SIGNATURE + " Can't continue!");
-			}
-        }
-        
-        if (toContentId == null)
-        {
-        	logger.debug("throwing ToolException: toContentId is null");
-			throw new ToolException("toContentId is missing");
-        }
-        logger.debug("final - copyToolContent using ids: " + fromContentId + " and " + toContentId);
-            
-        try
-        {
-            McContent fromContent = mcContentDAO.findMcContentById(fromContentId);
-        
-            if (fromContent == null)
-            {
-            	logger.debug("fromContent is null.");
-            	logger.debug("attempt retrieving tool's default content id with signatute : " + MY_SIGNATURE);
-            	long defaultContentId=0;
-    			try
-    			{
-    				defaultContentId=getToolDefaultContentIdBySignature(MY_SIGNATURE);
-    				fromContentId= new Long(defaultContentId);
-    			}
-    			catch(Exception e)
-    			{
-    				logger.debug("default content id has not been setup for signature: " +  MY_SIGNATURE);
-    				throw new ToolException("WARNING! default content has not been setup for signature" + MY_SIGNATURE + " Can't continue!");
-    			}
-    			
-    			fromContent = mcContentDAO.findMcContentById(fromContentId);
-    			logger.debug("using fromContent: " + fromContent);
-            }
-            
-            logger.debug("final - retrieved fromContent: " + fromContent);
-            logger.debug("final - before new instance using " + fromContent + " and " + toContentId);
-            McContent toContent = McContent.newInstance(fromContent,toContentId, request);
-            if (toContent == null)
-            {
-            	logger.debug("throwing ToolException: WARNING!, retrieved toContent is null.");
-            	throw new ToolException("WARNING! Fail to create toContent. Can't continue!");
-            }
-            else
-            {
-            	logger.debug("retrieved toContent: " + toContent);
-	            mcContentDAO.saveMcContent(toContent);
-	            logger.debug("toContent has been saved successfully: " + toContent);
-            }
-            logger.debug("end of copyToolContent with ids: " + fromContentId + " and " + toContentId);
-        }
-        catch (DataAccessException e)
-        {
-        	logger.debug("throwing ToolException: Exception occured when lams is copying content between content ids.");
-            throw new ToolException("Exception occured when lams is copying content between content ids."); 
-        }
-    }
-
-	
-	/**
-	 * 
-	 * gets called ONLY when a lesson is being created in monitoring mode. 
-	 * Should create the new content(toContent) based on what the author has created her content with. In q/a tool's case
-	 * that is content + question's content but not user responses. The deep copy should go only as far as
-	 * default content (or author created content) already goes.
-	 * ToolContentManager CONTRACT
-	 * 
-	 * 
-	 * similar to public void removeToolContent(Long toolContentId)
-	 * gets called by Container+Flash
-	 * 
-	 */
-
 	public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException
     {
-		/*
+
     	logger.debug("start of copyToolContent with ids: " + fromContentId + " and " + toContentId);
 
     	if (fromContentId == null)
@@ -1243,26 +1137,42 @@ public class McServicePOJO implements
             
             logger.debug("final - retrieved fromContent: " + fromContent);
             logger.debug("final - before new instance using " + fromContent + " and " + toContentId);
-            McContent toContent = McContent.newInstance(fromContent,toContentId);
-            if (toContent == null)
-            {
-            	logger.debug("throwing ToolException: WARNING!, retrieved toContent is null.");
-            	throw new ToolException("WARNING! Fail to create toContent. Can't continue!");
-            }
-            else
-            {
-            	logger.debug("retrieved toContent: " + toContent);
-	            mcContentDAO.saveMcContent(toContent);
-	            logger.debug("toContent has been saved successfully: " + toContent);
-            }
-            logger.debug("end of copyToolContent with ids: " + fromContentId + " and " + toContentId);
+            logger.debug("final - before new instance using mcToolContentHandler: " + mcToolContentHandler);
+            
+            try
+			{
+            	McContent toContent = McContent.newInstance(mcToolContentHandler, fromContent,toContentId);
+                if (toContent == null)
+                {
+                	logger.debug("throwing ToolException: WARNING!, retrieved toContent is null.");
+                	throw new ToolException("WARNING! Fail to create toContent. Can't continue!");
+                }
+                else
+                {
+                	logger.debug("retrieved toContent: " + toContent);
+    	            mcContentDAO.saveMcContent(toContent);
+    	            logger.debug("toContent has been saved successfully: " + toContent);
+                }
+                logger.debug("end of copyToolContent with ids: " + fromContentId + " and " + toContentId);
+
+			}
+        	catch(ItemNotFoundException e)
+			{
+        		logger.debug("exception occurred: " +  e);
+			}
+        	catch(RepositoryCheckedException e)
+			{
+        		logger.debug("exception occurred: " +  e);
+			}
+            
+        	
         }
         catch (DataAccessException e)
         {
         	logger.debug("throwing ToolException: Exception occured when lams is copying content between content ids.");
             throw new ToolException("Exception occured when lams is copying content between content ids."); 
         }
-        */
+
     }
 	
 

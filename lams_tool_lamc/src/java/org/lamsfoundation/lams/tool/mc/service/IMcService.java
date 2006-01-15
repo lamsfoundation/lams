@@ -28,6 +28,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.lamsfoundation.lams.contentrepository.ITicket;
+import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -157,8 +158,6 @@ public interface IMcService
 	
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException;
     
-    public void copyToolContent(Long fromContentId, Long toContentId, HttpServletRequest request) throws ToolException;
-
     public void setAsForceCompleteSession(Long toolSessionId) throws McApplicationException;
 
     public void setAsForceComplete(Long userId) throws McApplicationException;
