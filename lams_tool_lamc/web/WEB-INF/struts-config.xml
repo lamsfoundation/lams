@@ -32,6 +32,22 @@
    			type="org.lamsfoundation.lams.tool.mc.web.McStarterAction" 
    			name="McAuthoringForm" 
    			input=".starter"> 
+	
+		<exception
+	        key="error.exception.McApplication"
+	        type="org.lamsfoundation.lams.tool.mc.McApplicationException"
+	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
+	        path=".mcErrorBox"
+	        scope="request"
+	      />
+
+		<exception
+	        key="error.exception.McApplication"
+	        type="java.lang.NullPointerException"
+	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
+	        path=".mcErrorBox"
+	        scope="request"
+	      />	         			
 
 	  	<forward
 		    name="load"
@@ -62,6 +78,22 @@
       		parameter="dispatch"
       		unknown="false"
       		validate="true">
+	
+		<exception
+	        key="error.exception.McApplication"
+	        type="org.lamsfoundation.lams.tool.mc.McApplicationException"
+	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
+	        path=".mcErrorBox"
+	        scope="request"
+	      />
+
+		<exception
+	        key="error.exception.McApplication"
+	        type="java.lang.NullPointerException"
+	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
+	        path=".mcErrorBox"
+	        scope="request"
+	      />	         			      		
     	
 	      <forward
 	        name="load"
@@ -88,6 +120,22 @@
    			type="org.lamsfoundation.lams.tool.mc.web.McDLStarterAction" 
    			name="McAuthoringForm" 
    			input=".starter"> 
+	
+		<exception
+	        key="error.exception.McApplication"
+	        type="org.lamsfoundation.lams.tool.mc.McApplicationException"
+	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
+	        path=".mcErrorBox"
+	        scope="request"
+	      />
+
+		<exception
+	        key="error.exception.McApplication"
+	        type="java.lang.NullPointerException"
+	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
+	        path=".mcErrorBox"
+	        scope="request"
+	      />	         			   			
 
 	  	<forward
 		    name="load"
@@ -114,6 +162,22 @@
    			type="org.lamsfoundation.lams.tool.mc.web.McLearningStarterAction" 
    			name="McLearningForm" 
    			input=".learningStarter"> 
+
+		<exception
+	        key="error.exception.McApplication"
+	        type="org.lamsfoundation.lams.tool.mc.McApplicationException"
+	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
+	        path=".mcErrorBox"
+	        scope="request"
+	      />
+
+		<exception
+	        key="error.exception.McApplication"
+	        type="java.lang.NullPointerException"
+	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
+	        path=".mcErrorBox"
+	        scope="request"
+	      />	         			   			
 
 	  	<forward
 		    name="loadLearner"
@@ -144,6 +208,22 @@
       		parameter="method"
       		unknown="false"
       		validate="true">
+	
+		<exception
+	        key="error.exception.McApplication"
+	        type="org.lamsfoundation.lams.tool.mc.McApplicationException"
+	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
+	        path=".mcErrorBox"
+	        scope="request"
+	      />
+
+		<exception
+	        key="error.exception.McApplication"
+	        type="java.lang.NullPointerException"
+	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
+	        path=".mcErrorBox"
+	        scope="request"
+	      />	         			      		
 
 	  	<forward
 		    name="loadLearner"
@@ -189,6 +269,22 @@
    			name="McMonitoringForm" 
    			input=".monitoringStarter"> 
 
+		<exception
+	        key="error.exception.McApplication"
+	        type="org.lamsfoundation.lams.tool.mc.McApplicationException"
+	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
+	        path=".mcErrorBox"
+	        scope="request"
+	      />
+
+		<exception
+	        key="error.exception.McApplication"
+	        type="java.lang.NullPointerException"
+	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
+	        path=".mcErrorBox"
+	        scope="request"
+	      />	         			   			
+   			
 	  	<forward
 		    name="loadMonitoring"
 		    path=".monitoringContent"
@@ -212,6 +308,22 @@
       		parameter="dsp"
       		unknown="false"
       		validate="true"> 
+
+		<exception
+	        key="error.exception.McApplication"
+	        type="org.lamsfoundation.lams.tool.mc.McApplicationException"
+	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
+	        path=".mcErrorBox"
+	        scope="request"
+	      />
+
+		<exception
+	        key="error.exception.McApplication"
+	        type="java.lang.NullPointerException"
+	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
+	        path=".mcErrorBox"
+	        scope="request"
+	      />	         			      		
 
 	  	<forward
 		    name="loadMonitoring"
