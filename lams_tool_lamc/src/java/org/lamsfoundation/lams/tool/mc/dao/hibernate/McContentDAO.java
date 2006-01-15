@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.tool.mc.dao.hibernate;
 
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -40,6 +41,8 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  */
 
 public class McContentDAO extends HibernateDaoSupport implements IMcContentDAO {
+	static Logger logger = Logger.getLogger(McContentDAO.class.getName());
+	
 	private static final String FIND_MC_CONTENT = "from " + McContent.class.getName() + " as mc where content_id=?";
 	
 	private static final String LOAD_MC_BY_SESSION = "select mc from McContent mc left join fetch "
@@ -84,8 +87,9 @@ public class McContentDAO extends HibernateDaoSupport implements IMcContentDAO {
 	
 	public void saveMcContent(McContent mcContent)
     {
-		this.getSession().setFlushMode(FlushMode.AUTO);
-    	this.getHibernateTemplate().save(mcContent);
+		logger.debug("before saveOrUpdate");
+    	this.getHibernateTemplate().saveOrUpdate(mcContent);
+    	logger.debug("after saveOrUpdate");
     }
     
 	public void updateMcContent(McContent mcContent)
