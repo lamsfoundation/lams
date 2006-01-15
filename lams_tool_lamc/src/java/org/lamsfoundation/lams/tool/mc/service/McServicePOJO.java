@@ -159,6 +159,21 @@ public class McServicePOJO implements
 														   e);
         }
     }
+    
+    
+    public void  updateMcContent(McContent mcContent) throws McApplicationException
+    {
+        try
+        {
+            mcContentDAO.updateMcContent(mcContent);
+        }
+        catch (DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is updating mc content: "
+                                                         + e.getMessage(),
+														   e);
+        }
+    }
 
     
     public void createMcQue(McQueContent mcQueContent) throws McApplicationException
@@ -1294,21 +1309,18 @@ public class McServicePOJO implements
             throw new DataMissingException("toolContentId is missing");
     	}
     	
-    	McContent mcContent = mcContentDAO.findMcContentById(toolContentId);
-    	logger.debug("mcContent: " + mcContent);
+    	McContent mcContent=retrieveMc(toolContentId);
     	if (mcContent == null)
     	{
     		logger.debug("throwing DataMissingException: WARNING!: retrieved mcContent is null.");
             throw new DataMissingException("mcContent is missing");
     	}
-    	logger.debug("is define later: " + mcContent.isDefineLater());
+    	logger.debug("mcContent:" + mcContent);
     	mcContent.setDefineLater(true);
     	logger.debug("is define later: " + mcContent.isDefineLater());
-    	logger.debug("creating mc");
-    	createMc(mcContent);
-    	logger.debug("is define later: " + mcContent.isDefineLater());
-    	logger.debug("mcContent has been updated to true for defineLater: " + mcContent);
+    	saveMcContent(mcContent);
     }
+    
 
     /**
      * 
@@ -1332,7 +1344,7 @@ public class McServicePOJO implements
             throw new DataMissingException("mcContent is missing");
     	}
     	mcContent.setRunOffline(true);
-    	updateMc(mcContent);
+    	saveMcContent(mcContent);
     	logger.debug("qaContent has been updated for runOffline: " + mcContent);
     }
 
