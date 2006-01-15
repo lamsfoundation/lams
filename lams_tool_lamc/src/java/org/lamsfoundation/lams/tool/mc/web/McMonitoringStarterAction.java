@@ -113,6 +113,14 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 	    /* this section is related to Stats tab. Starts here. */
 	    int countAllUsers=mcService.getTotalNumberOfUsers();
 		logger.debug("countAllUsers: " + countAllUsers);
+		
+		if (countAllUsers == 0)
+		{
+	    	logger.debug("error: countAllUsers is 0");
+	    	persistError(request,"error.noStudentActivity");
+	    	request.setAttribute(USER_EXCEPTION_NO_STUDENT_ACTIVITY, new Boolean(true));
+			return (mapping.findForward(ERROR_LIST));
+		}
 	    
 		int countSessionComplete=mcService.countSessionComplete();
 		logger.debug("countSessionComplete: " + countSessionComplete);
