@@ -7,13 +7,12 @@
 
 	<!-- this form  exists temporarily to represent tool icon, remove this form once the tool is deployed into authoring environment -->
 <%
-	String userContentId="1234";
-	String userId="1111";
-	String toolUrl="/authoringStarter?userId=" + userId + "&toolContentID=" + userContentId;
+	String toolContentId="1234";
+	String toolUrl="/authoringStarter?toolContentID=" + toolContentId;
 	
-	String strCopyToolContent="/authoringStarter?userId=" + userId + "&toolContentID=" + userContentId + "&copyToolContent=1";
-	String strRemoveToolContent="/authoringStarter?userId=" + userId + "&toolContentID=" + userContentId + "&removeToolContent=1";
-	String strDefineLater="/defineLaterStarter?userId=" + userId + "&toolContentID=" + userContentId;
+	String strCopyToolContent="/authoringStarter?toolContentID=" + toolContentId + "&copyToolContent=1";
+	String strRemoveToolContent="/authoringStarter?toolContentID=" + toolContentId + "&removeToolContent=1";
+	String strDefineLater="/defineLaterStarter?toolContentID=" + toolContentId;
 %>
 
 Start authoring module
