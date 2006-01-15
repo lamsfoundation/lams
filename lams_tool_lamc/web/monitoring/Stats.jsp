@@ -7,69 +7,74 @@
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
 
-		<table align="left">
-			<tr> 
-				<td NOWRAP class="formlabel" align="right" valign=top>
-	  				<b> <bean:message key="count.total.user" /> </b>
-	  			</td>
-				<td NOWRAP class="formlabel" valign=top>
-				  	 <c:out value="${sessionScope.countAllUsers}"/>
-				</td> 
-			</tr>
-			
-			<tr> 
-				<td NOWRAP class="formlabel" align="right" valign=top>
-	  				<b> <bean:message key="count.finished.user" /> </b>
-	  			</td>
-				<td NOWRAP class="formlabel" valign=top>
-				  	 <c:out value="${sessionScope.countSessionComplete}"/>
-				</td> 
-			</tr>
-		
-			<tr> 
-				<td NOWRAP class="formlabel" align="right" valign=top>
-	  				<b> <bean:message key="label.topMark" /> </b>
-	  			</td>
-				<td NOWRAP class="formlabel" valign=top>
-				  	 <c:out value="${sessionScope.topMark}"/>
-				</td> 
-			</tr>
-			
+		<table class="forms">
 			<tr>
-				<td colspan=2> &nbsp&nbsp&nbsp </td>
-			</tr>
-	
-			<tr> 
-				<td NOWRAP class="formlabel" align="right" valign=top>
-	  				<b> <bean:message key="label.avMark" /> </b>
-	  			</td>
-				<td NOWRAP class="formlabel" valign=top>
-				  	<c:out value="${sessionScope.averageMark}"/>
-				</td> 
-			</tr>
+				<td>
+				<table align="center">
+						<tr> 
+							<td NOWRAP align="right" valign=top>
+				  				<b> <font size=2> <bean:message key="count.total.user" /> </font></b>
+				  			</td>
+							<td NOWRAP valign=top>
+							  	 <font size=2> <c:out value="${sessionScope.countAllUsers}"/>
+							</td> 
+						</tr>
+						
+						<tr> 
+							<td NOWRAP align="right" valign=top>
+				  				<b> <font size=2> <bean:message key="count.finished.user" /> </font></b>
+				  			</td>
+							<td NOWRAP valign=top>
+							  	 <font size=2> <c:out value="${sessionScope.countSessionComplete}"/></font>
+							</td> 
+						</tr>
+					
+						<tr> 
+							<td NOWRAP align="right" valign=top>
+				  				<b> <font size=2> <bean:message key="label.topMark" /> </font></b>
+				  			</td>
+							<td NOWRAP valign=top>
+							  	<font size=2> <c:out value="${sessionScope.topMark}"/></font>
+							</td> 
+						</tr>
+						
+						<tr>
+							<td colspan=2> &nbsp&nbsp&nbsp </td>
+						</tr>
+				
+						<tr> 
+							<td NOWRAP align="right" valign=top>
+				  				<b> <font size=2><bean:message key="label.avMark" /> </font></b>
+				  			</td>
+							<td NOWRAP valign=top>
+							  	<font size=2> <c:out value="${sessionScope.averageMark}"/></font>
+							</td> 
+						</tr>
+						
+						<tr>
+							<td colspan=2> &nbsp&nbsp&nbsp </td>
+						</tr>
+				
+						<tr> 
+							<td NOWRAP align="right" valign=top>
+				  				<b> <font size=2> <bean:message key="label.loMark" /> </font></b>
+				  			</td>
+							<td NOWRAP valign=top>
+							  	<font size=2> <c:out value="${sessionScope.lowestMark}"/></font>
+							</td> 
+						</tr>
 			
-			<tr>
-				<td colspan=2> &nbsp&nbsp&nbsp </td>
+						<tr> 
+							<td NOWRAP align="right" valign=top>
+				  				<b> <font size=2> <bean:message key="count.max.attempt" /> </font></b>
+				  			</td>
+							<td NOWRAP valign=top>
+							  	<font size=2> <c:out value="${sessionScope.countMaxAttempt}"/></font>
+							</td> 
+						</tr>
+				</table>
+				</td>
 			</tr>
-	
-			<tr> 
-				<td NOWRAP class="formlabel" align="right" valign=top>
-	  				<b> <bean:message key="label.loMark" /> </b>
-	  			</td>
-				<td NOWRAP class="formlabel" valign=top>
-				  	<c:out value="${sessionScope.lowestMark}"/>
-				</td> 
-			</tr>
-
-			<tr> 
-				<td NOWRAP class="formlabel" align="right" valign=top>
-	  				<b> <bean:message key="count.max.attempt" /> </b>
-	  			</td>
-				<td NOWRAP class="formlabel" valign=top>
-				  	<c:out value="${sessionScope.countMaxAttempt}"/>
-				</td> 
-			</tr>
-			
 		</table>
 
 
