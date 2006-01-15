@@ -1379,11 +1379,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		logger.debug("userAction:" + userAction);
 
 		request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(true));
-		
-		Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
-		logger.debug("current toolContentId: " + toolContentId);
-		mcService.setAsDefineLater(toolContentId);
-		logger.debug("done setting defineLater with toolContentId to true" + toolContentId);
+		setDefineLater(request);
 		
 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 		logger.debug("setting  EDIT_OPTIONS_MODE to 0");
@@ -2692,6 +2688,23 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     	mcService.saveMcContent(mcContent);
     }
 	
+    /**
+     * marks the define Later flag as true
+     * setDefineLater(HttpServletRequest request)
+     * @param request
+     */
+    protected void setDefineLater(HttpServletRequest request)
+    {
+    	IMcService mcService =McUtils.getToolService(request);
+    	Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
+    	logger.debug("toolContentId:" + toolContentId);
+    	
+    	McContent mcContent=mcService.retrieveMc(toolContentId);
+    	logger.debug("mcContent:" + mcContent);
+    	mcContent.setDefineLater(true);
+    	logger.debug("defineLater has been set to true");
+    	mcService.saveMcContent(mcContent);
+    }
 	
         
     /**
