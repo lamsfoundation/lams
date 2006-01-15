@@ -53,7 +53,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * When thinking about the tool content id and the tool session id, it might be helpful to think about the tool content id 
  * relating to the definition of an activity, whereas the tool session id relates to the runtime participation in the activity.
 
- *  * 
+ *  
  * Learner URL:
  * The learner url display the screen(s) that the learner uses to participate in the activity. 
  * When the learner accessed this user, it will have a tool access mode ToolAccessMode.LEARNER.
@@ -72,6 +72,48 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * ?? Would it be better to define a run offline message in the tool? We have instructions for the teacher but not the learner. ??
  * If the tool has a LockOnFinish flag, then the tool should lock learner's entries once they have completed the activity. 
  * If they return to the activity (e.g. via the progress bar) then the entries should be read only.
+ * 
+ *    <!--Learning Starter Action: initializes the Learning module -->
+   <action 	path="/learningStarter" 
+   			type="org.lamsfoundation.lams.tool.mc.web.McLearningStarterAction" 
+   			name="McLearningForm" 
+   			input=".learningStarter"> 
+
+		<exception
+	        key="error.exception.McApplication"
+	        type="org.lamsfoundation.lams.tool.mc.McApplicationException"
+	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
+	        path=".mcErrorBox"
+	        scope="request"
+	      />
+
+		<exception
+	        key="error.exception.McApplication"
+	        type="java.lang.NullPointerException"
+	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
+	        path=".mcErrorBox"
+	        scope="request"
+	      />	         			   			
+
+	  	<forward
+		    name="loadLearner"
+		    path=".answers"
+		    redirect="true"
+	  	/>
+
+	  	<forward
+		    name="redoQuestions"
+		    path=".redoQuestions"
+		    redirect="true"
+	  	/>
+	  	
+	  	<forward
+		    name="errorList"
+		    path=".mcErrorBox"
+		    redirect="true"
+	  	/>
+	</action>  
+
  *
  */
 
@@ -126,7 +168,6 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    	return validateParameters;
 	    }
   
-	    //Long toolSessionID=(Long) request.getSession().getAttribute(TOOL_SESSION_ID);
 	    Long toolSessionID=(Long) request.getSession().getAttribute(AttributeNames.PARAM_TOOL_SESSION_ID);
 	    logger.debug("retrieved toolSessionID: " + toolSessionID);
 	    /*

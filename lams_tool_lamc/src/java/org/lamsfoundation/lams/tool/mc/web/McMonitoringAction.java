@@ -53,6 +53,46 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
  * Struts action class as all of them are handled in 
  * <code>CustomStrutsExceptionHandler<code>.
  * 
+ *    <!--Monitoring Main Action: interacts with the Monitoring module user -->
+   <action 	path="/monitoring" 
+   			type="org.lamsfoundation.lams.tool.mc.web.McMonitoringAction" 
+   			name="McMonitoringForm" 
+	      	scope="session"
+   			input=".monitoringContent"
+      		parameter="dsp"
+      		unknown="false"
+      		validate="true"> 
+
+		<exception
+	        key="error.exception.McApplication"
+	        type="org.lamsfoundation.lams.tool.mc.McApplicationException"
+	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
+	        path=".mcErrorBox"
+	        scope="request"
+	      />
+
+		<exception
+	        key="error.exception.McApplication"
+	        type="java.lang.NullPointerException"
+	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
+	        path=".mcErrorBox"
+	        scope="request"
+	      />	         			      		
+
+	  	<forward
+		    name="loadMonitoring"
+		    path=".monitoringContent"
+		    redirect="true"
+	  	/>
+
+	  	<forward
+		    name="errorList"
+		    path=".mcErrorBox"
+		    redirect="true"
+	  	/>
+	</action>  
+
+ * 
 */
 public class McMonitoringAction extends LamsDispatchAction implements McAppConstants
 {
@@ -148,9 +188,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
     	return (mapping.findForward(LOAD_MONITORING));	
 	}
 
-    
-
-
+   
     /**
      * persists error messages to request scope
      * @param request

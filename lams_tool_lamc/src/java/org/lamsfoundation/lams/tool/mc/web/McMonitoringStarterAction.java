@@ -33,6 +33,42 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * 
  * @author Ozgur Demirtas
  * starts up the monitoring module
+ * 
+ * <!--Monitoring Starter Action: initializes the Monitoring module -->
+   <action 	path="/monitoringStarter" 
+   			type="org.lamsfoundation.lams.tool.mc.web.McMonitoringStarterAction" 
+   			name="McMonitoringForm" 
+   			input=".monitoringStarter"> 
+
+		<exception
+	        key="error.exception.McApplication"
+	        type="org.lamsfoundation.lams.tool.mc.McApplicationException"
+	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
+	        path=".mcErrorBox"
+	        scope="request"
+	      />
+
+		<exception
+	        key="error.exception.McApplication"
+	        type="java.lang.NullPointerException"
+	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
+	        path=".mcErrorBox"
+	        scope="request"
+	      />	         			   			
+   			
+	  	<forward
+		    name="loadMonitoring"
+		    path=".monitoringContent"
+		    redirect="true"
+	  	/>
+
+	  	<forward
+		    name="errorList"
+		    path=".mcErrorBox"
+		    redirect="true"
+	  	/>
+	</action>  
+
  *
  */
 

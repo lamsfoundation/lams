@@ -4,9 +4,28 @@
  * McDLStarterAction activates the Define Later module. 
  * It reuses majority of the functionality from existing authoring module.
  * 
-    <!--Define Later Starter  -->
-   <action path="/defineLaterStarter" type="org.lamsfoundation.lams.tool.mc.web.McDLStarterAction" 
-   			name="McAuthoringForm" input=".starter"> 
+   <!--Define Later Starter Action: initializes the DefineLater module -->
+   <action path="/defineLaterStarter" 
+   			type="org.lamsfoundation.lams.tool.mc.web.McDLStarterAction" 
+   			name="McAuthoringForm" 
+   			input=".starter"> 
+	
+		<exception
+	        key="error.exception.McApplication"
+	        type="org.lamsfoundation.lams.tool.mc.McApplicationException"
+	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
+	        path=".mcErrorBox"
+	        scope="request"
+	      />
+
+		<exception
+	        key="error.exception.McApplication"
+	        type="java.lang.NullPointerException"
+	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
+	        path=".mcErrorBox"
+	        scope="request"
+	      />	         			   			
+
 	  	<forward
 		    name="load"
 		    path=".questions"
@@ -14,14 +33,8 @@
 	  	/>
 	  	
 	  	<forward
-		    name="error"
-		    path=".error"
-		    redirect="true"
-	  	/>
-
-	  	<forward
 		    name="errorList"
-		    path=".errorList"
+		    path=".mcErrorBox"
 		    redirect="true"
 	  	/>
 	</action>  
