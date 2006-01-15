@@ -150,6 +150,8 @@ public interface McAppConstants {
     public static final String FILE_CONTENT_READY						="fileContentReady";
     public static final String FILE_NAME								="fileName";
     
+   
+    public static final String ERROR_MCAPPLICATION 						= "error.exception.McApplication";
     
     /*
      * authoring mode constants
