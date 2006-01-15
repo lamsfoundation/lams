@@ -56,14 +56,8 @@
 	  	/>
 	  	
 	  	<forward
-		    name="error"
-		    path=".error"
-		    redirect="true"
-	  	/>
-
-	  	<forward
 		    name="errorList"
-		    path=".errorList"
+		    path=".mcErrorBox"
 		    redirect="true"
 	  	/>
 	</action>  
@@ -144,14 +138,8 @@
 	  	/>
 	  	
 	  	<forward
-		    name="error"
-		    path=".error"
-		    redirect="true"
-	  	/>
-
-	  	<forward
 		    name="errorList"
-		    path=".errorList"
+		    path=".mcErrorBox"
 		    redirect="true"
 	  	/>
 	</action>  
@@ -193,7 +181,7 @@
 	  	
 	  	<forward
 		    name="errorList"
-		    path=".errorList"
+		    path=".mcErrorBox"
 		    redirect="true"
 	  	/>
 	</action>  
@@ -257,7 +245,7 @@
 
 	  	<forward
 		    name="errorList"
-		    path=".errorList"
+		    path=".mcErrorBox"
 		    redirect="true"
 	  	/>
     </action>
@@ -293,7 +281,7 @@
 
 	  	<forward
 		    name="errorList"
-		    path=".errorList"
+		    path=".mcErrorBox"
 		    redirect="true"
 	  	/>
 	</action>  
@@ -333,7 +321,7 @@
 
 	  	<forward
 		    name="errorList"
-		    path=".errorList"
+		    path=".mcErrorBox"
 		    redirect="true"
 	  	/>
 	</action>  
