@@ -2,8 +2,6 @@
 
 <html:form action="/monitoring/editActivity" method="post" >
 	<div id="basic">
-	<h1><fmt:message key="label.authoring.heading.basic" /></h1>
-	<h1><fmt:message key="label.authoring.heading.basic.desc" /></h1>
 	<table class="forms">
 		<!-- Title Row -->
 		<tr>

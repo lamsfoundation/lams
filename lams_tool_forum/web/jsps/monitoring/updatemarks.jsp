@@ -1,4 +1,5 @@
 <%@ include file="/includes/taglibs.jsp" %>
+<script type="text/javascript" src="<html:rewrite page='/includes/scripts.jsp'/>"></script>
 
 <html:form action="/monitoring/updateMark"  method="post">	
 <c_rt:set var="formBean" value="<%= session.getAttribute("markForm") %>" />
@@ -9,9 +10,9 @@
 	<tr>
 		<td valign="MIDDLE" width="48%">
 			<c:set var="viewtopic">
-				<html:rewrite page="/learning/viewTopic.do?topicId=${formBean.messageDto.message.uid}&create=${formBean.messageDto.message.created.time}" />
+				<html:rewrite page="/monitoring/viewTopic.do?messageID=${formBean.messageDto.message.uid}&create=${formBean.messageDto.message.created.time}" />
 			</c:set> 
-			<html:link href="${viewtopic}">
+			<html:link href="javascript:launchPopup('${viewtopic}')">
 				<c:out value="${formBean.messageDto.message.subject}" />
 			</html:link>
 		</td>

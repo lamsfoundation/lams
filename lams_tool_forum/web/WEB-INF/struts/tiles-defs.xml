@@ -142,7 +142,7 @@ http://www.gnu.org/licenses/gpl.txt
     	<put name="body" value="/jsps/monitoring/statistic.jsp"/>
 	</definition>
 	
-	<definition name="tiles:/monitoring/forum/viewTopic" extends="tiles:monioring:layout">
+	<definition name="tiles:/monitoring/forum/viewTopic" extends="tiles:layout">
     	<put name="pageTitleKey" value="page.title.monitoring.view.topic"/>
     	<put name="body" value="/jsps/monitoring/viewtopic.jsp"/>
 	</definition>
