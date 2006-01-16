@@ -175,6 +175,18 @@ public class McStarterAction extends Action implements McAppConstants {
 		    strToolContentId=request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 		    logger.debug("strToolContentId: " + strToolContentId);
 		    
+		    if (strToolContentId == null)
+		    {
+		    	Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+			    logger.debug("toolContentId: " + toolContentId);
+			    if (toolContentId != null)
+			    {
+			    	strToolContentId= toolContentId.toString();
+				    logger.debug("cached strToolContentId: " + strToolContentId);	
+			    }
+		    }
+		    
+		    
 		    if ((strToolContentId == null) || (strToolContentId.equals(""))) 
 		    {
 		    	persistError(request,"error.contentId.required");
