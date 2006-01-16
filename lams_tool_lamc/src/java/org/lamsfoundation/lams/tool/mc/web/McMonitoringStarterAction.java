@@ -100,8 +100,10 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 	    	return validateParameters;
 	    }
   
-	    Long toolContentId=(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    /* we have made sure TOOL_CONTENT_ID is passed  */
+	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
 	    logger.debug("toolContentId: " + toolContentId);
+	    
 	    McContent mcContent=mcService.retrieveMc(toolContentId);
 		logger.debug("existing mcContent:" + mcContent);
 		
