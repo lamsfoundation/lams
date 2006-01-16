@@ -25,11 +25,14 @@
 				property="activity.globel" /></td>
 		</tr>
 		<tr>
-			<td colspan="3"><html:cancel>
-				<fmt:message key="label.monitoring.edit.activity.cancel" />
-			</html:cancel> <html:submit>
+			<td colspan="3">
+			<html:submit>
 				<fmt:message key="label.monitoring.edit.activity.update" />
-			</html:submit></td>
+			</html:submit>
+			<html:button property="cancel" onclick="javascript:history.back()">
+				<fmt:message key="label.monitoring.edit.activity.cancel"/>
+			</html:button>
+			</td> 
 		</tr>
 	</table>
 	</div>
