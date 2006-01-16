@@ -106,6 +106,13 @@
 	        path=".editOptsContent"
 	        redirect="true"
 	      />
+	      
+	  	<forward
+		    name="errorList"
+		    path=".mcErrorBox"
+		    redirect="true"
+	  	/>
+	      
     </action>
     
     
@@ -293,7 +300,7 @@
    			name="McMonitoringForm" 
 	      	scope="session"
    			input=".monitoringContent"
-      		parameter="dsp"
+      		parameter="method"
       		unknown="false"
       		validate="true"> 
 
