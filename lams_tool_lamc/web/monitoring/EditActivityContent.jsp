@@ -6,4 +6,7 @@
 <%@ taglib uri="tags-fck-editor" prefix="FCK" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
-This is EditActivity content
+<h2><bean:message key="button.editActivity"/></h2>
+	<div id="datatablecontainer">
+		edit activity screen
+	</div>
