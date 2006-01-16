@@ -6,7 +6,8 @@
 <%@ taglib uri="tags-fck-editor" prefix="FCK" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
-
+	<h2><bean:message key="button.stats"/></h2>
+	<div id="datatablecontainer">
 		<table class="forms">
 			<tr>
 				<td>
@@ -38,10 +39,6 @@
 							</td> 
 						</tr>
 						
-						<tr>
-							<td colspan=2> &nbsp&nbsp&nbsp </td>
-						</tr>
-				
 						<tr> 
 							<td NOWRAP align="right" valign=top>
 				  				<b> <font size=2><bean:message key="label.avMark" /> </font></b>
@@ -51,10 +48,6 @@
 							</td> 
 						</tr>
 						
-						<tr>
-							<td colspan=2> &nbsp&nbsp&nbsp </td>
-						</tr>
-				
 						<tr> 
 							<td NOWRAP align="right" valign=top>
 				  				<b> <font size=2> <bean:message key="label.loMark" /> </font></b>
@@ -76,5 +69,6 @@
 				</td>
 			</tr>
 		</table>
+	</div>
 
 
