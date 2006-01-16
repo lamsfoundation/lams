@@ -1395,7 +1395,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		logger.debug("userAction:" + userAction);
 
 		request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(true));
-		setDefineLater(request);
+		setDefineLater(request, true);
 		
 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 		logger.debug("setting  EDIT_OPTIONS_MODE to 0");
@@ -1839,7 +1839,9 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		logger.debug("start unsetting define later with current toolContentId: " + toolContentId);
 		mcService.unsetAsDefineLater(toolContentId);
 		logger.debug("unset defineLater with toolContentId to true: " + toolContentId);
-		
+	
+		logger.debug("resetting defineLater flag. ");
+		setDefineLater(request, false);
 		return (mapping.findForward(LOAD_QUESTIONS));
     }
 
@@ -2687,6 +2689,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
         
     
     /**
+     * to indicate that some learners are using the content
      * marks the content as used content
      * setContentInUse(HttpServletRequest request)
      * 
@@ -2707,18 +2710,19 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 	
     /**
      * marks the define Later flag as true
-     * setDefineLater(HttpServletRequest request)
+     * setDefineLater(HttpServletRequest request, boolean value)
      * @param request
      */
-    protected void setDefineLater(HttpServletRequest request)
+    protected void setDefineLater(HttpServletRequest request, boolean value)
     {
     	IMcService mcService =McUtils.getToolService(request);
     	Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
     	logger.debug("toolContentId:" + toolContentId);
+    	logger.debug("value:" + value);
     	
     	McContent mcContent=mcService.retrieveMc(toolContentId);
     	logger.debug("mcContent:" + mcContent);
-    	mcContent.setDefineLater(true);
+    	mcContent.setDefineLater(value);
     	logger.debug("defineLater has been set to true");
     	mcService.saveMcContent(mcContent);
     }
@@ -2741,5 +2745,30 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     	mcLearningForm.resetCommands();
     	return (mapping.findForward(LOAD_LEARNER));
     }
+    
+    
+    public ActionForward editActivity(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+	{
+    	logger.debug("dispatching editActivity...");
+    	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
+	 	IMcService mcService =McUtils.getToolService(request);
+	 	logger.debug("mcService:" + mcService);
+	 	
+    	String userAction="editActivity";
+ 		request.setAttribute(USER_ACTION, userAction);
+ 		logger.debug("userAction:" + userAction);
+ 		request.setAttribute(CURRENT_MONITORING_TAB, "editActivity");
+ 		
+		McStarterAction mcStarterAction= new McStarterAction();
+	    request.getSession().setAttribute(TOOL_SERVICE, mcService);
+	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    	    
+	    return mcStarterAction.executeDefineLater(mapping, form, request, response, mcService);
+	}
+    
 }
     
