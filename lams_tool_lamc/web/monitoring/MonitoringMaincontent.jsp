@@ -13,7 +13,7 @@
 <html:html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-	<title>MCQ tool</title>
+	<title>MCQ tool Monitoring</title>
 	
 	<script lang="javascript">
 		var imgRoot="<c:out value="${lams}"/>images/";
@@ -32,7 +32,7 @@
 		// actionMethod: name of the method to be called in the DispatchAction
 		function submitMonitoringMethod(actionMethod) 
 		{
-			document.McMonitoringForm.dsp.value=actionMethod; 
+			document.McMonitoringForm.method.value=actionMethod; 
 			document.McMonitoringForm.submit();
 		}
 		
@@ -51,97 +51,116 @@
 	</script>	
 	
 </head>
-<body onLoad="initTabs()">
+<body onLoad="showMonitoringTab('su')">
 
 	<b> <bean:message key="label.monitoring"/> </b>
 	
+		<c:set var="monitoringURL">
+			<html:rewrite page="/monitoring.do" />
+		</c:set>
+
+		<c:set var="authoringURL">
+			<html:rewrite page="/authoring.do" />
+		</c:set>
+		
+		
 		<!-- start tabs -->
 		<!-- tab holder table -->
 		<table border="0" cellspacing="0" cellpadding="0">
 		  <tr>
+		  	<td> &nbsp&nbsp</td>
+		  </tr>
+			
+		  <tr>
+		  <html:form  action="/monitoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">
 			    <td valign="bottom">
-					<!-- table for tab 1 (summary)-->
 					<table border="0" cellspacing="0" cellpadding="0">
 					  <tr>
-						<td><a href="#"  onClick="showTab('b');return false;" ><img src="author_page/images/aqua_tab_s_left.gif" name="tab_left_b" width="8" height="25" border="0" id="tab_left_b"/></a></td>
-						<td class="tab tabcentre_selected" width="90" id="tab_tbl_centre_b"  onClick="showTab('b');return false;" ><label for="b" accesskey="b"><a href="#" onClick="showTab('b');return false;" id="b" >Summary</a></label></td>
-						<td><a href="#" onClick="showTab('b');return false;"><img src="author_page/images/aqua_tab_s_right.gif"  name="tab_right_b" width="8" height="25" border="0" id="tab_right_b"/></a></td>
+						<td><img src="<c:out value="${lams}"/>images/aqua_tab_s_left.gif" name="tab_left_su" width="8" height="25" border="0" id="tab_left_su"/></td>
+						<td class="tab tabcentre_selected" width="90" id="tab_tbl_centre_su" ><label for="su" accesskey="su">
+						<a href="<c:out value='${monitoringURL}'/>?method=getSummary" id="su" >Summary</a></label></td>
+						<td><a href="<c:out value='${monitoringURL}'/>?method=getSummary">
+							<img src="<c:out value="${lams}"/>images/aqua_tab_s_right.gif"  name="tab_right_su" width="8" height="25" border="0" id="tab_right_su"/></a></td>
 					  </tr>
 					</table>
 				</td>
+		  </html:form>				
+		
+		  <html:form  action="/monitoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
+			    <td valign="bottom">
+					<table border="0" cellspacing="0" cellpadding="0">
+					  <tr>
+						<td><img src="<c:out value="${lams}"/>images/aqua_tab_s_left.gif" name="tab_left_i" width="8" height="25" border="0" id="tab_left_i"/></td>
+						<td class="tab tabcentre_selected" width="90" id="tab_tbl_centre_i" ><label for="i" accesskey="i"><a
+							href="<c:out value='${monitoringURL}'/>?method=getInstructions" id="i" >Instructions</a></label></td>
+						<td><a href="<c:out value='${monitoringURL}'/>?method=getInstructions">
+							<img src="<c:out value="${lams}"/>images/aqua_tab_s_right.gif"  name="tab_right_i" width="8" height="25" border="0" id="tab_right_i"/></a></td>
+					  </tr>
+					</table>
+				</td>
+		  </html:form>				
 				
-			    <td valign="bottom">
-					<!-- table for tab 2 (instructions) -->
-					<table border="0" cellspacing="0" cellpadding="0">
-					  <tr>
-						<td><a href="#" onClick="showTab('a');return false;"><img src="author_page/images/aqua_tab_left.gif" name="tab_left_a" width="8" height="22" border="0" id="tab_left_a" /></a></td>
-						<td class="tab tabcentre" width="90" id="tab_tbl_centre_a" onClick="showTab('a');return false;"><label for="a" accesskey="a"><a href="#" onClick="showTab('a');return false;" id="a" >Instructions</a></label></td>
-						<td><a href="#" onClick="showTab('a');return false;"><img src="author_page/images/aqua_tab_right.gif" name="tab_right_a" width="9" height="22" border="0" id="tab_right_a" /></a></td>
-					  </tr>
-					</table>
-				</td>
-
-			    <td valign="bottom">
-					<!-- table for tab 3 (edit activity) -->
-					<table border="0" cellspacing="0" cellpadding="0">
-					  <tr>
-						<td ><a href="#" onClick="showTab('i');return false;"><img border="0" src="author_page/images/aqua_tab_left.gif" width="8" height="22" id="tab_left_i"   name="tab_left_i" /></a></td>
-						<td class="tab tabcentre" width="90" id="tab_tbl_centre_i"  onClick="showTab('i');return false;" ><label for="i" accesskey="i"><a href="#" onClick="showTab('i');return false;" id="i" >Edit Activity</a></label></td>
-						<td ><a href="#" onClick="showTab('i');return false;"><img src="author_page/images/aqua_tab_right.gif"  width="9" height="22" border="0" id="tab_right_i"  name="tab_right_i"/></a></td>
-					  </tr>
-					</table>
-				</td>
-
-<!--
+		  <html:form  action="/authoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">						
 			    <td valign="bottom">
 					<table border="0" cellspacing="0" cellpadding="0">
 					  <tr>
-						<td ><a href="#" onClick="showTab('s');return false;"><img border="0" src="author_page/images/aqua_tab_left.gif" width="8" height="22" id="tab_left_s"   name="tab_left_s" /></a></td>
-						<td class="tab tabcentre" width="90" id="tab_tbl_centre_s"  onClick="showTab('s');return false;" ><label for="s" accesskey="s"><a href="#" onClick="showTab('s');return false;" id="s" >Stats</a></label></td>
-						<td ><a href="#" onClick="showTab('s');return false;"><img src="author_page/images/aqua_tab_right.gif"  width="9" height="22" border="0" id="tab_right_s"  name="tab_right_s"/></a></td>
+						<td><img src="<c:out value="${lams}"/>images/aqua_tab_s_left.gif" name="tab_left_e" width="8" height="25" border="0" id="tab_left_e"/></td>
+						<td class="tab tabcentre_selected" width="90" id="tab_tbl_centre_e" ><label for="e" accesskey="e"><a
+							href="<c:out value='${authoringURL}'/>?dispatch=editActivity" id="e" >Edit Activity</a></label></td>
+						<td><a href="<c:out value='${authoringURL}'/>?dispatch=editActivity">
+							<img src="<c:out value="${lams}"/>images/aqua_tab_s_right.gif"  name="tab_right_e" width="8" height="25" border="0" id="tab_right_e"/></a></td>
 					  </tr>
 					</table>
 				</td>
--->
-
+			</html:form>				
+							
+		  <html:form  action="/monitoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">
+			    <td valign="bottom">
+					<table border="0" cellspacing="0" cellpadding="0">
+					  <tr>
+						<td><img src="<c:out value="${lams}"/>images/aqua_tab_s_left.gif" name="tab_left_s" width="8" height="25" border="0" id="tab_left_s"/></td>
+						<td class="tab tabcentre_selected" width="90" id="tab_tbl_centre_s" ><label for="s" accesskey="s"><a
+							href="<c:out value='${monitoringURL}'/>?method=getStats" id="e" >Stats</a></label></td>
+						<td><a href="<c:out value='${monitoringURL}'/>?method=getStats">
+							<img src="<c:out value="${lams}"/>images/aqua_tab_s_right.gif"  name="tab_right_s" width="8" height="25" border="0" id="tab_right_s"/></a></td>
+					  </tr>
+					</table>
+				</td>
+		</html:form>				
 		  </tr>
 		</table>
 	
 	<!-- end tab buttons -->
+		
+
 	<html:form  action="/monitoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">
-	<html:hidden property="dsp"/>	 
+	<html:hidden property="method"/>	 
+		
+		<c:choose>
+		         <c:when test='${currentMonitoringTab == "instructions"}'>
+						<div class="tabbody content_b" >
+							<jsp:include page="/monitoring/Instructions.jsp" />
+						</div>
+		        </c:when>
+		
+		        <c:when test='${currentMonitoringTab == "editActivity"}'>
+						<div class="tabbody content_b" >
+							<jsp:include page="/monitoring/EditActivityContent.jsp" />
+						</div>
+		        </c:when>
 
-		<div id='content_b' class="tabbody content_b" >
-				<h2><bean:message key="button.summary"/></h2>
-				<div id="formtablecontainer1">
+		         <c:when test='${currentMonitoringTab == "stats"}'>
+						<div class="tabbody content_b" >
+							<jsp:include page="/monitoring/Stats.jsp" />
+						</div>
+		        </c:when>
+		        
+		        <c:otherwise> 
+						<div class="tabbody content_b" >
 							<jsp:include page="/monitoring/SummaryContent.jsp" />
-				</div>
-		</div>
-			
-		<div id='content_a'  class="tabbody content_a">
-			<h2><bean:message key="button.instructions"/></h2>
-			<div id="formtablecontainer2">
-						<jsp:include page="/monitoring/InstructionsContent.jsp" />
-			</div>
-		</div>
-		
-		
-		<div id='content_i'  class="tabbody content_i">
-				<h2><bean:message key="button.editActivity"/></h2>
-				<div id="formtablecontainer3">
-						<jsp:include page="/monitoring/EditActivityContent.jsp" />
-				</div>
-		</div>
-
-
-<!--		
-		<div id='content_s'  class="tabbody content_s">
-				<h2><bean:message key="button.stats"/></h2>
-				<div id="formtablecontainer4">
-						<jsp:include page="/monitoring/Stats.jsp" />
-				</div>
-		</div>
--->
+						</div>		         							
+		        </c:otherwise>
+		</c:choose>
 	
 	</html:form>
 	<p></p>
