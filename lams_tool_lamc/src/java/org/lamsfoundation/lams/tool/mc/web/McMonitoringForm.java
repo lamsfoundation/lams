@@ -10,8 +10,8 @@ import org.lamsfoundation.lams.tool.mc.McAppConstants;
  * ActionForm for the Monitoring environment
  */
 public class McMonitoringForm extends ActionForm implements McAppConstants {
-	// dsp controls which method is called by the Lookup map */
-	protected String dsp;
+	// controls which method is called by the Lookup map */
+	protected String method;
 	
 	protected String selectedToolSessionId;
 	
@@ -43,15 +43,15 @@ public class McMonitoringForm extends ActionForm implements McAppConstants {
 	}
 	
 	/**
-	 * @return Returns the dsp.
+	 * @return Returns the method.
 	 */
-	public String getDsp() {
-		return dsp;
+	public String getMethod() {
+		return method;
 	}
 	/**
-	 * @param dsp The dsp to set.
+	 * @param method The method to set.
 	 */
-	public void setDsp(String dsp) {
-		this.dsp = dsp;
+	public void setMethod(String method) {
+		this.method = method;
 	}
 }
