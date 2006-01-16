@@ -35,6 +35,7 @@ import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McApplicationException;
 import org.lamsfoundation.lams.tool.mc.McUtils;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
+import org.lamsfoundation.lams.tool.mc.service.McServiceProxy;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 
 /**
@@ -132,6 +133,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
                                HttpServletResponse response) throws IOException,
                                                             ServletException
     {
+    	logger.debug("dispatching unspecified...");
 	 	McMonitoringForm mcMonitoringForm = (McMonitoringForm) form;
 	 	return null;
     }
@@ -186,6 +188,66 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	    logger.debug("CURRENT_MONITORED_TOOL_SESSION: " + request.getSession().getAttribute(CURRENT_MONITORED_TOOL_SESSION));
 	    
     	return (mapping.findForward(LOAD_MONITORING));	
+	}
+
+    
+    public ActionForward getSummary(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+	{
+    	logger.debug("dispatching getSummary...");
+    	McMonitoringForm mcMonitoringForm = (McMonitoringForm) form;
+	 	IMcService mcService =McUtils.getToolService(request);
+	 	
+    	String userAction="getSummary";
+ 		request.setAttribute(USER_ACTION, userAction);
+ 		logger.debug("userAction:" + userAction);
+ 		request.setAttribute(CURRENT_MONITORING_TAB, "summary");   
+ 		
+ 		return (mapping.findForward(LOAD_MONITORING));
+    	
+	}
+    
+    
+    public ActionForward getInstructions(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+	{
+    	logger.debug("dispatching getInstructions...");
+    	McMonitoringForm mcMonitoringForm = (McMonitoringForm) form;
+	 	IMcService mcService =McUtils.getToolService(request);
+	 	
+    	String userAction="getInstructions";
+ 		request.setAttribute(USER_ACTION, userAction);
+ 		logger.debug("userAction:" + userAction);
+ 		request.setAttribute(CURRENT_MONITORING_TAB, "instructions");
+ 		
+ 		return (mapping.findForward(LOAD_MONITORING));
+    	
+	}
+    
+
+    public ActionForward getStats(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+	{
+    	logger.debug("dispatching getStats...");
+    	McMonitoringForm mcMonitoringForm = (McMonitoringForm) form;
+	 	IMcService mcService =McUtils.getToolService(request);
+	 	
+    	String userAction="getStats";
+ 		request.setAttribute(USER_ACTION, userAction);
+ 		logger.debug("userAction:" + userAction);
+ 		request.setAttribute(CURRENT_MONITORING_TAB, "stats");
+ 		
+ 		return (mapping.findForward(LOAD_MONITORING));
+    	
 	}
 
    
