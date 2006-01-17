@@ -21,12 +21,10 @@
 package org.lamsfoundation.lams.tool.forum.test.dao;
 
 import org.lamsfoundation.lams.tool.forum.persistence.Forum;
-import org.lamsfoundation.lams.tool.forum.persistence.ForumDao;
-import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
-import org.lamsfoundation.lams.tool.forum.test.BaseTest;
+import org.lamsfoundation.lams.tool.forum.test.DAOBaseTest;
 import org.lamsfoundation.lams.tool.forum.test.TestUtils;
 
-public class ForumDAOTest extends BaseTest{
+public class ForumDAOTest extends DAOBaseTest{
 
 	public ForumDAOTest(String name) {
 		super(name);
@@ -34,14 +32,10 @@ public class ForumDAOTest extends BaseTest{
 	
 	public void testSave(){
 		Forum forum = TestUtils.getForumA();
-		ForumUser user = forum.getCreatedBy();
-		
-		ForumDao forumDao = new ForumDao();
 		forumDao.saveOrUpdate(forum);
 		
 		Forum tForum = forumDao.getById(forum.getUid());
 		assertEquals(tForum.getContentId(),new Long(1));
-		assertEquals(tForum.getCreatedBy(),user);
 		
 		//remove test data
 		forumDao.delete(forum);
@@ -49,7 +43,6 @@ public class ForumDAOTest extends BaseTest{
 	
 	public void testDelete(){
 		Forum forum = TestUtils.getForumA();
-		ForumDao forumDao = new ForumDao();
 		forumDao.saveOrUpdate(forum);
 			
 		//remove test data
@@ -58,8 +51,9 @@ public class ForumDAOTest extends BaseTest{
 		assertNull(forumDao.getById(forum.getUid()));
 	}
 	public void testGetByContentId(){
+		
 		Forum forum = TestUtils.getForumA();
-		ForumDao forumDao = new ForumDao();
+		
 		forumDao.saveOrUpdate(forum);
 		Forum tforum = forumDao.getByContentId(forum.getContentId());
 		assertEquals(tforum, forum);

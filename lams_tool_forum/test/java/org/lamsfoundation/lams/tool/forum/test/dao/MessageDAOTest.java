@@ -22,12 +22,14 @@ package org.lamsfoundation.lams.tool.forum.test.dao;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.tool.forum.persistence.Forum;
+import org.lamsfoundation.lams.tool.forum.persistence.ForumToolSession;
+import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
-import org.lamsfoundation.lams.tool.forum.persistence.MessageDao;
-import org.lamsfoundation.lams.tool.forum.test.BaseTest;
+import org.lamsfoundation.lams.tool.forum.test.DAOBaseTest;
 import org.lamsfoundation.lams.tool.forum.test.TestUtils;
 
-public class MessageDAOTest extends BaseTest{
+public class MessageDAOTest extends DAOBaseTest{
 
 	public MessageDAOTest(String name) {
 		super(name);
@@ -35,113 +37,137 @@ public class MessageDAOTest extends BaseTest{
 	
 	public void testSave(){
 		Message msg = TestUtils.getMessageA();
-		MessageDao dao = new MessageDao();
-		dao.saveOrUpdate(msg);
-		Message tmsg = dao.getById(msg.getUid());
+		messageDao.saveOrUpdate(msg);
+		Message tmsg = messageDao.getById(msg.getUid());
 		assertEquals(msg,tmsg);
 		
-		dao.delete(msg.getUid());
+		messageDao.delete(msg.getUid());
 	}
 	public void testDelete(){
 		Message msg = TestUtils.getMessageA();
-		MessageDao dao = new MessageDao();
-		dao.saveOrUpdate(msg);
-		dao.delete(msg.getUid());
+		messageDao.saveOrUpdate(msg);
+		messageDao.delete(msg.getUid());
 		
-		assertNull(dao.getById(msg.getUid()));
+		assertNull(messageDao.getById(msg.getUid()));
 		
 	}
 
 	public void testGetBySession(){
-		MessageDao dao = new MessageDao();
+		ForumToolSession sessionA = TestUtils.getSessionA();
+		forumToolSessionDao.saveOrUpdate(sessionA);
+		
 		Message msgA = TestUtils.getMessageA();
-		dao.saveOrUpdate(msgA);
+		msgA.setToolSession(sessionA);
+		messageDao.saveOrUpdate(msgA);
 		Message msgB = TestUtils.getMessageB();
-		dao.saveOrUpdate(msgB);
+		msgB.setToolSession(sessionA);
+		messageDao.saveOrUpdate(msgB);
 		
-		List list = dao.getBySession(new Long(1));
+		List list = messageDao.getBySession(new Long(1));
 		
-		assertEquals(list.size(),2);
+		assertEquals(2,list.size());
 		assertEquals(list.get(0),msgA);
 		assertEquals(list.get(1),msgB);
 		
 		//remove test data
-		dao.delete(msgA.getUid());
-		dao.delete(msgB.getUid());
-		
+		messageDao.delete(msgA.getUid());
+		messageDao.delete(msgB.getUid());
+		forumToolSessionDao.delete(sessionA);
 	}
 	public void testGetBySessionAndUser(){
-		MessageDao dao = new MessageDao();
+		ForumToolSession sessionA = TestUtils.getSessionA();
+		forumToolSessionDao.saveOrUpdate(sessionA);
+		ForumUser userA = TestUtils.getUserA();
+		forumUserDao.save(userA);
+		
 		Message msgA = TestUtils.getMessageA();
-		dao.saveOrUpdate(msgA);
+		msgA.setToolSession(sessionA);
+		msgA.setCreatedBy(userA);
+		messageDao.saveOrUpdate(msgA);
 		Message msgB = TestUtils.getMessageB();
-		dao.saveOrUpdate(msgB);
+		msgB.setToolSession(sessionA);
+		msgB.setCreatedBy(userA);
+		messageDao.saveOrUpdate(msgB);
 		
-		List list = dao.getByUserAndSession(new Long(1),new Long(1));
+		List list = messageDao.getByUserAndSession(userA.getUid(),sessionA.getSessionId());
 		
-		assertEquals(list.size(),1);
+		assertEquals(2,list.size());
 		assertEquals(list.get(0),msgA);
+		assertEquals(list.get(1),msgB);
 		
 		//remove test data
-		dao.delete(msgA.getUid());
-		dao.delete(msgB.getUid());
+		messageDao.delete(msgA.getUid());
+		messageDao.delete(msgB.getUid());
+		forumToolSessionDao.delete(sessionA);
+		forumUserDao.delete(userA);
 	}
 	public void testGetFromAuthor(){
-		MessageDao dao = new MessageDao();
+		ForumUser userA = TestUtils.getUserA();
+		forumUserDao.save(userA);
+		Forum forumA = TestUtils.getForumA();
+		forumDao.saveOrUpdate(forumA);
+		
 		Message msgA = TestUtils.getMessageA();
+		msgA.setCreatedBy(userA);
+		msgA.setForum(forumA);
 		msgA.setIsAuthored(true);
-		dao.saveOrUpdate(msgA);
+		messageDao.saveOrUpdate(msgA);
 		Message msgB = TestUtils.getMessageB();
+		msgB.setForum(forumA);
+		msgB.setCreatedBy(userA);
 		msgB.setIsAuthored(false);
-		dao.saveOrUpdate(msgB);
+		messageDao.saveOrUpdate(msgB);
 		
-		List list = dao.getTopicsFromAuthor(new Long(1));
+		List list = messageDao.getTopicsFromAuthor(forumA.getUid());
 		
-		assertEquals(list.size(),1);
+		assertEquals(1,list.size());
 		assertEquals(list.get(0),msgA);
 		
 		//remove test data
-		dao.delete(msgA.getUid());
-		dao.delete(msgB.getUid());
+		messageDao.delete(msgA.getUid());
+		messageDao.delete(msgB.getUid());
+		forumUserDao.delete(userA);
+		forumDao.delete(forumA);
 		
 	}
 	public void testGetRootTopics(){
-		MessageDao dao = new MessageDao();
+		ForumToolSession sessionA = TestUtils.getSessionA();
+		forumToolSessionDao.saveOrUpdate(sessionA);
+		
 		Message msgA = TestUtils.getMessageA();
-		msgA.setIsAuthored(true);
-		dao.saveOrUpdate(msgA);
+		msgA.setToolSession(sessionA);
+		messageDao.saveOrUpdate(msgA);
+		
 		Message msgB = TestUtils.getMessageB();
-		msgB.setIsAuthored(false);
 		msgB.setParent(msgA);
-		dao.saveOrUpdate(msgB);
+		msgB.setToolSession(sessionA);
+		messageDao.saveOrUpdate(msgB);
 		
-		List list = dao.getRootTopics(new Long(1));
+		List list = messageDao.getRootTopics(sessionA.getSessionId());
 		
-		assertEquals(list.size(),1);
+		assertEquals(1,list.size());
 		assertEquals(list.get(0),msgA);
 		
 		//remove test data
-		dao.delete(msgA.getUid());
-		dao.delete(msgB.getUid());
+		messageDao.delete(msgB.getUid());
+		messageDao.delete(msgA.getUid());
 	}
 	public void testGetChildrenTopics(){
-		MessageDao dao = new MessageDao();
 		Message msgA = TestUtils.getMessageA();
-		msgA.setIsAuthored(true);
-		dao.saveOrUpdate(msgA);
+		messageDao.saveOrUpdate(msgA);
+		
 		Message msgB = TestUtils.getMessageB();
-		msgB.setIsAuthored(false);
 		msgB.setParent(msgA);
-		dao.saveOrUpdate(msgB);
+		messageDao.saveOrUpdate(msgB);
 		
-		List list = dao.getChildrenTopics(new Long(1));
+		List list = messageDao.getChildrenTopics(msgA.getUid());
 		
-		assertEquals(list.size(),1);
+		assertEquals(1,list.size());
 		assertEquals(list.get(0),msgB);
 		
 		//remove test data
-		dao.delete(msgA.getUid());
-		dao.delete(msgB.getUid());
+		messageDao.delete(msgB.getUid());
+		messageDao.delete(msgA.getUid());
 	}
 	
 

@@ -21,29 +21,31 @@
 package org.lamsfoundation.lams.tool.forum.test.dao;
 
 import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
-import org.lamsfoundation.lams.tool.forum.persistence.ForumUserDao;
-import org.lamsfoundation.lams.tool.forum.test.BaseTest;
+import org.lamsfoundation.lams.tool.forum.test.DAOBaseTest;
 import org.lamsfoundation.lams.tool.forum.test.TestUtils;
 
-public class ForumUserDAOTest extends BaseTest{
+public class ForumUserDAOTest extends DAOBaseTest{
 
 	public ForumUserDAOTest(String name) {
 		super(name);
 	}
 	public void testSave(){
 		ForumUser user = TestUtils.getUserA();
-		ForumUserDao  dao = new ForumUserDao();
-		dao.save(user);
-		ForumUser tUser = dao.getByUid(user.getUid());
+		forumUserDao.save(user);
+		ForumUser tUser = forumUserDao.getByUid(user.getUid());
 		assertEquals(tUser,user);
+		
+		//remove test data
+		forumUserDao.delete(user);
 	}
 	public void testGetByUserId(){
 		ForumUser user = TestUtils.getUserA();
-		ForumUserDao  dao = new ForumUserDao();
-		dao.save(user);
-		ForumUser tUser = dao.getByUserId(new Long(1));
+		forumUserDao.save(user);
+		ForumUser tUser = forumUserDao.getByUserId(new Long(1));
 		assertEquals(tUser,user);
 		
+		//remove test data
+		forumUserDao.delete(user);
 	}
 
 }

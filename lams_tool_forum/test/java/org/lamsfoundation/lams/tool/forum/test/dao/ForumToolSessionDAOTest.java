@@ -22,12 +22,12 @@ package org.lamsfoundation.lams.tool.forum.test.dao;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.tool.forum.persistence.Forum;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumToolSession;
-import org.lamsfoundation.lams.tool.forum.persistence.ForumToolSessionDao;
-import org.lamsfoundation.lams.tool.forum.test.BaseTest;
+import org.lamsfoundation.lams.tool.forum.test.DAOBaseTest;
 import org.lamsfoundation.lams.tool.forum.test.TestUtils;
 
-public class ForumToolSessionDAOTest extends BaseTest{
+public class ForumToolSessionDAOTest extends DAOBaseTest{
 
 	public ForumToolSessionDAOTest(String name) {
 		super(name);
@@ -36,54 +36,56 @@ public class ForumToolSessionDAOTest extends BaseTest{
 	
 	public void testSave(){
 		ForumToolSession session = TestUtils.getSessionA();
-		ForumToolSessionDao dao = new ForumToolSessionDao();
-		dao.saveOrUpdate(session);
+		forumToolSessionDao.saveOrUpdate(session);
 		
-		ForumToolSession tSession = dao.getBySessionId(session.getSessionId());
+		ForumToolSession tSession = forumToolSessionDao.getBySessionId(session.getSessionId());
 		
 		assertEquals(session,tSession);
 		
 		//remove test data
-		dao.delete(session);
+		forumToolSessionDao.delete(session);
 		
 	}
 	
 	public void testDelete(){
 		ForumToolSession session = TestUtils.getSessionA();
-		ForumToolSessionDao dao = new ForumToolSessionDao();
-		dao.saveOrUpdate(session);
-		dao.delete(session);
+		forumToolSessionDao.saveOrUpdate(session);
+		forumToolSessionDao.delete(session);
 		
-		assertNull(dao.getBySessionId(session.getSessionId()));
+		assertNull(forumToolSessionDao.getBySessionId(session.getSessionId()));
 	}
 	
 	public void testGetByContentId(){
-		ForumToolSessionDao dao = new ForumToolSessionDao();
+		Forum forumA = TestUtils.getForumA();
+		forumDao.saveOrUpdate(forumA);
+		
 		ForumToolSession sessionA = TestUtils.getSessionA();
-		dao.saveOrUpdate(sessionA);
+		sessionA.setForum(forumA);
+		forumToolSessionDao.saveOrUpdate(sessionA);
 		ForumToolSession sessionB = TestUtils.getSessionB();
-		dao.saveOrUpdate(sessionB);
+		sessionB.setForum(forumA);
+		forumToolSessionDao.saveOrUpdate(sessionB);
 		
-		List list = dao.getByContentId(new Long(1));
+		List list = forumToolSessionDao.getByContentId(new Long(1));
 		
-		assertEquals(list.size(),2);
+		assertEquals(2,list.size());
 		assertEquals(list.get(0),sessionA);
 		assertEquals(list.get(1),sessionB);
 		//remove test data
-		dao.delete(sessionA);
-		dao.delete(sessionB);
+		forumToolSessionDao.delete(sessionA);
+		forumToolSessionDao.delete(sessionB);
+		forumDao.delete(forumA);
 	}
 	
 	public void testGetBySessionId(){
 		ForumToolSession session = TestUtils.getSessionA();
-		ForumToolSessionDao dao = new ForumToolSessionDao();
-		dao.saveOrUpdate(session);
+		forumToolSessionDao.saveOrUpdate(session);
 		
-		ForumToolSession tSession = dao.getBySessionId(session.getSessionId());
+		ForumToolSession tSession = forumToolSessionDao.getBySessionId(session.getSessionId());
 		
 		assertEquals(session,tSession);
 		
 		//remove test data
-		dao.delete(session);
+		forumToolSessionDao.delete(session);
 	}
 }

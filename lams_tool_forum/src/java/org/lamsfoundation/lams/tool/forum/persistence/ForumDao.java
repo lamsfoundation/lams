@@ -11,8 +11,6 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  *
  */
 public class ForumDao extends HibernateDaoSupport {
-	private static final String FIND_INSTRUCTION_FILE = "from " + Attachment.class.getName() 
-			+ " as i where forum_uid=? and i.fileUuid=? and i.fileVersionId=? and i.fileType=?";
 	private static final String FIND_FORUM_BY_CONTENTID = "from Forum forum where forum.contentId=?";
 	
 	public void saveOrUpdate(Forum forum) {
@@ -34,6 +32,7 @@ public class ForumDao extends HibernateDaoSupport {
 	 */
 	public void delete(Forum forum) {
 		this.getHibernateTemplate().delete(forum);
+		this.getHibernateTemplate().flush();
 	}
 
 	public Forum getByContentId(Long contentID) {

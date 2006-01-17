@@ -26,15 +26,16 @@ import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
+import org.lamsfoundation.lams.tool.forum.dto.MessageDTO;
 import org.lamsfoundation.lams.tool.forum.persistence.Forum;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumToolSession;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
 import org.lamsfoundation.lams.tool.forum.service.IForumService;
-import org.lamsfoundation.lams.tool.forum.test.BaseTest;
+import org.lamsfoundation.lams.tool.forum.test.DAOBaseTest;
 import org.lamsfoundation.lams.tool.forum.test.TestUtils;
 
-public class ForumServiceTest extends BaseTest{
+public class ForumServiceTest extends DAOBaseTest{
 	private IForumService forumService;
 	private ToolContentManager contentManager;
 	private ToolSessionManager sessionManager;
@@ -49,60 +50,103 @@ public class ForumServiceTest extends BaseTest{
 		sessionManager = (ToolSessionManager) forumService;
 	}
 	public void testUpdateForum(){
-		Forum forum = TestUtils.getForumA();
-		ForumUser user = forum.getCreatedBy();
+		ForumUser user = TestUtils.getUserA();
+		forumService.createUser(user);
 		
+		Forum forum = TestUtils.getForumA();
+		forum.setCreatedBy(user);
 		forumService.updateForum(forum);
+		
 		//get back
-		Forum tForum = forumService.getForum(new Long(1));
+		Forum tForum = forumService.getForum(forum.getUid());
 		assertEquals(tForum.getContentId(),new Long(1));
 		assertEquals(tForum.getCreatedBy(),user);
+		
+		//remove test data
+		forumDao.delete(forum);
+		forumUserDao.delete(user);
 	}
 	public void testCreateRootTopic(){
-		Message msg = TestUtils.getMessageA();
-		forumService.createRootTopic(new Long(1),new Long(1),msg);
-		Message tMsg = forumService.getMessage(msg.getUid());
-		assertFalse(tMsg.getUpdated().equals(msg.getUpdated()));
-		tMsg.setUpdated(msg.getUpdated());
-		assertEquals(tMsg,msg);
-	}
-	public void testUpdateTopic(){
+		Forum forum = TestUtils.getForumA();
+		forumDao.saveOrUpdate(forum);
+		ForumToolSession session = TestUtils.getSessionA();
+		session.setForum(forum);
+		forumToolSessionDao.saveOrUpdate(session);
 		
 		Message msg = TestUtils.getMessageA();
+		msg.setForum(forum);
+		
+		forumService.createRootTopic(forum.getUid(),session.getSessionId(),msg);
+		Message tMsg = forumService.getMessage(msg.getUid());
+		tMsg.setUpdated(msg.getUpdated());
+		assertEquals(tMsg,msg);
+
+		//remove test data
+		forumService.deleteTopic(msg.getUid());
+		forumToolSessionDao.delete(session);
+		forumDao.delete(forum);
+	}
+	public void testUpdateTopic(){
+		Forum forum = TestUtils.getForumA();
+		forumDao.saveOrUpdate(forum);
+		ForumToolSession session = TestUtils.getSessionA();
+		session.setForum(forum);
+		forumToolSessionDao.saveOrUpdate(session);
+		
+		Message msg = TestUtils.getMessageA();
+		forumService.createRootTopic(forum.getUid(),session.getSessionId(),msg);
+		
+		msg.setBody("update");
 		Message tMsg = forumService.updateTopic(msg);
 		//update date will be different
-		assertFalse(tMsg.getUpdated().equals(msg.getUpdated()));
 		tMsg.setUpdated(msg.getUpdated());
+		tMsg.setBody("update");
 		assertEquals(tMsg,msg);
 		
 		//remove test data
 		forumService.deleteTopic(msg.getUid());
+		forumToolSessionDao.delete(session);
+		forumDao.delete(forum);
 	}
 	public void testReplyTopic(){
+		Forum forum = TestUtils.getForumA();
+		forumDao.saveOrUpdate(forum);
+		ForumToolSession session = TestUtils.getSessionA();
+		session.setForum(forum);
+		forumToolSessionDao.saveOrUpdate(session);
+		ForumUser user = TestUtils.getUserA();
+		forumUserDao.save(user);
+		
 		Message parent = TestUtils.getMessageA();
-		forumService.updateTopic(parent);
+		parent.setCreatedBy(user);
+		forumService.createRootTopic(forum.getUid(),session.getSessionId(),parent);
 		
 		Message msg = TestUtils.getMessageB();
-		ForumToolSession session = TestUtils.getSessionA();
-		forumService.updateSession(session);
-		Message tMsg = forumService.replyTopic(parent.getUid(),session.getUid(),msg);
-		
-		//update date will be different
-		assertFalse(tMsg.getUpdated().equals(msg.getUpdated()));
-		tMsg.setUpdated(msg.getUpdated());
-		assertEquals(tMsg,msg);
+		msg.setCreatedBy(user);
+		Message tMsg = forumService.replyTopic(parent.getUid(),session.getSessionId(),msg);
+		List list = forumService.getTopicThread(parent.getUid());
+		Message child = ((MessageDTO) list.get(1)).getMessage();
+		assertEquals(child,tMsg);
 		
 //		remove test data
 		forumService.deleteTopic(parent.getUid());
+		forumToolSessionDao.delete(session);
+		forumDao.delete(forum);
+		forumUserDao.delete(user);
+
 	}
 	public void testDeleteTopic(){
+		Forum forum = TestUtils.getForumA();
+		forumDao.saveOrUpdate(forum);
+		ForumToolSession session = TestUtils.getSessionA();
+		session.setForum(forum);
+		forumToolSessionDao.saveOrUpdate(session);
+		
 		Message parent = TestUtils.getMessageA();
-		forumService.updateTopic(parent);
+		forumService.createRootTopic(forum.getUid(),session.getSessionId(),parent);
 		
 		Message msg = TestUtils.getMessageB();
-		ForumToolSession session = TestUtils.getSessionA();
-		forumService.updateSession(session);
-		forumService.replyTopic(parent.getUid(),session.getUid(),msg);
+		forumService.replyTopic(parent.getUid(),session.getSessionId(),msg);
 		
 		//delete parent and its children.
 		forumService.deleteTopic(parent.getUid());
@@ -110,30 +154,44 @@ public class ForumServiceTest extends BaseTest{
 		assertNull(forumService.getMessage(parent.getUid()));
 		assertNull(forumService.getMessage(msg.getUid()));
 		
+//		remove test data
+		forumToolSessionDao.delete(session);
+		forumDao.delete(forum);
+
 	}
 	public void testGetTopicThread(){
+		Forum forum = TestUtils.getForumA();
+		forumDao.saveOrUpdate(forum);
+		ForumToolSession session = TestUtils.getSessionA();
+		session.setForum(forum);
+		forumToolSessionDao.saveOrUpdate(session);
+		ForumUser user = TestUtils.getUserA();
+		forumUserDao.save(user);
+		
 		Message parent = TestUtils.getMessageA();
-		ForumToolSession sessionA = TestUtils.getSessionA();
-		forumService.updateSession(sessionA);
-		parent.setToolSession(sessionA);
-		forumService.updateTopic(parent);
+		parent.setCreatedBy(user);
+		forumService.createRootTopic(forum.getUid(),session.getSessionId(),parent);
 		
 		Message msg = TestUtils.getMessageB();
-		forumService.replyTopic(parent.getUid(),sessionA.getUid(),msg);
+		msg.setCreatedBy(user);
+		forumService.replyTopic(parent.getUid(),session.getSessionId(),msg);
 		
-		List list = forumService.getRootTopics(sessionA.getUid());
+		List list = forumService.getRootTopics(session.getSessionId());
 		
-		assertEquals(list.size(),1);
-		assertEquals(list.get(0),parent);
+		assertEquals(1,list.size());
+		assertEquals(((MessageDTO)list.get(0)).getMessage(),parent);
 		
+//		remove test data
 		//delete parent and its children.
 		forumService.deleteTopic(parent.getUid());
-		
+		forumToolSessionDao.delete(session);
+		forumDao.delete(forum);
+		forumUserDao.delete(user);
 	}
 	public void testUpdateSession() throws DataMissingException, ToolException{
 		ForumToolSession sessionA = TestUtils.getSessionA();
 		forumService.updateSession(sessionA);
-		ForumToolSession session = TestUtils.getSessionA();
+		ForumToolSession session = forumService.getSessionBySessionId(sessionA.getSessionId());
 		assertEquals(session,sessionA);
 		
 		//remove test data.
@@ -142,7 +200,7 @@ public class ForumServiceTest extends BaseTest{
 	public void testCreateUser(){
 		ForumUser userA = TestUtils.getUserA();
 		forumService.createUser(userA);
-		ForumUser user = TestUtils.getUserA();
+		ForumUser user = forumService.getUser(userA.getUid());
 		assertEquals(userA,user);
 	}
 }

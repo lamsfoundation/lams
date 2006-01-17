@@ -68,5 +68,10 @@ public class ForumUserDao extends HibernateDaoSupport{
 		return (ForumUser) this.getHibernateTemplate().get(ForumUser.class,userUid);
 	}
 
+	public void delete(ForumUser user) {
+		this.getHibernateTemplate().delete(user);
+		this.getHibernateTemplate().flush();
+	}
+
 
 }
