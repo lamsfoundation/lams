@@ -55,6 +55,13 @@ public class CSSThemeBriefDTO extends BaseDTO {
     		this.description = theme.getDescription();
         }
     }
+    
+    public CSSThemeBriefDTO(Long id, String name, String description)
+    {
+    	this.id = id;
+    	this.name = name;
+    	this.description = description;    	
+    }
 
     /**
      * @return Returns the description.
