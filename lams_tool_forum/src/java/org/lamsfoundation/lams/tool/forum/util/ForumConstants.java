@@ -50,6 +50,8 @@ public interface ForumConstants {
 	public static final String AUTHOR_MODE = "author_mode";
 	public static final String MONITOR_MODE = "monitor_mode";
 
+	public static final String FINISHEDLOCK = "finishedLock";
+
 
 
 	

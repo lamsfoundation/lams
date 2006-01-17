@@ -139,7 +139,9 @@ public class LearningAction extends Action {
 		request.getSession().setAttribute(ForumConstants.ALLOW_EDIT, allowEdit);
 		request.getSession().setAttribute(ForumConstants.ALLOW_RICH_EDITOR, allowRichEditor);
 		request.getSession().setAttribute(ForumConstants.LIMITED_CHARS, new Integer(allowNumber));
-		
+		boolean lock = session.getForum().getLockWhenFinished();
+		request.getSession().setAttribute(ForumConstants.FINISHEDLOCK,new Boolean(lock));
+
 		//get all root topic to display on init page
 		List rootTopics = forumService.getRootTopics(sessionId);
 		request.setAttribute(ForumConstants.AUTHORING_TOPICS_LIST,rootTopics);
