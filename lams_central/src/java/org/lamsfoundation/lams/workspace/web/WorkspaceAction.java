@@ -270,18 +270,18 @@ public class WorkspaceAction extends DispatchAction {
 													  ActionForm form,
 													  HttpServletRequest request,
 													  HttpServletResponse response)throws ServletException, Exception{
-		Integer contentTypeID = new Integer(WebUtil.readIntParam(request,"contentType"));
+		Integer contentTypeID = new Integer(WebUtil.readIntParam(request,"contentTypeID"));
 		String name = WebUtil.readStrParam(request,"name");
 		String description = WebUtil.readStrParam(request,"description");
-		Date createDateTime = DateUtil.convertFromString(WebUtil.readStrParam(request,"createDateTime"));
-		Date lastModifiedDate = DateUtil.convertFromString(WebUtil.readStrParam(request,"lastModifiedDateTime"));
+		//Date createDateTime = DateUtil.convertFromString(WebUtil.readStrParam(request,"createDateTime"));
+		//Date lastModifiedDate = DateUtil.convertFromString(WebUtil.readStrParam(request,"lastModifiedDateTime"));
 		Integer workspaceFolderID =  new Integer(WebUtil.readIntParam(request,"workspaceFolderID"));
 		String mimeType = WebUtil.readStrParam(request,"mimeType");
 		String path = WebUtil.readStrParam(request,"path");
 		
 		IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
 		String wddxPacket = workspaceManagementService.createWorkspaceFolderContent(contentTypeID,name,description,
-																				 createDateTime,lastModifiedDate,workspaceFolderID,
+																				 workspaceFolderID,
 																				 mimeType,path);
 		return outputPacket(mapping, request, response, wddxPacket, "details");
 	}
