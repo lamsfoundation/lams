@@ -10,6 +10,7 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
+import org.lamsfoundation.lams.themes.dto.CSSThemeBriefDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 /** 
@@ -639,7 +640,7 @@ public class User implements Serializable {
 							this.lastName,
 							this.login,
 							this.email,
-							this.theme);
+							new CSSThemeBriefDTO(this.theme));
     }
 	
 	/**This method checks whether user is a member of the 
