@@ -24,6 +24,9 @@ package org.lamsfoundation.lams.web.tag;
 
 import java.io.IOException;
 
+import java.util.Iterator;
+import java.util.List;
+
 import javax.servlet.http.HttpSession;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
@@ -35,6 +38,7 @@ import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.CSSThemeUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
@@ -55,7 +59,9 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 public class CssTag extends TagSupport {
 
 	private static final Logger log = Logger.getLogger(CssTag.class);
-
+	
+	private boolean generateLocalLink = false; 
+	
 	/**
 	 * 
 	 */
@@ -64,35 +70,69 @@ public class CssTag extends TagSupport {
 	}
 	
 	public int doStartTag() throws JspException {
-		String customStylesheetLink = null;
-    	String serverURL = Configuration.get(ConfigurationKeys.SERVER_URL);
+//		String customStylesheetLink = null;
+//    	String serverURL = Configuration.get(ConfigurationKeys.SERVER_URL);
+//		
+//	   	HttpSession ss = SessionManager.getSession();
+//	   	if ( ss != null ) {
+//	   		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+//	   		if ( user != null ) {
+//	   			CSSThemeVisualElement theme = user.getTheme();
+//	   			if ( theme != null && theme.getName() != null ) {
+//	   				customStylesheetLink = generateLink(theme.getName(),serverURL);
+//	   			}
+//	   		} 
+//	   	}
+//	   	
+//	   	try {
+//        	JspWriter writer = pageContext.getOut();
+//    	   	if ( customStylesheetLink != null ) {
+//    	   		writer.print(customStylesheetLink);
+//    	   	}
+//	   		writer.print(generateLink("default",serverURL));
+//		} catch ( IOException e ) {
+//			log.error("CssTag unable to write out CSS details due to IOException.", e);
+//			// don't throw a JSPException as we want the system to still function.
+//		}
+//	   	
 		
-	   	HttpSession ss = SessionManager.getSession();
-	   	if ( ss != null ) {
-	   		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	   		if ( user != null ) {
-	   			CSSThemeVisualElement theme = user.getTheme();
-	   			if ( theme != null && theme.getName() != null ) {
-	   				customStylesheetLink = generateLink(theme.getName(),serverURL);
-	   			}
-	   		} 
-	   	}
-
-		try {
-        	JspWriter writer = pageContext.getOut();
-    	   	if ( customStylesheetLink != null ) {
-    	   		writer.print(customStylesheetLink);
-    	   	}
-	   		writer.print(generateLink("default",serverURL));
-		} catch ( IOException e ) {
-			log.error("CssTag unable to write out CSS details due to IOException.", e);
-			// don't throw a JSPException as we want the system to still function.
+		String customStylesheetLink = null;
+		String serverURL = Configuration.get(ConfigurationKeys.SERVER_URL);
+		List themeList = CSSThemeUtil.getAllUserThemes();
+		
+		Iterator i = themeList.iterator();
+		
+		while (i.hasNext())
+		{
+			String theme = (String)i.next();
+			if ( theme != null) {
+				if (generateLocalLink)
+					customStylesheetLink = generateLocalLink(theme,serverURL);
+				else	
+					customStylesheetLink = generateLink(theme,serverURL);
+			}
+	
+			try {
+	        	JspWriter writer = pageContext.getOut();
+	    	   	if ( customStylesheetLink != null ) {
+	    	   		writer.print(customStylesheetLink);
+	    	   	}
+		   		//writer.print(generateLink("default",serverURL));
+			} catch ( IOException e ) {
+				log.error("CssTag unable to write out CSS details due to IOException.", e);
+				// don't throw a JSPException as we want the system to still function.
+			}
 		}
 	   	
     	return SKIP_BODY;
 	}
 
-	private String generateLink(String stylesheetName, String serverURL) {
+	private String generateLocalLink(String stylesheetName, String serverURL) {
+		return "<link href=\"../" + stylesheetName + ".css\" rel=\"stylesheet\" type=\"text/css\">";
+	}
+	
+	private String generateLink(String stylesheetName, String serverURL)
+	{
 		if ( serverURL.endsWith("/") ) {
 			return "<link href=\""+serverURL+"css/"+stylesheetName+".css\" rel=\"stylesheet\" type=\"text/css\">";
 		} else {
@@ -102,6 +142,14 @@ public class CssTag extends TagSupport {
 
 	public int doEndTag() {
 		return EVAL_PAGE;
+	}
+	
+	public void setLocalLink(String localLink)
+	{
+		if (localLink.equalsIgnoreCase("true"))
+			this.generateLocalLink = true;
+		else
+			this.generateLocalLink = false;
 	}
 	
 }
