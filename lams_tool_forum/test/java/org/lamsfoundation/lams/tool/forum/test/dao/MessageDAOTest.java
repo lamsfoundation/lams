@@ -151,6 +151,7 @@ public class MessageDAOTest extends DAOBaseTest{
 		//remove test data
 		messageDao.delete(msgB.getUid());
 		messageDao.delete(msgA.getUid());
+		forumToolSessionDao.delete(sessionA);
 	}
 	public void testGetChildrenTopics(){
 		Message msgA = TestUtils.getMessageA();

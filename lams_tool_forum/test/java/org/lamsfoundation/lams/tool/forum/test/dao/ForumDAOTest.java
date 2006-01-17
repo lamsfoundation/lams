@@ -45,7 +45,6 @@ public class ForumDAOTest extends DAOBaseTest{
 		Forum forum = TestUtils.getForumA();
 		forumDao.saveOrUpdate(forum);
 			
-		//remove test data
 		forumDao.delete(forum);
 		
 		assertNull(forumDao.getById(forum.getUid()));
@@ -57,6 +56,10 @@ public class ForumDAOTest extends DAOBaseTest{
 		forumDao.saveOrUpdate(forum);
 		Forum tforum = forumDao.getByContentId(forum.getContentId());
 		assertEquals(tforum, forum);
+		
+		//remove test data
+		forumDao.delete(forum);
+		
 	}
 
 }

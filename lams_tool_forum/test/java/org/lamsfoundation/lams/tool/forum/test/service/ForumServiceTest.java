@@ -51,7 +51,7 @@ public class ForumServiceTest extends DAOBaseTest{
 	}
 	public void testUpdateForum(){
 		ForumUser user = TestUtils.getUserA();
-		forumService.createUser(user);
+		forumUserDao.save(user);
 		
 		Forum forum = TestUtils.getForumA();
 		forum.setCreatedBy(user);
@@ -202,5 +202,9 @@ public class ForumServiceTest extends DAOBaseTest{
 		forumService.createUser(userA);
 		ForumUser user = forumService.getUser(userA.getUid());
 		assertEquals(userA,user);
+		
+		
+//		remove test data
+		forumUserDao.delete(userA);
 	}
 }
