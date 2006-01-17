@@ -23,7 +23,7 @@
 package org.lamsfoundation.lams.usermanagement.dto;
 
 import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
-
+import org.lamsfoundation.lams.themes.dto.CSSThemeBriefDTO;
 /**
  * @author Manpreet Minhas
  */
@@ -34,11 +34,22 @@ public class UserDTO {
 	private String lastName;
 	private String login;
     private String email;
-    private CSSThemeVisualElement theme;
+   // private CSSThemeVisualElement theme;
+    private CSSThemeBriefDTO theme;
 	
 
+//	public UserDTO(Integer userID, String firstName, String lastName,
+//			String login, String email, CSSThemeVisualElement theme) {		
+//		this.userID = userID;
+//		this.firstName = firstName;
+//		this.lastName = lastName;
+//		this.login = login;
+//		this.email = email;
+//		this.theme = theme;
+//	}
+	
 	public UserDTO(Integer userID, String firstName, String lastName,
-			String login, String email, CSSThemeVisualElement theme) {		
+			String login, String email, CSSThemeBriefDTO theme) {		
 		this.userID = userID;
 		this.firstName = firstName;
 		this.lastName = lastName;
@@ -46,6 +57,8 @@ public class UserDTO {
 		this.email = email;
 		this.theme = theme;
 	}
+	
+	
 	/**
 	 * @return Returns the firstName.
 	 */
@@ -70,12 +83,24 @@ public class UserDTO {
 	public Integer getUserID() {
 		return userID;
 	}
-	
-	public CSSThemeVisualElement getTheme() {
+
+
+	public CSSThemeBriefDTO getTheme() {
 		return theme;
 	}
-	
-	public void setTheme(CSSThemeVisualElement theme) {
+
+
+	public void setTheme(CSSThemeBriefDTO theme) {
 		this.theme = theme;
 	}
+	
+//	public CSSThemeVisualElement getTheme() {
+//		return theme;
+//	}
+//	
+//	public void setTheme(CSSThemeVisualElement theme) {
+//		this.theme = theme;
+//	}
+	
+	
 }
