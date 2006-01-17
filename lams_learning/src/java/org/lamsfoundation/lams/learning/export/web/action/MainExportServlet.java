@@ -33,6 +33,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,6 +41,9 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.lang.StringBuffer;
 import java.net.MalformedURLException;
+import java.util.Iterator;
+import java.util.List;
+
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -51,6 +55,7 @@ import javax.servlet.http.HttpSession;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.CSSThemeUtil;
 import org.lamsfoundation.lams.util.HttpUrlConnectionUtil;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileUtilException;
@@ -64,11 +69,16 @@ import org.lamsfoundation.lams.learning.export.ToolPortfolio;
 import org.lamsfoundation.lams.learning.export.service.IExportPortfolioService;
 import org.lamsfoundation.lams.learning.export.service.ExportPortfolioService;
 import org.lamsfoundation.lams.learning.export.service.ExportPortfolioServiceProxy;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
+import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+
+import org.apache.struts.util.MessageResources;
 
 
 
@@ -90,6 +100,7 @@ public class MainExportServlet extends HttpServlet {
 	
 	private static Logger log = Logger.getLogger(MainExportServlet.class);
 	private String exportTmpDir;
+	private MessageResources resources = MessageResources.getMessageResources(ExportPortfolioConstants.MESSAGE_RESOURCE_CONFIG_PARAM);
 	
 	
 	
@@ -103,11 +114,14 @@ public class MainExportServlet extends HttpServlet {
 	    
 	    String htmlOutput=null;	
 		Portfolio portfolios = null;
+		Long lessonID = null;
+		String lessonDescription = null;
 		
 	    /** Get the cookies that were sent along with this request, then pass it onto export service */
 		Cookie[] cookies = request.getCookies();	
 	
 		IExportPortfolioService exportService = ExportPortfolioServiceProxy.getExportPortfolioService(this.getServletContext());
+		ILearnerService learnerService = LearnerServiceProxy.getLearnerService(this.getServletContext());
 		
 		String mode = WebUtil.readStrParam(request, AttributeNames.PARAM_MODE);
 		
@@ -116,17 +130,19 @@ public class MainExportServlet extends HttpServlet {
 			HttpSession session = SessionManager.getSession();
 		    UserDTO userDto = (UserDTO)session.getAttribute(AttributeNames.USER);
 		    Integer userId = userDto.getUserID();
-		    
-		    Long lessonID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID));
+		    lessonID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID));
 		    portfolios = exportService.exportPortfolioForStudent(userId, lessonID, true, cookies);
 		}
 		else if(mode.equals(ToolAccessMode.TEACHER.toString()))
 		{
 			//done in the monitoring environment
-			Long lessonID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID));
-			
+			lessonID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID));			
 			portfolios = exportService.exportPortfolioForTeacher(lessonID, cookies);
 		}
+		
+		Lesson lesson = learnerService.getLesson(lessonID);
+		if (lesson != null)
+			lessonDescription = lesson.getLessonDescription();
 		
 		if (portfolios!= null)
 		{
@@ -135,12 +151,15 @@ public class MainExportServlet extends HttpServlet {
 				
 			String mainFileName = exportTmpDir+ File.separator + ExportPortfolioConstants.MAIN_EXPORT_FILENAME;				   
 				
-			htmlOutput = generateMainPage(portfolios);	
+			htmlOutput = generateMainPage(portfolios, lessonDescription);	
 			
 			//writing the file to the temp export folder.	
 			BufferedWriter fileout = new BufferedWriter(new FileWriter(mainFileName));
 			fileout.write(htmlOutput);
-			fileout.close();
+			fileout.close();			
+			
+			//bundle the stylesheet with the package
+			bundleStylesheetWithExportPackage(exportTmpDir, request, cookies);
 			
 			//zip up the contents of the temp export folder
 			String zipFilename = exportService.zipPortfolio(ExportPortfolioConstants.ZIP_FILENAME, exportTmpDir);
@@ -161,36 +180,29 @@ public class MainExportServlet extends HttpServlet {
 	 * @param portfolios
 	 * @return
 	 */
-	private String generateMainPage(Portfolio portfolio)
+	private String generateMainPage(Portfolio portfolio, String lessonDescriptionToDisplay)
 	{
 	    ToolPortfolio[] portfolios = portfolio.getToolPortfolios();
-	    StringBuffer htmlPage = new StringBuffer();
+	    String htmlPage;
 	    if (portfolios != null)
 	    {
-		   
-		    htmlPage.append("<html><head><title>Export Portfolio</title></head>");
-		    htmlPage.append("<body><h1>Portfolio</h1><h2>Activities</h2>");
-		    htmlPage.append("<ol>");
-		    for (int i=0; i<portfolios.length; i++)
+	    	StringBuffer htmlContent = new StringBuffer();
+	    	for (int i=0; i<portfolios.length; i++)
 		    {
-		        htmlPage.append("<li>");
-		        htmlPage.append(portfolios[i].getActivityName())
-		        .append(" <a href='").append(portfolios[i].getToolLink()).append("'> ")
+		        htmlContent.append("<li>");
+		        htmlContent.append(portfolios[i].getActivityName())
+		        .append("<a href='").append(portfolios[i].getToolLink()).append("'> ")
 		        .append(portfolios[i].getActivityDescription()).append("</a>");
-		        htmlPage.append("</li>");
+		        htmlContent.append("</li>");
 		    }
-		    htmlPage.append("</ol>");
-		    htmlPage.append("</body></html>");
+		    htmlPage = resources.getMessage(ExportPortfolioConstants.EXPORT_MAINPAGE_KEY, lessonDescriptionToDisplay, htmlContent.toString());
+
 		   
 	    }
 	    else
-	    {
-	        htmlPage.append("<html><head><title>Export Portfolio</title></head>");
-		    htmlPage.append("<body><h1>Export Portfolio Failed</h1>");
-		    htmlPage.append("This sequence does not support portfolio exports");
-		    htmlPage.append("</body></html>");
-	    }
-	    return htmlPage.toString();
+	    	htmlPage = resources.getMessage(ExportPortfolioConstants.EXPORT_FAILED_KEY);
+	    
+	     return htmlPage;
 	    
 	}
 	
@@ -200,6 +212,29 @@ public class MainExportServlet extends HttpServlet {
 	    String tempSysDirName = ExportPortfolioConstants.TEMP_DIRECTORY;
 	    return absolutePath.substring(tempSysDirName.length()+1, absolutePath.length());
 	}
+	
+	private void bundleStylesheetWithExportPackage(String directory, HttpServletRequest request, Cookie[] cookies) throws IOException
+	{
+		List themeList = CSSThemeUtil.getAllUserThemes();
+		
+		Iterator i = themeList.iterator();
+		
+		while (i.hasNext())
+		{
+			String theme = (String)i.next();
+			
+			String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort();
+			String url = basePath + "/lams/css/" + theme + ".css";
+			HttpUrlConnectionUtil.writeResponseToFile(url, directory, theme + ".css", cookies); //cookies aren't really needed here.
+		}
+		
+		
+		
+		
+		
+		
+	}
+	
 	
 	
 	/*
