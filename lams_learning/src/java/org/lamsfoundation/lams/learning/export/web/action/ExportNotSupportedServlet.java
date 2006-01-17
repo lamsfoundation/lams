@@ -19,8 +19,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.apache.struts.util.MessageResources;
 
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
+import org.lamsfoundation.lams.learning.export.ExportPortfolioConstants;
 import org.lamsfoundation.lams.learning.export.ExportPortfolioException;
 /**
  * @author mtruong
@@ -31,7 +33,8 @@ import org.lamsfoundation.lams.learning.export.ExportPortfolioException;
 public class ExportNotSupportedServlet extends AbstractExportPortfolioServlet {
     
     private static Logger log = Logger.getLogger(ExportNotSupportedServlet.class);
-    
+    private MessageResources resources = MessageResources.getMessageResources(ExportPortfolioConstants.MESSAGE_RESOURCE_CONFIG_PARAM);
+	    
     private final String FILENAME = "export_unsupported.html";
     
     public String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies)
@@ -58,12 +61,14 @@ public class ExportNotSupportedServlet extends AbstractExportPortfolioServlet {
     
     private String generateHtmlContent()
     {
-        StringBuffer htmlPage = new StringBuffer();
-	    htmlPage.append("<html><head><title>Export Portfolio Unsupported</title></head>");
-	    htmlPage.append("<body><p>Export Portfolio for this activity is unsupported</p></body>");
-	    htmlPage.append("</html>");
-	    
-	    return htmlPage.toString();
+//        StringBuffer htmlPage = new StringBuffer();
+//	    htmlPage.append("<html><head><title>Export Portfolio Unsupported</title></head>");
+//	    htmlPage.append("<body><p>Export Portfolio for this activity is unsupported</p></body>");
+//	    htmlPage.append("</html>");
+//	    
+//	    return htmlPage.toString();
+    	return resources.getMessage(ExportPortfolioConstants.EXPORT_NOT_SUPPORTED_KEY);
+    	
     }
    
    
