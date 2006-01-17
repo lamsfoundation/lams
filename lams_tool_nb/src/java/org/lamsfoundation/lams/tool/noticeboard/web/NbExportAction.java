@@ -39,7 +39,7 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
  *                          type="org.lamsfoundation.lams.tool.noticeboard.NbApplicationException"
  *                          path=".error"
  *                          handler="org.lamsfoundation.lams.tool.noticeboard.web.CustomStrutsExceptionHandler"
- * @struts:action-forward name="exportPortfolio" path=".exportPortfolio"
+ * @struts:action-forward name="exportPortfolio" path="/exportPortfolio.jsp"
  * ----------------XDoclet Tags--------------------
  */
 public class NbExportAction extends LamsDispatchAction {
