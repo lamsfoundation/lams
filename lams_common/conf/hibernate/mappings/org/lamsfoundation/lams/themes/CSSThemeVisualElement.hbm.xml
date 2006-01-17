@@ -93,7 +93,7 @@
     >
         <meta attribute="field-description">
                @hibernate.set
-                 lazy="true"
+                 lazy="false"
                  inverse="true"
                  cascade="none"
                 @hibernate.collection-key
@@ -113,7 +113,7 @@
     <!--  change to have more than one style per element, we'll be ready <grin> -->
     <set
         name="styles"
-        lazy="false"
+        lazy="true"
         inverse="true"
 		cascade="all-delete-orphan"
     >
@@ -139,7 +139,7 @@
     <!-- bi-directional one-to-many association to child visual elements (maybe child themes in the future) -->
     <set
         name="elements"
-        lazy="false"
+        lazy="true"
         inverse="true"
 		cascade="all-delete-orphan"
     >

@@ -335,6 +335,7 @@
     <!-- bi-directional many-to-one association to CSSTheme -->
     <many-to-one
         name="theme"
+        lazy="false"
         class="org.lamsfoundation.lams.themes.CSSThemeVisualElement"
         not-null="true"
     >
