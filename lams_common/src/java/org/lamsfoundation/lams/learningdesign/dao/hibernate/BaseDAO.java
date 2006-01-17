@@ -38,7 +38,8 @@ public class BaseDAO extends HibernateDaoSupport implements IBaseDAO {
 	 * @see org.lamsfoundation.lams.learningdesign.dao.interfaces.IBaseDAO#insert(java.lang.Object)
 	 */
 	public void insert(Object object) {
-		this.getHibernateTemplate().save(object);		
+		this.getHibernateTemplate().save(object);	
+		this.getHibernateTemplate().flush();
 	}
 
 	/**
@@ -46,6 +47,7 @@ public class BaseDAO extends HibernateDaoSupport implements IBaseDAO {
 	 */
 	public void update(Object object) {
 		this.getHibernateTemplate().update(object);
+		this.getHibernateTemplate().flush();
 	}
 
 	/** 
@@ -53,6 +55,7 @@ public class BaseDAO extends HibernateDaoSupport implements IBaseDAO {
 	 */
 	public void delete(Object object) {
 		this.getHibernateTemplate().delete(object);
+		this.getHibernateTemplate().flush();
 	}
 
 	/**
@@ -62,7 +65,8 @@ public class BaseDAO extends HibernateDaoSupport implements IBaseDAO {
 	 * @param id
 	 */
 	public Object find(Class objClass, Serializable id) {
-		return this.getHibernateTemplate().get(objClass,id);		
+		return this.getHibernateTemplate().get(objClass,id);
+		
 	}
 
 	/** 
