@@ -624,49 +624,47 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		}
 	}
 	
+	
 	/**
-	 * (non-Javadoc)
-	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#createWorkspaceFolderContent(java.lang.Integer, java.lang.String, java.lang.String, java.util.Date, java.util.Date, java.lang.Integer, java.lang.String, java.lang.String)
+	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#createWorkspaceFolderContent(java.lang.Integer, java.lang.String, java.lang.String, java.lang.Integer, java.lang.String, java.lang.String)
 	 */
-	public String createWorkspaceFolderContent(Integer contentTypeID,String name,
-											 String description,Date createDateTime,
-											 Date lastModifiedDate,Integer workspaceFolderID,
-											 String mimeType, String path)throws Exception{
+	public String createWorkspaceFolderContent(Integer contentTypeID,String name,String description,Integer workspaceFolderID, String mimeType, String path) throws Exception{
 		// TODO add some validation so that a non-unique name doesn't result in an index violation 
 		// bit hard for the user to understand.
 		WorkspaceFolder workspaceFolder = workspaceFolderDAO.getWorkspaceFolderByID(workspaceFolderID);
 		if(workspaceFolder!=null){
-			WorkspaceFolderContent workspaceFolderContent = new WorkspaceFolderContent(contentTypeID,name,description,createDateTime,lastModifiedDate,mimeType,workspaceFolder);
-			workspaceFolderContentDAO.insert(workspaceFolderContent);
-			try{
-				InputStream stream = new FileInputStream(path);
-				NodeKey nodeKey = addFileToRepository(stream,name,mimeType);
-				workspaceFolderContent.setUuid(nodeKey.getUuid());
-				workspaceFolderContent.setVersionID(nodeKey.getVersion());
-				workspaceFolderContentDAO.update(workspaceFolderContent);
-
-				UpdateContentDTO contentDTO = new UpdateContentDTO(nodeKey.getUuid(), nodeKey.getVersion(),
-							new Long(workspaceFolder.getWorkspaceFolderId().longValue()));
-				flashMessage = new FlashMessage("createWorkspaceFolderContent",contentDTO);
-				
-			}catch(AccessDeniedException ae){
-				flashMessage = new FlashMessage("createWorkspaceFolderContent",
-												"Exception occured while creating workspaceFolderContent: "+ ae.getMessage(),
-												FlashMessage.CRITICAL_ERROR);				
-			}catch(FileException fe){
-				flashMessage = new FlashMessage("createWorkspaceFolderContent",
-												"Exception occured while creating workspaceFolderContent: "+ fe.getMessage(),
-												FlashMessage.CRITICAL_ERROR);
-				
-			}catch(InvalidParameterException ip){
-				flashMessage = new FlashMessage("createWorkspaceFolderContent",
-												"Exception occured while creating workspaceFolderContent: "+ ip.getMessage(),
-												FlashMessage.CRITICAL_ERROR);
-			}
+		WorkspaceFolderContent workspaceFolderContent = new WorkspaceFolderContent(contentTypeID,name,description,new Date(),new Date(),mimeType,workspaceFolder);
+		workspaceFolderContentDAO.insert(workspaceFolderContent);
+		try{
+		InputStream stream = new FileInputStream(path);
+		NodeKey nodeKey = addFileToRepository(stream,name,mimeType);
+		workspaceFolderContent.setUuid(nodeKey.getUuid());
+		workspaceFolderContent.setVersionID(nodeKey.getVersion());
+		workspaceFolderContentDAO.update(workspaceFolderContent);
+		
+		UpdateContentDTO contentDTO = new UpdateContentDTO(nodeKey.getUuid(), nodeKey.getVersion(),
+		new Long(workspaceFolder.getWorkspaceFolderId().longValue()));
+		flashMessage = new FlashMessage("createWorkspaceFolderContent",contentDTO);
+		
+		}catch(AccessDeniedException ae){
+		flashMessage = new FlashMessage("createWorkspaceFolderContent",
+						"Exception occured while creating workspaceFolderContent: "+ ae.getMessage(),
+						FlashMessage.CRITICAL_ERROR);				
+		}catch(FileException fe){
+		flashMessage = new FlashMessage("createWorkspaceFolderContent",
+						"Exception occured while creating workspaceFolderContent: "+ fe.getMessage(),
+						FlashMessage.CRITICAL_ERROR);
+		
+		}catch(InvalidParameterException ip){
+		flashMessage = new FlashMessage("createWorkspaceFolderContent",
+						"Exception occured while creating workspaceFolderContent: "+ ip.getMessage(),
+						FlashMessage.CRITICAL_ERROR);
+		}
 		}else
-			flashMessage = FlashMessage.getNoSuchWorkspaceFolderExsists("createWorkspaceFolderContent",workspaceFolderID);
+		flashMessage = FlashMessage.getNoSuchWorkspaceFolderExsists("createWorkspaceFolderContent",workspaceFolderID);
 		return flashMessage.serializeMessage();
 	}
+	
 	
 	/**
 	 * (non-Javadoc)

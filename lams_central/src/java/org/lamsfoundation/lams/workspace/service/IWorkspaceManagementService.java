@@ -222,8 +222,6 @@ public interface IWorkspaceManagementService {
 	 * @param contentTypeID The type of content being added.(FILE/PACKAGE)
 	 * @param name The name of the file
 	 * @param description The description of the file
-	 * @param createDateTime The date and time this content was created
-	 * @param lastModifiedDate The date and time this content was last modified 
 	 * @param workspaceFolderID The container(<code>workspaceFolder</code>)which
 	 * 							holds this content
 	 * @param mimeType The MIME type of the file 
@@ -232,10 +230,7 @@ public interface IWorkspaceManagementService {
 	 * 				  FLASH client.
 	 * @throws Exception
 	 */
-	public String createWorkspaceFolderContent(Integer contentTypeID,String name,
-											   String description,Date createDateTime,
-											   Date lastModifiedDate,Integer workspaceFolderID,
-											   String mimeType, String path)throws Exception;
+	public String createWorkspaceFolderContent(Integer contentTypeID, String name, String description, Integer workspaceFolderID, String mimeType, String path) throws Exception;
 	
 	/**
 	 * This method updates an existing file(<code>workspaceFolderContet</code>)
