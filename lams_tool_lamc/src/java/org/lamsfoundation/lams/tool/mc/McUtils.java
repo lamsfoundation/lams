@@ -883,5 +883,36 @@ public abstract class McUtils implements McAppConstants {
     	}
     	return map;
 	}
+	
+	
+	/**
+	 * find out if the content is in use or not. If it is in use, the author can not modify it.
+	 * The idea of content being in use is, once any one learner starts using a particular content
+	 * that content should become unmodifiable. 
+	 * 
+	 * isContentInUse(McContent mcContent)
+	 * @param mcContent
+	 * @return boolean
+	 */
+	public static boolean isContentInUse(McContent mcContent)
+	{
+		logger.debug("is content inuse: " + mcContent.isContentInUse());
+		return  mcContent.isContentInUse();
+	}
+	
+	
+	/**
+	 * find out if the content is being edited in monitoring interface or not. If it is, the author can not modify it.
+	 * 
+	 * isDefineLater(McContent mcContent)
+	 * @param mcContent
+	 * @return boolean
+	 */
+	public static boolean isDefineLater(McContent mcContent)
+	{
+		logger.debug("is define later: " + mcContent.isDefineLater());
+		return  mcContent.isDefineLater();
+	}
+
 
 }
