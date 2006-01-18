@@ -2746,29 +2746,5 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     	return (mapping.findForward(LOAD_LEARNER));
     }
     
-    
-    public ActionForward editActivity(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response) throws IOException,
-                                         ServletException
-	{
-    	logger.debug("dispatching editActivity...");
-    	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
-	 	IMcService mcService =McUtils.getToolService(request);
-	 	logger.debug("mcService:" + mcService);
-	 	
-    	String userAction="editActivity";
- 		request.setAttribute(USER_ACTION, userAction);
- 		logger.debug("userAction:" + userAction);
- 		request.setAttribute(CURRENT_MONITORING_TAB, "editActivity");
- 		
-		McStarterAction mcStarterAction= new McStarterAction();
-	    request.getSession().setAttribute(TOOL_SERVICE, mcService);
-	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
-	    	    
-	    return mcStarterAction.executeDefineLater(mapping, form, request, response, mcService);
-	}
-    
 }
     
