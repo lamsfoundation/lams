@@ -1,7 +1,6 @@
 package org.lamsfoundation.lams.tool.mc.web;
 
 
-import org.apache.struts.action.ActionForm;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 
 /**
@@ -9,7 +8,7 @@ import org.lamsfoundation.lams.tool.mc.McAppConstants;
  *
  * ActionForm for the Monitoring environment
  */
-public class McMonitoringForm extends ActionForm implements McAppConstants {
+public class McMonitoringForm extends McAuthoringForm implements McAppConstants {
 	// controls which method is called by the Lookup map */
 	protected String method;
 	
