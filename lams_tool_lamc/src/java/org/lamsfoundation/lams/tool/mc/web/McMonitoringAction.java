@@ -35,7 +35,6 @@ import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McApplicationException;
 import org.lamsfoundation.lams.tool.mc.McUtils;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
-import org.lamsfoundation.lams.tool.mc.service.McServiceProxy;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 
 /**
@@ -189,6 +188,30 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	    
     	return (mapping.findForward(LOAD_MONITORING));	
 	}
+    
+    
+    public ActionForward editActivity(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+	{
+    	logger.debug("dispatching editActivity...");
+    	McMonitoringForm mcMonitoringForm = (McMonitoringForm) form;
+    	IMcService mcService =McUtils.getToolService(request);
+	 	
+	 	String userAction="editActivity";
+ 		request.setAttribute(USER_ACTION, userAction);
+ 		logger.debug("userAction:" + userAction);
+ 		request.setAttribute(CURRENT_MONITORING_TAB, "editActivity");
+ 		
+		McStarterAction mcStarterAction= new McStarterAction();
+	    request.getSession().setAttribute(TOOL_SERVICE, mcService);
+	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    	    
+	    return mcStarterAction.executeDefineLater(mapping, form, request, response, mcService);
+	}
+
 
     
     public ActionForward getSummary(ActionMapping mapping,
