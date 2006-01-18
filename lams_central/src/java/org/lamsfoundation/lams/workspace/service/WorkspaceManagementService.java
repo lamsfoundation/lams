@@ -167,15 +167,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 														"Cannot delete this folder as it is the Root folder.",
 														FlashMessage.ERROR);
 					else{
-						if(!workspaceFolder.isEmpty())
-							flashMessage = new FlashMessage("deleteFolder",
-															"Cannot delete folder with folder_id of: " + folderID +
-															" as it is not empty. Please delete its contents first.",
-															FlashMessage.ERROR);
-						else{
-							workspaceFolderDAO.delete(workspaceFolder);
-							flashMessage = new FlashMessage("deleteFolder","Folder deleted:" + folderID);
-						}
+						flashMessage = deleteFolderContents(workspaceFolder, userID);
 					}
 				}else
 					flashMessage = FlashMessage.getNoSuchWorkspaceFolderExsists("deleteFolder",folderID);
@@ -184,7 +176,105 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 			flashMessage = FlashMessage.getNoSuchUserExists("deleteFolder",userID);
 			
 		return flashMessage.serializeMessage();
-	}	
+	}
+	/**
+	 * This method will try to delete the <code>folder</code>. If the folder is not empty
+	 * it will attempt to delete all resources inside the folder. If the user does not
+	 * have permission to delete that resource then a FlashMessage will be returned
+	 * indicating which resource it was unable to delete.
+	 * If all resources inside that <code>folder</code> are successfully deleted, then
+	 * the folder will be deleted and a FlashMessage will be returned indicating it was 
+	 * successfully deleted.
+	 * TODO: put all flash messages in a message resource file so it can be
+	 * internationalised
+	 * @param folder
+	 */
+	private FlashMessage deleteFolderContents(WorkspaceFolder folder, Integer userID) throws IOException
+	{
+		boolean isDeleteSuccessful = true;
+		
+		Integer folderID = folder.getWorkspaceFolderId();
+		
+		if (!folder.isEmpty())
+		{
+			if (folder.hasSubFolders())
+			{
+				Set subFolders = folder.getChildWorkspaceFolders();
+				Iterator subFolderIterator = subFolders.iterator();
+				while (subFolderIterator.hasNext())
+				{
+					WorkspaceFolder subFolder = (WorkspaceFolder)subFolderIterator.next();
+					deleteFolder(subFolder.getWorkspaceFolderId(), userID);					
+				}
+			}
+			else
+			{
+				
+				//delete all files within the directory
+				Set folderContents = folder.getFolderContent();
+				Iterator i = folderContents.iterator();
+				while (i.hasNext())
+				{
+					WorkspaceFolderContent folderContent = (WorkspaceFolderContent)i.next();
+					folderContent.setWorkspaceFolder(null);
+					folder.getFolderContent().remove(folderContent);
+				}
+				
+				//delete all learning designs within folder (if created by the user)
+				Set learningDesigns = folder.getLearningDesigns();				
+				Iterator j = learningDesigns.iterator();
+				while (j.hasNext())
+				{
+					LearningDesign learningDesign = (LearningDesign)j.next();
+					//have to ensure that the user has permission to delete the learning design
+					//method taken from deleteLearningDesign
+					//code has been duplicated because it is not desirable to return a string.
+					Long learningDesignID = learningDesign.getLearningDesignId();
+					if (learningDesign != null) {
+						if (learningDesign.getUser().getUserId().equals(userID))
+						{
+							if (learningDesign.getReadOnly().booleanValue()) {
+								isDeleteSuccessful = false;
+								flashMessage = new FlashMessage("deleteFolder",
+																"Cannot delete design with learning_design_id of :" + learningDesignID +
+																" as it is READ ONLY.", FlashMessage.ERROR);
+							}
+							else
+							{
+								List list = learningDesignDAO.getLearningDesignsByParent(learningDesignID);
+								if(list==null || list.size()==0){
+									folder.getLearningDesigns().remove(learningDesign);
+									learningDesign.setWorkspaceFolder(null);
+								}
+								else
+								{
+									isDeleteSuccessful = false;
+									flashMessage = new FlashMessage("deleteFolder",
+																	"Cannot delete design with learning_design_id of:" + learningDesignID +
+																	" as it is a PARENT.",
+																	FlashMessage.ERROR);
+								}
+							}
+						}
+					}
+				}
+				
+				workspaceFolderDAO.update(folder); //this call will delete the files and learningdesigns which were removed from the collection above.
+				
+			}
+			
+		}
+		if(isDeleteSuccessful) //it will only delete this folder if all the files/folder/learningDesigns are all deleted
+		{
+			workspaceFolderDAO.delete(folder);
+			flashMessage = new FlashMessage("deleteFolder","Folder deleted:" + folderID);
+		}
+				
+		return flashMessage;
+	
+	}
+	
+	
 	/**
 	 * This method checks if the given <code>workspaceFolder</code> is the
 	 * root folder of any <code>Organisation</code> or <code>User</code>
@@ -551,6 +641,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		User user = userDAO.getUserById(userID);
 		if(user!=null){
 			LearningDesign learningDesign = learningDesignDAO.getLearningDesignById(learningDesignID);
+		
 			if(learningDesign!=null){
 				if(learningDesign.getUser().getUserId().equals(user.getUserId())){
 					if(learningDesign.getReadOnly().booleanValue()){
@@ -1028,5 +1119,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	{
 		return userMgmtService.getUsersFromOrganisationByRole(organisationID, role);
 	}
+	
+	
 	
 }
