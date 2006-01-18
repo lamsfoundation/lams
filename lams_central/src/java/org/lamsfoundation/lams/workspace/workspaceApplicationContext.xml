@@ -12,6 +12,7 @@
 		<property name="authoringService"><ref bean="authoringService"/></property>
 		<property name="userOrganisationDAO"><ref bean="userOrganisationDAO"/></property>
 		<property name="workspaceFolderContentDAO"><ref bean="workspaceFolderContentDAO"/></property>
+		<property name="userMgmtService"><ref bean="userManagementService"/></property>
 	</bean>
 	
 	<bean id="workspaceManagementService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
