@@ -326,6 +326,12 @@
 		    redirect="true"
 	  	/>
 
+       <forward
+	        name="load"
+	        path=".questions"
+	        redirect="true"
+	    />
+
 	  	<forward
 		    name="errorList"
 		    path=".mcErrorBox"
