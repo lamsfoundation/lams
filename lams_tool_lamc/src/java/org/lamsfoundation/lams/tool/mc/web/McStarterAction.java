@@ -142,6 +142,10 @@ public class McStarterAction extends Action implements McAppConstants {
 		{
 			request.getSession().setAttribute(ACTIVE_MODULE, AUTHORING);
 			logger.debug("activeModule set to Authoring: "  + activeModule);
+			
+			/*normally diplay all 3 tabs of the Authoring environment*/
+			request.getSession().setAttribute(SHOW_BASIC_CONTENT,new Boolean(false).toString());
+			
 		}
 		logger.debug("final active activeModule is: "  + request.getSession().getAttribute(ACTIVE_MODULE));
 		
@@ -270,28 +274,35 @@ public class McStarterAction extends Action implements McAppConstants {
 				logger.debug("retrieving existing content for: " + toolContentId);
 				McContent mcContent=mcService.retrieveMc(new Long(toolContentId));
 				logger.debug("existing mcContent:" + mcContent);
-				
-				/* it is possible that the content is being used by some learners. In this situation, the content  is marked as "in use" and 
-				  a content in use is not modifiable*/ 
-				boolean isContentInUse=isContentInUse(mcContent);
-				logger.debug("isContentInUse:" + isContentInUse);
-				
-				if (isContentInUse == true)
+		
+				String sourceMcStarter = (String) request.getAttribute(SOURCE_MC_STARTER);
+				logger.debug("sourceMcStarter: " + sourceMcStarter);
+
+				/* do not make these tests if the request is coming from monitoring url for Edit Activity*/
+				if ((sourceMcStarter != null) && !sourceMcStarter.equals("monitoring"))
 				{
-			    	persistError(request,"error.content.inUse");
-					logger.debug("forwarding to: " + ERROR_LIST);
-					return (mapping.findForward(ERROR_LIST));
-				}
-				
-				/* it is possible that the content is being EDITED in the monitoring interface. In this situation, the content is not modifiable*/ 
-				boolean isDefineLater=isDefineLater(mcContent);
-				logger.debug("isDefineLater:" + isDefineLater);
-				
-				if (isDefineLater == true)
-				{
-			    	persistError(request,"error.content.beingModified");
-					logger.debug("forwarding to: " + ERROR_LIST);
-					return (mapping.findForward(ERROR_LIST));
+					/* it is possible that the content is being used by some learners. In this situation, the content  is marked as "in use" and 
+					  a content in use is not modifiable*/ 
+					boolean isContentInUse=McUtils.isContentInUse(mcContent);
+					logger.debug("isContentInUse:" + isContentInUse);
+					
+					if (isContentInUse == true)
+					{
+				    	persistError(request,"error.content.inUse");
+						logger.debug("forwarding to: " + ERROR_LIST);
+						return (mapping.findForward(ERROR_LIST));
+					}
+					
+					/* it is possible that the content is being EDITED in the monitoring interface. In this situation, the content is not modifiable*/ 
+					boolean isDefineLater=McUtils.isDefineLater(mcContent);
+					logger.debug("isDefineLater:" + isDefineLater);
+					
+					if (isDefineLater == true)
+					{
+				    	persistError(request,"error.content.beingModified");
+						logger.debug("forwarding to: " + ERROR_LIST);
+						return (mapping.findForward(ERROR_LIST));
+					}
 				}
 				
 				retrieveExistingContent(request, mcAuthoringForm, toolContentId, mcContent);
@@ -434,35 +445,6 @@ public class McStarterAction extends Action implements McAppConstants {
 		return true;	
 	}
 	
-	/**
-	 * find out if the content is in use or not. If it is in use, the author can not modify it.
-	 * The idea of content being in use is, once any one learner starts using a particular content
-	 * that content should become unmodifiable. 
-	 * 
-	 * isContentInUse(McContent mcContent)
-	 * @param mcContent
-	 * @return boolean
-	 */
-	protected boolean isContentInUse(McContent mcContent)
-	{
-		logger.debug("is content inuse: " + mcContent.isContentInUse());
-		return  mcContent.isContentInUse();
-	}
-	
-	
-	/**
-	 * find out if the content is being edited in monitoring interface or not. If it is, the author can not modify it.
-	 * 
-	 * isDefineLater(McContent mcContent)
-	 * @param mcContent
-	 * @return boolean
-	 */
-	protected boolean isDefineLater(McContent mcContent)
-	{
-		logger.debug("is define later: " + mcContent.isDefineLater());
-		return  mcContent.isDefineLater();
-	}
-
 	
 	/**
 	 * retrieves the contents of an existing content from the db and prepares it for presentation
@@ -753,6 +735,9 @@ public class McStarterAction extends Action implements McAppConstants {
 		request.getSession().setAttribute(ACTIVE_MODULE, DEFINE_LATER);
 		/* present the view-only screen first */
 		request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(false));
+		
+		/*normally diplay all 3 tabs of the Authoring environment  but with define Later only display Basic content*/
+		request.getSession().setAttribute(SHOW_BASIC_CONTENT,new Boolean(true).toString());
 		return execute(mapping, form, request, response);
 	}
 	
