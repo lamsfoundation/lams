@@ -209,6 +209,8 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	    request.getSession().setAttribute(TOOL_SERVICE, mcService);
 	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
 	    	    
+	    request.setAttribute(SOURCE_MC_STARTER, "monitoring");
+	    logger.debug("SOURCE_MC_STARTER: monitoring");
 	    return mcStarterAction.executeDefineLater(mapping, form, request, response, mcService);
 	}
 
