@@ -5,11 +5,14 @@ var tab_lefts = new Array();
 var themeName = "aqua";
 var currentTab = "";
 
+//added comments to show how to add a new tab, we'll call the new tab 'x'
 function initTabs(){
-	//put all the tab contents in an array
+	//put all the tab contents layers in an array
 	tabsContents.push(document.getElementById('content_b'));
 	tabsContents.push(document.getElementById('content_a'));
 	tabsContents.push(document.getElementById('content_i'));
+	//to add a new tab add a new line here:
+	tabsContents.push(document.getElementById('content_x'));
 	
 	//position the advanced (a) and instructions (i) layers over the basic (b) layer
 	var bTabC_x = findPosX(tabsContents[0]);
@@ -69,7 +72,7 @@ function enableFCKEditor(){
 	}	
 }
 
-
+//call this function to show a tab (and hide all the others)
 function showTab(tabId){
 	if (currentTab == tabId){
 		return;
@@ -79,18 +82,36 @@ function showTab(tabId){
 	
 	selectTab(tabId);
 
+//note  you need to de-select the tabs you are not showing, including the new one:
 	if(tabId == "i"){
 		deSelectTab("a");
 		deSelectTab("b");
+		//e.g.:
+		//deSelectTab("x");
 	}else if(tabId=="a"){
 		deSelectTab("i");
 		deSelectTab("b");
-	}else{
+		//deSelectTab("x");
+	}else if(tabId="i"){
 		deSelectTab("i");
 		deSelectTab("a");
+		//deSelectTab("x");
 	}
+	//add new if to select the new tab:
+	/*
+	else if(tabId="x"){
+		deSelectTab("i");
+		deSelectTab("a");
+		deSelectTab("b");
+	}
+	*/
 	
-	//sort out the content
+	
+	*/
+	
+	//sort out the content layers:
+	//note: to add a new tab , you must also add a new content layer! a reference to which is created in innitTabs.
+
 	var contentId = "content_"+tabId;
 	for(var i=0; i < tabsContents.length; i++){
 		if(tabsContents[i].id==contentId){

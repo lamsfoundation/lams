@@ -73,6 +73,27 @@ function cancel(){
 	</table>
 
 </td>
+<!--  to add a new tab, add a new tab table here.
+note: the ID must be different to the other IDs in teh document, here we hae used x so the 
+ left image = tab_left_x
+ centre h-ref = x 
+ right image = tab_right_x 
+ -->
+<!-- the tab:
+    <td valign="bottom">
+	
+	<table border="0" cellspacing="0" cellpadding="0">
+	  <tr>
+		<td ><a href="#" onClick="showTab('i');return false;"><img border="0" src="../images/aqua_tab_left.gif" width="8" height="22" id="tab_left_i"   name="tab_left_x" /></a></td>
+		<td class="tab tabcentre" width="90" id="tab_tbl_centre_i"  onClick="showTab('i');return false;" ><a href="#" onClick="showTab('i');return false;" id="x" >Instructions</a></td>
+		<td ><a href="#" onClick="showTab('i');return false;"><img src="../images/aqua_tab_right.gif"  width="9" height="22" border="0" id="tab_right_i"  name="tab_right_x"/></a></td>
+	  </tr>
+	</table>
+
+</td>
+END new tab comments, see also ../tabController.js for additional changes required.
+-->
+
   </tr>
 </table>
     <!-- end tab buttons -->
