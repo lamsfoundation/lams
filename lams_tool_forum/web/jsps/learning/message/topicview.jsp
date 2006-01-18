@@ -40,22 +40,24 @@
 			<tr>
 				<td align="right">
 					<br>
-					<c:if test="${topic.isAuthor}">
-					<c:if test="${sessionScope.allowEdit}">
-						<c:set var="edittopic">
-							<html:rewrite page="/learning/editTopic.do?topicId=${topic.message.uid}&create=${topic.message.created.time}" />
+					<c:if test="${topic.isAuthor &&  (not finishedLock)}">
+						<c:if test="${sessionScope.allowEdit}">
+							<c:set var="edittopic">
+								<html:rewrite page="/learning/editTopic.do?topicId=${topic.message.uid}&create=${topic.message.created.time}" />
+							</c:set> 
+							<html:link href="${edittopic}">
+								<b><fmt:message key="label.edit" /></b>
+							</html:link>
+						</c:if>
+					</c:if>
+					<c:if test="${not finishedLock}">
+						<c:set var="replytopic">
+							<html:rewrite page="/learning/newReplyTopic.do?parentId=${topic.message.uid}" />
 						</c:set> 
-						<html:link href="${edittopic}">
-							<b><fmt:message key="label.edit" /></b>
+						<html:link href="${replytopic}">
+							<b><fmt:message key="label.reply" /></b>
 						</html:link>
 					</c:if>
-					</c:if>
-					<c:set var="replytopic">
-						<html:rewrite page="/learning/newReplyTopic.do?parentId=${topic.message.uid}" />
-					</c:set> 
-					<html:link href="${replytopic}">
-						<b><fmt:message key="label.reply" /></b>
-					</html:link>
 				</td>
 			</tr>
 		</table>
