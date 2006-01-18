@@ -24,7 +24,7 @@
 				<table class="forms">
 					<tr> 
 						<td NOWRAP class="formlabel" valign=top align=center> <b> <bean:message key="label.selectGroup"/> </b>
-								<select name="monitoredToolSessionId" onchange="javascript:alert(this.value);submitSession(this.value,'submitSession'); alert('aft');">
+								<select name="monitoredToolSessionId" onchange="javascript:submitSession(this.value,'submitSession');">
 								<c:forEach var="toolSessionId" items="${sessionScope.summaryToolSessions}">
 										<c:set var="SELECTED_SESSION" scope="request" value=""/>
 										<c:if test="${sessionScope.selectionCase == 2}"> 			
