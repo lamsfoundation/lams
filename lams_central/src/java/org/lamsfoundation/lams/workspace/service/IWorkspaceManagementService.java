@@ -359,5 +359,23 @@ public interface IWorkspaceManagementService {
 	 * @throws IOException
 	 */
 	public String getWorkspace(Integer userID) throws IOException;
+	
+	/** 
+	 * Retrieves the list of organisations in which the user has the specified role.
+	 * in WDDX format
+	 * @param userID
+	 * @param role
+	 * @return
+	 */
+	public String getOrganisationsByUserRole(Integer userID, String role) throws IOException;
+	
+	/**
+	 * Returns the users within the Organisation with <code>organisationID</code>
+	 * and <code>role</code> in WDDX format
+	 * @param organisationID
+	 * @param role
+	 * @return
+	 */
+	public String getUsersFromOrganisationByRole(Integer organisationID, String role) throws IOException;
 
 }

@@ -49,6 +49,7 @@ import org.lamsfoundation.lams.contentrepository.service.RepositoryProxy;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO;
+import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
@@ -61,6 +62,7 @@ import org.lamsfoundation.lams.usermanagement.dao.IUserOrganisationDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IWorkspaceDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IWorkspaceFolderDAO;
 import org.lamsfoundation.lams.usermanagement.dto.UserAccessFoldersDTO;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.usermanagement.exception.WorkspaceFolderException;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
@@ -91,6 +93,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		
 	protected IAuthoringService authoringService;
 	protected IRepositoryService repositoryService;
+	protected IUserManagementService userMgmtService;
 	
 	/**
 	 * @param workspaceFolderContentDAO The workspaceFolderContentDAO to set.
@@ -142,6 +145,11 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	public void setUserOrganisationDAO(IUserOrganisationDAO userOrganisationDAO) {
 		this.userOrganisationDAO = userOrganisationDAO;
 	}
+	
+	public void setUserMgmtService(IUserManagementService userMgmtService) {
+		this.userMgmtService = userMgmtService;
+	}
+	
 	/**
 	 * (non-Javadoc)
 	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#deleteFolder(java.lang.Integer, java.lang.Integer)
@@ -986,6 +994,39 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		} else
 			flashMessage = FlashMessage.getNoSuchUserExists("getWorkspace",userID);
 		return flashMessage.serializeMessage();
+	}
+	
+	/**
+	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#getOrganisationsByUserRole(Integer, String)
+	 */
+	public String getOrganisationsByUserRole(Integer userID, String role) throws IOException
+	{
+		User user = userDAO.getUserById(userID);
+		Vector organisations = new Vector();
+		if (user!=null) {
+			
+			Iterator iterator = userMgmtService.getOrganisationsForUserByRole(user, role).iterator();
+			
+			while (iterator.hasNext()) {
+				Organisation organisation = (Organisation) iterator.next();
+				organisations.add(organisation.getOrganisationDTO());
+			}
+			flashMessage = new FlashMessage(
+					"getOrganisationsByUserRole", organisations);
+		} else
+			flashMessage = FlashMessage.getNoSuchUserExists(
+					"getOrganisationsByUserRole", userID);
+
+		return flashMessage.serializeMessage();
+		
+	}
+	
+	/** 
+	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#getUsersFromOrganisationByRole(Integer, String)
+	 */
+	public String getUsersFromOrganisationByRole(Integer organisationID, String role) throws IOException
+	{
+		return userMgmtService.getUsersFromOrganisationByRole(organisationID, role);
 	}
 	
 }

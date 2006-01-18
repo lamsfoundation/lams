@@ -459,6 +459,29 @@ public class WorkspaceAction extends DispatchAction {
 		String wddxPacket = workspaceManagementService.deleteContentWithVersion(uuID,versionID,folderContentID);
 		return outputPacket(mapping, request, response, wddxPacket, "details");
 	}
+	
+	
+	public ActionForward getOrganisationsByUserRole(ActionMapping mapping,
+			  ActionForm form,
+			  HttpServletRequest request,
+			  HttpServletResponse response)throws Exception{
+		Integer userID = new Integer(WebUtil.readIntParam(request,"userID"));
+		String role = WebUtil.readStrParam(request, "role");
+		IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
+		String wddxPacket = workspaceManagementService.getOrganisationsByUserRole(userID, role);		
+		return outputPacket(mapping, request, response, wddxPacket, "details");
+	}
+	
+	public ActionForward getUsersFromOrganisationByRole(ActionMapping mapping,
+			  ActionForm form,
+			  HttpServletRequest request,
+			  HttpServletResponse response)throws Exception{
+		Integer organisationID = new Integer(WebUtil.readIntParam(request,"organisationID"));
+		String role = WebUtil.readStrParam(request, "role");
+		IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
+		String wddxPacket = workspaceManagementService.getUsersFromOrganisationByRole(organisationID, role);		
+		return outputPacket(mapping, request, response, wddxPacket, "details");
+	}
 
 }
 
