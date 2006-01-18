@@ -91,7 +91,7 @@
 		</table>
 	
 	</td>
-	<c:if test="${requestScope.showBasicContent != 'true'}">
+	<c:if test="${sessionScope.showBasicContent != 'true'}">
 	    <td valign="bottom">
 		<!-- table for tab 2 (advanced) -->
 		<table border="0" cellspacing="0" cellpadding="0">
