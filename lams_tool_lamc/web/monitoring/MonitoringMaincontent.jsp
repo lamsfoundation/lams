@@ -59,11 +59,7 @@
 			<html:rewrite page="/monitoring.do" />
 		</c:set>
 
-		<c:set var="authoringURL">
-			<html:rewrite page="/authoring.do" />
-		</c:set>
-		
-		
+	  <html:form  action="/monitoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
 		<!-- start tabs -->
 		<!-- tab holder table -->
 		<table border="0" cellspacing="0" cellpadding="0">
@@ -72,7 +68,6 @@
 		  </tr>
 			
 		  <tr>
-		  <html:form  action="/monitoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">
 			    <td valign="bottom">
 					<table border="0" cellspacing="0" cellpadding="0">
 					  <tr>
@@ -84,9 +79,7 @@
 					  </tr>
 					</table>
 				</td>
-		  </html:form>				
-		
-		  <html:form  action="/monitoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
+
 			    <td valign="bottom">
 					<table border="0" cellspacing="0" cellpadding="0">
 					  <tr>
@@ -98,23 +91,21 @@
 					  </tr>
 					</table>
 				</td>
-		  </html:form>				
+
 				
-		  <html:form  action="/authoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">						
 			    <td valign="bottom">
 					<table border="0" cellspacing="0" cellpadding="0">
 					  <tr>
 						<td><img src="<c:out value="${lams}"/>images/aqua_tab_s_left.gif" name="tab_left_e" width="8" height="25" border="0" id="tab_left_e"/></td>
 						<td class="tab tabcentre_selected" width="90" id="tab_tbl_centre_e" ><label for="e" accesskey="e"><a
-							href="<c:out value='${authoringURL}'/>?dispatch=editActivity" id="e" >Edit Activity</a></label></td>
-						<td><a href="<c:out value='${authoringURL}'/>?dispatch=editActivity">
+							href="<c:out value='${monitoringURL}'/>?method=editActivity" id="e" >Edit Activity</a></label></td>
+						<td><a href="<c:out value='${monitoringURL}'/>?method=editActivity">
 							<img src="<c:out value="${lams}"/>images/aqua_tab_s_right.gif"  name="tab_right_e" width="8" height="25" border="0" id="tab_right_e"/></a></td>
 					  </tr>
 					</table>
 				</td>
-			</html:form>				
+
 							
-		  <html:form  action="/monitoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">
 			    <td valign="bottom">
 					<table border="0" cellspacing="0" cellpadding="0">
 					  <tr>
@@ -126,14 +117,12 @@
 					  </tr>
 					</table>
 				</td>
-		</html:form>				
 		  </tr>
 		</table>
 	
 	<!-- end tab buttons -->
 		
 
-	<html:form  action="/monitoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">
 	<html:hidden property="method"/>	 
 		
 		<c:choose>
