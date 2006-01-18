@@ -25,19 +25,21 @@
 		<tr><td><A HREF="<lams:WebAppURL/>dummy.do">Refresh List</a></td></tr>	
 		<TR><TD><HR></TD></TR>
 		<c:forEach var="lesson" items="${lessons}">
-			<TR><TD><STRONG><c:out value="${lesson.lessonName}"/></STRONG>
-			<c:choose>
-				<c:when test="${lesson.lessonStateId==1}">[Created]</c:when>
-				<c:when test="${lesson.lessonStateId==2}">[Scheduled]</c:when>
-				<c:when test="${lesson.lessonStateId==3}">[Started]</c:when>
-				<c:when test="${lesson.lessonStateId==4}">[Suspended]</c:when>
-				<c:when test="${lesson.lessonStateId==5}">[Finished]</c:when>
-			</c:choose>
-			<BR><c:out value="${lesson.lessonDescription}"/>
-			<BR><A HREF="<lams:WebAppURL/>/dummy.do?method=getLesson&lessonID=<c:out value="${lesson.lessonId}"/>" target="contentFrame">Monitor Lesson</A>
-			<BR><A HREF="<lams:WebAppURL/>/dummy.do?method=archiveLesson&lessonID=<c:out value="${lesson.lessonId}"/>">Archive Lesson</A>
-			</TD></TR>
+			<c:if test="${lesson.lessonStateId<6}">
+				<TR><TD><STRONG><c:out value="${lesson.lessonName}"/></STRONG>
+				<c:choose>
+					<c:when test="${lesson.lessonStateId==1}">[Created]</c:when>
+					<c:when test="${lesson.lessonStateId==2}">[Scheduled]</c:when>
+					<c:when test="${lesson.lessonStateId==3}">[Started]</c:when>
+					<c:when test="${lesson.lessonStateId==4}">[Suspended]</c:when>
+					<c:when test="${lesson.lessonStateId==5}">[Finished]</c:when>
+				</c:choose>
+				<BR><c:out value="${lesson.lessonDescription}"/>
+				<BR><A HREF="<lams:WebAppURL/>/dummy.do?method=getLesson&lessonID=<c:out value="${lesson.lessonId}"/>" target="contentFrame">Monitor Lesson</A>
+				<BR><A HREF="<lams:WebAppURL/>/dummy.do?method=archiveLesson&lessonID=<c:out value="${lesson.lessonId}"/>">Archive Lesson</A>
+				</TD></TR>
 			<TR><TD><HR></TD></TR>
+			</c:if>
 		</c:forEach>
 	</table>
 	
