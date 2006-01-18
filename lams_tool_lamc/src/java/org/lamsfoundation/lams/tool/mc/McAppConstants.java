@@ -120,6 +120,7 @@ public interface McAppConstants {
     public static final String DISABLE_TOOL								="disabled";
     public static final String IS_DEFINE_LATER							="isDefineLater";
     public static final String DEFINE_LATER_CONTENT						="defineLaterContent";
+    public static final String SOURCE_MC_STARTER						="sourceMcStarter";
     
     /*
      * authoring mode controllers
@@ -207,7 +208,7 @@ public interface McAppConstants {
     public static final String SHOW_FEEDBACK							="showFeedback";
     public static final String USER_PASSED								="userPassed";
     public static final String VIEW_ANSWERS								="viewAnswers";
-    
+    public static final String SHOW_BASIC_CONTENT						="showBasicContent";
     
     public static final String ONLINE_INSTRUCTIONS						="onlineInstructions";
     public static final String OFFLINE_INSTRUCTIONS						="offlineInstructions";
