@@ -138,6 +138,12 @@ input, select, textarea {
 	position:absolute;
 	visibility: hidden;
 }
+.content_layer{
+	z-index: 0;
+	position:absolute;
+	visibility: hidden;
+	
+}
 /*end tabs*/
 
 a.button{
