@@ -33,6 +33,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.Vector;
 
+import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
 import org.lamsfoundation.lams.contentrepository.FileException;
@@ -40,10 +41,13 @@ import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.ITicket;
 import org.lamsfoundation.lams.contentrepository.IVersionedNode;
 import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
+import org.lamsfoundation.lams.contentrepository.ItemExistsException;
 import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
 import org.lamsfoundation.lams.contentrepository.LoginException;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
+import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
+import org.lamsfoundation.lams.contentrepository.client.ToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.contentrepository.service.RepositoryProxy;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
@@ -77,6 +81,8 @@ import org.lamsfoundation.lams.workspace.dto.UpdateContentDTO;
  */
 public class WorkspaceManagementService implements IWorkspaceManagementService{
 	
+	protected Logger log = Logger.getLogger(WorkspaceManagementService.class.getName());
+
 	private FlashMessage flashMessage;
 	
 	public static final Integer AUTHORING = new Integer(1);
@@ -694,6 +700,25 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		}
 		return flashMessage.serializeMessage();
 	}
+	
+	/** Set up the content repository - create the workspace and the credentials. */
+	  private void configureContentRepository(ICredentials cred) throws RepositoryCheckedException {
+			try {
+				repositoryService.createCredentials(cred);
+				repositoryService.addWorkspace(cred,IWorkspaceManagementService.REPOSITORY_WORKSPACE);
+			} catch (ItemExistsException ie) {
+			    log.warn("Tried to configure repository but it "
+			    		+" appears to be already configured."
+			    		+"Workspace name "+IWorkspaceManagementService.REPOSITORY_WORKSPACE
+			    		+". Exception thrown by repository being ignored. ", ie);
+			} catch (RepositoryCheckedException e) {
+			    log.error("Error occured while trying to configure repository."
+			    		+"Workspace name "+IWorkspaceManagementService.REPOSITORY_WORKSPACE
+						+" Unable to recover from error: "+e.getMessage(), e);
+				throw e;
+			}
+	    }
+
 	/**
 	 * This method verifies the credentials of the Workspace Manager
 	 * and gives him the Ticket to login and access the Content Repository.
@@ -701,6 +726,8 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	 * This method would be called evertime the user(Workspace Manager) receives 
 	 * a request to get the contents of the Folder or to add/update a file into
 	 * the <code>WorkspaceFodler</code> (Repository).
+	 * 
+	 * If the workspace/credential hasn't been set up, then it will be set up automatically.
 	 *  
 	 * @return ITicket The ticket for repostory access
 	 */
@@ -708,21 +735,23 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		repositoryService = RepositoryProxy.getLocalRepositoryService();
 		ICredentials credentials = new SimpleCredentials(IWorkspaceManagementService.REPOSITORY_USERNAME,
 				 										 IWorkspaceManagementService.REPOSITORY_PASSWORD.toCharArray());		
+		ITicket ticket = null;
+		
 		try{
-			ITicket ticket = repositoryService.login(credentials,IWorkspaceManagementService.REPOSITORY_WORKSPACE);
-			return ticket;
-		}catch(AccessDeniedException ae){
-			ae.printStackTrace();
-			return null;
-		}catch(WorkspaceNotFoundException we){
-			we.printStackTrace();
-			return null;			
-		}catch (LoginException e) {
-			e.printStackTrace();
+			try {
+				ticket = repositoryService.login(credentials,IWorkspaceManagementService.REPOSITORY_WORKSPACE);
+			} catch(WorkspaceNotFoundException we){
+				log.error("Content Repository workspace "+IWorkspaceManagementService.REPOSITORY_WORKSPACE
+				        +" not configured. Attempting to configure now.");
+				configureContentRepository(credentials);
+				ticket = repositoryService.login(credentials,IWorkspaceManagementService.REPOSITORY_WORKSPACE);
+			}
+		} catch ( RepositoryCheckedException e ) {
+			log.error("Unable to get ticket for workspace "+IWorkspaceManagementService.REPOSITORY_WORKSPACE,e);
 			return null;
 		}
+		return ticket;
 	}
-	
 	
 	/**
 	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#createWorkspaceFolderContent(java.lang.Integer, java.lang.String, java.lang.String, java.lang.Integer, java.lang.String, java.lang.String)
