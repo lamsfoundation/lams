@@ -189,8 +189,45 @@ public class MonitoringAction extends LamsDispatchAction
 		
         return outputPacket(mapping,request,response,message,"details");
     }
-    
-        public ActionForward getAllLessons(ActionMapping mapping,
+    /**
+     * <P>
+     * The STRUTS action will send back a WDDX message after marking the lesson by the given lesson ID
+     * as <code>Lesson.DISABLED_STATE</code> status.
+     * </P>
+     * <P>
+     * This action need a lession ID as input.
+     * </P>
+     * @param form The ActionForm class that will contain any data submitted
+     * by the end-user via a form.
+     * @param request A standard Servlet HttpServletRequest class.
+     * @param response A standard Servlet HttpServletResponse class.
+     * @return An ActionForward class that will be returned to the ActionServlet indicating where
+     *         the user is to go next.
+     * @throws IOException
+     * @throws ServletException
+     */
+    public ActionForward removeLesson(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                                 ServletException{
+    	FlashMessage flashMessage = null;
+    	this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+    	long lessonId = WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID);
+    	
+    	try {
+    		monitoringService.removeLesson(lessonId);
+    		flashMessage = new FlashMessage("removeLesson",Boolean.TRUE);
+		} catch (Exception e) {
+			flashMessage = new FlashMessage("removeLesson",
+					"Invalid lessonID :" +  lessonId,
+					FlashMessage.ERROR);
+		}
+		String message =  flashMessage.serializeMessage();
+    	return outputPacket(mapping,request,response,message,"details");
+    	
+    }
+    public ActionForward getAllLessons(ActionMapping mapping,
                                      ActionForm form,
                                      HttpServletRequest request,
                                      HttpServletResponse response)throws IOException{

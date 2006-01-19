@@ -356,9 +356,19 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         lessonDAO.updateLesson(requestedLesson);
 
     }
+    /**
+     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#removeLesson(long)
+     */
+    public void removeLesson(long lessonId) {
+        Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
+        if ( requestedLesson == null) {
+        	throw new MonitoringServiceException("Lesson for id="+lessonId+" is missing. Unable to start lesson.");
+        }
 
-
-    
+        requestedLesson.setLessonStateId(Lesson.DISABLED_STATE);
+        lessonDAO.updateLesson(requestedLesson);
+    	
+    }
     /**
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#openGate(org.lamsfoundation.lams.learningdesign.GateActivity)
      */

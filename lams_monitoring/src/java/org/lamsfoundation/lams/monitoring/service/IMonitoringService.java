@@ -92,6 +92,17 @@ public interface IMonitoringService
      */
     public void archiveLesson(long lessonId);
 
+
+    /**
+     * <P>
+     * Teachers sometimes find that there are just too many "old" designs and 
+     * wish to remove them and never access them again. This function disables 
+     * the lesson - it does not remove the contents from the database
+     * </P>
+     * @param lessonId 
+     * 		the specified the lesson id.
+     */
+	public void removeLesson(long lessonId);
     /**
      * Set the gate to open to let all the learners through. This learning service
      * is triggerred by the system scheduler. Will return true GateActivity (or subclass)
@@ -302,4 +313,5 @@ public interface IMonitoringService
     /* TODO Dummy methods - to be removed */
     public List getOrganisationsUsers(Integer userId);
     public List getLearningDesigns(Long userId);
+
 }
