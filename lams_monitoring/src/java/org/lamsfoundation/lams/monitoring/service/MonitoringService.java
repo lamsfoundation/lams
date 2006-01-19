@@ -349,7 +349,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 
         Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
         if ( requestedLesson == null) {
-        	throw new MonitoringServiceException("Lesson for id="+lessonId+" is missing. Unable to start lesson.");
+        	throw new MonitoringServiceException("Lesson for id="+lessonId+" is missing. Unable to archive lesson.");
         }
 
         requestedLesson.setLessonStateId(Lesson.ARCHIVED_STATE);
@@ -362,7 +362,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     public void removeLesson(long lessonId) {
         Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
         if ( requestedLesson == null) {
-        	throw new MonitoringServiceException("Lesson for id="+lessonId+" is missing. Unable to start lesson.");
+        	throw new MonitoringServiceException("Lesson for id="+lessonId+" is missing. Unable to remove lesson.");
         }
 
         requestedLesson.setLessonStateId(Lesson.DISABLED_STATE);
