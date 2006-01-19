@@ -36,7 +36,6 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McApplicationException;
 import org.lamsfoundation.lams.tool.mc.McUtils;
-import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 
@@ -391,6 +390,8 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
     	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
 	    logger.debug("SOURCE_MC_STARTER: monitoring");
 	    
+	    request.setAttribute(CURRENT_MONITORING_TAB, "editActivity");
+	    
     	McAction mcAction = new McAction();
     	return mcAction.addNewQuestion(mapping, form, request, response);
 	}
@@ -421,6 +422,8 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
     	logger.debug("dispatching proxy removeQuestion...");
     	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
 	    logger.debug("SOURCE_MC_STARTER: monitoring");
+	    
+	    request.setAttribute(CURRENT_MONITORING_TAB, "editActivity");
     	
 	    McAction mcAction = new McAction();
     	return mcAction.removeQuestion(mapping, form, request, response);
@@ -453,6 +456,8 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
     	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
 	    logger.debug("SOURCE_MC_STARTER: monitoring");
 	    
+	    request.setAttribute(CURRENT_MONITORING_TAB, "editActivity");
+	    
     	McAction mcAction = new McAction();
     	return mcAction.editOptions(mapping, form, request, response);
     }
@@ -484,6 +489,8 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
     	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
 	    logger.debug("SOURCE_MC_STARTER: monitoring");
 	    
+	    request.setAttribute(CURRENT_MONITORING_TAB, "editActivity");
+	    
     	McAction mcAction = new McAction();
     	return mcAction.addOption(mapping, form, request, response);
     }
@@ -513,6 +520,8 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
     	logger.debug("dispatching proxy removeOption...");
     	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
 	    logger.debug("SOURCE_MC_STARTER: monitoring");
+	    
+	    request.setAttribute(CURRENT_MONITORING_TAB, "editActivity");
 	    
     	McAction mcAction = new McAction();
     	return mcAction.removeOption(mapping, form, request, response);
@@ -546,6 +555,8 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
     	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
 	    logger.debug("SOURCE_MC_STARTER: monitoring");
 	    
+	    request.setAttribute(CURRENT_MONITORING_TAB, "editActivity");
+	    
     	McAction mcAction = new McAction();
     	return mcAction.moveQuestionDown(mapping, form, request, response);
     }
@@ -577,6 +588,8 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
     	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
 	    logger.debug("SOURCE_MC_STARTER: monitoring");
 	    
+	    request.setAttribute(CURRENT_MONITORING_TAB, "editActivity");
+	    
     	McAction mcAction = new McAction();
     	return mcAction.moveQuestionUp(mapping, form, request, response);
     }
@@ -606,6 +619,8 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
     	logger.debug("dispatching proxy doneOptions...");
     	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
 	    logger.debug("SOURCE_MC_STARTER: monitoring");
+	    
+	    request.setAttribute(CURRENT_MONITORING_TAB, "editActivity");
 	    
     	McAction mcAction = new McAction();
     	return mcAction.doneOptions(mapping, form, request, response);
@@ -639,6 +654,13 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
     	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
 	    logger.debug("SOURCE_MC_STARTER: monitoring");
 	    
+	    /*set the current tab*/
+	    request.setAttribute(CURRENT_MONITORING_TAB, "editActivity");
+	    
+	    /* present the view-only screen first */
+		request.getSession().setAttribute(ACTIVE_MODULE, DEFINE_LATER);
+		request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(false));
+	     
     	McAction mcAction = new McAction();
     	return mcAction.submitQuestions(mapping, form, request, response);
     }
@@ -670,6 +692,8 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
     	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
 	    logger.debug("SOURCE_MC_STARTER: monitoring");
 	    
+	    request.setAttribute(CURRENT_MONITORING_TAB, "editActivity");
+	    
     	McAction mcAction = new McAction();
     	return mcAction.deleteOfflineFile(mapping, form, request, response);
     }
@@ -700,6 +724,8 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
     	logger.debug("dispatching proxy deleteOnlineFile...");
     	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
 	    logger.debug("SOURCE_MC_STARTER: monitoring");
+	    
+	    request.setAttribute(CURRENT_MONITORING_TAB, "editActivity");
 	    
     	McAction mcAction = new McAction();
     	return mcAction.deleteOnlineFile(mapping, form, request, response);
@@ -735,6 +761,8 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
     	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
 	    logger.debug("SOURCE_MC_STARTER: monitoring");
 	    
+	    request.setAttribute(CURRENT_MONITORING_TAB, "editActivity");
+	    
     	McAction mcAction = new McAction();
     	return mcAction.submitOfflineFiles(mapping, form, request, response);
     }
@@ -768,6 +796,8 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
     	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
 	    logger.debug("SOURCE_MC_STARTER: monitoring");
 	    
+	    request.setAttribute(CURRENT_MONITORING_TAB, "editActivity");
+	    
     	McAction mcAction = new McAction();
     	return mcAction.submitOnlineFiles(mapping, form, request, response);
     }
@@ -798,6 +828,8 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
     	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
 	    logger.debug("SOURCE_MC_STARTER: monitoring");
 	    
+	    request.setAttribute(CURRENT_MONITORING_TAB, "editActivity");
+	    
     	McAction mcAction = new McAction();
     	return mcAction.doneAdvancedTab(mapping, form, request, response);
     }
@@ -827,6 +859,8 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
     	logger.debug("dispatching proxy doneInstructionsTab...");
     	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
 	    logger.debug("SOURCE_MC_STARTER: monitoring");
+	    
+	    request.setAttribute(CURRENT_MONITORING_TAB, "editActivity");
 	    
     	McAction mcAction = new McAction();
     	return mcAction.doneInstructionsTab(mapping, form, request, response);
