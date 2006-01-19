@@ -36,6 +36,12 @@
 			document.McMonitoringForm.submit();
 		}
 		
+		function submitMethod(actionMethod) 
+		{
+			submitMonitoringMethod(actionMethod);
+		}
+		
+		
 		function submitSession(selectedToolSessionId, actionMethod) {
 			document.McMonitoringForm.selectedToolSessionId.value=selectedToolSessionId; 
 			submitMonitoringMethod(actionMethod);
@@ -51,7 +57,27 @@
 	</script>	
 	
 </head>
-<body onLoad="showMonitoringTab('su')">
+
+
+<%-- chooses which tab to highlight --%>
+<c:choose>
+         <c:when test='${currentMonitoringTab == "instructions"}'>
+           <c:set var="tabId" value="i" />
+        </c:when>
+        <c:when test='${currentMonitoringTab == "editActivity"}'>
+           <c:set var="tabId" value="e" />
+        </c:when>
+        <c:when test='${currentMonitoringTab == "stats"}'>
+           <c:set var="tabId" value="st" />
+        </c:when>
+        <c:otherwise> 
+      	   <c:set var="tabId" value="su" />
+        </c:otherwise>
+</c:choose>
+
+tabId: <c:out value='${tabId}'/>
+
+<body onLoad='showMonitoringTab("<c:out value='${tabId}'/>")'>
 
 	<b> <bean:message key="label.monitoring"/> </b>
 	
@@ -134,7 +160,7 @@
 		
 		        <c:when test='${currentMonitoringTab == "editActivity"}'>
 						<div class="tabbody content_b" >
-							<jsp:include page="/monitoring/EditActivityContent.jsp" />
+							<jsp:include page="/authoring/BasicContent.jsp" />
 						</div>
 		        </c:when>
 
