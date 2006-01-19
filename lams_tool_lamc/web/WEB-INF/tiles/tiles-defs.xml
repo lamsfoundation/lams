@@ -124,6 +124,4 @@ http://www.gnu.org/licenses/gpl.txt
 		<put name="content" value="/monitoring/MonitoringMaincontent.jsp" />	
 	</definition>
 	
-	
-	
 </tiles-definitions>
