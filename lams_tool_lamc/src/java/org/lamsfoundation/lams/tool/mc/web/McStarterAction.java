@@ -136,6 +136,11 @@ public class McStarterAction extends Action implements McAppConstants {
 		String activeModule=(String) request.getSession().getAttribute(ACTIVE_MODULE);
 		logger.debug("activeModule: "  + activeModule);
 		
+		/* determine whether the request is from Monitoring url Edit Activity*/
+		String sourceMcStarter = (String) request.getAttribute(SOURCE_MC_STARTER);
+		logger.debug("sourceMcStarter: " + sourceMcStarter);
+		
+		
 		if ( (activeModule == null) || 
 			 (!activeModule.equals(DEFINE_LATER))
 			)
@@ -162,12 +167,12 @@ public class McStarterAction extends Action implements McAppConstants {
 		McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 		mcAuthoringForm.resetRadioBoxes();
 		
-		ActionForward validateParameters=readSignature(request,mapping);
-		logger.debug("validateParameters:  " + validateParameters);
-		if (validateParameters != null)
+		ActionForward validateSignature=readSignature(request,mapping);
+		logger.debug("validateSignature:  " + validateSignature);
+		if (validateSignature != null)
 		{
-			logger.debug("validateParameters not null : " + validateParameters);
-			return validateParameters;
+			logger.debug("validateSignature not null : " + validateSignature);
+			return validateSignature;
 		}
 		else
 		{
@@ -217,9 +222,12 @@ public class McStarterAction extends Action implements McAppConstants {
 			}
 	
 	    	
-	    	/* 	test whether the authoring level tool contract:
+	    	/* 	note: copyToolContent and removeToolContent code is redundant for production.
+	    	 *  test whether the authoring level tool contract:
 	    	 	public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException;
-	    	 * 	is working or not 
+	    	 * 	is working or not
+	    	 *  
+	    	 * test code from here... 
 	    	 */	
 	    	String copyToolContent= (String) request.getParameter(COPY_TOOL_CONTENT);
 	    	logger.debug("copyToolContent: " + copyToolContent);
@@ -254,7 +262,7 @@ public class McStarterAction extends Action implements McAppConstants {
 		    	
 		    	mcService.removeToolContent(fromContentId);	
 			}
-
+	    	/* ...till here*/
 	    	
 	    	/*
 			 * find out if the passed tool content id exists in the db 
@@ -264,6 +272,7 @@ public class McStarterAction extends Action implements McAppConstants {
 			 * there is no need to check if the content is in use in this case.
 			 * It is always unlocked -> not in use since it is the default content.
 			*/
+			
 			if (!existsContent(toolContentId, request))
 			{
 				logger.debug("retrieving default content");
@@ -275,9 +284,6 @@ public class McStarterAction extends Action implements McAppConstants {
 				McContent mcContent=mcService.retrieveMc(new Long(toolContentId));
 				logger.debug("existing mcContent:" + mcContent);
 		
-				String sourceMcStarter = (String) request.getAttribute(SOURCE_MC_STARTER);
-				logger.debug("sourceMcStarter: " + sourceMcStarter);
-
 				/* do not make these tests if the request is coming from monitoring url for Edit Activity*/
 				if ((sourceMcStarter != null) && !sourceMcStarter.equals("monitoring"))
 				{
@@ -309,8 +315,18 @@ public class McStarterAction extends Action implements McAppConstants {
 			}
 		}
 		mcAuthoringForm.resetUserAction();
-		logger.debug("return to: " + LOAD_QUESTIONS);
-		return (mapping.findForward(LOAD_QUESTIONS));
+		
+		logger.debug("will return to jsp.");
+		if ((sourceMcStarter != null) && !sourceMcStarter.equals("monitoring"))
+		{
+			logger.debug("request is from authoring or define Later url. return to: " + LOAD_QUESTIONS);
+			return (mapping.findForward(LOAD_QUESTIONS));	
+		}
+		else
+		{
+			logger.debug("request is from amonitoring url. return to: " + LOAD_MONITORING);
+			return (mapping.findForward(LOAD_MONITORING));	
+		}
 	} 
 
 	/**

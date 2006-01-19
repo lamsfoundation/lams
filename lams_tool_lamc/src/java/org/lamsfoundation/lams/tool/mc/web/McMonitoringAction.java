@@ -31,9 +31,11 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McApplicationException;
 import org.lamsfoundation.lams.tool.mc.McUtils;
+import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 
@@ -214,7 +216,32 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	    return mcStarterAction.executeDefineLater(mapping, form, request, response, mcService);
 	}
 
+    
+    public ActionForward editActivityQuestions(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException,
+                                         ToolException
+	 {
+    	logger.debug("dispatching editActivityQuestions..");
+	 	IMcService mcService =McUtils.getToolService(request);
+	 	
+	 	request.setAttribute(CURRENT_MONITORING_TAB, "editActivity");
+	 	
+     	String userAction="editActivityQuestions";
+		request.setAttribute(USER_ACTION, userAction);
+		logger.debug("userAction:" + userAction);
 
+		request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(true));
+		setDefineLater(request, true);
+		
+		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
+		logger.debug("setting  EDIT_OPTIONS_MODE to 0");
+		
+		return (mapping.findForward(LOAD_MONITORING));
+	 }
+    
     
     public ActionForward getSummary(ActionMapping mapping,
             ActionForm form,
@@ -274,6 +301,21 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
  		return (mapping.findForward(LOAD_MONITORING));
     	
 	}
+    
+    
+    protected void setDefineLater(HttpServletRequest request, boolean value)
+    {
+    	IMcService mcService =McUtils.getToolService(request);
+    	Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
+    	logger.debug("toolContentId:" + toolContentId);
+    	logger.debug("value:" + value);
+    	
+    	McContent mcContent=mcService.retrieveMc(toolContentId);
+    	logger.debug("mcContent:" + mcContent);
+    	mcContent.setDefineLater(value);
+    	logger.debug("defineLater has been set to true");
+    	mcService.saveMcContent(mcContent);
+    }
 
    
     /**
