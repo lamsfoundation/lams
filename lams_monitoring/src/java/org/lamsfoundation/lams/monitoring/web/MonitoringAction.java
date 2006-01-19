@@ -37,6 +37,7 @@ import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
@@ -171,15 +172,22 @@ public class MonitoringAction extends LamsDispatchAction
                                      HttpServletResponse response) throws IOException,
                                                                           ServletException
     {
-        this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-
-        long lessonId = WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID);
-        monitoringService.archiveLesson(lessonId);
-
-        //TODO add the wddx acknowledgement code.
-        
-        //return mapping.findForward(SCHEDULER);
-        return null;
+    	FlashMessage flashMessage = null;
+    	this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+    	long lessonId = WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID);
+    	
+    	try {
+    		monitoringService.archiveLesson(lessonId);
+    		flashMessage = new FlashMessage("archiveLesson",Boolean.TRUE);
+		} catch (Exception e) {
+			flashMessage = new FlashMessage("archiveLesson",
+					"Invalid lessonID :" +  lessonId,
+					FlashMessage.ERROR);
+		}
+		
+		String message =  flashMessage.serializeMessage();
+		
+        return outputPacket(mapping,request,response,message,"details");
     }
     
         public ActionForward getAllLessons(ActionMapping mapping,
