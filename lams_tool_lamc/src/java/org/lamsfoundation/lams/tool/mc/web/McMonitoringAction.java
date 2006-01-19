@@ -31,6 +31,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McApplicationException;
@@ -192,6 +193,22 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	}
     
     
+    /**
+     * reuses the define later functionality 
+     * editActivity(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     */
     public ActionForward editActivity(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
@@ -234,15 +251,30 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		logger.debug("userAction:" + userAction);
 
 		request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(true));
-		setDefineLater(request, true);
+		McUtils.setDefineLater(request, true);
 		
 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 		logger.debug("setting  EDIT_OPTIONS_MODE to 0");
 		
 		return (mapping.findForward(LOAD_MONITORING));
-	 }
+	}
     
-    
+    /**
+     * switches to summary tab of the monitoring url
+     * getSummary(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     */
     public ActionForward getSummary(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
@@ -262,7 +294,22 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
     	
 	}
     
-    
+    /**
+     * switches to instructions tab of the monitoring url.
+     * getInstructions(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     */
     public ActionForward getInstructions(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
@@ -282,7 +329,22 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
     	
 	}
     
-
+	/**
+	 * switches to Stats tab of the Monitoring url
+	 * getStats(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws IOException
+	 * @throws ServletException
+	 */
     public ActionForward getStats(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
@@ -303,21 +365,474 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	}
     
     
-    protected void setDefineLater(HttpServletRequest request, boolean value)
-    {
-    	IMcService mcService =McUtils.getToolService(request);
-    	Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
-    	logger.debug("toolContentId:" + toolContentId);
-    	logger.debug("value:" + value);
+    /**
+     * acts as a proxy to authoring addNewQuestion(....)
+     * addNewQuestion(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return ActionForward
+     * @throws IOException
+     * @throws ServletException
+     */
+    public ActionForward addNewQuestion(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+	{
+    	logger.debug("dispatching proxy addNewQuestion...");
+    	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
+	    logger.debug("SOURCE_MC_STARTER: monitoring");
+	    
+    	McAction mcAction = new McAction();
+    	return mcAction.addNewQuestion(mapping, form, request, response);
+	}
+    
+    /**
+     * acts as a proxy to authoring removeQuestion(....)
+     * removeQuestion(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+     * 
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return ActionForward
+     * @throws IOException
+     * @throws ServletException
+     */
+    public ActionForward removeQuestion(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+	{
+    	logger.debug("dispatching proxy removeQuestion...");
+    	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
+	    logger.debug("SOURCE_MC_STARTER: monitoring");
     	
-    	McContent mcContent=mcService.retrieveMc(toolContentId);
-    	logger.debug("mcContent:" + mcContent);
-    	mcContent.setDefineLater(value);
-    	logger.debug("defineLater has been set to true");
-    	mcService.saveMcContent(mcContent);
+	    McAction mcAction = new McAction();
+    	return mcAction.removeQuestion(mapping, form, request, response);
+	}
+    
+    
+    /**
+     * acts as a proxy to authoring editOptions(...)
+     * editOptions(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return ActionForward
+     * @throws IOException
+     * @throws ServletException
+     */
+    public ActionForward editOptions(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+    {
+    	logger.debug("dispatching proxy editOptions...");
+    	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
+	    logger.debug("SOURCE_MC_STARTER: monitoring");
+	    
+    	McAction mcAction = new McAction();
+    	return mcAction.editOptions(mapping, form, request, response);
+    }
+    
+    
+    /**
+     * acts as a proxy to authoring addOption(...) 
+     *  addOption(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return ActionForward
+     * @throws IOException
+     * @throws ServletException
+     */
+    public ActionForward addOption(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+    {
+    	logger.debug("dispatching proxy addOption...");
+    	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
+	    logger.debug("SOURCE_MC_STARTER: monitoring");
+	    
+    	McAction mcAction = new McAction();
+    	return mcAction.addOption(mapping, form, request, response);
+    }
+    
+    
+    /** acts as a proxy to authoring removeOption(...) 
+     * removeOption(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return ActionForward
+     * @throws IOException
+     * @throws ServletException
+     */
+    public ActionForward removeOption(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+    {
+    	logger.debug("dispatching proxy removeOption...");
+    	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
+	    logger.debug("SOURCE_MC_STARTER: monitoring");
+	    
+    	McAction mcAction = new McAction();
+    	return mcAction.removeOption(mapping, form, request, response);
+    }
+    
+    
+    /**
+     * acts as a proxy to authoring moveQuestionDown(...) 
+     * moveQuestionDown(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+     * 
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return ActionForward
+     * @throws IOException
+     * @throws ServletException
+     */
+    public ActionForward moveQuestionDown(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+    {
+    	logger.debug("dispatching proxy moveQuestionDown...");
+    	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
+	    logger.debug("SOURCE_MC_STARTER: monitoring");
+	    
+    	McAction mcAction = new McAction();
+    	return mcAction.moveQuestionDown(mapping, form, request, response);
+    }
+    
+    
+    /**
+     * acts as a proxy to authoring moveQuestionUp(...) 
+     * moveQuestionUp(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+                                         
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     */
+    public ActionForward moveQuestionUp(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+    {
+    	logger.debug("dispatching proxy moveQuestionUp...");
+    	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
+	    logger.debug("SOURCE_MC_STARTER: monitoring");
+	    
+    	McAction mcAction = new McAction();
+    	return mcAction.moveQuestionUp(mapping, form, request, response);
+    }
+    
+    /**
+     * acts as a proxy to authoring doneOptions(...)
+     * doneOptions(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return ActionForward
+     * @throws IOException
+     * @throws ServletException
+     */
+    public ActionForward doneOptions(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+    {
+    	logger.debug("dispatching proxy doneOptions...");
+    	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
+	    logger.debug("SOURCE_MC_STARTER: monitoring");
+	    
+    	McAction mcAction = new McAction();
+    	return mcAction.doneOptions(mapping, form, request, response);
     }
 
-   
+    
+    /**
+     * acts as a proxy to authoring submitQuestions(...)
+     * submitQuestions(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return ActionForward
+     * @throws IOException
+     * @throws ServletException
+     */
+    public ActionForward submitQuestions(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+
+    {
+    	logger.debug("dispatching proxy submitQuestions...");
+    	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
+	    logger.debug("SOURCE_MC_STARTER: monitoring");
+	    
+    	McAction mcAction = new McAction();
+    	return mcAction.submitQuestions(mapping, form, request, response);
+    }
+    
+    /**
+     * acts as a proxy to deleteOfflineFile(...) 
+     * deleteOfflineFile(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return ActionForward
+     * @throws IOException
+     * @throws ServletException
+     */
+    public ActionForward deleteOfflineFile(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+
+    {
+    	logger.debug("dispatching proxy deleteOfflineFile...");
+    	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
+	    logger.debug("SOURCE_MC_STARTER: monitoring");
+	    
+    	McAction mcAction = new McAction();
+    	return mcAction.deleteOfflineFile(mapping, form, request, response);
+    }
+    
+    /**
+     * acts as a proxy to authoring deleteOnlineFile(...) 
+     * deleteOnlineFile(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return ActionForward
+     * @throws IOException
+     * @throws ServletException
+     */
+    public ActionForward deleteOnlineFile(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+
+    {
+    	logger.debug("dispatching proxy deleteOnlineFile...");
+    	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
+	    logger.debug("SOURCE_MC_STARTER: monitoring");
+	    
+    	McAction mcAction = new McAction();
+    	return mcAction.deleteOnlineFile(mapping, form, request, response);
+    }
+    
+    
+    /**
+     * acts as a proxy to authoring submitOfflineFiles(...)
+     * submitOfflineFiles(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException,
+                                         RepositoryCheckedException
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     * @throws RepositoryCheckedException
+     */
+    public ActionForward submitOfflineFiles(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException,
+                                         RepositoryCheckedException
+    {
+    	logger.debug("dispatching proxy deleteOnlineFile...");
+    	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
+	    logger.debug("SOURCE_MC_STARTER: monitoring");
+	    
+    	McAction mcAction = new McAction();
+    	return mcAction.submitOfflineFiles(mapping, form, request, response);
+    }
+    
+    /**
+     * acts as a proxy to authoring submitOnlineFiles(...) 
+     * submitOnlineFiles(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException,
+                                         RepositoryCheckedException
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return ActionForward
+     * @throws IOException
+     * @throws ServletException
+     * @throws RepositoryCheckedException
+     */
+    public ActionForward submitOnlineFiles(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException,
+                                         RepositoryCheckedException
+    {
+    	logger.debug("dispatching proxy submitOnlineFiles...");
+    	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
+	    logger.debug("SOURCE_MC_STARTER: monitoring");
+	    
+    	McAction mcAction = new McAction();
+    	return mcAction.submitOnlineFiles(mapping, form, request, response);
+    }
+
+    /**
+     * acts as a proxy to authoring doneAdvancedTab(...) 
+     * doneAdvancedTab(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return ActionForward
+     * @throws IOException
+     * @throws ServletException
+     */
+    public ActionForward doneAdvancedTab(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+    {
+    	logger.debug("dispatching proxy doneAdvancedTab...");
+    	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
+	    logger.debug("SOURCE_MC_STARTER: monitoring");
+	    
+    	McAction mcAction = new McAction();
+    	return mcAction.doneAdvancedTab(mapping, form, request, response);
+    }
+    
+    /**
+     * acts as a proxy to authoring doneInstructionsTab(...)
+     * doneInstructionsTab(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+                                         
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     */
+    public ActionForward doneInstructionsTab(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+    {
+    	logger.debug("dispatching proxy doneInstructionsTab...");
+    	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
+	    logger.debug("SOURCE_MC_STARTER: monitoring");
+	    
+    	McAction mcAction = new McAction();
+    	return mcAction.doneInstructionsTab(mapping, form, request, response);
+    }
+    
+    
     /**
      * persists error messages to request scope
      * @param request
