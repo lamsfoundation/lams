@@ -759,40 +759,78 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	public String createWorkspaceFolderContent(Integer contentTypeID,String name,String description,Integer workspaceFolderID, String mimeType, String path) throws Exception{
 		// TODO add some validation so that a non-unique name doesn't result in an index violation 
 		// bit hard for the user to understand.
+		
 		WorkspaceFolder workspaceFolder = workspaceFolderDAO.getWorkspaceFolderByID(workspaceFolderID);
 		if(workspaceFolder!=null){
-		WorkspaceFolderContent workspaceFolderContent = new WorkspaceFolderContent(contentTypeID,name,description,new Date(),new Date(),mimeType,workspaceFolder);
-		workspaceFolderContentDAO.insert(workspaceFolderContent);
-		try{
-		InputStream stream = new FileInputStream(path);
-		NodeKey nodeKey = addFileToRepository(stream,name,mimeType);
-		workspaceFolderContent.setUuid(nodeKey.getUuid());
-		workspaceFolderContent.setVersionID(nodeKey.getVersion());
-		workspaceFolderContentDAO.update(workspaceFolderContent);
+			if (!contentAlreadyExists(workspaceFolder, name, mimeType))
+			{
+				WorkspaceFolderContent workspaceFolderContent = new WorkspaceFolderContent(contentTypeID,name,description,new Date(),new Date(),mimeType,workspaceFolder);
+				workspaceFolderContentDAO.insert(workspaceFolderContent);
+			
 		
-		UpdateContentDTO contentDTO = new UpdateContentDTO(nodeKey.getUuid(), nodeKey.getVersion(),
-		new Long(workspaceFolder.getWorkspaceFolderId().longValue()));
-		flashMessage = new FlashMessage("createWorkspaceFolderContent",contentDTO);
-		
-		}catch(AccessDeniedException ae){
-		flashMessage = new FlashMessage("createWorkspaceFolderContent",
-						"Exception occured while creating workspaceFolderContent: "+ ae.getMessage(),
-						FlashMessage.CRITICAL_ERROR);				
-		}catch(FileException fe){
-		flashMessage = new FlashMessage("createWorkspaceFolderContent",
-						"Exception occured while creating workspaceFolderContent: "+ fe.getMessage(),
-						FlashMessage.CRITICAL_ERROR);
-		
-		}catch(InvalidParameterException ip){
-		flashMessage = new FlashMessage("createWorkspaceFolderContent",
-						"Exception occured while creating workspaceFolderContent: "+ ip.getMessage(),
-						FlashMessage.CRITICAL_ERROR);
+	
+				try{
+				InputStream stream = new FileInputStream(path);
+				NodeKey nodeKey = addFileToRepository(stream,name,mimeType);
+				workspaceFolderContent.setUuid(nodeKey.getUuid());
+				workspaceFolderContent.setVersionID(nodeKey.getVersion());
+				workspaceFolderContentDAO.update(workspaceFolderContent);
+				
+				UpdateContentDTO contentDTO = new UpdateContentDTO(nodeKey.getUuid(), nodeKey.getVersion(),workspaceFolderContent.getFolderContentID());
+				flashMessage = new FlashMessage("createWorkspaceFolderContent",contentDTO);
+				
+				}catch(AccessDeniedException ae){
+				flashMessage = new FlashMessage("createWorkspaceFolderContent",
+								"Exception occured while creating workspaceFolderContent: "+ ae.getMessage(),
+								FlashMessage.CRITICAL_ERROR);				
+				}catch(FileException fe){
+				flashMessage = new FlashMessage("createWorkspaceFolderContent",
+								"Exception occured while creating workspaceFolderContent: "+ fe.getMessage(),
+								FlashMessage.CRITICAL_ERROR);
+				
+				}catch(InvalidParameterException ip){
+				flashMessage = new FlashMessage("createWorkspaceFolderContent",
+								"Exception occured while creating workspaceFolderContent: "+ ip.getMessage(),
+								FlashMessage.CRITICAL_ERROR);
+				}
+			}
+			else
+			{
+				flashMessage = new FlashMessage("createWorkspaceFolderContent",
+						"The resource " + name + " already exists in the repository: ", 
+						FlashMessage.ERROR);
+			}
 		}
-		}else
-		flashMessage = FlashMessage.getNoSuchWorkspaceFolderExsists("createWorkspaceFolderContent",workspaceFolderID);
+		else
+			flashMessage = FlashMessage.getNoSuchWorkspaceFolderExsists("createWorkspaceFolderContent",workspaceFolderID);
+		
 		return flashMessage.serializeMessage();
 	}
-	
+	/**
+	 * Checks whether the content already exists. It will just check the name and mime type
+	 * of the content that is to be created.
+	 * If there exists a content with the same mime type and name, then it will return true,
+	 * otherwise return false.
+	 * @param workspaceFolder
+	 * @param name
+	 * @param mimeType
+	 * @return
+	 */
+	private boolean contentAlreadyExists(WorkspaceFolder workspaceFolder, String name, String mimeType)
+	{
+		Set contentsInFolder = workspaceFolder.getFolderContent();
+		Iterator i = contentsInFolder.iterator();
+		while(i.hasNext())
+		{
+			WorkspaceFolderContent existingFolderContent = (WorkspaceFolderContent)i.next();
+			if (existingFolderContent.getMimeType().equalsIgnoreCase(mimeType) && existingFolderContent.getName().equalsIgnoreCase(name))
+			{
+				log.error("Content already exists in the db");
+				return true;
+			}
+		}
+		return false; 
+	}
 	
 	/**
 	 * (non-Javadoc)
@@ -860,46 +898,53 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	 */
 	public String deleteContentWithVersion(Long uuid, Long versionToBeDeleted,Long folderContentID)throws Exception{
 		WorkspaceFolderContent workspaceFolderContent = workspaceFolderContentDAO.getWorkspaceFolderContentByID(folderContentID);
-		Long databaseVersion = workspaceFolderContent.getVersionID();
-		
-		ITicket ticket = getRepositoryLoginTicket();
-		String files[]=null;
-		try{
-			files = repositoryService.deleteVersion(ticket,uuid,versionToBeDeleted);
-		}catch(ItemNotFoundException ie){
-			flashMessage = new FlashMessage("deleteContentWithVersion",
-											"No such content with versionID of " + versionToBeDeleted + " found in repository",
-											FlashMessage.ERROR);
-		   return flashMessage.serializeMessage();
-		}
-		
-		/*
-		 * ItemNotFoundException exception will be thrown if the version deleted
-		 * above was the only version available in the repository. If that is the
-		 * case the corresponding record from the database should also be deleted
-		 * 
-		 * If ItemNotFoundException is not thrown that means there are some other
-		 * versions of the content that are available, and it returns the latest 
-		 * version.
-		 * 
-		 * If databaseVersion is same as versionToBeDeleted we update the database with
-		 * the next available latest version , IF NOT no changes are made to the
-		 * database.
-		 */
-	
-		try{			
-			IVersionedNode latestAvailableNode = repositoryService.getFileItem(ticket,uuid,null);
-			Long latestAvailableVersion = latestAvailableNode.getVersion();
-			if(databaseVersion.equals(versionToBeDeleted)){
-				workspaceFolderContent.setVersionID(latestAvailableVersion);
-				workspaceFolderContentDAO.update(workspaceFolderContent);
+		if (workspaceFolderContent != null)
+		{
+			Long databaseVersion = workspaceFolderContent.getVersionID();
+			
+			ITicket ticket = getRepositoryLoginTicket();
+			String files[]=null;
+			try{
+				files = repositoryService.deleteVersion(ticket,uuid,versionToBeDeleted);
+			}catch(ItemNotFoundException ie){
+				flashMessage = new FlashMessage("deleteContentWithVersion",
+												"No such content with versionID of " + versionToBeDeleted + " found in repository",
+												FlashMessage.ERROR);
+			   return flashMessage.serializeMessage();
 			}
-			flashMessage = new FlashMessage("deleteContentWithVersion","Content Successfully deleted");			
-		}catch(ItemNotFoundException ie){
-			workspaceFolderContentDAO.delete(workspaceFolderContent);
+		
+		
+			/*
+			 * ItemNotFoundException exception will be thrown if the version deleted
+			 * above was the only version available in the repository. If that is the
+			 * case the corresponding record from the database should also be deleted
+			 * 
+			 * If ItemNotFoundException is not thrown that means there are some other
+			 * versions of the content that are available, and it returns the latest 
+			 * version.
+			 * 
+			 * If databaseVersion is same as versionToBeDeleted we update the database with
+			 * the next available latest version , IF NOT no changes are made to the
+			 * database.
+			 */
+		
+			try{			
+				IVersionedNode latestAvailableNode = repositoryService.getFileItem(ticket,uuid,null);
+				Long latestAvailableVersion = latestAvailableNode.getVersion();
+				if(databaseVersion.equals(versionToBeDeleted)){
+					workspaceFolderContent.setVersionID(latestAvailableVersion);
+					workspaceFolderContentDAO.update(workspaceFolderContent);
+				}
+				flashMessage = new FlashMessage("deleteContentWithVersion","Content Successfully deleted");			
+			}catch(ItemNotFoundException ie){
+				workspaceFolderContentDAO.delete(workspaceFolderContent);
+				flashMessage = new FlashMessage("deleteContentWithVersion","Content Successfully deleted");
+			}
+		}
+		else
+		{
 			flashMessage = new FlashMessage("deleteContentWithVersion","Content Successfully deleted");
 		}
-		
 		return  flashMessage.serializeMessage();		
 	}
 	
