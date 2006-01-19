@@ -322,6 +322,11 @@ public class McStarterAction extends Action implements McAppConstants {
 			logger.debug("request is from authoring or define Later url. return to: " + LOAD_QUESTIONS);
 			return (mapping.findForward(LOAD_QUESTIONS));	
 		}
+		else if (sourceMcStarter == null)
+		{
+			logger.debug("request is from authoring url. return to: " + LOAD_QUESTIONS);
+			return (mapping.findForward(LOAD_QUESTIONS));	
+		}
 		else
 		{
 			logger.debug("request is from amonitoring url. return to: " + LOAD_MONITORING);
