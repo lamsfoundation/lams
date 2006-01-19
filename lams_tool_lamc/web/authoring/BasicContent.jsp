@@ -226,7 +226,7 @@
 						<tr>
 						  	<td NOWRAP class="formlabel" valign=top align=left><b> <bean:message key="radiobox.passmark"/>: </b></td>
 							<td NOWRAP class="input" valign=top align=left> 
-									<c:out value="${McAuthoringForm.passmark}"/> <bean:message key="label.percent"/>
+									<c:out value="${sessionScope.passMark}"/> <bean:message key="label.percent"/>
 							</td>
 							<td NOWRAP valign=top> </td> 
 							<td NOWRAP valign=top> </td>
