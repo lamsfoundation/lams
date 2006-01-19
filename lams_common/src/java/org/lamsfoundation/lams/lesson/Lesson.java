@@ -64,6 +64,8 @@ public class Lesson implements Serializable {
     public static final Integer FINISHED_STATE = new Integer(5);
     //The state for lesssons that are no longer visible to the learners.
     public static final Integer ARCHIVED_STATE = new Integer(6);
+    //The state for lesssons that are removed and never can be accessed again
+    public static final Integer DISABLED_STATE  = new Integer(7);
     
     //---------------------------------------------------------------------
     // attributes
