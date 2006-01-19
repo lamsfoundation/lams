@@ -12,7 +12,7 @@
 							   (sessionScope.defineLaterInEditMode == 'true') 
 							  }"> 			
  						<tr> 
-					 		<td NOWRAP class="formlabel" valign=top> <bean:message key="label.authoring.title"/>: </td>
+					 		<td NOWRAP class="formlabel" valign=top> <b> <bean:message key="label.authoring.title"/>: </b> </td>
 							<td NOWRAP class="formcontrol" valign=top>
 								<FCK:editor id="richTextTitle" basePath="/lams/fckeditor/">
 									  <c:out value="${sessionScope.richTextTitle}" escapeXml="false" />						  
@@ -21,7 +21,7 @@
 					  	</tr>
 					  	
 					  	<tr> 
-					 		<td NOWRAP class="formlabel" valign=top> <bean:message key="label.authoring.instructions"/>: </td>
+					 		<td NOWRAP class="formlabel" valign=top> <b> <bean:message key="label.authoring.instructions"/>: </b> </td>
 							<td NOWRAP class="formcontrol" valign=top>
 								<FCK:editor id="richTextInstructions" basePath="/lams/fckeditor/">
 									  <c:out value="${sessionScope.richTextInstructions}" escapeXml="false" />						  
@@ -34,14 +34,14 @@
 							   (sessionScope.defineLaterInEditMode != 'true') 
 							  }"> 			
  						<tr> 
-					 		<td NOWRAP class="formlabel" valign=top align=left> <bean:message key="label.authoring.title"/>: </td>
+					 		<td NOWRAP class="formlabel" valign=top align=left> <b> <bean:message key="label.authoring.title"/>: </b> </td>
 							<td NOWRAP class="formcontrol" valign=top align=left>
 									  <c:out value="${sessionScope.richTextTitle}" escapeXml="false" />						  
 							</td> 
 					  	</tr>
 					  	
 					  	<tr> 
-					 		<td NOWRAP class="formlabel" valign=top align=left> <bean:message key="label.authoring.instructions"/>: </td>
+					 		<td NOWRAP class="formlabel" valign=top align=left> <b> <bean:message key="label.authoring.instructions"/>: </b> </td>
 							<td NOWRAP class="formcontrol" valign=top align=left>
 									  <c:out value="${sessionScope.richTextInstructions}" escapeXml="false" />						  
 							</td>
@@ -188,7 +188,7 @@
 						  }"> 			
 
 						<tr>
-						  	<td NOWRAP class="formlabel" valign=top><bean:message key="radiobox.passmark"/>: </td>
+						  	<td NOWRAP class="formlabel" valign=top><b> <bean:message key="radiobox.passmark"/>: </b> </td>
 							<td NOWRAP class="input" valign=top> 
 								  <html:text property="passmark"  size="3" maxlength="3"/><bean:message key="label.percent"/>
 							</td>
@@ -224,7 +224,7 @@
 								  }"> 			
 
 						<tr>
-						  	<td NOWRAP class="formlabel" valign=top align=left><bean:message key="radiobox.passmark"/>: </td>
+						  	<td NOWRAP class="formlabel" valign=top align=left><b> <bean:message key="radiobox.passmark"/>: </b></td>
 							<td NOWRAP class="input" valign=top align=left> 
 									<c:out value="${McAuthoringForm.passmark}"/> <bean:message key="label.percent"/>
 							</td>

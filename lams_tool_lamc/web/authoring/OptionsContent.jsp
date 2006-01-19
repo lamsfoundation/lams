@@ -9,7 +9,7 @@
 				<table class="forms" align=center>
 					<tr>
 	 				 	<td class="formlabel" align=right valign=top> 
-							<bean:message key="label.question"/>:
+							<b> <bean:message key="label.question"/>: </b>
 						</td>
 						
 						<td colspan=3 valign=top>
