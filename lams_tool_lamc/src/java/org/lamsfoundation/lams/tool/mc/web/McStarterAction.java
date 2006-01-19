@@ -316,22 +316,10 @@ public class McStarterAction extends Action implements McAppConstants {
 		}
 		mcAuthoringForm.resetUserAction();
 		
-		logger.debug("will return to jsp.");
-		if ((sourceMcStarter != null) && !sourceMcStarter.equals("monitoring"))
-		{
-			logger.debug("request is from authoring or define Later url. return to: " + LOAD_QUESTIONS);
-			return (mapping.findForward(LOAD_QUESTIONS));	
-		}
-		else if (sourceMcStarter == null)
-		{
-			logger.debug("request is from authoring url. return to: " + LOAD_QUESTIONS);
-			return (mapping.findForward(LOAD_QUESTIONS));	
-		}
-		else
-		{
-			logger.debug("request is from amonitoring url. return to: " + LOAD_MONITORING);
-			return (mapping.findForward(LOAD_MONITORING));	
-		}
+		logger.debug("will return to jsp with: " + sourceMcStarter);
+		String destination=McUtils.getDestination(sourceMcStarter);
+		logger.debug("destination: " + destination);
+		return (mapping.findForward(destination));
 	} 
 
 	/**
