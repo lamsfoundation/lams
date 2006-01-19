@@ -11,4 +11,4 @@ values
 null,null,now(),0,
 null,null,${tool_id},null,
 null,null,null,'tool/lasbmt11/images/icon_reportsubmission.swf',
-1,0,4);
+2,0,4);
