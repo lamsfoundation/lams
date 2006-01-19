@@ -36,9 +36,20 @@
 			document.McMonitoringForm.submit();
 		}
 		
+		function submitModifyQuestion(questionIndexValue, actionMethod) 
+		{
+			document.McMonitoringForm.questionIndex.value=questionIndexValue; 
+			submitMethod(actionMethod);
+		}
+		
 		function submitMethod(actionMethod) 
 		{
 			submitMonitoringMethod(actionMethod);
+		}
+		
+		function deleteOption(deletableOptionIndex, actionMethod) {
+			document.McMonitoringForm.deletableOptionIndex.value=deletableOptionIndex; 
+			submitMethod(actionMethod);
 		}
 		
 		
@@ -158,7 +169,12 @@
 		
 		        <c:when test='${currentMonitoringTab == "editActivity"}'>
 						<div class="tabbody content_b" >
-							<jsp:include page="/authoring/BasicContent.jsp" />
+							<c:if test="${sessionScope.editOptionsMode == 0}"> 			
+								<jsp:include page="/authoring/BasicContent.jsp" />
+							</c:if> 				
+							<c:if test="${sessionScope.editOptionsMode == 1}"> 			
+								<jsp:include page="/authoring/OptionsContent.jsp" />
+							</c:if> 				
 						</div>
 		        </c:when>
 
