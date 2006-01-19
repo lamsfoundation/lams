@@ -45,8 +45,6 @@ import org.lamsfoundation.lams.tool.mc.McUtils;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
-import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
-import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 
@@ -197,6 +195,12 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 	 	IMcService mcService =McUtils.getToolService(request);
 	 	
+		/* determine whether the request is from Monitoring url Edit Activity*/
+		String sourceMcStarter = (String) request.getAttribute(SOURCE_MC_STARTER);
+		logger.debug("sourceMcStarter: " + sourceMcStarter);
+		String destination=McUtils.getDestination(sourceMcStarter);
+		logger.debug("destination: " + destination);
+		
 	 	AuthoringUtil.readData(request, mcAuthoringForm);
 	 	
     	String userAction="addQuestion";
@@ -224,7 +228,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     		request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
     		logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
     		
-        	return (mapping.findForward(LOAD_QUESTIONS));
+        	return (mapping.findForward(destination));
     	}
     		
     	logger.debug("will validate weights");
@@ -241,7 +245,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     		request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
     		logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
     		
-        	return (mapping.findForward(LOAD_QUESTIONS));
+        	return (mapping.findForward(destination));
     	}
     	
     	
@@ -261,7 +265,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     		request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
     		logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
     		
-        	return (mapping.findForward(LOAD_QUESTIONS));
+        	return (mapping.findForward(destination));
     	}
     	request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);
     	logger.debug("MAP_WEIGHTS:" + request.getSession().getAttribute(MAP_WEIGHTS));
@@ -294,7 +298,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		logger.debug("sequenced mapGeneralSelectedOptionsContent:"+ mapGeneralSelectedOptionsContent);
 		request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapGeneralSelectedOptionsContent);
 		
-    	return (mapping.findForward(LOAD_QUESTIONS));	
+    	return (mapping.findForward(destination));	
 	}
     
 
@@ -320,6 +324,12 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     	logger.debug("dispatching removeQuestion...");
     	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 	 	IMcService mcService =McUtils.getToolService(request);
+	 	
+		/* determine whether the request is from Monitoring url Edit Activity*/
+		String sourceMcStarter = (String) request.getAttribute(SOURCE_MC_STARTER);
+		logger.debug("sourceMcStarter: " + sourceMcStarter);
+		String destination=McUtils.getDestination(sourceMcStarter);
+		logger.debug("destination: " + destination);
 	 	
 	 	AuthoringUtil.readData(request, mcAuthoringForm);
 	 	
@@ -410,7 +420,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		logger.debug("sequenced mapGeneralSelectedOptionsContent:"+ mapGeneralSelectedOptionsContent);
 		request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapGeneralSelectedOptionsContent);
 		
-		return (mapping.findForward(LOAD_QUESTIONS));
+		return (mapping.findForward(destination));
     }
 
     
@@ -436,6 +446,12 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 	 	IMcService mcService =McUtils.getToolService(request);
 	 	
+		/* determine whether the request is from Monitoring url Edit Activity*/
+		String sourceMcStarter = (String) request.getAttribute(SOURCE_MC_STARTER);
+		logger.debug("sourceMcStarter: " + sourceMcStarter);
+		String destination=McUtils.getDestination(sourceMcStarter);
+		logger.debug("destination: " + destination);
+
 	 	AuthoringUtil.readData(request, mcAuthoringForm);
 	 	
     	String userAction="editOption";
@@ -473,11 +489,11 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     		logger.debug("add error.emptyQuestion to ActionMessages");
     		saveErrors(request,errors);
     		mcAuthoringForm.resetUserAction();
-    		logger.debug("return to LOAD_QUESTIONS to fix error.");
+    		logger.debug("return to destination to fix error.");
     		
     		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
     		logger.debug("setting  EDIT_OPTIONS_MODE to 0");
-    		return (mapping.findForward(LOAD_QUESTIONS));
+    		return (mapping.findForward(destination));
     	}
     	
     	Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
@@ -739,7 +755,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		logger.debug("sequenced mapGeneralSelectedOptionsContent:"+ mapGeneralSelectedOptionsContent);
 		request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapGeneralSelectedOptionsContent);
 		
-    	return (mapping.findForward(LOAD_QUESTIONS));
+    	return (mapping.findForward(destination));
     }
 
     
@@ -765,6 +781,12 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 	 	IMcService mcService =McUtils.getToolService(request);
 	 	
+		/* determine whether the request is from Monitoring url Edit Activity*/
+		String sourceMcStarter = (String) request.getAttribute(SOURCE_MC_STARTER);
+		logger.debug("sourceMcStarter: " + sourceMcStarter);
+		String destination=McUtils.getDestination(sourceMcStarter);
+		logger.debug("destination: " + destination);
+
 	 	AuthoringUtil.readData(request, mcAuthoringForm);
 	 	
 		String userAction="addOption";
@@ -787,11 +809,11 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 			logger.debug("add error.answers.duplicate to ActionMessages");
 			saveErrors(request,errors);
 			mcAuthoringForm.resetUserAction();
-			logger.debug("return to LOAD_QUESTIONS to fix error.");
+			logger.debug("return to destination to fix error.");
 			
 			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
 			logger.debug("setting  EDIT_OPTIONS_MODE to 1");
-			return (mapping.findForward(LOAD_QUESTIONS));	
+			return (mapping.findForward(destination));	
  		}
 	 	
 	 	boolean verifyMapNoEmptyString=AuthoringUtil.verifyMapNoEmptyString(mapOptionsContent);
@@ -803,11 +825,11 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 			logger.debug("add error.answers.empty to ActionMessages");
 			saveErrors(request,errors);
 			mcAuthoringForm.resetUserAction();
-			logger.debug("return to LOAD_QUESTIONS to fix error.");
+			logger.debug("return to destination to fix error.");
 			
 			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
 			logger.debug("setting  EDIT_OPTIONS_MODE to 1");
-			return (mapping.findForward(LOAD_QUESTIONS));	
+			return (mapping.findForward(destination));	
  		}
 	 	
 	 	
@@ -881,7 +903,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		logger.debug("sequenced mapGeneralSelectedOptionsContent:"+ mapGeneralSelectedOptionsContent);
 		request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapGeneralSelectedOptionsContent);
 		
-		return (mapping.findForward(LOAD_QUESTIONS));
+		return (mapping.findForward(destination));
     }
     
     
@@ -906,6 +928,12 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     	logger.debug("dispatching removeOption...");
     	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 	 	IMcService mcService =McUtils.getToolService(request);
+	 	
+		/* determine whether the request is from Monitoring url Edit Activity*/
+		String sourceMcStarter = (String) request.getAttribute(SOURCE_MC_STARTER);
+		logger.debug("sourceMcStarter: " + sourceMcStarter);
+		String destination=McUtils.getDestination(sourceMcStarter);
+		logger.debug("destination: " + destination);
 	 	
 	 	AuthoringUtil.readData(request, mcAuthoringForm);
 	 	
@@ -934,7 +962,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 			
 			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
 	 		logger.debug("setting EDIT_OPTIONS_MODE :" + 1);
-			return (mapping.findForward(LOAD_QUESTIONS));
+			return (mapping.findForward(destination));
 		}
 	 	
 	 	
@@ -1014,7 +1042,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		mapGeneralSelectedOptionsContent=AuthoringUtil.sequenceMap(mapGeneralSelectedOptionsContent);
 		logger.debug("sequenced mapGeneralSelectedOptionsContent:"+ mapGeneralSelectedOptionsContent);
 		request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapGeneralSelectedOptionsContent);
-		return (mapping.findForward(LOAD_QUESTIONS));
+		return (mapping.findForward(destination));
     }
     
     
@@ -1039,7 +1067,13 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     	logger.debug("dispatching moveQuestionDown...");
     	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 	 	IMcService mcService =McUtils.getToolService(request);
-	 	
+
+		/* determine whether the request is from Monitoring url Edit Activity*/
+		String sourceMcStarter = (String) request.getAttribute(SOURCE_MC_STARTER);
+		logger.debug("sourceMcStarter: " + sourceMcStarter);
+		String destination=McUtils.getDestination(sourceMcStarter);
+		logger.debug("destination: " + destination);
+
 	 	AuthoringUtil.readData(request, mcAuthoringForm);
 	 	
     	String userAction="moveDown";
@@ -1117,7 +1151,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		mapGeneralSelectedOptionsContent=AuthoringUtil.sequenceMap(mapGeneralSelectedOptionsContent);
 		logger.debug("sequenced mapGeneralSelectedOptionsContent:"+ mapGeneralSelectedOptionsContent);
 		request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapGeneralSelectedOptionsContent);
-        return (mapping.findForward(LOAD_QUESTIONS));	
+        return (mapping.findForward(destination));	
     }
     
     
@@ -1142,6 +1176,12 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     	logger.debug("dispatching moveQuestionUp...");
     	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 	 	IMcService mcService =McUtils.getToolService(request);
+
+		/* determine whether the request is from Monitoring url Edit Activity*/
+		String sourceMcStarter = (String) request.getAttribute(SOURCE_MC_STARTER);
+		logger.debug("sourceMcStarter: " + sourceMcStarter);
+		String destination=McUtils.getDestination(sourceMcStarter);
+		logger.debug("destination: " + destination);
 	 	
 	 	AuthoringUtil.readData(request, mcAuthoringForm);
 	 	
@@ -1220,7 +1260,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		logger.debug("sequenced mapGeneralSelectedOptionsContent:"+ mapGeneralSelectedOptionsContent);
 		request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapGeneralSelectedOptionsContent);
 		
-	    return (mapping.findForward(LOAD_QUESTIONS));
+	    return (mapping.findForward(destination));
     }
     
 
@@ -1245,6 +1285,12 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     	logger.debug("dispatching doneOptions...");
     	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 	 	IMcService mcService =McUtils.getToolService(request);
+
+		/* determine whether the request is from Monitoring url Edit Activity*/
+		String sourceMcStarter = (String) request.getAttribute(SOURCE_MC_STARTER);
+		logger.debug("sourceMcStarter: " + sourceMcStarter);
+		String destination=McUtils.getDestination(sourceMcStarter);
+		logger.debug("destination: " + destination);
 	 	
 	 	AuthoringUtil.readData(request, mcAuthoringForm);
 
@@ -1265,11 +1311,11 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 			logger.debug("add error.checkBoxes.empty to ActionMessages");
 			saveErrors(request,errors);
 			mcAuthoringForm.resetUserAction();
-			logger.debug("return to LOAD_QUESTIONS to fix error.");
+			logger.debug("return to destination to fix error.");
 			
 			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
 			logger.debug("setting  EDIT_OPTIONS_MODE to 1");
-			return (mapping.findForward(LOAD_QUESTIONS));	
+			return (mapping.findForward(destination));	
  		}
 		
  		Map mapOptionsContent=AuthoringUtil.repopulateMap(request, "optionContent");
@@ -1353,7 +1399,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		logger.debug("sequenced mapGeneralSelectedOptionsContent:"+ mapGeneralSelectedOptionsContent);
 		request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapGeneralSelectedOptionsContent);
 		
-		return (mapping.findForward(LOAD_QUESTIONS));
+		return (mapping.findForward(destination));
     }
 
    
@@ -1387,17 +1433,23 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     	logger.debug("dispatching editActivityQuestions...");
 	 	IMcService mcService =McUtils.getToolService(request);
 	 	
+		/* determine whether the request is from Monitoring url Edit Activity*/
+		String sourceMcStarter = (String) request.getAttribute(SOURCE_MC_STARTER);
+		logger.debug("sourceMcStarter: " + sourceMcStarter);
+		String destination=McUtils.getDestination(sourceMcStarter);
+		logger.debug("destination: " + destination);
+
      	String userAction="editActivityQuestions";
 		request.setAttribute(USER_ACTION, userAction);
 		logger.debug("userAction:" + userAction);
 
 		request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(true));
-		setDefineLater(request, true);
+		McUtils.setDefineLater(request, true);
 		
 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 		logger.debug("setting  EDIT_OPTIONS_MODE to 0");
 		
-		return (mapping.findForward(LOAD_QUESTIONS));
+		return (mapping.findForward(destination));
     }
     
     
@@ -1423,7 +1475,13 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     	logger.debug("dispatching submitQuestions...");
     	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 	 	IMcService mcService =McUtils.getToolService(request);
-	 	
+
+		/* determine whether the request is from Monitoring url Edit Activity*/
+		String sourceMcStarter = (String) request.getAttribute(SOURCE_MC_STARTER);
+		logger.debug("sourceMcStarter: " + sourceMcStarter);
+		String destination=McUtils.getDestination(sourceMcStarter);
+		logger.debug("destination: " + destination);
+
 	 	AuthoringUtil.readData(request, mcAuthoringForm);
 	 	
      	/* persist the final Questions Map  */
@@ -1492,7 +1550,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 			mcAuthoringForm.resetUserAction();
 			persistError(request,"error.questions.submitted.none");
 			
-			return (mapping.findForward(LOAD_QUESTIONS));
+			return (mapping.findForward(destination));
 		}
 
 		Map mapWeights= AuthoringUtil.repopulateCurrentWeightsMap(request, "questionWeight");
@@ -1512,7 +1570,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 			request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
 			logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
 			
-	    	return (mapping.findForward(LOAD_QUESTIONS));
+	    	return (mapping.findForward(destination));
 		}
 		
 		
@@ -1533,7 +1591,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 			request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
 			logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
 			
-	    	return (mapping.findForward(LOAD_QUESTIONS));
+	    	return (mapping.findForward(destination));
 		}
 		
 		
@@ -1593,7 +1651,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 				request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
 				logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
 				
-				return (mapping.findForward(LOAD_QUESTIONS));
+				return (mapping.findForward(destination));
 			}
 		}
 		
@@ -1609,7 +1667,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 			logger.debug("add error.passMark.empty to ActionMessages");
 			saveErrors(request,errors);
 			mcAuthoringForm.resetUserAction();
-			logger.debug("return to LOAD_QUESTIONS to fix error.");
+			logger.debug("return to destination to fix error.");
 			
 			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 			logger.debug("setting  EDIT_OPTIONS_MODE to 0");
@@ -1618,7 +1676,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 			request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
 			logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
 			
-	    	return (mapping.findForward(LOAD_QUESTIONS));
+	    	return (mapping.findForward(destination));
 		}
 		
 		passmark= new Integer(mcAuthoringForm.getPassmark()).intValue();
@@ -1630,7 +1688,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 			logger.debug("add error.passMark.greater100to ActionMessages");
 			saveErrors(request,errors);
 			mcAuthoringForm.resetUserAction();
-			logger.debug("return to LOAD_QUESTIONS to fix error.");
+			logger.debug("return to destination to fix error.");
 			
 			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 			logger.debug("setting  EDIT_OPTIONS_MODE to 0");
@@ -1639,7 +1697,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 			request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
 			logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
 			
-	    	return (mapping.findForward(LOAD_QUESTIONS));
+	    	return (mapping.findForward(destination));
 		}
 		
 		
@@ -1694,7 +1752,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 			request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
 			logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
 			
-	    	return (mapping.findForward(LOAD_QUESTIONS));
+	    	return (mapping.findForward(destination));
 		}
 		
 		String richTextOfflineInstructions=(String) request.getSession().getAttribute(RICHTEXT_OFFLINEINSTRUCTIONS);
@@ -1838,8 +1896,8 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		logger.debug("unset defineLater with toolContentId to true: " + toolContentId);
 	
 		logger.debug("resetting defineLater flag. ");
-		setDefineLater(request, false);
-		return (mapping.findForward(LOAD_QUESTIONS));
+		McUtils.setDefineLater(request, false);
+		return (mapping.findForward(destination));
     }
 
 
@@ -1866,6 +1924,12 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 	 	IMcService mcService =McUtils.getToolService(request);
 	 	
+		/* determine whether the request is from Monitoring url Edit Activity*/
+		String sourceMcStarter = (String) request.getAttribute(SOURCE_MC_STARTER);
+		logger.debug("sourceMcStarter: " + sourceMcStarter);
+		String destination=McUtils.getDestination(sourceMcStarter);
+		logger.debug("destination: " + destination);
+	 	
 	 	AuthoringUtil.readData(request, mcAuthoringForm);
 	 	
 	 	String userAction="deleteOfflineFile";
@@ -1882,7 +1946,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
  		request.getSession().setAttribute(LIST_OFFLINEFILES_METADATA, listOfflineFilesMetaData);
 	 	
         mcAuthoringForm.resetUserAction();
-        return (mapping.findForward(LOAD_QUESTIONS));
+        return (mapping.findForward(destination));
     	
     }
 
@@ -1909,7 +1973,13 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     	logger.debug("dispatching deleteOnlineFile...");
     	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 	 	IMcService mcService =McUtils.getToolService(request);
-	 	
+
+		/* determine whether the request is from Monitoring url Edit Activity*/
+		String sourceMcStarter = (String) request.getAttribute(SOURCE_MC_STARTER);
+		logger.debug("sourceMcStarter: " + sourceMcStarter);
+		String destination=McUtils.getDestination(sourceMcStarter);
+		logger.debug("destination: " + destination);
+
 	 	AuthoringUtil.readData(request, mcAuthoringForm);
 	 	
 	 	String userAction="deleteOnlineFile";
@@ -1926,7 +1996,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
  		request.getSession().setAttribute(LIST_ONLINEFILES_METADATA, listOnlineFilesMetaData);
 	 	
         mcAuthoringForm.resetUserAction();
-        return (mapping.findForward(LOAD_QUESTIONS));
+        return (mapping.findForward(destination));
     }
 
     
@@ -1952,7 +2022,13 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     	logger.debug("dispatching submitOfflineFile...");
     	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 	 	IMcService mcService =McUtils.getToolService(request);
-	 	
+
+		/* determine whether the request is from Monitoring url Edit Activity*/
+		String sourceMcStarter = (String) request.getAttribute(SOURCE_MC_STARTER);
+		logger.debug("sourceMcStarter: " + sourceMcStarter);
+		String destination=McUtils.getDestination(sourceMcStarter);
+		logger.debug("destination: " + destination);
+
 	 	AuthoringUtil.readData(request, mcAuthoringForm);
 	 	
 		String userAction="submitOfflineFile";
@@ -1974,7 +2050,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
  			
  			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
  	 		logger.debug("setting EDIT_OPTIONS_MODE :" + 0);
- 	   	    return (mapping.findForward(LOAD_QUESTIONS));	
+ 	   	    return (mapping.findForward(destination));	
  		}
  		
  		 		
@@ -1987,7 +2063,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
  		mcAuthoringForm.resetUserAction();
  		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
  		logger.debug("setting EDIT_OPTIONS_MODE :" + 0);
-   	    return (mapping.findForward(LOAD_QUESTIONS));    
+   	    return (mapping.findForward(destination));    
     }
     
     
@@ -2013,7 +2089,13 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     	logger.debug("dispatching submitOnlineFiles...");
     	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 	 	IMcService mcService =McUtils.getToolService(request);
-	 	
+
+		/* determine whether the request is from Monitoring url Edit Activity*/
+		String sourceMcStarter = (String) request.getAttribute(SOURCE_MC_STARTER);
+		logger.debug("sourceMcStarter: " + sourceMcStarter);
+		String destination=McUtils.getDestination(sourceMcStarter);
+		logger.debug("destination: " + destination);
+
 	 	AuthoringUtil.readData(request, mcAuthoringForm);
 	 	
 		String userAction="submitOnlineFile";
@@ -2035,7 +2117,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
  			
  			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
  	 		logger.debug("setting EDIT_OPTIONS_MODE :" + 0);
- 	   	    return (mapping.findForward(LOAD_QUESTIONS));	
+ 	   	    return (mapping.findForward(destination));	
  		}
  		 		
  		List listOnlineFilesMetaData =(List)request.getSession().getAttribute(LIST_ONLINEFILES_METADATA);
@@ -2047,7 +2129,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
         mcAuthoringForm.resetUserAction();
         request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
  		logger.debug("setting EDIT_OPTIONS_MODE :" + 0);
-   	    return (mapping.findForward(LOAD_QUESTIONS));
+   	    return (mapping.findForward(destination));
     }
     
     
@@ -2072,7 +2154,13 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     	logger.debug("dispatching doneAdvancedTab...");
     	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 	 	IMcService mcService =McUtils.getToolService(request);
-	 	
+
+		/* determine whether the request is from Monitoring url Edit Activity*/
+		String sourceMcStarter = (String) request.getAttribute(SOURCE_MC_STARTER);
+		logger.debug("sourceMcStarter: " + sourceMcStarter);
+		String destination=McUtils.getDestination(sourceMcStarter);
+		logger.debug("destination: " + destination);
+
 	 	AuthoringUtil.readData(request, mcAuthoringForm);
 
         String userAction="advancedTabDone";
@@ -2080,7 +2168,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     	logger.debug("userAction:" + userAction);
     	
     	mcAuthoringForm.resetUserAction();
-        return (mapping.findForward(LOAD_QUESTIONS));
+        return (mapping.findForward(destination));
     }
     
     
@@ -2105,14 +2193,20 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     	logger.debug("dispatching doneInstructionsTab...");
     	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 	 	IMcService mcService =McUtils.getToolService(request);
-	 	
+
+	 	/* determine whether the request is from Monitoring url Edit Activity*/
+		String sourceMcStarter = (String) request.getAttribute(SOURCE_MC_STARTER);
+		logger.debug("sourceMcStarter: " + sourceMcStarter);
+		String destination=McUtils.getDestination(sourceMcStarter);
+		logger.debug("destination: " + destination);
+
 	 	AuthoringUtil.readData(request, mcAuthoringForm);
 	 	
 		String userAction="dispinstructionsTabDone";
 		request.setAttribute(USER_ACTION, userAction);
 		logger.debug("userAction:" + userAction);
 		mcAuthoringForm.resetUserAction();
-	    return (mapping.findForward(LOAD_QUESTIONS));
+	    return (mapping.findForward(destination));
     }
 
     
@@ -2190,558 +2284,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		logger.debug("add " + message +"  to ActionMessages:");
 		saveErrors(request,errors);	    	    
 	}
-    
-    
-    /**
-     *  responds to learner activity in learner mode.
-     * 
-     * ActionForward displayMc(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response) throws IOException,
-                                      ServletException
-     * 
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
-
-   <!--Learning Main Action: interacts with the Learning module user -->
-	<action	path="/learning"
-		    type="org.lamsfoundation.lams.tool.mc.web.McAction"
-			name="McLearningForm"
-      		scope="session"
-      		input=".answers"
-      		parameter="method"
-      		unknown="false"
-      		validate="true">
-	
-		<exception
-	        key="error.exception.McApplication"
-	        type="org.lamsfoundation.lams.tool.mc.McApplicationException"
-	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
-	        path=".mcErrorBox"
-	        scope="request"
-	      />
-
-		<exception
-	        key="error.exception.McApplication"
-	        type="java.lang.NullPointerException"
-	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
-	        path=".mcErrorBox"
-	        scope="request"
-	      />	         			      		
-
-	  	<forward
-		    name="loadLearner"
-		    path=".answers"
-		    redirect="true"
-	  	/>
-	  	
-	  	<forward
-		    name="individualReport"
-		    path=".individualReport"
-		    redirect="true"
-	  	/>
-	  	
-	  	<forward
-		    name="redoQuestions"
-		    path=".redoQuestions"
-		    redirect="true"
-	  	/>
-
-	  	<forward
-		    name="viewAnswers"
-		    path=".viewAnswers"
-		    redirect="true"
-	  	/>
-
-	  	<forward
-		    name="resultsSummary"
-		    path=".resultsSummary"
-		    redirect="true"
-	  	/>
-
-	  	<forward
-		    name="errorList"
-		    path=".mcErrorBox"
-		    redirect="true"
-	  	/>
-    </action>
-     * 
-     * ActionForward displayMc(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response) throws IOException,
-                                      ServletException
-     * 
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
-     */
-    public ActionForward displayMc(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response) throws IOException,
-                                      ServletException
-   {
-    	logger.debug("displayMc starting..");
-    	    	
-    	McLearningForm mcLearningForm = (McLearningForm) form;
-	 	IMcService mcService =McUtils.getToolService(request);
-	 	
-    	mcLearningForm.resetParameters();
-    	LearningUtil.readParameters(request, mcLearningForm);
-    	
-    	if (mcLearningForm.getContinueOptionsCombined() != null)
-    	{
-    		setContentInUse(request);
-    		return continueOptionsCombined(mapping, form, request, response);
-    	}
-    	else if (mcLearningForm.getNextOptions() != null)
-	 	{
-    		setContentInUse(request);
-	 		return getNextOptions(mapping, form, request, response);
-	 	}
-    	else if (mcLearningForm.getOptionCheckBoxSelected() != null)
-    	{
-    		setContentInUse(request);
-    		logger.debug("requested selectOptionsCheckBox...");
-    		mcLearningForm.resetCommands();
-    		LearningUtil.selectOptionsCheckBox(request,mcLearningForm, mcLearningForm.getQuestionIndex());
-    	}
-    	else if (mcLearningForm.getRedoQuestions() != null)
-    	{
-    		setContentInUse(request);
-    		return redoQuestions(mapping, form, request, response);
-    	}
-    	else if (mcLearningForm.getRedoQuestionsOk() != null)
-    	{
-    		setContentInUse(request);
-    		logger.debug("requested redoQuestionsOk, user is sure to redo the questions.");
-    		mcLearningForm.resetCommands();
-    		return redoQuestions(request, mcLearningForm, mapping);
-    	}
-    	else if (mcLearningForm.getViewAnswers() != null)
-    	{
-    		setContentInUse(request);
-    		return viewAnswers(mapping, form, request, response);
-    	}
-    	else if (mcLearningForm.getViewSummary() != null)
-    	{
-    		setContentInUse(request);
-			return viewSummary(mapping, form, request, response);
-    	}
-    	else if (mcLearningForm.getLearnerFinished() != null)
-    	{
-    		logger.debug("requested learner finished, the learner should be directed to next activity.");
-    		mcLearningForm.resetCommands();
-    		//fix this
-    		return (mapping.findForward(VIEW_SUMMARY));
-    	}
-
-    	mcLearningForm.resetCommands();	
- 		return (mapping.findForward(LOAD_LEARNER));
-   }
-    
-
-    /**
-     * responses to learner when they answer all the questions on a single page
-     * continueOptionsCombined(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response)
-     * 
-     * @param request
-     * @param form
-     * @param mapping
-     * @return ActionForward
-     */
-    public ActionForward continueOptionsCombined(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response) throws IOException,
-                                         ServletException
-	{                                         
-		logger.debug("dispatching continueOptionsCombined...");
-		McLearningForm mcLearningForm = (McLearningForm) form;
-	 	IMcService mcService =McUtils.getToolService(request);
-	 	
-	 	/* process the answers */
-		Map mapGeneralCheckedOptionsContent=(Map) request.getSession().getAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT);
-    	logger.debug("final mapGeneralCheckedOptionsContent: " + mapGeneralCheckedOptionsContent);
-    	
-    	Long toolContentId=(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
-    	logger.debug("toolContentId: " + toolContentId);
-    			
-    	logger.debug("will assess");
-    	Integer passMark=(Integer) request.getSession().getAttribute(PASSMARK);
-    	logger.debug("passMark: " + passMark);
-    	
-    	Map mapLeanerAssessmentResults=LearningUtil.assess(request, mapGeneralCheckedOptionsContent, toolContentId);
-    	logger.debug("mapLeanerAssessmentResults: " + mapLeanerAssessmentResults);
-    	logger.debug("assesment complete");
-    	
-    	int mark=LearningUtil.getMark(mapLeanerAssessmentResults);
-    	logger.debug("mark: " + mark);
-    	request.getSession().setAttribute(LEARNER_MARK, new Integer(mark).toString());
-    	request.getSession().setAttribute(LEARNER_MARK_ATLEAST, new Integer(mark+1).toString());
-    	
-    	Map mapQuestionWeights =(Map) request.getSession().getAttribute(MAP_QUESTION_WEIGHTS);
-    	logger.debug("mapQuestionWeights: " + mapQuestionWeights);
-    	
-    	boolean passed=false;
-    	if ((passMark != null) && (passMark.intValue() != 0)) 
-		{
-    		int totalUserWeight=LearningUtil.calculateWeights(mapLeanerAssessmentResults, mapQuestionWeights);
-    		logger.debug("totalUserWeight: " + totalUserWeight);
-    		
-    		if (totalUserWeight < passMark.intValue())
-    		{
-    			logger.debug("USER FAILED");
-    			request.getSession().setAttribute(USER_PASSED, new Boolean(false).toString());
-    			logger.debug("totalUserWeight is less than passmark: " + totalUserWeight + " < " + passMark.intValue());
-    			passed=false;
-    		}
-    		else
-    		{
-    			logger.debug("USER PASSED");
-    			request.getSession().setAttribute(USER_PASSED, new Boolean(true).toString());
-    			passed=true;
-    		}
-		}
-
-    	boolean isUserDefined=LearningUtil.doesUserExists(request);
-    	logger.debug("isUserDefined");
-    	if (isUserDefined == false)
-    	{
-    		LearningUtil.createUser(request);
-    		logger.debug("created user in the db");
-    	}
-    	McQueUsr mcQueUsr=LearningUtil.getUser(request);
-    	logger.debug("mcQueUsr: " + mcQueUsr);
-    	
-    	
-    	String highestAttemptOrder=(String)request.getSession().getAttribute(LEARNER_LAST_ATTEMPT_ORDER);
-        logger.debug("current highestAttemptOrder:" + highestAttemptOrder);
-        
-        logger.debug("passed: " + passed);
-    	LearningUtil.createAttempt(request, mcQueUsr, mapGeneralCheckedOptionsContent, mark, passed, new Integer(highestAttemptOrder).intValue(), mapLeanerAssessmentResults);
-    	logger.debug("created user attempt in the db");
-    	
-    	int intHighestAttemptOrder=new Integer(highestAttemptOrder).intValue()+ 1 ;
-        logger.debug("updated highestAttemptOrder:" + intHighestAttemptOrder);
-        request.getSession().setAttribute(LEARNER_LAST_ATTEMPT_ORDER, new Integer(intHighestAttemptOrder).toString());
-		
-		mcLearningForm.resetCommands();
-		return (mapping.findForward(INDIVIDUAL_REPORT));
-    }
-
-
-    /**
-     * takes the learner to the next set of questions
-     * continueOptionsCombined(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response)
-     * 
-     * @param request
-     * @param form
-     * @param mapping
-     * @return ActionForward
-     */
-    public ActionForward getNextOptions(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response) throws IOException,
-                                         ServletException
-	{
-		logger.debug("dispatching getNextOptions...");
-		McLearningForm mcLearningForm = (McLearningForm) form;
-	 	IMcService mcService =McUtils.getToolService(request);
-		
-		String currentQuestionIndex=(String)request.getSession().getAttribute(CURRENT_QUESTION_INDEX);
-    	logger.debug("currentQuestionIndex:" + currentQuestionIndex);
-    	
-    	String totalQuestionCount=(String)request.getSession().getAttribute(TOTAL_QUESTION_COUNT);
-    	logger.debug("totalQuestionCount:" + totalQuestionCount);
-    	
-    	int intTotalQuestionCount=new Integer(totalQuestionCount).intValue();
-    	int intCurrentQuestionIndex=new Integer(currentQuestionIndex).intValue();
-    	
-    	if (intTotalQuestionCount-1 == intCurrentQuestionIndex)
-    	{
-    		logger.debug("totalQuestionCount has been reached :" + totalQuestionCount);
-        		request.getSession().setAttribute(TOTAL_COUNT_REACHED, new Boolean(true).toString());
-        	}
-    		
-    		mcLearningForm.resetCommands();
-   
-        	int newQuestionIndex=new Integer(currentQuestionIndex).intValue() + 1;
-        	request.getSession().setAttribute(CURRENT_QUESTION_INDEX, new Integer(newQuestionIndex).toString());
-        	logger.debug("updated questionIndex:" + request.getSession().getAttribute(CURRENT_QUESTION_INDEX));
-		return (mapping.findForward(LOAD_LEARNER));
-    }
-
-
-    /**
-     * allows the learner to take the activity again
-     * redoQuestions(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response)
-     * 
-     * @param request
-     * @param form
-     * @param mapping
-     * @return ActionForward
-     */
-    public ActionForward redoQuestions(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response) throws IOException,
-                                         ServletException
-	{
-		logger.debug("dispatching redoQuestions...");
-		McLearningForm mcLearningForm = (McLearningForm) form;
- 		IMcService mcService =McUtils.getToolService(request);
- 		
-		request.getSession().setAttribute(CURRENT_QUESTION_INDEX, "1");
-		request.getSession().setAttribute(TOTAL_COUNT_REACHED, new Boolean(false).toString());
-		
-		McQueUsr mcQueUsr=LearningUtil.getUser(request);
-		Long queUsrId=mcQueUsr.getUid();
-		logger.debug("queUsrId: " + queUsrId);
-		
-		int learnerBestMark=LearningUtil.getHighestMark(request, queUsrId);
-		logger.debug("learnerBestMark: " + learnerBestMark);
-		request.getSession().setAttribute(LEARNER_BEST_MARK,new Integer(learnerBestMark).toString());
-		
-		mcLearningForm.resetCommands();
-		return (mapping.findForward(REDO_QUESTIONS));
-    }
-        
-
-    /**
-     * allows the learner to view their answer history
-     * viewAnswers(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response)
-     * 
-     * @param request
-     * @param form
-     * @param mapping
-     * @return ActionForward
-     */
-    public ActionForward viewAnswers(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response) throws IOException,
-                                         ServletException
-	{
-		logger.debug("dispatching viewAnswers...");
-		McLearningForm mcLearningForm = (McLearningForm) form;
- 		IMcService mcService =McUtils.getToolService(request);
-		String totalQuestionCount= (String) request.getSession().getAttribute(TOTAL_QUESTION_COUNT);
-		logger.debug("totalQuestionCount: " + totalQuestionCount);
-		
-		Long toolContentUID= (Long) request.getSession().getAttribute(TOOL_CONTENT_UID);
-		logger.debug("toolContentUID: " + toolContentUID);
-    	
-		McQueUsr mcQueUsr=LearningUtil.getUser(request);
-		Long queUsrId=mcQueUsr.getUid();
-		logger.debug("queUsrId: " + queUsrId);
-	
-		Map mapQueAttempts= new TreeMap(new McComparator());
-		Map mapQueCorrectAttempts= new TreeMap(new McComparator());
-		Map mapQueIncorrectAttempts= new TreeMap(new McComparator());
-		for (int i=1; i<=  new Integer(totalQuestionCount).intValue(); i++)
-		{
-			logger.debug("doing question with display order: " + i);
-			McQueContent mcQueContent=mcService.getQuestionContentByDisplayOrder(new Long(i), toolContentUID);
-			logger.debug("mcQueContent uid: " + mcQueContent.getUid());
-
-			Map mapAttemptOrderAttempts= new TreeMap(new McComparator());
-			Map mapAttemptOrderCorrectAttempts= new TreeMap(new McComparator());
-			Map mapAttemptOrderIncorrectAttempts= new TreeMap(new McComparator());
-			for (int j=1; j <= MAX_ATTEMPTY_HISTORY ; j++ )
-    		{
-    			List attemptsByAttemptOrder=mcService.getAttemptByAttemptOrder(queUsrId, mcQueContent.getUid(), new Integer(j));
-	    		logger.debug("attemptsByAttemptOrder: " + j + " is: " + attemptsByAttemptOrder);
-	    	
-	    		Map mapAttempts= new TreeMap(new McComparator());
-	    		Map mapAttemptsIncorrect= new TreeMap(new McComparator());
-	    		Map mapAttemptsCorrect= new TreeMap(new McComparator());
-	    		Iterator attemptIterator=attemptsByAttemptOrder.iterator();
-	    		Long mapIndex=new Long(1);
-    	    	while (attemptIterator.hasNext())
-    	    	{
-    	    		McUsrAttempt mcUsrAttempt=(McUsrAttempt)attemptIterator.next();
-    	    		
-    	    		if (mcUsrAttempt.isAttemptCorrect())
-    	    		{
-    	    			mapAttemptsCorrect.put(mapIndex.toString(), mcUsrAttempt.getMcOptionsContent().getMcQueOptionText());
-    	    		}
-    	    		else
-    	    		{
-    	    			mapAttemptsIncorrect.put(mapIndex.toString(), mcUsrAttempt.getMcOptionsContent().getMcQueOptionText());
-    	    		}
-    	    		mapAttempts.put(mapIndex.toString(), mcUsrAttempt.getMcOptionsContent().getMcQueOptionText());
-					
-	    			logger.debug("added attempt with order: " + mcUsrAttempt.getAttemptOrder() + " , option text is: " + mcUsrAttempt.getMcOptionsContent().getMcQueOptionText());
-	    			mapIndex=new Long(mapIndex.longValue()+1);
-    	    	}    	    		
-
-    	    	logger.debug("final mapAttempts is: " + mapAttempts);
-    	    	if (mapAttempts.size() > 0)
-    	    	{
-    	    		mapAttemptOrderAttempts.put(new Integer(j).toString(), mapAttempts);	
-    	    	}
-    	    	if (mapAttemptsCorrect.size() > 0)
-    	    	{
-    	    		mapAttemptOrderCorrectAttempts.put(new Integer(j).toString(), mapAttemptsCorrect);	
-    	    	}
-    	    	if (mapAttemptsIncorrect.size() > 0)
-    	    	{
-    	    		mapAttemptOrderIncorrectAttempts.put(new Integer(j).toString(), mapAttemptsIncorrect);	
-    	    	}
-    		}
-			
-			logger.debug("final mapAttemptOrderAttempts is: " + mapAttemptOrderAttempts);
-			if (mapAttemptOrderAttempts.size() > 0)
-	    	{
-				mapQueAttempts.put(new Integer(i).toString(), mapAttemptOrderAttempts);	
-	    	}
-			if (mapAttemptOrderCorrectAttempts.size() > 0)
-	    	{
-				mapQueCorrectAttempts.put(new Integer(i).toString(), mapAttemptOrderCorrectAttempts);	
-	    	}    			
-			if (mapAttemptOrderIncorrectAttempts.size() > 0)
-	    	{
-    			mapQueIncorrectAttempts.put(new Integer(i).toString(), mapAttemptOrderIncorrectAttempts);	
-	    	}    			
-		}
-		request.getSession().setAttribute(MAP_QUE_ATTEMPTS, mapQueAttempts);
-		request.getSession().setAttribute(MAP_QUE_CORRECT_ATTEMPTS, mapQueCorrectAttempts);
-		request.getSession().setAttribute(MAP_QUE_INCORRECT_ATTEMPTS, mapQueIncorrectAttempts);
-		
-		logger.debug("final mapQueAttempts is: " + mapQueAttempts);
-		logger.debug("final mapQueCorrectAttempts is: " + mapQueCorrectAttempts);
-		logger.debug("final mapQueIncorrectAttempts is: " + mapQueIncorrectAttempts);
-		mcLearningForm.resetCommands();
-		return (mapping.findForward(VIEW_ANSWERS));
-	}
-
-
-    /**
-     * allows the learner to view all the other learners' activity summary 
-     * viewSummary(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response)
-     * 
-     * @param request
-     * @param form
-     * @param mapping
-     * @return ActionForward
-     */
-    public ActionForward viewSummary(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response) throws IOException,
-                                         ServletException
-	{
-		logger.debug("dispatching viewSummary...");
-		McLearningForm mcLearningForm = (McLearningForm) form;
- 		IMcService mcService =McUtils.getToolService(request);
-		
-		int countSessionComplete=mcService.countSessionComplete();
-		int topMark=LearningUtil.getTopMark(request);
-		int lowestMark=LearningUtil.getLowestMark(request);
-		int averageMark=LearningUtil.getAverageMark(request);
-		
-		logger.debug("countSessionComplete: " + countSessionComplete);
-		logger.debug("topMark: " + topMark);
-		logger.debug("lowestMark: " + lowestMark);
-		logger.debug("averageMark: " + averageMark);
-		
-		request.getSession().setAttribute(COUNT_SESSION_COMPLETE, new Integer(countSessionComplete).toString());
-		request.getSession().setAttribute(TOP_MARK, new Integer(topMark).toString());
-		request.getSession().setAttribute(LOWEST_MARK, new Integer(lowestMark).toString());
-		request.getSession().setAttribute(AVERAGE_MARK, new Integer(averageMark).toString());
-		
-		mcLearningForm.resetCommands();
-		return (mapping.findForward(RESULTS_SUMMARY));	
-    }
-        
-    
-    /**
-     * to indicate that some learners are using the content
-     * marks the content as used content
-     * setContentInUse(HttpServletRequest request)
-     * 
-     * @param request
-     */
-    protected void setContentInUse(HttpServletRequest request)
-    {
-    	IMcService mcService =McUtils.getToolService(request);
-    	Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
-    	logger.debug("toolContentId:" + toolContentId);
-    	
-    	McContent mcContent=mcService.retrieveMc(toolContentId);
-    	logger.debug("mcContent:" + mcContent);
-    	mcContent.setContentInUse(true);
-    	logger.debug("content has been set to inuse");
-    	mcService.saveMcContent(mcContent);
-    }
-	
-    /**
-     * marks the define Later flag as true
-     * setDefineLater(HttpServletRequest request, boolean value)
-     * @param request
-     */
-    protected void setDefineLater(HttpServletRequest request, boolean value)
-    {
-    	IMcService mcService =McUtils.getToolService(request);
-    	Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
-    	logger.debug("toolContentId:" + toolContentId);
-    	logger.debug("value:" + value);
-    	
-    	McContent mcContent=mcService.retrieveMc(toolContentId);
-    	logger.debug("mcContent:" + mcContent);
-    	mcContent.setDefineLater(value);
-    	logger.debug("defineLater has been set to true");
-    	mcService.saveMcContent(mcContent);
-    }
-	
-        
-    /**
-     * redoQuestions(HttpServletRequest request, McLearningForm mcLearningForm, ActionMapping mapping)
-     * 
-     * @param request
-     * @param mcLearningForm
-     * @param mapping
-     * @return
-     */
-    protected ActionForward redoQuestions(HttpServletRequest request, McLearningForm mcLearningForm, ActionMapping mapping)
-    {
-    	logger.debug("requested redoQuestions...");
-    	/* reset the checked options MAP */
-    	Map mapGeneralCheckedOptionsContent= new TreeMap(new McComparator());
-    	request.getSession().setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, mapGeneralCheckedOptionsContent);
-    	mcLearningForm.resetCommands();
-    	return (mapping.findForward(LOAD_LEARNER));
-    }
     
 }
     
