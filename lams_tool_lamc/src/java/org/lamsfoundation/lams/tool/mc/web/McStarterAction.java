@@ -738,11 +738,8 @@ public class McStarterAction extends Action implements McAppConstants {
 		logger.debug("passed mcService: " + mcService);
 		request.getSession().setAttribute(TOOL_SERVICE, mcService);
 
-		/* to indicate that Edit button is enabled in the define later screen */
-		request.getSession().setAttribute(DEFINE_LATER_EDIT_ACTIVITY, new Boolean(true));
-		
-		request.getSession().setAttribute(ACTIVE_MODULE, DEFINE_LATER);
 		/* present the view-only screen first */
+		request.getSession().setAttribute(ACTIVE_MODULE, DEFINE_LATER);
 		request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(false));
 		
 		/*normally diplay all 3 tabs of the Authoring environment  but with define Later only display Basic content*/
