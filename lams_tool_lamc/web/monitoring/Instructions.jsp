@@ -24,9 +24,6 @@
 						<tr>
 							<td colspan=2> &nbsp&nbsp&nbsp </td>
 						</tr>
-						<tr>
-							<td colspan=2> &nbsp&nbsp&nbsp </td>
-						</tr>
 				
 						<tr> 
 							<td NOWRAP valign=top>
