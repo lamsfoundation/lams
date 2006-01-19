@@ -75,8 +75,6 @@
         </c:otherwise>
 </c:choose>
 
-tabId: <c:out value='${tabId}'/>
-
 <body onLoad='showMonitoringTab("<c:out value='${tabId}'/>")'>
 
 	<b> <bean:message key="label.monitoring"/> </b>
