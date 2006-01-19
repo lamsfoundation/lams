@@ -104,12 +104,18 @@
         </property>
         <property name="transactionAttributes">
             <props>
-                <prop key="createForum">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="deleteForum">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="createMessage">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="deleteMessage">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="modifyMessage">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="replyToMessage">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="createRootTopic">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="updateTopic">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="deleteTopic">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="replyTopic">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="createUser">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="updateForum">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="deleteForumAttachment">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="deleteFromRepository">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="updateSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="releaseMarksForSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="setAsDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="setAsRunOffline">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
             </props>
         </property>
     </bean>
