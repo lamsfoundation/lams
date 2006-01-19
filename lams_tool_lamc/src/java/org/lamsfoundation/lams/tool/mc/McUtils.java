@@ -913,6 +913,49 @@ public abstract class McUtils implements McAppConstants {
 		logger.debug("is define later: " + mcContent.isDefineLater());
 		return  mcContent.isDefineLater();
 	}
-
+	
+	/**
+     * sets/resets the define later flag of the content
+     * setDefineLater(HttpServletRequest request, boolean value)
+     * 
+     * @param request
+     * @param value
+     */
+    public static void setDefineLater(HttpServletRequest request, boolean value)
+    {
+    	IMcService mcService =McUtils.getToolService(request);
+    	Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
+    	logger.debug("toolContentId:" + toolContentId);
+    	logger.debug("value:" + value);
+    	
+    	McContent mcContent=mcService.retrieveMc(toolContentId);
+    	logger.debug("mcContent:" + mcContent);
+    	mcContent.setDefineLater(value);
+    	logger.debug("defineLater has been set to true");
+    	mcService.saveMcContent(mcContent);
+    }
+	
+    
+	public static String getDestination(String sourceMcStarter)
+	{
+		logger.debug("sourceMcStarter: " + sourceMcStarter);
+		
+		if ((sourceMcStarter != null) && !sourceMcStarter.equals("monitoring"))
+		{
+			logger.debug("request is from authoring or define Later url. return to: " + LOAD_QUESTIONS);
+			return LOAD_QUESTIONS;	
+		}
+		else if (sourceMcStarter == null)
+		{
+			logger.debug("request is from authoring url. return to: " + LOAD_QUESTIONS);
+			return LOAD_QUESTIONS;	
+		}
+		else
+		{
+			logger.debug("request is from amonitoring url. return to: " + LOAD_MONITORING);
+			return LOAD_MONITORING;	
+		}
+	}
+	
 
 }
