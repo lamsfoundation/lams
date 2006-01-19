@@ -1384,11 +1384,8 @@ public class McAction extends LamsDispatchAction implements McAppConstants
                                          ServletException,
                                          ToolException
     {
-    	logger.debug("dispatching editActivityQuestions.");
-    	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
+    	logger.debug("dispatching editActivityQuestions...");
 	 	IMcService mcService =McUtils.getToolService(request);
-	 	
-	 	AuthoringUtil.readData(request, mcAuthoringForm);
 	 	
      	String userAction="editActivityQuestions";
 		request.setAttribute(USER_ACTION, userAction);
