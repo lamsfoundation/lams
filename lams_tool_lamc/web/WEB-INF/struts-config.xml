@@ -202,7 +202,7 @@
 	
    <!--Learning Main Action: interacts with the Learning module user -->
 	<action	path="/learning"
-		    type="org.lamsfoundation.lams.tool.mc.web.McAction"
+		    type="org.lamsfoundation.lams.tool.mc.web.McLearningAction"
 			name="McLearningForm"
       		scope="session"
       		input=".answers"
