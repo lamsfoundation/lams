@@ -1897,6 +1897,13 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 	
 		logger.debug("resetting defineLater flag. ");
 		McUtils.setDefineLater(request, false);
+		
+		/* switch to view-only mode in the monitoring url after the content is persisted*/
+		if (destination.equals(LOAD_MONITORING))
+		{
+			request.getSession().setAttribute(ACTIVE_MODULE, DEFINE_LATER);
+			request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(false));	
+		}
 		return (mapping.findForward(destination));
     }
 
