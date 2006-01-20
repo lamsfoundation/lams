@@ -121,6 +121,7 @@ public interface IMonitoringService
     
     /**
      * This method returns a A list of all available Lessons.
+     * Note - this is all the lessons (for all users, for all states, including disabled).
      * If the data is to be sent to Flash, then use  getAllLessonsWDDX()
      * 
      * @return List The requested list of Lessons
@@ -130,6 +131,7 @@ public interface IMonitoringService
 
     /**
      * This method returns a string representing a list of all 
+     * Note - this is all the lessons (for all users, for all states, including disabled).
      * available Lessons in the WDDX format
      * 
      * @return String The requested list of Lessons in wddx format
