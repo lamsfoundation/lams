@@ -28,7 +28,7 @@ public class LessonDAO extends HibernateDaoSupport implements ILessonDAO
 	private static final String TABLENAME ="lams_lesson";
 	private final static String FIND_BY_USER="from " + TABLENAME + 
 											 " in class " + Lesson.class.getName() +
-											 " where user_id=?";
+											 " where user_id=? and lesson_state_id <= 6";
     /**
      * Retrieves the Lesson
      * @param lessonId identifies the lesson to get
@@ -57,12 +57,14 @@ public class LessonDAO extends HibernateDaoSupport implements ILessonDAO
              }
        ); 
     }
-    
+  
+    /** Get all the lessons in the database. This includes the disabled lessons. */
     public List getAllLessons()
     {
         return getHibernateTemplate().loadAll(Lesson.class);
     }
-    /**
+    
+     /**
      * Gets all lessons that are active for a learner.
      * @param learner a User that identifies the learner.
      * @return a List with all active lessons in it.
