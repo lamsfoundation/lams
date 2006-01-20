@@ -138,15 +138,23 @@ public class MonitoringAction extends LamsDispatchAction
                                                                           ServletException
     {
         this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-
         long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-
-        monitoringService.startLesson(lessonId);
-
-        //TODO add the wddx acknowledgement code.
+    	FlashMessage flashMessage = null;
+    	
+    	try {
+    		monitoringService.startLesson(lessonId);
+    		flashMessage = new FlashMessage("startLesson",Boolean.TRUE);
+		} catch (Exception e) {
+			flashMessage = new FlashMessage("startLesson",
+					"Invalid lessonID :" +  lessonId,
+					FlashMessage.ERROR);
+		}
+		
+		String message =  flashMessage.serializeMessage();
+		
+        return outputPacket(mapping,request,response,message,"details");
         
         //return mapping.findForward(SCHEDULER);
-        return null;
     }
     
     /**
