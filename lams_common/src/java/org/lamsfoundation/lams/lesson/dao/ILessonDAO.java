@@ -25,6 +25,7 @@ public interface ILessonDAO
      */
     public Lesson getLesson(Long lessonId);
     
+    /** Get all the lessons in the database. This includes the disabled lessons. */
     public List getAllLessons();
     
     public Lesson getLessonWithJoinFetchedProgress(Long lessonId);
@@ -55,7 +56,7 @@ public interface ILessonDAO
     
     /**
      * Returns the list of available Lessons for
-     * a given user.
+     * a given user. Does not return disabled lessons.
      * 
      * @param userID The user_id of the user
      * @return List The list of Lessons for the given user
