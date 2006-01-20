@@ -242,6 +242,37 @@ public class DummyMonitoringAction extends LamsDispatchAction
     }
 
     /**
+     * The Struts dispatch method to remove a lesson (marking the lesson by the given lesson ID
+     * as <code>Lesson.DISABLED_STATE</code> status).  Forwards to the control
+     * list jsp.
+     * 
+     * @param mapping An ActionMapping class that will be used by the Action class to tell
+     * the ActionServlet where to send the end-user.
+     *
+     * @param form The ActionForm class that will contain any data submitted
+     * by the end-user via a form.
+     * @param request A standard Servlet HttpServletRequest class.
+     * @param response A standard Servlet HttpServletResponse class.
+     * @return An ActionForward class that will be returned to the ActionServlet indicating where
+     *         the user is to go next.
+     * @throws IOException
+     * @throws ServletException
+     */
+    public ActionForward removeLesson(ActionMapping mapping,
+                                     ActionForm form,
+                                     HttpServletRequest request,
+                                     HttpServletResponse response) throws IOException,
+                                                                          ServletException
+    {
+        this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+
+        long lessonId = WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID);
+		monitoringService.removeLesson(lessonId);
+
+        return unspecified(mapping, form, request, response);
+    }
+
+    /**
      * The Struts dispatch method that lists a lesson's details. Forwards to the detail screen
      * 
      * @param mapping An ActionMapping class that will be used by the Action class to tell

@@ -24,6 +24,7 @@
 		<tr><td><A HREF="<lams:WebAppURL/>dummy.do?method=initStartScreen" target="contentFrame">Start new lesson</a></td></tr>	
 		<tr><td><A HREF="<lams:WebAppURL/>dummy.do">Refresh List</a></td></tr>	
 		<TR><TD><HR></TD></TR>
+		<TR><TD>Current Lessons</TD></TR>
 		<c:forEach var="lesson" items="${lessons}">
 			<c:if test="${lesson.lessonStateId<6}">
 				<TR><TD><STRONG><c:out value="${lesson.lessonName}"/></STRONG>
@@ -41,6 +42,19 @@
 			<TR><TD><HR></TD></TR>
 			</c:if>
 		</c:forEach>
+		<TR><TD><HR></TD></TR>
+		<TR><TD>Archived Lessons</TD></TR>
+		<c:forEach var="lesson" items="${lessons}">
+			<c:if test="${lesson.lessonStateId==6}">
+				<TR><TD><STRONG><c:out value="${lesson.lessonName}"/></STRONG>
+				<BR><c:out value="${lesson.lessonDescription}"/>
+				<BR><A HREF="<lams:WebAppURL/>/dummy.do?method=getLesson&lessonID=<c:out value="${lesson.lessonId}"/>" target="contentFrame">Monitor Lesson</A>
+				<BR><A HREF="<lams:WebAppURL/>/dummy.do?method=removeLesson&lessonID=<c:out value="${lesson.lessonId}"/>">Remove Lesson</A>
+				</TD></TR>
+			<TR><TD><HR></TD></TR>
+			</c:if>
+		</c:forEach>
+		<!-- Don't display the removed lessons ie lessonStateId=7 -->
 	</table>
 	
 	</body>
