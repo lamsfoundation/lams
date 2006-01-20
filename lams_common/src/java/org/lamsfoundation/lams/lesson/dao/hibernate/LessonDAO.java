@@ -135,7 +135,15 @@ public class LessonDAO extends HibernateDaoSupport implements ILessonDAO
     {
         getHibernateTemplate().update(lesson);
     }
-    public List getLessonsForUser(Integer userID){
+    
+    /**
+     * Returns the list of available Lessons for
+     * a given user. Does not return disabled lessons.
+     * 
+     * @param userID The user_id of the user
+     * @return List The list of Lessons for the given user
+     */
+   public List getLessonsForUser(Integer userID){
     	List lessons = this.getHibernateTemplate().find(FIND_BY_USER,userID);
     	return lessons;
     }
