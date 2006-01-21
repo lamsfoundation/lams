@@ -2217,6 +2217,53 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     }
 
     
+    /**Double check: we assume that the author have to use Cancel button to exit the authoring module.
+     * This is the place to remove any authoring modle related session attributes
+     * 
+     * author exiting, remove any session attributes that belong to authoring module here
+     * cancelAuthoring(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return ActionForward
+     * @throws IOException
+     * @throws ServletException
+     */
+    public ActionForward cancelAuthoring(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+    {
+    	logger.debug("dispatching cancelAuthoring...");
+    	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
+	 	
+
+	 	/* determine whether the request is from Monitoring url Edit Activity*/
+		String sourceMcStarter = (String) request.getAttribute(SOURCE_MC_STARTER);
+		logger.debug("sourceMcStarter: " + sourceMcStarter);
+		
+		String userAction="cancelAuthoring";
+		request.setAttribute(USER_ACTION, userAction);
+		logger.debug("userAction:" + userAction);
+		mcAuthoringForm.resetUserAction();
+		
+		/*remove attribues */
+		request.getSession().removeAttribute(SHOW_AUTHORING_TABS);
+		request.getSession().removeAttribute(ACTIVE_MODULE);
+		logger.debug("removed attribues...");
+		
+		/* Check this: find out where to forward to*/
+	    return (mapping.findForward(AUTHORING_STARTER));
+    }
+    
+    	
 	/**
      * ensures that the weight valued entered are valid
      * validateQuestionWeights(HttpServletRequest request, McAuthoringForm mcAuthoringForm)
