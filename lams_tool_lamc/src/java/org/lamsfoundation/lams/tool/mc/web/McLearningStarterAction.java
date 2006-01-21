@@ -223,6 +223,18 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    request.getSession().setAttribute(TOOL_CONTENT_UID, mcContent.getUid());
 	    logger.debug("using TOOL_CONTENT_UID: " + mcContent.getUid());
 	    
+	    /* find out if the content is set to run offline or online. If it is set to run offline , the learners are informed about that. */
+	    boolean isRunOffline=McUtils.isRunOffline(mcContent);
+	    logger.debug("isRunOffline: " + isRunOffline);
+	    
+	    if (isRunOffline == true)
+	    {
+	    	logger.debug("warning to learner: the activity is offline.");
+	    	persistError(request,"label.learning.runOffline");
+			return (mapping.findForward(ERROR_LIST));
+	    }
+	    		
+	    
 	    /*
 	     * The content we retrieved above must have been created before in Authoring time. 
 	     * And the passed tool session id already refers to it.
@@ -276,7 +288,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 		request.getSession().setAttribute(MAP_GENERAL_OPTIONS_CONTENT, mapGeneralOptionsContent);
     	
     	/*
-	     * Verify that userId does not already exist in the db.
+	     * verify that userId does not already exist in the db.
 	     * If it does exist, that means, that user already responded to the content and 
 	     * his answers must be displayed  read-only
 	     * 
