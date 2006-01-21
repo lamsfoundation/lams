@@ -760,23 +760,6 @@ public abstract class McUtils implements McAppConstants {
 		return user.getUserID().intValue();
     }
 	
-	
-    /**
-     * temporary function
-     * @return
-     */
-	public static User createMockUser()
-	{
-		logger.debug(logger + " " + "McUtils" +  " request for new new mock user");
-		int randomUserId=generateIntegerId();
-		User mockUser=new User();
-		mockUser.setUserId(new Integer(randomUserId));
-		mockUser.setFirstName(MOCK_USER_NAME + randomUserId);
-		mockUser.setLastName(MOCK_USER_LASTNAME + randomUserId);
-		mockUser.setLogin(MOCK_LOGIN_NAME + randomUserId); //we assume login and username refers to the same property
-		logger.debug(logger + " " + "McUtils" +  " created mockuser: " + mockUser);
-		return mockUser;
-	}
 
     /**
      * temporary function
@@ -786,22 +769,6 @@ public abstract class McUtils implements McAppConstants {
 	{
 		User user=new User();
 		user.setUserId(userId);
-		return user;
-	}
-
-    /**
-     * temporary function
-     * @return
-     */
-	public static User createUser(Integer userId)
-	{
-		User user=new User();
-		user.setUserId(userId);
-		
-		int randomUserId=generateIntegerId();
-		user.setFirstName(MOCK_USER_NAME + randomUserId);
-		user.setLastName(MOCK_USER_LASTNAME + randomUserId);
-		user.setLogin(MOCK_LOGIN_NAME + randomUserId); 
 		return user;
 	}
 
@@ -971,6 +938,4 @@ public abstract class McUtils implements McAppConstants {
 			return LOAD_MONITORING;	
 		}
 	}
-	
-
 }
