@@ -145,32 +145,5 @@
 						</html:submit>
 					</td> 
  				 </tr>
- 				 
- 				 <tr>
- 				 	<td NOWRAP colspan=4 align=center valign=top>								
-						&nbsp
-				  	</td>
-				</tr>
-				
-				<c:if test="${requestScope.fileContentReady == 1}"> 			
-					<tr>
-						<td NOWRAP align="right" valign=top>
-	          				 <bean:message key="label.fileContent" /> : 
-	          			</td>
-					
-	 				 	<td NOWRAP colspan=3 align=left valign=top>								
-	 				 		<table>
-	 				 			<tr> 
-	 				 				<td NOWRAP align=center> <font size=2> <b>
-	 				 					 <c:out value="${sessionScope.fileName}"/>  
-	 				 				</b> </font> </td>
-				 				 </tr>
-				 				 <tr>
-			 				 		<td NOWRAP> <textarea ROWS=20 COLS=80><c:out value="${sessionScope.fileContent}"/> </textarea> </td>				 				 
-				 				 </tr>
-	 				 		</table>
-					  	</td>
-					</tr>
-				</c:if> 			
- 				 
+
 			</table>	  	
