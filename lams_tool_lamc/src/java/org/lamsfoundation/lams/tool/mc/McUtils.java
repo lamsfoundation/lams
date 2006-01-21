@@ -914,6 +914,21 @@ public abstract class McUtils implements McAppConstants {
 		return  mcContent.isDefineLater();
 	}
 	
+	
+	/**
+	 * find out if the content is set to run offline or online. If it is set to run offline , the learners are informed about that..
+	 * isRubnOffline(McContent mcContent)
+	 * 
+	 * @param mcContent
+	 * @return boolean
+	 */
+	public static boolean isRunOffline(McContent mcContent)
+	{
+		logger.debug("is run offline: " + mcContent.isRunOffline());
+		return mcContent.isRunOffline();
+	}
+
+	
 	/**
      * sets/resets the define later flag of the content
      * setDefineLater(HttpServletRequest request, boolean value)
