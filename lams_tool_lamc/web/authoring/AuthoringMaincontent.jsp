@@ -21,12 +21,13 @@
 	<script type="text/javascript" src="<c:out value="${lams}"/>includes/javascript/tabcontroller.js"></script>
 	<script src="<c:out value="${lams}"/>includes/javascript/common.js"></script>
 	
-	<!-- this is the custom CSS for hte tool -->
+	<!-- this is the custom CSS for the tool -->
 	<link href="<c:out value="${tool}"/>css/tool_custom.css" rel="stylesheet" type="text/css">
 	<lams:css/>
-
+	
 	<script language="JavaScript" type="text/JavaScript">
 		<!--
+		
 		// questionIndexValue: index of question affected
 		// actionMethod: name of the method to be called in the DispatchAction	
 		function submitModifyQuestion(questionIndexValue, actionMethod) 
@@ -64,6 +65,7 @@
 		    document.MM_pgW=innerWidth; document.MM_pgH=innerHeight; onresize=MM_reloadPage; }}
 		  else if (innerWidth!=document.MM_pgW || innerHeight!=document.MM_pgH) location.reload();
 		}
+		
 		MM_reloadPage(true);
 		//-->
 	</script>
@@ -71,16 +73,18 @@
 <body onLoad="initTabs()">
 
 	<b> <bean:message key="label.authoring.mc"/> </b>
-    <!-- start tabs -->
+	    
+		<c:if test="${ sessionScope.showAuthoringTabs == 'true'}"> 			
+		<!-- start tabs -->
 				<jsp:include page="/authoring/AuthoringTabsHeader.jsp" />
-	<!-- end tab buttons -->
+		<!-- end tab buttons -->				
+		</c:if> 			
 	
 	<html:form  action="/authoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">
 	<html:hidden property="dispatch"/>
 	
 	<div id='content_b' class="tabbody content_b" >
-	
-			<h2><bean:message key="label.authoring.mc.basic"/></h2>
+		<h2><bean:message key="label.authoring.mc.basic"/></h2>	
 				<table align=center> 	  
 				<tr>   
 				<td NOWRAP class=error>
@@ -97,14 +101,35 @@
 						<jsp:include page="/authoring/OptionsContent.jsp" />
 					</c:if> 				
 			</div>
-			<a href="javascript:;" class="button">Cancel</a>
-				<!-- end of content_b -->
+
+			<table align=right> 	  
+				<tr>   
+					<td NOWRAP>
+						<html:submit onclick="javascript:submitMethod('cancelAuthoring');">
+							<bean:message key="button.cancel"/>
+						</html:submit>	 				 		  					
+					</td>
+				</tr> 
+			</table>
 	</div>
 		
-	<c:if test="${ sessionScope.activeModule != 'defineLater'}"> 			
-		<div id='content_a'  class="tabbody content_a">
-			<h2><bean:message key="label.advanced.definitions"/></h2>
-			
+	<div id='content_a'  class="tabbody content_a">
+			<h2><bean:message key="label.advanced.definitions"/></h2>	
+		<table align=center> 	  
+		<tr>   
+		<td NOWRAP class=error>
+			<%@ include file="/Errorbox.jsp" %> <!-- show any error messages here -->
+		</td>
+		</tr> 
+		</table>
+		
+		<div id="formtablecontainer2">
+			<jsp:include page="/authoring/AdvancedContent.jsp" />
+		</div>
+	</div>
+	
+	<div id='content_i'  class="tabbody content_i">
+		<h2><bean:message key="label.authoring.instructions"/></h2>	
 			<table align=center> 	  
 			<tr>   
 			<td NOWRAP class=error>
@@ -113,29 +138,10 @@
 			</tr> 
 			</table>
 			
-			<div id="formtablecontainer2">
-				<jsp:include page="/authoring/AdvancedContent.jsp" />
+			<div id="formtablecontainer3">
+					<jsp:include page="/authoring/InstructionsContent.jsp" />
 			</div>
-		</div>
-		
-		
-		<div id='content_i'  class="tabbody content_i">
-				<h2><bean:message key="label.authoring.instructions"/></h2>
-				
-				<table align=center> 	  
-				<tr>   
-				<td NOWRAP class=error>
-					<%@ include file="/Errorbox.jsp" %> <!-- show any error messages here -->
-				</td>
-				</tr> 
-				</table>
-				
-				<div id="formtablecontainer3">
-						<jsp:include page="/authoring/InstructionsContent.jsp" />
-				</div>
-		</div>
-	</c:if> 				
+	</div>
 	</html:form>
-	<p></p>
 </body>
 </html:html>
