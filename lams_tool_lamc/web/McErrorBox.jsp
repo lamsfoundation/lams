@@ -36,7 +36,7 @@ http://www.gnu.org/licenses/gpl.txt
 	</td>
 	<td width="90%" valign="middle" class="body" colspan="2">
 		 <html:messages id="error" message="false"> 
-			 <c:out value="${error}" escapeXml="false"/><BR>
+			<font size=2> <c:out value="${error}" escapeXml="false"/> </font> <br>
 		 </html:messages> 
 	</td>
 </tr>
