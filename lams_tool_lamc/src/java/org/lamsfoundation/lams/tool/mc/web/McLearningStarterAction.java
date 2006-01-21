@@ -153,11 +153,6 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    request.getSession().setAttribute(QUESTIONS_WITHNO_OPTIONS, new Boolean(false));
 	    
 	    /*
-	     * mark the http session as a learning activity 
-	     */
-	    request.getSession().setAttribute(TARGET_MODE,TARGET_MODE_LEARNING);
-	    
-	    /*
 	     * persist time zone information to session scope. 
 	     */
 	    McUtils.persistTimeZone(request);
@@ -382,11 +377,6 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    logger.debug("IS_CONTENT_IN_USE: " + mcContent.isContentInUse());
 	    request.getSession().setAttribute(IS_CONTENT_IN_USE, new Boolean(mcContent.isContentInUse()).toString());
 	    
-	    /*
-	     * Is the tool activity been checked as Define Later in the property inspector?
-	     */
-	    logger.debug("IS_DEFINE_LATER: " + mcContent.isDefineLater());
-	    request.getSession().setAttribute(IS_DEFINE_LATER, new Boolean(mcContent.isDefineLater()).toString());
 	    
 	    /*
 	     * Is the tool activity been checked as Run Offline in the property inspector?
