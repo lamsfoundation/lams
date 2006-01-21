@@ -15,28 +15,28 @@
 	String strDefineLater="/defineLaterStarter?toolContentID=" + toolContentId;
 %>
 
-Start authoring module
+
 <html:form action="<%=toolUrl%>" method="post">
+Start authoring module
       <table border=1>
       </table><br/>
       <html:submit value="Tool Icon"/>
 </html:form>
+<br>
 
-Copy Tool Content
 <html:form action="<%=strCopyToolContent%>" method="post">
       <table border=1>
       </table><br/>
       <html:submit value="Copy Tool Content"/>
 </html:form>
 
-Remove Tool Content
 <html:form action="<%=strRemoveToolContent%>" method="post">
       <table border=1>
       </table><br/>
       <html:submit value="Remove Tool Content"/>
 </html:form>
 
-Define Later Url
+
 <html:form action="<%=strDefineLater%>" method="post">
       <table border=1>
       </table><br/>
