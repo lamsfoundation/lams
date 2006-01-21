@@ -133,6 +133,17 @@ public class McStarterAction extends Action implements McAppConstants {
 		IMcService mcService = (IMcService)request.getSession().getAttribute(TOOL_SERVICE);
 		logger.debug("will retrieve mcService"  + mcService);
 		
+		
+		String showAuthoringTabs=(String) request.getSession().getAttribute(SHOW_AUTHORING_TABS);
+		logger.debug("showAuthoringTabs: "  + showAuthoringTabs);
+		
+		if (showAuthoringTabs == null)
+		{
+			request.getSession().setAttribute(SHOW_AUTHORING_TABS,new Boolean(true).toString());
+		}
+		logger.debug("final showAuthoringTabs: "  + request.getSession().getAttribute(SHOW_AUTHORING_TABS));
+		
+		
 		String activeModule=(String) request.getSession().getAttribute(ACTIVE_MODULE);
 		logger.debug("activeModule: "  + activeModule);
 		
@@ -179,9 +190,6 @@ public class McStarterAction extends Action implements McAppConstants {
 		}
 		else
 		{
-			/* mark the http session as an authoring activity */
-		    request.getSession().setAttribute(TARGET_MODE,TARGET_MODE_AUTHORING);
-		    
 		    logger.debug("will render authoring screen");
 		    String strToolContentId="";
 		    strToolContentId=request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
@@ -675,7 +683,6 @@ public class McStarterAction extends Action implements McAppConstants {
 	protected void initialiseAttributes(HttpServletRequest request)
 	{
 		logger.debug("starting initialiseAttributes...");
-		request.getSession().setAttribute(CURRENT_TAB, new Long(1));
 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 		
 		/* needs to run only once per tool*/ 
@@ -749,6 +756,8 @@ public class McStarterAction extends Action implements McAppConstants {
 		
 		/*normally diplay all 3 tabs of the Authoring environment  but with define Later only display Basic content*/
 		request.getSession().setAttribute(SHOW_BASIC_CONTENT,new Boolean(true).toString());
+		
+		request.getSession().setAttribute(SHOW_AUTHORING_TABS,new Boolean(false).toString());
 		return execute(mapping, form, request, response);
 	}
 	
