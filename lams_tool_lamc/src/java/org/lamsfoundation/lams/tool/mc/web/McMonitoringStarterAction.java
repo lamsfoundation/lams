@@ -83,11 +83,6 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 	    request.getSession().setAttribute(TOOL_SERVICE, mcService);		
 
 		McMonitoringForm mcMonitoringForm = (McMonitoringForm) form;
-
-	    /*
-	     * mark the http session as a monitoring activity 
-	     */
-	    request.getSession().setAttribute(TARGET_MODE,TARGET_MODE_MONITORING);
 	    
 	    /*
 	     * persist time zone information to session scope. 
