@@ -33,7 +33,7 @@
 
 					  <tr>
 					  	<td align=left class="input" valign=top colspan=2> 
-						  	<font size=2>  <c:out value="${sessionScope.countSessionComplete}"/> <bean:message key="label.learnersFinished"/> 4
+						  	<font size=2>  <c:out value="${sessionScope.countSessionComplete}"/> <bean:message key="label.learnersFinished"/> 
 						  	</font>
 					  	</td>
 					  </tr>	
