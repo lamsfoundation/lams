@@ -495,7 +495,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 			Map mapAttemptOrderAttempts= new TreeMap(new McComparator());
 			Map mapAttemptOrderCorrectAttempts= new TreeMap(new McComparator());
 			Map mapAttemptOrderIncorrectAttempts= new TreeMap(new McComparator());
-			for (int j=1; j <= MAX_ATTEMPTY_HISTORY ; j++ )
+			for (int j=1; j <= MAX_ATTEMPT_HISTORY ; j++ )
     		{
     			List attemptsByAttemptOrder=mcService.getAttemptByAttemptOrder(queUsrId, mcQueContent.getUid(), new Integer(j));
 	    		logger.debug("attemptsByAttemptOrder: " + j + " is: " + attemptsByAttemptOrder);
