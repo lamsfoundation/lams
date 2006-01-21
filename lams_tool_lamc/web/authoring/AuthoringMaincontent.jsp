@@ -12,10 +12,8 @@
 	<!DOCTYPE HTML PUBLIC "-//W3C//DTD hTML 4.01 Transitional//EN">
 	<html:html>
 	<head>
-	<head>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-	<title>Multiple Choice Tool Authoring</title>
-	
+		<title><bean:message key="label.authoring"/></title>
 	<script lang="javascript">
 	var imgRoot="<c:out value="${lams}"/>images/";
 	var themeName="aqua";
@@ -73,58 +71,11 @@
 <body onLoad="initTabs()">
 
 	<b> <bean:message key="label.authoring.mc"/> </b>
-	
-		<!-- start tabs -->
-		<!-- tab holder table -->
     <!-- start tabs -->
-	<!-- tab holder table -->
-	<table border="0" cellspacing="0" cellpadding="0">
-	  <tr>
-	    <td valign="bottom">
-		<!-- table for tab 1 (basic)-->
-		<table border="0" cellspacing="0" cellpadding="0">
-		  <tr>
-			<td><a href="#"  onClick="showTab('b');return false;" ><img src="<c:out value="${lams}"/>images/aqua_tab_s_left.gif" name="tab_left_b" width="8" height="25" border="0" id="tab_left_b"/></a></td>
-			<td class="tab tabcentre_selected" width="90" id="tab_tbl_centre_b"  onClick="showTab('b');return false;" ><label for="b" accesskey="b"><a href="#" onClick="showTab('b');return false;" id="b" >Basic</a></label></td>
-			<td><a href="#" onClick="showTab('b');return false;"><img src="<c:out value="${lams}"/>images/aqua_tab_s_right.gif"  name="tab_right_b" width="8" height="25" border="0" id="tab_right_b"/></a></td>
-		  </tr>
-		</table>
-	
-	</td>
-	<c:if test="${sessionScope.showBasicContent != 'true'}">
-	    <td valign="bottom">
-		<!-- table for tab 2 (advanced) -->
-		<table border="0" cellspacing="0" cellpadding="0">
-		  <tr>
-			<td><a href="#" onClick="showTab('a');return false;"><img src="<c:out value="${lams}"/>images/aqua_tab_left.gif" name="tab_left_a" width="8" height="22" border="0" id="tab_left_a" /></a></td>
-			<td class="tab tabcentre" width="90" id="tab_tbl_centre_a" onClick="showTab('a');return false;"><label for="a" accesskey="a"><a href="#" onClick="showTab('a');return false;" id="a" >Advanced</a></label></td>
-			<td><a href="#" onClick="showTab('a');return false;"><img src="<c:out value="${lams}"/>images/aqua_tab_right.gif" name="tab_right_a" width="9" height="22" border="0" id="tab_right_a" /></a></td>
-		  </tr>
-		</table>
-	
-	</td>
-	    <td valign="bottom">
-		<!-- table for tab 3 (instructions) -->
-		<table border="0" cellspacing="0" cellpadding="0">
-		  <tr>
-			<td ><a href="#" onClick="showTab('i');return false;"><img border="0" src="<c:out value="${lams}"/>images/aqua_tab_left.gif" width="8" height="22" id="tab_left_i"   name="tab_left_i" /></a></td>
-			<td class="tab tabcentre" width="90" id="tab_tbl_centre_i"  onClick="showTab('i');return false;" ><label for="i" accesskey="i"><a href="#" onClick="showTab('i');return false;" id="i" >Instructions</a></label></td>
-			<td ><a href="#" onClick="showTab('i');return false;"><img src="<c:out value="${lams}"/>images/aqua_tab_right.gif"  width="9" height="22" border="0" id="tab_right_i"  name="tab_right_i"/></a></td>
-		  </tr>
-		</table>
-	
-	</td>
-	</c:if>
-	
-	  </tr>
-	</table>
-	
+				<jsp:include page="/authoring/AuthoringTabsHeader.jsp" />
 	<!-- end tab buttons -->
 	
 	<html:form  action="/authoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">
-	
-	 <!-- tab content one (basic)-->
-	 
 	<html:hidden property="dispatch"/>
 	
 	<div id='content_b' class="tabbody content_b" >
@@ -163,7 +114,7 @@
 			</table>
 			
 			<div id="formtablecontainer2">
-						<jsp:include page="/authoring/AdvancedContent.jsp" />
+				<jsp:include page="/authoring/AdvancedContent.jsp" />
 			</div>
 		</div>
 		
@@ -188,10 +139,3 @@
 	<p></p>
 </body>
 </html:html>
-
-
-
-
-
-
-
