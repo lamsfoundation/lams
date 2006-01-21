@@ -148,7 +148,6 @@ public interface McAppConstants {
     public static final String SUBMIT_SUCCESS							="sbmtSuccess";
     public static final String FILE_CONTENT								="fileContent";
     public static final String LOAD_FILE_CONTENT						="loadFileContent";
-    public static final String FILE_CONTENT_READY						="fileContentReady";
     public static final String FILE_NAME								="fileName";
     
    
