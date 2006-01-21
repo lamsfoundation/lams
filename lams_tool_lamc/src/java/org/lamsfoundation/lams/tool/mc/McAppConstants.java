@@ -27,71 +27,31 @@ package org.lamsfoundation.lams.tool.mc;
  * Defines constants used throughout the application 
  */
 public interface McAppConstants {
-	/*
-	 * Currently we are hardcoding the default content id.
-     * This will be replaced when the deploy logic automatically assigns a default content id in the deploy script.
-     */
 
 	public static final String MY_SIGNATURE 							="lamc11";
-	public static final long DEFAULT_CONTENT_ID 						=0;
-    public static final long DEFAULT_QUE_CONTENT_ID 					=1;
-    
-	public static final String ROOT 									="root";
-	public static final String ROOT_PATH								="rootPath";
-	public static final String PATH_TO_LAMS 							="pathToLams";
-	
-	
-	/*
-	 * temporarily refers to an existing content id for an incoming tool session id, won't need it in deployment environment 
-	 */
-	public static final long THE_MOCKED_CONTENT_ID						=1803739427456570536L;  
 	public static final String TOOL_SERVICE								="tool_service";
-	public static final String ERROR									="error";
 	public static final String ERROR_LIST								="errorList";
-	
-	/*
-	 * indicates which mode the tool runs under between Authoring, Learning, Monitoring
-	 */
-	public static final String TARGET_MODE								="targetMode";
-	public static final String TARGET_MODE_AUTHORING					="Authoring";
-	public static final String TARGET_MODE_LEARNING						="Learning";
-	public static final String TARGET_MODE_MONITORING					="Monitoring";
-	public static final String TARGET_MODE_EXPORT_PORTFOLIO				="ExportPortfolio";
 	
 	public static final String AUTHORING_STARTER						="starter";
 	public static final String LEARNING_STARTER							="learningStarter";
 	public static final String MONITORING_STARTER						="monitoringStarter";
 	
-	/* these constants are from org.lamsfoundation.lams.web.util.AttributeNames  */
 	public static final String USER										= "user";
 	public static final String TOOL_CONTENT_ID 							= "toolContentID";
 	public static final String TOOL_CONTENT_UID							= "toolContentUID";
 	public static final String TOOL_SESSION_ID 							= "toolSessionID"; 
-	public static final String MODE 									= "mode";
 	public static final String USER_ID 									= "userID";
-    public static final String ACTIVITY_ID 								= "activityID";
-    public static final String CURRENT_TAB 								= "currentTab";
     public static final String MAX_QUESTION_INDEX 						= "maxQuestionIndex";
     public static final String COPY_TOOL_CONTENT 						= "copyToolContent";
     public static final String REMOVE_TOOL_CONTENT 						= "removeToolContent";
     
-   
-	/*
-	 * Mock constants below are temporary until the tool gets a User object from the container.
-	 */
-	public static final Integer	MOCK_USER_ID							= new Integer(111);
-	public static final String  MOCK_USER_NAME							="Ozgur";
-	public static final String  MOCK_USER_LASTNAME						="Demirtas";
-	public static final String  MOCK_LOGIN_NAME							="ozgur";
-	
     /*
      * refers to number of questions presented initially, we have a single record for default content
      */
     public static final Long INITIAL_QUESTION_COUNT		=new Long(1);
     public static final long MAX_QUESTION_COUNT 		=20;
     public static final long MAX_OPTION_COUNT 			=10;
-    public static final int  MAX_ATTEMPTY_HISTORY 		=30;
-    
+    public static final int  MAX_ATTEMPT_HISTORY 		=30;
     
     
     /*
@@ -107,20 +67,11 @@ public interface McAppConstants {
     public static final String REDO_QUESTIONS							="redoQuestions";
     public static final String SINGLE_QUESTION_ANSWERS					="singleQuestionAnswers";
     public static final String RESULTS_SUMMARY							="resultsSummary";
-    
-    public static final String ALL_INSTRUCTIONS							="allInstructions";
-    public static final String EDIT_OPTS_CONTENT						="editOptsContent";
-    public static final String ADD_OPTS_CONTENT							="addOptsContent";
-    public static final String REMOVE_OPTS_CONTENT						="removeOptsContent";
     public static final String USER_ACTION								="userAction";
     
     
-    public static final String AUTHORING_BASIC							="authoringBasic";
-    public static final boolean MODE_OPTIONAL 							= false;
-    public static final String DISABLE_TOOL								="disabled";
-    public static final String IS_DEFINE_LATER							="isDefineLater";
-    public static final String DEFINE_LATER_CONTENT						="defineLaterContent";
     public static final String SOURCE_MC_STARTER						="sourceMcStarter";
+    public static final String AUTHORING_CANCELLED						="authoringCancelled";
     
     /*
      * authoring mode controllers
@@ -208,6 +159,8 @@ public interface McAppConstants {
     public static final String USER_PASSED								="userPassed";
     public static final String VIEW_ANSWERS								="viewAnswers";
     public static final String SHOW_BASIC_CONTENT						="showBasicContent";
+    public static final String SHOW_AUTHORING_TABS						="showAuthoringTabs";
+    
     
     public static final String ONLINE_INSTRUCTIONS						="onlineInstructions";
     public static final String OFFLINE_INSTRUCTIONS						="offlineInstructions";
