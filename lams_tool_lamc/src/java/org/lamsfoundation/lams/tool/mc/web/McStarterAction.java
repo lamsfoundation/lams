@@ -136,7 +136,10 @@ public class McStarterAction extends Action implements McAppConstants {
 		String activeModule=(String) request.getSession().getAttribute(ACTIVE_MODULE);
 		logger.debug("activeModule: "  + activeModule);
 		
-		/* determine whether the request is from Monitoring url Edit Activity*/
+		/* determine whether the request is from Monitoring url Edit Activity
+		 * null sourceMcStarter indicates that the request is from authoring url.
+		 * */
+		
 		String sourceMcStarter = (String) request.getAttribute(SOURCE_MC_STARTER);
 		logger.debug("sourceMcStarter: " + sourceMcStarter);
 		
@@ -285,7 +288,9 @@ public class McStarterAction extends Action implements McAppConstants {
 				logger.debug("existing mcContent:" + mcContent);
 		
 				/* do not make these tests if the request is coming from monitoring url for Edit Activity*/
-				if ((sourceMcStarter != null) && !sourceMcStarter.equals("monitoring"))
+				if (  (sourceMcStarter == null) ||
+					  ((sourceMcStarter != null) && !sourceMcStarter.equals("monitoring"))
+				   )
 				{
 					/* it is possible that the content is being used by some learners. In this situation, the content  is marked as "in use" and 
 					  a content in use is not modifiable*/ 
