@@ -1218,12 +1218,6 @@ public class AuthoringUtil implements McAppConstants {
     	if ((reportTitle == null) || (reportTitle.length() == 0)) 
     		reportTitle=(String)request.getSession().getAttribute(REPORT_TITLE);
     	
-    			
-    	endLearningMessage=mcAuthoringForm.getEndLearningMessage();
-    	logger.debug("END_LEARNING_MESSAGE: " +  mcAuthoringForm.getEndLearningMessage());
-    	if ((endLearningMessage == null) || (endLearningMessage.length() == 0))
-    		endLearningMessage=(String)request.getSession().getAttribute(END_LEARNING_MESSAGE);
-
     	String richTextTitle="";
     	richTextTitle = (String)request.getSession().getAttribute(RICHTEXT_TITLE);
     	logger.debug("createContent richTextTitle from session: " + richTextTitle);
@@ -1283,7 +1277,7 @@ public class AuthoringUtil implements McAppConstants {
 	    mc.setDefineLater(false);
 	    mc.setSynchInMonitor(isSynchInMonitor);
 	    mc.setContentInUse(isContentInUse);
-	    mc.setEndLearningMessage(endLearningMessage);
+	    mc.setEndLearningMessage("Thanks");
 	    mc.setRunOffline(isRunOffline);
 	    mc.setReportTitle(richTextReportTitle);
 	    mc.setMonitoringReportTitle(monitoringReportTitle);
