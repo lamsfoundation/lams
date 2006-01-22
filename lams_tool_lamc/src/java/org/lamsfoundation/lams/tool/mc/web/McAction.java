@@ -203,10 +203,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		
 	 	AuthoringUtil.readData(request, mcAuthoringForm);
 	 	
-    	String userAction="addQuestion";
- 		request.setAttribute(USER_ACTION, userAction);
- 		logger.debug("userAction:" + userAction);
- 		
     	Map mapQuestionsContent=AuthoringUtil.repopulateMap(request, "questionContent");
      	logger.debug("mapQuestionsContent after shrinking: " + mapQuestionsContent);
      	logger.debug("mapQuestionsContent size after shrinking: " + mapQuestionsContent.size());
@@ -333,11 +329,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 	 	
 	 	AuthoringUtil.readData(request, mcAuthoringForm);
 	 	
-		String userAction="removeQuestion";
- 		request.setAttribute(USER_ACTION, userAction);
- 		logger.debug("userAction:" + userAction);
- 		
- 	
  		Map mapWeights= AuthoringUtil.repopulateMap(request, "questionWeight");
 		request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);
 		logger.debug("MAP_WEIGHTS:" + request.getSession().getAttribute(MAP_WEIGHTS));
@@ -454,10 +445,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 
 	 	AuthoringUtil.readData(request, mcAuthoringForm);
 	 	
-    	String userAction="editOption";
-    	request.setAttribute(USER_ACTION, userAction);
-    	logger.debug("userAction:" + userAction);
-    	
     	Map mapGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_OPTIONS_CONTENT);
     	logger.debug("initial test: current mapGeneralOptionsContent: " + mapGeneralOptionsContent);
     	
@@ -789,10 +776,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 
 	 	AuthoringUtil.readData(request, mcAuthoringForm);
 	 	
-		String userAction="addOption";
- 		request.setAttribute(USER_ACTION, userAction);
- 		logger.debug("userAction:" + userAction);
- 		
  		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
 		logger.debug("setting  EDIT_OPTIONS_MODE to 1");
  		
@@ -937,11 +920,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 	 	
 	 	AuthoringUtil.readData(request, mcAuthoringForm);
 	 	
-		String userAction="removeOption";
- 		request.setAttribute(USER_ACTION, userAction);
- 		logger.debug("userAction:" + userAction);
- 		
- 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
+		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
 		logger.debug("setting  EDIT_OPTIONS_MODE to 1");
  		
  		String optionIndex =mcAuthoringForm.getDeletableOptionIndex();
@@ -1076,10 +1055,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 
 	 	AuthoringUtil.readData(request, mcAuthoringForm);
 	 	
-    	String userAction="moveDown";
-    	request.setAttribute(USER_ACTION, userAction);
-    	logger.debug("userAction:" + userAction);
-    	
     	Map mapQuestionsContent=AuthoringUtil.repopulateMap(request, "questionContent");
      	logger.debug("mapQuestionsContent before move down: " + mapQuestionsContent);
      	logger.debug("mapQuestionsContent size move down: " + mapQuestionsContent.size());
@@ -1185,11 +1160,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 	 	
 	 	AuthoringUtil.readData(request, mcAuthoringForm);
 	 	
-		String userAction="moveUp";
- 		request.setAttribute(USER_ACTION, userAction);
- 		logger.debug("userAction:" + userAction);
- 		
- 		Map mapQuestionsContent=AuthoringUtil.repopulateMap(request, "questionContent");
+		Map mapQuestionsContent=AuthoringUtil.repopulateMap(request, "questionContent");
 	 	logger.debug("mapQuestionsContent before move down: " + mapQuestionsContent);
 	 	
      	//perform a move up if there are at least 2 questions
@@ -1294,11 +1265,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 	 	
 	 	AuthoringUtil.readData(request, mcAuthoringForm);
 
-		String userAction="doneOptions";
- 		request.setAttribute(USER_ACTION, userAction);
- 		logger.debug("userAction:" + userAction);
- 		
- 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
+		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 		logger.debug("setting  EDIT_OPTIONS_MODE to 0");
 		
  		boolean validateOptions=AuthoringUtil.validateOptions(request);
@@ -1439,11 +1406,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		String destination=McUtils.getDestination(sourceMcStarter);
 		logger.debug("destination: " + destination);
 
-     	String userAction="editActivityQuestions";
-		request.setAttribute(USER_ACTION, userAction);
-		logger.debug("userAction:" + userAction);
-
-		request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(true));
+     	request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(true));
 		McUtils.setDefineLater(request, true);
 		
 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
@@ -1484,12 +1447,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 
 	 	AuthoringUtil.readData(request, mcAuthoringForm);
 	 	
-     	/* persist the final Questions Map  */
-		String userAction="submitQuestions";
-		request.setAttribute(USER_ACTION, userAction);
-		logger.debug("userAction:" + userAction);
-		
-		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
+     	request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 		logger.debug("setting  EDIT_OPTIONS_MODE to 0");
 	
 		ActionMessages errors= new ActionMessages();
@@ -1715,12 +1673,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		if ((reportTitle == null) || (reportTitle.length() == 0)) 
 			reportTitle=(String)request.getSession().getAttribute(REPORT_TITLE);
 		
-		endLearningMessage=mcAuthoringForm.getEndLearningMessage();
-		logger.debug("END_LEARNING_MESSAGE: " +  mcAuthoringForm.getEndLearningMessage());
-		if ((endLearningMessage == null) || (endLearningMessage.length() == 0))
-			endLearningMessage=(String)request.getSession().getAttribute(END_LEARNING_MESSAGE);
-	
-		
 		String richTextTitle=(String) request.getSession().getAttribute(RICHTEXT_TITLE);
 		logger.debug("richTextTitle: " + richTextTitle);
 		
@@ -1785,7 +1737,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		    mcContent.setPassMark(new Integer(passmark));
 		    mcContent.setShowFeedback(isShowFeedback);
 		    mcContent.setShowReport(isSln);
-		    mcContent.setEndLearningMessage(endLearningMessage);
+		    mcContent.setEndLearningMessage("Thanks");
 		    mcContent.setReportTitle(richTextReportTitle);
 		    mcContent.setMonitoringReportTitle(monitoringReportTitle);
 		    mcContent.setEndLearningMessage(richTextEndLearningMessage);
@@ -1939,10 +1891,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 	 	
 	 	AuthoringUtil.readData(request, mcAuthoringForm);
 	 	
-	 	String userAction="deleteOfflineFile";
-    	request.setAttribute(USER_ACTION, userAction);
-    	logger.debug("userAction:" + userAction);
-
 	 	String uuid =mcAuthoringForm.getUuid();
 	 	logger.debug("uuid:" + uuid);
 	 	
@@ -1989,10 +1937,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 
 	 	AuthoringUtil.readData(request, mcAuthoringForm);
 	 	
-	 	String userAction="deleteOnlineFile";
-    	request.setAttribute(USER_ACTION, userAction);
-    	logger.debug("userAction:" + userAction);
-
 	 	String uuid =mcAuthoringForm.getUuid();
 	 	logger.debug("uuid:" + uuid);
 	 	
@@ -2038,11 +1982,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 
 	 	AuthoringUtil.readData(request, mcAuthoringForm);
 	 	
-		String userAction="submitOfflineFile";
- 		request.setAttribute(USER_ACTION, userAction);
- 		logger.debug("userAction:" + userAction);
- 		
- 		logger.debug("will uploadFile for offline file:");
+		logger.debug("will uploadFile for offline file:");
  		McAttachmentDTO mcAttachmentDTO=AuthoringUtil.uploadFile(request, mcAuthoringForm, true);
  		logger.debug("returned mcAttachmentDTO:" + mcAttachmentDTO);
  		
@@ -2105,11 +2045,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 
 	 	AuthoringUtil.readData(request, mcAuthoringForm);
 	 	
-		String userAction="submitOnlineFile";
- 		request.setAttribute(USER_ACTION, userAction);
- 		logger.debug("userAction:" + userAction);
- 		
- 		logger.debug("will uploadFile for online file:");
+		logger.debug("will uploadFile for online file:");
  		McAttachmentDTO mcAttachmentDTO=AuthoringUtil.uploadFile(request, mcAuthoringForm, false);
  		logger.debug("returned mcAttachmentDTO:" + mcAttachmentDTO);
  		
@@ -2170,11 +2106,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 
 	 	AuthoringUtil.readData(request, mcAuthoringForm);
 
-        String userAction="advancedTabDone";
-    	request.setAttribute(USER_ACTION, userAction);
-    	logger.debug("userAction:" + userAction);
-    	
-    	mcAuthoringForm.resetUserAction();
+        mcAuthoringForm.resetUserAction();
         return (mapping.findForward(destination));
     }
     
@@ -2209,9 +2141,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 
 	 	AuthoringUtil.readData(request, mcAuthoringForm);
 	 	
-		String userAction="dispinstructionsTabDone";
-		request.setAttribute(USER_ACTION, userAction);
-		logger.debug("userAction:" + userAction);
 		mcAuthoringForm.resetUserAction();
 	    return (mapping.findForward(destination));
     }
@@ -2249,13 +2178,11 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		String sourceMcStarter = (String) request.getAttribute(SOURCE_MC_STARTER);
 		logger.debug("sourceMcStarter: " + sourceMcStarter);
 		
-		String userAction="cancelAuthoring";
-		request.setAttribute(USER_ACTION, userAction);
-		logger.debug("userAction:" + userAction);
 		mcAuthoringForm.resetUserAction();
 		
 		/*remove attribues */
 		request.getSession().removeAttribute(SHOW_AUTHORING_TABS);
+		request.getSession().removeAttribute(DEFINE_LATER_IN_EDIT_MODE);
 		request.getSession().removeAttribute(ACTIVE_MODULE);
 		logger.debug("removed attribues...");
 		
