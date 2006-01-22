@@ -166,11 +166,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
     	McMonitoringForm mcMonitoringForm = (McMonitoringForm) form;
 	 	IMcService mcService =McUtils.getToolService(request);
 	 	
-    	String userAction="submitSession";
- 		request.setAttribute(USER_ACTION, userAction);
- 		logger.debug("userAction:" + userAction);
- 		
- 		String currentMonitoredToolSession=mcMonitoringForm.getSelectedToolSessionId(); 
+    	String currentMonitoredToolSession=mcMonitoringForm.getSelectedToolSessionId(); 
 	    logger.debug("currentMonitoredToolSession: " + currentMonitoredToolSession);
 	    
 	    if (currentMonitoredToolSession.equals("All"))
@@ -218,9 +214,6 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
     	McMonitoringForm mcMonitoringForm = (McMonitoringForm) form;
     	IMcService mcService =McUtils.getToolService(request);
 	 	
-	 	String userAction="editActivity";
- 		request.setAttribute(USER_ACTION, userAction);
- 		logger.debug("userAction:" + userAction);
  		request.setAttribute(CURRENT_MONITORING_TAB, "editActivity");
  		
 		McStarterAction mcStarterAction= new McStarterAction();
@@ -245,9 +238,6 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	 	
 	 	request.setAttribute(CURRENT_MONITORING_TAB, "editActivity");
 	 	
-     	String userAction="editActivityQuestions";
-		request.setAttribute(USER_ACTION, userAction);
-		logger.debug("userAction:" + userAction);
 
 		request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(true));
 		McUtils.setDefineLater(request, true);
@@ -284,13 +274,8 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
     	McMonitoringForm mcMonitoringForm = (McMonitoringForm) form;
 	 	IMcService mcService =McUtils.getToolService(request);
 	 	
-    	String userAction="getSummary";
- 		request.setAttribute(USER_ACTION, userAction);
- 		logger.debug("userAction:" + userAction);
  		request.setAttribute(CURRENT_MONITORING_TAB, "summary");   
- 		
  		return (mapping.findForward(LOAD_MONITORING));
-    	
 	}
     
     /**
@@ -319,13 +304,9 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
     	McMonitoringForm mcMonitoringForm = (McMonitoringForm) form;
 	 	IMcService mcService =McUtils.getToolService(request);
 	 	
-    	String userAction="getInstructions";
- 		request.setAttribute(USER_ACTION, userAction);
- 		logger.debug("userAction:" + userAction);
  		request.setAttribute(CURRENT_MONITORING_TAB, "instructions");
  		
  		return (mapping.findForward(LOAD_MONITORING));
-    	
 	}
     
 	/**
@@ -354,13 +335,8 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
     	McMonitoringForm mcMonitoringForm = (McMonitoringForm) form;
 	 	IMcService mcService =McUtils.getToolService(request);
 	 	
-    	String userAction="getStats";
- 		request.setAttribute(USER_ACTION, userAction);
- 		logger.debug("userAction:" + userAction);
  		request.setAttribute(CURRENT_MONITORING_TAB, "stats");
- 		
  		return (mapping.findForward(LOAD_MONITORING));
-    	
 	}
     
     

@@ -161,10 +161,6 @@ public class McStarterAction extends Action implements McAppConstants {
 		{
 			request.getSession().setAttribute(ACTIVE_MODULE, AUTHORING);
 			logger.debug("activeModule set to Authoring: "  + activeModule);
-			
-			/*normally diplay all 3 tabs of the Authoring environment*/
-			request.getSession().setAttribute(SHOW_BASIC_CONTENT,new Boolean(false).toString());
-			
 		}
 		logger.debug("final active activeModule is: "  + request.getSession().getAttribute(ACTIVE_MODULE));
 		
@@ -481,25 +477,15 @@ public class McStarterAction extends Action implements McAppConstants {
 		IMcService mcService =McUtils.getToolService(request);
 		
 		request.getSession().setAttribute(IS_REVISITING_USER, new Boolean(true));
-		
 		request.getSession().setAttribute(RICHTEXT_TITLE,mcContent.getTitle());
 		request.getSession().setAttribute(RICHTEXT_INSTRUCTIONS,mcContent.getInstructions());
-		request.getSession().setAttribute(QUESTIONS_SEQUENCED,new Boolean(mcContent.isQuestionsSequenced()));
-		request.getSession().setAttribute(USERNAME_VISIBLE,new Boolean(mcContent.isUsernameVisible()));
-		request.getSession().setAttribute(CREATED_BY, new Long(mcContent.getCreatedBy()));
 		request.getSession().setAttribute(MONITORING_REPORT_TITLE,mcContent.getMonitoringReportTitle());
 		request.getSession().setAttribute(REPORT_TITLE,mcContent.getReportTitle());
-		request.getSession().setAttribute(RUN_OFFLINE, new Boolean(mcContent.isRunOffline()));
 		request.getSession().setAttribute(DEFINE_LATER, new Boolean(mcContent.isDefineLater()));
-		request.getSession().setAttribute(SYNCH_IN_MONITOR, new Boolean(mcContent.isSynchInMonitor()));
-		request.getSession().setAttribute(OFFLINE_INSTRUCTIONS,mcContent.getOfflineInstructions());
-		request.getSession().setAttribute(ONLINE_INSTRUCTIONS,mcContent.getOnlineInstructions());
 		request.getSession().setAttribute(RICHTEXT_OFFLINEINSTRUCTIONS,mcContent.getOfflineInstructions());
 		request.getSession().setAttribute(RICHTEXT_REPORT_TITLE,mcContent.getReportTitle());
 	    request.getSession().setAttribute(RICHTEXT_ONLINEINSTRUCTIONS,mcContent.getOnlineInstructions());
 	    request.getSession().setAttribute(RICHTEXT_END_LEARNING_MSG,mcContent.getEndLearningMessage());
-		request.getSession().setAttribute(END_LEARNING_MESSAGE,mcContent.getEndLearningMessage());
-		request.getSession().setAttribute(CONTENT_IN_USE, new Boolean(mcContent.isContentInUse()));
 		request.getSession().setAttribute(RETRIES, new Boolean(mcContent.isRetries()));
 		request.getSession().setAttribute(PASSMARK, mcContent.getPassMark()); //Integer
 		request.getSession().setAttribute(SHOW_FEEDBACK, new Boolean(mcContent.isShowFeedback())); 
@@ -587,20 +573,11 @@ public class McStarterAction extends Action implements McAppConstants {
 		
 		request.getSession().setAttribute(RICHTEXT_TITLE,mcContent.getTitle());
 		request.getSession().setAttribute(RICHTEXT_INSTRUCTIONS,mcContent.getInstructions());
-		request.getSession().setAttribute(QUESTIONS_SEQUENCED,new Boolean(mcContent.isQuestionsSequenced()));
-		request.getSession().setAttribute(USERNAME_VISIBLE,new Boolean(mcContent.isUsernameVisible()));
-		request.getSession().setAttribute(CREATED_BY, new Long(mcContent.getCreatedBy()));
 		request.getSession().setAttribute(MONITORING_REPORT_TITLE,mcContent.getMonitoringReportTitle());
 		request.getSession().setAttribute(REPORT_TITLE,mcContent.getReportTitle());
-		request.getSession().setAttribute(RUN_OFFLINE, new Boolean(mcContent.isRunOffline()));
 		request.getSession().setAttribute(DEFINE_LATER, new Boolean(mcContent.isDefineLater()));
-		request.getSession().setAttribute(SYNCH_IN_MONITOR, new Boolean(mcContent.isSynchInMonitor()));
-		request.getSession().setAttribute(OFFLINE_INSTRUCTIONS,mcContent.getOfflineInstructions());
-		request.getSession().setAttribute(ONLINE_INSTRUCTIONS,mcContent.getOnlineInstructions());
 		request.getSession().setAttribute(RICHTEXT_OFFLINEINSTRUCTIONS,mcContent.getOfflineInstructions());
 	    request.getSession().setAttribute(RICHTEXT_ONLINEINSTRUCTIONS,mcContent.getOnlineInstructions());
-		request.getSession().setAttribute(END_LEARNING_MESSAGE,mcContent.getEndLearningMessage());
-		request.getSession().setAttribute(CONTENT_IN_USE, new Boolean(mcContent.isContentInUse()));
 		request.getSession().setAttribute(RETRIES, new Boolean(mcContent.isRetries()));
 		request.getSession().setAttribute(PASSMARK, mcContent.getPassMark()); //Integer
 		request.getSession().setAttribute(SHOW_FEEDBACK, new Boolean(mcContent.isShowFeedback())); 
@@ -613,12 +590,6 @@ public class McStarterAction extends Action implements McAppConstants {
 		
 		logger.debug("RICHTEXT_TITLE:" + request.getSession().getAttribute(RICHTEXT_TITLE));
 		logger.debug("getting default content");
-		/*
-		 * this is a new content creation, the content must not be in use.
-		 * relevant attribute: CONTENT_IN_USE  
-		 */
-		request.getSession().setAttribute(CONTENT_IN_USE, new Boolean(false));
-	    logger.debug("CONTENT_IN_USE: " + request.getSession().getAttribute(CONTENT_IN_USE));
 	    
 	    /* this is already done in  mcAuthoringForm.resetRadioBoxes()*/ 
 	    mcAuthoringForm.setUsernameVisible(OFF);
@@ -633,8 +604,6 @@ public class McStarterAction extends Action implements McAppConstants {
 		logger.debug("mcQueContent:" + mcQueContent);
 		
 		/* mcQueContent can not be null since here it was verified before*/ 
-		/* display a single sample question */
-		request.getSession().setAttribute(DEFAULT_QUESTION_CONTENT, mcQueContent.getQuestion());
 		
 		Map mapQuestionsContent= new TreeMap(new McComparator());
 		mapQuestionsContent.put(new Long(1).toString(), mcQueContent.getQuestion());
@@ -753,9 +722,6 @@ public class McStarterAction extends Action implements McAppConstants {
 		/* present the view-only screen first */
 		request.getSession().setAttribute(ACTIVE_MODULE, DEFINE_LATER);
 		request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(false));
-		
-		/*normally diplay all 3 tabs of the Authoring environment  but with define Later only display Basic content*/
-		request.getSession().setAttribute(SHOW_BASIC_CONTENT,new Boolean(true).toString());
 		
 		request.getSession().setAttribute(SHOW_AUTHORING_TABS,new Boolean(false).toString());
 		return execute(mapping, form, request, response);
