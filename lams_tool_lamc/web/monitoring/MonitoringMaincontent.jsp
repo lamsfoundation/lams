@@ -13,8 +13,7 @@
 <html:html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-	<title>MCQ tool Monitoring</title>
-	
+		<title><bean:message key="label.monitoring"/></title>
 	<script lang="javascript">
 		var imgRoot="<c:out value="${lams}"/>images/";
 		var themeName="aqua";
@@ -69,7 +68,6 @@
 	
 </head>
 
-
 <%-- chooses which tab to highlight --%>
 <c:choose>
          <c:when test='${currentMonitoringTab == "instructions"}'>
@@ -96,70 +94,10 @@
 
 	  <html:form  action="/monitoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
 		<!-- start tabs -->
-		<!-- tab holder table -->
-		<table border="0" cellspacing="0" cellpadding="0">
-		  <tr>
-		  	<td> &nbsp&nbsp</td>
-		  </tr>
-			
-		  <tr>
-			    <td valign="bottom">
-					<table border="0" cellspacing="0" cellpadding="0">
-					  <tr>
-						<td><img src="<c:out value="${lams}"/>images/aqua_tab_s_left.gif" name="tab_left_su" width="8" height="25" border="0" id="tab_left_su"/></td>
-						<td class="tab tabcentre_selected" width="90" id="tab_tbl_centre_su" ><label for="su" accesskey="su">
-						<a href="<c:out value='${monitoringURL}'/>?method=getSummary" id="su" >Summary</a></label></td>
-						<td><a href="<c:out value='${monitoringURL}'/>?method=getSummary">
-							<img src="<c:out value="${lams}"/>images/aqua_tab_s_right.gif"  name="tab_right_su" width="8" height="25" border="0" id="tab_right_su"/></a></td>
-					  </tr>
-					</table>
-				</td>
-
-			    <td valign="bottom">
-					<table border="0" cellspacing="0" cellpadding="0">
-					  <tr>
-						<td><img src="<c:out value="${lams}"/>images/aqua_tab_s_left.gif" name="tab_left_i" width="8" height="25" border="0" id="tab_left_i"/></td>
-						<td class="tab tabcentre_selected" width="90" id="tab_tbl_centre_i" ><label for="i" accesskey="i"><a
-							href="<c:out value='${monitoringURL}'/>?method=getInstructions" id="i" >Instructions</a></label></td>
-						<td><a href="<c:out value='${monitoringURL}'/>?method=getInstructions">
-							<img src="<c:out value="${lams}"/>images/aqua_tab_s_right.gif"  name="tab_right_i" width="8" height="25" border="0" id="tab_right_i"/></a></td>
-					  </tr>
-					</table>
-				</td>
-
-				
-			    <td valign="bottom">
-					<table border="0" cellspacing="0" cellpadding="0">
-					  <tr>
-						<td><img src="<c:out value="${lams}"/>images/aqua_tab_s_left.gif" name="tab_left_e" width="8" height="25" border="0" id="tab_left_e"/></td>
-						<td class="tab tabcentre_selected" width="90" id="tab_tbl_centre_e" ><label for="e" accesskey="e"><a
-							href="<c:out value='${monitoringURL}'/>?method=editActivity" id="e" >Edit Activity</a></label></td>
-						<td><a href="<c:out value='${monitoringURL}'/>?method=editActivity">
-							<img src="<c:out value="${lams}"/>images/aqua_tab_s_right.gif"  name="tab_right_e" width="8" height="25" border="0" id="tab_right_e"/></a></td>
-					  </tr>
-					</table>
-				</td>
-
-							
-			    <td valign="bottom">
-					<table border="0" cellspacing="0" cellpadding="0">
-					  <tr>
-						<td><img src="<c:out value="${lams}"/>images/aqua_tab_s_left.gif" name="tab_left_s" width="8" height="25" border="0" id="tab_left_s"/></td>
-						<td class="tab tabcentre_selected" width="90" id="tab_tbl_centre_s" ><label for="s" accesskey="s"><a
-							href="<c:out value='${monitoringURL}'/>?method=getStats" id="e" >Stats</a></label></td>
-						<td><a href="<c:out value='${monitoringURL}'/>?method=getStats">
-							<img src="<c:out value="${lams}"/>images/aqua_tab_s_right.gif"  name="tab_right_s" width="8" height="25" border="0" id="tab_right_s"/></a></td>
-					  </tr>
-					</table>
-				</td>
-		  </tr>
-		</table>
-	
-	<!-- end tab buttons -->
+					<jsp:include page="/monitoring/MonitoringTabsHeader.jsp" />
+		<!-- end tab buttons -->
 		
-
-	<html:hidden property="method"/>	 
-		
+		<html:hidden property="method"/>	 
 		<c:choose>
 		         <c:when test='${currentMonitoringTab == "instructions"}'>
 						<div class="tabbody content_b" >
