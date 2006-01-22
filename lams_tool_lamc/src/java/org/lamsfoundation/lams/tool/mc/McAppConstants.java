@@ -67,8 +67,6 @@ public interface McAppConstants {
     public static final String REDO_QUESTIONS							="redoQuestions";
     public static final String SINGLE_QUESTION_ANSWERS					="singleQuestionAnswers";
     public static final String RESULTS_SUMMARY							="resultsSummary";
-    public static final String USER_ACTION								="userAction";
-    
     
     public static final String SOURCE_MC_STARTER						="sourceMcStarter";
     public static final String AUTHORING_CANCELLED						="authoringCancelled";
@@ -82,26 +80,11 @@ public interface McAppConstants {
     public static final String IS_REVISITING_USER						="isRevisitingUser";
     public static final String DEFINE_LATER_EDIT_ACTIVITY				="defineLaterEditActivity";
     
-    public static final String QUESTIONS_SEQUENCED						="questionsSequenced";
-        
-    /*
-     * tab controllers, constants for authoring page html tabs, used within jsp
-     */
-    public static final String CHOICE									="choice";
-    public static final String CHOICE_TYPE_BASIC						="choiceTypeBasic";
-    public static final String CHOICE_TYPE_ADVANCED						="choiceTypeAdvanced";
-    public static final String CHOICE_TYPE_INSTRUCTIONS					="choiceTypeInstructions";
-    public static final String IS_DEFINE_LATER_URL						="isDefineLaterUrl";
     public static final String ACTIVE_MODULE							="activeModule";
     public static final String AUTHORING								="authoring";
     public static final String EDIT_OPTIONS_MODE						="editOptionsMode";
     public static final String DEFINE_LATER_IN_EDIT_MODE				="defineLaterInEditMode";
     public static final String SUBMIT_SUCCESS							="sbmtSuccess";
-    public static final String FILE_CONTENT								="fileContent";
-    public static final String LOAD_FILE_CONTENT						="loadFileContent";
-    public static final String FILE_NAME								="fileName";
-    
-   
     public static final String ERROR_MCAPPLICATION 						= "error.exception.McApplication";
     
     /*
@@ -137,41 +120,26 @@ public interface McAppConstants {
     public static final String MAP_FEEDBACK_CORRECT						="mapFeedbackCorrect";
     
     
-    public static final String SELECTED_QUESTION_CONTENT_UID			="selectedQuestionContentUid";
     public static final String SELECTED_QUESTION						="selectedQuestion";
     public static final String SELECTED_QUESTION_INDEX					="selectedQuestionIndex";
     public static final String DEFAULT_QUESTION_UID						="defaultQuestionUid";
     
-    
-    public static final String MAP_QUESTION_CONTENT						="mapQuestionContent";
-    public static final String DEFAULT_QUESTION_CONTENT					="defaultQuestionContent";
     public static final String TITLE									="title";
     public static final String INSTRUCTIONS								="instructions";
-    public static final String CREATED_BY								="createdBy";
     public static final String CREATION_DATE							="creationDate";
-    public static final String USERNAME_VISIBLE							="usernameVisible";
-    public static final String RUN_OFFLINE								="runOffline";
     public static final String DEFINE_LATER								="defineLater";
-    public static final String SYNCH_IN_MONITOR							="synchInMonitor";
     public static final String RETRIES									="retries";
     public static final String PASSMARK									="passMark";
     public static final String SHOW_FEEDBACK							="showFeedback";
     public static final String USER_PASSED								="userPassed";
     public static final String VIEW_ANSWERS								="viewAnswers";
-    public static final String SHOW_BASIC_CONTENT						="showBasicContent";
     public static final String SHOW_AUTHORING_TABS						="showAuthoringTabs";
     
-    
-    public static final String ONLINE_INSTRUCTIONS						="onlineInstructions";
-    public static final String OFFLINE_INSTRUCTIONS						="offlineInstructions";
-    public static final String END_LEARNING_MESSSAGE					="endLearningMessage";
-    public static final String CONTENT_LOCKED							="contentLocked";
-    public static final String CONTENT_IN_USE							="contentInUse";
     public static final String ON										="ON";
     public static final String OFF										="OFF";
-    public static final String IS_USERNAME_VISIBLE_MONITORING			="isUsernameVisibleMonitoring";
-    public static final String IS_SYNCH_INMONITOR_MONITORING			="isSynchInMonitorMonitoring";
-    public static final String IS_QUESTIONS_SEQUENCED_MONITORING		="isQuestionsSequencedMonitoring";
+    //public static final String IS_USERNAME_VISIBLE_MONITORING			="isUsernameVisibleMonitoring";
+    //public static final String IS_SYNCH_INMONITOR_MONITORING			="isSynchInMonitorMonitoring";
+    //public static final String IS_QUESTIONS_SEQUENCED_MONITORING		="isQuestionsSequencedMonitoring";
     
     
     public static final String RICHTEXT_FEEDBACK_CORRECT				="richTextFeedbackCorrect";
@@ -209,11 +177,6 @@ public interface McAppConstants {
     public static final String TOP_MARK									="topMark";
     public static final String LOWEST_MARK								="lowestMark";
     public static final String AVERAGE_MARK								="averageMark";
-
-    
-    /*
-     * the author's current content id
-     */
 
     
     /*
@@ -284,7 +247,6 @@ public interface McAppConstants {
     public static final String REPORT_TITLE								="reportTitle"; 
     public static final String MONITORING_REPORT_TITLE					="monitoringReportTitle"; 
     public static final String REPORT_TITLE_LEARNER						="reportTitleLearner"; 
-    public static final String END_LEARNING_MESSAGE						="endLearningMessage";
     public static final String TOTAL_COUNT_REACHED						="totalCountReached";
     
     
