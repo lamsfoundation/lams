@@ -371,9 +371,6 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    logger.debug("REPORT_TITLE_LEARNER: " + mcContent.getReportTitle());
 	    request.getSession().setAttribute(REPORT_TITLE_LEARNER,mcContent.getReportTitle());
 	    
-	    request.getSession().setAttribute(END_LEARNING_MESSAGE,mcContent.getEndLearningMessage());
-	    logger.debug("END_LEARNING_MESSAGE: " + mcContent.getEndLearningMessage());
-	    
 	    logger.debug("IS_CONTENT_IN_USE: " + mcContent.isContentInUse());
 	    request.getSession().setAttribute(IS_CONTENT_IN_USE, new Boolean(mcContent.isContentInUse()).toString());
 	    
