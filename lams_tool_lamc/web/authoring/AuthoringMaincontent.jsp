@@ -84,7 +84,10 @@
 	<html:hidden property="dispatch"/>
 	
 	<div id='content_b' class="tabbody content_b" >
-		<h2><bean:message key="label.authoring.mc.basic"/></h2>	
+				<c:if test="${ sessionScope.activeModule != 'defineLater')  }"> 			
+					<h2><bean:message key="label.authoring.mc.basic"/></h2>	
+				</c:if> 				
+				
 				<table align=center> 	  
 				<tr>   
 				<td NOWRAP class=error>
