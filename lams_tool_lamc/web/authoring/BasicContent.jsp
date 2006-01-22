@@ -117,7 +117,7 @@
 								  	<td NOWRAP bgcolor="#EEEEEE" class="input" valign=top>  <font size=2> <b> <c:out value="Question ${queIndex}"/> : </b>  </font> </td>
 								  	
 							  		<td NOWRAP bgcolor="#EEEEEE" class="input" valign=top> 
-								  		<c:out value="${questionEntry.value}"/>
+								  		<font size=2> <c:out value="${questionEntry.value}"/> </font>
 								  	</td>
 	
 								  	<td NOWRAP bgcolor="#EEEEEE" class="input"  align=center valign=top>			
@@ -138,7 +138,7 @@
 	                                    <td NOWRAP bgcolor="#EEEEEE" class="input" align=left valign=top>										  	
 											<c:forEach var="weightsEntry" items="${sessionScope.mapWeights}">                                            
 													<c:if test="${questionEntry.key == weightsEntry.key}"> 			
-															<c:out value="${weightsEntry.value}"/><bean:message key="label.percent"/>
+														<font size=2> <c:out value="${weightsEntry.value}"/><bean:message key="label.percent"/> </font>
 													</c:if>
 											</c:forEach>
 	                                    </td>
