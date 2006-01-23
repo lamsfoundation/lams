@@ -22,11 +22,11 @@
 
 package org.lamsfoundation.lams.util;
 
-import junit.framework.TestCase;
-import org.lamsfoundation.lams.util.FileUtil;
-import org.lamsfoundation.lams.util.FileUtilException;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+
+import junit.framework.TestCase;
 
 /**
  * @author mtruong
@@ -227,7 +227,32 @@ public class TestFileUtil extends TestCase {
 	}
 	
 		
-	
+	public void testCreateDumpFile() throws FileUtilException, IOException
+	{
+		byte[] testData = "This is my test string.".getBytes();
+		String indexString = "xyzzy_";
+		String filename = FileUtil.createDumpFile(testData, indexString);
+
+		assertNotNull("Filename of dump file is not null", filename);
+		assertTrue("Filename includes id string ", filename.indexOf(indexString)!=-1);
+		
+		File filenameFile = new File(filename);
+		assertTrue("File "+filename+" exists.", filenameFile.exists());
+		
+		
+		FileInputStream is = new FileInputStream(filename);
+		byte[] inputData = new byte[testData.length];
+		int readBytes = is.read(inputData);
+		assertTrue("File contains at least the test data length of data", readBytes == testData.length );
+		for ( int i=0; i<testData.length; i++ ) {
+			assertEquals("Byte "+i+" matches",inputData[i], testData[i]);
+		}
+
+		readBytes = is.read(inputData);
+		assertTrue("File contains nothing after the test data",readBytes==-1);
+		
+	}
+
 	
 
 }

@@ -21,9 +21,12 @@ http://www.gnu.org/licenses/gpl.txt
 package org.lamsfoundation.lams.util;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.OutputStream;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.util.FileUtilException;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
 
 /**
@@ -106,7 +109,6 @@ public class FileUtil {
 		String tempDirName = tempSysDirName+File.separator
 			+prefix+System.currentTimeMillis()+"_"+suffix;
 		
-		// Set up the directory. Check it doesn't exist and if it does
 		// try 100 slightly different variations. If I can't find a unique
 		// one in ten tries, then give up.
 		File tempDir = new File(tempDirName);
@@ -216,5 +218,68 @@ public class FileUtil {
 	{
 		File dir = new File(directoryToCheck);
 		return dir.exists();
+	}
+	
+	private static String generateDumpFilename(String id) throws FileUtilException {
+		// get dump directory name and make sure directory exists
+		String dumpDirectory = Configuration.get(ConfigurationKeys.LAMS_DUMP_DIR);
+		if ( dumpDirectory == null ) {
+			dumpDirectory = TEMP_DIR;
+		}
+		createDirectory(dumpDirectory);
+	
+		String dumpFilename = dumpDirectory+File.separator
+			+id+System.currentTimeMillis();
+		
+		File dumpFile = new File(dumpFilename);
+		int i = 0;
+		while ( dumpFile.exists() && i < 100 ) {
+			dumpFilename = dumpDirectory+File.separator
+				+id+System.currentTimeMillis()+"_"+i;
+			dumpFile = new File(dumpFilename);
+		}
+		if ( dumpFile.exists() ) {
+			throw new FileUtilException("Unable to create dump file. The filename that we would use already exists: "
+					+dumpFile);
+		}
+		
+		return dumpFilename;
+	}
+	/** 
+	 * Dump some data to a file in the Dump Directory. The directory is set in the LAMS
+	 * configuration file. These dumps are primarily for support/debugging/problem reporting
+	 * uses.
+	 * 
+	 * If the dump directory is not set, it will revert to the system temp directory.
+	 * 
+	 * Used by the FlashCrashDump servlet initially, may be used by other dump methods in future.
+	 * 
+	 * @param data data to dump
+	 * @param id some identification name for the string. Does not need to be unique. e.g. FLASH_jsmith
+	 * 
+	 * @author Fiona Malikoff
+	 * @throws FileUtilException 
+	 */
+	public static String createDumpFile(byte[] data, String id) throws FileUtilException {
+		String dumpFilename = generateDumpFilename(id);
+		OutputStream dumpFile = null;
+		try {
+			dumpFile = new FileOutputStream(dumpFilename);
+			dumpFile.write(data);
+		} catch (IOException e) {
+			log.error("Unable to write dump out byte array to dump file. ID: "+id
+					+" Dump: "+data+" Exception "+e.getMessage(), e);
+			throw new FileUtilException(e);
+		} finally {
+			try {
+				if ( dumpFile != null )
+				dumpFile.close();
+			} catch (IOException e) {
+				log.error("Unable to close dump file. ID: "+id
+						+" Dump: "+data+" Exception "+e.getMessage(), e);
+				throw new FileUtilException(e);
+			}
+		}
+		return dumpFilename;		
 	}
 }
