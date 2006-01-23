@@ -10,6 +10,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -62,7 +63,7 @@ public class WDDXPostAction extends Action {
 			log.error(e);
 			throw e;
 		}
-	    
+		Cookie[] cookies = req.getCookies();
 		// we've got the URL action and the WDDX input. Now try sending the WDDX to the URL
 	  	URL url = new URL(action);
 	  	HttpURLConnection urlConn = (HttpURLConnection) url.openConnection();
@@ -72,7 +73,8 @@ public class WDDXPostAction extends Action {
 		urlConn.setUseCaches (false);
 		urlConn.setAllowUserInteraction(false);
 	    urlConn.setInstanceFollowRedirects(true);
-
+	    urlConn.setRequestProperty("Cookie", getCookieString(cookies)); 
+	    
 	    // Get packet from input file  
 	    ByteArrayOutputStream byteStream = new ByteArrayOutputStream(512); // Grows if necessary
 	    PrintWriter urlStreamWriter = new PrintWriter(byteStream, true);
@@ -112,6 +114,28 @@ public class WDDXPostAction extends Action {
 		return null;
 	}
 	
-	
+    /**
+     * This helper method sets up the string which is passed as a parameter to
+     * conn.setRequestProperty("Cookie" cookeString). It formulates a string
+     * of the form JSESSIONID=XXXX;JSESSIONIDSSO=XXXX;SYSSESSIONID=XXXX
+     * @param cookies
+     * @return
+     */
+    private static String getCookieString(Cookie[] cookies)
+	{
+	    	    
+	   StringBuffer cookieString = new StringBuffer();
+	   for (int i=0; i< cookies.length; i++)
+	   {
+	   		cookieString.append(cookies[i].getName()).append("=").append(cookies[i].getValue());
+	   		if (i != (cookies.length-1))
+	   		{
+	   		    cookieString.append(";");
+	   		}
+	   }
+	   
+	   return cookieString.toString();
+	}
+
 	
 }
