@@ -91,6 +91,13 @@ public abstract class AbstractStoreWDDXPacketServlet extends HttpServlet {
 				log.debug("Request "+request.getRequestURI()+" received packet "+packet);
 			}
 
+			if(containsNulls(packet)){
+				FlashMessage flashMessage = new FlashMessage(getMessageKey(packet,request),
+												"WDDXPacket contains null",
+												FlashMessage.ERROR);
+				writer.write(flashMessage.serializeMessage());
+			}		
+
 			replyPacket = process(packet, request);
 
 			if ( log.isDebugEnabled() ) {
@@ -103,7 +110,7 @@ public abstract class AbstractStoreWDDXPacketServlet extends HttpServlet {
 			log.error(uri+" request triggered exception ",e);
 			
 			FlashMessage flashMessage = FlashMessage.getExceptionOccured(getMessageKey(packet,request),
-					e.getMessage()!=null?e.getMessage():"");
+					e.getMessage()!=null?e.getMessage():e.getClass().getName());
 			writer.write(flashMessage.serializeMessage());
 			return;
 		}
@@ -113,6 +120,18 @@ public abstract class AbstractStoreWDDXPacketServlet extends HttpServlet {
 			writer.println(replyPacket);
 	}
 	
+
+	/**
+	 * Checks whether the WDDX packet contains any invalid
+	 * "<null/>". It returns true if there exists any such null
+	 */
+	private boolean containsNulls(String packet)
+	{
+		if (packet.indexOf("<null />") != -1)
+			return true;
+		else
+			return false;
+	}
 
 	/**
 	 * Method to get the post body.

@@ -234,17 +234,6 @@ public class AuthoringService implements IAuthoringService {
 		}
 		return flashMessage.serializeMessage();
 	}	
-	/**
-	 * Checks whether the WDDX packet contains any invalid
-	 * "<null/>". It returns true if there exists any such null
-	 */
-	private boolean containsNulls(String packet)
-	{
-		if (packet.indexOf("<null />") != -1)
-			return true;
-		else
-			return false;
-	}
 	public String copyLearningDesign(Long originalDesignID,Integer copyType,
 									Integer userID, Integer workspaceFolderID)throws UserException, LearningDesignException, 
 											 							      WorkspaceFolderException, IOException{
@@ -420,12 +409,6 @@ public class AuthoringService implements IAuthoringService {
 	public String storeLearningDesignDetails(String wddxPacket) throws Exception{
 		LearningDesignDTO learningDesignDTO = null;
 		
-		if(containsNulls(wddxPacket)){
-			flashMessage = new FlashMessage("storeLearningDesignDetails",
-											"WDDXPacket contains null",
-											FlashMessage.ERROR);
-			return flashMessage.serializeMessage();
-		}		
 		Hashtable table = (Hashtable)WDDXProcessor.deserialize(wddxPacket);
 		ObjectExtractor extractor = new ObjectExtractor(userDAO,learningDesignDAO,
 														activityDAO,workspaceFolderDAO,
@@ -514,12 +497,6 @@ public class AuthoringService implements IAuthoringService {
 	 */
 	public String storeTheme(String wddxPacket) throws Exception {
 		
-		if(containsNulls(wddxPacket)){
-			flashMessage = new FlashMessage("storeTheme",
-											"WDDXPacket contains null",
-											FlashMessage.ERROR);
-			return flashMessage.serializeMessage();
-		}		
 		Hashtable table = (Hashtable)WDDXProcessor.deserialize(wddxPacket);
 		
 		CSSThemeDTO themeDTO = new CSSThemeDTO(table);
