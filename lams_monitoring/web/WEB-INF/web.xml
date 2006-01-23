@@ -113,7 +113,7 @@ http://www.gnu.org/licenses/gpl.txt
 </filter-mapping>
 <filter-mapping>
 	<filter-name>HibernateFilter</filter-name>
-	<url-pattern>*.do</url-pattern>
+	<url-pattern>/*</url-pattern>
 </filter-mapping>
 <filter-mapping>
 	<filter-name>HibernateFilter</filter-name>
@@ -125,6 +125,12 @@ http://www.gnu.org/licenses/gpl.txt
 		org.springframework.web.context.ContextLoaderListener
 	</listener-class>
 </listener>	
+
+   <servlet>
+      <servlet-name>createLesson</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.monitoring.web.CreateLessionServlet</servlet-class>
+
+   </servlet>
 
  <!--
 Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
@@ -193,6 +199,11 @@ http://www.gnu.org/licenses/gpl.txt
 	<servlet-name>action</servlet-name>
     <url-pattern>*.do</url-pattern>
 </servlet-mapping>
+
+   <servlet-mapping>
+      <servlet-name>createLesson</servlet-name>
+      <url-pattern>/monitoring/createLesson</url-pattern>
+   </servlet-mapping>
 
    <session-config>
       <session-timeout>120</session-timeout>

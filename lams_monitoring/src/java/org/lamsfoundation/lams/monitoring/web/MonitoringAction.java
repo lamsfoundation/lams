@@ -28,17 +28,21 @@ import java.io.PrintWriter;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 
@@ -108,9 +112,67 @@ public class MonitoringAction extends LamsDispatchAction
 	    }
 	}
 	
+    private UserDTO getUser() throws IOException {
+    	HttpSession ss = SessionManager.getSession();
+    	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+    	if ( user != null ) {
+    		return user;
+    	}
+    	
+    	throw new IOException("Unable to get user. User in session manager is "+user);
+    }
+    
     //---------------------------------------------------------------------
     // Struts Dispatch Method
     //---------------------------------------------------------------------
+    /**
+     * This STRUTS action method will initialize a lesson for specific learning design with the given lesson title
+     * and lesson description.<p>
+     * If initialization is successed, this method will return a WDDX message which includes the ID of new lesson.
+     * 
+     * @param mapping An ActionMapping class that will be used by the Action class to tell
+     * the ActionServlet where to send the end-user.
+     *
+     * @param form The ActionForm class that will contain any data submitted
+     * by the end-user via a form.
+     * @param request A standard Servlet HttpServletRequest class.
+     * @param response A standard Servlet HttpServletResponse class.
+     * @return An ActionForward class that will be returned to the ActionServlet indicating where
+     *         the user is to go next.
+     * @throws IOException
+     * @throws ServletException
+     */
+    public ActionForward initializeLesson(ActionMapping mapping,
+                                     ActionForm form,
+                                     HttpServletRequest request,
+                                     HttpServletResponse response) throws IOException,
+                                                                          ServletException
+    {
+
+        this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+        FlashMessage flashMessage = null;
+    	
+    	try {
+    		String title = WebUtil.readStrParam(request,"lessonName");
+    		if ( title == null ) title = "lesson";
+    		String desc = WebUtil.readStrParam(request,"lessonDescription");
+    		if ( desc == null ) desc = "description";
+    		long ldId = WebUtil.readLongParam(request, AttributeNames.PARAM_LEARNINGDESIGN_ID);
+    		Integer userId = new Integer(WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID));
+    		Lesson newLesson = monitoringService.initializeLesson(title,desc,ldId,userId);
+    		
+    		flashMessage = new FlashMessage("initializeLesson",newLesson.getLessonId());
+		} catch (Exception e) {
+			flashMessage = new FlashMessage("initializeLesson",
+					e.getMessage(),
+					FlashMessage.ERROR);
+		}
+		
+		String message =  flashMessage.serializeMessage();
+		
+        return outputPacket(mapping,request,response,message,"details");
+    }
+
     /**
      * The Struts dispatch method that starts a lesson that has been created
      * beforehand. Most likely, the request to start lesson should be triggered

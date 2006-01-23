@@ -189,6 +189,7 @@
 		<webdoclet destdir="${generated.java}" force="${xdoclet.force}">
 
          <fileset dir="${src.java.dir}">
+            <include name="**/*Servlet.java" />
             <include name="**/*Action.java" />
             <include name="**/*Form.java" />
          </fileset>

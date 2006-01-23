@@ -26,10 +26,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -47,6 +49,7 @@ import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.LessonClass;
 import org.lamsfoundation.lams.lesson.dao.ILessonClassDAO;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
+import org.lamsfoundation.lams.monitoring.MonitoringConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
@@ -58,10 +61,13 @@ import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.Workspace;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
+import org.lamsfoundation.lams.usermanagement.dao.IOrganisationDAO;
+import org.lamsfoundation.lams.usermanagement.dao.IUserDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IWorkspaceFolderDAO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
+import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
@@ -71,6 +77,7 @@ import org.quartz.Trigger;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+
 
 /**
  * <p>This is the major service facade for all monitoring functionalities. It is 
@@ -99,6 +106,8 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     private IActivityDAO activityDAO;
     private IWorkspaceFolderDAO workspaceFolderDAO;
     private ILearningDesignDAO learningDesignDAO;
+    private IOrganisationDAO organisationDAO;
+    private IUserDAO userDAO;
     private IAuthoringService authoringService;
     private ILamsCoreToolService lamsCoreToolService;
     private IUserManagementService userManagementService;
@@ -158,6 +167,13 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     {
         this.lessonDAO = lessonDAO;
     }
+    /**
+     * 
+     * @param userDAO
+     */
+	public void setUserDAO(IUserDAO userDAO) {
+		this.userDAO = userDAO;
+	}
 
     /**
      * @param lamsToolService The lamsToolService to set.
@@ -174,7 +190,10 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     {
         this.activityDAO = activityDAO;
     }
-    /**
+	public void setOrganisationDAO(IOrganisationDAO organisationDAO) {
+		this.organisationDAO = organisationDAO;
+	}
+      /**
      * @see org.springframework.context.ApplicationContextAware#setApplicationContext(org.springframework.context.ApplicationContext)
      */
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException
@@ -203,7 +222,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
      * 
      * <P>Tries to copy the design into the user's default runtime sequence folder. If
      * this is not available, then it is copied into the existing folder.</P>
-     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#createLesson(long, org.lamsfoundation.lams.usermanagement.User, java.util.List, java.util.List)
+     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#initializeLesson(String, String, long, Integer)
      */
     public Lesson initializeLesson(String lessonName,
                                String lessonDescription,
@@ -268,7 +287,77 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         return createNewLesson(lessonName,lessonDescription,user,copiedLearningDesign);
 
     }
-
+    /**
+     *  @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#createLesson(Integer, String)
+     */
+    public String createLesson(Integer creatorUserId, String lessonPacket){
+    	FlashMessage flashMessage = null;
+    	try{
+	    	Hashtable table = (Hashtable)WDDXProcessor.deserialize(lessonPacket);
+	    	//todo: convert:data type:
+	    	Integer orgId = 
+	    		WDDXProcessor.convertToInteger(MonitoringConstants.KEY_ORGANISATION_ID, table.get(MonitoringConstants.KEY_ORGANISATION_ID));
+	    	long lessonId = 
+	    		WDDXProcessor.convertToLong(MonitoringConstants.KEY_LESSON_ID, table.get(MonitoringConstants.KEY_LESSON_ID)).longValue();
+	    	List learners = (List) table.get(MonitoringConstants.KEY_LEARNER);
+	    	List staffs = (List) table.get(MonitoringConstants.KEY_STAFF);
+	    	if(learners == null)
+	    		learners = new LinkedList();
+	    	if(staffs == null)
+	    		staffs = new LinkedList();
+	    	
+	    	Organisation organisation = organisationDAO.getOrganisationById(orgId);
+	    	User creator = userDAO.getUserById(creatorUserId);
+	        // create the lesson class - add all the users in this organisation to the lesson class
+	        // add user as staff
+	    	List learnerList = new LinkedList();
+	    	learnerList.add(creator);
+	        Iterator iter = learners.iterator();
+	        while (iter.hasNext()) {
+	        	try {
+	        		int id = ((Double) iter.next()).intValue();
+	        		learnerList.add(userDAO.getUserById(new Integer(id)));
+				} catch (Exception e) {
+					log.error("Error parsing learner ID from " + lessonPacket);
+					continue;
+				}
+			}
+	        //get staff user info
+	    	List staffList = new LinkedList();
+	    	staffList.add(creator);
+	        iter = staffs.iterator();
+	        while (iter.hasNext()) {
+	        	try {
+	        		int id = ((Double) iter.next()).intValue();
+	        		staffList.add(userDAO.getUserById(new Integer(id)));
+				} catch (Exception e) {
+					log.error("Error parsing staff ID from " + lessonPacket);
+					continue;
+				}
+			}
+	        
+	        //Create Lesson!
+	        createLessonClassForLesson(lessonId,
+	        		organisation,
+	        		learnerList,
+	                staffList);
+	    	
+	   		flashMessage = new FlashMessage("createLesson",Boolean.TRUE);
+		} catch (Exception e) {
+			flashMessage = new FlashMessage("createLesson",
+					e.getMessage(),
+					FlashMessage.ERROR);
+		}
+		
+		String message = "Failed on creating flash message:" + flashMessage;
+		try {
+			message = flashMessage.serializeMessage();
+		} catch (IOException e) {
+			log.error(message);
+		}
+		
+        return message;
+    }
     /**
      * <p>Pre-condition: This method must be called under the condition of the
      * 					 existance of new lesson (without lesson class).</p>
@@ -1026,6 +1115,5 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     	
     	return learningDesignDAO.getLearningDesignByUserId(userId);
     }
-  
 
 }

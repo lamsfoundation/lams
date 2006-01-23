@@ -28,6 +28,7 @@ import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.User;
 
 
 /**
@@ -54,8 +55,27 @@ public interface IMonitoringService
      * @return the lesson initialized.
      */
     public Lesson initializeLesson(String lessonName, String lessonDescription,long learningDesignId,Integer userID);
-    
-    
+    /**
+     * Create a lession according to the input lession WDDX package. The sample package is following:
+     * <code>
+     * <pre>
+     * <wddxPacket version="1.0"><header /><data><struct>
+	 *	<var name="lessonID"><number>135</number></var>
+	 *	<var name="organisationID"><number>10</number></var>
+ 	 *	<var name="staff"><array length="2"><number>7</number><number>8</number></array></var>
+	 *	<var name="learners"><array length="6"><number>1</number><number>2</number>
+	 *			<number>3</number><number>4</number><number>5</number><number>6</number></array></var>
+	 *	</struct></data></wddxPacket>
+     * </pre>
+     * </code>
+     * <P>The lesson will includes creator who create this lesson as staff and learner.
+     * 
+     * @param creatorUserId The lesson creator, who will be add to lesson as staff and learner.
+     * @param lessionPackage
+     * @return
+     */
+    public String createLesson(Integer creatorUserId,String lessionPackage);
+
     /**
      * Setup the lesson class and organization for a lesson according to the 
      * input from monitoring GUI interface.
@@ -315,5 +335,7 @@ public interface IMonitoringService
     /* TODO Dummy methods - to be removed */
     public List getOrganisationsUsers(Integer userId);
     public List getLearningDesigns(Long userId);
+
+
 
 }

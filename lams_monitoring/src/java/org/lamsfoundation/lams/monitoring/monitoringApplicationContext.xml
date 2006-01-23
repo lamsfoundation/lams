@@ -41,6 +41,8 @@ http://www.gnu.org/licenses/gpl.txt
 	<bean id="monitoringServiceTarget" class="org.lamsfoundation.lams.monitoring.service.MonitoringService"
 		singleton="false"
 	>
+		<property name="userDAO"><ref bean="userDAO"/></property>
+		<property name="organisationDAO"><ref bean="organisationDAO"/></property>
 		<property name="lessonDAO"><ref bean="lessonDAO"/></property>
 		<property name="lessonClassDAO"><ref bean="lessonClassDAO"/></property>	
 		<property name="authoringService"><ref bean="authoringService"/></property>	
