@@ -8,7 +8,9 @@
 	<!-- this form  exists temporarily to represent tool icon, remove this form once the tool is deployed into authoring environment -->
 <%
 	String toolContentId="1234";
+	String hardCodedCopiedToolContentId="9876";
 	String toolUrl="/authoringStarter?toolContentID=" + toolContentId;
+	String copiedToolUrl="/authoringStarter?toolContentID=" + hardCodedCopiedToolContentId;
 	
 	String strCopyToolContent="/authoringStarter?toolContentID=" + toolContentId + "&copyToolContent=1";
 	String strRemoveToolContent="/authoringStarter?toolContentID=" + toolContentId + "&removeToolContent=1";
@@ -22,7 +24,14 @@ Start authoring module
       </table><br/>
       <html:submit value="Tool Icon"/>
 </html:form>
-<br>
+
+<html:form action="<%=copiedToolUrl%>" method="post">
+Start authoring module on the copied content
+      <table border=1>
+      </table><br/>
+      <html:submit value="Tool Icon"/>
+</html:form>
+
 
 <html:form action="<%=strCopyToolContent%>" method="post">
       <table border=1>
