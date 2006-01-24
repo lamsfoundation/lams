@@ -13,7 +13,7 @@
 	<html:html>
 	<head>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-		<title><bean:message key="label.authoring"/></title>
+		<title> <bean:message key="label.authoring"/> </title>
 	<script lang="javascript">
 	var imgRoot="<c:out value="${lams}"/>images/";
 	var themeName="aqua";
@@ -72,7 +72,7 @@
 </head>
 <body onLoad="initTabs()">
 
-	<b> <bean:message key="label.authoring.mc"/> </b>
+	<b> <font size=2> <bean:message key="label.authoring.mc"/> </font></b>
 	    
 		<c:if test="${ sessionScope.showAuthoringTabs == 'true'}"> 			
 		<!-- start tabs -->
@@ -85,13 +85,15 @@
 	
 	<div id='content_b' class="tabbody content_b" >
 				<c:if test="${sessionScope.activeModule != 'defineLater'}"> 			
-					<h2><bean:message key="label.authoring.mc.basic"/></h2>	
+					<h2><font size=2> <bean:message key="label.authoring.mc.basic"/> </font> </h2>	
 				</c:if> 				
 				
 				<table align=center> 	  
 				<tr>   
 				<td NOWRAP class=error>
-					<%@ include file="/Errorbox.jsp" %> <!-- show any error messages here -->
+					<font size=2>
+						<%@ include file="/Errorbox.jsp" %> <!-- show any error messages here -->
+					</font>
 				</td>
 				</tr> 
 				</table>
@@ -108,20 +110,24 @@
 			<table align=right> 	  
 				<tr>   
 					<td NOWRAP>
-						<html:submit onclick="javascript:submitMethod('cancelAuthoring');">
-							<bean:message key="button.cancel"/>
-						</html:submit>	 				 		  					
+						<font size=2>
+							<html:submit onclick="javascript:submitMethod('cancelAuthoring');">
+								<bean:message key="button.cancel"/>
+							</html:submit>	 				 		  					
+						</font>
 					</td>
 				</tr> 
 			</table>
 	</div>
 		
 	<div id='content_a'  class="tabbody content_a">
-			<h2><bean:message key="label.advanced.definitions"/></h2>	
+			<h2> <font size=2> <bean:message key="label.advanced.definitions"/> </font> </h2>	
 		<table align=center> 	  
 		<tr>   
 		<td NOWRAP class=error>
-			<%@ include file="/Errorbox.jsp" %> <!-- show any error messages here -->
+			<font size=2>
+				<%@ include file="/Errorbox.jsp" %> <!-- show any error messages here -->
+			</font>
 		</td>
 		</tr> 
 		</table>
@@ -136,7 +142,9 @@
 			<table align=center> 	  
 			<tr>   
 			<td NOWRAP class=error>
-				<%@ include file="/Errorbox.jsp" %> <!-- show any error messages here -->
+				<font size=2>
+					<%@ include file="/Errorbox.jsp" %> <!-- show any error messages here -->
+				</font>
 			</td>
 			</tr> 
 			</table>

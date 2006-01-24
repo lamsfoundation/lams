@@ -9,69 +9,89 @@
 			<table class="forms">
 				<tr>
 	      			<td NOWRAP class="formlabel" valign=top>
-		      			<bean:message key="radiobox.sln"/>:
+		      			<font size=2> 
+			      			<b> <bean:message key="radiobox.sln"/>: </b>
+		      			</font>
 					</td>
 					<td NOWRAP valign=top>
-						<html:radio property="sln"  value="ON">
-						 <bean:message key="option.on"/>
-						</html:radio>
-
-						<html:radio property="sln"  value="OFF">
-						 <bean:message key="option.off"/>
-						</html:radio>
+						<font size=2>
+							<html:radio property="sln"  value="ON">
+							 <bean:message key="option.on"/>
+							</html:radio>
+	
+							<html:radio property="sln"  value="OFF">
+							 <bean:message key="option.off"/>
+							</html:radio>
+						</font>
 	      			</td>
 		         </tr>
 		         
    				<tr>
 					<td NOWRAP class="formlabel" valign=top>
-		      			<bean:message key="radiobox.onepq"/>:		      			
+						<font size=2>
+			      			<b> <bean:message key="radiobox.onepq"/>: </b>
+		      			</font>
 					</td>
 					<td NOWRAP valign=top>
-						<html:radio property="questionsSequenced" value="ON">
-						 <bean:message key="option.on"/>
-						</html:radio>
-
-						<html:radio property="questionsSequenced" value="OFF">
-						 <bean:message key="option.off"/>
-						</html:radio>
+						<font size=2>
+							<html:radio property="questionsSequenced" value="ON">
+							 <bean:message key="option.on"/>
+							</html:radio>
+	
+							<html:radio property="questionsSequenced" value="OFF">
+							 <bean:message key="option.off"/>
+							</html:radio>
+						</font>
 	      			</td>
 		        </tr>
 		         
 		         <tr>
 					<td NOWRAP class="formlabel" valign=top>
-		      			<bean:message key="radiobox.retries"/>:		      			
+						<font size=2>
+			      			<b> <bean:message key="radiobox.retries"/>: </b>
+		      			</font>
 					</td>
 					<td NOWRAP valign=top>
-						<html:radio property="retries" value="ON">
-						 <bean:message key="option.on"/>
-						</html:radio>
-
-						<html:radio property="retries" value="OFF">
-						 <bean:message key="option.off"/>
-						</html:radio>
+						<font size=2>
+							<html:radio property="retries" value="ON">
+							 <bean:message key="option.on"/>
+							</html:radio>
+	
+							<html:radio property="retries" value="OFF">
+							 <bean:message key="option.off"/>
+							</html:radio>
+						</font>
 	      			</td>
 
 				</tr>	      			
 		        
 		         <tr> 
 					<td NOWRAP class="formlabel" valign=top>
-				 			<bean:message key="label.report.title"/>: 
+						<font size=2>
+					 		<b>	<bean:message key="label.report.title"/>: </b>
+				 		</font>
 				 	</td>
 	  				<td NOWRAP class="formcontrol" valign=top>
-						<FCK:editor id="richTextReportTitle" basePath="/lams/fckeditor/">
-							  <c:out value="${sessionScope.richTextReportTitle}" escapeXml="false" />						  
-						</FCK:editor>
+		  				<font size=2>
+							<FCK:editor id="richTextReportTitle" basePath="/lams/fckeditor/">
+								  <c:out value="${sessionScope.richTextReportTitle}" escapeXml="false" />						  
+							</FCK:editor>
+						</font>
 					</td> 
 			  	</tr>
 			  	
 			  	<tr> 
 					<td NOWRAP class="formlabel" valign=top>
-			 			<bean:message key="label.report.endLearningMessage"/>: 
+						<font size=2>
+					 		<b>	<bean:message key="label.report.endLearningMessage"/>: </b>
+			 			</font>
 			 		</td>
 	  				<td NOWRAP class="formcontrol">
-						<FCK:editor id="richTextEndLearningMsg" basePath="/lams/fckeditor/">
-							  <c:out value="${sessionScope.richTextEndLearningMsg}" escapeXml="false" />						  
-						</FCK:editor>
+		  				<font size=2>
+							<FCK:editor id="richTextEndLearningMsg" basePath="/lams/fckeditor/">
+								  <c:out value="${sessionScope.richTextEndLearningMsg}" escapeXml="false" />						  
+							</FCK:editor>
+						</font>
 					</td> 
 			  	</tr>
 			  	
@@ -85,13 +105,13 @@
 						&nbsp&nbsp
 				  	</td>
 					 <td NOWRAP valign=top> 
+		 			 <font size=2>
 						 <html:submit onclick="javascript:submitMethod('doneAdvancedTab');" >
-							<bean:message key="button.done"/>
+								<bean:message key="button.done"/>
 						</html:submit>
+					 </font>
 					</td> 
  				 </tr>
 			</table>	  	
 		
-		
-
-		
+			

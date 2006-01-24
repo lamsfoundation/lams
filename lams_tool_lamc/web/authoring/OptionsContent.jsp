@@ -9,12 +9,16 @@
 				<table class="forms" align=center>
 					<tr>
 	 				 	<td class="formlabel" align=right valign=top> 
-							<b> <bean:message key="label.question"/>: </b>
+		 				 	<font size=2>
+								<b> <bean:message key="label.question"/>: </b>
+							</font>
 						</td>
 						
 						<td colspan=3 valign=top>
-			  				<input type="text" name="selectedQuestion" value="<c:out value="${sessionScope.selectedQuestion}"/>"   
-					  			size="50" maxlength="255"> 
+							<font size=2>
+				  				<input type="text" name="selectedQuestion" value="<c:out value="${sessionScope.selectedQuestion}"/>"   
+						  			size="50" maxlength="255"> 
+					  		</font>
 					  	</td>
 					</tr>
 					
@@ -29,7 +33,7 @@
 					<table align="center" border="1">
 					     <tr>
 							  	<td bgcolor="#A8C7DE" colspan=4 class="input" valign=top align=left>
-								  	 <font size=2> <b> <bean:message key="label.mc.options"/> </b> </font>
+							  	 	<font size=2> <b> <bean:message key="label.mc.options"/> </b> </font>
 							  	</td>
 						 </tr>					
 					
@@ -40,34 +44,40 @@
 								  <tr>
 									  	<td bgcolor="#EEEEEE" class="input" valign=top>  <font size=2> <b> <c:out value="Candidate Answer ${optionIndex}"/> :  </b>  </font>
 
+										<font size=2>
 								  			<input type="text" name="optionContent<c:out value="${optionIndex}"/>" value="<c:out value="${optionEntry.value}"/>"   
 									  		size="50" maxlength="255">
+									  	</font>
 							
-									  	
 			  				  	 		<c:set var="selectedOptionFound" scope="request" value="0"/>
 			  							<c:forEach var="selectedOptionEntry" items="${sessionScope.mapSelectedOptions}">
-											  <c:if test="${selectedOptionEntry.value == optionEntry.value}"> 			
-						  					
-													  	<select name="checkBoxSelected<c:out value="${optionIndex}"/>">
-															<option value="Incorrect" > Incorrect </option>
-															<option value="Correct" SELECTED>   Correct  </option>
-														</select>
-											
-						  				  	 		<c:set var="selectedOptionFound" scope="request" value="1"/>
-						 					</c:if> 			
+				  							<font size=2>								  	
+												  <c:if test="${selectedOptionEntry.value == optionEntry.value}"> 			
+							  					
+														  	<select name="checkBoxSelected<c:out value="${optionIndex}"/>">
+																<option value="Incorrect" > <font size=2> Incorrect </font> </option>
+																<option value="Correct" SELECTED>  <font size=2> Correct </font></option>
+															</select>
+												
+							  				  	 		<c:set var="selectedOptionFound" scope="request" value="1"/>
+							 					</c:if> 			
+							 				</font>
 										</c:forEach>
 										
 									  <c:if test="${selectedOptionFound == 0}"> 			
-								  			
-												  	<select name="checkBoxSelected<c:out value="${optionIndex}"/>">
-														<option value="Incorrect" SELECTED> Incorrect </option>
-														<option value="Correct">   Correct  </option>
-													</select>
+										  <font size=2>								  	
+													  	<select name="checkBoxSelected<c:out value="${optionIndex}"/>">
+															<option value="Incorrect" SELECTED> <font size=2> Incorrect </font> </option>
+															<option value="Correct">   <font size=2> Correct  </font> </option>
+														</select>
+											</font>													
 					 					</c:if> 			
 										</td>
 	
 										<td bgcolor="#EEEEEE" class="input" valign=top>
-	       								    <img src="images/delete.gif" align=left onclick="javascript:deleteOption(1,'removeOption');">
+											<font size=2>								  	
+		       								    <img src="images/delete.gif" align=left onclick="javascript:deleteOption(1,'removeOption');">
+		       								 </font>
 									  	</td>
 							 </tr>
 							</c:if> 			
@@ -76,33 +86,37 @@
 								  <tr>
 								  	<td bgcolor="#EEEEEE" class="input" valign=top> <font size=2> <b> <c:out value="Candidate Answer ${optionIndex}"/> : </b></font>
 
-								  			<input type="text" name="optionContent<c:out value="${optionIndex}"/>" value="<c:out value="${optionEntry.value}"/>"
-									  		size="50" maxlength="255">
+									<font size=2>								  	
+							  			<input type="text" name="optionContent<c:out value="${optionIndex}"/>" value="<c:out value="${optionEntry.value}"/>"
+								  		size="50" maxlength="255">
+							  		</font>
 
 			  				  	 		<c:set var="selectedOptionFound" scope="request" value="0"/>
 			  							<c:forEach var="selectedOptionEntry" items="${sessionScope.mapSelectedOptions}">
+				  							<font size=2>								  	
 											  <c:if test="${selectedOptionEntry.value == optionEntry.value}"> 			
-
 													  	<select name="checkBoxSelected<c:out value="${optionIndex}"/>">
-															<option value="Incorrect" > Incorrect </option>
-															<option value="Correct" SELECTED>   Correct  </option>
+															<option value="Incorrect" > <font size=2> Incorrect </font> </option>
+															<option value="Correct" SELECTED> <font size=2>	  Correct  </font> </option>
 														</select>
-
 						  				  	 		<c:set var="selectedOptionFound" scope="request" value="1"/>
-						 					</c:if> 			
+							 					</c:if> 			
+							 				</font>
 										</c:forEach>
 										
 									  <c:if test="${selectedOptionFound == 0}"> 			
 
 												  	<select name="checkBoxSelected<c:out value="${optionIndex}"/>">
-														<option value="Incorrect" SELECTED> Incorrect </option>
-														<option value="Correct">   Correct  </option>
+														<option value="Incorrect" SELECTED> <font size=2> Incorrect  </font> </option>
+														<option value="Correct">   <font size=2> Correct </font>   </option>
 													</select>
 					 					</c:if> 			
 										</td>
 	
 										<td bgcolor="#EEEEEE" class="input" valign=top>
-	       								    <img src="images/delete.gif" align=left onclick="javascript:deleteOption(<c:out value="${optionIndex}"/>,'removeOption');">
+											<font size=2>
+		       								    <img src="images/delete.gif" align=left onclick="javascript:deleteOption(<c:out value="${optionIndex}"/>,'removeOption');">
+	       								    </font>
     								  	</td>
 								  </tr>
 							</c:if> 			
@@ -111,10 +125,12 @@
 						
 						 <tr>
 							  	<td bgcolor="#EEEEEE" colspan=4 class="input" valign=top align=right>
-									<html:submit onclick="javascript:submitMethod('addOption');" styleClass="a.button" >
-										<bean:message key="label.add.option"/>
-									</html:submit>	 				 		  										  		
-						  	</td>
+				  					<font size=2>
+										<html:submit onclick="javascript:submitMethod('addOption');" styleClass="a.button" >
+												<bean:message key="label.add.option"/>
+										</html:submit>	 				 		  										  		
+									</font>									
+							  	</td>
 						 </tr>							
 					</table> </td> </tr>	
 					
@@ -135,10 +151,11 @@
 	 				 <tr>
 	 				 <td valign=top> </td>
 	 				 <td class="input" align=left colspan=3 valign=top>
+						<font size=2>
 							<html:submit onclick="javascript:submitMethod('doneOptions');" styleClass="a.button">
-								<bean:message key="button.done"/>
+									<bean:message key="button.done"/>
 							</html:submit>	 				 		  										  		
-		 			  	</td>
-	 				 </tr>
-	 				 
+						</font>							
+	 			  	</td>
+	 				</tr>
 				</table> 	 

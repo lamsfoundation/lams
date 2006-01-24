@@ -12,7 +12,7 @@
 							   (sessionScope.defineLaterInEditMode == 'true') 
 							  }"> 			
  						<tr> 
-					 		<td NOWRAP class="formlabel" valign=top> <b> <bean:message key="label.authoring.title"/>: </b> </td>
+					 		<td NOWRAP class="formlabel" valign=top> <b> <font size=2> <bean:message key="label.authoring.title"/>: </font> </b> </td>
 							<td NOWRAP class="formcontrol" valign=top>
 								<FCK:editor id="richTextTitle" basePath="/lams/fckeditor/">
 									  <c:out value="${sessionScope.richTextTitle}" escapeXml="false" />						  
@@ -21,7 +21,7 @@
 					  	</tr>
 					  	
 					  	<tr> 
-					 		<td NOWRAP class="formlabel" valign=top> <b> <bean:message key="label.authoring.instructions"/>: </b> </td>
+					 		<td NOWRAP class="formlabel" valign=top> <b> <font size=2> <bean:message key="label.authoring.instructions"/>: </font> </b> </td>
 							<td NOWRAP class="formcontrol" valign=top>
 								<FCK:editor id="richTextInstructions" basePath="/lams/fckeditor/">
 									  <c:out value="${sessionScope.richTextInstructions}" escapeXml="false" />						  
@@ -34,14 +34,14 @@
 							   (sessionScope.defineLaterInEditMode != 'true') 
 							  }"> 			
  						<tr> 
-					 		<td NOWRAP class="formlabel" valign=top align=left> <b> <bean:message key="label.authoring.title"/>: </b> </td>
+					 		<td NOWRAP class="formlabel" valign=top align=left> <b> <font size=2> <bean:message key="label.authoring.title"/>: </font> </b> </td>
 							<td NOWRAP class="formcontrol" valign=top align=left>
 									  <c:out value="${sessionScope.richTextTitle}" escapeXml="false" />						  
 							</td> 
 					  	</tr>
 					  	
 					  	<tr> 
-					 		<td NOWRAP class="formlabel" valign=top align=left> <b> <bean:message key="label.authoring.instructions"/>: </b> </td>
+					 		<td NOWRAP class="formlabel" valign=top align=left> <b> <font size=2> <bean:message key="label.authoring.instructions"/>: </font> </b> </td>
 							<td NOWRAP class="formcontrol" valign=top align=left>
 									  <c:out value="${sessionScope.richTextInstructions}" escapeXml="false" />						  
 							</td>
@@ -73,38 +73,44 @@
 								  	<td NOWRAP bgcolor="#EEEEEE" class="input" valign=top>  <font size=2> <b> <c:out value="Question ${queIndex}"/> : </b>  </font> </td>
 								  	
 							  		<td NOWRAP bgcolor="#EEEEEE" class="input" valign=top width=50> 
-							  			<input type="text" name="questionContent<c:out value="${queIndex}"/>" value="<c:out value="${questionEntry.value}"/>"
-								  		size="50" maxlength="255" >
+								  		<font size=2> <input type="text" name="questionContent<c:out value="${queIndex}"/>" value="<c:out value="${questionEntry.value}"/>" 
+								  		size="50" maxlength="255" > </font>
 								  	</td>
 	
 								  	<td NOWRAP bgcolor="#EEEEEE" class="input"  align=center valign=top>			
 								 		<c:if test="${sessionScope.queIndex == 1}"> 		
-		   								    <img src="images/down.gif" align=left onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','moveQuestionDown');">
+			   								 <font size=2>  <img src="images/down.gif" align=left onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','moveQuestionDown');"> </font>
 		   								</c:if> 			
 		
 						  				<c:if test="${sessionScope.maxQuestionIndex == sessionScope.queIndex}"> 			
-		     								 <img src="images/up.gif" align=left onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','moveQuestionUp');">		  	
+		     								 <font size=2> <img src="images/up.gif" align=left onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','moveQuestionUp');"> </font>
 		     							</c:if> 	    
 										
 		 				  				<c:if test="${(sessionScope.maxQuestionIndex != sessionScope.queIndex) && (sessionScope.queIndex != 1)}"> 			
-		   								    <img src="images/down.gif" align=left onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','moveQuestionDown');">		  	   								 
-		       								<img src="images/up.gif" align=left onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','moveQuestionUp');">		  	
+			 				  				<font size=2>
+			   								    <img src="images/down.gif" align=left onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','moveQuestionDown');">		  	   								 
+			       								<img src="images/up.gif" align=left onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','moveQuestionUp');">		  	
+			       							</font>
 										</c:if> 	           								 
 	                                </td>
 	
 	                                    <td NOWRAP bgcolor="#EEEEEE" class="input" align=left valign=top>										  	
-											<c:forEach var="weightsEntry" items="${sessionScope.mapWeights}">                                            
-													<c:if test="${questionEntry.key == weightsEntry.key}"> 			
-												  			<input type="text" name="questionWeight<c:out value="${queIndex}"/>" value="<c:out value="${weightsEntry.value}"/>"
-													  		size="3" maxlength="3">
-													  		<bean:message key="label.percent"/>
-													</c:if>
-											</c:forEach>
+		                                    <font size=2>
+												<c:forEach var="weightsEntry" items="${sessionScope.mapWeights}">       
+														<c:if test="${questionEntry.key == weightsEntry.key}"> 			
+													  			<input type="text" name="questionWeight<c:out value="${queIndex}"/>" value="<c:out value="${weightsEntry.value}"/>"
+														  		size="3" maxlength="3">
+														  		<bean:message key="label.percent"/>
+														</c:if>
+												</c:forEach>
+											</font>
 	                                    </td>
 																						
 	                                   <td NOWRAP bgcolor="#EEEEEE" class="input" valign=top>								
-											<img src="images/edit.gif" align=left onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','editOptions');">	
-											<img src="images/delete.gif" align=left onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','removeQuestion');">	
+											<font size=2>	                                   
+												<img src="images/edit.gif" align=left onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','editOptions');">	
+												<img src="images/delete.gif" align=left onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','removeQuestion');">	
+											<font>											
 									  	</td>
 								  </tr>
 							</c:if> 																		  								  
@@ -121,32 +127,38 @@
 								  	</td>
 	
 								  	<td NOWRAP bgcolor="#EEEEEE" class="input"  align=center valign=top>			
-								 		<c:if test="${sessionScope.queIndex == 1}"> 		
-		   								    <img src="images/down.gif" align=left onclick="javascript:alert('This button is disabled in this [view-only] mode.');" >
-		   								</c:if> 			
-		
-						  				<c:if test="${sessionScope.maxQuestionIndex == sessionScope.queIndex}"> 			
-		     								 <img src="images/up.gif" align=left onclick="javascript:alert('This button is disabled in this [view-only] mode.');" >
-		     							</c:if> 	    
-										
-		 				  				<c:if test="${(sessionScope.maxQuestionIndex != sessionScope.queIndex) && (sessionScope.queIndex != 1)}"> 			
-		   								    <img src="images/down.gif" align=left onclick="javascript:alert('This button is disabled in this [view-only] mode.');" >
-		       								<img src="images/up.gif" align=left onclick="javascript:alert('This button is disabled in this [view-only] mode.');" >
-										</c:if> 	           								 
+									  	<font size=2>
+									 		<c:if test="${sessionScope.queIndex == 1}"> 		
+			   								    <img src="images/down.gif" align=left onclick="javascript:alert('This button is disabled in this [view-only] mode.');" >
+			   								</c:if> 			
+			
+							  				<c:if test="${sessionScope.maxQuestionIndex == sessionScope.queIndex}"> 			
+			     								 <img src="images/up.gif" align=left onclick="javascript:alert('This button is disabled in this [view-only] mode.');" >
+			     							</c:if> 	    
+											
+			 				  				<c:if test="${(sessionScope.maxQuestionIndex != sessionScope.queIndex) && (sessionScope.queIndex != 1)}"> 			
+			   								    <img src="images/down.gif" align=left onclick="javascript:alert('This button is disabled in this [view-only] mode.');" >
+			       								<img src="images/up.gif" align=left onclick="javascript:alert('This button is disabled in this [view-only] mode.');" >
+											</c:if> 	           								 
+										</font>
 	                                </td>
 	
-	                                    <td NOWRAP bgcolor="#EEEEEE" class="input" align=left valign=top>										  	
+                                    <td NOWRAP bgcolor="#EEEEEE" class="input" align=left valign=top>										  	
+	                                    <font size=2>
 											<c:forEach var="weightsEntry" items="${sessionScope.mapWeights}">                                            
 													<c:if test="${questionEntry.key == weightsEntry.key}"> 			
 														<font size=2> <c:out value="${weightsEntry.value}"/><bean:message key="label.percent"/> </font>
 													</c:if>
 											</c:forEach>
-	                                    </td>
-																						
-	                                   <td NOWRAP bgcolor="#EEEEEE" class="input" valign=top>								
+										</font>
+                                    </td>
+																					
+                                   <td NOWRAP bgcolor="#EEEEEE" class="input" valign=top>								
+										<font size=2>                                   
 											<img src="images/edit.gif" align=left onclick="javascript:alert('This button is disabled in this [view-only] mode.');" >
 											<img src="images/delete.gif" align=left onclick="javascript:alert('This button is disabled in this [view-only] mode.');" >
-									  	</td>
+										</font>
+								  	</td>
 								  </tr>
 							</c:if> 																		  								  
 						</c:forEach>
@@ -156,10 +168,12 @@
 							  }"> 			
 							 <tr>
 								  	<td NOWRAP bgcolor="#EEEEEE" colspan=5 class="input" valign=top align=right>
-										<html:submit styleClass="a.button" onclick="javascript:submitMethod('addNewQuestion');">
-											<bean:message key="label.add.question"/>
-										</html:submit>	 				 		  										  		
-							  	</td>
+									  	<font size=2>
+											<html:submit styleClass="a.button" onclick="javascript:submitMethod('addNewQuestion');">
+												<bean:message key="label.add.question"/>
+											</html:submit>	 				 		  										  		
+										</font>
+								  	</td>
 							 </tr>							
 						</c:if> 							
 
@@ -168,10 +182,12 @@
 										  }"> 			
 							 <tr>
 								  	<td NOWRAP bgcolor="#EEEEEE" colspan=5 class="input" valign=top align=right>
-										<html:submit styleClass="a.button" disabled="true" onclick="javascript:alert('This button is disabled in this [view-only] mode.');" >
-											<bean:message key="label.add.question"/>
-										</html:submit>	 				 		  										  		
-							  	</td>
+									  	<font size=2>
+											<html:submit styleClass="a.button" disabled="true" onclick="javascript:alert('This button is disabled in this [view-only] mode.');" >
+												<bean:message key="label.add.question"/>
+											</html:submit>	 				 		  										  		
+										</font>
+								  	</td>
 							 </tr>													
 						</c:if> 													
 						
@@ -179,7 +195,6 @@
 							<html:hidden property="questionIndex"/>
 					<tr>
 	 				 	<td colspan=5 align=center>
-
 					  	</td>
 					</tr>		
 					
@@ -188,9 +203,11 @@
 						  }"> 			
 
 						<tr>
-						  	<td NOWRAP class="formlabel" valign=top><b> <bean:message key="radiobox.passmark"/>: </b> </td>
+						  	<td NOWRAP class="formlabel" valign=top><b> <font size=2> <bean:message key="radiobox.passmark"/>: </font> </b> </td>
 							<td NOWRAP class="input" valign=top> 
+								<font size=2>
 								  <html:text property="passmark"  size="3" maxlength="3"/><bean:message key="label.percent"/>
+								 </font>
 							</td>
 							<td NOWRAP valign=top> </td> 
 							<td NOWRAP valign=top> </td>
@@ -209,10 +226,11 @@
 		 				 <tr>
 	 						<td NOWRAP valign=top> </td> 
 							<td NOWRAP class="input" colspan=3 align=left valign=top>								
-								<html:submit onclick="javascript:submitMethod('submitQuestions');" styleClass="a.button">
-									<bean:message key="button.submit"/>
-								</html:submit>	 				 		  					
-													  		
+								<font size=2>
+									<html:submit onclick="javascript:submitMethod('submitQuestions');" styleClass="a.button">
+										<bean:message key="button.submit"/>
+									</html:submit>	 				 		  					
+								</font>	
 			 			  	</td>
 							<td NOWRAP valign=top> </td> 
 							<td NOWRAP valign=top> </td>
@@ -226,7 +244,9 @@
 						<tr>
 						  	<td NOWRAP class="formlabel" valign=top align=left><b> <bean:message key="radiobox.passmark"/>: </b></td>
 							<td NOWRAP class="input" valign=top align=left> 
-									<c:out value="${sessionScope.passMark}"/> <bean:message key="label.percent"/>
+								<font size=2>
+										<c:out value="${sessionScope.passMark}"/> <bean:message key="label.percent"/>
+								</font>
 							</td>
 							<td NOWRAP valign=top> </td> 
 							<td NOWRAP valign=top> </td>
@@ -248,10 +268,11 @@
 							 <tr>
 		 						<td NOWRAP valign=top> </td> 
 								<td NOWRAP class="input" colspan=3 align=left valign=top>								
-									<html:submit onclick="javascript:submitMethod('editActivityQuestions');" styleClass="a.button" disabled="true">
-										<bean:message key="label.edit"/>
-									</html:submit>	 				 		  					
-														  		
+									<font size=2>
+										<html:submit onclick="javascript:submitMethod('editActivityQuestions');" styleClass="a.button" disabled="true">
+											<bean:message key="label.edit"/>
+										</html:submit>	 				 		  					
+									</font>
 				 			  	</td>
 								<td NOWRAP valign=top> </td> 
 								<td NOWRAP valign=top> </td>
@@ -264,10 +285,11 @@
 							 <tr>
 		 						<td NOWRAP valign=top> </td> 
 								<td NOWRAP class="input" colspan=3 align=left valign=top>								
-									<html:submit onclick="javascript:submitMethod('editActivityQuestions');" styleClass="a.button">
-										<bean:message key="label.edit"/>
-									</html:submit>	 				 		  					
-														  		
+									<font size=2>
+										<html:submit onclick="javascript:submitMethod('editActivityQuestions');" styleClass="a.button">
+											<bean:message key="label.edit"/>
+										</html:submit>	 				 		  					
+									</font>
 				 			  	</td>
 								<td NOWRAP valign=top> </td> 
 								<td NOWRAP valign=top> </td>

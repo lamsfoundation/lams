@@ -9,7 +9,9 @@
 				<table class="forms">
 				<tr> 
 					<td NOWRAP class="formlabel" valign=top>
-          				<bean:message key="label.offlineInstructions" />:
+						<font size=2>
+    	      				<b> <bean:message key="label.offlineInstructions" />: <b>
+    	      			</font>
           			</td>
 					<td NOWRAP colspan=3 class="formcontrol" valign=top>
 					<FCK:editor id="richTextOfflineInstructions" basePath="/lams/fckeditor/">
@@ -20,33 +22,39 @@
 				
 				<tr> 
 					<td NOWRAP class="formlabel" valign=top>
-          				<bean:message key="label.offlineFiles" />
+						<font size=2>
+							<b> <bean:message key="label.offlineFiles" /> <b>
+						</font>
           			</td>
           			<td colspan=3 NOWRAP valign=top> 
-						<html:file  property="theOfflineFile"></html:file>
-					 	<html:submit styleClass="a.button" onclick="javascript:submitMethod('submitOfflineFiles');">
-								<bean:message key="button.upload"/>
-						</html:submit>
+	          			<font size=2>
+							<html:file  property="theOfflineFile"></html:file>
+						 	<html:submit styleClass="a.button" onclick="javascript:submitMethod('submitOfflineFiles');">
+								 <bean:message key="button.upload"/> 
+							</html:submit>
+						</font>
 					</td> 
 
 				</tr>
 				<tr> 
 					<td NOWRAP align="right" valign=top>
-          				<bean:message key="label.uploadedOfflineFiles" />
+						<font size=2>
+    	      				<b> <bean:message key="label.uploadedOfflineFiles" /> </b>
+    	      			</font>
           			</td>
 					<td NOWRAP colspan=3 align=left valign=top width="100%">
 						<table align="left" border="1">
 									<c:forEach var='file' items='${sessionScope.listOfflineFilesMetadata}'>
 											<tr>
 												<td NOWRAP valign=top>
-													<c:out value="${file.filename}"/>
+													<font size=2> <c:out value="${file.filename}"/> </font>
 												</td>
 												<td NOWRAP valign=top>
 													<c:set var="viewURL">
 														<html:rewrite page="/download/?uuid=${file.uuid}&preferDownload=false"/>
 													</c:set>
 													<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
-														<bean:message key="label.view"/>
+														<font size=2> <bean:message key="label.view"/> </font>
 													</a>
 												</td>
 												<td NOWRAP valign=top>
@@ -54,11 +62,11 @@
 															<html:rewrite page="/download/?uuid=${file.uuid}&preferDownload=true"/>
 													</c:set>
 													<a href="<c:out value='${downloadURL}' escapeXml='false'/>">
-														<bean:message key="label.download"/>
+														<font size=2> <bean:message key="label.download"/> </font>
 													</a>
 												</td>
 												<td NOWRAP valign=top> 
-													<img src="images/delete.gif" align=left onclick="javascript:submitDeleteFile('<c:out value="${file.uuid}"/>','deleteOfflineFile');">													
+													 <font size=2>	<img src="images/delete.gif" align=left onclick="javascript:submitDeleteFile('<c:out value="${file.uuid}"/>','deleteOfflineFile');"> </font>													
 												</td>
 											</tr>
 				         			</c:forEach>
@@ -68,7 +76,9 @@
 
 				<tr> 
 					<td NOWRAP align="right" valign=top>
-          				<bean:message key="label.onlineInstructions" />
+						<font size=2>
+    	      				<b> <bean:message key="label.onlineInstructions" /> </b>
+    	      			</font>
           			</td>
 					<td NOWRAP colspan=3 class="formcontrol" valign=top>
 					<FCK:editor id="richTextOnlineInstructions" basePath="/lams/fckeditor/">
@@ -79,19 +89,25 @@
 				
 				<tr> 
 					<td NOWRAP class="formlabel" valign=top>
-          				<bean:message key="label.onlineFiles" />
+						<font size=2>
+    	      				<b> <bean:message key="label.onlineFiles" /> </b>
+    	      			</font>
           			</td>
           			<td colspan=3 NOWRAP valign=top> 
-						<html:file  property="theOnlineFile"></html:file>
-					 	<html:submit onclick="javascript:submitMethod('submitOnlineFiles');">
-								<bean:message key="button.upload"/>
-						</html:submit>
+	          			<font size=2>
+							<html:file  property="theOnlineFile"></html:file>
+						 	<html:submit onclick="javascript:submitMethod('submitOnlineFiles');">
+								 <bean:message key="button.upload"/> 
+							</html:submit>
+						</font>
 					</td> 
 				</tr>
 
 				<tr>
 					<td NOWRAP align="right" valign=top>
-          				<bean:message key="label.uploadedOnlineFiles" />
+	          			<font size=2>
+		      				<b> <bean:message key="label.uploadedOnlineFiles" /> </b>
+	      				</font>
           			</td>
           			
 					<td NOWRAP colspan=3 align=left valign=top width="100%">
@@ -99,14 +115,14 @@
 									<c:forEach var='file' items='${sessionScope.listOnlineFilesMetadata}'>
 											<tr>
 												<td NOWRAP valign=top>
-													<c:out value="${file.filename}"/>
+													<font size=2> <c:out value="${file.filename}"/> </font>
 												</td>
 												<td NOWRAP valign=top>
 													<c:set var="viewURL">
 														<html:rewrite page="/download/?uuid=${file.uuid}&preferDownload=false"/>
 													</c:set>
 													<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
-														<bean:message key="label.view"/>
+														 <font size=2>	<bean:message key="label.view"/> </font>
 													</a>
 												</td>
 												<td NOWRAP valign=top>
@@ -114,11 +130,11 @@
 															<html:rewrite page="/download/?uuid=${file.uuid}&preferDownload=true"/>
 													</c:set>
 													<a href="<c:out value='${downloadURL}' escapeXml='false'/>">
-														<bean:message key="label.download"/>
+														<font size=2> <bean:message key="label.download"/> </font>
 													</a>
 												</td>
 												<td NOWRAP valign=top> 
-													<img src="images/delete.gif" align=left onclick="javascript:submitDeleteFile('<c:out value="${file.uuid}"/>','deleteOnlineFile');">													
+													<font size=2> <img src="images/delete.gif" align=left onclick="javascript:submitDeleteFile('<c:out value="${file.uuid}"/>','deleteOnlineFile');"> </font>	
 												</td>
 											</tr>
 				         			</c:forEach>
@@ -140,9 +156,11 @@
 				 	<td NOWRAP valign=top>								
 				  	</td>
 					 <td NOWRAP colspan=3 valign=top> 
-						 <html:submit onclick="javascript:submitMethod('doneInstructionsTab');">
-							<bean:message key="button.done"/>
-						</html:submit>
+						 <font size=2>
+							 <html:submit onclick="javascript:submitMethod('doneInstructionsTab');">
+								  <bean:message key="button.done"/> 
+							</html:submit>
+						</font>						
 					</td> 
  				 </tr>
 
