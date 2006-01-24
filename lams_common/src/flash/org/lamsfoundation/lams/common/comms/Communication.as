@@ -36,7 +36,7 @@ class org.lamsfoundation.lams.common.comms.Communication {
     /**
     * Comms constructor
     */
-    function Communication(serverURL:String){
+    function Communication(aServerURL:String){
         trace('Communication.constructor');
 
         //Set up queue
@@ -48,10 +48,12 @@ class org.lamsfoundation.lams.common.comms.Communication {
 		//_global.breakpoint();
 		if(_serverURL == null){
 			//_serverURL = Config.getInstance().serverUrl;
-			if(_root.serverURL==null){
-				Debugger.log("! serverURL is not set, unable to connect to server !!",Debugger.CRITICAL,'Consturcutor','Communication');
-			}else{
+			if(_root.serverURL!=null){
 				_serverURL = _root.serverURL;
+			}else if(aServerURL != null){
+				_serverURL = aServerURL;
+			}else{
+				Debugger.log("! serverURL is not set, unable to connect to server !!",Debugger.CRITICAL,'Consturcutor','Communication');
 			}
 			
 		}
@@ -175,8 +177,10 @@ class org.lamsfoundation.lams.common.comms.Communication {
                 //user friendly error
 				var e = new LFError(responseObj.messageValue,"onServerResponse",this);
 				dispatchToHandlerByID(queueID,e);
-                //showAlert("Oops", responseObj.body, "sad");
+                //TODO: Make sure that things that have requested server responses can handle an error object
+				//showAlert("Oops", responseObj.body, "sad");
             }else if(responseObj.messageType == SYSTEM_ERROR_CODE){
+				LFMessage.showMessageAlert(responseObj.messageValue, null, null);
                 //showAlert("System error", "<p>Sorry there has been a system error, please try the operation again. If the problem persistes please contact support</p><p>Additional information:"+responseObj.body+"</p>", "sad");
             }else{
                 //Everything is fine so lookup callback handler on queue 
