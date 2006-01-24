@@ -103,6 +103,7 @@
 						<div class="tabbody content_b" >
 							<jsp:include page="/monitoring/Instructions.jsp" />
 						</div>
+						
 		        </c:when>
 		
 		        <c:when test='${currentMonitoringTab == "editActivity"}'>
@@ -125,12 +126,23 @@
 		        <c:otherwise> 
 						<div class="tabbody content_b" >
 							<jsp:include page="/monitoring/SummaryContent.jsp" />
+								<table align=right> 	  
+									<tr>   
+										<td NOWRAP>
+											<font size=2>
+												<html:submit onclick="javascript:submitMethod('doneMonitoring');">
+													<bean:message key="button.done"/>
+												</html:submit>	 				 		  					
+											</font>
+										</td>
+									</tr> 
+								</table>
 						</div>		         							
 		        </c:otherwise>
 		</c:choose>
 	
 	</html:form>
-	<p></p>
+
 </body>
 </html:html>
 
