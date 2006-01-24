@@ -29,4 +29,6 @@ public class MonitoringConstants {
 	public static final String KEY_LESSON_ID = "lessonID";
 	public static final String KEY_STAFF = "staff";
 	public static final String KEY_LEARNER = "learners";
+	public static final String JOB_START_LESSON = "startScheduleLessonJob";
+	public static final String JOB_FINISH_LESSON = "finishScheduleLessonJob";
 }

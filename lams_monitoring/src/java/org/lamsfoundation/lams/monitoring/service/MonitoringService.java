@@ -388,8 +388,36 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         
         return newLesson;
     }
-
     /**
+     * Start lesson 
+     * @param lessonId
+     * @param startDate
+     */
+    public void startLessonOnSchedule(long lessonId, Date startDate){
+        JobDetail startLessonJob = getStartScheduleLessonJob();
+        //setup the message for scheduling job
+        startLessonJob.setName("startLessonOnSchedule");
+        startLessonJob.getJobDataMap().put(MonitoringConstants.KEY_LESSON_ID,new Long(lessonId));
+        //create customized triggers
+        Trigger startLessonTrigger = new SimpleTrigger("startLessonOnScheduleTrigger",
+                                                    Scheduler.DEFAULT_GROUP, 
+                                                    startDate);
+        //start the scheduling job
+        try
+        {
+            scheduler.scheduleJob(startLessonJob, startLessonTrigger);
+        }
+        catch (SchedulerException e)
+        {
+            throw new MonitoringServiceException("Error occurred at " +
+            		"[startLessonOnSchedule]- fail to start scheduling",e);
+        }
+        
+        if(log.isDebugEnabled())
+            log.debug("Start lesson  ["+lessonId+"] on schedule is configured");
+    }
+
+	/**
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#startlesson(long)
      */
     public void startLesson(long lessonId) 
@@ -1066,7 +1094,20 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     {
         return (JobDetail)applicationContext.getBean("openScheduleGateJob");
     }
-    
+    /**
+     * 
+     * @return the bean that defines start lesson on schedule job.
+     */
+    private JobDetail getStartScheduleLessonJob() {
+    	return (JobDetail)applicationContext.getBean(MonitoringConstants.JOB_START_LESSON);
+	}
+    /**
+     * 
+     * @return the bean that defines start lesson on schedule job.
+     */
+    private JobDetail getFinishScheduleLessonJob() {
+    	return (JobDetail)applicationContext.getBean(MonitoringConstants.JOB_FINISH_LESSON);
+    }
     /**
      * Returns the bean that defines the close schdule gate job.
      */

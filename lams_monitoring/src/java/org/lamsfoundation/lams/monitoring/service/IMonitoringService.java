@@ -21,6 +21,7 @@
 package org.lamsfoundation.lams.monitoring.service;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -75,7 +76,7 @@ public interface IMonitoringService
      * @return
      */
     public String createLesson(Integer creatorUserId,String lessionPackage);
-
+    
     /**
      * Setup the lesson class and organization for a lesson according to the 
      * input from monitoring GUI interface.
@@ -97,7 +98,13 @@ public interface IMonitoringService
      * 									lesson.
      */
     public void startLesson(long lessonId);
-    
+    /**
+     * 
+     * @param lessonId
+     * @param startDate the lesson start date and time.
+     * @see org.lamsfoundation.lams.monitoring.service#startLesson(long)
+     */
+    public void startLessonOnSchedule(long lessonId, Date startDate);
     /**
      * Force the learner to complete all the activities for current lesson.
      * @param learnerProgressId the learner progress belongs to the user who

@@ -23,6 +23,8 @@
 package org.lamsfoundation.lams.monitoring.web;
 
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -206,7 +208,11 @@ public class DummyMonitoringAction extends LamsDispatchAction
 
         // start the lesson.
         this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-        monitoringService.startLesson(testLesson.getLessonId().longValue());
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Date());
+        cal.add(Calendar.MILLISECOND,5000);
+        monitoringService.startLessonOnSchedule(testLesson.getLessonId().longValue(),cal.getTime());
+//        monitoringService.startLesson(testLesson.getLessonId().longValue());
 
     	return mapping.findForward(LESSON_STARTED_FORWARD);
     }
