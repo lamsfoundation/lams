@@ -161,24 +161,6 @@ public abstract class McUtils implements McAppConstants {
 		return true;	
 	}
 	
-	public static void setDefaultSessionAttributes(HttpServletRequest request, McContent defaultMcContent, McAuthoringForm mcAuthoringForm)
-	{
-		/*should never be null anyway as default content MUST exist in the db*/
-		if (defaultMcContent != null)
-		{		
-			mcAuthoringForm.setTitle(defaultMcContent.getTitle());
-			mcAuthoringForm.setInstructions(defaultMcContent.getInstructions());
-			mcAuthoringForm.setOfflineInstructions (defaultMcContent.getOfflineInstructions());
-			mcAuthoringForm.setOnlineInstructions (defaultMcContent.getOnlineInstructions());
-			
-			if (defaultMcContent.getPassMark() != null) 
-				mcAuthoringForm.setPassmark((defaultMcContent.getPassMark()).toString());
-			else
-				mcAuthoringForm.setPassmark(new Integer(0).toString());
-			
-		}
-	}
-	
 	
 	/**
 	 * returns a Map of options
@@ -282,6 +264,13 @@ public abstract class McUtils implements McAppConstants {
 	    logger.debug("configureContentRepository ran successfully");
 	}
 	
+	/**
+	 * retrieves existing updated file information
+	 * populateUploadedFilesData(HttpServletRequest request, McContent defaultMcContent)
+	 * 
+	 * @param request
+	 * @param defaultMcContent
+	 */
 	public static void populateUploadedFilesData(HttpServletRequest request, McContent defaultMcContent)
 	{
 		logger.debug("attempt populateUploadedFilesData for: " + defaultMcContent);
