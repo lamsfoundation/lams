@@ -235,6 +235,16 @@ class org.lamsfoundation.lams.authoring.Application {
 					if(_uiLoadCheckCount >= UI_LOAD_CHECK_TIMEOUT_COUNT){
 						//if we havent loaded the dict or theme by the timeout count then give up
 						Debugger.log('raeached time out waiting to load dict and themes, giving up.',Debugger.CRITICAL,'checkUILoaded','Application');
+						var msg:String = "";
+						if(!_themeEventDispatched){
+							msg+="__The theme data has not been loaded__";
+						}
+						if(!_dictionaryEventDispatched){
+							msg+="__The lanaguage data has not been loaded__";
+						}
+						msg+="__The application cannot continue.  Please contact support__";
+						var e:LFError = new LFError(msg,"Canvas.setDroppedTemplateActivity",this,'_themeEventDispatched:'+_themeEventDispatched+' _dictionaryEventDispatched:'+_dictionaryEventDispatched);
+						e.showErrorAlert();
 						//todo:  give the user a message
 						clearInterval(_UILoadCheckIntervalID);
 					}
