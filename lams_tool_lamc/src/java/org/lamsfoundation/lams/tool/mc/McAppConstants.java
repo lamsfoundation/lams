@@ -30,11 +30,42 @@ public interface McAppConstants {
 
 	public static final String MY_SIGNATURE 							="lamc11";
 	public static final String TOOL_SERVICE								="tool_service";
-	public static final String ERROR_LIST								="errorList";
+	public static final String ERROR_MCAPPLICATION 						= "error.exception.McApplication";
 	
-	public static final String AUTHORING_STARTER						="starter";
+	/*
+     * Struts level constants
+     */
+    public static final String LOAD										="load";
+    public static final String LOAD_QUESTIONS							="load";
+    public static final String LOAD_STARTER								="starter";
+    public static final String AUTHORING_STARTER						="starter";
 	public static final String LEARNING_STARTER							="learningStarter";
 	public static final String MONITORING_STARTER						="monitoringStarter";
+	public static final String LOAD_LEARNER								="loadLearner";
+    public static final String LOAD_MONITORING							="loadMonitoring";
+    public static final String INDIVIDUAL_REPORT						="individualReport";
+    public static final String VIEW_SUMMARY								="viewSummary";
+    public static final String REDO_QUESTIONS							="redoQuestions";
+    public static final String SINGLE_QUESTION_ANSWERS					="singleQuestionAnswers";
+    public static final String RESULTS_SUMMARY							="resultsSummary";
+    public static final String ERROR_LIST								="errorList";
+	
+    public static final String AUTHORING								="authoring";
+    public static final String SOURCE_MC_STARTER						="sourceMcStarter";
+    public static final String AUTHORING_CANCELLED						="authoringCancelled";
+    public static final String DEFINE_LATER_EDIT_ACTIVITY				="defineLaterEditActivity";
+    public static final String ACTIVE_MODULE							="activeModule";
+    public static final String EDIT_OPTIONS_MODE						="editOptionsMode";
+    public static final String DEFINE_LATER_IN_EDIT_MODE				="defineLaterInEditMode";
+    public static final String SUBMIT_SUCCESS							="sbmtSuccess";
+    
+    /*
+     * authoring mode controllers
+     */ 
+    public static final String IS_ADD_QUESTION							="isAddQuestion";
+    public static final String IS_REMOVE_QUESTION						="isRemoveQuestion";
+    public static final String IS_REMOVE_CONTENT						="isRemoveContent";
+    public static final String IS_REVISITING_USER						="isRevisitingUser";
 	
 	public static final String USER										= "user";
 	public static final String TOOL_CONTENT_ID 							= "toolContentID";
@@ -53,39 +84,6 @@ public interface McAppConstants {
     public static final long MAX_OPTION_COUNT 			=10;
     public static final int  MAX_ATTEMPT_HISTORY 		=30;
     
-    
-    /*
-     * Struts level constants
-     */
-    public static final String LOAD										="load";
-    public static final String LOAD_QUESTIONS							="load";
-    public static final String LOAD_STARTER								="starter";
-    public static final String LOAD_LEARNER								="loadLearner";
-    public static final String LOAD_MONITORING							="loadMonitoring";
-    public static final String INDIVIDUAL_REPORT						="individualReport";
-    public static final String VIEW_SUMMARY								="viewSummary";
-    public static final String REDO_QUESTIONS							="redoQuestions";
-    public static final String SINGLE_QUESTION_ANSWERS					="singleQuestionAnswers";
-    public static final String RESULTS_SUMMARY							="resultsSummary";
-    
-    public static final String SOURCE_MC_STARTER						="sourceMcStarter";
-    public static final String AUTHORING_CANCELLED						="authoringCancelled";
-    
-    /*
-     * authoring mode controllers
-     */ 
-    public static final String IS_ADD_QUESTION							="isAddQuestion";
-    public static final String IS_REMOVE_QUESTION						="isRemoveQuestion";
-    public static final String IS_REMOVE_CONTENT						="isRemoveContent";
-    public static final String IS_REVISITING_USER						="isRevisitingUser";
-    public static final String DEFINE_LATER_EDIT_ACTIVITY				="defineLaterEditActivity";
-    
-    public static final String ACTIVE_MODULE							="activeModule";
-    public static final String AUTHORING								="authoring";
-    public static final String EDIT_OPTIONS_MODE						="editOptionsMode";
-    public static final String DEFINE_LATER_IN_EDIT_MODE				="defineLaterInEditMode";
-    public static final String SUBMIT_SUCCESS							="sbmtSuccess";
-    public static final String ERROR_MCAPPLICATION 						= "error.exception.McApplication";
     
     /*
      * authoring mode constants
@@ -130,18 +128,11 @@ public interface McAppConstants {
     public static final String DEFINE_LATER								="defineLater";
     public static final String RETRIES									="retries";
     public static final String PASSMARK									="passMark";
-    public static final String SHOW_FEEDBACK							="showFeedback";
-    public static final String USER_PASSED								="userPassed";
     public static final String VIEW_ANSWERS								="viewAnswers";
     public static final String SHOW_AUTHORING_TABS						="showAuthoringTabs";
     
     public static final String ON										="ON";
     public static final String OFF										="OFF";
-    //public static final String IS_USERNAME_VISIBLE_MONITORING			="isUsernameVisibleMonitoring";
-    //public static final String IS_SYNCH_INMONITOR_MONITORING			="isSynchInMonitorMonitoring";
-    //public static final String IS_QUESTIONS_SEQUENCED_MONITORING		="isQuestionsSequencedMonitoring";
-    
-    
     public static final String RICHTEXT_FEEDBACK_CORRECT				="richTextFeedbackCorrect";
     public static final String RICHTEXT_FEEDBACK_INCORRECT				="richTextFeedbackInCorrect";
     public static final String RICHTEXT_OFFLINEINSTRUCTIONS				="richTextOfflineInstructions";
@@ -151,25 +142,12 @@ public interface McAppConstants {
     public static final String RICHTEXT_TITLE							="richTextTitle";
     public static final String RICHTEXT_INSTRUCTIONS					="richTextInstructions";
     public static final String RICHTEXT_BLANK							="<p>&nbsp;</p>";
-    public static final String THE_OFFLINE_FILE							="theOfflineFile";
-    public static final String THE_ONLINE_FILE							="theOnlineFile";
-    public static final String THE_OFFLINE_FILENAME						="theOfflineFileName";
-    public static final String THE_ONLINE_FILENAME						="theOnlineFileName";
     public static final String SUBMIT_OFFLINE_FILE						="submitOfflineFile";
     public static final String SUBMIT_ONLINE_FILE						="submitOnlineFile";
-    public static final String LIST_UPLOADED_OFFLINE_FILES				="listUploadedOfflineFiles";
-    public static final String LIST_UPLOADED_ONLINE_FILES				="listUploadedOnlineFiles";
     public static final String LIST_UPLOADED_OFFLINE_FILENAMES			="listUploadedOfflineFileNames";
     public static final String LIST_UPLOADED_ONLINE_FILENAMES			="listUploadedOnlineFileNames";
-    public static final String LIST_UPLOADED_OFFLINE_FILES_UUID			="listUploadedOfflineFilesUuid";
-    public static final String LIST_UPLOADED_OFFLINE_FILES_NAME			="listUploadedOfflineFilesName";
-    public static final String LIST_UPLOADED_ONLINE_FILES_UUID			="listUploadedOnlineFilesUuid";
-    public static final String LIST_UPLOADED_ONLINE_FILES_NAME			="listUploadedOnlineFilesName";
-    
     public static final String LIST_OFFLINEFILES_METADATA				="listOfflineFilesMetadata";
     public static final String LIST_ONLINEFILES_METADATA				="listOnlineFilesMetadata";
-    public static final String POPULATED_UPLOADED_FILESDATA				="populateUploadedFilesData";
-    
     
     public static final String COUNT_SESSION_COMPLETE					="countSessionComplete";
     public static final String COUNT_ALL_USERS							="countAllUsers";
@@ -188,39 +166,9 @@ public interface McAppConstants {
     public static final String COMPLETED 								="COMPLETED";
     
     public static final String MAP_TOOL_SESSIONS						="mapToolSessions";
-    public static final String RESPONSE_INDEX							="responseIndex";
     public static final Integer MAX_TOOL_SESSION_COUNT					=new Integer(500);
     public static final String IS_TOOL_SESSION_CHANGED					="isToolSessionChanged";
-    public static final String USER_EXCEPTION_WRONG_FORMAT				="userExceptionWrongFormat";
-    public static final String USER_EXCEPTION_UNCOMPATIBLE_IDS      	="userExceptionUncompatibleIds";
-    public static final String USER_EXCEPTION_NUMBERFORMAT  	    	="userExceptionNumberFormat";
-    public static final String USER_EXCEPTION_CONTENT_DOESNOTEXIST		="userExceptionContentDoesNotExist";
-    public static final String USER_EXCEPTION_TOOLSESSION_DOESNOTEXIST	="userExceptionToolSessionDoesNotExist";
-    public static final String USER_EXCEPTION_CONTENTID_REQUIRED		="userExceptionContentIdRequired";
-    public static final String USER_EXCEPTION_TOOLSESSIONID_REQUIRED	="userExceptionToolSessionIdRequired";
-    public static final String USER_EXCEPTION_DEFAULTCONTENT_NOT_AVAILABLE 			="userExceptionDefaultContentNotAvailable";
-    public static final String USER_EXCEPTION_DEFAULTQUESTIONCONTENT_NOT_AVAILABLE 	="userExceptionDefaultQuestionContentNotAvailable";
-    public static final String USER_EXCEPTION_DEFAULTOPTIONSCONTENT_NOT_AVAILABLE 	="userExceptionDefaultOptionsContentNotAvailable";
-    
-    public static final String USER_EXCEPTION_USERID_NOTAVAILABLE		="userExceptionUserIdNotAvailable";
-    public static final String USER_EXCEPTION_USERID_NOTNUMERIC			="userExceptionUserIdNotNumeric";
-    public static final String USER_EXCEPTION_ONLYCONTENT_ANDNOSESSIONS ="userExceptionOnlyContentAndNoSessions";
-    public static final String USER_EXCEPTION_USERID_EXISTING			="userExceptionUserIdExisting";
-    public static final String USER_EXCEPTION_USER_DOESNOTEXIST			="userExceptionUserDoesNotExist";
-    public static final String USER_EXCEPTION_MONITORINGTAB_CONTENTID_REQUIRED	="userExceptionMonitoringTabContentIdRequired";
-    public static final String USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP	="userExceptionDefaultContentNotSetup";
-    public static final String USER_EXCEPTION_NO_TOOL_SESSIONS			="userExceptionNoToolSessions";
-    public static final String USER_EXCEPTION_NO_STUDENT_ACTIVITY		="userExceptionNoStudentActivity";
-    
-    /*
-     * export portfolio constants
-     */
-    public static final String LEARNER									="learner"; 
-    public static final String TEACHER									="teacher";
-    public static final String USER_EXCEPTION_MODE_REQUIRED				="userExceptionModeRequired";					
-    public static final String PORTFOLIO_REPORT							="portfolioReport";
-    public static final String PORTFOLIO_REQUEST						="portfolioRequest";
-    public static final int    MAX_GROUPS_COUNT							=250;						
+    public static final String OPTION_OFF								="false";    
         
     /*
      * user actions
@@ -230,8 +178,7 @@ public interface McAppConstants {
     public static final String REMOVE_ALL_CONTENT						="removeAllContent";
     public static final String SUBMIT_ALL_CONTENT						="submitAllContent";
     public static final String SUBMIT_TAB_DONE							="submitTabDone";
-    
-    public static final String OPTION_OFF								="false";
+
     
     /* learner mode contants */
     public static final String MAP_QUESTION_CONTENT_LEARNER				="mapQuestionContentLearner";
@@ -277,49 +224,15 @@ public interface McAppConstants {
     public static final String MONITORING_ERROR							="monitoringError";
     public static final String MAP_MONITORING_QUESTIONS					="mapMonitoringQuestions";
     public static final String SUMMARY_TOOL_SESSIONS					="summaryToolSessions";
-    public static final String CURRENT_MONITORED_TOOL_SESSION 			="currentMonitoredToolSession";
-    public static final String CHOICE_MONITORING			  			="choiceMonitoring";
-    public static final String CHOICE_TYPE_MONITORING_SUMMARY 			="choiceTypeMonitoringSummary";
-    public static final String CHOICE_TYPE_MONITORING_INSTRUCTIONS 		="choiceTypeMonitoringInstructions";
-    public static final String CHOICE_TYPE_MONITORING_EDITACTIVITY 		="choiceTypeMonitoringEditActivity";
-    public static final String CHOICE_TYPE_MONITORING_STATS 	   		="choiceTypeMonitoringStats";
-    public static final String MONITORING_INSTRUCTIONS_VISITED 	   		="monitoringInstructionsVisited";
-    public static final String MONITORING_EDITACTIVITY_VISITED 	   		="monitoringEditActivityVisited";
-    public static final String MONITORING_STATS_VISITED 	   	   		="monitoringStatsVisited";
-    public static final String DATAMAP_EDITABLE					   		="dataMapEditable";
-    public static final String DATAMAP_EDITABLE_RESPONSE_ID		   		="dataMapEditableResponseId";
-    public static final String DATAMAP_HIDDEN_RESPONSE_ID		   		="dataMapHiddenResponseId";
     public static final String MONITORED_CONTENT_ID				   		="monitoredContentId";
     public static final String START_MONITORING_SUMMARY_REQUEST	   		="startMonitoringSummaryRequest";
     public static final String STOP_RENDERING_QUESTIONS			   		="stopRenderingQuestions";
     public static final String EDITACTIVITY_EDITMODE	   		   		="editActivityEditMode";
     public static final String FORM_INDEX	   		   			   		="formIndex";
-    public static final String RENDER_MONITORING_EDITACTIVITY	   		="renderMonitoringEditActivity";
-    public static final String NO_AVAILABLE_SESSIONS	   		   		="noAvailableSessions";
-    public static final String INITIAL_MONITORING_TOOL_CONTENT_ID  		="initialMonitoringToolContentId";
-    public static final String IS_MONITORING_DEFINE_LATER  		   		="isMonitoringDefineLater";
-    public static final String NO_TOOL_SESSIONS_AVAILABLE				="noToolSessionAvailable";
-    public static final String ORIGINAL_TOOL_SESSIONS					="originalToolSessions";
+    public static final String CURRENT_MONITORED_TOOL_SESSION 			="currentMonitoredToolSession";
     public static final String SELECTION_CASE							="selectionCase";
-    
-    public static final String MONITORED_OFFLINE_INSTRUCTIONS			="monitoredOfflineInstructions";
-    public static final String MONITORED_ONLINE_INSTRUCTIONS			="monitoredOnlineInstructions";
-    public static final String MONITORING_INSTRUCTIONS_UPDATE_MESSAGE	="monitoringInstructionsUpdateMessage";
     public static final String LIST_MONITORED_ANSWERS_CONTAINER_DTO		="listMonitoredAnswersContainerDto";
-    
-    /*
-     * Monitor and Learning common constants - used in jsp reporting
-     */
-    public static final String FULLNAME									="fullName";
-    public static final String ANSWER									="answer";
-    public static final String ATIME									="aTime";
-    public static final String FORMATTED_ATIME							="formattedAtime";
-    public static final String RESPONSE_ID								="responseId";
-    public static final String RESPONSE_HIDDEN							="responseHidden";
-    public static final String CURRENTLEARNER_FULLNAME					="currentLearnerFullname";
-    public static final String ATTR_USERDATA 							="qa_user";
     public static final String TIMEZONE									="timeZone";
-    public static final String TIMEZONE_ID								="timeZoneId";
     
     /*
      * following tell whether author prefers to  have the questions listed all in one page or listed sequentially. The default is all in one page.
@@ -328,14 +241,28 @@ public interface McAppConstants {
     public static final String QUESTION_LISTING_MODE_SEQUENTIAL			="questionListingModeSequential";
     public static final String QUESTION_LISTING_MODE_COMBINED			="questionListingModeCombined";
     
-    public static final String FEEDBACK_TYPE_SEQUENTIAL					="You will be presented a total of : ";
-    public static final String FEEDBACK_TYPE_COMBINED					="You are being presented a total of : ";
-    public static final String QUESTIONS								=" questions.";
-
     /*
-     * constants redundant for the moment
+     * use exception constants
      */
-    public static final String DISPLAY_QUESTIONS 						="display";
-    public static final String SUBMIT_QUESTIONS 						="submit";
-    public static final String VIEW_INDIVIDUAL_SUMMARY 					="view";
+    public static final String USER_EXCEPTION_WRONG_FORMAT				="userExceptionWrongFormat";
+    public static final String USER_EXCEPTION_UNCOMPATIBLE_IDS      	="userExceptionUncompatibleIds";
+    public static final String USER_EXCEPTION_NUMBERFORMAT  	    	="userExceptionNumberFormat";
+    public static final String USER_EXCEPTION_CONTENT_DOESNOTEXIST		="userExceptionContentDoesNotExist";
+    public static final String USER_EXCEPTION_TOOLSESSION_DOESNOTEXIST	="userExceptionToolSessionDoesNotExist";
+    public static final String USER_EXCEPTION_CONTENTID_REQUIRED		="userExceptionContentIdRequired";
+    public static final String USER_EXCEPTION_TOOLSESSIONID_REQUIRED	="userExceptionToolSessionIdRequired";
+    public static final String USER_EXCEPTION_DEFAULTCONTENT_NOT_AVAILABLE 			="userExceptionDefaultContentNotAvailable";
+    public static final String USER_EXCEPTION_DEFAULTQUESTIONCONTENT_NOT_AVAILABLE 	="userExceptionDefaultQuestionContentNotAvailable";
+    public static final String USER_EXCEPTION_DEFAULTOPTIONSCONTENT_NOT_AVAILABLE 	="userExceptionDefaultOptionsContentNotAvailable";
+    
+    public static final String USER_EXCEPTION_USERID_NOTAVAILABLE		="userExceptionUserIdNotAvailable";
+    public static final String USER_EXCEPTION_USERID_NOTNUMERIC			="userExceptionUserIdNotNumeric";
+    public static final String USER_EXCEPTION_ONLYCONTENT_ANDNOSESSIONS ="userExceptionOnlyContentAndNoSessions";
+    public static final String USER_EXCEPTION_USERID_EXISTING			="userExceptionUserIdExisting";
+    public static final String USER_EXCEPTION_USER_DOESNOTEXIST			="userExceptionUserDoesNotExist";
+    public static final String USER_EXCEPTION_MONITORINGTAB_CONTENTID_REQUIRED	="userExceptionMonitoringTabContentIdRequired";
+    public static final String USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP	="userExceptionDefaultContentNotSetup";
+    public static final String USER_EXCEPTION_NO_TOOL_SESSIONS			="userExceptionNoToolSessions";
+    public static final String USER_EXCEPTION_NO_STUDENT_ACTIVITY		="userExceptionNoStudentActivity";
+    public static final String USER_EXCEPTION_MODE_REQUIRED				="userExceptionModeRequired";
 }
