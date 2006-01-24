@@ -46,9 +46,10 @@ class org.lamsfoundation.lams.common.ws.WorkspaceView extends AbstractView {
 	   _workspaceController = getController();
 	   switch (event.updateType){
             case 'CREATE_DIALOG' :
-                createWorkspaceDialogOpen(event.data.pos,event.data.callBack);
+                createWorkspaceDialog(event.data.pos,event.data.tabToSelect);
                 break;
 			
+			break;
             default :
                 Debugger.log('unknown update type :' + event.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.WorkspaceView');
 		}
@@ -60,7 +61,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceView extends AbstractView {
     * @param    pos - Position, either 'centre' or an object containing x + y coordinates
     * @param    callback - The function to call and pass the selectedID to
     */
-    public function createWorkspaceDialogOpen(pos:Object,callBack:Function){
+    public function createWorkspaceDialog(pos:Object){
         var dialog:MovieClip;
         //Check to see whether this should be a centered or positioned dialog
         if(typeof(pos)=='string'){
@@ -72,7 +73,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceView extends AbstractView {
 		Debugger.log('_workspaceController:'+_workspaceController,4,'createWorkspaceDialogOpen','WorkspaceView');
         //Assign dialog load handler
         dialog.addEventListener('contentLoaded',Delegate.create(_workspaceController,_workspaceController.openDialogLoaded));
-		okClickedCallback = callBack;
+		
     }
 	
 

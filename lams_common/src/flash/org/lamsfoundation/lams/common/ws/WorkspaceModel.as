@@ -15,10 +15,19 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 	//this is hte inital data
 	//private var _workspaceData:Object;
 	
-	//this contains refs to the tree nodes stored by resourceID
-	private var _workspaceResources:Hashtable;
+	
+	private var _workspaceResources:Hashtable;				//this contains refs to the tree nodes stored by resourceID
+	private var _accessibleWorkspaceFoldersDTOCopy:Object; // this is used so we can start again after we kill the cache
+	
 	//this is the dartaprovider for the tree
 	private var _treeDP:XML;
+
+	private var _selectedTreeNode:XMLNode;
+	
+	private var _currentTab:String; //tells us which tab should be displayed - LOCATION or PROPERTIES
+	private var _defaultTab:String;
+	private var _currentMode:String; //Tells us which mode the dialogue should be in - SAVE, SAVEAS, OPEN...
+	
 
 	
 	
@@ -35,21 +44,50 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
         EventDispatcher.initialize(this);
 		_workspace = w;
 		_workspaceResources = new Hashtable();
+		_defaultTab = "LOCATION";
 		
 		
 	}	
 	
 	
+	/**
+	 * Open the workspace dialog in the centre of the screen
+	 * Pass in the function to be called when a design is selected??
+	 * @usage   
+	 * @return  
+	 */
 	public function openDesignBySelection(){
-		//Open the workspace dialog in the centre of the screen
-		//Pass in the function to be called when a design is selected
+		
         //workspaceView.createWorkspaceDialogOpen('centre',Delegate.create(this,itemSelected));
 		
 		var dto:Object = {};
 		dto.pos='centre';
 		Debugger.log('_workspace.itemSelected:'+_workspace.itemSelected,Debugger.GEN,'openDesignBySelection','WorkspaceModel');
-		dto.callback=Delegate.create(_workspace,_workspace.itemSelected);
 		broadcastViewUpdate('CREATE_DIALOG',dto);
+		
+	}
+	
+	/**
+	 * Pops up a dialogue with inputs to set the meta data for the design.
+	 * @usage   
+	 * @param   _ddm        
+	 * @param   tabToSelect 
+	 * @return  
+	 */
+	public function userSetDesignProperties(tabToSelect:String){
+		_currentTab = tabToSelect;
+		var dto:Object = {};
+		dto.pos='centre';
+		broadcastViewUpdate('CREATE_DIALOG',dto);
+		
+		
+	}
+	
+	public function showTab(tabToSelect:String){
+		if(tabToSelect == undefined){
+			tabToSelect = _defaultTab;
+		}
+		broadcastViewUpdate('SHOW_TAB',tabToSelect);
 		
 	}
 	
@@ -63,18 +101,20 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 	
 	
 	/**
-    * Notify registered listeners that a data model change has happened
+    * Notify registered listeners that a data model change has happened.
+	* Note - Both the VorkspaceView and the WorkspaceDialog are listening (so careful what you say!)
+	* @param   _updateType = the string identifier of this type of update, allows the listener to dispatch to correct function
+	* @param   _data = the data to be sent to the view handler
     */
     public function broadcastViewUpdate(_updateType,_data){
         dispatchEvent({type:'viewUpdate',target:this,updateType:_updateType,data:_data});
-        trace('broadcast');
     }
 	
 	/**
 	 * Converts the de-serialised WDDX XML from an object into 
 	 * an xml format the tree likes
 	 * This is parsing data from the call to getAccessibleWOrkspaceFolders, so we know that all the
-	 * elements must be folders, as such we must set isBranch to be true;
+	 * elements must be folders, as such we must set isBranch to be true; Also some other minor hacks to make the data match what we get with getFodlerContents()
 	 * @usage   
 	 * @param   dto - contains:		
 	 * PRIVATE The folder which belongs to the given User
@@ -82,6 +122,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 	 * ORGANISATIONS List of folders (root folder only) which belong to organizations of which user is a member
 	 */
 	public function parseDataForTree(dto:Object):Void{
+		_accessibleWorkspaceFoldersDTOCopy = dto;
 		_treeDP = new XML();
 		//add top level
 		_treeDP.addTreeNode("My Workspace",0);
@@ -92,20 +133,30 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 				
 		var privateNode:XMLNode = fChild.addTreeNode("Private",dto.PRIVATE);
 		privateNode.attributes.isBranch = true;
+		
+		//copy folderID to resourceID to match what the other call to getFolderCOntents does
+		privateNode.attributes.data.resourceID = dto.PRIVATE.workspaceFolderID;
+		//add a resource type@
+		privateNode.attributes.data.resourceType = "Folder"; 
+		Debugger.log('privateNode.attributes.data.resourceID:'+privateNode.attributes.data.resourceID,Debugger.GEN,'openResourceInTree','org.lamsfoundation.lams.WorkspaceModel');
 		//privateNode.attributes.data = dto.PRIVATE;
 		_workspaceResources.put(dto.PRIVATE.workspaceFolderID,privateNode);
 				
-		
+		/*
 		var runNode:XMLNode = fChild.addTreeNode("Run Sequences",dto.RUN_SEQUENCES);
 		runNode.attributes.isBranch = true;
+		
+		privateNode.attributes.data.resourceID = dto.RUN_SEQUENCES.workspaceFolderID;
 		//runNode.attributes.data = dto.RUN_SEQUENCES;
 		_workspaceResources.put(dto.RUN_SEQUENCES.workspaceFolderID,runNode);
-		
+		*/
 		
 		for(var i=0;i<dto.ORGANISATIONS.length;i++){
 			var n = dto.ORGANISATIONS[i];
 			var nNode:XMLNode = orgNode.addTreeNode(n.name,n);
 			nNode.attributes.isBranch = true;
+			
+			nNode.attributes.data.resourceID = n.workspaceFolderID;
 			//nNode.attributes.data = n;
 			_workspaceResources.put(n.workspaceFolderID,nNode);
 			
@@ -144,6 +195,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 		if(_workspaceResources.get(resourceToOpen).attributes.data.contents == undefined){
 			Debugger.log('Requesting...',Debugger.GEN,'openResourceInTree','org.lamsfoundation.lams.WorkspaceModel');
 			//get that resource
+			//TODO: Waiting ofr bqack end to fix up the problems with DB -
 			_workspace.requestFolderContents(resourceToOpen);
 			
 	
@@ -166,7 +218,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 	 */
 	public function setFolderContents(dto:Object){
 		var nodeToUpdate:XMLNode;
-		Debugger.log('dto.workspaceFolderID:'+dto.workspaceFolderID,Debugger.GEN,'setFolderContents','org.lamsfoundation.lams.WorkspaceModel');
+		Debugger.log('dto.workspaceFolderID:'+dto.workspaceFolderID+', parentWorkspaceFolderID:'+dto.parentWorkspaceFolderID,Debugger.GEN,'setFolderContents','org.lamsfoundation.lams.WorkspaceModel');
 		//_global.breakpoint();
 		if(_workspaceResources.containsKey(dto.workspaceFolderID)){
 			nodeToUpdate = _workspaceResources.get(dto.workspaceFolderID);
@@ -181,11 +233,18 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 		
 		for(var i=0; i<dto.contents.length; i++){
 			var cNode = nodeToUpdate.addTreeNode(dto.contents[i].name,dto.contents[i]);
+			cNode.attributes.data.parentWorkspaceFolderID = dto.parentWorkspaceFolderID;
+			//workspaceFolderID should always be the ID of the folder this resource is contained in
+			cNode.attributes.data.workspaceFolderID = dto.workspaceFolderID;
 			//check if its a folder
 			if(dto.contents[i].resourceType=="Folder"){
 				cNode.attributes.isBranch=true;
 				//copy the resourceID to folderID
-				cNode.attributes.data.workspaceFolderID=dto.contents[i].resourceID;
+				//thisnk there is no need for this line! it might be wrong./.
+				//cNode.attributes.data.workspaceFolderID=dto.contents[i].resourceID;
+				
+			}else{
+				
 			}
 			Debugger.log('Adding new node to _workspaceResources ID :'+dto.contents[i].resourceID,Debugger.GEN,'setFolderContents','org.lamsfoundation.lams.WorkspaceModel');
 			_workspaceResources.put(dto.contents[i].resourceID,cNode);
@@ -196,6 +255,18 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 		
 		
 		
+	}
+	
+	/**
+	 * Clears the store of workspace resources - 
+	 * prob could make more granular by passing in a folder ID to clearTODO:
+	 * @usage   
+	 * @return  
+	 */
+	public function clearWorkspaceCache(){
+		_workspaceResources = new Hashtable();
+		//set up the inital folders again.. use the copy from startup time
+		parseDataForTree(_accessibleWorkspaceFoldersDTOCopy);
 	}
 	
 	//getts n setters
@@ -272,8 +343,61 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 		return _workspace;
 	}
 	
+	/**
+	 * 
+	 * @usage   
+	 * @param   newselectedTreeNode 
+	 * @return  
+	 */
+	public function setSelectedTreeNode (newselectedTreeNode:XMLNode):Void {
+		_selectedTreeNode = newselectedTreeNode;
+		//dispatch an update to the view
+		broadcastViewUpdate('ITEM_SELECTED',_selectedTreeNode);
+	}
+	/**
+	 * 
+	 * @usage   
+	 * @return  
+	 */
+	public function getSelectedTreeNode ():XMLNode {
+		return _selectedTreeNode;
+	}
 
+	/**
+	 * 
+	 * @usage   
+	 * @param   newcurrentTab 
+	 * @return  
+	 */
+	public function set currentTab (newcurrentTab:String):Void {
+		_currentTab = newcurrentTab;
+	}
+	/**
+	 * 
+	 * @usage   
+	 * @return  
+	 */
+	public function get currentTab ():String {
+		return _currentTab;
+	}
 	
-	
+	/**
+	 * 
+	 * @usage   
+	 * @param   newcurrentMode 
+	 * @return  
+	 */
+	public function set currentMode (newcurrentMode:String):Void {
+		_currentMode = newcurrentMode;
+	}
+	/**
+	 * 
+	 * @usage   
+	 * @return  
+	 */
+	public function get currentMode ():String {
+		return _currentMode;
+	}
+
 
 }

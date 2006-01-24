@@ -16,6 +16,9 @@ class org.lamsfoundation.lams.common.ws.Workspace {
 	//View
 	private var workspaceView:WorkspaceView;
 
+	private var _onOKCallBack:Function;
+	
+
 	/**
 	 * workspace Constructor
 	 *
@@ -65,7 +68,8 @@ class org.lamsfoundation.lams.common.ws.Workspace {
 	public function requestFolderContents(folderID:Number):Void{
 		var callback:Function = Proxy.create(this,recievedFolderContents);
         var uid:Number = Config.getInstance().userID;
-		Application.getInstance().getComms().getRequest('workspace.do?method=getFolderContents&folderID='+folderID+'&mode='+Config.getInstance().mode+'&userID='+uid,callback, false);
+		//Application.getInstance().getComms().getRequest('workspace.do?method=getFolderContents&folderID='+folderID+'&mode='+Config.getInstance().mode+'&userID='+uid,callback, false);
+		Application.getInstance().getComms().getRequest('workspace.do?method=getFolderContentsExcludeHome&folderID='+folderID+'&mode='+Config.getInstance().mode+'&userID='+uid,callback, false);
 		
 	}
 	
@@ -104,17 +108,66 @@ class org.lamsfoundation.lams.common.ws.Workspace {
     * This is the method called when the user opens a design
     * 
     */
-    public function userSelectItem(){
+    public function userSelectItem(callback){
+		_onOKCallBack = callback;
+		//var fn:Function = Delegate.create(this,itemSelected);
+		workspaceModel.currentMode = "OPEN";
 		workspaceModel.openDesignBySelection();
     }
+	
+	/**
+	 * Shows the workspace browsing dialoge to set a design;s properties
+	 * Usually used for saving a design by the canvas.
+	 * @usage   
+	 * @param   _ddm         The design in question
+	 * @param   tabToSelect  The tab to show, can be: SAVE_AS, PROPERTIES, 
+	 * @param   onOkCallback The function to call when the user clicks OK.
+	 * @return  
+	 */
+	public function setDesignProperties(tabToSelect:String,onOKCallback):Void{
+		_onOKCallBack = onOKCallback;
+		workspaceModel.currentMode = "SAVEAS";
+		workspaceModel.userSetDesignProperties(tabToSelect,onOKCallback);
+		
+	}
     
     /**
     * Called when design has been selected from within the workspace dialog, inovked via callback method.
     */
     public function itemSelected(designId:Number){
         Debugger.log('!!designID:'+designId,Debugger.GEN,'itemSelected','org.lamsfoundation.lams.Workspace');
-
+		_onOKCallBack(designId);
         //Design has been chosen, get Canvas to open design
-        Application.getInstance().getCanvas().openDesignById(designId);
+        //Application.getInstance().getCanvas().openDesignById(designId);
     }
+	
+	public function getDefaultWorkspaceID():Number{
+		return workspaceModel.workspaceID;
+	}
+	
+	public function getDefaultRootFolderID():Number{
+		return workspaceModel.rootFolderID;
+	}
+	
+	/**
+	 * 
+	 * @usage   
+	 * @param   newonOKCallback 
+	 * @return  
+	 */
+	public function set onOKCallback (newonOKCallback:Function):Void {
+		_onOKCallBack = newonOKCallback;
+	}
+	/**
+	 * 
+	 * @usage   
+	 * @return  
+	 */
+	public function get onOKCallback ():Function {
+		return _onOKCallBack;
+	}
+	
+	
+	
+	
 }

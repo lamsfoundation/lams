@@ -6,10 +6,9 @@ import org.lamsfoundation.lams.common.ws.*
 import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.common.dict.*
 import org.lamsfoundation.lams.common.style.*
-import it.sephiroth.XML2Object
-
+import org.lamsfoundation.lams.common.ui.*
 /**
-* @author      DI
+* @author      DI & DC
 */
 class WorkspaceDialog extends MovieClip{
  
@@ -21,17 +20,31 @@ class WorkspaceDialog extends MovieClip{
     private var ok_btn:Button;              //OK+Cancel buttons
     private var cancel_btn:Button;
     private var panel:MovieClip;            //The underlaying panel base
-    private var treeview:Tree;              //Treeview for navigation through workspace folder structure
-    private var datagrid:DataGrid;          //The details grid
-    private var myLabel_lbl:Label;          //Text labels
-    private var input_txt:TextInput;        //Text labels
-    private var combo:ComboBox;             //Text labels
     
+	private var location_btn:Button;
+    private var properties_btn:Button;
+	
+	//location tab elements
+	private var treeview:Tree;              //Treeview for navigation through workspace folder structure
+	private var input_txt:TextInput;
+	private var currentPath_lbl:Label;
+	private var name_lbl:Label;
+	private var resourceTitle_txi:TextInput;
+	
+	//properties
+	private var description_lbl:Label;
+	private var license_lbl:Label;
+    private var resourceDesc_txa:TextArea;
+    private var license_txa:TextArea;
+    private var licenseID_cmb:ComboBox;
+	
+	
+	
     private var fm:FocusManager;            //Reference to focus manager
     private var themeManager:ThemeManager;  //Theme manager
 	
 	private var _workspaceView:WorkspaceView;
-
+	private var _workspaceModel:WorkspaceModel;
 
     
     //Dimensions for resizing
@@ -40,7 +53,9 @@ class WorkspaceDialog extends MovieClip{
     private var xCancelOffset:Number;
     private var yCancelOffset:Number;
     
-    private var _okCallBack:Function;
+	private var _resultDTO:Object;			//This is an object to contain whatever the user has selected / set - will be passed back to the calling function
+	
+
     private var _selectedDesignId:Number;
     
     //These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
@@ -56,7 +71,7 @@ class WorkspaceDialog extends MovieClip{
         //trace('WorkSpaceDialog.constructor');
         //Set up this class to use the Flash event delegation model
         EventDispatcher.initialize(this);
-        
+        _resultDTO = new Object();
         //Create a clip that will wait a frame before dispatching init to give components time to setup
         this.onEnterFrame = init;
     }
@@ -67,25 +82,24 @@ class WorkspaceDialog extends MovieClip{
 	private function init(){
         //Delete the enterframe dispatcher
         delete this.onEnterFrame;
-        
-        //TODO DI 25/05/05 ID set as 1 is just a stub, selected id from dialog should replace
-        //_selectedDesignId = 1;
-        
-       
+		//TODO: DC apply the themes here
         
         //set the reference to the StyleManager
         themeManager = ThemeManager.getInstance();
         
         //Set the container reference
-        Debugger.log('container=' + _container,Debugger.GEN,'init','org.lamsfoundation.lams.wsDialog');
+        Debugger.log('container=' + _container,Debugger.GEN,'init','org.lamsfoundation.lams.WorkspaceDialog');
 
         //Set the text on the labels
-        myLabel_lbl.text = 'Enter the ID of the design you want to open:';
+        
         
         //Set the text for buttons
+		location_btn.label = Dictionary.getValue('ws_dlg_location_button');
+		properties_btn.label = Dictionary.getValue('ws_dlg_properties_button');
         ok_btn.label = Dictionary.getValue('ws_dlg_ok_button');
         cancel_btn.label = Dictionary.getValue('ws_dlg_cancel_button');
-        
+		
+
         //get focus manager + set focus to OK button, focus manager is available to all components through getFocusManager
         fm = _container.getFocusManager();
         fm.enabled = true;
@@ -97,6 +111,8 @@ class WorkspaceDialog extends MovieClip{
         //Add event listeners for ok, cancel and close buttons
         ok_btn.addEventListener('click',Delegate.create(this, ok));
         cancel_btn.addEventListener('click',Delegate.create(this, cancel));
+		location_btn.addEventListener('click',Delegate.create(this, showLocationTab));
+		properties_btn.addEventListener('click',Delegate.create(this, showPropertiesTab));
         //Tie parent click event (generated on clicking close button) to this instance
         _container.addEventListener('click',this);
         //Register for LFWindow size events
@@ -143,26 +159,32 @@ class WorkspaceDialog extends MovieClip{
 	 * @param   event
 	 */
 	public function viewUpdate(event:Object):Void{
-		Debugger.log('Recived an Event dispather UPDATE!, updateType:'+event.updateType+', target'+event.target,4,'viewUpdate','WorkspaceView');
+		Debugger.log('Recived an Event dispather UPDATE!, updateType:'+event.updateType+', target'+event.target,4,'viewUpdate','org.lamsfoundation.lams.ws.WorkspaceDialog');
 		 //Update view from info object
         //Debugger.log('Recived an UPDATE!, updateType:'+infoObj.updateType,4,'update','CanvasView');
        var wm:WorkspaceModel = event.target;
-	   //set a ref to the controller for ease (sorry mvc guru)
+	   //set a permenent ref to the model for ease (sorry mvc guru)
+	   _workspaceModel = wm;
 	  
 	   switch (event.updateType){
 
 			case 'REFRESH_TREE' :
                 refreshTree(event.data,wm);
                 break;
-           
+			case 'ITEM_SELECTED' :
+				itemSelected(event.data,wm);
+				break;
+			case 'SHOW_TAB' :
+				showTab(event.data,wm);
+				break;
             default :
-                Debugger.log('unknown update type :' + event.updateType,Debugger.GEN,'viewUpdate','org.lamsfoundation.lams.WorkspaceDialog');
+                Debugger.log('unknown update type :' + event.updateType,Debugger.GEN,'viewUpdate','org.lamsfoundation.lams.ws.WorkspaceDialog');
 		}
 
 	}
 	
-	public function refreshTree(changedNode:XMLNode,wm:WorkspaceModel){
-		 Debugger.log('Refreshing tree....:' ,Debugger.GEN,'refreshTree','org.lamsfoundation.lams.WorkspaceDialog');
+	private function refreshTree(changedNode:XMLNode,wm:WorkspaceModel){
+		 Debugger.log('Refreshing tree....:' ,Debugger.GEN,'refreshTree','org.lamsfoundation.lams.ws.WorkspaceDialog');
 		 //we have to set the new nodes to be branches, if they are branches
 		if(changedNode.attributes.isBranch){
 			treeview.setIsBranch(changedNode,true);
@@ -176,6 +198,78 @@ class WorkspaceDialog extends MovieClip{
 		}
 		 
 		 treeview.refresh();
+	}
+	
+	private function itemSelected(newSelectedNode:XMLNode,wm:WorkspaceModel){
+		//update the UI with the new info:
+		//_global.breakpoint();
+		//Only update the details if the node if its a resource:a
+		var nodeData = newSelectedNode.attributes.data;
+		if(nodeData.resourceType == "Folder"){
+			resourceTitle_txi.text = nodeData.name;
+			resourceDesc_txa.text = nodeData.description;
+			
+			//TODO These Items must also be in the FolderContentsDTO
+			/*
+			license_txa.text = ;
+			licenseID_cmb.value = ;
+			*/
+			
+		}
+		
+	}
+	
+	private function setLocationContentVisible(v:Boolean){
+		Debugger.log('v:'+v,Debugger.GEN,'setLocationContentVisible','org.lamsfoundation.lams.ws.WorkspaceDialog');
+		treeview.visible = v;
+		input_txt.visible = v;
+		currentPath_lbl.visible = v;
+		name_lbl.visible = v;
+		resourceTitle_txi.visible = v;
+		
+	
+	}
+	
+	private function setPropertiesContentVisible(v:Boolean){
+		Debugger.log('v:'+v,Debugger.GEN,'setPropertiesContentVisible','org.lamsfoundation.lams.ws.WorkspaceDialog');
+		description_lbl.visible = v;
+		license_lbl.visible = v;
+		resourceDesc_txa.visible = v;
+		license_txa.visible = v;
+		
+		
+	}
+	
+		
+	/**
+	 * updates the view to show the right controls for the tab
+	 * @usage   
+	 * @param   tabToSelect 
+	 * @param   wm          
+	 * @return  
+	 */
+	private function showTab(tabToSelect:String,wm:WorkspaceModel){
+		Debugger.log('tabToSelect:'+tabToSelect,Debugger.GEN,'showTab','org.lamsfoundation.lams.ws.WorkspaceDialog');
+		if(tabToSelect == "LOCATION"){
+			setLocationContentVisible(true);
+			setPropertiesContentVisible(false);
+			//set the right label on the 'doit' button
+			if(wm.currentMode=="OPEN"){
+				ok_btn.label = Dictionary.getValue('ws_dlg_open_btn');
+			}else if(wm.currentMode=="SAVE" || wm.currentMode=="SAVEAS"){
+				ok_btn.label = Dictionary.getValue('ws_dlg_save_btn');
+			}else{
+				Debugger.log('Dont know what mode the Workspace is in!',Debugger.CRITICAL,'showTab','org.lamsfoundation.lams.ws.WorkspaceDialog');
+				ok_btn.label = Dictionary.getValue('ws_dlg_ok_btn');
+			}
+				
+				
+		}else if(tabToSelect == "PROPERTIES"){
+			setLocationContentVisible(false);
+			setPropertiesContentVisible(true);
+			
+			ok_btn.label = Dictionary.getValue('ws_dlg_ok_btn');
+		}
 	}
 	
 	
@@ -211,7 +305,7 @@ class WorkspaceDialog extends MovieClip{
         
         //Get label style and apply to label
         styleObj = themeManager.getStyleObject('label');
-        myLabel_lbl.setStyle('styleName',styleObj);
+        //myLabel_lbl.setStyle('styleName',styleObj);
 
         //Apply treeview style 
         styleObj = themeManager.getStyleObject('treeview');
@@ -219,12 +313,14 @@ class WorkspaceDialog extends MovieClip{
 
         //Apply datagrid style 
         styleObj = themeManager.getStyleObject('datagrid');
-        datagrid.setStyle('styleName',styleObj);
+        //datagrid.setStyle('styleName',styleObj);
 
+/*
         //Apply combo style 
         styleObj = themeManager.getStyleObject('combo');
         combo.setStyle('styleName',styleObj);
-    }
+  */
+  }
 
     /**
     * Called by the cancel button 
@@ -236,17 +332,96 @@ class WorkspaceDialog extends MovieClip{
     }
     
     /**
-    * Called by the OK button 
-    */
+    * Called by the OK button
+	* Dispatches the okClicked event and passes a result DTO containing:
+	* <code>
+	*	_resultDTO.selectedResourceID 	//The ID of the resource that was selected when the dialogue closed
+	*	_resultDTO.resourceName 		//The contents of the Name text field
+	*	_resultDTO.resourceDescription 	//The contents of the description field on the propertirs tab
+	*	_resultDTO.resourceLicenseText 	//The contents of the license text field
+	*	_resultDTO.resourceLicenseID 	//The ID of the selected license from the drop down.
+    *</code>
+	*/
     private function ok(){
         trace('OK');
+		_global.breakpoint();
+		
+		//TODO: Rmeove this code as its been here only for deflopment
 		//set the selectedDesignId
+		/**/
+		if(StringUtils.isNull(input_txt.text)){
+			//get the selected value off the tree
+			var snode = treeview.selectedNode;
+			input_txt.text = snode.attributes.data.resourceID;
+			
+		}
 		_selectedDesignId = Number(input_txt.text);
-       //If validation successful commit + close parent window
-       //Fire callback with selectedId
-       dispatchEvent({type:'okClicked',target:this});
-       _container.deletePopUp();
+		
+		
+		//TODO: Validate you are allowed to use the name etc... Are you overwriting - NOTE Same names are nto allowed in this version
+		
+		var snode = treeview.selectedNode;
+		 Debugger.log('_workspaceModel.currentMode: ' + _workspaceModel.currentMode,Debugger.GEN,'setStyles','org.lamsfoundation.lams.WorkspaceDialog');
+		if(_workspaceModel.currentMode=="SAVE" || _workspaceModel.currentMode=="SAVEAS"){
+			//var rid:Number = Number(snode.attributes.data.resourceID);
+			if(snode.attributes.data.resourceType=="LearningDesign"){
+				//run a confirm dialogue as user is about to overwrite a design!
+				LFMessage.showMessageConfirm("LOOKOUT ABOUT TO OVERWRITE A RESOURCE!", Proxy.create(this,doWorkspaceDispatch,true), Proxy.create(this,closeThisDialogue));
+	
+			}else if (snode.attributes.data.resourceType=="Folder"){
+				doWorkspaceDispatch(false);
+			}else{
+				LFMessage.showMessageAlert("__Please click on either a Folder to save in, or a Design to overwrite__",null);
+			}
+		}else{
+			doWorkspaceDispatch(true);
+		}
+		
     }
+	
+	
+	
+	public function doWorkspaceDispatch(useResourceID:Boolean){
+		//ObjectUtils.printObject();
+		var snode = treeview.selectedNode;
+		
+		if(useResourceID){
+			_resultDTO.selectedResourceID = Number(snode.attributes.data.resourceID);
+			
+		}else{
+			_resultDTO.selectedResourceID  = null;
+			
+		}
+		_resultDTO.targetWorkspaceFolderID = Number(snode.attributes.data.resourceID);
+		_resultDTO.resourceName = resourceTitle_txi.text;
+		_resultDTO.resourceDescription = resourceDesc_txa.text;
+		_resultDTO.resourceLicenseText = license_txa.text;
+		_resultDTO.resourceLicenseID = licenseID_cmb.value;
+		
+
+        dispatchEvent({type:'okClicked',target:this});
+	   
+        closeThisDialogue();
+		
+	}
+	
+	public function closeThisDialogue(){
+		 _container.deletePopUp();
+	}
+	
+	
+	//TODO: maan must be able to just send a single event type and detect the name od the button
+	
+	private function showLocationTab(){
+		
+		//send to wsp controller
+		dispatchEvent({type:'locationTabClick',target:this});
+	}
+	
+	private function showPropertiesTab(){
+		
+		dispatchEvent({type:'propertiesTabClick',target:this});
+	}
     
     /**
     * Event dispatched by parent container when close button clicked
@@ -264,12 +439,18 @@ class WorkspaceDialog extends MovieClip{
 	 * @return  
 	 */
     private function setBranches(node:XMLNode){
-		if(node.hasChildNodes()){
+		if(node.hasChildNodes() || node.attributes.isBranch){
 			treeview.setIsBranch(node, true);
 			for (var i = 0; i<node.childNodes.length; i++) {
 				var cNode = node.getTreeNodeAt(i);
-				treeview.setIsBranch(cNode, true);
 				setBranches(cNode);
+				/*
+				if(cNode.hasChildNodes()){
+					treeview.setIsBranch(cNode, true);
+					setBranches(cNode);
+				}
+				*/
+				
 			}
 		}
 	}
@@ -285,8 +466,6 @@ class WorkspaceDialog extends MovieClip{
 	 */
 	private function setUpTreeview(){
 			
-		var converter:XML2Object = new XML2Object();
-	
 		//Debugger.log('_workspaceView:'+_workspaceView,Debugger.GEN,'setUpTreeview','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
 		treeview.dataProvider = WorkspaceModel(_workspaceView.getModel()).treeDP;
 		
@@ -340,6 +519,8 @@ class WorkspaceDialog extends MovieClip{
 		
 		treeview.addEventListener("nodeOpen", Delegate.create(wsc, wsc.onTreeNodeOpen));
 		treeview.addEventListener("nodeClose", Delegate.create(wsc, wsc.onTreeNodeClose));
+		treeview.addEventListener("change", Delegate.create(wsc, wsc.onTreeNodeChange));
+		
 		treeview.refresh();
 		
     }
@@ -407,4 +588,14 @@ class WorkspaceDialog extends MovieClip{
     function get selectedDesignId():Number { 
         return _selectedDesignId;
     }
+	
+	
+	/**
+	 * 
+	 * @usage   
+	 * @return  
+	 */
+	public function get resultDTO():Object {
+		return _resultDTO;
+	}
 }
