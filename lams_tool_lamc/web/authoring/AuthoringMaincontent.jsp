@@ -84,7 +84,7 @@
 	<html:hidden property="dispatch"/>
 	
 	<div id='content_b' class="tabbody content_b" >
-				<c:if test="${ sessionScope.activeModule != 'defineLater')  }"> 			
+				<c:if test="${sessionScope.activeModule != 'defineLater'}"> 			
 					<h2><bean:message key="label.authoring.mc.basic"/></h2>	
 				</c:if> 				
 				
