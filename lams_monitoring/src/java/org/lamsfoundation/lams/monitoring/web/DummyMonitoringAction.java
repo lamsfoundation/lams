@@ -208,11 +208,11 @@ public class DummyMonitoringAction extends LamsDispatchAction
 
         // start the lesson.
         this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(new Date());
-        cal.add(Calendar.MILLISECOND,5000);
-        monitoringService.startLessonOnSchedule(testLesson.getLessonId().longValue(),cal.getTime());
-//        monitoringService.startLesson(testLesson.getLessonId().longValue());
+//        Calendar cal = Calendar.getInstance();
+//        cal.setTime(new Date());
+//        cal.add(Calendar.MILLISECOND,5000);
+//        monitoringService.startLessonOnSchedule(testLesson.getLessonId().longValue(),cal.getTime());
+        monitoringService.startLesson(testLesson.getLessonId().longValue());
 
     	return mapping.findForward(LESSON_STARTED_FORWARD);
     }
@@ -242,6 +242,11 @@ public class DummyMonitoringAction extends LamsDispatchAction
         this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
 
         long lessonId = WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID);
+//	    Calendar cal = Calendar.getInstance();
+//		cal.setTime(new Date());
+//		cal.add(Calendar.MILLISECOND, 5000);
+//		monitoringService.finishLessonOnSchedule(lessonId,cal.getTime());
+
         monitoringService.archiveLesson(lessonId);
 
         return unspecified(mapping, form, request, response);

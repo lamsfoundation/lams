@@ -20,7 +20,10 @@
  */
 package org.lamsfoundation.lams.monitoring.service;
 
+import java.util.Map;
+
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.monitoring.MonitoringConstants;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.scheduling.quartz.QuartzJobBean;
@@ -29,7 +32,7 @@ public class FinishScheduleLesson extends QuartzJobBean{
     //---------------------------------------------------------------------
     // Instance variables
     //---------------------------------------------------------------------
-	private static Logger log = Logger.getLogger(OpenScheduleGateJob.class);
+	private static Logger log = Logger.getLogger(FinishScheduleLesson.class);
     private IMonitoringService monitoringService;
     
     //---------------------------------------------------------------------
@@ -43,6 +46,18 @@ public class FinishScheduleLesson extends QuartzJobBean{
         this.monitoringService = monitoringService;
     }
     
-	protected void executeInternal(JobExecutionContext arg0) throws JobExecutionException {
+	protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
+        //getting gate id set from scheduler
+        Map properties = context.getJobDetail().getJobDataMap();
+        long lessonId = ((Long)properties.get(MonitoringConstants.KEY_LESSON_ID)).longValue();
+        
+        if(log.isDebugEnabled())
+            log.debug("Lesson ["+lessonId+"] is stopping...");
+        
+		
+		monitoringService.archiveLesson(lessonId);
+        
+        if(log.isDebugEnabled())
+            log.debug("Lesson ["+lessonId+"] stopped");
 	}
 }

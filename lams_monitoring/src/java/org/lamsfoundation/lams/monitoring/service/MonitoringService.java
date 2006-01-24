@@ -389,9 +389,10 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         return newLesson;
     }
     /**
-     * Start lesson 
+     * Start lesson on schedule.
      * @param lessonId
-     * @param startDate
+     * @param startDate 
+     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#startLessonOnSchedule(long , Date)
      */
     public void startLessonOnSchedule(long lessonId, Date startDate){
         JobDetail startLessonJob = getStartScheduleLessonJob();
@@ -416,6 +417,36 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         if(log.isDebugEnabled())
             log.debug("Start lesson  ["+lessonId+"] on schedule is configured");
     }
+    
+    /**
+     * Start lesson on schedule.
+     * @param lessonId
+     * @param endDate 
+     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#finishLessonOnSchedule(long , Date)
+     */
+	public void finishLessonOnSchedule(long lessonId, Date endDate) {
+        JobDetail finishLessonJob = getFinishScheduleLessonJob();
+        //setup the message for scheduling job
+        finishLessonJob.setName("finishLessonOnSchedule");
+        finishLessonJob.getJobDataMap().put(MonitoringConstants.KEY_LESSON_ID,new Long(lessonId));
+        //create customized triggers
+        Trigger finishLessonTrigger = new SimpleTrigger("finishLessonOnScheduleTrigger",
+                                                    Scheduler.DEFAULT_GROUP, 
+                                                    endDate);
+        //start the scheduling job
+        try
+        {
+            scheduler.scheduleJob(finishLessonJob, finishLessonTrigger);
+        }
+        catch (SchedulerException e)
+        {
+            throw new MonitoringServiceException("Error occurred at " +
+            		"[finishLessonOnSchedule]- fail to start scheduling",e);
+        }
+        
+        if(log.isDebugEnabled())
+            log.debug("Finish lesson  ["+lessonId+"] on schedule is configured");
+	}
 
 	/**
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#startlesson(long)

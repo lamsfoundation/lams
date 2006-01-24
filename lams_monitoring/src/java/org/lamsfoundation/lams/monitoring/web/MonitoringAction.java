@@ -24,6 +24,9 @@ package org.lamsfoundation.lams.monitoring.web;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.util.Date;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -35,6 +38,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.monitoring.MonitoringConstants;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
@@ -217,6 +221,101 @@ public class MonitoringAction extends LamsDispatchAction
         return outputPacket(mapping,request,response,message,"details");
         
         //return mapping.findForward(SCHEDULER);
+    }
+    /**
+     * The Struts dispatch method that starts a lesson on schedule that has been created
+     * beforehand.
+     * 
+     * @param mapping An ActionMapping class that will be used by the Action class to tell
+     * the ActionServlet where to send the end-user.
+     *
+     * @param form The ActionForm class that will contain any data submitted
+     * by the end-user via a form.
+     * @param request A standard Servlet HttpServletRequest class.
+     * @param response A standard Servlet HttpServletResponse class.
+     * @return An ActionForward class that will be returned to the ActionServlet indicating where
+     *         the user is to go next.
+     * @throws IOException
+     * @throws ServletException
+     * @throws  
+     */
+    public ActionForward startOnScheduleLesson(ActionMapping mapping,
+    		ActionForm form,
+    		HttpServletRequest request,
+    		HttpServletResponse response) throws IOException,
+    		ServletException 
+    		{
+    	this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+    	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+    	String dateStr = WebUtil.readStrParam(request, MonitoringConstants.PARAM_LESSON_START_DATE);
+    	FlashMessage flashMessage = null;
+    	
+    	try {
+    		Date startDate = DateFormat.getInstance().parse(dateStr);
+    		monitoringService.startLessonOnSchedule(lessonId,startDate);
+    		flashMessage = new FlashMessage("startOnScheduleLesson",Boolean.TRUE);
+    	} catch(ParseException e){
+    		flashMessage = new FlashMessage("startOnScheduleLesson",
+    				"Invalid lesson start datetime format:" +  dateStr,
+    				FlashMessage.ERROR);
+    	}catch (Exception e) {
+    		flashMessage = new FlashMessage("startOnScheduleLesson",
+    				"Invalid lessonID :" +  lessonId,
+    				FlashMessage.ERROR);
+    	}
+    	
+    	String message =  flashMessage.serializeMessage();
+    	
+    	return outputPacket(mapping,request,response,message,"details");
+    	
+    	//return mapping.findForward(SCHEDULER);
+    }
+    
+    /**
+     * The Struts dispatch method that finsh a lesson on schedule that has been started
+     * beforehand.
+     * 
+     * @param mapping An ActionMapping class that will be used by the Action class to tell
+     * the ActionServlet where to send the end-user.
+     *
+     * @param form The ActionForm class that will contain any data submitted
+     * by the end-user via a form.
+     * @param request A standard Servlet HttpServletRequest class.
+     * @param response A standard Servlet HttpServletResponse class.
+     * @return An ActionForward class that will be returned to the ActionServlet indicating where
+     *         the user is to go next.
+     * @throws IOException
+     * @throws ServletException
+     * @throws  
+     */
+    public ActionForward finishOnScheduleLesson(ActionMapping mapping,
+    		ActionForm form,
+    		HttpServletRequest request,
+    		HttpServletResponse response) throws IOException,
+    		ServletException 
+    		{
+    	this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+    	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+    	String dateStr = WebUtil.readStrParam(request, MonitoringConstants.PARAM_LESSON_START_DATE);
+    	FlashMessage flashMessage = null;
+    	
+    	try {
+    		Date startDate = DateFormat.getInstance().parse(dateStr);
+    		monitoringService.finishLessonOnSchedule(lessonId,startDate);
+    		flashMessage = new FlashMessage("finishOnScheduleLesson",Boolean.TRUE);
+    	} catch(ParseException e){
+    		flashMessage = new FlashMessage("finishOnScheduleLesson",
+    				"Invalid lesson start datetime format:" +  dateStr,
+    				FlashMessage.ERROR);
+    	}catch (Exception e) {
+    		flashMessage = new FlashMessage("finishOnScheduleLesson",
+    				"Invalid lessonID :" +  lessonId,
+    				FlashMessage.ERROR);
+    	}
+    	
+    	String message =  flashMessage.serializeMessage();
+    	
+    	return outputPacket(mapping,request,response,message,"details");
     }
     
     /**

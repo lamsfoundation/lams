@@ -99,12 +99,19 @@ public interface IMonitoringService
      */
     public void startLesson(long lessonId);
     /**
-     * 
+     * Start a lesson on schedule datetime.
      * @param lessonId
      * @param startDate the lesson start date and time.
      * @see org.lamsfoundation.lams.monitoring.service#startLesson(long)
      */
     public void startLessonOnSchedule(long lessonId, Date startDate);
+    /**
+     * Finish a lesson on schedule datetime.
+     * @param lessonId
+     * @param endDate teh lesson end date and time.
+     */
+    public void finishLessonOnSchedule(long lessonId, Date endDate);
+    
     /**
      * Force the learner to complete all the activities for current lesson.
      * @param learnerProgressId the learner progress belongs to the user who

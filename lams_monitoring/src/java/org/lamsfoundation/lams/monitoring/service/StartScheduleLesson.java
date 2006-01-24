@@ -33,7 +33,7 @@ public class StartScheduleLesson extends QuartzJobBean{
     //---------------------------------------------------------------------
     // Instance variables
     //---------------------------------------------------------------------
-	private static Logger log = Logger.getLogger(OpenScheduleGateJob.class);
+	private static Logger log = Logger.getLogger(StartScheduleLesson.class);
     private IMonitoringService monitoringService;
     
     //---------------------------------------------------------------------
