@@ -1657,8 +1657,8 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 			
 	    	return (mapping.findForward(destination));
 		}
-		
-		
+		request.getSession().setAttribute(PASSMARK, new Integer(passmark).toString());
+				
 		logger.debug("isShowFeedback: " +  mcAuthoringForm.getShowFeedback());
 		if (mcAuthoringForm.getShowFeedback().equalsIgnoreCase(ON))
 			isShowFeedback=true;
