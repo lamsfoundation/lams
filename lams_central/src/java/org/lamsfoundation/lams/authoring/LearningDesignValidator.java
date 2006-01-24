@@ -14,45 +14,57 @@ import java.util.Set;
 import java.util.Vector;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 
+/**
+ * The LearningDesignValidator class contains methods which applies validation rules
+ * to determine the validity of a learning design. For the validation rules, please
+ * see the AuthoringDesignDoc in lams_documents.
+ * 
+ * If no errors are found, a learning design is considered valid, it will set the valid_design_flag to true.
+ * If validation fails, the validation messages will be returned in the response packet. The validation
+ * messages are a list of ValidationErrorDTO objects.
+ * 
+ * @author mtruong
+ *
+ */
 public class LearningDesignValidator {
 	
-	protected Logger log = Logger.getLogger(LearningDesignValidator.class);
+	//protected Logger log = Logger.getLogger(LearningDesignValidator.class);
 	protected LearningDesignDAO learningDesignDAO = null;
 	private Vector listOfValidationErrorDTOs = null;
 	private FlashMessage flashMessage;
 	
+	/*
+	 * Default constructor
+	 * initialises the list of validation messages.
+	 */
 	public LearningDesignValidator(LearningDesignDAO learningDesignDAO)
 	{
 		this.learningDesignDAO = learningDesignDAO;
 		listOfValidationErrorDTOs = new Vector();
 	}
-	
+
+	/**
+	 * This method calls other validation methods which apply the validation 
+	 * rules to determine whether or not the learning design is valid.
+	 *
+	 * @param learningDesign
+	 * @return
+	 */
 	public FlashMessage validateLearningDesign(LearningDesign learningDesign)
 	{
+		boolean valid = true;
 		
-		boolean valid = false;
-	
-		checkTransitionForActivities(learningDesign.getTransitions());
+		validateActivityTransitionRules(learningDesign.getParentActivities(), learningDesign.getTransitions());
+		validateGeneral(learningDesign.getActivities());
 		
-		Set topLevelActivities = learningDesign.getParentActivities();
-		
-		checkActivitiesForTransition(topLevelActivities);
-		//check for input/output transition
-		checkTopLevelActivitiesForInputTransition(topLevelActivities);
-		checkTopLevelActivitiesForOutputTransition(topLevelActivities);
-		checkIfGroupingRequired(learningDesign.getActivities());
-		validateOptionalActivity(topLevelActivities); //havent tested
-		validateGroupingIfGroupingIsApplied(topLevelActivities); //havent tested
-		
-		//if the size of the vector is > 0, then design is invalid, otherwise flag the design valid.
 		if (listOfValidationErrorDTOs.size() > 0)
 		{
+			valid = false;
 			flashMessage = new FlashMessage("storeLearningDesign", new StoreLearningDesignResultsDTO(valid,listOfValidationErrorDTOs), FlashMessage.ERROR);
 		}
 		else
 		{
-			valid = true;
-			learningDesign.setValidDesign(new Boolean(true));
+			learningDesign.setValidDesign(new Boolean(valid));
 			learningDesignDAO.insert(learningDesign);
 			flashMessage = new FlashMessage("storeLearningDesign", new StoreLearningDesignResultsDTO(valid, learningDesign.getLearningDesignId()));			
 		}
@@ -60,38 +72,78 @@ public class LearningDesignValidator {
 		
 	}
 	
-	private void checkActivitiesForTransition(Set topLevelActivities)
+	/**
+	 * Perform transition related validations.
+	 * 
+	 * All activities with no input transitions are added to the vector
+	 * <code>noInputTransition</code>. If the size of this list is greater 
+	 * than 1 (which violates the rule of having exactly one top level activity
+	 * with no input transition), then a ValidationErrorDTO will be created
+	 * for each activity with no input transition.
+	 * Similarly, the same concept applies for activities with no output transition.
+	 * 
+	 * @param topLevelActivities
+	 * @param transitions
+	 */
+	private void validateActivityTransitionRules(Set topLevelActivities, Set transitions)
 	{
-		//if one activity, then shouldnt have any transitions
-		int numOfActivities = topLevelActivities.size();
+		validateTransitions(transitions);
+		Vector noInputTransition = new Vector(); //a list to hold the activities which have no input transition
+		Vector noOuputTransition = new Vector(); //a list to hold the activities which have no output transition
+		int numOfTopLevelActivities = topLevelActivities.size();
+		Iterator activityIterator = topLevelActivities.iterator();
 		
-		Iterator i = topLevelActivities.iterator();
-			
-		while (i.hasNext())
+		while (activityIterator.hasNext())
 		{
-			Activity activity = (Activity)i.next();
-			Transition inputTransition = activity.getTransitionTo();
-			Transition outputTransition = activity.getTransitionFrom();
+			Activity activity = (Activity)activityIterator.next();
+			checkActivityForTransition(activity, numOfTopLevelActivities);
+			if (activity.getTransitionFrom() == null)
+				noOuputTransition.add(activity);
+			if (activity.getTransitionTo() == null)
+				noInputTransition.add(activity);
+		}
+		
+		if (numOfTopLevelActivities > 0)
+		{
+			if (noInputTransition.size() == 0)
+				listOfValidationErrorDTOs.add(new ValidationErrorDTO(ValidationErrorDTO.INPUT_TRANSITION_ERROR_TYPE2));
 			
-			if(numOfActivities > 1)
+			if (noInputTransition.size() > 1)
 			{
-				if (inputTransition == null && outputTransition == null)
+				//there is more than one activity with no input transitions
+				Iterator noInputTransitionIterator = noInputTransition.iterator();
+				while (noInputTransitionIterator.hasNext())
 				{
-					listOfValidationErrorDTOs.add(new ValidationErrorDTO(ValidationErrorDTO.LD_ACTIVITY_TRANSITION_ERROR, activity.getActivityUIID()));
+					Activity a = (Activity)noInputTransitionIterator.next();
+					listOfValidationErrorDTOs.add(new ValidationErrorDTO(ValidationErrorDTO.INPUT_TRANSITION_ERROR_TYPE1, a.getActivityUIID()));
 				}
 			}
-			else if (numOfActivities == 1)
+			
+			if (noOuputTransition.size() == 0)
+				listOfValidationErrorDTOs.add(new ValidationErrorDTO(ValidationErrorDTO.OUTPUT_TRANSITION_ERROR_TYPE2));
+			if (noOuputTransition.size() > 1)
 			{
-				if (inputTransition != null || outputTransition != null)
+				//there is more than one activity with no output transitions
+				Iterator noOutputTransitionIterator = noOuputTransition.iterator();
+				while (noOutputTransitionIterator.hasNext())
 				{
-					listOfValidationErrorDTOs.add(new ValidationErrorDTO(ValidationErrorDTO.LD_ACTIVITY_TRANSITION_ERROR, activity.getActivityUIID()));
+					Activity a = (Activity)noOutputTransitionIterator.next();
+					listOfValidationErrorDTOs.add(new ValidationErrorDTO(ValidationErrorDTO.OUTPUT_TRANSITION_ERROR_TYPE1, a.getActivityUIID()));					
 				}
 			}
 		}
-		
+	
 	}
 	
-	private void checkTransitionForActivities(Set transitions)
+	/**
+	 * This method checks if each transition in the learning design has an activity
+	 * before and after the transition.
+	 * 
+	 * If there exists a transition which does not have an activity before or after it,
+	 * the ValidationErrorDTO is added to the list of validation messages.
+	 * @param transitions the set of transitions to iterate through and validate
+	 */
+	private void validateTransitions(Set transitions)
 	{
 		Iterator i = transitions.iterator();
 		while (i.hasNext())
@@ -106,104 +158,71 @@ public class LearningDesignValidator {
 			
 		}
 		
-		
 	}
 	
-	private int countNumOfActivitiesWithNoInputTransition(Set topLevelActivities)
+	/**
+	 * For any learning design that has more than one activity then each activity should have at least an input
+	 * or output transition. If there is only one activity in the learning design, then that activity should
+	 * not have any transitions.
+	 * This method will check if there is an activity that exists that has no transitions at all (if there is
+	 * more than one activity in the learning design)
+	 * @param activity The Activity to validate
+	 * @param numOfActivities The number of activities in the learning design.
+	 */
+	private void checkActivityForTransition(Activity activity, int numOfActivities)
 	{
-		int numOfActivitiesWithNoInputTransition = 0;
-		Iterator i = topLevelActivities.iterator();
-		while (i.hasNext())
+		//if one activity, then shouldnt have any transitions
+		Transition inputTransition = activity.getTransitionTo();
+		Transition outputTransition = activity.getTransitionFrom();
+		
+		if(numOfActivities > 1)
 		{
-			Activity activity = (Activity)i.next();
-			Transition inputTransition = activity.getTransitionTo();
-			if (inputTransition == null)
-			{
-				numOfActivitiesWithNoInputTransition = numOfActivitiesWithNoInputTransition + 1;
-			}
-		}
-		
-		return numOfActivitiesWithNoInputTransition;
-		
-	}
-	
-	//only one should have an input transition
-	private void checkTopLevelActivitiesForInputTransition(Set topLevelActivities)
-	{
-		int numOfActivitiesWithNoInputTransition = countNumOfActivitiesWithNoInputTransition(topLevelActivities);
-		if (numOfActivitiesWithNoInputTransition > 1)
-		{
-			Iterator i = topLevelActivities.iterator();
-			while (i.hasNext())
-			{
-				Activity activity = (Activity)i.next();
-				Transition inputTransition = activity.getTransitionTo();
-				if (inputTransition == null)
-				{					
-					listOfValidationErrorDTOs.add(new ValidationErrorDTO(ValidationErrorDTO.INPUT_TRANSITION_ERROR_TYPE1, activity.getActivityUIID()));
-				}
-			}
-		}
-		
-		//if exactly one top level activity has no input transition then just return an empty list.
-		if (numOfActivitiesWithNoInputTransition == 0)
-			listOfValidationErrorDTOs.add(new ValidationErrorDTO(ValidationErrorDTO.INPUT_TRANSITION_ERROR_TYPE2));
-		
-		
-	}
-	
-	private int countNumOfActivitiesWithNoOutputTransition(Set topLevelActivities)
-	{
-		int numOfActivitiesWithNoOutputTransition = 0;
-		Iterator i = topLevelActivities.iterator();
-		while (i.hasNext())
-		{
-			Activity activity = (Activity)i.next();
-			Transition outputTransition = activity.getTransitionFrom();
-			if (outputTransition == null)
-			{
-				numOfActivitiesWithNoOutputTransition = numOfActivitiesWithNoOutputTransition+ 1;
-			}
-		}
-		
-		return numOfActivitiesWithNoOutputTransition;
-		
-	}
-	
-	//only one should have an output transition
-	private void checkTopLevelActivitiesForOutputTransition(Set topLevelActivities)
-	{
-		int numOfActivitiesWithNoOutputTransition = countNumOfActivitiesWithNoOutputTransition(topLevelActivities);
-		
-		if (numOfActivitiesWithNoOutputTransition > 1)
-		{
-			Iterator i = topLevelActivities.iterator();
-			while (i.hasNext())
-			{
-				Activity activity = (Activity)i.next();
-				Transition outputTransition = activity.getTransitionFrom();
-				if (outputTransition == null)
-				{
-					numOfActivitiesWithNoOutputTransition =+ 1;
-					listOfValidationErrorDTOs.add(new ValidationErrorDTO(ValidationErrorDTO.OUTPUT_TRANSITION_ERROR_TYPE1, activity.getActivityUIID()));
-				}
-			}
-		}
-		//if more than one activity is missing an input transition, return the list;
-		if (numOfActivitiesWithNoOutputTransition == 0)
-			listOfValidationErrorDTOs.add(new ValidationErrorDTO(ValidationErrorDTO.OUTPUT_TRANSITION_ERROR_TYPE2));
-	
+			if (inputTransition == null && outputTransition == null)
+				listOfValidationErrorDTOs.add(new ValidationErrorDTO(ValidationErrorDTO.ACTIVITY_TRANSITION_ERROR, activity.getActivityUIID()));
 			
+		}
+		if (numOfActivities == 1)
+		{	
+			if (inputTransition != null || outputTransition != null)				
+				listOfValidationErrorDTOs.add(new ValidationErrorDTO(ValidationErrorDTO.ACTIVITY_TRANSITION_ERROR, activity.getActivityUIID()));
+			
+		}
+	
 	}
 	
-	private void checkIfGroupingRequired(Set activities)
+	/**
+	 * This method will call all other validation methods.
+	 * 
+	 * @param activities
+	 */
+	private void validateGeneral(Set activities)
 	{
-		Integer groupingSupportType;
-		Iterator i = activities.iterator();
-		while (i.hasNext())
+		Iterator activityIterator = activities.iterator();
+		while (activityIterator.hasNext())
 		{
-			Activity activity = (Activity)i.next();
-			groupingSupportType = activity.getGroupingSupportType();
+			Activity activity = (Activity)activityIterator.next();
+			checkIfGroupingRequired(activity);
+			validateGroupingIfGroupingIsApplied(activity);	
+			validateOptionalActivity(activity);
+			validateOptionsActivityOrderId(activity);			
+		}
+	}
+	
+	/**
+	 * If grouping support type is set to <code>GROUPING_SUPPORT_REQUIRED</code>, 
+	 * then the activity is validated to ensure that the grouping exists.
+	 * If grouping support type is set to <code>GROUPING_SUPPORT_NONE</code>
+	 * then the activity is validated to ensure that the grouping does not exist.
+	 * 
+	 * If any validation fails, the message will be added to the list of validation
+	 * messages.
+	 * 
+	 * @param activity
+	 */
+	private void checkIfGroupingRequired(Activity activity)
+	{
+		
+			Integer groupingSupportType = activity.getGroupingSupportType();
 			if (groupingSupportType.intValue() == Grouping.GROUPING_SUPPORT_REQUIRED)
 			{
 				//make sure activity has been assigned a grouping
@@ -221,17 +240,18 @@ public class LearningDesignValidator {
 					listOfValidationErrorDTOs.add(new ValidationErrorDTO(ValidationErrorDTO.GROUPING_NOT_REQUIRED_ERROR, activity.getActivityUIID()));
 				}
 			}
-		}			
+				
 	}
 	
-	
-	private void validateOptionalActivity(Set parentActivities)
+	/**
+	 * If this activity is an OptionalActivity, then it must contain one or more
+	 * activities.
+	 * 
+	 * @param parentActivity
+	 */
+	private void validateOptionalActivity(Activity parentActivity)
 	{
-		Iterator parentActivityIterator = parentActivities.iterator();
-		
-		while (parentActivityIterator.hasNext())
-		{
-			Activity parentActivity = (Activity)parentActivityIterator.next();
+			
 			if (parentActivity.isOptionsActivity())
 			{
 				//get the child activities and check how many there are.
@@ -243,17 +263,62 @@ public class LearningDesignValidator {
 					listOfValidationErrorDTOs.add(new ValidationErrorDTO(ValidationErrorDTO.OPTIONAL_ACTIVITY_ERROR, optionsActivity.getActivityUIID()));
 				}
 				
+				
 			}
-		}
+		
 	}
 	
-	//if grouping is selected then grouping exists
-	private void validateGroupingIfGroupingIsApplied(Set parentActivities)
+	/**
+	 * This method ensures that the order id of the optional activities
+	 * start from 1, are sequential and do not contain any duplicates.
+	 * It will iterate through the child activities of the OptionalActivity,
+	 * and compare the current activity id with the previous activity id.
+	 * The currentActivityId should be 1 greater than the previous activity id.
+	 * @param parentActivity
+	 */
+	private void validateOptionsActivityOrderId(Activity parentActivity)
 	{
-		Iterator i = parentActivities.iterator();
-		while (i.hasNext())
+		Long thisActivityId = null;
+		Long previousActivityId = null;
+		boolean validOrderId = true;
+		if(parentActivity.isOptionsActivity())
 		{
-			Activity activity = (Activity)i.next();
+			OptionsActivity optionsActivity = (OptionsActivity)parentActivity;
+			Set childActivities = optionsActivity.getActivities(); //childActivities should be sorted according to order id (using the activityOrderComparator)
+			Iterator i = childActivities.iterator();
+			while (i.hasNext())
+			{
+				Activity childActivity = (Activity)i.next();
+				thisActivityId= childActivity.getActivityId();
+				if (previousActivityId != null)
+				{
+					//compare the two numbers
+					if (thisActivityId.longValue() != (previousActivityId.longValue() + 1))
+						validOrderId = validOrderId && false;
+					
+				}
+				else
+				{
+					//this is the first activity, since the previousActivityId is null
+					if(thisActivityId.longValue()!= 1)
+						validOrderId = validOrderId && false;
+				}
+				previousActivityId = thisActivityId; 
+			}
+			
+			if (!validOrderId)
+				listOfValidationErrorDTOs.add(new ValidationErrorDTO(ValidationErrorDTO.OPTIONAL_ACTIVITY_ORDER_ID_INVALID_ERROR, optionsActivity.getActivityUIID()));
+			
+		}	
+	}
+
+	
+	/**
+	 * If applyGrouping is set, then the grouping must exist
+	 * @param activity
+	 */
+	private void validateGroupingIfGroupingIsApplied(Activity activity)
+	{
 			if(activity.getApplyGrouping().booleanValue()) //if grouping is applied, ensure grouping exists
 			{				
 				if (activity.getGrouping() == null)
@@ -261,9 +326,9 @@ public class LearningDesignValidator {
 					listOfValidationErrorDTOs.add(new ValidationErrorDTO(ValidationErrorDTO.GROUPING_SELECTED_ERROR, activity.getActivityUIID()));
 				}
 			}
-			
-		}
+		
 	}
 	
-	
+
+		
 }
