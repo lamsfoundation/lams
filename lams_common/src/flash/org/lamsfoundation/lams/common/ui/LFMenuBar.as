@@ -11,7 +11,7 @@ import mx.utils.*
 *  
 * @author   DI
 */
-class LFMenuBar extends MovieClip {
+class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
 
     // instances on the stage
     private var _mb:MenuBar;
@@ -79,21 +79,23 @@ class LFMenuBar extends MovieClip {
         file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_new'), instanceName:"closeItem"});
         file_menu.addMenuItem({type:"separator"});
         file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_save'), instanceName:"saveItem"});
+        file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_saveas'), instanceName:"saveItemAs"});
 
 
 		/*=================
             EDIT MENU
         =================*/
-        edit_menu = _mb.addMenu("__Edit__");
+        edit_menu = _mb.addMenu(Dictionary.getValue("mnu_edit"));
         
         // "new" is the linkage id of the movie clip to be used as the icon for the "New" menu item.
         //file_menu.addMenuItem({label:"New", instanceName:"newInstance", icon:"new"});
         //_global.breakpoint();
-        edit_menu.addMenuItem({label:'__Undo__', instanceName:"undoItem"});
-        edit_menu.addMenuItem({label:'__Redo__', instanceName:"redoItem"});
-        edit_menu.addMenuItem({label:'__Cut__', instanceName:"cutItem"});
-        edit_menu.addMenuItem({label:'__Copy__', instanceName:"copyItem"});
-        edit_menu.addMenuItem({label:'__Paste__', instanceName:"pasteItem"});
+        edit_menu.addMenuItem({label:Dictionary.getValue('mnu_edit_undo'), instanceName:"undoItem"});
+        edit_menu.addMenuItem({label:Dictionary.getValue('mnu_edit_redo'), instanceName:"redoItem"});
+        edit_menu.addMenuItem({type:"separator"});
+		edit_menu.addMenuItem({label:Dictionary.getValue('mnu_edit_cut'), instanceName:"cutItem"});
+        edit_menu.addMenuItem({label:Dictionary.getValue('mnu_edit_copy'), instanceName:"copyItem"});
+        edit_menu.addMenuItem({label:Dictionary.getValue('mnu_edit_paste'), instanceName:"pasteItem"});
        
 
         /*=================
@@ -148,9 +150,14 @@ class LFMenuBar extends MovieClip {
                 app.getWorkspace().userSelectItem();
                 break;
 			case eventObj.menu.saveItem:
-			//TODO: go through workspace to save design in location
 				Debugger.log('Clicked Flie > Save',Debugger.GEN,'fileMenuClicked','LFMenuBar');
                 app.getCanvas().saveDesignToServer();
+                break;
+				
+			case eventObj.menu.saveItemAs:
+			//TODO: go through workspace to save design in location
+				Debugger.log('Clicked Flie > Save As',Debugger.GEN,'fileMenuClicked','LFMenuBar');
+                app.getCanvas().saveDesignToServerAs();
                 break;
 				
 		
