@@ -86,6 +86,8 @@
 	The author is given warnings when the content in use by learners OR when the content is being edited in the Monitoring interface.  
 */
 
+/* TO DO: enable show feedback on questions.*/
+
 package org.lamsfoundation.lams.tool.mc.web;
 import java.io.IOException;
 import java.util.Iterator;
@@ -489,8 +491,6 @@ public class McStarterAction extends Action implements McAppConstants {
 	    request.getSession().setAttribute(RICHTEXT_END_LEARNING_MSG,mcContent.getEndLearningMessage());
 		request.getSession().setAttribute(RETRIES, new Boolean(mcContent.isRetries()));
 		request.getSession().setAttribute(PASSMARK, mcContent.getPassMark()); //Integer
-		request.getSession().setAttribute(SHOW_FEEDBACK, new Boolean(mcContent.isShowFeedback())); 
-		
 		
 		McUtils.setDefaultSessionAttributes(request, mcContent, mcAuthoringForm);
 		logger.debug("RICHTEXT_TITLE:" + request.getSession().getAttribute(RICHTEXT_TITLE));
@@ -581,7 +581,6 @@ public class McStarterAction extends Action implements McAppConstants {
 	    request.getSession().setAttribute(RICHTEXT_ONLINEINSTRUCTIONS,mcContent.getOnlineInstructions());
 		request.getSession().setAttribute(RETRIES, new Boolean(mcContent.isRetries()));
 		request.getSession().setAttribute(PASSMARK, mcContent.getPassMark()); //Integer
-		request.getSession().setAttribute(SHOW_FEEDBACK, new Boolean(mcContent.isShowFeedback())); 
 		request.getSession().setAttribute(RICHTEXT_REPORT_TITLE,mcContent.getReportTitle());
 		request.getSession().setAttribute(RICHTEXT_END_LEARNING_MSG,mcContent.getEndLearningMessage());
 		
