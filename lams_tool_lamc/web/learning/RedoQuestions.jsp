@@ -62,13 +62,15 @@
 					  
 				  <tr>
 				  	<td colspan=2 align=center class="input" valign=top> 
-			  			<html:submit property="viewAnswers" styleClass="a.button">
-							<bean:message key="label.view.answers"/>
-						</html:submit>	 		
-   						&nbsp&nbsp&nbsp&nbsp&nbsp
-   						<html:submit property="redoQuestionsOk" styleClass="a.button">
-							<bean:message key="label.redo.questions"/>
-						</html:submit>	 				 		  					
+					  	<font size=2>
+				  			<html:submit property="viewAnswers" styleClass="a.button">
+								<bean:message key="label.view.answers"/>
+							</html:submit>	 		
+	   						&nbsp&nbsp&nbsp&nbsp&nbsp
+	   						<html:submit property="redoQuestionsOk" styleClass="a.button">
+								<bean:message key="label.redo.questions"/>
+							</html:submit>	 				 		  					
+						</font>
 				  	 </td>
 				  </tr>
 		</html:form>

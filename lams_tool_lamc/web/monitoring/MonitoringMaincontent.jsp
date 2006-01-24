@@ -13,7 +13,7 @@
 <html:html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-		<title><bean:message key="label.monitoring"/></title>
+		<title> <bean:message key="label.monitoring"/> </title>
 	<script lang="javascript">
 		var imgRoot="<c:out value="${lams}"/>images/";
 		var themeName="aqua";
@@ -86,7 +86,7 @@
 
 <body onLoad='showMonitoringTab("<c:out value='${tabId}'/>")'>
 
-	<b> <bean:message key="label.monitoring"/> </b>
+	<b> <font size=2> <bean:message key="label.monitoring"/> </font></b>
 	
 		<c:set var="monitoringURL">
 			<html:rewrite page="/monitoring.do" />

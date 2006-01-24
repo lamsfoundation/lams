@@ -50,7 +50,9 @@
 						  <tr>
 						  	<td align=left class="input" valign=top bgColor="#999966" colspan=2> 
 							  	<font color="#FFFFFF"> 
-							  		<c:out value="${questionEntry.value}"/> 
+								  	<font size=2>
+								  		<c:out value="${questionEntry.value}"/> 
+							  		</font>
 							  	</font> 
 						  	</td>
 						  </tr>
@@ -75,25 +77,31 @@
 									  							
 																	<tr> 
 																		<td align=left class="input" valign=top> 
-																			<input type="checkbox" 
-																			name=optionCheckBox<c:out value="${sessionScope.queIndex}"/>-<c:out value="${subEntry.key}"/>
-																			onclick="javascript:document.forms[0].optionCheckBoxSelected.value=1; 
-																			document.forms[0].questionIndex.value=<c:out value="${sessionScope.queIndex}"/>; 
-																			document.forms[0].optionIndex.value=<c:out value="${subEntry.key}"/>;
-																			document.forms[0].optionValue.value='<c:out value="${subEntry.value}"/>';
-																			
-																			if (this.checked == 1)
-																			{
-																				document.forms[0].checked.value=true;
-																			}
-																			else
-																			{
-																				document.forms[0].checked.value=false;
-																			}
-																			document.forms[0].submit();" CHECKED> 
+																			<font size=2>
+																				<input type="checkbox" 
+																				name=optionCheckBox<c:out value="${sessionScope.queIndex}"/>-<c:out value="${subEntry.key}"/>
+																				onclick="javascript:document.forms[0].optionCheckBoxSelected.value=1; 
+																				document.forms[0].questionIndex.value=<c:out value="${sessionScope.queIndex}"/>; 
+																				document.forms[0].optionIndex.value=<c:out value="${subEntry.key}"/>;
+																				document.forms[0].optionValue.value='<c:out value="${subEntry.value}"/>';
+																				
+																				if (this.checked == 1)
+																				{
+																					document.forms[0].checked.value=true;
+																				}
+																				else
+																				{
+																					document.forms[0].checked.value=false;
+																				}
+																				document.forms[0].submit();" CHECKED> 
+																			</font>
 																		</td> 
 																		<td align=left class="input" valign=top> 
-																			<font color="#CCCC99"> 	<c:out value="${subEntry.value}"/> </font>
+																			<font color="#CCCC99"> 	
+																				<font size=2>
+																					<c:out value="${subEntry.value}"/> 
+																				</font>
+																			</font>
 																		</td>
 																	</tr>	
 												  		  	 		<c:set var="checkedOptionFound" scope="request" value="1"/>
@@ -107,25 +115,29 @@
 												<c:if test="${requestScope.checkedOptionFound == 0}"> 		
 																	<tr> 
 																		<td align=left class="input" valign=top> 
-																			<input type="checkbox" 
-																			name=optionCheckBox<c:out value="${sessionScope.queIndex}"/>-<c:out value="${subEntry.key}"/>
-																			onclick="javascript:document.forms[0].optionCheckBoxSelected.value=1; 
-																			document.forms[0].questionIndex.value=<c:out value="${sessionScope.queIndex}"/>; 
-																			document.forms[0].optionIndex.value=<c:out value="${subEntry.key}"/>;
-																			document.forms[0].optionValue.value='<c:out value="${subEntry.value}"/>';																			
-
-																			if (this.checked == 1)
-																			{
-																				document.forms[0].checked.value=true;
-																			}
-																			else
-																			{
-																				document.forms[0].checked.value=false;
-																			}
-																			document.forms[0].submit();"> 
+																			<font size=2>
+																				<input type="checkbox" 
+																				name=optionCheckBox<c:out value="${sessionScope.queIndex}"/>-<c:out value="${subEntry.key}"/>
+																				onclick="javascript:document.forms[0].optionCheckBoxSelected.value=1; 
+																				document.forms[0].questionIndex.value=<c:out value="${sessionScope.queIndex}"/>; 
+																				document.forms[0].optionIndex.value=<c:out value="${subEntry.key}"/>;
+																				document.forms[0].optionValue.value='<c:out value="${subEntry.value}"/>';																			
+	
+																				if (this.checked == 1)
+																				{
+																					document.forms[0].checked.value=true;
+																				}
+																				else
+																				{
+																					document.forms[0].checked.value=false;
+																				}
+																				document.forms[0].submit();"> 
+																			</font>
 																		</td> 
 																		<td align=left class="input" valign=top> 
-																			<font color="#CCCC99"> <c:out value="${subEntry.value}"/> </font>
+																			<font size=2>
+																				<font color="#CCCC99"> <c:out value="${subEntry.value}"/> </font>
+																			</font>
 																		</td>
 																	</tr>	
   												</c:if> 			
@@ -153,9 +165,11 @@
 		 		<c:if test="${sessionScope.totalCountReached != 'true'}"> 		
 	  	   		  <tr>
 				  	<td colspan=2 align=right class="input" valign=top> 
-			  			<html:submit property="nextOptions" styleClass="a.button">
-							<bean:message key="button.nextQuestion"/>
-						</html:submit>	 				 		  					
+					  	<font size=2>
+				  			<html:submit property="nextOptions" styleClass="a.button">
+								<bean:message key="button.nextQuestion"/>
+							</html:submit>	 				 		  					
+						</font>
 				  	 </td>
 				  </tr>
 				</c:if> 								  
@@ -163,9 +177,11 @@
 		 		<c:if test="${sessionScope.totalCountReached == 'true'}"> 		
 	  	   		  <tr>
 				  	<td colspan=2 align=right class="input" valign=top> 
-			  			<html:submit property="continueOptionsCombined" styleClass="a.button">
-							<bean:message key="button.continue"/>
-						</html:submit>	 				 		  					
+					  	<font size=2>
+				  			<html:submit property="continueOptionsCombined" styleClass="a.button">
+								<bean:message key="button.continue"/>
+							</html:submit>	 				 		  					
+						</font>
 				  	 </td>
 				  </tr>
 				</c:if> 								  

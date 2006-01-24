@@ -34,7 +34,9 @@
 						  <tr>
 						  	<td align=left class="input" valign=top bgColor="#999966" colspan=2> 
 							  	<font color="#FFFFFF"> 
-							  		<c:out value="${questionEntry.value}"/> 
+								  	<font size=2>
+								  		<c:out value="${questionEntry.value}"/> 
+								  	</font>
 							  	</font> 
 						  	</td>
 						  </tr>
@@ -50,15 +52,19 @@
 									  		<c:forEach var="subEntry" items="${mainEntry.value}">
 				  								<tr> 
 													<td align=left class="input" valign=top> 
-					   								    <img src="images/dot.jpg" align=left> &nbsp
-														<font size=2 color="#669966">	<c:out value="${subEntry.value}"/> </font>					   								    
+														<font size=2>
+						   								    <img src="images/dot.jpg" align=left> &nbsp
+															<font size=2 color="#669966">	<c:out value="${subEntry.value}"/> </font>					   								    
+														</font>
 													</td> 
 												</tr>	
 											</c:forEach>
 
 												<tr>												
 												<td colspan=2 align=left class="input" valign=top> 
-				   								    <bean:message key="label.you.answered"/>
+													<font size=2>
+					   								    <bean:message key="label.you.answered"/>
+					   								 </font>
 												</td> 
 												</tr>
 												
@@ -74,7 +80,9 @@
 																				<c:if test="${distinctAttemptEntry.key == i}"> 	
 																					<tr>
 																						<td align=left class="input" valign=top> 
-																							<b> <bean:message key="label.attempt"/> <c:out value="${sessionScope.aIndex}"/>: </b>
+																							<font size=2>
+																								<b> <bean:message key="label.attempt"/> <c:out value="${sessionScope.aIndex}"/>: </b>
+																							</font>
 																						</td>
 																						<c:set var="aIndex" scope="session" value="${sessionScope.aIndex +1}"/>
 								 														<td align=left class="input" valign=top> 																					
@@ -82,7 +90,9 @@
 											 													<c:forEach var="singleAttemptEntry" items="${distinctAttemptEntry.value}">
 																									<tr>
 																										<td align=left class="input" valign=top>
-												 															<c:out value="${singleAttemptEntry.value}"/> 
+																											<font size=2>
+													 															<c:out value="${singleAttemptEntry.value}"/> 
+													 														</font>
 												 														</td>
 																									</tr>	
 																								</c:forEach>
@@ -116,19 +126,21 @@
 			 		<c:if test="${sessionScope.isRetries == 'true'}"> 					  	   
 		  	   		  <tr>
 					  	<td colspan=2 align=center class="input" valign=top> 
-				  			<html:submit property="redoQuestions" styleClass="a.button">
-								<bean:message key="label.redo.questions"/>
-							</html:submit>	 		
-		       
-							<c:if test="${sessionScope.userPassed == 'true'}">
-						  	   <html:submit property="learnerFinished" styleClass="a.button">
-									<bean:message key="label.finished"/>
-							   </html:submit>
-					  	   </c:if>
-
-	   						<html:submit property="viewSummary" styleClass="a.button">
-								<bean:message key="label.view.summary"/>
-							</html:submit>	 				 		  					
+						  	<font size=2>
+					  			<html:submit property="redoQuestions" styleClass="a.button">
+									<bean:message key="label.redo.questions"/>
+								</html:submit>	 		
+			       
+								<c:if test="${sessionScope.userPassed == 'true'}">
+							  	   <html:submit property="learnerFinished" styleClass="a.button">
+										<bean:message key="label.finished"/>
+								   </html:submit>
+						  	   </c:if>
+	
+		   						<html:submit property="viewSummary" styleClass="a.button">
+									<bean:message key="label.view.summary"/>
+								</html:submit>	 				 		  					
+							</font>
 					  	 </td>
 					  </tr>
 					</c:if> 																		
@@ -136,19 +148,20 @@
 					<c:if test="${sessionScope.isRetries != 'true'}"> 							  
 		  	   		  <tr>
 		  	   		    <td colspan=2 align=right class="input" valign=top>
-			  	   		  	<c:if test="${sessionScope.userPassed == 'true'}">
-						  	   <html:submit property="learnerFinished" styleClass="a.button">
-											<bean:message key="label.finished"/>
-							   </html:submit>
-				  	   		</c:if>
-
-	   						<html:submit property="viewSummary" styleClass="a.button">
-								<bean:message key="label.view.summary"/>
-							</html:submit>	 				 		  					
+			  	   		    <font size=2>
+				  	   		  	<c:if test="${sessionScope.userPassed == 'true'}">
+							  	   <html:submit property="learnerFinished" styleClass="a.button">
+												<bean:message key="label.finished"/>
+								   </html:submit>
+					  	   		</c:if>
+	
+		   						<html:submit property="viewSummary" styleClass="a.button">
+									<bean:message key="label.view.summary"/>
+								</html:submit>	 				 		  					
+							</font>
 					  	 </td>
 					  </tr>
 					</c:if> 																		
-					
 				</table>
 	</html:form>
 

@@ -53,7 +53,9 @@
 							  	<font size=2> <b>  <bean:message key="label.topMark"/> </b> </font> 
 							 </td> 
 							 <td align=right>	
-							  	 <c:out value="${sessionScope.topMark}"/>
+								 <font size=2>
+								  	 <c:out value="${sessionScope.topMark}"/>
+							  	 </font>
 						  	</td>
 						  </tr>	
 	
@@ -62,7 +64,9 @@
 							  	<font size=2> <b>  <bean:message key="label.avMark"/> </b>  </font>
 						  	</td>
 						  	<td align=right>
-							  	<c:out value="${sessionScope.averageMark}"/>
+							  	<font size=2>
+								  	<c:out value="${sessionScope.averageMark}"/>
+							  	</font>
 						  	</td>
 						  </tr>	
 	
@@ -71,7 +75,9 @@
 							  	<font size=2> <b>  <bean:message key="label.loMark"/> </b> </font>
 						  	</td>
 						  	<td align=right>
-							  	<c:out value="${sessionScope.lowestMark}"/>
+							  	<font size=2>
+								  	<c:out value="${sessionScope.lowestMark}"/>
+							  	</font>
 						  	</td>
 						  </tr>	
 						  
@@ -88,14 +94,15 @@
 			 		<c:if test="${sessionScope.isRetries == 'true'}"> 					  	   
 		  	   		  <tr>
 					  	<td colspan=2 align=center class="input" valign=top> 
-				  			<html:submit property="redoQuestions" styleClass="a.button">
-								<bean:message key="label.redo.questions"/>
-							</html:submit>	 		
-		       
-					  	   <html:submit property="learnerFinished" styleClass="a.button">
-								<bean:message key="label.finished"/>
-						   </html:submit>
-
+						  	<font size=2>
+					  			<html:submit property="redoQuestions" styleClass="a.button">
+									<bean:message key="label.redo.questions"/>
+								</html:submit>	 		
+			       
+						  	   <html:submit property="learnerFinished" styleClass="a.button">
+									<bean:message key="label.finished"/>
+							   </html:submit>
+							</font>
 					  	 </td>
 					  </tr>
 					</c:if> 																		
@@ -103,13 +110,14 @@
 					<c:if test="${sessionScope.isRetries != 'true'}"> 							  
 		  	   		  <tr>
 		  	   		    <td colspan=2 align=right class="input" valign=top>
-					  	   <html:submit property="learnerFinished" styleClass="a.button">
-										<bean:message key="label.finished"/>
-						   </html:submit>
+			  	   		    <font size=2>
+						  	   <html:submit property="learnerFinished" styleClass="a.button">
+											<bean:message key="label.finished"/>
+							   </html:submit>
+							 </font>
 					  	 </td>
 					  </tr>
 					</c:if> 																		
-					
 				</table>
 	</html:form>
 

@@ -6,13 +6,13 @@
 <%@ taglib uri="tags-fck-editor" prefix="FCK" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
-	<h2><bean:message key="button.summary"/></h2>
+	<h2><font size=2> <bean:message key="button.summary"/> </font> </h2>
 	<div id="datatablecontainer">
 		<c:if test="${sessionScope.userExceptionNoStudentActivity == 'true'}"> 	
 				<table class="forms" align="center">
 					<tr> 
 						<td NOWRAP valign=top align=center> 
-							<b> <bean:message key="error.noLearnerActivity"/> </b>
+							<b> <font size=2> <bean:message key="error.noLearnerActivity"/> </font></b>
 						</td> 
 					<tr>
 				</table>
@@ -23,7 +23,7 @@
 			<input type="hidden" name="isToolSessionChanged"/>
 				<table class="forms">
 					<tr> 
-						<td NOWRAP class="formlabel" valign=top align=center> <b> <bean:message key="label.selectGroup"/> </b>
+						<td NOWRAP class="formlabel" valign=top align=center><font size=2> <b> <bean:message key="label.selectGroup"/> </b>
 								<select name="monitoredToolSessionId" onchange="javascript:submitSession(this.value,'submitSession');">
 								<c:forEach var="toolSessionId" items="${sessionScope.summaryToolSessions}">
 										<c:set var="SELECTED_SESSION" scope="request" value=""/>
@@ -44,6 +44,7 @@
 										</c:if>						
 								</c:forEach>		  	
 								</select>
+							</font>
 						</td> 
 					<tr>
 				
@@ -117,12 +118,4 @@
 		</c:if>						
 	</div>
 
-	
-<SCRIPT language="JavaScript"> 
-	function selectToolSession()
-	{
-		document.forms[5].isToolSessionChanged.value='1';
-		document.forms[5].submit();
-	}
-</SCRIPT>	
 	

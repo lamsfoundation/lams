@@ -6,7 +6,7 @@
 <%@ taglib uri="tags-fck-editor" prefix="FCK" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
-	<h2><bean:message key="button.instructions"/></h2>
+	<h2> <font size=2> <bean:message key="button.instructions"/> </font> </h2>
 	<div id="datatablecontainer">
 		<table class="forms">
 			<tr>
