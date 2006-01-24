@@ -47,12 +47,12 @@ INSERT INTO lams_lesson_state VALUES (5, 'FINISHED');
 INSERT INTO lams_lesson_state VALUES (6, 'ARCHIVED');
 INSERT INTO lams_lesson_state VALUES (7, 'DISABLED_STATE');
 
-INSERT into lams_license VALUES (1, 'Attribution-Noncommercial-ShareAlike', 'by-nc-sa', 'http://creativecommons.org/licenses/by-nc-sa/2.0/', 1, '');
+INSERT into lams_license VALUES (1, 'Attribution-Noncommercial-ShareAlike 2.5', 'by-nc-sa', 'http://creativecommons.org/licenses/by-nc-sa/2.5/', 1, '/images/license/byncsa.jpg');
 INSERT into lams_license VALUES (2, 'Other Licensing Agreement', 'other', '',0, '');
-INSERT into lams_license VALUES (3, 'Attribution-No Derivatives', 'by-nd', 'http://creativecommons.org/licenses/by-nd/2.0/',0,'');
-INSERT into lams_license VALUES (4, 'Attribution-Noncommercial-No Derivatives', 'by-nc-nd', 'http://creativecommons.org/licenses/by-nc-nd/2.0/',0, '');
-INSERT into lams_license VALUES (5, 'Attribution-Noncommercial', 'by-nc', 'http://creativecommons.org/licenses/by-nc/2.0/',0,'');
-INSERT into lams_license VALUES (6, 'Attribution-ShareAlike', 'by-sa', 'http://creativecommons.org/licenses/by-sa/2.0/',0,''); 
+INSERT into lams_license VALUES (3, 'Attribution-No Derivatives 2.5', 'by-nd', 'http://creativecommons.org/licenses/by-nd/2.5/',0,'/images/license/bynd.jpg');
+INSERT into lams_license VALUES (4, 'Attribution-Noncommercial-No Derivatives 2.5', 'by-nc-nd', 'http://creativecommons.org/licenses/by-nc-nd/2.5/',0, '/images/license/byncnd.jpg');
+INSERT into lams_license VALUES (5, 'Attribution-Noncommercial 2.5', 'by-nc', 'http://creativecommons.org/licenses/by-nc/2.5/',0,'/images/license/bync.jpg');
+INSERT into lams_license VALUES (6, 'Attribution-ShareAlike 2.5', 'by-sa', 'http://creativecommons.org/licenses/by-sa/2.5/',0,'/images/license/byncsa.jpg'); 
 
 INSERT into lams_copy_type VALUES(1,'NONE');
 INSERT into lams_copy_type VALUES(2,'LESSON');
