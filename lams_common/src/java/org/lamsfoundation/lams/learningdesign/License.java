@@ -24,6 +24,8 @@ package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
 
+import org.lamsfoundation.lams.learningdesign.dto.LicenseDTO;
+
 /**
  * @author Manpreet Minhas
  */
@@ -61,7 +63,13 @@ public class License implements Serializable{
 		this.pictureURL = pictureURL;
 	}
 	
-
+	/** Get the standard DTO version of the license. Need the current serverURL
+	 * (e.g. http://localhost:8080/lams)
+	 * to construct a full address for the local images. */
+	public LicenseDTO getLicenseDTO(String serverURL) {
+		return new LicenseDTO(licenseID, name, code, url, defaultLicense, pictureURL, serverURL);
+	}
+	
 	public Boolean getDefaultLicense() {
 		return defaultLicense;
 	}
@@ -80,6 +88,10 @@ public class License implements Serializable{
 	public void setName(String name) {
 		this.name = name;
 	}
+	/** If it is a full url, then it should start with http://, ftp:// etc. 
+	 * If it just starts with "/" then it will be assumed to be a url on the 
+	 * local server and the server url (http://server/lams/ will be prepended).
+	 */
 	public String getPictureURL() {
 		return pictureURL;
 	}
