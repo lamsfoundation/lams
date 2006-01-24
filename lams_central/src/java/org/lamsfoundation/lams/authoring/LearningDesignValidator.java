@@ -60,7 +60,7 @@ public class LearningDesignValidator {
 		if (listOfValidationErrorDTOs.size() > 0)
 		{
 			valid = false;
-			flashMessage = new FlashMessage("storeLearningDesignDetails", new StoreLearningDesignResultsDTO(valid,listOfValidationErrorDTOs), FlashMessage.ERROR);
+			flashMessage = new FlashMessage("storeLearningDesignDetails", new StoreLearningDesignResultsDTO(valid,listOfValidationErrorDTOs, learningDesign.getLearningDesignId()), FlashMessage.ERROR);
 		}
 		else
 		{
