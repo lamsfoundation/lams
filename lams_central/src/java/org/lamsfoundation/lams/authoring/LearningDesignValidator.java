@@ -60,13 +60,13 @@ public class LearningDesignValidator {
 		if (listOfValidationErrorDTOs.size() > 0)
 		{
 			valid = false;
-			flashMessage = new FlashMessage("storeLearningDesign", new StoreLearningDesignResultsDTO(valid,listOfValidationErrorDTOs), FlashMessage.ERROR);
+			flashMessage = new FlashMessage("storeLearningDesignDetails", new StoreLearningDesignResultsDTO(valid,listOfValidationErrorDTOs), FlashMessage.ERROR);
 		}
 		else
 		{
 			learningDesign.setValidDesign(new Boolean(valid));
 			learningDesignDAO.insert(learningDesign);
-			flashMessage = new FlashMessage("storeLearningDesign", new StoreLearningDesignResultsDTO(valid, learningDesign.getLearningDesignId()));			
+			flashMessage = new FlashMessage("storeLearningDesignDetails", new StoreLearningDesignResultsDTO(valid, learningDesign.getLearningDesignId()));			
 		}
 		return flashMessage;
 		
