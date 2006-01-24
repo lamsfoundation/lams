@@ -191,8 +191,6 @@ public interface McAppConstants {
     public static final String MAP_ANSWERS								="mapAnswers";
     public static final String CURRENT_ANSWER							="currentAnswer";
     public static final String USER_FEEDBACK							="userFeedback";
-    public static final String REPORT_TITLE								="reportTitle"; 
-    public static final String MONITORING_REPORT_TITLE					="monitoringReportTitle"; 
     public static final String REPORT_TITLE_LEARNER						="reportTitleLearner"; 
     public static final String TOTAL_COUNT_REACHED						="totalCountReached";
     
@@ -211,8 +209,6 @@ public interface McAppConstants {
     public static final String MAP_USER_RESPONSES						="mapUserResponses";
     public static final String MAP_MAIN_REPORT							="mapMainReport";
     public static final String MAP_STATS								="mapStats";
-    public static final String ACTIVITY_TITLE							="activityTitle";
-    public static final String ACTIVITY_INSTRUCTIONS					="activityInstructions";
         
     /*
      * Monitoring Mode constants
