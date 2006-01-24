@@ -101,7 +101,6 @@ public class TestWorkspaceManagement extends BaseWorkspaceTest {
 		String name = "testCreateWorkspaceFolderContent"+System.currentTimeMillis();
 		String message = workspaceManagementService.createWorkspaceFolderContent(WorkspaceFolderContent.CONTENT_TYPE_FILE,
 				name,"Manpreet's Description",
-				new Date(),new Date(),
 				MELCOE_WORKSPACE_FOLDER,
 				"TXT",testFileString);
 		System.out.println(message);		
@@ -118,7 +117,6 @@ public class TestWorkspaceManagement extends BaseWorkspaceTest {
 		String message = workspaceManagementService.createWorkspaceFolderContent(
 				WorkspaceFolderContent.CONTENT_TYPE_FILE,
 				name,"This content is to be updated.",
-				new Date(),new Date(),
 				DOCUMENTS_WORKSPACE_FOLDER,
 				"TXT",testFileString);
 
@@ -171,7 +169,6 @@ public class TestWorkspaceManagement extends BaseWorkspaceTest {
 		String message = workspaceManagementService.createWorkspaceFolderContent(
 				WorkspaceFolderContent.CONTENT_TYPE_FILE,
 				name,"This content is to be deleted.",
-				new Date(),new Date(),
 				DOCUMENTS_WORKSPACE_FOLDER,
 				"TXT",testFileString);
 

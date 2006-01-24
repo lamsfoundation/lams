@@ -359,6 +359,26 @@ public class WorkspaceAction extends DispatchAction {
 	 * @return ActionForward
 	 * @throws IOException
 	 */
+	public ActionForward getAccessibleWorkspaceFoldersNew(ActionMapping mapping,
+													   ActionForm form,
+													   HttpServletRequest request,
+													   HttpServletResponse response)throws IOException{
+		Integer userID = new Integer(WebUtil.readIntParam(request,"userID"));
+		IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
+		String wddxPacket = workspaceManagementService.getAccessibleWorkspaceFoldersNew(userID);		
+		return outputPacket(mapping, request, response, wddxPacket, "details");
+	}
+	/**
+	 * For details please refer to
+	 * org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService
+	 *
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return ActionForward
+	 * @throws IOException
+	 */
 	public ActionForward moveLearningDesign(ActionMapping mapping,
 											ActionForm form,
 											HttpServletRequest request,

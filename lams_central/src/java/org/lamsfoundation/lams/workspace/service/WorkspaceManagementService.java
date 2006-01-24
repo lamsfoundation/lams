@@ -1037,6 +1037,53 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		
 		return flashMessage.serializeMessage();
 	}
+	
+	/**
+	 * (non-Javadoc)
+	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#getAccessibleWorkspaceFolders(java.lang.Integer)
+	 */
+	public String getAccessibleWorkspaceFoldersNew(Integer userID)	throws IOException {
+		User user = userDAO.getUserById(userID);
+		Hashtable table = new Hashtable();
+		Vector workspaces = new Vector();
+		
+		if (user != null) {
+			//add the user's own folder to the list
+			WorkspaceFolder privateFolder = user.getWorkspace().getRootFolder();
+			Integer permissions = getPermissions(privateFolder,user);
+			table.put("PRIVATE", new FolderContentDTO(privateFolder, permissions));
+			
+			// Get a list of organisations of which the given user is a member
+			List userMemberships = userOrganisationDAO.getUserOrganisationsByUser(user);
+			if (userMemberships != null) {
+				Iterator memberships = userMemberships.iterator();
+				while (memberships.hasNext()) {
+					UserOrganisation member = (UserOrganisation) memberships.next();
+					// Get a list of roles that the user has in this organisation
+					Set roles = member.getUserOrganisationRoles();
+					
+					/*Check if the user has write access, which is available
+					 * only if the user has an AUTHOR, TEACHER or STAFF role. If
+					 * he has acess add that folder to the list.
+					 */
+					if (hasWriteAccess(roles)) {
+						WorkspaceFolder orgFolder = member.getOrganisation().getWorkspace().getRootFolder();
+						workspaces.add(new FolderContentDTO(orgFolder,getPermissions(orgFolder,user)));
+					}
+				}
+				table.put("ORGANISATIONS", workspaces);
+				flashMessage = new FlashMessage("getAccessibleWorkspaceFolders", table);
+			}else
+				flashMessage = new FlashMessage("getAccessibleWorkspaceFolders",
+												"User with user_id of: " + userID
+												+ " is not a member of any organisation",
+												FlashMessage.ERROR);
+	 } else
+	 	flashMessage = FlashMessage.getNoSuchUserExists("getAccessibleWorkspaceFolders", userID);
+		
+		return flashMessage.serializeMessage();
+	}
+	
 	/**
 	 * This a utility method that checks whether user has write access. He can
 	 * save his contents to a folder only if he is an AUTHOR,TEACHER or STAFF

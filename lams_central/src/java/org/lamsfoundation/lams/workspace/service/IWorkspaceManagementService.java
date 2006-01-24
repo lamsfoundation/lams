@@ -304,6 +304,33 @@ public interface IWorkspaceManagementService {
 	public String getAccessibleWorkspaceFolders(Integer userID)throws IOException;
 	
 	/**
+	 * This method returns a list of workspace folders for which 
+	 * the user has "write" access. A user can write/save his content
+	 * in a folder in one of the following cases
+	 * <ol>
+	 * 	  <li>He is the OWNER of the given workspace folder</li>
+	 * 	  <li>He is a MEMBER of the organisation to which the
+	 * 			folder belongs and he has one or all of the follwing 
+	 * 			roles (SYSADMIN. ADMIN, AUTHOR, STAFF, TEACHER)</li>	  		
+	 * </ol>
+	 * 
+	 * The information returned is categorized under 3 main heads
+	 * <ul>
+	 * <li>PRIVATE The folder which belongs to the given User</li>
+	 * <li>ORGANISATIONS List of folders(root folder only) which belong 
+	 * to organisations of which user is a member.</li>
+	 * </ul>
+	 * 
+	 * This is a modified version which returns FolderContentDTO, rather than UserAccessFoldersDTO
+	 * 
+	 * @param userID The <code>user_id</code> of the user for whom the
+	 * 				 folders have to fetched
+	 * @return String The required information in WDDX format
+	 * @throws IOException
+	 */
+	public String getAccessibleWorkspaceFoldersNew(Integer userID)throws IOException;
+
+	/**
 	 * This method moves a Learning Design from one workspace 
 	 * folder to another.But before it does that it checks whether 
 	 * the given User is authorized to do so. 
