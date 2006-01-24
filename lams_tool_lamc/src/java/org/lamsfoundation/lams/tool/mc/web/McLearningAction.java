@@ -314,9 +314,8 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     	
     	int mark=LearningUtil.getMark(mapLeanerAssessmentResults);
     	logger.debug("mark: " + mark);
-    	request.getSession().setAttribute(LEARNER_MARK, new Integer(mark).toString());
-    	request.getSession().setAttribute(LEARNER_MARK_ATLEAST, new Integer(mark+1).toString());
-    	
+    	//request.getSession().setAttribute(LEARNER_MARK, new Integer(mark).toString());
+    	    	
     	Map mapQuestionWeights =(Map) request.getSession().getAttribute(MAP_QUESTION_WEIGHTS);
     	logger.debug("mapQuestionWeights: " + mapQuestionWeights);
     	
@@ -329,14 +328,12 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     		if (totalUserWeight < passMark.intValue())
     		{
     			logger.debug("USER FAILED");
-    			request.getSession().setAttribute(USER_PASSED, new Boolean(false).toString());
     			logger.debug("totalUserWeight is less than passmark: " + totalUserWeight + " < " + passMark.intValue());
     			passed=false;
     		}
     		else
     		{
     			logger.debug("USER PASSED");
-    			request.getSession().setAttribute(USER_PASSED, new Boolean(true).toString());
     			passed=true;
     		}
 		}
