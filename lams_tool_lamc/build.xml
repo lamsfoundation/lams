@@ -258,6 +258,7 @@
 						<include name="learning/*"/>
 		   				<include name="monitoring/*"/>
 	   					<include name="images/**"/>
+		   				<include name="css/**"/>
 				</fileset>
 				<!--
 	   			<fileset dir="${conf.includes.dir}">
