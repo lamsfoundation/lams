@@ -25,10 +25,15 @@ package org.lamsfoundation.lams.authoring.service;
 
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.Vector;
 
-import org.lamsfoundation.lams.test.AbstractLamsTestCase;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningDesignDAO;
+import org.lamsfoundation.lams.learningdesign.dto.LicenseDTO;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
+import org.lamsfoundation.lams.test.AbstractLamsTestCase;
 import org.lamsfoundation.lams.usermanagement.dao.hibernate.UserDAO;
 import org.lamsfoundation.lams.usermanagement.dao.hibernate.WorkspaceFolderDAO;
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
@@ -130,6 +135,53 @@ public class TestAuthoringService extends AbstractLamsTestCase {
 		assertTrue("Finds ruby theme", str.indexOf("ruby") != -1);
 	} 
 
+	public void testGetAvailableLicenses() throws Exception{
+		String otherLicenseCode = "other";
+		Set ccCodes = new HashSet();  // creative commons codes
+		ccCodes.add("by-nc-sa");
+		ccCodes.add("by-nd");
+		ccCodes.add("by-nc-nd");
+		ccCodes.add("by-nc");
+		ccCodes.add("by-sa");
+		
+		Vector v = authService.getAvailableLicenses();
+		assertNotNull("getAvailableLicenses() returns some values",v);
+		assertTrue("getAvailableLicenses() returns 6 licenses", v.size() == 6);
+		
+		// now check that by-nc-sa is default and that the expected five 
+		// commons licenses + other exists. For each one, check each field
+		// is populated for the creative commons entries. Other has a blank
+		// url and picture url
+		Iterator iter = v.iterator();
+		int numDefaultLicenses = 0;
+		boolean otherLicenseCodeFound = false;
+		while (iter.hasNext()) {
+			
+			LicenseDTO element = (LicenseDTO) iter.next();
+			String code = element.getCode();
+			
+			assertNotNull("License has a code", code);
+			assertNotNull("License "+code+" has an id ", element.getLicenseID());
+			assertNotNull("License "+code+" has a name ", element.getName());
+			if ( element.getDefaultLicense().booleanValue() ) {
+				numDefaultLicenses ++;
+			}
+			
+			if ( code.equals(otherLicenseCode) ) {
+				otherLicenseCodeFound = true;
+			} else if ( ccCodes.contains(code) ) {
+				assertNotNull("License "+code+" has a URL ", element.getUrl());
+				assertNotNull("License "+code+" has an pictureURL ", element.getPictureURL());
+				ccCodes.remove(code);
+			} else {
+				fail("License has an unexpected or duplicated code "+code);
+			}
+				
+		}
+		assertTrue("OTHER license code found ",otherLicenseCodeFound);
+		assertTrue("All expected creative commons licenses were found ",ccCodes.size()==0);
+		
+	} 
 
     /*  ******* WDDX Packets **************************************/
     private static final String LEARNING_DESIGN_PART_A = 
@@ -399,4 +451,7 @@ public class TestAuthoringService extends AbstractLamsTestCase {
 	    +"<var name='messageKey'><string>getThemes</string></var>"
 	    +"<var name='messageType'><number>3.0</number></var>"
 	    +"<var name='messageValue'><struct></struct></var></struct></data></wddxPacket>";
+
+
+	
 }

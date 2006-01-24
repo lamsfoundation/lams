@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.authoring.web;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Vector;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -39,6 +40,7 @@ import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.usermanagement.exception.WorkspaceFolderException;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -199,6 +201,40 @@ public class AuthoringAction extends DispatchAction{
 	    return outputPacket(mapping, request, response, message, "details");   
 	    
 	}
+	
+	/**
+	 * This method returns a list of all available license in
+	 * WDDX format. 
+	 * 
+	 * This will include our supported Creative Common
+	 * licenses and an "OTHER" license which may be used for user entered license details.
+	 * The picture url supplied should be a full URL i.e. if it was a relative URL in the 
+	 * database, it should have been converted to a complete server URL (starting http://)
+	 * before sending to the client.
+	 * 
+	 * @return String The required information in WDDX format
+	 * @throws IOException
+	 */
+	public ActionForward getAvailableLicenses(ActionMapping mapping,
+			ActionForm form,
+			HttpServletRequest request,
+			HttpServletResponse response)throws ServletException, Exception{
+
+		FlashMessage flashMessage = null;
+    	try {
+		    IAuthoringService authoringService = getAuthoringService();
+		    Vector licenses = authoringService.getAvailableLicenses();
+    		flashMessage = new FlashMessage("getAvailableLicenses",licenses);
+		} catch (Exception e) {
+			flashMessage = new FlashMessage("getAvailableLicenses",
+					"License details unavailable due to system error :" + e.getMessage(),
+					FlashMessage.ERROR);
+		}
+		
+        PrintWriter writer = response.getWriter();
+        writer.println(flashMessage.serializeMessage());
+        return null;
+	}	
 	
 
 }

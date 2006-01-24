@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.authoring.service;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Vector;
 
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
@@ -199,5 +200,14 @@ public interface IAuthoringService {
 	 * @return String The new tool content id in WDDX Format
 	 */
 	public String getToolContentID(Long toolID) throws IOException;
-	
+
+	/** Get the available licenses. This will include our supported Creative Common
+	 * licenses and an "OTHER" license which may be used for user entered license details.
+	 * The picture url supplied should be a full URL i.e. if it was a relative URL in the 
+	 * database, it should have been converted to a complete server URL (starting http://)
+	 * before sending to the client.
+	 * 
+	 * @return Vector of LicenseDTO objects. It is a Vector to ensure compatibility with WDDX 
+	 */
+	public Vector getAvailableLicenses();
 }

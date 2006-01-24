@@ -30,6 +30,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.authoring.ObjectExtractor;
@@ -40,6 +41,7 @@ import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.LearningLibrary;
+import org.lamsfoundation.lams.learningdesign.License;
 import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupDAO;
@@ -64,6 +66,8 @@ import org.lamsfoundation.lams.usermanagement.dao.hibernate.UserDAO;
 import org.lamsfoundation.lams.usermanagement.dao.hibernate.WorkspaceFolderDAO;
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.usermanagement.exception.WorkspaceFolderException;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 
@@ -580,5 +584,17 @@ public class AuthoringService implements IAuthoringService {
 	   return flashMessage.serializeMessage();
 	}
 	
+	/** @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getAvailableLicenses() */
+	public Vector getAvailableLicenses() {
+		List licenses = licenseDAO.findAll(License.class);
+		Vector licenseDTOList = new Vector(licenses.size());
+		Iterator iter = licenses.iterator(); 
+		while ( iter.hasNext() ) {
+			License element = (License) iter.next();
+			licenseDTOList.add(element.getLicenseDTO(Configuration.get(ConfigurationKeys.SERVER_URL)));
+		}
+		return licenseDTOList;
+	}
+
 	
 }
