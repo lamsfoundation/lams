@@ -279,6 +279,12 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 			_learningDesignID = Config.NUMERIC_NULL_VALUE;
 		}
 		
+		//_workspaceFolderID = Application.getInstance().getWorkspace().getDefaultRootFolderID();
+		
+		//todo: remove this hack!
+		//_title = "LD Created:"+(new Date()).toString();
+		//_description = "An example description";
+				
 		_validDesign = validate();
 		if(_validDesign){
 			//set first ID
