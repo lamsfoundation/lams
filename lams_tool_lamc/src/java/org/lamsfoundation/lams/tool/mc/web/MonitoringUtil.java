@@ -269,5 +269,38 @@ public class MonitoringUtil implements McAppConstants{
     	}
     	return map;
 	}
+	
+	/**
+	 * cleans up the monitoring session
+	 * cleanupMonitoringSession(HttpServletRequest request)
+	 * 
+	 * @param request
+	 */
+	public static void cleanupMonitoringSession(HttpServletRequest request)
+	{
+		request.getSession().removeAttribute(USER_ID);
+		request.getSession().removeAttribute(TOOL_CONTENT_ID);
+		request.getSession().removeAttribute(ACTIVE_MODULE);
+		request.getSession().removeAttribute(CURRENT_MONITORING_TAB);
+		request.getSession().removeAttribute(USER_EXCEPTION_CONTENT_DOESNOTEXIST);
+		request.getSession().removeAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS);
+		request.getSession().removeAttribute(SUMMARY_TOOL_SESSIONS);
+		request.getSession().removeAttribute(SELECTION_CASE);
+		request.getSession().removeAttribute(CURRENT_MONITORED_TOOL_SESSION);
+		request.getSession().removeAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO);
+		request.getSession().removeAttribute(RICHTEXT_ONLINEINSTRUCTIONS);
+		request.getSession().removeAttribute(RICHTEXT_OFFLINEINSTRUCTIONS);
+		request.getSession().removeAttribute(USER_EXCEPTION_NO_STUDENT_ACTIVITY);
+		request.getSession().removeAttribute(COUNT_SESSION_COMPLETE);
+		request.getSession().removeAttribute(COUNT_MAX_ATTEMPT);
+		request.getSession().removeAttribute(TOP_MARK);
+		request.getSession().removeAttribute(LOWEST_MARK);
+		request.getSession().removeAttribute(AVERAGE_MARK);
+		request.getSession().removeAttribute(USER_EXCEPTION_USERID_NOTAVAILABLE);
+		request.getSession().removeAttribute(USER_EXCEPTION_CONTENTID_REQUIRED);
+		request.getSession().removeAttribute(USER_EXCEPTION_NUMBERFORMAT);
+		request.getSession().removeAttribute(DEFINE_LATER_IN_EDIT_MODE);
+		request.getSession().removeAttribute(EDIT_OPTIONS_MODE);
+	}
     	
 }

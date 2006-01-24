@@ -478,25 +478,25 @@ public class McStarterAction extends Action implements McAppConstants {
 	protected void retrieveExistingContent(HttpServletRequest request, McAuthoringForm mcAuthoringForm, long toolContentId, McContent mcContent)
 	{
 		IMcService mcService =McUtils.getToolService(request);
-		
 		request.getSession().setAttribute(IS_REVISITING_USER, new Boolean(true));
+		/*to find out whether the content is being modified or not*/
+		request.getSession().setAttribute(DEFINE_LATER, new Boolean(mcContent.isDefineLater()));
+
+		/*used in authoring mode */
 		request.getSession().setAttribute(RICHTEXT_TITLE,mcContent.getTitle());
 		request.getSession().setAttribute(RICHTEXT_INSTRUCTIONS,mcContent.getInstructions());
-		request.getSession().setAttribute(MONITORING_REPORT_TITLE,mcContent.getMonitoringReportTitle());
-		request.getSession().setAttribute(REPORT_TITLE,mcContent.getReportTitle());
-		request.getSession().setAttribute(DEFINE_LATER, new Boolean(mcContent.isDefineLater()));
-		request.getSession().setAttribute(RICHTEXT_OFFLINEINSTRUCTIONS,mcContent.getOfflineInstructions());
+		
+		/*used in advanced tab*/
 		request.getSession().setAttribute(RICHTEXT_REPORT_TITLE,mcContent.getReportTitle());
-	    request.getSession().setAttribute(RICHTEXT_ONLINEINSTRUCTIONS,mcContent.getOnlineInstructions());
 	    request.getSession().setAttribute(RICHTEXT_END_LEARNING_MSG,mcContent.getEndLearningMessage());
-		request.getSession().setAttribute(RETRIES, new Boolean(mcContent.isRetries()));
+		//request.getSession().setAttribute(RETRIES, new Boolean(mcContent.isRetries()));
 		request.getSession().setAttribute(PASSMARK, mcContent.getPassMark()); //Integer
 		
-		McUtils.setDefaultSessionAttributes(request, mcContent, mcAuthoringForm);
-		logger.debug("RICHTEXT_TITLE:" + request.getSession().getAttribute(RICHTEXT_TITLE));
+		/* used in instructions tab*/
+		request.getSession().setAttribute(RICHTEXT_OFFLINEINSTRUCTIONS,mcContent.getOfflineInstructions());
+		request.getSession().setAttribute(RICHTEXT_ONLINEINSTRUCTIONS,mcContent.getOnlineInstructions());
 		
-		mcAuthoringForm.setPassmark((mcContent.getPassMark()).toString());
-		logger.debug("PASSMARK:" + mcAuthoringForm.getPassmark());
+		logger.debug("RICHTEXT_TITLE:" + request.getSession().getAttribute(RICHTEXT_TITLE));
 		
 		logger.debug("getting name lists based on uid:" + mcContent.getUid());
 		
@@ -514,7 +514,7 @@ public class McStarterAction extends Action implements McAppConstants {
 		McUtils.populateUploadedFilesData(request, mcContent);
 	    logger.debug("populated UploadedFilesData");
 	    Map mapWeights= AuthoringUtil.rebuildWeightsMapfromDB(request, new Long(toolContentId));
-    	logger.debug("mapWeights: " + mapWeights);
+    	logger.debug("Check the mapWeights: " + mapWeights);
     	request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);
     	
     	Map mapQuestionsContent=AuthoringUtil.rebuildQuestionMapfromDB(request, new Long(toolContentId));
@@ -574,8 +574,6 @@ public class McStarterAction extends Action implements McAppConstants {
 		
 		request.getSession().setAttribute(RICHTEXT_TITLE,mcContent.getTitle());
 		request.getSession().setAttribute(RICHTEXT_INSTRUCTIONS,mcContent.getInstructions());
-		request.getSession().setAttribute(MONITORING_REPORT_TITLE,mcContent.getMonitoringReportTitle());
-		request.getSession().setAttribute(REPORT_TITLE,mcContent.getReportTitle());
 		request.getSession().setAttribute(DEFINE_LATER, new Boolean(mcContent.isDefineLater()));
 		request.getSession().setAttribute(RICHTEXT_OFFLINEINSTRUCTIONS,mcContent.getOfflineInstructions());
 	    request.getSession().setAttribute(RICHTEXT_ONLINEINSTRUCTIONS,mcContent.getOnlineInstructions());
@@ -583,9 +581,7 @@ public class McStarterAction extends Action implements McAppConstants {
 		request.getSession().setAttribute(PASSMARK, mcContent.getPassMark()); //Integer
 		request.getSession().setAttribute(RICHTEXT_REPORT_TITLE,mcContent.getReportTitle());
 		request.getSession().setAttribute(RICHTEXT_END_LEARNING_MSG,mcContent.getEndLearningMessage());
-		
-		McUtils.setDefaultSessionAttributes(request, mcContent, mcAuthoringForm);
-		
+
 		logger.debug("PASSMARK:" + request.getSession().getAttribute(PASSMARK));
 		
 		logger.debug("RICHTEXT_TITLE:" + request.getSession().getAttribute(RICHTEXT_TITLE));

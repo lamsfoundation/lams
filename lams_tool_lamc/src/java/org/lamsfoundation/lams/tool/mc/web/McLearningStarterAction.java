@@ -385,11 +385,6 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    /* the following attributes are unused for the moment.
 	     * from here...
 	     */
-	    logger.debug("ACTIVITY_TITLE: " + mcContent.getTitle());
-	    request.getSession().setAttribute(ACTIVITY_TITLE,mcContent.getTitle());
-	    
-	    logger.debug("ACTIVITY_INSTRUCTIONS: " + mcContent.getInstructions());
-	    request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS,mcContent.getInstructions());
 	    
 		logger.debug("IS_USERNAME_VISIBLE: " + mcContent.isUsernameVisible());
 	    request.getSession().setAttribute(IS_USERNAME_VISIBLE, new Boolean(mcContent.isUsernameVisible()).toString());

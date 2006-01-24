@@ -266,6 +266,8 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     	{
     		logger.debug("requested learner finished, the learner should be directed to next activity.");
     		mcLearningForm.resetCommands();
+    		LearningUtil.cleanUpLearningSession(request);
+    		
     		//fix this
     		return (mapping.findForward(VIEW_SUMMARY));
     	}

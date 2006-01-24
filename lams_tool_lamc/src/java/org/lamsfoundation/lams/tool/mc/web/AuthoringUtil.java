@@ -89,18 +89,6 @@ public class AuthoringUtil implements McAppConstants {
 	 */
 	protected static void setRadioboxes(McContent mcContent, McAuthoringForm mcAuthoringForm)
 	{
-		if (mcContent.isUsernameVisible())
-		{
-			mcAuthoringForm.setUsernameVisible(ON);
-			logger.debug("setting userNameVisible to true");
-		}
-		else
-		{
-			mcAuthoringForm.setUsernameVisible(OFF);	
-			logger.debug("setting userNameVisible to false");				
-		}
-	    
-		
 		if (mcContent.isQuestionsSequenced())
 		{
 			mcAuthoringForm.setQuestionsSequenced(ON);
@@ -110,17 +98,6 @@ public class AuthoringUtil implements McAppConstants {
 		{
 			mcAuthoringForm.setQuestionsSequenced(OFF);	
 			logger.debug("setting questionsSequenced to false");				
-		}
-
-		if (mcContent.isSynchInMonitor())
-		{
-			mcAuthoringForm.setSynchInMonitor(ON);	
-			logger.debug("setting SynchInMonitor to true");
-		}
-		else
-		{
-			mcAuthoringForm.setSynchInMonitor(OFF);	
-			logger.debug("setting SynchInMonitor to false");				
 		}
 
 		if (mcContent.isRetries())
@@ -134,16 +111,6 @@ public class AuthoringUtil implements McAppConstants {
 			logger.debug("setting retries to false");				
 		}
 
-		if (mcContent.isShowFeedback())
-		{
-			mcAuthoringForm.setShowFeedback(ON);	
-			logger.debug("setting showFeedback to true");
-		}
-		else
-		{
-			mcAuthoringForm.setShowFeedback(OFF);	
-			logger.debug("setting showFeedback to false");				
-		}
 		
 		if (mcContent.isShowReport())
 		{
@@ -232,6 +199,13 @@ public class AuthoringUtil implements McAppConstants {
 	}
     
     
+    /**
+     * to make sure there is data in the map
+     * verifyMapNoEmptyString(Map map)
+     * 
+     * @param map
+     * @return boolean
+     */
     public static boolean verifyMapNoEmptyString(Map map)
 	{
     	Iterator itMap = map.entrySet().iterator();
@@ -301,7 +275,14 @@ public class AuthoringUtil implements McAppConstants {
     	return mapTempQuestionsContent;
     }
 
-    
+
+    /**
+     * makes entry set of the map sequential
+     * sequenceMap(Map globalMap)
+     * 
+     * @param globalMap
+     * @return Map
+     */
     public static Map sequenceMap(Map globalMap)
 	{
     	logger.debug("globalMap:"+ globalMap);
@@ -322,7 +303,6 @@ public class AuthoringUtil implements McAppConstants {
     	return mapTemp;
 	}
 	
-    
 
     /**
      * shrinks the size of the Map to only used entries
@@ -354,7 +334,15 @@ public class AuthoringUtil implements McAppConstants {
     	return mapTempQuestionsContent;
     }
 
-    
+
+    /**
+     * returns the value of the entry for a given index
+     * getRequiredWeightEntry(Map mapWeights, String questionIndex)
+     * 
+     * @param mapWeights
+     * @param questionIndex
+     * @return
+     */	
     public static String getRequiredWeightEntry(Map mapWeights, String questionIndex)
     {
     	logger.debug("mapWeights: " +  mapWeights);
@@ -399,6 +387,15 @@ public class AuthoringUtil implements McAppConstants {
 	}
     
     
+    /**
+     * moves the contents of the Map up or down
+     * shiftWeightsMap(Map mapWeights, String questionIndex , String direction)
+     * 
+     * @param mapWeights
+     * @param questionIndex
+     * @param direction
+     * @return Map
+     */
     public static Map shiftWeightsMap(Map mapWeights, String questionIndex , String direction)
     {
     	/* map to be returned */
@@ -449,6 +446,7 @@ public class AuthoringUtil implements McAppConstants {
     	logger.debug("final shifted mapTempWeights: " +  mapTempWeights);
     	return mapTempWeights;
     }
+    
     
     /**
      * shifts the options contents within mapGenaralOptionsContent and mapGeneralSelectedlOptionsContent
@@ -1208,15 +1206,6 @@ public class AuthoringUtil implements McAppConstants {
     	if (mcAuthoringForm.getShowFeedback().equalsIgnoreCase(ON))
     		isShowFeedback=true;
     	    	
-    	logger.debug("MONITORING_REPORT_TITLE: " +  mcAuthoringForm.getMonitoringReportTitle());
-    	monitoringReportTitle=mcAuthoringForm.getMonitoringReportTitle();
-    	if ((monitoringReportTitle == null) || (monitoringReportTitle.length() == 0)) 
-    		monitoringReportTitle=(String)request.getSession().getAttribute(MONITORING_REPORT_TITLE);
-    	
-    	reportTitle=mcAuthoringForm.getReportTitle();
-    	logger.debug("REPORT_TITLE: " +  mcAuthoringForm.getReportTitle());
-    	if ((reportTitle == null) || (reportTitle.length() == 0)) 
-    		reportTitle=(String)request.getSession().getAttribute(REPORT_TITLE);
     	
     	String richTextTitle="";
     	richTextTitle = (String)request.getSession().getAttribute(RICHTEXT_TITLE);
@@ -1645,7 +1634,7 @@ public class AuthoringUtil implements McAppConstants {
 	 */
 	public static void cleanupRedundantOptions(HttpServletRequest request, Map mapStartupGeneralOptionsContent, Map mapStartupGeneralSelectedOptionsContent, Map mapGeneralOptionsContent, Map mapGeneralSelectedOptionsContent, Map mapStartupGeneralOptionsQueId)
 	{
-		logger.debug("doing cleanupRedundantOptions...");
+		logger.debug("doing  upRedundantOptions...");
 		logger.debug("starting mapStartupGeneralOptionsContent...:" + mapStartupGeneralOptionsContent);
 		logger.debug("using mapGeneralOptionsContent..: "+ mapGeneralOptionsContent);
     	IMcService mcService =McUtils.getToolService(request);
@@ -2005,7 +1994,7 @@ public class AuthoringUtil implements McAppConstants {
 
 	
 	/**
-	 * persistw a question content 
+	 * persists the question content 
 	 * createQuestionContent(HttpServletRequest request, Map mapQuestionsContent, Map mapFeedbackIncorrect, Map mapFeedbackCorrect, String question, Map mapGeneralOptionsContent, McContent mcContent)
 	 *  
 	 * @param request
@@ -2058,12 +2047,17 @@ public class AuthoringUtil implements McAppConstants {
     	else
     	{
     	    logger.debug("we don't create this question's content since it doesn't have options associated with it.");
-    	    //mapCopyQuestionsContent.remove(new Long(displayOrder).toString());
-    	    //request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapCopyQuestionsContent);
     	}
     }
     
 
+    /**
+     * getNewDisplayOrder(Map mapQuestionsContent, String question)
+     * 
+     * @param mapQuestionsContent
+     * @param question
+     * @return int
+     */
     public static int getNewDisplayOrder(Map mapQuestionsContent, String question)
     {
     	Iterator itQuestionsMap = mapQuestionsContent.entrySet().iterator();
@@ -2143,6 +2137,13 @@ public class AuthoringUtil implements McAppConstants {
     }
 
     
+    /**
+     * getNextAvailableDisplayOrder(HttpServletRequest request, Long mcContentId)
+     * 
+     * @param request
+     * @param mcContentId
+     * @return int
+     */
     public static int getNextAvailableDisplayOrder(HttpServletRequest request, Long mcContentId)
     {
     	IMcService mcService =McUtils.getToolService(request);
@@ -2163,7 +2164,13 @@ public class AuthoringUtil implements McAppConstants {
     	
     }
     
-    
+
+    /**
+     * refreshMaps(HttpServletRequest request, long toolContentId)
+     * 
+     * @param request
+     * @param toolContentId
+     */
     public static void  refreshMaps(HttpServletRequest request, long toolContentId)
     {
     	Map mapQuestionsUidContent=AuthoringUtil.rebuildQuestionUidMapfromDB(request, new Long(toolContentId));
@@ -2186,6 +2193,16 @@ public class AuthoringUtil implements McAppConstants {
     }
     
     
+    /**
+     *
+     * uploadFile(HttpServletRequest request, McAuthoringForm mcAuthoringForm, boolean isOfflineFile) throws RepositoryCheckedException
+     *  
+     * @param request
+     * @param mcAuthoringForm
+     * @param isOfflineFile
+     * @return McAttachmentDTO
+     * @throws RepositoryCheckedException
+     */
     public static McAttachmentDTO uploadFile(HttpServletRequest request, McAuthoringForm mcAuthoringForm, boolean isOfflineFile) throws RepositoryCheckedException 
 	{
     	logger.debug("doing uploadFile...");
@@ -2301,7 +2318,12 @@ public class AuthoringUtil implements McAppConstants {
 	}
     
 
-    
+    /**
+     * populateMetaDataAsAttachments(List listOfflineFilesMetaData)
+     * 
+     * @param listOfflineFilesMetaData
+     * @return List
+     */
     public static List populateMetaDataAsAttachments(List listOfflineFilesMetaData)
     {
     	List listAttachments=new LinkedList();
@@ -2330,6 +2352,12 @@ public class AuthoringUtil implements McAppConstants {
     }
     
     
+    /**
+     * populateMetaDataAsFilenames(List listFilesMetaData)
+     * 
+     * @param listFilesMetaData
+     * @return List
+     */
     public static List populateMetaDataAsFilenames(List listFilesMetaData)
     {
     	List listFilenames=new LinkedList();
@@ -2346,7 +2374,14 @@ public class AuthoringUtil implements McAppConstants {
     	return listFilenames;
     }
     
-    
+
+    /**
+     * removeFileItem(HttpServletRequest request, String filename, String offlineFile)
+     * 
+     * @param request
+     * @param filename
+     * @param offlineFile
+     */
     public static void removeFileItem(HttpServletRequest request, String filename, String offlineFile)
 	{
     	logger.debug("offlineFile:" + offlineFile);
@@ -2377,6 +2412,13 @@ public class AuthoringUtil implements McAppConstants {
 	}
     
     
+    /**
+     * findFileNameIndex(List listUploadedFileNames, String filename)
+     * 
+     * @param listUploadedFileNames
+     * @param filename
+     * @return int
+     */
     public static int findFileNameIndex(List listUploadedFileNames, String filename)
     {
     	Iterator itListUploadedFileNames = listUploadedFileNames.iterator();
@@ -2396,6 +2438,13 @@ public class AuthoringUtil implements McAppConstants {
     }
     
     
+    /**
+     * removeFileItem(List listFilesMetaData, String uuid)
+     * 
+     * @param listFilesMetaData
+     * @param uuid
+     * @return List
+     */
     public static List removeFileItem(List listFilesMetaData, String uuid)
     {
     	McAttachmentDTO deletableAttachmentDTO=null;
@@ -2426,6 +2475,14 @@ public class AuthoringUtil implements McAppConstants {
     	return listFilesMetaData;
     }
     
+    
+    /**
+     * persistFilesMetaData(HttpServletRequest request, boolean isOfflineFile, McContent mcContent)
+     * 
+     * @param request
+     * @param isOfflineFile
+     * @param mcContent
+     */
     public static void persistFilesMetaData(HttpServletRequest request, boolean isOfflineFile, McContent mcContent)
     {
     	IMcService mcService =McUtils.getToolService(request);
@@ -2468,6 +2525,12 @@ public class AuthoringUtil implements McAppConstants {
     }
     
     
+    /**
+     * extractFileNames(List listFilesMetaData)
+     * 
+     * @param listFilesMetaData
+     * @return List
+     */
     public static List extractFileNames(List listFilesMetaData)
     {
     	Iterator itList = listFilesMetaData.iterator();
@@ -2485,6 +2548,12 @@ public class AuthoringUtil implements McAppConstants {
     }
     
     
+    /**
+     * removeRedundantOfflineFileItems(HttpServletRequest request, McContent mcContent)
+     * 
+     * @param request
+     * @param mcContent
+     */
     public static void removeRedundantOfflineFileItems(HttpServletRequest request, McContent mcContent)
     {
     	IMcService mcService =McUtils.getToolService(request);
@@ -2532,6 +2601,12 @@ public class AuthoringUtil implements McAppConstants {
     }
     
     
+    /**
+     * removeRedundantOnlineFileItems(HttpServletRequest request, McContent mcContent)
+     * 
+     * @param request
+     * @param mcContent
+     */
     public static void removeRedundantOnlineFileItems(HttpServletRequest request, McContent mcContent)
     {
     	IMcService mcService =McUtils.getToolService(request);
@@ -2579,7 +2654,10 @@ public class AuthoringUtil implements McAppConstants {
 		}
     }
     
-    
+    /**
+     * simulatePropertyInspector_RunOffline(HttpServletRequest request)
+     * @param request
+     */
     public void simulatePropertyInspector_RunOffline(HttpServletRequest request)
     {
     	IMcService mcService =McUtils.getToolService(request);
@@ -2627,5 +2705,55 @@ public class AuthoringUtil implements McAppConstants {
     		logger.debug("post-setAsDefineLater");
 		}
     	logger.debug("end of simulating setAsDefineLater on content id: " + toolContentId);
+    }
+    
+    
+    /**
+     * cleans up authoring http session 
+     * cleanupAuthoringSession(HttpServletRequest request)
+     * @param request
+     */
+    public static void cleanupAuthoringSession(HttpServletRequest request)
+    {
+    	request.getSession().removeAttribute(ACTIVE_MODULE);
+    	request.getSession().removeAttribute(SHOW_AUTHORING_TABS);
+    	request.getSession().removeAttribute(TOOL_CONTENT_ID);
+    	request.getSession().removeAttribute(DEFINE_LATER_IN_EDIT_MODE);
+    	request.getSession().removeAttribute(LIST_OFFLINEFILES_METADATA);
+    	request.getSession().removeAttribute(LIST_ONLINEFILES_METADATA);
+    	request.getSession().removeAttribute(LIST_UPLOADED_OFFLINE_FILENAMES);
+    	request.getSession().removeAttribute(LIST_UPLOADED_ONLINE_FILENAMES);
+    	request.getSession().removeAttribute(EDIT_OPTIONS_MODE);
+    	request.getSession().removeAttribute(IS_REVISITING_USER);
+    	request.getSession().removeAttribute(PASSMARK);
+    	request.getSession().removeAttribute(DEFINE_LATER);
+    	request.getSession().removeAttribute(IS_REVISITING_USER);
+    	request.getSession().removeAttribute(MAP_WEIGHTS);
+    	request.getSession().removeAttribute(DEFINE_LATER_EDIT_ACTIVITY);
+    	request.getSession().removeAttribute(RICHTEXT_END_LEARNING_MSG);
+    	request.getSession().removeAttribute(RICHTEXT_FEEDBACK_CORRECT);
+    	request.getSession().removeAttribute(RICHTEXT_FEEDBACK_INCORRECT);
+    	request.getSession().removeAttribute(RICHTEXT_TITLE);
+    	request.getSession().removeAttribute(RICHTEXT_INSTRUCTIONS);
+    	request.getSession().removeAttribute(RICHTEXT_OFFLINEINSTRUCTIONS);
+    	request.getSession().removeAttribute(RICHTEXT_ONLINEINSTRUCTIONS);
+    	request.getSession().removeAttribute(RETRIES);
+    	request.getSession().removeAttribute(MAP_DEFAULTOPTIONS_CONTENT);
+    	request.getSession().removeAttribute(MAP_GENERAL_OPTIONS_CONTENT);
+    	request.getSession().removeAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT);
+    	request.getSession().removeAttribute(MAP_STARTUP_GENERAL_OPTIONS_CONTENT);
+    	request.getSession().removeAttribute(MAP_STARTUP_GENERAL_SELECTED_OPTIONS_CONTENT);
+    	request.getSession().removeAttribute(MAP_DISABLED_QUESTIONS);
+    	request.getSession().removeAttribute(MAP_SELECTED_OPTIONS);
+    	request.getSession().removeAttribute(MAP_FEEDBACK_INCORRECT);
+    	request.getSession().removeAttribute(MAP_FEEDBACK_CORRECT);
+    	request.getSession().removeAttribute(SELECTED_QUESTION);
+    	request.getSession().removeAttribute(SELECTED_QUESTION_INDEX);
+    	request.getSession().removeAttribute(QUESTIONS_WITHNO_OPTIONS);
+    	request.getSession().removeAttribute(USER_EXCEPTION_CONTENTID_REQUIRED);
+    	request.getSession().removeAttribute(USER_EXCEPTION_NUMBERFORMAT);
+    	request.getSession().removeAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP);
+    	request.getSession().removeAttribute(USER_EXCEPTION_DEFAULTQUESTIONCONTENT_NOT_AVAILABLE);
+    	request.getSession().removeAttribute(USER_EXCEPTION_DEFAULTOPTIONSCONTENT_NOT_AVAILABLE);
     }
 }

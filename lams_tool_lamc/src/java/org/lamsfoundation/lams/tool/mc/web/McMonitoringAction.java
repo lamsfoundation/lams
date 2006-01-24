@@ -226,6 +226,23 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	}
 
     
+    /**
+     * editActivityQuestions(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException,
+                                         ToolException
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     * @throws ToolException
+     */
     public ActionForward editActivityQuestions(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
@@ -809,6 +826,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
     	McAction mcAction = new McAction();
     	return mcAction.doneAdvancedTab(mapping, form, request, response);
     }
+
     
     /**
      * acts as a proxy to authoring doneInstructionsTab(...)
@@ -840,6 +858,34 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	    
     	McAction mcAction = new McAction();
     	return mcAction.doneInstructionsTab(mapping, form, request, response);
+    }
+    
+    
+    /**
+     * user is done with Monitoring environment
+     * doneMonitoring(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     */
+    public ActionForward doneMonitoring(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+    {
+    	MonitoringUtil.cleanupMonitoringSession(request);
+    	/*forward outside of the app. Currently it is index.jsp */
+    	return (mapping.findForward(LOAD_STARTER)); 
     }
     
     

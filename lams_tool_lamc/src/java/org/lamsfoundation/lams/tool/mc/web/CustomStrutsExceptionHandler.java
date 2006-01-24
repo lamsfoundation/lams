@@ -48,7 +48,6 @@ public class CustomStrutsExceptionHandler extends ExceptionHandler {
 	                                 HttpServletRequest request,
 	                                 HttpServletResponse response) 
 	    {
-	        // write the exception information to the log file
 	        logger.error("fatal System exception: [" + ex.getMessage() + "] ", ex);
 	        ActionForward forward = null;
 	        String property = null;
@@ -68,7 +67,6 @@ public class CustomStrutsExceptionHandler extends ExceptionHandler {
 	            path = mapping.getInput();
 	        }
 	        logger.error("path: " + path);
-	        // Construct the forward object
 	        forward = new ActionForward(path);
 	        logger.error("forward: " + forward);
 

@@ -1663,16 +1663,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		if (mcAuthoringForm.getShowFeedback().equalsIgnoreCase(ON))
 			isShowFeedback=true;
 		    	
-		logger.debug("MONITORING_REPORT_TITLE: " +  mcAuthoringForm.getMonitoringReportTitle());
-		monitoringReportTitle=mcAuthoringForm.getMonitoringReportTitle();
-		if ((monitoringReportTitle == null) || (monitoringReportTitle.length() == 0)) 
-			monitoringReportTitle=(String)request.getSession().getAttribute(MONITORING_REPORT_TITLE);
-		
-		reportTitle=mcAuthoringForm.getReportTitle();
-		logger.debug("REPORT_TITLE: " +  mcAuthoringForm.getReportTitle());
-		if ((reportTitle == null) || (reportTitle.length() == 0)) 
-			reportTitle=(String)request.getSession().getAttribute(REPORT_TITLE);
-		
 		String richTextTitle=(String) request.getSession().getAttribute(RICHTEXT_TITLE);
 		logger.debug("richTextTitle: " + richTextTitle);
 		
@@ -1729,7 +1719,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 			logger.debug("updating mcContent title and instructions:" + mcContent);
 			mcContent.setTitle(richTextTitle);
 			mcContent.setInstructions(richTextInstructions);
-	
 			mcContent.setQuestionsSequenced(isQuestionsSequenced); 
 		    mcContent.setSynchInMonitor(isSynchInMonitor);
 		    mcContent.setUsernameVisible(isUsernameVisible);
@@ -1739,7 +1728,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		    mcContent.setShowReport(isSln);
 		    mcContent.setEndLearningMessage("Thanks");
 		    mcContent.setReportTitle(richTextReportTitle);
-		    mcContent.setMonitoringReportTitle(monitoringReportTitle);
+		    mcContent.setMonitoringReportTitle("Monitoring Report");
 		    mcContent.setEndLearningMessage(richTextEndLearningMessage);
 		    mcContent.setOfflineInstructions(richTextOfflineInstructions);
 		    mcContent.setOnlineInstructions(richTextOnlineInstructions);
@@ -2180,10 +2169,8 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		
 		mcAuthoringForm.resetUserAction();
 		
-		/*remove attribues */
-		request.getSession().removeAttribute(SHOW_AUTHORING_TABS);
-		request.getSession().removeAttribute(DEFINE_LATER_IN_EDIT_MODE);
-		request.getSession().removeAttribute(ACTIVE_MODULE);
+		/*remove session attribues */
+		AuthoringUtil.cleanupAuthoringSession(request);
 		logger.debug("removed attribues...");
 		
 		/* Check this: find out where to forward to*/

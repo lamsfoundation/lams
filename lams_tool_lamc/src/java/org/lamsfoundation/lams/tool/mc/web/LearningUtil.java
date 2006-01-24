@@ -247,7 +247,14 @@ public class LearningUtil implements McAppConstants {
 		
     }
     
-    
+   
+    /**
+     * calculateWeights(Map mapLeanerAssessmentResults, Map mapQuestionWeights)
+     * 
+     * @param mapLeanerAssessmentResults
+     * @param mapQuestionWeights
+     * @return int
+     */
     public static int calculateWeights(Map mapLeanerAssessmentResults, Map mapQuestionWeights)
 	{
     	logger.debug("starting calculate weights...");
@@ -286,6 +293,13 @@ public class LearningUtil implements McAppConstants {
 	}
     
     
+    /**
+     * calculates the mark of a learner
+     * getMark(Map mapLeanerAssessmentResults)
+     * 
+     * @param mapLeanerAssessmentResults
+     * @return int
+     */
     public static int getMark(Map mapLeanerAssessmentResults)
     {
     	int totalUserWeight=0;
@@ -302,7 +316,14 @@ public class LearningUtil implements McAppConstants {
 		return correctAnswerCount;
     }
   
-    
+    /**
+     * calculates the max attempt count of a learner
+     * getHighestAttemptOrder(HttpServletRequest request, Long queUsrId)
+     * 
+     * @param request
+     * @param queUsrId
+     * @return
+     */
     public static int getHighestAttemptOrder(HttpServletRequest request, Long queUsrId)
     {
     	IMcService mcService =McUtils.getToolService(request);
@@ -436,6 +457,13 @@ public class LearningUtil implements McAppConstants {
     }
     
     
+    /**
+     * conversts correct options list to correct options map
+     * buildMapCorrectOptions(List correctOptions)
+     * 
+     * @param correctOptions
+     * @return Map
+     */
     public static Map buildMapCorrectOptions(List correctOptions)
 	{
     	Map mapCorrectOptions= new TreeMap(new McComparator());
@@ -511,7 +539,13 @@ public class LearningUtil implements McAppConstants {
        return true;
 	}
     
-    
+    /**
+     * compareMapsCross(Map mapCorrectOptions, Map mapCheckedOptions)
+     * 
+     * @param mapCorrectOptions
+     * @param mapCheckedOptions
+     * @return boolean
+     */
     public static boolean compareMapsCross(Map mapCorrectOptions, Map mapCheckedOptions)
 	{
 	   logger.debug("mapCorrectOptions: " +  mapCorrectOptions);
@@ -533,6 +567,13 @@ public class LearningUtil implements McAppConstants {
 	}
     
     
+    /**
+     * optionExists(String optionValue, Map generalMap)
+     * 
+     * @param optionValue
+     * @param generalMap
+     * @return boolean
+     */
     public static boolean optionExists(String optionValue, Map generalMap)
     {
     	Iterator itMap = generalMap.entrySet().iterator();
@@ -667,6 +708,13 @@ public class LearningUtil implements McAppConstants {
     }
     
     
+    /**
+     * buildWeightsMap(HttpServletRequest request, Long toolContentId)
+     * 
+     * @param request
+     * @param toolContentId
+     * @return Map
+     */
     public static Map buildWeightsMap(HttpServletRequest request, Long toolContentId)
     {
     	IMcService mcService =McUtils.getToolService(request);
@@ -684,5 +732,51 @@ public class LearningUtil implements McAppConstants {
     		mapIndex=new Long(mapIndex.longValue()+1);
     	}
     	return mapWeights;
+    }
+    
+
+    /**
+     * removes Learning session attributes
+     * cleanUpLearningSession(HttpServletRequest request)
+     * 
+     * @param request
+     */
+    public static void cleanUpLearningSession(HttpServletRequest request)
+    {
+    	request.getSession().removeAttribute(USER_ID);
+    	request.getSession().removeAttribute(TOOL_CONTENT_ID);
+    	request.getSession().removeAttribute(TOOL_SESSION_ID);
+    	request.getSession().removeAttribute(QUESTION_LISTING_MODE);
+    	request.getSession().removeAttribute(QUESTION_LISTING_MODE_SEQUENTIAL);
+    	request.getSession().removeAttribute(QUESTION_LISTING_MODE_COMBINED);
+    	request.getSession().removeAttribute(MAP_OPTIONS_CONTENT);
+    	request.getSession().removeAttribute(MAP_QUESTION_CONTENT_LEARNER);
+    	request.getSession().removeAttribute(TOTAL_QUESTION_COUNT);
+    	request.getSession().removeAttribute(CURRENT_QUESTION_INDEX);
+    	request.getSession().removeAttribute(LEARNER_LAST_ATTEMPT_ORDER);
+    	request.getSession().removeAttribute(LEARNER_BEST_MARK);
+    	request.getSession().removeAttribute(PASSMARK);
+    	request.getSession().removeAttribute(REPORT_TITLE_LEARNER);
+    	request.getSession().removeAttribute(IS_CONTENT_IN_USE);
+    	request.getSession().removeAttribute(IS_TOOL_ACTIVITY_OFFLINE);
+    	request.getSession().removeAttribute(IS_USERNAME_VISIBLE);
+    	request.getSession().removeAttribute(IS_SHOW_FEEDBACK);
+    	request.getSession().removeAttribute(TOTAL_COUNT_REACHED);
+    	request.getSession().removeAttribute(COUNT_SESSION_COMPLETE);
+    	request.getSession().removeAttribute(CURRENT_QUESTION_INDEX);
+    	request.getSession().removeAttribute(TOP_MARK);
+    	request.getSession().removeAttribute(LOWEST_MARK);
+    	request.getSession().removeAttribute(AVERAGE_MARK);
+    	request.getSession().removeAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT);
+    	request.getSession().removeAttribute(MAP_LEARNER_ASSESSMENT_RESULTS);
+    	request.getSession().removeAttribute(MAP_LEARNER_FEEDBACK_INCORRECT);
+    	request.getSession().removeAttribute(MAP_LEARNER_FEEDBACK_CORRECT);
+    	request.getSession().removeAttribute(MAP_QUE_ATTEMPTS);
+    	request.getSession().removeAttribute(MAP_QUE_CORRECT_ATTEMPTS);
+    	request.getSession().removeAttribute(MAP_QUE_INCORRECT_ATTEMPTS);
+    	request.getSession().removeAttribute(MAP_QUESTION_WEIGHTS);
+    	request.getSession().removeAttribute(USER_EXCEPTION_USERID_NOTAVAILABLE);
+    	request.getSession().removeAttribute(USER_EXCEPTION_TOOLSESSIONID_REQUIRED);
+    	request.getSession().removeAttribute(USER_EXCEPTION_NUMBERFORMAT);
     }
  }
