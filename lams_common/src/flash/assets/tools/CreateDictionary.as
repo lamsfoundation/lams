@@ -61,3 +61,4 @@ createXML_btn.addEventListener("click", createXMLListener);
 addRow_btn.addEventListener("click", addRowListener);
 delRow_btn.addEventListener("click", delRowListener);
 clear_btn.addEventListener("click", clearListener);
+source_txt.text = "X:\\lams_central\\web\\flashxml\\en_dictionary.xml";

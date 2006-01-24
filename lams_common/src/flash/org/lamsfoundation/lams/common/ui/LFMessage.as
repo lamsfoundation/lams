@@ -61,7 +61,7 @@ class LFMessage{
 		}else if(e.detail == Alert.CANCEL){
 			cancelHandler();
 		}else{
-			Debugger.log('Unknows event detail form confirm:'+e.detail,Debugger.CRITICAL,"showMessageConfirm",'LFMessage');		
+			Debugger.log('Unknown event detail form confirm:'+e.detail,Debugger.CRITICAL,"showMessageConfirm",'LFMessage');		
 		}
 	}
 	alt = Alert.show(msg,"__Confirm__",Alert.OK | Alert.CANCEL, null, handlerObj, null, Alert.OK);
