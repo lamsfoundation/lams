@@ -196,5 +196,56 @@ class StringUtils {
        
         return uid;
     } 
+	
+	
+	/**
+	 * Checks to see if the value passed in is null, undefined or a blank string
+	 * @usage   
+	 * @param   v 
+	 * @return  
+	 */
+	public static function isEmpty(v):Boolean{
+		if(v == undefined || v== null || v==""){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
+	/**
+	 * Checks to see if the value passed in is any of the null values defined in Config.
+	 * @usage   
+	 * @param   v 
+	 * @return  boolean true if null
+	 */
+	public static function isWDDXNull(v):Boolean{
+		if(v==Config.STRING_NULL_VALUE){
+			return true;
+		}
+		if(v==Config.NUMERIC_NULL_VALUE){
+			return true;
+		}
+		if(v==Config.STRING_NULL_VALUE){
+			return true;
+		}
+		if(v==Config.DATE_NULL_VALUE){
+			return true;
+		}
+		if(v==Config.BOOLEAN_NULL_VALUE){
+			return true;
+		}
+		return false;
+	}
+	
+	public static function isNull(v):Boolean{
+		if(isEmpty(v)){
+			return true;
+		}else if(isWDDXNull(v)){
+			return true;
+		}else{
+			return false;
+		}
+		
+	}
     
 }
