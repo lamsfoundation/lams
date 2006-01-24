@@ -296,16 +296,16 @@ public class MonitoringAction extends LamsDispatchAction
     		{
     	this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
     	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-    	String dateStr = WebUtil.readStrParam(request, MonitoringConstants.PARAM_LESSON_START_DATE);
+    	String dateStr = WebUtil.readStrParam(request, MonitoringConstants.PARAM_LESSON_FINISH_DATE);
     	FlashMessage flashMessage = null;
     	
     	try {
-    		Date startDate = DateFormat.getInstance().parse(dateStr);
-    		monitoringService.finishLessonOnSchedule(lessonId,startDate);
+    		Date finishDate = DateFormat.getInstance().parse(dateStr);
+    		monitoringService.finishLessonOnSchedule(lessonId,finishDate);
     		flashMessage = new FlashMessage("finishOnScheduleLesson",Boolean.TRUE);
     	} catch(ParseException e){
     		flashMessage = new FlashMessage("finishOnScheduleLesson",
-    				"Invalid lesson start datetime format:" +  dateStr,
+    				"Invalid lesson finish datetime format:" +  dateStr,
     				FlashMessage.ERROR);
     	}catch (Exception e) {
     		flashMessage = new FlashMessage("finishOnScheduleLesson",

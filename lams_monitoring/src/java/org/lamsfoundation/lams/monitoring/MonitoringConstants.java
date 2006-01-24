@@ -32,4 +32,5 @@ public class MonitoringConstants {
 	public static final String JOB_START_LESSON = "startScheduleLessonJob";
 	public static final String JOB_FINISH_LESSON = "finishScheduleLessonJob";
 	public static final String PARAM_LESSON_START_DATE = "lessonStartDate";
+	public static final String PARAM_LESSON_FINISH_DATE = "lessonFinishDate";;
 }
