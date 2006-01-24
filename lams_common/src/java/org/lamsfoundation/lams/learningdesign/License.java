@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
 
+import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.learningdesign.dto.LicenseDTO;
 
 /**
@@ -109,5 +110,28 @@ public class License implements Serializable{
 	}
 	public void setCode(String code) {
 		this.code = code;
+	}
+	
+	/** Is this license and another license the same license? The licenseID and name fields
+	 * are checked, with the name fields having any leading or trailing spaces stripped
+	 * before comparison. If both licenseID fields are null, then they are assumed to be
+	 * different licenses.
+	 * 
+	 * This is to be used when importing designs, to see if licenses match. If the id and 
+	 * name fields match, then the imported design is linked to the license record. If
+	 * they don't match, the design should be attached to the "Other" license.
+	 * 
+	 * The user selects the license based on the name, hence we have chosen to check the name.
+	 *   
+	 * @param otherLicense
+	 * @return true if they are the same type of license
+	 */
+	public boolean isSameLicenseType(License otherLicense) {
+		if ( licenseID != null && licenseID.equals(otherLicense.getLicenseID()) ) {
+			String name1 = ( name != null ? StringUtils.strip(name) : "");
+			String name2 = ( otherLicense.getName() != null ? StringUtils.strip(otherLicense.getName()) : "");
+			return name1.equals(name2); 
+		}
+		return false;
 	}
 }
