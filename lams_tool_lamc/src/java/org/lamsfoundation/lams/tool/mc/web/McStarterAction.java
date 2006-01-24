@@ -245,7 +245,8 @@ public class McStarterAction extends Action implements McAppConstants {
 		    	Long fromContentId=new Long(strToolContentId);
 		    	logger.debug("fromContentId: " + fromContentId);
 		    	
-		    	Long toContentId=new Long(McUtils.generateId());
+		    	//Long toContentId=new Long(McUtils.generateId());
+		    	Long toContentId=new Long(9876);
 		    	logger.debug("toContentId: " + toContentId);
 		    	
 		    	try
