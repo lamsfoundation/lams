@@ -2,11 +2,22 @@ package org.lamsfoundation.lams.authoring.dto;
 
 import java.util.Vector;
 
+/**
+ * DTO created so the valid flag and any other messages
+ * can be sent back to Flash.
+ * 
+ * @author mtruong
+ *
+ */
 public class StoreLearningDesignResultsDTO {
 	
-	private boolean valid;
+	private boolean valid; //indicates whether learning design is valid or not
 	
-	private Vector messages;
+	/*
+	 * If the design is valid, then the learningDesignID will be returned.
+	 * Otherwise will return a list of ValidationErrorDTOs
+	 */
+	private Vector messages; 
 	
 	public StoreLearningDesignResultsDTO()
 	{}
