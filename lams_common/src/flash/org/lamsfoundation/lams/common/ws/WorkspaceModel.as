@@ -122,25 +122,31 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 	 * ORGANISATIONS List of folders (root folder only) which belong to organizations of which user is a member
 	 */
 	public function parseDataForTree(dto:Object):Void{
+		_global.breakpoint();
 		_accessibleWorkspaceFoldersDTOCopy = dto;
 		_treeDP = new XML();
 		//add top level
 		_treeDP.addTreeNode("My Workspace",0);
-		//add 3 folders
+		//add org folder container
 		var fChild:XMLNode = _treeDP.firstChild;
 		var orgNode:XMLNode = fChild.addTreeNode("Organisations",null);
 		orgNode.attributes.isBranch = true;
 				
+		for(var i=0;i<dto.ORGANISATIONS.length;i++){
+			var n = dto.ORGANISATIONS[i];
+			var nNode:XMLNode = orgNode.addTreeNode(n.name,n);
+			nNode.attributes.isBranch = true;
+			_workspaceResources.put(n.resourceID,nNode);
+			
+		}	
+				
+		//add the prvate folder:
 		var privateNode:XMLNode = fChild.addTreeNode("Private",dto.PRIVATE);
 		privateNode.attributes.isBranch = true;
 		
-		//copy folderID to resourceID to match what the other call to getFolderCOntents does
-		privateNode.attributes.data.resourceID = dto.PRIVATE.workspaceFolderID;
-		//add a resource type@
-		privateNode.attributes.data.resourceType = "Folder"; 
 		Debugger.log('privateNode.attributes.data.resourceID:'+privateNode.attributes.data.resourceID,Debugger.GEN,'openResourceInTree','org.lamsfoundation.lams.WorkspaceModel');
 		//privateNode.attributes.data = dto.PRIVATE;
-		_workspaceResources.put(dto.PRIVATE.workspaceFolderID,privateNode);
+		_workspaceResources.put(dto.PRIVATE.resourceID,privateNode);
 				
 		/*
 		var runNode:XMLNode = fChild.addTreeNode("Run Sequences",dto.RUN_SEQUENCES);
@@ -149,36 +155,6 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 		privateNode.attributes.data.resourceID = dto.RUN_SEQUENCES.workspaceFolderID;
 		//runNode.attributes.data = dto.RUN_SEQUENCES;
 		_workspaceResources.put(dto.RUN_SEQUENCES.workspaceFolderID,runNode);
-		*/
-		
-		for(var i=0;i<dto.ORGANISATIONS.length;i++){
-			var n = dto.ORGANISATIONS[i];
-			var nNode:XMLNode = orgNode.addTreeNode(n.name,n);
-			nNode.attributes.isBranch = true;
-			
-			nNode.attributes.data.resourceID = n.workspaceFolderID;
-			//nNode.attributes.data = n;
-			_workspaceResources.put(n.workspaceFolderID,nNode);
-			
-		}
-		
-		/*
-		for(var i=0;i<dto.PRIVATE.length;i++){
-			var n = dto.PRIVATE[i];
-			nNode = privateNode.addTreeNode(n.name,n);
-			nNode.attributes.isBranch = true;
-			nNode.attributes.data = n;
-			_workspaceResources.put(n.workspaceFolderID,nNode);
-			
-		}		
-		
-		for(var i=0;i<dto.RUN_SEQUENCES.length;i++){
-			var n = dto.RUN_SEQUENCES[i];
-			nNode = runNode.addTreeNode(n.name,n);
-			nNode.attributes.isBranch = true;
-			nNode.attributes.data = n;
-			_workspaceResources.put(n.workspaceFolderID,nNode);
-		}
 		*/
 		
 	}
@@ -212,6 +188,27 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 	 * Callback from loading some folder data.
 	 * Adds the node to the tree (and therfore by ref to the treeDP
 	 * Also adds a ref to the node to the _workspaceResources hashtable with the resourceID as the key
+	 * the contents of the folder as retrieved by getFolderContents() will contain a fodler or a learningdesign:
+	 * <code><pre>
+	 * - creationDateTime = 2004-12-23T0:0:0+10:0
+		 description = Folder
+		 lastModifiedDateTime = 2004-12-23T0:0:0+10:0
+		 name = Mary Morgan Run Sequences Folder
+		 permissionCode = 3.0
+		 resourceID = 7.0
+		 resourceType = Folder
+    or
+		creationDateTime = 2006-1-24T9:42:14+10:0
+		description = An example description
+		lastModifiedDateTime = 2006-1-24T10:42:14+10:0
+		name = LD Created:Tue Jan 24 10:42:14 GMT+1100 2006
+		permissionCode = 3.0
+		resourceID = 6.0
+	    resourceType = LearningDesign
+	    versionDetails
+	  
+  </pre></code>
+
 	 * @usage   
 	 * @param   dto 
 	 * @return  
@@ -226,6 +223,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 			Debugger.log('nodeToUpdate.attributes.data.workspaceFolderID:'+nodeToUpdate.attributes.data.workspaceFolderID,Debugger.GEN,'setFolderContents','org.lamsfoundation.lams.WorkspaceModel');
 		}else{
 			//think this wont ever happen as must have been listed by prevous node
+			Debugger.log('Did not find:'+dto.workspaceFolderID+' so creating a new XMLNode - this may/will fail',Debugger.CRITICAL,'setFolderContents','org.lamsfoundation.lams.WorkspaceModel');
 			nodeToUpdate = new XMLNode();
 		}
 		

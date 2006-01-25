@@ -90,12 +90,12 @@ class org.lamsfoundation.lams.common.ws.Workspace {
 	private function requestWorkspaceFolders():Void{
 		var callback:Function = Proxy.create(this,recievedWorkspaceFolders);
         var uid:Number = Config.getInstance().userID;
-		Application.getInstance().getComms().getRequest('workspace.do?method=getAccessibleWorkspaceFolders&userID='+uid,callback, false);
+		Application.getInstance().getComms().getRequest('workspace.do?method=getAccessibleWorkspaceFoldersNew&userID='+uid,callback, false);
 		
 	}
 	
 	private function recievedWorkspaceFolders(dto:Object):Void{
-		Debugger.log('Got the available folders - PRIVATE.workspaceFolderID:'+dto.PRIVATE.workspaceFolderID,Debugger.GEN,'recievedWorkspaceFolders','Workspace');			
+		Debugger.log('Got the available folders - PRIVATE.resourceID:'+dto.PRIVATE.resourceID,Debugger.GEN,'recievedWorkspaceFolders','Workspace');			
 		//_global.breakpoint();
 		workspaceModel.parseDataForTree(dto);
 		

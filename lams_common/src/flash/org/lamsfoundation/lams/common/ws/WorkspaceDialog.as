@@ -206,6 +206,10 @@ class WorkspaceDialog extends MovieClip{
 		//Only update the details if the node if its a resource:a
 		var nodeData = newSelectedNode.attributes.data;
 		if(nodeData.resourceType == "Folder"){
+			resourceTitle_txi.text = "";
+			resourceDesc_txa.text = "";
+				
+		}else{
 			resourceTitle_txi.text = nodeData.name;
 			resourceDesc_txa.text = nodeData.description;
 			
@@ -214,7 +218,7 @@ class WorkspaceDialog extends MovieClip{
 			license_txa.text = ;
 			licenseID_cmb.value = ;
 			*/
-			
+		
 		}
 		
 	}
