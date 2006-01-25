@@ -48,6 +48,7 @@ public class FolderContentDTO {
 	public Long resourceID;
 	public Integer permissionCode;
 	public Vector versionDetails;
+	public Long licenseID; // applicable for designs only
 	
 	public FolderContentDTO(){
 		
@@ -55,7 +56,8 @@ public class FolderContentDTO {
 
 	public FolderContentDTO(String name, String description,
 			Date creationDateTime, Date lastModifiedDateTime,
-			String resourceType, Long resourceID, Integer permissionCode) {
+			String resourceType, Long resourceID, Integer permissionCode,
+			Long licenseID) {
 		super();
 		this.name = name;
 		this.description = description;
@@ -64,7 +66,8 @@ public class FolderContentDTO {
 		this.resourceType = resourceType;
 		this.resourceID = resourceID;
 		this.permissionCode = permissionCode;
-		this.versionDetails = new Vector();
+		this.licenseID = licenseID;
+		this.versionDetails = null;
 	}
 	public FolderContentDTO(LearningDesign design, Integer permissionCode){
 		this.name = design.getTitle();
@@ -74,7 +77,8 @@ public class FolderContentDTO {
 		this.resourceType = DESIGN;
 		this.resourceID = design.getLearningDesignId();
 		this.permissionCode = permissionCode;
-		this.versionDetails = new Vector();
+		this.licenseID = ( design.getLicense() != null ? design.getLicense().getLicenseID() : null);
+		this.versionDetails = null;
 	}
 	public FolderContentDTO(WorkspaceFolder workspaceFolder, Integer permissionCode){
 		this.name = workspaceFolder.getName();
@@ -84,7 +88,8 @@ public class FolderContentDTO {
 		this.resourceType = FOLDER;
 		this.resourceID = new Long(workspaceFolder.getWorkspaceFolderId().intValue());
 		this.permissionCode = permissionCode;
-		this.versionDetails = new Vector();
+		this.licenseID = null;
+		this.versionDetails = null;
 	}	
 	public FolderContentDTO(Integer permissionCode, WorkspaceFolderContent workspaceFolderContent,SortedSet details){
 		this.name =workspaceFolderContent.getName();
@@ -97,6 +102,7 @@ public class FolderContentDTO {
 			this.resourceType = FILE;
 		else
 			this.resourceType = FOLDER;			
+		this.licenseID = null;
 		this.versionDetails = new Vector();
 		versionDetails.addAll(details);
 	}	
@@ -148,5 +154,15 @@ public class FolderContentDTO {
 	 */
 	public Vector getVersionDetails() {
 		return versionDetails;
+	}
+
+	/** Get the ID of the related license. Only applicable for learning designs */
+	public Long getLicenseID() {
+		return licenseID;
+	}
+
+	/** Set the ID of the related license. Only applicable for learning designs */
+	public void setLicenseID(Long licenseID) {
+		this.licenseID = licenseID;
 	}
 }
