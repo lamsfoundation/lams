@@ -70,6 +70,8 @@ import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
+import  org.lamsfoundation.lams.authoring.LearningDesignValidator;
+
 
 import com.allaire.wddx.WddxDeserializationException;
 
@@ -420,8 +422,9 @@ public class AuthoringService implements IAuthoringService {
 														groupingDAO,toolDAO,groupDAO,transitionDAO);
 		try { 
 			LearningDesign design = extractor.extractLearningDesign(table);	
-			learningDesignDAO.insert(design);
-			flashMessage = new FlashMessage(IAuthoringService.STORE_LD_MESSAGE_KEY,design.getLearningDesignId());
+			LearningDesignValidator validator = new LearningDesignValidator(learningDesignDAO);
+			flashMessage = validator.validateLearningDesign(design);
+			
 		} catch ( ObjectExtractorException e ) {
 			flashMessage = new FlashMessage(IAuthoringService.STORE_LD_MESSAGE_KEY,
 											"Invalid Object in WDDX packet. Error was "+e.getMessage(),
