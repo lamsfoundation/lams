@@ -8,23 +8,23 @@
 
 <%
 	String toolSessionID="88888888";
-	String toolUrl="/learningStarter?toolSessionID=" + toolSessionID;
+	String toolUrl="/learningStarter?toolSessionID=" + toolSessionID + "&mode=learner";
+	
 	
 	String toolSessionID2="55555555";
-	String toolUrl2="/learningStarter?toolSessionID=" + toolSessionID2;
+	String toolUrl2="/learningStarter?toolSessionID=" + toolSessionID2 + "&mode=learner";
 %>
-
 
 <html:form action="<%=toolUrl%>" method="post">
       <table border=1>
       </table><br/><BR>
-      <html:submit value="Session 1 - Learning Starter"/>
+      <html:submit value="Session 1 - Learning Starter, mode:learner"/>
 </html:form>
 
 <html:form action="<%=toolUrl2%>" method="post">
       <table border=1>
       </table><br/><BR>
-      <html:submit value="Session 2 - Learning Starter"/>
+      <html:submit value="Session 2 - Learning Starter, mode:learner"/>
 </html:form>
 
 
