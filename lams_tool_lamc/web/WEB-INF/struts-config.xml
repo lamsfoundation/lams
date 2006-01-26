@@ -199,6 +199,12 @@
 	  	/>
 
 	  	<forward
+		    name="viewAnswers"
+		    path=".viewAnswers"
+		    redirect="true"
+	  	/>
+
+	  	<forward
 		    name="redoQuestions"
 		    path=".redoQuestions"
 		    redirect="true"
@@ -271,6 +277,12 @@
 	  	<forward
 		    name="errorList"
 		    path=".mcErrorBox"
+		    redirect="true"
+	  	/>
+	  	
+	  	<forward
+		    name="learningStarter"
+		    path=".learningStarter"
 		    redirect="true"
 	  	/>
     </action>
