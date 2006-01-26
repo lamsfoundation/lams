@@ -269,7 +269,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     		LearningUtil.cleanUpLearningSession(request);
     		
     		//fix this
-    		return (mapping.findForward(VIEW_SUMMARY));
+    		return (mapping.findForward(LEARNING_STARTER));
     	}
 
     	mcLearningForm.resetCommands();	
