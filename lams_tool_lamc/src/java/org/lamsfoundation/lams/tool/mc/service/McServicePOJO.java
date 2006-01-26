@@ -1350,55 +1350,6 @@ public class McServicePOJO implements
 
         
     
-    /** 
-     * !!! UNUSED !!!
-     * 
-     * gets automatically called only in monitoring mode when the author chooses to delete a lesson.
-     * 
-     * The idea is to remove content + its relevant sessions + in q/a tools's case the question's content from the db. 
-     * ToolContentManager CONTRACT
-     *  this gets called automatically by Flash when a deletion is detected in the tool interface.
-     */
-    public void removeToolContent(Long toolContentId) 
-    {
-    	logger.debug("start of removeToolContent with toolContentId: " + toolContentId);
-    	
-    	McContent mcContent = mcContentDAO.findMcContentById(toolContentId);
-    	logger.debug("retrieving mcContent: " + mcContent);
-    	
-    	if (mcContent != null)
-    	{
-    		Iterator sessionIterator=mcContent.getMcSessions().iterator();
-            while (sessionIterator.hasNext())
-            {
-            	McSession mcSession=(McSession)sessionIterator.next(); 
-            	logger.debug("iterated mcSession : " + mcSession);
-            	
-            	Iterator sessionUsersIterator=mcSession.getMcQueUsers().iterator();
-            	while (sessionUsersIterator.hasNext())
-            	{
-            		McQueUsr mcQueUsr=(McQueUsr) sessionUsersIterator.next();
-            		logger.debug("iterated mcQueUsr : " + mcQueUsr);
-            		
-            		Iterator sessionUsersAttemptsIterator=mcQueUsr.getMcUsrAttempts().iterator();
-            		while (sessionUsersAttemptsIterator.hasNext())
-                	{
-            			McUsrAttempt mcUsrAttempt=(McUsrAttempt)sessionUsersAttemptsIterator.next();
-            			logger.debug("iterated mcUsrAttempt : " + mcUsrAttempt);
-            			removeAttempt(mcUsrAttempt);
-            			logger.debug("removed qaUsrAttempt : " + mcUsrAttempt);
-                	}
-            	}
-            }
-            
-            logger.debug("removed all existing responses of toolContent with toolContentId:" + 
-            																toolContentId);                
-            mcContentDAO.removeMcById(toolContentId);        
-            logger.debug("removed qaContent:" + mcContent);
-    	}
-    }
-    
-    
     /*
      * 
      * Will need an update on the core tool signature: reason : when  mcContent is null throw an exception 

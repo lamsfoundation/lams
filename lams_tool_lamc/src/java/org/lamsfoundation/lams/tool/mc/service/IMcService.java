@@ -25,10 +25,7 @@ package org.lamsfoundation.lams.tool.mc.service;
 import java.io.InputStream;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.lamsfoundation.lams.contentrepository.ITicket;
-import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -168,8 +165,6 @@ public interface IMcService
     
     public void setAsRunOffline(Long toolContentId) throws DataMissingException, ToolException;
 
-    public void removeToolContent(Long toolContentId); 
-    
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException, ToolException;
 	
     public boolean existsSession(Long toolSessionId); 
