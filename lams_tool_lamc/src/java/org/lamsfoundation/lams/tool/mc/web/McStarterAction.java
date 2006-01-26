@@ -269,8 +269,15 @@ public class McStarterAction extends Action implements McAppConstants {
 		    	logger.debug("user request to remove the content");
 		    	Long fromContentId=new Long(strToolContentId);
 		    	logger.debug("fromContentId: " + fromContentId);
-		    	
-		    	mcService.removeToolContent(fromContentId);	
+
+		    	try
+				{
+		    		mcService.removeToolContent(fromContentId, true);
+				}
+		    	catch(ToolException e)
+				{
+		    		logger.debug("error removing the content: " + e);
+				}
 			}
 	    	/* ...till here*/
 	    	
