@@ -111,7 +111,7 @@
 				<tr>   
 					<td NOWRAP>
 						<font size=2>
-							<html:submit onclick="javascript:submitMethod('cancelAuthoring');">
+							<html:submit onclick="javascript:submitMethod('cancelAuthoring');" styleClass="button">
 								<bean:message key="button.cancel"/>
 							</html:submit>	 				 		  					
 						</font>

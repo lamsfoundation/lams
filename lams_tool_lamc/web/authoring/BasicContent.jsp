@@ -169,7 +169,7 @@
 							 <tr>
 								  	<td NOWRAP bgcolor="#EEEEEE" colspan=5 class="input" valign=top align=right>
 									  	<font size=2>
-											<html:submit styleClass="a.button" onclick="javascript:submitMethod('addNewQuestion');">
+											<html:submit onclick="javascript:submitMethod('addNewQuestion');" styleClass="longButton">
 												<bean:message key="label.add.question"/>
 											</html:submit>	 				 		  										  		
 										</font>
@@ -183,7 +183,7 @@
 							 <tr>
 								  	<td NOWRAP bgcolor="#EEEEEE" colspan=5 class="input" valign=top align=right>
 									  	<font size=2>
-											<html:submit styleClass="a.button" disabled="true" onclick="javascript:alert('This button is disabled in this [view-only] mode.');" >
+											<html:submit styleClass="button" disabled="true" onclick="javascript:alert('This button is disabled in this [view-only] mode.');" >
 												<bean:message key="label.add.question"/>
 											</html:submit>	 				 		  										  		
 										</font>
@@ -227,7 +227,7 @@
 	 						<td NOWRAP valign=top> </td> 
 							<td NOWRAP class="input" colspan=3 align=left valign=top>								
 								<font size=2>
-									<html:submit onclick="javascript:submitMethod('submitQuestions');" styleClass="a.button">
+									<html:submit onclick="javascript:submitMethod('submitQuestions');" styleClass="button">
 										<bean:message key="button.submit"/>
 									</html:submit>	 				 		  					
 								</font>	
@@ -269,7 +269,7 @@
 		 						<td NOWRAP valign=top> </td> 
 								<td NOWRAP class="input" colspan=3 align=left valign=top>								
 									<font size=2>
-										<html:submit onclick="javascript:submitMethod('editActivityQuestions');" styleClass="a.button" disabled="true">
+										<html:submit onclick="javascript:submitMethod('editActivityQuestions');" disabled="true" styleClass="button">
 											<bean:message key="label.edit"/>
 										</html:submit>	 				 		  					
 									</font>
@@ -286,7 +286,7 @@
 		 						<td NOWRAP valign=top> </td> 
 								<td NOWRAP class="input" colspan=3 align=left valign=top>								
 									<font size=2>
-										<html:submit onclick="javascript:submitMethod('editActivityQuestions');" styleClass="a.button">
+										<html:submit onclick="javascript:submitMethod('editActivityQuestions');" styleClass="button">
 											<bean:message key="label.edit"/>
 										</html:submit>	 				 		  					
 									</font>

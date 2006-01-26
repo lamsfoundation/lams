@@ -106,7 +106,7 @@
 				  	</td>
 					 <td NOWRAP valign=top> 
 		 			 <font size=2>
-						 <html:submit onclick="javascript:submitMethod('doneAdvancedTab');" >
+						 <html:submit onclick="javascript:submitMethod('doneAdvancedTab');" styleClass="button">
 								<bean:message key="button.done"/>
 						</html:submit>
 					 </font>

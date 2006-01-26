@@ -29,7 +29,7 @@
           			<td colspan=3 NOWRAP valign=top> 
 	          			<font size=2>
 							<html:file  property="theOfflineFile"></html:file>
-						 	<html:submit styleClass="a.button" onclick="javascript:submitMethod('submitOfflineFiles');">
+						 	<html:submit onclick="javascript:submitMethod('submitOfflineFiles');" styleClass="buttonLeft">
 								 <bean:message key="button.upload"/> 
 							</html:submit>
 						</font>
@@ -96,7 +96,7 @@
           			<td colspan=3 NOWRAP valign=top> 
 	          			<font size=2>
 							<html:file  property="theOnlineFile"></html:file>
-						 	<html:submit onclick="javascript:submitMethod('submitOnlineFiles');">
+						 	<html:submit onclick="javascript:submitMethod('submitOnlineFiles');" styleClass="buttonLeft">
 								 <bean:message key="button.upload"/> 
 							</html:submit>
 						</font>
@@ -157,7 +157,7 @@
 				  	</td>
 					 <td NOWRAP colspan=3 valign=top> 
 						 <font size=2>
-							 <html:submit onclick="javascript:submitMethod('doneInstructionsTab');">
+							 <html:submit onclick="javascript:submitMethod('doneInstructionsTab');" styleClass="button">
 								  <bean:message key="button.done"/> 
 							</html:submit>
 						</font>						
