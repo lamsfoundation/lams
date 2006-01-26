@@ -20,7 +20,7 @@
 					<table border="0" cellspacing="0" cellpadding="0">
 					  <tr>
 						<td><img src="<c:out value="${lams}"/>images/aqua_tab_s_left.gif" name="tab_left_su" width="8" height="25" border="0" id="tab_left_su"/></td>
-						<td class="tab tabcentre_selected" width="90" id="tab_tbl_centre_su" ><label for="su" accesskey="su">
+						<td class="tab tabcentre_selected" width="90" id="tab_tbl_centre_su" ><label>
 						<a href="<c:out value='${monitoringURL}'/>?method=getSummary" id="su" >
 							<bean:message key="label.summary"/>
 						</a></label></td>
@@ -34,7 +34,7 @@
 					<table border="0" cellspacing="0" cellpadding="0">
 					  <tr>
 						<td><img src="<c:out value="${lams}"/>images/aqua_tab_s_left.gif" name="tab_left_i" width="8" height="25" border="0" id="tab_left_i"/></td>
-						<td class="tab tabcentre_selected" width="90" id="tab_tbl_centre_i" ><label for="i" accesskey="i"><a
+						<td class="tab tabcentre_selected" width="90" id="tab_tbl_centre_i" ><label><a
 							href="<c:out value='${monitoringURL}'/>?method=getInstructions" id="i" >
 								<bean:message key="label.instructions"/>
 							</a></label></td>
@@ -49,7 +49,7 @@
 					<table border="0" cellspacing="0" cellpadding="0">
 					  <tr>
 						<td><img src="<c:out value="${lams}"/>images/aqua_tab_s_left.gif" name="tab_left_e" width="8" height="25" border="0" id="tab_left_e"/></td>
-						<td class="tab tabcentre_selected" width="90" id="tab_tbl_centre_e" ><label for="e" accesskey="e"><a
+						<td class="tab tabcentre_selected" width="90" id="tab_tbl_centre_e" ><label><a
 							href="<c:out value='${monitoringURL}'/>?method=editActivity" id="e" >
 								<bean:message key="label.editActivity"/>								
 							</a></label></td>
@@ -64,7 +64,7 @@
 					<table border="0" cellspacing="0" cellpadding="0">
 					  <tr>
 						<td><img src="<c:out value="${lams}"/>images/aqua_tab_s_left.gif" name="tab_left_s" width="8" height="25" border="0" id="tab_left_s"/></td>
-						<td class="tab tabcentre_selected" width="90" id="tab_tbl_centre_s" ><label for="s" accesskey="s"><a
+						<td class="tab tabcentre_selected" width="90" id="tab_tbl_centre_s" ><label><a
 							href="<c:out value='${monitoringURL}'/>?method=getStats" id="e" >
 								<bean:message key="label.stats"/>								
 							</a></label></td>

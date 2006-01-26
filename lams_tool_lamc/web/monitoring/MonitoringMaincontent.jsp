@@ -130,7 +130,7 @@
 									<tr>   
 										<td NOWRAP>
 											<font size=2>
-												<html:submit onclick="javascript:submitMethod('doneMonitoring');">
+												<html:submit onclick="javascript:submitMethod('doneMonitoring');" styleClass="button">
 													<bean:message key="button.done"/>
 												</html:submit>	 				 		  					
 											</font>
