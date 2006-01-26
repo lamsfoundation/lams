@@ -778,5 +778,6 @@ public class LearningUtil implements McAppConstants {
     	request.getSession().removeAttribute(USER_EXCEPTION_USERID_NOTAVAILABLE);
     	request.getSession().removeAttribute(USER_EXCEPTION_TOOLSESSIONID_REQUIRED);
     	request.getSession().removeAttribute(USER_EXCEPTION_NUMBERFORMAT);
+    	request.getSession().removeAttribute(LEARNING_MODE);
     }
  }
