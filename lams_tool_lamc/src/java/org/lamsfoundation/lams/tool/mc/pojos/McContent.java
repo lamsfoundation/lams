@@ -142,13 +142,13 @@ public class McContent implements Serializable {
         this.createdBy = createdBy;
         this.synchInMonitor = synchInMonitor;
         this.contentInUse = contentInUse;
+        this.showFeedback = showFeedback;
         this.offlineInstructions = offlineInstructions;
         this.onlineInstructions = onlineInstructions;
         this.endLearningMessage = endLearningMessage;
+        this.retries=retries;
         this.passMark = passMark;
         this.showReport = showReport;
-        this.retries=retries;
-        this.showFeedback = showFeedback;
         this.mcQueContents = mcQueContents;
         this.mcSessions = mcSessions;
         this.mcAttachments = mcAttachments;
@@ -200,8 +200,8 @@ public class McContent implements Serializable {
 					 mc.getEndLearningMessage(),
 					 mc.getPassMark(),
 					 mc.isShowReport(),
-					 mc.isRetries(),
 					 mc.isShowFeedback(),
+					 mc.isRetries(),
          			 new TreeSet(),
                      new TreeSet(),
                      new TreeSet()
