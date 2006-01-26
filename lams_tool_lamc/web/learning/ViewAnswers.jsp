@@ -122,45 +122,46 @@
 			  	   </tr>
 
 			  	   
-
-			 		<c:if test="${sessionScope.isRetries == 'true'}"> 					  	   
-		  	   		  <tr>
-					  	<td colspan=2 align=center class="input" valign=top> 
-						  	<font size=2>
-					  			<html:submit property="redoQuestions" styleClass="a.button">
-									<bean:message key="label.redo.questions"/>
-								</html:submit>	 		
-			       
-								<c:if test="${sessionScope.userPassed == 'true'}">
-							  	   <html:submit property="learnerFinished" styleClass="a.button">
-										<bean:message key="label.finished"/>
-								   </html:submit>
-						  	   </c:if>
+			 		<c:if test="${sessionScope.learningMode == 'learner'}"> 					  	   
+				 		<c:if test="${sessionScope.isRetries == 'true'}"> 					  	   
+			  	   		  <tr>
+						  	<td colspan=2 align=center class="input" valign=top> 
+							  	<font size=2>
+						  			<html:submit property="redoQuestions" styleClass="button">
+										<bean:message key="label.redo.questions"/>
+									</html:submit>	 		
+				       
+									<c:if test="${sessionScope.userPassed == 'true'}">
+								  	   <html:submit property="learnerFinished" styleClass="button">
+											<bean:message key="label.finished"/>
+									   </html:submit>
+							  	   </c:if>
+		
+			   						<html:submit property="viewSummary" styleClass="button">
+										<bean:message key="label.view.summary"/>
+									</html:submit>	 				 		  					
+								</font>
+						  	 </td>
+						  </tr>
+						</c:if> 																		
 	
-		   						<html:submit property="viewSummary" styleClass="a.button">
-									<bean:message key="label.view.summary"/>
-								</html:submit>	 				 		  					
-							</font>
-					  	 </td>
-					  </tr>
-					</c:if> 																		
-
-					<c:if test="${sessionScope.isRetries != 'true'}"> 							  
-		  	   		  <tr>
-		  	   		    <td colspan=2 align=right class="input" valign=top>
-			  	   		    <font size=2>
-				  	   		  	<c:if test="${sessionScope.userPassed == 'true'}">
-							  	   <html:submit property="learnerFinished" styleClass="a.button">
-												<bean:message key="label.finished"/>
-								   </html:submit>
-					  	   		</c:if>
-	
-		   						<html:submit property="viewSummary" styleClass="a.button">
-									<bean:message key="label.view.summary"/>
-								</html:submit>	 				 		  					
-							</font>
-					  	 </td>
-					  </tr>
+						<c:if test="${sessionScope.isRetries != 'true'}"> 							  
+			  	   		  <tr>
+			  	   		    <td colspan=2 align=right class="input" valign=top>
+				  	   		    <font size=2>
+					  	   		  	<c:if test="${sessionScope.userPassed == 'true'}">
+								  	   <html:submit property="learnerFinished" styleClass="button">
+													<bean:message key="label.finished"/>
+									   </html:submit>
+						  	   		</c:if>
+		
+			   						<html:submit property="viewSummary" styleClass="button">
+										<bean:message key="label.view.summary"/>
+									</html:submit>	 				 		  					
+								</font>
+						  	 </td>
+						  </tr>
+						</c:if> 																		
 					</c:if> 																		
 				</table>
 	</html:form>

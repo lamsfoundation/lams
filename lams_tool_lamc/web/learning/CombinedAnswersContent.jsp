@@ -159,7 +159,7 @@
 	  	   		  <tr>
 				  	<td NOWRAP colspan=2 align=right class="input" valign=top> 
 					  	<font size=2>
-				  			<html:submit property="continueOptionsCombined" styleClass="a.button">
+				  			<html:submit property="continueOptionsCombined" styleClass="button">
 								<bean:message key="button.continue"/>
 							</html:submit>	 				 		  					
 						</font>

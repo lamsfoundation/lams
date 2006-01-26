@@ -95,11 +95,11 @@
 		  	   		  <tr>
 					  	<td colspan=2 align=center class="input" valign=top> 
 						  	<font size=2>
-					  			<html:submit property="redoQuestions" styleClass="a.button">
+					  			<html:submit property="redoQuestions" styleClass="button">
 									<bean:message key="label.redo.questions"/>
 								</html:submit>	 		
 			       
-						  	   <html:submit property="learnerFinished" styleClass="a.button">
+						  	   <html:submit property="learnerFinished" styleClass="button">
 									<bean:message key="label.finished"/>
 							   </html:submit>
 							</font>
@@ -111,7 +111,7 @@
 		  	   		  <tr>
 		  	   		    <td colspan=2 align=right class="input" valign=top>
 			  	   		    <font size=2>
-						  	   <html:submit property="learnerFinished" styleClass="a.button">
+						  	   <html:submit property="learnerFinished" styleClass="button">
 											<bean:message key="label.finished"/>
 							   </html:submit>
 							 </font>

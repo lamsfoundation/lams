@@ -166,7 +166,7 @@
 	  	   		  <tr>
 				  	<td colspan=2 align=right class="input" valign=top> 
 					  	<font size=2>
-				  			<html:submit property="nextOptions" styleClass="a.button">
+				  			<html:submit property="nextOptions" styleClass="button">
 								<bean:message key="button.nextQuestion"/>
 							</html:submit>	 				 		  					
 						</font>
@@ -178,7 +178,7 @@
 	  	   		  <tr>
 				  	<td colspan=2 align=right class="input" valign=top> 
 					  	<font size=2>
-				  			<html:submit property="continueOptionsCombined" styleClass="a.button">
+				  			<html:submit property="continueOptionsCombined" styleClass="button">
 								<bean:message key="button.continue"/>
 							</html:submit>	 				 		  					
 						</font>

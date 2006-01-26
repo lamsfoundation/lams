@@ -193,17 +193,17 @@
 		  	   		  <tr>
 					  	<td NOWRAP colspan=2 align=center class="input" valign=top> 
 						  	<font size=2>
-					  			<html:submit property="redoQuestions" styleClass="a.button">
+					  			<html:submit property="redoQuestions" styleClass="button">
 									<bean:message key="label.redo.questions"/>
 								</html:submit>	 		
 			       
 								<c:if test="${sessionScope.userPassed == 'true'}">
-							  	   <html:submit property="learnerFinished" styleClass="a.button">
+							  	   <html:submit property="learnerFinished" styleClass="button">
 										<bean:message key="label.finished"/>
 								   </html:submit>
 						  	   </c:if>
 	
-		   						<html:submit property="viewSummary" styleClass="a.button">
+		   						<html:submit property="viewSummary" styleClass="button">
 									<bean:message key="label.view.summary"/>
 								</html:submit>	 				 		  					
 							</font>
@@ -216,12 +216,12 @@
 		  	   		    <td NOWRAP colspan=2 align=right class="input" valign=top>
 			  	   		    <font size=2>
 				  	   		  	<c:if test="${sessionScope.userPassed == 'true'}">
-							  	   <html:submit property="learnerFinished" styleClass="a.button">
+							  	   <html:submit property="learnerFinished" styleClass="button">
 												<bean:message key="label.finished"/>
 								   </html:submit>
 					  	   		</c:if>
 	
-		   						<html:submit property="viewSummary" styleClass="a.button">
+		   						<html:submit property="viewSummary" styleClass="button">
 									<bean:message key="label.view.summary"/>
 								</html:submit>	 				 		  					
 							</font>

@@ -63,11 +63,11 @@
 				  <tr>
 				  	<td colspan=2 align=center class="input" valign=top> 
 					  	<font size=2>
-				  			<html:submit property="viewAnswers" styleClass="a.button">
+				  			<html:submit property="viewAnswers" styleClass="button">
 								<bean:message key="label.view.answers"/>
 							</html:submit>	 		
 	   						&nbsp&nbsp&nbsp&nbsp&nbsp
-	   						<html:submit property="redoQuestionsOk" styleClass="a.button">
+	   						<html:submit property="redoQuestionsOk" styleClass="button">
 								<bean:message key="label.redo.questions"/>
 							</html:submit>	 				 		  					
 						</font>
