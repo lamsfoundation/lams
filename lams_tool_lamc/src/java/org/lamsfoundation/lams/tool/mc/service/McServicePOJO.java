@@ -1348,14 +1348,12 @@ public class McServicePOJO implements
     	logger.debug("qaContent has been updated for runOffline: " + mcContent);
     }
 
-        
     
-    /*
+    /**
+     * Part of the tool contract. Removes content and uploaded files from the content repository.
+     * removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException, ToolException
      * 
-     * Will need an update on the core tool signature: reason : when  mcContent is null throw an exception 
-     *  (non-Javadoc)
-     * @see org.lamsfoundation.lams.tool.ToolContentManager#removeToolContent(java.lang.Long, boolean)
-     */
+     */    
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException, ToolException
 	{
     	logger.debug("start of: removeToolContent(Long toolContentId, boolean removeSessionData");
@@ -1372,6 +1370,28 @@ public class McServicePOJO implements
     	
     	if (mcContent != null)
     	{
+            logger.debug("start deleting any uploaded file for this content from the content repository");
+        	Iterator filesIterator=mcContent.getMcAttachments().iterator();
+        	while (filesIterator.hasNext())
+        	{
+        		McUploadedFile mcUploadedFile=(McUploadedFile) filesIterator.next();
+        		logger.debug("iterated mcUploadedFile : " + mcUploadedFile);
+        		String filesUuid=mcUploadedFile.getUuid(); 
+        		if ((filesUuid != null) && (filesUuid.length() > 0))
+        		{
+        			try
+					{
+        				mcToolContentHandler.deleteFile(new Long(filesUuid));	
+					}
+        			catch(RepositoryCheckedException e)
+					{
+        				logger.debug("exception occured deleting files from content repository : " + e);
+        				throw new ToolException("undeletable file in the content repository");
+					}
+        		}
+        	}
+        	logger.debug("end deleting any uploaded files for this content.");
+    		
     		Iterator sessionIterator=mcContent.getMcSessions().iterator();
             while (sessionIterator.hasNext())
             {
@@ -1400,9 +1420,8 @@ public class McServicePOJO implements
                 	}
             	}
             }
-            
             logger.debug("removed all existing responses of toolContent with toolContentId:" + 
-            																toolContentId);                
+            																toolContentId);   
             mcContentDAO.removeMcById(toolContentId);        
             logger.debug("removed qaContent:" + mcContent);
     	}
