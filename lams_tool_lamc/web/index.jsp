@@ -16,18 +16,20 @@
 	String strRemoveToolContent="/authoringStarter?toolContentID=" + toolContentId + "&removeToolContent=1";
 	String strRemoveCopiedToolContent="/authoringStarter?toolContentID=" + hardCodedCopiedToolContentId + "&removeToolContent=1";
 	String strDefineLater="/defineLaterStarter?toolContentID=" + toolContentId;
+	
+	
+	String strSetDefineLater="/authoringStarter?toolContentID=" + hardCodedCopiedToolContentId + "&setDefineLater=1";
+	String strSetRunoffline="/authoringStarter?toolContentID=" + hardCodedCopiedToolContentId + "&strSetRunoffline=1";	
 %>
 
 
 <html:form action="<%=toolUrl%>" method="post">
-Start authoring module
       <table border=1>
       </table><br/>
       <html:submit value="Authoring on the original content"/>
 </html:form>
 
 <html:form action="<%=copiedToolUrl%>" method="post">
-Start authoring module on the copied content
       <table border=1>
       </table><br/>
       <html:submit value="Authoring on the copied content"/>
@@ -58,5 +60,15 @@ Start authoring module on the copied content
       <html:submit value="Define Later URL"/>
 </html:form>
 
+<html:form action="<%=strSetDefineLater%>" method="post">
+      <table border=1>
+      </table><br/>
+      <html:submit value="Set as define later on the copied content"/>
+</html:form>
 
+<html:form action="<%=strSetRunoffline%>" method="post">
+      <table border=1>
+      </table><br/>
+      <html:submit value="Set as run offline on the copied content"/>
+</html:form>
 
