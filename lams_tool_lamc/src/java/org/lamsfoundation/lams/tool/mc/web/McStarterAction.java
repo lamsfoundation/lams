@@ -236,7 +236,7 @@ public class McStarterAction extends Action implements McAppConstants {
 	    	 	public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException;
 	    	 * 	is working or not
 	    	 *  
-	    	 * test code from here... 
+	    	 * test code starts from here... 
 	    	 */	
 	    	String copyToolContent= (String) request.getParameter(COPY_TOOL_CONTENT);
 	    	logger.debug("copyToolContent: " + copyToolContent);
@@ -279,7 +279,46 @@ public class McStarterAction extends Action implements McAppConstants {
 		    		logger.debug("error removing the content: " + e);
 				}
 			}
-	    	/* ...till here*/
+	    	
+	    	String setDefineLater= (String) request.getParameter("setDefineLater");
+	    	logger.debug("setDefineLater: " + setDefineLater);
+	    	
+	    	if ((setDefineLater != null) && (setDefineLater.equals("1")))
+			{
+		    	logger.debug("user request to set content as define later");
+		    	Long fromContentId=new Long(strToolContentId);
+		    	logger.debug("fromContentId: " + fromContentId);
+
+		    	try
+				{
+		    		mcService.setAsDefineLater(fromContentId);
+				}
+		    	catch(ToolException e)
+				{
+		    		logger.debug("error setting the define later on the content: " + e);
+				}
+			}
+
+	    	
+	    	String strSetRunoffline= (String) request.getParameter("strSetRunoffline");
+	    	logger.debug("strSetRunoffline: " + strSetRunoffline);
+	    	
+	    	if ((setDefineLater != null) && (setDefineLater.equals("1")))
+			{
+		    	logger.debug("user request to set content as run offline");
+		    	Long fromContentId=new Long(strToolContentId);
+		    	logger.debug("fromContentId: " + fromContentId);
+
+		    	try
+				{
+		    		mcService.setAsRunOffline(fromContentId);
+				}
+		    	catch(ToolException e)
+				{
+		    		logger.debug("error setting the run offline on the content: " + e);
+				}
+			}
+	    	/* ...testing code ends here*/
 	    	
 	    	/*
 			 * find out if the passed tool content id exists in the db 
@@ -489,9 +528,10 @@ public class McStarterAction extends Action implements McAppConstants {
 		/*to find out whether the content is being modified or not*/
 		request.getSession().setAttribute(DEFINE_LATER, new Boolean(mcContent.isDefineLater()));
 
-		/*used in authoring mode */
+		/*used in authoring mode basic tab*/
 		request.getSession().setAttribute(RICHTEXT_TITLE,mcContent.getTitle());
 		request.getSession().setAttribute(RICHTEXT_INSTRUCTIONS,mcContent.getInstructions());
+		mcAuthoringForm.setPassmark(mcContent.getPassMark().toString());
 		
 		/*used in advanced tab*/
 		request.getSession().setAttribute(RICHTEXT_REPORT_TITLE,mcContent.getReportTitle());
