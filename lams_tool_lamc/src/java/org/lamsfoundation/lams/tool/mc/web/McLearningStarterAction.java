@@ -179,7 +179,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 				/*
 				 *for testing only, remove this line in development 
 				 */
-				Long currentToolContentId= new Long(1234);
+				Long currentToolContentId= new Long(9876);
 				logger.debug("simulating container behaviour: calling createToolSession with toolSessionId : " + 
 						toolSessionID + " and toolContentId: " + currentToolContentId);
 				try
@@ -319,12 +319,20 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    	
 	    }
 	    
-	    if (mcQueUsr != null)
+	    String learningMode=(String) request.getSession().getAttribute(LEARNING_MODE);
+	    logger.debug("users learning mode is: " + learningMode);
+	    
+	    if ((mcQueUsr != null) && learningMode.equals("learner"))
 	    {
 	    	logger.debug("the learner has already responsed to this content, just generate a read-only report. Use redo questions for this.");
 	    	return (mapping.findForward(REDO_QUESTIONS));
 	    }
-	    logger.debug("mcQueUsr is null, user is a first timer, load questions..." + LOAD_LEARNER);
+	    else if (learningMode.equals("teacher"))
+	    {
+	    	McLearningAction mcLearningAction= new McLearningAction();
+	    	logger.debug("present to teacher learners progress...");
+	    	return mcLearningAction.viewAnswers(mapping, form, request, response);	
+	    }
 	    return (mapping.findForward(LOAD_LEARNER));	
 	}
 	
@@ -443,7 +451,6 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    /*
 	     * process incoming tool session id and later derive toolContentId from it. 
 	     */
-	    //String strToolSessionId=request.getParameter(TOOL_SESSION_ID);
     	String strToolSessionId=request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
 	    long toolSessionId=0;
 	    if ((strToolSessionId == null) || (strToolSessionId.length() == 0)) 
@@ -468,6 +475,26 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 				return (mapping.findForward(ERROR_LIST));
 			}
 	    }
+	    
+	    String mode=request.getParameter(MODE);
+	    logger.debug("mode: " + mode);
+	    
+	    if ((mode == null) || (mode.length() == 0)) 
+	    {
+	    	persistError(request, "error.mode.required");
+	    	request.setAttribute(USER_EXCEPTION_MODE_REQUIRED, new Boolean(true));
+			return (mapping.findForward(ERROR_LIST));
+	    }
+	    
+	    if ((!mode.equals("learner")) && (!mode.equals("teacher")))
+	    {
+	    	persistError(request, "error.mode.invalid");
+	    	request.setAttribute(USER_EXCEPTION_MODE_REQUIRED, new Boolean(true));
+			return (mapping.findForward(ERROR_LIST));
+	    }
+		logger.debug("session LEARNING_MODE set to:" + mode);
+	    request.getSession().setAttribute(LEARNING_MODE, mode);
+	    
 	    return null;
 	}
 
