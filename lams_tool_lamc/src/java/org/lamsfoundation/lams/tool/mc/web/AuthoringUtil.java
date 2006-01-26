@@ -1766,29 +1766,6 @@ public class AuthoringUtil implements McAppConstants {
     }
 
 
-    /**
-     * used to update existing candidate answers
-     * updateExistingOptionContent(HttpServletRequest request, Map options, String optionText)
-     * 
-     * @param request
-     * @param options
-     * @param optionText
-     */
-	public static void updateExistingOptionContent(HttpServletRequest request, Map options, String optionText)
-    {
-		logger.debug("doing updateExistingOptionContent...");
-    	IMcService mcService =McUtils.getToolService(request);
-    	int optionSize=options.size();
-		logger.debug("optionSize:" + optionSize);
-		String mcQueContentUid=(String)options.get(new Integer(optionSize).toString()); 
-		logger.debug("mcQueContentUid: " + mcQueContentUid);
-		
-		McOptsContent mcOptsContent = mcService.getOptionContentByOptionText(optionText, new Long(mcQueContentUid));
-		logger.debug("mcOptsContent: " + mcOptsContent);
-		mcService.removeMcOptionsContent(mcOptsContent);
-		logger.debug("removed mcOptsContent from db: " + mcOptsContent);
-    }
-
 	
 	/**
 	 * persists candidate answers
@@ -1847,25 +1824,29 @@ public class AuthoringUtil implements McAppConstants {
 	        	Map.Entry pairsPQ = (Map.Entry)itPQ.next();
 	        	String optionText=pairsPQ.getValue().toString() ;
 	        	logger.debug("optionText: " + optionText);
-	        	isOptionSelected=false;
-	        	isOptionSelected=isOptionSelected(mapGeneralSelectedOptionsContent, optionText, questionIndex);
-	    		logger.debug("isOptionSelected: " + isOptionSelected);
-	    		
-	    		McOptsContent mcOptsContent = mcService.getOptionContentByOptionText(optionText, mcQueContentUid);
-	    		logger.debug("mcOptsContent: " + mcOptsContent);
-	    		
-	    		if (mcOptsContent == null)
-	    		{
-	    			mcOptsContent = new McOptsContent(isOptionSelected, pairsPQ.getValue().toString(),mcQueContent , new TreeSet());
-	    			logger.debug("created new mcOptsContent:" + mcOptsContent);
-	    		}
-	        	else
+	        	
+	        	if ((optionText != null) && (!optionText.equals("")))
 	        	{
-	        		logger.debug("this option is already persisted mcQueContent, just look after isOptionSelected:" + mcQueContent);
-	        		mcOptsContent.setCorrectOption(isOptionSelected);
+	        		isOptionSelected=false;
+		        	isOptionSelected=isOptionSelected(mapGeneralSelectedOptionsContent, optionText, questionIndex);
+		    		logger.debug("isOptionSelected: " + isOptionSelected);
+		    		
+		    		McOptsContent mcOptsContent = mcService.getOptionContentByOptionText(optionText, mcQueContentUid);
+		    		logger.debug("mcOptsContent: " + mcOptsContent);
+		    		
+		    		if (mcOptsContent == null)
+		    		{
+		    			mcOptsContent = new McOptsContent(isOptionSelected, pairsPQ.getValue().toString(),mcQueContent , new TreeSet());
+		    			logger.debug("created new mcOptsContent:" + mcOptsContent);
+		    		}
+		        	else
+		        	{
+		        		logger.debug("this option is already persisted mcQueContent, just look after isOptionSelected:" + mcQueContent);
+		        		mcOptsContent.setCorrectOption(isOptionSelected);
+		        	}
+		    		mcService.saveMcOptionsContent(mcOptsContent);
+					logger.debug("persisted mcQueContent: " + mcQueContent);	        		
 	        	}
-	    		mcService.saveMcOptionsContent(mcOptsContent);
-				logger.debug("persisted mcQueContent: " + mcQueContent);
 	        }
 		}
 	}
