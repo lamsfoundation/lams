@@ -3,12 +3,10 @@ package org.lamsfoundation.lams.util;
 import java.security.Principal;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
-import org.apache.log4j.Logger;
-
-import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.tool.ToolAccessMode;
 
 /**
  * helper methods useful for servlets
@@ -115,14 +113,17 @@ public class WebUtil
 	/**
 	 * @return integer value of paramValue
 	 * @exception IllegalArgumentException -
-	 *                if not set or not integer
+	 *                if (a) not set and is not optional or (b) not integer
 	 */
-	public static int checkInteger(String paramName, String paramValue) throws IllegalArgumentException
+	public static Integer checkInteger(String paramName, String paramValue, boolean isOptional) throws IllegalArgumentException
 	{
 		try
 		{
-			checkObject(paramName, paramValue);
-			return Integer.parseInt(paramValue.trim());
+			if ( ! isOptional)
+				checkObject(paramName, paramValue);
+			String value = paramValue != null ? StringUtils.trimToNull(paramValue) : null;
+			return value != null ? new Integer(value) : null;
+			
 
 		}
 		catch (NumberFormatException e)
@@ -135,14 +136,16 @@ public class WebUtil
 	/**
 	 * @return long value of paramValue
 	 * @exception IllegalArgumentException -
-	 *                if not set or not long
+	 *                if (a) not set and is not optional or (b) not long
 	 */
-	public static long checkLong(String paramName, String paramValue) throws IllegalArgumentException
+	public static Long checkLong(String paramName, String paramValue, boolean isOptional) throws IllegalArgumentException
 	{
 		try
 		{
-			checkObject(paramName, paramValue);
-			return Long.parseLong(paramValue.trim());
+			if ( ! isOptional)
+				checkObject(paramName, paramValue);
+			String value = paramValue != null ? StringUtils.trimToNull(paramValue) : null;
+			return value != null ? new Long(value) : null;
 
 		}
 		catch (NumberFormatException e)
@@ -154,14 +157,15 @@ public class WebUtil
 
 	/**
 	 * Get a long version of paramValue, throwing an IllegalArgumentException
-	 * if the parameter is null
+	 * if isOptional = false and the is value is null
 	 * @return long value of paramValue
 	 * @exception IllegalArgumentException -
 	 *                if not set or not long
 	 */
-	public static long checkLong(String paramName, Long paramValue) throws IllegalArgumentException
+	public static long checkLong(String paramName, Long paramValue, boolean isOptional) throws IllegalArgumentException
 	{
-		checkObject(paramName, paramValue);
+		if ( ! isOptional)
+			checkObject(paramName, paramValue);
 		return paramValue.longValue();
 	}
 
@@ -178,45 +182,51 @@ public class WebUtil
 	}
 
 	/**
+	 * Read an int parameter, throwing exception if null or not a integer
 	 * @param req -
 	 * @param paramName -
 	 * @return parameter value
 	 */
 	public static int readIntParam(HttpServletRequest req, String paramName)
 	{
-		return checkInteger(paramName, req.getParameter(paramName));
+		return checkInteger(paramName, req.getParameter(paramName),false).intValue();
 	}
 
 	/**
-	 * The helper method to get integer parameter
-	 * @param req
-	 * @param paramName
-	 * @return
+	 * Read an int parameter, throwing exception if ( not optional and null ) or not a integer
+	 * @param req -
+	 * @param paramName -
+	 * @param isOptional 
+	 * @return parameter value
 	 */
-	public static int readIntParamFromUserSession(HttpServletRequest req,
-												  String paramName)
+	public static Integer readIntParam(HttpServletRequest req, String paramName, boolean isOptional)
 	{
-		HttpSession session = req.getSession();
-		if (session.getAttribute(paramName)!= null)
-		{
-			return checkInteger(paramName,String.valueOf(((Integer)session.getAttribute(paramName)).intValue()));
-		}
-		else
-		{
-			return -1;
-		}
-        
+		return checkInteger(paramName, req.getParameter(paramName), isOptional);
 	}
 
 	/**
+	 * Read an long parameter, throwing exception if null or not a long
 	 * @param req -
 	 * @param paramName -
 	 * @return parameter value
 	 */
 	public static long readLongParam(HttpServletRequest req, String paramName)
 	{
-		return checkLong(paramName, req.getParameter(paramName));
+		return checkLong(paramName, req.getParameter(paramName), false).longValue();
 	}
+
+	/**
+	 * Read an long parameter, throwing exception if ( not optional and null ) or not a long
+	 * @param req -
+	 * @param paramName -
+	 * @param isOptional 
+	 * @return parameter value
+	 */
+	public static Long readLongParam(HttpServletRequest req, String paramName, boolean isOptional)
+	{
+		return checkLong(paramName, req.getParameter(paramName), isOptional);
+	}
+
 
 	/**
 	 * @param req -
