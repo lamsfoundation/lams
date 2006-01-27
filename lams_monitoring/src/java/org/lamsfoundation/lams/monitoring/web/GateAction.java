@@ -147,7 +147,7 @@ public class GateAction extends LamsDispatchAction
         long lessonId = WebUtil.readLongParam(request,PARAM_LESSON_ID);
 
         Long gateIdLong = (Long)gateForm.get("activityId");
-        long gateId = WebUtil.checkLong("activityId", gateIdLong);
+        long gateId = gateIdLong != null ? gateIdLong.longValue() : -1 ;
         
         this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
         this.learnerService = MonitoringServiceProxy.getLearnerService(getServlet().getServletContext());

@@ -202,8 +202,7 @@ public class NbLearnerStarterAction extends LamsDispatchAction {
         ActionMessages message = new ActionMessages();
         INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
         
-        Long toolSessionId = new Long(WebUtil.checkLong(NoticeboardConstants.TOOL_SESSION_ID, 
-    			request.getParameter(NoticeboardConstants.TOOL_SESSION_ID)));
+        Long toolSessionId = WebUtil.readLongParam(request, NoticeboardConstants.TOOL_SESSION_ID,false);
 
         nbContent = nbService.retrieveNoticeboardBySessionID(toolSessionId);
 	      
