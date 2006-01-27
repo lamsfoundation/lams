@@ -29,7 +29,6 @@ import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.Organisation;
-import org.lamsfoundation.lams.usermanagement.User;
 
 
 /**
@@ -111,13 +110,17 @@ public interface IMonitoringService
      * @param endDate teh lesson end date and time.
      */
     public void finishLessonOnSchedule(long lessonId, Date endDate);
-    
     /**
-     * Force the learner to complete all the activities for current lesson.
-     * @param learnerProgressId the learner progress belongs to the user who
-     * 							will be force complete
+     * Force Complete works on an individual user. The teacher may complete it up to a particular activity, 
+     * or till the end of the sequence which activity id is null indicating complete to end. Note, the give 
+     * activity will be complete as well.
+     * 
+     * @param learnerId
+     * @param lessonId
+     * @param activityId force complete to this activity(this activity will be force complete as well). 
+     * 		If null value, force will complete all activities in this lesson.
      */
-    public void forceCompleteLessonByUser(long learnerProgressId);
+    public void forceCompleteLessonByUser(Integer learnerId,long lessonId,Long activityId);
     
     /**
      * Archive the specified the lesson. When archived, the data is retained
