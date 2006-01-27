@@ -8,6 +8,7 @@ package org.lamsfoundation.lams.util;
  */
 public class ConfigurationKeys {
 
+	public static String ROOT ="Lams";
 	public static String SERVER_URL="ServerURL";
 	public static String LAMS_HOME="LamsHome";
 	public static String LAMS_TEMP_DIR="TempDir";
@@ -40,4 +41,24 @@ public class ConfigurationKeys {
 	/** Turn on the cache debugging listener. Logs whenever an item is added/removed/evicted
 	 * to/from the cache. Not on in production. Must be set to a boolean value */
 	public static String USE_CACHE_DEBUG_LISTENER="UseCacheDebugListener";
+	
+	/** Values for client updates */
+	public static String AUTHORING_CLIENT_VERSION = "AuthoringClientVersion";
+	
+	public static String LEARNER_CLIENT_VERSION = "LearnerClientVersion";
+	
+	public static String MONITOR_CLIENT_VERSION = "MonitorClientVersion";
+	
+	public static String SERVER_VERSION_NUMBER = "ServerVersionNumber";
+	
+	public static String SERVER_LANGUAGE = "ServerLanguage";
+	
+	public static String DICTIONARY_DATES  = "DictionaryDates";
+	
+	public static String DICTIONARY = "Dictionary";
+	
+	public static String DICTIONARY_CREATE_DATE = "createDate";
+	
+	public static String DICTIONARY_LANGUAGE = "language";	
+	
 }
