@@ -135,7 +135,7 @@ function pviiClassNew(obj, new_style) { //v2.7 by PVII
     <div class="tabbody" id="tabbody2">
         <h2>Advanced tab content</h2>
         <div id="formtablecontainer">
-        <!-- jsp :include page="AdvancedContent.jsp" / -->
+            <jsp:include page="AdvancedContent.jsp" />
         </div>
         <a href="javascript:window.close()" class="button">Cancel</a>
         <a href="javascript:submitMethod('submitAllContent')" class="button">Save</a>
