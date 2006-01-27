@@ -23,4 +23,16 @@
 	<AllowMultipleLogin>false</AllowMultipleLogin>
 	<!--  Turn on the cache debugging listener. Set to false in production -->
 	<UseCacheDebugListener>false</UseCacheDebugListener>
+	<!--  used for client updates -->
+	<AuthoringClientVersion>1.0</AuthoringClientVersion>
+	<MonitorClientVersion>1.1</MonitorClientVersion>
+	<LearnerClientVersion>1.2</LearnerClientVersion>
+	<ServerVersionNumber>1.1</ServerVersionNumber>
+	<ServerLanguage>en_AU</ServerLanguage>
+	<DictionaryDates>
+		<Dictionary>
+			<language>en_AU</language>
+			<createDate>2006-01-02</createDate>
+		</Dictionary>
+	</DictionaryDates>
 </Lams>

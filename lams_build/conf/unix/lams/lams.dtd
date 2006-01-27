@@ -1,4 +1,4 @@
-<!ELEMENT Lams (ServerURL,LamsHome,TempDir,DumpDir,SMTPServer,LamsSupportEmail,ContentRepositoryPath,UploadFileMaxSize,UploadLargeFileMaxSize,UploadFileMaxMemorySize,ChatServerName,ChatPortNumber,FileManagerDir,ExecutableExtensions,TicketFile,UserInactiveTimeout,AllowMultipleLogin,UseCacheDebugListener)>
+<!ELEMENT Lams (ServerURL,LamsHome,TempDir,DumpDir,SMTPServer,LamsSupportEmail,ContentRepositoryPath,UploadFileMaxSize,UploadLargeFileMaxSize,UploadFileMaxMemorySize,ChatServerName,ChatPortNumber,FileManagerDir,ExecutableExtensions,TicketFile,UserInactiveTimeout,AllowMultipleLogin,UseCacheDebugListener,AuthoringClientVersion,MonitorClientVersion,LearnerClientVersion,ServerVersionNumber,ServerLanguage, DictionaryDates)>
 <!ELEMENT ServerURL (#PCDATA)>
 <!ELEMENT LamsHome (#PCDATA)>
 <!ELEMENT TempDir (#PCDATA)>
@@ -17,3 +17,12 @@
 <!ELEMENT UserInactiveTimeout (#PCDATA)>
 <!ELEMENT AllowMultipleLogin (#PCDATA)>
 <!ELEMENT UseCacheDebugListener (#PCDATA)>
+<!ELEMENT AuthoringClientVersion (#PCDATA)>
+<!ELEMENT MonitorClientVersion (#PCDATA)>
+<!ELEMENT LearnerClientVersion (#PCDATA)>
+<!ELEMENT ServerVersionNumber (#PCDATA)>
+<!ELEMENT ServerLanguage (#PCDATA)>
+<!ELEMENT DictionaryDates (Dictionary+) >
+<!ELEMENT Dictionary (language, createDate)>
+<!ELEMENT language (#PCDATA)>
+<!ELEMENT createDate (#PCDATA)>
