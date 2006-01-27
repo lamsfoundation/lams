@@ -872,15 +872,15 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 					WorkspaceFolder targetFolder = workspaceFolderDAO.getWorkspaceFolderByID(targetFolderID);
 					currentFolder.setParentWorkspaceFolder(targetFolder);
 					workspaceFolderDAO.update(currentFolder);
-					flashMessage = new FlashMessage("MSG_KEY_MOVE", targetFolderID);
+					flashMessage = new FlashMessage(MSG_KEY_MOVE, targetFolderID);
 				}else
 					throw new WorkspaceFolderException();
 			}else
-				flashMessage = FlashMessage.getUserNotAuthorized("MSG_KEY_MOVE", userID);			
+				flashMessage = FlashMessage.getUserNotAuthorized(MSG_KEY_MOVE, userID);			
 		}catch(UserException ue){
-			flashMessage = FlashMessage.getNoSuchUserExists("MSG_KEY_MOVE", userID);
+			flashMessage = FlashMessage.getNoSuchUserExists(MSG_KEY_MOVE, userID);
 		}catch(WorkspaceFolderException we){
-			flashMessage = FlashMessage.getNoSuchWorkspaceFolderExsists("MSG_KEY_MOVE",targetFolderID);			
+			flashMessage = FlashMessage.getNoSuchWorkspaceFolderExsists(MSG_KEY_MOVE,targetFolderID);			
 		}
 		return flashMessage.serializeMessage();
 	}
