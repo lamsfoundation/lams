@@ -71,7 +71,8 @@ public interface IAuthoringService {
 	public LearningDesign copyLearningDesign(LearningDesign originalLearningDesign,Integer copyType,User user, WorkspaceFolder workspaceFolder);
 	/**
 	 * Create a copy of learning design as per the requested learning design
-	 * and saves it in the given workspacefoler
+	 * and saves it in the given workspacefolder. Designed to be called when user tries
+	 * to copy a learning design using the Flash interface.
 	 * 
 	 * @param originalLearningDesingID the source learning design id.
 	 * @param copyType purpose of copying the design. Can have one of the follwing values
@@ -82,9 +83,9 @@ public interface IAuthoringService {
 	 * </ul>
 	 * @param userID The user_id of the user who has sent this request(author/teacher)
 	 * @param workspaceFolderID The workspacefolder where this copy of the design would be saved
-	 * @return String Acknowledgment message for FLASH in WDDX format  
+	 * @return new LearningDesign   
 	 */	
-	public String copyLearningDesign(Long originalLearningDesignID,Integer copyType,
+	public LearningDesign copyLearningDesign(Long originalLearningDesignID,Integer copyType,
 											 Integer userID, Integer workspaceFolder)throws UserException, LearningDesignException,
 											 										 WorkspaceFolderException, IOException;
 	/**

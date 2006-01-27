@@ -70,8 +70,6 @@ import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
-import  org.lamsfoundation.lams.authoring.LearningDesignValidator;
-
 
 import com.allaire.wddx.WddxDeserializationException;
 
@@ -240,7 +238,7 @@ public class AuthoringService implements IAuthoringService {
 		}
 		return flashMessage.serializeMessage();
 	}	
-	public String copyLearningDesign(Long originalDesignID,Integer copyType,
+	public LearningDesign copyLearningDesign(Long originalDesignID,Integer copyType,
 									Integer userID, Integer workspaceFolderID)throws UserException, LearningDesignException, 
 											 							      WorkspaceFolderException, IOException{
 		
@@ -256,9 +254,7 @@ public class AuthoringService implements IAuthoringService {
 		if(workspaceFolder==null)
 			throw new WorkspaceFolderException("No such WorkspaceFolder with workspace_folder_id of:" + workspaceFolderID + " exists");
 		
-		LearningDesign designCopy = copyLearningDesign(originalDesign,copyType,user,workspaceFolder);
-		flashMessage = new FlashMessage("copyLearningDesign", designCopy.getLearningDesignId());
-		return flashMessage.serializeMessage();
+		return copyLearningDesign(originalDesign,copyType,user,workspaceFolder);
 	}
 	
 	/**
@@ -422,9 +418,8 @@ public class AuthoringService implements IAuthoringService {
 														groupingDAO,toolDAO,groupDAO,transitionDAO);
 		try { 
 			LearningDesign design = extractor.extractLearningDesign(table);	
-			LearningDesignValidator validator = new LearningDesignValidator(learningDesignDAO);
-			flashMessage = validator.validateLearningDesign(design);
-			
+			learningDesignDAO.insert(design);
+			flashMessage = new FlashMessage(IAuthoringService.STORE_LD_MESSAGE_KEY,design.getLearningDesignId());
 		} catch ( ObjectExtractorException e ) {
 			flashMessage = new FlashMessage(IAuthoringService.STORE_LD_MESSAGE_KEY,
 											"Invalid Object in WDDX packet. Error was "+e.getMessage(),

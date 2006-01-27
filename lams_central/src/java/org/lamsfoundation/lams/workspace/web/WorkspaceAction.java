@@ -34,8 +34,13 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
+import org.lamsfoundation.lams.authoring.service.IAuthoringService;
+import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
+import org.lamsfoundation.lams.usermanagement.exception.UserException;
+import org.lamsfoundation.lams.usermanagement.exception.WorkspaceFolderException;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -50,11 +55,15 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class WorkspaceAction extends DispatchAction {
 	
+	public static final String RESOURCE_ID = "resourceID";
+	public static final String RESOURCE_TYPE = "resourceType";
+	
 	/** If you want the output given as a jsp, set the request parameter "jspoutput" to 
      * some value other than an empty string (e.g. 1, true, 0, false, blah). 
      * If you want it returned as a stream (ie for Flash), do not define this parameter
      */  
 	public static String USE_JSP_OUTPUT = "jspoutput";
+	
 	
 	/**
 	 * @return
@@ -105,7 +114,7 @@ public class WorkspaceAction extends DispatchAction {
 											   HttpServletResponse response)throws ServletException,IOException{
 		Integer parentFolderID = new Integer(WebUtil.readIntParam(request,"parentFolderID"));
 		String folderName = (String)WebUtil.readStrParam(request,"name");
-		Integer userID = new Integer(WebUtil.readIntParam(request,"userID"));
+		Integer userID = new Integer(WebUtil.readIntParam(request,AttributeNames.PARAM_USER_ID));
 		IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
 		String wddxPacket = workspaceManagementService.createFolderForFlash(parentFolderID,folderName,userID);		
 		return outputPacket(mapping, request, response, wddxPacket, "details");
@@ -129,7 +138,7 @@ public class WorkspaceAction extends DispatchAction {
 										   HttpServletResponse response)throws ServletException,Exception{
 		Integer folderID = new Integer(WebUtil.readIntParam(request,"folderID"));
 		Integer mode = new Integer(WebUtil.readIntParam(request,"mode"));		
-		Integer userID = new Integer(WebUtil.readIntParam(request,"userID"));
+		Integer userID = new Integer(WebUtil.readIntParam(request,AttributeNames.PARAM_USER_ID));
 		IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
 		String wddxPacket = workspaceManagementService.getFolderContents(userID,folderID,mode);		
 		return outputPacket(mapping, request, response, wddxPacket, "details");		
@@ -153,7 +162,7 @@ public class WorkspaceAction extends DispatchAction {
 										   HttpServletResponse response)throws ServletException,Exception{
 		Integer folderID = new Integer(WebUtil.readIntParam(request,"folderID"));
 		Integer mode = new Integer(WebUtil.readIntParam(request,"mode"));		
-		Integer userID = new Integer(WebUtil.readIntParam(request,"userID"));
+		Integer userID = new Integer(WebUtil.readIntParam(request,AttributeNames.PARAM_USER_ID));
 		IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
 		String wddxPacket = workspaceManagementService.getFolderContentsExcludeHome(userID,folderID,mode);		
 		return outputPacket(mapping, request, response, wddxPacket, "details");		
@@ -171,15 +180,18 @@ public class WorkspaceAction extends DispatchAction {
 	 * @throws ServletException
 	 * @throws IOException
 	 */
-	public ActionForward deleteFolder(ActionMapping mapping,
+	public ActionForward deleteResource(ActionMapping mapping,
 											   ActionForm form,
 											   HttpServletRequest request,
 											   HttpServletResponse response)throws ServletException, IOException{
-		Integer folderID = new Integer(WebUtil.readIntParam(request,"folderID"));				
-		Integer userID = new Integer(WebUtil.readIntParam(request,"userID"));
+		Long resourceID = new Long(WebUtil.readLongParam(request,RESOURCE_ID));				
+		String resourceType = WebUtil.readStrParam(request,RESOURCE_TYPE);				
+		Integer userID = new Integer(WebUtil.readIntParam(request,AttributeNames.PARAM_USER_ID));
 		IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
-		String wddxPacket = workspaceManagementService.deleteFolder(folderID,userID);		
-		return outputPacket(mapping, request, response, wddxPacket, "details");
+		String wddxPacket = workspaceManagementService.deleteResource(resourceID,resourceType,userID);		
+        PrintWriter writer = response.getWriter();
+        writer.println(wddxPacket);
+        return null;
 	}
 	
 	/**
@@ -194,39 +206,17 @@ public class WorkspaceAction extends DispatchAction {
 	 * @throws ServletException
 	 * @throws IOException
 	 */
-	public ActionForward deleteLearningDesign(ActionMapping mapping,
+	public ActionForward copyResource(ActionMapping mapping,
 											   ActionForm form,
 											   HttpServletRequest request,
 											   HttpServletResponse response)throws ServletException, IOException{
-		Long learningDesignID = new Long(WebUtil.readIntParam(request,"learningDesignID"));				
-		Integer userID = new Integer(WebUtil.readIntParam(request,"userID"));
-		IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
-		String wddxPacket = workspaceManagementService.deleteLearningDesign(learningDesignID,userID);		
-		return outputPacket(mapping, request, response, wddxPacket, "details");
-		
-	}
-	
-	/**
-	 * For details please refer to
-	 * org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService
-	 * 
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return ActionForward
-	 * @throws ServletException
-	 * @throws IOException
-	 */
-	public ActionForward copyFolder(ActionMapping mapping,
-											   ActionForm form,
-											   HttpServletRequest request,
-											   HttpServletResponse response)throws ServletException, IOException{
-		Integer folderID = new Integer(WebUtil.readIntParam(request,"folderID"));				
+		Long resourceID = new Long(WebUtil.readLongParam(request,RESOURCE_ID));				
+		String resourceType = WebUtil.readStrParam(request,RESOURCE_TYPE);				
 		Integer targetFolderID = new Integer(WebUtil.readIntParam(request,"targetFolderID"));
-		Integer userID = new Integer(WebUtil.readIntParam(request,"userID"));
+		Integer copyType = WebUtil.readIntParam(request, "copyType", true);
+		Integer userID = new Integer(WebUtil.readIntParam(request,AttributeNames.PARAM_USER_ID));
 		IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
-		String wddxPacket = workspaceManagementService.copyFolder(folderID,targetFolderID,userID);
+		String wddxPacket = workspaceManagementService.copyResource(resourceID,resourceType,copyType,targetFolderID,userID);
 		return outputPacket(mapping, request, response, wddxPacket, "details");
 	}
 	
@@ -242,16 +232,20 @@ public class WorkspaceAction extends DispatchAction {
 	 * @throws ServletException
 	 * @throws IOException
 	 */
-	public ActionForward moveFolder(ActionMapping mapping,
+	public ActionForward moveResource(ActionMapping mapping,
 									ActionForm form,
 									HttpServletRequest request,
 									HttpServletResponse response)throws ServletException, IOException{
-		Integer currentFolderID = new Integer(WebUtil.readIntParam(request,"currentFolderID"));				
+		Long resourceID = new Long(WebUtil.readLongParam(request,RESOURCE_ID));				
+		String resourceType = WebUtil.readStrParam(request,RESOURCE_TYPE);				
+		Integer userID = new Integer(WebUtil.readIntParam(request,AttributeNames.PARAM_USER_ID));
 		Integer targetFolderID = new Integer(WebUtil.readIntParam(request,"targetFolderID"));
-		Integer userID = new Integer(WebUtil.readIntParam(request,"userID"));
+
 		IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
-		String wddxPacket = workspaceManagementService.moveFolder(currentFolderID,targetFolderID,userID);
-		return outputPacket(mapping, request, response, wddxPacket, "details");
+		String wddxPacket = workspaceManagementService.moveResource(resourceID,targetFolderID,resourceType,userID);
+        PrintWriter writer = response.getWriter();
+        writer.println(wddxPacket);
+        return null;
 	}
 	
 	/**
@@ -316,34 +310,13 @@ public class WorkspaceAction extends DispatchAction {
 	 * @param request
 	 * @param response
 	 * @return ActionForward
-	 * @throws ServletException
-	 * @throws Exception
-	 */
-	public ActionForward deleteWorkspaceFolderContent(ActionMapping mapping,
-													ActionForm form,
-													HttpServletRequest request,
-													HttpServletResponse response)throws ServletException, Exception{
-		Long folderContentID = new Long(WebUtil.readLongParam(request,"folderContentID"));
-		IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
-		String wddxPacket = workspaceManagementService.deleteWorkspaceFolderContent(folderContentID);
-		return outputPacket(mapping, request, response, wddxPacket, "details");
-	}
-	/**
-	 * For details please refer to
-	 * org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService
-	 *
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return ActionForward
 	 * @throws IOException
 	 */
 	public ActionForward getAccessibleWorkspaceFolders(ActionMapping mapping,
 													   ActionForm form,
 													   HttpServletRequest request,
 													   HttpServletResponse response)throws IOException{
-		Integer userID = new Integer(WebUtil.readIntParam(request,"userID"));
+		Integer userID = new Integer(WebUtil.readIntParam(request,AttributeNames.PARAM_USER_ID));
 		IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
 		String wddxPacket = workspaceManagementService.getAccessibleWorkspaceFolders(userID);		
 		return outputPacket(mapping, request, response, wddxPacket, "details");
@@ -363,53 +336,9 @@ public class WorkspaceAction extends DispatchAction {
 													   ActionForm form,
 													   HttpServletRequest request,
 													   HttpServletResponse response)throws IOException{
-		Integer userID = new Integer(WebUtil.readIntParam(request,"userID"));
+		Integer userID = new Integer(WebUtil.readIntParam(request,AttributeNames.PARAM_USER_ID));
 		IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
 		String wddxPacket = workspaceManagementService.getAccessibleWorkspaceFoldersNew(userID);		
-		return outputPacket(mapping, request, response, wddxPacket, "details");
-	}
-	/**
-	 * For details please refer to
-	 * org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService
-	 *
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return ActionForward
-	 * @throws IOException
-	 */
-	public ActionForward moveLearningDesign(ActionMapping mapping,
-											ActionForm form,
-											HttpServletRequest request,
-											HttpServletResponse response)throws IOException{
-		Integer userID = new Integer(WebUtil.readIntParam(request,"userID"));
-		Integer targetFolderID = new Integer(WebUtil.readIntParam(request,"targetFolderID"));
-		Long learningDesignID = new Long(WebUtil.readIntParam(request,"learningDesignID"));
-		IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
-		String wddxPacket = workspaceManagementService.moveLearningDesign(learningDesignID,targetFolderID,userID);		
-		return outputPacket(mapping, request, response, wddxPacket, "details");
-	}
-	/**
-	 * For details please refer to
-	 * org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService
-	 *
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return ActionForward
-	 * @throws IOException
-	 */
-	public ActionForward renameWorkspaceFolder(ActionMapping mapping,
-											ActionForm form,
-											HttpServletRequest request,
-											HttpServletResponse response)throws IOException{
-		Integer userID = new Integer(WebUtil.readIntParam(request,"userID"));
-		Integer folderID = new Integer(WebUtil.readIntParam(request,"folderID"));
-		String name = WebUtil.readStrParam(request,"name");
-		IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
-		String wddxPacket = workspaceManagementService.renameWorkspaceFolder(folderID,name,userID);		
 		return outputPacket(mapping, request, response, wddxPacket, "details");
 	}
 	
@@ -424,16 +353,19 @@ public class WorkspaceAction extends DispatchAction {
 	 * @return ActionForward
 	 * @throws IOException
 	 */
-	public ActionForward renameLearningDesign(ActionMapping mapping,
-											  ActionForm form,
-											  HttpServletRequest request,
-											  HttpServletResponse response)throws IOException{
-		Integer userID = new Integer(WebUtil.readIntParam(request,"userID"));
-		Long learningDesignID = new Long(WebUtil.readIntParam(request,"learningDesignID"));
-		String title = WebUtil.readStrParam(request,"title");
+	public ActionForward renameResource(ActionMapping mapping,
+											ActionForm form,
+											HttpServletRequest request,
+											HttpServletResponse response)throws IOException{
+		Integer userID = new Integer(WebUtil.readIntParam(request,AttributeNames.PARAM_USER_ID));
+		Long resourceID = new Long(WebUtil.readLongParam(request,RESOURCE_ID));
+		String resourceType = WebUtil.readStrParam(request,RESOURCE_TYPE);				
+		String name = WebUtil.readStrParam(request,"name");
 		IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
-		String wddxPacket = workspaceManagementService.renameLearningDesign(learningDesignID,title,userID);		
-		return outputPacket(mapping, request, response, wddxPacket, "details");
+		String wddxPacket = workspaceManagementService.renameResource(resourceID,resourceType,name,userID);		
+        PrintWriter writer = response.getWriter();
+        writer.println(wddxPacket);
+        return null;
 	}
 	
 	/**
@@ -451,7 +383,7 @@ public class WorkspaceAction extends DispatchAction {
 									  ActionForm form,
 									  HttpServletRequest request,
 									  HttpServletResponse response)throws IOException{
-		Integer userID = new Integer(WebUtil.readIntParam(request,"userID"));
+		Integer userID = new Integer(WebUtil.readIntParam(request,AttributeNames.PARAM_USER_ID));
 		IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
 		String wddxPacket = workspaceManagementService.getWorkspace(userID);		
 		return outputPacket(mapping, request, response, wddxPacket, "details");
@@ -485,7 +417,7 @@ public class WorkspaceAction extends DispatchAction {
 			  ActionForm form,
 			  HttpServletRequest request,
 			  HttpServletResponse response)throws Exception{
-		Integer userID = new Integer(WebUtil.readIntParam(request,"userID"));
+		Integer userID = new Integer(WebUtil.readIntParam(request,AttributeNames.PARAM_USER_ID));
 		String role = WebUtil.readStrParam(request, "role");
 		IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
 		String wddxPacket = workspaceManagementService.getOrganisationsByUserRole(userID, role);		

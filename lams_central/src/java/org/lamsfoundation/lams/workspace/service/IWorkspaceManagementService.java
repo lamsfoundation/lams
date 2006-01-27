@@ -126,90 +126,56 @@ public interface IWorkspaceManagementService {
 	
 	
 	/**
-	 * This method deletes the <code>WorkspaceFolder</code> with given
-	 * <code>workspaceFolderID</code>. But before it does so it checks whether the
-	 * <code>User</code> is authorized to perform this action <br>
-	 *  
-	 * <p><b>Note:</b><br></p><p>To be able to a delete a <code>WorkspaceFolder</code>
-	 * successfully you have to keep the following things in mind
-	 * <ul>
-	 * <li>The folder to be deleted should be empty.</li>
-	 * <li>It should not be the root folder of any <code>Organisation</code>
-	 * 	   or <code>User</code>
-	 * </li>
-	 * </ul></p>
-	 * 
-	 * @param workspaceFolderID The <code>WorkspaceFolder</code> to be deleted
+	 * This method deletes an entry from a workspace. It may be a folder,
+	 * a learning design or an arbitrary resource. It works out what the resource
+	 * is and then calls the other deletion methods. Currently folders, files and learning
+	 * designs are supported - all other types return an error.
+	 * <p>
+	 * @param resourceID The <code>id</code> to be deleted. May be a learning design id
+	 * or a folder id.
+	 * @param resourceType The resource type sent to the client in the FolderContentDTO. 
 	 * @param userID The <code>User</code> who has requested this operation
 	 * @return String The acknowledgement/error message in WDDX format for FLASH
 	 * @throws IOException
 	 */
-	public String deleteFolder(Integer workspaceFolderID, Integer userID)throws IOException;
-	
+	public String deleteResource(Long resourceID, String resourceType, Integer userID)
+		throws IOException;
+
 	/**
-	 * This method deletes a <code>LearningDesign</code> with given <code>learningDesignID</code>
-	 * provied the <code>User</code> is authorized to do so.
-	 * <p><b>Note:</b></p>
-	 * <p><ul>
-	 * <li>The <code>LearningDesign</code> should not be readOnly,
-	 * 	   indicating that a <code>Lesson</code> has already been started
-	 * </li>
-	 * <li>The given <code>LearningDesign</code> should not be acting as a 
-	 * 	   parent to any other existing <code>LearningDesign's</code></li>
-	 * </ul></p>
-	 * @param learningDesignID The <code>learning_design_id</code> of the
-	 * 						   <code>LearningDesign</code> to be deleted.
-	 * @param userID The <code>user_id</code> of the <code>User</code> who has
-	 * 				 requested this opeartion 
-	 * @return String The acknowledgement/error message in WDDX format for FLASH
-	 * @throws IOException
-	 */
-	public String deleteLearningDesign(Long learningDesignID, Integer userID)throws IOException;
-	
-	/**
-	 * This method copies one folder inside another folder. To be able to
-	 * successfully perform this action following conditions must be met in the
-	 * order they are listed.
-	 * <p><ul>
-	 * <li> The target <code>WorkspaceFolder</code> must exists</li>
-	 * <li>The <code>User</code> with the given <code>userID</code> 
-	 *     must have OWNER or MEMBERSHIP rights for that <code>WorkspaceFolder</code>
-	 * 	   to be authorized to do so.</li>
-	 * <ul></p>
-	 * 
-	 * <p><b>Note: </b> By default the copied folder has the same name as that of the 
-	 * one being copied. But in case the target <code>WorkspaceFolder</code> already has 
-	 * a folder with the same name, an additional "C" is appended to the name of the folder
-	 * thus created. </p>
-	 * 
-	 * @param folderID The <code>WorkspaceFolder</code> to be copied.
-	 * @param newFolderID The parent <code>WorkspaceFolder</code> under 
+	 * This method copies one folder inside another folder, or a learning design 
+	 * to another folder. If it is a learning design then it also needs the copyType parameter.
+	 *  		String wddxPacket = workspaceManagementService.copyResource(resourceID,resourceType,copyType,targetFolderID,userID);
+
+	 * @param resourceID The <code>WorkspaceFolder</code> or <code>LearningDesign</code> to be copied.
+	 * @param resourceType The resource type sent to the client in the FolderContentDTO. 
+	 * @param copyType Is this an ordinary learning design or a runtime learning design.  
+	 * @param targetFolderID The parent <code>WorkspaceFolder</code> under 
 	 * 					  which it has to be copied
 	 * @param userID The <code>User</code> who has requested this opeartion
 	 * @return String The acknowledgement/error message to be sent to FLASH
 	 * @throws IOException
 	 */
-	public String copyFolder(Integer folderID,Integer newFolderID,Integer userID)throws IOException;
+	public String copyResource(Long resourceID, String resourceType, Integer copyType, Integer targetFolderID, Integer userID)throws IOException;
 	
 	
 	/**
-	 * This method moves the given <code>WorkspaceFolder</code> with <code>currentFolderID</code>
-	 * under the WorkspaceFolder with <code>targetFolderID</code>.But before it does so it checks
-	 * whether the <code>User</code> is authorized to do so.
-	 *  
+	 * This method moves an entry (folder, design, etc) etc from a workspace. It may be a folder,
+	 * a learning design or an arbitrary resource. under the WorkspaceFolder with <code>targetFolderID</code>.
+	 * But before it does so it checks whether the <code>User</code> is authorized to do so.
 	 * <p>
-	 * <b>Note: </b> This method doesn't actually copies the content from one place to another.
-	 * All it does is change the <code>parent_workspace_folder_id</code> of the currentFolder
-	 * to that of the <code>targetFolder</code></p> 
+	 * Currently only folders and learning 	designs are supported - all other types return an error.
 	 * 
-	 * @param currentFolderID The WorkspaceFolder to be moved
+	 * @param resourceID The <code>id</code> to be moved. May be a learning design id
+	 * or a folder id.
+	 * @param resourceType The resource type sent to the client in the FolderContentDTO. 
 	 * @param targetFolderID The WorkspaceFolder under which it has to be moved
 	 * @param userID The User who has requested this opeartion
-	 * @return String The acknowledgement/error message to be sent to FLASH
+	 * @return String The acknowledgement/error message in WDDX format for FLASH
 	 * @throws IOException
 	 */
-	public String moveFolder(Integer currentFolderID,Integer targetFolderID,Integer userID)throws IOException;
-	
+	public String moveResource(Long resourceID, Integer targetFolderID, String resourceType, Integer userID)
+		throws IOException;
+
 	/**
 	 * This method is called every time a new content is inserted into the
 	 * given workspaceFolder. The content to be inserted can be either of 
@@ -243,16 +209,6 @@ public interface IWorkspaceManagementService {
 	 * @throws Exception
 	 */
 	public String updateWorkspaceFolderContent(Long folderContentID,String path)throws Exception;
-	
-	/**
-	 * This method deletes all versions of the given content (FILE/PACKAGE)
-	 * fom the repository. 
-	 * 
-	 * @param folderContentID The content to be deleted
-	 * @return String Acknowledgement/error message in WDDX format for FLASH
-	 * @throws Exception
-	 */
-	public String deleteWorkspaceFolderContent(Long folderContentID)throws Exception;
 	
 	/**
 	 * This method is called when the user knows which version of the
@@ -331,53 +287,24 @@ public interface IWorkspaceManagementService {
 	public String getAccessibleWorkspaceFoldersNew(Integer userID)throws IOException;
 
 	/**
-	 * This method moves a Learning Design from one workspace 
-	 * folder to another.But before it does that it checks whether 
-	 * the given User is authorized to do so. 
+	 * This method renames the workspaceFolder/learning design with the
+	 * given <code>resourceID</code> to <code>newName</code>.
+	 * <p>
+	 * Currently only folders and learning 	designs are supported - all other 
+	 * types return an error.
 	 * 
-	 * Nothing is physically moved from one folder to another. 
-	 * It just changes the <code>workspace_folder_id</code> for the 
-	 * given learningdesign in the <code>lams_learning_design_table</code>
-	 * if the <code>User</code> is authorized to do so.
-	 * 
-	 * @param learningDesignID The <code>learning_design_id</code> of the
-	 * 							design to be moved
-	 * @param targetWorkspaceFolderID The <code>workspaceFolder</code> under
-	 * 								  which it has to be moved.
-	 * @param userID The <code>User</code> who is requesting this operation
-	 * @return String Acknowledgement/error message in WDDX format for FLASH  
+	 * @param resourceID The <code>id</code> to be moved. May be a learning design id
+	 * or a folder id.
+	 * @param resourceType The resource type sent to the client in the FolderContentDTO. 
+	 * @param targetFolderID The WorkspaceFolder under which it has to be moved
+	 * @param userID The User who has requested this opeartion
+	 * @return String The acknowledgement/error message in WDDX format for FLASH
 	 * @throws IOException
 	 */
-	public String moveLearningDesign(Long learningDesignID,Integer targetWorkspaceFolderID,Integer userID) throws IOException;
-	
-	/**
-	 * This method renames the <code>workspaceFolder</code> with the
-	 * given <code>workspaceFodlerID</code> to <code>newName</code>.
-	 * But before it does that it checks if the user is authorized to
-	 * do so.
-	 * 
-	 * @param workspaceFolderID The <code>workspaceFolder</code> to be renamed
-	 * @param newName The <code>newName</code> to be assigned
-	 * @param userID The <code>User</code> who requested this operation
-	 * @return String Acknowledgement/error message in WDDX format for FLASH
-	 * @throws IOException
-	 */
-	public String renameWorkspaceFolder(Integer workspaceFolderID,String newName,Integer userID)throws IOException;
-	
-	/**
-	 * This method renames the Learning design with given <code>learningDesignID</code>
-	 * to the new <code>title</code>. But before it does that it checks if the user 
-	 * is authorized to do so.
-	 * 
-	 * @param learningDesignID The <code>learning_design_id</code> of the
-	 * 							design to be renamed
-	 * @param title The new title
-	 * @param userID The <code>User</code> who requested this operation
-	 * @return String Acknowledgement/error message in WDDX format for FLASH
-	 * @throws IOException
-	 */
-	public String renameLearningDesign(Long learningDesignID, String title,Integer userID)throws IOException;
-	
+	public String renameResource(Long resourceID, String resourceType, String newName, Integer userID)
+		throws IOException;
+
+
 	/**
 	 * This method returns the workspace for the given User
 	 * 

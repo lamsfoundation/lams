@@ -43,16 +43,15 @@ import org.lamsfoundation.lams.contentrepository.IVersionedNode;
 import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.ItemExistsException;
 import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
-import org.lamsfoundation.lams.contentrepository.LoginException;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
-import org.lamsfoundation.lams.contentrepository.client.ToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.contentrepository.service.RepositoryProxy;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO;
+import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -66,11 +65,10 @@ import org.lamsfoundation.lams.usermanagement.dao.IUserOrganisationDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IWorkspaceDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IWorkspaceFolderDAO;
 import org.lamsfoundation.lams.usermanagement.dto.UserAccessFoldersDTO;
-import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.usermanagement.exception.WorkspaceFolderException;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
-import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 import org.lamsfoundation.lams.workspace.WorkspaceFolderContent;
 import org.lamsfoundation.lams.workspace.dao.IWorkspaceFolderContentDAO;
 import org.lamsfoundation.lams.workspace.dto.FolderContentDTO;
@@ -84,6 +82,11 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	protected Logger log = Logger.getLogger(WorkspaceManagementService.class.getName());
 
 	private FlashMessage flashMessage;
+	
+	private static final String MSG_KEY_MOVE = "moveResource";
+	private static final String MSG_KEY_COPY = "copyResource";
+	private static final String MSG_KEY_RENAME = "renameResource";
+	private static final String MSG_KEY_DELETE = "deleteResource";
 	
 	public static final Integer AUTHORING = new Integer(1);
 	public static final Integer MONITORING = new Integer(2);
@@ -100,6 +103,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	protected IAuthoringService authoringService;
 	protected IRepositoryService repositoryService;
 	protected IUserManagementService userMgmtService;
+	
 	
 	/**
 	 * @param workspaceFolderContentDAO The workspaceFolderContentDAO to set.
@@ -156,30 +160,74 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		this.userMgmtService = userMgmtService;
 	}
 	
+	
 	/**
 	 * (non-Javadoc)
-	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#deleteFolder(java.lang.Integer, java.lang.Integer)
+	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#deleteResource(java.lang.Integer, java.lang.String, java.lang.Integer)
+	 */
+	public String deleteResource(Long resourceID, String resourceType, Integer userID) throws IOException {
+
+		String errorMessage = null;
+
+		if ( resourceID == null || resourceType == null || userID== null ) {
+			errorMessage = "deleteResource(Long resourceID, String resourceType, Integer userID) requires a value for resourceID, resourceType and userID";
+		} else if ( FolderContentDTO.DESIGN.equals(resourceType) ) {
+			return deleteLearningDesign(resourceID, userID);
+		} else if ( FolderContentDTO.FOLDER.equals(resourceType) ) {
+			return deleteFolder(new Integer(resourceID.intValue()), userID);
+		} else if ( FolderContentDTO.FILE.equals(resourceType) ) {
+			return 	deleteWorkspaceFolderContent(resourceID);
+		} else if ( FolderContentDTO.LESSON.equals(resourceType) ) {
+			// TODO implement delete lesson
+			errorMessage = "LAMS does not support deleting a lesson via the workspace interface. ";			
+		}
+		
+		FlashMessage message = new FlashMessage(MSG_KEY_DELETE,
+					"Cannot delete the resource: "+errorMessage,
+					FlashMessage.ERROR);		
+		return message.serializeMessage();
+	
+	}
+	
+	/**
+	 * This method deletes the <code>WorkspaceFolder</code> with given
+	 * <code>workspaceFolderID</code>. But before it does so it checks whether the
+	 * <code>User</code> is authorized to perform this action <br>
+	 *  
+	 * <p><b>Note:</b><br></p><p>To be able to a delete a <code>WorkspaceFolder</code>
+	 * successfully you have to keep the following things in mind
+	 * <ul>
+	 * <li>The folder to be deleted should be empty.</li>
+	 * <li>It should not be the root folder of any <code>Organisation</code>
+	 * 	   or <code>User</code>
+	 * </li>
+	 * </ul></p>
+	 * 
+	 * @param workspaceFolderID The <code>WorkspaceFolder</code> to be deleted
+	 * @param userID The <code>User</code> who has requested this operation
+	 * @return String The acknowledgement/error message in WDDX format for FLASH
+	 * @throws IOException
 	 */
 	public String deleteFolder(Integer folderID, Integer userID)throws IOException{		
 		WorkspaceFolder workspaceFolder = workspaceFolderDAO.getWorkspaceFolderByID(folderID);
 		User user = userDAO.getUserById(userID);
 		if(user!=null){
 			if(!getPermissions(workspaceFolder,user).equals(WorkspaceFolder.OWNER_ACCESS)){
-				flashMessage = FlashMessage.getUserNotAuthorized("deleteFolder",userID);
+				flashMessage = FlashMessage.getUserNotAuthorized(MSG_KEY_DELETE,userID);
 			}else{
 				if(workspaceFolder!=null){
 					if(isRootFolder(workspaceFolder))
-						flashMessage = new FlashMessage("deleteFolder",
+						flashMessage = new FlashMessage(MSG_KEY_DELETE,
 														"Cannot delete this folder as it is the Root folder.",
 														FlashMessage.ERROR);
 					else{
 						flashMessage = deleteFolderContents(workspaceFolder, userID);
 					}
 				}else
-					flashMessage = FlashMessage.getNoSuchWorkspaceFolderExsists("deleteFolder",folderID);
+					flashMessage = FlashMessage.getNoSuchWorkspaceFolderExsists(MSG_KEY_DELETE,folderID);
 			}
 		}else
-			flashMessage = FlashMessage.getNoSuchUserExists("deleteFolder",userID);
+			flashMessage = FlashMessage.getNoSuchUserExists(MSG_KEY_DELETE,userID);
 			
 		return flashMessage.serializeMessage();
 	}
@@ -241,7 +289,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 						{
 							if (learningDesign.getReadOnly().booleanValue()) {
 								isDeleteSuccessful = false;
-								flashMessage = new FlashMessage("deleteFolder",
+								flashMessage = new FlashMessage(MSG_KEY_DELETE,
 																"Cannot delete design with learning_design_id of :" + learningDesignID +
 																" as it is READ ONLY.", FlashMessage.ERROR);
 							}
@@ -255,7 +303,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 								else
 								{
 									isDeleteSuccessful = false;
-									flashMessage = new FlashMessage("deleteFolder",
+									flashMessage = new FlashMessage(MSG_KEY_DELETE,
 																	"Cannot delete design with learning_design_id of:" + learningDesignID +
 																	" as it is a PARENT.",
 																	FlashMessage.ERROR);
@@ -273,7 +321,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		if(isDeleteSuccessful) //it will only delete this folder if all the files/folder/learningDesigns are all deleted
 		{
 			workspaceFolderDAO.delete(folder);
-			flashMessage = new FlashMessage("deleteFolder","Folder deleted:" + folderID);
+			flashMessage = new FlashMessage(MSG_KEY_DELETE,"Folder deleted:" + folderID);
 		}
 				
 		return flashMessage;
@@ -472,30 +520,110 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		return packet;
 	}	
 	/**
-	 * (non-Javadoc)
-	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#copyFolder(java.lang.Integer, java.lang.Integer, java.lang.Integer)
+	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#copyResource(Long, String, Integer, Integer, Integer)
 	 */
-	public String copyFolder(Integer folderID,Integer newFolderID,Integer userID)throws IOException{
+	public String copyResource(Long resourceID, String resourceType, Integer copyType, Integer targetFolderID, Integer userID)throws IOException {
+		String errorMessage = null;
+
+		if ( resourceID == null || targetFolderID == null || resourceType == null || userID== null ) {
+			errorMessage = "copyResource(Long resourceID,Integer targetFolderID, String resourceType, Integer userID) requires a value for resourceID, targetFolderID, resourceType and userID";
+		} else if ( FolderContentDTO.DESIGN.equals(resourceType) ) {
+			return copyLearningDesign(resourceID,targetFolderID,copyType,userID);
+		} else if ( FolderContentDTO.FOLDER.equals(resourceType) ) {
+			return copyFolder(new Integer(resourceID.intValue()), targetFolderID, userID);
+		} else if ( FolderContentDTO.FILE.equals(resourceType) ) {
+			// TODO implement delete file resource
+			errorMessage = "LAMS does not support copying a file via the workspace interface. ";			
+		} else if ( FolderContentDTO.LESSON.equals(resourceType) ) {
+			// TODO implement delete lesson
+			errorMessage = "LAMS does not support copying a lesson via the workspace interface. ";			
+		}
+		
+		FlashMessage message = new FlashMessage(MSG_KEY_COPY,
+					"Cannot copy the resource: "+errorMessage,
+					FlashMessage.ERROR);		
+		return message.serializeMessage();
+	
+	}
+
+	/**
+	 * This method copies one folder inside another folder. To be able to
+	 * successfully perform this action following conditions must be met in the
+	 * order they are listed.
+	 * <p><ul>
+	 * <li> The target <code>WorkspaceFolder</code> must exists</li>
+	 * <li>The <code>User</code> with the given <code>userID</code> 
+	 *     must have OWNER or MEMBERSHIP rights for that <code>WorkspaceFolder</code>
+	 * 	   to be authorized to do so.</li>
+	 * <ul></p>
+	 * 
+	 * <p><b>Note: </b> By default the copied folder has the same name as that of the 
+	 * one being copied. But in case the target <code>WorkspaceFolder</code> already has 
+	 * a folder with the same name, an additional "C" is appended to the name of the folder
+	 * thus created. </p>
+	 * 
+	 * @param folderID The <code>WorkspaceFolder</code> to be copied.
+	 * @param targetFolderID The parent <code>WorkspaceFolder</code> under 
+	 * 					  which it has to be copied
+	 * @param userID The <code>User</code> who has requested this opeartion
+	 * @return String The acknowledgement/error message to be sent to FLASH
+	 * @throws IOException
+	 */
+	public String copyFolder(Integer folderID,Integer targetFolderID,Integer userID)throws IOException{
 		try{
-			if(isUserAuthorized(newFolderID,userID)){
+			if(isUserAuthorized(targetFolderID,userID)){
 				WorkspaceFolder workspaceFolder = workspaceFolderDAO.getWorkspaceFolderByID(folderID);
 				if(workspaceFolder!=null){
-					WorkspaceFolder newFolder = createFolder(newFolderID,workspaceFolder.getName(),userID);
+					WorkspaceFolder newFolder = createFolder(targetFolderID,workspaceFolder.getName(),userID);
 					copyRootContent(workspaceFolder,newFolder,userID);				
 					if(workspaceFolder.hasSubFolders())
 						createSubFolders(workspaceFolder, newFolder,userID);
-					flashMessage = new FlashMessage("copyFolder",createCopyFolderPacket(newFolder));
+					flashMessage = new FlashMessage(MSG_KEY_COPY,newFolder.getWorkspaceFolderId());
 				}else
 					throw new WorkspaceFolderException();				
 			}else
-				flashMessage = FlashMessage.getUserNotAuthorized("copyFolder", userID);
+				flashMessage = FlashMessage.getUserNotAuthorized(MSG_KEY_COPY, userID);
 		}catch(UserException ue){
-			flashMessage = FlashMessage.getNoSuchUserExists("copyFolder",userID);
+			flashMessage = FlashMessage.getNoSuchUserExists(MSG_KEY_COPY,userID);
 		}catch(WorkspaceFolderException we){
-			flashMessage = FlashMessage.getNoSuchWorkspaceFolderExsists("copyFolder",folderID);
+			flashMessage = FlashMessage.getNoSuchWorkspaceFolderExsists(MSG_KEY_COPY,folderID);
 		}
 		return flashMessage.serializeMessage();
 	}
+	
+	/**
+	 * This method copies a learning design to another folder. Call the AuthoringService
+	 * to do the copy.
+	 * 
+	 * @param folderID The <code>WorkspaceFolder</code> to be copied.
+	 * @param newFolderID The parent <code>WorkspaceFolder</code> under 
+	 * 					  which it has to be copied
+	 * @param userID The <code>User</code> who has requested this opeartion
+	 * @return String The acknowledgement/error message to be sent to FLASH
+	 * @throws IOException
+	 */
+	public String copyLearningDesign(Long designID,Integer targetFolderID,Integer copyType,Integer userID)throws IOException{
+		FlashMessage message = null;
+		try { 
+			LearningDesign ld = authoringService.copyLearningDesign(designID, 
+					copyType != null ? copyType : new Integer(LearningDesign.COPY_TYPE_NONE), 
+							userID, targetFolderID);
+			message = new FlashMessage(MSG_KEY_COPY,ld.getLearningDesignId());
+			
+		} catch ( Exception e ) {
+			log.error("copyLearningDesign() unable to copy learning design due to an error. "
+				+ "designID="+designID
+				+ "copyType="+copyType
+				+ "targetFolderID="+targetFolderID
+				+ "userID="+userID ,e);
+
+			message = new FlashMessage(MSG_KEY_COPY, "Unable to copy learning design due to an error "+e.getMessage(), FlashMessage.ERROR);
+
+		}
+
+		return message.serializeMessage();
+	}
+
 	/**
 	 * This method checks whether the user is authorized to create 
 	 * a new folder under the given WorkspaceFolder.
@@ -524,10 +652,10 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		
 		return authorized;
 	}
-	private Hashtable createCopyFolderPacket(WorkspaceFolder workspaceFolder){
+	private Hashtable createCopyFolderPacket(Long newResourceID, Integer targetFolderID){
 		Hashtable packet = new Hashtable();
-		packet.put("workspaceFolderID", workspaceFolder.getWorkspaceFolderId());
-		packet.put("workspaceID",workspaceFolder.getWorkspaceID());
+		packet.put("newResourceID", newResourceID);
+		packet.put("targetFolderID",targetFolderID);
 		return packet;
 	}	
 	public boolean isUserOwner(WorkspaceFolder workspaceFolder, User user){				
@@ -636,12 +764,28 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		}
 	}
 	/**
+	 * This method deletes a <code>LearningDesign</code> with given <code>learningDesignID</code>
+	 * provied the <code>User</code> is authorized to do so.
+	 * <p><b>Note:</b></p>
+	 * <p><ul>
+	 * <li>The <code>LearningDesign</code> should not be readOnly,
+	 * 	   indicating that a <code>Lesson</code> has already been started
+	 * </li>
+	 * <li>The given <code>LearningDesign</code> should not be acting as a 
+	 * 	   parent to any other existing <code>LearningDesign's</code></li>
+	 * </ul></p>
+	 * 
 	 * TODO Deleting a LearningDesign would mean deleting all its corresponding
 	 * activities, transitions and the content related to such activities.
 	 * Deletion of content has to be yet taken care of. Since Tools manage there
 	 * own content.Just need to cross-check this once tools are functional
-	 * (non-Javadoc)
-	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#deleteLearningDesign(java.lang.Long)
+     *
+	 * @param learningDesignID The <code>learning_design_id</code> of the
+	 * 						   <code>LearningDesign</code> to be deleted.
+	 * @param userID The <code>user_id</code> of the <code>User</code> who has
+	 * 				 requested this opeartion 
+	 * @return String The acknowledgement/error message in WDDX format for FLASH
+	 * @throws IOException
 	 */
 	public String deleteLearningDesign(Long learningDesignID, Integer userID)throws IOException{
 		User user = userDAO.getUserById(userID);
@@ -651,7 +795,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 			if(learningDesign!=null){
 				if(learningDesign.getUser().getUserId().equals(user.getUserId())){
 					if(learningDesign.getReadOnly().booleanValue()){
-						flashMessage = new FlashMessage("deleteLearningDesign",
+						flashMessage = new FlashMessage(MSG_KEY_DELETE,
 														"Cannot delete design with learning_design_id of:" + learningDesignID +
 														" as it is READ ONLY.",
 														FlashMessage.ERROR);
@@ -659,23 +803,63 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 						List list = learningDesignDAO.getLearningDesignsByParent(learningDesignID);
 						if(list==null || list.size()==0){
 							learningDesignDAO.delete(learningDesign);
-							flashMessage = new FlashMessage("deleteLearningDesign","Learning Design deleted: "+ learningDesignID);
+							flashMessage = new FlashMessage(MSG_KEY_DELETE,"Learning Design deleted: "+ learningDesignID);
 						}
 						else
-							flashMessage = new FlashMessage("deleteLearningDesign",
+							flashMessage = new FlashMessage(MSG_KEY_DELETE,
 															"Cannot delete design with learning_design_id of:" + learningDesignID +
 															" as it is a PARENT.",
 															FlashMessage.ERROR);
 					}
 				}else
-					flashMessage = FlashMessage.getUserNotAuthorized("deleteLearningDesign",userID);
+					flashMessage = FlashMessage.getUserNotAuthorized(MSG_KEY_DELETE,userID);
 		}else
-			flashMessage = FlashMessage.getNoSuchLearningDesignExists("deleteLearningDesign",learningDesignID);
+			flashMessage = FlashMessage.getNoSuchLearningDesignExists(MSG_KEY_DELETE,learningDesignID);
 		}else
-			flashMessage = FlashMessage.getNoSuchUserExists("deleteLearningDesign",userID);
+			flashMessage = FlashMessage.getNoSuchUserExists(MSG_KEY_DELETE,userID);
 		
 		return flashMessage.serializeMessage();
 	}
+	/**
+	 * This method moves the given <code>WorkspaceFolder</code> with <code>currentFolderID</code>
+	 * under the WorkspaceFolder with <code>targetFolderID</code>.But before it does so it checks
+	 * whether the <code>User</code> is authorized to do so.
+	 *  
+	 * <p>
+	 * <b>Note: </b> This method doesn't actually copies the content from one place to another.
+	 * All it does is change the <code>parent_workspace_folder_id</code> of the currentFolder
+	 * to that of the <code>targetFolder</code></p> 
+	 * 
+	 * @param currentFolderID The WorkspaceFolder to be moved
+	 * @param targetFolderID The WorkspaceFolder under which it has to be moved
+	 * @param userID The User who has requested this opeartion
+	 * @return String The acknowledgement/error message to be sent to FLASH
+	 * @throws IOException
+	 */
+	public String moveResource(Long resourceID,Integer targetFolderID, String resourceType, Integer userID)throws IOException{
+		String errorMessage = null;
+
+		if ( resourceID == null || targetFolderID == null || resourceType == null || userID== null ) {
+			errorMessage = "moveResource(Long resourceID,Integer targetFolderID, String resourceType, Integer userID) requires a value for resourceID, targetFolderID, resourceType and userID";
+		} else if ( FolderContentDTO.DESIGN.equals(resourceType) ) {
+			return moveLearningDesign(resourceID, targetFolderID, userID);
+		} else if ( FolderContentDTO.FOLDER.equals(resourceType) ) {
+			return moveFolder(new Integer(resourceID.intValue()), targetFolderID, userID);
+		} else if ( FolderContentDTO.FILE.equals(resourceType) ) {
+			// TODO implement delete file resource
+			errorMessage = "LAMS does not support moving a file via the workspace interface. ";			
+		} else if ( FolderContentDTO.LESSON.equals(resourceType) ) {
+			// TODO implement delete lesson
+			errorMessage = "LAMS does not support moving a lesson via the workspace interface. ";			
+		}
+		
+		FlashMessage message = new FlashMessage(MSG_KEY_MOVE,
+					"Cannot move the resource: "+errorMessage,
+					FlashMessage.ERROR);		
+		return message.serializeMessage();
+	
+	}
+
 	/**
 	 * (non-Javadoc)
 	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#moveFolder(java.lang.Integer, java.lang.Integer, java.lang.Integer)
@@ -688,15 +872,15 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 					WorkspaceFolder targetFolder = workspaceFolderDAO.getWorkspaceFolderByID(targetFolderID);
 					currentFolder.setParentWorkspaceFolder(targetFolder);
 					workspaceFolderDAO.update(currentFolder);
-					flashMessage = new FlashMessage("moveFolder",currentFolderID);
+					flashMessage = new FlashMessage("MSG_KEY_MOVE", targetFolderID);
 				}else
 					throw new WorkspaceFolderException();
 			}else
-				flashMessage = FlashMessage.getUserNotAuthorized("moveFolder", userID);			
+				flashMessage = FlashMessage.getUserNotAuthorized("MSG_KEY_MOVE", userID);			
 		}catch(UserException ue){
-			flashMessage = FlashMessage.getNoSuchUserExists("moveFolder", userID);
+			flashMessage = FlashMessage.getNoSuchUserExists("MSG_KEY_MOVE", userID);
 		}catch(WorkspaceFolderException we){
-			flashMessage = FlashMessage.getNoSuchWorkspaceFolderExsists("moveFolder",targetFolderID);			
+			flashMessage = FlashMessage.getNoSuchWorkspaceFolderExsists("MSG_KEY_MOVE",targetFolderID);			
 		}
 		return flashMessage.serializeMessage();
 	}
@@ -949,16 +1133,20 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	}
 	
 	/**
-	 * (non-Javadoc)
-	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#deleteWorkspaceFolderContent(java.lang.Long, boolean)
+	 * This method deletes all versions of the given content (FILE/PACKAGE)
+	 * fom the repository. 
+	 * 
+	 * @param folderContentID The content to be deleted
+	 * @return String Acknowledgement/error message in WDDX format for FLASH
+	 * @throws Exception
 	 */
-	public String deleteWorkspaceFolderContent(Long folderContentID)throws Exception{
+	public String deleteWorkspaceFolderContent(Long folderContentID) throws IOException {
 		WorkspaceFolderContent workspaceFolderContent = workspaceFolderContentDAO.getWorkspaceFolderContentByID(folderContentID);
 		if(workspaceFolderContent!=null){
 			workspaceFolderContentDAO.delete(workspaceFolderContent);
-			flashMessage = new FlashMessage("deleteWorkspaceFolderContent","Content deleted");
+			flashMessage = new FlashMessage(MSG_KEY_DELETE,"Content deleted");
 		}else
-			flashMessage = FlashMessage.getNoSuchWorkspaceFolderContentExsists("deleteWorkspaceFolderContent",folderContentID);
+			flashMessage = FlashMessage.getNoSuchWorkspaceFolderContentExsists(MSG_KEY_DELETE,folderContentID);
 		
 		return flashMessage.serializeMessage();
 		
@@ -1106,8 +1294,22 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		return access;
 	}	
 	/**
-	 * (non-Javadoc)
-	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#moveLearningDesign(java.lang.Long, java.lang.Integer, java.lang.Integer)
+	 * This method moves a Learning Design from one workspace 
+	 * folder to another.But before it does that it checks whether 
+	 * the given User is authorized to do so. 
+	 * 
+	 * Nothing is physically moved from one folder to another. 
+	 * It just changes the <code>workspace_folder_id</code> for the 
+	 * given learningdesign in the <code>lams_learning_design_table</code>
+	 * if the <code>User</code> is authorized to do so.
+	 * 
+	 * @param learningDesignID The <code>learning_design_id</code> of the
+	 * 							design to be moved
+	 * @param targetWorkspaceFolderID The <code>workspaceFolder</code> under
+	 * 								  which it has to be moved.
+	 * @param userID The <code>User</code> who is requesting this operation
+	 * @return String Acknowledgement/error message in WDDX format for FLASH  
+	 * @throws IOException
 	 */
 	public String moveLearningDesign(Long learningDesignID,
 									 Integer targetWorkspaceFolderID,
@@ -1120,24 +1322,57 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 					if(workspaceFolder != null){
 						learningDesign.setWorkspaceFolder(workspaceFolder);
 						learningDesignDAO.update(learningDesign);
-						//flashMessage = new FlashMessage("moveLearningDesign","New WorkspaceFolderID is " + targetWorkspaceFolderID);
-						flashMessage = new FlashMessage("moveLearningDesign", targetWorkspaceFolderID);
+						flashMessage = new FlashMessage(MSG_KEY_MOVE, targetWorkspaceFolderID);
 					}else
-						flashMessage = FlashMessage.getNoSuchWorkspaceFolderExsists("moveLearningDesign",targetWorkspaceFolderID); 
+						flashMessage = FlashMessage.getNoSuchWorkspaceFolderExsists(MSG_KEY_MOVE,targetWorkspaceFolderID); 
 			   }else
-			   		flashMessage = FlashMessage.getNoSuchLearningDesignExists("moveLearningDesign", learningDesignID);
+			   		flashMessage = FlashMessage.getNoSuchLearningDesignExists(MSG_KEY_MOVE, learningDesignID);
 			}else
-				flashMessage = FlashMessage.getUserNotAuthorized("moveLearningDesign",userID);
+				flashMessage = FlashMessage.getUserNotAuthorized(MSG_KEY_MOVE,userID);
 		}catch(UserException ue){
-			flashMessage = FlashMessage.getNoSuchUserExists("moveLearningDesign", userID);
+			flashMessage = FlashMessage.getNoSuchUserExists(MSG_KEY_MOVE, userID);
 		}catch(WorkspaceFolderException we){
-			flashMessage = FlashMessage.getNoSuchWorkspaceFolderExsists("moveLearningDesign",targetWorkspaceFolderID);
+			flashMessage = FlashMessage.getNoSuchWorkspaceFolderExsists(MSG_KEY_MOVE,targetWorkspaceFolderID);
 		}
 		return flashMessage.serializeMessage();
 	}
 	/**
-	 * (non-Javadoc)
-	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#renameWorkspaceFolder(java.lang.Long, java.lang.String, java.lang.Integer)
+	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#renameResource(Long, String, String, Integer)
+	 */
+	public String renameResource(Long resourceID, String resourceType, String newName, Integer userID)throws IOException{
+		String errorMessage = null;
+
+		if ( resourceID == null || newName == null || resourceType == null || userID== null ) {
+			errorMessage = "renameResource(Long resourceID,Integer newName, String resourceType, Integer userID) requires a value for resourceID, targetFolderID, resourceType and userID";
+		} else if ( FolderContentDTO.DESIGN.equals(resourceType) ) {
+			return renameLearningDesign(resourceID, newName, userID);
+		} else if ( FolderContentDTO.FOLDER.equals(resourceType) ) {
+			return renameWorkspaceFolder(new Integer(resourceID.intValue()), newName, userID);
+		} else if ( FolderContentDTO.FILE.equals(resourceType) ) {
+			// TODO implement delete file resource
+			errorMessage = "LAMS does not support renaming a file via the workspace interface. ";			
+		} else if ( FolderContentDTO.LESSON.equals(resourceType) ) {
+			// TODO implement delete lesson
+			errorMessage = "LAMS does not support renaming a lesson via the workspace interface. ";			
+		}
+		
+		FlashMessage message = new FlashMessage(MSG_KEY_RENAME,
+					"Cannot rename the resource: "+errorMessage,
+					FlashMessage.ERROR);		
+		return message.serializeMessage();
+	
+	}
+	/**
+	 * This method renames the <code>workspaceFolder</code> with the
+	 * given <code>workspaceFolderID</code> to <code>newName</code>.
+	 * But before it does that it checks if the user is authorized to
+	 * do so.
+	 * 
+	 * @param workspaceFolderID The <code>workspaceFolder</code> to be renamed
+	 * @param newName The <code>newName</code> to be assigned
+	 * @param userID The <code>User</code> who requested this operation
+	 * @return String Acknowledgement/error message in WDDX format for FLASH
+	 * @throws IOException
 	 */
 	public String renameWorkspaceFolder(Integer workspaceFolderID,String newName,Integer userID)throws IOException{
 		try{
@@ -1149,29 +1384,37 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 						if(!ifNameExists(parent,newName)){
 							folder.setName(newName);
 							workspaceFolderDAO.update(folder);
-							flashMessage = new FlashMessage("renameWorkspaceFolder",newName);
+							flashMessage = new FlashMessage(MSG_KEY_RENAME,newName);
 						}else
-							flashMessage = new FlashMessage("renameWorkspaceFolder",
+							flashMessage = new FlashMessage(MSG_KEY_RENAME,
 															"A folder with given name '" + newName + "' already exists.",
 															FlashMessage.ERROR);
 					}else
-						flashMessage = FlashMessage.getUserNotAuthorized("renameWorkspaceFolder",userID);
+						flashMessage = FlashMessage.getUserNotAuthorized(MSG_KEY_RENAME,userID);
 				}else
-					flashMessage = new FlashMessage("renameWorkspaceFolder",
+					flashMessage = new FlashMessage(MSG_KEY_RENAME,
 													"Cannot rename the ROOT folder",
 													FlashMessage.ERROR);
 			}else
-				flashMessage = FlashMessage.getNoSuchWorkspaceFolderExsists("renameWorkspaceFolder",workspaceFolderID);
+				flashMessage = FlashMessage.getNoSuchWorkspaceFolderExsists(MSG_KEY_RENAME,workspaceFolderID);
 		}catch(UserException ue){
-			flashMessage = FlashMessage.getNoSuchUserExists("renameWorkspaceFolder", userID);
+			flashMessage = FlashMessage.getNoSuchUserExists(MSG_KEY_RENAME, userID);
 		}catch(WorkspaceFolderException we){
-			flashMessage = FlashMessage.getNoSuchWorkspaceFolderExsists("renameWorkspaceFolder",workspaceFolderID);
+			flashMessage = FlashMessage.getNoSuchWorkspaceFolderExsists(MSG_KEY_RENAME,workspaceFolderID);
 		}
 		return flashMessage.serializeMessage();
 	}
 	/**
-	 * (non-Javadoc)
-	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#renameLearningDesign(java.lang.Long, java.lang.String, java.lang.Integer)
+	 * This method renames the Learning design with given <code>learningDesignID</code>
+	 * to the new <code>title</code>. But before it does that it checks if the user 
+	 * is authorized to do so.
+	 * 
+	 * @param learningDesignID The <code>learning_design_id</code> of the
+	 * 							design to be renamed
+	 * @param title The new title
+	 * @param userID The <code>User</code> who requested this operation
+	 * @return String Acknowledgement/error message in WDDX format for FLASH
+	 * @throws IOException
 	 */
 	public String renameLearningDesign(Long learningDesignID, String title,Integer userID)throws IOException {
 		LearningDesign design = learningDesignDAO.getLearningDesignById(learningDesignID);	
@@ -1182,15 +1425,15 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 				if(isUserAuthorized(folderID,userID)){
 					design.setTitle(title);
 					learningDesignDAO.update(design);
-					flashMessage = new FlashMessage("renameLearningDesign",title);
+					flashMessage = new FlashMessage(MSG_KEY_RENAME,title);
 				}else
-					flashMessage = FlashMessage.getUserNotAuthorized("renameLearningDesign",userID);
+					flashMessage = FlashMessage.getUserNotAuthorized(MSG_KEY_RENAME,userID);
 			}else
-				flashMessage = FlashMessage.getNoSuchLearningDesignExists("renameLearningDesign",learningDesignID);			
+				flashMessage = FlashMessage.getNoSuchLearningDesignExists(MSG_KEY_RENAME,learningDesignID);			
 		}catch(UserException ue){
-			flashMessage = FlashMessage.getNoSuchUserExists("renameWorkspaceFolder", userID);
+			flashMessage = FlashMessage.getNoSuchUserExists(MSG_KEY_RENAME, userID);
 		}catch(WorkspaceFolderException we){
-			flashMessage = FlashMessage.getNoSuchWorkspaceFolderExsists("renameWorkspaceFolder",folderID);
+			flashMessage = FlashMessage.getNoSuchWorkspaceFolderExsists(MSG_KEY_RENAME,folderID);
 		}
 		return flashMessage.serializeMessage();
 	}

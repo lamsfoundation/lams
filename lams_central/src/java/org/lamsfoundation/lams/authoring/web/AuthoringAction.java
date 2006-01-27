@@ -107,21 +107,6 @@ public class AuthoringAction extends DispatchAction{
 		return outputPacket(mapping, request, response, wddxPacket, "details");
 	}
 	
-	public ActionForward copyLearningDesign(ActionMapping mapping,
-											ActionForm form,
-											HttpServletRequest request,
-											HttpServletResponse response)throws ServletException, IOException,
-																		 UserException, WorkspaceFolderException,
-																		 LearningDesignException{
-		
-		Long originalDesignID =  new Long(WebUtil.readLongParam(request,"originalDesignID"));
-		Integer workspaceFolderID = new Integer(WebUtil.readIntParam(request,"workspaceFolderID"));
-		Integer userID = new Integer(WebUtil.readIntParam(request,"userID"));
-		Integer copyType = new Integer(WebUtil.readIntParam(request,"copyType"));
-		IAuthoringService authoringService = getAuthoringService();
-		String message = authoringService.copyLearningDesign(originalDesignID,copyType,userID,workspaceFolderID);
-		return outputPacket(mapping, request, response, message, "message");
-	}
 	public ActionForward getLearningDesignsForUser(ActionMapping mapping,
 											ActionForm form,
 											HttpServletRequest request,
