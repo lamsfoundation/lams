@@ -1,4 +1,5 @@
 <%@ taglib uri="tags-lams" prefix="lams" %>
+<%@ page import="org.lamsfoundation.lams.util.Configuration" import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
 
 <HTML>
 <HEAD>
@@ -13,6 +14,10 @@ if(protocol.startsWith("HTTPS")){
 }
 String pathToRoot = protocol+request.getServerName()+":"+request.getServerPort()+request.getContextPath()+"/";
 String pathToShare = protocol+request.getServerName()+":"+request.getServerPort()+request.getContextPath()+"/../..";
+
+String authoringClientVersion = Configuration.get(ConfigurationKeys.AUTHORING_CLIENT_VERSION);
+String serverLanguage = Configuration.get(ConfigurationKeys.SERVER_LANGUAGE);
+String languageDate = Configuration.getDictionaryDateForLanguage(serverLanguage);
 
 %>
 
@@ -228,9 +233,8 @@ function checkSaved(){
   <param name="quality" value="high">
   <param name="scale" value="noscale">
   <param name="bgcolor" value="#B3B7C8">
-  <embed 
-	 
-	  src="lams_authoring.swf?userID=<lams:user property="userID"/>&serverURL=<%=pathToRoot%>"
+  <embed 	 
+	  src="lams_authoring.swf?userID=<lams:user property="userID"/>&serverURL=<%=pathToRoot%>&build=<%=authoringClientVersion%>&lang=<%=serverLanguage%>&date=<%=languageDate%>"
 	  quality="high" 
 	  scale="noscale" 
 	  bgcolor="#B3B7C8"  
