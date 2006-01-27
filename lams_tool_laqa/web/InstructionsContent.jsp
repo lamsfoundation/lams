@@ -15,13 +15,19 @@
           				<fmt:message key="label.offlineInstructions" />:
           			</td>
 					<td NOWRAP width=700> <!-- Dave,I found width was necessary to present all the elements of the editor, feel free to change -->
-					<FCK:editor id="offlineInstructions" basePath="/lams/fckeditor/"
-					      height="200"
-						  width="100%">
-						  <c:out value="${QaAuthoringForm.offlineInstructions}" escapeXml="false" />						  
-					</FCK:editor>
+                        <span id="previewOfflineInstructions" style="visibility: hidden; display: none;">
+                            <div>
+                                <a href="#" onClick="doWYSWYGEdit('OfflineInstructions')">Open Richtext Editor</a>
+                            </div>
+                            <div class="previewPanel" id="previewOfflineInstructions.text"></div>
+                        </span>
+                        <span id="txOfflineInstructions">
+                            <div>
+                                <a href="javascript:doWYSWYGEdit('OfflineInstructions')">Open Richtext Editor</a>
+                            </div>
+                            <textarea class="textareaPanel" name="offlineInstructions" id="txOfflineInstructions.textarea"><c:out value="${QaAuthoringForm.offlineInstructions}" escapeXml="false" /></textarea>
+                        </span>
 					</td> 
-					
 				</tr>
 
 				<tr> 
@@ -53,11 +59,18 @@
           				<fmt:message key="label.onlineInstructions" />
           			</td>
 					<td NOWRAP width=700> <!-- Dave,I found width was necessary to present all the elements of the editor, feel free to change -->
-					<FCK:editor id="onlineInstructions" basePath="/lams/fckeditor/"
-					      height="200"
-						  width="100%">
-  						  <c:out value="${QaAuthoringForm.onlineInstructions}" escapeXml="false" />						  
-					</FCK:editor>
+                        <span id="previewOnlineInstructions" style="visibility: hidden; display: none;">
+                            <div>
+                                <a href="#" onClick="doWYSWYGEdit('OnlineInstructions')">Open Richtext Editor</a>
+                            </div>
+                            <div class="previewPanel" id="previewOnlineInstructions.text"></div>
+                        </span>
+                        <span id="txOnlineInstructions">
+                            <div>
+                                <a href="javascript:doWYSWYGEdit('OnlineInstructions')">Open Richtext Editor</a>
+                            </div>
+                            <textarea class="textareaPanel" name="onlineInstructions" id="txOnlineInstructions.textarea"><c:out value="${QaAuthoringForm.onlineInstructions}" escapeXml="false" /></textarea>
+                        </span>
 					</td> 
 				</tr>
 				
@@ -94,7 +107,7 @@
 
 <logic:present name="attachmentList">
 <bean:size id="count" name="attachmentList" />
-<c:out value="${count}"/>
+
 <logic:notEqual name="count" value="0">
 
 	<h2><fmt:message key="label.attachments" /></h2>

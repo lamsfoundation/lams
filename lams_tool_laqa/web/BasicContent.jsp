@@ -11,43 +11,58 @@
 			<tr> <td>
 					<table align=center> 
 						<tr> 
-					 		<td> <bean:message key="label.authoring.title"/>: </td>
-					 		<td NOWRAP width=700> <!-- Dave,I found width was necessary to present all the elements of the editor, feel free to change -->
-							<FCK:editor id="title" basePath="/lams/fckeditor/"
-							      height="200"
-								  width="100%">
-								  <c:out value="${QaAuthoringForm.title}" escapeXml="false" />						  
-							</FCK:editor>
+					 		<td valign="top"> <bean:message key="label.authoring.title"/>: </td>
+					 		<td NOWRAP width=700> <!-- Dave,I found width was necessary to present all the elements of the editor, feel free to change -->                            
+                                <span id="previewTitle" style="visibility: hidden; display: none;">
+                                    <div>
+                                        <a href="#" onClick="doWYSWYGEdit('Title')">Open Richtext Editor</a>
+                                    </div>
+                                    <div class="previewPanel" id="previewTitle.text"></div>
+                                </span>
+                                <span id="txTitle">
+                                    <div>
+                                        <a href="#" onClick="doWYSWYGEdit('Title')">Open Richtext Editor</a>
+                                    </div>
+                                    <textarea class="textareaPanel" name="title" id="txTitle.textarea"><c:out value="${QaAuthoringForm.title}" escapeXml="false" /></textarea>
+                                </span>
 							</td> 
 					  	</tr>
 					  	<tr> 
-					 		<td> <bean:message key="label.authoring.instructions"/>: </td>
+					 		<td valign="top"> <bean:message key="label.authoring.instructions"/>: </td>
 					 		<td NOWRAP width=700> <!-- Dave,I found width was necessary to present all the elements of the editor, feel free to change -->
-							<FCK:editor id="instructions" basePath="/lams/fckeditor/"
-							      height="200"
-								  width="100%">
-								  <c:out value="${QaAuthoringForm.instructions}" escapeXml="false" />						  
-							</FCK:editor>
+                                <span id="previewInstructions" style="visibility: hidden; display: none;">
+                                    <div>
+                                        <a href="#" onClick="doWYSWYGEdit('Instructions')">Open Richtext Editor</a>
+                                    </div>
+                                    <div class="previewPanel" id="previewInstructions.text"></div>
+                                </span>
+                                <span id="txInstructions">
+                                    <div>
+                                        <a href="javascript:doWYSWYGEdit('Instructions')">Open Richtext Editor</a>
+                                    </div>
+                                    <textarea class="textareaPanel" name="instructions" id="txInstructions.textarea"><c:out value="${QaAuthoringForm.instructions}" escapeXml="false" /></textarea>
+                                </span>
 							</td>
 						</tr>
 				
 			 		<!--default question content, this entry can not be deleted but can be updated -->
 				 		<tr> 
-						  	<td> 
+						  	<td valign="top"> 
 						 		<bean:message key="label.question1"/> : 
 						 	</td>
 						  	<td>
-								  	<input type="text" name="questionContent0" size="50" 
-								  	maxlength="255" value="<c:out value="${sessionScope.defaultQuestionContent}"/>"> 
-								  	&nbsp
-									<html:submit property="addContent" 
-                                                 styleClass="linkbutton" 
-                                                 disabled="${sessionScope.isDefineLater}"
-                                                 onmouseover="pviiClassNew(this,'linkbutton')" 
-                                                 onmouseout="pviiClassNew(this,'linkbutton')"
-                                                 onclick="submitMethod('addNewQuestion');">
-									<bean:message key="button.addNewQuestion"/>
-									</html:submit>
+                                <span id="previewQuestion0" style="visibility: hidden; display: none;">
+                                    <div>
+                                        <a href="#" onClick="doWYSWYGEdit('Question0')">Open Richtext Editor</a>
+                                    </div>
+                                    <div class="previewPanel" id="previewQuestion0.text"></div>
+                                </span>
+                                <span id="txQuestion0">
+                                    <div>
+                                        <a href="javascript:doWYSWYGEdit('Question0')">Open Richtext Editor</a>
+                                    </div>
+                                    <textarea class="textareaPanel" name="questionContent0" id="txQuestion0.textarea"><c:out value="${sessionScope.defaultQuestionContent}"/></textarea>
+                                </span>
 						  	</td>
 					  	</tr>
 		
@@ -59,10 +74,22 @@
 					  		<c:if test="${questionEntry.key > 1}"> 			
 								<c:set var="queIndex" scope="session" value="${queIndex +1}"/>
 								  <tr>
-								  	<td> <c:out value="Question ${queIndex}"/> : </td>
-								  		<td> <input type="text" name="questionContent<c:out value="${queIndex-1}"/>" value="<c:out value="${questionEntry.value}"/>"   
-									  		size="50" maxlength="255"> 
-									  	&nbsp
+								  	<td valign="top"> <c:out value="Question ${queIndex}"/> : </td>
+								  	<td>
+  
+                                        <span id="preview<c:out value="Question${queIndex-1}"/>" style="visibility: hidden; display: none;">
+                                            <div>
+                                                <a href="#" onClick="doWYSWYGEdit('<c:out value="Question${queIndex-1}"/>')">Open Richtext Editor</a>
+                                            </div>
+                                            <div class="previewPanel" id="preview<c:out value="Question${queIndex-1}"/>.text"></div>
+                                        </span>
+                                        <span id="tx<c:out value="Question${queIndex-1}"/>">
+                                            <div>
+                                                <a href="javascript:doWYSWYGEdit('<c:out value="Question${queIndex-1}"/>')">Open Richtext Editor</a>
+                                            </div>
+                                            <textarea class="textareaPanel" name="<c:out value="questionContent${queIndex-1}"/>" id="tx<c:out value="Question${queIndex-1}"/>.textarea"><c:out value="${questionEntry.value}"/></textarea>
+                                        </span>
+                                
 		 		 						<html:submit property="removeContent" 
                                                      styleClass="linkbutton"  
                                                      onclick="removeQuestion(${queIndex});"
@@ -71,13 +98,26 @@
                                                      onmouseout="pviiClassNew(this,'linkbutton')">
 											<bean:message key="button.removeQuestion"/>
 										</html:submit>
-									  	</td>
+                                    </td>
 								  </tr>
 							</c:if> 			
 						</c:forEach>
 						<html:hidden property="toolContentId" value="${QaAuthoringForm.toolContentId}"/>
 						<html:hidden property="questionIndex"/>
-
+                        
+                        <tr>
+                            <td></td>
+                            <td align="right">
+                                <html:submit property="addContent" 
+                                             styleClass="linkbutton" 
+                                             disabled="${sessionScope.isDefineLater}"
+                                             onmouseover="pviiClassNew(this,'linkbutton')" 
+                                             onmouseout="pviiClassNew(this,'linkbutton')"
+                                             onclick="submitMethod('addNewQuestion');">
+                                    <bean:message key="button.addNewQuestion"/>
+                                </html:submit>
+                            </td>
+                        </tr>
 					
 					</table>
 			</td></tr>			
