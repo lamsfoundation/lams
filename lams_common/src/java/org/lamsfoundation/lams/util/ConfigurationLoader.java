@@ -36,6 +36,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import org.lamsfoundation.lams.util.ConfigurationKeys;
+
 
 /**
  * <p>
@@ -96,19 +98,32 @@ public class ConfigurationLoader {
 	{
 		setConfigFilePath();
 		Map items = Collections.synchronizedMap(new HashMap());
+		
 		try{
 			Document configureDoc = XmlFileLoader.getDocumentFromFilePath(configFilePath);
-			Element root = (Element)configureDoc.getElementsByTagName("Lams").item(0);
+			Element root = (Element)configureDoc.getElementsByTagName(ConfigurationKeys.ROOT).item(0);
 			NodeList nodeList = root.getChildNodes();
+			
 			for(int i=0; i<nodeList.getLength(); i++){
 				Node node = nodeList.item(i);
 				if(node.getNodeType()== Node.ELEMENT_NODE){
 					Element ele = (Element)node;
-					if(ele.getLastChild()!=null){
-						items.put(ele.getNodeName(),ele.getLastChild().getNodeValue());
+					
+					
+					 // DictionaryDates have a more complex structure than the rest of the configuration file.
+					if (ele.getNodeName().equals(ConfigurationKeys.DICTIONARY_DATES))
+					{
+						loadDictionaryDates(ele, items);
+					}
+					else
+					{
+						if(ele.getLastChild()!=null){
+							items.put(ele.getNodeName(),ele.getLastChild().getNodeValue());
+						}
 					}
 				}
 			}
+			
 		}catch(IOException e)
 		{
             log.error("===>IOExcpetion in ConfigurationLoader", e);
@@ -123,6 +138,54 @@ public class ConfigurationLoader {
 			//nothing to do
 		}
 		return items;
+	}
+	
+	/**
+	 * DictionaryDates are composed of one or more Dictionary items which have child elements
+	 * language and createDate
+	 * The Dictionary details will be placed in a separate hashMap with <code>language</code>
+	 * as the key and <code>createDate</code> as the value. This hashMap will then be added in the main
+	 * hashmap with "DictionaryDates" being the key.
+	 * 
+	 * @param ele
+	 * @param items The main hashmap where the elements are stored.
+	 */
+	private static void loadDictionaryDates(Element ele, Map items)
+	{
+		NodeList dictionaries = ele.getChildNodes();
+		HashMap dictionaryMap = new HashMap();
+		for(int i=0; i<dictionaries.getLength(); i++){
+			Node dictionaryNode = dictionaries.item(i);
+			if(dictionaryNode.getNodeType()== Node.ELEMENT_NODE)
+			{
+				Element dictionaryElement = (Element)dictionaryNode;
+				storeDictionaryDetailsInMap(dictionaryElement, dictionaryMap);
+			}
+		}
+		
+		items.put(ele.getNodeName(), dictionaryMap);
+	}
+	
+	/**
+	 * This method will get the values for language and createDate for the Dictionary
+	 * and will place it in a separate hashMap with language->createDate as the
+	 * key->value pair.
+	 * @param dictionary
+	 * @param dictionaryItems The separate hashMap in which to store the different dictionary and the date it was created.
+	 */
+	private static void storeDictionaryDetailsInMap(Element dictionary, HashMap dictionaryItems)
+	{
+		
+		Element language = (Element)dictionary.getElementsByTagName(ConfigurationKeys.DICTIONARY_LANGUAGE).item(0);
+		Element createDate = (Element)dictionary.getElementsByTagName(ConfigurationKeys.DICTIONARY_CREATE_DATE).item(0);
+		if (language != null && createDate != null)
+		{
+			if (language.getLastChild() != null && createDate.getLastChild() != null)
+			{
+				dictionaryItems.put(language.getLastChild().getNodeValue(), createDate.getLastChild().getNodeValue());
+			}
+		}
+		
 	}
 
 }
