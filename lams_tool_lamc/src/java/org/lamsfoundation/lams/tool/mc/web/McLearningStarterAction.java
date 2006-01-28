@@ -143,7 +143,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 		}
 
 		McLearningForm mcLearningForm = (McLearningForm) form;
-
+		
 		/*
 		 * initialize available question display modes in the session
 		 */
@@ -165,6 +165,50 @@ public class McLearningStarterAction extends Action implements McAppConstants {
   
 	    Long toolSessionID=(Long) request.getSession().getAttribute(AttributeNames.PARAM_TOOL_SESSION_ID);
 	    logger.debug("retrieved toolSessionID: " + toolSessionID);
+	    
+	    /* API test code from here*/
+	    String createToolSession=request.getParameter("createToolSession");
+		logger.debug("createToolSession: " + createToolSession);
+		if ((createToolSession != null) && createToolSession.equals("1"))
+		{	try
+			{
+				mcService.createToolSession(toolSessionID, new Long(9876));
+			}
+			catch(ToolException e)
+			{
+				logger.debug("tool exception"  + e);
+			}
+		}
+		
+		String removeToolSession=request.getParameter("removeToolSession");
+		logger.debug("removeToolSession: " + removeToolSession);
+		if ((removeToolSession != null) && removeToolSession.equals("1"))
+		{	try
+			{
+				mcService.removeToolSession(toolSessionID);
+			}
+			catch(ToolException e)
+			{
+				logger.debug("tool exception"  + e);
+			}
+		}
+		
+		String learnerId=request.getParameter("learnerId");
+		logger.debug("learnerId: " + learnerId);
+		if (learnerId != null) 
+		{	try
+			{
+				String nextUrl=mcService.leaveToolSession(toolSessionID, new Long(learnerId));
+				logger.debug("nextUrl: "+ nextUrl);
+			}
+			catch(ToolException e)
+			{
+				logger.debug("tool exception"  + e);
+			}
+		}
+		/*till here*/
+	    
+	    
 	    /*
 	     * By now, the passed tool session id MUST exist in the db through the calling of:
 	     * public void createToolSession(Long toolSessionId, Long toolContentId) by the container.
@@ -191,7 +235,6 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 				{
 					logger.debug("we should never come here.");
 				}
-				 
 		}
 		
 		/*
@@ -221,14 +264,23 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    /* find out if the content is set to run offline or online. If it is set to run offline , the learners are informed about that. */
 	    boolean isRunOffline=McUtils.isRunOffline(mcContent);
 	    logger.debug("isRunOffline: " + isRunOffline);
-	    
 	    if (isRunOffline == true)
 	    {
 	    	logger.debug("warning to learner: the activity is offline.");
 	    	persistError(request,"label.learning.runOffline");
 			return (mapping.findForward(ERROR_LIST));
 	    }
-	    		
+
+	    /* find out if the content is being modified at the moment. */
+	    boolean isDefineLater=McUtils.isDefineLater(mcContent);
+	    logger.debug("isDefineLater: " + isDefineLater);
+	    if (isDefineLater == true)
+	    {
+	    	logger.debug("warning to learner: the activity is defineLater, we interpret that as content being modified.");
+	    	persistError(request,"error.defineLater");
+			return (mapping.findForward(ERROR_LIST));
+	    }
+
 	    
 	    /*
 	     * The content we retrieved above must have been created before in Authoring time. 
