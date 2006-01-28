@@ -13,6 +13,8 @@
 	
 	String toolSessionID2="55555555";
 	String toolUrl2="/learningStarter?toolSessionID=" + toolSessionID2 + "&mode=learner";
+	
+	String toolUrlTeacher="/learningStarter?toolSessionID=" + toolSessionID + "&mode=teacher";
 %>
 
 <html:form action="<%=toolUrl%>" method="post">
@@ -27,5 +29,10 @@
       <html:submit value="Session 2 - Learning Starter, mode:learner"/>
 </html:form>
 
+<html:form action="<%=toolUrlTeacher%>" method="post">
+      <table border=1>
+      </table><br/><BR>
+      <html:submit value="Learning Starter, mode:teacher"/>
+</html:form>
 
 
