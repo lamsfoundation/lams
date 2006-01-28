@@ -43,8 +43,8 @@ activity_ui_id
 VALUES
 (
 NULL
-, 'MCQ Description'
-, 'MCQ'
+, 'Allows creation and use of multiple choice questioning format'
+, 'Multiple Choice Questions'
 , 'Put some help text here.'
 , NULL
 , NULL
@@ -73,7 +73,7 @@ NULL
 , NULL
 , NULL
 , NULL
-, 'tool/lamc11/images/icon_questionanswer.swf'
+, 'tool/lamc11/images/icon_mcq.swf'
 , NULL
 , NULL
 , NULL
