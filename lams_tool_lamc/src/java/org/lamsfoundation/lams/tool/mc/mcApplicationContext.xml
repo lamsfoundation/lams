@@ -84,7 +84,7 @@
 			 		<property name="mcUploadedFileDAO"><ref bean="mcUploadedFileDAO"/></property>
 					<property name="toolService"><ref bean="lamsToolService"/></property>
 		<!-- 		<property name="repositoryService"><ref bean="repositoryService"/></property> -->
-		<!-- 		<property name="learnerService"><ref bean="learnerService"/></property>		-->
+			 		<property name="learnerService"><ref bean="learnerService"/></property>		
 					<property name="mcToolContentHandler"><ref bean="mcToolContentHandler"/></property>			
 				</bean>
 			</property>
