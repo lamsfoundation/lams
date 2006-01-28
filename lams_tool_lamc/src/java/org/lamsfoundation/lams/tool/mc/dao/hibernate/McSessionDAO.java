@@ -108,6 +108,7 @@ public class McSessionDAO extends HibernateDaoSupport implements IMcSessionDAO {
 	
     public void updateMcSession(McSession mcSession)
     {
+    	this.getSession().setFlushMode(FlushMode.AUTO);
     	this.getHibernateTemplate().update(mcSession);
     }
 
