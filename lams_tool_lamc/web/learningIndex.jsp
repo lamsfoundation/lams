@@ -15,6 +15,11 @@
 	String toolUrl2="/learningStarter?toolSessionID=" + toolSessionID2 + "&mode=learner";
 	
 	String toolUrlTeacher="/learningStarter?toolSessionID=" + toolSessionID + "&mode=teacher";
+	
+	String strCreateToolSession="/learningStarter?toolSessionID=" + toolSessionID2 +  "&mode=learner" + "&createToolSession=1";
+	String strRemoveToolSession="/learningStarter?toolSessionID=" + toolSessionID2 +  "&mode=learner" + "&removeToolSession=1";
+	String strLeaveToolSession="/learningStarter?toolSessionID=" + toolSessionID2 +  "&mode=learner" + "&leaveToolSession=1" +  "&learnerId=4";
+	
 %>
 
 <html:form action="<%=toolUrl%>" method="post">
@@ -35,4 +40,20 @@
       <html:submit value="Learning Starter, mode:teacher"/>
 </html:form>
 
+<html:form action="<%=strCreateToolSession%>" method="post">
+      <table border=1>
+      </table><br/><BR>
+      <html:submit value="Create Tool Session"/>
+</html:form>
 
+<html:form action="<%=strRemoveToolSession%>" method="post">
+      <table border=1>
+      </table><br/><BR>
+      <html:submit value="Remove Tool Session"/>
+</html:form>
+
+<html:form action="<%=strLeaveToolSession%>" method="post">
+      <table border=1>
+      </table><br/><BR>
+      <html:submit value="Leave Tool Session"/>
+</html:form>
