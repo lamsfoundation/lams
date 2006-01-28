@@ -237,6 +237,7 @@ public interface McAppConstants {
     public static final String QUESTION_LISTING_MODE					="questionListingMode";
     public static final String QUESTION_LISTING_MODE_SEQUENTIAL			="questionListingModeSequential";
     public static final String QUESTION_LISTING_MODE_COMBINED			="questionListingModeCombined";
+    public static final String PREVIEW_ONLY								="previewOnly";
     
     public static final String MODE										="mode";
     public static final String LEARNING_MODE							="learningMode";
