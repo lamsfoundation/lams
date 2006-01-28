@@ -29,6 +29,7 @@ package org.lamsfoundation.lams.tool.mc;
 public interface McAppConstants {
 
 	public static final String MY_SIGNATURE 							="lamc11";
+	public static final String DEFAULT_CONTENT_ID 						="defaultContentId";
 	public static final String TOOL_SERVICE								="tool_service";
 	public static final String ERROR_MCAPPLICATION 						= "error.exception.McApplication";
 	
