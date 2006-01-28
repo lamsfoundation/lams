@@ -2737,5 +2737,14 @@ public class AuthoringUtil implements McAppConstants {
     	request.getSession().removeAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP);
     	request.getSession().removeAttribute(USER_EXCEPTION_DEFAULTQUESTIONCONTENT_NOT_AVAILABLE);
     	request.getSession().removeAttribute(USER_EXCEPTION_DEFAULTOPTIONSCONTENT_NOT_AVAILABLE);
+
+    	/* the attributes below used in the Preview mode*/
+    	request.getSession().removeAttribute(MAP_QUESTION_CONTENT_LEARNER);
+    	request.getSession().removeAttribute(TOTAL_QUESTION_COUNT);
+    	request.getSession().removeAttribute(CURRENT_QUESTION_INDEX);
+    	request.getSession().removeAttribute(MAP_GENERAL_OPTIONS_CONTENT);
+    	request.getSession().removeAttribute(MAP_OPTIONS_CONTENT);
+    	request.getSession().removeAttribute(QUESTION_LISTING_MODE_COMBINED);
+    	request.getSession().removeAttribute(PREVIEW_ONLY);
     }
 }
