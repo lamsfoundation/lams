@@ -11,6 +11,14 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <title> <bean:message key="label.learning"/> </title>
+	<script language="JavaScript" type="text/JavaScript">
+
+		function submitMethod(actionMethod) 
+		{
+			document.McAuthoringForm.method.value=actionMethod; 
+			document.McAuthoringForm.submit();
+		}
+	</script>
 </head>
 <body>
 

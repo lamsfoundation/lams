@@ -156,6 +156,8 @@
 				 		</td>
 			  	   </tr>
 			  	   
+			  	   
+				<c:if test="${sessionScope.previewOnly != 'true'}"> 		
 	  	   		  <tr>
 				  	<td NOWRAP colspan=2 align=right class="input" valign=top> 
 					  	<font size=2>
@@ -165,6 +167,22 @@
 						</font>
 				  	 </td>
 				  </tr>
-				</table>
+	    	 </c:if> 			  
+	    	 
+	    	  <c:if test="${sessionScope.previewOnly == 'true'}"> 		
+  	  	   		  <tr>
+				  	<td NOWRAP colspan=2 align=right class="input" valign=top> 
+					  	<font size=2>
+						 <html:submit onclick="javascript:submitMethod('donePreview');" styleClass="button">
+								<bean:message key="button.done"/>
+						</html:submit>
+						</font>
+				  	 </td>
+				  </tr>
+
+	    	 </c:if> 		
+	    	 
+	    	  
+		</table>
 	<!--options content ends here-->
 

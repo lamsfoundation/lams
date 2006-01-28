@@ -62,6 +62,18 @@
 	  	/>
 	  	
 	  	<forward
+		    name="loadLearner"
+		    path=".answers"
+		    redirect="true"
+	  	/>
+
+	  	<forward
+	        name="starter"
+	        path=".starter"
+	        redirect="true"
+	     />
+	  	
+	  	<forward
 		    name="errorList"
 		    path=".mcErrorBox"
 		    redirect="true"
@@ -279,7 +291,13 @@
 		    path=".mcErrorBox"
 		    redirect="true"
 	  	/>
-	  	
+
+	  	<forward
+	        name="starter"
+	        path=".starter"
+	        redirect="true"
+	     />
+
 	  	<forward
 		    name="learningStarter"
 		    path=".learningStarter"
