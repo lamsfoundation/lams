@@ -17,9 +17,10 @@
 	String strRemoveCopiedToolContent="/authoringStarter?toolContentID=" + hardCodedCopiedToolContentId + "&removeToolContent=1";
 	String strDefineLater="/defineLaterStarter?toolContentID=" + toolContentId;
 	
-	
 	String strSetDefineLater="/authoringStarter?toolContentID=" + hardCodedCopiedToolContentId + "&setDefineLater=1";
 	String strSetRunoffline="/authoringStarter?toolContentID=" + hardCodedCopiedToolContentId + "&strSetRunoffline=1";	
+	
+	String strPreview="/authoringStarter?toolContentID=" + hardCodedCopiedToolContentId + "&toolAccessMode=Author";	
 %>
 
 
@@ -72,3 +73,8 @@
       <html:submit value="Set as run offline on the copied content"/>
 </html:form>
 
+<html:form action="<%=strPreview%>" method="post">
+      <table border=1>
+      </table><br/>
+      <html:submit value="Preview with ToolAcessMode=AUTHOR"/>
+</html:form>
