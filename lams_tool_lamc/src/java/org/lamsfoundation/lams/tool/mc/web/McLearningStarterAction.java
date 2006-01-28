@@ -288,37 +288,11 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	     */
 	    setupAttributes(request, mcContent);
 	    
-	    
 	    /*
     	 * fetch question content from content
     	 */
-    	Iterator contentIterator=mcContent.getMcQueContents().iterator();
-    	while (contentIterator.hasNext())
-    	{
-    		McQueContent mcQueContent=(McQueContent)contentIterator.next();
-    		if (mcQueContent != null)
-    		{
-    			int displayOrder=mcQueContent.getDisplayOrder().intValue();
-        		if (displayOrder != 0)
-        		{
-        			/* add the question to the questions Map in the displayOrder*/
-        			mapQuestionsContent.put(new Integer(displayOrder).toString(),mcQueContent.getQuestion());
-        		}
-        		
-        		/* prepare the first question's candidate answers for presentation*/ 
-        		if (displayOrder == 1)
-        		{
-        			logger.debug("first question... ");
-        			Long uid=mcQueContent.getUid();
-        			logger.debug("uid : " + uid);
-        			List listMcOptions=mcService.findMcOptionsContentByQueId(uid);
-        			logger.debug("listMcOptions : " + listMcOptions);
-        			Map mapOptionsContent=McUtils.generateOptionsMap(listMcOptions);
-        			request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
-        			logger.debug("updated Options Map: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT));
-        		}
-    		}
-    	}
+	    mapQuestionsContent=LearningUtil.buildQuestionContentMap(request,mcContent);
+	    logger.debug("mapQuestionsContent: " + mapQuestionsContent);
     	
     	request.getSession().setAttribute(MAP_QUESTION_CONTENT_LEARNER, mapQuestionsContent);
     	logger.debug("MAP_QUESTION_CONTENT_LEARNER: " +  request.getSession().getAttribute(MAP_QUESTION_CONTENT_LEARNER));

@@ -1,6 +1,5 @@
 package org.lamsfoundation.lams.tool.mc.web;
 
-
 import org.apache.struts.action.ActionForm;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 

@@ -1,7 +1,6 @@
 package org.lamsfoundation.lams.tool.mc.web;
 
-
-import org.apache.struts.action.ActionForm;
+import org.lamsfoundation.lams.tool.mc.web.McLearningForm; 
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 
@@ -10,7 +9,7 @@ import org.lamsfoundation.lams.tool.mc.McAppConstants;
  *
  * ActionForm for the Authoring environment
  */
-public class McAuthoringForm extends ActionForm implements McAppConstants {
+public class McAuthoringForm extends McLearningForm implements McAppConstants {
 	/* form controllers */
 	protected String addOptionContent;	
 	

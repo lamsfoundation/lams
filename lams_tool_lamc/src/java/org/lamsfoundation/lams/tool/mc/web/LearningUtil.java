@@ -488,7 +488,10 @@ public class LearningUtil implements McAppConstants {
     	logger.debug("incoming mapGeneralCorrectOptions : " + mapGeneralCorrectOptions);
     	logger.debug("incoming mapGeneralCheckedOptionsContent : " + mapGeneralCheckedOptionsContent);
     	
-    	Map mapLeanerAssessmentResults= new TreeMap(new McComparator());		
+    	Map mapLeanerAssessmentResults= new TreeMap(new McComparator());
+    	
+    	if (mapGeneralCheckedOptionsContent == null)
+    		return mapLeanerAssessmentResults;
 		
     	Iterator itMap = mapGeneralCorrectOptions.entrySet().iterator();
     	boolean compareResult= false;
@@ -656,24 +659,27 @@ public class LearningUtil implements McAppConstants {
 		Long toolContentUID= (Long) request.getSession().getAttribute(TOOL_CONTENT_UID);
 		logger.debug("toolContentUID: " + toolContentUID);
 		 	
-		Iterator itCheckedMap = mapGeneralCheckedOptionsContent.entrySet().iterator();
-        while (itCheckedMap.hasNext()) 
-        {
-        	Map.Entry checkedPairs = (Map.Entry)itCheckedMap.next();
-            Map mapCheckedOptions=(Map) checkedPairs.getValue();
-            Long questionDisplayOrder=new Long(checkedPairs.getKey().toString());
-            
-            logger.debug("questionDisplayOrder: " + questionDisplayOrder);
-            String isAttemptCorrect=(String)mapLeanerAssessmentResults.get(questionDisplayOrder.toString());
-            logger.debug("isAttemptCorrect: " + isAttemptCorrect);
-            
-            McQueContent mcQueContent=mcService.getQuestionContentByDisplayOrder(questionDisplayOrder, toolContentUID);
-            logger.debug("mcQueContent: " + mcQueContent);
-            if (mcQueContent != null)
-            {
-                createIndividualOptions(request, mapCheckedOptions, mcQueContent, mcQueUsr, attempTime, timeZone, mark, passed, new Integer(highestAttemptOrder), isAttemptCorrect);    
-            }
-        }
+		if (toolContentUID != null)
+		{
+			Iterator itCheckedMap = mapGeneralCheckedOptionsContent.entrySet().iterator();
+	        while (itCheckedMap.hasNext()) 
+	        {
+	        	Map.Entry checkedPairs = (Map.Entry)itCheckedMap.next();
+	            Map mapCheckedOptions=(Map) checkedPairs.getValue();
+	            Long questionDisplayOrder=new Long(checkedPairs.getKey().toString());
+	            
+	            logger.debug("questionDisplayOrder: " + questionDisplayOrder);
+	            String isAttemptCorrect=(String)mapLeanerAssessmentResults.get(questionDisplayOrder.toString());
+	            logger.debug("isAttemptCorrect: " + isAttemptCorrect);
+	            
+	            McQueContent mcQueContent=mcService.getQuestionContentByDisplayOrder(questionDisplayOrder, toolContentUID);
+	            logger.debug("mcQueContent: " + mcQueContent);
+	            if (mcQueContent != null)
+	            {
+	                createIndividualOptions(request, mapCheckedOptions, mcQueContent, mcQueUsr, attempTime, timeZone, mark, passed, new Integer(highestAttemptOrder), isAttemptCorrect);    
+	            }
+	        }			
+		}
 	 }
     
     
@@ -734,6 +740,41 @@ public class LearningUtil implements McAppConstants {
     	return mapWeights;
     }
     
+    
+    public static Map buildQuestionContentMap(HttpServletRequest request, McContent mcContent)
+    {
+    	IMcService mcService =McUtils.getToolService(request);
+    	Map mapQuestionsContent= new TreeMap(new McComparator());
+    	
+        Iterator contentIterator=mcContent.getMcQueContents().iterator();
+    	while (contentIterator.hasNext())
+    	{
+    		McQueContent mcQueContent=(McQueContent)contentIterator.next();
+    		if (mcQueContent != null)
+    		{
+    			int displayOrder=mcQueContent.getDisplayOrder().intValue();
+        		if (displayOrder != 0)
+        		{
+        			/* add the question to the questions Map in the displayOrder*/
+        			mapQuestionsContent.put(new Integer(displayOrder).toString(),mcQueContent.getQuestion());
+        		}
+        		
+        		/* prepare the first question's candidate answers for presentation*/ 
+        		if (displayOrder == 1)
+        		{
+        			logger.debug("first question... ");
+        			Long uid=mcQueContent.getUid();
+        			logger.debug("uid : " + uid);
+        			List listMcOptions=mcService.findMcOptionsContentByQueId(uid);
+        			logger.debug("listMcOptions : " + listMcOptions);
+        			Map mapOptionsContent=McUtils.generateOptionsMap(listMcOptions);
+        			request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
+        			logger.debug("updated Options Map: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT));
+        		}
+    		}
+    	}
+    	return mapQuestionsContent;
+    }
 
     /**
      * removes Learning session attributes

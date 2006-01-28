@@ -240,7 +240,52 @@ public class McStarterAction extends Action implements McAppConstants {
 				logger.debug("forwarding to: " + ERROR_LIST);
 				return (mapping.findForward(ERROR_LIST));
 			}
-	
+
+	    	/*
+	    	Preview The tool must be able to show the specified content as if it was running in a lesson. 
+			It will be the learner url with tool access mode set to ToolAccessMode.AUTHOR
+			*/
+	    	String toolAccessMode= (String) request.getParameter("toolAccessMode");
+	    	logger.debug("toolAccessMode: " + toolAccessMode);
+	    	if ((toolAccessMode != null) && (toolAccessMode.equals("Author")))
+	    	{
+	    		logger.debug("Author requests for a preview of the content.");
+				
+	    		logger.debug("retrieving existing content for: " + toolContentId);
+				McContent mcContent=mcService.retrieveMc(new Long(toolContentId));
+				logger.debug("existing mcContent:" + mcContent);
+	    		
+				
+				/* note common code here: the section below is also used in McLearneringStarterAction, might be refactored later*/
+		    		Map mapQuestionsContent= new TreeMap(new McComparator());
+		    	    mapQuestionsContent=LearningUtil.buildQuestionContentMap(request,mcContent);
+		    	    logger.debug("mapQuestionsContent: " + mapQuestionsContent);
+		        	
+		        	request.getSession().setAttribute(MAP_QUESTION_CONTENT_LEARNER, mapQuestionsContent);
+		        	logger.debug("MAP_QUESTION_CONTENT_LEARNER: " +  request.getSession().getAttribute(MAP_QUESTION_CONTENT_LEARNER));
+		        	logger.debug("mcContent has : " + mapQuestionsContent.size() + " entries.");
+		        	request.getSession().setAttribute(TOTAL_QUESTION_COUNT, new Long(mapQuestionsContent.size()).toString());
+		        	
+		        	request.getSession().setAttribute(CURRENT_QUESTION_INDEX, "1");
+		    		logger.debug("CURRENT_QUESTION_INDEX: " + request.getSession().getAttribute(CURRENT_QUESTION_INDEX));
+		    		logger.debug("final Options Map for the first question: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT));
+		    		
+		    		/*also prepare data into mapGeneralOptionsContent for combined answers view */
+		    		Map mapGeneralOptionsContent=AuthoringUtil.generateGeneralOptionsContentMap(request, mcContent);
+		    		logger.debug("returned mapGeneralOptionsContent: " + mapGeneralOptionsContent);
+		    		request.getSession().setAttribute(MAP_GENERAL_OPTIONS_CONTENT, mapGeneralOptionsContent);
+	    		/* till here */
+	    		
+		    	/*only allowing combined view in the preview mode. Might be improved to support sequential view as well. */
+		    	request.getSession().setAttribute(QUESTION_LISTING_MODE, QUESTION_LISTING_MODE_COMBINED);
+		    	/* to disable the buttons on the screen*/
+		    	request.getSession().setAttribute(PREVIEW_ONLY, new Boolean(true).toString());
+		    	
+		    	request.getSession().setAttribute(CURRENT_QUESTION_INDEX, "1");
+	    		McLearningAction mcLearningAction= new McLearningAction();
+		    	return mcLearningAction.redoQuestions(request, mcAuthoringForm, mapping);
+	    	}
+	    	
 	    	
 	    	/* 	note: copyToolContent and removeToolContent code is redundant for production.
 	    	 *  test whether the authoring level tool contract:
@@ -258,7 +303,6 @@ public class McStarterAction extends Action implements McAppConstants {
 		    	Long fromContentId=new Long(strToolContentId);
 		    	logger.debug("fromContentId: " + fromContentId);
 		    	
-		    	//Long toContentId=new Long(McUtils.generateId());
 		    	Long toContentId=new Long(9876);
 		    	logger.debug("toContentId: " + toContentId);
 		    	

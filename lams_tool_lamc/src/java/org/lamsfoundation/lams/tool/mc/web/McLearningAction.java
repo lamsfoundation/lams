@@ -316,7 +316,6 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     	
     	int mark=LearningUtil.getMark(mapLeanerAssessmentResults);
     	logger.debug("mark: " + mark);
-    	//request.getSession().setAttribute(LEARNER_MARK, new Integer(mark).toString());
     	    	
     	Map mapQuestionWeights =(Map) request.getSession().getAttribute(MAP_QUESTION_WEIGHTS);
     	logger.debug("mapQuestionWeights: " + mapQuestionWeights);
@@ -353,6 +352,9 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     	
     	String highestAttemptOrder=(String)request.getSession().getAttribute(LEARNER_LAST_ATTEMPT_ORDER);
         logger.debug("current highestAttemptOrder:" + highestAttemptOrder);
+        
+        if (highestAttemptOrder == null)
+    		highestAttemptOrder="0";
         
         logger.debug("passed: " + passed);
     	LearningUtil.createAttempt(request, mcQueUsr, mapGeneralCheckedOptionsContent, mark, passed, new Integer(highestAttemptOrder).intValue(), mapLeanerAssessmentResults);
@@ -625,6 +627,32 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     	mcService.saveMcContent(mcContent);
     }
 	
+    
+    /**
+     * double check this: forwards to outside of the application.
+     * ActionForward donePreview(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+     *  
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     */
+    public ActionForward donePreview(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+    {
+    	logger.debug("dispatching donePreview...");
+    	return (mapping.findForward(LOAD_STARTER));
+    }
         
     /**
      * redoQuestions(HttpServletRequest request, McLearningForm mcLearningForm, ActionMapping mapping)
@@ -634,7 +662,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
      * @param mapping
      * @return
      */
-    protected ActionForward redoQuestions(HttpServletRequest request, McLearningForm mcLearningForm, ActionMapping mapping)
+    public ActionForward redoQuestions(HttpServletRequest request, McLearningForm mcLearningForm, ActionMapping mapping)
     {
     	logger.debug("requested redoQuestions...");
     	/* reset the checked options MAP */
