@@ -188,22 +188,33 @@ public class McStarterAction extends Action implements McAppConstants {
 		}
 		else
 		{
-		    logger.debug("will render authoring screen");
+		    logger.debug("no problems getting the default content, will render authoring screen");
 		    String strToolContentId="";
+		    /*the authoring url must be passed a tool content id*/
 		    strToolContentId=request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 		    logger.debug("strToolContentId: " + strToolContentId);
 		    
 		    if (strToolContentId == null)
 		    {
+		    	/*it is possible that the original request for authoring module is coming from monitoring url which keeps the
+		    	 TOOL_CONTENT_ID in the session*/
 		    	Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
 			    logger.debug("toolContentId: " + toolContentId);
 			    if (toolContentId != null)
 			    {
 			    	strToolContentId= toolContentId.toString();
-				    logger.debug("cached strToolContentId: " + strToolContentId);	
+				    logger.debug("cached strToolContentId from the session: " + strToolContentId);	
+			    }
+			    else
+			    {
+			    	logger.debug("we should IDEALLY not arrive here. The TOOL_CONTENT_ID is NOT available from the url or the session.");
+			    	/*use default content instead of giving a warning*/
+			    	String defaultContentId=(String) request.getSession().getAttribute(DEFAULT_CONTENT_ID);
+			    	logger.debug("using MCQ defaultContentId: " + defaultContentId);
+			    	strToolContentId=defaultContentId;
 			    }
 		    }
-		    
+	    	logger.debug("final strToolContentId: " + strToolContentId);
 		    
 		    if ((strToolContentId == null) || (strToolContentId.equals(""))) 
 		    {
@@ -383,6 +394,7 @@ public class McStarterAction extends Action implements McAppConstants {
 	/**
 	 * each tool has a signature. MCQ tool's signature is stored in MY_SIGNATURE. The default tool content id and 
 	 * other depending content ids are obtained in this method.
+	 * if all the default content has been setup properly the method persists DEFAULT_CONTENT_ID in the session.
 	 * 
 	 * readSignature(HttpServletRequest request, ActionMapping mapping)
 	 * @param request
@@ -492,6 +504,8 @@ public class McStarterAction extends Action implements McAppConstants {
 			return (mapping.findForward(ERROR_LIST));
 		}		
 		
+		logger.debug("MCQ tool has the default content id: " + contentId);
+		request.getSession().setAttribute(DEFAULT_CONTENT_ID, new Long(contentId).toString());
 		return null;
 	}
 	
