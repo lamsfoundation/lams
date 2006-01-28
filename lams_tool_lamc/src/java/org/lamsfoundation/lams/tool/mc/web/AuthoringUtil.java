@@ -2697,6 +2697,7 @@ public class AuthoringUtil implements McAppConstants {
     public static void cleanupAuthoringSession(HttpServletRequest request)
     {
     	request.getSession().removeAttribute(ACTIVE_MODULE);
+    	request.getSession().removeAttribute(DEFAULT_CONTENT_ID);
     	request.getSession().removeAttribute(SHOW_AUTHORING_TABS);
     	request.getSession().removeAttribute(TOOL_CONTENT_ID);
     	request.getSession().removeAttribute(DEFINE_LATER_IN_EDIT_MODE);
