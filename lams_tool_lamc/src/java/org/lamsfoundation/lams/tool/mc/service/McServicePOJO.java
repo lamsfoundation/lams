@@ -1044,9 +1044,9 @@ public class McServicePOJO implements
 
     
 	/**
-	 * checks the paramter content in the user responses table 
-	 * @param qa
-	 * @return
+	 * checks the parameter content in the user responses table 
+	 * @param mcContent
+	 * @return boolean
 	 * @throws McApplicationException
 	 */
 	public boolean studentActivityOccurredGlobal(McContent mcContent) throws McApplicationException
@@ -1096,10 +1096,18 @@ public class McServicePOJO implements
 		return false;
 	}
 	
-	
+
+	/**
+	 * implemented as part of the Tool Contract
+	 * copyToolContent(Long fromContentId, Long toContentId) throws ToolException
+	 * @param fromContentId
+	 * @param toContentId
+	 * @return 
+	 * @throws ToolException
+	 * 
+	 */
 	public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException
     {
-
     	logger.debug("start of copyToolContent with ids: " + fromContentId + " and " + toContentId);
 
     	if (fromContentId == null)
@@ -1179,17 +1187,100 @@ public class McServicePOJO implements
 			{
         		logger.debug("exception occurred: " +  e);
 			}
-            
-        	
         }
         catch (DataAccessException e)
         {
         	logger.debug("throwing ToolException: Exception occured when lams is copying content between content ids.");
             throw new ToolException("Exception occured when lams is copying content between content ids."); 
         }
-
     }
+
 	
+    /**
+     * implemented as part of the tool contract. Removes content and uploaded files from the content repository.
+     * removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException, ToolException
+	 * @param toContentId
+	 * @param removeSessionData 
+	 * @return 
+	 * @throws ToolException 
+     */    
+    public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException, ToolException
+	{
+    	logger.debug("start of removeToolContent with toolContentId: " + toolContentId + "removeSessionData: " + removeSessionData);
+    	
+    	if (toolContentId == null)
+    	{
+    		logger.debug("toolContentId is null");
+    		throw new ToolException("toolContentId is missing");
+    	}
+    	
+    	McContent mcContent = mcContentDAO.findMcContentById(toolContentId);
+    	logger.debug("retrieving mcContent: " + mcContent);
+    	
+    	if (mcContent != null)
+    	{
+            logger.debug("start deleting any uploaded file for this content from the content repository");
+        	Iterator filesIterator=mcContent.getMcAttachments().iterator();
+        	while (filesIterator.hasNext())
+        	{
+        		McUploadedFile mcUploadedFile=(McUploadedFile) filesIterator.next();
+        		logger.debug("iterated mcUploadedFile : " + mcUploadedFile);
+        		String filesUuid=mcUploadedFile.getUuid(); 
+        		if ((filesUuid != null) && (filesUuid.length() > 0))
+        		{
+        			try
+					{
+        				mcToolContentHandler.deleteFile(new Long(filesUuid));	
+					}
+        			catch(RepositoryCheckedException e)
+					{
+        				logger.debug("exception occured deleting files from content repository : " + e);
+        				throw new ToolException("undeletable file in the content repository");
+					}
+        		}
+        	}
+        	logger.debug("end deleting any uploaded files for this content.");
+    		
+    		Iterator sessionIterator=mcContent.getMcSessions().iterator();
+            while (sessionIterator.hasNext())
+            {
+            	if (removeSessionData == false)
+            	{
+            		logger.debug("removeSessionData is false, throwing SessionDataExistsException.");
+            		throw new SessionDataExistsException();	
+            	}
+            	
+            	McSession mcSession=(McSession)sessionIterator.next(); 
+            	logger.debug("iterated mcSession : " + mcSession);
+            	
+            	Iterator sessionUsersIterator=mcSession.getMcQueUsers().iterator();
+            	while (sessionUsersIterator.hasNext())
+            	{
+            		McQueUsr mcQueUsr=(McQueUsr) sessionUsersIterator.next();
+            		logger.debug("iterated mcQueUsr : " + mcQueUsr);
+            		
+            		Iterator sessionUsersAttemptsIterator=mcQueUsr.getMcUsrAttempts().iterator();
+            		while (sessionUsersAttemptsIterator.hasNext())
+                	{
+            			McUsrAttempt mcUsrAttempt=(McUsrAttempt)sessionUsersAttemptsIterator.next();
+            			logger.debug("iterated mcUsrAttempt : " + mcUsrAttempt);
+            			removeAttempt(mcUsrAttempt);
+            			logger.debug("removed mcUsrAttempt : " + mcUsrAttempt);
+                	}
+            	}
+            }
+            logger.debug("removed all existing responses of toolContent with toolContentId:" + 
+            																toolContentId);   
+            mcContentDAO.removeMcById(toolContentId);        
+            logger.debug("removed qaContent:" + mcContent);
+    	}
+    	else
+    	{
+        	logger.debug("Warning!!!, We should have not come here. mcContent is null.");
+        	throw new ToolException("toolContentId is missing");
+    	}
+	}
+
 
     
     /**
@@ -1293,12 +1384,13 @@ public class McServicePOJO implements
     	logger.debug("mcContent has been updated for unsetAsDefineLater: " + mcContent);
     }
     
+    
     /**
-     * 
-     * set the defineLater to true on this content
-     * 
+     * Implemented as part of the tool contract. Sets the defineLater to true on this content.
+     * setAsDefineLater(Long toolContentId) throws DataMissingException, ToolException
      * @param toolContentId
-     * return void
+     * @return 
+     * @throws ToolException
      */
     public void setAsDefineLater(Long toolContentId) throws DataMissingException, ToolException
     {
@@ -1315,19 +1407,19 @@ public class McServicePOJO implements
     		logger.debug("throwing DataMissingException: WARNING!: retrieved mcContent is null.");
             throw new DataMissingException("mcContent is missing");
     	}
-    	logger.debug("mcContent:" + mcContent);
     	mcContent.setDefineLater(true);
-    	logger.debug("is define later: " + mcContent.isDefineLater());
     	saveMcContent(mcContent);
+    	logger.debug("success: end of setAsDefineLater on toolContentId:" + toolContentId);
     }
     
 
     /**
-     * 
-     * set the runOffline to true on this content
+     * Implemented as part of the tool contract. Sets the runOffline to true on this content.
+     * setAsRunOffline(Long toolContentId) throws DataMissingException, ToolException
      * 
      * @param toolContentId
-     * return void
+     * return 
+     * @throws ToolException 
      */
     public void setAsRunOffline(Long toolContentId) throws DataMissingException, ToolException
     {
@@ -1345,92 +1437,8 @@ public class McServicePOJO implements
     	}
     	mcContent.setRunOffline(true);
     	saveMcContent(mcContent);
-    	logger.debug("qaContent has been updated for runOffline: " + mcContent);
+    	logger.debug("success: end of setAsRunOffline on toolContentId:" + toolContentId);
     }
-
-    
-    /**
-     * Part of the tool contract. Removes content and uploaded files from the content repository.
-     * removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException, ToolException
-     * 
-     */    
-    public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException, ToolException
-	{
-    	logger.debug("start of: removeToolContent(Long toolContentId, boolean removeSessionData");
-    	logger.debug("start of removeToolContent with toolContentId: " + toolContentId + "removeSessionData: " + removeSessionData);
-    	
-    	if (toolContentId == null)
-    	{
-    		logger.debug("toolContentId is null");
-    		throw new ToolException("toolContentId is missing");
-    	}
-    	
-    	McContent mcContent = mcContentDAO.findMcContentById(toolContentId);
-    	logger.debug("retrieving mcContent: " + mcContent);
-    	
-    	if (mcContent != null)
-    	{
-            logger.debug("start deleting any uploaded file for this content from the content repository");
-        	Iterator filesIterator=mcContent.getMcAttachments().iterator();
-        	while (filesIterator.hasNext())
-        	{
-        		McUploadedFile mcUploadedFile=(McUploadedFile) filesIterator.next();
-        		logger.debug("iterated mcUploadedFile : " + mcUploadedFile);
-        		String filesUuid=mcUploadedFile.getUuid(); 
-        		if ((filesUuid != null) && (filesUuid.length() > 0))
-        		{
-        			try
-					{
-        				mcToolContentHandler.deleteFile(new Long(filesUuid));	
-					}
-        			catch(RepositoryCheckedException e)
-					{
-        				logger.debug("exception occured deleting files from content repository : " + e);
-        				throw new ToolException("undeletable file in the content repository");
-					}
-        		}
-        	}
-        	logger.debug("end deleting any uploaded files for this content.");
-    		
-    		Iterator sessionIterator=mcContent.getMcSessions().iterator();
-            while (sessionIterator.hasNext())
-            {
-            	if (removeSessionData == false)
-            	{
-            		logger.debug("removeSessionData is false, throwing SessionDataExistsException.");
-            		throw new SessionDataExistsException();	
-            	}
-            	
-            	McSession mcSession=(McSession)sessionIterator.next(); 
-            	logger.debug("iterated mcSession : " + mcSession);
-            	
-            	Iterator sessionUsersIterator=mcSession.getMcQueUsers().iterator();
-            	while (sessionUsersIterator.hasNext())
-            	{
-            		McQueUsr mcQueUsr=(McQueUsr) sessionUsersIterator.next();
-            		logger.debug("iterated mcQueUsr : " + mcQueUsr);
-            		
-            		Iterator sessionUsersAttemptsIterator=mcQueUsr.getMcUsrAttempts().iterator();
-            		while (sessionUsersAttemptsIterator.hasNext())
-                	{
-            			McUsrAttempt mcUsrAttempt=(McUsrAttempt)sessionUsersAttemptsIterator.next();
-            			logger.debug("iterated mcUsrAttempt : " + mcUsrAttempt);
-            			removeAttempt(mcUsrAttempt);
-            			logger.debug("removed mcUsrAttempt : " + mcUsrAttempt);
-                	}
-            	}
-            }
-            logger.debug("removed all existing responses of toolContent with toolContentId:" + 
-            																toolContentId);   
-            mcContentDAO.removeMcById(toolContentId);        
-            logger.debug("removed qaContent:" + mcContent);
-    	}
-    	else
-    	{
-        	logger.debug("Warning!!!, We should have not come here. mcContent is null.");
-        	throw new ToolException("toolContentId is missing");
-    	}
-	}
     
     
     /**
