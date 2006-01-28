@@ -43,6 +43,7 @@ import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.contentrepository.service.RepositoryProxy;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.tool.BasicToolVO;
 import org.lamsfoundation.lams.tool.ToolContentManager;
@@ -102,8 +103,9 @@ public class McServicePOJO implements
 	private IMcUsrAttemptDAO		mcUsrAttemptDAO;
 	private IMcUploadedFileDAO  	mcUploadedFileDAO;
 	
-    private IUserManagementService userManagementService;
-    private ILamsToolService toolService;
+    private IUserManagementService 	userManagementService;
+    private ILearnerService 		learnerService;
+    private ILamsToolService 		toolService;
     private IToolContentHandler mcToolContentHandler = null;
     
     public McServicePOJO(){}
@@ -1001,7 +1003,7 @@ public class McServicePOJO implements
         	User user=userManagementService.getUserByLogin(username);
         	if (user  == null)
         	{
-        		logger.debug("No user with the username: "+ username +  " exists.");
+        		logger.error("No user with the username: "+ username +  " exists.");
         		throw new McApplicationException("No user with that username exists.");
         	}
         	return user;	 
@@ -1082,7 +1084,7 @@ public class McServicePOJO implements
 	 * 
 	 * find out if any student has ever used (logged in through the url  and replied) to this content
 	 * return true even if you have only one content passed as parameter referenced in the tool sessions table
-	 * @param qa
+	 * @param mc
 	 * @return boolean
 	 * @throws McApplicationException
 	 */
@@ -1112,7 +1114,7 @@ public class McServicePOJO implements
 
     	if (fromContentId == null)
         {
-        	logger.debug("fromContentId is null.");
+        	logger.error("fromContentId is null.");
         	logger.debug("attempt retrieving tool's default content id with signatute : " + MY_SIGNATURE);
         	long defaultContentId=0;
 			try
@@ -1122,14 +1124,14 @@ public class McServicePOJO implements
 			}
 			catch(Exception e)
 			{
-				logger.debug("default content id has not been setup for signature: " +  MY_SIGNATURE);
+				logger.error("default content id has not been setup for signature: " +  MY_SIGNATURE);
 				throw new ToolException("WARNING! default content has not been setup for signature" + MY_SIGNATURE + " Can't continue!");
 			}
         }
         
         if (toContentId == null)
         {
-        	logger.debug("throwing ToolException: toContentId is null");
+        	logger.error("throwing ToolException: toContentId is null");
 			throw new ToolException("toContentId is missing");
         }
         logger.debug("final - copyToolContent using ids: " + fromContentId + " and " + toContentId);
@@ -1140,8 +1142,8 @@ public class McServicePOJO implements
         
             if (fromContent == null)
             {
-            	logger.debug("fromContent is null.");
-            	logger.debug("attempt retrieving tool's default content id with signatute : " + MY_SIGNATURE);
+            	logger.error("fromContent is null.");
+            	logger.error("attempt retrieving tool's default content id with signatute : " + MY_SIGNATURE);
             	long defaultContentId=0;
     			try
     			{
@@ -1150,7 +1152,7 @@ public class McServicePOJO implements
     			}
     			catch(Exception e)
     			{
-    				logger.debug("default content id has not been setup for signature: " +  MY_SIGNATURE);
+    				logger.error("default content id has not been setup for signature: " +  MY_SIGNATURE);
     				throw new ToolException("WARNING! default content has not been setup for signature" + MY_SIGNATURE + " Can't continue!");
     			}
     			
@@ -1181,16 +1183,16 @@ public class McServicePOJO implements
 			}
         	catch(ItemNotFoundException e)
 			{
-        		logger.debug("exception occurred: " +  e);
+        		logger.error("exception occurred: " +  e);
 			}
         	catch(RepositoryCheckedException e)
 			{
-        		logger.debug("exception occurred: " +  e);
+        		logger.error("exception occurred: " +  e);
 			}
         }
         catch (DataAccessException e)
         {
-        	logger.debug("throwing ToolException: Exception occured when lams is copying content between content ids.");
+        	logger.error("throwing ToolException: Exception occured when lams is copying content between content ids.");
             throw new ToolException("Exception occured when lams is copying content between content ids."); 
         }
     }
@@ -1210,7 +1212,7 @@ public class McServicePOJO implements
     	
     	if (toolContentId == null)
     	{
-    		logger.debug("toolContentId is null");
+    		logger.error("toolContentId is null");
     		throw new ToolException("toolContentId is missing");
     	}
     	
@@ -1219,7 +1221,7 @@ public class McServicePOJO implements
     	
     	if (mcContent != null)
     	{
-            logger.debug("start deleting any uploaded file for this content from the content repository");
+            logger.error("start deleting any uploaded file for this content from the content repository");
         	Iterator filesIterator=mcContent.getMcAttachments().iterator();
         	while (filesIterator.hasNext())
         	{
@@ -1234,7 +1236,7 @@ public class McServicePOJO implements
 					}
         			catch(RepositoryCheckedException e)
 					{
-        				logger.debug("exception occured deleting files from content repository : " + e);
+        				logger.error("exception occured deleting files from content repository : " + e);
         				throw new ToolException("undeletable file in the content repository");
 					}
         		}
@@ -1272,11 +1274,11 @@ public class McServicePOJO implements
             logger.debug("removed all existing responses of toolContent with toolContentId:" + 
             																toolContentId);   
             mcContentDAO.removeMcById(toolContentId);        
-            logger.debug("removed qaContent:" + mcContent);
+            logger.debug("removed mcContent:" + mcContent);
     	}
     	else
     	{
-        	logger.debug("Warning!!!, We should have not come here. mcContent is null.");
+        	logger.error("Warning!!!, We should have not come here. mcContent is null.");
         	throw new ToolException("toolContentId is missing");
     	}
 	}
@@ -1314,8 +1316,8 @@ public class McServicePOJO implements
     	
     	if (mcQueUsr != null)
     	{
-    		logger.debug("retrieved mcQueUsr : " + mcQueUsr);
-        	logger.debug("retrieved mcQueUsr  has the tool session : " + mcQueUsr.getMcSession());
+    		logger.error("retrieved mcQueUsr : " + mcQueUsr);
+        	logger.error("retrieved mcQueUsr  has the tool session : " + mcQueUsr.getMcSession());
         	McSession mcSession=mcQueUsr.getMcSession();
         	if (mcSession != null)
         	{
@@ -1330,8 +1332,8 @@ public class McServicePOJO implements
             	logger.debug("updated  mcSession to COMPLETED in the db : ");
             	
             	McContent mcContent=mcSession.getMcContent();
-            	logger.debug("mcSession uses qaContent : " + mcContent);
-            	logger.debug("mcSession uses qaContentId : " + mcContent.getMcContentId());
+            	logger.debug("mcSession uses mcContent : " + mcContent);
+            	logger.debug("mcSession uses mcContentId : " + mcContent.getMcContentId());
             	
             	/**
             	 * if all the sessions of this content is COMPLETED, unlock the content
@@ -1344,21 +1346,21 @@ public class McServicePOJO implements
             	{
             		mcContent.setContentInUse(false);
             		updateMc(mcContent);
-                	logger.debug("qaContent has been updated for contentInUse" + mcContent);
+                	logger.debug("mcContent has been updated for contentInUse" + mcContent);
             	}
         	}
         	else
         	{
-        		logger.debug("WARNING!: retrieved mcSession is null.");
+        		logger.error("WARNING!: retrieved mcSession is null.");
         		throw new McApplicationException("Fail to setAsForceComplete"
                         + " based on null mcSession.");
         	}
     	}
     	else
     	{
-    		logger.debug("WARNING!: retrieved qaQueUsr is null.");
+    		logger.error("WARNING!: retrieved mcQueUsr is null.");
             throw new McApplicationException("Fail to setAsForceComplete"
-                    + " based on null qaQueUsr.");
+                    + " based on null mcQueUsr.");
     	}
     }
     
@@ -1368,14 +1370,14 @@ public class McServicePOJO implements
     	logger.debug("request for unsetAsDefineLater with toolContentId: " + toolContentId);
     	if  (toolContentId == null)
     	{
-    		logger.debug("WARNING!: retrieved toolContentId is null.");
+    		logger.error("WARNING!: retrieved toolContentId is null.");
             throw new McApplicationException("Fail to setAsDefineLater"
                     + " based on null toolContentId.");
     	}
     	McContent mcContent = mcContentDAO.findMcContentById(toolContentId);
     	if (mcContent == null)
     	{
-    		logger.debug("WARNING!!!: retrieved mcContent is null.");
+    		logger.error("WARNING!!!: retrieved mcContent is null.");
             throw new McApplicationException("Fail to unsetAsDefineLater"
                     + " based on null mcContent.");
     	}
@@ -1397,14 +1399,14 @@ public class McServicePOJO implements
     	logger.debug("request for setAsDefineLater with toolContentId: " + toolContentId);
     	if  (toolContentId == null)
     	{
-    		logger.debug("throwing DataMissingException: WARNING!: retrieved toolContentId is null.");
+    		logger.error("throwing DataMissingException: WARNING!: retrieved toolContentId is null.");
             throw new DataMissingException("toolContentId is missing");
     	}
     	
     	McContent mcContent=retrieveMc(toolContentId);
     	if (mcContent == null)
     	{
-    		logger.debug("throwing DataMissingException: WARNING!: retrieved mcContent is null.");
+    		logger.error("throwing DataMissingException: WARNING!: retrieved mcContent is null.");
             throw new DataMissingException("mcContent is missing");
     	}
     	mcContent.setDefineLater(true);
@@ -1426,13 +1428,13 @@ public class McServicePOJO implements
     	logger.debug("request for setAsRunOffline with toolContentId:" + toolContentId);
     	if  (toolContentId == null)
     	{
-    		logger.debug("throwing DataMissingException: WARNING!: retrieved toolContentId is null.");
+    		logger.error("throwing DataMissingException: WARNING!: retrieved toolContentId is null.");
             throw new DataMissingException("toolContentId is missing");
     	}
     	McContent mcContent = mcContentDAO.findMcContentById(toolContentId);
     	if (mcContent == null)
     	{
-    		logger.debug("throwing DataMissingException: WARNING!: retrieved mcContent is null.");
+    		logger.error("throwing DataMissingException: WARNING!: retrieved mcContent is null.");
             throw new DataMissingException("mcContent is missing");
     	}
     	mcContent.setRunOffline(true);
@@ -1454,7 +1456,7 @@ public class McServicePOJO implements
     	
 	    if (mcSession == null) 
 	    {
-	    	logger.debug("mcSession does not exist yet: " + toolSessionId);
+	    	logger.error("mcSession does not exist yet: " + toolSessionId);
 	    	return false;
 	    }
 	    else
@@ -1465,11 +1467,15 @@ public class McServicePOJO implements
 	}
     
     /**
-     * 
-     * ToolSessionManager CONTRACT : creates a tool session with the incoming toolSessionId in the tool session table
-     * 
-     * gets called only in the Learner mode.
+     * Implemented as part of the tool contract.
+     * Gets called only in the Learner mode.
      * All the learners in the same group have the same toolSessionId.
+     * 
+     * createToolSession(Long toolSessionId, Long toolContentId) throws ToolException
+     * @param toolSessionId
+     * @param toolContentId 
+     * return 
+     * @throws ToolException 
      * 
      */
     public void createToolSession(Long toolSessionId, Long toolContentId) throws ToolException
@@ -1477,15 +1483,15 @@ public class McServicePOJO implements
     	logger.debug("start of createToolSession with ids: " + toolSessionId + " and " + toolContentId);
     	if (toolSessionId == null)
     	{
-    		logger.debug("toolSessionId is null");
+    		logger.error("toolSessionId is null");
     		throw new ToolException("toolSessionId is missing");
     	}
     	
     	long defaultContentId=0;
     	if (toolContentId == null)
         {
-        	logger.debug("toolContentId is null.");
-        	logger.debug("attempt retrieving tool's default content id with signatute : " + MY_SIGNATURE);
+        	logger.error("toolContentId is null.");
+        	logger.error("attempt retrieving tool's default content id with signatute : " + MY_SIGNATURE);
         
 			try
 			{
@@ -1495,7 +1501,7 @@ public class McServicePOJO implements
 			}
 			catch(Exception e)
 			{
-				logger.debug("default content id has not been setup for signature: " +  MY_SIGNATURE);
+				logger.error("default content id has not been setup for signature: " +  MY_SIGNATURE);
 				throw new ToolException("WARNING! default content has not been setup for signature" + MY_SIGNATURE + " Can't continue!");
 			}
         }
@@ -1506,8 +1512,8 @@ public class McServicePOJO implements
         
         if (mcContent == null)
         {
-        	logger.debug("mcContent is null.");
-        	logger.debug("attempt retrieving tool's default content id with signatute : " + MY_SIGNATURE);
+        	logger.error("mcContent is null.");
+        	logger.error("attempt retrieving tool's default content id with signatute : " + MY_SIGNATURE);
         
 			try
 			{
@@ -1517,7 +1523,7 @@ public class McServicePOJO implements
 			}
 			catch(Exception e)
 			{
-				logger.debug("default content id has not been setup for signature: " +  MY_SIGNATURE);
+				logger.error("default content id has not been setup for signature: " +  MY_SIGNATURE);
 				throw new ToolException("WARNING! default content has not been setup for signature" + MY_SIGNATURE + " Can't continue!");
 			}
 
@@ -1526,12 +1532,11 @@ public class McServicePOJO implements
         logger.debug("final - retrieved mcContent: " + mcContent);
 
             
-        /**
+        /*
          * create a new a new tool session if it does not already exist in the tool session table
          */
         if (!existsSession(toolSessionId))
         {
-        	
         	try
 			{
         		McSession mcSession = new McSession(toolSessionId,
@@ -1547,19 +1552,27 @@ public class McServicePOJO implements
         	}
         	catch(Exception e)
 			{
-        		logger.debug("Error creating new toolsession in the db");
+        		logger.error("Error creating new toolsession in the db");
 				throw new ToolException("Error creating new toolsession in the db: " + e);
 			}
         }
     }
 
-    
+
+    /**
+     * Implemented as part of the tool contract.
+     * removeToolSession(Long toolSessionId) throws DataMissingException, ToolException
+     * @param toolSessionId
+     * @param toolContentId 
+     * return 
+     * @throws ToolException
+     */
     public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException
 	{
     	logger.debug("start of removeToolSession with id: " + toolSessionId);
     	if (toolSessionId == null)
     	{
-    		logger.debug("toolSessionId is null");
+    		logger.error("toolSessionId is null");
     		throw new DataMissingException("toolSessionId is missing");
     	}
     	
@@ -1568,7 +1581,7 @@ public class McServicePOJO implements
     	try
 		{
     		mcSession=retrieveMcSession(toolSessionId);
-    		logger.debug("retrieved qaSession: " + mcSession);
+    		logger.debug("retrieved mcSession: " + mcSession);
 		}
     	catch(McApplicationException e)
 		{
@@ -1576,12 +1589,12 @@ public class McServicePOJO implements
 		}
     	catch(Exception e)
 		{
-    		throw new ToolException("error retrieving qaSession: " + e);
+    		throw new ToolException("error retrieving mcSession: " + e);
 		}
     	
     	if (mcSession == null)
     	{
-    		logger.debug("mcSession is null");
+    		logger.error("mcSession is null");
     		throw new DataMissingException("mcSession is missing");
     	}
     	
@@ -1592,107 +1605,87 @@ public class McServicePOJO implements
 		}
     	catch(McApplicationException e)
 		{
-    		throw new ToolException("error deleting qaSession:" + e);
+    		throw new ToolException("error deleting mcSession:" + e);
 		}
 	}
 	
-    
-    /**FIX THIS ONE!!!!
-     * TO BE TESTED
-     * ToolSessionManager CONTRACT
-     * gets called only in the Learner mode.
-     * 
-     * Call controller service to complete the qa session
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#leaveToolSession(java.lang.Long)
-     */
-    public String leaveToolSession(Long toolSessionId,User user) throws DataMissingException, ToolException 
-    {
-        logger.debug("start of leaveToolSession with toolSessionId:" + toolSessionId);
-        //logger.debug("start of leaveToolSession with learner:" + learnerId);
-        
-        if (toolSessionId == null)
-    	{
-    		logger.debug("toolSessionId is null");
-    		throw new DataMissingException("toolSessionId is missing");
-    	}
-        
-        /*
-        if (learnerId == null)
-    	{
-    		logger.debug("learnerId is null");
-    		throw new DataMissingException("learnerId is missing");
-    	}
-    	*/
-        
-    	try
-		{
-    		/*
-    		String nextUrl=learnerService.completeToolSession(toolSessionId,learner);
-    		logger.debug(logger + " " + this.getClass().getName() +  " " + "nextUrl: " + nextUrl);
-    		return nextUrl;
-    		*/
-    		return "nextUrl";
-    	}
-    	catch(DataAccessException e)
-		{
-    		throw new ToolException("Exception occured when user is leaving tool session: " + e);
-		}
-        
-    }
-
-    
-    public String leaveToolSession(Long toolSessionId,Long learnerId) throws DataMissingException, ToolException 
-    {
-        logger.debug("start of leaveToolSession with toolSessionId:" + toolSessionId);
-        logger.debug("start of leaveToolSession with learner:" + learnerId);
-        
-        if (toolSessionId == null)
-    	{
-    		logger.debug("toolSessionId is null");
-    		throw new DataMissingException("toolSessionId is missing");
-    	}
-        
-        
-        if (learnerId == null)
-    	{
-    		logger.debug("learnerId is null");
-    		throw new DataMissingException("learnerId is missing");
-    	}
-    	
-        
-    	try
-		{
-    		/*
-    		String nextUrl=learnerService.completeToolSession(toolSessionId,learner);
-    		logger.debug(logger + " " + this.getClass().getName() +  " " + "nextUrl: " + nextUrl);
-    		return nextUrl;
-    		*/
-    		return "nextUrl";
-    	}
-    	catch(DataAccessException e)
-		{
-    		throw new ToolException("Exception occured when user is leaving tool session: " + e);
-		}
-        
-    }
 
     /**
-     * ToolSessionManager CONTRACT
+     * Implemtented as part of the tool contract.
+     * leaveToolSession(Long toolSessionId,Long learnerId) throws DataMissingException, ToolException
+     * @param toolSessionId
+     * @param learnerId 
+     * return String
+     * @throws ToolException
      * 
+     */
+    public String leaveToolSession(Long toolSessionId,Long learnerId) throws DataMissingException, ToolException 
+    {
+        logger.debug("start of leaveToolSession with toolSessionId:" + toolSessionId + " and learnerId:" + learnerId);
+        
+        if (learnerId == null)
+    	{
+    		logger.error("learnerId is null");
+    		throw new DataMissingException("learnerId is missing");
+    	}
+        
+        if (toolSessionId == null)
+    	{
+    		logger.error("toolSessionId is null");
+    		throw new DataMissingException("toolSessionId is missing");
+    	}
+        
+        McSession mcSession=null;
+    	try
+		{
+    		mcSession=retrieveMcSession(toolSessionId);
+    		logger.debug("retrieved mcSession: " + mcSession);
+		}
+    	catch(McApplicationException e)
+		{
+    		throw new DataMissingException("error retrieving mcSession: " + e);
+		}
+    	catch(Exception e)
+		{
+    		throw new ToolException("error retrieving mcSession: " + e);
+		}
+    	mcSession.setSessionStatus(COMPLETED);
+    	mcSessionDAO.updateMcSession(mcSession);
+    	logger.debug("updated mcSession to COMPLETED" + mcSession);
+    	
+    	String nextUrl= learnerService.completeToolSession(toolSessionId,learnerId);
+    	logger.debug("nextUrl: " + nextUrl);
+    	if (nextUrl == null)
+    	{
+    		logger.error("nextUrl is null");
+    		throw new ToolException("nextUrl is null");
+    	}
+    	return nextUrl;
+    }
+    
+
+    /**
+     * exportToolSession(Long toolSessionId) throws DataMissingException, ToolException
+     * @param toolSessionId
+     * return ToolSessionExportOutputData
+     * @throws ToolException
      */
     public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException
     {
         throw new ToolException("not yet implemented");
     }
 
+    
     /**
-     * ToolSessionManager CONTRACT
-     * 
+     * exportToolSession(Long toolSessionId) throws DataMissingException, ToolException
+     * @param toolSessionIds
+     * return ToolSessionExportOutputData
+     * @throws ToolException
      */
     public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException, ToolException
     {
-
         throw new ToolException("not yet implemented");
+
     }
     
     public BasicToolVO getToolBySignature(String toolSignature) throws McApplicationException
@@ -1964,8 +1957,6 @@ public class McServicePOJO implements
 	}
 
 	/**
-	 * 
-	 *  !! COMPLETE THIS !!
 	 * 
 	 * removes all the entries in the uploaded files table
 	 */
@@ -2250,5 +2241,17 @@ public class McServicePOJO implements
 	 */
 	public void setMcToolContentHandler(IToolContentHandler mcToolContentHandler) {
 		this.mcToolContentHandler = mcToolContentHandler;
+	}
+	/**
+	 * @return Returns the learnerService.
+	 */
+	public ILearnerService getLearnerService() {
+		return learnerService;
+	}
+	/**
+	 * @param learnerService The learnerService to set.
+	 */
+	public void setLearnerService(ILearnerService learnerService) {
+		this.learnerService = learnerService;
 	}
 }
