@@ -9,7 +9,7 @@
 	<!--options content goes here-->
 				<table align=center bgcolor="#FFFFFF">
 					  <tr>
-					  	<td align=left class="input" valign=top bgColor="#333366" colspan=2> 
+					  	<td NOWRAP align=left class="input" valign=top bgColor="#333366" colspan=2> 
 						  	<font size=2 color="#FFFFFF"> <b>  <bean:message key="label.assessment"/> </b> </font>
 					  	</td>
 					  </tr>
@@ -17,7 +17,7 @@
 
 			 		<c:if test="${sessionScope.isRetries == 'true'}"> 		
 					  <tr>
-					  	<td align=center class="input" valign=top colspan=2> 
+					  	<td NOWRAP align=center class="input" valign=top colspan=2> 
 						  	<font size=3> <b>  <bean:message key="label.withRetries"/> </b> </font>
 					  	</td>
 					  </tr>
@@ -25,7 +25,7 @@
 				
 					<c:if test="${sessionScope.isRetries != 'true'}"> 		
 					  <tr>
-					  	<td align=center class="input" valign=top colspan=2> 
+					  	<td NOWRAP align=center class="input" valign=top colspan=2> 
 						  	<font size=3> <b>  <bean:message key="label.withoutRetries"/> </b> </font>
 					  	</td>
 					  </tr>
@@ -33,7 +33,7 @@
 
 			 		<c:if test="${sessionScope.isRetries == 'true' && sessionScope.passMark > 0}"> 		
 					  <tr>
-					  	<td align=left class="input" valign=top colspan=2> 
+					  	<td NOWRAP align=left class="input" valign=top colspan=2> 
 						  	<font size=2> <b>  <bean:message key="label.learner.message"/>
 						  		 (<c:out value="${sessionScope.passMark}"/><bean:message key="label.percent"/> ) 
 						  	</b> </font>
@@ -48,7 +48,7 @@
 			  		<c:if test="${questionEntry.key == sessionScope.currentQuestionIndex  &&  sessionScope.questionListingMode == sessionScope.questionListingModeSequential}"> 			
 					
 						  <tr>
-						  	<td align=left class="input" valign=top bgColor="#999966" colspan=2> 
+						  	<td NOWRAP align=left class="input" valign=top bgColor="#999966" colspan=2> 
 							  	<font color="#FFFFFF"> 
 								  	<font size=2>
 								  		<c:out value="${questionEntry.value}"/> 
@@ -58,7 +58,7 @@
 						  </tr>
 
 						  <tr>						 
-							<td align=left>
+							<td NOWRAP align=left>
 							<table align=left>
 			  		  	 		<c:set var="queIndex" scope="session" value="0"/>
 								<c:forEach var="mainEntry" items="${sessionScope.mapGeneralOptionsContent}">
@@ -66,7 +66,6 @@
 										<c:if test="${sessionScope.mainQueIndex == sessionScope.queIndex}"> 		
 									  		<c:forEach var="subEntry" items="${mainEntry.value}">
 									  		
-
 							  		  	 		<c:set var="checkedOptionFound" scope="request" value="0"/>
 												<!-- traverse the selected option from here --> 									  		
 	  											<c:forEach var="selectedMainEntry" items="${sessionScope.mapGeneralCheckedOptionsContent}">
@@ -76,7 +75,7 @@
 																<c:if test="${subEntry.key == selectedSubEntry.key}"> 		
 									  							
 																	<tr> 
-																		<td align=left class="input" valign=top> 
+																		<td NOWRAP align=left class="input" valign=top> 
 																			<font size=2>
 																				<input type="checkbox" 
 																				name=optionCheckBox<c:out value="${sessionScope.queIndex}"/>-<c:out value="${subEntry.key}"/>
@@ -96,7 +95,7 @@
 																				document.forms[0].submit();" CHECKED> 
 																			</font>
 																		</td> 
-																		<td align=left class="input" valign=top> 
+																		<td NOWRAP align=left class="input" valign=top> 
 																			<font color="#CCCC99"> 	
 																				<font size=2>
 																					<c:out value="${subEntry.value}"/> 
@@ -114,7 +113,7 @@
 
 												<c:if test="${requestScope.checkedOptionFound == 0}"> 		
 																	<tr> 
-																		<td align=left class="input" valign=top> 
+																		<td NOWRAP align=left class="input" valign=top> 
 																			<font size=2>
 																				<input type="checkbox" 
 																				name=optionCheckBox<c:out value="${sessionScope.queIndex}"/>-<c:out value="${subEntry.key}"/>
@@ -134,7 +133,7 @@
 																				document.forms[0].submit();"> 
 																			</font>
 																		</td> 
-																		<td align=left class="input" valign=top> 
+																		<td NOWRAP align=left class="input" valign=top> 
 																			<font size=2>
 																				<font color="#CCCC99"> <c:out value="${subEntry.value}"/> </font>
 																			</font>
@@ -164,7 +163,7 @@
 
 		 		<c:if test="${sessionScope.totalCountReached != 'true'}"> 		
 	  	   		  <tr>
-				  	<td colspan=2 align=right class="input" valign=top> 
+				  	<td NOWRAP colspan=2 align=right class="input" valign=top> 
 					  	<font size=2>
 				  			<html:submit property="nextOptions" styleClass="button">
 								<bean:message key="button.nextQuestion"/>
@@ -176,7 +175,7 @@
 
 		 		<c:if test="${sessionScope.totalCountReached == 'true'}"> 		
 	  	   		  <tr>
-				  	<td colspan=2 align=right class="input" valign=top> 
+				  	<td NOWRAP colspan=2 align=right class="input" valign=top> 
 					  	<font size=2>
 				  			<html:submit property="continueOptionsCombined" styleClass="button">
 								<bean:message key="button.continue"/>
