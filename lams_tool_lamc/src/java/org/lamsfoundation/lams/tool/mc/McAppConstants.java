@@ -50,6 +50,7 @@ public interface McAppConstants {
     public static final String SINGLE_QUESTION_ANSWERS					="singleQuestionAnswers";
     public static final String RESULTS_SUMMARY							="resultsSummary";
     public static final String ERROR_LIST								="errorList";
+    public static final String PREVIEW									="preview";
 	
     public static final String AUTHORING								="authoring";
     public static final String SOURCE_MC_STARTER						="sourceMcStarter";
