@@ -2,8 +2,6 @@
 package org.lamsfoundation.lams.tool.mc.web;
 
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -216,13 +214,10 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	     * 
 	     * make sure this session exists in tool's session table by now.
 	     */
-		
+/*		
 	    if (!McUtils.existsSession(toolSessionID, request)) 
 		{
 				logger.debug("tool session does not exist" + toolSessionID);
-				/*
-				 *for testing only, remove this line in development 
-				 */
 				Long currentToolContentId= new Long(9876);
 				logger.debug("simulating container behaviour: calling createToolSession with toolSessionId : " + 
 						toolSessionID + " and toolContentId: " + currentToolContentId);
@@ -236,6 +231,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 					logger.debug("we should never come here.");
 				}
 		}
+*/		
 		
 		/*
 		 * by now, we made sure that the passed tool session id exists in the db as a new record
@@ -255,11 +251,64 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	     */
 		McContent mcContent=mcSession.getMcContent();
 	    logger.debug("using mcContent: " + mcContent);
+	    
+	    /*
+	     * The content we retrieved above must have been created before in Authoring time. 
+	     * And the passed tool session id already refers to it.
+	     */
+	    setupAttributes(request, mcContent);
+
 	    request.getSession().setAttribute(TOOL_CONTENT_ID, mcContent.getMcContentId());
 	    logger.debug("using TOOL_CONTENT_ID: " + mcContent.getMcContentId());
 	    
 	    request.getSession().setAttribute(TOOL_CONTENT_UID, mcContent.getUid());
 	    logger.debug("using TOOL_CONTENT_UID: " + mcContent.getUid());
+	    
+    	/* Is the request for a preview by the author?
+    	Preview The tool must be able to show the specified content as if it was running in a lesson. 
+		It will be the learner url with tool access mode set to ToolAccessMode.AUTHOR 
+		3 modes are:
+			author
+			teacher
+			learner
+		*/
+    	/* ? CHECK THIS: how do we determine whether preview is requested? Mode is not enough on its own.*/
+    	String mode= (String) request.getParameter("mode");
+    	logger.debug("mode: " + mode);
+    	if ((mode != null) && (mode.equals("author")))
+    	{
+    		logger.debug("Author requests for a preview of the content.");
+			logger.debug("existing mcContent:" + mcContent);
+    		
+    		mapQuestionsContent= new TreeMap(new McComparator());
+    	    mapQuestionsContent=LearningUtil.buildQuestionContentMap(request,mcContent);
+    	    logger.debug("mapQuestionsContent: " + mapQuestionsContent);
+        	
+        	request.getSession().setAttribute(MAP_QUESTION_CONTENT_LEARNER, mapQuestionsContent);
+        	logger.debug("MAP_QUESTION_CONTENT_LEARNER: " +  request.getSession().getAttribute(MAP_QUESTION_CONTENT_LEARNER));
+        	logger.debug("mcContent has : " + mapQuestionsContent.size() + " entries.");
+        	request.getSession().setAttribute(TOTAL_QUESTION_COUNT, new Long(mapQuestionsContent.size()).toString());
+        	
+        	request.getSession().setAttribute(CURRENT_QUESTION_INDEX, "1");
+    		logger.debug("CURRENT_QUESTION_INDEX: " + request.getSession().getAttribute(CURRENT_QUESTION_INDEX));
+    		logger.debug("final Options Map for the first question: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT));
+    		
+    		/*also prepare data into mapGeneralOptionsContent for combined answers view */
+    		Map mapGeneralOptionsContent=AuthoringUtil.generateGeneralOptionsContentMap(request, mcContent);
+    		logger.debug("returned mapGeneralOptionsContent: " + mapGeneralOptionsContent);
+    		request.getSession().setAttribute(MAP_GENERAL_OPTIONS_CONTENT, mapGeneralOptionsContent);
+    		
+	    	/*only allowing combined view in the preview mode. Might be improved to support sequential view as well. */
+	    	request.getSession().setAttribute(QUESTION_LISTING_MODE, QUESTION_LISTING_MODE_COMBINED);
+	    	/* to disable the buttons on the screen*/
+	    	request.getSession().setAttribute(PREVIEW_ONLY, new Boolean(true).toString());
+	    	
+	    	request.getSession().setAttribute(CURRENT_QUESTION_INDEX, "1");
+    		McLearningAction mcLearningAction= new McLearningAction();
+	    	return mcLearningAction.redoQuestions(request, mcLearningForm, mapping);
+    	}
+	    
+    	/* by now, we know that the mode is either teacher or learner. */
 	    
 	    /* find out if the content is set to run offline or online. If it is set to run offline , the learners are informed about that. */
 	    boolean isRunOffline=McUtils.isRunOffline(mcContent);
@@ -281,13 +330,6 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 			return (mapping.findForward(ERROR_LIST));
 	    }
 
-	    
-	    /*
-	     * The content we retrieved above must have been created before in Authoring time. 
-	     * And the passed tool session id already refers to it.
-	     */
-	    setupAttributes(request, mcContent);
-	    
 	    /*
     	 * fetch question content from content
     	 */
@@ -502,6 +544,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 			}
 	    }
 	    
+	    /*mode can be learner, teacher or author */
 	    String mode=request.getParameter(MODE);
 	    logger.debug("mode: " + mode);
 	    
@@ -512,7 +555,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 			return (mapping.findForward(ERROR_LIST));
 	    }
 	    
-	    if ((!mode.equals("learner")) && (!mode.equals("teacher")))
+	    if ((!mode.equals("learner")) && (!mode.equals("teacher")) && (!mode.equals("author")))
 	    {
 	    	persistError(request, "error.mode.invalid");
 	    	request.setAttribute(USER_EXCEPTION_MODE_REQUIRED, new Boolean(true));
