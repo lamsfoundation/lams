@@ -35,6 +35,8 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.lamsfoundation.lams.tool.exception.DataMissingException;
+import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McApplicationException;
 import org.lamsfoundation.lams.tool.mc.McComparator;
@@ -265,11 +267,36 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     	else if (mcLearningForm.getLearnerFinished() != null)
     	{
     		logger.debug("requested learner finished, the learner should be directed to next activity.");
+    		
+    		Long toolSessionId = (Long) request.getSession().getAttribute(TOOL_SESSION_ID);
+    		String userID=(String) request.getSession().getAttribute(USER_ID);
+    		logger.debug("attempting to leave/complete session with toolSessionId:" + toolSessionId + " and userID:"+userID);
+    		
+    		String nextUrl=null;
+    		try
+    		{
+    			nextUrl=mcService.leaveToolSession(toolSessionId, new Long(userID));
+    			logger.debug("nextUrl: "+ nextUrl);
+    		}
+    		catch (DataMissingException e)
+    		{
+    			throw new ServletException(e);
+    		}
+    		catch (ToolException e)
+    		{
+    			throw new ServletException(e);
+    		}
+            
+    		logger.debug("success getting nextUrl: "+ nextUrl);
     		mcLearningForm.resetCommands();
     		LearningUtil.cleanUpLearningSession(request);
     		
-    		//fix this
-    		return (mapping.findForward(LEARNING_STARTER));
+    		/* pay attention here*/
+    		logger.debug("redirecting to the nextUrl: "+ nextUrl);
+    		response.sendRedirect(nextUrl);
+    		
+    		//pay attention here as well: whete to go.
+    		return null;
     	}
     	else if (mcLearningForm.getDonePreview() != null)
     	{
@@ -277,7 +304,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
         	mcLearningForm.resetCommands();
         	LearningUtil.cleanUpLearningSession(request);
         	AuthoringUtil.cleanupAuthoringSession(request);
-        	return (mapping.findForward(LOAD_STARTER));
+        	return (mapping.findForward(LEARNING_STARTER));
     	}
     	mcLearningForm.resetCommands();	
  		return (mapping.findForward(LOAD_LEARNER));
