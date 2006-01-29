@@ -177,13 +177,14 @@
 							 </tr>							
 						</c:if> 							
 
+
 							<c:if test="${ (sessionScope.activeModule == 'defineLater') &&  
 										   (sessionScope.defineLaterInEditMode != 'true') 
 										  }"> 			
 							 <tr>
 								  	<td NOWRAP bgcolor="#EEEEEE" colspan=5 class="input" valign=top align=right>
 									  	<font size=2>
-											<html:submit styleClass="button" disabled="true" onclick="javascript:alert('This button is disabled in this [view-only] mode.');" >
+											<html:submit styleClass="longButton" disabled="true" onclick="javascript:alert('This button is disabled in this [view-only] mode.');" >
 												<bean:message key="label.add.question"/>
 											</html:submit>	 				 		  										  		
 										</font>
@@ -269,7 +270,7 @@
 		 						<td NOWRAP valign=top> </td> 
 								<td NOWRAP class="input" colspan=3 align=left valign=top>								
 									<font size=2>
-										<html:submit onclick="javascript:submitMethod('editActivityQuestions');" disabled="true" styleClass="button">
+										<html:submit onclick="javascript:submitMethod('editActivityQuestions');" disabled="true" styleClass="buttonLeft">
 											<bean:message key="label.edit"/>
 										</html:submit>	 				 		  					
 									</font>
@@ -286,7 +287,7 @@
 		 						<td NOWRAP valign=top> </td> 
 								<td NOWRAP class="input" colspan=3 align=left valign=top>								
 									<font size=2>
-										<html:submit onclick="javascript:submitMethod('editActivityQuestions');" styleClass="button">
+										<html:submit onclick="javascript:submitMethod('editActivityQuestions');" styleClass="buttonLeft">
 											<bean:message key="label.edit"/>
 										</html:submit>	 				 		  					
 									</font>
