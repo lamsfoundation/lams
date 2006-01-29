@@ -1622,6 +1622,10 @@ public class McServicePOJO implements
     public String leaveToolSession(Long toolSessionId,Long learnerId) throws DataMissingException, ToolException 
     {
         logger.debug("start of leaveToolSession with toolSessionId:" + toolSessionId + " and learnerId:" + learnerId);
+        logger.debug("make sure learnerService is available. Is it?" + learnerService);
+        
+        if (learnerService == null)
+			return "dummyNextUrl";
         
         if (learnerId == null)
     	{
