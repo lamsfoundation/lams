@@ -140,7 +140,6 @@
 						</div>		         							
 		        </c:otherwise>
 		</c:choose>
-	
 	</html:form>
 
 </body>
