@@ -19,6 +19,10 @@
 	String strCreateToolSession="/learningStarter?toolSessionID=" + toolSessionID2 +  "&mode=learner" + "&createToolSession=1";
 	String strRemoveToolSession="/learningStarter?toolSessionID=" + toolSessionID2 +  "&mode=learner" + "&removeToolSession=1";
 	String strLeaveToolSession="/learningStarter?toolSessionID=" + toolSessionID2 +  "&mode=learner" + "&leaveToolSession=1" +  "&learnerId=4";
+
+
+	String strPreview="/learningStarter?toolSessionID=" + toolSessionID2 + "&mode=author";	
+	String strLearnerProgress="/learningStarter?toolSessionID=" + toolSessionID2 +  "&mode=teacher" + "&userID=4";
 	
 %>
 
@@ -56,4 +60,17 @@
       <table border=1>
       </table><br/><BR>
       <html:submit value="Leave Tool Session"/>
+</html:form>
+
+<html:form action="<%=strPreview%>" method="post">
+      <table border=1>
+      </table><br/>
+      <html:submit value="Preview with ToolAcessMode=AUTHOR"/>
+</html:form>
+
+
+<html:form action="<%=strLearnerProgress%>" method="post">
+      <table border=1>
+      </table><br/><BR>
+      <html:submit value="View Learner Progress"/>
 </html:form>
