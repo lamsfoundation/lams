@@ -23,6 +23,7 @@ public class McLearningForm extends ActionForm implements McAppConstants {
 	protected String viewAnswers;
 	protected String learnerFinished;
 	protected String redoQuestionsOk;
+	protected String donePreview;
 	
 	public void resetCommands()
 	{
@@ -34,6 +35,7 @@ public class McLearningForm extends ActionForm implements McAppConstants {
 		this.setViewAnswers(null);
 		this.setRedoQuestionsOk(null);
 		this.setLearnerFinished(null);
+		this.setDonePreview(null);
 	}
 
 	public void resetParameters()
@@ -202,5 +204,17 @@ public class McLearningForm extends ActionForm implements McAppConstants {
 	 */
 	public void setLearnerFinished(String learnerFinished) {
 		this.learnerFinished = learnerFinished;
+	}
+	/**
+	 * @return Returns the donePreview.
+	 */
+	public String getDonePreview() {
+		return donePreview;
+	}
+	/**
+	 * @param donePreview The donePreview to set.
+	 */
+	public void setDonePreview(String donePreview) {
+		this.donePreview = donePreview;
 	}
 }
