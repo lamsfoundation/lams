@@ -124,4 +124,10 @@ http://www.gnu.org/licenses/gpl.txt
 		<put name="content" value="/monitoring/MonitoringMaincontent.jsp" />	
 	</definition>
 	
+	<definition name=".preview" extends=".baseDef" >
+		<put name="title" value="MCQ Preview"/>
+		<put name="pageHeader" value = "MCQ Preview"/>
+		<put name="content" value="/learning/Preview.jsp" />	
+	</definition>
+	
 </tiles-definitions>

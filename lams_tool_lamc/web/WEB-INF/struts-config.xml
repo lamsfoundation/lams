@@ -72,6 +72,12 @@
 	        path=".starter"
 	        redirect="true"
 	     />
+	     
+	     <forward
+	        name="preview"
+	        path=".preview"
+	        redirect="true"
+	     />
 	  	
 	  	<forward
 		    name="errorList"
@@ -130,7 +136,13 @@
 		    path=".monitoringContent"
 		    redirect="true"
 	  	/>
-	      
+
+	     <forward
+	        name="preview"
+	        path=".preview"
+	        redirect="true"
+	     />
+	  	
 	  	<forward
 		    name="errorList"
 		    path=".mcErrorBox"
@@ -303,6 +315,12 @@
 		    path=".learningStarter"
 		    redirect="true"
 	  	/>
+
+	     <forward
+	        name="preview"
+	        path=".preview"
+	        redirect="true"
+	     />
     </action>
     
     
