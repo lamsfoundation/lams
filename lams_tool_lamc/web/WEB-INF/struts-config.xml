@@ -234,6 +234,12 @@
 		    redirect="true"
 	  	/>
 	  	
+	     <forward
+	        name="preview"
+	        path=".preview"
+	        redirect="true"
+	     />
+	  	
 	  	<forward
 		    name="errorList"
 		    path=".mcErrorBox"
