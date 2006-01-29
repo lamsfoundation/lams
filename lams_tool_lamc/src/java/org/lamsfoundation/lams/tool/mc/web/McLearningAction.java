@@ -271,7 +271,14 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     		//fix this
     		return (mapping.findForward(LEARNING_STARTER));
     	}
-
+    	else if (mcLearningForm.getDonePreview() != null)
+    	{
+    		logger.debug("request is from authoring environment. requested  donePreview.");
+        	mcLearningForm.resetCommands();
+        	LearningUtil.cleanUpLearningSession(request);
+        	AuthoringUtil.cleanupAuthoringSession(request);
+        	return (mapping.findForward(LOAD_STARTER));
+    	}
     	mcLearningForm.resetCommands();	
  		return (mapping.findForward(LOAD_LEARNER));
    }
@@ -628,31 +635,6 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     }
 	
     
-    /**
-     * double check this: forwards to outside of the application.
-     * ActionForward donePreview(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response) throws IOException,
-                                         ServletException
-     *  
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
-     */
-    public ActionForward donePreview(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response) throws IOException,
-                                         ServletException
-    {
-    	logger.debug("dispatching donePreview...");
-    	return (mapping.findForward(LOAD_STARTER));
-    }
         
     /**
      * redoQuestions(HttpServletRequest request, McLearningForm mcLearningForm, ActionMapping mapping)
@@ -669,6 +651,14 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     	Map mapGeneralCheckedOptionsContent= new TreeMap(new McComparator());
     	request.getSession().setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, mapGeneralCheckedOptionsContent);
     	mcLearningForm.resetCommands();
+		
+		String previewOnly=(String)request.getSession().getAttribute(PREVIEW_ONLY);
+		logger.debug("previewOnly: " + previewOnly);
+		if ((previewOnly != null) && (previewOnly.equalsIgnoreCase("true")))
+		{
+	    	logger.debug("request for preview.");
+			return (mapping.findForward(PREVIEW));
+		}
     	return (mapping.findForward(LOAD_LEARNER));
     }
 
