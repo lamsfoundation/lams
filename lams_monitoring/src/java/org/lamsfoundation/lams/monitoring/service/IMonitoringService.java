@@ -119,8 +119,9 @@ public interface IMonitoringService
      * @param lessonId
      * @param activityId force complete to this activity(this activity will be force complete as well). 
      * 		If null value, force will complete all activities in this lesson.
+     * @return success message.
      */
-    public void forceCompleteLessonByUser(Integer learnerId,long lessonId,Long activityId);
+    public String forceCompleteLessonByUser(Integer learnerId,long lessonId,Long activityId);
     
     /**
      * Archive the specified the lesson. When archived, the data is retained

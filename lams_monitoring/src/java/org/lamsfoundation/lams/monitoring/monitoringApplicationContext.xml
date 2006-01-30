@@ -51,6 +51,7 @@ http://www.gnu.org/licenses/gpl.txt
 		<property name="workspaceFolderDAO"><ref bean="workspaceFolderDAO"/></property>
 		<property name="learningDesignDAO"><ref bean="learningDesignDAO"/></property>
 		<property name="lamsCoreToolService"><ref bean="lamsCoreToolService"/></property>			
+		<property name="learnerService"><ref bean="learnerService"/></property>			
 		<property name="userManagementService"><ref bean="userManagementService"/></property>			
 		<property name="scheduler"><ref bean="scheduler"/></property>
 	</bean>	

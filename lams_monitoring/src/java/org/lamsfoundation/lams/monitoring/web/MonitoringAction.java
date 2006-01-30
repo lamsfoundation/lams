@@ -396,6 +396,52 @@ public class MonitoringAction extends LamsDispatchAction
     	return outputPacket(mapping,request,response,message,"details");
     	
     }
+    /**
+     * <P>
+     * </P>
+     * <P>
+     * This action need a lession ID, Learner ID and Activity ID as input. Activity ID is optional, if it is 
+     * null, all activities for this learner will complete to as end as possible.
+     * </P>
+     * @param form 
+     * @param request A standard Servlet HttpServletRequest class.
+     * @param response A standard Servlet HttpServletResponse class.
+     * @return An ActionForward
+     * @throws IOException
+     * @throws ServletException
+     */
+    public ActionForward forceComplete(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                                 ServletException{
+    	FlashMessage flashMessage = null;
+    	this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+    	//get parameters
+    	Long activityId = null;
+    	String actId = request.getParameter(AttributeNames.PARAM_ACTIVITY_ID);
+    	if(actId != null)
+    		try{
+    			activityId = new Long(Long.parseLong(actId));
+    		}catch(Exception e){
+    			activityId = null;
+    		}
+    	long lessonId = WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID);
+    	Integer learnerId = new Integer(WebUtil.readIntParam(request,MonitoringConstants.PARAM_LEARNER_ID));
+    	
+    	//force complete
+    	try {
+    		String message = monitoringService.forceCompleteLessonByUser(learnerId,lessonId,activityId);
+    		flashMessage = new FlashMessage("removeLesson",message);
+		} catch (Exception e) {
+			flashMessage = new FlashMessage("forceComplete",
+					"Error occurs :" +  e.toString(),
+					FlashMessage.ERROR);
+		}
+		String message =  flashMessage.serializeMessage();
+    	return outputPacket(mapping,request,response,message,"details");
+    	
+    }
     public ActionForward getAllLessons(ActionMapping mapping,
                                      ActionForm form,
                                      HttpServletRequest request,

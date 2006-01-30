@@ -34,9 +34,8 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
-import org.lamsfoundation.lams.learning.service.LearnerService;
-import org.lamsfoundation.lams.learning.web.util.LessonLearnerDataManager;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ActivityVisitor;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
@@ -556,27 +555,29 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
      * @throws LamsToolServiceException 
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#forceCompleteLessonByUser(Integer,long,long)
      */
-    public void forceCompleteLessonByUser(Integer learnerId,long lessonId,Long activityId) 
+    public String forceCompleteLessonByUser(Integer learnerId,long lessonId,Long activityId) 
     {
-//    	LearnerProgress learnerProcess = learnerProgressDAO.getLearnerProgressByLearner(learner,lesson); 
-        List currentLessonLearners = learnerService.getActiveLearnersByLesson(lessonId);
+
+    	List currentLessonLearners = learnerService.getActiveLearnersByLesson(lessonId);
     	User learner = userDAO.getUserById(learnerId);
         Lesson newLesson = lessonDAO.getLesson(new Long(lessonId));
         Set activities = newLesson.getLearningDesign().getActivities();
         /*
-         Every check need check session
          Gate -- LearnerService.knockGate(GateActivity gate, User knocker, List lessonLearners)
          Y - continue
          N - Stop
          Group --  getGroup -> exist? 
          Y - continue 
          N - PermissionGroup - Stop
-         RandomGroup - create group, create tool session.
+         	 RandomGroup - create group, then complete it and continue.
          */
-        String stopReason = null;
+        String stopReason = "Success to complete to the end of lesson";
         for (Iterator i = activities.iterator(); i.hasNext();)
         {
-            Activity activity = (Activity) i.next();
+            Activity actProxy = (Activity) i.next();
+            //reload activity to get real object instead of CGLIB proxy
+            Activity activity = activityDAO.getActivityByActivityId(actProxy.getActivityId());
+            
             if (activity.isGroupingActivity()){
             	GroupingActivity groupActivity = (GroupingActivity) activity;
             	Grouping grouping = groupActivity.getCreateGrouping();
@@ -586,22 +587,30 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
             		if(grouping.isRandomGrouping()){
             			//for random grouping, create then complete it. Continue 
             			learnerService.performGrouping(groupActivity,currentLessonLearners);
-            			grouping = groupActivity.getCreateGrouping();
-            			myGroup = grouping.getGroupBy(learner);
+//            			grouping = groupActivity.getCreateGrouping();
+//            			myGroup = grouping.getGroupBy(learner);
             			learnerService.completeActivity(learner,activity,newLesson);
+            			log.debug("Grouping activity [" + activity.getActivityId() + "] is completed.");
+            		}else{
+	            		//except random grouping, stop here
+	            		stopReason = "Force complete stop at non-grouped grouping activity [" + groupActivity + "]";
+	            		break;
             		}
-            		//except random grouping, stop here
-            		stopReason = "Force complete stop at non-grouped grouping activity [" + groupActivity + "]";
-            		break;
+            	}else{
+            		//if group already exist
+            		learnerService.completeActivity(learner,activity,newLesson);
+            		log.debug("Grouping activity [" + activity.getActivityId() + "] is completed.");
             	}
             }else if ( activity.isGateActivity() ) {
             	GateActivity gate = (GateActivity) activity;
             	if(learnerService.knockGate(gate,learner,currentLessonLearners)){
             		//the gate is opened, continue to next activity to complete
             		learnerService.completeActivity(learner,activity,newLesson);
+            		log.debug("Gate activity [" + gate.getActivityId() + "] is completed.");
             	}else{
             		//the gate is closed, stop here
             		stopReason = "Force complete stop at gate activity [" + gate + "]";
+            		break;
             	}
             }else{
             	//left: toolActivity and complexActivity
@@ -610,7 +619,9 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
             		try {
 						ToolSession toolSession = lamsCoreToolService.getToolSessionByActivity(learner,toolActivity);
 						learnerService.completeToolSession(toolSession.getToolSessionId(),new Long(learnerId.intValue()));
+						log.debug("Tool activity [" + activity.getActivityId() + "] is completed.");
 					} catch (LamsToolServiceException e) {
+						throw new MonitoringServiceException(e);
 					}
             	}else if(activity.isComplexActivity()){
             		//for complex activities:SEQUENCE ACTIVITY,PARALLEL ACTIVITY,OPTIONS ACTIVITY
@@ -621,6 +632,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
             			Activity act = (Activity) iter.next();
             			forceCompleteLessonByUser(learnerId,lessonId,act.getActivityId());
             		}
+            		log.debug("Complex activity [" + activity.getActivityId() + "] is completed.");
             	}
             	
             }
@@ -632,6 +644,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
             }
         }
         
+        return stopReason;
 
     }
     
