@@ -216,7 +216,7 @@ public class TestAuthoringService extends AbstractLamsTestCase {
         +"<var name='createDateTime'><dateTime>2005-2-7T1:0:23</dateTime></var></struct></array></var>"
         +"<var name='title'><string>Test Learning Design title</string></var>"
         +"<var name='readOnly'><boolean value='false'/></var>"
-        +"<var name='parentLearningDesignID'><number>-111111</number></var>"
+        +"<var name='originalLearningDesignID'><number>-111111</number></var>"
         +"<var name='maxID'><number>1</number></var>"
         +"<var name='licenseText'><string>string__value</string></var>"
         +"<var name='licenseID'><number>-111111</number></var>"

@@ -212,15 +212,15 @@ public class ObjectExtractor {
 			}
 		}
 
-		if (keyExists(table, WDDXTAGS.PARENT_DESIGN_ID))
+		if (keyExists(table, WDDXTAGS.ORIGINAL_DESIGN_ID))
 		{
-			Long parentLearningDesignID = WDDXProcessor.convertToLong(table,WDDXTAGS.PARENT_DESIGN_ID);
+			Long parentLearningDesignID = WDDXProcessor.convertToLong(table,WDDXTAGS.ORIGINAL_DESIGN_ID);
 			if( parentLearningDesignID != null ){
 				LearningDesign parent = learningDesignDAO.getLearningDesignById(parentLearningDesignID);
-				learningDesign.setParentLearningDesign(parent);
+				learningDesign.setOriginalLearningDesign(parent);
 			}
 			else
-			    learningDesign.setParentLearningDesign(null);
+			    learningDesign.setOriginalLearningDesign(null);
 		}
 	
 		

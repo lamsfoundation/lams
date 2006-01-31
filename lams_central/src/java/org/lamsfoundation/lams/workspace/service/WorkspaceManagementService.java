@@ -295,19 +295,8 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 							}
 							else
 							{
-								List list = learningDesignDAO.getLearningDesignsByParent(learningDesignID);
-								if(list==null || list.size()==0){
-									folder.getLearningDesigns().remove(learningDesign);
-									learningDesign.setWorkspaceFolder(null);
-								}
-								else
-								{
-									isDeleteSuccessful = false;
-									flashMessage = new FlashMessage(MSG_KEY_DELETE,
-																	"Cannot delete design with learning_design_id of:" + learningDesignID +
-																	" as it is a PARENT.",
-																	FlashMessage.ERROR);
-								}
+								folder.getLearningDesigns().remove(learningDesign);
+								learningDesign.setWorkspaceFolder(null);
 							}
 						}
 					}
@@ -607,7 +596,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		try { 
 			LearningDesign ld = authoringService.copyLearningDesign(designID, 
 					copyType != null ? copyType : new Integer(LearningDesign.COPY_TYPE_NONE), 
-							userID, targetFolderID);
+							userID, targetFolderID, false);
 			message = new FlashMessage(MSG_KEY_COPY,ld.getLearningDesignId());
 			
 		} catch ( Exception e ) {
@@ -682,7 +671,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 				LearningDesign design = (LearningDesign)iterator.next();
 				authoringService.copyLearningDesign(design,
 													new Integer(LearningDesign.COPY_TYPE_NONE),
-													user,targetWorkspaceFolder);
+													user,targetWorkspaceFolder, false);
 			}
 		}
 	}
@@ -800,16 +789,8 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 														" as it is READ ONLY.",
 														FlashMessage.ERROR);
 					}else{
-						List list = learningDesignDAO.getLearningDesignsByParent(learningDesignID);
-						if(list==null || list.size()==0){
-							learningDesignDAO.delete(learningDesign);
-							flashMessage = new FlashMessage(MSG_KEY_DELETE,"Learning Design deleted: "+ learningDesignID);
-						}
-						else
-							flashMessage = new FlashMessage(MSG_KEY_DELETE,
-															"Cannot delete design with learning_design_id of:" + learningDesignID +
-															" as it is a PARENT.",
-															FlashMessage.ERROR);
+						learningDesignDAO.delete(learningDesign);
+						flashMessage = new FlashMessage(MSG_KEY_DELETE,"Learning Design deleted: "+ learningDesignID);
 					}
 				}else
 					flashMessage = FlashMessage.getUserNotAuthorized(MSG_KEY_DELETE,userID);

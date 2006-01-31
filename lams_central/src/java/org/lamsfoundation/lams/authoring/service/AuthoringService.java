@@ -239,7 +239,8 @@ public class AuthoringService implements IAuthoringService {
 		return flashMessage.serializeMessage();
 	}	
 	public LearningDesign copyLearningDesign(Long originalDesignID,Integer copyType,
-									Integer userID, Integer workspaceFolderID)throws UserException, LearningDesignException, 
+									Integer userID, Integer workspaceFolderID, boolean setOriginalDesign) 
+																	throws UserException, LearningDesignException, 
 											 							      WorkspaceFolderException, IOException{
 		
 		LearningDesign originalDesign = learningDesignDAO.getLearningDesignById(originalDesignID);
@@ -254,24 +255,15 @@ public class AuthoringService implements IAuthoringService {
 		if(workspaceFolder==null)
 			throw new WorkspaceFolderException("No such WorkspaceFolder with workspace_folder_id of:" + workspaceFolderID + " exists");
 		
-		return copyLearningDesign(originalDesign,copyType,user,workspaceFolder);
-	}
-	
-	/**
-	 * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#copyLearningDesign(org.lamsfoundation.lams.learningdesign.LearningDesign, java.lang.Integer, org.lamsfoundation.lams.usermanagement.User)
-	 */
-	public LearningDesign copyLearningDesign(LearningDesign originalLearningDesign,Integer copyType,User user){
-		Integer userId = user.getUserId();
-		WorkspaceFolder runSequencesFolder = workspaceFolderDAO.getRunSequencesFolderForUser(userId);
-		return copyLearningDesign(originalLearningDesign,copyType,user, runSequencesFolder);
+		return copyLearningDesign(originalDesign,copyType,user,workspaceFolder, setOriginalDesign);
 	}
 	
     /**
      * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#copyLearningDesign(org.lamsfoundation.lams.learningdesign.LearningDesign, java.lang.Integer, org.lamsfoundation.lams.usermanagement.User, org.lamsfoundation.lams.usermanagement.WorkspaceFolder)
      */
-    public LearningDesign copyLearningDesign(LearningDesign originalLearningDesign,Integer copyType,User user, WorkspaceFolder workspaceFolder)
+    public LearningDesign copyLearningDesign(LearningDesign originalLearningDesign,Integer copyType,User user, WorkspaceFolder workspaceFolder, boolean setOriginalDesign)
     {
-    	LearningDesign newLearningDesign  = LearningDesign.createLearningDesignCopy(originalLearningDesign,copyType);
+    	LearningDesign newLearningDesign  = LearningDesign.createLearningDesignCopy(originalLearningDesign,copyType, setOriginalDesign);
     	newLearningDesign.setUser(user);    	
     	newLearningDesign.setWorkspaceFolder(workspaceFolder);    	
     	learningDesignDAO.insert(newLearningDesign);
@@ -280,6 +272,7 @@ public class AuthoringService implements IAuthoringService {
     	updateDesignTransitions(originalLearningDesign,newLearningDesign);
         return newLearningDesign;
     }
+    
     /**
      * Calculates the First activity of the LearningDesign.
      * <p> 

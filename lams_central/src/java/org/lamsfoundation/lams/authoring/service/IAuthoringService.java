@@ -55,7 +55,8 @@ public interface IAuthoringService {
 	
 	/**
 	 * Create a copy of learning design as per the requested learning design 
-	 * and saves it in the default workspacefolder.
+	 * and saves it in the given workspacefolder. Does not set the original 
+	 * learning design field, so it should not be used for creating lesson learning designs. 
 	 * 
 	 * @param originalLearningDesign The source learning design id.
 	 * @param copyType purpose of copying the design. Can have one of the follwing values
@@ -65,14 +66,16 @@ public interface IAuthoringService {
 	 * <li>LearningDesign.COPY_TYPE_PREVIEW (for previewing purposes)</li>
 	 * </ul>
 	 * @param user The user who has sent this request(author/teacher)
+	 * @param setOriginalDesign If true, then sets the originalLearningDesign field in the new design
 	 * @return LearningDesign The new copy of learning design.
 	 */
-	public LearningDesign copyLearningDesign(LearningDesign originalLearningDesign,Integer copyType,User user);
-	public LearningDesign copyLearningDesign(LearningDesign originalLearningDesign,Integer copyType,User user, WorkspaceFolder workspaceFolder);
+	public LearningDesign copyLearningDesign(LearningDesign originalLearningDesign,Integer copyType,User user, WorkspaceFolder workspaceFolder, boolean setOriginalDesign);
+	
 	/**
 	 * Create a copy of learning design as per the requested learning design
 	 * and saves it in the given workspacefolder. Designed to be called when user tries
-	 * to copy a learning design using the Flash interface.
+	 * to copy a learning design using the Flash interface. Does not set the original 
+	 * learning design field, so it should not be used for creating lesson learning designs.
 	 * 
 	 * @param originalLearningDesingID the source learning design id.
 	 * @param copyType purpose of copying the design. Can have one of the follwing values
@@ -83,10 +86,11 @@ public interface IAuthoringService {
 	 * </ul>
 	 * @param userID The user_id of the user who has sent this request(author/teacher)
 	 * @param workspaceFolderID The workspacefolder where this copy of the design would be saved
+	 * @param setOriginalDesign If true, then sets the originalLearningDesign field in the new design
 	 * @return new LearningDesign   
 	 */	
 	public LearningDesign copyLearningDesign(Long originalLearningDesignID,Integer copyType,
-											 Integer userID, Integer workspaceFolder)throws UserException, LearningDesignException,
+											 Integer userID, Integer workspaceFolder, boolean setOriginalDesign)throws UserException, LearningDesignException,
 											 										 WorkspaceFolderException, IOException;
 	/**
 	 * @return List Returns the list of all the available LearningDesign's   
