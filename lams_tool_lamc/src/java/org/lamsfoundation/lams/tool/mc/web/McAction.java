@@ -2170,7 +2170,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		mcAuthoringForm.resetUserAction();
 		
 		/*remove session attribues */
-		AuthoringUtil.cleanupAuthoringSession(request);
+		McUtils.cleanUpSessionAbsolute(request);
 		logger.debug("removed attribues...");
 		
 		/* Check this: find out where to forward to*/
