@@ -260,7 +260,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         LearningDesign copiedLearningDesign = authoringService.copyLearningDesign(originalLearningDesign,
                                                                                   new Integer(LearningDesign.COPY_TYPE_LESSON),
                                                                                   user,
-                                                                                  destinationFolder);
+                                                                                  destinationFolder, true);
         // copy the tool content
         // unfortuanately, we have to reaccess the activities to make sure we get the
         // subclass, not a hibernate proxy.
