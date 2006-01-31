@@ -6,6 +6,14 @@
 <%@ taglib uri="tags-fck-editor" prefix="FCK" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
+	<script language="JavaScript" type="text/JavaScript">
+		function submitLearnerProgressMethod(actionMethod) 
+		{
+			document.McLearningForm.doneLearnerProgress.value=1; 
+			document.McLearningForm.submit();
+		}
+	</script>
+
 		<html:form  action="/learning?method=displayMc&validate=false" method="POST" target="_self">
 				<table align=center bgcolor="#FFFFFF">
 					  <tr>
@@ -14,13 +22,21 @@
 					  	</td>
 					  </tr>
 				
-
+					<c:if test="${sessionScope.learnerProgress != 'true'}"> 							  
 					  <tr>
 					  	<td NOWRAP align=center class="input" valign=top colspan=2> 
 						  	<font size=3> <b>  <bean:message key="label.viewAnswers"/> </b> </font>
 					  	</td>
 					  </tr>
+					</c:if> 								  
 
+					<c:if test="${sessionScope.learnerProgress == 'true'}"> 							  
+					  <tr>
+					  	<td NOWRAP align=center class="input" valign=top colspan=2> 
+						  	<font size=3> <b>  <bean:message key="label.learner.viewAnswers"/> </b> </font>
+					  	</td>
+					  </tr>
+					</c:if> 								  
 
 					<tr>
 						<td NOWRAP align=right class="input" valign=top colspan=2> 
@@ -63,7 +79,7 @@
 												<tr>												
 												<td NOWRAP colspan=2 align=left class="input" valign=top> 
 													<font size=2>
-					   								    <bean:message key="label.you.answered"/>
+					   								    <b> <bean:message key="label.attempts"/> </b>
 					   								 </font>
 												</td> 
 												</tr>
@@ -163,6 +179,19 @@
 						  </tr>
 						</c:if> 																		
 					</c:if> 																		
+					
+				  	<html:hidden property="doneLearnerProgress"/>						   
+					<c:if test="${sessionScope.learnerProgress == 'true'}"> 							  
+		  	   		  <tr>
+		  	   		    <td colspan=2 align=right class="input" valign=top>
+			  	   		    <font size=2>
+								 <html:submit onclick="javascript:submitLearnerProgressMethod('doneLearnerProgress');" styleClass="button">
+										<bean:message key="button.done"/>
+								</html:submit>
+							</font>
+					  	 </td>
+					  </tr>
+					</c:if> 		
 				</table>
 	</html:form>
 
