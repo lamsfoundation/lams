@@ -24,7 +24,6 @@ import org.lamsfoundation.lams.tool.mc.McApplicationException;
 import org.lamsfoundation.lams.tool.mc.McComparator;
 import org.lamsfoundation.lams.tool.mc.McUtils;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
-import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
 import org.lamsfoundation.lams.tool.mc.pojos.McSession;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
@@ -118,12 +117,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 public class McLearningStarterAction extends Action implements McAppConstants {
 	static Logger logger = Logger.getLogger(McLearningStarterAction.class.getName());
 	 /* Since the toolSessionId is passed, we will derive toolContentId from the toolSessionId
-	 *
 	 * This class is used to load the default content and initialize the presentation Map for Learner mode 
-	 * 
-	 * createToolSession will not be called once the tool is deployed.
-	 * 
-	 * It is important that ALL the session attributes created in this action gets removed by: QaUtils.cleanupSession(request)
 	 */ 
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
@@ -171,9 +165,11 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 		{	try
 			{
 				mcService.createToolSession(toolSessionID, new Long(9876));
+				return (mapping.findForward(LEARNING_STARTER));
 			}
 			catch(ToolException e)
 			{
+				McUtils.cleanUpSessionAbsolute(request);
 				logger.debug("tool exception"  + e);
 			}
 		}
@@ -184,9 +180,11 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 		{	try
 			{
 				mcService.removeToolSession(toolSessionID);
+				return (mapping.findForward(LEARNING_STARTER));
 			}
 			catch(ToolException e)
 			{
+				McUtils.cleanUpSessionAbsolute(request);
 				logger.debug("tool exception"  + e);
 			}
 		}
@@ -198,9 +196,11 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 			{
 				String nextUrl=mcService.leaveToolSession(toolSessionID, new Long(learnerId));
 				logger.debug("nextUrl: "+ nextUrl);
+				return (mapping.findForward(LEARNING_STARTER));
 			}
 			catch(ToolException e)
 			{
+				McUtils.cleanUpSessionAbsolute(request);
 				logger.debug("tool exception"  + e);
 			}
 		}
@@ -241,16 +241,30 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 		McSession mcSession=mcService.retrieveMcSession(toolSessionID);
 	    logger.debug("retrieving mcSession: " + mcSession);
 	    
+	    if (mcSession == null)
+	    {
+	    	logger.debug("error: The tool expects mcSession.");
+	    	persistError(request,"error.toolSession.notAvailable");
+	    	McUtils.cleanUpSessionAbsolute(request);
+			return (mapping.findForward(ERROR_LIST));
+	    }
+
 	    /*
 	     * find out what content this tool session is referring to
-	     * get the content for this tool session (many to one mapping)
-	     */
-	    
-	    /*
+	     * get the content for this tool session 
 	     * Each passed tool session id points to a particular content. Many to one mapping.
 	     */
 		McContent mcContent=mcSession.getMcContent();
 	    logger.debug("using mcContent: " + mcContent);
+	    
+	    if (mcContent == null)
+	    {
+	    	logger.debug("error: The tool expects mcContent.");
+	    	persistError(request,"error.toolContent.notAvailable");
+	    	McUtils.cleanUpSessionAbsolute(request);
+			return (mapping.findForward(ERROR_LIST));
+	    }
+
 	    
 	    /*
 	     * The content we retrieved above must have been created before in Authoring time. 
@@ -273,34 +287,20 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 			learner
 		*/
     	/* ? CHECK THIS: how do we determine whether preview is requested? Mode is not enough on its own.*/
-    	String mode= (String) request.getParameter("mode");
-    	logger.debug("mode: " + mode);
+	    
+	    /*handle PREVIEW mode*/
+	    String mode=(String) request.getSession().getAttribute(LEARNING_MODE);
+	    logger.debug("mode: " + mode);
     	if ((mode != null) && (mode.equals("author")))
     	{
     		logger.debug("Author requests for a preview of the content.");
 			logger.debug("existing mcContent:" + mcContent);
     		
-    		mapQuestionsContent= new TreeMap(new McComparator());
-    	    mapQuestionsContent=LearningUtil.buildQuestionContentMap(request,mcContent);
-    	    logger.debug("mapQuestionsContent: " + mapQuestionsContent);
-        	
-        	request.getSession().setAttribute(MAP_QUESTION_CONTENT_LEARNER, mapQuestionsContent);
-        	logger.debug("MAP_QUESTION_CONTENT_LEARNER: " +  request.getSession().getAttribute(MAP_QUESTION_CONTENT_LEARNER));
-        	logger.debug("mcContent has : " + mapQuestionsContent.size() + " entries.");
-        	request.getSession().setAttribute(TOTAL_QUESTION_COUNT, new Long(mapQuestionsContent.size()).toString());
-        	
-        	request.getSession().setAttribute(CURRENT_QUESTION_INDEX, "1");
-    		logger.debug("CURRENT_QUESTION_INDEX: " + request.getSession().getAttribute(CURRENT_QUESTION_INDEX));
-    		logger.debug("final Options Map for the first question: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT));
-    		
-    		/*also prepare data into mapGeneralOptionsContent for combined answers view */
-    		Map mapGeneralOptionsContent=AuthoringUtil.generateGeneralOptionsContentMap(request, mcContent);
-    		logger.debug("returned mapGeneralOptionsContent: " + mapGeneralOptionsContent);
-    		request.getSession().setAttribute(MAP_GENERAL_OPTIONS_CONTENT, mapGeneralOptionsContent);
+			commonContentSetup(request, mcContent);
     		
 	    	/*only allowing combined view in the preview mode. Might be improved to support sequential view as well. */
 	    	request.getSession().setAttribute(QUESTION_LISTING_MODE, QUESTION_LISTING_MODE_COMBINED);
-	    	/* to disable the buttons on the screen*/
+	    	/* PREVIEW_ONLY for jsp*/
 	    	request.getSession().setAttribute(PREVIEW_ONLY, new Boolean(true).toString());
 	    	
 	    	request.getSession().setAttribute(CURRENT_QUESTION_INDEX, "1");
@@ -308,7 +308,35 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    	return mcLearningAction.redoQuestions(request, mcLearningForm, mapping);
     	}
 	    
-    	/* by now, we know that the mode is either teacher or learner. */
+    	/* by now, we know that the mode is either teacher or learner
+    	 * check if the mode is teacher and request is for Learner Progress
+    	 */
+		String userId=request.getParameter(USER_ID);
+		logger.debug("userId: " + userId);
+		if ((userId != null) && (mode.equals("teacher")))
+		{
+			logger.debug("request is for learner progress");
+			commonContentSetup(request, mcContent);
+	    	
+			/* LEARNER_PROGRESS for jsp*/
+			request.getSession().setAttribute(LEARNER_PROGRESS_USERID, userId);
+			request.getSession().setAttribute(LEARNER_PROGRESS, new Boolean(true).toString());
+			McLearningAction mcLearningAction= new McLearningAction();
+			/* pay attention that this userId is the learner's userId passed by the request parameter.
+			 * It is differerent than USER_ID kept in the session of the current system user*/
+			McQueUsr mcQueUsr=mcService.retrieveMcQueUsr(new Long(userId));
+		    logger.debug("mcQueUsr:" + mcQueUsr);
+		    if (mcQueUsr == null)
+		    {
+		    	persistError(request, "error.learner.required");
+		    	request.setAttribute(USER_EXCEPTION_LEARNER_REQUIRED, new Boolean(true));
+		    	McUtils.cleanUpSessionAbsolute(request);
+				return (mapping.findForward(ERROR_LIST));
+		    }
+			return mcLearningAction.viewAnswers(mapping, form, request, response);
+		}
+    	
+		/* by now, we know that the mode is learner*/
 	    
 	    /* find out if the content is set to run offline or online. If it is set to run offline , the learners are informed about that. */
 	    boolean isRunOffline=McUtils.isRunOffline(mcContent);
@@ -317,6 +345,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    {
 	    	logger.debug("warning to learner: the activity is offline.");
 	    	persistError(request,"label.learning.runOffline");
+	    	McUtils.cleanUpSessionAbsolute(request);
 			return (mapping.findForward(ERROR_LIST));
 	    }
 
@@ -325,8 +354,9 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    logger.debug("isDefineLater: " + isDefineLater);
 	    if (isDefineLater == true)
 	    {
-	    	logger.debug("warning to learner: the activity is defineLater, we interpret that as content being modified.");
+	    	logger.debug("warning to learner: the activity is defineLater, we interpret that the content is being modified.");
 	    	persistError(request,"error.defineLater");
+	    	McUtils.cleanUpSessionAbsolute(request);
 			return (mapping.findForward(ERROR_LIST));
 	    }
 
@@ -402,6 +432,35 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    	return mcLearningAction.viewAnswers(mapping, form, request, response);	
 	    }
 	    return (mapping.findForward(LOAD_LEARNER));	
+	}
+	
+	
+	/**
+	 * sets up question and candidate answers maps
+	 * commonContentSetup(HttpServletRequest request, McContent mcContent)
+	 * 
+	 * @param request
+	 * @param mcContent
+	 */
+	protected void commonContentSetup(HttpServletRequest request, McContent mcContent)
+	{
+		Map mapQuestionsContent= new TreeMap(new McComparator());
+		mapQuestionsContent=LearningUtil.buildQuestionContentMap(request,mcContent);
+	    logger.debug("mapQuestionsContent: " + mapQuestionsContent);
+		
+		request.getSession().setAttribute(MAP_QUESTION_CONTENT_LEARNER, mapQuestionsContent);
+		logger.debug("MAP_QUESTION_CONTENT_LEARNER: " +  request.getSession().getAttribute(MAP_QUESTION_CONTENT_LEARNER));
+		logger.debug("mcContent has : " + mapQuestionsContent.size() + " entries.");
+		request.getSession().setAttribute(TOTAL_QUESTION_COUNT, new Long(mapQuestionsContent.size()).toString());
+		
+		request.getSession().setAttribute(CURRENT_QUESTION_INDEX, "1");
+		logger.debug("CURRENT_QUESTION_INDEX: " + request.getSession().getAttribute(CURRENT_QUESTION_INDEX));
+		logger.debug("final Options Map for the first question: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT));
+		
+		/*also prepare data into mapGeneralOptionsContent for combined answers view */
+		Map mapGeneralOptionsContent=AuthoringUtil.generateGeneralOptionsContentMap(request, mcContent);
+		logger.debug("returned mapGeneralOptionsContent: " + mapGeneralOptionsContent);
+		request.getSession().setAttribute(MAP_GENERAL_OPTIONS_CONTENT, mapGeneralOptionsContent);
 	}
 	
 	
@@ -507,7 +566,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    {
 	    	logger.debug("error: The tool expects userId");
 	    	persistError(request,"error.learningUser.notAvailable");
-	    	request.setAttribute(USER_EXCEPTION_USERID_NOTAVAILABLE, new Boolean(true));
+	    	McUtils.cleanUpSessionAbsolute(request);
 			return (mapping.findForward(ERROR_LIST));
 	    }else
 	    	userID = user.getUserID().toString();
@@ -524,7 +583,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    if ((strToolSessionId == null) || (strToolSessionId.length() == 0)) 
 	    {
 	    	persistError(request, "error.toolSessionId.required");
-	    	request.setAttribute(USER_EXCEPTION_TOOLSESSIONID_REQUIRED, new Boolean(true));
+	    	McUtils.cleanUpSessionAbsolute(request);
 			return (mapping.findForward(ERROR_LIST));
 	    }
 	    else
@@ -539,7 +598,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 			{
 	    		persistError(request, "error.sessionId.numberFormatException");
 	    		logger.debug("add error.sessionId.numberFormatException to ActionMessages.");
-				request.setAttribute(USER_EXCEPTION_NUMBERFORMAT, new Boolean(true));
+	    		McUtils.cleanUpSessionAbsolute(request);
 				return (mapping.findForward(ERROR_LIST));
 			}
 	    }
@@ -551,14 +610,14 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    if ((mode == null) || (mode.length() == 0)) 
 	    {
 	    	persistError(request, "error.mode.required");
-	    	request.setAttribute(USER_EXCEPTION_MODE_REQUIRED, new Boolean(true));
+	    	McUtils.cleanUpSessionAbsolute(request);
 			return (mapping.findForward(ERROR_LIST));
 	    }
 	    
 	    if ((!mode.equals("learner")) && (!mode.equals("teacher")) && (!mode.equals("author")))
 	    {
 	    	persistError(request, "error.mode.invalid");
-	    	request.setAttribute(USER_EXCEPTION_MODE_REQUIRED, new Boolean(true));
+	    	McUtils.cleanUpSessionAbsolute(request);
 			return (mapping.findForward(ERROR_LIST));
 	    }
 		logger.debug("session LEARNING_MODE set to:" + mode);

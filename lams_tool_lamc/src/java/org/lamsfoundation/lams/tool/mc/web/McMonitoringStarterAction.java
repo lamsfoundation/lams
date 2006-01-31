@@ -105,7 +105,7 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 		if (mcContent == null)
 		{
 			persistError(request, "error.content.doesNotExist");
-	    	request.setAttribute(USER_EXCEPTION_CONTENT_DOESNOTEXIST, new Boolean(true));
+			McUtils.cleanUpSessionAbsolute(request);
 			return (mapping.findForward(ERROR_LIST));
 		}
 	    
@@ -193,6 +193,7 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 	
 	protected ActionForward validateParameters(HttpServletRequest request, ActionMapping mapping)
 	{
+		logger.debug("start validating monitoring parameters...");
 		/*
 	     * obtain and setup the current user's data 
 	     */
@@ -203,21 +204,22 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 	    {
 	    	logger.debug("error: The tool expects userId");
 	    	persistError(request,"error.learningUser.notAvailable");
-	    	request.setAttribute(USER_EXCEPTION_USERID_NOTAVAILABLE, new Boolean(true));
-			return (mapping.findForward(ERROR_LIST));
+	    	McUtils.cleanUpSessionAbsolute(request);
+	    	return (mapping.findForward(ERROR_LIST));
 	    }else
 	    	userID = user.getUserID().toString();
 	    
 	    logger.debug("retrieved userId: " + userID);
     	request.getSession().setAttribute(USER_ID, userID);
-
     	
     	String strToolContentId=request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
+    	logger.debug("strToolContentId: " + strToolContentId);
+    	 
 	    long toolSessionId=0;
 	    if ((strToolContentId == null) || (strToolContentId.length() == 0)) 
 	    {
 	    	persistError(request, "error.contentId.required");
-	    	request.setAttribute(USER_EXCEPTION_CONTENTID_REQUIRED, new Boolean(true));
+	    	McUtils.cleanUpSessionAbsolute(request);
 			return (mapping.findForward(ERROR_LIST));
 	    }
 	    else
@@ -232,7 +234,7 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 			{
 	    		persistError(request, "error.contentId.numberFormatException");
 	    		logger.debug("add error.contentId.numberFormatException to ActionMessages.");
-				request.setAttribute(USER_EXCEPTION_NUMBERFORMAT, new Boolean(true));
+	    		McUtils.cleanUpSessionAbsolute(request);
 				return (mapping.findForward(ERROR_LIST));
 			}
 	    }

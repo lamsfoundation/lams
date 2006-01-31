@@ -238,7 +238,6 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     	else if (mcLearningForm.getOptionCheckBoxSelected() != null)
     	{
     		setContentInUse(request);
-    		logger.debug("requested selectOptionsCheckBox...");
     		mcLearningForm.resetCommands();
     		LearningUtil.selectOptionsCheckBox(request,mcLearningForm, mcLearningForm.getQuestionIndex());
     	}
@@ -272,6 +271,8 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     		String userID=(String) request.getSession().getAttribute(USER_ID);
     		logger.debug("attempting to leave/complete session with toolSessionId:" + toolSessionId + " and userID:"+userID);
     		
+    		McUtils.cleanUpSessionAbsolute(request);
+    		
     		String nextUrl=null;
     		try
     		{
@@ -280,32 +281,50 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     		}
     		catch (DataMissingException e)
     		{
-    			throw new ServletException(e);
+    			logger.debug("failure getting nextUrl: "+ e);
+        		mcLearningForm.resetCommands();
+    			//throw new ServletException(e);
+        		return (mapping.findForward(LEARNING_STARTER));
     		}
     		catch (ToolException e)
     		{
-    			throw new ServletException(e);
+    			logger.debug("failure getting nextUrl: "+ e);
+        		mcLearningForm.resetCommands();
+    			//throw new ServletException(e);
+        		return (mapping.findForward(LEARNING_STARTER));        		
     		}
-            
+    		catch (Exception e)
+    		{
+    			logger.debug("unknown exception getting nextUrl: "+ e);
+        		mcLearningForm.resetCommands();
+    			//throw new ServletException(e);
+        		return (mapping.findForward(LEARNING_STARTER));        		
+    		}
+
     		logger.debug("success getting nextUrl: "+ nextUrl);
     		mcLearningForm.resetCommands();
-    		LearningUtil.cleanUpLearningSession(request);
     		
     		/* pay attention here*/
     		logger.debug("redirecting to the nextUrl: "+ nextUrl);
     		response.sendRedirect(nextUrl);
     		
-    		//pay attention here as well: whete to go.
     		return null;
     	}
     	else if (mcLearningForm.getDonePreview() != null)
     	{
-    		logger.debug("request is from authoring environment. requested  donePreview.");
+    		logger.debug("requested  donePreview.");
         	mcLearningForm.resetCommands();
-        	LearningUtil.cleanUpLearningSession(request);
-        	AuthoringUtil.cleanupAuthoringSession(request);
+        	McUtils.cleanUpSessionAbsolute(request);
         	return (mapping.findForward(LEARNING_STARTER));
     	}
+    	else if (mcLearningForm.getDoneLearnerProgress() != null)
+    	{
+    		logger.debug("requested  doneLearnerProgress.");
+        	mcLearningForm.resetCommands();
+        	McUtils.cleanUpSessionAbsolute(request);
+        	return (mapping.findForward(LEARNING_STARTER));
+    	}
+    	
     	mcLearningForm.resetCommands();	
  		return (mapping.findForward(LOAD_LEARNER));
    }
@@ -511,10 +530,33 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		String totalQuestionCount= (String) request.getSession().getAttribute(TOTAL_QUESTION_COUNT);
 		logger.debug("totalQuestionCount: " + totalQuestionCount);
 		
+		/* this section is needed to separate learner progress view from standard attempts list. Goes from here.. */
+		String learnerProgress=(String)request.getSession().getAttribute(LEARNER_PROGRESS);
+		logger.debug("learnerProgress: " + learnerProgress);
+		
+		String learnerProgressUserId=(String)request.getSession().getAttribute(LEARNER_PROGRESS_USERID);
+		logger.debug("learnerProgressUserId: " + learnerProgressUserId);
+		
+		boolean learnerProgressOn=false;
+		if (learnerProgressUserId != null)
+		{
+			if ((learnerProgress.equalsIgnoreCase("true")) && 
+					(learnerProgressUserId.length() > 0))
+			{
+				logger.debug("request is for learner progress: learnerProgress: " + learnerProgress);
+				logger.debug("request is for learner progress: learnerProgressUserId: " + learnerProgressUserId);
+				learnerProgressOn=true;;
+			}
+		}
+		logger.debug("final learnerProgressOn:" + learnerProgressOn);
+		/*..till here*/
+		
 		Long toolContentUID= (Long) request.getSession().getAttribute(TOOL_CONTENT_UID);
 		logger.debug("toolContentUID: " + toolContentUID);
     	
 		McQueUsr mcQueUsr=LearningUtil.getUser(request);
+		logger.debug("mcQueUsr: " + mcQueUsr);
+		
 		Long queUsrId=mcQueUsr.getUid();
 		logger.debug("queUsrId: " + queUsrId);
 	
@@ -543,15 +585,36 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     	    	while (attemptIterator.hasNext())
     	    	{
     	    		McUsrAttempt mcUsrAttempt=(McUsrAttempt)attemptIterator.next();
-    	    		
-    	    		if (mcUsrAttempt.isAttemptCorrect())
+    	    		if (learnerProgressOn == false)
     	    		{
-    	    			mapAttemptsCorrect.put(mapIndex.toString(), mcUsrAttempt.getMcOptionsContent().getMcQueOptionText());
+    	    			logger.debug("learnerProgressOn is false, populating map based on all the learners");
+        	    		if (mcUsrAttempt.isAttemptCorrect())
+        	    		{
+        	    			mapAttemptsCorrect.put(mapIndex.toString(), mcUsrAttempt.getMcOptionsContent().getMcQueOptionText());
+        	    		}
+        	    		else
+        	    		{
+        	    			mapAttemptsIncorrect.put(mapIndex.toString(), mcUsrAttempt.getMcOptionsContent().getMcQueOptionText());
+        	    		}
     	    		}
     	    		else
     	    		{
-    	    			mapAttemptsIncorrect.put(mapIndex.toString(), mcUsrAttempt.getMcOptionsContent().getMcQueOptionText());
+    	    			/* this section is needed to separate learner progress view from standard attempts list. */
+    	    			logger.debug("learnerProgressOn is true, populating map based on the learner id: " + learnerProgressUserId);
+    	    			if (mcUsrAttempt.getQueUsrId().toString().equals(learnerProgressUserId))
+						{
+							logger.debug("found learner progress user: " + learnerProgressUserId);
+	        	    		if (mcUsrAttempt.isAttemptCorrect())
+	        	    		{
+	        	    			mapAttemptsCorrect.put(mapIndex.toString(), mcUsrAttempt.getMcOptionsContent().getMcQueOptionText());
+	        	    		}
+	        	    		else
+	        	    		{
+	        	    			mapAttemptsIncorrect.put(mapIndex.toString(), mcUsrAttempt.getMcOptionsContent().getMcQueOptionText());
+	        	    		}
+						}
     	    		}
+				
     	    		mapAttempts.put(mapIndex.toString(), mcUsrAttempt.getMcOptionsContent().getMcQueOptionText());
 					
 	    			logger.debug("added attempt with order: " + mcUsrAttempt.getAttemptOrder() + " , option text is: " + mcUsrAttempt.getMcOptionsContent().getMcQueOptionText());

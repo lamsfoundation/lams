@@ -295,6 +295,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
  		return (mapping.findForward(LOAD_MONITORING));
 	}
     
+    
     /**
      * switches to instructions tab of the monitoring url.
      * getInstructions(ActionMapping mapping,
@@ -321,8 +322,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
     	McMonitoringForm mcMonitoringForm = (McMonitoringForm) form;
 	 	IMcService mcService =McUtils.getToolService(request);
 	 	
- 		request.setAttribute(CURRENT_MONITORING_TAB, "instructions");
- 		
+	 	request.setAttribute(CURRENT_MONITORING_TAB, "instructions");
  		return (mapping.findForward(LOAD_MONITORING));
 	}
     
@@ -883,7 +883,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
             HttpServletResponse response) throws IOException,
                                          ServletException
     {
-    	MonitoringUtil.cleanupMonitoringSession(request);
+    	McUtils.cleanUpSessionAbsolute(request);
     	/*forward outside of the app. Currently it is index.jsp */
     	return (mapping.findForward(LOAD_STARTER)); 
     }
