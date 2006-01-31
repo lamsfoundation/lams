@@ -41,10 +41,10 @@ public class LessonDTO
     //---------------------------------------------------------------------
     // attributes
     //---------------------------------------------------------------------
-    private Long lessonId;
+    private Long lessonID;
     private String lessonName;
     private String lessonDescription;
-    private Integer lessonStateId;
+    private Integer lessonStateID;
 
     //---------------------------------------------------------------------
     // Construtors
@@ -57,10 +57,10 @@ public class LessonDTO
                          String lessonDescription,
                          Integer lessonStateId)
     {
-        this.lessonId = lessonId;
+        this.lessonID = lessonId;
         this.lessonName = lessonName;
         this.lessonDescription = lessonDescription;
-        this.lessonStateId = lessonStateId;
+        this.lessonStateID = lessonStateId;
 
     }
     //---------------------------------------------------------------------
@@ -68,11 +68,11 @@ public class LessonDTO
     //---------------------------------------------------------------------
     /**
      * Returns the lesson id.
-     * @return Returns the lessonId.
+     * @return Returns the lessonID.
      */
-    public Long getLessonId()
+    public Long getLessonID()
     {
-        return lessonId;
+        return lessonID;
     }    
     
     /**
@@ -95,11 +95,11 @@ public class LessonDTO
     /**
      * Returns the lesson state. Plese refer to the lesson object for lesson
      * state.
-     * @return Returns the lessonStateId.
+     * @return Returns the lessonStateID.
      */
-    public Integer getLessonStateId()
+    public Integer getLessonStateID()
     {
-        return lessonStateId;
+        return lessonStateID;
     }
 
     /**
@@ -109,10 +109,10 @@ public class LessonDTO
     public String toString()
     {
         StringBuffer sb = new StringBuffer(getClass().getName() + ": ");
-        sb.append("lessonId='" + getLessonId() + "'; ");
+        sb.append("lessonID='" + getLessonID() + "'; ");
         sb.append("lessonName='" + getLessonName()+"';");
         sb.append("lessonDescription='" + getLessonDescription() + "'; ");
-        sb.append("lessonStateId='" + getLessonStateId() + "'; ");
+        sb.append("lessonStateID='" + getLessonStateID() + "'; ");
         return sb.toString();
     }
 }
