@@ -152,7 +152,7 @@
 	 				 <td valign=top> </td>
 	 				 <td class="input" align=left colspan=3 valign=top>
 						<font size=2>
-							<html:submit onclick="javascript:submitMethod('doneOptions');" styleClass="button">
+							<html:submit onclick="javascript:submitMethod('doneOptions');" styleClass="buttonLeft">
 									<bean:message key="button.done"/>
 							</html:submit>	 				 		  										  		
 						</font>							
