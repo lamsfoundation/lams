@@ -6,11 +6,22 @@
  */
 
 import org.lamsfoundation.lams.common.ui.*
+import org.lamsfoundation.lams.common.util.*
+import org.lamsfoundation.lams.common.dict.*
 import mx.containers.*
 import mx.managers.*
+import mx.events.*
+import org.lamsfoundation.lams.authoring.*
 
-class Dialog {
+class org.lamsfoundation.lams.common.ui.Dialog {
     
+	private static var _inputDialog:MovieClip;
+	private static var _inputInstructions:String;
+    private static var _inputOkButtonLabel:String;
+    private static var _inputCancelButtonLabel:String;
+    private static var _inputOkHandler:Function;
+    private static var _inputCancelHandler:Function;
+	
 //   
     //private static var _dialogInstances:Array;
     //private static var _currentIndex:Number;
@@ -40,5 +51,29 @@ class Dialog {
         trace('Dialog.createPopUp');
         return path.createClassChildAtDepth(cls, DepthManager.kTopmost, initobj);
     }
+	
+	static function createInputDialog(instructions:String, okButtonLabel:String, cancelButtonLabel:String, okHandler:Function, cancelHandler:Function){
+		_inputInstructions = instructions;
+		_inputOkButtonLabel = okButtonLabel;
+		_inputCancelButtonLabel = cancelButtonLabel;
+		_inputOkHandler = okHandler;
+		_inputCancelHandler = cancelHandler;
+		_inputDialog = PopUpManager.createPopUp(Application.root, LFWindow, true,{title:Dictionary.getValue('ws_dlg_title'),closeButton:true,scrollContentPath:'InputDialog'});
+		//Assign dialog load handler
+		_inputDialog.addEventListener('contentLoaded',Proxy.create(org.lamsfoundation.lams.common.ui.Dialog,inputDialogLoaded));
+	}
+	
+	static function inputDialogLoaded(evt:Object) {
+		
+        Debugger.log('!evt.type:'+evt.type,Debugger.GEN,'inputDialogLoaded','org.lamsfoundation.lams.common.ui.Dialog');
+      
+        //Set up handlers and labels
+        Debugger.log('!evt.target.scrollContent:'+evt.target.scrollContent,Debugger.GEN,'inputDialogLoaded','org.lamsfoundation.lams.common.ui.Dialog');
+		evt.target.scrollContent.setInstructionsLabel(_inputInstructions);
+		evt.target.scrollContent.setOKButton(_inputOkButtonLabel,_inputOkHandler);
+		evt.target.scrollContent.setCancelButton(_inputCancelButtonLabel,_inputCancelButtonLabel);
+		
+
+	}
 
 }
