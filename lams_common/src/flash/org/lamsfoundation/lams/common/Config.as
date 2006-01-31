@@ -95,8 +95,7 @@ class Config {
         //createFromCode();
         //serverDefaultsLoaded(_configData);
         var callBack = Proxy.create(this,serverDefaultsLoaded);
-        
-        //TODO DI 09/06/05 - When server is ready change to getRequest()
+
         _comms.getRequest('flashxml/configData.xml',callBack)
         //_comms.loadXML('lams_authoring/configData.xml',callBack,true,true);
     }
@@ -200,7 +199,8 @@ class Config {
     * gets the language from the root that was passed in by the JSP page containing the SWF
     */
     private function getLanguage():String{
-        //return 'en';
+        //TODO: make this a real call to get browser lcoale!
+		//return 'en';
         return 'en';
         /*
         if(_root.language){
