@@ -17,14 +17,36 @@
 	String toolUrlTeacher="/learningStarter?toolSessionID=" + toolSessionID + "&mode=teacher";
 	
 	String strCreateToolSession="/learningStarter?toolSessionID=" + toolSessionID2 +  "&mode=learner" + "&createToolSession=1";
+	String strCreateToolSession2="/learningStarter?toolSessionID=" + toolSessionID +  "&mode=learner" + "&createToolSession=1";
 	String strRemoveToolSession="/learningStarter?toolSessionID=" + toolSessionID2 +  "&mode=learner" + "&removeToolSession=1";
 	String strLeaveToolSession="/learningStarter?toolSessionID=" + toolSessionID2 +  "&mode=learner" + "&leaveToolSession=1" +  "&learnerId=4";
 
 
 	String strPreview="/learningStarter?toolSessionID=" + toolSessionID2 + "&mode=author";	
 	String strLearnerProgress="/learningStarter?toolSessionID=" + toolSessionID2 +  "&mode=teacher" + "&userID=4";
-	
+	String strLearnerProgress2="/learningStarter?toolSessionID=" + toolSessionID2 +  "&mode=teacher" + "&userID=1";
+	String strLearnerProgress3="/learningStarter?toolSessionID=" + toolSessionID +  "&mode=teacher" + "&userID=4";
+	String strLearnerProgress4="/learningStarter?toolSessionID=" + toolSessionID +  "&mode=teacher" + "&userID=1";
 %>
+
+<html:form action="<%=strCreateToolSession%>" method="post">
+      <table border=1>
+      </table><br/><BR>
+      <html:submit value="Create Tool Session: 55555555"/>
+</html:form>
+
+<html:form action="<%=strCreateToolSession2%>" method="post">
+      <table border=1>
+      </table><br/><BR>
+      <html:submit value="Create Tool Session: 88888888"/>
+</html:form>
+
+<html:form action="<%=strCreateToolSession2%>" method="post">
+      <table border=1>
+      </table><br/><BR>
+      <html:submit value="Create Tool Session - for sysadmin: 88888888"/>
+</html:form>
+
 
 <html:form action="<%=toolUrl%>" method="post">
       <table border=1>
@@ -42,12 +64,6 @@
       <table border=1>
       </table><br/><BR>
       <html:submit value="Learning Starter, mode:teacher"/>
-</html:form>
-
-<html:form action="<%=strCreateToolSession%>" method="post">
-      <table border=1>
-      </table><br/><BR>
-      <html:submit value="Create Tool Session"/>
 </html:form>
 
 <html:form action="<%=strRemoveToolSession%>" method="post">
@@ -68,9 +84,26 @@
       <html:submit value="Preview with ToolAcessMode=AUTHOR"/>
 </html:form>
 
-
 <html:form action="<%=strLearnerProgress%>" method="post">
       <table border=1>
       </table><br/><BR>
-      <html:submit value="View Learner Progress"/>
+      <html:submit value="View Learner Progress 55555555- id:4"/>
+</html:form>
+
+<html:form action="<%=strLearnerProgress2%>" method="post">
+      <table border=1>
+      </table><br/><BR>
+      <html:submit value="View Learner Progress 55555555- id:1"/>
+</html:form>
+
+<html:form action="<%=strLearnerProgress3%>" method="post">
+      <table border=1>
+      </table><br/><BR>
+      <html:submit value="View Learner Progress 88888888 id:4"/>
+</html:form>
+
+<html:form action="<%=strLearnerProgress4%>" method="post">
+      <table border=1>
+      </table><br/><BR>
+      <html:submit value="View Learner Progress 88888888 id:1"/>
 </html:form>

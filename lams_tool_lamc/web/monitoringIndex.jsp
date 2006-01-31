@@ -7,8 +7,9 @@
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
 <%
-	String toolContentID="1234";
+	String toolContentID="9876";
 	String toolUrl="/monitoringStarter?toolContentID=" + toolContentID;
+
 %>
 
 

@@ -15,7 +15,7 @@
 	String strCopyToolContent="/authoringStarter?toolContentID=" + toolContentId + "&copyToolContent=1";
 	String strRemoveToolContent="/authoringStarter?toolContentID=" + toolContentId + "&removeToolContent=1";
 	String strRemoveCopiedToolContent="/authoringStarter?toolContentID=" + hardCodedCopiedToolContentId + "&removeToolContent=1";
-	String strDefineLater="/defineLaterStarter?toolContentID=" + toolContentId;
+	String strDefineLater="/defineLaterStarter?toolContentID=" + hardCodedCopiedToolContentId;
 	
 	String strSetDefineLater="/authoringStarter?toolContentID=" + hardCodedCopiedToolContentId + "&setDefineLater=1";
 	String strSetRunoffline="/authoringStarter?toolContentID=" + hardCodedCopiedToolContentId + "&strSetRunoffline=1";	
@@ -28,17 +28,22 @@
       <html:submit value="Authoring on the original content"/>
 </html:form>
 
+<html:form action="<%=strCopyToolContent%>" method="post">
+      <table border=1>
+      </table><br/>
+      <html:submit value="Copy Original Tool Content"/>
+</html:form>
+
 <html:form action="<%=copiedToolUrl%>" method="post">
       <table border=1>
       </table><br/>
       <html:submit value="Authoring on the copied content"/>
 </html:form>
 
-
-<html:form action="<%=strCopyToolContent%>" method="post">
+<html:form action="<%=strRemoveToolContent%>" method="post">
       <table border=1>
       </table><br/>
-      <html:submit value="Copy Original Tool Content"/>
+      <html:submit value="Remove Original Tool Content"/>
 </html:form>
 
 <html:form action="<%=strRemoveCopiedToolContent%>" method="post">
@@ -47,11 +52,6 @@
       <html:submit value="Remove Copied Tool Content"/>
 </html:form>
 
-<html:form action="<%=strRemoveToolContent%>" method="post">
-      <table border=1>
-      </table><br/>
-      <html:submit value="Remove Original Tool Content"/>
-</html:form>
 
 <html:form action="<%=strDefineLater%>" method="post">
       <table border=1>
