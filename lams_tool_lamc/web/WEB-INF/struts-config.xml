@@ -239,6 +239,12 @@
 	        path=".preview"
 	        redirect="true"
 	     />
+
+	  	<forward
+		    name="learningStarter"
+		    path=".learningStarter"
+		    redirect="true"
+	  	/>
 	  	
 	  	<forward
 		    name="errorList"
@@ -357,6 +363,18 @@
 		    path=".monitoringContent"
 		    redirect="true"
 	  	/>
+
+       <forward
+	        name="load"
+	        path=".questions"
+	        redirect="true"
+	    />
+	    
+	    <forward
+	        name="starter"
+	        path=".starter"
+	        redirect="true"
+	     />
 
 	  	<forward
 		    name="errorList"
