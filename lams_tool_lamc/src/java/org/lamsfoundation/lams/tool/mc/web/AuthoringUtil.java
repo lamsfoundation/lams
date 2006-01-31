@@ -1471,7 +1471,7 @@ public class AuthoringUtil implements McAppConstants {
     
     
     /**
-     * helps persist questions
+     * supports persistance of questions
      * selectAndPersistQuestions(HttpServletRequest request, List existingQuestions, Map mapQuestionsContent,Map mapFeedbackIncorrect, Map mapFeedbackCorrect, Map mapGeneralOptionsContent, McContent mcContent)
      * 
      * @param request
