@@ -155,7 +155,7 @@ public interface WDDXTAGS {
 	public static final String CREATION_DATE ="createDateTime";
 	public static final String LAST_MODIFIED_DATE = "lastModifiedDateTime";
 	public static final String VERSION="version";
-	public static final String PARENT_DESIGN_ID ="parentLearningDesignID";
+	public static final String ORIGINAL_DESIGN_ID ="originalLearningDesignID";
 	public static final String WORKSPACE_FOLDER_ID= "workspaceFolderID";
 	public static final String DURATION ="duration";
 	public static final String LICENCE_ID ="licenseID";

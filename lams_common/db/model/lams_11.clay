@@ -915,8 +915,8 @@
 <variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
 </data-type>
 </column>
-<column name="parent_learning_design_id" alias="" remarks="" mandatory="false" column-size="20" decimal-digits="0" default-value="" auto-increment="false">
-<column-description/>
+<column name="original_learning_design_id" alias="" remarks="" mandatory="false" column-size="20" decimal-digits="0" default-value="" auto-increment="false">
+<column-description>When a lesson is started, the authored design is considered the orginial learning design</column-description>
 <data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
 <variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
 <variant type-name-pattern="BIGINT"/>
@@ -1032,13 +1032,6 @@
 </primary-key>
 <unique-key-list/>
 <foreign-key-list>
-<foreign-key name="FK_lams_learning_design_2" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="lams_learning_design" referenced-key="PRIMARY" on-update="NO ACTION" on-delete="NO ACTION" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
-<foreign-key-description/>
-<foreign-key-figure>
-<fk-fig-bendpoint-list/>
-</foreign-key-figure>
-<foreign-key-column column-name="parent_learning_design_id" referenced-key-column-name="learning_design_id"/>
-</foreign-key>
 <foreign-key name="FK_lams_learning_design_3" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="lams_user" referenced-key="PRIMARY" on-update="" on-delete="" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
 <foreign-key-description/>
 <foreign-key-figure>
@@ -1075,7 +1068,7 @@
 </index>
 <index name="idx_design_parent_id" alias="" remarks="" unique="false">
 <index-description/>
-<index-column name="parent_learning_design_id" sort="ASC"/>
+<index-column name="original_learning_design_id" sort="ASC"/>
 </index>
 <index name="idx_design_user_id" alias="" remarks="" unique="false">
 <index-description/>
@@ -2197,8 +2190,8 @@
 <column name="def_run_seq_fld_id" alias="" remarks="" mandatory="false" column-size="20" decimal-digits="0" default-value="" auto-increment="false">
 <column-description/>
 <data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
-<variant type-name-pattern="BIGINT"/>
 <variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT"/>
 <variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
 <variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
 <variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
@@ -3604,7 +3597,7 @@ It will be used for the IMS LD import/export.</column-description>
 </table>
 <table name="lams_copy_type" alias="" remarks="">
 <table-description/>
-<table-figure-bounds x="95" y="1618" width="-1" height="-1"/>
+<table-figure-bounds x="94" y="1709" width="-1" height="-1"/>
 <column-list>
 <column name="copy_type_id" alias="" remarks="" mandatory="true" column-size="4" decimal-digits="0" default-value="" auto-increment="false">
 <column-description/>

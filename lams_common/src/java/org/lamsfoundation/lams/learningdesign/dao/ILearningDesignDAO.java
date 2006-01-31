@@ -75,11 +75,11 @@ public interface ILearningDesignDAO extends IBaseDAO{
 	
 	/**
 	 * This method returns a List of Learning Designs with given  
-	 * <code>parent_learning_design_id</code>
+	 * <code>original_learning_design_id</code>
 	 * 
-	 * @param parentDesignID The <code>parent_learning_design_id</code>
+	 * @param originalDesignID The <code>original_learning_design_id</code>
 	 * @return List The List of all corresponding Learning designs with
-	 * 				given <code>parent_learning_design_id</code> 
+	 * 				given <code>original_learning_design_id</code> 
 	 */
-	public List getLearningDesignsByParent(Long parentDesignID);
+	public List getLearningDesignsByOriginalDesign(Long originalDesignID);
 }

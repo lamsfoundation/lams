@@ -106,7 +106,7 @@ public class LearningDesign implements Serializable {
 	private User user;
 
 	/** persistent field */
-	private LearningDesign parentLearningDesign;
+	private LearningDesign originalLearningDesign;
 
 	/** persistent field */
 	private Set childLearningDesigns;
@@ -177,7 +177,7 @@ public class LearningDesign implements Serializable {
 			Date createDateTime,
 			String version,
 			User user,
-			LearningDesign parentLearningDesign,
+			LearningDesign originalLearningDesign,
 			Set childLearningDesigns, Set lessons, Set transitions,
 			Set activities,
 			Long duration,
@@ -199,7 +199,7 @@ public class LearningDesign implements Serializable {
 		this.createDateTime = createDateTime != null ? createDateTime : new Date();
 		this.version = version;
 		this.user = user;
-		this.parentLearningDesign = parentLearningDesign;
+		this.originalLearningDesign = originalLearningDesign;
 		this.childLearningDesigns = childLearningDesigns;
 		this.lessons = lessons;
 		this.transitions = transitions;
@@ -228,7 +228,7 @@ public class LearningDesign implements Serializable {
 			Date createDateTime,
 			String version,
 			User user,
-			org.lamsfoundation.lams.learningdesign.LearningDesign parentLearningDesign,
+			org.lamsfoundation.lams.learningdesign.LearningDesign originalLearningDesign,
 			Set childLearningDesigns, Set lessons, Set transitions,
 			Set activities) {
 		this.learningDesignId = learningDesignId;
@@ -238,25 +238,22 @@ public class LearningDesign implements Serializable {
 		this.createDateTime = createDateTime != null ? createDateTime : new Date();
 		this.version = version;
 		this.user = user;
-		this.parentLearningDesign = parentLearningDesign;
+		this.originalLearningDesign = originalLearningDesign;
 		this.childLearningDesigns = childLearningDesigns;
 		this.lessons = lessons;
 		this.transitions = transitions;
 		this.activities = activities;
 		this.lastModifiedDateTime = new Date();
 	}
-	public static LearningDesign createLearningDesignCopy(LearningDesign design, Integer designCopyType){
-		LearningDesign newDesign = newInstance(design);
-				
-		if(designCopyType.intValue()!=COPY_TYPE_NONE)
-			newDesign.setReadOnly(new Boolean(true));
-		else
-			newDesign.setReadOnly(new Boolean(false));
-		
-		newDesign.setCopyTypeID(designCopyType);		
-		return newDesign;
-	}	
-	private static LearningDesign newInstance(LearningDesign design) {		
+	/** Create a new learning design based on an existing learning design. If setOriginalDesign is true, then set the input design
+	 * as the original design in the copied design - this is used when runtime copies of a design are created. It is not used
+	 * for user based copying of a design. 
+	 * @param design Design to be copied
+	 * @param designCopyType COPY_TYPE_NONE, COPY_TYPE_LESSON, COPY_TYPE_PREVIEW
+	 * @param setOriginalDesign should we set the originalLearningDesign field.
+	 * @return
+	 */ 
+	public static LearningDesign createLearningDesignCopy(LearningDesign design, Integer designCopyType, boolean setOriginalDesign){
 		LearningDesign newDesign = new LearningDesign();		
 		newDesign.setDescription(design.getDescription());
 		newDesign.setTitle(design.getTitle());		
@@ -265,14 +262,25 @@ public class LearningDesign implements Serializable {
 		newDesign.setDateReadOnly(design.getDateReadOnly());
 		newDesign.setHelpText(design.getHelpText());
 		newDesign.setVersion(design.getVersion());
-		newDesign.setParentLearningDesign(design);
 		newDesign.setCreateDateTime(new Date());
 		newDesign.setDuration(design.getDuration());
 		newDesign.setLicense(design.getLicense());
 		newDesign.setLicenseText(design.getLicenseText());
 		newDesign.setLastModifiedDateTime(new Date());
+				
+		// is this really right? why are preview set to read only when we will delete them? do we set them to not read only later?
+		if(designCopyType.intValue()!=COPY_TYPE_NONE)
+			newDesign.setReadOnly(new Boolean(true));
+		else
+			newDesign.setReadOnly(new Boolean(false));
+		
+		if ( setOriginalDesign ) 
+			newDesign.setOriginalLearningDesign(design);
+		
+		newDesign.setCopyTypeID(designCopyType);		
 		return newDesign;
 	}	
+
 	public Long getLearningDesignId() {
 		return this.learningDesignId;
 	}
@@ -352,12 +360,15 @@ public class LearningDesign implements Serializable {
 	public void setUser(User user) {
 		this.user = user;
 	}
-	public org.lamsfoundation.lams.learningdesign.LearningDesign getParentLearningDesign() {
-		return this.parentLearningDesign;
+	/** If this is a lesson type of learning design, then the original learning design was the authoring
+	 * learning design which was copied to make this learning design. The original design may or may not still exist 
+	 * in the database.  */
+	public org.lamsfoundation.lams.learningdesign.LearningDesign getOriginalLearningDesign() {
+		return this.originalLearningDesign;
 	}
-	public void setParentLearningDesign(
-			org.lamsfoundation.lams.learningdesign.LearningDesign parentLearningDesign) {
-		this.parentLearningDesign = parentLearningDesign;
+	public void setOriginalLearningDesign(
+			org.lamsfoundation.lams.learningdesign.LearningDesign originalLearningDesign) {
+		this.originalLearningDesign = originalLearningDesign;
 	}
 	public Set getChildLearningDesigns() {
 		return this.childLearningDesigns;
@@ -433,17 +444,17 @@ public class LearningDesign implements Serializable {
 		return parentActivities;
 	}
 	public Activity calculateFirstActivity(){
-		Activity firstActivity = null;
+		Activity newFirstActivity = null;
 		HashSet parentActivities = this.getParentActivities();
 		Iterator parentIterator = parentActivities.iterator();
 		while(parentIterator.hasNext()){
 			Activity activity = (Activity)parentIterator.next();
 			if(activity.getTransitionTo()==null){
-				firstActivity = activity;
+				newFirstActivity = activity;
 				break;
 			}
 		}
-		return firstActivity;
+		return newFirstActivity;
 	}
 	public WorkspaceFolder getWorkspaceFolder() {
 		return workspaceFolder;

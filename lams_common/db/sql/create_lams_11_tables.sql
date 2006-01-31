@@ -286,7 +286,7 @@ CREATE TABLE lams_learning_design (
      , copy_type_id TINYINT(4) NOT NULL
      , create_date_time DATETIME NOT NULL
      , version VARCHAR(56)
-     , parent_learning_design_id BIGINT(20)
+     , original_learning_design_id BIGINT(20)
      , workspace_folder_id BIGINT(20)
      , duration BIGINT(38)
      , license_id BIGINT(20)
@@ -298,9 +298,7 @@ CREATE TABLE lams_learning_design (
      , lesson_name VARCHAR(255)
      , last_modified_date_time DATETIME
      , PRIMARY KEY (learning_design_id)
-     , INDEX (parent_learning_design_id)
-     , CONSTRAINT FK_lams_learning_design_2 FOREIGN KEY (parent_learning_design_id)
-                  REFERENCES lams_learning_design (learning_design_id) ON DELETE NO ACTION ON UPDATE NO ACTION
+     , INDEX (original_learning_design_id)
      , INDEX (user_id)
      , CONSTRAINT FK_lams_learning_design_3 FOREIGN KEY (user_id)
                   REFERENCES lams_user (user_id)

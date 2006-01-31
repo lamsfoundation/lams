@@ -181,10 +181,10 @@
     
     <!-- bi-directional many-to-one association to LearningDesign -->
     
-    <many-to-one name="parentLearningDesign" class="org.lamsfoundation.lams.learningdesign.LearningDesign">
-        <meta attribute="field-description">@hibernate.column name="parent_learning_design_id"         
+    <many-to-one name="originalLearningDesign" class="org.lamsfoundation.lams.learningdesign.LearningDesign">
+        <meta attribute="field-description">@hibernate.column name="original_learning_design_id"         
       	</meta>
-        <column name="parent_learning_design_id" />
+        <column name="original_learning_design_id" />
     </many-to-one>
     			 
     <!-- bi-directional many-to-one association to User -->

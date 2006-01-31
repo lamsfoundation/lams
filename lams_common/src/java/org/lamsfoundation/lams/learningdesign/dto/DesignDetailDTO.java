@@ -86,8 +86,8 @@ public class DesignDetailDTO extends BaseDTO {
 		this.helpText = learningDesign.getHelpText();
 		this.copyTypeID = learningDesign.getCopyTypeID();
 		this.version = learningDesign.getVersion();
-		this.parentLearningDesignID = learningDesign.getParentLearningDesign()!=null?
-									  learningDesign.getParentLearningDesign().getLearningDesignId():
+		this.parentLearningDesignID = learningDesign.getOriginalLearningDesign()!=null?
+									  learningDesign.getOriginalLearningDesign().getLearningDesignId():
 									  null;
 		this.workspaceFolderID = learningDesign.getWorkspaceFolder().getWorkspaceFolderId();
 	}

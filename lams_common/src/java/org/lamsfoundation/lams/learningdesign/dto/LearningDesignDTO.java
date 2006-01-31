@@ -29,14 +29,10 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
-import org.lamsfoundation.lams.learningdesign.ChosenGrouping;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
-import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
-import org.lamsfoundation.lams.learningdesign.RandomGrouping;
 import org.lamsfoundation.lams.learningdesign.Transition;
-import org.lamsfoundation.lams.lesson.LessonClass;
 import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 
 /**
@@ -59,7 +55,7 @@ public class LearningDesignDTO extends BaseDTO{
 	private Integer copyTypeID;
 	private Date createDateTime;
 	private String version;	
-	private Long parentLearningDesignID;
+	private Long originalLearningDesignID;
 	private Integer workspaceFolderID;
 	private Long duration;
 	private String licenseText;
@@ -97,7 +93,7 @@ public class LearningDesignDTO extends BaseDTO{
 							 Integer copyTypeID,
 							 Date createDateTime,
 							 String version,
-							 Long parentLearningDesignID,
+							 Long originalLearningDesignID,
 							 Integer workspaceFolderID,
 							 Long duration, 
 							 String licenseText,
@@ -128,7 +124,7 @@ public class LearningDesignDTO extends BaseDTO{
 		this.copyTypeID = copyTypeID;
 		this.createDateTime = createDateTime;
 		this.version = version;
-		this.parentLearningDesignID = parentLearningDesignID;
+		this.originalLearningDesignID = originalLearningDesignID;
 		this.workspaceFolderID = workspaceFolderID;
 		this.duration = duration;
 		this.licenseText = licenseText;
@@ -171,8 +167,8 @@ public class LearningDesignDTO extends BaseDTO{
 		this.createDateTime = learningDesign.getCreateDateTime();
 		this.version = learningDesign.getVersion();
 		
-		this.parentLearningDesignID = learningDesign.getParentLearningDesign()!=null?
-									  learningDesign.getParentLearningDesign().getLearningDesignId():
+		this.originalLearningDesignID = learningDesign.getOriginalLearningDesign()!=null?
+									  learningDesign.getOriginalLearningDesign().getLearningDesignId():
 									  null;
 		
 	    this.workspaceFolderID = learningDesign.getWorkspaceFolder()!=null?
@@ -325,11 +321,11 @@ public class LearningDesignDTO extends BaseDTO{
 	    return maxID;
 	}
 	/**
-	 * @return Returns the parentLearningDesignID.
+	 * @return Returns the originalLearningDesignID.
 	 */
-	public Long getParentLearningDesignID() {
+	public Long getOriginalLearningDesignID() {
 		//return parentLearningDesignID!=null?parentLearningDesignID:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
-	    return parentLearningDesignID;
+	    return originalLearningDesignID;
 	}
 	/**
 	 * @return Returns the readOnly.
@@ -588,9 +584,9 @@ public class LearningDesignDTO extends BaseDTO{
 	/**
 	 * @param parentLearningDesignID The parentLearningDesignID to set.
 	 */
-	public void setParentLearningDesignID(Long parentLearningDesignID) {
-		if(!parentLearningDesignID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG))
-			this.parentLearningDesignID = parentLearningDesignID;
+	public void setOriginalLearningDesignID(Long originalLearningDesignID) {
+		if(!originalLearningDesignID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG))
+			this.originalLearningDesignID = originalLearningDesignID;
 	}
 	/**
 	 * @param readOnly The readOnly to set.
