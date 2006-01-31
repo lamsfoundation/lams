@@ -51,6 +51,8 @@ public interface McAppConstants {
     public static final String RESULTS_SUMMARY							="resultsSummary";
     public static final String ERROR_LIST								="errorList";
     public static final String PREVIEW									="preview";
+    public static final String LEARNER_PROGRESS							="learnerProgress";
+    public static final String LEARNER_PROGRESS_USERID					="learnerProgressUserId";
 	
     public static final String AUTHORING								="authoring";
     public static final String SOURCE_MC_STARTER						="sourceMcStarter";
@@ -223,8 +225,6 @@ public interface McAppConstants {
     public static final String MAP_MONITORING_QUESTIONS					="mapMonitoringQuestions";
     public static final String SUMMARY_TOOL_SESSIONS					="summaryToolSessions";
     public static final String MONITORED_CONTENT_ID				   		="monitoredContentId";
-    public static final String START_MONITORING_SUMMARY_REQUEST	   		="startMonitoringSummaryRequest";
-    public static final String STOP_RENDERING_QUESTIONS			   		="stopRenderingQuestions";
     public static final String EDITACTIVITY_EDITMODE	   		   		="editActivityEditMode";
     public static final String FORM_INDEX	   		   			   		="formIndex";
     public static final String CURRENT_MONITORED_TOOL_SESSION 			="currentMonitoredToolSession";
@@ -251,6 +251,8 @@ public interface McAppConstants {
     public static final String USER_EXCEPTION_NUMBERFORMAT  	    	="userExceptionNumberFormat";
     public static final String USER_EXCEPTION_CONTENT_DOESNOTEXIST		="userExceptionContentDoesNotExist";
     public static final String USER_EXCEPTION_TOOLSESSION_DOESNOTEXIST	="userExceptionToolSessionDoesNotExist";
+    public static final String USER_EXCEPTION_TOOLCONTENT_DOESNOTEXIST	="userExceptionToolContentDoesNotExist";
+    public static final String USER_EXCEPTION_LEARNER_REQUIRED			="userExceptionLearnerRequired";
     public static final String USER_EXCEPTION_CONTENTID_REQUIRED		="userExceptionContentIdRequired";
     public static final String USER_EXCEPTION_TOOLSESSIONID_REQUIRED	="userExceptionToolSessionIdRequired";
     public static final String USER_EXCEPTION_DEFAULTCONTENT_NOT_AVAILABLE 			="userExceptionDefaultContentNotAvailable";
