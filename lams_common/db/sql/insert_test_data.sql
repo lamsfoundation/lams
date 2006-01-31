@@ -779,7 +779,7 @@ values(10,10,'ParallelActivity to SequenceActivity','ParallelActivity to Sequenc
 
 insert into lams_learning_design(learning_design_ui_id,description,title,first_activity_id,max_id,valid_design_flag,
 								 read_only_flag,user_id,help_text,copy_type_id,create_date_time,version,
-								 parent_learning_design_id,workspace_folder_id,
+								 original_learning_design_id,workspace_folder_id,
 								 online_instructions,offline_instructions)
 								values
 								(1,'Test Learning Design','Test Learning Design title',20,1,1,0,1,
