@@ -103,6 +103,8 @@ public interface IMcService
     
     public void removeMcQueContentByUID(Long uid) throws McApplicationException;
     
+    public McQueUsr getMcUserByUID(Long uid) throws McApplicationException;
+    
     public List getCorrectOption(Long mcQueContentId);
     
     public List getAllQuestionEntries(final Long mcContentId) throws McApplicationException;
@@ -116,6 +118,8 @@ public interface IMcService
     public void updateMcSession(McSession mcSession) throws McApplicationException;
     
     public List getMcUserBySessionOnly(final McSession mcSession) throws McApplicationException;
+    
+    public McSession getMcSessionByUID(Long uid) throws McApplicationException;
     
     public void deleteMc(McContent mc) throws McApplicationException;
     

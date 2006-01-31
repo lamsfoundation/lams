@@ -551,15 +551,30 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		logger.debug("final learnerProgressOn:" + learnerProgressOn);
 		/*..till here*/
 		
+		McQueUsr mcQueUsr=null;
+		Long queUsrId=null;
+		if (learnerProgressOn == false)
+		{
+			mcQueUsr=LearningUtil.getUser(request);
+			logger.debug("mcQueUsr: " + mcQueUsr);
+			
+			queUsrId=mcQueUsr.getUid();
+			logger.debug("queUsrId: " + queUsrId);
+		}
+		else
+		{
+			mcQueUsr=mcService.retrieveMcQueUsr(new Long(learnerProgressUserId));
+			logger.debug("mcQueUsr: " + mcQueUsr);
+			
+			queUsrId=mcQueUsr.getUid();
+			logger.debug("queUsrId: " + queUsrId);
+		}
+		logger.debug("final mcQueUsr: " + mcQueUsr);
+		logger.debug("final queUsrId: " + queUsrId);
+		
 		Long toolContentUID= (Long) request.getSession().getAttribute(TOOL_CONTENT_UID);
 		logger.debug("toolContentUID: " + toolContentUID);
     	
-		McQueUsr mcQueUsr=LearningUtil.getUser(request);
-		logger.debug("mcQueUsr: " + mcQueUsr);
-		
-		Long queUsrId=mcQueUsr.getUid();
-		logger.debug("queUsrId: " + queUsrId);
-	
 		Map mapQueAttempts= new TreeMap(new McComparator());
 		Map mapQueCorrectAttempts= new TreeMap(new McComparator());
 		Map mapQueIncorrectAttempts= new TreeMap(new McComparator());
@@ -574,6 +589,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 			Map mapAttemptOrderIncorrectAttempts= new TreeMap(new McComparator());
 			for (int j=1; j <= MAX_ATTEMPT_HISTORY ; j++ )
     		{
+				logger.debug("getting list for queUsrId: " + queUsrId);
     			List attemptsByAttemptOrder=mcService.getAttemptByAttemptOrder(queUsrId, mcQueContent.getUid(), new Integer(j));
 	    		logger.debug("attemptsByAttemptOrder: " + j + " is: " + attemptsByAttemptOrder);
 	    	
@@ -596,12 +612,20 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
         	    		{
         	    			mapAttemptsIncorrect.put(mapIndex.toString(), mcUsrAttempt.getMcOptionsContent().getMcQueOptionText());
         	    		}
+        	    		mapAttempts.put(mapIndex.toString(), mcUsrAttempt.getMcOptionsContent().getMcQueOptionText());
+    	    			logger.debug("added attempt with order: " + mcUsrAttempt.getAttemptOrder() + " , option text is: " + mcUsrAttempt.getMcOptionsContent().getMcQueOptionText());
+    	    			mapIndex=new Long(mapIndex.longValue()+1);
+
     	    		}
     	    		else
     	    		{
     	    			/* this section is needed to separate learner progress view from standard attempts list. */
     	    			logger.debug("learnerProgressOn is true, populating map based on the learner id: " + learnerProgressUserId);
-    	    			if (mcUsrAttempt.getQueUsrId().toString().equals(learnerProgressUserId))
+    	    			logger.debug("retrieve user based on uid in the attempt: " + mcUsrAttempt.getQueUsrId());
+    	    			McQueUsr mcQueUsrLocal=mcService.getMcUserByUID(mcUsrAttempt.getQueUsrId());
+    	    			logger.debug("mcQueUsrLocal: " + mcQueUsrLocal);
+    	    			
+    	    			if (mcQueUsrLocal.getQueUsrId().toString().equals(learnerProgressUserId))
 						{
 							logger.debug("found learner progress user: " + learnerProgressUserId);
 	        	    		if (mcUsrAttempt.isAttemptCorrect())
@@ -612,13 +636,12 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	        	    		{
 	        	    			mapAttemptsIncorrect.put(mapIndex.toString(), mcUsrAttempt.getMcOptionsContent().getMcQueOptionText());
 	        	    		}
+	        	    		mapAttempts.put(mapIndex.toString(), mcUsrAttempt.getMcOptionsContent().getMcQueOptionText());
+	    	    			logger.debug("added attempt with order: " + mcUsrAttempt.getAttemptOrder() + " , option text is: " + mcUsrAttempt.getMcOptionsContent().getMcQueOptionText());
+	    	    			mapIndex=new Long(mapIndex.longValue()+1);
 						}
     	    		}
 				
-    	    		mapAttempts.put(mapIndex.toString(), mcUsrAttempt.getMcOptionsContent().getMcQueOptionText());
-					
-	    			logger.debug("added attempt with order: " + mcUsrAttempt.getAttemptOrder() + " , option text is: " + mcUsrAttempt.getMcOptionsContent().getMcQueOptionText());
-	    			mapIndex=new Long(mapIndex.longValue()+1);
     	    	}    	    		
 
     	    	logger.debug("final mapAttempts is: " + mapAttempts);

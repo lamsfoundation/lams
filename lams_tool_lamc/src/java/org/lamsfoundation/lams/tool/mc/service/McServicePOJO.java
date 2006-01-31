@@ -311,6 +311,22 @@ public class McServicePOJO implements
         }
     }
 
+    
+    public McSession getMcSessionByUID(Long uid) throws McApplicationException
+    {
+        try
+        {
+        	return mcSessionDAO.getMcSessionByUID(uid);
+        }
+        catch (DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is getting mcSession my uid: "
+                                                         + e.getMessage(),
+														   e);
+        }
+    }
+
+
     public void createMcQueUsr(McQueUsr mcQueUsr) throws McApplicationException
     {
 	   try
@@ -325,7 +341,19 @@ public class McServicePOJO implements
         }
     }
     
-
+    public McQueUsr getMcUserByUID(Long uid) throws McApplicationException
+    {
+	   try
+        {
+	   		return mcUserDAO.getMcUserByUID(uid);
+        }
+        catch (DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is getting the mc QueUsr by uid."
+                                                         + e.getMessage(),
+														   e);
+        }
+    }
     
     public McQueUsr retrieveMcQueUsr(Long userId) throws McApplicationException
     {

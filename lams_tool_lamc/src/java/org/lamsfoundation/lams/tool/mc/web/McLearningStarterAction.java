@@ -329,7 +329,21 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 		    if (mcQueUsr == null)
 		    {
 		    	persistError(request, "error.learner.required");
-		    	request.setAttribute(USER_EXCEPTION_LEARNER_REQUIRED, new Boolean(true));
+		    	McUtils.cleanUpSessionAbsolute(request);
+				return (mapping.findForward(ERROR_LIST));
+		    }
+		    
+		    /* check whether the user's session really referrs to the session id passed to the url*/
+		    Long sessionUid=mcQueUsr.getMcSessionId();
+		    logger.debug("sessionUid" + sessionUid);
+		    McSession mcSessionLocal=mcService.getMcSessionByUID(sessionUid);
+		    logger.debug("checking mcSessionLocal" + mcSessionLocal);
+		    Long toolSessionId=(Long)request.getSession().getAttribute(TOOL_SESSION_ID);
+		    logger.debug("toolSessionId: " + toolSessionId + " versus" + mcSessionLocal);
+		    if  ((mcSessionLocal ==  null) ||
+				 (mcSessionLocal.getMcSessionId().longValue() != toolSessionId.longValue()))
+		    {
+		    	persistError(request, "error.learner.sessionId.inconsistent");
 		    	McUtils.cleanUpSessionAbsolute(request);
 				return (mapping.findForward(ERROR_LIST));
 		    }
