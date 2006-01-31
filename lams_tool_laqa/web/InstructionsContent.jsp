@@ -17,13 +17,13 @@
 					<td NOWRAP width=700> <!-- Dave,I found width was necessary to present all the elements of the editor, feel free to change -->
                         <span id="previewOfflineInstructions" style="visibility: hidden; display: none;">
                             <div>
-                                <a href="#" onClick="doWYSWYGEdit('OfflineInstructions')">Open Richtext Editor</a>
+                                <a href="javascript:doWYSWYGEdit('OfflineInstructions')">Open Richtext Editor</a>
                             </div>
                             <div class="previewPanel" id="previewOfflineInstructions.text"></div>
                         </span>
                         <span id="txOfflineInstructions">
                             <div>
-                                <a href="javascript:doWYSWYGEdit('OfflineInstructions')">Open Richtext Editor</a>
+                                <a href="javascript:doTextToHTML('OfflineInstructions'); doWYSWYGEdit('OfflineInstructions')">Open Richtext Editor</a>
                             </div>
                             <textarea class="textareaPanel" name="offlineInstructions" id="txOfflineInstructions.textarea"><c:out value="${QaAuthoringForm.offlineInstructions}" escapeXml="false" /></textarea>
                         </span>
@@ -61,13 +61,13 @@
 					<td NOWRAP width=700> <!-- Dave,I found width was necessary to present all the elements of the editor, feel free to change -->
                         <span id="previewOnlineInstructions" style="visibility: hidden; display: none;">
                             <div>
-                                <a href="#" onClick="doWYSWYGEdit('OnlineInstructions')">Open Richtext Editor</a>
+                                <a href="javascript:doWYSWYGEdit('OnlineInstructions')">Open Richtext Editor</a>
                             </div>
                             <div class="previewPanel" id="previewOnlineInstructions.text"></div>
                         </span>
                         <span id="txOnlineInstructions">
                             <div>
-                                <a href="javascript:doWYSWYGEdit('OnlineInstructions')">Open Richtext Editor</a>
+                                <a href="javascript:doTextToHTML('OnlineInstructions'); doWYSWYGEdit('OnlineInstructions')">Open Richtext Editor</a>
                             </div>
                             <textarea class="textareaPanel" name="onlineInstructions" id="txOnlineInstructions.textarea"><c:out value="${QaAuthoringForm.onlineInstructions}" escapeXml="false" /></textarea>
                         </span>

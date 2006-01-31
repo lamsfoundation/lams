@@ -4,7 +4,7 @@
 <%@ taglib uri="/WEB-INF/c.tld" prefix="c" %>
 <%@ taglib uri="/WEB-INF/fmt.tld" prefix="fmt" %>
 <%@ taglib uri="fck-editor" prefix="FCK" %>
-
+ 
 <div id="basicTabContainer">	
 		<c:if test="${(requestScope.startMonitoringSummaryRequest != 'true')  || (sessionScope.editActivityEditMode=='true') }"> 			
 			<c:if test="${requestScope.stopRenderingQuestions != 'true'}"> 			
@@ -13,18 +13,20 @@
 						<tr> 
 					 		<td valign="top"> <bean:message key="label.authoring.title"/>: </td>
 					 		<td NOWRAP width=700> <!-- Dave,I found width was necessary to present all the elements of the editor, feel free to change -->                            
-                                <span id="previewTitle" style="visibility: hidden; display: none;">
-                                    <div>
-                                        <a href="#" onClick="doWYSWYGEdit('Title')">Open Richtext Editor</a>
-                                    </div>
-                                    <div class="previewPanel" id="previewTitle.text"></div>
-                                </span>
-                                <span id="txTitle">
-                                    <div>
-                                        <a href="#" onClick="doWYSWYGEdit('Title')">Open Richtext Editor</a>
-                                    </div>
-                                    <textarea class="textareaPanel" name="title" id="txTitle.textarea"><c:out value="${QaAuthoringForm.title}" escapeXml="false" /></textarea>
-                                </span>
+                                
+                                 <span id="previewTitle" style="visibility: hidden; display: none;">
+                                     <div>
+                                         <a href="javascript:doWYSWYGEdit('Title','small')">Open Richtext Editor</a>
+                                     </div>
+                                     <div class="smallPreviewPanel" id="previewTitle.text"></div>
+                                 </span>
+                                 <span id="txTitle">
+                                     <div>
+                                         <a href="javascript:doTextToHTML('Title'); doWYSWYGEdit('Title','small')">Open Richtext Editor</a>
+                                     </div>
+                                     <textarea class="smallTextareaPanel" name="title" id="txTitle.textarea"><c:out value="${QaAuthoringForm.title}" escapeXml="false" /></textarea>
+                                 </span>
+                                
 							</td> 
 					  	</tr>
 					  	<tr> 
@@ -32,13 +34,13 @@
 					 		<td NOWRAP width=700> <!-- Dave,I found width was necessary to present all the elements of the editor, feel free to change -->
                                 <span id="previewInstructions" style="visibility: hidden; display: none;">
                                     <div>
-                                        <a href="#" onClick="doWYSWYGEdit('Instructions')">Open Richtext Editor</a>
+                                        <a href="javascript:doWYSWYGEdit('Instructions')">Open Richtext Editor</a>
                                     </div>
                                     <div class="previewPanel" id="previewInstructions.text"></div>
                                 </span>
                                 <span id="txInstructions">
                                     <div>
-                                        <a href="javascript:doWYSWYGEdit('Instructions')">Open Richtext Editor</a>
+                                        <a href="javascript:doTextToHTML('Instructions'); doWYSWYGEdit('Instructions')">Open Richtext Editor</a>
                                     </div>
                                     <textarea class="textareaPanel" name="instructions" id="txInstructions.textarea"><c:out value="${QaAuthoringForm.instructions}" escapeXml="false" /></textarea>
                                 </span>
@@ -53,13 +55,13 @@
 						  	<td>
                                 <span id="previewQuestion0" style="visibility: hidden; display: none;">
                                     <div>
-                                        <a href="#" onClick="doWYSWYGEdit('Question0')">Open Richtext Editor</a>
+                                        <a href="javascript:doWYSWYGEdit('Question0')">Open Richtext Editor</a>
                                     </div>
                                     <div class="previewPanel" id="previewQuestion0.text"></div>
                                 </span>
                                 <span id="txQuestion0">
                                     <div>
-                                        <a href="javascript:doWYSWYGEdit('Question0')">Open Richtext Editor</a>
+                                        <a href="javascript:doTextToHTML('Question0'); doWYSWYGEdit('Question0')">Open Richtext Editor</a>
                                     </div>
                                     <textarea class="textareaPanel" name="questionContent0" id="txQuestion0.textarea"><c:out value="${sessionScope.defaultQuestionContent}"/></textarea>
                                 </span>
@@ -79,13 +81,13 @@
   
                                         <span id="preview<c:out value="Question${queIndex-1}"/>" style="visibility: hidden; display: none;">
                                             <div>
-                                                <a href="#" onClick="doWYSWYGEdit('<c:out value="Question${queIndex-1}"/>')">Open Richtext Editor</a>
+                                                <a href="javascript:doWYSWYGEdit('<c:out value="Question${queIndex-1}"/>')">Open Richtext Editor</a>
                                             </div>
                                             <div class="previewPanel" id="preview<c:out value="Question${queIndex-1}"/>.text"></div>
                                         </span>
                                         <span id="tx<c:out value="Question${queIndex-1}"/>">
                                             <div>
-                                                <a href="javascript:doWYSWYGEdit('<c:out value="Question${queIndex-1}"/>')">Open Richtext Editor</a>
+                                                <a href="javascript:doTextToHTML('<c:out value="Question${queIndex-1}"/>'); doWYSWYGEdit('<c:out value="Question${queIndex-1}"/>')">Open Richtext Editor</a>
                                             </div>
                                             <textarea class="textareaPanel" name="<c:out value="questionContent${queIndex-1}"/>" id="tx<c:out value="Question${queIndex-1}"/>.textarea"><c:out value="${questionEntry.value}"/></textarea>
                                         </span>

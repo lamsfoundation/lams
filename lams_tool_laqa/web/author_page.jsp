@@ -80,15 +80,19 @@ function pviiClassNew(obj, new_style) { //v2.7 by PVII
             else{
                 selectTab(1); //select the default tab;
             }
-                        
             
-            //showElementById("tx1");
-            //showElementById("tx2");
-            //showElementById("tx3");
-    
-            //hideElementById("preview1");
-            //hideElementById("preview2");
-            //hideElementById("preview3");
+            initEditor("Title");
+            initEditor("Instructions");
+            initEditor("Question0");
+            initEditor("OnlineInstructions");
+            initEditor("OfflineInstructions");
+           
+            <c:set var="queIndex" scope="session" value="1"/>
+            <c:forEach var="questionEntry" items="${sessionScope.mapQuestionContent}">
+                <c:set var="queIndex" scope="session" value="${queIndex +1}"/>
+                initEditor("<c:out value="Question${queIndex-1}"/>");
+            </c:forEach>
+            
         }        
     </script>
 
@@ -112,7 +116,7 @@ function pviiClassNew(obj, new_style) { //v2.7 by PVII
             <li id="tab2" class="tabitem"><div class="tableft"><div class="tabright"><a href="javascript:selectTab(2);">Advanced</a> </div></div></li>
             <li id="tab3" class="tabitem"><div class="tableft"><div class="tabright"><a href="javascript:selectTab(3);">Instructions</a> </div></div></li>
         </ul>
-    </div>  
+    </div>
     <!-- end tab buttons -->
     
         

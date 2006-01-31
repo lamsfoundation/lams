@@ -4,11 +4,27 @@
 	border-style: none;
 	border-width: 1px;
 	padding: 5px;
+	
+	overflow: auto;
 }
 
 .textareaPanel{
 	width: 700px; 
 	height: 220px; 
+}
+
+
+.smallPreviewPanel{
+         width: 700px;
+         height: 120px;
+         border-style: none;
+         border-width: 1px;
+         padding: 5px;
+}
+
+.smallTextareaPanel{
+         width: 700px;
+         height: 120px;
 }
 
 #wyswygEditor{
@@ -36,3 +52,4 @@
 	padding: 0px;
 	margin: 0px;
 }
+

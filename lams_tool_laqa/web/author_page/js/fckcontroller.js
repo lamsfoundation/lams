@@ -1,8 +1,26 @@
 var activeEditorIndex = 0;
-var commentFlag = "<!-- HTML -->";
-var commentFlagLength = 13;
 var oFCKeditor;
 
+//whether to initialise the editor in textarea mode or preview mode
+function initEditor(index){
+    var textareaElement = document.getElementById("tx" + index + ".textarea")
+    if(textareaElement == null)
+        return;
+    var text = textareaElement.value;
+    
+    if(containsHTML(text)){
+        var previewTextElement = document.getElementById("preview" + index + ".text");
+        var previewText = document.getElementById("tx" + index + ".textarea").value;
+        previewTextElement.innerHTML = previewText;
+    
+        hideElementById("tx"+index);
+        showElementById("preview"+index);
+    }
+    else{
+        hideElementById("preview"+index);
+        showElementById("tx"+index);
+    }
+}
 
 // FCKeditor_OnComplete is a special function that is called when an editor
 // instance is loaded ad available to the API. It must be named exactly in
@@ -22,8 +40,8 @@ function SetContents(content)
 	oEditor.SetHTML(content) ;
 }
 
-
-function doWYSWYGEdit(index){
+  
+function doWYSWYGEdit(index, size){
 
     var oEditor;
     try {
@@ -57,21 +75,31 @@ function doWYSWYGEdit(index){
     wyswygEditorScreenElement.style.top = posY + "px";
     wyswygEditorScreenElement.style.left = posX + "px";
     
+    //resize the fck editor
+    fckFrameElement = document.getElementById("FCKeditor1___Frame");
+    if (size == "small") {
+        fckFrameElement.style.height = "100px";
+    } else {
+        fckFrameElement.style.height = "200px";
+    }
+
+     showElementById("wyswygEditorScreen");
+
     
     showElementById("wyswygEditorScreen");
 }
 
+//convert the text to HTML first,
+function doTextToHTML(index){
+    var textareaElement = document.getElementById("tx" + index + ".textarea");
+    var text = covertTextToHTML(textareaElement.value);
+    textareaElement.value = text;
+}
 
 function saveWYSWYGEdittedText(index){
     var oEditor = FCKeditorAPI.GetInstance('FCKeditor1') ;
     var text = oEditor.GetXHTML( true )
 
-
-	// add in <!-- HTML --> to indicate that we have used the wyswyg editor 
-	var testText = text.substring(0,commentFlagLength);
-	if ( commentFlag != testText ) {
-		text = commentFlag + text;
-	}
 
     var htmlEditorElement = document.getElementById("tx" + index + ".textarea");
     htmlEditorElement.value = text;
@@ -95,8 +123,7 @@ function doPreview(index){
 }
 
 
-
-
+/*** show/hide Elements ***/
 function showElement(element) {
     element.style.visibility = 'visible';
     element.style.display = "block";
@@ -117,6 +144,7 @@ function hideElementById(id) {
 }
 
 
+/*** findPosX and findPoxY functions are use to locate the x,y location of an element ***/
 function findPosX(obj)  {
     var curleft = 0;
     if(obj.offsetParent)
@@ -146,6 +174,33 @@ function findPosY(obj)  {
         curtop += obj.y;
     return curtop;
 }
+
+/**** Using the regular expressions defined below to convert Text to HTML ****/
+var NEWLINE = "<BR>";
+var GREATER = "&gt;";
+var LESSER = "&lt;";
+//var SPACE = "&nbsp;";
+
+var RE_ESCAPE_NEWLINE = new RegExp("\n", "g");
+var RE_ESCAPE_GREATER = new RegExp(">", "g");
+var RE_ESCAPE_LESSER = new RegExp("<", "g");
+//var RE_ESCAPE_SPACE = new RegExp(" ", "g");
+
+var RE_HTML_TAG = new RegExp("<.*>|" + LESSER + "|" + GREATER);
+
+function covertTextToHTML(str){
+    return str.replace(RE_ESCAPE_GREATER, GREATER)
+              .replace(RE_ESCAPE_LESSER, LESSER)
+              .replace(RE_ESCAPE_NEWLINE, NEWLINE);
+              
+              //.replace(RE_ESCAPE_SPACE, SPACE)
+}
+
+/**** Detect whether HTML was used */
+function containsHTML(str){
+    return (str.match(RE_HTML_TAG) != null)? true:false;
+}
+
 
 
 /*** implement the event onSelectTab() which gets trigger when tabs is changed ***/
