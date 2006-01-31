@@ -1,5 +1,5 @@
 /*
- * Created on 16/05/2005
+ * Created on 16/10/2005
  */
 package org.lamsfoundation.lams.tool.mc.web;
 
@@ -821,5 +821,7 @@ public class LearningUtil implements McAppConstants {
     	request.getSession().removeAttribute(USER_EXCEPTION_NUMBERFORMAT);
     	request.getSession().removeAttribute(LEARNING_MODE);
     	request.getSession().removeAttribute(PREVIEW_ONLY);
+    	request.getSession().removeAttribute(LEARNER_PROGRESS);
+    	request.getSession().removeAttribute(LEARNER_PROGRESS_USERID);
     }
  }
