@@ -116,15 +116,15 @@ http://www.gnu.org/licenses/gpl.txt
 		<table width="100%" border="0" cellspacing="2" cellpadding="2" summary="This table is being used for layout purposes only">
 			<TR><TD><A HREF="<lams:WebAppURL/>dummylearner.do?method=getActiveLessons">Refresh List</A></TD></TR>
 		<c:forEach var="lesson" items="${lessons}">
-		<c:if test="${lesson.lessonStateId<6}">
+		<c:if test="${lesson.lessonStateID<6}">
 			<TR><TD>
 				<STRONG><c:out value="${lesson.lessonName}"/></STRONG>
 			<c:choose>
-				<c:when test="${lesson.lessonStateId==1}">[Created]</c:when>
-				<c:when test="${lesson.lessonStateId==2}">[Scheduled]</c:when>
-				<c:when test="${lesson.lessonStateId==3}">[Started]</c:when>
-				<c:when test="${lesson.lessonStateId==4}">[Suspended]</c:when>
-				<c:when test="${lesson.lessonStateId==5}">[Finished]</c:when>
+				<c:when test="${lesson.lessonStateID==1}">[Created]</c:when>
+				<c:when test="${lesson.lessonStateID==2}">[Scheduled]</c:when>
+				<c:when test="${lesson.lessonStateID==3}">[Started]</c:when>
+				<c:when test="${lesson.lessonStateID==4}">[Suspended]</c:when>
+				<c:when test="${lesson.lessonStateID==5}">[Finished]</c:when>
 			</c:choose>
 			<c:if test="${lesson.lessonDescription}">
 				<BR><c:out value="${lesson.lessonDescription}"/>
