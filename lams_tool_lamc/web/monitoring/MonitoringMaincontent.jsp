@@ -94,7 +94,73 @@
 
 	  <html:form  action="/monitoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
 		<!-- start tabs -->
-					<jsp:include page="/monitoring/MonitoringTabsHeader.jsp" />
+		<!-- tab holder table -->
+		<table border="0" cellspacing="0" cellpadding="0">
+		  <tr>
+		  	<td> &nbsp&nbsp</td>
+		  </tr>
+			
+		  <tr>
+			    <td valign="bottom">
+					<table border="0" cellspacing="0" cellpadding="0">
+					  <tr>
+						<td><img src="<c:out value="${lams}"/>images/aqua_tab_s_left.gif" name="tab_left_su" width="8" height="25" border="0" id="tab_left_su"/></td>
+						<td class="tab tabcentre_selected" width="90" id="tab_tbl_centre_su" ><label>
+						<a href="<c:out value='${monitoringURL}'/>?method=getSummary" id="su" >
+							<bean:message key="label.summary"/>
+						</a></label></td>
+						<td><a href="<c:out value='${monitoringURL}'/>?method=getSummary">
+							<img src="<c:out value="${lams}"/>images/aqua_tab_s_right.gif"  name="tab_right_su" width="8" height="25" border="0" id="tab_right_su"/></a></td>
+					  </tr>
+					</table>
+				</td>
+
+			    <td valign="bottom">
+					<table border="0" cellspacing="0" cellpadding="0">
+					  <tr>
+						<td><img src="<c:out value="${lams}"/>images/aqua_tab_s_left.gif" name="tab_left_i" width="8" height="25" border="0" id="tab_left_i"/></td>
+						<td class="tab tabcentre_selected" width="90" id="tab_tbl_centre_i" ><label><a
+							href="<c:out value='${monitoringURL}'/>?method=getInstructions" id="i" >
+								<bean:message key="label.instructions"/>
+							</a></label></td>
+						<td><a href="<c:out value='${monitoringURL}'/>?method=getInstructions">
+							<img src="<c:out value="${lams}"/>images/aqua_tab_s_right.gif"  name="tab_right_i" width="8" height="25" border="0" id="tab_right_i"/></a></td>
+					  </tr>
+					</table>
+				</td>
+
+				
+			    <td valign="bottom">
+					<table border="0" cellspacing="0" cellpadding="0">
+					  <tr>
+						<td><img src="<c:out value="${lams}"/>images/aqua_tab_s_left.gif" name="tab_left_e" width="8" height="25" border="0" id="tab_left_e"/></td>
+						<td class="tab tabcentre_selected" width="90" id="tab_tbl_centre_e" ><label><a
+							href="<c:out value='${monitoringURL}'/>?method=editActivity" id="e" >
+								<bean:message key="label.editActivity"/>								
+							</a></label></td>
+						<td><a href="<c:out value='${monitoringURL}'/>?method=editActivity">
+							<img src="<c:out value="${lams}"/>images/aqua_tab_s_right.gif"  name="tab_right_e" width="8" height="25" border="0" id="tab_right_e"/></a></td>
+					  </tr>
+					</table>
+				</td>
+
+							
+			    <td valign="bottom">
+					<table border="0" cellspacing="0" cellpadding="0">
+					  <tr>
+						<td><img src="<c:out value="${lams}"/>images/aqua_tab_s_left.gif" name="tab_left_s" width="8" height="25" border="0" id="tab_left_s"/></td>
+						<td class="tab tabcentre_selected" width="90" id="tab_tbl_centre_s" ><label><a
+							href="<c:out value='${monitoringURL}'/>?method=getStats" id="e" >
+								<bean:message key="label.stats"/>								
+							</a></label></td>
+						<td><a href="<c:out value='${monitoringURL}'/>?method=getStats">
+							<img src="<c:out value="${lams}"/>images/aqua_tab_s_right.gif"  name="tab_right_s" width="8" height="25" border="0" id="tab_right_s"/></a></td>
+					  </tr>
+					</table>
+				</td>
+		  </tr>
+		</table>
+
 		<!-- end tab buttons -->
 		
 		<html:hidden property="method"/>	 
