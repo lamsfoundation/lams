@@ -1,6 +1,7 @@
 ﻿import org.lamsfoundation.lams.common.util.Observable;
 import org.lamsfoundation.lams.common.ws.*;
 import org.lamsfoundation.lams.common.util.*
+//import mx.utils.ObjectCopy;
 import mx.events.*
 import mx.utils.*
 /*
@@ -16,7 +17,8 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 	//private var _workspaceData:Object;
 	
 	
-	private var _workspaceResources:Hashtable;				//this contains refs to the tree nodes stored by resourceID
+	//private var _workspaceResources:Hashtable;				//this contains refs to the tree nodes stored by resourceID
+	private var _workspaceResources:Array;				//this contains refs to the tree nodes stored by resourceType_resourceID
 	private var _accessibleWorkspaceFoldersDTOCopy:Object; // this is used so we can start again after we kill the cache
 	
 	//this is the dartaprovider for the tree
@@ -27,6 +29,11 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 	private var _currentTab:String; //tells us which tab should be displayed - LOCATION or PROPERTIES
 	private var _defaultTab:String;
 	private var _currentMode:String; //Tells us which mode the dialogue should be in - SAVE, SAVEAS, OPEN...
+	private var _clipboard:Object;
+	private var _clipboardMode:String; // tells us if its a cut or copy 
+	private var _folderIDPendingRefresh:Number; // The ID of the folder an operation has just been done on, will be refreshed...
+	
+
 	
 
 	
@@ -43,7 +50,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 		//Set up this class to use the Flash event delegation model
         EventDispatcher.initialize(this);
 		_workspace = w;
-		_workspaceResources = new Hashtable();
+		_workspaceResources = new Array();
 		_defaultTab = "LOCATION";
 		
 		
@@ -123,7 +130,10 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 	 */
 	public function parseDataForTree(dto:Object):Void{
 		_global.breakpoint();
-		_accessibleWorkspaceFoldersDTOCopy = dto;
+
+
+		_accessibleWorkspaceFoldersDTOCopy = ObjectCopy.copy(dto);
+		//this xml will be implementing the TreeDataProvider , see: http://livedocs.macromedia.com/flash/mx2004/main_7_2/wwhelp/wwhimpl/common/html/wwhelp.htm?context=Flash_MX_2004&file=00002902.html
 		_treeDP = new XML();
 		//add top level
 		_treeDP.addTreeNode("My Workspace",0);
@@ -136,17 +146,21 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 			var n = dto.ORGANISATIONS[i];
 			var nNode:XMLNode = orgNode.addTreeNode(n.name,n);
 			nNode.attributes.isBranch = true;
-			_workspaceResources.put(n.resourceID,nNode);
+			setWorkspaceResource(n.resourceType+'_'+n.resourceID,nNode);
 			
 		}	
 				
 		//add the prvate folder:
-		var privateNode:XMLNode = fChild.addTreeNode("Private",dto.PRIVATE);
+		var key = dto.PRIVATE.resourceType+'_'+dto.PRIVATE.resourceID;
+		//TODO:Remove ID when deploy
+		//var privateNode:XMLNode = fChild.addTreeNode("Private",dto.PRIVATE);
+		var privateNode:XMLNode = fChild.addTreeNode("Private:"+key,dto.PRIVATE);
 		privateNode.attributes.isBranch = true;
 		
 		Debugger.log('privateNode.attributes.data.resourceID:'+privateNode.attributes.data.resourceID,Debugger.GEN,'openResourceInTree','org.lamsfoundation.lams.WorkspaceModel');
 		//privateNode.attributes.data = dto.PRIVATE;
-		_workspaceResources.put(dto.PRIVATE.resourceID,privateNode);
+		setWorkspaceResource(key,privateNode);
+		//_workspaceResources.put(dto.PRIVATE.resourceID,privateNode);
 				
 		/*
 		var runNode:XMLNode = fChild.addTreeNode("Run Sequences",dto.RUN_SEQUENCES);
@@ -162,25 +176,24 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 	/**
 	 * Called when the user expands a tree node
 	 * @usage   
-	 * @param   resourceToOpen 
+	 * @param   resourceToOpen ID:Number of resource to open
 	 * @return  
 	 */
-	public function openResourceInTree(resourceToOpen:Number):Void{
-		Debugger.log('resourceToOpen :'+resourceToOpen ,Debugger.GEN,'openResourceInTree','org.lamsfoundation.lams.WorkspaceModel');
+	public function openFolderInTree(resourceToOpen:Number):Void{
+		Debugger.log('resourceToOpen :'+resourceToOpen ,Debugger.GEN,'openFolderInTree','org.lamsfoundation.lams.WorkspaceModel');
 		//lets see if its in the hash table already (prob not)
-		if(_workspaceResources.get(resourceToOpen).attributes.data.contents == undefined){
-			Debugger.log('Requesting...',Debugger.GEN,'openResourceInTree','org.lamsfoundation.lams.WorkspaceModel');
+		//if(_workspaceResources.get(resourceToOpen).attributes.data.contents == undefined){
+			Debugger.log('Requesting...',Debugger.GEN,'openFolderInTree','org.lamsfoundation.lams.WorkspaceModel');
 			//get that resource
-			//TODO: Waiting ofr bqack end to fix up the problems with DB -
 			_workspace.requestFolderContents(resourceToOpen);
 			
 	
-		}else{
-			Debugger.log('Already in hashtable',Debugger.GEN,'openResourceInTree','org.lamsfoundation.lams.WorkspaceModel');
-			//just update the tree
+		//}else{
+		//	Debugger.log('Already in hashtable',Debugger.GEN,'openResourceInTree','org.lamsfoundation.lams.WorkspaceModel');
+			//just update the tree, nothing to do...
 			
 			
-		}
+		//}
 		
 	}
 	
@@ -215,22 +228,27 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 	 */
 	public function setFolderContents(dto:Object){
 		var nodeToUpdate:XMLNode;
-		Debugger.log('dto.workspaceFolderID:'+dto.workspaceFolderID+', parentWorkspaceFolderID:'+dto.parentWorkspaceFolderID,Debugger.GEN,'setFolderContents','org.lamsfoundation.lams.WorkspaceModel');
-		//_global.breakpoint();
-		if(_workspaceResources.containsKey(dto.workspaceFolderID)){
-			nodeToUpdate = _workspaceResources.get(dto.workspaceFolderID);
+		Debugger.log('looking for:Folder_'+dto.workspaceFolderID+', parentWorkspaceFolderID:'+dto.parentWorkspaceFolderID,Debugger.GEN,'setFolderContents','org.lamsfoundation.lams.WorkspaceModel');
+		_global.breakpoint();
+		//if(_workspaceResources.containsKey(dto.workspaceFolderID)){
+		if(getWorkspaceResource('Folder_'+dto.workspaceFolderID)!=null){
+			nodeToUpdate = getWorkspaceResource('Folder_'+dto.workspaceFolderID);
 			Debugger.log('nodeToUpdate.attributes.data.resourceID:'+nodeToUpdate.attributes.data.resourceID,Debugger.GEN,'setFolderContents','org.lamsfoundation.lams.WorkspaceModel');
 			Debugger.log('nodeToUpdate.attributes.data.workspaceFolderID:'+nodeToUpdate.attributes.data.workspaceFolderID,Debugger.GEN,'setFolderContents','org.lamsfoundation.lams.WorkspaceModel');
+
 		}else{
 			//think this wont ever happen as must have been listed by prevous node
-			Debugger.log('Did not find:'+dto.workspaceFolderID+' so creating a new XMLNode - this may/will fail',Debugger.CRITICAL,'setFolderContents','org.lamsfoundation.lams.WorkspaceModel');
-			nodeToUpdate = new XMLNode();
+			Debugger.log('Did not find:'+dto.resourceType+'_'+dto.workspaceFolderID+' so creating a new XMLNode - this may/will fail',Debugger.CRITICAL,'setFolderContents','org.lamsfoundation.lams.WorkspaceModel');
+			return false;
 		}
 		
 		
-		
+		// go throught the contents of DTO and add it aas children to the node to update.
 		for(var i=0; i<dto.contents.length; i++){
-			var cNode = nodeToUpdate.addTreeNode(dto.contents[i].name,dto.contents[i]);
+			var key:String = dto.contents[i].resourceType+'_'+dto.contents[i].resourceID;
+			//TODO: Remove ID from label on demply
+			//var cNode = nodeToUpdate.addTreeNode(dto.contents[i].name,dto.contents[i]);
+			var cNode = nodeToUpdate.addTreeNode(dto.contents[i].name+':'+key,dto.contents[i]);
 			cNode.attributes.data.parentWorkspaceFolderID = dto.parentWorkspaceFolderID;
 			//workspaceFolderID should always be the ID of the folder this resource is contained in
 			cNode.attributes.data.workspaceFolderID = dto.workspaceFolderID;
@@ -244,12 +262,12 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 			}else{
 				
 			}
-			Debugger.log('Adding new node to _workspaceResources ID :'+dto.contents[i].resourceID,Debugger.GEN,'setFolderContents','org.lamsfoundation.lams.WorkspaceModel');
-			_workspaceResources.put(dto.contents[i].resourceID,cNode);
+			Debugger.log('Adding new node to _workspaceResources ID :'+key,Debugger.GEN,'setFolderContents','org.lamsfoundation.lams.WorkspaceModel');
+			setWorkspaceResource(key,cNode);
 		}
 		
 		//dispatch an update to the view
-		broadcastViewUpdate('REFRESH_TREE',nodeToUpdate);
+		broadcastViewUpdate('UPDATE_CHILD_FOLDER',nodeToUpdate);
 		
 		
 		
@@ -257,35 +275,91 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 	
 	/**
 	 * Clears the store of workspace resources - 
-	 * prob could make more granular by passing in a folder ID to clearTODO:
+	 * TODO:prob could make more granular by passing in a folder ID to clear
 	 * @usage   
 	 * @return  
 	 */
-	public function clearWorkspaceCache(){
-		_workspaceResources = new Hashtable();
-		//set up the inital folders again.. use the copy from startup time
-		parseDataForTree(_accessibleWorkspaceFoldersDTOCopy);
+	public function clearWorkspaceCache(folderIDPendingRefresh){
+		Debugger.log('removing children of:'+folderIDPendingRefresh,Debugger.GEN,'clearWorkspaceCache','org.lamsfoundation.lams.WorkspaceModel');
+		
+		//get this node and clear its children
+		var nodeToUpdate:XMLNode;
+		var key:String = 'Folder_'+folderIDPendingRefresh;
+		var wspResource:XMLNode = getWorkspaceResource(key);
+		if(wspResource!=null){
+			if (wspResource.hasChildNodes()) {
+			   var deleteQue:Array = new Array();
+			  //mental. but true - you have to add themn to an array and then delete them from the array, 
+			  //as deleting in the loop them will remove the reference from nextSibling
+			  // also childNodes:Array not seem to work properly.
+			  // use firstChild to iterate through the child nodes of wspResource
+			  for (var aNode:XMLNode = wspResource.firstChild; aNode != null; aNode=aNode.nextSibling) {
+				deleteQue.push(aNode);
+				//var deletedNode:XMLNode = aNode.removeTreeNode();
+			  }
+			  
+			  for(var i=0; i<deleteQue.length;i++){
+				  var deletedNode:XMLNode = deleteQue[i].removeTreeNode();
+				  //Debugger.log('Removed node:'+deletedNode,Debugger.GEN,'clearWorkspaceCache','org.lamsfoundation.lams.WorkspaceModel');
+			  }
+			}else{
+				Debugger.log('No Child nodes to delete',Debugger.GEN,'clearWorkspaceCache','org.lamsfoundation.lams.WorkspaceModel');
+			}
+/*			//this only deletes some children, dont know why, see solution above
+			for(var i=0; i<wspResource.childNodes.length;i++){
+				var deletedNode:XMLNode = wspResource.childNodes[i].removeTreeNode();
+				Debugger.log('Removed node:'+deletedNode,Debugger.GEN,'clearWorkspaceCache','org.lamsfoundation.lams.WorkspaceModel');
+				
+			}
+	*/		
+		}else{
+			//think this wont ever happen as must have been listed by prevous node
+			Debugger.log('Failing! - Did not find folderIDPendingRefresh:'+folderIDPendingRefresh+' Cant do anything',Debugger.CRITICAL,'clearWorkspaceCache','org.lamsfoundation.lams.WorkspaceModel');
+		}
+		
+		broadcastViewUpdate('REFRESH_TREE',null);
+		
 	}
 	
+	public function autoOpenFolderInTree(folderID){
+		var nodeToOpen:XMLNode = getWorkspaceResource('Folder_'+folderID);
+		Debugger.log('Opening node:'+nodeToOpen,Debugger.GEN,'autoOpenFolderInTree','org.lamsfoundation.lams.WorkspaceModel');
+		broadcastViewUpdate('REFRESH_FOLDER',nodeToOpen);
+	}
+	
+	public function setClipboardItem(item:Object,mode:String){
+		//mode not used :-) no cut, only copy functionality this time.
+		_clipboardMode = mode;
+		_clipboard = item;
+		
+	}
+	
+	public function getClipboardItem():Object{
+		return _clipboard;
+	}
+	
+	
+	
 	//getts n setters
-	
-	
 	/**
 	 * 
 	 * @usage   
 	 * @param   newworkpaceResources 
 	 * @return  
 	 */
-	public function set workspaceResources (newworkspaceResources:Hashtable):Void {
-		_workspaceResources = newworkspaceResources;
+	public function setWorkspaceResource(key:String,newworkspaceResources:XMLNode):Void {
+		Debugger.log(key+'='+newworkspaceResources,Debugger.GEN,'setWorkspaceResource','org.lamsfoundation.lams.WorkspaceModel');
+		_workspaceResources[key] = newworkspaceResources;
 	}
 	/**
 	 * 
 	 * @usage   
 	 * @return  
 	 */
-	public function get workspaceResources ():Hashtable {
-		return _workspaceResources;
+	public function getWorkspaceResource(key:String):XMLNode{
+		Debugger.log(key+' is returning '+_workspaceResources[key],Debugger.GEN,'getWorkspaceResource','org.lamsfoundation.lams.WorkspaceModel');
+		return _workspaceResources[key];
+		
 	}
 
 	
@@ -293,6 +367,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 		return _treeDP;
 	}
 
+	
 	
 	/**
 	 * 
@@ -395,6 +470,24 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 	 */
 	public function get currentMode ():String {
 		return _currentMode;
+	}
+	
+	/**
+	 * 
+	 * @usage   
+	 * @param   newfolderIDPendingRefresh 
+	 * @return  
+	 */
+	public function set folderIDPendingRefresh (newfolderIDPendingRefresh:Number):Void {
+		_folderIDPendingRefresh = newfolderIDPendingRefresh;
+	}
+	/**
+	 * 
+	 * @usage   
+	 * @return  
+	 */
+	public function get folderIDPendingRefresh ():Number {
+		return _folderIDPendingRefresh;
 	}
 
 

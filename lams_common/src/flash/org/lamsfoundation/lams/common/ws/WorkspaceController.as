@@ -1,6 +1,7 @@
 ﻿import org.lamsfoundation.lams.common.ws.*
 import org.lamsfoundation.lams.common.mvc.*
 import org.lamsfoundation.lams.common.util.*
+import org.lamsfoundation.lams.common.ui.*
 import mx.utils.*
 
 /*
@@ -9,6 +10,7 @@ import mx.utils.*
 class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractController {
 	
 	private var _workspaceModel:WorkspaceModel;
+	private var _workspaceController:WorkspaceController;
 	/**
 	* Constructor
 	*
@@ -16,6 +18,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
 	*/
 	public function WorkspaceController (wm:Observable) {
 		super (wm);
+		_workspaceController = this;
 		_workspaceModel = WorkspaceModel(wm);
 	}
    
@@ -79,7 +82,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
             //_workspaceModel.getWorkspace().onOKCallback(evt.target.selectedDesignId);
 			
 			//invalidate the cache of folders
-			_workspaceModel.clearWorkspaceCache();
+			_workspaceModel.clearWorkspaceCache(evt.target.resultDTO.targetWorkspaceFolderID);
 			
 			//pass the resultant DTO back to the class that called us.
             _workspaceModel.getWorkspace().onOKCallback(evt.target.resultDTO);
@@ -102,14 +105,14 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
     public function onTreeNodeOpen (evt:Object){
 		var treeview = evt.target;
 		var nodeToOpen:XMLNode = evt.node;
-		
+		Debugger.log('nodeToOpen workspaceFolderID:'+nodeToOpen.attributes.data.workspaceFolderID,Debugger.GEN,'onTreeNodeOpen','org.lamsfoundation.lams.WorkspaceController');
+		Debugger.log('nodeToOpen resourceID:'+nodeToOpen.attributes.data.resourceID,Debugger.GEN,'onTreeNodeOpen','org.lamsfoundation.lams.WorkspaceController');
 		//if this ndoe has children then the 
 		//data has already been got, nothing to do
 		
 		if(!nodeToOpen.hasChildNodes()){
 		
-			Debugger.log('nodeToOpen workspaceFolderID:'+nodeToOpen.attributes.data.workspaceFolderID,Debugger.GEN,'onTreeNodeOpen','org.lamsfoundation.lams.WorkspaceController');
-			Debugger.log('nodeToOpen resourceID:'+nodeToOpen.attributes.data.resourceID,Debugger.GEN,'onTreeNodeOpen','org.lamsfoundation.lams.WorkspaceController');
+			
 			
 			//if the resourceID is null then use the folderID
 			//var resourceToOpen = (nodeToOpen.attributes.data.resourceID) ? nodeToOpen.attributes.data.resourceID : nodeToOpen.attributes.data.workspaceFolderID;
@@ -119,8 +122,11 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
 			
 			
 			//TODO: I think it must be a folder ID, depoends if this event is fired for an "open" reousrce click
-			_workspaceModel.openResourceInTree(resourceToOpen);
+			_workspaceModel.openFolderInTree(resourceToOpen);
 				
+		}else{
+			Debugger.log('nodeToOpen already has children in cache',Debugger.GEN,'onTreeNodeOpen','org.lamsfoundation.lams.WorkspaceController');
+			
 		}
 		
 	   
@@ -147,6 +153,117 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
 		
 		
 	}
+	
+	public function onDragComplete(evt:Object){
+		Debugger.log('type::'+evt.type,Debugger.GEN,'onDragComplete','org.lamsfoundation.lams.WorkspaceController');
+		var treeview = evt.target;
+		//_workspaceModel.setSelectedTreeNode(treeview.selectedNode);
+		
+		
+		
+	}
+	
+	
+	
+		/**
+	 * Handles the events from the cut, copy, paste n delete buttons
+	 * @usage   
+	 * @param   e 
+	 * @return  
+	 */
+	public function fileOperationRequest(e:Object){
+		var tgt:String = new String(e.target);
+		var workspaceDialogue = getView().workspaceDialogue;
+		Debugger.log('type:'+e.type+',target:'+tgt,Debugger.GEN,'fileOperationRequest','org.lamsfoundation.lams.WorkspaceController');
+		//get the selected node:
+		var snode = workspaceDialogue.treeview.selectedNode;
+		
+		//Number(snode.attributes.data.resourceID);
+		//check target for button name
+		/* TODO: Add cut implementation, for now just scrap it :-)
+		if(tgt.indexOf("cut_btn") != -1){
+			_workspaceModel.setClipboardItem(snode,"CUT");
+			//TODO: Be nice to dim the branch in the tree
+			
+		}else 
+		*/
+		_global.breakpoint();
+		if(tgt.indexOf("copy_btn") != -1){
+			_workspaceModel.setClipboardItem(snode.attributes.data);
+			
+		}else if(tgt.indexOf("paste_btn") != -1){
+			var itemToPaste = _workspaceModel.getClipboardItem();
+			if(itemToPaste != null){
+				//find out the selected folderID:
+				//get the selected node:
+				var snodeData = workspaceDialogue.treeview.selectedNode.attributes.data;
+				var selectedFolderID:Number;
+				//if its a folder then the resourceID is the selected folder ID, otherwise its the parent
+				if(snodeData.resourceType == "Folder"){
+					selectedFolderID = snodeData.resourceID;
+				}else{
+					selectedFolderID = snodeData.workspaceFolderID;
+				}
+				
+				_workspaceModel.folderIDPendingRefresh = selectedFolderID;
+				
+				Debugger.log('Selected (target) folder ID=:'+selectedFolderID,Debugger.GEN,'fileOperationRequest','org.lamsfoundation.lams.WorkspaceController');
+				
+				
+					_workspaceModel.getWorkspace().requestCopyResource(itemToPaste.resourceID,selectedFolderID,itemToPaste.resourceType);
+			}else{
+				//nothing to paste..
+			}
+
+		}else if(tgt.indexOf("delete_btn") != -1){
+			//find out the selected folderID:
+			//get the selected node:
+			var snodeData = workspaceDialogue.treeview.selectedNode.attributes.data;
+			_workspaceModel.folderIDPendingRefresh = snodeData.workspaceFolderID;
+			_workspaceModel.getWorkspace().requestDeleteResource(snodeData.resourceID,snodeData.resourceType);
+			
+		}else if(tgt.indexOf("new_btn") != -1){
+			//check we can create a folder here
+			var snodeData = workspaceDialogue.treeview.selectedNode.attributes.data;
+			if(snodeData != null){
+				Dialog.createInputDialog('__Enter the new folder name__', '__OK__', '__Cancel__', Delegate.create(_workspaceController ,setNewFolderName),null);
+			}else{
+				//no where to make new folder
+			}
+			
+			//_workspaceModel.getWorkspace().requestCreateFolder();
+			
+		}
+		//get selected node from the tree
+		
+		//check its ok do do the operation
+			
+		//if so do the operation - sned to controller, balh balhblah  		
+		
+		//invalidate the cahe, re,load the data, refresh the tree
+		
+		
+		//TODO: integrate with key listener for canvas!! CTRL-C is handels by the canvas at the mo... need to set somethign in application.#
+		
+	}
+	
+	public function setNewFolderName(newName:String){
+		Debugger.log('newName:'+newName,Debugger.GEN,'setNewFolderName','org.lamsfoundation.lams.WorkspaceController');
+		var workspaceDialogue = getView().workspaceDialogue;
+		var snodeData = workspaceDialogue.treeview.selectedNode.attributes.data;
+		var selectedFolderID:Number;
+		//if its a folder then the resourceID is the selected folder ID, otherwise its the parent
+		if(snodeData.resourceType == "Folder"){
+			selectedFolderID = snodeData.resourceID;
+		}else{
+			selectedFolderID = snodeData.workspaceFolderID;
+		}
+		_workspaceModel.folderIDPendingRefresh = selectedFolderID;
+		//TODO: Validate is allowed name
+		_workspaceModel.getWorkspace().requestNewFolder(selectedFolderID,newName);
+	}
+	
+	
 	
 	//override the super version
 	public function getView(){

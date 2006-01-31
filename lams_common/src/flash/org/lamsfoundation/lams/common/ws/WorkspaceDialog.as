@@ -7,6 +7,7 @@ import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.common.dict.*
 import org.lamsfoundation.lams.common.style.*
 import org.lamsfoundation.lams.common.ui.*
+import it.sephiroth.TreeDnd;
 /**
 * @author      DI & DC
 */
@@ -21,15 +22,21 @@ class WorkspaceDialog extends MovieClip{
     private var cancel_btn:Button;
     private var panel:MovieClip;            //The underlaying panel base
     
-	private var location_btn:Button;
-    private var properties_btn:Button;
+	private var switchView_tab:TabBar;
 	
 	//location tab elements
 	private var treeview:Tree;              //Treeview for navigation through workspace folder structure
+	private var location_dnd:TreeDnd;
 	private var input_txt:TextInput;
 	private var currentPath_lbl:Label;
 	private var name_lbl:Label;
 	private var resourceTitle_txi:TextInput;
+	private var new_btn:Button;
+	private var cut_btn:Button;
+	private var copy_btn:Button;
+	private var paste_btn:Button;
+	private var delete_btn:Button;
+		
 	
 	//properties
 	private var description_lbl:Label;
@@ -45,6 +52,7 @@ class WorkspaceDialog extends MovieClip{
 	
 	private var _workspaceView:WorkspaceView;
 	private var _workspaceModel:WorkspaceModel;
+	private var _workspaceController:WorkspaceController;
 
     
     //Dimensions for resizing
@@ -90,12 +98,16 @@ class WorkspaceDialog extends MovieClip{
         //Set the container reference
         Debugger.log('container=' + _container,Debugger.GEN,'init','org.lamsfoundation.lams.WorkspaceDialog');
 
-        //Set the text on the labels
+        //set up the tab bar:
+		
+		switchView_tab.addItem({label:Dictionary.getValue('ws_dlg_location_button'), data:'LOCATION'});
+		switchView_tab.addItem({label:Dictionary.getValue('ws_dlg_properties_button'), data:'PROPERTIES'});
+
+		
+		//Set the text on the labels
         
         
         //Set the text for buttons
-		location_btn.label = Dictionary.getValue('ws_dlg_location_button');
-		properties_btn.label = Dictionary.getValue('ws_dlg_properties_button');
         ok_btn.label = Dictionary.getValue('ws_dlg_ok_button');
         cancel_btn.label = Dictionary.getValue('ws_dlg_cancel_button');
 		
@@ -108,11 +120,7 @@ class WorkspaceDialog extends MovieClip{
         
         Debugger.log('ok_btn.tabIndex: '+ok_btn.tabIndex,Debugger.GEN,'init','org.lamsfoundation.lams.WorkspaceDialog');
         
-        //Add event listeners for ok, cancel and close buttons
-        ok_btn.addEventListener('click',Delegate.create(this, ok));
-        cancel_btn.addEventListener('click',Delegate.create(this, cancel));
-		location_btn.addEventListener('click',Delegate.create(this, showLocationTab));
-		properties_btn.addEventListener('click',Delegate.create(this, showPropertiesTab));
+       
         //Tie parent click event (generated on clicking close button) to this instance
         _container.addEventListener('click',this);
         //Register for LFWindow size events
@@ -132,8 +140,8 @@ class WorkspaceDialog extends MovieClip{
         themeManager.addEventListener('themeChanged',this);
 		//TODO: Make setStyles more efficient
 		//setStyles();
-        
-        //Fire contentLoaded event, this is required by all dialogs so that creator of LFWindow can know content loaded
+        treeview = location_dnd.getTree();
+		//Fire contentLoaded event, this is required by all dialogs so that creator of LFWindow can know content loaded
         _container.contentLoaded();
     }
 	
@@ -144,9 +152,28 @@ class WorkspaceDialog extends MovieClip{
 	 */
 	public function setUpContent():Void{
 		
-		
 		//register to recive updates form the model
 		WorkspaceModel(_workspaceView.getModel()).addEventListener('viewUpdate',this);
+		
+		Debugger.log('_workspaceView:'+_workspaceView,Debugger.GEN,'setUpTreeview','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
+		//get a ref to the controller and kkep it here to listen for events:
+		_workspaceController = _workspaceView.getController();
+		Debugger.log('_workspaceController:'+_workspaceController,Debugger.GEN,'setUpTreeview','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
+		
+		
+		 //Add event listeners for ok, cancel and close buttons
+        ok_btn.addEventListener('click',Delegate.create(this, ok));
+        cancel_btn.addEventListener('click',Delegate.create(this, cancel));
+		switchView_tab.addEventListener("change",Delegate.create(this, switchTab));
+		//think this is failing....
+		switchView_tab.setSelectedIndex(0); 
+		
+		new_btn.addEventListener('click',Delegate.create(_workspaceController, _workspaceController.fileOperationRequest));
+		cut_btn.addEventListener('click',Delegate.create(_workspaceController, _workspaceController.fileOperationRequest));
+		copy_btn.addEventListener('click',Delegate.create(_workspaceController, _workspaceController.fileOperationRequest));
+		paste_btn.addEventListener('click',Delegate.create(_workspaceController, _workspaceController.fileOperationRequest));
+		delete_btn.addEventListener('click',Delegate.create(_workspaceController, _workspaceController.fileOperationRequest));
+		
 		
 		//Set up the treeview
         setUpTreeview();
@@ -169,10 +196,18 @@ class WorkspaceDialog extends MovieClip{
 	   switch (event.updateType){
 
 			case 'REFRESH_TREE' :
-                refreshTree(event.data,wm);
+                refreshTree(wm);
                 break;
+			case 'UPDATE_CHILD_FOLDER' :
+				updateChildFolderBranches(event.data,wm);
 			case 'ITEM_SELECTED' :
 				itemSelected(event.data,wm);
+				break;
+			case 'OPEN_FOLDER' :
+				openFolder(event.data, wm);
+				break;
+			case 'REFRESH_FOLDER' :
+				refreshFolder(event.data, wm);
 				break;
 			case 'SHOW_TAB' :
 				showTab(event.data,wm);
@@ -183,8 +218,18 @@ class WorkspaceDialog extends MovieClip{
 
 	}
 	
-	private function refreshTree(changedNode:XMLNode,wm:WorkspaceModel){
-		 Debugger.log('Refreshing tree....:' ,Debugger.GEN,'refreshTree','org.lamsfoundation.lams.ws.WorkspaceDialog');
+	
+	
+	/**
+	 * called witht he result when a child folder is opened..
+	 * updates the tree branch satus, then refreshes.
+	 * @usage   
+	 * @param   changedNode 
+	 * @param   wm          
+	 * @return  
+	 */
+	private function updateChildFolderBranches(changedNode:XMLNode,wm:WorkspaceModel){
+		 Debugger.log('updateChildFolder....:' ,Debugger.GEN,'updateChildFolder','org.lamsfoundation.lams.ws.WorkspaceDialog');
 		 //we have to set the new nodes to be branches, if they are branches
 		if(changedNode.attributes.isBranch){
 			treeview.setIsBranch(changedNode,true);
@@ -196,9 +241,68 @@ class WorkspaceDialog extends MovieClip{
 				}
 			}
 		}
-		 
-		 treeview.refresh();
+		
+		 openFolder(changedNode);
 	}
+	
+	private function refreshTree(){
+		 Debugger.log('Refreshing tree....:' ,Debugger.GEN,'refreshTree','org.lamsfoundation.lams.ws.WorkspaceDialog');
+		
+		
+		 treeview.refresh();// this is USELESS
+
+		//var oBackupDP = treeview.dataProvider;
+		//treeview.dataProvider = null; // clear
+		//treeview.dataProvider = oBackupDP;
+		
+		//treeview.setIsOpen(treeview.getNodeDisplayedAt(0),false);
+		//treeview.setIsOpen(treeview.getNodeDisplayedAt(0),true);
+
+	}
+	
+	/**
+	 * Just opens the fodler node - DOES NOT FIRE EVENT - so is used after updatting the child folder
+	 * @usage   
+	 * @param   nodeToOpen 
+	 * @param   wm         
+	 * @return  
+	 */
+	private function openFolder(nodeToOpen:XMLNode, wm:WorkspaceModel){
+		Debugger.log('openFolder:'+nodeToOpen ,Debugger.GEN,'openFolder','org.lamsfoundation.lams.ws.WorkspaceDialog');
+		//open the node
+		treeview.setIsOpen(nodeToOpen,true);
+		refreshTree();
+	
+	}
+	/**
+	 * Closes folder, then sends openEvent to controller
+	 * @usage   
+	 * @param   nodeToOpen 
+	 * @param   wm         
+	 * @return  
+	 */
+	private function refreshFolder(nodeToOpen:XMLNode, wm:WorkspaceModel){		Debugger.log('refreshFolder:'+nodeToOpen ,Debugger.GEN,'refreshFolder','org.lamsfoundation.lams.ws.WorkspaceDialog');
+		//close the node
+		treeview.setIsOpen(nodeToOpen,false);
+		/*
+		for(var i=0; i<nodeToUpdate.childNodes.length;i++){
+				Debugger.log('deleting node:'+nodeToUpdate.childNodes[i],Debugger.GEN,'clearWorkspaceCache','org.lamsfoundation.lams.WorkspaceModel');
+				nodeToUpdate.childNodes[i].removeNode();
+				
+		}
+		*/
+		
+		//treeview.setIsOpen(nodeToOpen,true);
+		
+		//we are gonna need to fire the event manually for some stupid reason the tree is not firing it.
+		//dispatchEvent({type:'nodeOpen',target:treeview,node:nodeToOpen});
+		_workspaceController = _workspaceView.getController();
+		_workspaceController.onTreeNodeOpen({type:'nodeOpen',target:treeview,node:nodeToOpen});
+		//var treeview = evt.target;
+		//var nodeToOpen:XMLNode = evt.node;
+		//refreshTree();
+	}
+	
 	
 	private function itemSelected(newSelectedNode:XMLNode,wm:WorkspaceModel){
 		//update the UI with the new info:
@@ -230,6 +334,12 @@ class WorkspaceDialog extends MovieClip{
 		currentPath_lbl.visible = v;
 		name_lbl.visible = v;
 		resourceTitle_txi.visible = v;
+		new_btn.visible = v;
+		cut_btn.visible = v;
+		copy_btn.visible = v;
+		paste_btn.visible = v;
+		delete_btn.visible = v;
+	
 		
 	
 	}
@@ -257,21 +367,23 @@ class WorkspaceDialog extends MovieClip{
 		if(tabToSelect == "LOCATION"){
 			setLocationContentVisible(true);
 			setPropertiesContentVisible(false);
-			//set the right label on the 'doit' button
-			if(wm.currentMode=="OPEN"){
-				ok_btn.label = Dictionary.getValue('ws_dlg_open_btn');
-			}else if(wm.currentMode=="SAVE" || wm.currentMode=="SAVEAS"){
-				ok_btn.label = Dictionary.getValue('ws_dlg_save_btn');
-			}else{
-				Debugger.log('Dont know what mode the Workspace is in!',Debugger.CRITICAL,'showTab','org.lamsfoundation.lams.ws.WorkspaceDialog');
-				ok_btn.label = Dictionary.getValue('ws_dlg_ok_btn');
-			}
+			
 				
 				
 		}else if(tabToSelect == "PROPERTIES"){
 			setLocationContentVisible(false);
 			setPropertiesContentVisible(true);
 			
+		
+		}
+		
+		//set the right label on the 'doit' button
+		if(wm.currentMode=="OPEN"){
+			ok_btn.label = Dictionary.getValue('ws_dlg_open_btn');
+		}else if(wm.currentMode=="SAVE" || wm.currentMode=="SAVEAS"){
+			ok_btn.label = Dictionary.getValue('ws_dlg_save_btn');
+		}else{
+			Debugger.log('Dont know what mode the Workspace is in!',Debugger.CRITICAL,'showTab','org.lamsfoundation.lams.ws.WorkspaceDialog');
 			ok_btn.label = Dictionary.getValue('ws_dlg_ok_btn');
 		}
 	}
@@ -390,13 +502,16 @@ class WorkspaceDialog extends MovieClip{
 		var snode = treeview.selectedNode;
 		
 		if(useResourceID){
+			//its an LD
 			_resultDTO.selectedResourceID = Number(snode.attributes.data.resourceID);
-			
+			_resultDTO.targetWorkspaceFolderID = Number(snode.attributes.data.workspaceFolderID);
 		}else{
+			//its a folder
 			_resultDTO.selectedResourceID  = null;
+			_resultDTO.targetWorkspaceFolderID = Number(snode.attributes.data.resourceID);
 			
 		}
-		_resultDTO.targetWorkspaceFolderID = Number(snode.attributes.data.resourceID);
+		
 		_resultDTO.resourceName = resourceTitle_txi.text;
 		_resultDTO.resourceDescription = resourceDesc_txa.text;
 		_resultDTO.resourceLicenseText = license_txa.text;
@@ -416,15 +531,20 @@ class WorkspaceDialog extends MovieClip{
 	
 	//TODO: maan must be able to just send a single event type and detect the name od the button
 	
-	private function showLocationTab(){
-		
-		//send to wsp controller
-		dispatchEvent({type:'locationTabClick',target:this});
-	}
+
 	
-	private function showPropertiesTab(){
-		
-		dispatchEvent({type:'propertiesTabClick',target:this});
+	private function switchTab(e){
+		Debugger.log('Switch tab called!',Debugger.GEN,'switchTab','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
+		if(e.newIndex == 0){			
+			dispatchEvent({type:'locationTabClick',target:this});
+		}else if(e.newIndex ==1){
+			dispatchEvent({type:'propertiesTabClick',target:this});
+		}
+		/*
+		for (var item:String in e) {	
+			trace("Item: " + item + "=" + e[item]);
+		}
+		*/
 	}
     
     /**
@@ -434,7 +554,8 @@ class WorkspaceDialog extends MovieClip{
         trace('WorkspaceDialog.click');
         e.target.deletePopUp();
     }
-    
+	
+
 	/**
 	 * Recursive function to set any folder with children to be a branch
 	 * TODO: Might / will have to change this behaviour once designs are being returned into the mix
@@ -515,15 +636,24 @@ class WorkspaceDialog extends MovieClip{
 		
 		
 		
-		Debugger.log('_workspaceView:'+_workspaceView,Debugger.GEN,'setUpTreeview','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
-		var wsc:WorkspaceController = _workspaceView.getController();
-		Debugger.log('wsc:'+wsc,Debugger.GEN,'setUpTreeview','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
-		Debugger.log('wsc.onTreeNodeOpen:'+wsc.onTreeNodeOpen,Debugger.GEN,'setUpTreeview','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
+
+		Debugger.log('_workspaceController.onTreeNodeOpen:'+_workspaceController.onTreeNodeOpen,Debugger.GEN,'setUpTreeview','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
 		
 		
-		treeview.addEventListener("nodeOpen", Delegate.create(wsc, wsc.onTreeNodeOpen));
-		treeview.addEventListener("nodeClose", Delegate.create(wsc, wsc.onTreeNodeClose));
-		treeview.addEventListener("change", Delegate.create(wsc, wsc.onTreeNodeChange));
+		treeview.addEventListener("nodeOpen", Delegate.create(_workspaceController, _workspaceController.onTreeNodeOpen));
+		treeview.addEventListener("nodeClose", Delegate.create(_workspaceController, _workspaceController.onTreeNodeClose));
+		treeview.addEventListener("change", Delegate.create(_workspaceController, _workspaceController.onTreeNodeChange));
+
+		//location_dnd.addEventListener('double_click', dndList);
+		//location_dnd.addEventListener('drag_start', dndList);
+		//location_dnd.addEventListener('drag_fail', dndList);
+		
+		//location_dnd.addEventListener('drag_target', dndList);
+		location_dnd.addEventListener("drag_complete", Delegate.create(_workspaceController, _workspaceController.onDragComplete));
+		//location_dnd.addEventListener('drag_complete', dndList);
+		//use the above event, on comlete the drop, send the request to do the move to the server (evt.targetNode);
+		//then immediatly invlaidate the cache.  then server may return error if therrte is a problem, else new details willbe shown
+		
 		
 		treeview.refresh();
 		
