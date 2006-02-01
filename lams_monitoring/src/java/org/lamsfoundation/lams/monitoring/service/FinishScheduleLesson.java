@@ -55,7 +55,7 @@ public class FinishScheduleLesson extends QuartzJobBean{
             log.debug("Lesson ["+lessonId+"] is stopping...");
         
 		
-		monitoringService.archiveLesson(lessonId);
+		monitoringService.finishLesson(lessonId);
         
         if(log.isDebugEnabled())
             log.debug("Lesson ["+lessonId+"] stopped");

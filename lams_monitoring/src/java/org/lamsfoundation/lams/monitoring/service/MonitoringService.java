@@ -416,6 +416,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         //start the scheduling job
         try
         {
+        	setLessonStatus(lessonId,Lesson.NOT_STARTED_STATE);
             scheduler.scheduleJob(startLessonJob, startLessonTrigger);
         }
         catch (SchedulerException e)
@@ -427,7 +428,8 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         if(log.isDebugEnabled())
             log.debug("Start lesson  ["+lessonId+"] on schedule is configured");
     }
-    
+
+
     /**
      * Start lesson on schedule.
      * @param lessonId
@@ -497,22 +499,41 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         if(log.isDebugEnabled())
             log.debug("=============Lesson "+lessonId+" started===============");
     }
-
+    /**
+     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#finishLesson(long)
+     */
+	public void finishLesson(long lessonId) {
+		setLessonStatus(lessonId,Lesson.FINISHED_STATE);
+	}
     /**
      * Archive the specified the lesson. When archived, the data is retained
      * but the learners cannot access the details. 
      * @param lessonId the specified the lesson id.
      */
     public void archiveLesson(long lessonId) {
+    	setLessonStatus(lessonId,Lesson.ARCHIVED_STATE);
 
-        Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
-        if ( requestedLesson == null) {
-        	throw new MonitoringServiceException("Lesson for id="+lessonId+" is missing. Unable to archive lesson.");
-        }
-
-        requestedLesson.setLessonStateId(Lesson.ARCHIVED_STATE);
-        lessonDAO.updateLesson(requestedLesson);
-
+    }
+    /**
+     * Set lesson status to given status value. The stauts value will be one value of class level in   
+     * org.lamsfoundation.lams.lesson.Lesson.
+     *  
+     * @param lessonId
+     * @param status
+     */
+    private void setLessonStatus(long lessonId,Integer status) {
+    	
+    	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
+    	if( status == null ){
+    		throw new MonitoringServiceException("Lesson status is required");
+    	}
+    	if ( requestedLesson == null ) {
+    		throw new MonitoringServiceException("Lesson for id="+lessonId+" is missing. Unable to set lesson status to "+ status.intValue());
+    	}
+    	
+    	requestedLesson.setLessonStateId(status);
+    	lessonDAO.updateLesson(requestedLesson);
+    	
     }
     /**
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#removeLesson(long)
@@ -1285,4 +1306,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     	
     	return learningDesignDAO.getLearningDesignByUserId(userId);
     }
+	public void performChosenGrouping(GroupingActivity groupingActivity, List groups) {
+		
+	}
 }

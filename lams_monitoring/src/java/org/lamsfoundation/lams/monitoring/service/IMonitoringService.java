@@ -26,6 +26,7 @@ import java.util.List;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
+import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.Organisation;
@@ -111,6 +112,17 @@ public interface IMonitoringService
      */
     public void finishLessonOnSchedule(long lessonId, Date endDate);
     /**
+     * Finish a lesson.A Finished lesson can be viewed on the monitoring interface. 
+     * It should be an "inactive" lesson. A Finished lesson is listed on the learner 
+     * interface but all the learner can do is view the progress bar and do an 
+     * export portfolio - they cannot access any of the tool screens.
+     *  
+     * @param lessonId
+     * @param endDate teh lesson end date and time.
+     */
+    public void finishLesson(long lessonId);
+    
+    /**
      * Force Complete works on an individual user. The teacher may complete it up to a particular activity, 
      * or till the end of the sequence which activity id is null indicating complete to end. Note, the give 
      * activity will be complete as well.
@@ -124,7 +136,7 @@ public interface IMonitoringService
     public String forceCompleteLessonByUser(Integer learnerId,long lessonId,Long activityId);
     
     /**
-     * Archive the specified the lesson. When archived, the data is retained
+     * Archive the specified lesson. When archived, the data is retained
      * but the learners cannot access the details. 
      * @param lessonId the specified the lesson id.
      */
@@ -350,10 +362,16 @@ public interface IMonitoringService
      */
     public String releaseGate(Long activityID) throws IOException;
     
+    /**
+     * 
+     * @param groupingActivity
+     * @param groups
+     */
+    public void performChosenGrouping(GroupingActivity groupingActivity, List groups);
+    
     /* TODO Dummy methods - to be removed */
     public List getOrganisationsUsers(Integer userId);
     public List getLearningDesigns(Long userId);
-
 
 
 }
