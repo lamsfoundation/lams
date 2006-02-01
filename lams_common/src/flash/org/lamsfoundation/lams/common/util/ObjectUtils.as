@@ -18,31 +18,34 @@ class org.lamsfoundation.lams.common.util.ObjectUtils{
 	* @return  
 	*/
 	public static function printObject(target):String{  
+		var str:String = "";
 		for(var o in target){  
 			//trace('object:' + o  + ' value:' + target[o]);  
-			var str:String = "";
+			
 			
 			Debugger.log(o  + ':' + target[o],Debugger.GEN,'printObject','org.lamsfoundation.lams.common.util.ObjectUtils');
 			str += o  + ':' + target[o];
 			printObject(target[o]);  
 		}  
+		
 		return str;  
 	}
 	
 	/**
-	* Recursively goes through and object and prints out property values
+	* Recursively goes through and object and returns string out property values
 	* @usage   printObject(_global);
 	* @param   target 
 	* @return  
 	*/
-	public static function toString(target):String{  
+	public static function toString(target):String{ 
+		var str:String = "";
 		for(var o in target){  
 			//trace('object:' + o  + ' value:' + target[o]);  
-			var str:String = "";
+			
 			
 			//Debugger.log(o  + ':' + target[o],Debugger.GEN,'printObject','org.lamsfoundation.lams.common.util.ObjectUtils');
 			str += o  + ':' + target[o];
-			printObject(target[o]);  
+			toString(target[o]);  
 		}  
 		return str;  
 	}
@@ -111,5 +114,6 @@ class org.lamsfoundation.lams.common.util.ObjectUtils{
 		}
 		
 	}
+	
 	
 }
