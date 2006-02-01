@@ -90,35 +90,36 @@ class org.lamsfoundation.lams.common.ws.Workspace {
 	 */
 	public function requestCopyResource(resourceID:Number,targetFolderID:Number,resourceType:String){
 		Debugger.log(resourceID+',to folder '+targetFolderID+','+resourceType,Debugger.GEN,'copyResourceResponse','Workspace');			
-		var callback:Function = Proxy.create(this,copyResourceResponse);
+		var callback:Function = Proxy.create(this,generalWorkspaceOperationResponseHandler);
         var uid:Number = Config.getInstance().userID;
 		Application.getInstance().getComms().getRequest('workspace.do?method=copyResource&resourceID='+resourceID+'&targetFolderID='+targetFolderID+'&resourceType='+resourceType+'&userID='+uid,callback, false);
 		//http://localhost:8080/lams/workspace.do?method=copyResource&resourceID=10&targetFolderID=6&resourceType=FOLDER&userID=4
 	}
 	
-	public function copyResourceResponse(dto:Object):Void{
+	public function generalWorkspaceOperationResponseHandler(dto:Object){
 		if(dto instanceof LFError){
 			dto.showErrorAlert();
+			
 		}
-		Debugger.log('New resourceID:'+dto,Debugger.GEN,'copyResourceResponse','Workspace');
+		//make a copy as the function deletes it after its finished.
+		var toRefresh = workspaceModel.folderIDPendingRefresh;
+		Debugger.log('reponse ID:'+dto,Debugger.GEN,'generalWorkspaceOperationResponseHandler','Workspace');
 		//pass the folder that contained this resource
 		
 		workspaceModel.clearWorkspaceCache(workspaceModel.folderIDPendingRefresh);
 		//now open this node in the tree
-		workspaceModel.autoOpenFolderInTree(workspaceModel.folderIDPendingRefresh);
+		workspaceModel.autoOpenFolderInTree(toRefresh);
 		
-				// if it comes back ok, clear the clipboard & refresh
-		// if not, alertUser
 	}
 	
 	public function requestDeleteResource(resourceID:Number,resourceType:String){
 		Debugger.log('resourceID:'+resourceID+', resourceType'+resourceType,Debugger.GEN,'copyResourceResponse','Workspace');			
-		var callback:Function = Proxy.create(this,deleteResourceResponse);
+		var callback:Function = Proxy.create(this,generalWorkspaceOperationResponseHandler);
         var uid:Number = Config.getInstance().userID;
 		Application.getInstance().getComms().getRequest('workspace.do?method=deleteResource&resourceID='+resourceID+'&resourceType='+resourceType+'&userID='+uid,callback, false);
 		
 	}
-	
+	/*
 	public function deleteResourceResponse(dto:Object){
 		if(dto instanceof LFError){
 			dto.showErrorAlert();
@@ -127,15 +128,15 @@ class org.lamsfoundation.lams.common.ws.Workspace {
 		//now open this node in the tree
 		workspaceModel.autoOpenFolderInTree(workspaceModel.folderIDPendingRefresh);
 	}
-	
+	*/
 	public function requestNewFolder(parentFolderID:Number,folderName:String){
 		Debugger.log('parentFolderID:'+parentFolderID+', folderName'+folderName,Debugger.GEN,'requestNewFolder','Workspace');			
-		var callback:Function = Proxy.create(this,requestNewFolderResponse);
+		var callback:Function = Proxy.create(this,generalWorkspaceOperationResponseHandler);
         var uid:Number = Config.getInstance().userID;
 		Application.getInstance().getComms().getRequest('workspace.do?method=createFolderForFlash&parentFolderID='+parentFolderID+'&name='+folderName+'&userID='+uid,callback, false);
 		
 	}
-	
+	/*
 	public function requestNewFolderResponse(dto:Object){
 		if(dto instanceof LFError){
 			dto.showErrorAlert();
@@ -144,7 +145,39 @@ class org.lamsfoundation.lams.common.ws.Workspace {
 		//now open this node in the tree
 		workspaceModel.autoOpenFolderInTree(workspaceModel.folderIDPendingRefresh);
 	}
+	*/
+	public function requestRenameResource(resourceID:Number,resourceType:Number,newName:String){
+		Debugger.log('resourceID:'+resourceID+', resourceType'+resourceType+', newName:'+newName,Debugger.GEN,'requestRenameResource','Workspace');			
+		var callback:Function = Proxy.create(this,generalWorkspaceOperationResponseHandler);
+        var uid:Number = Config.getInstance().userID;
+		Application.getInstance().getComms().getRequest('workspace.do?method=renameResource&resourceID='+resourceID+'&resourceType='+resourceType+'&name='+newName+'&userID='+uid,callback, false);
+	}
+	/*
+	public function requestRenameResourceResponse(dto){
+		if(dto instanceof LFError){
+			dto.showErrorAlert();
+		}
+		workspaceModel.clearWorkspaceCache(workspaceModel.folderIDPendingRefresh);
+		//now open this node in the tree
+		workspaceModel.autoOpenFolderInTree(workspaceModel.folderIDPendingRefresh);
+	}
+	*/
+	public function requestMoveResource(resourceID:Number, targetFolderID:Number, resourceType:String){
+		Debugger.log('resourceID:'+resourceID+', resourceType'+resourceType+', targetFolderID:'+targetFolderID,Debugger.GEN,'requestMoveResource','Workspace');			
+		var callback:Function = Proxy.create(this,requestMoveResourceResponse);
+        var uid:Number = Config.getInstance().userID;
+		Application.getInstance().getComms().getRequest('workspace.do?method=moveResource&resourceID='+resourceID+'&resourceType='+resourceType+'&targetFolderID='+targetFolderID+'&userID='+uid,callback, false);
+	}
 	
+	public function requestMoveResourceResponse(dto){
+		if(dto instanceof LFError){
+			dto.showErrorAlert();
+		}
+		
+		workspaceModel.clearWorkspaceCacheMultiple();
+
+		
+	}
 	
 	/**
 	 * Retrieves the available folders:
