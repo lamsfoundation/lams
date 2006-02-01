@@ -55,6 +55,11 @@ class org.lamsfoundation.lams.common.ui.InputDialog extends MovieClip implements
         delete this.onEnterFrame;
 		ok_btn.addEventListener('click',Delegate.create(this, ok));
         cancel_btn.addEventListener('click',Delegate.create(this, cancel));
+		
+		//get focus manager + set focus to OK button, focus manager is available to all components through getFocusManager
+        fm = _container.getFocusManager();
+        fm.enabled = true;
+        input_txi.setFocus();
         //Set the text for buttons
     //    ok_btn.label = Dictionary.getValue('input_dlg_ok');
       //  cancel_btn.label = Dictionary.getValue('input_dlg_cancel');
