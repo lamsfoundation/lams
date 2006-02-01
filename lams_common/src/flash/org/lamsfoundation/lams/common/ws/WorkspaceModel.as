@@ -1,6 +1,7 @@
 ﻿import org.lamsfoundation.lams.common.util.Observable;
 import org.lamsfoundation.lams.common.ws.*;
 import org.lamsfoundation.lams.common.util.*
+import org.lamsfoundation.lams.common.dict.*
 //import mx.utils.ObjectCopy;
 import mx.events.*
 import mx.utils.*
@@ -8,6 +9,18 @@ import mx.utils.*
 * Model for the Canvas
 */
 class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
+	public var RT_FOLDER:String = "Folder";
+	public var RT_LD:String = "LearningDesign";
+	public var RT_LESSON:String = "Lesson";
+	public var RT_FILE:String = "File";
+	
+	
+	public var READ_ACCESS:Number = 1;
+	public var MEMBERSHIP_ACCESS:Number = 2;
+	public var OWNER_ACCESS:Number = 3;
+	public var NO_ACCESS:Number = 4;
+	
+
 	//ref to the wsp containter
 	private var _workspace:Workspace;
 	//private data
@@ -32,6 +45,9 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 	private var _clipboard:Object;
 	private var _clipboardMode:String; // tells us if its a cut or copy 
 	private var _folderIDPendingRefresh:Number; // The ID of the folder an operation has just been done on, will be refreshed...
+	private var _folderIDPendingRefreshList:Array; // The List of ID of the folder an operation has just been done on, will be refreshed...
+	
+
 	
 
 	
@@ -136,10 +152,36 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 		//this xml will be implementing the TreeDataProvider , see: http://livedocs.macromedia.com/flash/mx2004/main_7_2/wwhelp/wwhimpl/common/html/wwhelp.htm?context=Flash_MX_2004&file=00002902.html
 		_treeDP = new XML();
 		//add top level
-		_treeDP.addTreeNode("My Workspace",0);
+		//create the data obj:
+		var mdto= {};
+		mdto.creationDateTime = new Date(null);
+		mdto.description = "";
+		mdto.lastModifiedDateTime = new Date(null);
+		mdto.name =  Dictionary.getValue('ws_tree_mywsp');
+		mdto.parentWorkspaceFolderID = null;
+		//read only
+		mdto.permissionCode = 1;
+		mdto.resourceID = "x1";
+		mdto.resourceType = "Folder";
+		mdto.workspaceFolderID = null;
+		
+		
+		_treeDP.addTreeNode(mdto.name,mdto);
+		
 		//add org folder container
 		var fChild:XMLNode = _treeDP.firstChild;
-		var orgNode:XMLNode = fChild.addTreeNode("Organisations",null);
+		var o_oto = {};
+		o_oto.creationDateTime = new Date(null);
+		o_oto.description = "";
+		o_oto.lastModifiedDateTime = new Date(null);
+		o_oto.name = Dictionary.getValue('ws_tree_orgs');
+		o_oto.parentWorkspaceFolderID = null;
+		//read only
+		o_oto.permissionCode = 1;
+		o_oto.resourceID = "x2";
+		o_oto.resourceType = "Folder";
+		o_oto.workspaceFolderID = "x1";
+		var orgNode:XMLNode = fChild.addTreeNode(o_oto.name,o_oto);
 		orgNode.attributes.isBranch = true;
 				
 		for(var i=0;i<dto.ORGANISATIONS.length;i++){
@@ -152,8 +194,8 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 				
 		//add the prvate folder:
 		var key = dto.PRIVATE.resourceType+'_'+dto.PRIVATE.resourceID;
-		//TODO:Remove ID when deploy
-		//var privateNode:XMLNode = fChild.addTreeNode("Private",dto.PRIVATE);
+		
+		dto.PRIVATE.workspaceFolderID="x1";
 		var privateNode:XMLNode = fChild.addTreeNode("Private:"+key,dto.PRIVATE);
 		privateNode.attributes.isBranch = true;
 		
@@ -253,7 +295,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 			//workspaceFolderID should always be the ID of the folder this resource is contained in
 			cNode.attributes.data.workspaceFolderID = dto.workspaceFolderID;
 			//check if its a folder
-			if(dto.contents[i].resourceType=="Folder"){
+			if(dto.contents[i].resourceType==RT_FOLDER){
 				cNode.attributes.isBranch=true;
 				//copy the resourceID to folderID
 				//thisnk there is no need for this line! it might be wrong./.
@@ -280,6 +322,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 	 * @return  
 	 */
 	public function clearWorkspaceCache(folderIDPendingRefresh){
+		
 		Debugger.log('removing children of:'+folderIDPendingRefresh,Debugger.GEN,'clearWorkspaceCache','org.lamsfoundation.lams.WorkspaceModel');
 		
 		//get this node and clear its children
@@ -305,6 +348,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 			}else{
 				Debugger.log('No Child nodes to delete',Debugger.GEN,'clearWorkspaceCache','org.lamsfoundation.lams.WorkspaceModel');
 			}
+			_folderIDPendingRefresh = null;
 /*			//this only deletes some children, dont know why, see solution above
 			for(var i=0; i<wspResource.childNodes.length;i++){
 				var deletedNode:XMLNode = wspResource.childNodes[i].removeTreeNode();
@@ -321,6 +365,20 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 		
 	}
 	
+	public function clearWorkspaceCacheMultiple(){
+		if(_folderIDPendingRefreshList != null){
+			for (var i=0;i<_folderIDPendingRefreshList.length;i++){
+				clearWorkspaceCache(_folderIDPendingRefreshList[i]);
+				//now open this node in the tree
+				autoOpenFolderInTree(_folderIDPendingRefreshList[i]);
+			}
+			_folderIDPendingRefreshList = new Array();
+		}else{
+			//raise error
+		}
+	}
+	
+
 	public function autoOpenFolderInTree(folderID){
 		var nodeToOpen:XMLNode = getWorkspaceResource('Folder_'+folderID);
 		Debugger.log('Opening node:'+nodeToOpen,Debugger.GEN,'autoOpenFolderInTree','org.lamsfoundation.lams.WorkspaceModel');
@@ -336,6 +394,36 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 	
 	public function getClipboardItem():Object{
 		return _clipboard;
+	}
+	
+	/**
+	 * Checks to see if the user can wrote to this resource
+	 * If the resource is a folder, then can we write inside it
+	 * If the resource is a file/Design then can we overwrite it.
+	 * @usage   
+	 * @param   resourceType 
+	 * @param   resourceID   
+	 * @return  
+	 */
+	public function isWritableResource(resourceType,resourceID){
+		var rData = getWorkspaceResource(resourceType+'_'+resourceID).attributes.data;
+		Debugger.log(resourceType+'_'+resourceID+'has permission code:'+rData.permissionCode,Debugger.GEN,'isWritableResource','org.lamsfoundation.lams.WorkspaceModel');
+		if(rData.permissionCode == READ_ACCESS){
+			return false;
+		}
+		if(rData.permissionCode == MEMBERSHIP_ACCESS){
+			return false;
+		}
+		if(rData.permissionCode == OWNER_ACCESS){
+			return true;
+		}
+		if(rData.permissionCode == NO_ACCESS){
+			return false;
+		}
+		if(rData.permissionCode == undefined || rData.permissionCode == null){
+			return false;
+		}
+	
 	}
 	
 	
@@ -490,5 +578,23 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 		return _folderIDPendingRefresh;
 	}
 
+
+	/**
+	 * 
+	 * @usage   
+	 * @param   newfolderIDPendingRefreshList 
+	 * @return  
+	 */
+	public function set folderIDPendingRefreshList (newfolderIDPendingRefreshList:Array):Void {
+		_folderIDPendingRefreshList = newfolderIDPendingRefreshList;
+	}
+	/**
+	 * 
+	 * @usage   
+	 * @return  
+	 */
+	public function get folderIDPendingRefreshList ():Array{
+		return _folderIDPendingRefreshList;
+	}
 
 }
