@@ -359,6 +359,79 @@ public class MonitoringAction extends LamsDispatchAction
         return outputPacket(mapping,request,response,message,"details");
     }
     /**
+     * The purpose of suspending is to hide the lesson from learners temporarily. 
+     * It doesn't make any sense to suspend a created or a not started (ie scheduled) 
+     * lesson as they will not be shown on the learner interface anyway! If the teacher 
+     * tries to suspend a lesson that is not in the STARTED_STATE, then an error should 
+     * be returned to Flash. 
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     */
+    public ActionForward suspendLesson(ActionMapping mapping,
+    		ActionForm form,
+    		HttpServletRequest request,
+    		HttpServletResponse response) throws IOException,
+    		ServletException
+    		{
+    	FlashMessage flashMessage = null;
+    	this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+    	long lessonId = WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID);
+    	
+    	try {
+    		monitoringService.suspendLesson(lessonId);
+    		flashMessage = new FlashMessage("suspendLesson",Boolean.TRUE);
+    	} catch (Exception e) {
+    		flashMessage = new FlashMessage("suspendLesson",
+    				"Error occurs :" +  e.getMessage(),
+    				FlashMessage.ERROR);
+    	}
+    	
+    	String message =  flashMessage.serializeMessage();
+    	
+    	return outputPacket(mapping,request,response,message,"details");
+    }
+    /**
+     * Unsuspend a lesson which state must be Lesson.SUPSENDED_STATE. Otherwise a error message will return to 
+     * flash client.
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     */
+    public ActionForward unsuspendLesson(ActionMapping mapping,
+    		ActionForm form,
+    		HttpServletRequest request,
+    		HttpServletResponse response) throws IOException,
+    		ServletException
+    		{
+    	FlashMessage flashMessage = null;
+    	this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+    	long lessonId = WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID);
+    	
+    	try {
+    		monitoringService.unsuspendLesson(lessonId);
+    		flashMessage = new FlashMessage("unsuspendLesson",Boolean.TRUE);
+    	} catch (Exception e) {
+    		flashMessage = new FlashMessage("unsuspendLesson",
+    				"Error occurs :" +  e.getMessage(),
+    				FlashMessage.ERROR);
+    	}
+    	
+    	String message =  flashMessage.serializeMessage();
+    	
+    	return outputPacket(mapping,request,response,message,"details");
+    		}
+    /**
      * <P>
      * The STRUTS action will send back a WDDX message after marking the lesson by the given lesson ID
      * as <code>Lesson.DISABLED_STATE</code> status.

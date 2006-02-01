@@ -141,7 +141,18 @@ public interface IMonitoringService
      * @param lessonId the specified the lesson id.
      */
     public void archiveLesson(long lessonId);
-
+    /**
+     * A lesson can only be suspended if it is started. The purpose of suspending is 
+     * to hide the lesson from learners temporarily. If the teacher tries to suspend a lesson that 
+     * is not in the STARTED_STATE, then an error should be returned. 
+     * @param lessonId the lesson ID which will be suspended.
+     */
+    public void suspendLesson(long lessonId);
+    /**
+     * Unsuspend a lesson, which state must be Lesson.SUSPEND_STATE. Otherwise an exception will be thrown.
+     * @param lessonId
+     */
+    public void unsuspendLesson(long lessonId);
 
     /**
      * <P>
@@ -372,6 +383,7 @@ public interface IMonitoringService
     /* TODO Dummy methods - to be removed */
     public List getOrganisationsUsers(Integer userId);
     public List getLearningDesigns(Long userId);
+	
 
 
 }
