@@ -2,6 +2,7 @@
 import org.lamsfoundation.lams.common.mvc.*
 import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.common.ui.*
+import org.lamsfoundation.lams.common.dict.*
 import mx.utils.*
 
 /*
@@ -156,8 +157,60 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
 	
 	public function onDragComplete(evt:Object){
 		Debugger.log('type::'+evt.type,Debugger.GEN,'onDragComplete','org.lamsfoundation.lams.WorkspaceController');
+		//this event should contain: {type:"drag_complete", target: this.tree, sourceNode: node, targetNode: this.__targetNode.item}
 		var treeview = evt.target;
-		//_workspaceModel.setSelectedTreeNode(treeview.selectedNode);
+		//var snodeData = treeview.selectedNode.attributes.data;
+		
+		//targetNode is the folder or resource that the source was dropped onto
+		var targetNodeData = evt.targetNode.attributes.data;
+		//source node is the ndie that was picked up.
+		var sourceNodeData = evt.sourceNode.attributes.data;
+		var targetFolderID:Number;
+		
+		//Find where we are to copy to
+		//if its a folder then the resourceID is the selected folder ID, otherwise its the parent
+		if(targetNodeData.resourceType == _workspaceModel.RT_FOLDER){
+			targetFolderID= targetNodeData.resourceID;
+		}else{
+			targetFolderID= targetNodeData.workspaceFolderID;
+		}
+		
+		//check the permission code for that folder
+		var isWritable = _workspaceModel.isWritableResource(_workspaceModel.RT_FOLDER,targetFolderID);
+		
+		
+		
+		var sourceFolderID:Number;
+		if(sourceNodeData.resourceType == _workspaceModel.RT_FOLDER){
+			sourceFolderID= sourceNodeData.resourceID;
+		}else{
+			sourceFolderID= sourceNodeData.workspaceFolderID;
+		}
+		
+		
+		//must clear the entire cache as both the source and target folders need to be refreshed
+		_workspaceModel.folderIDPendingRefresh = null;
+		_workspaceModel.folderIDPendingRefreshList = new Array(targetFolderID,sourceFolderID);
+		
+		
+		Debugger.log('SourceNode:\n'+ObjectUtils.toString(sourceNodeData),Debugger.GEN,'onDragComplete','org.lamsfoundation.lams.WorkspaceController');
+		
+		Debugger.log('TargetNode:\n'+ObjectUtils.toString(targetNodeData),Debugger.GEN,'onDragComplete','org.lamsfoundation.lams.WorkspaceController');
+		
+		
+		
+		
+		//ok we are going to do a move:
+		if(isWritable){
+			_workspaceModel.getWorkspace().requestMoveResource(sourceNodeData.resourceID, targetFolderID, sourceNodeData.resourceType);
+		}else{
+			//show an alert();
+			LFMessage.showMessageAlert(Dictionary.getValue('ws_no_permission'),null,null);
+			//we still have to refresh the folders as the DnD tree will be showing wrong info
+			_workspaceModel.clearWorkspaceCacheMultiple();
+		}
+		
+		
 		
 		
 		
@@ -199,7 +252,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
 				var snodeData = workspaceDialogue.treeview.selectedNode.attributes.data;
 				var selectedFolderID:Number;
 				//if its a folder then the resourceID is the selected folder ID, otherwise its the parent
-				if(snodeData.resourceType == "Folder"){
+				if(snodeData.resourceType == _workspaceModel.RT_FOLDER){
 					selectedFolderID = snodeData.resourceID;
 				}else{
 					selectedFolderID = snodeData.workspaceFolderID;
@@ -218,33 +271,50 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
 		}else if(tgt.indexOf("delete_btn") != -1){
 			//find out the selected folderID:
 			//get the selected node:
-			var snodeData = workspaceDialogue.treeview.selectedNode.attributes.data;
-			_workspaceModel.folderIDPendingRefresh = snodeData.workspaceFolderID;
-			_workspaceModel.getWorkspace().requestDeleteResource(snodeData.resourceID,snodeData.resourceType);
-			
+			if(snodeData != null){
+				//TODO Check permission code to make sure we can do this!
+				var snodeData = workspaceDialogue.treeview.selectedNode.attributes.data;
+				
+				_workspaceModel.folderIDPendingRefresh = snodeData.workspaceFolderID;
+				_workspaceModel.getWorkspace().requestDeleteResource(snodeData.resourceID,snodeData.resourceType);
+			}else{
+				//nothing to delete
+			}
 		}else if(tgt.indexOf("new_btn") != -1){
 			//check we can create a folder here
 			var snodeData = workspaceDialogue.treeview.selectedNode.attributes.data;
 			if(snodeData != null){
-				Dialog.createInputDialog('__Enter the new folder name__', '__OK__', '__Cancel__', Delegate.create(_workspaceController ,setNewFolderName),null);
+				Dialog.createInputDialog(Dictionary.getValue('ws_newfolder_ins'), Dictionary.getValue('ws_newfolder_ok'), Dictionary.getValue('ws_newfolder_cancel'), Delegate.create(_workspaceController ,setNewFolderName),null);
 			}else{
 				//no where to make new folder
 			}
 			
 			//_workspaceModel.getWorkspace().requestCreateFolder();
 			
-		}
-		//get selected node from the tree
-		
-		//check its ok do do the operation
+		}else if(tgt.indexOf("rename_btn") != -1){
+			//check we can create a folder here
+			var snodeData = workspaceDialogue.treeview.selectedNode.attributes.data;
+			if(snodeData != null){
+				Dialog.createInputDialog(Dictionary.getValue('ws_rename_ins'), Dictionary.getValue('ws_newfolder_ok'), Dictionary.getValue('ws_newfolder_cancel'), Delegate.create(_workspaceController ,setNewResourceName),null);
+			}else{
+				//nothing to rename
+			}
 			
-		//if so do the operation - sned to controller, balh balhblah  		
-		
-		//invalidate the cahe, re,load the data, refresh the tree
-		
+			//_workspaceModel.getWorkspace().requestCreateFolder();
+			
+		}
+
 		
 		//TODO: integrate with key listener for canvas!! CTRL-C is handels by the canvas at the mo... need to set somethign in application.#
 		
+	}
+	
+	public function setNewResourceName(newName:String){
+		Debugger.log('newName:'+newName,Debugger.GEN,'setNewResourceName','org.lamsfoundation.lams.WorkspaceController');
+		var workspaceDialogue = getView().workspaceDialogue;
+		var snodeData = workspaceDialogue.treeview.selectedNode.attributes.data;
+		_workspaceModel.folderIDPendingRefresh = snodeData.workspaceFolderID;
+		_workspaceModel.getWorkspace().requestRenameResource(snodeData.resourceID,snodeData.resourceType,newName);
 	}
 	
 	public function setNewFolderName(newName:String){
@@ -253,7 +323,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
 		var snodeData = workspaceDialogue.treeview.selectedNode.attributes.data;
 		var selectedFolderID:Number;
 		//if its a folder then the resourceID is the selected folder ID, otherwise its the parent
-		if(snodeData.resourceType == "Folder"){
+		if(snodeData.resourceType == _workspaceModel.RT_FOLDER){
 			selectedFolderID = snodeData.resourceID;
 		}else{
 			selectedFolderID = snodeData.workspaceFolderID;
