@@ -51,20 +51,26 @@ public class Lesson implements Serializable {
     //---------------------------------------------------------------------
     // Class level constants
     //---------------------------------------------------------------------
-    //The state for newly created lesson
+    /** The state for newly created lesson. The learning design has been copied. 
+     * The lesson class may or may not have been configured. It is 
+     * seen on the staff interface but not on the learning interface. */ 
     public static final Integer CREATED = new Integer(1);
-    //The state for lessons that have been scheduled
+    /** The state for lessons that have been scheduled.  */ 
     public static final Integer NOT_STARTED_STATE = new Integer(2);
-    //The state for started lesson
+    /** The state for started lesson */
     public static final Integer STARTED_STATE = new Integer(3);
-    //The state for lessons that have been suspended by the teacher. 
-    //Note that suspension of the entire lesson is not a 1.1 feature.
+    /** The state for lessons that have been suspended by the teacher. 
+     * The lesson can be seen on the staff interface but not on the learning interface */ 
     public static final Integer SUSPENDED_STATE = new Integer(4);
-    //The state for lessons that have been finished.
+    /** The state for lessons that have been finished. A finished lesson
+    * is shown as inactive on the staff interface, and is shown on the learner interface
+    * but the learner is to only see the overall progress and be able to export
+    * data - they should not be able to iteract with the tools */ 
     public static final Integer FINISHED_STATE = new Integer(5);
-    //The state for lesssons that are no longer visible to the learners.
+    /** The state for lesssons that are shown as inactive on the staff interface
+     * but no longer visible to the learners. */
     public static final Integer ARCHIVED_STATE = new Integer(6);
-    //The state for lesssons that are removed and never can be accessed again
+    /** The state for lesssons that are removed and never can be accessed again */
     public static final Integer DISABLED_STATE  = new Integer(7);
     
     //---------------------------------------------------------------------
