@@ -36,6 +36,7 @@ class WorkspaceDialog extends MovieClip{
 	private var copy_btn:Button;
 	private var paste_btn:Button;
 	private var delete_btn:Button;
+	private var rename_btn:Button;
 		
 	
 	//properties
@@ -111,6 +112,9 @@ class WorkspaceDialog extends MovieClip{
         ok_btn.label = Dictionary.getValue('ws_dlg_ok_button');
         cancel_btn.label = Dictionary.getValue('ws_dlg_cancel_button');
 		
+		//TODO: Dictionary calls for all the rest of the buttons
+		
+		
 
         //get focus manager + set focus to OK button, focus manager is available to all components through getFocusManager
         fm = _container.getFocusManager();
@@ -173,6 +177,7 @@ class WorkspaceDialog extends MovieClip{
 		copy_btn.addEventListener('click',Delegate.create(_workspaceController, _workspaceController.fileOperationRequest));
 		paste_btn.addEventListener('click',Delegate.create(_workspaceController, _workspaceController.fileOperationRequest));
 		delete_btn.addEventListener('click',Delegate.create(_workspaceController, _workspaceController.fileOperationRequest));
+		rename_btn.addEventListener('click',Delegate.create(_workspaceController, _workspaceController.fileOperationRequest));
 		
 		
 		//Set up the treeview
@@ -309,7 +314,7 @@ class WorkspaceDialog extends MovieClip{
 		//_global.breakpoint();
 		//Only update the details if the node if its a resource:a
 		var nodeData = newSelectedNode.attributes.data;
-		if(nodeData.resourceType == "Folder"){
+		if(nodeData.resourceType == _workspaceModel.RT_FOLDER){
 			resourceTitle_txi.text = "";
 			resourceDesc_txa.text = "";
 				
@@ -339,6 +344,7 @@ class WorkspaceDialog extends MovieClip{
 		copy_btn.visible = v;
 		paste_btn.visible = v;
 		delete_btn.visible = v;
+		rename_btn.visible = v;
 	
 		
 	
@@ -480,11 +486,11 @@ class WorkspaceDialog extends MovieClip{
 		 Debugger.log('_workspaceModel.currentMode: ' + _workspaceModel.currentMode,Debugger.GEN,'setStyles','org.lamsfoundation.lams.WorkspaceDialog');
 		if(_workspaceModel.currentMode=="SAVE" || _workspaceModel.currentMode=="SAVEAS"){
 			//var rid:Number = Number(snode.attributes.data.resourceID);
-			if(snode.attributes.data.resourceType=="LearningDesign"){
+			if(snode.attributes.data.resourceType==_workspaceModel.RT_LD){
 				//run a confirm dialogue as user is about to overwrite a design!
 				LFMessage.showMessageConfirm("LOOKOUT ABOUT TO OVERWRITE A RESOURCE!", Proxy.create(this,doWorkspaceDispatch,true), Proxy.create(this,closeThisDialogue));
 	
-			}else if (snode.attributes.data.resourceType=="Folder"){
+			}else if (snode.attributes.data.resourceType==_workspaceModel.RT_FOLDER){
 				doWorkspaceDispatch(false);
 			}else{
 				LFMessage.showMessageAlert("__Please click on either a Folder to save in, or a Design to overwrite__",null);
