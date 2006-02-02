@@ -480,9 +480,12 @@ public abstract class McUtils implements McAppConstants {
     	
     	McContent mcContent=mcService.retrieveMc(toolContentId);
     	logger.debug("mcContent:" + mcContent);
-    	mcContent.setDefineLater(value);
-    	logger.debug("defineLater has been set to true");
-    	mcService.saveMcContent(mcContent);
+    	if (mcContent != null)
+    	{
+    		mcContent.setDefineLater(value);
+        	logger.debug("defineLater has been set to true");
+        	mcService.saveMcContent(mcContent);	
+    	}
     }
 	
     
@@ -529,7 +532,6 @@ public abstract class McUtils implements McAppConstants {
     {
     	request.getSession().removeAttribute(MY_SIGNATURE);
     	request.getSession().removeAttribute(DEFAULT_CONTENT_ID);
-    	request.getSession().removeAttribute(TOOL_SERVICE);
     	request.getSession().removeAttribute(ERROR_MCAPPLICATION);
     	request.getSession().removeAttribute(LOAD);
     	request.getSession().removeAttribute(LOAD_QUESTIONS);
