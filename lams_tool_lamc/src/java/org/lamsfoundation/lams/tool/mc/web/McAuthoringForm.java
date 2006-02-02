@@ -81,7 +81,6 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
 
 	protected String edit;
 	
-	
 	public void resetUserAction()
     {
 		this.editDefaultQuestion=null;
