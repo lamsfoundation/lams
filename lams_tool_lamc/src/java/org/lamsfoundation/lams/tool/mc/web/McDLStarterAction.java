@@ -54,6 +54,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McApplicationException;
+import org.lamsfoundation.lams.tool.mc.McUtils;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.tool.mc.service.McServiceProxy;
 
@@ -63,11 +64,14 @@ public class McDLStarterAction extends Action implements McAppConstants {
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
   								throws IOException, ServletException, McApplicationException {
-		McStarterAction mcStarterAction= new McStarterAction();
-
-		IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
-	    request.getSession().setAttribute(TOOL_SERVICE, mcService);
+		McUtils.cleanUpSessionAbsolute(request);
+		logger.debug("init defineLater mode. removed attributes...");
 		
+		IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+		logger.debug("mcService: " + mcService);
+	    request.getSession().setAttribute(TOOL_SERVICE, mcService);
+	    
+	    McStarterAction mcStarterAction= new McStarterAction();
 	    return mcStarterAction.executeDefineLater(mapping, form, request, response, mcService);
 	}
 }

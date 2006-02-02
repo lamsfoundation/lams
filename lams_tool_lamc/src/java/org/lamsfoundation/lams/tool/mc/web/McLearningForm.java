@@ -26,6 +26,9 @@ public class McLearningForm extends ActionForm implements McAppConstants {
 	protected String donePreview;
 	protected String doneLearnerProgress;
 	
+	
+	
+	
 	public void resetCommands()
 	{
 		this.setContinueOptions(null);
