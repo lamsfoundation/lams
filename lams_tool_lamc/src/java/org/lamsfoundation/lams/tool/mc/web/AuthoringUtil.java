@@ -20,6 +20,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.upload.FormFile;
+import org.lamsfoundation.lams.contentrepository.FileException;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
@@ -1165,7 +1166,7 @@ public class AuthoringUtil implements McAppConstants {
     	String offlineInstructions="";
     	String onlineInstructions="";
     	String endLearningMessage="";
-    	String creationDate="";
+    	Date creationDate=null;
     	int passmark=0;
     	
     	boolean isQuestionsSequenced=false;
@@ -1234,10 +1235,11 @@ public class AuthoringUtil implements McAppConstants {
 		String richTextEndLearningMessage=(String)request.getSession().getAttribute(RICHTEXT_END_LEARNING_MSG);
 		logger.debug("richTextEndLearningMessage: " + richTextEndLearningMessage);
     	
-    	creationDate=(String)request.getSession().getAttribute(CREATION_DATE);
+		creationDate=(Date)request.getSession().getAttribute(CREATION_DATE);
 		if (creationDate == null)
-			creationDate=new Date(System.currentTimeMillis()).toString();
+			creationDate=new Date(System.currentTimeMillis());
 		
+		logger.debug("using creationDate: " + creationDate);
     		
     	/*obtain user object from the session*/
 	    HttpSession ss = SessionManager.getSession();
@@ -2285,9 +2287,18 @@ public class AuthoringUtil implements McAppConstants {
 		logger.debug("mimeType:" + mimeType);
 		logger.debug("fileProperty:" + fileProperty);
 		
-		NodeKey nodeKey=mcService.uploadFile(stream, fileName, mimeType, fileProperty);
-		logger.debug("nodeKey:" + nodeKey);
-		logger.debug("nodeKey uuid:" + nodeKey.getUuid());
+		NodeKey nodeKey=null;
+		try{
+			nodeKey=mcService.uploadFile(stream, fileName, mimeType, fileProperty);
+			logger.debug("nodeKey:" + nodeKey);
+			logger.debug("nodeKey uuid:" + nodeKey.getUuid());	
+		}
+		catch(FileException e)
+		{
+			logger.debug("exception writing raw data:" + e);
+			/* return a null dto*/
+			return null;
+		}
 		
 		McAttachmentDTO mcAttachmentDTO= new McAttachmentDTO();
 		mcAttachmentDTO.setUid(null);
