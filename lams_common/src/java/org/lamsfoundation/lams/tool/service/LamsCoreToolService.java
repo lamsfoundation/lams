@@ -220,28 +220,41 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
                                           User learner, 
                                           ToolAccessMode accessMode) throws LamsToolServiceException
     {
-        if(accessMode==ToolAccessMode.LEARNER)
-            return setupToolURLWithToolSession(activity,
-                                               learner,
-                                               WebUtil.appendParameterToURL(activity.getTool().getLearnerUrl(),
-                                                                            AttributeNames.PARAM_MODE,
-                                                                            ToolAccessMode.LEARNER.toString()));
-        else if(accessMode == ToolAccessMode.TEACHER)
-            return setupToolURLWithToolSession(activity,
-                                               learner,
-                                               WebUtil.appendParameterToURL(activity.getTool().getLearnerUrl(),
-                                               								AttributeNames.PARAM_MODE,
-                                                                            ToolAccessMode.TEACHER.toString()));
-        else if (accessMode == ToolAccessMode.AUTHOR)
-            return setupToolURLWithToolSession(activity,
-                                               learner,
-                                               WebUtil.appendParameterToURL(activity.getTool().getLearnerUrl(),
-                                               								AttributeNames.PARAM_MODE,
-                                                                            ToolAccessMode.AUTHOR.toString()));
-        
-        throw new LamsToolServiceException("Unknown tool access mode:"+accessMode.toString());
+    	String toolURL = activity.getTool().getLearnerUrl();
+    	
+        if(accessMode==ToolAccessMode.LEARNER) {
+        	toolURL = appendModeToURL(ToolAccessMode.LEARNER, toolURL);
+        } else if(accessMode == ToolAccessMode.TEACHER) {
+        	toolURL = appendModeToURL(ToolAccessMode.TEACHER, toolURL);
+        	toolURL = appendUserIDToURL(learner, toolURL);
+        } else if (accessMode == ToolAccessMode.AUTHOR) {
+        	toolURL = appendModeToURL(ToolAccessMode.AUTHOR, toolURL);
+        } else {
+        	throw new LamsToolServiceException("Unknown tool access mode:"+accessMode.toString());
+        }
+        return toolURL;
     }
     
+
+    /**
+     * Add the mode=TEACHER, mode=LEARNER or mode=AUTHOR to the supplied URL
+     */
+    private String appendModeToURL(ToolAccessMode toolAccessMode,String toolURL) 
+    {
+        return WebUtil.appendParameterToURL(toolURL,
+        		AttributeNames.PARAM_MODE,
+        		toolAccessMode.toString());
+    }
+
+    /**
+     * Add the user id to the url
+     */
+    private String appendUserIDToURL(User user, String toolURL) 
+    {
+        return WebUtil.appendParameterToURL(toolURL,
+        		AttributeNames.PARAM_USER_ID,
+        		user.getUserId().toString());
+    }
 
     /**
      * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#setupToolURLWithToolSession(org.lamsfoundation.lams.learningdesign.ToolActivity, org.lamsfoundation.lams.usermanagement.User, java.lang.String)
