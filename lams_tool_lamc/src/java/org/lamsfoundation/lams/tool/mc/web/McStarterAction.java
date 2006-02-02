@@ -90,6 +90,7 @@
 
 package org.lamsfoundation.lams.tool.mc.web;
 import java.io.IOException;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -561,6 +562,10 @@ public class McStarterAction extends Action implements McAppConstants {
 		/* used in instructions tab*/
 		request.getSession().setAttribute(RICHTEXT_OFFLINEINSTRUCTIONS,mcContent.getOfflineInstructions());
 		request.getSession().setAttribute(RICHTEXT_ONLINEINSTRUCTIONS,mcContent.getOnlineInstructions());
+		
+		Date creationDate=mcContent.getCreationDate();
+		logger.debug("creationDate:" + creationDate);
+		request.getSession().setAttribute(CREATION_DATE,creationDate);
 		
 		logger.debug("RICHTEXT_TITLE:" + request.getSession().getAttribute(RICHTEXT_TITLE));
 		
