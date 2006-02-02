@@ -65,12 +65,12 @@
 		    document.MM_pgW=innerWidth; document.MM_pgH=innerHeight; onresize=MM_reloadPage; }}
 		  else if (innerWidth!=document.MM_pgW || innerHeight!=document.MM_pgH) location.reload();
 		}
-		
+
 		MM_reloadPage(true);
 		//-->
 	</script>
 </head>
-<body onLoad="initTabs()">
+<body onLoad="initTabs();">
 
 	<b> <font size=2> <bean:message key="label.authoring.mc"/> </font></b>
 	    
@@ -111,10 +111,7 @@
 				<tr>   
 					<td NOWRAP>
 						<font size=2>
-							<html:submit onclick="javascript:submitMethod('cancelAuthoring');" styleClass="button">
-								<bean:message key="button.cancel"/>
-							</html:submit>	 				 		  					
-						</font>
+							<input type="button" name="cancelAuthoring" value="Cancel" onclick="javascript: window.opener=top; window.close();"> </input>
 					</td>
 				</tr> 
 			</table>
