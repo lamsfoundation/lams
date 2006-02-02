@@ -74,6 +74,8 @@ public class LessonDataAccessTestCase extends AbstractCommonTestCase
     private final Long TEST_LEARNING_DESIGN_ID = new Long(1);
     private final Integer TEST_ORGANIZATION_ID = new Integer(1);
     private final int TEST_GROUP_ORDER_ID = 0;
+    private final String TEST_GROUP_NAME_STAFF = "staffgroup";
+    private final String TEST_GROUP_NAME_LEARNER = "learnergroup";
 
 
     //---------------------------------------------------------------------
@@ -193,6 +195,7 @@ public class LessonDataAccessTestCase extends AbstractCommonTestCase
         Set staffs = new HashSet();
         staffs.add(testUser);
         Group staffGroup = new Group(null,//group id 
+        							 TEST_GROUP_NAME_STAFF,
                                      TEST_GROUP_ORDER_ID,
                                      testLessonClass,
                                      staffs,
@@ -203,7 +206,8 @@ public class LessonDataAccessTestCase extends AbstractCommonTestCase
         Set learnergroups = new HashSet();
         //make a copy of lazily initialized users
         Set users = new HashSet(testOrg.getUsers());
-        Group learnerClassGroup = new Group(null,//group id 
+        Group learnerClassGroup = new Group(null,//group id
+        									TEST_GROUP_NAME_LEARNER,
                                             testLessonClass.getNextGroupOrderId(),
                                             testLessonClass,
                                             users,

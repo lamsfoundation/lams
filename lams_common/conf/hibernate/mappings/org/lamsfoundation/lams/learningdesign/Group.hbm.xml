@@ -38,6 +38,19 @@
     </id>
 
     <property
+        name="groupName"
+        type="java.lang.String"
+        column="group_name"
+        not-null="false"
+        length="255"
+    >
+        <meta attribute="field-description">
+			@hibernate.property
+			column="group_name"
+         </meta>    
+    </property>
+    
+    <property
         name="orderId"
         type="int"
         column="order_id"

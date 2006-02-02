@@ -43,23 +43,23 @@ public class ChosenGrouper implements Grouper,Serializable
 {
 
     /**
-     * @see org.lamsfoundation.lams.learningdesign.Grouper#doGrouping(org.lamsfoundation.lams.learningdesign.Grouping, org.lamsfoundation.lams.usermanagement.User)
+     * @see org.lamsfoundation.lams.learningdesign.Grouper#doGrouping(org.lamsfoundation.lams.learningdesign.Grouping,java.lang.String, org.lamsfoundation.lams.usermanagement.User)
      */
-    public void doGrouping(Grouping chosenGrouping, User learner)
+    public void doGrouping(Grouping chosenGrouping, String groupName, User learner)
     {
         //convert the single user into a list.
         List learners = new ArrayList();
         learners.add(learner);
         //delegate to do grouping for a list of learners.
-        doGrouping(chosenGrouping,learners);
+        doGrouping(chosenGrouping,groupName, learners);
     }
     
     /**
-     * @see org.lamsfoundation.lams.learningdesign.Grouper#doGrouping(org.lamsfoundation.lams.learningdesign.Grouping, java.util.List)
+     * @see org.lamsfoundation.lams.learningdesign.Grouper#doGrouping(org.lamsfoundation.lams.learningdesign.Grouping,java.lang.String, java.util.List)
      */
-    public void doGrouping(Grouping chosenGrouping, List learners)
+    public void doGrouping(Grouping chosenGrouping,String groupName, List learners)
     {
-        chosenGrouping.getGroups().add(Group.createLearnerGroup(chosenGrouping,
+        chosenGrouping.getGroups().add(Group.createLearnerGroup(chosenGrouping,groupName,
                                                                 new HashSet(learners)));
     }
 

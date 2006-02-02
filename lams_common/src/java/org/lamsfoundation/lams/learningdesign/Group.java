@@ -26,6 +26,7 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -41,9 +42,12 @@ import org.lamsfoundation.lams.util.Nullable;
 public class Group implements Serializable,Nullable,Comparable {
 
     public final static int STAFF_GROUP_ORDER_ID = 1;
+    public final static String NAME_OF_STAFF_GROUP = "Staff Group";
     
     /** identifier field */
     private Long groupId;
+    
+    private String groupName;
 
     /** persistent field */
     private int orderId;
@@ -62,8 +66,9 @@ public class Group implements Serializable,Nullable,Comparable {
     //---------------------------------------------------------------------
     
     /** full constructor */
-    public Group(Long groupId, int orderId, Grouping grouping, Set users, Set toolSessions) {
+    public Group(Long groupId, String groupName, int orderId, Grouping grouping, Set users, Set toolSessions) {
         this.groupId = groupId;
+        this.groupName = groupName;
         this.orderId = orderId;
         this.grouping = grouping;
         this.users = users;
@@ -78,9 +83,9 @@ public class Group implements Serializable,Nullable,Comparable {
      * @param users the users in this group.
      * @return the new learner group
      */
-    public static Group createLearnerGroup(Grouping grouping, Set users)
+    public static Group createLearnerGroup(Grouping grouping, String groupName, Set users)
     {
-        return new Group(null,grouping.getNextGroupOrderId(),grouping,users,new HashSet());
+        return new Group(null,groupName,grouping.getNextGroupOrderId(),grouping,users,new HashSet());
     }
   
     /**
@@ -92,9 +97,9 @@ public class Group implements Serializable,Nullable,Comparable {
      * @param toolSessions all tool sessions included in this group
      * @return the new learner group
      */
-    public static Group createLearnerGroupWithToolSession(Grouping grouping, Set users,Set toolSessions)
+    public static Group createLearnerGroupWithToolSession(Grouping grouping, String groupName, Set users,Set toolSessions)
     {
-        return new Group(null,grouping.getNextGroupOrderId(),grouping,users,toolSessions);
+        return new Group(null,groupName,grouping.getNextGroupOrderId(),grouping,users,toolSessions);
     }
     
     /**
@@ -104,9 +109,9 @@ public class Group implements Serializable,Nullable,Comparable {
      * @param staffs the users in this group.
      * @return the new staff group. 
      */
-    public static Group createStaffGroup(Grouping grouping, Set staffs)
+    public static Group createStaffGroup(Grouping grouping,  Set staffs)
     {
-        return new Group(null,STAFF_GROUP_ORDER_ID,grouping,staffs,new HashSet());
+        return new Group(null,NAME_OF_STAFF_GROUP,STAFF_GROUP_ORDER_ID,grouping,staffs,new HashSet());
     }
     
     /** default constructor */
@@ -126,8 +131,21 @@ public class Group implements Serializable,Nullable,Comparable {
     public Long getGroupId() {
         return this.groupId;
     }
+    /**
+     * @hibernate.property
+     * 	 column="group_name"
+     * 	 
+     * @return
+     */
+    public String getGroupName() {
+		return groupName;
+	}
 
-    public void setGroupId(Long groupId) {
+	public void setGroupName(String groupName) {
+		this.groupName = groupName;
+	}
+
+	public void setGroupId(Long groupId) {
         this.groupId = groupId;
     }
 
@@ -197,6 +215,7 @@ public class Group implements Serializable,Nullable,Comparable {
     public String toString() {
         return new ToStringBuilder(this)
             .append("groupId", getGroupId())
+            .append("groupName", getGroupName())
             .toString();
     }
 
@@ -206,6 +225,7 @@ public class Group implements Serializable,Nullable,Comparable {
         Group castOther = (Group) other;
         return new EqualsBuilder()
         	.append(this.getGroupId(), castOther.getGroupId())
+        	.append(this.getGroupName(), castOther.getGroupName())
             .append(this.getOrderId(), castOther.getOrderId())
             .isEquals();
     }
@@ -213,6 +233,7 @@ public class Group implements Serializable,Nullable,Comparable {
     public int hashCode() {
         return new HashCodeBuilder()
         	.append(getGroupId())
+        	.append(getGroupName())
             .append(getOrderId())
             .toHashCode();
     }

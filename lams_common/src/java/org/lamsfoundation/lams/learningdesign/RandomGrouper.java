@@ -58,27 +58,28 @@ import org.lamsfoundation.lams.usermanagement.User;
  */
 public class RandomGrouper implements Grouper , Serializable
 {
+	private static final String GROUP_NAME_PREFIX = "Group ";
     //---------------------------------------------------------------------
     // Grouping algorithm Implementation Method
     //---------------------------------------------------------------------
     /**
      * Do the grouping for single new learner.
-     * @see org.lamsfoundation.lams.learningdesign.Grouper#doGrouping(org.lamsfoundation.lams.learningdesign.Grouping, org.lamsfoundation.lams.usermanagement.User)
+     * @see org.lamsfoundation.lams.learningdesign.Grouper#doGrouping(org.lamsfoundation.lams.learningdesign.Grouping, java.lang.String,org.lamsfoundation.lams.usermanagement.User)
      */
-    public void doGrouping(Grouping randomGrouping, User learner)
+    public void doGrouping(Grouping randomGrouping,String groupName, User learner)
     {
         //convert the single user into a list.
         List learners = new ArrayList();
         learners.add(learner);
         //delegate to do grouping for a list of learners.
-        doGrouping(randomGrouping,learners);
+        doGrouping(randomGrouping,groupName,learners);
     }
     
     /**
      * Do the grouping for a list of new learners.
-     * @see org.lamsfoundation.lams.learningdesign.Grouper#doGrouping(org.lamsfoundation.lams.learningdesign.Grouping, java.util.List)
+     * @see org.lamsfoundation.lams.learningdesign.Grouper#doGrouping(org.lamsfoundation.lams.learningdesign.Grouping,java.lang.String, java.util.List)
      */
-    public void doGrouping(Grouping randomGrouping, List learners)
+    public void doGrouping(Grouping randomGrouping, String groupName, List learners)
     {
         //calculate how many new groups needs to be created.
         int numOfGroupsTobeCreated =0;
@@ -91,7 +92,7 @@ public class RandomGrouper implements Grouper , Serializable
                                                              learners,
                                                              false);
         //create new groups
-        createGroups((RandomGrouping)randomGrouping,numOfGroupsTobeCreated);
+        createGroups((RandomGrouping)randomGrouping, numOfGroupsTobeCreated);
         //join the new learners into these groups.
         joinGroups(randomGrouping, learners);
     }
@@ -128,9 +129,11 @@ public class RandomGrouper implements Grouper , Serializable
     private void createGroups(RandomGrouping randomGrouping, 
                               int numOfGroupsTobeCreated)
     {
+    	int size = randomGrouping.getGroups().size();
         for(int i=0;i<numOfGroupsTobeCreated;i++)
         {
-            randomGrouping.getGroups().add(Group.createLearnerGroup(randomGrouping,
+        	String groupName = GROUP_NAME_PREFIX + new Integer(size + i).toString();  
+            randomGrouping.getGroups().add(Group.createLearnerGroup(randomGrouping,groupName,
                                                                     new HashSet()));
         }
     }

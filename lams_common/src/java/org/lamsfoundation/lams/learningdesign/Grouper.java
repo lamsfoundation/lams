@@ -43,15 +43,17 @@ public interface Grouper
     /**
      * Do the grouping for a list of learners that the teacher requested.
      * @param grouping the grouping that is used to perform groups creation.
+     * @param name for this group
      * @param learners the list of learners that the teacher requested.
      */
-	public void doGrouping(Grouping grouping, List learners);
+	public void doGrouping(Grouping grouping, String groupName, List learners);
 	
 	/**
 	 * Do the grouping for a single learner.
 	 * @param grouping the grouping that is used to perform groups creation.
+	 * @param name for this group
 	 * @param learner the learner teacher want to add.
 	 */
-	public void doGrouping(Grouping grouping, User learner);
+	public void doGrouping(Grouping grouping, String groupName, User learner);
     
 }
