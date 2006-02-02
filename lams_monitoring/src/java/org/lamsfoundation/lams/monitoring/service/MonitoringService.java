@@ -21,6 +21,7 @@
 package org.lamsfoundation.lams.monitoring.service;
 
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,7 +29,9 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -44,6 +47,7 @@ import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
+import org.lamsfoundation.lams.learningdesign.dao.IGroupingDAO;
 import org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO;
 import org.lamsfoundation.lams.learningdesign.dao.ITransitionDAO;
 import org.lamsfoundation.lams.learningdesign.dto.ProgressActivityDTO;
@@ -71,6 +75,7 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
+import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
@@ -111,6 +116,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     private ILearningDesignDAO learningDesignDAO;
     private IOrganisationDAO organisationDAO;
     private IUserDAO userDAO;
+    private IGroupingDAO groupingDAO;
     private IAuthoringService authoringService;
     private ILearnerService learnerService;
     private ILamsCoreToolService lamsCoreToolService;
@@ -178,11 +184,16 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         this.lessonDAO = lessonDAO;
     }
     /**
-     * 
      * @param userDAO
      */
 	public void setUserDAO(IUserDAO userDAO) {
 		this.userDAO = userDAO;
+	}
+	/**
+	 * @param groupingDAO
+	 */
+	public void setGroupingDAO(IGroupingDAO groupingDAO) {
+		this.groupingDAO = groupingDAO;
 	}
 
     /**
@@ -1045,7 +1056,48 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 	    return flashMessage.serializeMessage();
 	    
 	}
-	
+	 /**
+     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#performChosenGrouping(GroupingActivity,java.util.List)
+     */
+	public void performChosenGrouping(GroupingActivity groupingActivity, List groups) {
+        Grouping grouping = groupingActivity.getCreateGrouping();
+        
+        if(!grouping.isChosenGrouping()){
+        	log.error("GroupingActivity ["+groupingActivity.getActivityId() +"] does not have chosen grouping.");
+        	throw new MonitoringServiceException("GroupingActivity ["+groupingActivity.getActivityId()
+        			+"] does not have chosen grouping.");
+        }
+        try {
+        	//try to sorted group list by orderID.
+        	Iterator iter = groups.iterator();
+        	Map sortedMap = new TreeMap(new Comparator(){
+					public int compare(Object arg0, Object arg1) {
+						return ((Long)arg0).compareTo((Long)arg1);
+					}
+        		}
+        	); 
+	        while(iter.hasNext()){
+	        	Hashtable group = (Hashtable) iter.next();
+	        	Long orderId = WDDXProcessor.convertToLong(group,MonitoringConstants.KEY_GROUP_ORDER_ID);
+	        	sortedMap.put(orderId,group);
+	        }
+	        iter = sortedMap.values().iterator();
+	        //grouping all group in list
+	        while(iter.hasNext()){
+	        	Hashtable group = (Hashtable) iter.next();
+	        	List learners = (List) group.get(MonitoringConstants.KEY_GROUP_LEARNERS);
+	        	String groupName = WDDXProcessor.convertToString(group,MonitoringConstants.KEY_GROUP_NAME);
+	        	log.debug("Performing grouping for " + groupName + "...");
+	        	grouping.doGrouping(groupName,learners);
+	        	groupingDAO.update(grouping);
+	        	log.debug("Finish grouping for " + groupName);
+	        }
+        } catch (WDDXProcessorConversionException e) {
+        	throw new MonitoringServiceException("Perform chosen grouping occurs error when parsing WDDX package:"
+        			+ e.getMessage());
+        }
+        
+	}
 	
 	
     //---------------------------------------------------------------------
@@ -1072,8 +1124,9 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         newLessonClass.setStaffGroup(Group.createStaffGroup(newLessonClass,
                                                             new HashSet(staffs)));
         //setup learner group
+        //TODO:need confirm group name!
         newLessonClass.getGroups()
-                      .add(Group.createLearnerGroup(newLessonClass,
+                      .add(Group.createLearnerGroup(newLessonClass, "Learner Group",
                                                     new HashSet(organizationUsers)));
         
         lessonClassDAO.updateLessonClass(newLessonClass);
@@ -1349,7 +1402,5 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     	
     	return learningDesignDAO.getLearningDesignByUserId(userId);
     }
-	public void performChosenGrouping(GroupingActivity groupingActivity, List groups) {
-		
-	}
+  
 }

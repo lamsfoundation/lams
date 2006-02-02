@@ -127,6 +127,11 @@ http://www.gnu.org/licenses/gpl.txt
 </listener>	
 
    <servlet>
+      <servlet-name>performChosenGrouping</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.monitoring.web.PerformChosenGroupingServlet</servlet-class>
+
+   </servlet>
+   <servlet>
       <servlet-name>createLesson</servlet-name>
       <servlet-class>org.lamsfoundation.lams.monitoring.web.CreateLessionServlet</servlet-class>
 
@@ -200,6 +205,10 @@ http://www.gnu.org/licenses/gpl.txt
     <url-pattern>*.do</url-pattern>
 </servlet-mapping>
 
+   <servlet-mapping>
+      <servlet-name>performChosenGrouping</servlet-name>
+      <url-pattern>/monitoring/performChosenGrouping</url-pattern>
+   </servlet-mapping>
    <servlet-mapping>
       <servlet-name>createLesson</servlet-name>
       <url-pattern>/monitoring/createLesson</url-pattern>

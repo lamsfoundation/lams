@@ -42,6 +42,7 @@ http://www.gnu.org/licenses/gpl.txt
 		singleton="false"
 	>
 		<property name="userDAO"><ref bean="userDAO"/></property>
+		<property name="groupingDAO"><ref bean="groupingDAO"/></property>
 		<property name="organisationDAO"><ref bean="organisationDAO"/></property>
 		<property name="lessonDAO"><ref bean="lessonDAO"/></property>
 		<property name="lessonClassDAO"><ref bean="lessonClassDAO"/></property>	

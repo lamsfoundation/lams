@@ -374,9 +374,16 @@ public interface IMonitoringService
     public String releaseGate(Long activityID) throws IOException;
     
     /**
+     * Perform chosen grouping. The groups contains a list of Hashtable which contain 
+     * following information for each group:<br>
+     * <ol>
+     *   <li>List of learners in this group</li>
+     *   <li>Order ID</li>
+     *   <li>Group name</li>
+     * </ol>
      * 
      * @param groupingActivity
-     * @param groups
+     * @param groups list of group information. 
      */
     public void performChosenGrouping(GroupingActivity groupingActivity, List groups);
     
