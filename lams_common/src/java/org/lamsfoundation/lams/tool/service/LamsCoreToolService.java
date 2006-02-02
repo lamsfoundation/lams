@@ -232,7 +232,7 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
         } else {
         	throw new LamsToolServiceException("Unknown tool access mode:"+accessMode.toString());
         }
-        return toolURL;
+        return setupToolURLWithToolSession(activity, learner, toolURL);
     }
     
 
