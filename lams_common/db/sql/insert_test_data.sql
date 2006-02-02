@@ -154,10 +154,10 @@ insert into lams_grouping values(99,99,1,2,-1,0,-1);
 insert into lams_grouping values(100,100,2,1,-1,0,-1);		
 INSERT INTO lams_grouping values(101, NULL, 3, NULL, NULL, 89, NULL);
 
-insert into lams_group values(87,99,1);
-insert into lams_group values(88,100,1);
-insert into lams_group values(89, 101, 1);
-insert into lams_group values(90, 101, 1);
+insert into lams_group values(87,"testgroup1",99,1);
+insert into lams_group values(88,"testgroup2",100,1);
+insert into lams_group values(89,"testgroup3", 101, 1);
+insert into lams_group values(90,"testgroup4", 101, 1);
 
 insert into lams_user_group values(1,87);
 insert into lams_user_group values(1,88);
