@@ -126,7 +126,7 @@
 						 <tr>
 							  	<td bgcolor="#EEEEEE" colspan=4 class="input" valign=top align=right>
 				  					<font size=2>
-										<html:submit onclick="javascript:submitMethod('addOption');" styleClass="longButton">
+										<html:submit onclick="javascript:submitMethod('addOption');" styleClass="button">
 												<bean:message key="label.add.option"/>
 										</html:submit>	 				 		  										  		
 									</font>									
@@ -152,7 +152,7 @@
 	 				 <td valign=top> </td>
 	 				 <td class="input" align=left colspan=3 valign=top>
 						<font size=2>
-							<html:submit onclick="javascript:submitMethod('doneOptions');" styleClass="buttonLeft">
+							<html:submit onclick="javascript:submitMethod('doneOptions');" styleClass="button">
 									<bean:message key="button.done"/>
 							</html:submit>	 				 		  										  		
 						</font>							
