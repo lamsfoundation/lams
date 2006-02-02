@@ -51,7 +51,6 @@ import org.lamsfoundation.lams.contentrepository.service.RepositoryProxy;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO;
-import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -64,7 +63,7 @@ import org.lamsfoundation.lams.usermanagement.dao.IUserDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IUserOrganisationDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IWorkspaceDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IWorkspaceFolderDAO;
-import org.lamsfoundation.lams.usermanagement.dto.UserAccessFoldersDTO;
+import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.usermanagement.exception.WorkspaceFolderException;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -339,14 +338,20 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	}
 	
 	/**
+	 * Get the workspace folder for a particular id. Does not check the user permissions - that will be checked if you try to get
+	 * anything from the folder.
+	 */
+	public WorkspaceFolder getWorkspaceFolder(Integer workspaceFolderID) {
+		return workspaceFolderDAO.getWorkspaceFolderByID(workspaceFolderID);
+	}
+	
+	/**
 	 * (non-Javadoc)
 	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#getFolderContentsExcludeHome(java.lang.Integer, java.lang.Integer, java.lang.Integer)
 	 */
-	public String getFolderContentsExcludeHome(Integer userID, Integer workspaceFolderID, Integer mode)throws Exception{
+	public Vector getFolderContentsExcludeHome(Integer userID, WorkspaceFolder folder, Integer mode)throws UserAccessDeniedException, RepositoryCheckedException {
 		User user = userDAO.getUserById(userID);
-		WorkspaceFolder folder = user.getWorkspace().getRootFolder();
-		return getFolderContentsInternal(user, workspaceFolderID, mode, "getFolderContentsExcludeHome", 
-				folder != null ? folder.getWorkspaceFolderId() : null);
+		return getFolderContentsInternal(user, folder, mode, "getFolderContentsExcludeHome", user.getWorkspace().getRootFolder());
 	}
 	 
 	
@@ -354,44 +359,36 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	 * (non-Javadoc)
 	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#getFolderContents(java.lang.Integer, java.lang.Integer, java.lang.Integer)
 	 */
-	public String getFolderContents(Integer userID, Integer workspaceFolderID, Integer mode)throws Exception{
+	public Vector getFolderContents(Integer userID, WorkspaceFolder folder, Integer mode)throws UserAccessDeniedException, RepositoryCheckedException {
 		User user = userDAO.getUserById(userID);
-		return getFolderContentsInternal(user, workspaceFolderID, mode, "getFolderContents", null);
+		return getFolderContentsInternal(user, folder, mode, "getFolderContents", null);
 	}
+	
 	
 	/**
 	 * Get the contents of a folder. Internal method used for both getFolderContentsExcludeHome() and getFolderContents().
 	 * If skipContentId is not null, then skip any contents found with this id. 
+	 * @throws UserAccessDeniedException 
+	 * @throws RepositoryCheckedException 
 	 */
-	public String getFolderContentsInternal(User user, Integer workspaceFolderID, Integer mode, String methodName, Integer skipContentId)throws Exception{
-		WorkspaceFolder workspaceFolder = null;
-		Integer permissions = null;
+	public Vector getFolderContentsInternal(User user, WorkspaceFolder workspaceFolder, Integer mode, String methodName, WorkspaceFolder skipFolder)throws UserAccessDeniedException, RepositoryCheckedException {
+		Vector contentDTO = new Vector();
 		if(user!=null){
-			workspaceFolder = workspaceFolderDAO.getWorkspaceFolderByID(workspaceFolderID);
-			if(workspaceFolder!=null){
-				permissions = getPermissions(workspaceFolder,user);
-				if(permissions!=WorkspaceFolder.NO_ACCESS){					
-					Vector contentDTO = new Vector();
-					getFolderContent(workspaceFolder,permissions,mode,contentDTO);
-					if(workspaceFolder.hasSubFolders())
-						getSubFolderDetails(workspaceFolder,permissions,contentDTO, skipContentId);	
-					Vector repositoryContent = getContentsFromRepository(new Long(workspaceFolderID.intValue()),permissions);
-					if(repositoryContent!=null)
-						contentDTO.addAll(repositoryContent);
-					flashMessage = new FlashMessage(methodName,createFolderContentPacket(workspaceFolder,contentDTO));
-				}
-				else
-					flashMessage = new FlashMessage(methodName,
-													"Access Denied for user with user_id:" + user.getUserId(),
-													FlashMessage.ERROR);
+			Integer permissions = getPermissions(workspaceFolder,user);
+			if(permissions!=WorkspaceFolder.NO_ACCESS){					
+				getFolderContent(workspaceFolder,permissions,mode,contentDTO);
+				if(workspaceFolder.hasSubFolders())
+					getSubFolderDetails(workspaceFolder,permissions,contentDTO, skipFolder);	
+				Vector repositoryContent = getContentsFromRepository(workspaceFolder.getWorkspaceFolderId(),permissions);
+				if(repositoryContent!=null)
+					contentDTO.addAll(repositoryContent);
+			} else {
+					throw new UserAccessDeniedException(user);
 			}
-			else
-				flashMessage = new FlashMessage(methodName,
-												"No such workspaceFolder with workspace_folder_id of:" + workspaceFolderID + " exists",
-												FlashMessage.ERROR);
-		}else
-			flashMessage = FlashMessage.getNoSuchUserExists(methodName,user.getUserId());
-		return flashMessage.serializeMessage();
+		}else {
+			throw new UserAccessDeniedException(user);
+		}
+		return contentDTO;
 		
 	}	
 	private void getFolderContent(WorkspaceFolder workspaceFolder, Integer permissions, Integer mode,Vector contentDTO){
@@ -408,11 +405,12 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	/** 
 	 * Get the folders in the given workspaceFolder. If skipContentId is not null, then skip any contents found with this id.
 	 */ 
-	private void getSubFolderDetails(WorkspaceFolder workspaceFolder,Integer permissions, Vector subFolderContent, Integer skipContentId){				
+	private void getSubFolderDetails(WorkspaceFolder workspaceFolder,Integer permissions, Vector subFolderContent, WorkspaceFolder skipFolder){
+		Integer skipFolderID = skipFolder != null ? skipFolder.getWorkspaceFolderId() : null;
 		Iterator iterator = workspaceFolder.getChildWorkspaceFolders().iterator();
 		while(iterator.hasNext()){
 			WorkspaceFolder subFolder = (WorkspaceFolder)iterator.next();
-			if ( skipContentId==null || ! skipContentId.equals(subFolder.getWorkspaceFolderId()) ) {
+			if ( skipFolderID==null || ! skipFolderID.equals(subFolder.getWorkspaceFolderId()) ) {
 				subFolderContent.add(new FolderContentDTO(subFolder,permissions));
 			}
 		}		
@@ -501,13 +499,6 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		return folderContent;
 		
 	}
-	private Hashtable createFolderContentPacket(WorkspaceFolder workspaceFolder, Vector contents){
-		Hashtable packet = new Hashtable();
-		packet.put("parentWorkspaceFolderID", workspaceFolder.getParentWorkspaceFolder().getWorkspaceFolderId());
-		packet.put("workspaceFolderID", workspaceFolder.getWorkspaceFolderId());
-		packet.put("contents", contents);
-		return packet;
-	}	
 	/**
 	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#copyResource(Long, String, Integer, Integer, Integer)
 	 */
@@ -1146,10 +1137,12 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	 * 							requested from the Repositor
 	 * @param permissions The permissions on this WorkspaceFolder and hence all its contents
 	 * @return Vector A collection of required information.
+	 * @throws AccessDeniedException 
+	 * @throws RepositoryCheckedException 
 	 * @throws Exception
 	 */
-	private Vector getContentsFromRepository(Long workspaceFolderID, Integer permissions)throws Exception{
-		List content = workspaceFolderContentDAO.getContentByWorkspaceFolder(workspaceFolderID);
+	private Vector getContentsFromRepository(Integer workspaceFolderID, Integer permissions) throws RepositoryCheckedException{
+		List content = workspaceFolderContentDAO.getContentByWorkspaceFolder(new Long(workspaceFolderID.longValue()));
 		if(content.size()==0)
 			return null;
 		else{
@@ -1164,64 +1157,16 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 			return repositoryContent;
 		}
 	}
-	/**
-	 * (non-Javadoc)
-	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#getAccessibleWorkspaceFolders(java.lang.Integer)
-	 */
-	public String getAccessibleWorkspaceFolders(Integer userID)	throws IOException {
-		User user = userDAO.getUserById(userID);
-		Hashtable table = new Hashtable();
-		Vector workspaces = new Vector();
-		
-		if (user != null) {
-			//add the user's own folder to the list
-			table.put("PRIVATE", new UserAccessFoldersDTO(user.getWorkspace().getRootFolder()));
-			
-			// Get a list of organisations of which the given user is a member
-			List userMemberships = userOrganisationDAO.getUserOrganisationsByUser(user);
-			if (userMemberships != null) {
-				Iterator memberships = userMemberships.iterator();
-				while (memberships.hasNext()) {
-					UserOrganisation member = (UserOrganisation) memberships.next();
-					// Get a list of roles that the user has in this organisation
-					Set roles = member.getUserOrganisationRoles();
-					
-					/*Check if the user has write access, which is available
-					 * only if the user has an AUTHOR, TEACHER or STAFF role. If
-					 * he has acess add that folder to the list.
-					 */
-					if (hasWriteAccess(roles)) {
-						workspaces.add(new UserAccessFoldersDTO(member.getOrganisation().getWorkspace().getRootFolder()));
-					}
-				}
-				table.put("ORGANISATIONS", workspaces);
-				flashMessage = new FlashMessage("getAccessibleWorkspaceFolders", table);
-			}else
-				flashMessage = new FlashMessage("getAccessibleWorkspaceFolders",
-												"User with user_id of: " + userID
-												+ " is not a member of any organisation",
-												FlashMessage.ERROR);
-	 } else
-	 	flashMessage = FlashMessage.getNoSuchUserExists("getAccessibleWorkspaceFolders", userID);
-		
-		return flashMessage.serializeMessage();
-	}
 	
 	/**
 	 * (non-Javadoc)
-	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#getAccessibleWorkspaceFolders(java.lang.Integer)
+	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#getAccessibleOrganisationWorkspaceFolders(java.lang.Integer)
 	 */
-	public String getAccessibleWorkspaceFoldersNew(Integer userID)	throws IOException {
+	public Vector getAccessibleOrganisationWorkspaceFolders(Integer userID)	throws IOException {
 		User user = userDAO.getUserById(userID);
-		Hashtable table = new Hashtable();
-		Vector workspaces = new Vector();
+		Vector folders = new Vector();
 		
 		if (user != null) {
-			//add the user's own folder to the list
-			WorkspaceFolder privateFolder = user.getWorkspace().getRootFolder();
-			Integer permissions = getPermissions(privateFolder,user);
-			table.put("PRIVATE", new FolderContentDTO(privateFolder, permissions));
-			
 			// Get a list of organisations of which the given user is a member
 			List userMemberships = userOrganisationDAO.getUserOrganisationsByUser(user);
 			if (userMemberships != null) {
@@ -1237,22 +1182,39 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 					 */
 					if (hasWriteAccess(roles)) {
 						WorkspaceFolder orgFolder = member.getOrganisation().getWorkspace().getRootFolder();
-						workspaces.add(new FolderContentDTO(orgFolder,getPermissions(orgFolder,user)));
+						folders.add(new FolderContentDTO(orgFolder,getPermissions(orgFolder,user)));
 					}
 				}
-				table.put("ORGANISATIONS", workspaces);
-				flashMessage = new FlashMessage("getAccessibleWorkspaceFolders", table);
-			}else
-				flashMessage = new FlashMessage("getAccessibleWorkspaceFolders",
-												"User with user_id of: " + userID
-												+ " is not a member of any organisation",
-												FlashMessage.ERROR);
-	 } else
-	 	flashMessage = FlashMessage.getNoSuchUserExists("getAccessibleWorkspaceFolders", userID);
+			} else {
+				log.warn("getAccessibleWorkspaceFolders: Trying to get user memberships for user "+userID+". User doesn't belong to any organisations. Returning no folders.");
+			}
+		} else {
+			log.warn("getAccessibleWorkspaceFolders: User "+userID+" does not exist. Returning no folders.");
+		}
 		
-		return flashMessage.serializeMessage();
+		return folders;
 	}
 	
+	/**
+	 * (non-Javadoc)
+	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#getUserWorkspaceFolder(java.lang.Integer)
+	 */
+	public FolderContentDTO getUserWorkspaceFolder(Integer userID)	throws IOException {
+		User user = userDAO.getUserById(userID);
+		
+		if (user != null) {
+			//add the user's own folder to the list
+			WorkspaceFolder privateFolder = user.getWorkspace().getRootFolder();
+			Integer permissions = getPermissions(privateFolder,user);
+			return new FolderContentDTO(privateFolder, permissions);
+			
+		} else {
+			log.warn("getAccessibleWorkspaceFolders: User "+userID+" does not exist. Returning no folders.");
+		}
+		
+		return null;
+	}
+
 	/**
 	 * This a utility method that checks whether user has write access. He can
 	 * save his contents to a folder only if he is an AUTHOR,TEACHER or STAFF

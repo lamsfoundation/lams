@@ -24,7 +24,8 @@ package org.lamsfoundation.lams.workspace.web;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Date;
+import java.util.Hashtable;
+import java.util.Vector;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -34,13 +35,12 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
-import org.lamsfoundation.lams.authoring.service.IAuthoringService;
-import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
-import org.lamsfoundation.lams.usermanagement.exception.UserException;
-import org.lamsfoundation.lams.usermanagement.exception.WorkspaceFolderException;
-import org.lamsfoundation.lams.util.DateUtil;
+import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
+import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.lamsfoundation.lams.workspace.dto.FolderContentDTO;
 import org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -58,6 +58,20 @@ public class WorkspaceAction extends DispatchAction {
 	public static final String RESOURCE_ID = "resourceID";
 	public static final String RESOURCE_TYPE = "resourceType";
 	
+	/** 
+	 * Special value for folderID on getFolderContents(). Triggers getting the 
+	 * dummy value for the organisations (see ORG_FOLDER_ID) and the user's
+	 * private folder. See the method for more details. 
+	 */
+	public static final Integer BOOTSTRAP_FOLDER_ID = new Integer(-1);
+	
+	/** 
+	 * Special value for folderID on getFolderContents(). Triggers getting the 
+	 * organisation folders that are available to a user. See
+	 * the method for more details. 
+	 */
+	public static final Integer ORG_FOLDER_ID = new Integer(-2);
+
 	/** If you want the output given as a jsp, set the request parameter "jspoutput" to 
      * some value other than an empty string (e.g. 1, true, 0, false, blah). 
      * If you want it returned as a stream (ie for Flash), do not define this parameter
@@ -97,6 +111,33 @@ public class WorkspaceAction extends DispatchAction {
 	        return null;
 	    }
 	}
+	
+	/** Send the flash message back to Flash */
+	private ActionForward returnWDDXPacket(FlashMessage flashMessage, HttpServletResponse response) throws IOException {
+	        PrintWriter writer = response.getWriter();
+	        writer.println(flashMessage.serializeMessage());
+	        return null;
+	}
+
+	/** Is the folder id one of our special dummy ids? If so, we can't process the normal create, copy, paste, move
+	 * functions on this folder.
+	 * @return error packet if it is a special id. Should return packet to Flash with no further processing.
+	 */
+	private String checkResourceNotDummyValue(String methodName, Integer folderID, String resourceType) throws IOException {
+		return checkResourceNotDummyValue(methodName, new Long(folderID.longValue()), resourceType);
+	}
+
+	/** Is the folder id one of our special dummy ids? If so, we can't process the normal create, copy, paste, move
+	 * functions on this folder.
+	 */
+	private String checkResourceNotDummyValue(String methodName, Long folderID, String resourceType) throws IOException {
+		if ( FolderContentDTO.FOLDER.equals(resourceType) && (BOOTSTRAP_FOLDER_ID.equals(folderID) || ORG_FOLDER_ID.equals(folderID)) ) {
+			FlashMessage msg = new FlashMessage(methodName, "FolderID "+folderID+" invalid for this call.",FlashMessage.ERROR);
+			return msg.serializeMessage();
+		}
+		return null;
+	}
+
 	/**
 	 * For details please refer to 
 	 * org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService 
@@ -113,6 +154,10 @@ public class WorkspaceAction extends DispatchAction {
 											   HttpServletRequest request,
 											   HttpServletResponse response)throws ServletException,IOException{
 		Integer parentFolderID = new Integer(WebUtil.readIntParam(request,"parentFolderID"));
+		String errorPacket = checkResourceNotDummyValue("createFolderForFlash", parentFolderID, FolderContentDTO.FOLDER);
+		if ( errorPacket != null)
+			return outputPacket(mapping, request, response, errorPacket, "details");
+
 		String folderName = (String)WebUtil.readStrParam(request,"name");
 		Integer userID = new Integer(WebUtil.readIntParam(request,AttributeNames.PARAM_USER_ID));
 		IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
@@ -121,7 +166,24 @@ public class WorkspaceAction extends DispatchAction {
 	}
 	
 	/**
-	 * For details please refer to 
+	 * getFolderContents returns the details of the folders, learning designs and files 
+	 * contained in a folder. 
+	 * 
+	 * If getFolderContents gets the BOOTSTRAP_FOLDER_ID (-1), then it return the user's private
+	 * folder and the root folder. 
+	 * 
+	 * If getFolderContents gets the ORG_FOLDER_ID (-2) then it will return all the workspace
+	 * folders that the user can access.
+	 * 
+	 * This method handles the special values for the BOOTSTRAP_FOLDER_ID and the ORG_FOLDER_ID
+	 * as these values are only meaningful to the Flash client - they are not meaningful to 
+	 * the progress engine or the like. If we ever had to return this data to another client,
+	 * the data may be returned in a different way.
+	 * 
+	 * The calls made to the service layer vary depending on what is required - this decouple's
+	 * the client's special needs from the overall logic of the workspaces.
+	 * 
+	 * For more details please refer to 
 	 * org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService
 	 *  
 	 * @param mapping
@@ -135,38 +197,74 @@ public class WorkspaceAction extends DispatchAction {
 	public ActionForward getFolderContents(ActionMapping mapping,
 										   ActionForm form,
 										   HttpServletRequest request,
-										   HttpServletResponse response)throws ServletException,Exception{
+										   HttpServletResponse response)throws ServletException,IOException{
 		Integer folderID = new Integer(WebUtil.readIntParam(request,"folderID"));
 		Integer mode = new Integer(WebUtil.readIntParam(request,"mode"));		
 		Integer userID = new Integer(WebUtil.readIntParam(request,AttributeNames.PARAM_USER_ID));
 		IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
-		String wddxPacket = workspaceManagementService.getFolderContents(userID,folderID,mode);		
-		return outputPacket(mapping, request, response, wddxPacket, "details");		
-	}
+		String methodKey = "getFolderContents";
+		Hashtable packet = null;
+		
+		try {
+			if ( BOOTSTRAP_FOLDER_ID.equals(folderID )) {
+				// return back the dummy org DTO and the user's workspace folder
+				Vector folders = new Vector();
+				FolderContentDTO userFolder = workspaceManagementService.getUserWorkspaceFolder(userID);
+				if ( userFolder != null )
+					folders.add(userFolder);
+				
+				// TODO I8N the organisation strings
+				FolderContentDTO dummyOrgFolder = new  FolderContentDTO("Organisations", "Folder",
+						null, null, 
+						FolderContentDTO.FOLDER, new Long(ORG_FOLDER_ID.longValue()), WorkspaceFolder.READ_ACCESS,
+						null);
+				
+				folders.add(dummyOrgFolder);
+				
+				packet = createFolderContentPacket(null, BOOTSTRAP_FOLDER_ID, folders);
+				
+			} else if ( ORG_FOLDER_ID.equals(folderID) ) {
+				// return back all the organisation folders that the user can access
+				Vector folders = workspaceManagementService.getAccessibleOrganisationWorkspaceFolders(userID);
+				packet = createFolderContentPacket(BOOTSTRAP_FOLDER_ID, ORG_FOLDER_ID, folders);
+				
+			} else {
+				// normal case - just return back the contents of this folder.
+				WorkspaceFolder folder = workspaceManagementService.getWorkspaceFolder(folderID);
+				if ( folder != null ) {
+					Vector items;
+						items = workspaceManagementService.getFolderContentsExcludeHome(userID,folder,mode);
+					WorkspaceFolder parentWorkspaceFolder = folder.getParentWorkspaceFolder();
+					packet = createFolderContentPacket(parentWorkspaceFolder!=null?parentWorkspaceFolder.getWorkspaceFolderId():null, 
+							folder.getWorkspaceFolderId(), 
+							items);
+				} else {
+					return returnWDDXPacket(FlashMessage.getNoSuchWorkspaceFolderContentExsists(methodKey,new Long(folderID.longValue())), response);		
+				}
+			}
+		} catch (UserAccessDeniedException e) {
+			return returnWDDXPacket(FlashMessage.getUserNotAuthorized(methodKey, userID), response);
+		} catch (Exception e) {
+			return returnWDDXPacket(FlashMessage.getExceptionOccured(methodKey, e.getMessage()), response);
+		}
 	
-	/**
-	 * For details please refer to 
-	 * org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService
-	 *  
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return ActionForward
-	 * @throws ServletException
-	 * @throws Exception
-	 */
-	public ActionForward getFolderContentsExcludeHome(ActionMapping mapping,
-										   ActionForm form,
-										   HttpServletRequest request,
-										   HttpServletResponse response)throws ServletException,Exception{
-		Integer folderID = new Integer(WebUtil.readIntParam(request,"folderID"));
-		Integer mode = new Integer(WebUtil.readIntParam(request,"mode"));		
-		Integer userID = new Integer(WebUtil.readIntParam(request,AttributeNames.PARAM_USER_ID));
-		IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
-		String wddxPacket = workspaceManagementService.getFolderContentsExcludeHome(userID,folderID,mode);		
-		return outputPacket(mapping, request, response, wddxPacket, "details");		
+		return returnWDDXPacket(new FlashMessage(methodKey,packet), response);		
 	}
+
+	private Hashtable createFolderContentPacket(Integer parentWorkspaceFolderID, Integer workspaceFolderID, Vector contents){
+		Hashtable packet = new Hashtable();
+		
+		if ( parentWorkspaceFolderID != null )
+			packet.put("parentWorkspaceFolderID", parentWorkspaceFolderID);
+		
+		if ( workspaceFolderID != null )
+			packet.put("workspaceFolderID", workspaceFolderID);
+		
+		if ( contents != null )
+			packet.put("contents", contents);
+		return packet;
+	}	
+
 
 	/**
 	 * For details please refer to
@@ -185,7 +283,11 @@ public class WorkspaceAction extends DispatchAction {
 											   HttpServletRequest request,
 											   HttpServletResponse response)throws ServletException, IOException{
 		Long resourceID = new Long(WebUtil.readLongParam(request,RESOURCE_ID));				
-		String resourceType = WebUtil.readStrParam(request,RESOURCE_TYPE);				
+		String resourceType = WebUtil.readStrParam(request,RESOURCE_TYPE);
+		String errorPacket = checkResourceNotDummyValue("deleteResource", resourceID, FolderContentDTO.FOLDER);
+		if ( errorPacket != null)
+			return outputPacket(mapping, request, response, errorPacket, "details");
+
 		Integer userID = new Integer(WebUtil.readIntParam(request,AttributeNames.PARAM_USER_ID));
 		IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
 		String wddxPacket = workspaceManagementService.deleteResource(resourceID,resourceType,userID);		
@@ -213,6 +315,10 @@ public class WorkspaceAction extends DispatchAction {
 		Long resourceID = new Long(WebUtil.readLongParam(request,RESOURCE_ID));				
 		String resourceType = WebUtil.readStrParam(request,RESOURCE_TYPE);				
 		Integer targetFolderID = new Integer(WebUtil.readIntParam(request,"targetFolderID"));
+		String errorPacket = checkResourceNotDummyValue("copyResource", targetFolderID, FolderContentDTO.FOLDER);
+		if ( errorPacket != null)
+			return outputPacket(mapping, request, response, errorPacket, "details");
+
 		Integer copyType = WebUtil.readIntParam(request, "copyType", true);
 		Integer userID = new Integer(WebUtil.readIntParam(request,AttributeNames.PARAM_USER_ID));
 		IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
@@ -240,6 +346,10 @@ public class WorkspaceAction extends DispatchAction {
 		String resourceType = WebUtil.readStrParam(request,RESOURCE_TYPE);				
 		Integer userID = new Integer(WebUtil.readIntParam(request,AttributeNames.PARAM_USER_ID));
 		Integer targetFolderID = new Integer(WebUtil.readIntParam(request,"targetFolderID"));
+
+		String errorPacket = checkResourceNotDummyValue("copyResource", targetFolderID, FolderContentDTO.FOLDER);
+		if ( errorPacket != null)
+			return outputPacket(mapping, request, response, errorPacket, "details");
 
 		IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
 		String wddxPacket = workspaceManagementService.moveResource(resourceID,targetFolderID,resourceType,userID);
@@ -273,6 +383,10 @@ public class WorkspaceAction extends DispatchAction {
 		String mimeType = WebUtil.readStrParam(request,"mimeType");
 		String path = WebUtil.readStrParam(request,"path");
 		
+		String errorPacket = checkResourceNotDummyValue("createWorkspaceFolderContent", workspaceFolderID, FolderContentDTO.FOLDER);
+		if ( errorPacket != null)
+			return outputPacket(mapping, request, response, errorPacket, "details");
+
 		IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
 		String wddxPacket = workspaceManagementService.createWorkspaceFolderContent(contentTypeID,name,description,
 																				 workspaceFolderID,
@@ -297,51 +411,11 @@ public class WorkspaceAction extends DispatchAction {
 											 HttpServletResponse response)throws ServletException, Exception{
 		Long folderContentID = new Long(WebUtil.readLongParam(request,"folderContentID"));
 		String path = WebUtil.readStrParam(request,"path");
+
 		IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
 		String wddxPacket = workspaceManagementService.updateWorkspaceFolderContent(folderContentID,path);
 		return outputPacket(mapping, request, response, wddxPacket, "details");
 	}
-	/**
-	 * For details please refer to
-	 * org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService
-	 *
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return ActionForward
-	 * @throws IOException
-	 */
-	public ActionForward getAccessibleWorkspaceFolders(ActionMapping mapping,
-													   ActionForm form,
-													   HttpServletRequest request,
-													   HttpServletResponse response)throws IOException{
-		Integer userID = new Integer(WebUtil.readIntParam(request,AttributeNames.PARAM_USER_ID));
-		IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
-		String wddxPacket = workspaceManagementService.getAccessibleWorkspaceFolders(userID);		
-		return outputPacket(mapping, request, response, wddxPacket, "details");
-	}
-	/**
-	 * For details please refer to
-	 * org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService
-	 *
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return ActionForward
-	 * @throws IOException
-	 */
-	public ActionForward getAccessibleWorkspaceFoldersNew(ActionMapping mapping,
-													   ActionForm form,
-													   HttpServletRequest request,
-													   HttpServletResponse response)throws IOException{
-		Integer userID = new Integer(WebUtil.readIntParam(request,AttributeNames.PARAM_USER_ID));
-		IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
-		String wddxPacket = workspaceManagementService.getAccessibleWorkspaceFoldersNew(userID);		
-		return outputPacket(mapping, request, response, wddxPacket, "details");
-	}
-	
 	/**
 	 * For details please refer to
 	 * org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService
@@ -360,33 +434,17 @@ public class WorkspaceAction extends DispatchAction {
 		Integer userID = new Integer(WebUtil.readIntParam(request,AttributeNames.PARAM_USER_ID));
 		Long resourceID = new Long(WebUtil.readLongParam(request,RESOURCE_ID));
 		String resourceType = WebUtil.readStrParam(request,RESOURCE_TYPE);				
+
+		String errorPacket = checkResourceNotDummyValue("renameResource", resourceID, resourceType);
+		if ( errorPacket != null)
+			return outputPacket(mapping, request, response, errorPacket, "details");
+
 		String name = WebUtil.readStrParam(request,"name");
 		IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
 		String wddxPacket = workspaceManagementService.renameResource(resourceID,resourceType,name,userID);		
         PrintWriter writer = response.getWriter();
         writer.println(wddxPacket);
         return null;
-	}
-	
-	/**
-	 * For details please refer to
-	 * org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService
-	 * 
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return ActionForward
-	 * @throws IOException
-	 */
-	public ActionForward getWorkspace(ActionMapping mapping,
-									  ActionForm form,
-									  HttpServletRequest request,
-									  HttpServletResponse response)throws IOException{
-		Integer userID = new Integer(WebUtil.readIntParam(request,AttributeNames.PARAM_USER_ID));
-		IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
-		String wddxPacket = workspaceManagementService.getWorkspace(userID);		
-		return outputPacket(mapping, request, response, wddxPacket, "details");
 	}
 	
 	/**
@@ -407,6 +465,11 @@ public class WorkspaceAction extends DispatchAction {
 		Long uuID = new Long(WebUtil.readIntParam(request,"uuID"));
 		Long versionID= new Long(WebUtil.readIntParam(request,"versionID"));
 		Long folderContentID = new Long(WebUtil.readIntParam(request,"folderContentID"));
+
+		String errorPacket = checkResourceNotDummyValue("deleteContentWithVersion", folderContentID, FolderContentDTO.FOLDER);
+		if ( errorPacket != null)
+			return outputPacket(mapping, request, response, errorPacket, "details");
+
 		IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
 		String wddxPacket = workspaceManagementService.deleteContentWithVersion(uuID,versionID,folderContentID);
 		return outputPacket(mapping, request, response, wddxPacket, "details");

@@ -23,11 +23,14 @@
 package org.lamsfoundation.lams.workspace.service;
 
 import java.io.IOException;
-import java.util.Date;
+import java.util.Vector;
 
+import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
+import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.usermanagement.exception.WorkspaceFolderException;
+import org.lamsfoundation.lams.workspace.dto.FolderContentDTO;
 
 /**
  * @author Manpreet Minhas
@@ -38,6 +41,12 @@ public interface IWorkspaceManagementService {
 	public static final String REPOSITORY_PASSWORD ="flashClient";
 	public static final String REPOSITORY_WORKSPACE="FlashClientsWorkspace";
 	
+	/**
+	 * Get the workspace folder for a particular id. Does not check the user permissions - that will be checked if you try to get
+	 * anything from the folder.
+	 */
+	public WorkspaceFolder getWorkspaceFolder(Integer workspaceFolderID);
+
 	/**
 	 * This method returns the contents of the folder with given
 	 * <code>workspaceFolderID</code> depending upon the <code>mode</code>. 
@@ -74,13 +83,12 @@ public interface IWorkspaceManagementService {
 	 * method with workspaceFolderID of A1. 
 	 * 
 	 * @param userID The <code>user_id</code> of the <code>User</code> who has requested the contents
-	 * @param workspaceFolderID The <code>workspace_folder_id</code> of the <code>WorkspaceFolder</code>
-	 * 							whose contents are requested
+	 * @param workspaceFolder The <code>WorkspaceFolder</code> whose contents are requested
 	 * @param mode It can be either 1(AUTHORING) or 2(MONITORING)
-	 * @return String The required information in WDDX format 
+	 * @return A list of the FolderContentDTOs in a format suitable for WDDX 
 	 * @throws Exception
 	 */
-	public String getFolderContents(Integer userID, Integer workspaceFolderID, Integer mode)throws Exception;
+	public Vector getFolderContents(Integer userID, WorkspaceFolder workspaceFolder, Integer mode)throws UserAccessDeniedException, RepositoryCheckedException ;
 	
 	/**
 	 * This method does the same as getFolderContents() except that it doesn't return
@@ -89,13 +97,12 @@ public interface IWorkspaceManagementService {
 	 * folder from the getAccessibleWorkspaceFolders() call.
 	 * 
 	 * @param userID The <code>user_id</code> of the <code>User</code> who has requested the contents
-	 * @param workspaceFolderID The <code>workspace_folder_id</code> of the <code>WorkspaceFolder</code>
-	 * 							whose contents are requested
+	 * @param workspaceFolder The <code>WorkspaceFolder</code> whose contents are requested
 	 * @param mode It can be either 1(AUTHORING) or 2(MONITORING)
-	 * @return String The required information in WDDX format 
+	 * @return A list of the FolderContentDTOs in a format suitable for WDDX 
 	 * @throws Exception
 	 */
-	public String getFolderContentsExcludeHome(Integer userID, Integer workspaceFolderID, Integer mode)throws Exception;
+	public Vector getFolderContentsExcludeHome(Integer userID, WorkspaceFolder workspaceFolder, Integer mode)throws UserAccessDeniedException, RepositoryCheckedException ;
 	
 	/**
 	 * This method creates a new folder under the given parentFolder
@@ -235,56 +242,30 @@ public interface IWorkspaceManagementService {
 	public String deleteContentWithVersion(Long uuid, Long versionToBeDeleted,Long folderContentID)throws Exception;
 	
 	/**
-	 * This method returns a list of workspace folders for which 
-	 * the user has "write" access. A user can write/save his content
-	 * in a folder in one of the following cases
-	 * <ol>
-	 * 	  <li>He is the OWNER of the given workspace folder</li>
-	 * 	  <li>He is a MEMBER of the organisation to which the
-	 * 			folder belongs and he has one or all of the follwing 
-	 * 			roles (SYSADMIN. ADMIN, AUTHOR, STAFF, TEACHER)</li>	  		
-	 * </ol>
+	 * This method returns a list of organisation workspace folders. 
 	 * 
-	 * The information returned is categorized under 3 main heads
-	 * <ul>
-	 * <li>PRIVATE The folder which belongs to the given User</li>
-	 * <li>ORGANISATIONS List of folders(root folder only) which belong 
-	 * to organisations of which user is a member.</li>
-	 * </ul>
+	 * The organisation folders returned are determined based on whether
+	 * the user has "write" access. A user can write/save his content
+	 * in an organisation folder the user is a MEMBER of the organisation to 
+	 * which the folder belongs and the user has one or all of the follwing
+	 * roles (SYSADMIN. ADMIN, AUTHOR, STAFF, TEACHER)
 	 * 
 	 * @param userID The <code>user_id</code> of the user for whom the
 	 * 				 folders have to fetched
-	 * @return String The required information in WDDX format
+	 * @return List of folders, in a format suitable for WDDX
 	 * @throws IOException
 	 */
-	public String getAccessibleWorkspaceFolders(Integer userID)throws IOException;
+	public Vector getAccessibleOrganisationWorkspaceFolders(Integer userID)throws IOException;
 	
 	/**
-	 * This method returns a list of workspace folders for which 
-	 * the user has "write" access. A user can write/save his content
-	 * in a folder in one of the following cases
-	 * <ol>
-	 * 	  <li>He is the OWNER of the given workspace folder</li>
-	 * 	  <li>He is a MEMBER of the organisation to which the
-	 * 			folder belongs and he has one or all of the follwing 
-	 * 			roles (SYSADMIN. ADMIN, AUTHOR, STAFF, TEACHER)</li>	  		
-	 * </ol>
-	 * 
-	 * The information returned is categorized under 3 main heads
-	 * <ul>
-	 * <li>PRIVATE The folder which belongs to the given User</li>
-	 * <li>ORGANISATIONS List of folders(root folder only) which belong 
-	 * to organisations of which user is a member.</li>
-	 * </ul>
-	 * 
-	 * This is a modified version which returns FolderContentDTO, rather than UserAccessFoldersDTO
+	 * This method returns the root workspace folder for a particular user. 
 	 * 
 	 * @param userID The <code>user_id</code> of the user for whom the
 	 * 				 folders have to fetched
-	 * @return String The required information in WDDX format
+	 * @return FolderContentDTO for the user's root workspace folder 
 	 * @throws IOException
 	 */
-	public String getAccessibleWorkspaceFoldersNew(Integer userID)throws IOException;
+	public FolderContentDTO getUserWorkspaceFolder(Integer userID)throws IOException;
 
 	/**
 	 * This method renames the workspaceFolder/learning design with the
