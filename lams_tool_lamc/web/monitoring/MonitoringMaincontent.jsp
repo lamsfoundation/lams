@@ -174,12 +174,25 @@
 		
 		        <c:when test='${currentMonitoringTab == "editActivity"}'>
 						<div class="tabbody content_b" >
-							<c:if test="${sessionScope.editOptionsMode == 0}"> 			
-								<jsp:include page="/authoring/BasicContent.jsp" />
-							</c:if> 				
-							<c:if test="${sessionScope.editOptionsMode == 1}"> 			
-								<jsp:include page="/authoring/OptionsContent.jsp" />
-							</c:if> 				
+							<c:if test="${requestScope.isMonitoredContentInUse != 'true'}"> 			
+								<c:if test="${sessionScope.editOptionsMode == 0}"> 			
+									<jsp:include page="/authoring/BasicContent.jsp" />
+								</c:if> 				
+								<c:if test="${sessionScope.editOptionsMode == 1}"> 			
+									<jsp:include page="/authoring/OptionsContent.jsp" />
+								</c:if> 				
+							</c:if> 											
+							<c:if test="${requestScope.isMonitoredContentInUse == 'true'}"> 			
+									<table align=center> 	  
+									<tr>   
+									<td NOWRAP class=error>
+										<font size=2>
+											<%@ include file="/McErrorBox.jsp" %> <!-- show any error messages here -->
+										</font>
+									</td>
+									</tr> 
+									</table>
+							</c:if> 																									
 						</div>
 		        </c:when>
 

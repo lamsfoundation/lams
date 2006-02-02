@@ -202,6 +202,7 @@ public interface McAppConstants {
     public static final String IS_TOOL_ACTIVITY_OFFLINE					="isToolActivityOffline";
     public static final String IS_USERNAME_VISIBLE						="isUsernameVisible";
     public static final String IS_CONTENT_IN_USE						="isContentInUse";
+    public static final String IS_MONITORED_CONTENT_IN_USE				="isMonitoredContentInUse";
     public static final String IS_RETRIES								="isRetries";
     public static final String IS_SHOW_FEEDBACK							="isShowFeedback";
     public static final String IS_SHOW_LEARNERS_REPORT					="isShowLearnersReport";    

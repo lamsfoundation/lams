@@ -36,7 +36,9 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McApplicationException;
 import org.lamsfoundation.lams.tool.mc.McUtils;
+import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
+import org.lamsfoundation.lams.tool.mc.service.McServiceProxy;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 
 /**
@@ -165,6 +167,13 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
     	logger.debug("dispatching submitSession...");
     	McMonitoringForm mcMonitoringForm = (McMonitoringForm) form;
 	 	IMcService mcService =McUtils.getToolService(request);
+    	if (mcService == null)
+		{
+			logger.debug("will retrieve mcService");
+			mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+		    logger.debug("retrieving mcService from cache: " + mcService);
+		}
+	    request.getSession().setAttribute(TOOL_SERVICE, mcService);
 	 	
     	String currentMonitoredToolSession=mcMonitoringForm.getSelectedToolSessionId(); 
 	    logger.debug("currentMonitoredToolSession: " + currentMonitoredToolSession);
@@ -213,15 +222,43 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
     	logger.debug("dispatching editActivity...");
     	McMonitoringForm mcMonitoringForm = (McMonitoringForm) form;
     	IMcService mcService =McUtils.getToolService(request);
-	 	
- 		request.setAttribute(CURRENT_MONITORING_TAB, "editActivity");
+    	logger.debug("mcService: " + mcService);
+    	
+    	if (mcService == null)
+		{
+			logger.debug("will retrieve mcService");
+			mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+		    logger.debug("retrieving mcService from cache: " + mcService);
+		}
+	    request.getSession().setAttribute(TOOL_SERVICE, mcService);
+    	
+	 	request.setAttribute(CURRENT_MONITORING_TAB, "editActivity");
  		
 		McStarterAction mcStarterAction= new McStarterAction();
 	    request.getSession().setAttribute(TOOL_SERVICE, mcService);
 	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    logger.debug("toolContentId: " + toolContentId);
 	    	    
 	    request.setAttribute(SOURCE_MC_STARTER, "monitoring");
 	    logger.debug("SOURCE_MC_STARTER: monitoring");
+	    
+		/* it is possible that the content is being used by some learners. In this situation, the content  is marked as "in use" and 
+		   content in use is not modifiable*/ 
+		McContent mcContent=mcService.retrieveMc(toolContentId);
+		logger.debug("mcContent:" + mcContent);
+		boolean isContentInUse=McUtils.isContentInUse(mcContent);
+		logger.debug("isContentInUse:" + isContentInUse);
+		
+		if (isContentInUse == true)
+		{
+			logger.debug("monitoring url does not allow editActivity since the content is in use.");
+	    	persistError(request,"error.content.inUse");
+	    	McUtils.cleanUpSessionAbsolute(request);
+	    	request.setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(true).toString());
+			logger.debug("forwarding to: " + LOAD_MONITORING);
+			return (mapping.findForward(LOAD_MONITORING));
+		}
+
 	    return mcStarterAction.executeDefineLater(mapping, form, request, response, mcService);
 	}
 
@@ -252,6 +289,13 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	 {
     	logger.debug("dispatching editActivityQuestions..");
 	 	IMcService mcService =McUtils.getToolService(request);
+    	if (mcService == null)
+		{
+			logger.debug("will retrieve mcService");
+			mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+		    logger.debug("retrieving mcService from cache: " + mcService);
+		}
+	    request.getSession().setAttribute(TOOL_SERVICE, mcService);
 	 	
 	 	request.setAttribute(CURRENT_MONITORING_TAB, "editActivity");
 	 	
@@ -290,6 +334,13 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
     	logger.debug("dispatching getSummary...");
     	McMonitoringForm mcMonitoringForm = (McMonitoringForm) form;
 	 	IMcService mcService =McUtils.getToolService(request);
+    	if (mcService == null)
+		{
+			logger.debug("will retrieve mcService");
+			mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+		    logger.debug("retrieving mcService from cache: " + mcService);
+		}
+	    request.getSession().setAttribute(TOOL_SERVICE, mcService);
 	 	
  		request.setAttribute(CURRENT_MONITORING_TAB, "summary");   
  		return (mapping.findForward(LOAD_MONITORING));
@@ -321,6 +372,14 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
     	logger.debug("dispatching getInstructions...");
     	McMonitoringForm mcMonitoringForm = (McMonitoringForm) form;
 	 	IMcService mcService =McUtils.getToolService(request);
+    	
+	 	if (mcService == null)
+		{
+			logger.debug("will retrieve mcService");
+			mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+		    logger.debug("retrieving mcService from cache: " + mcService);
+		}
+	    request.getSession().setAttribute(TOOL_SERVICE, mcService);
 	 	
 	 	request.setAttribute(CURRENT_MONITORING_TAB, "instructions");
  		return (mapping.findForward(LOAD_MONITORING));
@@ -351,6 +410,13 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
     	logger.debug("dispatching getStats...");
     	McMonitoringForm mcMonitoringForm = (McMonitoringForm) form;
 	 	IMcService mcService =McUtils.getToolService(request);
+    	if (mcService == null)
+		{
+			logger.debug("will retrieve mcService");
+			mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+		    logger.debug("retrieving mcService from cache: " + mcService);
+		}
+	    request.getSession().setAttribute(TOOL_SERVICE, mcService);
 	 	
  		request.setAttribute(CURRENT_MONITORING_TAB, "stats");
  		return (mapping.findForward(LOAD_MONITORING));

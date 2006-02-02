@@ -77,6 +77,8 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
   								throws IOException, ServletException, McApplicationException {
+		
+		McUtils.cleanUpSessionAbsolute(request);
 
 		IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
 	    logger.debug("retrieving mcService from proxy: " + mcService);

@@ -124,25 +124,13 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 
 public class McStarterAction extends Action implements McAppConstants {
 	/*
-	 * CONTENT_LOCKED refers to content being in use or not: Any students answered that content?
-	 * Currently CONTENT_LOCKED ->CONTENT_IN_USE
-	 * 
+	 * This class is reused by defineLater and monitoring modules as well. 
 	 */
 	static Logger logger = Logger.getLogger(McStarterAction.class.getName());
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
   								throws IOException, ServletException, McApplicationException {
 
-		/*
-		String showAuthoringTabs=(String) request.getSession().getAttribute(SHOW_AUTHORING_TABS);
-		logger.debug("showAuthoringTabs: "  + showAuthoringTabs);
-
-		if (showAuthoringTabs == null)
-		{
-			request.getSession().setAttribute(SHOW_AUTHORING_TABS,new Boolean(true).toString());
-		}
-		logger.debug("final showAuthoringTabs: "  + request.getSession().getAttribute(SHOW_AUTHORING_TABS));
-		*/
 		McUtils.cleanUpSessionAbsolute(request);
 		logger.debug("init authoring mode. removed attributes...");
 		
@@ -158,39 +146,21 @@ public class McStarterAction extends Action implements McAppConstants {
 
 		String servletPath=request.getServletPath();
 		logger.debug("getServletPath: "+ servletPath);
-		if (servletPath.indexOf("defineLaterStarter") > 0)
-		{
-			logger.debug("request is for define later module.");
-			request.getSession().setAttribute(ACTIVE_MODULE, DEFINE_LATER);
-			request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(false));
-			request.getSession().setAttribute(SHOW_AUTHORING_TABS,new Boolean(false).toString());
-		}
-		else
+		if (servletPath.indexOf("authoringStarter") > 0)
 		{
 			logger.debug("request is for authoring module");
 			request.getSession().setAttribute(ACTIVE_MODULE, AUTHORING);
 			request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(true));
 			request.getSession().setAttribute(SHOW_AUTHORING_TABS,new Boolean(true).toString());
 		}
-		 
-		/*
-		String activeModule=(String) request.getSession().getAttribute(ACTIVE_MODULE);
-		logger.debug("activeModule: "  + activeModule);
-		
-		if ( (activeModule == null) || 
-			 (!activeModule.equals(DEFINE_LATER))
-			)
+		else
 		{
-		    McUtils.cleanUpSessionAbsolute(request);
-			logger.debug("init authoring mode. removed attributes...");
-			request.getSession().setAttribute(ACTIVE_MODULE, AUTHORING);
-			logger.debug("activeModule set to Authoring: "  + activeModule);
-			request.getSession().setAttribute(SHOW_AUTHORING_TABS,new Boolean(true).toString());
+			logger.debug("request is for define later module. either direct or by monitoring module");
+			request.getSession().setAttribute(ACTIVE_MODULE, DEFINE_LATER);
+			request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(false));
+			request.getSession().setAttribute(SHOW_AUTHORING_TABS,new Boolean(false).toString());			
 		}
-		logger.debug("final active activeModule is: "  + request.getSession().getAttribute(ACTIVE_MODULE));
-		logger.debug("final showAuthoringTabs: "  + request.getSession().getAttribute(SHOW_AUTHORING_TABS));
-		*/
-
+		 
 		initialiseAttributes(request);
     	/* determine whether the request is from Monitoring url Edit Activity
 		 * null sourceMcStarter indicates that the request is from authoring url.
@@ -378,23 +348,24 @@ public class McStarterAction extends Action implements McAppConstants {
 				McContent mcContent=mcService.retrieveMc(new Long(toolContentId));
 				logger.debug("existing mcContent:" + mcContent);
 		
+				/* it is possible that the content is being used by some learners. In this situation, the content  is marked as "in use" and 
+				   content in use is not modifiable*/ 
+				boolean isContentInUse=McUtils.isContentInUse(mcContent);
+				logger.debug("isContentInUse:" + isContentInUse);
+				
+				if (isContentInUse == true)
+				{
+			    	persistError(request,"error.content.inUse");
+			    	McUtils.cleanUpSessionAbsolute(request);
+					logger.debug("forwarding to: " + ERROR_LIST);
+					return (mapping.findForward(ERROR_LIST));
+				}
+				
 				/* do not make these tests if the request is coming from monitoring url for Edit Activity*/
 				if (  (sourceMcStarter == null) ||
 					  ((sourceMcStarter != null) && !sourceMcStarter.equals("monitoring"))
 				   )
 				{
-					/* it is possible that the content is being used by some learners. In this situation, the content  is marked as "in use" and 
-					  a content in use is not modifiable*/ 
-					boolean isContentInUse=McUtils.isContentInUse(mcContent);
-					logger.debug("isContentInUse:" + isContentInUse);
-					
-					if (isContentInUse == true)
-					{
-				    	persistError(request,"error.content.inUse");
-				    	McUtils.cleanUpSessionAbsolute(request);
-						logger.debug("forwarding to: " + ERROR_LIST);
-						return (mapping.findForward(ERROR_LIST));
-					}
 					
 					/* it is possible that the content is being EDITED in the monitoring interface. In this situation, the content is not modifiable*/ 
 					boolean isDefineLater=McUtils.isDefineLater(mcContent);
@@ -806,19 +777,29 @@ public class McStarterAction extends Action implements McAppConstants {
 	}
 	
 	
+	/**
+	 * is reused by defineLater and monitoring urls to activate defineLater module 
+	 * 
+	 * executeDefineLater(ActionMapping mapping, ActionForm form, 
+			HttpServletRequest request, HttpServletResponse response, IMcService mcService) 
+		throws IOException, ServletException, McApplicationException
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @param mcService
+	 * @return ActionForward
+	 * @throws IOException
+	 * @throws ServletException
+	 * @throws McApplicationException
+	 */
 	public ActionForward executeDefineLater(ActionMapping mapping, ActionForm form, 
 			HttpServletRequest request, HttpServletResponse response, IMcService mcService) 
 		throws IOException, ServletException, McApplicationException {
 		logger.debug("passed mcService: " + mcService);
 		request.getSession().setAttribute(TOOL_SERVICE, mcService);
 
-		/* present the view-only screen first */
-		/*
-		request.getSession().setAttribute(ACTIVE_MODULE, DEFINE_LATER);
-		request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(false));
-		request.getSession().setAttribute(SHOW_AUTHORING_TABS,new Boolean(false).toString());
-		*/
-		
 		return execute(mapping, form, request, response);
 	}
 	

@@ -524,7 +524,7 @@ public abstract class McUtils implements McAppConstants {
 	
 	
 	/**
-	 * 
+	 * the only attributes kept are TOOL_SESSION and TOOL_CONTENT_ID
 	 * cleanUpSessionAbsolute(HttpServletRequest request)
 	 * @param request
 	 */
@@ -563,7 +563,6 @@ public abstract class McUtils implements McAppConstants {
     	request.getSession().removeAttribute(IS_REMOVE_CONTENT);
     	request.getSession().removeAttribute(IS_REVISITING_USER);
     	request.getSession().removeAttribute(USER);
-    	request.getSession().removeAttribute(TOOL_CONTENT_ID);
     	request.getSession().removeAttribute(TOOL_CONTENT_UID);
     	request.getSession().removeAttribute(TOOL_SESSION_ID);
     	request.getSession().removeAttribute(USER_ID);
