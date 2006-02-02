@@ -3,7 +3,7 @@ CREATE TABLE lams.tl_lamc11_content (
      , content_id BIGINT(20) NOT NULL
      , title TEXT NOT NULL
      , instructions TEXT NOT NULL
-     , creation_date VARCHAR(100)
+     , creation_date DATETIME
      , update_date DATETIME
      , questions_sequenced TINYINT(1) NOT NULL DEFAULT 0
      , username_visible TINYINT(1) NOT NULL DEFAULT 0
@@ -112,7 +112,6 @@ CREATE TABLE lams.tl_lamc11_uploadedFile (
      , CONSTRAINT FK_tl_lamc11_uploadedFile FOREIGN KEY (mc_content_id)
                   REFERENCES lams.tl_lamc11_content (uid)
 )TYPE=InnoDB;
-
 
 INSERT INTO lams.tl_lamc11_content(uid, content_id , title , instructions , creation_date , questions_sequenced , username_visible , created_by , monitoring_report_title , report_title , run_offline , define_later, synch_in_monitor, offline_instructions, online_instructions, end_learning_message, content_in_use, retries, show_feedback, show_report) VALUES (1, ${default_content_id} ,'Mc Title','Mc Instructions', NOW(), 0, 0,1,'Monitoring Report','Report', 0, 0, 0,'offline instructions','online instructions','Finished Activity...', 0, 0, 0, 0);
 

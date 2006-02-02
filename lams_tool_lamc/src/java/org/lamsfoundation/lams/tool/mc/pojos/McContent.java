@@ -65,7 +65,7 @@ public class McContent implements Serializable {
     private boolean runOffline;
 
     /** nullable persistent field */
-    private String creationDate;
+    private Date creationDate;
 
     /** nullable persistent field */
     private Date updateDate;
@@ -123,7 +123,7 @@ public class McContent implements Serializable {
     private Set mcAttachments;
 
     /** full constructor */
-    public McContent(Long mcContentId, String title, String instructions, boolean defineLater, boolean runOffline, String creationDate, 
+    public McContent(Long mcContentId, String title, String instructions, boolean defineLater, boolean runOffline, Date creationDate, 
     		Date updateDate, boolean questionsSequenced, boolean usernameVisible, String reportTitle, String monitoringReportTitle, 
 			long createdBy, boolean synchInMonitor, boolean contentInUse, String offlineInstructions, String onlineInstructions, 
 			String endLearningMessage, Integer passMark, boolean showReport, boolean showFeedback, boolean retries, Set mcQueContents, Set mcSessions, 
@@ -308,14 +308,6 @@ public class McContent implements Serializable {
         this.runOffline = runOffline;
     }
 
-    public String getCreationDate() {
-        return this.creationDate;
-    }
-
-    public void setCreationDate(String creationDate) {
-        this.creationDate = creationDate;
-    }
-
     public Date getUpdateDate() {
         return this.updateDate;
     }
@@ -484,5 +476,17 @@ public class McContent implements Serializable {
 	 */
 	public void setMcAttachments(Set mcAttachments) {
 		this.mcAttachments = mcAttachments;
+	}
+	/**
+	 * @return Returns the creationDate.
+	 */
+	public Date getCreationDate() {
+		return creationDate;
+	}
+	/**
+	 * @param creationDate The creationDate to set.
+	 */
+	public void setCreationDate(Date creationDate) {
+		this.creationDate = creationDate;
 	}
 }
