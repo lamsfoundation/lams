@@ -2,6 +2,7 @@
 import org.lamsfoundation.lams.authoring.tb.*
 import org.lamsfoundation.lams.common.mvc.*
 import mx.managers.*
+import mx.controls.*
 /*
 * Authoring view for the toolbar
 */
@@ -47,9 +48,21 @@ class ToolbarView extends AbstractView {
         _toolbar_mc = this;
         //Add the button handlers, essentially this is handing on clicked event to controller.
         var controller = getController();
-        _toolbar_mc.newButton.onRelease = Proxy.create(controller,controller['buttonClicked'],'new');
+        /*
+		_toolbar_mc.newButton.onRelease = Proxy.create(controller,controller['buttonClicked'],'new');
         _toolbar_mc.openButton.onRelease = Proxy.create(controller,controller['buttonClicked'],'open');
         _toolbar_mc.saveButton.onRelease = Proxy.create(controller,controller['buttonClicked'],'save');
+		*/
+		_toolbar_mc.new_btn.addEventListener("click",controller);
+		_toolbar_mc.open_btn.addEventListener("click",controller);
+		_toolbar_mc.save_btn.addEventListener("click",controller);
+		_toolbar_mc.copy_btn.addEventListener("click",controller);
+		_toolbar_mc.paste_btn.addEventListener("click",controller);
+		_toolbar_mc.trans_btn.addEventListener("click",controller);
+		_toolbar_mc.optional_btn.addEventListener("click",controller);
+		_toolbar_mc.preview_btn.addEventListener("click",controller);
+		
+		
         Debugger.log('dispatch it',Debugger.GEN,'createToolbar','ToolbarView');
         
        //Now that view is setup dispatch loaded event
