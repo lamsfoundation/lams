@@ -106,6 +106,12 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 		
 	}
 	
+	/**
+	 * Shows one or other of the tabs in the dialog
+	 * @usage   
+	 * @param   tabToSelect can be either LOCATION or PROPERTIES
+	 * @return  
+	 */
 	public function showTab(tabToSelect:String){
 		if(tabToSelect == undefined){
 			tabToSelect = _defaultTab;
@@ -125,98 +131,14 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
         dispatchEvent({type:'viewUpdate',target:this,updateType:_updateType,data:_data});
     }
 	
+	
+	
 	/**
-	 * Converts the de-serialised WDDX XML from an object into 
-	 * an xml format the tree likes
-	 * This is parsing data from the call to getAccessibleWOrkspaceFolders, so we know that all the
-	 * elements must be folders, as such we must set isBranch to be true; Also some other minor hacks to make the data match what we get with getFodlerContents()
+	 * Sets up the tree for the 1st time
+	 * Creates the dummy root folder with ID -1
 	 * @usage   
-	 * @param   dto - contains:		
-	 * PRIVATE The folder which belongs to the given User
-	 * RUN_SEQUENCES The folder in which user stores his lessons
-	 * ORGANISATIONS List of folders (root folder only) which belong to organizations of which user is a member
+	 * @return  
 	 */
-	 /*
-	public function parseDataForTree(dto:Object):Void{
-		Debugger.log('Running....',Debugger.GEN,'parseDataForTree','org.lamsfoundation.lams.WorkspaceModel');
-		
-		//_global.breakpoint();
-
-		if(_accessibleWorkspaceFoldersDTOCopy == null){
-			//first time in so make a copy
-			_accessibleWorkspaceFoldersDTOCopy = ObjectCopy.copy(dto);
-		}else{
-			//need to use the copy
-			dto = _accessibleWorkspaceFoldersDTOCopy;
-		}
-		
-		Debugger.log('_accessibleWorkspaceFoldersDTOCopy:'+ObjectUtils.toString(_accessibleWorkspaceFoldersDTOCopy),Debugger.GEN,'parseDataForTree','org.lamsfoundation.lams.WorkspaceModel');
-		Debugger.log('dto:'+ObjectUtils.toString(dto),Debugger.GEN,'parseDataForTree','org.lamsfoundation.lams.WorkspaceModel');
-		//this xml will be implementing the TreeDataProvider , see: http://livedocs.macromedia.com/flash/mx2004/main_7_2/wwhelp/wwhimpl/common/html/wwhelp.htm?context=Flash_MX_2004&file=00002902.html
-		_treeDP = new XML();
-		_workspaceResources = new Array();
-		//add top level
-		//create the data obj:
-		var mdto= {};
-		mdto.creationDateTime = new Date(null);
-		mdto.description = "";
-		mdto.lastModifiedDateTime = new Date(null);
-		mdto.name =  Dictionary.getValue('ws_tree_mywsp');
-		mdto.parentWorkspaceFolderID = null;
-		//read only
-		mdto.permissionCode = 1;
-		mdto.resourceID = "x1";
-		mdto.resourceType = "Folder";
-		mdto.workspaceFolderID = null;
-		
-		
-		var rootNode = _treeDP.addTreeNode(mdto.name,mdto);
-		rootNode.attributes.isBranch = true;
-		setWorkspaceResource(RT_FOLDER+'_'+mdto.resourceID,rootNode);
-		
-		//add org folder container
-		var fChild:XMLNode = _treeDP.firstChild;
-		var o_oto = {};
-		o_oto.creationDateTime = new Date(null);
-		o_oto.description = "";
-		o_oto.lastModifiedDateTime = new Date(null);
-		o_oto.name = Dictionary.getValue('ws_tree_orgs');
-		o_oto.parentWorkspaceFolderID = null;
-		//read only
-		o_oto.permissionCode = 1;
-		o_oto.resourceID = "x2";
-		o_oto.resourceType = "Folder";
-		o_oto.workspaceFolderID = "x1";
-		var orgNode:XMLNode = fChild.addTreeNode(o_oto.name,o_oto);
-		orgNode.attributes.isBranch = true;
-		setWorkspaceResource(RT_FOLDER+'_'+o_oto.resourceID,orgNode);
-				
-		for(var i=0;i<dto.ORGANISATIONS.length;i++){
-			var n = dto.ORGANISATIONS[i];
-			var nNode:XMLNode = orgNode.addTreeNode(n.name,n);
-			nNode.attributes.isBranch = true;
-			setWorkspaceResource(n.resourceType+'_'+n.resourceID,nNode);
-			
-		}	
-				
-		//add the prvate folder:
-		var key = dto.PRIVATE.resourceType+'_'+dto.PRIVATE.resourceID;
-		
-		dto.PRIVATE.workspaceFolderID="x1";
-		var privateNode:XMLNode = fChild.addTreeNode("Private:"+key,dto.PRIVATE);
-		privateNode.attributes.isBranch = true;
-		
-		Debugger.log('privateNode.attributes.data.resourceID:'+privateNode.attributes.data.resourceID,Debugger.GEN,'parseDataForTree','org.lamsfoundation.lams.WorkspaceModel');
-		//privateNode.attributes.data = dto.PRIVATE;
-		setWorkspaceResource(key,privateNode);
-		//_workspaceResources.put(dto.PRIVATE.resourceID,privateNode);
-				
-
-		
-	}
-	
-	*/
-	
 	public function initWorkspaceTree(){
 		Debugger.log('Running',Debugger.GEN,'initWorkspaceTree','org.lamsfoundation.lams.WorkspaceModel');
 		_treeDP = new XML();
@@ -364,20 +286,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 					  //Debugger.log('Removed node:'+deletedNode,Debugger.GEN,'clearWorkspaceCache','org.lamsfoundation.lams.WorkspaceModel');
 				  }
 				  
-				  	//if(wspResource.attributes.data.resourceID.indexOf('x') != -1){
-					/*
-					Debugger.log('folderIDPendingRefresh.indexOf(x):'+String(folderIDPendingRefresh).indexOf('x'),Debugger.GEN,'clearWorkspaceCache','org.lamsfoundation.lams.WorkspaceModel');
-					if(String(folderIDPendingRefresh).indexOf('x') > -1){
-						Debugger.log('Found a root/fake node',Debugger.GEN,'clearWorkspaceCache','org.lamsfoundation.lams.WorkspaceModel');
-						//need refresh root data as is one of the fake root folders ( root , or orgs)
-						_folderIDPendingRefreshList = new Array();
-						parseDataForTree(_accessibleWorkspaceFoldersDTOCopy);
-						Debugger.log('Gonna try auto open:'+folderIDPendingRefresh,Debugger.GEN,'clearWorkspaceCache','org.lamsfoundation.lams.WorkspaceModel');
-						//setFolderOpen(folderIDPendingRefresh);
-						broadcastViewUpdate('SET_UP_BRANCHES_INIT',null);
-						return 'CLEARED_ALL';
-					}
-				  */
+
 				  
 				}else{
 					Debugger.log('No Child nodes to delete',Debugger.GEN,'clearWorkspaceCache','org.lamsfoundation.lams.WorkspaceModel');
@@ -399,6 +308,11 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 		
 	}
 	
+	/**
+	 * If mroe than one fodler is pending refresh - use this and ensure the _folderIDPendingRefreshList is populated
+	 * @usage   
+	 * @return  
+	 */
 	public function clearWorkspaceCacheMultiple(){
 		if(_folderIDPendingRefreshList != null){
 			for (var i=0;i<_folderIDPendingRefreshList.length;i++){
@@ -417,6 +331,13 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 	}
 	
 
+	/**
+	 * Tells the dialog to open a folder, as if the user had expanded the node
+	 * NOTE - this manually generated the onOpen event for the controller
+	 * @usage   
+	 * @param   folderID The folder to open
+	 * @return  
+	 */
 	public function autoOpenFolderInTree(folderID){
 		var nodeToOpen:XMLNode = getWorkspaceResource('Folder_'+folderID);
 		Debugger.log('Opening node:'+nodeToOpen,Debugger.GEN,'autoOpenFolderInTree','org.lamsfoundation.lams.WorkspaceModel');
@@ -424,6 +345,12 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 		broadcastViewUpdate('REFRESH_FOLDER',nodeToOpen);
 	}
 	
+	/**
+	 * Opens folder but does not generate the event (therefore does not request the children, currently not used
+	 * @usage   
+	 * @param   folderID The folder to open
+	 * @return  
+	 */
 	public function setFolderOpen(folderID){
 		var nodeToOpen:XMLNode = getWorkspaceResource('Folder_'+folderID);
 		Debugger.log('Basic open folder call:'+nodeToOpen,Debugger.GEN,'setFolderOpen','org.lamsfoundation.lams.WorkspaceModel');
@@ -432,11 +359,23 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 		
 	}
 	
+	/**
+	 * Telkls the dialog that the _availableLicenses array is now full and the combo can be populated
+	 * @usage   
+	 * @return  
+	 */
 	public function populateLicenseDetails(){
 		broadcastViewUpdate('POPULATE_LICENSE_DETAILS',_availableLicenses);
 	}
 	
 	
+	/**
+	 * Sticks an item on the clipboard
+	 * @usage   
+	 * @param   item 
+	 * @param   mode 
+	 * @return  
+	 */
 	public function setClipboardItem(item:Object,mode:String){
 		//mode not used :-) no cut, only copy functionality this time.
 		_clipboardMode = mode;
@@ -444,12 +383,17 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 		
 	}
 	
+	/**
+	 * retrieves the item from the clipboard
+	 * @usage   
+	 * @return  
+	 */
 	public function getClipboardItem():Object{
 		return _clipboard;
 	}
 	
 	/**
-	 * Checks to see if the user can wrote to this resource
+	 * Checks to see if the user can write to this resource
 	 * If the resource is a folder, then can we write inside it
 	 * If the resource is a file/Design then can we overwrite it.
 	 * @usage   

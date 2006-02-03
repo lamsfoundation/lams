@@ -551,6 +551,19 @@ class WorkspaceDialog extends MovieClip{
 	
 	
 	
+	/**
+	 * Dispatches an event - picked up by the canvas in authoring
+	 * sends paramter containing:
+	 * _resultDTO.selectedResourceID 
+	 * _resultDTO.targetWorkspaceFolderID
+	 * 	_resultDTO.resourceName 
+		_resultDTO.resourceDescription 
+		_resultDTO.resourceLicenseText 
+		_resultDTO.resourceLicenseID 
+	 * @usage   
+	 * @param   useResourceID //if its true then we will send the resorceID of teh item selected in the tree - usually this means we are overwriting something
+	 * @return  
+	 */
 	public function doWorkspaceDispatch(useResourceID:Boolean){
 		//ObjectUtils.printObject();
 		var snode = treeview.selectedNode;
@@ -581,12 +594,14 @@ class WorkspaceDialog extends MovieClip{
 	public function closeThisDialogue(){
 		 _container.deletePopUp();
 	}
-	
-	
-	//TODO: maan must be able to just send a single event type and detect the name od the button
-	
 
 	
+	/**
+	 * Called when the tabs are clicked
+	 * @usage   
+	 * @param   e 
+	 * @return  
+	 */
 	private function switchTab(e){
 		Debugger.log('Switch tab called!',Debugger.GEN,'switchTab','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
 		if(e.newIndex == 0){			
@@ -635,6 +650,11 @@ class WorkspaceDialog extends MovieClip{
 	}
 	
 
+	/**
+	 * Sets up the inital branch detials
+	 * @usage   
+	 * @return  
+	 */
 	private function setUpBranchesInit(){
 		Debugger.log('Running...',Debugger.GEN,'setUpBranchesInit','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
 		//get the 1st child

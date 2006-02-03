@@ -29,7 +29,6 @@ class org.lamsfoundation.lams.common.ws.WorkspaceView extends AbstractView {
 		super (m, c);
 		//register to recive updates form the model
 		WorkspaceModel(m).addEventListener('viewUpdate',this);
-		//_workspaceController = getController();
 	}
 	
 	/**

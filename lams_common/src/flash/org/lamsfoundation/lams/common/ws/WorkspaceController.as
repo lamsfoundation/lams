@@ -42,30 +42,23 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
             evt.target.scrollContent.addEventListener('okClicked',Delegate.create(this,okClicked));
             evt.target.scrollContent.addEventListener('locationTabClick',Delegate.create(this,locationTabClick));
             evt.target.scrollContent.addEventListener('propertiesTabClick',Delegate.create(this,propertiesTabClick));
-            //evt.target.scrollContent.addEventListener('click',Delegate.create(this,click));
-			
-			
-			
+				
 			//set a ref to the view
 			evt.target.scrollContent.workspaceView = getView();
 			//set a ref to the dia in the view
 			getView().workspaceDialogue = evt.target.scrollContent;
-			
-			
 			//set up UI
 			//note this function registeres the dialog to recieve view updates
-			evt.target.scrollContent.setUpContent();
-			
+			evt.target.scrollContent.setUpContent();		
 			//populate the licenses drop down
-			_workspaceModel.populateLicenseDetails();
-			
+			_workspaceModel.populateLicenseDetails();			
 			//select the right tab, dont pass anything to show the default tab
 			_workspaceModel.showTab(_workspaceModel.currentTab);
         }else {
             //TODO DI 25/05/05 raise wrong event type error 
         }
     }
-    /**/
+
 	private function locationTabClick(evt:Object) {
         Debugger.log('locationTabClick:'+evt.type,Debugger.GEN,'locationTabClick','org.lamsfoundation.lams.WorkspaceController');
         _workspaceModel.showTab("LOCATION");
@@ -84,11 +77,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
         //Check type is correct
 		if(evt.type == 'okClicked'){
             //Call the callback, passing in the design selected designId
-			_global.breakpoint();
-            //okClickedCallback(evt.target.selectedDesignId);
-            //_workspaceModel.getWorkspace().itemSelected(evt.target.selectedDesignId);
-            //_workspaceModel.getWorkspace().onOKCallback(evt.target.selectedDesignId);
-			
+
 			//invalidate the cache of folders
 			_workspaceModel.clearWorkspaceCache(evt.target.resultDTO.targetWorkspaceFolderID);
 			
@@ -99,7 +88,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
         }
     }
 	
-	    /**
+	/**
     * Workspace dialog OK button clicked handler
     */
     private function clickFromDialog(evt:Object) {
@@ -119,24 +108,14 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
 		//data has already been got, nothing to do
 		
 		if(!nodeToOpen.hasChildNodes()){
-		
-
-			//if the resourceID is null then use the folderID
-			//var resourceToOpen = (nodeToOpen.attributes.data.resourceID) ? nodeToOpen.attributes.data.resourceID : nodeToOpen.attributes.data.workspaceFolderID;
-			
 			// DC24-01-06 this resource ID must refer to a folder as its been marked as a branch
 			var resourceToOpen = nodeToOpen.attributes.data.resourceID;
-			
-			
-			//TODO: I think it must be a folder ID, depoends if this event is fired for an "open" reousrce click
+			//must be a folder ID, depoends if this event is fired for an "open" reousrce click
 			_workspaceModel.openFolderInTree(resourceToOpen);
-				
 		}else{
 			Debugger.log('nodeToOpen already has children in cache',Debugger.GEN,'onTreeNodeOpen','org.lamsfoundation.lams.WorkspaceController');
 			
 		}
-		
-	   
     }
 	
 	/**
@@ -145,20 +124,12 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
     public function onTreeNodeClose (evt:Object){
 		Debugger.log('type::'+evt.type,Debugger.GEN,'onTreeNodeClose','org.lamsfoundation.lams.WorkspaceController');
 		var treeview = evt.target;
-	   
-	   
-	   
-	   
-	   
     }
 	
 	public function onTreeNodeChange (evt:Object){
 		Debugger.log('type::'+evt.type,Debugger.GEN,'onTreeNodeChange','org.lamsfoundation.lams.WorkspaceController');
 		var treeview = evt.target;
 		_workspaceModel.setSelectedTreeNode(treeview.selectedNode);
-		
-		
-		
 	}
 	
 	/**
@@ -186,12 +157,8 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
 		}else{
 			targetFolderID= targetNodeData.workspaceFolderID;
 		}
-		
 		//check the permission code for that folder
 		var isWritable = _workspaceModel.isWritableResource(_workspaceModel.RT_FOLDER,targetFolderID);
-		
-		
-		
 		var sourceFolderID:Number;
 		if(sourceNodeData.resourceType == _workspaceModel.RT_FOLDER){
 			sourceFolderID= sourceNodeData.resourceID;
@@ -199,18 +166,12 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
 			sourceFolderID= sourceNodeData.workspaceFolderID;
 		}
 		
-		
 		//must clear the entire cache as both the source and target folders need to be refreshed
 		_workspaceModel.folderIDPendingRefresh = null;
 		_workspaceModel.folderIDPendingRefreshList = new Array(targetFolderID,sourceFolderID);
 		
-		
-		Debugger.log('SourceNode:\n'+ObjectUtils.toString(sourceNodeData),Debugger.GEN,'onDragComplete','org.lamsfoundation.lams.WorkspaceController');
-		
-		Debugger.log('TargetNode:\n'+ObjectUtils.toString(targetNodeData),Debugger.GEN,'onDragComplete','org.lamsfoundation.lams.WorkspaceController');
-		
-		
-		
+		//Debugger.log('SourceNode:\n'+ObjectUtils.toString(sourceNodeData),Debugger.GEN,'onDragComplete','org.lamsfoundation.lams.WorkspaceController');
+		//Debugger.log('TargetNode:\n'+ObjectUtils.toString(targetNodeData),Debugger.GEN,'onDragComplete','org.lamsfoundation.lams.WorkspaceController');
 		
 		//ok we are going to do a move:
 		if(isWritable){
@@ -333,8 +294,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
 				}else{
 					LFMessage.showMessageAlert(Dictionary.getValue('ws_no_permission'),null,null);
 				}
-				
-				
+
 			}else{
 				//nothing to rename
 			}
@@ -348,6 +308,12 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
 		
 	}
 	
+	/**
+	 * Called when the user finishes the editing the name in the pop up dialog
+	 * @usage   
+	 * @param   newName 
+	 * @return  
+	 */
 	public function setNewResourceName(newName:String){
 		Debugger.log('newName:'+newName,Debugger.GEN,'setNewResourceName','org.lamsfoundation.lams.WorkspaceController');
 		var workspaceDialogue = getView().workspaceDialogue;
@@ -356,6 +322,12 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
 		_workspaceModel.getWorkspace().requestRenameResource(snodeData.resourceID,snodeData.resourceType,newName);
 	}
 	
+	/**
+	 * Called when the user finishes the editing the name in the pop up dialog
+	 * @usage   
+	 * @param   newName 
+	 * @return  
+	 */
 	public function setNewFolderName(newName:String){
 		Debugger.log('newName:'+newName,Debugger.GEN,'setNewFolderName','org.lamsfoundation.lams.WorkspaceController');
 		var workspaceDialogue = getView().workspaceDialogue;
@@ -380,29 +352,4 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
 		return WorkspaceView(v);
 		
 	}
-	
-	/**
-    * Treeview data changed event handler
-    
-    private function onTvChange (event:Object){
-        if (treeview == event.target) {
-            var node = treeview.selectedItem;
-            
-            // If this is a branch, expand/collapse it
-            if (treeview.getIsBranch(node)) {
-                treeview.setIsOpen(node, !treeview.getIsOpen(node), true);
-            }
-            
-            // If this is a hyperlink, jump to it
-            var url = node.attributes.url;
-            if (url) {
-                getURL(url, "_top");
-            }
-            
-            // Clear any selection
-            treeview.selectedNode = null;
-        }
-    }
-    
-   */
 }

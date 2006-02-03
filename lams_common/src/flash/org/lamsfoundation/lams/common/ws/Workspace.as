@@ -67,6 +67,13 @@ class org.lamsfoundation.lams.common.ws.Workspace {
 
 	}
 	
+	/**
+	 * Called when the user opens a node and we dont already have the children in the cache. 
+	 * either becasue never opened beofre or becasuse the cache was cleared for that folder
+	 * @usage   
+	 * @param   folderID 
+	 * @return  
+	 */
 	public function requestFolderContents(folderID:Number):Void{
 		var callback:Function = Proxy.create(this,recievedFolderContents);
         var uid:Number = Config.getInstance().userID;
@@ -75,6 +82,12 @@ class org.lamsfoundation.lams.common.ws.Workspace {
 		
 	}
 	
+	/**
+	 * Response handler for requestFolderContents
+	 * @usage   
+	 * @param   dto The WDDX object containing the children of this folder
+	 * @return  
+	 */
 	public function recievedFolderContents(dto:Object):Void{
 		workspaceModel.setFolderContents(dto);
 		
@@ -98,6 +111,13 @@ class org.lamsfoundation.lams.common.ws.Workspace {
 		//http://localhost:8080/lams/workspace.do?method=copyResource&resourceID=10&targetFolderID=6&resourceType=FOLDER&userID=4
 	}
 	
+	/**
+	 * Handler for most of the workspace file operations, it just invalidates the cache from the folderID pending refresh
+	 * and sends an open event to the dialog
+	 * @usage   
+	 * @param   dto 
+	 * @return  
+	 */
 	public function generalWorkspaceOperationResponseHandler(dto:Object){
 		if(dto instanceof LFError){
 			dto.showErrorAlert();
@@ -121,16 +141,7 @@ class org.lamsfoundation.lams.common.ws.Workspace {
 		Application.getInstance().getComms().getRequest('workspace.do?method=deleteResource&resourceID='+resourceID+'&resourceType='+resourceType+'&userID='+uid,callback, false);
 		
 	}
-	/*
-	public function deleteResourceResponse(dto:Object){
-		if(dto instanceof LFError){
-			dto.showErrorAlert();
-		}
-		workspaceModel.clearWorkspaceCache(workspaceModel.folderIDPendingRefresh);
-		//now open this node in the tree
-		workspaceModel.autoOpenFolderInTree(workspaceModel.folderIDPendingRefresh);
-	}
-	*/
+
 	public function requestNewFolder(parentFolderID:Number,folderName:String){
 		Debugger.log('parentFolderID:'+parentFolderID+', folderName'+folderName,Debugger.GEN,'requestNewFolder','Workspace');			
 		var callback:Function = Proxy.create(this,generalWorkspaceOperationResponseHandler);
@@ -138,32 +149,14 @@ class org.lamsfoundation.lams.common.ws.Workspace {
 		Application.getInstance().getComms().getRequest('workspace.do?method=createFolderForFlash&parentFolderID='+parentFolderID+'&name='+folderName+'&userID='+uid,callback, false);
 		
 	}
-	/*
-	public function requestNewFolderResponse(dto:Object){
-		if(dto instanceof LFError){
-			dto.showErrorAlert();
-		}
-		workspaceModel.clearWorkspaceCache(workspaceModel.folderIDPendingRefresh);
-		//now open this node in the tree
-		workspaceModel.autoOpenFolderInTree(workspaceModel.folderIDPendingRefresh);
-	}
-	*/
+
 	public function requestRenameResource(resourceID:Number,resourceType:Number,newName:String){
 		Debugger.log('resourceID:'+resourceID+', resourceType'+resourceType+', newName:'+newName,Debugger.GEN,'requestRenameResource','Workspace');			
 		var callback:Function = Proxy.create(this,generalWorkspaceOperationResponseHandler);
         var uid:Number = Config.getInstance().userID;
 		Application.getInstance().getComms().getRequest('workspace.do?method=renameResource&resourceID='+resourceID+'&resourceType='+resourceType+'&name='+newName+'&userID='+uid,callback, false);
 	}
-	/*
-	public function requestRenameResourceResponse(dto){
-		if(dto instanceof LFError){
-			dto.showErrorAlert();
-		}
-		workspaceModel.clearWorkspaceCache(workspaceModel.folderIDPendingRefresh);
-		//now open this node in the tree
-		workspaceModel.autoOpenFolderInTree(workspaceModel.folderIDPendingRefresh);
-	}
-	*/
+
 	public function requestMoveResource(resourceID:Number, targetFolderID:Number, resourceType:String){
 		Debugger.log('resourceID:'+resourceID+', resourceType'+resourceType+', targetFolderID:'+targetFolderID,Debugger.GEN,'requestMoveResource','Workspace');			
 		var callback:Function = Proxy.create(this,requestMoveResourceResponse);
@@ -187,6 +180,8 @@ class org.lamsfoundation.lams.common.ws.Workspace {
 		PRIVATE The folder which belongs to the given User
 		RUN_SEQUENCES The folder in which user stores his lessons
 		ORGANISATIONS List of folders (root folder only) which belong to organizations of which user is a member
+		
+		NB THis dunction is not used in the new folder structure
 	
 	private function requestWorkspaceFolders():Void{
 		var callback:Function = Proxy.create(this,recievedWorkspaceFolders);
@@ -202,21 +197,32 @@ class org.lamsfoundation.lams.common.ws.Workspace {
 
 	}
 	 */
+	/**
+	 * Gets a list of available licenses to apply to the designs.  Mostly they are creative commons licenses
+	 * @usage   
+	 * @return  
+	 */
 	public function requestAvailableLicenses(){
 		var callback:Function = Proxy.create(this,recievedAvailableLicenses);
         var uid:Number = Config.getInstance().userID;
 		Application.getInstance().getComms().getRequest('authoring/author.do?method=getAvailableLicenses',callback, false);
 	}
 	
+	/**
+	 * The handler for requestAvailableLicenses
+	 * @usage   
+`	 * @param   dto An array contaning objects of each of the licenses. Each one has a url, an id, a code and a imageURL, see the model for more description
+	 * @return  
+	 */
 	public function recievedAvailableLicenses(dto:Array){
 		workspaceModel.setAvailableLicenses(dto);
 	}
 	
 	
 	
-	
-    /**
-    * This is the method called when the user opens a design
+	/**
+	 * Shows the workspace browsing dialoge to open a design
+	 * Usually used by the canvas.
     * 
     */
     public function userSelectItem(callback){
@@ -248,8 +254,6 @@ class org.lamsfoundation.lams.common.ws.Workspace {
     public function itemSelected(designId:Number){
         Debugger.log('!!designID:'+designId,Debugger.GEN,'itemSelected','org.lamsfoundation.lams.Workspace');
 		_onOKCallBack(designId);
-        //Design has been chosen, get Canvas to open design
-        //Application.getInstance().getCanvas().openDesignById(designId);
     }
 	
 	public function getDefaultWorkspaceID():Number{
