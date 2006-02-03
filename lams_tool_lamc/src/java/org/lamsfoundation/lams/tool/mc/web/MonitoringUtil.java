@@ -172,7 +172,6 @@ public class MonitoringUtil implements McAppConstants{
     	logger.debug("total attempt count: " + listMarks.size());
     	return listMarks.size();
     }
-
 	
 	
 	/**

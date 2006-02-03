@@ -123,6 +123,14 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
   								throws IOException, ServletException, McApplicationException {
 		
+	    /*
+	     * By now, the passed tool session id MUST exist in the db through the calling of:
+	     * public void createToolSession(Long toolSessionId, Long toolContentId) by the container.
+	     *  
+	     * 
+	     * make sure this session exists in tool's session table by now.
+	     */
+		
 		McUtils.cleanUpSessionAbsolute(request);
 		
 		Map mapQuestionsContent= new TreeMap(new McComparator());
@@ -209,32 +217,6 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 		}
 		/*till here*/
 	    
-	    
-	    /*
-	     * By now, the passed tool session id MUST exist in the db through the calling of:
-	     * public void createToolSession(Long toolSessionId, Long toolContentId) by the container.
-	     *  
-	     * 
-	     * make sure this session exists in tool's session table by now.
-	     */
-/*		
-	    if (!McUtils.existsSession(toolSessionID, request)) 
-		{
-				logger.debug("tool session does not exist" + toolSessionID);
-				Long currentToolContentId= new Long(9876);
-				logger.debug("simulating container behaviour: calling createToolSession with toolSessionId : " + 
-						toolSessionID + " and toolContentId: " + currentToolContentId);
-				try
-				{
-					mcService.createToolSession(toolSessionID, currentToolContentId);
-					logger.debug("simulated container behaviour.");
-				}
-				catch(ToolException e)
-				{
-					logger.debug("we should never come here.");
-				}
-		}
-*/		
 		
 		/*
 		 * by now, we made sure that the passed tool session id exists in the db as a new record
@@ -436,11 +418,24 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    
 	    String learningMode=(String) request.getSession().getAttribute(LEARNING_MODE);
 	    logger.debug("users learning mode is: " + learningMode);
-	    
+	    /*if the user's session id AND user id exists in the tool tables go to redo questions.*/
 	    if ((mcQueUsr != null) && learningMode.equals("learner"))
 	    {
-	    	logger.debug("the learner has already responsed to this content, just generate a read-only report. Use redo questions for this.");
-	    	return (mapping.findForward(REDO_QUESTIONS));
+	    	Long sessionUid=mcQueUsr.getMcSessionId();
+	    	logger.debug("users sessionUid: " + sessionUid);
+	    	McSession mcUserSession= mcService.getMcSessionByUID(sessionUid);
+	    	logger.debug("mcUserSession: " + mcUserSession);
+	    	String userSessionId=mcUserSession.getMcSessionId().toString();
+	    	logger.debug("userSessionId: " + userSessionId);
+	    	Long toolSessionId=(Long)request.getSession().getAttribute(TOOL_SESSION_ID);
+	    	logger.debug("current toolSessionId: " + toolSessionId);
+	    	if (toolSessionId.toString().equals(userSessionId))
+	    	{
+	    		logger.debug("the user's session id AND user id exists in the tool tables go to redo questions. " + toolSessionId + " mcQueUsr: " + 
+	    				mcQueUsr + " user id: " + mcQueUsr.getQueUsrId());
+	    		logger.debug("the learner has already responsed to this content, just generate a read-only report. Use redo questions for this.");
+		    	return (mapping.findForward(REDO_QUESTIONS));
+	    	}
 	    }
 	    else if (learningMode.equals("teacher"))
 	    {

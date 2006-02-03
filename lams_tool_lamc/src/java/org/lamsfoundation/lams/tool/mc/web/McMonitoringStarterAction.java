@@ -76,27 +76,55 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 	static Logger logger = Logger.getLogger(McMonitoringStarterAction.class.getName());
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
-  								throws IOException, ServletException, McApplicationException {
-		
+  								throws IOException, ServletException, McApplicationException 
+	{
 		McUtils.cleanUpSessionAbsolute(request);
-
-		IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
-	    logger.debug("retrieving mcService from proxy: " + mcService);
-	    request.getSession().setAttribute(TOOL_SERVICE, mcService);		
-
-		McMonitoringForm mcMonitoringForm = (McMonitoringForm) form;
-	    
-	    /*
-	     * persist time zone information to session scope. 
-	     */
-	    McUtils.persistTimeZone(request);
+		
 	    ActionForward validateParameters=validateParameters(request, mapping);
 	    logger.debug("validateParamaters: " + validateParameters);
 	    if (validateParameters != null)
 	    {
 	    	return validateParameters;
 	    }
-  
+
+		boolean initData=initialiseMonitoringData(mapping, form, request, response);
+		logger.debug("initData: " + initData);
+		if (initData == false)
+			return (mapping.findForward(ERROR_LIST));
+		
+	    return (mapping.findForward(LOAD_MONITORING));	
+	}
+
+	
+	/**
+	 * initialises monitoring data mainly for jsp purposes 
+	 * initialiseMonitoringData(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return boolean
+	 */
+	public boolean initialiseMonitoringData(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+	{
+		IMcService mcService = (IMcService)request.getSession().getAttribute(TOOL_SERVICE);
+		logger.debug("mcService: " + mcService);
+		if (mcService == null)
+		{
+			logger.debug("will retrieve mcService");
+			mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+		    logger.debug("retrieving mcService from cache: " + mcService);
+		}
+
+	    request.getSession().setAttribute(TOOL_SERVICE, mcService);		
+		McMonitoringForm mcMonitoringForm = (McMonitoringForm) form;
+	    
+	    /*
+	     * persist time zone information to session scope. 
+	     */
+	    McUtils.persistTimeZone(request);
+
 	    /* we have made sure TOOL_CONTENT_ID is passed  */
 	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
 	    logger.debug("toolContentId: " + toolContentId);
@@ -108,7 +136,7 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 		{
 			persistError(request, "error.content.doesNotExist");
 			McUtils.cleanUpSessionAbsolute(request);
-			return (mapping.findForward(ERROR_LIST));
+			return false;
 		}
 	    
 		Map summaryToolSessions=MonitoringUtil.populateToolSessions(request, mcContent);
@@ -186,13 +214,18 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 		request.getSession().setAttribute(LOWEST_MARK, new Integer(lowestMark).toString());
 		request.getSession().setAttribute(AVERAGE_MARK, new Integer(averageMark).toString());
 		/* ends here. */
-	    
-	    
-	    logger.debug("forwarding to: " + LOAD_MONITORING);
-	    return (mapping.findForward(LOAD_MONITORING));	
+		return true;
 	}
+
 	
-	
+	/**
+	 * validates request paramaters based on tool contract
+	 * validateParameters(HttpServletRequest request, ActionMapping mapping)
+	 * 
+	 * @param request
+	 * @param mapping
+	 * @return ActionForward
+	 */
 	protected ActionForward validateParameters(HttpServletRequest request, ActionMapping mapping)
 	{
 		logger.debug("start validating monitoring parameters...");

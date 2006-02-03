@@ -369,6 +369,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     	
     	int mark=LearningUtil.getMark(mapLeanerAssessmentResults);
     	logger.debug("mark: " + mark);
+    	request.getSession().setAttribute(LEARNER_MARK, new Integer(mark).toString());
     	    	
     	Map mapQuestionWeights =(Map) request.getSession().getAttribute(MAP_QUESTION_WEIGHTS);
     	logger.debug("mapQuestionWeights: " + mapQuestionWeights);
@@ -416,11 +417,15 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     	int intHighestAttemptOrder=new Integer(highestAttemptOrder).intValue()+ 1 ;
         logger.debug("updated highestAttemptOrder:" + intHighestAttemptOrder);
         request.getSession().setAttribute(LEARNER_LAST_ATTEMPT_ORDER, new Integer(intHighestAttemptOrder).toString());
+        
+        int learnerMarkAtLeast=LearningUtil.getLearnerMarkAtLeast(passMark,mapQuestionWeights);
+        logger.debug("learnerMarkAtLeast:" + learnerMarkAtLeast);
+        request.getSession().setAttribute(LEARNER_MARK_ATLEAST, new Integer(learnerMarkAtLeast).toString());
 		
 		mcLearningForm.resetCommands();
 		return (mapping.findForward(INDIVIDUAL_REPORT));
     }
-
+    
 
     /**
      * takes the learner to the next set of questions
@@ -748,7 +753,6 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     }
 	
     
-        
     /**
      * redoQuestions(HttpServletRequest request, McLearningForm mcLearningForm, ActionMapping mapping)
      * 

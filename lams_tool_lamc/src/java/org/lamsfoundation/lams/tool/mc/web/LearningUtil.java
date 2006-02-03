@@ -39,6 +39,7 @@ public class LearningUtil implements McAppConstants {
      * 
      * @param request
      * @param form
+     * @param questionIndex
      */
     public static  void selectOptionsCheckBox(HttpServletRequest request,McLearningForm mcLearningForm, String questionIndex)
     {
@@ -756,7 +757,7 @@ public class LearningUtil implements McAppConstants {
         		if (displayOrder != 0)
         		{
         			/* add the question to the questions Map in the displayOrder*/
-        			mapQuestionsContent.put(new Integer(displayOrder).toString(),mcQueContent.getQuestion());
+        			mapQuestionsContent.put(new Integer(displayOrder).toString(),mcQueContent.getQuestion() + "      of weight: " + mcQueContent.getWeight().toString() + "%");
         		}
         		
         		/* prepare the first question's candidate answers for presentation*/ 
@@ -775,7 +776,92 @@ public class LearningUtil implements McAppConstants {
     	}
     	return mapQuestionsContent;
     }
+    
 
+    public static int getLearnerMarkAtLeast(Integer passMark, Map mapQuestionWeights)
+    {
+    	logger.debug("passMark:" + passMark);
+        logger.debug("mapQuestionWeights:" + mapQuestionWeights);
+        
+    	if ((passMark == null) || (passMark.intValue() == 0))
+    	{
+    		logger.debug("no passMark..");
+    		return 0;
+    	}
+    	else if ((passMark != null) && (passMark.intValue() != 0))
+    	{
+    		int minimumQuestionCountToPass=calculateMinimumQuestionCountToPass(passMark, mapQuestionWeights);
+    		logger.debug("minimumQuestionCountToPass: " + minimumQuestionCountToPass);
+    		return minimumQuestionCountToPass;
+    	}
+    	return 0;
+    }
+
+
+    public static int calculateMinimumQuestionCountToPass(Integer passMark, Map mapQuestionWeights)
+    {
+    	logger.debug("passMark: " + passMark);
+    	logger.debug("original mapQuestionWeights: " + mapQuestionWeights);
+    	
+    	int minimumQuestionCount=0;
+    	int totalHighestWeights=0;
+    	while (totalHighestWeights <= passMark.intValue())
+    	{
+        	int highestWeight=getHighestWeight(mapQuestionWeights);
+        	totalHighestWeights=totalHighestWeights + highestWeight;
+        	logger.debug("totalHighestWeights: " + totalHighestWeights);
+        	mapQuestionWeights=rebuildWeightsMapExcludeHighestWeight(mapQuestionWeights, highestWeight);
+    		logger.debug("mapQuestionWeights: " + mapQuestionWeights);
+    		++minimumQuestionCount;
+    	}
+    	logger.debug("returning minimumQuestionCount: " + minimumQuestionCount);
+    	return minimumQuestionCount;
+    }
+    
+    
+	public static int getHighestWeight(Map mapQuestionWeights)
+	{
+	   Iterator itMap = mapQuestionWeights.entrySet().iterator();
+ 	   int highestWeight=0; 	   
+       while (itMap.hasNext()) 
+       {
+       		Map.Entry pair = (Map.Entry)itMap.next();
+       		String weight=pair.getValue().toString();
+       		int intWeight=new Integer(weight).intValue();
+       		
+			if (intWeight > highestWeight)
+				highestWeight= intWeight;
+       }
+       return highestWeight;
+	}
+
+	
+	public static Map rebuildWeightsMapExcludeHighestWeight(Map mapQuestionWeights, int highestWeight)
+	{
+	   Map mapWeightsExcludeHighestWeight= new TreeMap(new McComparator());
+	   
+	   Iterator itMap = mapQuestionWeights.entrySet().iterator();
+	   Long mapIndex=new Long(1);
+       while (itMap.hasNext()) 
+       {
+       		Map.Entry pair = (Map.Entry)itMap.next();
+       		String weight=pair.getValue().toString();
+       		int intWeight=new Integer(weight).intValue();
+       		if (intWeight != highestWeight)
+       		{
+           		mapWeightsExcludeHighestWeight.put(mapIndex.toString(),weight);
+    	   		mapIndex=new Long(mapIndex.longValue()+1);
+       		}
+       		else
+       		{
+       			logger.debug("excluding highest weight from the reconstructed map: " + intWeight);
+       		}
+       }
+       logger.debug("returning mapWeightsExcludeHighestWeight: " + mapWeightsExcludeHighestWeight);
+       return mapWeightsExcludeHighestWeight; 
+	}
+
+    
     /**
      * removes Learning session attributes
      * cleanUpLearningSession(HttpServletRequest request)

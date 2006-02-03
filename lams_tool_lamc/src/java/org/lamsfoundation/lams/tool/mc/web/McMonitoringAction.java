@@ -331,7 +331,12 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
             HttpServletResponse response) throws IOException,
                                          ServletException
 	{
-    	logger.debug("dispatching getSummary...");
+    	McMonitoringStarterAction mcMonitoringStarter= new McMonitoringStarterAction();
+    	logger.debug("init monitoring data");
+    	boolean initData=mcMonitoringStarter.initialiseMonitoringData(mapping, form, request, response);
+		logger.debug("monitoring data initialised..");
+
+    	logger.debug("dispatching getSummary..."+ request);
     	McMonitoringForm mcMonitoringForm = (McMonitoringForm) form;
 	 	IMcService mcService =McUtils.getToolService(request);
     	if (mcService == null)
@@ -369,9 +374,15 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
             HttpServletResponse response) throws IOException,
                                          ServletException
 	{
-    	logger.debug("dispatching getInstructions...");
+    	logger.debug("dispatching getInstructions..." + request);
+    	McMonitoringStarterAction mcMonitoringStarter= new McMonitoringStarterAction();
+    	logger.debug("init monitoring data");
+    	boolean initData=mcMonitoringStarter.initialiseMonitoringData(mapping, form, request, response);
+		logger.debug("monitoring data initialised..");
+    	
     	McMonitoringForm mcMonitoringForm = (McMonitoringForm) form;
 	 	IMcService mcService =McUtils.getToolService(request);
+	 	logger.debug("mcService: " + mcService);
     	
 	 	if (mcService == null)
 		{
@@ -384,6 +395,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	 	request.setAttribute(CURRENT_MONITORING_TAB, "instructions");
  		return (mapping.findForward(LOAD_MONITORING));
 	}
+
     
 	/**
 	 * switches to Stats tab of the Monitoring url
@@ -407,7 +419,12 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
             HttpServletResponse response) throws IOException,
                                          ServletException
 	{
-    	logger.debug("dispatching getStats...");
+    	McMonitoringStarterAction mcMonitoringStarter= new McMonitoringStarterAction();
+    	logger.debug("init monitoring data");
+    	boolean initData=mcMonitoringStarter.initialiseMonitoringData(mapping, form, request, response);
+		logger.debug("monitoring data initialised..");
+
+    	logger.debug("dispatching getStats..." + request);
     	McMonitoringForm mcMonitoringForm = (McMonitoringForm) form;
 	 	IMcService mcService =McUtils.getToolService(request);
     	if (mcService == null)
@@ -511,7 +528,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
             HttpServletResponse response) throws IOException,
                                          ServletException
     {
-    	logger.debug("dispatching proxy editOptions...");
+    	logger.debug("dispatching proxy editOptions..." + request);
     	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
 	    logger.debug("SOURCE_MC_STARTER: monitoring");
 	    
@@ -544,7 +561,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
             HttpServletResponse response) throws IOException,
                                          ServletException
     {
-    	logger.debug("dispatching proxy addOption...");
+    	logger.debug("dispatching proxy addOption..."+ request);
     	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
 	    logger.debug("SOURCE_MC_STARTER: monitoring");
 	    
@@ -576,7 +593,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
             HttpServletResponse response) throws IOException,
                                          ServletException
     {
-    	logger.debug("dispatching proxy removeOption...");
+    	logger.debug("dispatching proxy removeOption..." + request);
     	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
 	    logger.debug("SOURCE_MC_STARTER: monitoring");
 	    
@@ -610,7 +627,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
             HttpServletResponse response) throws IOException,
                                          ServletException
     {
-    	logger.debug("dispatching proxy moveQuestionDown...");
+    	logger.debug("dispatching proxy moveQuestionDown..." + request);
     	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
 	    logger.debug("SOURCE_MC_STARTER: monitoring");
 	    
@@ -643,7 +660,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
             HttpServletResponse response) throws IOException,
                                          ServletException
     {
-    	logger.debug("dispatching proxy moveQuestionUp...");
+    	logger.debug("dispatching proxy moveQuestionUp..." + request);
     	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
 	    logger.debug("SOURCE_MC_STARTER: monitoring");
 	    
@@ -709,7 +726,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
                                          ServletException
 
     {
-    	logger.debug("dispatching proxy submitQuestions...");
+    	logger.debug("dispatching proxy submitQuestions..." + request);
     	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
 	    logger.debug("SOURCE_MC_STARTER: monitoring");
 	    
@@ -747,7 +764,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
                                          ServletException
 
     {
-    	logger.debug("dispatching proxy deleteOfflineFile...");
+    	logger.debug("dispatching proxy deleteOfflineFile..." + request);
     	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
 	    logger.debug("SOURCE_MC_STARTER: monitoring");
 	    
@@ -816,7 +833,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
                                          ServletException,
                                          RepositoryCheckedException
     {
-    	logger.debug("dispatching proxy deleteOnlineFile...");
+    	logger.debug("dispatching proxy deleteOnlineFile..." + request);
     	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
 	    logger.debug("SOURCE_MC_STARTER: monitoring");
 	    
@@ -851,7 +868,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
                                          ServletException,
                                          RepositoryCheckedException
     {
-    	logger.debug("dispatching proxy submitOnlineFiles...");
+    	logger.debug("dispatching proxy submitOnlineFiles..." + request);
     	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
 	    logger.debug("SOURCE_MC_STARTER: monitoring");
 	    

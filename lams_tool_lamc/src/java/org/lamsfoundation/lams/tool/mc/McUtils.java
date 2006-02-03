@@ -21,8 +21,6 @@ import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McSession;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
-import org.lamsfoundation.lams.tool.mc.web.AuthoringUtil;
-import org.lamsfoundation.lams.tool.mc.web.LearningUtil;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -511,20 +509,11 @@ public abstract class McUtils implements McAppConstants {
 	}
 	
 
-	/**
-	 * cleanUpSession(HttpServletRequest request)
-	 * @param request
-	 */
-	public static void cleanUpSession(HttpServletRequest request)
-	{
-		LearningUtil.cleanUpLearningSession(request);
-		AuthoringUtil.cleanupAuthoringSession(request);
-		//MonitoringUtil.cleanupAuthoringSession(request);
-	}
+	
 	
 	
 	/**
-	 * the only attributes kept are TOOL_SESSION and TOOL_CONTENT_ID
+	 * the only attributes kept are TOOL_SESSION and TOOL_CONTENT_ID and CURRENT_MONITORED_TOOL_SESSION
 	 * cleanUpSessionAbsolute(HttpServletRequest request)
 	 * @param request
 	 */
@@ -676,7 +665,6 @@ public abstract class McUtils implements McAppConstants {
     	request.getSession().removeAttribute(MONITORED_CONTENT_ID);
     	request.getSession().removeAttribute(EDITACTIVITY_EDITMODE);
     	request.getSession().removeAttribute(FORM_INDEX);
-    	request.getSession().removeAttribute(CURRENT_MONITORED_TOOL_SESSION);
     	request.getSession().removeAttribute(SELECTION_CASE);
     	request.getSession().removeAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO);
     	request.getSession().removeAttribute(QUESTION_LISTING_MODE);

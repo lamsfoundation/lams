@@ -2592,6 +2592,7 @@ public class AuthoringUtil implements McAppConstants {
 		}
     }
     
+
     
     /**
      * removeRedundantOnlineFileItems(HttpServletRequest request, McContent mcContent)
