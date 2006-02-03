@@ -70,16 +70,183 @@ class Toolkit {
 		Debugger.log('Running',4,'getToolkitActivities','Toolkit');
 		
 		var callback:Function = Proxy.create(this,setToolkitLibraries);
-		Application.getInstance().getComms().getRequest('http://dolly.uklams.net/lams/lams_authoring/all_library_details.xml',callback,true);
+		//Application.getInstance().getComms().getRequest('flashxml/all_library_details.xml',callback,false);
 		//Application.getInstance().getComms().getRequest('http://dolly.uklams.net/lams/lams_authoring/liblist.xml',callback,true);
-		//Application.getInstance().getComms().getRequest('authoring/author.do?method=getAllLearningLibraryDetails',callback);
+		//TODO: sort out with the aussies what is going on with this structure
+		Application.getInstance().getComms().getRequest('authoring/author.do?method=getAllLearningLibraryDetails',callback);
 	}
+
 	
+	/**
+	 * Call back, get the response from getToolkitLibraries server call
+	 * @usage   
+	 * @param   toolkits 
+	 * @return  
+	 */
 	public function setToolkitLibraries(toolkits:Array):Void{
 		
 		Debugger.log('Recieved toolkits array length:'+toolkits.length,4,'setToolkitActivities','Toolkit');
 		//TODO: Validate if correct data?
+		//go throught the recieved toolkits and make ToolActivities from them:
+		for(var i=0; i< toolkits.length; i++){
+			var toolkit:Object = toolkits[i];
+			
+			var classInstanceRefs = new Array();
+			//loop through the template activities, there should only be one for LAMS 1.1
+			//but coding a loop so we can use it later
+			
+			//this templateActivities array may contain other types, such as Parallel activities check with Fiona.
+			
+			for(var j=0; j<toolkit.templateActivities.length; j++){
+				var ta:Object = toolkit.templateActivities[j];
+				//TODO:ta.activityUIID ashould be null
+				//TODO - prune out non conforming activityTypeIDs
+				
+				//switch constructors based on the activityTypeID.
+				Debugger.log("in toolkit:"+toolkit.learningLibraryID+" Checking ACTIVITY_TYPE:"+ta.activityTypeID,4,'setToolkitActivities','Toolkit');
+				switch(ta.activityTypeID){
+					case Activity.TOOL_ACTIVITY_TYPE:
+						var toolAct:ToolActivity = new ToolActivity(null);
+						toolAct.populateFromDTO(ta);
+						classInstanceRefs.push(toolAct);
+						break;
+					case Activity.GROUPING_ACTIVITY_TYPE:
+						new LFError("Not able to handle this ACTIVITY_TYPE:"+ta.activityTypeID+", functionality not implemented","setToolkitLibraries",this);
+						toolkits.splice(i,1);
+						break;
+					case Activity.SYNCH_GATE_ACTIVITY_TYPE:
+						new LFError("Not able to handle this ACTIVITY_TYPE:"+ta.activityTypeID+", functionality not implemented","setToolkitLibraries",this);
+						toolkits.splice(i,1);
+						break;
+					case Activity.SCHEDULE_GATE_ACTIVITY_TYPE:
+						new LFError("Not able to handle this ACTIVITY_TYPE:"+ta.activityTypeID+", functionality not implemented","setToolkitLibraries",this);
+						toolkits.splice(i,1);
+						break;
+					case Activity.PERMISSION_GATE_ACTIVITY_TYPE:
+						new LFError("Not able to handle this ACTIVITY_TYPE:"+ta.activityTypeID+", functionality not implemented","setToolkitLibraries",this);
+						toolkits.splice(i,1);
+						break;
+					case Activity.PARALLEL_ACTIVITY_TYPE:
+						var cAct:ComplexActivity = new ComplexActivity(null);
+						cAct.populateFromDTO(ta);
+						classInstanceRefs.push(cAct);
+						//new LFError("Not able to handle this ACTIVITY_TYPE:"+ta.activityTypeID+", functionality not implemented","setToolkitLibraries",this);
+						//toolkits.splice(i,1);
+						break;
+					case Activity.OPTIONS_ACTIVITY_TYPE:
+						/*
+						var optAct:ComplexActivity = new ComplexActivity(null);
+						optAct.populateFromDTO(ta);
+						classInstanceRefs.push(optAct);
+						*/
+						new LFError("Not able to handle this ACTIVITY_TYPE:"+ta.activityTypeID+", functionality not implemented","setToolkitLibraries",this);
+						toolkits.splice(i,1);
+						break;
+					case Activity.SEQUENCE_ACTIVITY_TYPE:
+						new LFError("Not able to handle this ACTIVITY_TYPE:"+ta.activityTypeID+", functionality not implemented","setToolkitLibraries",this);
+						toolkits.splice(i,1);
+						break;
+					
+				}
+				
+				/*
+				var toolAct:ToolActivity = new ToolActivity(null);
+				toolAct.activityCategoryID = ta.activityCategoryID;
+				//toolAct.activityID = ta.null;    --- i changed this cos i dont know why it was hardcoded to null?>
+				toolAct.activityID = ta.activityID;
+				toolAct.activityTypeID = ta.activityTypeID;
+				toolAct.description = ta.description;
+				toolAct.helpText = ta.helpText;
+				//NOTE 09-11-05: this has changed from libraryActivityUiImage to libraryActivityUIImage
+				toolAct.libraryActivityUIImage = ta.libraryActivityUIImage;
+				toolAct.title = ta.title;
+				toolAct.learningLibraryID = toolkit.learningLibraryID;
+				//TODO get this field included in lib packet
+				toolAct.groupingSupportType = Activity.GROUPING_SUPPORT_OPTIONAL;
+				
+				toolAct.authoringURL = ta.tool.authoringURL;
+				toolAct.toolContentID = ta.tool.toolContentID;
+				toolAct.toolID = ta.tool.toolID;
+				toolAct.toolDisplayName = ta.tool.toolDisplayName;
+				toolAct.supportsContribute = ta.tool.supportsContribute;
+				toolAct.supportsDefineLater = ta.tool.supportsDefineLater;
+				toolAct.supportsModeration = ta.tool.supportsModeration;
+				toolAct.supportsRunOffline = ta.tool.supportsRunOffline;
+				
+				toolActivities.push(toolAct);
+				*/
+			}
+			
+			//put the instance ref array into the toolkit object
+			toolkit.classInstanceRefs = classInstanceRefs;
+			
+			
+		}
+		
+		
+		//sets these in the toolkit model in a hashtable by lib id
 		toolkitModel.setToolkitLibraries(toolkits);
+		
+		
+		
+	/**
+	 * Returns the TemplateActivity as Toolactivity
+	 * @usage   
+	 * @return  ToolActivity
+	 */
+	 
+	 /*
+	function getAsToolActivity():ToolActivity{
+		activityUIID:Number, 
+							activityTypeID:Number, 
+							activityCategoryID:Number, 
+							learningLibraryID:Number,
+							libraryActivityUIImage:String, 
+							toolContentUIID:Number, 
+							toolUIID:Number){
+		
+		
+		var myToolAct = new ToolActivity(	_templateActivityData.activityUIID,
+											_templateActivityData.activityCategoryID,
+											_
+		
+		
+		
+		);
+		
+		
+		
+	}
+
+*/
+
+	}
+	
+	/**
+	 * Retrieves the defaultContentID for a given learning libraryID and toolID.
+	 * It is the content ID that was in the library packet when it arrived
+	 * @usage   
+	 * @param   lid - The learning library id
+	 * @param   tid - The tool id
+	 * @return  default content ID
+	 */
+	public function getDefaultContentID(lid:Number,tid:Number):Number{
+		var ll:Object = toolkitModel.getLearningLibrary(lid);
+		for (var i=0; i<ll.classInstanceRefs.length; i++){
+			var ta:Activity = ll.classInstanceRefs[i];
+			if(ta.activityTypeID == Activity.TOOL_ACTIVITY_TYPE){
+				var toolAct = ToolActivity(ta);
+				if(tid == toolAct.toolID){
+					Debugger.log('DefaultContentID:'+toolAct.toolContentID,Debugger.GEN,'getDefaultContentID','Toolkit');
+					return toolAct.toolContentID;
+					
+				}
+			}
+		}
+		
+		return null;
+		
+		
 	}
     
 	/**

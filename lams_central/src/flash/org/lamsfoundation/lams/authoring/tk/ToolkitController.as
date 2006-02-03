@@ -44,7 +44,7 @@ class ToolkitController extends AbstractController {
 			dragIcon_mc.removeMovieClip();
 			
 			var ta:TemplateActivity;
-			ta = _toolkitModel.getSelectedTemplateActivity();			Debugger.log('ta:'+ta.getTemplateActivityData().title,4,'canvasDrop','ToolkitController');		
+			ta = _toolkitModel.getSelectedTemplateActivity();			Debugger.log('ta:'+ta.toolActivity.title,4,'canvasDrop','ToolkitController');		
 			cv.setDroppedTemplateActivity(ta);
 		}
 		

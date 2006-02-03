@@ -8,53 +8,71 @@ import org.lamsfoundation.lams.authoring.cv.*;
 /**  
 * CanvasActivity - 
 */  
-class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip{  
+class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip implements ICanvasActivity{  
+//class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip{  
   
 	
 	//this is set by the init object
 	private var _canvasController:CanvasController;
 	private var _canvasView:CanvasView;
+	//TODO:This should be ToolActivity
 	private var _activity:Activity;
 	
 	//locals
-	private var _icon_mc;
+	private var icon_mc:MovieClip;
+	private var icon_mcl:MovieClipLoader;
 	private var title_lbl:MovieClip;
 	private var stopSign_mc:MovieClip;
 	private var clickTarget_mc:MovieClip;
 	private var canvasActivity_mc:MovieClip;	private var _dcStartTime:Number = 0;
 	private var _doubleClicking:Boolean;
+	private var _visibleWidth:Number;
+	private var _visibleHeight:Number;
+	
+	
 	
 	function CanvasActivity(){
-		Debugger.log("_activity:"+_activity.title,4,'Constructor','CanvasActivity');
+		//Debugger.log("_activity:"+_activity.title,4,'Constructor','CanvasActivity');
 		//let it wait one frame to set up the components.
-		MovieClipUtils.doLater(Proxy.create(this,init));
+		//this has to be set b4 ther do later :)
+		_visibleHeight = canvasActivity_mc._height;
+		_visibleWidth = canvasActivity_mc._width;
+		//call init if we have passed in the _activity as an initObj in the attach movie,
+		//otherwise wait as the class outside will call it
+		if(_activity != undefined){
+			init();
+		}
+		
 	}
 	
-	public function init():Void{
+	public function init(initObj):Void{
+		if(initObj){
+			_canvasView = initObj.canvasView;
+			_canvasController = initObj.canvasController;
+			_activity = initObj.activity;
+		}
 		canvasActivity_mc._visible=false;
 		stopSign_mc._visible=false;
 		title_lbl._visible=false;
 		clickTarget_mc._visible=false;
-		_global.breakpoint();
-		if(_activity.isGateActivity()){
-			loadIcon();
-		}
-		draw();
+		
+		loadIcon();
+		
+		MovieClipUtils.doLater(Proxy.create(this,draw));
+
 	}
 	
-	public function get activity():Activity{
-		return _activity;
-	}
-	
-	public function set activity(a:Activity){
-		_activity = a;
-	}
 	
 	private function loadIcon():Void{
-		Debugger.log('Running, _activity.libraryActivityUIImage:'+_activity.libraryActivityUIImage,4,'loadIcon','CanvasActivity');
-		_icon_mc = this.createEmptyMovieClip("_icon_mc", this.getNextHighestDepth());
-		var ml = new MovieLoader(_activity.libraryActivityUIImage,setUpActIcon,this,_icon_mc);	
+		//Debugger.log('Running, _activity.libraryActivityUIImage:'+_activity.libraryActivityUIImage,4,'loadIcon','CanvasActivity');
+		icon_mc = this.createEmptyMovieClip("icon_mc", this.getNextHighestDepth());
+		var ml = new MovieLoader(Config.getInstance().serverUrl+_activity.libraryActivityUIImage,setUpActIcon,this,icon_mc);	
+		//icon_mc = MovieLoader.movieCache[Config.getInstance().serverUrl+_activity.libraryActivityUIImage];
+		//Debugger.log('icon_mc:'+icon_mc,4,'loadIcon','CanvasActivity');
+		setUpActIcon(icon_mc);
 	}
+	
+	
 	
 	
 	
@@ -64,7 +82,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip{
 		icon_mc._y = (this._height / 2) - (icon_mc._height / 2) - 5;
 	}
 	
-	private function draw(){		Debugger.log(_activity.title,4,'draw','CanvasActivity');
+	private function draw(){		Debugger.log(_activity.title+',_activity.isGateActivity():'+_activity.isGateActivity(),4,'draw','CanvasActivity');
 		if(_activity.isGateActivity()){
 			stopSign_mc._visible = true;
 		}else{
@@ -77,6 +95,14 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip{
 	
 		//indicate grouping
 		
+		//position
+		_x = _activity.xCoord;
+		_y = _activity.yCoord;
+		
+
+		
+		Debugger.log('canvasActivity_mc._visible'+canvasActivity_mc._visible,4,'draw','CanvasActivity');
+		_visible = true;
 	}
 	
 	
@@ -87,7 +113,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip{
 			var now:Number = new Date().getTime();
 			
 			if((now - _dcStartTime) <= Config.DOUBLE_CLICK_DELAY){
-				Debugger.log('DoubleClicking:'+this,Debugger.GEN,'onPress','CanvasActivity');
+				//Debugger.log('DoubleClicking:'+this,Debugger.GEN,'onPress','CanvasActivity');
 				_doubleClicking = true;
 				_canvasController.activityDoubleClick(this);
 				
@@ -103,10 +129,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip{
 				*/
 				
 			}else{
-				Debugger.log('SingleClicking:+'+this,Debugger.GEN,'onPress','CanvasActivity');
+				//Debugger.log('SingleClicking:+'+this,Debugger.GEN,'onPress','CanvasActivity');
 				_doubleClicking = false;
 				
-				Debugger.log('_canvasController:'+_canvasController,Debugger.GEN,'onPress','CanvasActivity');
+				//Debugger.log('_canvasController:'+_canvasController,Debugger.GEN,'onPress','CanvasActivity');
+				
 				_canvasController.activityClick(this);
 				
 				
@@ -136,23 +163,58 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip{
 	
 	private function onRelease():Void{
 		if(!_doubleClicking){
-			Debugger.log('Releasing:'+this,Debugger.GEN,'onRelease','CanvasActivity');
+			//Debugger.log('Releasing:'+this,Debugger.GEN,'onRelease','CanvasActivity');
+								
 			_canvasController.activityRelease(this);
 		}
 		
 	}
 	
 	private function onReleaseOutside():Void{
-		Debugger.log('ReleasingOutside:'+this,Debugger.GEN,'onReleaseOutside','CanvasActivity');
+		//Debugger.log('ReleasingOutside:'+this,Debugger.GEN,'onReleaseOutside','CanvasActivity');
+
 		_canvasController.activityReleaseOutside(this);
 	}
 	
 	
-	
-	
-	
-	
+	/**
+	 * 
+	 * @usage   
+	 * @return  
+	 */
+	public function getVisibleWidth ():Number {
+		return _visibleWidth;
+	}
 
+	
+	/**
+	 * 
+	 * @usage   
+	 * @return  
+	 */
+	public function getVisibleHeight ():Number {
+		return _visibleHeight;
+	}
+
+	
+	
+	public function get activity():Activity{
+		return getActivity();
+	}
+	
+	public function set activity(a:Activity){
+		setActivity(a);
+	}
+	
+	
+	public function getActivity():Activity{
+		return _activity;
+
+	}
+	
+	public function setActivity(a:Activity){
+		_activity = a;
+	}
 
 
 }

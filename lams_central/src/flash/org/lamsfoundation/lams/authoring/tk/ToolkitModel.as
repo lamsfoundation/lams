@@ -23,7 +23,7 @@ class ToolkitModel extends Observable {	private var _className:String = "Toolki
 	* Container for the Libraries. There maybe many template actvities per learning library. 
 	* Currently (1.1) there is only ever one.
 	*/
-	var _toolkitLearningLibraries:Hashtable;
+	private var _toolkitLearningLibraries:Hashtable;
 	/**
 	* Constructor.
 	*/
@@ -32,7 +32,10 @@ class ToolkitModel extends Observable {	private var _className:String = "Toolki
 	}
 		/**
 	* Sets the data for the toolkit (ToolkitLibraries). Called by the toolkit container.  Sends the update to the view. (LIBRARIES_UPDATED
-	*/
+	 * @usage   
+	 * @param   toolkits array of toolkits, also contains the classInstanceRefs array.
+	 * @return  
+	 */
 	public function setToolkitLibraries(tls:Array):Boolean{		//Debugger.log('_className:'+_className,4,'setToolkitLibraryActivities','ToolkitModel');				//_global.breakpoint();
 		var updateOk:Boolean=false;
 		//clear the old lot:
@@ -108,6 +111,18 @@ class ToolkitModel extends Observable {	private var _className:String = "Toolki
 	public function getToolkitDescription():String{
 		return _currentToolkitDescription;
 	}
+	
+	/**
+	 * Gets a learning Library using its ID
+	 * @usage   
+	 * @param   learningLibraryID 
+	 * @return  
+	 */
+	public function getLearningLibrary(learningLibraryID:Number):Object{
+		return _toolkitLearningLibraries.get(learningLibraryID);
+	}
+	
+	
     
     /**
     * set the size on the model, this in turn will set a changed flag and notify observers (views)
@@ -184,12 +199,6 @@ class ToolkitModel extends Observable {	private var _className:String = "Toolki
         return 'ToolkitModel';
     }
 	
-	// HELPER Methods
-	
-	public function getLibraryIDForTemplateActivity(templateActivityID){
-		
-		
-	}
     
 }
 

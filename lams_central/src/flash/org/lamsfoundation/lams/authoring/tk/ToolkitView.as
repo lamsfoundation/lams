@@ -1,7 +1,8 @@
-﻿import org.lamsfoundation.lams.common.util.*;
+﻿import org.lamsfoundation.lams.common.*;
+import org.lamsfoundation.lams.common.util.*;
+import org.lamsfoundation.lams.authoring.*;
 import org.lamsfoundation.lams.authoring.tk.*;
 import org.lamsfoundation.lams.common.mvc.*;import org.lamsfoundation.lams.authoring.cv.*  
-import org.lamsfoundation.lams.authoring.Application;
 
 import mx.managers.*;import mx.controls.*;
 import mx.events.*
@@ -34,7 +35,7 @@ class ToolkitView extends AbstractView {
 	*/
 	public function ToolkitView(){	
         //Set up this class to use the Flash event delegation model
-        EventDispatcher.initialize(this);        		Debugger.log('Running',4,'Constructor','ToolkitView');
+        EventDispatcher.initialize(this);        		//Debugger.log('Running',4,'Constructor','ToolkitView');
 	}
 		/**
 	* Initialisation - sets up the mvc relations ship Abstract view.
@@ -43,7 +44,7 @@ class ToolkitView extends AbstractView {
 	public function init(m:Observable, c:Controller){
 		//Invoke superconstructor, which sets up MVC relationships.
 		super (m, c);
-		Debugger.log('Running',4,'init','ToolkitView');
+		//Debugger.log('Running',4,'init','ToolkitView');
 		_dragging = false;
 		dragIconListener = new Object();
 		dragIconListener.cRef = this;
@@ -56,7 +57,7 @@ class ToolkitView extends AbstractView {
 		* @param dragIcon_mc The target mc that got the loaded movie
 		*/
 		dragIconListener.onLoadInit = function(dragIcon_mc){
-			Debugger.log('dragIcon_mc:'+dragIcon_mc,4,'dragIconListener.onLoadInit','ToolkitView');
+			//Debugger.log('dragIcon_mc:'+dragIcon_mc,4,'dragIconListener.onLoadInit','ToolkitView');
 			dragIcon_mc._visible = false;
 			//dragIcon_mc = dragIcon_mc;			//Proxy.create(this.cRef,this.cRef['setUpDrag'],dragIcon_mc);
 			this.cRef.setUpDrag(dragIcon_mc);
@@ -81,7 +82,7 @@ class ToolkitView extends AbstractView {
 		delete this.onEnterFrame;		_depth = this.getNextHighestDepth();
 		this.desc_pnl.setStyle("backgroundColor",0xFFFFFF);
         
-        Debugger.log('dispatching event',Debugger.GEN,'createToolkit','ToolkitView');
+        //Debugger.log('dispatching event',Debugger.GEN,'createToolkit','ToolkitView');
         
         
         //dispatch load event
@@ -131,10 +132,10 @@ class ToolkitView extends AbstractView {
         var s:Object = m.getSize();
         //Panel
         bkg_pnl.setSize(s.w,s.h);
-        Debugger.log('s.w:' + s.w,Debugger.GEN,'setSize','org.lamsfoundation.lams.ToolkitView');
-        Debugger.log('s.h:' + s.h,Debugger.GEN,'setSize','org.lamsfoundation.lams.ToolkitView');
-        Debugger.log('libraryActivityDesc_txa._y:' + libraryActivityDesc_txa._y,Debugger.GEN,'setSize','org.lamsfoundation.lams.ToolkitView');
-        Debugger.log('libraryActivityDesc_txa.height:' + libraryActivityDesc_txa.height,Debugger.GEN,'setSize','org.lamsfoundation.lams.ToolkitView');
+        //Debugger.log('s.w:' + s.w,Debugger.GEN,'setSize','org.lamsfoundation.lams.ToolkitView');
+        //Debugger.log('s.h:' + s.h,Debugger.GEN,'setSize','org.lamsfoundation.lams.ToolkitView');
+        //Debugger.log('libraryActivityDesc_txa._y:' + libraryActivityDesc_txa._y,Debugger.GEN,'setSize','org.lamsfoundation.lams.ToolkitView');
+        //Debugger.log('libraryActivityDesc_txa.height:' + libraryActivityDesc_txa.height,Debugger.GEN,'setSize','org.lamsfoundation.lams.ToolkitView');
 
         //Calculate scrollpane size
         var spWidth:Number = s.w-_scrollPanelWidthDiff;
@@ -159,8 +160,9 @@ class ToolkitView extends AbstractView {
         this._y = p.y;
     }
 	/**
-	* Updates learning library activities.  Creates a templateActivity mc / class for each one.	*  NOTE: Each library element contains an array of templateActivities.  
-	*	templateActivities array will always have one element, may become more in future.
+	* Updates learning library activities.  Creates a templateActivity mc / class for each one.	* NOTE: Each library element contains an array of templateActivities.  
+	* templateActivities array may contain just one ToolActivity, or a container activity
+	* like Parralel and corresponding child activities
 	*
 	* @param   o   		The model object that is broadcasting an update.
 	*/
@@ -173,22 +175,22 @@ class ToolkitView extends AbstractView {
 		
 		var tkv = ToolkitView(this);
 		var tkm = ToolkitModel(o);
-		var myLibs = tkm.getToolkitLibraries();	
-		
+		//get the hashtable
+		var myLibs:Hashtable = tkm.getToolkitLibraries();	
 		//loop through the libraries
-		var keys = myLibs.keys();
+		var keys:Array = myLibs.keys();
 		for(var i=0; i<keys.length; i++){
 			//NOTE: Each library element contains an array of templateActivities.  
-			//templateActivities array will always have one element, may become more in future.
-			var learningLib:Object = myLibs.get(keys[i]);
-			var templateActivity:Object = learningLib.templateActivities[0];
-			//add in the libraryID cas we will need that later
-			templateActivity.learningLibraryID = learningLib.learningLibraryID;
-			Debugger.log('templateActivity '+templateActivity.title+'('+templateActivity.activityId+')',4,'updateLibraries','ToolkitView');
-			_global.breakpoint();
 			
-			var templateActivity_mc = toolkitLibraries_sp.content.attachMovie("TemplateActivity","ta_"+templateActivity.activityId,_depth++,{_templateActivityData:templateActivity,_toolkitView:tkv});
-			//templateActivity_mc.setTemplateActivity(templateActivity);
+			var learningLib:Object = myLibs.get(keys[i]);
+			if(learningLib.templateActivities.length > 1){
+				Debugger.log('Template activities library length is greater than 1, may be complex activity',Debugger.GEN,'updateLibraries','ToolkitView');
+			}
+			
+			//NOW we pass in the whole array, as complex activities are supprted in this way
+			var activities:Array = learningLib.classInstanceRefs;
+			//Debugger.log('toolActivity '+ta.title+'('+ta.activityID+')',4,'updateLibraries','ToolkitView');
+			var templateActivity_mc = toolkitLibraries_sp.content.attachMovie("TemplateActivity","ta_"+learningLib.learningLibraryID,_depth++,{_activities:activities,_toolkitView:tkv});
 			
 			//position it
 			templateActivity_mc._y = yPos;
@@ -210,7 +212,7 @@ class ToolkitView extends AbstractView {
 		var c = tkm.getSelectedTemplateActivity();
 		c.setState(true);
 		//Update the descripotion panel
-		libraryActivityDesc_txa.text = "<p><b>"+c.getTemplateActivityData().title+"</b></p><p>"+c.getTemplateActivityData().description+"</p>";
+		libraryActivityDesc_txa.text = "<p><b>"+c.toolActivity.title+"</b></p><p>"+c.toolActivity.description+"</p>";
 		
 		//set up the drag
 		initDrag(c);
@@ -231,12 +233,12 @@ class ToolkitView extends AbstractView {
 		//dragIcon_mc = _root.createObjectAtDepth("dummy_mc",DepthManager.kCursor);
 		//dragIcon_mc = Application.root.createObjectAtDepth("dummy_mc",DepthManager.kCursor);
 		
-		Debugger.log('dragIcon_mc:'+dragIcon_mc,4,'initDrag','TemplateActivity');
+		//Debugger.log('dragIcon_mc:'+dragIcon_mc,4,'initDrag','ToolkitView');
 		//TODO: Here we need to load the right icon.
-		//var icon_url = selectedTA.getTemplateActivityData().library_activity_ui_image
-		dragIcon_mcl.loadClip("http://dolly.uklams.net/lams/lams_central/icons/icon_chat.swf",dragIcon_mc);
-		//dragIcon_mc = _global.myRoot.duplicateMovieClip('dragIcon_mc',DepthManager.kTopmost);
 
+		dragIcon_mcl.loadClip(Config.getInstance().serverUrl+selectedTA.toolActivity.libraryActivityUIImage,dragIcon_mc);
+		//dragIcon_mc = _global.myRoot.duplicateMovieClip('dragIcon_mc',DepthManager.kTopmost);
+		//Debugger.log('dragIcon_mc:'+dragIcon_mc,4,'initDrag','ToolkitView');
 		
 	}
 	/*
@@ -252,8 +254,8 @@ class ToolkitView extends AbstractView {
 	*/
 	
 	private function setUpDrag(aDragIcon_mc):Void{
-		Debugger.log('aDragIcon_mc:'+aDragIcon_mc,4,'setUpDrag','TemplateActivity');
-		Debugger.log('this:'+this,4,'setUpDrag','TemplateActivity');
+		//Debugger.log('aDragIcon_mc:'+aDragIcon_mc,4,'setUpDrag','TemplateActivity');
+		//Debugger.log('this:'+this,4,'setUpDrag','TemplateActivity');
 		dragIcon_mc = aDragIcon_mc;
 		_dragging = true;
 		

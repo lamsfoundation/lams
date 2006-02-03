@@ -1,4 +1,5 @@
 ﻿import org.lamsfoundation.lams.authoring.cv.*;
+import org.lamsfoundation.lams.authoring.*;
 import mx.controls.*
 import mx.utils.*
 import mx.managers.*
@@ -18,7 +19,10 @@ class TransitionPropertiesDialog extends MovieClip{
     private var ok_btn:Button;              //OK+Cancel buttons
     private var cancel_btn:Button;
     private var bkg_pnl:MovieClip;          //The underlaying panel base
-    private var syncType_cmb:MovieClip;     //combo to allow you select the sybnc =gate type
+    private var gateType_cmb:ComboBox;		//combo to allow you select the sybnc =gate type
+	private var gateType_lbl:Label;
+	private var section_lbl:Label;
+	
 	
         
     private var fm:FocusManager;            //Reference to focus manager
@@ -57,10 +61,17 @@ class TransitionPropertiesDialog extends MovieClip{
         //Delete the enterframe dispatcher
         delete this.onEnterFrame;
         
+		//text for labels
+		section_lbl.text = Dictionary.getValue('trans_dlg_gate');
+		gateType_lbl.text = Dictionary.getValue('trans_dlg_gatetypecmb');
+		
 		//Set the text for buttons
         ok_btn.label = Dictionary.getValue('trans_dlg_ok');
         cancel_btn.label = Dictionary.getValue('trans_dlg_cancel');
         
+		//populate the synch type combo:
+		gateType_cmb.dataProvider = Activity.getGateActivityTypes();
+		
         /*
 		//get focus manager + set focus to OK button, focus manager is available to all components through getFocusManager
         fm = _container.getFocusManager();
