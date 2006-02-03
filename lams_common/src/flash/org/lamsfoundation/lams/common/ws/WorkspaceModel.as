@@ -20,9 +20,15 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 	public var OWNER_ACCESS:Number = 3;
 	public var NO_ACCESS:Number = 4;
 	
+	
 
 	//ref to the wsp containter
 	private var _workspace:Workspace;
+	
+	private var _availableLicenses:Array;
+	
+
+	
 	//private data
 	private var _workspaceID:Number;
 	private var _rootFolderID:Number;
@@ -46,13 +52,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 	private var _clipboardMode:String; // tells us if its a cut or copy 
 	private var _folderIDPendingRefresh:Number; // The ID of the folder an operation has just been done on, will be refreshed...
 	private var _folderIDPendingRefreshList:Array; // The List of ID of the folder an operation has just been done on, will be refreshed...
-	
 
-	
-
-	
-
-	
 	
 	//These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
@@ -67,8 +67,8 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
         EventDispatcher.initialize(this);
 		_workspace = w;
 		_workspaceResources = new Array();
+		_availableLicenses = new Array();
 		_defaultTab = "LOCATION";
-		
 		
 	}	
 	
@@ -114,14 +114,6 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 		
 	}
 	
-	public function getUsersWorkspace(){
-		
-	}
-	
-	public function getFolderContents(){
-		
-	}
-	
 	
 	/**
     * Notify registered listeners that a data model change has happened.
@@ -144,13 +136,25 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 	 * RUN_SEQUENCES The folder in which user stores his lessons
 	 * ORGANISATIONS List of folders (root folder only) which belong to organizations of which user is a member
 	 */
+	 /*
 	public function parseDataForTree(dto:Object):Void{
-		_global.breakpoint();
+		Debugger.log('Running....',Debugger.GEN,'parseDataForTree','org.lamsfoundation.lams.WorkspaceModel');
+		
+		//_global.breakpoint();
 
-
-		_accessibleWorkspaceFoldersDTOCopy = ObjectCopy.copy(dto);
+		if(_accessibleWorkspaceFoldersDTOCopy == null){
+			//first time in so make a copy
+			_accessibleWorkspaceFoldersDTOCopy = ObjectCopy.copy(dto);
+		}else{
+			//need to use the copy
+			dto = _accessibleWorkspaceFoldersDTOCopy;
+		}
+		
+		Debugger.log('_accessibleWorkspaceFoldersDTOCopy:'+ObjectUtils.toString(_accessibleWorkspaceFoldersDTOCopy),Debugger.GEN,'parseDataForTree','org.lamsfoundation.lams.WorkspaceModel');
+		Debugger.log('dto:'+ObjectUtils.toString(dto),Debugger.GEN,'parseDataForTree','org.lamsfoundation.lams.WorkspaceModel');
 		//this xml will be implementing the TreeDataProvider , see: http://livedocs.macromedia.com/flash/mx2004/main_7_2/wwhelp/wwhimpl/common/html/wwhelp.htm?context=Flash_MX_2004&file=00002902.html
 		_treeDP = new XML();
+		_workspaceResources = new Array();
 		//add top level
 		//create the data obj:
 		var mdto= {};
@@ -166,7 +170,9 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 		mdto.workspaceFolderID = null;
 		
 		
-		_treeDP.addTreeNode(mdto.name,mdto);
+		var rootNode = _treeDP.addTreeNode(mdto.name,mdto);
+		rootNode.attributes.isBranch = true;
+		setWorkspaceResource(RT_FOLDER+'_'+mdto.resourceID,rootNode);
 		
 		//add org folder container
 		var fChild:XMLNode = _treeDP.firstChild;
@@ -183,6 +189,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 		o_oto.workspaceFolderID = "x1";
 		var orgNode:XMLNode = fChild.addTreeNode(o_oto.name,o_oto);
 		orgNode.attributes.isBranch = true;
+		setWorkspaceResource(RT_FOLDER+'_'+o_oto.resourceID,orgNode);
 				
 		for(var i=0;i<dto.ORGANISATIONS.length;i++){
 			var n = dto.ORGANISATIONS[i];
@@ -199,20 +206,40 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 		var privateNode:XMLNode = fChild.addTreeNode("Private:"+key,dto.PRIVATE);
 		privateNode.attributes.isBranch = true;
 		
-		Debugger.log('privateNode.attributes.data.resourceID:'+privateNode.attributes.data.resourceID,Debugger.GEN,'openResourceInTree','org.lamsfoundation.lams.WorkspaceModel');
+		Debugger.log('privateNode.attributes.data.resourceID:'+privateNode.attributes.data.resourceID,Debugger.GEN,'parseDataForTree','org.lamsfoundation.lams.WorkspaceModel');
 		//privateNode.attributes.data = dto.PRIVATE;
 		setWorkspaceResource(key,privateNode);
 		//_workspaceResources.put(dto.PRIVATE.resourceID,privateNode);
 				
-		/*
-		var runNode:XMLNode = fChild.addTreeNode("Run Sequences",dto.RUN_SEQUENCES);
-		runNode.attributes.isBranch = true;
+
 		
-		privateNode.attributes.data.resourceID = dto.RUN_SEQUENCES.workspaceFolderID;
-		//runNode.attributes.data = dto.RUN_SEQUENCES;
-		_workspaceResources.put(dto.RUN_SEQUENCES.workspaceFolderID,runNode);
-		*/
+	}
+	
+	*/
+	
+	public function initWorkspaceTree(){
+		Debugger.log('Running',Debugger.GEN,'initWorkspaceTree','org.lamsfoundation.lams.WorkspaceModel');
+		_treeDP = new XML();
+		_workspaceResources = new Array();
+		//add top level
+		//create the data obj:
+		var mdto= {};
+		mdto.creationDateTime = new Date(null);
+		mdto.description = "";
+		mdto.lastModifiedDateTime = new Date(null);
+		mdto.name =  Dictionary.getValue('ws_tree_mywsp');
+		mdto.parentWorkspaceFolderID = null;
+		//read only
+		mdto.permissionCode = 1;
+		mdto.resourceID = "-1";
+		mdto.resourceType = RT_FOLDER;
+		mdto.workspaceFolderID = null;
 		
+		
+		var rootNode = _treeDP.addTreeNode(mdto.name,mdto);
+		rootNode.attributes.isBranch = true;
+		setWorkspaceResource(RT_FOLDER+'_'+mdto.resourceID,rootNode);
+		//ObjectUtils.printObject(getWorkspaceResource(RT_FOLDER+'_'+mdto.resourceID));
 	}
 	
 	/**
@@ -277,11 +304,8 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 			nodeToUpdate = getWorkspaceResource('Folder_'+dto.workspaceFolderID);
 			Debugger.log('nodeToUpdate.attributes.data.resourceID:'+nodeToUpdate.attributes.data.resourceID,Debugger.GEN,'setFolderContents','org.lamsfoundation.lams.WorkspaceModel');
 			Debugger.log('nodeToUpdate.attributes.data.workspaceFolderID:'+nodeToUpdate.attributes.data.workspaceFolderID,Debugger.GEN,'setFolderContents','org.lamsfoundation.lams.WorkspaceModel');
-
 		}else{
-			//think this wont ever happen as must have been listed by prevous node
-			Debugger.log('Did not find:'+dto.resourceType+'_'+dto.workspaceFolderID+' so creating a new XMLNode - this may/will fail',Debugger.CRITICAL,'setFolderContents','org.lamsfoundation.lams.WorkspaceModel');
-			return false;
+			Debugger.log('Did not find:'+dto.resourceType+'_'+dto.workspaceFolderID+' Something bad has happened',Debugger.CRITICAL,'setFolderContents','org.lamsfoundation.lams.WorkspaceModel');
 		}
 		
 		
@@ -296,11 +320,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 			cNode.attributes.data.workspaceFolderID = dto.workspaceFolderID;
 			//check if its a folder
 			if(dto.contents[i].resourceType==RT_FOLDER){
-				cNode.attributes.isBranch=true;
-				//copy the resourceID to folderID
-				//thisnk there is no need for this line! it might be wrong./.
-				//cNode.attributes.data.workspaceFolderID=dto.contents[i].resourceID;
-				
+				cNode.attributes.isBranch=true;	
 			}else{
 				
 			}
@@ -310,8 +330,6 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 		
 		//dispatch an update to the view
 		broadcastViewUpdate('UPDATE_CHILD_FOLDER',nodeToUpdate);
-		
-		
 		
 	}
 	
@@ -330,32 +348,48 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 		var key:String = 'Folder_'+folderIDPendingRefresh;
 		var wspResource:XMLNode = getWorkspaceResource(key);
 		if(wspResource!=null){
-			if (wspResource.hasChildNodes()) {
-			   var deleteQue:Array = new Array();
-			  //mental. but true - you have to add themn to an array and then delete them from the array, 
-			  //as deleting in the loop them will remove the reference from nextSibling
-			  // also childNodes:Array not seem to work properly.
-			  // use firstChild to iterate through the child nodes of wspResource
-			  for (var aNode:XMLNode = wspResource.firstChild; aNode != null; aNode=aNode.nextSibling) {
-				deleteQue.push(aNode);
-				//var deletedNode:XMLNode = aNode.removeTreeNode();
-			  }
-			  
-			  for(var i=0; i<deleteQue.length;i++){
-				  var deletedNode:XMLNode = deleteQue[i].removeTreeNode();
-				  //Debugger.log('Removed node:'+deletedNode,Debugger.GEN,'clearWorkspaceCache','org.lamsfoundation.lams.WorkspaceModel');
-			  }
-			}else{
-				Debugger.log('No Child nodes to delete',Debugger.GEN,'clearWorkspaceCache','org.lamsfoundation.lams.WorkspaceModel');
-			}
-			_folderIDPendingRefresh = null;
-/*			//this only deletes some children, dont know why, see solution above
-			for(var i=0; i<wspResource.childNodes.length;i++){
-				var deletedNode:XMLNode = wspResource.childNodes[i].removeTreeNode();
-				Debugger.log('Removed node:'+deletedNode,Debugger.GEN,'clearWorkspaceCache','org.lamsfoundation.lams.WorkspaceModel');
-				
-			}
-	*/		
+		
+				if (wspResource.hasChildNodes()) {
+				   var deleteQue:Array = new Array();
+				  //mental. but true - you have to add them to an array and then delete them from the array, 
+				  //as deleting in the loop them will remove the reference from nextSibling
+				  // also childNodes:Array not seem to work properly.
+				  // use firstChild to iterate through the child nodes of wspResource
+				  for (var aNode:XMLNode = wspResource.firstChild; aNode != null; aNode=aNode.nextSibling) {
+					deleteQue.push(aNode);
+				  }
+				  
+				  for(var i=0; i<deleteQue.length;i++){
+					  var deletedNode:XMLNode = deleteQue[i].removeTreeNode();
+					  //Debugger.log('Removed node:'+deletedNode,Debugger.GEN,'clearWorkspaceCache','org.lamsfoundation.lams.WorkspaceModel');
+				  }
+				  
+				  	//if(wspResource.attributes.data.resourceID.indexOf('x') != -1){
+					/*
+					Debugger.log('folderIDPendingRefresh.indexOf(x):'+String(folderIDPendingRefresh).indexOf('x'),Debugger.GEN,'clearWorkspaceCache','org.lamsfoundation.lams.WorkspaceModel');
+					if(String(folderIDPendingRefresh).indexOf('x') > -1){
+						Debugger.log('Found a root/fake node',Debugger.GEN,'clearWorkspaceCache','org.lamsfoundation.lams.WorkspaceModel');
+						//need refresh root data as is one of the fake root folders ( root , or orgs)
+						_folderIDPendingRefreshList = new Array();
+						parseDataForTree(_accessibleWorkspaceFoldersDTOCopy);
+						Debugger.log('Gonna try auto open:'+folderIDPendingRefresh,Debugger.GEN,'clearWorkspaceCache','org.lamsfoundation.lams.WorkspaceModel');
+						//setFolderOpen(folderIDPendingRefresh);
+						broadcastViewUpdate('SET_UP_BRANCHES_INIT',null);
+						return 'CLEARED_ALL';
+					}
+				  */
+				  
+				}else{
+					Debugger.log('No Child nodes to delete',Debugger.GEN,'clearWorkspaceCache','org.lamsfoundation.lams.WorkspaceModel');
+				}
+				_folderIDPendingRefresh = null;
+	/*			//this only deletes some children, dont know why, see solution above
+				for(var i=0; i<wspResource.childNodes.length;i++){
+					var deletedNode:XMLNode = wspResource.childNodes[i].removeTreeNode();
+					Debugger.log('Removed node:'+deletedNode,Debugger.GEN,'clearWorkspaceCache','org.lamsfoundation.lams.WorkspaceModel');
+					
+				}
+		*/		
 		}else{
 			//think this wont ever happen as must have been listed by prevous node
 			Debugger.log('Failing! - Did not find folderIDPendingRefresh:'+folderIDPendingRefresh+' Cant do anything',Debugger.CRITICAL,'clearWorkspaceCache','org.lamsfoundation.lams.WorkspaceModel');
@@ -368,9 +402,13 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 	public function clearWorkspaceCacheMultiple(){
 		if(_folderIDPendingRefreshList != null){
 			for (var i=0;i<_folderIDPendingRefreshList.length;i++){
-				clearWorkspaceCache(_folderIDPendingRefreshList[i]);
-				//now open this node in the tree
-				autoOpenFolderInTree(_folderIDPendingRefreshList[i]);
+				var r = clearWorkspaceCache(_folderIDPendingRefreshList[i]);
+				if(r=='CLEARED_ALL'){
+					return;
+				}else{
+					//now open this node in the tree
+					autoOpenFolderInTree(_folderIDPendingRefreshList[i]);
+				}
 			}
 			_folderIDPendingRefreshList = new Array();
 		}else{
@@ -382,8 +420,22 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 	public function autoOpenFolderInTree(folderID){
 		var nodeToOpen:XMLNode = getWorkspaceResource('Folder_'+folderID);
 		Debugger.log('Opening node:'+nodeToOpen,Debugger.GEN,'autoOpenFolderInTree','org.lamsfoundation.lams.WorkspaceModel');
+		
 		broadcastViewUpdate('REFRESH_FOLDER',nodeToOpen);
 	}
+	
+	public function setFolderOpen(folderID){
+		var nodeToOpen:XMLNode = getWorkspaceResource('Folder_'+folderID);
+		Debugger.log('Basic open folder call:'+nodeToOpen,Debugger.GEN,'setFolderOpen','org.lamsfoundation.lams.WorkspaceModel');
+		
+		broadcastViewUpdate('OPEN_FOLDER',nodeToOpen);
+		
+	}
+	
+	public function populateLicenseDetails(){
+		broadcastViewUpdate('POPULATE_LICENSE_DETAILS',_availableLicenses);
+	}
+	
 	
 	public function setClipboardItem(item:Object,mode:String){
 		//mode not used :-) no cut, only copy functionality this time.
@@ -597,4 +649,33 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 		return _folderIDPendingRefreshList;
 	}
 
+	/**
+	 * <wddxPacket version='1.0'><header/><data>
+	 * <struct type='Lorg.lamsfoundation.lams.util.wddx.FlashMessage;'>
+	 * <var name='messageKey'><string>getAvailableLicenses</string></var>
+	 * <var name='messageType'><number>3.0</number></var><var name='messageValue'>
+	 * <array length='6'><struct type='Lorg.lamsfoundation.lams.learningdesign.dto.LicenseDTO;'>
+	 * <var name='code'><string>by-nc-sa</string></var>
+	 * <var name='defaultLicense'><boolean value='true'/></var>
+	 * <var name='licenseID'><number>1.0</number></var>
+	 * <var name='name'><string>Attribution-Noncommercial-ShareAlike 2.5</string></var>
+	 * <var name='pictureURL'><string>http://localhost:8080/lams//images/license/byncsa.jpg</string></var>
+	 * <var name='url'><string>http://creativecommons.org/licenses/by-nc-sa/2.5/</string></var>
+	 * </struct>
+	 * * @usage   
+	 * @param   newavailableLicenses 
+	 * @return  
+	 */
+	public function setAvailableLicenses (newavailableLicenses:Array):Void {
+		newavailableLicenses.sortOn('name');
+		_availableLicenses = newavailableLicenses;
+	}
+	/**
+	 * 
+	 * @usage   
+	 * @return  
+	 */
+	public function getAvailableLicenses ():Array {
+		return _availableLicenses;
+	}
 }

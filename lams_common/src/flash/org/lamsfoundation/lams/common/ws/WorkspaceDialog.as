@@ -45,6 +45,8 @@ class WorkspaceDialog extends MovieClip{
     private var resourceDesc_txa:TextArea;
     private var license_txa:TextArea;
     private var licenseID_cmb:ComboBox;
+    private var licenseImg_pnl:MovieClip;
+    private var viewLicense_btn:Button;
 	
 	
 	
@@ -107,11 +109,10 @@ class WorkspaceDialog extends MovieClip{
 		
 		//Set the text on the labels
         
-        
         //Set the text for buttons
         ok_btn.label = Dictionary.getValue('ws_dlg_ok_button');
         cancel_btn.label = Dictionary.getValue('ws_dlg_cancel_button');
-		
+		viewLicense_btn.label = Dictionary.getValue('ws_view_license_button');
 		//TODO: Dictionary calls for all the rest of the buttons
 		
 		
@@ -130,7 +131,7 @@ class WorkspaceDialog extends MovieClip{
         //Register for LFWindow size events
         _container.addEventListener('size',this);
 		
-		
+		//panel.setStyle('backgroundColor',0xFFFFFF);
         
         //Debugger.log('setting offsets',Debugger.GEN,'init','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
 
@@ -159,10 +160,10 @@ class WorkspaceDialog extends MovieClip{
 		//register to recive updates form the model
 		WorkspaceModel(_workspaceView.getModel()).addEventListener('viewUpdate',this);
 		
-		Debugger.log('_workspaceView:'+_workspaceView,Debugger.GEN,'setUpTreeview','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
+		Debugger.log('_workspaceView:'+_workspaceView,Debugger.GEN,'setUpContent','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
 		//get a ref to the controller and kkep it here to listen for events:
 		_workspaceController = _workspaceView.getController();
-		Debugger.log('_workspaceController:'+_workspaceController,Debugger.GEN,'setUpTreeview','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
+		Debugger.log('_workspaceController:'+_workspaceController,Debugger.GEN,'setUpContent','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
 		
 		
 		 //Add event listeners for ok, cancel and close buttons
@@ -179,10 +180,13 @@ class WorkspaceDialog extends MovieClip{
 		delete_btn.addEventListener('click',Delegate.create(_workspaceController, _workspaceController.fileOperationRequest));
 		rename_btn.addEventListener('click',Delegate.create(_workspaceController, _workspaceController.fileOperationRequest));
 		
+		viewLicense_btn.addEventListener('click',Delegate.create(this, openLicenseURL));
+		licenseID_cmb.addEventListener('change',Delegate.create(this, onLicenseComboSelect));
 		
 		//Set up the treeview
         setUpTreeview();
 		
+		itemSelected(treeview.selectedNode);
 	}
 	
 	/**
@@ -199,7 +203,8 @@ class WorkspaceDialog extends MovieClip{
 	   _workspaceModel = wm;
 	  
 	   switch (event.updateType){
-
+			case 'POPULATE_LICENSE_DETAILS' :
+				populateAvailableLicenses(event.data, wm);
 			case 'REFRESH_TREE' :
                 refreshTree(wm);
                 break;
@@ -217,6 +222,10 @@ class WorkspaceDialog extends MovieClip{
 			case 'SHOW_TAB' :
 				showTab(event.data,wm);
 				break;
+			case 'SET_UP_BRANCHES_INIT' :
+				setUpBranchesInit();
+				break;
+				
             default :
                 Debugger.log('unknown update type :' + event.updateType,Debugger.GEN,'viewUpdate','org.lamsfoundation.lams.ws.WorkspaceDialog');
 		}
@@ -288,24 +297,11 @@ class WorkspaceDialog extends MovieClip{
 	 */
 	private function refreshFolder(nodeToOpen:XMLNode, wm:WorkspaceModel){		Debugger.log('refreshFolder:'+nodeToOpen ,Debugger.GEN,'refreshFolder','org.lamsfoundation.lams.ws.WorkspaceDialog');
 		//close the node
-		treeview.setIsOpen(nodeToOpen,false);
-		/*
-		for(var i=0; i<nodeToUpdate.childNodes.length;i++){
-				Debugger.log('deleting node:'+nodeToUpdate.childNodes[i],Debugger.GEN,'clearWorkspaceCache','org.lamsfoundation.lams.WorkspaceModel');
-				nodeToUpdate.childNodes[i].removeNode();
-				
-		}
-		*/
-		
-		//treeview.setIsOpen(nodeToOpen,true);
-		
+		treeview.setIsOpen(nodeToOpen,false);		
 		//we are gonna need to fire the event manually for some stupid reason the tree is not firing it.
 		//dispatchEvent({type:'nodeOpen',target:treeview,node:nodeToOpen});
 		_workspaceController = _workspaceView.getController();
 		_workspaceController.onTreeNodeOpen({type:'nodeOpen',target:treeview,node:nodeToOpen});
-		//var treeview = evt.target;
-		//var nodeToOpen:XMLNode = evt.node;
-		//refreshTree();
 	}
 	
 	
@@ -321,6 +317,20 @@ class WorkspaceDialog extends MovieClip{
 		}else{
 			resourceTitle_txi.text = nodeData.name;
 			resourceDesc_txa.text = nodeData.description;
+			Debugger.log('nodeData.licenseID:'+nodeData.licenseID,Debugger.GEN,'itemSelected','org.lamsfoundation.lams.ws.WorkspaceDialog');
+			//find the SI of the license we need:
+			//check if a license ID has been selected:
+			if(nodeData.licenseID > 0){
+				for(var i=0; i<licenseID_cmb.dataProvider.length; i++){
+					if(licenseID_cmb.dataProvider[i].data.licenseID == nodeData.licenseID){
+						licenseID_cmb.selectedIndex = i;
+					}
+				}
+			}else{
+				licenseID_cmb.selectedIndex = 0;
+			}
+			
+			
 			
 			//TODO These Items must also be in the FolderContentsDTO
 			/*
@@ -331,6 +341,42 @@ class WorkspaceDialog extends MovieClip{
 		}
 		
 	}
+	
+	private function populateAvailableLicenses(licenses:Array, wm:WorkspaceModel){
+		Debugger.log('Got this many:'+licenses.length,Debugger.GEN,'populateAvailableLicenses','org.lamsfoundation.lams.ws.WorkspaceDialog');
+		//add the blank one
+		var lic_dp = new Array();
+		lic_dp.addItem({label:Dictionary.getValue('license_not_selected'),data:""});
+		licenseID_cmb.dataProvider = lic_dp;
+		for (var i=0;i<licenses.length;i++){
+			lic_dp.addItem({label:licenses[i].name,data:licenses[i]});
+		}
+		
+	}
+	
+	public function onLicenseComboSelect(evt:Object){
+		
+		//load the picture into the panel
+		licenseImg_pnl.createEmptyMovieClip("image_mc", this.getNextHighestDepth());
+		licenseImg_pnl.image_mc.loadMovie(licenseID_cmb.value.pictureURL);
+
+		//license_txa.text = StringUtils.cleanNull(evt.target.data.
+		
+		if(licenseID_cmb.value.url == undefined){
+			viewLicense_btn.enabled = false;
+		}else{
+			viewLicense_btn.enabled = true;
+		}
+	}
+		
+	public function openLicenseURL(evt:Object){
+		var urlToOpen:String = licenseID_cmb.value.url;
+		if(urlToOpen != undefined){
+			getURL(urlToOpen,'_blank');
+		}
+	}
+	
+	
 	
 	private function setLocationContentVisible(v:Boolean){
 		Debugger.log('v:'+v,Debugger.GEN,'setLocationContentVisible','org.lamsfoundation.lams.ws.WorkspaceDialog');
@@ -346,8 +392,6 @@ class WorkspaceDialog extends MovieClip{
 		delete_btn.visible = v;
 		rename_btn.visible = v;
 	
-		
-	
 	}
 	
 	private function setPropertiesContentVisible(v:Boolean){
@@ -356,8 +400,11 @@ class WorkspaceDialog extends MovieClip{
 		license_lbl.visible = v;
 		resourceDesc_txa.visible = v;
 		license_txa.visible = v;
+		licenseImg_pnl.visible = v;
+		viewLicense_btn.visible = v;
 		
-		
+	
+
 	}
 	
 		
@@ -392,6 +439,7 @@ class WorkspaceDialog extends MovieClip{
 			Debugger.log('Dont know what mode the Workspace is in!',Debugger.CRITICAL,'showTab','org.lamsfoundation.lams.ws.WorkspaceDialog');
 			ok_btn.label = Dictionary.getValue('ws_dlg_ok_btn');
 		}
+		
 	}
 	
 	
@@ -521,7 +569,7 @@ class WorkspaceDialog extends MovieClip{
 		_resultDTO.resourceName = resourceTitle_txi.text;
 		_resultDTO.resourceDescription = resourceDesc_txa.text;
 		_resultDTO.resourceLicenseText = license_txa.text;
-		_resultDTO.resourceLicenseID = licenseID_cmb.value;
+		_resultDTO.resourceLicenseID = licenseID_cmb.value.licenseID;
 		
 
         dispatchEvent({type:'okClicked',target:this});
@@ -587,6 +635,14 @@ class WorkspaceDialog extends MovieClip{
 	}
 	
 
+	private function setUpBranchesInit(){
+		Debugger.log('Running...',Debugger.GEN,'setUpBranchesInit','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
+		//get the 1st child
+		treeview.dataProvider = WorkspaceModel(_workspaceView.getModel()).treeDP;
+		var fNode = treeview.dataProvider.firstChild;
+		setBranches(fNode);
+		treeview.refresh();
+	}
 	
 	
 	/**
@@ -598,52 +654,12 @@ class WorkspaceDialog extends MovieClip{
 	private function setUpTreeview(){
 			
 		//Debugger.log('_workspaceView:'+_workspaceView,Debugger.GEN,'setUpTreeview','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
-		treeview.dataProvider = WorkspaceModel(_workspaceView.getModel()).treeDP;
 		
+		setUpBranchesInit();
 		Debugger.log('WorkspaceModel(_workspaceView.getModel()).treeDP:'+WorkspaceModel(_workspaceView.getModel()).treeDP.toString(),Debugger.GEN,'setUpTreeview','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
 		
-		//get the 1st child
-		var fNode = treeview.dataProvider.firstChild;
+		//Debugger.log('_workspaceController.onTreeNodeOpen:'+_workspaceController.onTreeNodeOpen,Debugger.GEN,'setUpTreeview','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
 		
-		
-		
-			/*
-	* 
-	
-		//loop thorigh th childresn to see if they are branches
-		for (var i = 0; i<fNode.childNodes.length; i++) {
-			var node:XMLNode = fNode.getTreeNodeAt(i);
-			// Set each of the 3 initial child nodes to be branches
-			if(node.attributes.isBranch){
-				treeview.setIsBranch(node,true);
-				//also check this branches children to see if they have isBranch set
-				if(node.hasChildNodes()){
-					for(var j=0; j<node.childNodes.length; j++){
-						var cNode:XMLNode = node.getTreeNodeAt(j);
-						if(cNode.attributes.isBranch){
-							treeview.setIsBranch(cNode,true);
-							
-						}
-						
-					}
-					
-					
-				}
-				
-				
-				
-			}
-			
-			
-		}
-	*/
-		
-		setBranches(fNode);
-		
-		
-		
-
-		Debugger.log('_workspaceController.onTreeNodeOpen:'+_workspaceController.onTreeNodeOpen,Debugger.GEN,'setUpTreeview','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
 		
 		
 		treeview.addEventListener("nodeOpen", Delegate.create(_workspaceController, _workspaceController.onTreeNodeOpen));
@@ -661,7 +677,7 @@ class WorkspaceDialog extends MovieClip{
 		//then immediatly invlaidate the cache.  then server may return error if therrte is a problem, else new details willbe shown
 		
 		
-		treeview.refresh();
+		
 		
     }
     

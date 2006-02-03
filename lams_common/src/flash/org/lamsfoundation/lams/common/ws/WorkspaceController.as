@@ -43,6 +43,9 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
             evt.target.scrollContent.addEventListener('locationTabClick',Delegate.create(this,locationTabClick));
             evt.target.scrollContent.addEventListener('propertiesTabClick',Delegate.create(this,propertiesTabClick));
             //evt.target.scrollContent.addEventListener('click',Delegate.create(this,click));
+			
+			
+			
 			//set a ref to the view
 			evt.target.scrollContent.workspaceView = getView();
 			//set a ref to the dia in the view
@@ -50,7 +53,11 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
 			
 			
 			//set up UI
+			//note this function registeres the dialog to recieve view updates
 			evt.target.scrollContent.setUpContent();
+			
+			//populate the licenses drop down
+			_workspaceModel.populateLicenseDetails();
 			
 			//select the right tab, dont pass anything to show the default tab
 			_workspaceModel.showTab(_workspaceModel.currentTab);
@@ -113,8 +120,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
 		
 		if(!nodeToOpen.hasChildNodes()){
 		
-			
-			
+
 			//if the resourceID is null then use the folderID
 			//var resourceToOpen = (nodeToOpen.attributes.data.resourceID) ? nodeToOpen.attributes.data.resourceID : nodeToOpen.attributes.data.workspaceFolderID;
 			
@@ -155,9 +161,15 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
 		
 	}
 	
+	/**
+	 * Initiates a move request for a folder or resource
+	 * @usage   
+	 * @param   evt //this event should contain: {type:"drag_complete", target: this.tree, sourceNode: node, targetNode: this.__targetNode.item}
+	 * @return  
+	 */
 	public function onDragComplete(evt:Object){
 		Debugger.log('type::'+evt.type,Debugger.GEN,'onDragComplete','org.lamsfoundation.lams.WorkspaceController');
-		//this event should contain: {type:"drag_complete", target: this.tree, sourceNode: node, targetNode: this.__targetNode.item}
+		
 		var treeview = evt.target;
 		//var snodeData = treeview.selectedNode.attributes.data;
 		
@@ -251,19 +263,25 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
 				//get the selected node:
 				var snodeData = workspaceDialogue.treeview.selectedNode.attributes.data;
 				var selectedFolderID:Number;
+				
 				//if its a folder then the resourceID is the selected folder ID, otherwise its the parent
 				if(snodeData.resourceType == _workspaceModel.RT_FOLDER){
 					selectedFolderID = snodeData.resourceID;
+					
 				}else{
 					selectedFolderID = snodeData.workspaceFolderID;
 				}
 				
-				_workspaceModel.folderIDPendingRefresh = selectedFolderID;
-				
-				Debugger.log('Selected (target) folder ID=:'+selectedFolderID,Debugger.GEN,'fileOperationRequest','org.lamsfoundation.lams.WorkspaceController');
-				
-				
+				//check if we can write to this folder
+				if(_workspaceModel.isWritableResource(snodeData.resourceType,selectedFolderID)){
+					_workspaceModel.folderIDPendingRefresh = selectedFolderID;
+					Debugger.log('Selected (target) folder ID=:'+selectedFolderID,Debugger.GEN,'fileOperationRequest','org.lamsfoundation.lams.WorkspaceController');
 					_workspaceModel.getWorkspace().requestCopyResource(itemToPaste.resourceID,selectedFolderID,itemToPaste.resourceType);
+					
+				}else{
+					LFMessage.showMessageAlert(Dictionary.getValue('ws_no_permission'),null,null);
+				}
+				
 			}else{
 				//nothing to paste..
 			}
@@ -271,12 +289,18 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
 		}else if(tgt.indexOf("delete_btn") != -1){
 			//find out the selected folderID:
 			//get the selected node:
+			var snodeData = workspaceDialogue.treeview.selectedNode.attributes.data;
 			if(snodeData != null){
 				//TODO Check permission code to make sure we can do this!
-				var snodeData = workspaceDialogue.treeview.selectedNode.attributes.data;
+				//check if we can write to this folder
+				if(_workspaceModel.isWritableResource(snodeData.resourceType,snodeData.resourceID)){
+					_workspaceModel.folderIDPendingRefresh = snodeData.workspaceFolderID;
+					_workspaceModel.getWorkspace().requestDeleteResource(snodeData.resourceID,snodeData.resourceType);	
+				}else{
+					LFMessage.showMessageAlert(Dictionary.getValue('ws_no_permission'),null,null);
+				}
 				
-				_workspaceModel.folderIDPendingRefresh = snodeData.workspaceFolderID;
-				_workspaceModel.getWorkspace().requestDeleteResource(snodeData.resourceID,snodeData.resourceType);
+				
 			}else{
 				//nothing to delete
 			}
@@ -284,7 +308,15 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
 			//check we can create a folder here
 			var snodeData = workspaceDialogue.treeview.selectedNode.attributes.data;
 			if(snodeData != null){
-				Dialog.createInputDialog(Dictionary.getValue('ws_newfolder_ins'), Dictionary.getValue('ws_newfolder_ok'), Dictionary.getValue('ws_newfolder_cancel'), Delegate.create(_workspaceController ,setNewFolderName),null);
+				
+				
+				//check if we can write to this folder
+				if(_workspaceModel.isWritableResource(snodeData.resourceType,snodeData.resourceID)){
+					Dialog.createInputDialog(Dictionary.getValue('ws_newfolder_ins'), Dictionary.getValue('ws_newfolder_ok'), Dictionary.getValue('ws_newfolder_cancel'), Delegate.create(_workspaceController ,setNewFolderName),null);
+				}else{
+					LFMessage.showMessageAlert(Dictionary.getValue('ws_no_permission'),null,null);
+				}
+				
 			}else{
 				//no where to make new folder
 			}
@@ -295,7 +327,14 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
 			//check we can create a folder here
 			var snodeData = workspaceDialogue.treeview.selectedNode.attributes.data;
 			if(snodeData != null){
-				Dialog.createInputDialog(Dictionary.getValue('ws_rename_ins'), Dictionary.getValue('ws_newfolder_ok'), Dictionary.getValue('ws_newfolder_cancel'), Delegate.create(_workspaceController ,setNewResourceName),null);
+				//check if we can write to this folder
+				if(_workspaceModel.isWritableResource(snodeData.resourceType,snodeData.resourceID)){
+					Dialog.createInputDialog(Dictionary.getValue('ws_rename_ins'), Dictionary.getValue('ws_newfolder_ok'), Dictionary.getValue('ws_newfolder_cancel'), Delegate.create(_workspaceController ,setNewResourceName),null);
+				}else{
+					LFMessage.showMessageAlert(Dictionary.getValue('ws_no_permission'),null,null);
+				}
+				
+				
 			}else{
 				//nothing to rename
 			}
