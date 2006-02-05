@@ -378,7 +378,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 			if(permissions!=WorkspaceFolder.NO_ACCESS){					
 				getFolderContent(workspaceFolder,permissions,mode,contentDTO);
 				if(workspaceFolder.hasSubFolders())
-					getSubFolderDetails(workspaceFolder,permissions,contentDTO, skipFolder);	
+					getSubFolderDetails(workspaceFolder,user,contentDTO, skipFolder);	
 				Vector repositoryContent = getContentsFromRepository(workspaceFolder.getWorkspaceFolderId(),permissions);
 				if(repositoryContent!=null)
 					contentDTO.addAll(repositoryContent);
@@ -405,13 +405,16 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	/** 
 	 * Get the folders in the given workspaceFolder. If skipContentId is not null, then skip any contents found with this id.
 	 */ 
-	private void getSubFolderDetails(WorkspaceFolder workspaceFolder,Integer permissions, Vector subFolderContent, WorkspaceFolder skipFolder){
+	private void getSubFolderDetails(WorkspaceFolder workspaceFolder,User user, Vector subFolderContent, WorkspaceFolder skipFolder){
 		Integer skipFolderID = skipFolder != null ? skipFolder.getWorkspaceFolderId() : null;
 		Iterator iterator = workspaceFolder.getChildWorkspaceFolders().iterator();
 		while(iterator.hasNext()){
 			WorkspaceFolder subFolder = (WorkspaceFolder)iterator.next();
 			if ( skipFolderID==null || ! skipFolderID.equals(subFolder.getWorkspaceFolderId()) ) {
-				subFolderContent.add(new FolderContentDTO(subFolder,permissions));
+				Integer permissions = getPermissions(subFolder, user);
+				if ( permissions!=WorkspaceFolder.NO_ACCESS) {
+					subFolderContent.add(new FolderContentDTO(subFolder,permissions));
+				}
 			}
 		}		
 	}
