@@ -40,10 +40,7 @@
  * The data elements must be "version" aware. The data elements must be "type" aware if they are to be shared between Tools.
  * LAMS Xpress (Ernie, could you put something in here. You explain it better than I do!)
  *
- * Data Exchange At present, there is no data exchange format between tools. Therefore if 
- * 
- * 
- * 
+ * Data Exchange At present, there is no data exchange format between tools. Therefore if..  
  * 
  * 
  * Tool path The URL path for the tool should be <lamsroot>/tool/$TOOL_SIG.  
@@ -75,6 +72,30 @@
 		    path=".questions"
 		    redirect="true"
 	  	/>
+
+	  	<forward
+		    name="loadMonitoring"
+		    path=".monitoringContent"
+		    redirect="true"
+	  	/>
+	  	
+	  	<forward
+		    name="loadLearner"
+		    path=".answers"
+		    redirect="true"
+	  	/>
+
+	  	<forward
+	        name="starter"
+	        path=".starter"
+	        redirect="true"
+	     />
+	     
+	     <forward
+	        name="preview"
+	        path=".preview"
+	        redirect="true"
+	     />
 	  	
 	  	<forward
 		    name="errorList"
@@ -82,6 +103,7 @@
 		    redirect="true"
 	  	/>
 	</action>  
+  
 
 	The author is given warnings when the content in use by learners OR when the content is being edited in the Monitoring interface.  
 */

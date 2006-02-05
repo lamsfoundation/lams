@@ -57,13 +57,13 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
  * Struts action class as all of them are handled in 
  * <code>CustomStrutsExceptionHandler<code>.
  * 
- *    <!--Monitoring Main Action: interacts with the Monitoring module user -->
+   <!--Monitoring Main Action: interacts with the Monitoring module user -->
    <action 	path="/monitoring" 
    			type="org.lamsfoundation.lams.tool.mc.web.McMonitoringAction" 
    			name="McMonitoringForm" 
 	      	scope="session"
    			input=".monitoringContent"
-      		parameter="dsp"
+      		parameter="method"
       		unknown="false"
       		validate="true"> 
 
@@ -89,13 +89,24 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 		    redirect="true"
 	  	/>
 
+       <forward
+	        name="load"
+	        path=".questions"
+	        redirect="true"
+	    />
+	    
+	    <forward
+	        name="starter"
+	        path=".starter"
+	        redirect="true"
+	     />
+
 	  	<forward
 		    name="errorList"
 		    path=".mcErrorBox"
 		    redirect="true"
 	  	/>
 	</action>  
-
  * 
 */
 public class McMonitoringAction extends LamsDispatchAction implements McAppConstants

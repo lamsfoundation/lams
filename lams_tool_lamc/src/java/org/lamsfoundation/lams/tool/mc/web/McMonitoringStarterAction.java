@@ -34,7 +34,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @author Ozgur Demirtas
  * starts up the monitoring module
  * 
- * <!--Monitoring Starter Action: initializes the Monitoring module -->
+    <!--Monitoring Starter Action: initializes the Monitoring module -->
    <action 	path="/monitoringStarter" 
    			type="org.lamsfoundation.lams.tool.mc.web.McMonitoringStarterAction" 
    			name="McMonitoringForm" 
@@ -62,12 +62,25 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 		    redirect="true"
 	  	/>
 
+       <forward
+	        name="load"
+	        path=".questions"
+	        redirect="true"
+	    />
+	    
+	    <forward
+	        name="starter"
+	        path=".starter"
+	        redirect="true"
+	     />
+
 	  	<forward
 		    name="errorList"
 		    path=".mcErrorBox"
 		    redirect="true"
 	  	/>
 	</action>  
+  
 
  *
  */

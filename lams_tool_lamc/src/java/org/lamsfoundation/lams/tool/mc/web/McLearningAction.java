@@ -64,9 +64,9 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
  * Struts action class as all of them are handled in 
  * <code>CustomStrutsExceptionHandler<code>.
  * 
- *    <!--Learning Main Action: interacts with the Learning module user -->
+   <!--Learning Main Action: interacts with the Learning module user -->
 	<action	path="/learning"
-		    type="org.lamsfoundation.lams.tool.mc.web.McAction"
+		    type="org.lamsfoundation.lams.tool.mc.web.McLearningAction"
 			name="McLearningForm"
       		scope="session"
       		input=".answers"
@@ -125,7 +125,26 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 		    path=".mcErrorBox"
 		    redirect="true"
 	  	/>
+
+	  	<forward
+	        name="starter"
+	        path=".starter"
+	        redirect="true"
+	     />
+
+	  	<forward
+		    name="learningStarter"
+		    path=".learningStarter"
+		    redirect="true"
+	  	/>
+
+	     <forward
+	        name="preview"
+	        path=".preview"
+	        redirect="true"
+	     />
     </action>
+
  * 
 */
 public class McLearningAction extends LamsDispatchAction implements McAppConstants

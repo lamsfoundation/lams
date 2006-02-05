@@ -33,11 +33,17 @@
 	  	/>
 	  	
 	  	<forward
+	        name="starter"
+	        path=".starter"
+	        redirect="true"
+	     />
+	  	
+	  	<forward
 		    name="errorList"
 		    path=".mcErrorBox"
 		    redirect="true"
 	  	/>
-	</action>  
+	</action>    
   
 */
 package org.lamsfoundation.lams.tool.mc.web;

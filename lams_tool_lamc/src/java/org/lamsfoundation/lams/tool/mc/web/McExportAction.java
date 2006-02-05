@@ -1,6 +1,3 @@
-	/*
- * Created on Jul 25, 2005
- */
 package org.lamsfoundation.lams.tool.mc.web;
 
 import javax.servlet.http.HttpServletRequest;
@@ -28,6 +25,34 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @author Ozgur Demirtas
  *
  * enables  the learner and teacher to export the contents of the mcq tool.
+ *    <!--Export Prtfolio Action -->
+	    <action
+		      path="/exportPortfolio"
+		      type="org.lamsfoundation.lams.tool.mc.web.McExportAction"
+		      name="McExportForm"
+		      scope="session"
+		      parameter="mode"
+		      unknown="false"
+		      validate="false"
+	    >
+		<exception
+	        key="error.exception.McApplication"
+	        type="java.lang.NullPointerException"
+	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
+	        path=".mcErrorBox"
+	        scope="request"
+	      />	         			      		
+	      <forward
+	        name="exportPortfolio"
+	        path=".exportPortfolio"
+	        redirect="false"
+	      />
+	  	<forward
+		    name="errorList"
+		    path=".mcErrorBox"
+		    redirect="true"
+	  	/>
+    </action>
  */
 
 public class McExportAction extends LamsDispatchAction implements McAppConstants{

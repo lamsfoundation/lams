@@ -70,7 +70,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * If the tool has a LockOnFinish flag, then the tool should lock learner's entries once they have completed the activity. 
  * If they return to the activity (e.g. via the progress bar) then the entries should be read only.
  * 
- *    <!--Learning Starter Action: initializes the Learning module -->
+   <!--Learning Starter Action: initializes the Learning module -->
    <action 	path="/learningStarter" 
    			type="org.lamsfoundation.lams.tool.mc.web.McLearningStarterAction" 
    			name="McLearningForm" 
@@ -99,8 +99,26 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 	  	/>
 
 	  	<forward
+		    name="viewAnswers"
+		    path=".viewAnswers"
+		    redirect="true"
+	  	/>
+
+	  	<forward
 		    name="redoQuestions"
 		    path=".redoQuestions"
+		    redirect="true"
+	  	/>
+	  	
+	     <forward
+	        name="preview"
+	        path=".preview"
+	        redirect="true"
+	     />
+
+	  	<forward
+		    name="learningStarter"
+		    path=".learningStarter"
 		    redirect="true"
 	  	/>
 	  	
@@ -109,8 +127,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 		    path=".mcErrorBox"
 		    redirect="true"
 	  	/>
-	</action>  
-
+	</action>    
  *
  */
 

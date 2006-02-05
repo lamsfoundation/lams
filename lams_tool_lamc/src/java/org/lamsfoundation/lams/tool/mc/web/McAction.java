@@ -108,6 +108,25 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 	        path=".editOptsContent"
 	        redirect="true"
 	      />
+
+	  	<forward
+		    name="loadMonitoring"
+		    path=".monitoringContent"
+		    redirect="true"
+	  	/>
+
+	     <forward
+	        name="preview"
+	        path=".preview"
+	        redirect="true"
+	     />
+	  	
+	  	<forward
+		    name="errorList"
+		    path=".mcErrorBox"
+		    redirect="true"
+	  	/>
+	      
     </action>
 
 */
