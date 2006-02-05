@@ -250,7 +250,6 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
     	String strToolContentId=request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
     	logger.debug("strToolContentId: " + strToolContentId);
     	 
-	    long toolSessionId=0;
 	    if ((strToolContentId == null) || (strToolContentId.length() == 0)) 
 	    {
 	    	persistError(request, "error.contentId.required");

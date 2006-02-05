@@ -65,6 +65,8 @@ public interface IMcService
   
     public void createMcQueUsr(McQueUsr mcQueUsr) throws McApplicationException;
     
+    public McQueUsr getMcUserBySession(final Long queUsrId, final Long mcSessionId) throws McApplicationException;
+    
  	public McQueUsr retrieveMcQueUsr(Long userId) throws McApplicationException;
     
     public void createMcUsrAttempt(McUsrAttempt mcUsrAttempt) throws McApplicationException;

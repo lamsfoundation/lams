@@ -696,6 +696,7 @@ public abstract class McUtils implements McAppConstants {
     	request.getSession().removeAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS);
     	request.getSession().removeAttribute(USER_EXCEPTION_NO_STUDENT_ACTIVITY);
     	request.getSession().removeAttribute(USER_EXCEPTION_MODE_REQUIRED);
+    	request.getSession().removeAttribute(EXPORT_USER_ID);
     	logger.debug("completely cleaned the session.");
     }
 }

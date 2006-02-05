@@ -51,6 +51,9 @@ public class McContent implements Serializable {
 
     /** persistent field */
     private Long mcContentId;
+    
+    /** persistent field, used for export portfolio */
+    private String content;
 
     /** nullable persistent field */
     private String title;
@@ -123,12 +126,13 @@ public class McContent implements Serializable {
     private Set mcAttachments;
 
     /** full constructor */
-    public McContent(Long mcContentId, String title, String instructions, boolean defineLater, boolean runOffline, Date creationDate, 
+    public McContent(Long mcContentId, String content, String title, String instructions, boolean defineLater, boolean runOffline, Date creationDate, 
     		Date updateDate, boolean questionsSequenced, boolean usernameVisible, String reportTitle, String monitoringReportTitle, 
 			long createdBy, boolean synchInMonitor, boolean contentInUse, String offlineInstructions, String onlineInstructions, 
 			String endLearningMessage, Integer passMark, boolean showReport, boolean showFeedback, boolean retries, Set mcQueContents, Set mcSessions, 
 			Set mcAttachments) {
         this.mcContentId = mcContentId;
+        this.content=content;
         this.title = title;
         this.instructions = instructions;
         this.defineLater = defineLater;
@@ -182,6 +186,7 @@ public class McContent implements Serializable {
     {
     	McContent newContent = new McContent(
     				 newContentId,
+					 mc.getContent(),
                      mc.getTitle(),
                      mc.getInstructions(),
                      mc.isDefineLater(),
@@ -488,5 +493,17 @@ public class McContent implements Serializable {
 	 */
 	public void setCreationDate(Date creationDate) {
 		this.creationDate = creationDate;
+	}
+	/**
+	 * @return Returns the content.
+	 */
+	public String getContent() {
+		return content;
+	}
+	/**
+	 * @param content The content to set.
+	 */
+	public void setContent(String content) {
+		this.content = content;
 	}
 }
