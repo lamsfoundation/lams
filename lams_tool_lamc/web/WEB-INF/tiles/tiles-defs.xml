@@ -130,4 +130,9 @@ http://www.gnu.org/licenses/gpl.txt
 		<put name="content" value="/learning/Preview.jsp" />	
 	</definition>
 	
+	<definition name=".exportPortfolio" extends=".baseDef" >
+		<put name="title" value="MCQ Portfolio Export"/>
+		<put name="pageHeader" value = "MCQ Portfolio Export"/>
+		<put name="content" value="/exportPortfolio.jsp" />	
+	</definition>
 </tiles-definitions>

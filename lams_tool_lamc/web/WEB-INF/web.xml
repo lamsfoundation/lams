@@ -107,7 +107,14 @@
 	    <load-on-startup>3</load-on-startup>
 	</servlet>
 	
-  	<servlet-mapping>
+	<servlet>
+		<servlet-name>exportPortfolio</servlet-name>
+		<display-name>Export Portfolio</display-name>
+		<description>Export Portfolio</description>		
+		<servlet-class>org.lamsfoundation.lams.tool.mc.web.McExportServlet</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
 		<servlet-name>action</servlet-name>
 	   	<url-pattern>*.do</url-pattern>
 	</servlet-mapping>
@@ -116,6 +123,12 @@
 		<servlet-name>download</servlet-name>
 		<url-pattern>/download/*</url-pattern>
   	</servlet-mapping>
+
+  	<servlet-mapping>
+		<servlet-name>exportPortfolio</servlet-name>
+		<url-pattern>/portfolioExport</url-pattern>
+  	</servlet-mapping>
+  	
 
 <!--
   	<servlet-mapping>

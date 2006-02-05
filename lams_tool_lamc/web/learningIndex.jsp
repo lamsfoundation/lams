@@ -21,12 +21,15 @@
 	String strRemoveToolSession="/learningStarter?toolSessionID=" + toolSessionID2 +  "&mode=learner" + "&removeToolSession=1";
 	String strLeaveToolSession="/learningStarter?toolSessionID=" + toolSessionID2 +  "&mode=learner" + "&leaveToolSession=1" +  "&learnerId=4";
 
-
 	String strPreview="/learningStarter?toolSessionID=" + toolSessionID2 + "&mode=author";	
 	String strLearnerProgress="/learningStarter?toolSessionID=" + toolSessionID2 +  "&mode=teacher" + "&userID=4";
 	String strLearnerProgress2="/learningStarter?toolSessionID=" + toolSessionID2 +  "&mode=teacher" + "&userID=1";
 	String strLearnerProgress3="/learningStarter?toolSessionID=" + toolSessionID +  "&mode=teacher" + "&userID=4";
 	String strLearnerProgress4="/learningStarter?toolSessionID=" + toolSessionID +  "&mode=teacher" + "&userID=1";
+
+	String exportPortfolioStudent8 = "/exportPortfolio.do?mode=learner&toolSessionID=88888888&userID=4";	
+	String exportPortfolioStudent5 = "/exportPortfolio.do?mode=learner&toolSessionID=55555555&userID=4";	
+
 %>
 
 <html:form action="<%=strCreateToolSession%>" method="post">
@@ -107,3 +110,16 @@
       </table><br/><BR>
       <html:submit value="View Learner Progress 88888888 id:1"/>
 </html:form>
+
+<html:form action="<%=exportPortfolioStudent8%>" method="post">
+      <table border=1>
+      </table><br/><BR>
+      <html:submit value="Export Portfolio Student, session id: 88888888"/>
+</html:form>
+
+<html:form action="<%=exportPortfolioStudent5%>" method="post">
+      <table border=1>
+      </table><br/><BR>
+      <html:submit value="Export Portfolio Student, session id: 55555555"/>
+</html:form>
+

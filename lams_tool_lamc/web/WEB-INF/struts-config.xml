@@ -7,6 +7,7 @@
 		<form-bean name="McAuthoringForm" type="org.lamsfoundation.lams.tool.mc.web.McAuthoringForm"/>
 		<form-bean name="McLearningForm" type="org.lamsfoundation.lams.tool.mc.web.McLearningForm"/>
 		<form-bean name="McMonitoringForm" type="org.lamsfoundation.lams.tool.mc.web.McMonitoringForm"/>
+		<form-bean name="McExportForm" type="org.lamsfoundation.lams.tool.mc.web.McExportForm"/>		
 	</form-beans>
 	
   	<!-- ========== Global Exception Definitions =================================== -->
@@ -434,8 +435,35 @@
 		    redirect="true"
 	  	/>
 	</action>  
-   
-    
+
+   <!--Export Prtfolio Action -->
+    <action
+	      path="/exportPortfolio"
+	      type="org.lamsfoundation.lams.tool.mc.web.McExportAction"
+	      name="McExportForm"
+	      scope="session"
+	      parameter="mode"
+	      unknown="false"
+	      validate="false"
+    >
+		<exception
+	        key="error.exception.McApplication"
+	        type="java.lang.NullPointerException"
+	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
+	        path=".mcErrorBox"
+	        scope="request"
+	      />	         			      		
+	      <forward
+	        name="exportPortfolio"
+	        path=".exportPortfolio"
+	        redirect="false"
+	      />
+	  	<forward
+		    name="errorList"
+		    path=".mcErrorBox"
+		    redirect="true"
+	  	/>
+    </action>
  </action-mappings>
 	
 	<message-resources parameter="org.lamsfoundation.lams.tool.mc.McResources"/>
