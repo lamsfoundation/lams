@@ -75,7 +75,7 @@ public interface IMonitoringService
      * @param lessionPackage
      * @return
      */
-    public String createLesson(Integer creatorUserId,String lessionPackage);
+    public String createLessonClassForLessonWDDX(Integer creatorUserId,String lessionPackage);
     
     /**
      * Setup the lesson class and organization for a lesson according to the 

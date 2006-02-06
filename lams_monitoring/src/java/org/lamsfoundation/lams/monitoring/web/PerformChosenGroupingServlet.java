@@ -22,23 +22,19 @@ package org.lamsfoundation.lams.monitoring.web;
 
 import java.io.IOException;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Vector;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.monitoring.MonitoringConstants;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
-import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.lamsfoundation.lams.web.servlet.AbstractStoreWDDXPacketServlet;
-import org.lamsfoundation.lams.web.session.SessionManager;
-import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -63,7 +59,8 @@ public class PerformChosenGroupingServlet extends AbstractStoreWDDXPacketServlet
 	}
 	
 	protected String process(String chosenGroupingPacket, HttpServletRequest request) throws Exception {
-		FlashMessage flashMessage = null;
+		FlashMessage flashMessage;
+		String message;
 		try {
 			Hashtable table = (Hashtable)WDDXProcessor.deserialize(chosenGroupingPacket);
 			//get back value from WDDX package
@@ -73,18 +70,27 @@ public class PerformChosenGroupingServlet extends AbstractStoreWDDXPacketServlet
 			
 			IMonitoringService monitoringService = getMonitoringService();
 			//get the activity according to the given activity ID
-			GroupingActivity activity = (GroupingActivity) monitoringService.getActivityById(activityId);
+			Activity act = monitoringService.getActivityById(activityId);
+			if(!act.isGroupingActivity()){
+				 throw new Exception("The given activity ["+activityId+"] is not grouping type.");
+			}
+			GroupingActivity activity = (GroupingActivity) act;
 			//perform grouping
 			monitoringService.performChosenGrouping(activity,groups);
+			
+			//construct return WDDX message
+			Grouping grouping = activity.getCreateGrouping();
+			flashMessage = new FlashMessage("performChosenGrouping",grouping.getGroupingDTO());
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(e);
+			flashMessage = new FlashMessage("performChosenGrouping","Perfrom chosen grouping occurs error:" 
+					+ e.getMessage(),FlashMessage.ERROR);
 		}
 		
-		String message = "Failed on creating flash message:" + flashMessage;
-		try {
+		try{
 			message = flashMessage.serializeMessage();
-		} catch (IOException e) {
-			log.error(message);
+		}catch(IOException e){
+			 message = "Failed on creating flash message:" + flashMessage;
 		}
 		
         return message;

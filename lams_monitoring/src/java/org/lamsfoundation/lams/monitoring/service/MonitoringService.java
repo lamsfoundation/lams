@@ -21,6 +21,7 @@
 package org.lamsfoundation.lams.monitoring.service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -309,9 +310,9 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 
     }
     /**
-     *  @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#createLesson(Integer, String)
+     *  @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#createLessonClassForLessonWDDX(Integer, String)
      */
-    public String createLesson(Integer creatorUserId, String lessonPacket){
+    public String createLessonClassForLessonWDDX(Integer creatorUserId, String lessonPacket){
     	FlashMessage flashMessage = null;
     	try{
 	    	Hashtable table = (Hashtable)WDDXProcessor.deserialize(lessonPacket);
@@ -1065,7 +1066,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         if(!grouping.isChosenGrouping()){
         	log.error("GroupingActivity ["+groupingActivity.getActivityId() +"] does not have chosen grouping.");
         	throw new MonitoringServiceException("GroupingActivity ["+groupingActivity.getActivityId()
-        			+"] does not have chosen grouping.");
+        			+"] is not chosen grouping.");
         }
         try {
         	//try to sorted group list by orderID.
@@ -1083,15 +1084,26 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 	        }
 	        iter = sortedMap.values().iterator();
 	        //grouping all group in list
-	        while(iter.hasNext()){
+	        for(int orderId=0;iter.hasNext();orderId++){
 	        	Hashtable group = (Hashtable) iter.next();
-	        	List learners = (List) group.get(MonitoringConstants.KEY_GROUP_LEARNERS);
+	        	List learnerIdList = (List) group.get(MonitoringConstants.KEY_GROUP_LEARNERS);
 	        	String groupName = WDDXProcessor.convertToString(group,MonitoringConstants.KEY_GROUP_NAME);
+	        	List learners = new ArrayList();
+	        	//? Seem too low efficient, is there a easy way?
+	        	for(int idx=0;idx<learnerIdList.size();idx++){
+	        		User user = userDAO.getUserById(new Integer(((Double)learnerIdList.get(idx)).intValue()));
+	        		learners.add(user);
+	        	
+	        	}
 	        	log.debug("Performing grouping for " + groupName + "...");
 	        	grouping.doGrouping(groupName,learners);
-	        	groupingDAO.update(grouping);
 	        	log.debug("Finish grouping for " + groupName);
 	        }
+	        
+	        log.debug("Persist grouping for [" + grouping.getGroupingId()  + "]...");
+        	groupingDAO.update(grouping);
+        	log.debug("Persist grouping for [" + grouping.getGroupingId()  + "] success.");
+        	
         } catch (WDDXProcessorConversionException e) {
         	throw new MonitoringServiceException("Perform chosen grouping occurs error when parsing WDDX package:"
         			+ e.getMessage());

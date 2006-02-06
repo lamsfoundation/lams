@@ -66,7 +66,7 @@ public class CreateLessionServlet  extends AbstractStoreWDDXPacketServlet {
     		return flashMessage.serializeMessage();
     	}
 		IMonitoringService monitoringService = getMonitoringService();
-		return monitoringService.createLesson(user.getUserID(),lessionPackage);
+		return monitoringService.createLessonClassForLessonWDDX(user.getUserID(),lessionPackage);
 	}
 
 	protected String getMessageKey(String packet, HttpServletRequest request) {
