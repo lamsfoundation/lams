@@ -22,7 +22,13 @@
  */
 package org.lamsfoundation.lams.learningdesign.dto;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
 import org.lamsfoundation.lams.learningdesign.ChosenGrouping;
+import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.RandomGrouping;
 import org.lamsfoundation.lams.lesson.LessonClass;
@@ -40,13 +46,14 @@ public class GroupingDTO extends BaseDTO{
 	private Integer learnersPerGroup;
 	private Long staffGroupID;
 	private Integer maxNumberOfGroups;
-	
+	//list of GroupDTO
+	private List groups;
 	
 
 	public GroupingDTO(Long groupingID, Integer groupingUIID,
 			Integer groupingType, Integer numberOfGroups,
 			Integer learnersPerGroup, Long staffGroupID,
-			Integer maxNumberOfGroups) {		
+			Integer maxNumberOfGroups,List groupDTOs) {		
 		this.groupingID = groupingID;
 		this.groupingUIID = groupingUIID;
 		this.groupingTypeID = groupingType;
@@ -54,12 +61,21 @@ public class GroupingDTO extends BaseDTO{
 		this.learnersPerGroup = learnersPerGroup;
 		this.staffGroupID = staffGroupID;
 		this.maxNumberOfGroups = maxNumberOfGroups;
+		this.groups = groupDTOs;
 	}
 	public GroupingDTO(Grouping grouping){
 		this.groupingID = grouping.getGroupingId();
 		this.groupingUIID = grouping.getGroupingUIID();
 		this.maxNumberOfGroups = grouping.getMaxNumberOfGroups();		
 		this.groupingTypeID = grouping.getGroupingTypeId();
+		Set groupSet = grouping.getGroups();
+		groups = new ArrayList();
+		if(groupSet != null){
+			Iterator iter = groupSet.iterator();
+			while(iter.hasNext()){
+				groups.add(((Group)iter.next()).getGroupDTO());
+			}
+		}
 		/*The two lines of code below are commented out, because it creates a new grouping instance and then tries to 
 		 get the attributes for it , in which the values are null. So the grouping object is passed straight into
 		 the processGroupingActivity() function. */
@@ -175,5 +191,15 @@ public class GroupingDTO extends BaseDTO{
 	public void setStaffGroupID(Long staffGroupID) {
 		if(!staffGroupID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG))
 			this.staffGroupID = staffGroupID;
+	}
+	/**
+	 * 
+	 * @return group list belongs to this grouping.
+	 */
+	public List getGroups() {
+		return groups;
+	}
+	public void setGroups(List groups) {
+		this.groups = groups;
 	}
 }

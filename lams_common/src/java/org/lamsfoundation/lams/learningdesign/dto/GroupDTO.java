@@ -20,7 +20,12 @@
  */
 package org.lamsfoundation.lams.learningdesign.dto;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+
+import org.lamsfoundation.lams.learningdesign.Group;
+import org.lamsfoundation.lams.usermanagement.User;
 
 public class GroupDTO {
 	
@@ -30,6 +35,18 @@ public class GroupDTO {
 	//list of org.lamsfoundation.lams.usermanagement.dto.UserDTO
 	private List userList;
 	
+	public GroupDTO(Group group) {
+		groupID = group.getGroupId();
+		groupName = group.getGroupName();
+		orderID = group.getOrderId();
+		userList = new ArrayList();
+		if(group.getUsers() != null){
+			Iterator iter = group.getUsers().iterator();
+			while(iter.hasNext()){
+				userList.add(((User)iter.next()).getUserDTO());
+			}
+		}
+	}
 	public Long getGroupID() {
 		return groupID;
 	}
