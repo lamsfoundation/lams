@@ -5,6 +5,7 @@
     		<url-pattern>*.jsp</url-pattern>
     		<url-pattern>*.html</url-pattern>
     		<url-pattern>/index.jsp</url-pattern>
+    		<url-pattern>/flashCrashDump</url-pattern>
     	</web-resource-collection>
     	<auth-constraint>
     		<role-name>LEARNER</role-name>

@@ -3,6 +3,7 @@ package org.lamsfoundation.lams.web;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
@@ -22,6 +23,8 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  */
 public class FlashCrashDumpServlet extends AbstractStoreWDDXPacketServlet {
 	
+	private static Logger log = Logger.getLogger(HomeAction.class);
+
 	private static final String MESSAGE_KEY = "flashCrashDump";
 	private static final String PREFIX = "Flash_";
 
@@ -29,10 +32,15 @@ public class FlashCrashDumpServlet extends AbstractStoreWDDXPacketServlet {
 		throws Exception
 		{
 			HttpSession ss = SessionManager.getSession();
-			UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-			String id = PREFIX + ( user != null ? user.getLastName() : "unknown") + "_"; 
+			UserDTO user = ss !=null ? (UserDTO) ss.getAttribute(AttributeNames.USER) : null;
+			if ( user == null ) {
+				log.warn("Attempt to dump file by someone not logged in. SessionManager session is "+ss);
+				return new FlashMessage(MESSAGE_KEY,"User not logged in - unable to dump file.", FlashMessage.ERROR).serializeMessage();
+			}
 			
-			String filename = FileUtil.createDumpFile(wddxPacket.getBytes(), id);
+			String id = PREFIX + user.getLogin(); 
+			
+			String filename = FileUtil.createDumpFile(wddxPacket.getBytes(), id, "xml");
 			FlashMessage flashMessage = new FlashMessage(MESSAGE_KEY,filename);
 			return flashMessage.serializeMessage(); 		
 		}

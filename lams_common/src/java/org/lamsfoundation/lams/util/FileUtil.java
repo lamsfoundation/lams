@@ -22,7 +22,6 @@ package org.lamsfoundation.lams.util;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -220,7 +219,7 @@ public class FileUtil {
 		return dir.exists();
 	}
 	
-	private static String generateDumpFilename(String id) throws FileUtilException {
+	private static String generateDumpFilename(String id, String extension) throws FileUtilException {
 		// get dump directory name and make sure directory exists
 		String dumpDirectory = Configuration.get(ConfigurationKeys.LAMS_DUMP_DIR);
 		if ( dumpDirectory == null ) {
@@ -229,13 +228,15 @@ public class FileUtil {
 		createDirectory(dumpDirectory);
 	
 		String dumpFilename = dumpDirectory+File.separator
-			+id+System.currentTimeMillis();
+			+id+System.currentTimeMillis()
+			+( extension != null ? "."+extension : "");
 		
 		File dumpFile = new File(dumpFilename);
 		int i = 0;
 		while ( dumpFile.exists() && i < 100 ) {
 			dumpFilename = dumpDirectory+File.separator
-				+id+System.currentTimeMillis()+"_"+i;
+				+id+System.currentTimeMillis()+"_"+i
+				+( extension != null ? "."+extension : "");
 			dumpFile = new File(dumpFilename);
 		}
 		if ( dumpFile.exists() ) {
@@ -256,12 +257,14 @@ public class FileUtil {
 	 * 
 	 * @param data data to dump
 	 * @param id some identification name for the string. Does not need to be unique. e.g. FLASH_jsmith
+	 * @param extension optional extension to be added to filename e.g. xml. Note: do not include the "." - that
+	 * will be added automatically.
 	 * 
 	 * @author Fiona Malikoff
 	 * @throws FileUtilException 
 	 */
-	public static String createDumpFile(byte[] data, String id) throws FileUtilException {
-		String dumpFilename = generateDumpFilename(id);
+	public static String createDumpFile(byte[] data, String id, String extension) throws FileUtilException {
+		String dumpFilename = generateDumpFilename(id, extension);
 		OutputStream dumpFile = null;
 		try {
 			dumpFile = new FileOutputStream(dumpFilename);

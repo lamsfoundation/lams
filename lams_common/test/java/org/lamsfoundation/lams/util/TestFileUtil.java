@@ -231,7 +231,7 @@ public class TestFileUtil extends TestCase {
 	{
 		byte[] testData = "This is my test string.".getBytes();
 		String indexString = "xyzzy_";
-		String filename = FileUtil.createDumpFile(testData, indexString);
+		String filename = FileUtil.createDumpFile(testData, indexString, ".xml");
 
 		assertNotNull("Filename of dump file is not null", filename);
 		assertTrue("Filename includes id string ", filename.indexOf(indexString)!=-1);
