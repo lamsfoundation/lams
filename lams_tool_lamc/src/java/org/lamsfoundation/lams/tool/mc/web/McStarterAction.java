@@ -135,6 +135,7 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McApplicationException;
 import org.lamsfoundation.lams.tool.mc.McComparator;
+import org.lamsfoundation.lams.tool.mc.McStringComparator;
 import org.lamsfoundation.lams.tool.mc.McUtils;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
@@ -184,7 +185,7 @@ public class McStarterAction extends Action implements McAppConstants {
 		}
 		 
 		initialiseAttributes(request);
-    	/* determine whether the request is from Monitoring url Edit Activity
+    	/* determine whether the request is from Monitoring url Edit Activity.
 		 * null sourceMcStarter indicates that the request is from authoring url.
 		 * */
 		
@@ -398,6 +399,7 @@ public class McStarterAction extends Action implements McAppConstants {
 					/* we should allow content to be edited if the url mode is define Later*/
 					if (!defineLater.equals(DEFINE_LATER))
 					{
+						logger.debug("the url mode is :" + defineLater);
 						if (isDefineLater == true)
 						{
 					    	persistError(request,"error.content.beingModified");
@@ -566,6 +568,8 @@ public class McStarterAction extends Action implements McAppConstants {
 	protected void retrieveExistingContent(HttpServletRequest request, McAuthoringForm mcAuthoringForm, long toolContentId, McContent mcContent)
 	{
 		IMcService mcService =McUtils.getToolService(request);
+		logger.debug("mcService:" + mcService);
+		
 		request.getSession().setAttribute(IS_REVISITING_USER, new Boolean(true));
 		/*to find out whether the content is being modified or not*/
 		request.getSession().setAttribute(DEFINE_LATER, new Boolean(mcContent.isDefineLater()));
@@ -578,7 +582,6 @@ public class McStarterAction extends Action implements McAppConstants {
 		/*used in advanced tab*/
 		request.getSession().setAttribute(RICHTEXT_REPORT_TITLE,mcContent.getReportTitle());
 	    request.getSession().setAttribute(RICHTEXT_END_LEARNING_MSG,mcContent.getEndLearningMessage());
-		//request.getSession().setAttribute(RETRIES, new Boolean(mcContent.isRetries()));
 		request.getSession().setAttribute(PASSMARK, mcContent.getPassMark()); //Integer
 		
 		/* used in instructions tab*/
@@ -590,7 +593,6 @@ public class McStarterAction extends Action implements McAppConstants {
 		request.getSession().setAttribute(CREATION_DATE,creationDate);
 		
 		logger.debug("RICHTEXT_TITLE:" + request.getSession().getAttribute(RICHTEXT_TITLE));
-		
 		logger.debug("getting name lists based on uid:" + mcContent.getUid());
 		
 		List listUploadedOffFiles= mcService.retrieveMcUploadedOfflineFilesName(mcContent.getUid());
@@ -616,6 +618,8 @@ public class McStarterAction extends Action implements McAppConstants {
     	logger.debug("starter initialized the existing Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
     	
 	    AuthoringUtil.refreshMaps(request, toolContentId);
+	    AuthoringUtil.assignStaterMapsToCurrentMaps(request);
+	    
 	    /*process offline files metadata*/
 	    List listOfflineFilesMetaData=mcService.getOfflineFilesMetaData(mcContent.getUid());
 	    logger.debug("existing listOfflineFilesMetaData, to be structured as McAttachmentDTO: " + listOfflineFilesMetaData);
@@ -649,7 +653,15 @@ public class McStarterAction extends Action implements McAppConstants {
 	 */
 	protected void retrieveDefaultContent(HttpServletRequest request, McAuthoringForm mcAuthoringForm)
 	{
-		IMcService mcService =McUtils.getToolService(request);
+		IMcService mcService = (IMcService)request.getSession().getAttribute(TOOL_SERVICE);
+		logger.debug("mcService: " + mcService);
+		if (mcService == null)
+		{
+			logger.debug("will retrieve mcService");
+			mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+		    logger.debug("retrieving mcService from cache: " + mcService);
+		}
+
 		request.getSession().setAttribute(IS_REVISITING_USER, new Boolean(false));
 		
 		request.getSession().setAttribute(DEFINE_LATER_EDIT_ACTIVITY, new Boolean(false));
@@ -658,12 +670,13 @@ public class McStarterAction extends Action implements McAppConstants {
 		long contentId=0;
 		logger.debug("getting default content");
 		contentId=mcService.getToolDefaultContentIdBySignature(MY_SIGNATURE);
+		logger.debug("contentId:" + contentId);
 		McContent mcContent=mcService.retrieveMc(new Long(contentId));
 		logger.debug("mcContent:" + mcContent);
 		
 		/* reset all radioboxes to false*/
 		mcAuthoringForm.resetRadioBoxes();
-		logger.debug("all radioboxes arec reset");
+		logger.debug("all radioboxes are reset");
 		
 		request.getSession().setAttribute(RICHTEXT_TITLE,mcContent.getTitle());
 		request.getSession().setAttribute(RICHTEXT_INSTRUCTIONS,mcContent.getInstructions());
@@ -676,7 +689,6 @@ public class McStarterAction extends Action implements McAppConstants {
 		request.getSession().setAttribute(RICHTEXT_END_LEARNING_MSG,mcContent.getEndLearningMessage());
 
 		logger.debug("PASSMARK:" + request.getSession().getAttribute(PASSMARK));
-		
 		logger.debug("RICHTEXT_TITLE:" + request.getSession().getAttribute(RICHTEXT_TITLE));
 		logger.debug("getting default content");
 	    
@@ -703,7 +715,7 @@ public class McStarterAction extends Action implements McAppConstants {
 		List list=mcService.findMcOptionsContentByQueId(mcQueContent.getUid());
 		logger.debug("options list:" + list);
 
-		Map mapOptionsContent= new TreeMap(new McComparator());
+		Map mapOptionsContent= new TreeMap(new McStringComparator());
 		Iterator listIterator=list.iterator();
 		Long mapIndex=new Long(1);
 		while (listIterator.hasNext())
@@ -757,10 +769,6 @@ public class McStarterAction extends Action implements McAppConstants {
 		LinkedList listOnlineFilesMetaData= new LinkedList();
 		request.getSession().setAttribute(LIST_OFFLINEFILES_METADATA, listOfflineFilesMetaData);
 		request.getSession().setAttribute(LIST_ONLINEFILES_METADATA, listOnlineFilesMetaData);
-		
-		Map mapQuestionsContent= new TreeMap(new McComparator());
-		Map mapOptionsContent= new TreeMap(new McComparator());
-		Map mapDefaultOptionsContent= new TreeMap(new McComparator());
 		
 		Map mapGeneralOptionsContent= new TreeMap(new McComparator());
 		request.getSession().setAttribute(MAP_GENERAL_OPTIONS_CONTENT, mapGeneralOptionsContent);

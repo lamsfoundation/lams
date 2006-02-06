@@ -171,7 +171,7 @@ public abstract class McUtils implements McAppConstants {
 	public static Map generateOptionsMap(List listMcOptions)
 	{
 		logger.debug("incoming listMcOptions" + listMcOptions);
-		Map mapOptionsContent= new TreeMap(new McComparator());
+		Map mapOptionsContent= new TreeMap(new McStringComparator());
 		
 		Iterator listIterator=listMcOptions.iterator();
     	Long mapIndex=new Long(1);
@@ -509,6 +509,32 @@ public abstract class McUtils implements McAppConstants {
 	}
 	
 
+    public static void debugMaps(HttpServletRequest request)
+    {
+    	Map mapQuestionsContent=(Map)request.getSession().getAttribute(MAP_QUESTIONS_CONTENT);
+    	Map mapOptionsContent=(Map)request.getSession().getAttribute(MAP_OPTIONS_CONTENT);
+    	Map mapGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_OPTIONS_CONTENT);
+    	Map mapGeneralSelectedOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT);
+    	Map mapStartupGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_STARTUP_GENERAL_OPTIONS_CONTENT);
+    	Map mapStartupGeneralSelectedOptionsContent=(Map)request.getSession().getAttribute(MAP_STARTUP_GENERAL_SELECTED_OPTIONS_CONTENT);
+    	Map mapDisabledQuestions=(Map)request.getSession().getAttribute(MAP_DISABLED_QUESTIONS);
+    	Map mapWeights=(Map)request.getSession().getAttribute(MAP_WEIGHTS);
+    	Map mapCheckBoxStates=(Map)request.getSession().getAttribute(MAP_CHECKBOX_STATES);
+    	Map mapSelectedOptions=(Map)request.getSession().getAttribute(MAP_SELECTED_OPTIONS);    	
+    	
+    	logger.debug("START DEBUGGING MAPS:");
+    	logger.debug("mapQuestionsContent:" + mapQuestionsContent);
+    	logger.debug("mapOptionsContent:" + mapOptionsContent);
+    	logger.debug("mapGeneralOptionsContent:" + mapGeneralOptionsContent);
+    	logger.debug("mapGeneralSelectedOptionsContent:" + mapGeneralSelectedOptionsContent);
+    	logger.debug("mapStartupGeneralOptionsContent:" + mapStartupGeneralOptionsContent);
+    	logger.debug("mapStartupGeneralSelectedOptionsContent:" + mapStartupGeneralSelectedOptionsContent);
+    	logger.debug("mapDisabledQuestions:" + mapDisabledQuestions);
+    	logger.debug("mapWeights:" + mapWeights);
+    	logger.debug("mapCheckBoxStates:" + mapCheckBoxStates);
+    	logger.debug("mapSelectedOptions:" + mapSelectedOptions);
+    	logger.debug("STOP DEBUGGING MAPS");
+    }
 	
 	
 	
