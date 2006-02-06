@@ -1,6 +1,3 @@
-/*
- * Created on 16/05/2005
- */
 package org.lamsfoundation.lams.tool.mc.web;
 
 import java.io.FileNotFoundException;
@@ -1636,7 +1633,7 @@ public class AuthoringUtil implements McAppConstants {
 	 */
 	public static void cleanupRedundantOptions(HttpServletRequest request, Map mapStartupGeneralOptionsContent, Map mapStartupGeneralSelectedOptionsContent, Map mapGeneralOptionsContent, Map mapGeneralSelectedOptionsContent, Map mapStartupGeneralOptionsQueId)
 	{
-		logger.debug("doing  upRedundantOptions...");
+		logger.debug("doing  cleanupRedundantOptions...");
 		logger.debug("starting mapStartupGeneralOptionsContent...:" + mapStartupGeneralOptionsContent);
 		logger.debug("using mapGeneralOptionsContent..: "+ mapGeneralOptionsContent);
     	IMcService mcService =McUtils.getToolService(request);
@@ -2156,9 +2153,11 @@ public class AuthoringUtil implements McAppConstants {
      */
     public static void  refreshMaps(HttpServletRequest request, long toolContentId)
     {
+    	logger.debug("refreshing maps..");
     	Map mapQuestionsUidContent=AuthoringUtil.rebuildQuestionUidMapfromDB(request, new Long(toolContentId));
     	logger.debug("mapQuestionsUidContent:" + mapQuestionsUidContent);
     	
+    	logger.debug("mapQuestionsUidContent size:" + mapQuestionsUidContent.size());
     	if (mapQuestionsUidContent.size() > 0)
     	{
     		Map mapStartupGeneralOptionsContent=AuthoringUtil.rebuildStartupGeneralOptionsContentMapfromDB(request, mapQuestionsUidContent);
@@ -2173,6 +2172,24 @@ public class AuthoringUtil implements McAppConstants {
         	logger.debug("mapStartupGeneralOptionsQueId:" + mapStartupGeneralOptionsQueId);
         	request.getSession().setAttribute(MAP_STARTUP_GENERAL_OPTIONS_QUEID, mapStartupGeneralOptionsQueId);	
     	}
+    }
+    
+    
+    /**
+     * assignStaterMapsToCurrentMaps(HttpServletRequest request)
+     * @param request
+     */
+    public static void  assignStaterMapsToCurrentMaps(HttpServletRequest request)
+    {
+    	logger.debug("assigning maps..");
+		Map mapStartupGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_STARTUP_GENERAL_OPTIONS_CONTENT);
+		logger.debug("mapStartupGeneralOptionsContent: " + mapStartupGeneralOptionsContent);
+    	
+		Map mapStartupGeneralSelectedOptionsContent=(Map) request.getSession().getAttribute(MAP_STARTUP_GENERAL_SELECTED_OPTIONS_CONTENT);
+		logger.debug("mapStartupGeneralSelectedOptionsContent: " + mapStartupGeneralSelectedOptionsContent);
+    	
+		request.getSession().setAttribute(MAP_GENERAL_OPTIONS_CONTENT, mapStartupGeneralOptionsContent);
+		request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapStartupGeneralSelectedOptionsContent);
     }
     
     
