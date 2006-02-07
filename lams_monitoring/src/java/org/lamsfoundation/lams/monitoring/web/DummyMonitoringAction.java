@@ -203,7 +203,9 @@ public class DummyMonitoringAction extends LamsDispatchAction
         
         testLesson = monitoringService.createLessonClassForLesson(testLesson.getLessonId().longValue(),
         		organisation,
+        		"Leaner Group",
 				learners,
+				"Staff Group",
                 staffs);
 
         // start the lesson.

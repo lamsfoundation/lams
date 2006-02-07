@@ -179,7 +179,9 @@ public class TestMonitoringService extends AbstractLamsTestCase
         
         Lesson testLesson = monitoringService.createLessonClassForLesson(TEST_LESSON_ID.longValue(),
                                                                          testOrganisation,
+                                                                         "leaner group",
                                                                          learners,
+                                                                         "staff group",
                                                                          staffs);
         Lesson createdLesson = lessonDao.getLesson(TEST_LESSON_ID);
         

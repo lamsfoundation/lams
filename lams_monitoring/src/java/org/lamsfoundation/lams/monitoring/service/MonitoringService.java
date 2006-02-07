@@ -321,8 +321,15 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 	    		WDDXProcessor.convertToInteger(MonitoringConstants.KEY_ORGANISATION_ID, table.get(MonitoringConstants.KEY_ORGANISATION_ID));
 	    	long lessonId = 
 	    		WDDXProcessor.convertToLong(MonitoringConstants.KEY_LESSON_ID, table.get(MonitoringConstants.KEY_LESSON_ID)).longValue();
-	    	List learners = (List) table.get(MonitoringConstants.KEY_LEARNER);
-	    	List staffs = (List) table.get(MonitoringConstants.KEY_STAFF);
+	    	//get leaner group info
+	    	Hashtable learnerMap = (Hashtable) table.get(MonitoringConstants.KEY_LEARNER);
+	    	List learners = (List) learnerMap.get(MonitoringConstants.KEY_USERS);
+	    	String learnerGroupName = WDDXProcessor.convertToString(learnerMap, MonitoringConstants.KEY_GROUP_NAME);
+	    	//get staff group info
+	    	Hashtable staffMap = (Hashtable) table.get(MonitoringConstants.KEY_STAFF);
+	    	List staffs = (List) staffMap.get(MonitoringConstants.KEY_USERS);
+	    	String staffGroupName = WDDXProcessor.convertToString(staffMap, MonitoringConstants.KEY_GROUP_NAME);
+	    	
 	    	if(learners == null)
 	    		learners = new LinkedList();
 	    	if(staffs == null)
@@ -361,7 +368,9 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 	        //Create Lesson!
 	        createLessonClassForLesson(lessonId,
 	        		organisation,
+	        		learnerGroupName,
 	        		learnerList,
+	        		staffGroupName,
 	                staffList);
 	    	
 	   		flashMessage = new FlashMessage("createLesson",Boolean.TRUE);
@@ -385,13 +394,15 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
      * 					 existance of new lesson (without lesson class).</p>
      * <p>A lesson class record should be inserted and organization should be
      * 	  setup after execution of this service.</p> 
+     * @param staffGroupName 
+     * @param learnerGroupName 
      * 
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#createLessonClassForLesson(long, org.lamsfoundation.lams.usermanagement.Organisation, java.util.List, java.util.List)
      */
     public Lesson createLessonClassForLesson(long lessonId,
                                              Organisation organisation,
-                                             List organizationUsers,
-                                             List staffs)
+                                             String learnerGroupName, List organizationUsers,
+                                             String staffGroupName, List staffs)
     {
         Lesson newLesson = lessonDAO.getLesson(new Long(lessonId));
         if ( newLesson == null) {
@@ -399,7 +410,9 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         }
        
         LessonClass newLessonClass = this.createLessonClass(organisation,
+        													learnerGroupName,
                                                             organizationUsers,
+                                                            staffGroupName,
                                                             staffs,
                                                             newLesson);
         newLessonClass.setLesson(newLesson);
@@ -1124,7 +1137,9 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
      * @param newLesson 
      */
     private LessonClass createLessonClass(Organisation organisation,
+    									  String learnerGroupName,
                                           List organizationUsers,
+                                          String staffGroupName,
                                           List staffs,
                                           Lesson newLesson)
     {
@@ -1133,12 +1148,12 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         lessonClassDAO.saveLessonClass(newLessonClass);
 
         //setup staff group
-        newLessonClass.setStaffGroup(Group.createStaffGroup(newLessonClass,
+        newLessonClass.setStaffGroup(Group.createStaffGroup(newLessonClass,staffGroupName,
                                                             new HashSet(staffs)));
         //setup learner group
         //TODO:need confirm group name!
         newLessonClass.getGroups()
-                      .add(Group.createLearnerGroup(newLessonClass, "Learner Group",
+                      .add(Group.createLearnerGroup(newLessonClass, learnerGroupName,
                                                     new HashSet(organizationUsers)));
         
         lessonClassDAO.updateLessonClass(newLessonClass);

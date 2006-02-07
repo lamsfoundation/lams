@@ -83,11 +83,13 @@ public interface IMonitoringService
      * 
      * @param lessonId the lesson without lesson class and organization
      * @param organisation  the organization this lesson belongs to.
+     * @param name of learner group
      * @param organizationUsers a list of learner will be in this new lessons.
+     * @param name of staff group
      * @param staffs a list of staffs who will be in charge of this lesson.
      * @return the lesson with lesson class and organization
      */
-    public Lesson createLessonClassForLesson(long lessonId,Organisation organisation,List organizationUsers,List staffs);
+    public Lesson createLessonClassForLesson(long lessonId, Organisation organisation,String leanerGroupName, List organizationUsers,String staffGroupName, List staffs);
     
     /**
      * Start the specified the lesson. It must be created before calling this

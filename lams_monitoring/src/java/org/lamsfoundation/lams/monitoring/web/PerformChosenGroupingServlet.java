@@ -21,8 +21,10 @@
 package org.lamsfoundation.lams.monitoring.web;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -80,7 +82,10 @@ public class PerformChosenGroupingServlet extends AbstractStoreWDDXPacketServlet
 			
 			//construct return WDDX message
 			Grouping grouping = activity.getCreateGrouping();
-			flashMessage = new FlashMessage("performChosenGrouping",grouping.getGroupingDTO());
+			Map map = new HashMap();
+			map.put(MonitoringConstants.KEY_GROUPING_ACTIVITY,new Long(activityId));
+			map.put("grouping",grouping.getGroupingDTO());
+			flashMessage = new FlashMessage("performChosenGrouping",map);
 		} catch (Exception e) {
 			log.error(e);
 			flashMessage = new FlashMessage("performChosenGrouping","Perfrom chosen grouping occurs error:" 

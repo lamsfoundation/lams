@@ -42,4 +42,5 @@ public class MonitoringConstants {
 	public static final String KEY_GROUP_NAME = "groupName";
 	public static final String KEY_GROUP_ORDER_ID = "orderID";
 	public static final String KEY_GROUP_LEARNERS = "learners";
+	public static final Object KEY_USERS = "users";
 }
