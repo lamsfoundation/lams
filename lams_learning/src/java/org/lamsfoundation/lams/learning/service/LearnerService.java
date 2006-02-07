@@ -447,7 +447,7 @@ public class LearnerService implements ILearnerService
         // if the tool session already exists, will return null
         if ( toolSession !=null ) {
 	        toolActivity.getToolSessions().add(toolSession);
-	        lamsCoreToolService.notifyToolsToCreateSession(toolSession.getToolSessionId(), toolActivity);
+	        lamsCoreToolService.notifyToolsToCreateSession(toolSession, toolActivity);
         }
     }
     

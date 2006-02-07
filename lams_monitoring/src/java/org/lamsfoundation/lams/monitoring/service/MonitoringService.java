@@ -1222,7 +1222,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     			// core has set up a new tool session, we need to ask tool to create their own 
     			// tool sessions using the given id and attach the session to the activity.
     			ToolSession toolSession = (ToolSession) iter.next();
-	            lamsCoreToolService.notifyToolsToCreateSession(toolSession.getToolSessionId(), activity);
+	            lamsCoreToolService.notifyToolsToCreateSession(toolSession, activity);
 	            activity.getToolSessions().add(toolSession);
         		}
     		}

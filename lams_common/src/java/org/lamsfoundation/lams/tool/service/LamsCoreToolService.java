@@ -161,15 +161,15 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
     
     /**
      * @throws ToolException
-     * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#notifyToolsToCreateSession(java.lang.Long, org.lamsfoundation.lams.learningdesign.ToolActivity)
+     * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#notifyToolsToCreateSession( org.lamsfoundation.lams.tool.ToolSession, org.lamsfoundation.lams.learningdesign.ToolActivity)
      */
-    public void notifyToolsToCreateSession(Long toolSessionId, ToolActivity activity) throws ToolException
+    public void notifyToolsToCreateSession(ToolSession toolSession, ToolActivity activity) throws ToolException
     {
     	// TODO remove call to isToolOnClasspath. Should throw an error if tool cannot be found.
     	if ( isToolOnClasspath(activity) ) {
 	        ToolSessionManager sessionManager = (ToolSessionManager) findToolService(activity);
 	
-	        sessionManager.createToolSession(toolSessionId,
+	        sessionManager.createToolSession(toolSession.getToolSessionId(),toolSession.getToolSessionName(),
 	                                         activity.getToolContentId());
     	}
     }

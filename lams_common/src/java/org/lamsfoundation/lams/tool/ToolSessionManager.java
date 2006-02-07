@@ -34,10 +34,11 @@ public interface ToolSessionManager
      * tool content id, then use the default content id.
      * 
      * @param toolSessionId the generated tool session id.
+     * @param toolSessionName the tool session name.
      * @param toolContentId the tool content id specified.
      * @throws ToolException if an error occurs e.g. defaultContent is missing.
      */
-    public void createToolSession(Long toolSessionId, Long toolContentId) throws ToolException;
+    public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException;
     
     /**
      * Call the controller service to complete and leave the tool session.
