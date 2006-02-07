@@ -53,6 +53,9 @@ public class NonGroupedToolSession extends ToolSession {
         				   +"_"
                            +user.getUserId().toString());
         this.user=user;
+        //set toolSession name as same as login name of relatived user.
+        this.setToolSessionName(user.getLogin());
+
     }
     /**default constructor*/
     public NonGroupedToolSession(){}

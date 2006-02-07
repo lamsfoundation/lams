@@ -94,6 +94,7 @@ public class Group implements Serializable,Nullable,Comparable {
      * The order is generated using synchornize method on grouping.
      * 
      * @param grouping the grouping this group belongs to.
+     * @param name of this group
      * @param users the users in this group.
      * @param toolSessions all tool sessions included in this group
      * @return the new learner group
@@ -107,12 +108,14 @@ public class Group implements Serializable,Nullable,Comparable {
      * Creation constructor for initializing staff group. The order is created
      * using default constant.
      * @param grouping the grouping this group belongs to.
+     * @param name of this group
      * @param staffs the users in this group.
+     * 
      * @return the new staff group. 
      */
-    public static Group createStaffGroup(Grouping grouping,  Set staffs)
+    public static Group createStaffGroup(Grouping grouping,  String groupName, Set staffs)
     {
-        return new Group(null,NAME_OF_STAFF_GROUP,STAFF_GROUP_ORDER_ID,grouping,staffs,new HashSet());
+        return new Group(null,groupName, STAFF_GROUP_ORDER_ID,grouping,staffs,new HashSet());
     }
     
     /** default constructor */

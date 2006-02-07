@@ -30,7 +30,10 @@ public abstract class ToolSession implements Serializable {
     public static final String UNIQUE_KEY_PREFIX = "uq";
     /** identifier field */
     private Long toolSessionId;
-
+    
+    /** NON-Persistent field **/
+    private String toolSessionName;
+    
     /** persistent field */
     private ToolActivity toolActivity;
 
@@ -163,4 +166,12 @@ public abstract class ToolSession implements Serializable {
     public void setLesson(Lesson lesson) {
         this.lesson = lesson;
     }
+
+	public String getToolSessionName() {
+		return toolSessionName;
+	}
+
+	public void setToolSessionName(String toolSessionName) {
+		this.toolSessionName = toolSessionName;
+	}
 }

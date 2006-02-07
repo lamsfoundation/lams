@@ -43,6 +43,8 @@ public class GroupedToolSession extends ToolSession {
         				   +"_"
                            +sessionGroup.getGroupId().toString());
         this.sessionGroup=sessionGroup;
+        //set toolSession name as same as name of relatived group.
+        this.setToolSessionName(sessionGroup.getGroupName());
     }
     
 	public Group getSessionGroup() {
