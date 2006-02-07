@@ -212,15 +212,16 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 				Long currentToolContentId= new Long(1234);
 				logger.debug("simulating container behaviour: calling createToolSession with toolSessionId : " + 
 						new Long(toolSessionId) + " and toolContentId: " + currentToolContentId);
-				try
-				{
-					qaService.createToolSession(new Long(toolSessionId), currentToolContentId);
-					logger.debug("simulated container behaviour.");
-				}
-				catch(ToolException e)
-				{
-					logger.debug("we should never come here.");
-				}
+				//Comment: can not create toolSession from tool.
+//				try
+//				{
+//					qaService.createToolSession(new Long(toolSessionId), currentToolContentId);
+//					logger.debug("simulated container behaviour.");
+//				}
+//				catch(ToolException e)
+//				{
+//					logger.debug("we should never come here.");
+//				}
 				 
 		}
 		
