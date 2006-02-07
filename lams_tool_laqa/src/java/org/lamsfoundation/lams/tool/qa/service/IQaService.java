@@ -170,7 +170,7 @@ public interface IQaService
     
     
     /**
-     * createToolSession(Long toolSessionId, Long toolContentId) should ideally should not be part this interface as it is
+     * createToolSession(Long toolSessionId,String toolSessionName, Long toolContentId) should ideally should not be part this interface as it is
      * already part of the interface ToolSessionManager. It is here for development purposes.
      * 
      * It is also defined here since in development we want to be able call it directly from our web-layer 
@@ -178,7 +178,7 @@ public interface IQaService
      * @param toolSessionId
      * @param toolContentId
      */
-    public void createToolSession(Long toolSessionId, Long toolContentId) throws ToolException;
+    public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException;
     
     /**
      * leaveToolSession(Long toolSessionId, Long learnerId) should ideally should not be part this interface as it is

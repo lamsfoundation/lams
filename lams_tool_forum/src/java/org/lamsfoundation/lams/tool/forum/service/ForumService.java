@@ -520,7 +520,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		forumDao.delete(forum);
 	}
 
-	public void createToolSession(Long toolSessionId, Long toolContentId) throws ToolException {
+	public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 		ForumToolSession session = new ForumToolSession();
 		session.setSessionId(toolSessionId);
 		Forum forum = forumDao.getByContentId(toolContentId);
