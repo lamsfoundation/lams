@@ -880,8 +880,8 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 
 	/* ===============Methods implemented from ToolSessionManager =============== */
 	
-	/** @see org.lamsfoundation.lams.tool.ToolSessionManager#createToolSession(java.lang.Long, java.lang.Long) */
-	public void createToolSession(Long toolSessionId, Long toolContentId) throws ToolException
+	/** @see org.lamsfoundation.lams.tool.ToolSessionManager#createToolSession(java.lang.Long, java.lang.String, java.lang.Long) */
+	public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException
 	{
 	    if (toolSessionId == null || toolContentId == null)
 	    {

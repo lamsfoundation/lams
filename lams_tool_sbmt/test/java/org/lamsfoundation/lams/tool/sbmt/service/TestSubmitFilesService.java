@@ -101,7 +101,7 @@ public class TestSubmitFilesService extends SbmtBaseTestCase {
 		Long toolSessionId = new Long(getMaxSessionId()+1);
 
 		try {
-			submitFilesToolSessionManager.createToolSession(toolSessionId,toolContentId);
+			submitFilesToolSessionManager.createToolSession(toolSessionId,"sessionName",toolContentId);
 		} catch (ToolException e) {
 			e.printStackTrace();
 			fail("Tool exception thrown while creating session");

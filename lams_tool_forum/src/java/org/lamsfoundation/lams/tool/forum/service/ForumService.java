@@ -519,7 +519,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		}
 		forumDao.delete(forum);
 	}
-
+	/** @see org.lamsfoundation.lams.tool.ToolSessionManager#createToolSession(java.lang.Long, java.lang.String, java.lang.Long) */
 	public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 		ForumToolSession session = new ForumToolSession();
 		session.setSessionId(toolSessionId);

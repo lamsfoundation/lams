@@ -307,10 +307,10 @@ public class SubmitFilesService implements ToolContentManager,
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.lamsfoundation.lams.tool.ToolSessionManager#createToolSession(java.lang.Long,
+	 * @see org.lamsfoundation.lams.tool.ToolSessionManager#createToolSession(java.lang.Long,java.lang.String,
 	 *      java.lang.Long)
 	 */
-	public void createToolSession(Long toolSessionId, Long toolContentId) {
+	public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) {
         //pre-condition validation
         if (toolSessionId == null || toolContentId == null)
             throw new SubmitFilesException("Fail to create a submission session"

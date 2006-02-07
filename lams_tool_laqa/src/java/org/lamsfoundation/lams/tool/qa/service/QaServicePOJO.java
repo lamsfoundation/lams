@@ -1224,7 +1224,7 @@ public class QaServicePOJO
 	}
     
     /**
-     * createToolSession(Long toolSessionId, Long toolContentId) throws ToolException
+     * createToolSession(Long toolSessionId,String toolSessionName, Long toolContentId) throws ToolException
      * TESTED
      * ToolSessionManager CONTRACT : creates a tool session with the incoming toolSessionId in the tool session table
      * 
@@ -1232,7 +1232,7 @@ public class QaServicePOJO
      * All the learners in the same group have the same toolSessionId.
      * 
      */
-    public void createToolSession(Long toolSessionId, Long toolContentId) throws ToolException
+    public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException
     {
     	logger.debug("start of createToolSession with ids: " + toolSessionId + " and " + toolContentId);
     	if (toolSessionId == null)

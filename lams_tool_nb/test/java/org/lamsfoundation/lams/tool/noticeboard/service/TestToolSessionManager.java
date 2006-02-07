@@ -45,6 +45,7 @@ public class TestToolSessionManager extends NbDataAccessTestCase {
     private INoticeboardService nbService = null;
     private boolean cleanContentData = true;
     private static final Long NEW_SESSION_ID = new Long(3400);
+    private static final String NEW_SESSION_NAME = "SessionName";
     
     public TestToolSessionManager(String name)
 	{
@@ -79,7 +80,7 @@ public class TestToolSessionManager extends NbDataAccessTestCase {
 	{
 	    try
 	    {
-	        nbSessionManager.createToolSession(NEW_SESSION_ID, TEST_NB_ID);
+	        nbSessionManager.createToolSession(NEW_SESSION_ID,NEW_SESSION_NAME, TEST_NB_ID);
 		    
 		    nbSession = nbService.retrieveNoticeboardSession(NEW_SESSION_ID);
 		    
@@ -102,7 +103,7 @@ public class TestToolSessionManager extends NbDataAccessTestCase {
 	{
 	    try
 	    {
-	        nbSessionManager.createToolSession(null, TEST_NB_ID);
+	        nbSessionManager.createToolSession(null, NEW_SESSION_NAME,TEST_NB_ID);
 	        fail("An exception should be raised as the toolSessionId is null");
 	    }
 	    catch(ToolException e)
@@ -118,7 +119,7 @@ public class TestToolSessionManager extends NbDataAccessTestCase {
 	{
 	    try
 	    {
-	        nbSessionManager.createToolSession(NEW_SESSION_ID, null);
+	        nbSessionManager.createToolSession(NEW_SESSION_ID,NEW_SESSION_NAME,  null);
 	        fail("An exception should be raised as the toolContentId is null");
 	    }
 	    catch(ToolException e)
@@ -136,7 +137,7 @@ public class TestToolSessionManager extends NbDataAccessTestCase {
 	    Long invalidId = new Long(8968);
 	    try
 	    {
-	        nbSessionManager.createToolSession(NEW_SESSION_ID, invalidId);	    
+	        nbSessionManager.createToolSession(NEW_SESSION_ID, NEW_SESSION_NAME, invalidId);	    
 		    
 	        nbSession = nbService.retrieveNoticeboardSession(NEW_SESSION_ID);
 		    
@@ -161,7 +162,7 @@ public class TestToolSessionManager extends NbDataAccessTestCase {
 	    
 	    try
 	    {
-	        nbSessionManager.createToolSession(NEW_SESSION_ID, null);
+	        nbSessionManager.createToolSession(NEW_SESSION_ID, NEW_SESSION_NAME, null);
 	        fail("An exception should be raised since the toolContentId"
 	                + "is null and the defaultContent is missing");
 	    }
