@@ -568,6 +568,7 @@ CREATE TABLE lams_user_organisation_role (
 
 CREATE TABLE lams_tool_session (
        tool_session_id BIGINT(20) NOT NULL AUTO_INCREMENT
+     , tool_session_name VARCHAR(255) NOT NULL
      , tool_session_type_id INT(3) NOT NULL
      , lesson_id BIGINT(20) NOT NULL
      , activity_id BIGINT(20) NOT NULL

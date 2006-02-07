@@ -31,7 +31,7 @@ public abstract class ToolSession implements Serializable {
     /** identifier field */
     private Long toolSessionId;
     
-    /** NON-Persistent field **/
+    /** Persistent field **/
     private String toolSessionName;
     
     /** persistent field */
@@ -119,6 +119,18 @@ public abstract class ToolSession implements Serializable {
     {
         this.uniqueKey = uniqueKey;
     }
+    /**
+     * @hibernate.property column="tool_session_name"
+     * length="255" not-null="true"
+     * @return
+     */
+	public String getToolSessionName() {
+		return toolSessionName;
+	}
+
+	public void setToolSessionName(String toolSessionName) {
+		this.toolSessionName = toolSessionName;
+	}
     /** 
      *            @hibernate.many-to-one
      *             not-null="true"
@@ -167,11 +179,4 @@ public abstract class ToolSession implements Serializable {
         this.lesson = lesson;
     }
 
-	public String getToolSessionName() {
-		return toolSessionName;
-	}
-
-	public void setToolSessionName(String toolSessionName) {
-		this.toolSessionName = toolSessionName;
-	}
 }

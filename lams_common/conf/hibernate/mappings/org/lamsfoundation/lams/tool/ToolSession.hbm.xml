@@ -55,6 +55,7 @@
 			column="tool_session_state_id" />
 			
     	<property name="uniqueKey" type="java.lang.String" column="unique_key" length="128" not-null="true"/>
+    	<property name="toolSessionName" type="java.lang.String" column="tool_session_name" length="255" not-null="true"/>
         
 		<subclass name="org.lamsfoundation.lams.tool.GroupedToolSession"
 			discriminator-value="1">
