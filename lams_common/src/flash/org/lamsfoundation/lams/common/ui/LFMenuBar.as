@@ -151,7 +151,7 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
                 break;
 			case eventObj.menu.saveItem:
 				Debugger.log('Clicked Flie > Save',Debugger.GEN,'fileMenuClicked','LFMenuBar');
-                app.getCanvas().saveDesignToServer();
+                app.getCanvas().saveDesign();
                 break;
 				
 			case eventObj.menu.saveItemAs:
