@@ -44,7 +44,7 @@ class org.lamsfoundation.lams.common.util.ObjectUtils{
 			
 			
 			//Debugger.log(o  + ':' + target[o],Debugger.GEN,'printObject','org.lamsfoundation.lams.common.util.ObjectUtils');
-			str += o  + ':' + target[o];
+			str += '\n'+ o  + ':' + target[o];
 			toString(target[o]);  
 		}  
 		return str;  
