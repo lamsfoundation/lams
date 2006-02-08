@@ -29,8 +29,10 @@ class org.lamsfoundation.lams.common.comms.Communication {
     private var queue:Array;
     private var queueID:Number;
 	
-	//so compiler can see application when not in LAMS
-	private var Application;
+	//so compiler can see application when not in LAMS - but this overwrites the actual ref... need to think about this one
+	//TODO: Fix the above
+	//private var _app:Application;
+	//private var Application;
     
    
     /**
@@ -38,6 +40,8 @@ class org.lamsfoundation.lams.common.comms.Communication {
     */
     function Communication(aServerURL:String){
         trace('Communication.constructor');
+
+		//_app = Application.getInstance();
 
         //Set up queue
         queue=[];
@@ -82,9 +86,9 @@ class org.lamsfoundation.lams.common.comms.Communication {
     * @returns Void
     */
     public function getRequest(requestURL:String,handler:Function,isFullURL:Boolean):Void{
-		if(Application != null){
+		//if(Application != null){
 			Cursor.showCursor(Application.C_HOURGLASS);
-		}
+		//}
 		//Create XML response object 
         var responseXML = new XML();
 		responseXML.ignoreWhite = ignoreWhite;
@@ -266,9 +270,9 @@ class org.lamsfoundation.lams.common.comms.Communication {
         //Set ondata handler to validate data returned in XML object
         xmlObject.onData = function(src){
 			//Debugger.log('src:'+src,Debugger.GEN,' xmlObject.onData ','Communication');		
-			if(Application != null){
+			//if(Application != null){
 				Cursor.showCursor(Application.C_DEFAULT);
-            }
+           // }
 			if (src != undefined) {
                 //Check for login page
                 if(src.indexOf("j_security_login_page") != -1){
