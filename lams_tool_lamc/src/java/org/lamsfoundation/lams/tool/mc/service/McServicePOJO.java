@@ -1515,14 +1515,13 @@ public class McServicePOJO implements
      * Gets called only in the Learner mode.
      * All the learners in the same group have the same toolSessionId.
      * 
-     * createToolSession(Long toolSessionId, Long toolContentId) throws ToolException
-     * @param toolSessionId
-     * @param toolContentId 
-     * return 
-     * @throws ToolException 
+     * @param toolSessionId the generated tool session id.
+     * @param toolSessionName the tool session name.
+     * @param toolContentId the tool content id specified.
+     * @throws ToolException if an error occurs e.g. defaultContent is missing. 
      * 
      */
-    public void createToolSession(Long toolSessionId, Long toolContentId) throws ToolException
+	public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException
     {
     	logger.debug("start of createToolSession with ids: " + toolSessionId + " and " + toolContentId);
     	if (toolSessionId == null)

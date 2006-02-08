@@ -175,7 +175,7 @@ public interface IMcService
 	
     public boolean existsSession(Long toolSessionId); 
    
-    public void createToolSession(Long toolSessionId, Long toolContentId) throws ToolException;
+    public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException;
     
     public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException;
 
