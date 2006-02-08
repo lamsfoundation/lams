@@ -35,7 +35,7 @@
 		<td class="formcontrol">
 			<select name="learningDesignId">
 				<c:forEach items="${designs}" var="design">
-					<option value="<c:out value="${design.learningDesignId}"/>"><c:out value="${design.learningDesignId}"/>
+					<option value="<c:out value="${design.learningDesignId}"/>"><c:out value="${design.title}"/>: <c:out value="${design.learningDesignId}"/>
 					<c:if test="${design.title}">
 						: <c:out value="${design.title}"/> (<c:out value="${design.description}"/>)</option>
 					</c:if>
