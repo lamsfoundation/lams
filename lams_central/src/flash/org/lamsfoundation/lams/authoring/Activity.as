@@ -144,7 +144,8 @@ class org.lamsfoundation.lams.authoring.Activity {
 	 * @param   libraryActivityUIImage  
 	 */
     function Activity(activityUIID:Number){
-        //assign the values:
+        Debugger.log('activityUIID:'+activityUIID,Debugger.GEN,'constructor','Activity');
+		//assign the values:
 		
 		_activityUIID = activityUIID;
 		//set default calues
@@ -164,6 +165,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 	 */
 	public static function getGateActivityTypes():Array{
 		var types:Array = [];
+		//types.addItem({label: Dictionary.getValue('none_act_lbl'), data: 0});
 		types.addItem({label: Dictionary.getValue('synch_act_lbl'), data: SYNCH_GATE_ACTIVITY_TYPE});
 		types.addItem({label: Dictionary.getValue('sched_act_lbl'), data: SCHEDULE_GATE_ACTIVITY_TYPE});
 		types.addItem({label: Dictionary.getValue('perm_act_lbl'), data: PERMISSION_GATE_ACTIVITY_TYPE});
@@ -196,6 +198,42 @@ class org.lamsfoundation.lams.authoring.Activity {
 		}
 	}
 	
+	/**
+	 * Populates all the fields in this activity from a dto object contaning the following fields
+	 * NB: This is not very clever, if the field in the dto is blank then the value is overwritten in the class...
+	 * <code><pre>
+
+			//activity properties:
+			_activityTypeID = dto.activityTypeID;
+			_activityID = dto.activityID;
+			_activityCategoryID = dto.activityCategoryID;
+			_activityUIID = dto.activityUIID;
+			_learningLibraryID = dto.learningLibraryID;
+			_learningDesignID = dto.learningDesignID;
+			_libraryActivityID = dto.libraryActivityID;
+			_parentActivityID = dto.parentActivityID;
+			_parentUIID = dto.parentUIID
+			_orderID = dto.orderID
+			_groupingID = dto.groupingID;
+			_groupingUIID = dto.groupingUIID
+			_title = dto.title;
+			_description = dto.description;
+			_helpText =  dto.helpText;
+			_yCoord = dto.yCoord;
+			_xCoord = dto.xCoord;
+			_libraryActivityUIImage = dto.libraryActivityUIImage;
+			_applyGrouping = dto.applyGrouping;
+			_runOffline = dto.runOffline;
+			_defineLater = dto.defineLater;
+			_createDateTime = dto.createDateTime;
+			_groupingSupportType = dto.groupingSupportType;
+</pre></code>
+	 * 
+	 * 
+	 * @usage   
+	 * @param   dto //the dto containing these fields
+	 * @return  
+	 */
 	public function populateFromDTO(dto:Object){
 	
 	
@@ -223,6 +261,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 			_defineLater = dto.defineLater;
 			_createDateTime = dto.createDateTime;
 			_groupingSupportType = dto.groupingSupportType;
+			
 	
 	
 
