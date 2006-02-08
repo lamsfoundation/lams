@@ -125,6 +125,27 @@ public class MonitoringAction extends LamsDispatchAction
     	
     	throw new IOException("Unable to get user. User in session manager is "+user);
     }
+
+    /**
+	 * @param wddxPacket
+	 * @return
+	 */
+	private String extractURL(String wddxPacket) {
+		String url = null;
+    	String previousString = "<var name='activityURL'><string>";
+    	int index = wddxPacket.indexOf(previousString);
+    	if ( index > -1 && index+previousString.length() < wddxPacket.length() ) {
+    		url = wddxPacket.substring(index+previousString.length());
+    		index = url.indexOf("</string>");
+    		url = url.substring(0,index);
+    	}
+    	// replace any &amp; with &
+    	url = url.replace("&amp;","&");
+    	url = WebUtil.convertToFullURL(url);
+    	
+		return url;
+	}
+
     
     //---------------------------------------------------------------------
     // Struts Dispatch Method
@@ -568,6 +589,7 @@ public class MonitoringAction extends LamsDispatchAction
     	String wddxPacket = monitoringService.getAllContributeActivities(lessonID);
     	return outputPacket(mapping, request, response, wddxPacket, "details");
     }
+    
     public ActionForward getLearnerActivityURL(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
@@ -575,8 +597,13 @@ public class MonitoringAction extends LamsDispatchAction
     	this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
     	Integer userID = new Integer(WebUtil.readIntParam(request,"userID"));
     	Long activityID = new Long(WebUtil.readLongParam(request,"activityID"));
+    	//Show learner in monitor in a single call: extract URL and redirect it rather than returning the WDDX packet
+    	
     	String wddxPacket = monitoringService.getLearnerActivityURL(activityID,userID);
-    	return outputPacket(mapping, request, response, wddxPacket, "details");
+    	String url = extractURL(wddxPacket);
+    	response.sendRedirect(response.encodeRedirectURL(url));
+    	
+    	return null;
     }
     public ActionForward getActivityContributionURL(ActionMapping mapping,
             ActionForm form,
