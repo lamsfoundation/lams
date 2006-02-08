@@ -105,7 +105,7 @@ insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,des
 grouping_support_type_id,supports_define_later_flag,supports_run_offline_flag,supports_moderation_flag,supports_contribute_flag,
 learner_url,author_url,define_later_url,export_portfolio_url,monitor_url,contribute_url,moderation_url,
 valid_flag,learning_library_id)
-values(10,'submit_files_signature','submitFilesService','Submit Files','Submit Files Description','submit files','1.1',10,
+values(10,'submit_files_signature','sbService','Submit Files','Submit Files Description','submit files','1.1',10,
 2,1,1,1,1,
 'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url','contribute_url','moderation_url',
 1,10);
