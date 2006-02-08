@@ -40,6 +40,8 @@ public interface QaAppConstants {
 	public static final String AUTHORING_STARTER						="starter";
 	public static final String LEARNING_STARTER							="learningStarter";
 	public static final String MONITORING_STARTER						="monitoringStarter";
+	public static final String COPY_TOOL_CONTENT 						="copyToolContent";
+	public static final String ERROR_LIST								="errorList";
 	
 	/*
 	 * Mock constants below are temporary until the tool gets a User object from the container.

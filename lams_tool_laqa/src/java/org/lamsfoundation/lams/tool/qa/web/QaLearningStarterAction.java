@@ -23,6 +23,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.exception.ToolException;
+
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaApplicationException;
 import org.lamsfoundation.lams.tool.qa.QaComparator;
@@ -136,7 +137,6 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    
 		IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
 	    logger.debug("retrieving qaService: " + qaService);
-//	    request.getSession().setAttribute(TOOL_SERVICE, qaService);
 	    
 	    /*
 	     * mark the http session as a learning activity 
@@ -184,7 +184,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 			{
 	    		toolSessionId=new Long(strToolSessionId).longValue();
 		    	logger.debug("passed TOOL_SESSION_ID : " + new Long(toolSessionId));
-		    	request.getSession().setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,new Long(toolSessionId));	
+		    	request.getSession().setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,new Long(toolSessionId));
 			}
 	    	catch(NumberFormatException e)
 			{
@@ -196,6 +196,24 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 			}
 	    }
 		
+	    /* API test code */
+	    String createToolSession=request.getParameter("createToolSession");
+		logger.debug("createToolSession: " + createToolSession);
+		if ((createToolSession != null) && createToolSession.equals("1"))
+		{	try
+			{
+				logger.debug("creating test session with toolSessionId:" + toolSessionId);
+				qaService.createToolSession(new Long(toolSessionId), "toolSessionName", new Long(9876));
+				return (mapping.findForward(LEARNING_STARTER));
+			}
+			catch(ToolException e)
+			{
+				logger.debug("tool exception: "  + e);
+			}
+		}
+
+	    
+	    
 	    /*
 	     * By now, the passed tool session id MUST exist in the db through the calling of:
 	     * public void createToolSession(Long toolSessionId, Long toolContentId) by the container.
@@ -205,25 +223,11 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 		
 	    if (!QaUtils.existsSession(toolSessionId, qaService)) 
 		{
-				logger.debug("tool session does not exist" + toolSessionId);
-				/*
-				 *for testing only, remove this line in development 
-				 */
-				Long currentToolContentId= new Long(1234);
-				logger.debug("simulating container behaviour: calling createToolSession with toolSessionId : " + 
-						new Long(toolSessionId) + " and toolContentId: " + currentToolContentId);
-				//Comment: can not create toolSession from tool.
-//				try
-//				{
-//					qaService.createToolSession(new Long(toolSessionId), currentToolContentId);
-//					logger.debug("simulated container behaviour.");
-//				}
-//				catch(ToolException e)
-//				{
-//					logger.debug("we should never come here.");
-//				}
-				 
+		    	logger.debug("error: The tool expects mcSession.");
+		    	persistError(request,"error.toolSession.notAvailable");
+				return (mapping.findForward(ERROR_LIST));
 		}
+	    
 		
 		/*
 		 * by now, we made sure that the passed tool session id exists in the db as a new record
@@ -246,12 +250,10 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    request.getSession().setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, qaContent.getQaContentId());
 	    logger.debug("using TOOL_CONTENT_ID: " + qaContent.getQaContentId());
 	    	    
-	    
 	    /*
 	     * The content we retrieved above must have been created before in Authoring time. 
 	     * And the passed tool session id already refers to it.
 	     */
-	    
 	    
 	    logger.debug("ACTIVITY_TITLE: " + qaContent.getTitle());
 	    request.getSession().setAttribute(ACTIVITY_TITLE,qaContent.getTitle());
@@ -331,16 +333,27 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	     * If it does exist, that means, that user already responded to the content and 
 	     * his answers must be displayed  read-only
 	     * 
+	     * NEW: if the user's tool session id AND user id exists in the tool tables go to learner's report.
 	     */
 	    QaQueUsr qaQueUsr=qaService.loadQaQueUsr(new Long(userId));
 	    logger.debug("QaQueUsr:" + qaQueUsr);
 	    if (qaQueUsr != null)
 	    {
-	    	logger.debug("the learner has already responsed to this content, just generate a read-only report.");
-	    	LearningUtil learningUtil= new LearningUtil();
-	    	learningUtil.buidLearnerReport(request,1, qaService);    	
-	    	logger.debug("buidLearnerReport called successfully, forwarding to: " + LEARNER_REPORT);
-	    	return (mapping.findForward(LEARNER_REPORT));
+	    	String localToolSession=qaQueUsr.getQaSessionId().toString(); 
+	    	logger.debug("localToolSession: " + localToolSession);
+	    	
+	    	Long incomingToolSessionId=(Long)request.getSession().getAttribute(AttributeNames.PARAM_TOOL_SESSION_ID);
+	    	logger.debug("incomingToolSessionId: " + incomingToolSessionId);
+	    	
+	    	/* now we know that this user has already responsed before*/
+	    	if (localToolSession.equals(incomingToolSessionId.toString()))
+	    	{
+		    	logger.debug("the learner has already responsed to this content, just generate a read-only report.");
+		    	LearningUtil learningUtil= new LearningUtil();
+		    	learningUtil.buidLearnerReport(request,1, qaService);    	
+		    	logger.debug("buidLearnerReport called successfully, forwarding to: " + LEARNER_REPORT);
+		    	return (mapping.findForward(LEARNER_REPORT));	    		
+	    	}
 	    }
     	/*
     	 * present user with the questions.

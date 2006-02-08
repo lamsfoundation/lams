@@ -1209,7 +1209,9 @@ public class QaServicePOJO
 	 */
 	protected boolean existsSession(long toolSessionId) 
 	{
+		logger.debug("toolSessionId: " + toolSessionId);
 		QaSession qaSession=retrieveQaSessionOrNullById(toolSessionId);
+		logger.debug("qaSession: " + qaSession);
     	
 	    if (qaSession == null) 
 	    {

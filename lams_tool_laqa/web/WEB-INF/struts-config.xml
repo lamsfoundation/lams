@@ -14,8 +14,8 @@
 
 <form-beans>
 	<form-bean name="QaAuthoringForm" type="org.lamsfoundation.lams.tool.qa.web.QaAuthoringForm"/>
-      	<form-bean name="QaLearningForm" type="org.lamsfoundation.lams.tool.qa.web.QaLearningForm"/>
-      	<form-bean name="QaMonitoringForm" type="org.lamsfoundation.lams.tool.qa.web.QaMonitoringForm"/>
+   	<form-bean name="QaLearningForm" type="org.lamsfoundation.lams.tool.qa.web.QaLearningForm"/>
+   	<form-bean name="QaMonitoringForm" type="org.lamsfoundation.lams.tool.qa.web.QaMonitoringForm"/>
 </form-beans>
 
   <!-- ========== Global Exceptions Definitions =================================== -->
@@ -57,11 +57,6 @@
       unknown="false"
       validate="false"
     >
-	  	<!--  forward
-		    name="load"
-		    path=".questions"
-		    redirect="true"
-	  	/ -->
         <forward
           name="load"
           path="/author_page.jsp"
@@ -72,22 +67,38 @@
           path=".monitoringReport"
           redirect="true"
    	  	/>
+	  	<forward
+		    name="errorList"
+		    path=".qaErrorBox"
+		    redirect="true"
+	  	/>
 	</action>  
 	<!--Learning Starter  -->
    <action path="/learningStarter" type="org.lamsfoundation.lams.tool.qa.web.QaLearningStarterAction" 
    			name="QaLearningForm" input=".learningStarter"> 
-	  <forward
-	    name="load"
-	    path=".answers"
-	    redirect="true"
-	  />
+		  <forward
+		    name="load"
+		    path=".answers"
+		    redirect="true"
+		  />
 	  	
-      <forward
-        name="learnerReport"
-        path=".learnerReport"
-        redirect="true"
-      />
-	  	
+	      <forward
+	        name="learnerReport"
+	        path=".learnerReport"
+	        redirect="true"
+	      />
+
+	      <forward
+	        name="learningStarter"
+	        path=".learningStarter"
+	        redirect="true"
+	      />
+	      
+		<forward
+		    name="errorList"
+		    path=".qaErrorBox"
+		    redirect="true"
+	  	/>      
 	</action>  
 	<!--Monitoring Starter -->
 	<action path="/monitoringStarter" type="org.lamsfoundation.lams.tool.qa.web.QaMonitoringStarterAction" 
