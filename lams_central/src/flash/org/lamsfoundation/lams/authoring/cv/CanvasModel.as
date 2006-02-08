@@ -2,14 +2,16 @@
 import org.lamsfoundation.lams.authoring.cv.*;
 import org.lamsfoundation.lams.authoring.*;
 import org.lamsfoundation.lams.common.util.*;
+import org.lamsfoundation.lams.common.ui.*;
 import mx.events.*
 /*
 * Model for the Canvas
 */
 class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	
-	public static var TRANSITION_TOOL:String = "TRANSITION";
+	public static var TRANSITION_TOOL:String = "TRANSITION";  //activie tool ID strings definition
 	public static var OPTIONAL_TOOL:String = "OPTIONAL";
+	public static var GATE_TOOL:String = "GATE";
 	
 	private var __width:Number;
 	private var __height:Number;
@@ -149,8 +151,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	public function startTransitionTool():Void{
 		Debugger.log('Starting transition tool',Debugger.GEN,'startTransitionTool','CanvasModel');			
 		resetTransitionTool();
-		_activeTool = CanvasModel.TRANSITION_TOOL;
-		broadcastViewUpdate("START_TRANSITION_TOOL");
+		_activeTool = TRANSITION_TOOL;
+		//broadcastViewUpdate("START_TRANSITION_TOOL");
 	}
 	
 	/**
@@ -163,36 +165,122 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		Debugger.log('Stopping transition tool',Debugger.GEN,'stopTransitionTool','CanvasModel');
 		resetTransitionTool();
 		_activeTool = null;
-		broadcastViewUpdate("STOP_TRANSITION_TOOL");
+		//broadcastViewUpdate("STOP_TRANSITION_TOOL");
+	}
+	
+	
+	
+	
+	
+	
+	/**
+	 * Craetes a [trans][gate act][trans] combo from an existing transition.
+	 * NOT used anymore as we dont want to allow users to think they can click transitions
+	 * BUT IF/When the request this - just use this function
+	 * @usage   
+	 * @param   transitionUIID 
+	 * @param   gateTypeID     
+	 * @return  
+	 */
+	public function createGateTransition(transitionUIID,gateTypeID){
+		Debugger.log('transitionUIID:'+transitionUIID,Debugger.GEN,'createGateTransition','CanvasModel');
+		Debugger.log('gateTypeID:'+gateTypeID,Debugger.GEN,'createGateTransition','CanvasModel');
+		var editedTrans = _cv.ddm.getTransitionByUIID(transitionUIID);
+		var editedCanvasTrans = _transitionsDisplayed.get(transitionUIID);
+		var fromAct = _cv.ddm.getActivityByUIID(editedTrans.fromUIID);
+		var toAct = _cv.ddm.getActivityByUIID(editedTrans.toUIID);
+		//create a gate activity
+		var gateAct = new GateActivity(_cv.ddm.newUIID(),gateTypeID);
+		gateAct.learningDesignID = _cv.ddm.learningDesignID;
+		
+		//gateAct.yCoord = (toAct.yCoord + fromAct.yCoord) / 2;
+		//gateAct.xCoord = (toAct.xCoord + fromAct.xCoord) / 2;
+		
+		gateAct.yCoord = editedCanvasTrans.midPoint.y - (CanvasActivity.GATE_ACTIVITY_WIDTH / 2);
+		gateAct.xCoord = editedCanvasTrans.midPoint.x - (CanvasActivity.GATE_ACTIVITY_HEIGHT / 2);
+		
+		Debugger.log('gateAct.yCoord:'+gateAct.yCoord,Debugger.GEN,'createGateTransition','CanvasModel');
+		Debugger.log('gateAct.xCoord:'+gateAct.xCoord,Debugger.GEN,'createGateTransition','CanvasModel');
+
+		_cv.ddm.addActivity(gateAct);
+		
+		//create the from trans
+		addActivityToTransition(fromAct);
+		addActivityToTransition(gateAct);
+		
+		//create the to trans
+		addActivityToTransition(gateAct);
+		addActivityToTransition(toAct);
+		
+		_cv.ddm.removeTransition(transitionUIID);
+		
+		//flag the model as dirty and trigger a refresh
+		setDirty();	
+		//select the new thing
+		setSelectedItem(_activitiesDisplayed.get(gateAct.activityUIID));
+	}
+	
+	/**
+	 * Creates a new gate activity at the specified location
+	 * @usage   
+	 * @param   gateTypeID 
+	 * @param   pos        
+	 * @return  
+	 */
+	public function createNewGate(gateTypeID, pos:Point){
+		Debugger.log('gateTypeID:'+gateTypeID,Debugger.GEN,'createNewGate','CanvasModel');
+		var gateAct = new GateActivity(_cv.ddm.newUIID(),gateTypeID);
+		gateAct.learningDesignID = _cv.ddm.learningDesignID;
+		
+		
+		gateAct.yCoord = pos.y;
+		gateAct.xCoord = pos.x;
+		
+		
+		Debugger.log('gateAct.yCoord:'+gateAct.yCoord,Debugger.GEN,'createGateTransition','CanvasModel');
+		Debugger.log('gateAct.xCoord:'+gateAct.xCoord,Debugger.GEN,'createGateTransition','CanvasModel');
+
+		_cv.ddm.addActivity(gateAct);
+		
+		setDirty();
+		//select the new thing
+		setSelectedItem(_activitiesDisplayed.get(gateAct.activityUIID));
+		
 	}
 	
 	/**
 	 * Adds another Canvas Activity to the transition.  
 	 * Only 2 may be added, adding the 2nd one triggers the creation of the transition.
 	 * @usage   
-	 * @param   ca (Canvas Activity)
+	 * @param   ca (Canvas or data Activity)
 	 * @return  
 	 */
 	public function addActivityToTransition(ca:Object):Object{
+		var activity:Activity;
 		//check we have not added too many
+		if(ca instanceof CanvasActivity){
+			activity = ca.activity;
+		}else if(ca instanceof Activity){
+			activity = Activity(ca);
+		}
 		
 		if(_transitionActivities.length >= 2){
 			//TODO: show an error
 			return new LFError("Too many activities in the Transition","addActivityToTransition",this);
 		}
-		Debugger.log('Adding Activity.UIID:'+ca.activity.activityUIID,Debugger.GEN,'addActivityToTransition','CanvasModel');
-		_transitionActivities.push(ca);
+		Debugger.log('Adding Activity.UIID:'+activity.activityUIID,Debugger.GEN,'addActivityToTransition','CanvasModel');
+		_transitionActivities.push(activity);
 		
 		if(_transitionActivities.length == 2){
 			//check we have 2 valid acts to create the transition.
-			if(_transitionActivities[0].activity.activityUIID == _transitionActivities[1].activity.activityUIID){
+			if(_transitionActivities[0].activityUIID == _transitionActivities[1].activityUIID){
 				return new LFError("You cannot create a Transition between the same Activities","addActivityToTransition",this);
 			}
-			if(!_activitiesDisplayed.containsKey(_transitionActivities[0].activity.activityUIID)){
-				return new LFError("First activity of the Transition is missing, UIID:"+_transitionActivities[0].activity.activityUIID,"addActivityToTransition",this);
+			if(!_cv.ddm.activities.containsKey(_transitionActivities[0].activityUIID)){
+				return new LFError("First activity of the Transition is missing, UIID:"+_transitionActivities[0].activityUIID,"addActivityToTransition",this);
 			}
-			if(!_activitiesDisplayed.containsKey(_transitionActivities[1].activity.activityUIID)){
-				return new LFError("Second activity of the Transition is missing, UIID:"+_transitionActivities[1].activity.activityUIID,"addActivityToTransition",this);
+			if(!_cv.ddm.activities.containsKey(_transitionActivities[1].activityUIID)){
+				return new LFError("Second activity of the Transition is missing, UIID:"+_transitionActivities[1].activityUIID,"addActivityToTransition",this);
 			}
 			
 			//check there is not already a transition to or from this activity:
@@ -222,6 +310,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 			var success:Object = _cv.ddm.addTransition(t);
 			//flag the model as dirty and trigger a refresh
 			setDirty();
+			
+			setSelectedItem(_transitionsDisplayed.get(t.transitionUIID));
 			
 			_cv.stopTransitionTool();
 			
@@ -257,8 +347,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	 * @return  
 	 */
 	private function createTransition(transitionActs:Array):Transition{
-		var fromAct:Activity = transitionActs[0].activity;
-		var toAct:Activity = transitionActs[1].activity;
+		var fromAct:Activity = transitionActs[0];
+		var toAct:Activity = transitionActs[1];
 		
 		var t:Transition = new Transition(_cv.ddm.newUIID(),fromAct.activityUIID,toAct.activityUIID,_cv.ddm.learningDesignID);
 		
@@ -580,6 +670,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		return _activeTool;
 	}
 	
+	private function setSelectedItem(newselectItem:Object){
+		_selectedItem = newselectItem;
+		broadcastViewUpdate("SELECTED_ITEM");
+	}
+	
 	/**
 	 * 
 	 * @usage   
@@ -587,8 +682,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	 * @return  
 	 */
 	public function set selectedItem (newselectItem:Object):Void {
-		_selectedItem = newselectItem;
-		broadcastViewUpdate("SELECTED_ITEM");
+		setSelectedItem(newselectItem);
 	}
 	/**
 	 * 

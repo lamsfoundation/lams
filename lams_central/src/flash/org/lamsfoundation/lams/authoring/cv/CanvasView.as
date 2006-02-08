@@ -30,7 +30,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends AbstractView{
     private var _gridLayer_mc:MovieClip;
     private var _transitionLayer_mc:MovieClip;
 	private var _activityLayer_mc:MovieClip;
-    
+	
+	private var _transitionPropertiesOK:Function;
+    private var _canvasView:CanvasView;
     //Defined so compiler can 'see' events added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
     public var addEventListener:Function;
@@ -41,6 +43,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends AbstractView{
 	* Constructor
 	*/
 	function CanvasView(){
+		_canvasView = this;
         //Init for event delegation
         mx.events.EventDispatcher.initialize(this);
 	}
@@ -99,23 +102,28 @@ public function viewUpdate(event:Object):Void{
 			case 'REMOVE_TRANSITION':
 				removeTransition(event.data,cm);
 				break;
+			/*
 			case 'START_TRANSITION_TOOL':
 				startDrawingTransition(cm);
 				break;
 			case 'STOP_TRANSITION_TOOL':
 				stopDrawingTransition(cm);
 				break;
+				*/
             default :
                 Debugger.log('unknown update type :' + event.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.CanvasView');
-	}
+		}
 
 	}
-
-
-    /**
+	/*
+	public function onRelease(){
+		getController().canvasRelease(_canvas_mc);
+	}
+	*/
+	
+	/**
     * layout visual elements on the canvas on initialisation
     */
-    
 	private function draw(){
 		//get the content path for the sp
 		_canvas_mc = canvas_scp.content;
@@ -128,7 +136,16 @@ public function viewUpdate(event:Object):Void{
 		_gridLayer_mc = _canvas_mc.createEmptyMovieClip("_gridLayer_mc", _canvas_mc.getNextHighestDepth());
 		_transitionLayer_mc = _canvas_mc.createEmptyMovieClip("_transitionLayer_mc", _canvas_mc.getNextHighestDepth());
 		_activityLayer_mc = _canvas_mc.createEmptyMovieClip("_activityLayer_mc", _canvas_mc.getNextHighestDepth());
-			
+		
+
+		
+		//_canvas_mc.addEventListener('onRelease',this);
+		bkg_pnl.onRelease = function(){
+			trace('_canvas_mc.onRelease');
+			Application.getInstance().getCanvas().getCanvasView().getController().canvasRelease(this);
+		}
+		bkg_pnl.useHandCursor = false;
+		
 		
 	/*	
 		//var s = canvasModel.getSize();
@@ -172,10 +189,10 @@ public function viewUpdate(event:Object):Void{
 		
 		var cvc = getController();
 		//take action depending on act type
-		if(a.activityTypeID==Activity.TOOL_ACTIVITY_TYPE){
+		if(a.activityTypeID==Activity.TOOL_ACTIVITY_TYPE || a.isGateActivity() ){
 			var newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasActivity",DepthManager.kTop,{_activity:a,_canvasController:cvc,_canvasView:cvv});
 			cm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
-			Debugger.log('Tool activity a.title:'+a.title+','+a.activityUIID+' added to the cm.activitiesDisplayed hashtable:'+newActivity_mc,4,'drawActivity','CanvasView');
+			Debugger.log('Tool or gate activity a.title:'+a.title+','+a.activityUIID+' added to the cm.activitiesDisplayed hashtable:'+newActivity_mc,4,'drawActivity','CanvasView');
 		}else if(a.activityTypeID==Activity.PARALLEL_ACTIVITY_TYPE){
 			//get the children
 			var children:Array = cm.getCanvas().ddm.getComplexActivityChildren(a.activityUIID);
@@ -248,13 +265,6 @@ public function viewUpdate(event:Object):Void{
 		return s;
 	}
 	
-	private function startDrawingTransition(cm:CanvasModel):Void{
-		
-	}
-	
-	private function stopDrawingTransition(cm:CanvasModel):Void{
-		
-	}
 		
 	/**
     * Create a popup dialog to set transition parameters
@@ -263,6 +273,7 @@ public function viewUpdate(event:Object):Void{
     public function createTransitionPropertiesDialog(pos:Object,callBack:Function){
 	   //Debugger.log('Call',Debugger.GEN,'createTransitionPropertiesDialog','CanvasView');
 	   var dialog:MovieClip;
+	   _transitionPropertiesOK = callBack;
         //Check to see whether this should be a centered or positioned dialog
         if(typeof(pos)=='string'){
 			//Debugger.log('pos:'+pos,Debugger.GEN,'createTransitionPropertiesDialog','CanvasView');
@@ -271,38 +282,25 @@ public function viewUpdate(event:Object):Void{
             dialog = PopUpManager.createPopUp(Application.root, LFWindow, true,{title:Dictionary.getValue('trans_dlg_title'),closeButton:true,scrollContentPath:"TransitionProperties",_x:pos.x,_y:pos.y});
         }
         //Assign dialog load handler
-        dialog.addEventListener('contentLoaded',Delegate.create(this,dialogLoaded));
+        dialog.addEventListener('contentLoaded',Delegate.create(this,transitionDialogLoaded));
         //okClickedCallback = callBack;
     }
 	
 	/**
-    * called when the dialog is loaded
+    * called when the transitionDialogLoaded is loaded
     */
-    public function dialogLoaded(evt:Object) {
+    public function transitionDialogLoaded(evt:Object) {
         //Debugger.log('!evt.type:'+evt.type,Debugger.GEN,'dialogLoaded','CanvasView');
         //Check type is correct
         if(evt.type == 'contentLoaded'){
             //Set up callback for ok button click
             //Debugger.log('!evt.target.scrollContent:'+evt.target.scrollContent,Debugger.GEN,'dialogLoaded','CanvasView');
-            evt.target.scrollContent.addEventListener('okClicked',Delegate.create(this,okClicked));
+            evt.target.scrollContent.addEventListener('okClicked',_transitionPropertiesOK);
         }else {
             //TODO DI 25/05/05 raise wrong event type error 
         }
     }
 	
-	 /**
-    * Workspace dialog OK button clicked handler
-    */
-    private function okClicked(evt:Object) {
-        //Debugger.log('!okClicked:',Debugger.GEN,'okClicked','CanvasView');
-        //Check type is correct
-        if(evt.type == 'okClicked'){
-            //Call the callback, passing in the design selected designId
-            //okClickedCallback(evt.target.selectedDesignId);
-        }else {
-            //TODO DI 25/05/05 raise wrong event type error 
-        }
-    }
 	
     /**
     * Sets the size of the canvas on stage, called from update

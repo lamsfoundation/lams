@@ -3,6 +3,7 @@ import org.lamsfoundation.lams.authoring.cv.*
 import org.lamsfoundation.lams.common.mvc.*
 import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.common.ui.*
+import mx.utils.*
 
 
 /*
@@ -139,12 +140,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	}
    
    public function transitionDoubleClick(ct:CanvasTransition):Void{
-	   Debugger.log('transitionDoubleClick CanvasTransition:'+ct.transition.uiID,Debugger.GEN,'transitionDoubleClick','CanvasController');
+	   Debugger.log('transitionDoubleClick CanvasTransition:'+ct.transition.transitionUIID,Debugger.GEN,'transitionDoubleClick','CanvasController');
 	   
 	   //TODO: fix this, its null
 	   _canvasView =  CanvasView(getView());
 	   Debugger.log('_canvasView:'+_canvasView,Debugger.GEN,'transitionDoubleClick','CanvasController');
-	   _canvasView.createTransitionPropertiesDialog("centre",tpOKHandler);
+	   _canvasView.createTransitionPropertiesDialog("centre",Delegate.create(this, transitionPropertiesOK));
 	   
 	    _canvasModel.selectedItem = ct;
    }
@@ -173,8 +174,37 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	 * @usage   
 	 * @return  
 	 */
-	public function tpOKHandler():Void{
-		Debugger.log('!!!!!!!!! FUNCTION NOT IMPLEMENTED !!!!!!!!',Debugger.CRITICAL,'tpOKHandler','CanvasController');
+	public function transitionPropertiesOK(evt:Object):Void{
+		Debugger.log(evt.gate,Debugger.GEN,'transitionPropertiesOK','CanvasController');
+		//cm creates gate act and another transition to make [trans][gate][trans] seq
+		//sets in ddm
+		//flags dirty to refresh view
+		_canvasModel.createGateTransition(_canvasModel.selectedItem.transition.transitionUIID,evt.gate);
+		
+		
+		
+	}
+		
+	/**
+	* Clled when we get a click on the canvas, if its in craete gate mode then create a gate
+	* 
+	 * public static var SYNCH_GATE_ACTIVITY_TYPE:Number = 3;
+	 * public static var SCHEDULE_GATE_ACTIVITY_TYPE:Number = 4;
+	 * public static var PERMISSION_GATE_ACTIVITY_TYPE:Number = 5;
+	 * @usage   
+	 * @param   canvas_mc 
+	 * @return  
+	 */
+	public function canvasRelease(canvas_mc:MovieClip){
+		Debugger.log(canvas_mc,Debugger.GEN,'canvasRelease','CanvasController');
+		Debugger.log('_canvasModel.activeTool:'+_canvasModel.activeTool,Debugger.GEN,'canvasRelease','CanvasController');
+		if(_canvasModel.activeTool == CanvasModel.GATE_TOOL){
+			var p = new Point(canvas_mc._xmouse, canvas_mc._ymouse); 
+			_canvasModel.createNewGate(Activity.PERMISSION_GATE_ACTIVITY_TYPE,p);
+			_canvasModel.getCanvas().stopGateTool();
+			
+		}
+		
 	}
 	
 	private function createValidTransitionTarget(transitionTargetObj:Object):Object{
@@ -224,6 +254,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			}
 			*/
 	}
+	
+	
    
 
    

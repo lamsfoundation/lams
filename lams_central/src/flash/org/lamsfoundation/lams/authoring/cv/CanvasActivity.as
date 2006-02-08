@@ -11,6 +11,10 @@ import org.lamsfoundation.lams.authoring.cv.*;
 class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip implements ICanvasActivity{  
 //class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip{  
   
+	public static var TOOL_ACTIVITY_WIDTH:Number = 123.1;
+	public static var TOOL_ACTIVITY_HEIGHT:Number = 50.5;
+	public static var GATE_ACTIVITY_HEIGHT:Number = 30;
+	public static var GATE_ACTIVITY_WIDTH:Number = 30;
 	
 	//this is set by the init object
 	private var _canvasController:CanvasController;
@@ -34,9 +38,14 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	function CanvasActivity(){
 		//Debugger.log("_activity:"+_activity.title,4,'Constructor','CanvasActivity');
 		//let it wait one frame to set up the components.
-		//this has to be set b4 ther do later :)
-		_visibleHeight = canvasActivity_mc._height;
-		_visibleWidth = canvasActivity_mc._width;
+		//this has to be set b4 the do later :)
+		if(_activity.isGateActivity()){
+			_visibleHeight = GATE_ACTIVITY_HEIGHT;
+			_visibleWidth = GATE_ACTIVITY_WIDTH;
+		}else{
+			_visibleHeight = TOOL_ACTIVITY_HEIGHT;
+			_visibleWidth = TOOL_ACTIVITY_WIDTH;
+		}
 		//call init if we have passed in the _activity as an initObj in the attach movie,
 		//otherwise wait as the class outside will call it
 		if(_activity != undefined){
@@ -51,12 +60,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			_canvasController = initObj.canvasController;
 			_activity = initObj.activity;
 		}
-		canvasActivity_mc._visible=false;
-		stopSign_mc._visible=false;
-		title_lbl._visible=false;
-		clickTarget_mc._visible=false;
+
 		
-		loadIcon();
+		if(!_activity.isGateActivity()){
+			loadIcon();
+		}
 		
 		MovieClipUtils.doLater(Proxy.create(this,draw));
 
@@ -85,13 +93,26 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	private function draw(){		Debugger.log(_activity.title+',_activity.isGateActivity():'+_activity.isGateActivity(),4,'draw','CanvasActivity');
 		if(_activity.isGateActivity()){
 			stopSign_mc._visible = true;
+			canvasActivity_mc._visible=false;
+			title_lbl.visible=false;
+			clickTarget_mc._width = GATE_ACTIVITY_WIDTH;
+			clickTarget_mc._height= GATE_ACTIVITY_HEIGHT;
+			
 		}else{
 			canvasActivity_mc._visible=true;
-			title_lbl._visible=true;
-			clickTarget_mc._visible=true;
+			title_lbl.visible=true;
+			//clickTarget_mc._visible=true;
+			stopSign_mc._visible = false;
+			
 			//write text
 			title_lbl.text = _activity.title;
+			
+			clickTarget_mc._width = TOOL_ACTIVITY_WIDTH;
+			clickTarget_mc._height= TOOL_ACTIVITY_HEIGHT;
+			
 		}
+	
+		
 	
 		//indicate grouping
 		

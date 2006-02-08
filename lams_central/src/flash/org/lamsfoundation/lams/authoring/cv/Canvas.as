@@ -16,7 +16,7 @@ import mx.utils.*
 class org.lamsfoundation.lams.authoring.cv.Canvas {
 	
 	//Constants
-	public static var USE_PROPERTY_INSPECTOR = false;
+	public static var USE_PROPERTY_INSPECTOR = true;
 	
 	//Model
 	private var canvasModel:CanvasModel;
@@ -295,7 +295,8 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		_ddm.addActivity(actToAdd);
 		//refresh the design
 		canvasModel.setDirty();
-	
+		//select the new thing
+		canvasModel.selectedItem = (canvasModel.activitiesDisplayed.get(actToAdd.activityUIID));
 	}
 	
 
@@ -314,7 +315,8 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		//Debugger.log('activityUIID:'+activityUIID,4,'removeActivity','Canvas');		
 		_ddm.removeActivity(activityUIID);
 		canvasModel.setDirty();		
-		
+		//select the new thing
+		canvasModel.selectedItem = null;
 	}
 	
 	/**
@@ -328,7 +330,8 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		//Debugger.log('transitionUIID:'+transitionUIID,4,'removeTransition','Canvas');		
 		_ddm.removeTransition(transitionUIID);
 		canvasModel.setDirty();		
-		
+		//select the new thing
+		canvasModel.selectedItem = null;
 	}
 	
 	
@@ -432,6 +435,30 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	}
 	
 	
+	public function toggleGateTool():Void{
+		var c = Cursor.getCurrentCursor();
+		if(c==Application.C_GATE){
+			stopGateTool();
+		}else{
+			startGateTool();
+		}
+	}
+	
+	public function startGateTool(){
+		Debugger.log('Starting gate tool',Debugger.GEN,'startGateTool','Canvas');
+		Cursor.showCursor(Application.C_GATE);
+		canvasModel.activeTool = CanvasModel.GATE_TOOL;
+	}
+		
+
+	
+	public function stopGateTool(){
+		Debugger.log('Stopping gate tool',Debugger.GEN,'startGateTool','Canvas');
+		Cursor.showCursor(Application.C_DEFAULT);
+		canvasModel.activeTool = null;
+	}
+	
+	
 	public function toggleTransitionTool():Void{
 		var c = Cursor.getCurrentCursor();
 		if(c==Application.C_TRANSITION){
@@ -441,7 +468,6 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		}
 	}
 	
-
 	
 	/**
 	 * Called by the top menu bar and the tool bar to start the transition tool, switches cursor.
@@ -501,7 +527,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		//note the init obnject parameters are passed into the _container object in the embeded class (*in this case PropertyInspector)
 		//we are setting up a vew so we need to pass the model and controller to it
 		var cc:CanvasController = canvasView.getController();
-		_pi = PopUpManager.createPopUp(Application.root, LFWindow, false,{title:Dictionary.getValue('trans_dlg_title'),closeButton:true,scrollContentPath:"PropertyInspector",_canvasModel:canvasModel,_canvasController:cc});
+		_pi = PopUpManager.createPopUp(Application.root, LFWindow, false,{title:Dictionary.getValue('property_inspector_title'),closeButton:true,scrollContentPath:"PropertyInspector",_canvasModel:canvasModel,_canvasController:cc});
 		//Assign dialog load handler
         _pi.addEventListener('contentLoaded',Delegate.create(this,piLoaded));
         //okClickedCallback = callBack;
@@ -571,7 +597,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	public function onDDMBeforeUpdate(evt:Object):Void{
 		//_global.breakpoint();
 		//var _ddm:DesignDataModel = evt.target;
-		Debugger.log('DDM about to be updated updated',Debugger.GEN,'onDDMBeforeUpdate','Canvas');
+		Debugger.log('DDM about to be updated',Debugger.GEN,'onDDMBeforeUpdate','Canvas');
 		//take a snapshot of the design and save it in the undoStack
 		var snapshot:Object = _ddm.toData();
 		_undoStack.push(snapshot);

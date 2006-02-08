@@ -20,6 +20,13 @@ class org.lamsfoundation.lams.authoring.cv.CanvasTransition extends MovieClip{
 	private var stopArrow_mc:MovieClip;
 	private var stopSign_mc:MovieClip;
 	
+	
+	private var _startPoint:Point;
+	private var _midPoint:Point;
+	private var _endPoint:Point;
+	
+	
+	
 	private var _dcStartTime:Number = 0;
 	private var _doubleClicking:Boolean;
 		
@@ -51,6 +58,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasTransition extends MovieClip{
 		_transition = t;
 	}
 	
+	public function get midPoint():Point{
+		return _midPoint;
+	}
 	
 	
 	
@@ -75,40 +85,38 @@ class org.lamsfoundation.lams.authoring.cv.CanvasTransition extends MovieClip{
 		var isGateTransition = toAct_mc.activity.isGateActivity();
 		
 		
-		
-		
-		
-		//var startPoint:Point = new Point(fromAct.xCoord,fromAct.yCoord);
-		//var endPoint:Point = new Point(toAct.xCoord,toAct.yCoord);
-		
 		var offsetToCentre_x = fromAct_mc.getVisibleWidth() / 2;
 		var offsetToCentre_y = fromAct_mc.getVisibleHeight() / 2;
 		Debugger.log('fromAct_mc.getActivity().xCoord:'+fromAct_mc.getActivity().xCoord,4,'draw','CanvasTransition');	
 		Debugger.log('offsetToCentre_x:'+offsetToCentre_x,4,'draw','CanvasTransition');	
 
 		
-		var startPoint:Point = new Point(fromAct_mc.getActivity().xCoord+offsetToCentre_x,fromAct_mc.getActivity().yCoord+offsetToCentre_y);
+		_startPoint = new Point(fromAct_mc.getActivity().xCoord+offsetToCentre_x,fromAct_mc.getActivity().yCoord+offsetToCentre_y);
 		
 		var toOTC_x:Number = toAct_mc.getVisibleWidth() /2;
 		var toOTC_y:Number = toAct_mc.getVisibleHeight() /2;
 		
-		var endPoint:Point = new Point(toAct_mc.getActivity().xCoord+toOTC_x,toAct_mc.getActivity().yCoord+toOTC_y);
+		_endPoint = new Point(toAct_mc.getActivity().xCoord+toOTC_x,toAct_mc.getActivity().yCoord+toOTC_y);
 		
 		
 		Debugger.log('fromAct_mc:'+fromAct_mc,4,'draw','CanvasTransition');
 		Debugger.log('toAct_mc:'+toAct_mc,4,'draw','CanvasTransition');
 		this.lineStyle(2, _drawnLineStyle);
-		this.moveTo(startPoint.x, startPoint.y);
+		this.moveTo(_startPoint.x, _startPoint.y);
 		
 		//this.dashTo(startX, startY, endX, endY, 8, 4);
-		this.lineTo(endPoint.x, endPoint.y);
-		Debugger.log('drawn line from:'+startPoint.x+','+startPoint.y+'to:'+endPoint.x+','+endPoint.y,4,'draw','CanvasTransition');
+		this.lineTo(_endPoint.x, _endPoint.y);
+		Debugger.log('drawn line from:'+_startPoint.x+','+_startPoint.y+'to:'+_endPoint.x+','+_endPoint.y,4,'draw','CanvasTransition');
 		// calculate the position and angle for the arrow_mc
-		arrow_mc._x = (startPoint.x + endPoint.x)/2;
-		arrow_mc._y = (startPoint.y + endPoint.y)/2;
-			
+		arrow_mc._x = (_startPoint.x + _endPoint.x)/2;
+		arrow_mc._y = (_startPoint.y + _endPoint.y)/2;
+		
+		_midPoint = new Point(arrow_mc._x,arrow_mc._y);
+		
+		
+		
 		// gradient
-		var angle:Number = Math.atan2((endPoint.y- startPoint.y),(endPoint.x- startPoint.x));
+		var angle:Number = Math.atan2((_endPoint.y- _startPoint.y),(_endPoint.x- _startPoint.x));
 		var degs:Number = Math.round(angle*180/Math.PI);
 		arrow_mc._rotation = degs;
 		arrow_mc._visible = true;

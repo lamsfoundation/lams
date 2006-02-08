@@ -1,12 +1,12 @@
 ﻿import org.lamsfoundation.lams.authoring.cv.*;
 import org.lamsfoundation.lams.authoring.*;
+import org.lamsfoundation.lams.common.util.*
+import org.lamsfoundation.lams.common.dict.*
+import org.lamsfoundation.lams.common.style.*
 import mx.controls.*
 import mx.utils.*
 import mx.managers.*
 import mx.events.*
-import org.lamsfoundation.lams.common.util.*
-import org.lamsfoundation.lams.common.dict.*
-import org.lamsfoundation.lams.common.style.*
 
 /**
 * @author      DC
@@ -117,6 +117,10 @@ class TransitionPropertiesDialog extends MovieClip{
             Debugger.log('themeChanged event broadcast with an object.type not equal to "themeChanged"',Debugger.CRITICAL,'themeChanged','org.lamsfoundation.lams.WorkspaceDialog');
         }
     }
+	
+	public function getSelectedGateType(){
+		return gateType_cmb.selectedItem.data;
+	}
     
     /**
     * Called on initialisation and themeChanged event handler
@@ -145,9 +149,11 @@ class TransitionPropertiesDialog extends MovieClip{
         trace('OK');
        //If validation successful commit + close parent window
        //Fire callback with selectedId
-       dispatchEvent({type:'okClicked',target:this});
+       dispatchEvent({type:'okClicked',target:this,gate:getSelectedGateType()});
        _container.deletePopUp();
     }
+	
+	
     
     /**
     * Event dispatched by parent container when close button clicked
