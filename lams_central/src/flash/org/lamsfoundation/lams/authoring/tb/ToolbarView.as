@@ -60,6 +60,7 @@ class ToolbarView extends AbstractView {
 		_toolbar_mc.paste_btn.addEventListener("click",controller);
 		_toolbar_mc.trans_btn.addEventListener("click",controller);
 		_toolbar_mc.optional_btn.addEventListener("click",controller);
+		_toolbar_mc.gate_btn.addEventListener("click",controller);
 		_toolbar_mc.preview_btn.addEventListener("click",controller);
 		
 		
