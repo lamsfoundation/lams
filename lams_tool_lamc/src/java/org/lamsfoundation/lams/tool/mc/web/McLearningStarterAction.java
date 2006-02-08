@@ -192,8 +192,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 		if ((createToolSession != null) && createToolSession.equals("1"))
 		{	try
 			{
-				//TODO: please confirm the toolSessionName: I am wonder whether tool can call this interface itself.
-				mcService.createToolSession(toolSessionID,"mcSessionName", new Long(9876));
+				mcService.createToolSession(toolSessionID, new Long(9876));
 				return (mapping.findForward(LEARNING_STARTER));
 			}
 			catch(ToolException e)
