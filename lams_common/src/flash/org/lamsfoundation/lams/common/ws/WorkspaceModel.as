@@ -1,5 +1,4 @@
-﻿import org.lamsfoundation.lams.common.util.Observable;
-import org.lamsfoundation.lams.common.ws.*;
+﻿import org.lamsfoundation.lams.common.ws.*;
 import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.common.dict.*
 //import mx.utils.ObjectCopy;
@@ -149,7 +148,9 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 		mdto.creationDateTime = new Date(null);
 		mdto.description = "";
 		mdto.lastModifiedDateTime = new Date(null);
-		mdto.name =  Dictionary.getValue('ws_tree_mywsp');
+		//why is this returning undefines
+		mdto.name = Dictionary.getValue('ws_tree_mywsp');
+		trace(Dictionary.getValue('ws_dlg_location_button'));
 		mdto.parentWorkspaceFolderID = null;
 		//read only
 		mdto.permissionCode = 1;
