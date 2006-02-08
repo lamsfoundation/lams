@@ -105,7 +105,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	public function addActivity(activity:Activity):Object{
 		var success = false;
 		//create an Activity from the template actvity.
-		Debugger.log('activity:'+activity.title+':'+activity.activityUIID,4,'addActivity','DesignDataModel');
+		Debugger.log('activity:'+activity.title+', UIID:'+activity.activityUIID,4,'addActivity','DesignDataModel');
 		
 		//validate the activity ?		
 		//validate if we can do it?
@@ -438,6 +438,18 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		return a;
 	}
 	
+	/**
+	 * Retreives a reference to a transition in the DDM using its UIID
+	 * @usage   
+	 * @param   UIID 
+	 * @return  
+	 */
+	public function getTransitionByUIID(UIID:Number):Transition{
+		
+		var t:Transition = _transitions.get(UIID);
+		Debugger.log('Returning transition:'+t.transitionUIID,Debugger.GEN,'getTransitionByUIID','DesignDataModel');
+		return t;
+	}
 	/**
 	 * Retrieves all children of a complexy activity
 	 * E.g. child acts in an optional activity
