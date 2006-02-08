@@ -160,30 +160,45 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
 		//check the permission code for that folder
 		var isWritable = _workspaceModel.isWritableResource(_workspaceModel.RT_FOLDER,targetFolderID);
 		var sourceFolderID:Number;
+		/*
+		* actually its always the folderID , even if its the folder, 
+		* cos we are looking to refresh the containing fodlerID, 
+		* not the resource being moved
 		if(sourceNodeData.resourceType == _workspaceModel.RT_FOLDER){
 			sourceFolderID= sourceNodeData.resourceID;
 		}else{
 			sourceFolderID= sourceNodeData.workspaceFolderID;
 		}
+		*/
+		sourceFolderID= sourceNodeData.workspaceFolderID;
 		
-		//must clear the entire cache as both the source and target folders need to be refreshed
-		_workspaceModel.folderIDPendingRefresh = null;
-		_workspaceModel.folderIDPendingRefreshList = new Array(targetFolderID,sourceFolderID);
-		
-		//Debugger.log('SourceNode:\n'+ObjectUtils.toString(sourceNodeData),Debugger.GEN,'onDragComplete','org.lamsfoundation.lams.WorkspaceController');
-		//Debugger.log('TargetNode:\n'+ObjectUtils.toString(targetNodeData),Debugger.GEN,'onDragComplete','org.lamsfoundation.lams.WorkspaceController');
-		
-		//ok we are going to do a move:
-		if(isWritable){
-			_workspaceModel.getWorkspace().requestMoveResource(sourceNodeData.resourceID, targetFolderID, sourceNodeData.resourceType);
-		}else{
-			//show an alert();
-			LFMessage.showMessageAlert(Dictionary.getValue('ws_no_permission'),null,null);
+		Debugger.log('sourceFolderID:'+sourceFolderID+', targetFolderID:'+targetFolderID,Debugger.GEN,'onDragComplete','org.lamsfoundation.lams.WorkspaceController');
+		//are we trying to copy to the same folder?
+		if(sourceFolderID == targetFolderID){
+			
+			LFMessage.showMessageAlert(Dictionary.getValue('ws_copy_same_folder'),null,null);
 			//we still have to refresh the folders as the DnD tree will be showing wrong info
 			_workspaceModel.clearWorkspaceCacheMultiple();
+		}else{
+			
+			//must clear the entire cache as both the source and target folders need to be refreshed
+			_workspaceModel.folderIDPendingRefresh = null;
+			_workspaceModel.folderIDPendingRefreshList = new Array(targetFolderID,sourceFolderID);
+			
+			//Debugger.log('SourceNode:\n'+ObjectUtils.toString(sourceNodeData),Debugger.GEN,'onDragComplete','org.lamsfoundation.lams.WorkspaceController');
+			//Debugger.log('TargetNode:\n'+ObjectUtils.toString(targetNodeData),Debugger.GEN,'onDragComplete','org.lamsfoundation.lams.WorkspaceController');
+			
+			//ok we are going to do a move:
+			if(isWritable){
+				_workspaceModel.getWorkspace().requestMoveResource(sourceNodeData.resourceID, targetFolderID, sourceNodeData.resourceType);
+			}else{
+				//show an alert();
+				LFMessage.showMessageAlert(Dictionary.getValue('ws_no_permission'),null,null);
+				//we still have to refresh the folders as the DnD tree will be showing wrong info
+				_workspaceModel.clearWorkspaceCacheMultiple();
+			}
+		
 		}
-		
-		
 		
 		
 		
