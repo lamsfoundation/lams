@@ -19,10 +19,11 @@ import mx.utils.*
 class org.lamsfoundation.lams.authoring.Application {
 	
 	//public constants
-	public static var C_HOURGLASS = "c_hourglass";
-	public static var C_TRANSITION = "c_pen";
-	public static var C_OPTIONAL = "c_optionalBoxPen";
-	public static var C_DEFAULT = "default";
+	public static var C_HOURGLASS:String = "c_hourglass";
+	public static var C_TRANSITION:String = "c_pen";
+	public static var C_OPTIONAL:String = "c_optionalBoxPen";
+	public static var C_GATE:String = "c_gate";
+	public static var C_DEFAULT:String = "default";
 	
 	private static var SHOW_DEBUGGER:Boolean = false;
 	
@@ -130,6 +131,12 @@ class org.lamsfoundation.lams.authoring.Application {
         _container_mc = container_mc;
         _UILoaded = false;
         
+		//add the cursors:
+		Cursor.addCursor(C_HOURGLASS);
+		Cursor.addCursor(C_OPTIONAL);
+		Cursor.addCursor(C_TRANSITION);
+		Cursor.addCursor(C_GATE);
+		
 		//Comms object - do this before any objects are created that require it for server communication
         _comms = new Communication();
 
@@ -303,10 +310,7 @@ class org.lamsfoundation.lams.authoring.Application {
         _tooltipContainer_mc = _container_mc.createEmptyMovieClip('_tooltipContainer_mc',TOOLTIP_DEPTH);
         _cursorContainer_mc = _container_mc.createEmptyMovieClip('_cursorContainer_mc',CURSOR_DEPTH);
 		
-		//add the cursors:
-		Cursor.addCursor(C_HOURGLASS);
-		Cursor.addCursor(C_OPTIONAL);
-		Cursor.addCursor(C_TRANSITION);
+		
 
         //MENU
         _menu_mc = _container_mc.attachMovie('LFMenuBar','_menu_mc',MENU_DEPTH, {_x:0,_y:0});
