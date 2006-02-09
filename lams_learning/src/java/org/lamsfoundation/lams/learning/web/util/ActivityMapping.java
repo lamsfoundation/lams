@@ -24,6 +24,8 @@ package org.lamsfoundation.lams.learning.web.util;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Iterator;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -114,6 +116,8 @@ public class ActivityMapping implements Serializable
     {
         ActionForward actionForward = null;
 
+        String activitiesURL = getProgressUrlParamString(progress);	
+        
         // TODO: lesson complete client request to clear frames
         if (progress.isLessonComplete())
         {
@@ -167,6 +171,50 @@ public class ActivityMapping implements Serializable
         return actionForward;
     }
 
+	/**
+	 * NOTE: not decided to use method for LDEV-90 
+	 * @param progress
+	 * @return
+	 */
+	private String getProgressUrlParamString(LearnerProgress progress) {
+		StringBuffer activitiesURL = new StringBuffer();
+        Activity current;
+        Set attemptedSet = progress.getAttemptedActivities();
+        Iterator iter = attemptedSet.iterator();
+        boolean first = true;
+        while(iter.hasNext()){
+        	current = (Activity) iter.next();
+        	if(first){
+        		activitiesURL.append("attempted=");
+        		first = false;
+        	}else
+        		activitiesURL.append("_");
+        	activitiesURL.append(current.getActivityId());
+        }
+        Set completedSet = progress.getCompletedActivities();
+        first = true;
+        iter = completedSet.iterator();
+        while(iter.hasNext()){
+        	current = (Activity) iter.next();
+        	if(first){
+        		if(activitiesURL.length() != 0)
+        			activitiesURL.append("&");
+        		activitiesURL.append("completed=");
+        		first = false;
+        	}else
+        		activitiesURL.append("_");
+        	activitiesURL.append(current.getActivityId());
+        }
+        current = progress.getCurrentActivity();
+        if(current != null){
+			if(activitiesURL.length() != 0)
+				activitiesURL.append("&");
+			activitiesURL.append("current=");
+			activitiesURL.append(current.getActivityId());
+        }
+		return activitiesURL.toString();
+	}
+
     /**
      * Generates an ActivityURL for an Activity using it's progress. The URL is for
      * the client and so includes hostname etc.
@@ -193,7 +241,7 @@ public class ActivityMapping implements Serializable
     public String getProgressURL(LearnerProgress progress) throws UnsupportedEncodingException
     {
         String activityURL = null;
-
+        
         // TODO: lesson complete
         if (progress.isLessonComplete())
         {
