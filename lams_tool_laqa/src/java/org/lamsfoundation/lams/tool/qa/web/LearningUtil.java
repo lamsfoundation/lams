@@ -41,110 +41,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 public class LearningUtil implements QaAppConstants{
 	static Logger logger = Logger.getLogger(LearningUtil.class.getName());
 
-//	/**
-//	 * NEVER USED: redundant method.
-//	 * deleteSessionUsersAndResponses(HttpServletRequest request)
-//	 * @param request
-//	 */
-//	protected void deleteSessionUsersAndResponses(HttpServletRequest request)
-//    {
-//        IQaService qaService =QaUtils.getToolService(request);
-//        /*
-//         * retrive contentId from the http session
-//         */
-//        logger.debug("attempt retrieving toolContentId: " + request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID));
-//        Long toolContentId=(Long)request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
-//        QaContent qaContent=qaService.retrieveQa(toolContentId.longValue());
-//        
-//        logger.debug("retrieving qaContent: " + qaContent);
-//        Iterator sessionIterator=qaContent.getQaSessions().iterator();
-//        while (sessionIterator.hasNext())
-//        {
-//        	QaSession qaSession=(QaSession)sessionIterator.next(); 
-//        	logger.debug("iterated qaSession : " + qaSession);
-//        	
-//        	Iterator sessionUsersIterator=qaSession.getQaQueUsers().iterator();
-//        	while (sessionUsersIterator.hasNext())
-//        	{
-//        		QaQueUsr qaQueUsr=(QaQueUsr) sessionUsersIterator.next();
-//        		logger.debug("iterated qaQueUsr : " + qaQueUsr);
-//        		
-//        		Iterator sessionUsersResponsesIterator=qaQueUsr.getQaUsrResps().iterator();
-//        		while (sessionUsersResponsesIterator.hasNext())
-//            	{
-//        			QaUsrResp qaUsrResp=(QaUsrResp)sessionUsersResponsesIterator.next();
-//        			logger.debug("iterated qaUsrResp : " + qaUsrResp);
-//        			qaService.removeUserResponse(qaUsrResp);
-//        			logger.debug("removed qaUsrResp : " + qaUsrResp);
-//            	}
-//        	}
-//        }
-//        logger.debug("end of deleteSessionUsersAndResponses()");
-//    }
-//
-//
-//	/**
-//	 * NEVER USED: redundant method.
-//     * deletes the user of a particular question content and her responses
-//     * deleteExistingUsersAndResponses(HttpServletRequest request)
-//     * 
-//     * return void
-//     * @param request
-//     */
-//    protected void deleteExistingUsersAndResponses(HttpServletRequest request)
-//    {
-//        IQaService qaService =QaUtils.getToolService(request);
-//        /*
-//         * retrive contentId from the http session
-//         */
-//        logger.debug("attempt retrieving toolContentId: " + request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID));
-//        Long toolContentId=(Long)request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
-//        QaContent qaContent=qaService.retrieveQa(toolContentId.longValue());
-//        
-//        logger.debug("retrieving qaContent: " + qaContent);
-//        
-//    	Iterator contentIterator=qaContent.getQaQueContents().iterator();
-//    	while (contentIterator.hasNext())
-//    	{
-//    		QaQueContent qaQueContent=(QaQueContent)contentIterator.next();
-//    		logger.debug("retrieving qaQueContent: " + qaQueContent);
-//    		if (qaQueContent != null)
-//    		{
-//    			Set qaQueUsers=qaQueContent.getQaQueUsers();
-//    			logger.debug("qaQueUsers size: " + qaQueUsers.size());
-//        		/*
-//        		 * iterate users and delete them
-//        		 */
-//        		Iterator usersIterator=qaQueUsers.iterator();
-//        		while (usersIterator.hasNext())
-//            	{
-//        			QaQueUsr qaQueUsr=(QaQueUsr) usersIterator.next();
-//        			logger.debug("retrieving qaQueUsr: " + qaQueUsr);
-//        			if (qaQueUsr != null)
-//        			{
-//        				Set qaUsrResps=qaQueUsr.getQaUsrResps();
-//    					logger.debug("retrieving user's all responses : " + qaUsrResps);
-//        				Iterator responsesIterator=qaUsrResps.iterator();
-//        				while (responsesIterator.hasNext())
-//        				{
-//        					QaUsrResp qaUsrResp=(QaUsrResp)responsesIterator.next();
-//        					if (qaUsrResp != null)
-//        					{
-//        						logger.debug("retrieving qaUsrResp: " + qaUsrResp);
-//        						qaService.removeUserResponse(qaUsrResp);
-//								logger.debug("removed qaUsrResp with id:"  + qaUsrResp.getResponseId());
-//        					}
-//        				}
-//        				qaService.deleteQaQueUsr(qaQueUsr);
-//        				logger.debug("deleted user: " + qaQueUsr);
-//        			}
-//            	}
-//    		}
-//    	}
-//    	logger.debug("end of deleteExistingUsersAndResponses()");
-//    }
-
-    
     /**
      * createUsersAndResponses(Map mapAnswers, HttpServletRequest request)
      * create users of the responses
@@ -201,11 +97,21 @@ public class LearningUtil implements QaAppConstants{
 										new TreeSet());
 						    	
     	logger.debug("createQaQueUsr - qaQueUsr: " + qaQueUsr);
-    	if (qaQueUsr != null)
+    	
+    	/*note that it is possible for a user to already exist from another tool session. In this case don't add any more user record*/
+    	QaQueUsr qaQueUsrLocal=qaService.getQaQueUsrById(userId.longValue());
+    	logger.debug("qaQueUsrLocal: " + qaQueUsrLocal);
+    	
+    	if ((qaQueUsr != null) && (qaQueUsrLocal == null)) 
         {
         	qaService.createQaQueUsr(qaQueUsr);
             logger.debug("createUsers-qaQueUsr created in the db: " + qaQueUsr);	
         }
+    	else
+    	{
+    		logger.debug("assign user");
+    		qaQueUsr=qaQueUsrLocal;
+    	}
     	
         while (contentIterator.hasNext())
     	{
@@ -231,6 +137,7 @@ public class LearningUtil implements QaAppConstants{
         		
                 String timezoneId=(String)request.getSession().getAttribute(TIMEZONE_ID);
                 if (timezoneId == null) timezoneId="";
+                
                 
             	QaUsrResp qaUsrResp= new QaUsrResp(answer,false,
 						new Date(System.currentTimeMillis()),

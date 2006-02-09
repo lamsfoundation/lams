@@ -6,11 +6,14 @@
  */
 package org.lamsfoundation.lams.tool.qa.dao.hibernate;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.dao.IQaQueUsrDAO;
+import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 
@@ -28,6 +31,12 @@ public class QaQueUsrDAO extends HibernateDaoSupport implements IQaQueUsrDAO {
 	 	
 	 private static final String COUNT_SESSION_USER = "select qaQueUsr.queUsrId from QaQueUsr qaQueUsr where qaQueUsr.qaSessionId= :qaSession";
 		
+	   public QaQueUsr getQaUserByUID(Long uid)
+		{
+			 return (QaQueUsr) this.getHibernateTemplate()
+	         .get(QaQueUsr.class, uid);
+		}
+
 		
 		public int countSessionUser(QaSession qaSession)
 	    {
@@ -37,7 +46,8 @@ public class QaQueUsrDAO extends HibernateDaoSupport implements IQaQueUsrDAO {
 	    }
 	 	
 	 	
-	 	public QaQueUsr getQaQueUsrById(long qaQueUsrId)
+	 	/*
+		public QaQueUsr getQaQueUsrById(long qaQueUsrId)
 	 	{
 	 		return (QaQueUsr) this.getHibernateTemplate().load(QaQueUsr.class, new Long(qaQueUsrId));
 	 	}
@@ -46,7 +56,31 @@ public class QaQueUsrDAO extends HibernateDaoSupport implements IQaQueUsrDAO {
 	 	{
 	 		return (QaQueUsr) this.getHibernateTemplate().get(QaQueUsr.class, new Long(qaQueUsrId));
 	 	}
-	 	
+	 	*/
+		
+		public QaQueUsr getQaQueUsrById(long qaQueUsrId)
+		{
+			String query = "from QaQueUsr user where user.queUsrId=?";
+			
+				HibernateTemplate templ = this.getHibernateTemplate();
+				List list = getSession().createQuery(query)
+				.setLong(0,qaQueUsrId)
+				.list();
+				
+				if(list != null && list.size() > 0){
+					QaQueUsr qu = (QaQueUsr) list.get(0);
+					return qu;
+				}
+				return null;
+		}
+		
+		
+		public QaQueUsr loadQaQueUsrById(long qaQueUsrId)
+	 	{
+	 		return getQaQueUsrById(qaQueUsrId);
+	 	}
+
+		
 	 	public void createUsr(QaQueUsr usr) 
 	    {
 	 		this.getSession().setFlushMode(FlushMode.AUTO);

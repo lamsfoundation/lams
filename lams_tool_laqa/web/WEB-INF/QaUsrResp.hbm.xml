@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC
-    "-//Hibernate/Hibernate Mapping DTD 2.0//EN"
-    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
     
 <hibernate-mapping>
 
@@ -28,8 +28,6 @@
     <property
             name="hidden"
             type="boolean"
-            update="true"
-            insert="true"
             access="property"
             column="hidden"
    >
@@ -75,6 +73,7 @@
    <many-to-one
             name="qaQueContent"
             class="org.lamsfoundation.lams.tool.qa.QaQueContent"
+            not-null="true"            
             cascade="none"
             outer-join="auto"
             update="true"
@@ -90,6 +89,7 @@
   <many-to-one
             name="qaQueUser"
             class="org.lamsfoundation.lams.tool.qa.QaQueUsr"
+            not-null="true"            
             cascade="none"
             outer-join="auto"
             update="true"
@@ -100,7 +100,6 @@
                 name="que_usr_id" 
             />
   </many-to-one>
-
 
 </class>
 </hibernate-mapping>

@@ -101,6 +101,8 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * 
  * A Map  data structure is used to present the UI.
    It is fetched by subsequent Action classes to manipulate its content and gets parsed in the presentation layer for display.
+   
+   NOTE: You have to keep in mind that once user can have multiple tool session ids.
  */
 public class QaStarterAction extends Action implements QaAppConstants {
 	static Logger logger = Logger.getLogger(QaStarterAction.class.getName());

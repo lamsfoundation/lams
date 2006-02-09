@@ -100,26 +100,6 @@
 		    redirect="true"
 	  	/>      
 	</action>  
-	<!--Monitoring Starter -->
-	<action path="/monitoringStarter" type="org.lamsfoundation.lams.tool.qa.web.QaMonitoringStarterAction" 
-   			name="QaMonitoringForm" input=".monitoringStarter"> 
-      <forward
-        name="monitoringReport"
-        path=".monitoringReport"
-        redirect="true"
-   	  	/>
-      <forward
-        name="load"
-        path=".questions"
-        redirect="true"
-      />     
-      <forward
-        name="monitoringError"
-        path=".monitoringError"
-        redirect="true"
-      />	
-	</action>  
-	
 	
     <action
       path="/authoring"

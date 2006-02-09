@@ -9,13 +9,23 @@
     name="org.lamsfoundation.lams.tool.qa.QaQueUsr" 
     table="tl_laqa11_que_usr"
 >
+
     <id
+        name="uid"
+        type="java.lang.Long"
+        column="uid"
+    >
+		    <generator class="native"/>
+    </id>
+
+	<property
         name="queUsrId"
         type="java.lang.Long"
         column="que_usr_id"
+        not-null="true"
+        length="20"
     >
-		    <generator class="assigned"/>
-    </id>
+    </property>
 
     <property
         name="username"

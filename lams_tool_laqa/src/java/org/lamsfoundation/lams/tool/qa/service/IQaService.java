@@ -107,6 +107,8 @@ public interface IQaService
      */
 	public QaQueUsr retrieveQaQueUsr(long qaQaUsrId);
 	
+	public QaQueUsr getQaQueUsrById(long qaQueUsrId);
+	
 	public void updateQa(QaContent qa);
 	
 	public void createQa(QaContent qa);

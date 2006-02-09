@@ -312,6 +312,23 @@ public class QaServicePOJO
 														   e);
         }
     }
+
+    
+    public QaQueUsr getQaQueUsrById(long qaQueUsrId) throws QaApplicationException
+	{
+ 	   try
+       {
+	   		QaQueUsr qaQueUsr=qaQueUsrDAO.getQaQueUsrById(qaQueUsrId);
+	   		return qaQueUsr;
+       }
+       catch (DataAccessException e)
+       {
+           throw new QaApplicationException("Exception occured when lams is getting qa QueUsr: "
+                                                        + e.getMessage(),
+														   e);
+       }
+    	
+	}
     
     
     public void createQaUsrResp(QaUsrResp qaUsrResp) throws QaApplicationException

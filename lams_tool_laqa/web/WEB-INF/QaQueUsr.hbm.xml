@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC
-    "-//Hibernate/Hibernate Mapping DTD 2.0//EN"
-    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
     
 <hibernate-mapping>
 
@@ -9,13 +9,23 @@
     name="org.lamsfoundation.lams.tool.qa.QaQueUsr" 
     table="tl_laqa11_que_usr"
 >
+
     <id
+        name="uid"
+        type="java.lang.Long"
+        column="uid"
+    >
+		    <generator class="native"/>
+    </id>
+
+	<property
         name="queUsrId"
         type="java.lang.Long"
         column="que_usr_id"
+        not-null="true"
+        length="20"
     >
-		    <generator class="assigned"/>
-    </id>
+    </property>
 
     <property
         name="username"
@@ -44,6 +54,7 @@
     <many-to-one
         name="qaSession"
         class="org.lamsfoundation.lams.tool.qa.QaSession"
+        not-null="true"
         cascade="none"
         outer-join="auto"
         update="true"
@@ -55,7 +66,7 @@
     
     <set
             name="qaUsrResps"
-            lazy="false"
+            lazy="true"
             inverse="true"
             cascade="all-delete-orphan"
             sort="unsorted"

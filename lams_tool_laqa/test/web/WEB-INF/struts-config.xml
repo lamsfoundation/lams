@@ -14,8 +14,8 @@
 
 <form-beans>
 	<form-bean name="QaAuthoringForm" type="org.lamsfoundation.lams.tool.qa.web.QaAuthoringForm"/>
-      	<form-bean name="QaLearningForm" type="org.lamsfoundation.lams.tool.qa.web.QaLearningForm"/>
-      	<form-bean name="QaMonitoringForm" type="org.lamsfoundation.lams.tool.qa.web.QaMonitoringForm"/>
+   	<form-bean name="QaLearningForm" type="org.lamsfoundation.lams.tool.qa.web.QaLearningForm"/>
+   	<form-bean name="QaMonitoringForm" type="org.lamsfoundation.lams.tool.qa.web.QaMonitoringForm"/>
 </form-beans>
 
   <!-- ========== Global Exceptions Definitions =================================== -->
@@ -47,72 +47,73 @@
   <action-mappings>
    
 	<!--Authoring Starter  -->
-   <action path="/authoringStarter" type="org.lamsfoundation.lams.tool.qa.web.QaStarterAction" 
-   			name="QaAuthoringForm" input=".starter"> 
+   <!--  action path="/authoringStarter" type="org.lamsfoundation.lams.tool.qa.web.QaStarterAction" 
+   			name="QaAuthoringForm" input=".starter" --> 
+    <action
+      path="/authoringStarter"
+      type="org.lamsfoundation.lams.tool.qa.web.QaStarterAction"
+      name="QaAuthoringForm"
+      scope="session"
+      unknown="false"
+      validate="false"
+    >
+        <forward
+          name="load"
+          path="/author_page.jsp"
+          redirect="false"
+        />
 	  	<forward
-		    name="load"
-		    path=".questions"
+          name="monitoringReport"
+          path=".monitoringReport"
+          redirect="true"
+   	  	/>
+	  	<forward
+		    name="errorList"
+		    path=".qaErrorBox"
 		    redirect="true"
 	  	/>
-	  	<forward
-        name="monitoringReport"
-        path=".monitoringReport"
-        redirect="true"
-   	  	/>
 	</action>  
 	<!--Learning Starter  -->
    <action path="/learningStarter" type="org.lamsfoundation.lams.tool.qa.web.QaLearningStarterAction" 
    			name="QaLearningForm" input=".learningStarter"> 
-	  <forward
-	    name="load"
-	    path=".answers"
-	    redirect="true"
-	  />
+		  <forward
+		    name="load"
+		    path=".answers"
+		    redirect="true"
+		  />
 	  	
-      <forward
-        name="learnerReport"
-        path=".learnerReport"
-        redirect="true"
-      />
-	  	
-	</action>  
-	<!--Monitoring Starter  -->
-	<action path="/monitoringStarter" type="org.lamsfoundation.lams.tool.qa.web.QaMonitoringStarterAction" 
-   			name="QaMonitoringForm" input=".monitoringStarter"> 
-      <forward
-        name="monitoringReport"
-        path=".monitoringReport"
-        redirect="true"
-   	  	/>
-   	  	
-	   	<forward
-        name="load"
-        path=".questions"
-        redirect="true"
-      />
-      
-       	<forward
-        name="monitoringError"
-        path=".monitoringError"
-        redirect="true"
-      />	
-      
-      
-	</action>  
+	      <forward
+	        name="learnerReport"
+	        path=".learnerReport"
+	        redirect="true"
+	      />
 
+	      <forward
+	        name="learningStarter"
+	        path=".learningStarter"
+	        redirect="true"
+	      />
+	      
+		<forward
+		    name="errorList"
+		    path=".qaErrorBox"
+		    redirect="true"
+	  	/>      
+	</action>  
+	
     <action
       path="/authoring"
       type="org.lamsfoundation.lams.tool.qa.web.QAction"
       name="QaAuthoringForm"
       scope="session"
-      input=".questions"
-      parameter="method"
+      input="/author_page.jsp"
+      parameter="dispatch"
       unknown="false"
       validate="true"
     >
       <forward
         name="load"
-        path=".questions"
+        path="/author_page.jsp"
         redirect="true"
       />
       <forward
@@ -164,8 +165,7 @@
       type="org.lamsfoundation.lams.tool.qa.web.QaMonitoringAction"
       name="QaMonitoringForm"
       scope="session"
-      input=".monitoringReport"
-      parameter="method"
+      parameter="dispatch"
       unknown="false"
       validate="false"
     >

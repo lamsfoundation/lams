@@ -52,7 +52,10 @@ public class QaQueUsr implements Serializable, Comparable, Nullable
 {
 	static Logger logger = Logger.getLogger(QaQueUsr.class.getName());
 	
-	/** identifier field */
+    /** identifier field */
+    private Long uid;
+
+	/** persistent field */
     private Long queUsrId;
     
     /** nullable persistent field */
@@ -466,5 +469,17 @@ public class QaQueUsr implements Serializable, Comparable, Nullable
 	 */
 	public void setQaSessionId(Long qaSessionId) {
 		this.qaSessionId = qaSessionId;
+	}
+	/**
+	 * @return Returns the uid.
+	 */
+	public Long getUid() {
+		return uid;
+	}
+	/**
+	 * @param uid The uid to set.
+	 */
+	public void setUid(Long uid) {
+		this.uid = uid;
 	}
 }

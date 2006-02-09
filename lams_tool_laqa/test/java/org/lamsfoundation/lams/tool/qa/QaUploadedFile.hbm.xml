@@ -41,7 +41,7 @@
             column="fileName"
    />
    
-       <property
+       <!--  property
         name="qaContentId"
         type="java.lang.Long"
         update="false"
@@ -49,7 +49,7 @@
         access="property"
         column="qa_content_id"
         length="20"
-    />
+    / -->
    
 
    <many-to-one

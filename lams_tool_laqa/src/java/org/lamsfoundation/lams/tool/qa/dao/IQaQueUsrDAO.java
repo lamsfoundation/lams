@@ -31,9 +31,11 @@ import org.lamsfoundation.lams.tool.qa.QaSession;
  */
 public interface IQaQueUsrDAO
 {
+	public QaQueUsr getQaUserByUID(Long uid);
+	
     public QaQueUsr getQaQueUsrById(long qaQueUsrId);
     
-    public QaQueUsr loadQaQueUsrById(long qaQueUsrId);
+    public QaQueUsr loadQaQueUsrById(long qaQueUsrId); 
     
     public void createUsr(QaQueUsr usr);
     
