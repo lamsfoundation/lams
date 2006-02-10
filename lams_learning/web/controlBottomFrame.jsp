@@ -32,51 +32,10 @@ http://www.gnu.org/licenses/gpl.txt
 		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 		<link href="<lams:LAMSURL/>/css/default.css" rel="stylesheet" type="text/css"/>
 		<title>Learner :: LAMS</title>
-		<SCRIPT LANGUAGE="VBScript">
-			<!-- 
-			//  Map VB script events to the JavaScript method - Netscape will ignore this... 
-			//  Since FSCommand fires a VB event under ActiveX, we respond here 
-			Sub leftUI_FSCommand(ByVal command, ByVal args)
-			  call leftUI_DoFSCommand(command, args)
-			end sub
-			-->
-		</SCRIPT>
 		<script language="JavaScript" type="text/JavaScript">
 			<!--
 			
-			function setFlashVars(){
-				var serverURL = parent.window.serverURL;
-				window.document.leftUI.SetVariable("serverURL", serverURL);
-				
-				//alert('serverURL='+serverURL);
-			}
-			
 			var thePopUp = null;
-			function leftUI_DoFSCommand(command, args) {
-				//alert("command:"+command+","+args);
-			
-				if (command == "alert") {
-					 doAlert(args);
-				}else if (command == "confirm"){
-					doConfirm(arg);
-				}else if (command == "openPopUp"){
-					openPopUp(args);		
-				}
-			
-			}
-			
-			function doAlert(arg){
-				alert(arg);
-			}
-			
-			function doConfirm(arg){
-				var answer = confirm (arg)
-				if (answer)
-					alert ("Oh yeah?")
-				else
-					alert ("Why not?")
-			}
-			 
 			
 			function openPopUp(args){
 				if(thePopUp && thePopUp.open && !thePopUp.closed){		
@@ -91,7 +50,7 @@ http://www.gnu.org/licenses/gpl.txt
 		</script>
 
 	</head>
-	<body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onLoad="setFlashVars()">
+	<body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
 
 		<!-- URL's used in the movie-->
 		<!-- text used in the movie-->

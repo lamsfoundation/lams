@@ -32,11 +32,6 @@ http://www.gnu.org/licenses/gpl.txt
 		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 		<lams:css/>
 		<title>Learner :: Staff</title>
-		<script language="JavaScript" type="text/JavaScript">
-			<!--
-			var serverURL = <lams:LAMSURL/>;
-			//-->
-		</script>
 	</head>
 
 	<frameset rows="*" cols="178,*">

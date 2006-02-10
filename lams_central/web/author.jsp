@@ -219,7 +219,7 @@ function checkSaved(){
 </script>
 <TITLE>Author :: LAMS</TITLE>
 </HEAD>
-<BODY bgcolor="#FFFFFF" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onUnload="endPreviewSession()">
+<BODY bgcolor="#FFFFFF" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
 
 <!-- URL's used in the movie-->
 <!-- text used in the movie-->

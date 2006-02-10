@@ -6,7 +6,7 @@
 
 <TITLE>Learner:: LAMS</TITLE>
 </HEAD>
-<BODY bgcolor="#FFFFFF" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onUnload="endPreviewSession()">
+<BODY bgcolor="#FFFFFF" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
 
 <p>Loading Learner Environment.</p>
 
