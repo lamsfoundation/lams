@@ -59,7 +59,7 @@ public class LAMSURLTag extends TagSupport {
 	public int doStartTag() throws JspException {
 		String serverURL = Configuration.get(ConfigurationKeys.SERVER_URL);
 		serverURL = ( serverURL != null ? serverURL.trim() : null);
-   		if ( serverURL != null || serverURL.length()>0 ) {
+   		if ( serverURL != null && serverURL.length()>0 ) {
    			JspWriter writer = pageContext.getOut();
    			try {
 				writer.print(serverURL);

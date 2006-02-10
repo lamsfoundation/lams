@@ -23,24 +23,17 @@
 package org.lamsfoundation.lams.web.tag;
 
 import java.io.IOException;
-
 import java.util.Iterator;
 import java.util.List;
 
-import javax.servlet.http.HttpSession;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.TagSupport;
 
-import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
-import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.CSSThemeUtil;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
-import org.lamsfoundation.lams.util.CSSThemeUtil;
-import org.lamsfoundation.lams.web.session.SessionManager;
-import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * Output the required css based in the user's details. Will output one or more
@@ -70,60 +63,40 @@ public class CssTag extends TagSupport {
 	}
 	
 	public int doStartTag() throws JspException {
-//		String customStylesheetLink = null;
-//    	String serverURL = Configuration.get(ConfigurationKeys.SERVER_URL);
-//		
-//	   	HttpSession ss = SessionManager.getSession();
-//	   	if ( ss != null ) {
-//	   		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-//	   		if ( user != null ) {
-//	   			CSSThemeVisualElement theme = user.getTheme();
-//	   			if ( theme != null && theme.getName() != null ) {
-//	   				customStylesheetLink = generateLink(theme.getName(),serverURL);
-//	   			}
-//	   		} 
-//	   	}
-//	   	
-//	   	try {
-//        	JspWriter writer = pageContext.getOut();
-//    	   	if ( customStylesheetLink != null ) {
-//    	   		writer.print(customStylesheetLink);
-//    	   	}
-//	   		writer.print(generateLink("default",serverURL));
-//		} catch ( IOException e ) {
-//			log.error("CssTag unable to write out CSS details due to IOException.", e);
-//			// don't throw a JSPException as we want the system to still function.
-//		}
-//	   	
 		
 		String customStylesheetLink = null;
 		String serverURL = Configuration.get(ConfigurationKeys.SERVER_URL);
-		List themeList = CSSThemeUtil.getAllUserThemes();
+		serverURL = ( serverURL != null ? serverURL.trim() : null);
+
+		if ( serverURL != null ) {
+			List themeList = CSSThemeUtil.getAllUserThemes();
+			
+			Iterator i = themeList.iterator();
+			
+			while (i.hasNext())
+			{
+				String theme = (String)i.next();
+				if ( theme != null) {
+					if (generateLocalLink)
+						customStylesheetLink = generateLocalLink(theme,serverURL);
+					else	
+						customStylesheetLink = generateLink(theme,serverURL);
+				}
 		
-		Iterator i = themeList.iterator();
-		
-		while (i.hasNext())
-		{
-			String theme = (String)i.next();
-			if ( theme != null) {
-				if (generateLocalLink)
-					customStylesheetLink = generateLocalLink(theme,serverURL);
-				else	
-					customStylesheetLink = generateLink(theme,serverURL);
+				try {
+		        	JspWriter writer = pageContext.getOut();
+		    	   	if ( customStylesheetLink != null ) {
+		    	   		writer.print(customStylesheetLink);
+		    	   	}
+			   		//writer.print(generateLink("default",serverURL));
+				} catch ( IOException e ) {
+					log.error("CssTag unable to write out CSS details due to IOException.", e);
+					// don't throw a JSPException as we want the system to still function.
+				}
 			}
-	
-			try {
-	        	JspWriter writer = pageContext.getOut();
-	    	   	if ( customStylesheetLink != null ) {
-	    	   		writer.print(customStylesheetLink);
-	    	   	}
-		   		//writer.print(generateLink("default",serverURL));
-			} catch ( IOException e ) {
-				log.error("CssTag unable to write out CSS details due to IOException.", e);
-				// don't throw a JSPException as we want the system to still function.
-			}
+		} else {
+	   		log.warn("CSSTag unable to write out CSS entries as the server url is missing from the configuration file.");
 		}
-	   	
     	return SKIP_BODY;
 	}
 
