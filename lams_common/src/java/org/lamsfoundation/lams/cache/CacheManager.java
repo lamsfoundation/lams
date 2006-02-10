@@ -77,7 +77,7 @@ public class CacheManager implements ICacheManager {
 					treeCache.addTreeCacheListener(listener);
 					log.info("Added tree cache listener.");
 				}
-			} catch (MalformedObjectNameException e) {
+			} catch (Exception e) {
 				log.error("Unable to access the JBOSS cache mbean "+cacheObjectName+". Cache not available.",e);
 			}
 		}
