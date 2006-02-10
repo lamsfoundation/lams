@@ -30,6 +30,7 @@ import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 
 
 /**
@@ -56,6 +57,13 @@ public interface IMonitoringService
      * @return the lesson initialized.
      */
     public Lesson initializeLesson(String lessonName, String lessonDescription,long learningDesignId,Integer userID);
+    /**
+     * Create new lesson according to the learning design specified by the 
+     * user, but for a preview session rather than a normal learning session.
+     * The design is not assigned to any workspace folder.
+     */
+    public Lesson initializeLessonForPreview(String lessonName,String lessonDescription,long learningDesignId,Integer userID); 
+
     /**
      * Create a lession according to the input lession WDDX package. The sample package is following:
      * <code>
@@ -166,7 +174,13 @@ public interface IMonitoringService
      * 		the specified the lesson id.
      */
 	public void removeLesson(long lessonId);
-    /**
+   /**
+    * 
+    * Permanently remove a lesson from the database. This can not be undone - once deleted the 
+    * data is gone forever.
+     */
+    public void deleteLesson(Lesson lesson); 
+     /**
      * Set the gate to open to let all the learners through. This learning service
      * is triggerred by the system scheduler. Will return true GateActivity (or subclass)
      * object, rather than a hibernate proxy. This is needed so that the class can 
@@ -389,10 +403,37 @@ public interface IMonitoringService
      */
     public void performChosenGrouping(GroupingActivity groupingActivity, List groups);
     
+	//---------------------------------------------------------------------
+	// Preview Methods
+	//---------------------------------------------------------------------
+	/**
+	 * Create the lesson class and the staff class for a preview lesson.
+	 * 
+	 * @param userID User ID of the teacher running the preview. Mandatory.
+	 * @param lessonID ID of the lesson
+	 * @return Lesson
+	 */
+	public abstract Lesson createPreviewClassForLesson(int userID,
+			long lessonID) throws UserAccessDeniedException;
+
+	/**
+	 * Remove all the details for a particular preview lessons.
+	 * 
+	 * @param lessonID ID of the lesson which is the preview session. Mandatory.
+	 */
+	public abstract void deletePreviewLesson(long lessonID);
+
+	/**
+	 * Remove all the "old" preview lessons. Removes all preview lessons older than <code>numDays</code> old.  
+	 * 
+	 * @param numDays Delete any preview lessons older than numDays
+	 * @return number of lessons deleted.
+	 */
+	public abstract int deleteAllOldPreviewLessons(int numDays);
+
     /* TODO Dummy methods - to be removed */
     public List getOrganisationsUsers(Integer userId);
     public List getLearningDesigns(Long userId);
 	
-
 
 }

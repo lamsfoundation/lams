@@ -6,6 +6,7 @@
 
 package org.lamsfoundation.lams.lesson.dao;
 
+import java.util.Date;
 import java.util.List;
 
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -55,13 +56,13 @@ public interface ILessonDAO
     public void updateLesson(Lesson lesson);
     
     /**
-     * Returns the list of available Lessons for
-     * a given user. Does not return disabled lessons.
-     * 
+      * Returns the list of available Lessons created by
+     * a given user. Does not return disabled lessons or preview lessons.
+    * 
      * @param userID The user_id of the user
      * @return List The list of Lessons for the given user
      */
-    public List getLessonsForUser(Integer userID);
+    public List getLessonsCreatedByUser(Integer userID);
     
     /**
      * Returns the all the learners that have started the requested lesson.
@@ -70,4 +71,12 @@ public interface ILessonDAO
      * @return the list of learners.
      */
     public List getActiveLearnerByLesson(final long lessonId);
+
+    /**
+     * Get all the preview lessons more with the creation date before the given date.
+     * 
+     * @param startDate UTC date 
+     * @return the list of Lessons
+     */
+    public List getPreviewLessonsBeforeDate(final Date startDate);
 }

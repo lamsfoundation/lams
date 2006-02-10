@@ -240,6 +240,13 @@ Ant build file.
 		<copy file="${build.lib}/${product}.jar"
 				todir="${jboss.deploy}"/>
 	</target>
+	<!-- =================================================================== -->
+	<!-- Deploy the project's jar file to the shared lib area				 -->
+	<!-- =================================================================== -->
+	<target name="copy-lams-jar-to-shared-lib" depends="lams-jar">
+		<copy file="${build.lib}/${product}.jar"
+				todir="${sharedlib}/lams"/>
+	</target>
 
 	<!-- =================================================================== -->
 	<!-- Clean and rebuild the database. Also cleans out content repository  -->

@@ -37,6 +37,7 @@ import org.lamsfoundation.lams.test.AbstractLamsTestCase;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -314,5 +315,62 @@ public class TestMonitoringService extends AbstractLamsTestCase
         JdbcTemplate jt = new JdbcTemplate(dataSource);
         return jt.queryForLong("SELECT max("+idname+") FROM "+tablename);
     }
+
+	/*
+	 * Test method for 'org.lamsfoundation.lams.preview.service.PreviewService.startPreviewLesson(int, long, String, String)'
+	 */
+	public void testStartPreviewLesson() {
+		String testName = "LESSON";
+		String testDesc = "DESC";
+		Lesson lesson = startLesson(testName, testDesc);
+		assertEquals("Lesson has correct title",testName, lesson.getLessonName());
+		assertEquals("Lesson has correct description",testDesc, lesson.getLessonDescription());
+
+		Lesson newLesson = lessonDao.getLesson(lesson.getLessonId());
+		assertNotNull("Lesson can be found in database",newLesson);
+	}
+
+	private Lesson startLesson(String testName, String testDesc) {
+		try {
+	        Lesson previewLesson = monitoringService.initializeLessonForPreview(testName,testDesc,TEST_LEARNING_DESIGN_ID,TEST_USER_ID);
+	        assertNotNull("Lesson created",previewLesson);
+			assertNotNull("Lesson has been saved - an id exists", previewLesson.getLessonId());
+
+	        Lesson newLesson = monitoringService.createPreviewClassForLesson(TEST_USER_ID.intValue(), previewLesson.getLessonId().longValue());
+	        assertNotNull("Lesson returned from create class",newLesson);
+	        assertSame("Lesson updated from create class", newLesson.getLessonId(),previewLesson.getLessonId());
+
+	        monitoringService.startLesson(previewLesson.getLessonId().longValue());
+
+			return previewLesson;
+		} catch (UserAccessDeniedException e) {
+			fail("Unable to start lesson as due to a user exception");
+		}
+		return null;
+		
+	}
+	
+	/*
+	 * Test method for 'org.lamsfoundation.lams.preview.service.PreviewService.deletePreviewLesson(long)'
+	 */
+	public void testDeletePreviewLesson() {
+		String testName = "LESSON TO DELETE";
+		String testDesc = "TO BE DELETED";
+		Lesson lesson = startLesson(testName, testDesc);
+		Long lessonId = lesson.getLessonId();
+		
+		monitoringService.deletePreviewLesson(lessonId.longValue());
+		Lesson deletedLesson = lessonDao.getLesson(lessonId);
+		assertNull("Deleted lesson cannot be found",deletedLesson);
+	}
+
+	/*
+	 * Test method for 'org.lamsfoundation.lams.preview.service.PreviewService.deleteAllOldPreviewLessons(int)'
+	 * Can't really test this properly - can't tell if deleted or not. Can only test that it doesn't fail
+	 */
+	public void testDeleteAllOldPreviewLessons() {
+		int lessonsDeleted = monitoringService.deleteAllOldPreviewLessons(1);
+		assertTrue("deleteAllOldPreviewLessons returns 0 or more", lessonsDeleted>=0);
+	}
 
 }

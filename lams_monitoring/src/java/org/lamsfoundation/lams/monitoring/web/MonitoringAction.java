@@ -31,9 +31,7 @@ import java.util.Date;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
-import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -42,11 +40,9 @@ import org.lamsfoundation.lams.monitoring.MonitoringConstants;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
-import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
-import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 
@@ -77,13 +73,10 @@ public class MonitoringAction extends LamsDispatchAction
     //---------------------------------------------------------------------
     // Instance variables
     //---------------------------------------------------------------------
-	private static Logger log = Logger.getLogger(MonitoringAction.class);
 	
-	private IMonitoringService monitoringService;
     //---------------------------------------------------------------------
     // Class level constants - Struts forward
     //---------------------------------------------------------------------
-    private static final String SCHEDULER = "scheduler";
 
     /** If you want the output given as a jsp, set the request parameter "jspoutput" to 
      * some value other than an empty string (e.g. 1, true, 0, false, blah). 
@@ -116,16 +109,6 @@ public class MonitoringAction extends LamsDispatchAction
 	    }
 	}
 	
-    private UserDTO getUser() throws IOException {
-    	HttpSession ss = SessionManager.getSession();
-    	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-    	if ( user != null ) {
-    		return user;
-    	}
-    	
-    	throw new IOException("Unable to get user. User in session manager is "+user);
-    }
-
     /**
 	 * @param wddxPacket
 	 * @return
@@ -174,7 +157,7 @@ public class MonitoringAction extends LamsDispatchAction
                                                                           ServletException
     {
 
-        this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+    	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
         FlashMessage flashMessage = null;
     	
     	try {
@@ -224,7 +207,7 @@ public class MonitoringAction extends LamsDispatchAction
                                      HttpServletResponse response) throws IOException,
                                                                           ServletException
     {
-        this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+        IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
         long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
     	FlashMessage flashMessage = null;
     	
@@ -266,7 +249,7 @@ public class MonitoringAction extends LamsDispatchAction
     		HttpServletResponse response) throws IOException,
     		ServletException 
     		{
-    	this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+    	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
     	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
     	String dateStr = WebUtil.readStrParam(request, MonitoringConstants.PARAM_LESSON_START_DATE);
     	FlashMessage flashMessage = null;
@@ -315,7 +298,7 @@ public class MonitoringAction extends LamsDispatchAction
     		HttpServletResponse response) throws IOException,
     		ServletException 
     		{
-    	this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+    	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
     	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
     	String dateStr = WebUtil.readStrParam(request, MonitoringConstants.PARAM_LESSON_FINISH_DATE);
     	FlashMessage flashMessage = null;
@@ -363,7 +346,7 @@ public class MonitoringAction extends LamsDispatchAction
                                                                           ServletException
     {
     	FlashMessage flashMessage = null;
-    	this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+    	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
     	long lessonId = WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID);
     	
     	try {
@@ -401,7 +384,7 @@ public class MonitoringAction extends LamsDispatchAction
     		ServletException
     		{
     	FlashMessage flashMessage = null;
-    	this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+    	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
     	long lessonId = WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID);
     	
     	try {
@@ -436,7 +419,7 @@ public class MonitoringAction extends LamsDispatchAction
     		ServletException
     		{
     	FlashMessage flashMessage = null;
-    	this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+    	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
     	long lessonId = WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID);
     	
     	try {
@@ -475,7 +458,7 @@ public class MonitoringAction extends LamsDispatchAction
             HttpServletResponse response) throws IOException,
                                                  ServletException{
     	FlashMessage flashMessage = null;
-    	this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+    	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
     	long lessonId = WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID);
     	
     	try {
@@ -510,7 +493,7 @@ public class MonitoringAction extends LamsDispatchAction
             HttpServletResponse response) throws IOException,
                                                  ServletException{
     	FlashMessage flashMessage = null;
-    	this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+    	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
     	//get parameters
     	Long activityId = null;
     	String actId = request.getParameter(AttributeNames.PARAM_ACTIVITY_ID);
@@ -540,7 +523,7 @@ public class MonitoringAction extends LamsDispatchAction
                                      ActionForm form,
                                      HttpServletRequest request,
                                      HttpServletResponse response)throws IOException{
-    	this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+    	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
     	String wddxPacket = monitoringService.getAllLessonsWDDX();
     	return outputPacket(mapping, request, response, wddxPacket, "details");
     }
@@ -548,7 +531,7 @@ public class MonitoringAction extends LamsDispatchAction
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response)throws IOException{
-    	this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+    	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
     	Long lessonID = new Long(WebUtil.readLongParam(request,"lessonID"));
     	String wddxPacket = monitoringService.getLessonDetails(lessonID);
     	return outputPacket(mapping, request, response, wddxPacket, "details");
@@ -557,7 +540,7 @@ public class MonitoringAction extends LamsDispatchAction
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response)throws IOException{
-    	this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+    	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
     	Long lessonID = new Long(WebUtil.readLongParam(request,"lessonID"));
     	String wddxPacket = monitoringService.getLessonLearners(lessonID);
     	return outputPacket(mapping, request, response, wddxPacket, "details");
@@ -566,7 +549,7 @@ public class MonitoringAction extends LamsDispatchAction
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response)throws IOException{
-    	this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+    	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
     	Long lessonID = new Long(WebUtil.readLongParam(request,"lessonID"));
     	String wddxPacket = monitoringService.getLearningDesignDetails(lessonID);
     	return outputPacket(mapping, request, response, wddxPacket, "details");
@@ -575,7 +558,7 @@ public class MonitoringAction extends LamsDispatchAction
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response)throws IOException{
-    	this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+    	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
     	Long lessonID = new Long(WebUtil.readLongParam(request,"lessonID"));
     	String wddxPacket = monitoringService.getAllLearnersProgress(lessonID);
     	return outputPacket(mapping, request, response, wddxPacket, "details");
@@ -584,7 +567,7 @@ public class MonitoringAction extends LamsDispatchAction
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response)throws IOException{
-    	this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+    	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
     	Long lessonID = new Long(WebUtil.readLongParam(request,"lessonID"));
     	String wddxPacket = monitoringService.getAllContributeActivities(lessonID);
     	return outputPacket(mapping, request, response, wddxPacket, "details");
@@ -594,7 +577,7 @@ public class MonitoringAction extends LamsDispatchAction
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response)throws IOException,LamsToolServiceException{
-    	this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+    	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
     	Integer userID = new Integer(WebUtil.readIntParam(request,"userID"));
     	Long activityID = new Long(WebUtil.readLongParam(request,"activityID"));
     	//Show learner in monitor in a single call: extract URL and redirect it rather than returning the WDDX packet
@@ -609,7 +592,7 @@ public class MonitoringAction extends LamsDispatchAction
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response)throws IOException{
-    	this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());    	
+    	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());    	
     	Long activityID = new Long(WebUtil.readLongParam(request,"activityID"));
     	String wddxPacket = monitoringService.getActivityContributionURL(activityID);
     	return outputPacket(mapping, request, response, wddxPacket, "details");
@@ -618,7 +601,7 @@ public class MonitoringAction extends LamsDispatchAction
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response)throws IOException{
-    	this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+    	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
     	Long lessonID = new Long(WebUtil.readLongParam(request,"lessonID"));
     	Integer userID = new Integer(WebUtil.readIntParam(request,"userID"));
     	Integer targetWorkspaceFolderID = new Integer(WebUtil.readIntParam(request,"folderID"));
@@ -629,7 +612,7 @@ public class MonitoringAction extends LamsDispatchAction
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response)throws IOException{
-    	this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+    	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
     	Long lessonID = new Long(WebUtil.readLongParam(request,"lessonID"));
     	Integer userID = new Integer(WebUtil.readIntParam(request,"userID"));
     	String name = WebUtil.readStrParam(request,"name"); 
@@ -642,7 +625,7 @@ public class MonitoringAction extends LamsDispatchAction
             HttpServletRequest request,
             HttpServletResponse response) throws IOException {
         
-        this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+        IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
         Long activityID = new Long(WebUtil.readLongParam(request, "activityID"));
         Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
         String wddxPacket = monitoringService.checkGateStatus(activityID, lessonID);
@@ -655,11 +638,56 @@ public class MonitoringAction extends LamsDispatchAction
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response) throws IOException {
-        this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+        IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
         Long activityID = new Long(WebUtil.readLongParam(request, "activityID"));
         String wddxPacket = monitoringService.releaseGate(activityID);
        // request.setAttribute(USE_JSP_OUTPUT, "1");
         return outputPacket(mapping, request, response, wddxPacket, "details");
     }
+
+	public ActionForward startPreviewLesson(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException {
+		IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+		FlashMessage flashMessage = null;
+		
+		try {
+		
+			int userID = WebUtil.readIntParam(request,AttributeNames.PARAM_USER_ID); 
+			long learningDesignID = WebUtil.readLongParam(request,AttributeNames.PARAM_LEARNINGDESIGN_ID);
+			String title = WebUtil.readStrParam(request,"title");
+			String desc = WebUtil.readStrParam(request,"description"); 
+			
+	        // initialize the lesson
+	        Lesson previewLesson = monitoringService.initializeLessonForPreview(title,desc,learningDesignID,new Integer(userID));
+	        if ( previewLesson != null ) {
+
+	        	long lessonID = previewLesson.getLessonId().longValue();
+				
+	        	monitoringService.createPreviewClassForLesson(userID, lessonID);
+		        monitoringService.startLesson(lessonID);
+		
+				flashMessage = new FlashMessage("startPreviewSession",new Long(lessonID));
+				
+	        } else {
+	        	
+				flashMessage = new FlashMessage("startPreviewSession",
+						"Internal error - no lesson created.",
+						FlashMessage.CRITICAL_ERROR);
+	        }
+			
+		} catch (Exception e) {
+		
+			flashMessage = new FlashMessage("startPreviewSession",
+			e.getMessage(),
+			FlashMessage.ERROR);
+		
+		}
+		
+		PrintWriter writer = response.getWriter();
+		writer.println(flashMessage.serializeMessage());
+		return null;
+	}
 
 }

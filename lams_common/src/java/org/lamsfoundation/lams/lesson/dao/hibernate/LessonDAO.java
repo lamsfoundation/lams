@@ -6,6 +6,7 @@
 
 package org.lamsfoundation.lams.lesson.dao.hibernate;
 
+import java.util.Date;
 import java.util.List;
 
 import org.hibernate.FetchMode;
@@ -13,6 +14,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Expression;
+import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -25,10 +27,17 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  */
 public class LessonDAO extends HibernateDaoSupport implements ILessonDAO
 {
-	private static final String TABLENAME ="lams_lesson";
-	private final static String FIND_BY_USER="from " + TABLENAME + 
-											 " in class " + Lesson.class.getName() +
-											 " where user_id=? and lesson_state_id <= 6";
+	private final static String FIND_LESSON_BY_CREATOR="from "
+					+ Lesson.class.getName()
+					+ " lesson where lesson.user.userId=? and lesson.lessonStateId <= 6 and "
+					+" lesson.learningDesign.copyTypeID="
+					+ LearningDesign.COPY_TYPE_LESSON;
+	private final static String FIND_PREVIEW_BEFORE_START_DATE=	"from "
+					+ Lesson.class.getName()
+					+ " lesson where lesson.learningDesign.copyTypeID="
+					+ LearningDesign.COPY_TYPE_PREVIEW 
+					+ "and lesson.start_date_time < ?";
+	
     /**
      * Retrieves the Lesson
      * @param lessonId identifies the lesson to get
@@ -137,15 +146,26 @@ public class LessonDAO extends HibernateDaoSupport implements ILessonDAO
     }
     
     /**
-     * Returns the list of available Lessons for
-     * a given user. Does not return disabled lessons.
+     * Returns the list of available Lessons created by
+     * a given user. Does not return disabled lessons or preview lessons.
      * 
      * @param userID The user_id of the user
      * @return List The list of Lessons for the given user
      */
-   public List getLessonsForUser(Integer userID){
-    	List lessons = this.getHibernateTemplate().find(FIND_BY_USER,userID);
+   public List getLessonsCreatedByUser(Integer userID){
+    	List lessons = this.getHibernateTemplate().find(FIND_LESSON_BY_CREATOR,userID);
     	return lessons;
     }
+   
+   /**
+    * Get all the preview lessons more with the creation date before the given date.
+    * 
+    * @param startDate UTC date 
+    * @return the list of Lessons
+    */
+   public List getPreviewLessonsBeforeDate(final Date startDate){
+   	List lessons = this.getHibernateTemplate().find(FIND_PREVIEW_BEFORE_START_DATE,startDate);
+	return lessons;
+   }
 
 }

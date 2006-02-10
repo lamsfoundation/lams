@@ -72,6 +72,7 @@ import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dao.IOrganisationDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IUserDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IWorkspaceFolderDAO;
+import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
@@ -108,7 +109,8 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     // Instance variables
     //---------------------------------------------------------------------
 	private static Logger log = Logger.getLogger(MonitoringService.class);
-    
+   	private static final long numMilliSecondsInADay = 24 * 60 * 60 * 1000;
+
     private ILessonDAO lessonDAO;    
     private ILessonClassDAO lessonClassDAO;        
     private ITransitionDAO transitionDAO;
@@ -268,11 +270,41 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         	destinationFolder = originalLearningDesign.getWorkspaceFolder(); 
         }
         
+        return initializeLessonForPreview(lessonName, lessonDescription, originalLearningDesign, user, LearningDesign.COPY_TYPE_LESSON, destinationFolder);
+        
+    }
+    
+    /**
+     * Create new lesson according to the learning design specified by the 
+     * user, but for a preview session rather than a normal learning session.
+     * The design is not assigned to any workspace folder.
+     */
+    public Lesson initializeLessonForPreview(String lessonName,
+                               String lessonDescription,
+                               long learningDesignId,
+                               Integer userID) 
+    {
+        LearningDesign originalLearningDesign = authoringService.getLearningDesign(new Long(learningDesignId));
+        if ( originalLearningDesign == null) {
+        	throw new MonitoringServiceException("Learning design for id="+learningDesignId+" is missing. Unable to initialize lesson.");
+        }
+    	User user = (userID != null ? userManagementService.getUserById(userID) : null);
+
+        return initializeLessonForPreview(lessonName, lessonDescription, originalLearningDesign, user, LearningDesign.COPY_TYPE_PREVIEW, null);
+    }
+
+    public Lesson initializeLessonForPreview(String lessonName,
+            String lessonDescription,
+            LearningDesign originalLearningDesign,
+            User user,
+            int copyType,
+            WorkspaceFolder folder) { 
+    
         //copy the current learning design
         LearningDesign copiedLearningDesign = authoringService.copyLearningDesign(originalLearningDesign,
-                                                                                  new Integer(LearningDesign.COPY_TYPE_LESSON),
+                                                                                  new Integer(copyType),
                                                                                   user,
-                                                                                  destinationFolder, true);
+                                                                                  folder, true);
         // copy the tool content
         // unfortuanately, we have to reaccess the activities to make sure we get the
         // subclass, not a hibernate proxy.
@@ -287,7 +319,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
                     toolActivity.setToolContentId(newContentId);
                 } catch (DataMissingException e) {
                     String error = "Unable to initialise the lesson. Data is missing for activity "+currentActivity.getActivityUIID()
-                            +" in learning design "+learningDesignId
+                            +" in learning design "+originalLearningDesign.getLearningDesignId()
                             +" default content may be missing for the tool. Error was "
                             +e.getMessage();
                     log.error(error,e);
@@ -295,7 +327,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
                 } catch (ToolException e) {
                     String error = "Unable to initialise the lesson. Tool encountered an error copying the data is missing for activity "
                             +currentActivity.getActivityUIID()
-                            +" in learning design "+learningDesignId
+                            +" in learning design "+originalLearningDesign.getLearningDesignId()
                             +" default content may be missing for the tool. Error was "
                             +e.getMessage();
                     log.error(error,e);
@@ -309,6 +341,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         return createNewLesson(lessonName,lessonDescription,user,copiedLearningDesign);
 
     }
+    
     /**
      *  @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#createLessonClassForLessonWDDX(Integer, String)
      */
@@ -616,6 +649,31 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         lessonDAO.updateLesson(requestedLesson);
     	
     }
+
+    /**
+     * Delete a lesson and all its contents. Warning: at the moment, this should only be done to preview lessons.
+     * Can't guarentee data integrity if it is done to any other type of lesson. See removeLesson() for hiding
+     * lessons from a teacher's view without removing them from the database.
+     * 
+     * This code actually checks that the lesson is a preview lesson - writes out a warning message if it is not
+     * a preview lesson.
+     * 
+     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#deleteLesson(org.lamsfoundation.lams.lesson.Lesson)
+     * TODO remove the related tool data.
+     */
+    public void deleteLesson(Lesson lesson) {
+    	
+		if ( lesson != null && lesson.getLearningDesign()!= null && lesson.getLearningDesign().getCopyTypeID() != null && 
+				LearningDesign.COPY_TYPE_PREVIEW == lesson.getLearningDesign().getCopyTypeID().intValue() ) { 
+	        lessonDAO.deleteLesson(lesson);
+		} else {
+			log.warn("Unable to delete lesson as lesson is not a preview lesson. Learning design copy type was "
+					+(lesson != null && lesson.getLearningDesign()!= null ? lesson.getLearningDesign().getCopyTypeID() : null)
+					+" Lesson is "+lesson);
+		}
+
+    }
+    
     /**
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#openGate(org.lamsfoundation.lams.learningdesign.GateActivity)
      */
@@ -757,7 +815,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getAllLessons(java.lang.Integer)
      */
     public List getAllLessons(Integer userID)throws IOException{
-    	return lessonDAO.getLessonsForUser(userID);
+    	return lessonDAO.getLessonsCreatedByUser(userID);
     }
 
     /**
@@ -1429,5 +1487,82 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     	
     	return learningDesignDAO.getLearningDesignByUserId(userId);
     }
+    
+   //---------------------------------------------------------------------
+   // Preview related methods
+   //---------------------------------------------------------------------
+   /* (non-Javadoc)
+   	 * @see org.lamsfoundation.lams.preview.service.IPreviewService#createPreviewClassForLesson(long, long)
+   	 */
+       public Lesson createPreviewClassForLesson(int userID, long lessonID) throws UserAccessDeniedException {
+
+           User user = userManagementService.getUserById(new Integer(userID));
+           if ( user == null ) {
+           	throw new UserAccessDeniedException("User "+userID+" not found");
+           }
+           Organisation organisation = user.getBaseOrganisation();
+           
+           // create the lesson class - add the teacher as the learner and as staff
+           LinkedList learners = new LinkedList();
+           learners.add(user);
+
+           LinkedList staffs = new LinkedList();
+           staffs.add(user);
+           
+           return createLessonClassForLesson(lessonID,
+           		organisation,
+           		"Learner Group",
+   				learners,
+   				"Staff Group",
+                   staffs);
+
+       }
+    
+       /* (non-Javadoc)
+   	 * @see org.lamsfoundation.lams.preview.service.IPreviewService#deletePreviewSession(long)
+   	 */
+       public void deletePreviewLesson(long lessonID) {
+       	Lesson lesson = lessonDAO.getLesson(new Long(lessonID));
+       	if ( lesson != null ) {
+       		if ( lesson.getLearningDesign().getCopyTypeID() != null && 
+       				LearningDesign.COPY_TYPE_PREVIEW == lesson.getLearningDesign().getCopyTypeID().intValue() ) { 
+       	    	deleteLesson(lesson);
+       		} else {
+       			log.warn("Unable to delete lesson as lesson is not a preview lesson. Learning design copy type was "+lesson.getLearningDesign().getCopyTypeID());
+       		}
+       	}
+       }
+
+       /* (non-Javadoc)
+   	 * @see org.lamsfoundation.lams.preview.service.IPreviewService#deleteAllOldPreviewLessons(int)
+   	 */
+       public int deleteAllOldPreviewLessons(int numDays) {
+
+   	    // Contract checking 
+   	    if ( numDays <= 0 ) {
+   	    	log.error("deleteAllOldPreviewSessions: number of days invalid ("+numDays+"). Unable to delete any preview lessons");
+   	    	return 0;
+   	    }
+   	   
+     		int numDeleted = 0;
+
+     		// calculate comparison date
+   	    long newestDateToKeep = System.currentTimeMillis() - ( numDays * numMilliSecondsInADay);
+   	    Date date = new Date(newestDateToKeep);
+   	    // convert data to UTC
+   	    log.info("Deleting all preview lessons before "+date.toString()+" (server time) ("+newestDateToKeep+")");
+     	  
+     		// get all the preview sessions older than a particular date.
+   	    List sessions = lessonDAO.getPreviewLessonsBeforeDate(date);
+   	    Iterator iter = sessions.iterator();
+   	    while (iter.hasNext()) {
+   	    	Lesson lesson = (Lesson) iter.next();
+   	    	deleteLesson(lesson);
+   	        log.info("Preview lesson deleted. Lesson was "+lesson);
+       	    numDeleted++;
+   		}
+   	    
+   		return numDeleted;
+       }
   
 }

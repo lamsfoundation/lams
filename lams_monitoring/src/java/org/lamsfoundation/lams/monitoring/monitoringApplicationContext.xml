@@ -73,6 +73,9 @@ http://www.gnu.org/licenses/gpl.txt
 				<prop key="removeLesson">PROPAGATION_REQUIRED</prop>
 				<prop key="openGate">PROPAGATION_REQUIRED</prop>
 				<prop key="closeGate">PROPAGATION_REQUIRED</prop>
+				<prop key="createPreviewClassForLesson">PROPAGATION_REQUIRED</prop>
+				<prop key="deletePreviewLesson">PROPAGATION_REQUIRED</prop>
+				<prop key="deleteAllOldPreviewLessons">PROPAGATION_REQUIRED</prop>
 			</props>
 		</property>
 	</bean>    
@@ -129,4 +132,5 @@ http://www.gnu.org/licenses/gpl.txt
     
     <bean id="scheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
     </bean>
+    
 </beans>
