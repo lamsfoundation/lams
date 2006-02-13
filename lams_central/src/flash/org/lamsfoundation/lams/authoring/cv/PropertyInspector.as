@@ -23,6 +23,7 @@ class PropertyInspector extends MovieClip{
 	 //References to components + clips 
     private var _container:MovieClip;       //The container window that holds the dialog. Will contain any init params that were passed into createPopUp
    
+    private var _tm:ThemeManager;
     private var toolDisplayName_lbl:Label;
 
    
@@ -51,21 +52,7 @@ class PropertyInspector extends MovieClip{
 
 	
 	
-	
-	//Comments tab
-	/*
-	private var runOffline_lbl:Label;
-    private var runOnline_lbl:Label;
-    private var runOffline_txa:TextArea;
-    private var runOnline_txa:TextArea;
-   */
-   
-   
-   
-	
-	
-	
-	
+
 	
 	//screen assets:
 	private var body_pnl:Panel;
@@ -83,8 +70,8 @@ class PropertyInspector extends MovieClip{
 	function PropertyInspector(){
 		//register to recive updates form the model
 		Debugger.log('Constructor',Debugger.GEN,'PropertyInspector','PropertyInspector');
+		_tm = ThemeManager.getInstance();
 		//Set up this class to use the Flash event delegation model
-    	
 		EventDispatcher.initialize(this);
 		
 		//let it wait one frame to set up the components.
@@ -100,9 +87,8 @@ class PropertyInspector extends MovieClip{
 		_canvasModel.addEventListener('viewUpdate',this);
 		
 		//Debugger.log('_canvasModel: ' + _canvasModel,Debugger.GEN,'init','PropertyInspector');
-		
+		setStyles();
 		//set up handlers
-
 		title_txt.addEventListener("focusOut",this);
 		desc_txt.addEventListener("focusOut",this);
 		runOffline_chk.addEventListener("click",this);
@@ -238,7 +224,7 @@ class PropertyInspector extends MovieClip{
 		//show from act and to act
 		
 	}
-	/**/
+
 	private function checkEnableGateControls(){
 		//Debugger.log('Activity.SCHEDULE_GATE_ACTIVITY_TYPE:'+Activity.SCHEDULE_GATE_ACTIVITY_TYPE,Debugger.GEN,'checkEnableGateControls','PropertyInspector');
 		//Debugger.log('_canvasModel.selectedItem.activity.activityTypeID:'+_canvasModel.selectedItem.activity.activityTypeID,Debugger.GEN,'checkEnableGateControls','PropertyInspector');
@@ -313,6 +299,44 @@ class PropertyInspector extends MovieClip{
         bar_pnl.setSize(w);
 
         
+    }
+	
+	private function setStyles() {
+        
+		var styleObj = _tm.getStyleObject('button');
+		editGrouping_btn.setStyle('styleName',styleObj);
+		
+		styleObj = _tm.getStyleObject('label');
+		title_lbl.setStyle('styleName',styleObj);
+		desc_lbl.setStyle('styleName',styleObj);
+		grouping_lbl.setStyle('styleName',styleObj);
+		currentGrouping_lbl.setStyle('styleName',styleObj);
+		gateType_lbl.setStyle('styleName',styleObj);
+		gateType_lbl.setStyle('styleName',styleObj);
+		startOffset_lbl.setStyle('styleName',styleObj);
+		endOffset_lbl.setStyle('styleName',styleObj);
+		hours_lbl.setStyle('styleName',styleObj);
+		mins_lbl.setStyle('styleName',styleObj);
+		
+		styleObj = _tm.getStyleObject('combo');
+		gateType_cmb.setStyle('styleName',styleObj);
+		
+		styleObj = _tm.getStyleObject('textinput');
+		title_txt.setStyle('styleName',styleObj);
+		desc_txt.setStyle('styleName',styleObj);
+		
+		styleObj = _tm.getStyleObject('checkbox');
+		runOffline_chk.setStyle('styleName',styleObj);
+		defineLater_chk.setStyle('styleName',styleObj);
+		
+		styleObj = _tm.getStyleObject('numericstepper');
+		hours_stp.setStyle('styleName',styleObj);
+		mins_stp.setStyle('styleName',styleObj);
+		endHours_stp.setStyle('styleName',styleObj);
+		endMins_stp.setStyle('styleName',styleObj);
+		
+		
+		
     }
     
     //Gets+Sets
