@@ -16,7 +16,11 @@ class org.lamsfoundation.lams.authoring.tk.TemplateActivity extends MovieClip{
      //Declarations  
 	 private var bkg_pnl:MovieClip;
 	 private var title_lbl:Label;
-	 private var select_btn:Button;	 private var icon_mc:MovieClip;		 private var _instance:TemplateActivity;	 private var icon_mcl:MovieClipLoader;
+	 private var select_btn:Button;
+	 private var icon_mc:MovieClip;
+	
+	 private var _instance:TemplateActivity;
+	 private var icon_mcl:MovieClipLoader;
 	 
 
 	 //this is set by the init object
@@ -29,9 +33,10 @@ class org.lamsfoundation.lams.authoring.tk.TemplateActivity extends MovieClip{
 	 private var _toolkitView:ToolkitView;
 	 
     /**  
-    * Constructor - creates an onEnterFrame doLater call to init
+     Constructor - creates an onEnterFrame doLater call to init
     */ 
-    function TemplateActivity() {          this.onEnterFrame = init;
+    function TemplateActivity() {  
+        this.onEnterFrame = init;
 		
 		_childActivities = new Array();
 		
@@ -44,7 +49,8 @@ class org.lamsfoundation.lams.authoring.tk.TemplateActivity extends MovieClip{
 		delete this.onEnterFrame;
 		
 		_instance = this;
-				var tkv = ToolkitView(_toolkitView);
+		
+		var tkv = ToolkitView(_toolkitView);
 		
 		//Set up this class to use the Flash event delegation model  
         EventDispatcher.initialize(this);  
@@ -74,10 +80,12 @@ class org.lamsfoundation.lams.authoring.tk.TemplateActivity extends MovieClip{
 		
 		icon_mcl = new MovieClipLoader();
 		icon_mcl.addListener(this);
-				//Debugger.log('_toolkitView:'+_toolkitView.getClassname(),4,'init','TemplateActivity');
+		
+		//Debugger.log('_toolkitView:'+_toolkitView.getClassname(),4,'init','TemplateActivity');
 		//set up the button handlers
 		select_btn.onPress = Proxy.create(this,this['select']);
-		//create an mc to hold th icon		icon_mc = this.createEmptyMovieClip("icon_mc",getNextHighestDepth());
+		//create an mc to hold th icon
+		icon_mc = this.createEmptyMovieClip("icon_mc",getNextHighestDepth());
 		loadIcon();
 	}
 
@@ -99,7 +107,8 @@ class org.lamsfoundation.lams.authoring.tk.TemplateActivity extends MovieClip{
 			new LFError("Cannot handle this activity type yet","setUpComplexActivity",this,'_mainActivity.activityTypeID:'+_mainActivity.activityTypeID);
 		}
 	}
-		/**  
+	
+	/**  
 	* Loads the icon for the temopate activity using a movieclip loader
 	*
 	*/
@@ -153,10 +162,13 @@ class org.lamsfoundation.lams.authoring.tk.TemplateActivity extends MovieClip{
 	private function draw():Void{
 		
 		//Debugger.log('bkg_pnl:'+bkg_pnl,4,'draw','TemplateActivity');
-		bkg_pnl.setStyle("borderStyle","outset");		//Debugger.log('Setting '+this+' title '+_templateActivityData.title,4,'draw','TemplateActivity')
+		bkg_pnl.setStyle("borderStyle","outset");
+		//Debugger.log('Setting '+this+' title '+_templateActivityData.title,4,'draw','TemplateActivity')
 		title_lbl.text=_mainActivity.title;
-		//attach the icon now...		
-		//icon_mc.loadMovie("http://dolly.uklams.net/lams/lams_central/icons/icon_chat.swf");		icon_mc._width = 20;
+		//attach the icon now...
+		
+		//icon_mc.loadMovie("http://dolly.uklams.net/lams/lams_central/icons/icon_chat.swf");
+		icon_mc._width = 20;
 		icon_mc._height = 20;
 		//Debugger.log('icon_mc._width:'+icon_mc._width,4,'draw','TemplateActivity');
 		//Debugger.log('icon_mc._height:'+icon_mc._height,4,'draw','TemplateActivity');
@@ -210,11 +222,13 @@ class org.lamsfoundation.lams.authoring.tk.TemplateActivity extends MovieClip{
 		if(selected){
 			//TODO: Get the StyleObj from Style manager and apply the selected type state thang
 			bkg_pnl.setStyle("backgroundColor",0x0099ff);
-			bkg_pnl.setStyle("borderStyle","inset");			
+			bkg_pnl.setStyle("borderStyle","inset");
+			
 		}else{
 			bkg_pnl.setStyle("backgroundColor",0xCCCCCC);
 			bkg_pnl.setStyle("borderStyle","outset");
-		}	}
+		}
+	}
 	
 	private function select():Void{
 		//Debugger.log('btn: '+this,4,'select','TemplateActivity');
