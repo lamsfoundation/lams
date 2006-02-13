@@ -1,0 +1,33 @@
+strict digraph class_diagram {
+  rankdir=LR;
+  WorkspaceView[
+    label="WorkspaceView",
+    URL="WorkspaceView.html",
+    tooltip="org.lamsfoundation.lams.common.ws.WorkspaceView",
+    shape="record"
+  ];
+  WorkspaceModel[
+    label="WorkspaceModel",
+    URL="WorkspaceModel.html",
+    tooltip="org.lamsfoundation.lams.common.ws.WorkspaceModel",
+    shape="record"
+  ];
+  WorkspaceDialog[
+    label="WorkspaceDialog",
+    URL="WorkspaceDialog.html",
+    tooltip="org.lamsfoundation.lams.common.ws.WorkspaceDialog",
+    shape="record"
+  ];
+  WorkspaceController[
+    label="WorkspaceController",
+    URL="WorkspaceController.html",
+    tooltip="org.lamsfoundation.lams.common.ws.WorkspaceController",
+    shape="record"
+  ];
+  Workspace[
+    label="Workspace",
+    URL="Workspace.html",
+    tooltip="org.lamsfoundation.lams.common.ws.Workspace",
+    shape="record"
+  ];
+}

@@ -1,0 +1,27 @@
+strict digraph class_diagram {
+  rankdir=LR;
+  VisualElement[
+    label="VisualElement",
+    URL="VisualElement.html",
+    tooltip="org.lamsfoundation.lams.common.style.VisualElement",
+    shape="record"
+  ];
+  ThemeManager[
+    label="ThemeManager",
+    URL="ThemeManager.html",
+    tooltip="org.lamsfoundation.lams.common.style.ThemeManager",
+    shape="record"
+  ];
+  Theme[
+    label="Theme",
+    URL="Theme.html",
+    tooltip="org.lamsfoundation.lams.common.style.Theme",
+    shape="record"
+  ];
+  LFButtonSkin[
+    label="LFButtonSkin",
+    URL="LFButtonSkin.html",
+    tooltip="org.lamsfoundation.lams.common.style.LFButtonSkin",
+    shape="record"
+  ];
+}

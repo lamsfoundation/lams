@@ -1,0 +1,10 @@
+strict digraph interface_diagram {
+  rankdir=LR;
+  Observer[
+    label="Observer",
+    URL="Observer.html",
+    tooltip="org.lamsfoundation.lams.common.util.Observer",
+    fontname="Times-Italic",
+    shape="record"
+  ];
+}

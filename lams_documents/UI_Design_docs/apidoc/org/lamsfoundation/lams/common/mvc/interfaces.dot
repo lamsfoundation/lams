@@ -1,0 +1,17 @@
+strict digraph interface_diagram {
+  rankdir=LR;
+  View[
+    label="View",
+    URL="View.html",
+    tooltip="org.lamsfoundation.lams.common.mvc.View",
+    fontname="Times-Italic",
+    shape="record"
+  ];
+  Controller[
+    label="Controller",
+    URL="Controller.html",
+    tooltip="org.lamsfoundation.lams.common.mvc.Controller",
+    fontname="Times-Italic",
+    shape="record"
+  ];
+}

@@ -1,0 +1,30 @@
+<?xml version="1.0"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html><head><title>org.lamsfoundation.lams.common.util.Observable</title><link href="../../../../../style.css" rel="stylesheet" type="text/css"/><meta name="generator" content="http://www.badgers-in-foil.co.uk/projects/as2api/"/></head><body><div><a href="#skip_nav" title="Skip navigation"></a></div><ul class="main_nav"><li><a href="../../../../../overview-summary.html">Overview</a></li><li><a href="package-summary.html">Package</a></li><li><span class="nav_current">Class</span></li><li><a href="../../../../../index-files/index.html">Index</a></li></ul><div><a name="skip_nav"></a></div><h1>Class org.lamsfoundation.lams.common.util.Observable</h1><pre class="type_hierachy"><strong>org.lamsfoundation.lams.common.util.Observable</strong></pre><div class="type_description"><h2>Description</h2><p>
+ A Java-style Observable class used to represent the "subject"
+ of the Observer design pattern. Observers must implement the Observer
+ interface, and register to observe the subject via addObserver().
+</p></div><div class="field_index"><h2>Field Index</h2></div><div class="method_index"><h2>Method Index</h2><p><code>new <a href="#method_Observable">Observable()</a></code></p><a href="#method_addObserver">addObserver()</a>, <a href="#method_clearObservers">clearObservers()</a>, <a href="#method_countObservers">countObservers()</a>, <a href="#method_hasChanged">hasChanged()</a>, <a href="#method_notifyObservers">notifyObservers()</a>, <a href="#method_removeObserver">removeObserver()</a></div><div class="constructor_detail_list"><h2>Constructor Detail</h2><div class="method_details"><a name="method_Observable"/><h3>Observable</h3><code class="method_synopsis">public function <strong class="method_name">Observable</strong>()</code><div class="method_info"><p>
+ Constructor function.
+</p></div></div></div><div class="field_detail_list"><h2>Field Detail</h2></div><div class="method_detail_list"><h2>Method Detail</h2><div class="method_details alt_row"><a name="method_addObserver"/><h3>addObserver</h3><code class="method_synopsis">public function <strong class="method_name">addObserver</strong>(o:<a href="../../../../../org/lamsfoundation/lams/common/util/Observer.html" title="Interface org.lamsfoundation.lams.common.util.Observer" class="interface_name">Observer</a>):<span class="unresolved_type_name">Boolean</span></code><div class="method_info"><p>
+ Adds an observer to the list of observers.
+</p><h4>Parameters</h4><table class="arguments extra_info" summary=""><tr><td><code>o</code></td><td>The observer to be added.
+</td></tr></table></div></div><div class="method_details"><a name="method_removeObserver"/><h3>removeObserver</h3><code class="method_synopsis">public function <strong class="method_name">removeObserver</strong>(o:<a href="../../../../../org/lamsfoundation/lams/common/util/Observer.html" title="Interface org.lamsfoundation.lams.common.util.Observer" class="interface_name">Observer</a>):<span class="unresolved_type_name">Boolean</span></code><div class="method_info"><p>
+ Removes an observer from the list of observers.
+
+</p><h4>Parameters</h4><table class="arguments extra_info" summary=""><tr><td><code>o</code></td><td>The observer to remove.
+</td></tr></table></div></div><div class="method_details alt_row"><a name="method_notifyObservers"/><h3>notifyObservers</h3><code class="method_synopsis">public function <strong class="method_name">notifyObservers</strong>(infoObj:<span class="unresolved_type_name">Object</span>):<span class="void_name">Void</span></code><div class="method_info"><p>
+ Tell all observers that the subject has changed.
+
+</p><h4>Parameters</h4><table class="arguments extra_info" summary=""><tr><td><code>infoObj</code></td><td>An object containing arbitrary data
+                    to pass to observers.
+</td></tr></table></div></div><div class="method_details"><a name="method_clearObservers"/><h3>clearObservers</h3><code class="method_synopsis">public function <strong class="method_name">clearObservers</strong>():<span class="void_name">Void</span></code><div class="method_info"><p>
+ Removes all observers from the observer list.
+</p></div></div><div class="method_details alt_row"><a name="method_hasChanged"/><h3>hasChanged</h3><code class="method_synopsis">public function <strong class="method_name">hasChanged</strong>():<span class="unresolved_type_name">Boolean</span></code><div class="method_info"><p>
+ Checks if the subject has changed.
+
+</p><h4>Return</h4><p class="extra_info">true if the subject has changed, as determined by setChanged().
+</p></div></div><div class="method_details"><a name="method_countObservers"/><h3>countObservers</h3><code class="method_synopsis">public function <strong class="method_name">countObservers</strong>():<span class="unresolved_type_name">Number</span></code><div class="method_info"><p>
+ Returns the number of observers in the observer list.
+
+</p><h4>Return</h4><p class="extra_info">An integer: the number of observers for this subject.
+</p></div></div></div><ul class="main_nav"><li><a href="../../../../../overview-summary.html">Overview</a></li><li><a href="package-summary.html">Package</a></li><li><span class="nav_current">Class</span></li><li><a href="../../../../../index-files/index.html">Index</a></li></ul><div class="footer"><a href="http://www.badgers-in-foil.co.uk/projects/as2api/" title="ActionScript 2 API Documentation Generator">as2api</a></div></body></html>

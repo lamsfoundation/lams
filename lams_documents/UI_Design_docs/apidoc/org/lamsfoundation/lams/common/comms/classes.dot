@@ -1,0 +1,21 @@
+strict digraph class_diagram {
+  rankdir=LR;
+  WddxRecordset[
+    label="WddxRecordset",
+    URL="WddxRecordset.html",
+    tooltip="org.lamsfoundation.lams.common.comms.WddxRecordset",
+    shape="record"
+  ];
+  Wddx[
+    label="Wddx",
+    URL="Wddx.html",
+    tooltip="org.lamsfoundation.lams.common.comms.Wddx",
+    shape="record"
+  ];
+  Communication[
+    label="Communication",
+    URL="Communication.html",
+    tooltip="org.lamsfoundation.lams.common.comms.Communication",
+    shape="record"
+  ];
+}

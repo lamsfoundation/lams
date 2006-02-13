@@ -1,0 +1,7 @@
+<map id="class_diagram" name="class_diagram">
+<area shape="rect" href="ToolkitView.html" title="org.lamsfoundation.lams.authoring.tk.ToolkitView" alt="" coords="26,295,138,343" />
+<area shape="rect" href="ToolkitModel.html" title="org.lamsfoundation.lams.authoring.tk.ToolkitModel" alt="" coords="20,223,143,271" />
+<area shape="rect" href="ToolkitController.html" title="org.lamsfoundation.lams.authoring.tk.ToolkitController" alt="" coords="7,151,156,199" />
+<area shape="rect" href="Toolkit.html" title="org.lamsfoundation.lams.authoring.tk.Toolkit" alt="" coords="44,79,119,127" />
+<area shape="rect" href="TemplateActivity.html" title="org.lamsfoundation.lams.authoring.tk.TemplateActivity" alt="" coords="7,7,156,55" />
+</map>

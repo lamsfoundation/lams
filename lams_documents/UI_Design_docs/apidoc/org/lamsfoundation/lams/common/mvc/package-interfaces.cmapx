@@ -1,0 +1,4 @@
+<map id="interface_diagram" name="interface_diagram">
+<area shape="rect" href="View.html" title="org.lamsfoundation.lams.common.mvc.View" alt="" coords="22,79,94,127" />
+<area shape="rect" href="Controller.html" title="org.lamsfoundation.lams.common.mvc.Controller" alt="" coords="8,7,107,55" />
+</map>

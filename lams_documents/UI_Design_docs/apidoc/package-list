@@ -1,0 +1,12 @@
+org.lamsfoundation.lams.common.style
+org.lamsfoundation.lams.authoring.cv
+org.lamsfoundation.lams.common
+org.lamsfoundation.lams.authoring.tk
+org.lamsfoundation.lams.authoring
+org.lamsfoundation.lams.common.comms
+org.lamsfoundation.lams.common.dict
+org.lamsfoundation.lams.common.ws
+org.lamsfoundation.lams.authoring.tb
+org.lamsfoundation.lams.common.ui
+org.lamsfoundation.lams.common.util
+org.lamsfoundation.lams.common.mvc

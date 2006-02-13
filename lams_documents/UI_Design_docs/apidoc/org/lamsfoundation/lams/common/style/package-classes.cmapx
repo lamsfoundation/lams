@@ -1,0 +1,6 @@
+<map id="class_diagram" name="class_diagram">
+<area shape="rect" href="VisualElement.html" title="org.lamsfoundation.lams.common.style.VisualElement" alt="" coords="12,223,140,271" />
+<area shape="rect" href="ThemeManager.html" title="org.lamsfoundation.lams.common.style.ThemeManager" alt="" coords="7,151,145,199" />
+<area shape="rect" href="Theme.html" title="org.lamsfoundation.lams.common.style.Theme" alt="" coords="40,79,112,127" />
+<area shape="rect" href="LFButtonSkin.html" title="org.lamsfoundation.lams.common.style.LFButtonSkin" alt="" coords="13,7,139,55" />
+</map>

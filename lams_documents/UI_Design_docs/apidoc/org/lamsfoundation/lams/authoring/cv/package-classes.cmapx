@@ -1,0 +1,12 @@
+<map id="class_diagram" name="class_diagram">
+<area shape="rect" href="TransitionPropertiesDialog.html" title="org.lamsfoundation.lams.authoring.cv.TransitionPropertiesDialog" alt="" coords="7,655,228,703" />
+<area shape="rect" href="PropertyInspector.html" title="org.lamsfoundation.lams.authoring.cv.PropertyInspector" alt="" coords="40,583,195,631" />
+<area shape="rect" href="CanvasView.html" title="org.lamsfoundation.lams.authoring.cv.CanvasView" alt="" coords="60,511,175,559" />
+<area shape="rect" href="CanvasTransition.html" title="org.lamsfoundation.lams.authoring.cv.CanvasTransition" alt="" coords="43,439,192,487" />
+<area shape="rect" href="CanvasParallelActivity.html" title="org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity" alt="" coords="22,367,214,415" />
+<area shape="rect" href="CanvasModel.html" title="org.lamsfoundation.lams.authoring.cv.CanvasModel" alt="" coords="55,295,180,343" />
+<area shape="rect" href="CanvasController.html" title="org.lamsfoundation.lams.authoring.cv.CanvasController" alt="" coords="42,223,194,271" />
+<area shape="rect" href="CanvasActivity.html" title="org.lamsfoundation.lams.authoring.cv.CanvasActivity" alt="" coords="50,151,186,199" />
+<area shape="rect" href="Canvas.html" title="org.lamsfoundation.lams.authoring.cv.Canvas" alt="" coords="80,79,155,127" />
+<area shape="rect" href="Bin.html" title="org.lamsfoundation.lams.authoring.cv.Bin" alt="" coords="82,7,154,55" />
+</map>

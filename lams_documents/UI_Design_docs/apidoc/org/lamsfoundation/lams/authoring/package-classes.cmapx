@@ -1,0 +1,10 @@
+<map id="class_diagram" name="class_diagram">
+<area shape="rect" href="Transition.html" title="org.lamsfoundation.lams.authoring.Transition" alt="" coords="39,223,135,271" />
+<area shape="rect" href="ToolActivity.html" title="org.lamsfoundation.lams.authoring.ToolActivity" alt="" coords="233,43,348,91" />
+<area shape="rect" href="GroupingActivity.html" title="org.lamsfoundation.lams.authoring.GroupingActivity" alt="" coords="216,115,365,163" />
+<area shape="rect" href="GateActivity.html" title="org.lamsfoundation.lams.authoring.GateActivity" alt="" coords="233,187,348,235" />
+<area shape="rect" href="DesignDataModel.html" title="org.lamsfoundation.lams.authoring.DesignDataModel" alt="" coords="8,79,165,127" />
+<area shape="rect" href="ComplexActivity.html" title="org.lamsfoundation.lams.authoring.ComplexActivity" alt="" coords="217,259,364,307" />
+<area shape="rect" href="Application.html" title="org.lamsfoundation.lams.authoring.Application" alt="" coords="32,7,141,55" />
+<area shape="rect" href="Activity.html" title="org.lamsfoundation.lams.authoring.Activity" alt="" coords="45,151,128,199" />
+</map>

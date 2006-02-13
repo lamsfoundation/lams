@@ -1,0 +1,34 @@
+<?xml version="1.0"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html><head><title>org.lamsfoundation.lams.common.ui.Panel</title><link href="../../../../../style.css" rel="stylesheet" type="text/css"/><meta name="generator" content="http://www.badgers-in-foil.co.uk/projects/as2api/"/></head><body><div><a href="#skip_nav" title="Skip navigation"></a></div><ul class="main_nav"><li><a href="../../../../../overview-summary.html">Overview</a></li><li><a href="package-summary.html">Package</a></li><li><span class="nav_current">Class</span></li><li><a href="../../../../../index-files/index.html">Index</a></li></ul><div><a name="skip_nav"></a></div><h1>Class org.lamsfoundation.lams.common.ui.Panel</h1><pre class="type_hierachy">????
+   +--<span class="unresolved_type_name">UIComponent</span>
+      +--<strong>org.lamsfoundation.lams.common.ui.Panel</strong></pre><div class="type_description"></div><div class="field_index"><h2>Field Index</h2><code><a href="#field_borderType">borderType</a></code>, <code><a href="#field_className">className</a></code>, <code><a href="#field_symbolName">symbolName</a></code>, <code><a href="#field_symbolOwner">symbolOwner</a></code></div><div class="method_index"><h2>Method Index</h2><p><code>new <a href="#method_Panel">Panel()</a></code></p><a href="#method_draw">draw()</a>, <a href="#method_init">init()</a>, <a href="#method_setStyle">setStyle()</a>, <a href="#method_size">size()</a></div><div class="constructor_detail_list"><h2>Constructor Detail</h2><div class="method_details"><a name="method_Panel"/><h3>Panel</h3><code class="method_synopsis">function <strong class="method_name">Panel</strong>()</code><div class="method_info"><p>
+ Constructor (Empty)
+
+</p></div></div></div><div class="field_detail_list"><h2>Field Detail</h2><a name="field_symbolName"/><h3>symbolName</h3><div class="field_details"><code class="field_synopsis">static <strong class="field_name">symbolName</strong>:<span class="unresolved_type_name">String</span></code></div><a name="field_symbolOwner"/><h3>symbolOwner</h3><div class="field_details"><code class="field_synopsis">static <strong class="field_name">symbolOwner</strong>:<span class="unresolved_type_name">Object</span></code></div><a name="field_className"/><h3>className</h3><div class="field_details"><code class="field_synopsis"><strong class="field_name">className</strong>:<span class="unresolved_type_name">String</span></code></div><a name="field_borderType"/><h3>borderType</h3><div class="field_details"><code class="field_synopsis"><strong class="field_name">borderType</strong>:<span class="unresolved_type_name">String</span></code></div></div><div class="method_detail_list"><h2>Method Detail</h2><div class="method_details alt_row"><a name="method_init"/><h3>init</h3><code class="method_synopsis">function <strong class="method_name">init</strong>():<span class="void_name">Void</span></code><div class="method_info"><p>
+ Intialisation, Flash calls the init() method
+ when the class is created. This method is
+ called once when a component is instantiated
+ and never again. NOTE: CALLED BY UI OBJECT so don't call explicitly here
+
+</p></div></div><div class="method_details"><a name="method_draw"/><h3>draw</h3><code class="method_synopsis">public function <strong class="method_name">draw</strong>():<span class="void_name">Void</span></code><div class="method_info"><p>
+ The draw method is invoked after the component has
+ been invalidated, by someone (USUALLY UI OBJECT) calling invalidate().
+ This is better than redrawing from within the set function
+ for value, because if there are other properties, it's
+ better to batch up the changes into one redraw, rather
+ than doing them all individually. This approach leads
+ to more efficiency and better centralization of code.
+
+ Here we just call layout children and the super
+
+</p></div></div><div class="method_details alt_row"><a name="method_size"/><h3>size</h3><code class="method_synopsis">public function <strong class="method_name">size</strong>(Void):<span class="void_name">Void</span></code><div class="method_info"><p>
+ Overrides the function in UIObject.
+ Calls invalidate, which will call draw() one frame
+ later and therefore will call layoutChildren
+ - to hanlde the size...
+</p></div></div><div class="method_details"><a name="method_setStyle"/><h3>setStyle</h3><code class="method_synopsis">public function <strong class="method_name">setStyle</strong>(styleProp:<span class="unresolved_type_name">String</span>, newValue):<span class="void_name">Void</span></code><div class="method_info"><p>
+ General set style method
+</p><h4>Parameters</h4><table class="arguments extra_info" summary=""><tr><td><code>styleProp</code></td><td>The property to affect, can be backgroundColor or borderStyle
+</td></tr><tr><td><code>newValue</code></td><td>the value to assign to that styleProp. Colours can be in name or hex format, borders as in set borderType
+
+</td></tr></table></div></div></div><ul class="main_nav"><li><a href="../../../../../overview-summary.html">Overview</a></li><li><a href="package-summary.html">Package</a></li><li><span class="nav_current">Class</span></li><li><a href="../../../../../index-files/index.html">Index</a></li></ul><div class="footer"><a href="http://www.badgers-in-foil.co.uk/projects/as2api/" title="ActionScript 2 API Documentation Generator">as2api</a></div></body></html>

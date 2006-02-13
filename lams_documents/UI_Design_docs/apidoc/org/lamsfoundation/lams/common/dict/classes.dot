@@ -1,0 +1,15 @@
+strict digraph class_diagram {
+  rankdir=LR;
+  DictionaryItem[
+    label="DictionaryItem",
+    URL="DictionaryItem.html",
+    tooltip="org.lamsfoundation.lams.common.dict.DictionaryItem",
+    shape="record"
+  ];
+  Dictionary[
+    label="Dictionary",
+    URL="Dictionary.html",
+    tooltip="org.lamsfoundation.lams.common.dict.Dictionary",
+    shape="record"
+  ];
+}

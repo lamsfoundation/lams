@@ -1,0 +1,10 @@
+strict digraph interface_diagram {
+  rankdir=LR;
+  ICanvasActivity[
+    label="ICanvasActivity",
+    URL="ICanvasActivity.html",
+    tooltip="org.lamsfoundation.lams.authoring.cv.ICanvasActivity",
+    fontname="Times-Italic",
+    shape="record"
+  ];
+}

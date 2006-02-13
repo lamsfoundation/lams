@@ -1,0 +1,33 @@
+strict digraph class_diagram {
+  rankdir=LR;
+  ToolkitView[
+    label="ToolkitView",
+    URL="ToolkitView.html",
+    tooltip="org.lamsfoundation.lams.authoring.tk.ToolkitView",
+    shape="record"
+  ];
+  ToolkitModel[
+    label="ToolkitModel",
+    URL="ToolkitModel.html",
+    tooltip="org.lamsfoundation.lams.authoring.tk.ToolkitModel",
+    shape="record"
+  ];
+  ToolkitController[
+    label="ToolkitController",
+    URL="ToolkitController.html",
+    tooltip="org.lamsfoundation.lams.authoring.tk.ToolkitController",
+    shape="record"
+  ];
+  Toolkit[
+    label="Toolkit",
+    URL="Toolkit.html",
+    tooltip="org.lamsfoundation.lams.authoring.tk.Toolkit",
+    shape="record"
+  ];
+  TemplateActivity[
+    label="TemplateActivity",
+    URL="TemplateActivity.html",
+    tooltip="org.lamsfoundation.lams.authoring.tk.TemplateActivity",
+    shape="record"
+  ];
+}

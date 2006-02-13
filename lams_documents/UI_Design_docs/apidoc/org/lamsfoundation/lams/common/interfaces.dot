@@ -1,0 +1,10 @@
+strict digraph interface_diagram {
+  rankdir=LR;
+  Dialog[
+    label="Dialog",
+    URL="Dialog.html",
+    tooltip="org.lamsfoundation.lams.common.Dialog",
+    fontname="Times-Italic",
+    shape="record"
+  ];
+}

@@ -1,0 +1,21 @@
+strict digraph class_diagram {
+  rankdir=LR;
+  PreferencesDialog[
+    label="PreferencesDialog",
+    URL="PreferencesDialog.html",
+    tooltip="org.lamsfoundation.lams.common.PreferencesDialog",
+    shape="record"
+  ];
+  DebugDialog[
+    label="DebugDialog",
+    URL="DebugDialog.html",
+    tooltip="org.lamsfoundation.lams.common.DebugDialog",
+    shape="record"
+  ];
+  Config[
+    label="Config",
+    URL="Config.html",
+    tooltip="org.lamsfoundation.lams.common.Config",
+    shape="record"
+  ];
+}

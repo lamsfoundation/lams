@@ -1,0 +1,27 @@
+strict digraph class_diagram {
+  rankdir=LR;
+  ToolbarView[
+    label="ToolbarView",
+    URL="ToolbarView.html",
+    tooltip="org.lamsfoundation.lams.authoring.tb.ToolbarView",
+    shape="record"
+  ];
+  ToolbarModel[
+    label="ToolbarModel",
+    URL="ToolbarModel.html",
+    tooltip="org.lamsfoundation.lams.authoring.tb.ToolbarModel",
+    shape="record"
+  ];
+  ToolbarController[
+    label="ToolbarController",
+    URL="ToolbarController.html",
+    tooltip="org.lamsfoundation.lams.authoring.tb.ToolbarController",
+    shape="record"
+  ];
+  Toolbar[
+    label="Toolbar",
+    URL="Toolbar.html",
+    tooltip="org.lamsfoundation.lams.authoring.tb.Toolbar",
+    shape="record"
+  ];
+}

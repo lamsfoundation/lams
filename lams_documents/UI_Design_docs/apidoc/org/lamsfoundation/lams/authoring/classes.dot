@@ -1,0 +1,55 @@
+strict digraph class_diagram {
+  rankdir=LR;
+  Transition[
+    label="Transition",
+    URL="Transition.html",
+    tooltip="org.lamsfoundation.lams.authoring.Transition",
+    shape="record"
+  ];
+  ToolActivity[
+    label="ToolActivity",
+    URL="ToolActivity.html",
+    tooltip="org.lamsfoundation.lams.authoring.ToolActivity",
+    shape="record"
+  ];
+  GroupingActivity[
+    label="GroupingActivity",
+    URL="GroupingActivity.html",
+    tooltip="org.lamsfoundation.lams.authoring.GroupingActivity",
+    shape="record"
+  ];
+  GateActivity[
+    label="GateActivity",
+    URL="GateActivity.html",
+    tooltip="org.lamsfoundation.lams.authoring.GateActivity",
+    shape="record"
+  ];
+  DesignDataModel[
+    label="DesignDataModel",
+    URL="DesignDataModel.html",
+    tooltip="org.lamsfoundation.lams.authoring.DesignDataModel",
+    shape="record"
+  ];
+  ComplexActivity[
+    label="ComplexActivity",
+    URL="ComplexActivity.html",
+    tooltip="org.lamsfoundation.lams.authoring.ComplexActivity",
+    shape="record"
+  ];
+  Application[
+    label="Application",
+    URL="Application.html",
+    tooltip="org.lamsfoundation.lams.authoring.Application",
+    shape="record"
+  ];
+  Activity[
+    label="Activity",
+    URL="Activity.html",
+    tooltip="org.lamsfoundation.lams.authoring.Activity",
+    shape="record"
+  ];
+  Activity -> ToolActivity;
+  Activity -> GroupingActivity;
+  Activity -> GateActivity;
+  Activity -> ComplexActivity;
+}

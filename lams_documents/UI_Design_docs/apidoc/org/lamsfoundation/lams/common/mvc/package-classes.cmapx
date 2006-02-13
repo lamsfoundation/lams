@@ -1,0 +1,4 @@
+<map id="class_diagram" name="class_diagram">
+<area shape="rect" href="AbstractView.html" title="org.lamsfoundation.lams.common.mvc.AbstractView" alt="" coords="25,79,151,127" />
+<area shape="rect" href="AbstractController.html" title="org.lamsfoundation.lams.common.mvc.AbstractController" alt="" coords="8,7,168,55" />
+</map>

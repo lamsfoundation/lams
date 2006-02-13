@@ -1,0 +1,11 @@
+<map id="class_diagram" name="class_diagram">
+<area shape="rect" href="Point.html" title="org.lamsfoundation.lams.common.ui.Point" alt="" coords="28,583,100,631" />
+<area shape="rect" href="Panel.html" title="org.lamsfoundation.lams.common.ui.Panel" alt="" coords="28,511,100,559" />
+<area shape="rect" href="LFWindow.html" title="org.lamsfoundation.lams.common.ui.LFWindow" alt="" coords="11,439,117,487" />
+<area shape="rect" href="LFMessage.html" title="org.lamsfoundation.lams.common.ui.LFMessage" alt="" coords="9,367,119,415" />
+<area shape="rect" href="LFMenuBar.html" title="org.lamsfoundation.lams.common.ui.LFMenuBar" alt="" coords="8,295,120,343" />
+<area shape="rect" href="InputDialog.html" title="org.lamsfoundation.lams.common.ui.InputDialog" alt="" coords="9,223,119,271" />
+<area shape="rect" href="Grid.html" title="org.lamsfoundation.lams.common.ui.Grid" alt="" coords="28,151,100,199" />
+<area shape="rect" href="Dialog.html" title="org.lamsfoundation.lams.common.ui.Dialog" alt="" coords="28,79,100,127" />
+<area shape="rect" href="Cursor.html" title="org.lamsfoundation.lams.common.ui.Cursor" alt="" coords="28,7,100,55" />
+</map>

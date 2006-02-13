@@ -1,0 +1,15 @@
+strict digraph class_diagram {
+  rankdir=LR;
+  AbstractView[
+    label="AbstractView",
+    URL="AbstractView.html",
+    tooltip="org.lamsfoundation.lams.common.mvc.AbstractView",
+    shape="record"
+  ];
+  AbstractController[
+    label="AbstractController",
+    URL="AbstractController.html",
+    tooltip="org.lamsfoundation.lams.common.mvc.AbstractController",
+    shape="record"
+  ];
+}
