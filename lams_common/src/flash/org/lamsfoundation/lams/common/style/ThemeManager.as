@@ -1,6 +1,7 @@
 ﻿import mx.events.*
 import mx.utils.*
 import mx.transitions.easing.*
+import org.lamsfoundation.lams.common.Config
 import org.lamsfoundation.lams.common.style.*
 import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.common.ui.*
@@ -69,13 +70,15 @@ class ThemeManager {
         _currentThemeName = theme;
         
         //Cookie or server?
-        if(CookieMonster.cookieExists('theme.'+theme)) {
+        if(CookieMonster.cookieExists('theme.'+theme)&&Config.USE_CACHE) {
             //Whilst waiting for theme to load from disk - show busy
             Cursor.showCursor(Application.C_HOURGLASS);            
             openFromDisk(theme);
             Cursor.showCursor(Application.C_DEFAULT);            
         }else {
-            openFromServer(theme);
+			//testing style creator
+			createThemeFromCode(theme);
+            //openFromServer(theme);
         }        
     }
     
@@ -119,17 +122,19 @@ class ThemeManager {
                 baseStyleObj.setStyle('color', 0x333648);
                 baseStyleObj.setStyle('themeColor', 0x266DEE);
                 baseStyleObj.setStyle('borderStyle', 'inset');
+				baseStyleObj.setStyle('fontFamily', 'Verdana');
+                baseStyleObj.setStyle('fontSize', 10);
+                baseStyleObj.setStyle('color', 0x333648);
                 
                 //Create default theme
                 _theme = new Theme('default',baseStyleObj);
+				
+				//NOTE all the items below do not need to re-define any vaules already defined above in the base SO
+				// when the SO is requested for a Visual Elemnent, the SO is merged with the base Style Object
         
                 //----BUTTON------------------------------------------------
                 //Style object
                 var buttonSO = new mx.styles.CSSStyleDeclaration();
-                buttonSO.setStyle('fontFamily', '_sans');
-                buttonSO.setStyle('fontSize', 10);
-                buttonSO.setStyle('color', 0x333648);
-                buttonSO.setStyle('themeColor', 0x266DEE);
                 buttonSO.setStyle('emphasizedStyleDeclaration', 0x266DEE);
                 
                 //Visual Element
@@ -141,9 +146,7 @@ class ThemeManager {
                 //----LABEL-------------------------------------------------
                 //Style object
                 var labelSO = new mx.styles.CSSStyleDeclaration();
-                labelSO.setStyle('fontFamily', '_sans');
-                labelSO.setStyle('fontSize', 14);
-                labelSO.setStyle('color', 0x333648);
+				//add any costom items here
                 //Visual Element
                 var labelVisualElement = new VisualElement('label',labelSO);
                 //add visual element to the default theme
@@ -153,10 +156,7 @@ class ThemeManager {
                 //----LFWINDOW--------------------------------------------
                 //Style object
                 var LFWindowSO = new mx.styles.CSSStyleDeclaration();
-                LFWindowSO.setStyle('fontFamily', '_sans');
                 LFWindowSO.setStyle('fontSize', 14);
-                LFWindowSO.setStyle('color', 0x333648);
-                LFWindowSO.setStyle('themeColor', 0x266DEE);
                 LFWindowSO.setStyle('borderStyle', 'inset');
                 //Visual Element
                 var LFWindowVisualElement = new VisualElement('LFWindow',LFWindowSO);
@@ -167,10 +167,6 @@ class ThemeManager {
                 //----TREE VIEW ---------------------------------------
                 //Style object
                 var treeviewSO = new mx.styles.CSSStyleDeclaration();
-                treeviewSO.setStyle('fontFamily', '_sans');
-                treeviewSO.setStyle('fontSize', 14);
-                treeviewSO.setStyle('color', 0x333648);
-                treeviewSO.setStyle('themeColor', 0x266DEE);
                 //treeviewSO.setStyle('rollOverColor', 0xC4C7D5);
                 treeviewSO.setStyle('openEasing', 'Elastic');
                 //Visual Element
@@ -182,10 +178,6 @@ class ThemeManager {
                 //----DATA GRID------------------------------------------
                 //Style object
                 var datagridSO = new mx.styles.CSSStyleDeclaration();
-                datagridSO.setStyle('fontFamily', '_sans');
-                datagridSO.setStyle('fontSize', 14);
-                datagridSO.setStyle('color', 0x333648);
-                datagridSO.setStyle('themeColor', 0x266DEE);
                 //datagridSO.setStyle('rollOverColor', 0xC4C7D5);
                 datagridSO.setStyle('openEasing', 'Elastic');
                 //Visual Element
@@ -194,14 +186,18 @@ class ThemeManager {
                 _theme.addVisualElement(datagridVisualElement);
                 //------------------------------------------------------
         
+				//----checkbox------------------------------------------
+                //Style object
+                var checkboxSO = new mx.styles.CSSStyleDeclaration();
+                //Visual Element
+                var checkboxVisualElement = new VisualElement('checkbox',checkboxSO);
+                //add visual element to the default theme
+                _theme.addVisualElement(comboVisualElement);
+                //------------------------------------------------------
         
                 //----COMBO------------------------------------------
                 //Style object
                 var comboSO = new mx.styles.CSSStyleDeclaration();
-                comboSO.setStyle('fontFamily', '_sans');
-                comboSO.setStyle('fontSize', 14);
-                comboSO.setStyle('color', 0x333648);
-                comboSO.setStyle('themeColor', 0x266DEE);
                 comboSO.setStyle('openEasing', Elastic.easeOut);
                 //Visual Element
                 var comboVisualElement = new VisualElement('combo',comboSO);
@@ -212,10 +208,6 @@ class ThemeManager {
                 //----LF MENU-------------------------------------------
                 //Style object
                 var lfMenuSO = new mx.styles.CSSStyleDeclaration();
-                lfMenuSO.setStyle('fontFamily', '_sans');
-                lfMenuSO.setStyle('fontSize', 14);
-                lfMenuSO.setStyle('color', 0x333648);
-                lfMenuSO.setStyle('themeColor', 0x266DEE);
                 lfMenuSO.setStyle('openEasing', Elastic.easeOut);
                 //Visual Element
                 var lfMenuVisualElement = new VisualElement('LFMenuBar',lfMenuSO);
@@ -397,12 +389,22 @@ class ThemeManager {
             default:        
         }
         
+		//New theme loaded so dispatch a load event
+        dispatchEvent({type:'load',target:this});
+		
         _currentThemeName = theme;
         
         //Now theme has been created save it to disk and broadcast themeChanged event
         saveToDisk();
         broadcastThemeChanged();
     }
+	
+	private function setGlobalDefaults():Void{
+		//go throughu the _theme and set the _global styles
+		_global.styles.Label.setStyle('styleName',getStyleObject('label'));
+		
+		
+	}
     
     /**
     * Retrieves an instance of the ThemeManager singleton, creating it if necessary
@@ -425,6 +427,7 @@ class ThemeManager {
     
     /**
     * Returns a style object with styles for the VisualElementId passed in
+	* Returns the base style object + any features overwritten by the extended visual elemnt definition.
     */
     public function getStyleObject(visualElementId:String):mx.styles.CSSStyleDeclaration{
         //TODO DI 06/05/05 check for errors here with ID not found
@@ -445,13 +448,16 @@ class ThemeManager {
             customSO = styleObjectToData(customSO);
             baseSO = styleObjectToData(baseSO);
             
-            //Merge/overwrite
+            //Merge/overwrite 
+			//TODO: This may not be working properly, button is not reciving style infor from base.
             for (var prop in customSO){
                 baseSO[prop] = customSO[prop];
             }  
             
             //Convert back
             baseSO = dataToStyleObject(baseSO);
+			
+			
         }
         
         //Construct style object by superimposing base style and visua
