@@ -2,6 +2,7 @@
 import org.lamsfoundation.lams.common.dict.*
 import org.lamsfoundation.lams.common.*
 import org.lamsfoundation.lams.common.util.*
+
 /*
 *Activity Data storage class. USed as a base class for extending to be Tool, Gate and Complex
 * <pre><code>
