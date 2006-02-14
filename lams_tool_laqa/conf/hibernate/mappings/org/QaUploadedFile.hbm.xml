@@ -7,7 +7,7 @@
 
 <class 
     name="org.lamsfoundation.lams.tool.qa.QaUploadedFile" 
-    table="tl_laqa11_uploadedfile"
+    table="tl_laqa11_uploadedFile"
 >
 
     <id
