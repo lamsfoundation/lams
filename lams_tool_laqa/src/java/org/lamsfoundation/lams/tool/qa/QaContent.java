@@ -31,6 +31,9 @@ public class QaContent implements Serializable {
 	static Logger logger = Logger.getLogger(QaContent.class.getName());
 	
 	/** identifier field */
+    private Long uid;
+    
+	/** identifier field */
     private Long qaContentId;
 	
     /** nullable persistent field */
@@ -495,5 +498,17 @@ public class QaContent implements Serializable {
 	 */
 	public void setQaUploadedFiles(Set qaUploadedFiles) {
 		this.qaUploadedFiles = qaUploadedFiles;
+	}
+	/**
+	 * @return Returns the uid.
+	 */
+	public Long getUid() {
+		return uid;
+	}
+	/**
+	 * @param uid The uid to set.
+	 */
+	public void setUid(Long uid) {
+		this.uid = uid;
 	}
 }

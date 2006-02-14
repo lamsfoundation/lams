@@ -22,14 +22,16 @@
 
 package org.lamsfoundation.lams.tool.qa.dao.hibernate;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.dao.IQaContentDAO;
-import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.springframework.orm.hibernate3.HibernateCallback;
+import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 
@@ -53,22 +55,42 @@ public class QaContentDAO extends HibernateDaoSupport implements IQaContentDAO {
 	 	
 	 	public QaContentDAO() {}
 
+	 	
 	 	public QaContent getQaById(long qaId)
 	    {
-	        return (QaContent) this.getHibernateTemplate()
-	                                   .load(QaContent.class, new Long(qaId));
+	 		return loadQaById(qaId);
 	    }
 	 	
-	 	/**
-	 	 * 
-	 	 * return null if not found
-	 	 */
+	 	/*
 	 	public QaContent loadQaById(long qaId)
 	    {
 	    	return (QaContent) this.getHibernateTemplate().get(QaContent.class, new Long(qaId));
 	    }
 
+		*/
+
+	 	public QaContent loadQaById(long qaId)
+	    {
+	 		String query = "from QaContent as qa where qa.qaContentId = ?";
+		    HibernateTemplate templ = this.getHibernateTemplate();
+			List list = getSession().createQuery(query)
+				.setLong(0,qaId)
+				.list();
+			
+			if(list != null && list.size() > 0){
+				QaContent qa = (QaContent) list.get(0);
+				return qa;
+			}
+			return null;
+	    }
+
+
 	 	
+	 	public QaContent getQaContentByUID(Long uid)
+		{
+			return (QaContent) this.getHibernateTemplate().get(QaContent.class, uid);
+		}
+		
 	 	
 	 	public void updateQa(QaContent qa)
 	    {

@@ -137,75 +137,6 @@ public class QaServicePOJO
     
     public QaServicePOJO(){}
     
-    public void setQaDAO(IQaContentDAO qaDAO)
-    {
-        this.qaDAO = qaDAO;
-    }
-    
-    public void setQaQueContentDAO(IQaQueContentDAO qaQueContentDAO)
-    {
-        this.qaQueContentDAO = qaQueContentDAO;
-    }
-
-    public void setQaSessionDAO(IQaSessionDAO qaSessionDAO)
-    {
-        this.qaSessionDAO = qaSessionDAO;
-    }
-    
-    public void setQaQueUsrDAO(IQaQueUsrDAO qaQueUsrDAO)
-    {
-        this.qaQueUsrDAO = qaQueUsrDAO;
-    }
-    
-    public void setQaUsrRespDAO(IQaUsrRespDAO qaUsrRespDAO)
-    {
-        this.qaUsrRespDAO = qaUsrRespDAO;
-    }
-
-    /**
-	 * @return Returns the qaDAO.
-	 */
-	public IQaContentDAO getQaDAO() {
-		return qaDAO;
-	}
-	/**
-	 * @return Returns the qaSessionDAO.
-	 */
-	public IQaSessionDAO getQaSessionDAO() {
-		return qaSessionDAO;
-	}
-	/**
-	 * @return Returns the qaUsrRespDAO.
-	 */
-	public IQaUsrRespDAO getQaUsrRespDAO() {
-		return qaUsrRespDAO;
-	}
-
-	/**
-	 * @return Returns the repositoryService.
-	 */
-	public IRepositoryService getRepositoryService() {
-		return repositoryService;
-	}
-	/**
-	 * @param repositoryService The repositoryService to set.
-	 */
-	public void setRepositoryService(IRepositoryService repositoryService) {
-		this.repositoryService = repositoryService;
-	}
-
-    
-    
-    public void setUserManagementService(IUserManagementService userManagementService)
-    {
-        this.userManagementService = userManagementService;
-    }
-    
-    public void setToolService(ILamsToolService toolService)
-    {
-        this.toolService = toolService;
-    }
-    
     
     public void createQa(QaContent qaContent) throws QaApplicationException
     {
@@ -220,7 +151,22 @@ public class QaServicePOJO
 														   e);
         }
     }
-	
+
+    public QaContent getQaContentByUID(Long uid) throws QaApplicationException
+    {
+        try
+        {
+            return qaDAO.getQaContentByUID(uid);
+        }
+        catch (DataAccessException e)
+        {
+            throw new QaApplicationException("Exception occured when lams is getting qa content by uid: "
+                                                         + e.getMessage(),
+														   e);
+        }
+    	
+    }
+    
     
     public QaContent retrieveQa(long toolContentId) throws QaApplicationException
     {
@@ -435,7 +381,20 @@ public class QaServicePOJO
                                               e);
         }
     }
-    
+
+    public List retrieveQaQueContentsByToolContentId(long qaContentId){
+        try
+        {
+            return qaQueContentDAO.getQaQueContentsByContentId(qaContentId);
+        }
+        catch (DataAccessException e)
+        {
+            throw new QaApplicationException("Exception occured when lams is loading qa que usr: "
+                                                         + e.getMessage(),
+                                                           e);
+        }
+    }
+
     
     public void updateQa(QaContent qa) throws QaApplicationException
     {
@@ -1715,17 +1674,73 @@ public class QaServicePOJO
 	public void setLearnerService(ILearnerService learnerService) {
 		this.learnerService = learnerService;
 	}
+	
+    public void setQaDAO(IQaContentDAO qaDAO)
+    {
+        this.qaDAO = qaDAO;
+    }
     
-    public List retrieveQaQueContentsByToolContentId(long qaContentId){
-        try
-        {
-            return qaQueContentDAO.getQaQueContentsByContentId(qaContentId);
-        }
-        catch (DataAccessException e)
-        {
-            throw new QaApplicationException("Exception occured when lams is loading qa que usr: "
-                                                         + e.getMessage(),
-                                                           e);
-        }
+    public void setQaQueContentDAO(IQaQueContentDAO qaQueContentDAO)
+    {
+        this.qaQueContentDAO = qaQueContentDAO;
+    }
+
+    public void setQaSessionDAO(IQaSessionDAO qaSessionDAO)
+    {
+        this.qaSessionDAO = qaSessionDAO;
+    }
+    
+    public void setQaQueUsrDAO(IQaQueUsrDAO qaQueUsrDAO)
+    {
+        this.qaQueUsrDAO = qaQueUsrDAO;
+    }
+    
+    public void setQaUsrRespDAO(IQaUsrRespDAO qaUsrRespDAO)
+    {
+        this.qaUsrRespDAO = qaUsrRespDAO;
+    }
+
+    /**
+	 * @return Returns the qaDAO.
+	 */
+	public IQaContentDAO getQaDAO() {
+		return qaDAO;
+	}
+	/**
+	 * @return Returns the qaSessionDAO.
+	 */
+	public IQaSessionDAO getQaSessionDAO() {
+		return qaSessionDAO;
+	}
+	/**
+	 * @return Returns the qaUsrRespDAO.
+	 */
+	public IQaUsrRespDAO getQaUsrRespDAO() {
+		return qaUsrRespDAO;
+	}
+
+	/**
+	 * @return Returns the repositoryService.
+	 */
+	public IRepositoryService getRepositoryService() {
+		return repositoryService;
+	}
+	/**
+	 * @param repositoryService The repositoryService to set.
+	 */
+	public void setRepositoryService(IRepositoryService repositoryService) {
+		this.repositoryService = repositoryService;
+	}
+
+    
+    
+    public void setUserManagementService(IUserManagementService userManagementService)
+    {
+        this.userManagementService = userManagementService;
+    }
+    
+    public void setToolService(ILamsToolService toolService)
+    {
+        this.toolService = toolService;
     }
 }

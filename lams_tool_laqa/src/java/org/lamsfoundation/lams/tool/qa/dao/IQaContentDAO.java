@@ -46,6 +46,9 @@ public interface IQaContentDAO
 	 * @param sessionId
 	 * @return QaContent
 	 */
+	
+	public QaContent getQaContentByUID(Long uid);
+	
 	public QaContent getQaBySession(Long sessionId);
     
     public void saveQa(QaContent qa);

@@ -11,13 +11,22 @@
 >
 
     <id
+        name="uid"
+        type="java.lang.Long"
+        column="uid"
+    >
+        <generator class="native" />
+    </id>
+
+
+	<property
         name="qaContentId"
         type="java.lang.Long"
         column="qa_content_id"
+        not-null="true"
+        length="20"
     >
-	    <generator class="assigned"/>
-    </id>
-
+    </property>
 
     <property
         name="title"
