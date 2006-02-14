@@ -97,7 +97,7 @@ public class MessageService {
     public String getMessage(String key, Object[] args, String defaultMessage){
     	String message = defaultMessage;
     	try {
-    		message = messageAccessor.getMessage(key,args,LocaleContextHolder.getLocale());
+    		message = messageAccessor.getMessage(key,args,defaultMessage,LocaleContextHolder.getLocale());
 		} catch (NoSuchMessageException e) {
 			message = defaultMessage;
 		}
