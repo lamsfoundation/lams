@@ -54,6 +54,8 @@ import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
 import org.lamsfoundation.lams.tool.forum.util.ForumToolContentHandler;
 import org.lamsfoundation.lams.tool.forum.util.TopicComparator;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
+import org.lamsfoundation.lams.util.MessageService;
+import org.springframework.context.support.MessageSourceAccessor;
 
 /**
  * 
@@ -75,7 +77,14 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	private ForumToolContentHandler forumToolContentHandler;
 	private IRepositoryService repositoryService;
 	private ILearnerService learnerService;
-
+    private MessageService messageService;
+	//---------------------------------------------------------------------
+    // Inversion of Control Methods - Method injection
+    //---------------------------------------------------------------------
+	public void setMessageService(MessageService messageService) {
+		this.messageService = messageService;
+	}
+	
     public Forum updateForum(Forum forum) throws PersistenceException {
         forumDao.saveOrUpdate(forum);
         return forum;
@@ -86,6 +95,9 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
     }
 
 	public Forum getForumByContentId(Long contentID)  throws PersistenceException {
+//    	String str = messageService.getMessage("label.authoring.heading.basic");
+//    	System.out.println(str);
+    	
 		Forum forum = (Forum) forumDao.getByContentId(contentID);
 		if(forum == null){
 			log.error("Could not find the content by given ID:"+contentID);
