@@ -77,6 +77,11 @@ public class User implements Serializable {
     private Boolean disabledFlag;
 
     /** persistent field */
+    private String localeLanguage;
+    /** persistent field */
+    private String localeCountry;
+    
+    /** persistent field */
     private Date createDate;
 
     /** persistent field */
@@ -639,6 +644,8 @@ public class User implements Serializable {
     						this.firstName,
 							this.lastName,
 							this.login,
+							this.localeLanguage,
+							this.localeCountry,
 							this.email,
 							new CSSThemeBriefDTO(this.theme));
     }
@@ -668,5 +675,28 @@ public class User implements Serializable {
 				return true;
 		}		
 		return false;
+	}
+
+	/**
+	 * @hibernate.property column="locale_country" length="2"
+	 * @param localeCountry
+	 */
+	public String getLocaleCountry() {
+		return localeCountry;
+	}
+
+	public void setLocaleCountry(String localeCountry) {
+		this.localeCountry = localeCountry;
+	}
+	/**
+	 * @hibernate.property column="locale_language" length="2"
+	 * @param localeCountry
+	 */
+	public String getLocaleLanguage() {
+		return localeLanguage;
+	}
+
+	public void setLocaleLanguage(String localeLanguage) {
+		this.localeLanguage = localeLanguage;
 	}	
 }

@@ -22,7 +22,6 @@
  */
 package org.lamsfoundation.lams.usermanagement.dto;
 
-import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
 import org.lamsfoundation.lams.themes.dto.CSSThemeBriefDTO;
 /**
  * @author Manpreet Minhas
@@ -33,6 +32,8 @@ public class UserDTO {
 	private String firstName;
 	private String lastName;
 	private String login;
+	private String localeLanguage;
+	private String localeCountry;
     private String email;
    // private CSSThemeVisualElement theme;
     private CSSThemeBriefDTO theme;
@@ -49,11 +50,14 @@ public class UserDTO {
 //	}
 	
 	public UserDTO(Integer userID, String firstName, String lastName,
-			String login, String email, CSSThemeBriefDTO theme) {		
+			String login, String localeLanguage, 
+			String localeCountry, String email, CSSThemeBriefDTO theme) {		
 		this.userID = userID;
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.login = login;
+		this.localeCountry = localeCountry;
+		this.localeLanguage = localeLanguage;
 		this.email = email;
 		this.theme = theme;
 	}
@@ -92,6 +96,21 @@ public class UserDTO {
 
 	public void setTheme(CSSThemeBriefDTO theme) {
 		this.theme = theme;
+	}
+
+
+	public String getEmail() {
+		return email;
+	}
+
+
+	public String getLocaleCountry() {
+		return localeCountry;
+	}
+
+
+	public String getLocaleLanguage() {
+		return localeLanguage;
 	}
 	
 //	public CSSThemeVisualElement getTheme() {

@@ -264,6 +264,31 @@
             not-null="true"
         </meta>    
     </property>
+    <property
+        name="localeLanguage"
+        type="java.lang.String"
+        column="locale_language"
+        length="2"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="locale_language"
+            length="2"
+        </meta>    
+    </property>
+    
+    <property
+        name="localeCountry"
+        type="java.lang.String"
+        column="locale_country"
+        length="2"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="locale_country"
+            length="2"
+        </meta>    
+    </property>
     
     <!-- Associations -->
   
