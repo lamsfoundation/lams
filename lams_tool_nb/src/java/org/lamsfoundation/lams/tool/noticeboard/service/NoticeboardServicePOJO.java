@@ -898,6 +898,7 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 		    if (defaultContent != null)
 		    {
 		        NoticeboardSession newSession = new NoticeboardSession(toolSessionId, 
+		        														toolSessionName,
 		                												defaultContent,
 		                												new Date(System.currentTimeMillis()),
 		                												NoticeboardSession.NOT_ATTEMPTED);
@@ -914,6 +915,7 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	    else
 	    {
 	        NoticeboardSession nbSession = new NoticeboardSession(toolSessionId,
+	        									  toolSessionName,
 												  nbContent,
 												  new Date(System.currentTimeMillis()),
 												  NoticeboardSession.NOT_ATTEMPTED);
