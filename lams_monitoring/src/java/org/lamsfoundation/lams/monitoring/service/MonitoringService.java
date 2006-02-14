@@ -74,6 +74,7 @@ import org.lamsfoundation.lams.usermanagement.dao.IUserDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IWorkspaceFolderDAO;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
@@ -126,10 +127,17 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     private IUserManagementService userManagementService;
     private Scheduler scheduler;
     private ApplicationContext applicationContext;
-    
-    //---------------------------------------------------------------------
+    private MessageService messageService;
+
+	//---------------------------------------------------------------------
     // Inversion of Control Methods - Method injection
     //---------------------------------------------------------------------
+    /**
+     * @param messageService the i18n Service bean.
+     */
+	public void setMessageService(MessageService messageService) {
+		this.messageService = messageService;
+	}
 	/**
 	 * @param userManagementService The userManagementService to set.
 	 */

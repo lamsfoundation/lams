@@ -29,7 +29,16 @@ http://www.gnu.org/licenses/gpl.txt
 <beans>
 
 	<!-- ========================= GENERAL DEFINITIONS ========================= -->
-	
+		<bean id="monitoringMessageService" class="org.lamsfoundation.lams.util.MessageService" singleton="true">
+		<property name="messageSource">
+			<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+				<property name="basename">
+					<value>org.lamsfoundation.lams.monitoring.MonitoringResources</value>
+				</property>
+			</bean>
+		</property>
+		
+	</bean>
 	<!-- ========================= BUSINESS OBJECT DEFINITIONS ======================== -->
 
 
