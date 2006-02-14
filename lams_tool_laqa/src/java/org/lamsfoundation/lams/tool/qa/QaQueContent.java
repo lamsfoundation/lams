@@ -49,6 +49,9 @@ public class QaQueContent implements Serializable,Comparable, Nullable
 {
 	static Logger logger = Logger.getLogger(QaQueContent.class.getName());
 	
+	/** identifier field */
+    private Long uid;
+
     /** identifier field */
     private Long qaQueContentId;
     
@@ -354,5 +357,17 @@ public class QaQueContent implements Serializable,Comparable, Nullable
 	 */
 	public void setQaContentId(Long qaContentId) {
 		this.qaContentId = qaContentId;
+	}
+	/**
+	 * @return Returns the uid.
+	 */
+	public Long getUid() {
+		return uid;
+	}
+	/**
+	 * @param uid The uid to set.
+	 */
+	public void setUid(Long uid) {
+		this.uid = uid;
 	}
 }

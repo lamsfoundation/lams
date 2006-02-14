@@ -33,6 +33,7 @@ import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.dao.IQaQueContentDAO;
 import org.springframework.orm.hibernate3.HibernateCallback;
+import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 
@@ -62,6 +63,23 @@ public class QaQueContentDAO extends HibernateDaoSupport implements IQaQueConten
 	             }
 	         });
 	    }
+	 	
+
+	 	public QaQueContent getQaQueById(long qaQueContentId)
+	 	{
+			String query = "from QaQueContent as qu where qu.qaQueContentId = ?";
+		    HibernateTemplate templ = this.getHibernateTemplate();
+			List list = getSession().createQuery(query)
+				.setLong(0,qaQueContentId)
+				.list();
+			
+			if(list != null && list.size() > 0){
+				QaQueContent qa = (QaQueContent) list.get(0);
+				return qa;
+			}
+			return null;
+	 	}
+
 
 	 	public List getQuestionIndsForContent(QaContent qa)
 	    {
@@ -73,11 +91,12 @@ public class QaQueContentDAO extends HibernateDaoSupport implements IQaQueConten
 			  return listDefaultQuestionIds;
 	    }
 	 	
-	 	
+	 	/*
 	 	public QaQueContent getQaQueById(long qaQueContentId)
 	 	{
 	 		return (QaQueContent) this.getHibernateTemplate().load(QaQueContent.class, new Long(qaQueContentId));
 	 	}
+	 	*/
 	 	
 		public void createQueContent(QaQueContent queContent) 
 	    {

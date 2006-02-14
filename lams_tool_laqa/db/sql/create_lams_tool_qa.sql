@@ -45,11 +45,12 @@ CREATE TABLE lams.tl_laqa11_que_usr (
 )TYPE=InnoDB;
 
 CREATE TABLE lams.tl_laqa11_que_content (
-       qa_que_content_id BIGINT(20) NOT NULL
+       uid BIGINT(20) NOT NULL AUTO_INCREMENT
+     , qa_que_content_id BIGINT(20) NOT NULL
      , question VARCHAR(255)
      , display_order INT(5)
      , qa_content_id BIGINT(20) NOT NULL
-     , PRIMARY KEY (qa_que_content_id)
+     , PRIMARY KEY (uid)
      , INDEX (qa_content_id)
      , CONSTRAINT FK_tl_laqa11_que_content_1 FOREIGN KEY (qa_content_id)
                   REFERENCES lams.tl_laqa11_content (uid)
@@ -64,12 +65,12 @@ CREATE TABLE lams.tl_laqa11_usr_resp (
      , que_usr_id BIGINT(20) NOT NULL
      , qa_que_content_id BIGINT(20) NOT NULL
      , PRIMARY KEY (response_id)
-     , INDEX (qa_que_content_id)
-     , CONSTRAINT FK_tl_laqa11_usr_resp_2 FOREIGN KEY (qa_que_content_id)
-                  REFERENCES lams.tl_laqa11_que_content (qa_que_content_id)
      , INDEX (que_usr_id)
      , CONSTRAINT FK_tl_laqa11_usr_resp_3 FOREIGN KEY (que_usr_id)
                   REFERENCES lams.tl_laqa11_que_usr (uid)
+     , INDEX (qa_que_content_id)
+     , CONSTRAINT FK_tl_laqa11_usr_resp_2 FOREIGN KEY (qa_que_content_id)
+                  REFERENCES lams.tl_laqa11_que_content (uid)
 )TYPE=InnoDB;
 
 CREATE TABLE lams.tl_laqa11_uploadedfile (
@@ -83,7 +84,6 @@ CREATE TABLE lams.tl_laqa11_uploadedfile (
      , CONSTRAINT FK_tl_laqa11_uploadedfile_1 FOREIGN KEY (qa_content_id)
                   REFERENCES lams.tl_laqa11_content (uid)
 )TYPE=InnoDB;
-
 
 -- data for content table
 INSERT INTO tl_laqa11_content (qa_content_id, 	creation_date)  VALUES (${default_content_id}, NOW());
