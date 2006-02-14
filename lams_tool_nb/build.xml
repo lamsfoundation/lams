@@ -283,6 +283,30 @@ Ant build file.
 
 	   </target>
 	
+	<!-- =================================================================== -->
+	<!-- Generate hibernate xml files                             			 -->
+	<!-- =================================================================== -->
+	  <target name="generate-hbm-files" 
+	   	description="Generate the hibernate hbm.xml files from the Java source (using XDoclet)">
+	  
+	  <taskdef name="hibernatedoclet"
+	   classname="xdoclet.modules.hibernate.HibernateDocletTask"
+	   classpathref="all-libs"/>
+	  
+	  <echo message="Building hbm.xml files using XDoclet"/>
+
+	  <hibernatedoclet
+	   destdir="${conf.hibernate.mapping.dir}"
+	   excludedtags="@version,@author,@todo"
+	   force="true">
+	    <fileset dir="${src.java.dir}">
+	    	<include name="**/*.java"/>
+	    </fileset>
+	   <hibernate version="3.0"/>
+	  </hibernatedoclet>
+	 </target>
+	
+	
 		<!-- =================================================================== -->
 		<!-- Run JUnit Tests                                                     -->
 		<!-- =================================================================== -->
