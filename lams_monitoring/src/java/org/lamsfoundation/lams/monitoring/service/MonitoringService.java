@@ -471,6 +471,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#startLessonOnSchedule(long , Date)
      */
     public void startLessonOnSchedule(long lessonId, Date startDate){
+
         JobDetail startLessonJob = getStartScheduleLessonJob();
         //setup the message for scheduling job
         startLessonJob.setName("startLessonOnSchedule");
@@ -531,6 +532,11 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
      */
     public void startLesson(long lessonId) 
     {
+//    	System.out.println(messageService.getMessage("NO.SUCH.LESSON",new Object[]{new Long(lessonId)}));
+//    	System.out.println(messageService.getMessage("INVALID.ACTIVITYID.USER", new Object[]{ "activityID","userID" }));
+//    	System.out.println(messageService.getMessage("INVALID.ACTIVITYID.TYPE", new Object[]{  "activityID"}));
+//    	System.out.println(messageService.getMessage("INVALID.ACTIVITYID.LESSONID",new Object[]{ "activityID","lessonID"}));
+//    	System.out.println(messageService.getMessage("INVALID.ACTIVITYID",new Object[]{ "activityID"}));
         if(log.isDebugEnabled())
             log.debug("=============Starting Lesson "+lessonId+"==============");
 
@@ -844,7 +850,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     		flashMessage = new FlashMessage("getLessonDetails",lesson.getLessonDetails());
     	}else
     		flashMessage = new FlashMessage("getLessonDetails",
-    										"No such Lesson with a lessonID of :" + lessonID + " exists.",
+    										messageService.getMessage("NO.SUCH.LESSON",new Object[]{lessonID}),
 											FlashMessage.ERROR);
     	return flashMessage.serializeMessage();    	
     }
@@ -865,7 +871,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     		flashMessage = new FlashMessage("getLessonLearners",lessonLearners);
     	}else
     		flashMessage = new FlashMessage("getLessonLearners",
-    										 "No such lesson with a lesson_id of :"+ lessonID + " exists",
+    										 messageService.getMessage("NO.SUCH.LESSON",new Object[]{lessonID}),
 											 FlashMessage.ERROR);
     	return flashMessage.serializeMessage();
     }    
@@ -894,7 +900,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     		flashMessage = new FlashMessage("getAllLearnersProgress",progressData);
     	}else{
     		flashMessage = new FlashMessage("getAllLearnersProgress",
-    											"No such lesson with a lesson_id of :"+ lessonID + " exists",
+    				 							messageService.getMessage("NO.SUCH.LESSON",new Object[]{lessonID}),
 												FlashMessage.ERROR);
     	}
     	return flashMessage.serializeMessage();
@@ -920,7 +926,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     		flashMessage = new FlashMessage("getAllContributeActivities",sortedSet);
     	}else{
     		flashMessage = new FlashMessage("getAllContributeActivities",
-    										"No such lesson with a lesson_id of " + lessonID + "exists",
+    										messageService.getMessage("NO.SUCH.LESSON",new Object[]{lessonID}),
 											FlashMessage.ERROR);
     	}
     	return flashMessage.serializeMessage();    	
@@ -935,7 +941,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     	FlashMessage flashMessage;
     	if(activity==null || user==null){
     		flashMessage = new FlashMessage("getLearnerActivityURL",
-    										"Invalid activityID/User :" + activityID + " : " + userID,
+    										messageService.getMessage("INVALID.ACTIVITYID.USER", new Object[]{ activityID,userID }),
 											FlashMessage.ERROR);
     	}else{
     		if(activity.isToolActivity()){
@@ -944,7 +950,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         		flashMessage = new FlashMessage("getLearnerActivityURL",new ProgressActivityDTO(activityID,toolURL));
         	}else{
         		flashMessage = new FlashMessage("getLearnerActivityURL",
-        										"Invalid Activity type: " + activity.getActivityId()+ "\n Only ToolActivity allowed.",
+        										messageService.getMessage("INVALID.ACTIVITYID.TYPE", new Object[]{ activity.getActivityId()}),
 												FlashMessage.ERROR);
         	}    		
     	}   	
@@ -1059,7 +1065,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 				flashMessage = FlashMessage.getUserNotAuthorized("moveLesson",userID);
 		}else{
 			flashMessage = new FlashMessage("moveLesson",
-											"No such lesson with a lesson_id of :" + lessonID +" exists.",
+											messageService.getMessage("NO.SUCH.LESSON",new Object[]{lessonID}),
 											FlashMessage.ERROR);
 											
 		}
@@ -1082,7 +1088,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 	 			flashMessage = FlashMessage.getUserNotAuthorized("renameLesson",userID);
 	 	}else
 	 		flashMessage = new FlashMessage("renameLesson",
-	 										"No such lesson with a lesson_id of :" + lessonID +" exists.",
+	 										messageService.getMessage("NO.SUCH.LESSON",new Object[]{lessonID}),
 											FlashMessage.ERROR);
 	 	return flashMessage.serializeMessage();
 	 }
@@ -1099,7 +1105,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 	    
 	    if(gate==null || lesson==null){
 	    		flashMessage = new FlashMessage("checkGateStatus",
-	    										"Invalid activityID/lessonID :" + activityID + " : " + lessonID,
+	    										messageService.getMessage("INVALID.ACTIVITYID.LESSONID",new Object[]{activityID,lessonID}),
 												FlashMessage.ERROR);
 	    }
 	    else
@@ -1122,7 +1128,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 	    if (gate ==null)
 	    {
 	        flashMessage = new FlashMessage("releaseGate", 
-	                						"Invalid activityID :" + activityID, 
+	        								messageService.getMessage("INVALID.ACTIVITYID",new Object[]{activityID}),
 	                						FlashMessage.ERROR);
 	    }
 	    else

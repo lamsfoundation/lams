@@ -64,6 +64,7 @@ http://www.gnu.org/licenses/gpl.txt
 		<property name="learnerService"><ref bean="learnerService"/></property>			
 		<property name="userManagementService"><ref bean="userManagementService"/></property>			
 		<property name="scheduler"><ref bean="scheduler"/></property>
+		<property name="messageService"><ref bean="monitoringMessageService"/></property>
 	</bean>	
 	
 	<bean id="monitoringService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
