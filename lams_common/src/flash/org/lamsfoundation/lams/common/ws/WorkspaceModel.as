@@ -235,9 +235,9 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 		// go throught the contents of DTO and add it aas children to the node to update.
 		for(var i=0; i<dto.contents.length; i++){
 			var key:String = dto.contents[i].resourceType+'_'+dto.contents[i].resourceID;
-			//TODO: Remove ID from label on demply
-			//var cNode = nodeToUpdate.addTreeNode(dto.contents[i].name,dto.contents[i]);
-			var cNode = nodeToUpdate.addTreeNode(dto.contents[i].name+':'+key,dto.contents[i]);
+			
+			var cNode = nodeToUpdate.addTreeNode(dto.contents[i].name,dto.contents[i]);
+			//var cNode = nodeToUpdate.addTreeNode(dto.contents[i].name+':'+key,dto.contents[i]);
 			cNode.attributes.data.parentWorkspaceFolderID = dto.parentWorkspaceFolderID;
 			//workspaceFolderID should always be the ID of the folder this resource is contained in
 			cNode.attributes.data.workspaceFolderID = dto.workspaceFolderID;

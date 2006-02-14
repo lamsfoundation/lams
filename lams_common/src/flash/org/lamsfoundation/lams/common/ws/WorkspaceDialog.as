@@ -32,7 +32,7 @@ class WorkspaceDialog extends MovieClip{
 	private var name_lbl:Label;
 	private var resourceTitle_txi:TextInput;
 	private var new_btn:Button;
-	private var cut_btn:Button;
+	//private var cut_btn:Button;
 	private var copy_btn:Button;
 	private var paste_btn:Button;
 	private var delete_btn:Button;
@@ -83,6 +83,7 @@ class WorkspaceDialog extends MovieClip{
         //Set up this class to use the Flash event delegation model
         EventDispatcher.initialize(this);
         _resultDTO = new Object();
+		
         //Create a clip that will wait a frame before dispatching init to give components time to setup
         this.onEnterFrame = init;
     }
@@ -115,7 +116,8 @@ class WorkspaceDialog extends MovieClip{
 		viewLicense_btn.label = Dictionary.getValue('ws_view_license_button');
 		//TODO: Dictionary calls for all the rest of the buttons
 		
-		
+		//TODO: Make setStyles more efficient
+		setStyles();
 
         //get focus manager + set focus to OK button, focus manager is available to all components through getFocusManager
         fm = _container.getFocusManager();
@@ -143,8 +145,7 @@ class WorkspaceDialog extends MovieClip{
         
         //Register as listener with StyleManager and set Styles
         themeManager.addEventListener('themeChanged',this);
-		//TODO: Make setStyles more efficient
-		//setStyles();
+
         treeview = location_dnd.getTree();
 		//Fire contentLoaded event, this is required by all dialogs so that creator of LFWindow can know content loaded
         _container.contentLoaded();
@@ -174,7 +175,7 @@ class WorkspaceDialog extends MovieClip{
 		switchView_tab.setSelectedIndex(0); 
 		
 		new_btn.addEventListener('click',Delegate.create(_workspaceController, _workspaceController.fileOperationRequest));
-		cut_btn.addEventListener('click',Delegate.create(_workspaceController, _workspaceController.fileOperationRequest));
+		//cut_btn.addEventListener('click',Delegate.create(_workspaceController, _workspaceController.fileOperationRequest));
 		copy_btn.addEventListener('click',Delegate.create(_workspaceController, _workspaceController.fileOperationRequest));
 		paste_btn.addEventListener('click',Delegate.create(_workspaceController, _workspaceController.fileOperationRequest));
 		delete_btn.addEventListener('click',Delegate.create(_workspaceController, _workspaceController.fileOperationRequest));
@@ -386,7 +387,7 @@ class WorkspaceDialog extends MovieClip{
 		name_lbl.visible = v;
 		resourceTitle_txi.visible = v;
 		new_btn.visible = v;
-		cut_btn.visible = v;
+		//cut_btn.visible = v;
 		copy_btn.visible = v;
 		paste_btn.visible = v;
 		delete_btn.visible = v;
@@ -462,27 +463,27 @@ class WorkspaceDialog extends MovieClip{
     */
     private function setStyles(){
         //LFWindow, goes first to prevent being overwritten with inherited styles.
-        var styleObj = themeManager.getStyleObject('LFWindow');
-        _container.setStyle('styleName',styleObj);
+        //var styleObj = themeManager.getStyleObject('LFWindow');
+        //_container.setStyle('styleName',styleObj);
 
         //Get the button style from the style manager
-        styleObj = themeManager.getStyleObject('button');
+       // styleObj = themeManager.getStyleObject('button');
         
         //apply to both buttons
-        Debugger.log('styleObject : ' + styleObj,Debugger.GEN,'setStyles','org.lamsfoundation.lams.WorkspaceDialog');
-        ok_btn.setStyle('styleName',styleObj);
-        cancel_btn.setStyle('styleName',styleObj);
+       // Debugger.log('styleObject : ' + styleObj,Debugger.GEN,'setStyles','org.lamsfoundation.lams.WorkspaceDialog');
+       // ok_btn.setStyle('styleName',styleObj);
+        //cancel_btn.setStyle('styleName',styleObj);
         
         //Get label style and apply to label
-        styleObj = themeManager.getStyleObject('label');
-        //myLabel_lbl.setStyle('styleName',styleObj);
+       var styleObj = themeManager.getStyleObject('label');
+        name_lbl.setStyle('styleName',styleObj);
 
         //Apply treeview style 
-        styleObj = themeManager.getStyleObject('treeview');
-        treeview.setStyle('styleName',styleObj);
+       // styleObj = themeManager.getStyleObject('treeview');
+        //treeview.setStyle('styleName',styleObj);
 
         //Apply datagrid style 
-        styleObj = themeManager.getStyleObject('datagrid');
+      //  styleObj = themeManager.getStyleObject('datagrid');
         //datagrid.setStyle('styleName',styleObj);
 
 /*
@@ -531,7 +532,7 @@ class WorkspaceDialog extends MovieClip{
 		//TODO: Validate you are allowed to use the name etc... Are you overwriting - NOTE Same names are nto allowed in this version
 		
 		var snode = treeview.selectedNode;
-		 Debugger.log('_workspaceModel.currentMode: ' + _workspaceModel.currentMode,Debugger.GEN,'setStyles','org.lamsfoundation.lams.WorkspaceDialog');
+		 Debugger.log('_workspaceModel.currentMode: ' + _workspaceModel.currentMode,Debugger.GEN,'ok','org.lamsfoundation.lams.WorkspaceDialog');
 		if(_workspaceModel.currentMode=="SAVE" || _workspaceModel.currentMode=="SAVEAS"){
 			//var rid:Number = Number(snode.attributes.data.resourceID);
 			if(snode.attributes.data.resourceType==_workspaceModel.RT_LD){
