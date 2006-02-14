@@ -17,6 +17,7 @@ CREATE TABLE tl_lanb11_content (
 CREATE TABLE tl_lanb11_session (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
      , nb_session_id BIGINT(20) UNIQUE NOT NULL
+     , nb_session_name VARCHAR(255) NOT NULL
      , nb_content_uid BIGINT(20) NOT NULL
      , session_start_date DATETIME
      , session_end_date DATETIME
