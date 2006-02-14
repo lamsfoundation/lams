@@ -23,6 +23,10 @@ http://www.gnu.org/licenses/gpl.txt
      <url-pattern>/*</url-pattern>
 </filter-mapping>
 <filter-mapping>
+    <filter-name>LocaleFilter</filter-name>
+     <url-pattern>/*</url-pattern>
+</filter-mapping>
+<filter-mapping>
 	<filter-name>HibernateFilter</filter-name>
 	<url-pattern>/*</url-pattern>
 </filter-mapping>
