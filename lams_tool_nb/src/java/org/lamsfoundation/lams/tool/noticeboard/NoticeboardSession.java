@@ -55,6 +55,9 @@ public class NoticeboardSession implements Serializable {
     /** persistent field*/
 	private Long nbSessionId;
 	
+	/** persistent field*/
+	private String nbSessionName;
+	
   	/** nullable persistent field */
 	private Date sessionStartDate;
 		
@@ -78,12 +81,14 @@ public class NoticeboardSession implements Serializable {
 	
 	/** full constructor */
 	public NoticeboardSession(Long nbSessionId, 
+							  String nbSessionName,
 							  NoticeboardContent nbContent,
 							  Date sessionStartDate,
 							  Date sessionEndDate,
 							  String sessionStatus)
 	{
 		this.nbSessionId = nbSessionId;
+		this.nbSessionName = nbSessionName;
 		//this.nbContentId = nbContentId;
 		this.nbContent = nbContent;
 		this.sessionStartDate = sessionStartDate;
@@ -97,22 +102,34 @@ public class NoticeboardSession implements Serializable {
 	 */
 	
 	public NoticeboardSession(Long nbSessionId,
+							  String nbSessionName,
 	        				  NoticeboardContent nbContent,
 	        				  Date sessionStartDate,
 	        				  String sessionStatus)
 	{
 	    this.nbSessionId = nbSessionId;
+	    this.nbSessionName = nbSessionName;
 	    this.nbContent = nbContent;
 	    this.sessionStartDate = sessionStartDate;
 	    this.sessionEndDate = null;
 	    this.sessionStatus = sessionStatus;
 	}
 	
-	public NoticeboardSession(Long nbSessionId,
-	        					NoticeboardContent nbContent)
+	public NoticeboardSession(Long nbSessionId, 
+							  String nbSessionName,
+							  NoticeboardContent nbContent)
 	{
 	    this.nbSessionId = nbSessionId;
+	    this.nbSessionName = nbSessionName;
 	    this.nbContent = nbContent;
+	    this.sessionStartDate = new Date(System.currentTimeMillis());
+		this.sessionStatus = NoticeboardSession.INCOMPLETE;
+	}
+	
+	public NoticeboardSession(Long nbSessionId, String nbSessionName)
+	{
+	    this.nbSessionId = nbSessionId;
+	    this.nbSessionName = nbSessionName;
 	    this.sessionStartDate = new Date(System.currentTimeMillis());
 		this.sessionStatus = NoticeboardSession.INCOMPLETE;
 	}
@@ -149,6 +166,20 @@ public class NoticeboardSession implements Serializable {
 	
 	public void setNbSessionId(Long nbSessionId) {
 		this.nbSessionId = nbSessionId;
+	}
+	
+	/**
+	 * 		@hibernate.property
+     *      column="nb_session_name"
+     *      length="255"
+     *      not-null="true"
+	 */
+	public String getNbSessionName() {
+		return nbSessionName;
+	}
+	
+	public void setNbSessionName(String nbSessionName) {
+		this.nbSessionName = nbSessionName;
 	}
 	
 	/**
