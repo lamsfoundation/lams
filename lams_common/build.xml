@@ -178,6 +178,11 @@ Ant build file.
 						<include name="**/*.properties"/>
 				</fileset>
 		</copy>
+		<copy overwrite="yes" todir="${build.classes.java}" verbose="true">
+			<fileset dir="${src.java.dir}">
+				<include name="**/*.properties"/>
+			</fileset>
+		</copy>
 	</target>
 
 	<target name="compile.test" depends="compile">
