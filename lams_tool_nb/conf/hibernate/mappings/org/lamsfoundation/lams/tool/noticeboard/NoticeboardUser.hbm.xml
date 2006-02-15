@@ -1,112 +1,86 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
+
 <!DOCTYPE hibernate-mapping PUBLIC
-    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
-    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
-    
-<hibernate-mapping>
-<!-- 
-    Created by the Middlegen Hibernate plugin 2.1
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN" 
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 
-    http://boss.bekk.no/boss/middlegen/
-    http://www.hibernate.org/
--->
-
-<class 
-    name="org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser" 
-    table="tl_lanb11_user"
+<hibernate-mapping
 >
-    <meta attribute="class-description" inherit="false">
-       @hibernate.class
+    <class
+        name="org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser"
         table="tl_lanb11_user"
-    </meta>
-
-    <id
-        name="uid"
-        type="java.lang.Long"
-        column="uid"
     >
-        <meta attribute="field-description">
-           @hibernate.id
-            generator-class="native"
-            type="java.lang.Long"
+
+        <id
+            name="uid"
             column="uid"
+            type="java.lang.Long"
+        >
+            <generator class="native">
+              <!--  
+                  To add non XDoclet generator parameters, create a file named 
+                  hibernate-generator-params-NoticeboardUser.xml 
+                  containing the additional parameters and place it in your merge dir. 
+              --> 
+            </generator>
+        </id>
 
+        <property
+            name="fullname"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="fullname"
+            length="50"
+        />
 
-        </meta>
-        <generator class="native" />
-    </id>
+        <many-to-one
+            name="nbSession"
+            class="org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession"
+            cascade="none"
+            outer-join="auto"
+            update="true"
+            insert="true"
+        >
+            <column
+                name="nb_session_uid" 
+            />
+        </many-to-one>
 
-    <property
-        name="userId"
-        type="java.lang.Long"
-        column="user_id"
-        not-null="true"
-        length="20"
-    >
-        <meta attribute="field-description">
-           @hibernate.property
+        <property
+            name="userId"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
             column="user_id"
             length="20"
             not-null="true"
-        </meta>    
-    </property>
-    <property
-        name="username"
-        type="java.lang.String"
-        column="username"
-        length="50"
-    >
-        <meta attribute="field-description">
-           @hibernate.property
+        />
+
+        <property
+            name="username"
+            type="java.lang.String"
+            update="true"
+            insert="true"
             column="username"
             length="50"
-        </meta>    
-    </property>
-    <property
-        name="fullname"
-        type="java.lang.String"
-        column="fullname"
-        length="50"
-    >
-        <meta attribute="field-description">
-           @hibernate.property
-            column="fullname"
-            length="50"
-        </meta>    
-    </property>
-    <property
-        name="userStatus"
-        type="java.lang.String"
-        column="user_status"
-        length="50"
-    >
-        <meta attribute="field-description">
-           @hibernate.property
+        />
+
+        <property
+            name="userStatus"
+            type="java.lang.String"
+            update="true"
+            insert="true"
             column="user_status"
             length="50"
-        </meta>    
-    </property>
+        />
 
-    <!-- Associations -->
-  
-    <!-- bi-directional many-to-one association to TlLanb11Session -->
-    <many-to-one
-        name="nbSession"
-        class="org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession"
-        not-null="true"
-        cascade="none"
-        outer-join="auto"
-        update="true"
-        insert="true"
-        access="property"
-    >
-        <meta attribute="field-description">
-           @hibernate.many-to-one
-            not-null="true"
-           @hibernate.column name="nb_session_uid"         
-        </meta>
-        <column name="nb_session_uid" />
-    </many-to-one>
+        <!--
+            To add non XDoclet property mappings, create a file named
+                hibernate-properties-NoticeboardUser.xml
+            containing the additional properties and place it in your merge dir.
+        -->
 
-</class>
+    </class>
+
 </hibernate-mapping>

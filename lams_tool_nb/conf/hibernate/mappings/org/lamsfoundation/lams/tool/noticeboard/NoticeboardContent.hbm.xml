@@ -1,236 +1,175 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
+
 <!DOCTYPE hibernate-mapping PUBLIC
-    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
-    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
-    
-<hibernate-mapping>
-<!-- 
-    Created by the Middlegen Hibernate plugin 2.1
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN" 
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 
-    http://boss.bekk.no/boss/middlegen/
-    http://www.hibernate.org/
--->
-
-<class 
-    name="org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent" 
-    table="tl_lanb11_content"
+<hibernate-mapping
 >
-    <meta attribute="class-description" inherit="false">
-       @hibernate.class
+    <class
+        name="org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent"
         table="tl_lanb11_content"
-    </meta>
-
-    <id
-        name="uid"
-        type="java.lang.Long"
-        column="uid"
-        unsaved-value="0"
     >
-        <meta attribute="field-description">
-           @hibernate.id
-            generator-class="native"
-            type="java.lang.Long"
+
+        <id
+            name="uid"
             column="uid"
+            type="java.lang.Long"
             unsaved-value="0"
+        >
+            <generator class="native">
+              <!--  
+                  To add non XDoclet generator parameters, create a file named 
+                  hibernate-generator-params-NoticeboardContent.xml 
+                  containing the additional parameters and place it in your merge dir. 
+              --> 
+            </generator>
+        </id>
 
+        <property
+            name="content"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="content"
+            length="65535"
+        />
 
-        </meta>
-        <generator class="native" />
-    </id>
+        <property
+            name="creatorUserId"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
+            column="creator_user_id"
+            length="20"
+        />
 
-    <property
-        name="nbContentId"
-        type="java.lang.Long"
-        column="nb_content_id"
-        not-null="true"
-        length="20"
-    >
-        <meta attribute="field-description">
-           @hibernate.property
+        <property
+            name="dateCreated"
+            type="java.util.Date"
+            update="true"
+            insert="true"
+            column="date_created"
+            length="19"
+        />
+
+        <property
+            name="dateUpdated"
+            type="java.util.Date"
+            update="true"
+            insert="true"
+            column="date_updated"
+            length="19"
+        />
+
+        <property
+            name="defineLater"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="define_later"
+            length="1"
+        />
+
+        <property
+            name="forceOffline"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="force_offline"
+            length="1"
+        />
+
+        <property
+            name="contentInUse"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="content_in_use"
+            length="1"
+        />
+
+        <property
+            name="nbContentId"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
             column="nb_content_id"
             length="20"
             not-null="true"
-        </meta>    
-    </property>
-    <property
-        name="title"
-        type="java.lang.String"
-        column="title"
-        
-    >
-        <meta attribute="field-description">
-           @hibernate.property
-            column="title"
-            length="255"
-        </meta>    
-    </property>
-    <property
-        name="content"
-        type="java.lang.String"
-        column="content"
-        
-    >
-        <meta attribute="field-description">
-           @hibernate.property
-            column="content"
-            length="65535"
-        </meta>    
-    </property>
-    <property
-        name="onlineInstructions"
-        type="java.lang.String"
-        column="online_instructions"
-        
-    >
-        <meta attribute="field-description">
-           @hibernate.property
-            column="online_instructions"
-            length="65535"
-        </meta>    
-    </property>
-    <property
-        name="offlineInstructions"
-        type="java.lang.String"
-        column="offline_instructions"
-       
-    >
-        <meta attribute="field-description">
-           @hibernate.property
+        />
+
+        <set
+            name="nbSessions"
+            lazy="true"
+            inverse="true"
+            cascade="all-delete-orphan"
+            sort="unsorted"
+        >
+
+            <key
+                column="nb_content_uid"
+            >
+            </key>
+
+            <one-to-many
+                  class="org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession"
+            />
+
+        </set>
+
+        <set
+            name="nbAttachments"
+            lazy="true"
+            inverse="true"
+            cascade="all-delete-orphan"
+            sort="unsorted"
+        >
+
+            <key
+                column="nb_content_uid"
+            >
+            </key>
+
+            <one-to-many
+                  class="org.lamsfoundation.lams.tool.noticeboard.NoticeboardAttachment"
+            />
+
+        </set>
+
+        <property
+            name="offlineInstructions"
+            type="java.lang.String"
+            update="true"
+            insert="true"
             column="offline_instructions"
             length="65535"
-        </meta>    
-    </property>
-    <property
-        name="defineLater"
-        type="boolean"
-        column="define_later"
-        length="1"
-    >
-        <meta attribute="field-description">
-           @hibernate.property
-            column="define_later"
-            length="1"
-        </meta>    
-    </property>
-    <property
-        name="forceOffline"
-        type="boolean"
-        column="force_offline"
-        length="1"
-    >
-        <meta attribute="field-description">
-           @hibernate.property
-            column="force_offline"
-            length="1"
-        </meta>    
-    </property>
-    
-     <property
-        name="contentInUse"
-        type="boolean"
-        column="content_in_use"
-        length="1"
-    >
-        <meta attribute="field-description">
-           @hibernate.property
-            column="contentInUse"
-            length="1"
-        </meta>    
-    </property>
-    
-    <property
-        name="creatorUserId"
-        type="java.lang.Long"
-        column="creator_user_id"
-        length="20"
-    >
-        <meta attribute="field-description">
-           @hibernate.property
-            column="creator_user_id"
-            length="20"
-        </meta>    
-    </property>
-    <property
-        name="dateCreated"
-        type="java.sql.Timestamp"
-        column="date_created"
-        length="19"
-    >
-        <meta attribute="field-description">
-           @hibernate.property
-            column="date_created"
-            length="19"
-        </meta>    
-    </property>
-    <property
-        name="dateUpdated"
-        type="java.sql.Timestamp"
-        column="date_updated"
-        length="19"
-    >
-        <meta attribute="field-description">
-           @hibernate.property
-            column="date_updated"
-            length="19"
-        </meta>    
-    </property>
-
-    <!-- Associations -->
-  
-    <!-- bi-directional one-to-many association to NoticeboardSession -->
-    <set
-        name="nbSessions"
-        lazy="true"
-        inverse="true"
-		cascade="all-delete-orphan"
-    >
-        <meta attribute="field-description">
-           @hibernate.set
-            lazy="true"
-            inverse="true"
-            cascade="all-delete-orphan"
-
-           @hibernate.collection-key
-            column="nb_content_uid"
-
-           @hibernate.collection-one-to-many
-            class="org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession"
-        </meta>
-        <key>
-            <column name="nb_content_uid" />
-        </key>
-        <one-to-many 
-            class="org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession"
         />
-    </set>
-    
-    <!-- bi-directional one-to-many association to TlLanb11Attachment -->
-    <set
-        name="nbAttachments"
-        lazy="true"
-        inverse="true"
-		cascade="all-delete-orphan"
-    >
-        <meta attribute="field-description">
-           @hibernate.set
-            lazy="true"
-            inverse="true"
-            cascade="all-delete-orphan"
 
-           @hibernate.collection-key
-            column="nb_content_uid"
-
-           @hibernate.collection-one-to-many
-            class="org.lamsfoundation.lams.tool.noticeboard.NoticeboardAttachment"
-        </meta>
-        <key>
-            <column name="nb_content_uid" />
-        </key>
-        <one-to-many 
-            class="org.lamsfoundation.lams.tool.noticeboard.NoticeboardAttachment"
+        <property
+            name="onlineInstructions"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="online_instructions"
+            length="65535"
         />
-    </set>
-    
 
-</class>
+        <property
+            name="title"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="title"
+            length="65535"
+        />
+
+        <!--
+            To add non XDoclet property mappings, create a file named
+                hibernate-properties-NoticeboardContent.xml
+            containing the additional properties and place it in your merge dir.
+        -->
+
+    </class>
+
 </hibernate-mapping>

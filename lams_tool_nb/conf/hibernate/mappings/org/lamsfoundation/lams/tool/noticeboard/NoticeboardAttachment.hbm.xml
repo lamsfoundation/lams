@@ -1,116 +1,88 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
+
 <!DOCTYPE hibernate-mapping PUBLIC
-    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
-    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
-    
-<hibernate-mapping>
-<!-- 
-    Created by the Middlegen Hibernate plugin 2.1
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN" 
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 
-    http://boss.bekk.no/boss/middlegen/
-    http://www.hibernate.org/
--->
-
-<class 
-    name="org.lamsfoundation.lams.tool.noticeboard.NoticeboardAttachment" 
-    table="tl_lanb11_attachment"
+<hibernate-mapping
 >
-    <meta attribute="class-description" inherit="false">
-       @hibernate.class
+    <class
+        name="org.lamsfoundation.lams.tool.noticeboard.NoticeboardAttachment"
         table="tl_lanb11_attachment"
-    </meta>
-
-    <id
-        name="attachmentId"
-        type="java.lang.Long"
-        column="attachment_id"
     >
-        <meta attribute="field-description">
-           @hibernate.id
-            generator-class="native"
-            type="java.lang.Long"
+
+        <id
+            name="attachmentId"
             column="attachment_id"
+            type="java.lang.Long"
+        >
+            <generator class="native">
+              <!--  
+                  To add non XDoclet generator parameters, create a file named 
+                  hibernate-generator-params-NoticeboardAttachment.xml 
+                  containing the additional parameters and place it in your merge dir. 
+              --> 
+            </generator>
+        </id>
 
-
-        </meta>
-        <generator class="native" />
-    </id>
-
-    <property
-        name="filename"
-        type="java.lang.String"
-        column="filename"
-        not-null="true"
-        length="255"
-    >
-        <meta attribute="field-description">
-           @hibernate.property
+        <property
+            name="filename"
+            type="java.lang.String"
+            update="true"
+            insert="true"
             column="filename"
             length="255"
             not-null="true"
-        </meta>    
-    </property>
-    <property
-        name="uuid"
-        type="java.lang.Long"
-        column="uuid"
-        not-null="true"
-        length="20"
-    >
-        <meta attribute="field-description">
-           @hibernate.property
-            column="uuid"
-            not-null="true"
-            length="20"
-        </meta>    
-    </property>
-    <property
-        name="versionId"
-        type="java.lang.Long"
-        column="version_id"
-        length="20"
-    >
-        <meta attribute="field-description">
-           @hibernate.property
-            column="version_id"
-            length="20"
-        </meta>    
-    </property>
-    <property
-        name="onlineFile"
-        type="boolean"
-        column="online_file"
-        not-null="true"
-        length="1"
-    >
-        <meta attribute="field-description">
-           @hibernate.property
+        />
+
+        <property
+            name="onlineFile"
+            type="boolean"
+            update="true"
+            insert="true"
             column="online_file"
             length="1"
             not-null="true"
-        </meta>    
-    </property>
+        />
 
-    <!-- Associations -->
-  
-    <!-- bi-directional many-to-one association to NoticeboardContent -->
-    <many-to-one
-        name="nbContent"
-        class="org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent"
-        not-null="true"
-        cascade="none"
-        outer-join="auto"
-        update="true"
-        insert="true"
-        access="property"
-    >
-        <meta attribute="field-description">
-           @hibernate.many-to-one
+        <many-to-one
+            name="nbContent"
+            class="org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent"
+            cascade="none"
+            outer-join="auto"
+            update="true"
+            insert="true"
+        >
+            <column
+                name="nb_content_uid" 
+            />
+        </many-to-one>
+
+        <property
+            name="uuid"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
+            column="uuid"
+            length="20"
             not-null="true"
-           @hibernate.column name="nb_content_uid"         
-        </meta>
-        <column name="nb_content_uid" />
-    </many-to-one>
+        />
 
-</class>
+        <property
+            name="versionId"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
+            column="version_id"
+            length="20"
+        />
+
+        <!--
+            To add non XDoclet property mappings, create a file named
+                hibernate-properties-NoticeboardAttachment.xml
+            containing the additional properties and place it in your merge dir.
+        -->
+
+    </class>
+
 </hibernate-mapping>
