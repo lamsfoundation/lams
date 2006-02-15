@@ -50,6 +50,7 @@ import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
 import org.lamsfoundation.lams.tool.sbmt.dto.AuthoringDTO;
 import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
 import org.lamsfoundation.lams.tool.sbmt.dto.StatisticDTO;
+import org.lamsfoundation.lams.tool.sbmt.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
 import org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants;
@@ -125,9 +126,14 @@ public class MonitoringAction extends DispatchAction {
         //build a map with all users in the submitFilesSessionList
         Iterator it = submitFilesSessionList.iterator();
         while(it.hasNext()){
-            Long sessionID = ((SubmitFilesSession)it.next()).getSessionID();
+        	SessionDTO sessionDto = new SessionDTO();
+        	SubmitFilesSession sfs = (SubmitFilesSession)it.next();
+        	
+            Long sessionID = sfs.getSessionID();
+            sessionDto.setSessionID(sessionID);
+            sessionDto.setSessionName(sfs.getSessionName());
             List userList = submitFilesService.getUsers(sessionID);
-            sessionUserMap.put(sessionID, userList);
+            sessionUserMap.put(sessionDto, userList);
         }
         
 		//request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionID);
@@ -470,7 +476,11 @@ public class MonitoringAction extends DispatchAction {
 		// build a map with all users in the submitFilesSessionList
 		Iterator it = submitFilesSessionList.iterator();
 		while (it.hasNext()) {
-			Long sessionID = ((SubmitFilesSession) it.next()).getSessionID();
+			
+			SubmitFilesSession sfs = (SubmitFilesSession) it.next();
+			Long sessionID = sfs.getSessionID();
+			String sessionName = sfs.getSessionName();
+				
 			submitFilesService = getSubmitFilesService();
 			//return FileDetailsDTO list according to the given sessionID
 			Map userFilesMap = submitFilesService.getFilesUploadedBySession(sessionID);
@@ -489,11 +499,14 @@ public class MonitoringAction extends DispatchAction {
 						markedCount++;
 				}
 			}
-			StatisticDTO dto = new StatisticDTO();
-			dto.setMarkedCount(markedCount);
-			dto.setNotMarkedCount(notMarkedCount);
-			dto.setTotalUploadedFiles(markedCount+notMarkedCount);
-			sessionStatisticMap.put(sessionID,dto);
+			StatisticDTO statisticDto = new StatisticDTO();
+			SessionDTO sessionDto = new SessionDTO();
+			statisticDto.setMarkedCount(markedCount);
+			statisticDto.setNotMarkedCount(notMarkedCount);
+			statisticDto.setTotalUploadedFiles(markedCount+notMarkedCount);
+			sessionDto.setSessionID(sessionID);
+			sessionDto.setSessionName(sessionName);
+			sessionStatisticMap.put(sessionDto,statisticDto);
 		}
 
 		request.setAttribute("statisticList",sessionStatisticMap);
