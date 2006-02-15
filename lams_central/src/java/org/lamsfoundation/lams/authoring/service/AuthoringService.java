@@ -253,15 +253,15 @@ public class AuthoringService implements IAuthoringService {
 		
 		LearningDesign originalDesign = learningDesignDAO.getLearningDesignById(originalDesignID);
 		if(originalDesign==null)
-			throw new LearningDesignException("No Learning Design with learning_design_id of:" + originalDesignID +" exists");
+			throw new LearningDesignException(messageService.getMessage("no.such.learningdesign.exist",new Object[]{originalDesignID}));
 		
 		User user = userDAO.getUserById(userID);
 		if(user==null)
-			throw new UserException("No such User with a user_id of:" + userID + " exists");
+			throw new UserException(messageService.getMessage("no.such.user.exist",new Object[]{userID}));
 		
 		WorkspaceFolder workspaceFolder = workspaceFolderDAO.getWorkspaceFolderByID(workspaceFolderID);
 		if(workspaceFolder==null)
-			throw new WorkspaceFolderException("No such WorkspaceFolder with workspace_folder_id of:" + workspaceFolderID + " exists");
+			throw new WorkspaceFolderException(messageService.getMessage("no.such.workspace.exist",new Object[]{workspaceFolderID}));
 		
 		return copyLearningDesign(originalDesign,copyType,user,workspaceFolder, setOriginalDesign);
 	}
@@ -423,7 +423,7 @@ public class AuthoringService implements IAuthoringService {
 			flashMessage = new FlashMessage(IAuthoringService.STORE_LD_MESSAGE_KEY,design.getLearningDesignId());
 		} catch ( ObjectExtractorException e ) {
 			flashMessage = new FlashMessage(IAuthoringService.STORE_LD_MESSAGE_KEY,
-											"Invalid Object in WDDX packet. Error was "+e.getMessage(),
+											messageService.getMessage("invalid.wddx.packet",new Object[]{e.getMessage()}),
 											FlashMessage.ERROR);
 		}
 	
