@@ -326,7 +326,7 @@ public class NoticeboardContent implements Serializable {
 	/**
 	 * 		@hibernate.property
      *      column="title"
-     *      length="255"
+     *      length="65535"
 	 */
 	public String getTitle() {
 		return title;
