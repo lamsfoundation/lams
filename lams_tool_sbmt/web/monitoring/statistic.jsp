@@ -13,11 +13,11 @@
 		<h1><fmt:message key="monitoring.statistic.title"/></h1>
 		<div class="datatablecontainer">
 		<c:forEach var="element" items="${statisticList}">
-			<c:set var="sessionID" value="${element.key}"/>
+			<c:set var="sessionName" value="${element.key.sessionName}"/>
 			<c:set var="statistic" value="${element.value}"/>
 			<table width="100%"  border="0" cellspacing="0" cellpadding="0">
 		    <tr>
-		        <td style="border-bottom:1px #000 solid;" colspan="2"><b>SESSION ID: <c:out value="${sessionID}" /></td>
+		        <td style="border-bottom:1px #000 solid;" colspan="2"><b>SESSION NAME: <c:out value="${sessionName}" /></td>
 		    </tr>
 		    <tr>
 			    <th scope="col">Title</th>

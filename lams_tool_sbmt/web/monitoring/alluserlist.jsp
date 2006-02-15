@@ -22,11 +22,11 @@
   		<c:set var="sessionUserMap" scope="request" value="${sessionUserMap}"/>
   		<logic:notEmpty name="sessionUserMap">
 			<logic:iterate id="element" name="sessionUserMap">
-				<bean:define id="sessionID" name="element" property="key"/>
+				<bean:define id="sessionDto" name="element" property="key"/>
 				<bean:define id="userlist" name="element" property="value"/>
 		  		<table class="forms">
 				    <tr>
-				        <td style="border-bottom:1px #000 solid;" colspan="4"><b>SESSION ID: <c:out value="${sessionID}" /></td>
+				        <td style="border-bottom:1px #000 solid;" colspan="4"><b>SESSION NAME: <c:out value="${sessionDto.sessionName}" /></td>
 				    </tr>
 			  		<logic:notEmpty name="userlist">
 						<logic:iterate id="user" name="userlist">
