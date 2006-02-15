@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.jsp.jstl.core.Config;
 
+import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -44,38 +45,38 @@ import org.springframework.web.filter.OncePerRequestFilter;
  */
 public class LocaleFilter extends OncePerRequestFilter {
 
-	private static final String DEFAULT_LANGUAGE = "en";
-	private static final String DEFUALT_COUNTRY = "AU";
+//	private static final String DEFAULT_LANGUAGE = "en";
+//	private static final String DEFUALT_COUNTRY = "AU";
 	private static final String PREFERRED_LOCALE_KEY = "org.apache.struts.action.LOCALE";
 
     public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, 
             FilterChain chain) throws IOException, ServletException {
     	Locale preferredLocale = null;
+    	//user set has first prority:
+    	String locale = request.getParameter("locale");
+    	if (locale != null)
+    		preferredLocale = new Locale(locale);
 
-		HttpSession sharedsession = SessionManager.getSession(); 
-		UserDTO user = (UserDTO) sharedsession.getAttribute(AttributeNames.USER);
-		if(user != null){
-			String lang = user.getLocaleLanguage();
-			String country = user.getLocaleCountry();
-			//whatever user set lang or country, then try to use it.
-			if(lang != null || country!= null){
-				if(lang == null)
-					lang = DEFAULT_LANGUAGE;
-				if(country == null)
-					country = DEFUALT_COUNTRY;
-				preferredLocale = new Locale(lang,country);
+    	//if request does not assign locale, then get it from database
+    	if(preferredLocale == null){
+			HttpSession sharedsession = SessionManager.getSession(); 
+			UserDTO user = (UserDTO) sharedsession.getAttribute(AttributeNames.USER);
+			if(user != null){
+				String lang = user.getLocaleLanguage();
+				String country = user.getLocaleCountry();
+				//language and country must both exist: 
+				//It is not good idea to combine customerized language with system default country! no en_CN!  
+				if(!StringUtils.isEmpty(lang) && !StringUtils.isEmpty(country)){
+					preferredLocale = new Locale(lang,country);
+				}
 			}
-		}else{
-			//user does not set any locale information, try to get from request
-			String locale = request.getParameter("locale");
-	        if (locale != null) {
-	            preferredLocale = new Locale(locale);
-	        }else
-	        	//if request does not have, set it default then.
-	        	preferredLocale = new Locale(DEFAULT_LANGUAGE,DEFUALT_COUNTRY);
-		}
-		
-        HttpSession session = request.getSession(false);
+    	}
+//		if(preferredLocale == null){
+//        	//if request does not have, set it default then.
+//        	preferredLocale = new Locale(DEFAULT_LANGUAGE,DEFUALT_COUNTRY);
+//		}
+
+    	HttpSession session = request.getSession(false);
         //set locale for STURTS and JSTL
         if (session != null) {
             if (preferredLocale == null) {
