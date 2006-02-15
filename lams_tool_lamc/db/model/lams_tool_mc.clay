@@ -729,7 +729,7 @@
 </foreign-key-list>
 <index-list/>
 </table>
-<table alias="" name="tl_lamc11_uploadedFile" remarks="">
+<table alias="" name="tl_lamc11_uploadedfile" remarks="">
 <table-description></table-description>
 <table-figure-bounds height="93" width="158" x="449" y="286"/>
 <column-list>

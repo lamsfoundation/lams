@@ -1,4 +1,4 @@
-CREATE TABLE lams.tl_lamc11_content (
+CREATE TABLE tl_lamc11_content (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
      , content_id BIGINT(20) NOT NULL
      , title TEXT NOT NULL
@@ -25,7 +25,7 @@ CREATE TABLE lams.tl_lamc11_content (
      , PRIMARY KEY (uid)
 )TYPE=InnoDB;
 
-CREATE TABLE lams.tl_lamc11_que_content (
+CREATE TABLE tl_lamc11_que_content (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
      , question VARCHAR(255)
      , weight INT(5) NOT NULL DEFAULT 0
@@ -37,10 +37,10 @@ CREATE TABLE lams.tl_lamc11_que_content (
      , PRIMARY KEY (uid)
      , INDEX (mc_content_id)
      , CONSTRAINT FK_tl_lamc11_que_content_1 FOREIGN KEY (mc_content_id)
-                  REFERENCES lams.tl_lamc11_content (uid)
+                  REFERENCES tl_lamc11_content (uid)
 )TYPE=InnoDB;
 
-CREATE TABLE lams.tl_lamc11_options_content (
+CREATE TABLE tl_lamc11_options_content (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
      , correct_option TINYINT(1) NOT NULL DEFAULT 0
      , mc_que_content_id BIGINT(20) NOT NULL
@@ -48,10 +48,10 @@ CREATE TABLE lams.tl_lamc11_options_content (
      , PRIMARY KEY (uid)
      , INDEX (mc_que_content_id)
      , CONSTRAINT FK_tl_lamc11_options_content_1 FOREIGN KEY (mc_que_content_id)
-                  REFERENCES lams.tl_lamc11_que_content (uid)
+                  REFERENCES tl_lamc11_que_content (uid)
 )TYPE=InnoDB;
 
-CREATE TABLE lams.tl_lamc11_session (
+CREATE TABLE tl_lamc11_session (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
      , mc_session_id BIGINT(20) NOT NULL
      , session_start_date DATETIME
@@ -62,10 +62,10 @@ CREATE TABLE lams.tl_lamc11_session (
      , PRIMARY KEY (uid)
      , INDEX (mc_content_id)
      , CONSTRAINT FK_tl_lamc_session_1 FOREIGN KEY (mc_content_id)
-                  REFERENCES lams.tl_lamc11_content (uid)
+                  REFERENCES tl_lamc11_content (uid)
 )TYPE=InnoDB;
 
-CREATE TABLE lams.tl_lamc11_que_usr (
+CREATE TABLE tl_lamc11_que_usr (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
      , que_usr_id BIGINT(20) NOT NULL
      , mc_session_id BIGINT(20) NOT NULL
@@ -75,10 +75,10 @@ CREATE TABLE lams.tl_lamc11_que_usr (
      , PRIMARY KEY (uid)
      , INDEX (mc_session_id)
      , CONSTRAINT FK_tl_lamc_tool_usr_1 FOREIGN KEY (mc_session_id)
-                  REFERENCES lams.tl_lamc11_session (uid)
+                  REFERENCES tl_lamc11_session (uid)
 )TYPE=InnoDB;
 
-CREATE TABLE lams.tl_lamc11_usr_attempt (
+CREATE TABLE tl_lamc11_usr_attempt (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
      , que_usr_id BIGINT(20) NOT NULL
      , mc_que_content_id BIGINT(20) NOT NULL
@@ -92,16 +92,16 @@ CREATE TABLE lams.tl_lamc11_usr_attempt (
      , PRIMARY KEY (uid)
      , INDEX (que_usr_id)
      , CONSTRAINT FK_tl_lamc11_usr_attempt_1 FOREIGN KEY (que_usr_id)
-                  REFERENCES lams.tl_lamc11_que_usr (uid)
+                  REFERENCES tl_lamc11_que_usr (uid)
      , INDEX (mc_que_content_id)
      , CONSTRAINT FK_tl_lamc11_usr_attempt_2 FOREIGN KEY (mc_que_content_id)
-                  REFERENCES lams.tl_lamc11_que_content (uid)
+                  REFERENCES tl_lamc11_que_content (uid)
      , INDEX (mc_que_option_id)
      , CONSTRAINT FK_tl_lamc11_usr_attempt_3 FOREIGN KEY (mc_que_option_id)
-                  REFERENCES lams.tl_lamc11_options_content (uid)
+                  REFERENCES tl_lamc11_options_content (uid)
 )TYPE=InnoDB;
 
-CREATE TABLE lams.tl_lamc11_uploadedFile (
+CREATE TABLE tl_lamc11_uploadedfile (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
      , uuid VARCHAR(255) NOT NULL
      , mc_content_id BIGINT(20) NOT NULL
@@ -109,13 +109,13 @@ CREATE TABLE lams.tl_lamc11_uploadedFile (
      , filename VARCHAR(255) NOT NULL
      , PRIMARY KEY (uid)
      , INDEX (mc_content_id)
-     , CONSTRAINT FK_tl_lamc11_uploadedFile FOREIGN KEY (mc_content_id)
-                  REFERENCES lams.tl_lamc11_content (uid)
+     , CONSTRAINT FK_tl_lamc11_uploadedfile FOREIGN KEY (mc_content_id)
+                  REFERENCES tl_lamc11_content (uid)
 )TYPE=InnoDB;
 
-INSERT INTO lams.tl_lamc11_content(uid, content_id , title , instructions , creation_date , questions_sequenced , username_visible , created_by , monitoring_report_title , report_title , run_offline , define_later, synch_in_monitor, offline_instructions, online_instructions, end_learning_message, content_in_use, retries, show_feedback, show_report) VALUES (1, ${default_content_id} ,'Mc Title','Mc Instructions', NOW(), 0, 0,1,'Monitoring Report','Report', 0, 0, 0,'offline instructions','online instructions','Finished Activity...', 0, 0, 0, 0);
+INSERT INTO tl_lamc11_content(uid, content_id , title , instructions , creation_date , questions_sequenced , username_visible , created_by , monitoring_report_title , report_title , run_offline , define_later, synch_in_monitor, offline_instructions, online_instructions, end_learning_message, content_in_use, retries, show_feedback, show_report) VALUES (1, ${default_content_id} ,'Mc Title','Mc Instructions', NOW(), 0, 0,1,'Monitoring Report','Report', 0, 0, 0,'offline instructions','online instructions','Finished Activity...', 0, 0, 0, 0);
 
-INSERT INTO lams.tl_lamc11_que_content  (uid,question, weight, disabled, display_order,  mc_content_id) VALUES (1, 'a sample question', 0, 1, 1,	1);
+INSERT INTO tl_lamc11_que_content  (uid,question, weight, disabled, display_order,  mc_content_id) VALUES (1, 'a sample question', 0, 1, 1,	1);
 	
-INSERT INTO lams.tl_lamc11_options_content (uid,  correct_option,  mc_que_content_id,  mc_que_option_text) VALUES (1, 0, 1,'sample answer 1');
+INSERT INTO tl_lamc11_options_content (uid,  correct_option,  mc_que_content_id,  mc_que_option_text) VALUES (1, 0, 1,'sample answer 1');
 
