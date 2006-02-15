@@ -242,6 +242,13 @@
 	     </webdoclet>
 	</target>
 		
+	<!-- deploy-war : for convenience during development. Should be deployed via the master build -->
+	<target name="deploy-war" depends="build-war">
+		<copy file="${build.lib}/${product}.jar"
+				todir="${jboss.deploy}"/>
+		<copy file="${build.lib}/${product}.war"
+				todir="${jboss.deploy}"/>
+	</target>
 	
 </project>
 
