@@ -38,6 +38,7 @@ create table tl_lasbmt11_session (
    session_id bigint not null,
    status integer not null,
    content_id bigint,
+   session_name varchar(250),
    primary key (session_id)
 );
 create table tl_lasbmt11_session_learners (
