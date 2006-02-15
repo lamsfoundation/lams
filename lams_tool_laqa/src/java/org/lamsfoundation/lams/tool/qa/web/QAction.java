@@ -423,7 +423,9 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
         /*delete-recreate the questions in the db*/
           authoringUtil.reconstructQuestionContentMapForSubmit(mapQuestionContent, request);
         
-          QaContent qaContent = authoringUtil.saveOrUpdateQaContent(mapQuestionContent, qaService, qaAuthoringForm);            
+          logger.debug("before saveOrUpdateQaContent.");
+          QaContent qaContent = authoringUtil.saveOrUpdateQaContent(mapQuestionContent, qaService, qaAuthoringForm);
+          logger.debug("after saveOrUpdateQaContent.");
 
           saveAttachments(qaContent, attachmentList, deletedAttachmentList, mapping, request);
       

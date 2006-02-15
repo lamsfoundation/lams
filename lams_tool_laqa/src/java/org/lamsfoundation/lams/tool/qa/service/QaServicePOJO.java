@@ -146,7 +146,7 @@ public class QaServicePOJO
         }
         catch (DataAccessException e)
         {
-            throw new QaApplicationException("Exception occured when lams is loading qa content: "
+            throw new QaApplicationException("Exception occured when lams is creating qa content: "
                                                          + e.getMessage(),
 														   e);
         }
@@ -205,7 +205,10 @@ public class QaServicePOJO
     {
         try
         {
+        	
+        	logger.debug("attempt service createQaQue: " + qaQueContent);
         	qaQueContentDAO.createQueContent(qaQueContent);
+        	logger.debug("after  servicecreateQaQue: " + qaQueContent);
         }
         catch (DataAccessException e)
         {

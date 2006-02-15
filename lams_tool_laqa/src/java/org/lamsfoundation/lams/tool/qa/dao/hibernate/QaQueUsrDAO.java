@@ -32,10 +32,10 @@ public class QaQueUsrDAO extends HibernateDaoSupport implements IQaQueUsrDAO {
 	 private static final String COUNT_SESSION_USER = "select qaQueUsr.queUsrId from QaQueUsr qaQueUsr where qaQueUsr.qaSessionId= :qaSession";
 		
 	   public QaQueUsr getQaUserByUID(Long uid)
-		{
+	   {
 			 return (QaQueUsr) this.getHibernateTemplate()
 	         .get(QaQueUsr.class, uid);
-		}
+	   }
 
 		
 		public int countSessionUser(QaSession qaSession)
@@ -45,19 +45,7 @@ public class QaQueUsrDAO extends HibernateDaoSupport implements IQaQueUsrDAO {
 				qaSession)).size();
 	    }
 	 	
-	 	
-	 	/*
-		public QaQueUsr getQaQueUsrById(long qaQueUsrId)
-	 	{
-	 		return (QaQueUsr) this.getHibernateTemplate().load(QaQueUsr.class, new Long(qaQueUsrId));
-	 	}
-	 	
-	 	public QaQueUsr loadQaQueUsrById(long qaQueUsrId)
-	 	{
-	 		return (QaQueUsr) this.getHibernateTemplate().get(QaQueUsr.class, new Long(qaQueUsrId));
-	 	}
-	 	*/
-		
+
 		public QaQueUsr getQaQueUsrById(long qaQueUsrId)
 		{
 			String query = "from QaQueUsr user where user.queUsrId=?";

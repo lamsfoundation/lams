@@ -49,7 +49,6 @@ public class QaUsrRespDAO extends HibernateDaoSupport implements IQaUsrRespDAO
 
 	public QaUsrResp retrieveQaUsrResp(long responseId)
     {
-    	logger.debug(logger + " " + this.getClass().getName() +  " " + "retrieveUserResponse called with: " + responseId);
         return (QaUsrResp) this.getHibernateTemplate().get(QaUsrResp.class, new Long(responseId));
     }
 

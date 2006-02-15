@@ -26,6 +26,7 @@ import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.dao.IQaSessionDAO;
+import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 
@@ -71,12 +72,23 @@ public class QaSessionDAO extends HibernateDaoSupport implements
      */
     public QaSession getQaSessionById(long qaSessionId)
     {
-        return (QaSession)this.getHibernateTemplate().load(QaSession.class,new Long(qaSessionId));
+		String query = "from QaSession as qus where qus.qaSessionId = ?";
+	    HibernateTemplate templ = this.getHibernateTemplate();
+		List list = getSession().createQuery(query)
+			.setLong(0,qaSessionId)
+			.list();
+		
+		if(list != null && list.size() > 0){
+			QaSession qus = (QaSession) list.get(0);
+			return qus;
+		}
+		return null;
     }
+    
     
     public QaSession getQaSessionOrNullById(long qaSessionId)
     {
-        return (QaSession)this.getHibernateTemplate().get(QaSession.class,new Long(qaSessionId));
+    	return getQaSessionById(qaSessionId);
     }
 
     /**

@@ -8,34 +8,20 @@ package org.lamsfoundation.lams.tool.qa.web;
 
 import java.util.Date;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaComparator;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
-import org.lamsfoundation.lams.tool.qa.QaUploadedFile;
-import org.lamsfoundation.lams.tool.qa.QaUtils;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
-import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-
-import sun.tools.jar.resources.jar;
 
 /**
  * 
@@ -483,6 +469,7 @@ public class AuthoringUtil implements QaAppConstants {
     //doesn't update files
     public QaContent saveOrUpdateQaContent(Map mapQuestionContent, IQaService qaService, QaAuthoringForm qaAuthoringForm){
         
+    	logger.debug("starting saveOrUpdateQaContent.");
         UserDTO toolUser = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);//request.getSession().getAttribute(AttributeNames.USER);
         
         boolean isQuestionsSequenced=false;
@@ -527,13 +514,20 @@ public class AuthoringUtil implements QaAppConstants {
         //qa.setQaSessions(new TreeSet());
         //qa.setQaUploadedFiles(new TreeSet());
         
+        logger.debug("before  update or save: " + qa);
         if(qa.getQaContentId() == null){
             qa.setQaContentId(new Long(qaAuthoringForm.getToolContentId()));
+            logger.debug("will create: " + qa);
             qaService.createQa(qa);
         }
         else
+        {
+        	logger.debug("will update: " + qa);
             qaService.updateQa(qa);
-        
+        }
+        	
+        logger.debug("before  createQuestionContent: mapQuestionContent" + mapQuestionContent);
+        logger.debug("before  createQuestionContent: qa" + qa);
         //recreate all question contents
         createQuestionContent(mapQuestionContent, qaService, qa);
         
@@ -547,7 +541,8 @@ public class AuthoringUtil implements QaAppConstants {
      * persist the questions in the Map the user has submitted 
      */
     protected void createQuestionContent(Map mapQuestionContent, IQaService qaService, QaContent qaContent)
-    {        
+    {    
+        logger.debug("starting createQuestionContent: qaContent" + qaContent);
         Iterator itMap = mapQuestionContent.entrySet().iterator();
         int diplayOrder=0;
         while (itMap.hasNext()) 
@@ -557,7 +552,10 @@ public class AuthoringUtil implements QaAppConstants {
 	        
 	        /*make sure question entered is NOT blank*/
 	        if (pairs.getValue().toString().length() != 0)
-	        {	        	
+	        {
+	        	logger.debug("starting createQuestionContent: pairs.getValue().toString():" + pairs.getValue().toString());
+	        	logger.debug("starting createQuestionContent: qaContent: " + qaContent);
+	        	logger.debug("starting createQuestionContent: diplayOrder: " + diplayOrder);
 		        QaQueContent queContent=  new QaQueContent(pairs.getValue().toString(), 
 		        											++diplayOrder, 
 															qaContent,

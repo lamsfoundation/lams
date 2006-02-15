@@ -8,13 +8,25 @@
     name="org.lamsfoundation.lams.tool.qa.QaSession" 
     table="tl_laqa11_session"
 >
+
     <id
+        name="uid"
+        type="java.lang.Long"
+        column="uid"
+    >
+        <generator class="native" />
+    </id>
+
+
+	<property
         name="qaSessionId"
         type="java.lang.Long"
         column="qa_session_id"
+        not-null="true"
+        length="20"
     >
-		    <generator class="assigned"/>
-    </id>
+    </property>
+
 
     <property
         name="session_start_date"

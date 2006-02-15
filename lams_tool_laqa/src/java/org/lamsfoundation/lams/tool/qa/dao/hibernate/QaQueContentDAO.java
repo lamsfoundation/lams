@@ -91,16 +91,11 @@ public class QaQueContentDAO extends HibernateDaoSupport implements IQaQueConten
 			  return listDefaultQuestionIds;
 	    }
 	 	
-	 	/*
-	 	public QaQueContent getQaQueById(long qaQueContentId)
-	 	{
-	 		return (QaQueContent) this.getHibernateTemplate().load(QaQueContent.class, new Long(qaQueContentId));
-	 	}
-	 	*/
 	 	
 		public void createQueContent(QaQueContent queContent) 
 	    {
 			this.getSession().setFlushMode(FlushMode.AUTO);
+			logger.debug("before createQueContent save: " + queContent);
 	    	this.getHibernateTemplate().save(queContent);
 	    }
 		

@@ -9,8 +9,21 @@
 <table-list>
 <table alias="" name="tl_laqa11_session" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="117" width="181" x="118" y="106"/>
+<table-figure-bounds height="104" width="181" x="118" y="106"/>
 <column-list>
+<column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="">
+<column-description></column-description>
+<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
 <column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="qa_session_id" remarks="">
 <column-description></column-description>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
@@ -59,7 +72,7 @@
 </column-list>
 <primary-key alias="" name="PK_TL_LAQA11_SESSION" remarks="">
 <primary-key-description></primary-key-description>
-<primary-key-column name="qa_session_id"/>
+<primary-key-column name="uid"/>
 </primary-key>
 <unique-key-list/>
 <foreign-key-list>
@@ -334,33 +347,20 @@
 <foreign-key-figure>
 <fk-fig-bendpoint-list/>
 </foreign-key-figure>
-<foreign-key-column column-name="qa_session_id" referenced-key-column-name="qa_session_id"/>
+<foreign-key-column column-name="qa_session_id" referenced-key-column-name="uid"/>
 </foreign-key>
 </foreign-key-list>
 <index-list/>
 </table>
 <table alias="" name="tl_laqa11_que_content" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="97" width="179" x="786" y="491"/>
+<table-figure-bounds height="83" width="179" x="786" y="491"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="">
 <column-description></column-description>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
-<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
-<variant type-name-pattern="BIGINT UNSIGNED"/>
-<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
-<variant type-name-pattern="BIGINT ZEROFILL"/>
-</data-type>
-</column>
-<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="qa_que_content_id" remarks="">
-<column-description></column-description>
-<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
 <variant type-name-pattern="BIGINT"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
@@ -423,7 +423,7 @@
 <table-description></table-description>
 <table-figure-bounds height="117" width="181" x="987" y="97"/>
 <column-list>
-<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="response_id" remarks="">
+<column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="response_id" remarks="">
 <column-description></column-description>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
@@ -521,7 +521,7 @@
 </table>
 <table alias="" name="tl_laqa11_uploadedfile" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="105" width="158" x="450" y="246"/>
+<table-figure-bounds height="94" width="153" x="450" y="246"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="submissionId" remarks="just an auto increment id and has no business relationship">
 <column-description></column-description>

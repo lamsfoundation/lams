@@ -61,13 +61,6 @@ public class QaContentDAO extends HibernateDaoSupport implements IQaContentDAO {
 	 		return loadQaById(qaId);
 	    }
 	 	
-	 	/*
-	 	public QaContent loadQaById(long qaId)
-	    {
-	    	return (QaContent) this.getHibernateTemplate().get(QaContent.class, new Long(qaId));
-	    }
-
-		*/
 
 	 	public QaContent loadQaById(long qaId)
 	    {
@@ -94,9 +87,9 @@ public class QaContentDAO extends HibernateDaoSupport implements IQaContentDAO {
 	 	
 	 	public void updateQa(QaContent qa)
 	    {
-            //this.getSession().setFlushMode(FlushMode.AUTO);
+	 		this.getSession().setFlushMode(FlushMode.AUTO);
+			logger.debug("before updateQa: " + qa);
 	        this.getHibernateTemplate().update(qa);
-            //this.getHibernateTemplate().saveOrUpdate(qa);
 	    }
 	 	
 
@@ -116,6 +109,7 @@ public class QaContentDAO extends HibernateDaoSupport implements IQaContentDAO {
                               });
 	     }
 
+	     
 	    public void saveQa(QaContent qa) 
 	    {
 	    	this.getHibernateTemplate().save(qa);
@@ -123,6 +117,8 @@ public class QaContentDAO extends HibernateDaoSupport implements IQaContentDAO {
 	    
 	    public void createQa(QaContent qa) 
 	    {
+	    	this.getSession().setFlushMode(FlushMode.AUTO);
+			logger.debug("before createQa: " + qa);
 	    	this.getHibernateTemplate().save(qa);
 	    }
 	    
@@ -139,9 +135,6 @@ public class QaContentDAO extends HibernateDaoSupport implements IQaContentDAO {
 	    }
 	    
 	    
-
-	    /** GETS CALLED BY CONTRACT
-	     */
 	    public void removeAllQaSession(QaContent qaContent){
 	    	this.getHibernateTemplate().deleteAll(qaContent.getQaSessions());	
 	    }
@@ -176,6 +169,5 @@ public class QaContentDAO extends HibernateDaoSupport implements IQaContentDAO {
 	    {
 	        this.getHibernateTemplate().flush();
 	    }
-	
 	    
 } 
