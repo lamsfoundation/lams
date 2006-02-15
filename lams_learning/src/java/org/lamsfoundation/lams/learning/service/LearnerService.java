@@ -44,6 +44,7 @@ import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dao.ILearnerProgressDAO;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
+import org.lamsfoundation.lams.tool.ToolContentIDGenerator;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.dao.IToolSessionDAO;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
@@ -51,6 +52,7 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.MessageService;
 /**
  * This class is a facade over the Learning middle tier.
  * @author chris, Jacky Fang
@@ -71,6 +73,8 @@ public class LearnerService implements ILearnerService
     private ILamsCoreToolService lamsCoreToolService;
     private ActivityMapping activityMapping;
     private IUserManagementService userManagementService;
+    protected MessageService messageService;
+
     //---------------------------------------------------------------------
     // Inversion of Control Methods - Constructor injection
     //---------------------------------------------------------------------
@@ -83,6 +87,13 @@ public class LearnerService implements ILearnerService
     //---------------------------------------------------------------------
     // Inversion of Control Methods - Method injection
     //---------------------------------------------------------------------
+	/**
+	 * Set i18n MessageService
+	 */
+	public void setMessageService(MessageService messageService) {
+		this.messageService = messageService;
+	}
+
     /**
      * @param toolSessionDAO The toolSessionDAO to set.
      */

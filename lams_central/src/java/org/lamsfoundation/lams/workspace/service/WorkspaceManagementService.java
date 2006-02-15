@@ -67,6 +67,7 @@ import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedExceptio
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.usermanagement.exception.WorkspaceFolderException;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.workspace.WorkspaceFolderContent;
 import org.lamsfoundation.lams.workspace.dao.IWorkspaceFolderContentDAO;
@@ -102,8 +103,15 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	protected IAuthoringService authoringService;
 	protected IRepositoryService repositoryService;
 	protected IUserManagementService userMgmtService;
+	protected MessageService messageService;
 	
-	
+	/**
+	 * i18n Message service
+	 * @param messageSource
+	 */
+	public void setMessageService(MessageService messageService) {
+		this.messageService = messageService;
+	}
 	/**
 	 * @param workspaceFolderContentDAO The workspaceFolderContentDAO to set.
 	 */

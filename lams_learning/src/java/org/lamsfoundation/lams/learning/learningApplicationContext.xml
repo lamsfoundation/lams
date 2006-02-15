@@ -9,6 +9,15 @@
 <beans>
 
 	<!-- ========================= GENERAL DEFINITIONS ========================= -->
+	<bean id="learningMessageService" class="org.lamsfoundation.lams.util.MessageService" singleton="true">
+		<property name="messageSource">
+			<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+				<property name="basename">
+					<value>org.lamsfoundation.lams.learning.LearningResources</value>
+				</property>
+			</bean>
+		</property>
+    </bean>
 	
 	<!-- ========================= BUSINESS OBJECT DEFINITIONS ======================== -->
 	<bean id="learnerServiceTarget" class="org.lamsfoundation.lams.learning.service.LearnerService" singleton="false">
@@ -23,6 +32,7 @@
 		<property name="groupingDAO"><ref bean="groupingDAO"/></property>
 		<property name="activityMapping"><ref bean="activityMapping"/></property>
 		<property name="userManagementService"><ref bean="userManagementService"/></property>
+		<property name="messageService"><ref bean="learningMessageService"/></property>
 	</bean>
 	
 	<bean id="learnerService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">

@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
+	<!-- ========================= GENERAL DEFINITIONS ========================= -->
+	<bean id="workspaceMessageService" class="org.lamsfoundation.lams.util.MessageService" singleton="true">
+		<property name="messageSource">
+			<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+				<property name="basename">
+					<value>org.lamsfoundation.lams.applicationResources</value>
+				</property>
+			</bean>
+		</property>
+    </bean>
 	
 	<!-- ========================= BUSINESS OBJECT DEFINITIONS ========================= -->	
 	<bean id="workspaceServiceTarget" class="org.lamsfoundation.lams.workspace.service.WorkspaceManagementService">
@@ -13,6 +23,7 @@
 		<property name="userOrganisationDAO"><ref bean="userOrganisationDAO"/></property>
 		<property name="workspaceFolderContentDAO"><ref bean="workspaceFolderContentDAO"/></property>
 		<property name="userMgmtService"><ref bean="userManagementService"/></property>
+		<property name="messageService"><ref bean="workspaceMessageService"/></property>
 	</bean>
 	
 	<bean id="workspaceManagementService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">

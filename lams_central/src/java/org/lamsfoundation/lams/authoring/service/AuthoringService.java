@@ -68,6 +68,7 @@ import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.usermanagement.exception.WorkspaceFolderException;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 
@@ -93,6 +94,7 @@ public class AuthoringService implements IAuthoringService {
 	protected GroupingDAO groupingDAO;
 	protected GroupDAO groupDAO;
 	protected ICSSThemeDAO themeDAO;
+	protected MessageService messageService;
 	
 	protected ToolContentIDGenerator contentIDGenerator;
 	
@@ -103,7 +105,13 @@ public class AuthoringService implements IAuthoringService {
 	/**********************************************
 	 * Setter Methods
 	 * *******************************************/
-	
+	/**
+	 * Set i18n MessageService
+	 */
+	public void setMessageService(MessageService messageService) {
+		this.messageService = messageService;
+	}
+
 	/**
 	 * @param groupDAO The groupDAO to set.
 	 */

@@ -15,5 +15,10 @@
 		<param-value>coreSessionFactory</param-value>
 	</init-param>
    </filter>
-
+<filter>
+       <filter-name>LocaleFilter</filter-name>
+         <filter-class>
+		   org.lamsfoundation.lams.web.filter.LocaleFilter
+         </filter-class>
+</filter>
    
