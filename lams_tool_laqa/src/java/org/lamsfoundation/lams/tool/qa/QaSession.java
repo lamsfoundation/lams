@@ -51,7 +51,10 @@ public class QaSession implements Serializable,Comparable, Nullable
     public final static String INCOMPLETE = "INCOMPLETE";
     
     public static final String COMPLETED = "COMPLETED";
-    
+
+	/** identifier field */
+    private Long uid;
+
     /** identifier field */
     private Long qaSessionId;
 
@@ -361,5 +364,17 @@ public class QaSession implements Serializable,Comparable, Nullable
 	 */
 	public void setQaContentId(Long qaContentId) {
 		this.qaContentId = qaContentId;
+	}
+	/**
+	 * @return Returns the uid.
+	 */
+	public Long getUid() {
+		return uid;
+	}
+	/**
+	 * @param uid The uid to set.
+	 */
+	public void setUid(Long uid) {
+		this.uid = uid;
 	}
 }

@@ -52,9 +52,6 @@ public class QaQueContent implements Serializable,Comparable, Nullable
 	/** identifier field */
     private Long uid;
 
-    /** identifier field */
-    private Long qaQueContentId;
-    
     /** nullable persistent field */
     private String question;
 
@@ -145,7 +142,7 @@ public class QaQueContent implements Serializable,Comparable, Nullable
     
     public String toString() {
         return new ToStringBuilder(this)
-            .append("qaQueContentId: ", getQaQueContentId())
+            .append("qaQueContentId: ", getUid())
 			.append("question: ", getQuestion())
 			.append("displayOrder: ", getDisplayOrder())
             .toString();
@@ -155,13 +152,13 @@ public class QaQueContent implements Serializable,Comparable, Nullable
         if ( !(other instanceof QaQueContent) ) return false;
         QaQueContent castOther = (QaQueContent) other;
         return new EqualsBuilder()
-            .append(this.getQaQueContentId(), castOther.getQaQueContentId())
+            .append(this.getUid(), castOther.getUid())
             .isEquals();
     }
 
     public int hashCode() {
         return new HashCodeBuilder()
-            .append(getQaQueContentId())
+            .append(getUid())
             .toHashCode();
     }
   
@@ -190,18 +187,7 @@ public class QaQueContent implements Serializable,Comparable, Nullable
 	public void setQaContent(org.lamsfoundation.lams.tool.qa.QaContent qaContent) {
 		this.qaContent = qaContent;
 	}
-	/**
-	 * @return Returns the qaQueContentId.
-	 */
-	public Long getQaQueContentId() {
-		return qaQueContentId;
-	}
-	/**
-	 * @param qaQueContentId The qaQueContentId to set.
-	 */
-	public void setQaQueContentId(Long qaQueContentId) {
-		this.qaQueContentId = qaQueContentId;
-	}
+	
 	/**
 	 * @return Returns the qaQueUsers.
 	 */
@@ -338,10 +324,10 @@ public class QaQueContent implements Serializable,Comparable, Nullable
         QaQueContent queContent = (QaQueContent) o;
         
         //if the object does not exist yet, then just return any one of 0, -1, 1. Should not make a difference.
-        if (qaQueContentId == null)
+        if (uid == null)
         	return 1;
 		else
-			return (int) (qaQueContentId.longValue() - queContent.qaQueContentId.longValue());
+			return (int) (uid.longValue() - queContent.uid.longValue());
         
     }
 

@@ -9,15 +9,16 @@
         table="tl_laqa11_que_content"
     >
 
-        <id
-            name="qaQueContentId"
-            column="qa_que_content_id"
-            type="java.lang.Long"
-        >
-		    <generator class="increment"/>
-        </id>
+    <id
+        name="uid"
+        type="java.lang.Long"
+        column="uid"
+    >
+        <generator class="native" />
+    </id>
 
-        <property
+
+	   <property
             name="question"
             type="java.lang.String"
             access="property"

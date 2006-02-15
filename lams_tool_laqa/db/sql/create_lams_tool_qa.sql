@@ -21,12 +21,13 @@ CREATE TABLE lams.tl_laqa11_content (
 )TYPE=InnoDB;
 
 CREATE TABLE lams.tl_laqa11_session (
-       qa_session_id BIGINT(20) NOT NULL
+       uid BIGINT(20) NOT NULL AUTO_INCREMENT
+     , qa_session_id BIGINT(20) NOT NULL
      , session_start_date DATETIME
      , session_end_date DATETIME
      , session_status VARCHAR(100)
      , qa_content_id BIGINT(20) NOT NULL
-     , PRIMARY KEY (qa_session_id)
+     , PRIMARY KEY (uid)
      , INDEX (qa_content_id)
      , CONSTRAINT FK_tl_laqa11_session_1 FOREIGN KEY (qa_content_id)
                   REFERENCES lams.tl_laqa11_content (uid)
@@ -41,12 +42,11 @@ CREATE TABLE lams.tl_laqa11_que_usr (
      , PRIMARY KEY (uid)
      , INDEX (qa_session_id)
      , CONSTRAINT FK_tl_laqa11_que_usr_1 FOREIGN KEY (qa_session_id)
-                  REFERENCES lams.tl_laqa11_session (qa_session_id)
+                  REFERENCES lams.tl_laqa11_session (uid)
 )TYPE=InnoDB;
 
 CREATE TABLE lams.tl_laqa11_que_content (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
-     , qa_que_content_id BIGINT(20) NOT NULL
      , question VARCHAR(255)
      , display_order INT(5)
      , qa_content_id BIGINT(20) NOT NULL
@@ -57,7 +57,7 @@ CREATE TABLE lams.tl_laqa11_que_content (
 )TYPE=InnoDB;
 
 CREATE TABLE lams.tl_laqa11_usr_resp (
-       response_id BIGINT(20) NOT NULL
+       response_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , hidden TINYINT(1) DEFAULT 0
      , answer VARCHAR(255)
      , time_zone VARCHAR(255)
