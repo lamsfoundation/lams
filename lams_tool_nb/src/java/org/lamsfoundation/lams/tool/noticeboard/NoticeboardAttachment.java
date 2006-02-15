@@ -39,7 +39,7 @@ import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
  * in the content repository, however, the file details will be stored in the
  * tl_lanb11_attachment table. The file uploaded, will be of two types: online or offline.
  * </p>
- * 
+ * @hibernate.class table="tl_lanb11_attachment"
  * @author mtruong
  */
 public class NoticeboardAttachment implements Serializable, Cloneable {
@@ -109,6 +109,11 @@ public class NoticeboardAttachment implements Serializable, Cloneable {
 	}    
 
     /**
+     * @hibernate.id 
+     * 		generator-class="native" 
+     * 		type="java.lang.Long" 
+     * 		column="attachment_id"
+     * 
      * @return Returns the attachmentId.
      */
     public Long getAttachmentId() {
@@ -123,6 +128,11 @@ public class NoticeboardAttachment implements Serializable, Cloneable {
     }
     
     /**
+     * @hibernate.property 
+     * 		column="filename" 
+     * 		length="255" 
+     * 		not-null="true"
+     * 
      * @return Returns the filename.
      */
     public String getFilename() {
@@ -136,6 +146,11 @@ public class NoticeboardAttachment implements Serializable, Cloneable {
     }
    
     /**
+     * @hibernate.property 
+     * 		column="online_file" 
+     * 		length="1" 
+     * 		not-null="true"
+     * 
      * @return Returns the isOnline.
      */
     public boolean isOnlineFile() {
@@ -149,6 +164,12 @@ public class NoticeboardAttachment implements Serializable, Cloneable {
     }
    
     /**
+     * @hibernate.many-to-one 
+     * 		not-null="true" 
+     * 
+     * @hibernate.column 
+     * 		name="nb_content_uid"
+     * 
      * @return Returns the nbContent.
      */
     public NoticeboardContent getNbContent() {
@@ -162,6 +183,11 @@ public class NoticeboardAttachment implements Serializable, Cloneable {
     }
    
     /**
+     * @hibernate.property 
+     * 		column="uuid" 
+     * 		not-null="true" 
+     * 		length="20"
+     * 
      * @return Returns the uuid.
      */
     public Long getUuid() {
@@ -175,6 +201,10 @@ public class NoticeboardAttachment implements Serializable, Cloneable {
     }
    
     /**
+     * @hibernate.property 
+     * 		column="version_id" 
+     * 		length="20"
+     * 
      * @return Returns the versionId.
      */
     public Long getVersionId() { //nullable

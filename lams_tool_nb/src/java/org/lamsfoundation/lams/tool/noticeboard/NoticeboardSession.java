@@ -38,6 +38,7 @@ import java.util.Set;
  * <li>COMPLETED: The session status will never be set to complete as you don't know when this tool is going to end.
  * </ul></p>
  * @author mtruong
+ * @hibernate.class table="tl_lanb11_session"
  */
 
 public class NoticeboardSession implements Serializable {
@@ -144,7 +145,7 @@ public class NoticeboardSession implements Serializable {
 	/**
 	 * 		@hibernate.many-to-one
      *      not-null="true"
-     *      @hibernate.column name="nb_content_id" 
+     *      @hibernate.column name="nb_content_uid" 
 	 */
 	public NoticeboardContent getNbContent() {
 		return nbContent;

@@ -26,6 +26,7 @@ import java.io.Serializable;
  */
 
 /**
+ * @hibernate.class table="tl_lanb11_user"
  * @author mtruong
  *
  * <p>The NoticeboardUser class represents the learners that will participate
@@ -85,6 +86,10 @@ public class NoticeboardUser implements Serializable {
     }
     
     /**
+     * @hibernate.property 
+     * 		column="fullname" 
+     * 		length="50"
+     * 
      * @return Returns the fullname.
      */
     public String getFullname() {
@@ -97,6 +102,11 @@ public class NoticeboardUser implements Serializable {
         this.fullname = fullname;
     }
     /**
+     * @hibernate.many-to-one 
+     * 		not-null="true" 
+     * @hibernate.column 
+     * 		name="nb_session_uid"
+     * 
      * @return Returns the nbSession.
      */
     public NoticeboardSession getNbSession() {
@@ -109,6 +119,11 @@ public class NoticeboardUser implements Serializable {
         this.nbSession = nbSession;
     }
     /**
+     * @hibernate.id 
+     * 		generator-class="native" 
+     * 		type="java.lang.Long" 
+     * 		column="uid"
+     * 
      * @return Returns the uid.
      */
     public Long getUid() {
@@ -121,6 +136,11 @@ public class NoticeboardUser implements Serializable {
         this.uid = uid;
     }
     /**
+     * @hibernate.property 
+     * 		column="user_id" 
+     * 		length="20" 
+     * 		not-null="true"
+     * 
      * @return Returns the userId.
      */
     public Long getUserId() {
@@ -133,6 +153,10 @@ public class NoticeboardUser implements Serializable {
         this.userId = userId;
     }
     /**
+     * @hibernate.property 
+     * 		column="username" 
+     * 		length="50"
+     * 
      * @return Returns the username.
      */
     public String getUsername() {
@@ -145,6 +169,10 @@ public class NoticeboardUser implements Serializable {
         this.username = username;
     }
     /**
+     * @hibernate.property 
+     * 		column="user_status" 
+     * 		length="50"
+     * 
      * @return Returns the userStatus.
      */
     public String getUserStatus() {

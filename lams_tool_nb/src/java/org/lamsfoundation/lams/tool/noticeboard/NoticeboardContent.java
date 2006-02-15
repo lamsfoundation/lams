@@ -35,7 +35,7 @@ import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 /**
  * <p>Persistent noticeboard object/bean that defines the content for the noticeboard tool.
  * Provides accessors and mutators to get/set noticeboard attributes</p>
- * 
+ * @hibernate.class table="tl_lanb11_content"
  * @author mtruong
  */
 public class NoticeboardContent implements Serializable {
