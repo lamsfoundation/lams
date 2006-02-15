@@ -26,6 +26,9 @@ public class SubmitFilesSession implements Serializable,Cloneable{
     
 	/** identifier field */
     private Long sessionID;
+    
+    /** persistent field */
+    private String sessionName;
 
     /** persistent field */
     private Integer status;
@@ -165,5 +168,22 @@ public class SubmitFilesSession implements Serializable,Cloneable{
 	 */
 	public void setContent(SubmitFilesContent content) {
 		this.content = content;
+	}
+	
+	/**
+	 * @hibernate.property column="session_name" length="250"
+	 * 
+	 * @return Returns the session name.
+	 */
+	public String getSessionName() {
+		return sessionName;
+	}
+
+	/**
+	 * 
+	 * @param sessionName The session name to set.
+	 */
+	public void setSessionName(String sessionName) {
+		this.sessionName = sessionName;
 	}
 }
