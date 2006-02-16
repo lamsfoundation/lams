@@ -3,20 +3,20 @@
 
 <div class="datatablecontainer">
 <c:forEach var="element" items="${topicList}">
-	<c:set var="toolSessionID" value="${element.key}"/>
+	<c:set var="toolSessionDto" value="${element.key}"/>
 	<c:set var="sessionTopicList" value="${element.value}"/>
 	<c:forEach var="totalMsg" items="${totalMessage}">
-		<c:if test="${totalMsg.key eq toolSessionID}">
+		<c:if test="${totalMsg.key eq toolSessionDto.sessionID}">
 			<c:set var="sessionTotalMessage" value="${totalMsg.value}"/>
 		</c:if>
 	</c:forEach>
 	<c:forEach var="avaMark" items="${markAverage}">
-		<c:if test="${avaMark.key eq toolSessionID}">
+		<c:if test="${avaMark.key eq toolSessionDto.sessionID}">
 			<c:set var="sessionMarkAverage" value="${avaMark.value}"/>
 		</c:if>
 	</c:forEach>
 	
-		Session ID: <c:out value="${toolSessionID}"/>
+		Session Name: <c:out value="${toolSessionDto.sessionName}"/>
 	
 	<table width="100%"  border="0" cellspacing="0" cellpadding="0">
 	
