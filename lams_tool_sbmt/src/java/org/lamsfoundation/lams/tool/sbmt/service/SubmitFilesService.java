@@ -329,6 +329,7 @@ public class SubmitFilesService implements ToolContentManager,
             SubmitFilesSession submitSession = new SubmitFilesSession ();
 
             submitSession.setSessionID(toolSessionId);
+            submitSession.setSessionName(toolSessionName);
             submitSession.setStatus(new Integer(SubmitFilesSession.INCOMPLETE));
             submitSession.setContent(submitContent);
             submitFilesSessionDAO.createSession(submitSession);
