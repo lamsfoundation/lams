@@ -1,4 +1,9 @@
 ﻿import org.lamsfoundation.lams.common.util.*
+import org.lamsfoundation.lams.common.comms.*
+import org.lamsfoundation.lams.common.Config
+import org.lamsfoundation.lams.common.dict.*
+import org.lamsfoundation.lams.common.ui.*
+import org.lamsfoundation.lams.authoring.Application
 import mx.events.*/**  
 * Debug  
 * Can be used to print message to a floating windoe and to trace windoe.  SHoudl be used over trace().  
@@ -12,6 +17,7 @@ import mx.events.*/**
 class org.lamsfoundation.lams.common.util.Debugger {  
 	
     //Declarations  
+	private var _config:Config;
     public static var CRITICAL:Number = 1;      //level constants
     public static var HIGH:Number = 2;
     public static var MED:Number = 3;
@@ -20,7 +26,8 @@ class org.lamsfoundation.lams.common.util.Debugger {
 	public static var COMP:Number = 5;
 	
     
-    private static var _severityLevel:Number = 5;
+    private static var _severityLevel:Number;
+	private static var _crashDumpSeverityLevel:Number;
 	private static var _allowDebug:Boolean = true;
 	
 	private static var _currentClass:String;
@@ -31,8 +38,9 @@ class org.lamsfoundation.lams.common.util.Debugger {
     public var addEventListener:Function;
     public var removeEventListener:Function;
     
-    private static var _msgLog:Array;
-
+    //private static var _msgLog:Array;
+	public static var _msgLog:Array;
+	public static var _crashDumpMsgLog:Array;
 
     //TODO DI 07/06/05 Add code to get dump of flash from _root
     
@@ -41,10 +49,13 @@ class org.lamsfoundation.lams.common.util.Debugger {
         //Set up this class to use the Flash event delegation model
         EventDispatcher.initialize(this);
         _msgLog = [];
+		_crashDumpMsgLog = [];
+		
+		
 	}  
     
     /**
-    * Retrieves an instance of the Application singleton
+    * Retrieves an instance of the debugger singleton
     */ 
     public static function getInstance():Debugger{
         if(Debugger._instance == null){
@@ -53,7 +64,6 @@ class org.lamsfoundation.lams.common.util.Debugger {
         return Debugger._instance;
     }
 	
-	
 	public function set allowDebug(arg:Boolean):Void{
 			_allowDebug = arg;
 	}
@@ -61,7 +71,9 @@ class org.lamsfoundation.lams.common.util.Debugger {
 	public function get allowDebug():Boolean{
 			return _allowDebug;
 	}
-	
+	/*
+	* Method to Set the Message Log - Severity Level through Application once config file has been loaded
+	*/
 	public function set severityLevel(sLevel:Number):Void{
 			_severityLevel = sLevel;
 	}
@@ -70,7 +82,59 @@ class org.lamsfoundation.lams.common.util.Debugger {
 			return _severityLevel;
 	}
     
-			/**
+	/*
+	* Method to Set the Crash Data Message Log - Crash Dump Severity Level through Application once config file has been loaded
+	*/
+	public function set crashDumpSeverityLevel(cdsLevel:Number):Void{
+			_crashDumpSeverityLevel = cdsLevel;
+	}
+	public function get crashDumpSeverityLevel():Number{
+			return _crashDumpSeverityLevel;
+	}
+	/**
+	* Method to get the Design Data from canvas & debugger log and store it in an object to send it to the server. 
+	*/
+	public static function crashDataDump():Void{
+        //getInstance();
+		var dto:Object = new Object()
+		var _instance = getInstance()
+		
+		
+		var crashDumpLevel = _instance.crashDumpSeverityLevel;
+		
+		/*
+		* //Write to Crash Dump log based on the Crash Dump Severity Level set through the Congif class
+		*/
+		for(var i=0;i<_msgLog.length;i++) {
+			if(_msgLog[i].level <= _crashDumpSeverityLevel){ 
+				_crashDumpMsgLog.push(_msgLog[i])
+			}
+        }
+		
+		//trace("Length of _crashDumpMsgLog:- "+_crashDumpMsgLog.length)	
+		var sendDumpMsgLog = _crashDumpMsgLog;
+		//_global.breakpoint();
+		//Debugger.log('HI there: '+mytest,Debugger.CRITICAL,'crashDataDump','Debugger');
+		dto.ddm = Application.getInstance().getDesignDataModel().getDesignForSaving();
+		dto.crashDataLog = sendDumpMsgLog;   
+		var callback:Function = Proxy.create(Debugger,onCrashDumpResponse);
+		
+		var comms = Application.getInstance().getComms();
+        comms.sendAndReceive(dto, 'flashCrashDump',callback,false)
+		
+    }	
+			
+	public static function onCrashDumpResponse(r):Void{
+		if(r instanceof LFError){
+			r.showErrorAlert();
+			
+		}else{
+					
+			var msg:String = Dictionary.getValue('db_datasend_confirm')+r;
+			LFMessage.showMessageAlert(msg);
+			
+		}
+	}	/**
 	* Method to print a message to the output - trace or window...
 	* @param msg 			The actual message to be printed
 	* @param level 			(Optional) Severity of this messgae:
@@ -110,6 +174,8 @@ class org.lamsfoundation.lams.common.util.Debugger {
                 
                 //Write to log
                 _msgLog.push(obj);
+					
+				//trace("Length of _msgLog:- "+_msgLog.length)
                 //Dispatch update event
                 _instance.dispatchEvent({type:'update',target:_instance});
 			}
@@ -153,6 +219,11 @@ class org.lamsfoundation.lams.common.util.Debugger {
             format.date = false;
         }
         //Loop through messages and build return string
+        //for(var i=0;i<_msgLog.length;i++) {
+        //    ret += buildMessage(format,_msgLog[i]);
+        //}
+		//Loop through messages and build return string
+		
         for(var i=0;i<_msgLog.length;i++) {
             ret += buildMessage(format,_msgLog[i]);
         }
@@ -231,7 +302,8 @@ class org.lamsfoundation.lams.common.util.Debugger {
     /**
     */
     function get msgLog(){
-        return _msgLog;   
+        return _msgLog; 
+		return _crashDumpMsgLog;
     }
     
 }
