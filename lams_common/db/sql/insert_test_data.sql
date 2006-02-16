@@ -20,105 +20,105 @@ insert into lams_learning_library (learning_library_id,description,title,create_
 insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,description,tool_identifier,tool_version,default_tool_content_id,
 grouping_support_type_id,supports_define_later_flag,supports_run_offline_flag,supports_moderation_flag,supports_contribute_flag,
 learner_url,author_url,define_later_url,export_portfolio_url,monitor_url,contribute_url,moderation_url,
-valid_flag,learning_library_id)
+valid_flag,learning_library_id,create_date_time)
 values(1,'notebook_signature','notebookService','Notebook','Notebook Description','notebook','1.1',1,
 2,0,1,0,1,
 'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url','contribute_url','moderation_url',
-1,1);
+1,1,now());
 
 insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,description,tool_identifier,tool_version,default_tool_content_id,
 grouping_support_type_id,supports_define_later_flag,supports_run_offline_flag,supports_moderation_flag,supports_contribute_flag,
 learner_url,author_url,define_later_url,export_portfolio_url,monitor_url,contribute_url,moderation_url,
-valid_flag,learning_library_id)
+valid_flag,learning_library_id,create_date_time)
 values(2,'noticeboard_signature','noticeboardService','Noticeboard','Noticeboard Description','noticeboard','1.1',2,
 2,1,1,0,1,
 'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url','contribute_url','moderation_url',
-1,2);
+1,2,now());
 
 insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,description,tool_identifier,tool_version,default_tool_content_id,
 grouping_support_type_id,supports_define_later_flag,supports_run_offline_flag,supports_moderation_flag,supports_contribute_flag,
 learner_url,author_url,define_later_url,export_portfolio_url,monitor_url,contribute_url,moderation_url,
-valid_flag,learning_library_id)
+valid_flag,learning_library_id,create_date_time)
 values(3,'multiple_choice_signature','multipleChoiceService','Multiple Choice','Multiple Coice Description','multiple choice','1.1',3,
 2,1,1,1,1,
 'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url','contribute_url','moderation_url',
-1,3);
+1,3,now());
 
 insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,description,tool_identifier,tool_version,default_tool_content_id,
 grouping_support_type_id,supports_define_later_flag,supports_run_offline_flag,supports_moderation_flag,supports_contribute_flag,
 learner_url,author_url,define_later_url,export_portfolio_url,monitor_url,contribute_url,moderation_url,
-valid_flag,learning_library_id)
+valid_flag,learning_library_id,create_date_time)
 values(4,'question_answer_signature','questionAnswerService','Question and Answers','Question and Answers Description','q & a','1.1',4,
 2,1,1,1,1,
 'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url','contribute_url','moderation_url',
-1,4);
+1,4,now());
 
 insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,description,tool_identifier,tool_version,default_tool_content_id,
 grouping_support_type_id,supports_define_later_flag,supports_run_offline_flag,supports_moderation_flag,supports_contribute_flag,
 learner_url,author_url,define_later_url,export_portfolio_url,monitor_url,contribute_url,moderation_url,
-valid_flag,learning_library_id)
+valid_flag,learning_library_id,create_date_time)
 values(5,'message_board_signature','messageBoardService','Message Board','Message Board Description','forum','1.1',5,
 2,1,1,1,1,
 'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url','contribute_url','moderation_url',
-1,5);
+1,5,now());
 
 insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,description,tool_identifier,tool_version,default_tool_content_id,
 grouping_support_type_id,supports_define_later_flag,supports_run_offline_flag,supports_moderation_flag,supports_contribute_flag,
 learner_url,author_url,define_later_url,export_portfolio_url,monitor_url,contribute_url,moderation_url,
-valid_flag,learning_library_id)
+valid_flag,learning_library_id,create_date_time)
 values(6,'survey_signature','srvyService','Survey','Survey Description','survey','1.1',6,
 2,1,1,1,1,
 '/lams_tool_survey/tool/survey/survey.do?method=loadQuestionnaire','/lams_tool_survey/tool/survey/authoring.do?method=loadSurvey','define_later_url','export_portfolio_url',
 '/lams_tool_survey/tool/survey/report.do?method=loadMonitorReport','contribute_url','moderation_url',
-1,6);
+1,6,now());
 
 insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,description,tool_identifier,tool_version,default_tool_content_id,
 grouping_support_type_id,supports_define_later_flag,supports_run_offline_flag,supports_moderation_flag,supports_contribute_flag,
 learner_url,author_url,define_later_url,export_portfolio_url,monitor_url,contribute_url,moderation_url,
-valid_flag,learning_library_id)
+valid_flag,learning_library_id,create_date_time)
 values(7,'chat_signature','chatService','Chat','Chat Description','chat','1.1',7,
 2,1,1,1,1,
 'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url','contribute_url','moderation_url',
-1,7);
+1,7,now());
 
 insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,description,tool_identifier,tool_version,default_tool_content_id,
 grouping_support_type_id,supports_define_later_flag,supports_run_offline_flag,supports_moderation_flag,supports_contribute_flag,
 learner_url,author_url,define_later_url,export_portfolio_url,monitor_url,contribute_url,moderation_url,
-valid_flag,learning_library_id)
+valid_flag,learning_library_id,create_date_time)
 values(8,'shared_resources_signature','sharedResourcesService','Shared Resources','Shared Resources Description','shared resources','1.1',8,
 2,1,0,1,1,
 'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url','contribute_url','moderation_url',
-1,8);
+1,8,now());
 
 
 insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,description,tool_identifier,tool_version,default_tool_content_id,
 grouping_support_type_id,supports_define_later_flag,supports_run_offline_flag,supports_moderation_flag,supports_contribute_flag,
 learner_url,author_url,define_later_url,export_portfolio_url,monitor_url,contribute_url,moderation_url,
-valid_flag,learning_library_id)
+valid_flag,learning_library_id,create_date_time)
 values(9,'voting_signature','votingService','Voting','Voting Description','voting','1.1',9,
 2,1,1,1,1,
 'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url','contribute_url','moderation_url',
-1,9);
+1,9,now());
 
 
 insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,description,tool_identifier,tool_version,default_tool_content_id,
 grouping_support_type_id,supports_define_later_flag,supports_run_offline_flag,supports_moderation_flag,supports_contribute_flag,
 learner_url,author_url,define_later_url,export_portfolio_url,monitor_url,contribute_url,moderation_url,
-valid_flag,learning_library_id)
+valid_flag,learning_library_id,create_date_time)
 values(10,'submit_files_signature','sbService','Submit Files','Submit Files Description','submit files','1.1',10,
 2,1,1,1,1,
 'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url','contribute_url','moderation_url',
-1,10);
+1,10,now());
 
 
 insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,description,tool_identifier,tool_version,default_tool_content_id,
 grouping_support_type_id,supports_define_later_flag,supports_run_offline_flag,supports_moderation_flag,supports_contribute_flag,
 learner_url,author_url,define_later_url,export_portfolio_url,monitor_url,contribute_url,moderation_url,
-valid_flag,learning_library_id)
+valid_flag,learning_library_id,create_date_time)
 values(11,'instant_messaging_signature','instantMessagingService','Instant Messaging','Instant Messaging Description','instant messaging','1.1',11,
 2,1,1,1,1,
 'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url','contribute_url','moderation_url',
-1,11);
+1,11,now());
 
 -- Populates the lams_tool_content table with dummy default content for all above tools
 
@@ -839,7 +839,7 @@ INSERT INTO lams_cr_credential (credential_id, name, password) VALUES (3, 'Submi
 INSERT INTO lams_cr_workspace  (workspace_id, name) VALUES (4, 'SubmitFilesWorkspace');
 INSERT INTO lams_cr_workspace_credential  (wc_id, workspace_id, credential_id) VALUES  (4,4,3);
 
-INSERT INTO lams_cr_node (node_id, workspace_id, type, created_date_time, path, next_version_id) VALUES (1, 1, 'DATANODE', 20050106103100, "/test",3);
+INSERT INTO lams_cr_node (node_id, workspace_id, type, created_date_time, path, next_version_id,nv_id) VALUES (1, 1, 'DATANODE', 20050106103100, "/test",3,1);
 INSERT INTO lams_cr_node_version (nv_id, node_id, version_id, created_date_time)
 VALUES (1, 1, 1, 20050106103100);
 INSERT INTO lams_cr_node_version (nv_id, node_id, version_id, created_date_time)
@@ -851,7 +851,7 @@ INSERT INTO lams_cr_node_version_property( id, nv_id, name, value, type) VALUES 
 INSERT INTO lams_cr_node_version_property( id, nv_id, name, value, type) VALUES (4,2,"VERSIONDESC","The second version.",1);
 
 -- Note : this file node is missing its file as can't setup the repository
-INSERT INTO lams_cr_node (node_id, workspace_id, type, created_date_time, path, next_version_id) VALUES (2, 1, 'FILENODE', 20050106103100, "", 2);
+INSERT INTO lams_cr_node (node_id, workspace_id, type, created_date_time, path, next_version_id,nv_id) VALUES (2, 1, 'FILENODE', 20050106103100, "", 2,3);
 INSERT INTO lams_cr_node_version (nv_id, node_id, version_id, created_date_time)
 VALUES (3, 2, 1, 20050106103100);
 INSERT INTO lams_cr_node_version_property( id, nv_id, name, value, type) VALUES (5,3,"VERSIONDESC","Initial Version.",1);

@@ -544,7 +544,6 @@ CREATE TABLE lams_cr_node_version (
      , node_id BIGINT(20) UNSIGNED NOT NULL
      , version_id BIGINT(20) UNSIGNED NOT NULL
      , created_date_time DATETIME NOT NULL
-     , id BIGINT(20) UNSIGNED NOT NULL
      , PRIMARY KEY (nv_id)
      , INDEX (node_id)
      , CONSTRAINT FK_lams_cr_node_version_2 FOREIGN KEY (node_id)
