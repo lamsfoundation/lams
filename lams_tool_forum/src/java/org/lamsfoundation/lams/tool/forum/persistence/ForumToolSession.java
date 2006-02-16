@@ -36,6 +36,7 @@ public class ForumToolSession implements Cloneable{
 	
 	private Long uid;
 	private Long sessionId;
+	private String sessionName;
 	private Forum forum;
 	private Date sessionStartDate;
 	private Date sessionEndDate;
@@ -125,6 +126,22 @@ public class ForumToolSession implements Cloneable{
 	}
 	public void setSessionId(Long sessionId) {
 		this.sessionId = sessionId;
+	}
+
+	/**
+	 * @hibernate.property column="session_name" length="250"
+	 * @return Returns the session name
+	 */
+	public String getSessionName() {
+		return sessionName;
+	}
+
+	/**
+	 * 
+	 * @param sessionName The session name to set.
+	 */
+	public void setSessionName(String sessionName) {
+		this.sessionName = sessionName;
 	}
 
 
