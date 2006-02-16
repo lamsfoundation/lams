@@ -53,9 +53,9 @@ public class LocaleFilter extends OncePerRequestFilter {
             FilterChain chain) throws IOException, ServletException {
     	Locale preferredLocale = null;
     	//user set has first prority:
-    	String locale = request.getParameter("locale");
-    	if (locale != null)
-    		preferredLocale = new Locale(locale);
+//    	String locale = request.getParameter("locale");
+//    	if (locale != null)
+//    		preferredLocale = new Locale(locale);
 
     	//if request does not assign locale, then get it from database
     	if(preferredLocale == null){
