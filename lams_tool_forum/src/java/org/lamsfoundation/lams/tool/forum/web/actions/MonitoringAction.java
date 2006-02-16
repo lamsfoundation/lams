@@ -47,6 +47,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.forum.dto.MessageDTO;
+import org.lamsfoundation.lams.tool.forum.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.forum.persistence.Forum;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumReport;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumToolSession;
@@ -558,7 +559,12 @@ public class MonitoringAction extends Action {
 			}
 			
 			float averMark = totalMsg == 0 ? 0: (totalMsgMarkSum/(float)totalMsg);
-			sessionTopicsMap.put(session.getSessionId(),topicList);
+			
+			SessionDTO sessionDto = new SessionDTO();
+			sessionDto.setSessionID(session.getSessionId());
+			sessionDto.setSessionName(session.getSessionName());
+			
+			sessionTopicsMap.put(sessionDto,topicList);
 			sessionAvaMarkMap.put(session.getSessionId(),getAverageFormat(averMark));
 			sessionTotalMsgMap.put(session.getSessionId(),new Integer(totalMsg));
 		}
@@ -607,9 +613,12 @@ public class MonitoringAction extends Action {
         //build a map with all users in the submitFilesSessionList
         Iterator it = sessionsList.iterator();
         while(it.hasNext()){
-            Long sessionID = ((ForumToolSession)it.next()).getUid();
-            List userList = forumService.getUsersBySessionId(sessionID);
-            sessionUserMap.put(sessionID, userList);
+        	SessionDTO sessionDto = new SessionDTO();
+        	ForumToolSession fts = (ForumToolSession)it.next();
+        	sessionDto.setSessionID(fts.getSessionId());
+        	sessionDto.setSessionName(fts.getSessionName());
+        	List userList = forumService.getUsersBySessionId(fts.getSessionId());
+            sessionUserMap.put(sessionDto, userList);
         }
         
 		//request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionID);
