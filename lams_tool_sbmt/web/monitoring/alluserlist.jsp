@@ -33,7 +33,7 @@
 							<tr>
 							<html:form  action="/monitoring">
 							<html:hidden property="method" value="getFilesUploadedByUser"/>
-							<html:hidden property="toolSessionID" value="${sessionID}"/>
+							<html:hidden property="toolSessionID" value="${sessionDto.sessionID}"/>
 							
 							<bean:define id="details" name="user" property="userID"/>
 							<html:hidden property="userID" value="${details}"/>
@@ -53,21 +53,21 @@
 			  			<td class="formcontrol">
 			  			<html:form  action="/monitoring">
 			  				<html:hidden property="method" value="viewAllMarks"/>
-							<html:hidden property="toolSessionID" value="${sessionID}"/>
+							<html:hidden property="toolSessionID" value="${sessionDto.sessionID}"/>
 				  			<html:submit property="viewAllMarks" value="View all marks"/>
 		  				</html:form>
 			  			</td>
 			  			<td class="formcontrol">
 			  			<html:form  action="/monitoring">
 			  				<html:hidden property="method" value="releaseMarks"/>
-							<html:hidden property="toolSessionID" value="${sessionID}"/>
+							<html:hidden property="toolSessionID" value="${sessionDto.sessionID}"/>
 				  			<html:submit property="releaseMarks" value="Release marks"/>
 		  				</html:form>
 			  			</td>
 			  			<td class="formcontrol">
 			  			<html:form  action="/monitoring">
 			  				<html:hidden property="method" value="downloadMarks"/>
-							<html:hidden property="toolSessionID" value="${sessionID}"/>
+							<html:hidden property="toolSessionID" value="${sessionDto.sessionID}"/>
 				  			<html:submit property="downloadMarks" value="Download marks"/>
 		  				</html:form>
 			  			</td>
