@@ -535,6 +535,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 		ForumToolSession session = new ForumToolSession();
 		session.setSessionId(toolSessionId);
+		session.setSessionName(toolSessionName);
 		Forum forum = forumDao.getByContentId(toolContentId);
 		session.setForum(forum);
 		forumToolSessionDao.saveOrUpdate(session);
