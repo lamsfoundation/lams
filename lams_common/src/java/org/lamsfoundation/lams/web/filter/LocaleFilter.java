@@ -52,6 +52,7 @@ public class LocaleFilter extends OncePerRequestFilter {
     public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, 
             FilterChain chain) throws IOException, ServletException {
     	Locale preferredLocale = null;
+    	//Comment: This getParameter() cause problem when reading WDDX packet, which need request.getInputStream() method.
     	//user set has first prority:
 //    	String locale = request.getParameter("locale");
 //    	if (locale != null)
