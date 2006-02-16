@@ -87,6 +87,7 @@ create table tl_lafrum11_tool_session (
    status integer,
    forum_uid bigint,
    session_id bigint,
+   session_name varchar(250),
    primary key (uid)
 );
 alter table tl_lafrum11_attachment add index FK389AD9A2FE939F2A (message_uid), add constraint FK389AD9A2FE939F2A foreign key (message_uid) references tl_lafrum11_message (uid);
