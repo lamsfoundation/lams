@@ -12,6 +12,8 @@ import org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningDesignDAO;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.Vector;
+
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 
 /**
@@ -32,14 +34,16 @@ public class LearningDesignValidator {
 	protected LearningDesignDAO learningDesignDAO = null;
 	private Vector listOfValidationErrorDTOs = null;
 	private FlashMessage flashMessage;
+	protected MessageService messageService;
 	
 	/*
 	 * Default constructor
 	 * initialises the list of validation messages.
 	 */
-	public LearningDesignValidator(LearningDesignDAO learningDesignDAO)
+	public LearningDesignValidator(LearningDesignDAO learningDesignDAO, MessageService messageService)
 	{
 		this.learningDesignDAO = learningDesignDAO;
+		this.messageService = messageService;
 		listOfValidationErrorDTOs = new Vector();
 	}
 
@@ -200,11 +204,15 @@ public class LearningDesignValidator {
 		Iterator activityIterator = activities.iterator();
 		while (activityIterator.hasNext())
 		{
+			String errorMessage = null;
 			Activity activity = (Activity)activityIterator.next();
 			checkIfGroupingRequired(activity);
 			validateGroupingIfGroupingIsApplied(activity);	
 			validateOptionalActivity(activity);
-			validateOptionsActivityOrderId(activity);			
+			validateOptionsActivityOrderId(activity);
+			if((errorMessage = activity.validateActivity()) != null) {
+				listOfValidationErrorDTOs.add(new ValidationErrorDTO(errorMessage, activity.getActivityUIID()));
+			}
 		}
 	}
 	
