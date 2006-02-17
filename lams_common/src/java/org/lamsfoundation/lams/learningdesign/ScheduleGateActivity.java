@@ -126,7 +126,7 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
                 gateActivityLevelId,
                 waitingLearners);
         //validate pre-condition.
-        if(gateStartTimeOffset.intValue()>gateEndTimeOffset.intValue())
+        if(gateStartTimeOffset != null && gateEndTimeOffset != null && (gateStartTimeOffset.intValue()>gateEndTimeOffset.intValue()))
             throw new IllegalStateException("End time offset must be larger" +
             		" than start time offset");
         
@@ -167,9 +167,10 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
 				transitionFrom,
                 gateActivityLevelId,
                 waitingLearners);
-      if(gateStartTimeOffset.intValue()>gateEndTimeOffset.intValue())
+      if(gateStartTimeOffset != null && gateEndTimeOffset != null && (gateStartTimeOffset.intValue()>gateEndTimeOffset.intValue()))
           throw new IllegalStateException("End time offset must be larger" +
           		" than start time offset");
+      
       this.gateStartTimeOffset = gateStartTimeOffset;
       this.gateEndTimeOffset = gateEndTimeOffset;
       this.simpleActivityStrategy = new ScheduleGateActivityStrategy(this);
@@ -280,20 +281,22 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
         Calendar openTime = new GregorianCalendar(TimeZone.getDefault());
         openTime.setTime(lessonStartTime);
         //compute the real opening time based on the lesson start time. 
-        if(isScheduledByTimeOffset())
+        if(isScheduledByStartTimeOffset())
         {
             openTime.add(Calendar.MINUTE,getGateStartTimeOffset().intValue());
             this.setGateStartDateTime(openTime.getTime());
         }
 
-        else if(isScheduledByDateTime())
+        else if(isScheduledByStartDateTime())
             openTime.setTime( getGateStartDateTime());
-        else
-            throw new ActivityBehaviorException("No way of scheduling has " +
+ 
+        /** else
+             throw new ActivityBehaviorException("No way of scheduling has " +
             		"been setup - this usually should be done at authoring " +
             		"interface. Fail to calculate gate open time for lesson.");
-        
+        */
         return openTime.getTime();
+        
     }
     
     /**
@@ -315,19 +318,18 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
         Calendar closeTime = new GregorianCalendar(TimeZone.getDefault());
         closeTime.setTime(lessonStartTime);
         //compute the real opening time based on the  
-        if(isScheduledByTimeOffset())
+        if(isScheduledByEndTimeOffset())
         {
             closeTime.add(Calendar.MINUTE,getGateEndTimeOffset().intValue());
             this.setGateEndDateTime(closeTime.getTime());
         }
-
-        else if(isScheduledByDateTime())
+        else if(isScheduledByEndDateTime())
             closeTime.setTime(getGateEndDateTime());
-        else
-            throw new ActivityBehaviorException("No way of scheduling has " +
+           /** else
+            * 	throw new ActivityBehaviorException("No way of scheduling has " +
             		"been setup - this usually should be done at authoring " +
             		"interface. Fail to calculate gate close time.");
-        
+           */
         return closeTime.getTime();
     }
     
@@ -344,7 +346,21 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
     {
         return false;
     }
-
+    /**
+     * Validate schedule gate activity (offset conditions)
+     * @return error message
+     */
+    public String validateActivity() {
+    	
+    	if(isScheduledByTimeOffset()) {
+    		if(getGateStartTimeOffset().equals(getGateEndTimeOffset()))
+    			return "Cannot have equal start and end time offsets.";
+    		else if(getGateStartTimeOffset().compareTo(getGateEndTimeOffset()) > 0)
+    			return "End offset must be greater than start time offset";
+    	}
+    	return null;
+    }
+    
     /**
      * Helper method that determines the way of sheduling gate.
      * @return is the gate scheduled by time offset
@@ -362,4 +378,50 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
     {
         return getGateStartDateTime()!=null&&getGateEndDateTime()!=null;
     }
+    
+    /**
+     * Helper method that determines way of scheduling a gate.
+     * @return is the gate scheduled by start time offset
+     */
+    private boolean isScheduledByStartTimeOffset() 
+    {	
+    	return getGateStartTimeOffset()!=null;
+    }
+    
+    /**
+     * Helper method that determines way of scheduling a gate.
+     * @return is the gate scheduled by start time offset
+     */
+    private boolean isScheduledByEndTimeOffset() 
+    {	
+    	return getGateEndTimeOffset()!=null;
+    }
+    
+    /**
+     * Helper method that determines way of scheduling a gate.
+     * @return is the gate scheduled by start exact date time.
+     */
+    private boolean isScheduledByStartDateTime() 
+    {	
+    	return getGateStartDateTime()!=null;
+    }
+    
+    /**
+     * Helper method that determines way of scheduling a gate.
+     * @return is the gate scheduled by start exact date time.
+     */
+    private boolean isScheduledByEndDateTime() 
+    {	
+    	return getGateEndDateTime()!=null;
+    }
+    
+    /**
+     * Helper method that determines if a gate is not scheduled.
+     * @return is the gate scheduled by any time offset.
+     */
+    public boolean isScheduled()
+    {
+    	return isScheduledByTimeOffset() || isScheduledByDateTime();
+    }
+    
 }
