@@ -7,20 +7,24 @@ import org.lamsfoundation.lams.learningdesign.LearningDesign;
 public class ValidationErrorDTO {
 	
 	/** Struts Message Resource related variables */
-	private static final String CONFIG_PARAM = "org.lamsfoundation.lams.applicationResources";
-	private static final String OTHER_ERROR_KEY = "flash.validation.error.other";
-	private static final String TRANSITION_ERROR_KEY = "flash.validation.error.transitionNoActivityBeforeOrAfter";
-	private static final String ACTIVITY_TRANSITION_ERROR_KEY= "flash.validation.error.activityWithNoTransition";
-	private static final String INPUT_TRANSITION_ERROR_TYPE1_KEY = "flash.validation.error.inputTransitionType1";
-	private static final String INPUT_TRANSITION_ERROR_TYPE2_KEY = "flash.validation.error.inputTransitionType2";
-	private static final String OUTPUT_TRANSITION_ERROR_TYPE1_KEY = "flash.validation.error.outputTransitionType1";
-	private static final String OUTPUT_TRANSITION_ERROR_TYPE2_KEY = "flash.validation.error.outputTransitionType2";
-	private static final String GROUPING_REQUIRED_ERROR_KEY = "flash.validation.error.GroupingRequired";
-	private static final String GROUPING_NOT_REQUIRED_ERROR_KEY = "flash.validation.error.GroupingNotRequired";
-	private static final String GROUPING_SELECTED_ERROR_KEY = "flash.validation.error.GroupingSelected";
-	private static final String OPTIONAL_ACTIVITY_ERROR_KEY = "flash.validation.error.OptionalActivity";
-	private static final String OPTIONAL_ACTIVITY_ORDER_ID_INVALID_ERROR_KEY = "flash.validation.error.OptionalActivityOrderId";
-		
+	public static final String CONFIG_PARAM = "org.lamsfoundation.lams.applicationResources";
+	public static final String OTHER_ERROR_KEY = "flash.validation.error.other";
+	public static final String TRANSITION_ERROR_KEY = "flash.validation.error.transitionNoActivityBeforeOrAfter";
+	public static final String ACTIVITY_TRANSITION_ERROR_KEY= "flash.validation.error.activityWithNoTransition";
+	public static final String INPUT_TRANSITION_ERROR_TYPE1_KEY = "flash.validation.error.inputTransitionType1";
+	public static final String INPUT_TRANSITION_ERROR_TYPE2_KEY = "flash.validation.error.inputTransitionType2";
+	public static final String OUTPUT_TRANSITION_ERROR_TYPE1_KEY = "flash.validation.error.outputTransitionType1";
+	public static final String OUTPUT_TRANSITION_ERROR_TYPE2_KEY = "flash.validation.error.outputTransitionType2";
+	public static final String GROUPING_REQUIRED_ERROR_KEY = "flash.validation.error.GroupingRequired";
+	public static final String GROUPING_NOT_REQUIRED_ERROR_KEY = "flash.validation.error.GroupingNotRequired";
+	public static final String GROUPING_SELECTED_ERROR_KEY = "flash.validation.error.GroupingSelected";
+	public static final String OPTIONAL_ACTIVITY_ERROR_KEY = "flash.validation.error.OptionalActivity";
+	public static final String OPTIONAL_ACTIVITY_ORDER_ID_INVALID_ERROR_KEY = "flash.validation.error.OptionalActivityOrderId";
+	public static final String SCHEDULE_GATE_ERROR_TYPE1_KEY = "flash.validation.error.illegalScheduleGateOffsetsType1";
+	public static final String SCHEDULE_GATE_ERROR_TYPE2_KEY = "flash.validation.error.illegalScheduleGateOffsetsType2";	
+	
+	
+	
 	private static MessageResources resources = MessageResources.getMessageResources(CONFIG_PARAM);
 	/**
 	 * Rule: Other (Covers any cases that are not covered by another code)
@@ -88,14 +92,28 @@ public class ValidationErrorDTO {
 	 */
 	public static final String ACTIVITY_TRANSITION_ERROR = resources.getMessage(ACTIVITY_TRANSITION_ERROR_KEY);
 
+	/**
+	 * Rule: For Schedule Gates (Activity) if start and end time offsets are set they should not be equal.
+	 */
+	public static final String SCHEDULE_GATE_ERROR_TYPE1 = resources.getMessage(SCHEDULE_GATE_ERROR_TYPE1_KEY);
+	
+	
+	/**
+	 * Rule: For Schedule Gates (Activity) if start and end time offsets are set then the start time offset should be 
+	 * greater than the end time offset.
+	 */
+	public static final String SCHEDULE_GATE_ERROR_TYPE2 = resources.getMessage(SCHEDULE_GATE_ERROR_TYPE2_KEY);
+	
 	private Integer UIID;
 	private String message; //the validation message explaining what the problem is
 	
 	
 	public ValidationErrorDTO(String message, Integer UIID)
 	{
-		this.message = message;
+		this.message =  message;
 		this.UIID = UIID;
+		
+		
 	}
 	
 	public ValidationErrorDTO(String message)
