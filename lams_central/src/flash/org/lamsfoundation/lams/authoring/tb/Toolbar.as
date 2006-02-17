@@ -69,6 +69,10 @@ class Toolbar {
             //Raise error for unrecognized event
         }
     }
+	
+	public function setButtonState(btnName:String, btnState:Boolean){
+		toolbarModel.setButtonState(btnName, btnState);
+	}
     
     function get className():String{
         return 'Toolbar';
