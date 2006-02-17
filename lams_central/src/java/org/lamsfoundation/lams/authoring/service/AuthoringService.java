@@ -33,6 +33,7 @@ import java.util.TreeSet;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.authoring.LearningDesignValidator;
 import org.lamsfoundation.lams.authoring.ObjectExtractor;
 import org.lamsfoundation.lams.authoring.ObjectExtractorException;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -417,10 +418,15 @@ public class AuthoringService implements IAuthoringService {
 														activityDAO,workspaceFolderDAO,
 														learningLibraryDAO,licenseDAO,
 														groupingDAO,toolDAO,groupDAO,transitionDAO);
+		
 		try { 
 			LearningDesign design = extractor.extractLearningDesign(table);	
 			learningDesignDAO.insert(design);
-			flashMessage = new FlashMessage(IAuthoringService.STORE_LD_MESSAGE_KEY,design.getLearningDesignId());
+			LearningDesignValidator validator = new LearningDesignValidator(learningDesignDAO, messageService);
+			flashMessage = (FlashMessage)validator.validateLearningDesign(design);
+			
+			
+			//flashMessage = new FlashMessage(IAuthoringService.STORE_LD_MESSAGE_KEY,design.getLearningDesignId());
 		} catch ( ObjectExtractorException e ) {
 			flashMessage = new FlashMessage(IAuthoringService.STORE_LD_MESSAGE_KEY,
 											messageService.getMessage("invalid.wddx.packet",new Object[]{e.getMessage()}),
