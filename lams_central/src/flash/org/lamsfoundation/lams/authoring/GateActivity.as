@@ -32,6 +32,41 @@ class GateActivity extends Activity{
 		_groupingSupportType = GROUPING_SUPPORT_OPTIONAL;
 	}
 	
+	
+	
+	/**
+	 * Creates a complex activity from a dto... which is nice
+	 * @usage   
+	 * @param   dto 
+	 * @return  
+	 */
+	public function populateFromDTO(dto:Object){
+		super.populateFromDTO(dto);
+		_gateActivityLevelID = dto.gateActivityLevelID;
+		if(_activityTypeID == Activity.SCHEDULE_GATE_ACTIVITY_TYPE){
+			_gateStartTimeOffset = dto.gateStartTimeOffset;
+			_gateEndTimeOffset = dto.gateEndTimeOffset;
+		}
+	}
+	
+	/**
+	 * Creates an object containing all the props of the ComplexActivity.  
+	 * If a value is null then it is ommitted... if itsd the null value from const 
+	 * then its included
+	 * @usage   
+	 * @return  the DTO
+	 */
+	public function toData():Object{
+		var dto:Object = super.toData();
+		if(_gateActivityLevelID){	dto.gateActivityLevelID = _gateActivityLevelID;	}
+		if(_gateStartTimeOffset){	dto.gateStartTimeOffset = _gateStartTimeOffset;	}
+		if(_gateEndTimeOffset)	{	dto.gateEndTimeOffset= _gateEndTimeOffset;		}
+		return dto;
+	}
+	
+	
+	
+	
 	/**
 	 * 
 	 * @usage   
