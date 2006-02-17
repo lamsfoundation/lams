@@ -13,11 +13,13 @@ class ToolbarModel extends Observable {
 	private var __y:Number;
 	private var _isDirty:Boolean;
 	private var infoObj:Object;
+	private var _btnState:Boolean = false;
     
 	/**
 	* Constructor.
 	*/
 	public function ToolbarModel (){
+		
 	}
     
     /**
@@ -37,6 +39,34 @@ class ToolbarModel extends Observable {
     }
     
 	/**
+	* set the button state to enabled/disabled and set a changed flag and notify view and controller.
+    */
+	
+	public function setDefaultState(){
+		Debugger.log('setDefaultState is called: ',Debugger.GEN,'setDefaultState','Toolbar');
+		setButtonState("preview", false)
+	}
+
+	/**
+	 * 
+	 * @usage   
+	 * @param   btnName  
+	 * @param   btnState 
+	 * @return  
+	 */
+	public function setButtonState(btnName:Object, btnState:Boolean){
+		Debugger.log('button name in setButtonState is : '+btnName, Debugger.GEN,'setButtonState','ToolbarModel');		
+		
+		setChanged();
+		infoObj = {};
+		infoObj.updateType = "BUTTON";
+		infoObj.button = btnName
+		infoObj.buttonstate = btnState
+		notifyObservers(infoObj);
+		
+	}
+	
+	/**
 	* Used by View to get the size
 	* @returns Object containing width(w) & height(h).  obj.w & obj.h
 	*/
@@ -44,6 +74,17 @@ class ToolbarModel extends Observable {
 		var s:Object = {};
 		s.w = __width;
 		s.h = __height;
+		return s;
+	}  
+	
+	/**
+	* Used by View to get the button state enabled/disabled
+	* @returns Object containing true or false .  obj.newbtnstate
+	*/
+	
+	public function getState():Object{
+		var s:Object = {};
+		s.newbtnstate = _btnState;
 		return s;
 	}  
     
