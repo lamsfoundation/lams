@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.authoring.dto.ValidationErrorDTO;
 import org.lamsfoundation.lams.authoring.dto.StoreLearningDesignResultsDTO;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.OptionsActivity;
@@ -64,7 +65,7 @@ public class LearningDesignValidator {
 		if (listOfValidationErrorDTOs.size() > 0)
 		{
 			valid = false;
-			flashMessage = new FlashMessage("storeLearningDesignDetails", new StoreLearningDesignResultsDTO(valid,listOfValidationErrorDTOs, learningDesign.getLearningDesignId()), FlashMessage.ERROR);
+			flashMessage = new FlashMessage("storeLearningDesignDetails", new StoreLearningDesignResultsDTO(valid,listOfValidationErrorDTOs, learningDesign.getLearningDesignId()), FlashMessage.OBJECT_MESSAGE);
 		}
 		else
 		{
@@ -110,7 +111,7 @@ public class LearningDesignValidator {
 		if (numOfTopLevelActivities > 0)
 		{
 			if (noInputTransition.size() == 0)
-				listOfValidationErrorDTOs.add(new ValidationErrorDTO(ValidationErrorDTO.INPUT_TRANSITION_ERROR_TYPE2));
+				listOfValidationErrorDTOs.add(new ValidationErrorDTO(messageService.getMessage(ValidationErrorDTO.INPUT_TRANSITION_ERROR_TYPE2_KEY)));
 			
 			if (noInputTransition.size() > 1)
 			{
@@ -119,12 +120,12 @@ public class LearningDesignValidator {
 				while (noInputTransitionIterator.hasNext())
 				{
 					Activity a = (Activity)noInputTransitionIterator.next();
-					listOfValidationErrorDTOs.add(new ValidationErrorDTO(ValidationErrorDTO.INPUT_TRANSITION_ERROR_TYPE1, a.getActivityUIID()));
+					listOfValidationErrorDTOs.add(new ValidationErrorDTO(messageService.getMessage(ValidationErrorDTO.INPUT_TRANSITION_ERROR_TYPE1_KEY), a.getActivityUIID()));
 				}
 			}
 			
 			if (noOuputTransition.size() == 0)
-				listOfValidationErrorDTOs.add(new ValidationErrorDTO(ValidationErrorDTO.OUTPUT_TRANSITION_ERROR_TYPE2));
+				listOfValidationErrorDTOs.add(new ValidationErrorDTO(messageService.getMessage(ValidationErrorDTO.OUTPUT_TRANSITION_ERROR_TYPE2_KEY)));
 			if (noOuputTransition.size() > 1)
 			{
 				//there is more than one activity with no output transitions
@@ -132,7 +133,7 @@ public class LearningDesignValidator {
 				while (noOutputTransitionIterator.hasNext())
 				{
 					Activity a = (Activity)noOutputTransitionIterator.next();
-					listOfValidationErrorDTOs.add(new ValidationErrorDTO(ValidationErrorDTO.OUTPUT_TRANSITION_ERROR_TYPE1, a.getActivityUIID()));					
+					listOfValidationErrorDTOs.add(new ValidationErrorDTO(messageService.getMessage(ValidationErrorDTO.OUTPUT_TRANSITION_ERROR_TYPE1_KEY), a.getActivityUIID()));					
 				}
 			}
 		}
@@ -156,9 +157,9 @@ public class LearningDesignValidator {
 			Activity fromActivity = transition.getFromActivity();
 			Activity toActivity = transition.getToActivity();
 			if (fromActivity == null)
-				listOfValidationErrorDTOs.add(new ValidationErrorDTO(ValidationErrorDTO.TRANSITION_ERROR, transition.getTransitionUIID()));
+				listOfValidationErrorDTOs.add(new ValidationErrorDTO(messageService.getMessage(ValidationErrorDTO.TRANSITION_ERROR_KEY), transition.getTransitionUIID()));
 			else if (toActivity == null)
-				listOfValidationErrorDTOs.add(new ValidationErrorDTO(ValidationErrorDTO.TRANSITION_ERROR, transition.getTransitionUIID()));
+				listOfValidationErrorDTOs.add(new ValidationErrorDTO(messageService.getMessage(ValidationErrorDTO.TRANSITION_ERROR_KEY), transition.getTransitionUIID()));
 			
 		}
 		
@@ -182,13 +183,13 @@ public class LearningDesignValidator {
 		if(numOfActivities > 1)
 		{
 			if (inputTransition == null && outputTransition == null)
-				listOfValidationErrorDTOs.add(new ValidationErrorDTO(ValidationErrorDTO.ACTIVITY_TRANSITION_ERROR, activity.getActivityUIID()));
+				listOfValidationErrorDTOs.add(new ValidationErrorDTO(messageService.getMessage(ValidationErrorDTO.ACTIVITY_TRANSITION_ERROR_KEY), activity.getActivityUIID()));
 			
 		}
 		if (numOfActivities == 1)
 		{	
 			if (inputTransition != null || outputTransition != null)				
-				listOfValidationErrorDTOs.add(new ValidationErrorDTO(ValidationErrorDTO.ACTIVITY_TRANSITION_ERROR, activity.getActivityUIID()));
+				listOfValidationErrorDTOs.add(new ValidationErrorDTO(messageService.getMessage(ValidationErrorDTO.ACTIVITY_TRANSITION_ERROR_KEY), activity.getActivityUIID()));
 			
 		}
 	
@@ -204,15 +205,14 @@ public class LearningDesignValidator {
 		Iterator activityIterator = activities.iterator();
 		while (activityIterator.hasNext())
 		{
-			String errorMessage = null;
+			String errorKey = null;
 			Activity activity = (Activity)activityIterator.next();
 			checkIfGroupingRequired(activity);
 			validateGroupingIfGroupingIsApplied(activity);	
 			validateOptionalActivity(activity);
 			validateOptionsActivityOrderId(activity);
-			if((errorMessage = activity.validateActivity()) != null) {
-				listOfValidationErrorDTOs.add(new ValidationErrorDTO(errorMessage, activity.getActivityUIID()));
-			}
+			if((errorKey = activity.validateActivity()) != null)
+				listOfValidationErrorDTOs.add(new ValidationErrorDTO(messageService.getMessage(errorKey), activity.getActivityUIID()));
 		}
 	}
 	
@@ -237,7 +237,7 @@ public class LearningDesignValidator {
 				Grouping grouping = activity.getGrouping();
 				if (grouping == null)
 				{
-					listOfValidationErrorDTOs.add(new ValidationErrorDTO(ValidationErrorDTO.GROUPING_REQUIRED_ERROR, activity.getActivityUIID()));
+					listOfValidationErrorDTOs.add(new ValidationErrorDTO(messageService.getMessage(ValidationErrorDTO.GROUPING_REQUIRED_ERROR_KEY), activity.getActivityUIID()));
 				}
 			}
 			else if(groupingSupportType.intValue() == Grouping.GROUPING_SUPPORT_NONE)
@@ -245,7 +245,7 @@ public class LearningDesignValidator {
 				Grouping grouping = activity.getGrouping();
 				if (grouping != null)
 				{
-					listOfValidationErrorDTOs.add(new ValidationErrorDTO(ValidationErrorDTO.GROUPING_NOT_REQUIRED_ERROR, activity.getActivityUIID()));
+					listOfValidationErrorDTOs.add(new ValidationErrorDTO(messageService.getMessage(ValidationErrorDTO.GROUPING_NOT_REQUIRED_ERROR_KEY), activity.getActivityUIID()));
 				}
 			}
 				
@@ -268,7 +268,7 @@ public class LearningDesignValidator {
 				int numOfChildActivities = childActivities.size();
 				if(numOfChildActivities == 0)
 				{
-					listOfValidationErrorDTOs.add(new ValidationErrorDTO(ValidationErrorDTO.OPTIONAL_ACTIVITY_ERROR, optionsActivity.getActivityUIID()));
+					listOfValidationErrorDTOs.add(new ValidationErrorDTO(messageService.getMessage(ValidationErrorDTO.OPTIONAL_ACTIVITY_ERROR_KEY), optionsActivity.getActivityUIID()));
 				}
 				
 				
@@ -315,7 +315,7 @@ public class LearningDesignValidator {
 			}
 			
 			if (!validOrderId)
-				listOfValidationErrorDTOs.add(new ValidationErrorDTO(ValidationErrorDTO.OPTIONAL_ACTIVITY_ORDER_ID_INVALID_ERROR, optionsActivity.getActivityUIID()));
+				listOfValidationErrorDTOs.add(new ValidationErrorDTO(messageService.getMessage(ValidationErrorDTO.OPTIONAL_ACTIVITY_ORDER_ID_INVALID_ERROR_KEY), optionsActivity.getActivityUIID()));
 			
 		}	
 	}
@@ -331,7 +331,7 @@ public class LearningDesignValidator {
 			{				
 				if (activity.getGrouping() == null)
 				{
-					listOfValidationErrorDTOs.add(new ValidationErrorDTO(ValidationErrorDTO.GROUPING_SELECTED_ERROR, activity.getActivityUIID()));
+					listOfValidationErrorDTOs.add(new ValidationErrorDTO(messageService.getMessage(ValidationErrorDTO.GROUPING_SELECTED_ERROR), activity.getActivityUIID()));
 				}
 			}
 		
