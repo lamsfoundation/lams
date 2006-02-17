@@ -180,6 +180,9 @@ class org.lamsfoundation.lams.authoring.Application {
         _themeManager = ThemeManager.getInstance();
         _themeManager.addEventListener('load',Delegate.create(this,onThemeLoad));
         _themeManager.loadTheme(theme);
+		Debugger.getInstance().crashDumpSeverityLevel = Number(_config.getItem('crashDumpSeverityLevelLog'));
+		Debugger.getInstance().severityLevel = Number(_config.getItem('severityLevelLog')); 
+		
     }
     
     /**
