@@ -54,7 +54,7 @@ class ToolbarModel extends Observable {
 	 * @param   btnState 
 	 * @return  
 	 */
-	public function setButtonState(btnName:Object, btnState:Boolean){
+	public function setButtonState(btnName:String, btnState:Boolean){
 		Debugger.log('button name in setButtonState is : '+btnName, Debugger.GEN,'setButtonState','ToolbarModel');		
 		
 		setChanged();
