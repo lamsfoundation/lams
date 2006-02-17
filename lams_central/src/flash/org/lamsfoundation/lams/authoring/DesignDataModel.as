@@ -285,11 +285,11 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		//_title = "LD Created:"+(new Date()).toString();
 		//_description = "An example description";
 				
-		_validDesign = validate();
-		if(_validDesign){
+		//_validDesign = validate();
+		//if(_validDesign){
 			//set first ID
 			
-		}
+		//}
 		
 		
 		
