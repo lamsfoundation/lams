@@ -1,5 +1,6 @@
 ﻿import org.lamsfoundation.lams.common.*;
 import org.lamsfoundation.lams.common.util.*;
+import org.lamsfoundation.lams.common.style.*;
 import org.lamsfoundation.lams.authoring.*;
 import org.lamsfoundation.lams.authoring.tk.*;
 import org.lamsfoundation.lams.common.mvc.*;import org.lamsfoundation.lams.authoring.cv.*  
@@ -12,14 +13,18 @@ import mx.events.*
 */
 class ToolkitView extends AbstractView {
 	private var bkg_pnl:MovieClip;
-	private var desc_pnl:MovieClip;	private var toolkitLibraries_sp:MovieClip;
-	private var libraryActivityDesc_txa:TextArea;	private var _className = "ToolkitView";
+		private var toolkitLibraries_sp:MovieClip;
+	private var libraryActivityDesc_txa:TextArea;
+	private var title_lbl:Label;
+		private var _className = "ToolkitView";
 	private var _depth:Number;
 	
 	private var dragIcon_mc:MovieClip;
 	private var dragIcon_mcl:MovieClipLoader;
 	
 	private var dragIconListener:Object;
+	
+	private var _tm:ThemeManager;
 	
 	//sorry mvc guru but i disagree - little state var here
 	private var _dragging:Boolean;
@@ -35,7 +40,8 @@ class ToolkitView extends AbstractView {
 	*/
 	public function ToolkitView(){	
         //Set up this class to use the Flash event delegation model
-        EventDispatcher.initialize(this);        		//Debugger.log('Running',4,'Constructor','ToolkitView');
+        EventDispatcher.initialize(this);     
+		_tm = ThemeManager.getInstance();		//Debugger.log('Running',4,'Constructor','ToolkitView');
 	}
 		/**
 	* Initialisation - sets up the mvc relations ship Abstract view.
@@ -78,16 +84,10 @@ class ToolkitView extends AbstractView {
 	public function createToolkit():Void {
         //Work out difference between scrollpane and panel (container) width
         _scrollPanelWidthDiff = bkg_pnl.width - toolkitLibraries_sp.width;
-        		//_toolkit_mc.bkg_panel.setStyle("backgroundColor",0xFFFFFF);
 		delete this.onEnterFrame;		_depth = this.getNextHighestDepth();
-		this.desc_pnl.setStyle("backgroundColor",0xFFFFFF);
-        
-        //Debugger.log('dispatching event',Debugger.GEN,'createToolkit','ToolkitView');
-        
-        
+        setStyles();
         //dispatch load event
         dispatchEvent({type:'load',target:this});
-        
 		//Debugger.log('_toolkit_mc.desc_panel:'+this.desc_panel,4,'createToolkit','ToolkitView');
 		layoutToolkit();
 	}
@@ -297,6 +297,18 @@ class ToolkitView extends AbstractView {
 		ToolkitController(getController()).iconDrop(dragIcon_mc);
 		
 		
+		
+	}
+	
+	private function setStyles():Void{
+		var styleObj = _tm.getStyleObject('BGPanel');
+		bkg_pnl.setStyle('styleName',styleObj);
+		styleObj = _tm.getStyleObject('scrollpane');
+		toolkitLibraries_sp.setStyle('styleName',styleObj);
+		styleObj = _tm.getStyleObject('textarea');
+		libraryActivityDesc_txa.setStyle(styleObj);
+		styleObj = _tm.getStyleObject('label');
+		title_lbl.setStyle(styleObj);
 		
 	}
 	
