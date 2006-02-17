@@ -142,7 +142,7 @@ class Config {
         limeTheme.data = 'lime';
         themes.push(limeTheme);
 
-        //Lime
+        //Ruby
         var rubyTheme:Object = {};
         rubyTheme.label = 'Ruby';
         rubyTheme.data = 'ruby';
