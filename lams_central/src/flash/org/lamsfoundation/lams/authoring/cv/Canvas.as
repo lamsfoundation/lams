@@ -373,6 +373,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		
 		if(clearCanvas(true)){
 			_ddm.setDesign(designData);
+			checkValidDesign();
 			canvasModel.setDirty();
 		}else{
 			Debugger.log('Set design failed as old design could not be cleared',Debugger.CRITICAL,"setDesign",'Canvas');		
@@ -395,6 +396,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 			//as its a new instance of the ddm,need to add the listener again
 			_ddm.addEventListener('ddmUpdate',Proxy.create(this,onDDMUpdated));
 			_ddm.addEventListener('ddmBeforeUpdate',Proxy.create(this,onDDMBeforeUpdate));
+			checkValidDesign();
 			canvasModel.setDirty();
 			return true;
 		}else{
