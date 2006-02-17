@@ -210,22 +210,46 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 			//public function sendAndReceive(dto:Object, requestURL:String,handler:Function,isFullURL){
 	}
 	
+	/**
+	 * now contains a validation response packet
+	 * Displays to the user the results of the response.
+	 * @usage   
+	 * @param   r //the validation response
+	 * @return  
+	 */
 	public function onStoreDesignResponse(r):Void{
 		//Debugger.log('Response:'+ObjectUtils.printObject(response),Debugger.GEN,'onStoreDesignResponse','Canvas');
 		if(r instanceof LFError){
 			r.showErrorAlert();
 		}else{
 			//_global.breakpoint();
-			//TODO: 
 			//Debugger.log('_ddm.learningDesignID:'+_ddm.learningDesignID,Debugger.GEN,'setDroppedTemplateActivity','Canvas');		
-			_ddm.learningDesignID = r;
+
+			_ddm.learningDesignID = r.learningDesignID;
+			_ddm.validDesign = r.valid;
+			
+			
 			Debugger.log('_ddm.learningDesignID:'+_ddm.learningDesignID,Debugger.GEN,'onStoreDesignResponse','Canvas');		
 			
 			
-			var msg:String = "Your design has been saved with ID:"+r;
+			if(_ddm.validDesign){
+				var msg:String = "Congratulations! - Your design is valid has been saved with ID:"+r.learningDesignID;
+			}else{
+				var msg:String = "Your design is not yet valid, but it has been saved with ID:"+r.learningDesignID;
+			}
 			LFMessage.showMessageAlert(msg);
+			checkValidDesign();
 			
 		}
+	}
+	
+	public function checkValidDesign(){
+		if(_ddm.validDesign){
+			Application.getInstance().getToolbar().setButtonState('preview',true);
+		}else{
+			Application.getInstance().getToolbar().setButtonState('preview',false);
+		}
+		
 	}
 	
 	/**
@@ -576,15 +600,12 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	public function onDDMUpdated(evt:Object):Void{
 		//_global.breakpoint();
 		//var _ddm:DesignDataModel = evt.target;
-		Debugger.log('DDM has been updated',Debugger.GEN,'onDDMUpdated','Canvas');
-		/*
-		//take a snapshot of the design and save it in the undoStack
-		var snapshot:Object = _ddm.toData();
-		_undoStack.push(snapshot);
-		
-		_redoStack = new Array();
-		*/
-		
+		Debugger.log('DDM has been updated, _ddm.validDesign:'+_ddm.validDesign,Debugger.GEN,'onDDMUpdated','Canvas');
+		//if its valid, its not anymore!
+		if(_ddm.validDesign){
+			_ddm.validDesign = false;
+			checkValidDesign();
+		}
 	}
 	
 	
@@ -609,7 +630,9 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	
 	
 	/**
-	 * Undo the last change to the DDM
+	 * Undo the last change to the DDM.
+	 * TODO: Does not handle moving activities on the canvas, only when actual change to activities or transitions.  
+	 * Need to generate update event when re-position activities
 	 * @usage   
 	 * @return  
 	 */
