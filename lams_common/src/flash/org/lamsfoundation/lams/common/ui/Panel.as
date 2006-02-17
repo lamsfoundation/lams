@@ -1,11 +1,10 @@
-﻿import org.lamsfoundation.lams.common.util.Debugger
-import org.lamsfoundation.lams.common.ui.*
+﻿//import org.lamsfoundation.lams.common.util.Debugger
 import mx.core.UIComponent
 import mx.styles.StyleManager
 /**
-* Panel is a base UI building block used in LAMS.  It is a holder for other UI
-* components
-* It is re-sizable, and supports Macromedia's skinning
+* Panel is a base UI building block used in LAMS.  
+* It is often a holder or background for other UI components
+* It is re-sizable, and supports Macromedia's skinning see setStyle for possible values:
 *
 * @see <a href="http://livedocs.macromedia.com/flash/mx2004/main_7_2/wwhelp/wwhimpl/common/html/wwhelp.htm?context=Flash_MX_2004&file=00003104.html">More info on core functions required when developing a component</a>
 *
@@ -22,7 +21,8 @@ class org.lamsfoundation.lams.common.ui.Panel extends UIComponent
 	private var panel : MovieClip;
 	private var boundingBox_mc : MovieClip;
 	private var border_mc : MovieClip;	//private var background_mc : MovieClip;	private var background_ct : Color;
-	private var _borderType : String;	private var _backgroundColour : Number; 
+	private var _borderType : String;	private var _backgroundColour : Number; 
+	private var _borderColor : Number; 
 	
 
 	/**
@@ -88,6 +88,10 @@ class org.lamsfoundation.lams.common.ui.Panel extends UIComponent
 	/**
 	* The borderStyle (uses rectBorder class) inny our outy etc..
 	* @param type The kind of border we use, possible values: 'inset', 'outset', 'solid'
+	* 
+	* 
+	* 
+	* 
 	*/
 	[Inspectable(enumeration="inset,outset,solid,default,dropDown,none"defaultValue="inset")]
 	function set borderType (bStyle:String):Void{		//trace('set bStyle:'+bStyle);
@@ -98,27 +102,33 @@ class org.lamsfoundation.lams.common.ui.Panel extends UIComponent
 		return _borderType;		
 	}	/**
 	* General set style method
-	* @param styleProp The property to affect, can be backgroundColor or borderStyle
-	* @param newValue the value to assign to that styleProp. Colours can be in name or hex format, borders as in set borderType
+	* Can set:
+	* backgroundColor - Color in Hex format.
+	* borderStyle - the type of border of the rectBorder class used in the panel (see set borderType for details)
+	* borderColor - the colour of the border (when solid only, otherwise it looks crap if applied to 3d styles as need to set other set of styles see rectBorder class for details) in Hex format
+	* styleName - this is to support the use of CSSStyleDeclaration class, you can pass a StyleObject into the panel and it wil extract the style information and apply it
+	*
+	* @param styleProp The property to affect
+	* @param newValue the value to assign to that styleProp. Colours in hex format, borders as in set borderType
 	* 
-	*/	public function setStyle(styleProp:String, newValue):Void{		Debugger.log('styleProp:'+styleProp+' newValue:'+newValue,5,'setStyle','Panel');
+	*/	public function setStyle(styleProp:String, newValue):Void{		//trace('[Panel setStyle]styleProp:'+styleProp+' newValue:'+newValue);
 		//only process if we want to set the bkg
 		if(styleProp == "backgroundColor"){
-			//trace('Setting panel bkg to:'+newValue);
-			/*
-			if(isNaN(newValue)){
-				//colour name
-				_backgroundColour = StyleManager.getColorName(newValue);
-			}else{
-				_backgroundColour = newValue;
-			}
-			*/
 			_backgroundColour = newValue;
-			
 		}else if(styleProp == "borderStyle"){
-			//must be going for the border			_borderType = newValue;		
+			//must be going for the border			_borderType = newValue;
+		}else if(styleProp == "borderColour"){
+			//must be going for the border colour
+			_borderColor = newValue;
+		}else if(styleProp == "styleName"){
+			
+			_backgroundColour = newValue.getStyle('backgroundColor');
+			_borderType = newValue.getStyle('borderStyle');
+			_borderColor = newValue.getStyle('borderColor');
+			//trace('[Panel setStyle]styleName: _backgroundColour:'+_backgroundColour);
+			//trace('[Panel setStyle]styleName: borderStyle:'+_borderType);
 		}else{
-			trace('Panel got an unsupported set style type.... can only be backgroundColor or borderStyle');
+			trace('Panel got an unsupported set style type.... can only be backgroundColor or borderStyle or styleName');
 		}
 		invalidate();
 	}
@@ -130,7 +140,7 @@ class org.lamsfoundation.lams.common.ui.Panel extends UIComponent
 	* NOTE: CALLED BY UI OBJECT so don't call explicitly here
 	* 
 	*/
-	private function createChildren () : Void
+	private function createChildren() : Void
 	{
 		//trace('create children in panel, panel:'+panel);
 		panel = this.createObject ("PanelAssets", "panel", getNextHighestDepth());
@@ -142,7 +152,7 @@ class org.lamsfoundation.lams.common.ui.Panel extends UIComponent
 	* Lays out all the attached mcs.  Mainly handles re-sizes
 	* 
 	*/
-	private function layoutChildren () : Void
+	private function layoutChildren() : Void
 	{
 		panel._yscale = 100;
 		panel._xscale = 100;
@@ -153,24 +163,19 @@ class org.lamsfoundation.lams.common.ui.Panel extends UIComponent
 		border_mc.setSize(__width, __height);
 		border_mc._x = panel.background_mc._x;
 		border_mc._y = panel.background_mc._y;
-		if(_borderType == "none"){
+				if(_borderType == "none"){
 			border_mc.visible=false;
 		}else{
-			if(!border_mc.visible){border_mc.visible=true;};			border_mc.setStyle("borderStyle",_borderType);
+			if(!border_mc.visible){
+				border_mc.visible=true;
+			}
+			border_mc.setStyle("borderStyle",_borderType);
 		}
 		
-		/*
-		panel.borderTop_mc._width = __width;
-		panel.borderBottom_mc._width = __width;
-		panel.borderBottom_mc._y = __height;
-		panel.borderRight_mc._height = __height;
-		panel.borderRight_mc._x = __width;
-		panel.borderLeft_mc._height = __height;
-		//trace ('width:' + width);
-		//trace ('__width :' + __width);
-		//trace ('height:' + height);
-		//trace ('__height:' + __height);
-		*/
+		if(_borderColor != null){
+			border_mc.setStyle('borderColor',_borderColor);
+		}
+
 	}	
 	
 	/*
