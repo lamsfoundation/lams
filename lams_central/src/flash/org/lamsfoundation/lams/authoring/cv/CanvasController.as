@@ -32,7 +32,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	   if(_canvasModel.isTransitionToolActive()){
 		   var transitionTarget = createValidTransitionTarget(ca);
 		   if(transitionTarget instanceof LFError){
-				transitionTarget.showErrorAlert(null);  
+				transitionTarget.showErrorAlert(null); 
+				//transitionTarget.showMessageConfirm()
+				//TODO: transitionTarget.showErrorAlertCrashDump(null); 
 		   }else{
 				_canvasModel.addActivityToTransition(transitionTarget);
 			}
@@ -109,7 +111,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			
 			var transitionTarget = createValidTransitionTarget(transitionTarget_mc);
 			if(transitionTarget instanceof LFError){
-				transitionTarget.showErrorAlert(null);  
+			//if(transitionTarget instanceof LFMessage){
+				//transitionTarget.showErrorAlert(null);
+				transitionTarget.showMessageConfirm();
 			}else{
 				_canvasModel.addActivityToTransition(transitionTarget);
 			}
