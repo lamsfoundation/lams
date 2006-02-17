@@ -49,6 +49,7 @@ class Toolbar {
 	* @param width The desired width
 	* @param height the desired height
 	*/
+	
 	public function setSize(width:Number, height:Number):Void{
 		toolbarModel.setSize(width, height);
 	}
@@ -61,7 +62,8 @@ class Toolbar {
     
     private function viewLoaded(evt:Object){
         Debugger.log('viewLoaded called',Debugger.GEN,'viewLoaded','Toolbar');
-        if(evt.type=='load') {
+		toolbarModel.setDefaultState();
+		if(evt.type=='load') {
             dispatchEvent({type:'load',target:this});
         }else {
             //Raise error for unrecognized event
