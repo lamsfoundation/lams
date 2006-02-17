@@ -1,5 +1,6 @@
 ﻿import org.lamsfoundation.lams.common.ui.*
 import org.lamsfoundation.lams.common.util.*
+import org.lamsfoundation.lams.common.dict.*
 import mx.controls.Alert;
 
 
@@ -13,12 +14,13 @@ class LFMessage{
      //Declarations  
 	 private var _ref:Object;
 	 private var _fn:String;
+	 private var title:String;
 	 
      //Constructor  
   function LFMessage() {
 	  //enable accesibility for the Alert 
 	mx.accessibility.AlertAccImpl.enableAccessibility();
-		
+	title = Dictionary.getValue('al_alert')
   }
   
   	
@@ -36,9 +38,9 @@ class LFMessage{
 	//msg += "\n  \n  \n  \n  ";
 	if(okHandler != undefined){
 	   //alt = Alert.show(msg,"__Message__",Alert.OK,null,okHandler,"alertIcon_gen",Alert.OK);
-	   alt = Alert.show(msg,"__Message__",Alert.OK,null,okHandler,null,Alert.OK);
+	   alt = Alert.show(msg,Dictionary.getValue('al_alert'),Alert.OK,null,okHandler,null,Alert.OK);
 	}else{
-	   alt = Alert.show(msg,"__Message__",Alert.OK,null,null,null,Alert.OK);
+	   alt = Alert.show(msg,Dictionary.getValue('al_alert'),Alert.OK,null,null,null,Alert.OK);
 	   //alt = super.show(msg,"__Message__",Alert.OK,null,null,"alertIcon_gen",Alert.OK);
 	}
 	
@@ -74,6 +76,7 @@ class LFMessage{
   public function get fname():String{
 	return _fn;
   }
+  
   
   /**
   * this function is in mx.controls.alertClasses.AlertForm and i think it has a bug in getting a size with an icon
