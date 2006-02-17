@@ -16,6 +16,8 @@ import org.lamsfoundation.lams.authoring.*
 *   Visual element      'LFWindow' or 'Button' 
 *   StyleObject         contains style attributes such as 'ThemeColor', 'Color', 'borderStyle' etc.
 * 
+* D:C 14-02-06 //BASE STYLE OBJ not being used - see the note on getStyleObject as its crashing the player
+* 
 * 
 * @class    ThemeManager
 * @author   DI
@@ -113,28 +115,32 @@ class ThemeManager {
     /**
     * TODO: THIS IS ONLY USED FOR TESTING WHILST SERVER DOES NOT SUPPORT STRUCTURE
     * REMOVE WHEN NO LONGER REQUIRED
+	* //BASE STYLE OBJ not being used - see the node on getStyleObject
     */
     public function createThemeFromCode(theme:String) {
         switch (theme) {
             case 'default' :
                 //Base style object for 'default' theme
+				//BASE STYLE OBJ not being used - see the node on getStyleObject
                 var baseStyleObj = new mx.styles.CSSStyleDeclaration();
                 baseStyleObj.setStyle('color', 0x333648);
                 baseStyleObj.setStyle('themeColor', 0x266DEE);
-                baseStyleObj.setStyle('borderStyle', 'inset');
+                
 				baseStyleObj.setStyle('fontFamily', 'Verdana');
                 baseStyleObj.setStyle('fontSize', 10);
-                baseStyleObj.setStyle('color', 0x333648);
                 
                 //Create default theme
                 _theme = new Theme('default',baseStyleObj);
-				
-				//NOTE all the items below do not need to re-define any vaules already defined above in the base SO
-				// when the SO is requested for a Visual Elemnent, the SO is merged with the base Style Object
+			
         
                 //----BUTTON------------------------------------------------
                 //Style object
                 var buttonSO = new mx.styles.CSSStyleDeclaration();
+				buttonSO.setStyle('color', 0x333648);
+                buttonSO.setStyle('themeColor', 0x266DEE);
+                
+				buttonSO.setStyle('fontFamily', 'Verdana');
+                buttonSO.setStyle('fontSize', 10);
                 buttonSO.setStyle('emphasizedStyleDeclaration', 0x266DEE);
                 
                 //Visual Element
@@ -143,16 +149,47 @@ class ThemeManager {
                 _theme.addVisualElement(buttonVisualElement);
                 //----------------------------------------------------------
         
+                //----Text Area-------------------------------------------------
+                //Style object
+                var txaSO = new mx.styles.CSSStyleDeclaration();
+				txaSO.setStyle('color', 0x333648);
+				txaSO.setStyle('fontFamily', 'Verdana');
+                txaSO.setStyle('fontSize', 10);
+                //Visual Element
+                var txaVisualElement = new VisualElement('textarea',txaSO);
+                //add visual element to the default theme
+                _theme.addVisualElement(txaVisualElement);
+                //--------------------------------------------------------
+				
+        
                 //----LABEL-------------------------------------------------
                 //Style object
                 var labelSO = new mx.styles.CSSStyleDeclaration();
-				//add any costom items here
+                labelSO.setStyle('fontFamily', 'Verdana');
+                labelSO.setStyle('fontSize', 10);
+                labelSO.setStyle('color', 0x333648);
                 //Visual Element
                 var labelVisualElement = new VisualElement('label',labelSO);
                 //add visual element to the default theme
                 _theme.addVisualElement(labelVisualElement);
                 //--------------------------------------------------------
                 
+				
+                //----TextInput-------------------------------------------------
+                //Style object
+                var txiSO = new mx.styles.CSSStyleDeclaration();
+				txiSO.setStyle('color', 0x333648);
+                txiSO.setStyle('themeColor', 0x266DEE);
+                
+				txiSO.setStyle('fontFamily', 'Verdana');
+                txiSO.setStyle('fontSize', 10);
+                //Visual Element
+                var txiVisualElement = new VisualElement('textinput',txiSO);
+                //add visual element to the default theme
+                _theme.addVisualElement(txiVisualElement);
+                //--------------------------------------------------------
+                
+				
                 //----LFWINDOW--------------------------------------------
                 //Style object
                 var LFWindowSO = new mx.styles.CSSStyleDeclaration();
@@ -163,11 +200,53 @@ class ThemeManager {
                 //add visual element to the default theme
                 _theme.addVisualElement(LFWindowVisualElement);
                 //-----------------------------------------------------
+				
+				//----Scroll pane ---------------------------------------
+				/*
+				Style
+ Theme
+ Description
+ 
+themeColor  Halo
+ The base color scheme of a component. Possible values are "haloGreen", "haloBlue", and "haloOrange". The default value is "haloGreen".
+ 
+border styles
+ Both
+ The ScrollPane component uses a RectBorder instance as its border and responds to the styles defined on that class. See RectBorder class.
+
+
+The default border style is "inset".
+ 
+scrollTrackColor  Sample
+ The background color for the scroll track. The default value is 0xCCCCCC (light gray).
+ 
+symbolColor  Sample
+ The color of the check mark. The default value is 0x000000 (black). 
+ 
+symbolDisabledColor  Sample
+ The color of the disabled check mark. The default value is 0x848384 (dark gray). 
+ 
+
+
+				*/
+                //Style object
+                var spSO = new mx.styles.CSSStyleDeclaration();
+                spSO.setStyle('themeColor', 0x266DEE);
+                //Visual Element
+                var spVisualElement = new VisualElement('scrollpane',spSO);
+                //add visual element to the default theme
+                _theme.addVisualElement(spVisualElement);
+                //------------------------------------------------------
         
                 //----TREE VIEW ---------------------------------------
                 //Style object
                 var treeviewSO = new mx.styles.CSSStyleDeclaration();
                 //treeviewSO.setStyle('rollOverColor', 0xC4C7D5);
+				treeviewSO.setStyle('color', 0x333648);
+                treeviewSO.setStyle('themeColor', 0x266DEE);
+                
+				treeviewSO.setStyle('fontFamily', 'Verdana');
+                treeviewSO.setStyle('fontSize', 10);
                 treeviewSO.setStyle('openEasing', 'Elastic');
                 //Visual Element
                 var treeviewVisualElement = new VisualElement('treeview',treeviewSO);
@@ -189,15 +268,24 @@ class ThemeManager {
 				//----checkbox------------------------------------------
                 //Style object
                 var checkboxSO = new mx.styles.CSSStyleDeclaration();
+				checkboxSO.setStyle('color', 0x333648);
+                checkboxSO.setStyle('themeColor', 0x266DEE);
+                
+				checkboxSO.setStyle('fontFamily', 'Verdana');
+                checkboxSO.setStyle('fontSize', 10);
                 //Visual Element
                 var checkboxVisualElement = new VisualElement('checkbox',checkboxSO);
                 //add visual element to the default theme
-                _theme.addVisualElement(comboVisualElement);
+                _theme.addVisualElement(checkboxVisualElement);
                 //------------------------------------------------------
         
                 //----COMBO------------------------------------------
                 //Style object
                 var comboSO = new mx.styles.CSSStyleDeclaration();
+				comboSO.setStyle('color', 0x333648);
+                comboSO.setStyle('themeColor', 0x266DEE);
+                comboSO.setStyle('fontFamily', 'Verdana');
+                comboSO.setStyle('fontSize', 10);
                 comboSO.setStyle('openEasing', Elastic.easeOut);
                 //Visual Element
                 var comboVisualElement = new VisualElement('combo',comboSO);
@@ -208,13 +296,43 @@ class ThemeManager {
                 //----LF MENU-------------------------------------------
                 //Style object
                 var lfMenuSO = new mx.styles.CSSStyleDeclaration();
+				lfMenuSO.setStyle('color', 0x333648);
+                lfMenuSO.setStyle('themeColor', 0x266DEE);
+				lfMenuSO.setStyle('fontFamily', 'Verdana');
+                lfMenuSO.setStyle('fontSize', 10);
                 lfMenuSO.setStyle('openEasing', Elastic.easeOut);
                 //Visual Element
                 var lfMenuVisualElement = new VisualElement('LFMenuBar',lfMenuSO);
                 //add visual element to the default theme
                 _theme.addVisualElement(lfMenuVisualElement);
                 //------------------------------------------------------
-        
+			
+				//----BGPanel-------------------------------------------
+                //Style object
+                var BGPanelSO = new mx.styles.CSSStyleDeclaration();
+				BGPanelSO.setStyle('borderStyle', 'outset');
+				BGPanelSO.setStyle('backgroundColor', 0xEDF2F8);
+				
+                //Visual Element
+                var BGPanelVisualElement = new VisualElement('BGPanel',BGPanelSO);
+                //add visual element to the default TAPanelVisualElement
+                _theme.addVisualElement(BGPanelVisualElement);
+                //------------------------------------------------------
+			
+				//----TAPanel-------------------------------------------
+                //Style object
+                var TAPanelSO = new mx.styles.CSSStyleDeclaration();
+				TAPanelSO.setStyle('borderStyle', 'solid');
+				TAPanelSO.setStyle('backgroundColor', 0xA6CAFF);
+				TAPanelSO.setStyle('borderColor', 0x000000);
+				
+				
+                //Visual Element
+                var TAPanelVisualElement = new VisualElement('TAPanel',TAPanelSO);
+                //add visual element to the default TAPanelVisualElement
+                _theme.addVisualElement(TAPanelVisualElement);
+                //------------------------------------------------------
+		
                 //----LFBUTTON----------------------------------------------
                 //NOTE:This style is used in conjunction with LFButtonSkin class. For usage, see common.style.LFButtonSkin.as
                 //Style object
@@ -428,16 +546,29 @@ class ThemeManager {
     /**
     * Returns a style object with styles for the VisualElementId passed in
 	* Returns the base style object + any features overwritten by the extended visual elemnt definition.
+	* DC: Well its not returning base style obj anymore as it seems to splat the player when you try and run the merge
+	* As such each style definition will have to define all thier own styles.  This might speed everything up a fair bit
     */
     public function getStyleObject(visualElementId:String):mx.styles.CSSStyleDeclaration{
         //TODO DI 06/05/05 check for errors here with ID not found
         //TODO DI 06/05/05 implement, for now just return style for visual element
 
         //Get base style object theme + overwrite properties with ones in visual element for selected theme if found 
-        var baseSO = _theme.baseStyleObject;
+        //var baseSO = _theme.baseStyleObject;
+		
+		
 
         //Get the correct visual element
         var visualElement:VisualElement = _theme.getVisualElement(visualElementId);
+		if(visualElement){
+			return visualElement.styleObject;
+		}else{
+			Debugger.log('Visual element "'+visualElementId+'" not found, returning default',Debugger.HIGH,'getStyleObject','ThemeManager');
+			return _theme.getVisualElement(visualElementId).styleObject;
+		}
+/*		
+* //this bit is v.inefficent, seems to crash player - esp in toolkit
+		
         //Was it found?
         if(visualElement) {
             var customSO = visualElement.styleObject;
@@ -462,6 +593,8 @@ class ThemeManager {
         
         //Construct style object by superimposing base style and visua
         return baseSO;
+		
+		*/
     }
     
     /**
