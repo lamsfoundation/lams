@@ -98,7 +98,7 @@ class org.lamsfoundation.lams.common.comms.Communication {
         addToQueue(handler);        
         //Assign onData function        
         setOnData(responseXML);
-		        
+        
         //TODO DI 11/04/05 Stub here for now until we have server implmenting new WDDX structure
         if(isFullURL){
 			Debugger.log('Requesting:'+requestURL,Debugger.GEN,'getRequest','Communication');			
@@ -191,7 +191,7 @@ class org.lamsfoundation.lams.common.comms.Communication {
                 if(responseObj.messageValue != null){
 					dispatchToHandlerByID(queueID,responseObj.messageValue);
 				}else{
-					Debugger.log('Message value was null, cannot continue',Debugger.CRITICAL,'getRequest','Communication');			
+					Debugger.log('Message value was null, cannot continue',Debugger.CRITICAL,'onServerResponse','Communication');			
 				}
             }
 			
@@ -200,8 +200,10 @@ class org.lamsfoundation.lams.common.comms.Communication {
         }else {
             //TODO DI 12/04/05 Handle onLoad error
             //showAlert("System error", "<p>Communication Error</p>", "sad");
-			Debugger.log("XML Load failed",Debugger.CRITICAL,'onServerResponse','Communication');			
-			}
+			Debugger.log("XML Load failed",Debugger.CRITICAL,'onServerResponse','Communication');
+			var e = new LFError("Communication with the server has failed. \nPlease check you are connected to the internet and/or LAMS server","onServerResponse",this,'Server URL:'+_serverURL);
+			e.showErrorAlert();
+		}
     }
     
     /**
