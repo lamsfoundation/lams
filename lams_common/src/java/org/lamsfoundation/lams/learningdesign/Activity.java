@@ -799,4 +799,18 @@ public abstract class Activity implements Serializable,Nullable {
 	 */
    public abstract Activity createCopy();
 
+   
+   // ---------------------------------------------------------------------
+   // Data Validation methods
+   //---------------------------------------------------------------------
+   
+   /**
+	 * Validate activity
+	 * 
+	 */
+	public String validateActivity() { 
+		return null; 
+	}
+   
+   
 }
