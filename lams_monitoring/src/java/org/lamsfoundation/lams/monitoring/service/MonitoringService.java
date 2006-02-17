@@ -1398,6 +1398,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     private void runGateScheduler(ScheduleGateActivity scheduleGate,
                                   Date lessonStartTime)
     {
+    	
         if(log.isDebugEnabled())
             log.debug("Running scheduler for gate "+scheduleGate.getActivityId()+"...");
         JobDetail openScheduleGateJob = getOpenScheduleGateJob();
@@ -1407,18 +1408,29 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         openScheduleGateJob.getJobDataMap().put("gateId",scheduleGate.getActivityId());
         closeScheduleGateJob.setName("closeGate");
         closeScheduleGateJob.getJobDataMap().put("gateId",scheduleGate.getActivityId());
+
+        
         //create customized triggers
         Trigger openGateTrigger = new SimpleTrigger("openGateTrigger",
                                                     Scheduler.DEFAULT_GROUP, 
                                                     scheduleGate.getLessonGateOpenTime(lessonStartTime));
+        
+        
         Trigger closeGateTrigger = new SimpleTrigger("closeGateTrigger",
                                                     Scheduler.DEFAULT_GROUP,
                                                     scheduleGate.getLessonGateCloseTime(lessonStartTime));
+
         //start the scheduling job
         try
         {
-            scheduler.scheduleJob(openScheduleGateJob, openGateTrigger);
-            scheduler.scheduleJob(closeScheduleGateJob, closeGateTrigger);
+        	if((scheduleGate.getGateStartTimeOffset() == null && scheduleGate.getGateEndTimeOffset() == null) || 
+        	   (scheduleGate.getGateStartTimeOffset() != null && scheduleGate.getGateEndTimeOffset() == null))
+        		scheduler.scheduleJob(openScheduleGateJob, openGateTrigger);
+        	else if(openGateTrigger.getStartTime().before(closeGateTrigger.getStartTime())) {
+        		scheduler.scheduleJob(openScheduleGateJob, openGateTrigger);
+        		scheduler.scheduleJob(closeScheduleGateJob, closeGateTrigger);
+        	}
+
         }
         catch (SchedulerException e)
         {
