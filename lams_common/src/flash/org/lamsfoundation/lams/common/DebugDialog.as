@@ -25,6 +25,7 @@ class DebugDialog extends MovieClip implements Dialog{
     private var load_btn:Button;
     private var assign_btn:Button;     //Assign property
     private var serialize_btn:Button;  //Serialize an object and trace
+	private var sendData_btn:Button;  //Send Data to an object to send it to the server
     private var showProps_btn:Button;  //Serialize an object and trace
     private var clear_btn:Button;  //Clear text area
     
@@ -110,6 +111,7 @@ class DebugDialog extends MovieClip implements Dialog{
         
         assign_btn.addEventListener('click',Delegate.create(this, assignProperty));
         serialize_btn.addEventListener('click',Delegate.create(this, serialize));
+		sendData_btn.addEventListener('click',Delegate.create(this, crashDumpToServer));
         showProps_btn.addEventListener('click',Delegate.create(this, showProperties));
         clear_btn.addEventListener('click',Delegate.create(this, clearText));
         load_btn.addEventListener('click',Delegate.create(this, loadHandler));
@@ -227,6 +229,11 @@ class DebugDialog extends MovieClip implements Dialog{
         }
     }
     
+	private function crashDumpToServer(){
+		Debugger.crashDataDump();
+		
+	}
+	
     /**
     * Shows the properties of the object entered into the textInput
     */
