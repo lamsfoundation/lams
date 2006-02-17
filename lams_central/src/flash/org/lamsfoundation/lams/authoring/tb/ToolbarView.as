@@ -61,6 +61,7 @@ class ToolbarView extends AbstractView {
 	public function createToolbar(){
 		setStyles();
         _toolbar_mc = this;
+		
         //Add the button handlers, essentially this is handing on clicked event to controller.
         var controller = getController();
         /*
@@ -103,11 +104,25 @@ class ToolbarView extends AbstractView {
             case 'SIZE' :
                 setSize(tm);
                 break;
+			case 'BUTTON' :
+                setState(tm, infoObj);
+                break;
             default :
                 Debugger.log('unknown update type :' + infoObj.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.ToolbarView');
         }
 	}
     
+	/**
+    * Sets the botton state of the Toolbar on stage, called from update
+    */
+	private function setState(tm:ToolbarModel, infoObj:Object):Void{
+		Debugger.log('button name in setButtonState is : '+infoObj.button, Debugger.GEN,'setState','ToolbarView');		
+        if (infoObj.button == "preview"){
+			
+			this.preview_btn.enabled = infoObj.buttonstate;
+		}
+	}
+	
     /**
     * Sets the size of the Toolbar on stage, called from update
     */
