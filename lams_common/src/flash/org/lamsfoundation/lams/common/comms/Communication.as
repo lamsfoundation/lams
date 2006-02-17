@@ -98,7 +98,7 @@ class org.lamsfoundation.lams.common.comms.Communication {
         addToQueue(handler);        
         //Assign onData function        
         setOnData(responseXML);
-        
+		        
         //TODO DI 11/04/05 Stub here for now until we have server implmenting new WDDX structure
         if(isFullURL){
 			Debugger.log('Requesting:'+requestURL,Debugger.GEN,'getRequest','Communication');			
