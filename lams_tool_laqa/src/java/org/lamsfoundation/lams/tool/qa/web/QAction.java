@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -45,6 +46,7 @@ import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
+import org.lamsfoundation.lams.tool.qa.QaComparator;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaUploadedFile;
 import org.lamsfoundation.lams.tool.qa.QaUtils;
@@ -388,6 +390,11 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
         IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
         AuthoringUtil authoringUtil= new AuthoringUtil();
         Map mapQuestionContent=(Map)request.getSession().getAttribute(MAP_QUESTION_CONTENT);
+        logger.debug("mapQuestionContent :" +mapQuestionContent);
+        
+        if (mapQuestionContent == null)
+        	mapQuestionContent= new TreeMap(new QaComparator());
+        logger.debug("mapQuestionContent :" +mapQuestionContent);
         
         ActionMessages errors= new ActionMessages();
         /* full form validation should be performed only in standard authoring mode, but not in monitoring EditActivity */
@@ -421,6 +428,7 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
 //          QaContent qaContent=authoringUtil.createContent(mapQuestionContent, request, qaAuthoringForm);            
 
         /*delete-recreate the questions in the db*/
+          
           authoringUtil.reconstructQuestionContentMapForSubmit(mapQuestionContent, request);
         
           logger.debug("before saveOrUpdateQaContent.");

@@ -79,6 +79,9 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.exception.ToolException;
+
+
+
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaApplicationException;
 import org.lamsfoundation.lams.tool.qa.QaComparator;
@@ -138,72 +141,25 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	    	request.setAttribute(USER_EXCEPTION_USERID_NOTAVAILABLE, new Boolean(true));
 	    	return (mapping.findForward(LOAD_QUESTIONS));
 	    }
-		
-		/*
-		 * retrieve the default content id based on tool signature
-		 */
-		long defaultContentID=0;
-		try
+
+	    ActionForward validateSignature=readSignature(request,mapping);
+		logger.debug("validateSignature:  " + validateSignature);
+		if (validateSignature != null)
 		{
-			logger.debug("attempt retrieving tool with signatute : " + MY_SIGNATURE);
-            defaultContentID=qaService.getToolDefaultContentIdBySignature(MY_SIGNATURE);
-			logger.debug("retrieved tool default contentId: " + defaultContentID);
-			if (defaultContentID == 0)
-			{
-				logger.debug("default content id has not been setup");
-				persistError(request,"error.defaultContent.notSetup");
-		    	request.setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true));
-				return (mapping.findForward(LOAD_QUESTIONS));	//TODO: forward to error page
-			}
-		}
-		catch(Exception e)
-		{
-			logger.debug("error getting the default content id: " + e.getMessage());
-			persistError(request,"error.defaultContent.notSetup");
-	    	request.setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true));
-			return (mapping.findForward(LOAD_QUESTIONS)); //TODO: forward to error page
+			logger.debug("validateSignature not null : " + validateSignature);
+			return validateSignature;
 		}
 
-		/*
-		 * retrieve the default question content id based on default content id determined above
-		 */
-		try
-		{
-			logger.debug("retrieve the default question content based on default contentId: " + defaultContentID);
-			QaQueContent qaQueContent=qaService.getToolDefaultQuestionContent(defaultContentID);
-			logger.debug("using QaQueContent: " + qaQueContent);
-			if (qaQueContent == null)
-			{
-				logger.debug("Exception occured: No default question content");
-	    		request.setAttribute(USER_EXCEPTION_DEFAULTQUESTIONCONTENT_NOT_AVAILABLE, new Boolean(true));
-				persistError(request,"error.defaultQuestionContent.notAvailable");
-				return (mapping.findForward(LOAD_QUESTIONS));
-			}
-			/*
-        	 * display a single sample question
-        	 */
-    		request.getSession().setAttribute(DEFAULT_QUESTION_CONTENT, qaQueContent.getQuestion());
-		}
-		catch(Exception e)
-		{
-			logger.debug("Exception occured: No default question content");
-    		request.setAttribute(USER_EXCEPTION_DEFAULTQUESTIONCONTENT_NOT_AVAILABLE, new Boolean(true));
-			persistError(request,"error.defaultQuestionContent.notAvailable");
-			return (mapping.findForward(LOAD_QUESTIONS));
-		}
-		
 		/*
 	     * mark the http session as an authoring activity 
 	     */
 	    request.getSession().setAttribute(TARGET_MODE,TARGET_MODE_AUTHORING);
-	    
 	    
 	    /*
 	     * define tab controllers for jsp
 	     */
 	    request.getSession().setAttribute(EDITACTIVITY_EDITMODE, new Boolean(false));
 		
-	    
 	    /*
 	     * find out whether the request is coming from monitoring module for EditActivity tab or from authoring environment url
 	     */
@@ -279,9 +235,12 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		*/
 		if (!existsContent(contentID.longValue(), qaService)) 
 		{
-            return retrieveContent(request, mapping, qaAuthoringForm, mapQuestionContent, defaultContentID);
+			String defaultContentIdStr=(String) request.getSession().getAttribute(DEFAULT_CONTENT_ID_STR);
+			logger.debug("defaultContentIdStr:" + defaultContentIdStr);
+            return retrieveContent(request, mapping, qaAuthoringForm, mapQuestionContent, new Long(defaultContentIdStr).longValue());
 		}
-        else{
+        else
+        {
             return retrieveContent(request, mapping, qaAuthoringForm, mapQuestionContent, contentID.longValue());
         }
 	} 
@@ -358,6 +317,109 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		return presentInitialUserInterface(request, mapping, qaAuthoringForm, mapQuestionContent);
 	}
 
+	
+	/**
+	 * each tool has a signature. QA tool's signature is stored in MY_SIGNATURE. The default tool content id and 
+	 * other depending content ids are obtained in this method.
+	 * if all the default content has been setup properly the method persists DEFAULT_CONTENT_ID in the session.
+	 * 
+	 * readSignature(HttpServletRequest request, ActionMapping mapping)
+	 * @param request
+	 * @param mapping
+	 * @return ActionForward
+	 */
+	public ActionForward readSignature(HttpServletRequest request, ActionMapping mapping)
+	{
+		IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
+		logger.debug("retrieving qaService from session: " + qaService);
+		/*
+		 * retrieve the default content id based on tool signature
+		 */
+		long defaultContentID=0;
+		try
+		{
+			logger.debug("attempt retrieving tool with signatute : " + MY_SIGNATURE);
+            defaultContentID=qaService.getToolDefaultContentIdBySignature(MY_SIGNATURE);
+			logger.debug("retrieved tool default contentId: " + defaultContentID);
+			if (defaultContentID == 0)
+			{
+				logger.debug("default content id has not been setup");
+				persistError(request,"error.defaultContent.notSetup");
+		    	request.setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true));
+				return (mapping.findForward(LOAD_QUESTIONS));	//TODO: forward to error page
+			}
+		}
+		catch(Exception e)
+		{
+			logger.debug("error getting the default content id: " + e.getMessage());
+			persistError(request,"error.defaultContent.notSetup");
+	    	request.setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true));
+			return (mapping.findForward(LOAD_QUESTIONS)); //TODO: forward to error page
+		}
+
+		
+		/* retrieve uid of the content based on default content id determined above */
+		long contentUID=0;
+		try
+		{
+			logger.debug("retrieve uid of the content based on default content id determined above: " + defaultContentID);
+			QaContent qaContent=qaService.loadQa(defaultContentID);
+			if (qaContent == null)
+			{
+				logger.debug("Exception occured: No default content");
+	    		persistError(request,"error.defaultContent.notSetup");
+	    		return (mapping.findForward(LOAD_QUESTIONS));
+	    		//McUtils.cleanUpSessionAbsolute(request);
+				//return (mapping.findForward(ERROR_LIST));
+			}
+			logger.debug("using qaContent: " + qaContent);
+			logger.debug("using mcContent uid: " + qaContent.getUid());
+			contentUID=qaContent.getUid().longValue();
+			logger.debug("contentUID: " + contentUID);
+		}
+		catch(Exception e)
+		{
+			logger.debug("Exception occured: No default question content");
+			persistError(request,"error.defaultContent.notSetup");
+			return (mapping.findForward(LOAD_QUESTIONS));
+			//McUtils.cleanUpSessionAbsolute(request);
+			//return (mapping.findForward(ERROR_LIST));
+		}
+
+		
+		/* retrieve uid of the default question content  */
+		long queContentUID=0;
+		try
+		{
+			logger.debug("retrieve the default question content based on default content UID: " + queContentUID);
+			QaQueContent qaQueContent=qaService.getToolDefaultQuestionContent(contentUID);
+			logger.debug("using mcQueContent: " + qaQueContent);
+			if (qaQueContent == null)
+			{
+				logger.debug("Exception occured: No default question content");
+	    		persistError(request,"error.defaultQuestionContent.notAvailable");
+	    		return (mapping.findForward(LOAD_QUESTIONS));
+	    		//McUtils.cleanUpSessionAbsolute(request);
+				//return (mapping.findForward(ERROR_LIST));
+			}
+			logger.debug("using qaQueContent uid: " + qaQueContent.getUid());
+			//request.getSession().setAttribute(DEFAULT_QUESTION_UID, new Long(queContentUID));
+			request.getSession().setAttribute(DEFAULT_QUESTION_CONTENT, qaQueContent.getQuestion());
+		}
+		catch(Exception e)
+		{
+			logger.debug("Exception occured: No default question content");
+    		persistError(request,"error.defaultQuestionContent.notAvailable");
+    		return (mapping.findForward(LOAD_QUESTIONS));
+    		//McUtils.cleanUpSessionAbsolute(request);
+			//return (mapping.findForward(ERROR_LIST));
+		}
+		
+		logger.debug("QA tool has the default content id: " + defaultContentID);
+		request.getSession().setAttribute(DEFAULT_CONTENT_ID_STR, new Long(defaultContentID).toString());
+		return null;
+	}
+	
 	
 	/**
 	 * presents the final Map to the jsp
@@ -437,3 +499,4 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		saveErrors(request,errors);	    	    
 	}
 }  
+
