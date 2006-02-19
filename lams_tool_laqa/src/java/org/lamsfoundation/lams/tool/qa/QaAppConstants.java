@@ -42,6 +42,7 @@ public interface QaAppConstants {
 	public static final String MONITORING_STARTER						="monitoringStarter";
 	public static final String COPY_TOOL_CONTENT 						="copyToolContent";
 	public static final String ERROR_LIST								="errorList";
+	public static final String DEFAULT_CONTENT_ID_STR					="defaultContentIdStr";
 	
 	/*
 	 * Mock constants below are temporary until the tool gets a User object from the container.
@@ -121,6 +122,7 @@ public interface QaAppConstants {
 //    public static final String LIST_UPLOADED_ONLINE_FILES_UUID			="listUploadedOnlineFilesUuid";
 //    public static final String LIST_UPLOADED_ONLINE_FILES_NAME			="listUploadedOnlineFilesName";
     public static final String POPULATED_UPLOADED_FILESDATA				="populateUploadedFilesData";
+    
     
     
     /*
