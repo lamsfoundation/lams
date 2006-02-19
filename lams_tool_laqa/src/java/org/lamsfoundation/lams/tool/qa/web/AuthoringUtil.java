@@ -482,6 +482,28 @@ public class AuthoringUtil implements QaAppConstants {
         String richTextInstructions = qaAuthoringForm.getInstructions(); //??
         String richTextOnlineInstructions = qaAuthoringForm.getOfflineInstructions(); //??
         String endLearningMessage = qaAuthoringForm.getEndLearningMessage();
+        
+        String questionsSequenced = qaAuthoringForm.getQuestionsSequenced();
+        logger.debug("questionsSequenced: " + questionsSequenced);
+        
+        String synchInMonitor = qaAuthoringForm.getSynchInMonitor(); 
+        logger.debug("synchInMonitor: " + synchInMonitor);
+        
+        String usernameVisible = qaAuthoringForm.getUsernameVisible();
+        logger.debug("usernameVisible: " + usernameVisible);
+        
+        boolean questionsSequencedBoolean=false;
+        if (questionsSequenced.equalsIgnoreCase(ON))
+        	questionsSequencedBoolean=true;
+        
+        boolean synchInMonitorBoolean=false;
+        if (synchInMonitor.equalsIgnoreCase(ON))
+        	synchInMonitorBoolean=true;
+        
+        boolean usernameVisibleBoolean=false;
+        if (usernameVisible.equalsIgnoreCase(ON))
+        	usernameVisibleBoolean=true;
+        
         long userId = toolUser.getUserID().longValue();
         
        
@@ -502,7 +524,9 @@ public class AuthoringUtil implements QaAppConstants {
         qa.setEndLearningMessage(endLearningMessage);
         qa.setReportTitle(reportTitle);
         qa.setMonitoringReportTitle(monitoringReportTitle);
-        
+        qa.setUsernameVisible(usernameVisibleBoolean);
+        qa.setQuestionsSequenced(questionsSequencedBoolean);
+        qa.setSynchInMonitor(synchInMonitorBoolean);
         /**
          * TODO: right now the code simply remove all the questions and recreate them.
          *       Ideally, when existing questions changed it should be updated accordingly
