@@ -86,7 +86,7 @@
 	<!-- =================================================================== -->
 	<!-- Run Middlegen For LearningDesign                                                       -->
 	<!-- =================================================================== -->
-		<target name="middlegen" description="Run Middlegen For Submit Fiiles Tool" unless="middlegen.skip" depends="init,fail-if-no-xdoclet-1.2.x,check-driver-present,panic-if-driver-not-present">
+		<target name="middlegen" description="Run Middlegen For QA Tool" unless="middlegen.skip" depends="init,fail-if-no-xdoclet-1.2.x,check-driver-present,panic-if-driver-not-present">
 			<taskdef name="middlegen" classname="middlegen.MiddlegenTask" classpathref="all-libs" />
 			
 			<middlegen appname="lams_tool_laqa11" 
@@ -105,10 +105,12 @@
 						   javaTypeMapper="middlegen.plugins.hibernate.HibernateJavaTypeMapper"
 				/>
 				
-				<table name="tl_lasbmt11_content"/>
-				<table name="tl_lasbmt11_report"/>
-				<table name="tl_lasbmt11_session"/>
-				<table name="tl_lasbmt11_submission_details"/>
+				<table name="tl_laqa11_content"/>
+				<table name="tl_laqa11_session"/>
+				<table name="tl_laqa11_que_usr"/>
+				<table name="tl_laqa11_que_content"/>
+				<table name="tl_laqa11_usr_resp"/>
+				<table name="tl_laqa11_uploadedfile"/>				
 			</middlegen>
 
 		</target>
@@ -254,7 +256,11 @@
 	   			<fileset dir="${conf.web.dir}">
 						<include name="*"/>
 	   					<include name="author_page/**"/>
+						<include name="authoring/*"/>
+						<include name="learning/*"/>
+		   				<include name="monitoring/*"/>
 	   					<include name="images/**"/>
+		   				<include name="css/**"/>
 				</fileset>
 				<!--
 	   			<fileset dir="${conf.includes.dir}">
@@ -287,7 +293,7 @@
 		<!-- Clean and rebuild the database. 									 -->
 		<!-- =================================================================== -->
 		<target name="rebuild-db"
-			description="rebuild Submit Files tables">
+			description="rebuild Qa tables">
 			<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
 					password="${db.password}">
 				<classpath>
@@ -303,7 +309,7 @@
 		<!-- Clean tool database. 									 -->
 		<!-- =================================================================== -->
 		<target name="clean-tool-db"
-			description="rebuild Submit Files tables">
+			description="rebuild Qa tables">
 			<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
 					password="${db.password}">
 				<classpath>
@@ -386,7 +392,7 @@
 				</fileset>
 			</path> 
 
-			<echo>Deploying the Question and Answer tool</echo>
+			<echo>Deploying the Q/A tool</echo>
 	
 			<java
 				classname="org.lamsfoundation.lams.tool.deploy.Deploy"
@@ -439,6 +445,5 @@
 				</junitreport>
 
 			</target>
-	
 	
 </project>
