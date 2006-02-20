@@ -10,10 +10,6 @@ import org.lamsfoundation.lams.authoring.*;
 */
 class org.lamsfoundation.lams.common.comms.Communication {
     
-    
-
-
-
 	private static var FRIENDLY_ERROR_CODE:Number = 1;  //Server error codes
     private static var SYSTEM_ERROR_CODE:Number = 2;
     
@@ -177,14 +173,18 @@ class org.lamsfoundation.lams.common.comms.Communication {
 			}
 			
             //Check for errors in message type that's returned from server
+			//if its a user firendly error, then we can return it to the calling class, it might be able to do somehting with it
 			if(responseObj.messageType == FRIENDLY_ERROR_CODE){
                 //user friendly error
 				var e = new LFError(responseObj.messageValue,"onServerResponse",this);
 				dispatchToHandlerByID(queueID,e);
                 //TODO: Make sure that things that have requested server responses can handle an error object
-				//showAlert("Oops", responseObj.body, "sad");
             }else if(responseObj.messageType == SYSTEM_ERROR_CODE){
-				LFMessage.showMessageAlert(responseObj.messageValue, null, null);
+				//if its a system error, then just show an alert, with the option to send a crash dump
+				//LFMessage.showMessageAlert(responseObj.messageValue, null, null);
+				var e = new LFError(responseObj.messageValue, "onServerResponse",wrappedPacketXML);
+				e.showMessageConfirm();
+				
                 //showAlert("System error", "<p>Sorry there has been a system error, please try the operation again. If the problem persistes please contact support</p><p>Additional information:"+responseObj.body+"</p>", "sad");
             }else{
                 //Everything is fine so lookup callback handler on queue 
@@ -202,7 +202,8 @@ class org.lamsfoundation.lams.common.comms.Communication {
             //showAlert("System error", "<p>Communication Error</p>", "sad");
 			Debugger.log("XML Load failed",Debugger.CRITICAL,'onServerResponse','Communication');
 			var e = new LFError("Communication with the server has failed. \nPlease check you are connected to the internet and/or LAMS server","onServerResponse",this,'Server URL:'+_serverURL);
-			e.showErrorAlert();
+			e.showMessageConfirm();
+			
 		}
     }
     
