@@ -21,6 +21,9 @@
 package org.lamsfoundation.lams.monitoring.service;
 
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.LinkedList;
 
 import javax.sql.DataSource;
@@ -39,6 +42,8 @@ import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 
@@ -63,11 +68,12 @@ public class TestMonitoringService extends AbstractLamsTestCase
     private final Integer TEST_LEARNER_ID = new Integer(2);
     private final Integer TEST_STAFF_ID = new Integer(3);
     // values when demo'ing the progress engine
-    private final long TEST_LEARNING_DESIGN_ID = 2;
-    private final long TEST_COPIED_LEARNING_DESIGN_ID = 3;
+    // private final long TEST_LEARNING_DESIGN_ID = 3;
+    // private final long TEST_COPIED_LEARNING_DESIGN_ID = 4;
     // values when testing the progress engine
-    //private final long TEST_LEARNING_DESIGN_ID = 1;
-    //private final long TEST_COPIED_LEARNING_DESIGN_ID = 2;
+    private final long TEST_LEARNING_DESIGN_ID = 1;
+    private final long TEST_LEARNING_DESIGN_SURVEY_ONLY_ID = 2;
+    private final long TEST_COPIED_LEARNING_DESIGN_ID = 3;
     private final Integer TEST_ORGANIZATION_ID = new Integer(1);
     private final Long TEST_SCHEDULE_GATE_ID = new Long(27);
     private final Long TEST_LESSION_ID = new Long(1); // "Test_Lesson" from insert_test_data script 
@@ -276,6 +282,7 @@ public class TestMonitoringService extends AbstractLamsTestCase
         testLearner = usermanageService.getUserById(TEST_LEARNER_ID);        
         testOrganisation = usermanageService.getOrganisationById(TEST_ORGANIZATION_ID);
     }
+   
    public void testGetActivityContributionURL() throws IOException{
     	String packet = monitoringService.getActivityContributionURL(new Long(29));    	
     	System.out.println(packet);
@@ -332,7 +339,7 @@ public class TestMonitoringService extends AbstractLamsTestCase
 
 	private Lesson startLesson(String testName, String testDesc) {
 		try {
-	        Lesson previewLesson = monitoringService.initializeLessonForPreview(testName,testDesc,TEST_LEARNING_DESIGN_ID,TEST_USER_ID);
+	        Lesson previewLesson = monitoringService.initializeLessonForPreview(testName,testDesc,TEST_LEARNING_DESIGN_SURVEY_ONLY_ID,TEST_USER_ID);
 	        assertNotNull("Lesson created",previewLesson);
 			assertNotNull("Lesson has been saved - an id exists", previewLesson.getLessonId());
 
@@ -366,11 +373,27 @@ public class TestMonitoringService extends AbstractLamsTestCase
 
 	/*
 	 * Test method for 'org.lamsfoundation.lams.preview.service.PreviewService.deleteAllOldPreviewLessons(int)'
-	 * Can't really test this properly - can't tell if deleted or not. Can only test that it doesn't fail
 	 */
 	public void testDeleteAllOldPreviewLessons() {
-		int lessonsDeleted = monitoringService.deleteAllOldPreviewLessons(1);
-		assertTrue("deleteAllOldPreviewLessons returns 0 or more", lessonsDeleted>=0);
+		// need to dummy up something to delete. Create a lesson and force it to be over 7 days old.
+		String testName = "LESSON TO DELETE By BATCH";
+		String testDesc = "TO BE DELETED BY THE BATCH CALL";
+		Lesson lesson = startLesson(testName, testDesc);
+		Long lessonId = lesson.getLessonId();
+		
+		int numDays = Configuration.getAsInt(ConfigurationKeys.PREVIEW_CLEANUP_NUM_DAYS);
+		assertTrue("Number of days till the cleanup should be deleted is greater than zero (value is "+numDays+")", numDays > 0);
+
+		//Configuration.
+		Calendar calendar = new GregorianCalendar();
+		calendar.setTime(new Date());
+		calendar.add(Calendar.DAY_OF_MONTH, -8);
+		lesson.setStartDateTime(calendar.getTime());
+		int lessonsDeleted = monitoringService.deleteAllOldPreviewLessons();
+		assertTrue("deleteAllOldPreviewLessons returns at least 1 lesson", lessonsDeleted>=1);
+		
+		Lesson deletedLesson = lessonDao.getLesson(lessonId);
+		assertNull("Batch deleted lesson cannot be found",deletedLesson);
 	}
 
 }

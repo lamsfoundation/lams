@@ -424,12 +424,11 @@ public interface IMonitoringService
 	public abstract void deletePreviewLesson(long lessonID);
 
 	/**
-	 * Remove all the "old" preview lessons. Removes all preview lessons older than <code>numDays</code> old.  
-	 * 
-	 * @param numDays Delete any preview lessons older than numDays
+	 * Remove all the "old" preview lessons. Removes all preview lessons older than 
+	 * the number of days specified in the configuration file.  
 	 * @return number of lessons deleted.
 	 */
-	public abstract int deleteAllOldPreviewLessons(int numDays);
+	public abstract int deleteAllOldPreviewLessons();
 
     /* TODO Dummy methods - to be removed */
     public List getOrganisationsUsers(Integer userId);

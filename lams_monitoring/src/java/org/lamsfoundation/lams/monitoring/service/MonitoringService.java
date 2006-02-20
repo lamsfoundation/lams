@@ -74,6 +74,8 @@ import org.lamsfoundation.lams.usermanagement.dao.IUserDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IWorkspaceFolderDAO;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
@@ -132,7 +134,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 	//---------------------------------------------------------------------
     // Inversion of Control Methods - Method injection
     //---------------------------------------------------------------------
-    /**
+   /**
      * @param messageService the i18n Service bean.
      */
 	public void setMessageService(MessageService messageService) {
@@ -278,7 +280,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         	destinationFolder = originalLearningDesign.getWorkspaceFolder(); 
         }
         
-        return initializeLessonForPreview(lessonName, lessonDescription, originalLearningDesign, user, LearningDesign.COPY_TYPE_LESSON, destinationFolder);
+        return initializeLesson(lessonName, lessonDescription, originalLearningDesign, user, LearningDesign.COPY_TYPE_LESSON, destinationFolder);
         
     }
     
@@ -298,10 +300,10 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         }
     	User user = (userID != null ? userManagementService.getUserById(userID) : null);
 
-        return initializeLessonForPreview(lessonName, lessonDescription, originalLearningDesign, user, LearningDesign.COPY_TYPE_PREVIEW, null);
+        return initializeLesson(lessonName, lessonDescription, originalLearningDesign, user, LearningDesign.COPY_TYPE_PREVIEW, null);
     }
 
-    public Lesson initializeLessonForPreview(String lessonName,
+    public Lesson initializeLesson(String lessonName,
             String lessonDescription,
             LearningDesign originalLearningDesign,
             User user,
@@ -1551,7 +1553,26 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
        	Lesson lesson = lessonDAO.getLesson(new Long(lessonID));
        	if ( lesson != null ) {
        		if ( lesson.getLearningDesign().getCopyTypeID() != null && 
-       				LearningDesign.COPY_TYPE_PREVIEW == lesson.getLearningDesign().getCopyTypeID().intValue() ) { 
+       				LearningDesign.COPY_TYPE_PREVIEW == lesson.getLearningDesign().getCopyTypeID().intValue() ) {
+       			
+       	    	// get all the tool sessions for this lesson and remove all the tool session data
+       			List toolSessions = lamsCoreToolService.getToolSessionsByLesson(lesson);
+       			if ( toolSessions != null && toolSessions.size() > 0 ) {
+       				Iterator iter = toolSessions.iterator();
+       				while ( iter.hasNext() ) {
+       					ToolSession toolSession = (ToolSession) iter.next();
+       					lamsCoreToolService.deleteToolSession(toolSession);
+       				}
+       			} else {
+       				log.debug("deletePreviewLesson: Removing tool sessions - none exist");
+       			}
+       			
+       			
+       			// get the learning design for this lesson
+       			LearningDesign ld = lesson.getLearningDesign();
+       			authoringService.deleteLearningDesign(ld);
+       		
+       			// remove the lesson.
        	    	deleteLesson(lesson);
        		} else {
        			log.warn("Unable to delete lesson as lesson is not a preview lesson. Learning design copy type was "+lesson.getLearningDesign().getCopyTypeID());
@@ -1560,17 +1581,23 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
        }
 
        /* (non-Javadoc)
-   	 * @see org.lamsfoundation.lams.preview.service.IPreviewService#deleteAllOldPreviewLessons(int)
+   	 * @see org.lamsfoundation.lams.preview.service.IMonitoringService#deleteAllOldPreviewLessons(int)
    	 */
-       public int deleteAllOldPreviewLessons(int numDays) {
+       public int deleteAllOldPreviewLessons() {
+
+    	int numDays = Configuration.getAsInt(ConfigurationKeys.PREVIEW_CLEANUP_NUM_DAYS);
 
    	    // Contract checking 
    	    if ( numDays <= 0 ) {
-   	    	log.error("deleteAllOldPreviewSessions: number of days invalid ("+numDays+"). Unable to delete any preview lessons");
+   	    	log.error("deleteAllOldPreviewSessions: number of days invalid ("
+   	    			+numDays
+   	    			+"). See configuration file (option "
+   	    			+ConfigurationKeys.PREVIEW_CLEANUP_NUM_DAYS
+   	    			+" Unable to delete any preview lessons");
    	    	return 0;
    	    }
    	   
-     		int numDeleted = 0;
+   	    int numDeleted = 0;
 
      		// calculate comparison date
    	    long newestDateToKeep = System.currentTimeMillis() - ( numDays * numMilliSecondsInADay);
