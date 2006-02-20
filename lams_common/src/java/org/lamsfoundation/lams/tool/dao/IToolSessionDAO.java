@@ -6,7 +6,10 @@
 
 package org.lamsfoundation.lams.tool.dao;
 
+import java.util.List;
+
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.usermanagement.User;
 
@@ -37,5 +40,15 @@ public interface IToolSessionDAO
 	 */
 	public ToolSession getToolSessionByLearner(final User learner,final Activity activity);
 
+	/**
+	 * Get all the tools for a lesson. Does not order the tool sessions with respect to their
+	 * activities - to do that you need to get the activities first and get the tool session from
+	 * the activity.
+	 * 
+	 * @returns list of tool sessions.
+	 */
+	public List getToolSessionsByLesson(final Lesson lesson);
+
+	
 	public void updateToolSession(ToolSession toolSession);
 }

@@ -215,4 +215,9 @@ public interface IAuthoringService {
 	 * @return Vector of LicenseDTO objects. It is a Vector to ensure compatibility with WDDX 
 	 */
 	public Vector getAvailableLicenses();
+	
+	/** Delete a learning design from the database. Does not remove any content stored in tools - 
+	 * that is done by the LamsCoreToolService */
+	public void deleteLearningDesign(LearningDesign design);
+
 }

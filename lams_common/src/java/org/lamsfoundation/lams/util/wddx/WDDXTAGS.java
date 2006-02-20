@@ -171,5 +171,7 @@ public interface WDDXTAGS {
 	public static final String LESSON_NAME = "lessonName";
 	public static final String LESSON_START_DATETIME = "lessonStartDateTime";
 	
+	/** Crash Dump Specific Tags */
+	public static final String CRASH_DUMP_BATCH="crashDataBatch";
 	
 }

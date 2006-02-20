@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.tool.service;
 
 
+import java.util.List;
 import java.util.Set;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -31,7 +32,6 @@ import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSession;
-import org.lamsfoundation.lams.tool.dao.IToolSessionDAO;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
@@ -131,6 +131,15 @@ public interface ILamsCoreToolService
     	throws DataMissingException, ToolException;
     
     /**
+     * Ask a tool to delete a tool content. If any related tool session data exists then it should 
+     * be deleted.
+     * 
+     * @param toolActivity the tool activity defined in the design.
+     * @throws ToolException 
+     */
+    public void notifyToolToDeleteContent(ToolActivity toolActivity) throws ToolException;
+    
+    /**
      * Update the tool session data.
      * @param toolSession the new tool session object.
      */
@@ -146,6 +155,20 @@ public interface ILamsCoreToolService
      * @return the tool access url with tool session id and access mode.
      */
     public String getLearnerToolURLByMode(ToolActivity activity, User learner, ToolAccessMode accessMode) throws LamsToolServiceException;
+
+    /**
+     * Get all the tool sessions for a lesson. The resulting list is not sorted.
+     * @return list of ToolSession objects 
+     */
+    public List getToolSessionsByLesson(Lesson lesson);
+    
+    
+    /**
+     * Delete a tool session. Calls the tool to delete its session details and then
+     * deletes the main tool session record. If the tool throws an exception, the main
+     * tool session record is still deleted.
+     */
+    public void deleteToolSession(ToolSession toolSession);
 
     /**
      * <p>Setup target tool url with tool session id parameter based on the tool

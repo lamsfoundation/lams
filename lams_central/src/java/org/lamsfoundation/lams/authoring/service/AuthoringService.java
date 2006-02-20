@@ -43,6 +43,7 @@ import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.LearningLibrary;
 import org.lamsfoundation.lams.learningdesign.License;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupDAO;
@@ -61,6 +62,8 @@ import org.lamsfoundation.lams.themes.dto.CSSThemeDTO;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolContentIDGenerator;
 import org.lamsfoundation.lams.tool.dao.hibernate.ToolDAO;
+import org.lamsfoundation.lams.tool.exception.ToolException;
+import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dao.hibernate.UserDAO;
@@ -95,6 +98,7 @@ public class AuthoringService implements IAuthoringService {
 	protected GroupingDAO groupingDAO;
 	protected GroupDAO groupDAO;
 	protected ICSSThemeDAO themeDAO;
+	protected ILamsCoreToolService lamsCoreToolService;
 	protected MessageService messageService;
 	
 	protected ToolContentIDGenerator contentIDGenerator;
@@ -187,6 +191,14 @@ public class AuthoringService implements IAuthoringService {
         this.themeDAO = themeDAO;
     }
     
+	public ILamsCoreToolService getLamsCoreToolService() {
+		return lamsCoreToolService;
+	}
+
+	public void setLamsCoreToolService(ILamsCoreToolService lamsCoreToolService) {
+		this.lamsCoreToolService = lamsCoreToolService;
+	}
+
     /**
      * @param contentIDGenerator The contentIDGenerator to set.
      */
@@ -601,5 +613,34 @@ public class AuthoringService implements IAuthoringService {
 		return licenseDTOList;
 	}
 
-	
+	/** Delete a learning design from the database. Does not remove any content stored in tools - 
+	 * that is done by the LamsCoreToolService */
+	public void deleteLearningDesign(LearningDesign design) {
+		if ( design == null ) {
+			log.error("deleteLearningDesign: unable to delete learning design as design is null.");
+			return;
+		}
+		
+		// remove all the tool content for the learning design
+		Set acts = design.getActivities();
+		Iterator iter = acts.iterator();
+		while (iter.hasNext()) {
+			Activity activity = (Activity) iter.next();
+			if ( activity.getActivityTypeId() != null && 
+						Activity.TOOL_ACTIVITY_TYPE == activity.getActivityTypeId().intValue() )  {
+				// TODO can't just cast....
+				try {
+					lamsCoreToolService.notifyToolToDeleteContent((ToolActivity)activity);
+				} catch (ToolException e) {
+					log.error("Unable to delete tool content for activity"+activity
+							+" as activity threw exception does not exist",e);
+				}
+			}
+		}
+			
+		// remove the learning design 
+		learningDesignDAO.delete(design);
+	}
+
+
 }

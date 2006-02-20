@@ -6,9 +6,11 @@
 
 package org.lamsfoundation.lams.tool.dao.hibernate;
 
+import java.util.List;
+
 import org.hibernate.Query;
 import org.lamsfoundation.lams.learningdesign.Activity;
-import org.lamsfoundation.lams.learningdesign.Group;
+import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.tool.GroupedToolSession;
 import org.lamsfoundation.lams.tool.NonGroupedToolSession;
 import org.lamsfoundation.lams.tool.ToolSession;
@@ -30,6 +32,8 @@ public class ToolSessionDAO extends HibernateDaoSupport implements IToolSessionD
     protected static final String LOAD_GROUPED_TOOL_SESSION_BY_GROUP2 = 
         "select s from GroupedToolSession as s inner join s.sessionGroup as sg inner join sg.users as u "
     	+" where :learner = u and s.toolActivity = :activity";
+    protected static final String LOAD_TOOL_SESSION_BY_LESSON =  
+        "from ToolSession s where s.lesson = :lesson";
 
     /**
      * Retrieves the ToolSession
@@ -78,6 +82,17 @@ public class ToolSessionDAO extends HibernateDaoSupport implements IToolSessionD
     {
         getHibernateTemplate().delete(toolSession);
     }
+
+    /**
+     * @see org.lamsfoundation.lams.tool.dao.IToolSessionDAO#getToolSessionsByLesson(org.lamsfoundation.lams.lesson.Lesson)
+     */
+	public List getToolSessionsByLesson(final Lesson lesson) {
+
+		Query query = this.getSession().createQuery(LOAD_TOOL_SESSION_BY_LESSON);
+		query.setParameter("lesson",lesson);
+		return query.list();
+
+	}
 
     /**
      * @see org.lamsfoundation.lams.tool.dao.IToolSessionDAO#updateToolSession(org.lamsfoundation.lams.tool.ToolSession)

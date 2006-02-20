@@ -31,6 +31,8 @@ public class ConfigurationKeys {
 	
 	public static String LICENSE_TICKET_FILE="TicketFile";
 
+	public static String PREVIEW_CLEANUP_NUM_DAYS="CleanupPreviewOlderThanDays";
+
 	/** Number of milliseconds before a user is considered "inactive". "Anonymous" sessions
 	 * are ended after this period (ie ones that haven't ever access one of the clients ) */
 	public static String INACTIVE_TIME="UserInactiveTimeout";

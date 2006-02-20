@@ -22,6 +22,7 @@ package org.lamsfoundation.lams.tool.service;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -175,7 +176,7 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
     }
 
     /**
-     * Make a copy of all tools content which belongs to this learning design.
+     * Calls the tool to copy the content for an activity. Used when copying a learning design.
      * 
      * @param toolActivity the tool activity defined in the design.
      * @throws DataMissingException, ToolException
@@ -206,12 +207,66 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
     }
     
     /**
+     * Ask a tool to delete a tool content. If any related tool session data exists then it should 
+     * be deleted.
+     * 
+     * @param toolActivity the tool activity defined in the design.
+     * @throws ToolException 
+     */
+    public void notifyToolToDeleteContent(ToolActivity toolActivity) throws ToolException
+    {
+        //TODO we need to the classpath check once all tools done.
+        if (isToolOnClasspath(toolActivity))
+        {
+			ToolContentManager contentManager = (ToolContentManager) findToolService(toolActivity);
+			contentManager.removeToolContent(toolActivity.getToolContentId(),true);
+        }
+    }
+    /**
      * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#updateToolSession(org.lamsfoundation.lams.tool.ToolSession)
      */
     public void updateToolSession(ToolSession toolSession)
     {
         toolSessionDAO.updateToolSession(toolSession);        
     }
+    
+    /**
+     * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#getToolSessionsByLesson(org.lamsfoundation.lams.lesson.Lesson)
+     */
+    public List getToolSessionsByLesson(Lesson lesson)
+    {
+        return toolSessionDAO.getToolSessionsByLesson(lesson);        
+    }
+    
+    
+    /**
+     * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#deleteToolSession(org.lamsfoundation.lams.tool.ToolSession)
+     */
+    public void deleteToolSession(ToolSession toolSession)
+    {
+		if ( toolSession == null ) {
+			log.error("deleteToolSession: unable to delete tool session as tool session is null.");
+			return;		
+		}
+
+    	// call the tool to remove the session details
+        ToolSessionManager sessionManager = (ToolSessionManager) findToolService(toolSession.getToolActivity());
+
+        try {
+			sessionManager.removeToolSession(toolSession.getToolSessionId());
+		} catch (DataMissingException e) {
+			log.error("Unable to delete tool data for tool session "+toolSession.getToolSessionId()
+					+" as toolSession does not exist",e);
+		} catch (ToolException e) {
+			log.error("Unable to delete tool data for tool session "+toolSession.getToolSessionId()
+					+" as tool threw an exception",e);
+		}
+    	
+    	// now remove the tool session from the core tables.
+    	toolSessionDAO.removeToolSession(toolSession);
+        
+    }
+
     
     /**
      * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#getLearnerToolURLByMode(org.lamsfoundation.lams.learningdesign.ToolActivity, org.lamsfoundation.lams.usermanagement.User, org.lamsfoundation.lams.tool.ToolAccessMode)

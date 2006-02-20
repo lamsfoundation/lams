@@ -88,7 +88,7 @@ public abstract class AbstractStoreWDDXPacketServlet extends HttpServlet {
 
 			packet = getBody(request);
 			if ( log.isDebugEnabled() ) {
-				log.debug("Request "+request.getRequestURI()+" received packet "+packet);
+				log.debug("Request "+request.getRequestURI()+" received packet length "+packet);
 			}
 
 			if(containsNulls(packet)){
@@ -151,26 +151,26 @@ public abstract class AbstractStoreWDDXPacketServlet extends HttpServlet {
   	{
   	    int tempContentLength = req.getContentLength();
   	    InputStream sis = req.getInputStream();
-  	    byte[] content = new byte[1024*4];
+/*  	    byte[] content = new byte[1024*4];
   	    OutputStream bos = new ByteArrayOutputStream(tempContentLength>0 ? tempContentLength : 200);
   	    int len;
   	    while((len = sis.read(content)) != -1){
   	    	bos.write(content,0,len);
   	    }
   	    return bos.toString();
-  	     	    	  
-//  	    BufferedReader buff = new BufferedReader(new InputStreamReader(sis));
-//  	   
-//  	    StringBuffer tempStrBuf = new StringBuffer( tempContentLength>0 ? tempContentLength : 200 );
-//		String tempStr;
-//		tempStr = buff.readLine();
-//		while ( tempStr != null )
-//		{
-//			tempStrBuf.append(tempStr);
-//			tempStr = buff.readLine();
-//		}
-//
-//		return(tempStrBuf.toString()); 
+  */	     	    	  
+  	    BufferedReader buff = new BufferedReader(new InputStreamReader(sis));
+  	   
+  	    StringBuffer tempStrBuf = new StringBuffer( tempContentLength>0 ? tempContentLength : 200 );
+		String tempStr;
+		tempStr = buff.readLine();
+		while ( tempStr != null )
+		{
+			tempStrBuf.append(tempStr);
+			tempStr = buff.readLine();
+		}
+
+		return(tempStrBuf.toString()); 
   	   
 	/*	BufferedReader  tempReader  = req.getReader();
 		int tempContentLength = req.getContentLength();
