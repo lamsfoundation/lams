@@ -4,6 +4,10 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 <%@ taglib uri="fck-editor" prefix="FCK" %>
+<%@ taglib uri="tags-lams" prefix="lams" %>
+
+<c:set var="lams"><lams:LAMSURL/></c:set>
+<c:set var="tool"><lams:WebAppURL/></c:set>
 
 <%
 String protocol = request.getProtocol();
@@ -17,15 +21,14 @@ String pathToLams = protocol+request.getServerName()+":"+request.getServerPort()
 
 %>
 
-<!DOCTYPE html
-PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD hTML 4.01 Transitional//EN">
 
 <html:html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<title>Tool</title>
+<title><bean:message key="label.authoring"/></title>
+
+<!-- depending on user / site preference this will get changed probbably use passed in variable from flash to select which one to use-->
 <script type="text/javascript" src="author_page/js/tabcontroller.js"></script>
 <script src="<%=pathToLams%>/includes/javascript/common.js"></script>
 <!-- this is the custom CSS for hte tool -->
@@ -123,7 +126,7 @@ function pviiClassNew(obj, new_style) { //v2.7 by PVII
 
     <!-- tab content one (basic)-->
     <div class="tabbody" id="tabbody1">
-        <h2>Basic tab content</h2>
+        <h2><font size=2> <b> <bean:message key="label.authoring.qa.basic"/> </b></font></h2>
         <div id="formtablecontainer">
             <jsp:include page="BasicContent.jsp" />
         </div>
@@ -137,7 +140,7 @@ function pviiClassNew(obj, new_style) { //v2.7 by PVII
 
     <!-- tab content 2 Advanced-->
     <div class="tabbody" id="tabbody2">
-        <h2>Advanced tab content</h2>
+        <h2><font size=2> <b> <bean:message key="label.advanced.definitions"/> </b></font></h2>
         <div id="formtablecontainer">
             <jsp:include page="AdvancedContent.jsp" />
         </div>
@@ -148,13 +151,13 @@ function pviiClassNew(obj, new_style) { //v2.7 by PVII
 
     <!-- tab content 3 instructions -->
     <div class="tabbody" id="tabbody3">
-        <h2>Instructions tab content </h2>
+        <h2><font size=2> <b> <bean:message key="label.authoring.instructions"/> </b></font></h2>
         <div id="formtablecontainer">
             <jsp:include page="InstructionsContent.jsp" />
         </div>
         <hr>
-        <a href="javascript:window.close()" class="button">Cancel</a>
-        <a href="javascript:submitMethod('submitAllContent')" class="button">Save</a>
+        <a href="javascript:window.close()" class="button"><font size=2> <b> Cancel </font> </b> </a>
+        <a href="javascript:submitMethod('submitAllContent')" class="button"><font size=2> <b> Save </font> </b></a>
     </div>
     <!-- end of content_a -->
 
@@ -172,8 +175,9 @@ function pviiClassNew(obj, new_style) { //v2.7 by PVII
                 </FCK:editor>  
             </div>
             <div style="text-align: center">
-                <a href="#" onClick="saveWYSWYGEdittedText(activeEditorIndex); doPreview(activeEditorIndex)">Save</a>
-                <a href="#" onClick="doPreview(activeEditorIndex)">Cancel</a>
+                <a href="#" onClick="saveWYSWYGEdittedText(activeEditorIndex); doPreview(activeEditorIndex)"> <font size=2> <b> Save </b> </font></a>
+                &nbsp&nbsp&nbsp&nbsp
+                <a href="#" onClick="doPreview(activeEditorIndex)"><font size=2> <b>Cancel </font> </b></a>
             </div>
         </div>
     </div>

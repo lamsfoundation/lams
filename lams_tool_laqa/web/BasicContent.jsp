@@ -11,18 +11,18 @@
 			<tr> <td>
 					<table align=center> 
 						<tr> 
-					 		<td valign="top"> <bean:message key="label.authoring.title"/>: </td>
+					 		<td valign="top"><font size=2> <b> <bean:message key="label.authoring.title"/>: </b></font> </td>
 					 		<td NOWRAP width=700> <!-- Dave,I found width was necessary to present all the elements of the editor, feel free to change -->                            
                                 
                                  <span id="previewTitle" style="visibility: hidden; display: none;">
                                      <div>
-                                         <a href="javascript:doWYSWYGEdit('Title','small')">Open Richtext Editor</a>
+                                         <a href="javascript:doWYSWYGEdit('Title','small')"><font size=2> <b> Open Richtext Editor </a>
                                      </div>
                                      <div class="smallPreviewPanel" id="previewTitle.text"></div>
                                  </span>
                                  <span id="txTitle">
                                      <div>
-                                         <a href="javascript:doTextToHTML('Title'); doWYSWYGEdit('Title','small')">Open Richtext Editor</a>
+                                         <a href="javascript:doTextToHTML('Title'); doWYSWYGEdit('Title','small')"><font size=2> <b> Open Richtext Editor</a>
                                      </div>
                                      <textarea class="smallTextareaPanel" name="title" id="txTitle.textarea"><c:out value="${QaAuthoringForm.title}" escapeXml="false" /></textarea>
                                  </span>
@@ -30,17 +30,17 @@
 							</td> 
 					  	</tr>
 					  	<tr> 
-					 		<td valign="top"> <bean:message key="label.authoring.instructions"/>: </td>
+					 		<td valign="top"><font size=2> <b> <bean:message key="label.authoring.instructions"/>:  </b></font></td>
 					 		<td NOWRAP width=700> <!-- Dave,I found width was necessary to present all the elements of the editor, feel free to change -->
                                 <span id="previewInstructions" style="visibility: hidden; display: none;">
                                     <div>
-                                        <a href="javascript:doWYSWYGEdit('Instructions')">Open Richtext Editor</a>
+                                        <a href="javascript:doWYSWYGEdit('Instructions')"><font size=2> <b> Open Richtext Editor</a>
                                     </div>
                                     <div class="previewPanel" id="previewInstructions.text"></div>
                                 </span>
                                 <span id="txInstructions">
                                     <div>
-                                        <a href="javascript:doTextToHTML('Instructions'); doWYSWYGEdit('Instructions')">Open Richtext Editor</a>
+                                        <a href="javascript:doTextToHTML('Instructions'); doWYSWYGEdit('Instructions')"><font size=2> <b>Open Richtext Editor</a>
                                     </div>
                                     <textarea class="textareaPanel" name="instructions" id="txInstructions.textarea"><c:out value="${QaAuthoringForm.instructions}" escapeXml="false" /></textarea>
                                 </span>
@@ -50,7 +50,7 @@
 			 		<!--default question content, this entry can not be deleted but can be updated -->
 				 		<tr> 
 						  	<td valign="top"> 
-						 		<bean:message key="label.question1"/> : 
+						 		<font size=2> <b> <bean:message key="label.question1"/> :  </b></font>
 						 	</td>
 						  	<td>
                                 <span id="previewQuestion0" style="visibility: hidden; display: none;">
@@ -61,7 +61,7 @@
                                 </span>
                                 <span id="txQuestion0">
                                     <div>
-                                        <a href="javascript:doTextToHTML('Question0'); doWYSWYGEdit('Question0')">Open Richtext Editor</a>
+                                        <a href="javascript:doTextToHTML('Question0'); doWYSWYGEdit('Question0')"><font size=2> <b>Open Richtext Editor</a>
                                     </div>
                                     <textarea class="textareaPanel" name="questionContent0" id="txQuestion0.textarea"><c:out value="${sessionScope.defaultQuestionContent}"/></textarea>
                                 </span>
@@ -76,18 +76,18 @@
 					  		<c:if test="${questionEntry.key > 1}"> 			
 								<c:set var="queIndex" scope="session" value="${queIndex +1}"/>
 								  <tr>
-								  	<td valign="top"> <c:out value="Question ${queIndex}"/> : </td>
+								  	<td valign="top"> <font size=2> <b> <c:out value="Question ${queIndex}"/> :  </b></font></td>
 								  	<td>
   
                                         <span id="preview<c:out value="Question${queIndex-1}"/>" style="visibility: hidden; display: none;">
                                             <div>
-                                                <a href="javascript:doWYSWYGEdit('<c:out value="Question${queIndex-1}"/>')">Open Richtext Editor</a>
+                                                <a href="javascript:doWYSWYGEdit('<c:out value="Question${queIndex-1}"/>')"><font size=2> <b>Open Richtext Editor</a>
                                             </div>
                                             <div class="previewPanel" id="preview<c:out value="Question${queIndex-1}"/>.text"></div>
                                         </span>
                                         <span id="tx<c:out value="Question${queIndex-1}"/>">
                                             <div>
-                                                <a href="javascript:doTextToHTML('<c:out value="Question${queIndex-1}"/>'); doWYSWYGEdit('<c:out value="Question${queIndex-1}"/>')">Open Richtext Editor</a>
+                                                <a href="javascript:doTextToHTML('<c:out value="Question${queIndex-1}"/>'); doWYSWYGEdit('<c:out value="Question${queIndex-1}"/>')"><font size=2> <b>Open Richtext Editor</a>
                                             </div>
                                             <textarea class="textareaPanel" name="<c:out value="questionContent${queIndex-1}"/>" id="tx<c:out value="Question${queIndex-1}"/>.textarea"><c:out value="${questionEntry.value}"/></textarea>
                                         </span>
@@ -133,14 +133,14 @@
 			<tr> <td>
 					<table align=center>
 						<tr> 
-					 		<td> <bean:message key="label.authoring.title"/>: </td>
+					 		<td> <font size=2> <b> <bean:message key="label.authoring.title"/>:  </b></font></td>
 					 		<td NOWRAP width=700> <!-- Dave,I found width was necessary to present all the elements of the editor, feel free to change -->
 						 		<c:out value="${sessionScope.richTextTitle}" escapeXml="false" />
 							</td> 
 					  	</tr>
 
 					  	<tr> 
-					 		<td> <bean:message key="label.authoring.instructions"/>: </td> 
+					 		<td> <font size=2> <b> <bean:message key="label.authoring.instructions"/>:  </b></font></td> 
 					 		<td NOWRAP width=700> <!-- Dave,I found width was necessary to present all the elements of the editor, feel free to change -->
 							  <c:out value="${sessionScope.richTextInstructions}" escapeXml="false" />						  
 							</td>
@@ -149,8 +149,8 @@
 			 		<!--default question content, this entry can not be deleted but can be updated -->
 		
 				 		<tr> 
-						  	<td> 
-						  		<c:out value="Question 1"/> : </td>
+						  	<td> <font size=2> <b>
+						  		<c:out value="Question 1"/> :  </b></font></td>
 						  		<td>
 									<c:out value="${sessionScope.defaultQuestionContent}"/>
 						  		</td>
@@ -164,7 +164,7 @@
 					  		<c:if test="${questionEntry.key > 1}"> 			
 								<c:set var="queIndex" scope="session" value="${queIndex +1}"/>
 								  <tr>
-								  	<td> <c:out value="Question ${queIndex}"/> : </td>
+								  	<td> <font size=2> <b><c:out value="Question ${queIndex}"/> :  </b></font></td>
 								  		<td> <c:out value="${questionEntry.value}"/>
 									  	&nbsp
 									  	</td>

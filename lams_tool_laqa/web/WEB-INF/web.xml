@@ -132,6 +132,11 @@
 	<error-code>403</error-code>
 	<location>/403.html</location>
 </error-page>
+
+	<taglib>
+	   <taglib-uri>tags-lams</taglib-uri>
+	   <taglib-location>/WEB-INF/lams.tld</taglib-location>
+	</taglib>
    
    <taglib>
     <taglib-uri>fck-editor</taglib-uri>

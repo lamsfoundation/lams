@@ -6,7 +6,7 @@
 
 <div id="advancedTabContainer">
 		<tr> <td>
-			<table class="forms">
+			<table align=center>
 				<tr>
 	      			<td NOWRAP class="formlabel" valign=top>
 		      			<font size=2> <b>
