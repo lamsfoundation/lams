@@ -300,7 +300,7 @@ public class AuthoringService implements IAuthoringService {
     	Integer oldUIID  = oldDesign.getFirstActivity().getActivityUIID();
     	Activity firstActivity = activityDAO.getActivityByUIID(oldUIID,newDesign);
     	newDesign.setFirstActivity(firstActivity);
-    	Integer learning_design_ui_id = new Integer(newDesign.getLearningDesignId().intValue());
+    	Integer learning_design_ui_id = newDesign.getLearningDesignUIID();
     	newDesign.setLearningDesignUIID(learning_design_ui_id);
     }
     
