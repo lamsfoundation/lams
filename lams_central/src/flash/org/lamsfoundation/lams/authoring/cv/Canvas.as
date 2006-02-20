@@ -476,6 +476,13 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		canvasModel.activeTool = CanvasModel.GATE_TOOL;
 	}
 		
+	public function launchPreviewWindow(){
+		
+		
+		Debugger.log('Launching Preview Window',Debugger.GEN,'launchPreviewWindow','Canvas');
+		//Cursor.showCursor(Application.C_GATE);
+		canvasModel.activeTool = null;    //CanvasModel.GATE_TOOL;
+	}
 
 	
 	public function stopGateTool(){
