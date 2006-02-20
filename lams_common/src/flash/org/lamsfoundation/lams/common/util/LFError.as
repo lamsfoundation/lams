@@ -43,8 +43,13 @@ class LFError extends Error{
 	
 	a.setSize(500,250);
   }
-  //showMessageConfirm
   
+/**
+ * Shows a confrim dialog that allows the user to send a dump tothe server.
+ * @see Debugger.crashDataDump();
+ * @usage   
+ * @return  
+ */
   public function showMessageConfirm(){
 	var alt:Alert;
 	var handlerObj = new Object();
@@ -57,6 +62,8 @@ class LFError extends Error{
 			Debugger.log('Unknown event detail form confirm:'+e.detail,Debugger.CRITICAL,"showMessageConfirm",'LFMessage');		
 		}
 	}
+	//TODO: Make __confirm__ be in the dictionary
+	
 	alt = Alert.show(message,"__Confirm__",Alert.OK | Alert.CANCEL, null, handlerObj, null, Alert.OK);
   }
   
