@@ -812,12 +812,43 @@ values(10,10,'ParallelActivity to SequenceActivity','ParallelActivity to Sequenc
 --values(13,13,'Shared Resources to QNA','Shared Resources to QNA',25,22,1,'20050207',25,8);
 
 
-insert into lams_learning_design(learning_design_ui_id,description,title,first_activity_id,max_id,valid_design_flag,
+insert into lams_learning_design(learning_design_id, learning_design_ui_id,description,title,first_activity_id,max_id,valid_design_flag,
 								 read_only_flag,user_id,help_text,copy_type_id,create_date_time,version,
 								 original_learning_design_id,workspace_folder_id,
 								 online_instructions,offline_instructions)
 								values
-								(1,'Test Learning Design','Test Learning Design title',20,1,1,0,1,
+								(1,1,'Test Learning Design','Test Learning Design title',20,1,1,0,1,
+								'Help Text',1,'20041223','1.0',null,2,
+								'Online instructions', 'Offline instructions');		
+
+
+-- now the test data for the survey only sequence
+
+insert into lams_learning_activity
+(activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,help_text,
+learning_activity_type_id,grouping_id,order_id,define_later_flag,
+learning_design_id,learning_library_id,create_date_time,run_offline_flag,
+max_number_of_options,min_number_of_options,tool_id,tool_content_id,
+gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image,
+grouping_support_type_id, apply_grouping_flag,activity_category_id)
+values
+(31,2,'Survey Activity','Survey Title',10,20,null,'Help Text for Activity',
+1,null,0,1,
+2,6,'20050101',0,
+null,null,6,27,
+null,null,null,'/images/icon_survey.swf',
+1,0,1);
+
+insert into lams_tool_content (tool_content_id,tool_id) values(27,6);
+
+insert into lams_learning_design(learning_design_id, learning_design_ui_id,description,title,
+								first_activity_id,max_id,valid_design_flag,
+								 read_only_flag,user_id,help_text,copy_type_id,create_date_time,version,
+								 original_learning_design_id,workspace_folder_id,
+								 online_instructions,offline_instructions)
+								values
+								(2, 1,'Survey Only Sequence - used for testing preview','Survey Only Sequence',
+								31,2,1,0,1,
 								'Help Text',1,'20041223','1.0',null,2,
 								'Online instructions', 'Offline instructions');		
 
