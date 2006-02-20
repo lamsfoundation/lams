@@ -33,7 +33,6 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.exception.ActivityBehaviorException;
 import org.lamsfoundation.lams.learningdesign.strategy.ScheduleGateActivityStrategy;
 
-
 /**
  * <p>The hibernate object that wraps the information to schedule a gate in the
  * sequence engine. The schedule gate is defined either by offset to the
@@ -348,15 +347,15 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
     }
     /**
      * Validate schedule gate activity (offset conditions)
-     * @return error message
+     * @return error message key
      */
     public String validateActivity() {
     	
     	if(isScheduledByTimeOffset()) {
     		if(getGateStartTimeOffset().equals(getGateEndTimeOffset()))
-    			return "Cannot have equal start and end time offsets.";
+    			return "flash.validation.error.illegalScheduleGateOffsetsType1";
     		else if(getGateStartTimeOffset().compareTo(getGateEndTimeOffset()) > 0)
-    			return "End offset must be greater than start time offset";
+    			return "flash.validation.error.illegalScheduleGateOffsetsType2";
     	}
     	return null;
     }
