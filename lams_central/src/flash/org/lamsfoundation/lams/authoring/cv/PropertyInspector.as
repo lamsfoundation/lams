@@ -301,9 +301,16 @@ class PropertyInspector extends MovieClip{
         
     }
 	
+	/**
+	 * Get the CSSStyleDeclaration objects for each component and applies them
+	 * directly to the instanced
+	 * @usage   
+	 * @return  
+	 */
 	private function setStyles() {
-        
+        Debugger.log('Button stykle obejct',Debugger.GEN,'setStyles','PropertyInspector');
 		var styleObj = _tm.getStyleObject('button');
+		ObjectUtils.printObject(styleObj);
 		editGrouping_btn.setStyle('styleName',styleObj);
 		
 		styleObj = _tm.getStyleObject('label');
@@ -317,6 +324,7 @@ class PropertyInspector extends MovieClip{
 		endOffset_lbl.setStyle('styleName',styleObj);
 		hours_lbl.setStyle('styleName',styleObj);
 		mins_lbl.setStyle('styleName',styleObj);
+		toolDisplayName_lbl.setStyle('styleName',styleObj);
 		
 		styleObj = _tm.getStyleObject('combo');
 		gateType_cmb.setStyle('styleName',styleObj);
