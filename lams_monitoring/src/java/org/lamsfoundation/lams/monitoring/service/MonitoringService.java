@@ -1520,7 +1520,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
    // Preview related methods
    //---------------------------------------------------------------------
    /* (non-Javadoc)
-   	 * @see org.lamsfoundation.lams.preview.service.IPreviewService#createPreviewClassForLesson(long, long)
+   	 * @see org.lamsfoundation.lams.preview.service.IMonitoringService#createPreviewClassForLesson(long, long)
    	 */
        public Lesson createPreviewClassForLesson(int userID, long lessonID) throws UserAccessDeniedException {
 
@@ -1546,11 +1546,15 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 
        }
     
-       /* (non-Javadoc)
-   	 * @see org.lamsfoundation.lams.preview.service.IPreviewService#deletePreviewSession(long)
+      /* (non-Javadoc)
+   	 * @see org.lamsfoundation.lams.preview.service.IMonitoringService#deletePreviewSession(long)
    	 */
        public void deletePreviewLesson(long lessonID) {
        	Lesson lesson = lessonDAO.getLesson(new Long(lessonID));
+       	deletePreviewLesson(lesson);
+       }
+       
+       private void deletePreviewLesson(Lesson lesson) {
        	if ( lesson != null ) {
        		if ( lesson.getLearningDesign().getCopyTypeID() != null && 
        				LearningDesign.COPY_TYPE_PREVIEW == lesson.getLearningDesign().getCopyTypeID().intValue() ) {
@@ -1605,13 +1609,12 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
    	    // convert data to UTC
    	    log.info("Deleting all preview lessons before "+date.toString()+" (server time) ("+newestDateToKeep+")");
      	  
-     		// get all the preview sessions older than a particular date.
+     	// get all the preview sessions older than a particular date.
    	    List sessions = lessonDAO.getPreviewLessonsBeforeDate(date);
    	    Iterator iter = sessions.iterator();
    	    while (iter.hasNext()) {
    	    	Lesson lesson = (Lesson) iter.next();
-   	    	deleteLesson(lesson);
-   	        log.info("Preview lesson deleted. Lesson was "+lesson);
+   	    	deletePreviewLesson(lesson);
        	    numDeleted++;
    		}
    	    
