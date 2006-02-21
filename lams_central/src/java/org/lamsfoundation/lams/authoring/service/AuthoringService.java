@@ -33,9 +33,9 @@ import java.util.TreeSet;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.authoring.LearningDesignValidator;
 import org.lamsfoundation.lams.authoring.ObjectExtractor;
 import org.lamsfoundation.lams.authoring.ObjectExtractorException;
+import org.lamsfoundation.lams.authoring.dto.StoreLearningDesignResultsDTO;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
 import org.lamsfoundation.lams.learningdesign.Grouping;
@@ -55,6 +55,7 @@ import org.lamsfoundation.lams.learningdesign.dao.hibernate.TransitionDAO;
 import org.lamsfoundation.lams.learningdesign.dto.DesignDetailDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
+import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
 import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
 import org.lamsfoundation.lams.themes.dao.ICSSThemeDAO;
 import org.lamsfoundation.lams.themes.dto.CSSThemeBriefDTO;
@@ -99,6 +100,7 @@ public class AuthoringService implements IAuthoringService {
 	protected GroupDAO groupDAO;
 	protected ICSSThemeDAO themeDAO;
 	protected ILamsCoreToolService lamsCoreToolService;
+	protected ILearningDesignService learningDesignService;
 	protected MessageService messageService;
 	
 	protected ToolContentIDGenerator contentIDGenerator;
@@ -198,6 +200,19 @@ public class AuthoringService implements IAuthoringService {
 	public void setLamsCoreToolService(ILamsCoreToolService lamsCoreToolService) {
 		this.lamsCoreToolService = lamsCoreToolService;
 	}
+	
+	
+	public ILearningDesignService getLearningDesignService() {
+		return learningDesignService;
+	}
+	
+	/**
+	 * @param learningDesignService The Learning Design Validator Service
+	 */
+	public void setLearningDesignService(ILearningDesignService learningDesignService) {
+		this.learningDesignService = learningDesignService;
+	}
+	
 
     /**
      * @param contentIDGenerator The contentIDGenerator to set.
@@ -424,6 +439,8 @@ public class AuthoringService implements IAuthoringService {
 	 */
 	public String storeLearningDesignDetails(String wddxPacket) throws Exception{
 		LearningDesignDTO learningDesignDTO = null;
+		Vector listOfValidationErrorDTOs = null;
+		boolean valid = true;
 		
 		Hashtable table = (Hashtable)WDDXProcessor.deserialize(wddxPacket);
 		ObjectExtractor extractor = new ObjectExtractor(userDAO,learningDesignDAO,
@@ -434,9 +451,19 @@ public class AuthoringService implements IAuthoringService {
 		try { 
 			LearningDesign design = extractor.extractLearningDesign(table);	
 			learningDesignDAO.insert(design);
-			LearningDesignValidator validator = new LearningDesignValidator(learningDesignDAO, messageService);
-			flashMessage = (FlashMessage)validator.validateLearningDesign(design);
+			listOfValidationErrorDTOs = (Vector)learningDesignService.validateLearningDesign(design);
 			
+			if (listOfValidationErrorDTOs.size() > 0)
+			{
+				valid = false;
+				flashMessage = new FlashMessage("storeLearningDesignDetails", new StoreLearningDesignResultsDTO(valid,listOfValidationErrorDTOs, design.getLearningDesignId()), FlashMessage.OBJECT_MESSAGE);
+			}
+			else
+			{
+				design.setValidDesign(new Boolean(valid));
+				learningDesignDAO.update(design);
+				flashMessage = new FlashMessage("storeLearningDesignDetails", new StoreLearningDesignResultsDTO(valid, design.getLearningDesignId()));			
+			}
 			
 			//flashMessage = new FlashMessage(IAuthoringService.STORE_LD_MESSAGE_KEY,design.getLearningDesignId());
 		} catch ( ObjectExtractorException e ) {
