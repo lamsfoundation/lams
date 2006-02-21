@@ -27,11 +27,15 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Set;
+import java.util.Vector;
 import java.util.TimeZone;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.lamsfoundation.lams.learningdesign.exception.ActivityBehaviorException;
+import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
+//import org.lamsfoundation.lams.learningdesign.exception.ActivityBehaviorException;
 import org.lamsfoundation.lams.learningdesign.strategy.ScheduleGateActivityStrategy;
+
+import org.lamsfoundation.lams.util.MessageService;
 
 /**
  * <p>The hibernate object that wraps the information to schedule a gate in the
@@ -349,15 +353,16 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
      * Validate schedule gate activity (offset conditions)
      * @return error message key
      */
-    public String validateActivity() {
-    	
+    public Vector validateActivity(MessageService messageService) {
+    	Vector listOfValidationErrors = new Vector();
     	if(isScheduledByTimeOffset()) {
     		if(getGateStartTimeOffset().equals(getGateEndTimeOffset()))
-    			return "flash.validation.error.illegalScheduleGateOffsetsType1";
+    			listOfValidationErrors.add(new ValidationErrorDTO(messageService.getMessage(ValidationErrorDTO.SCHEDULE_GATE_ERROR_TYPE1_KEY), this.getActivityUIID()));
     		else if(getGateStartTimeOffset().compareTo(getGateEndTimeOffset()) > 0)
-    			return "flash.validation.error.illegalScheduleGateOffsetsType2";
+    			listOfValidationErrors.add(new ValidationErrorDTO(messageService.getMessage(ValidationErrorDTO.SCHEDULE_GATE_ERROR_TYPE2_KEY), this.getActivityUIID()));
+    		
     	}
-    	return null;
+    	return listOfValidationErrors;
     }
     
     /**
