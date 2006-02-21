@@ -1,0 +1,9 @@
+    <action
+      path="/adminstart"
+      forward=".admin"
+    />
+    
+    <action
+      path="/sysadminstart"
+      forward=".sysadmin"
+    />

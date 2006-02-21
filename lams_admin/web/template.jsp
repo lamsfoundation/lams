@@ -1,6 +1,7 @@
 <%@include file="sharing/share.jsp" %>
 <%@ taglib uri="tags-tiles" prefix="tiles" %>
 <%@ taglib uri="tags-html" prefix="html" %>
+<%@ taglib uri="tags-lams" prefix="lams" %>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html:html locale = "true">
@@ -10,7 +11,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 	<meta http-equiv="pragma" content="no-cache">
 	<meta http-equiv="cache-control" content="no-cache">
-	<link rel="stylesheet" type="text/css" href="<%=LAMS_WEB_ROOT%>/css/aqua.css" >
+	<lams:css/>
 	<script language="JavaScript" type="text/JavaScript" src="<%=LAMS_WEB_ROOT%>/includes/javascript/changeStyle.js"></script>
 </head>
     
@@ -23,7 +24,7 @@
 		</td>
 	</tr>
 	<tr>
-		<td width="100%" height="100%" align="center" valign="middle" bgcolor="#FFFFFF">	
+		<td width="100%" height="100%" align="left" valign="middle" bgcolor="#FFFFFF">	
 			<tiles:insert attribute="content" />
 		</td>
 	</tr>

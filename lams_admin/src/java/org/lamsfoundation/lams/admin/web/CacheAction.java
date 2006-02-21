@@ -27,7 +27,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * 				  path="/cache"
  * 				  parameter="method"
  * 				  validate="false"
- * @struts:action-forward name="cache" path="/cache.jsp"
+ * @struts:action-forward name="cache" path=".cache"
  *
  */
 public class CacheAction extends LamsDispatchAction {

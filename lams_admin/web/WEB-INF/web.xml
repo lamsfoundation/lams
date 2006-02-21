@@ -6,26 +6,106 @@
  <display-name>LAMS</display-name>
 
 <description>Learning Activity Management System</description>
+
+<context-param>
+	<param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
+  	<param-value>org.lamsfoundation.lams.admin.applicationResources</param-value>
+</context-param>
+
 <context-param>
 	<param-name>contextConfigLocation</param-name>
 	<param-value>
 		classpath:/org/lamsfoundation/lams/applicationContext.xml
+		classpath:/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml
+		classpath:/org/lamsfoundation/lams/tool/toolApplicationContext.xml
+		classpath:/org/lamsfoundation/lams/learning/learningApplicationContext.xml
+  		classpath:/org/lamsfoundation/lams/authoring/authoringApplicationContext.xml
+  		classpath:/org/lamsfoundation/lams/monitoring/monitoringApplicationContext.xml
+		classpath:/org/lamsfoundation/lams/contentrepository/applicationContext.xml		
 	</param-value>
 </context-param>
 
-    <!--
-    To use non XDoclet filters, create a filters.xml file that
-    contains the additional filters (eg Sitemesh) and place it in your
-    project's merge dir.  Don't include filter-mappings in this file,
-    include them in a file called filter-mappings.xml and put that in
-    the same directory.
-    -->
+  <!--
+Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
 
-    <!--
-    To use non XDoclet filter-mappings, create a filter-mappings.xml file that
-    contains the additional filter-mappings and place it in your
-    project's merge dir.
-    -->
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+USA
+
+http://www.gnu.org/licenses/gpl.txt
+-->
+<filter>
+       <filter-name>SystemSessionFilter</filter-name>
+         <filter-class>
+		   org.lamsfoundation.lams.web.session.SystemSessionFilter
+         </filter-class>
+</filter>
+<filter>
+       <filter-name>LocaleFilter</filter-name>
+         <filter-class>
+		   org.lamsfoundation.lams.web.filter.LocaleFilter
+         </filter-class>
+</filter>
+<filter>
+	<filter-name>HibernateFilter</filter-name>
+	<filter-class>org.lamsfoundation.lams.util.CustomizedOpenSessionInViewFilter</filter-class>
+	<init-param>
+		<param-name>sessionFactoryBeanName</param-name>
+		<param-value>coreSessionFactory</param-value>
+	</init-param>
+	<init-param>
+		<param-name>singleSession</param-name>
+		<param-value>true</param-value>
+	</init-param>
+</filter>
+
+  <!--
+Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+USA
+
+http://www.gnu.org/licenses/gpl.txt
+-->
+<filter-mapping>
+    <filter-name>SystemSessionFilter</filter-name>
+     <url-pattern>/*</url-pattern>
+</filter-mapping>
+<filter-mapping>
+    <filter-name>LocaleFilter</filter-name>
+     <url-pattern>/*</url-pattern>
+</filter-mapping>
+<filter-mapping>
+	<filter-name>HibernateFilter</filter-name>
+	<url-pattern>/*</url-pattern>
+</filter-mapping>
+<filter-mapping>
+	<filter-name>HibernateFilter</filter-name>
+	<url-pattern>*.jsp</url-pattern>
+</filter-mapping>
 
   <listener>
 	<listener-class>
@@ -162,6 +242,14 @@
 <taglib>
     <taglib-uri>fck-editor</taglib-uri>
     <taglib-location>/WEB-INF/fckeditor/tlds/FCKeditor.tld</taglib-location>
+</taglib>
+
+<!--  ======================================================== -->	
+<!--   LAMS Tag Library -->
+<!--  ======================================================== -->	
+<taglib>
+   <taglib-uri>tags-lams</taglib-uri>
+   <taglib-location>/WEB-INF/lams.tld</taglib-location>
 </taglib>
 
    <!--

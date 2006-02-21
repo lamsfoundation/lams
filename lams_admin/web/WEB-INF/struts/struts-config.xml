@@ -94,6 +94,29 @@
       />
     </action>
     <action
+      path="/sysadmin"
+      type="org.lamsfoundation.lams.admin.web.SysadminAction"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="sysadmin"
+        path=".sysadmin"
+        redirect="false"
+      />
+      <forward
+        name="previewdeleted"
+        path=".previewdeleted"
+        redirect="false"
+      />
+      <forward
+        name="error"
+        path=".admin.error"
+        redirect="false"
+      />
+    </action>
+    <action
       path="/admin"
       type="org.lamsfoundation.lams.admin.web.AdminAction"
       parameter="method"
@@ -162,7 +185,7 @@
     >
       <forward
         name="cache"
-        path="/cache.jsp"
+        path=".cache"
         redirect="false"
       />
     </action>
@@ -192,7 +215,14 @@
       />
     </action>
 
-    <!-- If you have non XDoclet actions, define them in a file called struts-actions.xml and place it in your merge directory. -->
+       <action
+      path="/adminstart"
+      forward=".admin"
+    />
+    <action
+      path="/sysadminstart"
+      forward=".sysadmin"
+    />
   </action-mappings>
 
    <!-- Define your Struts controller in a file called struts-controller.xml and place it in your merge directory. -->

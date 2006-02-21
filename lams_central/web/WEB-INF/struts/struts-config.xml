@@ -70,8 +70,13 @@
       validate="false"
     >
       <forward
+        name="sysadmin"
+        path="/sysadmin.jsp"
+        redirect="false"
+      />
+      <forward
         name="admin"
-        path=".admin"
+        path="/admin.jsp"
         redirect="false"
       />
       <forward

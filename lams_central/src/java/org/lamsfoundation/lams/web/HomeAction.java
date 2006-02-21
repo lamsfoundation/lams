@@ -33,7 +33,8 @@ import org.lamsfoundation.lams.util.ConfigurationKeys;
  * @struts:action path="/home"
  * 				  validate="false"
  * 				  parameter="method"
- * @struts:action-forward name="admin" path=".admin"
+ * @struts:action-forward name="sysadmin" path="/sysadmin.jsp"
+ * @struts:action-forward name="admin" path="/admin.jsp"
  * @struts:action-forward name="learner" path="/learner.jsp"
  * @struts:action-forward name="author" path="/author.jsp"
  * @struts:action-forward name="staff" path="/staff.jsp"
@@ -56,7 +57,7 @@ public class HomeAction extends DispatchAction {
 	}
 	
 	/**
-	 * request for sysadmin environment
+	 * request for admin environment
 	 */
 	public ActionForward admin(ActionMapping mapping, ActionForm form, 
 			HttpServletRequest req, HttpServletResponse res)
@@ -79,6 +80,37 @@ public class HomeAction extends DispatchAction {
 			else
 			{
 				log.error("User "+login+" tried to get admin screen but isn't admin in organisation: "+orgId);
+				return mapping.findForward("error");
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			return mapping.findForward("error");
+		}
+	}
+	
+	/**
+	 * request for sysadmin environment
+	 */
+	public ActionForward sysadmin(ActionMapping mapping, ActionForm form, 
+			HttpServletRequest req, HttpServletResponse res)
+			throws IOException, ServletException {
+
+		try {
+			log.debug("request sysadmin");
+			
+			String login = req.getRemoteUser();
+			
+			int orgId = new Integer(req.getParameter("orgId")).intValue();
+			
+			if ( isUserInRole(login,orgId,Role.SYSADMIN))
+			{
+				log.debug("user is sysadmin");
+				return mapping.findForward("sysadmin");
+			}
+			else
+			{
+				log.error("User "+login+" tried to get sysadmin screen but isn't sysadmin in organisation: "+orgId);
 				return mapping.findForward("error");
 			}
 			

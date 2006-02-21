@@ -1,9 +1,23 @@
 <display-name>LAMS</display-name>
 
 <description>Learning Activity Management System</description>
+
+
+<context-param>
+	<param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
+  	<param-value>org.lamsfoundation.lams.admin.applicationResources</param-value>
+</context-param>
+
 <context-param>
 	<param-name>contextConfigLocation</param-name>
 	<param-value>
 		classpath:/org/lamsfoundation/lams/applicationContext.xml
+		classpath:/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml
+		classpath:/org/lamsfoundation/lams/tool/toolApplicationContext.xml
+		classpath:/org/lamsfoundation/lams/learning/learningApplicationContext.xml
+  		classpath:/org/lamsfoundation/lams/authoring/authoringApplicationContext.xml
+  		classpath:/org/lamsfoundation/lams/monitoring/monitoringApplicationContext.xml
+		classpath:/org/lamsfoundation/lams/contentrepository/applicationContext.xml		
 	</param-value>
 </context-param>
+

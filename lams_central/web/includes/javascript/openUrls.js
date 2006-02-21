@@ -11,6 +11,7 @@
 		var learnWin = null;
 		var teachWin = null;
 		var adminWin = null;
+		var sysadminWin = null;
 		
 		function openAuthor( )
 		{
@@ -102,5 +103,28 @@
 				}
 			}
 		}
+			
+		function openSysadmin()
+		{
+			var orgId = document.forms[0].orgIdForAdmin.value;
+			if(isMac)
+			{
+				sysadminWin = window.open('home.do?method=sysadmin&orgId='+orgId,'saWindow','width=796,height=570,resizable,location,menubar,scrollbars,dependent,status,toolbar');
+			}
+			else
+			{
+				if(sysadminWin && sysadminWin.open && !sysadminWin.closed )
+				{
+					sysadminWin.focus();
+				}
+				else
+				{
+					sysadminWin = window.open('home.do?method=sysadmin&orgId='+orgId,'saWindow','width=796,height=570,resizable,location,menubar,scrollbars,dependent,status,toolbar');
+					sysadminWin.focus();
+				}
+			}
+		}
+			
+		
 			
 	//-->

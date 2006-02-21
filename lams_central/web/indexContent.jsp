@@ -50,11 +50,27 @@
 					</td>
 					<td width="50%" align="right" valign="top">
 						<table border="0" cellpadding="0" cellspacing="3">
-							<%List list = service.getOrganisationsForUserByRole(user,Role.ADMIN);
+							<%List list = service.getOrganisationsForUserByRole(user,Role.SYSADMIN);
 								if(list.size()>0){%>
 								<tr>
 									<td align="left">
-										<input name="admin" type="button" id="admin" onClick="openAdmin();" value="Adminstrator" style="width:100" />
+										<input name="sysadmin" type="button" id="sysadmin" onClick="openSysadmin();" value="System Adminstration" style="width:100" />
+									</td>
+									<td align="left">
+										<select name="orgIdForAdmin">
+										<%for(int i=0;i<list.size();i++){
+											Organisation org = (Organisation)list.get(i);%>
+											<option value="<%=org.getOrganisationId()%>"><%=org.getName()%></option>
+										<%}%>
+										</select> 
+									</td>
+								</tr>
+							<%}%>
+							<%list = service.getOrganisationsForUserByRole(user,Role.ADMIN);
+								if(list.size()>0){%>
+								<tr>
+									<td align="left">
+										<input name="admin" type="button" id="admin" onClick="openAdmin();" value="Adminstration" style="width:100" />
 									</td>
 									<td align="left">
 										<select name="orgIdForAdmin">

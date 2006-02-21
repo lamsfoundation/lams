@@ -75,3 +75,11 @@
     <taglib-uri>fck-editor</taglib-uri>
     <taglib-location>/WEB-INF/fckeditor/tlds/FCKeditor.tld</taglib-location>
 </taglib>
+
+<!--  ======================================================== -->	
+<!--   LAMS Tag Library -->
+<!--  ======================================================== -->	
+<taglib>
+   <taglib-uri>tags-lams</taglib-uri>
+   <taglib-location>/WEB-INF/lams.tld</taglib-location>
+</taglib>

@@ -1,8 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!DOCTYPE tiles-definitions PUBLIC
-   "-//Apache Software Foundation//DTD Tiles Configuration//EN"
-   "http://jakarta.apache.org/struts/dtds/tiles-config.dtd">
+<!--
+Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+USA
+
+http://www.gnu.org/licenses/gpl.txt
+-->
 
 <tiles-definitions>
 
@@ -54,5 +71,28 @@
 		<put name="content" value="/admin/usersremoveContent.jsp" />	
 		<put name="footer" value="footer.jsp"/>	
 	</definition>
+
+	<definition name=".sysadmin" path="/template.jsp">
+		<put name="title" value="LAMS :: Maintain LAMS"/>
+		<put name="pageHeader" value="Maintain LAMS"/>
+		<put name="header" value="adminHeader.jsp"/>
+		<put name="content" value="/sysadmin/sysadminContent.jsp" />	
+		<put name="footer" value="footer.jsp"/>	
+	</definition>
+
+	<definition name=".cache" path="/template.jsp">
+		<put name="title" value="LAMS :: Maintain LAMS"/>
+		<put name="pageHeader" value="Maintain LAMS"/>
+		<put name="header" value="adminHeader.jsp"/>
+		<put name="content" value="/sysadmin/cache.jsp" />	
+		<put name="footer" value="footer.jsp"/>	
+	</definition>
 	
+	<definition name=".previewdeleted" path="/template.jsp">
+		<put name="title" value="LAMS :: Maintain LAMS"/>
+		<put name="pageHeader" value="Maintain LAMS"/>
+		<put name="header" value="adminHeader.jsp"/>
+		<put name="content" value="/sysadmin/previewdeleted.jsp" />	
+		<put name="footer" value="footer.jsp"/>	
+	</definition>
 </tiles-definitions>
