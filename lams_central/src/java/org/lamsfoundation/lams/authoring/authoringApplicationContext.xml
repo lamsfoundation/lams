@@ -13,7 +13,7 @@
 		<property name="messageSource">
 			<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
 				<property name="basename">
-					<value>org.lamsfoundation.lams.applicationResources</value>
+					<value>org.lamsfoundation.lams.central.applicationResources</value>
 				</property>
 			</bean>
 		</property>
@@ -35,6 +35,7 @@
 		<property name="lamsCoreToolService"><ref bean="lamsCoreToolService"/></property>			
 		<property name="contentIDGenerator"><ref bean="toolContentIDGenerator"/></property>
 		<property name="messageService"><ref bean="authoringMessageService"/></property>
+		<property name="learningDesignService"><ref bean="learningDesignService"/></property>
 	</bean>
 	
 	<bean id="authoringService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
