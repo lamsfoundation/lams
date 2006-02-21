@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.Vector;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -40,6 +41,9 @@ import org.lamsfoundation.lams.learningdesign.dto.ProgressActivityDTO;
 import org.lamsfoundation.lams.learningdesign.strategy.SimpleActivityStrategy;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.Nullable;
+
+import org.lamsfoundation.lams.util.MessageService;
+
 /**
  * Base class for all activities. If you add another subclass, 
  * you must update ActivityDAO.getActivityByActivityId() and add a  
@@ -808,7 +812,7 @@ public abstract class Activity implements Serializable,Nullable {
 	 * Validate activity
 	 * 
 	 */
-	public String validateActivity() { 
+	public Vector validateActivity(MessageService messageService) { 
 		return null; 
 	}
    
