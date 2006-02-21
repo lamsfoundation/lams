@@ -4,6 +4,7 @@
 <%@ taglib uri="/WEB-INF/c.tld" prefix="c" %>
 <%@ taglib uri="/WEB-INF/fmt.tld" prefix="fmt" %>
 <%@ taglib uri="fck-editor" prefix="FCK" %>
+<%@ taglib uri="/WEB-INF/lams.tld" prefix="lams" %>
  
 <div id="basicTabContainer">	
 		<c:if test="${(requestScope.startMonitoringSummaryRequest != 'true')  || (sessionScope.editActivityEditMode=='true') }"> 			

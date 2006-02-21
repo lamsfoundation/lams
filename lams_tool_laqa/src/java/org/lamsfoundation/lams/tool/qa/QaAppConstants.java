@@ -279,6 +279,7 @@ public interface QaAppConstants {
     
     
     public static final String ATTACHMENT_LIST                          ="attachmentList";
+    public static final String SUBMIT_SUCCESS							="sbmtSuccess";
     public static final String DELETED_ATTACHMENT_LIST                  ="deletedAttachmentList";
     public static final String UUID                                     ="uuid";
 }

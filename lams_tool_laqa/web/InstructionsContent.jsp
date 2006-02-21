@@ -5,6 +5,7 @@
 <%@ taglib uri="/WEB-INF/fmt.tld" prefix="fmt" %>
 <%@ taglib uri="fck-editor" prefix="FCK" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
+<%@ taglib uri="/WEB-INF/lams.tld" prefix="lams" %>
 
 
 <div id="richTextContainer">

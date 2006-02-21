@@ -381,11 +381,14 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
 //    }
     
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+    	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
         return (mapping.findForward(LOAD_QUESTIONS));
     }
     
     public ActionForward submitAllContent(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
         throws IOException, ServletException {
+    	
+    	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
         QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
         IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
         AuthoringUtil authoringUtil= new AuthoringUtil();
@@ -439,8 +442,11 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
       
         /*give the user a feedback*/
           errors.clear();
-          errors.add(Globals.ERROR_KEY, new ActionMessage("submit.successful")); 
-        logger.debug("submit successful.");
+          errors.add(Globals.ERROR_KEY, new ActionMessage("submit.successful"));
+          request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(1));
+          logger.debug("setting SUBMIT_SUCCESS to 1.");
+        
+        
         saveErrors(request,errors);
         
         qaAuthoringForm.resetUserAction();
@@ -456,6 +462,7 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
     
     public ActionForward addNewQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
         throws IOException, ServletException {
+    	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
         AuthoringUtil authoringUtil= new AuthoringUtil();
         Map mapQuestionContent=(Map)request.getSession().getAttribute(MAP_QUESTION_CONTENT);
         
@@ -467,6 +474,7 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
     
     public ActionForward removeQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
         throws IOException, ServletException {
+    	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
         AuthoringUtil authoringUtil= new AuthoringUtil();
         QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
         Map mapQuestionContent=(Map)request.getSession().getAttribute(MAP_QUESTION_CONTENT);
@@ -479,6 +487,7 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
 
     public ActionForward addNewFile(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
         throws IOException, ServletException {
+    	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
         QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
         
         addFileToContentRepository(request, qaAuthoringForm);
@@ -493,6 +502,7 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
             HttpServletResponse response) throws IOException,
                                          ServletException
     {
+    	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
         long uuid = WebUtil.readLongParam(request, UUID);
         
         // move the file's details from the attachment collection to the deleted attachments collection
@@ -523,6 +533,7 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
      */
     protected ActionMessages validateSubmit(HttpServletRequest request, ActionMessages errors, QaAuthoringForm qaAuthoringForm)
     {
+    	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
 //        String richTextTitle=(String) request.getSession().getAttribute(RICHTEXT_TITLE);
         String title = qaAuthoringForm.getTitle();
         logger.debug("title: " + title);
@@ -647,6 +658,7 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
                                               HttpServletResponse response) throws IOException,
                                                                         ServletException, ToolException
     {
+    	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
         /*
          * if the content is not ready yet, don't even proceed.
          * check the define later status

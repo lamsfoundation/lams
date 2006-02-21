@@ -4,10 +4,11 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 <%@ taglib uri="fck-editor" prefix="FCK" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
+<%@ taglib uri="/WEB-INF/lams.tld" prefix="lams" %>
 
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
+
 
 <%
 String protocol = request.getProtocol();
@@ -110,7 +111,7 @@ function pviiClassNew(obj, new_style) { //v2.7 by PVII
 
 <input type="hidden" name="dispatch" value=""/>
 <h1>Question & Answers</h1>
-  
+ 
     
     <!-- start tabs -->
     <div class="tabmenu">
@@ -127,13 +128,24 @@ function pviiClassNew(obj, new_style) { //v2.7 by PVII
     <!-- tab content one (basic)-->
     <div class="tabbody" id="tabbody1">
         <h2><font size=2> <b> <bean:message key="label.authoring.qa.basic"/> </b></font></h2>
+        
+        	<table align=center> 	  
+				<tr>   
+				<td NOWRAP class=error>
+					<c:if test="${sessionScope.sbmtSuccess == 1}"> 			
+						<img src="images/success.gif" align="left" width=20 height=20>  <font size=2> <bean:message key="submit.successful"/> </font> </img>
+					</c:if> 			
+				</td>
+				</tr> 
+			</table>
+        
         <div id="formtablecontainer">
             <jsp:include page="BasicContent.jsp" />
         </div>
     
         <hr>
-        <a href="javascript:window.close()" class="button">Cancel</a>
-        <a href="javascript:submitMethod('submitAllContent')" class="button">Save</a>
+        <a href="javascript:window.close()" class="button"><font size=2> <b> Cancel </b> </font></a>
+        <a href="javascript:submitMethod('submitAllContent')" class="button"><font size=2> <b> Save </b> </font></a>
     </div>
     <!-- end of content_b -->
 
@@ -144,8 +156,6 @@ function pviiClassNew(obj, new_style) { //v2.7 by PVII
         <div id="formtablecontainer">
             <jsp:include page="AdvancedContent.jsp" />
         </div>
-        <a href="javascript:window.close()" class="button">Cancel</a>
-        <a href="javascript:submitMethod('submitAllContent')" class="button">Save</a>
     </div>
     <!-- end of content_b -->
 
@@ -156,8 +166,6 @@ function pviiClassNew(obj, new_style) { //v2.7 by PVII
             <jsp:include page="InstructionsContent.jsp" />
         </div>
         <hr>
-        <a href="javascript:window.close()" class="button"><font size=2> <b> Cancel </font> </b> </a>
-        <a href="javascript:submitMethod('submitAllContent')" class="button"><font size=2> <b> Save </font> </b></a>
     </div>
     <!-- end of content_a -->
 
