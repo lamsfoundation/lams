@@ -36,7 +36,7 @@ public class LessonDAO extends HibernateDaoSupport implements ILessonDAO
 					+ Lesson.class.getName()
 					+ " lesson where lesson.learningDesign.copyTypeID="
 					+ LearningDesign.COPY_TYPE_PREVIEW 
-					+ "and lesson.start_date_time < ?";
+					+ "and lesson.startDateTime is not null and lesson.startDateTime < ?";
 	
     /**
      * Retrieves the Lesson
