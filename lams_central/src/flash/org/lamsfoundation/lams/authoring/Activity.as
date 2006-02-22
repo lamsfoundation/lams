@@ -199,6 +199,12 @@ class org.lamsfoundation.lams.authoring.Activity {
 		}
 	}
 	
+	public function isGroupActivity():Boolean{
+		if (_activityTypeID == GROUPING_ACTIVITY_TYPE){
+			return true;
+		}
+	}
+	
 	/**
 	 * Populates all the fields in this activity from a dto object contaning the following fields
 	 * NB: This is not very clever, if the field in the dto is blank then the value is overwritten in the class...
