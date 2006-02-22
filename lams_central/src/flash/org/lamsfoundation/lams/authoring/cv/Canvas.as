@@ -163,7 +163,8 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	 * @return  
 	 */
 	public function saveDesignToServerAs(){
-		//clear the learningDesignID so it will not overwrite the existing one		_ddm.learningDesignID = null;
+		//clear the learningDesignID so it will not overwrite the existing one
+		_ddm.learningDesignID = null;
 		
         var onOkCallback:Function = Proxy.create(this, saveDesignToServer);
 		var ws = Application.getInstance().getWorkspace();
@@ -235,14 +236,37 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 			
 			
 			if(_ddm.validDesign){
-				var msg:String = "Congratulations! - Your design is valid has been saved with ID:"+r.learningDesignID;
+				//var msg:String = "Congratulations! - Your design is valid has been saved"+r.learningDesignID;
+				//TODO take this from the dictionary
+				var msg:String = Dictionary.getValue('cv_valid_design_saved');
+				LFMessage.showMessageAlert(msg);
 			}else{
-				var msg:String = "Your design is not yet valid, but it has been saved with ID:"+r.learningDesignID;
+				
+				var msg:String = Dictionary.getValue('cv_invalid_design_saved');
+				//public static function howMessageConfirm(msg, okHandler:Function, cancelHandler:Function,okLabel:String,cancelLabel:String){
+				var okHandler = Proxy.create(this,showDesignValidationIssues,r);
+				LFMessage.showMessageConfirm(msg,okHandler,null,Dictionary.getValue('cv_show_validation'));
+				
 			}
-			LFMessage.showMessageAlert(msg);
+			
 			checkValidDesign();
 			
 		}
+	}
+	
+	public function showDesignValidationIssues(responsePacket){
+		Debugger.log(responsePacket.messages.length+' issues',Debugger.GEN,'showDesignValidationIssues','Canvas');
+		var dp = new Array();
+		for(var i=0; i<responsePacket.messages.length;i++){
+			var dpElement = {};
+			dpElement.Issue = responsePacket.messages[i].message;
+			dpElement.Activity =  _ddm.getActivityByUIID(responsePacket.messages[i].UIID).title;
+			dpElement.uiid = responsePacket.messages[i].UIID;
+			dp.push(dpElement);
+		}
+		//show the window, on load, populate it
+		var cc:CanvasController = canvasView.getController();
+		var validationIssuesDialog = PopUpManager.createPopUp(Application.root, LFWindow, false,{title:Dictionary.getValue('ld_val_title'),closeButton:true,scrollContentPath:"ValidationIssuesDialog",validationIssues:dp, canvasModel:canvasModel,canvasController:cc});
 	}
 	
 	public function checkValidDesign(){
@@ -566,7 +590,8 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		Debugger.log('Cut',Debugger.GEN,'cut','Canvas');
 		
 		
-	}
+	}
+
 	public function copy():Void{
 		Debugger.log('Copy',Debugger.GEN,'copy','Canvas');
 		
