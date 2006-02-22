@@ -674,7 +674,17 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		_selectedItem = newselectItem;
 		broadcastViewUpdate("SELECTED_ITEM");
 	}
-	
+
+	public function setSelectedItemByUIID(uiid:Number){
+		var selectedCanvasElement;
+		if(_activitiesDisplayed.get(uiid) != null){
+			selectedCanvasElement = _activitiesDisplayed.get(uiid);
+		}else{
+			selectedCanvasElement = _transitionsDisplayed.get(uiid);
+		}
+		setSelectedItem(selectedCanvasElement);
+		
+	}
 	/**
 	 * 
 	 * @usage   
