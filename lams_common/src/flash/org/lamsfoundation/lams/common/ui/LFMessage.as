@@ -54,8 +54,9 @@ class LFMessage{
  * @param   handler		A handler for the click events broadcast when the buttons are clicked. In addition to the standard click event object properties, there is an additional detail property, which contains the flag value of the button that was clicked (Alert.OK, Alert.CANCEL, Alert.YES, Alert.NO). This handler can be a function or an object
  * @return  
  */
-  public static function showMessageConfirm(msg, okHandler:Function, cancelHandler:Function,okLabel:String,cancelLabel:String){
+  public static function showMessageConfirm(msg:String, msgTitle:String, okHandler:Function, cancelHandler:Function, okLabel:String, cancelLabel:String){
 	var alt:Alert;
+	var customTitle = Dictionary.getValue(msgTitle)
 	var handlerObj = new Object();
 	handlerObj.click = function(e){
 		if(e.detail == Alert.OK){
@@ -76,10 +77,9 @@ class LFMessage{
 	}else{
 		Alert.cancelLabel= Dictionary.getValue('al_cancel');
 	}
-	alt = Alert.show(msg,"__Confirm__",Alert.OK | Alert.CANCEL, null, handlerObj, null, Alert.OK);
+	alt = Alert.show(msg,customTitle,Alert.OK | Alert.CANCEL, null, handlerObj, null, Alert.OK);
   }
   
-
   public function get reference():Object{
    return _ref;
   }
