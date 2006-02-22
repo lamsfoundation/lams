@@ -3,6 +3,7 @@ import org.lamsfoundation.lams.common.util.*;
 import org.lamsfoundation.lams.common.util.ui.*;
 import org.lamsfoundation.lams.authoring.*;
 import org.lamsfoundation.lams.authoring.cv.*;
+import com.polymercode.Draw;
 
 
 /**  
@@ -32,6 +33,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	private var _doubleClicking:Boolean;
 	private var _visibleWidth:Number;
 	private var _visibleHeight:Number;
+	private var _base_mc:MovieClip;
+	private var _selected_mc:MovieClip;
 	
 	
 	
@@ -46,6 +49,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			_visibleHeight = TOOL_ACTIVITY_HEIGHT;
 			_visibleWidth = TOOL_ACTIVITY_WIDTH;
 		}
+		_base_mc = this;
 		//call init if we have passed in the _activity as an initObj in the attach movie,
 		//otherwise wait as the class outside will call it
 		if(_activity != undefined){
@@ -60,6 +64,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			_canvasController = initObj.canvasController;
 			_activity = initObj.activity;
 		}
+		
+		
 
 		
 		if(!_activity.isGateActivity()){
@@ -68,6 +74,59 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		
 		MovieClipUtils.doLater(Proxy.create(this,draw));
 
+	}
+	
+	/**
+	 * Updates the CanvasActivity display fields with the current data
+	 * @usage   
+	 * @return  
+	 */
+	public function refresh():Void{
+		draw();
+	}
+	
+	public function setSelected(isSelected){
+		Debugger.log(_activity.title+" isSelected:"+isSelected,4,'setSelected','CanvasActivity');
+		var MARGIN = 5;
+		if(isSelected){
+			//draw a selected border
+			var tgt_mc;
+			if(_activity.isGateActivity()){
+				tgt_mc = stopSign_mc;			
+			}else{
+				tgt_mc = canvasActivity_mc;
+			}
+			
+				//vars
+				var tl_x = tgt_mc._x - MARGIN; 							//top left x
+				var tl_y = tgt_mc._y - MARGIN;							//top left y
+				var tr_x = tgt_mc._x + tgt_mc._width + MARGIN;//top right x
+				var tr_y = tl_y;														//top right y
+				var br_x = tr_x;														//bottom right x
+				var br_y = tgt_mc._y + tgt_mc._height + MARGIN;//bottom right y
+				var bl_x = tl_x;														//biottom left x															
+				var bl_y = br_y;														//bottom left y
+				
+				
+				//dashTo(target:MovieClip, x1:Number, y1:Number,x2:Number, y2:Number, dashLength:Number, spaceLength:Number )
+				_selected_mc = _base_mc.createEmptyMovieClip('_selected_mc',_base_mc.getNextHighestDepth());
+				Draw.dashTo(_selected_mc,tl_x,tl_y,tr_x,tr_y,2,3,2,0x266DEE);
+				Draw.dashTo(_selected_mc,tr_x,tr_y,br_x,br_y,2,3,2,0x266DEE);
+				Draw.dashTo(_selected_mc,br_x,br_y,bl_x,bl_y,2,3,2,0x266DEE);
+				Draw.dashTo(_selected_mc,bl_x,bl_y,tl_x,tl_y,2,3,2,0x266DEE);
+				/*				Draw.dashTo(_base_mc,tl_x,tl_y,tr_x,tr_y,2,3,2,0x266DEE);
+				Draw.dashTo(_base_mc,tr_x,tr_y,br_x,br_y,2,3,2,0x266DEE);
+				Draw.dashTo(_base_mc,br_x,br_y,bl_x,bl_y,2,3,2,0x266DEE);
+				Draw.dashTo(_base_mc,bl_x,bl_y,tl_x,tl_y,2,3,2,0x266DEE);
+				*/
+			
+			
+			
+		}else{
+			//hide the selected border
+			_selected_mc.removeMovieClip();
+		}
+		
 	}
 	
 	
