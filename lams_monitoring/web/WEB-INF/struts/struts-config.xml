@@ -86,6 +86,11 @@ http://www.gnu.org/licenses/gpl.txt
         path="/index.jsp"
         redirect="false"
       />
+      <forward
+        name="previewdeleted"
+        path="/previewdeleted.jsp"
+        redirect="false"
+      />
     </action>
     <action
       path="/gate"

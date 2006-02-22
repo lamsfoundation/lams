@@ -27,10 +27,12 @@ import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -40,10 +42,18 @@ import org.lamsfoundation.lams.monitoring.MonitoringConstants;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
+import org.lamsfoundation.lams.usermanagement.Role;
+import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.lamsfoundation.lams.web.util.HttpSessionManager;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 
 /**
@@ -65,25 +75,33 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * 							handler="org.lamsfoundation.lams.web.util.CustomStrutsExceptionHandler"
  * @struts:action-forward name="scheduler" path="/TestScheduler.jsp"
  * @struts.action-forward name = "success" path = "/index.jsp"
+ * @struts.action-forward name = "previewdeleted" path = "/previewdeleted.jsp"
  * 
  * ----------------XDoclet Tags--------------------
  */
 public class MonitoringAction extends LamsDispatchAction
 {
-    //---------------------------------------------------------------------
+	WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(HttpSessionManager.getInstance().getServletContext());
+	UserManagementService userManagementService = (UserManagementService) ctx.getBean("userManagementServiceTarget");
+	
+	//---------------------------------------------------------------------
     // Instance variables
     //---------------------------------------------------------------------
 	
     //---------------------------------------------------------------------
     // Class level constants - Struts forward
     //---------------------------------------------------------------------
+	private static final String PREVIEW_DELETED_REPORT_SCREEN = "previewdeleted";
 
     /** If you want the output given as a jsp, set the request parameter "jspoutput" to 
      * some value other than an empty string (e.g. 1, true, 0, false, blah). 
      * If you want it returned as a stream (ie for Flash), do not define this parameter
      */  
 	public static String USE_JSP_OUTPUT = "jspoutput";
-	
+
+	/** See deleteOldPreviewLessons */
+	public static final String NUM_DELETED = "numDeleted";
+
 	/** Output the supplied WDDX packet. If the request parameter USE_JSP_OUTPUT
 	 * is set, then it sets the session attribute "parameterName" to the wddx packet string.
 	 * If  USE_JSP_OUTPUT is not set, then the packet is written out to the 
@@ -688,6 +706,19 @@ public class MonitoringAction extends LamsDispatchAction
 		PrintWriter writer = response.getWriter();
 		writer.println(flashMessage.serializeMessage());
 		return null;
+	}
+
+	/** Delete all old preview lessons and their related data, across all
+	 * organisations.
+	 *  Should go to a monitoring webservice maybe ? */
+	public ActionForward deleteOldPreviewLessons(ActionMapping mapping,
+			ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws IOException, ServletException {
+		
+		IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+		int numDeleted = monitoringService.deleteAllOldPreviewLessons();
+		request.setAttribute(NUM_DELETED, Integer.toString(numDeleted));
+		return mapping.findForward(PREVIEW_DELETED_REPORT_SCREEN);
 	}
 
 }

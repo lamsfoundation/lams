@@ -1570,14 +1570,12 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
        			} else {
        				log.debug("deletePreviewLesson: Removing tool sessions - none exist");
        			}
-       			
-       			
-       			// get the learning design for this lesson
+
+       			// lesson has learning design as a foriegn key, so need to remove lesson before learning design
        			LearningDesign ld = lesson.getLearningDesign();
+       	    	deleteLesson(lesson);
        			authoringService.deleteLearningDesign(ld);
        		
-       			// remove the lesson.
-       	    	deleteLesson(lesson);
        		} else {
        			log.warn("Unable to delete lesson as lesson is not a preview lesson. Learning design copy type was "+lesson.getLearningDesign().getCopyTypeID());
        		}
@@ -1614,8 +1612,12 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
    	    Iterator iter = sessions.iterator();
    	    while (iter.hasNext()) {
    	    	Lesson lesson = (Lesson) iter.next();
-   	    	deletePreviewLesson(lesson);
-       	    numDeleted++;
+   	    	try {
+   	    		deletePreviewLesson(lesson);
+   	       	    numDeleted++;
+   	    	} catch ( Exception e ) {
+   	    		log.error("Unable to delete lesson "+lesson.getLessonId()+" due to exception.",e);
+   	    	}
    		}
    	    
    		return numDeleted;

@@ -417,7 +417,9 @@ public interface IMonitoringService
 			long lessonID) throws UserAccessDeniedException;
 
 	/**
-	 * Remove all the details for a particular preview lessons.
+	 * Remove all the details for a particular preview lessons. The transaction 
+	 * handling for this method should be REQUIRES_NEW, which allows
+	 * each lesson to be deleted separately. 
 	 * 
 	 * @param lessonID ID of the lesson which is the preview session. Mandatory.
 	 */
@@ -426,6 +428,11 @@ public interface IMonitoringService
 	/**
 	 * Remove all the "old" preview lessons. Removes all preview lessons older than 
 	 * the number of days specified in the configuration file.  
+	 * <p>
+	 * Calls deletePreviewLesson(long lessonID) to do the actual deletion, so
+	 * if one lesson throws a database exception when deleting, the other lessons
+	 * should delete okay (as  deletePreviewLesson uses a REQUIRES_NEW transaction)
+	 * 
 	 * @return number of lessons deleted.
 	 */
 	public abstract int deleteAllOldPreviewLessons();
