@@ -2,6 +2,7 @@
 import org.lamsfoundation.lams.common.comms.*import org.lamsfoundation.lams.common.*;
 import org.lamsfoundation.lams.common.ui.*;
 import org.lamsfoundation.lams.authoring.*;
+import org.lamsfoundation.lams.common.dict.*
 
 /**
 * Communication - responsible for server side communication and wddx serialisation/de-serialisation
@@ -10,6 +11,10 @@ import org.lamsfoundation.lams.authoring.*;
 */
 class org.lamsfoundation.lams.common.comms.Communication {
     
+    
+
+
+
 	private static var FRIENDLY_ERROR_CODE:Number = 1;  //Server error codes
     private static var SYSTEM_ERROR_CODE:Number = 2;
     
@@ -173,18 +178,22 @@ class org.lamsfoundation.lams.common.comms.Communication {
 			}
 			
             //Check for errors in message type that's returned from server
-			//if its a user firendly error, then we can return it to the calling class, it might be able to do somehting with it
 			if(responseObj.messageType == FRIENDLY_ERROR_CODE){
                 //user friendly error
 				var e = new LFError(responseObj.messageValue,"onServerResponse",this);
 				dispatchToHandlerByID(queueID,e);
-                //TODO: Make sure that things that have requested server responses can handle an error object
-            }else if(responseObj.messageType == SYSTEM_ERROR_CODE){
-				//if its a system error, then just show an alert, with the option to send a crash dump
+				//var somemsg =" this is just a test so please ignore as i am testing the max number of"
+				var sendMsg:String = Dictionary.getValue('sys_error_msg_start')+"\n\n"+responseObj.messageValue+"\n\n"+Dictionary.getValue('sys_error_msg_finish')+"\n\n\n";
 				//LFMessage.showMessageAlert(responseObj.messageValue, null, null);
-				var e = new LFError(responseObj.messageValue, "onServerResponse",wrappedPacketXML);
-				e.showMessageConfirm();
-				
+				LFError.showSendErrorRequest(sendMsg, 'sys_error', Debugger.crashDataDump, null);
+                //TODO: Make sure that things that have requested server responses can handle an error object
+				//showAlert("Oops", responseObj.body, "sad");
+            }else if(responseObj.messageType == SYSTEM_ERROR_CODE){
+				var somemsg =" this is just a test so please ignore as i am testing the max number of character possible to show in the alert window. Hope I will be able to get success if this task."
+				var sendMsg:String = Dictionary.getValue('sys_error_msg_start')+"/n"+somemsg+"/n"+Dictionary.getValue('sys_error_msg_finish');
+				//var sendMsg:String = Dictionary.getValue('sys_error_msg_start')+"/n"+responseObj.messageValue+"/n"+Dictionary.getValue('sys_error_msg_finish');
+				//LFMessage.showMessageAlert(responseObj.messageValue, null, null);
+				LFError.showSendErrorRequest(sendMsg, 'sys_error', Debugger.crashDataDump, null);
                 //showAlert("System error", "<p>Sorry there has been a system error, please try the operation again. If the problem persistes please contact support</p><p>Additional information:"+responseObj.body+"</p>", "sad");
             }else{
                 //Everything is fine so lookup callback handler on queue 
