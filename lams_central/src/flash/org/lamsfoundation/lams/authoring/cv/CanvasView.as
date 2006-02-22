@@ -102,6 +102,9 @@ public function viewUpdate(event:Object):Void{
 			case 'REMOVE_TRANSITION':
 				removeTransition(event.data,cm);
 				break;
+			case 'SELECTED_ITEM' :
+                highlightActivity(cm);
+                break;
 			/*
 			case 'START_TRANSITION_TOOL':
 				startDrawingTransition(cm);
@@ -263,6 +266,41 @@ public function viewUpdate(event:Object):Void{
 		r.removeMovieClip();
 		var s:Boolean = (r==null) ? false : true;
 		return s;
+	}
+	
+	private function highlightActivity(cm:CanvasModel){
+		Debugger.log('running..',Debugger.CRITICAL,'highlightActivity','CanvasView');
+		//deselect everything else
+		var CAsArray:Array = cm.activitiesDisplayed.values();
+		Debugger.log('CAsArray:'+CAsArray.length,Debugger.CRITICAL,'highlightActivity','CanvasView');
+		for(var i=0; i < CAsArray.length; i++){
+			CAsArray[i].setSelected(false);
+		}
+		//try to cast the selected item to see what we have (instance of des not seem to work)
+		if(CanvasActivity(cm.selectedItem) != null){
+			Debugger.log('Its a canvas activity',4,'highlightActivity','CanvasView');
+			var ca = CanvasActivity(cm.selectedItem);
+			var a:Activity = ca.activity;			
+			ca.setSelected(true);
+			/*
+			if(a.isGateActivity()){
+				
+			}else{
+			
+			}
+			*/
+			
+		}else if(CanvasTransition(cm.selectedItem) != null){
+			var ct = CanvasTransition(cm.selectedItem);
+			var t:Transition = ct.transition;
+			Debugger.log('Its a canvas transition',4,'highlightActivity','CanvasView');
+			
+		
+			
+		}else{
+			Debugger.log('Its a something we dont know',Debugger.CRITICAL,'updateItemProperties','PropertyInspector');
+		
+		}
 	}
 	
 		
