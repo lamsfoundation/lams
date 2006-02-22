@@ -210,6 +210,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			_canvasModel.getCanvas().stopGateTool();
 			
 		}
+		if(_canvasModel.activeTool == CanvasModel.OPTIONAL_TOOL){
+			var p = new Point(canvas_mc._xmouse, canvas_mc._ymouse); 
+			_canvasModel.createNewOptionalActivity(Activity.PERMISSION_OPTIONAL_ACTIVITY_TYPE,p);
+			_canvasModel.getCanvas().stopOptionalActivity();
+			
+		}
 		
 	}
 	
