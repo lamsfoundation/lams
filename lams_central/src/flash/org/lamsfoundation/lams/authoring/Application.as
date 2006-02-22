@@ -23,6 +23,7 @@ class org.lamsfoundation.lams.authoring.Application {
 	public static var C_TRANSITION:String = "c_pen";
 	public static var C_OPTIONAL:String = "c_optionalBoxPen";
 	public static var C_GATE:String = "c_gate";
+	public static var C_GROUP:String = "c_group";
 	public static var C_DEFAULT:String = "default";
 	
 	private static var SHOW_DEBUGGER:Boolean = false;
@@ -136,6 +137,8 @@ class org.lamsfoundation.lams.authoring.Application {
 		Cursor.addCursor(C_OPTIONAL);
 		Cursor.addCursor(C_TRANSITION);
 		Cursor.addCursor(C_GATE);
+		Cursor.addCursor(C_GROUP);
+		
 		
 		//Comms object - do this before any objects are created that require it for server communication
         _comms = new Communication();
