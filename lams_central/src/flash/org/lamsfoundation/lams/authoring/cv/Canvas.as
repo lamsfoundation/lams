@@ -427,8 +427,8 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 			return true;
 		}else{
 			var fn:Function = Proxy.create(ref,confirmedClearDesign, ref);
-			LFMessage.showMessageConfirm("Are you sure you want to clear your design?", "al_confirm",fn,null);
-			Debugger.log('Set design failed as old design could not be cleared',Debugger.CRITICAL,"setDesign",'Canvas');		
+			LFMessage.showMessageConfirm("__Are you sure you want to clear your design?__", fn,null);
+			//Debugger.log('Set design failed as old design could not be cleared',Debugger.CRITICAL,"setDesign",'Canvas');		
 		}
 		
 		
@@ -487,22 +487,6 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	}
 	
 	
-	public function toggleGateTool():Void{
-		var c = Cursor.getCurrentCursor();
-		if(c==Application.C_GATE){
-			stopGateTool();
-		}else{
-			startGateTool();
-		}
-	}
-	
-	public function startGateTool(){
-		Debugger.log('Starting gate tool',Debugger.GEN,'startGateTool','Canvas');
-		Cursor.showCursor(Application.C_GATE);
-		canvasModel.activeTool = CanvasModel.GATE_TOOL;
-	}
-		
-	
 	
 	/**
 	 * Method to open Preview popup window.
@@ -544,6 +528,54 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		}
 	}
 	
+	/**
+	 * Called from the toolbar usually - starts or stops the gate tool
+	 * @usage   
+	 * @return  
+	 */
+	public function toggleGroupTool():Void{
+		var c = Cursor.getCurrentCursor();
+		if(c==Application.C_GROUP){
+			stopGroupTool();
+		}else{
+			startGroupTool();
+		}
+	}
+	
+	public function startGroupTool(){
+		Debugger.log('Starting group tool',Debugger.GEN,'startGateTool','Canvas');
+		Cursor.showCursor(Application.C_GROUP);
+		canvasModel.activeTool = CanvasModel.GROUP_TOOL;
+	}
+	
+	public function stopGroupTool(){
+		Debugger.log('Stopping group tool',Debugger.GEN,'startGateTool','Canvas');
+		Cursor.showCursor(Application.C_DEFAULT);
+		canvasModel.activeTool = null;
+	}
+	
+	
+	
+
+	/**
+	 * Called from the toolbar usually - starts or stops the gate tool
+	 * @usage   
+	 * @return  
+	 */
+	public function toggleGateTool():Void{
+		var c = Cursor.getCurrentCursor();
+		if(c==Application.C_GATE){
+			stopGateTool();
+		}else{
+			startGateTool();
+		}
+	}
+	
+	public function startGateTool(){
+		Debugger.log('Starting gate tool',Debugger.GEN,'startGateTool','Canvas');
+		Cursor.showCursor(Application.C_GATE);
+		canvasModel.activeTool = CanvasModel.GATE_TOOL;
+	}
 	
 	public function stopGateTool(){
 		Debugger.log('Stopping gate tool',Debugger.GEN,'startGateTool','Canvas');
