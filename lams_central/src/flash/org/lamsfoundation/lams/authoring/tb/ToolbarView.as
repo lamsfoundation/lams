@@ -64,11 +64,7 @@ class ToolbarView extends AbstractView {
 		
         //Add the button handlers, essentially this is handing on clicked event to controller.
         var controller = getController();
-        /*
-		_toolbar_mc.newButton.onRelease = Proxy.create(controller,controller['buttonClicked'],'new');
-        _toolbar_mc.openButton.onRelease = Proxy.create(controller,controller['buttonClicked'],'open');
-        _toolbar_mc.saveButton.onRelease = Proxy.create(controller,controller['buttonClicked'],'save');
-		*/
+
 		_toolbar_mc.new_btn.addEventListener("click",controller);
 		_toolbar_mc.open_btn.addEventListener("click",controller);
 		_toolbar_mc.save_btn.addEventListener("click",controller);
@@ -77,6 +73,7 @@ class ToolbarView extends AbstractView {
 		_toolbar_mc.trans_btn.addEventListener("click",controller);
 		_toolbar_mc.optional_btn.addEventListener("click",controller);
 		_toolbar_mc.gate_btn.addEventListener("click",controller);
+		_toolbar_mc.group_btn.addEventListener("click",controller);
 		_toolbar_mc.preview_btn.addEventListener("click",controller);
 		
 		

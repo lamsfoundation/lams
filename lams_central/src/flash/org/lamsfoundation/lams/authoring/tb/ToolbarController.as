@@ -47,7 +47,9 @@ class org.lamsfoundation.lams.authoring.tb.ToolbarController extends AbstractCon
 		}else if(tgt.indexOf("optional") != -1){
 			
 		}else if(tgt.indexOf("gate") != -1){
-			_app.getCanvas().startGateTool();
+			_app.getCanvas().toggleGateTool();
+		}else if(tgt.indexOf("group") != -1){
+			_app.getCanvas().toggleGroupTool();
 		}else if(tgt.indexOf("preview") != -1){
 			
 		}
