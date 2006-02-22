@@ -96,6 +96,10 @@
 					<prop key="update*">PROPAGATION_REQUIRED,-McApplicationException</prop>
 					<prop key="get*">PROPAGATION_REQUIRED,readOnly,-McApplicationException</prop>
 					<prop key="remove*">PROPAGATION_REQUIRED,-McApplicationException</prop>
+					<prop key="setAsDefineLater">PROPAGATION_REQUIRED,-McApplicationException</prop>
+					<prop key="setAsRunOffline">PROPAGATION_REQUIRED,-McApplicationException</prop>
+					<prop key="exportToolSession">PROPAGATION_REQUIRED,-McApplicationException</prop>
+					<prop key="leaveToolSession">PROPAGATION_REQUIRED,-McApplicationException</prop>
 				</props>
 			</property>
 	</bean>  

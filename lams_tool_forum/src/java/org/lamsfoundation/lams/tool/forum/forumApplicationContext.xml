@@ -120,8 +120,15 @@
                 <prop key="deleteFromRepository">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="updateSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="releaseMarksForSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <!--  Tool Content Manager and Tool Session Manager calls -->
+                <prop key="copyToolContent">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="removeToolContent">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="setAsDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="setAsRunOffline">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="createToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="exportToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="leaveToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="removeToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>                
             </props>
         </property>
     </bean>
