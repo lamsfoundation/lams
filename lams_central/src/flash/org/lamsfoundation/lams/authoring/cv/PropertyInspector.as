@@ -81,7 +81,6 @@ class PropertyInspector extends MovieClip{
 	
 	public function init():Void{
 		_canvasModel = _container._canvasModel;
-		//might not need this ref..
 		_canvasController = _container._canvasController;
 		//_global.breakpoint();
 		_canvasModel.addEventListener('viewUpdate',this);
@@ -423,9 +422,12 @@ class PropertyInspector extends MovieClip{
 		if(tgt.indexOf("title_txt") != -1){
 			//todo check if this is the right place to set edited content, should it be ddm?
 			_canvasModel.selectedItem.activity.title = title_txt.text;
+			
 		}else if(tgt.indexOf("desc_txt") != -1){
 			_canvasModel.selectedItem.activity.description= desc_txt.text;
 		}
+		_canvasModel.selectedItem.refresh();
+		
 		
 	}
 	
