@@ -452,6 +452,19 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		Debugger.log('Returning transition:'+t.transitionUIID,Debugger.GEN,'getTransitionByUIID','DesignDataModel');
 		return t;
 	}
+	
+	/**
+	 * Retreives a reference to an activity in the DDM using its UIID
+	 * @usage   
+	 * @param   UIID 
+	 * @return  
+	 */
+	public function getGroupingByUIID(UIID:Number):Grouping{
+		var g:Grouping = _groupings.get(UIID);
+		Debugger.log('Returning grouping:'+g.groupingUIID,Debugger.GEN,'getGroupingByUIID','DesignDataModel');
+		return g;
+	}
+	
 	/**
 	 * Retrieves all children of a complexy activity
 	 * E.g. child acts in an optional activity
