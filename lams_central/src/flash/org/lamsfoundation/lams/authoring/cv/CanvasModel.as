@@ -313,19 +313,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		setSelectedItem(_activitiesDisplayed.get(optAct.activityUIID));
 		
 	}
-	
-	/**
-	 * Creates a new gate activity at the specified location
-	 * @usage   
-	 * @param   gateTypeID 
-	 * @param   pos        
-	 * @return  
-	 */
-	public function createNewGroupActivity(pos:Point){
-		
-		
-	}
-	
+
 	/**
 	 * Adds another Canvas Activity to the transition.  
 	 * Only 2 may be added, adding the 2nd one triggers the creation of the transition.
