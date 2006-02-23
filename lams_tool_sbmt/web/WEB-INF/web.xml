@@ -229,6 +229,11 @@
     <taglib-location>/WEB-INF/fckeditor/tlds/FCKeditor.tld</taglib-location>
 </taglib>
 
+<taglib>
+   <taglib-uri>tags-lams</taglib-uri>
+   <taglib-location>/WEB-INF/lams.tld</taglib-location>
+</taglib>
+
   	<!--  Security Constraint -->
 	<security-constraint>
 	   	<web-resource-collection>
