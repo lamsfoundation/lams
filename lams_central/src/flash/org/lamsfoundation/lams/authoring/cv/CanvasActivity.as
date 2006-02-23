@@ -27,7 +27,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	private var icon_mc:MovieClip;
 	private var icon_mcl:MovieClipLoader;
 	private var title_lbl:MovieClip;
-	private var stopSign_mc:MovieClip;
+	private var groupIcon_mc:MovieClip;
+	private var stopSign_mc:MovieClip;	
 	private var clickTarget_mc:MovieClip;
 	private var canvasActivity_mc:MovieClip;	private var _dcStartTime:Number = 0;
 	private var _doubleClicking:Boolean;
@@ -45,6 +46,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		if(_activity.isGateActivity()){
 			_visibleHeight = GATE_ACTIVITY_HEIGHT;
 			_visibleWidth = GATE_ACTIVITY_WIDTH;
+		}else if(_activity.isGroupActivity()){
+			_visibleHeight = TOOL_ACTIVITY_HEIGHT;
+			_visibleWidth = TOOL_ACTIVITY_WIDTH;
 		}else{
 			_visibleHeight = TOOL_ACTIVITY_HEIGHT;
 			_visibleWidth = TOOL_ACTIVITY_WIDTH;
@@ -65,15 +69,26 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			_activity = initObj.activity;
 		}
 		
+		showAssets(false);
+		
 		
 
 		
-		if(!_activity.isGateActivity()){
+		if(!_activity.isGateActivity() && !_activity.isGroupActivity()){
 			loadIcon();
 		}
 		
 		MovieClipUtils.doLater(Proxy.create(this,draw));
 
+	}
+	
+	private function showAssets(isVisible:Boolean){
+		groupIcon_mc._visible = isVisible;
+		title_lbl._visible = isVisible;
+		icon_mc._visible = isVisible;
+		stopSign_mc._visible = isVisible;
+		canvasActivity_mc._visible = isVisible;
+		clickTarget_mc._visible = isVisible;
 	}
 	
 	/**
@@ -149,7 +164,20 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		icon_mc._y = (this._height / 2) - (icon_mc._height / 2) - 5;
 	}
 	
+	/**
+	 * Does the work of laying out the screen assets.
+	 * Depending on type of Activity different bits will be shown
+	 * @usage   
+	 * @return  
+	 */
 	private function draw(){		Debugger.log(_activity.title+',_activity.isGateActivity():'+_activity.isGateActivity(),4,'draw','CanvasActivity');
+		
+		
+		
+		title_lbl._visible = true;
+		icon_mc._visible = true;
+		clickTarget_mc._visible = true;
+		
 		if(_activity.isGateActivity()){
 			stopSign_mc._visible = true;
 			canvasActivity_mc._visible=false;
@@ -158,6 +186,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			clickTarget_mc._height= GATE_ACTIVITY_HEIGHT;
 			
 		}else{
+			if(_activity.isGroupActivity()){
+				groupIcon_mc._visible = true;
+			}else{
+				groupIcon_mc._visible = false;
+			}
 			canvasActivity_mc._visible=true;
 			title_lbl.visible=true;
 			//clickTarget_mc._visible=true;
