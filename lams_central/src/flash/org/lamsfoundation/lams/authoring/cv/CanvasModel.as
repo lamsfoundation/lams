@@ -13,9 +13,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	public static var OPTIONAL_TOOL:String = "OPTIONAL";
 	public static var GATE_TOOL:String = "GATE";
 	public static var GROUP_TOOL:String = "GROUP";
-	
 	private var _defaultGroupingTypeID;
-	
 	private var __width:Number;
 	private var __height:Number;
 	private var __x:Number;
@@ -53,7 +51,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		_cv = cv;
 		_activitiesDisplayed = new Hashtable("_activitiesDisplayed");
 		_transitionsDisplayed = new Hashtable("_transitionsDisplayed");
-
+		
+		
+		
+				
+	
 		_activeTool = null;
 		_transitionActivities = new Array();
 		_defaultGroupingTypeID = Grouping.RANDOM_GROUPING;
@@ -247,7 +249,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		setSelectedItem(_activitiesDisplayed.get(gateAct.activityUIID));
 		
 	}
-	
 	/**
 	 * Creates a new group activity at the specified location
 	 * @usage   
@@ -283,6 +284,45 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		setDirty();
 		//select the new thing
 		setSelectedItem(_activitiesDisplayed.get(groupingActivity.activityUIID));
+	}
+	/**
+	 * Creates a new gate activity at the specified location
+	 * @usage   
+	 * @param   gateTypeID 
+	 * @param   pos        
+	 * @return  
+	 */
+	public function createNewOptionalActivity(ActivityTypeID, pos:Point){
+		//Debugger.log('gateTypeID:'+gateTypeID,Debugger.GEN,'createNewGate','CanvasModel');
+		var optAct = new ComplexActivity(_cv.ddm.newUIID());
+		optAct.learningDesignID = _cv.ddm.learningDesignID;
+		optAct.activityTypeID = Activity.OPTIONAL_ACTIVITY_TYPE;
+		
+		optAct.yCoord = pos.y;
+		optAct.xCoord = pos.x;
+		
+		
+		Debugger.log('Optional Activitys Y Coord is :'+optAct.yCoord,Debugger.GEN,'createNewOptionalActivity','CanvasModel');
+		//Debugger.log('gateAct.xCoord:'+gateAct.xCoord,Debugger.GEN,'createGateTransition','CanvasModel');
+
+		_cv.ddm.addActivity(optAct);
+		
+		setDirty();
+		//select the new thing
+		setSelectedItem(_activitiesDisplayed.get(optAct.activityUIID));
+		
+	}
+	
+	/**
+	 * Creates a new gate activity at the specified location
+	 * @usage   
+	 * @param   gateTypeID 
+	 * @param   pos        
+	 * @return  
+	 */
+	public function createNewGroupActivity(pos:Point){
+		
+		
 	}
 	
 	/**
