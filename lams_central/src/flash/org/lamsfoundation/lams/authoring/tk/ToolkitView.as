@@ -306,9 +306,9 @@ class ToolkitView extends AbstractView {
 		styleObj = _tm.getStyleObject('scrollpane');
 		toolkitLibraries_sp.setStyle('styleName',styleObj);
 		styleObj = _tm.getStyleObject('textarea');
-		libraryActivityDesc_txa.setStyle(styleObj);
+		libraryActivityDesc_txa.setStyle('styleName',styleObj);
 		styleObj = _tm.getStyleObject('label');
-		title_lbl.setStyle(styleObj);
+		title_lbl.setStyle('styleName',styleObj);
 		
 	}
 	
