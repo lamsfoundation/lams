@@ -21,26 +21,13 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
  * 
  * @struts:action path="/sysadmin" validate="false" parameter="method"
  * @struts:action-forward name="sysadmin" path=".sysadmin"
- * @struts:action-forward name="previewdeleted" path=".previewdeleted"
  * @struts:action-forward name="error" path=".admin.error"
  */
 public class SysadminAction extends LamsDispatchAction {
 
-	public static final String NUM_DELETED = "numDeleted";
 	
 	private static Logger logger = Logger.getLogger(SysadminAction.class);
 
-	public ActionForward deleteOldPreviewLessons(ActionMapping mapping,
-			ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) throws IOException, ServletException {
-		
-		logger.debug("deleteOldPreviewLessons");
-
-		IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-		int numDeleted = monitoringService.deleteAllOldPreviewLessons();
-		request.setAttribute(NUM_DELETED, Integer.toString(numDeleted));
-		return mapping.findForward("message");
-	}
 
 	
 

@@ -1,4 +1,3 @@
-<%@include file="sharing/share.jsp" %>
 <%@ taglib uri="tags-tiles" prefix="tiles" %>
 <%@ taglib uri="tags-html" prefix="html" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
@@ -12,7 +11,7 @@
 	<meta http-equiv="pragma" content="no-cache">
 	<meta http-equiv="cache-control" content="no-cache">
 	<lams:css/>
-	<script language="JavaScript" type="text/JavaScript" src="<%=LAMS_WEB_ROOT%>/includes/javascript/changeStyle.js"></script>
+	<script language="JavaScript" type="text/JavaScript" src="<lams:LAMSURL/>/includes/javascript/changeStyle.js"></script>
 </head>
     
 <body bgcolor="#9DC5EC" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">

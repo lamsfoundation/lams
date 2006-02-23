@@ -106,11 +106,6 @@
         redirect="false"
       />
       <forward
-        name="previewdeleted"
-        path=".previewdeleted"
-        redirect="false"
-      />
-      <forward
         name="error"
         path=".admin.error"
         redirect="false"
