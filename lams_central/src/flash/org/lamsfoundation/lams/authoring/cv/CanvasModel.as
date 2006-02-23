@@ -3,6 +3,7 @@ import org.lamsfoundation.lams.authoring.cv.*;
 import org.lamsfoundation.lams.authoring.*;
 import org.lamsfoundation.lams.common.util.*;
 import org.lamsfoundation.lams.common.ui.*;
+import org.lamsfoundation.lams.common.dict.*
 import mx.events.*
 /*
 * Model for the Canvas
