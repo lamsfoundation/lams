@@ -192,7 +192,7 @@ public function viewUpdate(event:Object):Void{
 		
 		var cvc = getController();
 		//take action depending on act type
-		if(a.activityTypeID==Activity.TOOL_ACTIVITY_TYPE || a.isGateActivity() ){
+		if(a.activityTypeID==Activity.TOOL_ACTIVITY_TYPE || a.isGateActivity() || a.isGroupActivity() ){
 			var newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasActivity",DepthManager.kTop,{_activity:a,_canvasController:cvc,_canvasView:cvv});
 			cm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
 			Debugger.log('Tool or gate activity a.title:'+a.title+','+a.activityUIID+' added to the cm.activitiesDisplayed hashtable:'+newActivity_mc,4,'drawActivity','CanvasView');
@@ -203,6 +203,9 @@ public function viewUpdate(event:Object):Void{
 			var newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasParallelActivity",DepthManager.kTop,{_activity:a,_children:children,_canvasController:cvc,_canvasView:cvv});
 			cm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
 			Debugger.log('Parallel activity a.title:'+a.title+','+a.activityUIID+' added to the cm.activitiesDisplayed hashtable :'+newActivity_mc,4,'drawActivity','CanvasView');
+		
+		}else{
+			Debugger.log('The activity:'+a.title+','+a.activityUIID+' is of unknown type, it cannot be drawn',Debugger.CRITICAL,'drawActivity','CanvasView');
 		}
 		
 		
