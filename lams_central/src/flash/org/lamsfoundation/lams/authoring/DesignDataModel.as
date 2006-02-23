@@ -472,7 +472,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	 */
 	public function getGroupingByUIID(UIID:Number):Grouping{
 		var g:Grouping = _groupings.get(UIID);
-		Debugger.log('Returning grouping:'+g.groupingUIID,Debugger.GEN,'getGroupingByUIID','DesignDataModel');
+		Debugger.log('Returning grouping:'+g.groupingUIID+' for activity:'+UIID,Debugger.GEN,'getGroupingByUIID','DesignDataModel');
 		return g;
 	}
 	
