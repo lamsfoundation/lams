@@ -4,7 +4,7 @@
 * For reference these are the activity types
 * <pre><code>
 * public static var PARALLEL_ACTIVITY_TYPE:Number = 6;
-* public static var OPTIONS_ACTIVITY_TYPE:Number = 7;
+* public static var OPTIONAL_ACTIVITY_TYPE:Number = 7;
 * public static var SEQUENCE_ACTIVITY_TYPE:Number = 8;
 * </code></pre>
 * @author      DC
@@ -32,7 +32,7 @@ class ComplexActivity extends Activity{
 	 */
 	public function populateFromDTO(dto:Object){
 		super.populateFromDTO(dto);
-		if(_activityTypeID == Activity.OPTIONS_ACTIVITY_TYPE){
+		if(_activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE){
 			_maxOptions = dto.maxOptions;
 			_minOptions = dto.minOptions;
 			//TODO: This is missing in the Library packet - tell mai.
@@ -49,7 +49,7 @@ class ComplexActivity extends Activity{
 	 */
 	public function toData():Object{
 		var dto:Object = super.toData();
-		if(_activityTypeID == Activity.OPTIONS_ACTIVITY_TYPE){
+		if(_activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE){
 			if(_maxOptions){	dto.maxOptions = _maxOptions;		}
 			if(_minOptions){	dto.minOptions = _minOptions;		}
 			if(_optionsInstructions){	dto.optionsInstructions = _optionsInstructions;		}
@@ -70,7 +70,7 @@ class ComplexActivity extends Activity{
 	}
 	
 	/**
-	 * Used by OPTIONS_ACTIVITY_TYPE
+	 * Used by OPTIONAL_ACTIVITY_TYPE
 	 * @usage   
 	 * @param   newmaxOptions 
 	 * @return  
@@ -79,7 +79,7 @@ class ComplexActivity extends Activity{
 		_maxOptions = newmaxOptions;
 	}
 	/**
-	 * used by OPTIONS_ACTIVITY_TYPE
+	 * used by OPTIONAL_ACTIVITY_TYPE
 	 * @usage   
 	 * @return  
 	 */
@@ -89,7 +89,7 @@ class ComplexActivity extends Activity{
 
 	
 	/**
-	 * used by OPTIONS_ACTIVITY_TYPE
+	 * used by OPTIONAL_ACTIVITY_TYPE
 	 * @usage   
 	 * @param   newminOptions 
 	 * @return  
@@ -98,7 +98,7 @@ class ComplexActivity extends Activity{
 		_minOptions = newminOptions;
 	}
 	/**
-	 * used by OPTIONS_ACTIVITY_TYPE
+	 * used by OPTIONAL_ACTIVITY_TYPE
 	 * @usage   
 	 * @return  
 	 */
