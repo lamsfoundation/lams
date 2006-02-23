@@ -8,7 +8,7 @@
 	-->
 <beans>
 
-	<!-- ========================= GENERAL DEFINITIONS ========================= -->
+<!-- ========================= GENERAL DEFINITIONS ========================= -->
 
 	<!-- ========================= RESOURCE DEFINITIONS ========================= -->
 	
@@ -31,6 +31,8 @@
 	<!-- ========================= BUSINESS OBJECT DEFINITIONS ======================== -->
 
 	<!-- tool beans -->
+
+
 	<bean id="qaContentDAO" class="org.lamsfoundation.lams.tool.qa.dao.hibernate.QaContentDAO">
 		<property name="sessionFactory"><ref local="qaSessionFactory"/></property>
 	</bean>  
@@ -42,23 +44,28 @@
 	<bean id="qaQueUsrDAO" class="org.lamsfoundation.lams.tool.qa.dao.hibernate.QaQueUsrDAO">
 		<property name="sessionFactory"><ref local="qaSessionFactory"/></property>
 	</bean>
-	
+
 	<bean id="qaQueContentDAO" class="org.lamsfoundation.lams.tool.qa.dao.hibernate.QaQueContentDAO">
 		<property name="sessionFactory"><ref local="qaSessionFactory"/></property>
 	</bean>
-	
+
 	<bean id="qaUsrRespDAO" class="org.lamsfoundation.lams.tool.qa.dao.hibernate.QaUsrRespDAO">
 		<property name="sessionFactory"><ref local="qaSessionFactory"/></property>
 	</bean>
-	
+
 	<bean id="qaUploadedFileDAO" class="org.lamsfoundation.lams.tool.qa.dao.hibernate.QaUploadedFileDAO">
 		<property name="sessionFactory"><ref local="qaSessionFactory"/></property>
 	</bean>
+
 	
-	
-	<!-- end of tool beans -->
+	<bean id="qaToolContentHandler" class="org.lamsfoundation.lams.tool.qa.util.QaToolContentHandler">
+ 		<property name="repositoryService"><ref bean="repositoryService"/></property>
+	</bean> 
 	
 
+	<!-- end of tool beans -->
+
+	
 	<bean id="qaService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
 			<property name="target">
@@ -83,19 +90,10 @@
 					<prop key="get*">PROPAGATION_REQUIRED, -QacpApplicationException</prop>
 					<prop key="remove*">PROPAGATION_REQUIRED,-QaApplicationException</prop>
 					<prop key="persistFile">PROPAGATION_REQUIRED,-QaApplicationException</prop>
-	                <prop key="setAsDefineLater">PROPAGATION_REQUIRED,-QaApplicationException</prop>
-	                <prop key="setAsRunOffline">PROPAGATION_REQUIRED,-QaApplicationException</prop>
-	                <prop key="createToolSession">PROPAGATION_REQUIRED,-QaApplicationException</prop>
-	                <prop key="exportToolSession">PROPAGATION_REQUIRED,-QaApplicationException</prop>
-	                <prop key="leaveToolSession">PROPAGATION_REQUIRED,-QaApplicationException</prop>
 					<!--  <prop key="configureContentRepository">PROPAGATION_REQUIRED,-QaApplicationException</prop> -->
 				</props>
 			</property>
 	</bean>  
-	
-	<bean id="qaToolContentHandler" class="org.lamsfoundation.lams.tool.qa.util.QaToolContentHandler">
- 		<property name="repositoryService"><ref bean="repositoryService"/></property>
-	</bean> 
-
 
 </beans>
+

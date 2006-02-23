@@ -95,6 +95,8 @@ public interface IQaService
 		
 	public void createQaSession(QaSession qaSession);
 	
+	public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException;
+	
 	public void createQaQueUsr(QaQueUsr qaQueUsr);
 	
 	public void updateQaSession(QaSession qaSession);

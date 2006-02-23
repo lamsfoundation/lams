@@ -6,38 +6,25 @@
  */
 package org.lamsfoundation.lams.tool.qa;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.security.Principal;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 import java.util.TimeZone;
-import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.upload.FormFile;
-import org.lamsfoundation.lams.contentrepository.NodeKey;
-import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.web.QaAuthoringForm;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
-import org.lamsfoundation.lams.tool.qa.util.QaToolContentHandler;
 
 /**
  * 
@@ -267,44 +254,6 @@ public abstract class QaUtils implements QaAppConstants {
 		return username;
 	}
 	
-	
-	/**
-	 * This method exists temporarily until we have the user data is passed properly from teh container to the tool
-	 * createMockUser()
-	 * @return User 
-	 */
-	public static User createMockUser()
-	{
-		logger.debug(logger + " " + "QaUtils" +  " request for new new mock user");
-		int randomUserId=generateIntegerId();
-		User mockUser=new User();
-		mockUser.setUserId(new Integer(randomUserId));
-		mockUser.setFirstName(MOCK_USER_NAME + randomUserId);
-		mockUser.setLastName(MOCK_USER_LASTNAME + randomUserId);
-		mockUser.setLogin(MOCK_LOGIN_NAME + randomUserId); //we assume login and username refers to the same property
-		logger.debug(logger + " " + "QaUtils" +  " created mockuser: " + mockUser);
-		return mockUser;
-	}
-	
-	
-	public static User createSimpleUser(Integer userId)
-	{
-		User user=new User();
-		user.setUserId(userId);
-		return user;
-	}
-	
-	public static User createUser(Integer userId)
-	{
-		User user=new User();
-		user.setUserId(userId);
-		
-		int randomUserId=generateIntegerId();
-		user.setFirstName(MOCK_USER_NAME + randomUserId);
-		user.setLastName(MOCK_USER_LASTNAME + randomUserId);
-		user.setLogin(MOCK_LOGIN_NAME + randomUserId); 
-		return user;
-	}
 	
 	public static boolean getDefineLaterStatus()
 	{
@@ -842,7 +791,6 @@ public abstract class QaUtils implements QaAppConstants {
     }
     
     
-    
     /** If this file exists in attachments map, move it to the deleted attachments map.
      * Returns the updated deletedAttachments map, creating a new one if needed. If uuid supplied
      * then tries to match on that, otherwise uses filename and isOnline. */
@@ -868,4 +816,18 @@ public abstract class QaUtils implements QaAppConstants {
         
         return deletedList;
     }
+    
+    
+	/**
+	 * find out if the content is set to run offline or online. If it is set to run offline , the learners are informed about that..
+	 * isRubnOffline(QaContent qaContent)
+	 * 
+	 * @param qaContent
+	 * @return boolean
+	 */
+	public static boolean isRunOffline(QaContent qaContent)
+	{
+		logger.debug("is run offline: " + qaContent.isRunOffline());
+		return qaContent.isRunOffline();
+	}
 }

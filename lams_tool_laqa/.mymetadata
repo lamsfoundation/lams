@@ -2,10 +2,10 @@
 <project-module
    type="WEB"
    name="lams_tool_laqa"
-   id="myeclipse.1118965629516"
-   context-root="/lams_tool_qa"
+   id="myeclipse.1133940888421"
+   context-root="/lams_tool_laqa"
    j2ee-spec="1.4"
-   archive="lams_tool_laqa.war">
+   archive="lams_tool_lamc.war">
    <attributes>
       <attribute name="webrootdir" value="web" />
    </attributes>

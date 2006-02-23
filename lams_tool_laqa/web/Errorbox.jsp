@@ -18,15 +18,13 @@ USA
 
 http://www.gnu.org/licenses/gpl.txt
 -->
-<%@ taglib uri="/WEB-INF/struts-html-el.tld" prefix="html" %>
-<%@ taglib uri="/WEB-INF/fmt.tld" prefix="fmt" %>
-<%@ taglib uri="/WEB-INF/c.tld" prefix="c" %>
-<%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
-<%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
-<%@ taglib uri="fck-editor" prefix="FCK" %>
-<%@ taglib uri="/WEB-INF/lams.tld" prefix="lams" %>
-
-doing error box
+<%@ taglib uri="tags-html-el" prefix="html" %>
+<%@ taglib uri="tags-bean" prefix="bean" %>
+<%@ taglib uri="tags-logic-el" prefix="logic-el" %>
+<%@ taglib uri="tags-c" prefix="c" %>
+<%@ taglib uri="tags-fmt" prefix="fmt" %>
+<%@ taglib uri="tags-fck-editor" prefix="FCK" %>
+<%@ taglib uri="tags-lams" prefix="lams" %>
 
 <c:if test="${sbmtSuccess == 1}"> 			
 	<logic-el:messagesPresent> 

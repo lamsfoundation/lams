@@ -23,7 +23,6 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.exception.ToolException;
-
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaApplicationException;
 import org.lamsfoundation.lams.tool.qa.QaComparator;
@@ -104,13 +103,10 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 public class QaLearningStarterAction extends Action implements QaAppConstants {
 	static Logger logger = Logger.getLogger(QaLearningStarterAction.class.getName());
 
-	/*
-	 * holds the question contents for a given tool session and relevant content
-	 */
+	/* holds the question contents for a given tool session and relevant content */
 	protected Map mapQuestions= new TreeMap(new QaComparator());
-	/*
-	 * holds the answers
-	 */  
+	
+	/*holds the answers */  
 	protected Map mapAnswers= new TreeMap(new QaComparator());
 	
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
@@ -118,114 +114,100 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 
 		QaLearningForm qaQaLearningForm = (QaLearningForm) form;
 		
-		/*
-		 * reset the question index to 1. 
-		 */
 		request.getSession().setAttribute(CURRENT_QUESTION_INDEX, "1");
-		logger.debug("CURRENT_QUESTION_INDEX: " + request.getSession().getAttribute(CURRENT_QUESTION_INDEX));
-
-		/*
-		 * reset the current answer
-		 */
 		request.getSession().setAttribute(CURRENT_ANSWER, "");
 
-		/*
-		 * initialize available question display modes in the session
-		 */
+		/*initialize available question display modes in the session */
 		request.getSession().setAttribute(QUESTION_LISTING_MODE_SEQUENTIAL,QUESTION_LISTING_MODE_SEQUENTIAL);
 	    request.getSession().setAttribute(QUESTION_LISTING_MODE_COMBINED, QUESTION_LISTING_MODE_COMBINED);
 	    
 		IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
 	    logger.debug("retrieving qaService: " + qaService);
 	    
-	    /*
-	     * mark the http session as a learning activity 
-	     */
+	    /*mark the http session as a learning activity  */
 	    request.getSession().setAttribute(TARGET_MODE,TARGET_MODE_LEARNING);
 	    
-	    /*
-	     * persist time zone information to session scope. 
-	     */
 	    QaUtils.persistTimeZone(request);
 	    
-	    /*
-	     * obtain and setup the current user's data 
-	     */
-	    String userId = "";
-	    /* get session from shared session.*/
-	    HttpSession ss = SessionManager.getSession();
-	    /* get back login user DTO*/
-	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	    if ((user == null) || (user.getUserID() == null))
+	    /*validate learning mode parameters*/
+	    ActionForward validateParameters=validateParameters(request, mapping);
+	    logger.debug("validateParamaters: " + validateParameters);
+	    if (validateParameters != null)
 	    {
-	    	logger.debug("error: The tool expects userId");
-	    	persistError(request,"error.authoringUser.notAvailable");
-	    	request.setAttribute(USER_EXCEPTION_USERID_NOTAVAILABLE, new Boolean(true));
-	    	return (mapping.findForward(LOAD_QUESTIONS));
-	    }else
-	    	userId = user.getUserID().toString();
-		
+	    	return validateParameters;
+	    }
+	    
+	    String userId=(String)request.getSession().getAttribute(USER_ID);
+		logger.debug("userId: " + userId);
 	    
 	    /*
-	     * process incoming tool session id and later derive toolContentId from it. 
+	     * use the incoming tool session id and later derive toolContentId from it. 
 	     */
-	    String strToolSessionId=request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
-	    long toolSessionId=0;
-	    if ((strToolSessionId == null) || (strToolSessionId.length() == 0)) 
-	    {
-	    	persistError(request, "error.toolSessionId.required");
-	    	request.setAttribute(USER_EXCEPTION_TOOLSESSIONID_REQUIRED, new Boolean(true));
-			logger.debug("forwarding to: " + LOAD);
-			return (mapping.findForward(LOAD));
-	    }
-	    else
-	    {
-	    	try
-			{
-	    		toolSessionId=new Long(strToolSessionId).longValue();
-		    	logger.debug("passed TOOL_SESSION_ID : " + new Long(toolSessionId));
-		    	request.getSession().setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,new Long(toolSessionId));
-			}
-	    	catch(NumberFormatException e)
-			{
-	    		persistError(request, "error.sessionId.numberFormatException");
-	    		logger.debug("add error.sessionId.numberFormatException to ActionMessages.");
-				request.setAttribute(USER_EXCEPTION_NUMBERFORMAT, new Boolean(true));
-				logger.debug("forwarding to: " + LOAD);
-				return (mapping.findForward(LOAD));
-			}
-	    }
+		Long toolSessionId=(Long)request.getSession().getAttribute(TOOL_SESSION_ID);
+		logger.debug("toolSessionId: " + toolSessionId);
 		
-	    /* API test code */
+	    /* API test code , from  here*/
 	    String createToolSession=request.getParameter("createToolSession");
 		logger.debug("createToolSession: " + createToolSession);
 		if ((createToolSession != null) && createToolSession.equals("1"))
 		{	try
 			{
 				logger.debug("creating test session with toolSessionId:" + toolSessionId);
-				qaService.createToolSession(new Long(toolSessionId), "toolSessionName", new Long(9876));
+				qaService.createToolSession(toolSessionId, "toolSessionName", new Long(9876));
 				return (mapping.findForward(LEARNING_STARTER));
 			}
 			catch(ToolException e)
 			{
+				//McUtils.cleanUpSessionAbsolute(request);
 				logger.debug("tool exception: "  + e);
 			}
 		}
 
-	    
-	    
+		String removeToolSession=request.getParameter("removeToolSession");
+		logger.debug("removeToolSession: " + removeToolSession);
+		if ((removeToolSession != null) && removeToolSession.equals("1"))
+		{	try
+			{
+				qaService.removeToolSession(toolSessionId);
+				return (mapping.findForward(LEARNING_STARTER));
+			}
+			catch(ToolException e)
+			{
+				//McUtils.cleanUpSessionAbsolute(request);
+				logger.debug("tool exception"  + e);
+			}
+		}
+
+		String learnerId=request.getParameter("learnerId");
+		logger.debug("learnerId: " + learnerId);
+		if (learnerId != null) 
+		{	try
+			{
+				String nextUrl=qaService.leaveToolSession(toolSessionId, new Long(learnerId));
+				logger.debug("nextUrl: "+ nextUrl);
+				return (mapping.findForward(LEARNING_STARTER));
+			}
+			catch(ToolException e)
+			{
+				//McUtils.cleanUpSessionAbsolute(request);
+				logger.debug("tool exception"  + e);
+			}
+		}
+		/* API test code , till here*/
+		
+
 	    /*
-	     * By now, the passed tool session id MUST exist in the db through the calling of:
-	     * public void createToolSession(Long toolSessionId, Long toolContentId) by the container.
+	     * By now, the passed tool session id MUST exist in the db by calling:
+	     * public void createToolSession(Long toolSessionId, Long toolContentId) by the core.
 	     *  
 	     * make sure this session exists in tool's session table by now.
 	     */
 		
-	    if (!QaUtils.existsSession(toolSessionId, qaService)) 
+	    if (!QaUtils.existsSession(toolSessionId.longValue(), qaService)) 
 		{
 		    	logger.debug("error: The tool expects mcSession.");
 		    	persistError(request,"error.toolSession.notAvailable");
-				return (mapping.findForward(ERROR_LIST));
+				return (mapping.findForward(ERROR_LIST_LEARNER));
 		}
 	    
 		
@@ -235,7 +217,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 		 */
 		
 	    
-		QaSession qaSession=qaService.retrieveQaSessionOrNullById(toolSessionId);
+		QaSession qaSession=qaService.retrieveQaSessionOrNullById(toolSessionId.longValue());
 	    logger.debug("retrieving qaSession: " + qaSession);
 	    /*
 	     * find out what content this tool session is referring to
@@ -247,6 +229,14 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	     */
 		QaContent qaContent=qaSession.getQaContent();
 	    logger.debug("using qaContent: " + qaContent);
+	    if (qaContent == null)
+	    {
+	    	logger.debug("error: The tool expects qaContent.");
+	    	persistError(request,"error.toolContent.notAvailable");
+	    	//McUtils.cleanUpSessionAbsolute(request);
+			return (mapping.findForward(ERROR_LIST_LEARNER));
+	    }
+
 	    request.getSession().setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, qaContent.getQaContentId());
 	    logger.debug("using TOOL_CONTENT_ID: " + qaContent.getQaContentId());
 	    	    
@@ -321,11 +311,61 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 		
     	request.getSession().setAttribute(MAP_ANSWERS, mapAnswers);
     	request.getSession().setAttribute(MAP_QUESTION_CONTENT_LEARNER, mapQuestions);
-    	logger.debug("qaContent has : " + mapQuestions.size() + " entries.");
+    	logger.debug("mapQuestions has : " + mapQuestions.size() + " entries.");
     	
     	request.getSession().setAttribute(TOTAL_QUESTION_COUNT, new Long(mapQuestions.size()).toString());
     	String userFeedback= feedBackType + request.getSession().getAttribute(TOTAL_QUESTION_COUNT) + QUESTIONS;
     	request.getSession().setAttribute(USER_FEEDBACK, userFeedback);
+    	
+    	
+    	
+    	
+    	/* Is the request for a preview by the author?
+    	Preview The tool must be able to show the specified content as if it was running in a lesson. 
+		It will be the learner url with tool access mode set to ToolAccessMode.AUTHOR 
+		3 modes are:
+			author
+			teacher
+			learner
+		*/
+    	/* ? CHECK THIS: how do we determine whether preview is requested? Mode is not enough on its own.*/
+	    
+	    /*handle PREVIEW mode*/
+	    String mode=(String) request.getSession().getAttribute(LEARNING_MODE);
+	    logger.debug("mode: " + mode);
+    	if ((mode != null) && (mode.equals("author")))
+    	{
+    		/*complete this section */
+    		logger.debug("Author requests for a preview of the content.");
+			logger.debug("existing qaContent:" + qaContent);
+    		
+			return (mapping.findForward(LEARNING_STARTER)); 
+    	}
+    	
+    	/* by now, we know that the mode is either teacher or learner
+    	 * check if the mode is teacher and request is for Learner Progress
+    	 */
+		logger.debug("userId: " + userId);
+		if ((userId != null) && (mode.equals("teacher")))
+		{
+    		/*complete this section */
+			logger.debug("request is for learner progress");
+			return (mapping.findForward(LEARNING_STARTER));
+		}
+    	
+		/* by now, we know that the mode is learner*/
+	    /* find out if the content is set to run offline or online. If it is set to run offline , the learners are informed about that. */
+	    boolean isRunOffline=QaUtils.isRunOffline(qaContent);
+	    logger.debug("isRunOffline: " + isRunOffline);
+	    if (isRunOffline == true)
+	    {
+	    	logger.debug("warning to learner: the activity is offline.");
+	    	persistError(request,"label.learning.runOffline");
+	    	//McUtils.cleanUpSessionAbsolute(request);
+			return (mapping.findForward(ERROR_LIST_LEARNER));
+	    }
+    	
+    	
     	
     	
     	/*
@@ -358,10 +398,92 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
     	/*
     	 * present user with the questions.
     	 */
-		logger.debug("forwarding to: " + LOAD);
-		return (mapping.findForward(LOAD));	
+		logger.debug("forwarding to: " + LOAD_LEARNER);
+		return (mapping.findForward(LOAD_LEARNER));	
+	}
+	
+
+	/**
+	 * validates the learning mode parameters
+	 * @param request
+	 * @param mapping
+	 * @return ActionForward
+	 */
+	protected ActionForward validateParameters(HttpServletRequest request, ActionMapping mapping)
+	{
+		/*
+	     * obtain and setup the current user's data 
+	     */
 		
-  } 
+	    String userID = "";
+	    /* get session from shared session.*/
+	    HttpSession ss = SessionManager.getSession();
+	    /* get back login user DTO*/
+	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    if ((user == null) || (user.getUserID() == null))
+	    {
+	    	logger.debug("error: The tool expects userId");
+	    	persistError(request,"error.learningUser.notAvailable");
+	    	//McUtils.cleanUpSessionAbsolute(request);
+			return (mapping.findForward(ERROR_LIST_LEARNER));
+	    }else
+	    	userID = user.getUserID().toString();
+	    
+	    logger.debug("retrieved userId: " + userID);
+    	request.getSession().setAttribute(USER_ID, userID);
+		
+	    
+	    /*
+	     * process incoming tool session id and later derive toolContentId from it. 
+	     */
+    	String strToolSessionId=request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
+	    long toolSessionId=0;
+	    if ((strToolSessionId == null) || (strToolSessionId.length() == 0)) 
+	    {
+	    	persistError(request, "error.toolSessionId.required");
+	    	//McUtils.cleanUpSessionAbsolute(request);
+			return (mapping.findForward(ERROR_LIST_LEARNER));
+	    }
+	    else
+	    {
+	    	try
+			{
+	    		toolSessionId=new Long(strToolSessionId).longValue();
+		    	logger.debug("passed TOOL_SESSION_ID : " + new Long(toolSessionId));
+		    	request.getSession().setAttribute(TOOL_SESSION_ID,new Long(toolSessionId));	
+			}
+	    	catch(NumberFormatException e)
+			{
+	    		persistError(request, "error.sessionId.numberFormatException");
+	    		logger.debug("add error.sessionId.numberFormatException to ActionMessages.");
+	    		//McUtils.cleanUpSessionAbsolute(request);
+				return (mapping.findForward(ERROR_LIST_LEARNER));
+			}
+	    }
+	    
+	    /*mode can be learner, teacher or author */
+	    String mode=request.getParameter(MODE);
+	    logger.debug("mode: " + mode);
+	    
+	    if ((mode == null) || (mode.length() == 0)) 
+	    {
+	    	persistError(request, "error.mode.required");
+	    	//McUtils.cleanUpSessionAbsolute(request);
+			return (mapping.findForward(ERROR_LIST_LEARNER));
+	    }
+	    
+	    if ((!mode.equals("learner")) && (!mode.equals("teacher")) && (!mode.equals("author")))
+	    {
+	    	persistError(request, "error.mode.invalid");
+	    	//McUtils.cleanUpSessionAbsolute(request);
+			return (mapping.findForward(ERROR_LIST_LEARNER));
+	    }
+		logger.debug("session LEARNING_MODE set to:" + mode);
+	    request.getSession().setAttribute(LEARNING_MODE, mode);
+	    
+	    return null;
+	}
+	
 	
 	/**
      * persists error messages to request scope

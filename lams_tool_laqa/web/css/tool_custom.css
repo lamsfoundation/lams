@@ -1,0 +1,105 @@
+.button{
+	float:right;
+	font-size: 10px;
+	color: #000000;
+	text-decoration:none;
+	text-align: center;
+	background-color:#B4C8FE;
+	margin: 2px 5px 2px 5px;
+	padding:3px;
+  	width: 60px;
+	border-top-width: 1px;
+	border-right-width: 1px;
+	border-bottom-width: 1px;
+	border-left-width: 1px;
+	border-top-style: solid;
+	border-right-style: solid;
+	border-bottom-style: solid;
+	border-left-style: solid;
+	border-top-color: #FFFFFF;
+	border-right-color: #0D3F59;
+	border-bottom-color: #0D3F59;
+	border-left-color: #FFFFFF;
+}
+
+.buttonLeft{
+	float:left;
+	font-size: 10px;
+	color: #000000;
+	text-decoration:none;
+	text-align: center;
+	background-color:#B4C8FE;
+	margin: 2px 5px 2px 5px;
+	padding:3px;
+  	width: 60px;
+	border-top-width: 1px;
+	border-right-width: 1px;
+	border-bottom-width: 1px;
+	border-left-width: 1px;
+	border-top-style: solid;
+	border-right-style: solid;
+	border-bottom-style: solid;
+	border-left-style: solid;
+	border-top-color: #FFFFFF;
+	border-right-color: #0D3F59;
+	border-bottom-color: #0D3F59;
+	border-left-color: #FFFFFF;
+}
+.longButton{
+	float:right;
+	font-size: 10px;
+	color: #000000;
+	text-decoration:none;
+	text-align: center;
+	background-color:#B4C8FE;
+	margin: 2px 5px 2px 5px;
+	padding:3px;
+  	width: 120px;
+	border-top-width: 1px;
+	border-right-width: 1px;
+	border-bottom-width: 1px;
+	border-left-width: 1px;
+	border-top-style: solid;
+	border-right-style: solid;
+	border-bottom-style: solid;
+	border-left-style: solid;
+	border-top-color: #FFFFFF;
+	border-right-color: #0D3F59;
+	border-bottom-color: #0D3F59;
+	border-left-color: #FFFFFF;
+}
+
+.button:link{
+		color: #000000;
+		text-decoration:none;
+		background-color:#B4C8FE;
+}
+
+.button:visited{
+		color: #000000;
+		text-decoration:none;
+		background-color:#B4C8FE;
+}
+
+
+.button:hover{
+		text-decoration:none;
+		background-color:#FFFFFF;	
+}
+
+.button:active{
+		text-decoration:none;
+		background-color:#CCCCCC;	
+		border-top-width: 1px;
+		border-right-width: 1px;
+		border-bottom-width: 1px;
+		border-left-width: 1px;
+		border-top-style: solid;
+		border-right-style: solid;
+		border-bottom-style: solid;
+		border-left-style: solid;
+		border-bottom-color: #FFFFFF;
+		border-left-color: #0D3F59;
+		border-top-color: #0D3F59;
+		border-right-color: #FFFFFF;
+}

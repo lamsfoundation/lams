@@ -29,6 +29,7 @@ public class QaAuthoringForm extends ActionForm implements QaAppConstants {
 	protected String submitTabDone;
 	protected String submitOfflineFile;
 	protected String submitOnlineFile;
+	protected String dispatch;
 	
 	/* tab controller, these may go away once the Flash wraps the jsp */
 	protected String choice;
@@ -502,5 +503,18 @@ public class QaAuthoringForm extends ActionForm implements QaAppConstants {
 	 */
 	public void setSubmitOnlineFile(String submitOnlineFile) {
 		this.submitOnlineFile = submitOnlineFile;
+	}
+	
+	/**
+	 * @return Returns the dispatch.
+	 */
+	public String getDispatch() {
+		return dispatch;
+	}
+	/**
+	 * @param dispatch The dispatch to set.
+	 */
+	public void setDispatch(String dispatch) {
+		this.dispatch = dispatch;
 	}
 }

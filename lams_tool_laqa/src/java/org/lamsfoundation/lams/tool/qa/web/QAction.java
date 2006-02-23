@@ -658,6 +658,7 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
                                               HttpServletResponse response) throws IOException,
                                                                         ServletException, ToolException
     {
+        logger.debug("dispatching displayQ...");
     	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
         /*
          * if the content is not ready yet, don't even proceed.
@@ -668,7 +669,7 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
         if (defineLater.booleanValue() == true)
         {
             persistError(request,"error.defineLater");
-            return (mapping.findForward(LOAD));
+            return (mapping.findForward(ERROR_LIST_LEARNER));
         }
         
         LearningUtil learningUtil= new LearningUtil();
@@ -724,7 +725,7 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
                 mapAnswers.put(new Long(questionIndex).toString(), answer);
             }
         }
-        
+        logger.debug("continue processing answers...");
         /*
          *  At this point the Map holding learner responses is ready. So place that into the session.
          */
@@ -756,7 +757,7 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
                 /*
                  * The learner is done with the tool session. The tool needs to clean-up.
                  */
-                
+        		logger.debug("end learning...");
                 Long toolSessionId=(Long)request.getSession().getAttribute(AttributeNames.PARAM_TOOL_SESSION_ID);
                 HttpSession ss = SessionManager.getSession();
                 /*get back login user DTO*/
@@ -767,15 +768,14 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
                 String nextActivityUrl = qaService.leaveToolSession(toolSessionId, new Long(user.getUserID().longValue()));
                 response.sendRedirect(nextActivityUrl);
                 return null;
-              
-                
             }
             
             /* Also cleanup session attributes */
-            QaUtils.cleanupSession(request);
+            //QaUtils.cleanupSession(request);
         
+        logger.debug("forwarding to: " + LOAD_LEARNER);
         qaLearningForm.resetUserActions();
-        return (mapping.findForward(LOAD));
+        return (mapping.findForward(LOAD_LEARNER));
     }
     
     

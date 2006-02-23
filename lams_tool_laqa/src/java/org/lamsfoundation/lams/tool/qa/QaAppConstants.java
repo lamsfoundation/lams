@@ -22,15 +22,9 @@ public interface QaAppConstants {
 	public static final String MY_SIGNATURE 							="laqa11";
 	public static final long DEFAULT_CONTENT_ID 						=0;
     public static final long DEFAULT_QUE_CONTENT_ID 					=1;
+	public static final String TOOL_SERVICE								="tool_service";
+	public static final String ERROR_MCAPPLICATION 						= "error.exception.QaApplication";
 
-	/*
-	 * temporarily refers to an existing content id for an incoming tool session id, won't need it in deployment environment 
-	 */
-	public static final long THE_MOCKED_CONTENT_ID						=1803739427456570536L;  
-//	public static final String TOOL_SERVICE								="tool_service";
-	/*
-	 * indicates which mode the tool runs under between Authoring, Learning, Monitoring
-	 */
 	public static final String TARGET_MODE								="targetMode";
 	public static final String TARGET_MODE_AUTHORING					="Authoring";
 	public static final String TARGET_MODE_LEARNING						="Learning";
@@ -38,21 +32,16 @@ public interface QaAppConstants {
 	public static final String TARGET_MODE_EXPORT_PORTFOLIO				="ExportPortfolio";
 	
 	public static final String AUTHORING_STARTER						="starter";
+	public static final String LOAD_LEARNER								="loadLearner";
 	public static final String LEARNING_STARTER							="learningStarter";
 	public static final String MONITORING_STARTER						="monitoringStarter";
 	public static final String COPY_TOOL_CONTENT 						="copyToolContent";
 	public static final String ERROR_LIST								="errorList";
+	public static final String ERROR_LIST_LEARNER						="errorListLearner";
 	public static final String DEFAULT_CONTENT_ID_STR					="defaultContentIdStr";
-	
+	public static final String TOOL_SESSION_ID 							= "toolSessionID";
+		
 	/*
-	 * Mock constants below are temporary until the tool gets a User object from the container.
-	 */
-	public static final Integer	MOCK_USER_ID							= new Integer(111);
-	public static final String  MOCK_USER_NAME							="Ozgur";
-	public static final String  MOCK_USER_LASTNAME						="Demirtas";
-	public static final String  MOCK_LOGIN_NAME							="ozgur";
-	
-    /*
      * refers to number of questions presented initially, we have a single record for default content
      */
     public static final Long INITIAL_QUESTION_COUNT		=new Long(1);
@@ -67,6 +56,7 @@ public interface QaAppConstants {
     public static final boolean MODE_OPTIONAL 							= false;
     public static final String DISABLE_TOOL								="disabled";
     public static final String IS_DEFINE_LATER							="isDefineLater";
+    public static final String LEARNING_MODE							="learningMode";
     
     /*
      * authoring mode controllers
@@ -107,33 +97,11 @@ public interface QaAppConstants {
     public static final String RICHTEXT_TITLE							="richTextTitle";
     public static final String RICHTEXT_INSTRUCTIONS					="richTextInstructions";
     public static final String RICHTEXT_BLANK							="<p>&nbsp;</p>";
-//    public static final String THE_OFFLINE_FILE							="theOfflineFile";
-//    public static final String THE_ONLINE_FILE							="theOnlineFile";
-//    public static final String THE_OFFLINE_FILENAME						="theOfflineFileName";
-//    public static final String THE_ONLINE_FILENAME						="theOnlineFileName";
+
     public static final String SUBMIT_OFFLINE_FILE						="submitOfflineFile";
     public static final String SUBMIT_ONLINE_FILE						="submitOnlineFile";
-//    public static final String LIST_UPLOADED_OFFLINE_FILES				="listUploadedOfflineFiles";
-//    public static final String LIST_UPLOADED_ONLINE_FILES				="listUploadedOnlineFiles";
-//    public static final String LIST_UPLOADED_OFFLINE_FILENAMES			="listUploadedOfflineFileNames";
-//    public static final String LIST_UPLOADED_ONLINE_FILENAMES			="listUploadedOnlineFileNames";
-//    public static final String LIST_UPLOADED_OFFLINE_FILES_UUID			="listUploadedOfflineFilesUuid";
-//    public static final String LIST_UPLOADED_OFFLINE_FILES_NAME			="listUploadedOfflineFilesName";
-//    public static final String LIST_UPLOADED_ONLINE_FILES_UUID			="listUploadedOnlineFilesUuid";
-//    public static final String LIST_UPLOADED_ONLINE_FILES_NAME			="listUploadedOnlineFilesName";
     public static final String POPULATED_UPLOADED_FILESDATA				="populateUploadedFilesData";
-    
-    
-    
-    /*
-     * the author's current content id
-     */
-    //public static final String TOOL_CONTENT_ID							="toolContentId";
-    
-    /*
-     * the learner or monitoring environment provides toolSessionId
-     */
-    //public static final String TOOL_SESSION_ID							="toolSessionId";
+    public static final String USER_ID 									= "userID";
     
     public final long 	ONE_DAY 										=60 * 60 * 1000 * 24;
     public final static String NOT_ATTEMPTED 							="NOT_ATTEMPTED";
@@ -233,10 +201,9 @@ public interface QaAppConstants {
     public static final String START_MONITORING_SUMMARY_REQUEST	   		="startMonitoringSummaryRequest";
     public static final String STOP_RENDERING_QUESTIONS			   		="stopRenderingQuestions";
     public static final String EDITACTIVITY_EDITMODE	   		   		="editActivityEditMode";
-//    public static final String FORM_INDEX	   		   			   		="formIndex";
     public static final String RENDER_MONITORING_EDITACTIVITY	   		="renderMonitoringEditActivity";
     public static final String NO_AVAILABLE_SESSIONS	   		   		="noAvailableSessions";
-//    public static final String INITIAL_MONITORING_TOOL_CONTENT_ID  		="initialMonitoringToolContentId";
+
     public static final String IS_MONITORING_DEFINE_LATER  		   		="isMonitoringDefineLater";
     public static final String NO_TOOL_SESSIONS_AVAILABLE				="noToolSessionAvailable";
     public static final String ORIGINAL_TOOL_SESSIONS					="originalToolSessions";
@@ -259,9 +226,6 @@ public interface QaAppConstants {
     public static final String TIMEZONE									="timeZone";
     public static final String TIMEZONE_ID								="timeZoneId";
     
-    /*
-     * following tell whether author prefers to  have the questions listed all in one page or listed sequentially. The default is all in one page.
-     */
     public static final String QUESTION_LISTING_MODE					="questionListingMode";
     public static final String QUESTION_LISTING_MODE_SEQUENTIAL			="questionListingModeSequential";
     public static final String QUESTION_LISTING_MODE_COMBINED			="questionListingModeCombined";
@@ -270,14 +234,6 @@ public interface QaAppConstants {
     public static final String FEEDBACK_TYPE_COMBINED					="You are being presented a total of : ";
     public static final String QUESTIONS								=" questions.";
 
-    /*
-     * constants redundant for the moment
-     */
-    public static final String DISPLAY_QUESTIONS 						="display";
-    public static final String SUBMIT_QUESTIONS 						="submit";
-    public static final String VIEW_INDIVIDUAL_SUMMARY 					="view";
-    
-    
     public static final String ATTACHMENT_LIST                          ="attachmentList";
     public static final String SUBMIT_SUCCESS							="sbmtSuccess";
     public static final String DELETED_ATTACHMENT_LIST                  ="deletedAttachmentList";

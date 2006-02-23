@@ -105,12 +105,10 @@
 						   javaTypeMapper="middlegen.plugins.hibernate.HibernateJavaTypeMapper"
 				/>
 				
-				<table name="tl_laqa11_content"/>
-				<table name="tl_laqa11_session"/>
-				<table name="tl_laqa11_que_usr"/>
-				<table name="tl_laqa11_que_content"/>
-				<table name="tl_laqa11_usr_resp"/>
-				<table name="tl_laqa11_uploadedfile"/>				
+				<table name="tl_lasbmt11_content"/>
+				<table name="tl_lasbmt11_report"/>
+				<table name="tl_lasbmt11_session"/>
+				<table name="tl_lasbmt11_submission_details"/>
 			</middlegen>
 
 		</target>
@@ -293,7 +291,7 @@
 		<!-- Clean and rebuild the database. 									 -->
 		<!-- =================================================================== -->
 		<target name="rebuild-db"
-			description="rebuild Qa tables">
+			description="rebuild QA tables">
 			<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
 					password="${db.password}">
 				<classpath>
@@ -309,7 +307,7 @@
 		<!-- Clean tool database. 									 -->
 		<!-- =================================================================== -->
 		<target name="clean-tool-db"
-			description="rebuild Qa tables">
+			description="rebuild qa tables">
 			<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
 					password="${db.password}">
 				<classpath>
@@ -392,7 +390,7 @@
 				</fileset>
 			</path> 
 
-			<echo>Deploying the Q/A tool</echo>
+			<echo>Deploying the QA tool</echo>
 	
 			<java
 				classname="org.lamsfoundation.lams.tool.deploy.Deploy"
