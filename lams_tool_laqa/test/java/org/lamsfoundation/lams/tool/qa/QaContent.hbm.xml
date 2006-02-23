@@ -1,0 +1,220 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+    
+<hibernate-mapping>
+
+<class 
+    name="org.lamsfoundation.lams.tool.qa.QaContent" 
+    table="tl_laqa11_content"
+>
+
+    <id
+        name="uid"
+        type="java.lang.Long"
+        column="uid"
+    >
+        <generator class="native" />
+    </id>
+
+
+	<property
+        name="qaContentId"
+        type="java.lang.Long"
+        column="qa_content_id"
+        not-null="true"
+        length="20"
+    >
+    </property>
+
+    <property
+        name="title"
+        type="java.lang.String"
+        access="property"
+        column="title"
+        length="100"
+    />
+
+    <property
+        name="instructions"
+        type="java.lang.String"
+        access="property"        
+        column="instructions"
+        length="255"
+    />
+
+
+   <property
+            name="defineLater"
+            type="boolean"
+            access="property"
+            column="define_later"
+   />
+
+
+   <property
+            name="runOffline"
+            type="boolean"
+            access="property"
+            column="run_offline"
+   />
+
+
+    <property
+        name="creationDate"
+        type="java.lang.String"
+        access="property"        
+        column="creation_date"
+        length="10"
+    />
+
+
+    <property
+        name="updateDate"
+        type="java.util.Date"
+        access="property"        
+        column="update_date"
+        length="10"
+    />
+
+
+   <property
+            name="questionsSequenced"
+            type="boolean"
+            access="property"
+            column="questions_sequenced"
+   />
+
+    <property
+        name="usernameVisible"
+        type="boolean"
+        access="property"        
+        column="username_visible"
+        length="1"
+    />
+
+    <property
+        name="reportTitle"
+        type="java.lang.String"
+        access="property"        
+        column="report_title"
+        length="100"
+    />
+    
+
+    <property
+        name="monitoringReportTitle"
+        type="java.lang.String"
+        access="property"        
+        column="monitoring_report_title"
+        length="100"
+    />
+ 
+ 
+    <property
+        name="createdBy"
+        type="long"
+        access="property"        
+        column="created_by"
+        length="20"
+    />
+
+
+    <property
+        name="synchInMonitor"
+        type="boolean"
+        access="property"        
+        column="synch_in_monitor"
+        length="1"
+    />
+    
+    <property
+        name="contentLocked"
+        type="boolean"
+        access="property"        
+        column="content_locked"
+        length="1"
+    />
+    
+    
+    
+    <property
+        name="offlineInstructions"
+        type="java.lang.String"
+        access="property"        
+        column="offline_instructions"
+        length="65535"
+    />
+    
+    <property
+        name="onlineInstructions"
+        type="java.lang.String"
+        access="property"        
+        column="online_instructions"
+        length="65535"
+    />
+    
+    <property
+        name="endLearningMessage"
+        type="java.lang.String"
+        access="property"        
+        column="end_learning_message"
+        length="65535"
+    />
+    
+
+   	 <set
+            name="qaQueContents"
+            lazy="true"
+            inverse="true"
+            cascade="all-delete-orphan"
+            sort="natural"
+        >
+              <key
+                  column="qa_content_id"
+              >
+              </key>
+
+              <one-to-many
+                  class="org.lamsfoundation.lams.tool.qa.QaQueContent"
+              />
+    </set>
+
+	<set
+            name="qaSessions"
+            lazy="true"
+            inverse="true"
+            cascade="all-delete-orphan"
+            sort="unsorted"
+        >
+              <key
+                  column="qa_content_id"
+              >
+              </key>
+
+              <one-to-many
+                  class="org.lamsfoundation.lams.tool.qa.QaSession"
+              />
+
+    </set>
+    
+   	<set
+            name="qaUploadedFiles"
+            lazy="true"
+            inverse="true"
+            cascade="all-delete-orphan"
+            sort="unsorted"
+        >
+              <key
+                  column="qa_content_id"
+              >
+              </key>
+
+              <one-to-many
+                  class="org.lamsfoundation.lams.tool.qa.QaUploadedFile"
+              />
+    </set> 
+
+</class>
+</hibernate-mapping>

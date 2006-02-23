@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+
+<hibernate-mapping>
+    <class
+        name="org.lamsfoundation.lams.tool.qa.QaQueContent"
+        table="tl_laqa11_que_content"
+    >
+
+    <id
+        name="uid"
+        type="java.lang.Long"
+        column="uid"
+    >
+        <generator class="native" />
+    </id>
+
+
+	   <property
+            name="question"
+            type="java.lang.String"
+            access="property"
+            column="question"
+            length="65535"
+        />
+
+        <property
+            name="displayOrder"
+            type="int"
+            access="property"
+            column="display_order"
+            length="11"
+        />
+
+
+        <property
+            name="qaContentId"
+            type="java.lang.Long"
+            update="false"
+            insert="false"
+            access="property"
+            column="qa_content_id"
+            length="65535"
+        />
+
+        <many-to-one
+            name="qaContent"
+            class="org.lamsfoundation.lams.tool.qa.QaContent"
+            not-null="true"
+            cascade="none"
+            outer-join="auto"
+            update="true"
+            insert="true"
+            access="property"
+        >
+            <column
+                name="qa_content_id" 
+            />
+        </many-to-one>
+
+ 		<set
+            name="qaUsrResps"
+            lazy="true"
+            inverse="true"
+            cascade="all-delete-orphan"
+            sort="natural"
+        >
+              <key
+                  column="qa_que_content_id"
+              >
+              </key>
+
+              <one-to-many
+                  class="org.lamsfoundation.lams.tool.qa.QaUsrResp"
+              />
+
+        </set>
+    </class>
+</hibernate-mapping>
