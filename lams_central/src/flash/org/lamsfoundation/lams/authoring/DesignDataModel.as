@@ -84,6 +84,17 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		
     }
 	
+	public function getChildActivities(ActivityUIID:Number):Array{
+		var _child:Array = new Array();
+		var values = _activities.values();
+		for (var i=0; i<values.length; i++){
+			if (values[i].parentActivityID == ActivityUIID){
+				_child.push(values[i];
+			}
+		}
+		return _child;
+	}
+	
 	/**
 	 * Validates the design data model
 	 * @usage   
