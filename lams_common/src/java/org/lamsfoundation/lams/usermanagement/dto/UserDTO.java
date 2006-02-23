@@ -62,6 +62,25 @@ public class UserDTO {
 		this.theme = theme;
 	}
 	
+	/**
+	 * Equality test of UserDTO objects
+	 */
+	public boolean equals(Object o) {
+		if ((o != null) && (o.getClass() == this.getClass())) {
+			return ((UserDTO)o).userID == this.userID;
+		} else {
+			return false;
+		}		
+	}
+	
+	/**
+	 *  Returns the hash code value for this object.
+	 */
+	public int hashCode() {
+		// TODO this might be an ineffcient implementation since userIDs are likely to be sequential, 
+		// hence we dont get a good spread of values
+		return userID.intValue();
+	}
 	
 	/**
 	 * @return Returns the firstName.
