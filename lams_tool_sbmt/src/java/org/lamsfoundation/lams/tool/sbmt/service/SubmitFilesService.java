@@ -27,12 +27,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -77,6 +77,7 @@ import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dao.IUserDAO;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.util.LastNameAlphabeticComparator;
 import org.springframework.dao.DataAccessException;
 
 /**
@@ -521,7 +522,8 @@ public class SubmitFilesService implements ToolContentManager,
 		while(iterator.hasNext()){
 			SubmissionDetails submissionDetails = (SubmissionDetails)iterator.next();
 			SubmitFilesReport report = submissionDetails.getReport();
-			FileDetailsDTO detailDto = new FileDetailsDTO(submissionDetails,report);
+			UserDTO user = getUserDetails(userID);
+			FileDetailsDTO detailDto = new FileDetailsDTO(submissionDetails,report, user);
 			details.add(detailDto);
 		}
 		return details;
@@ -531,12 +533,12 @@ public class SubmitFilesService implements ToolContentManager,
 	 * value is a list container, which contains all <code>FileDetailsDTO</code> object belong to
 	 * this user.
 	 */
-	public Map getFilesUploadedBySession(Long sessionID) {
+	public SortedMap getFilesUploadedBySession(Long sessionID) {
 		List list =  submissionDetailsDAO.getSubmissionDetailsBySession(sessionID);
 		if(list!=null){
-			Map map = new HashMap();
+			SortedMap map = new TreeMap(new LastNameAlphabeticComparator());
 			Iterator iterator = list.iterator();
-			List element;
+			List userFileList;
 			while(iterator.hasNext()){
 				SubmissionDetails submissionDetails = (SubmissionDetails)iterator.next();
 				SubmitFilesReport report = submissionDetails.getReport();
@@ -548,12 +550,12 @@ public class SubmitFilesService implements ToolContentManager,
 				UserDTO user = getUserDetails(learner.getUserID());
 				
 				FileDetailsDTO detailDto = new FileDetailsDTO(submissionDetails,report,user);
-				element = (List) map.get(learner.getUserID());
+				userFileList = (List) map.get(user);
 				//if it is first time to this user, creating a new ArrayList for this user.
-				if(element == null)
-					element = new ArrayList();
-				element.add(detailDto);
-				map.put(learner.getUserID(),element);
+				if(userFileList == null)
+					userFileList = new ArrayList();
+				userFileList.add(detailDto);
+				map.put(user, userFileList);
 			}
 			return map;
 		}
