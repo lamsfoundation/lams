@@ -15,7 +15,7 @@ import org.lamsfoundation.lams.common.util.*
 	public static var SCHEDULE_GATE_ACTIVITY_TYPE:Number = 4;
 	public static var PERMISSION_GATE_ACTIVITY_TYPE:Number = 5;
 	public static var PARALLEL_ACTIVITY_TYPE:Number = 6;
-	public static var OPTIONS_ACTIVITY_TYPE:Number = 7;
+	public static var OPTIONAL_ACTIVITY_TYPE:Number = 7;
 	public static var SEQUENCE_ACTIVITY_TYPE:Number = 8;
 
 	* static final variables indicating the the category of activities
@@ -58,7 +58,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 	public static var SCHEDULE_GATE_ACTIVITY_TYPE:Number = 4;
 	public static var PERMISSION_GATE_ACTIVITY_TYPE:Number = 5;
 	public static var PARALLEL_ACTIVITY_TYPE:Number = 6;
-	public static var OPTIONS_ACTIVITY_TYPE:Number = 7;
+	public static var OPTIONAL_ACTIVITY_TYPE:Number = 7;
 	public static var SEQUENCE_ACTIVITY_TYPE:Number = 8;
 	/******************************************************************/
 	
@@ -201,6 +201,12 @@ class org.lamsfoundation.lams.authoring.Activity {
 	
 	public function isGroupActivity():Boolean{
 		if (_activityTypeID == GROUPING_ACTIVITY_TYPE){
+			return true;
+		}
+	}
+	
+	public function isOptionalActivity():Boolean{
+		if (_activityTypeID == OPTIONAL_ACTIVITY_TYPE){
 			return true;
 		}
 	}
