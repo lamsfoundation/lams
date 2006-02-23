@@ -12,6 +12,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	public static var TRANSITION_TOOL:String = "TRANSITION";  //activie tool ID strings definition
 	public static var OPTIONAL_TOOL:String = "OPTIONAL";
 	public static var GATE_TOOL:String = "GATE";
+	public static var GROUP_TOOL:String = "GROUP";
+	
+	private var _defaultGroupingTypeID;
 	
 	private var __width:Number;
 	private var __height:Number;
@@ -50,13 +53,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		_cv = cv;
 		_activitiesDisplayed = new Hashtable("_activitiesDisplayed");
 		_transitionsDisplayed = new Hashtable("_transitionsDisplayed");
-		
-		
-		
-				
-	
+
 		_activeTool = null;
 		_transitionActivities = new Array();
+		_defaultGroupingTypeID = Grouping.RANDOM_GROUPING;
 	}
 
 	
@@ -246,6 +246,43 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		//select the new thing
 		setSelectedItem(_activitiesDisplayed.get(gateAct.activityUIID));
 		
+	}
+	
+	/**
+	 * Creates a new group activity at the specified location
+	 * @usage   
+	 * @param   pos 
+	 * @return  
+	 */
+	public function createNewGroupActivity(pos){
+		Debugger.log('Running...',Debugger.GEN,'createNewGroupActivity','CanvasModel');
+		
+		//first create the grouping object
+		var newGrouping = new Grouping(_cv.ddm.newUIID());
+		newGrouping.groupingTypeID = _defaultGroupingTypeID;
+		
+		_cv.ddm.addGrouping(newGrouping);
+		
+		var groupingActivity = new GroupingActivity(_cv.ddm.newUIID());
+		groupingActivity.title = Dictionary.getValue('grouping_act_title');
+		groupingActivity.learningDesignID = _cv.ddm.learningDesignID;
+		groupingActivity.createGroupingUIID = newGrouping.groupingUIID;
+		
+		groupingActivity.yCoord = pos.y;
+		groupingActivity.xCoord = pos.x;
+		
+		
+		Debugger.log('groupingActivity.createGroupingUIID :'+groupingActivity.createGroupingUIID ,Debugger.GEN,'createNewGroupActivity','CanvasModel');
+		Debugger.log('groupingActivity.yCoord:'+groupingActivity.yCoord,Debugger.GEN,'createNewGroupActivity','CanvasModel');
+		Debugger.log('groupingActivity.xCoord:'+groupingActivity.xCoord,Debugger.GEN,'createNewGroupActivity','CanvasModel');
+
+
+		_cv.ddm.addActivity(groupingActivity);
+		
+		//tell the canvas to go refresh
+		setDirty();
+		//select the new thing
+		setSelectedItem(_activitiesDisplayed.get(groupingActivity.activityUIID));
 	}
 	
 	/**
