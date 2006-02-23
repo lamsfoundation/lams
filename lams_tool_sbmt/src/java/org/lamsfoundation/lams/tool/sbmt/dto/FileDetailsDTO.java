@@ -50,10 +50,16 @@ public class FileDetailsDTO implements Serializable{
 	private Long marks;
 	private Long uuID;
 	private Long versionID;
-	
+	private String exportedURL;  // the location of this file saved by the export function.      	
 	private UserDTO userDTO;
 	
 
+	public String getExportedURL() {
+		return exportedURL;
+	}
+	public void setExportedURL(String exportedURL) {
+		this.exportedURL = exportedURL;
+	}
 	public FileDetailsDTO(SubmissionDetails details, SubmitFilesReport report){
 		if(details == null){
 			log.warn("SubmissionDetails is null, failed to initial FileDetailDTO");
