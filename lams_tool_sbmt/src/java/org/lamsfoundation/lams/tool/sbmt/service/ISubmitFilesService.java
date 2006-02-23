@@ -21,7 +21,7 @@
 package org.lamsfoundation.lams.tool.sbmt.service;
 
 import java.util.List;
-import java.util.Map;
+import java.util.SortedMap;
 
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.IVersionedNode;
@@ -105,19 +105,13 @@ public interface ISubmitFilesService {
 	 */
 	public List getFilesUploadedByUser(Long userID, Long sessionID);
 	/**
-	 * This method returns a list of files that were uploaded by the
-	 * given <code>contentID</code>.
-	 * 
-	 * This method is used in the authoring enviornment for displaying 
-	 * the files being uploaded by the given session, as the user 
-	 * uploads them one by one.
-	 * 
+	 * This method returns a SortedMap of all files that were submitted users within a
+	 * given <code>sessionID</code>.
+	 *  
 	 * @param sessionID The <code>session_id</code> to be looked up
-	 * @return List The list of required objects.
-	 * @param sessionID
-	 * @return
+	 * @return SortedMap, the key is UserDTO, the value is a List of FileDetailsDTO objects 
 	 */
-	public Map getFilesUploadedBySession(Long sessionID);
+	public SortedMap getFilesUploadedBySession(Long sessionID);
 
 	/**
 	 * Get information of all users who have submitted file.
