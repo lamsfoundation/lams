@@ -133,12 +133,12 @@ class Toolkit {
 						//new LFError("Not able to handle this ACTIVITY_TYPE:"+ta.activityTypeID+", functionality not implemented","setToolkitLibraries",this);
 						//toolkits.splice(i,1);
 						break;
-					case Activity.OPTIONS_ACTIVITY_TYPE:
-						/*
+					case Activity.OPTIONAL_ACTIVITY_TYPE:
+						
 						var optAct:ComplexActivity = new ComplexActivity(null);
 						optAct.populateFromDTO(ta);
 						classInstanceRefs.push(optAct);
-						*/
+						
 						new LFError("Not able to handle this ACTIVITY_TYPE:"+ta.activityTypeID+", functionality not implemented","setToolkitLibraries",this);
 						toolkits.splice(i,1);
 						break;
