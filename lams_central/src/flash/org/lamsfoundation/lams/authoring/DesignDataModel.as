@@ -184,9 +184,23 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	
 		Debugger.log('Transition from:'+transition.fromUIID+', to:'+transition.toUIID,4,'addActivity','DesignDataModel');
 		_transitions.put(transition.transitionUIID,transition);
-			dispatchEvent({type:'ddmUpdate',target:this});
+		dispatchEvent({type:'ddmUpdate',target:this});
 		//TODO some validation would be nice
 		return true;
+	}
+	
+	public function addGrouping(grp:Grouping):Object{
+		//dispatch an event to show the design is going to change
+		dispatchEvent({type:'ddmBeforeUpdate',target:this});
+		Debugger.log('groupingUIID:'+grp.groupingUIID,Debugger.GEN,'addGrouping','DesignDataModel');
+		var r = _groupings.put(grp.groupingUIID,grp);
+		if(r){
+			return r;
+		}else{
+			return new LFError("Adding grouping to hashtable failed","addGrouping",this,'groupingUIID:'+grp.groupingUIID);
+		}
+		
+		
 	}
 	
 	
@@ -238,7 +252,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 				_activities.put(newToolActivity.activityUIID,newToolActivity);
 			
 			}else if(dto.objectType = "ComplexActivity"){
-				
+				//TODO: add support for Parallel and Optional activity
 			
 			}
 		}
@@ -256,6 +270,8 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 			newTransition.transitionID = tdto.transitionID;
 			_transitions.put(newTransition.transitionUIID,newTransition);
 		}
+		
+		//add a loop for the groupings.
 				
 		return success;
 	}
