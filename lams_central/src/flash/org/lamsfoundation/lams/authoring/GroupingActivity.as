@@ -11,12 +11,43 @@ class GroupingActivity extends Activity{
 	private var _createGroupingID:Number;
 	private var _createGroupingUIID:Number;
 
-	function GroupingActivity(activityUIID:Number, activityTypeID:Number, activityCategoryID:Number, learningLibraryID:Number,libraryActivityUIImage:String, createGroupingUIID:Number){
-		super(activityUIID, activityTypeID, activityCategoryID, learningLibraryID,libraryActivityUIImage);
-		_createGroupingUIID = createGroupingUIID;
+	
+	function GroupingActivity(activityUIID:Number){
+		super(activityUIID);
+		_activityTypeID = GROUPING_ACTIVITY_TYPE;
+		
 	}
 	
-		/**
+	
+	
+	/**
+	 * Creates from a dto... which is nice
+	 * @usage   
+	 * @param   dto 
+	 * @return  
+	 */
+	public function populateFromDTO(dto:Object){
+		super.populateFromDTO(dto);
+		_createGroupingID = dto.createGroupingID;
+		_createGroupingUIID = dto.createGroupingUIID;
+	}
+	
+	/**
+	 * Creates an object containing all the props
+	 * If a value is null then it is ommitted... if itsd the null value from const 
+	 * then its included
+	 * @usage   
+	 * @return  the DTO
+	 */
+	public function toData():Object{
+		var dto:Object = super.toData();
+		if(_createGroupingID){	dto.createGroupingID = _createGroupingID;	}
+		if(_createGroupingUIID){	dto.createGroupingUIID = _createGroupingUIID;	}
+		return dto;
+	}
+	
+	
+	/**
 	 * 
 	 * @usage   
 	 * @param   newcreateGroupingID 
