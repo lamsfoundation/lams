@@ -19,15 +19,15 @@ USA
 http://www.gnu.org/licenses/gpl.txt
 -->
 
-<%@ taglib uri="tags-html-el" prefix="html-el" %>
-<%@ taglib uri="tags-bean-el" prefix="bean-el" %>
-<%@ taglib uri="tags-logic-el" prefix="logic-el" %>
+<%@ taglib uri="tags-html" prefix="html" %>
+<%@ taglib uri="tags-bean" prefix="bean" %>
+<%@ taglib uri="tags-logic" prefix="logic" %>
 <%@ taglib uri="tags-core" prefix="c" %>		
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 
 <div align="center">
 
-	<html-el:form action="/grouping.do?method=completeActivity&userId=${user.userId}&lessonId=${lesson.lessonId}&activityId=${activityId}" target="_self">
+	<html:form action="/grouping.do?method=completeActivity&userId=${user.userId}&lessonId=${lesson.lessonId}&activityId=${activityId}" target="_self">
 
 		<span class="error">
 			<%-- Struts error messages --%>
@@ -47,7 +47,7 @@ http://www.gnu.org/licenses/gpl.txt
 					</table>
 				</td>
 			</tr>
-			<logic-el:iterate id="group" name="groups" indexId="gId"> 
+			<logic:iterate id="group" name="groups" indexId="gId"> 
 			<tr>
 				<td align="right" class="bodyBold" style="{border-right: solid #CCCCCC 1px; border-bottom: solid #CCCCCC 1px; }">
 					Group <c:out value="${gId+1}"/>
@@ -65,15 +65,15 @@ http://www.gnu.org/licenses/gpl.txt
 					</table>		
 				</td>
 			</tr>
-			</logic-el:iterate>
+			</logic:iterate>
 			<tr> 
 				<td align="right" valign="top" class="bodyBold">&nbsp;</td>
 				<td align="right">
-					<html-el:submit styleClass="button" value="Finished" onmouseover="pviiClassNew(this,'buttonover')" onmouseout="pviiClassNew(this,'button')"/> 
+					<html:submit styleClass="button" value="Finished" onmouseover="pviiClassNew(this,'buttonover')" onmouseout="pviiClassNew(this,'button')"/> 
 				</td>
 			</tr>
 		</table>
 
-	</html-el:form>
+	</html:form>
 
 </div>

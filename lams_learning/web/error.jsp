@@ -19,7 +19,7 @@
   http://www.gnu.org/licenses/gpl.txt 
 -->
 
-<%@ taglib uri="tags-html-el" prefix="html-el" %>
+<%@ taglib uri="tags-html" prefix="html" %>
 <%@ taglib uri="tags-logic" prefix="logic" %>
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ page import="org.apache.struts.action.Action" %>
@@ -40,9 +40,9 @@ String pathToShare = cprotocol+request.getServerName()+":"+request.getServerPort
 		<img src="<%=pathToShare%>/images/error.jpg" alt="Error occured"/>
 	</td>
 	<td width="90%" valign="middle" class="body" colspan="2">
-		 <html-el:messages id="error" message="false"> 
+		 <html:messages id="error" message="false"> 
 			 <c:out value="${error}" escapeXml="false"/><BR>
-		 </html-el:messages> 
+		 </html:messages> 
 	</td>
 </tr>
 </logic:messagesPresent>

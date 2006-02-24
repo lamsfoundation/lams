@@ -226,7 +226,7 @@ http://www.gnu.org/licenses/gpl.txt
 				<include name="**/web/form/*.java" />
 			</fileset>
 
-			<deploymentdescriptor servletspec="2.3"
+			<deploymentdescriptor servletspec="2.4" distributable="false"
 				destdir="${conf.webinf.dir}" mergedir="${conf.xdoclet.dir}"
 				sessiontimeout="${sessiontimeout}" />
 
