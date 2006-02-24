@@ -1,26 +1,27 @@
-/*
- *Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
- *
- *This program is free software; you can redistribute it and/or modify
- *it under the terms of the GNU General Public License as published by
- *the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
- *
- *This program is distributed in the hope that it will be useful,
- *but WITHOUT ANY WARRANTY; without even the implied warranty of
- *MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *GNU General Public License for more details.
- *
- *You should have received a copy of the GNU General Public License
- *along with this program; if not, write to the Free Software
- *Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- *USA
- *
- *http://www.gnu.org/licenses/gpl.txt
- */
+/***************************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ * 
+ * http://www.gnu.org/licenses/gpl.txt
+ * ***********************************************************************/
+
 package org.lamsfoundation.lams.tool.qa.service;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -525,80 +526,6 @@ public class QaServicePOJO
                                                          e);
         }
     }
-    
-//    public List retrieveQaUploadedFiles(QaContent qa, boolean fileOnline) throws QaApplicationException
-//    {
-//        try
-//        {
-//            return qaUploadedFileDAO.retrieveQaUploadedFiles(qa, fileOnline);
-//        }
-//        catch (DataAccessException e)
-//        {
-//            throw new QaApplicationException("Exception occured when lams is loading qa uploaded files: "
-//                                                         + e.getMessage(),
-//														   e);
-//        }
-//    }
-//    
-//    
-//    public List retrieveQaUploadedOfflineFilesUuid(QaContent qa)
-//    {
-//    	try
-//        {
-//            return qaUploadedFileDAO.retrieveQaUploadedOfflineFilesUuid(qa);
-//        }
-//        catch (DataAccessException e)
-//        {
-//            throw new QaApplicationException("Exception occured when lams is loading qa uploaded files: offline + uuids "
-//                                                         + e.getMessage(),
-//														   e);
-//        }
-//    }
-//    
-//    public List retrieveQaUploadedOnlineFilesUuid(QaContent qa)
-//    {
-//    	try
-//        {
-//            return qaUploadedFileDAO.retrieveQaUploadedOnlineFilesUuid(qa);
-//        }
-//        catch (DataAccessException e)
-//        {
-//            throw new QaApplicationException("Exception occured when lams is loading qa uploaded files: online + uuids "
-//                                                         + e.getMessage(),
-//														   e);
-//        }
-//    }
-//    
-//    public List retrieveQaUploadedOfflineFilesName(QaContent qa)
-//    {
-//    	try
-//        {
-//            return qaUploadedFileDAO.retrieveQaUploadedOfflineFilesName(qa);
-//        }
-//        catch (DataAccessException e)
-//        {
-//            throw new QaApplicationException("Exception occured when lams is loading qa uploaded files: offline + fileNames "
-//                                                         + e.getMessage(),
-//														   e);
-//        }
-//    }
-//    
-//    public List retrieveQaUploadedOnlineFilesName(QaContent qa)
-//    {
-//    	try
-//        {
-//            return qaUploadedFileDAO.retrieveQaUploadedOnlineFilesName(qa);
-//        }
-//        catch (DataAccessException e)
-//        {
-//            throw new QaApplicationException("Exception occured when lams is loading qa uploaded files: online + fileNames "
-//                                                         + e.getMessage(),
-//														   e);
-//        }
-//    	
-//    }
-    
-    
     
     public int countTotalNumberOfUserResponsed(QaContent qa) throws QaApplicationException
     {
@@ -1492,39 +1419,6 @@ public class QaServicePOJO
 		}
 	}
 	
-	
-//	/**
-//	 * This method is called everytime a new content has to be added to the
-//	 * repository. In order to do so first of all a valid ticket is obtained
-//	 * from the Repository hence authenticating the tool(SubmitFiles) and then
-//	 * the corresponding file is added to the repository.
-//	 * 
-//	 * @param stream
-//	 *            The <code>InputStream</code> representing the data to be
-//	 *            added
-//	 * @param fileName
-//	 *            The name of the file being added
-//	 * @param mimeType
-//	 *            The MIME type of the file (eg. TXT, DOC, GIF etc)
-//	 * @return NodeKey Represents the two part key - UUID and Version.
-//	 * @throws SubmitFilesException
-//	 */
-//	public NodeKey uploadFileToRepository(InputStream stream, String fileName) throws QaApplicationException {
-//		logger.debug("attempt getting the ticket");
-//		ITicket ticket = getRepositoryLoginTicket();
-//		logger.debug("retrieved ticket: " + ticket);
-//		
-//		try {
-//			NodeKey nodeKey = repositoryService.addFileItem(ticket, stream,
-//					fileName, null, null);
-//			logger.debug("retrieved nodeKey from repository service: " + nodeKey);
-//			return nodeKey;
-//		} catch (Exception e) {
-//			throw new QaApplicationException("Exception occured while trying to"
-//					+ " upload file into the repository" + e.getMessage());
-//		}
-//	}
-
 	
 	public InputStream downloadFile(Long uuid, Long versionID)throws QaApplicationException{
 		ITicket ticket = getRepositoryLoginTicket();		

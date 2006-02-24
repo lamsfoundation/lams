@@ -5,18 +5,52 @@
 <taglib>
   <tlib-version>1.0</tlib-version>
   <jsp-version>1.2</jsp-version>
-  <short-name>c_rt</short-name>
-  <uri>http://java.sun.com/jstl/core_rt</uri>
-  <display-name>JSTL core RT</display-name>
+  <short-name>c</short-name>
+  <uri>http://java.sun.com/jstl/core</uri>
+  <display-name>JSTL core</display-name>
   <description>JSTL 1.0 core library</description>
 
   <validator>
     <validator-class>
-        org.apache.taglibs.standard.tlv.JstlCoreTLV
+	org.apache.taglibs.standard.tlv.JstlCoreTLV
     </validator-class>
-    <description>
-        Provides core validation features for JSTL tags.
-    </description>
+    <init-param>
+	<param-name>expressionAttributes</param-name>
+	<param-value>
+	    out:value
+	    out:default
+	    out:escapeXml
+	    if:test
+	    import:url
+	    import:context
+	    import:charEncoding
+	    forEach:items
+	    forEach:begin
+	    forEach:end
+	    forEach:step
+	    forTokens:items
+	    forTokens:begin
+	    forTokens:end
+	    forTokens:step
+	    param:encode
+	    param:name
+	    param:value
+            redirect:context
+            redirect:url
+	    set:property
+	    set:target
+	    set:value
+	    url:context
+	    url:value
+	    when:test
+	</param-value>
+	<description>
+	    Whitespace-separated list of colon-separated token pairs
+	    describing tag:attribute combinations that accept expressions.
+	    The validator uses this information to determine which
+	    attributes need their syntax validated.
+	</description>
+     </init-param>
   </validator>
 
   <tag>
@@ -39,26 +73,49 @@
     <tag-class>org.apache.taglibs.standard.tag.common.core.ChooseTag</tag-class>
     <body-content>JSP</body-content>
     <description>
-	Simple conditional tag that establishes a context for
-	mutually exclusive conditional operations, marked by
-	&lt;when&gt; and &lt;otherwise&gt;
+        Simple conditional tag that establishes a context for
+        mutually exclusive conditional operations, marked by
+        &lt;when&gt; and &lt;otherwise&gt;
     </description>
   </tag>
 
   <tag>
-    <name>if</name>
-    <tag-class>org.apache.taglibs.standard.tag.rt.core.IfTag</tag-class>
+    <name>out</name>
+    <tag-class>org.apache.taglibs.standard.tag.el.core.OutTag</tag-class>
     <body-content>JSP</body-content>
     <description>
-	Simple conditional tag, which evalutes its body if the
-	supplied condition is true and optionally exposes a Boolean
-	scripting variable representing the evaluation of this condition
+	Like &lt;%= ... &gt;, but for expressions.
+    </description>
+    <attribute>
+        <name>value</name>
+        <required>true</required>
+        <rtexprvalue>false</rtexprvalue>
+    </attribute>
+    <attribute>
+        <name>default</name>
+        <required>false</required>
+        <rtexprvalue>false</rtexprvalue>
+    </attribute>
+    <attribute>
+        <name>escapeXml</name>
+        <required>false</required>
+        <rtexprvalue>false</rtexprvalue>
+    </attribute>
+  </tag>
+
+  <tag>
+    <name>if</name>
+    <tag-class>org.apache.taglibs.standard.tag.el.core.IfTag</tag-class>
+    <body-content>JSP</body-content>
+    <description>
+        Simple conditional tag, which evalutes its body if the
+        supplied condition is true and optionally exposes a Boolean
+        scripting variable representing the evaluation of this condition
     </description>
     <attribute>
         <name>test</name>
         <required>true</required>
-        <rtexprvalue>true</rtexprvalue>
-	<type>boolean</type>
+        <rtexprvalue>false</rtexprvalue>
     </attribute>
     <attribute>
         <name>var</name>
@@ -74,17 +131,17 @@
 
   <tag>
     <name>import</name>
-    <tag-class>org.apache.taglibs.standard.tag.rt.core.ImportTag</tag-class>
+    <tag-class>org.apache.taglibs.standard.tag.el.core.ImportTag</tag-class>
     <tei-class>org.apache.taglibs.standard.tei.ImportTEI</tei-class>
     <body-content>JSP</body-content>
     <description>
-        Retrieves an absolute or relative URL and exposes its contents
-        to either the page, a String in 'var', or a Reader in 'varReader'.
+	Retrieves an absolute or relative URL and exposes its contents
+	to either the page, a String in 'var', or a Reader in 'varReader'.
     </description>
     <attribute>
         <name>url</name>
         <required>true</required>
-        <rtexprvalue>true</rtexprvalue>
+        <rtexprvalue>false</rtexprvalue>
     </attribute>
     <attribute>
         <name>var</name>
@@ -104,18 +161,18 @@
     <attribute>
         <name>context</name>
         <required>false</required>
-        <rtexprvalue>true</rtexprvalue>
+        <rtexprvalue>false</rtexprvalue>
     </attribute>
     <attribute>
         <name>charEncoding</name>
         <required>false</required>
-        <rtexprvalue>true</rtexprvalue>
+        <rtexprvalue>false</rtexprvalue>
     </attribute>
   </tag>
 
   <tag>
     <name>forEach</name>
-    <tag-class>org.apache.taglibs.standard.tag.rt.core.ForEachTag</tag-class>
+    <tag-class>org.apache.taglibs.standard.tag.el.core.ForEachTag</tag-class>
     <tei-class>org.apache.taglibs.standard.tei.ForEachTEI</tei-class>
     <body-content>JSP</body-content>
     <description>
@@ -126,26 +183,22 @@
     <attribute>
 	<name>items</name>
 	<required>false</required>
-	<rtexprvalue>true</rtexprvalue>
-	<type>java.lang.Object</type>
+	<rtexprvalue>false</rtexprvalue>
     </attribute>
     <attribute>
 	<name>begin</name>
 	<required>false</required>
-	<rtexprvalue>true</rtexprvalue>
-	<type>int</type>
+	<rtexprvalue>false</rtexprvalue>
     </attribute>
     <attribute>
 	<name>end</name>
 	<required>false</required>
-	<rtexprvalue>true</rtexprvalue>
-	<type>int</type>
+	<rtexprvalue>false</rtexprvalue>
     </attribute>
     <attribute>
 	<name>step</name>
 	<required>false</required>
-	<rtexprvalue>true</rtexprvalue>
-	<type>int</type>
+	<rtexprvalue>false</rtexprvalue>
     </attribute>
     <attribute>
 	<name>var</name>
@@ -161,7 +214,7 @@
 
   <tag>
     <name>forTokens</name>
-    <tag-class>org.apache.taglibs.standard.tag.rt.core.ForTokensTag</tag-class>
+    <tag-class>org.apache.taglibs.standard.tag.el.core.ForTokensTag</tag-class>
     <body-content>JSP</body-content>
     <description>
 	Iterates over tokens, separated by the supplied delimeters
@@ -169,32 +222,27 @@
     <attribute>
 	<name>items</name>
 	<required>true</required>
-	<rtexprvalue>true</rtexprvalue>
-	<type>java.lang.String</type>
+	<rtexprvalue>false</rtexprvalue>
     </attribute>
     <attribute>
 	<name>delims</name>
 	<required>true</required>
-	<rtexprvalue>true</rtexprvalue>
-	<type>java.lang.String</type>
+	<rtexprvalue>false</rtexprvalue>
     </attribute>
     <attribute>
 	<name>begin</name>
 	<required>false</required>
-	<rtexprvalue>true</rtexprvalue>
-	<type>int</type>
+	<rtexprvalue>false</rtexprvalue>
     </attribute>
     <attribute>
 	<name>end</name>
 	<required>false</required>
-	<rtexprvalue>true</rtexprvalue>
-	<type>int</type>
+	<rtexprvalue>false</rtexprvalue>
     </attribute>
     <attribute>
 	<name>step</name>
 	<required>false</required>
-	<rtexprvalue>true</rtexprvalue>
-	<type>int</type>
+	<rtexprvalue>false</rtexprvalue>
     </attribute>
     <attribute>
 	<name>var</name>
@@ -209,66 +257,41 @@
   </tag>
 
   <tag>
-    <name>out</name>
-    <tag-class>org.apache.taglibs.standard.tag.rt.core.OutTag</tag-class>
-    <body-content>JSP</body-content>
-    <description>
-        Like &lt;%= ... &gt;, but for expressions.
-    </description> 
-    <attribute>
-        <name>value</name>
-        <required>true</required>
-        <rtexprvalue>true</rtexprvalue>
-    </attribute>
-    <attribute>
-        <name>default</name>
-        <required>false</required>
-        <rtexprvalue>true</rtexprvalue>
-    </attribute>
-    <attribute>
-        <name>escapeXml</name>
-        <required>false</required>
-        <rtexprvalue>true</rtexprvalue>
-    </attribute>
-  </tag>
-
-
-  <tag>
     <name>otherwise</name>
     <tag-class>org.apache.taglibs.standard.tag.common.core.OtherwiseTag</tag-class>
     <body-content>JSP</body-content>
     <description>
-        Subtag of &lt;choose&gt; that follows &lt;when&gt; tags
-        and runs only if all of the prior conditions evaluated to
-        'false'
+	Subtag of &lt;choose&gt; that follows &lt;when&gt; tags
+	and runs only if all of the prior conditions evaluated to
+	'false'
     </description>
   </tag>
 
   <tag>
     <name>param</name>
-    <tag-class>org.apache.taglibs.standard.tag.rt.core.ParamTag</tag-class>
+    <tag-class>org.apache.taglibs.standard.tag.el.core.ParamTag</tag-class>
     <body-content>JSP</body-content>
     <description>
-        Adds a parameter to a containing 'import' tag's URL.
+	Adds a parameter to a containing 'import' tag's URL.
     </description>
     <attribute>
         <name>name</name>
         <required>true</required>
-        <rtexprvalue>true</rtexprvalue>
+        <rtexprvalue>false</rtexprvalue>
     </attribute>
     <attribute>
         <name>value</name>
         <required>false</required>
-        <rtexprvalue>true</rtexprvalue>
+        <rtexprvalue>false</rtexprvalue>
     </attribute>
   </tag>
 
   <tag>
     <name>redirect</name>
-    <tag-class>org.apache.taglibs.standard.tag.rt.core.RedirectTag</tag-class>
+    <tag-class>org.apache.taglibs.standard.tag.el.core.RedirectTag</tag-class>
     <body-content>JSP</body-content>
     <description>
-        Redirects to a new URL.
+	Redirects to a new URL.
     </description>
     <attribute>
         <name>var</name>
@@ -282,13 +305,13 @@
     </attribute>
     <attribute>
         <name>url</name>
-        <required>false</required>
-        <rtexprvalue>true</rtexprvalue>
+        <required>true</required>
+        <rtexprvalue>false</rtexprvalue>
     </attribute>
     <attribute>
         <name>context</name>
         <required>false</required>
-        <rtexprvalue>true</rtexprvalue>
+        <rtexprvalue>false</rtexprvalue>
     </attribute>
   </tag>
 
@@ -297,7 +320,7 @@
     <tag-class>org.apache.taglibs.standard.tag.common.core.RemoveTag</tag-class>
     <body-content>empty</body-content>
     <description>
-        Removes a scoped variable (from a particular scope, if specified).
+	Removes a scoped variable (from a particular scope, if specified).
     </description>
     <attribute>
         <name>var</name>
@@ -311,12 +334,12 @@
     </attribute>
   </tag>
 
- <tag>
+  <tag>
     <name>set</name>
-    <tag-class>org.apache.taglibs.standard.tag.rt.core.SetTag</tag-class>
+    <tag-class>org.apache.taglibs.standard.tag.el.core.SetTag</tag-class>
     <body-content>JSP</body-content>
     <description>
-        Sets the result of an expression evaluation in a 'scope'
+	Sets the result of an expression evaluation in a 'scope'
     </description>
     <attribute>
         <name>var</name>
@@ -326,17 +349,17 @@
     <attribute>
         <name>value</name>
         <required>false</required>
-        <rtexprvalue>true</rtexprvalue>
+        <rtexprvalue>false</rtexprvalue>
     </attribute>
     <attribute>
         <name>target</name>
         <required>false</required>
-        <rtexprvalue>true</rtexprvalue>
+        <rtexprvalue>false</rtexprvalue>
     </attribute>
     <attribute>
         <name>property</name>
         <required>false</required>
-        <rtexprvalue>true</rtexprvalue>
+        <rtexprvalue>false</rtexprvalue>
     </attribute>
     <attribute>
         <name>scope</name>
@@ -347,10 +370,11 @@
 
   <tag>
     <name>url</name>
-    <tag-class>org.apache.taglibs.standard.tag.rt.core.UrlTag</tag-class>
+    <tag-class>org.apache.taglibs.standard.tag.el.core.UrlTag</tag-class>
     <body-content>JSP</body-content>
     <description>
-        Creates a URL with optional query parameters.
+	Prints or exposes a URL with optional query parameters
+        (via the c:param tag).
     </description>
     <attribute>
         <name>var</name>
@@ -364,29 +388,28 @@
     </attribute>
     <attribute>
         <name>value</name>
-        <required>false</required>
-        <rtexprvalue>true</rtexprvalue>
+        <required>true</required>
+        <rtexprvalue>false</rtexprvalue>
     </attribute>
     <attribute>
         <name>context</name>
         <required>false</required>
-        <rtexprvalue>true</rtexprvalue>
+        <rtexprvalue>false</rtexprvalue>
     </attribute>
   </tag>
 
   <tag>
     <name>when</name>
-    <tag-class>org.apache.taglibs.standard.tag.rt.core.WhenTag</tag-class>
+    <tag-class>org.apache.taglibs.standard.tag.el.core.WhenTag</tag-class>
     <body-content>JSP</body-content>
     <description>
-	Subtag of &lt;choose&gt; that includes its body if its
-	condition evalutes to 'true'
+        Subtag of &lt;choose&gt; that includes its body if its
+        condition evalutes to 'true'
     </description>
     <attribute>
         <name>test</name>
         <required>true</required>
-        <rtexprvalue>true</rtexprvalue>
-	<type>boolean</type>
+        <rtexprvalue>false</rtexprvalue>
     </attribute>
   </tag>
 

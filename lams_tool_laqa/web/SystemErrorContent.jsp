@@ -19,12 +19,12 @@ USA
 http://www.gnu.org/licenses/gpl.txt
 -->
 <!-- taglib definition-->
-<%@ taglib uri="tags-html-el" prefix="html" %>
-<%@ taglib uri="tags-bean" prefix="bean" %>
-<%@ taglib uri="tags-logic-el" prefix="logic-el" %>
-<%@ taglib uri="tags-c" prefix="c" %>
+<%@ taglib uri="tags-bean" prefix="bean"%> 
+<%@ taglib uri="tags-html" prefix="html"%>
+<%@ taglib uri="tags-logic" prefix="logic" %>
+<%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="tags-fck-editor" prefix="FCK" %>
+<%@ taglib uri="fck-editor" prefix="FCK" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
 <!-- end of taglib definition -->
@@ -36,7 +36,7 @@ http://www.gnu.org/licenses/gpl.txt
 				 <table width="90%" border="0" cellspacing="0" cellpadding="0">
 				 	<br/>
 					<br/>
-   					<%@ include file="Errorbox.jsp" %>
+   					<%@ include file="/Errorbox.jsp" %>
 				 </table>
 				</td>
 			 </tr>

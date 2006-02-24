@@ -1,3 +1,24 @@
+/***************************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ * 
+ * http://www.gnu.org/licenses/gpl.txt
+ * ***********************************************************************/
 package org.lamsfoundation.lams.tool.qa.web;
 
 import java.util.Iterator;
@@ -30,7 +51,6 @@ public class MonitoringUtil implements QaAppConstants{
 	 */
 	public boolean isSessionsSync(QaContent qaContent)
 	{
-    
     	/*
     	 * iterate all the tool sessions, if even one session is INCOMPLETE, the function returns false
     	 */
@@ -72,135 +92,8 @@ public class MonitoringUtil implements QaAppConstants{
 		request.getSession().removeAttribute(CHECK_ALL_SESSIONS_COMPLETED);
 		request.getSession().removeAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
 		request.getSession().removeAttribute(ATTR_USERDATA);
-//		request.getSession().removeAttribute(TOOL_SERVICE);
 		request.getSession().removeAttribute(TARGET_MODE);
 	}
-//
-//	/**
-//	 * startLesson(QaMonitoringForm qaMonitoringForm, HttpServletRequest request) throws ToolException
-//	 * 
-//	 * @param qaMonitoringForm
-//	 * @param request
-//	 * @throws ToolException
-//	 */
-//	public void startLesson(QaMonitoringForm qaMonitoringForm, HttpServletRequest request) throws ToolException
-//	{
-//		IQaService qaService=QaUtils.getToolService(request);
-//		
-//		String strFromToolContentId="";
-//	    String strToToolContentId="";
-//	    
-//		qaMonitoringForm.resetUserAction();
-//		/*
-//	     * In deployment, we won't be passing FROM_TOOL_CONTENT_ID, TO_TOOL_CONTENT_ID and TOOL_SESSION_ID from url
-//	     * the Monitoring Service bean calls:
-//	     * copyToolContent(Long fromContentId, Long toContentId)  
-//	     */
-//	    strFromToolContentId=request.getParameter(FROM_TOOL_CONTENT_ID);
-//		logger.debug("startLesson"  +  "FROM_TOOL_CONTENT_ID: " + strFromToolContentId);
-//	    if (strFromToolContentId == null)
-//	    {
-//	    	throw new QaApplicationException("Exception occured: " +
-//	    			"Tool expects a legitimate FROM_TOOL_CONTENT_ID from the container. Can't continue!");
-//	    }
-//	    
-//	    strToToolContentId=request.getParameter(TO_TOOL_CONTENT_ID);
-//	    logger.debug("startLesson" +  "TO_TOOL_CONTENT_ID: " + strToToolContentId);
-//	    if (strToToolContentId == null)
-//	    {
-//	    	throw new QaApplicationException("Exception occured: " +
-//	    			"Tool expects a legitimate TO_TOOL_CONTENT_ID from the container. Can't continue!");
-//	    }
-//	    
-//	    try
-//		{
-//	    	qaService.copyToolContent(new Long(strFromToolContentId), new Long(strToToolContentId));	
-//	    }
-//	    catch(ToolException e)
-//		{
-//	    	logger.debug("exception copying content.");
-//	    	throw e;
-//		}
-//		
-//		/* calls to these two methods will be made from Monitoring Service bean optionally depending on
-//		 *  the the tool is setup for DefineLater and (or) RunOffline 
-//		 */
-//		
-//		/*
-//		 * TESTED to work
-//		 * qaService.setAsDefineLater(new Long(strToToolContentId));
-//		   qaService.setAsRunOffline(new Long(strToToolContentId));
-//		 * 
-//		 */
-//		qaMonitoringForm.resetUserAction();
-//	}
-//	
-//	/**
-//	 * deleteLesson(QaMonitoringForm qaMonitoringForm, HttpServletRequest request)
-//	 * @param qaMonitoringForm
-//	 * @param request
-//	 */
-//	public void deleteLesson(QaMonitoringForm qaMonitoringForm, HttpServletRequest request)
-//	{
-//		IQaService qaService=QaUtils.getToolService(request);
-//		
-//		String strFromToolContentId="";
-//	    String strToToolContentId="";
-//		
-//	    qaMonitoringForm.resetUserAction();
-//				
-//		/*
-//		 * TESTED to work
-//		 */
-//		strToToolContentId=request.getParameter(TO_TOOL_CONTENT_ID);
-//	    logger.debug("TO_TOOL_CONTENT_ID: " + strToToolContentId);
-//	    if (strToToolContentId == null)
-//	    {
-//	    	throw new QaApplicationException("Exception occured: " +
-//	    			"Tool expects a legitimate TO_TOOL_CONTENT_ID from the container. Can't continue!");
-//	    }
-//		qaService.removeToolContent(new Long(strToToolContentId));
-//		qaMonitoringForm.resetUserAction();
-//	}
-//	
-//
-//	/**
-//	 * forceComplete(QaMonitoringForm qaMonitoringForm, HttpServletRequest request)
-//	 * @param qaMonitoringForm
-//	 * @param request
-//	 */
-//	public void forceComplete(QaMonitoringForm qaMonitoringForm, HttpServletRequest request)
-//	{
-//		IQaService qaService=QaUtils.getToolService(request);
-//		/*
-//		 * Parameter: userId
-//		 */
-//		qaMonitoringForm.resetUserAction();
-//		logger.debug("request for forceComplete");
-//		String userId=request.getParameter(MONITOR_USER_ID);
-//		logger.debug("MONITOR_USER_ID: " + userId);
-//		qaService.setAsForceComplete(new Long(userId));
-//		logger.debug("end of setAsForceComplete with userId: " + userId);
-//	}
-//	
-//	/**
-//	 * boolean isDefaultMonitoringScreen(QaMonitoringForm qaMonitoringForm)
-//	 * @param qaMonitoringForm
-//	 * @return boolean
-//	 */	
-//	public boolean isDefaultMonitoringScreen(QaMonitoringForm qaMonitoringForm)
-//	{
-//		if ((qaMonitoringForm.getSummary() == null) &&
-//		   (qaMonitoringForm.getInstructions() == null) &&
-//		   (qaMonitoringForm.getEditActivity() == null) &&
-//		   (qaMonitoringForm.getStats() == null))
-//		{
-//			qaMonitoringForm.setSummary("summary");
-//			return true;
-//		}
-//		return false;
-//	}
-	
 
 	/**
 	 * findSelectedMonitoringTab(ActionForm form,
@@ -249,6 +142,7 @@ public class MonitoringUtil implements QaAppConstants{
 		qaMonitoringForm.setEditActivity(null);
 		qaMonitoringForm.setStats(null);
 	}
+
 	
 	/**
 	 * boolean isNonDefaultScreensVisited(HttpServletRequest request)
@@ -276,6 +170,7 @@ public class MonitoringUtil implements QaAppConstants{
 		return false;
 	}
 
+	
 	/**
 	 * updateResponse(HttpServletRequest request, String responseId, String updatedResponse)
 	 * @param qaService
@@ -292,6 +187,7 @@ public class MonitoringUtil implements QaAppConstants{
 		logger.debug("updated user response in the db:  " + qaUsrResp);
 	}
 	
+	
 	/**
 	 * hideResponse(HttpServletRequest request, String responseId)
 	 * @param qaService
@@ -306,6 +202,7 @@ public class MonitoringUtil implements QaAppConstants{
 		qaService.updateQaUsrResp(qaUsrResp);
 		logger.debug("updated user response in the db:  " + qaUsrResp);
 	}
+	
 	
 	/**
 	 * unHideResponse(HttpServletRequest request, String responseId)

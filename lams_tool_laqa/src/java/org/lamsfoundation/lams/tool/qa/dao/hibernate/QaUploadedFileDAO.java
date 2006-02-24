@@ -46,15 +46,6 @@ public class QaUploadedFileDAO extends HibernateDaoSupport implements IQaUploade
 	 	
         private static final String GET_UPLOADED_FILES = "from QaUploadedFile qaUploadedFile where qaUploadedFile.qaContent.qaContentId = :contentId";
         
-//	 	private static final String GET_ONLINE_FILENAMES_FOR_CONTENT = "select qaUploadedFile.fileName from QaUploadedFile qaUploadedFile where qaUploadedFile.qaContentId = :qa and qaUploadedFile.fileOnline=1";
-//	 	private static final String GET_OFFLINE_FILENAMES_FOR_CONTENT = "select qaUploadedFile.fileName from QaUploadedFile qaUploadedFile where qaUploadedFile.qaContentId = :qa and qaUploadedFile.fileOnline=0";
-//	 	
-//	 	private static final String GET_ONLINE_FILES_UUID = "select qaUploadedFile.uuid from QaUploadedFile qaUploadedFile where qaUploadedFile.qaContentId = :qa and qaUploadedFile.fileOnline=1";
-//	 	private static final String GET_ONLINE_FILES_NAME ="select qaUploadedFile.fileName from QaUploadedFile qaUploadedFile where qaUploadedFile.qaContentId = :qa and qaUploadedFile.fileOnline=1 order by qaUploadedFile.uuid";
-//	 	
-//	 	private static final String GET_OFFLINE_FILES_UUID = "select qaUploadedFile.uuid from QaUploadedFile qaUploadedFile where qaUploadedFile.qaContentId = :qa and qaUploadedFile.fileOnline=0";
-//	 	private static final String GET_OFFLINE_FILES_NAME ="select qaUploadedFile.fileName from QaUploadedFile qaUploadedFile where qaUploadedFile.qaContentId = :qa and qaUploadedFile.fileOnline=0 order by qaUploadedFile.uuid";
-	 	
 	 	private static final String DELETE_FILES_META_DATA = "from qaUploadedFile in class QaUploadedFile";
 	 	
 	 	public QaUploadedFile getUploadedFileById(long submissionId)
@@ -145,54 +136,6 @@ public class QaUploadedFileDAO extends HibernateDaoSupport implements IQaUploade
 	      	listFilenames=(getHibernateTemplate().findByNamedParam(GET_UPLOADED_FILES, "contentId", qa.getQaContentId()));	
 		  return listFilenames;	
 	    }
-//	    
-//	    
-//	    public List retrieveQaUploadedOfflineFilesUuid(QaContent qa)
-//	    {
-//	      List listFilesUuid=null;
-//	    	
-//	      listFilesUuid=(getHibernateTemplate().findByNamedParam(GET_OFFLINE_FILES_UUID,
-//	                "qa",
-//	                qa));	
-//	      
-//		  return listFilesUuid;
-//	    }
-//	    
-//	    public List retrieveQaUploadedOnlineFilesUuid(QaContent qa)
-//	    {
-//	      List listFilesUuid=null;
-//	    	
-//	      listFilesUuid=(getHibernateTemplate().findByNamedParam(GET_ONLINE_FILES_UUID,
-//	                "qa",
-//	                qa));	
-//	      
-//		  return listFilesUuid;
-//	    }
-//	    
-//	    
-//	    public List retrieveQaUploadedOfflineFilesName(QaContent qa)
-//	    {
-//	      List listFilesUuid=null;
-//	    	
-//	      listFilesUuid=(getHibernateTemplate().findByNamedParam(GET_OFFLINE_FILES_NAME,
-//	                "qa",
-//	                qa));	
-//	      
-//		  return listFilesUuid;
-//	    }
-//	    
-//	    public List retrieveQaUploadedOnlineFilesName(QaContent qa)
-//	    {
-//	      List listFilesUuid=null;
-//	    	
-//	      listFilesUuid=(getHibernateTemplate().findByNamedParam(GET_ONLINE_FILES_NAME,
-//	                "qa",
-//	                qa));	
-//	      
-//		  return listFilesUuid;
-//	    }
-	    
-	    
 	    
 	    public void deleteUploadFile(QaUploadedFile qaUploadedFile)
 	    {

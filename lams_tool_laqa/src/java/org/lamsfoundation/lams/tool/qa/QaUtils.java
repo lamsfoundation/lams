@@ -1,9 +1,24 @@
-/*
- * Created on 21/04/2005
- *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
- */
+/***************************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ * 
+ * http://www.gnu.org/licenses/gpl.txt
+ * ***********************************************************************/
 package org.lamsfoundation.lams.tool.qa;
 
 import java.security.Principal;
@@ -50,11 +65,11 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 public abstract class QaUtils implements QaAppConstants {
 	static Logger logger = Logger.getLogger(QaUtils.class.getName());
 	
-//	public static IQaService getToolService(HttpServletRequest request)
-//	{
-//		IQaService qaService=(IQaService)request.getSession().getAttribute(TOOL_SERVICE);
-//	    return qaService;
-//	}
+	public static IQaService getToolService(HttpServletRequest request)
+	{
+		IQaService qaService=(IQaService)request.getSession().getAttribute(TOOL_SERVICE);
+	    return qaService;
+	}
 	
 	public static long generateId()
 	{
@@ -127,7 +142,6 @@ public abstract class QaUtils implements QaAppConstants {
 		request.getSession().removeAttribute(CHECK_ALL_SESSIONS_COMPLETED);
 		request.getSession().removeAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
 		request.getSession().removeAttribute(ATTR_USERDATA);
-//		request.getSession().removeAttribute(TOOL_SERVICE);
 		request.getSession().removeAttribute(TARGET_MODE);
     }
 
@@ -157,14 +171,6 @@ public abstract class QaUtils implements QaAppConstants {
         qaAuthoringForm.setUsernameVisible(defaultQaContent.isUsernameVisible()?ON:OFF);
         qaAuthoringForm.setSynchInMonitor(defaultQaContent.isSynchInMonitor()?ON:OFF);
         qaAuthoringForm.setQuestionsSequenced(defaultQaContent.isQuestionsSequenced()?ON:OFF);
-            
-//			request.getSession().setAttribute(TITLE,qaAuthoringForm.getTitle());
-//			request.getSession().setAttribute(INSTRUCTIONS,qaAuthoringForm.getInstructions());
-//			
-//			request.getSession().setAttribute(RICHTEXT_TITLE, defaultQaContent.getTitle());
-//		    request.getSession().setAttribute(RICHTEXT_INSTRUCTIONS, defaultQaContent.getInstructions());
-//		    request.getSession().setAttribute(RICHTEXT_OFFLINEINSTRUCTIONS,defaultQaContent.getOfflineInstructions());
-//		    request.getSession().setAttribute(RICHTEXT_ONLINEINSTRUCTIONS,defaultQaContent.getOnlineInstructions());
 	}
     
     
@@ -351,384 +357,17 @@ public abstract class QaUtils implements QaAppConstants {
 	}
 	
 	
-//	public static void configureContentRepository(HttpServletRequest request)
-//	{
-//		logger.debug("attempt configureContentRepository");
-//    	IQaService qaService =QaUtils.getToolService(request);
-//    	logger.debug("retrieving qaService from session: " + qaService);
-//    	logger.debug("calling configureContentRepository()");
-//	    qaService.configureContentRepository();
-//	    logger.debug("configureContentRepository ran successfully");
-//	}
-	
-	
-	public static void addFileToContentRepository(HttpServletRequest request, QaAuthoringForm qaAuthoringForm, boolean isOfflineFile)
+	public static void configureContentRepository(HttpServletRequest request)
 	{
-//		logger.debug("attempt addFileToContentRepository");
-//    	IQaService qaService =QaUtils.getToolService(request);
-//    	logger.debug("qaService: " + qaService);
-//        
-//        List attachmentList = (List) request.getSession().getAttribute(ATTACHMENT_LIST);
-//        List deletedAttachmentList = (List) request.getSession().getAttribute(DELETED_ATTACHMENT_LIST);
-//        
-//        FormFile uploadedFile = (isOfflineFile)?qaAuthoringForm.getTheOfflineFile():qaAuthoringForm.getTheOnlineFile();
-//        logger.debug("uploadedFile.getFileName(): " + uploadedFile.getFileName());
-//        
-//        String toolContentId=(String)request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
-//        
-//        
-////      if a file with the same name already exists then move the old one to deleted
-//        deletedAttachmentList = moveToDelete(uploadedFile.getFileName(), !isOfflineFile, null, attachmentList, deletedAttachmentList );
-        
-        
-//    	
-//    	Boolean populateUploadedFilesData=(Boolean)request.getSession().getAttribute(POPULATED_UPLOADED_FILESDATA);
-//    	logger.debug("boolean populateUploadedFilesData: " + populateUploadedFilesData);
-//    	
-//    	if ((populateUploadedFilesData !=null) && (populateUploadedFilesData.booleanValue()))
-//    	{
-//    		String toolContentId=(String)request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
-//            logger.debug("toolContentId: " + toolContentId);
-//            QaContent  defaultQaContent=qaService.loadQa(new Long(toolContentId).longValue());
-//            logger.debug("defaultQaContent: " + defaultQaContent);
-//            
-//            populateUploadedFilesMetaDataFromDb(request, defaultQaContent);
-//            logger.debug("done populateUploadedFilesMetaDataFromDb");	
-//    	}
-//    	
-//        
-//        List listUploadedOfflineFilesUuid = (List) request.getSession().getAttribute(LIST_UPLOADED_OFFLINE_FILES_UUID);
-//    	logger.debug("listUploadedOfflineFilesUuid: " + listUploadedOfflineFilesUuid);
-//    	 
-//    	List listUploadedOfflineFilesName = (List) request.getSession().getAttribute(LIST_UPLOADED_OFFLINE_FILES_NAME);
-//    	logger.debug("listUploadedOfflineFilesName: " + listUploadedOfflineFilesName);
-//    	
-//    	List listUploadedOnlineFilesUuid = (List) request.getSession().getAttribute(LIST_UPLOADED_ONLINE_FILES_UUID);
-//    	logger.debug("listUploadedOnlineFilesUuid: " + listUploadedOnlineFilesUuid);
-//    	
-//    	List listUploadedOnlineFilesName = (List) request.getSession().getAttribute(LIST_UPLOADED_ONLINE_FILES_NAME);
-//    	logger.debug("listUploadedOnlineFilesName: " + listUploadedOnlineFilesName);
-//    	
-//    	List listUploadedOfflineFiles= (List) request.getSession().getAttribute(LIST_UPLOADED_OFFLINE_FILES);
-//    	logger.debug("listUploadedOfflineFiles: " + listUploadedOfflineFiles);
-//    	
-//    	List listUploadedOfflineFileNames=(List)request.getSession().getAttribute(LIST_UPLOADED_OFFLINE_FILENAMES);
-//    	logger.debug("listUploadedOfflineFiles: " + listUploadedOfflineFiles);
-//    	
-//    	List listUploadedOnlineFileNames=(List)request.getSession().getAttribute(LIST_UPLOADED_ONLINE_FILENAMES);
-//    	logger.debug("listUploadedOnlineFileNames: " + listUploadedOnlineFileNames);
-//    	
-//    	
-//    	if (listUploadedOfflineFileNames == null) 
-//    		listUploadedOfflineFileNames = new LinkedList();
-//    	logger.debug("listUploadedOfflineFileNames: " + listUploadedOfflineFileNames);
-//    	
-//    	if (listUploadedOnlineFileNames == null) 
-//    		listUploadedOnlineFileNames = new LinkedList();
-//    	logger.debug("listUploadedOnlineFileNames: " + listUploadedOnlineFileNames);
-//	    
-//    	Map allOfflineUuids= new TreeMap(new QaComparator());
-//    	if ((listUploadedOfflineFilesUuid != null) && (listUploadedOfflineFilesName != null))
-//    	{
-//    		logger.debug("listUploadedOfflineFilesUuid and listUploadedOfflineFilesName are not null");
-//    		Iterator listUploadedOfflineFilesUuidIterator=listUploadedOfflineFilesUuid.iterator();
-//    		int counter=1;
-//    		logger.debug("allOfflineUuids: " + allOfflineUuids);
-//    		while (listUploadedOfflineFilesUuidIterator.hasNext())
-//			{
-//    			String uuid = (String)listUploadedOfflineFilesUuidIterator.next();
-//    			allOfflineUuids.put(new Integer(counter).toString(), uuid);
-//    			counter++;
-//    		}
-//    		logger.debug("allOfflineUuids: " + allOfflineUuids);
-//    		Iterator listUploadedOfflineFilesNameIterator=listUploadedOfflineFilesName.iterator();
-//    		
-//    		counter=1;
-//    		while (listUploadedOfflineFilesNameIterator.hasNext())
-//    		{
-//    				String fileName = (String)listUploadedOfflineFilesNameIterator.next();
-//    				if (!offLineFileNameExists(request,fileName))
-//    				{
-//    					logger.debug("reading with counter: " + new Integer(counter).toString());
-//                		String uuid=(String)allOfflineUuids.get(new Integer(counter).toString());
-//            			logger.debug("parsed uuid: " + uuid);
-//            			listUploadedOfflineFiles.add(uuid + '~'+ fileName);
-//            			counter++;	
-//    				}
-//    				else
-//    				{
-//    					logger.debug("offline fileName exists: " +fileName);
-//    				}
-//    		}
-//    		logger.debug("final listUploadedOfflineFiles: " + listUploadedOfflineFiles);
-//    		request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILES,listUploadedOfflineFiles);
-//    	}
-//    	/*
-//    	List listUploadedOfflineFileNames = (List) request.getSession().getAttribute(LIST_UPLOADED_OFFLINE_FILENAMES);
-//    	logger.debug("listUploadedOfflineFileNames: " + listUploadedOfflineFileNames);
-//    	
-//    	
-//    	List listUploadedOnlineFileNames = (List) request.getSession().getAttribute(LIST_UPLOADED_ONLINE_FILENAMES);
-//    	logger.debug("listUploadedOnlineFileNames: " + listUploadedOnlineFileNames);
-//    	*/
-//    	
-//    	
-//    	/* holds final online files list */
-//    	List listUploadedOnlineFiles= (List) request.getSession().getAttribute(LIST_UPLOADED_ONLINE_FILES);
-//    	logger.debug("listUploadedOnlineFiles: " + listUploadedOnlineFiles);
-//    	
-//    	Map allOnlineUuids= new TreeMap(new QaComparator());
-//    	if ((listUploadedOnlineFilesUuid != null) && (listUploadedOnlineFilesName != null))
-//    	{
-//    		logger.debug("listUploadedOnlineFilesUuid and listUploadedOnlineFilesName are not null");
-//    		Iterator listUploadedOnlineFilesUuidIterator=listUploadedOnlineFilesUuid.iterator();
-//    		int counter=1;
-//    		logger.debug("allOnlineUuids: " + allOnlineUuids);
-//    		while (listUploadedOnlineFilesUuidIterator.hasNext())
-//			{
-//    			String uuid = (String)listUploadedOnlineFilesUuidIterator.next();
-//    			allOnlineUuids.put(new Integer(counter).toString(), uuid);
-//    			counter++;
-//    			
-//			}
-//    		logger.debug("allOnlineUuids: " + allOnlineUuids);
-//    		Iterator listUploadedOnlineFilesNameIterator=listUploadedOnlineFilesName.iterator();
-//    		
-//    		counter=1;
-//    		while (listUploadedOnlineFilesNameIterator.hasNext())
-//    		{
-//    			String fileName = (String)listUploadedOnlineFilesNameIterator.next();
-//    			if (!onLineFileNameExists(request,fileName))
-//    			{
-//    				logger.debug("reading with counter: " + new Integer(counter).toString());
-//        			String uuid=(String)allOnlineUuids.get(new Integer(counter).toString());
-//        			logger.debug("parsed uuid: " + uuid);
-//        			listUploadedOnlineFiles.add(uuid + '~'+ fileName);
-//        			counter++;	
-//    			}
-//    			else
-//    			{
-//    				logger.debug("online fileName exists: " +fileName);
-//    			}
-//    			
-//        		
-//    		}
-//    		logger.debug("final listUploadedOnlineFiles: " + listUploadedOnlineFiles);
-//    		request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILES,listUploadedOnlineFiles);
-//    	}
-//    	
-//    	
-//    	if (isOfflineFile)
-//    	{
-//    		/* read uploaded file informtion  - offline file*/
-//    		logger.debug("retrieve theOfflineFile.");
-//    		FormFile theOfflineFile = qaAuthoringForm.getTheOfflineFile();
-//    		logger.debug("retrieved theOfflineFile: " + theOfflineFile);
-//    		
-//    		String offlineFileName="";
-//    		NodeKey nodeKey=null;
-//    		String offlineFileUuid="";
-//    		try
-//    		{
-//    			InputStream offlineFileInputStream = theOfflineFile.getInputStream();
-//    			logger.debug("retrieved offlineFileInputStream: " + offlineFileInputStream);
-//    			offlineFileName=theOfflineFile.getFileName();
-//    			logger.debug("retrieved offlineFileName: " + offlineFileName);
-//    	    	nodeKey=qaService.uploadFileToRepository(offlineFileInputStream, offlineFileName);
-//    	    	logger.debug("repository returned nodeKey: " + nodeKey);
-//    	    	logger.debug("repository returned offlineFileUuid nodeKey uuid: " + nodeKey.getUuid());
-//    	    	offlineFileUuid=nodeKey.getUuid().toString();
-//    	    	logger.debug("offline file added to contentRepository");
-//    	    	logger.debug("using listUploadedOfflineFiles: " + listUploadedOfflineFiles);
-//    	    	listUploadedOfflineFiles.add(offlineFileUuid + "~" + offlineFileName);
-//    	    	logger.debug("listUploadedOfflineFiles updated: " + listUploadedOfflineFiles);
-//    	    	request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILES,listUploadedOfflineFiles);
-//    	 
-//    	    	listUploadedOfflineFileNames.add(offlineFileName);
-//    	    	request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILENAMES,listUploadedOfflineFileNames);
-//    	    }
-//    		catch(FileNotFoundException e)
-//    		{
-//    			logger.debug("exception occured, offline file not found : " + e.getMessage());
-//    			//possibly give warning to user in request scope
-//    		}
-//    		catch(IOException e)
-//    		{
-//    			logger.debug("exception occured in offline file transfer: " + e.getMessage());
-//    			//possibly give warning to user in request scope
-//    		}
-//    		catch(QaApplicationException e)
-//    		{
-//    			logger.debug("exception occured in accessing the repository server: " + e.getMessage());
-//    			//possibly give warning to user in request scope
-//    		}
-//    	}
-//    	else
-//    	{
-//    		/** read uploaded file information  - online file*/
-//    		logger.debug("retrieve theOnlineFile");
-//    		FormFile theOnlineFile = qaAuthoringForm.getTheOnlineFile();
-//    		logger.debug("retrieved theOnlineFile: " + theOnlineFile);
-//    		
-//    		String onlineFileName="";
-//    		NodeKey nodeKey=null;
-//    		String onlineFileUuid="";
-//    		try
-//    		{
-//    			InputStream onlineFileInputStream = theOnlineFile.getInputStream();
-//    			logger.debug("retrieved onlineFileInputStream: " + onlineFileInputStream);
-//    			onlineFileName=theOnlineFile.getFileName();
-//    			logger.debug("retrieved onlineFileName: " + onlineFileName);
-//    	    	nodeKey=qaService.uploadFileToRepository(onlineFileInputStream, onlineFileName);
-//    	    	logger.debug("repository returned nodeKey: " + nodeKey);
-//    	    	logger.debug("repository returned onlineFileUuid nodeKey uuid: " + nodeKey.getUuid());
-//    	    	onlineFileUuid=nodeKey.getUuid().toString();
-//    	    	logger.debug("online file added to contentRepository");
-//    	    	listUploadedOnlineFiles.add(onlineFileUuid + "~" + onlineFileName);
-//    	    	logger.debug("listUploadedOnlineFiles updated: " + listUploadedOnlineFiles);
-//    	    	request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILES,listUploadedOnlineFiles);
-//    	    	
-//    	    	listUploadedOnlineFileNames.add(onlineFileName);
-//    	    	request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILENAMES,listUploadedOnlineFileNames);
-//    	    }
-//    		catch(FileNotFoundException e)
-//    		{
-//    			logger.debug("exception occured, online file not found : " + e.getMessage());
-//    			//possibly give warning to user in request scope
-//    		}
-//    		catch(IOException e)
-//    		{
-//    			logger.debug("exception occured in online file transfer: " + e.getMessage());
-//    			//possibly give warning to user in request scope
-//    		}
-//    		catch(QaApplicationException e)
-//    		{
-//    			logger.debug("exception occured in accessing the repository server: " + e.getMessage());
-//    			//possibly give warning to user in request scope
-//    		}	
-//    	}
-//		
-//    
-//    	if ((populateUploadedFilesData != null) && (populateUploadedFilesData.booleanValue()))
-//    	{
-//    		logger.debug("removing ofline + online file list attributes");
-//    		request.getSession().removeAttribute(LIST_UPLOADED_OFFLINE_FILES_UUID);
-//    		request.getSession().removeAttribute(LIST_UPLOADED_OFFLINE_FILES_NAME);
-//    		request.getSession().removeAttribute(LIST_UPLOADED_ONLINE_FILES_UUID);
-//    		request.getSession().removeAttribute(LIST_UPLOADED_ONLINE_FILES_NAME);
-//    	}
+		logger.debug("attempt configureContentRepository");
+    	IQaService qaService =QaUtils.getToolService(request);
+    	logger.debug("retrieving qaService from session: " + qaService);
+    	logger.debug("calling configureContentRepository()");
+	    qaService.configureContentRepository();
+	    logger.debug("configureContentRepository ran successfully");
 	}
 	
-//	static boolean offLineFileNameExists(HttpServletRequest request,String fileName)
-//	{
-//		logger.debug("attempt populateUploadedFilesData");
-//		IQaService qaService =QaUtils.getToolService(request);
-//    	logger.debug("qaService: " + qaService);
-//    	
-//    	String toolContentId=(String)request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
-//        logger.debug("toolContentId: " + toolContentId);
-//        QaContent  defaultQaContent=qaService.loadQa(new Long(toolContentId).longValue());
-//        logger.debug("defaultQaContent: " + defaultQaContent);
-//    	
-//	    /** read the uploaded offline uuid + file name pair */
-//	    List listOfflineFilesName=new LinkedList();
-//	    listOfflineFilesName=qaService.retrieveQaUploadedOfflineFilesName(defaultQaContent);
-//	    logger.debug("listOfflineFilesName: " + listOfflineFilesName);
-//	    
-//	    Iterator listOfflineFilesNameIterator=listOfflineFilesName.iterator();
-//		while (listOfflineFilesNameIterator.hasNext())
-//		{
-//			String currentFileName = (String)listOfflineFilesNameIterator.next();
-//    		logger.debug("currentFileName: " + currentFileName);
-//    		if (currentFileName.equalsIgnoreCase(fileName))
-//    		{
-//    			logger.debug("existing fileName: " + currentFileName);
-//    			return true;
-//    		}
-//		}
-//		return false;
-//	}
 	
-//	static boolean onLineFileNameExists(HttpServletRequest request,String fileName)
-//	{
-//		logger.debug("attempt populateUploadedFilesData");
-//		IQaService qaService =QaUtils.getToolService(request);
-//    	logger.debug("qaService: " + qaService);
-//    	
-//    	String toolContentId=(String)request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
-//        logger.debug("toolContentId: " + toolContentId);
-//        QaContent  defaultQaContent=qaService.loadQa(new Long(toolContentId).longValue());
-//        logger.debug("defaultQaContent: " + defaultQaContent);
-//    	
-//	    /* read the uploaded offline uuid + file name pair */
-//	    List listOnlineFilesName=new LinkedList();
-//	    listOnlineFilesName=qaService.retrieveQaUploadedOnlineFilesName(defaultQaContent);
-//	    logger.debug("listOnlineFilesName: " + listOnlineFilesName);
-//	    
-//	    Iterator listOnlineFilesNameIterator=listOnlineFilesName.iterator();
-//		while (listOnlineFilesNameIterator.hasNext())
-//		{
-//			String currentFileName = (String)listOnlineFilesNameIterator.next();
-//    		logger.debug("currentFileName: " + currentFileName);
-//    		if (currentFileName.equalsIgnoreCase(fileName))
-//    		{
-//    			logger.debug("existing fileName: " + currentFileName);
-//    			return true;
-//    		}
-//    			
-//		}
-//		return false;
-//	}
-
-//	public static void populateUploadedFilesData(HttpServletRequest request, QaContent defaultQaContent)
-//	{
-//		populateUploadedFilesMetaDataFromDb(request, defaultQaContent);
-//	    request.getSession().setAttribute(POPULATED_UPLOADED_FILESDATA, new Boolean(true));
-//	}
-
-	
-//	public static void populateUploadedFilesMetaDataFromDb(HttpServletRequest request, QaContent defaultQaContent)
-//	{
-//		logger.debug("attempt populateUploadedFilesData");
-//		IQaService qaService =QaUtils.getToolService(request);
-//    	logger.debug("qaService: " + qaService);
-//
-//		/* just for jsp purposes **
-//	    /* read the uploaded offline uuid + file name pair */
-//	    List listOfflineFilesUuid=new LinkedList();
-//	    listOfflineFilesUuid=qaService.retrieveQaUploadedOfflineFilesUuid(defaultQaContent);
-//	    logger.debug("initial listOfflineFilesUuid: " + listOfflineFilesUuid);
-//	    request.getSession().removeAttribute(LIST_UPLOADED_OFFLINE_FILES_UUID);
-//	    request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILES_UUID, listOfflineFilesUuid);
-//	    
-//	    /* read the uploaded online uuid + file name pair */
-//	    List listOnlineFilesUuid=new LinkedList();
-//	    listOnlineFilesUuid=qaService.retrieveQaUploadedOnlineFilesUuid(defaultQaContent);
-//	    logger.debug("initial listOnlineFilesUuid: " + listOnlineFilesUuid);
-//	    request.getSession().removeAttribute(LIST_UPLOADED_ONLINE_FILES_UUID);
-//	    request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILES_UUID, listOnlineFilesUuid);
-//	    
-//	    /* read the uploaded offline uuid + file name pair */
-//	    List listOfflineFilesName=new LinkedList();
-//	    listOfflineFilesName=qaService.retrieveQaUploadedOfflineFilesName(defaultQaContent);
-//	    logger.debug("initial listOfflineFilesName: " + listOfflineFilesName);
-//	    request.getSession().removeAttribute(LIST_UPLOADED_OFFLINE_FILES_NAME);
-//	    request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILES_NAME, listOfflineFilesName);
-//	    
-//	    /* read the uploaded online uuid + file name pair */
-//	    List listOnlineFilesName=new LinkedList();
-//	    listOnlineFilesName=qaService.retrieveQaUploadedOnlineFilesName(defaultQaContent);
-//	    logger.debug("initial listOnlineFilesName: " + listOnlineFilesName);
-//	    request.getSession().removeAttribute(LIST_UPLOADED_ONLINE_FILES_NAME);
-//	    request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILES_NAME, listOnlineFilesName);
-//	    
-//	    request.getSession().removeAttribute(LIST_UPLOADED_OFFLINE_FILENAMES);
-//	    request.getSession().removeAttribute(LIST_UPLOADED_ONLINE_FILENAMES);
-//	    request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILENAMES, listOfflineFilesName);
-//	    request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILENAMES, listOnlineFilesName);
-//	}
-
-    
     public static void populateUploadedFilesData(HttpServletRequest request, QaContent qaContent, IQaService qaService) {
         List attachmentList = qaService.retrieveQaUploadedFiles(qaContent); 
         request.getSession().setAttribute(ATTACHMENT_LIST, attachmentList);

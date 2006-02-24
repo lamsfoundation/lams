@@ -1,23 +1,24 @@
-/*
- *Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
- *
- *This program is free software; you can redistribute it and/or modify
- *it under the terms of the GNU General Public License as published by
- *the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
- *
- *This program is distributed in the hope that it will be useful,
- *but WITHOUT ANY WARRANTY; without even the implied warranty of
- *MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *GNU General Public License for more details.
- *
- *You should have received a copy of the GNU General Public License
- *along with this program; if not, write to the Free Software
- *Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- *USA
- *
- *http://www.gnu.org/licenses/gpl.txt
- */
+/***************************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ * 
+ * http://www.gnu.org/licenses/gpl.txt
+ * ***********************************************************************/
 package org.lamsfoundation.lams.tool.qa;
 
 import java.io.Serializable;
@@ -76,13 +77,6 @@ public class QaQueUsr implements Serializable, Comparable, Nullable
     /** persistent field */
     private Set qaUsrResps;  
     
-    public QaQueUsr()
-	{
-		logger.debug(logger + " " + this.getClass().getName() +  "in constructor: QaQueUsr()");
-	}
-    
-    
-    
     /** full constructor */
     public QaQueUsr(Long queUsrId,
                     String username,
@@ -126,7 +120,6 @@ public class QaQueUsr implements Serializable, Comparable, Nullable
 	}
     
     
-
     public QaQueUsr(String username,
                     String fullname,
                     QaQueContent qaQueContent,
@@ -142,8 +135,6 @@ public class QaQueUsr implements Serializable, Comparable, Nullable
     }
 
     
-
-    //implement this, double check this, what is it for?
     /**
      * Copy construtor; We copy all data except the hibernate id field.
      * @param queUsr the original survey question user object.
@@ -440,16 +431,6 @@ public class QaQueUsr implements Serializable, Comparable, Nullable
     {
         
     	QaQueUsr qUser = (QaQueUsr) o;
-    	/*
-    	if (this.qaQueContent == null
-                && qUser.getQaQueContent() == null)
-            return String.CASE_INSENSITIVE_ORDER.compare(username,
-                                                         qUser.username);
-        if (this.qaQueContent == null)
-            return 1;
-        if (qUser.getQaQueContent() == null)
-            return -1;
-        */      
         return this.getQaQueContent().compareTo(qUser.getQaQueContent());
     }
     
