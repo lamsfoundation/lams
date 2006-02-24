@@ -13,9 +13,9 @@
 <%@ page import="org.lamsfoundation.lams.usermanagement.User" %>
 <%@ page import="org.lamsfoundation.lams.web.util.AttributeNames" %>
 <%@ taglib uri="tags-bean" prefix="bean" %>
-<%@ taglib uri="tags-html-el" prefix="html" %>
+<%@ taglib uri="tags-html" prefix="html" %>
 <%@ taglib uri="tags-logic" prefix="logic" %>
-<%@ taglib uri="http://java.sun.com/jstl/core" prefix="c" %>
+<%@ taglib uri="tags-core" prefix="c" %>
 
 <html>
 <head>

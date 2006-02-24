@@ -1,6 +1,6 @@
 <%@ page contentType="text/html; charset=iso-8859-1" language="java" %>
 <%@ page import="org.lamsfoundation.lams.admin.web.OrganisationActionForm" %>
-<%@ taglib uri="http://java.sun.com/jstl/core" prefix="c" %>
+<%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-html" prefix="html" %>
 
 <html:form action="/admin/organisation" method="post">

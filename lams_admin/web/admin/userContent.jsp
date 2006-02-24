@@ -3,7 +3,7 @@
 <%@ page import="org.lamsfoundation.lams.usermanagement.Organisation" %>
 <%@ page import="org.lamsfoundation.lams.usermanagement.Role" %>
 <%@ page import="org.lamsfoundation.lams.usermanagement.User" %>
-<%@ taglib uri="http://java.sun.com/jstl/core" prefix="c" %>
+<%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-bean" prefix="bean" %>
 <%@ taglib uri="tags-html" prefix="html" %>
 <%@ taglib uri="tags-logic" prefix="logic" %>
