@@ -1,11 +1,25 @@
-/* ********************************************************************************
- *  Copyright Notice
- *  =================
- * This file contains propriety information of LAMS Foundation. 
- * Copying or reproduction with prior written permission is prohibited.
- * Copyright (c) 2004 
- * Created on 2004-12-23
- ******************************************************************************** */
+/***************************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ * 
+ * http://www.gnu.org/licenses/gpl.txt
+ * ***********************************************************************/
+
 
 package org.lamsfoundation.lams.tool.mc;
 
@@ -40,21 +54,6 @@ public class TestMcOptionsContent extends McDataAccessTestCase
         super(name);
     }
     
-    /*	
-    public void testCreateMcOptionsContent()
-    {
-    	McQueContent mcQueContent = mcQueContentDAO.getMcQueContentByUID(new Long(1));
-    	McOptsContent mcOptionsContent= new McOptsContent(new Long(777), true, "red", mcQueContent, new HashSet());
-    	mcOptionsContentDAO.saveMcOptionsContent(mcOptionsContent);
-    	
-    	McOptsContent mcOptionsContent2= new McOptsContent(new Long(888), false, "blue", mcQueContent, new HashSet());
-    	mcOptionsContentDAO.saveMcOptionsContent(mcOptionsContent2);
-    	
-    	McOptsContent mcOptionsContent3= new McOptsContent(new Long(999), false, "yellow", mcQueContent, new HashSet());
-    	mcOptionsContentDAO.saveMcOptionsContent(mcOptionsContent3);
-    }
-  */
-    
     public void testRetrieveMcOptionsContent()
     {
     	List list=mcOptionsContentDAO.findMcOptionsContentByQueId(new Long(1));
@@ -67,7 +66,6 @@ public class TestMcOptionsContent extends McDataAccessTestCase
     		System.out.println("option text:" + mcOptsContent.getMcQueOptionText());
     	}
     }
-    
 }
 
 

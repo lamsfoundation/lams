@@ -1,4 +1,4 @@
-<!--
+<%--
 Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
 
 This program is free software; you can redistribute it and/or modify
@@ -17,14 +17,19 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 USA
 
 http://www.gnu.org/licenses/gpl.txt
--->
-<%@ taglib uri="tags-tiles" prefix="tiles" %>
-<%@ taglib uri="tags-html" prefix="html" %>
+--%>
+
+<%@ taglib uri="tags-bean" prefix="bean"%> 
+<%@ taglib uri="tags-html" prefix="html"%>
+<%@ taglib uri="tags-logic" prefix="logic" %>
+<%@ taglib uri="tags-logic-el" prefix="logic-el" %>
+<%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="tags-c" prefix="c" %>
-<%@ taglib uri="tags-fck-editor" prefix="FCK" %>
+<%@ taglib uri="fck-editor" prefix="FCK" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
+<c:set var="lams"><lams:LAMSURL/></c:set>
+<c:set var="tool"><lams:WebAppURL/></c:set>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html:html locale = "true">

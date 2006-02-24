@@ -1,4 +1,4 @@
-<!--
+<%--
 Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
 
 This program is free software; you can redistribute it and/or modify
@@ -17,4 +17,12 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 USA
 
 http://www.gnu.org/licenses/gpl.txt
--->
+--%>
+
+<%@ taglib uri="tags-bean" prefix="bean"%> 
+<%@ taglib uri="tags-html" prefix="html"%>
+<%@ taglib uri="tags-logic" prefix="logic" %>
+<%@ taglib uri="tags-core" prefix="c"%>
+<%@ taglib uri="tags-fmt" prefix="fmt" %>
+<%@ taglib uri="fck-editor" prefix="FCK" %>
+<%@ taglib uri="tags-lams" prefix="lams" %>

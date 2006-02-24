@@ -181,6 +181,8 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 	 	IMcService mcService =McUtils.getToolService(request);
 	 	AuthoringUtil.readData(request, mcAuthoringForm);	 	
 	 	mcAuthoringForm.resetUserAction();
+	 	
+	 	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
 	 	return null;
     }
 
@@ -205,6 +207,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 	{
     	logger.debug("dispatching addNewQuestion...");
     	McUtils.debugMaps(request);
+    	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
     	
     	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 	 	IMcService mcService =McUtils.getToolService(request);
@@ -336,6 +339,8 @@ public class McAction extends LamsDispatchAction implements McAppConstants
                                          ServletException
 	{
     	logger.debug("dispatching removeQuestion...");
+    	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
+    	
     	McUtils.debugMaps(request);
     	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 	 	IMcService mcService =McUtils.getToolService(request);
@@ -455,6 +460,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     {
     	logger.debug("dispatching editOptions...");
     	McUtils.debugMaps(request);
+    	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
     	
     	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 	 	IMcService mcService =McUtils.getToolService(request);
@@ -812,6 +818,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
                                          ServletException
     {
     	logger.debug("dispatching addOption...");
+    	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
     	McUtils.debugMaps(request);
     	
     	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
@@ -963,6 +970,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
                                          ServletException
     {
     	logger.debug("dispatching removeOption...");
+    	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
     	McUtils.debugMaps(request);
     	
     	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
@@ -1104,6 +1112,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
                                          ServletException
     {
     	logger.debug("dispatching moveQuestionDown...");
+    	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
     	McUtils.debugMaps(request);
     	
     	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
@@ -1213,6 +1222,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
                                          ServletException
     {
     	logger.debug("dispatching moveQuestionUp...");
+    	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
     	McUtils.debugMaps(request);
     	
     	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
@@ -1321,6 +1331,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
                                          ServletException
     {
     	logger.debug("dispatching doneOptions...");
+    	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
     	McUtils.debugMaps(request);
     	
     	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
@@ -1470,6 +1481,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
                                          ToolException
     {
     	logger.debug("dispatching editActivityQuestions...");
+    	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
     	McUtils.debugMaps(request);
     	
 	 	IMcService mcService =McUtils.getToolService(request);
@@ -1511,6 +1523,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 
     {
     	logger.debug("dispatching submitQuestions...");
+    	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
     	McUtils.debugMaps(request);
     	
     	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
@@ -1886,7 +1899,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		errors.add(Globals.ERROR_KEY,new ActionMessage("sbmt.successful"));
 		logger.debug("add sbmt.successful to ActionMessages");
 		saveErrors(request,errors);
-		request.setAttribute(SUBMIT_SUCCESS, new Integer(1));
+		request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(1));
 		logger.debug("set SUBMIT_SUCCESS to 1");
 		
 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
@@ -1953,6 +1966,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 
     {
     	logger.debug("dispatching deleteOfflineFile...");
+    	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
     	McUtils.debugMaps(request);
     	
     	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
@@ -2003,6 +2017,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 
     {
     	logger.debug("dispatching deleteOnlineFile...");
+    	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
     	McUtils.debugMaps(request);
     	
     	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
@@ -2052,6 +2067,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
                                          RepositoryCheckedException
     {
     	logger.debug("dispatching submitOfflineFile...");
+    	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
     	McUtils.debugMaps(request);
     	
     	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
@@ -2121,7 +2137,9 @@ public class McAction extends LamsDispatchAction implements McAppConstants
                                          RepositoryCheckedException
     {
     	logger.debug("dispatching submitOnlineFiles...");
+    	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
     	McUtils.debugMaps(request);
+    	
     	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 	 	IMcService mcService =McUtils.getToolService(request);
 
@@ -2186,6 +2204,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
                                          ServletException
     {
     	logger.debug("dispatching doneAdvancedTab...");
+    	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
     	McUtils.debugMaps(request);
     	
     	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
@@ -2225,6 +2244,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
                                          ServletException
     {
     	logger.debug("dispatching doneInstructionsTab...");
+    	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
     	McUtils.debugMaps(request);
     	
     	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
@@ -2270,7 +2290,9 @@ public class McAction extends LamsDispatchAction implements McAppConstants
                                          ServletException
     {
     	logger.debug("dispatching cancelAuthoring...");
+    	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
     	McUtils.debugMaps(request);
+    	
     	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 	 	
 	 	/* determine whether the request is from Monitoring url Edit Activity*/
@@ -2300,6 +2322,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     protected boolean validateQuestionWeights(HttpServletRequest request, Map mapWeights, McAuthoringForm mcAuthoringForm)
     {
     	logger.debug("mapWeights: " + mapWeights);
+    	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
     	McUtils.debugMaps(request);
     	
     	Iterator itMap = mapWeights.entrySet().iterator();

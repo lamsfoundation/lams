@@ -1,10 +1,35 @@
-<%@ taglib uri="tags-html-el" prefix="html" %>
-<%@ taglib uri="tags-bean" prefix="bean" %>
+<%--
+Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+USA
+
+http://www.gnu.org/licenses/gpl.txt
+--%>
+
+<%@ taglib uri="tags-bean" prefix="bean"%> 
+<%@ taglib uri="tags-html" prefix="html"%>
+<%@ taglib uri="tags-logic" prefix="logic" %>
 <%@ taglib uri="tags-logic-el" prefix="logic-el" %>
-<%@ taglib uri="tags-c" prefix="c" %>
+<%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="tags-fck-editor" prefix="FCK" %>
+<%@ taglib uri="fck-editor" prefix="FCK" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
+
+<c:set var="lams"><lams:LAMSURL/></c:set>
+<c:set var="tool"><lams:WebAppURL/></c:set>
 
 				<table class="forms">
 					
@@ -79,17 +104,18 @@
 	
 								  	<td NOWRAP bgcolor="#EEEEEE" class="input"  align=center valign=top>			
 								 		<c:if test="${sessionScope.queIndex == 1}"> 		
-			   								 <font size=2>  <img src="images/down.gif" align=left onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','moveQuestionDown');"> </font>
+			   								 <font size=2>  <img src="<c:out value="${tool}"/>images/down.gif" align=left onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','moveQuestionDown');"> </font>
 		   								</c:if> 			
+		   								
 		
 						  				<c:if test="${sessionScope.maxQuestionIndex == sessionScope.queIndex}"> 			
-		     								 <font size=2> <img src="images/up.gif" align=left onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','moveQuestionUp');"> </font>
+		     								 <font size=2> <img src="<c:out value="${tool}"/>images/up.gif" align=left onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','moveQuestionUp');"> </font>
 		     							</c:if> 	    
 										
 		 				  				<c:if test="${(sessionScope.maxQuestionIndex != sessionScope.queIndex) && (sessionScope.queIndex != 1)}"> 			
 			 				  				<font size=2>
-			   								    <img src="images/down.gif" align=left onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','moveQuestionDown');">		  	   								 
-			       								<img src="images/up.gif" align=left onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','moveQuestionUp');">		  	
+			   								    <img src="<c:out value="${tool}"/>images/down.gif" align=left onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','moveQuestionDown');">		  	   								 
+			       								<img src="<c:out value="${tool}"/>images/up.gif" align=left onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','moveQuestionUp');">		  	
 			       							</font>
 										</c:if> 	           								 
 	                                </td>
@@ -108,8 +134,8 @@
 																						
 	                                   <td NOWRAP bgcolor="#EEEEEE" class="input" valign=top>								
 											<font size=2>	                                   
-												<img src="images/edit.gif" align=left onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','editOptions');">	
-												<img src="images/delete.gif" align=left onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','removeQuestion');">	
+												<img src="<c:out value="${tool}"/>images/edit.gif" align=left onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','editOptions');">	
+												<img src="<c:out value="${tool}"/>images/delete.gif" align=left onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','removeQuestion');">	
 											<font>											
 									  	</td>
 								  </tr>
@@ -129,16 +155,16 @@
 								  	<td NOWRAP bgcolor="#EEEEEE" class="input"  align=center valign=top>			
 									  	<font size=2>
 									 		<c:if test="${sessionScope.queIndex == 1}"> 		
-			   								    <img src="images/down.gif" align=left onclick="javascript:alert('This button is disabled in this [view-only] mode.');" >
+			   								    <img src="<c:out value="${tool}"/>images/down.gif" align=left onclick="javascript:alert('This button is disabled in this [view-only] mode.');" >
 			   								</c:if> 			
 			
 							  				<c:if test="${sessionScope.maxQuestionIndex == sessionScope.queIndex}"> 			
-			     								 <img src="images/up.gif" align=left onclick="javascript:alert('This button is disabled in this [view-only] mode.');" >
+			     								 <img src="<c:out value="${tool}"/>images/up.gif" align=left onclick="javascript:alert('This button is disabled in this [view-only] mode.');" >
 			     							</c:if> 	    
 											
 			 				  				<c:if test="${(sessionScope.maxQuestionIndex != sessionScope.queIndex) && (sessionScope.queIndex != 1)}"> 			
-			   								    <img src="images/down.gif" align=left onclick="javascript:alert('This button is disabled in this [view-only] mode.');" >
-			       								<img src="images/up.gif" align=left onclick="javascript:alert('This button is disabled in this [view-only] mode.');" >
+			   								    <img src="<c:out value="${tool}"/>images/down.gif" align=left onclick="javascript:alert('This button is disabled in this [view-only] mode.');" >
+			       								<img src="<c:out value="${tool}"/>images/up.gif" align=left onclick="javascript:alert('This button is disabled in this [view-only] mode.');" >
 											</c:if> 	           								 
 										</font>
 	                                </td>
@@ -155,8 +181,8 @@
 																					
                                    <td NOWRAP bgcolor="#EEEEEE" class="input" valign=top>								
 										<font size=2>                                   
-											<img src="images/edit.gif" align=left onclick="javascript:alert('This button is disabled in this [view-only] mode.');" >
-											<img src="images/delete.gif" align=left onclick="javascript:alert('This button is disabled in this [view-only] mode.');" >
+											<img src="<c:out value="${tool}"/>images/edit.gif" align=left onclick="javascript:alert('This button is disabled in this [view-only] mode.');" >
+											<img src="<c:out value="${tool}"/>images/delete.gif" align=left onclick="javascript:alert('This button is disabled in this [view-only] mode.');" >
 										</font>
 								  	</td>
 								  </tr>

@@ -16,7 +16,7 @@
 	        key="error.system.mc"
 	        type="org.lamsfoundation.lams.tool.mc.McApplicationException"
 	        handler="org.lamsfoundation.lams.util.CustomStrutsExceptionHandler"
-	        path=".systemError"
+	        path="/SystemErrorContent.jsp"
 	        scope="request"
 	      />
 	</global-exceptions>
@@ -32,13 +32,13 @@
    <action path="/authoringStarter" 
    			type="org.lamsfoundation.lams.tool.mc.web.McStarterAction" 
    			name="McAuthoringForm" 
-   			input=".starter"> 
+   			input="/index.jsp"> 
 	
 		<exception
 	        key="error.exception.McApplication"
 	        type="org.lamsfoundation.lams.tool.mc.McApplicationException"
 	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
-	        path=".mcErrorBox"
+	        path="/McErrorBox.jsp"
 	        scope="request"
 	      />
 
@@ -46,43 +46,43 @@
 	        key="error.exception.McApplication"
 	        type="java.lang.NullPointerException"
 	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
-	        path=".mcErrorBox"
+	        path="/McErrorBox.jsp"
 	        scope="request"
 	      />	         			
 
 	  	<forward
 		    name="load"
-		    path=".questions"
+		    path="/authoring/AuthoringMaincontent.jsp"
 		    redirect="true"
 	  	/>
 
 	  	<forward
 		    name="loadMonitoring"
-		    path=".monitoringContent"
+		    path="/monitoring/MonitoringMaincontent.jsp"
 		    redirect="true"
 	  	/>
 	  	
 	  	<forward
 		    name="loadLearner"
-		    path=".answers"
+		    path="/learning/AnswersContent.jsp"
 		    redirect="true"
 	  	/>
 
 	  	<forward
 	        name="starter"
-	        path=".starter"
+	        path="/index.jsp"
 	        redirect="true"
 	     />
 	     
 	     <forward
 	        name="preview"
-	        path=".preview"
+	        path="/learning/Preview.jsp"
 	        redirect="true"
 	     />
 	  	
 	  	<forward
 		    name="errorList"
-		    path=".mcErrorBox"
+		    path="/McErrorBox.jsp"
 		    redirect="true"
 	  	/>
 	</action>  
@@ -93,7 +93,7 @@
 	      	type="org.lamsfoundation.lams.tool.mc.web.McAction"
     	  	name="McAuthoringForm"
 	      	scope="session"
-    	  	input=".questions"
+    	  	input="/authoring/AuthoringMaincontent.jsp"
       		parameter="dispatch"
       		unknown="false"
       		validate="true">
@@ -102,7 +102,7 @@
 	        key="error.exception.McApplication"
 	        type="org.lamsfoundation.lams.tool.mc.McApplicationException"
 	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
-	        path=".mcErrorBox"
+	        path="/McErrorBox.jsp"
 	        scope="request"
 	      />
 
@@ -110,43 +110,37 @@
 	        key="error.exception.McApplication"
 	        type="java.lang.NullPointerException"
 	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
-	        path=".mcErrorBox"
+	        path="/McErrorBox.jsp"
 	        scope="request"
 	      />	         			      		
     	
 	      <forward
 	        name="load"
-	        path=".questions"
+	        path="/authoring/AuthoringMaincontent.jsp"
 	        redirect="true"
 	      />
 	    
 	      <forward
 	        name="starter"
-	        path=".starter"
+	        path="/index.jsp"
 	        redirect="true"
 	      />
 	      
-	      <forward
-	        name="editOptsContent"
-	        path=".editOptsContent"
-	        redirect="true"
-	      />
-
 	  	<forward
 		    name="loadMonitoring"
-		    path=".monitoringContent"
+		    path="/monitoring/MonitoringMaincontent.jsp"
 		    redirect="true"
 	  	/>
 
 	     <forward
 	        name="preview"
-	        path=".preview"
+	        path="/learning/Preview.jsp"
 	        redirect="true"
 	     />
 	  	
 	  	<forward
 		    name="errorList"
-		    path=".mcErrorBox"
+		    path="/McErrorBox.jsp"
 		    redirect="true"
 	  	/>
 	      
@@ -157,13 +151,13 @@
    <action path="/defineLaterStarter" 
    			type="org.lamsfoundation.lams.tool.mc.web.McDLStarterAction" 
    			name="McAuthoringForm" 
-   			input=".starter"> 
+   			input="/index.jsp"> 
 	
 		<exception
 	        key="error.exception.McApplication"
 	        type="org.lamsfoundation.lams.tool.mc.McApplicationException"
 	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
-	        path=".mcErrorBox"
+	        path="/McErrorBox.jsp"
 	        scope="request"
 	      />
 
@@ -171,25 +165,25 @@
 	        key="error.exception.McApplication"
 	        type="java.lang.NullPointerException"
 	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
-	        path=".mcErrorBox"
+	        path="/McErrorBox.jsp"
 	        scope="request"
 	      />	         			   			
 
 	  	<forward
 		    name="load"
-		    path=".questions"
+		    path="/authoring/AuthoringMaincontent.jsp"
 		    redirect="true"
 	  	/>
 	  	
 	  	<forward
 	        name="starter"
-	        path=".starter"
+	        path="/index.jsp"
 	        redirect="true"
 	     />
 	  	
 	  	<forward
 		    name="errorList"
-		    path=".mcErrorBox"
+		    path="/McErrorBox.jsp"
 		    redirect="true"
 	  	/>
 	</action>  
@@ -199,13 +193,13 @@
    <action 	path="/learningStarter" 
    			type="org.lamsfoundation.lams.tool.mc.web.McLearningStarterAction" 
    			name="McLearningForm" 
-   			input=".learningStarter"> 
+   			input="/learningIndex.jsp"> 
 
 		<exception
 	        key="error.exception.McApplication"
 	        type="org.lamsfoundation.lams.tool.mc.McApplicationException"
 	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
-	        path=".mcErrorBox"
+	        path="/McErrorBox.jsp"
 	        scope="request"
 	      />
 
@@ -213,43 +207,43 @@
 	        key="error.exception.McApplication"
 	        type="java.lang.NullPointerException"
 	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
-	        path=".mcErrorBox"
+	        path="/McErrorBox.jsp"
 	        scope="request"
 	      />	         			   			
 
 	  	<forward
 		    name="loadLearner"
-		    path=".answers"
+		    path="/learning/AnswersContent.jsp"
 		    redirect="true"
 	  	/>
 
 	  	<forward
 		    name="viewAnswers"
-		    path=".viewAnswers"
+		    path="/learning/ViewAnswers.jsp"
 		    redirect="true"
 	  	/>
 
 	  	<forward
 		    name="redoQuestions"
-		    path=".redoQuestions"
+		    path="/learning/RedoQuestions.jsp"
 		    redirect="true"
 	  	/>
 	  	
 	     <forward
 	        name="preview"
-	        path=".preview"
+	        path="/learning/Preview.jsp"
 	        redirect="true"
 	     />
 
 	  	<forward
 		    name="learningStarter"
-		    path=".learningStarter"
+		    path="/learningIndex.jsp"
 		    redirect="true"
 	  	/>
 	  	
 	  	<forward
 		    name="errorList"
-		    path=".mcErrorBox"
+		    path="/McErrorBox.jsp"
 		    redirect="true"
 	  	/>
 	</action>  
@@ -260,7 +254,7 @@
 		    type="org.lamsfoundation.lams.tool.mc.web.McLearningAction"
 			name="McLearningForm"
       		scope="session"
-      		input=".answers"
+      		input="/learning/AnswersContent.jsp"
       		parameter="method"
       		unknown="false"
       		validate="true">
@@ -269,7 +263,7 @@
 	        key="error.exception.McApplication"
 	        type="org.lamsfoundation.lams.tool.mc.McApplicationException"
 	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
-	        path=".mcErrorBox"
+	        path="/McErrorBox.jsp"
 	        scope="request"
 	      />
 
@@ -277,61 +271,61 @@
 	        key="error.exception.McApplication"
 	        type="java.lang.NullPointerException"
 	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
-	        path=".mcErrorBox"
+	        path="/McErrorBox.jsp"
 	        scope="request"
 	      />	         			      		
 
 	  	<forward
 		    name="loadLearner"
-		    path=".answers"
+		    path="/learning/AnswersContent.jsp"
 		    redirect="true"
 	  	/>
 	  	
 	  	<forward
 		    name="individualReport"
-		    path=".individualReport"
+		    path="/learning/IndividualLearnerResults.jsp"
 		    redirect="true"
 	  	/>
 	  	
 	  	<forward
 		    name="redoQuestions"
-		    path=".redoQuestions"
+		    path="/learning/RedoQuestions.jsp"
 		    redirect="true"
 	  	/>
 
 	  	<forward
 		    name="viewAnswers"
-		    path=".viewAnswers"
+		    path="/learning/ViewAnswers.jsp"
 		    redirect="true"
 	  	/>
 
 	  	<forward
 		    name="resultsSummary"
-		    path=".resultsSummary"
+		    path="/learning/ResultsSummary.jsp"
 		    redirect="true"
 	  	/>
 
 	  	<forward
 		    name="errorList"
-		    path=".mcErrorBox"
+		    path="/McErrorBox.jsp"
 		    redirect="true"
 	  	/>
 
 	  	<forward
 	        name="starter"
-	        path=".starter"
+	        path="/index.jsp"
 	        redirect="true"
 	     />
 
 	  	<forward
 		    name="learningStarter"
-		    path=".learningStarter"
+		    path="/learningIndex.jsp"
 		    redirect="true"
 	  	/>
 
 	     <forward
 	        name="preview"
-	        path=".preview"
+	        path="/learning/Preview.jsp"
 	        redirect="true"
 	     />
     </action>
@@ -341,13 +335,13 @@
    <action 	path="/monitoringStarter" 
    			type="org.lamsfoundation.lams.tool.mc.web.McMonitoringStarterAction" 
    			name="McMonitoringForm" 
-   			input=".monitoringStarter"> 
+   			input="/monitoringIndex.jsp"> 
 
 		<exception
 	        key="error.exception.McApplication"
 	        type="org.lamsfoundation.lams.tool.mc.McApplicationException"
 	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
-	        path=".mcErrorBox"
+	        path="/McErrorBox.jsp"
 	        scope="request"
 	      />
 
@@ -355,31 +349,31 @@
 	        key="error.exception.McApplication"
 	        type="java.lang.NullPointerException"
 	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
-	        path=".mcErrorBox"
+	        path="/McErrorBox.jsp"
 	        scope="request"
 	      />	         			   			
    			
 	  	<forward
 		    name="loadMonitoring"
-		    path=".monitoringContent"
+		    path="/monitoring/MonitoringMaincontent.jsp"
 		    redirect="true"
 	  	/>
 
        <forward
 	        name="load"
-	        path=".questions"
+	        path="/authoring/AuthoringMaincontent.jsp"
 	        redirect="true"
 	    />
 	    
 	    <forward
 	        name="starter"
-	        path=".starter"
+	        path="/index.jsp"
 	        redirect="true"
 	     />
 
 	  	<forward
 		    name="errorList"
-		    path=".mcErrorBox"
+		    path="/McErrorBox.jsp"
 		    redirect="true"
 	  	/>
 	</action>  
@@ -390,7 +384,7 @@
    			type="org.lamsfoundation.lams.tool.mc.web.McMonitoringAction" 
    			name="McMonitoringForm" 
 	      	scope="session"
-   			input=".monitoringContent"
+   			input="/monitoring/MonitoringMaincontent.jsp"
       		parameter="method"
       		unknown="false"
       		validate="true"> 
@@ -399,7 +393,7 @@
 	        key="error.exception.McApplication"
 	        type="org.lamsfoundation.lams.tool.mc.McApplicationException"
 	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
-	        path=".mcErrorBox"
+	        path="/McErrorBox.jsp"
 	        scope="request"
 	      />
 
@@ -407,31 +401,31 @@
 	        key="error.exception.McApplication"
 	        type="java.lang.NullPointerException"
 	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
-	        path=".mcErrorBox"
+	        path="/McErrorBox.jsp"
 	        scope="request"
 	      />	         			      		
 
 	  	<forward
 		    name="loadMonitoring"
-		    path=".monitoringContent"
+		    path="/monitoring/MonitoringMaincontent.jsp"
 		    redirect="true"
 	  	/>
 
        <forward
 	        name="load"
-	        path=".questions"
+	        path="/authoring/AuthoringMaincontent.jsp"
 	        redirect="true"
 	    />
 	    
 	    <forward
 	        name="starter"
-	        path=".starter"
+	        path="/index.jsp"
 	        redirect="true"
 	     />
 
 	  	<forward
 		    name="errorList"
-		    path=".mcErrorBox"
+		    path="/McErrorBox.jsp"
 		    redirect="true"
 	  	/>
 	</action>  
@@ -450,17 +444,17 @@
 	        key="error.exception.McApplication"
 	        type="java.lang.NullPointerException"
 	        handler="org.lamsfoundation.lams.tool.mc.web.CustomStrutsExceptionHandler"
-	        path=".mcErrorBox"
+	        path="/McErrorBox.jsp"
 	        scope="request"
 	      />	         			      		
 	      <forward
 	        name="exportPortfolio"
-	        path=".exportPortfolio"
+	        path="/exportPortfolio.jsp"
 	        redirect="false"
 	      />
 	  	<forward
 		    name="errorList"
-		    path=".mcErrorBox"
+		    path="/McErrorBox.jsp"
 		    redirect="true"
 	  	/>
     </action>

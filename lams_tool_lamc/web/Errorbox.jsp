@@ -1,4 +1,4 @@
-<!--
+<%--
 Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
 
 This program is free software; you can redistribute it and/or modify
@@ -17,30 +17,35 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 USA
 
 http://www.gnu.org/licenses/gpl.txt
--->
-<%@ taglib uri="tags-html-el" prefix="html" %>
-<%@ taglib uri="tags-bean" prefix="bean" %>
+--%>
+
+<%@ taglib uri="tags-bean" prefix="bean"%> 
+<%@ taglib uri="tags-html" prefix="html"%>
+<%@ taglib uri="tags-logic" prefix="logic" %>
 <%@ taglib uri="tags-logic-el" prefix="logic-el" %>
-<%@ taglib uri="tags-c" prefix="c" %>
+<%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="tags-fck-editor" prefix="FCK" %>
+<%@ taglib uri="fck-editor" prefix="FCK" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
+
+<c:set var="lams"><lams:LAMSURL/></c:set>
+<c:set var="tool"><lams:WebAppURL/></c:set>
 
 <c:if test="${sbmtSuccess == 1}"> 			
 	<logic-el:messagesPresent> 
 	 <html:messages id="error"> 
-		    <img src="images/success.gif" align="left" width=20 height=20>  <font size=2> <bean:write name="error"/> </font> </img>
+		    <img src="<c:out value="${tool}"/>images/success.gif" align="left" width=20 height=20>  <font size=2> <bean:write name="error"/> </font> </img>
 	 </html:messages> 
 	</logic-el:messagesPresent>
 </c:if> 			
 
 
 <c:if test="${sbmtSuccess != 1}"> 			
-	<logic-el:messagesPresent> 
+	<logic:messagesPresent> 
 	 <html:messages id="error"> 
-		    <img src="images/error.jpg" align="left" width=20 height=20>  <font size=2> <bean:write name="error"/> </font> </img>
+		    <img src="<c:out value="${tool}"/>images/error.jpg" align="left" width=20 height=20>  <font size=2> <bean:write name="error"/> </font> </img>
 	 </html:messages> 
-	</logic-el:messagesPresent>
+	</logic:messagesPresent>
 </c:if> 			
 
 
