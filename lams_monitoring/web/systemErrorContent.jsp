@@ -19,7 +19,7 @@ USA
 http://www.gnu.org/licenses/gpl.txt
 -->
 <!-- taglib definition-->
-<%@ taglib uri="tags-html-el" prefix="html-el" %>
+<%@ taglib uri="tags-html" prefix="html" %>
 <%@ taglib uri="tags-logic" prefix="logic" %>
 
 <!-- end of taglib definition -->

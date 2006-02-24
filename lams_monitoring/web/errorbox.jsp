@@ -1,4 +1,4 @@
-<%@ taglib uri="tags-html-el" prefix="html-el" %>
+<%@ taglib uri="tags-html" prefix="html" %>
 <%@ taglib uri="tags-logic" prefix="logic" %>
 <%@ page import="org.apache.struts.Globals" %>
 <%
@@ -16,7 +16,7 @@ String rootPath = cprotocol+request.getServerName()+":"+request.getServerPort()+
 		<img src="<%=rootPath%>/images/error.jpg" alt="Error occured"/>
 	</td>
 	<td width="90%" valign="center" class="body" colspan="2">
-		<html-el:errors/>
+		<html:errors/>
 	</td>
 </tr>
 </logic:present>

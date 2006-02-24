@@ -653,14 +653,14 @@ public class AuthoringService implements IAuthoringService {
 		Iterator iter = acts.iterator();
 		while (iter.hasNext()) {
 			Activity activity = (Activity) iter.next();
-			if ( activity.getActivityTypeId() != null && 
-						Activity.TOOL_ACTIVITY_TYPE == activity.getActivityTypeId().intValue() )  {
-				// TODO can't just cast....
-				try {
-					lamsCoreToolService.notifyToolToDeleteContent((ToolActivity)activity);
+            if (activity.isToolActivity())
+            {
+                try {
+                	ToolActivity toolActivity = (ToolActivity) activityDAO.getActivityByActivityId(activity.getActivityId());
+					lamsCoreToolService.notifyToolToDeleteContent(toolActivity);
 				} catch (ToolException e) {
 					log.error("Unable to delete tool content for activity"+activity
-							+" as activity threw exception does not exist",e);
+							+" as activity threw an exception",e);
 				}
 			}
 		}

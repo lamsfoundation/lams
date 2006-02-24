@@ -42,11 +42,6 @@
       <name>css</name>
       <tagclass>org.lamsfoundation.lams.web.tag.CssTag</tagclass>
       <info><![CDATA[Output stylesheet based on the user preferences.]]></info>
-      
-      <attribute>
-	      <name>localLink</name>
-	      <required>false</required>
-      </attribute>
 
    </tag>
 

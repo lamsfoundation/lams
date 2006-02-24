@@ -220,7 +220,8 @@
 	         </fileset>
 
 	         <deploymentdescriptor 
-	         				servletspec="2.3" 
+				         	servletspec="2.4" 
+	         				distributable="false"
 	         				destdir="${conf.webinf.dir}"
 				         	mergedir="${conf.xdoclet.dir}"
 	         				sessiontimeout="${sessiontimeout}"/>

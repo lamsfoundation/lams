@@ -19,6 +19,9 @@
    
 	<path id="project.classpath">
 		<path refid="all-libs" />
+		<fileset dir="${basedir}/lib">
+			<include name="**/*.jar"/>
+		</fileset>
 		<!-- Java CLASSPATH should be added as the last item -->
 		<!-- This property is supposed to be set in eclipse  -->
 		<pathelement location="${java.class.path}" />
@@ -194,7 +197,8 @@
             <include name="**/*Form.java" />
          </fileset>
 
-         <deploymentdescriptor servletspec="2.3" destdir="${conf.webinf.dir}"
+         <deploymentdescriptor servletspec="2.4" distributable="false"
+         	destdir="${conf.webinf.dir}"
 			mergedir="${conf.xdoclet.dir}" sessiontimeout="${sessiontimeout}"/>
 		
 		 <strutsconfigxml destdir="${conf.struts.dir}"
@@ -219,7 +223,7 @@
 			<batchtest todir="${build.report}">
 				<fileset dir="${src.test.dir}">
 					<include name="**/TestMonitoringService.java" />
-					<include name="**/TestGateAction.java" /> 
+<!--					<include name="**/TestGateAction.java" />  -->
 					<!-- does not work <include name="**/TestMonitoringAction.java" /> -->
 				</fileset>
 			</batchtest>

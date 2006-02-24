@@ -2,9 +2,9 @@
 	<td class="body" valign="middle">Class cannot continue until the gate is opened by you</td>
 	<td width="90" align="center" valign="middle" class="bodyBold">
 		<c:if test="${not GateForm.map.gate.gateOpen}" >
-			<html-el:form action="/gate?method=openGate" target="_self">
-				<html-el:submit styleClass="button" value="Open Gate" onmouseover="pviiClassNew(this,'buttonover')" onmouseout="pviiClassNew(this,'button')" /> 
-			</html-el:form>
+			<html:form action="/gate?method=openGate" target="_self">
+				<html:submit styleClass="button" value="Open Gate" onmouseover="pviiClassNew(this,'buttonover')" onmouseout="pviiClassNew(this,'button')" /> 
+			</html:form>
 		</c:if>
 		<c:if test="${GateForm.map.gate.gateOpen}">
 			 Gate has been opened
