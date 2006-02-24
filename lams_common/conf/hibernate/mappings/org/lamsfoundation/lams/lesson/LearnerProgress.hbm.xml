@@ -28,6 +28,12 @@
 
 		<property name="restarting" type="java.lang.Boolean"
 			column="requires_restart_flag" />
+			
+		<property name="startDate" type="java.util.Date"
+			column="start_date_time" />
+			
+		<property name="finishDate" type="java.util.Date"
+			column="finish_date_time" />
 
 		<!-- uni-directional one-to-many association to attempted acitivities -->
 		<set name="attemptedActivities" lazy="true" batch-size="20"

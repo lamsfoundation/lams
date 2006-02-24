@@ -28,6 +28,7 @@ import org.lamsfoundation.lams.lesson.dto.LearnerProgressDTO;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -129,6 +130,8 @@ public class LearnerProgress implements Serializable
     /**Indicate whether the learning progress is restarting or not*/
     private boolean restarting;
     
+    private Date startDate;
+    private Date finishDate;
     //---------------------------------------------------------------------
     // Constructors
     //---------------------------------------------------------------------
@@ -457,4 +460,17 @@ public class LearnerProgress implements Serializable
         
         return (Long [])activitiesIds.toArray(new Long[activitiesIds.size()]);
     }
+    
+	public Date getFinishDate() {
+		return finishDate;
+	}
+	public void setFinishDate(Date finishDate) {
+		this.finishDate = finishDate;
+	}
+	public Date getStartDate() {
+		return startDate;
+	}
+	public void setStartDate(Date startDate) {
+		this.startDate = startDate;
+	}
 }

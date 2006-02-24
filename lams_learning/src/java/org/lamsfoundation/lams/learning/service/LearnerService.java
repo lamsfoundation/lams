@@ -24,7 +24,9 @@
 package org.lamsfoundation.lams.learning.service;
 
 import java.io.UnsupportedEncodingException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -213,7 +215,8 @@ public class LearnerService implements ILearnerService
                 log.error("error occurred in 'setUpStartPoint':"+e.getMessage());
         		throw new LearnerServiceException(e.getMessage());
             }
-            
+        	//Use TimeStamp rather than Date directly to keep consistent with Hibnerate persiste object.
+        	learnerProgress.setStartDate(new Timestamp(new Date().getTime()));
             learnerProgressDAO.saveLearnerProgress(learnerProgress);
         }
         //The restarting flag should be setup when the learner hit the exit
