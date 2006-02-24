@@ -44,7 +44,14 @@ import org.lamsfoundation.lams.contentrepository.struts.form.AddFileContentForm;
  * Creation date: 11-30-2004
  * 
  * XDoclet definition:
- * @struts:action path="/addFileContent" name="addFileContentForm" input="nodeSelection.jsp" scope="request" validate="true" parameter="method"
+ * @struts:action path="/addFileContent" 
+ * 				name="addFileContentForm" 
+ * 				input="nodeSelection.jsp" 
+ * 				scope="request" 
+ * 				validate="false" 
+ * 				parameter="method"
+ * @struts:action-forward name="success" path="/nodeSelection.do?method=getList"
+ * @struts:action-forward name="error" path="/error.jsp"
  */
 public class AddFileContentAction extends RepositoryDispatchAction {
 

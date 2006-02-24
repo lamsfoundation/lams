@@ -50,7 +50,14 @@ import org.lamsfoundation.lams.contentrepository.NodeKey;
  * here so (1) I can log them and (2) you can see what exceptions are thrown.
  * 
  * XDoclet definition:
- * @struts:action path="/nodeSelection" name="nodeSelectionForm" input="/nodeSelection.jsp" scope="request" parameter="method"
+ * @struts:action path="/nodeSelection" 
+ * 				name="nodeSelectionForm" 
+ * 				input="/nodeSelection.jsp" 
+ * 				scope="request" 
+ * 				parameter="method"
+ * @struts:action-forward name="nodelist" path="/nodeSelection.jsp"
+ * @struts:action-forward name="error" path="/error.jsp"
+ * @struts:action-forward name="packagelist" path="/packageList.jsp"
  */
 public class NodeSelectionAction extends RepositoryDispatchAction {
 

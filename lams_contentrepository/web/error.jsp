@@ -19,7 +19,7 @@
   http://www.gnu.org/licenses/gpl.txt 
 -->
 <%@ page language="java"%>
-<%@ taglib uri="/WEB-INF/struts/struts-html.tld" prefix="html" %>
+<%@ taglib uri="tags-html" prefix="html" %>
  
 <html> 
 	<head>

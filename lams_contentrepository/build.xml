@@ -77,33 +77,12 @@ Ant build file.
 		<echo message=""/>
 	</target>
 
-	<target name="init">
-		<available property="xdoclet-jars-installed" file="lib/xdoclet/xdoclet-${xdoclet.version}.jar"/>
-	</target>
-
 	<!-- =================================================================== -->
 	<!-- Build and deploy all the java files                            -->
 	<!-- =================================================================== -->
 	<target name="build-all" depends="build-jar, build-war" description="Builds all the war/jar files">
 	</target>
 	
-
-	<!-- =================================================================== -->
-	<!-- Fails if XDoclet 1.2.x is not on classpath                          -->
-	<!-- =================================================================== -->
-	<target name="fail-if-no-xdoclet-1.2.x" unless="xdoclet-jars-installed">
-		<fail>
-	      You must download several jar files before you can build Middlegen.
-	      Execute the "download-deps" target. Then try to build again.
-
-	      If you are behind a proxy, you should define the properties
-	      http.proxyHost and http.proxyPort. Example:
-	      
-	      ant -Dhttp.proxyHost=foo.com -Dhttp.proxyPort=8080
-	      
-	      It's also possible to download the jars manually.
-	     </fail>
-	</target>
 
 	<target name="check-driver-present">
 		<available file="${db.driver}" type="file" property="driver.present"/>
@@ -244,15 +223,39 @@ Ant build file.
 	<!-- = = = = = = = = = = = = = = = = = = = = = = = =  -->
 	<!-- Make the war archive  for deployment             -->
 	<!-- = = = = = = = = = = = = = = = = = = = = = = = =  -->
-	<target name="build-war" description="creates war file">
+	<target name="webdoclet" depends="preparedirs">
+		<webdoclet destdir="${generated.java}" force="${xdoclet.force}">
+	         <fileset dir="${src.java.dir}">
+	            <include name="**/Download.java" />
+	            <include name="**/TestLogin.java" />
+	            <include name="**/*Action.java" />
+	            <include name="**/*Form.java" />
+	         </fileset>
+
+	         <deploymentdescriptor 
+				         	servletspec="2.4" 
+	         				distributable="false"
+	         				destdir="${conf.webinf.dir}"
+				         	mergedir="${conf.xdoclet.dir}"
+	         				sessiontimeout="${sessiontimeout}"/>
+			
+	         <strutsconfigxml 
+	         				destdir="${conf.struts.dir}"
+	         				version="1.2" 
+	         				mergedir="${conf.xdoclet.dir}"/>
+			 
+	     </webdoclet>
+	</target>
+	
+	<target name="build-war" description="creates war file" depends="webdoclet">
 		<delete file="${build.lib}/${product}.war"/>
 		<war warfile="${build.lib}/${product}.war" 
   				webxml="${conf.webinf.dir}/web.xml">
 			<webinf dir="${conf.webinf.dir}">
 				<include name="*.xml"/>
 				<include name="*.properties"/>
-				<include name="struts/*"/>
-				<include name="jstl/*"/>
+				<include name="struts/**"/>
+				<include name="jstl/**"/>
 				<exclude name="web.xml"/>
 			</webinf>
 			<!-- don't include the jar file as it should be built and deployed separately -->
@@ -294,8 +297,7 @@ Ant build file.
 	</target>
 
 	<target name="generate-hbm-files" 
-			description="Generate the hibernate hbm.xml files from the Java source (using XDoclet)"
-			depends="init">
+			description="Generate the hibernate hbm.xml files from the Java source (using XDoclet)">
 		
 		<taskdef name="hibernatedoclet"
 			classname="xdoclet.modules.hibernate.HibernateDocletTask"
@@ -313,6 +315,11 @@ Ant build file.
 			<hibernate version="3.0"/>
 		</hibernatedoclet>
 	</target>
+
+	<taskdef name="webdoclet" classname="xdoclet.modules.web.WebDocletTask">
+	    <classpath refid="all-libs"/>
+	</taskdef>
+
 
 	<!-- =================================================================== -->
 	<!-- Run JUnit Tests                                                     -->

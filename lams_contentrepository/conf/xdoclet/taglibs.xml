@@ -1,0 +1,50 @@
+	<jsp-config>
+	
+		<!--  ======================================================== -->	
+		<!-- Struts Tag Library Descriptors -->
+		<!--  ======================================================== -->	
+		<taglib>
+		    <taglib-uri>tags-bean</taglib-uri>
+		    <taglib-location>/WEB-INF/struts/tlds/struts-bean.tld</taglib-location>
+		</taglib>
+		
+		<taglib>
+		    <taglib-uri>tags-html</taglib-uri>
+		    <taglib-location>/WEB-INF/struts/tlds/struts-html.tld</taglib-location>
+		</taglib>
+		
+		<taglib>
+		    <taglib-uri>tags-logic</taglib-uri>
+		    <taglib-location>/WEB-INF/struts/tlds/struts-logic.tld</taglib-location>
+		</taglib>
+		
+		<taglib>
+		    <taglib-uri>tags-tiles</taglib-uri>
+		    <taglib-location>/WEB-INF/struts/tlds/struts-tiles.tld</taglib-location>
+		</taglib>
+		
+		<!--  ======================================================== -->	
+		<!--  JSTL 1.2 Tag Library 									   -->
+		<!--  ======================================================== -->	
+		  <taglib>
+		    <taglib-uri>tags-fmt</taglib-uri>
+		    <taglib-location>/WEB-INF/jstl/tlds/fmt.tld</taglib-location>
+		  </taglib>
+		
+		  <taglib>
+		    <taglib-uri>tags-core</taglib-uri>
+		    <taglib-location>/WEB-INF/jstl/tlds/c.tld</taglib-location>
+		  </taglib>
+		
+		  <taglib>
+		    <taglib-uri>tags-function</taglib-uri>
+		    <taglib-location>/WEB-INF/jstl/tlds/fn.tld</taglib-location>
+		  </taglib>
+		
+		  <taglib>
+		    <taglib-uri>tags-xml</taglib-uri>
+		    <taglib-location>/WEB-INF/jstl/tlds/x.tld</taglib-location>
+		  </taglib>
+				
+	</jsp-config>
+	

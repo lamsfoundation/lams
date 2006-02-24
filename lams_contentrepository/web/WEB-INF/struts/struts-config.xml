@@ -1,116 +1,126 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE struts-config PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 1.1//EN" "http://jakarta.apache.org/struts/dtds/struts-config_1_1.dtd">
+<?xml version="1.0" encoding="UTF-8" ?>
 
-<!-- 
-  Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
-
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation; either version 2 of the License, or
-  (at your option) any later version.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-  USA
-
-  http://www.gnu.org/licenses/gpl.txt 
--->
+<!DOCTYPE struts-config PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 1.2//EN" "http://jakarta.apache.org/struts/dtds/struts-config_1_2.dtd">
 
 <struts-config>
-   <data-sources />
-   <form-beans >
-      <form-bean name="loginRepositoryForm" type="org.lamsfoundation.lams.contentrepository.struts.form.LoginRepositoryForm" />
-      <form-bean name="nodeSelectionForm" type="org.lamsfoundation.lams.contentrepository.struts.form.NodeSelectionForm" />
-      <form-bean name="addFileContentForm" type="org.lamsfoundation.lams.contentrepository.struts.form.AddFileContentForm" />
-   </form-beans>
 
-   <global-exceptions>
-   	<!-- the exception handling isn't working as I expected so I'm letting them bubble to the top. -->
-   	<!-- in a real application, the exceptions should be caught and handled -->
-	<!--	   <exception-->
-	<!--	        key="exception.accessDenied"-->
-	<!--    	    type="org.lamsfoundation.lams.contentrepository.AccessDeniedException"-->
-	<!--        	path="/error.jsp"/>-->
-	<!--	   <exception-->
-	<!--	        key="exception.loginFailed"-->
-	<!--    	    type="org.lamsfoundation.lams.contentrepository.LoginException"-->
-	<!--        	path="/error.jsp"/>-->
-	<!--	   <exception-->
-	<!--	        key="exception.workspaceNotFound"-->
-	<!--    	    type="org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException"-->
-	<!--        	path="/error.jsp"/>-->
-	<!--	   <exception-->
-	<!--	        key="exception.itemNotFound"-->
-	<!--    	    type="org.lamsfoundation.lams.contentrepository.ItemNotFoundException"-->
-	<!--        	path="/error.jsp"/>-->
-	<!--	   <exception-->
-	<!--	        key="exception.itemExists"-->
-	<!--    	    type="org.lamsfoundation.lams.contentrepository.ItemExistsException"-->
-	<!--        	path="/error.jsp"/>-->
-	<!--	   <exception-->
-	<!--	        key="exception.file"-->
-	<!--    	    type="org.lamsfoundation.lams.contentrepository.FileException"-->
-	<!--        	path="/error.jsp"/>-->
-	<!--	   <exception-->
-	<!--	        key="exception.valueformat"-->
-	<!--    	    type="org.lamsfoundation.lams.contentrepository.ValueFormatException"-->
-	<!--        	path="/error.jsp"/>-->
-	<!--	   <exception-->
-	<!--	        key="exception.repository"-->
-	<!--    	    type="org.lamsfoundation.lams.contentrepository.RepositoryCheckedException"-->
-	<!--        	path="/error.jsp"/>-->
-	<!--	   <exception-->
-	<!--	        key="exception.repository"-->
-	<!--    	    type="java.lang.Exception"-->
-	<!--        	path="/error.jsp"/>-->
-    </global-exceptions>
-   
-    
-   <global-forwards >
+  <!-- ========== Data Sources Definitions =================================== -->
+  <!--
+    Define your Struts data sources in a file called struts-data-sources.xml and place
+    it in your merge directory.
+  -->
+
+  <!-- ========== Form Bean Definitions =================================== -->
+  <form-beans>
+
+    <form-bean
+      name="addFileContentForm"
+      type="org.lamsfoundation.lams.contentrepository.struts.form.AddFileContentForm"
+    />
+    <form-bean
+      name="loginRepositoryForm"
+      type="org.lamsfoundation.lams.contentrepository.struts.form.LoginRepositoryForm"
+    />
+    <form-bean
+      name="nodeSelectionForm"
+      type="org.lamsfoundation.lams.contentrepository.struts.form.NodeSelectionForm"
+    />
+
+    <!--
+         If you have non XDoclet forms, define them in a file called struts-forms.xml and
+         place it in your merge directory.
+    -->
+  </form-beans>
+
+  <!-- ========== Global Exceptions Definitions =================================== -->
+  <!--
+    Define your exceptions in a file called global-exceptions.xml and place
+    it in your merge directory.
+  -->
+
+  <!-- ========== Global Forward Definitions =================================== -->
+    <global-forwards >
 	     <forward name="logout" path="/loggedout.html" />
    </global-forwards>
 
-   <action-mappings >
-      <action
-         path="/loginRepository"
-         type="org.lamsfoundation.lams.contentrepository.struts.action.LoginRepositoryAction"
-         name="loginRepositoryForm"
-         validate="true"
-         scope="request"
-         attribute="loginRepositoryForm"
-         input="/loginRepository.jsp"
-         parameter="method">
-         <forward name="success" path="/nodeSelection.do?method=getList"/>
-	     <forward name="error" path="/error.jsp" />
-      </action>
-      <action
-         path="/nodeSelection"
-         type="org.lamsfoundation.lams.contentrepository.struts.action.NodeSelectionAction"
-         name="nodeSelectionForm"
-         input="/nodeSelection.jsp"
-         parameter="method">
-	     <forward name="nodelist" path="/nodeSelection.jsp" />
-	     <forward name="packagelist" path="/packageList.jsp" />
-	     <forward name="error" path="/error.jsp" />
-      </action>
-      <action
-         path="/addFileContent"
-         type="org.lamsfoundation.lams.contentrepository.struts.action.AddFileContentAction"
-         name="addFileContentForm"
-         input="/addNode.jsp"
-         parameter="method">
-         <forward name="success" path="/nodeSelection.do?method=getList"/>
-	     <forward name="error" path="/error.jsp" />
-      </action>
-   </action-mappings>
+  <!-- ========== Action Mapping Definitions =================================== -->
+   <action-mappings>
+    <action
+      path="/loginRepository"
+      type="org.lamsfoundation.lams.contentrepository.struts.action.LoginRepositoryAction"
+      name="loginRepositoryForm"
+      scope="request"
+      input="/loginRepository.jsp"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="success"
+        path="/nodeSelection.do?method=getList"
+        redirect="false"
+      />
+      <forward
+        name="error"
+        path="/error.jsp"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/addFileContent"
+      type="org.lamsfoundation.lams.contentrepository.struts.action.AddFileContentAction"
+      name="addFileContentForm"
+      scope="request"
+      input="nodeSelection.jsp"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="success"
+        path="/nodeSelection.do?method=getList"
+        redirect="false"
+      />
+      <forward
+        name="error"
+        path="/error.jsp"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/nodeSelection"
+      type="org.lamsfoundation.lams.contentrepository.struts.action.NodeSelectionAction"
+      name="nodeSelectionForm"
+      scope="request"
+      input="/nodeSelection.jsp"
+      parameter="method"
+      unknown="false"
+      validate="true"
+    >
+      <forward
+        name="nodelist"
+        path="/nodeSelection.jsp"
+        redirect="false"
+      />
+      <forward
+        name="error"
+        path="/error.jsp"
+        redirect="false"
+      />
+      <forward
+        name="packagelist"
+        path="/packageList.jsp"
+        redirect="false"
+      />
+    </action>
 
-   <controller bufferSize="4096" debug="0" />
-   <message-resources parameter="org.lamsfoundation.lams.contentrepository.struts.ApplicationResources"/>
+    <!-- If you have non XDoclet actions, define them in a file called struts-actions.xml and place it in your merge directory. -->
+  </action-mappings>
+
+   <!-- Define your Struts controller in a file called struts-controller.xml and place it in your merge directory. -->
+
+     <message-resources parameter="org.lamsfoundation.lams.contentrepository.struts.ApplicationResources"/>
+
+   <!-- Define your Struts plugins in a file called struts-plugins.xml and place it in your merge directory. -->
+
 </struts-config>
-

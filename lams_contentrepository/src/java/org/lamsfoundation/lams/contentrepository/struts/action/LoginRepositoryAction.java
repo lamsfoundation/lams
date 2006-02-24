@@ -47,8 +47,14 @@ import org.lamsfoundation.lams.contentrepository.struts.form.LoginRepositoryForm
  * The exceptions will be handled by struts but are listed explicitly
  * here so (1) I can log them and (2) you can see what exceptions are thrown.
  * 
- * XDoclet definition:
- * @struts:action path="/loginRepository" name="loginRepositoryForm" input="/loginRepository.jsp" scope="request" validate="true"  parameter="method"
+ * @struts:action path="/loginRepository" 
+ * 				validate="false"
+ * 				name="loginRepositoryForm" 
+ * 				input="/loginRepository.jsp"
+ * 				scope="request"
+ * 				parameter="method"
+ * @struts:action-forward name="success" path="/nodeSelection.do?method=getList"
+ * @struts:action-forward name="error" path="/error.jsp"
  */
 public class LoginRepositoryAction extends RepositoryDispatchAction {
 	
