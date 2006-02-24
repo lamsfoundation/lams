@@ -96,7 +96,7 @@
 <archive path="/lams_build/lib/xdoclet/xdoclet-webwork-module-1.2.3.jar"/>
 <archive path="/lams_build/lib/xdoclet/xdoclet-wsee-module-1.2.3.jar"/>
 <archive path="/lams_build/lib/xdoclet/xdoclet-xdoclet-module-1.2.3.jar"/>
-<archive path="/lams_build/lib/j2ee/jstl-1.0.jar"/>
+<archive path="/lams_build/lib/j2ee/jstl.jar"/>
 <archive path="/lams_build/lib/fckeditor/FCKeditor-2.3.jar"/>
 <archive path="/lams_build/lib/concurrent/concurrent-1.3.4.jar"/>
 <archive path="/lams_build/lib/catalina/catalina.jar"/>

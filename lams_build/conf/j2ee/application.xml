@@ -79,7 +79,7 @@
 		<java>hibernate3.jar</java>
 	</module>
 	<module>
-		<java>jstl-1.0.jar</java>
+		<java>jstl.jar</java>
 	</module>
 	<module>
 		<java>commons-beanutils.jar</java>
