@@ -29,7 +29,6 @@ import org.lamsfoundation.lams.util.MessageService;
 public class LearningDesignService implements ILearningDesignService{
 	
 	//protected Logger log = Logger.getLogger(LearningDesignService.class);
-	private Vector listOfValidationErrorDTOs = null;
 	protected MessageService messageService;
 	
 	/*
@@ -71,7 +70,7 @@ public class LearningDesignService implements ILearningDesignService{
 	public Vector validateLearningDesign(LearningDesign learningDesign)
 	{
 
-		listOfValidationErrorDTOs = new Vector();		// initialises the list of validation messages.
+		Vector listOfValidationErrorDTOs = new Vector();		// initialises the list of validation messages.
 		
 		validateActivityTransitionRules(learningDesign.getParentActivities(), learningDesign.getTransitions(), listOfValidationErrorDTOs);
 		validateGeneral(learningDesign.getActivities(), listOfValidationErrorDTOs);
