@@ -23,6 +23,8 @@
 	<AllowMultipleLogin>false</AllowMultipleLogin>
 	<!--  Turn on the cache debugging listener. Set to false in production -->
 	<UseCacheDebugListener>false</UseCacheDebugListener>
+	<!--  Number of days after which preview session data may be deleted. Recommend 7 days -->
+	<CleanupPreviewOlderThanDays>7</CleanupPreviewOlderThanDays>
 	<!--  client updates -->
 	<AuthoringClientVersion>1.0</AuthoringClientVersion>
 	<MonitorClientVersion>1.1</MonitorClientVersion>
