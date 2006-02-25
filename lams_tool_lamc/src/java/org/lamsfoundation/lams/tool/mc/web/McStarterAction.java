@@ -1,3 +1,25 @@
+/***************************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ * 
+ * http://www.gnu.org/licenses/gpl.txt
+ * ***********************************************************************/
+
 /**
  * @author Ozgur Demirtas
  * 
@@ -567,6 +589,7 @@ public class McStarterAction extends Action implements McAppConstants {
 	 */
 	protected void retrieveExistingContent(HttpServletRequest request, McAuthoringForm mcAuthoringForm, long toolContentId, McContent mcContent)
 	{
+		logger.debug("retrieving existing content:" + mcContent);
 		IMcService mcService =McUtils.getToolService(request);
 		logger.debug("mcService:" + mcService);
 		
@@ -577,14 +600,19 @@ public class McStarterAction extends Action implements McAppConstants {
 		/*used in authoring mode basic tab*/
 		request.getSession().setAttribute(RICHTEXT_TITLE,mcContent.getTitle());
 		request.getSession().setAttribute(RICHTEXT_INSTRUCTIONS,mcContent.getInstructions());
+		
+		logger.debug("passMark:" +mcContent.getPassMark());
+		if (mcContent.getPassMark() == null)
+			mcContent.setPassMark(new Integer(0));
+		
 		mcAuthoringForm.setPassmark(mcContent.getPassMark().toString());
+		request.getSession().setAttribute(PASSMARK, mcContent.getPassMark()); //Integer
 		
 		/*used in advanced tab*/
 		request.getSession().setAttribute(RICHTEXT_REPORT_TITLE,mcContent.getReportTitle());
 	    request.getSession().setAttribute(RICHTEXT_END_LEARNING_MSG,mcContent.getEndLearningMessage());
-		request.getSession().setAttribute(PASSMARK, mcContent.getPassMark()); //Integer
 		
-		/* used in instructions tab*/
+	    /* used in instructions tab*/
 		request.getSession().setAttribute(RICHTEXT_OFFLINEINSTRUCTIONS,mcContent.getOfflineInstructions());
 		request.getSession().setAttribute(RICHTEXT_ONLINEINSTRUCTIONS,mcContent.getOnlineInstructions());
 		

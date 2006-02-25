@@ -521,8 +521,8 @@ public abstract class McUtils implements McAppConstants {
 		}
 		else
 		{
-			logger.debug("request is from amonitoring url. return to: " + LOAD_MONITORING);
-			return LOAD_MONITORING;	
+			logger.debug("request is from monitoring url. return to: " + LOAD_MONITORING_CONTENT_EDITACTIVITY);
+			return LOAD_MONITORING_CONTENT_EDITACTIVITY;	
 		}
 	}
 	
@@ -573,7 +573,7 @@ public abstract class McUtils implements McAppConstants {
     	request.getSession().removeAttribute(LEARNING_STARTER);
     	request.getSession().removeAttribute(MONITORING_STARTER);
     	request.getSession().removeAttribute(LOAD_LEARNER);
-    	request.getSession().removeAttribute(LOAD_MONITORING);
+    	request.getSession().removeAttribute(LOAD_MONITORING_CONTENT);
     	request.getSession().removeAttribute(INDIVIDUAL_REPORT);
     	request.getSession().removeAttribute(VIEW_SUMMARY);
     	request.getSession().removeAttribute(REDO_QUESTIONS);
@@ -699,7 +699,7 @@ public abstract class McUtils implements McAppConstants {
     	request.getSession().removeAttribute(MAP_USER_RESPONSES);
     	request.getSession().removeAttribute(MAP_MAIN_REPORT);
     	request.getSession().removeAttribute(MAP_STATS);
-    	request.getSession().removeAttribute(CURRENT_MONITORING_TAB);
+    	//request.getSession().removeAttribute(CURRENT_MONITORING_TAB);
     	request.getSession().removeAttribute(REPORT_TITLE_MONITOR);
     	request.getSession().removeAttribute(MONITOR_USER_ID);
     	request.getSession().removeAttribute(MONITORING_REPORT);

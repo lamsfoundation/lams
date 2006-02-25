@@ -43,7 +43,8 @@ public interface McAppConstants {
 	public static final String LEARNING_STARTER							="learningStarter";
 	public static final String MONITORING_STARTER						="monitoringStarter";
 	public static final String LOAD_LEARNER								="loadLearner";
-    public static final String LOAD_MONITORING							="loadMonitoring";
+    public static final String LOAD_MONITORING_CONTENT							="loadMonitoringContent";
+    public static final String LOAD_MONITORING_CONTENT_EDITACTIVITY				="loadMonitoringEditActivity";
     public static final String EXPORT_PORTFOLIO 						= "exportPortfolio";
     public static final String INDIVIDUAL_REPORT						="individualReport";
     public static final String VIEW_SUMMARY								="viewSummary";

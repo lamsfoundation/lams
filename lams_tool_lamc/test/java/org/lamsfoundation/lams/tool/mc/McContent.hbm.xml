@@ -48,6 +48,7 @@
         type="boolean"
         access="property"
         column="define_later"
+        length="1"        
    />
 
    <property
@@ -55,15 +56,16 @@
         type="boolean"
         access="property"
         column="run_offline"
+        length="1"        
    />
 
 
     <property
         name="creationDate"
-        type="java.lang.String"
+        type="java.util.Date"
         access="property"        
         column="creation_date"
-        length="10"
+        length="20"
     />
 
 
@@ -81,6 +83,7 @@
         type="boolean"
         access="property"
         column="questions_sequenced"
+        length="1"        
    />
 
     <property
@@ -168,6 +171,7 @@
         type="boolean"
         access="property"
         column="show_report"
+        length="1"        
    />
     
     
@@ -176,6 +180,7 @@
         type="java.lang.Integer"
         access="property"        
         column="pass_mark"
+        length="1"
     />
 
     <property

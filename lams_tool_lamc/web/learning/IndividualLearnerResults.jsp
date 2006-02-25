@@ -110,7 +110,7 @@ http://www.gnu.org/licenses/gpl.txt
 									  		<c:forEach var="subEntry" items="${mainEntry.value}">
 				  								<tr> 
 													<td NOWRAP align=left class="input" valign=top> 
-					   								    <img src="images/dot.jpg" align=left> &nbsp
+					   								    <img src="<c:out value="${tool}"/>images/dot.jpg" align=left> &nbsp
 														<font size=2 color="#669966">	<c:out value="${subEntry.value}"/> </font>					   								    
 													</td> 
 												</tr>	
@@ -155,7 +155,7 @@ http://www.gnu.org/licenses/gpl.txt
 																		<c:if test="${mainEntry.value == 'true'}"> 		
 																			<c:forEach var="feedbackEntry" items="${sessionScope.mapLeanerFeedbackCorrect}">
 																				<c:if test="${feedbackEntry.key == sessionScope.queIndex}"> 		
-																					    <img src="images/tick.gif" align=right width=20 height=20>
+																					    <img src="<c:out value="${tool}"/>images/tick.gif" align=right width=20 height=20>
 																				</c:if> 																																				
 																			</c:forEach>											
 																		</c:if> 														
@@ -163,7 +163,7 @@ http://www.gnu.org/licenses/gpl.txt
 																		<c:if test="${mainEntry.value == 'false'}"> 		
 																			<c:forEach var="feedbackEntry" items="${sessionScope.mapLeanerFeedbackIncorrect}">
 																				<c:if test="${feedbackEntry.key == sessionScope.queIndex}"> 		
-																					    <img src="images/cross.gif" align=right width=20 height=20>
+																					    <img src="<c:out value="${tool}"/>images/cross.gif" align=right width=20 height=20>
 																				</c:if> 																																				
 																			</c:forEach>											
 																		</c:if> 														

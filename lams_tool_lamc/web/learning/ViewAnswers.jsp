@@ -94,7 +94,7 @@ http://www.gnu.org/licenses/gpl.txt
 				  								<tr> 
 													<td NOWRAP align=left class="input" valign=top> 
 														<font size=2>
-						   								    <img src="images/dot.jpg" align=left> &nbsp
+						   								    <img src="<c:out value="${tool}"/>images/dot.jpg" align=left> &nbsp
 															<font size=2 color="#669966">	<c:out value="${subEntry.value}"/> </font>					   								    
 														</font>
 													</td> 

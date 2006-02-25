@@ -197,7 +197,7 @@ http://www.gnu.org/licenses/gpl.txt
 		
 		        <c:when test='${currentMonitoringTab == "editActivity"}'>
 						<div class="tabbody content_b" >
-							<c:if test="${requestScope.isMonitoredContentInUse != 'true'}"> 			
+							<c:if test="${isMonitoredContentInUse != 'true'}"> 			
 								<c:if test="${sessionScope.editOptionsMode == 0}"> 			
 									<jsp:include page="/authoring/BasicContent.jsp" />
 								</c:if> 				
@@ -205,7 +205,7 @@ http://www.gnu.org/licenses/gpl.txt
 									<jsp:include page="/authoring/OptionsContent.jsp" />
 								</c:if> 				
 							</c:if> 											
-							<c:if test="${requestScope.isMonitoredContentInUse == 'true'}"> 			
+							<c:if test="${isMonitoredContentInUse == 'true'}"> 			
 									<table align=center> 	  
 									<tr>   
 									<td NOWRAP class=error>

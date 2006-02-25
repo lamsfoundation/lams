@@ -52,8 +52,6 @@
     
 
     <!-- Associations -->
-  
-    <!-- bi-directional many-to-one association to TlLamc11QueContent -->
     <many-to-one
         name="mcQueContent"
         class="org.lamsfoundation.lams.tool.mc.pojos.McQueContent"

@@ -57,7 +57,13 @@
 	  	/>
 
 	  	<forward
-		    name="loadMonitoring"
+		    name="loadMonitoringContent"
+		    path="/monitoring/MonitoringMaincontent.jsp"
+		    redirect="true"
+	  	/>
+	  	
+	  	<forward
+		    name="loadMonitoringEditActivity"
 		    path="/monitoring/MonitoringMaincontent.jsp"
 		    redirect="true"
 	  	/>
@@ -127,7 +133,7 @@
 	      />
 	      
 	  	<forward
-		    name="loadMonitoring"
+		    name="loadMonitoringContent"
 		    path="/monitoring/MonitoringMaincontent.jsp"
 		    redirect="true"
 	  	/>
@@ -354,7 +360,7 @@
 	      />	         			   			
    			
 	  	<forward
-		    name="loadMonitoring"
+		    name="loadMonitoringContent"
 		    path="/monitoring/MonitoringMaincontent.jsp"
 		    redirect="true"
 	  	/>
@@ -406,11 +412,17 @@
 	      />	         			      		
 
 	  	<forward
-		    name="loadMonitoring"
+		    name="loadMonitoringContent"
 		    path="/monitoring/MonitoringMaincontent.jsp"
 		    redirect="true"
 	  	/>
-
+	  	
+	  	<forward
+		    name="loadMonitoringEditActivity"
+		    path="/monitoring/MonitoringMaincontent.jsp"
+		    redirect="true"
+	  	/>
+	  	
        <forward
 	        name="load"
 	        path="/authoring/AuthoringMaincontent.jsp"
