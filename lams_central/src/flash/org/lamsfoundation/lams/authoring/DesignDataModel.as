@@ -66,6 +66,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
         //initialise the hashtables
 		_activities = new Hashtable("_activities");
 		_transitions = new Hashtable("_transitions");
+		_groupings = new Hashtable("_groupings");
 		
 		//set the defualts:
 		_objectType = "LearningDesign";
@@ -83,7 +84,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		
 		
     }
-	
+	/*
 	public function getChildActivities(ActivityUIID:Number):Array{
 		var _child:Array = new Array();
 		var values = _activities.values();
@@ -94,7 +95,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		}
 		return _child;
 	}
-	
+	*/
 	/**
 	 * Validates the design data model
 	 * @usage   
@@ -205,13 +206,15 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		dispatchEvent({type:'ddmBeforeUpdate',target:this});
 		Debugger.log('groupingUIID:'+grp.groupingUIID,Debugger.GEN,'addGrouping','DesignDataModel');
 		var r = _groupings.put(grp.groupingUIID,grp);
+		/*
 		if(r){
 			return r;
 		}else{
 			return new LFError("Adding grouping to hashtable failed","addGrouping",this,'groupingUIID:'+grp.groupingUIID);
 		}
-		
-		
+		*/
+		return true;
+		dispatchEvent({type:'ddmUpdate',target:this});
 	}
 	
 	
@@ -257,18 +260,24 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 			var dto = design.activities[i];
 			//change to using if _activityTypeID == Activity.TOOL_ACTIVITY_TYPE
 			//depending on the objectType call the relevent constructor.
-			if(dto.objectType = "ToolActivity"){
+			Debugger.log('Adding activity dto.activityTypeID:'+dto.activityTypeID,Debugger.GEN,'setDesign','DesignDataModel');	
+			
+			//if(dto.objectType = "ToolActivity"){
+			if(dto.activityTypeID == Activity.TOOL_ACTIVITY_TYPE){
 				var newToolActivity:ToolActivity = new ToolActivity(dto.activityUIID);
 				newToolActivity.populateFromDTO(dto);				
 				_activities.put(newToolActivity.activityUIID,newToolActivity);
 			
-			}else if(dto.objectType = "ComplexActivity"){
-				//TODO: add support for Parallel and Optional activity
-			
+			//}else if(dto.objectType == "ComplexActivity"){
+			}else if(dto.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE){
+				//TODO: Optional activity
+				
+			}else if(dto.activityTypeID == Activity.GROUPING_ACTIVITY_TYPE){
+				//todo
 			}
 		}
 		
-		//set the activities in the hash table
+		//set the transitions in the hashtable
 		for(var i=0; i<design.transitions.length;i++){
 			//note if the design is being opened - then it must have ui_ids already
 			Debugger.log('Adding transition ID:'+design.transitions[i].transitionUIID,Debugger.GEN,'setDesign','DesignDataModel');
@@ -280,6 +289,11 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 											tdto.learningDesignID);
 			newTransition.transitionID = tdto.transitionID;
 			_transitions.put(newTransition.transitionUIID,newTransition);
+		}
+		
+		//set the groupings in the hashtable
+		for(var i=0; i<design.groupings.length;i++){
+			
 		}
 		
 		//add a loop for the groupings.
@@ -411,7 +425,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 			
 			for(var i=0; i<classGroups.length; i++){
 				//TODO: Add a toData to the gorup class (after we make the group class :)
-				design[i] = classGroups[i].toData();
+				design.groupings[i] = classGroups[i].toData();
 			}
 		}
 
@@ -471,8 +485,9 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	 * @return  
 	 */
 	public function getGroupingByUIID(UIID:Number):Grouping{
+		_global.breakpoint();
 		var g:Grouping = _groupings.get(UIID);
-		Debugger.log('Returning grouping:'+g.groupingUIID+' for activity:'+UIID,Debugger.GEN,'getGroupingByUIID','DesignDataModel');
+		Debugger.log('Returning grouping:'+ObjectUtils.toString(g)+' for uiid:'+UIID,Debugger.GEN,'getGroupingByUIID','DesignDataModel');
 		return g;
 	}
 	
