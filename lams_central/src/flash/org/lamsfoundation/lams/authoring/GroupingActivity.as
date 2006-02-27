@@ -15,7 +15,8 @@ class GroupingActivity extends Activity{
 	function GroupingActivity(activityUIID:Number){
 		super(activityUIID);
 		_activityTypeID = GROUPING_ACTIVITY_TYPE;
-		
+		_activityCategoryID = CATEGORY_SYSTEM;
+		_groupingSupportType = GROUPING_SUPPORT_OPTIONAL;
 	}
 	
 	
@@ -45,6 +46,10 @@ class GroupingActivity extends Activity{
 		if(_createGroupingUIID){	dto.createGroupingUIID = _createGroupingUIID;	}
 		return dto;
 	}
+	
+
+	
+	//get and sets
 	
 	
 	/**
