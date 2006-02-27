@@ -554,6 +554,17 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		
 	}
 	
+	public function getTransitionsForActivityUIID(UIID):Array{
+		var ts:Array = _transitions.values();
+		var myTransitions:Array = new Array();
+		for(var i=0; i<ts.length;i++){
+			if(ts[i].toUIID == UIID || ts[i].fromUIID == UIID){
+				myTransitions.push(ts[i]);
+			}
+		}
+		return myTransitions;
+	}
+	
 	
 	//Getters and setters for the properties
 	public function get objectType():String{
