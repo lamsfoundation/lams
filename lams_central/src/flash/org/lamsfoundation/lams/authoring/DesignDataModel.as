@@ -479,7 +479,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	}
 	
 	/**
-	 * Retreives a reference to an activity in the DDM using its UIID
+	 * Retreives a reference to a grouping in the DDM using its UIID
 	 * @usage   
 	 * @param   UIID 
 	 * @return  
@@ -489,6 +489,44 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		var g:Grouping = _groupings.get(UIID);
 		Debugger.log('Returning grouping:'+ObjectUtils.toString(g)+' for uiid:'+UIID,Debugger.GEN,'getGroupingByUIID','DesignDataModel');
 		return g;
+	}
+	
+	/**
+	 * Returns a grouping activity based on a groupingUIID 
+	 * Used by the property inspector
+	 * @usage   
+	 * @param   UIID The UIID of the Grouping
+	 * @return  
+	 */
+	public function getGroupingActivityByGroupingUIID(UIID:Number):GroupingActivity{
+		//get all the grouping activities:
+		var gActs = getGroupingActivities();
+		//macthup the createGroupingUIID
+		for(var i=0; i<gActs.length; i++){
+			if(gActs[i].createGroupingUIID == UIID){
+				Debugger.log('Returning grouping activity:'+gActs[i].activityUIID+' for grouping uiid:'+UIID,Debugger.GEN,'getGroupingByUIID','DesignDataModel');
+				return gActs[i];
+			}
+		}
+		Debugger.log('Did not find a grouping activity for grouping uiid:'+UIID,Debugger.GEN,'getGroupingActivityByGroupingUIID','DesignDataModel');
+		
+	}
+	
+	/**
+	 * Returns an Array of all the Grouping Activites
+	 * @usage   
+	 * @return  
+	 */
+	public function getGroupingActivities():Array{
+		var acts:Array = _activities.values();
+		var gActs = new Array();
+		for(var i=0; i<acts.length;i++){
+			if(acts[i].activityTypeID == Activity.GROUPING_ACTIVITY_TYPE){
+				gActs.push(acts[i]);
+			}
+		}
+		Debugger.log('Returning '+gActs.length+' grouping activities',Debugger.GEN,'getGroupingActivities','DesignDataModel');
+		return gActs;
 	}
 	
 	/**
