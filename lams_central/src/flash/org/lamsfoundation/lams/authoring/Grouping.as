@@ -1,4 +1,5 @@
 ﻿import org.lamsfoundation.lams.authoring.*;
+import org.lamsfoundation.lams.common.dict.*
 import org.lamsfoundation.lams.common.*;
 import org.lamsfoundation.lams.common.util.*;/**
 * Grouping data class. Groupings are craeted by grouping activities.  They contain data about how to group the users.
@@ -24,6 +25,19 @@ class org.lamsfoundation.lams.authoring.Grouping {
 		_groupingUIID = uiid;
 		Debugger.log('Created a new Grouping:'+_groupingUIID,Debugger.GEN,'Constructor','Grouping');
 	}
+	//static class level methods
+	/**
+	 * Created an array of grouping types to be can be used as a dataprovider
+	 * @usage   
+	 * @return  
+	 */
+	public static function getGroupingTypesDataProvider():Array{
+		var types:Array = [];
+		types.addItem({label: Dictionary.getValue('random_grp_lbl'), data: RANDOM_GROUPING});
+		types.addItem({label: Dictionary.getValue('chosen_grp_lbl'), data: CHOSEN_GROUPING});
+		return types;
+	}
+
 	/**
 	 * Populates the class using a DTO.  All fields are overwritten, even if they dont exist in the DTO
 	 * @usage   
