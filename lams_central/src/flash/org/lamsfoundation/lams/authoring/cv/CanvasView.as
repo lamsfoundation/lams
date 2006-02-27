@@ -29,6 +29,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends AbstractView{
 	
     private var _gridLayer_mc:MovieClip;
     private var _transitionLayer_mc:MovieClip;
+	private var _activityLayerComplex_mc:MovieClip;
 	private var _activityLayer_mc:MovieClip;
 	
 	private var _transitionPropertiesOK:Function;
@@ -138,6 +139,7 @@ public function viewUpdate(event:Object):Void{
 		//_canvas_mc = this;
 		_gridLayer_mc = _canvas_mc.createEmptyMovieClip("_gridLayer_mc", _canvas_mc.getNextHighestDepth());
 		_transitionLayer_mc = _canvas_mc.createEmptyMovieClip("_transitionLayer_mc", _canvas_mc.getNextHighestDepth());
+		_activityLayerComplex_mc = _canvas_mc.createEmptyMovieClip("_activityLayerComplex_mc", _canvas_mc.getNextHighestDepth());
 		_activityLayer_mc = _canvas_mc.createEmptyMovieClip("_activityLayer_mc", _canvas_mc.getNextHighestDepth());
 		
 
@@ -191,19 +193,29 @@ public function viewUpdate(event:Object):Void{
 		var cvv = CanvasView(this);
 		
 		var cvc = getController();
+		Debugger.log('I am in drawActivity and Activity typeID :'+a+' added to the cm.activitiesDisplayed hashtable :'+newActivity_mc,4,'drawActivity','CanvasView');
+		Debugger.log('I am in drawActivity and Activity typeID :'+a.activityTypeID+' added to the cm.activitiesDisplayed hashtable :'+newActivity_mc,4,'drawActivity','CanvasView');
 		//take action depending on act type
 		if(a.activityTypeID==Activity.TOOL_ACTIVITY_TYPE || a.isGateActivity() || a.isGroupActivity() ){
 			var newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasActivity",DepthManager.kTop,{_activity:a,_canvasController:cvc,_canvasView:cvv});
 			cm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
 			Debugger.log('Tool or gate activity a.title:'+a.title+','+a.activityUIID+' added to the cm.activitiesDisplayed hashtable:'+newActivity_mc,4,'drawActivity','CanvasView');
-		}else if(a.activityTypeID==Activity.PARALLEL_ACTIVITY_TYPE){
+		}
+		if(a.activityTypeID==Activity.PARALLEL_ACTIVITY_TYPE){
 			//get the children
 			var children:Array = cm.getCanvas().ddm.getComplexActivityChildren(a.activityUIID);
 			//var newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasParallelActivity",DepthManager.kTop,{_activity:a,_children:children,_canvasController:cvc,_canvasView:cvv});
 			var newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasParallelActivity",DepthManager.kTop,{_activity:a,_children:children,_canvasController:cvc,_canvasView:cvv});
 			cm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
 			Debugger.log('Parallel activity a.title:'+a.title+','+a.activityUIID+' added to the cm.activitiesDisplayed hashtable :'+newActivity_mc,4,'drawActivity','CanvasView');
-		
+		}
+		if(a.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE){
+			var children:Array = cm.getCanvas().ddm.getComplexActivityChildren(a.activityUIID);
+			//var newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasParallelActivity",DepthManager.kTop,{_activity:a,_children:children,_canvasController:cvc,_canvasView:cvv});
+			var newActivity_mc = _activityLayerComplex_mc.createChildAtDepth("CanvasOptionalActivity",DepthManager.kTop,{_activity:a,_children:children,_canvasController:cvc,_canvasView:cvv});
+			cm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
+			Debugger.log('Optional activity Type a.title:'+a.title+','+a.activityUIID+' added to the cm.activitiesDisplayed hashtable :'+newActivity_mc,4,'drawActivity','CanvasView');
+			
 		}else{
 			Debugger.log('The activity:'+a.title+','+a.activityUIID+' is of unknown type, it cannot be drawn',Debugger.CRITICAL,'drawActivity','CanvasView');
 		}
