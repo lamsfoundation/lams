@@ -379,6 +379,15 @@ class org.lamsfoundation.lams.authoring.Application {
 
         //Toolbar
         //_toolbar.setSize(w,_toolbar.height);
+		//Property Inspector
+		var pi = _canvas.getPropertyInspector();
+		//pi._y = h;//- pi._height;
+		pi._y = h - 210;
+		
+		
+		
+		
+		
     }
     
     /**
