@@ -21,11 +21,16 @@
 
 package org.lamsfoundation.lams.monitoring.web;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionMessage;
 
 /**
  * See DummyMonitoringAction
@@ -38,7 +43,11 @@ public class DummyForm extends ActionForm {
 	private String desc;
 	private Long learningDesignId;
 	private Integer organisationId;
-
+	private Integer startDay;
+	private Integer startMonth;
+	private Integer startYear;
+	private Integer startHour;
+	private Integer startMinute;
 	
 	public void reset(ActionMapping mapping, HttpServletRequest request) {
 		
@@ -92,5 +101,65 @@ public class DummyForm extends ActionForm {
 		this.organisationId = organisationId;
 	}
 
+	public Integer getStartDay() {
+		return startDay;
+	}
 
+
+	public void setStartDay(Integer startDay) {
+		this.startDay = startDay;
+	}
+
+
+	public Integer getStartHour() {
+		return startHour;
+	}
+
+
+	public void setStartHour(Integer startHour) {
+		this.startHour = startHour;
+	}
+
+
+	public Integer getStartMinute() {
+		return startMinute;
+	}
+
+
+	public void setStartMinute(Integer startMinute) {
+		this.startMinute = startMinute;
+	}
+
+
+	public Integer getStartMonth() {
+		return startMonth;
+	}
+
+
+	public void setStartMonth(Integer startMonth) {
+		this.startMonth = startMonth;
+	}
+
+
+	public Integer getStartYear() {
+		return startYear;
+	}
+
+
+	public void setStartYear(Integer startYear) {
+		this.startYear = startYear;
+	}
+	
+	public Calendar getStartDate() {
+		if ( getStartDay() != null && getStartDay().intValue() > 0 ) {
+			Calendar cal = new GregorianCalendar();
+			cal.set(Calendar.DAY_OF_MONTH, getStartDay().intValue());
+			cal.set(Calendar.MONTH, getStartMonth() != null ? getStartMonth().intValue()-1 : 1);
+			cal.set(Calendar.YEAR, getStartYear() != null ? getStartYear().intValue() : 0);
+			cal.set(Calendar.HOUR_OF_DAY, getStartHour() != null ? getStartHour().intValue() : 0);
+			cal.set(Calendar.MINUTE, getStartMinute() != null ? getStartMinute().intValue() : 0);
+			return cal;
+		}
+		return null;
+	}
 }

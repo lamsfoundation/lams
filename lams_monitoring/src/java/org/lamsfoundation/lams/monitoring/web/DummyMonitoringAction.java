@@ -203,18 +203,18 @@ public class DummyMonitoringAction extends LamsDispatchAction
         
         testLesson = monitoringService.createLessonClassForLesson(testLesson.getLessonId().longValue(),
         		organisation,
-        		"Leaner Group",
+        		"Learner Group",
 				learners,
 				"Staff Group",
                 staffs);
 
         // start the lesson.
-        this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-//        Calendar cal = Calendar.getInstance();
-//        cal.setTime(new Date());
-//        cal.add(Calendar.MILLISECOND,5000);
-//        monitoringService.startLessonOnSchedule(testLesson.getLessonId().longValue(),cal.getTime());
-        monitoringService.startLesson(testLesson.getLessonId().longValue());
+        Calendar startDate = dummyForm.getStartDate();
+        if ( startDate == null ) {
+            monitoringService.startLesson(testLesson.getLessonId().longValue());
+        } else {
+        	monitoringService.startLessonOnSchedule(testLesson.getLessonId().longValue(),startDate.getTime());
+        }
 
     	return mapping.findForward(LESSON_STARTED_FORWARD);
     }

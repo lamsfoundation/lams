@@ -46,8 +46,18 @@
 		<tr><td class="formlabel">Title</td>
 		<td class="formcontrol"><html:text property="title" maxlength="80"  size="50"/></td></tr>
 
-		<tr><td class="formlabel">Description</td>
+		<tr><td class="formlabel">Description (optional)</td>
 		<td class="formcontrol"><html:text property="desc" maxlength="80"  size="50"/></td></tr>
+
+		<tr><td class="formlabel">Start lesson at date/time (optional)<BR>
+		Format: DD/MM/YYYY HH:MM (24hr time)</td>
+		<td class="formcontrol">
+			<html:text property="startDay" maxlength="2"  size="3"/>/
+			<html:text property="startMonth" maxlength="2"  size="3"/>/
+			<html:text property="startYear" maxlength="4"  size="5"/>&nbsp;&nbsp;
+			<html:text property="startHour" maxlength="2"  size="3"/>:
+			<html:text property="startMinute" maxlength="2"  size="3"/>			
+		</td></tr>
 
 		<tr><td class="formlabel">Organisation</td>
 		<td class="formcontrol">
