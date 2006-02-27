@@ -3,6 +3,7 @@ import org.lamsfoundation.lams.authoring.cv.*
 import org.lamsfoundation.lams.common.mvc.*
 import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.common.ui.*
+import org.lamsfoundation.lams.common.dict.*
 import mx.utils.*
 
 
@@ -26,12 +27,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		
 	}
    
-   public function activityClick(ca:Object):Void{
+    public function activityClick(ca:Object):Void{
 	   Debugger.log('activityClick CanvasActivity:'+ca.activity.activityUIID,Debugger.GEN,'activityClick','CanvasController');
 	   //if transition tool active
-	   if(_canvasModel.isTransitionToolActive()){
+	    if(_canvasModel.isTransitionToolActive()){
 		   var transitionTarget = createValidTransitionTarget(ca);
-		   if(transitionTarget instanceof LFError){
+		    if(transitionTarget instanceof LFError){
 				transitionTarget.showErrorAlert(null); 
 				//transitionTarget.showMessageConfirm()
 				//TODO: transitionTarget.showErrorAlertCrashDump(null); 
@@ -44,7 +45,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				_canvasModel.addActivityToTransition(ca);
 			}
 			*/
-	   }else{
+	    }else{
 		   //just select the activity
 		 _canvasModel.selectedItem = ca;
 		 _canvasModel.isDragging = true;
@@ -62,14 +63,58 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		}else{
 			//TODO: Show the property inspector if its a parralel activity or whatever
 		}
-   }
+    }
    
-   public function activityRelease(ca:Object):Void{
+    public function activityRelease(ca:Object):Void{
 	   Debugger.log('activityRelease CanvasActivity:'+ca.activity.activityUIID,Debugger.GEN,'activityRelease','CanvasController');
-	   if(_canvasModel.isDragging){
+	    if(_canvasModel.isDragging){
 			ca.stopDrag();
 			//if we are on the bin - trash it
 			if (ca.hitTest(_canvasModel.getCanvas().bin)){
+				_canvasModel.getCanvas().removeActivity(ca.activity.activityUIID);
+			}
+			
+			var optionalOnCanvas:Array  = _canvasModel.findOptionalActivities();
+			if (ca.activity.parentUIID != null){
+				trace ("testing Optional child on Canvas "+ca.activity.activityUIID)
+				for (var i=0; i<optionalOnCanvas.length; i++){
+				//trace ("testing Optional on Canvas "+i)
+					if (ca.activity.parentUIID == optionalOnCanvas[i].activity.activityUIID){
+						if (optionalOnCanvas[i].locked == false){
+							if (ca._x > 170){
+								trace (ca.activity.activityUIID+" had a hitTest with canvas.")
+								_canvasModel.removeOptionalCA(ca, optionalOnCanvas[i].activity.activityUIID);
+							//var msg:String = Dictionary.getValue('act_lock_chk');
+							//LFMessage.showMessageAlert(msg);
+							}
+						}
+					}
+					//trace ("Optional ActivityID is: "+optionalOnCanvas[i].activity.activityUIID)
+					
+				}
+			}
+			//if we are on the optional Activity remove this activity from canvas and assign it a parentID of 
+			//optional activity and place it in the optional activity window.
+			
+			
+			//trace ("testing number of Optionals on Canvas = "+optionalOnCanvas.length)
+			for (var i=0; i<optionalOnCanvas.length; i++){
+				//trace ("testing Optional on Canvas "+i)
+				if (ca.activity.activityUIID != optionalOnCanvas[i].activity.activityUIID){
+					if (ca.hitTest(optionalOnCanvas[i])){
+						if (optionalOnCanvas[i].locked == true){
+							var msg:String = Dictionary.getValue('act_lock_chk');
+							LFMessage.showMessageAlert(msg);
+						}else{
+							_canvasModel.addParentToActivity(optionalOnCanvas[i].activity.activityUIID, ca)
+						}
+						//trace ("Optional ActivityID is: "+optionalOnCanvas[i].activity.activityUIID)
+					}
+				}
+			}
+			
+			if (ca.hitTest(_canvasModel.getCanvas().bin)){
+				
 				_canvasModel.getCanvas().removeActivity(ca.activity.activityUIID);
 			}
 			
@@ -83,6 +128,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			ca.activity.xCoord = ca._x;
 			ca.activity.yCoord = ca._y;
 			
+			//refresh the transitions
 			//TODO: refresh the transitions as you drag...
 			var myTransitions = _canvasModel.getCanvas().ddm.getTransitionsForActivityUIID(ca.activity.activityUIID);
 			//run in a loop ato support branches, maybe more then 2 transitions.
@@ -94,14 +140,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			}
 			_canvasModel.setDirty();
 			
-			
-			
-			
 			Debugger.log('ca.activity.xCoord:'+ca.activity.xCoord,Debugger.GEN,'activityRelease','CanvasController');
 			
 			
 		}
-   }
+	}
+   
    
    public function activityReleaseOutside(ca:Object):Void{
 	   Debugger.log('activityReleaseOutside CanvasActivity:'+ca.activity.activityUIID,Debugger.GEN,'activityReleaseOutside','CanvasController');
@@ -187,6 +231,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	}
    
 	
+	
 	/**
 	 * Transition Properties OK Handler
 	 * @usage   
@@ -224,8 +269,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		}
 		if(_canvasModel.activeTool == CanvasModel.OPTIONAL_TOOL){
 			var p = new Point(canvas_mc._xmouse, canvas_mc._ymouse); 
-			//_canvasModel.createNewOptionalActivity(Activity.PERMISSION_OPTIONAL_ACTIVITY_TYPE,p);
-			//_canvasModel.getCanvas().stopOptionalActivity();
+			_canvasModel.createNewOptionalActivity(Activity.OPTIONAL_ACTIVITY_TYPE,p);
+			//_canvasModel.createNewOptionalActivity(p);
+			_canvasModel.getCanvas().stopOptionalActivity();
 			
 		}
 		if(_canvasModel.activeTool == CanvasModel.GROUP_TOOL){
