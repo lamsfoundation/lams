@@ -653,9 +653,11 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		//note the init obnject parameters are passed into the _container object in the embeded class (*in this case PropertyInspector)
 		//we are setting up a vew so we need to pass the model and controller to it
 		var cc:CanvasController = canvasView.getController();
-		_pi = PopUpManager.createPopUp(Application.root, LFWindow, false,{title:Dictionary.getValue('property_inspector_title'),closeButton:true,scrollContentPath:"PropertyInspector",_canvasModel:canvasModel,_canvasController:cc});
+		_pi = PopUpManager.createPopUp(Application.root, LFWindow, false,{title:Dictionary.getValue('pi_title'),closeButton:true,scrollContentPath:"PropertyInspector",_canvasModel:canvasModel,_canvasController:cc});
 		//Assign dialog load handler
         _pi.addEventListener('contentLoaded',Delegate.create(this,piLoaded));
+
+		
         //okClickedCallback = callBack;
     }
 	
@@ -672,20 +674,19 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 
 	}
 	
+	/**
+	 * Fired whern property inspector's contentLoaded is fired
+	 * Positions the PI
+	 * @usage   
+	 * @param   evt 
+	 * @return  
+	 */
 	public function piLoaded(evt:Object) {
-        //Debugger.log('!evt.type:'+evt.type,Debugger.GEN,'piLoaded','Canvas');
-        //Check type is correct
         if(evt.type == 'contentLoaded'){
-            //Set up callback for ok button click
-            //Debugger.log('!evt.target.scrollContent:'+evt.target.scrollContent,Debugger.GEN,'piLoaded','Canvas');
-			//set the model ref:
-			//evt.target.scrollContent.PropertyInspector.setCanvasModelRef(canvasModel)
-			//_global.breakpoint();
+			//call a resize to line up the PI
+			Application.getInstance().onResize();
 			
-			
-			
-			
-            //evt.target.scrollContent.addEventListener('okClicked',Delegate.create(this,okClicked));
+           
         }else {
             //TODO raise wrong event type error 
         }
@@ -831,6 +832,10 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	
 	public function get ddm():DesignDataModel{
 		return _ddm;
+	}
+	
+	public function getPropertyInspector():MovieClip{
+		return _pi;
 	}
 	
 	
