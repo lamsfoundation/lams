@@ -49,6 +49,7 @@ public class FolderContentDTO {
 	public Integer permissionCode;
 	public Vector versionDetails;
 	public Long licenseID; // applicable for designs only
+	public String licenseText; // applicable for designs only
 	
 	public FolderContentDTO(){
 		
@@ -78,6 +79,7 @@ public class FolderContentDTO {
 		this.resourceID = design.getLearningDesignId();
 		this.permissionCode = permissionCode;
 		this.licenseID = ( design.getLicense() != null ? design.getLicense().getLicenseID() : null);
+		this.licenseText = design.getLicenseText();
 		this.versionDetails = null;
 	}
 	public FolderContentDTO(WorkspaceFolder workspaceFolder, Integer permissionCode){
@@ -164,5 +166,13 @@ public class FolderContentDTO {
 	/** Set the ID of the related license. Only applicable for learning designs */
 	public void setLicenseID(Long licenseID) {
 		this.licenseID = licenseID;
+	}
+
+	public String getLicenseText() {
+		return licenseText;
+	}
+
+	public void setLicenseText(String licenseText) {
+		this.licenseText = licenseText;
 	}
 }
