@@ -527,7 +527,7 @@ public class MonitoringAction extends LamsDispatchAction
     	//force complete
     	try {
     		String message = monitoringService.forceCompleteLessonByUser(learnerId,lessonId,activityId);
-    		flashMessage = new FlashMessage("removeLesson",message);
+    		flashMessage = new FlashMessage("forceComplete",message);
 		} catch (Exception e) {
 			flashMessage = new FlashMessage("forceComplete",
 					"Error occurs :" +  e.toString(),
