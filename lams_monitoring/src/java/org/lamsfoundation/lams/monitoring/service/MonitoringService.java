@@ -474,6 +474,12 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
      */
     public void startLessonOnSchedule(long lessonId, Date startDate){
 
+        //we get the lesson just created
+        Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
+        if ( requestedLesson == null) {
+        	throw new MonitoringServiceException("Lesson for id="+lessonId+" is missing. Unable to start lesson.");
+        }
+        
         JobDetail startLessonJob = getStartScheduleLessonJob();
         //setup the message for scheduling job
         startLessonJob.setName("startLessonOnSchedule");
@@ -485,7 +491,8 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         //start the scheduling job
         try
         {
-        	setLessonState(lessonId,Lesson.NOT_STARTED_STATE);
+        	requestedLesson.setScheduleStartDate(startDate);
+        	setLessonState(requestedLesson,Lesson.NOT_STARTED_STATE);
             scheduler.scheduleJob(startLessonJob, startLessonTrigger);
         }
         catch (SchedulerException e)
@@ -500,12 +507,18 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 
 
     /**
-     * Start lesson on schedule.
+     * Finish lesson on schedule.
      * @param lessonId
      * @param endDate 
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#finishLessonOnSchedule(long , Date)
      */
 	public void finishLessonOnSchedule(long lessonId, Date endDate) {
+        //we get the lesson want to finish
+        Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
+        if ( requestedLesson == null) {
+        	throw new MonitoringServiceException("Lesson for id="+lessonId+" is missing. Unable to start lesson.");
+        }
+
         JobDetail finishLessonJob = getFinishScheduleLessonJob();
         //setup the message for scheduling job
         finishLessonJob.setName("finishLessonOnSchedule");
@@ -517,6 +530,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         //start the scheduling job
         try
         {
+        	requestedLesson.setScheduleEndDate(endDate);
             scheduler.scheduleJob(finishLessonJob, finishLessonTrigger);
         }
         catch (SchedulerException e)
