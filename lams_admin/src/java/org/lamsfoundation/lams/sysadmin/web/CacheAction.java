@@ -1,4 +1,4 @@
-package org.lamsfoundation.lams.admin.web;
+package org.lamsfoundation.lams.sysadmin.web;
 
 import java.io.IOException;
 import java.util.Map;
@@ -24,7 +24,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * initial configuration of the individual environment setting is done here.
  * 
  * @struts:action name="CacheActionForm"
- * 				  path="/cache"
+ * 				  path="/sysadmin/cache"
  * 				  parameter="method"
  * 				  validate="false"
  * @struts:action-forward name="cache" path=".cache"

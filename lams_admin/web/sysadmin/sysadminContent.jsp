@@ -6,7 +6,7 @@
 <H1>System Administration</H1>
 
 <UL>
-<LI><A HREF="cache.do"><fmt:message key="cache.title"/></A></LI>
+<LI><A HREF="sysadmin/cache.do"><fmt:message key="cache.title"/></A></LI>
 <LI><fmt:message key="sysadmin.manage.config.file"/></LI>
 </UL>
 

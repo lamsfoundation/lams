@@ -1,4 +1,4 @@
-package org.lamsfoundation.lams.admin.web;
+package org.lamsfoundation.lams.sysadmin.web;
 
 import javax.servlet.http.HttpServletRequest;
 

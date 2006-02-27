@@ -18,12 +18,12 @@
       type="org.lamsfoundation.lams.admin.web.OrganisationActionForm"
     />
     <form-bean
-      name="UsersRemoveActionForm"
-      type="org.lamsfoundation.lams.admin.web.UsersRemoveActionForm"
+      name="CacheActionForm"
+      type="org.lamsfoundation.lams.sysadmin.web.CacheActionForm"
     />
     <form-bean
-      name="CacheActionForm"
-      type="org.lamsfoundation.lams.admin.web.CacheActionForm"
+      name="UsersRemoveActionForm"
+      type="org.lamsfoundation.lams.admin.web.UsersRemoveActionForm"
     />
     <form-bean
       name="UserActionForm"
@@ -94,20 +94,17 @@
       />
     </action>
     <action
-      path="/sysadmin"
-      type="org.lamsfoundation.lams.admin.web.SysadminAction"
+      path="/sysadmin/cache"
+      type="org.lamsfoundation.lams.sysadmin.web.CacheAction"
+      name="CacheActionForm"
+      scope="request"
       parameter="method"
       unknown="false"
       validate="false"
     >
       <forward
-        name="sysadmin"
-        path=".sysadmin"
-        redirect="false"
-      />
-      <forward
-        name="error"
-        path=".admin.error"
+        name="cache"
+        path=".cache"
         redirect="false"
       />
     </action>
@@ -166,21 +163,6 @@
       <forward
         name="error"
         path=".admin.error"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/cache"
-      type="org.lamsfoundation.lams.admin.web.CacheAction"
-      name="CacheActionForm"
-      scope="request"
-      parameter="method"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="cache"
-        path=".cache"
         redirect="false"
       />
     </action>
