@@ -239,7 +239,8 @@
             <include name="**/*Form.java" />
          </fileset>
 
-         <deploymentdescriptor servletspec="2.3" sessiontimeout="${sessiontimeout}"/>
+         <deploymentdescriptor servletspec="2.4" 
+				distributable="false" sessiontimeout="${sessiontimeout}"/>
 			
          <strutsconfigxml validatexml="true" version="1.2" mergedir="${conf.xdoclet.dir}"/>
          <strutsdynaformvalidationxml destdir="${conf.struts.dir}" mergedir="${conf.xdoclet.dir}" version="1.1.3"  />

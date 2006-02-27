@@ -1,4 +1,4 @@
-<%@ taglib uri="tags-html-el" prefix="html-el" %>
+<%@ taglib uri="tags-html" prefix="html" %>
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-logic" prefix="logic" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
@@ -11,9 +11,9 @@
 		<img src="<lams:LAMSURL/>/images/error.jpg" alt="Error occured"/>
 	</td>
 	<td width="90%" valign="middle" class="body" colspan="2">
-		 <html-el:messages id="error" message="false"> 
+		 <html:messages id="error" message="false"> 
 			 <c:out value="${error}" escapeXml="false"/><BR>
-		 </html-el:messages> 
+		 </html:messages> 
 	</td>
 </tr>
 </logic:messagesPresent>

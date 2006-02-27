@@ -67,6 +67,15 @@
             column="session_id"
         />
 
+        <property
+            name="sessionName"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="session_name"
+            length="250"
+        />
+
         <!--
             To add non XDoclet property mappings, create a file named
                 hibernate-properties-ForumToolSession.xml

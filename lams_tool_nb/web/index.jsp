@@ -1,5 +1,5 @@
 <%@ page import="org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants" %>
-<%@ taglib uri="tags-html-el" prefix="html" %>
+<%@ taglib uri="tags-html" prefix="html" %>
 <%
 
 String authorUrl = "/authoring?toolContentID="+355;
