@@ -299,7 +299,11 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 				//give it a new UIID:
 				actToAdd.activityUIID = _ddm.newUIID();
 			break;
-			//case(Activity.OPTIONS_ACTIVITY_TYPE):
+			case(Activity.OPTIONAL_ACTIVITY_TYPE):
+				actToAdd = Activity(actToCopy.clone());
+				//give it a new UIID:
+				actToAdd.activityUIID = _ddm.newUIID();
+			
 			case(Activity.PARALLEL_ACTIVITY_TYPE):
 			
 				actToAdd = Activity(actToCopy.clone());
@@ -355,7 +359,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	}
 	*/
 	/**
-	 * Removes an activity using its activityUIID.  
+	 * Removes an activity from Design Data Model using its activityUIID.  
 	 * Called by the bin
 	 * @usage   
 	 * @param   activityUIID 
@@ -428,7 +432,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		}else{
 			var fn:Function = Proxy.create(ref,confirmedClearDesign, ref);
 			LFMessage.showMessageConfirm("__Are you sure you want to clear your design?__", fn,null);
-			//Debugger.log('Set design failed as old design could not be cleared',Debugger.CRITICAL,"setDesign",'Canvas');		
+			Debugger.log('Set design failed as old design could not be cleared',Debugger.CRITICAL,"setDesign",'Canvas');		
 		}
 		
 		
@@ -487,6 +491,46 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	}
 	
 	
+	public function toggleGateTool():Void{
+		var c = Cursor.getCurrentCursor();
+		if(c==Application.C_GATE){
+			stopGateTool();
+		}else{
+			startGateTool();
+		}
+	}
+	
+	public function startGateTool(){
+		Debugger.log('Starting gate tool',Debugger.GEN,'startGateTool','Canvas');
+		Cursor.showCursor(Application.C_GATE);
+		canvasModel.activeTool = CanvasModel.GATE_TOOL;
+	}
+		
+	public function stopGateTool(){
+		Debugger.log('Stopping gate tool',Debugger.GEN,'stopGateTool','Canvas');
+		Cursor.showCursor(Application.C_DEFAULT);
+		canvasModel.activeTool = null;
+	}
+	
+	public function toggleOptionalActivity():Void{
+		var c = Cursor.getCurrentCursor();
+		if(c==Application.C_OPTIONAL){
+			startOptionalActivity();
+		}else{
+			stopOptionalActivity();
+		}
+	}
+	public function startOptionalActivity(){
+		Debugger.log('Starting Optioanl Activity',Debugger.GEN,'startOptionalActivity','Canvas');
+		Cursor.showCursor(Application.C_OPTIONAL);
+		canvasModel.activeTool = CanvasModel.OPTIONAL_TOOL;
+	}
+		
+	public function stopOptionalActivity(){
+		Debugger.log('Stopping Optioanl Activity',Debugger.GEN,'stopOptionalActivity','Canvas');
+		Cursor.showCursor(Application.C_DEFAULT);
+		canvasModel.activeTool = null;
+	}
 	
 	/**
 	 * Method to open Preview popup window.
@@ -541,7 +585,6 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 			startGroupTool();
 		}
 	}
-	
 	public function startGroupTool(){
 		Debugger.log('Starting group tool',Debugger.GEN,'startGateTool','Canvas');
 		Cursor.showCursor(Application.C_GROUP);
@@ -550,35 +593,6 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	
 	public function stopGroupTool(){
 		Debugger.log('Stopping group tool',Debugger.GEN,'startGateTool','Canvas');
-		Cursor.showCursor(Application.C_DEFAULT);
-		canvasModel.activeTool = null;
-	}
-	
-	
-	
-
-	/**
-	 * Called from the toolbar usually - starts or stops the gate tool
-	 * @usage   
-	 * @return  
-	 */
-	public function toggleGateTool():Void{
-		var c = Cursor.getCurrentCursor();
-		if(c==Application.C_GATE){
-			stopGateTool();
-		}else{
-			startGateTool();
-		}
-	}
-	
-	public function startGateTool(){
-		Debugger.log('Starting gate tool',Debugger.GEN,'startGateTool','Canvas');
-		Cursor.showCursor(Application.C_GATE);
-		canvasModel.activeTool = CanvasModel.GATE_TOOL;
-	}
-	
-	public function stopGateTool(){
-		Debugger.log('Stopping gate tool',Debugger.GEN,'startGateTool','Canvas');
 		Cursor.showCursor(Application.C_DEFAULT);
 		canvasModel.activeTool = null;
 	}
@@ -653,11 +667,9 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		//note the init obnject parameters are passed into the _container object in the embeded class (*in this case PropertyInspector)
 		//we are setting up a vew so we need to pass the model and controller to it
 		var cc:CanvasController = canvasView.getController();
-		_pi = PopUpManager.createPopUp(Application.root, LFWindow, false,{title:Dictionary.getValue('pi_title'),closeButton:true,scrollContentPath:"PropertyInspector",_canvasModel:canvasModel,_canvasController:cc});
+		_pi = PopUpManager.createPopUp(Application.root, LFWindow, false,{title:Dictionary.getValue('property_inspector_title'),closeButton:true,scrollContentPath:"PropertyInspector",_canvasModel:canvasModel,_canvasController:cc});
 		//Assign dialog load handler
         _pi.addEventListener('contentLoaded',Delegate.create(this,piLoaded));
-
-		
         //okClickedCallback = callBack;
     }
 	
@@ -674,19 +686,20 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 
 	}
 	
-	/**
-	 * Fired whern property inspector's contentLoaded is fired
-	 * Positions the PI
-	 * @usage   
-	 * @param   evt 
-	 * @return  
-	 */
 	public function piLoaded(evt:Object) {
+        //Debugger.log('!evt.type:'+evt.type,Debugger.GEN,'piLoaded','Canvas');
+        //Check type is correct
         if(evt.type == 'contentLoaded'){
-			//call a resize to line up the PI
-			Application.getInstance().onResize();
+            //Set up callback for ok button click
+            //Debugger.log('!evt.target.scrollContent:'+evt.target.scrollContent,Debugger.GEN,'piLoaded','Canvas');
+			//set the model ref:
+			//evt.target.scrollContent.PropertyInspector.setCanvasModelRef(canvasModel)
+			//_global.breakpoint();
 			
-           
+			
+			
+			
+            //evt.target.scrollContent.addEventListener('okClicked',Delegate.create(this,okClicked));
         }else {
             //TODO raise wrong event type error 
         }
@@ -832,10 +845,6 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	
 	public function get ddm():DesignDataModel{
 		return _ddm;
-	}
-	
-	public function getPropertyInspector():MovieClip{
-		return _pi;
 	}
 	
 	
