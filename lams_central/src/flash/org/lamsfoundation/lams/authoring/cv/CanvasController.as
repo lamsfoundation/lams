@@ -83,7 +83,19 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			ca.activity.xCoord = ca._x;
 			ca.activity.yCoord = ca._y;
 			
-			//refresh the transitions
+			//TODO: refresh the transitions as you drag...
+			var myTransitions = _canvasModel.getCanvas().ddm.getTransitionsForActivityUIID(ca.activity.activityUIID);
+			//run in a loop ato support branches, maybe more then 2 transitions.
+			for (var i=0; i<myTransitions.length;i++){
+				Debugger.log('removing transition for redraw:'+myTransitions[i].transitionUIID,Debugger.GEN,'activityRelease','CanvasController');
+				var t = _canvasModel.transitionsDisplayed.remove(myTransitions[i].transitionUIID);
+				t.removeMovieClip();
+				
+			}
+			_canvasModel.setDirty();
+			
+			
+			
 			
 			Debugger.log('ca.activity.xCoord:'+ca.activity.xCoord,Debugger.GEN,'activityRelease','CanvasController');
 			
@@ -212,8 +224,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		}
 		if(_canvasModel.activeTool == CanvasModel.OPTIONAL_TOOL){
 			var p = new Point(canvas_mc._xmouse, canvas_mc._ymouse); 
-			_canvasModel.createNewOptionalActivity(Activity.PERMISSION_OPTIONAL_ACTIVITY_TYPE,p);
-			_canvasModel.getCanvas().stopOptionalActivity();
+			//_canvasModel.createNewOptionalActivity(Activity.PERMISSION_OPTIONAL_ACTIVITY_TYPE,p);
+			//_canvasModel.getCanvas().stopOptionalActivity();
 			
 		}
 		if(_canvasModel.activeTool == CanvasModel.GROUP_TOOL){
