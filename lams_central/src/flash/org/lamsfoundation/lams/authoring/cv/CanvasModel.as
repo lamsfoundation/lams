@@ -24,7 +24,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	
 	
 	private var _cv:Canvas;
-		//UI State variabls	private var _isDirty:Boolean;
+	private var _ddm:DesignDataModel;	//UI State variabls	private var _isDirty:Boolean;
 	private var _activeTool:String;
 	private var _selectedItem:Object;  // the currently selected thing - could be activity, transition etc.
 	private var _isDrawingTransition:Boolean;
@@ -50,6 +50,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		 //Set up this class to use the Flash event delegation model
         EventDispatcher.initialize(this);
 		_cv = cv;
+		_ddm = new DesignDataModel();
 		_activitiesDisplayed = new Hashtable("_activitiesDisplayed");
 		_transitionsDisplayed = new Hashtable("_transitionsDisplayed");
 		
@@ -173,7 +174,21 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	
 	
 	
-	
+	public function findOptionalActivities():Array{
+		//_activitiesDisplayed
+		//var _ddm.getActivityByUIID(Activity.OPTIONAL_ACTIVITY_TYPE)
+		var actOptional:Array = new Array();
+		var k:Array = _activitiesDisplayed.values();
+		//trace("findOptionalActivities Called "+k.length )
+		for (var i=0; i<k.length; i++){
+			if (k[i].activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE){
+				actOptional.push(k[i]);
+				trace("find the Optional with id:"+k[i].activity.activityUIID )
+			}
+			
+		}
+		return actOptional
+	}
 	
 	
 	/**
@@ -313,7 +328,61 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		setSelectedItem(_activitiesDisplayed.get(optAct.activityUIID));
 		
 	}
-
+	
+	/**
+	 * Assign activityID of Optional activity as a parentID to the ca (canvas activity) 
+	 * Which will draw child activities in Parent Optional Activity.
+	 * @usage   
+	 * @param   parentID (ActivityID of Optional Activity where canavas activity has been dropped.)
+	 * @param   ca       (reference of the canvas activity to which parentID is assigned)
+	 * @return  
+	 */
+	public function addParentToActivity(parentID, ca:Object){
+		ca.activity.parentUIID = parentID;
+		Debugger.log('ParentId of '+ca.activity.activityUIID+ 'Is : '+ca.activity.parentUIID,Debugger.GEN,'addActivityToTransition','CanvasModel');
+		removeActivity(parentID);
+		removeActivity(ca.activity.activityUIID);
+		setDirty();
+		//var lengthOfChildren:Array = _cv.ddm.getComplexActivityChildren(parentID);
+		//trace("No. of Chlidren in Optional Activity "+parentID+" is: "+lengthOfChildren.length)
+	}
+	
+	/**
+	 * Removes the activity from the Canvas Model
+	 * @usage   
+	 * @param   activityUIID 
+	 * @return  
+	 */
+	 
+	 /**
+	*Called by the view when a template activity icon is dropped
+	*/
+	public function removeOptionalCA(ca:Object, parentID){
+		//lets do a test to see if we got the canvas
+		Debugger.log('Removed Child '+ca.activity.activityUIID+ 'from : '+ca.activity.parentUIID,Debugger.GEN,'removeOptionalCA','CanvasModel');
+		ca.activity.parentUIID = null;
+		
+		removeActivity(ca.activity.activityUIID);
+		removeActivity(parentID);
+		setDirty();
+		
+	}
+	
+	public function removeActivity(activityUIID):Object{
+		//dispatch an event to show the design  has changed
+				
+		var r:Object = _activitiesDisplayed.remove(activityUIID);
+		if(r==null){
+			return new LFError("Removing activity failed:"+activityUIID,"removeActivity",this,null);
+		}else{
+			Debugger.log('Removed:'+r.activityUIID,Debugger.GEN,'removeActivity','DesignDataModel');
+				//dispatchEvent({type:'ddmUpdate',target:this});
+			
+			r.removeMovieClip();
+		}
+	}
+	
+	
 	/**
 	 * Adds another Canvas Activity to the transition.  
 	 * Only 2 may be added, adding the 2nd one triggers the creation of the transition.
