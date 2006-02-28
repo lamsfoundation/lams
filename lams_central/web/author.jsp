@@ -111,13 +111,16 @@ function doConfirm(arg){
 		alert ("Why not?")
 }
 
-function openPopUp(args){
+function openPopUp(args, title, h, w, resize, status, scrollbar){
 	if(thePopUp && thePopUp.open && !thePopUp.closed){
 			thePopUp.focus();
+			
 	}else{
 		//mozilla seems to want a full url
-		args = getHostURL()+args;
-		thePopUp = window.open(args,"learnerPop","HEIGHT=450,WIDTH=550,resizable,scrollbars");
+		
+		var args = getHostURL()+args;
+		thePopUp = window.open(args,title,"HEIGHT="+h+",WIDTH="+w+",resizable="+resize+",scrollbars="+scrollbar+",status="+status+"");
+		//thePopUp = window.open(args,"learnerPop","HEIGHT=450,WIDTH=550,resizable,scrollbars");
 	}
 }
 
@@ -131,7 +134,7 @@ function closeWindow(win){
 }
 
 var learnWin = null;
-function openPreview(sessionId)	{
+/*function openPreview(sessionId)	{
 	//debug: To check we are gettin a session Id to open
 	var welcomeLearnerOpen = false;
 	previewSessionId = sessionId;
@@ -144,7 +147,7 @@ function openPreview(sessionId)	{
 	learnWin.focus();
 
 
-}
+}*/
 
 
 function openFilePopUp(args){
