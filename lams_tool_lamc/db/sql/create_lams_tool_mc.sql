@@ -56,6 +56,7 @@ CREATE TABLE tl_lamc11_session (
      , mc_session_id BIGINT(20) NOT NULL
      , session_start_date DATETIME
      , session_end_date DATETIME
+     , session_name VARCHAR(100)
      , session_status VARCHAR(100)
      , mc_content_id BIGINT(20) NOT NULL
      , UNIQUE UQ_tl_lamc11_session_1 (mc_session_id)
@@ -109,7 +110,7 @@ CREATE TABLE tl_lamc11_uploadedfile (
      , filename VARCHAR(255) NOT NULL
      , PRIMARY KEY (uid)
      , INDEX (mc_content_id)
-     , CONSTRAINT FK_tl_lamc11_uploadedfile FOREIGN KEY (mc_content_id)
+     , CONSTRAINT FK_tl_lamc11_uploadedFile FOREIGN KEY (mc_content_id)
                   REFERENCES tl_lamc11_content (uid)
 )TYPE=InnoDB;
 

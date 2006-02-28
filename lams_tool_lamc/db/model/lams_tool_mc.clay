@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <clay-model clay-version="1.1.0">
-<database-model alias="" author="Ozgur Demirtas" begin-script="" end-script="" name="survey" remarks="" sql-dialect-id="jp.azzurri.clay.model.physical.dialect.MySQL_4_0_Dialect" version="1.0">
-<database-model-description>QA Tool for Lams 1.1</database-model-description>
+<database-model alias="" author="Ozgur Demirtas" begin-script="" end-script="" name="mcq" remarks="" sql-dialect-id="jp.azzurri.clay.model.physical.dialect.MySQL_4_0_Dialect" version="1.0">
+<database-model-description>MCQ Tool for Lams 1.1</database-model-description>
 <schema-list>
 <schema alias="" name="lams" remarks="">
 <schema-description></schema-description>
@@ -501,7 +501,7 @@
 </table>
 <table alias="" name="tl_lamc11_session" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="106" width="205" x="105" y="85"/>
+<table-figure-bounds height="121" width="205" x="105" y="85"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="">
 <column-description></column-description>
@@ -539,6 +539,13 @@
 <column-description></column-description>
 <data-type jdbc-type="93" literal-prefix="'" literal-suffix="'" name="DATETIME" selected-variant-pattern="DATETIME">
 <variant type-name-pattern="DATETIME"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="100" decimal-digits="0" default-value="" mandatory="false" name="session_name" remarks="">
+<column-description></column-description>
+<data-type jdbc-type="12" literal-prefix="'" literal-suffix="'" name="VARCHAR" selected-variant-pattern="VARCHAR(%n)">
+<variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n)"/>
+<variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n) BINARY"/>
 </data-type>
 </column>
 <column alias="" auto-increment="false" column-size="100" decimal-digits="0" default-value="" mandatory="false" name="session_status" remarks="">

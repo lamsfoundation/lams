@@ -1524,6 +1524,8 @@ public class McServicePOJO implements
 	public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException
     {
     	logger.debug("start of createToolSession with ids: " + toolSessionId + " and " + toolContentId);
+    	logger.debug("toolSessionName: " + toolSessionName);
+    	
     	if (toolSessionId == null)
     	{
     		logger.error("toolSessionId is null");
@@ -1585,6 +1587,7 @@ public class McServicePOJO implements
         		McSession mcSession = new McSession(toolSessionId,
                         new Date(System.currentTimeMillis()),
                         McSession.INCOMPLETE,
+                        toolSessionName,
                         mcContent,
                         new TreeSet());
 

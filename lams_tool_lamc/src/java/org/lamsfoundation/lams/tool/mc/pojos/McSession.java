@@ -58,6 +58,8 @@ public class McSession implements Serializable {
 
     /** nullable persistent field */
     private String sessionStatus;
+    
+    private String session_name;
 
     /** nullable persistent field */
     private Long mcContentId;
@@ -78,6 +80,15 @@ public class McSession implements Serializable {
         this.mcQueUsers = mcQueUsers;
     }
     
+    public McSession(Long mcSessionId, Date sessionStartDate, String sessionStatus, String session_name, org.lamsfoundation.lams.tool.mc.pojos.McContent mcContent, Set mcQueUsers) {
+        this.mcSessionId = mcSessionId;
+        this.sessionStartDate = sessionStartDate;
+        this.sessionStatus = sessionStatus;
+        this.session_name = session_name;
+        this.mcContent = mcContent;
+        this.mcQueUsers = mcQueUsers;
+    }
+    
     public McSession(Long mcSessionId, Date sessionStartDate, String sessionStatus, org.lamsfoundation.lams.tool.mc.pojos.McContent mcContent, Set mcQueUsers) {
         this.mcSessionId = mcSessionId;
         this.sessionStartDate = sessionStartDate;
@@ -85,7 +96,6 @@ public class McSession implements Serializable {
         this.mcContent = mcContent;
         this.mcQueUsers = mcQueUsers;
     }
-    
     
     /** default constructor */
     public McSession() {
@@ -186,5 +196,17 @@ public class McSession implements Serializable {
 	 */
 	public void setMcQueUsers(Set mcQueUsers) {
 		this.mcQueUsers = mcQueUsers;
+	}
+	/**
+	 * @return Returns the session_name.
+	 */
+	public String getSession_name() {
+		return session_name;
+	}
+	/**
+	 * @param session_name The session_name to set.
+	 */
+	public void setSession_name(String session_name) {
+		this.session_name = session_name;
 	}
 }

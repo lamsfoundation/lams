@@ -265,6 +265,7 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 		/*
 	     * obtain and setup the current user's data 
 	     */
+		/*
 	    String userID = "";
 	    HttpSession ss = SessionManager.getSession();
 	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
@@ -279,6 +280,7 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 	    
 	    logger.debug("retrieved userId: " + userID);
     	request.getSession().setAttribute(USER_ID, userID);
+    	*/
     	
     	String strToolContentId=request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
     	logger.debug("strToolContentId: " + strToolContentId);
