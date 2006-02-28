@@ -22,38 +22,55 @@
  */
 package org.lamsfoundation.lams.learningdesign.dao.hibernate;
 
-import java.util.List;
-
+import org.lamsfoundation.lams.learningdesign.ChosenGrouping;
 import org.lamsfoundation.lams.learningdesign.Grouping;
+import org.lamsfoundation.lams.learningdesign.RandomGrouping;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupingDAO;
+import org.springframework.dao.DataRetrievalFailureException;
 
 /**
  * @author Manpreet Minhas
  */
 public class GroupingDAO extends BaseDAO implements IGroupingDAO {
 	
-	private static final String TABLENAME ="lams_grouping";
-
-	private static final String FIND_BY_UI_ID ="from " + TABLENAME +
-											   " in class " + Grouping.class.getName() +
-											   " where grouping_ui_id=?";
+	private static final String FIND_BY_UI_ID ="from "+Grouping.class.getName()+" g where g.groupingUIID=:UIID";
 
 	/**
 	 * @see org.lamsfoundation.lams.learningdesign.dao.interfaces.IGroupingDAO#getGroupingById(java.lang.Long)
 	 */
 	public Grouping getGroupingById(Long groupingID) {
-		return (Grouping)super.find(Grouping.class,groupingID);
+		Grouping grouping = (Grouping)super.find(Grouping.class,groupingID);
+		return getNonCGLibGrouping(grouping);
 	}
 
 	/**
 	 * @see org.lamsfoundation.lams.learningdesign.dao.IGroupingDAO#getGroupingByUIID(java.lang.Integer)
 	 */
 	public Grouping getGroupingByUIID(Integer groupingUIID) {
-		List list = this.getHibernateTemplate().find(FIND_BY_UI_ID,groupingUIID);	
-		if(list!=null && list.size()>0)
-			return (Grouping)list.get(0);
-		else
-			return null;
+		if ( groupingUIID != null ) {
+			Grouping grouping = (Grouping) getSession()
+									.createQuery(FIND_BY_UI_ID)
+									.setInteger("UIID",groupingUIID.intValue())
+									.uniqueResult();
+			return getNonCGLibGrouping(grouping);
+		} 
+		return null;
 	}
+
+	/** we must return the real grouping, not a Hibernate proxy. So relook
+	* it up. This should be quick as it should be in the cache.
+	*/
+	private Grouping getNonCGLibGrouping(Grouping grouping) {
+		if ( grouping != null ) {
+			if ( grouping.isRandomGrouping() ) {
+				return (Grouping)super.find(RandomGrouping.class,grouping.getGroupingId());
+			} else if ( grouping.isChosenGrouping() ) {
+				return (Grouping)super.find(ChosenGrouping.class,grouping.getGroupingId());
+			}
+			throw new DataRetrievalFailureException("Unable to get grouping as the grouping type is unknown or missing. Grouping object is "+grouping);
+		}
+		return null;
+	}
+
 
 }

@@ -30,12 +30,17 @@ import org.lamsfoundation.lams.learningdesign.Grouping;
 public interface IGroupingDAO extends IBaseDAO {
 	
 	/**
+	 * Get a grouping record from the database. Must return a "real" grouping object, not
+	 * a CGLIB proxy object.
+	 * 
 	 * @param groupingID
 	 * @return Grouping populated Grouping object
 	 */
 	public Grouping getGroupingById(Long groupingID);	
 	
 	/**
+	 * Must return a "real" grouping object, not a CGLIB proxy object.
+	 * 
 	 * @param groupingUIID
 	 * @return Grouping populated Grouping object
 	 */
