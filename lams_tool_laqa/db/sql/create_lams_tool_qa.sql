@@ -25,6 +25,7 @@ CREATE TABLE tl_laqa11_session (
      , qa_session_id BIGINT(20) NOT NULL
      , session_start_date DATETIME
      , session_end_date DATETIME
+     , session_name VARCHAR(100)
      , session_status VARCHAR(100)
      , qa_content_id BIGINT(20) NOT NULL
      , PRIMARY KEY (uid)

@@ -47,7 +47,7 @@ NULL,
 'tool/laqa11/authoringStarter.do',
 'tool/laqa11/definelater.do',
 'tool/laqa11/export.do',
-'tool/laqa11/monitoring.do',
+'tool/laqa11/monitoringStarter.do',
 'tool/laqa11/monitoring.do',
 'tool/laqa11/monitoring.do',
 NOW()

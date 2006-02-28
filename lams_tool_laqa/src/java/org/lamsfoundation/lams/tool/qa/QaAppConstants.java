@@ -31,6 +31,7 @@ public interface QaAppConstants {
     public static final long DEFAULT_QUE_CONTENT_ID 					=1;
 	public static final String TOOL_SERVICE								="tool_service";
 	public static final String ERROR_MCAPPLICATION 						= "error.exception.QaApplication";
+	public static final String TOOL_CONTENT_ID 							= "toolContentID";
 
 	public static final String TARGET_MODE								="targetMode";
 	public static final String TARGET_MODE_AUTHORING					="Authoring";
@@ -42,12 +43,13 @@ public interface QaAppConstants {
 	public static final String LOAD_LEARNER								="loadLearner";
 	public static final String LEARNING_STARTER							="learningStarter";
 	public static final String MONITORING_STARTER						="monitoringStarter";
+	public static final String LOAD_MONITORING							="loadMonitoring";
 	public static final String COPY_TOOL_CONTENT 						="copyToolContent";
 	public static final String ERROR_LIST								="errorList";
 	public static final String ERROR_LIST_LEARNER						="errorListLearner";
 	public static final String DEFAULT_CONTENT_ID_STR					="defaultContentIdStr";
 	public static final String TOOL_SESSION_ID 							= "toolSessionID";
-		
+			
 	/*
      * refers to number of questions presented initially, we have a single record for default content
      */

@@ -1143,6 +1143,8 @@ public class QaServicePOJO
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException
     {
     	logger.debug("start of createToolSession with ids: " + toolSessionId + " and " + toolContentId);
+    	logger.debug("toolSessionName: " + toolSessionName);
+    	
     	if (toolSessionId == null)
     	{
     		logger.debug("toolSessionId is null");
@@ -1204,6 +1206,7 @@ public class QaServicePOJO
         		QaSession qaSession = new QaSession(toolSessionId,
                         new Date(System.currentTimeMillis()),
                         QaSession.INCOMPLETE,
+                        toolSessionName,
                         qaContent,
                         new TreeSet());
 

@@ -66,6 +66,9 @@ public class QaSession implements Serializable,Comparable, Nullable
     /** nullable persistent field */
     private String session_status;
     
+    /** nullable persistent field */
+    private String session_name;
+    
     /** persistent field */
     private QaContent qaContent;
 
@@ -77,7 +80,7 @@ public class QaSession implements Serializable,Comparable, Nullable
     
     public QaSession(){};
 
-    /** full constructor */
+    
     public QaSession(Long qaSessionId,
                          Date session_start_date,
                          Date session_end_date,
@@ -91,26 +94,25 @@ public class QaSession implements Serializable,Comparable, Nullable
         this.session_status = session_status;
         this.qaContent = qaContent;
         this.qaQueUsers = qaQueUsers;
-        logger.debug(logger + " " + this.getClass().getName() +  "in full constructor: QaSession()");
     }
 
-
-    /**
-     * Construtor for initializing survey session.
-     * @param sessionStartDate
-     * @param sessionStatus
-     * @param surveyContent
-     * @param surveyQueUsrs
-     */
+    
     public QaSession(Long qaSessionId,
-                         Date session_start_date,
-                         String session_status,
-                         QaContent qaContent,
-                         Set qaQueUsers)
-    {
-        this(qaSessionId,session_start_date,null,session_status,qaContent,qaQueUsers);
-    }
-
+			            Date session_start_date,
+			            String session_status,
+			            String session_name,						
+			            QaContent qaContent,
+			            Set qaQueUsers)
+	{
+		this.qaSessionId = qaSessionId;
+		this.session_start_date = session_start_date;
+		this.session_status = session_status;
+		this.session_name=session_name;
+		this.qaContent = qaContent;
+		this.qaQueUsers = qaQueUsers;
+		logger.debug(logger + " " + this.getClass().getName() +  "in full constructor: QaSession()");
+	}
+    
 
     public Long getQaSessionId()
     {
@@ -246,5 +248,17 @@ public class QaSession implements Serializable,Comparable, Nullable
 
 	public void setUid(Long uid) {
 		this.uid = uid;
+	}
+	/**
+	 * @return Returns the session_name.
+	 */
+	public String getSession_name() {
+		return session_name;
+	}
+	/**
+	 * @param session_name The session_name to set.
+	 */
+	public void setSession_name(String session_name) {
+		this.session_name = session_name;
 	}
 }

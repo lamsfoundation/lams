@@ -153,6 +153,28 @@
 	</action>
 
 	 <action
+	      path="/monitoringStarter"
+	      type="org.lamsfoundation.lams.tool.qa.web.QaMonitoringStarterAction"
+	      name="QaMonitoringForm"
+	      scope="session"
+	      parameter="dispatch"
+	      unknown="false"
+	      validate="false">
+
+	  	<forward
+		    name="loadMonitoring"
+		    path="/monitoring/MonitoringMaincontent.jsp"
+		    redirect="true"
+	  	/>
+	      
+   	  	<forward
+		    name="errorList"
+		    path="/QaErrorBox.jsp"
+		    redirect="true"
+	  	/>
+	</action>
+
+	 <action
 	      path="/monitoring"
 	      type="org.lamsfoundation.lams.tool.qa.web.QaMonitoringAction"
 	      name="QaMonitoringForm"
@@ -160,24 +182,18 @@
 	      parameter="dispatch"
 	      unknown="false"
 	      validate="false">
-
-     	 <forward
-	        name="monitoringReport"
-	        path=".monitoringReport"
-	        redirect="true"
-   	  	/>
-	   	
-	   	<forward
-	        name="load"
-	        path=".questions"
-	        redirect="true"
-	      />	
-      
-	   	<forward
-	        name="error"
-	        path=".error"
-	        redirect="true"
-      	/>	
+	      
+	  	<forward
+		    name="loadMonitoring"
+		    path="/monitoring/MonitoringMaincontent.jsp"
+		    redirect="true"
+	  	/>
+	      
+   	  	<forward
+		    name="errorList"
+		    path="/QaErrorBox.jsp"
+		    redirect="true"
+	  	/>
 	</action>
 
 <!--Export Portfoloio Starter  -->
