@@ -273,7 +273,10 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 				//TODO: Optional activity
 				
 			}else if(dto.activityTypeID == Activity.GROUPING_ACTIVITY_TYPE){
-				//todo
+				//TODO: Test this code when we are able to save and then open a design with grouping
+				var newGroupActiviy:GroupingActivity = new GroupingActivity(dto.activityUIID);
+				newGroupActiviy.populateFromDTO(dto);
+				_activities.put(newGroupActiviy.activityUIID,newGroupActiviy);
 			}
 		}
 		
@@ -293,11 +296,20 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		
 		//set the groupings in the hashtable
 		for(var i=0; i<design.groupings.length;i++){
-			
+			//TODO: Test this when the server can save and open a design with groupings.
+			Debugger.log('Adding grouping UIID:'+design.groupings[i].groupingUIID,Debugger.GEN,'setDesign','DesignDataModel');
+			var gdto = design.groupings[i];
+			var newGrouping:Grouping = new Grouping(gdto.groupingUIID);
+			newGrouping.populateFromDTO(gdto);
+			_groupings.put(newGrouping.groupingUIID,newGrouping);
+		
 		}
 		
-		//add a loop for the groupings.
-				
+		
+		
+		
+		
+		
 		return success;
 	}
 	
