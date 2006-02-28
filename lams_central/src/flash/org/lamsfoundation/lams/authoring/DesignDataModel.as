@@ -269,9 +269,12 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 				_activities.put(newToolActivity.activityUIID,newToolActivity);
 			
 			//}else if(dto.objectType == "ComplexActivity"){
-			}else if(dto.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE){
-				//TODO: Optional activity
-				
+			}else if(dto.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || dto.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
+				//TODO: Test this!
+				var cAct:ComplexActivity= new ComplexActivity(dto.activityUIID);
+				cAct.populateFromDTO(dto);				
+				_activities.put(cAct.activityUIID,cAct);
+					
 			}else if(dto.activityTypeID == Activity.GROUPING_ACTIVITY_TYPE){
 				//TODO: Test this code when we are able to save and then open a design with grouping
 				var newGroupActiviy:GroupingActivity = new GroupingActivity(dto.activityUIID);
