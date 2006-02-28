@@ -36,7 +36,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 	private var padlockOpen_mc:MovieClip;
 	
 	
-	
+	private var _ddm:DesignDataModel;
 	private var _dcStartTime:Number = 0;
 	private var _doubleClicking:Boolean;
 	private var child1_mc:MovieClip;
@@ -51,7 +51,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 	function CanvasParallelActivity(){
 		Debugger.log("_activity:"+_activity.title+'uiID:'+_activity.activityUIID+' children:'+_children.length,Debugger.GEN,'Constructor','CanvasParallelActivity');
 		_visible = false;
-	
+		_ddm = new DesignDataModel()
 		_visibleHeight = container_pnl._height;
 		_visibleWidth = container_pnl._width;
 		//init();
@@ -67,7 +67,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 		clickTarget_mc.onRelease = Proxy.create(this,localOnRelease);
 		clickTarget_mc.onReleaseOutside = Proxy.create(this,localOnReleaseOutside);
 
-		
+		_ddm.getComplexActivityChildren(_activity.activityUIID);
 		_locked = true;
 		
 		
