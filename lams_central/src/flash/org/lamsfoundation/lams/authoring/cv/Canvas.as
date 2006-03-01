@@ -1,4 +1,4 @@
-﻿import org.lamsfoundation.lams.authoring.cv.*
+﻿ï»¿import org.lamsfoundation.lams.authoring.cv.*
 import org.lamsfoundation.lams.authoring.tk.*
 import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.authoring.*
@@ -28,6 +28,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	private var _canvasView_mc:MovieClip;
 	private var app:Application;
 	private var _ddm:DesignDataModel;
+	private var _dictionary:Dictionary;
 	private var _config:Config;
 	private var _undoStack:Array;	
 	private var _redoStack:Array;	
@@ -56,7 +57,9 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		//Create the model.
 		//pass in a ref to this container
 		canvasModel = new CanvasModel(this);
-
+		
+		_dictionary = Dictionary.getInstance();
+		
 		//Create the view
 		_canvasView_mc = target_mc.createChildAtDepth("canvasView",DepthManager.kTop);		
 
@@ -92,16 +95,20 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
         canvasModel.setSize(w,h);
 		
 		//muist comne after the canvasView as we use the defaultController method to get a controller ref.
-		if(USE_PROPERTY_INSPECTOR){
-			initPropertyInspector();
-		}
+		_dictionary.addEventListener('init',Proxy.create(this,setupPI));
+		
+		
 		
 		//if in monitor, dont do it!
 		initBin();
 		
 		
 	}
-    
+    public function setupPI(){
+		if(USE_PROPERTY_INSPECTOR){
+			initPropertyInspector();
+		}
+	}
     /**
     * Event dispatched from the view once it's loaded
     */
@@ -686,7 +693,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 
 	}
 	
-/**
+	/**
 	 * Fired whern property inspector's contentLoaded is fired
 	 * Positions the PI
 	 * @usage   
@@ -849,7 +856,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	public function getPropertyInspector():MovieClip{
 		return _pi;
 	}
-	
+
 	/**
 	 * 
 	 * @usage   
