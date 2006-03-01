@@ -1,6 +1,9 @@
+
+<%@ taglib uri="tags-html" prefix="html" %>
+<%@ taglib uri="tags-core" prefix="c"%>
+<%@ taglib uri="tags-fmt" prefix="fmt"%>
+
 <!---------------------------Advance Tab Content ------------------------>	
-	<div id='content_a'  class="tabbody content_a">
-	<h2><fmt:message key="label.authoring.heading.advance.desc" /></h2>
 	<table class="forms">
 		<!-- Instructions Row -->
 		<tr>
@@ -11,15 +14,4 @@
 			</td>
 		</tr>
 		<tr><td colspan="2"><html:errors/></td></tr>
-		</table>		
-		<!-- Button Row -->
-		<p align="right">
-			<html:submit property="action" styleClass="button">
-				<fmt:message key="label.authoring.save.button" />
-			</html:submit>
-			<html:button property="cancel"
-				onclick="window.close()" styleClass="button">
-				<fmt:message key="label.authoring.cancel.button" />
-			</html:button>
-		</p>
-	</div>
+	</table>

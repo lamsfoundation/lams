@@ -1,7 +1,9 @@
+<%@ taglib uri="tags-html" prefix="html" %>
+<%@ taglib uri="tags-core" prefix="c"%>
+<%@ taglib uri="tags-fmt" prefix="fmt"%>
+<%@ taglib tagdir="/WEB-INF/tags" prefix="dolly" %>
 
 	<!---------------------------Instruction Tab Content ------------------------>
-	<div id='content_i'  class="tabbody content_i">
-	<h2><fmt:message key="label.authoring.heading.instructions.desc" /></h2>
 	<table class="forms">
 		<!--hidden field contentID passed by flash-->
 		<tr>
@@ -10,10 +12,14 @@
 		<tr>
 			<td class="formlabel"><fmt:message
 				key="label.authoring.online.instruction" />:</td>
-			<td class="formcontrol"><FCK:editor id="onlineInstruction"
+			<td NOWRAP width="700">
+			
+			<!-- remove <FCK:editor id="onlineInstruction"
 				basePath="/lams/fckeditor/" height="150" width="85%">
 				<c:out value="${authoring.onlineInstruction}" escapeXml="false"/>
-			</FCK:editor></td>
+			</FCK:editor>-->
+			<dolly:SetEditor id="OnlineInstruction" text="${authoring.onlineInstruction}"/>
+			</td>
 		</tr>
 		<tr>
 			<td></td>
@@ -52,19 +58,22 @@
 				<html:file property="onlineFile">
 					<fmt:message key="label.authoring.choosefile.button" />
 				</html:file>
-				<html:submit property="action">
+				<html:link href="javascript:;" property="submit" onclick="doSubmit('uploadOnline')">
 					<fmt:message key="label.authoring.upload.online.button" />
-				</html:submit>
+				</html:link>
 			</td>
 		</tr>	
 		<!------------Offline Instructions ----------------------->
 		<tr>
 			<td class="formlabel"><fmt:message
 				key="label.authoring.offline.instruction" />:</td>
-			<td class="formcontrol"><FCK:editor id="offlineInstruction"
+			<td NOWRAP width="700">
+			<!-- remove <FCK:editor id="offlineInstruction"
 				basePath="/lams/fckeditor/" height="150" width="85%">
 				<c:out value="${authoring.offlineInstruction}" escapeXml="false"/>
-			</FCK:editor></td>
+			</FCK:editor>-->
+			<dolly:SetEditor id="OfflineInstruction" text="${authoring.offlineInstruction}"/>
+			</td>
 		</tr>
 		<tr>
 			<td></td>
@@ -97,21 +106,10 @@
 				<html:file property="offlineFile">
 					<fmt:message key="label.authoring.choosefile.button" />
 				</html:file>
-				<html:submit property="action">
+				<html:link href="javascript:;" property="submit" onclick="doSubmit('uploadOffline')">
 					<fmt:message key="label.authoring.upload.offline.button" />
-				</html:submit>
+				</html:link>
 			</td>
 		</tr>			
 		<tr><td colspan="2"><html:errors/></td></tr>
-		</table>		
-		<!-- Button Row -->
-		<p align="right">
-			<html:submit property="action" styleClass="button">
-				<fmt:message key="label.authoring.save.button" />
-			</html:submit>
-			<html:button property="cancel"
-				onclick="window.close()" styleClass="button">
-				<fmt:message key="label.authoring.cancel.button" />
-			</html:button>
-		</p>
-	</div>
+		</table>
