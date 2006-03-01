@@ -33,6 +33,8 @@
 
 	<form-property name="currentTab"
 				   type="java.lang.String"/>
+	<form-property name="dispatch"
+				   type="java.lang.String"/>
 </form-bean>
 
 <form-bean name="SbmtLearnerForm" type="org.apache.struts.validator.DynaValidatorForm">
@@ -154,20 +156,20 @@
       path="/authoring"
       type="org.lamsfoundation.lams.tool.sbmt.web.AuthoringAction"
       name="SbmtAuthoringForm"
-      scope="request"
-      input="/authoring/authoring.jsp"
-      parameter="action"
+      scope="session"
+      input="/authoring/authoring_tags.jsp"
+      parameter="dispatch"
       unknown="false"
       validate="true"
     >
       <exception
         key="authoring.exception"
         type="org.lamsfoundation.lams.tool.sbmt.exception.SubmitFilesException"
-        path="/authoring/authoring.jsp"
+        path="/authoring/authoring_tags.jsp"
       />
       <forward
         name="success"
-        path="/authoring/authoring.jsp"
+        path="/authoring/authoring_tags.jsp"
         redirect="false"
       />
     </action>
