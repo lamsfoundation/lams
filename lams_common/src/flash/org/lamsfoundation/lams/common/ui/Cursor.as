@@ -53,6 +53,7 @@ class Cursor {
 			_cursors[_current]._visible = false;
 		}else{
 			Mouse.hide();
+			_cursors[_current]._visible = false;
 			_cursors[id]._visible = true;
 			startDrag(_cursors[id], true);
 		}
