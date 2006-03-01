@@ -686,20 +686,19 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 
 	}
 	
+/**
+	 * Fired whern property inspector's contentLoaded is fired
+	 * Positions the PI
+	 * @usage   
+	 * @param   evt 
+	 * @return  
+	 */
 	public function piLoaded(evt:Object) {
-        //Debugger.log('!evt.type:'+evt.type,Debugger.GEN,'piLoaded','Canvas');
-        //Check type is correct
         if(evt.type == 'contentLoaded'){
-            //Set up callback for ok button click
-            //Debugger.log('!evt.target.scrollContent:'+evt.target.scrollContent,Debugger.GEN,'piLoaded','Canvas');
-			//set the model ref:
-			//evt.target.scrollContent.PropertyInspector.setCanvasModelRef(canvasModel)
-			//_global.breakpoint();
+			//call a resize to line up the PI
+			Application.getInstance().onResize();
 			
-			
-			
-			
-            //evt.target.scrollContent.addEventListener('okClicked',Delegate.create(this,okClicked));
+           
         }else {
             //TODO raise wrong event type error 
         }
@@ -847,6 +846,9 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		return _ddm;
 	}
 	
+	public function getPropertyInspector():MovieClip{
+		return _pi;
+	}
 	
 	/**
 	 * 
