@@ -1,4 +1,5 @@
 ﻿import org.lamsfoundation.lams.common.ui.*
+import com.polymercode.Draw;
 
 /**
 * Grid  - For positioning and calulcating relative to a grid in canvas
@@ -16,6 +17,8 @@ class Grid {
 	public static var SMALL_GRID_V_SPACING:Number = 28;
 	public static var LARGE_GRID_H_SPACING:Number = 5 * SMALL_GRID_H_SPACING;  //Large grid dimensions
 	public static var LARGE_GRID_V_SPACING:Number = 5 * SMALL_GRID_V_SPACING;
+	
+	public static var GRID_STYLE:String = 'dots';
 		 
 	//Vars
     private var gridWidth:Number;
@@ -92,17 +95,41 @@ class Grid {
 		_mc.lineStyle(LINE_THICKNESS,LINE_COLOR,LINE_ALPHA);
 		for (var i=0; i<= hLines;i++){
 			var x:Number = i*hGap;
-			_mc.moveTo(x,0);
-			_mc.lineTo(x,gridHeight);
+				
+			/*	
+				public static function dashTo(target:MovieClip, x1:Number, 
+		y1:Number,x2:Number, y2:Number, dashLength:Number, 
+		spaceLength:Number,strokeWidth:Number,rgbHex:Number )
+		*/
+		
+			if(GRID_STYLE == 'dots'){
+				Draw.dashTo(_mc,x,0,x,gridHeight,1,hGap,1,0xCCCCCC);
+			}else{
+				_mc.moveTo(x,0);
+				_mc.lineTo(x,gridHeight);
+			}
+			
+			
 		}
 		//draw vertical lines
 		var vLines:Number = Math.floor(gridHeight/vGap);
 		for (i=0; i<= vLines;i++){
 			var y = i*vGap;
-			_mc.moveTo(0,y);
-			_mc.lineTo(gridWidth,y);
+			
+			if(GRID_STYLE == 'dots'){
+				Draw.dashTo(_mc,0,y,gridWidth,y,1,vGap,1,0x000000);
+			}else{
+				_mc.moveTo(0,y);
+				_mc.lineTo(gridWidth,y);
+			}
+			
 		}
+		
+		
 		return _mc;
+		
+		
+		
 	}
 
 }
