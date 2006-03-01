@@ -81,7 +81,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				//trace ("testing Optional on Canvas "+i)
 					if (ca.activity.parentUIID == optionalOnCanvas[i].activity.activityUIID){
 						if (optionalOnCanvas[i].locked == false){
-							if (ca._x > 170){
+							if (ca._x > 142 || ca._x < -129 || ca._y < -55 || ca._y > optionalOnCanvas[i].getpanelHeight){
 								trace (ca.activity.activityUIID+" had a hitTest with canvas.")
 								_canvasModel.removeOptionalCA(ca, optionalOnCanvas[i].activity.activityUIID);
 							//var msg:String = Dictionary.getValue('act_lock_chk');
@@ -167,7 +167,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			
 			var transitionTarget = createValidTransitionTarget(transitionTarget_mc);
 			if(transitionTarget instanceof LFError){
-				//_canvasModel.resetTransitionTool();
+			//_canvasModel.resetTransitionTool();
 				_canvasModel.getCanvas().stopTransitionTool();
 			//if(transitionTarget instanceof LFMessage){
 				//transitionTarget.showErrorAlert(null);
