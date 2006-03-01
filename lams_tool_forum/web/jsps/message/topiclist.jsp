@@ -4,7 +4,7 @@
 	<div id="datatablecontainer">
 	<table width="100%" align="CENTER" 	class="form">
 		<tr>
-			<td valign="MIDDLE"><b>Topic</b></td>
+			<td valign="MIDDLE"><b><fmt:message key="title.message.view"/></b></td>
 			<td colspan="3" />
 		</tr>
 		<tr>

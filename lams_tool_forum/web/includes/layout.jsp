@@ -1,6 +1,9 @@
+<%@ page contentType="text/html;charset=ISO8859_1" %>
+
 <%@ include file="/includes/taglibs.jsp"%>
 <%@ taglib uri="tags-tiles" prefix="tiles"%>
 <html>
+
 <tiles:insert attribute="header" />
 <body >
 

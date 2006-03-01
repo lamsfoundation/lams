@@ -1,3 +1,5 @@
+<%@ page contentType="text/html;charset=ISO8859_1" %>
+
 <%@ include file="/includes/taglibs.jsp" %>
 <%@ taglib uri="tags-fck-editor" prefix="FCK"%>
 
@@ -6,6 +8,7 @@
 <head>
 	<html:base />
 	<title>Forum Tool</title>
+	<meta http-equiv="content-type" content="text/html; charset=<%=session.getAttribute("org.lamsfoundation.lams.web.filter.CHARSET.KEY")%>">
 	<c:set var="lams"><lams:LAMSURL/></c:set>
 	<c:set var="tool"><lams:WebAppURL/></c:set>
 	
@@ -45,7 +48,7 @@
 	<table border="0" cellspacing="0" cellpadding="0">
 	  <tr>
 		<td><a href="#"  onClick="showTab('b');setTab('b');return false;" ><img src="<c:out value="${lams}"/>images/aqua_tab_s_left.gif" name="tab_left_b" width="8" height="25" border="0" id="tab_left_b"/></a></td>
-		<td class="tab tabcentre_selected" width="90" id="tab_tbl_centre_b"  onClick="showTab('b');setTab('b');return false;" ><a href="#" onClick="showTab('b');setTab('b');return false;" id="b" >Basic</a></td>
+		<td class="tab tabcentre_selected" width="90" id="tab_tbl_centre_b"  onClick="showTab('b');setTab('b');return false;" ><a href="#" onClick="showTab('b');setTab('b');return false;" id="b" ><fmt:message key="label.basic" /></a></td>
 		<td><a href="#" onClick="showTab('b');setTab('b');return false;"><img src="<c:out value="${lams}"/>images/aqua_tab_s_right.gif"  name="tab_right_b" width="8" height="25" border="0" id="tab_right_b"/></a></td>
 	  </tr>
 	</table>
@@ -56,7 +59,7 @@
 	<table border="0" cellspacing="0" cellpadding="0">
 	  <tr>
 		<td><a href="#" onClick="showTab('a');setTab('a');return false;"><img src="<c:out value="${lams}"/>images/aqua_tab_left.gif" name="tab_left_a" width="8" height="22" border="0" id="tab_left_a" /></a></td>
-		<td class="tab tabcentre" width="90" id="tab_tbl_centre_a" onClick="showTab('a');setTab('a');return false;"><a href="#" onClick="showTab('a');setTab('a');return false;" id="a" >Advanced</a></td>
+		<td class="tab tabcentre" width="90" id="tab_tbl_centre_a" onClick="showTab('a');setTab('a');return false;"><a href="#" onClick="showTab('a');setTab('a');return false;" id="a" ><fmt:message key="label.advanced" /></a></td>
 		<td><a href="#" onClick="showTab('a');setTab('a');return false;"><img src="<c:out value="${lams}"/>images/aqua_tab_right.gif" name="tab_right_a" width="9" height="22" border="0" id="tab_right_a" /></a></td>
 	  </tr>
 	</table>
@@ -67,7 +70,7 @@
 	<table border="0" cellspacing="0" cellpadding="0">
 	  <tr>
 		<td ><a href="#" onClick="showTab('i');setTab('i');return false;"><img border="0" src="<c:out value="${lams}"/>images/aqua_tab_left.gif" width="8" height="22" id="tab_left_i"   name="tab_left_i" /></a></td>
-		<td class="tab tabcentre" width="90" id="tab_tbl_centre_i"  onClick="showTab('i');setTab('i');return false;" ><a href="#" onClick="showTab('i');setTab('i');return false;" id="i" >Instructions</a></td>
+		<td class="tab tabcentre" width="90" id="tab_tbl_centre_i"  onClick="showTab('i');setTab('i');return false;" ><a href="#" onClick="showTab('i');setTab('i');return false;" id="i" ><fmt:message key="label.instructions" /></a></td>
 		<td ><a href="#" onClick="showTab('i');setTab('i');return false;"><img src="<c:out value="${lams}"/>images/aqua_tab_right.gif"  width="9" height="22" border="0" id="tab_right_i"  name="tab_right_i"/></a></td>
 	  </tr>
 	</table>
