@@ -174,18 +174,10 @@ class org.lamsfoundation.lams.authoring.Activity {
 	}
 	
 	
+	
+	
 	//helper methods
 	
-	/**
-	* Validates the activity is ok to be used. basically that al required fields have a value;
-	*/
-	public function validate(activity:Activity):Boolean{
-		var isValid:Boolean;
-		
-		
-		return isValid;
-		
-	}
 	
 	public function isGateActivity():Boolean{
 		if (_activityTypeID == SYNCH_GATE_ACTIVITY_TYPE){
@@ -642,6 +634,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 	 * @return  
 	 */
 	public function get groupingUIID ():Number {
+		trace('returning:'+_groupingUIID);
 		return _groupingUIID;
 	}
 
