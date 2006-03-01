@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- <!DOCTYPE XMI SYSTEM "uml14xmi12.dtd"> -->
 
-<XMI xmi.version='1.2' timestamp='Wed Mar 01 11:44:09 EST 2006' xmlns:UML='omg.org/UML/1.4'>
+<XMI xmi.version='1.2' timestamp='Wed Mar 01 13:02:11 EST 2006' xmlns:UML='omg.org/UML/1.4'>
 	<XMI.header>
 		<XMI.documentation>
 			<XMI.exporter>MagicDraw UML</XMI.exporter>
@@ -582,18 +582,6 @@
 						<UML:AssociationEnd xmi.id='_9_0_2_3880181_1141100583468_41162_447' visibility='private' isNavigable='true' ordering='unordered' aggregation='none' targetScope='instance' changeability='changeable' association='_9_0_2_3880181_1141100583468_451508_448' participant='_9_0_2_3880181_1141096882203_61595_239'/>
 					</UML:Association.connection>
 				</UML:Association>
-				<UML:Class xmi.id='_9_0_2_3880181_1141164373375_233467_561' name='LessonView' visibility='public' isRoot='false' isLeaf='false' isAbstract='false' isActive='false'>
-					<UML:ModelElement.comment>
-						<UML:Comment xmi.id='_9_0_2_3880181_1141166455546_638264_1627' name='&#10;'/>
-					</UML:ModelElement.comment>
-					<UML:Classifier.feature>
-						<UML:Operation xmi.id='_9_0_2_3880181_1141166333484_18286_1606' name='showLessonDetails' visibility='public' ownerScope='instance' isQuery='false' concurrency='sequential' isRoot='false' isLeaf='false' isAbstract='false' owner='_9_0_2_3880181_1141164373375_233467_561'>
-							<UML:BehavioralFeature.parameter>
-								<UML:Parameter xmi.id='_9_0_2_3880181_1141166333484_428194_1605' kind='return'/>
-							</UML:BehavioralFeature.parameter>
-						</UML:Operation>
-					</UML:Classifier.feature>
-				</UML:Class>
 				<UML:Class xmi.id='_9_0_2_3880181_1141164496453_293176_625' name='DesignController' visibility='public' isRoot='false' isLeaf='false' isAbstract='false' isActive='false'/>
 				<UML:Class xmi.id='_9_0_2_3880181_1141164528281_554675_641' name='LearnerController' visibility='public' isRoot='false' isLeaf='false' isAbstract='false' isActive='false'/>
 				<UML:Class xmi.id='_9_0_2_3880181_1141164543359_515318_657' name='TodoController' visibility='public' isRoot='false' isLeaf='false' isAbstract='false' isActive='false'/>
@@ -613,6 +601,11 @@
 								<UML:Operation xmi.id='_9_0_2_3880181_1141172808265_880666_2011' name='createLesson' visibility='public' ownerScope='instance' isQuery='false' concurrency='sequential' isRoot='false' isLeaf='false' isAbstract='false' owner='_9_0_2_3880181_1141100560687_435997_419'>
 									<UML:BehavioralFeature.parameter>
 										<UML:Parameter xmi.id='_9_0_2_3880181_1141172808265_503695_2010' kind='return'/>
+									</UML:BehavioralFeature.parameter>
+								</UML:Operation>
+								<UML:Operation xmi.id='_9_0_2_3880181_1141176626750_905382_2257' name='initialiseLesson' visibility='public' ownerScope='instance' isQuery='false' concurrency='sequential' isRoot='false' isLeaf='false' isAbstract='false' owner='_9_0_2_3880181_1141100560687_435997_419'>
+									<UML:BehavioralFeature.parameter>
+										<UML:Parameter xmi.id='_9_0_2_3880181_1141176626750_794015_2256' kind='return'/>
 									</UML:BehavioralFeature.parameter>
 								</UML:Operation>
 							</UML:Classifier.feature>
@@ -642,7 +635,6 @@
 							</UML:Association.connection>
 						</UML:Association>
 						<UML:Class xmi.id='_9_0_2_3880181_1141096882203_61595_239' name='Monitor' visibility='public' isRoot='false' isLeaf='false' isAbstract='false' isActive='false'/>
-						<UML:Class xmi.id='_9_0_2_3880181_1141166179078_353699_1515' name='LessonBrowserView' visibility='public' isRoot='false' isLeaf='false' isAbstract='false' isActive='false'/>
 						<UML:Class xmi.id='_9_0_2_3880181_1141164400125_58365_577' name='LearnerView' visibility='public' isRoot='false' isLeaf='false' isAbstract='false' isActive='false'>
 							<UML:Classifier.feature>
 								<UML:Operation xmi.id='_9_0_2_3880181_1141166395000_169061_1616' name='showLearnerProgress' visibility='public' ownerScope='instance' isQuery='false' concurrency='sequential' isRoot='false' isLeaf='false' isAbstract='false' owner='_9_0_2_3880181_1141164400125_58365_577'>
@@ -671,48 +663,11 @@
 							</UML:Classifier.feature>
 						</UML:Class>
 						<UML:Class xmi.id='_9_0_2_3880181_1141167945937_742822_1644' visibility='public' isRoot='false' isLeaf='false' isAbstract='false' isActive='false'/>
-						<UML:Class xmi.id='_9_0_2_3880181_1141172194421_723777_1663' name='LessonBrowserModel' visibility='public' isRoot='false' isLeaf='false' isAbstract='false' isActive='false' generalization='_9_0_2_3880181_1141172272078_592555_1762'>
-							<UML:Classifier.feature>
-								<UML:Operation xmi.id='_9_0_2_3880181_1141172464531_744013_1879' name='getAllLessons' visibility='public' ownerScope='instance' isQuery='false' concurrency='sequential' isRoot='false' isLeaf='false' isAbstract='false' owner='_9_0_2_3880181_1141172194421_723777_1663'>
-									<UML:BehavioralFeature.parameter>
-										<UML:Parameter xmi.id='_9_0_2_3880181_1141172464531_706096_1878' kind='return'/>
-									</UML:BehavioralFeature.parameter>
-								</UML:Operation>
-							</UML:Classifier.feature>
-						</UML:Class>
-						<UML:Class xmi.id='_9_0_2_3880181_1141172219609_664712_1682' name='LessonClassDialog' visibility='public' isRoot='false' isLeaf='false' isAbstract='false' isActive='false'/>
-						<UML:Class xmi.id='_9_0_2_3880181_1141172252125_50949_1701' name='LessonClass' visibility='public' isRoot='false' isLeaf='false' isAbstract='false' isActive='false'>
-							<UML:Classifier.feature>
-								<UML:Operation xmi.id='_9_0_2_3880181_1141173035093_704956_2017' name='getOrganisationByUserRole' visibility='public' ownerScope='instance' isQuery='false' concurrency='sequential' isRoot='false' isLeaf='false' isAbstract='false' owner='_9_0_2_3880181_1141172252125_50949_1701'>
-									<UML:BehavioralFeature.parameter>
-										<UML:Parameter xmi.id='_9_0_2_3880181_1141173035093_828351_2016' kind='return'/>
-									</UML:BehavioralFeature.parameter>
-								</UML:Operation>
-								<UML:Operation xmi.id='_9_0_2_3880181_1141173289765_855422_2020' name='getUsersFromOrganisationByRole' visibility='public' ownerScope='instance' isQuery='false' concurrency='sequential' isRoot='false' isLeaf='false' isAbstract='false' owner='_9_0_2_3880181_1141172252125_50949_1701'>
-									<UML:BehavioralFeature.parameter>
-										<UML:Parameter xmi.id='_9_0_2_3880181_1141173289765_621848_2019' kind='return'/>
-									</UML:BehavioralFeature.parameter>
-								</UML:Operation>
-							</UML:Classifier.feature>
-						</UML:Class>
+						<UML:Class xmi.id='_9_0_2_3880181_1141172252125_50949_1701' name='LessonClass' visibility='public' isRoot='false' isLeaf='false' isAbstract='false' isActive='false'/>
 						<UML:Association xmi.id='_9_0_2_3880181_1141172264250_44508_1722' isRoot='false' isLeaf='false' isAbstract='false'>
 							<UML:Association.connection>
 								<UML:AssociationEnd xmi.id='_9_0_2_3880181_1141172264250_427186_1720' visibility='private' isNavigable='true' ordering='unordered' aggregation='aggregate' targetScope='instance' changeability='changeable' association='_9_0_2_3880181_1141172264250_44508_1722' participant='_9_0_2_3880181_1141172252125_50949_1701'/>
 								<UML:AssociationEnd xmi.id='_9_0_2_3880181_1141172264250_936174_1721' visibility='private' isNavigable='true' ordering='unordered' aggregation='none' targetScope='instance' changeability='changeable' association='_9_0_2_3880181_1141172264250_44508_1722' participant='_9_0_2_3880181_1112200737875_563740_815'/>
-							</UML:Association.connection>
-						</UML:Association>
-						<UML:Generalization xmi.id='_9_0_2_3880181_1141172272078_592555_1762' child='_9_0_2_3880181_1141172194421_723777_1663' parent='_9_0_2_3880181_1141166179078_353699_1515'/>
-						<UML:Class xmi.id='_9_0_2_3880181_1141172334906_58792_1773' name='LessonBrowserController' visibility='public' isRoot='false' isLeaf='false' isAbstract='false' isActive='false'/>
-						<UML:Association xmi.id='_9_0_2_3880181_1141172351843_779945_1796' isRoot='false' isLeaf='false' isAbstract='false'>
-							<UML:Association.connection>
-								<UML:AssociationEnd xmi.id='_9_0_2_3880181_1141172351843_312824_1794' visibility='private' isNavigable='true' ordering='unordered' aggregation='aggregate' targetScope='instance' changeability='changeable' association='_9_0_2_3880181_1141172351843_779945_1796' participant='_9_0_2_3880181_1141166179078_353699_1515'/>
-								<UML:AssociationEnd xmi.id='_9_0_2_3880181_1141172351843_271904_1795' visibility='private' isNavigable='true' ordering='unordered' aggregation='none' targetScope='instance' changeability='changeable' association='_9_0_2_3880181_1141172351843_779945_1796' participant='_9_0_2_3880181_1141172334906_58792_1773'/>
-							</UML:Association.connection>
-						</UML:Association>
-						<UML:Association xmi.id='_9_0_2_3880181_1141172374828_45184_1838' isRoot='false' isLeaf='false' isAbstract='false'>
-							<UML:Association.connection>
-								<UML:AssociationEnd xmi.id='_9_0_2_3880181_1141172374828_287523_1836' visibility='private' isNavigable='true' ordering='unordered' aggregation='none' targetScope='instance' changeability='changeable' association='_9_0_2_3880181_1141172374828_45184_1838' participant='_9_0_2_3880181_1141172194421_723777_1663'/>
-								<UML:AssociationEnd xmi.id='_9_0_2_3880181_1141172374828_362336_1837' visibility='private' isNavigable='true' ordering='unordered' aggregation='none' targetScope='instance' changeability='changeable' association='_9_0_2_3880181_1141172374828_45184_1838' participant='_9_0_2_3880181_1141166179078_353699_1515'/>
 							</UML:Association.connection>
 						</UML:Association>
 						<UML:Association xmi.id='_9_0_2_3880181_1141172578078_116108_1928' isRoot='false' isLeaf='false' isAbstract='false'>
@@ -732,6 +687,39 @@
 							<UML:Association.connection>
 								<UML:AssociationEnd xmi.id='_9_0_2_3880181_1141173627765_185440_2067' visibility='private' isNavigable='true' ordering='unordered' aggregation='none' targetScope='instance' changeability='changeable' association='_9_0_2_3880181_1141173627765_921708_2069' participant='_9_0_2_3880181_1141172252125_50949_1701'/>
 								<UML:AssociationEnd xmi.id='_9_0_2_3880181_1141173627765_921727_2068' visibility='private' isNavigable='true' ordering='unordered' aggregation='none' targetScope='instance' changeability='changeable' association='_9_0_2_3880181_1141173627765_921708_2069' participant='_9_0_2_3880181_1141172219609_664712_1682'/>
+							</UML:Association.connection>
+						</UML:Association>
+						<UML:Generalization xmi.id='_9_0_2_3880181_1141172272078_592555_1762' child='_9_0_2_3880181_1141172194421_723777_1663' parent='_9_0_2_3880181_1141166179078_353699_1515'/>
+						<UML:Association xmi.id='_9_0_2_3880181_1141175617890_696520_2165' isRoot='false' isLeaf='false' isAbstract='false'>
+							<UML:Association.connection>
+								<UML:AssociationEnd xmi.id='_9_0_2_3880181_1141175617890_209651_2163' visibility='private' isNavigable='true' ordering='unordered' aggregation='aggregate' targetScope='instance' changeability='changeable' association='_9_0_2_3880181_1141175617890_696520_2165' participant='_9_0_2_3880181_1141172194421_723777_1663'/>
+								<UML:AssociationEnd xmi.id='_9_0_2_3880181_1141175617890_5493_2164' visibility='private' isNavigable='true' ordering='unordered' aggregation='none' targetScope='instance' changeability='changeable' association='_9_0_2_3880181_1141175617890_696520_2165' participant='_9_0_2_3880181_1112200737875_563740_815'/>
+							</UML:Association.connection>
+						</UML:Association>
+						<UML:Class xmi.id='_9_0_2_3880181_1141164373375_233467_561' name='LessonView' visibility='public' isRoot='false' isLeaf='false' isAbstract='false' isActive='false'>
+							<UML:ModelElement.comment>
+								<UML:Comment xmi.id='_9_0_2_3880181_1141166455546_638264_1627' name='&#10;'/>
+							</UML:ModelElement.comment>
+							<UML:Classifier.feature>
+								<UML:Operation xmi.id='_9_0_2_3880181_1141166333484_18286_1606' name='showLessonDetails' visibility='public' ownerScope='instance' isQuery='false' concurrency='sequential' isRoot='false' isLeaf='false' isAbstract='false' owner='_9_0_2_3880181_1141164373375_233467_561'>
+									<UML:BehavioralFeature.parameter>
+										<UML:Parameter xmi.id='_9_0_2_3880181_1141166333484_428194_1605' kind='return'/>
+									</UML:BehavioralFeature.parameter>
+								</UML:Operation>
+							</UML:Classifier.feature>
+						</UML:Class>
+						<UML:Class xmi.id='_9_0_2_3880181_1141178079171_23313_2420' name='ToolBar' visibility='public' isRoot='false' isLeaf='false' isAbstract='false' isActive='false'/>
+						<UML:Association xmi.id='_9_0_2_3880181_1141178172656_946742_2451' isRoot='false' isLeaf='false' isAbstract='false'>
+							<UML:Association.connection>
+								<UML:AssociationEnd xmi.id='_9_0_2_3880181_1141178172656_649487_2449' visibility='private' isNavigable='true' ordering='unordered' aggregation='aggregate' targetScope='instance' changeability='changeable' association='_9_0_2_3880181_1141178172656_946742_2451' participant='_9_0_2_3880181_1112199870718_490819_731'/>
+								<UML:AssociationEnd xmi.id='_9_0_2_3880181_1141178172656_109270_2450' visibility='private' isNavigable='true' ordering='unordered' aggregation='none' targetScope='instance' changeability='changeable' association='_9_0_2_3880181_1141178172656_946742_2451' participant='_9_0_2_3880181_1141178079171_23313_2420'/>
+							</UML:Association.connection>
+						</UML:Association>
+						<UML:Class xmi.id='_9_0_2_3880181_1141178190156_432292_2521' name='LFMenuBar' visibility='public' isRoot='false' isLeaf='false' isAbstract='false' isActive='false'/>
+						<UML:Association xmi.id='_9_0_2_3880181_1141178200609_654392_2542' isRoot='false' isLeaf='false' isAbstract='false'>
+							<UML:Association.connection>
+								<UML:AssociationEnd xmi.id='_9_0_2_3880181_1141178200609_879834_2540' visibility='private' isNavigable='true' ordering='unordered' aggregation='aggregate' targetScope='instance' changeability='changeable' association='_9_0_2_3880181_1141178200609_654392_2542' participant='_9_0_2_3880181_1112199870718_490819_731'/>
+								<UML:AssociationEnd xmi.id='_9_0_2_3880181_1141178200609_901882_2541' visibility='private' isNavigable='true' ordering='unordered' aggregation='none' targetScope='instance' changeability='changeable' association='_9_0_2_3880181_1141178200609_654392_2542' participant='_9_0_2_3880181_1141178190156_432292_2521'/>
 							</UML:Association.connection>
 						</UML:Association>
 					</UML:Namespace.ownedElement>
@@ -864,6 +852,79 @@
 						<UML:AssociationEnd xmi.id='_9_0_2_3880181_1141172570156_440360_1885' visibility='private' isNavigable='true' ordering='unordered' aggregation='none' targetScope='instance' changeability='changeable' association='_9_0_2_3880181_1141172570156_594193_1886' participant='_9_0_2_3880181_1141100560687_435997_419'/>
 					</UML:Association.connection>
 				</UML:Association>
+				<UML:Package xmi.id='_9_0_2_3880181_1141176759156_727651_2267' name='org.lamsfoundation.lams.monitor.lesson' isRoot='false' isLeaf='false' isAbstract='false'>
+					<UML:Namespace.ownedElement>
+						<UML:Class xmi.id='_9_0_2_3880181_1141172194421_723777_1663' name='LessonManager' visibility='public' isRoot='false' isLeaf='false' isAbstract='false' isActive='false' generalization='_9_0_2_3880181_1141172272078_592555_1762'>
+							<UML:Classifier.feature>
+								<UML:Operation xmi.id='_9_0_2_3880181_1141172464531_744013_1879' name='getAllLessons' visibility='public' ownerScope='instance' isQuery='false' concurrency='sequential' isRoot='false' isLeaf='false' isAbstract='false' owner='_9_0_2_3880181_1141172194421_723777_1663'>
+									<UML:BehavioralFeature.parameter>
+										<UML:Parameter xmi.id='_9_0_2_3880181_1141172464531_706096_1878' kind='return'/>
+									</UML:BehavioralFeature.parameter>
+								</UML:Operation>
+								<UML:Operation xmi.id='_9_0_2_3880181_1141173289765_855422_2020' name='getUsersFromOrganisationByRole' visibility='public' ownerScope='instance' isQuery='false' concurrency='sequential' isRoot='false' isLeaf='false' isAbstract='false' owner='_9_0_2_3880181_1141172194421_723777_1663'>
+									<UML:BehavioralFeature.parameter>
+										<UML:Parameter xmi.id='_9_0_2_3880181_1141173289765_621848_2019' kind='return'/>
+									</UML:BehavioralFeature.parameter>
+								</UML:Operation>
+								<UML:Operation xmi.id='_9_0_2_3880181_1141173035093_704956_2017' name='getOrganisationByUserRole' visibility='public' ownerScope='instance' isQuery='false' concurrency='sequential' isRoot='false' isLeaf='false' isAbstract='false' owner='_9_0_2_3880181_1141172194421_723777_1663'>
+									<UML:BehavioralFeature.parameter>
+										<UML:Parameter xmi.id='_9_0_2_3880181_1141173035093_828351_2016' kind='return'/>
+									</UML:BehavioralFeature.parameter>
+								</UML:Operation>
+							</UML:Classifier.feature>
+						</UML:Class>
+						<UML:Class xmi.id='_9_0_2_3880181_1141166179078_353699_1515' name='LessonBrowserView' visibility='public' isRoot='false' isLeaf='false' isAbstract='false' isActive='false'>
+							<UML:Classifier.feature>
+								<UML:Operation xmi.id='_9_0_2_3880181_1141176093078_315259_2250' name='showPane(ACTIVE)' visibility='public' ownerScope='instance' isQuery='false' concurrency='sequential' isRoot='false' isLeaf='false' isAbstract='false' owner='_9_0_2_3880181_1141166179078_353699_1515'>
+									<UML:BehavioralFeature.parameter>
+										<UML:Parameter xmi.id='_9_0_2_3880181_1141176093078_202219_2249' kind='return'/>
+									</UML:BehavioralFeature.parameter>
+								</UML:Operation>
+								<UML:Operation xmi.id='_9_0_2_3880181_1141176093078_132143_2248' name='showAllLessons' visibility='public' ownerScope='instance' isQuery='false' concurrency='sequential' isRoot='false' isLeaf='false' isAbstract='false' owner='_9_0_2_3880181_1141166179078_353699_1515'>
+									<UML:BehavioralFeature.parameter>
+										<UML:Parameter xmi.id='_9_0_2_3880181_1141176093078_688882_2247' kind='return'/>
+									</UML:BehavioralFeature.parameter>
+								</UML:Operation>
+							</UML:Classifier.feature>
+						</UML:Class>
+						<UML:Class xmi.id='_9_0_2_3880181_1141172334906_58792_1773' name='LessonBrowserController' visibility='public' isRoot='false' isLeaf='false' isAbstract='false' isActive='false'>
+							<UML:Classifier.feature>
+								<UML:Operation xmi.id='_9_0_2_3880181_1141176110015_515194_2254' name='onSelectLesson' visibility='public' ownerScope='instance' isQuery='false' concurrency='sequential' isRoot='false' isLeaf='false' isAbstract='false' owner='_9_0_2_3880181_1141172334906_58792_1773'>
+									<UML:BehavioralFeature.parameter>
+										<UML:Parameter xmi.id='_9_0_2_3880181_1141176110015_307510_2253' kind='return'/>
+									</UML:BehavioralFeature.parameter>
+								</UML:Operation>
+							</UML:Classifier.feature>
+						</UML:Class>
+						<UML:Class xmi.id='_9_0_2_3880181_1141172219609_664712_1682' name='LessonClassDialog' visibility='public' isRoot='false' isLeaf='false' isAbstract='false' isActive='false'/>
+						<UML:Class xmi.id='_9_0_2_3880181_1141177343718_948720_2334' name='SelectUsersDialog' visibility='public' isRoot='false' isLeaf='false' isAbstract='false' isActive='false'/>
+						<UML:Association xmi.id='_9_0_2_3880181_1141177871781_598731_2364' isRoot='false' isLeaf='false' isAbstract='false'>
+							<UML:Association.connection>
+								<UML:AssociationEnd xmi.id='_9_0_2_3880181_1141177871781_972232_2362' visibility='private' isNavigable='true' ordering='unordered' aggregation='aggregate' targetScope='instance' changeability='changeable' association='_9_0_2_3880181_1141177871781_598731_2364' participant='_9_0_2_3880181_1141172194421_723777_1663'/>
+								<UML:AssociationEnd xmi.id='_9_0_2_3880181_1141177871781_874899_2363' visibility='private' isNavigable='true' ordering='unordered' aggregation='none' targetScope='instance' changeability='changeable' association='_9_0_2_3880181_1141177871781_598731_2364' participant='_9_0_2_3880181_1141177343718_948720_2334'/>
+							</UML:Association.connection>
+						</UML:Association>
+					</UML:Namespace.ownedElement>
+				</UML:Package>
+				<UML:Association xmi.id='_9_0_2_3880181_1141175640062_987766_2207' isRoot='false' isLeaf='false' isAbstract='false'>
+					<UML:Association.connection>
+						<UML:AssociationEnd xmi.id='_9_0_2_3880181_1141175640062_192344_2205' visibility='private' isNavigable='true' ordering='unordered' aggregation='aggregate' targetScope='instance' changeability='changeable' association='_9_0_2_3880181_1141175640062_987766_2207' participant='_9_0_2_3880181_1141172194421_723777_1663'/>
+						<UML:AssociationEnd xmi.id='_9_0_2_3880181_1141175640062_957076_2206' visibility='private' isNavigable='true' ordering='unordered' aggregation='none' targetScope='instance' changeability='changeable' association='_9_0_2_3880181_1141175640062_987766_2207' participant='_9_0_2_3880181_1141172219609_664712_1682'/>
+					</UML:Association.connection>
+				</UML:Association>
+				<UML:Association xmi.id='_9_0_2_3880181_1141172374828_45184_1838' isRoot='false' isLeaf='false' isAbstract='false'>
+					<UML:Association.connection>
+						<UML:AssociationEnd xmi.id='_9_0_2_3880181_1141172374828_287523_1836' visibility='private' isNavigable='true' ordering='unordered' aggregation='none' targetScope='instance' changeability='changeable' association='_9_0_2_3880181_1141172374828_45184_1838' participant='_9_0_2_3880181_1141172194421_723777_1663'/>
+						<UML:AssociationEnd xmi.id='_9_0_2_3880181_1141172374828_362336_1837' visibility='private' isNavigable='true' ordering='unordered' aggregation='none' targetScope='instance' changeability='changeable' association='_9_0_2_3880181_1141172374828_45184_1838' participant='_9_0_2_3880181_1141166179078_353699_1515'/>
+					</UML:Association.connection>
+				</UML:Association>
+				<UML:Association xmi.id='_9_0_2_3880181_1141172351843_779945_1796' isRoot='false' isLeaf='false' isAbstract='false'>
+					<UML:Association.connection>
+						<UML:AssociationEnd xmi.id='_9_0_2_3880181_1141172351843_312824_1794' visibility='private' isNavigable='true' ordering='unordered' aggregation='aggregate' targetScope='instance' changeability='changeable' association='_9_0_2_3880181_1141172351843_779945_1796' participant='_9_0_2_3880181_1141166179078_353699_1515'/>
+						<UML:AssociationEnd xmi.id='_9_0_2_3880181_1141172351843_271904_1795' visibility='private' isNavigable='true' ordering='unordered' aggregation='none' targetScope='instance' changeability='changeable' association='_9_0_2_3880181_1141172351843_779945_1796' participant='_9_0_2_3880181_1141172334906_58792_1773'/>
+					</UML:Association.connection>
+				</UML:Association>
+				<UML:Package xmi.id='_9_0_2_3880181_1141178462640_187189_2582' isRoot='false' isLeaf='false' isAbstract='false'/>
 				<UML:UninterpretedAction xmi.id='_9_0_2_3880181_1127386177722_165063_54' name='do?userID=123' isAsynchronous='false'>
 					<UML:Action.target>
 						<UML:ObjectSetExpression xmi.id='_9_0_2_3880181_1127386177722_308033_56' body='GET&#10;getLDID'/>
@@ -3265,74 +3326,74 @@ window to show page</text>
 				<umlType>Class Diagram</umlType>
 				<mdElement elementClass='DiagramView' xmi.id='_9_0_2_3880181_1141097210296_253344_263'>
 					<elementID xmi.idref='_9_0_2_3880181_1141096631640_435926_0'/>
-					<zoomFactor xmi.value='1.0'/>
+					<zoomFactor xmi.value='0.75'/>
 					<diagramOpened xmi.value='true'/>
 					<diagramWindowBounds>0, 0, 1188, 992</diagramWindowBounds>
-					<diagramScrollPositionX xmi.value='190'/>
-					<diagramScrollPositionY xmi.value='400'/>
+					<diagramScrollPositionX xmi.value='0'/>
+					<diagramScrollPositionY xmi.value='0'/>
 					<maximized xmi.value='true'/>
 					<active xmi.value='true'/>
 					<mdOwnedViews>
 						<mdElement elementClass='ClassView' xmi.id='_9_0_2_3880181_1141096716953_523793_19'>
 							<elementID xmi.idref='_9_0_2_3880181_1111684023162_54186_1'/>
-							<geometry>10, 70, 150, 120</geometry>
+							<geometry>10, 100, 150, 120</geometry>
 							<compartment xmi.value='_9_0_2_3880181_1111684319677_197572_67'/>
 						</mdElement>
 						<mdElement elementClass='ClassView' xmi.id='_9_0_2_3880181_1141096744812_118035_40'>
 							<elementID xmi.idref='_9_0_2_3880181_1141096744812_137990_39'/>
-							<geometry>10, 220, 150, 90</geometry>
+							<geometry>10, 250, 150, 90</geometry>
 						</mdElement>
 						<mdElement elementClass='ClassView' xmi.id='_9_0_2_3880181_1141096784921_494737_56'>
 							<elementID xmi.idref='_9_0_2_3880181_1141096784921_460720_55'/>
-							<geometry>10, 330, 150, 80</geometry>
+							<geometry>10, 360, 150, 80</geometry>
 						</mdElement>
 						<mdElement elementClass='ClassView' xmi.id='_9_0_2_3880181_1141100473890_176247_351'>
 							<elementID xmi.idref='_9_0_2_3880181_1112196427906_43956_582'/>
-							<geometry>960, 70, 178, 207</geometry>
+							<geometry>1020, 70, 178, 207</geometry>
 							<compartment xmi.value='_9_0_2_3880181_1112351516453_312549_35^_9_0_2_3880181_1112351516453_318969_37^_9_0_2_3880181_1112356509187_37412_615^_9_0_2_3880181_1112356509187_948104_617'/>
 						</mdElement>
 						<mdElement elementClass='ClassView' xmi.id='_9_0_2_3880181_1141164496453_696659_626'>
 							<elementID xmi.idref='_9_0_2_3880181_1141164496453_293176_625'/>
-							<geometry>450, 660, 105, 116</geometry>
+							<geometry>540, 660, 105, 116</geometry>
 						</mdElement>
 						<mdElement elementClass='ClassView' xmi.id='_9_0_2_3880181_1141164528281_927362_642'>
 							<elementID xmi.idref='_9_0_2_3880181_1141164528281_554675_641'/>
-							<geometry>590, 660, 108, 120</geometry>
+							<geometry>680, 660, 108, 120</geometry>
 						</mdElement>
 						<mdElement elementClass='ClassView' xmi.id='_9_0_2_3880181_1141164543359_446181_658'>
 							<elementID xmi.idref='_9_0_2_3880181_1141164543359_515318_657'/>
-							<geometry>720, 660, 110, 121</geometry>
+							<geometry>810, 660, 110, 121</geometry>
 						</mdElement>
 						<mdElement elementClass='PackageView' xmi.id='_9_0_2_3880181_1141164860453_434998_685'>
 							<elementID xmi.idref='_9_0_2_3880181_1141164860453_749463_684'/>
-							<geometry>230, 40, 670, 1200</geometry>
+							<geometry>300, 30, 680, 870</geometry>
 							<mdOwnedViews>
 								<mdElement elementClass='ClassView' xmi.id='_9_0_2_3880181_1141096687984_487081_2'>
 									<elementID xmi.idref='_9_0_2_3880181_1112199870718_490819_731'/>
-									<geometry>280, 120, 124, 125</geometry>
+									<geometry>370, 120, 124, 125</geometry>
 								</mdElement>
 								<mdElement elementClass='AssociationView' xmi.id='_9_0_2_3880181_1141164200218_297516_491'>
 									<elementID xmi.idref='_9_0_2_3880181_1141172552796_250013_1883'/>
 									<linkFirstEndID xmi.idref='_9_0_2_3880181_1141100560687_745697_420'/>
 									<linkSecondEndID xmi.idref='_9_0_2_3880181_1141096687984_487081_2'/>
-									<geometry>500, 195; 404, 195; </geometry>
+									<geometry>590, 195; 494, 195; </geometry>
 									<linkNameID xmi.idref='_9_0_2_3880181_1141164200218_608026_527'/>
 									<nameVisible xmi.value='true'/>
 									<mdOwnedViews>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141164200218_209633_492'>
 											<editable xmi.value='false'/>
 											<visible xmi.value='false'/>
-											<geometry>424, 265, 30, 15</geometry>
+											<geometry>514, 265, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141164200218_268377_494'>
 											<editable xmi.value='false'/>
 											<visible xmi.value='false'/>
-											<geometry>408, 264, 30, 15</geometry>
+											<geometry>498, 264, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141164200218_353457_497'>
 											<editable xmi.value='false'/>
 											<visible xmi.value='false'/>
-											<geometry>388, 84, 30, 15</geometry>
+											<geometry>478, 84, 30, 15</geometry>
 											<text>&lt;html&gt;
 &lt;body&gt;
 &lt;p&gt;&lt;/p&gt;
@@ -3341,28 +3402,28 @@ window to show page</text>
 										</mdElement>
 										<mdElement elementClass='RoleView' xmi.id='_9_0_2_3880181_1141164200218_323179_499'>
 											<elementID xmi.idref='_9_0_2_3880181_1141172552796_266539_1881'/>
-											<geometry>490, 190, 10, 10</geometry>
+											<geometry>580, 190, 10, 10</geometry>
 											<mdOwnedViews>
 												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141164200218_62956_500'>
 													<visible xmi.value='false'/>
-													<geometry>490, 190, 30, 15</geometry>
+													<geometry>580, 190, 30, 15</geometry>
 												</mdElement>
 												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141164200218_871796_502'>
 													<visible xmi.value='false'/>
-													<geometry>490, 190, 30, 15</geometry>
+													<geometry>580, 190, 30, 15</geometry>
 												</mdElement>
 												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141164200218_164073_504'>
 													<visible xmi.value='false'/>
-													<geometry>490, 190, 30, 15</geometry>
+													<geometry>580, 190, 30, 15</geometry>
 												</mdElement>
 												<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141164200218_871903_506'>
 													<editable xmi.value='false'/>
 													<visible xmi.value='false'/>
-													<geometry>490, 210, 30, 15</geometry>
+													<geometry>580, 210, 30, 15</geometry>
 												</mdElement>
 												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141164200218_404943_509'>
 													<visible xmi.value='false'/>
-													<geometry>490, 190, 30, 15</geometry>
+													<geometry>580, 190, 30, 15</geometry>
 													<text>&lt;html&gt;
 &lt;body&gt;
 &lt;p&gt;&lt;/p&gt;
@@ -3378,28 +3439,28 @@ window to show page</text>
 										</mdElement>
 										<mdElement elementClass='RoleView' xmi.id='_9_0_2_3880181_1141164200218_895102_513'>
 											<elementID xmi.idref='_9_0_2_3880181_1141172552796_984230_1882'/>
-											<geometry>404, 190, 10, 10</geometry>
+											<geometry>494, 190, 10, 10</geometry>
 											<mdOwnedViews>
 												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141164200218_881750_514'>
 													<visible xmi.value='false'/>
-													<geometry>404, 190, 30, 15</geometry>
+													<geometry>494, 190, 30, 15</geometry>
 												</mdElement>
 												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141164200218_469783_516'>
 													<visible xmi.value='false'/>
-													<geometry>404, 190, 30, 15</geometry>
+													<geometry>494, 190, 30, 15</geometry>
 												</mdElement>
 												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141164200218_669799_518'>
 													<visible xmi.value='false'/>
-													<geometry>404, 190, 30, 15</geometry>
+													<geometry>494, 190, 30, 15</geometry>
 												</mdElement>
 												<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141164200218_754410_520'>
 													<editable xmi.value='false'/>
 													<visible xmi.value='false'/>
-													<geometry>404, 210, 30, 15</geometry>
+													<geometry>494, 210, 30, 15</geometry>
 												</mdElement>
 												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141164200218_578182_523'>
 													<visible xmi.value='false'/>
-													<geometry>404, 190, 30, 15</geometry>
+													<geometry>494, 190, 30, 15</geometry>
 													<text>&lt;html&gt;
 &lt;body&gt;
 &lt;p&gt;&lt;/p&gt;
@@ -3415,7 +3476,7 @@ window to show page</text>
 										</mdElement>
 										<mdElement elementClass='AssociationTextBoxView' xmi.id='_9_0_2_3880181_1141164200218_608026_527'>
 											<visible xmi.value='false'/>
-											<geometry>417, 265, 45, 15</geometry>
+											<geometry>507, 265, 45, 15</geometry>
 										</mdElement>
 									</mdOwnedViews>
 									<linkConstraintID xmi.idref='_9_0_2_3880181_1141164200218_209633_492'/>
@@ -3426,78 +3487,50 @@ window to show page</text>
 								</mdElement>
 								<mdElement elementClass='ClassView' xmi.id='_9_0_2_3880181_1141100560687_745697_420'>
 									<elementID xmi.idref='_9_0_2_3880181_1141100560687_435997_419'/>
-									<geometry>500, 120, 145, 125</geometry>
+									<geometry>590, 120, 145, 125</geometry>
 								</mdElement>
 								<mdElement elementClass='NoteView' xmi.id='_9_0_2_3880181_1141165287296_250722_1129'>
-									<geometry>340, 450, 69, 45</geometry>
+									<geometry>390, 450, 69, 45</geometry>
 									<text>Lesson tab</text>
 								</mdElement>
 								<mdElement elementClass='NoteView' xmi.id='_9_0_2_3880181_1141165307406_572292_1160'>
-									<geometry>460, 450, 67, 45</geometry>
+									<geometry>550, 450, 67, 45</geometry>
 									<text>Design tab</text>
 								</mdElement>
 								<mdElement elementClass='NoteView' xmi.id='_9_0_2_3880181_1141165338265_533284_1177'>
-									<geometry>610, 450, 70, 45</geometry>
+									<geometry>700, 450, 70, 45</geometry>
 									<text>Learner tab</text>
 								</mdElement>
 								<mdElement elementClass='NoteView' xmi.id='_9_0_2_3880181_1141165354453_320748_1193'>
-									<geometry>770, 450, 60, 45</geometry>
+									<geometry>860, 450, 60, 45</geometry>
 									<text>Todo tab</text>
-								</mdElement>
-								<mdElement elementClass='NoteView' xmi.id='_9_0_2_3880181_1141165424953_172481_1369'>
-									<geometry>420, 810, 270, 81</geometry>
-									<text>View controllers handle UI input events, in the view class use uiObject.addEVentListener(Proxy.create(xxxController,onxxxClick) to set up references to the controllers</text>
-								</mdElement>
-								<mdElement elementClass='NoteAnchorView' xmi.id='_9_0_2_3880181_1141165511265_875173_1381'>
-									<linkFirstEndID xmi.idref='_9_0_2_3880181_1141164467500_151878_610'/>
-									<linkSecondEndID xmi.idref='_9_0_2_3880181_1141165424953_172481_1369'/>
-									<geometry>400, 749; 494, 810; </geometry>
-								</mdElement>
-								<mdElement elementClass='NoteAnchorView' xmi.id='_9_0_2_3880181_1141165515921_111626_1382'>
-									<linkFirstEndID xmi.idref='_9_0_2_3880181_1141164496453_696659_626'/>
-									<linkSecondEndID xmi.idref='_9_0_2_3880181_1141165424953_172481_1369'/>
-									<geometry>525, 776; 539, 810; </geometry>
-								</mdElement>
-								<mdElement elementClass='NoteAnchorView' xmi.id='_9_0_2_3880181_1141165518453_975224_1383'>
-									<linkFirstEndID xmi.idref='_9_0_2_3880181_1141164528281_927362_642'/>
-									<linkSecondEndID xmi.idref='_9_0_2_3880181_1141165424953_172481_1369'/>
-									<geometry>603, 780; 582, 810; </geometry>
-								</mdElement>
-								<mdElement elementClass='NoteAnchorView' xmi.id='_9_0_2_3880181_1141165521203_663385_1384'>
-									<linkFirstEndID xmi.idref='_9_0_2_3880181_1141164543359_446181_658'/>
-									<linkSecondEndID xmi.idref='_9_0_2_3880181_1141165424953_172481_1369'/>
-									<geometry>720, 752; 622, 810; </geometry>
-								</mdElement>
-								<mdElement elementClass='ClassView' xmi.id='_9_0_2_3880181_1141166179078_670281_1516'>
-									<elementID xmi.idref='_9_0_2_3880181_1141166179078_353699_1515'/>
-									<geometry>260, 1070, 126, 100</geometry>
 								</mdElement>
 								<mdElement elementClass='ClassView' xmi.id='_9_0_2_3880181_1141164400125_905037_578'>
 									<elementID xmi.idref='_9_0_2_3880181_1141164400125_58365_577'/>
-									<geometry>570, 500, 145, 129</geometry>
+									<geometry>660, 500, 145, 129</geometry>
 								</mdElement>
 								<mdElement elementClass='AssociationView' xmi.id='_9_0_2_3880181_1141165136281_275406_1039'>
 									<elementID xmi.idref='_9_0_2_3880181_1141165136281_168909_1038'/>
 									<linkFirstEndID xmi.idref='_9_0_2_3880181_1141100560687_745697_420'/>
 									<linkSecondEndID xmi.idref='_9_0_2_3880181_1141164400125_905037_578'/>
-									<geometry>580, 245; 580, 500; </geometry>
+									<geometry>670, 245; 670, 500; </geometry>
 									<linkNameID xmi.idref='_9_0_2_3880181_1141165136281_152477_1075'/>
 									<nameVisible xmi.value='true'/>
 									<mdOwnedViews>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165136281_218784_1040'>
 											<editable xmi.value='false'/>
 											<visible xmi.value='false'/>
-											<geometry>565, 337, 30, 15</geometry>
+											<geometry>655, 337, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141165136281_857891_1042'>
 											<editable xmi.value='false'/>
 											<visible xmi.value='false'/>
-											<geometry>565, 394, 30, 15</geometry>
+											<geometry>655, 394, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165136281_504079_1045'>
 											<editable xmi.value='false'/>
 											<visible xmi.value='false'/>
-											<geometry>0, 220, 30, 15</geometry>
+											<geometry>90, 220, 30, 15</geometry>
 											<text>&lt;html&gt;
 &lt;body&gt;
 &lt;p&gt;&lt;/p&gt;
@@ -3506,28 +3539,28 @@ window to show page</text>
 										</mdElement>
 										<mdElement elementClass='RoleView' xmi.id='_9_0_2_3880181_1141165136281_657282_1047'>
 											<elementID xmi.idref='_9_0_2_3880181_1141165136281_960634_1036'/>
-											<geometry>575, 245, 10, 10</geometry>
+											<geometry>665, 245, 10, 10</geometry>
 											<mdOwnedViews>
 												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165136281_639938_1048'>
 													<visible xmi.value='false'/>
-													<geometry>575, 245, 30, 15</geometry>
+													<geometry>665, 245, 30, 15</geometry>
 												</mdElement>
 												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165136281_833400_1050'>
 													<visible xmi.value='false'/>
-													<geometry>575, 245, 30, 15</geometry>
+													<geometry>665, 245, 30, 15</geometry>
 												</mdElement>
 												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165136281_210906_1052'>
 													<visible xmi.value='false'/>
-													<geometry>575, 245, 30, 15</geometry>
+													<geometry>665, 245, 30, 15</geometry>
 												</mdElement>
 												<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141165136281_260087_1054'>
 													<editable xmi.value='false'/>
 													<visible xmi.value='false'/>
-													<geometry>575, 265, 30, 15</geometry>
+													<geometry>665, 265, 30, 15</geometry>
 												</mdElement>
 												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165136281_42379_1057'>
 													<visible xmi.value='false'/>
-													<geometry>575, 245, 30, 15</geometry>
+													<geometry>665, 245, 30, 15</geometry>
 													<text>&lt;html&gt;
 &lt;body&gt;
 &lt;p&gt;&lt;/p&gt;
@@ -3543,28 +3576,28 @@ window to show page</text>
 										</mdElement>
 										<mdElement elementClass='RoleView' xmi.id='_9_0_2_3880181_1141165136281_975437_1061'>
 											<elementID xmi.idref='_9_0_2_3880181_1141165136281_354305_1037'/>
-											<geometry>575, 490, 10, 10</geometry>
+											<geometry>665, 490, 10, 10</geometry>
 											<mdOwnedViews>
 												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165136281_663563_1062'>
 													<visible xmi.value='false'/>
-													<geometry>575, 490, 30, 15</geometry>
+													<geometry>665, 490, 30, 15</geometry>
 												</mdElement>
 												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165136281_769967_1064'>
 													<visible xmi.value='false'/>
-													<geometry>575, 490, 30, 15</geometry>
+													<geometry>665, 490, 30, 15</geometry>
 												</mdElement>
 												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165136281_320009_1066'>
 													<visible xmi.value='false'/>
-													<geometry>575, 490, 30, 15</geometry>
+													<geometry>665, 490, 30, 15</geometry>
 												</mdElement>
 												<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141165136281_128356_1068'>
 													<editable xmi.value='false'/>
 													<visible xmi.value='false'/>
-													<geometry>575, 510, 30, 15</geometry>
+													<geometry>665, 510, 30, 15</geometry>
 												</mdElement>
 												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165136281_967704_1071'>
 													<visible xmi.value='false'/>
-													<geometry>575, 490, 30, 15</geometry>
+													<geometry>665, 490, 30, 15</geometry>
 													<text>&lt;html&gt;
 &lt;body&gt;
 &lt;p&gt;&lt;/p&gt;
@@ -3580,7 +3613,7 @@ window to show page</text>
 										</mdElement>
 										<mdElement elementClass='AssociationTextBoxView' xmi.id='_9_0_2_3880181_1141165136281_152477_1075'>
 											<visible xmi.value='false'/>
-											<geometry>558, 356, 45, 15</geometry>
+											<geometry>648, 356, 45, 15</geometry>
 										</mdElement>
 									</mdOwnedViews>
 									<linkConstraintID xmi.idref='_9_0_2_3880181_1141165136281_218784_1040'/>
@@ -3591,30 +3624,30 @@ window to show page</text>
 								</mdElement>
 								<mdElement elementClass='ClassView' xmi.id='_9_0_2_3880181_1141164326656_99602_546'>
 									<elementID xmi.idref='_9_0_2_3880181_1141164310437_42632_530'/>
-									<geometry>420, 500, 145, 131</geometry>
+									<geometry>510, 500, 145, 131</geometry>
 								</mdElement>
 								<mdElement elementClass='AssociationView' xmi.id='_9_0_2_3880181_1141165132031_117820_997'>
 									<elementID xmi.idref='_9_0_2_3880181_1141165132031_677989_996'/>
 									<linkFirstEndID xmi.idref='_9_0_2_3880181_1141100560687_745697_420'/>
 									<linkSecondEndID xmi.idref='_9_0_2_3880181_1141164326656_99602_546'/>
-									<geometry>515, 245; 515, 500; </geometry>
+									<geometry>605, 245; 605, 500; </geometry>
 									<linkNameID xmi.idref='_9_0_2_3880181_1141165132031_230510_1033'/>
 									<nameVisible xmi.value='true'/>
 									<mdOwnedViews>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165132031_438344_998'>
 											<editable xmi.value='false'/>
 											<visible xmi.value='false'/>
-											<geometry>500, 343, 30, 15</geometry>
+											<geometry>590, 343, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141165132031_563789_1000'>
 											<editable xmi.value='false'/>
 											<visible xmi.value='false'/>
-											<geometry>500, 383, 30, 15</geometry>
+											<geometry>590, 383, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165132031_228509_1003'>
 											<editable xmi.value='false'/>
 											<visible xmi.value='false'/>
-											<geometry>424, 178, 30, 15</geometry>
+											<geometry>514, 178, 30, 15</geometry>
 											<text>&lt;html&gt;
 &lt;body&gt;
 &lt;p&gt;&lt;/p&gt;
@@ -3623,28 +3656,28 @@ window to show page</text>
 										</mdElement>
 										<mdElement elementClass='RoleView' xmi.id='_9_0_2_3880181_1141165132031_316625_1005'>
 											<elementID xmi.idref='_9_0_2_3880181_1141165132031_573582_994'/>
-											<geometry>510, 245, 10, 10</geometry>
+											<geometry>600, 245, 10, 10</geometry>
 											<mdOwnedViews>
 												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165132031_91095_1006'>
 													<visible xmi.value='false'/>
-													<geometry>510, 245, 30, 15</geometry>
+													<geometry>600, 245, 30, 15</geometry>
 												</mdElement>
 												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165132031_33066_1008'>
 													<visible xmi.value='false'/>
-													<geometry>510, 245, 30, 15</geometry>
+													<geometry>600, 245, 30, 15</geometry>
 												</mdElement>
 												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165132031_315001_1010'>
 													<visible xmi.value='false'/>
-													<geometry>510, 245, 30, 15</geometry>
+													<geometry>600, 245, 30, 15</geometry>
 												</mdElement>
 												<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141165132031_406747_1012'>
 													<editable xmi.value='false'/>
 													<visible xmi.value='false'/>
-													<geometry>510, 265, 30, 15</geometry>
+													<geometry>600, 265, 30, 15</geometry>
 												</mdElement>
 												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165132031_408118_1015'>
 													<visible xmi.value='false'/>
-													<geometry>510, 245, 30, 15</geometry>
+													<geometry>600, 245, 30, 15</geometry>
 													<text>&lt;html&gt;
 &lt;body&gt;
 &lt;p&gt;&lt;/p&gt;
@@ -3660,28 +3693,28 @@ window to show page</text>
 										</mdElement>
 										<mdElement elementClass='RoleView' xmi.id='_9_0_2_3880181_1141165132031_288972_1019'>
 											<elementID xmi.idref='_9_0_2_3880181_1141165132031_547951_995'/>
-											<geometry>510, 490, 10, 10</geometry>
+											<geometry>600, 490, 10, 10</geometry>
 											<mdOwnedViews>
 												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165132031_973581_1020'>
 													<visible xmi.value='false'/>
-													<geometry>510, 490, 30, 15</geometry>
+													<geometry>600, 490, 30, 15</geometry>
 												</mdElement>
 												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165132031_205585_1022'>
 													<visible xmi.value='false'/>
-													<geometry>510, 490, 30, 15</geometry>
+													<geometry>600, 490, 30, 15</geometry>
 												</mdElement>
 												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165132031_268015_1024'>
 													<visible xmi.value='false'/>
-													<geometry>510, 490, 30, 15</geometry>
+													<geometry>600, 490, 30, 15</geometry>
 												</mdElement>
 												<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141165132031_290532_1026'>
 													<editable xmi.value='false'/>
 													<visible xmi.value='false'/>
-													<geometry>510, 510, 30, 15</geometry>
+													<geometry>600, 510, 30, 15</geometry>
 												</mdElement>
 												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165132031_995367_1029'>
 													<visible xmi.value='false'/>
-													<geometry>510, 490, 30, 15</geometry>
+													<geometry>600, 490, 30, 15</geometry>
 													<text>&lt;html&gt;
 &lt;body&gt;
 &lt;p&gt;&lt;/p&gt;
@@ -3697,7 +3730,7 @@ window to show page</text>
 										</mdElement>
 										<mdElement elementClass='AssociationTextBoxView' xmi.id='_9_0_2_3880181_1141165132031_230510_1033'>
 											<visible xmi.value='false'/>
-											<geometry>493, 362, 45, 15</geometry>
+											<geometry>583, 362, 45, 15</geometry>
 										</mdElement>
 									</mdOwnedViews>
 									<linkConstraintID xmi.idref='_9_0_2_3880181_1141165132031_438344_998'/>
@@ -3708,30 +3741,30 @@ window to show page</text>
 								</mdElement>
 								<mdElement elementClass='ClassView' xmi.id='_9_0_2_3880181_1141164450437_327697_594'>
 									<elementID xmi.idref='_9_0_2_3880181_1141164450437_872749_593'/>
-									<geometry>720, 500, 126, 131</geometry>
+									<geometry>810, 500, 126, 131</geometry>
 								</mdElement>
 								<mdElement elementClass='AssociationView' xmi.id='_9_0_2_3880181_1141165141437_487073_1081'>
 									<elementID xmi.idref='_9_0_2_3880181_1141165141437_932988_1080'/>
 									<linkFirstEndID xmi.idref='_9_0_2_3880181_1141100560687_745697_420'/>
 									<linkSecondEndID xmi.idref='_9_0_2_3880181_1141164450437_327697_594'/>
-									<geometry>645, 245; 645, 465; 775, 465; 775, 485; 773, 485; 773, 500; </geometry>
+									<geometry>735, 245; 735, 465; 865, 465; 865, 485; 863, 485; 863, 500; </geometry>
 									<linkNameID xmi.idref='_9_0_2_3880181_1141165141437_307735_1117'/>
 									<nameVisible xmi.value='true'/>
 									<mdOwnedViews>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165141437_473257_1082'>
 											<editable xmi.value='false'/>
 											<visible xmi.value='false'/>
-											<geometry>630, 403, 30, 15</geometry>
+											<geometry>720, 403, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141165141437_91435_1084'>
 											<editable xmi.value='false'/>
 											<visible xmi.value='false'/>
-											<geometry>630, 458, 30, 15</geometry>
+											<geometry>720, 458, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165141437_14585_1087'>
 											<editable xmi.value='false'/>
 											<visible xmi.value='false'/>
-											<geometry>979, 553, 30, 15</geometry>
+											<geometry>1069, 553, 30, 15</geometry>
 											<text>&lt;html&gt;
 &lt;body&gt;
 &lt;p&gt;&lt;/p&gt;
@@ -3740,28 +3773,28 @@ window to show page</text>
 										</mdElement>
 										<mdElement elementClass='RoleView' xmi.id='_9_0_2_3880181_1141165141437_126584_1089'>
 											<elementID xmi.idref='_9_0_2_3880181_1141165141437_163497_1078'/>
-											<geometry>645, 240, 10, 10</geometry>
+											<geometry>735, 240, 10, 10</geometry>
 											<mdOwnedViews>
 												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165141437_452870_1090'>
 													<visible xmi.value='false'/>
-													<geometry>645, 240, 30, 15</geometry>
+													<geometry>735, 240, 30, 15</geometry>
 												</mdElement>
 												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165141437_842573_1092'>
 													<visible xmi.value='false'/>
-													<geometry>645, 240, 30, 15</geometry>
+													<geometry>735, 240, 30, 15</geometry>
 												</mdElement>
 												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165141437_29347_1094'>
 													<visible xmi.value='false'/>
-													<geometry>645, 240, 30, 15</geometry>
+													<geometry>735, 240, 30, 15</geometry>
 												</mdElement>
 												<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141165141437_977885_1096'>
 													<editable xmi.value='false'/>
 													<visible xmi.value='false'/>
-													<geometry>645, 260, 30, 15</geometry>
+													<geometry>735, 260, 30, 15</geometry>
 												</mdElement>
 												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165141437_665944_1099'>
 													<visible xmi.value='false'/>
-													<geometry>645, 240, 30, 15</geometry>
+													<geometry>735, 240, 30, 15</geometry>
 													<text>&lt;html&gt;
 &lt;body&gt;
 &lt;p&gt;&lt;/p&gt;
@@ -3777,28 +3810,28 @@ window to show page</text>
 										</mdElement>
 										<mdElement elementClass='RoleView' xmi.id='_9_0_2_3880181_1141165141437_21722_1103'>
 											<elementID xmi.idref='_9_0_2_3880181_1141165141437_859055_1079'/>
-											<geometry>768, 490, 10, 10</geometry>
+											<geometry>858, 490, 10, 10</geometry>
 											<mdOwnedViews>
 												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165141437_57206_1104'>
 													<visible xmi.value='false'/>
-													<geometry>768, 490, 30, 15</geometry>
+													<geometry>858, 490, 30, 15</geometry>
 												</mdElement>
 												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165141437_564659_1106'>
 													<visible xmi.value='false'/>
-													<geometry>768, 490, 30, 15</geometry>
+													<geometry>858, 490, 30, 15</geometry>
 												</mdElement>
 												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165141437_406931_1108'>
 													<visible xmi.value='false'/>
-													<geometry>768, 490, 30, 15</geometry>
+													<geometry>858, 490, 30, 15</geometry>
 												</mdElement>
 												<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141165141437_659034_1110'>
 													<editable xmi.value='false'/>
 													<visible xmi.value='false'/>
-													<geometry>768, 510, 30, 15</geometry>
+													<geometry>858, 510, 30, 15</geometry>
 												</mdElement>
 												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165141437_843739_1113'>
 													<visible xmi.value='false'/>
-													<geometry>768, 490, 30, 15</geometry>
+													<geometry>858, 490, 30, 15</geometry>
 													<text>&lt;html&gt;
 &lt;body&gt;
 &lt;p&gt;&lt;/p&gt;
@@ -3814,7 +3847,7 @@ window to show page</text>
 										</mdElement>
 										<mdElement elementClass='AssociationTextBoxView' xmi.id='_9_0_2_3880181_1141165141437_307735_1117'>
 											<visible xmi.value='false'/>
-											<geometry>623, 421, 45, 15</geometry>
+											<geometry>713, 421, 45, 15</geometry>
 										</mdElement>
 									</mdOwnedViews>
 									<linkConstraintID xmi.idref='_9_0_2_3880181_1141165141437_473257_1082'/>
@@ -3823,283 +3856,41 @@ window to show page</text>
 									<associationFirstEndID xmi.idref='_9_0_2_3880181_1141165141437_126584_1089'/>
 									<associationSecondEndID xmi.idref='_9_0_2_3880181_1141165141437_21722_1103'/>
 								</mdElement>
-								<mdElement elementClass='ClassView' xmi.id='_9_0_2_3880181_1141172194421_482789_1664'>
-									<elementID xmi.idref='_9_0_2_3880181_1141172194421_723777_1663'/>
-									<geometry>260, 920, 132, 110</geometry>
-								</mdElement>
-								<mdElement elementClass='ClassView' xmi.id='_9_0_2_3880181_1141172219609_354048_1683'>
-									<elementID xmi.idref='_9_0_2_3880181_1141172219609_664712_1682'/>
-									<geometry>630, 930, 210, 120</geometry>
-								</mdElement>
-								<mdElement elementClass='ClassView' xmi.id='_9_0_2_3880181_1141172252125_72920_1702'>
-									<elementID xmi.idref='_9_0_2_3880181_1141172252125_50949_1701'/>
-									<geometry>630, 1070, 211, 111</geometry>
-								</mdElement>
-								<mdElement elementClass='ClassView' xmi.id='_9_0_2_3880181_1141172334906_647678_1774'>
-									<elementID xmi.idref='_9_0_2_3880181_1141172334906_58792_1773'/>
-									<geometry>420, 1070, 154, 103</geometry>
-								</mdElement>
-								<mdElement elementClass='AssociationView' xmi.id='_9_0_2_3880181_1141172351843_849749_1797'>
-									<elementID xmi.idref='_9_0_2_3880181_1141172351843_779945_1796'/>
-									<linkFirstEndID xmi.idref='_9_0_2_3880181_1141166179078_670281_1516'/>
-									<linkSecondEndID xmi.idref='_9_0_2_3880181_1141172334906_647678_1774'/>
-									<geometry>386, 1121; 420, 1121; </geometry>
-									<linkNameID xmi.idref='_9_0_2_3880181_1141172351843_423855_1833'/>
-									<nameVisible xmi.value='true'/>
-									<mdOwnedViews>
-										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172351843_800261_1798'>
-											<editable xmi.value='false'/>
-											<visible xmi.value='false'/>
-											<geometry>388, 1094, 30, 15</geometry>
-										</mdElement>
-										<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141172351843_532272_1800'>
-											<editable xmi.value='false'/>
-											<visible xmi.value='false'/>
-											<geometry>388, 1134, 30, 15</geometry>
-										</mdElement>
-										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172351843_676240_1803'>
-											<editable xmi.value='false'/>
-											<visible xmi.value='false'/>
-											<geometry>367, 5, 30, 15</geometry>
-											<text>&lt;html&gt;
-&lt;body&gt;
-&lt;p&gt;&lt;/p&gt;
-&lt;/body&gt;
-&lt;/html&gt;</text>
-										</mdElement>
-										<mdElement elementClass='RoleView' xmi.id='_9_0_2_3880181_1141172351843_80083_1805'>
-											<elementID xmi.idref='_9_0_2_3880181_1141172351843_312824_1794'/>
-											<geometry>386, 1116, 10, 10</geometry>
-											<mdOwnedViews>
-												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172351843_694092_1806'>
-													<visible xmi.value='false'/>
-													<geometry>386, 1116, 30, 15</geometry>
-												</mdElement>
-												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172351843_59524_1808'>
-													<visible xmi.value='false'/>
-													<geometry>386, 1116, 30, 15</geometry>
-												</mdElement>
-												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172351843_559100_1810'>
-													<visible xmi.value='false'/>
-													<geometry>386, 1116, 30, 15</geometry>
-												</mdElement>
-												<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141172351843_312840_1812'>
-													<editable xmi.value='false'/>
-													<visible xmi.value='false'/>
-													<geometry>386, 1136, 30, 15</geometry>
-												</mdElement>
-												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172351843_633059_1815'>
-													<visible xmi.value='false'/>
-													<geometry>386, 1116, 30, 15</geometry>
-													<text>&lt;html&gt;
-&lt;body&gt;
-&lt;p&gt;&lt;/p&gt;
-&lt;/body&gt;
-&lt;/html&gt;</text>
-												</mdElement>
-											</mdOwnedViews>
-											<roleNameID xmi.idref='_9_0_2_3880181_1141172351843_694092_1806'/>
-											<roleMultiplicityID xmi.idref='_9_0_2_3880181_1141172351843_59524_1808'/>
-											<roleConstraintsID xmi.idref='_9_0_2_3880181_1141172351843_559100_1810'/>
-											<roleStereotypeID xmi.idref='_9_0_2_3880181_1141172351843_312840_1812'/>
-											<roleTaggedValuesID xmi.idref='_9_0_2_3880181_1141172351843_633059_1815'/>
-										</mdElement>
-										<mdElement elementClass='RoleView' xmi.id='_9_0_2_3880181_1141172351843_561891_1819'>
-											<elementID xmi.idref='_9_0_2_3880181_1141172351843_271904_1795'/>
-											<geometry>410, 1116, 10, 10</geometry>
-											<mdOwnedViews>
-												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172351843_431281_1820'>
-													<visible xmi.value='false'/>
-													<geometry>410, 1116, 30, 15</geometry>
-												</mdElement>
-												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172351843_508942_1822'>
-													<visible xmi.value='false'/>
-													<geometry>410, 1116, 30, 15</geometry>
-												</mdElement>
-												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172351843_792027_1824'>
-													<visible xmi.value='false'/>
-													<geometry>410, 1116, 30, 15</geometry>
-												</mdElement>
-												<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141172351843_904560_1826'>
-													<editable xmi.value='false'/>
-													<visible xmi.value='false'/>
-													<geometry>410, 1136, 30, 15</geometry>
-												</mdElement>
-												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172351843_629699_1829'>
-													<visible xmi.value='false'/>
-													<geometry>410, 1116, 30, 15</geometry>
-													<text>&lt;html&gt;
-&lt;body&gt;
-&lt;p&gt;&lt;/p&gt;
-&lt;/body&gt;
-&lt;/html&gt;</text>
-												</mdElement>
-											</mdOwnedViews>
-											<roleNameID xmi.idref='_9_0_2_3880181_1141172351843_431281_1820'/>
-											<roleMultiplicityID xmi.idref='_9_0_2_3880181_1141172351843_508942_1822'/>
-											<roleConstraintsID xmi.idref='_9_0_2_3880181_1141172351843_792027_1824'/>
-											<roleStereotypeID xmi.idref='_9_0_2_3880181_1141172351843_904560_1826'/>
-											<roleTaggedValuesID xmi.idref='_9_0_2_3880181_1141172351843_629699_1829'/>
-										</mdElement>
-										<mdElement elementClass='AssociationTextBoxView' xmi.id='_9_0_2_3880181_1141172351843_423855_1833'>
-											<visible xmi.value='false'/>
-											<geometry>381, 1107, 45, 15</geometry>
-										</mdElement>
-									</mdOwnedViews>
-									<linkConstraintID xmi.idref='_9_0_2_3880181_1141172351843_800261_1798'/>
-									<linkStereotypeID xmi.idref='_9_0_2_3880181_1141172351843_532272_1800'/>
-									<linkTaggedValuesID xmi.idref='_9_0_2_3880181_1141172351843_676240_1803'/>
-									<associationFirstEndID xmi.idref='_9_0_2_3880181_1141172351843_80083_1805'/>
-									<associationSecondEndID xmi.idref='_9_0_2_3880181_1141172351843_561891_1819'/>
-								</mdElement>
-								<mdElement elementClass='AssociationView' xmi.id='_9_0_2_3880181_1141172374828_422826_1839'>
-									<elementID xmi.idref='_9_0_2_3880181_1141172374828_45184_1838'/>
-									<linkFirstEndID xmi.idref='_9_0_2_3880181_1141172194421_482789_1664'/>
-									<linkSecondEndID xmi.idref='_9_0_2_3880181_1141166179078_670281_1516'/>
-									<geometry>323, 1030; 323, 1070; </geometry>
-									<linkNameID xmi.idref='_9_0_2_3880181_1141172374828_941286_1875'/>
-									<nameVisible xmi.value='true'/>
-									<mdOwnedViews>
-										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172374828_33929_1840'>
-											<editable xmi.value='false'/>
-											<visible xmi.value='false'/>
-											<geometry>308, 1037, 30, 15</geometry>
-										</mdElement>
-										<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141172374828_378153_1842'>
-											<editable xmi.value='false'/>
-											<visible xmi.value='false'/>
-											<geometry>308, 1049, 30, 15</geometry>
-										</mdElement>
-										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172374828_880639_1845'>
-											<editable xmi.value='false'/>
-											<visible xmi.value='false'/>
-											<geometry>10, 757, 30, 15</geometry>
-											<text>&lt;html&gt;
-&lt;body&gt;
-&lt;p&gt;&lt;/p&gt;
-&lt;/body&gt;
-&lt;/html&gt;</text>
-										</mdElement>
-										<mdElement elementClass='RoleView' xmi.id='_9_0_2_3880181_1141172374828_187635_1847'>
-											<elementID xmi.idref='_9_0_2_3880181_1141172374828_287523_1836'/>
-											<geometry>318, 1030, 10, 10</geometry>
-											<mdOwnedViews>
-												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172374828_18546_1848'>
-													<visible xmi.value='false'/>
-													<geometry>318, 1030, 30, 15</geometry>
-												</mdElement>
-												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172374828_947230_1850'>
-													<visible xmi.value='false'/>
-													<geometry>318, 1030, 30, 15</geometry>
-												</mdElement>
-												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172374828_907299_1852'>
-													<visible xmi.value='false'/>
-													<geometry>318, 1030, 30, 15</geometry>
-												</mdElement>
-												<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141172374828_996708_1854'>
-													<editable xmi.value='false'/>
-													<visible xmi.value='false'/>
-													<geometry>318, 1050, 30, 15</geometry>
-												</mdElement>
-												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172374828_140141_1857'>
-													<visible xmi.value='false'/>
-													<geometry>318, 1030, 30, 15</geometry>
-													<text>&lt;html&gt;
-&lt;body&gt;
-&lt;p&gt;&lt;/p&gt;
-&lt;/body&gt;
-&lt;/html&gt;</text>
-												</mdElement>
-											</mdOwnedViews>
-											<roleNameID xmi.idref='_9_0_2_3880181_1141172374828_18546_1848'/>
-											<roleMultiplicityID xmi.idref='_9_0_2_3880181_1141172374828_947230_1850'/>
-											<roleConstraintsID xmi.idref='_9_0_2_3880181_1141172374828_907299_1852'/>
-											<roleStereotypeID xmi.idref='_9_0_2_3880181_1141172374828_996708_1854'/>
-											<roleTaggedValuesID xmi.idref='_9_0_2_3880181_1141172374828_140141_1857'/>
-										</mdElement>
-										<mdElement elementClass='RoleView' xmi.id='_9_0_2_3880181_1141172374828_651474_1861'>
-											<elementID xmi.idref='_9_0_2_3880181_1141172374828_362336_1837'/>
-											<geometry>318, 1060, 10, 10</geometry>
-											<mdOwnedViews>
-												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172374828_665606_1862'>
-													<visible xmi.value='false'/>
-													<geometry>318, 1060, 30, 15</geometry>
-												</mdElement>
-												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172374828_909642_1864'>
-													<visible xmi.value='false'/>
-													<geometry>318, 1060, 30, 15</geometry>
-												</mdElement>
-												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172374828_457655_1866'>
-													<visible xmi.value='false'/>
-													<geometry>318, 1060, 30, 15</geometry>
-												</mdElement>
-												<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141172374828_294336_1868'>
-													<editable xmi.value='false'/>
-													<visible xmi.value='false'/>
-													<geometry>318, 1080, 30, 15</geometry>
-												</mdElement>
-												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172374828_158971_1871'>
-													<visible xmi.value='false'/>
-													<geometry>318, 1060, 30, 15</geometry>
-													<text>&lt;html&gt;
-&lt;body&gt;
-&lt;p&gt;&lt;/p&gt;
-&lt;/body&gt;
-&lt;/html&gt;</text>
-												</mdElement>
-											</mdOwnedViews>
-											<roleNameID xmi.idref='_9_0_2_3880181_1141172374828_665606_1862'/>
-											<roleMultiplicityID xmi.idref='_9_0_2_3880181_1141172374828_909642_1864'/>
-											<roleConstraintsID xmi.idref='_9_0_2_3880181_1141172374828_457655_1866'/>
-											<roleStereotypeID xmi.idref='_9_0_2_3880181_1141172374828_294336_1868'/>
-											<roleTaggedValuesID xmi.idref='_9_0_2_3880181_1141172374828_158971_1871'/>
-										</mdElement>
-										<mdElement elementClass='AssociationTextBoxView' xmi.id='_9_0_2_3880181_1141172374828_941286_1875'>
-											<visible xmi.value='false'/>
-											<geometry>301, 1041, 45, 15</geometry>
-										</mdElement>
-									</mdOwnedViews>
-									<linkConstraintID xmi.idref='_9_0_2_3880181_1141172374828_33929_1840'/>
-									<linkStereotypeID xmi.idref='_9_0_2_3880181_1141172374828_378153_1842'/>
-									<linkTaggedValuesID xmi.idref='_9_0_2_3880181_1141172374828_880639_1845'/>
-									<associationFirstEndID xmi.idref='_9_0_2_3880181_1141172374828_187635_1847'/>
-									<associationSecondEndID xmi.idref='_9_0_2_3880181_1141172374828_651474_1861'/>
-								</mdElement>
 								<mdElement elementClass='NoteView' xmi.id='_9_0_2_3880181_1141165182125_324758_1120'>
-									<geometry>670, 270, 230, 51</geometry>
+									<geometry>750, 270, 230, 51</geometry>
 									<text>MonitorController dispatches update events to all four Views</text>
 								</mdElement>
 								<mdElement elementClass='NoteAnchorView' xmi.id='_9_0_2_3880181_1141165258953_320135_1128'>
 									<linkFirstEndID xmi.idref='_9_0_2_3880181_1141100560687_745697_420'/>
 									<linkSecondEndID xmi.idref='_9_0_2_3880181_1141165182125_324758_1120'/>
-									<geometry>645, 221; 738, 270; </geometry>
+									<geometry>735, 223; 820, 270; </geometry>
 								</mdElement>
 								<mdElement elementClass='ClassView' xmi.id='_9_0_2_3880181_1141164467500_151878_610'>
 									<elementID xmi.idref='_9_0_2_3880181_1141164467500_75431_609'/>
-									<geometry>280, 660, 120, 100</geometry>
+									<geometry>370, 660, 120, 100</geometry>
 								</mdElement>
 								<mdElement elementClass='AssociationView' xmi.id='_9_0_2_3880181_1141165404359_383305_1204'>
 									<elementID xmi.idref='_9_0_2_3880181_1141165404359_666805_1203'/>
 									<linkFirstEndID xmi.idref='_9_0_2_3880181_1141164373375_552461_562'/>
 									<linkSecondEndID xmi.idref='_9_0_2_3880181_1141164467500_151878_610'/>
-									<geometry>338, 630; 338, 641; 340, 641; 340, 660; </geometry>
+									<geometry>408, 630; 408, 641; 430, 641; 430, 660; </geometry>
 									<linkNameID xmi.idref='_9_0_2_3880181_1141165404359_851786_1240'/>
 									<nameVisible xmi.value='true'/>
 									<mdOwnedViews>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165404359_122257_1205'>
 											<editable xmi.value='false'/>
 											<visible xmi.value='false'/>
-											<geometry>324, 634, 30, 15</geometry>
+											<geometry>401, 634, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141165404359_426749_1207'>
 											<editable xmi.value='false'/>
 											<visible xmi.value='false'/>
-											<geometry>325, 643, 30, 15</geometry>
+											<geometry>415, 637, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165404359_472576_1210'>
 											<editable xmi.value='false'/>
 											<visible xmi.value='false'/>
-											<geometry>0, 605, 30, 15</geometry>
+											<geometry>71, 622, 30, 15</geometry>
 											<text>&lt;html&gt;
 &lt;body&gt;
 &lt;p&gt;&lt;/p&gt;
@@ -4108,28 +3899,28 @@ window to show page</text>
 										</mdElement>
 										<mdElement elementClass='RoleView' xmi.id='_9_0_2_3880181_1141165404359_792408_1212'>
 											<elementID xmi.idref='_9_0_2_3880181_1141165404359_112681_1201'/>
-											<geometry>333, 630, 10, 10</geometry>
+											<geometry>403, 630, 10, 10</geometry>
 											<mdOwnedViews>
 												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165404359_800386_1213'>
 													<visible xmi.value='false'/>
-													<geometry>333, 630, 30, 15</geometry>
+													<geometry>403, 630, 30, 15</geometry>
 												</mdElement>
 												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165404359_830205_1215'>
 													<visible xmi.value='false'/>
-													<geometry>333, 630, 30, 15</geometry>
+													<geometry>403, 630, 30, 15</geometry>
 												</mdElement>
 												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165404359_306196_1217'>
 													<visible xmi.value='false'/>
-													<geometry>333, 630, 30, 15</geometry>
+													<geometry>403, 630, 30, 15</geometry>
 												</mdElement>
 												<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141165404359_163269_1219'>
 													<editable xmi.value='false'/>
 													<visible xmi.value='false'/>
-													<geometry>333, 650, 30, 15</geometry>
+													<geometry>403, 650, 30, 15</geometry>
 												</mdElement>
 												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165404359_473454_1222'>
 													<visible xmi.value='false'/>
-													<geometry>333, 630, 30, 15</geometry>
+													<geometry>403, 630, 30, 15</geometry>
 													<text>&lt;html&gt;
 &lt;body&gt;
 &lt;p&gt;&lt;/p&gt;
@@ -4145,28 +3936,28 @@ window to show page</text>
 										</mdElement>
 										<mdElement elementClass='RoleView' xmi.id='_9_0_2_3880181_1141165404359_13748_1226'>
 											<elementID xmi.idref='_9_0_2_3880181_1141165404359_573438_1202'/>
-											<geometry>335, 650, 10, 10</geometry>
+											<geometry>425, 650, 10, 10</geometry>
 											<mdOwnedViews>
 												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165404359_283190_1227'>
 													<visible xmi.value='false'/>
-													<geometry>335, 650, 30, 15</geometry>
+													<geometry>425, 650, 30, 15</geometry>
 												</mdElement>
 												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165404359_260673_1229'>
 													<visible xmi.value='false'/>
-													<geometry>335, 650, 30, 15</geometry>
+													<geometry>425, 650, 30, 15</geometry>
 												</mdElement>
 												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165404359_955237_1231'>
 													<visible xmi.value='false'/>
-													<geometry>335, 650, 30, 15</geometry>
+													<geometry>425, 650, 30, 15</geometry>
 												</mdElement>
 												<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141165404359_70840_1233'>
 													<editable xmi.value='false'/>
 													<visible xmi.value='false'/>
-													<geometry>335, 670, 30, 15</geometry>
+													<geometry>425, 670, 30, 15</geometry>
 												</mdElement>
 												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165404359_538627_1236'>
 													<visible xmi.value='false'/>
-													<geometry>335, 650, 30, 15</geometry>
+													<geometry>425, 650, 30, 15</geometry>
 													<text>&lt;html&gt;
 &lt;body&gt;
 &lt;p&gt;&lt;/p&gt;
@@ -4182,7 +3973,7 @@ window to show page</text>
 										</mdElement>
 										<mdElement elementClass='AssociationTextBoxView' xmi.id='_9_0_2_3880181_1141165404359_851786_1240'>
 											<visible xmi.value='false'/>
-											<geometry>319, 634, 45, 15</geometry>
+											<geometry>397, 634, 45, 15</geometry>
 										</mdElement>
 									</mdOwnedViews>
 									<linkConstraintID xmi.idref='_9_0_2_3880181_1141165404359_122257_1205'/>
@@ -4191,58 +3982,86 @@ window to show page</text>
 									<associationFirstEndID xmi.idref='_9_0_2_3880181_1141165404359_792408_1212'/>
 									<associationSecondEndID xmi.idref='_9_0_2_3880181_1141165404359_13748_1226'/>
 								</mdElement>
-								<mdElement elementClass='AssociationView' xmi.id='_9_0_2_3880181_1141173627765_603186_2070'>
-									<elementID xmi.idref='_9_0_2_3880181_1141173627765_921708_2069'/>
-									<linkFirstEndID xmi.idref='_9_0_2_3880181_1141172252125_72920_1702'/>
-									<linkSecondEndID xmi.idref='_9_0_2_3880181_1141172219609_354048_1683'/>
-									<geometry>725, 1070; 725, 1050; </geometry>
-									<linkNameID xmi.idref='_9_0_2_3880181_1141173627765_320225_2106'/>
+								<mdElement elementClass='NoteView' xmi.id='_9_0_2_3880181_1141165424953_172481_1369'>
+									<geometry>500, 800, 270, 81</geometry>
+									<text>View controllers handle UI input events, in the view class use uiObject.addEVentListener(Proxy.create(xxxController,onxxxClick) to set up references to the controllers</text>
+								</mdElement>
+								<mdElement elementClass='NoteAnchorView' xmi.id='_9_0_2_3880181_1141165511265_875173_1381'>
+									<linkFirstEndID xmi.idref='_9_0_2_3880181_1141164467500_151878_610'/>
+									<linkSecondEndID xmi.idref='_9_0_2_3880181_1141165424953_172481_1369'/>
+									<geometry>490, 748; 572, 800; </geometry>
+								</mdElement>
+								<mdElement elementClass='NoteAnchorView' xmi.id='_9_0_2_3880181_1141165515921_111626_1382'>
+									<linkFirstEndID xmi.idref='_9_0_2_3880181_1141164496453_696659_626'/>
+									<linkSecondEndID xmi.idref='_9_0_2_3880181_1141165424953_172481_1369'/>
+									<geometry>609, 776; 619, 800; </geometry>
+								</mdElement>
+								<mdElement elementClass='NoteAnchorView' xmi.id='_9_0_2_3880181_1141165518453_975224_1383'>
+									<linkFirstEndID xmi.idref='_9_0_2_3880181_1141164528281_927362_642'/>
+									<linkSecondEndID xmi.idref='_9_0_2_3880181_1141165424953_172481_1369'/>
+									<geometry>682, 780; 666, 800; </geometry>
+								</mdElement>
+								<mdElement elementClass='NoteAnchorView' xmi.id='_9_0_2_3880181_1141165521203_663385_1384'>
+									<linkFirstEndID xmi.idref='_9_0_2_3880181_1141164543359_446181_658'/>
+									<linkSecondEndID xmi.idref='_9_0_2_3880181_1141165424953_172481_1369'/>
+									<geometry>810, 748; 711, 800; </geometry>
+								</mdElement>
+								<mdElement elementClass='ClassView' xmi.id='_9_0_2_3880181_1141164373375_552461_562'>
+									<elementID xmi.idref='_9_0_2_3880181_1141164373375_233467_561'/>
+									<geometry>350, 500, 132, 130</geometry>
+								</mdElement>
+								<mdElement elementClass='AssociationView' xmi.id='_9_0_2_3880181_1141165127250_168766_955'>
+									<elementID xmi.idref='_9_0_2_3880181_1141165127250_883314_954'/>
+									<linkFirstEndID xmi.idref='_9_0_2_3880181_1141100560687_745697_420'/>
+									<linkSecondEndID xmi.idref='_9_0_2_3880181_1141164373375_552461_562'/>
+									<geometry>590, 245; 590, 445; 415, 445; 415, 500; </geometry>
+									<linkNameID xmi.idref='_9_0_2_3880181_1141165127250_613944_991'/>
 									<nameVisible xmi.value='true'/>
 									<mdOwnedViews>
-										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141173627765_730874_2071'>
+										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165127250_354819_956'>
 											<editable xmi.value='false'/>
 											<visible xmi.value='false'/>
-											<geometry>710, 1047, 30, 15</geometry>
+											<geometry>575, 430, 30, 15</geometry>
 										</mdElement>
-										<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141173627765_839051_2073'>
+										<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141165127250_729256_958'>
 											<editable xmi.value='false'/>
 											<visible xmi.value='false'/>
-											<geometry>710, 1059, 30, 15</geometry>
+											<geometry>515, 446, 30, 15</geometry>
 										</mdElement>
-										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141173627765_726020_2076'>
+										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165127250_496957_961'>
 											<editable xmi.value='false'/>
 											<visible xmi.value='false'/>
-											<geometry>1, 846, 30, 15</geometry>
+											<geometry>74, 528, 30, 15</geometry>
 											<text>&lt;html&gt;
 &lt;body&gt;
 &lt;p&gt;&lt;/p&gt;
 &lt;/body&gt;
 &lt;/html&gt;</text>
 										</mdElement>
-										<mdElement elementClass='RoleView' xmi.id='_9_0_2_3880181_1141173627765_990099_2078'>
-											<elementID xmi.idref='_9_0_2_3880181_1141173627765_185440_2067'/>
-											<geometry>720, 1060, 10, 10</geometry>
+										<mdElement elementClass='RoleView' xmi.id='_9_0_2_3880181_1141165127250_417168_963'>
+											<elementID xmi.idref='_9_0_2_3880181_1141165127250_561110_952'/>
+											<geometry>580, 240, 10, 10</geometry>
 											<mdOwnedViews>
-												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141173627765_366534_2079'>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165127250_724250_964'>
 													<visible xmi.value='false'/>
-													<geometry>720, 1060, 30, 15</geometry>
+													<geometry>580, 240, 30, 15</geometry>
 												</mdElement>
-												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141173627765_444628_2081'>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165127250_142239_966'>
 													<visible xmi.value='false'/>
-													<geometry>720, 1060, 30, 15</geometry>
+													<geometry>580, 240, 30, 15</geometry>
 												</mdElement>
-												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141173627765_729649_2083'>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165127250_807135_968'>
 													<visible xmi.value='false'/>
-													<geometry>720, 1060, 30, 15</geometry>
+													<geometry>580, 240, 30, 15</geometry>
 												</mdElement>
-												<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141173627765_686064_2085'>
+												<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141165127250_258463_970'>
 													<editable xmi.value='false'/>
 													<visible xmi.value='false'/>
-													<geometry>720, 1080, 30, 15</geometry>
+													<geometry>580, 260, 30, 15</geometry>
 												</mdElement>
-												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141173627765_830875_2088'>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165127250_975705_973'>
 													<visible xmi.value='false'/>
-													<geometry>720, 1060, 30, 15</geometry>
+													<geometry>580, 240, 30, 15</geometry>
 													<text>&lt;html&gt;
 &lt;body&gt;
 &lt;p&gt;&lt;/p&gt;
@@ -4250,36 +4069,36 @@ window to show page</text>
 &lt;/html&gt;</text>
 												</mdElement>
 											</mdOwnedViews>
-											<roleNameID xmi.idref='_9_0_2_3880181_1141173627765_366534_2079'/>
-											<roleMultiplicityID xmi.idref='_9_0_2_3880181_1141173627765_444628_2081'/>
-											<roleConstraintsID xmi.idref='_9_0_2_3880181_1141173627765_729649_2083'/>
-											<roleStereotypeID xmi.idref='_9_0_2_3880181_1141173627765_686064_2085'/>
-											<roleTaggedValuesID xmi.idref='_9_0_2_3880181_1141173627765_830875_2088'/>
+											<roleNameID xmi.idref='_9_0_2_3880181_1141165127250_724250_964'/>
+											<roleMultiplicityID xmi.idref='_9_0_2_3880181_1141165127250_142239_966'/>
+											<roleConstraintsID xmi.idref='_9_0_2_3880181_1141165127250_807135_968'/>
+											<roleStereotypeID xmi.idref='_9_0_2_3880181_1141165127250_258463_970'/>
+											<roleTaggedValuesID xmi.idref='_9_0_2_3880181_1141165127250_975705_973'/>
 										</mdElement>
-										<mdElement elementClass='RoleView' xmi.id='_9_0_2_3880181_1141173627765_94870_2092'>
-											<elementID xmi.idref='_9_0_2_3880181_1141173627765_921727_2068'/>
-											<geometry>720, 1050, 10, 10</geometry>
+										<mdElement elementClass='RoleView' xmi.id='_9_0_2_3880181_1141165127250_852366_977'>
+											<elementID xmi.idref='_9_0_2_3880181_1141165127250_688752_953'/>
+											<geometry>410, 490, 10, 10</geometry>
 											<mdOwnedViews>
-												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141173627765_411480_2093'>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165127250_729953_978'>
 													<visible xmi.value='false'/>
-													<geometry>720, 1050, 30, 15</geometry>
+													<geometry>410, 490, 30, 15</geometry>
 												</mdElement>
-												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141173627765_638050_2095'>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165127250_820350_980'>
 													<visible xmi.value='false'/>
-													<geometry>720, 1050, 30, 15</geometry>
+													<geometry>410, 490, 30, 15</geometry>
 												</mdElement>
-												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141173627765_623235_2097'>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165127250_365441_982'>
 													<visible xmi.value='false'/>
-													<geometry>720, 1050, 30, 15</geometry>
+													<geometry>410, 490, 30, 15</geometry>
 												</mdElement>
-												<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141173627765_287335_2099'>
+												<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141165127250_704922_984'>
 													<editable xmi.value='false'/>
 													<visible xmi.value='false'/>
-													<geometry>720, 1070, 30, 15</geometry>
+													<geometry>410, 470, 30, 15</geometry>
 												</mdElement>
-												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141173627765_927248_2102'>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165127250_850311_987'>
 													<visible xmi.value='false'/>
-													<geometry>720, 1050, 30, 15</geometry>
+													<geometry>410, 490, 30, 15</geometry>
 													<text>&lt;html&gt;
 &lt;body&gt;
 &lt;p&gt;&lt;/p&gt;
@@ -4287,22 +4106,256 @@ window to show page</text>
 &lt;/html&gt;</text>
 												</mdElement>
 											</mdOwnedViews>
-											<roleNameID xmi.idref='_9_0_2_3880181_1141173627765_411480_2093'/>
-											<roleMultiplicityID xmi.idref='_9_0_2_3880181_1141173627765_638050_2095'/>
-											<roleConstraintsID xmi.idref='_9_0_2_3880181_1141173627765_623235_2097'/>
-											<roleStereotypeID xmi.idref='_9_0_2_3880181_1141173627765_287335_2099'/>
-											<roleTaggedValuesID xmi.idref='_9_0_2_3880181_1141173627765_927248_2102'/>
+											<roleNameID xmi.idref='_9_0_2_3880181_1141165127250_729953_978'/>
+											<roleMultiplicityID xmi.idref='_9_0_2_3880181_1141165127250_820350_980'/>
+											<roleConstraintsID xmi.idref='_9_0_2_3880181_1141165127250_365441_982'/>
+											<roleStereotypeID xmi.idref='_9_0_2_3880181_1141165127250_704922_984'/>
+											<roleTaggedValuesID xmi.idref='_9_0_2_3880181_1141165127250_850311_987'/>
 										</mdElement>
-										<mdElement elementClass='AssociationTextBoxView' xmi.id='_9_0_2_3880181_1141173627765_320225_2106'>
+										<mdElement elementClass='AssociationTextBoxView' xmi.id='_9_0_2_3880181_1141165127250_613944_991'>
 											<visible xmi.value='false'/>
-											<geometry>703, 1051, 45, 15</geometry>
+											<geometry>565, 434, 45, 15</geometry>
 										</mdElement>
 									</mdOwnedViews>
-									<linkConstraintID xmi.idref='_9_0_2_3880181_1141173627765_730874_2071'/>
-									<linkStereotypeID xmi.idref='_9_0_2_3880181_1141173627765_839051_2073'/>
-									<linkTaggedValuesID xmi.idref='_9_0_2_3880181_1141173627765_726020_2076'/>
-									<associationFirstEndID xmi.idref='_9_0_2_3880181_1141173627765_990099_2078'/>
-									<associationSecondEndID xmi.idref='_9_0_2_3880181_1141173627765_94870_2092'/>
+									<linkConstraintID xmi.idref='_9_0_2_3880181_1141165127250_354819_956'/>
+									<linkStereotypeID xmi.idref='_9_0_2_3880181_1141165127250_729256_958'/>
+									<linkTaggedValuesID xmi.idref='_9_0_2_3880181_1141165127250_496957_961'/>
+									<associationFirstEndID xmi.idref='_9_0_2_3880181_1141165127250_417168_963'/>
+									<associationSecondEndID xmi.idref='_9_0_2_3880181_1141165127250_852366_977'/>
+								</mdElement>
+								<mdElement elementClass='ClassView' xmi.id='_9_0_2_3880181_1141178079171_351222_2421'>
+									<elementID xmi.idref='_9_0_2_3880181_1141178079171_23313_2420'/>
+									<geometry>400, 280, 150, 50</geometry>
+								</mdElement>
+								<mdElement elementClass='AssociationView' xmi.id='_9_0_2_3880181_1141178172656_923599_2452'>
+									<elementID xmi.idref='_9_0_2_3880181_1141178172656_946742_2451'/>
+									<linkFirstEndID xmi.idref='_9_0_2_3880181_1141096687984_487081_2'/>
+									<linkSecondEndID xmi.idref='_9_0_2_3880181_1141178079171_351222_2421'/>
+									<geometry>494, 182; 505, 182; 505, 280; </geometry>
+									<linkNameID xmi.idref='_9_0_2_3880181_1141178172656_841317_2488'/>
+									<nameVisible xmi.value='true'/>
+									<mdOwnedViews>
+										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141178172656_215087_2453'>
+											<editable xmi.value='false'/>
+											<visible xmi.value='false'/>
+											<geometry>490, 206, 30, 15</geometry>
+										</mdElement>
+										<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141178172656_868158_2455'>
+											<editable xmi.value='false'/>
+											<visible xmi.value='false'/>
+											<geometry>490, 230, 30, 15</geometry>
+										</mdElement>
+										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141178172656_668873_2458'>
+											<editable xmi.value='false'/>
+											<visible xmi.value='false'/>
+											<geometry>340, 1, 30, 15</geometry>
+											<text>&lt;html&gt;
+&lt;body&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</text>
+										</mdElement>
+										<mdElement elementClass='RoleView' xmi.id='_9_0_2_3880181_1141178172656_694491_2460'>
+											<elementID xmi.idref='_9_0_2_3880181_1141178172656_649487_2449'/>
+											<geometry>494, 177, 10, 10</geometry>
+											<mdOwnedViews>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141178172656_374338_2461'>
+													<visible xmi.value='false'/>
+													<geometry>494, 177, 30, 15</geometry>
+												</mdElement>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141178172656_326674_2463'>
+													<visible xmi.value='false'/>
+													<geometry>494, 177, 30, 15</geometry>
+												</mdElement>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141178172656_697877_2465'>
+													<visible xmi.value='false'/>
+													<geometry>494, 177, 30, 15</geometry>
+												</mdElement>
+												<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141178172656_253536_2467'>
+													<editable xmi.value='false'/>
+													<visible xmi.value='false'/>
+													<geometry>494, 197, 30, 15</geometry>
+												</mdElement>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141178172656_903299_2470'>
+													<visible xmi.value='false'/>
+													<geometry>494, 177, 30, 15</geometry>
+													<text>&lt;html&gt;
+&lt;body&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</text>
+												</mdElement>
+											</mdOwnedViews>
+											<roleNameID xmi.idref='_9_0_2_3880181_1141178172656_374338_2461'/>
+											<roleMultiplicityID xmi.idref='_9_0_2_3880181_1141178172656_326674_2463'/>
+											<roleConstraintsID xmi.idref='_9_0_2_3880181_1141178172656_697877_2465'/>
+											<roleStereotypeID xmi.idref='_9_0_2_3880181_1141178172656_253536_2467'/>
+											<roleTaggedValuesID xmi.idref='_9_0_2_3880181_1141178172656_903299_2470'/>
+										</mdElement>
+										<mdElement elementClass='RoleView' xmi.id='_9_0_2_3880181_1141178172656_953389_2474'>
+											<elementID xmi.idref='_9_0_2_3880181_1141178172656_109270_2450'/>
+											<geometry>500, 270, 10, 10</geometry>
+											<mdOwnedViews>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141178172656_979037_2475'>
+													<visible xmi.value='false'/>
+													<geometry>500, 270, 30, 15</geometry>
+												</mdElement>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141178172656_716486_2477'>
+													<visible xmi.value='false'/>
+													<geometry>500, 270, 30, 15</geometry>
+												</mdElement>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141178172656_78748_2479'>
+													<visible xmi.value='false'/>
+													<geometry>500, 270, 30, 15</geometry>
+												</mdElement>
+												<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141178172656_506346_2481'>
+													<editable xmi.value='false'/>
+													<visible xmi.value='false'/>
+													<geometry>500, 290, 30, 15</geometry>
+												</mdElement>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141178172656_9970_2484'>
+													<visible xmi.value='false'/>
+													<geometry>500, 270, 30, 15</geometry>
+													<text>&lt;html&gt;
+&lt;body&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</text>
+												</mdElement>
+											</mdOwnedViews>
+											<roleNameID xmi.idref='_9_0_2_3880181_1141178172656_979037_2475'/>
+											<roleMultiplicityID xmi.idref='_9_0_2_3880181_1141178172656_716486_2477'/>
+											<roleConstraintsID xmi.idref='_9_0_2_3880181_1141178172656_78748_2479'/>
+											<roleStereotypeID xmi.idref='_9_0_2_3880181_1141178172656_506346_2481'/>
+											<roleTaggedValuesID xmi.idref='_9_0_2_3880181_1141178172656_9970_2484'/>
+										</mdElement>
+										<mdElement elementClass='AssociationTextBoxView' xmi.id='_9_0_2_3880181_1141178172656_841317_2488'>
+											<visible xmi.value='false'/>
+											<geometry>483, 214, 45, 15</geometry>
+										</mdElement>
+									</mdOwnedViews>
+									<linkConstraintID xmi.idref='_9_0_2_3880181_1141178172656_215087_2453'/>
+									<linkStereotypeID xmi.idref='_9_0_2_3880181_1141178172656_868158_2455'/>
+									<linkTaggedValuesID xmi.idref='_9_0_2_3880181_1141178172656_668873_2458'/>
+									<associationFirstEndID xmi.idref='_9_0_2_3880181_1141178172656_694491_2460'/>
+									<associationSecondEndID xmi.idref='_9_0_2_3880181_1141178172656_953389_2474'/>
+								</mdElement>
+								<mdElement elementClass='ClassView' xmi.id='_9_0_2_3880181_1141178190156_939238_2522'>
+									<elementID xmi.idref='_9_0_2_3880181_1141178190156_432292_2521'/>
+									<geometry>400, 350, 145, 50</geometry>
+								</mdElement>
+								<mdElement elementClass='AssociationView' xmi.id='_9_0_2_3880181_1141178200609_580911_2543'>
+									<elementID xmi.idref='_9_0_2_3880181_1141178200609_654392_2542'/>
+									<linkFirstEndID xmi.idref='_9_0_2_3880181_1141096687984_487081_2'/>
+									<linkSecondEndID xmi.idref='_9_0_2_3880181_1141178190156_939238_2522'/>
+									<geometry>390, 245; 390, 350; 400, 350; </geometry>
+									<linkNameID xmi.idref='_9_0_2_3880181_1141178200609_774040_2579'/>
+									<nameVisible xmi.value='true'/>
+									<mdOwnedViews>
+										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141178200609_813587_2544'>
+											<editable xmi.value='false'/>
+											<visible xmi.value='false'/>
+											<geometry>375, 282, 30, 15</geometry>
+										</mdElement>
+										<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141178200609_81594_2546'>
+											<editable xmi.value='false'/>
+											<visible xmi.value='false'/>
+											<geometry>375, 308, 30, 15</geometry>
+										</mdElement>
+										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141178200609_531262_2549'>
+											<editable xmi.value='false'/>
+											<visible xmi.value='false'/>
+											<geometry>20, 153, 30, 15</geometry>
+											<text>&lt;html&gt;
+&lt;body&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</text>
+										</mdElement>
+										<mdElement elementClass='RoleView' xmi.id='_9_0_2_3880181_1141178200609_54119_2551'>
+											<elementID xmi.idref='_9_0_2_3880181_1141178200609_879834_2540'/>
+											<geometry>385, 245, 10, 10</geometry>
+											<mdOwnedViews>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141178200609_956969_2552'>
+													<visible xmi.value='false'/>
+													<geometry>385, 245, 30, 15</geometry>
+												</mdElement>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141178200609_704370_2554'>
+													<visible xmi.value='false'/>
+													<geometry>385, 245, 30, 15</geometry>
+												</mdElement>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141178200609_827441_2556'>
+													<visible xmi.value='false'/>
+													<geometry>385, 245, 30, 15</geometry>
+												</mdElement>
+												<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141178200609_256540_2558'>
+													<editable xmi.value='false'/>
+													<visible xmi.value='false'/>
+													<geometry>385, 265, 30, 15</geometry>
+												</mdElement>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141178200609_305199_2561'>
+													<visible xmi.value='false'/>
+													<geometry>385, 245, 30, 15</geometry>
+													<text>&lt;html&gt;
+&lt;body&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</text>
+												</mdElement>
+											</mdOwnedViews>
+											<roleNameID xmi.idref='_9_0_2_3880181_1141178200609_956969_2552'/>
+											<roleMultiplicityID xmi.idref='_9_0_2_3880181_1141178200609_704370_2554'/>
+											<roleConstraintsID xmi.idref='_9_0_2_3880181_1141178200609_827441_2556'/>
+											<roleStereotypeID xmi.idref='_9_0_2_3880181_1141178200609_256540_2558'/>
+											<roleTaggedValuesID xmi.idref='_9_0_2_3880181_1141178200609_305199_2561'/>
+										</mdElement>
+										<mdElement elementClass='RoleView' xmi.id='_9_0_2_3880181_1141178200609_604298_2565'>
+											<elementID xmi.idref='_9_0_2_3880181_1141178200609_901882_2541'/>
+											<geometry>390, 345, 10, 10</geometry>
+											<mdOwnedViews>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141178200609_401762_2566'>
+													<visible xmi.value='false'/>
+													<geometry>390, 345, 30, 15</geometry>
+												</mdElement>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141178200609_505151_2568'>
+													<visible xmi.value='false'/>
+													<geometry>390, 345, 30, 15</geometry>
+												</mdElement>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141178200609_777621_2570'>
+													<visible xmi.value='false'/>
+													<geometry>390, 345, 30, 15</geometry>
+												</mdElement>
+												<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141178200609_577747_2572'>
+													<editable xmi.value='false'/>
+													<visible xmi.value='false'/>
+													<geometry>390, 365, 30, 15</geometry>
+												</mdElement>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141178200609_867582_2575'>
+													<visible xmi.value='false'/>
+													<geometry>390, 345, 30, 15</geometry>
+													<text>&lt;html&gt;
+&lt;body&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</text>
+												</mdElement>
+											</mdOwnedViews>
+											<roleNameID xmi.idref='_9_0_2_3880181_1141178200609_401762_2566'/>
+											<roleMultiplicityID xmi.idref='_9_0_2_3880181_1141178200609_505151_2568'/>
+											<roleConstraintsID xmi.idref='_9_0_2_3880181_1141178200609_777621_2570'/>
+											<roleStereotypeID xmi.idref='_9_0_2_3880181_1141178200609_577747_2572'/>
+											<roleTaggedValuesID xmi.idref='_9_0_2_3880181_1141178200609_867582_2575'/>
+										</mdElement>
+										<mdElement elementClass='AssociationTextBoxView' xmi.id='_9_0_2_3880181_1141178200609_774040_2579'>
+											<visible xmi.value='false'/>
+											<geometry>368, 291, 45, 15</geometry>
+										</mdElement>
+									</mdOwnedViews>
+									<linkConstraintID xmi.idref='_9_0_2_3880181_1141178200609_813587_2544'/>
+									<linkStereotypeID xmi.idref='_9_0_2_3880181_1141178200609_81594_2546'/>
+									<linkTaggedValuesID xmi.idref='_9_0_2_3880181_1141178200609_531262_2549'/>
+									<associationFirstEndID xmi.idref='_9_0_2_3880181_1141178200609_54119_2551'/>
+									<associationSecondEndID xmi.idref='_9_0_2_3880181_1141178200609_604298_2565'/>
 								</mdElement>
 							</mdOwnedViews>
 						</mdElement>
@@ -4310,24 +4363,24 @@ window to show page</text>
 							<elementID xmi.idref='_9_0_2_3880181_1141165037312_745506_786'/>
 							<linkFirstEndID xmi.idref='_9_0_2_3880181_1141096687984_487081_2'/>
 							<linkSecondEndID xmi.idref='_9_0_2_3880181_1141096716953_523793_19'/>
-							<geometry>280, 155; 160, 155; </geometry>
+							<geometry>370, 185; 160, 185; </geometry>
 							<linkNameID xmi.idref='_9_0_2_3880181_1141165037312_586968_823'/>
 							<nameVisible xmi.value='true'/>
 							<mdOwnedViews>
 								<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165037312_229533_788'>
 									<editable xmi.value='false'/>
 									<visible xmi.value='false'/>
-									<geometry>205, 128, 30, 15</geometry>
+									<geometry>250, 173, 30, 15</geometry>
 								</mdElement>
 								<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141165037312_930530_790'>
 									<editable xmi.value='false'/>
 									<visible xmi.value='false'/>
-									<geometry>205, 168, 30, 15</geometry>
+									<geometry>250, 198, 30, 15</geometry>
 								</mdElement>
 								<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165037312_311581_793'>
 									<editable xmi.value='false'/>
 									<visible xmi.value='false'/>
-									<geometry>104, 11, 30, 15</geometry>
+									<geometry>124, 41, 30, 15</geometry>
 									<text>&lt;html&gt;
 &lt;body&gt;
 &lt;p&gt;&lt;/p&gt;
@@ -4336,28 +4389,28 @@ window to show page</text>
 								</mdElement>
 								<mdElement elementClass='RoleView' xmi.id='_9_0_2_3880181_1141165037312_392450_795'>
 									<elementID xmi.idref='_9_0_2_3880181_1141165037312_558163_784'/>
-									<geometry>270, 150, 10, 10</geometry>
+									<geometry>360, 180, 10, 10</geometry>
 									<mdOwnedViews>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165037312_160155_796'>
 											<visible xmi.value='false'/>
-											<geometry>270, 150, 30, 15</geometry>
+											<geometry>360, 180, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165037312_909237_798'>
 											<visible xmi.value='false'/>
-											<geometry>270, 150, 30, 15</geometry>
+											<geometry>360, 180, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165037312_385554_800'>
 											<visible xmi.value='false'/>
-											<geometry>270, 150, 30, 15</geometry>
+											<geometry>360, 180, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141165037312_226657_802'>
 											<editable xmi.value='false'/>
 											<visible xmi.value='false'/>
-											<geometry>270, 170, 30, 15</geometry>
+											<geometry>360, 200, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165037312_883179_805'>
 											<visible xmi.value='false'/>
-											<geometry>270, 150, 30, 15</geometry>
+											<geometry>360, 180, 30, 15</geometry>
 											<text>&lt;html&gt;
 &lt;body&gt;
 &lt;p&gt;&lt;/p&gt;
@@ -4373,28 +4426,28 @@ window to show page</text>
 								</mdElement>
 								<mdElement elementClass='RoleView' xmi.id='_9_0_2_3880181_1141165037312_823994_809'>
 									<elementID xmi.idref='_9_0_2_3880181_1141165037312_976806_785'/>
-									<geometry>160, 150, 10, 10</geometry>
+									<geometry>160, 180, 10, 10</geometry>
 									<mdOwnedViews>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165037312_153304_810'>
 											<visible xmi.value='false'/>
-											<geometry>160, 150, 30, 15</geometry>
+											<geometry>160, 180, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165037312_854327_812'>
 											<visible xmi.value='false'/>
-											<geometry>160, 150, 30, 15</geometry>
+											<geometry>160, 180, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165037312_47308_814'>
 											<visible xmi.value='false'/>
-											<geometry>160, 150, 30, 15</geometry>
+											<geometry>160, 180, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141165037312_689021_816'>
 											<editable xmi.value='false'/>
 											<visible xmi.value='false'/>
-											<geometry>160, 170, 30, 15</geometry>
+											<geometry>160, 200, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165037312_148121_819'>
 											<visible xmi.value='false'/>
-											<geometry>160, 150, 30, 15</geometry>
+											<geometry>160, 180, 30, 15</geometry>
 											<text>&lt;html&gt;
 &lt;body&gt;
 &lt;p&gt;&lt;/p&gt;
@@ -4410,7 +4463,7 @@ window to show page</text>
 								</mdElement>
 								<mdElement elementClass='AssociationTextBoxView' xmi.id='_9_0_2_3880181_1141165037312_586968_823'>
 									<visible xmi.value='false'/>
-									<geometry>198, 143, 45, 15</geometry>
+									<geometry>243, 173, 45, 15</geometry>
 								</mdElement>
 							</mdOwnedViews>
 							<linkConstraintID xmi.idref='_9_0_2_3880181_1141165037312_229533_788'/>
@@ -4423,24 +4476,24 @@ window to show page</text>
 							<elementID xmi.idref='_9_0_2_3880181_1141165064390_748014_828'/>
 							<linkFirstEndID xmi.idref='_9_0_2_3880181_1141096687984_487081_2'/>
 							<linkSecondEndID xmi.idref='_9_0_2_3880181_1141096744812_118035_40'/>
-							<geometry>280, 215; 140, 215; 140, 220; </geometry>
+							<geometry>370, 215; 140, 215; 140, 250; </geometry>
 							<linkNameID xmi.idref='_9_0_2_3880181_1141165064390_938104_865'/>
 							<nameVisible xmi.value='true'/>
 							<mdOwnedViews>
 								<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165064390_582057_830'>
 									<editable xmi.value='false'/>
 									<visible xmi.value='false'/>
-									<geometry>192, 187, 30, 15</geometry>
+									<geometry>223, 203, 30, 15</geometry>
 								</mdElement>
 								<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141165064390_308620_832'>
 									<editable xmi.value='false'/>
 									<visible xmi.value='false'/>
-									<geometry>192, 229, 30, 15</geometry>
+									<geometry>223, 228, 30, 15</geometry>
 								</mdElement>
 								<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165064390_447056_835'>
 									<editable xmi.value='false'/>
 									<visible xmi.value='false'/>
-									<geometry>13, 219, 30, 15</geometry>
+									<geometry>14, 247, 30, 15</geometry>
 									<text>&lt;html&gt;
 &lt;body&gt;
 &lt;p&gt;&lt;/p&gt;
@@ -4449,28 +4502,28 @@ window to show page</text>
 								</mdElement>
 								<mdElement elementClass='RoleView' xmi.id='_9_0_2_3880181_1141165064390_175056_837'>
 									<elementID xmi.idref='_9_0_2_3880181_1141165064390_577872_826'/>
-									<geometry>270, 210, 10, 10</geometry>
+									<geometry>360, 210, 10, 10</geometry>
 									<mdOwnedViews>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165064390_916777_838'>
 											<visible xmi.value='false'/>
-											<geometry>270, 210, 30, 15</geometry>
+											<geometry>360, 210, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165064390_969372_840'>
 											<visible xmi.value='false'/>
-											<geometry>270, 210, 30, 15</geometry>
+											<geometry>360, 210, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165064390_482928_842'>
 											<visible xmi.value='false'/>
-											<geometry>270, 210, 30, 15</geometry>
+											<geometry>360, 210, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141165064390_298724_844'>
 											<editable xmi.value='false'/>
 											<visible xmi.value='false'/>
-											<geometry>270, 230, 30, 15</geometry>
+											<geometry>360, 230, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165064390_571701_847'>
 											<visible xmi.value='false'/>
-											<geometry>270, 210, 30, 15</geometry>
+											<geometry>360, 210, 30, 15</geometry>
 											<text>&lt;html&gt;
 &lt;body&gt;
 &lt;p&gt;&lt;/p&gt;
@@ -4486,28 +4539,28 @@ window to show page</text>
 								</mdElement>
 								<mdElement elementClass='RoleView' xmi.id='_9_0_2_3880181_1141165064390_242210_851'>
 									<elementID xmi.idref='_9_0_2_3880181_1141165064390_768212_827'/>
-									<geometry>135, 210, 10, 10</geometry>
+									<geometry>135, 240, 10, 10</geometry>
 									<mdOwnedViews>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165064390_758852_852'>
 											<visible xmi.value='false'/>
-											<geometry>135, 210, 30, 15</geometry>
+											<geometry>135, 240, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165064390_800468_854'>
 											<visible xmi.value='false'/>
-											<geometry>135, 210, 30, 15</geometry>
+											<geometry>135, 240, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165064390_65353_856'>
 											<visible xmi.value='false'/>
-											<geometry>135, 210, 30, 15</geometry>
+											<geometry>135, 240, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141165064390_137410_858'>
 											<editable xmi.value='false'/>
 											<visible xmi.value='false'/>
-											<geometry>135, 230, 30, 15</geometry>
+											<geometry>135, 260, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165064390_939867_861'>
 											<visible xmi.value='false'/>
-											<geometry>135, 210, 30, 15</geometry>
+											<geometry>135, 240, 30, 15</geometry>
 											<text>&lt;html&gt;
 &lt;body&gt;
 &lt;p&gt;&lt;/p&gt;
@@ -4523,7 +4576,7 @@ window to show page</text>
 								</mdElement>
 								<mdElement elementClass='AssociationTextBoxView' xmi.id='_9_0_2_3880181_1141165064390_938104_865'>
 									<visible xmi.value='false'/>
-									<geometry>185, 201, 45, 15</geometry>
+									<geometry>216, 203, 45, 15</geometry>
 								</mdElement>
 							</mdOwnedViews>
 							<linkConstraintID xmi.idref='_9_0_2_3880181_1141165064390_582057_830'/>
@@ -4536,24 +4589,24 @@ window to show page</text>
 							<elementID xmi.idref='_9_0_2_3880181_1141165067625_584024_870'/>
 							<linkFirstEndID xmi.idref='_9_0_2_3880181_1141096687984_487081_2'/>
 							<linkSecondEndID xmi.idref='_9_0_2_3880181_1141096784921_494737_56'/>
-							<geometry>280, 245; 280, 365; 160, 365; </geometry>
+							<geometry>370, 245; 370, 395; 160, 395; </geometry>
 							<linkNameID xmi.idref='_9_0_2_3880181_1141165067640_724689_907'/>
 							<nameVisible xmi.value='true'/>
 							<mdOwnedViews>
 								<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165067625_712493_872'>
 									<editable xmi.value='false'/>
 									<visible xmi.value='false'/>
-									<geometry>255, 328, 30, 15</geometry>
+									<geometry>335, 388, 30, 15</geometry>
 								</mdElement>
 								<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141165067625_536957_874'>
 									<editable xmi.value='false'/>
 									<visible xmi.value='false'/>
-									<geometry>241, 378, 30, 15</geometry>
+									<geometry>291, 388, 30, 15</geometry>
 								</mdElement>
 								<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165067625_412806_877'>
 									<editable xmi.value='false'/>
 									<visible xmi.value='false'/>
-									<geometry>167, 238, 30, 15</geometry>
+									<geometry>257, 238, 30, 15</geometry>
 									<text>&lt;html&gt;
 &lt;body&gt;
 &lt;p&gt;&lt;/p&gt;
@@ -4562,28 +4615,28 @@ window to show page</text>
 								</mdElement>
 								<mdElement elementClass='RoleView' xmi.id='_9_0_2_3880181_1141165067625_627346_879'>
 									<elementID xmi.idref='_9_0_2_3880181_1141165067625_741650_868'/>
-									<geometry>270, 240, 10, 10</geometry>
+									<geometry>360, 240, 10, 10</geometry>
 									<mdOwnedViews>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165067640_239706_880'>
 											<visible xmi.value='false'/>
-											<geometry>270, 240, 30, 15</geometry>
+											<geometry>360, 240, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165067640_345953_882'>
 											<visible xmi.value='false'/>
-											<geometry>270, 240, 30, 15</geometry>
+											<geometry>360, 240, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165067640_685438_884'>
 											<visible xmi.value='false'/>
-											<geometry>270, 240, 30, 15</geometry>
+											<geometry>360, 240, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141165067640_101249_886'>
 											<editable xmi.value='false'/>
 											<visible xmi.value='false'/>
-											<geometry>270, 260, 30, 15</geometry>
+											<geometry>360, 260, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165067640_797753_889'>
 											<visible xmi.value='false'/>
-											<geometry>270, 240, 30, 15</geometry>
+											<geometry>360, 240, 30, 15</geometry>
 											<text>&lt;html&gt;
 &lt;body&gt;
 &lt;p&gt;&lt;/p&gt;
@@ -4599,28 +4652,28 @@ window to show page</text>
 								</mdElement>
 								<mdElement elementClass='RoleView' xmi.id='_9_0_2_3880181_1141165067640_997590_893'>
 									<elementID xmi.idref='_9_0_2_3880181_1141165067625_712433_869'/>
-									<geometry>160, 360, 10, 10</geometry>
+									<geometry>160, 390, 10, 10</geometry>
 									<mdOwnedViews>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165067640_64089_894'>
 											<visible xmi.value='false'/>
-											<geometry>160, 360, 30, 15</geometry>
+											<geometry>160, 390, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165067640_123395_896'>
 											<visible xmi.value='false'/>
-											<geometry>160, 360, 30, 15</geometry>
+											<geometry>160, 390, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165067640_713605_898'>
 											<visible xmi.value='false'/>
-											<geometry>160, 360, 30, 15</geometry>
+											<geometry>160, 390, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141165067640_860849_900'>
 											<editable xmi.value='false'/>
 											<visible xmi.value='false'/>
-											<geometry>160, 380, 30, 15</geometry>
+											<geometry>160, 410, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165067640_54805_903'>
 											<visible xmi.value='false'/>
-											<geometry>160, 360, 30, 15</geometry>
+											<geometry>160, 390, 30, 15</geometry>
 											<text>&lt;html&gt;
 &lt;body&gt;
 &lt;p&gt;&lt;/p&gt;
@@ -4636,7 +4689,7 @@ window to show page</text>
 								</mdElement>
 								<mdElement elementClass='AssociationTextBoxView' xmi.id='_9_0_2_3880181_1141165067640_724689_907'>
 									<visible xmi.value='false'/>
-									<geometry>258, 353, 45, 15</geometry>
+									<geometry>328, 388, 45, 15</geometry>
 								</mdElement>
 							</mdOwnedViews>
 							<linkConstraintID xmi.idref='_9_0_2_3880181_1141165067625_712493_872'/>
@@ -4649,24 +4702,24 @@ window to show page</text>
 							<elementID xmi.idref='_9_0_2_3880181_1141165407453_891687_1245'/>
 							<linkFirstEndID xmi.idref='_9_0_2_3880181_1141164326656_99602_546'/>
 							<linkSecondEndID xmi.idref='_9_0_2_3880181_1141164496453_696659_626'/>
-							<geometry>480, 631; 480, 660; </geometry>
+							<geometry>640, 631; 640, 660; </geometry>
 							<linkNameID xmi.idref='_9_0_2_3880181_1141165407453_314368_1282'/>
 							<nameVisible xmi.value='true'/>
 							<mdOwnedViews>
 								<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165407453_97309_1247'>
 									<editable xmi.value='false'/>
 									<visible xmi.value='false'/>
-									<geometry>465, 633, 30, 15</geometry>
+									<geometry>625, 633, 30, 15</geometry>
 								</mdElement>
 								<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141165407453_347145_1249'>
 									<editable xmi.value='false'/>
 									<visible xmi.value='false'/>
-									<geometry>465, 644, 30, 15</geometry>
+									<geometry>625, 644, 30, 15</geometry>
 								</mdElement>
 								<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165407453_767407_1252'>
 									<editable xmi.value='false'/>
 									<visible xmi.value='false'/>
-									<geometry>0, 490, 30, 15</geometry>
+									<geometry>561, 696, 30, 15</geometry>
 									<text>&lt;html&gt;
 &lt;body&gt;
 &lt;p&gt;&lt;/p&gt;
@@ -4675,28 +4728,28 @@ window to show page</text>
 								</mdElement>
 								<mdElement elementClass='RoleView' xmi.id='_9_0_2_3880181_1141165407453_404694_1254'>
 									<elementID xmi.idref='_9_0_2_3880181_1141165407453_542034_1243'/>
-									<geometry>475, 631, 10, 10</geometry>
+									<geometry>635, 631, 10, 10</geometry>
 									<mdOwnedViews>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165407453_133085_1255'>
 											<visible xmi.value='false'/>
-											<geometry>475, 631, 30, 15</geometry>
+											<geometry>635, 631, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165407453_407018_1257'>
 											<visible xmi.value='false'/>
-											<geometry>475, 631, 30, 15</geometry>
+											<geometry>635, 631, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165407453_17055_1259'>
 											<visible xmi.value='false'/>
-											<geometry>475, 631, 30, 15</geometry>
+											<geometry>635, 631, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141165407453_327156_1261'>
 											<editable xmi.value='false'/>
 											<visible xmi.value='false'/>
-											<geometry>475, 651, 30, 15</geometry>
+											<geometry>635, 651, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165407453_401102_1264'>
 											<visible xmi.value='false'/>
-											<geometry>475, 631, 30, 15</geometry>
+											<geometry>635, 631, 30, 15</geometry>
 											<text>&lt;html&gt;
 &lt;body&gt;
 &lt;p&gt;&lt;/p&gt;
@@ -4712,28 +4765,28 @@ window to show page</text>
 								</mdElement>
 								<mdElement elementClass='RoleView' xmi.id='_9_0_2_3880181_1141165407453_804733_1268'>
 									<elementID xmi.idref='_9_0_2_3880181_1141165407453_884099_1244'/>
-									<geometry>475, 650, 10, 10</geometry>
+									<geometry>635, 650, 10, 10</geometry>
 									<mdOwnedViews>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165407453_860152_1269'>
 											<visible xmi.value='false'/>
-											<geometry>475, 650, 30, 15</geometry>
+											<geometry>635, 650, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165407453_376554_1271'>
 											<visible xmi.value='false'/>
-											<geometry>475, 650, 30, 15</geometry>
+											<geometry>635, 650, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165407453_173123_1273'>
 											<visible xmi.value='false'/>
-											<geometry>475, 650, 30, 15</geometry>
+											<geometry>635, 650, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141165407453_676368_1275'>
 											<editable xmi.value='false'/>
 											<visible xmi.value='false'/>
-											<geometry>475, 630, 30, 15</geometry>
+											<geometry>635, 630, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165407453_670635_1278'>
 											<visible xmi.value='false'/>
-											<geometry>475, 650, 30, 15</geometry>
+											<geometry>635, 650, 30, 15</geometry>
 											<text>&lt;html&gt;
 &lt;body&gt;
 &lt;p&gt;&lt;/p&gt;
@@ -4749,7 +4802,7 @@ window to show page</text>
 								</mdElement>
 								<mdElement elementClass='AssociationTextBoxView' xmi.id='_9_0_2_3880181_1141165407453_314368_1282'>
 									<visible xmi.value='false'/>
-									<geometry>458, 637, 45, 15</geometry>
+									<geometry>618, 637, 45, 15</geometry>
 								</mdElement>
 							</mdOwnedViews>
 							<linkConstraintID xmi.idref='_9_0_2_3880181_1141165407453_97309_1247'/>
@@ -4762,24 +4815,24 @@ window to show page</text>
 							<elementID xmi.idref='_9_0_2_3880181_1141165413875_704335_1287'/>
 							<linkFirstEndID xmi.idref='_9_0_2_3880181_1141164400125_905037_578'/>
 							<linkSecondEndID xmi.idref='_9_0_2_3880181_1141164528281_927362_642'/>
-							<geometry>610, 629; 610, 660; </geometry>
+							<geometry>780, 629; 780, 660; </geometry>
 							<linkNameID xmi.idref='_9_0_2_3880181_1141165413875_760908_1324'/>
 							<nameVisible xmi.value='true'/>
 							<mdOwnedViews>
 								<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165413875_939422_1289'>
 									<editable xmi.value='false'/>
 									<visible xmi.value='false'/>
-									<geometry>595, 632, 30, 15</geometry>
+									<geometry>765, 632, 30, 15</geometry>
 								</mdElement>
 								<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141165413875_623908_1291'>
 									<editable xmi.value='false'/>
 									<visible xmi.value='false'/>
-									<geometry>595, 643, 30, 15</geometry>
+									<geometry>765, 643, 30, 15</geometry>
 								</mdElement>
 								<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165413875_709281_1294'>
 									<editable xmi.value='false'/>
 									<visible xmi.value='false'/>
-									<geometry>0, 496, 30, 15</geometry>
+									<geometry>710, 814, 30, 15</geometry>
 									<text>&lt;html&gt;
 &lt;body&gt;
 &lt;p&gt;&lt;/p&gt;
@@ -4788,28 +4841,28 @@ window to show page</text>
 								</mdElement>
 								<mdElement elementClass='RoleView' xmi.id='_9_0_2_3880181_1141165413875_294132_1296'>
 									<elementID xmi.idref='_9_0_2_3880181_1141165413875_599951_1285'/>
-									<geometry>605, 629, 10, 10</geometry>
+									<geometry>775, 629, 10, 10</geometry>
 									<mdOwnedViews>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165413875_881815_1297'>
 											<visible xmi.value='false'/>
-											<geometry>605, 629, 30, 15</geometry>
+											<geometry>775, 629, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165413875_749314_1299'>
 											<visible xmi.value='false'/>
-											<geometry>605, 629, 30, 15</geometry>
+											<geometry>775, 629, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165413875_856998_1301'>
 											<visible xmi.value='false'/>
-											<geometry>605, 629, 30, 15</geometry>
+											<geometry>775, 629, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141165413875_646350_1303'>
 											<editable xmi.value='false'/>
 											<visible xmi.value='false'/>
-											<geometry>605, 649, 30, 15</geometry>
+											<geometry>775, 649, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165413875_543231_1306'>
 											<visible xmi.value='false'/>
-											<geometry>605, 629, 30, 15</geometry>
+											<geometry>775, 629, 30, 15</geometry>
 											<text>&lt;html&gt;
 &lt;body&gt;
 &lt;p&gt;&lt;/p&gt;
@@ -4825,28 +4878,28 @@ window to show page</text>
 								</mdElement>
 								<mdElement elementClass='RoleView' xmi.id='_9_0_2_3880181_1141165413875_532829_1310'>
 									<elementID xmi.idref='_9_0_2_3880181_1141165413875_712615_1286'/>
-									<geometry>605, 650, 10, 10</geometry>
+									<geometry>775, 650, 10, 10</geometry>
 									<mdOwnedViews>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165413875_379101_1311'>
 											<visible xmi.value='false'/>
-											<geometry>605, 650, 30, 15</geometry>
+											<geometry>775, 650, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165413875_424306_1313'>
 											<visible xmi.value='false'/>
-											<geometry>605, 650, 30, 15</geometry>
+											<geometry>775, 650, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165413875_687001_1315'>
 											<visible xmi.value='false'/>
-											<geometry>605, 650, 30, 15</geometry>
+											<geometry>775, 650, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141165413875_414682_1317'>
 											<editable xmi.value='false'/>
 											<visible xmi.value='false'/>
-											<geometry>605, 630, 30, 15</geometry>
+											<geometry>775, 630, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165413875_942283_1320'>
 											<visible xmi.value='false'/>
-											<geometry>605, 650, 30, 15</geometry>
+											<geometry>775, 650, 30, 15</geometry>
 											<text>&lt;html&gt;
 &lt;body&gt;
 &lt;p&gt;&lt;/p&gt;
@@ -4862,7 +4915,7 @@ window to show page</text>
 								</mdElement>
 								<mdElement elementClass='AssociationTextBoxView' xmi.id='_9_0_2_3880181_1141165413875_760908_1324'>
 									<visible xmi.value='false'/>
-									<geometry>588, 636, 45, 15</geometry>
+									<geometry>758, 636, 45, 15</geometry>
 								</mdElement>
 							</mdOwnedViews>
 							<linkConstraintID xmi.idref='_9_0_2_3880181_1141165413875_939422_1289'/>
@@ -4875,24 +4928,24 @@ window to show page</text>
 							<elementID xmi.idref='_9_0_2_3880181_1141165416906_995759_1329'/>
 							<linkFirstEndID xmi.idref='_9_0_2_3880181_1141164450437_327697_594'/>
 							<linkSecondEndID xmi.idref='_9_0_2_3880181_1141164543359_446181_658'/>
-							<geometry>775, 631; 775, 660; </geometry>
+							<geometry>915, 631; 915, 660; </geometry>
 							<linkNameID xmi.idref='_9_0_2_3880181_1141165416906_786443_1366'/>
 							<nameVisible xmi.value='true'/>
 							<mdOwnedViews>
 								<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165416906_525178_1331'>
 									<editable xmi.value='false'/>
 									<visible xmi.value='false'/>
-									<geometry>760, 634, 30, 15</geometry>
+									<geometry>900, 634, 30, 15</geometry>
 								</mdElement>
 								<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141165416906_525106_1333'>
 									<editable xmi.value='false'/>
 									<visible xmi.value='false'/>
-									<geometry>760, 643, 30, 15</geometry>
+									<geometry>900, 643, 30, 15</geometry>
 								</mdElement>
 								<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165416906_25525_1336'>
 									<editable xmi.value='false'/>
 									<visible xmi.value='false'/>
-									<geometry>1, 521, 30, 15</geometry>
+									<geometry>853, 719, 30, 15</geometry>
 									<text>&lt;html&gt;
 &lt;body&gt;
 &lt;p&gt;&lt;/p&gt;
@@ -4901,28 +4954,28 @@ window to show page</text>
 								</mdElement>
 								<mdElement elementClass='RoleView' xmi.id='_9_0_2_3880181_1141165416906_948528_1338'>
 									<elementID xmi.idref='_9_0_2_3880181_1141165416906_156783_1327'/>
-									<geometry>770, 631, 10, 10</geometry>
+									<geometry>910, 631, 10, 10</geometry>
 									<mdOwnedViews>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165416906_643455_1339'>
 											<visible xmi.value='false'/>
-											<geometry>770, 631, 30, 15</geometry>
+											<geometry>910, 631, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165416906_460460_1341'>
 											<visible xmi.value='false'/>
-											<geometry>770, 631, 30, 15</geometry>
+											<geometry>910, 631, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165416906_520192_1343'>
 											<visible xmi.value='false'/>
-											<geometry>770, 631, 30, 15</geometry>
+											<geometry>910, 631, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141165416906_910113_1345'>
 											<editable xmi.value='false'/>
 											<visible xmi.value='false'/>
-											<geometry>770, 651, 30, 15</geometry>
+											<geometry>910, 651, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165416906_932584_1348'>
 											<visible xmi.value='false'/>
-											<geometry>770, 631, 30, 15</geometry>
+											<geometry>910, 631, 30, 15</geometry>
 											<text>&lt;html&gt;
 &lt;body&gt;
 &lt;p&gt;&lt;/p&gt;
@@ -4938,28 +4991,28 @@ window to show page</text>
 								</mdElement>
 								<mdElement elementClass='RoleView' xmi.id='_9_0_2_3880181_1141165416906_69497_1352'>
 									<elementID xmi.idref='_9_0_2_3880181_1141165416906_321409_1328'/>
-									<geometry>770, 650, 10, 10</geometry>
+									<geometry>910, 650, 10, 10</geometry>
 									<mdOwnedViews>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165416906_612473_1353'>
 											<visible xmi.value='false'/>
-											<geometry>770, 650, 30, 15</geometry>
+											<geometry>910, 650, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165416906_508453_1355'>
 											<visible xmi.value='false'/>
-											<geometry>770, 650, 30, 15</geometry>
+											<geometry>910, 650, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165416906_929457_1357'>
 											<visible xmi.value='false'/>
-											<geometry>770, 650, 30, 15</geometry>
+											<geometry>910, 650, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141165416906_334198_1359'>
 											<editable xmi.value='false'/>
 											<visible xmi.value='false'/>
-											<geometry>770, 670, 30, 15</geometry>
+											<geometry>910, 670, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165416906_83201_1362'>
 											<visible xmi.value='false'/>
-											<geometry>770, 650, 30, 15</geometry>
+											<geometry>910, 650, 30, 15</geometry>
 											<text>&lt;html&gt;
 &lt;body&gt;
 &lt;p&gt;&lt;/p&gt;
@@ -4975,7 +5028,7 @@ window to show page</text>
 								</mdElement>
 								<mdElement elementClass='AssociationTextBoxView' xmi.id='_9_0_2_3880181_1141165416906_786443_1366'>
 									<visible xmi.value='false'/>
-									<geometry>753, 637, 45, 15</geometry>
+									<geometry>893, 637, 45, 15</geometry>
 								</mdElement>
 							</mdOwnedViews>
 							<linkConstraintID xmi.idref='_9_0_2_3880181_1141165416906_525178_1331'/>
@@ -4986,34 +5039,34 @@ window to show page</text>
 						</mdElement>
 						<mdElement elementClass='PackageView' xmi.id='_9_0_2_3880181_1141166014953_29360_1490'>
 							<elementID xmi.idref='_9_0_2_3880181_1141166014953_27358_1489'/>
-							<geometry>920, 320, 272, 188</geometry>
+							<geometry>1020, 300, 272, 188</geometry>
 							<mdOwnedViews>
 								<mdElement elementClass='ClassView' xmi.id='_9_0_2_3880181_1141165944781_808633_1386'>
 									<elementID xmi.idref='_9_0_2_3880181_1112198260546_540674_686'/>
-									<geometry>940, 360, 208, 142</geometry>
+									<geometry>1040, 340, 208, 142</geometry>
 								</mdElement>
 								<mdElement elementClass='AssociationView' xmi.id='_9_0_2_3880181_1141172586453_889742_1971'>
 									<elementID xmi.idref='_9_0_2_3880181_1141172586453_283062_1970'/>
 									<linkFirstEndID xmi.idref='_9_0_2_3880181_1141100560687_745697_420'/>
 									<linkSecondEndID xmi.idref='_9_0_2_3880181_1141165944781_808633_1386'/>
-									<geometry>645, 182; 945, 182; 945, 360; </geometry>
+									<geometry>735, 182; 1045, 182; 1045, 340; </geometry>
 									<linkNameID xmi.idref='_9_0_2_3880181_1141172586453_767845_2007'/>
 									<nameVisible xmi.value='true'/>
 									<mdOwnedViews>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172586453_46632_1972'>
 											<editable xmi.value='false'/>
 											<visible xmi.value='false'/>
-											<geometry>869, 154, 30, 15</geometry>
+											<geometry>954, 168, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141172586453_154424_1974'>
 											<editable xmi.value='false'/>
 											<visible xmi.value='false'/>
-											<geometry>869, 196, 30, 15</geometry>
+											<geometry>954, 194, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172586453_922997_1977'>
 											<editable xmi.value='false'/>
 											<visible xmi.value='false'/>
-											<geometry>352, 0, 30, 15</geometry>
+											<geometry>649, 4, 30, 15</geometry>
 											<text>&lt;html&gt;
 &lt;body&gt;
 &lt;p&gt;&lt;/p&gt;
@@ -5022,28 +5075,28 @@ window to show page</text>
 										</mdElement>
 										<mdElement elementClass='RoleView' xmi.id='_9_0_2_3880181_1141172586453_558279_1979'>
 											<elementID xmi.idref='_9_0_2_3880181_1141172586453_87786_1968'/>
-											<geometry>645, 177, 10, 10</geometry>
+											<geometry>735, 177, 10, 10</geometry>
 											<mdOwnedViews>
 												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172586453_68323_1980'>
 													<visible xmi.value='false'/>
-													<geometry>645, 177, 30, 15</geometry>
+													<geometry>735, 177, 30, 15</geometry>
 												</mdElement>
 												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172586453_797629_1982'>
 													<visible xmi.value='false'/>
-													<geometry>645, 177, 30, 15</geometry>
+													<geometry>735, 177, 30, 15</geometry>
 												</mdElement>
 												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172586453_491420_1984'>
 													<visible xmi.value='false'/>
-													<geometry>645, 177, 30, 15</geometry>
+													<geometry>735, 177, 30, 15</geometry>
 												</mdElement>
 												<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141172586453_702148_1986'>
 													<editable xmi.value='false'/>
 													<visible xmi.value='false'/>
-													<geometry>645, 197, 30, 15</geometry>
+													<geometry>735, 197, 30, 15</geometry>
 												</mdElement>
 												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172586453_102451_1989'>
 													<visible xmi.value='false'/>
-													<geometry>645, 177, 30, 15</geometry>
+													<geometry>735, 177, 30, 15</geometry>
 													<text>&lt;html&gt;
 &lt;body&gt;
 &lt;p&gt;&lt;/p&gt;
@@ -5059,28 +5112,28 @@ window to show page</text>
 										</mdElement>
 										<mdElement elementClass='RoleView' xmi.id='_9_0_2_3880181_1141172586453_673503_1993'>
 											<elementID xmi.idref='_9_0_2_3880181_1141172586453_612576_1969'/>
-											<geometry>940, 350, 10, 10</geometry>
+											<geometry>1040, 330, 10, 10</geometry>
 											<mdOwnedViews>
 												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172586453_688496_1994'>
 													<visible xmi.value='false'/>
-													<geometry>940, 350, 30, 15</geometry>
+													<geometry>1040, 330, 30, 15</geometry>
 												</mdElement>
 												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172586453_682124_1996'>
 													<visible xmi.value='false'/>
-													<geometry>940, 350, 30, 15</geometry>
+													<geometry>1040, 330, 30, 15</geometry>
 												</mdElement>
 												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172586453_997653_1998'>
 													<visible xmi.value='false'/>
-													<geometry>940, 350, 30, 15</geometry>
+													<geometry>1040, 330, 30, 15</geometry>
 												</mdElement>
 												<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141172586453_226163_2000'>
 													<editable xmi.value='false'/>
 													<visible xmi.value='false'/>
-													<geometry>940, 370, 30, 15</geometry>
+													<geometry>1040, 350, 30, 15</geometry>
 												</mdElement>
 												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172586453_935133_2003'>
 													<visible xmi.value='false'/>
-													<geometry>940, 350, 30, 15</geometry>
+													<geometry>1040, 330, 30, 15</geometry>
 													<text>&lt;html&gt;
 &lt;body&gt;
 &lt;p&gt;&lt;/p&gt;
@@ -5096,7 +5149,7 @@ window to show page</text>
 										</mdElement>
 										<mdElement elementClass='AssociationTextBoxView' xmi.id='_9_0_2_3880181_1141172586453_767845_2007'>
 											<visible xmi.value='false'/>
-											<geometry>862, 170, 45, 15</geometry>
+											<geometry>947, 168, 45, 15</geometry>
 										</mdElement>
 									</mdOwnedViews>
 									<linkConstraintID xmi.idref='_9_0_2_3880181_1141172586453_46632_1972'/>
@@ -5108,191 +5161,74 @@ window to show page</text>
 							</mdOwnedViews>
 						</mdElement>
 						<mdElement elementClass='NoteView' xmi.id='_9_0_2_3880181_1141166095531_878134_1502'>
-							<geometry>20, 550, 220, 51</geometry>
+							<geometry>40, 500, 220, 51</geometry>
 							<text>Each view has an associated MovieCLip in lams_monitor.swf</text>
-						</mdElement>
-						<mdElement elementClass='ClassView' xmi.id='_9_0_2_3880181_1141164373375_552461_562'>
-							<elementID xmi.idref='_9_0_2_3880181_1141164373375_233467_561'/>
-							<geometry>280, 500, 132, 130</geometry>
 						</mdElement>
 						<mdElement elementClass='NoteAnchorView' xmi.id='_9_0_2_3880181_1141166126578_549555_1510'>
 							<linkFirstEndID xmi.idref='_9_0_2_3880181_1141164373375_552461_562'/>
 							<linkSecondEndID xmi.idref='_9_0_2_3880181_1141166095531_878134_1502'/>
-							<geometry>280, 568; 240, 570; </geometry>
-						</mdElement>
-						<mdElement elementClass='AssociationView' xmi.id='_9_0_2_3880181_1141165127250_168766_955'>
-							<elementID xmi.idref='_9_0_2_3880181_1141165127250_883314_954'/>
-							<linkFirstEndID xmi.idref='_9_0_2_3880181_1141100560687_745697_420'/>
-							<linkSecondEndID xmi.idref='_9_0_2_3880181_1141164373375_552461_562'/>
-							<geometry>500, 245; 500, 445; 345, 445; 345, 500; </geometry>
-							<linkNameID xmi.idref='_9_0_2_3880181_1141165127250_613944_991'/>
-							<nameVisible xmi.value='true'/>
-							<mdOwnedViews>
-								<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165127250_354819_956'>
-									<editable xmi.value='false'/>
-									<visible xmi.value='false'/>
-									<geometry>475, 412, 30, 15</geometry>
-								</mdElement>
-								<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141165127250_729256_958'>
-									<editable xmi.value='false'/>
-									<visible xmi.value='false'/>
-									<geometry>437, 446, 30, 15</geometry>
-								</mdElement>
-								<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165127250_496957_961'>
-									<editable xmi.value='false'/>
-									<visible xmi.value='false'/>
-									<geometry>1, 539, 30, 15</geometry>
-									<text>&lt;html&gt;
-&lt;body&gt;
-&lt;p&gt;&lt;/p&gt;
-&lt;/body&gt;
-&lt;/html&gt;</text>
-								</mdElement>
-								<mdElement elementClass='RoleView' xmi.id='_9_0_2_3880181_1141165127250_417168_963'>
-									<elementID xmi.idref='_9_0_2_3880181_1141165127250_561110_952'/>
-									<geometry>490, 240, 10, 10</geometry>
-									<mdOwnedViews>
-										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165127250_724250_964'>
-											<visible xmi.value='false'/>
-											<geometry>490, 240, 30, 15</geometry>
-										</mdElement>
-										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165127250_142239_966'>
-											<visible xmi.value='false'/>
-											<geometry>490, 240, 30, 15</geometry>
-										</mdElement>
-										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165127250_807135_968'>
-											<visible xmi.value='false'/>
-											<geometry>490, 240, 30, 15</geometry>
-										</mdElement>
-										<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141165127250_258463_970'>
-											<editable xmi.value='false'/>
-											<visible xmi.value='false'/>
-											<geometry>490, 260, 30, 15</geometry>
-										</mdElement>
-										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165127250_975705_973'>
-											<visible xmi.value='false'/>
-											<geometry>490, 240, 30, 15</geometry>
-											<text>&lt;html&gt;
-&lt;body&gt;
-&lt;p&gt;&lt;/p&gt;
-&lt;/body&gt;
-&lt;/html&gt;</text>
-										</mdElement>
-									</mdOwnedViews>
-									<roleNameID xmi.idref='_9_0_2_3880181_1141165127250_724250_964'/>
-									<roleMultiplicityID xmi.idref='_9_0_2_3880181_1141165127250_142239_966'/>
-									<roleConstraintsID xmi.idref='_9_0_2_3880181_1141165127250_807135_968'/>
-									<roleStereotypeID xmi.idref='_9_0_2_3880181_1141165127250_258463_970'/>
-									<roleTaggedValuesID xmi.idref='_9_0_2_3880181_1141165127250_975705_973'/>
-								</mdElement>
-								<mdElement elementClass='RoleView' xmi.id='_9_0_2_3880181_1141165127250_852366_977'>
-									<elementID xmi.idref='_9_0_2_3880181_1141165127250_688752_953'/>
-									<geometry>340, 490, 10, 10</geometry>
-									<mdOwnedViews>
-										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165127250_729953_978'>
-											<visible xmi.value='false'/>
-											<geometry>340, 490, 30, 15</geometry>
-										</mdElement>
-										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165127250_820350_980'>
-											<visible xmi.value='false'/>
-											<geometry>340, 490, 30, 15</geometry>
-										</mdElement>
-										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165127250_365441_982'>
-											<visible xmi.value='false'/>
-											<geometry>340, 490, 30, 15</geometry>
-										</mdElement>
-										<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141165127250_704922_984'>
-											<editable xmi.value='false'/>
-											<visible xmi.value='false'/>
-											<geometry>340, 470, 30, 15</geometry>
-										</mdElement>
-										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141165127250_850311_987'>
-											<visible xmi.value='false'/>
-											<geometry>340, 490, 30, 15</geometry>
-											<text>&lt;html&gt;
-&lt;body&gt;
-&lt;p&gt;&lt;/p&gt;
-&lt;/body&gt;
-&lt;/html&gt;</text>
-										</mdElement>
-									</mdOwnedViews>
-									<roleNameID xmi.idref='_9_0_2_3880181_1141165127250_729953_978'/>
-									<roleMultiplicityID xmi.idref='_9_0_2_3880181_1141165127250_820350_980'/>
-									<roleConstraintsID xmi.idref='_9_0_2_3880181_1141165127250_365441_982'/>
-									<roleStereotypeID xmi.idref='_9_0_2_3880181_1141165127250_704922_984'/>
-									<roleTaggedValuesID xmi.idref='_9_0_2_3880181_1141165127250_850311_987'/>
-								</mdElement>
-								<mdElement elementClass='AssociationTextBoxView' xmi.id='_9_0_2_3880181_1141165127250_613944_991'>
-									<visible xmi.value='false'/>
-									<geometry>473, 432, 45, 15</geometry>
-								</mdElement>
-							</mdOwnedViews>
-							<linkConstraintID xmi.idref='_9_0_2_3880181_1141165127250_354819_956'/>
-							<linkStereotypeID xmi.idref='_9_0_2_3880181_1141165127250_729256_958'/>
-							<linkTaggedValuesID xmi.idref='_9_0_2_3880181_1141165127250_496957_961'/>
-							<associationFirstEndID xmi.idref='_9_0_2_3880181_1141165127250_417168_963'/>
-							<associationSecondEndID xmi.idref='_9_0_2_3880181_1141165127250_852366_977'/>
+							<geometry>350, 555; 260, 542; </geometry>
 						</mdElement>
 						<mdElement elementClass='PackageView' xmi.id='_9_0_2_3880181_1141167882265_801991_1632'>
 							<elementID xmi.idref='_9_0_2_3880181_1141167882265_660494_1631'/>
-							<geometry>930, 870, 282, 216</geometry>
+							<geometry>0, 610, 282, 216</geometry>
 							<mdOwnedViews>
 								<mdElement elementClass='ClassView' xmi.id='_9_0_2_3880181_1141166208031_721339_1535'>
 									<elementID xmi.idref='_9_0_2_3880181_1112200737875_563740_815'/>
-									<geometry>950, 920, 249, 154</geometry>
+									<geometry>20, 660, 249, 154</geometry>
 								</mdElement>
-								<mdElement elementClass='AssociationView' xmi.id='_9_0_2_3880181_1141172264250_842056_1723'>
-									<elementID xmi.idref='_9_0_2_3880181_1141172264250_44508_1722'/>
-									<linkFirstEndID xmi.idref='_9_0_2_3880181_1141172252125_72920_1702'/>
+								<mdElement elementClass='AssociationView' xmi.id='_9_0_2_3880181_1141175617890_855741_2166'>
+									<elementID xmi.idref='_9_0_2_3880181_1141175617890_696520_2165'/>
+									<linkFirstEndID xmi.idref='_9_0_2_3880181_1141172194421_482789_1664'/>
 									<linkSecondEndID xmi.idref='_9_0_2_3880181_1141166208031_721339_1535'/>
-									<geometry>841, 1125; 1065, 1125; 1065, 1074; </geometry>
-									<linkNameID xmi.idref='_9_0_2_3880181_1141172264250_872925_1759'/>
+									<geometry>511, 990; 511, 770; 269, 770; </geometry>
+									<linkNameID xmi.idref='_9_0_2_3880181_1141175617890_594454_2202'/>
 									<nameVisible xmi.value='true'/>
 									<mdOwnedViews>
-										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172264250_898573_1724'>
+										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141175617890_265398_2167'>
 											<editable xmi.value='false'/>
 											<visible xmi.value='false'/>
-											<geometry>963, 1098, 30, 15</geometry>
+											<geometry>443, 780, 30, 15</geometry>
 										</mdElement>
-										<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141172264250_501965_1726'>
+										<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141175617890_22870_2169'>
 											<editable xmi.value='false'/>
 											<visible xmi.value='false'/>
-											<geometry>963, 1138, 30, 15</geometry>
+											<geometry>485, 744, 30, 15</geometry>
 										</mdElement>
-										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172264250_904421_1729'>
+										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141175617890_223043_2172'>
 											<editable xmi.value='false'/>
 											<visible xmi.value='false'/>
-											<geometry>584, 1, 30, 15</geometry>
+											<geometry>50, 907, 30, 15</geometry>
 											<text>&lt;html&gt;
 &lt;body&gt;
 &lt;p&gt;&lt;/p&gt;
 &lt;/body&gt;
 &lt;/html&gt;</text>
 										</mdElement>
-										<mdElement elementClass='RoleView' xmi.id='_9_0_2_3880181_1141172264250_62218_1731'>
-											<elementID xmi.idref='_9_0_2_3880181_1141172264250_427186_1720'/>
-											<geometry>841, 1120, 10, 10</geometry>
+										<mdElement elementClass='RoleView' xmi.id='_9_0_2_3880181_1141175617890_159112_2174'>
+											<elementID xmi.idref='_9_0_2_3880181_1141175617890_209651_2163'/>
+											<geometry>511, 985, 10, 10</geometry>
 											<mdOwnedViews>
-												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172264250_937644_1732'>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141175617890_771689_2175'>
 													<visible xmi.value='false'/>
-													<geometry>841, 1120, 30, 15</geometry>
+													<geometry>511, 985, 30, 15</geometry>
 												</mdElement>
-												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172264250_866570_1734'>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141175617890_913530_2177'>
 													<visible xmi.value='false'/>
-													<geometry>841, 1120, 30, 15</geometry>
+													<geometry>511, 985, 30, 15</geometry>
 												</mdElement>
-												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172264250_367017_1736'>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141175617890_507390_2179'>
 													<visible xmi.value='false'/>
-													<geometry>841, 1120, 30, 15</geometry>
+													<geometry>511, 985, 30, 15</geometry>
 												</mdElement>
-												<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141172264250_88162_1738'>
+												<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141175617890_765691_2181'>
 													<editable xmi.value='false'/>
 													<visible xmi.value='false'/>
-													<geometry>841, 1140, 30, 15</geometry>
+													<geometry>511, 1005, 30, 15</geometry>
 												</mdElement>
-												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172264250_413316_1741'>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141175617890_705260_2184'>
 													<visible xmi.value='false'/>
-													<geometry>841, 1120, 30, 15</geometry>
+													<geometry>511, 985, 30, 15</geometry>
 													<text>&lt;html&gt;
 &lt;body&gt;
 &lt;p&gt;&lt;/p&gt;
@@ -5300,36 +5236,36 @@ window to show page</text>
 &lt;/html&gt;</text>
 												</mdElement>
 											</mdOwnedViews>
-											<roleNameID xmi.idref='_9_0_2_3880181_1141172264250_937644_1732'/>
-											<roleMultiplicityID xmi.idref='_9_0_2_3880181_1141172264250_866570_1734'/>
-											<roleConstraintsID xmi.idref='_9_0_2_3880181_1141172264250_367017_1736'/>
-											<roleStereotypeID xmi.idref='_9_0_2_3880181_1141172264250_88162_1738'/>
-											<roleTaggedValuesID xmi.idref='_9_0_2_3880181_1141172264250_413316_1741'/>
+											<roleNameID xmi.idref='_9_0_2_3880181_1141175617890_771689_2175'/>
+											<roleMultiplicityID xmi.idref='_9_0_2_3880181_1141175617890_913530_2177'/>
+											<roleConstraintsID xmi.idref='_9_0_2_3880181_1141175617890_507390_2179'/>
+											<roleStereotypeID xmi.idref='_9_0_2_3880181_1141175617890_765691_2181'/>
+											<roleTaggedValuesID xmi.idref='_9_0_2_3880181_1141175617890_705260_2184'/>
 										</mdElement>
-										<mdElement elementClass='RoleView' xmi.id='_9_0_2_3880181_1141172264250_803377_1745'>
-											<elementID xmi.idref='_9_0_2_3880181_1141172264250_936174_1721'/>
-											<geometry>1060, 1074, 10, 10</geometry>
+										<mdElement elementClass='RoleView' xmi.id='_9_0_2_3880181_1141175617890_104926_2188'>
+											<elementID xmi.idref='_9_0_2_3880181_1141175617890_5493_2164'/>
+											<geometry>269, 765, 10, 10</geometry>
 											<mdOwnedViews>
-												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172264250_800387_1746'>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141175617890_382547_2189'>
 													<visible xmi.value='false'/>
-													<geometry>1060, 1074, 30, 15</geometry>
+													<geometry>269, 765, 30, 15</geometry>
 												</mdElement>
-												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172264250_197476_1748'>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141175617890_6051_2191'>
 													<visible xmi.value='false'/>
-													<geometry>1060, 1074, 30, 15</geometry>
+													<geometry>269, 765, 30, 15</geometry>
 												</mdElement>
-												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172264250_417942_1750'>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141175617890_887193_2193'>
 													<visible xmi.value='false'/>
-													<geometry>1060, 1074, 30, 15</geometry>
+													<geometry>269, 765, 30, 15</geometry>
 												</mdElement>
-												<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141172264250_4834_1752'>
+												<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141175617890_118755_2195'>
 													<editable xmi.value='false'/>
 													<visible xmi.value='false'/>
-													<geometry>1060, 1094, 30, 15</geometry>
+													<geometry>269, 785, 30, 15</geometry>
 												</mdElement>
-												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172264250_464888_1755'>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141175617890_183681_2198'>
 													<visible xmi.value='false'/>
-													<geometry>1060, 1074, 30, 15</geometry>
+													<geometry>269, 765, 30, 15</geometry>
 													<text>&lt;html&gt;
 &lt;body&gt;
 &lt;p&gt;&lt;/p&gt;
@@ -5337,22 +5273,22 @@ window to show page</text>
 &lt;/html&gt;</text>
 												</mdElement>
 											</mdOwnedViews>
-											<roleNameID xmi.idref='_9_0_2_3880181_1141172264250_800387_1746'/>
-											<roleMultiplicityID xmi.idref='_9_0_2_3880181_1141172264250_197476_1748'/>
-											<roleConstraintsID xmi.idref='_9_0_2_3880181_1141172264250_417942_1750'/>
-											<roleStereotypeID xmi.idref='_9_0_2_3880181_1141172264250_4834_1752'/>
-											<roleTaggedValuesID xmi.idref='_9_0_2_3880181_1141172264250_464888_1755'/>
+											<roleNameID xmi.idref='_9_0_2_3880181_1141175617890_382547_2189'/>
+											<roleMultiplicityID xmi.idref='_9_0_2_3880181_1141175617890_6051_2191'/>
+											<roleConstraintsID xmi.idref='_9_0_2_3880181_1141175617890_887193_2193'/>
+											<roleStereotypeID xmi.idref='_9_0_2_3880181_1141175617890_118755_2195'/>
+											<roleTaggedValuesID xmi.idref='_9_0_2_3880181_1141175617890_183681_2198'/>
 										</mdElement>
-										<mdElement elementClass='AssociationTextBoxView' xmi.id='_9_0_2_3880181_1141172264250_872925_1759'>
+										<mdElement elementClass='AssociationTextBoxView' xmi.id='_9_0_2_3880181_1141175617890_594454_2202'>
 											<visible xmi.value='false'/>
-											<geometry>956, 1113, 45, 15</geometry>
+											<geometry>478, 768, 45, 15</geometry>
 										</mdElement>
 									</mdOwnedViews>
-									<linkConstraintID xmi.idref='_9_0_2_3880181_1141172264250_898573_1724'/>
-									<linkStereotypeID xmi.idref='_9_0_2_3880181_1141172264250_501965_1726'/>
-									<linkTaggedValuesID xmi.idref='_9_0_2_3880181_1141172264250_904421_1729'/>
-									<associationFirstEndID xmi.idref='_9_0_2_3880181_1141172264250_62218_1731'/>
-									<associationSecondEndID xmi.idref='_9_0_2_3880181_1141172264250_803377_1745'/>
+									<linkConstraintID xmi.idref='_9_0_2_3880181_1141175617890_265398_2167'/>
+									<linkStereotypeID xmi.idref='_9_0_2_3880181_1141175617890_22870_2169'/>
+									<linkTaggedValuesID xmi.idref='_9_0_2_3880181_1141175617890_223043_2172'/>
+									<associationFirstEndID xmi.idref='_9_0_2_3880181_1141175617890_159112_2174'/>
+									<associationSecondEndID xmi.idref='_9_0_2_3880181_1141175617890_104926_2188'/>
 								</mdElement>
 							</mdOwnedViews>
 						</mdElement>
@@ -5360,24 +5296,24 @@ window to show page</text>
 							<elementID xmi.idref='_9_0_2_3880181_1141172578078_116108_1928'/>
 							<linkFirstEndID xmi.idref='_9_0_2_3880181_1141100560687_745697_420'/>
 							<linkSecondEndID xmi.idref='_9_0_2_3880181_1141100473890_176247_351'/>
-							<geometry>645, 182; 960, 182; </geometry>
+							<geometry>735, 182; 1020, 182; </geometry>
 							<linkNameID xmi.idref='_9_0_2_3880181_1141172578078_76287_1965'/>
 							<nameVisible xmi.value='true'/>
 							<mdOwnedViews>
 								<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172578078_880836_1930'>
 									<editable xmi.value='false'/>
 									<visible xmi.value='false'/>
-									<geometry>787, 152, 30, 15</geometry>
+									<geometry>862, 170, 30, 15</geometry>
 								</mdElement>
 								<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141172578078_402883_1932'>
 									<editable xmi.value='false'/>
 									<visible xmi.value='false'/>
-									<geometry>787, 197, 30, 15</geometry>
+									<geometry>862, 195, 30, 15</geometry>
 								</mdElement>
 								<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172578078_248924_1935'>
 									<editable xmi.value='false'/>
 									<visible xmi.value='false'/>
-									<geometry>307, 0, 30, 15</geometry>
+									<geometry>682, 31, 30, 15</geometry>
 									<text>&lt;html&gt;
 &lt;body&gt;
 &lt;p&gt;&lt;/p&gt;
@@ -5386,28 +5322,28 @@ window to show page</text>
 								</mdElement>
 								<mdElement elementClass='RoleView' xmi.id='_9_0_2_3880181_1141172578078_645463_1937'>
 									<elementID xmi.idref='_9_0_2_3880181_1141172578078_536346_1926'/>
-									<geometry>645, 177, 10, 10</geometry>
+									<geometry>735, 177, 10, 10</geometry>
 									<mdOwnedViews>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172578078_904720_1938'>
 											<visible xmi.value='false'/>
-											<geometry>645, 177, 30, 15</geometry>
+											<geometry>735, 177, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172578078_150777_1940'>
 											<visible xmi.value='false'/>
-											<geometry>645, 177, 30, 15</geometry>
+											<geometry>735, 177, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172578078_954275_1942'>
 											<visible xmi.value='false'/>
-											<geometry>645, 177, 30, 15</geometry>
+											<geometry>735, 177, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141172578078_976621_1944'>
 											<editable xmi.value='false'/>
 											<visible xmi.value='false'/>
-											<geometry>645, 197, 30, 15</geometry>
+											<geometry>735, 197, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172578078_107326_1947'>
 											<visible xmi.value='false'/>
-											<geometry>645, 177, 30, 15</geometry>
+											<geometry>735, 177, 30, 15</geometry>
 											<text>&lt;html&gt;
 &lt;body&gt;
 &lt;p&gt;&lt;/p&gt;
@@ -5423,28 +5359,28 @@ window to show page</text>
 								</mdElement>
 								<mdElement elementClass='RoleView' xmi.id='_9_0_2_3880181_1141172578078_703266_1951'>
 									<elementID xmi.idref='_9_0_2_3880181_1141172578078_273181_1927'/>
-									<geometry>950, 177, 10, 10</geometry>
+									<geometry>1010, 177, 10, 10</geometry>
 									<mdOwnedViews>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172578078_698938_1952'>
 											<visible xmi.value='false'/>
-											<geometry>950, 177, 30, 15</geometry>
+											<geometry>1010, 177, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172578078_26987_1954'>
 											<visible xmi.value='false'/>
-											<geometry>950, 177, 30, 15</geometry>
+											<geometry>1010, 177, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172578078_919192_1956'>
 											<visible xmi.value='false'/>
-											<geometry>950, 177, 30, 15</geometry>
+											<geometry>1010, 177, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141172578078_26271_1958'>
 											<editable xmi.value='false'/>
 											<visible xmi.value='false'/>
-											<geometry>950, 197, 30, 15</geometry>
+											<geometry>1010, 197, 30, 15</geometry>
 										</mdElement>
 										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172578078_710440_1961'>
 											<visible xmi.value='false'/>
-											<geometry>950, 177, 30, 15</geometry>
+											<geometry>1010, 177, 30, 15</geometry>
 											<text>&lt;html&gt;
 &lt;body&gt;
 &lt;p&gt;&lt;/p&gt;
@@ -5460,7 +5396,7 @@ window to show page</text>
 								</mdElement>
 								<mdElement elementClass='AssociationTextBoxView' xmi.id='_9_0_2_3880181_1141172578078_76287_1965'>
 									<visible xmi.value='false'/>
-									<geometry>780, 167, 45, 15</geometry>
+									<geometry>855, 170, 45, 15</geometry>
 								</mdElement>
 							</mdOwnedViews>
 							<linkConstraintID xmi.idref='_9_0_2_3880181_1141172578078_880836_1930'/>
@@ -5472,11 +5408,506 @@ window to show page</text>
 						<mdElement elementClass='NoteAnchorView' xmi.id='_9_0_2_3880181_1141173661468_814101_2117'>
 							<linkFirstEndID xmi.idref='_9_0_2_3880181_1141172219609_354048_1683'/>
 							<linkSecondEndID xmi.idref='_9_0_2_3880181_1141173645218_148712_2109'/>
-							<geometry>794, 930; 967, 756; </geometry>
+							<geometry>820, 1121; 960, 1154; </geometry>
 						</mdElement>
 						<mdElement elementClass='NoteView' xmi.id='_9_0_2_3880181_1141173645218_148712_2109'>
-							<geometry>920, 690, 160, 66</geometry>
-							<text>Similar to what workspace dialog does, used to select the set of users for a lesson</text>
+							<geometry>960, 1140, 160, 66</geometry>
+							<text>Similar to what workspace dialog does, selects the set of users for a lesson</text>
+						</mdElement>
+						<mdElement elementClass='PackageView' xmi.id='_9_0_2_3880181_1141176759156_522466_2268'>
+							<elementID xmi.idref='_9_0_2_3880181_1141176759156_727651_2267'/>
+							<geometry>280, 920, 663, 376</geometry>
+							<mdOwnedViews>
+								<mdElement elementClass='AssociationView' xmi.id='_9_0_2_3880181_1141172351843_849749_1797'>
+									<elementID xmi.idref='_9_0_2_3880181_1141172351843_779945_1796'/>
+									<linkFirstEndID xmi.idref='_9_0_2_3880181_1141166179078_670281_1516'/>
+									<linkSecondEndID xmi.idref='_9_0_2_3880181_1141172334906_647678_1774'/>
+									<geometry>416, 1221; 460, 1221; </geometry>
+									<linkNameID xmi.idref='_9_0_2_3880181_1141172351843_423855_1833'/>
+									<nameVisible xmi.value='true'/>
+									<mdOwnedViews>
+										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172351843_800261_1798'>
+											<editable xmi.value='false'/>
+											<visible xmi.value='false'/>
+											<geometry>492, 1665, 30, 15</geometry>
+										</mdElement>
+										<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141172351843_532272_1800'>
+											<editable xmi.value='false'/>
+											<visible xmi.value='false'/>
+											<geometry>492, 1693, 30, 15</geometry>
+										</mdElement>
+										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172351843_676240_1803'>
+											<editable xmi.value='false'/>
+											<visible xmi.value='false'/>
+											<geometry>401, 105, 30, 15</geometry>
+											<text>&lt;html&gt;
+&lt;body&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</text>
+										</mdElement>
+										<mdElement elementClass='RoleView' xmi.id='_9_0_2_3880181_1141172351843_80083_1805'>
+											<elementID xmi.idref='_9_0_2_3880181_1141172351843_312824_1794'/>
+											<geometry>416, 1216, 10, 10</geometry>
+											<mdOwnedViews>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172351843_694092_1806'>
+													<visible xmi.value='false'/>
+													<geometry>416, 1216, 30, 15</geometry>
+												</mdElement>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172351843_59524_1808'>
+													<visible xmi.value='false'/>
+													<geometry>416, 1216, 30, 15</geometry>
+												</mdElement>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172351843_559100_1810'>
+													<visible xmi.value='false'/>
+													<geometry>416, 1216, 30, 15</geometry>
+												</mdElement>
+												<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141172351843_312840_1812'>
+													<editable xmi.value='false'/>
+													<visible xmi.value='false'/>
+													<geometry>416, 1236, 30, 15</geometry>
+												</mdElement>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172351843_633059_1815'>
+													<visible xmi.value='false'/>
+													<geometry>416, 1216, 30, 15</geometry>
+													<text>&lt;html&gt;
+&lt;body&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</text>
+												</mdElement>
+											</mdOwnedViews>
+											<roleNameID xmi.idref='_9_0_2_3880181_1141172351843_694092_1806'/>
+											<roleMultiplicityID xmi.idref='_9_0_2_3880181_1141172351843_59524_1808'/>
+											<roleConstraintsID xmi.idref='_9_0_2_3880181_1141172351843_559100_1810'/>
+											<roleStereotypeID xmi.idref='_9_0_2_3880181_1141172351843_312840_1812'/>
+											<roleTaggedValuesID xmi.idref='_9_0_2_3880181_1141172351843_633059_1815'/>
+										</mdElement>
+										<mdElement elementClass='RoleView' xmi.id='_9_0_2_3880181_1141172351843_561891_1819'>
+											<elementID xmi.idref='_9_0_2_3880181_1141172351843_271904_1795'/>
+											<geometry>450, 1216, 10, 10</geometry>
+											<mdOwnedViews>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172351843_431281_1820'>
+													<visible xmi.value='false'/>
+													<geometry>450, 1216, 30, 15</geometry>
+												</mdElement>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172351843_508942_1822'>
+													<visible xmi.value='false'/>
+													<geometry>450, 1216, 30, 15</geometry>
+												</mdElement>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172351843_792027_1824'>
+													<visible xmi.value='false'/>
+													<geometry>450, 1216, 30, 15</geometry>
+												</mdElement>
+												<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141172351843_904560_1826'>
+													<editable xmi.value='false'/>
+													<visible xmi.value='false'/>
+													<geometry>450, 1236, 30, 15</geometry>
+												</mdElement>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172351843_629699_1829'>
+													<visible xmi.value='false'/>
+													<geometry>450, 1216, 30, 15</geometry>
+													<text>&lt;html&gt;
+&lt;body&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</text>
+												</mdElement>
+											</mdOwnedViews>
+											<roleNameID xmi.idref='_9_0_2_3880181_1141172351843_431281_1820'/>
+											<roleMultiplicityID xmi.idref='_9_0_2_3880181_1141172351843_508942_1822'/>
+											<roleConstraintsID xmi.idref='_9_0_2_3880181_1141172351843_792027_1824'/>
+											<roleStereotypeID xmi.idref='_9_0_2_3880181_1141172351843_904560_1826'/>
+											<roleTaggedValuesID xmi.idref='_9_0_2_3880181_1141172351843_629699_1829'/>
+										</mdElement>
+										<mdElement elementClass='AssociationTextBoxView' xmi.id='_9_0_2_3880181_1141172351843_423855_1833'>
+											<visible xmi.value='false'/>
+											<geometry>485, 1665, 45, 15</geometry>
+										</mdElement>
+									</mdOwnedViews>
+									<linkConstraintID xmi.idref='_9_0_2_3880181_1141172351843_800261_1798'/>
+									<linkStereotypeID xmi.idref='_9_0_2_3880181_1141172351843_532272_1800'/>
+									<linkTaggedValuesID xmi.idref='_9_0_2_3880181_1141172351843_676240_1803'/>
+									<associationFirstEndID xmi.idref='_9_0_2_3880181_1141172351843_80083_1805'/>
+									<associationSecondEndID xmi.idref='_9_0_2_3880181_1141172351843_561891_1819'/>
+								</mdElement>
+								<mdElement elementClass='AssociationView' xmi.id='_9_0_2_3880181_1141172374828_422826_1839'>
+									<elementID xmi.idref='_9_0_2_3880181_1141172374828_45184_1838'/>
+									<linkFirstEndID xmi.idref='_9_0_2_3880181_1141172194421_482789_1664'/>
+									<linkSecondEndID xmi.idref='_9_0_2_3880181_1141166179078_670281_1516'/>
+									<geometry>416, 1100; 416, 1140; </geometry>
+									<linkNameID xmi.idref='_9_0_2_3880181_1141172374828_941286_1875'/>
+									<nameVisible xmi.value='true'/>
+									<mdOwnedViews>
+										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172374828_33929_1840'>
+											<editable xmi.value='false'/>
+											<visible xmi.value='false'/>
+											<geometry>779, 1140, 30, 15</geometry>
+										</mdElement>
+										<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141172374828_378153_1842'>
+											<editable xmi.value='false'/>
+											<visible xmi.value='false'/>
+											<geometry>780, 1141, 30, 15</geometry>
+										</mdElement>
+										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172374828_880639_1845'>
+											<editable xmi.value='false'/>
+											<visible xmi.value='false'/>
+											<geometry>115, 1092, 30, 15</geometry>
+											<text>&lt;html&gt;
+&lt;body&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</text>
+										</mdElement>
+										<mdElement elementClass='RoleView' xmi.id='_9_0_2_3880181_1141172374828_187635_1847'>
+											<elementID xmi.idref='_9_0_2_3880181_1141172374828_287523_1836'/>
+											<geometry>411, 1100, 10, 10</geometry>
+											<mdOwnedViews>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172374828_18546_1848'>
+													<visible xmi.value='false'/>
+													<geometry>411, 1100, 30, 15</geometry>
+												</mdElement>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172374828_947230_1850'>
+													<visible xmi.value='false'/>
+													<geometry>411, 1100, 30, 15</geometry>
+												</mdElement>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172374828_907299_1852'>
+													<visible xmi.value='false'/>
+													<geometry>411, 1100, 30, 15</geometry>
+												</mdElement>
+												<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141172374828_996708_1854'>
+													<editable xmi.value='false'/>
+													<visible xmi.value='false'/>
+													<geometry>411, 1120, 30, 15</geometry>
+												</mdElement>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172374828_140141_1857'>
+													<visible xmi.value='false'/>
+													<geometry>411, 1100, 30, 15</geometry>
+													<text>&lt;html&gt;
+&lt;body&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</text>
+												</mdElement>
+											</mdOwnedViews>
+											<roleNameID xmi.idref='_9_0_2_3880181_1141172374828_18546_1848'/>
+											<roleMultiplicityID xmi.idref='_9_0_2_3880181_1141172374828_947230_1850'/>
+											<roleConstraintsID xmi.idref='_9_0_2_3880181_1141172374828_907299_1852'/>
+											<roleStereotypeID xmi.idref='_9_0_2_3880181_1141172374828_996708_1854'/>
+											<roleTaggedValuesID xmi.idref='_9_0_2_3880181_1141172374828_140141_1857'/>
+										</mdElement>
+										<mdElement elementClass='RoleView' xmi.id='_9_0_2_3880181_1141172374828_651474_1861'>
+											<elementID xmi.idref='_9_0_2_3880181_1141172374828_362336_1837'/>
+											<geometry>416, 1135, 10, 10</geometry>
+											<mdOwnedViews>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172374828_665606_1862'>
+													<visible xmi.value='false'/>
+													<geometry>416, 1135, 30, 15</geometry>
+												</mdElement>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172374828_909642_1864'>
+													<visible xmi.value='false'/>
+													<geometry>416, 1135, 30, 15</geometry>
+												</mdElement>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172374828_457655_1866'>
+													<visible xmi.value='false'/>
+													<geometry>416, 1135, 30, 15</geometry>
+												</mdElement>
+												<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141172374828_294336_1868'>
+													<editable xmi.value='false'/>
+													<visible xmi.value='false'/>
+													<geometry>416, 1155, 30, 15</geometry>
+												</mdElement>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141172374828_158971_1871'>
+													<visible xmi.value='false'/>
+													<geometry>416, 1135, 30, 15</geometry>
+													<text>&lt;html&gt;
+&lt;body&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</text>
+												</mdElement>
+											</mdOwnedViews>
+											<roleNameID xmi.idref='_9_0_2_3880181_1141172374828_665606_1862'/>
+											<roleMultiplicityID xmi.idref='_9_0_2_3880181_1141172374828_909642_1864'/>
+											<roleConstraintsID xmi.idref='_9_0_2_3880181_1141172374828_457655_1866'/>
+											<roleStereotypeID xmi.idref='_9_0_2_3880181_1141172374828_294336_1868'/>
+											<roleTaggedValuesID xmi.idref='_9_0_2_3880181_1141172374828_158971_1871'/>
+										</mdElement>
+										<mdElement elementClass='AssociationTextBoxView' xmi.id='_9_0_2_3880181_1141172374828_941286_1875'>
+											<visible xmi.value='false'/>
+											<geometry>772, 1140, 45, 15</geometry>
+										</mdElement>
+									</mdOwnedViews>
+									<linkConstraintID xmi.idref='_9_0_2_3880181_1141172374828_33929_1840'/>
+									<linkStereotypeID xmi.idref='_9_0_2_3880181_1141172374828_378153_1842'/>
+									<linkTaggedValuesID xmi.idref='_9_0_2_3880181_1141172374828_880639_1845'/>
+									<associationFirstEndID xmi.idref='_9_0_2_3880181_1141172374828_187635_1847'/>
+									<associationSecondEndID xmi.idref='_9_0_2_3880181_1141172374828_651474_1861'/>
+								</mdElement>
+								<mdElement elementClass='ClassView' xmi.id='_9_0_2_3880181_1141172334906_647678_1774'>
+									<elementID xmi.idref='_9_0_2_3880181_1141172334906_58792_1773'/>
+									<geometry>460, 1140, 154, 103</geometry>
+								</mdElement>
+								<mdElement elementClass='ClassView' xmi.id='_9_0_2_3880181_1141166179078_670281_1516'>
+									<elementID xmi.idref='_9_0_2_3880181_1141166179078_353699_1515'/>
+									<geometry>290, 1140, 126, 100</geometry>
+								</mdElement>
+								<mdElement elementClass='ClassView' xmi.id='_9_0_2_3880181_1141172194421_482789_1664'>
+									<elementID xmi.idref='_9_0_2_3880181_1141172194421_723777_1663'/>
+									<geometry>300, 990, 211, 110</geometry>
+								</mdElement>
+								<mdElement elementClass='ClassView' xmi.id='_9_0_2_3880181_1141172219609_354048_1683'>
+									<elementID xmi.idref='_9_0_2_3880181_1141172219609_664712_1682'/>
+									<geometry>660, 1050, 160, 100</geometry>
+								</mdElement>
+								<mdElement elementClass='AssociationView' xmi.id='_9_0_2_3880181_1141175640062_641889_2208'>
+									<elementID xmi.idref='_9_0_2_3880181_1141175640062_987766_2207'/>
+									<linkFirstEndID xmi.idref='_9_0_2_3880181_1141172194421_482789_1664'/>
+									<linkSecondEndID xmi.idref='_9_0_2_3880181_1141172219609_354048_1683'/>
+									<geometry>511, 1045; 710, 1045; 710, 1050; </geometry>
+									<linkNameID xmi.idref='_9_0_2_3880181_1141175640062_580207_2244'/>
+									<nameVisible xmi.value='true'/>
+									<mdOwnedViews>
+										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141175640062_700554_2209'>
+											<editable xmi.value='false'/>
+											<visible xmi.value='false'/>
+											<geometry>1036, 1253, 30, 15</geometry>
+										</mdElement>
+										<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141175640062_590948_2211'>
+											<editable xmi.value='false'/>
+											<visible xmi.value='false'/>
+											<geometry>1037, 1272, 30, 15</geometry>
+										</mdElement>
+										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141175640062_620536_2214'>
+											<editable xmi.value='false'/>
+											<visible xmi.value='false'/>
+											<geometry>455, 84, 30, 15</geometry>
+											<text>&lt;html&gt;
+&lt;body&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</text>
+										</mdElement>
+										<mdElement elementClass='RoleView' xmi.id='_9_0_2_3880181_1141175640062_516044_2216'>
+											<elementID xmi.idref='_9_0_2_3880181_1141175640062_192344_2205'/>
+											<geometry>511, 1040, 10, 10</geometry>
+											<mdOwnedViews>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141175640062_834842_2217'>
+													<visible xmi.value='false'/>
+													<geometry>511, 1040, 30, 15</geometry>
+												</mdElement>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141175640062_858852_2219'>
+													<visible xmi.value='false'/>
+													<geometry>511, 1040, 30, 15</geometry>
+												</mdElement>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141175640062_335952_2221'>
+													<visible xmi.value='false'/>
+													<geometry>511, 1040, 30, 15</geometry>
+												</mdElement>
+												<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141175640062_306590_2223'>
+													<editable xmi.value='false'/>
+													<visible xmi.value='false'/>
+													<geometry>511, 1060, 30, 15</geometry>
+												</mdElement>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141175640062_111920_2226'>
+													<visible xmi.value='false'/>
+													<geometry>511, 1040, 30, 15</geometry>
+													<text>&lt;html&gt;
+&lt;body&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</text>
+												</mdElement>
+											</mdOwnedViews>
+											<roleNameID xmi.idref='_9_0_2_3880181_1141175640062_834842_2217'/>
+											<roleMultiplicityID xmi.idref='_9_0_2_3880181_1141175640062_858852_2219'/>
+											<roleConstraintsID xmi.idref='_9_0_2_3880181_1141175640062_335952_2221'/>
+											<roleStereotypeID xmi.idref='_9_0_2_3880181_1141175640062_306590_2223'/>
+											<roleTaggedValuesID xmi.idref='_9_0_2_3880181_1141175640062_111920_2226'/>
+										</mdElement>
+										<mdElement elementClass='RoleView' xmi.id='_9_0_2_3880181_1141175640062_599940_2230'>
+											<elementID xmi.idref='_9_0_2_3880181_1141175640062_957076_2206'/>
+											<geometry>705, 1040, 10, 10</geometry>
+											<mdOwnedViews>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141175640062_627998_2231'>
+													<visible xmi.value='false'/>
+													<geometry>705, 1040, 30, 15</geometry>
+												</mdElement>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141175640062_507689_2233'>
+													<visible xmi.value='false'/>
+													<geometry>705, 1040, 30, 15</geometry>
+												</mdElement>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141175640062_262162_2235'>
+													<visible xmi.value='false'/>
+													<geometry>705, 1040, 30, 15</geometry>
+												</mdElement>
+												<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141175640062_698223_2237'>
+													<editable xmi.value='false'/>
+													<visible xmi.value='false'/>
+													<geometry>705, 1020, 30, 15</geometry>
+												</mdElement>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141175640062_928058_2240'>
+													<visible xmi.value='false'/>
+													<geometry>705, 1040, 30, 15</geometry>
+													<text>&lt;html&gt;
+&lt;body&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</text>
+												</mdElement>
+											</mdOwnedViews>
+											<roleNameID xmi.idref='_9_0_2_3880181_1141175640062_627998_2231'/>
+											<roleMultiplicityID xmi.idref='_9_0_2_3880181_1141175640062_507689_2233'/>
+											<roleConstraintsID xmi.idref='_9_0_2_3880181_1141175640062_262162_2235'/>
+											<roleStereotypeID xmi.idref='_9_0_2_3880181_1141175640062_698223_2237'/>
+											<roleTaggedValuesID xmi.idref='_9_0_2_3880181_1141175640062_928058_2240'/>
+										</mdElement>
+										<mdElement elementClass='AssociationTextBoxView' xmi.id='_9_0_2_3880181_1141175640062_580207_2244'>
+											<visible xmi.value='false'/>
+											<geometry>1029, 1253, 45, 15</geometry>
+										</mdElement>
+									</mdOwnedViews>
+									<linkConstraintID xmi.idref='_9_0_2_3880181_1141175640062_700554_2209'/>
+									<linkStereotypeID xmi.idref='_9_0_2_3880181_1141175640062_590948_2211'/>
+									<linkTaggedValuesID xmi.idref='_9_0_2_3880181_1141175640062_620536_2214'/>
+									<associationFirstEndID xmi.idref='_9_0_2_3880181_1141175640062_516044_2216'/>
+									<associationSecondEndID xmi.idref='_9_0_2_3880181_1141175640062_599940_2230'/>
+								</mdElement>
+								<mdElement elementClass='ClassView' xmi.id='_9_0_2_3880181_1141177343718_33489_2335'>
+									<elementID xmi.idref='_9_0_2_3880181_1141177343718_948720_2334'/>
+									<geometry>660, 1170, 166, 87</geometry>
+								</mdElement>
+								<mdElement elementClass='AssociationView' xmi.id='_9_0_2_3880181_1141177871781_214790_2365'>
+									<elementID xmi.idref='_9_0_2_3880181_1141177871781_598731_2364'/>
+									<linkFirstEndID xmi.idref='_9_0_2_3880181_1141172194421_482789_1664'/>
+									<linkSecondEndID xmi.idref='_9_0_2_3880181_1141177343718_33489_2335'/>
+									<geometry>511, 1100; 511, 1110; 635, 1110; 635, 1170; 660, 1170; </geometry>
+									<linkNameID xmi.idref='_9_0_2_3880181_1141177871781_867392_2401'/>
+									<nameVisible xmi.value='true'/>
+									<mdOwnedViews>
+										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141177871781_666635_2366'>
+											<editable xmi.value='false'/>
+											<visible xmi.value='false'/>
+											<geometry>596, 1081, 30, 15</geometry>
+										</mdElement>
+										<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141177871781_135566_2368'>
+											<editable xmi.value='false'/>
+											<visible xmi.value='false'/>
+											<geometry>596, 1123, 30, 15</geometry>
+										</mdElement>
+										<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141177871781_309113_2371'>
+											<editable xmi.value='false'/>
+											<visible xmi.value='false'/>
+											<geometry>1347, 976, 30, 15</geometry>
+											<text>&lt;html&gt;
+&lt;body&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</text>
+										</mdElement>
+										<mdElement elementClass='RoleView' xmi.id='_9_0_2_3880181_1141177871781_417699_2373'>
+											<elementID xmi.idref='_9_0_2_3880181_1141177871781_972232_2362'/>
+											<geometry>511, 1095, 10, 10</geometry>
+											<mdOwnedViews>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141177871781_529259_2374'>
+													<visible xmi.value='false'/>
+													<geometry>511, 1095, 30, 15</geometry>
+												</mdElement>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141177871781_586303_2376'>
+													<visible xmi.value='false'/>
+													<geometry>511, 1095, 30, 15</geometry>
+												</mdElement>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141177871781_420160_2378'>
+													<visible xmi.value='false'/>
+													<geometry>511, 1095, 30, 15</geometry>
+												</mdElement>
+												<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141177871781_721475_2380'>
+													<editable xmi.value='false'/>
+													<visible xmi.value='false'/>
+													<geometry>511, 1115, 30, 15</geometry>
+												</mdElement>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141177871781_302184_2383'>
+													<visible xmi.value='false'/>
+													<geometry>511, 1095, 30, 15</geometry>
+													<text>&lt;html&gt;
+&lt;body&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</text>
+												</mdElement>
+											</mdOwnedViews>
+											<roleNameID xmi.idref='_9_0_2_3880181_1141177871781_529259_2374'/>
+											<roleMultiplicityID xmi.idref='_9_0_2_3880181_1141177871781_586303_2376'/>
+											<roleConstraintsID xmi.idref='_9_0_2_3880181_1141177871781_420160_2378'/>
+											<roleStereotypeID xmi.idref='_9_0_2_3880181_1141177871781_721475_2380'/>
+											<roleTaggedValuesID xmi.idref='_9_0_2_3880181_1141177871781_302184_2383'/>
+										</mdElement>
+										<mdElement elementClass='RoleView' xmi.id='_9_0_2_3880181_1141177871781_605223_2387'>
+											<elementID xmi.idref='_9_0_2_3880181_1141177871781_874899_2363'/>
+											<geometry>650, 1165, 10, 10</geometry>
+											<mdOwnedViews>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141177871781_523210_2388'>
+													<visible xmi.value='false'/>
+													<geometry>650, 1165, 30, 15</geometry>
+												</mdElement>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141177871781_57289_2390'>
+													<visible xmi.value='false'/>
+													<geometry>650, 1165, 30, 15</geometry>
+												</mdElement>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141177871781_319882_2392'>
+													<visible xmi.value='false'/>
+													<geometry>650, 1165, 30, 15</geometry>
+												</mdElement>
+												<mdElement elementClass='TextBoxWithIconView' xmi.id='_9_0_2_3880181_1141177871781_730368_2394'>
+													<editable xmi.value='false'/>
+													<visible xmi.value='false'/>
+													<geometry>650, 1185, 30, 15</geometry>
+												</mdElement>
+												<mdElement elementClass='TextBoxView' xmi.id='_9_0_2_3880181_1141177871781_74745_2397'>
+													<visible xmi.value='false'/>
+													<geometry>650, 1165, 30, 15</geometry>
+													<text>&lt;html&gt;
+&lt;body&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</text>
+												</mdElement>
+											</mdOwnedViews>
+											<roleNameID xmi.idref='_9_0_2_3880181_1141177871781_523210_2388'/>
+											<roleMultiplicityID xmi.idref='_9_0_2_3880181_1141177871781_57289_2390'/>
+											<roleConstraintsID xmi.idref='_9_0_2_3880181_1141177871781_319882_2392'/>
+											<roleStereotypeID xmi.idref='_9_0_2_3880181_1141177871781_730368_2394'/>
+											<roleTaggedValuesID xmi.idref='_9_0_2_3880181_1141177871781_74745_2397'/>
+										</mdElement>
+										<mdElement elementClass='AssociationTextBoxView' xmi.id='_9_0_2_3880181_1141177871781_867392_2401'>
+											<visible xmi.value='false'/>
+											<geometry>589, 1097, 45, 15</geometry>
+										</mdElement>
+									</mdOwnedViews>
+									<linkConstraintID xmi.idref='_9_0_2_3880181_1141177871781_666635_2366'/>
+									<linkStereotypeID xmi.idref='_9_0_2_3880181_1141177871781_135566_2368'/>
+									<linkTaggedValuesID xmi.idref='_9_0_2_3880181_1141177871781_309113_2371'/>
+									<associationFirstEndID xmi.idref='_9_0_2_3880181_1141177871781_417699_2373'/>
+									<associationSecondEndID xmi.idref='_9_0_2_3880181_1141177871781_605223_2387'/>
+								</mdElement>
+							</mdOwnedViews>
+						</mdElement>
+						<mdElement elementClass='NoteView' xmi.id='_9_0_2_3880181_1141177840375_407838_2353'>
+							<geometry>940, 1230, 200, 66</geometry>
+							<text>Use for selecting a group of users for assigning to a lesson and also for chosen grouping.</text>
+						</mdElement>
+						<mdElement elementClass='NoteAnchorView' xmi.id='_9_0_2_3880181_1141177867234_781411_2361'>
+							<linkFirstEndID xmi.idref='_9_0_2_3880181_1141177343718_33489_2335'/>
+							<linkSecondEndID xmi.idref='_9_0_2_3880181_1141177840375_407838_2353'/>
+							<geometry>826, 1228; 940, 1247; </geometry>
+						</mdElement>
+						<mdElement elementClass='PackageView' xmi.id='_9_0_2_3880181_1141177932140_136258_2405'>
+							<elementID xmi.idref='_9_0_2_3880181_1141167882265_660494_1631'/>
+							<geometry>0, 50, 265, 394</geometry>
+						</mdElement>
+						<mdElement elementClass='PackageView' xmi.id='_9_0_2_3880181_1141178462640_659297_2583'>
+							<elementID xmi.idref='_9_0_2_3880181_1141178462640_187189_2582'/>
+							<geometry>1010, 30, 302, 267</geometry>
 						</mdElement>
 					</mdOwnedViews>
 				</mdElement>
@@ -5612,7 +6043,7 @@ window to show page</text>
 					<mdElement elementClass='StringProperty'>
 						<propertyID>INFO_PROPERTY</propertyID>
 						<propertyDescriptionID>INFO_PROPERTY_DESCRIPTION</propertyDescriptionID>
-						<value>17 22 60 39 38 5c 65 60 6e 6f 3a b5 4c f7 53 4f fc 4 68 c 11 8c 21 a7 85 b4 1b 41 a8 8c bc c8 61 6b de 6d 8e 4b 89 8f 89 b0 ca a6 c6 16 99 f5 20 87 da 69 50 fc 4a 10 61 d0 80 81 30 39 fb 39 33 88 80 4d 6a 62 78 </value>
+						<value>17 22 60 39 38 5c 65 60 6e 6f 3a b5 4c f7 53 4f fc 4 68 c 11 8c 21 a5 85 b0 1d 41 a9 84 bc c8 61 6b de 6d 8e 4b 89 8f 89 b0 ca a6 c6 16 99 f5 20 87 da 69 50 fc 4a 10 61 d0 80 81 30 39 fb 39 33 88 80 4d 6a 62 78 </value>
 						<multiline xmi.value='false'/>
 					</mdElement>
 					<mdElement elementClass='ChoiceProperty'>
