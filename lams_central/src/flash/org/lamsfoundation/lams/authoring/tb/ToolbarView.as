@@ -2,6 +2,7 @@
 import org.lamsfoundation.lams.authoring.tb.*
 import org.lamsfoundation.lams.common.mvc.*
 import org.lamsfoundation.lams.common.style.*
+import org.lamsfoundation.lams.common.dict.*
 import mx.managers.*
 import mx.controls.*
 /*
@@ -21,7 +22,7 @@ class ToolbarView extends AbstractView {
 	private var optional_btn:Button;
 	private var gate_btn:Button;
 	private var preview_btn:Button;
-	
+	private var _dictionary:Dictionary;
 	
     //Defined so compiler can 'see' events added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
@@ -36,8 +37,11 @@ class ToolbarView extends AbstractView {
 	*/
 	public function ToolbarView (){
         //Set up to use Flash Event Delegation model
+		
         mx.events.EventDispatcher.initialize(this);  
 		_tm = ThemeManager.getInstance();
+		_dictionary = Dictionary.getInstance();
+		_dictionary.addEventListener('init',Proxy.create(this,setupLabels));
 	}
     
     /**
@@ -46,6 +50,8 @@ class ToolbarView extends AbstractView {
     public function init(m:Observable, c:Controller) {
 		//Invoke superconstructor, which sets up MVC relationships.
 		super (m, c);
+		
+		
         //In one frame call createToolbar this gives components one frame to setup etc.
         MovieClipUtils.doLater(Proxy.create(this,createToolbar));		
     }
@@ -64,7 +70,9 @@ class ToolbarView extends AbstractView {
 		
         //Add the button handlers, essentially this is handing on clicked event to controller.
         var controller = getController();
-
+		
+		
+		
 		_toolbar_mc.new_btn.addEventListener("click",controller);
 		_toolbar_mc.open_btn.addEventListener("click",controller);
 		_toolbar_mc.save_btn.addEventListener("click",controller);
@@ -82,7 +90,19 @@ class ToolbarView extends AbstractView {
        //Now that view is setup dispatch loaded event
        dispatchEvent({type:'load',target:this});
 	}
-	
+	public function setupLabels(){
+		
+		_toolbar_mc.new_btn.label = Dictionary.getValue('new_btn');
+		_toolbar_mc.open_btn.label = Dictionary.getValue('open_btn');
+		_toolbar_mc.save_btn.label = Dictionary.getValue('save_btn');
+		_toolbar_mc.copy_btn.label = Dictionary.getValue('copy_btn');
+		_toolbar_mc.paste_btn.label = Dictionary.getValue('paste_btn');
+		_toolbar_mc.trans_btn.label = Dictionary.getValue('trans_btn');
+		_toolbar_mc.optional_btn.label = Dictionary.getValue('optional_btn');
+		_toolbar_mc.gate_btn.label = Dictionary.getValue('gate_btn');
+		_toolbar_mc.group_btn.label = Dictionary.getValue('group_btn');
+		_toolbar_mc.preview_btn.label = Dictionary.getValue('preview_btn');
+			}
 	/*
 	* Updates state of the Toolbar, called by Toolbar Model
 	*
