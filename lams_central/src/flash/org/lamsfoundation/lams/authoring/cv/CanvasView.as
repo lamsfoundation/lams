@@ -1,5 +1,6 @@
 ﻿import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.common.ui.*
+import org.lamsfoundation.lams.common.style.*
 import org.lamsfoundation.lams.authoring.cv.*
 import org.lamsfoundation.lams.authoring.*
 import org.lamsfoundation.lams.common.dict.*
@@ -21,6 +22,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends AbstractView{
 	private var GRID_WIDTH:Number;
 	private var H_GAP:Number;
 	private var V_GAP:Number;
+	
+	private var _tm:ThemeManager;
 	
 	//Canvas clip
 	private var _canvas_mc:MovieClip;
@@ -45,6 +48,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends AbstractView{
 	*/
 	function CanvasView(){
 		_canvasView = this;
+		_tm = ThemeManager.getInstance();
         //Init for event delegation
         mx.events.EventDispatcher.initialize(this);
 	}
@@ -87,9 +91,6 @@ public function viewUpdate(event:Object):Void{
                 break;
             case 'SIZE' :
                 setSize(cm);
-                break;
-            case 'DRAW_DESIGN' :
-                drawDesign(cm);
                 break;
             case 'DRAW_ACTIVITY':
                 drawActivity(event.data,cm);
@@ -151,7 +152,7 @@ public function viewUpdate(event:Object):Void{
 		}
 		bkg_pnl.useHandCursor = false;
 		
-		
+		setStyles();
 	/*	
 		//var s = canvasModel.getSize();
         
@@ -167,16 +168,6 @@ public function viewUpdate(event:Object):Void{
         dispatchEvent({type:'load',target:this});
 	}
    
-	
-	/**
-	 * Renders the whole design to the canvas
-	 * @usage   
-	 * @param   o - The Canvas MOdel
-	 * @return  
-	 */
-	private function drawDesign(cm:CanvasModel):Void{
-		Debugger.log('Running - !!!!NOT IMPLEMENTED!!!!',4,'drawDesign','CanvasView');
-	}
 	
 	/**
 	 * Draws new or replaces existing activity to canvas stage.
@@ -363,8 +354,8 @@ public function viewUpdate(event:Object):Void{
 		canvas_scp.setSize(s.w,s.h);
 		bkg_pnl.setSize(s.w,s.h);
 
-		//Create the grid.  The gris is re-dwarn ech time the canvas is res-zed.
-		var grid_mc = Grid.drawGrid(_gridLayer_mc,s.w,s.h,V_GAP,H_GAP);
+		//Create the grid.  The gris is re-drawn each time the canvas is resized.
+		var grid_mc = Grid.drawGrid(_gridLayer_mc,Math.round(s.w),Math.round(s.h),V_GAP,H_GAP);
 		//Debugger.log('grid_mc depth:'+grid_mc.getDepth(),4,'setSize','CanvasView');
 		//Debugger.log('_activityLayer_mc depth:'+_activityLayer_mc.getDepth(),4,'setSize','CanvasView');
 		//position bin in canvas.  
@@ -374,6 +365,21 @@ public function viewUpdate(event:Object):Void{
 		
 	}
 	
+	/**
+	 * Get the CSSStyleDeclaration objects for each component and apply them
+	 * directly to the instance
+	 * @usage   
+	 * @return  
+	 */
+	private function setStyles() {
+        
+		var styleObj = _tm.getStyleObject('CanvasPanel');
+		bkg_pnl.setStyle('styleName',styleObj);
+		
+		
+		
+    }
+    
 	
 	
     /**
