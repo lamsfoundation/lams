@@ -20,6 +20,7 @@ class PropertyInspector extends MovieClip{
 	
 	private var _canvasModel:CanvasModel;
 	private var _canvasController:CanvasController;
+	private var _dictionary:Dictionary;
 	 //References to components + clips 
     private var _container:MovieClip;       //The container window that holds the dialog. Will contain any init params that were passed into createPopUp
    
@@ -63,7 +64,12 @@ class PropertyInspector extends MovieClip{
 	private var rndGroup_radio:RadioButtonGroup;
 	private var numGroups_stp:NumericStepper;
 	private var numLearners_stp:NumericStepper;
-
+	
+	//Complex Activity
+	private var min_lbl:Label;
+	private var max_lbl:Label;
+	private var min_act:ComboBox;
+	private var max_act:ComboBox;
 	
 	//screen assets:
 	private var body_pnl:Panel;
@@ -88,6 +94,8 @@ class PropertyInspector extends MovieClip{
 		//let it wait one frame to set up the components.
 		MovieClipUtils.doLater(Proxy.create(this,init));
 		
+		//_dictionary = Dictionary.getInstance();
+		//_dictionary.addEventListener('init',Proxy.create(this,setupLabels));
 	}
 	
 	public function init():Void{
@@ -213,8 +221,22 @@ class PropertyInspector extends MovieClip{
 				//show the title
 				title_txt.text = StringUtils.cleanNull(a.title);
 			
+			}else if(a.isOptionalActivity()){
+				//its an optional activity
+				showOptionalControls(true);
+				showGroupingControls(false);
+				//showRelevantGroupOptions();
+				showToolActivityControls(false);
+				showGateControls(false);
+				showAppliedGroupingControls(true);
+				populateGroupingProperties(GroupingActivity(a));
+				showAppliedGroupingProperties(a);
+				//show the title
+				title_txt.text = StringUtils.cleanNull(a.title);
+			
 			}else{
 				//its a tool activity
+				showOptionalControls(false);
 				showGroupingControls(false);
 				showToolActivityControls(true);
 				showGateControls(false);
@@ -242,6 +264,7 @@ class PropertyInspector extends MovieClip{
 			showGroupingControls(false);
 			showToolActivityControls(false);
 			showGateControls(false);
+			showOptionalControls(false);
 		}
 	}
 	
@@ -258,7 +281,7 @@ class PropertyInspector extends MovieClip{
 					
 		currentGrouping_lbl.text = "GroupingUIID:"+StringUtils.cleanNull(ta.runOffline.groupingUIID);
 			
-		
+
 	}
 	
 	private function showGateActivityProperties(ga:GateActivity){
@@ -350,6 +373,15 @@ class PropertyInspector extends MovieClip{
 		runOffline_chk.visible = v;
 		defineLater_chk.visible = v;
 		editGrouping_btn.visible = v;
+	}
+	
+	private function showOptionalControls(v:Boolean){
+
+		min_lbl.visible = v		
+		max_lbl.visible = v;
+		min_act.visible = v;
+		max_act.visible = v;
+		
 	}
 	
 	private function showGateControls(v:Boolean){
