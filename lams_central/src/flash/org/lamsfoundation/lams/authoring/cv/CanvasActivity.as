@@ -3,6 +3,7 @@ import org.lamsfoundation.lams.common.util.*;
 import org.lamsfoundation.lams.common.util.ui.*;
 import org.lamsfoundation.lams.authoring.*;
 import org.lamsfoundation.lams.authoring.cv.*;
+import org.lamsfoundation.lams.common.style.*
 import com.polymercode.Draw;
 
 
@@ -14,14 +15,19 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
   
 	public static var TOOL_ACTIVITY_WIDTH:Number = 123.1;
 	public static var TOOL_ACTIVITY_HEIGHT:Number = 50.5;
-	public static var GATE_ACTIVITY_HEIGHT:Number = 30;
-	public static var GATE_ACTIVITY_WIDTH:Number = 30;
+	public static var GATE_ACTIVITY_HEIGHT:Number =50;
+	public static var GATE_ACTIVITY_WIDTH:Number = 50;
+	public static var ICON_WIDTH:Number = 30;
+	public static var ICON_HEIGHT:Number = 30;
 	
 	//this is set by the init object
 	private var _canvasController:CanvasController;
 	private var _canvasView:CanvasView;
+	private var _tm:ThemeManager;
 	//TODO:This should be ToolActivity
 	private var _activity:Activity;
+	
+	private var _isSelected:Boolean;
 	
 	//locals
 	private var icon_mc:MovieClip;
@@ -30,7 +36,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	private var groupIcon_mc:MovieClip;
 	private var stopSign_mc:MovieClip;	
 	private var clickTarget_mc:MovieClip;
-	private var canvasActivity_mc:MovieClip;	private var _dcStartTime:Number = 0;
+	private var canvasActivity_mc:MovieClip;
+	private var canvasActivityGrouped_mc:MovieClip;	private var _dcStartTime:Number = 0;
 	private var _doubleClicking:Boolean;
 	private var _visibleWidth:Number;
 	private var _visibleHeight:Number;
@@ -41,6 +48,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	
 	function CanvasActivity(){
 		//Debugger.log("_activity:"+_activity.title,4,'Constructor','CanvasActivity');
+		_tm = ThemeManager.getInstance();
 		//let it wait one frame to set up the components.
 		//this has to be set b4 the do later :)
 		if(_activity.isGateActivity()){
@@ -77,7 +85,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		if(!_activity.isGateActivity() && !_activity.isGroupActivity()){
 			loadIcon();
 		}
-		
+		setStyles();
 		MovieClipUtils.doLater(Proxy.create(this,draw));
 
 	}
@@ -89,6 +97,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		stopSign_mc._visible = isVisible;
 		canvasActivity_mc._visible = isVisible;
 		clickTarget_mc._visible = isVisible;
+		canvasActivityGrouped_mc._visible = isVisible;
 	}
 	
 	/**
@@ -98,6 +107,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	 */
 	public function refresh():Void{
 		draw();
+		setSelected(_isSelected);
 	}
 	
 	public function setSelected(isSelected){
@@ -108,10 +118,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			var tgt_mc;
 			if(_activity.isGateActivity()){
 				tgt_mc = stopSign_mc;			
+			}else if(_activity.groupingUIID > 0){
+				tgt_mc = canvasActivityGrouped_mc;
 			}else{
 				tgt_mc = canvasActivity_mc;
 			}
-			
+			Debugger.log("tgt_mc:"+tgt_mc,4,'setSelected','CanvasActivity');
 				//vars
 				var tl_x = tgt_mc._x - MARGIN; 							//top left x
 				var tl_y = tgt_mc._y - MARGIN;							//top left y
@@ -124,6 +136,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 				
 				
 				//dashTo(target:MovieClip, x1:Number, y1:Number,x2:Number, y2:Number, dashLength:Number, spaceLength:Number )
+				if(_selected_mc){
+					_selected_mc.removeMovieClip();
+				}
 				_selected_mc = _base_mc.createEmptyMovieClip('_selected_mc',_base_mc.getNextHighestDepth());
 				Draw.dashTo(_selected_mc,tl_x,tl_y,tr_x,tr_y,2,3,2,0x266DEE);
 				Draw.dashTo(_selected_mc,tr_x,tr_y,br_x,br_y,2,3,2,0x266DEE);
@@ -134,7 +149,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 				Draw.dashTo(_base_mc,br_x,br_y,bl_x,bl_y,2,3,2,0x266DEE);
 				Draw.dashTo(_base_mc,bl_x,bl_y,tl_x,tl_y,2,3,2,0x266DEE);
 				*/
-			
+				
+				_isSelected = isSelected;
 			
 			
 		}else{
@@ -173,9 +189,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	private function draw(){		Debugger.log(_activity.title+',_activity.isGateActivity():'+_activity.isGateActivity(),4,'draw','CanvasActivity');
 		
 		
-		
+		var theIcon_mc:MovieClip;
 		title_lbl._visible = true;
-		icon_mc._visible = true;
+		
 		clickTarget_mc._visible = true;
 		
 		if(_activity.isGateActivity()){
@@ -184,14 +200,38 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			title_lbl.visible=false;
 			clickTarget_mc._width = GATE_ACTIVITY_WIDTH;
 			clickTarget_mc._height= GATE_ACTIVITY_HEIGHT;
+			stopSign_mc._height= GATE_ACTIVITY_HEIGHT;
+			stopSign_mc._width= GATE_ACTIVITY_WIDTH;
+			stopSign_mc._x = 0;
+			stopSign_mc._y = 0;
+			
+			
 			
 		}else{
+			//chose the icon:
 			if(_activity.isGroupActivity()){
 				groupIcon_mc._visible = true;
+				icon_mc._visible = false;
+				theIcon_mc = groupIcon_mc;
 			}else{
 				groupIcon_mc._visible = false;
+				icon_mc._visible = true;
+				theIcon_mc = icon_mc;
 			}
-			canvasActivity_mc._visible=true;
+			theIcon_mc._width = ICON_WIDTH;
+			theIcon_mc._height = ICON_HEIGHT;
+			
+			
+			
+			//chose the background mc
+			if(_activity.groupingUIID > 0){
+				canvasActivityGrouped_mc._visible = true;
+				canvasActivity_mc._visible=false;
+			}else{
+				canvasActivity_mc._visible=true;
+				canvasActivityGrouped_mc._visible = false;
+			}
+			
 			title_lbl.visible=true;
 			//clickTarget_mc._visible=true;
 			stopSign_mc._visible = false;
@@ -204,10 +244,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			
 		}
 	
-		
-	
-		//indicate grouping
-		
+
 		//position
 		_x = _activity.xCoord;
 		_y = _activity.yCoord;
@@ -329,5 +366,24 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		_activity = a;
 	}
 
+
+	/**
+	 * Get the CSSStyleDeclaration objects for each component and applies them
+	 * directly to the instanced
+	 * @usage   
+	 * @return  
+	 */
+	private function setStyles() {
+		var styleObj = _tm.getStyleObject('label');
+		
+		title_lbl.setStyle('styleName',styleObj);
+		title_lbl.setStyle('textAlign', 'center');
+		//title_lbl.setStyle('textAlign','center');
+		
+		
+		
+		
+    }
+    
 
 }
