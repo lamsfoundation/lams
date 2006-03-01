@@ -26,15 +26,6 @@ public interface ISubmissionDetailsDAO extends IBaseDAO {
 	 */
 	public SubmissionDetails getSubmissionDetailsByID(Long submissionID);
 	
-	/**
-	 * Returns a list of records coresponding to the given contentID.
-	 * 
-	 * @param contentID The content_id to be looked up
-	 * @return List The list of required details
-	 */
-	public List getSubmissionDetailsByContentID(Long contentID);
-
-	
 	public List getUsersForSession(Long contentID);
 
 	/**

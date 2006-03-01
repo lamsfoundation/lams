@@ -57,6 +57,7 @@ import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
+import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.sbmt.InstructionFiles;
 import org.lamsfoundation.lams.tool.sbmt.Learner;
@@ -188,26 +189,25 @@ public class SubmitFilesService implements ToolContentManager,
 
 	/**
 	 * (non-Javadoc)
+	 * @throws SessionDataExistsException 
 	 * 
 	 * @see org.lamsfoundation.lams.tool.ToolContentManager#removeToolContent(java.lang.Long)
 	 */
-	public void removeToolContent(Long toolContentId, boolean removeSessionData)throws DataMissingException {
+	public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException {
 		SubmitFilesContent submitFilesContent = submitFilesContentDAO.getContentByID(toolContentId);
-		if (submitFilesContent == null)
-			throw new DataMissingException(
-					"No such content with a contentID of : " + toolContentId
-							+ " exists");
-		else {
-			List filesUploaded = submissionDetailsDAO.getSubmissionDetailsByContentID(toolContentId);
-			if(filesUploaded!=null){
-				Iterator fileIterator = filesUploaded.iterator();				
-				while(fileIterator.hasNext()){
-					SubmissionDetails details = (SubmissionDetails)fileIterator.next();
-					deleteFromRepository(details.getUuid(),details.getVersionID());
-					submissionDetailsDAO.delete(details);
+		if (submitFilesContent != null) {
+		   //if session data exist and removeSessionData=false, throw an exception
+			Set submissionData = submitFilesContent.getToolSession();
+			if ( !(submissionData==null || submissionData.isEmpty()) && ! removeSessionData) {
+		        throw new SessionDataExistsException("Delete failed: There is session data that belongs to this tool content id");
+			} else if ( submissionData != null ){
+				Iterator iter = submissionData.iterator();
+				while (iter.hasNext()) {
+					SubmitFilesSession element = (SubmitFilesSession) iter.next();
+					removeToolSession(element);
 				}
-				submitFilesContentDAO.delete(submitFilesContent);
-			}			
+			}
+			submitFilesContentDAO.delete(submitFilesContent);
 		}
 	}
 
@@ -408,14 +408,28 @@ public class SubmitFilesService implements ToolContentManager,
 		}
 			
 		SubmitFilesSession session = submitFilesSessionDAO.getSessionByID(toolSessionId);
-		if(session != null)
-			submitFilesSessionDAO.delete(session);
-		else{
+		if ( session != null ) {
+			removeToolSession(session);
+		} else {
 			log.error("Could not find submit file session by given session id: "+toolSessionId);
 			throw new DataMissingException("Could not find submit file session by given session id: "+toolSessionId);
 		}
-		return;
 	}
+	
+	/** Remove a tool session. The session parameter must not be null. */
+	private void removeToolSession(SubmitFilesSession session) {
+		Set filesUploaded = session.getSubmissionDetails();
+		if(filesUploaded!=null){
+			Iterator fileIterator = filesUploaded.iterator();				
+			while(fileIterator.hasNext()){
+				SubmissionDetails details = (SubmissionDetails)fileIterator.next();
+				deleteFromRepository(details.getUuid(),details.getVersionID());
+				submissionDetailsDAO.delete(details);
+			}
+		}			
+		submitFilesSessionDAO.delete(session);
+	}
+	
 	/**
 	 * (non-Javadoc)
 	 * 

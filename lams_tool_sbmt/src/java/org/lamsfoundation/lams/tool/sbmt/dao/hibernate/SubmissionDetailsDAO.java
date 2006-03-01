@@ -23,9 +23,6 @@ public class SubmissionDetailsDAO extends BaseDAO implements
 	
 	private static final String TABLENAME = "tl_lasbmt11_submission_details";
 	
-	private static final String FIND_BY_CONTENT_ID = "from " + TABLENAME + " in class " + SubmissionDetails.class.getName() +
-													 " where content_id=? ORDER BY learner_id";
-	
 	private static final String FIND_BY_SESSION = "from " + TABLENAME +
 													" in class " + SubmissionDetails.class.getName() +
 													" where session_id=?";
@@ -43,14 +40,6 @@ public class SubmissionDetailsDAO extends BaseDAO implements
 	public SubmissionDetails getSubmissionDetailsByID(Long submissionID) {
 		return (SubmissionDetails) this.getHibernateTemplate().
 								   get(SubmissionDetails.class, submissionID);
-	}
-	
-	/**
-	 * (non-Javadoc)
-	 * @see org.lamsfoundation.lams.tool.sbmt.dao.ISubmissionDetailsDAO#getSubmissionDetailsByContentID(java.lang.Long)
-	 */
-	public List getSubmissionDetailsByContentID(Long contentID){
-		return this.getHibernateTemplate().find(FIND_BY_CONTENT_ID,contentID);
 	}
 	
 	public List getUsersForSession(final Long sessionID){			

@@ -60,15 +60,6 @@ public class TestSubmissionDetailsDAO extends SbmtBaseTestCase {
 		assertEquals(details.getFilePath(),TEST_FILE_NAME);
 	}
 
-	public void testGetSubmissionDetailsByContentID() {
-		List list = submissionDetailsDAO.getSubmissionDetailsByContentID(TEST_CONTENT_ID);
-		assertEquals("Expect only 1 submission", list.size(), 1);
-		SubmissionDetails details = (SubmissionDetails) list.iterator().next();
-		assertNotNull("details", details);
-		assertEquals(details.getSubmissionID(),TEST_SUBMISSION_ID);
-		assertEquals(details.getFilePath(),TEST_FILE_NAME);
-	}
-
 	public void testGetSubmissionDetailsBySession() {
 		List list = submissionDetailsDAO.getSubmissionDetailsBySession(TEST_SESSION_ID);
 		assertEquals("Expect only 1 submission", list.size(), 1);
