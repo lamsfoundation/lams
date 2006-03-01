@@ -40,7 +40,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.DynaActionForm;
-import org.apache.struts.actions.LookupDispatchAction;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.sbmt.InstructionFiles;
@@ -51,6 +50,7 @@ import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
 import org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 
 /**
  * @author Manpreet Minhas
@@ -58,9 +58,9 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * 
  * @struts.action path="/authoring" 
  * 				  name="SbmtAuthoringForm" 
- * 				  parameter="action"
+ * 				  parameter="dispatch"
  *                input="/authoring/authoring.jsp" 
- *                scope="request" 
+ *                scope="session" 
  *                validate="true"
  * 
  * @struts.action-forward name="success" path="/authoring/authoring.jsp"
@@ -70,7 +70,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * 				path="/authoring/authoring.jsp"
 
  */
-public class AuthoringAction extends LookupDispatchAction {
+public class AuthoringAction extends LamsDispatchAction {
 	private Logger log = Logger.getLogger(AuthoringAction.class);
 
 	public ISubmitFilesService submitFilesService;
@@ -143,6 +143,8 @@ public class AuthoringAction extends LookupDispatchAction {
 			PropertyUtils.copyProperties(persistContent,content);
 			
 			submitFilesService.saveOrUpdateContent(persistContent);
+			request.setAttribute("sbmtSuccess", new Boolean(true));
+			setUp(request, persistContent);
 		} catch (Exception e) {
 			log.error(e);
 		}
@@ -271,7 +273,7 @@ public class AuthoringAction extends LookupDispatchAction {
 		return mapping.getInputForward();
 	}
 	/**
-	 * Just for STRUTS LookupDispatchAction mapping function.
+	 * Depreciated: Just for STRUTS LookupDispatchAction mapping function.
 	 */
 	protected Map getKeyMethodMap() {
 		Map map = new HashMap();
