@@ -278,7 +278,19 @@ class ThemeManager {
                 //add visual element to the default theme
                 _theme.addVisualElement(checkboxVisualElement);
                 //------------------------------------------------------
-        
+				
+				//----Small LABEL-------------------------------------------------
+                //Style object
+                var smlLabelSO = new mx.styles.CSSStyleDeclaration();
+                smlLabelSO.setStyle('fontFamily', 'Tahoma');
+                smlLabelSO.setStyle('fontSize', 9);
+                smlLabelSO.setStyle('color', 0x333648);
+                //Visual Element
+                var smlLabelVisualElement = new VisualElement('smlLabel',smlLabelSO);
+                //add visual element to the default theme
+                _theme.addVisualElement(smlLabelVisualElement);
+                //--------------------------------------------------------
+				
                 //----COMBO------------------------------------------
                 //Style object
                 var comboSO = new mx.styles.CSSStyleDeclaration();
