@@ -253,8 +253,7 @@
 	            <include name="**/*Form.java" />
 	         </fileset>
 
-	         <deploymentdescriptor servletspec="2.4" 
- 				distributable="false" destdir="${conf.webinf.dir}"
+	         <deploymentdescriptor servletspec="2.4" distributable="false" destdir="${conf.webinf.dir}"
 				mergedir="${conf.xdoclet.dir}" sessiontimeout="${sessiontimeout}"/>
 				
 	         <strutsconfigxml destdir="${conf.struts.dir}" mergedir="${conf.xdoclet.dir}" version="1.2" />
@@ -283,7 +282,9 @@
 						<include name="**/*.jsp"/>
 						<include name="**/*.html"/>
 						<include name="**/*.swf"/>
+	   					<include name="**/*.gif"/>
 						<include name="includes/**"/>
+	   					<include name="author_page/**"/>
 				</fileset>
 	   			
 	   	   </war>
