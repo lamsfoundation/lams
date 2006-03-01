@@ -1,4 +1,5 @@
 ﻿import org.lamsfoundation.lams.common.*;
+import org.lamsfoundation.lams.common.dict.*;
 import org.lamsfoundation.lams.common.util.*;
 import org.lamsfoundation.lams.common.style.*;
 import org.lamsfoundation.lams.authoring.*;
@@ -85,6 +86,8 @@ class ToolkitView extends AbstractView {
         //Work out difference between scrollpane and panel (container) width
         _scrollPanelWidthDiff = bkg_pnl.width - toolkitLibraries_sp.width;
 		delete this.onEnterFrame;		_depth = this.getNextHighestDepth();
+		
+		title_lbl.text = Dictionary.getValue('tk_title');
         setStyles();
         //dispatch load event
         dispatchEvent({type:'load',target:this});
