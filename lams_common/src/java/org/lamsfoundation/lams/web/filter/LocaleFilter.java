@@ -48,7 +48,7 @@ public class LocaleFilter extends OncePerRequestFilter {
 //	private static final String DEFAULT_LANGUAGE = "en";
 //	private static final String DEFUALT_COUNTRY = "AU";
 	private static final String PREFERRED_LOCALE_KEY = "org.apache.struts.action.LOCALE";
-
+	private static final String CHARSET_KEY_KEY = "org.lamsfoundation.lams.web.filter.CHARSET.KEY";
     public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, 
             FilterChain chain) throws IOException, ServletException {
     	Locale preferredLocale = null;
@@ -85,6 +85,7 @@ public class LocaleFilter extends OncePerRequestFilter {
             } else {
                 session.setAttribute(PREFERRED_LOCALE_KEY, preferredLocale);
                 Config.set(session, Config.FMT_LOCALE, preferredLocale);
+                session.setAttribute(CHARSET_KEY_KEY,LocaleToCharsetMap.getCharset(preferredLocale));
             }
         }
         if (preferredLocale != null && !(request instanceof LocaleRequestWrapper)) {
