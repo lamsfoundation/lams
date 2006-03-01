@@ -667,7 +667,7 @@ class PropertyInspector extends MovieClip{
 		a.groupingUIID = newGroupingUIID;
 		
 		Debugger.log('Set grouping UIID to: '+a.groupingUIID ,Debugger.GEN,'onAppliedGroupingChange','PropertyInspector');
-		
+		_canvasModel.selectedItem.refresh();
 	}
 	
 	/**
