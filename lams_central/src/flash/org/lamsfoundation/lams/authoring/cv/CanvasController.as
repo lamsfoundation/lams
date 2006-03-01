@@ -167,13 +167,15 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			
 			var transitionTarget = createValidTransitionTarget(transitionTarget_mc);
 			if(transitionTarget instanceof LFError){
-				_canvasModel.resetTransitionTool();
+				//_canvasModel.resetTransitionTool();
+				_canvasModel.getCanvas().stopTransitionTool();
 			//if(transitionTarget instanceof LFMessage){
 				//transitionTarget.showErrorAlert(null);
 				transitionTarget.showMessageConfirm();
 			}else{
 				_canvasModel.addActivityToTransition(transitionTarget);
-				_canvasModel.resetTransitionTool();
+				//_canvasModel.resetTransitionTool();
+				_canvasModel.getCanvas().stopTransitionTool();
 			}
 			
 		
