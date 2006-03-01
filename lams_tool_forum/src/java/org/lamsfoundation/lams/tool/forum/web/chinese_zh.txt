@@ -1,0 +1,117 @@
+appName  = forum
+#=========================labels===========================#
+#-------------------------Authoring Labels-----------------#
+label.authoring.heading.basic=论坛
+label.authoring.heading.basic.desc=基本信息
+label.authoring.heading.instructions.desc=请输入在线和脱机指导
+label.authoring.heading.advance.desc=请输入高级选项
+label.authoring.create.new.topic=发消息
+
+label.authoring.basic.title=标题
+label.authoring.basic.instruction=指导
+label.authoring.online.instruction =在线指导
+label.authoring.offline.instruction=脱机指导
+label.authoring.online.file =上传在线指导
+label.authoring.offline.file=上传脱机指导
+label.authoring.advance.lock.on.finished=完成后锁定
+
+label.authoring.save.button=保存
+label.authoring.cancel.button=取消
+label.authoring.choosefile.button=选择文件
+label.authoring.upload.online.button=上传在线
+label.authoring.upload.offline.button=上传脱机
+label.authoring.online.filelist=在线文件列表
+label.authoring.offline.filelist=脱机文件列表
+label.authoring.online.delete=删除
+label.authoring.offline.delete=脱机
+label.authoring.advance.allow.edit=容许编辑
+label.authoring.advance.use.richeditor=容许高级编辑器
+label.authoring.advance.limited.input=限制输入字符
+
+lable.topic.title.subject=主题
+lable.topic.title.body=内容
+lable.topic.title.update=前一个消息
+lable.topic.title.author=作者
+lable.topic.title.startedby=首贴于
+lable.topic.title.replies=回复
+lable.topic.title.mark=标注
+lable.topic.subject.by=由
+label.back.to.forum=返回论坛
+label.monitoring.edit.activity.cancel=取消
+label.monitoring.edit.activity.update=更新
+label.monitoring.edit.activity.edit=编辑
+lable.topic.title.message.number=消息# 
+lable.topic.title.average.mark= 平均分
+label.monitoring.statistic.average.mark= Average message mark
+lable.monitoring.statistic.total.message=# of total message
+authoring.exception= 在编辑页发生问题,原因是{0}
+#-------------------------END Authoring Labels END-----------------#
+page.title.monitoring.content.userlist=Monitoring User List
+page.title.monitoring.view.user.mark=View user mark
+page.title.monitoring.edit.user.mark=Edit user mark
+page.title.monitoring.view.activity=View Activity
+page.title.monitoring.edit.activity=Edit Activity
+page.title.monitoring.view.instructions=View Instructions
+page.title.monitoring.view.topic=View topic
+page.title.monitoring.statistic=Statistic
+page.title.monitoring.definelater=Forum Tool Define
+## errors
+errors.header=<b class="error">
+errors.footer=</b>
+
+#error.title = System Error!
+error.valueReqd = Value Required
+error.inputFileTooLarge = Input File size is too large!
+error.uploading = error uploading
+error.mark.needNumber= Mark must be int value
+error.mark.invalid.number= Mark is invalid number format
+error.fail.get.forum=No Forum available
+error.title.empty=Title can not be blank
+#General Messages
+message.msg.maxFileSize = 最大 250K
+
+##Message
+title.messageTopic.open = Topic Details
+
+title.message.add = 发消息
+title.message.open = 察看消息
+title.message.reply = 回复消息
+title.message.edit = 编辑消息
+title.message.view=消息板
+title.message.view.topic=察看消息
+title.message.delete=删除消息
+
+message.label.subject = 主题
+message.label.body = 内容
+message.label.attachment = 附件
+message.label.postedOn = 发布:
+message.label.threadReplies  = 消息树
+message.link.reply = 回复
+
+##Labels
+label.open = 打开
+label.delete = 删除
+label.download = 下载
+label.view = 察看
+label.edit = 编辑
+label.reply = 回复
+label.done = 完成
+label.finish= 完成
+label.newtopic= 新消息
+label.refresh= 刷新
+lable.char.left=剩余字符
+label.basic=基本
+label.advanced=高级
+label.instructions=指导
+##Buttons
+button.upload = 上传
+button.done = 完成
+button.submit = 提交
+button.on = 在
+button.off = 关
+button.add = 添加
+button.cancel = 取消
+
+js.error.invalid.number=The input is invalid number format 
+js.error.min.number=The input must be greater than 0 
+js.error.title=The following error(s) occurred:

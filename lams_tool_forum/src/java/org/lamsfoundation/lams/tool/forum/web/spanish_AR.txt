@@ -1,0 +1,116 @@
+appName  = forum
+#=========================labels===========================#
+#-------------------------Authoring Labels-----------------#
+label.authoring.heading.basic=Foro
+label.authoring.heading.basic.desc=Basic input information for forum
+label.authoring.heading.instructions.desc=Ingrese instrucciones para modos online y offline
+label.authoring.heading.advance.desc=Ingrese instrucciones avanzadas para Foro
+label.authoring.create.new.topic=Crear un nuevo hilo de discussión 
+
+label.authoring.basic.title=Título
+label.authoring.basic.instruction=Instrucciones
+label.authoring.online.instruction =Instrucciones para modo Online
+label.authoring.offline.instruction=Instrucciones para modo Offline
+label.authoring.online.file =Subir instrucciones como archivo (online)
+label.authoring.offline.file=Subir instrucciones como archivo (offline)label.authoring.advance.lock.on.finished=Cuando terminado, bloquear foro
+
+label.authoring.save.button=Salvar
+label.authoring.cancel.button=Cancelar
+label.authoring.choosefile.button=Elegir archivo
+label.authoring.upload.online.button=Subir Archivo Online
+label.authoring.upload.offline.button=Subir Archivo Offline
+label.authoring.online.filelist=Lista de Archivos Online
+label.authoring.offline.filelist=List de Archivos Offline
+label.authoring.online.delete=Borrar
+label.authoring.offline.delete=Borrar
+label.authoring.advance.allow.edit=Permitir Edición
+label.authoring.advance.use.richeditor=Utilizar Editor HTML
+label.authoring.advance.limited.input=Limite de número de caracteres
+
+lable.topic.title.subject=Asunto
+lable.topic.title.body=Mensaje
+lable.topic.title.update=Último mensaje
+lable.topic.title.author=Autor
+lable.topic.title.startedby=Empezar en
+lable.topic.title.replies=Respuestas
+lable.topic.title.mark=Nota de Evaluación
+lable.topic.subject.by=De
+label.back.to.forum=Volver al Foro
+label.monitoring.edit.activity.cancel=Cancelar
+label.monitoring.edit.activity.update=Update
+label.monitoring.edit.activity.edit=Editar
+lable.topic.title.message.number=Número de Mensajes
+lable.topic.title.average.mark= Promedio Nota de Evaluación
+label.monitoring.statistic.average.mark= Promedio de Evaluación por mensaje
+lable.monitoring.statistic.total.message=Número total de Mensajes
+authoring.exception= Hay un problmea con la paguina de Foro, la razón es {0}
+#-------------------------END Authoring Labels END-----------------#
+page.title.monitoring.content.userlist=Monitoreo de lista de estudiantes
+page.title.monitoring.view.user.mark=Ver evaluación de estudiante
+page.title.monitoring.edit.user.mark=Editr evaluación de estudiante
+page.title.monitoring.view.activity=Ver Actividad
+page.title.monitoring.edit.activity=Editar Actividad
+page.title.monitoring.view.instructions=Ver Instrucciones
+page.title.monitoring.view.topic=Ver hilo
+page.title.monitoring.statistic=Estadísticas
+page.title.monitoring.definelater=Definir en Monitoreo
+## errors
+errors.header=<b class="error">
+errors.footer=</b>
+
+#error.title = System Error!
+error.valueReqd = Valor Requerido
+error.inputFileTooLarge = El tamaño de este archivo es demasiado grande!
+error.uploading = error al subir archivo
+error.mark.needNumber= La evaluación tiene que ser valor entero
+error.mark.invalid.number= La evaluación no es un valor entero
+error.fail.get.forum=Foro no disponible
+error.title.empty=El Asunto no puede omitirse
+#General Messages
+message.msg.maxFileSize = Maximo 250K
+
+##Message
+title.messageTopic.open = Detalles del hilo
+
+title.message.add = Agregar Mensaje
+title.message.open = Ver Mensaje
+title.message.reply = Responder Mensaje
+title.message.edit = Editar Mensaje
+title.message.view=Lista de Mensajes
+title.message.view.topic=Ver Mensaje
+title.message.delete=Borrar Mensaje
+
+message.label.subject = Asunto
+message.label.body = Mensaje
+message.label.attachment = Archivo Adjunto
+message.label.postedOn = Enviado el:
+message.label.threadReplies  = Hilo de respuestas
+message.link.reply = Responder
+
+##Labels
+label.open = Abrir
+label.delete = Borrar
+label.download = Bajar-Descargar 
+label.view = Ver
+label.edit = Editar
+label.reply = Responder
+label.done = Listo
+label.finish= Terminar
+label.newtopic= Nuevo Hilo
+label.refresh= Refrescar
+lable.char.left=Limite de caracteres
+label.basic=Contenido Basico
+label.advanced=Opciones Avanzadas
+label.instructions=Instrucciones
+##Buttons
+button.upload = Subir
+button.done = Fin
+button.submit = Enviar
+button.on = Si
+button.off = No
+button.add = Agregrar
+button.cancel = Cancelar
+
+js.error.invalid.number=Su ingreso no es un número entero valido
+js.error.min.number=El número ingresado tiene que ser mayor a 0
+js.error.title=Se han producido los siguientes errores:
