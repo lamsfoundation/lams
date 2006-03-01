@@ -580,9 +580,9 @@ class PropertyInspector extends MovieClip{
 	 * @return  
 	 */
 	private function setStyles() {
-        Debugger.log('Button stykle obejct',Debugger.GEN,'setStyles','PropertyInspector');
+       // Debugger.log('Button stykle obejct',Debugger.GEN,'setStyles','PropertyInspector');
 		var styleObj = _tm.getStyleObject('button');
-		ObjectUtils.printObject(styleObj);
+		//ObjectUtils.printObject(styleObj);
 		editGrouping_btn.setStyle('styleName',styleObj);
 		
 		styleObj = _tm.getStyleObject('label');
@@ -616,6 +616,10 @@ class PropertyInspector extends MovieClip{
 		mins_stp.setStyle('styleName',styleObj);
 		endHours_stp.setStyle('styleName',styleObj);
 		endMins_stp.setStyle('styleName',styleObj);
+		
+		styleObj = _tm.getStyleObject('BGPanel');
+		body_pnl.setStyle('styleName',styleObj);
+		bar_pnl.setStyle('styleName',styleObj);
 		
 		
 		
