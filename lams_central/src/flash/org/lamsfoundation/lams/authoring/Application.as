@@ -341,10 +341,12 @@ class org.lamsfoundation.lams.authoring.Application {
     }
     
     /**
-    * Runs when application setup has completed.  At this point the init screen can be removed and the user can
+    * Runs when application setup has completed.  At this point the init/loading screen can be removed and the user can
     * work with the application
     */
     private function start(){
+		//TODO: Remove the loading screen
+		
         //Fire off a resize to set up sizes
         onResize();
 		//TODO Remove loading screen
