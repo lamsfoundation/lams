@@ -62,7 +62,7 @@ class com.polymercode.Draw
 		y1:Number,x2:Number, y2:Number, dashLength:Number, 
 		spaceLength:Number,strokeWidth:Number,rgbHex:Number ):Void
 	{
-		trace("com.polymercode.Draw.dashTo - arguments:"+arguments.toString());
+		//trace("com.polymercode.Draw.dashTo - arguments:"+arguments.toString());
 		if ( arguments < 5 ){
 			trace("com.polymercode.Draw.dashTo - too few parameters.");
 			return;
