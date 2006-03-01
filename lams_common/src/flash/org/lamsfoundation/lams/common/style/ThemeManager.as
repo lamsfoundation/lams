@@ -124,7 +124,7 @@ class ThemeManager {
 				//BASE STYLE OBJ not being used - see the node on getStyleObject
                 var baseStyleObj = new mx.styles.CSSStyleDeclaration();
                 baseStyleObj.setStyle('color', 0x333648);
-                baseStyleObj.setStyle('themeColor', 0x266DEE);
+                baseStyleObj.setStyle('themeColor', 0x669BF2);
                 
 				baseStyleObj.setStyle('fontFamily', 'Verdana');
                 baseStyleObj.setStyle('fontSize', 10);
@@ -137,11 +137,11 @@ class ThemeManager {
                 //Style object
                 var buttonSO = new mx.styles.CSSStyleDeclaration();
 				buttonSO.setStyle('color', 0x333648);
-                buttonSO.setStyle('themeColor', 0x266DEE);
+                buttonSO.setStyle('themeColor', 0x669BF2);
                 
 				buttonSO.setStyle('fontFamily', 'Verdana');
                 buttonSO.setStyle('fontSize', 10);
-                buttonSO.setStyle('emphasizedStyleDeclaration', 0x266DEE);
+                buttonSO.setStyle('emphasizedStyleDeclaration', 0x669BF2);
                 
                 //Visual Element
                 var buttonVisualElement = new VisualElement('button',buttonSO);
@@ -179,7 +179,7 @@ class ThemeManager {
                 //Style object
                 var txiSO = new mx.styles.CSSStyleDeclaration();
 				txiSO.setStyle('color', 0x333648);
-                txiSO.setStyle('themeColor', 0x266DEE);
+                txiSO.setStyle('themeColor', 0x669BF2);
                 
 				txiSO.setStyle('fontFamily', 'Verdana');
                 txiSO.setStyle('fontSize', 10);
@@ -204,34 +204,34 @@ class ThemeManager {
 				//----Scroll pane ---------------------------------------
 				/*
 				Style
- Theme
- Description
- 
-themeColor  Halo
- The base color scheme of a component. Possible values are "haloGreen", "haloBlue", and "haloOrange". The default value is "haloGreen".
- 
-border styles
- Both
- The ScrollPane component uses a RectBorder instance as its border and responds to the styles defined on that class. See RectBorder class.
-
-
-The default border style is "inset".
- 
-scrollTrackColor  Sample
- The background color for the scroll track. The default value is 0xCCCCCC (light gray).
- 
-symbolColor  Sample
- The color of the check mark. The default value is 0x000000 (black). 
- 
-symbolDisabledColor  Sample
- The color of the disabled check mark. The default value is 0x848384 (dark gray). 
+				 Theme
+				 Description
+				 
+				themeColor  Halo
+				 The base color scheme of a component. Possible values are "haloGreen", "haloBlue", and "haloOrange". The default value is "haloGreen".
+				 
+				border styles
+				 Both
+				 The ScrollPane component uses a RectBorder instance as its border and responds to the styles defined on that class. See RectBorder class.
+				
+				
+				The default border style is "inset".
+				 
+				scrollTrackColor  Sample
+				 The background color for the scroll track. The default value is 0xCCCCCC (light gray).
+				 
+				symbolColor  Sample
+				 The color of the check mark. The default value is 0x000000 (black). 
+				 
+				symbolDisabledColor  Sample
+				  The color of the disabled check mark. The default value is 0x848384 (dark gray). 
  
 
 
 				*/
                 //Style object
                 var spSO = new mx.styles.CSSStyleDeclaration();
-                spSO.setStyle('themeColor', 0x266DEE);
+                spSO.setStyle('themeColor', 0x669BF2);
                 //Visual Element
                 var spVisualElement = new VisualElement('scrollpane',spSO);
                 //add visual element to the default theme
@@ -243,7 +243,7 @@ symbolDisabledColor  Sample
                 var treeviewSO = new mx.styles.CSSStyleDeclaration();
                 //treeviewSO.setStyle('rollOverColor', 0xC4C7D5);
 				treeviewSO.setStyle('color', 0x333648);
-                treeviewSO.setStyle('themeColor', 0x266DEE);
+                treeviewSO.setStyle('themeColor', 0x669BF2);
                 
 				treeviewSO.setStyle('fontFamily', 'Verdana');
                 treeviewSO.setStyle('fontSize', 10);
@@ -269,7 +269,7 @@ symbolDisabledColor  Sample
                 //Style object
                 var checkboxSO = new mx.styles.CSSStyleDeclaration();
 				checkboxSO.setStyle('color', 0x333648);
-                checkboxSO.setStyle('themeColor', 0x266DEE);
+                checkboxSO.setStyle('themeColor', 0x669BF2);
                 
 				checkboxSO.setStyle('fontFamily', 'Verdana');
                 checkboxSO.setStyle('fontSize', 10);
@@ -283,7 +283,7 @@ symbolDisabledColor  Sample
                 //Style object
                 var comboSO = new mx.styles.CSSStyleDeclaration();
 				comboSO.setStyle('color', 0x333648);
-                comboSO.setStyle('themeColor', 0x266DEE);
+                comboSO.setStyle('themeColor', 0x669BF2);
                 comboSO.setStyle('fontFamily', 'Verdana');
                 comboSO.setStyle('fontSize', 10);
                 comboSO.setStyle('openEasing', Elastic.easeOut);
@@ -297,7 +297,7 @@ symbolDisabledColor  Sample
                 //Style object
                 var lfMenuSO = new mx.styles.CSSStyleDeclaration();
 				lfMenuSO.setStyle('color', 0x333648);
-                lfMenuSO.setStyle('themeColor', 0x266DEE);
+                lfMenuSO.setStyle('themeColor', 0x669BF2);
 				lfMenuSO.setStyle('fontFamily', 'Verdana');
                 lfMenuSO.setStyle('fontSize', 10);
                 lfMenuSO.setStyle('openEasing', Elastic.easeOut);
@@ -311,7 +311,7 @@ symbolDisabledColor  Sample
                 //Style object
                 var BGPanelSO = new mx.styles.CSSStyleDeclaration();
 				BGPanelSO.setStyle('borderStyle', 'outset');
-				BGPanelSO.setStyle('backgroundColor', 0xEDF2F8);
+				BGPanelSO.setStyle('backgroundColor', 0xC2D5FE);
 				
                 //Visual Element
                 var BGPanelVisualElement = new VisualElement('BGPanel',BGPanelSO);
@@ -323,7 +323,7 @@ symbolDisabledColor  Sample
                 //Style object
                 var TAPanelSO = new mx.styles.CSSStyleDeclaration();
 				TAPanelSO.setStyle('borderStyle', 'solid');
-				TAPanelSO.setStyle('backgroundColor', 0xA6CAFF);
+				TAPanelSO.setStyle('backgroundColor', 0xC2D5FE);
 				TAPanelSO.setStyle('borderColor', 0x000000);
 				
 				
@@ -332,7 +332,21 @@ symbolDisabledColor  Sample
                 //add visual element to the default TAPanelVisualElement
                 _theme.addVisualElement(TAPanelVisualElement);
                 //------------------------------------------------------
-		
+			
+				//----CanvasPanel-------------------------------------------
+                //Style object
+                var CAPanelSO = new mx.styles.CSSStyleDeclaration();
+				
+				CAPanelSO.setStyle('backgroundColor', 0xF4F5FD);
+				
+				
+				
+                //Visual Element
+                var CAPanelVisualElement = new VisualElement('CanvasPanel',CAPanelSO);
+                //add visual element to the default TAPanelVisualElement
+                _theme.addVisualElement(CAPanelVisualElement);
+                //------------------------------------------------------
+				
                 //----LFBUTTON----------------------------------------------
                 //NOTE:This style is used in conjunction with LFButtonSkin class. For usage, see common.style.LFButtonSkin.as
                 //Style object
@@ -371,7 +385,7 @@ symbolDisabledColor  Sample
                 buttonSO.setStyle('fontSize', 10);
                 buttonSO.setStyle('color', 0x333648);
                 buttonSO.setStyle('themeColor', 0xBFFFBF);
-                buttonSO.setStyle('emphasizedStyleDeclaration', 0x266DEE);
+                buttonSO.setStyle('emphasizedStyleDeclaration', 0x669BF2);
                 
                 //Visual Element
                 var buttonVisualElement = new VisualElement('button',buttonSO);
@@ -397,7 +411,7 @@ symbolDisabledColor  Sample
                 LFWindowSO.setStyle('fontFamily', '_sans');
                 LFWindowSO.setStyle('fontSize', 14);
                 LFWindowSO.setStyle('color', 0x333648);
-                LFWindowSO.setStyle('themeColor', 0x266DEE);
+                LFWindowSO.setStyle('themeColor', 0x669BF2);
                 LFWindowSO.setStyle('borderStyle', 'inset');
                 //Visual Element
                 var LFWindowVisualElement = new VisualElement('LFWindow',LFWindowSO);
@@ -426,7 +440,7 @@ symbolDisabledColor  Sample
                 datagridSO.setStyle('fontFamily', '_sans');
                 datagridSO.setStyle('fontSize', 14);
                 datagridSO.setStyle('color', 0x333648);
-                datagridSO.setStyle('themeColor', 0x266DEE);
+                datagridSO.setStyle('themeColor', 0x669BF2);
                 //datagridSO.setStyle('rollOverColor', 0xC4C7D5);
                 datagridSO.setStyle('openEasing', 'Elastic');
                 //Visual Element
@@ -456,7 +470,7 @@ symbolDisabledColor  Sample
                 lfMenuSO.setStyle('fontFamily', '_sans');
                 lfMenuSO.setStyle('fontSize', 14);
                 lfMenuSO.setStyle('color', 0x333648);
-                lfMenuSO.setStyle('themeColor', 0x266DEE);
+                lfMenuSO.setStyle('themeColor', 0x669BF2);
                 lfMenuSO.setStyle('openEasing', Elastic.easeOut);
                 //Visual Element
                 var lfMenuVisualElement = new VisualElement('LFMenuBar',lfMenuSO);
