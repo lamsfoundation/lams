@@ -394,7 +394,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	public function addActivityToTransition(ca:Object):Object{
 		var activity:Activity;
 		//check we have not added too many
-		if(ca instanceof CanvasActivity){
+		if(ca instanceof CanvasActivity || ca instanceof CanvasParallelActivity || ca instanceof CanvasOptionalActivity){
 			activity = ca.activity;
 		}else if(ca instanceof Activity){
 			activity = Activity(ca);
