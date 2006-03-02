@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=ISO8859_1" %>
+<%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ include file="/includes/taglibs.jsp" %>
 <%@ taglib uri="tags-fck-editor" prefix="FCK"%>
@@ -45,33 +45,33 @@
   <tr>
     <td valign="bottom">
 	<!-- table for tab 1 (basic)-->
-	<table border="0" cellspacing="0" cellpadding="0">
+	<table border="0" cellspacing="0" cellpadding="0" width="120">
 	  <tr>
-		<td><a href="#"  onClick="showTab('b');setTab('b');return false;" ><img src="<c:out value="${lams}"/>images/aqua_tab_s_left.gif" name="tab_left_b" width="8" height="25" border="0" id="tab_left_b"/></a></td>
-		<td class="tab tabcentre_selected" width="90" id="tab_tbl_centre_b"  onClick="showTab('b');setTab('b');return false;" ><a href="#" onClick="showTab('b');setTab('b');return false;" id="b" ><fmt:message key="label.basic" /></a></td>
-		<td><a href="#" onClick="showTab('b');setTab('b');return false;"><img src="<c:out value="${lams}"/>images/aqua_tab_s_right.gif"  name="tab_right_b" width="8" height="25" border="0" id="tab_right_b"/></a></td>
+		<td width="8" ><a href="#"  onClick="showTab('b');setTab('b');return false;" ><img src="<c:out value="${lams}"/>images/aqua_tab_s_left.gif" name="tab_left_b" width="8" height="25" border="0" id="tab_left_b"/></a></td>
+		<td class="tab tabcentre_selected" id="tab_tbl_centre_b"  onClick="showTab('b');setTab('b');return false;"  nowrap="nowrap"><a href="#" onClick="showTab('b');setTab('b');return false;" id="b" ><fmt:message key="label.basic" /></a></td>
+		<td width="8" ><a href="#" onClick="showTab('b');setTab('b');return false;"><img src="<c:out value="${lams}"/>images/aqua_tab_s_right.gif"  name="tab_right_b" width="8" height="25" border="0" id="tab_right_b"/></a></td>
 	  </tr>
 	</table>
 
 </td>
     <td valign="bottom">
 	<!-- table for tab 2 (advanced) -->
-	<table border="0" cellspacing="0" cellpadding="0">
+	<table border="0" cellspacing="0" cellpadding="0"  width="120">
 	  <tr>
-		<td><a href="#" onClick="showTab('a');setTab('a');return false;"><img src="<c:out value="${lams}"/>images/aqua_tab_left.gif" name="tab_left_a" width="8" height="22" border="0" id="tab_left_a" /></a></td>
-		<td class="tab tabcentre" width="90" id="tab_tbl_centre_a" onClick="showTab('a');setTab('a');return false;" nowrap="true"><a href="#" onClick="showTab('a');setTab('a');return false;" id="a" ><fmt:message key="label.advanced" /></a></td>
-		<td><a href="#" onClick="showTab('a');setTab('a');return false;"><img src="<c:out value="${lams}"/>images/aqua_tab_right.gif" name="tab_right_a" width="9" height="22" border="0" id="tab_right_a" /></a></td>
+		<td width="8" ><a href="#" onClick="showTab('a');setTab('a');return false;"><img src="<c:out value="${lams}"/>images/aqua_tab_left.gif" name="tab_left_a" width="8" height="22" border="0" id="tab_left_a" /></a></td>
+		<td class="tab tabcentre" id="tab_tbl_centre_a" onClick="showTab('a');setTab('a');return false;" nowrap="nowrap"><a href="#" onClick="showTab('a');setTab('a');return false;" id="a" ><fmt:message key="label.advanced" /></a></td>
+		<td width="9"><a href="#" onClick="showTab('a');setTab('a');return false;"><img src="<c:out value="${lams}"/>images/aqua_tab_right.gif" name="tab_right_a" width="9" height="22" border="0" id="tab_right_a" /></a></td>
 	  </tr>
 	</table>
 
 </td>
     <td valign="bottom">
 	<!-- table for ab 3 (instructions) -->
-	<table border="0" cellspacing="0" cellpadding="0">
+	<table border="0" cellspacing="0" cellpadding="0"  width="120">
 	  <tr>
-		<td ><a href="#" onClick="showTab('i');setTab('i');return false;"><img border="0" src="<c:out value="${lams}"/>images/aqua_tab_left.gif" width="8" height="22" id="tab_left_i"   name="tab_left_i" /></a></td>
-		<td class="tab tabcentre" width="90" id="tab_tbl_centre_i"  onClick="showTab('i');setTab('i');return false;" ><a href="#" onClick="showTab('i');setTab('i');return false;" id="i" ><fmt:message key="label.instructions" /></a></td>
-		<td ><a href="#" onClick="showTab('i');setTab('i');return false;"><img src="<c:out value="${lams}"/>images/aqua_tab_right.gif"  width="9" height="22" border="0" id="tab_right_i"  name="tab_right_i"/></a></td>
+		<td width="8" ><a href="#" onClick="showTab('i');setTab('i');return false;"><img border="0" src="<c:out value="${lams}"/>images/aqua_tab_left.gif" width="8" height="22" id="tab_left_i"   name="tab_left_i" /></a></td>
+		<td class="tab tabcentre" id="tab_tbl_centre_i"  onClick="showTab('i');setTab('i');return false;" nowrap="nowrap"><a href="#" onClick="showTab('i');setTab('i');return false;" id="i" ><fmt:message key="label.instructions" /></a></td>
+		<td width="9" ><a href="#" onClick="showTab('i');setTab('i');return false;"><img src="<c:out value="${lams}"/>images/aqua_tab_right.gif"  width="9" height="22" border="0" id="tab_right_i"  name="tab_right_i"/></a></td>
 	  </tr>
 	</table>
 
