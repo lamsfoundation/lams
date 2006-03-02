@@ -34,7 +34,7 @@
 <%@ attribute name="collection" type="java.util.Collection" required="false" rtexprvalue="true" %>
 <%@ attribute name="control" required="false" rtexprvalue="true" %>
 <%@ taglib uri="tags-core" prefix="c" %>
-<%@ taglib tagdir="/WEB-INF/tags" prefix="dolly" %>
+<%@ taglib uri="tags-lams" prefix="lams" %>
 <c:set var="dControl" value="false" scope="request"/>
 <c:if test="${control}">
 	<c:set var="dControl" value="${control}" scope="request"/>
@@ -46,7 +46,7 @@
 			<c:set var="count" value="0"/>
 			<c:forEach var="tab" begin="0" items="${collection}">
 				<c:set var="count" value="${count+1}"/>
-				<dolly:Tab id="${count}" value="${tab}"/>	
+				<lams:Tab id="${count}" value="${tab}"/>	
 			</c:forEach>
 	</c:when>
 	<c:otherwise>
