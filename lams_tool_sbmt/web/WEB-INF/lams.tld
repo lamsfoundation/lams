@@ -38,7 +38,6 @@
          <required>true</required>
 
            <rtexprvalue>true</rtexprvalue>
-           <type>String</type>
 
       </attribute>
 
