@@ -6,7 +6,7 @@
 		if(flag == "CREATE_SUCCESS"){
 			var d = new Date()
 			var t = d.getTime()
-			loadDoc("<html:rewrite page='/authoring/refreshTopic.do'/>"+"?="+escape(t),window.parent.document.getElementById("messageListArea"));
+			loadDoc("<html:rewrite page='/authoring/refreshTopic.do'/>"+"?reqID="+escape(t),window.parent.document.getElementById("messageListArea"));
 			window.parent.hideMessage();
 		}
 	}
