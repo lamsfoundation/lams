@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- <!DOCTYPE XMI SYSTEM "uml14xmi12.dtd"> -->
 
-<XMI xmi.version='1.2' timestamp='Wed Mar 01 13:02:11 EST 2006' xmlns:UML='omg.org/UML/1.4'>
+<XMI xmi.version='1.2' timestamp='Wed Mar 01 13:09:46 EST 2006' xmlns:UML='omg.org/UML/1.4'>
 	<XMI.header>
 		<XMI.documentation>
 			<XMI.exporter>MagicDraw UML</XMI.exporter>
@@ -924,7 +924,6 @@
 						<UML:AssociationEnd xmi.id='_9_0_2_3880181_1141172351843_271904_1795' visibility='private' isNavigable='true' ordering='unordered' aggregation='none' targetScope='instance' changeability='changeable' association='_9_0_2_3880181_1141172351843_779945_1796' participant='_9_0_2_3880181_1141172334906_58792_1773'/>
 					</UML:Association.connection>
 				</UML:Association>
-				<UML:Package xmi.id='_9_0_2_3880181_1141178462640_187189_2582' isRoot='false' isLeaf='false' isAbstract='false'/>
 				<UML:UninterpretedAction xmi.id='_9_0_2_3880181_1127386177722_165063_54' name='do?userID=123' isAsynchronous='false'>
 					<UML:Action.target>
 						<UML:ObjectSetExpression xmi.id='_9_0_2_3880181_1127386177722_308033_56' body='GET&#10;getLDID'/>
@@ -5906,7 +5905,7 @@ window to show page</text>
 							<geometry>0, 50, 265, 394</geometry>
 						</mdElement>
 						<mdElement elementClass='PackageView' xmi.id='_9_0_2_3880181_1141178462640_659297_2583'>
-							<elementID xmi.idref='_9_0_2_3880181_1141178462640_187189_2582'/>
+							<elementID xmi.idref='_9_0_2_3880181_1112195850890_318463_185'/>
 							<geometry>1010, 30, 302, 267</geometry>
 						</mdElement>
 					</mdOwnedViews>
@@ -6043,7 +6042,7 @@ window to show page</text>
 					<mdElement elementClass='StringProperty'>
 						<propertyID>INFO_PROPERTY</propertyID>
 						<propertyDescriptionID>INFO_PROPERTY_DESCRIPTION</propertyDescriptionID>
-						<value>17 22 60 39 38 5c 65 60 6e 6f 3a b5 4c f7 53 4f fc 4 68 c 11 8c 21 a5 85 b0 1d 41 a9 84 bc c8 61 6b de 6d 8e 4b 89 8f 89 b0 ca a6 c6 16 99 f5 20 87 da 69 50 fc 4a 10 61 d0 80 81 30 39 fb 39 33 88 80 4d 6a 62 78 </value>
+						<value>17 22 60 39 38 5c 65 60 6e 6f 3a b5 4c f7 53 4f fc 4 68 c 11 8c 21 a5 85 b0 16 41 ac 83 bc c8 61 6b de 6d 8e 4b 89 8f 89 b0 ca a6 c6 16 99 f5 20 87 da 69 50 fc 4a 10 61 d0 80 81 30 39 fb 39 33 88 80 4d 6a 62 78 </value>
 						<multiline xmi.value='false'/>
 					</mdElement>
 					<mdElement elementClass='ChoiceProperty'>
