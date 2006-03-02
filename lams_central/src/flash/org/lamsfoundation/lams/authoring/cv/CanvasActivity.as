@@ -52,14 +52,14 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		//let it wait one frame to set up the components.
 		//this has to be set b4 the do later :)
 		if(_activity.isGateActivity()){
-			_visibleHeight = GATE_ACTIVITY_HEIGHT;
-			_visibleWidth = GATE_ACTIVITY_WIDTH;
+			_visibleHeight = CanvasActivity.GATE_ACTIVITY_HEIGHT;
+			_visibleWidth = CanvasActivity.GATE_ACTIVITY_WIDTH;
 		}else if(_activity.isGroupActivity()){
-			_visibleHeight = TOOL_ACTIVITY_HEIGHT;
-			_visibleWidth = TOOL_ACTIVITY_WIDTH;
+			_visibleHeight = CanvasActivity.TOOL_ACTIVITY_HEIGHT;
+			_visibleWidth = CanvasActivity.TOOL_ACTIVITY_WIDTH;
 		}else{
-			_visibleHeight = TOOL_ACTIVITY_HEIGHT;
-			_visibleWidth = TOOL_ACTIVITY_WIDTH;
+			_visibleHeight = CanvasActivity.TOOL_ACTIVITY_HEIGHT;
+			_visibleWidth = CanvasActivity.TOOL_ACTIVITY_WIDTH;
 		}
 		_base_mc = this;
 		//call init if we have passed in the _activity as an initObj in the attach movie,
@@ -167,7 +167,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		var ml = new MovieLoader(Config.getInstance().serverUrl+_activity.libraryActivityUIImage,setUpActIcon,this,icon_mc);	
 		//icon_mc = MovieLoader.movieCache[Config.getInstance().serverUrl+_activity.libraryActivityUIImage];
 		//Debugger.log('icon_mc:'+icon_mc,4,'loadIcon','CanvasActivity');
-		setUpActIcon(icon_mc);
+		//setUpActIcon(icon_mc);
 	}
 	
 	
@@ -176,8 +176,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	
 	
 	private function setUpActIcon(icon_mc):Void{
-		icon_mc._x = (this._width / 2) - (icon_mc._width / 2);
-		icon_mc._y = (this._height / 2) - (icon_mc._height / 2) - 5;
+		icon_mc._x = (CanvasActivity.TOOL_ACTIVITY_WIDTH / 2) - (icon_mc._width / 2);
+		icon_mc._y = (CanvasActivity.TOOL_ACTIVITY_HEIGHT / 2) - (icon_mc._height / 2) - 5;
 	}
 	
 	/**
@@ -198,10 +198,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			stopSign_mc._visible = true;
 			canvasActivity_mc._visible=false;
 			title_lbl.visible=false;
-			clickTarget_mc._width = GATE_ACTIVITY_WIDTH;
-			clickTarget_mc._height= GATE_ACTIVITY_HEIGHT;
-			stopSign_mc._height= GATE_ACTIVITY_HEIGHT;
-			stopSign_mc._width= GATE_ACTIVITY_WIDTH;
+			clickTarget_mc._width = CanvasActivity.GATE_ACTIVITY_WIDTH;
+			clickTarget_mc._height= CanvasActivity.GATE_ACTIVITY_HEIGHT;
+			stopSign_mc._height= CanvasActivity.GATE_ACTIVITY_HEIGHT;
+			stopSign_mc._width= CanvasActivity.GATE_ACTIVITY_WIDTH;
 			stopSign_mc._x = 0;
 			stopSign_mc._y = 0;
 			
@@ -218,8 +218,16 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 				icon_mc._visible = true;
 				theIcon_mc = icon_mc;
 			}
-			theIcon_mc._width = ICON_WIDTH;
-			theIcon_mc._height = ICON_HEIGHT;
+			/*
+			* some bug here - size always reported as 0x0 and wehn set to ICON_WIDTH it stays at 0, so maybe icon is still loading...
+			trace(theIcon_mc._width+'x'+theIcon_mc._height );
+			theIcon_mc._width = CanvasActivity.ICON_WIDTH;
+			theIcon_mc._height = CanvasActivity.ICON_HEIGHT;
+			trace('CanvasActivity.ICON_HEIGHT:'+CanvasActivity.ICON_HEIGHT);
+			trace('ICON_HEIGHT:'+ICON_HEIGHT);
+			trace(theIcon_mc._width+'x'+theIcon_mc._height );
+			*/
+			theIcon_mc._visible = true;
 			
 			
 			
