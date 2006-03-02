@@ -37,7 +37,7 @@ import org.apache.log4j.Logger;
  * based on the current servlet details. 
  * 
  * @jsp.tag name="WebAppURL"
- * 			bodycontent="empty"
+ * 			body-content="empty"
  * 			display-name="Base URL for the current web app"
  * 			description="Output the basic URL for the current webapp. e.g. http://server/lams/tool/nb11/"
  * 	

@@ -37,7 +37,7 @@ import org.lamsfoundation.lams.util.ConfigurationKeys;
  * will be the same value as the server url in the lams.xml configuration file.
  * 
  * @jsp.tag name="LAMSURL"
- * 			bodycontent="empty"
+ * 			body-content="empty"
  * 			display-name="LAMS URL"
  * 			description="Output the Server URL as defined in the lams.xml configuration file."
  * 	

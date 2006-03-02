@@ -43,7 +43,7 @@ import org.lamsfoundation.lams.util.ConfigurationKeys;
  * doesn't exist, the default one is always available.  
  * 
  * @jsp.tag name="css"
- * 			bodycontent="empty"
+ * 			body-content="empty"
  * 			display-name="User's chosen stylesheet"
  * 			description="Output stylesheet based on the user preferences."
  * 	

@@ -44,7 +44,7 @@ import org.apache.commons.beanutils.PropertyUtils;
  * Doesn't support theme yet - to be added when we work out what we want from the theme details.
  * 
  * @jsp.tag name="user"
- * 			bodycontent="empty"
+ * 			body-content="empty"
  * 			display-name="user details"
  * 			description="Output details from the shared session UserDTO object"
  * 	
