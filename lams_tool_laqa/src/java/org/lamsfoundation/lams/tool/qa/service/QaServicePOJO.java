@@ -326,7 +326,7 @@ public class QaServicePOJO
     	
     }
     
-	public void updateQaUsrResp(QaUsrResp qaUsrResp) throws QaApplicationException
+    public void updateQaUsrResp(QaUsrResp qaUsrResp) throws QaApplicationException
     {
         try
         {
@@ -582,6 +582,21 @@ public class QaServicePOJO
                                                  e);
         }
     }
+
+    
+    public List getAllQuestionEntries(final Long uid) throws QaApplicationException
+	{
+	   try
+        {
+            return qaQueContentDAO.getAllQuestionEntries(uid.longValue());
+        }
+        catch (DataAccessException e)
+        {
+            throw new QaApplicationException("Exception occured when lams is getting by uid  qa question content: "
+                                                         + e.getMessage(),
+														   e);
+        }
+	}
 
     
     public User getCurrentUserData(String username) throws QaApplicationException

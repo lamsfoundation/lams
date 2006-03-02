@@ -134,6 +134,8 @@ public interface IQaService
 	
 	public void removeUserResponse(QaUsrResp resp);
 	
+	public List getAllQuestionEntries(final Long uid) throws QaApplicationException;
+	
     public User getCurrentUserData(String username);
     
     /**
