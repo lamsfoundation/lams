@@ -49,6 +49,7 @@ public interface QaAppConstants {
 	public static final String ERROR_LIST_LEARNER						="errorListLearner";
 	public static final String DEFAULT_CONTENT_ID_STR					="defaultContentIdStr";
 	public static final String TOOL_SESSION_ID 							= "toolSessionID";
+	
 			
 	/*
      * refers to number of questions presented initially, we have a single record for default content
@@ -81,6 +82,7 @@ public interface QaAppConstants {
     public static final String CHOICE_TYPE_BASIC						="choiceTypeBasic";
     public static final String CHOICE_TYPE_ADVANCED						="choiceTypeAdvanced";
     public static final String CHOICE_TYPE_INSTRUCTIONS					="choiceTypeInstructions";
+    public static final String SELECTION_CASE							="selectionCase";
     
     /*
      * authoring mode constants
@@ -145,6 +147,7 @@ public interface QaAppConstants {
     public static final String AVERAGE_MARK								="averageMark";
     public static final String COUNT_ALL_USERS							="countAllUsers";
     public static final String CURRENT_MONITORING_TAB					="currentMonitoringTab";
+    public static final String LIST_MONITORED_ANSWERS_CONTAINER_DTO		="listMonitoredAnswersContainerDto";
         
     /*
      * export portfolio constants

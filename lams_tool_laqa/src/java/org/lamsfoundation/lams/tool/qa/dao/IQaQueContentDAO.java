@@ -45,4 +45,6 @@ public interface IQaQueContentDAO
     public void removeQueContent(long qaQueContentId);
     
     public List getQaQueContentsByContentId(long qaContentId);
+    
+    public List getAllQuestionEntries(final long qaContentId);
 }

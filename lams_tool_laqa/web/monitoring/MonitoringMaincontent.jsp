@@ -52,13 +52,13 @@ http://www.gnu.org/licenses/gpl.txt
 		// actionMethod: name of the method to be called in the DispatchAction
 		function submitMonitoringMethod(actionMethod) 
 		{
-			document.McMonitoringForm.method.value=actionMethod; 
-			document.McMonitoringForm.submit();
+			document.QaMonitoringForm.method.value=actionMethod; 
+			document.QaMonitoringForm.submit();
 		}
 		
 		function submitModifyQuestion(questionIndexValue, actionMethod) 
 		{
-			document.McMonitoringForm.questionIndex.value=questionIndexValue; 
+			document.QaMonitoringForm.questionIndex.value=questionIndexValue; 
 			submitMethod(actionMethod);
 		}
 		
@@ -68,13 +68,12 @@ http://www.gnu.org/licenses/gpl.txt
 		}
 		
 		function deleteOption(deletableOptionIndex, actionMethod) {
-			document.McMonitoringForm.deletableOptionIndex.value=deletableOptionIndex; 
+			document.QaMonitoringForm.deletableOptionIndex.value=deletableOptionIndex; 
 			submitMethod(actionMethod);
 		}
 		
-		
 		function submitSession(selectedToolSessionId, actionMethod) {
-			document.McMonitoringForm.selectedToolSessionId.value=selectedToolSessionId; 
+			document.QaMonitoringForm.selectedToolSessionId.value=selectedToolSessionId; 
 			submitMonitoringMethod(actionMethod);
 		}
 		

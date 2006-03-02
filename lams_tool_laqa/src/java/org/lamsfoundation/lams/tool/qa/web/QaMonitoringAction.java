@@ -43,7 +43,6 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
-import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
@@ -168,6 +167,52 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
     	
  		request.getSession().setAttribute(CURRENT_MONITORING_TAB, "summary");   
  		return (mapping.findForward(LOAD_MONITORING));
+	}
+
+    /**
+     * gets called when the user selects a group from dropdown box in the summary tab 
+     * submitSession(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     */
+    public ActionForward submitSession(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+	{
+    	logger.debug("dispatching submitSession...");
+    	
+    	QaMonitoringForm qaMonitoringForm = (QaMonitoringForm) form;
+	 	String currentMonitoredToolSession=qaMonitoringForm.getSelectedToolSessionId(); 
+	    logger.debug("currentMonitoredToolSession: " + currentMonitoredToolSession);
+	    
+	    if (currentMonitoredToolSession.equals("All"))
+	    {
+		    request.getSession().setAttribute(SELECTION_CASE, new Long(2));
+	    }
+	    else
+	    {
+	    	/* SELECTION_CASE == 1 indicates a selected group other than "All" */
+		    request.getSession().setAttribute(SELECTION_CASE, new Long(1));
+	    }
+	    logger.debug("SELECTION_CASE: " + request.getSession().getAttribute(SELECTION_CASE));
+	    
+	    
+	    request.getSession().setAttribute(CURRENT_MONITORED_TOOL_SESSION, currentMonitoredToolSession);
+	    logger.debug("CURRENT_MONITORED_TOOL_SESSION: " + request.getSession().getAttribute(CURRENT_MONITORED_TOOL_SESSION));
+	    
+    	return (mapping.findForward(LOAD_MONITORING));	
 	}
 
 	

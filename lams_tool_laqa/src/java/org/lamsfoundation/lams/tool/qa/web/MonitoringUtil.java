@@ -22,6 +22,7 @@
 package org.lamsfoundation.lams.tool.qa.web;
 
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -31,6 +32,8 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaContent;
+import org.lamsfoundation.lams.tool.qa.QaMonitoredAnswersDTO;
+import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.QaUtils;
@@ -98,80 +101,10 @@ public class MonitoringUtil implements QaAppConstants{
 		request.getSession().removeAttribute(TARGET_MODE);
 	}
 
-	/**
-	 * findSelectedMonitoringTab(ActionForm form,
-	 *							            HttpServletRequest request)
-	 * return void						            
-	 * determines which monitoring tabs is the active one.
-	 * 
-	 */
-	public void findSelectedMonitoringTab(ActionForm form,
-								            HttpServletRequest request)
-	{
-		QaMonitoringForm qaMonitoringForm = (QaMonitoringForm) form;
-		String choiceTypeMonitoringSummary=qaMonitoringForm.getSummary();
-		String choiceTypeMonitoringInstructions=qaMonitoringForm.getInstructions();
-		String choiceTypeMonitoringEditActivity=qaMonitoringForm.getEditActivity();
-		String choiceTypeMonitoringStats=qaMonitoringForm.getStats();
-		
-		/* make the Summary tab the default one */
-		request.getSession().setAttribute(CHOICE_MONITORING,CHOICE_TYPE_MONITORING_SUMMARY);
-		
-		if (choiceTypeMonitoringSummary != null)
-		{
-			logger.debug("CHOICE_TYPE_MONITORING_SUMMARY");
-			request.getSession().setAttribute(CHOICE_MONITORING,CHOICE_TYPE_MONITORING_SUMMARY);
-		}
-		else if ((choiceTypeMonitoringInstructions != null) || (qaMonitoringForm.getSubmitMonitoringInstructions() != null))
-		{
-			logger.debug("CHOICE_TYPE_MONITORING_INSTRUCTIONS");
-			request.getSession().setAttribute(CHOICE_MONITORING,CHOICE_TYPE_MONITORING_INSTRUCTIONS);
-		}
-		else if (choiceTypeMonitoringEditActivity != null)
-		{
-			logger.debug("CHOICE_TYPE_MONITORING_EDITACTIVITY");
-			request.getSession().setAttribute(CHOICE_MONITORING,CHOICE_TYPE_MONITORING_EDITACTIVITY);
-		}
-		else if (choiceTypeMonitoringStats != null)
-		{
-			logger.debug("CHOICE_TYPE_MONITORING_STATS");
-			request.getSession().setAttribute(CHOICE_MONITORING,CHOICE_TYPE_MONITORING_STATS);
-		}
-		logger.debug("CHOICE_MONITORING is:" + request.getSession().getAttribute(CHOICE_MONITORING));
-		
-		/* reset tab controllers */
-		qaMonitoringForm.setSummary(null);
-		qaMonitoringForm.setInstructions(null);
-		qaMonitoringForm.setEditActivity(null);
-		qaMonitoringForm.setStats(null);
-	}
+
 
 	
-	/**
-	 * boolean isNonDefaultScreensVisited(HttpServletRequest request)
-	 * @param request
-	 * @return boolean
-	 */
-	public boolean isNonDefaultScreensVisited(HttpServletRequest request)
-	{
-		Boolean monitoringInstructionsVisited = (Boolean) request.getSession().getAttribute(MONITORING_INSTRUCTIONS_VISITED);
-		Boolean monitoringEditActivityVisited = (Boolean) request.getSession().getAttribute(MONITORING_EDITACTIVITY_VISITED);
-		Boolean monitoringStatsVisited 		  = (Boolean) request.getSession().getAttribute(MONITORING_STATS_VISITED);
-		
-		logger.debug("isNonDefaultScreensVisited:" + monitoringInstructionsVisited  + " " + 
-													monitoringEditActivityVisited + " " + monitoringStatsVisited);
-		 
-		if ((monitoringInstructionsVisited != null) && (monitoringInstructionsVisited.booleanValue()))
-			return true;
-		
-		if ((monitoringEditActivityVisited != null) && (monitoringEditActivityVisited.booleanValue()))
-			return true;
-		
-		if ((monitoringStatsVisited != null) && (monitoringStatsVisited.booleanValue()))
-			return true;
-		
-		return false;
-	}
+	
 
 	
 	/**
@@ -254,4 +187,48 @@ public class MonitoringUtil implements QaAppConstants{
     	logger.debug("final sessionsMap:" + sessionsMap);
     	return sessionsMap;
 	}
+	
+	
+	/**
+	 * ends up populating the attempt history for all the users of all the tool sessions for a content
+	 * buildGroupsQuestionData(HttpServletRequest request, McContent mcContent)
+	 * 
+	 * @param request
+	 * @param mcContent
+	 * @return List
+	 */
+	public static List buildGroupsQuestionData(HttpServletRequest request, QaContent qaContent)
+	{
+		IQaService qaService = (IQaService)request.getSession().getAttribute(TOOL_SERVICE);
+    	logger.debug("qaService: " + qaService);
+    	
+		logger.debug("will be building groups question data  for content:..." + qaContent);
+    	List listQuestions=qaService.getAllQuestionEntries(qaContent.getUid());
+    	logger.debug("listQuestions:..." + listQuestions);
+    	
+    	List listMonitoredAnswersContainerDTO= new LinkedList();
+    		
+		Iterator itListQuestions = listQuestions.iterator();
+	    while (itListQuestions.hasNext())
+	    {
+	    	QaQueContent qaQueContent =(QaQueContent)itListQuestions.next();
+	    	logger.debug("mcQueContent:..." + qaQueContent);
+	    	
+	    	if (qaQueContent != null)
+	    	{
+	    		QaMonitoredAnswersDTO qaMonitoredAnswersDTO= new QaMonitoredAnswersDTO();
+	    		qaMonitoredAnswersDTO.setQuestionUid(qaQueContent.getUid().toString());
+	    		qaMonitoredAnswersDTO.setQuestion(qaQueContent.getQuestion());
+	    		
+				//Map questionAttemptData= buildGroupsAttemptData(request, qaContent, qaQueContent, qaQueContent.getUid().toString());
+				//logger.debug("questionAttemptData:..." + questionAttemptData);
+				//qaMonitoredAnswersDTO.setQuestionAttempts(questionAttemptData);
+				listMonitoredAnswersContainerDTO.add(qaMonitoredAnswersDTO);
+				
+	    	}
+		}
+		logger.debug("final listMonitoredAnswersContainerDTO:..." + listMonitoredAnswersContainerDTO);
+		return listMonitoredAnswersContainerDTO;
+	}
 }
+

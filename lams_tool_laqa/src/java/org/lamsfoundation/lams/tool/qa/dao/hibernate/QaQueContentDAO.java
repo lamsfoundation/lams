@@ -50,7 +50,7 @@ public class QaQueContentDAO extends HibernateDaoSupport implements IQaQueConten
 	 	static Logger logger = Logger.getLogger(QaQueContentDAO.class.getName());
 	 	private static final String LOAD_QUESTION_CONTENT_BY_CONTENT_ID = "from qaQueContent in class QaQueContent where qaQueContent.qaContentId=:qaContentId";
 	 	private static final String GET_QUESTION_IDS_FOR_CONTENT = "select qaQueContent.qaQueContentId from QaQueContent qaQueContent where qaQueContent.qaContentId = :qa";
-		
+	 			
 	 	public QaQueContent getToolDefaultQuestionContent(final long qaContentId)
 	    {
 	        return (QaQueContent) getHibernateTemplate().execute(new HibernateCallback()
@@ -89,6 +89,16 @@ public class QaQueContentDAO extends HibernateDaoSupport implements IQaQueConten
 	                qa));
 			  
 			  return listDefaultQuestionIds;
+	    }
+	 	
+	 	public List getAllQuestionEntries(final long qaContentId)
+	    {
+	        HibernateTemplate templ = this.getHibernateTemplate();
+			List list = getSession().createQuery(LOAD_QUESTION_CONTENT_BY_CONTENT_ID)
+				.setLong("qaContentId", qaContentId)
+				.list();
+
+			return list;
 	    }
 	 	
 	 	

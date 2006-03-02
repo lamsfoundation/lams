@@ -2,6 +2,7 @@
 package org.lamsfoundation.lams.tool.qa.web;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -19,6 +20,7 @@ import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaApplicationException;
 import org.lamsfoundation.lams.tool.qa.QaContent;
+import org.lamsfoundation.lams.tool.qa.QaUtils;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -76,6 +78,10 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 		
 		request.getSession().setAttribute(CURRENT_MONITORING_TAB, "summary");
 		
+		/*
+	     * persist time zone information to session scope. 
+	     */
+	    QaUtils.persistTimeZone(request);
 		
 		/* we have made sure TOOL_CONTENT_ID is passed  */
 	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
@@ -102,6 +108,20 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 		 
 		request.getSession().setAttribute(SUMMARY_TOOL_SESSIONS, summaryToolSessions);
 	    logger.debug("SUMMARY_TOOL_SESSIONS: " + request.getSession().getAttribute(SUMMARY_TOOL_SESSIONS));
+	    
+	    
+	    
+	    /* SELECTION_CASE == 2 indicates start up */
+	    request.getSession().setAttribute(SELECTION_CASE, new Long(2));
+	    logger.debug("SELECTION_CASE: " + request.getSession().getAttribute(SELECTION_CASE));
+	    
+	    /* Default to All for tool Sessions so that all tool sessions' summary information gets displayed when the module starts up */
+	    request.getSession().setAttribute(CURRENT_MONITORED_TOOL_SESSION, "All");
+	    logger.debug("CURRENT_MONITORED_TOOL_SESSION: " + request.getSession().getAttribute(CURRENT_MONITORED_TOOL_SESSION));
+	    
+	    List listMonitoredAnswersContainerDTO=MonitoringUtil.buildGroupsQuestionData(request, qaContent);
+	    request.getSession().setAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO, listMonitoredAnswersContainerDTO);
+	    logger.debug("LIST_MONITORED_ANSWERS_CONTAINER_DTO: " + request.getSession().getAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO));
 	    /* ends here. */
 
 		

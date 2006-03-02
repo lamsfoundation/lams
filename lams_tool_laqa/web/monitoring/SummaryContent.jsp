@@ -43,8 +43,39 @@ http://www.gnu.org/licenses/gpl.txt
 		</c:if>						
 
 		<c:if test="${sessionScope.userExceptionNoStudentActivity != 'true'}"> 	
-			display summary screen
+			<html:hidden property="selectedToolSessionId"/>							
+			<input type="hidden" name="isToolSessionChanged"/>
+				<table class="forms">
+					<tr> 
+						<td NOWRAP class="formlabel" valign=top align=center><font size=2> <b> <bean:message key="label.selectGroup"/> </b>
+								<select name="monitoredToolSessionId" onchange="javascript:submitSession(this.value,'submitSession');">
+								<c:forEach var="toolSessionId" items="${sessionScope.summaryToolSessions}">
+										<c:set var="SELECTED_SESSION" scope="request" value=""/>
+										<c:if test="${sessionScope.selectionCase == 2}"> 			
+											<c:set var="currentMonitoredToolSession" scope="session" value="All"/>
+										</c:if>						
+										
+										<c:if test="${toolSessionId.value == sessionScope.currentMonitoredToolSession}"> 			
+												<c:set var="SELECTED_SESSION" scope="request" value="SELECTED"/>
+										</c:if>						
+										
+										<c:if test="${toolSessionId.value != 'All'}"> 		
+											<option value="<c:out value="${toolSessionId.value}"/>"  <c:out value="${requestScope.SELECTED_SESSION}"/>> Group <c:out value="${toolSessionId.key}"/>  </option>						
+										</c:if>						
+										
+										<c:if test="${toolSessionId.value == 'All'}"> 	
+											<option value="<c:out value="${toolSessionId.value}"/>"  <c:out value="${requestScope.SELECTED_SESSION}"/>>  All  </option>						
+										</c:if>						
+								</c:forEach>		  	
+								</select>
+							</font>
+						</td> 
+					<tr>
+
+				</table>
 		</c:if>						
+
+
 
 
 	</div>
