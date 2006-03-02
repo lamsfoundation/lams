@@ -59,7 +59,7 @@
 	<table border="0" cellspacing="0" cellpadding="0">
 	  <tr>
 		<td><a href="#" onClick="showTab('a');setTab('a');return false;"><img src="<c:out value="${lams}"/>images/aqua_tab_left.gif" name="tab_left_a" width="8" height="22" border="0" id="tab_left_a" /></a></td>
-		<td class="tab tabcentre" width="90" id="tab_tbl_centre_a" onClick="showTab('a');setTab('a');return false;"><a href="#" onClick="showTab('a');setTab('a');return false;" id="a" ><fmt:message key="label.advanced" /></a></td>
+		<td class="tab tabcentre" width="90" id="tab_tbl_centre_a" onClick="showTab('a');setTab('a');return false;" nowrap="true"><a href="#" onClick="showTab('a');setTab('a');return false;" id="a" ><fmt:message key="label.advanced" /></a></td>
 		<td><a href="#" onClick="showTab('a');setTab('a');return false;"><img src="<c:out value="${lams}"/>images/aqua_tab_right.gif" name="tab_right_a" width="9" height="22" border="0" id="tab_right_a" /></a></td>
 	  </tr>
 	</table>
