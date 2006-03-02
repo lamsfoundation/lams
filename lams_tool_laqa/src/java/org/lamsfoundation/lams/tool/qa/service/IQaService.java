@@ -100,6 +100,10 @@ public interface IQaService
 		
 	public void createQaSession(QaSession qaSession);
 	
+	public List getSessionNamesFromContent(QaContent qaContent);
+	
+	public String getSessionNameById(long qaSessionId);
+	
 	public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException;
 	
 	public List getSessionsFromContent(QaContent qaContent);

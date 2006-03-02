@@ -107,8 +107,12 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 		}
 		 
 		request.getSession().setAttribute(SUMMARY_TOOL_SESSIONS, summaryToolSessions);
-	    logger.debug("SUMMARY_TOOL_SESSIONS: " + request.getSession().getAttribute(SUMMARY_TOOL_SESSIONS));
-	    
+	    	    
+	    Map summaryToolSessionsId=MonitoringUtil.populateToolSessionsId(request, qaContent, qaService);
+		logger.debug("summaryToolSessionsId: " + summaryToolSessionsId);
+		request.getSession().setAttribute(SUMMARY_TOOL_SESSIONS_ID, summaryToolSessionsId);
+	    	
+	    	    
 	    
 	    
 	    /* SELECTION_CASE == 2 indicates start up */

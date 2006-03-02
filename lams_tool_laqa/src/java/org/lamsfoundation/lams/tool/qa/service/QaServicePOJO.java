@@ -233,6 +233,36 @@ public class QaServicePOJO
         }
     }
     
+    
+    public List getSessionNamesFromContent(QaContent qaContent)
+    {
+        try
+        {
+        	return qaSessionDAO.getSessionNamesFromContent(qaContent);
+        }
+        catch (DataAccessException e)
+        {
+            throw new QaApplicationException("Exception occured when lams is getting session names from content: "
+                                                         + e.getMessage(),
+														   e);
+        }
+    }
+
+    
+    public String getSessionNameById(long qaSessionId)
+    {
+        try
+        {
+        	return qaSessionDAO.getSessionNameById(qaSessionId);
+        }
+        catch (DataAccessException e)
+        {
+            throw new QaApplicationException("Exception occured when lams is getting session name: "
+                                                         + e.getMessage(),
+														   e);
+        }
+    }
+    
     public List getSessionsFromContent(QaContent qaContent) throws QaApplicationException
 	{
     	try

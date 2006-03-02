@@ -53,6 +53,10 @@ public interface IQaSessionDAO
     public void deleteQaSession(QaSession session);
     
     public List getSessionsFromContent(QaContent qaContent);
+    
+    public String getSessionNameById(long qaSessionId);
+    
+    public List getSessionNamesFromContent(QaContent qaContent);
 }
 
 

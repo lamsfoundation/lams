@@ -49,35 +49,67 @@ http://www.gnu.org/licenses/gpl.txt
 					<tr> 
 						<td NOWRAP class="formlabel" valign=top align=center><font size=2> <b> <bean:message key="label.selectGroup"/> </b>
 								<select name="monitoredToolSessionId" onchange="javascript:submitSession(this.value,'submitSession');">
-								<c:forEach var="toolSessionId" items="${sessionScope.summaryToolSessions}">
-										<c:set var="SELECTED_SESSION" scope="request" value=""/>
-										<c:if test="${sessionScope.selectionCase == 2}"> 			
-											<c:set var="currentMonitoredToolSession" scope="session" value="All"/>
-										</c:if>						
+								<c:forEach var="toolSessionName" items="${sessionScope.summaryToolSessions}">
+									<c:forEach var="toolSessionId" items="${sessionScope.summaryToolSessionsId}">
+										<c:out value="${toolSessionName.key}"/> -<c:out value="${toolSessionId.value}"/>
+									
+											<c:if test="${toolSessionName.key == toolSessionId.key}"> 			
 										
-										<c:if test="${toolSessionId.value == sessionScope.currentMonitoredToolSession}"> 			
-												<c:set var="SELECTED_SESSION" scope="request" value="SELECTED"/>
-										</c:if>						
-										
-										<c:if test="${toolSessionId.value != 'All'}"> 		
-											<option value="<c:out value="${toolSessionId.value}"/>"  <c:out value="${requestScope.SELECTED_SESSION}"/>> Group <c:out value="${toolSessionId.key}"/>  </option>						
-										</c:if>						
-										
-										<c:if test="${toolSessionId.value == 'All'}"> 	
-											<option value="<c:out value="${toolSessionId.value}"/>"  <c:out value="${requestScope.SELECTED_SESSION}"/>>  All  </option>						
-										</c:if>						
+												<c:set var="SELECTED_SESSION" scope="request" value=""/>
+												<c:if test="${sessionScope.selectionCase == 2}"> 			
+													<c:set var="currentMonitoredToolSession" scope="session" value="All"/>
+												</c:if>						
+												
+												<c:if test="${toolSessionId.value == sessionScope.currentMonitoredToolSession}"> 			
+														<c:set var="SELECTED_SESSION" scope="request" value="SELECTED"/>
+												</c:if>						
+												
+												<c:if test="${toolSessionId.value != 'All'}"> 		
+													<option value="<c:out value="${toolSessionId.value}"/>"  <c:out value="${requestScope.SELECTED_SESSION}"/>> <c:out value="${toolSessionName.value}"/>  </option>						
+												</c:if>						
+												
+												<c:if test="${toolSessionId.value == 'All'}"> 	
+													<option value="<c:out value="${toolSessionId.value}"/>"  <c:out value="${requestScope.SELECTED_SESSION}"/>>  All  </option>						
+												</c:if>						
+											
+										</c:if>							
+									</c:forEach>		  	
 								</c:forEach>		  	
 								</select>
 							</font>
 						</td> 
 					<tr>
 
+					<c:forEach var="currentDto" items="${sessionScope.listMonitoredAnswersContainerDto}">
+			  	 		<c:set var="currentQuestionId" scope="request" value="${currentDto.questionUid}"/>
+			  	 		<tr>
+			  	 			<td> &nbsp&nbsp&nbsp</td>
+			  	 		</tr>
+						<tr>			
+							<td NOWRAP valign=top align=left><b> <font size=2> <bean:message key="label.question.col"/> </b>
+								<c:out value="${currentDto.question}"/>
+							</font> </td>
+						</tr>	
+						
+						<tr> 
+							<td NOWRAP class="formlabel" valign=top>
+								<table align=center>
+									<tr> 
+										 <td NOWRAP valign=top> <b> <font size=2> <bean:message key="label.user"/> </font> 			</b> </td>  
+				  						 <td NOWRAP valign=top> <b> <font size=2> <bean:message key="label.attemptTime"/> </font> 	</b></td>
+				  						 <td NOWRAP valign=top> <b> <font size=2> <bean:message key="label.timezone"/> </font>		</b></td>
+				  						 <td NOWRAP valign=top> <b> <font size=2> <bean:message key="label.response"/> </font> 		</b></td>
+						  			</tr>				 
+	
+
+
+								</table>
+							</td>  
+			  			</tr>
+					</c:forEach>		  	
+
 				</table>
 		</c:if>						
-
-
-
-
 	</div>
 
 	

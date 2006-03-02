@@ -166,6 +166,38 @@ public class MonitoringUtil implements QaAppConstants{
 	 */
 	public static Map populateToolSessions(HttpServletRequest request, QaContent qaContent, IQaService qaService)
 	{
+		List sessionsList=qaService.getSessionNamesFromContent(qaContent);
+    	logger.debug("sessionsList size is:..." + sessionsList.size());
+    	
+    	Map sessionsMap=QaUtils.convertToStringMap(sessionsList, "String");
+    	logger.debug("generated sessionsMap:..." + sessionsMap);
+    	logger.debug("sessionsMap size:..." + sessionsMap.size());
+    	
+    	if (sessionsMap.isEmpty())
+		{
+    		logger.debug("sessionsMap size is 0:");
+        	sessionsMap.put(new Long(1).toString() , "None");
+		}
+    	else
+    	{
+    		logger.debug("sessionsMap has some entries: " +  sessionsMap.size());
+    		sessionsMap.put(new Long(sessionsMap.size()+ 1).toString() , "All");	
+    	}
+    	
+    	logger.debug("final sessionsMap:" + sessionsMap);
+    	return sessionsMap;
+	}
+	
+	/**
+	 * populates all the tool sessions in a map 
+	 * populateToolSessions(HttpServletRequest request, McContent mcContent)
+	 * 
+	 * @param request
+	 * @param mcContent
+	 * @return Map
+	 */
+	public static Map populateToolSessionsId(HttpServletRequest request, QaContent qaContent, IQaService qaService)
+	{
 		List sessionsList=qaService.getSessionsFromContent(qaContent);
     	logger.debug("sessionsList size is:..." + sessionsList.size());
     	

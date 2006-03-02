@@ -204,6 +204,7 @@ public interface QaAppConstants {
     public static final String MONITORING_ERROR							="monitoringError";
     public static final String MAP_MONITORING_QUESTIONS					="mapMonitoringQuestions";
     public static final String SUMMARY_TOOL_SESSIONS					="summaryToolSessions";
+    public static final String SUMMARY_TOOL_SESSIONS_ID					="summaryToolSessionsId";
     public static final String CURRENT_MONITORED_TOOL_SESSION 			="currentMonitoredToolSession";
     public static final String CHOICE_MONITORING			  			="choiceMonitoring";
     public static final String CHOICE_TYPE_MONITORING_SUMMARY 			="choiceTypeMonitoringSummary";
