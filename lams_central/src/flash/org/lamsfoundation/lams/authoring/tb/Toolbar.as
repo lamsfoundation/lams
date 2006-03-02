@@ -77,4 +77,11 @@ class Toolbar {
     function get className():String{
         return 'Toolbar';
     }
+	
+	public function get width(){
+		return toolbarModel.width;
+	}
+	public function get height(){
+		return toolbarModel.height;
+	}
 }

@@ -1,4 +1,5 @@
-﻿import org.lamsfoundation.lams.common.util.*
+﻿import org.lamsfoundation.lams.common.ui.*
+import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.authoring.tb.*
 import org.lamsfoundation.lams.common.mvc.*
 import org.lamsfoundation.lams.common.style.*
@@ -22,6 +23,7 @@ class ToolbarView extends AbstractView {
 	private var optional_btn:Button;
 	private var gate_btn:Button;
 	private var preview_btn:Button;
+	private var bkg_pnl:Panel;
 	private var _dictionary:Dictionary;
 	
     //Defined so compiler can 'see' events added at runtime by EventDispatcher
@@ -144,8 +146,11 @@ class ToolbarView extends AbstractView {
     * Sets the size of the Toolbar on stage, called from update
     */
 	private function setSize(tm:ToolbarModel):Void{
+		
         var s:Object = tm.getSize();
         //Size panel
+		trace('toolbar view  setting width to '+s.w);
+		bkg_pnl.setSize(s.w,bkg_pnl._width);
 	}
 	
     /**
@@ -173,6 +178,8 @@ class ToolbarView extends AbstractView {
 		optional_btn.setStyle('styleName',styleObj);
 		gate_btn.setStyle('styleName',styleObj);
 		preview_btn.setStyle('styleName',styleObj);
+		styleObj = _tm.getStyleObject('BGPanel');
+		bkg_pnl.setStyle('styleName',styleObj);
 		/*
 		_toolbar_mc.open_btn.addEventListener("click",controller);
 		_toolbar_mc.save_btn.addEventListener("click",controller);
