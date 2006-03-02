@@ -1,6 +1,7 @@
 	<tag>
 		<name>STRUTS-textarea</name>
 		<tagclass>org.lamsfoundation.lams.web.tag.MultiLinesTextareaTag</tagclass>
+		<body-content>empty</body-content>
 		<attribute>
 			<name>accesskey</name>
 			<required>false</required>
@@ -177,3 +178,23 @@
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 	</tag>
+	<tag-file>
+       <name>Tab</name>
+       <path>/WEB-INF/tags/Tab.tag</path>
+   	</tag-file>
+   	<tag-file>
+       <name>Tabs</name>
+       <path>/WEB-INF/tags/Tabs.tag</path>
+   	</tag-file>
+   	<tag-file>
+       <name>TabBody</name>
+       <path>/WEB-INF/tags/TabBody.tag</path>
+   	</tag-file>
+   	<tag-file>
+       <name>HTMLEditor</name>
+       <path>/WEB-INF/tags/HTMLEditor.tag</path>
+   	</tag-file>
+   	<tag-file>
+       <name>SetEditor</name>
+       <path>/WEB-INF/tags/SetEditor.tag</path>
+   	</tag-file>
