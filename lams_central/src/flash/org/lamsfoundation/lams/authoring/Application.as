@@ -27,9 +27,12 @@ class org.lamsfoundation.lams.authoring.Application {
 	public static var C_DEFAULT:String = "default";
 	
 	private static var SHOW_DEBUGGER:Boolean = false;
-	
+	/*
     private static var TOOLBAR_X:Number = 10;
-    private static var TOOLBAR_Y:Number = 35;    private static var TOOLKIT_X:Number = 0;
+    private static var TOOLBAR_Y:Number = 35;*/
+	private static var TOOLBAR_X:Number = 0;
+    private static var TOOLBAR_Y:Number = 21;
+    private static var TOOLKIT_X:Number = 0;
     private static var TOOLKIT_Y:Number = 74;
     
     private static var CANVAS_X:Number = 180;
@@ -380,7 +383,7 @@ class org.lamsfoundation.lams.authoring.Application {
         _toolkit.setSize(_toolkit.width,h-TOOLKIT_Y);
 
         //Toolbar
-        //_toolbar.setSize(w,_toolbar.height);
+        _toolbar.setSize(w,_toolbar.height);
 		//Property Inspector
 		var pi = _canvas.getPropertyInspector();
 		//pi._y = h;//- pi._height;
