@@ -1,7 +1,7 @@
 <%@ taglib uri="tags-html" prefix="html" %>
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
-<%@ taglib tagdir="/WEB-INF/tags" prefix="dolly" %>
+<%@ taglib uri="tags-lams" prefix="lams" %>
 
 	<!---------------------------Instruction Tab Content ------------------------>
 	<table class="forms">
@@ -13,12 +13,7 @@
 			<td class="formlabel"><fmt:message
 				key="label.authoring.online.instruction" />:</td>
 			<td NOWRAP width="700">
-			
-			<!-- remove <FCK:editor id="onlineInstruction"
-				basePath="/lams/fckeditor/" height="150" width="85%">
-				<c:out value="${authoring.onlineInstruction}" escapeXml="false"/>
-			</FCK:editor>-->
-			<dolly:SetEditor id="OnlineInstruction" text="${authoring.onlineInstruction}"/>
+				<lams:SetEditor id="OnlineInstruction" text="${authoring.onlineInstruction}"/>
 			</td>
 		</tr>
 		<tr>
@@ -72,7 +67,7 @@
 				basePath="/lams/fckeditor/" height="150" width="85%">
 				<c:out value="${authoring.offlineInstruction}" escapeXml="false"/>
 			</FCK:editor>-->
-			<dolly:SetEditor id="OfflineInstruction" text="${authoring.offlineInstruction}"/>
+			<lams:SetEditor id="OfflineInstruction" text="${authoring.offlineInstruction}"/>
 			</td>
 		</tr>
 		<tr>

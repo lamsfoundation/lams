@@ -1,6 +1,5 @@
 <%@ include file="../sharing/share.jsp" %>
 <%@ taglib uri="fck-editor" prefix="FCK"%>
-<%@ taglib tagdir="/WEB-INF/tags" prefix="dolly" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
 <c:set var="lams"><lams:LAMSURL/></c:set>
@@ -70,11 +69,11 @@
 <h1><fmt:message key="label.authoring.heading" /></h1>
 
 <!-- start tabs -->
-<dolly:Tabs control="true">
-	<dolly:Tab id="1" value="Basic"/>
-	<dolly:Tab id="2" value="Advanced"/>
-	<dolly:Tab id="3" value="Instructions"/>
-</dolly:Tabs>
+<lams:Tabs>
+	<lams:Tab id="1" value="Basic"/>
+	<lams:Tab id="2" value="Advanced"/>
+	<lams:Tab id="3" value="Instructions"/>
+</lams:Tabs>
 <!-- end tab buttons -->
 <div class="tabbody">
 <table align=center> 	  
@@ -88,15 +87,15 @@
 </table>
 
 <!-- tab content 1 (Basic) -->
-<dolly:TabBody id="1" titleKey="label.authoring.heading.basic.desc" page="basic.jsp"/>
+<lams:TabBody id="1" titleKey="label.authoring.heading.basic.desc" page="basic.jsp"/>
 <!-- end of content (Basic) -->
       
 <!-- tab content 2 (Advanced) -->
-<dolly:TabBody id="2" titleKey="label.authoring.heading.advance.desc" page="advance.jsp" />
+<lams:TabBody id="2" titleKey="label.authoring.heading.advance.desc" page="advance.jsp" />
 <!-- end of content (Advanced) -->
 
 <!-- tab content 3 (Instructions) -->
-<dolly:TabBody id="3" titleKey="label.authoring.heading.instructions.desc" page="instructions.jsp" />
+<lams:TabBody id="3" titleKey="label.authoring.heading.instructions.desc" page="instructions.jsp" />
 <!-- end of content (Instructions) -->
 
 
@@ -111,7 +110,7 @@
 			</html:link>
 		</p>
 </div>
-<dolly:HTMLEditor/>
+<lams:HTMLEditor/>
 	
 
 </html:form>
