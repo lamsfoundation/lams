@@ -66,6 +66,10 @@ public interface IQaService
 
 	public QaContent getQaContentByUID(Long uid);
 	
+	public int getTotalNumberOfUsers();
+	
+	public int countSessionComplete();
+	
 	
 	/**
      * Return the question content object according to the requested question content id.
@@ -97,6 +101,8 @@ public interface IQaService
 	public void createQaSession(QaSession qaSession);
 	
 	public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException;
+	
+	public List getSessionsFromContent(QaContent qaContent);
 	
 	public void createQaQueUsr(QaQueUsr qaQueUsr);
 	

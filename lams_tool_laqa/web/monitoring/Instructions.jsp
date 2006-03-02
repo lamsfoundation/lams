@@ -32,6 +32,33 @@ http://www.gnu.org/licenses/gpl.txt
 
 	<h2> <font size=2> <bean:message key="button.instructions"/> </font> </h2>
 	<div id="datatablecontainer">
-		instructions creen
+		<table class="forms">
+			<tr>
+				<td>
+					<table align="center">
+						<tr> 
+							<td NOWRAP valign=top>
+				  				<b> <font size=2> <bean:message key="label.offlineInstructions.col" /> </font> </b>
+				  			</td>
+							<td NOWRAP valign=top>
+								  <font size=2> <c:out value="${sessionScope.richTextOfflineInstructions}" escapeXml="false" />	</font>					  
+							</td> 
+						</tr>
+						
+						<tr>
+							<td colspan=2> &nbsp&nbsp&nbsp </td>
+						</tr>
+				
+						<tr> 
+							<td NOWRAP valign=top>
+				  				<b> <font size=2> <bean:message key="label.onlineInstructions.col" /> </font></b>
+				  			</td>
+							<td NOWRAP valign=top>
+								  <font size=2> <c:out value="${sessionScope.richTextOnlineInstructions}" escapeXml="false" />	</font>					  
+							</td> 
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
 	</div>		
-

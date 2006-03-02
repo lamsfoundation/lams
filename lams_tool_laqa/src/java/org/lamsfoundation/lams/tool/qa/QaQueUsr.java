@@ -76,6 +76,8 @@ public class QaQueUsr implements Serializable, Comparable, Nullable
     
     /** persistent field */
     private Set qaUsrResps;  
+
+    public QaQueUsr(){};
     
     /** full constructor */
     public QaQueUsr(Long queUsrId,

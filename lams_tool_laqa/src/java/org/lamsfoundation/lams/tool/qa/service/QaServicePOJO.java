@@ -232,6 +232,20 @@ public class QaServicePOJO
 														   e);
         }
     }
+    
+    public List getSessionsFromContent(QaContent qaContent) throws QaApplicationException
+	{
+    	try
+        {
+            return qaSessionDAO.getSessionsFromContent(qaContent);
+        }
+        catch (DataAccessException e)
+        {
+            throw new QaApplicationException("Exception occured when lams is getting"
+                                                 + " the qa sessions list: "
+                                                 + e.getMessage(),e);
+        }
+	}
 
     public void createQaQueUsr(QaQueUsr qaQueUsr) throws QaApplicationException
     {
@@ -326,6 +340,19 @@ public class QaServicePOJO
         }
     }
 	
+	public int countSessionComplete() throws QaApplicationException
+	{
+		try
+        {
+			return qaSessionDAO.countSessionComplete();
+        }
+		catch(DataAccessException e)
+        {
+            throw new QaApplicationException("Exception occured when lams is counting complete sessions"
+                                                 + e.getMessage(),e);
+        }		
+	}
+
     
     
     public QaQueContent retrieveQaQue(long qaQueContentId) throws QaApplicationException
@@ -526,7 +553,22 @@ public class QaServicePOJO
                                                          e);
         }
     }
-    
+
+    public int getTotalNumberOfUsers() throws QaApplicationException
+	{
+ 	   try
+       {
+	   		return qaQueUsrDAO.getTotalNumberOfUsers();
+       }
+       catch (DataAccessException e)
+       {
+           throw new QaApplicationException("Exception occured when lams is retrieving total number of QaQueUsr: "
+                                                        + e.getMessage(),
+														   e);
+       }
+    	
+	}
+
     public int countTotalNumberOfUserResponsed(QaContent qa) throws QaApplicationException
     {
         try
@@ -681,7 +723,7 @@ public class QaServicePOJO
 	{
 		logger.debug("start of countIncompleteSession: " + qa);
 		logger.debug("qaContentId: " + qa.getQaContentId());
-		int countIncompleteSession=qaSessionDAO.countIncompleteSession(qa);
+		int countIncompleteSession=qaSessionDAO.countSessionIncomplete();
 		logger.debug("countIncompleteSession: " + countIncompleteSession);
 		return countIncompleteSession;
 	}

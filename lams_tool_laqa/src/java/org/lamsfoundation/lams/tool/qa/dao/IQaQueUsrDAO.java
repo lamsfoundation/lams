@@ -43,4 +43,6 @@ public interface IQaQueUsrDAO
     public void deleteQaQueUsr(QaQueUsr qaQueUsr);
     
     public int countSessionUser(QaSession qaSession);
+    
+    public int getTotalNumberOfUsers();
 }

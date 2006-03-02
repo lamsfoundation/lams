@@ -516,4 +516,5 @@ public class LearningUtil implements QaAppConstants{
         qaService.updateQa(qaContent);
         logger.debug("content with id : " + toolContentId + "has been marked LOCKED and updated in the db");
     }
+
 }

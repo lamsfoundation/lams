@@ -34,8 +34,10 @@ import org.lamsfoundation.lams.tool.qa.QaSession;
  */
 public interface IQaSessionDAO
 {
-	public int countIncompleteSession(QaContent qa);
-    
+	public int countSessionIncomplete();
+	
+	public int countSessionComplete();
+		    
 	public QaSession getQaSessionById(long qaSessionId);
 	
 	public List getToolSessionsForContent(QaContent qa);
@@ -49,6 +51,8 @@ public interface IQaSessionDAO
     public void UpdateQaSession(QaSession session);
     
     public void deleteQaSession(QaSession session);
+    
+    public List getSessionsFromContent(QaContent qaContent);
 }
 
 

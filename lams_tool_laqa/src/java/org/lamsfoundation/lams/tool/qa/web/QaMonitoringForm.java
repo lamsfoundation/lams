@@ -39,6 +39,8 @@ public class QaMonitoringForm extends ActionForm implements QaAppConstants {
 	protected String deleteLesson;
 	protected String forceComplete;
 	
+	protected String method;
+	
 	protected String editReport;
 	protected String updateReport;
 	protected String hideReport;
@@ -304,4 +306,17 @@ public class QaMonitoringForm extends ActionForm implements QaAppConstants {
     public void setToolContentID(Long toolContentID) {
         this.toolContentID = toolContentID;
     }
+
+    /**
+	 * @return Returns the method.
+	 */
+	public String getMethod() {
+		return method;
+	}
+	/**
+	 * @param method The method to set.
+	 */
+	public void setMethod(String method) {
+		this.method = method;
+	}
 }

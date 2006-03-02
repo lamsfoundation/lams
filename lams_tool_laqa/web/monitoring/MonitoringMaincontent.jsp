@@ -27,7 +27,6 @@ http://www.gnu.org/licenses/gpl.txt
 <%@ taglib uri="fck-editor" prefix="FCK" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
-
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
@@ -183,8 +182,7 @@ http://www.gnu.org/licenses/gpl.txt
 		  </tr>
 		</table>
 
-		<!-- end tab buttons -->
-		
+		<!-- end tab buttons -->	
 		<html:hidden property="method"/>	 
 		<c:choose>
 		         <c:when test='${currentMonitoringTab == "instructions"}'>

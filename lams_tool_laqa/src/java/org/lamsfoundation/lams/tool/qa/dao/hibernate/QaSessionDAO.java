@@ -42,14 +42,34 @@ public class QaSessionDAO extends HibernateDaoSupport implements
 	private static final String COUNT_SESSION_INCOMPLITE 	= "select qaSession.session_status from QaSession qaSession where qaSession.session_status='INCOMPLETE' and qaSession.qaContentId = :qa";
 	private static final String COUNT_SESSION_ACTIVITY   	= "select qaSession.session_status from QaSession qaSession where qaSession.qaContentId = :qa";
 	private static final String GET_SESSION_IDS_FOR_CONTENT = "select qaSession.qaSessionId    from QaSession qaSession where qaSession.qaContentId = :qa";
-	
-	
-	public int countIncompleteSession(QaContent qa)
+	private static final String COUNT_SESSION_COMPLETE 		= "from   qaSession in class QaSession where qaSession.session_status='COMPLETE'";
+	private static final String COUNT_SESSION_INCOMPLETE 	= "from   qaSession in class QaSession where qaSession.session_status='INCOMPLETE'";
+	private static final String GET_SESSIONS_FROM_CONTENT 	= "select qas.qaSessionId from QaSession qas where qas.qaContent=:qaContent";
+		
+    public int countSessionComplete()
     {
-	   return (getHibernateTemplate().findByNamedParam(COUNT_SESSION_INCOMPLITE,
-            "qa",
-            qa)).size();
-    }
+    	HibernateTemplate templ = this.getHibernateTemplate();
+		List list = getSession().createQuery(COUNT_SESSION_COMPLETE)
+		.list();
+		
+		if(list != null && list.size() > 0){
+			return list.size();
+		}
+		else return 0;
+	}
+    
+    public int countSessionIncomplete()
+    {
+    	HibernateTemplate templ = this.getHibernateTemplate();
+		List list = getSession().createQuery(COUNT_SESSION_INCOMPLETE)
+		.list();
+		
+		if(list != null && list.size() > 0){
+			return list.size();
+		}
+		else return 0;
+	}
+
 	
     public int studentActivityOccurred(QaContent qa)
     {
@@ -118,5 +138,11 @@ public class QaSessionDAO extends HibernateDaoSupport implements
     	this.getSession().setFlushMode(FlushMode.AUTO);    	
         this.getHibernateTemplate().delete(qaSession);
     }
-
+    
+	public List getSessionsFromContent(QaContent qaContent)
+	{
+	    return (getHibernateTemplate().findByNamedParam(GET_SESSIONS_FROM_CONTENT,
+	            "qaContent",
+				qaContent));
+	}
 }

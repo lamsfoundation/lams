@@ -95,5 +95,8 @@ public class QaQueUsrDAO extends HibernateDaoSupport implements IQaQueUsrDAO {
 	    	this.getHibernateTemplate().delete(qaQueUsr);
 	    }
 	 	
-	 	
+	    public int getTotalNumberOfUsers() {
+			String query="from obj in class QaQueUsr"; 
+			return this.getHibernateTemplate().find(query).size();
+		}
 } 

@@ -27,8 +27,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.TimeZone;
+import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -469,4 +471,40 @@ public abstract class QaUtils implements QaAppConstants {
 		logger.debug("is run offline: " + qaContent.isRunOffline());
 		return qaContent.isRunOffline();
 	}
+	
+	/**
+	 * builds a String based map from a list 
+	 * convertToMap(List sessionsList)
+	 * 
+	 * @param sessionsList
+	 * @return Map
+	 */
+	public static Map convertToStringMap(List sessionsList, String listType)
+	{
+		Map map= new TreeMap(new QaComparator());
+		logger.debug("listType: " + listType);
+		
+		Iterator listIterator=sessionsList.iterator();
+    	Long mapIndex=new Long(1);
+    	
+    	
+    	while (listIterator.hasNext())
+    	{
+    		if (listType.equals("String"))
+    		{
+    			logger.debug("listType String");
+    			String text=(String)listIterator.next();
+    			map.put(mapIndex.toString(), text);
+    		}
+    		else if (listType.equals("Long"))
+    		{
+    			logger.debug("listType Long");
+    			Long LongValue=(Long)listIterator.next();
+    			map.put(mapIndex.toString(), LongValue.toString());
+    		}
+    		mapIndex=new Long(mapIndex.longValue()+1);
+    	}
+    	return map;
+	}
+
 }

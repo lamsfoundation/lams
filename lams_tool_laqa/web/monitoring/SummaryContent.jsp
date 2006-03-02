@@ -32,7 +32,21 @@ http://www.gnu.org/licenses/gpl.txt
 
 	<h2><font size=2> <bean:message key="button.summary"/> </font> </h2>
 	<div id="datatablecontainer">
-		summary screen
+		<c:if test="${sessionScope.userExceptionNoStudentActivity == 'true'}"> 	
+				<table class="forms" align="center">
+					<tr> 
+						<td NOWRAP valign=top align=center> 
+							<b> <font size=2> <bean:message key="error.noLearnerActivity"/> </font></b>
+						</td> 
+					<tr>
+				</table>
+		</c:if>						
+
+		<c:if test="${sessionScope.userExceptionNoStudentActivity != 'true'}"> 	
+			display summary screen
+		</c:if>						
+
+
 	</div>
 
 	

@@ -2,6 +2,7 @@
 package org.lamsfoundation.lams.tool.qa.web;
 
 import java.io.IOException;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -17,6 +18,9 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaApplicationException;
+import org.lamsfoundation.lams.tool.qa.QaContent;
+import org.lamsfoundation.lams.tool.qa.service.IQaService;
+import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 
@@ -67,6 +71,61 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	public boolean initialiseMonitoringData(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
 	{
 		logger.debug("start initializing  monitoring data...");
+		IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
+		request.getSession().setAttribute(TOOL_SERVICE, qaService);
+		
+		request.getSession().setAttribute(CURRENT_MONITORING_TAB, "summary");
+		
+		
+		/* we have made sure TOOL_CONTENT_ID is passed  */
+	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    logger.debug("toolContentId: " + toolContentId);
+	    
+	    QaContent qaContent=qaService.loadQa(toolContentId.longValue());
+		logger.debug("existing qaContent:" + qaContent);
+		
+		if (qaContent == null)
+		{
+			persistError(request, "error.content.doesNotExist");
+			//McUtils.cleanUpSessionAbsolute(request);
+			return false;
+		}
+		
+		/* this section is related to summary tab. Starts here. */
+		Map summaryToolSessions=MonitoringUtil.populateToolSessions(request, qaContent, qaService);
+		logger.debug("summaryToolSessions: " + summaryToolSessions);
+		if (summaryToolSessions.isEmpty())
+		{
+			/* inform in the Summary tab that the tool has no active sessions */
+			request.setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true));
+		}
+		 
+		request.getSession().setAttribute(SUMMARY_TOOL_SESSIONS, summaryToolSessions);
+	    logger.debug("SUMMARY_TOOL_SESSIONS: " + request.getSession().getAttribute(SUMMARY_TOOL_SESSIONS));
+	    /* ends here. */
+
+		
+		/* this section is related to Stats tab. Starts here. */
+		/* it is possible that no users has ever logged in for the activity yet*/ 
+	    int countAllUsers=qaService.getTotalNumberOfUsers();
+		logger.debug("countAllUsers: " + countAllUsers);
+		
+		if (countAllUsers == 0)
+		{
+	    	logger.debug("error: countAllUsers is 0");
+	    	request.getSession().setAttribute(USER_EXCEPTION_NO_STUDENT_ACTIVITY, new Boolean(true));
+		}
+		request.getSession().setAttribute(COUNT_ALL_USERS, new Integer(countAllUsers).toString());
+		
+		int countSessionComplete=qaService.countSessionComplete();
+		logger.debug("countSessionComplete: " + countSessionComplete);
+		request.getSession().setAttribute(COUNT_SESSION_COMPLETE, new Integer(countSessionComplete).toString());
+		/* ends here. */
+		
+		/* this section is related to instructions tab. Starts here. */
+	    request.getSession().setAttribute(RICHTEXT_ONLINEINSTRUCTIONS,qaContent.getOnlineInstructions());
+	    request.getSession().setAttribute(RICHTEXT_OFFLINEINSTRUCTIONS,qaContent.getOfflineInstructions());
+	    /* ends here. */
 		return true;
 	}
 

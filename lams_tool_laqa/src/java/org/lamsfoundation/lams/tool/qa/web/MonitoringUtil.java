@@ -22,6 +22,8 @@
 package org.lamsfoundation.lams.tool.qa.web;
 
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -31,6 +33,7 @@ import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
+import org.lamsfoundation.lams.tool.qa.QaUtils;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
@@ -217,5 +220,38 @@ public class MonitoringUtil implements QaAppConstants{
 		qaUsrResp.setHidden(false);
 		qaService.updateQaUsrResp(qaUsrResp);
 		logger.debug("updated user response in the db:  " + qaUsrResp);
+	}
+	
+	
+	/**
+	 * populates all the tool sessions in a map 
+	 * populateToolSessions(HttpServletRequest request, McContent mcContent)
+	 * 
+	 * @param request
+	 * @param mcContent
+	 * @return Map
+	 */
+	public static Map populateToolSessions(HttpServletRequest request, QaContent qaContent, IQaService qaService)
+	{
+		List sessionsList=qaService.getSessionsFromContent(qaContent);
+    	logger.debug("sessionsList size is:..." + sessionsList.size());
+    	
+    	Map sessionsMap=QaUtils.convertToStringMap(sessionsList, "Long");
+    	logger.debug("generated sessionsMap:..." + sessionsMap);
+    	logger.debug("sessionsMap size:..." + sessionsMap.size());
+    	
+    	if (sessionsMap.isEmpty())
+		{
+    		logger.debug("sessionsMap size is 0:");
+        	sessionsMap.put(new Long(1).toString() , "None");
+		}
+    	else
+    	{
+    		logger.debug("sessionsMap has some entries: " +  sessionsMap.size());
+    		sessionsMap.put(new Long(sessionsMap.size()+ 1).toString() , "All");	
+    	}
+    	
+    	logger.debug("final sessionsMap:" + sessionsMap);
+    	return sessionsMap;
 	}
 }

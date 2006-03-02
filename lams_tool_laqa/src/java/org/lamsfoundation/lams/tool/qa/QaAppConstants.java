@@ -73,7 +73,7 @@ public interface QaAppConstants {
     public static final String IS_ADD_QUESTION							="isAddQuestion";
     public static final String IS_REMOVE_QUESTION						="isRemoveQuestion";
     public static final String IS_REMOVE_CONTENT						="isRemoveContent";
-    
+        
     /*
      * tab controllers, constants for authoring page html tabs, used within jsp
      */
@@ -81,7 +81,6 @@ public interface QaAppConstants {
     public static final String CHOICE_TYPE_BASIC						="choiceTypeBasic";
     public static final String CHOICE_TYPE_ADVANCED						="choiceTypeAdvanced";
     public static final String CHOICE_TYPE_INSTRUCTIONS					="choiceTypeInstructions";
-
     
     /*
      * authoring mode constants
@@ -138,7 +137,15 @@ public interface QaAppConstants {
     public static final String USER_EXCEPTION_MONITORINGTAB_CONTENTID_REQUIRED	="userExceptionMonitoringTabContentIdRequired";
     public static final String USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP	="userExceptionDefaultContentNotSetup";
     public static final String USER_EXCEPTION_NO_TOOL_SESSIONS			="userExceptionNoToolSessions";
+    public static final String USER_EXCEPTION_NO_STUDENT_ACTIVITY		="userExceptionNoStudentActivity";
+    public static final String COUNT_SESSION_COMPLETE					="countSessionComplete";
     
+    public static final String TOP_MARK									="topMark";
+    public static final String LOWEST_MARK								="lowestMark";
+    public static final String AVERAGE_MARK								="averageMark";
+    public static final String COUNT_ALL_USERS							="countAllUsers";
+    public static final String CURRENT_MONITORING_TAB					="currentMonitoringTab";
+        
     /*
      * export portfolio constants
      */

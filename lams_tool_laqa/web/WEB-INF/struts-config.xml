@@ -157,7 +157,7 @@
 	      type="org.lamsfoundation.lams.tool.qa.web.QaMonitoringStarterAction"
 	      name="QaMonitoringForm"
 	      scope="session"
-	      parameter="dispatch"
+	      parameter="method"
 	      unknown="false"
 	      validate="false">
 
@@ -179,7 +179,7 @@
 	      type="org.lamsfoundation.lams.tool.qa.web.QaMonitoringAction"
 	      name="QaMonitoringForm"
 	      scope="session"
-	      parameter="dispatch"
+	      parameter="method"
 	      unknown="false"
 	      validate="false">
 	      

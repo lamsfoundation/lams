@@ -33,7 +33,32 @@ http://www.gnu.org/licenses/gpl.txt
 
 	<h2><font size=2> <bean:message key="button.stats"/> </font> </h2>
 	<div id="datatablecontainer">
-		stats screen
+		<table class="forms">
+			<tr>
+				<td>
+				<table align="center">
+						<tr> 
+							<td NOWRAP align="right" valign=top>
+				  				<b> <font size=2> <bean:message key="count.total.user" /> </font></b>
+				  			</td>
+							<td NOWRAP valign=top>
+							  	 <font size=2> <c:out value="${sessionScope.countAllUsers}"/>
+							</td> 
+						</tr>
+						
+						<tr> 
+							<td NOWRAP align="right" valign=top>
+				  				<b> <font size=2> <bean:message key="count.finished.user" /> </font></b>
+				  			</td>
+							<td NOWRAP valign=top>
+							  	 <font size=2> <c:out value="${sessionScope.countSessionComplete}"/></font>
+							</td> 
+						</tr>
+						
+				</table>
+				</td>
+			</tr>
+		</table>
 	</div>
 
 
