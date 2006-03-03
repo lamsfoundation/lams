@@ -321,9 +321,37 @@ public class QaServicePOJO
                                                         + e.getMessage(),
 														   e);
        }
-    	
 	}
     
+    public List getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long qaQueContentId) throws QaApplicationException
+	{
+        try
+        {
+        	return qaUsrRespDAO.getAttemptsForUserAndQuestionContent(queUsrId, qaQueContentId);
+        }
+        catch (DataAccessException e)
+        {
+            throw new QaApplicationException("Exception occured when lams is getting qa qaUsrRespDAO by user id and que content id: "
+                                                         + e.getMessage(),
+														   e);
+        }
+	}
+
+    
+    public List getUserBySessionOnly(final QaSession qaSession) throws QaApplicationException
+    {
+  	   try
+       {
+	   		return qaQueUsrDAO.getUserBySessionOnly(qaSession);
+       }
+       catch (DataAccessException e)
+       {
+           throw new QaApplicationException("Exception occured when lams is getting qa QueUsr by qa session "
+                                                        + e.getMessage(),
+														   e);
+       }
+    }
+
     
     public void createQaUsrResp(QaUsrResp qaUsrResp) throws QaApplicationException
     {

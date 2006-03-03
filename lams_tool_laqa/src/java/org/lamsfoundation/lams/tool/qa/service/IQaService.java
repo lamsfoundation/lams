@@ -79,6 +79,8 @@ public interface IQaService
 	public QaQueContent retrieveQaQue(long qaQueContentId);
 	
 	public QaQueUsr loadQaQueUsr(Long userId);
+	
+	public List getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long qaQueContentId);
 		
 	public void createQaQue(QaQueContent qaQueContent);
 	
@@ -141,6 +143,8 @@ public interface IQaService
 	public List getAllQuestionEntries(final Long uid) throws QaApplicationException;
 	
     public User getCurrentUserData(String username);
+    
+    public List getUserBySessionOnly(final QaSession qaSession);
     
     /**
      * 

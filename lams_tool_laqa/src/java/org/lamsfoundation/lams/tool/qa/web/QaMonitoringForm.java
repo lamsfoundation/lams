@@ -34,6 +34,8 @@ import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 public class QaMonitoringForm extends ActionForm implements QaAppConstants {
 //	 controls which method is called by the Lookup map */
 	protected String method;
+
+	protected String responseId;
 	
 	protected String selectedToolSessionId;
 	
@@ -75,5 +77,18 @@ public class QaMonitoringForm extends ActionForm implements QaAppConstants {
 	 */
 	public void setMethod(String method) {
 		this.method = method;
+	}
+	
+	/**
+	 * @return Returns the responseId.
+	 */
+	public String getResponseId() {
+		return responseId;
+	}
+	/**
+	 * @param responseId The responseId to set.
+	 */
+	public void setResponseId(String responseId) {
+		this.responseId = responseId;
 	}
 }

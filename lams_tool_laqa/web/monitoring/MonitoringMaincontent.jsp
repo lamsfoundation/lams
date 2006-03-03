@@ -62,6 +62,12 @@ http://www.gnu.org/licenses/gpl.txt
 			submitMethod(actionMethod);
 		}
 		
+		function submitEditResponse(responseId, actionMethod) 
+		{
+			document.QaMonitoringForm.responseId.value=responseId; 
+			submitMethod(actionMethod);
+		}
+		
 		function submitMethod(actionMethod) 
 		{
 			submitMonitoringMethod(actionMethod);

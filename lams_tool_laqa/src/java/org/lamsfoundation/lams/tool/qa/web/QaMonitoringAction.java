@@ -26,6 +26,7 @@
 package org.lamsfoundation.lams.tool.qa.web;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -42,6 +43,7 @@ import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaContent;
+import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -84,6 +86,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
                                          ServletException
 	{
     	logger.debug("dispatching getStats..." + request);
+    	request.getSession().setAttribute(EDIT_RESPONSE, new Boolean(false));
     	
     	request.getSession().setAttribute(CURRENT_MONITORING_TAB, "stats");
  		return (mapping.findForward(LOAD_MONITORING));
@@ -113,6 +116,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
                                          ServletException
 	{
     	logger.debug("dispatching getInstructions..." + request);
+    	request.getSession().setAttribute(EDIT_RESPONSE, new Boolean(false));
 
     	request.getSession().setAttribute(CURRENT_MONITORING_TAB, "instructions");
 	 	return (mapping.findForward(LOAD_MONITORING));
@@ -142,6 +146,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
                                          ServletException
 	{
     	logger.debug("dispatching getSummary..." + request);
+    	request.getSession().setAttribute(EDIT_RESPONSE, new Boolean(false));
     	
     	IQaService qaService = (IQaService)request.getSession().getAttribute(TOOL_SERVICE);
     	logger.debug("qaService: " + qaService);
@@ -192,6 +197,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
                                          ServletException
 	{
     	logger.debug("dispatching submitSession...");
+    	request.getSession().setAttribute(EDIT_RESPONSE, new Boolean(false));
     	
     	QaMonitoringForm qaMonitoringForm = (QaMonitoringForm) form;
 	 	String currentMonitoredToolSession=qaMonitoringForm.getSelectedToolSessionId(); 
@@ -216,6 +222,105 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	}
 
 	
+    public ActionForward editResponse(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+	{
+    	logger.debug("dispatching editResponse...");
+    	
+    	QaMonitoringForm qaMonitoringForm = (QaMonitoringForm) form;
+	 	
+	    String responseId=qaMonitoringForm.getResponseId();
+	    logger.debug("responseId: " + responseId);
+	    request.getSession().setAttribute(EDIT_RESPONSE, new Boolean(true));
+	    request.getSession().setAttribute(EDITABLE_RESPONSE_ID, responseId);
+	    
+	    refreshUserInput(request);
+	    
+	    return (mapping.findForward(LOAD_MONITORING));	
+	}
+    
+
+    public ActionForward updateResponse(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+	{
+    	logger.debug("dispatching updateResponse...");
+
+    	IQaService qaService = (IQaService)request.getSession().getAttribute(TOOL_SERVICE);
+    	logger.debug("qaService: " + qaService);
+
+    	QaMonitoringForm qaMonitoringForm = (QaMonitoringForm) form;
+	 	
+	    String responseId=qaMonitoringForm.getResponseId();
+	    logger.debug("responseId: " + responseId);
+	    
+	    String updatedResponse=request.getParameter("updatedResponse");
+	    logger.debug("updatedResponse: " + updatedResponse);
+	    QaUsrResp qaUsrResp= qaService.retrieveQaUsrResp(new Long(responseId).longValue());
+	    logger.debug("qaUsrResp: " + qaUsrResp);
+	    qaUsrResp.setAnswer(updatedResponse);
+	    qaService.updateQaUsrResp(qaUsrResp);
+	    logger.debug("response updated.");
+	    
+	    request.getSession().setAttribute(EDIT_RESPONSE, new Boolean(false));
+	    
+	    refreshUserInput(request);
+	    return (mapping.findForward(LOAD_MONITORING));	
+	}
+
+    
+    public ActionForward deleteResponse(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+	{
+    	logger.debug("dispatching deleteResponse...");
+    	request.getSession().setAttribute(EDIT_RESPONSE, new Boolean(false));
+
+    	IQaService qaService = (IQaService)request.getSession().getAttribute(TOOL_SERVICE);
+    	logger.debug("qaService: " + qaService);
+
+    	QaMonitoringForm qaMonitoringForm = (QaMonitoringForm) form;
+	 	
+	    String responseId=qaMonitoringForm.getResponseId();
+	    logger.debug("responseId: " + responseId);
+	    
+	    QaUsrResp qaUsrResp= qaService.retrieveQaUsrResp(new Long(responseId).longValue());
+	    logger.debug("qaUsrResp: " + qaUsrResp);
+	  
+	    qaService.removeUserResponse(qaUsrResp);
+	    logger.debug("response deleted.");
+	    
+	    logger.debug("CURRENT_MONITORED_TOOL_SESSION: " + request.getSession().getAttribute(CURRENT_MONITORED_TOOL_SESSION));
+	    
+	    refreshUserInput(request);
+    	return (mapping.findForward(LOAD_MONITORING));	
+	}
+
+
+    public void refreshUserInput(HttpServletRequest request)
+    {
+    	IQaService qaService = (IQaService)request.getSession().getAttribute(TOOL_SERVICE);
+    	logger.debug("qaService: " + qaService);
+        
+        Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+        logger.debug("toolContentId: " + toolContentId);
+        
+        QaContent qaContent=qaService.loadQa(toolContentId.longValue());
+    	logger.debug("existing qaContent:" + qaContent);
+    	
+        List listMonitoredAnswersContainerDTO=MonitoringUtil.buildGroupsQuestionData(request, qaContent);
+        request.getSession().setAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO, listMonitoredAnswersContainerDTO);
+        logger.debug("LIST_MONITORED_ANSWERS_CONTAINER_DTO: " + request.getSession().getAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO));
+    }
+    
+    
 	/**
      * persists error messages to request scope
      * persistError(HttpServletRequest request, String message)

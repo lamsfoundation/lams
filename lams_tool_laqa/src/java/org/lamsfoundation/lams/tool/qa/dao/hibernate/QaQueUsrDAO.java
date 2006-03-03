@@ -44,6 +44,7 @@ public class QaQueUsrDAO extends HibernateDaoSupport implements IQaQueUsrDAO {
 	 	static Logger logger = Logger.getLogger(QaQueUsrDAO.class.getName());
 	 	
 	 private static final String COUNT_SESSION_USER = "select qaQueUsr.queUsrId from QaQueUsr qaQueUsr where qaQueUsr.qaSessionId= :qaSession";
+	 private static final String LOAD_USER_FOR_SESSION = "from qaQueUsr in class QaQueUsr where  qaQueUsr.qaSessionId= :qaSessionId";
 		
 	   public QaQueUsr getQaUserByUID(Long uid)
 	   {
@@ -75,6 +76,16 @@ public class QaQueUsrDAO extends HibernateDaoSupport implements IQaQueUsrDAO {
 				}
 				return null;
 		}
+
+		
+		public List getUserBySessionOnly(final QaSession qaSession)
+	    {
+	        HibernateTemplate templ = this.getHibernateTemplate();
+	        List list = getSession().createQuery(LOAD_USER_FOR_SESSION)
+			.setLong("qaSessionId", qaSession.getUid().longValue())				
+			.list();
+			return list;
+	    }
 		
 		
 		public QaQueUsr loadQaQueUsrById(long qaQueUsrId)

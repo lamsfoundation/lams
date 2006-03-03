@@ -21,10 +21,13 @@
  * ***********************************************************************/
 package org.lamsfoundation.lams.tool.qa.dao.hibernate;
 
+import java.util.List;
+
 import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.dao.IQaUsrRespDAO;
+import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 
@@ -35,6 +38,7 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  */
 public class QaUsrRespDAO extends HibernateDaoSupport implements IQaUsrRespDAO
 {
+	private static final String LOAD_ATTEMPT_FOR_USER_AND_QUESTION_CONTENT	 = "from qaUsrResp in class QaUsrResp where qaUsrResp.queUsrId=:queUsrId and qaUsrResp.qaQueContentId=:qaQueContentId";
 
 	public QaQueUsr getUserById(long userId)
     {
@@ -78,6 +82,16 @@ public class QaUsrRespDAO extends HibernateDaoSupport implements IQaUsrRespDAO
         this.getHibernateTemplate().delete(resp);        
     }
 
+    public List getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long qaQueContentId)
+    {
+        HibernateTemplate templ = this.getHibernateTemplate();
+        List list = getSession().createQuery(LOAD_ATTEMPT_FOR_USER_AND_QUESTION_CONTENT)
+		.setLong("queUsrId", queUsrId.longValue())
+		.setLong("qaQueContentId", qaQueContentId.longValue())
+		.list();
+        
+		return list;
+    }
     
     public void removeUserResponseByQaQueId(Long qaQueId)
     {

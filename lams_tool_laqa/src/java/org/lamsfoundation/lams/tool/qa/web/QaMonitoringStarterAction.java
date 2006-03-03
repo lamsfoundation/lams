@@ -77,6 +77,7 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 		request.getSession().setAttribute(TOOL_SERVICE, qaService);
 		
 		request.getSession().setAttribute(CURRENT_MONITORING_TAB, "summary");
+		request.getSession().setAttribute(EDIT_RESPONSE, new Boolean(false));
 		
 		/*
 	     * persist time zone information to session scope. 

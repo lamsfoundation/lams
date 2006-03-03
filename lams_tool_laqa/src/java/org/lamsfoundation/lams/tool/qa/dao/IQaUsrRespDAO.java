@@ -21,6 +21,8 @@
  * ***********************************************************************/
 package org.lamsfoundation.lams.tool.qa.dao;
 
+import java.util.List;
+
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 
 
@@ -42,6 +44,8 @@ public interface IQaUsrRespDAO
 	public void removeUserResponseByQaQueId(Long qaQueId);
 	
 	public QaUsrResp retrieveQaUsrResp(long responseId);
+	
+	public List getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long qaQueContentId);
 }
 
 
