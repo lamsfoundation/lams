@@ -124,6 +124,7 @@
 			<fileset dir="${conf.web.dir}">
 				<include name="**/*.xml"/>
 				<include name="**/*.tld"/>
+				<include name="**/*.tag"/>
 			</fileset>
 		</copy>
 	</target>
@@ -139,6 +140,7 @@
 			<webinf dir="${conf.webinf.dir}">
 				<include name="*.xml"/>
 				<include name="*.tld"/>
+				<include name="tags/**"/>
 				<include name="*.properties"/>
 				<include name="struts/**"/>
 				<include name="jstl/**"/>
@@ -231,7 +233,7 @@
 	         				version="1.2" 
 	         				mergedir="${conf.xdoclet.dir}"/>
 			 
-			 <jsptaglib jspversion="1.1"
+			 <jsptaglib jspversion="2.0"
 						taglibversion="1.0"
 					 	shortname="lams"
 			 			displayname="LAMSTags"
