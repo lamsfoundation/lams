@@ -141,8 +141,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		qaAuthoringForm.resetRadioBoxes();
 		
 		request.getSession().setAttribute(IS_DEFINE_LATER,"false");
-		request.getSession().setAttribute(DISABLE_TOOL,"");
-
+		
 		IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
 		logger.debug("retrieving qaService from session: " + qaService);
 
@@ -211,41 +210,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 			}
 		}
         
-        
         qaAuthoringForm.setToolContentId(contentID.toString());
-	    Boolean isMonitoringEditActivityVisited=(Boolean)request.getSession().getAttribute(MONITORING_EDITACTIVITY_VISITED);
-	    logger.debug("isMonitoringEditActivityVisited: " + isMonitoringEditActivityVisited);
-	    
-	    Long monitoredContentId=(Long)request.getSession().getAttribute(MONITORED_CONTENT_ID);
-	    logger.debug("MONITORED_CONTENT_ID: " + monitoredContentId);
-	    
-	    request.getSession().setAttribute(RENDER_MONITORING_EDITACTIVITY,new Boolean(false));
-	    
-		Boolean startMonitoringSummaryRequest=(Boolean)request.getAttribute(START_MONITORING_SUMMARY_REQUEST);
-		if ((startMonitoringSummaryRequest != null) && (startMonitoringSummaryRequest.booleanValue()))
-		{
-			logger.debug("will render Monitoring Edit Activity screen");
-		    if  ((isMonitoringEditActivityVisited != null) && (isMonitoringEditActivityVisited.booleanValue()))
-		    {
-		    	if (monitoredContentId != null)
-		    	{
-		    		/* request is from Edit Activity tab in monitoring */
-		    		strToolContentId=monitoredContentId.toString();
-		    		logger.debug("request is from Edit Activity tab in monitoring: " + monitoredContentId);
-		    		logger.debug("using MONITORED_CONTENT_ID: " + monitoredContentId);
-		    		request.getSession().setAttribute(RENDER_MONITORING_EDITACTIVITY,new Boolean(true));
-		    	}
-		    }
-		}
-	    else
-	    {
-	    	logger.debug("will render authoring screen");
-	    	/* request is from authoring environment */
-	    	request.setAttribute(START_MONITORING_SUMMARY_REQUEST, new Boolean(false));
-	    	logger.debug("request is from authoring environment: ");
-	    	strToolContentId=request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	    }
-	    logger.debug("usable strToolContentId: " + strToolContentId);
 
 		/*
 		 * find out if the passed tool content id exists in the db 
@@ -297,13 +262,9 @@ public class QaStarterAction extends Action implements QaAppConstants {
 			ActionMessages errors= new ActionMessages();
 			errors.add(Globals.ERROR_KEY, new ActionMessage("error.content.inUse"));
 			saveErrors(request,errors);
-			request.getSession().setAttribute(CONTENT_LOCKED, new Boolean(true));
 			logger.debug("forwarding to:" + LOAD);
 			return (mapping.findForward(LOAD));
 		}
-		
-	    request.getSession().setAttribute(CONTENT_LOCKED, new Boolean(qaContent.isContentLocked()));
-	    logger.debug("CONTENT_LOCKED: " + request.getSession().getAttribute(CONTENT_LOCKED));
 		
 		QaUtils.setDefaultSessionAttributes(request, qaContent, qaAuthoringForm);
         QaUtils.populateUploadedFilesData(request, qaContent, qaService);
@@ -462,7 +423,6 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		/*
 		 * load questions page
 		 */
-		logger.debug("START_MONITORING_SUMMARY_REQUEST: " + request.getAttribute(START_MONITORING_SUMMARY_REQUEST));
 		logger.debug("RENDER_MONITORING_EDITACTIVITY: " + request.getAttribute(RENDER_MONITORING_EDITACTIVITY));
 		qaAuthoringForm.resetUserAction();
 		return (mapping.findForward(LOAD_QUESTIONS));
@@ -503,7 +463,6 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	public ActionForward startMonitoringSummary(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
 															throws IOException, ServletException, QaApplicationException 
 	{
-		request.setAttribute(START_MONITORING_SUMMARY_REQUEST, new Boolean(true));
 		return execute(mapping, form, request, response);
 	}
 	

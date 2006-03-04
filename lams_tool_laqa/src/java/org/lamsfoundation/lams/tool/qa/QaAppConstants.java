@@ -64,9 +64,6 @@ public interface QaAppConstants {
     public static final String LOAD										="load";
     public static final String LOAD_QUESTIONS							="load";
     public static final String LOAD_STARTER								="starter";
-    public static final String AUTHORING_BASIC							="authoringBasic";
-    public static final boolean MODE_OPTIONAL 							= false;
-    public static final String DISABLE_TOOL								="disabled";
     public static final String IS_DEFINE_LATER							="isDefineLater";
     public static final String LEARNING_MODE							="learningMode";
     
@@ -76,14 +73,6 @@ public interface QaAppConstants {
     public static final String IS_ADD_QUESTION							="isAddQuestion";
     public static final String IS_REMOVE_QUESTION						="isRemoveQuestion";
     public static final String IS_REMOVE_CONTENT						="isRemoveContent";
-        
-    /*
-     * tab controllers, constants for authoring page html tabs, used within jsp
-     */
-    public static final String CHOICE									="choice";
-    public static final String CHOICE_TYPE_BASIC						="choiceTypeBasic";
-    public static final String CHOICE_TYPE_ADVANCED						="choiceTypeAdvanced";
-    public static final String CHOICE_TYPE_INSTRUCTIONS					="choiceTypeInstructions";
     public static final String SELECTION_CASE							="selectionCase";
     
     /*
@@ -91,19 +80,11 @@ public interface QaAppConstants {
      */
     public static final String MAP_QUESTION_CONTENT						="mapQuestionContent";
     public static final String DEFAULT_QUESTION_CONTENT					="defaultQuestionContent";
-    public static final String TITLE									="title";
-    public static final String INSTRUCTIONS								="instructions";
-    public static final String CREATION_DATE							="creationDate";
-    public static final String USERNAME_VISIBLE							="usernameVisible";
     public static final String ONLINE_INSTRUCTIONS						="onlineInstructions";
     public static final String OFFLINE_INSTRUCTIONS						="offlineInstructions";
     public static final String END_LEARNING_MESSSAGE					="endLearningMessage";
-    public static final String CONTENT_LOCKED							="contentLocked";
     public static final String ON										="ON";
     public static final String OFF										="OFF";
-    public static final String IS_USERNAME_VISIBLE_MONITORING			="isUsernameVisibleMonitoring";
-    public static final String IS_SYNCH_INMONITOR_MONITORING			="isSynchInMonitorMonitoring";
-    public static final String IS_QUESTIONS_SEQUENCED_MONITORING		="isQuestionsSequencedMonitoring";
     public static final String RICHTEXT_OFFLINEINSTRUCTIONS				="richTextOfflineInstructions";
     public static final String RICHTEXT_ONLINEINSTRUCTIONS				="richTextOnlineInstructions";
     public static final String RICHTEXT_TITLE							="richTextTitle";
@@ -121,7 +102,6 @@ public interface QaAppConstants {
     public static final String COMPLETED 								="COMPLETED";
     
     public static final String MAP_TOOL_SESSIONS						="mapToolSessions";
-    public static final String RESPONSE_INDEX							="responseIndex";
     public static final Integer MAX_TOOL_SESSION_COUNT					=new Integer(500);
     public static final String IS_TOOL_SESSION_CHANGED					="isToolSessionChanged";
     public static final String USER_EXCEPTION_WRONG_FORMAT				="userExceptionWrongFormat";
@@ -143,13 +123,13 @@ public interface QaAppConstants {
     public static final String USER_EXCEPTION_NO_TOOL_SESSIONS			="userExceptionNoToolSessions";
     public static final String USER_EXCEPTION_NO_STUDENT_ACTIVITY		="userExceptionNoStudentActivity";
     public static final String COUNT_SESSION_COMPLETE					="countSessionComplete";
+    public static final String CURRENT_MONITORED_TOOL_SESSION 			="currentMonitoredToolSession";
     
-    public static final String TOP_MARK									="topMark";
-    public static final String LOWEST_MARK								="lowestMark";
-    public static final String AVERAGE_MARK								="averageMark";
     public static final String COUNT_ALL_USERS							="countAllUsers";
     public static final String CURRENT_MONITORING_TAB					="currentMonitoringTab";
     public static final String LIST_MONITORED_ANSWERS_CONTAINER_DTO		="listMonitoredAnswersContainerDto";
+    public static final String SUMMARY_TOOL_SESSIONS					="summaryToolSessions";
+    public static final String SUMMARY_TOOL_SESSIONS_ID					="summaryToolSessionsId";
         
     /*
      * export portfolio constants
@@ -200,53 +180,16 @@ public interface QaAppConstants {
     /*
      * Monitoring Mode constants
      */
-    public static final String REPORT_TITLE_MONITOR						="reportTitleMonitor"; 
-    public static final String MONITOR_USER_ID							="userId";
-    public static final String MONITORING_REPORT						="monitoringReport";
-    public static final String MONITORING_ERROR							="monitoringError";
-    public static final String MAP_MONITORING_QUESTIONS					="mapMonitoringQuestions";
-    public static final String SUMMARY_TOOL_SESSIONS					="summaryToolSessions";
-    public static final String SUMMARY_TOOL_SESSIONS_ID					="summaryToolSessionsId";
-    public static final String CURRENT_MONITORED_TOOL_SESSION 			="currentMonitoredToolSession";
-    public static final String CHOICE_MONITORING			  			="choiceMonitoring";
-    public static final String CHOICE_TYPE_MONITORING_SUMMARY 			="choiceTypeMonitoringSummary";
-    public static final String CHOICE_TYPE_MONITORING_INSTRUCTIONS 		="choiceTypeMonitoringInstructions";
-    public static final String CHOICE_TYPE_MONITORING_EDITACTIVITY 		="choiceTypeMonitoringEditActivity";
-    public static final String CHOICE_TYPE_MONITORING_STATS 	   		="choiceTypeMonitoringStats";
-    public static final String MONITORING_INSTRUCTIONS_VISITED 	   		="monitoringInstructionsVisited";
-    public static final String MONITORING_EDITACTIVITY_VISITED 	   		="monitoringEditActivityVisited";
-    public static final String MONITORING_STATS_VISITED 	   	   		="monitoringStatsVisited";
-    public static final String DATAMAP_EDITABLE					   		="dataMapEditable";
-    public static final String DATAMAP_EDITABLE_RESPONSE_ID		   		="dataMapEditableResponseId";
-    public static final String DATAMAP_HIDDEN_RESPONSE_ID		   		="dataMapHiddenResponseId";
-    public static final String MONITORED_CONTENT_ID				   		="monitoredContentId";
-    public static final String START_MONITORING_SUMMARY_REQUEST	   		="startMonitoringSummaryRequest";
-    public static final String STOP_RENDERING_QUESTIONS			   		="stopRenderingQuestions";
     public static final String EDITACTIVITY_EDITMODE	   		   		="editActivityEditMode";
     public static final String RENDER_MONITORING_EDITACTIVITY	   		="renderMonitoringEditActivity";
     public static final String NO_AVAILABLE_SESSIONS	   		   		="noAvailableSessions";
-
-    public static final String IS_MONITORING_DEFINE_LATER  		   		="isMonitoringDefineLater";
     public static final String NO_TOOL_SESSIONS_AVAILABLE				="noToolSessionAvailable";
-    public static final String ORIGINAL_TOOL_SESSIONS					="originalToolSessions";
     
-    public static final String MONITORED_OFFLINE_INSTRUCTIONS			="monitoredOfflineInstructions";
-    public static final String MONITORED_ONLINE_INSTRUCTIONS			="monitoredOnlineInstructions";
-    public static final String MONITORING_INSTRUCTIONS_UPDATE_MESSAGE	="monitoringInstructionsUpdateMessage";
-    
+    public static final String TIMEZONE									="timeZone";
+    public static final String TIMEZONE_ID								="timeZoneId";
     /*
      * Monitor and Learning common constants - used in jsp reporting
      */
-    public static final String FULLNAME									="fullName";
-    public static final String ANSWER									="answer";
-    public static final String ATIME									="aTime";
-    public static final String FORMATTED_ATIME							="formattedAtime";
-    public static final String RESPONSE_ID								="responseId";
-    public static final String RESPONSE_HIDDEN							="responseHidden";
-    public static final String CURRENTLEARNER_FULLNAME					="currentLearnerFullname";
-    public static final String ATTR_USERDATA 							="qa_user";
-    public static final String TIMEZONE									="timeZone";
-    public static final String TIMEZONE_ID								="timeZoneId";
     
     public static final String QUESTION_LISTING_MODE					="questionListingMode";
     public static final String QUESTION_LISTING_MODE_SEQUENTIAL			="questionListingModeSequential";

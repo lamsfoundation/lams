@@ -400,9 +400,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    	if (localToolSession.equals(incomingToolSessionId.toString()))
 	    	{
 		    	logger.debug("the learner has already responsed to this content, just generate a read-only report.");
-		    	LearningUtil learningUtil= new LearningUtil();
-		    	learningUtil.buidLearnerReport(request,1, qaService);    	
-		    	logger.debug("buidLearnerReport called successfully, forwarding to: " + LEARNER_REPORT);
+		    	
 		    	return (mapping.findForward(LEARNER_REPORT));	    		
 	    	}
 	    }

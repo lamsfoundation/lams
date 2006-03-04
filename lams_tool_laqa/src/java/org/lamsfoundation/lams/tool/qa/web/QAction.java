@@ -239,34 +239,21 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
             request.getSession().setAttribute(EDITACTIVITY_EDITMODE, new Boolean(true));
             return (mapping.findForward(LOAD_QUESTIONS));
         }
-
-        /*
-         * look after defineLater flag
-         */
-        Long monitoredContentId=(Long)request.getSession().getAttribute(MONITORED_CONTENT_ID);
-        logger.debug("MONITORED_CONTENT_ID: " + monitoredContentId);
-        if (monitoredContentId != null)
-        {
-            qaService.unsetAsDefineLater(monitoredContentId);
-            logger.debug("MONITORED_CONTENT_ID has been unset as defineLater: ");
-        }
         
-          List attachmentList = (List) request.getSession().getAttribute(ATTACHMENT_LIST);
-          List deletedAttachmentList = (List) request.getSession().getAttribute(DELETED_ATTACHMENT_LIST);
+        List attachmentList = (List) request.getSession().getAttribute(ATTACHMENT_LIST);
+        List deletedAttachmentList = (List) request.getSession().getAttribute(DELETED_ATTACHMENT_LIST);
 
-          authoringUtil.reconstructQuestionContentMapForSubmit(mapQuestionContent, request);
-        
-          logger.debug("before saveOrUpdateQaContent.");
-          QaContent qaContent = authoringUtil.saveOrUpdateQaContent(mapQuestionContent, qaService, qaAuthoringForm);
-          logger.debug("after saveOrUpdateQaContent.");
+        authoringUtil.reconstructQuestionContentMapForSubmit(mapQuestionContent, request);
+        logger.debug("before saveOrUpdateQaContent.");
+        QaContent qaContent = authoringUtil.saveOrUpdateQaContent(mapQuestionContent, qaService, qaAuthoringForm);
+        logger.debug("after saveOrUpdateQaContent.");
 
-          saveAttachments(qaContent, attachmentList, deletedAttachmentList, mapping, request);
-      
-          errors.clear();
-          errors.add(Globals.ERROR_KEY, new ActionMessage("submit.successful"));
-          request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(1));
-          logger.debug("setting SUBMIT_SUCCESS to 1.");
-        
+        saveAttachments(qaContent, attachmentList, deletedAttachmentList, mapping, request);
+  
+        errors.clear();
+        errors.add(Globals.ERROR_KEY, new ActionMessage("submit.successful"));
+        request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(1));
+        logger.debug("setting SUBMIT_SUCCESS to 1.");
         
         saveErrors(request,errors);
         
@@ -505,8 +492,6 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
             learningUtil.createUsersAndResponses(mapAnswers, request, qaService);
             qaLearningForm.resetUserActions();
             qaLearningForm.setSubmitAnswersContent(null);
-            /*start generating a report for the Learner*/
-            learningUtil.buidLearnerReport(request,1, qaService);
             Long toolContentId=(Long) request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
             learningUtil.lockContent(toolContentId.longValue(), qaService);
             logger.debug("content has been locked");

@@ -79,30 +79,7 @@ public class MonitoringUtil implements QaAppConstants{
 	}
 	
 	
-	/**
-	 * cleanupMonitoringSession(HttpServletRequest request)
-	 * @param request
-	 */
-	public void cleanupMonitoringSession(HttpServletRequest request)
-	{
-		request.getSession().removeAttribute(MAP_TOOL_SESSIONS);
-		request.getSession().removeAttribute(MAP_MONITORING_QUESTIONS);
-		request.getSession().removeAttribute(CURRENT_MONITORED_TOOL_SESSION);
-		request.getSession().removeAttribute(MAP_USER_RESPONSES);
-		request.getSession().removeAttribute(DATAMAP_EDITABLE);
-		request.getSession().removeAttribute(CHOICE_MONITORING);
-		request.getSession().removeAttribute(DATAMAP_EDITABLE_RESPONSE_ID);
-		request.getSession().removeAttribute(DATAMAP_HIDDEN_RESPONSE_ID);
-		
-		/* remove session attributes used commonly */
-		request.getSession().removeAttribute(IS_USERNAME_VISIBLE);
-		request.getSession().removeAttribute(REPORT_TITLE_MONITOR);
-		request.getSession().removeAttribute(IS_ALL_SESSIONS_COMPLETED);
-		request.getSession().removeAttribute(CHECK_ALL_SESSIONS_COMPLETED);
-		request.getSession().removeAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
-		request.getSession().removeAttribute(ATTR_USERDATA);
-		request.getSession().removeAttribute(TARGET_MODE);
-	}
+	
 
 
 

@@ -29,8 +29,6 @@ http://www.gnu.org/licenses/gpl.txt
 
  
 <div id="basicTabContainer">	
-		<c:if test="${(requestScope.startMonitoringSummaryRequest != 'true')  || (sessionScope.editActivityEditMode=='true') }"> 			
-			<c:if test="${requestScope.stopRenderingQuestions != 'true'}"> 			
 			<tr> <td>
 					<table align=center> 
 						<tr> 
@@ -146,73 +144,6 @@ http://www.gnu.org/licenses/gpl.txt
 					
 					</table>
 			</td></tr>			
-			</c:if>	
-		</c:if>	
-	
-		
-		<c:if test="${sessionScope.editActivityEditMode=='false'}"> 
-			<c:if test="${requestScope.startMonitoringSummaryRequest == 'true'}"> 
-			<c:if test="${requestScope.stopRenderingQuestions != 'true'}"> 			
-			<tr> <td>
-					<table align=center>
-						<tr> 
-					 		<td> <font size=2> <b> <bean:message key="label.authoring.title"/>:  </b></font></td>
-					 		<td NOWRAP width=700> <!-- Dave,I found width was necessary to present all the elements of the editor, feel free to change -->
-						 		<c:out value="${sessionScope.richTextTitle}" escapeXml="false" />
-							</td> 
-					  	</tr>
-
-					  	<tr> 
-					 		<td> <font size=2> <b> <bean:message key="label.authoring.instructions"/>:  </b></font></td> 
-					 		<td NOWRAP width=700> <!-- Dave,I found width was necessary to present all the elements of the editor, feel free to change -->
-							  <c:out value="${sessionScope.richTextInstructions}" escapeXml="false" />						  
-							</td>
-						</tr>
-				
-			 		<!--default question content, this entry can not be deleted but can be updated -->
-		
-				 		<tr> 
-						  	<td> <font size=2> <b>
-						  		<c:out value="Question 1"/>:  </b></font></td>
-						  		<td>
-									<c:out value="${sessionScope.defaultQuestionContent}"/>
-						  		</td>
-					  	</tr>
-		
-				  	<!--end of default question content -->
-				  	
-			  		<!-- if there is more than just the default content start presenting them -->
-			  	 		<c:set var="queIndex" scope="session" value="1"/>
-						<c:forEach var="questionEntry" items="${sessionScope.mapQuestionContent}">
-					  		<c:if test="${questionEntry.key > 1}"> 			
-								<c:set var="queIndex" scope="session" value="${queIndex +1}"/>
-								  <tr>
-								  	<td> <font size=2> <b><c:out value="Question ${queIndex}"/>:  </b></font></td>
-								  		<td> <c:out value="${questionEntry.value}"/>
-									  	&nbsp
-									  	</td>
-								  </tr>
-							</c:if> 			
-						</c:forEach>
-						<html:hidden property="toolContentId" value="${sessionScope.toolContentID}"/>
-						<html:hidden property="questionIndex"/>
-						<html:hidden property="isRemoveContent"/>
-					</table>
-		
-					<hr>
-					<table>
-							<tr>
-									 <td> 
-										 <html:submit property="edit" styleClass="linkbutton" onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
-											<bean:message key="label.edit"/>
-										</html:submit>
-									</td> 
-							</tr>
-					</table>
-			</td></tr>			
-			</c:if>	
-			</c:if>	
-		</c:if>	
 </div>	
 
 <SCRIPT language="JavaScript"> 

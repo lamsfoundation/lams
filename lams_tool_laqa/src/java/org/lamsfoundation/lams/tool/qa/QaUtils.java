@@ -102,49 +102,7 @@ public abstract class QaUtils implements QaAppConstants {
      */
     public static void cleanupSession(HttpServletRequest request)
     {
-    	/* remove session attributes in Authoring mode */ 
-		request.getSession().removeAttribute(DEFAULT_QUESTION_CONTENT);
-		request.getSession().removeAttribute(MAP_QUESTION_CONTENT);
-		request.getSession().removeAttribute(CHOICE);
-		request.getSession().removeAttribute(IS_DEFINE_LATER);
-		request.getSession().removeAttribute(DISABLE_TOOL);
-		request.getSession().removeAttribute(CHOICE_TYPE_BASIC);
-	    request.getSession().removeAttribute(CHOICE_TYPE_ADVANCED);
-	    request.getSession().removeAttribute(CHOICE_TYPE_INSTRUCTIONS);
-	    request.getSession().removeAttribute(REPORT_TITLE);
-	    request.getSession().removeAttribute(INSTRUCTIONS);
-	    request.getSession().removeAttribute(TITLE);
-	    request.getSession().removeAttribute(CONTENT_LOCKED);
-	    
-		/* remove session attributes in Learner mode */
-		request.getSession().removeAttribute(MAP_ANSWERS);
-		request.getSession().removeAttribute(MAP_QUESTION_CONTENT_LEARNER);
-		request.getSession().removeAttribute(CURRENT_QUESTION_INDEX);
-		request.getSession().removeAttribute(TOTAL_QUESTION_COUNT);
-		request.getSession().removeAttribute(CURRENT_ANSWER);
-		request.getSession().removeAttribute(USER_FEEDBACK);
-		request.getSession().removeAttribute(AttributeNames.PARAM_TOOL_SESSION_ID);
-		request.getSession().removeAttribute(QUESTION_LISTING_MODE);
-		request.getSession().removeAttribute(QUESTION_LISTING_MODE_SEQUENTIAL);
-		request.getSession().removeAttribute(QUESTION_LISTING_MODE_COMBINED);
-		request.getSession().removeAttribute(MAP_USER_RESPONSES);
-		request.getSession().removeAttribute(MAP_MAIN_REPORT);
-		request.getSession().removeAttribute(REPORT_TITLE_LEARNER);
-		request.getSession().removeAttribute(END_LEARNING_MESSAGE);
-		request.getSession().removeAttribute(IS_TOOL_ACTIVITY_OFFLINE);
-		
-		/* remove session attributes in Monitoring mode */
-		request.getSession().removeAttribute(MAP_TOOL_SESSIONS);
-		request.getSession().removeAttribute(MAP_MONITORING_QUESTIONS);
-		
-		/* remove session attributes used commonly */
-		request.getSession().removeAttribute(IS_USERNAME_VISIBLE);
-		request.getSession().removeAttribute(REPORT_TITLE_MONITOR);
-		request.getSession().removeAttribute(IS_ALL_SESSIONS_COMPLETED);
-		request.getSession().removeAttribute(CHECK_ALL_SESSIONS_COMPLETED);
-		request.getSession().removeAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
-		request.getSession().removeAttribute(ATTR_USERDATA);
-		request.getSession().removeAttribute(TARGET_MODE);
+
     }
 
     /**
@@ -176,49 +134,7 @@ public abstract class QaUtils implements QaAppConstants {
 	}
     
     
-    /**
-     * Helper method to retrieve the user data. We always load up from http
-     * session first to optimize the performance. If no session cache available,
-     * we load it from data source.
-     * @param request A standard Servlet HttpServletRequest class.
-     * @param surveyService the service facade of qa tool
-     * @return the user data value object
-     */
-	public static User getUserData(HttpServletRequest request,IQaService qaService) throws QaApplicationException
-    {
-        User userCompleteData = (User) request.getSession().getAttribute(ATTR_USERDATA);
-	    logger.debug(logger + " " + "QaUtils" +  "retrieving userCompleteData: " + userCompleteData);
-        /*
-         * if no session cache available, retrieve it from data source
-         */
-        if (userCompleteData == null)
-        {	
-        	/*
-             * WebUtil.getUsername(request,DEVELOPMENT_FLAG) returns the current learner's username based on 
-             * user principals defined in the container. If no username is defined in the container, we get a RunTimeException.
-             */
-        	
-        	/*
-        	 * pass testing flag as false to obtain user principal 
-        	 */
-        	try
-			{
-        		String userName=getUsername(request,false);
-        		userCompleteData = qaService.getCurrentUserData(userName);
-        	}
-        	catch(QaApplicationException e)
-			{
-        		logger.debug(logger + " " + "QaUtils" +  " Exception occured: Tool expects the current user is an authenticated user and he has a security principal defined. Can't continue!: " + e);
-        		throw new QaApplicationException("Exception occured: " +
-    			"Tool expects the current user is an authenticated user and he has a security principal defined. Can't continue!");	
-			}
-        	
-            logger.debug(logger + " " + "QaUtils" +  "retrieving userCompleteData from service: " + userCompleteData);
-            /* this can be redundant as we keep the User data in TOOL_USER */
-            request.getSession().setAttribute(ATTR_USERDATA, userCompleteData);
-        }
-        return userCompleteData;
-    }
+
 
 	public static int getCurrentUserId(HttpServletRequest request) throws QaApplicationException
     {
@@ -319,6 +235,7 @@ public abstract class QaUtils implements QaAppConstants {
 	    logger.debug("current timezone id: " + timeZone.getID());
 	    request.getSession().setAttribute(TIMEZONE_ID, timeZone.getID());
 	}
+
 
 	/**
 	 * stores the rich text values on the forms into the session scope
