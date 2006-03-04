@@ -102,8 +102,6 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 
-
-
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaApplicationException;
 import org.lamsfoundation.lams.tool.qa.QaComparator;
@@ -135,34 +133,68 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
   								throws IOException, ServletException, QaApplicationException {
 	
+		QaUtils.cleanUpSessionAbsolute(request);
+		logger.debug("init authoring mode. removed attributes...");
+
 		Map mapQuestionContent= new TreeMap(new QaComparator());
+		logger.debug("mapQuestionContent: " + mapQuestionContent);
 		
 		QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
+		logger.debug("qaAuthoringForm: " + qaAuthoringForm);
 		qaAuthoringForm.resetRadioBoxes();
 		
-		request.getSession().setAttribute(IS_DEFINE_LATER,"false");
 		
-		IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-		logger.debug("retrieving qaService from session: " + qaService);
+		IQaService qaService = (IQaService)request.getSession().getAttribute(TOOL_SERVICE);
+		logger.debug("qaService: " + qaService);
+		if (qaService == null)
+		{
+			logger.debug("will retrieve qaService");
+			qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
+			logger.debug("retrieving qaService from session: " + qaService);
+		}
+	    request.getSession().setAttribute(TOOL_SERVICE, qaService);
+		
+		String servletPath=request.getServletPath();
+		logger.debug("getServletPath: "+ servletPath);
+		if (servletPath.indexOf("authoringStarter") > 0)
+		{
+			logger.debug("request is for authoring module");
+			request.getSession().setAttribute(ACTIVE_MODULE, AUTHORING);
+			request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(true));
+			request.getSession().setAttribute(SHOW_AUTHORING_TABS,new Boolean(true).toString());
+		}
+		else
+		{
+			logger.debug("request is for define later module. either direct or by monitoring module");
+			request.getSession().setAttribute(ACTIVE_MODULE, DEFINE_LATER);
+			request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(false));
+			request.getSession().setAttribute(SHOW_AUTHORING_TABS,new Boolean(false).toString());			
+		}
 
 	
-		/* needs to be called only once.  */ 
+		/* in development this needs to be called only once.  */ 
 		/* QaUtils.configureContentRepository(request); */
+		
+		String sourceMcStarter = (String) request.getAttribute(SOURCE_MC_STARTER);
+		logger.debug("sourceMcStarter: " + sourceMcStarter);
+
 		
 	    /*
 	     * obtain and setup the current user's data 
 	     * get session from shared session. */
-	    HttpSession ss = SessionManager.getSession();
-	    /* get back login user DTO */
+	   
+		HttpSession ss = SessionManager.getSession();
 	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	    if ((user == null) || (user.getUserID() == null))
 	    {
 	    	logger.debug("error: The tool expects userId");
 	    	persistError(request,"error.authoringUser.notAvailable");
 	    	request.setAttribute(USER_EXCEPTION_USERID_NOTAVAILABLE, new Boolean(true));
-	    	return (mapping.findForward(LOAD_QUESTIONS));
+			logger.debug("forwarding to: " + ERROR_LIST);
+			return (mapping.findForward(ERROR_LIST));
 	    }
-
+	    
+		
 	    ActionForward validateSignature=readSignature(request,mapping);
 		logger.debug("validateSignature:  " + validateSignature);
 		if (validateSignature != null)
@@ -176,11 +208,6 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	     */
 	    request.getSession().setAttribute(TARGET_MODE,TARGET_MODE_AUTHORING);
 	    
-	    /*
-	     * define tab controllers for jsp
-	     */
-	    request.getSession().setAttribute(EDITACTIVITY_EDITMODE, new Boolean(false));
-		
 	    /*
 	     * find out whether the request is coming from monitoring module for EditActivity tab or from authoring environment url
 	     */
@@ -220,16 +247,41 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		 * there is no need to check if the content is locked in this case.
 		 * It is always unlocked since it is the default content.
 		*/
+        
+        /*
+	    QaContent qaContent = qaService.loadQa(contentID.longValue());
+		logger.debug("QaContent: " + qaContent);
+		
+		boolean studentActivity=qaService.studentActivityOccurredGlobal(qaContent);
+		logger.debug("studentActivity on content: " + studentActivity);
+		if (studentActivity)
+		{
+			logger.debug("forward to warning screen as the content is not allowed to be modified.");
+			ActionMessages errors= new ActionMessages();
+			errors.add(Globals.ERROR_KEY, new ActionMessage("error.content.inUse"));
+			saveErrors(request,errors);
+			QaUtils.cleanUpSessionAbsolute(request);
+			logger.debug("forwarding to: " + ERROR_LIST);
+			return (mapping.findForward(ERROR_LIST));
+		}
+		
+		*/
+		
 		if (!existsContent(contentID.longValue(), qaService)) 
 		{
 			String defaultContentIdStr=(String) request.getSession().getAttribute(DEFAULT_CONTENT_ID_STR);
 			logger.debug("defaultContentIdStr:" + defaultContentIdStr);
-            return retrieveContent(request, mapping, qaAuthoringForm, mapQuestionContent, new Long(defaultContentIdStr).longValue());
+            retrieveContent(request, mapping, qaAuthoringForm, mapQuestionContent, new Long(defaultContentIdStr).longValue());
 		}
         else
         {
-            return retrieveContent(request, mapping, qaAuthoringForm, mapQuestionContent, contentID.longValue());
+            retrieveContent(request, mapping, qaAuthoringForm, mapQuestionContent, contentID.longValue());
         }
+		
+		logger.debug("will return to jsp with: " + sourceMcStarter);
+		String destination=QaUtils.getDestination(sourceMcStarter);
+		logger.debug("destination: " + destination);
+		return (mapping.findForward(destination));
 	} 
 	
 	
@@ -245,30 +297,28 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	 * @param toolContentId
 	 * @return ActionForward
 	 */
-	protected ActionForward retrieveContent(HttpServletRequest request, ActionMapping mapping, QaAuthoringForm qaAuthoringForm, Map mapQuestionContent, long toolContentId)
+	protected void retrieveContent(HttpServletRequest request, ActionMapping mapping, QaAuthoringForm qaAuthoringForm, Map mapQuestionContent, long toolContentId)
 	{
 		logger.debug("starting retrieveExistingContent for toolContentId: " + toolContentId);
-		IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-		
-		logger.debug("getting existing content with id:" + toolContentId);
+
+		IQaService qaService = (IQaService)request.getSession().getAttribute(TOOL_SERVICE);
+		logger.debug("qaService: " + qaService);
+		if (qaService == null)
+		{
+			logger.debug("will retrieve qaService");
+			qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
+			logger.debug("retrieving qaService from session: " + qaService);
+		}
+	    request.getSession().setAttribute(TOOL_SERVICE, qaService);
+
+	    logger.debug("getting existing content with id:" + toolContentId);
 	    QaContent qaContent = qaService.retrieveQa(toolContentId);
 		logger.debug("QaContent: " + qaContent);
 		
-		boolean studentActivity=qaService.studentActivityOccurredGlobal(qaContent);
-		logger.debug("studentActivity on content: " + studentActivity);
-		if (studentActivity)
-		{
-			logger.debug("forward to warning screen as the content is not allowed to be modified.");
-			ActionMessages errors= new ActionMessages();
-			errors.add(Globals.ERROR_KEY, new ActionMessage("error.content.inUse"));
-			saveErrors(request,errors);
-			logger.debug("forwarding to:" + LOAD);
-			return (mapping.findForward(LOAD));
-		}
 		
 		QaUtils.setDefaultSessionAttributes(request, qaContent, qaAuthoringForm);
         QaUtils.populateUploadedFilesData(request, qaContent, qaService);
-	    request.getSession().setAttribute(IS_DEFINE_LATER, 					new Boolean(qaContent.isDefineLater()));
+	    request.getSession().setAttribute(IS_DEFINE_LATER, new Boolean(qaContent.isDefineLater()));
 	    
 	    
 	    /*
@@ -297,7 +347,15 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		logger.debug("Map initialized with existing contentid to: " + mapQuestionContent);
 		
 		logger.debug("callling presentInitialUserInterface for the existing content.");
-		return presentInitialUserInterface(request, mapping, qaAuthoringForm, mapQuestionContent);
+		
+		request.getSession().setAttribute(MAP_QUESTION_CONTENT, mapQuestionContent);
+		logger.debug("starter initialized the Comparable Map: " + request.getSession().getAttribute("mapQuestionContent") );
+
+		/*
+		 * load questions page
+		 */
+		logger.debug("RENDER_MONITORING_EDITACTIVITY: " + request.getAttribute(RENDER_MONITORING_EDITACTIVITY));
+		qaAuthoringForm.resetUserAction();
 	}
 
 	
@@ -313,8 +371,15 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	 */
 	public ActionForward readSignature(HttpServletRequest request, ActionMapping mapping)
 	{
-		IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-		logger.debug("retrieving qaService from session: " + qaService);
+		IQaService qaService = (IQaService)request.getSession().getAttribute(TOOL_SERVICE);
+		logger.debug("qaService: " + qaService);
+		if (qaService == null)
+		{
+			logger.debug("will retrieve qaService");
+			qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
+			logger.debug("retrieving qaService from session: " + qaService);
+		}
+	    request.getSession().setAttribute(TOOL_SERVICE, qaService);
 		/*
 		 * retrieve the default content id based on tool signature
 		 */
@@ -337,7 +402,8 @@ public class QaStarterAction extends Action implements QaAppConstants {
 			logger.debug("error getting the default content id: " + e.getMessage());
 			persistError(request,"error.defaultContent.notSetup");
 	    	request.setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true));
-			return (mapping.findForward(LOAD_QUESTIONS)); //TODO: forward to error page
+			logger.debug("forwarding to: " + ERROR_LIST);
+			return (mapping.findForward(ERROR_LIST));
 		}
 
 		
@@ -351,9 +417,8 @@ public class QaStarterAction extends Action implements QaAppConstants {
 			{
 				logger.debug("Exception occured: No default content");
 	    		persistError(request,"error.defaultContent.notSetup");
+	    		QaUtils.cleanUpSessionAbsolute(request);
 	    		return (mapping.findForward(LOAD_QUESTIONS));
-	    		//McUtils.cleanUpSessionAbsolute(request);
-				//return (mapping.findForward(ERROR_LIST));
 			}
 			logger.debug("using qaContent: " + qaContent);
 			logger.debug("using mcContent uid: " + qaContent.getUid());
@@ -364,9 +429,9 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		{
 			logger.debug("Exception occured: No default question content");
 			persistError(request,"error.defaultContent.notSetup");
-			return (mapping.findForward(LOAD_QUESTIONS));
-			//McUtils.cleanUpSessionAbsolute(request);
-			//return (mapping.findForward(ERROR_LIST));
+			QaUtils.cleanUpSessionAbsolute(request);
+			logger.debug("forwarding to: " + ERROR_LIST);
+			return (mapping.findForward(ERROR_LIST));
 		}
 
 		
@@ -381,9 +446,8 @@ public class QaStarterAction extends Action implements QaAppConstants {
 			{
 				logger.debug("Exception occured: No default question content");
 	    		persistError(request,"error.defaultQuestionContent.notAvailable");
+	    		QaUtils.cleanUpSessionAbsolute(request);
 	    		return (mapping.findForward(LOAD_QUESTIONS));
-	    		//McUtils.cleanUpSessionAbsolute(request);
-				//return (mapping.findForward(ERROR_LIST));
 			}
 			logger.debug("using qaQueContent uid: " + qaQueContent.getUid());
 			//request.getSession().setAttribute(DEFAULT_QUESTION_UID, new Long(queContentUID));
@@ -393,9 +457,9 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		{
 			logger.debug("Exception occured: No default question content");
     		persistError(request,"error.defaultQuestionContent.notAvailable");
-    		return (mapping.findForward(LOAD_QUESTIONS));
-    		//McUtils.cleanUpSessionAbsolute(request);
-			//return (mapping.findForward(ERROR_LIST));
+    		QaUtils.cleanUpSessionAbsolute(request);    		
+			logger.debug("forwarding to: " + ERROR_LIST);
+			return (mapping.findForward(ERROR_LIST));
 		}
 		
 		logger.debug("QA tool has the default content id: " + defaultContentID);
@@ -403,30 +467,6 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		return null;
 	}
 	
-	
-	/**
-	 * presents the final Map to the jsp
-	 * ActionForward presentInitialUserInterface(HttpServletRequest request, ActionMapping mapping, QaAuthoringForm qaAuthoringForm, Map mapQuestionContent)
-	 * 
-	 * @param request
-	 * @param mapping
-	 * @param qaAuthoringForm
-	 * @param mapQuestionContent
-	 * @return
-	 */
-	protected ActionForward presentInitialUserInterface(HttpServletRequest request, ActionMapping mapping, QaAuthoringForm qaAuthoringForm, Map mapQuestionContent)
-	{
-		logger.debug("starting presentInitialUserInterface...");
-		request.getSession().setAttribute(MAP_QUESTION_CONTENT, mapQuestionContent);
-		logger.debug("starter initialized the Comparable Map: " + request.getSession().getAttribute("mapQuestionContent") );
-
-		/*
-		 * load questions page
-		 */
-		logger.debug("RENDER_MONITORING_EDITACTIVITY: " + request.getAttribute(RENDER_MONITORING_EDITACTIVITY));
-		qaAuthoringForm.resetUserAction();
-		return (mapping.findForward(LOAD_QUESTIONS));
-	}
 	
 	
 	/**
@@ -444,29 +484,18 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		return true;	
 	}
 	
-	
-	/**
-	 * mark the request scope to generate monitoring summary screen
-	 * 
-	 * ActionForward startMonitoringSummary(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
-															throws IOException, ServletException, QaApplicationException 
-	 * 
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return
-	 * @throws IOException
-	 * @throws ServletException
-	 * @throws QaApplicationException
-	 */
-	public ActionForward startMonitoringSummary(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
-															throws IOException, ServletException, QaApplicationException 
-	{
+
+	public ActionForward executeDefineLater(ActionMapping mapping, ActionForm form, 
+			HttpServletRequest request, HttpServletResponse response, IQaService qaService) 
+		throws IOException, ServletException, QaApplicationException {
+		logger.debug("passed qaService: " + qaService);
+		request.getSession().setAttribute(TOOL_SERVICE, qaService);
+		logger.debug("calling execute...");
 		return execute(mapping, form, request, response);
 	}
+
 	
-	
+
 	/**
      * persists error messages to request scope
      * @param request

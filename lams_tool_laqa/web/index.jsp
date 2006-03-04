@@ -74,6 +74,12 @@ http://www.gnu.org/licenses/gpl.txt
       <html:submit value="Remove Copied Tool Content"/>
 </html:form>
 
+<html:form action="<%=strDefineLater%>" method="post">
+      <table border=1>
+      </table><br/>
+      <html:submit value="Define Later URL"/>
+</html:form>
+
 <html:form action="<%=strSetDefineLater%>" method="post">
       <table border=1>
       </table><br/>

@@ -151,6 +151,32 @@
 		    redirect="true"
 	  	/>      
 	</action>
+	
+	   <!--Define Later Starter Action: initializes the DefineLater module -->
+   <action path="/defineLaterStarter" 
+   			type="org.lamsfoundation.lams.tool.qa.web.QaDLStarterAction" 
+   			name="QaAuthoringForm" 
+   			input="/index.jsp"> 
+
+	  	<forward
+		    name="load"
+          	path="/AuthoringMaincontent.jsp"
+		    redirect="true"
+	  	/>
+	  	
+	  	<forward
+	        name="starter"
+	        path="/index.jsp"
+	        redirect="true"
+	     />
+	  	
+	  	<forward
+		    name="errorList"
+		    path="/QaErrorBox.jsp"
+		    redirect="true"
+	  	/>
+	</action>  
+	
 
 	 <action
 	      path="/monitoringStarter"

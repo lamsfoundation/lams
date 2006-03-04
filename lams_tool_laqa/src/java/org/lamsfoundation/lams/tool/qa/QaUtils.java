@@ -36,6 +36,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
+
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.web.QaAuthoringForm;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -423,5 +424,172 @@ public abstract class QaUtils implements QaAppConstants {
     	}
     	return map;
 	}
+	
+	public static boolean isContentInUse(QaContent qaContent)
+	{
+		logger.debug("is content inuse: " + qaContent.isContentLocked());
+		return  qaContent.isContentLocked();
+	}
 
+	/**
+	 * the only attribute kept is TOOL_SESSION 
+	 * cleanUpSessionAbsolute(HttpServletRequest request)
+	 * @param request
+	 */
+	public static void cleanUpSessionAbsolute(HttpServletRequest request)
+	{
+		request.getSession().removeAttribute(MY_SIGNATURE);
+		request.getSession().removeAttribute(ERROR_MCAPPLICATION);
+		request.getSession().removeAttribute(TOOL_CONTENT_ID);
+		request.getSession().removeAttribute(TARGET_MODE);
+		request.getSession().removeAttribute(TARGET_MODE_AUTHORING);
+		request.getSession().removeAttribute(TARGET_MODE_LEARNING);
+		request.getSession().removeAttribute(TARGET_MODE_MONITORING);
+		request.getSession().removeAttribute(TARGET_MODE_EXPORT_PORTFOLIO);
+		request.getSession().removeAttribute(AUTHORING_STARTER);
+		request.getSession().removeAttribute(LOAD_LEARNER);
+		request.getSession().removeAttribute(LEARNING_STARTER);
+		request.getSession().removeAttribute(MONITORING_STARTER);
+		request.getSession().removeAttribute(LOAD_MONITORING);
+		request.getSession().removeAttribute(EDIT_RESPONSE);
+		request.getSession().removeAttribute(EDITABLE_RESPONSE_ID);
+		request.getSession().removeAttribute(COPY_TOOL_CONTENT);
+		request.getSession().removeAttribute(ERROR_LIST);
+		request.getSession().removeAttribute(ERROR_LIST_LEARNER);
+		request.getSession().removeAttribute(DEFAULT_CONTENT_ID_STR);
+		request.getSession().removeAttribute(TOOL_SESSION_ID);
+		request.getSession().removeAttribute(LOAD);
+		request.getSession().removeAttribute(LOAD_QUESTIONS);
+		request.getSession().removeAttribute(LOAD_STARTER);
+		request.getSession().removeAttribute(IS_DEFINE_LATER);
+		request.getSession().removeAttribute(LEARNING_MODE);
+		request.getSession().removeAttribute(IS_ADD_QUESTION);
+		request.getSession().removeAttribute(IS_REMOVE_QUESTION);
+		request.getSession().removeAttribute(IS_REMOVE_CONTENT);
+		request.getSession().removeAttribute(SELECTION_CASE);
+		request.getSession().removeAttribute(MAP_QUESTION_CONTENT);
+		request.getSession().removeAttribute(DEFAULT_QUESTION_CONTENT);
+		request.getSession().removeAttribute(ONLINE_INSTRUCTIONS);
+		request.getSession().removeAttribute(OFFLINE_INSTRUCTIONS);
+		request.getSession().removeAttribute(END_LEARNING_MESSSAGE);
+		request.getSession().removeAttribute(ON);
+		request.getSession().removeAttribute(OFF);
+		request.getSession().removeAttribute(RICHTEXT_OFFLINEINSTRUCTIONS);
+		request.getSession().removeAttribute(RICHTEXT_ONLINEINSTRUCTIONS);
+		request.getSession().removeAttribute(RICHTEXT_TITLE);
+		request.getSession().removeAttribute(RICHTEXT_INSTRUCTIONS);
+		request.getSession().removeAttribute(RICHTEXT_BLANK);
+		request.getSession().removeAttribute(SUBMIT_OFFLINE_FILE);
+		request.getSession().removeAttribute(SUBMIT_ONLINE_FILE);
+		request.getSession().removeAttribute(POPULATED_UPLOADED_FILESDATA);
+		request.getSession().removeAttribute(USER_ID);
+		request.getSession().removeAttribute(NOT_ATTEMPTED);
+		request.getSession().removeAttribute(INCOMPLETE);
+		request.getSession().removeAttribute(COMPLETED);
+		request.getSession().removeAttribute(MAP_TOOL_SESSIONS);
+		request.getSession().removeAttribute(MAX_TOOL_SESSION_COUNT.toString());
+		request.getSession().removeAttribute(IS_TOOL_SESSION_CHANGED);
+		request.getSession().removeAttribute(USER_EXCEPTION_WRONG_FORMAT);
+		request.getSession().removeAttribute(USER_EXCEPTION_UNCOMPATIBLE_IDS);
+		request.getSession().removeAttribute(USER_EXCEPTION_NUMBERFORMAT);
+		request.getSession().removeAttribute(USER_EXCEPTION_CONTENT_DOESNOTEXIST);
+		request.getSession().removeAttribute(USER_EXCEPTION_TOOLSESSION_DOESNOTEXIST);
+		request.getSession().removeAttribute(USER_EXCEPTION_CONTENTID_REQUIRED);
+		request.getSession().removeAttribute(USER_EXCEPTION_TOOLSESSIONID_REQUIRED);
+		request.getSession().removeAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOT_AVAILABLE);
+		request.getSession().removeAttribute(USER_EXCEPTION_DEFAULTQUESTIONCONTENT_NOT_AVAILABLE);
+		request.getSession().removeAttribute(USER_EXCEPTION_USERID_NOTAVAILABLE);
+		request.getSession().removeAttribute(USER_EXCEPTION_USERID_NOTNUMERIC);
+		request.getSession().removeAttribute(USER_EXCEPTION_ONLYCONTENT_ANDNOSESSIONS);
+		request.getSession().removeAttribute(USER_EXCEPTION_USERID_EXISTING);
+		request.getSession().removeAttribute(USER_EXCEPTION_USER_DOESNOTEXIST);
+		request.getSession().removeAttribute(USER_EXCEPTION_MONITORINGTAB_CONTENTID_REQUIRED);
+		request.getSession().removeAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP);
+		request.getSession().removeAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS);
+		request.getSession().removeAttribute(USER_EXCEPTION_NO_STUDENT_ACTIVITY);
+		request.getSession().removeAttribute(COUNT_SESSION_COMPLETE);
+		request.getSession().removeAttribute(CURRENT_MONITORED_TOOL_SESSION);
+		request.getSession().removeAttribute(COUNT_ALL_USERS);
+		request.getSession().removeAttribute(CURRENT_MONITORING_TAB);
+		request.getSession().removeAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO);
+		request.getSession().removeAttribute(SUMMARY_TOOL_SESSIONS);
+		request.getSession().removeAttribute(SUMMARY_TOOL_SESSIONS_ID);
+		request.getSession().removeAttribute(MODE);
+		request.getSession().removeAttribute(LEARNER);
+		request.getSession().removeAttribute(TEACHER);
+		request.getSession().removeAttribute(USER_EXCEPTION_MODE_REQUIRED);
+		request.getSession().removeAttribute(PORTFOLIO_REPORT);
+		request.getSession().removeAttribute(PORTFOLIO_REQUEST);
+		request.getSession().removeAttribute(ADD_NEW_QUESTION);
+		request.getSession().removeAttribute(REMOVE_QUESTION);
+		request.getSession().removeAttribute(REMOVE_ALL_CONTENT);
+		request.getSession().removeAttribute(SUBMIT_ALL_CONTENT);
+		request.getSession().removeAttribute(SUBMIT_TAB_DONE);
+		request.getSession().removeAttribute(OPTION_OFF);
+		request.getSession().removeAttribute(MAP_QUESTION_CONTENT_LEARNER);
+		request.getSession().removeAttribute(CURRENT_QUESTION_INDEX);
+		request.getSession().removeAttribute(CURRENT_QUESTION_INDEX);
+		request.getSession().removeAttribute(TOTAL_QUESTION_COUNT);
+		request.getSession().removeAttribute(MAP_ANSWERS);
+		request.getSession().removeAttribute(USER_FEEDBACK);
+		request.getSession().removeAttribute(REPORT_TITLE);
+		request.getSession().removeAttribute(MONITORING_REPORT_TITLE);
+		request.getSession().removeAttribute(REPORT_TITLE_LEARNER);
+		request.getSession().removeAttribute(END_LEARNING_MESSAGE);
+		request.getSession().removeAttribute(IS_TOOL_ACTIVITY_OFFLINE);
+		request.getSession().removeAttribute(CHECK_ALL_SESSIONS_COMPLETED);
+		request.getSession().removeAttribute(FROM_TOOL_CONTENT_ID);
+		request.getSession().removeAttribute(TO_TOOL_CONTENT_ID);
+		request.getSession().removeAttribute(LEARNER_REPORT);
+		request.getSession().removeAttribute(EDITACTIVITY_EDITMODE);
+		request.getSession().removeAttribute(RENDER_MONITORING_EDITACTIVITY);
+		request.getSession().removeAttribute(NO_AVAILABLE_SESSIONS);
+		request.getSession().removeAttribute(NO_TOOL_SESSIONS_AVAILABLE);
+		request.getSession().removeAttribute(TIMEZONE);
+		request.getSession().removeAttribute(TIMEZONE_ID);
+		request.getSession().removeAttribute(QUESTION_LISTING_MODE);
+		request.getSession().removeAttribute(QUESTION_LISTING_MODE_SEQUENTIAL);
+		request.getSession().removeAttribute(QUESTION_LISTING_MODE_COMBINED);
+		request.getSession().removeAttribute(FEEDBACK_TYPE_SEQUENTIAL);
+		request.getSession().removeAttribute(FEEDBACK_TYPE_COMBINED);
+		request.getSession().removeAttribute(QUESTIONS);
+		request.getSession().removeAttribute(ATTACHMENT_LIST);
+		request.getSession().removeAttribute(SUBMIT_SUCCESS);
+		request.getSession().removeAttribute(DELETED_ATTACHMENT_LIST);
+		request.getSession().removeAttribute(UUID);
+		request.getSession().removeAttribute(ACTIVITY_TITLE);
+		request.getSession().removeAttribute(ACTIVITY_INSTRUCTIONS);
+		request.getSession().removeAttribute(IS_USERNAME_VISIBLE);
+		request.getSession().removeAttribute(CURRENT_ANSWER);
+		request.getSession().removeAttribute(ACTIVE_MODULE);
+		request.getSession().removeAttribute(AUTHORING);
+		request.getSession().removeAttribute(DEFINE_LATER_IN_EDIT_MODE);
+		request.getSession().removeAttribute(SHOW_AUTHORING_TABS);
+		request.getSession().removeAttribute(DEFINE_LATER);
+		request.getSession().removeAttribute(SOURCE_MC_STARTER);
+		request.getSession().removeAttribute(IS_MONITORED_CONTENT_IN_USE);
+		request.getSession().removeAttribute(LOAD_MONITORING_CONTENT_EDITACTIVITY);
+	}
+	
+	
+	public static String getDestination(String sourceMcStarter)
+	{
+		logger.debug("sourceMcStarter: " + sourceMcStarter);
+		
+		if ((sourceMcStarter != null) && !sourceMcStarter.equals("monitoring"))
+		{
+			logger.debug("request is from authoring or define Later url. return to: " + LOAD_QUESTIONS);
+			return LOAD_QUESTIONS;	
+		}
+		else if (sourceMcStarter == null)
+		{
+			logger.debug("request is from authoring url. return to: " + LOAD_QUESTIONS);
+			return LOAD_QUESTIONS;	
+		}
+		else
+		{
+			logger.debug("request is from monitoring url. return to: " + LOAD_MONITORING_CONTENT_EDITACTIVITY);
+			return LOAD_MONITORING_CONTENT_EDITACTIVITY;	
+		}
+	}
 }

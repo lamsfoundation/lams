@@ -44,6 +44,7 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
+import org.lamsfoundation.lams.tool.qa.QaUtils;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -122,6 +123,49 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	 	return (mapping.findForward(LOAD_MONITORING));
 	}
 
+    
+    public ActionForward editActivity(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+	{
+    	logger.debug("dispatching editActivity...");
+    	QaMonitoringForm qaMonitoringForm = (QaMonitoringForm) form;
+    	IQaService qaService = (IQaService)request.getSession().getAttribute(TOOL_SERVICE);
+    	logger.debug("qaService: " + qaService);
+    	    	
+	 	request.getSession().setAttribute(CURRENT_MONITORING_TAB, "editActivity");
+ 		
+		QaStarterAction qaStarterAction= new QaStarterAction();
+
+		Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    logger.debug("toolContentId: " + toolContentId);
+	    	    
+	    request.setAttribute(SOURCE_MC_STARTER, "monitoring");
+	    logger.debug("SOURCE_MC_STARTER: monitoring");
+	    
+		/* it is possible that the content is being used by some learners. In this situation, the content  is marked as "in use" and 
+		   content in use is not modifiable*/ 
+		QaContent qaContent=qaService.loadQa(toolContentId.longValue());
+		logger.debug("qaContent:" + qaContent);
+		boolean isContentInUse=QaUtils.isContentInUse(qaContent);
+		logger.debug("isContentInUse:" + isContentInUse);
+		
+		if (isContentInUse == true)
+		{
+			logger.debug("monitoring url does not allow editActivity since the content is in use.");
+	    	persistError(request,"error.content.inUse");
+	    	QaUtils.cleanUpSessionAbsolute(request);
+	    	request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(true).toString());
+			logger.debug("forwarding to: " + LOAD_MONITORING);
+			return (mapping.findForward(LOAD_MONITORING));
+		}
+
+	    return qaStarterAction.executeDefineLater(mapping, form, request, response, qaService);
+	}
+
+    
     
     /**
      * switches to summary tab of the monitoring url
@@ -327,11 +371,13 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
             HttpServletResponse response) throws IOException,
                                          ServletException
     {
-    	//McUtils.cleanUpSessionAbsolute(request);
+    	QaUtils.cleanUpSessionAbsolute(request);
     	/*forward outside of the app. Currently it is index.jsp */
     	return (mapping.findForward(LOAD_STARTER)); 
     }
 
+    
+    
     
 	/**
      * persists error messages to request scope

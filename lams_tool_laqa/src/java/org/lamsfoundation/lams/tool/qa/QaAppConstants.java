@@ -52,6 +52,15 @@ public interface QaAppConstants {
 	public static final String DEFAULT_CONTENT_ID_STR					="defaultContentIdStr";
 	public static final String TOOL_SESSION_ID 							= "toolSessionID";
 	
+	public static final String ACTIVE_MODULE							="activeModule";
+	public static final String AUTHORING								="authoring";
+	public static final String DEFINE_LATER_IN_EDIT_MODE				="defineLaterInEditMode";
+	public static final String SHOW_AUTHORING_TABS						="showAuthoringTabs";
+	public static final String DEFINE_LATER								="defineLater";
+	public static final String SOURCE_MC_STARTER						="sourceMcStarter";	
+	
+	public static final String IS_MONITORED_CONTENT_IN_USE				="isMonitoredContentInUse";
+	public static final String LOAD_MONITORING_CONTENT_EDITACTIVITY				="loadMonitoringEditActivity";
 			
 	/*
      * refers to number of questions presented initially, we have a single record for default content
@@ -130,6 +139,12 @@ public interface QaAppConstants {
     public static final String LIST_MONITORED_ANSWERS_CONTAINER_DTO		="listMonitoredAnswersContainerDto";
     public static final String SUMMARY_TOOL_SESSIONS					="summaryToolSessions";
     public static final String SUMMARY_TOOL_SESSIONS_ID					="summaryToolSessionsId";
+    
+    public static final String ACTIVITY_TITLE							="activityTitle";
+    public static final String ACTIVITY_INSTRUCTIONS					="activityInstructions";
+    public static final String IS_USERNAME_VISIBLE						="isUsernameVisible";
+    public static final String CURRENT_ANSWER							="currentAnswer";
+
         
     /*
      * export portfolio constants
@@ -158,25 +173,18 @@ public interface QaAppConstants {
     public static final String CURRENT_QUESTION_INDEX					="currentQuestionIndex";
     public static final String TOTAL_QUESTION_COUNT						="totalQuestionCount";
     public static final String MAP_ANSWERS								="mapAnswers";
-    public static final String CURRENT_ANSWER							="currentAnswer";
     public static final String USER_FEEDBACK							="userFeedback";
     public static final String REPORT_TITLE								="reportTitle"; 
     public static final String MONITORING_REPORT_TITLE					="monitoringReportTitle"; 
     public static final String REPORT_TITLE_LEARNER						="reportTitleLearner"; 
     public static final String END_LEARNING_MESSAGE						="endLearningMessage";
     public static final String IS_TOOL_ACTIVITY_OFFLINE					="isToolActivityOffline";
-    public static final String IS_USERNAME_VISIBLE						="isUsernameVisible";
-    public static final String IS_ALL_SESSIONS_COMPLETED				="isAllSessionsCompleted";
     public static final String CHECK_ALL_SESSIONS_COMPLETED				="checkAllSessionsCompleted";
     public static final String FROM_TOOL_CONTENT_ID						="fromToolContentId";
     public static final String TO_TOOL_CONTENT_ID						="toToolContentId";
     public static final String LEARNER_REPORT							="learnerReport";
-    public static final String MAP_USER_RESPONSES						="mapUserResponses";
-    public static final String MAP_MAIN_REPORT							="mapMainReport";
-    public static final String MAP_STATS								="mapStats";
-    public static final String ACTIVITY_TITLE							="activityTitle";
-    public static final String ACTIVITY_INSTRUCTIONS					="activityInstructions";
-        
+    
+            
     /*
      * Monitoring Mode constants
      */

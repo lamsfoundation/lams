@@ -42,7 +42,7 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
   								throws IOException, ServletException, QaApplicationException 
 	{
 		logger.debug("init QaMonitoringStarterAction...");
-		//McUtils.cleanUpSessionAbsolute(request);
+		QaUtils.cleanUpSessionAbsolute(request);
 		
 	    ActionForward validateParameters=validateParameters(request, mapping);
 	    logger.debug("validateParamaters: " + validateParameters);
@@ -94,7 +94,7 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 		if (qaContent == null)
 		{
 			persistError(request, "error.content.doesNotExist");
-			//McUtils.cleanUpSessionAbsolute(request);
+			QaUtils.cleanUpSessionAbsolute(request);
 			return false;
 		}
 		
@@ -113,8 +113,6 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 		logger.debug("summaryToolSessionsId: " + summaryToolSessionsId);
 		request.getSession().setAttribute(SUMMARY_TOOL_SESSIONS_ID, summaryToolSessionsId);
 	    	
-	    	    
-	    
 	    
 	    /* SELECTION_CASE == 2 indicates start up */
 	    request.getSession().setAttribute(SELECTION_CASE, new Long(2));
@@ -191,7 +189,7 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	    if ((strToolContentId == null) || (strToolContentId.length() == 0)) 
 	    {
 	    	persistError(request, "error.contentId.required");
-	    	//McUtils.cleanUpSessionAbsolute(request);
+	    	QaUtils.cleanUpSessionAbsolute(request);
 			return (mapping.findForward(ERROR_LIST));
 	    }
 	    else
@@ -206,7 +204,7 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 			{
 	    		persistError(request, "error.contentId.numberFormatException");
 	    		logger.debug("add error.contentId.numberFormatException to ActionMessages.");
-	    		//McUtils.cleanUpSessionAbsolute(request);
+	    		QaUtils.cleanUpSessionAbsolute(request);
 				return (mapping.findForward(ERROR_LIST));
 			}
 	    }

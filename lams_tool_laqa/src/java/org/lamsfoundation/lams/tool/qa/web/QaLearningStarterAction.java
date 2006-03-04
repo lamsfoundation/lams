@@ -169,7 +169,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 			}
 			catch(ToolException e)
 			{
-				//McUtils.cleanUpSessionAbsolute(request);
+				QaUtils.cleanUpSessionAbsolute(request);
 				logger.debug("tool exception: "  + e);
 			}
 		}
@@ -184,7 +184,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 			}
 			catch(ToolException e)
 			{
-				//McUtils.cleanUpSessionAbsolute(request);
+				QaUtils.cleanUpSessionAbsolute(request);
 				logger.debug("tool exception"  + e);
 			}
 		}
@@ -200,7 +200,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 			}
 			catch(ToolException e)
 			{
-				//McUtils.cleanUpSessionAbsolute(request);
+				QaUtils.cleanUpSessionAbsolute(request);
 				logger.debug("tool exception"  + e);
 			}
 		}
@@ -244,8 +244,8 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    {
 	    	logger.debug("error: The tool expects qaContent.");
 	    	persistError(request,"error.toolContent.notAvailable");
-	    	//McUtils.cleanUpSessionAbsolute(request);
-			return (mapping.findForward(ERROR_LIST_LEARNER));
+	    	QaUtils.cleanUpSessionAbsolute(request);
+	    	return (mapping.findForward(ERROR_LIST_LEARNER));
 	    }
 
 	    request.getSession().setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, qaContent.getQaContentId());
@@ -372,7 +372,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    {
 	    	logger.debug("warning to learner: the activity is offline.");
 	    	persistError(request,"label.learning.runOffline");
-	    	//McUtils.cleanUpSessionAbsolute(request);
+	    	QaUtils.cleanUpSessionAbsolute(request);
 			return (mapping.findForward(ERROR_LIST_LEARNER));
 	    }
     	
