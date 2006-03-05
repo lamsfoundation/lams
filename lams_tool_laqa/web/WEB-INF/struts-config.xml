@@ -67,6 +67,12 @@
         />
 
 	  	<forward
+		    name="loadMonitoring"
+		    path="/monitoring/MonitoringMaincontent.jsp"
+		    redirect="true"
+	  	/>
+
+	  	<forward
 		    name="errorList"
 		    path="/QaErrorBox.jsp"
 		    redirect="true"
@@ -235,6 +241,18 @@
 		    redirect="true"
 	  	/>
 
+        <forward
+          name="load"
+          path="/AuthoringMaincontent.jsp"
+          redirect="false"
+        />
+	  	
+	  	<forward
+          name="loadViewOnly"
+          path="/authoring/AuthoringTabsHolder.jsp"
+          redirect="false"
+        />
+	  	
 	    <forward
 	        name="starter"
 	        path="/index.jsp"

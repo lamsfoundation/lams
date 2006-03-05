@@ -430,7 +430,7 @@ public abstract class QaUtils implements QaAppConstants {
 	}
 
 	/**
-	 * the only attribute kept is TOOL_SESSION 
+	 * the only attributes kept are TOOL_SESSION and TOOL_CONTENT_ID 
 	 * cleanUpSessionAbsolute(HttpServletRequest request)
 	 * @param request
 	 */
@@ -438,7 +438,6 @@ public abstract class QaUtils implements QaAppConstants {
 	{
 		request.getSession().removeAttribute(MY_SIGNATURE);
 		request.getSession().removeAttribute(ERROR_MCAPPLICATION);
-		request.getSession().removeAttribute(TOOL_CONTENT_ID);
 		request.getSession().removeAttribute(TARGET_MODE);
 		request.getSession().removeAttribute(TARGET_MODE_AUTHORING);
 		request.getSession().removeAttribute(TARGET_MODE_LEARNING);
@@ -567,6 +566,7 @@ public abstract class QaUtils implements QaAppConstants {
 		request.getSession().removeAttribute(SOURCE_MC_STARTER);
 		request.getSession().removeAttribute(IS_MONITORED_CONTENT_IN_USE);
 		request.getSession().removeAttribute(LOAD_MONITORING_CONTENT_EDITACTIVITY);
+		request.getSession().removeAttribute(MONITORING_ORIGINATED_DEFINELATER);
 	}
 	
 	
@@ -597,12 +597,11 @@ public abstract class QaUtils implements QaAppConstants {
 			logger.debug("request is from define Later url. return to: " + LOAD_VIEW_ONLY);
 			return LOAD_VIEW_ONLY;	
 		}
-		if (requestedModule.equals(AUTHORING))
+		else if (requestedModule.equals(AUTHORING))
 		{
 			logger.debug("request is from authoring url. return to: " + LOAD_QUESTIONS);
 			return LOAD_QUESTIONS;	
 		}
-
 		else
 		{
 			logger.debug("request is from an unknown source. return null");

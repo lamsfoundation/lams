@@ -46,6 +46,7 @@ import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.QaUtils;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
+import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
@@ -132,9 +133,16 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	{
     	logger.debug("dispatching editActivity...");
     	QaMonitoringForm qaMonitoringForm = (QaMonitoringForm) form;
+
     	IQaService qaService = (IQaService)request.getSession().getAttribute(TOOL_SERVICE);
-    	logger.debug("qaService: " + qaService);
-    	    	
+		logger.debug("qaService: " + qaService);
+		if (qaService == null)
+		{
+			logger.debug("will retrieve qaService");
+			qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
+			logger.debug("retrieving qaService from session: " + qaService);
+		}
+	    request.getSession().setAttribute(TOOL_SERVICE, qaService);
 	 	request.getSession().setAttribute(CURRENT_MONITORING_TAB, "editActivity");
  		
 		QaStarterAction qaStarterAction= new QaStarterAction();

@@ -27,7 +27,7 @@ http://www.gnu.org/licenses/gpl.txt
 <%@ taglib uri="fck-editor" prefix="FCK" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
-
+	
 	<div id="basicTabContainer">	
 				<tr> <td>
 						<table align=center> 

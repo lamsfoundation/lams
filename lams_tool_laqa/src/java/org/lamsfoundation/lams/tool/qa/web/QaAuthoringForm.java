@@ -22,9 +22,8 @@
 package org.lamsfoundation.lams.tool.qa.web;
 
 /* ActionForm for the Authoring environment*/
-import org.apache.struts.action.ActionForm;
-import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.apache.struts.upload.FormFile;
+import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 
 /**
  * @author Ozgur Demirtas
@@ -32,7 +31,7 @@ import org.apache.struts.upload.FormFile;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class QaAuthoringForm extends ActionForm implements QaAppConstants {
+public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 	/* form controllers */
 	protected String addContent;
 	protected String removeContent;

@@ -133,17 +133,50 @@ function pviiClassNew(obj, new_style) { //v2.7 by PVII
 				</c:if> 											  
 				
 				<c:if test="${ (sessionScope.activeModule == 'defineLater') &&  
-							   (sessionScope.defineLaterInEditMode != 'true') 
-							  }"> 			
+							   (sessionScope.defineLaterInEditMode != 'true') && 
+							   (monitoringOriginatedDefineLater != 'true')
+							  }">
+
 			        <div class="tabbody" id="tabbody1">
+			        	<tr><td>
+								<font size=3> <b> <bean:message key="label.authoring.qa"/> </b> </font>
+						</td></tr><tr> <td> &nbsp&nbsp&nbsp&nbsp</td> </tr>
 				        <jsp:include page="/authoring/BasicContentViewOnly.jsp" />
    				    </div>
 				</c:if> 											  				
 				
 				<c:if test="${ (sessionScope.activeModule == 'defineLater') &&  
-							   (sessionScope.defineLaterInEditMode == 'true') 
+							   (sessionScope.defineLaterInEditMode != 'true') &&
+							   (monitoringOriginatedDefineLater == 'true')							   
 							  }"> 			
-			        <jsp:include page="/authoring/AuthoringTabs.jsp" />				
+
+					<b> <font size=2> <bean:message key="label.monitoring"/> </font></b>
+			        <jsp:include page="/monitoring/MonitoringTabsHeader.jsp" />
+			        <div class="tabbody" id="tabbody1">
+				        <jsp:include page="/authoring/BasicContentViewOnly.jsp" />
+   				    </div>
+				</c:if> 											  				
+				
+				<!-- switching from define later view only to editable -->
+				<c:if test="${ (sessionScope.activeModule == 'defineLater') &&  
+							   (sessionScope.defineLaterInEditMode == 'true') &&
+							   (monitoringOriginatedDefineLater != 'true')							   
+							  }"> 			
+			        <div class="tabbody" id="tabbody1">
+				        <jsp:include page="/authoring/AuthoringTabs.jsp" />				
+   				    </div>			        
+			    </c:if> 											  						
+
+
+				<c:if test="${ (sessionScope.activeModule == 'defineLater') &&  
+							   (sessionScope.defineLaterInEditMode == 'true') &&
+							   (monitoringOriginatedDefineLater == 'true')							   
+							  }"> 			
+					<b> <font size=2> <bean:message key="label.monitoring"/> </font></b>
+			        <jsp:include page="/monitoring/MonitoringTabsHeader.jsp" />
+			        <div class="tabbody" id="tabbody1">
+				        <jsp:include page="/authoring/AuthoringTabs.jsp" />				
+   				    </div>			        
 			    </c:if> 											  						
 </html:form>
 </body>

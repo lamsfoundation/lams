@@ -234,7 +234,40 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
         qaAuthoringForm.resetUserAction();
         return mapping.findForward(LOAD_QUESTIONS);
     }
+
     
+    public ActionForward getSummary(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+	{
+    	logger.debug("dispatching proxy getSummary...start with monitoringStarter" + request);
+ 		return null;
+	}
+
+    
+    public ActionForward getInstructions(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+	{
+    	logger.debug("dispatching proxy getInstructions..." + request);
+ 		return null;
+
+	}
+
+    public ActionForward getStats(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+	{
+    	logger.debug("dispatching proxy getStats..." + request);
+ 		return null;
+	}
+
     
     public ActionForward editActivityQuestions(ActionMapping mapping,
             ActionForm form,

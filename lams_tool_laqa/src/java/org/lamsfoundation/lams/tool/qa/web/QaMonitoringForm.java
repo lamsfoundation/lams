@@ -22,7 +22,7 @@
 package org.lamsfoundation.lams.tool.qa.web;
 
 /* ActionForm for the Monitoring environment */
-import org.apache.struts.action.ActionForm;
+
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 
 /**
@@ -31,7 +31,7 @@ import org.lamsfoundation.lams.tool.qa.QaAppConstants;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class QaMonitoringForm extends ActionForm implements QaAppConstants {
+public class QaMonitoringForm extends QaAuthoringForm implements QaAppConstants {
 //	 controls which method is called by the Lookup map */
 	protected String method;
 

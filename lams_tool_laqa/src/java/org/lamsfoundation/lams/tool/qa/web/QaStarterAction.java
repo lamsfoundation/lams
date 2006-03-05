@@ -31,8 +31,7 @@
 /**
  * Tool path The URL path for the tool should be <lamsroot>/tool/$TOOL_SIG.
  * 
- * CONTENT_LOCKED refers to content being in use or not: Any students answered that content?
- * For future CONTENT_LOCKED ->CONTENT_IN_USE 
+ * CONTENT_LOCKED ->CONTENT_IN_USE 
  * 
  * QaStarterAction loads the default content and initializes the presentation Map
  * Requests can come either from authoring envuironment or from the monitoring environment for Edit Activity screen
@@ -166,13 +165,20 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		}
 		else
 		{
-			logger.debug("request is for define later module. either direct or by monitoring module");
+			logger.debug("request is for define later module either direcly from define later url or monitoring url");
 			request.getSession().setAttribute(ACTIVE_MODULE, DEFINE_LATER);
 			request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(false));
 			request.getSession().setAttribute(SHOW_AUTHORING_TABS,new Boolean(false).toString());
 			requestedModule=DEFINE_LATER;
+			
+			if (servletPath.indexOf("monitoring") > 0)
+			{
+				logger.debug("request is from monitoring  url.");
+				request.getSession().setAttribute(MONITORING_ORIGINATED_DEFINELATER,new Boolean(true).toString());
+			}
 		}
 		logger.debug("requestedModule: " + requestedModule);
+		request.getSession().setAttribute(REQUESTED_MODULE,requestedModule);
 
 	
 		/* in development this needs to be called only once.  */ 
@@ -214,9 +220,47 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	    /*
 	     * find out whether the request is coming from monitoring module for EditActivity tab or from authoring environment url
 	     */
+	    //String strToolContentId="";
+        //Long contentID =new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
+	    
+	    
+	    logger.debug("no problems getting the default content, will render authoring screen");
 	    String strToolContentId="";
-        Long contentID =new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
-        
+	    /*the authoring url must be passed a tool content id*/
+	    strToolContentId=request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
+	    logger.debug("strToolContentId: " + strToolContentId);
+	    
+	    if (strToolContentId == null)
+	    {
+	    	/*it is possible that the original request for authoring module is coming from monitoring url which keeps the
+	    	 TOOL_CONTENT_ID in the session*/
+	    	Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+		    logger.debug("toolContentId: " + toolContentId);
+		    if (toolContentId != null)
+		    {
+		    	strToolContentId= toolContentId.toString();
+			    logger.debug("cached strToolContentId from the session: " + strToolContentId);	
+		    }
+		    else
+		    {
+		    	logger.debug("we should IDEALLY not arrive here. The TOOL_CONTENT_ID is NOT available from the url or the session.");
+		    	/*use default content instead of giving a warning*/
+		    	String defaultContentId=(String) request.getSession().getAttribute(DEFAULT_CONTENT_ID_STR);
+		    	logger.debug("using MCQ defaultContentId: " + defaultContentId);
+		    	strToolContentId=defaultContentId;
+		    }
+	    }
+    	logger.debug("final strToolContentId: " + strToolContentId);
+	    
+	    if ((strToolContentId == null) || (strToolContentId.equals(""))) 
+	    {
+	    	persistError(request,"error.contentId.required");
+	    	QaUtils.cleanUpSessionAbsolute(request);
+			logger.debug("forwarding to: " + ERROR_LIST);
+			return (mapping.findForward(ERROR_LIST));
+	    }
+
+	    
 	    /* API test code for copying the content*/
     	String copyToolContent= (String) request.getParameter(COPY_TOOL_CONTENT);
     	logger.debug("copyToolContent: " + copyToolContent);
@@ -224,7 +268,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
     	if ((copyToolContent != null) && (copyToolContent.equals("1")))
 		{
 	    	logger.debug("user request to copy the content");
-	    	Long fromContentId=contentID;
+	    	Long fromContentId=new Long(strToolContentId);
 	    	logger.debug("fromContentId: " + fromContentId);
 	    	
 	    	Long toContentId=new Long(9876);
@@ -240,7 +284,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 			}
 		}
         
-        qaAuthoringForm.setToolContentId(contentID.toString());
+        qaAuthoringForm.setToolContentId(strToolContentId);
 
 		/*
 		 * find out if the passed tool content id exists in the db 
@@ -270,7 +314,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		
 		*/
 		
-		if (!existsContent(contentID.longValue(), qaService)) 
+		if (!existsContent(new Long(strToolContentId).longValue(), qaService)) 
 		{
 			String defaultContentIdStr=(String) request.getSession().getAttribute(DEFAULT_CONTENT_ID_STR);
 			logger.debug("defaultContentIdStr:" + defaultContentIdStr);
@@ -278,7 +322,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		}
         else
         {
-            retrieveContent(request, mapping, qaAuthoringForm, mapQuestionContent, contentID.longValue());
+            retrieveContent(request, mapping, qaAuthoringForm, mapQuestionContent, new Long(strToolContentId).longValue());
         }
 		
 		logger.debug("will return to jsp with: " + sourceMcStarter);

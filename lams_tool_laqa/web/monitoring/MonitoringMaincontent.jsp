@@ -119,6 +119,7 @@ http://www.gnu.org/licenses/gpl.txt
 		</c:set>
 
 	  <html:form  action="/monitoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
+
 		<!-- start tabs -->
 		<!-- tab holder table -->
 		<table border="0" cellspacing="0" cellpadding="0">
@@ -188,6 +189,8 @@ http://www.gnu.org/licenses/gpl.txt
 		</table>
 
 		<!-- end tab buttons -->	
+
+
 		<html:hidden property="method"/>	 
 		<c:choose>
 		         <c:when test='${currentMonitoringTab == "instructions"}'>

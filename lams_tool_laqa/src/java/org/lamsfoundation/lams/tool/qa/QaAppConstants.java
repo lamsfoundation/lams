@@ -55,9 +55,13 @@ public interface QaAppConstants {
 	
 	public static final String ACTIVE_MODULE							="activeModule";
 	public static final String AUTHORING								="authoring";
+	public static final String MONITORING								="monitoring";
 	public static final String DEFINE_LATER_IN_EDIT_MODE				="defineLaterInEditMode";
 	public static final String SHOW_AUTHORING_TABS						="showAuthoringTabs";
+	public static final String MONITORING_ORIGINATED_DEFINELATER		="monitoringOriginatedDefineLater";
 	public static final String DEFINE_LATER								="defineLater";
+	public static final String REQUESTED_MODULE							="requestedModule";
+	
 	public static final String SOURCE_MC_STARTER						="sourceMcStarter";	
 	
 	public static final String IS_MONITORED_CONTENT_IN_USE				="isMonitoredContentInUse";
