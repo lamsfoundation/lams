@@ -94,7 +94,7 @@ class PropertyInspector extends MovieClip{
 		//let it wait one frame to set up the components.
 		MovieClipUtils.doLater(Proxy.create(this,init));
 		
-		//_dictionary = Dictionary.getInstance();
+		_dictionary = Dictionary.getInstance();
 		//_dictionary.addEventListener('init',Proxy.create(this,setupLabels));
 	}
 	
@@ -202,6 +202,7 @@ class PropertyInspector extends MovieClip{
 				//its a gate
 				showGroupingControls(false);
 				showToolActivityControls(false);
+				showOptionalControls(false);
 				showGateControls(true);
 				showAppliedGroupingControls(true);
 				showGateActivityProperties(GateActivity(a));
@@ -211,21 +212,10 @@ class PropertyInspector extends MovieClip{
 				title_txt.text = StringUtils.cleanNull(a.title);
 			}else if(a.isGroupActivity()){
 				//its a grouping activity
+				
 				showGroupingControls(true);
+				showOptionalControls(false);
 				showRelevantGroupOptions();
-				showToolActivityControls(false);
-				showGateControls(false);
-				showAppliedGroupingControls(true);
-				populateGroupingProperties(GroupingActivity(a));
-				showAppliedGroupingProperties(a);
-				//show the title
-				title_txt.text = StringUtils.cleanNull(a.title);
-			
-			}else if(a.isOptionalActivity()){
-				//its an optional activity
-				showOptionalControls(true);
-				showGroupingControls(false);
-				//showRelevantGroupOptions();
 				showToolActivityControls(false);
 				showGateControls(false);
 				showAppliedGroupingControls(true);
@@ -248,19 +238,36 @@ class PropertyInspector extends MovieClip{
 			}
 
 			
+		}else if(CanvasOptionalActivity(cm.selectedItem) != null){
+			var co = CanvasOptionalActivity(cm.selectedItem);
+			var cca:ComplexActivity = ComplexActivity(co.activity);
+				//its an optional activity
+				showOptionalControls(true);
+				showGroupingControls(false);
+				//showRelevantGroupOptions();
+				showToolActivityControls(false);
+				showGateControls(false);
+				showAppliedGroupingControls(true);
+				populateGroupingProperties(GroupingActivity(cca));
+				showAppliedGroupingProperties(cca);
+				showOptionalActivityProperties(cca);
+				//show the title
+				title_txt.text = StringUtils.cleanNull(cca.title);
+			
 		}else if(CanvasTransition(cm.selectedItem) != null){
 			var ct = CanvasTransition(cm.selectedItem);
 			var t:Transition = ct.transition;
 			Debugger.log('Its a canvas transition',4,'updateItemProperties','PropertyInspector');
 			
 			showTransitionProperties(t);
-			
+			showOptionalControls(false);
 			showGroupingControls(false);
 			showToolActivityControls(false);
 			showGateControls(false);
 			
 		}else{
 			Debugger.log('Its a something we dont know',Debugger.CRITICAL,'updateItemProperties','PropertyInspector');
+			showOptionalControls(false);
 			showGroupingControls(false);
 			showToolActivityControls(false);
 			showGateControls(false);
@@ -280,6 +287,20 @@ class PropertyInspector extends MovieClip{
 		defineLater_chk.selected = ta.defineLater;
 					
 		currentGrouping_lbl.text = "GroupingUIID:"+StringUtils.cleanNull(ta.runOffline.groupingUIID);
+			
+
+	}
+	
+	private function showOptionalActivityProperties(ca:ComplexActivity){
+		
+		
+		toolDisplayName_lbl.text = Dictionary.getValue('pi_optional_title');
+		//title_txt.text = StringUtils.cleanNull(ta.title);
+		//desc_txt.text = StringUtils.cleanNull(ta.description);
+		runOffline_chk.selected = ca.runOffline;
+		defineLater_chk.selected = ca.defineLater;
+					
+		currentGrouping_lbl.text = "GroupingUIID:"+StringUtils.cleanNull(ca.runOffline.groupingUIID);
 			
 
 	}
@@ -620,7 +641,6 @@ class PropertyInspector extends MovieClip{
 		styleObj = _tm.getStyleObject('BGPanel');
 		body_pnl.setStyle('styleName',styleObj);
 		bar_pnl.setStyle('styleName',styleObj);
-		
 		
 		
     }
