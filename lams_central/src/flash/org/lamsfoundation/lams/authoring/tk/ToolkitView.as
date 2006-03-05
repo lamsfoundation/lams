@@ -3,6 +3,7 @@ import org.lamsfoundation.lams.common.dict.*;
 import org.lamsfoundation.lams.common.util.*;
 import org.lamsfoundation.lams.common.style.*;
 import org.lamsfoundation.lams.authoring.*;
+import org.lamsfoundation.lams.common.ui.*
 import org.lamsfoundation.lams.authoring.tk.*;
 import org.lamsfoundation.lams.common.mvc.*;import org.lamsfoundation.lams.authoring.cv.*  
 
@@ -259,9 +260,11 @@ class ToolkitView extends AbstractView {
 	private function setUpDrag(aDragIcon_mc):Void{
 		//Debugger.log('aDragIcon_mc:'+aDragIcon_mc,4,'setUpDrag','TemplateActivity');
 		//Debugger.log('this:'+this,4,'setUpDrag','TemplateActivity');
+		Cursor.showCursor(Application.C_DEFAULT);
 		dragIcon_mc = aDragIcon_mc;
+		Application.getInstance().getCanvas().model.activeTool = null;
+		//canvasModel = new CanvasModel(this);
 		_dragging = true;
-		
 		Application.cursor.onMouseMove = Proxy.create(this,this['dragIcon']);
 		Application.cursor.onMouseUp = Proxy.create(this,this['dropIcon']);
 		/*
