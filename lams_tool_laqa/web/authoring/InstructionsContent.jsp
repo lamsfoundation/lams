@@ -36,16 +36,16 @@ http://www.gnu.org/licenses/gpl.txt
 	          			</b>
     	      			</font>
           			</td>
-					<td NOWRAP width=700> <!-- Dave,I found width was necessary to present all the elements of the editor, feel free to change -->
+					<td NOWRAP width=700> 
                         <span id="previewOfflineInstructions" style="visibility: hidden; display: none;">
                             <div>
-                                <a href="javascript:doWYSWYGEdit('OfflineInstructions')"><font size=2> <b> Open Richtext Editor </font> </b></a>
+                                <a href="javascript:doWYSWYGEdit('OfflineInstructions')"><font size=2> <b> <bean:message key="label.openEditor"/></font> </b></a>
                             </div>
                             <div class="previewPanel" id="previewOfflineInstructions.text"></div>
                         </span>
                         <span id="txOfflineInstructions">
                             <div>
-                                <a href="javascript:doTextToHTML('OfflineInstructions'); doWYSWYGEdit('OfflineInstructions')"><font size=2> <b> Open Richtext Editor </font> </b> </a>
+                                <a href="javascript:doTextToHTML('OfflineInstructions'); doWYSWYGEdit('OfflineInstructions')"><font size=2> <b> <bean:message key="label.openEditor"/> </font> </b> </a>
                             </div>
                             <textarea class="textareaPanel" name="offlineInstructions" id="txOfflineInstructions.textarea"><c:out value="${QaAuthoringForm.offlineInstructions}" escapeXml="false" /></textarea>
                         </span>
@@ -75,16 +75,16 @@ http://www.gnu.org/licenses/gpl.txt
           				<bean:message key="label.onlineInstructions.col" />
 	       				</b> </font>
           			</td>
-					<td NOWRAP width=700> <!-- Dave,I found width was necessary to present all the elements of the editor, feel free to change -->
+					<td NOWRAP width=700> 
                         <span id="previewOnlineInstructions" style="visibility: hidden; display: none;">
                             <div>
-                                <a href="javascript:doWYSWYGEdit('OnlineInstructions')"> <font size=2> <b> Open Richtext Editor </font> </b></a>
+                                <a href="javascript:doWYSWYGEdit('OnlineInstructions')"> <font size=2> <b> <bean:message key="label.openEditor"/> </font> </b></a>
                             </div>
                             <div class="previewPanel" id="previewOnlineInstructions.text"></div>
                         </span>
                         <span id="txOnlineInstructions">
                             <div>
-                                <a href="javascript:doTextToHTML('OnlineInstructions'); doWYSWYGEdit('OnlineInstructions')"><font size=2> <b> Open Richtext Editor </font> </b></a>
+                                <a href="javascript:doTextToHTML('OnlineInstructions'); doWYSWYGEdit('OnlineInstructions')"><font size=2> <b> <bean:message key="label.openEditor"/> </font> </b></a>
                             </div>
                             <textarea class="textareaPanel" name="onlineInstructions" id="txOnlineInstructions.textarea"><c:out value="${QaAuthoringForm.onlineInstructions}" escapeXml="false" /></textarea>
                         </span>

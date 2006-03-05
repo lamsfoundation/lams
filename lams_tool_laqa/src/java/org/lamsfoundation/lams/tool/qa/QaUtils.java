@@ -36,10 +36,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.web.QaAuthoringForm;
-import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -572,24 +570,43 @@ public abstract class QaUtils implements QaAppConstants {
 	}
 	
 	
-	public static String getDestination(String sourceMcStarter)
+	public static void setDefineLater(HttpServletRequest request, boolean value, String toolContentId)
+    {
+		IQaService qaService = (IQaService)request.getSession().getAttribute(TOOL_SERVICE);
+		logger.debug("qaService: " + qaService);
+    	logger.debug("value:" + value);
+    	logger.debug("toolContentId:" + toolContentId);
+    	
+		QaContent qaContent=qaService.loadQa(new Long(toolContentId).longValue());
+    	logger.debug("qaContent:" + qaContent);
+    	if (qaContent != null)
+    	{
+    		qaContent.setDefineLater(value);
+        	logger.debug("defineLater has been set to true");
+        	qaService.updateQa(qaContent);	
+    	}
+    }
+	
+	
+	public static String getDestination(String sourceMcStarter, String requestedModule)
 	{
-		logger.debug("sourceMcStarter: " + sourceMcStarter);
+		logger.debug("sourceMcStarter: " + sourceMcStarter + " and requestedModule:" + requestedModule);
 		
-		if ((sourceMcStarter != null) && !sourceMcStarter.equals("monitoring"))
+		if (requestedModule.equals(DEFINE_LATER))
 		{
-			logger.debug("request is from authoring or define Later url. return to: " + LOAD_QUESTIONS);
-			return LOAD_QUESTIONS;	
+			logger.debug("request is from define Later url. return to: " + LOAD_VIEW_ONLY);
+			return LOAD_VIEW_ONLY;	
 		}
-		else if (sourceMcStarter == null)
+		if (requestedModule.equals(AUTHORING))
 		{
 			logger.debug("request is from authoring url. return to: " + LOAD_QUESTIONS);
 			return LOAD_QUESTIONS;	
 		}
+
 		else
 		{
-			logger.debug("request is from monitoring url. return to: " + LOAD_MONITORING_CONTENT_EDITACTIVITY);
-			return LOAD_MONITORING_CONTENT_EDITACTIVITY;	
+			logger.debug("request is from an unknown source. return null");
+			return null;
 		}
 	}
 }

@@ -42,7 +42,7 @@ public class QaAuthoringForm extends ActionForm implements QaAppConstants {
 	protected String submitOfflineFile;
 	protected String submitOnlineFile;
 	protected String dispatch;
-	
+		
 	protected String choice;
 	protected String choiceBasic;
 	protected String choiceAdvanced;

@@ -60,6 +60,12 @@
           redirect="false"
         />
 
+        <forward
+          name="loadViewOnly"
+          path="/authoring/AuthoringTabsHolder.jsp"
+          redirect="false"
+        />
+
 	  	<forward
 		    name="errorList"
 		    path="/QaErrorBox.jsp"
@@ -82,6 +88,13 @@
 	        path="/AuthoringMaincontent.jsp"
 	        redirect="true"
       />
+      
+        <forward
+          name="loadViewOnly"
+          path="/authoring/AuthoringTabsHolder.jsp"
+          redirect="false"
+        />
+      
       	<forward
 	        name="starter"
 	        path=".starter"
@@ -169,6 +182,13 @@
 	        path="/index.jsp"
 	        redirect="true"
 	     />
+	  
+	  
+        <forward
+          name="loadViewOnly"
+          path="/authoring/AuthoringTabsHolder.jsp"
+          redirect="false"
+        />
 	  	
 	  	<forward
 		    name="errorList"

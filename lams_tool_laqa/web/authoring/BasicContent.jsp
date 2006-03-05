@@ -28,22 +28,33 @@ http://www.gnu.org/licenses/gpl.txt
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
  
-<div id="basicTabContainer">	
+	<div id="basicTabContainer">	
+		           <h2><font size=2> <b> <bean:message key="label.authoring.qa.basic"/> </b></font></h2>
+		        	<table align=center> 	  
+						<tr>   
+						<td NOWRAP class=error>
+							<c:if test="${sessionScope.sbmtSuccess == 1}"> 			
+								<img src="images/success.gif" align="left" width=20 height=20>  <font size=2> <bean:message key="submit.successful"/> </font> </img>
+							</c:if> 			
+						</td>
+						</tr> 
+					</table>
+
 			<tr> <td>
 					<table align=center> 
 						<tr> 
 					 		<td valign="top"><font size=2> <b> <bean:message key="label.authoring.title"/>: </b></font> </td>
-					 		<td NOWRAP width=700> <!-- Dave,I found width was necessary to present all the elements of the editor, feel free to change -->                            
+					 		<td NOWRAP width=700> 
                                 
                                  <span id="previewTitle" style="visibility: hidden; display: none;">
                                      <div>
-                                         <a href="javascript:doWYSWYGEdit('Title','small')"><font size=2> <b> Open Richtext Editor </a>
+                                         <a href="javascript:doWYSWYGEdit('Title','small')"><font size=2> <b> <bean:message key="label.openEditor"/></a>
                                      </div>
                                      <div class="smallPreviewPanel" id="previewTitle.text"></div>
                                  </span>
                                  <span id="txTitle">
                                      <div>
-                                         <a href="javascript:doTextToHTML('Title'); doWYSWYGEdit('Title','small')"><font size=2> <b> Open Richtext Editor</a>
+                                         <a href="javascript:doTextToHTML('Title'); doWYSWYGEdit('Title','small')"><font size=2> <b> <bean:message key="label.openEditor"/></a>
                                      </div>
                                      <textarea class="smallTextareaPanel" name="title" id="txTitle.textarea"><c:out value="${QaAuthoringForm.title}" escapeXml="false" /></textarea>
                                  </span>
@@ -52,16 +63,16 @@ http://www.gnu.org/licenses/gpl.txt
 					  	</tr>
 					  	<tr> 
 					 		<td valign="top"><font size=2> <b> <bean:message key="label.authoring.instructions"/>:  </b></font></td>
-					 		<td NOWRAP width=700> <!-- Dave,I found width was necessary to present all the elements of the editor, feel free to change -->
+					 		<td NOWRAP width=700> 
                                 <span id="previewInstructions" style="visibility: hidden; display: none;">
                                     <div>
-                                        <a href="javascript:doWYSWYGEdit('Instructions')"><font size=2> <b> Open Richtext Editor</a>
+                                        <a href="javascript:doWYSWYGEdit('Instructions')"><font size=2> <b> <bean:message key="label.openEditor"/></a>
                                     </div>
                                     <div class="previewPanel" id="previewInstructions.text"></div>
                                 </span>
                                 <span id="txInstructions">
                                     <div>
-                                        <a href="javascript:doTextToHTML('Instructions'); doWYSWYGEdit('Instructions')"><font size=2> <b>Open Richtext Editor</a>
+                                        <a href="javascript:doTextToHTML('Instructions'); doWYSWYGEdit('Instructions')"><font size=2> <b><bean:message key="label.openEditor"/></a>
                                     </div>
                                     <textarea class="textareaPanel" name="instructions" id="txInstructions.textarea"><c:out value="${QaAuthoringForm.instructions}" escapeXml="false" /></textarea>
                                 </span>
@@ -76,13 +87,13 @@ http://www.gnu.org/licenses/gpl.txt
 						  	<td>
                                 <span id="previewQuestion0" style="visibility: hidden; display: none;">
                                     <div>
-                                        <a href="javascript:doWYSWYGEdit('Question0')">Open Richtext Editor</a>
+                                        <a href="javascript:doWYSWYGEdit('Question0')"><bean:message key="label.openEditor"/></a>
                                     </div>
                                     <div class="previewPanel" id="previewQuestion0.text"></div>
                                 </span>
                                 <span id="txQuestion0">
                                     <div>
-                                        <a href="javascript:doTextToHTML('Question0'); doWYSWYGEdit('Question0')"><font size=2> <b>Open Richtext Editor</a>
+                                        <a href="javascript:doTextToHTML('Question0'); doWYSWYGEdit('Question0')"><font size=2> <b><bean:message key="label.openEditor"/></a>
                                     </div>
                                     <textarea class="textareaPanel" name="questionContent0" id="txQuestion0.textarea"><c:out value="${sessionScope.defaultQuestionContent}"/></textarea>
                                 </span>
@@ -102,13 +113,13 @@ http://www.gnu.org/licenses/gpl.txt
   
                                         <span id="preview<c:out value="Question${queIndex-1}"/>" style="visibility: hidden; display: none;">
                                             <div>
-                                                <a href="javascript:doWYSWYGEdit('<c:out value="Question${queIndex-1}"/>')"><font size=2> <b>Open Richtext Editor</a>
+                                                <a href="javascript:doWYSWYGEdit('<c:out value="Question${queIndex-1}"/>')"><font size=2> <b><bean:message key="label.openEditor"/></a>
                                             </div>
                                             <div class="previewPanel" id="preview<c:out value="Question${queIndex-1}"/>.text"></div>
                                         </span>
                                         <span id="tx<c:out value="Question${queIndex-1}"/>">
                                             <div>
-                                                <a href="javascript:doTextToHTML('<c:out value="Question${queIndex-1}"/>'); doWYSWYGEdit('<c:out value="Question${queIndex-1}"/>')"><font size=2> <b>Open Richtext Editor</a>
+                                                <a href="javascript:doTextToHTML('<c:out value="Question${queIndex-1}"/>'); doWYSWYGEdit('<c:out value="Question${queIndex-1}"/>')"><font size=2> <b><bean:message key="label.openEditor"/></a>
                                             </div>
                                             <textarea class="textareaPanel" name="<c:out value="questionContent${queIndex-1}"/>" id="tx<c:out value="Question${queIndex-1}"/>.textarea"><c:out value="${questionEntry.value}"/></textarea>
                                         </span>
@@ -116,7 +127,6 @@ http://www.gnu.org/licenses/gpl.txt
 		 		 						<html:submit property="removeContent" 
                                                      styleClass="linkbutton"  
                                                      onclick="removeQuestion(${queIndex});"
-                                                     disabled="${sessionScope.isDefineLater}" 
                                                      onmouseover="pviiClassNew(this,'linkbutton')" 
                                                      onmouseout="pviiClassNew(this,'linkbutton')">
 											<bean:message key="button.removeQuestion"/>
@@ -133,7 +143,6 @@ http://www.gnu.org/licenses/gpl.txt
                             <td align="right">
                                 <html:submit property="addContent" 
                                              styleClass="linkbutton" 
-                                             disabled="${sessionScope.isDefineLater}"
                                              onmouseover="pviiClassNew(this,'linkbutton')" 
                                              onmouseout="pviiClassNew(this,'linkbutton')"
                                              onclick="submitMethod('addNewQuestion');">
@@ -148,8 +157,6 @@ http://www.gnu.org/licenses/gpl.txt
 
 <SCRIPT language="JavaScript"> 
 
-<!--  addQuestion gets called everytime a new question content is added to the UI -->
-	
 	function removeQuestion(questionIndex)
 	{
 		document.QaAuthoringForm.questionIndex.value=questionIndex;

@@ -143,7 +143,6 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		logger.debug("qaAuthoringForm: " + qaAuthoringForm);
 		qaAuthoringForm.resetRadioBoxes();
 		
-		
 		IQaService qaService = (IQaService)request.getSession().getAttribute(TOOL_SERVICE);
 		logger.debug("qaService: " + qaService);
 		if (qaService == null)
@@ -156,20 +155,24 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		
 		String servletPath=request.getServletPath();
 		logger.debug("getServletPath: "+ servletPath);
+		String requestedModule=null;
 		if (servletPath.indexOf("authoringStarter") > 0)
 		{
 			logger.debug("request is for authoring module");
 			request.getSession().setAttribute(ACTIVE_MODULE, AUTHORING);
 			request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(true));
 			request.getSession().setAttribute(SHOW_AUTHORING_TABS,new Boolean(true).toString());
+			requestedModule=AUTHORING;
 		}
 		else
 		{
 			logger.debug("request is for define later module. either direct or by monitoring module");
 			request.getSession().setAttribute(ACTIVE_MODULE, DEFINE_LATER);
 			request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(false));
-			request.getSession().setAttribute(SHOW_AUTHORING_TABS,new Boolean(false).toString());			
+			request.getSession().setAttribute(SHOW_AUTHORING_TABS,new Boolean(false).toString());
+			requestedModule=DEFINE_LATER;
 		}
+		logger.debug("requestedModule: " + requestedModule);
 
 	
 		/* in development this needs to be called only once.  */ 
@@ -177,7 +180,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		
 		String sourceMcStarter = (String) request.getAttribute(SOURCE_MC_STARTER);
 		logger.debug("sourceMcStarter: " + sourceMcStarter);
-
+		
 		
 	    /*
 	     * obtain and setup the current user's data 
@@ -279,7 +282,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
         }
 		
 		logger.debug("will return to jsp with: " + sourceMcStarter);
-		String destination=QaUtils.getDestination(sourceMcStarter);
+		String destination=QaUtils.getDestination(sourceMcStarter, requestedModule);
 		logger.debug("destination: " + destination);
 		return (mapping.findForward(destination));
 	} 
@@ -314,7 +317,6 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	    logger.debug("getting existing content with id:" + toolContentId);
 	    QaContent qaContent = qaService.retrieveQa(toolContentId);
 		logger.debug("QaContent: " + qaContent);
-		
 		
 		QaUtils.setDefaultSessionAttributes(request, qaContent, qaAuthoringForm);
         QaUtils.populateUploadedFilesData(request, qaContent, qaService);

@@ -46,6 +46,7 @@ import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.exception.ToolException;
+
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaComparator;
 import org.lamsfoundation.lams.tool.qa.QaContent;
@@ -61,33 +62,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
-
-
-/**
- * 
- * change the logic about completion status
- *
- */
-
-/**
- * 
- * once lams_learning is ready and appContext file is src/ then FINISH toool session will work.
- * 
- */
-
-/**
- * 
- * done: removed styling, except error messages and table centering
- * 
- */
-
-/**
- * The tool's Spring configuration file: qaCompactApplicationContext.xml
- * Main service bean of the tool is: org.lamsfoundation.lams.tool.qa.service.QaServicePOJO
- * 
- * done: config file is read from classpath
- */
-
 
 /**
  * 
@@ -261,6 +235,44 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
         return mapping.findForward(LOAD_QUESTIONS);
     }
     
+    
+    public ActionForward editActivityQuestions(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException,
+                                         ToolException
+    {
+    	logger.debug("dispatching editActivityQuestions...");
+    	
+    	QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
+		logger.debug("qaAuthoringForm: " + qaAuthoringForm);
+    	
+		IQaService qaService = (IQaService)request.getSession().getAttribute(TOOL_SERVICE);
+		logger.debug("qaService: " + qaService);
+		if (qaService == null)
+		{
+			logger.debug("will retrieve qaService");
+			qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
+			logger.debug("retrieving qaService from session: " + qaService);
+		}
+
+		/* determine whether the request is from Monitoring url Edit Activity*/
+		String sourceMcStarter = (String) request.getAttribute(SOURCE_MC_STARTER);
+		logger.debug("sourceMcStarter: " + sourceMcStarter);
+
+     	request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(true));
+     	request.getSession().setAttribute(SHOW_AUTHORING_TABS,new Boolean(false).toString());
+     	     	
+     	String toolContentId=qaAuthoringForm.getToolContentId();
+     	logger.debug("toolContentId: " + toolContentId);
+		QaUtils.setDefineLater(request, true, toolContentId);
+		
+		logger.debug("forwarding to : " + LOAD_QUESTIONS);
+		return mapping.findForward(LOAD_QUESTIONS);
+    }
+
+    
     public ActionForward addNewQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
         throws IOException, ServletException {
     	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
@@ -293,7 +305,7 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
         
         addFileToContentRepository(request, qaAuthoringForm);
         qaAuthoringForm.resetUserAction();
-//        request.getSession().setAttribute(CHOICE,CHOICE_TYPE_INSTRUCTIONS); //FIXME: ??
+        // request.getSession().setAttribute(CHOICE,CHOICE_TYPE_INSTRUCTIONS); 
         return (mapping.findForward(LOAD_QUESTIONS));
     }
     

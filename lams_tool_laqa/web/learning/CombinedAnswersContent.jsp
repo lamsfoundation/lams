@@ -31,7 +31,7 @@ http://www.gnu.org/licenses/gpl.txt
 			<table>
 				<c:forEach var="questionEntry" items="${sessionScope.mapQuestionContentLearner}">
 						  <tr>
-						  	<td colspan=2 NOWRAP class="input" valign=top> <font size=2> Question <c:out value="${questionEntry.key}" escapeXml="false"/>: 
+						  	<td colspan=2 NOWRAP class="input" valign=top> <font size=2> <bean:message key="label.question"/> <c:out value="${questionEntry.key}" escapeXml="false"/>: 
 						  		<c:out value="${questionEntry.value}" escapeXml="false"/> 
 						  	</font> </td>
 						  </tr>
