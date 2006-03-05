@@ -31,7 +31,7 @@
 <c:if test="${empty currentTab}"><c:set var="currentTab" value="b"/></c:if>
 <body onLoad="initTabs();showTab('<c:out value='${currentTab}'/>');">
 <html:form action="authoring/update" method="post"	 enctype="multipart/form-data">
-		<c_rt:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
+		<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 		<html:hidden property="toolContentID"/>
 		<html:hidden  property="currentTab" styleId="currentTab"/>
 
