@@ -42,14 +42,18 @@ class org.lamsfoundation.lams.authoring.tb.ToolbarController extends AbstractCon
 			_app.copy();
 		}else if(tgt.indexOf("paste") != -1){
 			_app.paste();
-		}else if(tgt.indexOf("trans") != -1){
+		}else if(tgt.indexOf("trans") != -1){	
 			_app.getCanvas().toggleTransitionTool();
+					
 		}else if(tgt.indexOf("optional") != -1){
-			_app.getCanvas().startOptionalActivity();
+			_app.getCanvas().toggleOptionalActivity();
+						
 		}else if(tgt.indexOf("gate") != -1){
 			_app.getCanvas().toggleGateTool();
+						
 		}else if(tgt.indexOf("group") != -1){
 			_app.getCanvas().toggleGroupTool();
+			
 		}else if(tgt.indexOf("preview") != -1){
 			_app.getCanvas().launchPreviewWindow();
 		}
