@@ -1,4 +1,3 @@
-
 <%@ include file="/includes/taglibs.jsp" %>
 <%@ taglib uri="tags-fck-editor" prefix="FCK"%>
 
