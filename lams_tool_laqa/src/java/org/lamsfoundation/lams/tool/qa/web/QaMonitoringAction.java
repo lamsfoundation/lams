@@ -88,6 +88,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
                                          ServletException
 	{
     	logger.debug("dispatching getStats..." + request);
+    	
+    	refreshStatsData(request);
     	request.getSession().setAttribute(EDIT_RESPONSE, new Boolean(false));
     	
     	request.getSession().setAttribute(CURRENT_MONITORING_TAB, "stats");
@@ -118,6 +120,23 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
                                          ServletException
 	{
     	logger.debug("dispatching getInstructions..." + request);
+
+    	IQaService qaService = (IQaService)request.getSession().getAttribute(TOOL_SERVICE);
+		logger.debug("qaService: " + qaService);
+		if (qaService == null)
+		{
+			logger.debug("will retrieve qaService");
+			qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
+			logger.debug("retrieving qaService from session: " + qaService);
+		}
+
+	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    logger.debug("toolContentId: " + toolContentId);
+	    
+	    QaContent qaContent=qaService.loadQa(toolContentId.longValue());
+		logger.debug("existing qaContent:" + qaContent);
+
+    	refreshInstructionsData(request, qaContent);
     	request.getSession().setAttribute(EDIT_RESPONSE, new Boolean(false));
 
     	request.getSession().setAttribute(CURRENT_MONITORING_TAB, "instructions");
@@ -132,8 +151,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
                                          ServletException
 	{
     	logger.debug("dispatching editActivity...");
-    	QaMonitoringForm qaMonitoringForm = (QaMonitoringForm) form;
-
+    	
     	IQaService qaService = (IQaService)request.getSession().getAttribute(TOOL_SERVICE);
 		logger.debug("qaService: " + qaService);
 		if (qaService == null)
@@ -200,8 +218,14 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
     	logger.debug("dispatching getSummary..." + request);
     	request.getSession().setAttribute(EDIT_RESPONSE, new Boolean(false));
     	
-    	IQaService qaService = (IQaService)request.getSession().getAttribute(TOOL_SERVICE);
-    	logger.debug("qaService: " + qaService);
+		IQaService qaService = (IQaService)request.getSession().getAttribute(TOOL_SERVICE);
+		logger.debug("qaService: " + qaService);
+		if (qaService == null)
+		{
+			logger.debug("will retrieve qaService");
+			qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
+			logger.debug("retrieving qaService from session: " + qaService);
+		}
 		
     	Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
 	    logger.debug("toolContentId: " + toolContentId);
@@ -215,7 +239,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		if (summaryToolSessions.isEmpty())
 		{
 			/* inform in the Summary tab that the tool has no active sessions */
-			request.setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true));
+			request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
+			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to true");
 		}
 		 
 		request.getSession().setAttribute(SUMMARY_TOOL_SESSIONS, summaryToolSessions);
@@ -435,5 +460,44 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
             return false;
         }
     }
+    
+    
+	public void refreshStatsData(HttpServletRequest request)
+	{
+		/* it is possible that no users has ever logged in for the activity yet*/
+		IQaService qaService = (IQaService)request.getSession().getAttribute(TOOL_SERVICE);
+		logger.debug("qaService: " + qaService);
+		if (qaService == null)
+		{
+			logger.debug("will retrieve qaService");
+			qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
+			logger.debug("retrieving qaService from session: " + qaService);
+		}
+
+		
+	    int countAllUsers=qaService.getTotalNumberOfUsers();
+		logger.debug("countAllUsers: " + countAllUsers);
+		
+		if (countAllUsers == 0)
+		{
+	    	logger.debug("error: countAllUsers is 0");
+	    	request.getSession().setAttribute(USER_EXCEPTION_NO_STUDENT_ACTIVITY, new Boolean(true));
+		}
+		
+		request.getSession().setAttribute(COUNT_ALL_USERS, new Integer(countAllUsers).toString());
+		
+		int countSessionComplete=qaService.countSessionComplete();
+		logger.debug("countSessionComplete: " + countSessionComplete);
+		request.getSession().setAttribute(COUNT_SESSION_COMPLETE, new Integer(countSessionComplete).toString());
+	}
+	
+	
+	public void refreshInstructionsData(HttpServletRequest request, QaContent qaContent)
+	{
+	    request.getSession().setAttribute(RICHTEXT_ONLINEINSTRUCTIONS,qaContent.getOnlineInstructions());
+	    request.getSession().setAttribute(RICHTEXT_OFFLINEINSTRUCTIONS,qaContent.getOfflineInstructions());
+	}
+
+    
 
 }

@@ -236,6 +236,19 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
     }
 
     
+    public ActionForward editActivity(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+	{
+    	logger.debug("dispatching proxy editActivity...");
+    	//QaMonitoringAction qaMonitoringAction= new QaMonitoringAction();
+	    //return qaMonitoringAction.editActivity(mapping, form, request, response);
+    	return null;
+	}
+
+    
     public ActionForward getSummary(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
@@ -243,7 +256,8 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
                                          ServletException
 	{
     	logger.debug("dispatching proxy getSummary...start with monitoringStarter" + request);
- 		return null;
+    	QaMonitoringAction qaMonitoringAction= new QaMonitoringAction();
+    	return qaMonitoringAction.getSummary(mapping, form, request, response);
 	}
 
     
@@ -254,8 +268,8 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
                                          ServletException
 	{
     	logger.debug("dispatching proxy getInstructions..." + request);
- 		return null;
-
+    	QaMonitoringAction qaMonitoringAction= new QaMonitoringAction();
+    	return qaMonitoringAction.getInstructions(mapping, form, request, response);
 	}
 
     public ActionForward getStats(ActionMapping mapping,
@@ -265,7 +279,8 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
                                          ServletException
 	{
     	logger.debug("dispatching proxy getStats..." + request);
- 		return null;
+    	QaMonitoringAction qaMonitoringAction= new QaMonitoringAction();
+    	return qaMonitoringAction.getStats(mapping, form, request, response);
 	}
 
     

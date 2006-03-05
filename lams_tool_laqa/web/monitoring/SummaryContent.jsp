@@ -38,7 +38,7 @@ http://www.gnu.org/licenses/gpl.txt
 	
 	<h2><font size=2> <bean:message key="button.summary"/> </font> </h2>
 	<div id="datatablecontainer">
-		<c:if test="${sessionScope.userExceptionNoStudentActivity == 'true'}"> 	
+		<c:if test="${(userExceptionNoStudentActivity == 'true') || (userExceptionNoToolSessions == 'true') }"> 	
 				<table class="forms" align="center">
 					<tr> 
 						<td NOWRAP valign=top align=center> 
@@ -46,9 +46,10 @@ http://www.gnu.org/licenses/gpl.txt
 						</td> 
 					<tr>
 				</table>
-		</c:if>						
+		</c:if>			
+					
 
-		<c:if test="${sessionScope.userExceptionNoStudentActivity != 'true'}"> 	
+		<c:if test="${(userExceptionNoStudentActivity != 'true')  && (userExceptionNoToolSessions  != 'true') }"> 	
 			<html:hidden property="selectedToolSessionId"/>							
 			<input type="hidden" name="isToolSessionChanged"/>
 				<table class="forms">
@@ -93,7 +94,7 @@ http://www.gnu.org/licenses/gpl.txt
 			  	 		</tr>
 						<tr>			
 							<td NOWRAP valign=top align=left><b> <font size=2> <bean:message key="label.question.col"/> </b>
-								<c:out value="${currentDto.question}"/>
+								<c:out value="${currentDto.question}" escapeXml="false"/>
 							</font> </td>
 						</tr>	
 						

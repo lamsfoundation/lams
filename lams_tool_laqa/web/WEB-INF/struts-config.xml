@@ -94,6 +94,12 @@
 	        path="/AuthoringMaincontent.jsp"
 	        redirect="true"
       />
+
+	  	<forward
+		    name="loadMonitoring"
+		    path="/monitoring/MonitoringMaincontent.jsp"
+		    redirect="true"
+	  	/>
       
         <forward
           name="loadViewOnly"

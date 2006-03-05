@@ -30,6 +30,10 @@ http://www.gnu.org/licenses/gpl.txt
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
+		<c:set var="authoringURL">
+			<html:rewrite page="/authoring.do" />
+		</c:set>
+
 	        	<tr><td>
 				<!-- start tabs -->
 				<!-- tab holder table -->
@@ -44,10 +48,10 @@ http://www.gnu.org/licenses/gpl.txt
 							  <tr>
 								<td><img src="<c:out value="${lams}"/>images/aqua_tab_s_left.gif" name="tab_left_su" width="8" height="25" border="0" id="tab_left_su"/></td>
 								<td NOWRAP class="tab tabcentre_selected" width="90" id="tab_tbl_centre_su" ><label>
-								<a href="?method=getSummary" id="su" >
+								<a href="<c:out value='${authoringURL}'/>?dispatch=getSummary" id="su" >
 									<font size=2> 	<bean:message key="label.summary"/> </font>
 								</a></label></td>
-								<td><a href="?method=getSummary">
+								<td><a href="<c:out value='${authoringURL}'/>?dispatch=getSummary">
 									<img src="<c:out value="${lams}"/>images/aqua_tab_s_right.gif"  name="tab_right_su" width="8" height="25" border="0" id="tab_right_su"/></a></td>
 							  </tr>
 							</table>
@@ -58,10 +62,10 @@ http://www.gnu.org/licenses/gpl.txt
 							  <tr>
 								<td><img src="<c:out value="${lams}"/>images/aqua_tab_s_left.gif" name="tab_left_i" width="8" height="25" border="0" id="tab_left_i"/></td>
 								<td NOWRAP class="tab tabcentre_selected" width="90" id="tab_tbl_centre_i" ><label>
-								<a href="?method=getInstructions" id="i" >
+								<a href="<c:out value='${authoringURL}'/>?dispatch=getInstructions" id="i" >
 										<font size=2>  <bean:message key="label.instructions"/> </font>
 									</a></label></td>
-								<td><a href="?method=getInstructions">
+								<td><a href="<c:out value='${authoringURL}'/>?dispatch=getInstructions">
 									<img src="<c:out value="${lams}"/>images/aqua_tab_s_right.gif"  name="tab_right_i" width="8" height="25" border="0" id="tab_right_i"/></a></td>
 							  </tr>
 							</table>
@@ -73,10 +77,10 @@ http://www.gnu.org/licenses/gpl.txt
 							  <tr>
 								<td><img src="<c:out value="${lams}"/>images/aqua_tab_s_left.gif" name="tab_left_e" width="8" height="25" border="0" id="tab_left_e"/></td>
 								<td NOWRAP class="tab tabcentre_selected" width="90" id="tab_tbl_centre_e" ><label>
-								<a href="?method=editActivity" id="e" >
+								<a href="" id="e" >
 										<font size=2>  <bean:message key="label.editActivity"/>	 </font>					
 									</a></label></td>
-								<td><a href="?method=editActivity">
+								<td><a href="">
 									<img src="<c:out value="${lams}"/>images/aqua_tab_s_right.gif"  name="tab_right_e" width="8" height="25" border="0" id="tab_right_e"/></a></td>
 							  </tr>
 							</table>
@@ -88,10 +92,10 @@ http://www.gnu.org/licenses/gpl.txt
 							  <tr>
 								<td><img src="<c:out value="${lams}"/>images/aqua_tab_s_left.gif" name="tab_left_s" width="8" height="25" border="0" id="tab_left_s"/></td>
 								<td NOWRAP class="tab tabcentre_selected" width="90" id="tab_tbl_centre_s" ><label>
-									<a href="?method=getStats" id="e" >
+									<a href="<c:out value='${authoringURL}'/>?dispatch=getStats" id="e" >
 										<font size=2>  <bean:message key="label.stats"/> </font>								
 									</a></label></td>
-								<td><a href="?method=getStats">
+								<td><a href="<c:out value='${authoringURL}'/>?dispatch=getStats">
 									<img src="<c:out value="${lams}"/>images/aqua_tab_s_right.gif"  name="tab_right_s" width="8" height="25" border="0" id="tab_right_s"/></a></td>
 							  </tr>
 							</table>

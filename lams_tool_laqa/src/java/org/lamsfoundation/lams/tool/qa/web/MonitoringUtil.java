@@ -149,6 +149,14 @@ public class MonitoringUtil implements QaAppConstants{
 		List sessionsList=qaService.getSessionNamesFromContent(qaContent);
     	logger.debug("sessionsList size is:..." + sessionsList.size());
     	
+		if (sessionsList.isEmpty())
+		{
+			/* inform in the Summary tab that the tool has no active sessions */
+			request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
+			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to true");
+		}
+
+    	
     	Map sessionsMap=QaUtils.convertToStringMap(sessionsList, "String");
     	logger.debug("generated sessionsMap:..." + sessionsMap);
     	logger.debug("sessionsMap size:..." + sessionsMap.size());
@@ -375,6 +383,7 @@ public class MonitoringUtil implements QaAppConstants{
 		}
 		return map;
 	}
+	
 }
 
 

@@ -104,7 +104,8 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 		if (summaryToolSessions.isEmpty())
 		{
 			/* inform in the Summary tab that the tool has no active sessions */
-			request.setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true));
+			request.setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
+			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to true");
 		}
 		 
 		request.getSession().setAttribute(SUMMARY_TOOL_SESSIONS, summaryToolSessions);
@@ -127,30 +128,17 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	    logger.debug("LIST_MONITORED_ANSWERS_CONTAINER_DTO: " + request.getSession().getAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO));
 	    /* ends here. */
 
-		
-		/* this section is related to Stats tab. Starts here. */
-		/* it is possible that no users has ever logged in for the activity yet*/ 
-	    int countAllUsers=qaService.getTotalNumberOfUsers();
-		logger.debug("countAllUsers: " + countAllUsers);
-		
-		if (countAllUsers == 0)
-		{
-	    	logger.debug("error: countAllUsers is 0");
-	    	request.getSession().setAttribute(USER_EXCEPTION_NO_STUDENT_ACTIVITY, new Boolean(true));
-		}
-		request.getSession().setAttribute(COUNT_ALL_USERS, new Integer(countAllUsers).toString());
-		
-		int countSessionComplete=qaService.countSessionComplete();
-		logger.debug("countSessionComplete: " + countSessionComplete);
-		request.getSession().setAttribute(COUNT_SESSION_COMPLETE, new Integer(countSessionComplete).toString());
-		/* ends here. */
+		QaMonitoringAction qaMonitoringAction= new QaMonitoringAction();
+		logger.debug("refreshing stats data...");
+		qaMonitoringAction.refreshStatsData(request);
+		logger.debug("refreshing instructions data...");
+		qaMonitoringAction.refreshInstructionsData(request, qaContent);
 		
 		/* this section is related to instructions tab. Starts here. */
-	    request.getSession().setAttribute(RICHTEXT_ONLINEINSTRUCTIONS,qaContent.getOnlineInstructions());
-	    request.getSession().setAttribute(RICHTEXT_OFFLINEINSTRUCTIONS,qaContent.getOfflineInstructions());
 	    /* ends here. */
 		return true;
 	}
+
 
 	
 	/**

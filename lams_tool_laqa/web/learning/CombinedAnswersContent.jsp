@@ -31,12 +31,12 @@ http://www.gnu.org/licenses/gpl.txt
 			<table>
 				<c:forEach var="questionEntry" items="${sessionScope.mapQuestionContentLearner}">
 						  <tr>
-						  	<td colspan=2 NOWRAP class="input" valign=top> <font size=2> <bean:message key="label.question"/> <c:out value="${questionEntry.key}" escapeXml="false"/>: 
+						  	<td colspan=2 NOWRAP class="input" valign=top> <font size=2> <b> <bean:message key="label.question"/> <c:out value="${questionEntry.key}" escapeXml="false"/>: </b> 
 						  		<c:out value="${questionEntry.value}" escapeXml="false"/> 
 						  	</font> </td>
 						  </tr>
 						  <tr> 
-					 		<td NOWRAP class="input" valign=top > <font size=2> <bean:message key="label.answers"/>  </font> </td>
+					 		<td NOWRAP class="input" valign=top > <font size=2> <b> <bean:message key="label.answer"/> </b> </font> </td>
 					 		<td  NOWRAP class="input" valign=top>
 					 			<input type="text" name="answer<c:out value="${questionEntry.key}"  escapeXml="false"/>" size="60" maxlength="255" value=""/> 
 					 		</td>

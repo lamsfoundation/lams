@@ -152,7 +152,7 @@ function pviiClassNew(obj, new_style) { //v2.7 by PVII
 
 					<b> <font size=2> <bean:message key="label.monitoring"/> </font></b>
 			        <jsp:include page="/monitoring/MonitoringTabsHeader.jsp" />
-			        <div class="tabbody" id="tabbody1">
+			        <div class="tabbody content_b" id="tabbody1">
 				        <jsp:include page="/authoring/BasicContentViewOnly.jsp" />
    				    </div>
 				</c:if> 											  				
@@ -174,7 +174,7 @@ function pviiClassNew(obj, new_style) { //v2.7 by PVII
 							  }"> 			
 					<b> <font size=2> <bean:message key="label.monitoring"/> </font></b>
 			        <jsp:include page="/monitoring/MonitoringTabsHeader.jsp" />
-			        <div class="tabbody" id="tabbody1">
+			        <div class="tabbody content_b" id="tabbody1">
 				        <jsp:include page="/authoring/AuthoringTabs.jsp" />				
    				    </div>			        
 			    </c:if> 											  						

@@ -34,12 +34,12 @@ http://www.gnu.org/licenses/gpl.txt
 			  		<c:if test="${questionEntry.key == sessionScope.currentQuestionIndex}"> 			
 					  <tr>
 					  	<td colspan=2 NOWRAP class="input" valign=top> <font size=2> 
-					  		<bean:message key="label.question"/> 
-						  	<c:out value="${questionEntry.key}" escapeXml="false"/>: <c:out value="${questionEntry.value}" escapeXml="false"/>
+					  		<b> <bean:message key="label.question"/> 
+						  	<c:out value="${questionEntry.key}" escapeXml="false"/>:</b> <c:out value="${questionEntry.value}" escapeXml="false"/>
 					  	</font>
 					  </tr>
 					  <tr> 
-				 		<td NOWRAP class="input" valign=top> <font size=2> <bean:message key="label.answers"/> </font> </td>
+				 		<td NOWRAP class="input" valign=top> <font size=2> <b> <bean:message key="label.answer"/> </b> </font> </td>
 				 		<td NOWRAP class="input" valign=top> 
 				 			<html:text property="answer" size="60" maxlength="255" value="${sessionScope.currentAnswer}"/>
 				 			<html:hidden property="currentQuestionIndex" value="${questionEntry.key}"/>
