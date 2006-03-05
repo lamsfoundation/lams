@@ -263,6 +263,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	public function canvasRelease(canvas_mc:MovieClip){
 		Debugger.log(canvas_mc,Debugger.GEN,'canvasRelease','CanvasController');
 		Debugger.log('_canvasModel.activeTool:'+_canvasModel.activeTool,Debugger.GEN,'canvasRelease','CanvasController');
+		_canvasModel.selectedItem = null;
 		if(_canvasModel.activeTool == CanvasModel.GATE_TOOL){
 			var p = new Point(canvas_mc._xmouse, canvas_mc._ymouse); 
 			_canvasModel.createNewGate(Activity.PERMISSION_GATE_ACTIVITY_TYPE,p);
