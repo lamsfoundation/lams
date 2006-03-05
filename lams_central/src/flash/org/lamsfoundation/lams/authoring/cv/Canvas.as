@@ -1,4 +1,4 @@
-﻿ï»¿import org.lamsfoundation.lams.authoring.cv.*
+﻿import org.lamsfoundation.lams.authoring.cv.*
 import org.lamsfoundation.lams.authoring.tk.*
 import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.authoring.*
@@ -497,15 +497,48 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		}
 	}
 	
+		
+	/**
+	 * Called from the toolbar usually - starts or stops the gate tool
+	 * @usage   
+	 * @return  
+	 */
+	public function toggleGroupTool():Void{
+		var c:String = Cursor.getCurrentCursor();
+		if(c==Application.C_GROUP){
+			stopGroupTool();
+		}else{
+			startGroupTool();
+		}
+	}
 	
 	public function toggleGateTool():Void{
-		var c = Cursor.getCurrentCursor();
+		var c:String = Cursor.getCurrentCursor();
 		if(c==Application.C_GATE){
 			stopGateTool();
 		}else{
 			startGateTool();
 		}
 	}
+	
+	public function toggleOptionalActivity():Void{
+		var c:String = Cursor.getCurrentCursor();
+		if(c==Application.C_OPTIONAL){
+			stopOptionalActivity();
+		}else{
+			startOptionalActivity();
+		}
+	}
+	
+	public function toggleTransitionTool():Void{
+		var c:String = Cursor.getCurrentCursor();
+		if(c==Application.C_TRANSITION){
+			stopTransitionTool();
+		}else{
+			startTransitionTool();
+		}
+	}
+	
 	
 	public function startGateTool(){
 		Debugger.log('Starting gate tool',Debugger.GEN,'startGateTool','Canvas');
@@ -519,14 +552,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		canvasModel.activeTool = null;
 	}
 	
-	public function toggleOptionalActivity():Void{
-		var c = Cursor.getCurrentCursor();
-		if(c==Application.C_OPTIONAL){
-			startOptionalActivity();
-		}else{
-			stopOptionalActivity();
-		}
-	}
+	
 	public function startOptionalActivity(){
 		Debugger.log('Starting Optioanl Activity',Debugger.GEN,'startOptionalActivity','Canvas');
 		Cursor.showCursor(Application.C_OPTIONAL);
@@ -579,19 +605,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		}
 	}
 	
-	/**
-	 * Called from the toolbar usually - starts or stops the gate tool
-	 * @usage   
-	 * @return  
-	 */
-	public function toggleGroupTool():Void{
-		var c = Cursor.getCurrentCursor();
-		if(c==Application.C_GROUP){
-			stopGroupTool();
-		}else{
-			startGroupTool();
-		}
-	}
+	
 	public function startGroupTool(){
 		Debugger.log('Starting group tool',Debugger.GEN,'startGateTool','Canvas');
 		Cursor.showCursor(Application.C_GROUP);
@@ -602,16 +616,6 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		Debugger.log('Stopping group tool',Debugger.GEN,'startGateTool','Canvas');
 		Cursor.showCursor(Application.C_DEFAULT);
 		canvasModel.activeTool = null;
-	}
-	
-	
-	public function toggleTransitionTool():Void{
-		var c = Cursor.getCurrentCursor();
-		if(c==Application.C_TRANSITION){
-			stopTransitionTool();
-		}else{
-			startTransitionTool();
-		}
 	}
 	
 	
