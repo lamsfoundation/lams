@@ -1,4 +1,3 @@
-<%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ include file="/includes/taglibs.jsp" %>
 <%@ taglib uri="tags-fck-editor" prefix="FCK"%>
@@ -8,7 +7,7 @@
 <head>
 	<html:base />
 	<title>Forum Tool</title>
-	<meta http-equiv="content-type" content="text/html; charset=<%=session.getAttribute("org.lamsfoundation.lams.web.filter.CHARSET.KEY")%>">
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 	<c:set var="lams"><lams:LAMSURL/></c:set>
 	<c:set var="tool"><lams:WebAppURL/></c:set>
 	
