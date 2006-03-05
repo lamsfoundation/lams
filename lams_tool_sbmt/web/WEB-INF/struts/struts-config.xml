@@ -157,7 +157,7 @@
       type="org.lamsfoundation.lams.tool.sbmt.web.AuthoringAction"
       name="SbmtAuthoringForm"
       scope="session"
-      input="/authoring/authoring_tags.jsp"
+      input="/authoring/authoring.jsp"
       parameter="dispatch"
       unknown="false"
       validate="true"
@@ -165,11 +165,11 @@
       <exception
         key="authoring.exception"
         type="org.lamsfoundation.lams.tool.sbmt.exception.SubmitFilesException"
-        path="/authoring/authoring_tags.jsp"
+        path="/authoring/authoring.jsp"
       />
       <forward
         name="success"
-        path="/authoring/authoring_tags.jsp"
+        path="/authoring/authoring.jsp"
         redirect="false"
       />
     </action>
