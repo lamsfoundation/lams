@@ -41,7 +41,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public class QaServiceProxy
 {
     /**
-     * Return the survey domain service object. It will delegate to the Spring
+     * Return the q/a domain service object. It will delegate to the Spring
      * helper method to retrieve the proper bean from Spring bean factory.
      * @param servletContext the servletContext for current application
      * @return qaService object.

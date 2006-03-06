@@ -550,15 +550,31 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
          */
         if (qaLearningForm.getSubmitAnswersContent() != null)
         {
+        	request.getSession().setAttribute(TOOL_SERVICE, qaService);
+    		logger.debug("qaService: " + qaService);
+    		
             logger.debug(logger + " " + this.getClass().getName() +  "submit the responses: " + mapAnswers);
             /*recreate the users and responses*/
             learningUtil.createUsersAndResponses(mapAnswers, request, qaService);
             qaLearningForm.resetUserActions();
             qaLearningForm.setSubmitAnswersContent(null);
             Long toolContentId=(Long) request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
-            learningUtil.lockContent(toolContentId.longValue(), qaService);
-            logger.debug("content has been locked");
-            return (mapping.findForward(LEARNER_REPORT));
+            learningUtil.setContentInUse(toolContentId.longValue(), qaService);
+            logger.debug("content has been set in use");
+            
+            logger.debug("start generating learning report...");
+            Long toolContentID=(Long) request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
+    	    logger.debug("toolContentID: " + toolContentID);
+    	    QaContent qaContent=qaService.loadQa(toolContentID.longValue());
+    	    logger.debug("qaContent: " + qaContent);
+
+    	    QaMonitoringAction qaMonitoringAction= new QaMonitoringAction();
+    		logger.debug("refreshing summary data...");
+    		qaMonitoringAction.refreshSummaryData(request, qaContent, qaService);
+    		
+    		request.getSession().setAttribute(REQUEST_LEARNING_REPORT, new Boolean(true).toString());
+    		logger.debug("fwd'ing to." + LEARNER_REPORT);
+    		return (mapping.findForward(LEARNER_REPORT));
         }
         /*
          * Simulate learner leaving the current tool session. This will normally gets called by the container by 

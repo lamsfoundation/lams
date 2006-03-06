@@ -41,6 +41,7 @@ import org.lamsfoundation.lams.tool.qa.QaStringComparator;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.QaUtils;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
+import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
@@ -77,12 +78,6 @@ public class MonitoringUtil implements QaAppConstants{
 	
 	return true;
 	}
-	
-	
-	
-
-
-
 	
 	
 
@@ -220,7 +215,7 @@ public class MonitoringUtil implements QaAppConstants{
 	public static List buildGroupsQuestionData(HttpServletRequest request, QaContent qaContent)
 	{
 		IQaService qaService = (IQaService)request.getSession().getAttribute(TOOL_SERVICE);
-    	logger.debug("qaService: " + qaService);
+		logger.debug("qaService: " + qaService);
     	
 		logger.debug("will be building groups question data  for content:..." + qaContent);
     	List listQuestions=qaService.getAllQuestionEntries(qaContent.getUid());

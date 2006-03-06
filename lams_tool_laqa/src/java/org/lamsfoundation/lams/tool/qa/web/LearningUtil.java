@@ -190,7 +190,7 @@ public class LearningUtil implements QaAppConstants{
     	request.getSession().setAttribute(USER_FEEDBACK, userFeedback);
     }
     
-    public void lockContent(long toolContentId, IQaService qaService)
+    public void setContentInUse(long toolContentId, IQaService qaService)
     {
     	QaContent qaContent=qaService.loadQa(toolContentId);
     	logger.debug("retrieve qaContent: " + qaContent);

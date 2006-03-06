@@ -458,6 +458,41 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
     }
     
     
+	public void refreshSummaryData(HttpServletRequest request, QaContent qaContent, IQaService qaService)
+	{
+		/* this section is related to summary tab. Starts here. */
+		Map summaryToolSessions=MonitoringUtil.populateToolSessions(request, qaContent, qaService);
+		logger.debug("summaryToolSessions: " + summaryToolSessions);
+		if (summaryToolSessions.isEmpty())
+		{
+			QaUtils.cleanUpSessionAbsolute(request);
+			/* inform in the Summary tab that the tool has no active sessions */
+			request.setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
+			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to true");
+		}
+		 
+		request.getSession().setAttribute(SUMMARY_TOOL_SESSIONS, summaryToolSessions);
+	    	    
+	    Map summaryToolSessionsId=MonitoringUtil.populateToolSessionsId(request, qaContent, qaService);
+		logger.debug("summaryToolSessionsId: " + summaryToolSessionsId);
+		request.getSession().setAttribute(SUMMARY_TOOL_SESSIONS_ID, summaryToolSessionsId);
+	    	
+	    
+	    /* SELECTION_CASE == 2 indicates start up */
+	    request.getSession().setAttribute(SELECTION_CASE, new Long(2));
+	    logger.debug("SELECTION_CASE: " + request.getSession().getAttribute(SELECTION_CASE));
+	    
+	    /* Default to All for tool Sessions so that all tool sessions' summary information gets displayed when the module starts up */
+	    request.getSession().setAttribute(CURRENT_MONITORED_TOOL_SESSION, "All");
+	    logger.debug("CURRENT_MONITORED_TOOL_SESSION: " + request.getSession().getAttribute(CURRENT_MONITORED_TOOL_SESSION));
+	    
+	    List listMonitoredAnswersContainerDTO=MonitoringUtil.buildGroupsQuestionData(request, qaContent);
+	    request.getSession().setAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO, listMonitoredAnswersContainerDTO);
+	    logger.debug("LIST_MONITORED_ANSWERS_CONTAINER_DTO: " + request.getSession().getAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO));
+	    /* ends here. */
+	}
+
+    
 	public void refreshStatsData(HttpServletRequest request)
 	{
 		/* it is possible that no users has ever logged in for the activity yet*/

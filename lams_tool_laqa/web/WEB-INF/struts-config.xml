@@ -124,10 +124,17 @@
 		  />
 	  	
 	      <forward
-	        name="learnerReport"
-	        path="/learning/learnerReport.jsp"
+	        name="learnerRep"
+	        path="/monitoring/LearnerRep.jsp"
 	        redirect="true"
 	      />
+
+	  	<forward
+		    name="loadMonitoring"
+		    path="/monitoring/MonitoringMaincontent.jsp"
+		    redirect="true"
+	  	/>
+	      
 
 	      <forward
 	        name="learningStarter"
@@ -157,6 +164,12 @@
 		    path="/learning/answersContent.jsp"	        
 		    redirect="true"
 	      />
+
+	  	<forward
+		    name="loadMonitoring"
+		    path="/monitoring/MonitoringMaincontent.jsp"
+		    redirect="true"
+	  	/>
 	      
 	      <forward
 	        name="learningStarter"
@@ -165,8 +178,8 @@
 	      />
       
 	      <forward
-	        name="learnerReport"
-	        path="/learning/learnerReport.jsp"
+	        name="learnerRep"
+	        path="/monitoring/LearnerRep.jsp"
 	        redirect="true"
 	      />
 	      

@@ -42,7 +42,6 @@ import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.contentrepository.service.RepositoryProxy;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
-import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.tool.BasicToolVO;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
@@ -96,7 +95,6 @@ public class QaServicePOJO
 {
 	static Logger logger = Logger.getLogger(QaServicePOJO.class.getName());
 	
-	/*repository access related constants */
 	private final String repositoryUser 		= "laqa11";
 	private final char[] repositoryId 			= {'l','a','q','a','_','1', '1'}; 
 	private final String repositoryWorkspace 	= "laqa11";
@@ -184,7 +182,7 @@ public class QaServicePOJO
     }
 
     /**
-     * same as retrieveQa(long toolContentId) except that returns null if not found
+     * returns null if not found
      */
     public QaContent loadQa(long toolContentId) throws QaApplicationException
     {
@@ -206,7 +204,6 @@ public class QaServicePOJO
     {
         try
         {
-        	
         	logger.debug("attempt service createQaQue: " + qaQueContent);
         	qaQueContentDAO.createQueContent(qaQueContent);
         	logger.debug("after  servicecreateQaQue: " + qaQueContent);
@@ -234,7 +231,7 @@ public class QaServicePOJO
     }
     
     
-    public List getSessionNamesFromContent(QaContent qaContent)
+    public List getSessionNamesFromContent(QaContent qaContent) throws QaApplicationException
     {
         try
         {
@@ -249,7 +246,7 @@ public class QaServicePOJO
     }
 
     
-    public String getSessionNameById(long qaSessionId)
+    public String getSessionNameById(long qaSessionId) throws QaApplicationException
     {
         try
         {
@@ -471,7 +468,9 @@ public class QaServicePOJO
         }
     }
 
-    public List retrieveQaQueContentsByToolContentId(long qaContentId){
+    
+    public List retrieveQaQueContentsByToolContentId(long qaContentId) throws QaApplicationException
+	{
         try
         {
             return qaQueContentDAO.getQaQueContentsByContentId(qaContentId);
@@ -682,33 +681,7 @@ public class QaServicePOJO
         }
     }
 
-    /**
-     * 
-     * Unused method
-     * @param lessonId
-     * @return
-     * @throws QaApplicationException
-     */
-    public Lesson getCurrentLesson(long lessonId) throws QaApplicationException
-    {
-        try
-        {
-            /**this is a mock implementation to make the project compile and 
-            work. When the Lesson service is ready, we need to switch to 
-            real service implmenation.
-            */
-            return new Lesson();
-            /**return lsDAO.find(lsessionId); */
-        }
-        catch (DataAccessException e)
-        {
-            throw new QaApplicationException("Exception occured when lams is loading"
-                                                 + " learning session:"
-                                                 + e.getMessage(),
-                                                 e);
-        }
-    }
-
+    
     public void saveQaContent(QaContent qa) throws QaApplicationException
     {
         try
@@ -773,9 +746,6 @@ public class QaServicePOJO
         	while (responsesIterator.hasNext())
         	{
         		logger.debug("there is at least one response");
-        		/*
-        		 * proved the fact that there is at least one response for this content.
-        		 */
         		return true;
         	}
         } 
@@ -824,7 +794,6 @@ public class QaServicePOJO
 	
 	
 	/**
-	 * TESTED
 	 * gets called ONLY when a lesson is being created in monitoring mode. 
 	 * Should create the new content(toContent) based on what the author has created her content with. In q/a tool's case
 	 * that is content + question's content but not user responses. The deep copy should go only as far as
@@ -913,11 +882,8 @@ public class QaServicePOJO
 
     
     /**
-     * TO BE DEFINED-FUTURE API
      * setAsForceCompleteSession(Long toolSessionId) throws QaApplicationException
-     * 
      * update the tool session status to COMPLETE for this tool session
-     * IMPLEMENT THIS!!!! Is this from ToolContentManager???
      * 
      * @param Long toolSessionId
      */
@@ -935,12 +901,8 @@ public class QaServicePOJO
 
     
     /**
-     * TO BE DEFINED
      * setAsForceComplete(Long userId) throws QaApplicationException
-     * 
-     * TESTED
      * update the tool session status to COMPLETE for this user
-     * IMPLEMENT THIS!!!! Is this from ToolContentManager???
      * @param userId
      */
     public void setAsForceComplete(Long userId) throws QaApplicationException
@@ -968,10 +930,6 @@ public class QaServicePOJO
             	logger.debug("qaSession uses qaContent : " + qaContent);
             	logger.debug("qaSession uses qaContentId : " + qaContent.getQaContentId());
             	
-            	/*
-            	 * if all the sessions of this content is COMPLETED, unlock the content
-            	 * 
-            	 */
             	int countIncompleteSession=countIncompleteSession(qaContent);
             	logger.debug("qaSession countIncompleteSession : " + countIncompleteSession);
             	
@@ -1019,10 +977,9 @@ public class QaServicePOJO
     	logger.debug("qaContent has been updated for unsetAsDefineLater: " + qaContent);
     }
     
+
     /**
      * setAsDefineLater(Long toolContentId) throws DataMissingException, ToolException
-     * TESTED
-     * set the defineLater to true on this content
      * 
      * @param toolContentId
      * return void
@@ -1048,7 +1005,6 @@ public class QaServicePOJO
 
     /**
      * setAsRunOffline(Long toolContentId) throws DataMissingException, ToolException
-     * TESTED
      * set the runOffline to true on this content
      * 
      * @param toolContentId
@@ -1077,8 +1033,6 @@ public class QaServicePOJO
     /** 
      * 
      * removeToolContent(Long toolContentId)
-     * ! UNUSED !
-     * TESTED
      * gets automatically called only in monitoring mode when the author chooses to delete a lesson.
      * 
      * The idea is to remove content + its relevant sessions + in q/a tools's case the question's content from the db. 
@@ -1124,10 +1078,10 @@ public class QaServicePOJO
     	}
     }
     
-    public void removeQuestions(Long toolContentId){
+    public void removeQuestions(Long toolContentId) throws QaApplicationException 
+	{
         QaContent qaContent = qaDAO.loadQaById(toolContentId.longValue());
         qaContent.setQaQueContents(new TreeSet());
-        
         
         if (qaContent != null)
         {
@@ -1158,7 +1112,6 @@ public class QaServicePOJO
     
     
     /**
-     * DOUBLE CHECK!
      * removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException, ToolException
      * Will need an update on the core tool signature: reason : when  qaContent is null throw an exception 
      * 
@@ -1248,7 +1201,6 @@ public class QaServicePOJO
     
     /**
      * createToolSession(Long toolSessionId,String toolSessionName, Long toolContentId) throws ToolException
-     * TESTED
      * ToolSessionManager CONTRACT : creates a tool session with the incoming toolSessionId in the tool session table
      * 
      * gets called only in the Learner mode.
@@ -1310,7 +1262,6 @@ public class QaServicePOJO
         }
         logger.debug("final - retrieved qaContent: " + qaContent);
 
-            
         /*
          * create a new a new tool session if it does not already exist in the tool session table
          */

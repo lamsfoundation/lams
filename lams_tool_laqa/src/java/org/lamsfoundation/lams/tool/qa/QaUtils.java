@@ -548,6 +548,8 @@ public abstract class QaUtils implements QaAppConstants {
 		request.getSession().removeAttribute(IS_MONITORED_CONTENT_IN_USE);
 		request.getSession().removeAttribute(LOAD_MONITORING_CONTENT_EDITACTIVITY);
 		request.getSession().removeAttribute(MONITORING_ORIGINATED_DEFINELATER);
+		request.getSession().removeAttribute(REQUEST_LEARNING_REPORT);
+		
 		request.getSession().removeAttribute(USER_EXCEPTION_WRONG_FORMAT);
 		request.getSession().removeAttribute(USER_EXCEPTION_UNCOMPATIBLE_IDS);
 		request.getSession().removeAttribute(USER_EXCEPTION_NUMBERFORMAT);

@@ -433,10 +433,10 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	    if ((user == null) || (user.getUserID() == null))
 	    {
-	    	logger.debug("error: The tool expects userId");
-	    	request.setAttribute(USER_EXCEPTION_USER_DOESNOTEXIST, new Boolean(true).toString());			
-	    	persistError(request,"error.learningUser.notAvailable");
 	    	QaUtils.cleanUpSessionAbsolute(request);
+	    	logger.debug("error: The tool expects userId");
+	    	request.getSession().setAttribute(USER_EXCEPTION_USER_DOESNOTEXIST, new Boolean(true).toString());			
+	    	persistError(request,"error.learningUser.notAvailable");
 			return (mapping.findForward(ERROR_LIST_LEARNER));
 	    }else
 	    	userID = user.getUserID().toString();
@@ -452,9 +452,9 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    long toolSessionId=0;
 	    if ((strToolSessionId == null) || (strToolSessionId.length() == 0)) 
 	    {
-	    	request.setAttribute(USER_EXCEPTION_TOOLSESSIONID_REQUIRED, new Boolean(true).toString());
-	    	persistError(request, "error.toolSessionId.required");
 	    	QaUtils.cleanUpSessionAbsolute(request);
+	    	request.getSession().setAttribute(USER_EXCEPTION_TOOLSESSIONID_REQUIRED, new Boolean(true).toString());
+	    	persistError(request, "error.toolSessionId.required");
 			return (mapping.findForward(ERROR_LIST_LEARNER));
 	    }
 	    else
@@ -467,10 +467,10 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 			}
 	    	catch(NumberFormatException e)
 			{
-		    	request.setAttribute(USER_EXCEPTION_NUMBERFORMAT, new Boolean(true).toString());				
+	    		QaUtils.cleanUpSessionAbsolute(request);
+		    	request.getSession().setAttribute(USER_EXCEPTION_NUMBERFORMAT, new Boolean(true).toString());				
 	    		persistError(request, "error.sessionId.numberFormatException");
 	    		logger.debug("add error.sessionId.numberFormatException to ActionMessages.");
-	    		QaUtils.cleanUpSessionAbsolute(request);
 				return (mapping.findForward(ERROR_LIST_LEARNER));
 			}
 	    }
@@ -481,17 +481,17 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    
 	    if ((mode == null) || (mode.length() == 0)) 
 	    {
-	    	request.setAttribute(USER_EXCEPTION_MODE_REQUIRED, new Boolean(true).toString());			
-	    	persistError(request, "error.mode.required");
     		QaUtils.cleanUpSessionAbsolute(request);
+	    	request.getSession().setAttribute(USER_EXCEPTION_MODE_REQUIRED, new Boolean(true).toString());			
+	    	persistError(request, "error.mode.required");
 			return (mapping.findForward(ERROR_LIST_LEARNER));
 	    }
 	    
 	    if ((!mode.equals("learner")) && (!mode.equals("teacher")) && (!mode.equals("author")))
 	    {
-	    	request.setAttribute(USER_EXCEPTION_MODE_INVALID, new Boolean(true).toString());			
-	    	persistError(request, "error.mode.invalid");
 	    	QaUtils.cleanUpSessionAbsolute(request);
+	    	request.getSession().setAttribute(USER_EXCEPTION_MODE_INVALID, new Boolean(true).toString());			
+	    	persistError(request, "error.mode.invalid");
 			return (mapping.findForward(ERROR_LIST_LEARNER));
 	    }
 		logger.debug("session LEARNING_MODE set to:" + mode);

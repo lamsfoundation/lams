@@ -36,25 +36,36 @@ http://www.gnu.org/licenses/gpl.txt
 		 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.attemptTime}"/> </font> </td>
 		 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.timeZone}"/> </font> </td>
 		 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.response}"/> </font> </td>
-		 <td NOWRAP valign=top> <img src="<c:out value="${tool}"/>images/edit.gif" align=left onclick="javascript:submitEditResponse('<c:out value="${userData.uid}"/>','editResponse');">	</td>	  	 
-		 <td NOWRAP valign=top> <img src="<c:out value="${tool}"/>images/delete.gif" align=left onclick="javascript:submitEditResponse('<c:out value="${userData.uid}"/>','deleteResponse');">	</td>	  	 
+
+		<c:if test="${(requestLearningReport != 'true')}"> 	
+			 <td NOWRAP valign=top> <img src="<c:out value="${tool}"/>images/edit.gif" align=left onclick="javascript:submitEditResponse('<c:out value="${userData.uid}"/>','editResponse');">	</td>	  	 
+			 <td NOWRAP valign=top> <img src="<c:out value="${tool}"/>images/delete.gif" align=left onclick="javascript:submitEditResponse('<c:out value="${userData.uid}"/>','deleteResponse');">	</td>	  	 
+		</c:if>				 
 	</c:if>
+	
 	<c:if test="${editResponse == 'true'}">	  	
 		<c:if test="${editableResponseId == responseUid}">	  	 									 			
 			 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.userName}"/> </font>  </td>  
 			 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.attemptTime}"/> </font> </td>
 			 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.timeZone}"/> </font> </td>
 			 <td NOWRAP valign=top>  <font size=2> <input type="text" name="updatedResponse" value='<c:out value="${userData.response}"/>'> </font> </td>
-			 <td NOWRAP valign=top> <img src="<c:out value="${tool}"/>images/tick.gif" align=left onclick="javascript:submitEditResponse('<c:out value="${userData.uid}"/>','updateResponse');">	</td>	  	 
-			 <td NOWRAP valign=top> <img src="<c:out value="${tool}"/>images/delete.gif" align=left onclick="javascript:submitEditResponse('<c:out value="${userData.uid}"/>','deleteResponse');">	</td>	  	 
-		</c:if>
-		<c:if test="${editableResponseId != responseUid}">	  	 									 			
+	
+			<c:if test="${(requestLearningReport != 'true')}"> 				 
+				 <td NOWRAP valign=top> <img src="<c:out value="${tool}"/>images/tick.gif" align=left onclick="javascript:submitEditResponse('<c:out value="${userData.uid}"/>','updateResponse');">	</td>	  	 
+				 <td NOWRAP valign=top> <img src="<c:out value="${tool}"/>images/delete.gif" align=left onclick="javascript:submitEditResponse('<c:out value="${userData.uid}"/>','deleteResponse');">	</td>	  	 
+			</c:if>				 				 
+	</c:if>
+	
+	<c:if test="${editableResponseId != responseUid}">	  	 									 			
 			 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.userName}"/> </font>  </td>  
 			 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.attemptTime}"/> </font> </td>
 			 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.timeZone}"/> </font> </td>
 			 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.response}"/> </font> </td>
-			 <td NOWRAP valign=top> <img src="<c:out value="${tool}"/>images/edit.gif" align=left onclick="javascript:submitEditResponse('<c:out value="${userData.uid}"/>','editResponse');">	</td>	  	 
-			 <td NOWRAP valign=top> <img src="<c:out value="${tool}"/>images/delete.gif" align=left onclick="javascript:submitEditResponse('<c:out value="${userData.uid}"/>','deleteResponse');">	</td>	  	 
+	
+			<c:if test="${(requestLearningReport != 'true')}"> 	
+				 <td NOWRAP valign=top> <img src="<c:out value="${tool}"/>images/edit.gif" align=left onclick="javascript:submitEditResponse('<c:out value="${userData.uid}"/>','editResponse');">	</td>	  	 
+				 <td NOWRAP valign=top> <img src="<c:out value="${tool}"/>images/delete.gif" align=left onclick="javascript:submitEditResponse('<c:out value="${userData.uid}"/>','deleteResponse');">	</td>	  	 
+			</c:if>				 			 
 		</c:if>														  					 									  													  			
 	</c:if>														  					 									  													  			
 </tr>		

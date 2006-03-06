@@ -40,7 +40,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 
 
 /**
- * This interface define the contract that all Survey service provider must
+ * This interface define the contract that all Q/A service provider must
  * follow.
  * 
  * @author Ozgur Demirtas
@@ -53,7 +53,7 @@ public interface IQaService
      * @return the qa object
      */
     
-	public QaContent retrieveQa(long toolContentId);
+	public QaContent retrieveQa(long toolContentId) throws QaApplicationException;;
 	
 	
 	/**
@@ -62,13 +62,13 @@ public interface IQaService
      * @return the qa object or null
      */
     
-	public QaContent loadQa(long toolContentId);
+	public QaContent loadQa(long toolContentId) throws QaApplicationException;;
 
-	public QaContent getQaContentByUID(Long uid);
+	public QaContent getQaContentByUID(Long uid) throws QaApplicationException;;
 	
-	public int getTotalNumberOfUsers();
+	public int getTotalNumberOfUsers() throws QaApplicationException;;
 	
-	public int countSessionComplete();
+	public int countSessionComplete() throws QaApplicationException;;
 	
 	
 	/**
@@ -76,19 +76,19 @@ public interface IQaService
      * @param qaQueContentId qa question content id
      * @return the qa question object
      */
-	public QaQueContent retrieveQaQue(long qaQueContentId);
+	public QaQueContent retrieveQaQue(long qaQueContentId) throws QaApplicationException;;
 	
-	public QaQueUsr loadQaQueUsr(Long userId);
+	public QaQueUsr loadQaQueUsr(Long userId) throws QaApplicationException;;
 	
-	public List getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long qaQueContentId);
+	public List getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long qaQueContentId) throws QaApplicationException;;
 		
-	public void createQaQue(QaQueContent qaQueContent);
+	public void createQaQue(QaQueContent qaQueContent) throws QaApplicationException;;
 	
-	public void createQaUsrResp(QaUsrResp qaUsrResp);
+	public void createQaUsrResp(QaUsrResp qaUsrResp) throws QaApplicationException;;
 	
-	public QaUsrResp retrieveQaUsrResp(long responseId);
+	public QaUsrResp retrieveQaUsrResp(long responseId) throws QaApplicationException;;
 	
-	public void updateQaUsrResp(QaUsrResp qaUsrResp);
+	public void updateQaUsrResp(QaUsrResp qaUsrResp) throws QaApplicationException;;
 	
 	
 	/**
@@ -96,23 +96,23 @@ public interface IQaService
      * @param qaSessionId qa session id
      * @return the qa session object
      */
-	public QaSession retrieveQaSession(long qaSessionId);
+	public QaSession retrieveQaSession(long qaSessionId) throws QaApplicationException;;
 	
 	public QaSession retrieveQaSessionOrNullById(long qaSessionId) throws QaApplicationException;
 		
-	public void createQaSession(QaSession qaSession);
+	public void createQaSession(QaSession qaSession) throws QaApplicationException;;
 	
-	public List getSessionNamesFromContent(QaContent qaContent);
+	public List getSessionNamesFromContent(QaContent qaContent) throws QaApplicationException;;
 	
-	public String getSessionNameById(long qaSessionId);
+	public String getSessionNameById(long qaSessionId) throws QaApplicationException;;
 	
 	public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException;
 	
-	public List getSessionsFromContent(QaContent qaContent);
+	public List getSessionsFromContent(QaContent qaContent) throws QaApplicationException;;
 	
-	public void createQaQueUsr(QaQueUsr qaQueUsr);
+	public void createQaQueUsr(QaQueUsr qaQueUsr) throws QaApplicationException;;
 	
-	public void updateQaSession(QaSession qaSession);
+	public void updateQaSession(QaSession qaSession) throws QaApplicationException;;
 	
 	
 	/**
@@ -120,37 +120,34 @@ public interface IQaService
      * @param qaQaUsrId qa usr id
      * @return the qa que usr object
      */
-	public QaQueUsr retrieveQaQueUsr(long qaQaUsrId);
+	public QaQueUsr retrieveQaQueUsr(long qaQaUsrId) throws QaApplicationException;;
 	
-	public QaQueUsr getQaQueUsrById(long qaQueUsrId);
+	public QaQueUsr getQaQueUsrById(long qaQueUsrId) throws QaApplicationException;;
 	
-	public void updateQa(QaContent qa);
+	public void updateQa(QaContent qa) throws QaApplicationException;;
 	
-	public void createQa(QaContent qa);
+	public void createQa(QaContent qa) throws QaApplicationException;;
 	
-	public void deleteQa(QaContent qa);
+	public void deleteQa(QaContent qa) throws QaApplicationException;;
     
 	public void deleteQaSession(QaSession QaSession) throws QaApplicationException;
 	
-	public void deleteUsrRespByQueId(Long qaQueId);
+	public void deleteUsrRespByQueId(Long qaQueId) throws QaApplicationException;;
 	
-	public void deleteQaById(Long qaId);
+	public void deleteQaById(Long qaId) throws QaApplicationException;;
 	
-	public void deleteQaQueUsr(QaQueUsr qaQueUsr);
+	public void deleteQaQueUsr(QaQueUsr qaQueUsr) throws QaApplicationException;;
 	
-	public void removeUserResponse(QaUsrResp resp);
+	public void removeUserResponse(QaUsrResp resp) throws QaApplicationException;;
 	
 	public List getAllQuestionEntries(final Long uid) throws QaApplicationException;
 	
-    public User getCurrentUserData(String username);
+    public User getCurrentUserData(String username) throws QaApplicationException;;
     
-    public List getUserBySessionOnly(final QaSession qaSession);
+    public List getUserBySessionOnly(final QaSession qaSession) throws QaApplicationException;;
     
     /**
-     * 
      * copyToolContent(Long fromContentId, Long toContentId)
-     * should ideally should not be part this interface as it is
-     * already part of the interface ToolSessionManager. It is here for development purposes.
      * return void
      * @param fromContentId
      * @param toContentId
@@ -159,42 +156,31 @@ public interface IQaService
     
     public void setAsDefineLater(Long toolContentId) throws DataMissingException, ToolException;
     
-    public void unsetAsDefineLater(Long toolContentId);
+    public void unsetAsDefineLater(Long toolContentId) throws QaApplicationException;;
     
     public void setAsRunOffline(Long toolContentId) throws DataMissingException, ToolException;
     
-    /**
-     * TO BE DEFINED AS PART OF MAIN TOOL API
-     * updates user's tool session status from INCOMPLETE to COMPLETED
-     * @param userId
-     */
-    public void setAsForceComplete(Long userId);
+    public void setAsForceComplete(Long userId) throws QaApplicationException;;
     
-    /**
-     * TO BE DEFINED AS PART OF MAIN TOOL API
-     * @param toolSessionId
-     */
-    public void setAsForceCompleteSession(Long toolSessionId);
+    public void setAsForceCompleteSession(Long toolSessionId) throws QaApplicationException;;
     
-    public boolean studentActivityOccurred(QaContent qa);
+    public boolean studentActivityOccurred(QaContent qa) throws QaApplicationException;;
     
-    public boolean studentActivityOccurredGlobal(QaContent qaContent);
+    public boolean studentActivityOccurredGlobal(QaContent qaContent) throws QaApplicationException;;
     
     
     /**
-     * removeToolContent(Long toolContentId) should ideally should not be part this interface as it is
-     * already part of the interface ToolSessionManager. It is here for development purposes.
+     * removeToolContent(Long toolContentId) 
      * return void
      * @param toolContentId
      */
-    public void removeToolContent(Long toolContentId);
+    public void removeToolContent(Long toolContentId) throws QaApplicationException;;
     
     
     /**
-     * createToolSession(Long toolSessionId,String toolSessionName, Long toolContentId) should ideally should not be part this interface as it is
-     * already part of the interface ToolSessionManager. It is here for development purposes.
+     * createToolSession(Long toolSessionId,String toolSessionName, Long toolContentId) 
      * 
-     * It is also defined here since in development we want to be able call it directly from our web-layer 
+     * It is also defined here since in development we want to be able call it directly from the web-layer 
      * instead of it being called by the container.
      * @param toolSessionId
      * @param toolContentId
@@ -202,8 +188,7 @@ public interface IQaService
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException;
     
     /**
-     * leaveToolSession(Long toolSessionId, Long learnerId) should ideally should not be part this interface as it is
-     * already part of the interface ToolSessionManager. It is here for development purposes.
+     * leaveToolSession(Long toolSessionId, Long learnerId) 
      * 
      * It is also defined here since in development we want to be able call it directly from our web-layer 
      * instead of it being called by the container.
@@ -212,15 +197,15 @@ public interface IQaService
      */
     public String leaveToolSession(Long toolSessionId,Long learnerId) throws DataMissingException, ToolException;
     
-    public BasicToolVO getToolBySignature(String toolSignature);
+    public BasicToolVO getToolBySignature(String toolSignature) throws QaApplicationException;;
     
-    public long getToolDefaultContentIdBySignature(String toolSignature);
+    public long getToolDefaultContentIdBySignature(String toolSignature) throws QaApplicationException;;
     
-    public int countSessionUser(QaSession qaSession);
+    public int countSessionUser(QaSession qaSession) throws QaApplicationException;;
     
-    public List getToolSessionsForContent(QaContent qa);
+    public List getToolSessionsForContent(QaContent qa) throws QaApplicationException;;
     
-    public QaQueContent getToolDefaultQuestionContent(long contentId);
+    public QaQueContent getToolDefaultQuestionContent(long contentId) throws QaApplicationException;;
     
     public void configureContentRepository() throws QaApplicationException;
     

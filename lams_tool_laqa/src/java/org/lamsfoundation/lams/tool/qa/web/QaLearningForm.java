@@ -42,6 +42,8 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
 	protected String getPreviousQuestion;
 	protected String endLearning;
 	
+	protected String responseId;
+	
 	
 	/**
      * reset user actions in learning mode
@@ -129,4 +131,16 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
 	public void setEndLearning(String endLearning) {
 		this.endLearning = endLearning;
 	}
+	/**
+	 * @return Returns the responseId.
+	 */
+	public String getResponseId() {
+		return responseId;
 	}
+	/**
+	 * @param responseId The responseId to set.
+	 */
+	public void setResponseId(String responseId) {
+		this.responseId = responseId;
+	}
+}

@@ -193,7 +193,8 @@ public interface QaAppConstants {
     public static final String CHECK_ALL_SESSIONS_COMPLETED				="checkAllSessionsCompleted";
     public static final String FROM_TOOL_CONTENT_ID						="fromToolContentId";
     public static final String TO_TOOL_CONTENT_ID						="toToolContentId";
-    public static final String LEARNER_REPORT							="learnerReport";
+    public static final String LEARNER_REPORT							="learnerRep";
+    public static final String REQUEST_LEARNING_REPORT					="requestLearningReport";
     
             
     /*
