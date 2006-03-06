@@ -1,23 +1,5 @@
 <%@include file="../sharing/share.jsp" %>
-<%@ taglib uri="tags-bean" prefix="bean" %>
 <%@ taglib uri="tags-logic" prefix="logic" %>
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html:html locale="true">
-  <head>
-    <html:base />
-    
-    <title><bean:message key="page.title.mark1.userlist"/></title>    
-	<!-- depending on user / site preference this will get changed probbably use passed in variable from flash to select which one to use-->
-    <link href="<%=LAMS_WEB_ROOT%>/css/aqua.css" rel="stylesheet" type="text/css">
-
-  </head>
-  
-  <body>
-    <div>
-    <%@ include file="tabmenu.jsp"%>
-    </div>
-	<html:errors/>
   	<div id="datatablecontainer">
   		<c:set var="sessionUserMap" scope="request" value="${sessionUserMap}"/>
   		<logic:notEmpty name="sessionUserMap">
@@ -31,17 +13,16 @@
 			  		<logic:notEmpty name="userlist">
 						<logic:iterate id="user" name="userlist">
 							<tr>
-							<html:form  action="/monitoring">
-							<html:hidden property="method" value="getFilesUploadedByUser"/>
-							<html:hidden property="toolSessionID" value="${sessionDto.sessionID}"/>
-							
 							<bean:define id="details" name="user" property="userID"/>
 							<html:hidden property="userID" value="${details}"/>
-							
+							<html:hidden property="toolSessionID" value="${sessionDto.sessionID}"/>
 							<td class="formlabel"><b><bean:write name="user" property="firstName"/> <bean:write name="user" property="lastName"/></b></td>
 							<td class="formlabel"><b><bean:write name="user" property="login"/></b></td>
-							<td class="formcontrol"><b><html:submit property="Mark" value="Mark"/></b></td>
-							</html:form>
+							<td class="formcontrol">
+								<html:link href="javascript:doSubmit('getFilesUploadedByUser', 5);" property="Mark" styleClass="button">
+									<bean:message key="label.monitoring.Mark.button" />
+								</html:link>
+							</td>
 							</tr>		
 						</logic:iterate>
 			  		</logic:notEmpty>
@@ -51,25 +32,19 @@
 				    
 	  				<tr>
 			  			<td class="formcontrol">
-			  			<html:form  action="/monitoring">
-			  				<html:hidden property="method" value="viewAllMarks"/>
-							<html:hidden property="toolSessionID" value="${sessionDto.sessionID}"/>
-				  			<html:submit property="viewAllMarks" value="View all marks"/>
-		  				</html:form>
+			  			<html:link href="javascript:doSubmit('viewAllMarks', 5);" property="viewAllMarks" styleClass="button">
+							<bean:message key="label.monitoring.viewAllMarks.button" />
+						</html:link>
 			  			</td>
 			  			<td class="formcontrol">
-			  			<html:form  action="/monitoring">
-			  				<html:hidden property="method" value="releaseMarks"/>
-							<html:hidden property="toolSessionID" value="${sessionDto.sessionID}"/>
-				  			<html:submit property="releaseMarks" value="Release marks"/>
-		  				</html:form>
+			  			<html:link href="javascript:doSubmit('releaseMarks');" property="releaseMarks" styleClass="button">
+							<bean:message key="label.monitoring.releaseMarks.button" />
+						</html:link>
 			  			</td>
 			  			<td class="formcontrol">
-			  			<html:form  action="/monitoring">
-			  				<html:hidden property="method" value="downloadMarks"/>
-							<html:hidden property="toolSessionID" value="${sessionDto.sessionID}"/>
-				  			<html:submit property="downloadMarks" value="Download marks"/>
-		  				</html:form>
+			  			<html:link href="javascript:doSubmit('downloadMarks');" property="downloadMarks" styleClass="button">
+							<bean:message key="label.monitoring.downloadMarks.button" />
+						</html:link>
 			  			</td>
 	  				</tr>
 				</table>
@@ -78,6 +53,3 @@
 
   		</logic:notEmpty>  		
 	</div>
-					
-  </body>
-</html:html>

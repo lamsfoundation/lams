@@ -1,20 +1,4 @@
 <%@include file="../sharing/share.jsp" %>
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html:html locale="true">
-  <head>
-    
-    <title>Monitoring Instructions</title>    
-    <html:base />
-    <link href="<%=LAMS_WEB_ROOT%>/css/aqua.css" rel="stylesheet" type="text/css">
-	<script type="text/javascript" src="<%=LAMS_WEB_ROOT%>/includes/javascript/common.js"></script>
-  </head>
-  <body>
-      <div>
-    <%@ include file="tabmenu.jsp"%>
-    </div>  
-  	<h1><fmt:message key="label.monitoring.heading.instructions" /></h1>
-	<h2><fmt:message key="label.monitoring.heading.instructions.desc" /></h2>
 	<table class="forms">
 		<!--hidden field contentID passed by flash-->
 		<tr>
@@ -67,7 +51,3 @@
 		</tr>
 		</tr>
 	</table>
-
-
-  </body>
-</html:html>

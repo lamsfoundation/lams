@@ -1,17 +1,4 @@
 <%@include file="../sharing/share.jsp" %>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html:html locale="true">
-  <head>    
-    <title>All Learner Submission Details</title>
-    <html:base/>
-  	<link href="<%=LAMS_WEB_ROOT%>/css/aqua.css" rel="stylesheet" type="text/css">
-	<script type="text/javascript" src="<%=LAMS_WEB_ROOT%>/includes/javascript/common.js"></script>
-  	
-  </head>  
-  <body>
-    <div>
-    <%@ include file="tabmenu.jsp"%>
-    </div>
 		<table width="100%"  border="0" cellspacing="0" cellpadding="0">
 		<c:forEach items="${report}"  var ="user" >		
 			<c:set var="filesUploaded" value="${user.value}"/>
@@ -80,19 +67,16 @@
 		
 				<tr>
 					<td colspan="2">
-					<form action="<html:rewrite page='/monitoring.do?method=markFile'/>" method="post">
 							<input type="hidden" name="detailID" value=<c:out value='${details.submissionID}' /> >
 							<input type="hidden" name="reportID" value=<c:out value='${details.reportID}' /> >
 							<input type="hidden" name="userID" value=<c:out value='${details.userID}' /> >
 							<input type="hidden" name="toolSessionID" value=<c:out value='${toolSessionID}' /> >
-							<input type="submit" value="Update Marks"/>
-					</form>
+							<html:link href="javascript:doSubmit('markFile');" property="submit" styleClass="button">
+								<bean:message key="label.monitoring.updateMarks.button" />
+							</html:link>
 					</td>
 				</tr>
 				</span>
 			</c:forEach>
 		</c:forEach>
-		</table>						
-  </body>
-</html:html>
-
+		</table>	
