@@ -61,7 +61,7 @@ public class LocaleFilter extends OncePerRequestFilter {
     public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, 
             FilterChain chain) throws IOException, ServletException {
     	//charset encoding
-    	if(StringUtils.isEmpty(this.encoding))
+    	if(!StringUtils.isEmpty(this.encoding))
     		request.setCharacterEncoding(encoding);
     	else
     		request.setCharacterEncoding("UTF-8");
