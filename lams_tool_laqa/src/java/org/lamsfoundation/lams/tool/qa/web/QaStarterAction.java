@@ -194,14 +194,14 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	    if ((user == null) || (user.getUserID() == null))
 	    {
+	    	QaUtils.cleanUpSessionAbsolute(request);
 	    	logger.debug("error: The tool expects userId");
+	    	request.getSession().setAttribute(USER_EXCEPTION_USER_DOESNOTEXIST, new Boolean(true).toString());	    	
 	    	persistError(request,"error.authoringUser.notAvailable");
-	    	request.setAttribute(USER_EXCEPTION_USERID_NOTAVAILABLE, new Boolean(true));
 			logger.debug("forwarding to: " + ERROR_LIST);
 			return (mapping.findForward(ERROR_LIST));
 	    }
 	    
-		
 	    ActionForward validateSignature=readSignature(request,mapping);
 		logger.debug("validateSignature:  " + validateSignature);
 		if (validateSignature != null)
@@ -248,8 +248,9 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	    
 	    if ((strToolContentId == null) || (strToolContentId.equals(""))) 
 	    {
-	    	persistError(request,"error.contentId.required");
 	    	QaUtils.cleanUpSessionAbsolute(request);
+	    	request.getSession().setAttribute(USER_EXCEPTION_CONTENTID_REQUIRED, new Boolean(true).toString());	    	
+	    	persistError(request,"error.contentId.required");
 			logger.debug("forwarding to: " + ERROR_LIST);
 			return (mapping.findForward(ERROR_LIST));
 	    }
@@ -303,10 +304,11 @@ public class QaStarterAction extends Action implements QaAppConstants {
         	logger.debug("qaContent: " + qaContent);
         	if (qaService.studentActivityOccurred(qaContent))
     		{
+        		QaUtils.cleanUpSessionAbsolute(request);
     			logger.debug("student activity occurred on this content:" + qaContent);
+    	    	request.getSession().setAttribute(USER_EXCEPTION_CONTENT_IN_USE, new Boolean(true).toString());    			
 	    		persistError(request, "error.content.inUse");
 	    		logger.debug("add error.content.inUse to ActionMessages.");
-	    		QaUtils.cleanUpSessionAbsolute(request);
 				return (mapping.findForward(ERROR_LIST));
     		}
             retrieveContent(request, mapping, qaAuthoringForm, mapQuestionContent, new Long(strToolContentId).longValue());
@@ -424,17 +426,19 @@ public class QaStarterAction extends Action implements QaAppConstants {
 			logger.debug("retrieved tool default contentId: " + defaultContentID);
 			if (defaultContentID == 0)
 			{
+				QaUtils.cleanUpSessionAbsolute(request);
 				logger.debug("default content id has not been setup");
 				persistError(request,"error.defaultContent.notSetup");
-		    	request.setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true));
-				return (mapping.findForward(LOAD_QUESTIONS));	//TODO: forward to error page
+		    	request.getSession().setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true).toString());
+				return (mapping.findForward(ERROR_LIST));	
 			}
 		}
 		catch(Exception e)
 		{
+			QaUtils.cleanUpSessionAbsolute(request);
 			logger.debug("error getting the default content id: " + e.getMessage());
 			persistError(request,"error.defaultContent.notSetup");
-	    	request.setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true));
+	    	request.getSession().setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true).toString());
 			logger.debug("forwarding to: " + ERROR_LIST);
 			return (mapping.findForward(ERROR_LIST));
 		}
@@ -448,10 +452,11 @@ public class QaStarterAction extends Action implements QaAppConstants {
 			QaContent qaContent=qaService.loadQa(defaultContentID);
 			if (qaContent == null)
 			{
+				QaUtils.cleanUpSessionAbsolute(request);
 				logger.debug("Exception occured: No default content");
 	    		persistError(request,"error.defaultContent.notSetup");
-	    		QaUtils.cleanUpSessionAbsolute(request);
-	    		return (mapping.findForward(LOAD_QUESTIONS));
+	    		request.getSession().setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true).toString());
+	    		return (mapping.findForward(ERROR_LIST));
 			}
 			logger.debug("using qaContent: " + qaContent);
 			logger.debug("using mcContent uid: " + qaContent.getUid());
@@ -460,9 +465,10 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		}
 		catch(Exception e)
 		{
+			QaUtils.cleanUpSessionAbsolute(request);
 			logger.debug("Exception occured: No default question content");
 			persistError(request,"error.defaultContent.notSetup");
-			QaUtils.cleanUpSessionAbsolute(request);
+    		request.getSession().setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true).toString());
 			logger.debug("forwarding to: " + ERROR_LIST);
 			return (mapping.findForward(ERROR_LIST));
 		}

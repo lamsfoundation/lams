@@ -93,13 +93,15 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 		
 		if (qaContent == null)
 		{
-			persistError(request, "error.content.doesNotExist");
 			QaUtils.cleanUpSessionAbsolute(request);
+			request.getSession().setAttribute(USER_EXCEPTION_CONTENT_DOESNOTEXIST, new Boolean(true).toString());
+			persistError(request, "error.content.doesNotExist");
 			return false;
 		}
 		
 		if (qaService.studentActivityOccurred(qaContent))
 		{
+			QaUtils.cleanUpSessionAbsolute(request);
 			logger.debug("student activity occurred on this content:" + qaContent);
 			request.getSession().setAttribute(USER_EXCEPTION_CONTENT_IN_USE, new Boolean(true).toString());
 		}
@@ -110,6 +112,7 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 		logger.debug("summaryToolSessions: " + summaryToolSessions);
 		if (summaryToolSessions.isEmpty())
 		{
+			QaUtils.cleanUpSessionAbsolute(request);
 			/* inform in the Summary tab that the tool has no active sessions */
 			request.setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
 			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to true");

@@ -25,8 +25,85 @@ http://www.gnu.org/licenses/gpl.txt
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="fck-editor" prefix="FCK" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
-
+				
+		
 <div id="datatablecontainer">
+<table border="0" cellspacing="2" cellpadding="2" summary="This table is being used for layout purposes only">
+		<c:if test="${userExceptionContentDefineLater == 'true'}"> 			
+			<tr> <td NOWRAP valign=top>
+						<font size=2> <bean:message key="error.defineLater"/> </font>
+			</td> </tr>
+		</c:if> 				    
+
+		<c:if test="${userExceptionContentDoesNotExist == 'true'}"> 			
+			<tr> <td NOWRAP valign=top>
+						<font size=2> <bean:message key="error.content.doesNotExist"/> </font>
+			</td> </tr>
+		</c:if> 				    
+
+		<c:if test="${userExceptionNoToolSessions == 'true'}"> 			
+			<tr> <td NOWRAP valign=top>
+						<font size=2> <bean:message key="error.toolSession.notAvailable"/> </font>
+			</td> </tr>
+		</c:if> 				    
+
+		<c:if test="${userExceptionRunOffline == 'true'}"> 			
+			<tr> <td NOWRAP valign=top>
+						<font size=2> <bean:message key="label.learning.runOffline"/> </font>
+			</td> </tr>
+		</c:if> 				    
+
+		<c:if test="${userExceptionToolSessionIdRequired == 'true'}"> 			
+			<tr> <td NOWRAP valign=top>
+						<font size=2> <bean:message key="error.toolSessionId.required"/> </font>
+			</td> </tr>
+		</c:if> 				    
+
+		<c:if test="${userExceptionUserDoesNotExist == 'true'}"> 			
+			<tr> <td NOWRAP valign=top>
+						<font size=2> <bean:message key="error.learningUser.notAvailable"/> </font>
+			</td> </tr>
+		</c:if> 				    
+
+		<c:if test="${userExceptionModeRequired == 'true'}"> 			
+			<tr> <td NOWRAP valign=top>
+						<font size=2> <bean:message key="error.mode.required"/> </font>
+			</td> </tr>
+		</c:if> 				    
+
+		<c:if test="${userExceptionNumberFormat == 'true'}"> 			
+			<tr> <td NOWRAP valign=top>
+						<font size=2> <bean:message key="error.sessionId.numberFormatException"/> </font>
+			</td> </tr>
+		</c:if> 				    
+
+		<c:if test="${userExceptionContentIdRequired == 'true'}"> 			
+			<tr> <td NOWRAP valign=top>
+						<font size=2> <bean:message key="error.contentId.required"/> </font>
+			</td> </tr>
+		</c:if> 				    
+
+		<c:if test="${userExceptionContentInUse == 'true'}"> 			
+			<tr> <td NOWRAP valign=top>
+						<font size=2> <bean:message key="error.content.inUse"/> </font>
+			</td> </tr>
+		</c:if> 				    
+
+		<c:if test="${userExceptionModeInvalid == 'true'}"> 			
+			<tr> <td NOWRAP valign=top>
+						<font size=2> <bean:message key="error.mode.invalid"/> </font>
+			</td> </tr>
+		</c:if> 				    
+		
+		<c:if test="${userExceptionDefaultContentNotSetup == 'true'}"> 			
+			<tr> <td NOWRAP valign=top>
+						<font size=2> <bean:message key="error.defaultContent.notSetup"/> </font>
+			</td> </tr>
+		</c:if> 				    
+		
+</table>
+
+<!--
 <logic:messagesPresent> 
 <table border="0" cellspacing="2" cellpadding="2" summary="This table is being used for layout purposes only">
 <tr>
@@ -39,6 +116,8 @@ http://www.gnu.org/licenses/gpl.txt
 		 </html:messages> 
 	</td>
 </tr>
+
 </logic:messagesPresent>
+-->
 </div>
 

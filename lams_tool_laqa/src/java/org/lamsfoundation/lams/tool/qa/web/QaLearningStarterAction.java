@@ -216,6 +216,8 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 		
 	    if (!QaUtils.existsSession(toolSessionId.longValue(), qaService)) 
 		{
+	    		QaUtils.cleanUpSessionAbsolute(request);
+	     		request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
 		    	logger.debug("error: The tool expects mcSession.");
 		    	persistError(request,"error.toolSession.notAvailable");
 				return (mapping.findForward(ERROR_LIST_LEARNER));
@@ -242,9 +244,10 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    logger.debug("using qaContent: " + qaContent);
 	    if (qaContent == null)
 	    {
+    		QaUtils.cleanUpSessionAbsolute(request);	    	
 	    	logger.debug("error: The tool expects qaContent.");
+	    	request.getSession().setAttribute(USER_EXCEPTION_CONTENT_DOESNOTEXIST, new Boolean(true).toString());
 	    	persistError(request,"error.toolContent.notAvailable");
-	    	QaUtils.cleanUpSessionAbsolute(request);
 	    	return (mapping.findForward(ERROR_LIST_LEARNER));
 	    }
 
@@ -370,13 +373,12 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    logger.debug("isRunOffline: " + isRunOffline);
 	    if (isRunOffline == true)
 	    {
+    		QaUtils.cleanUpSessionAbsolute(request);
 	    	logger.debug("warning to learner: the activity is offline.");
+	    	request.getSession().setAttribute(USER_EXCEPTION_RUN_OFFLINE, new Boolean(true).toString());
 	    	persistError(request,"label.learning.runOffline");
-	    	QaUtils.cleanUpSessionAbsolute(request);
 			return (mapping.findForward(ERROR_LIST_LEARNER));
 	    }
-    	
-    	
     	
     	
     	/*
@@ -432,8 +434,9 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    if ((user == null) || (user.getUserID() == null))
 	    {
 	    	logger.debug("error: The tool expects userId");
+	    	request.setAttribute(USER_EXCEPTION_USER_DOESNOTEXIST, new Boolean(true).toString());			
 	    	persistError(request,"error.learningUser.notAvailable");
-	    	//McUtils.cleanUpSessionAbsolute(request);
+	    	QaUtils.cleanUpSessionAbsolute(request);
 			return (mapping.findForward(ERROR_LIST_LEARNER));
 	    }else
 	    	userID = user.getUserID().toString();
@@ -449,8 +452,9 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    long toolSessionId=0;
 	    if ((strToolSessionId == null) || (strToolSessionId.length() == 0)) 
 	    {
+	    	request.setAttribute(USER_EXCEPTION_TOOLSESSIONID_REQUIRED, new Boolean(true).toString());
 	    	persistError(request, "error.toolSessionId.required");
-	    	//McUtils.cleanUpSessionAbsolute(request);
+	    	QaUtils.cleanUpSessionAbsolute(request);
 			return (mapping.findForward(ERROR_LIST_LEARNER));
 	    }
 	    else
@@ -463,9 +467,10 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 			}
 	    	catch(NumberFormatException e)
 			{
+		    	request.setAttribute(USER_EXCEPTION_NUMBERFORMAT, new Boolean(true).toString());				
 	    		persistError(request, "error.sessionId.numberFormatException");
 	    		logger.debug("add error.sessionId.numberFormatException to ActionMessages.");
-	    		//McUtils.cleanUpSessionAbsolute(request);
+	    		QaUtils.cleanUpSessionAbsolute(request);
 				return (mapping.findForward(ERROR_LIST_LEARNER));
 			}
 	    }
@@ -476,15 +481,17 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    
 	    if ((mode == null) || (mode.length() == 0)) 
 	    {
+	    	request.setAttribute(USER_EXCEPTION_MODE_REQUIRED, new Boolean(true).toString());			
 	    	persistError(request, "error.mode.required");
-	    	//McUtils.cleanUpSessionAbsolute(request);
+    		QaUtils.cleanUpSessionAbsolute(request);
 			return (mapping.findForward(ERROR_LIST_LEARNER));
 	    }
 	    
 	    if ((!mode.equals("learner")) && (!mode.equals("teacher")) && (!mode.equals("author")))
 	    {
+	    	request.setAttribute(USER_EXCEPTION_MODE_INVALID, new Boolean(true).toString());			
 	    	persistError(request, "error.mode.invalid");
-	    	//McUtils.cleanUpSessionAbsolute(request);
+	    	QaUtils.cleanUpSessionAbsolute(request);
 			return (mapping.findForward(ERROR_LIST_LEARNER));
 	    }
 		logger.debug("session LEARNING_MODE set to:" + mode);

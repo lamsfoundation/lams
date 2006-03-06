@@ -479,8 +479,11 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
         logger.debug("learning-defineLater: " + defineLater);
         if (defineLater.booleanValue() == true)
         {
-            persistError(request,"error.defineLater");
-            return (mapping.findForward(ERROR_LIST_LEARNER));
+            QaUtils.cleanUpSessionAbsolute(request);
+			logger.debug("default content id has not been setup");
+			persistError(request,"error.defineLater");
+			request.getSession().setAttribute(USER_EXCEPTION_CONTENT_DEFINE_LATER, new Boolean(true).toString());
+			return (mapping.findForward(ERROR_LIST_LEARNER));
         }
         
         LearningUtil learningUtil= new LearningUtil();

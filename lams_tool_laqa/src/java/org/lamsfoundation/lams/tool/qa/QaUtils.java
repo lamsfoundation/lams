@@ -486,24 +486,6 @@ public abstract class QaUtils implements QaAppConstants {
 		request.getSession().removeAttribute(MAP_TOOL_SESSIONS);
 		request.getSession().removeAttribute(MAX_TOOL_SESSION_COUNT.toString());
 		request.getSession().removeAttribute(IS_TOOL_SESSION_CHANGED);
-		request.getSession().removeAttribute(USER_EXCEPTION_WRONG_FORMAT);
-		request.getSession().removeAttribute(USER_EXCEPTION_UNCOMPATIBLE_IDS);
-		request.getSession().removeAttribute(USER_EXCEPTION_NUMBERFORMAT);
-		request.getSession().removeAttribute(USER_EXCEPTION_CONTENT_DOESNOTEXIST);
-		request.getSession().removeAttribute(USER_EXCEPTION_TOOLSESSION_DOESNOTEXIST);
-		request.getSession().removeAttribute(USER_EXCEPTION_CONTENTID_REQUIRED);
-		request.getSession().removeAttribute(USER_EXCEPTION_TOOLSESSIONID_REQUIRED);
-		request.getSession().removeAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOT_AVAILABLE);
-		request.getSession().removeAttribute(USER_EXCEPTION_DEFAULTQUESTIONCONTENT_NOT_AVAILABLE);
-		request.getSession().removeAttribute(USER_EXCEPTION_USERID_NOTAVAILABLE);
-		request.getSession().removeAttribute(USER_EXCEPTION_USERID_NOTNUMERIC);
-		request.getSession().removeAttribute(USER_EXCEPTION_ONLYCONTENT_ANDNOSESSIONS);
-		request.getSession().removeAttribute(USER_EXCEPTION_USERID_EXISTING);
-		request.getSession().removeAttribute(USER_EXCEPTION_USER_DOESNOTEXIST);
-		request.getSession().removeAttribute(USER_EXCEPTION_MONITORINGTAB_CONTENTID_REQUIRED);
-		request.getSession().removeAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP);
-		request.getSession().removeAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS);
-		request.getSession().removeAttribute(USER_EXCEPTION_NO_STUDENT_ACTIVITY);
 		request.getSession().removeAttribute(COUNT_SESSION_COMPLETE);
 		request.getSession().removeAttribute(CURRENT_MONITORED_TOOL_SESSION);
 		request.getSession().removeAttribute(COUNT_ALL_USERS);
@@ -514,7 +496,6 @@ public abstract class QaUtils implements QaAppConstants {
 		request.getSession().removeAttribute(MODE);
 		request.getSession().removeAttribute(LEARNER);
 		request.getSession().removeAttribute(TEACHER);
-		request.getSession().removeAttribute(USER_EXCEPTION_MODE_REQUIRED);
 		request.getSession().removeAttribute(PORTFOLIO_REPORT);
 		request.getSession().removeAttribute(PORTFOLIO_REQUEST);
 		request.getSession().removeAttribute(ADD_NEW_QUESTION);
@@ -567,7 +548,29 @@ public abstract class QaUtils implements QaAppConstants {
 		request.getSession().removeAttribute(IS_MONITORED_CONTENT_IN_USE);
 		request.getSession().removeAttribute(LOAD_MONITORING_CONTENT_EDITACTIVITY);
 		request.getSession().removeAttribute(MONITORING_ORIGINATED_DEFINELATER);
-		request.getSession().removeAttribute(USER_EXCEPTION_CONTENT_IN_USE);		
+		request.getSession().removeAttribute(USER_EXCEPTION_WRONG_FORMAT);
+		request.getSession().removeAttribute(USER_EXCEPTION_UNCOMPATIBLE_IDS);
+		request.getSession().removeAttribute(USER_EXCEPTION_NUMBERFORMAT);
+		request.getSession().removeAttribute(USER_EXCEPTION_USER_DOESNOTEXIST);
+		request.getSession().removeAttribute(USER_EXCEPTION_CONTENT_DOESNOTEXIST);
+		request.getSession().removeAttribute(USER_EXCEPTION_TOOLSESSION_DOESNOTEXIST);
+		request.getSession().removeAttribute(USER_EXCEPTION_CONTENTID_REQUIRED);
+		request.getSession().removeAttribute(USER_EXCEPTION_TOOLSESSIONID_REQUIRED);
+		request.getSession().removeAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOT_AVAILABLE);
+		request.getSession().removeAttribute(USER_EXCEPTION_DEFAULTQUESTIONCONTENT_NOT_AVAILABLE);
+		request.getSession().removeAttribute(USER_EXCEPTION_USERID_NOTAVAILABLE);
+		request.getSession().removeAttribute(USER_EXCEPTION_USERID_NOTNUMERIC);
+		request.getSession().removeAttribute(USER_EXCEPTION_ONLYCONTENT_ANDNOSESSIONS);
+		request.getSession().removeAttribute(USER_EXCEPTION_USERID_EXISTING);
+		request.getSession().removeAttribute(USER_EXCEPTION_MONITORINGTAB_CONTENTID_REQUIRED);
+		request.getSession().removeAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP);
+		request.getSession().removeAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS);
+		request.getSession().removeAttribute(USER_EXCEPTION_NO_STUDENT_ACTIVITY);
+		request.getSession().removeAttribute(USER_EXCEPTION_CONTENT_IN_USE);
+		request.getSession().removeAttribute(USER_EXCEPTION_CONTENT_DEFINE_LATER);
+		request.getSession().removeAttribute(USER_EXCEPTION_MODE_REQUIRED);
+		request.getSession().removeAttribute(USER_EXCEPTION_RUN_OFFLINE);
+		request.getSession().removeAttribute(USER_EXCEPTION_MODE_INVALID);
 	}
 	
 	

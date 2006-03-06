@@ -137,6 +137,10 @@ public interface QaAppConstants {
     public static final String USER_EXCEPTION_NO_TOOL_SESSIONS			="userExceptionNoToolSessions";
     public static final String USER_EXCEPTION_NO_STUDENT_ACTIVITY		="userExceptionNoStudentActivity";
     public static final String USER_EXCEPTION_CONTENT_IN_USE			="userExceptionContentInUse";
+    public static final String USER_EXCEPTION_CONTENT_DEFINE_LATER		="userExceptionContentDefineLater";
+    public static final String USER_EXCEPTION_RUN_OFFLINE				="userExceptionRunOffline";    
+    public static final String USER_EXCEPTION_MODE_REQUIRED				="userExceptionModeRequired";    
+    public static final String USER_EXCEPTION_MODE_INVALID				="userExceptionModeInvalid";    
     public static final String COUNT_SESSION_COMPLETE					="countSessionComplete";
     public static final String CURRENT_MONITORED_TOOL_SESSION 			="currentMonitoredToolSession";
     
@@ -159,7 +163,7 @@ public interface QaAppConstants {
     public static final String MODE										="mode";  
     public static final String LEARNER									="learner"; 
     public static final String TEACHER									="teacher";
-    public static final String USER_EXCEPTION_MODE_REQUIRED				="userExceptionModeRequired";					
+    					
     public static final String PORTFOLIO_REPORT							="portfolioReport";
     public static final String PORTFOLIO_REQUEST						="portfolioRequest";
     public static final int    MAX_GROUPS_COUNT							=250;						
