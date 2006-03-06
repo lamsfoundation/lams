@@ -42,36 +42,36 @@ label.monitoring.edit.activity.update=更新
 label.monitoring.edit.activity.edit=编辑
 lable.topic.title.message.number=消息# 
 lable.topic.title.average.mark= 平均分
-label.monitoring.statistic.average.mark= Average message mark
-lable.monitoring.statistic.total.message=# of total message
+label.monitoring.statistic.average.mark= 消息平均分
+lable.monitoring.statistic.total.message= 总消息 # 
 authoring.exception= 在编辑页发生问题,原因是{0}
 #-------------------------END Authoring Labels END-----------------#
-page.title.monitoring.content.userlist=Monitoring User List
-page.title.monitoring.view.user.mark=View user mark
-page.title.monitoring.edit.user.mark=Edit user mark
-page.title.monitoring.view.activity=View Activity
-page.title.monitoring.edit.activity=Edit Activity
-page.title.monitoring.view.instructions=View Instructions
-page.title.monitoring.view.topic=View topic
-page.title.monitoring.statistic=Statistic
-page.title.monitoring.definelater=Forum Tool Define
+page.title.monitoring.content.userlist=监控用户列表
+page.title.monitoring.view.user.mark=查看用户分数
+page.title.monitoring.edit.user.mark=编辑用户分数
+page.title.monitoring.view.activity=查看活动
+page.title.monitoring.edit.activity=编辑活动
+page.title.monitoring.view.instructions=查看指导
+page.title.monitoring.view.topic=查看主题
+page.title.monitoring.statistic=统计
+page.title.monitoring.definelater=论坛工具定义
 ## errors
 errors.header=<b class="error">
 errors.footer=</b>
 
-#error.title = System Error!
-error.valueReqd = Value Required
-error.inputFileTooLarge = Input File size is too large!
-error.uploading = error uploading
-error.mark.needNumber= Mark must be int value
-error.mark.invalid.number= Mark is invalid number format
-error.fail.get.forum=No Forum available
-error.title.empty=Title can not be blank
+#error.title = 系统出错
+error.valueReqd = 必须输入值
+error.inputFileTooLarge = 超过文件大小上限
+error.uploading = 上传出错
+error.mark.needNumber= 分数必须是整数
+error.mark.invalid.number= 分数是无效的数字格式
+error.fail.get.forum=没有可利用的论坛
+error.title.empty=标题不能为空
 #General Messages
 message.msg.maxFileSize = 最大 250K
 
 ##Message
-title.messageTopic.open = Topic Details
+title.messageTopic.open = 更多
 
 title.message.add = 发消息
 title.message.open = 察看消息
@@ -112,6 +112,22 @@ button.off = 关
 button.add = 添加
 button.cancel = 取消
 
-js.error.invalid.number=The input is invalid number format 
-js.error.min.number=The input must be greater than 0 
-js.error.title=The following error(s) occurred:
+js.error.invalid.number=输入是无效的数字格式 
+js.error.min.number=输入必须大于0
+js.error.title=有下列错误发生：
+
+
+monitoring.tab.summary=总计
+monitoring.tab.instructions=指导
+monitoring.tab.edit.activity=编辑活动
+monitoring.tab.edit.statistics=统计
+monitoring.user.post.topic=发布下列消息:
+lable.topic.title.comment=评论
+message.not.avaliable=不可用
+lable.update.mark=更新分数
+message.assign.mark= 请给出分数和评论 
+message.session.name=会话名
+message.monitoring.summary.no.users=没有可用用户
+message.view.all.marks=查看全部分数
+message.download.marks=下载分数
+label.monitoring.summary.view.forum=查看论坛

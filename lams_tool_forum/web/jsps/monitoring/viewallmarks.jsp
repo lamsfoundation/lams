@@ -14,7 +14,7 @@
 				    	<td colspan="2">
 				    	<c:out value="${user.firstName}"/> <c:out value="${user.lastName}"/> ,
 				    	<c:out value="${user.loginName}"/>,
-				    	 provides following submisstion:
+				    	 <fmt:message key="monitoring.user.post.topic"/>
 				    	</td>
 				    <tr>
 			    </c:if>
@@ -45,7 +45,7 @@
 			</tr>
 		 <tr>
 			<tr>
-				<td>Marks:</td>
+				<td> <fmt:message key="lable.topic.title.mark"/>:</td>
 				<td colspan="3"> 	
 						<c:choose>
 									<c:when test="${empty topic.message.report.mark}">
@@ -58,11 +58,11 @@
 				</td>
 			</tr>			
 			<tr>
-				<td>Comments:</td>
+				<td><fmt:message key="lable.topic.title.comment"/>:</td>
 				<td  colspan="3">
 								<c:choose>
 									<c:when test="${empty topic.message.report.comment}">
-										<c:out value="Not Available"/>								
+										<fmt:message key="message.not.avaliable"/>								
 									</c:when>
 									<c:otherwise>
 										<c:out value="${topic.message.report.comment}" escapeXml="false"/>
@@ -77,7 +77,7 @@
 							<input type="hidden" name="messageID" value=<c:out value='${topic.message.uid}' /> >
 							<input type="hidden" name="toolSessionID" value=<c:out value='${toolSessionID}' /> >
 							<input type="hidden" name="userID" value=<c:out value='${user.uid}' /> >
-							<input type="submit" value="Update Marks"/>
+							<input type="submit" value="<fmt:message key="lable.update.mark"/>"/>
 					</html:form>
 				</td>
 			</tr>

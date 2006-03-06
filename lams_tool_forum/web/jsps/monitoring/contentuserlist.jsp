@@ -14,19 +14,18 @@
 			<c:param name="toolSessionID" value="${toolSessionDto.sessionID}" />
 		</c:url>
 		<a href='<c:out value="${viewForumUrl}"/>'>
-			<fmt:message key="label.monitoring.summary.view.forum" />
+			<fmt:message key="message.session.name" />
 		</a> 
 		
 		<html:link href="${viewForumUrl}" styleClass="button" target="_blank">
 			<fmt:message key="label.monitoring.summary.view.forum" />
 		</html:link>
 		
-		T2
 		<table class="forms">
 			<tr>
 				<td style="border-bottom:1px #000 solid;" colspan="4">
 					<b />
-						<fmt:message key="label.monitoring.session.name" />
+						<fmt:message key="message.session.name" />
 						:
 						<c:out value="${toolSessionDto.sessionName}" />
 				</td>
@@ -49,7 +48,10 @@
 						</td>
 						<td class="formcontrol">
 							<b>
-								<html:submit property="Mark" value="Mark" />
+								<html:submit property="Mark">
+									<fmt:message key="lable.topic.title.mark"/>
+								</html:submit>
+								
 							</b>
 						</td>
 					</html:form>
@@ -67,13 +69,17 @@
 				<td class="formcontrol">
 					<html:form action="/monitoring/viewAllMarks">
 						<html:hidden property="toolSessionID" value="${toolSessionDto.sessionID}" />
-						<html:submit property="viewAllMarks" value="View all marks" />
+						<html:submit property="Mark">
+									<fmt:message key="lable.topic.title.mark"/>
+						</html:submit>
 					</html:form>
 				</td>
 				<td class="formcontrol">
 					<html:form action="/monitoring/downloadMarks">
 						<html:hidden property="toolSessionID" value="${toolSessionDto.sessionID}" />
-						<html:submit property="downloadMarks" value="Download marks" />
+						<html:submit property="downloadMarks">
+							<fmt:message key="message.download.marks" />
+						</html:submit>
 					</html:form>
 				</td>
 			</tr>

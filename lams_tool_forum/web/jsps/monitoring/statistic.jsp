@@ -16,7 +16,7 @@
 		</c:if>
 	</c:forEach>
 	
-		Session Name: <c:out value="${toolSessionDto.sessionName}"/>
+		<fmt:message key="message.session.name"/>: <c:out value="${toolSessionDto.sessionName}"/>
 	
 	<table width="100%"  border="0" cellspacing="0" cellpadding="0">
 	

@@ -7,22 +7,23 @@
 			</c:set>
 			<td>
 				<a href="<c:out value='${monitoringURL}'/>listContentUsers.do?toolContentID=<c:out value='${sessionScope.toolContentID}'/>">
-					Summary
+					<fmt:message key="monitoring.tab.summary"/>
 				</a>
 			</td>
 			<td>
 				<a href="<c:out value='${monitoringURL}'/>viewInstructions.do?toolContentID=<c:out value='${sessionScope.toolContentID}'/>">
-					Instructions
+					<fmt:message key="monitoring.tab.instructions"/>
 				</a>
 			</td>
 			<td>
 				<a href="<c:out value='${monitoringURL}'/>editActivity.do?toolContentID=<c:out value='${sessionScope.toolContentID}'/>">
-					Edit Activity
+					<fmt:message key="monitoring.tab.edit.activity"/>
 				</a>
 			</td>
 			<td>
 				<a href="<c:out value='${monitoringURL}'/>statistic.do?toolContentID=<c:out value='${sessionScope.toolContentID}'/>">
-					Statistics
+					<fmt:message key="monitoring.tab.edit.statistics"/>
+					
 				</a>
 			</td>
 		</tr>

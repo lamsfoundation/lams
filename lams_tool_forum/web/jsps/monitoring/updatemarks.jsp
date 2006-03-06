@@ -3,7 +3,7 @@
 
 <html:form action="/monitoring/updateMark"  method="post">	
 <c_rt:set var="formBean" value="<%= session.getAttribute("markForm") %>" />
-  <b>Please assign a mark and a comment for the report by 
+  <b><fmt:message key="message.assign.mark"/>
   		 <c:out value="${formBean.user.loginName}" /> , <c:out value="${formBean.user.firstName}" />  <c:out value="${formBean.user.lastName}" /> 	
   </b></p>
  <table width="100%"  border="0" cellspacing="0" cellpadding="0">
@@ -38,14 +38,14 @@
 				 <input type="hidden" name="messageID" value="<c:out value='${formBean.messageDto.message.uid}'/>" />						
 				 <input type="hidden" name="userID" value="<c:out value='${formBean.user.uid}'/>" />
 				 <tr>						 
-			            <td class="formlabel">Marks:</td>
+			            <td class="formlabel"><fmt:message key="lable.topic.title.mark"/>:</td>
 			            <td class="formcontrol">
 			        		<input type="text"  name="mark" value="<c:out value='${formBean.mark}'/>"/>
 			        	</td>
 			        	<td><html:errors property="report.mark" /></td>
 			    </tr>
 			    <tr>
-		    		<td class="formlabel">Comments:</td>
+		    		<td class="formlabel"><fmt:message key="lable.topic.title.comment"/>:</td>
 			        <td class="formcontrol">
 			            <FCK:editor id="comment" 
 			    			basePath="/lams/fckeditor/"
@@ -63,7 +63,7 @@
 			</tr>
 			<tr>
 				  <td class="formcontrol" colspan="3">
-					<input type="submit" value="Update Marks" />
+					<input type="submit" value="<fmt:message key="lable.update.mark"/>" />
 				  </td>
 			</tr>
 		</span>

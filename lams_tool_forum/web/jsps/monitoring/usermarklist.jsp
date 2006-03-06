@@ -1,8 +1,9 @@
 <%@ include file="/includes/taglibs.jsp" %>
 <script type="text/javascript" src="<html:rewrite page='/includes/scripts.jsp'/>"></script>
 	
-	<b>Following files have been submitted by 
+	<b>
 		 <c:out value="${user.loginName}" /> , <c:out value="${user.firstName}" />  <c:out value="${user.lastName}" /> 	
+		 <fmt:message key="monitoring.user.post.topic"/>
 	</b>
 	</p>
 <table width="100%"  border="0" cellspacing="0" cellpadding="0">
@@ -34,7 +35,7 @@
 			</tr>
 			 <tr>
 			<tr>
-				<td>Marks:</td>
+				<td><fmt:message key="lable.topic.title.mark"/>:</td>
 				<td colspan="3"> 	
 						<c:choose>
 									<c:when test="${empty topic.message.report.mark}">
@@ -47,7 +48,7 @@
 				</td>
 			</tr>			
 			<tr>
-				<td>Comments:</td>
+				<td><fmt:message key="lable.topic.title.comment"/>:</td>
 				<td  colspan="3">
 								<c:choose>
 									<c:when test="${empty topic.message.report.comment}">
@@ -66,7 +67,7 @@
 					<input type="hidden" name="messageID" value=<c:out value='${topic.message.uid}' /> >
 					<input type="hidden" name="toolSessionID" value=<c:out value='${toolSessionID}' /> >
 					<input type="hidden" name="userID" value=<c:out value='${user.uid}' /> >
-					<input type="submit" value="Update Marks"/>
+					<input type="submit" value="<fmt:message key="lable.update.mark"/>"/>
 			</html:form>
 			</td>
 		</tr>

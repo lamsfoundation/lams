@@ -12,7 +12,8 @@ label.authoring.basic.instruction=Instrucciones
 label.authoring.online.instruction =Instrucciones para modo Online
 label.authoring.offline.instruction=Instrucciones para modo Offline
 label.authoring.online.file =Subir instrucciones como archivo (online)
-label.authoring.offline.file=Subir instrucciones como archivo (offline)label.authoring.advance.lock.on.finished=Cuando terminado, bloquear foro
+label.authoring.offline.file=Subir instrucciones como archivo (offline)
+label.authoring.advance.lock.on.finished=Cuando terminado, bloquear foro
 
 label.authoring.save.button=Salvar
 label.authoring.cancel.button=Cancelar
