@@ -33,11 +33,17 @@
 <%@ tag body-content="scriptless" %>
 <%@ attribute name="collection" type="java.util.Collection" required="false" rtexprvalue="true" %>
 <%@ attribute name="control" required="false" rtexprvalue="true" %>
+<%@ attribute name="useKey" required="false" rtexprvalue="true" %>
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 <c:set var="dControl" value="false" scope="request"/>
 <c:if test="${control}">
 	<c:set var="dControl" value="${control}" scope="request"/>
+</c:if>
+
+<c:set var="dUseKey" value="false" scope="request"/>
+<c:if test="${useKey}">
+	<c:set var="dUseKey" value="${useKey}" scope="request"/>
 </c:if>
 
 <div class="tabmenu"><ul>
@@ -46,7 +52,14 @@
 			<c:set var="count" value="0"/>
 			<c:forEach var="tab" begin="0" items="${collection}">
 				<c:set var="count" value="${count+1}"/>
-				<lams:Tab id="${count}" value="${tab}"/>	
+				<c:choose>
+					<c:when test="${dUseKey}">
+						<lams:Tab id="${count}" key="${tab}"/>
+					</c:when>
+					<c:otherwise>
+						<lams:Tab id="${count}" value="${tab}"/>
+					</c:otherwise>
+				</c:choose>
 			</c:forEach>
 	</c:when>
 	<c:otherwise>
