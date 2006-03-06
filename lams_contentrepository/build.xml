@@ -29,7 +29,7 @@ Ant build file.
 	<!ENTITY properties SYSTEM "file:./properties.xml">
 ]>
 
-<project name="LAMS" basedir="." default="usage">
+<project name="LAMS-ContentRepository" basedir="." default="usage">
 
 	<!-- import properties from the specified file -->
 	<property file="build.properties"/>

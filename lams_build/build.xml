@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project name="LAMS" default="usage" basedir=".">
+<project name="LAMS-Build" default="usage" basedir=".">
 
 	<!-- import properties from the shared and o/s specific files -->
 	<property file="common.properties" />
@@ -177,11 +177,11 @@
 <!--		<ant antfile="../${tool_imscp_dir}/build.xml" target="deploy-tool"
 				inheritAll="false" >
 			<property name="jboss.deploy" location="${jboss.deploy}"/>
-		</ant> -->
+		</ant>
 		<ant antfile="../${tool_lamc_dir}/build.xml" target="deploy-tool"
 				inheritAll="false" >
 			<property name="jboss.deploy" location="${jboss.deploy}"/>
-		</ant>
+		</ant> -->
 		<ant antfile="../${tool_lanb_dir}/build.xml" target="deploy-tool"
 				inheritAll="false" >
 			<property name="jboss.deploy" location="${jboss.deploy}"/>
