@@ -98,6 +98,13 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 			return false;
 		}
 		
+		if (qaService.studentActivityOccurred(qaContent))
+		{
+			logger.debug("student activity occurred on this content:" + qaContent);
+			request.getSession().setAttribute(USER_EXCEPTION_CONTENT_IN_USE, new Boolean(true).toString());
+		}
+		
+		
 		/* this section is related to summary tab. Starts here. */
 		Map summaryToolSessions=MonitoringUtil.populateToolSessions(request, qaContent, qaService);
 		logger.debug("summaryToolSessions: " + summaryToolSessions);

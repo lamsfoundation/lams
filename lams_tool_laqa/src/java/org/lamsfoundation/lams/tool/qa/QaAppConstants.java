@@ -136,8 +136,10 @@ public interface QaAppConstants {
     public static final String USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP	="userExceptionDefaultContentNotSetup";
     public static final String USER_EXCEPTION_NO_TOOL_SESSIONS			="userExceptionNoToolSessions";
     public static final String USER_EXCEPTION_NO_STUDENT_ACTIVITY		="userExceptionNoStudentActivity";
+    public static final String USER_EXCEPTION_CONTENT_IN_USE			="userExceptionContentInUse";
     public static final String COUNT_SESSION_COMPLETE					="countSessionComplete";
     public static final String CURRENT_MONITORED_TOOL_SESSION 			="currentMonitoredToolSession";
+    
     
     public static final String COUNT_ALL_USERS							="countAllUsers";
     public static final String CURRENT_MONITORING_TAB					="currentMonitoringTab";

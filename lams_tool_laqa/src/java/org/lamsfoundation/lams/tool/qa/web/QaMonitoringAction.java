@@ -175,19 +175,15 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		   content in use is not modifiable*/ 
 		QaContent qaContent=qaService.loadQa(toolContentId.longValue());
 		logger.debug("qaContent:" + qaContent);
-		boolean isContentInUse=QaUtils.isContentInUse(qaContent);
-		logger.debug("isContentInUse:" + isContentInUse);
 		
-		if (isContentInUse == true)
+		if (qaService.studentActivityOccurred(qaContent))
 		{
-			logger.debug("monitoring url does not allow editActivity since the content is in use.");
-	    	persistError(request,"error.content.inUse");
-	    	QaUtils.cleanUpSessionAbsolute(request);
-	    	request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(true).toString());
+			logger.debug("student activity occurred on this content:" + qaContent);
+			request.getSession().setAttribute(USER_EXCEPTION_CONTENT_IN_USE, new Boolean(true).toString());
 			logger.debug("forwarding to: " + LOAD_MONITORING);
 			return (mapping.findForward(LOAD_MONITORING));
 		}
-
+		
 	    return qaStarterAction.executeDefineLater(mapping, form, request, response, qaService);
 	}
 

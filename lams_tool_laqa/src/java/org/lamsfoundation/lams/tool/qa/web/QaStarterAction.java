@@ -100,7 +100,6 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.exception.ToolException;
-
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaApplicationException;
 import org.lamsfoundation.lams.tool.qa.QaComparator;
@@ -110,7 +109,6 @@ import org.lamsfoundation.lams.tool.qa.QaUtils;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
@@ -220,10 +218,6 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	    /*
 	     * find out whether the request is coming from monitoring module for EditActivity tab or from authoring environment url
 	     */
-	    //String strToolContentId="";
-        //Long contentID =new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
-	    
-	    
 	    logger.debug("no problems getting the default content, will render authoring screen");
 	    String strToolContentId="";
 	    /*the authoring url must be passed a tool content id*/
@@ -295,33 +289,26 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		 * It is always unlocked since it is the default content.
 		*/
         
-        /*
-	    QaContent qaContent = qaService.loadQa(contentID.longValue());
-		logger.debug("QaContent: " + qaContent);
-		
-		boolean studentActivity=qaService.studentActivityOccurredGlobal(qaContent);
-		logger.debug("studentActivity on content: " + studentActivity);
-		if (studentActivity)
-		{
-			logger.debug("forward to warning screen as the content is not allowed to be modified.");
-			ActionMessages errors= new ActionMessages();
-			errors.add(Globals.ERROR_KEY, new ActionMessage("error.content.inUse"));
-			saveErrors(request,errors);
-			QaUtils.cleanUpSessionAbsolute(request);
-			logger.debug("forwarding to: " + ERROR_LIST);
-			return (mapping.findForward(ERROR_LIST));
-		}
-		
-		*/
-		
 		if (!existsContent(new Long(strToolContentId).longValue(), qaService)) 
 		{
+			/*fetch default content*/
 			String defaultContentIdStr=(String) request.getSession().getAttribute(DEFAULT_CONTENT_ID_STR);
 			logger.debug("defaultContentIdStr:" + defaultContentIdStr);
             retrieveContent(request, mapping, qaAuthoringForm, mapQuestionContent, new Long(defaultContentIdStr).longValue());
 		}
         else
         {
+        	/* it is possible that the content is in use by learners.*/
+        	QaContent qaContent=qaService.loadQa(new Long(strToolContentId).longValue());
+        	logger.debug("qaContent: " + qaContent);
+        	if (qaService.studentActivityOccurred(qaContent))
+    		{
+    			logger.debug("student activity occurred on this content:" + qaContent);
+	    		persistError(request, "error.content.inUse");
+	    		logger.debug("add error.content.inUse to ActionMessages.");
+	    		QaUtils.cleanUpSessionAbsolute(request);
+				return (mapping.findForward(ERROR_LIST));
+    		}
             retrieveContent(request, mapping, qaAuthoringForm, mapQuestionContent, new Long(strToolContentId).longValue());
         }
 		
@@ -529,6 +516,9 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	    
 		return true;	
 	}
+	
+	
+		
 	
 
 	public ActionForward executeDefineLater(ActionMapping mapping, ActionForm form, 

@@ -202,7 +202,11 @@ http://www.gnu.org/licenses/gpl.txt
 		
 		        <c:when test='${currentMonitoringTab == "editActivity"}'>
 						<div class="tabbody content_b" >
-								edit activity screen
+							<c:if test="${ sessionScope.userExceptionContentInUse == 'true'}"> 			
+									<div id="datatablecontainer">
+										<font size=2> <bean:message key="label.content.notEditable"/> </font>
+									</div>										
+							</c:if> 				    
 						</div>
 		        </c:when>
 
