@@ -1,4 +1,3 @@
-<%@ page language="java" contentType="application/x-javascript" %>
 <%@ include file="/includes/taglibs.jsp" %>
 <!--
 
