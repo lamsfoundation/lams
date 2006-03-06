@@ -65,11 +65,11 @@
   	<h1><bean:message key="label.monitoring.heading" /></h1>
     <!-- start tabs -->
 		<lams:Tabs control="true">
-			<lams:Tab id="1" value="Summery"/>
-			<lams:Tab id="2" value="Instructions"/>
-			<lams:Tab id="3" value="Edit Activity"/>
-			<lams:Tab id="4" value="Statistics"/>
-			<lams:Tab id="5" value="Marking"/>
+			<lams:Tab id="1" key="label.monitoring.heading.userlist"/>
+			<lams:Tab id="2" key="label.monitoring.heading.instructions"/>
+			<lams:Tab id="3" key="label.monitoring.heading.edit.activity"/>
+			<lams:Tab id="4" key="label.monitoring.heading.stats"/>
+			<lams:Tab id="5" key="label.monitoring.heading.marking"/>
 		</lams:Tabs>
 	<!-- end tab buttons -->
 	<div class="tabbody">

@@ -70,9 +70,9 @@
 
 <!-- start tabs -->
 <lams:Tabs>
-	<lams:Tab id="1" value="Basic"/>
-	<lams:Tab id="2" value="Advanced"/>
-	<lams:Tab id="3" value="Instructions"/>
+	<lams:Tab id="1" key="label.authoring.heading.basic"/>
+	<lams:Tab id="2" key="label.authoring.heading.advance"/>
+	<lams:Tab id="3" key="label.authoring.heading.instructions"/>
 </lams:Tabs>
 <!-- end tab buttons -->
 <div class="tabbody">
