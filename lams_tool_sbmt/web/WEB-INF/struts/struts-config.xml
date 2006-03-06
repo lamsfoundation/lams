@@ -51,7 +51,20 @@
 				   type="java.util.List"/>
 </form-bean>
 
-<form-bean name="emptyForm" type="org.apache.struts.action.DynaActionForm"/>
+<form-bean name="SbmtMonitoringForm" type="org.apache.struts.action.DynaActionForm">
+
+	<form-property name="toolSessionID"
+				   type="java.lang.Long"/>
+	<form-property name="toolContentID"
+				   type="java.lang.Long"/>
+	<form-property name="userID"
+				   type="java.lang.Long"/>		
+
+	<form-property name="currentTab"
+				   type="java.lang.String"/>
+	<form-property name="method"
+				   type="java.lang.String"/>
+</form-bean>
   </form-beans>
 
   <!-- ========== Global Exceptions Definitions =================================== -->
@@ -92,7 +105,7 @@
     <action
       path="/monitoring"
       type="org.lamsfoundation.lams.tool.sbmt.web.MonitoringAction"
-      name="emptyForm"
+      name="SbmtMonitoringForm"
       scope="request"
       parameter="method"
       unknown="false"
@@ -100,47 +113,52 @@
     >
       <forward
         name="userlist"
-        path="/monitoring/alluserlist.jsp"
+        path="/monitoring/monitoring.jsp"
         redirect="false"
       />
       <forward
         name="userMarks"
-        path="/monitoring/usermarkslist.jsp"
+        path="/monitoring/monitoring.jsp"
         redirect="false"
       />
       <forward
         name="updateMarks"
-        path="/monitoring/updatemarks.jsp"
+        path="/monitoring/monitoring.jsp"
         redirect="false"
       />
       <forward
         name="allUserMarks"
-        path="/monitoring/viewallmarks.jsp"
+        path="/monitoring/monitoring.jsp"
         redirect="false"
       />
       <forward
         name="instructions"
-        path="/monitoring/instructions.jsp"
+        path="/monitoring/monitoring.jsp"
         redirect="false"
       />
       <forward
         name="showActivity"
-        path="/monitoring/showactivity.jsp"
+        path="/monitoring/monitoring.jsp"
         redirect="false"
       />
       <forward
         name="editActivity"
-        path="/monitoring/editactivity.jsp"
+        path="/monitoring/monitoring.jsp"
         redirect="false"
       />
       <forward
         name="success"
-        path="/monitoring/showactivity.jsp"
+        path="/monitoring/monitoring.jsp"
+        redirect="false"
+      />
+      <forward
+        name="load"
+        path="/monitoring/monitoring.jsp"
         redirect="false"
       />
       <forward
         name="statistic"
-        path="/monitoring/statistic.jsp"
+        path="/monitoring/monitoring.jsp"
         redirect="false"
       />
     </action>
