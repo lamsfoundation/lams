@@ -25,6 +25,7 @@
 
 	<form-property name="currentTab"
 				   type="java.lang.String"/>
+				   
 	<form-property name="dispatch"
 				   type="java.lang.String"/>
 </form-bean>
@@ -48,4 +49,21 @@
 </form-bean>
 
 
-<form-bean name="emptyForm" type="org.apache.struts.action.DynaActionForm"/>
+<form-bean name="SbmtMonitoringForm" type="org.apache.struts.action.DynaActionForm">
+
+	<form-property name="toolSessionID"
+				   type="java.lang.Long"/>
+				   
+	<form-property name="toolContentID"
+				   type="java.lang.Long"/>
+				   
+	<form-property name="userID"
+				   type="java.lang.Long"/>		
+
+	<form-property name="currentTab"
+				   type="java.lang.String"/>
+				   
+	<form-property name="method"
+				   type="java.lang.String"/>
+				   
+</form-bean>
