@@ -1,39 +1,40 @@
 <%@ include file="/includes/taglibs.jsp"%>
 
-<html:form action="/monitoring/updateActivity" method="post">
-	<div id="basic">
-	<table class="forms">
-		<!-- Title Row -->
-		<tr>
-			<td class="formlabel"><fmt:message key="label.authoring.basic.title" />:</td>
-			<td class="formcontrol"><input type="text" name="title"
-				value="<c:out value='${title}' escapeXml='false'/>" /></td>
-			<td><html:errors property="activity.title" /></td>
-		</tr>
-		<!-- Instructions Row -->
-		<tr>
-			<td class="formlabel"><fmt:message
-				key="label.authoring.basic.instruction" />:</td>
-			<td class="formcontrol"><FCK:editor id="instruction"
-				basePath="/lams/fckeditor/" height="150" width="85%">
-				<c:out value="${instruction}" escapeXml="false" />
-			</FCK:editor></td>
-			<td><html:errors property="activity.instruction" /></td>
-		</tr>
-		<tr>
-			<td class="formlabel" colspan="3"><html:errors
-				property="activity.globel" /></td>
-		</tr>
-		<tr>
-			<td colspan="3">
-			<html:submit>
-				<fmt:message key="label.monitoring.edit.activity.update" />
-			</html:submit>
-			<html:button property="cancel" onclick="javascript:history.back()">
-				<fmt:message key="label.monitoring.edit.activity.cancel"/>
-			</html:button>
-			</td> 
-		</tr>
-	</table>
-	</div>
-</html:form>
+<table>
+	<tr>
+		<td>
+			<fmt:message key="label.authoring.basic.title" />
+			:
+		</td>
+		<td>
+			<c:out value="${title}" escapeXml="false" />
+		</td>
+	</tr>
+
+	<tr>
+		<td>
+			<fmt:message key="label.authoring.basic.instruction" />
+			:
+		</td>
+		<td>
+			<c:out value="${instruction}" escapeXml="false" />
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<c:set var="isPageEditable" value="${isPageEditable}" />
+			<c:choose>
+				<c:when test='${isPageEditable == "true"}'>
+					<html:link forward="forwardToAuthorPage" name="monitorForm" property="parametersToAppend" styleClass="button" target="_blank">
+						<fmt:message key="label.monitoring.edit.activity.edit" />
+					</html:link>
+					
+					
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="message.monitoring.edit.activity.not.editable" />
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
+</table>
