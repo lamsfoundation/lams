@@ -44,13 +44,28 @@ import org.springframework.web.filter.OncePerRequestFilter;
  * @version $Revision$
  */
 public class LocaleFilter extends OncePerRequestFilter {
-
-//	private static final String DEFAULT_LANGUAGE = "en";
+	private String encoding;
+	
+	//	private static final String DEFAULT_LANGUAGE = "en";
 //	private static final String DEFUALT_COUNTRY = "AU";
 	private static final String PREFERRED_LOCALE_KEY = "org.apache.struts.action.LOCALE";
 	private static final String CHARSET_KEY_KEY = "org.lamsfoundation.lams.web.filter.CHARSET.KEY";
+	/**
+	 * Set the encoding to use for requests. This encoding will be
+	 * passed into a ServletRequest.setCharacterEncoding call.
+	*/
+	public void setEncoding(String encoding) {
+		this.encoding = encoding;
+	}
+	
     public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, 
             FilterChain chain) throws IOException, ServletException {
+    	//charset encoding
+    	if(StringUtils.isEmpty(this.encoding))
+    		request.setCharacterEncoding(encoding);
+    	else
+    		request.setCharacterEncoding("UTF-8");
+    	
     	Locale preferredLocale = null;
     	//Comment: This getParameter() cause problem when reading WDDX packet, which need request.getInputStream() method.
     	//user set has first prority:
