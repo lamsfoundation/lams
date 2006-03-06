@@ -40,11 +40,11 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.Region;
 import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.DynaActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
-import org.apache.struts.actions.DispatchAction;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
 import org.lamsfoundation.lams.tool.sbmt.dto.AuthoringDTO;
@@ -57,6 +57,7 @@ import org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 
 
 /**
@@ -65,23 +66,24 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * 				path="/monitoring"
  * 				parameter="method"
  * 				scope="request"
- * 				name="emptyForm" 				
+ * 				name="SbmtMonitoringForm" 				
  * 
- * @struts.action-forward name="userlist" path="/monitoring/alluserlist.jsp"
- * @struts.action-forward name="userMarks" path="/monitoring/usermarkslist.jsp"
- * @struts.action-forward name="updateMarks" path="/monitoring/updatemarks.jsp"
- * @struts.action-forward name="allUserMarks" path="/monitoring/viewallmarks.jsp"
+ * @struts.action-forward name="userlist" path="/monitoring/monitoring.jsp"
+ * @struts.action-forward name="userMarks" path="/monitoring/monitoring.jsp"
+ * @struts.action-forward name="updateMarks" path="/monitoring/monitoring.jsp"
+ * @struts.action-forward name="allUserMarks" path="/monitoring/monitoring.jsp"
  * 
- * @struts.action-forward name="instructions" path="/monitoring/instructions.jsp"
- * @struts.action-forward name="showActivity" path="/monitoring/showactivity.jsp"
- * @struts.action-forward name="editActivity" path="/monitoring/editactivity.jsp"
- * @struts.action-forward name="success" path="/monitoring/showactivity.jsp"
+ * @struts.action-forward name="instructions" path="/monitoring/monitoring.jsp"
+ * @struts.action-forward name="showActivity" path="/monitoring/monitoring.jsp"
+ * @struts.action-forward name="editActivity" path="/monitoring/monitoring.jsp"
+ * @struts.action-forward name="success" path="/monitoring/monitoring.jsp"
+ * @struts.action-forward name="load" path="/monitoring/monitoring.jsp"
  * 
- * @struts.action-forward name="statistic" path="/monitoring/statistic.jsp"
+ * @struts.action-forward name="statistic" path="/monitoring/monitoring.jsp"
  * 
  * 
  */
-public class MonitoringAction extends DispatchAction {
+public class MonitoringAction extends LamsDispatchAction {
 	
 	public ISubmitFilesService submitFilesService;
 	
@@ -99,9 +101,21 @@ public class MonitoringAction extends DispatchAction {
     {
     	Long contentID =new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
     	request.getSession().setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID,contentID);
-        return userList(mapping, form, request, response);
+        
+        return doTabs(mapping, form, request, response);
     }
     
+    private ActionForward doTabs(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) {
+    	 this.userList(mapping, form, request, response);
+         this.instructions(mapping, form, request, response);
+         this.showActivity(mapping, form, request, response);
+         this.statistic(mapping, form, request, response);
+         
+         return mapping.findForward("load");
+    }
     
 	/**
 	 * List all user for monitor staff choose which user need to do report marking.
@@ -138,6 +152,7 @@ public class MonitoringAction extends DispatchAction {
         
 		//request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionID);
 		request.setAttribute("sessionUserMap",sessionUserMap);
+		
 		return mapping.findForward("userlist");
 	}
 	/**
@@ -163,6 +178,9 @@ public class MonitoringAction extends DispatchAction {
 		request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionID);
 		request.setAttribute("user",userDto);
 		request.setAttribute("userReport",files);
+		
+		setTab(request);
+		doTabs(mapping, form, request, response);
 		return mapping.findForward("userMarks");
 	}
 	/**
@@ -187,6 +205,9 @@ public class MonitoringAction extends DispatchAction {
 		request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionID);
 		request.setAttribute("user",submitFilesService.getUserDetails(userID));
 		request.setAttribute("fileDetails",submitFilesService.getFileDetails(detailID));
+		
+		setTab(request);
+		doTabs(mapping, form, request, response);
 		return mapping.findForward("updateMarks");
 	}
 	
@@ -196,6 +217,8 @@ public class MonitoringAction extends DispatchAction {
 							   HttpServletResponse response){
 		//check whether the mark is validate
 		Long marks = null;
+		DynaActionForm sbmtMonitoringForm = (DynaActionForm) form;
+		
 		ActionMessages errors = new ActionMessages();  
 		try {
 			marks = new Long(WebUtil.readLongParam(request,"marks"));
@@ -210,6 +233,10 @@ public class MonitoringAction extends DispatchAction {
 			if(details != null)
 				details.setComments(comments);
 			saveErrors(request,errors);
+			
+			setTab(request);
+			doTabs(mapping, form, request, response);
+			sbmtMonitoringForm.set("method", "markFile");
 			return mapping.findForward("updateMarks");
 		}
 		
@@ -231,6 +258,9 @@ public class MonitoringAction extends DispatchAction {
 		request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionID);
 		UserDTO userDto = submitFilesService.getUserDetails(userID);
 		request.setAttribute("user",userDto);
+		
+		setTab(request);
+		doTabs(mapping, form, request, response);
 		return mapping.findForward("userMarks");
 	}
 	public ActionForward viewAllMarks(ActionMapping mapping,
@@ -245,6 +275,9 @@ public class MonitoringAction extends DispatchAction {
 		request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionID);
 //		request.setAttribute("user",submitFilesService.getUserDetails(userID));
 		request.setAttribute("report",userFilesMap);
+		
+		setTab(request);
+		doTabs(mapping, form, request, response);
 		return mapping.findForward("allUserMarks");
 
 	}
@@ -258,8 +291,10 @@ public class MonitoringAction extends DispatchAction {
 		Long sessionID =new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_SESSION_ID));
 		submitFilesService.releaseMarksForSession(sessionID);
 		
+		setTab(request);
+		
 		//echo message back
-		return userList(mapping, form, request, response);
+		return doTabs(mapping, form, request, response);
 	}
 	public ActionForward downloadMarks(ActionMapping mapping,
 			   ActionForm form,
@@ -350,6 +385,8 @@ public class MonitoringAction extends DispatchAction {
 		if(!errors.isEmpty()){
 			saveErrors(request,errors);
 			request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionID);
+			setTab(request);
+			doTabs(mapping, form, request, response);
 			return mapping.findForward("userlist");
 		}
 			
@@ -415,6 +452,12 @@ public class MonitoringAction extends DispatchAction {
 		Long contentID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
 		getAuthoringActivity(contentID, request);
 		String mode = request.getParameter("mode");
+		
+		setTab(request);
+		
+		// do other tabs
+		doTabs(mapping, form, request, response);
+		
 		if(StringUtils.equals(mode,"definelater"))
 			return mapping.findForward("definelater");
 		else
@@ -445,6 +488,8 @@ public class MonitoringAction extends DispatchAction {
 		submitFilesService.saveOrUpdateContent(content);
 		
 		getAuthoringActivity(contentID, request);
+		setTab(request);
+		doTabs(mapping, form, request, response);
 		
 		String mode = request.getParameter("mode");
 		if(StringUtils.equals(mode,"definelater"))
@@ -535,5 +580,9 @@ public class MonitoringAction extends DispatchAction {
 			   .getServletContext());
 	}
 	
+	private void setTab(HttpServletRequest request) {
+		String currTab = request.getParameter("currentTab");
+		request.setAttribute("currentTab",currTab);
+	}
 	
 }
