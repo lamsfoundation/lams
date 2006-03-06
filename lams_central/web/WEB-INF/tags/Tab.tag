@@ -32,10 +32,16 @@
  %>
 <%@ tag body-content="empty" %>
 <%@ attribute name="id" required="true" rtexprvalue="true" %>
-<%@ attribute name="value" required="true" rtexprvalue="true" %>
+<%@ attribute name="value" required="false" rtexprvalue="true" %>
+<%@ attribute name="key" required="false" rtexprvalue="true" %>
 <%@ taglib uri="tags-core" prefix="c" %>
+<%@ taglib uri="tags-bean" prefix="bean" %>
 <c:set var="methodCall" value="selectTab"/>
+<c:set var="title" value="${value}"/>
 <c:if test="${dControl}">
 	<c:set var="methodCall" value="doSelectTab"/>
 </c:if>
-<li id="tab${id}" class="tabitem"><div class="tableft"><div class="tabright"><a href="javascript:${methodCall}(${id});">${value}</a> <!-- IE CSS Bug, If you remove the space infront this comment then height of the Tab will change in IE - Anthony --></div></div></li>
+<c:if test="${key != null && value == null}">
+	<c:set var="title"><bean:message name="key" scope="page"/></c:set>
+</c:if>
+<li id="tab${id}" class="tabitem"><div class="tableft"><div class="tabright"><a href="javascript:${methodCall}(${id});">${title}</a> <!-- IE CSS Bug, If you remove the space infront this comment then height of the Tab will change in IE - Anthony --></div></div></li>
