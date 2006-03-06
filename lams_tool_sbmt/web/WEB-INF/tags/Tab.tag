@@ -35,7 +35,7 @@
 <%@ attribute name="value" required="false" rtexprvalue="true" %>
 <%@ attribute name="key" required="false" rtexprvalue="true" %>
 <%@ taglib uri="tags-core" prefix="c" %>
-<%@ taglil uri="tags-bean" prefix="bean" %>
+<%@ taglib uri="tags-bean" prefix="bean" %>
 <c:set var="methodCall" value="selectTab"/>
 <c:set var="title" value="${value}"/>
 <c:if test="${dControl}">
