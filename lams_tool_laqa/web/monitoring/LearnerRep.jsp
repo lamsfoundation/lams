@@ -89,9 +89,9 @@ http://www.gnu.org/licenses/gpl.txt
 		
 			<tr>
 				 <td> 
-				 	 <html:submit property="endLearning" styleClass="linkbutton" onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
+					<html:submit onclick="javascript:submitMethod('endLearning');" styleClass="button">
 						<bean:message key="button.endLearning"/>
-					</html:submit>
+					</html:submit>	 				 		  					
 				</td> 
 			</tr>
 			</table>

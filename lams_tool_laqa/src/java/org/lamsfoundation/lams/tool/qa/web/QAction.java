@@ -568,9 +568,23 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
     	    QaContent qaContent=qaService.loadQa(toolContentID.longValue());
     	    logger.debug("qaContent: " + qaContent);
 
-    	    QaMonitoringAction qaMonitoringAction= new QaMonitoringAction();
-    		logger.debug("refreshing summary data...");
-    		qaMonitoringAction.refreshSummaryData(request, qaContent, qaService);
+    	    Boolean isUserNamesVisible=(Boolean)request.getSession().getAttribute(IS_USERNAME_VISIBLE);
+    	    logger.debug("isUserNamesVisible: " + isUserNamesVisible);
+    	    
+    	    
+	    	QaMonitoringAction qaMonitoringAction= new QaMonitoringAction();
+    	    if (isUserNamesVisible.booleanValue())
+    	    {
+    	    	/*the report should have all the users' entries*/
+    	    	logger.debug("refreshing summary data for all...");
+        		qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, true);	
+    	    }
+    	    else
+    	    {
+    	    	/*the report should have only this user's entries*/
+    	    	logger.debug("refreshing summary data ...");
+        		qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, false);
+    	    }
     		
     		request.getSession().setAttribute(REQUEST_LEARNING_REPORT, new Boolean(true).toString());
     		logger.debug("fwd'ing to." + LEARNER_REPORT);
@@ -582,27 +596,33 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
          */
         else if (qaLearningForm.getEndLearning() != null) 
         {
-                /*
-                 * The learner is done with the tool session. The tool needs to clean-up.
-                 */
-        		logger.debug("end learning...");
-                Long toolSessionId=(Long)request.getSession().getAttribute(AttributeNames.PARAM_TOOL_SESSION_ID);
-                HttpSession ss = SessionManager.getSession();
-                /*get back login user DTO*/
-                UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-                logger.debug("simulating container behaviour by calling  " +
-                             "leaveToolSession() with toolSessionId: " +  toolSessionId + " and user: " + user);
-                
-                String nextActivityUrl = qaService.leaveToolSession(toolSessionId, new Long(user.getUserID().longValue()));
-                response.sendRedirect(nextActivityUrl);
+        		endLearning(request, qaService,  response);
                 return null;
-            }
+         }
             
         logger.debug("forwarding to: " + LOAD_LEARNER);
         qaLearningForm.resetUserActions();
         return (mapping.findForward(LOAD_LEARNER));
     }
+
     
+    public void endLearning(HttpServletRequest request, IQaService qaService, HttpServletResponse response) 
+    	throws IOException, ToolException
+    {
+        /*
+         * The learner is done with the tool session. The tool needs to clean-up.
+         */
+		logger.debug("end learning...");
+        Long toolSessionId=(Long)request.getSession().getAttribute(AttributeNames.PARAM_TOOL_SESSION_ID);
+        HttpSession ss = SessionManager.getSession();
+        /*get back login user DTO*/
+        UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+        logger.debug("simulating container behaviour by calling  " +
+                     "leaveToolSession() with toolSessionId: " +  toolSessionId + " and user: " + user);
+        
+        String nextActivityUrl = qaService.leaveToolSession(toolSessionId, new Long(user.getUserID().longValue()));
+        response.sendRedirect(nextActivityUrl);
+    }
 
     /**
      * persists error messages to request scope

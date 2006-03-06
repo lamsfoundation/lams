@@ -212,8 +212,10 @@ public class MonitoringUtil implements QaAppConstants{
 	 * @param mcContent
 	 * @return List
 	 */
-	public static List buildGroupsQuestionData(HttpServletRequest request, QaContent qaContent)
+	public static List buildGroupsQuestionData(HttpServletRequest request, QaContent qaContent, boolean allUsersData)
 	{
+		logger.debug("allUsersData: " + allUsersData);
+		
 		IQaService qaService = (IQaService)request.getSession().getAttribute(TOOL_SERVICE);
 		logger.debug("qaService: " + qaService);
     	
@@ -235,7 +237,8 @@ public class MonitoringUtil implements QaAppConstants{
 	    		qaMonitoredAnswersDTO.setQuestionUid(qaQueContent.getUid().toString());
 	    		qaMonitoredAnswersDTO.setQuestion(qaQueContent.getQuestion());
 	    		
-				Map questionAttemptData= buildGroupsAttemptData(request, qaContent, qaQueContent, qaQueContent.getUid().toString());
+	    		logger.debug("using allUsersData to retrieve users data: " + allUsersData);
+				Map questionAttemptData= buildGroupsAttemptData(request, qaContent, qaQueContent, qaQueContent.getUid().toString(), allUsersData );
 				logger.debug("questionAttemptData:..." + questionAttemptData);
 				qaMonitoredAnswersDTO.setQuestionAttempts(questionAttemptData);
 				listMonitoredAnswersContainerDTO.add(qaMonitoredAnswersDTO);
@@ -247,8 +250,10 @@ public class MonitoringUtil implements QaAppConstants{
 	}
 	
 
-	public static Map buildGroupsAttemptData(HttpServletRequest request, QaContent qaContent, QaQueContent qaQueContent, String questionUid)
+	public static Map buildGroupsAttemptData(HttpServletRequest request, QaContent qaContent, QaQueContent qaQueContent, String questionUid, boolean allUsersData)
 	{
+		logger.debug("allUsersData: " + allUsersData);
+		
 		logger.debug("doing buildGroupsAttemptData...");
 		IQaService qaService = (IQaService)request.getSession().getAttribute(TOOL_SERVICE);
     	logger.debug("qaService: " + qaService);
@@ -274,7 +279,7 @@ public class MonitoringUtil implements QaAppConstants{
             	{
             		List listUsers=qaService.getUserBySessionOnly(qaSession);	
             		logger.debug("listMcUsers for session id:"  + qaSession.getQaSessionId() +  " = " + listUsers);
-            		Map sessionUsersAttempts=populateSessionUsersAttempts(request,qaSession.getQaSessionId(), listUsers, questionUid);
+            		Map sessionUsersAttempts=populateSessionUsersAttempts(request,qaSession.getQaSessionId(), listUsers, questionUid, allUsersData);
             		listMonitoredAttemptsContainerDTO.add(sessionUsersAttempts);
             	}
             }
@@ -295,8 +300,10 @@ public class MonitoringUtil implements QaAppConstants{
 	 * @param listUsers
 	 * @return List
 	 */
-	public static Map populateSessionUsersAttempts(HttpServletRequest request,Long sessionId, List listUsers, String questionUid)
+	public static Map populateSessionUsersAttempts(HttpServletRequest request,Long sessionId, List listUsers, String questionUid, boolean allUsersData)
 	{
+		logger.debug("allUsersData: " + allUsersData);
+		
 		logger.debug("doing populateSessionUsersAttempts...");
 		IQaService qaService = (IQaService)request.getSession().getAttribute(TOOL_SERVICE);
     	logger.debug("qaService: " + qaService);
@@ -305,12 +312,53 @@ public class MonitoringUtil implements QaAppConstants{
 		List listMonitoredUserContainerDTO= new LinkedList();
 		
 		Iterator itUsers=listUsers.iterator();
-		while (itUsers.hasNext())
+		
+		if (allUsersData)
 		{
-    		QaQueUsr qaQueUsr=(QaQueUsr)itUsers.next();
-    		logger.debug("qaQueUsr: " + qaQueUsr);
-    		
-    		if (qaQueUsr != null)
+			logger.debug("getting alll the user' data");
+			while (itUsers.hasNext())
+			{
+	    		QaQueUsr qaQueUsr=(QaQueUsr)itUsers.next();
+	    		logger.debug("qaQueUsr: " + qaQueUsr);
+	    		
+	    		if (qaQueUsr != null)
+	    		{
+	    			logger.debug("getting listUserAttempts for user id: " + qaQueUsr.getUid() + " and que content id: " + questionUid);
+	    			List listUserAttempts=qaService.getAttemptsForUserAndQuestionContent(qaQueUsr.getUid(), new Long(questionUid));
+	    			logger.debug("listUserAttempts: " + listUserAttempts);
+
+	    			Iterator itAttempts=listUserAttempts.iterator();
+	    			while (itAttempts.hasNext())
+	    			{
+	    				QaUsrResp qaUsrResp=(QaUsrResp)itAttempts.next();
+	    	    		logger.debug("qaUsrResp: " + qaUsrResp);
+	    	    		
+	    	    		if (qaUsrResp != null)
+	    	    		{
+	    	    			QaMonitoredUserDTO qaMonitoredUserDTO = new QaMonitoredUserDTO();
+	    	    			qaMonitoredUserDTO.setAttemptTime(qaUsrResp.getAttemptTime().toString());
+	    	    			qaMonitoredUserDTO.setTimeZone(qaUsrResp.getTimezone());
+	    	    			qaMonitoredUserDTO.setUid(qaUsrResp.getResponseId().toString());
+	    	    			qaMonitoredUserDTO.setUserName(qaQueUsr.getUsername());
+	    	    			qaMonitoredUserDTO.setQueUsrId(qaQueUsr.getUid().toString());
+	    	    			qaMonitoredUserDTO.setSessionId(sessionId.toString());
+	    	    			qaMonitoredUserDTO.setResponse(qaUsrResp.getAnswer());
+	    	    			qaMonitoredUserDTO.setQuestionUid(questionUid);
+	    	    			listMonitoredUserContainerDTO.add(qaMonitoredUserDTO);
+	    	    		}
+	    			}
+	    		}
+			}
+		}
+		else
+		{
+			logger.debug("getting only current user's data" );
+			String userID= (String)request.getSession().getAttribute(USER_ID);
+			logger.debug("userID: " + userID);
+			QaQueUsr qaQueUsr=qaService.getQaQueUsrById(new Long(userID).longValue());
+			logger.debug("the current user qaQueUsr " + qaQueUsr + " and username: "  + qaQueUsr.getUsername());
+
+			if (qaQueUsr != null)
     		{
     			logger.debug("getting listUserAttempts for user id: " + qaQueUsr.getUid() + " and que content id: " + questionUid);
     			List listUserAttempts=qaService.getAttemptsForUserAndQuestionContent(qaQueUsr.getUid(), new Long(questionUid));
@@ -336,8 +384,9 @@ public class MonitoringUtil implements QaAppConstants{
     	    			listMonitoredUserContainerDTO.add(qaMonitoredUserDTO);
     	    		}
     			}
-    		}
+			}
 		}
+		
 		logger.debug("final listMonitoredUserContainerDTO: " + listMonitoredUserContainerDTO);
 		mapMonitoredUserContainerDTO=convertToMcMonitoredUserDTOMap(listMonitoredUserContainerDTO);
 		logger.debug("final mapMonitoredUserContainerDTO:..." + mapMonitoredUserContainerDTO);

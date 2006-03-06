@@ -2,8 +2,6 @@
 package org.lamsfoundation.lams.tool.qa.web;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -108,7 +106,7 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 		
 		QaMonitoringAction qaMonitoringAction= new QaMonitoringAction();
 		logger.debug("refreshing summary data...");
-		qaMonitoringAction.refreshSummaryData(request, qaContent, qaService);
+		qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, true);
 		
 		logger.debug("refreshing stats data...");
 		qaMonitoringAction.refreshStatsData(request);

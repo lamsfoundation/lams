@@ -107,9 +107,9 @@ http://www.gnu.org/licenses/gpl.txt
 								<table align=center>
 									<tr> 
 										 <td NOWRAP valign=top> <b> <font size=2> <bean:message key="label.user"/> </font> </b> </td>  
-				  						 <td NOWRAP valign=top> <b> <font size=2> <bean:message key="label.attemptTime"/></font> 	</b></td>
-				  						 <td NOWRAP valign=top> <b> <font size=2> <bean:message key="label.timezone"/> </font>		</b></td>
-				  						 <td NOWRAP valign=top> <b> <font size=2> <bean:message key="label.response"/> </font> 		</b></td>
+				  						 <td NOWRAP valign=top> <b> <font size=2> <bean:message key="label.attemptTime"/></font> </b></td>
+				  						 <td NOWRAP valign=top> <b> <font size=2> <bean:message key="label.timezone"/> </font>	</b></td>
+				  						 <td NOWRAP valign=top> <b> <font size=2> <bean:message key="label.response"/> </font> 	</b></td>
 						  			</tr>				 
 		  							<c:forEach var="questionAttemptData" items="${currentDto.questionAttempts}">
 										<c:forEach var="sData" items="${questionAttemptData.value}">
