@@ -26,7 +26,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 	//Set by the init obj
 	private var _activity:Activity;
 	private var _children:Array;
-	
+	private var panelHeight:Number;
 	//refs to screen items:
 	private var container_pnl:Panel;
 	private var header_pnl:Panel;
@@ -70,7 +70,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		//Debugger.log('I am in CanvasOptionalActivity init :',Debugger.CRITICAL,'Init','CanvasOptionalActivity');
 		//set up some handlers:
 			
-		_locked = true;
+		_locked = false;
 		
 		childActivities_mc = this.createEmptyMovieClip("childActivities_mc", this.getNextHighestDepth());
 		//var numofChildren:Array = _children //_ddm.getComplexActivityChildren(_activity.activityUIID);
@@ -127,7 +127,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 	
 	private function draw(numOfChildren:Number){
 			
-			var panelHeight = CHILD_OFFSET_Y + (numOfChildren*CHILD_INCRE);
+			panelHeight = CHILD_OFFSET_Y + (numOfChildren*CHILD_INCRE);
 			if (numOfChildren <= 1){
 				panelHeight = 120;
 			}
@@ -233,6 +233,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 	
 	public function get locked ():Boolean {
 		return _locked;
+	}
+	
+	public function get getpanelHeight ():Number {
+		return panelHeight;
 	}
 	private function setStyles():Void{
 		
