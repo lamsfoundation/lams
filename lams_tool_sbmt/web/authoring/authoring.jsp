@@ -101,7 +101,7 @@
 
 <!-- Button Row -->
 		<p align="right">
-			<html:link href="javascript:;" property="submit" onclick="doSubmit('updateContent')" styleClass="button">
+			<html:link href="javascript:doSubmit('updateContent');" property="submit" styleClass="button">
 				<fmt:message key="label.authoring.save.button" />
 			</html:link>
 			<html:link href="javascript:;" property="cancel"

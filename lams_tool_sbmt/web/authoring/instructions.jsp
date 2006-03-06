@@ -53,7 +53,7 @@
 				<html:file property="onlineFile">
 					<fmt:message key="label.authoring.choosefile.button" />
 				</html:file>
-				<html:link href="javascript:;" property="submit" onclick="doSubmit('uploadOnline')">
+				<html:link href="javascript:doSubmit('uploadOnline');" property="submit">
 					<fmt:message key="label.authoring.upload.online.button" />
 				</html:link>
 			</td>
@@ -63,10 +63,6 @@
 			<td class="formlabel"><fmt:message
 				key="label.authoring.offline.instruction" />:</td>
 			<td NOWRAP width="700">
-			<!-- remove <FCK:editor id="offlineInstruction"
-				basePath="/lams/fckeditor/" height="150" width="85%">
-				<c:out value="${authoring.offlineInstruction}" escapeXml="false"/>
-			</FCK:editor>-->
 			<lams:SetEditor id="OfflineInstruction" text="${authoring.offlineInstruction}"/>
 			</td>
 		</tr>
@@ -101,7 +97,7 @@
 				<html:file property="offlineFile">
 					<fmt:message key="label.authoring.choosefile.button" />
 				</html:file>
-				<html:link href="javascript:;" property="submit" onclick="doSubmit('uploadOffline')">
+				<html:link href="javascript:doSubmit('uploadOffline');" property="submit">
 					<fmt:message key="label.authoring.upload.offline.button" />
 				</html:link>
 			</td>
