@@ -75,7 +75,7 @@ http://www.gnu.org/licenses/gpl.txt
 	<c:if test="${ requestLearningReportViewOnly != 'true'}"> 			
 		<b> <font size=2> <c:out value="${sessionScope.reportTitleLearner}" escapeXml="false"/> </font></b>
 	</c:if> 				    
-	<c:if test="${ requestLearningReportViewOnly != 'true'}"> 			
+	<c:if test="${ requestLearningReportViewOnly == 'true'}"> 			
 		<b> <font size=2> <bean:message key="label.learning.viewOnly"/> </font></b>
 	</c:if> 				    
 
@@ -104,9 +104,9 @@ http://www.gnu.org/licenses/gpl.txt
 					</td> 
 				</tr>
 				</table>
-			</c:if> 				    
-			
+			</c:if> 			
 	</html:form>
+
 </body>
 </html:html>
 

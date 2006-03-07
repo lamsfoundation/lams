@@ -123,8 +123,9 @@ http://www.gnu.org/licenses/gpl.txt
 												
 		  	 									<c:if test="${sessionScope.currentMonitoredToolSession != 'All'}"> 			
 		  	 										<c:if test="${sessionScope.currentMonitoredToolSession == userData.sessionId}"> 			
-															<jsp:include page="/monitoring/UserResponses.jsp" />													</c:if>														  					 									  													  			
+															<jsp:include page="/monitoring/UserResponses.jsp" />										
 													</c:if>														  					 									  													  			
+												</c:if>														  					 									  													  			
 											</c:if>														  					 
 	 									</c:forEach>		  	
 									</c:forEach>		  	
