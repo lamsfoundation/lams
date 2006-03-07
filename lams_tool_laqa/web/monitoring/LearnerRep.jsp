@@ -72,6 +72,7 @@ http://www.gnu.org/licenses/gpl.txt
 </head>
 <body>
 
+<c:if test="${ requestLearningReportProgress != 'true'}"> 			
 	<c:if test="${ requestLearningReportViewOnly != 'true'}"> 			
 		<b> <font size=2> <c:out value="${sessionScope.reportTitleLearner}" escapeXml="false"/> </font></b>
 	</c:if> 				    
@@ -106,6 +107,23 @@ http://www.gnu.org/licenses/gpl.txt
 				</table>
 			</c:if> 			
 	</html:form>
+</c:if> 				    
+
+<c:if test="${ requestLearningReportProgress == 'true'}"> 			
+		 <font size=2> <b> <bean:message key="label.learner.progress"/> </b> </font>
+
+		<c:set var="monitoringURL">
+			<html:rewrite page="/monitoring.do" />
+		</c:set>
+
+	  <html:form  action="/monitoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
+		<html:hidden property="method"/>	 
+
+			<div class="tabbody content_b" >
+				<jsp:include page="/monitoring/SummaryContent.jsp" />
+			</div>		         
+	</html:form>
+</c:if> 				    
 
 </body>
 </html:html>

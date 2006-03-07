@@ -343,12 +343,11 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 		*/
     	/* ? CHECK THIS: how do we determine whether preview is requested? Mode is not enough on its own.*/
 	    
-	    /*handle PREVIEW mode*/
+	    /*handling PREVIEW mode*/
 	    String mode=(String) request.getSession().getAttribute(LEARNING_MODE);
 	    logger.debug("mode: " + mode);
     	if ((mode != null) && (mode.equals("author")))
     	{
-    		/*complete this section */
     		logger.debug("Author requests for a preview of the content.");
 			logger.debug("existing qaContent:" + qaContent);
 			
@@ -364,10 +363,18 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 		logger.debug("userId: " + userId);
 		if ((userId != null) && (mode.equals("teacher")))
 		{
-    		/*complete this section */
-			logger.debug("request is for learner progress");
-			return (mapping.findForward(LEARNING_STARTER));
-		}
+			logger.debug("start generating learner progress report.");
+	    	Long currentToolSessionId=(Long)request.getSession().getAttribute(TOOL_SESSION_ID);
+	    	logger.debug("currentToolSessionId: " + currentToolSessionId);
+	    	
+	    	/* the report should have only this user's entries(with userId)*/
+	    	QaMonitoringAction qaMonitoringAction= new QaMonitoringAction();
+	    	qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, true, true, currentToolSessionId.toString(), userId);
+	    	
+    		request.getSession().setAttribute(REQUEST_LEARNING_REPORT, new Boolean(true).toString());
+    		request.getSession().setAttribute(REQUEST_LEARNING_REPORT_PROGRESS, new Boolean(true).toString());
+    		logger.debug("fwd'ing to for learner progress" + LEARNER_REPORT);
+    		return (mapping.findForward(LEARNER_REPORT));		}
     	
 		/* by now, we know that the mode is learner*/
 	    /* find out if the content is set to run offline or online. If it is set to run offline , the learners are informed about that. */
@@ -407,7 +414,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 		    	/*the report should have all the users' entries OR
 		    	 * the report should have only the current session's entries*/
 		    	request.getSession().setAttribute(REQUEST_LEARNING_REPORT_VIEWONLY, new Boolean(true).toString());
-		    	qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, isUserNamesVisible, true, currentToolSessionId.toString());
+		    	qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, isUserNamesVisible, true, currentToolSessionId.toString(), null);
 		    	
 	    		request.getSession().setAttribute(REQUEST_LEARNING_REPORT, new Boolean(true).toString());
 	    		logger.debug("fwd'ing to." + LEARNER_REPORT);

@@ -36,9 +36,10 @@ http://www.gnu.org/licenses/gpl.txt
 					<font size=2> <b> <c:out value="${sessionScope.activityTitle}" escapeXml="false"/> </b> </font>
 				</td></tr>
 			</c:if> 		
+			
 			<c:if test="${questionListingMode == 'questionListingModePreview'}"> 						
 				<tr><td NOWRAP class="input" valign=top>
-					<bean:message key="label.preview"/>
+					<font size=2> </b> <bean:message key="label.preview"/> </b> </font>
 				</td></tr>
 			</c:if> 		
 			

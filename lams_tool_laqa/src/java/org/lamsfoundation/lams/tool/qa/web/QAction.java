@@ -586,7 +586,7 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
 	    	QaMonitoringAction qaMonitoringAction= new QaMonitoringAction();
 	    	/*the report should have all the users' entries OR
 	    	 * the report should have only the current session's entries*/
-	    	qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, isUserNamesVisible, true, currentSessionId);
+	    	qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, isUserNamesVisible, true, currentSessionId, null);
 	    	
     		request.getSession().setAttribute(REQUEST_LEARNING_REPORT, new Boolean(true).toString());
     		logger.debug("fwd'ing to." + LEARNER_REPORT);

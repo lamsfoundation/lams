@@ -388,7 +388,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
         QaContent qaContent=qaService.loadQa(toolContentId.longValue());
     	logger.debug("existing qaContent:" + qaContent);
     	
-        List listMonitoredAnswersContainerDTO=MonitoringUtil.buildGroupsQuestionData(request, qaContent, true, false, null);
+        List listMonitoredAnswersContainerDTO=MonitoringUtil.buildGroupsQuestionData(request, qaContent, true, false, null, null);
         request.getSession().setAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO, listMonitoredAnswersContainerDTO);
         logger.debug("LIST_MONITORED_ANSWERS_CONTAINER_DTO: " + request.getSession().getAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO));
     }
@@ -482,7 +482,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
     }
     
 	public void refreshSummaryData(HttpServletRequest request, QaContent qaContent, IQaService qaService, 
-			boolean isUserNamesVisible, boolean isLearnerRequest, String currentSessionId)
+			boolean isUserNamesVisible, boolean isLearnerRequest, String currentSessionId, String userId)
 	{
 		if (qaService == null)
 		{
@@ -527,7 +527,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    
 	    logger.debug("using allUsersData to retrieve data: " + isUserNamesVisible);
 	    List listMonitoredAnswersContainerDTO=MonitoringUtil.buildGroupsQuestionData(request, qaContent, 
-	    		isUserNamesVisible, isLearnerRequest, currentSessionId);
+	    		isUserNamesVisible, isLearnerRequest, currentSessionId, userId);
 	    request.getSession().setAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO, listMonitoredAnswersContainerDTO);
 	    logger.debug("LIST_MONITORED_ANSWERS_CONTAINER_DTO: " + request.getSession().getAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO));
 	    /* ends here. */
