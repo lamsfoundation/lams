@@ -106,7 +106,7 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 		
 		QaMonitoringAction qaMonitoringAction= new QaMonitoringAction();
 		logger.debug("refreshing summary data...");
-		qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, true);
+		qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, true, false, null);
 		
 		logger.debug("refreshing stats data...");
 		qaMonitoringAction.refreshStatsData(request);

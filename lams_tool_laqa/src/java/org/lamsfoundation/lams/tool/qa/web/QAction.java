@@ -50,6 +50,7 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaComparator;
 import org.lamsfoundation.lams.tool.qa.QaContent;
+import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaUploadedFile;
 import org.lamsfoundation.lams.tool.qa.QaUtils;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
@@ -568,32 +569,29 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
     	    QaContent qaContent=qaService.loadQa(toolContentID.longValue());
     	    logger.debug("qaContent: " + qaContent);
 
-    	    Boolean isUserNamesVisible=(Boolean)request.getSession().getAttribute(IS_USERNAME_VISIBLE);
-    	    logger.debug("isUserNamesVisible: " + isUserNamesVisible);
+    	   
+    	    String userID= (String)request.getSession().getAttribute(USER_ID);
+			logger.debug("userID: " + userID);
+			QaQueUsr qaQueUsr=qaService.getQaQueUsrById(new Long(userID).longValue());
+			logger.debug("the current user qaQueUsr " + qaQueUsr + " and username: "  + qaQueUsr.getUsername());
+			logger.debug("the current user qaQueUsr's session  " + qaQueUsr.getQaSession());
+			String currentSessionId=qaQueUsr.getQaSession().getQaSessionId().toString();
+			logger.debug("the current user SessionId  " + currentSessionId);
+			    	    
     	    
+    	    Boolean isUserNamesVisibleBoolean=(Boolean)request.getSession().getAttribute(IS_USERNAME_VISIBLE);
+	    	boolean isUserNamesVisible=isUserNamesVisibleBoolean.booleanValue();
+	    	logger.debug("isUserNamesVisible: " + isUserNamesVisible);
     	    
 	    	QaMonitoringAction qaMonitoringAction= new QaMonitoringAction();
-    	    if (isUserNamesVisible.booleanValue())
-    	    {
-    	    	/*the report should have all the users' entries*/
-    	    	logger.debug("refreshing summary data for all...");
-        		qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, true);	
-    	    }
-    	    else
-    	    {
-    	    	/*the report should have only this user's entries*/
-    	    	logger.debug("refreshing summary data ...");
-        		qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, false);
-    	    }
-    		
+	    	/*the report should have all the users' entries OR
+	    	 * the report should have only the current session's entries*/
+	    	qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, isUserNamesVisible, true, currentSessionId);
+	    	
     		request.getSession().setAttribute(REQUEST_LEARNING_REPORT, new Boolean(true).toString());
     		logger.debug("fwd'ing to." + LEARNER_REPORT);
     		return (mapping.findForward(LEARNER_REPORT));
         }
-        /*
-         * Simulate learner leaving the current tool session. This will normally gets called by the container by 
-         * leaveToolSession(toolSessionId, user) 
-         */
         else if (qaLearningForm.getEndLearning() != null) 
         {
         		endLearning(request, qaService,  response);

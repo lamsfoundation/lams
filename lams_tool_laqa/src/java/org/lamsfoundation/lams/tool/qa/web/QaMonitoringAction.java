@@ -388,10 +388,12 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
         QaContent qaContent=qaService.loadQa(toolContentId.longValue());
     	logger.debug("existing qaContent:" + qaContent);
     	
-        List listMonitoredAnswersContainerDTO=MonitoringUtil.buildGroupsQuestionData(request, qaContent, true);
+        List listMonitoredAnswersContainerDTO=MonitoringUtil.buildGroupsQuestionData(request, qaContent, true, false, null);
         request.getSession().setAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO, listMonitoredAnswersContainerDTO);
         logger.debug("LIST_MONITORED_ANSWERS_CONTAINER_DTO: " + request.getSession().getAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO));
     }
+    
+    
     
     
     public ActionForward doneMonitoring(ActionMapping mapping,
@@ -479,10 +481,12 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
     	return null; 
     }
     
-	public void refreshSummaryData(HttpServletRequest request, QaContent qaContent, IQaService qaService, boolean allUsersData)
+	public void refreshSummaryData(HttpServletRequest request, QaContent qaContent, IQaService qaService, 
+			boolean isUserNamesVisible, boolean isLearnerRequest, String currentSessionId)
 	{
-		logger.debug("allUsersData: " + allUsersData);
-		
+		logger.debug("isUserNamesVisible: " + isUserNamesVisible);
+		logger.debug("isLearnerRequest: " + isLearnerRequest);
+				
 		/* this section is related to summary tab. Starts here. */
 		Map summaryToolSessions=MonitoringUtil.populateToolSessions(request, qaContent, qaService);
 		logger.debug("summaryToolSessions: " + summaryToolSessions);
@@ -508,8 +512,9 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    logger.debug("CURRENT_MONITORED_TOOL_SESSION: " + request.getSession().getAttribute(CURRENT_MONITORED_TOOL_SESSION));
 	    
 	    
-	    logger.debug("using allUsersData to retrieve data: " + allUsersData);
-	    List listMonitoredAnswersContainerDTO=MonitoringUtil.buildGroupsQuestionData(request, qaContent, allUsersData);
+	    logger.debug("using allUsersData to retrieve data: " + isUserNamesVisible);
+	    List listMonitoredAnswersContainerDTO=MonitoringUtil.buildGroupsQuestionData(request, qaContent, 
+	    		isUserNamesVisible, isLearnerRequest, currentSessionId);
 	    request.getSession().setAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO, listMonitoredAnswersContainerDTO);
 	    logger.debug("LIST_MONITORED_ANSWERS_CONTAINER_DTO: " + request.getSession().getAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO));
 	    /* ends here. */

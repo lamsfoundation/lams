@@ -212,9 +212,11 @@ public class MonitoringUtil implements QaAppConstants{
 	 * @param mcContent
 	 * @return List
 	 */
-	public static List buildGroupsQuestionData(HttpServletRequest request, QaContent qaContent, boolean allUsersData)
+	public static List buildGroupsQuestionData(HttpServletRequest request, QaContent qaContent, 
+			boolean isUserNamesVisible, boolean isLearnerRequest, String currentSessionId)
 	{
-		logger.debug("allUsersData: " + allUsersData);
+		logger.debug("isUserNamesVisible: " + isUserNamesVisible);
+		logger.debug("isLearnerRequest: " + isLearnerRequest);
 		
 		IQaService qaService = (IQaService)request.getSession().getAttribute(TOOL_SERVICE);
 		logger.debug("qaService: " + qaService);
@@ -237,8 +239,9 @@ public class MonitoringUtil implements QaAppConstants{
 	    		qaMonitoredAnswersDTO.setQuestionUid(qaQueContent.getUid().toString());
 	    		qaMonitoredAnswersDTO.setQuestion(qaQueContent.getQuestion());
 	    		
-	    		logger.debug("using allUsersData to retrieve users data: " + allUsersData);
-				Map questionAttemptData= buildGroupsAttemptData(request, qaContent, qaQueContent, qaQueContent.getUid().toString(), allUsersData );
+	    		logger.debug("using allUsersData to retrieve users data: " + isUserNamesVisible);
+				Map questionAttemptData= buildGroupsAttemptData(request, qaContent, qaQueContent, qaQueContent.getUid().toString(), 
+						isUserNamesVisible,isLearnerRequest, currentSessionId);
 				logger.debug("questionAttemptData:..." + questionAttemptData);
 				qaMonitoredAnswersDTO.setQuestionAttempts(questionAttemptData);
 				listMonitoredAnswersContainerDTO.add(qaMonitoredAnswersDTO);
@@ -250,9 +253,12 @@ public class MonitoringUtil implements QaAppConstants{
 	}
 	
 
-	public static Map buildGroupsAttemptData(HttpServletRequest request, QaContent qaContent, QaQueContent qaQueContent, String questionUid, boolean allUsersData)
+	public static Map buildGroupsAttemptData(HttpServletRequest request, QaContent qaContent, QaQueContent qaQueContent, String questionUid, 
+			boolean isUserNamesVisible, boolean isLearnerRequest, String currentSessionId)
 	{
-		logger.debug("allUsersData: " + allUsersData);
+		logger.debug("isUserNamesVisible: " + isUserNamesVisible);
+		logger.debug("isLearnerRequest: " + isLearnerRequest);
+		logger.debug("currentSessionId: " + currentSessionId);
 		
 		logger.debug("doing buildGroupsAttemptData...");
 		IQaService qaService = (IQaService)request.getSession().getAttribute(TOOL_SERVICE);
@@ -265,25 +271,62 @@ public class MonitoringUtil implements QaAppConstants{
     	logger.debug("summaryToolSessions: " + summaryToolSessions);
     	
     	Iterator itMap = summaryToolSessions.entrySet().iterator();
-    	while (itMap.hasNext()) 
+    	
+    	
+    	/*request is for monitoring summary */
+    	if (!isLearnerRequest)
     	{
-        	Map.Entry pairs = (Map.Entry)itMap.next();
-            logger.debug("using the  summary tool sessions pair: " +  pairs.getKey() + " = " + pairs.getValue());
-            
-            if (!(pairs.getValue().toString().equals("None")) && !(pairs.getValue().toString().equals("All")))
-            {
-            	logger.debug("using the  numerical summary tool sessions pair: " +  " = " + pairs.getValue());
-            	QaSession qaSession= qaService.retrieveQaSession(new Long(pairs.getValue().toString()).longValue());
-            	logger.debug("qaSession: " +  " = " + qaSession);
-            	if (qaSession != null)
-            	{
-            		List listUsers=qaService.getUserBySessionOnly(qaSession);	
-            		logger.debug("listMcUsers for session id:"  + qaSession.getQaSessionId() +  " = " + listUsers);
-            		Map sessionUsersAttempts=populateSessionUsersAttempts(request,qaSession.getQaSessionId(), listUsers, questionUid, allUsersData);
-            		listMonitoredAttemptsContainerDTO.add(sessionUsersAttempts);
-            	}
-            }
-		}
+        	while (itMap.hasNext()) 
+        	{
+            	Map.Entry pairs = (Map.Entry)itMap.next();
+                logger.debug("using the  summary tool sessions pair: " +  pairs.getKey() + " = " + pairs.getValue());
+                
+                if (!(pairs.getValue().toString().equals("None")) && !(pairs.getValue().toString().equals("All")))
+                {
+                	logger.debug("using the  numerical summary tool sessions pair: " +  " = " + pairs.getValue());
+                	QaSession qaSession= qaService.retrieveQaSession(new Long(pairs.getValue().toString()).longValue());
+                	logger.debug("qaSession: " +  " = " + qaSession);
+                	if (qaSession != null)
+                	{
+                		List listUsers=qaService.getUserBySessionOnly(qaSession);	
+                		logger.debug("listMcUsers for session id:"  + qaSession.getQaSessionId() +  " = " + listUsers);
+                		Map sessionUsersAttempts=populateSessionUsersAttempts(request,qaSession.getQaSessionId(), listUsers, questionUid, 
+                				isUserNamesVisible, isLearnerRequest);
+                		listMonitoredAttemptsContainerDTO.add(sessionUsersAttempts);
+                	}
+                }
+    		}
+    	}
+    	else
+    	{
+    		/*request is for learner report, use only the passed tool session in the report*/
+    		logger.debug("using currentSessionId for the learner report:"  + currentSessionId);
+        	while (itMap.hasNext()) 
+        	{
+            	Map.Entry pairs = (Map.Entry)itMap.next();
+                logger.debug("using the  summary tool sessions pair: " +  pairs.getKey() + " = " + pairs.getValue());
+                
+                if (!(pairs.getValue().toString().equals("None")) && !(pairs.getValue().toString().equals("All")))
+                {
+                	logger.debug("using the  numerical summary tool sessions pair: " +  " = " + pairs.getValue());
+                	
+                	if (currentSessionId.equals(pairs.getValue()))
+                	{
+                		logger.debug("only using this tool session for the learner report: " +  " = " + pairs.getValue());
+                		QaSession qaSession= qaService.retrieveQaSession(new Long(pairs.getValue().toString()).longValue());
+                    	logger.debug("qaSession: " +  " = " + qaSession);
+                    	if (qaSession != null)
+                    	{
+                    		List listUsers=qaService.getUserBySessionOnly(qaSession);	
+                    		logger.debug("listMcUsers for session id:"  + qaSession.getQaSessionId() +  " = " + listUsers);
+                    		Map sessionUsersAttempts=populateSessionUsersAttempts(request,qaSession.getQaSessionId(), listUsers, questionUid, 
+                    				isUserNamesVisible, isLearnerRequest);
+                    		listMonitoredAttemptsContainerDTO.add(sessionUsersAttempts);
+                    	}
+                	}
+                }
+    		}
+    	}
 
     	logger.debug("final listMonitoredAttemptsContainerDTO:..." + listMonitoredAttemptsContainerDTO);
     	mapMonitoredAttemptsContainerDTO=convertToMap(listMonitoredAttemptsContainerDTO);
@@ -300,9 +343,11 @@ public class MonitoringUtil implements QaAppConstants{
 	 * @param listUsers
 	 * @return List
 	 */
-	public static Map populateSessionUsersAttempts(HttpServletRequest request,Long sessionId, List listUsers, String questionUid, boolean allUsersData)
+	public static Map populateSessionUsersAttempts(HttpServletRequest request,Long sessionId, List listUsers, String questionUid, 
+			boolean isUserNamesVisible, boolean isLearnerRequest)
 	{
-		logger.debug("allUsersData: " + allUsersData);
+		logger.debug("isUserNamesVisible: " + isUserNamesVisible);
+		logger.debug("isLearnerRequest: " + isLearnerRequest);
 		
 		logger.debug("doing populateSessionUsersAttempts...");
 		IQaService qaService = (IQaService)request.getSession().getAttribute(TOOL_SERVICE);
@@ -313,8 +358,9 @@ public class MonitoringUtil implements QaAppConstants{
 		
 		Iterator itUsers=listUsers.iterator();
 		
-		if (allUsersData)
+		if ((isUserNamesVisible) && (!isLearnerRequest))
 		{
+			logger.debug("isUserNamesVisible true, isLearnerRequest false" );
 			logger.debug("getting alll the user' data");
 			while (itUsers.hasNext())
 			{
@@ -350,41 +396,103 @@ public class MonitoringUtil implements QaAppConstants{
 	    		}
 			}
 		}
-		else
+		else if ((isUserNamesVisible) && (isLearnerRequest))
 		{
-			logger.debug("getting only current user's data" );
+			logger.debug("just populating data normally just like monitoring summary, except that the data is ony for a specific session" );
+			logger.debug("isUserNamesVisible true, isLearnerRequest true" );
 			String userID= (String)request.getSession().getAttribute(USER_ID);
 			logger.debug("userID: " + userID);
 			QaQueUsr qaQueUsr=qaService.getQaQueUsrById(new Long(userID).longValue());
 			logger.debug("the current user qaQueUsr " + qaQueUsr + " and username: "  + qaQueUsr.getUsername());
-
-			if (qaQueUsr != null)
-    		{
-    			logger.debug("getting listUserAttempts for user id: " + qaQueUsr.getUid() + " and que content id: " + questionUid);
-    			List listUserAttempts=qaService.getAttemptsForUserAndQuestionContent(qaQueUsr.getUid(), new Long(questionUid));
-    			logger.debug("listUserAttempts: " + listUserAttempts);
-
-    			Iterator itAttempts=listUserAttempts.iterator();
-    			while (itAttempts.hasNext())
-    			{
-    				QaUsrResp qaUsrResp=(QaUsrResp)itAttempts.next();
-    	    		logger.debug("qaUsrResp: " + qaUsrResp);
-    	    		
-    	    		if (qaUsrResp != null)
-    	    		{
-    	    			QaMonitoredUserDTO qaMonitoredUserDTO = new QaMonitoredUserDTO();
-    	    			qaMonitoredUserDTO.setAttemptTime(qaUsrResp.getAttemptTime().toString());
-    	    			qaMonitoredUserDTO.setTimeZone(qaUsrResp.getTimezone());
-    	    			qaMonitoredUserDTO.setUid(qaUsrResp.getResponseId().toString());
-    	    			qaMonitoredUserDTO.setUserName(qaQueUsr.getUsername());
-    	    			qaMonitoredUserDTO.setQueUsrId(qaQueUsr.getUid().toString());
-    	    			qaMonitoredUserDTO.setSessionId(sessionId.toString());
-    	    			qaMonitoredUserDTO.setResponse(qaUsrResp.getAnswer());
-    	    			qaMonitoredUserDTO.setQuestionUid(questionUid);
-    	    			listMonitoredUserContainerDTO.add(qaMonitoredUserDTO);
-    	    		}
-    			}
+						
+				while (itUsers.hasNext())
+				{
+		    		qaQueUsr=(QaQueUsr)itUsers.next();
+		    		logger.debug("qaQueUsr: " + qaQueUsr);
+		    		
+		    		if (qaQueUsr != null)
+		    		{
+		    			logger.debug("getting listUserAttempts for user id: " + qaQueUsr.getUid() + " and que content id: " + questionUid);
+		    			List listUserAttempts=qaService.getAttemptsForUserAndQuestionContent(qaQueUsr.getUid(), new Long(questionUid));
+		    			logger.debug("listUserAttempts: " + listUserAttempts);
+	
+		    			Iterator itAttempts=listUserAttempts.iterator();
+		    			while (itAttempts.hasNext())
+		    			{
+		    				QaUsrResp qaUsrResp=(QaUsrResp)itAttempts.next();
+		    	    		logger.debug("qaUsrResp: " + qaUsrResp);
+		    	    		
+		    	    		if (qaUsrResp != null)
+		    	    		{
+		    	    			QaMonitoredUserDTO qaMonitoredUserDTO = new QaMonitoredUserDTO();
+		    	    			qaMonitoredUserDTO.setAttemptTime(qaUsrResp.getAttemptTime().toString());
+		    	    			qaMonitoredUserDTO.setTimeZone(qaUsrResp.getTimezone());
+		    	    			qaMonitoredUserDTO.setUid(qaUsrResp.getResponseId().toString());
+		    	    			qaMonitoredUserDTO.setUserName(qaQueUsr.getUsername());
+		    	    			qaMonitoredUserDTO.setQueUsrId(qaQueUsr.getUid().toString());
+		    	    			qaMonitoredUserDTO.setSessionId(sessionId.toString());
+		    	    			qaMonitoredUserDTO.setResponse(qaUsrResp.getAnswer());
+		    	    			qaMonitoredUserDTO.setQuestionUid(questionUid);
+		    	    			listMonitoredUserContainerDTO.add(qaMonitoredUserDTO);
+		    	    		}
+		    			}
+		    		}
+				}
 			}
+			else if ((!isUserNamesVisible) && (isLearnerRequest))
+			{
+				logger.debug("populating data normally exception are for a specific session and other user names are not visible.");				
+				logger.debug("isUserNamesVisible false, isLearnerRequest true" );
+				logger.debug("getting only current user's data" );
+				String userID= (String)request.getSession().getAttribute(USER_ID);
+				logger.debug("userID: " + userID);
+							
+					while (itUsers.hasNext())
+					{
+						QaQueUsr qaQueUsr=(QaQueUsr)itUsers.next();
+			    		logger.debug("qaQueUsr: " + qaQueUsr);
+			    		
+			    		if (qaQueUsr != null)
+			    		{
+			    			logger.debug("getting listUserAttempts for user id: " + qaQueUsr.getUid() + " and que content id: " + questionUid);
+			    			List listUserAttempts=qaService.getAttemptsForUserAndQuestionContent(qaQueUsr.getUid(), new Long(questionUid));
+			    			logger.debug("listUserAttempts: " + listUserAttempts);
+	
+			    			Iterator itAttempts=listUserAttempts.iterator();
+			    			while (itAttempts.hasNext())
+			    			{
+			    				QaUsrResp qaUsrResp=(QaUsrResp)itAttempts.next();
+			    	    		logger.debug("qaUsrResp: " + qaUsrResp);
+			    	    		
+			    	    		if (qaUsrResp != null)
+			    	    		{
+			    	    			QaMonitoredUserDTO qaMonitoredUserDTO = new QaMonitoredUserDTO();
+			    	    			qaMonitoredUserDTO.setAttemptTime(qaUsrResp.getAttemptTime().toString());
+			    	    			qaMonitoredUserDTO.setTimeZone(qaUsrResp.getTimezone());
+			    	    			qaMonitoredUserDTO.setUid(qaUsrResp.getResponseId().toString());
+			    	    			
+			    	    			logger.debug("userID versus queUsrId: " + userID + "-" + qaQueUsr.getQueUsrId());
+			    	    			if (userID.equals(qaQueUsr.getQueUsrId().toString()))
+									{
+			    	    				logger.debug("this is current user, put his name normally.");
+			    	    				qaMonitoredUserDTO.setUserName(qaQueUsr.getUsername());	
+									}
+			    	    			else
+			    	    			{
+			    	    				logger.debug("this is  not current user, put his name as blank.");
+			    	    				qaMonitoredUserDTO.setUserName("[        ]");
+			    	    			}
+			    	    			
+			    	    			qaMonitoredUserDTO.setQueUsrId(qaQueUsr.getUid().toString());
+			    	    			qaMonitoredUserDTO.setSessionId(sessionId.toString());
+			    	    			qaMonitoredUserDTO.setResponse(qaUsrResp.getAnswer());
+			    	    			qaMonitoredUserDTO.setQuestionUid(questionUid);
+			    	    			listMonitoredUserContainerDTO.add(qaMonitoredUserDTO);
+			    	    		}
+			    			}
+			    		}
+				}
+			
 		}
 		
 		logger.debug("final listMonitoredUserContainerDTO: " + listMonitoredUserContainerDTO);
