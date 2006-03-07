@@ -195,6 +195,7 @@ public interface QaAppConstants {
     public static final String TO_TOOL_CONTENT_ID						="toToolContentId";
     public static final String LEARNER_REPORT							="learnerRep";
     public static final String REQUEST_LEARNING_REPORT					="requestLearningReport";
+    public static final String REQUEST_LEARNING_REPORT_VIEWONLY			="requestLearningReportViewOnly";    
     
             
     /*

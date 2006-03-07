@@ -134,6 +134,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    
 		IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
 	    logger.debug("retrieving qaService: " + qaService);
+	    request.getSession().setAttribute(TOOL_SERVICE, qaService);
 	    
 	    /*mark the http session as a learning activity  */
 	    request.getSession().setAttribute(TARGET_MODE,TARGET_MODE_LEARNING);
@@ -392,19 +393,25 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    logger.debug("QaQueUsr:" + qaQueUsr);
 	    if (qaQueUsr != null)
 	    {
-	    	String localToolSession=qaQueUsr.getQaSessionId().toString(); 
-	    	logger.debug("localToolSession: " + localToolSession);
-	    	
-	    	Long incomingToolSessionId=(Long)request.getSession().getAttribute(AttributeNames.PARAM_TOOL_SESSION_ID);
-	    	logger.debug("incomingToolSessionId: " + incomingToolSessionId);
-	    	
-	    	/* now we know that this user has already responsed before*/
-	    	if (localToolSession.equals(incomingToolSessionId.toString()))
-	    	{
 		    	logger.debug("the learner has already responsed to this content, just generate a read-only report.");
 		    	
-		    	return (mapping.findForward(LEARNER_REPORT));	    		
-	    	}
+	    	    Boolean isUserNamesVisibleBoolean=(Boolean)request.getSession().getAttribute(IS_USERNAME_VISIBLE);
+		    	boolean isUserNamesVisible=isUserNamesVisibleBoolean.booleanValue();
+		    	logger.debug("isUserNamesVisible: " + isUserNamesVisible);
+
+		    	Long currentToolSessionId=(Long)request.getSession().getAttribute(TOOL_SESSION_ID);
+		    	logger.debug("currentToolSessionId: " + currentToolSessionId);
+		    	
+		    	QaMonitoringAction qaMonitoringAction= new QaMonitoringAction();
+		    	/*the report should have all the users' entries OR
+		    	 * the report should have only the current session's entries*/
+		    	request.getSession().setAttribute(REQUEST_LEARNING_REPORT_VIEWONLY, new Boolean(true).toString());
+		    	qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, isUserNamesVisible, true, currentToolSessionId.toString());
+		    	
+	    		request.getSession().setAttribute(REQUEST_LEARNING_REPORT, new Boolean(true).toString());
+	    		logger.debug("fwd'ing to." + LEARNER_REPORT);
+	    		return (mapping.findForward(LEARNER_REPORT));
+
 	    }
     	/*
     	 * present user with the questions.

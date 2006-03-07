@@ -71,7 +71,14 @@ http://www.gnu.org/licenses/gpl.txt
 	</script>	
 </head>
 <body>
-	<b> <font size=2> <c:out value="${sessionScope.reportTitleLearner}" escapeXml="false"/> </font></b>
+
+	<c:if test="${ requestLearningReportViewOnly != 'true'}"> 			
+		<b> <font size=2> <c:out value="${sessionScope.reportTitleLearner}" escapeXml="false"/> </font></b>
+	</c:if> 				    
+	<c:if test="${ requestLearningReportViewOnly != 'true'}"> 			
+		<b> <font size=2> <bean:message key="label.learning.viewOnly"/> </font></b>
+	</c:if> 				    
+
 		<c:set var="monitoringURL">
 			<html:rewrite page="/monitoring.do" />
 		</c:set>
@@ -82,19 +89,23 @@ http://www.gnu.org/licenses/gpl.txt
 			<div class="tabbody content_b" >
 				<jsp:include page="/monitoring/SummaryContent.jsp" />
 			</div>		         
-			<table align=right> 	  
-			<tr> <td> 
-				<c:out value="${sessionScope.endLearningMessage}" escapeXml="false"/>
-			</td> </tr>
-		
-			<tr>
-				 <td> 
-					<html:submit onclick="javascript:submitMethod('endLearning');" styleClass="button">
-						<bean:message key="button.endLearning"/>
-					</html:submit>	 				 		  					
-				</td> 
-			</tr>
-			</table>
+
+			<c:if test="${ requestLearningReportViewOnly != 'true'}"> 			
+				<table align=right> 	  
+				<tr> <td> 
+					<c:out value="${sessionScope.endLearningMessage}" escapeXml="false"/>
+				</td> </tr>
+			
+				<tr>
+					 <td> 
+						<html:submit onclick="javascript:submitMethod('endLearning');" styleClass="button">
+							<bean:message key="button.endLearning"/>
+						</html:submit>	 				 		  					
+					</td> 
+				</tr>
+				</table>
+			</c:if> 				    
+			
 	</html:form>
 </body>
 </html:html>

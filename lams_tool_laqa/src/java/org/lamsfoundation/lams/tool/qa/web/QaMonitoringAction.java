@@ -484,6 +484,19 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	public void refreshSummaryData(HttpServletRequest request, QaContent qaContent, IQaService qaService, 
 			boolean isUserNamesVisible, boolean isLearnerRequest, String currentSessionId)
 	{
+		if (qaService == null)
+		{
+			logger.debug("will retrieve qaService");
+			qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
+			logger.debug("retrieving qaService from session: " + qaService);
+		}
+		if (qaService == null)
+		{
+	    	qaService = (IQaService)request.getSession().getAttribute(TOOL_SERVICE);
+			logger.debug("qaService: " + qaService);
+		}
+
+		
 		logger.debug("isUserNamesVisible: " + isUserNamesVisible);
 		logger.debug("isLearnerRequest: " + isLearnerRequest);
 				
