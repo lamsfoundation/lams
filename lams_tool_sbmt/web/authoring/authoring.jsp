@@ -1,17 +1,27 @@
 <%@ include file="../sharing/share.jsp" %>
 <%@ taglib uri="fck-editor" prefix="FCK"%>
 <%@ taglib uri="tags-lams" prefix="lams" %>
+<%@ page import="java.util.HashSet" %>
+<%@ page import="java.util.Set" %>
 
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
-
+    <% 
+    	
+		Set tabs = new HashSet();
+		tabs.add("label.authoring.heading.basic");
+		tabs.add("label.authoring.heading.advance");
+		tabs.add("label.authoring.heading.instructions");
+		pageContext.setAttribute("tabs", tabs);
+		
+	%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html:html locale="true">
 <head>
 	<title>Submit Files</title>
 	<!-- depending on user / site preference this will get changed probbably use passed in variable from flash to select which one to use-->
-    <link href="${tool}author_page/css/aqua.css" rel="stylesheet" type="text/css">
-	
+    <link href="<c:out value="${tool}"/>author_page/css/aqua.css" rel="stylesheet" type="text/css">
+    
 	<!-- this is the custom CSS for hte tool -->
 	<link href="${tool}author_page/css/tool_custom.css" rel="stylesheet" type="text/css">
 
@@ -20,9 +30,14 @@
     <script type="text/javascript" src="${lams}fckeditor/fckeditor.js"></script>
     <script type="text/javascript" src="${tool}author_page/js/fckcontroller.js"></script>
     <link href="${tool}author_page/css/fckeditor_style.css" rel="stylesheet" type="text/css">
-    
+
     <script>
+    
+    	var imgRoot="${lams}images/";
+	    var themeName="aqua";
+        
         function init(){
+        
             initTabSize(3);
             
             var tag = document.getElementById("currentTab");
@@ -54,8 +69,8 @@
     <!-- ******************** END FCK Editor related javascript & HTML ********************** -->
     
     
-	<script type="text/javascript" src="${tool}author_page/js/tabcontroller.js"></script>    
-	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
+	<script type="text/javascript" src="<c:out value="${tool}"/>author_page/js/tabcontroller.js"></script>    
+	<script type="text/javascript" src="<c:out value="${lams}"/>includes/javascript/common.js"></script>
 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/xmlrequest.js'/>"></script>
 </head>
 <body onLoad="init()">
@@ -69,11 +84,7 @@
 <h1><fmt:message key="label.authoring.heading" /></h1>
 
 <!-- start tabs -->
-<lams:Tabs>
-	<lams:Tab id="1" key="label.authoring.heading.basic"/>
-	<lams:Tab id="2" key="label.authoring.heading.advance"/>
-	<lams:Tab id="3" key="label.authoring.heading.instructions"/>
-</lams:Tabs>
+<lams:Tabs collection="${tabs}" useKey="true"/>
 <!-- end tab buttons -->
 <div class="tabbody">
 <table align=center> 	  
