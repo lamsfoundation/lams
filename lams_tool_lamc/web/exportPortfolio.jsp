@@ -35,7 +35,6 @@ http://www.gnu.org/licenses/gpl.txt
 <html:html locale="true">
   	<head>    
 	    <title><bean:message key="label.exportPortfolio"/></title>
-		<lams:css localLink="true" />
 	</head>  
   	<body>
    		<h1><bean:message key="label.exportPortfolio.simple"/></h1>

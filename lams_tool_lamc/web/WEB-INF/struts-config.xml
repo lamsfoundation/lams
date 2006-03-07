@@ -442,7 +442,7 @@
 	  	/>
 	</action>  
 
-   <!--Export Prtfolio Action -->
+   <!--Export Portfolio Action -->
 	    <action
 		      path="/exportPortfolio"
 		      type="org.lamsfoundation.lams.tool.mc.web.McExportAction"
