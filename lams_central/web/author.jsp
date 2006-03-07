@@ -1,6 +1,7 @@
 <%@ taglib uri="tags-lams" prefix="lams" %>
+<%@ taglib uri="tags-core" prefix="c" %>
 <%@ page import="org.lamsfoundation.lams.util.Configuration" import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
-
+<%@ page import="org.lamsfoundation.lams.themes.dto.CSSThemeBriefDTO" %>
 <HTML>
 <HEAD>
 <meta http-equiv=Content-Type content="text/html; charset=iso-8859-1">
@@ -233,12 +234,12 @@ function checkSaved(){
   <param name="allowScriptAccess" value="sameDomain" />
 
  <!-- <param name="movie" value="lams_authoring.swf?userID=<lams:user property="userID"/>&serverURL=<%=pathToRoot%>&build=<%=authoringClientVersion%>&lang=<%=serverLanguage%>&date=<%=languageDate%>">-->
-  <param name="movie" value="lams_authoring.swf?userID=<lams:user property="userID"/>&serverURL=<%=pathToRoot%>&build=<%=authoringClientVersion%>&lang=es&date=<%=languageDate%>">
+  <param name="movie" value="lams_authoring.swf?userID=<lams:user property="userID"/>&serverURL=<%=pathToRoot%>&build=<%=authoringClientVersion%>&lang=es&date=<%=languageDate%>&theme=<lams:user property="theme"/>">
   <param name="quality" value="high">
   <param name="scale" value="noscale">
   <param name="bgcolor" value="#B3B7C8">
   <embed 	
-   	  src="lams_authoring.swf?userID=<lams:user property="userID"/>&serverURL=<%=pathToRoot%>&build=<%=authoringClientVersion%>&lang=es&date=<%=languageDate%>"
+   	  src="lams_authoring.swf?userID=<lams:user property="userID"/>&serverURL=<%=pathToRoot%>&build=<%=authoringClientVersion%>&lang=es&date=<%=languageDate%>&theme=<lams:user property="theme"/>"
 	  quality="high" 
 	  scale="noscale" 
 	  bgcolor="#B3B7C8"  
