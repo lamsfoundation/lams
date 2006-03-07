@@ -73,7 +73,7 @@ public class CustomStrutsExceptionHandler extends ExceptionHandler {
 	        logger.error("errorMessage: " + errorMessage);
 	        ActionMessage error = null;
 	        if (QaApplicationException.class.isInstance(ex) ) {
-		        error = new ActionMessage(QaAppConstants.ERROR_MCAPPLICATION, errorMessage );
+		        error = new ActionMessage(QaAppConstants.ERROR_QAAPPLICATION, errorMessage );
 	        }        
 	        storeException(request, property, error, forward, ae.getScope( ));
 	        /* process the exception as normal */

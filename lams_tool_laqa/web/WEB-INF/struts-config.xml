@@ -16,6 +16,7 @@
 	<form-bean name="QaAuthoringForm" type="org.lamsfoundation.lams.tool.qa.web.QaAuthoringForm"/>
    	<form-bean name="QaLearningForm" type="org.lamsfoundation.lams.tool.qa.web.QaLearningForm"/>
    	<form-bean name="QaMonitoringForm" type="org.lamsfoundation.lams.tool.qa.web.QaMonitoringForm"/>
+	<form-bean name="QaExportForm" type="org.lamsfoundation.lams.tool.qa.web.QaExportForm"/>		   	
 </form-beans>
 
   <!-- ========== Global Exceptions Definitions =================================== -->
@@ -284,6 +285,29 @@
 		    redirect="true"
 	  	/>
 	</action>
+	
+	   <!--Export Portfolio Action -->
+	    <action
+		      path="/exportPortfolio"
+		      type="org.lamsfoundation.lams.tool.qa.web.QaExportAction"
+		      name="QaExportForm"
+		      scope="session"
+		      parameter="mode"
+		      unknown="false"
+		      validate="false"
+	    >
+	    <forward
+    	    name="exportPortfolio"
+        	path="/exportPortfolio.jsp"
+	        redirect="false"
+    	  />
+
+	  	<forward
+		    name="errorList"
+		    path="/McErrorBox.jsp"
+		    redirect="true"
+	  	/>
+    </action>
 
  </action-mappings>
 

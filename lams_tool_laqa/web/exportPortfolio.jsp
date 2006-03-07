@@ -27,13 +27,11 @@ http://www.gnu.org/licenses/gpl.txt
 <%@ taglib uri="fck-editor" prefix="FCK" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
-<c:set var="lams"><lams:LAMSURL/></c:set>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html:html locale="true">
   	<head>    
 	    <title><bean:message key="label.exportPortfolio"/></title>
-		<lams:css localLink="true" />
 	</head>  
   	<body>
    		<h1><bean:message key="label.exportPortfolio.simple"/></h1>

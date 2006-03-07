@@ -30,7 +30,7 @@ public interface QaAppConstants {
 	public static final long DEFAULT_CONTENT_ID 						=0;
     public static final long DEFAULT_QUE_CONTENT_ID 					=1;
 	public static final String TOOL_SERVICE								="tool_service";
-	public static final String ERROR_MCAPPLICATION 						= "error.exception.QaApplication";
+	public static final String ERROR_QAAPPLICATION 						= "error.exception.QaApplication";
 	public static final String TOOL_CONTENT_ID 							= "toolContentID";
 
 	public static final String TARGET_MODE								="targetMode";

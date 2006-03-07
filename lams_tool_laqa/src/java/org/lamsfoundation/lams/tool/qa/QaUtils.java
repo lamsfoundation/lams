@@ -437,7 +437,7 @@ public abstract class QaUtils implements QaAppConstants {
 	public static void cleanUpSessionAbsolute(HttpServletRequest request)
 	{
 		request.getSession().removeAttribute(MY_SIGNATURE);
-		request.getSession().removeAttribute(ERROR_MCAPPLICATION);
+		request.getSession().removeAttribute(ERROR_QAAPPLICATION);
 		request.getSession().removeAttribute(TARGET_MODE);
 		request.getSession().removeAttribute(TARGET_MODE_AUTHORING);
 		request.getSession().removeAttribute(TARGET_MODE_LEARNING);
