@@ -21,6 +21,10 @@
     <link href="${tool}author_page/css/fckeditor_style.css" rel="stylesheet" type="text/css">
     
 	<script type="text/javascript">
+		var imgRoot="${lams}images/";
+	    var themeName="aqua";
+        
+	
 		 function init(){
             initTabSize(5);
             
