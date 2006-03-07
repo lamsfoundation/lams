@@ -39,7 +39,10 @@ http://www.gnu.org/licenses/gpl.txt
 			
 			<c:if test="${questionListingMode == 'questionListingModePreview'}"> 						
 				<tr><td NOWRAP class="input" valign=top>
-					<font size=2> </b> <bean:message key="label.preview"/> </b> </font>
+					<font size=2> <b> <bean:message key="label.preview"/> </b> </font>
+				</td></tr>
+				<tr><td NOWRAP class="input" valign=top>
+					&nbsp&nbsp&nbsp&nbsp&nbsp
 				</td></tr>
 			</c:if> 		
 			

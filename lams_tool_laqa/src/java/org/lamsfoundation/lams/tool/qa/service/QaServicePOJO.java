@@ -289,6 +289,21 @@ public class QaServicePOJO
     }
     
     
+    public QaQueUsr getQaUserBySession(final Long queUsrId, final Long qaSessionId) throws QaApplicationException
+	{
+ 	   try
+       {
+	   		return qaQueUsrDAO.getQaUserBySession(queUsrId, qaSessionId);
+       }
+       catch (DataAccessException e)
+       {
+           throw new QaApplicationException("Exception occured when lams is getting  qa QueUsr: "
+                                                        + e.getMessage(),
+														   e);
+       }
+	}
+    
+    
     public QaQueUsr loadQaQueUsr(Long userId) throws QaApplicationException
     {
 	   try

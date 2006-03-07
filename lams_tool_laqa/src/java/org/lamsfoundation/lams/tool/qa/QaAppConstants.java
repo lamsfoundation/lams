@@ -43,6 +43,7 @@ public interface QaAppConstants {
 	public static final String LOAD_LEARNER								="loadLearner";
 	public static final String LEARNING_STARTER							="learningStarter";
 	public static final String MONITORING_STARTER						="monitoringStarter";
+	public static final String EXPORT_PORTFOLIO 						= "exportPortfolio";
 	public static final String LOAD_MONITORING							="loadMonitoring";
 	public static final String LOAD_VIEW_ONLY						="loadViewOnly";
 	public static final String EDIT_RESPONSE							="editResponse";
@@ -52,6 +53,7 @@ public interface QaAppConstants {
 	public static final String ERROR_LIST_LEARNER						="errorListLearner";
 	public static final String DEFAULT_CONTENT_ID_STR					="defaultContentIdStr";
 	public static final String TOOL_SESSION_ID 							= "toolSessionID";
+	public static final String EXPORT_USER_ID							="exportUserId";
 	
 	public static final String ACTIVE_MODULE							="activeModule";
 	public static final String AUTHORING								="authoring";

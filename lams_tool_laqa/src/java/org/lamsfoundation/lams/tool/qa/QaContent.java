@@ -64,6 +64,9 @@ public class QaContent implements Serializable {
     /** nullable persistent field */
     private String instructions;
     
+    /** persistent field, used for export portfolio */
+    private String content;
+    
     /** nullable persistent field */
     private String reportTitle;
     
@@ -119,6 +122,7 @@ public class QaContent implements Serializable {
     
     /** full constructor */
     public QaContent(Long 		qaContentId,
+    				 String 	content,
                      String 	title,
 	                 String 	instructions,
 	                 String 	reportTitle,
@@ -140,6 +144,7 @@ public class QaContent implements Serializable {
 					 Set 		qaUploadedFiles)
     {
         this.qaContentId 		 = qaContentId;
+        this.content 		 	 = content;
         this.title 				 = title;
         this.instructions 		 = instructions;
         this.reportTitle 		 = reportTitle;
@@ -174,6 +179,7 @@ public class QaContent implements Serializable {
             Long newContentId)
     {
     	QaContent newContent = new QaContent(newContentId,
+    				 qa.getContent(),
                      qa.getTitle(),
                      qa.getInstructions(),
                      qa.getReportTitle(),
@@ -200,7 +206,6 @@ public class QaContent implements Serializable {
 	}
 
     
-    //part of the contract: make sure that this works!
     public Set deepCopyQaQueContent(QaContent newQaContent)
     {
     	logger.debug(logger + " " + "QaContent" +  " " + "start of deepCopyQaQueContent");
@@ -215,8 +220,6 @@ public class QaContent implements Serializable {
         logger.debug(logger + " " + "QaContent" +  " " + "returning newQaQueContent: " + newQaQueContent);
         return newQaQueContent;
     }
-    
-    
     
     
     public Set deepCopyQaSession(QaContent newQaSession)
@@ -298,13 +301,7 @@ public class QaContent implements Serializable {
                                         .toString();
     }
 
-	
 
-    /**
-     * Since the survey content id is assigned variable, we can use content id
-     * to ensure two survey objects are equal.
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     public boolean equals(Object other)
     {
         if (!(other instanceof QaContent))
@@ -315,11 +312,7 @@ public class QaContent implements Serializable {
 										  .isEquals();
     }
 
-    /**
-     * Since the survey content id is assigned variable, we can use content id
-     * to ensure two survey objects are equal.
-     * @see java.lang.Object#hashCode()
-     */
+
     public int hashCode()
     {
         return new HashCodeBuilder().append(getQaContentId()).toHashCode();
@@ -532,5 +525,17 @@ public class QaContent implements Serializable {
 	 */
 	public void setUid(Long uid) {
 		this.uid = uid;
+	}
+	/**
+	 * @return Returns the content.
+	 */
+	public String getContent() {
+		return content;
+	}
+	/**
+	 * @param content The content to set.
+	 */
+	public void setContent(String content) {
+		this.content = content;
 	}
 }

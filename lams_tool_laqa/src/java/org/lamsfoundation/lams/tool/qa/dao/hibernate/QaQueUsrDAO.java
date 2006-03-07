@@ -77,6 +77,26 @@ public class QaQueUsrDAO extends HibernateDaoSupport implements IQaQueUsrDAO {
 				return null;
 		}
 
+
+		public QaQueUsr getQaUserBySession(final Long queUsrId, final Long qaSessionId)
+		{
+			
+			String strGetUser = "from qaQueUsr in class QaQueUsr where qaQueUsr.queUsrId=:queUsrId and qaQueUsr.qaSessionId=:qaSessionId";
+	        HibernateTemplate templ = this.getHibernateTemplate();
+			List list = getSession().createQuery(strGetUser)
+				.setLong("queUsrId", queUsrId.longValue())
+				.setLong("qaSessionId", qaSessionId.longValue())				
+				.list();
+			
+			if(list != null && list.size() > 0){
+				QaQueUsr usr = (QaQueUsr) list.get(0);
+				return usr;
+			}
+			return null;
+		}
+
+		
+		
 		
 		public List getUserBySessionOnly(final QaSession qaSession)
 	    {

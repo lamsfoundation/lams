@@ -38,7 +38,9 @@ public interface IQaQueUsrDAO
 	
     public QaQueUsr getQaQueUsrById(long qaQueUsrId);
     
-    public QaQueUsr loadQaQueUsrById(long qaQueUsrId); 
+    public QaQueUsr loadQaQueUsrById(long qaQueUsrId);
+    
+    public QaQueUsr getQaUserBySession(final Long queUsrId, final Long qaSessionId);
     
     public void createUsr(QaQueUsr usr);
     
