@@ -35,6 +35,8 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.apache.commons.beanutils.PropertyUtils;
 
+import org.lamsfoundation.lams.themes.dto.CSSThemeBriefDTO;
+
 /**
  * Output a property from the userDTO object in the shared session.
  * 
@@ -93,6 +95,10 @@ public class UserTag extends TagSupport {
 				
 		        try {
 		            value = PropertyUtils.getProperty(user, property);
+		            if( property.equals("theme")) {
+		            	CSSThemeBriefDTO cssTheme = (CSSThemeBriefDTO) value;
+		            	value = (String) cssTheme.getName();
+		            }
 		        } catch (Exception e) {
 					log.warn("UserTag unable to write out user details due to exception while accessing property value. User id "+user.getUserID(), e);
 		        }
