@@ -195,6 +195,7 @@ public interface QaAppConstants {
     public static final String TO_TOOL_CONTENT_ID						="toToolContentId";
     public static final String LEARNER_REPORT							="learnerRep";
     public static final String REQUEST_LEARNING_REPORT					="requestLearningReport";
+    public static final String REQUEST_PREVIEW							="requestPreview";
     public static final String REQUEST_LEARNING_REPORT_VIEWONLY			="requestLearningReportViewOnly";    
     
             
@@ -214,6 +215,7 @@ public interface QaAppConstants {
     
     public static final String QUESTION_LISTING_MODE					="questionListingMode";
     public static final String QUESTION_LISTING_MODE_SEQUENTIAL			="questionListingModeSequential";
+    public static final String QUESTION_LISTING_MODE_PREVIEW			="questionListingModePreview";
     public static final String QUESTION_LISTING_MODE_COMBINED			="questionListingModeCombined";
     
     public static final String FEEDBACK_TYPE_SEQUENTIAL					="You will be presented a total of : ";

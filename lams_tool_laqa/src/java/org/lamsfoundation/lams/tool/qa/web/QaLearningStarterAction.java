@@ -131,6 +131,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 		/*initialize available question display modes in the session */
 		request.getSession().setAttribute(QUESTION_LISTING_MODE_SEQUENTIAL,QUESTION_LISTING_MODE_SEQUENTIAL);
 	    request.getSession().setAttribute(QUESTION_LISTING_MODE_COMBINED, QUESTION_LISTING_MODE_COMBINED);
+	    request.getSession().setAttribute(QUESTION_LISTING_MODE_PREVIEW, QUESTION_LISTING_MODE_PREVIEW);
 	    
 		IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
 	    logger.debug("retrieving qaService: " + qaService);
@@ -332,9 +333,6 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
     	String userFeedback= feedBackType + request.getSession().getAttribute(TOTAL_QUESTION_COUNT) + QUESTIONS;
     	request.getSession().setAttribute(USER_FEEDBACK, userFeedback);
     	
-    	
-    	
-    	
     	/* Is the request for a preview by the author?
     	Preview The tool must be able to show the specified content as if it was running in a lesson. 
 		It will be the learner url with tool access mode set to ToolAccessMode.AUTHOR 
@@ -353,8 +351,11 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
     		/*complete this section */
     		logger.debug("Author requests for a preview of the content.");
 			logger.debug("existing qaContent:" + qaContent);
-    		
-			return (mapping.findForward(LEARNING_STARTER)); 
+			
+			/* overwrite qiestionListing mode for preview*/
+			request.getSession().setAttribute(QUESTION_LISTING_MODE, QUESTION_LISTING_MODE_PREVIEW);
+			logger.debug("forwarding to for preview: " + LOAD_LEARNER);
+			return (mapping.findForward(LOAD_LEARNER));	
     	}
     	
     	/* by now, we know that the mode is either teacher or learner

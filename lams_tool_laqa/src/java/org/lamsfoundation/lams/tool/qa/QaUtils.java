@@ -528,6 +528,7 @@ public abstract class QaUtils implements QaAppConstants {
 		request.getSession().removeAttribute(QUESTION_LISTING_MODE);
 		request.getSession().removeAttribute(QUESTION_LISTING_MODE_SEQUENTIAL);
 		request.getSession().removeAttribute(QUESTION_LISTING_MODE_COMBINED);
+		request.getSession().removeAttribute(QUESTION_LISTING_MODE_COMBINED);
 		request.getSession().removeAttribute(FEEDBACK_TYPE_SEQUENTIAL);
 		request.getSession().removeAttribute(FEEDBACK_TYPE_COMBINED);
 		request.getSession().removeAttribute(QUESTIONS);
@@ -549,7 +550,9 @@ public abstract class QaUtils implements QaAppConstants {
 		request.getSession().removeAttribute(LOAD_MONITORING_CONTENT_EDITACTIVITY);
 		request.getSession().removeAttribute(MONITORING_ORIGINATED_DEFINELATER);
 		request.getSession().removeAttribute(REQUEST_LEARNING_REPORT);
-		request.getSession().removeAttribute(REQUEST_LEARNING_REPORT_VIEWONLY);		
+		request.getSession().removeAttribute(REQUEST_LEARNING_REPORT_VIEWONLY);
+		request.getSession().removeAttribute(REQUEST_PREVIEW);
+		
 		
 		request.getSession().removeAttribute(USER_EXCEPTION_WRONG_FORMAT);
 		request.getSession().removeAttribute(USER_EXCEPTION_UNCOMPATIBLE_IDS);

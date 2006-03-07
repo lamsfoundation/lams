@@ -30,19 +30,30 @@ http://www.gnu.org/licenses/gpl.txt
 		<html:form  action="/learning?method=displayQ&validate=false" method="POST" target="_self">
 		<br>
 		<table align=center bgcolor="#FFFFFF"> 
-			<tr><td NOWRAP class="input" valign=top>
-				<font size=2> <b> <c:out value="${sessionScope.activityTitle}" escapeXml="false"/> </b> </font>
-			</td></tr>
-			
-			<tr> <td class="error">
-				<html:errors/>
-			</td></tr>
 		
-			<c:if test="${sessionScope.isDefineLater == 'true'}"> 			
-				<tr> <td class="error">
-					<bean:message key="error.defineLater"/>
+			<c:if test="${questionListingMode != 'questionListingModePreview'}"> 						
+				<tr><td NOWRAP class="input" valign=top>
+					<font size=2> <b> <c:out value="${sessionScope.activityTitle}" escapeXml="false"/> </b> </font>
 				</td></tr>
 			</c:if> 		
+			<c:if test="${questionListingMode == 'questionListingModePreview'}"> 						
+				<tr><td NOWRAP class="input" valign=top>
+					<bean:message key="label.preview"/>
+				</td></tr>
+			</c:if> 		
+			
+			<c:if test="${questionListingMode != 'questionListingModePreview'}"> 						
+				<tr> <td class="error">
+					<html:errors/>
+				</td></tr>
+
+				<c:if test="${sessionScope.isDefineLater == 'true'}"> 			
+					<tr> <td class="error">
+						<bean:message key="error.defineLater"/>
+					</td></tr>
+				</c:if> 		
+			</c:if>														  					 									  													  			
+			
 			<c:if test="${sessionScope.isDefineLater == 'false'}"> 			
 				<c:if test="${sessionScope.isToolActivityOffline == 'true'}"> 			
 					<tr> <td class="error">
@@ -63,6 +74,11 @@ http://www.gnu.org/licenses/gpl.txt
 					  <c:when test="${sessionScope.questionListingMode == sessionScope.questionListingModeSequential}" > 
 							<jsp:include page="/learning/SequentialAnswersContent.jsp" /> 
 					  </c:when> 
+
+  					  <c:when test="${sessionScope.questionListingMode == sessionScope.questionListingModePreview}" > 
+							<jsp:include page="/learning/Preview.jsp" /> 
+					  </c:when> 
+					  
 					  <c:otherwise>
 						  	<jsp:include page="/learning/CombinedAnswersContent.jsp" /> 
 					  </c:otherwise>
@@ -70,7 +86,7 @@ http://www.gnu.org/licenses/gpl.txt
 				</c:if> 		
 		  	</c:if> 		
 	 	</table>
-		</html:form>
+	</html:form>
 	
 	
 	

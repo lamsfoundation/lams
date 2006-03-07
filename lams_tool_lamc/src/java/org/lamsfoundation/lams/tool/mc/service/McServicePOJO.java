@@ -1033,7 +1033,6 @@ public class McServicePOJO implements
                                                         + e.getMessage(),
 														   e);
        }
-    	
 	}
     
     public User getCurrentUserData(String username) throws McApplicationException
