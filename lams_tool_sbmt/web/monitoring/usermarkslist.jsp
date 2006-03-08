@@ -70,4 +70,11 @@
 		</tr>
 		</span>
 	</c:forEach>
+			<tr>
+				<td colspan="2">
+					<html:link href="javascript:doSubmit('unspecified', 1);" property="submit" styleClass="button">
+							<bean:message key="label.monitoring.finishedMarks.button" />
+					</html:link>
+				</td>
+			</tr>
 </table>			

@@ -1,6 +1,6 @@
 <%@include file="../sharing/share.jsp" %>
 <%@ taglib uri="tags-logic" prefix="logic" %>
-				<table class="forms">					
+				<table border="0" cellpadding="2" cellspacing="2">					
 					<tr>
 			  			<td class="formcontrol">
 			  			<html:link href="javascript:doSubmit('viewAllMarks', 5);" property="viewAllMarks" styleClass="button">

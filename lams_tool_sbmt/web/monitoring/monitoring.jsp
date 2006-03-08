@@ -44,8 +44,15 @@
         	var tag = document.getElementById("currentTab");
 	    	tag.value = tabId;
 	    	// end optional tab controller stuff
-	    	selectTab(tabId);
+	    	if(active(tabId))
+	    		selectTab(tabId);
         } 
+        
+        function active(tabId) {
+        	if(document.getElementById("tab" + tabId).className == "tab tabcentre_inactive")
+        		return false;
+        	return true;
+        }
         
         function doSubmit(method, tabId) {
         	if(tabId != null)
@@ -73,7 +80,7 @@
 			<lams:Tab id="2" key="label.monitoring.heading.instructions"/>
 			<lams:Tab id="3" key="label.monitoring.heading.edit.activity"/>
 			<lams:Tab id="4" key="label.monitoring.heading.stats"/>
-			<lams:Tab id="5" key="label.monitoring.heading.marking"/>
+			<lams:Tab id="5" key="label.monitoring.heading.marking" inactive="true"/>
 		</lams:Tabs>
 	<!-- end tab buttons -->
 	<div class="tabbody">

@@ -17,5 +17,12 @@
 					<lams:SetEditor id="Instructions" text="${authoring.instruction}"/>
 				</td>
 			</tr>
+			<tr>
+				<td colspan="2">
+					<html:link href="javascript:doSubmit('updateActivity');" property="Update" styleClass="button">
+								<bean:message key="label.monitoring.edit.activity.update"/>
+					</html:link>
+				</td>
+			</tr>
 		</table>
 	</div>

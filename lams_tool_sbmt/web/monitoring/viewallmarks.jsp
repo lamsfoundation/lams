@@ -4,7 +4,7 @@
 			<c:set var="filesUploaded" value="${user.value}"/>
 			<c:set var="first" value="true"/>
 			<c:forEach items="${filesUploaded}"  var ="details" >			
-				<span><p>			
+				<p>			
 					<c:if test="${first}">
 						<c:set var="first" value="false"/>
 					    <tr>
@@ -16,8 +16,7 @@
 				    </c:if>
 				<tr>
 					<td>File Path: </td>
-						<td>
-						</td><td><c:out value="${details.filePath}" /> 
+					<td><c:out value="${details.filePath}" /> 
 						<c:set var="viewURL">
 							<html:rewrite page="/download/?uuid=${details.uuID}&versionID=${details.versionID}&preferDownload=false"/>
 						</c:set>
@@ -30,7 +29,7 @@
 						<a href="<c:out value='${downloadURL}' escapeXml='false'/>">
 									<fmt:message key="label.download"/>
 						</a>
-						</td>					
+					</td>					
 					
 				</tr>
 				<tr>
@@ -76,7 +75,13 @@
 							</html:link>
 					</td>
 				</tr>
-				</span>
 			</c:forEach>
 		</c:forEach>
+			<tr>
+				<td colspan="2">
+					<html:link href="javascript:doSubmit('unspecified', 1);" property="submit" styleClass="button">
+							<bean:message key="label.monitoring.finishedMarks.button" />
+					</html:link>
+				</td>
+			</tr>
 		</table>	
