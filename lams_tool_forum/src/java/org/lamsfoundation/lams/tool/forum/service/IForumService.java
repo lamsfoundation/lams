@@ -83,6 +83,13 @@ public interface IForumService {
      */
     public Message updateTopic(Message message) throws PersistenceException;
     /**
+     * Hide a message by given <code>Message</code> instance
+     * @param message
+     * @return
+     * @throws PersistenceException
+     */
+    public Message updateMessageHideFlag(Long messageId, boolean hideFlag) throws PersistenceException;
+    /**
      * Reply a topic.
      * @param parentId
      * @param sessionId ToolSessionID

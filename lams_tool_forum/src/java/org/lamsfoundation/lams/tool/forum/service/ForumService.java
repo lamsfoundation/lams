@@ -55,7 +55,6 @@ import org.lamsfoundation.lams.tool.forum.util.ForumToolContentHandler;
 import org.lamsfoundation.lams.tool.forum.util.TopicComparator;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.util.MessageService;
-import org.springframework.context.support.MessageSourceAccessor;
 
 /**
  * 
@@ -151,6 +150,16 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
         
         return message;
     }
+     
+    public Message updateMessageHideFlag(Long messageId, boolean hideFlag) {
+    	
+    	Message message = getMessage(messageId);
+    	message.setHideFlag(hideFlag);
+    	
+    	// update message
+    	messageDao.update(message);
+    	return message;
+     }
 
     public Message getMessage(Long messageUid) throws PersistenceException {
         return (Message) messageDao.getById(messageUid);
