@@ -51,9 +51,10 @@ public interface ForumConstants {
 	public static final String MONITOR_MODE = "monitor_mode";
 
 	public static final String FINISHEDLOCK = "finishedLock";
-
-
-
 	
+	// used in monitoring 
+	public static final String TITLE = "title";
+	public static final String INSTRUCTIONS = "instructions";
+	public static final String PAGE_EDITABLE = "isPageEditable";
 	
 }
