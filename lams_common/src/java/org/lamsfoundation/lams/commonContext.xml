@@ -120,6 +120,24 @@
 		</property>
 	</bean>
 	
+	<bean id="themeServiceTarget" class="org.lamsfoundation.lams.themes.service.ThemeService">
+		<property name="themeDAO"><ref local="themeDAO"/></property>
+		<property name="userDAO"><ref local="userDAO"/></property>
+	</bean>
+	
+	<bean id="themeService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name ="transactionManager"><ref bean ="transactionManager"/></property>
+		<property name ="target"><ref bean="themeServiceTarget"/></property>
+		<property name="proxyTargetClass"><value>true</value></property> 
+		<property name="transactionAttributes">
+			<props>
+				<prop key="get*">PROPAGATION_REQUIRED</prop>
+				<prop key="store*">PROPAGATION_REQUIRED</prop>
+				<prop key="set*">PROPAGATION_REQUIRED</prop>
+			</props>
+		</property>
+	</bean>
+		
 	<!-- Learning Design related beans-->
 	
 	<bean id="activityDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO">
