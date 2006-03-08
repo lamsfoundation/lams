@@ -55,6 +55,7 @@ public class SynchGateActivity extends GateActivity implements Serializable {
             Integer activityTypeId, 
             Transition transitionTo,
             Transition transitionFrom,
+            String languageFile,
             Integer gateActivityLevelId,
             Set waitingLearners) {
         super(activityId, 
@@ -75,6 +76,7 @@ public class SynchGateActivity extends GateActivity implements Serializable {
                 activityTypeId,  
                 transitionTo,
 				transitionFrom,
+				languageFile,
                 gateActivityLevelId,
                 waitingLearners);
         super.simpleActivityStrategy = new SynchGateActivityStrategy(this);
@@ -144,6 +146,7 @@ public class SynchGateActivity extends GateActivity implements Serializable {
     	newSynchGateActivity.setRunOffline(this.getRunOffline());
     	newSynchGateActivity.setLibraryActivity(this.getLibraryActivity());
     	newSynchGateActivity.setLibraryActivityUiImage(this.getLibraryActivityUiImage());
+    	newSynchGateActivity.setLanguageFile(this.getLanguageFile());
     	
     	return newSynchGateActivity;    	
     }

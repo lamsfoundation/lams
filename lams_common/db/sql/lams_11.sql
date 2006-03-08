@@ -170,62 +170,6 @@ CREATE TABLE lams_workspace (
                   REFERENCES lams_workspace_folder (workspace_folder_id)
 )TYPE=InnoDB;
 
-CREATE TABLE lams_organisation (
-       organisation_id BIGINT(20) NOT NULL AUTO_INCREMENT
-     , name VARCHAR(250)
-     , description VARCHAR(250)
-     , parent_organisation_id BIGINT(20)
-     , organisation_type_id INT(3) NOT NULL DEFAULT 0
-     , create_date DATETIME NOT NULL
-     , workspace_id BIGINT(20)
-     , PRIMARY KEY (organisation_id)
-     , INDEX (organisation_type_id)
-     , CONSTRAINT FK_lams_organisation_1 FOREIGN KEY (organisation_type_id)
-                  REFERENCES lams_organisation_type (organisation_type_id) ON DELETE NO ACTION ON UPDATE NO ACTION
-     , INDEX (workspace_id)
-     , CONSTRAINT FK_lams_organisation_2 FOREIGN KEY (workspace_id)
-                  REFERENCES lams_workspace (workspace_id) ON DELETE NO ACTION ON UPDATE NO ACTION
-     , INDEX (parent_organisation_id)
-     , CONSTRAINT FK_lams_organisation_3 FOREIGN KEY (parent_organisation_id)
-                  REFERENCES lams_organisation (organisation_id) ON DELETE NO ACTION ON UPDATE NO ACTION
-)TYPE=InnoDB;
-
-CREATE TABLE lams_css_theme_ve (
-       theme_ve_id BIGINT(20) NOT NULL AUTO_INCREMENT
-     , name VARCHAR(100) NOT NULL
-     , description VARCHAR(100)
-     , parent_id BIGINT(20)
-     , theme_flag TINYINT(1) NOT NULL DEFAULT 0
-     , PRIMARY KEY (theme_ve_id)
-     , INDEX (parent_id)
-     , CONSTRAINT FK_lams_css_theme_ve_2 FOREIGN KEY (parent_id)
-                  REFERENCES lams_css_theme_ve (theme_ve_id) ON DELETE NO ACTION ON UPDATE NO ACTION
-)TYPE=InnoDB;
-ALTER TABLE lams_css_theme_ve COMMENT='Stores both the Flash theme and visual element';
-
-CREATE TABLE lams_css_style (
-       style_id BIGINT(20) NOT NULL AUTO_INCREMENT
-     , theme_ve_id BIGINT(20) NOT NULL
-     , PRIMARY KEY (style_id)
-     , INDEX (theme_ve_id)
-     , CONSTRAINT FK_lams_css_style_1 FOREIGN KEY (theme_ve_id)
-                  REFERENCES lams_css_theme_ve (theme_ve_id) ON DELETE NO ACTION ON UPDATE NO ACTION
-)TYPE=InnoDB;
-ALTER TABLE lams_css_style COMMENT='Groups lams_css_property into a CSSStyleDeclaration.';
-
-CREATE TABLE lams_css_property (
-       property_id BIGINT(20) NOT NULL AUTO_INCREMENT
-     , style_id BIGINT(20) NOT NULL
-     , name VARCHAR(255) NOT NULL
-     , value VARCHAR(100) NOT NULL
-     , style_subset VARCHAR(20)
-     , type TINYINT NOT NULL
-     , PRIMARY KEY (property_id)
-  --   , INDEX (style_id)
-  --   , CONSTRAINT FK_lams_css_property_1 FOREIGN KEY (style_id)
-  --                REFERENCES lams_css_style (style_id) ON DELETE NO ACTION ON UPDATE NO ACTION
-)TYPE=InnoDB;
-
 CREATE TABLE lams_user (
        user_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , login VARCHAR(20) NOT NULL
@@ -261,11 +205,15 @@ CREATE TABLE lams_user (
                   REFERENCES lams_workspace (workspace_id) ON DELETE NO ACTION ON UPDATE NO ACTION
      , INDEX (base_organisation_id)
      , CONSTRAINT FK_lams_user_3 FOREIGN KEY (base_organisation_id)
-                  REFERENCES lams_organisation (organisation_id) ON DELETE NO ACTION ON UPDATE NO ACTION
+                  REFERENCES lams_organisation (organisation_id)
      , INDEX (theme_id)
      , CONSTRAINT FK_lams_user_4 FOREIGN KEY (theme_id)
                   REFERENCES lams_css_theme_ve (theme_ve_id) ON DELETE NO ACTION ON UPDATE NO ACTION
 )TYPE=InnoDB;
+ALTER TABLE lams_user MODIFY COLUMN locale_language CHAR(2) NOT NULL DEFAULT 'en'
+      COMMENT 'ISO 639-1 Language Code (2 letter version) Java only supports 2 letter properly, not the 3 letter codes.';
+ALTER TABLE lams_user MODIFY COLUMN locale_country CHAR(2)
+      COMMENT 'ISO 3166 Country Code';
 CREATE UNIQUE INDEX UQ_lams_user_login ON lams_user (login ASC);
 CREATE INDEX login ON lams_user (login ASC);
 
@@ -298,7 +246,6 @@ CREATE TABLE lams_learning_design (
      , lesson_name VARCHAR(255)
      , last_modified_date_time DATETIME
      , PRIMARY KEY (learning_design_id)
-     , INDEX (original_learning_design_id)
      , INDEX (user_id)
      , CONSTRAINT FK_lams_learning_design_3 FOREIGN KEY (user_id)
                   REFERENCES lams_user (user_id)
@@ -312,6 +259,7 @@ CREATE TABLE lams_learning_design (
      , CONSTRAINT FK_lams_learning_design_6 FOREIGN KEY (copy_type_id)
                   REFERENCES lams_copy_type (copy_type_id)
 )TYPE=InnoDB;
+CREATE INDEX idx_design_parent_id ON lams_learning_design (original_learning_design_id ASC);
 CREATE INDEX idx_design_first_act ON lams_learning_design (first_activity_id ASC);
 
 CREATE TABLE lams_grouping (
@@ -339,46 +287,26 @@ CREATE TABLE lams_group (
                   REFERENCES lams_grouping (grouping_id) ON DELETE NO ACTION ON UPDATE NO ACTION
 )TYPE=InnoDB;
 
-CREATE TABLE lams_tool (
-       tool_id BIGINT(20) NOT NULL AUTO_INCREMENT
-     , tool_signature VARCHAR(64) NOT NULL
-     , service_name VARCHAR(255) NOT NULL
-     , tool_display_name VARCHAR(255) NOT NULL
-     , description TEXT
-     , tool_identifier VARCHAR(64) NOT NULL
-     , tool_version VARCHAR(10) NOT NULL
-     , learning_library_id BIGINT(20)
-     , default_tool_content_id BIGINT(20)
-     , valid_flag TINYINT(1) NOT NULL DEFAULT 1
-     , grouping_support_type_id INT(3) NOT NULL
-     , supports_run_offline_flag TINYINT(1) NOT NULL
-     , learner_url TEXT NOT NULL
-     , learner_preview_url TEXT
-     , learner_progress_url TEXT
-     , author_url TEXT NOT NULL
-     , define_later_url TEXT
-     , export_pfolio_learner_url TEXT 
-     , export_pfolio_class_url TEXT
-     , monitor_url TEXT 
-     , contribute_url TEXT
-     , moderation_url TEXT
-     , create_date_time DATETIME NOT NULL
-     , language_file VARCHAR(255)
-     , UNIQUE UQ_lams_tool_sig (tool_signature)
-     , UNIQUE UQ_lams_tool_class_name (service_name)
-     , PRIMARY KEY (tool_id)
-     , INDEX (learning_library_id)
-     , CONSTRAINT FK_lams_tool_1 FOREIGN KEY (learning_library_id)
-                  REFERENCES lams_learning_library (learning_library_id)
-     , INDEX (grouping_support_type_id)
-     , CONSTRAINT FK_lams_tool_2 FOREIGN KEY (grouping_support_type_id)
-                  REFERENCES lams_grouping_support_type (grouping_support_type_id)
+CREATE TABLE lams_organisation (
+       organisation_id BIGINT(20) NOT NULL AUTO_INCREMENT
+     , name VARCHAR(250)
+     , description VARCHAR(250)
+     , parent_organisation_id BIGINT(20)
+     , organisation_type_id INT(3) NOT NULL DEFAULT 0
+     , create_date DATETIME NOT NULL
+     , workspace_id BIGINT(20)
+     , PRIMARY KEY (organisation_id)
+     , INDEX (organisation_type_id)
+     , CONSTRAINT FK_lams_organisation_1 FOREIGN KEY (organisation_type_id)
+                  REFERENCES lams_organisation_type (organisation_type_id) ON DELETE NO ACTION ON UPDATE NO ACTION
+     , INDEX (workspace_id)
+     , CONSTRAINT FK_lams_organisation_2 FOREIGN KEY (workspace_id)
+                  REFERENCES lams_workspace (workspace_id) ON DELETE NO ACTION ON UPDATE NO ACTION
+     , INDEX (parent_organisation_id)
+     , CONSTRAINT FK_lams_organisation_3 FOREIGN KEY (parent_organisation_id)
+                  REFERENCES lams_organisation (organisation_id) ON DELETE NO ACTION ON UPDATE NO ACTION
 )TYPE=InnoDB;
-ALTER TABLE lams_tool MODIFY COLUMN learner_preview_url TEXT
-      COMMENT 'Learner screen for preview a learning design. ';
-ALTER TABLE lams_tool MODIFY COLUMN learner_progress_url TEXT
-      COMMENT 'Teacher''s view of a learner''s screen.';
-      
+
 CREATE TABLE lams_learning_activity (
        activity_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , activity_ui_id INT(11)
@@ -485,6 +413,45 @@ CREATE TABLE lams_lesson (
                   REFERENCES lams_grouping (grouping_id)
 )TYPE=InnoDB;
 
+CREATE TABLE lams_tool (
+       tool_id BIGINT(20) NOT NULL AUTO_INCREMENT
+     , tool_signature VARCHAR(64) NOT NULL
+     , service_name VARCHAR(255) NOT NULL
+     , tool_display_name VARCHAR(255) NOT NULL
+     , description TEXT
+     , tool_identifier VARCHAR(64) NOT NULL
+     , tool_version VARCHAR(10) NOT NULL
+     , learning_library_id BIGINT(20)
+     , default_tool_content_id BIGINT(20)
+     , valid_flag TINYINT(1) NOT NULL DEFAULT 1
+     , grouping_support_type_id INT(3) NOT NULL
+     , supports_run_offline_flag TINYINT(1) NOT NULL
+     , learner_url TEXT NOT NULL
+     , learner_preview_url TEXT
+     , learner_progress_url TEXT
+     , author_url TEXT NOT NULL
+     , define_later_url TEXT
+     , export_portfolio_learner_url TEXT NOT NULL
+     , export_portfolio_class_url TEXT
+     , monitor_url TEXT NOT NULL
+     , contribute_url TEXT
+     , moderation_url TEXT
+     , create_date_time DATETIME NOT NULL
+     , language_file VARCHAR(255)
+     , UNIQUE UQ_lams_tool_sig (tool_signature)
+     , UNIQUE UQ_lams_tool_class_name (service_name)
+     , PRIMARY KEY (tool_id)
+     , INDEX (learning_library_id)
+     , CONSTRAINT FK_lams_tool_1 FOREIGN KEY (learning_library_id)
+                  REFERENCES lams_learning_library (learning_library_id)
+     , INDEX (grouping_support_type_id)
+     , CONSTRAINT FK_lams_tool_2 FOREIGN KEY (grouping_support_type_id)
+                  REFERENCES lams_grouping_support_type (grouping_support_type_id)
+)TYPE=InnoDB;
+ALTER TABLE lams_tool MODIFY COLUMN learner_preview_url TEXT
+      COMMENT 'Learner screen for preview a learning design. ';
+ALTER TABLE lams_tool MODIFY COLUMN learner_progress_url TEXT
+      COMMENT 'Teacher''s view of a learner''s screen.';
 
 CREATE TABLE lams_user_organisation (
        user_organisation_id BIGINT(20) NOT NULL AUTO_INCREMENT
@@ -557,6 +524,32 @@ CREATE TABLE lams_cr_node_version (
 )TYPE=InnoDB;
 ALTER TABLE lams_cr_node_version COMMENT='Represents a version of a node';
 
+CREATE TABLE lams_css_theme_ve (
+       theme_ve_id BIGINT(20) NOT NULL AUTO_INCREMENT
+     , name VARCHAR(100) NOT NULL
+     , description VARCHAR(100)
+     , parent_id BIGINT(20)
+     , theme_flag TINYINT(1) NOT NULL DEFAULT 0
+     , PRIMARY KEY (theme_ve_id)
+     , INDEX (parent_id)
+     , CONSTRAINT FK_lams_css_theme_ve_2 FOREIGN KEY (parent_id)
+                  REFERENCES lams_css_theme_ve (theme_ve_id) ON DELETE NO ACTION ON UPDATE NO ACTION
+)TYPE=InnoDB;
+ALTER TABLE lams_css_theme_ve COMMENT='Stores both the Flash theme and visual element';
+ALTER TABLE lams_css_theme_ve MODIFY COLUMN parent_id BIGINT(20)
+      COMMENT 'Parent theme';
+
+CREATE TABLE lams_css_style (
+       style_id BIGINT(20) NOT NULL AUTO_INCREMENT
+     , theme_ve_id BIGINT(20) NOT NULL
+     , PRIMARY KEY (style_id)
+     , INDEX (theme_ve_id)
+     , CONSTRAINT FK_lams_css_style_1 FOREIGN KEY (theme_ve_id)
+                  REFERENCES lams_css_theme_ve (theme_ve_id) ON DELETE NO ACTION ON UPDATE NO ACTION
+)TYPE=InnoDB;
+ALTER TABLE lams_css_style COMMENT='Groups lams_css_property into a CSSStyleDeclaration.';
+ALTER TABLE lams_css_style MODIFY COLUMN theme_ve_id BIGINT(20) NOT NULL
+      COMMENT 'Theme or visual element that has this style';
 
 CREATE TABLE lams_user_organisation_role (
        user_organisation_role_id BIGINT(20) NOT NULL AUTO_INCREMENT
@@ -573,7 +566,6 @@ CREATE TABLE lams_user_organisation_role (
 
 CREATE TABLE lams_tool_session (
        tool_session_id BIGINT(20) NOT NULL AUTO_INCREMENT
-     , tool_session_name VARCHAR(255) NOT NULL
      , tool_session_type_id INT(3) NOT NULL
      , lesson_id BIGINT(20) NOT NULL
      , activity_id BIGINT(20) NOT NULL
@@ -582,6 +574,7 @@ CREATE TABLE lams_tool_session (
      , group_id BIGINT(20)
      , user_id BIGINT(20)
      , unique_key VARCHAR(128) NOT NULL
+     , tool_session_name VARCHAR(255) NOT NULL
      , UNIQUE UQ_lams_tool_session_1 (unique_key)
      , PRIMARY KEY (tool_session_id)
      , INDEX (tool_session_state_id)
@@ -728,6 +721,23 @@ CREATE TABLE lams_workspace_folder_content (
      , CONSTRAINT FK_lams_workspace_folder_content_2 FOREIGN KEY (content_type_id)
                   REFERENCES lams_workspace_folder_content_type (content_type_id)
 )TYPE=InnoDB;
+
+CREATE TABLE lams_css_property (
+       property_id BIGINT(20) NOT NULL AUTO_INCREMENT
+     , style_id BIGINT(20) NOT NULL
+     , name VARCHAR(255) NOT NULL
+     , value VARCHAR(100) NOT NULL
+     , style_subset VARCHAR(20)
+     , type TINYINT NOT NULL
+     , PRIMARY KEY (property_id)
+     , INDEX (style_id)
+     , CONSTRAINT FK_lams_css_property_1 FOREIGN KEY (style_id)
+                  REFERENCES lams_css_style (style_id) ON DELETE NO ACTION ON UPDATE NO ACTION
+)TYPE=InnoDB;
+ALTER TABLE lams_css_property MODIFY COLUMN style_subset VARCHAR(20)
+      COMMENT 'e.g. "_tf"';
+ALTER TABLE lams_css_property MODIFY COLUMN type TINYINT NOT NULL
+      COMMENT 'String, Boolean, etc';
 
 CREATE TABLE lams_learning_transition (
        transition_id BIGINT(20) NOT NULL AUTO_INCREMENT

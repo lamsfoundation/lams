@@ -74,6 +74,7 @@ public abstract class GateActivity extends SimpleActivity implements Serializabl
             Integer activityTypeId,
             Transition transitionTo,
             Transition transitionFrom,
+            String languageFile,
             Integer gateActivityLevelId,
             Set waitingLearners)
     {
@@ -94,7 +95,8 @@ public abstract class GateActivity extends SimpleActivity implements Serializabl
                 grouping,
                 activityTypeId,
                 transitionTo,
-				transitionFrom);
+				transitionFrom,
+				languageFile);
         this.gateActivityLevelId = gateActivityLevelId;
         this.waitingLearners = waitingLearners;
     }

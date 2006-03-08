@@ -57,7 +57,8 @@ public abstract class SimpleActivity extends Activity implements Serializable
             LearningDesign learningDesign, 
             Grouping grouping, 
             Integer activityTypeId, Transition transitionTo,
-			Transition transitionFrom){
+			Transition transitionFrom,
+			String languageFile){
         super(activityId, 
                 id, 
                 description, 
@@ -75,7 +76,8 @@ public abstract class SimpleActivity extends Activity implements Serializable
                 grouping, 
                 activityTypeId, 
                 transitionTo,
-				transitionFrom);
+				transitionFrom,
+				languageFile);
     }
     
     /** default constructor */

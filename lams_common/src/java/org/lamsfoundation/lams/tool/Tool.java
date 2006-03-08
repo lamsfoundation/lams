@@ -41,32 +41,44 @@ public class Tool implements Serializable {
     private Long toolId;
 
     /** persistent field */
+    private boolean supportsGrouping;
+
+    /** persistent field */
     private String learnerUrl;
 
     /** persistent field */
-    private boolean supportsGrouping;
+    private String learnerPreviewUrl;
+
+    /** persistent field */
+    private String learnerProgressUrl;
 
     /** nullable persistent field */
     private String authorUrl;
 
-    /** persistent field */
-    private boolean supportsDefineLater;
+    /** nullable persistent field */
+    private String defineLaterUrl;
 
     /** persistent field */
-    private boolean supportsModeration;
+    private String exportPortfolioLearnerUrl;
+
+    /** persistent field */
+    private String exportPortfolioClassUrl;
+
+    /** persistent field */
+    private String monitorUrl;
+    
+    /** persistent field */
+    private String contributeUrl;
+    
+    /** persistent field */
+    private String moderationUrl;
     
     /** persistent field */
     private boolean supportsRunOffline;
     
     /** persistent field */
-    private boolean supportsContribute;
-    
-    /** persistent field */
     private boolean valid;
     
-    /** nullable persistent field */
-    private String defineLaterUrl;
-
     /** nullable persistent field */
     private long defaultToolContentId;
 
@@ -86,18 +98,6 @@ public class Tool implements Serializable {
     private Date createDateTime;
     
     /** persistent field */
-    private String exportPortfolioUrl;
-
-    /** persistent field */
-    private String monitorUrl;
-    
-    /** persistent field */
-    private String contributeUrl;
-    
-    /** persistent field */
-    private String moderationUrl;
-    
-    /** persistent field */
     private Set activities;
 
     /** persistent field */
@@ -109,54 +109,62 @@ public class Tool implements Serializable {
     /** persistent field */
     private String toolVersion;
 
+	/** Name of the file (including the package) that contains the text strings for
+	 * this activity. e.g. org.lamsfoundation.lams.tool.sbmt.SbmtResources.properties. */
+	private String languageFile;
+
+
     /** full constructor */
     public Tool(Long toolId, 
                 String learnerUrl, 
-                boolean supportsGrouping, 
+                String learnerPreviewUrl,
+                String learnerProgressUrl,
                 String authorUrl, 
-                boolean supportsDefineLater,
-                boolean supportsModeration,
-                boolean supportsRunOffline,
-                boolean supportsContribute,
                 String defineLaterUrl, 
+                String monitorUrl,
+                String contributeUrl,
+                String moderationUrl,
+                String exportPortfolioLearnerUrl,
+                String exportPortfolioClassUrl,
+                boolean supportsGrouping, 
+                boolean supportsRunOffline,
                 long defaultToolContentId, 
                 String toolSignature, 
                 String toolDisplayName, 
                 String description, 
                 String className, 
-                String exportPortfolioUrl, 
                 Set activities,
                 Integer groupingSupportTypeId,
                 Date createDateTime,
-                String monitorUrl,
-                String contributeUrl,
-                String moderationUrl,
                 String toolIdentifier,
-                String toolVersion) 
+                String toolVersion,
+                String languageFile) 
     {
         this.toolId = toolId;
         this.learnerUrl = learnerUrl;
-        this.supportsGrouping = supportsGrouping;
+        this.learnerPreviewUrl = learnerPreviewUrl;
+        this.learnerProgressUrl = learnerProgressUrl;
         this.authorUrl = authorUrl;
-        this.supportsDefineLater = supportsDefineLater;
-        this.supportsModeration = supportsModeration;
-        this.supportsContribute = supportsContribute;
-        this.supportsRunOffline = supportsRunOffline;
         this.defineLaterUrl = defineLaterUrl;
+        this.monitorUrl = monitorUrl;
+        this.contributeUrl = contributeUrl;
+        this.moderationUrl = moderationUrl;
+        this.exportPortfolioLearnerUrl = exportPortfolioLearnerUrl;
+        this.exportPortfolioClassUrl = exportPortfolioClassUrl;
+
+        this.supportsGrouping = supportsGrouping;
+        this.supportsRunOffline = supportsRunOffline;
         this.defaultToolContentId = defaultToolContentId;
         this.toolSignature = toolSignature;
         this.toolDisplayName = toolDisplayName;
         this.description = description;
         this.serviceName = className;
-        this.exportPortfolioUrl = exportPortfolioUrl;
         this.activities = activities;
         this.groupingSupportTypeId = groupingSupportTypeId;
         this.createDateTime = createDateTime;
-        this.monitorUrl = monitorUrl;
-        this.contributeUrl = contributeUrl;
-        this.moderationUrl = moderationUrl;
         this.toolIdentifier = toolIdentifier;
         this.toolVersion = toolVersion;
+        this.languageFile = languageFile;
     }
 
     /** default constructor */
@@ -166,39 +174,31 @@ public class Tool implements Serializable {
     /** minimal constructor */
     public Tool(Long toolId, 
                 String learnerUrl, 
+                String authorUrl, 
                 boolean supportsGrouping, 
-                boolean supportsDefineLater,
-                boolean supportsModeration,
-                boolean supportsContribute,
                 boolean supportsRunOffline,
                 long defaultToolContentId, 
                 String toolSignature, 
                 String toolDisplayName, 
                 String className, 
-                String exportPortfolioUrl, 
                 Set activities,
                 Integer groupingSupportTypeId,
                 Date createDateTime,
-                String monitorUrl,
                 String toolIdentifier,
                 String toolVersion) 
     {
         this.toolId = toolId;
         this.learnerUrl = learnerUrl;
+        this.authorUrl = authorUrl;
         this.supportsGrouping = supportsGrouping;
-        this.supportsDefineLater = supportsDefineLater;
-        this.supportsModeration = supportsModeration;
-        this.supportsContribute = supportsContribute;
         this.supportsRunOffline = supportsRunOffline;
         this.defaultToolContentId = defaultToolContentId;
         this.toolSignature = toolSignature;
         this.toolDisplayName = toolDisplayName;
         this.serviceName = className;
-        this.exportPortfolioUrl = exportPortfolioUrl;
         this.activities = activities;
         this.groupingSupportTypeId = groupingSupportTypeId;
         this.createDateTime = createDateTime;
-        this.monitorUrl = monitorUrl;
         this.toolIdentifier = toolIdentifier;
         this.toolVersion = toolVersion;
     }
@@ -216,7 +216,7 @@ public class Tool implements Serializable {
     }
 
     /** 
-     * @hibernate.property column="learner_url"length="65535"
+     * @hibernate.property column="learner_url" length="65535"
      *            		   not-null="true"    
      */
     public String getLearnerUrl() {
@@ -227,25 +227,41 @@ public class Tool implements Serializable {
         this.learnerUrl = learnerUrl;
     }
 
+    /** 
+     * @hibernate.property column="learner_preview_url" length="65535"
+     *            		   not-null="false"    
+     */
+    public String getLearnerPreviewUrl() {
+        return this.learnerPreviewUrl;
+    }
+
+    public void setLearnerPreviewUrl(String learnerPreviewUrl) {
+        this.learnerPreviewUrl = learnerPreviewUrl;
+    }
+
+    /** 
+     * @hibernate.property column="learner_progress_url" length="65535"
+     *            		   not-null="false"    
+     */
+    public String getLearnerProgressUrl() {
+        return this.learnerProgressUrl;
+    }
+
+    public void setLearnerProgressUrl(String learnerProgressUrl) {
+        this.learnerProgressUrl = learnerProgressUrl;
+    }
+
     /**
-     * @hibernate.property column="supports_contribute_flag" length="1"
-     *             		   not-null="true"    
-     * @return Returns the supportsContribute.
+     * Does this tool support contribute? Will be true if the contributeURL is not null/empty string.
      */
     public boolean getSupportsContribute()
     {
-        return supportsContribute;
-    }
-    /**
-     * @param supportsContribute The supportsContribute to set.
-     */
-    public void setSupportsContribute(boolean supportsContribute)
-    {
-        this.supportsContribute = supportsContribute;
+    	String contributeURL = getContributeUrl();
+    	return ( contributeURL != null && contributeURL.trim().length() > 0);   
     }
     
     /** 
-     * @hibernate.property column="author_url" length="65535"       
+     * @hibernate.property column="author_url" length="65535" not-null="true"         
      */
     public String getAuthorUrl() {
         return this.authorUrl;
@@ -256,32 +272,20 @@ public class Tool implements Serializable {
     }
 
     /** 
-     * @hibernate.property column="supports_define_later_flag" length="1"
-     *             		   not-null="true"     
+     * Does this tool support define later? Will be true if the defineLaterURL is not null/empty string.
      */
     public boolean getSupportsDefineLater() {
-        return this.supportsDefineLater;
-    }
-
-    public void setSupportsDefineLater(boolean supportsDefineLater) {
-        this.supportsDefineLater = supportsDefineLater;
+    	String url = getDefineLaterUrl();
+    	return ( url != null && url.trim().length() > 0);   
     }
 
     /**
-     * @hibernate.property column="supports_moderation_flag" length="1"
-     *             		   not-null="true" 
-     * @return Returns the supportsModeration.
+     * Does this tool support moderation? Will be true if the moderateURL is not null/empty string.
      */
     public boolean getSupportsModeration()
     {
-        return supportsModeration;
-    }
-    /**
-     * @param supportsModeration The supportsModeration to set.
-     */
-    public void setSupportsModeration(boolean supportsModeration)
-    {
-        this.supportsModeration = supportsModeration;
+    	String url = getModerationUrl();
+    	return ( url != null && url.trim().length() > 0);   
     }
     
     /**
@@ -303,7 +307,7 @@ public class Tool implements Serializable {
     }
     
     /** 
-     * @hibernate.property column="define_later_url" length="65535"       
+     * @hibernate.property column="define_later_url" length="65535"  not-null="false"        
      */
     public String getDefineLaterUrl() {
         return this.defineLaterUrl;
@@ -373,15 +377,27 @@ public class Tool implements Serializable {
     }
 
     /** 
-     * @hibernate.property column="export_portfolio_url" length="65535"
-     *             		   not-null="true"  
+     * @hibernate.property column="export_pfolio_learner_url" length="65535"
+     *             		   not-null="false"  
      */
-    public String getExportPortfolioUrl() {
-        return this.exportPortfolioUrl;
+    public String getExportPortfolioLearnerUrl() {
+        return this.exportPortfolioLearnerUrl;
     }
 
-    public void setExportPortfolioUrl(String exportPortfolioUrl) {
-        this.exportPortfolioUrl = exportPortfolioUrl;
+    public void setExportPortfolioLearnerUrl(String exportPortfolioLearnerUrl) {
+        this.exportPortfolioLearnerUrl = exportPortfolioLearnerUrl;
+    }
+
+    /** 
+     * @hibernate.property column="export_pfolio_class_url" length="65535"
+     *             		   not-null="false"  
+     */
+    public String getExportPortfolioClassUrl() {
+        return this.exportPortfolioClassUrl;
+    }
+
+    public void setExportPortfolioClassUrl(String exportPortfolioClassUrl) {
+        this.exportPortfolioClassUrl = exportPortfolioClassUrl;
     }
 
     /** 
@@ -449,7 +465,7 @@ public class Tool implements Serializable {
     
 
     /**
-     * @hibernate.property column="contribute_url" length="65535"  
+     * @hibernate.property column="contribute_url" length="65535" not-null="false"  
      * @return Returns the contributeUrl.
      */
     public String getContributeUrl()
@@ -464,7 +480,7 @@ public class Tool implements Serializable {
         this.contributeUrl = contributeUrl;
     }
     /**
-     * @hibernate.property column="moderation_url" length="65535"   
+     * @hibernate.property column="moderation_url" length="65535" not-null="false"   
      * @return Returns the moderationUrl.
      */
     public String getModerationUrl()
@@ -479,7 +495,7 @@ public class Tool implements Serializable {
         this.moderationUrl = moderationUrl;
     }
     /**
-     * @hibernate.property column="monitor_url" length="65535"  
+     * @hibernate.property column="monitor_url" length="65535" not-null="false"  
      * @return Returns the monitorUrl.
      */
     public String getMonitorUrl()
@@ -517,6 +533,18 @@ public class Tool implements Serializable {
         this.toolVersion = toolVersion;
     }
 
+    
+    /** 
+     * @hibernate.property column="language_file" length="255" not-null="false"   
+     */
+	public String getLanguageFile() {
+		return languageFile;
+	}
+
+	public void setLanguageFile(String languageFile) {
+		this.languageFile = languageFile;
+	}
+
     public String toString() {
         return new ToStringBuilder(this)
             .append("toolId", getToolId())
@@ -546,4 +574,5 @@ public class Tool implements Serializable {
     	vo.setAuthorUrl(this.getAuthorUrl());
     	return vo;
     }
+
 }

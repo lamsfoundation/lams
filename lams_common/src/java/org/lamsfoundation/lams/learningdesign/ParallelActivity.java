@@ -53,6 +53,7 @@ public class ParallelActivity extends ComplexActivity implements Serializable {
             Integer activityTypeId,  
             Transition transitionTo,
             Transition transitionFrom,
+            String languageFile,
             java.util.Set activities) {
         super(activityId, 
                 id, 
@@ -72,6 +73,7 @@ public class ParallelActivity extends ComplexActivity implements Serializable {
                 activityTypeId,  
                 transitionTo,
 				transitionFrom,
+				languageFile,
                 activities);
         super.activityStrategy = new ParallelActivityStrategy(this);
     }
@@ -135,7 +137,8 @@ public class ParallelActivity extends ComplexActivity implements Serializable {
     	newParallelActivity.setRunOffline(this.getRunOffline());
     	
     	newParallelActivity.setLibraryActivityUiImage(this.getLibraryActivityUiImage());    	
-    	newParallelActivity.setLibraryActivity(this.getLibraryActivity());		
+    	newParallelActivity.setLibraryActivity(this.getLibraryActivity());	
+    	newParallelActivity.setLanguageFile(this.getLanguageFile());
     	
     	return newParallelActivity;
     }

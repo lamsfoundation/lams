@@ -320,7 +320,10 @@ public class WebUtil
 	}
 	
     /**
-     * Retrieve the tool access mode from http request
+     * Retrieve the tool access mode from http request. This is a utility used by the tools that share an implementation for
+	 * the learner screen. They use mode=learner, mode=author and mode=teacher for learning, preview and monitoring respectively.
+	 * Only used if the tool programmer wants to have one call that supports all three ways of looking at a learner screen.
+	 *
      * @param request
      * @param param_mode
      * @return the ToolAccessMode object
@@ -340,7 +343,10 @@ public class WebUtil
     }
 
     /**
-     * Retrieve the tool access mode from a string value, presumably from a Form
+     * Retrieve the tool access mode from a string value, presumably from a Form.
+	 * This is a utility used by the tools that share an implementation for the learner screen. 
+	 * They use mode=learner, mode=author and mode=teacher for learning, preview and monitoring respectively.
+	 * Only used if the tool programmer wants to have one call that supports all three ways of looking at a learner screen.
      * @param request
      * @param param_mode
      * @return the ToolAccessMode object

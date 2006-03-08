@@ -63,7 +63,8 @@ public class GroupingActivity extends SimpleActivity implements Serializable
             Transition transitionFrom,
             Grouping createGrouping,
 			Integer grouping_ui_id,
-			Integer create_grouping_ui_id)
+			Integer create_grouping_ui_id,
+			String languageFile)
     {
         super(activityId, 
                 id, 
@@ -82,7 +83,8 @@ public class GroupingActivity extends SimpleActivity implements Serializable
                 grouping, 
                 activityTypeId, 
                 transitionTo,
-				transitionFrom);
+				transitionFrom,
+				languageFile);
         this.createGrouping = createGrouping;        
         this.createGroupingUIID = create_grouping_ui_id;
         super.simpleActivityStrategy = new GroupingActivityStrategy(this);
@@ -154,7 +156,8 @@ public class GroupingActivity extends SimpleActivity implements Serializable
     	groupingActivity.setDefineLater(this.getDefineLater());    	
     	groupingActivity.setCreateDateTime(new Date()); 
     	groupingActivity.setRunOffline(this.getRunOffline());
-    	groupingActivity.setLibraryActivityUiImage(this.getLibraryActivityUiImage());    	
+    	groupingActivity.setLibraryActivityUiImage(this.getLibraryActivityUiImage());
+    	groupingActivity.setLanguageFile(this.getLanguageFile());
 
     	Grouping currentGrouping = this.getCreateGrouping();
     	Grouping newGrouping = currentGrouping.createCopy();

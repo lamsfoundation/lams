@@ -81,6 +81,37 @@
             not-null="true"
         </meta>    
     </property>
+
+    <property
+        name="learnerPreviewUrl"
+        type="java.lang.String"
+        column="learner_preview_url"
+        not-null="false"
+        length="65535"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="learner_preview_url"
+            length="65535"
+            not-null="true"
+        </meta>    
+    </property>
+
+    <property
+        name="learnerProgressUrl"
+        type="java.lang.String"
+        column="learner_progress_url"
+        not-null="false"
+        length="65535"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="learner_progress_url"
+            length="65535"
+            not-null="true"
+        </meta>    
+    </property>
+
     <property
         name="groupingSupportTypeId"
         type="java.lang.Integer"
@@ -100,39 +131,12 @@
         type="java.lang.String"
         column="author_url"
         length="65535"
+        not-null="true"
     >
         <meta attribute="field-description">
            @hibernate.property
             column="author_url"
             length="65535"
-        </meta>    
-    </property>
-    <property
-        name="supportsDefineLater"
-        type="java.lang.Boolean"
-        column="supports_define_later_flag"
-        not-null="true"
-        length="1"
-    >
-        <meta attribute="field-description">
-           @hibernate.property
-            column="supports_define_later_flag"
-            length="1"
-            not-null="true"
-        </meta>    
-    </property>
-    
-    <property
-        name="supportsModeration"
-        type="java.lang.Boolean"
-        column="supports_moderation_flag"
-        not-null="true"
-        length="1"
-    >
-        <meta attribute="field-description">
-           @hibernate.property
-            column="supports_moderation_flag"
-            length="1"
             not-null="true"
         </meta>    
     </property>
@@ -151,22 +155,7 @@
             not-null="true"
         </meta>    
     </property>    
-    
-    <property
-        name="supportsContribute"
-        type="java.lang.Boolean"
-        column="supports_contribute_flag"
-        not-null="true"
-        length="1"
-    >
-        <meta attribute="field-description">
-           @hibernate.property
-            column="supports_contribute_flag"
-            length="1"
-            not-null="true"
-        </meta>    
-    </property> 
-    
+       
     <property
         name="valid"
         type="java.lang.Boolean"
@@ -270,32 +259,47 @@
         </meta>    
     </property>
     <property
-        name="exportPortfolioUrl"
+        name="exportPortfolioLearnerUrl"
         type="java.lang.String"
-        column="export_portfolio_url"
+        column="export_pfolio_learner_url"
         not-null="true"
         length="65535"
     >
         <meta attribute="field-description">
            @hibernate.property
-            column="export_portfolio_url"
+            column="export_pfolio_learner_url"
             length="65535"
-            not-null="true"
+            not-null="false"
         </meta>    
     </property>
     
     <property
+        name="exportPortfolioClassUrl"
+        type="java.lang.String"
+        column="export_pfolio_class_url"
+        not-null="true"
+        length="65535"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="export_pfolio_class_url"
+            length="65535"
+            not-null="false"
+        </meta>    
+    </property>
+ 
+    <property
         name="monitorUrl"
         type="java.lang.String"
         column="monitor_url"
-        not-null="true"
+        not-null="false"
         length="65535"
     >
         <meta attribute="field-description">
            @hibernate.property
             column="monitor_url"
             length="65535"
-            not-null="true"
+            not-null="false"
         </meta>    
     </property>
     
@@ -303,14 +307,14 @@
         name="moderationUrl"
         type="java.lang.String"
         column="moderation_url"
-        not-null="true"
+        not-null="false"
         length="65535"
     >
         <meta attribute="field-description">
            @hibernate.property
             column="moderation_url"
             length="65535"
-            not-null="true"
+            not-null="false"
         </meta>    
     </property> 
     
@@ -318,14 +322,23 @@
         name="contributeUrl"
         type="java.lang.String"
         column="contribute_url"
-        not-null="true"
+        not-null="false"
         length="65535"
     >
         <meta attribute="field-description">
            @hibernate.property
             column="contribute_url"
             length="65535"
-            not-null="true"
+            not-null="false"
+        </meta>    
+    </property>
+    
+    <property name="languageFile" type="java.lang.String" column="language_file" length="255">
+        <meta attribute="field-description">
+           @hibernate.property
+            column="languageFile"
+            length="255"
+            not-null="false"
         </meta>    
     </property>
            

@@ -104,6 +104,7 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
             Integer activityTypeId,
             Transition transitionTo,
             Transition transitionFrom,
+            String languageFile,
             Integer gateActivityLevelId,
             Long gateStartTimeOffset, 
             Long gateEndTimeOffset,
@@ -126,6 +127,7 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
                 activityTypeId,
                 transitionTo,
 				transitionFrom,
+				languageFile,
                 gateActivityLevelId,
                 waitingLearners);
         //validate pre-condition.
@@ -213,7 +215,7 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
     	newScheduleGateActivity.setRunOffline(this.getRunOffline());
     	newScheduleGateActivity.setLibraryActivity(this.getLibraryActivity());
     	newScheduleGateActivity.setLibraryActivityUiImage(this.getLibraryActivityUiImage());
-    	
+    	newScheduleGateActivity.setLanguageFile(this.getLanguageFile());
     	return newScheduleGateActivity;
     }
 

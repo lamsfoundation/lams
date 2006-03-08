@@ -17,6 +17,14 @@ import java.io.Serializable;
  * It resolves the performance and potential hard coding error problems of using
  * interface to define enum type.</p>
  * 
+ * <p>This set of modes is a helper for tools. Some tools may want to use the same
+ * code for the three versions of the learner screen (ordinary, learner progress and
+ * preview) or for the two versions of export portfolio (leaner and teacher).
+ * If a tool wants to do this, they should include mode=author, mode=teacher
+ * and mode=learner in their url definitions, and use the helper methods
+ * WebUtil.readToolAccessModeParam() and WebUtil.getToolAccessMode() to access
+ * the modes.</p>
+ * 
  * <p>As a class, it can implement any interface as we want. For now, it implements
  * serializable because we might need to set it into http session. To ensure
  * serializable works properly, <code>readResolve()</code> must be overriden.</p>

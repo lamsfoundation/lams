@@ -56,6 +56,7 @@ public class PermissionGateActivity extends GateActivity implements Serializable
             Integer activityTypeId,
             Transition transitionTo,
             Transition transitionFrom,
+            String languageFile,
             Integer gateActivityLevelId,
             Set waitingLearners)
     {
@@ -77,6 +78,7 @@ public class PermissionGateActivity extends GateActivity implements Serializable
                 activityTypeId,
                 transitionTo,
 				transitionFrom,
+				languageFile,
                 gateActivityLevelId,
                 waitingLearners);
         super.simpleActivityStrategy = new PermissionGateActivityStrategy(this);
@@ -145,7 +147,8 @@ public class PermissionGateActivity extends GateActivity implements Serializable
     	newPermissionGateActivity.setCreateDateTime(new Date());
     	newPermissionGateActivity.setRunOffline(this.getRunOffline());
     	newPermissionGateActivity.setLibraryActivity(this.getLibraryActivity());
-    	newPermissionGateActivity.setLibraryActivityUiImage(this.getLibraryActivityUiImage());    	
+    	newPermissionGateActivity.setLibraryActivityUiImage(this.getLibraryActivityUiImage());
+    	newPermissionGateActivity.setLanguageFile(this.getLanguageFile());
     	return newPermissionGateActivity;
     	
     }

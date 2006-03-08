@@ -269,36 +269,31 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
 
     
     /**
-     * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#getLearnerToolURLByMode(org.lamsfoundation.lams.learningdesign.ToolActivity, org.lamsfoundation.lams.usermanagement.User, org.lamsfoundation.lams.tool.ToolAccessMode)
+     * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#getToolLearnerURL(org.lamsfoundation.lams.learningdesign.ToolActivity, org.lamsfoundation.lams.usermanagement.User)
      */
-    public String getLearnerToolURLByMode(ToolActivity activity, 
-                                          User learner, 
-                                          ToolAccessMode accessMode) throws LamsToolServiceException
+    public String getToolLearnerURL(ToolActivity activity,User learner) throws LamsToolServiceException
     {
     	String toolURL = activity.getTool().getLearnerUrl();
-    	
-        if(accessMode==ToolAccessMode.LEARNER) {
-        	toolURL = appendModeToURL(ToolAccessMode.LEARNER, toolURL);
-        } else if(accessMode == ToolAccessMode.TEACHER) {
-        	toolURL = appendModeToURL(ToolAccessMode.TEACHER, toolURL);
-        	toolURL = appendUserIDToURL(learner, toolURL);
-        } else if (accessMode == ToolAccessMode.AUTHOR) {
-        	toolURL = appendModeToURL(ToolAccessMode.AUTHOR, toolURL);
-        } else {
-        	throw new LamsToolServiceException("Unknown tool access mode:"+accessMode.toString());
-        }
         return setupToolURLWithToolSession(activity, learner, toolURL);
     }
     
+    /**
+     * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#getToolLearnerPreviewURL(org.lamsfoundation.lams.learningdesign.ToolActivity, org.lamsfoundation.lams.usermanagement.User)
+     */
+    public String getToolLearnerPreviewURL(ToolActivity activity,User authorLearner) throws LamsToolServiceException
+    {
+    	String toolURL = activity.getTool().getLearnerPreviewUrl();
+        return setupToolURLWithToolSession(activity, authorLearner, toolURL);
+    }
 
     /**
-     * Add the mode=TEACHER, mode=LEARNER or mode=AUTHOR to the supplied URL
+     * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#getToolLearnerProgressURL(org.lamsfoundation.lams.learningdesign.ToolActivity, org.lamsfoundation.lams.usermanagement.User)
      */
-    private String appendModeToURL(ToolAccessMode toolAccessMode,String toolURL) 
+    public String getToolLearnerProgressURL(ToolActivity activity,User learner) throws LamsToolServiceException
     {
-        return WebUtil.appendParameterToURL(toolURL,
-        		AttributeNames.PARAM_MODE,
-        		toolAccessMode.toString());
+    	String toolURL = activity.getTool().getLearnerProgressUrl();
+       	toolURL = appendUserIDToURL(learner, toolURL);
+        return setupToolURLWithToolSession(activity, learner, toolURL);
     }
 
     /**

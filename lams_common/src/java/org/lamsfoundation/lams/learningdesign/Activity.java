@@ -185,6 +185,10 @@ public abstract class Activity implements Serializable,Nullable {
 	
 	private Integer groupingSupportType;
 
+	/** Name of the file (including the package) that contains the text strings for
+	 * this activity. e.g. org.lamsfoundation.lams.tool.sbmt.SbmtResources.properties. */
+	private String languageFile;
+
 	protected SimpleActivityStrategy simpleActivityStrategy;
 	
     //---------------------------------------------------------------------
@@ -214,7 +218,8 @@ public abstract class Activity implements Serializable,Nullable {
 			Grouping grouping,
 			Integer activityTypeId, 
 			Transition transitionTo,
-			Transition transitionFrom) {
+			Transition transitionFrom,
+			String languageFile) {
 		this.activityId = activityId;
 		this.activityUIID = id;
 		this.description = description;
@@ -233,6 +238,7 @@ public abstract class Activity implements Serializable,Nullable {
 		this.activityTypeId = activityTypeId;
 		this.transitionTo = transitionTo;
 		this.transitionFrom = transitionFrom;
+		this.languageFile = languageFile;
 	}	
 	/** default constructor */
 	public Activity() {
@@ -614,6 +620,14 @@ public abstract class Activity implements Serializable,Nullable {
 	{
 		this.activityCategoryID = activityCategoryID;
 	}
+	
+	public String getLanguageFile() {
+		return languageFile;
+	}
+	public void setLanguageFile(String languageFile) {
+		this.languageFile = languageFile;
+	}
+	   
     //---------------------------------------------------------------------
     // Service Methods 
     //---------------------------------------------------------------------
@@ -815,6 +829,6 @@ public abstract class Activity implements Serializable,Nullable {
 	public Vector validateActivity(MessageService messageService) { 
 		return null; 
 	}
-   
+
    
 }

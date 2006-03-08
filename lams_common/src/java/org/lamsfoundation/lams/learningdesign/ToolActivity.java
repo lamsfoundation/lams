@@ -77,6 +77,7 @@ public class ToolActivity extends SimpleActivity implements Serializable
             Integer activityTypeId,
             Transition transitionTo,
             Transition transitionFrom,
+            String languageFile,
             Tool tool,
             Long toolContentId)
     {
@@ -97,7 +98,8 @@ public class ToolActivity extends SimpleActivity implements Serializable
                 grouping,
                 activityTypeId,
                 transitionTo,
-				transitionFrom);
+				transitionFrom,
+				languageFile);
         this.tool = tool;
         this.toolContentId = toolContentId;
         super.simpleActivityStrategy = new ToolActivityStrategy(this);
@@ -168,6 +170,8 @@ public class ToolActivity extends SimpleActivity implements Serializable
     	newToolActivity.setActivityCategoryID(this.getActivityCategoryID());
     	newToolActivity.setLibraryActivityUiImage(this.getLibraryActivityUiImage());
     	newToolActivity.setLibraryActivity(this.getLibraryActivity());
+    	newToolActivity.setLanguageFile(this.getLanguageFile());
+    	
     	return newToolActivity;
     }    
     

@@ -62,6 +62,7 @@ public class OptionsActivity extends ComplexActivity implements Serializable {
             Integer activityTypeId,  
             Transition transitionTo,
             Transition transitionFrom,
+            String languageFile,
             java.util.Set activities, 
             Integer maxNumberOfOptions, 
             Integer minNumberOfOptions,
@@ -84,6 +85,7 @@ public class OptionsActivity extends ComplexActivity implements Serializable {
                 activityTypeId,  
                 transitionTo,
 				transitionFrom,
+				languageFile,
                 activities);
         this.maxNumberOfOptions = maxNumberOfOptions;
         this.minNumberOfOptions = minNumberOfOptions;
@@ -150,6 +152,8 @@ public class OptionsActivity extends ComplexActivity implements Serializable {
     	newOptionsActivity.setRunOffline(this.getRunOffline());
     	newOptionsActivity.setLibraryActivityUiImage(this.getLibraryActivityUiImage());
     	newOptionsActivity.setLibraryActivity(this.getLibraryActivity());
+    	newOptionsActivity.setLanguageFile(this.getLanguageFile());
+
     	return newOptionsActivity;
     }
 

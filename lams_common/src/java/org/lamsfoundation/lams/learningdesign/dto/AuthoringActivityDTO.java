@@ -132,6 +132,15 @@ public class AuthoringActivityDTO extends BaseDTO{
 	/** The url of the tool's authoring screen. */
 	private String authoringURL;
 	
+	/** The url of the tool's monitoring screen. */
+	private String monitoringURL;
+
+	/** The url of the tool's contribute screen. */
+	private String contributeURL;
+
+	/** The url of the tool's moderation screen. */
+	private String moderationURL;
+
 	/** The category of activity */
 	private Integer activityCategoryID;
 	
@@ -174,6 +183,10 @@ public class AuthoringActivityDTO extends BaseDTO{
 	 * activity is this.*/
 	private Long libraryActivityID;
 	
+	/** Name of the file (including the package) that contains the text strings for
+	 * this activity. e.g. org.lamsfoundation.lams.tool.sbmt.SbmtResources.properties. */
+	private String languageFile;
+	
 	/*****************************************************************************
 	 * Constructors
 	 *****************************************************************************/
@@ -183,6 +196,7 @@ public class AuthoringActivityDTO extends BaseDTO{
 			Integer activityTypeId, Long groupingID, Integer groupingUIID,
 			Integer orderID, Boolean defineLater, Long learningDesignID,
 			Long learningLibraryID, Date createDateTime, Boolean runOffline,
+			String languageFile,
 			Integer maxOptions, Integer minOptions,
 			String optionsInstructions, Long toolID, Long toolContentID,
 			Integer activityCategoryID, Integer gateActivityLevelID,
@@ -211,6 +225,7 @@ public class AuthoringActivityDTO extends BaseDTO{
 		this.learningLibraryID = learningLibraryID;
 		this.createDateTime = createDateTime;
 		this.runOffline = runOffline;
+		this.languageFile = languageFile;
 		this.maxOptions = maxOptions;
 		this.minOptions = minOptions;
 		this.optionsInstructions = optionsInstructions;
@@ -262,6 +277,7 @@ public class AuthoringActivityDTO extends BaseDTO{
 								 null;
 		this.createDateTime = activity.getCreateDateTime();
 		this.runOffline = activity.getRunOffline();
+		this.languageFile = activity.getLanguageFile();
 		this.activityCategoryID = activity.getActivityCategoryID();		
 		this.libraryActivityUIImage = activity.getLibraryActivityUiImage();		
 		this.libraryActivityID = activity.getLibraryActivity()!=null?
@@ -314,6 +330,9 @@ public class AuthoringActivityDTO extends BaseDTO{
 		this.toolContentID = toolActivity.getToolContentId();
 		this.toolID = toolActivity.getTool().getToolId();	
 		this.authoringURL = toolActivity.getTool().getAuthorUrl();
+		this.monitoringURL = toolActivity.getTool().getMonitorUrl();
+		this.contributeURL = toolActivity.getTool().getContributeUrl();
+		this.moderationURL = toolActivity.getTool().getModerationUrl();
 		this.toolDisplayName = toolActivity.getTool().getToolDisplayName();
 	}
 	private void addGateActivityAttributes(Object activity){
@@ -847,5 +866,35 @@ public class AuthoringActivityDTO extends BaseDTO{
 	}
 	public void setToolDisplayName(String toolDisplayName) {
 		this.toolDisplayName = toolDisplayName;
+	}
+	/** 
+	 * Name of the file (including the package) that contains the text strings for
+	 * this activity. e.g. org.lamsfoundation.lams.tool.sbmt.SbmtResources.properties.
+	 */
+	public String getLanguageFile() {
+		return languageFile;
+	}
+	public void setLanguageFile(String languageFile) {
+		this.languageFile = languageFile;
+	}
+	/** Get the contribution url related to this tool */
+	public String getContributeURL() {
+		return contributeURL;
+	}
+	public void setContributeURL(String contributeURL) {
+		this.contributeURL = contributeURL;
+	}
+	/** Get the monitoring url related to this tool */
+	public String getMonitoringURL() {
+		return monitoringURL;
+	}
+	public void setMonitoringURL(String monitoringURL) {
+		this.monitoringURL = monitoringURL;
+	}
+	public String getModerationURL() {
+		return moderationURL;
+	}
+	public void setModerationURL(String moderationURL) {
+		this.moderationURL = moderationURL;
 	}
 }

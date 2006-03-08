@@ -48,7 +48,7 @@
 				<prop key="createToolSessions">PROPAGATION_REQUIRED</prop>
 				<prop key="notifyToolsToCreateSession">PROPAGATION_REQUIRED</prop>
 			    <prop key="update*">PROPAGATION_REQUIRED</prop>
-			    <prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
+			    <prop key="get*">PROPAGATION_REQUIRED</prop>
 			</props>
 		</property>
 	</bean>   	

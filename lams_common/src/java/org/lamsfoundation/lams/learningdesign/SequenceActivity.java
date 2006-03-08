@@ -54,6 +54,7 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
             Integer activityTypeId,  
             Transition transitionTo,
             Transition transitionFrom,
+            String languageFile,
             java.util.Set activities) {
         super(activityId, 
                 id, 
@@ -73,6 +74,7 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
                 activityTypeId,  
                 transitionTo,
 				transitionFrom,
+				languageFile,
                 activities);
         super.activityStrategy = new SequenceActivityStrategy(this);
     }
@@ -137,7 +139,7 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
     	
     	newSequenceActivity.setLibraryActivity(this.getLibraryActivity());
 		newSequenceActivity.setLibraryActivityUiImage(this.getLibraryActivityUiImage());    	
-    	
+    	newSequenceActivity.setLanguageFile(this.getLanguageFile());
 		return newSequenceActivity;
     }
 
