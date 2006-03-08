@@ -116,9 +116,7 @@ public class UserTag extends TagSupport {
 		}
 	}
 	/**
-	 * @jsp.attribute required="true" 
-	 * 		rtexprvalue="true" 
-	 * 		description="Property of UserDTO to be accessed."
+	 * @jsp.attribute required="true"  rtexprvalue="true"  description="Property of UserDTO to be accessed."
 	 * 
 	 * @return Returns the property.
 	 */

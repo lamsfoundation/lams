@@ -117,9 +117,19 @@ public class CssTag extends TagSupport {
 		return EVAL_PAGE;
 	}
 	
+	/**
+	 * @jsp.attribute required="false" rtexprvalue="true" description="Should the css link be a local file link? Useful for export portfolio. Valid values true or false."
+	 * 
+	 * @return Returns the property.
+	 */
+	public String getLocalLink()
+	{
+		return generateLocalLink ? Boolean.TRUE.toString() : Boolean.FALSE.toString();
+	}
+
 	public void setLocalLink(String localLink)
 	{
-		if (localLink.equalsIgnoreCase("true"))
+		if (Boolean.parseBoolean(localLink))
 			this.generateLocalLink = true;
 		else
 			this.generateLocalLink = false;

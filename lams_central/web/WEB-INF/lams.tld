@@ -33,7 +33,6 @@
       <body-content>empty</body-content>
 
       <attribute>
-         <description>Output details from the shared session UserDTO object</description>
          <name>property</name>
          <required>true</required>
 
@@ -62,6 +61,14 @@
       <name>css</name>
       <tag-class>org.lamsfoundation.lams.web.tag.CssTag</tag-class>
       <body-content>empty</body-content>
+
+      <attribute>
+         <name>localLink</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
 
    </tag>
 
