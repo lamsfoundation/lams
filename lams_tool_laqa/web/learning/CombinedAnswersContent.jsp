@@ -49,10 +49,9 @@ http://www.gnu.org/licenses/gpl.txt
 			<table>
 			<tr>
 				 <td> 
-				 	 <html:submit property="submitAnswersContent" styleClass="linkbutton" onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
-						<bean:message key="button.submitAllContent"/>
-					</html:submit>
+						<html:submit onclick="javascript:submitMethod('submitAnswersContent');" styleClass="button">
+							<bean:message key="button.submitAllContent"/>
+						</html:submit>	 				 		  					
 				</td> 
 			</tr>
 			</table>
-			

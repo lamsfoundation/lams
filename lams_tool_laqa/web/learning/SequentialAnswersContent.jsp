@@ -57,31 +57,31 @@ http://www.gnu.org/licenses/gpl.txt
 				<c:choose>  
 				  <c:when test="${sessionScope.currentQuestionIndex == sessionScope.totalQuestionCount}"> 
 					 <td NOWRAP class="input" valign=top> 
-					 	<html:submit property="getPreviousQuestion" styleClass="linkbutton" onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
-							<bean:message key="button.getPreviousQuestion"/>
-						</html:submit>
+						<html:submit onclick="javascript:submitMethod('getPreviousQuestion');" styleClass="button">
+									<bean:message key="button.getPreviousQuestion"/>
+						</html:submit>	 				 		  					
 					 		&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-					 	 <html:submit property="submitAnswersContent" styleClass="linkbutton" onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
-							<bean:message key="button.submitAllContent"/>
-						</html:submit>
+						<html:submit onclick="javascript:submitMethod('submitAnswersContent');" styleClass="button">
+									<bean:message key="button.done"/>
+						</html:submit>	 				 		  					
 					</td> 
 				  </c:when> 
  				  <c:when test="${sessionScope.currentQuestionIndex != sessionScope.totalQuestionCount && sessionScope.currentQuestionIndex > 1}"> 
 					 <td NOWRAP class="input" valign=top> 
-						<html:submit property="getPreviousQuestion" styleClass="linkbutton" onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
-							<bean:message key="button.getPreviousQuestion"/>
-						</html:submit>
+						<html:submit onclick="javascript:submitMethod('getPreviousQuestion');" styleClass="button">
+									<bean:message key="button.getPreviousQuestion"/>
+						</html:submit>	 				 		  					
 						&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-						 <html:submit property="getNextQuestion" styleClass="linkbutton" onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
-							<bean:message key="button.getNextQuestion"/>
-						</html:submit>
+						<html:submit onclick="javascript:submitMethod('getNextQuestion');" styleClass="button">
+									<bean:message key="button.getNextQuestion"/>
+						</html:submit>	 				 		  					
 					</td> 
   				  </c:when> 
 				  <c:otherwise>
 					 <td NOWRAP class="input" valign=top> 
-						 <html:submit property="getNextQuestion" styleClass="linkbutton" onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
-							<bean:message key="button.getNextQuestion"/>
-						</html:submit>
+						<html:submit onclick="javascript:submitMethod('getNextQuestion');" styleClass="button">
+									<bean:message key="button.getNextQuestion"/>
+						</html:submit>	 				 		  					
 					</td> 
 				  </c:otherwise>
 				</c:choose> 

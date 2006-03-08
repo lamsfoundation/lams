@@ -32,12 +32,8 @@ http://www.gnu.org/licenses/gpl.txt
 	<td>
 		<table width="100%" height="190" border="0" align="center" cellpadding="5" cellspacing="0" bgcolor="#FFFFFF" summary="This table is being used for layout purposes only">
 			<tr> 
-				<td height="138" valign="top"> 
-				 <table width="90%" border="0" cellspacing="0" cellpadding="0">
-				 	<br/>
-					<br/>
-   					<%@ include file="/Errorbox.jsp" %>
-				 </table>
+				<td NOWRAP valign="top"> 
+					<font size=2> <bean:message key="error.system.qa"/> </font>
 				</td>
 			 </tr>
 		</table>

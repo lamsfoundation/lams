@@ -27,7 +27,34 @@ http://www.gnu.org/licenses/gpl.txt
 <%@ taglib uri="fck-editor" prefix="FCK" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
-		<html:form  action="/learning?method=displayQ&validate=false" method="POST" target="_self">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<title> </title>
+	<script language="JavaScript" type="text/JavaScript">
+
+		function submitLearningMethod(actionMethod) 
+		{
+			document.QaLearningForm.method.value=actionMethod; 
+			document.QaLearningForm.submit();
+		}
+		
+		function submitMethod(actionMethod) 
+		{
+			submitLearningMethod(actionMethod);
+		}
+		
+		function MM_reloadPage(init) {  //reloads the window if Nav4 resized
+		  if (init==true) with (navigator) {if ((appName=="Netscape")&&(parseInt(appVersion)==4)) {
+		    document.MM_pgW=innerWidth; document.MM_pgH=innerHeight; onresize=MM_reloadPage; }}
+		  else if (innerWidth!=document.MM_pgW || innerHeight!=document.MM_pgH) location.reload();
+		}
+		MM_reloadPage(true);
+		//-->
+	</script>	
+</head>
+
+	  <html:form  action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
+  		<html:hidden property="method"/>	 
 		<br>
 		<table align=center bgcolor="#FFFFFF"> 
 		
