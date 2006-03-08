@@ -103,43 +103,6 @@ public interface IExportPortfolioService {
 	public Portfolio exportPortfolioForStudent(Integer userId, Long lessonID, boolean anonymity, Cookie[] cookies);
 	
 	/**
-	 * A helper method that sets up the export url for the activity. Will go through all key-value pairs
-	 * in this map, and append it to the url given.
-	 * @param parametersToAppend Map containing parameter name-parameter value pairs, to be appended to the end of the url
-	 * @param url The url in which the parameters should be appended.
-	 * @return The url with all parameters appended.
-	 */
-	public String setupExportUrl(Map parametersToAppend, String url);
-	
-	/**
-	 * Obtains the Tool from the ToolActivity and creates a portfolio object with properties activityId, activityName, 
-	 * activityDescription, exportURL set to the value of the ToolActivity's properties activityId, toolDisplayName 
-	 * (retrieved from Tool object), title, exportPortfolioUrl respestively.
-	 * 
-	 * @param activity The Tool Activity
-	 * @return a Portfolio object
-	 */
-	public ToolPortfolio createToolPortfolio(ToolActivity activity);
-	
-	/**
-	 * This method will iterate through the list of ordered activities and create a Portfolio
-	 * object for each activity. It will set up most of the properies of the Portfolio object.
-	 * This method is used regardless of whether the export is being done by the teacher or
-	 * the student. However, if the export is being done be the teacher, the User object should
-	 * be null.
-	 * 
-	 * If the list of ordered activities is null, then a Portfolio object will be created
-	 * with the attribute exportTmpDir set and the array of ToolPortfolios being null.
-	 * 
-	 * @param orderedActivityList The ordered activity list to iterate through
-	 * @param accessMode The tool access mode, either Teacher or Learner.
-	 * @param user The learner, or null if export is being done by the teacher.
-	 * @return the array of Portfolio objects
-	 * @throws LamsToolServiceException
-	 */
-	public Vector setupPortfolios(Vector orderedActivityList, ToolAccessMode accessMode, User user) throws LamsToolServiceException;
-
-	/**
 	 * Returns the ordered activity list (ordered by the ActivityOrderComparator)
 	 * containing all activities present in the learning design. The list will
 	 * only contain Tool Activities. If it comes across a Complex Activity, it

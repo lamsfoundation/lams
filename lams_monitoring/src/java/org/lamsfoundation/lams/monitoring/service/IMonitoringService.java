@@ -300,6 +300,8 @@ public interface IMonitoringService
      * enviornment. This is the URL that opens up when the user/teacher clicks on
      * the activity in the monitoring enviornment and then selects a learner OR
      * in the LEARNER tab when a learner's activity is clicked.
+     * 
+     * This is also known as the learner progress url.
      *  
      * @param activityID The activity_id of the activity for which the URL is required 
      * @param userID The user_id of the Learner for whom the URL is being fetched

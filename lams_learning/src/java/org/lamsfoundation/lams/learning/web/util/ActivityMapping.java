@@ -298,7 +298,7 @@ public class ActivityMapping implements Serializable
     {
         try
         {
-            return toolService.getLearnerToolURLByMode(activity,learner,ToolAccessMode.LEARNER);
+            return toolService.getToolLearnerURL(activity,learner);
         }
         catch (LamsToolServiceException e)
         {

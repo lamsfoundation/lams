@@ -292,8 +292,23 @@ public class ExportPortfolioService implements IExportPortfolioService {
 		}
 	}
 		
-	/** @see org.lamsfoundation.lams.learning.export.service.IExportPortfolioService#setupPortfolios(java.util.Vector, org.lamsfoundation.lams.tool.ToolAccessMode, org.lamsfoundation.lams.usermanagement.User) */
-	public Vector setupPortfolios(Vector sortedActivityList, ToolAccessMode accessMode, User user) throws LamsToolServiceException
+	/**
+	 * This method will iterate through the list of ordered activities and create a Portfolio
+	 * object for each activity. It will set up most of the properies of the Portfolio object.
+	 * This method is used regardless of whether the export is being done by the teacher or
+	 * the student. However, if the export is being done be the teacher, the User object should
+	 * be null.
+	 * 
+	 * If the list of ordered activities is null, then a Portfolio object will be created
+	 * with the attribute exportTmpDir set and the array of ToolPortfolios being null.
+	 * 
+	 * @param orderedActivityList The ordered activity list to iterate through
+	 * @param accessMode The tool access mode, either Teacher or Learner.
+	 * @param user The learner, or null if export is being done by the teacher.
+	 * @return the array of Portfolio objects
+	 * @throws LamsToolServiceException
+	 */
+	protected Vector setupPortfolios(Vector sortedActivityList, ToolAccessMode accessMode, User user) throws LamsToolServiceException
 	{
 	    /* these checks are not really needed, the calling code ensures that the right parameters are supplied */
 		/* if (sortedActivityList == null)
@@ -314,7 +329,6 @@ public class ExportPortfolioService implements IExportPortfolioService {
 		Iterator i = sortedActivityList.iterator();
 		Vector portfolioList = new Vector();
 		
-		Map mapOfValuesToAppend = new HashMap();
 		while(i.hasNext())
 		{		
 			Activity activity = (Activity)i.next();
@@ -322,7 +336,8 @@ public class ExportPortfolioService implements IExportPortfolioService {
 			if (activity.isToolActivity())
 			{
 				ToolActivity toolActivity = (ToolActivity)activityDAO.getActivityByActivityId(activity.getActivityId());
-				ToolPortfolio portfolio = createToolPortfolio(toolActivity);
+				ToolPortfolio portfolio = createToolPortfolio(toolActivity,accessMode);
+				String url = portfolio.getExportUrl();
 				
 				/*
 				 * Append parameters to the export url.
@@ -331,27 +346,18 @@ public class ExportPortfolioService implements IExportPortfolioService {
 				 */
 				if (accessMode == ToolAccessMode.LEARNER)
 				{
+					url = WebUtil.appendParameterToURL(url, AttributeNames.PARAM_USER_ID, user.getUserId().toString());
 					ToolSession toolSession = lamsCoreToolService.getToolSessionByActivity(user, toolActivity);
-					/*if (toolSession == null)
-					{
-					    String error = "Cannot obtain the toolSessionId for this tool activity. The Tool Session for this user and activity is null. Cannot Continue";
-					    log.error(error);
-					    throw new ExportPortfolioException(error);
-					}*/
-					mapOfValuesToAppend.put(AttributeNames.PARAM_MODE, ToolAccessMode.LEARNER.toString());
-					mapOfValuesToAppend.put(AttributeNames.PARAM_USER_ID, user.getUserId().toString());
-					if (toolSession != null)
-					    mapOfValuesToAppend.put(AttributeNames.PARAM_TOOL_SESSION_ID, toolSession.getToolSessionId().toString());
+					if (toolSession != null) {
+						url = WebUtil.appendParameterToURL(url, AttributeNames.PARAM_TOOL_SESSION_ID, toolSession.getToolSessionId().toString());
+					}
 				}
 				else if (accessMode == ToolAccessMode.TEACHER)
 				{
-					mapOfValuesToAppend.put(AttributeNames.PARAM_MODE, ToolAccessMode.TEACHER.toString());
-					mapOfValuesToAppend.put(AttributeNames.PARAM_TOOL_CONTENT_ID, toolActivity.getToolContentId().toString());
+					url = WebUtil.appendParameterToURL(url, AttributeNames.PARAM_TOOL_CONTENT_ID, toolActivity.getToolContentId().toString());
 				}
-				
-				String url = setupExportUrl(mapOfValuesToAppend, portfolio.getExportUrl());
+
 				portfolio.setExportUrl(url);				
-									
 				portfolioList.add(portfolio); //add the portfolio at the end of the list.
 			}
 		}
@@ -359,8 +365,15 @@ public class ExportPortfolioService implements IExportPortfolioService {
 		return portfolioList;
 	}
 	
-	/** @see org.lamsfoundation.lams.learning.export.service.IExportPortfolioService#createToolPortfolio(org.lamsfoundation.lams.learningdesign.ToolActivity) */
-	public ToolPortfolio createToolPortfolio(ToolActivity activity)
+	/**
+	 * Obtains the Tool from the ToolActivity and creates a portfolio object with properties activityId, activityName, 
+	 * activityDescription, exportURL set to the value of the ToolActivity's properties activityId, toolDisplayName 
+	 * (retrieved from Tool object), title, exportPortfolioUrl respestively.
+	 * 
+	 * @param activity The Tool Activity
+	 * @return a Portfolio object
+	 */
+	protected ToolPortfolio createToolPortfolio(ToolActivity activity, ToolAccessMode accessMode)
 	{
 		if (activity == null)
 		{
@@ -375,31 +388,20 @@ public class ExportPortfolioService implements IExportPortfolioService {
 		p.setActivityDescription(activity.getTitle());
 		
 		/* if the tool does not have an export url, use the url that points to the servlet that generates a page saying that the export is not supported */
-		String exportUrlForTool = tool.getExportPortfolioUrl();
+		String exportUrlForTool = null;
+		if (accessMode == ToolAccessMode.LEARNER)
+			exportUrlForTool = tool.getExportPortfolioLearnerUrl();
+		else 
+			exportUrlForTool = tool.getExportPortfolioClassUrl();
+		
 		if (exportUrlForTool == null || exportUrlForTool.equals(""))
 		    p.setExportUrl(ExportPortfolioConstants.URL_FOR_UNSUPPORTED_EXPORT);
 		else    
-		    p.setExportUrl(tool.getExportPortfolioUrl()); 
+		    p.setExportUrl(exportUrlForTool); 
 		
 		return p;		
 	}
 	
-	/** @see org.lamsfoundation.lams.learning.export.service.IExportPortfolioService#setupExportUrl(java.util.Map, java.lang.String) */
-	public String setupExportUrl(Map parametersToAppend, String url)
-	{
-		int mapSize = parametersToAppend.size();
-		Iterator mapIterator = parametersToAppend.entrySet().iterator();
-		String urlToReturn = url;
-		for (int i=0; i< mapSize; i++)
-		{
-			Map.Entry entry = (Map.Entry)mapIterator.next();
-			String parameterName = (String)entry.getKey();
-			String parameterValue = (String)entry.getValue();
-			urlToReturn = WebUtil.appendParameterToURL(urlToReturn, parameterName, parameterValue);
-		}
-		return urlToReturn;
-	}
-		
 	/** @see org.lamsfoundation.lams.learning.export.service.IExportPortfolioService#getOrderedActivityList(org.lamsfoundation.lams.lesson.LearnerProgress) */
 	public Vector getOrderedActivityList(LearnerProgress learnerProgress)
 	{		

@@ -962,7 +962,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     	}else{
     		if(activity.isToolActivity()){
         		ToolActivity toolActivity = (ToolActivity)activity;        		
-        		String toolURL = lamsCoreToolService.getLearnerToolURLByMode(toolActivity,user,ToolAccessMode.TEACHER);        		
+        		String toolURL = lamsCoreToolService.getToolLearnerProgressURL(toolActivity,user);        		
         		flashMessage = new FlashMessage("getLearnerActivityURL",new ProgressActivityDTO(activityID,toolURL));
         	}else{
         		flashMessage = new FlashMessage("getLearnerActivityURL",
