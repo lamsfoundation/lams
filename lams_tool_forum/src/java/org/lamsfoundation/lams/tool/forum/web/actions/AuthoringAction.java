@@ -80,7 +80,7 @@ public class AuthoringAction extends Action {
 	  		request.getSession().setAttribute(ForumConstants.MODE,ForumConstants.AUTHOR_MODE);
        		return initPage(mapping, form, request, response);
         }
-	  	if (param.equals("defineLater")) {
+	  	if (param.equals("monitoringInitPage")) {
 	  		request.getSession().setAttribute(ForumConstants.MODE,ForumConstants.MONITOR_MODE);
 	  		return initPage(mapping, form, request, response);
 	  	}
