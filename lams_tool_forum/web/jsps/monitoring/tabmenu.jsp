@@ -1,4 +1,5 @@
 <%@ include file="/includes/taglibs.jsp"%>
+
 <div id="datatablecontainer">
 	<table class="forms">
 		<tr>
@@ -7,7 +8,7 @@
 			</c:set>
 			<td>
 				<a href="<c:out value='${monitoringURL}'/>listContentUsers.do?toolContentID=<c:out value='${sessionScope.toolContentID}'/>">
-					<fmt:message key="monitoring.tab.summary"/>
+					<fmt:message key=""/>
 				</a>
 			</td>
 			<td>
@@ -17,12 +18,12 @@
 			</td>
 			<td>
 				<a href="<c:out value='${monitoringURL}'/>editActivity.do?toolContentID=<c:out value='${sessionScope.toolContentID}'/>">
-					<fmt:message key="monitoring.tab.edit.activity"/>
+					<fmt:message key=""/>
 				</a>
 			</td>
 			<td>
 				<a href="<c:out value='${monitoringURL}'/>statistic.do?toolContentID=<c:out value='${sessionScope.toolContentID}'/>">
-					<fmt:message key="monitoring.tab.edit.statistics"/>
+					<fmt:message key=""/>
 					
 				</a>
 			</td>
