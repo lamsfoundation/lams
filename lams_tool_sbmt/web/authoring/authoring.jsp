@@ -84,7 +84,7 @@
 <h1><fmt:message key="label.authoring.heading" /></h1>
 
 <!-- start tabs -->
-<lams:Tabs collection="${tabs}" useKey="true"/>
+<lams:Tabs collection="${tabs}" useKey="true" control="true"/>
 <!-- end tab buttons -->
 <div class="tabbody">
 <table align=center> 	  
