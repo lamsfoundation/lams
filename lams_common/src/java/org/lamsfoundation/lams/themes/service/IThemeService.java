@@ -37,6 +37,9 @@ public interface IThemeService {
 	/** Message key returned by the storeTheme() method */
 	public static final String STORE_THEME_MESSAGE_KEY = "storeTheme";
 	
+	/** Message key for successful saved theme - setTheme() method */
+	public static final String SET_THEME_SAVED_MESSAGE_KEY = "theme.service.setTheme.saved";
+	
 	/**
      * Set IThemeDAO
      *

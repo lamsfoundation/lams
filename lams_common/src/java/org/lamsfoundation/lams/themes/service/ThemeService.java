@@ -35,10 +35,11 @@ import org.lamsfoundation.lams.themes.dto.CSSThemeBriefDTO;
 import org.lamsfoundation.lams.themes.dto.CSSThemeDTO;
 import org.lamsfoundation.lams.usermanagement.dao.IUserDAO;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
-
 import com.allaire.wddx.WddxDeserializationException;
+import org.lamsfoundation.lams.util.MessageService;
 
 /**
  * 
@@ -52,6 +53,7 @@ public class ThemeService implements IThemeService {
 	/** Required DAO's */
 	protected ICSSThemeDAO themeDAO;
 	protected IUserDAO userDAO;
+	protected MessageService messageService;
 	
 	/** for sending acknowledgment/error messages back to flash */
 	private FlashMessage flashMessage;
@@ -87,6 +89,19 @@ public class ThemeService implements IThemeService {
 		this.userDAO = userDAO;
 	}
 	
+	/**
+	 * Set i18n MessageService
+	 */
+	public void setMessageService(MessageService messageService) {
+		this.messageService = messageService;
+	}
+
+	/**
+	 * Get i18n MessageService
+	 */
+	public MessageService getMessageService() {
+		return this.messageService;
+	}
 	
 	/**********************************************
 	 * Utility/Service Methods
@@ -186,7 +201,7 @@ public class ThemeService implements IThemeService {
 		else{
 			user.setTheme(theme);
 			userDAO.updateUser(user);
-			flashMessage = new FlashMessage("setTheme", "User theme saved.");
+			flashMessage = new FlashMessage("setTheme", messageService.getMessage(IThemeService.SET_THEME_SAVED_MESSAGE_KEY));
 		}
 		
 		return flashMessage.serializeMessage();
