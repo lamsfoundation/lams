@@ -113,6 +113,7 @@
                 <prop key="createRootTopic">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="updateTopic">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="deleteTopic">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="hideMessage">PROPAGATION_REQUIRED,-java.lang.Exception</prop>                
                 <prop key="replyTopic">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="createUser">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="updateForum">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
