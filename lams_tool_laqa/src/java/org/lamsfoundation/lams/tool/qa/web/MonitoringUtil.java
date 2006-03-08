@@ -41,8 +41,6 @@ import org.lamsfoundation.lams.tool.qa.QaStringComparator;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.QaUtils;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
-import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
-import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * 
@@ -585,7 +583,6 @@ public class MonitoringUtil implements QaAppConstants{
 		}
 		return map;
 	}
-	
 }
 
 

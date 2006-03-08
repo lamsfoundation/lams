@@ -12,29 +12,29 @@
 
   <!-- ========== Form Bean Definitions =================================== -->
 
-<form-beans>
-	<form-bean name="QaAuthoringForm" type="org.lamsfoundation.lams.tool.qa.web.QaAuthoringForm"/>
-   	<form-bean name="QaLearningForm" type="org.lamsfoundation.lams.tool.qa.web.QaLearningForm"/>
-   	<form-bean name="QaMonitoringForm" type="org.lamsfoundation.lams.tool.qa.web.QaMonitoringForm"/>
-	<form-bean name="QaExportForm" type="org.lamsfoundation.lams.tool.qa.web.QaExportForm"/>		   	
-</form-beans>
-
-  <!-- ========== Global Exceptions Definitions =================================== -->
-  <!--
-    Define your exceptions in a file called global-exceptions.xml and place
-    it in your merge directory.
-  -->
-
-
-<global-exceptions>
-      <exception
-        key="error.system.qa"
-        type="org.lamsfoundation.lams.tool.qa.QaApplicationException"
-        handler="org.lamsfoundation.lams.util.CustomStrutsExceptionHandler"
-        path=".systemError"
-        scope="request"
-      />
-</global-exceptions>
+	<form-beans>
+		<form-bean name="QaAuthoringForm" type="org.lamsfoundation.lams.tool.qa.web.QaAuthoringForm"/>
+	   	<form-bean name="QaLearningForm" type="org.lamsfoundation.lams.tool.qa.web.QaLearningForm"/>
+	   	<form-bean name="QaMonitoringForm" type="org.lamsfoundation.lams.tool.qa.web.QaMonitoringForm"/>
+		<form-bean name="QaExportForm" type="org.lamsfoundation.lams.tool.qa.web.QaExportForm"/>		   	
+	</form-beans>
+	
+	  <!-- ========== Global Exceptions Definitions =================================== -->
+	  <!--
+	    Define your exceptions in a file called global-exceptions.xml and place
+	    it in your merge directory.
+	  -->
+	
+	
+	<global-exceptions>
+	      <exception
+	        key="error.exception.QaApplication"
+	        type="org.lamsfoundation.lams.tool.qa.QaApplicationException"
+	        handler="org.lamsfoundation.lams.tool.qa.web.CustomStrutsExceptionHandler"
+	        path="/SystemErrorContent.jsp"
+	        scope="request"
+	      />
+	</global-exceptions>
 
 
   <!-- ========== Global Forward Definitions =================================== -->
@@ -42,47 +42,64 @@
      <forward name="starter" path="/authoringStarter"/>   
 	  <forward name="learningStarter" path="/learningStarter"/>   
 	  <forward name="monitoringStarter" path="/monitoringStarter"/>   
- </global-forwards>
+ 	</global-forwards>
 
   <!-- ========== Action Mapping Definitions =================================== -->
   <action-mappings>
    <!--Authoring Starter  -->
     <action
-      path="/authoringStarter"
-      type="org.lamsfoundation.lams.tool.qa.web.QaStarterAction"
-      name="QaAuthoringForm"
-      scope="session"
-      unknown="false"
-      validate="false"
+		path="/authoringStarter"
+		type="org.lamsfoundation.lams.tool.qa.web.QaStarterAction"
+		name="QaAuthoringForm"
+		scope="session"
+		unknown="false"
+		validate="false"
     >
-        <forward
-          name="load"
-          path="/AuthoringMaincontent.jsp"
-          redirect="false"
-        />
 
-        <forward
-          name="loadViewOnly"
-          path="/authoring/AuthoringTabsHolder.jsp"
-          redirect="false"
-        />
-
+		<exception
+			key="error.exception.QaApplication"
+			type="org.lamsfoundation.lams.tool.qa.QaApplicationException"
+			handler="org.lamsfoundation.lams.tool.qa.web.CustomStrutsExceptionHandler"
+			path="/SystemErrorContent.jsp"
+			scope="request"
+		/>
+		    
+		<exception
+		    key="error.exception.QaApplication"
+		    type="java.lang.NullPointerException"
+		    handler="org.lamsfoundation.lams.tool.qa.web.CustomStrutsExceptionHandler"
+		    path="/SystemErrorContent.jsp"
+		    scope="request"
+		/>	         			
+	    
+	    <forward
+			name="load"
+			path="/AuthoringMaincontent.jsp"
+			redirect="false"
+	    />
+	
+	    <forward
+			name="loadViewOnly"
+	      	path="/authoring/AuthoringTabsHolder.jsp"
+	      	redirect="false"
+	    />
+	
 	  	<forward
-		    name="loadMonitoring"
-		    path="/monitoring/MonitoringMaincontent.jsp"
-		    redirect="true"
+			name="loadMonitoring"
+			path="/monitoring/MonitoringMaincontent.jsp"
+			redirect="true"
 	  	/>
-
+	
 	  	<forward
-		    name="errorList"
-		    path="/QaErrorBox.jsp"
-		    redirect="true"
+			name="errorList"
+			path="/QaErrorBox.jsp"
+			redirect="true"
 	  	/>
 	</action>  
 	
 	<action
       path="/authoring"
-      type="org.lamsfoundation.lams.tool.qa.web.QAction"
+      type="org.lamsfoundation.lams.tool.qa.web.QaAction"
       name="QaAuthoringForm"
       scope="session"
       input="/AuthoringMaincontent.jsp"
@@ -90,37 +107,73 @@
       unknown="false"
       validate="true"
     >
-      	<forward
+    
+		<exception
+			key="error.exception.QaApplication"
+			type="org.lamsfoundation.lams.tool.qa.QaApplicationException"
+			handler="org.lamsfoundation.lams.tool.qa.web.CustomStrutsExceptionHandler"
+			path="/SystemErrorContent.jsp"
+			scope="request"
+		/>
+		    
+		<exception
+		    key="error.exception.QaApplication"
+		    type="java.lang.NullPointerException"
+		    handler="org.lamsfoundation.lams.tool.qa.web.CustomStrutsExceptionHandler"
+		    path="/SystemErrorContent.jsp"
+		    scope="request"
+		/>	         			
+	    
+	  	<forward
 	        name="load"
 	        path="/AuthoringMaincontent.jsp"
 	        redirect="true"
-      />
-
+		/>
+	
 	  	<forward
 		    name="loadMonitoring"
 		    path="/monitoring/MonitoringMaincontent.jsp"
 		    redirect="true"
 	  	/>
-      
-        <forward
-          name="loadViewOnly"
-          path="/authoring/AuthoringTabsHolder.jsp"
-          redirect="false"
-        />
-      
-      	<forward
+	  
+	    <forward
+			name="loadViewOnly"
+			path="/authoring/AuthoringTabsHolder.jsp"
+			redirect="false"
+	    />
+	  
+	  	<forward
 	        name="starter"
-	        path=".starter"
+	        path="/index.jsp"
 	        redirect="true"
-      />
-    </action>
+	  	/>
+  </action>
 	
 	<!--Learning Starter  -->
-   <action path="/learningStarter" type="org.lamsfoundation.lams.tool.qa.web.QaLearningStarterAction" 
-   			name="QaLearningForm" input=".learningStarter"> 
-		  <forward
+   <action 
+   		path="/learningStarter" 
+   		type="org.lamsfoundation.lams.tool.qa.web.QaLearningStarterAction" 
+   		name="QaLearningForm" input="/learningIndex.jsp"> 
+   			
+		<exception
+			key="error.exception.QaApplication"
+			type="org.lamsfoundation.lams.tool.qa.QaApplicationException"
+			handler="org.lamsfoundation.lams.tool.qa.web.CustomStrutsExceptionHandler"
+			path="/SystemErrorContent.jsp"
+			scope="request"
+		/>
+		    
+		<exception
+		    key="error.exception.QaApplication"
+		    type="java.lang.NullPointerException"
+		    handler="org.lamsfoundation.lams.tool.qa.web.CustomStrutsExceptionHandler"
+		    path="/SystemErrorContent.jsp"
+		    scope="request"
+		/>	         			
+
+	  	<forward
 		    name="loadLearner"
-		    path="/learning/answersContent.jsp"
+		    path="/learning/AnswersContent.jsp"
 		    redirect="true"
 		  />
 	  	
@@ -136,10 +189,9 @@
 		    redirect="true"
 	  	/>
 	      
-
 	      <forward
 	        name="learningStarter"
-	        path=".learningStarter"
+	        path="/learningIndex.jsp"
 	        redirect="true"
 	      />
 	      
@@ -151,18 +203,34 @@
 	</action>  
 	
 	<action
-	      path="/learning"
-	      type="org.lamsfoundation.lams.tool.qa.web.QAction"
-	      name="QaLearningForm"
-	      scope="session"
-	      input="/learning/answersContent.jsp"
-	      parameter="method"
-	      unknown="false"
-	      validate="true">
+      path="/learning"
+      type="org.lamsfoundation.lams.tool.qa.web.QaLearningAction"
+      name="QaLearningForm"
+      scope="session"
+      input="/learning/AnswersContent.jsp"
+      parameter="method"
+      unknown="false"
+      validate="true">
 
-	      <forward
+		<exception
+			key="error.exception.QaApplication"
+			type="org.lamsfoundation.lams.tool.qa.QaApplicationException"
+			handler="org.lamsfoundation.lams.tool.qa.web.CustomStrutsExceptionHandler"
+			path="/SystemErrorContent.jsp"
+			scope="request"
+		/>
+		    
+		<exception
+		    key="error.exception.QaApplication"
+		    type="java.lang.NullPointerException"
+		    handler="org.lamsfoundation.lams.tool.qa.web.CustomStrutsExceptionHandler"
+		    path="/SystemErrorContent.jsp"
+		    scope="request"
+		/>	         			
+
+      	<forward
 		    name="loadLearner"
-		    path="/learning/answersContent.jsp"	        
+		    path="/learning/AnswersContent.jsp"	        
 		    redirect="true"
 	      />
 
@@ -172,13 +240,13 @@
 		    redirect="true"
 	  	/>
 	      
-	      <forward
+	    <forward
 	        name="learningStarter"
-	        path=".learningStarter"
+	        path="/learningIndex.jsp"
 	        redirect="true"
 	      />
       
-	      <forward
+	     <forward
 	        name="learnerRep"
 	        path="/monitoring/LearnerRep.jsp"
 	        redirect="true"
@@ -192,10 +260,27 @@
 	</action>
 	
 	   <!--Define Later Starter Action: initializes the DefineLater module -->
-   <action path="/defineLaterStarter" 
-   			type="org.lamsfoundation.lams.tool.qa.web.QaDLStarterAction" 
-   			name="QaAuthoringForm" 
-   			input="/index.jsp"> 
+   <action 
+   	path="/defineLaterStarter" 
+   	type="org.lamsfoundation.lams.tool.qa.web.QaDLStarterAction" 
+   	name="QaAuthoringForm" 
+   	input="/index.jsp"> 
+
+		<exception
+			key="error.exception.QaApplication"
+			type="org.lamsfoundation.lams.tool.qa.QaApplicationException"
+			handler="org.lamsfoundation.lams.tool.qa.web.CustomStrutsExceptionHandler"
+			path="/SystemErrorContent.jsp"
+			scope="request"
+		/>
+		    
+		<exception
+		    key="error.exception.QaApplication"
+		    type="java.lang.NullPointerException"
+		    handler="org.lamsfoundation.lams.tool.qa.web.CustomStrutsExceptionHandler"
+		    path="/SystemErrorContent.jsp"
+		    scope="request"
+		/>	         			
 
 	  	<forward
 		    name="load"
@@ -208,7 +293,6 @@
 	        path="/index.jsp"
 	        redirect="true"
 	     />
-	  
 	  
         <forward
           name="loadViewOnly"
@@ -223,16 +307,31 @@
 	  	/>
 	</action>  
 	
-
 	 <action
-	      path="/monitoringStarter"
-	      type="org.lamsfoundation.lams.tool.qa.web.QaMonitoringStarterAction"
-	      name="QaMonitoringForm"
-	      scope="session"
-	      parameter="method"
-	      unknown="false"
-	      validate="false">
-
+		path="/monitoringStarter"
+		type="org.lamsfoundation.lams.tool.qa.web.QaMonitoringStarterAction"
+		name="QaMonitoringForm"
+		scope="session"
+		parameter="method"
+		unknown="false"
+		validate="false">
+		
+		<exception
+			key="error.exception.QaApplication"
+			type="org.lamsfoundation.lams.tool.qa.QaApplicationException"
+			handler="org.lamsfoundation.lams.tool.qa.web.CustomStrutsExceptionHandler"
+			path="/SystemErrorContent.jsp"
+			scope="request"
+		/>
+		    
+		<exception
+		    key="error.exception.QaApplication"
+		    type="java.lang.NullPointerException"
+		    handler="org.lamsfoundation.lams.tool.qa.web.CustomStrutsExceptionHandler"
+		    path="/SystemErrorContent.jsp"
+		    scope="request"
+		/>	         			
+		
 	  	<forward
 		    name="loadMonitoring"
 		    path="/monitoring/MonitoringMaincontent.jsp"
@@ -255,6 +354,22 @@
 	      unknown="false"
 	      validate="false">
 	      
+		<exception
+			key="error.exception.QaApplication"
+			type="org.lamsfoundation.lams.tool.qa.QaApplicationException"
+			handler="org.lamsfoundation.lams.tool.qa.web.CustomStrutsExceptionHandler"
+			path="/SystemErrorContent.jsp"
+			scope="request"
+		/>
+		    
+		<exception
+		    key="error.exception.QaApplication"
+		    type="java.lang.NullPointerException"
+		    handler="org.lamsfoundation.lams.tool.qa.web.CustomStrutsExceptionHandler"
+		    path="/SystemErrorContent.jsp"
+		    scope="request"
+		/>	         			
+	      
 	  	<forward
 		    name="loadMonitoring"
 		    path="/monitoring/MonitoringMaincontent.jsp"
@@ -286,16 +401,33 @@
 	  	/>
 	</action>
 	
-	   <!--Export Portfolio Action -->
-	    <action
-		      path="/exportPortfolio"
-		      type="org.lamsfoundation.lams.tool.qa.web.QaExportAction"
-		      name="QaExportForm"
-		      scope="session"
-		      parameter="mode"
-		      unknown="false"
-		      validate="false"
-	    >
+   <!--Export Portfolio Action -->
+    <action
+      path="/exportPortfolio"
+      type="org.lamsfoundation.lams.tool.qa.web.QaExportAction"
+      name="QaExportForm"
+      scope="session"
+      parameter="mode"
+      unknown="false"
+      validate="false"
+    >
+	    
+		<exception
+			key="error.exception.QaApplication"
+			type="org.lamsfoundation.lams.tool.qa.QaApplicationException"
+			handler="org.lamsfoundation.lams.tool.qa.web.CustomStrutsExceptionHandler"
+			path="/SystemErrorContent.jsp"
+			scope="request"
+		/>
+		    
+		<exception
+		    key="error.exception.QaApplication"
+		    type="java.lang.NullPointerException"
+		    handler="org.lamsfoundation.lams.tool.qa.web.CustomStrutsExceptionHandler"
+		    path="/SystemErrorContent.jsp"
+		    scope="request"
+		/>	         			
+	    
 	    <forward
     	    name="exportPortfolio"
         	path="/exportPortfolio.jsp"
@@ -304,11 +436,10 @@
 
 	  	<forward
 		    name="errorList"
-		    path="/McErrorBox.jsp"
+		    path="/QaErrorBox.jsp"
 		    redirect="true"
 	  	/>
     </action>
-
  </action-mappings>
 
   <!-- Define your Struts controller in a file called struts-controller.xml and place it in your merge directory. -->

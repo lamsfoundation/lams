@@ -133,7 +133,7 @@
         name="contentLocked"
         type="boolean"
         access="property"        
-        column="content_locked"
+        column="content_inUse"
         length="1"
     />
     

@@ -44,7 +44,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * @author Ozgur Demirtas
- *
  * enables  the learner and teacher to export the contents of the mcq tool.
  */
 

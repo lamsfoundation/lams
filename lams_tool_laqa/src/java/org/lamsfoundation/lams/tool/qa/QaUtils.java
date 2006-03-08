@@ -43,17 +43,6 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
- * 
- * 
- * The session attributes ATTR_USERDATA refer to the same User object.
- * 
- * Verify the assumption:
- * We make the assumption that the obtained User object will habe a userId property ready in it. 
- * We use the same  userId property as the user table key when we are saving learner responses and associated user data. 
- *   * 
- */
-
-/**
  * @author Ozgur Demirtas
  *
  * TODO To change the template for this generated type comment go to
@@ -93,16 +82,6 @@ public abstract class QaUtils implements QaAppConstants {
 		return intId;
 	}
 	
-	
-	/**
-     * cleanupSession(TreeMap mapQuestionContent, HttpServletRequest request)
-     * return void
-     * cleans up the session of the content details
-     */
-    public static void cleanupSession(HttpServletRequest request)
-    {
-
-    }
 
     /**
      * setDefaultSessionAttributes(HttpServletRequest request, QaContent defaultQaContent, QaAuthoringForm qaAuthoringForm)
@@ -133,8 +112,6 @@ public abstract class QaUtils implements QaAppConstants {
 	}
     
     
-
-
 	public static int getCurrentUserId(HttpServletRequest request) throws QaApplicationException
     {
 	    HttpSession ss = SessionManager.getSession();
@@ -579,7 +556,13 @@ public abstract class QaUtils implements QaAppConstants {
 		request.getSession().removeAttribute(USER_EXCEPTION_MODE_INVALID);
 	}
 	
-	
+
+	/**
+	 * setDefineLater(HttpServletRequest request, boolean value, String toolContentId)
+	 * @param request
+	 * @param value
+	 * @param toolContentId
+	 */
 	public static void setDefineLater(HttpServletRequest request, boolean value, String toolContentId)
     {
 		IQaService qaService = (IQaService)request.getSession().getAttribute(TOOL_SERVICE);
@@ -592,12 +575,18 @@ public abstract class QaUtils implements QaAppConstants {
     	if (qaContent != null)
     	{
     		qaContent.setDefineLater(value);
-        	logger.debug("defineLater has been set to true");
+        	logger.debug("defineLater has been set to:" + value);
         	qaService.updateQa(qaContent);	
     	}
     }
 	
-	
+
+	/**
+	 * determines the struts level location to return  
+	 * @param sourceMcStarter
+	 * @param requestedModule
+	 * @return
+	 */
 	public static String getDestination(String sourceMcStarter, String requestedModule)
 	{
 		logger.debug("sourceMcStarter: " + sourceMcStarter + " and requestedModule:" + requestedModule);

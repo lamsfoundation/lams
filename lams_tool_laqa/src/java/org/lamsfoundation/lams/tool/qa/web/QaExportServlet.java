@@ -33,7 +33,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * @author Ozgur Demirtas
- *
+ * used in exporting tool content
  */
 public class QaExportServlet extends AbstractExportPortfolioServlet {
 	
@@ -41,7 +41,6 @@ public class QaExportServlet extends AbstractExportPortfolioServlet {
 	
 	public String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies)
 	{
-	
 		String mode = WebUtil.readStrParam(request, AttributeNames.PARAM_MODE);
 		String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+request.getContextPath();
 

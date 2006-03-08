@@ -32,7 +32,6 @@ import org.lamsfoundation.lams.tool.qa.QaAppConstants;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
-	/* form controllers */
 	protected String addContent;
 	protected String removeContent;
 	protected String removeAllContent;

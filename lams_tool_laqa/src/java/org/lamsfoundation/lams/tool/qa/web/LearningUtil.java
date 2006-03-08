@@ -23,10 +23,7 @@ package org.lamsfoundation.lams.tool.qa.web;
 
 import java.util.Date;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,14 +31,11 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
-import org.lamsfoundation.lams.tool.qa.QaComparator;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaSession;
-import org.lamsfoundation.lams.tool.qa.QaStringComparator;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
-import org.lamsfoundation.lams.tool.qa.QaUtils;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -73,9 +67,7 @@ public class LearningUtil implements QaAppConstants{
     	logger.debug("retrieving toolUser: " + toolUser);
     	logger.debug("retrieving toolUser userId: " + toolUser.getUserID());
     	logger.debug("retrieving toolUser username: " + toolUser.getLogin());
-    	/*
-    	 * !!double check this!!
-    	 */
+
     	String userName=toolUser.getLogin(); 
     	String fullName= toolUser.getFirstName() + " " + toolUser.getLastName();
     	logger.debug("retrieving toolUser fullname: " + fullName);
@@ -163,12 +155,6 @@ public class LearningUtil implements QaAppConstants{
     }
 
     
-    
-    
-    
-
-
-    
     /**
 	 * feedBackAnswersProgress(HttpServletRequest request, int currentQuestionIndex)
 	 * give user feedback on the remaining questions
@@ -200,5 +186,4 @@ public class LearningUtil implements QaAppConstants{
         qaService.updateQa(qaContent);
         logger.debug("content with id : " + toolContentId + "has been marked LOCKED and updated in the db");
     }
-
 }

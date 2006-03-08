@@ -21,22 +21,20 @@
  * ***********************************************************************/
 package org.lamsfoundation.lams.tool.qa.web;
 
-/**
- * ActionForm for the Learning environment
- */
+/** ActionForm for the Learning environment */
 import org.apache.struts.action.ActionForm;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 
 /**
  * @author Ozgur Demirtas
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
  */
 public class QaLearningForm extends ActionForm implements QaAppConstants {
+	
+	//controls which method is called by the Lookup map */
+	protected String method;
+
 	protected String answer;
 	protected String currentQuestionIndex;
-	/* form controllers */
 	protected String submitAnswersContent;
 	protected String getNextQuestion;
 	protected String getPreviousQuestion;
@@ -142,5 +140,17 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
 	 */
 	public void setResponseId(String responseId) {
 		this.responseId = responseId;
+	}
+	/**
+	 * @return Returns the method.
+	 */
+	public String getMethod() {
+		return method;
+	}
+	/**
+	 * @param method The method to set.
+	 */
+	public void setMethod(String method) {
+		this.method = method;
 	}
 }

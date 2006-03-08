@@ -28,15 +28,11 @@ import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 /**
  * @author Ozgur Demirtas
  *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
  */
 public class QaMonitoringForm extends QaAuthoringForm implements QaAppConstants {
-//	 controls which method is called by the Lookup map */
+	//controls which method is called by the Lookup map */
 	protected String method;
-
 	protected String selectedToolSessionId;
-	
 	protected String isToolSessionChanged;
 	
 	/**

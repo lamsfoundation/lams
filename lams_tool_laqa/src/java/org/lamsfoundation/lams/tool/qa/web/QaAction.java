@@ -32,7 +32,6 @@ import java.util.TreeMap;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.Globals;
@@ -46,100 +45,23 @@ import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.exception.ToolException;
-
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
+import org.lamsfoundation.lams.tool.qa.QaApplicationException;
 import org.lamsfoundation.lams.tool.qa.QaComparator;
 import org.lamsfoundation.lams.tool.qa.QaContent;
-import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaUploadedFile;
 import org.lamsfoundation.lams.tool.qa.QaUtils;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
 import org.lamsfoundation.lams.tool.qa.util.QaToolContentHandler;
-import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.session.SessionManager;
-import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-/**
- * 
- * the tool's web.xml will be modified to have classpath to learning service.
- * This is how the tool gets the definition of "learnerService"
- */
-
-/**
- * 
- * when to reset define later and synchin monitor etc..
- *  
- */
-
-/** make sure the tool gets called on:
- *  setAsForceComplete(Long userId) throws QaApplicationException 
- */
-
-
-/**
- * 
- * User Issue:
- * Right now:
- * 1- the tool gets the request object from the container.
- * 2- Principal principal = req.getUserPrincipal();
- * 3- String username = principal.getName();
- * 4- User userCompleteData = qaService.getCurrentUserData(userName);
- * 5- write back userCompleteData.getUserId()
- */
-
-
-/**
- * 
- * JBoss Issue: 
- * Currently getUserPrincipal() returns null and ServletRequest.isUserInRole() always returns false on unsecured pages, 
- * even after the user has been authenticated.
- * http://jira.jboss.com/jira/browse/JBWEB-19 
- */
-
-
-/**
- * eliminate calls:
- * authoringUtil.simulatePropertyInspector_RunOffline(request);
- * authoringUtil.simulatePropertyInspector_setAsDefineLater(request);
- */
-
-
-/**
- * 
- * TOOL PARAMETERS: ?? (toolAccessMode) ??
- * Authoring environment: toolContentId
- * Learning environment: toolSessionId + toolContentId  
- * Monitoring environment: toolContentId / Contribute tab:toolSessionId(s)
- *   
- * 
- */
-
-/**
- * Note: the tool must support deletion of an existing content from within the authoring environment.
- * The current support for this is by implementing the tool contract : removeToolContent(Long toolContentId)
- */
-
-
-/**
- * 
- * We have had to simulate container bahaviour in development stage by calling 
- * createToolSession and leaveToolSession from the web layer. These will go once the tool is 
- * in deployment environment.
- * 
- * 
- * CHECK: leaveToolSession and relavent LearnerService may need to be defined in the spring config file.
- * 
- */
-
-
-/**
- * 
- * GROUPING SUPPORT: Find out what to do.
+/** 
+ *  setAsForceComplete(Long userId) throws QaApplicationException ? 
  */
 
 
@@ -159,9 +81,9 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * 
  * @author Ozgur Demirtas
  */
-public class QAction extends LamsDispatchAction implements QaAppConstants
+public class QaAction extends LamsDispatchAction implements QaAppConstants
 {
-    static Logger logger = Logger.getLogger(QAction.class.getName());
+    static Logger logger = Logger.getLogger(QaAction.class.getName());
     
     private QaToolContentHandler toolContentHandler;
     
@@ -190,6 +112,19 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
         return (mapping.findForward(LOAD_QUESTIONS));
     }
     
+    /**
+     * submits content
+     * ActionForward submitAllContent(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
+        throws IOException, ServletException
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     */
     public ActionForward submitAllContent(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
         throws IOException, ServletException {
     	
@@ -230,6 +165,10 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
         request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(1));
         logger.debug("setting SUBMIT_SUCCESS to 1.");
         
+        Long strToolContentId=(Long)request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
+	    logger.debug("strToolContentId: " + strToolContentId);
+        QaUtils.setDefineLater(request, false, strToolContentId.toString());
+        
         saveErrors(request,errors);
         
         qaAuthoringForm.resetUserAction();
@@ -244,12 +183,26 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
                                          ServletException
 	{
     	logger.debug("dispatching proxy editActivity...");
-    	//QaMonitoringAction qaMonitoringAction= new QaMonitoringAction();
-	    //return qaMonitoringAction.editActivity(mapping, form, request, response);
     	return null;
 	}
 
     
+    /**
+     * calls monitoring action summary screen generation
+     * ActionForward getSummary(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     */
     public ActionForward getSummary(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
@@ -262,6 +215,22 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
 	}
 
     
+    /**
+     * calls monitoring action instructions screen generation
+     * ActionForward getInstructions(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     */
     public ActionForward getInstructions(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
@@ -273,6 +242,23 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
     	return qaMonitoringAction.getInstructions(mapping, form, request, response);
 	}
 
+    /**
+     * calls monitoring action stats screen generation
+     * 
+     * ActionForward getStats(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     */
     public ActionForward getStats(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
@@ -285,6 +271,24 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
 	}
 
     
+    /**
+     * generates Edit Activity screen
+     * ActionForward editActivityQuestions(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException,
+                                         ToolException
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     * @throws ToolException
+     */
     public ActionForward editActivityQuestions(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
@@ -322,6 +326,19 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
     }
 
     
+    /**
+     * adds a new question to the questions map
+     * ActionForward addNewQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
+        throws IOException, ServletException
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     */
     public ActionForward addNewQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
         throws IOException, ServletException {
     	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
@@ -334,6 +351,20 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
         return (mapping.findForward(LOAD_QUESTIONS));
     }
     
+    
+    /**
+     * removes a question from the questions map
+     * ActionForward removeQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
+        throws IOException, ServletException
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     */
     public ActionForward removeQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
         throws IOException, ServletException {
     	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
@@ -347,6 +378,20 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
         return (mapping.findForward(LOAD_QUESTIONS));
     }
 
+    
+    /**
+     * adds a new file to content repository
+     * ActionForward addNewFile(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
+        throws IOException, ServletException
+        
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     */
     public ActionForward addNewFile(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
         throws IOException, ServletException {
     	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
@@ -354,10 +399,26 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
         
         addFileToContentRepository(request, qaAuthoringForm);
         qaAuthoringForm.resetUserAction();
-        // request.getSession().setAttribute(CHOICE,CHOICE_TYPE_INSTRUCTIONS); 
         return (mapping.findForward(LOAD_QUESTIONS));
     }
     
+    
+    /**
+     * deletes a file from the content repository
+     * ActionForward deleteFile(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     */
     public ActionForward deleteFile(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
@@ -381,7 +442,7 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
    
 
     /**
-     * perform error validation on form submit
+     * performs error validation on form submit
      * 
      * ActionMessages validateSubmit(HttpServletRequest request, ActionMessages errors, QaAuthoringForm qaAuthoringForm)
      * @param request
@@ -441,187 +502,6 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
         return errors;
     }
     
-    
-    /**
-     * This method manages the presentation Map for the learner mode.
-     * The dispatch method to decide which view should be shown to the user.
-     * The deicision is based on tool access mode and tool session status.
-     * The tool access mode is lams concept and should comes from progress
-     * engine, whereas tool session status is tool's own session state
-     * concept and should be loaded from database and setup by
-     * <code>loadQuestionnaire</code>.
-     * 
-     * @param mapping An ActionMapping class that will be used by the Action class to tell
-     * the ActionServlet where to send the end-user.
-     *
-     * @param form The ActionForm class that will contain any data submitted
-     * by the end-user via a form.
-     * @param request A standard Servlet HttpServletRequest class.
-     * @param response A standard Servlet HttpServletResponse class.
-     * @return An ActionForward class that will be returned to the ActionServlet indicating where
-     *         the user is to go next.
-     * @throws IOException
-     * @throws ServletException
-     * @throws ToolException 
-     */
-    public ActionForward displayQ(ActionMapping mapping,
-                                              ActionForm form,
-                                              HttpServletRequest request,
-                                              HttpServletResponse response) throws IOException,
-                                                                        ServletException, ToolException
-    {
-        logger.debug("dispatching displayQ...");
-    	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
-        /*
-         * if the content is not ready yet, don't even proceed.
-         * check the define later status
-         */
-        Boolean defineLater=(Boolean)request.getSession().getAttribute(IS_DEFINE_LATER);
-        logger.debug("learning-defineLater: " + defineLater);
-        if (defineLater.booleanValue() == true)
-        {
-            QaUtils.cleanUpSessionAbsolute(request);
-			logger.debug("default content id has not been setup");
-			persistError(request,"error.defineLater");
-			request.getSession().setAttribute(USER_EXCEPTION_CONTENT_DEFINE_LATER, new Boolean(true).toString());
-			return (mapping.findForward(ERROR_LIST_LEARNER));
-        }
-        
-        LearningUtil learningUtil= new LearningUtil();
-        QaLearningForm qaLearningForm = (QaLearningForm) form;
-        IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-        
-        /*retrieve the default question content map*/ 
-        Map mapQuestions=(Map)request.getSession().getAttribute(MAP_QUESTION_CONTENT_LEARNER);
-        logger.debug("MAP_QUESTION_CONTENT_LEARNER:" + request.getSession().getAttribute(MAP_QUESTION_CONTENT_LEARNER));
-        
-        Map mapAnswers=(Map)request.getSession().getAttribute(MAP_ANSWERS);
-        logger.debug("MAP_ANSWERS:" + mapAnswers);
-
-        /*obtain author's question listing preference*/
-        String questionListingMode=(String) request.getSession().getAttribute(QUESTION_LISTING_MODE);
-        /* maintain Map either based on sequential listing or based on combined listing*/
-        if (questionListingMode.equalsIgnoreCase(QUESTION_LISTING_MODE_SEQUENTIAL))
-        {
-            logger.debug("QUESTION_LISTING_MODE_SEQUENTIAL");
-            
-            int currentQuestionIndex=new Long(qaLearningForm.getCurrentQuestionIndex()).intValue();
-            logger.debug("currentQuestionIndex is: " + currentQuestionIndex);
-            logger.debug("getting answer for question: " + currentQuestionIndex + "as: " +  qaLearningForm.getAnswer());
-            logger.debug("mapAnswers size:" + mapAnswers.size());
-            
-            if  (mapAnswers.size() >= currentQuestionIndex)
-            {
-                logger.debug("mapAnswers size:" + mapAnswers.size() + " and currentQuestionIndex: " + currentQuestionIndex);
-                mapAnswers.remove(new Long(currentQuestionIndex).toString());
-            }
-            logger.debug("before adding to mapAnswers: " + mapAnswers);
-            mapAnswers.put(new Long(currentQuestionIndex).toString(), qaLearningForm.getAnswer());
-            logger.debug("adding new answer:" + qaLearningForm.getAnswer() + " to mapAnswers.");
-            
-            if (qaLearningForm.getGetNextQuestion() != null)
-                currentQuestionIndex++; 
-            else if (qaLearningForm.getGetPreviousQuestion() != null)
-                currentQuestionIndex--;
-            
-            request.getSession().setAttribute(CURRENT_ANSWER, mapAnswers.get(new Long(currentQuestionIndex).toString()));
-            logger.debug("currentQuestionIndex will be: " + currentQuestionIndex);
-            request.getSession().setAttribute(CURRENT_QUESTION_INDEX, new Long(currentQuestionIndex));
-            learningUtil.feedBackAnswersProgress(request,currentQuestionIndex);
-            qaLearningForm.resetUserActions(); /*resets all except submitAnswersContent */ 
-        }
-        else
-        {
-            logger.debug(logger + " " + this.getClass().getName() +  "QUESTION_LISTING_MODE_COMBINED");
-            for (int questionIndex=INITIAL_QUESTION_COUNT.intValue(); questionIndex<= mapQuestions.size(); questionIndex++ )
-            {
-                String answer=request.getParameter("answer" + questionIndex);
-                logger.debug("answer for question " + questionIndex + " is:" + answer);
-                mapAnswers.put(new Long(questionIndex).toString(), answer);
-            }
-        }
-        logger.debug("continue processing answers...");
-        /*
-         *  At this point the Map holding learner responses is ready. So place that into the session.
-         */
-        request.getSession().setAttribute(MAP_ANSWERS, mapAnswers);
-        
-        /*
-         * Learner submits the responses to the questions. 
-         */
-        if (qaLearningForm.getSubmitAnswersContent() != null)
-        {
-        	request.getSession().setAttribute(TOOL_SERVICE, qaService);
-    		logger.debug("qaService: " + qaService);
-    		
-            logger.debug(logger + " " + this.getClass().getName() +  "submit the responses: " + mapAnswers);
-            /*recreate the users and responses*/
-            learningUtil.createUsersAndResponses(mapAnswers, request, qaService);
-            qaLearningForm.resetUserActions();
-            qaLearningForm.setSubmitAnswersContent(null);
-            Long toolContentId=(Long) request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
-            learningUtil.setContentInUse(toolContentId.longValue(), qaService);
-            logger.debug("content has been set in use");
-            
-            logger.debug("start generating learning report...");
-            Long toolContentID=(Long) request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
-    	    logger.debug("toolContentID: " + toolContentID);
-    	    QaContent qaContent=qaService.loadQa(toolContentID.longValue());
-    	    logger.debug("qaContent: " + qaContent);
-
-    	   
-    	    String userID= (String)request.getSession().getAttribute(USER_ID);
-			logger.debug("userID: " + userID);
-			QaQueUsr qaQueUsr=qaService.getQaQueUsrById(new Long(userID).longValue());
-			logger.debug("the current user qaQueUsr " + qaQueUsr + " and username: "  + qaQueUsr.getUsername());
-			logger.debug("the current user qaQueUsr's session  " + qaQueUsr.getQaSession());
-			String currentSessionId=qaQueUsr.getQaSession().getQaSessionId().toString();
-			logger.debug("the current user SessionId  " + currentSessionId);
-			    	    
-    	    
-    	    Boolean isUserNamesVisibleBoolean=(Boolean)request.getSession().getAttribute(IS_USERNAME_VISIBLE);
-	    	boolean isUserNamesVisible=isUserNamesVisibleBoolean.booleanValue();
-	    	logger.debug("isUserNamesVisible: " + isUserNamesVisible);
-    	    
-	    	QaMonitoringAction qaMonitoringAction= new QaMonitoringAction();
-	    	/*the report should have all the users' entries OR
-	    	 * the report should have only the current session's entries*/
-	    	qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, isUserNamesVisible, true, currentSessionId, null);
-	    	
-    		request.getSession().setAttribute(REQUEST_LEARNING_REPORT, new Boolean(true).toString());
-    		logger.debug("fwd'ing to." + LEARNER_REPORT);
-    		return (mapping.findForward(LEARNER_REPORT));
-        }
-        else if (qaLearningForm.getEndLearning() != null) 
-        {
-        		endLearning(request, qaService,  response);
-                return null;
-         }
-            
-        logger.debug("forwarding to: " + LOAD_LEARNER);
-        qaLearningForm.resetUserActions();
-        return (mapping.findForward(LOAD_LEARNER));
-    }
-
-    
-    public void endLearning(HttpServletRequest request, IQaService qaService, HttpServletResponse response) 
-    	throws IOException, ToolException
-    {
-        /*
-         * The learner is done with the tool session. The tool needs to clean-up.
-         */
-		logger.debug("end learning...");
-        Long toolSessionId=(Long)request.getSession().getAttribute(AttributeNames.PARAM_TOOL_SESSION_ID);
-        HttpSession ss = SessionManager.getSession();
-        /*get back login user DTO*/
-        UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-        logger.debug("simulating container behaviour by calling  " +
-                     "leaveToolSession() with toolSessionId: " +  toolSessionId + " and user: " + user);
-        
-        String nextActivityUrl = qaService.leaveToolSession(toolSessionId, new Long(user.getUserID().longValue()));
-        response.sendRedirect(nextActivityUrl);
-    }
-
     /**
      * persists error messages to request scope
      * 
@@ -638,6 +518,11 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
     } 
     
     
+    /**
+     * addFileToContentRepository(HttpServletRequest request, QaAuthoringForm qaAuthoringForm)
+     * @param request
+     * @param qaAuthoringForm
+     */
     public void addFileToContentRepository(HttpServletRequest request, QaAuthoringForm qaAuthoringForm)
     {
         logger.debug("attempt addFileToContentRepository");
@@ -709,21 +594,32 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
     }
         
     
+    /**
+     * QaToolContentHandler getToolContentHandler()
+     * @return
+     */
     private QaToolContentHandler getToolContentHandler()
     {
         if ( toolContentHandler == null ) {
               WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
-//            toolContentHandler = (QaToolContentHandler) wac.getBean(QaToolContentHandler.SPRING_BEAN_NAME);
               toolContentHandler = (QaToolContentHandler) wac.getBean("qaToolContentHandler");
             }
             return toolContentHandler;
     }
 
-    /** 
-    * Go through the attachments collections. Remove any content repository or tool objects
-    * matching entries in the the deletedAttachments collection, add any new attachments in the
-    * attachments collection. Clear the deletedAttachments collection, ready for new editing.
-    */ 
+    /**
+     * 
+     * Go through the attachments collections. Remove any content repository or tool objects
+     * matching entries in the the deletedAttachments collection, add any new attachments in the
+     * attachments collection. Clear the deletedAttachments collection, ready for new editing.
+     * 
+     * @param qaContent
+     * @param attachmentList
+     * @param deletedAttachmentList
+     * @param mapping
+     * @param request
+     * @return
+     */
     private List saveAttachments (QaContent qaContent, 
             List attachmentList, List deletedAttachmentList,
             ActionMapping mapping, HttpServletRequest request) {
@@ -753,7 +649,6 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
                     saveErrors( request, am ); 
                 }
 
-                // remove tool entry from db
                 if ( attachment.getSubmissionId() != null ) {
                     qaService.removeFile(attachment.getSubmissionId());
                 }

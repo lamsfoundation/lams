@@ -143,7 +143,23 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	 	return (mapping.findForward(LOAD_MONITORING));
 	}
 
-    
+
+    /**
+     * activates editActivity screen
+     * ActionForward editActivity(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     */
     public ActionForward editActivity(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
@@ -191,6 +207,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
     
     /**
      * switches to summary tab of the monitoring url
+     * 
      * getSummary(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
@@ -249,6 +266,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 
     /**
      * gets called when the user selects a group from dropdown box in the summary tab 
+     * 
      * submitSession(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
@@ -294,7 +312,22 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
     	return (mapping.findForward(LOAD_MONITORING));	
 	}
 
-	
+    
+	/**
+	 * enables the user to edit responses
+	 * ActionForward editResponse(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws IOException
+	 * @throws ServletException
+	 */
     public ActionForward editResponse(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
@@ -316,6 +349,22 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	}
     
 
+    /**
+     * enables the user to update responses 
+     * ActionForward updateResponse(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     */
     public ActionForward updateResponse(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
@@ -346,7 +395,22 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    return (mapping.findForward(LOAD_MONITORING));	
 	}
 
-    
+    /**
+     * enables the user to delete responses
+     * ActionForward deleteResponse(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     */
     public ActionForward deleteResponse(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
@@ -376,7 +440,11 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
     	return (mapping.findForward(LOAD_MONITORING));	
 	}
 
-
+    
+    /**
+     * refreshUserInput(HttpServletRequest request)
+     * @param request
+     */
     public void refreshUserInput(HttpServletRequest request)
     {
     	IQaService qaService = (IQaService)request.getSession().getAttribute(TOOL_SERVICE);
@@ -394,8 +462,22 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
     }
     
     
-    
-    
+    /**
+     * ?TEMPORARY: allows to exit monitoring url 
+     * ActionForward doneMonitoring(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+                                         
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     */
     public ActionForward doneMonitoring(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
@@ -407,8 +489,6 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
     	return (mapping.findForward(LOAD_STARTER)); 
     }
 
-    
-    
     
 	/**
      * persists error messages to request scope
@@ -459,7 +539,24 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
         }
     }
     
-   
+    
+    /**
+     * calls learning action endLearning functionality 
+     * ActionForward endLearning(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException, ToolException
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     * @throws ToolException
+     */
     public ActionForward endLearning(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
@@ -476,11 +573,25 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 			logger.debug("retrieving qaService from session: " + qaService);
 		}
 
-    	QAction qAction=  new QAction();
-    	qAction.endLearning(request, qaService, response);
+    	QaLearningAction qaLearningAction= new QaLearningAction();
+    	qaLearningAction.endLearning(request, qaService, response);
     	return null; 
     }
     
+    
+    /**
+     * populates data for summary screen
+     * refreshSummaryData(HttpServletRequest request, QaContent qaContent, IQaService qaService, 
+			boolean isUserNamesVisible, boolean isLearnerRequest, String currentSessionId, String userId)
+			
+     * @param request
+     * @param qaContent
+     * @param qaService
+     * @param isUserNamesVisible
+     * @param isLearnerRequest
+     * @param currentSessionId
+     * @param userId
+     */
 	public void refreshSummaryData(HttpServletRequest request, QaContent qaContent, IQaService qaService, 
 			boolean isUserNamesVisible, boolean isLearnerRequest, String currentSessionId, String userId)
 	{
@@ -533,7 +644,12 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    /* ends here. */
 	}
 
-    
+	
+    /**
+     * populates data for stats screen
+     * refreshStatsData(HttpServletRequest request)
+     * @param request
+     */
 	public void refreshStatsData(HttpServletRequest request)
 	{
 		/* it is possible that no users has ever logged in for the activity yet*/
@@ -564,6 +680,11 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	}
 	
 	
+	/**
+	 * populates data for instructions screen
+	 * @param request
+	 * @param qaContent
+	 */
 	public void refreshInstructionsData(HttpServletRequest request, QaContent qaContent)
 	{
 	    request.getSession().setAttribute(RICHTEXT_ONLINEINSTRUCTIONS,qaContent.getOnlineInstructions());

@@ -114,15 +114,17 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 public class QaLearningStarterAction extends Action implements QaAppConstants {
 	static Logger logger = Logger.getLogger(QaLearningStarterAction.class.getName());
 
-	/* holds the question contents for a given tool session and relevant content */
-	protected Map mapQuestions= new TreeMap(new QaComparator());
-	
-	/*holds the answers */  
-	protected Map mapAnswers= new TreeMap(new QaComparator());
-	
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
   								throws IOException, ServletException, QaApplicationException {
+		
+		QaUtils.cleanUpSessionAbsolute(request);
 
+		/* holds the question contents for a given tool session and relevant content */
+		Map mapQuestions= new TreeMap(new QaComparator());
+		
+		/*holds the answers */  
+		Map mapAnswers= new TreeMap(new QaComparator());
+		
 		QaLearningForm qaQaLearningForm = (QaLearningForm) form;
 		
 		request.getSession().setAttribute(CURRENT_QUESTION_INDEX, "1");
@@ -421,6 +423,21 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    		return (mapping.findForward(LEARNER_REPORT));
 
 	    }
+	    
+        /*
+         * if the content is not ready yet, don't even proceed.
+         * check the define later status
+         */
+        Boolean defineLater=(Boolean)request.getSession().getAttribute(IS_DEFINE_LATER);
+        logger.debug("learning-defineLater: " + defineLater);
+        if (defineLater.booleanValue() == true)
+        {
+            QaUtils.cleanUpSessionAbsolute(request);
+			persistError(request,"error.defineLater");
+			request.getSession().setAttribute(USER_EXCEPTION_CONTENT_DEFINE_LATER, new Boolean(true).toString());
+			return (mapping.findForward(ERROR_LIST_LEARNER));
+        }
+        
     	/*
     	 * present user with the questions.
     	 */

@@ -42,41 +42,41 @@ import org.lamsfoundation.lams.tool.qa.QaApplicationException;
 public class CustomStrutsExceptionHandler extends ExceptionHandler {
     private static Logger logger = Logger.getLogger(CustomStrutsExceptionHandler.class);
  
-	    public ActionForward execute(Exception ex,
-	                                 ExceptionConfig ae,
-	                                 ActionMapping mapping,
-	                                 ActionForm formInstance,
-	                                 HttpServletRequest request,
-	                                 HttpServletResponse response) 
-	    {
-	        logger.error("fatal System exception: [" + ex.getMessage() + "] ", ex);
-	        ActionForward forward = null;
-	        String property = null;
+    public ActionForward execute(Exception ex,
+                                 ExceptionConfig ae,
+                                 ActionMapping mapping,
+                                 ActionForm formInstance,
+                                 HttpServletRequest request,
+                                 HttpServletResponse response) 
+    {
+        logger.error("fatal System exception: [" + ex.getMessage() + "] ", ex);
+        ActionForward forward = null;
+        String property = null;
 
-	        String path = null;
-	        if (ae.getPath() != null)
-	        {
-	            path = ae.getPath();
-	        }
-	        else
-	        {
-	            path = mapping.getInput();
-	        }
-	        logger.error("path: " + path);
-	        forward = new ActionForward(path);
-	        logger.error("forward: " + forward);
+        String path = null;
+        if (ae.getPath() != null)
+        {
+            path = ae.getPath();
+        }
+        else
+        {
+            path = mapping.getInput();
+        }
+        logger.error("path: " + path);
+        forward = new ActionForward(path);
+        logger.error("forward: " + forward);
 
-	        /* some exceptions do have null messages, so be careful! */
-	        String exceptionMessage = ex.getMessage();
-	        logger.error("exceptionMessage: " + exceptionMessage);
-	        String errorMessage = exceptionMessage == null || exceptionMessage.equals("null") ? ex.getClass().getName() : ex.getMessage();
-	        logger.error("errorMessage: " + errorMessage);
-	        ActionMessage error = null;
-	        if (QaApplicationException.class.isInstance(ex) ) {
-		        error = new ActionMessage(QaAppConstants.ERROR_QAAPPLICATION, errorMessage );
-	        }        
-	        storeException(request, property, error, forward, ae.getScope( ));
-	        /* process the exception as normal */
-	        return forward;
-	    }
+        /* some exceptions do have null messages, so be careful! */
+        String exceptionMessage = ex.getMessage();
+        logger.error("exceptionMessage: " + exceptionMessage);
+        String errorMessage = exceptionMessage == null || exceptionMessage.equals("null") ? ex.getClass().getName() : ex.getMessage();
+        logger.error("errorMessage: " + errorMessage);
+        ActionMessage error = null;
+        if (QaApplicationException.class.isInstance(ex) ) {
+	        error = new ActionMessage(QaAppConstants.ERROR_QAAPPLICATION, errorMessage );
+        }        
+        storeException(request, property, error, forward, ae.getScope( ));
+        /* process the exception as normal */
+        return forward;
+    }
 }

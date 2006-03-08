@@ -280,6 +280,9 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		}
         
         qaAuthoringForm.setToolContentId(strToolContentId);
+        request.getSession().setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, new Long(strToolContentId));
+	    logger.debug("using TOOL_CONTENT_ID: " + strToolContentId);
+	    
 
 		/*
 		 * find out if the passed tool content id exists in the db 
@@ -524,9 +527,23 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	}
 	
 	
-		
-	
-
+	/**
+	 * bridges define later url request to authoring functionality
+	 * 
+	 * executeDefineLater(ActionMapping mapping, ActionForm form, 
+			HttpServletRequest request, HttpServletResponse response, IQaService qaService) 
+		throws IOException, ServletException, QaApplicationException
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @param qaService
+	 * @return
+	 * @throws IOException
+	 * @throws ServletException
+	 * @throws QaApplicationException
+	 */
 	public ActionForward executeDefineLater(ActionMapping mapping, ActionForm form, 
 			HttpServletRequest request, HttpServletResponse response, IQaService qaService) 
 		throws IOException, ServletException, QaApplicationException {
@@ -537,7 +554,6 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	}
 
 	
-
 	/**
      * persists error messages to request scope
      * @param request
