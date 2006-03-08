@@ -30,6 +30,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.Vector;
 
+import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningDesignDAO;
 import org.lamsfoundation.lams.learningdesign.dto.LicenseDTO;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
@@ -70,11 +71,11 @@ public class TestAuthoringService extends AbstractLamsTestCase {
 							 "org/lamsfoundation/lams/authoring/authoringApplicationContext.xml"};	
 	}
 	public void testCopyLearningdesign()throws UserException, WorkspaceFolderException, LearningDesignException, IOException{			
-		String wddxPacket = authService.copyLearningDesign(new Long(1),
+		LearningDesign design = authService.copyLearningDesign(new Long(1),
 															   new Integer(1),
 															   new Integer(1),
-															   new Integer(1));
-		System.out.println(wddxPacket);				
+															   new Integer(1),
+															   true);
 	} 
 	// TODO Check that this packet structure is still what is coming from Flash, and change test case to actually check the values are updated.
 	public void testGetLearningDesignDetails()throws Exception{
