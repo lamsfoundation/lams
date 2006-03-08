@@ -39,7 +39,6 @@ activity_ui_id
 , create_grouping_id
 , create_grouping_ui_id
 , library_activity_id
-, language_file
 )
 VALUES
 (
@@ -78,5 +77,4 @@ NULL
 , NULL
 , NULL
 , NULL
-, 'org.lamsfoundation.lams.tool.qa.QaResources'
 )
