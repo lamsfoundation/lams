@@ -123,6 +123,7 @@
 	<bean id="themeServiceTarget" class="org.lamsfoundation.lams.themes.service.ThemeService">
 		<property name="themeDAO"><ref local="themeDAO"/></property>
 		<property name="userDAO"><ref local="userDAO"/></property>
+		<property name="messageService"><ref bean="commonMessageService"/></property>
 	</bean>
 	
 	<bean id="themeService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
