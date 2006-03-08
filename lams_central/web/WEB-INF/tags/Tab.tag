@@ -34,14 +34,36 @@
 <%@ attribute name="id" required="true" rtexprvalue="true" %>
 <%@ attribute name="value" required="false" rtexprvalue="true" %>
 <%@ attribute name="key" required="false" rtexprvalue="true" %>
+<%@ attribute name="inactive" required="false" rtexprvalue="true" %>
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-bean" prefix="bean" %>
+<%@ taglib uri="tags-lams" prefix="lams" %>
+<c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="methodCall" value="selectTab"/>
 <c:set var="title" value="${value}"/>
+<c:set var="tableftFile" value="aqua_tab_left.gif"/>
+<c:set var="tabrightFile" value="aqua_tab_right.gif"/>
+<c:set var="tabcentreClass" value="tab tabcentre"/>
+
 <c:if test="${dControl}">
 	<c:set var="methodCall" value="doSelectTab"/>
 </c:if>
+
 <c:if test="${key != null && value == null}">
 	<c:set var="title"><bean:message name="key" scope="page"/></c:set>
 </c:if>
-<li id="tab${id}" class="tabitem"><div class="tableft"><div class="tabright"><a href="javascript:${methodCall}(${id});">${title}</a> <!-- IE CSS Bug, If you remove the space infront this comment then height of the Tab will change in IE - Anthony --></div></div></li>
+
+<c:if test="${inactive}">
+	<c:set var="tableftFile" value="aqua_tab_i_left.gif"/>
+	<c:set var="tabrightFile" value="aqua_tab_i_right.gif"/>
+	<c:set var="tabcentreClass" value="tab tabcentre_inactive"/>
+</c:if>
+
+<td>
+	<table border="0" cellspacing="0" cellpadding="0" width="120" summary="This table is being used for layout purposes only">
+	  <tr>
+		<td width="8"><a href="#" onClick="${methodCall}(${id});return false;" ><img src="${lams}images/${tableftFile}" name="tableft_${id}" width="8" height="22" border="0" id="tableft_${id}"/></a></td>
+		<td class="${tabcentreClass}" id="tab${id}"  onClick="${methodCall}(${id});return false;"  nowrap="nowrap"><a href="#" onClick="${methodCall}(${id});return false;" id="${id}" >${title}</a></td>
+		<td width="8"><a href="#" onClick="${methodCall}(${id});return false;" ><img src="${lams}images/${tabrightFile}" name="tabright_${id}" width="8" height="22" border="0" id="tabright_${id}"/></a></td></tr>
+	</table>
+</td>
