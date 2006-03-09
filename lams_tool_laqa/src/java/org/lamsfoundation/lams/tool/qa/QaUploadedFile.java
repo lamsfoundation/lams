@@ -26,6 +26,11 @@ import java.io.Serializable;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
+import org.lamsfoundation.lams.contentrepository.NodeKey;
+import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
+import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 
 /**
  * 
@@ -43,8 +48,9 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * Holds question content within a particular content  
  */
 
-public class QaUploadedFile implements Serializable
+public class QaUploadedFile implements Serializable, Comparable
 {
+	static Logger logger = Logger.getLogger(QaUploadedFile.class.getName());
 	/** identifier field */
     private Long submissionId;
     
@@ -75,12 +81,41 @@ public class QaUploadedFile implements Serializable
         this.fileName = fileName;
         this.qaContent=qaContent;
     }
+    
+    
+    public static QaUploadedFile newInstance(IToolContentHandler toolContentHandler, QaUploadedFile qaUploadedFile,
+			QaContent newMcContent) throws ItemNotFoundException, RepositoryCheckedException
+			
+	{
+    	QaUploadedFile newMcUploadedFile=null;
+
+    	try
+		{
+    		NodeKey copiedNodeKey =  toolContentHandler.copyFile(new Long(qaUploadedFile.getUuid()));
+        	logger.debug("copied NodeKey: " + copiedNodeKey);
+        	logger.debug("copied NodeKey uuid: " + copiedNodeKey.getUuid().toString());
+        	newMcUploadedFile = new QaUploadedFile(copiedNodeKey.getUuid().toString(),
+        			qaUploadedFile.isFileOnline(),
+        			qaUploadedFile.getFileName(),
+					newMcContent);
+
+		}
+		catch(RepositoryCheckedException e)
+		{
+			logger.debug("error occurred: " + e);
+		}
+		
+    	return newMcUploadedFile;
+	}
+    
+    
 
     public QaUploadedFile(String uuid, 
     					boolean fileOnline, 
     					String fileName,
 						QaContent qaContent)  
     {
+    	logger.debug("constructor gets called.");
         this.uuid = uuid;
         this.fileOnline = fileOnline;
         this.fileName = fileName;
@@ -172,4 +207,14 @@ public class QaUploadedFile implements Serializable
 	public void setFileOnline(boolean fileOnline) {
 		this.fileOnline = fileOnline;
 	}
+	
+	public int compareTo(Object o)
+    {
+		QaUploadedFile file = (QaUploadedFile) o;
+        //if the object does not exist yet, then just return any one of 0, -1, 1. Should not make a difference.
+        if (submissionId == null)
+        	return 1;
+		else
+			return (int) (submissionId.longValue() - file.submissionId.longValue());
+    }
 }

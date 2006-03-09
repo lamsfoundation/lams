@@ -39,6 +39,8 @@ public interface IQaContentDAO
 	
 	public QaContent getQaBySession(Long sessionId);
     
+	public void saveOrUpdateQa(QaContent qa);
+	
     public void saveQa(QaContent qa);
     
     public void updateQa(QaContent qa);

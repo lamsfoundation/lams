@@ -38,7 +38,7 @@
             name="fileName"
             type="java.lang.String"
             access="property"
-            column="fileName"
+            column="filename"
    />
    
        <!--  property

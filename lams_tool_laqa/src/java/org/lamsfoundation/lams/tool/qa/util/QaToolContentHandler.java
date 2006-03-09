@@ -26,8 +26,6 @@ import org.lamsfoundation.lams.contentrepository.client.ToolContentHandler;
 
 /**
  * Simple client for accessing the content repository.
- * 
- *  @author <a href="mailto:anthony.xiao@lamsinternational.com">Anthony Xiao</a>
  */
 public class QaToolContentHandler extends ToolContentHandler {
 

@@ -79,6 +79,7 @@
 					<property name="toolService"><ref bean="lamsToolService"/></property>
 					<property name="repositoryService"><ref bean="repositoryService"/></property>
 					<property name="learnerService"><ref bean="learnerService"/></property>			
+					<property name="qaToolContentHandler"><ref bean="qaToolContentHandler"/></property>								
 				</bean>
 			</property>
 			<property name="transactionAttributes">

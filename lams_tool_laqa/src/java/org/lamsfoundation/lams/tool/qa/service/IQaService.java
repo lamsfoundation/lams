@@ -63,6 +63,8 @@ public interface IQaService
      */
     
 	public QaContent loadQa(long toolContentId) throws QaApplicationException;
+	
+	public void saveOrUpdateQa(QaContent qa) throws QaApplicationException;
 
 	public QaContent getQaContentByUID(Long uid) throws QaApplicationException;
 	

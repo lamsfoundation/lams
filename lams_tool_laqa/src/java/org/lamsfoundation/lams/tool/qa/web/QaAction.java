@@ -158,7 +158,8 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants
         QaContent qaContent = authoringUtil.saveOrUpdateQaContent(mapQuestionContent, qaService, qaAuthoringForm);
         logger.debug("after saveOrUpdateQaContent.");
 
-        saveAttachments(qaContent, attachmentList, deletedAttachmentList, mapping, request);
+        List attacments=saveAttachments(qaContent, attachmentList, deletedAttachmentList, mapping, request);
+        logger.debug("attacments: " + attacments);
   
         errors.clear();
         errors.add(Globals.ERROR_KEY, new ActionMessage("submit.successful"));
@@ -559,7 +560,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants
         // if a file with the same name already exists then move the old one to deleted
         deletedAttachmentList = QaUtils.moveToDelete(uploadedFile.getFileName(), isOnlineFile, attachmentList, deletedAttachmentList );
 
-        
         try
         {
             // This is a new file and so is saved to the content repository. Add it to the 
@@ -624,21 +624,32 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants
             List attachmentList, List deletedAttachmentList,
             ActionMapping mapping, HttpServletRequest request) {
 
+    	logger.debug("start saveAttachments, attachmentList " + attachmentList);
+    	logger.debug("start deletedAttachmentList, deletedAttachmentList " + deletedAttachmentList);
+    	
         if(attachmentList==null || deletedAttachmentList==null)
             return null;
         
         IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
+        logger.debug("qaService: " + qaService);
         
         if ( deletedAttachmentList != null ) {
+        	logger.debug("deletedAttachmentList is iterated...");
             Iterator iter = deletedAttachmentList.iterator();
             while (iter.hasNext()) {
                 QaUploadedFile attachment = (QaUploadedFile) iter.next();
+                logger.debug("attachment: " + attachment);
                 
                 // remove entry from content repository. deleting a non-existent entry 
                 // shouldn't cause any errors.
-                try {
+                try 
+				{
+                	
                     if(attachment.getUuid()!= null)
-                        getToolContentHandler().deleteFile(Long.getLong(attachment.getUuid()));
+                    {
+                    	getToolContentHandler().deleteFile(Long.getLong(attachment.getUuid()));
+                        logger.error("deleted file with uuid: " + attachment.getUuid());
+                    }
                 }
                 catch (RepositoryCheckedException e) {
                     logger.error("Unable to delete file",e);
@@ -654,16 +665,21 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants
                 }
             }
             deletedAttachmentList.clear();
+            logger.error("cleared attachment list.");
         }
         
-        if ( attachmentList != null ) {
+        if ( attachmentList != null ) 
+        {
+        	logger.debug("attachmentList is iterated...");
             Iterator iter = attachmentList.iterator();
             while (iter.hasNext()) {
                 QaUploadedFile attachment = (QaUploadedFile) iter.next();
+            	logger.debug("attachment: " + attachment);
+            	logger.debug("attachment submission id: " + attachment.getSubmissionId());
 
                 if ( attachment.getSubmissionId() == null ) {
                     // add entry to tool table - file already in content repository
-                    //FIXME: qaService.saveAttachment(nbContent, attachment);
+                	logger.debug("calling persistFile with  attachment: " + attachment);
                     qaService.persistFile(qaContent, attachment);
                 }
             }

@@ -38,6 +38,7 @@ import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
 import org.lamsfoundation.lams.contentrepository.LoginException;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
+import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.contentrepository.service.RepositoryProxy;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
@@ -108,6 +109,7 @@ public class QaServicePOJO
     private IQaUsrRespDAO 		qaUsrRespDAO;
     private IQaUploadedFileDAO  qaUploadedFileDAO;
     
+    private IToolContentHandler qaToolContentHandler = null;
     private IUserManagementService userManagementService;
     private ILamsToolService toolService;
     private ILearnerService learnerService;
@@ -180,6 +182,21 @@ public class QaServicePOJO
 														   e);
         }
     }
+    
+    public void saveOrUpdateQa(QaContent qa) throws QaApplicationException
+	{
+        try
+        {
+            qaDAO.saveOrUpdateQa(qa);
+        }
+        catch (DataAccessException e)
+        {
+            throw new QaApplicationException("Exception occured when lams is saveOrUpdating qa content: "
+                                                         + e.getMessage(),
+														   e);
+        }
+    	
+	}
 
     /**
      * returns null if not found
@@ -820,6 +837,7 @@ public class QaServicePOJO
 	 * 
 	 */
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException
+     
     {
     	logger.debug("start of copyToolContent with ids: " + fromContentId + " and " + toContentId);
 
@@ -873,7 +891,9 @@ public class QaServicePOJO
             
             logger.debug("final - retrieved fromContent: " + fromContent);
             logger.debug("final - before new instance using " + fromContent + " and " + toContentId);
-            QaContent toContent = QaContent.newInstance(fromContent,toContentId);
+            
+            
+            QaContent toContent = QaContent.newInstance(qaToolContentHandler, fromContent,toContentId);
             if (toContent == null)
             {
             	logger.debug("throwing ToolException: WARNING!, retrieved toContent is null.");
@@ -892,6 +912,15 @@ public class QaServicePOJO
         	logger.debug("throwing ToolException: Exception occured when lams is copying content between content ids.");
             throw new ToolException("Exception occured when lams is copying content between content ids."); 
         }
+        catch (ItemNotFoundException e)
+        {
+            throw new ToolException("Exception occured when lams is copying content between content ids."); 
+        }
+        catch (RepositoryCheckedException e)
+        {
+            throw new ToolException("Exception occured when lams is copying content between content ids."); 
+        }
+        
     }
 
 
@@ -1534,22 +1563,17 @@ public class QaServicePOJO
     /**
      * adds a new entry to the uploaded files table
      */
-    public void persistFile(QaContent content, QaUploadedFile file) throws QaApplicationException {       
+    public void persistFile(QaContent content, QaUploadedFile file) throws QaApplicationException {
+    	logger.debug("in persistFile: " + file);
         content.getQaUploadedFiles().add(file);
         file.setQaContent(content);
-        if ( content.getQaContentId() == null ) {
-            qaDAO.saveQa(content);
-        } else {            
-            qaDAO.updateQa(content);
-        }
-        
-        //qaUploadedFileDAO.saveUploadFile(file);
+        qaDAO.saveOrUpdateQa(content);
         logger.debug("persisted qaUploadedFile: " + file);
     }
     
     
     /**
-     * adds a new entry to the uploaded files table
+     * removes an entry from the uploaded files table
      */
     public void removeFile(Long submissionId) throws QaApplicationException {
         qaUploadedFileDAO.removeUploadFile(submissionId);
@@ -1724,4 +1748,16 @@ public class QaServicePOJO
     {
         this.toolService = toolService;
     }
+	/**
+	 * @return Returns the qaToolContentHandler.
+	 */
+	public IToolContentHandler getQaToolContentHandler() {
+		return qaToolContentHandler;
+	}
+	/**
+	 * @param qaToolContentHandler The qaToolContentHandler to set.
+	 */
+	public void setQaToolContentHandler(IToolContentHandler qaToolContentHandler) {
+		this.qaToolContentHandler = qaToolContentHandler;
+	}
 }

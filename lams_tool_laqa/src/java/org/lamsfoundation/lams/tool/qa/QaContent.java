@@ -31,6 +31,9 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
+import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
+import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
 
 
@@ -175,8 +178,9 @@ public class QaContent implements Serializable {
      * @param newContentId the new qa content id.
      * @return the new qa content object.
      */
-    public static QaContent newInstance(QaContent qa,
+    public static QaContent newInstance(IToolContentHandler toolContentHandler, QaContent qa,
             Long newContentId)
+    	throws ItemNotFoundException, RepositoryCheckedException
     {
     	QaContent newContent = new QaContent(newContentId,
     				 qa.getContent(),
@@ -202,10 +206,12 @@ public class QaContent implements Serializable {
     	logger.debug(logger + " " + "QaContent" +  " " + "before doing deepCopyQaQueContent");
     	newContent.setQaQueContents(qa.deepCopyQaQueContent(newContent));
     	logger.debug(logger + " " + "QaContent" +  " " + "after doing deepCopyQaQueContent");
+
+    	newContent.setQaUploadedFiles(qa.deepCopyQaAttachments(toolContentHandler, newContent));	
+		
     	return newContent;
 	}
 
-    
     public Set deepCopyQaQueContent(QaContent newQaContent)
     {
     	logger.debug(logger + " " + "QaContent" +  " " + "start of deepCopyQaQueContent");
@@ -220,6 +226,25 @@ public class QaContent implements Serializable {
         logger.debug(logger + " " + "QaContent" +  " " + "returning newQaQueContent: " + newQaQueContent);
         return newQaQueContent;
     }
+    
+    
+    public Set deepCopyQaAttachments(IToolContentHandler toolContentHandler,QaContent newQaContent)
+    throws ItemNotFoundException, RepositoryCheckedException
+    {
+    	Set attachments = new TreeSet();
+        for (Iterator i = this.getQaUploadedFiles().iterator(); i.hasNext();)
+        {
+        	QaUploadedFile qaUploadedFile = (QaUploadedFile) i.next();
+            if (qaUploadedFile.getQaContent() != null)
+            {
+            	QaUploadedFile newQaUploadedFile=QaUploadedFile.newInstance(toolContentHandler, qaUploadedFile,
+            			newQaContent);
+            	attachments.add(newQaUploadedFile);
+            }
+        }
+        return attachments;
+    }
+    
     
     
     public Set deepCopyQaSession(QaContent newQaSession)

@@ -110,8 +110,17 @@ public class QaContentDAO extends HibernateDaoSupport implements IQaContentDAO {
 	     
 	    public void saveQa(QaContent qa) 
 	    {
+	    	this.getSession().setFlushMode(FlushMode.AUTO);
 	    	this.getHibernateTemplate().save(qa);
 	    }
+	    
+	 	public void saveOrUpdateQa(QaContent qa)
+	    {
+	 		this.getSession().setFlushMode(FlushMode.AUTO);
+			logger.debug("before saveOrUpdateQa: " + qa);
+			this.getHibernateTemplate().saveOrUpdate(qa);
+	    }
+
 	    
 	    public void createQa(QaContent qa) 
 	    {
