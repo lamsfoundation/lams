@@ -97,6 +97,11 @@ input, select, textarea {
 	background-repeat:repeat-x;
 }
 
+.tabcentre_inactive{
+	background-image:url(../images/aqua_tab_i_centre.gif);
+	background-repeat:repeat-x;
+}
+
 /** Non Selected tab style **/
 .tableft td{
 	background: url(../images/aqua_tab_left.gif) no-repeat;
@@ -110,8 +115,16 @@ input, select, textarea {
 	background: url(../images/aqua_tab_s_left.gif) no-repeat;
 }
 
+.tableft_inactive td{
+	background: url(../images/aqua_tab_i_left.gif) no-repeat;
+}
+
 .tabright_selected td{
 	background: url(../images/aqua_tab_s_right.gif) no-repeat;
+}
+
+.tabright_inactive td{
+	background: url(../images/aqua_tab_i_right.gif) no-repeat;
 }
 
 /*Tab content containers*/
