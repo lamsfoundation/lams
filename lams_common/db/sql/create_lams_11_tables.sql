@@ -537,7 +537,6 @@ CREATE TABLE lams_cr_node (
      , created_date_time DATETIME NOT NULL
      , next_version_id BIGINT(20) UNSIGNED NOT NULL DEFAULT 1
      , parent_nv_id BIGINT(20) UNSIGNED
-     , nv_id BIGINT(20) UNSIGNED NOT NULL
      , PRIMARY KEY (node_id)
      , INDEX (workspace_id)
      , CONSTRAINT FK_lams_cr_node_1 FOREIGN KEY (workspace_id)
