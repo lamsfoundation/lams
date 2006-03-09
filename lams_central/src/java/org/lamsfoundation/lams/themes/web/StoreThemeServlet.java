@@ -19,12 +19,12 @@
  * 
  * http://www.gnu.org/licenses/gpl.txt
  * ************************************************************************
- */package org.lamsfoundation.lams.authoring.web;
+ */package org.lamsfoundation.lams.themes.web;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.authoring.service.IAuthoringService;
+import org.lamsfoundation.lams.themes.service.IThemeService;
 import org.lamsfoundation.lams.web.servlet.AbstractStoreWDDXPacketServlet;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -35,25 +35,25 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @author Fiona Malikoff
  *
  * @web:servlet name="storeTheme"
- * @web:servlet-mapping url-pattern="/authoring/storeTheme"
+ * @web:servlet-mapping url-pattern="/themes/storeTheme"
  */
 public class StoreThemeServlet extends AbstractStoreWDDXPacketServlet {
 
 	private static Logger log = Logger.getLogger(StoreThemeServlet.class);
 
-	public IAuthoringService getAuthoringService(){
+	public IThemeService getThemeService(){
 		WebApplicationContext webContext = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
-		return (IAuthoringService) webContext.getBean(AuthoringConstants.AUTHORING_SERVICE_BEAN_NAME);		
+		return (IThemeService) webContext.getBean(ThemeConstants.THEME_SERVICE_BEAN_NAME);		
 	}
 
 	protected String process(String theme, HttpServletRequest request) 
 		throws Exception
 		{
-			IAuthoringService authoringService = getAuthoringService();
-			return authoringService.storeTheme(theme);
+			IThemeService themeService = getThemeService();
+			return themeService.storeTheme(theme);
 		}
 	
 	protected String getMessageKey(String theme, HttpServletRequest request) {
-		return IAuthoringService.STORE_THEME_MESSAGE_KEY;
+		return IThemeService.STORE_THEME_MESSAGE_KEY;
 	}
 }
