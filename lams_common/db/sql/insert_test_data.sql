@@ -18,107 +18,132 @@ insert into lams_learning_library (learning_library_id,description,title,create_
 -- Populates the lams_tool table with default tools corresponding to each of the above libraries
 
 insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,description,tool_identifier,tool_version,default_tool_content_id,
-grouping_support_type_id,supports_define_later_flag,supports_run_offline_flag,supports_moderation_flag,supports_contribute_flag,
-learner_url,author_url,define_later_url,export_portfolio_url,monitor_url,contribute_url,moderation_url,
-valid_flag,learning_library_id,create_date_time)
+grouping_support_type_id,supports_run_offline_flag,
+learner_url, learner_preview_url, learner_progress_url, author_url, define_later_url, 
+export_pfolio_learner_url, export_pfolio_class_url, monitor_url,contribute_url, moderation_url,
+language_file, valid_flag,learning_library_id,create_date_time)
 values(1,'notebook_signature','notebookService','Notebook','Notebook Description','notebook','1.1',1,
-2,0,1,0,1,
-'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url','contribute_url','moderation_url',
-1,1,now());
+2,1,
+'learner_url','learner_url','learner_url','author_url','define_later_url',
+'export_portfolio_learner_url','export_portfolio_learner_url','monitor_url','contribute_url','moderation_url',
+'toolsig.ApplicationResources',1,1,now());
 
 insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,description,tool_identifier,tool_version,default_tool_content_id,
-grouping_support_type_id,supports_define_later_flag,supports_run_offline_flag,supports_moderation_flag,supports_contribute_flag,
-learner_url,author_url,define_later_url,export_portfolio_url,monitor_url,contribute_url,moderation_url,
-valid_flag,learning_library_id,create_date_time)
+grouping_support_type_id,supports_run_offline_flag,
+learner_url, learner_preview_url, learner_progress_url, author_url, define_later_url, 
+export_pfolio_learner_url, export_pfolio_class_url, monitor_url,contribute_url, moderation_url,
+language_file, valid_flag,learning_library_id,create_date_time)
 values(2,'noticeboard_signature','noticeboardService','Noticeboard','Noticeboard Description','noticeboard','1.1',2,
-2,1,1,0,1,
-'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url','contribute_url','moderation_url',
-1,2,now());
+2,1,
+'learner_url','learner_url','learner_url','author_url','define_later_url',
+'export_portfolio_learner_url','export_portfolio_learner_url','monitor_url','contribute_url','moderation_url',
+'toolsig.ApplicationResources',1,2,now());
 
 insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,description,tool_identifier,tool_version,default_tool_content_id,
-grouping_support_type_id,supports_define_later_flag,supports_run_offline_flag,supports_moderation_flag,supports_contribute_flag,
-learner_url,author_url,define_later_url,export_portfolio_url,monitor_url,contribute_url,moderation_url,
-valid_flag,learning_library_id,create_date_time)
+grouping_support_type_id,supports_run_offline_flag,
+learner_url, learner_preview_url, learner_progress_url, author_url, define_later_url, 
+export_pfolio_learner_url, export_pfolio_class_url, monitor_url,contribute_url, moderation_url,
+language_file, valid_flag,learning_library_id,create_date_time)
 values(3,'multiple_choice_signature','multipleChoiceService','Multiple Choice','Multiple Coice Description','multiple choice','1.1',3,
-2,1,1,1,1,
-'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url','contribute_url','moderation_url',
-1,3,now());
+2,1,
+'learner_url','learner_url','learner_url','author_url','define_later_url',
+'export_portfolio_learner_url','export_portfolio_learner_url','monitor_url','contribute_url','moderation_url',
+'toolsig.ApplicationResources',1,3,now());
 
 insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,description,tool_identifier,tool_version,default_tool_content_id,
-grouping_support_type_id,supports_define_later_flag,supports_run_offline_flag,supports_moderation_flag,supports_contribute_flag,
-learner_url,author_url,define_later_url,export_portfolio_url,monitor_url,contribute_url,moderation_url,
-valid_flag,learning_library_id,create_date_time)
+grouping_support_type_id,supports_run_offline_flag,
+learner_url, learner_preview_url, learner_progress_url, author_url, define_later_url, 
+export_pfolio_learner_url, export_pfolio_class_url, monitor_url,contribute_url, moderation_url,
+language_file, valid_flag,learning_library_id,create_date_time)
 values(4,'question_answer_signature','questionAnswerService','Question and Answers','Question and Answers Description','q & a','1.1',4,
-2,1,1,1,1,
-'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url','contribute_url','moderation_url',
-1,4,now());
+2,1,
+'learner_url','learner_url','learner_url','author_url','define_later_url',
+'export_portfolio_learner_url','export_portfolio_learner_url','monitor_url','contribute_url','moderation_url',
+'toolsig.ApplicationResources',1,4,now());
 
 insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,description,tool_identifier,tool_version,default_tool_content_id,
-grouping_support_type_id,supports_define_later_flag,supports_run_offline_flag,supports_moderation_flag,supports_contribute_flag,
-learner_url,author_url,define_later_url,export_portfolio_url,monitor_url,contribute_url,moderation_url,
-valid_flag,learning_library_id,create_date_time)
+grouping_support_type_id,supports_run_offline_flag,
+learner_url, learner_preview_url, learner_progress_url, author_url, define_later_url, 
+export_pfolio_learner_url, export_pfolio_class_url, monitor_url,contribute_url, moderation_url,
+language_file, valid_flag,learning_library_id,create_date_time)
 values(5,'message_board_signature','messageBoardService','Message Board','Message Board Description','forum','1.1',5,
-2,1,1,1,1,
-'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url','contribute_url','moderation_url',
-1,5,now());
+2,1,
+'learner_url','learner_url','learner_url','author_url','define_later_url',
+'export_portfolio_learner_url','export_portfolio_learner_url','monitor_url','contribute_url','moderation_url',
+'toolsig.ApplicationResources',1,5,now());
 
 insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,description,tool_identifier,tool_version,default_tool_content_id,
-grouping_support_type_id,supports_define_later_flag,supports_run_offline_flag,supports_moderation_flag,supports_contribute_flag,
-learner_url,author_url,define_later_url,export_portfolio_url,monitor_url,contribute_url,moderation_url,
-valid_flag,learning_library_id,create_date_time)
+grouping_support_type_id,supports_run_offline_flag,
+learner_url, learner_preview_url, learner_progress_url, author_url, define_later_url, 
+export_pfolio_learner_url, export_pfolio_class_url, monitor_url,contribute_url, moderation_url,
+language_file, valid_flag,learning_library_id,create_date_time)
 values(6,'survey_signature','srvyService','Survey','Survey Description','survey','1.1',6,
-2,1,1,1,1,
-'/lams_tool_survey/tool/survey/survey.do?method=loadQuestionnaire','/lams_tool_survey/tool/survey/authoring.do?method=loadSurvey','define_later_url','export_portfolio_url',
+2,1,
+'/lams_tool_survey/tool/survey/survey.do?method=loadQuestionnaire',
+'/lams_tool_survey/tool/survey/survey.do?method=loadQuestionnaire',
+'/lams_tool_survey/tool/survey/survey.do?method=loadQuestionnaire',
+'/lams_tool_survey/tool/survey/authoring.do?method=loadSurvey','define_later_url',
+'export_portfolio_learner_url','export_portfolio_learner_url',
 '/lams_tool_survey/tool/survey/report.do?method=loadMonitorReport','contribute_url','moderation_url',
-1,6,now());
+'toolsig.ApplicationResources',1,6,now());
 
 insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,description,tool_identifier,tool_version,default_tool_content_id,
-grouping_support_type_id,supports_define_later_flag,supports_run_offline_flag,supports_moderation_flag,supports_contribute_flag,
-learner_url,author_url,define_later_url,export_portfolio_url,monitor_url,contribute_url,moderation_url,
-valid_flag,learning_library_id,create_date_time)
+grouping_support_type_id,supports_run_offline_flag,
+learner_url, learner_preview_url, learner_progress_url, author_url, define_later_url, 
+export_pfolio_learner_url, export_pfolio_class_url, monitor_url,contribute_url, moderation_url,
+language_file, valid_flag,learning_library_id,create_date_time)
 values(7,'chat_signature','chatService','Chat','Chat Description','chat','1.1',7,
-2,1,1,1,1,
-'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url','contribute_url','moderation_url',
-1,7,now());
+2,1,
+'learner_url','learner_url','learner_url','author_url','define_later_url',
+'export_portfolio_learner_url','export_portfolio_learner_url','monitor_url','contribute_url','moderation_url',
+'toolsig.ApplicationResources',1,7,now());
 
 insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,description,tool_identifier,tool_version,default_tool_content_id,
-grouping_support_type_id,supports_define_later_flag,supports_run_offline_flag,supports_moderation_flag,supports_contribute_flag,
-learner_url,author_url,define_later_url,export_portfolio_url,monitor_url,contribute_url,moderation_url,
-valid_flag,learning_library_id,create_date_time)
+grouping_support_type_id,supports_run_offline_flag,
+learner_url, learner_preview_url, learner_progress_url, author_url, define_later_url, 
+export_pfolio_learner_url, export_pfolio_class_url, monitor_url,contribute_url, moderation_url,
+language_file, valid_flag,learning_library_id,create_date_time)
 values(8,'shared_resources_signature','sharedResourcesService','Shared Resources','Shared Resources Description','shared resources','1.1',8,
-2,1,0,1,1,
-'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url','contribute_url','moderation_url',
-1,8,now());
+2,1,
+'learner_url','learner_url','learner_url','author_url','define_later_url',
+'export_portfolio_learner_url','export_portfolio_learner_url','monitor_url','contribute_url','moderation_url',
+'toolsig.ApplicationResources',1,8,now());
 
 
 insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,description,tool_identifier,tool_version,default_tool_content_id,
-grouping_support_type_id,supports_define_later_flag,supports_run_offline_flag,supports_moderation_flag,supports_contribute_flag,
-learner_url,author_url,define_later_url,export_portfolio_url,monitor_url,contribute_url,moderation_url,
-valid_flag,learning_library_id,create_date_time)
+grouping_support_type_id,supports_run_offline_flag,
+learner_url, learner_preview_url, learner_progress_url, author_url, define_later_url, 
+export_pfolio_learner_url, export_pfolio_class_url, monitor_url,contribute_url, moderation_url,
+language_file, valid_flag,learning_library_id,create_date_time)
 values(9,'voting_signature','votingService','Voting','Voting Description','voting','1.1',9,
-2,1,1,1,1,
-'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url','contribute_url','moderation_url',
-1,9,now());
+2,1,
+'learner_url','learner_url','learner_url','author_url','define_later_url',
+'export_portfolio_learner_url','export_portfolio_learner_url','monitor_url','contribute_url','moderation_url',
+'toolsig.ApplicationResources',1,9,now());
 
 
 insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,description,tool_identifier,tool_version,default_tool_content_id,
-grouping_support_type_id,supports_define_later_flag,supports_run_offline_flag,supports_moderation_flag,supports_contribute_flag,
-learner_url,author_url,define_later_url,export_portfolio_url,monitor_url,contribute_url,moderation_url,
-valid_flag,learning_library_id,create_date_time)
+grouping_support_type_id,supports_run_offline_flag,
+learner_url, learner_preview_url, learner_progress_url, author_url, define_later_url, 
+export_pfolio_learner_url, export_pfolio_class_url, monitor_url,contribute_url, moderation_url,
+language_file, valid_flag,learning_library_id,create_date_time)
 values(10,'submit_files_signature','sbService','Submit Files','Submit Files Description','submit files','1.1',10,
-2,1,1,1,1,
-'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url','contribute_url','moderation_url',
-1,10,now());
+2,1,
+'learner_url','learner_url','learner_url','author_url','define_later_url',
+'export_portfolio_learner_url','export_portfolio_learner_url','monitor_url','contribute_url','moderation_url',
+'toolsig.ApplicationResources',1,10,now());
 
 
 insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,description,tool_identifier,tool_version,default_tool_content_id,
-grouping_support_type_id,supports_define_later_flag,supports_run_offline_flag,supports_moderation_flag,supports_contribute_flag,
-learner_url,author_url,define_later_url,export_portfolio_url,monitor_url,contribute_url,moderation_url,
-valid_flag,learning_library_id,create_date_time)
+grouping_support_type_id,supports_run_offline_flag,
+learner_url, learner_preview_url, learner_progress_url, author_url, define_later_url, 
+export_pfolio_learner_url, export_pfolio_class_url, monitor_url,contribute_url, moderation_url,
+language_file, valid_flag,learning_library_id,create_date_time)
 values(11,'instant_messaging_signature','instantMessagingService','Instant Messaging','Instant Messaging Description','instant messaging','1.1',11,
-2,1,1,1,1,
-'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url','contribute_url','moderation_url',
-1,11,now());
+2,1,
+'learner_url','learner_url','learner_url','author_url','define_later_url',
+'export_portfolio_learner_url','export_portfolio_learner_url','monitor_url','contribute_url','moderation_url',
+'toolsig.ApplicationResources',1,11,now());
 
 -- Populates the lams_tool_content table with dummy default content for all above tools
 
@@ -175,154 +200,154 @@ learning_activity_type_id,grouping_id,order_id,define_later_flag,
 learning_design_id,learning_library_id,create_date_time,run_offline_flag,
 max_number_of_options,min_number_of_options,tool_id,tool_content_id,
 gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image,
-grouping_support_type_id, apply_grouping_flag,activity_category_id)
+grouping_support_type_id, apply_grouping_flag,activity_category_id,language_file)
 values
 (1,1,'Notebook Template','Notebook',10,20,null,'Help Text for Activity',
 1,null,0,0,
 null,1,'20050101',0,
 null,null,1,1,
 null,null,null,'/images/icon_journal.swf',
-1,0,1);
+1,0,1,'toolsig.ApplicationResources');
 
 insert into lams_learning_activity (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,help_text,
 learning_activity_type_id,grouping_id,order_id,define_later_flag,
 learning_design_id,learning_library_id,create_date_time,run_offline_flag,
 max_number_of_options,min_number_of_options,tool_id,tool_content_id,
 gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image,
-grouping_support_type_id, apply_grouping_flag,activity_category_id)
+grouping_support_type_id, apply_grouping_flag,activity_category_id,language_file)
 values
 (2,2,'NoticeBoard Template','NoticeBoard',10,20,null,'Help Text for Activity',
 1,null,0,0,
 null,2,'20050101',0,
 null,null,2,2,
 null,null,null,'/images/icon_noticeboard.swf',
-1,0,1);
+1,0,1,'toolsig.ApplicationResources');
 
 insert into lams_learning_activity (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,help_text,
 learning_activity_type_id,grouping_id,order_id,define_later_flag,
 learning_design_id,learning_library_id,create_date_time,run_offline_flag,
 max_number_of_options,min_number_of_options,tool_id,tool_content_id,
 gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image,
-grouping_support_type_id, apply_grouping_flag,activity_category_id)
+grouping_support_type_id, apply_grouping_flag,activity_category_id,language_file)
 values
 (3,3,'Multiple Choice Template','Multiple Choice',10,20,null,'Help Text for Activity',
 1,null,0,0,
 null,3,'20050101',0,
 null,null,3,3,
 null,null,null,'missing.swf',
-1,0,1);
+1,0,1,'toolsig.ApplicationResources');
 
 insert into lams_learning_activity (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,help_text,
 learning_activity_type_id,grouping_id,order_id,define_later_flag,
 learning_design_id,learning_library_id,create_date_time,run_offline_flag,
 max_number_of_options,min_number_of_options,tool_id,tool_content_id,
 gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image,
-grouping_support_type_id, apply_grouping_flag,activity_category_id)
+grouping_support_type_id, apply_grouping_flag,activity_category_id,language_file)
 values
 (4,4,'Question and Answer Template','Question and Answer',10,20,null,'Help Text for Activity',
 1,null,0,0,
 null,4,'20050101',0,
 null,null,4,4,
 null,null,null,'tool/laqa/images/icon_questionanswer.swf',
-1,0,1);
+1,0,1,'toolsig.ApplicationResources');
 
 insert into lams_learning_activity (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,help_text,
 learning_activity_type_id,grouping_id,order_id,define_later_flag,
 learning_design_id,learning_library_id,create_date_time,run_offline_flag,
 max_number_of_options,min_number_of_options,tool_id,tool_content_id,
 gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image,
-grouping_support_type_id, apply_grouping_flag,activity_category_id)
+grouping_support_type_id, apply_grouping_flag,activity_category_id,language_file)
 values
 (5,5,'MessageBoard Template','MessageBoard',10,20,null,'Help Text for Activity',
 1,null,0,0,
 null,5,'20050101',0,
 null,null,5,5,
 null,null,null,'/images/icon_messageboard.swf',
-1,0,1);
+1,0,1,'toolsig.ApplicationResources');
 
 insert into lams_learning_activity (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,help_text,
 learning_activity_type_id,grouping_id,order_id,define_later_flag,
 learning_design_id,learning_library_id,create_date_time,run_offline_flag,
 max_number_of_options,min_number_of_options,tool_id,tool_content_id,
 gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image,
-grouping_support_type_id, apply_grouping_flag,activity_category_id)
+grouping_support_type_id, apply_grouping_flag,activity_category_id,language_file)
 values
 (6,6,'Survey Template','Survey',10,20,null,'Help Text for Activity',
 1,null,0,0,
 null,6,'20050101',0,
 null,null,6,6,
 null,null,null,'/images/icon_survey.swf',
-1,0,1);
+1,0,1,'toolsig.ApplicationResources');
 
 insert into lams_learning_activity (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,help_text,
 learning_activity_type_id,grouping_id,order_id,define_later_flag,
 learning_design_id,learning_library_id,create_date_time,run_offline_flag,
 max_number_of_options,min_number_of_options,tool_id,tool_content_id,
 gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image,
-grouping_support_type_id, apply_grouping_flag,activity_category_id)
+grouping_support_type_id, apply_grouping_flag,activity_category_id,language_file)
 values
 (7,7,'Chat Template','Chat',10,20,null,'Help Text for Activity',
 1,null,0,0,
 null,7,'20050101',0,
 null,null,7,7,
 null,null,null,'/images/icon_chat.swf',
-1,0,1);
+1,0,1,'toolsig.ApplicationResources');
 
 insert into lams_learning_activity (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,help_text,
 learning_activity_type_id,grouping_id,order_id,define_later_flag,
 learning_design_id,learning_library_id,create_date_time,run_offline_flag,
 max_number_of_options,min_number_of_options,tool_id,tool_content_id,
 gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image,
-grouping_support_type_id, apply_grouping_flag,activity_category_id)
+grouping_support_type_id, apply_grouping_flag,activity_category_id,language_file)
 values
 (8,8,'Shared Resources Template','Shared Resources',10,20,null,'Help Text for Activity',
 1,null,0,0,
 null,8,'20050101',0,
 null,null,8,8,
 null,null,null,'/images/icon_singleresource.swf',
-1,0,1);
+1,0,1,'toolsig.ApplicationResources');
 
 insert into lams_learning_activity (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,help_text,
 learning_activity_type_id,grouping_id,order_id,define_later_flag,
 learning_design_id,learning_library_id,create_date_time,run_offline_flag,
 max_number_of_options,min_number_of_options,tool_id,tool_content_id,
 gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image,
-grouping_support_type_id, apply_grouping_flag,activity_category_id)
+grouping_support_type_id, apply_grouping_flag,activity_category_id,language_file)
 values
 (9,9,'Voting Template','Voting',10,20,null,'Help Text for Activity',
 1,null,0,0,
 null,9,'20050101',0,
 null,null,9,9,
 null,null,null,'/images/icon_ranking.swf',
-1,0,1);
+1,0,1,'toolsig.ApplicationResources');
 
 insert into lams_learning_activity (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,help_text,
 learning_activity_type_id,grouping_id,order_id,define_later_flag,
 learning_design_id,learning_library_id,create_date_time,run_offline_flag,
 max_number_of_options,min_number_of_options,tool_id,tool_content_id,
 gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image,
-grouping_support_type_id, apply_grouping_flag,activity_category_id)
+grouping_support_type_id, apply_grouping_flag,activity_category_id,language_file)
 values
 (10,10,'Submit Files Template','Submit Files',10,20,null,'Help Text for Activity',
 1,null,0,0,
 null,10,'20050101',0,
 null,null,10,10,
 null,null,null,'/images/icon_reportsubmission.swf',
-1,0,1);
+1,0,1,'toolsig.ApplicationResources');
 
 insert into lams_learning_activity (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,help_text,
 learning_activity_type_id,grouping_id,order_id,define_later_flag,
 learning_design_id,learning_library_id,create_date_time,run_offline_flag,
 max_number_of_options,min_number_of_options,tool_id,tool_content_id,
 gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image,
-grouping_support_type_id, apply_grouping_flag,activity_category_id)
+grouping_support_type_id, apply_grouping_flag,activity_category_id,language_file)
 values
 (11,11,'Instant Messaging Template','Instant Messaging',10,20,null,'Help Text for Activity',
 1,null,0,0,
 null,11,'20050101',0,
 null,null,11,11,
 null,null,null,'missing.swf',
-1,0,1);
+1,0,1,'toolsig.ApplicationResources');
 
 insert into lams_learning_activity
 (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,help_text,
@@ -330,14 +355,14 @@ learning_activity_type_id,grouping_id,order_id,define_later_flag,
 learning_design_id,learning_library_id,create_date_time,run_offline_flag,
 max_number_of_options,min_number_of_options,tool_id,tool_content_id,
 gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image,
-grouping_support_type_id, apply_grouping_flag,activity_category_id)
+grouping_support_type_id, apply_grouping_flag,activity_category_id,language_file)
 values
 (12,12,'Optional Activity Description','Optional Activity Title',10,20,null,'Help Text for Activity',
 7,null,1,0,
 1,null,'20050101',0,
 1,1,null,null,
 null,'20050101','20050101','missing.swf',
-3,1,1);
+3,1,1,'toolsig.ApplicationResources');
 
 insert into lams_learning_activity
 (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,help_text,
@@ -345,14 +370,14 @@ learning_activity_type_id,grouping_id,order_id,define_later_flag,
 learning_design_id,learning_library_id,create_date_time,run_offline_flag,
 max_number_of_options,min_number_of_options,tool_id,tool_content_id,
 gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image,
-grouping_support_type_id, apply_grouping_flag,activity_category_id)
+grouping_support_type_id, apply_grouping_flag,activity_category_id,language_file)
 values
 (13,13,'Parallel Activity Description','Parallel Activity Title',10,20,null,'Help Text for Activity',
 6,null,1,0,
 1,null,'20050101',0,
 null,null,null,null,
 null,null,null,'missing.swf',
-1,0,1);
+1,0,1,'toolsig.ApplicationResources');
 
 insert into lams_learning_activity
 (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,help_text,
@@ -360,14 +385,14 @@ learning_activity_type_id,grouping_id,order_id,define_later_flag,
 learning_design_id,learning_library_id,create_date_time,run_offline_flag,
 max_number_of_options,min_number_of_options,tool_id,tool_content_id,
 gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image,
-grouping_support_type_id, apply_grouping_flag,activity_category_id)
+grouping_support_type_id, apply_grouping_flag,activity_category_id,language_file)
 values
 (14,14,'Sequence Activity Description','Sequence Activity Title',10,20,null,'Help Text for Activity',
 8,null,1,0,
 1,null,'20050101',0,
 null,null,null,null,
 null,null,null,'missing.swf',
-1,0,1);
+1,0,1,'toolsig.ApplicationResources');
 
 insert into lams_learning_activity
 (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,help_text,
@@ -375,14 +400,14 @@ learning_activity_type_id,grouping_id,order_id,define_later_flag,
 learning_design_id,learning_library_id,create_date_time,run_offline_flag,
 max_number_of_options,min_number_of_options,tool_id,tool_content_id,
 gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image,
-grouping_support_type_id, apply_grouping_flag,activity_category_id)
+grouping_support_type_id, apply_grouping_flag,activity_category_id,language_file)
 values
 (15,1,'Notebook Activity Description','Notebook Activity Title',10,20,null,'Help Text for Activity',
 1,null,1,0,
 1,1,'20050101',0,
 null,null,1,12,
 null,null,null,'/images/icon_journal.swf',
-1,0,1);
+1,0,1,'toolsig.ApplicationResources');
 
 insert into lams_learning_activity
 (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,help_text,
@@ -390,14 +415,14 @@ learning_activity_type_id,grouping_id,order_id,define_later_flag,
 learning_design_id,learning_library_id,create_date_time,run_offline_flag,
 max_number_of_options,min_number_of_options,tool_id,tool_content_id,
 gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image,
-grouping_support_type_id, apply_grouping_flag,activity_category_id)
+grouping_support_type_id, apply_grouping_flag,activity_category_id,language_file)
 values
 (16,2,'NoticeBoard Activity','NoticeBoard Activity',10,20,12,'Help Text for Activity',
 1,null,0,0,
 1,2,'20050101',0,
 null,null,2,13,
 null,null,null,'/images/icon_noticeboard.swf',
-1,0,1);
+1,0,1,'toolsig.ApplicationResources');
 
 insert into lams_learning_activity
 (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,help_text,
@@ -405,14 +430,14 @@ learning_activity_type_id,grouping_id,order_id,define_later_flag,
 learning_design_id,learning_library_id,create_date_time,run_offline_flag,
 max_number_of_options,min_number_of_options,tool_id,tool_content_id,
 gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image,
-grouping_support_type_id, apply_grouping_flag,activity_category_id)
+grouping_support_type_id, apply_grouping_flag,activity_category_id,language_file)
 values
 (17,3,'Multiple Choice Activity ','Multiple Choice',10,20,12,'Help Text for Activity',
 1,null,1,0,
 1,3,'20050101',0,
 null,null,3,14,
 null,null,null,'missing.swf',
-1,0,1);
+1,0,1,'toolsig.ApplicationResources');
 
 insert into lams_learning_activity
 (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,help_text,
@@ -420,14 +445,14 @@ learning_activity_type_id,grouping_id,order_id,define_later_flag,
 learning_design_id,learning_library_id,create_date_time,run_offline_flag,
 max_number_of_options,min_number_of_options,tool_id,tool_content_id,
 gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image,
-grouping_support_type_id, apply_grouping_flag,activity_category_id)
+grouping_support_type_id, apply_grouping_flag,activity_category_id,language_file)
 values
 (18,4,'Question and Answer Activity','Question and Answer',10,20,13,'Help Text for Activity',
 1,null,0,1,
 1,4,'20050101',0,
 null,null,4,15,
 null,null,null,'tool/laqa/images/icon_questionanswer.swf',
-1,0,1);
+1,0,1,'toolsig.ApplicationResources');
 
 insert into lams_learning_activity
 (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,help_text,
@@ -435,14 +460,14 @@ learning_activity_type_id,grouping_id,order_id,define_later_flag,
 learning_design_id,learning_library_id,create_date_time,run_offline_flag,
 max_number_of_options,min_number_of_options,tool_id,tool_content_id,
 gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image,
-grouping_support_type_id, apply_grouping_flag,activity_category_id)
+grouping_support_type_id, apply_grouping_flag,activity_category_id,language_file)
 values
 (19,5,'Message Board Activity','Message Board',10,20,13,'Help Text for Activity',
 1,100,1,0,
 1,5,'20050101',0,
 null,null,5,16,
 null,null,null,'/images/icon_messageboard.swf',
-1,0,1);
+1,0,1,'toolsig.ApplicationResources');
 
 insert into lams_learning_activity
 (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,help_text,
@@ -450,14 +475,14 @@ learning_activity_type_id,grouping_id,order_id,define_later_flag,
 learning_design_id,learning_library_id,create_date_time,run_offline_flag,
 max_number_of_options,min_number_of_options,tool_id,tool_content_id,
 gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image,
-grouping_support_type_id, apply_grouping_flag,activity_category_id)
+grouping_support_type_id, apply_grouping_flag,activity_category_id,language_file)
 values
 (20,6,'Survey Activity','Survey Title',10,20,null,'Help Text for Activity',
 1,null,0,1,
 1,6,'20050101',0,
 null,null,6,17,
 null,null,null,'/images/icon_survey.swf',
-1,0,1);
+1,0,1,'toolsig.ApplicationResources');
 
 insert into lams_learning_activity
 (activity_id,activity_ui_id,
@@ -475,7 +500,7 @@ gate_start_date_time,gate_end_date_time,
 library_activity_ui_image,
 create_grouping_id,create_grouping_ui_id,
 library_activity_id,
-grouping_support_type_id, apply_grouping_flag,activity_category_id)
+grouping_support_type_id, apply_grouping_flag,activity_category_id,language_file)
 values
 (21,7,
 'Chat Activity Description','Chat Title','Help Text for Chat Activity',
@@ -492,7 +517,7 @@ null,null,
 '/images/icon_chat.swf',
 null,null,
 7,
-2,1,1);
+2,1,1,'toolsig.ApplicationResources');
 
 insert into lams_learning_activity
 (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,help_text,
@@ -500,14 +525,14 @@ learning_activity_type_id,grouping_id,order_id,define_later_flag,
 learning_design_id,learning_library_id,create_date_time,run_offline_flag,
 max_number_of_options,min_number_of_options,tool_id,tool_content_id,
 gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image,
-grouping_support_type_id, apply_grouping_flag,activity_category_id)
+grouping_support_type_id, apply_grouping_flag,activity_category_id,language_file)
 values
 (22,8,'Shared Resources Activity','Shared Resources',10,20,14,'Help Text for Activity',
 1,null,0,0,
 1,8,'20050101',0,
 null,null,8,19,
 null,null,null,'/images/icon_singleresource.swf',
-1,0,1);
+1,0,1,'toolsig.ApplicationResources');
 
 -- Sample GroupingActivity with RandomGrouping 
 
@@ -527,7 +552,7 @@ gate_start_date_time,gate_end_date_time,
 library_activity_ui_image,
 create_grouping_id,create_grouping_ui_id,
 library_activity_id,
-grouping_support_type_id, apply_grouping_flag,activity_category_id)
+grouping_support_type_id, apply_grouping_flag,activity_category_id,language_file)
 values
 (23,23,
 'Random Grouping Activity Description','RandomGroupingActivity Title','Help Text for RandomGroupingActivity',
@@ -544,7 +569,7 @@ null,null,
 'missing.swf',
 99,99,
 null,
-1,0,1);
+1,0,1,'toolsig.ApplicationResources');
 
 insert into lams_learning_activity
 (activity_id,activity_ui_id,
@@ -562,7 +587,7 @@ gate_start_date_time,gate_end_date_time,
 library_activity_ui_image,
 create_grouping_id,create_grouping_ui_id,
 library_activity_id,
-grouping_support_type_id, apply_grouping_flag,activity_category_id)
+grouping_support_type_id, apply_grouping_flag,activity_category_id,language_file)
 values
 (30,30,
 'Chosen Grouping Activity Description','ChosenroupingActivity Title','Help Text for ChosenGroupingActivity',
@@ -579,7 +604,7 @@ null,null,
 'missing.swf',
 100,100,
 null,
-1,0,1);
+1,0,1,'toolsig.ApplicationResources');
 
 insert into lams_learning_activity
 (activity_id,activity_ui_id,
@@ -597,7 +622,7 @@ gate_start_date_time,gate_end_date_time,
 library_activity_ui_image,
 create_grouping_id,create_grouping_ui_id,
 library_activity_id,
-grouping_support_type_id, apply_grouping_flag,activity_category_id)
+grouping_support_type_id, apply_grouping_flag,activity_category_id,language_file)
 values
 (24,24,
 'QNA Activity Description','QNA Activity Title','Help Text for QNA Activity',
@@ -614,7 +639,7 @@ null,null,
 'tool/laqa/images/icon_questionanswer.swf',
 null,null,
 4,
-2,1,1);
+2,1,1,'toolsig.ApplicationResources');
 
 insert into lams_learning_activity
 (activity_id,activity_ui_id,
@@ -632,7 +657,7 @@ gate_start_date_time,gate_end_date_time,
 library_activity_ui_image,
 create_grouping_id,create_grouping_ui_id,
 library_activity_id,
-grouping_support_type_id, apply_grouping_flag,activity_category_id)
+grouping_support_type_id, apply_grouping_flag,activity_category_id,language_file)
 values
 (25,25,
 'QNA Activity Description','QNA Activity Title','Help Text for QNA Activity',
@@ -649,7 +674,7 @@ null,null,
 'tool/laqa/images/icon_questionanswer.swf',
 null,null,
 4,
-1,0,1);
+1,0,1,'toolsig.ApplicationResources');
 
 
 
@@ -669,7 +694,7 @@ gate_start_date_time,gate_end_date_time,
 library_activity_ui_image,
 create_grouping_id,create_grouping_ui_id,
 library_activity_id,
-grouping_support_type_id, apply_grouping_flag,activity_category_id)
+grouping_support_type_id, apply_grouping_flag,activity_category_id,language_file)
 values
 (26,26,
 'Synch Gate','Synch Gate Activity','Help Text for Synch Gate',
@@ -686,7 +711,7 @@ null,null,
 'missing.swf',
 null,null,
 null,
-1,0,1);
+1,0,1,'toolsig.ApplicationResources');
 
 insert into lams_learning_activity
 (activity_id,activity_ui_id,
@@ -704,7 +729,7 @@ gate_start_date_time,gate_end_date_time,
 library_activity_ui_image,
 create_grouping_id,create_grouping_ui_id,
 library_activity_id,
-grouping_support_type_id, apply_grouping_flag,activity_category_id)
+grouping_support_type_id, apply_grouping_flag,activity_category_id,language_file)
 values
 (27,27,
 'Schedule Gate','Schedule Gate Activity','Help Text for Schedule Gate',
@@ -721,7 +746,7 @@ null,null,
 'missing.swf',
 null,null,
 null,
-1,0,1);
+1,0,1,'toolsig.ApplicationResources');
 
 insert into lams_learning_activity
 (activity_id,activity_ui_id,
@@ -739,7 +764,7 @@ gate_start_date_time,gate_end_date_time,
 library_activity_ui_image,
 create_grouping_id,create_grouping_ui_id,
 library_activity_id,
-grouping_support_type_id, apply_grouping_flag,activity_category_id)
+grouping_support_type_id, apply_grouping_flag,activity_category_id,language_file)
 values
 (28,28,
 'Permission Gate','Permission Gate Activity','Help Text for Permission Gate',
@@ -756,7 +781,7 @@ null,null,
 'missing.swf',
 null,null,
 null,
-1,0,1);
+1,0,1,'toolsig.ApplicationResources');
 
 -- Populates the lams_learning_transition table with various transitions for the dummy design 
 
@@ -830,14 +855,14 @@ learning_activity_type_id,grouping_id,order_id,define_later_flag,
 learning_design_id,learning_library_id,create_date_time,run_offline_flag,
 max_number_of_options,min_number_of_options,tool_id,tool_content_id,
 gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image,
-grouping_support_type_id, apply_grouping_flag,activity_category_id)
+grouping_support_type_id, apply_grouping_flag,activity_category_id,language_file)
 values
 (31,2,'Survey Activity','Survey Title',10,20,null,'Help Text for Activity',
 1,null,0,1,
 2,6,'20050101',0,
 null,null,6,27,
 null,null,null,'/images/icon_survey.swf',
-1,0,1);
+1,0,1,'toolsig.ApplicationResources');
 
 insert into lams_tool_content (tool_content_id,tool_id) values(27,6);
 
