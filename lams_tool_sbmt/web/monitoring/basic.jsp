@@ -6,8 +6,8 @@
 			<!-- Title Row -->
 			<tr>
 				<td class="formlabel"><fmt:message key="label.authoring.basic.title" />:</td>
-				<td class="formcontrol">
-					<input type="text" name="title" value="<c:out value='${authoring.title}' escapeXml='false'/>" />
+				<td NOWRAP width="700">
+					<lams:SetEditor id="Title" text="${authoring.title}" small="true"/>
 				</td>
 			</tr>
 			<!-- Instructions Row -->

@@ -8,7 +8,7 @@
 	<table class="forms">
 		<tr>
 			<td class="formlabel"><fmt:message key="label.authoring.basic.title" />:</td>
-			<td class="formcontrol"><html:text property="title" /></td>
+			<td NOWRAP width="700"><lams:SetEditor id="Title" text="${authoring.title}" small="true"/></td>
 		</tr>
 		<tr>
 			<td class="formlabel"><fmt:message key="label.authoring.basic.instruction" />:</td>
