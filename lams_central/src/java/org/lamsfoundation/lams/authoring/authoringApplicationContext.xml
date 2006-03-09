@@ -31,7 +31,6 @@
 		<property name="groupingDAO"><ref bean="groupingDAO"/></property>
 		<property name="groupDAO"><ref bean="groupDAO"/></property>
 		<property name="licenseDAO"><ref bean="licenseDAO"/></property>
-		<property name="themeDAO"><ref bean="themeDAO"/></property>
 		<property name="lamsCoreToolService"><ref bean="lamsCoreToolService"/></property>			
 		<property name="contentIDGenerator"><ref bean="toolContentIDGenerator"/></property>
 		<property name="messageService"><ref bean="authoringMessageService"/></property>

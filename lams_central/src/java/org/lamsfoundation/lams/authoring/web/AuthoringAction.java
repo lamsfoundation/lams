@@ -35,6 +35,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
+import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
@@ -54,7 +55,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @struts.action-forward name = "success" path = "/index.jsp"
  *    
  */
-public class AuthoringAction extends DispatchAction{
+public class AuthoringAction extends LamsDispatchAction{
 	
 	private static Logger log = Logger.getLogger(AuthoringAction.class);
 
@@ -63,9 +64,6 @@ public class AuthoringAction extends DispatchAction{
      * If you want it returned as a stream (ie for Flash), do not define this parameter
      */  
 	public static String USE_JSP_OUTPUT = "jspoutput";
-	
-	/** Id of theme to be retrieved from the db */
-	public static final String THEME_ID_PARAMETER = "themeID";
 		
 	public IAuthoringService getAuthoringService(){
 		WebApplicationContext webContext = WebApplicationContextUtils.getRequiredWebApplicationContext(this.getServlet().getServletContext());
@@ -132,47 +130,6 @@ public class AuthoringAction extends DispatchAction{
 		IAuthoringService authoringService = getAuthoringService();
 		String wddxPacket = authoringService.getAllLearningLibraryDetails();
 		return outputPacket(mapping, request, response, wddxPacket, "details");
-	}
-	
-
-	
-	/**
-	 * Returns a string representing the requested theme in WDDX format
-	 * 
-	 * @param learningDesignID The learning_design_id of the design whose WDDX packet is requested 
-	 * @return String The requested LearningDesign in WDDX format
-	 * @throws Exception
-	 */
-	public ActionForward getTheme(ActionMapping mapping,
-			ActionForm form,
-			HttpServletRequest request,
-			HttpServletResponse response)throws ServletException, Exception{
-
-		Long themeId = new Long(WebUtil.readLongParam(request,THEME_ID_PARAMETER));
-		IAuthoringService authoringService = getAuthoringService();
-		String message = authoringService.getTheme(themeId);
-		request.getSession().setAttribute("message",message);
-		return outputPacket(mapping, request, response, message, "message");
-	}
-
-
-	/**
-	 * This method returns a list of all available themes in
-	 * WDDX format. We need to work out if this should be restricted
-	 * by user.
-	 * 
-	 * @return String The required information in WDDX format
-	 * @throws IOException
-	 */
-	public ActionForward getThemes(ActionMapping mapping,
-			ActionForm form,
-			HttpServletRequest request,
-			HttpServletResponse response)throws ServletException, Exception{
-	    
-	    IAuthoringService authoringService = getAuthoringService();
-	    String message = authoringService.getThemes();
-	    request.getSession().setAttribute("message",message);
-	    return outputPacket(mapping, request, response, message, "message");
 	}
 	
 	public ActionForward getToolContentID(ActionMapping mapping,

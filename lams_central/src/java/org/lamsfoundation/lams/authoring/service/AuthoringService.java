@@ -98,7 +98,6 @@ public class AuthoringService implements IAuthoringService {
 	protected LicenseDAO licenseDAO;
 	protected GroupingDAO groupingDAO;
 	protected GroupDAO groupDAO;
-	protected ICSSThemeDAO themeDAO;
 	protected ILamsCoreToolService lamsCoreToolService;
 	protected ILearningDesignService learningDesignService;
 	protected MessageService messageService;
@@ -180,19 +179,6 @@ public class AuthoringService implements IAuthoringService {
 		this.licenseDAO = licenseDAO;
 	}	
 	
-    /**
-     * @return Returns the themeDAO.
-     */
-    public ICSSThemeDAO getThemeDAO() {
-        return themeDAO;
-    }
-    /**
-     * @param themeDAO The ICSSThemeDAO to set.
-     */
-    public void setThemeDAO(ICSSThemeDAO themeDAO) {
-        this.themeDAO = themeDAO;
-    }
-    
 	public ILamsCoreToolService getLamsCoreToolService() {
 		return lamsCoreToolService;
 	}
@@ -532,84 +518,6 @@ public class AuthoringService implements IAuthoringService {
 		flashMessage = new FlashMessage("getAllLearningLibraryDetails",libraries);
 		return flashMessage.serializeMessage();
 	}
-	
-	
-	/**
-	 * Store a theme created on a client.
-	 * @param wddxPacket The WDDX packet received from Flash
-	 * @return String The acknowledgement in WDDX format that the theme has been
-	 * 				  successfully saved.
-	 * @throws IOException
-	 * @throws WddxDeserializationException
-	 * @throws Exception
-	 */
-	public String storeTheme(String wddxPacket) throws Exception {
-		
-		Hashtable table = (Hashtable)WDDXProcessor.deserialize(wddxPacket);
-		
-		CSSThemeDTO themeDTO = new CSSThemeDTO(table);
-		if ( log.isDebugEnabled() ) {
-		    log.debug("Converted Theme packet. Packet was \n"+wddxPacket+
-		            "\nDTO is\n"+themeDTO);
-		}
-
-		CSSThemeVisualElement dbTheme = null;
-		CSSThemeVisualElement storedTheme = null;
-		if ( themeDTO.getId() != null )  {
-		    // Flash has supplied an id, get the record from the database for update
-		    dbTheme = themeDAO.getThemeById(themeDTO.getId());
-		}
-		
-		if ( dbTheme == null ) {
-		    storedTheme = themeDTO.createCSSThemeVisualElement();
-		} else {
-		    storedTheme = themeDTO.updateCSSTheme(dbTheme);
-		}
-		
-		themeDAO.saveOrUpdateTheme(storedTheme);
-		flashMessage = new FlashMessage(IAuthoringService.STORE_THEME_MESSAGE_KEY,storedTheme.getId());
-		return flashMessage.serializeMessage(); 		
-	}
-
-	/**
-	 * Returns a string representing the requested theme in WDDX format
-	 * 
-	 * @param learningDesignID The learning_design_id of the design whose WDDX packet is requested 
-	 * @return String The requested LearningDesign in WDDX format
-	 * @throws Exception
-	 */
-	public String getTheme(Long themeId)throws IOException {
-	    CSSThemeVisualElement theme = themeDAO.getThemeById(themeId);
-		if(theme==null)
-			flashMessage = FlashMessage.getNoSuchTheme("wddxPacket",themeId);
-		else{
-			CSSThemeDTO dto = new CSSThemeDTO(theme);
-			flashMessage = new FlashMessage("getTheme",dto);
-		}
-		return flashMessage.serializeMessage();
-	}
-
-
-	/**
-	 * This method returns a list of all available themes in
-	 * WDDX format. We need to work out if this should be restricted
-	 * by user.
-	 * 
-	 * @return String The required information in WDDX format
-	 * @throws IOException
-	 */
-	public String getThemes() throws IOException {
-	    List themes = themeDAO.getAllThemes();
-		ArrayList themeList = new ArrayList();
-		Iterator iterator = themes.iterator();
-		while(iterator.hasNext()){
-		    CSSThemeBriefDTO dto = new CSSThemeBriefDTO((CSSThemeVisualElement)iterator.next());
-		    themeList.add(dto);
-		}
-		flashMessage = new FlashMessage("getThemes",themeList);		
-		return flashMessage.serializeMessage();
-	}
-	
 	
 	/** @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getToolContentID(java.lang.Long) */
 

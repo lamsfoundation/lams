@@ -38,9 +38,6 @@ import org.lamsfoundation.lams.usermanagement.exception.WorkspaceFolderException
  */
 public interface IAuthoringService {
 	
-	/** Message key returned by the storeTheme() method */
-	public static final String STORE_THEME_MESSAGE_KEY = "storeTheme";
-	
 	/** Message key returned by the storeLearningDesignDetails() method */
 	public static final String STORE_LD_MESSAGE_KEY = "storeLearningDesignDetails";
 
@@ -162,35 +159,6 @@ public interface IAuthoringService {
 	 * @throws IOException
 	 */
 	public String getAllLearningLibraryDetails()throws IOException;
-	
-	/**
-	 * Store a theme created on a client.
-	 * @param wddxPacket The WDDX packet received from Flash
-	 * @return String The acknowledgement in WDDX format that the theme has been
-	 * 				  successfully saved.
-	 * @throws Exception
-	 */
-	public String storeTheme(String wddxPacket) throws Exception;
-
-	/**
-	 * Returns a string representing the requested theme in WDDX format
-	 * 
-	 * @param learningDesignID The learning_design_id of the design whose WDDX packet is requested 
-	 * @return String The requested LearningDesign in WDDX format
-	 * @throws Exception
-	 */
-	public String getTheme(Long themeId)throws IOException;
-
-
-	/**
-	 * This method returns a list of all available themes in
-	 * WDDX format. We need to work out if this should be restricted
-	 * by user.
-	 * 
-	 * @return String The required information in WDDX format
-	 * @throws IOException
-	 */
-	public String getThemes() throws IOException;
 	
 	/**
 	 * Returns a string representing the new tool content id in 
