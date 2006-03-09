@@ -260,6 +260,7 @@
 				<include name="**/*.tld"/>
 				<include name="*.xml"/>
 				<include name="struts/*"/>
+				<include name="tags/*"/>
 				<include name="fckeditor/*"/>
 				<exclude name="web.xml"/>
 			</webinf>
@@ -276,7 +277,7 @@
 	<!-- =================================================================== -->
 	<!-- Deploy the jar and war                               				 -->
 	<!-- =================================================================== -->
-	<target name="deploy-war" depends="build-war" description="Deploy the IMS Content Package tool war file and jar file">
+	<target name="deploy-war" depends="_build" description="Deploy the IMS Content Package tool war file and jar file">
 		<copy file="${build.lib}/${product}.jar"
 				todir="${jboss.deploy}"/> 
 		<copy file="${build.lib}/${product}.war"
