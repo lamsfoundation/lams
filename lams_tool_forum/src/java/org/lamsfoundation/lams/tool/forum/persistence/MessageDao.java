@@ -34,6 +34,11 @@ public class MessageDao extends HibernateDaoSupport {
 		this.getHibernateTemplate().saveOrUpdate(message);
 		this.getHibernateTemplate().flush();
 	}
+	
+	public void update(Message message) {
+		this.getHibernateTemplate().saveOrUpdate(message);
+		this.getHibernateTemplate().flush();
+	}
 
 	public Message getById(Long messageId) {
 		return (Message) getHibernateTemplate().get(Message.class,messageId);
