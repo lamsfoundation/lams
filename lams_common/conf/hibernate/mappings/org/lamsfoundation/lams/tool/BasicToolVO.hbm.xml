@@ -77,6 +77,8 @@
             length="65535"
         </meta>    
     </property>
+
+<!-- 
     <property
         name="supportsDefineLater"
         type="java.lang.Boolean"
@@ -91,7 +93,9 @@
             not-null="true"
         </meta>    
     </property>
+  -->
     
+<!-- 
     <property
         name="supportsModeration"
         type="java.lang.Boolean"
@@ -106,7 +110,8 @@
             not-null="true"
         </meta>    
     </property>
-    
+-->   
+ 
     <property
         name="supportsRunOffline"
         type="java.lang.Boolean"
@@ -122,6 +127,7 @@
         </meta>    
     </property>    
     
+<!-- 
     <property
         name="supportsContribute"
         type="java.lang.Boolean"
@@ -136,6 +142,7 @@
             not-null="true"
         </meta>    
     </property> 
+-->    
     
     <property
         name="valid"
@@ -239,6 +246,8 @@
             not-null="true"
         </meta>    
     </property>
+
+<!-- 
     <property
         name="exportPortfolioUrl"
         type="java.lang.String"
@@ -253,6 +262,7 @@
             not-null="true"
         </meta>    
     </property>
+-->    
     
     <property
         name="monitorUrl"
