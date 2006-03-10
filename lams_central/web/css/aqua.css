@@ -71,6 +71,7 @@ input, select, textarea {
 	text-align: left;
 }
 
+/********* tab styles **********/
 /*tab styles*/
 .tab{
 	text-align:center;
@@ -91,22 +92,49 @@ input, select, textarea {
 	background-repeat:repeat-x;
 }
 
-
 .tabcentre_selected{
 	background-image:url(../images/aqua_tab_s_centre.gif);
 	background-repeat:repeat-x;
 }
 
+.tabcentre_inactive{
+	background-image:url(../images/aqua_tab_i_centre.gif);
+	background-repeat:repeat-x;
+}
 
+/** Non Selected tab style **/
+.tableft td{
+	background: url(../images/aqua_tab_left.gif) no-repeat;
+}
+.tabright td{
+	background: url(../images/aqua_tab_right.gif) no-repeat;
+}
+
+/** Selected tab style **/
+.tableft_selected td{
+	background: url(../images/aqua_tab_s_left.gif) no-repeat;
+}
+
+.tableft_inactive td{
+	background: url(../images/aqua_tab_i_left.gif) no-repeat;
+}
+
+.tabright_selected td{
+	background: url(../images/aqua_tab_s_right.gif) no-repeat;
+}
+
+.tabright_inactive td{
+	background: url(../images/aqua_tab_i_right.gif) no-repeat;
+}
 
 /*Tab content containers*/
 .tabbody{
-
+	width: 98%;
 	
 	background-color : #D9E8FF;
 	float:left;
 
-	margin : 0;
+	margin : 0px 0px 0px 0px;
 	border-right-width: 1px;
 	border-left-width: 1px;
 	border-right-style: solid;
@@ -120,7 +148,6 @@ input, select, textarea {
 	padding:5px;	
 
 }
-
 
 /*specific styles for the content divs of the tabs*/
 .content_b{
