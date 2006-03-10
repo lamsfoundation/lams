@@ -382,6 +382,7 @@ Ant build file.
 				<mkdir dir="${build.deploy}"/>
 				<mkdir dir="${build.deploy}/lib"/> 
 				<mkdir dir="${build.deploy}/sql"/> 
+				<mkdir dir="${build.deploy}/lang"/> 
 				 
 				<copy overwrite="yes" todir="${build.deploy}/sql">
 					<fileset dir="${db.scripts}/">
@@ -405,7 +406,13 @@ Ant build file.
 					</fileset>
 				</copy>
 
-				<taskdef name="generateDeployProperties" 
+				<copy overwrite="yes" todir="${build.deploy}/lang">
+					<fileset dir="${conf.dir}/language">
+						<include name="*.properties"/>
+					</fileset>
+				</copy>
+
+			<taskdef name="generateDeployProperties" 
 					classname="org.lamsfoundation.lams.tool.deploy.CreateToolPackageTask">
 				    <classpath refid="deploy.lib.classpath"/>
 				</taskdef>
@@ -426,8 +433,14 @@ Ant build file.
 					toolInsertScriptPath="${db.scripts}/tool_insert.sql"
 					lamsEarPath="${jboss.deploy}"
 					toolContext="${toolContext}"
-					toolWebUri="${product}.war"
-					/>
+					toolWebUri="${product}.war">
+
+					<!-- language files go as a fileset. Not nice but can't work out how to embed them in a tag. -->
+					<fileset dir="${conf.dir}/language/">
+						<include name="*.properties"/>
+					</fileset>
+						
+				</generateDeployProperties>
 			</target>
 		
 			<target name="deploy-tool" depends="create-deploy-package" 

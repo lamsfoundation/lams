@@ -32,8 +32,8 @@ VALUES
 (
 'lanb11',
 'nbService',
-'Noticeboard',
-'Displays a Noticeboard',
+'NoticeboardX',
+'Displays a NoticeboardX',
 'nb',
 '1.1',
 NULL,
@@ -51,6 +51,6 @@ NULL,
 'tool/lanb11/portfolioExport?mode=teacher',
 NULL,
 NULL,
-'org.lamsfoundation.lams.tool.noticeboard.ApplicationProperties',
+'lanb11.ApplicationResources',
 NOW()
 );

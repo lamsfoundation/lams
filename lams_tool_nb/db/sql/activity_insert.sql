@@ -44,8 +44,8 @@ activity_ui_id
 VALUES
 (
 NULL
-, 'Displays a Noticeboard'
-, 'Noticeboard'
+, 'Displays a NoticeboardX'
+, 'NoticeboardX'
 , 'Put some help text here.'
 , NULL
 , NULL
@@ -78,5 +78,5 @@ NULL
 , NULL
 , NULL
 , NULL
-, 'org.lamsfoundation.lams.tool.noticeboard.ApplicationProperties'
+, 'lanb11.ApplicationResources'
 )
