@@ -21,13 +21,14 @@
 
 package org.lamsfoundation.lams.tool.deploy;
 
-import java.util.Map;
-import java.util.HashMap;
 import java.io.File;
 import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.ResultSet;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.dbutils.DbUtils;
 
 /**
@@ -229,14 +230,14 @@ public class ToolDBDeployTask extends DBTask
         this.toolActivityInsertScriptPath = toolActivityInsertScriptPath;
     }
     
-    private long getNewToolContentId(long toolId, Connection conn) throws DeployException
+    private long getNewToolContentId(long newToolId, Connection conn) throws DeployException
     {
         PreparedStatement stmt = null;
         ResultSet results = null;
         try
         {
             stmt = conn.prepareStatement("INSERT INTO lams_tool_content (tool_id) VALUES (?)");
-            stmt.setLong(1, toolId);
+            stmt.setLong(1, newToolId);
             stmt.execute();
             stmt = conn.prepareStatement("SELECT LAST_INSERT_ID() FROM lams_tool_content");
             results = stmt.executeQuery();
@@ -282,14 +283,14 @@ public class ToolDBDeployTask extends DBTask
         }
     }
     
-    private void updateToolLibraryId(long toolId, long libraryId, Connection conn) throws DeployException
+    private void updateToolLibraryId(long newToolId, long libraryId, Connection conn) throws DeployException
     {
         PreparedStatement stmt = null;
         try
         {
             stmt = conn.prepareStatement("UPDATE lams_tool SET learning_library_id = ? WHERE tool_id = ?");
             stmt.setLong(1, libraryId);
-            stmt.setLong(2, toolId);
+            stmt.setLong(2, newToolId);
             stmt.execute();
             
         }

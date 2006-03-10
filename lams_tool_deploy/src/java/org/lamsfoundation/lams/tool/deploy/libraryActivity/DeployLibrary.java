@@ -24,11 +24,6 @@ http://www.gnu.org/licenses/gpl.txt
  */
 package org.lamsfoundation.lams.tool.deploy.libraryActivity;
 
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.xml.sax.SAXException;
 /**
  * @author mtruong
  *

@@ -25,9 +25,11 @@ http://www.gnu.org/licenses/gpl.txt
 package org.lamsfoundation.lams.tool.deploy;
 
 import java.io.IOException;
+import java.util.Vector;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.tools.ant.types.FileSet;
 import org.xml.sax.SAXException;
 
 /**
@@ -65,12 +67,18 @@ import org.xml.sax.SAXException;
  * scripts to be copied from the scriptPath directory to deploy/sql.
  * Generates the toolInsertScriptPath, toolLibraryInsertScriptPath,
  * toolActivityInsertScriptPath and toolTablesScriptPath entries.</LI>
+ * <LI>(Optional) languageFileScriptPath: define the directory
+ * containing any tool language files. On deployment, files will
+ * be copied to the lams-dictionary jar directory. 
+ * Generates the languageFiles entries.</LI>
  * <LI>(Optional) all other parameters go into the deploy.properties file.</LI> 
  * </UL>
  *
  */
 public class CreateToolPackageTask extends CreatePackageTask {
-    
+
+	private Vector<FileSet> filesets = new Vector<FileSet>();
+	
     public void execute() {
         log("Create Deployment Package.");
         
@@ -99,16 +107,26 @@ public class CreateToolPackageTask extends CreatePackageTask {
             }
         }
         
+        // convert the language filesets to Strings, ready for the properties o
         applyParameters();
+        applyFilesets(DeployToolConfig.LANGUAGE_FILES, filesets);
         deployConfig.validateProperties();
         try
         {
-            writeConfigFile(); //change this to write out xml file instead
+            writeConfigFile();  
         }
         catch(IOException e)
         {
             throw new DeployException(e.getMessage());
         }
     }
+    
+	public void addLanguageFiles(Object input) {
+		System.out.println("input to addLanguageFiles is "+input);
+	}
+
+	public void addFileset(FileSet fileset) {
+		filesets.add(fileset);
+	}
 
 }

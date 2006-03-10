@@ -25,22 +25,12 @@ http://www.gnu.org/licenses/gpl.txt
 package org.lamsfoundation.lams.tool.deploy.libraryActivity;
 
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URL;
-import java.util.Iterator;
-import java.util.Properties;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.tools.ant.BuildException;
-import org.apache.tools.ant.DynamicConfigurator;
-import org.apache.tools.ant.Task;
 import org.lamsfoundation.lams.tool.deploy.CreatePackageTask;
 import org.lamsfoundation.lams.tool.deploy.DeployException;
-import org.lamsfoundation.lams.tool.deploy.DeployToolConfig;
 import org.xml.sax.SAXException;
 
 /**

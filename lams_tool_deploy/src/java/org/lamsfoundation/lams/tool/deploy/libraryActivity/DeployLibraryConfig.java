@@ -25,24 +25,14 @@ http://www.gnu.org/licenses/gpl.txt
  */
 package org.lamsfoundation.lams.tool.deploy.libraryActivity;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.lamsfoundation.lams.tool.deploy.DeployConfig;
 import org.lamsfoundation.lams.tool.deploy.DeployException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory; 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 
@@ -53,7 +43,7 @@ import org.xml.sax.SAXException;
  */
 public class DeployLibraryConfig extends DeployConfig {
     
-    private static Log log = LogFactory.getLog(DeployLibraryConfig.class);
+    // private static Log log = LogFactory.getLog(DeployLibraryConfig.class);
     
     private static final String LEARNING_LIBRARY = "learningLibrary";
     private static final String LIBRARY_INSERT_SCRIPT = "libraryInsertScriptPath";

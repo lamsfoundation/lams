@@ -21,12 +21,11 @@
 
 package org.lamsfoundation.lams.tool.deploy;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.Driver;
-import java.sql.SQLException;
 import java.io.File;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+
 import org.apache.commons.io.FileUtils;
 
 /**

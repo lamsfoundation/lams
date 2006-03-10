@@ -25,26 +25,12 @@ http://www.gnu.org/licenses/gpl.txt
  */
 package org.lamsfoundation.lams.tool.deploy;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.Writer;
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-
-import com.thoughtworks.xstream.*;
-import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  * @author mtruong
@@ -61,7 +47,7 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
  */
 public class DeployToolConfig extends DeployConfig {
     
-    private static Log log = LogFactory.getLog(DeployToolConfig.class);
+    // private static Log log = LogFactory.getLog(DeployToolConfig.class);
     
     private static final String TOOL_WEB_URI = "toolWebUri";
     private static final String TOOL_CONTEXT = "toolContext";
@@ -71,7 +57,7 @@ public class DeployToolConfig extends DeployConfig {
     private static final String TOOL_TABLES_SCRIPT_PATH = "toolTablesScriptPath";
     private static final String TOOL_TABLES_DELETE_SCRIPT_PATH = "toolTablesDeleteScriptPath";
     private static final String DEPLOY_FILES= "deployFiles";
-    private static final String FILE = "file";
+    public static final String LANGUAGE_FILES= "languageFiles";
   
     /**
      * Holds value of property toolSignature.
@@ -121,8 +107,13 @@ public class DeployToolConfig extends DeployConfig {
     /**
      * Holds value of property deployFiles.
      */
-    private ArrayList deployFiles;
+    private ArrayList<String> deployFiles;
     
+    /**
+     * Holds value of property languageFiles.
+     */
+    private ArrayList<String> languageFiles;
+
     /**
      * Creates an instance of DeployToolConfig object.
      */
@@ -212,16 +203,30 @@ public class DeployToolConfig extends DeployConfig {
    }
    
    /**
+    * Pass through some filename lists to be assigned to a parameter
+    */
+   protected void setFilenames(String key, ArrayList<String> filenames) throws DeployException {
+       if ( key == null )
+           throw new DeployException("Invalid parameter: Key is null. ");
+
+       super.setFilenames(key, filenames);
+
+       if ( key.equalsIgnoreCase(LANGUAGE_FILES) ) {
+           languageFiles = filenames;
+       }
+   }
+
+   /**
     * Converts a String to a List. Entries should be comma separated.
     * @param Input string containing entries.
     * @return List of (String) properties, null if not found.
     */
-   protected ArrayList convertList(String input) throws DeployException
+   protected ArrayList<String> convertList(String input) throws DeployException
    {
        String[] strings = input.split(",");
-       ArrayList list = new ArrayList(strings.length);
-       for ( int i=0; i<strings.length; i++) {
-           list.add(strings[i]);
+       ArrayList<String> list = new ArrayList<String>(strings.length);
+       for ( String value : strings) {
+           list.add(value);
        }
        return list;
    }
@@ -243,6 +248,7 @@ public class DeployToolConfig extends DeployConfig {
        valid = valid && validateStringProperty(getDbDriverClass(), DB_PASSWORD);
        valid = valid && validateStringProperty(getDbDriverUrl(), DB_DRIVER_URL);
        valid = valid && validateListProperty(deployFiles,DEPLOY_FILES);
+       valid = valid && validateListProperty(deployFiles,LANGUAGE_FILES);
        
        if (!valid )
            throw new DeployException("Invalid deployment properties: "+validationError);
@@ -285,6 +291,8 @@ public class DeployToolConfig extends DeployConfig {
 	       this.toolTablesDeleteScriptPath = config.getToolTablesDeleteScriptPath();
        if (config.getDeployFiles() != null)
 	       this.deployFiles = config.getDeployFiles();
+       if (config.getLanguageFiles() != null)
+	       this.languageFiles = config.getLanguageFiles();
    }
    
    /** Used for testing purposes only */
@@ -309,6 +317,11 @@ public class DeployToolConfig extends DeployConfig {
        {
            System.out.println("DeployFiles: " + list.get(i));
        }
+       list = this.languageFiles;
+       for(int i=0; i<list.size(); i++)
+       {
+           System.out.println("LanguageFiles: " + list.get(i));
+       }
        System.out.println("========End Object Properties=======");
       
    }
@@ -321,13 +334,13 @@ public class DeployToolConfig extends DeployConfig {
    /**
      * @return Returns the deployFiles.
      */
-    public ArrayList getDeployFiles() {
+    public ArrayList<String> getDeployFiles() {
         return deployFiles;
     }
     /**
      * @param deployFiles The deployFiles to set.
      */
-    public void setDeployFiles(ArrayList deployFiles) {
+    public void setDeployFiles(ArrayList<String> deployFiles) {
         this.deployFiles = deployFiles;
     }
     /**
@@ -440,4 +453,12 @@ public class DeployToolConfig extends DeployConfig {
     public void setToolWebUri(String toolWebUri) {
         this.toolWebUri = toolWebUri;
     }
+
+	public ArrayList<String> getLanguageFiles() {
+		return languageFiles;
+	}
+
+	public void setLanguageFiles(ArrayList<String> languageFiles) {
+		this.languageFiles = languageFiles;
+	}
 }

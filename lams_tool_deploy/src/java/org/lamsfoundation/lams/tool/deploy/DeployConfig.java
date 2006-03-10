@@ -25,18 +25,14 @@ http://www.gnu.org/licenses/gpl.txt
 package org.lamsfoundation.lams.tool.deploy;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 import com.thoughtworks.xstream.XStream;
@@ -219,6 +215,16 @@ public abstract class DeployConfig {
         if ( key.equalsIgnoreCase(DB_DRIVER_URL) ) {
             setDbDriverUrl(value);
         }       
+    }
+    
+    /**
+     * Pass through some filename lists to be assigned to a parameter
+     */
+    protected void setFilenames(String key, ArrayList<String> filenames) throws DeployException {
+        if ( key == null )
+            throw new DeployException("Invalid parameter: Key is null. ");
+
+        // no filelists are known to the basic configuration.
     }
     
     /**

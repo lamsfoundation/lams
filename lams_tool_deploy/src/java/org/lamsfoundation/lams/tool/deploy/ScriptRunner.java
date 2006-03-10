@@ -22,11 +22,10 @@
 package org.lamsfoundation.lams.tool.deploy;
 
 
-import java.sql.SQLException;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.List;
-import java.util.ArrayList;
+
 import org.apache.commons.dbutils.DbUtils;
 /**
  * Used to Run a SQL script.
@@ -91,12 +90,12 @@ public class ScriptRunner
      * Executes an array of statements againt a connection.
      * Note that it will *WILL NOT* close the connection, commit or roll back.
      */
-    protected void executeStatements(String[] statements, Connection conn) throws DeployException
+    protected void executeStatements(String[] statements, Connection newConn) throws DeployException
     {
         Statement stmt = null;
         try
         {
-            stmt = conn.createStatement();
+            stmt = newConn.createStatement();
             for (int i = 0, length = statements.length; i < length; i++)
             {
                stmt.addBatch(statements[i]);

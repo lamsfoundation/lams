@@ -21,6 +21,10 @@
 
 package org.lamsfoundation.lams.tool.deploy;
 
+import java.util.List;
+
+
+
 
 /**
  * Tool Deployer Main Class
@@ -103,6 +107,15 @@ public class Deploy
             deployFilesTask.setDeployFiles(config.getDeployFiles());
             deployFilesTask.execute();
             
+            List<String> files = config.getLanguageFiles();
+            if ( files != null && files.size() > 0 ) {
+	            DeployLanguageFilesTask deployLanguageFilesTask = new DeployLanguageFilesTask();
+	            deployLanguageFilesTask.setLamsEarPath(config.getLamsEarPath());
+	            deployLanguageFilesTask.setDictionaryPacket(config.getToolSignature());
+	            deployLanguageFilesTask.setDeployFiles(config.getLanguageFiles());
+	            deployLanguageFilesTask.execute();
+            }
+
             System.out.println("Activating Tool in LAMS");
             ToolDBActivateTask dbActivateTask = new ToolDBActivateTask();
             dbActivateTask.setDbUsername(config.getDbUsername());

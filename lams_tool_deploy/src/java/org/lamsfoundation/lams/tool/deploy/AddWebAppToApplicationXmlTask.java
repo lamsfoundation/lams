@@ -23,7 +23,6 @@ package org.lamsfoundation.lams.tool.deploy;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 /**
  * Task to add a web application entry to an EAR application XML

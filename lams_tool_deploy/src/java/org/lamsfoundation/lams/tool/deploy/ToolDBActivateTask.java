@@ -22,8 +22,9 @@
 package org.lamsfoundation.lams.tool.deploy;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
 import org.apache.commons.dbutils.DbUtils;
 
 /**
@@ -34,7 +35,7 @@ import org.apache.commons.dbutils.DbUtils;
  */
 public class ToolDBActivateTask extends DBTask
 {
-    private long defaultContentId;
+    //private long defaultContentId;
     
     private long toolId;
     
@@ -109,13 +110,13 @@ public class ToolDBActivateTask extends DBTask
         this.learningLibraryId = learningLibraryId;
     }
     
-    private void activateTool(long toolId, Connection conn) throws SQLException
+    private void activateTool(long newToolId, Connection conn) throws SQLException
     {
         PreparedStatement stmt = null;
         try
         {
             stmt = conn.prepareStatement("UPDATE lams_tool SET valid_flag = 1 WHERE tool_id  = ?");
-            stmt.setLong(1, toolId);
+            stmt.setLong(1, newToolId);
             stmt.execute();
         }
         finally

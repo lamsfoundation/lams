@@ -50,11 +50,6 @@ public class ToolDBRemoveToolEntriesTask extends DBTask
      */
     private String toolSignature;
 
-    /**
-     * Holds value of property learningLibraryId.
-     */
-    private long learningLibraryId;
-    
     /** Creates a new instance of ToolDBActivateTask */
     public ToolDBRemoveToolEntriesTask()
     {
@@ -83,7 +78,7 @@ public class ToolDBRemoveToolEntriesTask extends DBTask
     public void execute() throws DeployException
     {
         long toolId = 0;
-        long learningLibraryId = 0;
+        long libId = 0;
         
         toolTablesDeleteScript = new File(toolTablesDeleteScriptPath);
                 
@@ -94,10 +89,10 @@ public class ToolDBRemoveToolEntriesTask extends DBTask
             conn.setAutoCommit(false);
             toolId = getToolId(conn);
             if ( toolId != 0 ) {
-	            learningLibraryId = getLearningLibraryId(toolId, conn);
+            	libId = getLearningLibraryId(toolId, conn);
 	            
-	            System.out.println("Deleting rows where toolId = "+toolId+" and learningLibraryId = "+learningLibraryId);
-	            cleanupToolTables(toolId, learningLibraryId, conn);
+	            System.out.println("Deleting rows where toolId = "+toolId+" and learningLibraryId = "+libId);
+	            cleanupToolTables(toolId, libId, conn);
 	            
 	            //run the tool table delete script
 	            if ( toolTablesDeleteScriptPath == null || toolTablesDeleteScriptPath.length() == 0 ) {
@@ -141,7 +136,7 @@ public class ToolDBRemoveToolEntriesTask extends DBTask
         }
     }
     
-    private void cleanupToolTables(long toolId, long learningLibraryId, Connection conn) throws DeployException
+    private void cleanupToolTables(long toolId, long libraryId, Connection conn) throws DeployException
     {
         PreparedStatement stmt = null;
         try
@@ -159,7 +154,7 @@ public class ToolDBRemoveToolEntriesTask extends DBTask
             stmt.execute();
 
             stmt = conn.prepareStatement("DELETE FROM lams_learning_library WHERE learning_library_id = ?");
-            stmt.setLong(1, learningLibraryId);
+            stmt.setLong(1, libraryId);
             stmt.execute();
 
         }

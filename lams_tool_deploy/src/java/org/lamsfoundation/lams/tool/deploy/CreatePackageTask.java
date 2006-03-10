@@ -26,19 +26,18 @@ package org.lamsfoundation.lams.tool.deploy;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URL;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Properties;
-
-import javax.xml.parsers.ParserConfigurationException;
+import java.util.Vector;
 
 import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.DynamicConfigurator;
 import org.apache.tools.ant.Task;
-import org.xml.sax.SAXException;
+import org.apache.tools.ant.types.FileSet;
 /**
  * @author mtruong, Original design by Fiona Malikoff
  *
@@ -102,8 +101,22 @@ public abstract class CreatePackageTask extends Task implements DynamicConfigura
         while ( iter.hasNext() ) {
             String key = (String) iter.next();
             // any keys not known to the deployConfig are ignored, so it doesn't matter if we pass mode, etc.
-            deployConfig.setProperty(key, inputProperties.getProperty(key));
+            // The only vectors will be filesets.
+           	deployConfig.setProperty(key, (String) inputProperties.getProperty(key));
         }
+    }
+
+    protected void applyFilesets(String key, Vector<FileSet> filesets) {
+    	ArrayList<String> filenames = new ArrayList<String>();
+    	for ( FileSet fileset : filesets) {
+    		DirectoryScanner ds = fileset.getDirectoryScanner(getProject());
+    		String[] files = ds.getIncludedFiles();
+    		for ( String filename: files ) {
+    			filenames.add(ds.getBasedir()+File.separator+filename);
+    		}
+    	}
+    	
+       	deployConfig.setFilenames(key, filenames);
     }
 
     protected void createDirectory(File dir) {

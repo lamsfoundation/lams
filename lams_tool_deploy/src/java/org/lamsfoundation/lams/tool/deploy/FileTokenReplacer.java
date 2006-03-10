@@ -23,12 +23,12 @@ package org.lamsfoundation.lams.tool.deploy;
         
 import java.io.File;
 import java.io.IOException;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
-import java.util.regex.PatternSyntaxException;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.Iterator;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
 import org.apache.commons.io.FileUtils;
 /**
  * Parsers a file and does token replacement

@@ -20,9 +20,10 @@
  */
 
 package org.lamsfoundation.lams.tool.deploy;
-import java.util.List;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
+
 import org.apache.commons.io.FileUtils;
 
 /**
@@ -40,7 +41,7 @@ public abstract class FilesTask implements Task
     /**
      * Holds value of property deployFiles.
      */
-    protected List deployFiles;
+    protected List<String> deployFiles;
     
     /** Creates a new instance of DeployWarTask */
     public FilesTask()
@@ -61,11 +62,46 @@ public abstract class FilesTask implements Task
      * Sets the list of file paths to operate on.
      * @param deployFiles New value of property deployFiles.
      */
-    public void setDeployFiles(List deployFiles)
+    public void setDeployFiles(List<String> deployFiles)
     {
         
         this.deployFiles = deployFiles;
     }
-    
-    
+
+     /**
+    * Copy a file to a given directory
+    */
+   protected void copyFile(String fileName, File directory) throws DeployException
+   {
+       try
+       {
+           File original = new File(fileName);
+           FileUtils.copyFileToDirectory(original, directory);
+       }
+       catch (IOException ioex)
+       {
+           throw new DeployException("Could not copy file "+fileName+" to "+directory.getAbsolutePath(), ioex);
+       }
+       
+   }
+
+   /** Gets the LAMS ear directory and checks that it exists, is a directory and is writable. */
+   protected File getLamsEar() throws DeployException {
+   	
+	    File lamsEar =  new File(lamsEarPath);
+	    if (!lamsEar.exists())
+	    {
+	        throw new DeployException("Could not find "+lamsEarPath);
+	    }
+	    else if (!lamsEar.isDirectory())
+	    {
+	        throw new DeployException(lamsEarPath+" is not a directory");
+	    }
+	    else if (!lamsEar.canWrite())
+	    {
+	        throw new DeployException(lamsEarPath+" is not writable");
+	    }
+	    return lamsEar;
+   }
+
 }
