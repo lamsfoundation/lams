@@ -52,13 +52,13 @@
 	</c:if>
 	<span id="preview${id}" style="visibility: hidden; display: none;">
 		<div>
-	    	<a href="javascript:doWYSWYGEdit('${id}'<c:if test="${small}">,'small'</c:if>)"><img src="${lams}images/html.gif" width="80" height="15" border="0" alt="Open HTML Editor"></a>
+	    	<a href="javascript:doWYSWYGEdit('${id}'<c:if test="${small}">,'small'</c:if>)"><img src="${lams}images/html.gif" border="0" alt="Open HTML Editor"></a>
 	    </div>
 	    <div class="${previewClassName}" id="preview${id}.text"></div>
 	</span>
 	<span id="tx${id}">
 		<div>
-	    	<a href="javascript:doTextToHTML('${id}'); doWYSWYGEdit('${id}'<c:if test="${small}">,'small'</c:if>)"><img src="${lams}images/html.gif" width="80" height="15" border="0" alt="Open HTML Editor"></a>
+	    	<a href="javascript:doTextToHTML('${id}'); doWYSWYGEdit('${id}'<c:if test="${small}">,'small'</c:if>)"><img src="${lams}images/html.gif" border="0" alt="Open HTML Editor"></a>
 	    </div>
 		<textarea class="${txtClassName}" name="${fn:toLowerCase(id_a)}${id_b}" id="tx${id}.textarea"><c:out value="${text}" escapeXml="false" /></textarea>
 	</span>
