@@ -46,7 +46,9 @@
 	<c:set var="dUseKey" value="${useKey}" scope="request"/>
 </c:if>
 
-<div class="tabmenu"><ul>
+<!-- tab holder table -->
+<table border="0" cellspacing="0" cellpadding="0" summary="This table is being used for layout purposes only">
+  <tr valign="bottom">
 <c:choose>
 	<c:when test="${collection != null}">
 			<c:set var="count" value="0"/>
@@ -66,4 +68,5 @@
 		<jsp:doBody/>
 	</c:otherwise>
 </c:choose>
-</ul></div>
+  </tr>
+</table>
