@@ -50,6 +50,8 @@ public class QaQueContentDAO extends HibernateDaoSupport implements IQaQueConten
 	 	static Logger logger = Logger.getLogger(QaQueContentDAO.class.getName());
 	 	private static final String LOAD_QUESTION_CONTENT_BY_CONTENT_ID = "from qaQueContent in class QaQueContent where qaQueContent.qaContentId=:qaContentId";
 	 	private static final String GET_QUESTION_IDS_FOR_CONTENT = "select qaQueContent.qaQueContentId from QaQueContent qaQueContent where qaQueContent.qaContentId = :qa";
+	 	private static final String LOAD_QUESTION_CONTENT_BY_QUESTION_TEXT = "from qaQueContent in class QaQueContent where qaQueContent.question=:question and qaQueContent.qaContentId=:qaContentId";
+	 	private static final String LOAD_QUESTION_CONTENT_BY_DISPLAY_ORDER = "from qaQueContent in class QaQueContent where qaQueContent.displayOrder=:displayOrder and qaQueContent.qaContentId=:qaContentId";
 	 			
 	 	public QaQueContent getToolDefaultQuestionContent(final long qaContentId)
 	    {
@@ -80,6 +82,40 @@ public class QaQueContentDAO extends HibernateDaoSupport implements IQaQueConten
 			return null;
 	 	}
 
+	 	
+	 	public QaQueContent getQuestionContentByQuestionText(final String question, Long qaContentId)
+	    {
+	        HibernateTemplate templ = this.getHibernateTemplate();
+
+	        List list = getSession().createQuery(LOAD_QUESTION_CONTENT_BY_QUESTION_TEXT)
+			.setString("question", question)
+			.setLong("qaContentId", qaContentId.longValue())				
+			.list();
+			
+			if(list != null && list.size() > 0){
+				QaQueContent qa = (QaQueContent) list.get(0);
+				return qa;
+			}
+			return null;
+	    }
+
+
+	 	public QaQueContent getQuestionContentByDisplayOrder(Long displayOrder, Long qaContentId)
+	    {
+	        HibernateTemplate templ = this.getHibernateTemplate();
+
+	        List list = getSession().createQuery(LOAD_QUESTION_CONTENT_BY_DISPLAY_ORDER)
+			.setLong("displayOrder", displayOrder.longValue())
+			.setLong("qaContentId", qaContentId.longValue())				
+			.list();
+			
+			if(list != null && list.size() > 0){
+				QaQueContent qa = (QaQueContent) list.get(0);
+				return qa;
+			}
+			return null;
+	    }
+
 
 	 	public List getQuestionIndsForContent(QaContent qa)
 	    {
@@ -105,9 +141,15 @@ public class QaQueContentDAO extends HibernateDaoSupport implements IQaQueConten
 		public void createQueContent(QaQueContent queContent) 
 	    {
 			this.getSession().setFlushMode(FlushMode.AUTO);
-			logger.debug("before createQueContent save: " + queContent);
 	    	this.getHibernateTemplate().save(queContent);
 	    }
+		
+		public void updateQaQueContent(QaQueContent qaQueContent)
+	    {
+			this.getSession().setFlushMode(FlushMode.AUTO);
+	    	this.getHibernateTemplate().update(qaQueContent);
+	    }
+
 		
 		public void removeQueContent(long qaQueContentId) 
 	    {

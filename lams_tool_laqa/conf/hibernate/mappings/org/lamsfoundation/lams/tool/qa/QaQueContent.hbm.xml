@@ -26,13 +26,13 @@
             length="65535"
         />
 
-        <property
-            name="displayOrder"
-            type="int"
-            access="property"
-            column="display_order"
-            length="11"
-        />
+	    <property
+	        name="displayOrder"
+	        type="java.lang.Integer"
+	        column="display_order"
+	        length="5"
+	    >
+	    </property>
 
 
         <property

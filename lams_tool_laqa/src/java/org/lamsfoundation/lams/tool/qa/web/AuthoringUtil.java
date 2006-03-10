@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.tool.qa.web;
 
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -34,6 +35,7 @@ import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaComparator;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
+import org.lamsfoundation.lams.tool.qa.QaStringComparator;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -98,7 +100,7 @@ public class AuthoringUtil implements QaAppConstants {
     /**
      * reconstructQuestionContentMapForSubmit(TreeMap mapQuestionContent, HttpServletRequest request)
      * return void
-     * re-organizes the Map by removing empty entries from the user and creates the final Map ready for service layer
+     * 
     */
     protected  void reconstructQuestionContentMapForSubmit(Map mapQuestionContent, HttpServletRequest request)
     {
@@ -120,7 +122,7 @@ public class AuthoringUtil implements QaAppConstants {
 	    
 	    mapQuestionContent=(TreeMap)mapFinalQuestionContent;
 	    request.getSession().setAttribute("mapQuestionContent", mapQuestionContent);
-	    logger.debug("post-submit Map:" + mapQuestionContent);
+	    logger.debug("final mapQuestionContent:" + mapQuestionContent);
     }
     
     
@@ -157,20 +159,19 @@ public class AuthoringUtil implements QaAppConstants {
     }
 
 
-    public QaContent saveOrUpdateQaContent(Map mapQuestionContent, IQaService qaService, QaAuthoringForm qaAuthoringForm){
-        
-    	logger.debug("starting saveOrUpdateQaContent.");
+    public QaContent saveOrUpdateQaContent(Map mapQuestionContent, IQaService qaService, QaAuthoringForm qaAuthoringForm)
+    {
         UserDTO toolUser = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
         
         boolean isQuestionsSequenced=false;
         boolean isSynchInMonitor=false;
         boolean isUsernameVisible=false;
         String reportTitle = qaAuthoringForm.getReportTitle();
-        String richTextTitle = qaAuthoringForm.getTitle(); //??
+        String richTextTitle = qaAuthoringForm.getTitle(); 
         String monitoringReportTitle = qaAuthoringForm.getMonitoringReportTitle();
-        String richTextOfflineInstructions = qaAuthoringForm.getOnlineInstructions(); //??
-        String richTextInstructions = qaAuthoringForm.getInstructions(); //??
-        String richTextOnlineInstructions = qaAuthoringForm.getOfflineInstructions(); //??
+        String richTextOfflineInstructions = qaAuthoringForm.getOnlineInstructions(); 
+        String richTextInstructions = qaAuthoringForm.getInstructions(); 
+        String richTextOnlineInstructions = qaAuthoringForm.getOfflineInstructions(); 
         String endLearningMessage = qaAuthoringForm.getEndLearningMessage();
         
         String questionsSequenced = qaAuthoringForm.getQuestionsSequenced();
@@ -196,12 +197,11 @@ public class AuthoringUtil implements QaAppConstants {
         
         long userId = toolUser.getUserID().longValue();
         
-       
+        
         QaContent qa = qaService.loadQa(Long.parseLong(qaAuthoringForm.getToolContentId()));
         if(qa==null)
             qa = new QaContent();
-        
-        
+            
         qa.setTitle(richTextTitle);
         qa.setInstructions(richTextInstructions);
         qa.setUpdateDate(new Date(System.currentTimeMillis())); /**keep updating this one*/
@@ -217,18 +217,13 @@ public class AuthoringUtil implements QaAppConstants {
         qa.setUsernameVisible(usernameVisibleBoolean);
         qa.setQuestionsSequenced(questionsSequencedBoolean);
         qa.setSynchInMonitor(synchInMonitorBoolean);
+    
         /**
          * TODO: right now the code simply remove all the questions and recreate them.
          *       Ideally, when existing questions changed it should be updated accordingly
          *       and when new questions is added it should be created in the in the database.  
          */
-        //Remove all question contents;
-        qa.getQaQueContents().clear();
-
-        //qa.setQaSessions(new TreeSet());
-        //qa.setQaUploadedFiles(new TreeSet());
-        
-        logger.debug("before  update or save: " + qa);
+            
         if(qa.getQaContentId() == null){
             qa.setQaContentId(new Long(qaAuthoringForm.getToolContentId()));
             logger.debug("will create: " + qa);
@@ -239,13 +234,11 @@ public class AuthoringUtil implements QaAppConstants {
         	logger.debug("will update: " + qa);
             qaService.updateQa(qa);
         }
-        	
-        logger.debug("before  createQuestionContent: mapQuestionContent" + mapQuestionContent);
-        logger.debug("before  createQuestionContent: qa" + qa);
-        //recreate all question contents
-        createQuestionContent(mapQuestionContent, qaService, qa);
         
-        return qa;
+        QaContent qaContent=qaService.loadQa(new Long(qaAuthoringForm.getToolContentId()).longValue());
+        qaContent=createQuestionContent(mapQuestionContent, qaService, qaContent);
+        
+        return qaContent;
     }
     
     /**
@@ -254,9 +247,22 @@ public class AuthoringUtil implements QaAppConstants {
      * 
      * persist the questions in the Map the user has submitted 
      */
-    protected void createQuestionContent(Map mapQuestionContent, IQaService qaService, QaContent qaContent)
+    protected QaContent createQuestionContent(Map mapQuestionContent, IQaService qaService, QaContent qaContent)
     {    
-        logger.debug("starting createQuestionContent: qaContent" + qaContent);
+        logger.debug("content uid is: " + qaContent.getUid());
+        List questions=qaService.retrieveQaQueContentsByToolContentId(qaContent.getUid().longValue());
+        logger.debug("questions: " + questions);
+        
+		Iterator listIterator=questions.iterator();
+		Long mapIndex=new Long(1);
+		
+		while (listIterator.hasNext())
+		{
+			QaQueContent queContent=(QaQueContent)listIterator.next();
+			logger.debug("queContent data: " + queContent);
+			logger.debug("queContent: " + queContent.getQuestion() + "" + queContent.getDisplayOrder());
+		}
+        
         Iterator itMap = mapQuestionContent.entrySet().iterator();
         int diplayOrder=0;
         while (itMap.hasNext()) 
@@ -269,17 +275,39 @@ public class AuthoringUtil implements QaAppConstants {
 	        	logger.debug("starting createQuestionContent: pairs.getValue().toString():" + pairs.getValue().toString());
 	        	logger.debug("starting createQuestionContent: qaContent: " + qaContent);
 	        	logger.debug("starting createQuestionContent: diplayOrder: " + diplayOrder);
-		        QaQueContent queContent=  new QaQueContent(pairs.getValue().toString(), 
+	        	
+	        	
+	        	QaQueContent queContent=  new QaQueContent(pairs.getValue().toString(), 
 		        											++diplayOrder, 
 															qaContent,
 															null,
 															null);
-	        
-   			logger.debug("queContent: " + queContent);
-   			qaService.createQaQue(queContent);
-   			logger.debug("a qaQueContent created:");
+		        
+		        
+			       /* is this question already recorded?*/
+			       logger.debug("question text is: " + pairs.getValue().toString());
+			       logger.debug("content uid is: " + qaContent.getUid());
+			       logger.debug("question display order is: " + diplayOrder);
+			       QaQueContent existingQaQueContent=qaService.getQuestionContentByDisplayOrder(new Long(diplayOrder), qaContent.getUid());
+			       logger.debug("existingQaQueContent: " + existingQaQueContent);
+			       if (existingQaQueContent == null)
+			       {
+			       		logger.debug("creating a new question content: " + queContent);
+			       		logger.debug("adding a new question to content: " + queContent);
+			       		qaContent.getQaQueContents().add(queContent);
+			       		queContent.setQaContent(qaContent);
+	
+			       		qaService.createQaQue(queContent);
+			       }
+			       else
+			       {
+			       		existingQaQueContent.setQuestion(pairs.getValue().toString());
+			       		logger.debug("updating the existing question content: " + existingQaQueContent);
+			       		qaService.updateQaQueContent(existingQaQueContent);
+			       }
 	        }
+	        logger.debug("returning qaContent: " + qaContent);
 	    }
-	    logger.debug("all questions in the Map persisted:");
+        return qaContent;
     }
 }

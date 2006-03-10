@@ -92,6 +92,11 @@ public interface IQaService
 	
 	public void updateQaUsrResp(QaUsrResp qaUsrResp) throws QaApplicationException;
 	
+	public QaQueContent getQuestionContentByQuestionText(final String question, Long contentUid) throws QaApplicationException;
+	
+	public QaQueContent getQuestionContentByDisplayOrder(Long displayOrder, Long contentUid) throws QaApplicationException;
+	
+	public void updateQaQueContent(QaQueContent qaQueContent) throws QaApplicationException;
 	
 	/**
      * Return the qa session object according to the requested session id.

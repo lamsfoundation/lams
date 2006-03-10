@@ -42,9 +42,15 @@ public interface IQaQueContentDAO
     
     public void createQueContent(QaQueContent queContent);
     
+    public void updateQaQueContent(QaQueContent qaQueContent);
+    
     public void removeQueContent(long qaQueContentId);
     
     public List getQaQueContentsByContentId(long qaContentId);
     
     public List getAllQuestionEntries(final long qaContentId);
+    
+    public QaQueContent getQuestionContentByQuestionText(final String question, Long qaContentId);
+    
+ 	public QaQueContent getQuestionContentByDisplayOrder(Long displayOrder, Long qaContentId);
 }

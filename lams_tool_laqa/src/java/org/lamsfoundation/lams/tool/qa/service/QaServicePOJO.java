@@ -215,7 +215,55 @@ public class QaServicePOJO
         }
     }
     
+
+    public QaQueContent getQuestionContentByQuestionText(final String question, Long contentUid) throws QaApplicationException
+	{
+        try
+        {
+        	return qaQueContentDAO.getQuestionContentByQuestionText(question, contentUid);
+
+        }
+        catch (DataAccessException e)
+        {
+            throw new QaApplicationException("Exception occured when lams is getting qa content by question text: "
+                                                         + e.getMessage(),
+														   e);
+        }
+	}
     
+
+    public QaQueContent getQuestionContentByDisplayOrder(Long displayOrder, Long contentUid) throws QaApplicationException
+	{
+        try
+        {
+        	return qaQueContentDAO.getQuestionContentByDisplayOrder(displayOrder, contentUid);
+
+        }
+        catch (DataAccessException e)
+        {
+            throw new QaApplicationException("Exception occured when lams is getting qa content by question text: "
+                                                         + e.getMessage(),
+														   e);
+        }
+	}
+
+    
+    public void updateQaQueContent(QaQueContent qaQueContent) throws QaApplicationException
+	{
+    	try
+        {
+        	qaQueContentDAO.updateQaQueContent(qaQueContent);
+
+        }
+        catch (DataAccessException e)
+        {
+            throw new QaApplicationException("Exception occured when lams is updating qa content by question: "
+                                                         + e.getMessage(),
+														   e);
+        }
+    	
+	}
+
     
     public void createQaQue(QaQueContent qaQueContent) throws QaApplicationException
     {
