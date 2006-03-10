@@ -155,8 +155,9 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants
 
         authoringUtil.reconstructQuestionContentMapForSubmit(mapQuestionContent, request);
         logger.debug("before saveOrUpdateQaContent.");
-        QaContent qaContent = authoringUtil.saveOrUpdateQaContent(mapQuestionContent, qaService, qaAuthoringForm);
-        logger.debug("after saveOrUpdateQaContent.");
+        
+        QaContent qaContent=authoringUtil.saveOrUpdateQaContent(mapQuestionContent, qaService, qaAuthoringForm);
+        logger.debug("qaContent: " + qaContent);
 
         List attacments=saveAttachments(qaContent, attachmentList, deletedAttachmentList, mapping, request);
         logger.debug("attacments: " + attacments);
@@ -552,32 +553,32 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants
             fileType = IToolContentHandler.TYPE_ONLINE;
         }
         else
-            //no file uploaded
+            /*no file uploaded*/
             return;
         
         logger.debug("uploadedFile.getFileName(): " + uploadedFile.getFileName());
         
-        // if a file with the same name already exists then move the old one to deleted
+        /* if a file with the same name already exists then move the old one to deleted */
         deletedAttachmentList = QaUtils.moveToDelete(uploadedFile.getFileName(), isOnlineFile, attachmentList, deletedAttachmentList );
 
         try
         {
-            // This is a new file and so is saved to the content repository. Add it to the 
-            // attachments collection, but don't add it to the tool's tables yet.
+            /* This is a new file and so is saved to the content repository. Add it to the 
+             attachments collection, but don't add it to the tool's tables yet.
+             */
             NodeKey node = getToolContentHandler().uploadFile(uploadedFile.getInputStream(), uploadedFile.getFileName(), 
                     uploadedFile.getContentType(), fileType); 
             QaUploadedFile file = new QaUploadedFile();
             file.setFileName(uploadedFile.getFileName());
             file.setFileOnline(isOnlineFile);
-            //file.setQaContent(qaContent);
             file.setUuid(node.getUuid().toString());
-            //file.setVersionId(node.getVersion()); 
+            /* file.setVersionId(node.getVersion()); */ 
             
-            // add the files to the attachment collection - if one existed, it should have already been removed.
+            /* add the files to the attachment collection - if one existed, it should have already been removed. */
             attachmentList.add(file);
             
             QaUtils.addUploadsToSession(request, attachmentList, deletedAttachmentList);
-            //reset the fields so that more files can be uploaded
+            /* reset the fields so that more files can be uploaded */
             qaAuthoringForm.setTheOfflineFile(null);
             qaAuthoringForm.setTheOnlineFile(null);
         }
@@ -640,8 +641,8 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants
                 QaUploadedFile attachment = (QaUploadedFile) iter.next();
                 logger.debug("attachment: " + attachment);
                 
-                // remove entry from content repository. deleting a non-existent entry 
-                // shouldn't cause any errors.
+                /*remove entry from content repository. deleting a non-existent entry 
+                 shouldn't cause any errors.*/
                 try 
 				{
                 	
@@ -678,7 +679,7 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants
             	logger.debug("attachment submission id: " + attachment.getSubmissionId());
 
                 if ( attachment.getSubmissionId() == null ) {
-                    // add entry to tool table - file already in content repository
+                    /* add entry to tool table - file already in content repository */
                 	logger.debug("calling persistFile with  attachment: " + attachment);
                     qaService.persistFile(qaContent, attachment);
                 }
