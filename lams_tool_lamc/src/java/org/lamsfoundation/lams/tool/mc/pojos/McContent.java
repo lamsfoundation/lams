@@ -214,8 +214,6 @@ public class McContent implements Serializable {
     	newContent.setMcQueContents(mc.deepCopyMcQueContent(newContent));
     	newContent.setMcAttachments(mc.deepCopyMcAttachments(toolContentHandler, newContent));
     	
-    	 
-    	
     	return newContent;
 	}
     
