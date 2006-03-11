@@ -28,6 +28,45 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * 
  * @author Ozgur Demirtas
  * starts up the monitoring module
+ * 
+ *  <action
+		path="/monitoringStarter"
+		type="org.lamsfoundation.lams.tool.qa.web.QaMonitoringStarterAction"
+		name="QaMonitoringForm"
+		scope="session"
+		parameter="method"
+		unknown="false"
+		validate="false">
+		
+		<exception
+			key="error.exception.QaApplication"
+			type="org.lamsfoundation.lams.tool.qa.QaApplicationException"
+			handler="org.lamsfoundation.lams.tool.qa.web.CustomStrutsExceptionHandler"
+			path="/SystemErrorContent.jsp"
+			scope="request"
+		/>
+		    
+		<exception
+		    key="error.exception.QaApplication"
+		    type="java.lang.NullPointerException"
+		    handler="org.lamsfoundation.lams.tool.qa.web.CustomStrutsExceptionHandler"
+		    path="/SystemErrorContent.jsp"
+		    scope="request"
+		/>	         			
+		
+	  	<forward
+		    name="loadMonitoring"
+		    path="/monitoring/MonitoringMaincontent.jsp"
+		    redirect="true"
+	  	/>
+	      
+   	  	<forward
+		    name="errorList"
+		    path="/QaErrorBox.jsp"
+		    redirect="true"
+	  	/>
+	</action>
+
  *
  */
 

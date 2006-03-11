@@ -76,7 +76,61 @@
 *
 * The format of the serialization for export is XML. Tool will define extra namespace inside the <Content> element to add a new data element (type). Inside the data element, it can further define more structures and types as it seems fit.
 * The data elements must be "version" aware. The data elements must be "type" aware if they are to be shared between Tools.
-*
+* 
+* 
+* 
+*    <!--Authoring Starter  -->
+    <action
+		path="/authoringStarter"
+		type="org.lamsfoundation.lams.tool.qa.web.QaStarterAction"
+		name="QaAuthoringForm"
+		scope="session"
+		unknown="false"
+		validate="false"
+    >
+
+		<exception
+			key="error.exception.QaApplication"
+			type="org.lamsfoundation.lams.tool.qa.QaApplicationException"
+			handler="org.lamsfoundation.lams.tool.qa.web.CustomStrutsExceptionHandler"
+			path="/SystemErrorContent.jsp"
+			scope="request"
+		/>
+		    
+		<exception
+		    key="error.exception.QaApplication"
+		    type="java.lang.NullPointerException"
+		    handler="org.lamsfoundation.lams.tool.qa.web.CustomStrutsExceptionHandler"
+		    path="/SystemErrorContent.jsp"
+		    scope="request"
+		/>	         			
+	    
+	    <forward
+			name="load"
+			path="/AuthoringMaincontent.jsp"
+			redirect="false"
+	    />
+	
+	    <forward
+			name="loadViewOnly"
+	      	path="/authoring/AuthoringTabsHolder.jsp"
+	      	redirect="false"
+	    />
+	
+	  	<forward
+			name="loadMonitoring"
+			path="/monitoring/MonitoringMaincontent.jsp"
+			redirect="true"
+	  	/>
+	
+	  	<forward
+			name="errorList"
+			path="/QaErrorBox.jsp"
+			redirect="true"
+	  	/>
+	</action>  
+
+* 
 */
 
 

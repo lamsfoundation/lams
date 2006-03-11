@@ -26,6 +26,55 @@
  * QaDLStarterAction activates the Define Later module. 
  * It reuses majority of the functionality from existing authoring module.
  * 
+ * 	   <!--Define Later Starter Action: initializes the DefineLater module -->
+   <action 
+   	path="/defineLaterStarter" 
+   	type="org.lamsfoundation.lams.tool.qa.web.QaDLStarterAction" 
+   	name="QaAuthoringForm" 
+   	input="/index.jsp"> 
+
+		<exception
+			key="error.exception.QaApplication"
+			type="org.lamsfoundation.lams.tool.qa.QaApplicationException"
+			handler="org.lamsfoundation.lams.tool.qa.web.CustomStrutsExceptionHandler"
+			path="/SystemErrorContent.jsp"
+			scope="request"
+		/>
+		    
+		<exception
+		    key="error.exception.QaApplication"
+		    type="java.lang.NullPointerException"
+		    handler="org.lamsfoundation.lams.tool.qa.web.CustomStrutsExceptionHandler"
+		    path="/SystemErrorContent.jsp"
+		    scope="request"
+		/>	         			
+
+	  	<forward
+		    name="load"
+          	path="/AuthoringMaincontent.jsp"
+		    redirect="true"
+	  	/>
+	  	
+	  	<forward
+	        name="starter"
+	        path="/index.jsp"
+	        redirect="true"
+	     />
+	  
+        <forward
+          name="loadViewOnly"
+          path="/authoring/AuthoringTabsHolder.jsp"
+          redirect="false"
+        />
+	  	
+	  	<forward
+		    name="errorList"
+		    path="/QaErrorBox.jsp"
+		    redirect="true"
+	  	/>
+	</action>  
+
+ * 
   
 */
 package org.lamsfoundation.lams.tool.qa.web;

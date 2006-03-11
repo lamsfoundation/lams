@@ -21,6 +21,63 @@
  * ***********************************************************************/
  /**
  * @author Ozgur Demirtas
+ * 
+ * 	 <action
+	      path="/monitoring"
+	      type="org.lamsfoundation.lams.tool.qa.web.QaMonitoringAction"
+	      name="QaMonitoringForm"
+	      scope="session"
+	      parameter="method"
+	      unknown="false"
+	      validate="false">
+	      
+		<exception
+			key="error.exception.QaApplication"
+			type="org.lamsfoundation.lams.tool.qa.QaApplicationException"
+			handler="org.lamsfoundation.lams.tool.qa.web.CustomStrutsExceptionHandler"
+			path="/SystemErrorContent.jsp"
+			scope="request"
+		/>
+		    
+		<exception
+		    key="error.exception.QaApplication"
+		    type="java.lang.NullPointerException"
+		    handler="org.lamsfoundation.lams.tool.qa.web.CustomStrutsExceptionHandler"
+		    path="/SystemErrorContent.jsp"
+		    scope="request"
+		/>	         			
+	      
+	  	<forward
+		    name="loadMonitoring"
+		    path="/monitoring/MonitoringMaincontent.jsp"
+		    redirect="true"
+	  	/>
+
+        <forward
+          name="load"
+          path="/AuthoringMaincontent.jsp"
+          redirect="false"
+        />
+	  	
+	  	<forward
+          name="loadViewOnly"
+          path="/authoring/AuthoringTabsHolder.jsp"
+          redirect="false"
+        />
+	  	
+	    <forward
+	        name="starter"
+	        path="/index.jsp"
+	        redirect="true"
+	     />
+	      
+   	  	<forward
+		    name="errorList"
+		    path="/QaErrorBox.jsp"
+		    redirect="true"
+	  	/>
+	</action>
+
  */
 
 package org.lamsfoundation.lams.tool.qa.web;

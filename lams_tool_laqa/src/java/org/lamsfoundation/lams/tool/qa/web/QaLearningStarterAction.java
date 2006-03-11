@@ -107,8 +107,60 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  */
 
 /**
- * 
- * verifies that the content id passed to the tool is numeric and does refer to an existing content.
+ *	<!--Learning Starter  -->
+   <action 
+   		path="/learningStarter" 
+   		type="org.lamsfoundation.lams.tool.qa.web.QaLearningStarterAction" 
+   		name="QaLearningForm" input="/learningIndex.jsp"> 
+   			
+		<exception
+			key="error.exception.QaApplication"
+			type="org.lamsfoundation.lams.tool.qa.QaApplicationException"
+			handler="org.lamsfoundation.lams.tool.qa.web.CustomStrutsExceptionHandler"
+			path="/SystemErrorContent.jsp"
+			scope="request"
+		/>
+		    
+		<exception
+		    key="error.exception.QaApplication"
+		    type="java.lang.NullPointerException"
+		    handler="org.lamsfoundation.lams.tool.qa.web.CustomStrutsExceptionHandler"
+		    path="/SystemErrorContent.jsp"
+		    scope="request"
+		/>	         			
+
+	  	<forward
+		    name="loadLearner"
+		    path="/learning/AnswersContent.jsp"
+		    redirect="true"
+		  />
+	  	
+	      <forward
+	        name="learnerRep"
+	        path="/monitoring/LearnerRep.jsp"
+	        redirect="true"
+	      />
+
+	  	<forward
+		    name="loadMonitoring"
+		    path="/monitoring/MonitoringMaincontent.jsp"
+		    redirect="true"
+	  	/>
+	      
+	      <forward
+	        name="learningStarter"
+	        path="/learningIndex.jsp"
+	        redirect="true"
+	      />
+	      
+		<forward
+		    name="errorListLearner"
+		    path="/QaErrorBox.jsp"
+		    redirect="true"
+	  	/>      
+	</action>  
+
+ *  
  */
 
 public class QaLearningStarterAction extends Action implements QaAppConstants {

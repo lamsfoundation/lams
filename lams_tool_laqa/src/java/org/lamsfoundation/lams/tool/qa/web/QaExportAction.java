@@ -44,7 +44,49 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * @author Ozgur Demirtas
- * enables  the learner and teacher to export the contents of the mcq tool.
+ * enables  the learner and teacher to export the contents of the q/a tool.
+ * 
+ *    <!--Export Portfolio Action -->
+    <action
+      path="/exportPortfolio"
+      type="org.lamsfoundation.lams.tool.qa.web.QaExportAction"
+      name="QaExportForm"
+      scope="session"
+      parameter="mode"
+      unknown="false"
+      validate="false"
+    >
+	    
+		<exception
+			key="error.exception.QaApplication"
+			type="org.lamsfoundation.lams.tool.qa.QaApplicationException"
+			handler="org.lamsfoundation.lams.tool.qa.web.CustomStrutsExceptionHandler"
+			path="/SystemErrorContent.jsp"
+			scope="request"
+		/>
+		    
+		<exception
+		    key="error.exception.QaApplication"
+		    type="java.lang.NullPointerException"
+		    handler="org.lamsfoundation.lams.tool.qa.web.CustomStrutsExceptionHandler"
+		    path="/SystemErrorContent.jsp"
+		    scope="request"
+		/>	         			
+	    
+	    <forward
+    	    name="exportPortfolio"
+        	path="/exportPortfolio.jsp"
+	        redirect="false"
+    	  />
+
+	  	<forward
+		    name="errorList"
+		    path="/QaErrorBox.jsp"
+		    redirect="true"
+	  	/>
+    </action>
+
+ * 
  */
 
 public class QaExportAction extends LamsDispatchAction implements QaAppConstants{

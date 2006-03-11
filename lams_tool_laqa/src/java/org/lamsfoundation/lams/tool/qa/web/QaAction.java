@@ -80,6 +80,60 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * <code>CustomStrutsExceptionHandler<code>.
  * 
  * @author Ozgur Demirtas
+ * 
+ * 	<action
+      path="/authoring"
+      type="org.lamsfoundation.lams.tool.qa.web.QaAction"
+      name="QaAuthoringForm"
+      scope="session"
+      input="/AuthoringMaincontent.jsp"
+      parameter="dispatch"
+      unknown="false"
+      validate="true"
+    >
+    
+		<exception
+			key="error.exception.QaApplication"
+			type="org.lamsfoundation.lams.tool.qa.QaApplicationException"
+			handler="org.lamsfoundation.lams.tool.qa.web.CustomStrutsExceptionHandler"
+			path="/SystemErrorContent.jsp"
+			scope="request"
+		/>
+		    
+		<exception
+		    key="error.exception.QaApplication"
+		    type="java.lang.NullPointerException"
+		    handler="org.lamsfoundation.lams.tool.qa.web.CustomStrutsExceptionHandler"
+		    path="/SystemErrorContent.jsp"
+		    scope="request"
+		/>	         			
+	    
+	  	<forward
+	        name="load"
+	        path="/AuthoringMaincontent.jsp"
+	        redirect="true"
+		/>
+	
+	  	<forward
+		    name="loadMonitoring"
+		    path="/monitoring/MonitoringMaincontent.jsp"
+		    redirect="true"
+	  	/>
+	  
+	    <forward
+			name="loadViewOnly"
+			path="/authoring/AuthoringTabsHolder.jsp"
+			redirect="false"
+	    />
+	  
+	  	<forward
+	        name="starter"
+	        path="/index.jsp"
+	        redirect="true"
+	  	/>
+  </action>
+
+ * 
  */
 public class QaAction extends LamsDispatchAction implements QaAppConstants
 {
