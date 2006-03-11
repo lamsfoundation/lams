@@ -734,6 +734,36 @@ public class QaServicePOJO
 														   e);
         }
 	}
+    
+    
+    public List getAllQuestionEntriesSorted(final long qaContentId) throws QaApplicationException
+	{
+ 	   try
+       {
+           return qaQueContentDAO.getAllQuestionEntriesSorted(qaContentId);
+       }
+       catch (DataAccessException e)
+       {
+           throw new QaApplicationException("Exception occured when lams is getting all question entries: "
+                                                        + e.getMessage(),
+														   e);
+       }
+	}
+    
+    
+    public void removeQaQueContent(QaQueContent qaQueContent) throws QaApplicationException
+	{
+ 	   try
+       {
+           qaQueContentDAO.removeQaQueContent(qaQueContent);
+       }
+       catch (DataAccessException e)
+       {
+           throw new QaApplicationException("Exception occured when lams is removing question content: "
+                                                        + e.getMessage(),
+														   e);
+       }
+	}
 
     
     public User getCurrentUserData(String username) throws QaApplicationException

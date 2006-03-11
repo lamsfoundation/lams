@@ -156,11 +156,33 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants
         authoringUtil.reconstructQuestionContentMapForSubmit(mapQuestionContent, request);
         logger.debug("before saveOrUpdateQaContent.");
         
+        boolean verifyDuplicatesOptionsMap=AuthoringUtil.verifyDuplicatesOptionsMap(mapQuestionContent);
+	 	logger.debug("verifyDuplicatesOptionsMap: " + verifyDuplicatesOptionsMap);
+	 	request.getSession().removeAttribute(USER_EXCEPTION_QUESTIONS_DUPLICATE);
+	 	if (verifyDuplicatesOptionsMap == false)
+ 		{
+ 			errors= new ActionMessages();
+			errors.add(Globals.ERROR_KEY,new ActionMessage("error.questions.duplicate"));
+			request.getSession().setAttribute(USER_EXCEPTION_QUESTIONS_DUPLICATE, new Boolean(true).toString());
+			logger.debug("add error.questions.duplicate to ActionMessages");
+			saveErrors(request,errors);
+			qaAuthoringForm.resetUserAction();
+            return (mapping.findForward(LOAD_QUESTIONS));
+ 		}
+        
+        
+        /*to remove deleted entries in the questions table based on mapQuestionContent */
+        authoringUtil.removeRedundantQuestions(mapQuestionContent, qaService, qaAuthoringForm);
+        logger.debug("end of removing unused entries... ");
+        
         QaContent qaContent=authoringUtil.saveOrUpdateQaContent(mapQuestionContent, qaService, qaAuthoringForm);
         logger.debug("qaContent: " + qaContent);
+        
+        authoringUtil.reOrganizeDisplayOrder(mapQuestionContent, qaService, qaAuthoringForm, qaContent);
 
         List attacments=saveAttachments(qaContent, attachmentList, deletedAttachmentList, mapping, request);
         logger.debug("attacments: " + attacments);
+
   
         errors.clear();
         errors.add(Globals.ERROR_KEY, new ActionMessage("submit.successful"));

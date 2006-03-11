@@ -485,8 +485,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
                                          ServletException
     {
     	QaUtils.cleanUpSessionAbsolute(request);
-    	/*forward outside of the app. Currently it is index.jsp */
-    	return (mapping.findForward(LOAD_STARTER)); 
+    	/*check this again */
+    	return (mapping.findForward(LOAD_MONITORING)); 
     }
 
     

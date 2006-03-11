@@ -64,7 +64,8 @@ public interface QaAppConstants {
 	public static final String DEFINE_LATER								="defineLater";
 	public static final String REQUESTED_MODULE							="requestedModule";
 	
-	public static final String SOURCE_MC_STARTER						="sourceMcStarter";	
+	public static final String SOURCE_MC_STARTER						="sourceMcStarter";
+	public static final Integer MAX_QUESTION_COUNT						=new Integer(50);
 	
 	public static final String IS_MONITORED_CONTENT_IN_USE				="isMonitoredContentInUse";
 	public static final String LOAD_MONITORING_CONTENT_EDITACTIVITY		="loadMonitoringEditActivity";
@@ -139,7 +140,8 @@ public interface QaAppConstants {
     public static final String USER_EXCEPTION_CONTENT_DEFINE_LATER		="userExceptionContentDefineLater";
     public static final String USER_EXCEPTION_RUN_OFFLINE				="userExceptionRunOffline";    
     public static final String USER_EXCEPTION_MODE_REQUIRED				="userExceptionModeRequired";    
-    public static final String USER_EXCEPTION_MODE_INVALID				="userExceptionModeInvalid";    
+    public static final String USER_EXCEPTION_MODE_INVALID				="userExceptionModeInvalid";
+    public static final String USER_EXCEPTION_QUESTIONS_DUPLICATE		="userExceptionQuestionsDuplicate";
     public static final String COUNT_SESSION_COMPLETE					="countSessionComplete";
     public static final String CURRENT_MONITORED_TOOL_SESSION 			="currentMonitoredToolSession";
     

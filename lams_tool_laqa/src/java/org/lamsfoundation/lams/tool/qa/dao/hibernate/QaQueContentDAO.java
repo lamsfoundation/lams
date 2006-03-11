@@ -29,6 +29,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 
 import org.apache.log4j.Logger;
+
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.dao.IQaQueContentDAO;
@@ -52,7 +53,8 @@ public class QaQueContentDAO extends HibernateDaoSupport implements IQaQueConten
 	 	private static final String GET_QUESTION_IDS_FOR_CONTENT = "select qaQueContent.qaQueContentId from QaQueContent qaQueContent where qaQueContent.qaContentId = :qa";
 	 	private static final String LOAD_QUESTION_CONTENT_BY_QUESTION_TEXT = "from qaQueContent in class QaQueContent where qaQueContent.question=:question and qaQueContent.qaContentId=:qaContentId";
 	 	private static final String LOAD_QUESTION_CONTENT_BY_DISPLAY_ORDER = "from qaQueContent in class QaQueContent where qaQueContent.displayOrder=:displayOrder and qaQueContent.qaContentId=:qaContentId";
-	 			
+	 	private static final String SORT_QUESTION_CONTENT_BY_DISPLAY_ORDER = "from qaQueContent in class QaQueContent where qaQueContent.qaContentId=:qaContentId order by qaQueContent.displayOrder";
+	 	
 	 	public QaQueContent getToolDefaultQuestionContent(final long qaContentId)
 	    {
 	        return (QaQueContent) getHibernateTemplate().execute(new HibernateCallback()
@@ -116,6 +118,16 @@ public class QaQueContentDAO extends HibernateDaoSupport implements IQaQueConten
 			return null;
 	    }
 
+	 	public List getAllQuestionEntriesSorted(final long qaContentId)
+	    {
+	        HibernateTemplate templ = this.getHibernateTemplate();
+			List list = getSession().createQuery(SORT_QUESTION_CONTENT_BY_DISPLAY_ORDER)
+				.setLong("qaContentId", qaContentId)
+				.list();
+
+			return list;
+	    }
+
 
 	 	public List getQuestionIndsForContent(QaContent qa)
 	    {
@@ -157,6 +169,14 @@ public class QaQueContentDAO extends HibernateDaoSupport implements IQaQueConten
 			this.getSession().setFlushMode(FlushMode.AUTO);
 	    	this.getHibernateTemplate().delete(qaQueContent);
 	    }
+		
+		
+		public void removeQaQueContent(QaQueContent qaQueContent)
+	    {
+			this.getSession().setFlushMode(FlushMode.AUTO);
+	        this.getHibernateTemplate().delete(qaQueContent);
+	    }
+
         
         public List getQaQueContentsByContentId(long qaContentId){
             return getHibernateTemplate().findByNamedParam(LOAD_QUESTION_CONTENT_BY_CONTENT_ID, "qaContentId", new Long(qaContentId));

@@ -35,7 +35,6 @@ import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaComparator;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
-import org.lamsfoundation.lams.tool.qa.QaStringComparator;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -137,7 +136,7 @@ public class AuthoringUtil implements QaAppConstants {
     	long queIndex= new Long(request.getSession().getAttribute("queIndex").toString()).longValue();
     	logger.debug("queIndex: " + queIndex);
 
-    	/** if there is data in the Map remaining from previous session remove those */
+    	/* if there is data in the Map remaining from previous session remove those */
 		mapQuestionContent.clear();
 		logger.debug("Map got initialized: " + mapQuestionContent);
 		
@@ -241,6 +240,78 @@ public class AuthoringUtil implements QaAppConstants {
         return qaContent;
     }
     
+    
+    /**
+     * removes unused question entries from db
+     * removeRedundantQuestions (Map mapQuestionContent, IQaService qaService, QaAuthoringForm qaAuthoringForm)
+     * 
+     * @param mapQuestionContent
+     * @param qaService
+     * @param qaAuthoringForm
+     */
+    public void removeRedundantQuestions (Map mapQuestionContent, IQaService qaService, QaAuthoringForm qaAuthoringForm)
+	{
+    	logger.debug("removing unused entries... ");
+    	logger.debug("mapQuestionContent:  " + mapQuestionContent);
+    	logger.debug("qaAuthoringForm.getToolContentId():  " + qaAuthoringForm.getToolContentId());
+    	
+    	QaContent qaContent=qaService.loadQa(new Long(qaAuthoringForm.getToolContentId()).longValue());
+    	logger.debug("qaContent:  " + qaContent);
+    	
+    	if (qaContent != null)
+    	{
+        	logger.debug("qaContent uid: " + qaContent.getUid());
+        	List allQuestions=qaService.getAllQuestionEntries(qaContent.getUid());
+        	logger.debug("allQuestions: " + allQuestions);
+        	
+        	Iterator listIterator=allQuestions.iterator();
+    		Long mapIndex=new Long(1);
+    		boolean entryUsed=false;
+    		while (listIterator.hasNext())
+    		{
+    			QaQueContent queContent=(QaQueContent)listIterator.next();
+    			logger.debug("queContent data: " + queContent);
+    			logger.debug("queContent: " + queContent.getQuestion() + " " + queContent.getDisplayOrder());
+    			
+    			entryUsed=false;
+    	        Iterator itMap = mapQuestionContent.entrySet().iterator();
+    	        int diplayOrder=0;
+    	        while (itMap.hasNext()) 
+    		    {
+    	        	entryUsed=false;
+    		        Map.Entry pairs = (Map.Entry)itMap.next();
+    		        logger.debug("using the pair: " +  pairs.getKey() + " = " + pairs.getValue());
+    		        if (pairs.getValue().toString().length() != 0)
+    		        {
+    		        	logger.debug("text from map:" + pairs.getValue().toString());
+    		        	logger.debug("text from db:" + queContent.getQuestion());
+    		        	if (pairs.getValue().toString().equals(queContent.getQuestion()))
+    		        	{
+    		        		logger.debug("used entry in db:" + queContent.getQuestion());
+    		        		entryUsed=true;
+    		        		break;
+    		        	}
+    		        }
+    		    }
+    	        
+    	        if (entryUsed == false)
+    	        {
+    	        	logger.debug("removing unused entry in db:" + queContent.getQuestion());
+    	        	
+    	        	QaQueContent removeableQaQueContent=qaService.getQuestionContentByQuestionText(queContent.getQuestion(), qaContent.getUid());
+        			logger.debug("removeableQaQueContent"  + removeableQaQueContent);
+        			if (removeableQaQueContent != null)
+        			{
+        				qaService.removeQaQueContent(removeableQaQueContent);
+            			logger.debug("removed removeableQaQueContent from the db: " + removeableQaQueContent);	
+        			}
+    	        	
+    	        }
+    		}    		
+    	}
+	
+	}
+    
     /**
      * createQuestionContent(TreeMap mapQuestionContent, HttpServletRequest request)
      * return void
@@ -252,16 +323,17 @@ public class AuthoringUtil implements QaAppConstants {
         logger.debug("content uid is: " + qaContent.getUid());
         List questions=qaService.retrieveQaQueContentsByToolContentId(qaContent.getUid().longValue());
         logger.debug("questions: " + questions);
-        
+
+        /*
 		Iterator listIterator=questions.iterator();
 		Long mapIndex=new Long(1);
-		
 		while (listIterator.hasNext())
 		{
 			QaQueContent queContent=(QaQueContent)listIterator.next();
 			logger.debug("queContent data: " + queContent);
 			logger.debug("queContent: " + queContent.getQuestion() + "" + queContent.getDisplayOrder());
 		}
+        */
         
         Iterator itMap = mapQuestionContent.entrySet().iterator();
         int diplayOrder=0;
@@ -284,7 +356,7 @@ public class AuthoringUtil implements QaAppConstants {
 															null);
 		        
 		        
-			       /* is this question already recorded?*/
+			       /* checks if the question is already recorded*/
 			       logger.debug("question text is: " + pairs.getValue().toString());
 			       logger.debug("content uid is: " + qaContent.getUid());
 			       logger.debug("question display order is: " + diplayOrder);
@@ -292,12 +364,17 @@ public class AuthoringUtil implements QaAppConstants {
 			       logger.debug("existingQaQueContent: " + existingQaQueContent);
 			       if (existingQaQueContent == null)
 			       {
-			       		logger.debug("creating a new question content: " + queContent);
-			       		logger.debug("adding a new question to content: " + queContent);
-			       		qaContent.getQaQueContents().add(queContent);
-			       		queContent.setQaContent(qaContent);
-	
-			       		qaService.createQaQue(queContent);
+			       	/*make sure a question with the same question text is not already saved*/
+			    	QaQueContent duplicateQaQueContent=qaService.getQuestionContentByQuestionText(pairs.getValue().toString(), qaContent.getUid());
+			    	logger.debug("duplicateQaQueContent: " + duplicateQaQueContent);
+				       	if (duplicateQaQueContent == null)
+				       	{
+				       		logger.debug("adding a new question to content: " + queContent);
+				       		qaContent.getQaQueContents().add(queContent);
+				       		queContent.setQaContent(qaContent);
+		
+				       		qaService.createQaQue(queContent);
+				       	}
 			       }
 			       else
 			       {
@@ -305,9 +382,80 @@ public class AuthoringUtil implements QaAppConstants {
 			       		logger.debug("updating the existing question content: " + existingQaQueContent);
 			       		qaService.updateQaQueContent(existingQaQueContent);
 			       }
-	        }
-	        logger.debug("returning qaContent: " + qaContent);
+	        }      
 	    }
         return qaContent;
     }
+    
+    
+    /**
+     * sorts the questions by the display order
+     * reOrganizeDisplayOrder(Map mapQuestionContent, IQaService qaService, QaAuthoringForm qaAuthoringForm, QaContent qaContent)
+     * 
+     * @param mapQuestionContent
+     * @param qaService
+     * @param qaAuthoringForm
+     * @param qaContent
+     */
+    public void reOrganizeDisplayOrder(Map mapQuestionContent, IQaService qaService, QaAuthoringForm qaAuthoringForm, QaContent qaContent)
+    {    
+    	logger.debug("content uid: " + qaContent.getUid());
+    	List sortedQuestions=qaService.getAllQuestionEntriesSorted(qaContent.getUid().longValue());
+    	logger.debug("sortedQuestions: " + sortedQuestions);
+    	
+		Iterator listIterator=sortedQuestions.iterator();
+		int displayOrder=1;
+		while (listIterator.hasNext())
+		{
+			QaQueContent queContent=(QaQueContent)listIterator.next();
+			logger.debug("queContent data: " + queContent);
+			logger.debug("queContent: " + queContent.getQuestion() + " " + queContent.getDisplayOrder());
+			
+			QaQueContent existingQaQueContent=qaService.getQuestionContentByQuestionText(queContent.getQuestion(), qaContent.getUid());
+	    	logger.debug("existingQaQueContent: " + existingQaQueContent);
+	    	existingQaQueContent.setDisplayOrder(displayOrder);
+	    	logger.debug("updating the existing question content for displayOrder: " + existingQaQueContent);
+       		qaService.updateQaQueContent(existingQaQueContent);
+			displayOrder++;
+		}
+		logger.debug("done with reOrganizeDisplayOrder...");
+    }
+    
+    
+    /**
+     * checks if any entry is duplicate 
+     * verifyDuplicatesOptionsMap(Map mapQuestions)
+     * 
+     * @param mapQuestions
+     * @return
+     */
+    public static boolean verifyDuplicatesOptionsMap(Map mapQuestions)
+	{
+    	Map originalMap=mapQuestions;
+    	Map backupMap=mapQuestions;
+    	
+    	int optionCount=0;
+    	for (long i=1; i <= MAX_QUESTION_COUNT.longValue()  ; i++)
+		{
+    		String currentOption=(String)originalMap.get(new Long(i).toString());
+    		
+    		optionCount=0;
+    		for (long j=1; j <= MAX_QUESTION_COUNT.longValue() ; j++)
+    		{
+        		String backedOption=(String)backupMap.get(new Long(j).toString());
+        		
+        		if ((currentOption != null) && (backedOption !=null))
+        		{
+        			if (currentOption.equals(backedOption))
+    				{
+    					optionCount++;
+    				}
+    				
+            		if (optionCount > 1)
+            			return false;	
+        		}
+    		}	
+		}
+    	return true;
+	}
 }

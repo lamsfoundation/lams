@@ -38,6 +38,14 @@ http://www.gnu.org/licenses/gpl.txt
 							</c:if> 			
 						</td>
 						</tr> 
+
+						<tr>   
+						<td NOWRAP class=error>
+							<c:if test="${userExceptionQuestionsDuplicate == 'true'}"> 			
+								<img src="images/error.jpg" align="left" width=20 height=20>  <font size=2> <bean:message key="error.questions.duplicate"/> </font> </img>
+							</c:if> 			
+						</td>
+						</tr> 
 					</table>
 
 			<tr> <td>

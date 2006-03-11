@@ -33,8 +33,8 @@ import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaSession;
-import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.QaUploadedFile;
+import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.usermanagement.User;
 
 
@@ -86,6 +86,8 @@ public interface IQaService
 		
 	public void createQaQue(QaQueContent qaQueContent) throws QaApplicationException;
 	
+	public void removeQaQueContent(QaQueContent qaQueContent) throws QaApplicationException;
+	
 	public void createQaUsrResp(QaUsrResp qaUsrResp) throws QaApplicationException;
 	
 	public QaUsrResp retrieveQaUsrResp(long responseId) throws QaApplicationException;
@@ -95,6 +97,8 @@ public interface IQaService
 	public QaQueContent getQuestionContentByQuestionText(final String question, Long contentUid) throws QaApplicationException;
 	
 	public QaQueContent getQuestionContentByDisplayOrder(Long displayOrder, Long contentUid) throws QaApplicationException;
+	
+	public List getAllQuestionEntriesSorted(final long qaContentId) throws QaApplicationException;
 	
 	public void updateQaQueContent(QaQueContent qaQueContent) throws QaApplicationException;
 	

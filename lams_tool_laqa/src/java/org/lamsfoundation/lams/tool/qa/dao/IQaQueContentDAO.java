@@ -46,6 +46,8 @@ public interface IQaQueContentDAO
     
     public void removeQueContent(long qaQueContentId);
     
+    public void removeQaQueContent(QaQueContent qaQueContent);
+    
     public List getQaQueContentsByContentId(long qaContentId);
     
     public List getAllQuestionEntries(final long qaContentId);
@@ -53,4 +55,6 @@ public interface IQaQueContentDAO
     public QaQueContent getQuestionContentByQuestionText(final String question, Long qaContentId);
     
  	public QaQueContent getQuestionContentByDisplayOrder(Long displayOrder, Long qaContentId);
+ 	
+ 	public List getAllQuestionEntriesSorted(final long qaContentId);
 }
