@@ -180,10 +180,12 @@ public class McAction extends LamsDispatchAction implements McAppConstants
                                HttpServletResponse response) throws IOException,
                                                             ServletException
     {
+    	McUtils.cleanUpUserExceptions(request);
 	 	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 	 	IMcService mcService =McUtils.getToolService(request);
 	 	AuthoringUtil.readData(request, mcAuthoringForm);	 	
 	 	mcAuthoringForm.resetUserAction();
+	 	
 	 	
 	 	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
 	 	return null;
@@ -208,6 +210,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
             HttpServletResponse response) throws IOException,
                                          ServletException
 	{
+    	McUtils.cleanUpUserExceptions(request);
     	logger.debug("dispatching addNewQuestion...");
     	McUtils.debugMaps(request);
     	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
@@ -236,6 +239,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     		ActionMessages errors= new ActionMessages();
     		errors= new ActionMessages();
     		errors.add(Globals.ERROR_KEY,new ActionMessage("error.question.empty"));
+    		request.getSession().setAttribute(USER_EXCEPTION_QUESTION_EMPTY, new Boolean(true).toString());
     		saveErrors(request,errors);
     		mcAuthoringForm.resetUserAction();
     		persistError(request,"error.question.empty");
@@ -275,6 +279,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     		ActionMessages errors= new ActionMessages();
     		errors= new ActionMessages();
     		errors.add(Globals.ERROR_KEY,new ActionMessage("error.question.weight.total"));
+    		request.getSession().setAttribute(USER_EXCEPTION_WEIGHT_TOTAL, new Boolean(true).toString());
     		saveErrors(request,errors);
     		mcAuthoringForm.resetUserAction();
     		persistError(request,"error.question.weight.total");
@@ -341,6 +346,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
             HttpServletResponse response) throws IOException,
                                          ServletException
 	{
+    	McUtils.cleanUpUserExceptions(request);
     	logger.debug("dispatching removeQuestion...");
     	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
     	
@@ -461,6 +467,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
             HttpServletResponse response) throws IOException,
                                          ServletException
     {
+    	McUtils.cleanUpUserExceptions(request);
     	logger.debug("dispatching editOptions...");
     	McUtils.debugMaps(request);
     	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
@@ -503,6 +510,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     	{
     		ActionMessages errors= new ActionMessages();
     		errors.add(Globals.ERROR_KEY,new ActionMessage("error.emptyQuestion"));
+    		request.getSession().setAttribute(USER_EXCEPTION_QUESTION_EMPTY, new Boolean(true).toString());
     		logger.debug("add error.emptyQuestion to ActionMessages");
     		saveErrors(request,errors);
     		mcAuthoringForm.resetUserAction();
@@ -522,6 +530,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     	{
     		ActionMessages errors= new ActionMessages();
     		errors.add(Globals.ERROR_KEY,new ActionMessage("error.emptyWeight"));
+    		request.getSession().setAttribute(USER_EXCEPTION_WEIGHT_EMPTY, new Boolean(true).toString());
     		logger.debug("add error.emptyWeight to ActionMessages");
     		saveErrors(request,errors);
     		mcAuthoringForm.resetUserAction();
@@ -820,6 +829,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
             HttpServletResponse response) throws IOException,
                                          ServletException
     {
+    	McUtils.cleanUpUserExceptions(request);
     	logger.debug("dispatching addOption...");
     	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
     	McUtils.debugMaps(request);
@@ -848,6 +858,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
  		{
  			ActionMessages errors= new ActionMessages();
 			errors.add(Globals.ERROR_KEY,new ActionMessage("error.answers.duplicate"));
+			request.getSession().setAttribute(USER_EXCEPTION_ANSWERS_DUPLICATE, new Boolean(true).toString());
 			logger.debug("add error.answers.duplicate to ActionMessages");
 			saveErrors(request,errors);
 			mcAuthoringForm.resetUserAction();
@@ -866,6 +877,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
  		{
  			ActionMessages errors= new ActionMessages();
 			errors.add(Globals.ERROR_KEY,new ActionMessage("error.answers.empty"));
+			request.getSession().setAttribute(USER_EXCEPTION_ANSWER_EMPTY, new Boolean(true).toString());
 			logger.debug("add error.answers.empty to ActionMessages");
 			saveErrors(request,errors);
 			mcAuthoringForm.resetUserAction();
@@ -972,6 +984,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
             HttpServletResponse response) throws IOException,
                                          ServletException
     {
+    	McUtils.cleanUpUserExceptions(request);
     	logger.debug("dispatching removeOption...");
     	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
     	McUtils.debugMaps(request);
@@ -1001,6 +1014,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		{
 	 		ActionMessages errors= new ActionMessages();
     		errors= new ActionMessages();
+    		request.getSession().setAttribute(USER_EXCEPTION_OPTIONS_COUNT_ZERO, new Boolean(true).toString());
 			errors.add(Globals.ERROR_KEY,new ActionMessage("options.count.zero"));
 			saveErrors(request,errors);
 			mcAuthoringForm.resetUserAction();
@@ -1114,6 +1128,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
             HttpServletResponse response) throws IOException,
                                          ServletException
     {
+    	McUtils.cleanUpUserExceptions(request);
     	logger.debug("dispatching moveQuestionDown...");
     	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
     	McUtils.debugMaps(request);
@@ -1224,6 +1239,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
             HttpServletResponse response) throws IOException,
                                          ServletException
     {
+    	McUtils.cleanUpUserExceptions(request);
     	logger.debug("dispatching moveQuestionUp...");
     	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
     	McUtils.debugMaps(request);
@@ -1333,6 +1349,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
             HttpServletResponse response) throws IOException,
                                          ServletException
     {
+    	McUtils.cleanUpUserExceptions(request);
     	logger.debug("dispatching doneOptions...");
     	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
     	McUtils.debugMaps(request);
@@ -1357,6 +1374,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
  		if (validateOptions == false)
  		{
  			ActionMessages errors= new ActionMessages();
+ 			request.getSession().setAttribute(USER_EXCEPTION_CHKBOXES_EMPTY, new Boolean(true).toString());
 			errors.add(Globals.ERROR_KEY,new ActionMessage("error.checkBoxes.empty"));
 			logger.debug("add error.checkBoxes.empty to ActionMessages");
 			saveErrors(request,errors);
@@ -1483,6 +1501,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
                                          ServletException,
                                          ToolException
     {
+    	McUtils.cleanUpUserExceptions(request);
     	logger.debug("dispatching editActivityQuestions...");
     	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
     	McUtils.debugMaps(request);
@@ -1525,6 +1544,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
                                          ServletException
 
     {
+    	McUtils.cleanUpUserExceptions(request);
     	logger.debug("dispatching submitQuestions...");
     	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
     	McUtils.debugMaps(request);
@@ -1598,6 +1618,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 			
 			saveErrors(request,errors);
 			mcAuthoringForm.resetUserAction();
+			request.getSession().setAttribute(USER_EXCEPTION_SUBMIT_NONE, new Boolean(true).toString());
 			persistError(request,"error.questions.submitted.none");
 
 	    	McUtils.debugMaps(request);
@@ -1631,6 +1652,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		if (isTotalWeightsValid == false)
 		{
 			errors= new ActionMessages();
+			request.getSession().setAttribute(USER_EXCEPTION_WEIGHT_MUST_EQUAL100, new Boolean(true).toString());
 			errors.add(Globals.ERROR_KEY,new ActionMessage("error.weights.total.invalid"));
 			saveErrors(request,errors);
 			mcAuthoringForm.resetUserAction();
@@ -1684,6 +1706,9 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		
 		if (mcAuthoringForm.getPassmark() != null)
 		{
+			if (mcAuthoringForm.getPassmark().equals(""))
+				mcAuthoringForm.setPassmark("0");
+				
 			try
 			{
 	    		passmark= new Integer(mcAuthoringForm.getPassmark()).intValue();
@@ -1692,6 +1717,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 	    	catch(Exception e)
 			{
 	    		errors= new ActionMessages();
+	    		request.getSession().setAttribute(USER_EXCEPTION_PASSMARK_NOTINTEGER, new Boolean(true).toString());
 				errors.add(Globals.ERROR_KEY,new ActionMessage("error.passmark.notInteger"));
 				saveErrors(request,errors);
 				mcAuthoringForm.resetUserAction();
@@ -1717,6 +1743,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		else
 		{
 			errors= new ActionMessages();
+			request.getSession().setAttribute(USER_EXCEPTION_PASSMARK_EMPTY, new Boolean(true).toString());
 			errors.add(Globals.ERROR_KEY,new ActionMessage("error.passMark.empty"));
 			logger.debug("add error.passMark.empty to ActionMessages");
 			saveErrors(request,errors);
@@ -1739,6 +1766,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		if (passmark > 100)
 		{
 			errors= new ActionMessages();
+			request.getSession().setAttribute(USER_EXCEPTION_PASSMARK_GREATER100, new Boolean(true).toString());
 			errors.add(Globals.ERROR_KEY,new ActionMessage("error.passMark.greater100"));
 			logger.debug("add error.passMark.greater100to ActionMessages");
 			saveErrors(request,errors);
@@ -1968,6 +1996,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
                                          ServletException
 
     {
+    	McUtils.cleanUpUserExceptions(request);
     	logger.debug("dispatching deleteOfflineFile...");
     	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
     	McUtils.debugMaps(request);
@@ -2019,6 +2048,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
                                          ServletException
 
     {
+    	McUtils.cleanUpUserExceptions(request);
     	logger.debug("dispatching deleteOnlineFile...");
     	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
     	McUtils.debugMaps(request);
@@ -2069,6 +2099,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
                                          ServletException,
                                          RepositoryCheckedException
     {
+    	McUtils.cleanUpUserExceptions(request);
     	logger.debug("dispatching submitOfflineFile...");
     	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
     	McUtils.debugMaps(request);
@@ -2092,6 +2123,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
  		{
  			ActionMessages errors= new ActionMessages();
  			errors= new ActionMessages();
+ 			request.getSession().setAttribute(USER_EXCEPTION_FILENAME_EMPTY, new Boolean(true).toString());
  			errors.add(Globals.ERROR_KEY,new ActionMessage("error.fileName.empty"));
  			saveErrors(request,errors);
  			mcAuthoringForm.resetUserAction();
@@ -2139,6 +2171,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
                                          ServletException,
                                          RepositoryCheckedException
     {
+    	McUtils.cleanUpUserExceptions(request);
     	logger.debug("dispatching submitOnlineFiles...");
     	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
     	McUtils.debugMaps(request);
@@ -2162,6 +2195,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
  		{
  			ActionMessages errors= new ActionMessages();
  			errors= new ActionMessages();
+ 			request.getSession().setAttribute(USER_EXCEPTION_FILENAME_EMPTY, new Boolean(true).toString());
  			errors.add(Globals.ERROR_KEY,new ActionMessage("error.fileName.empty"));
  			saveErrors(request,errors);
  			mcAuthoringForm.resetUserAction();
@@ -2206,6 +2240,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
             HttpServletResponse response) throws IOException,
                                          ServletException
     {
+    	McUtils.cleanUpUserExceptions(request);
     	logger.debug("dispatching doneAdvancedTab...");
     	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
     	McUtils.debugMaps(request);
@@ -2246,6 +2281,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
             HttpServletResponse response) throws IOException,
                                          ServletException
     {
+    	McUtils.cleanUpUserExceptions(request);
     	logger.debug("dispatching doneInstructionsTab...");
     	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
     	McUtils.debugMaps(request);
@@ -2292,6 +2328,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
             HttpServletResponse response) throws IOException,
                                          ServletException
     {
+    	McUtils.cleanUpUserExceptions(request);
     	logger.debug("dispatching cancelAuthoring...");
     	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
     	McUtils.debugMaps(request);
@@ -2324,6 +2361,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
      */
     protected boolean validateQuestionWeights(HttpServletRequest request, Map mapWeights, McAuthoringForm mcAuthoringForm)
     {
+    	McUtils.cleanUpUserExceptions(request);
     	logger.debug("mapWeights: " + mapWeights);
     	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
     	McUtils.debugMaps(request);
@@ -2337,6 +2375,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
             {
             	ActionMessages errors= new ActionMessages();
         		errors= new ActionMessages();
+        		request.getSession().setAttribute(USER_EXCEPTION_WEIGHT_EMPTY, new Boolean(true).toString());
 				errors.add(Globals.ERROR_KEY,new ActionMessage("error.weights.empty"));
 				saveErrors(request,errors);
     			mcAuthoringForm.resetUserAction();
@@ -2355,6 +2394,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
         		ActionMessages errors= new ActionMessages();
         		errors= new ActionMessages();
 				errors.add(Globals.ERROR_KEY,new ActionMessage("error.weights.notInteger"));
+				request.getSession().setAttribute(USER_EXCEPTION_WEIGHT_NOTINTEGER, new Boolean(true).toString());
 				saveErrors(request,errors);
     			mcAuthoringForm.resetUserAction();
 				persistError(request,"error.weights.notInteger");
@@ -2367,9 +2407,9 @@ public class McAction extends LamsDispatchAction implements McAppConstants
             {
             	ActionMessages errors= new ActionMessages();
         		errors= new ActionMessages();
-				errors.add(Globals.ERROR_KEY,new ActionMessage("error.weights.zero"));
+        		errors.add(Globals.ERROR_KEY,new ActionMessage("error.weights.zero"));
 				saveErrors(request,errors);
-    			mcAuthoringForm.resetUserAction();
+				request.getSession().setAttribute(USER_EXCEPTION_WEIGHT_ZERO, new Boolean(true).toString());
 				persistError(request,"error.weights.zero");
 				return false;
             }

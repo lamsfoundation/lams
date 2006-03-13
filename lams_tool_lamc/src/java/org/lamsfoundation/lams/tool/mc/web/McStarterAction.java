@@ -257,6 +257,8 @@ public class McStarterAction extends Action implements McAppConstants {
 		    
 		    if ((strToolContentId == null) || (strToolContentId.equals(""))) 
 		    {
+		    	McUtils.cleanUpSessionAbsolute(request);
+		    	request.getSession().setAttribute(USER_EXCEPTION_CONTENTID_REQUIRED, new Boolean(true).toString());
 		    	persistError(request,"error.contentId.required");
 		    	McUtils.cleanUpSessionAbsolute(request);
 				logger.debug("forwarding to: " + ERROR_LIST);
@@ -274,8 +276,9 @@ public class McStarterAction extends Action implements McAppConstants {
 	    	}
 	    	catch(NumberFormatException e)
 			{
-		    	persistError(request,"error.ids.numberFormatException");
 		    	McUtils.cleanUpSessionAbsolute(request);
+		    	request.getSession().setAttribute(USER_EXCEPTION_NUMBERFORMAT, new Boolean(true).toString());
+		    	persistError(request,"error.numberFormatException");
 				logger.debug("forwarding to: " + ERROR_LIST);
 				return (mapping.findForward(ERROR_LIST));
 			}
@@ -400,8 +403,9 @@ public class McStarterAction extends Action implements McAppConstants {
 				
 				if (isContentInUse == true)
 				{
+					McUtils.cleanUpSessionAbsolute(request);
+			    	request.getSession().setAttribute(USER_EXCEPTION_CONTENT_IN_USE, new Boolean(true).toString());
 			    	persistError(request,"error.content.inUse");
-			    	McUtils.cleanUpSessionAbsolute(request);
 					logger.debug("forwarding to: " + ERROR_LIST);
 					return (mapping.findForward(ERROR_LIST));
 				}
@@ -424,8 +428,9 @@ public class McStarterAction extends Action implements McAppConstants {
 						logger.debug("the url mode is :" + defineLater);
 						if (isDefineLater == true)
 						{
-					    	persistError(request,"error.content.beingModified");
 					    	McUtils.cleanUpSessionAbsolute(request);
+					    	request.getSession().setAttribute(USER_EXCEPTION_CONTENT_BEING_MODIFIED, new Boolean(true).toString());
+					    	persistError(request,"error.content.beingModified");
 							logger.debug("forwarding to: " + ERROR_LIST);
 							return (mapping.findForward(ERROR_LIST));
 						}						
@@ -465,17 +470,19 @@ public class McStarterAction extends Action implements McAppConstants {
 			logger.debug("retrieved tool default contentId: " + contentId);
 			if (contentId == 0) 
 			{
-				logger.debug("default content id has not been setup");
-				persistError(request,"error.defaultContent.notSetup");
 				McUtils.cleanUpSessionAbsolute(request);
-				return (mapping.findForward(ERROR_LIST));	
+				logger.debug("Exception occured: No default options content");
+	    		request.getSession().setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true).toString());
+	    		persistError(request,"error.defaultContent.notSetup");
+				return (mapping.findForward(ERROR_LIST));
 			}
 		}
 		catch(Exception e)
 		{
-			logger.debug("error getting the default content id: " + e.getMessage());
-			persistError(request,"error.defaultContent.notSetup");
 			McUtils.cleanUpSessionAbsolute(request);
+			logger.debug("Exception occured: No default options content");
+    		request.getSession().setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true).toString());
+    		persistError(request,"error.defaultContent.notSetup");
 			return (mapping.findForward(ERROR_LIST));
 		}
 
@@ -487,9 +494,10 @@ public class McStarterAction extends Action implements McAppConstants {
 			McContent mcContent=mcService.retrieveMc(new Long(contentId));
 			if (mcContent == null)
 			{
-				logger.debug("Exception occured: No default content");
+				McUtils.cleanUpSessionAbsolute(request);
+				logger.debug("Exception occured: No default options content");
+	    		request.getSession().setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true).toString());
 	    		persistError(request,"error.defaultContent.notSetup");
-	    		McUtils.cleanUpSessionAbsolute(request);
 				return (mapping.findForward(ERROR_LIST));
 			}
 			logger.debug("using mcContent: " + mcContent);
@@ -498,9 +506,10 @@ public class McStarterAction extends Action implements McAppConstants {
 		}
 		catch(Exception e)
 		{
-			logger.debug("Exception occured: No default question content");
-			persistError(request,"error.defaultContent.notSetup");
 			McUtils.cleanUpSessionAbsolute(request);
+			logger.debug("Exception occured: No default options content");
+    		request.getSession().setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true).toString());
+    		persistError(request,"error.defaultContent.notSetup");
 			return (mapping.findForward(ERROR_LIST));
 		}
 				
@@ -514,9 +523,10 @@ public class McStarterAction extends Action implements McAppConstants {
 			logger.debug("using mcQueContent: " + mcQueContent);
 			if (mcQueContent == null)
 			{
-				logger.debug("Exception occured: No default question content");
-	    		persistError(request,"error.defaultQuestionContent.notAvailable");
-	    		McUtils.cleanUpSessionAbsolute(request);
+				McUtils.cleanUpSessionAbsolute(request);
+				logger.debug("Exception occured: No default options content");
+	    		request.getSession().setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true).toString());
+	    		persistError(request,"error.defaultContent.notSetup");
 				return (mapping.findForward(ERROR_LIST));
 			}
 			logger.debug("using mcQueContent uid: " + mcQueContent.getUid());
@@ -526,9 +536,10 @@ public class McStarterAction extends Action implements McAppConstants {
 		}
 		catch(Exception e)
 		{
-			logger.debug("Exception occured: No default question content");
-    		persistError(request,"error.defaultQuestionContent.notAvailable");
-    		McUtils.cleanUpSessionAbsolute(request);
+			McUtils.cleanUpSessionAbsolute(request);
+			logger.debug("Exception occured: No default options content");
+    		request.getSession().setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true).toString());
+    		persistError(request,"error.defaultContent.notSetup");
 			return (mapping.findForward(ERROR_LIST));
 		}
 		
@@ -541,18 +552,20 @@ public class McStarterAction extends Action implements McAppConstants {
 			logger.debug("using options list: " + list);
 			if (list == null)
 			{
+				McUtils.cleanUpSessionAbsolute(request);
 				logger.debug("Exception occured: No default options content");
-	    		persistError(request,"error.defaultOptionsContent.notAvailable");
-	    		McUtils.cleanUpSessionAbsolute(request);
+	    		request.getSession().setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true).toString());
+	    		persistError(request,"error.defaultContent.notSetup");
 				return (mapping.findForward(ERROR_LIST));
 			}
 			
 		}
 		catch(Exception e)
 		{
+			McUtils.cleanUpSessionAbsolute(request);
 			logger.debug("Exception occured: No default options content");
-    		persistError(request,"error.defaultOptionsContent.notAvailable");
-    		McUtils.cleanUpSessionAbsolute(request);
+    		request.getSession().setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true).toString());
+    		persistError(request,"error.defaultContent.notSetup");
 			return (mapping.findForward(ERROR_LIST));
 		}		
 		

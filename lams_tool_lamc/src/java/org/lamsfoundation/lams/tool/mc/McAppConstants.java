@@ -249,7 +249,7 @@ public interface McAppConstants {
      * exception constants
      */
     public static final String USER_EXCEPTION_WRONG_FORMAT				="userExceptionWrongFormat";
-    public static final String USER_EXCEPTION_UNCOMPATIBLE_IDS      	="userExceptionUncompatibleIds";
+    public static final String USER_EXCEPTION_INCOMPATIBLE_IDS      	="userExceptionIncompatibleIds";
     public static final String USER_EXCEPTION_NUMBERFORMAT  	    	="userExceptionNumberFormat";
     public static final String USER_EXCEPTION_CONTENT_DOESNOTEXIST		="userExceptionContentDoesNotExist";
     public static final String USER_EXCEPTION_TOOLSESSION_DOESNOTEXIST	="userExceptionToolSessionDoesNotExist";
@@ -257,10 +257,10 @@ public interface McAppConstants {
     public static final String USER_EXCEPTION_LEARNER_REQUIRED			="userExceptionLearnerRequired";
     public static final String USER_EXCEPTION_CONTENTID_REQUIRED		="userExceptionContentIdRequired";
     public static final String USER_EXCEPTION_TOOLSESSIONID_REQUIRED	="userExceptionToolSessionIdRequired";
+    public static final String USER_EXCEPTION_TOOLSESSIONID_INCONSISTENT ="userExceptionToolSessionIdInconsistent";
     public static final String USER_EXCEPTION_DEFAULTCONTENT_NOT_AVAILABLE 			="userExceptionDefaultContentNotAvailable";
     public static final String USER_EXCEPTION_DEFAULTQUESTIONCONTENT_NOT_AVAILABLE 	="userExceptionDefaultQuestionContentNotAvailable";
     public static final String USER_EXCEPTION_DEFAULTOPTIONSCONTENT_NOT_AVAILABLE 	="userExceptionDefaultOptionsContentNotAvailable";
-    
     public static final String USER_EXCEPTION_USERID_NOTAVAILABLE		="userExceptionUserIdNotAvailable";
     public static final String USER_EXCEPTION_USERID_NOTNUMERIC			="userExceptionUserIdNotNumeric";
     public static final String USER_EXCEPTION_ONLYCONTENT_ANDNOSESSIONS ="userExceptionOnlyContentAndNoSessions";
@@ -271,4 +271,24 @@ public interface McAppConstants {
     public static final String USER_EXCEPTION_NO_TOOL_SESSIONS			="userExceptionNoToolSessions";
     public static final String USER_EXCEPTION_NO_STUDENT_ACTIVITY		="userExceptionNoStudentActivity";
     public static final String USER_EXCEPTION_MODE_REQUIRED				="userExceptionModeRequired";
+    public static final String USER_EXCEPTION_CONTENT_IN_USE			="userExceptionContentInUse";
+    public static final String USER_EXCEPTION_CONTENT_BEING_MODIFIED	="userExceptionContentBeingModified";
+    public static final String USER_EXCEPTION_CONTENT_RUNOFFLINE		="userExceptionContentRunOffline";
+    public static final String USER_EXCEPTION_CONTENT_DEFINE_LATER		="userExceptionContentDefineLater";
+    public static final String USER_EXCEPTION_MODE_INVALID				="userExceptionModeInvalid";
+    public static final String USER_EXCEPTION_QUESTION_EMPTY			="userExceptionQuestionEmpty";
+    public static final String USER_EXCEPTION_ANSWER_EMPTY				="userExceptionAnswerEmpty";
+    public static final String USER_EXCEPTION_WEIGHT_TOTAL				="userExceptionWeightTotal";
+    public static final String USER_EXCEPTION_WEIGHT_EMPTY				="userExceptionWeightEmpty";
+    public static final String USER_EXCEPTION_WEIGHT_NOTINTEGER			="userExceptionWeightNotInteger";
+    public static final String USER_EXCEPTION_WEIGHT_ZERO				="userExceptionWeightZero";
+    public static final String USER_EXCEPTION_ANSWERS_DUPLICATE			="userExceptionAnswersDuplicate";
+    public static final String USER_EXCEPTION_OPTIONS_COUNT_ZERO		="userExceptionOptionsCountZero";
+    public static final String USER_EXCEPTION_CHKBOXES_EMPTY			="userExceptionChkboxesEmpty";
+    public static final String USER_EXCEPTION_SUBMIT_NONE				="userExceptionSubmitNone";
+    public static final String USER_EXCEPTION_PASSMARK_NOTINTEGER		="userExceptionPassmarkNotInteger";
+    public static final String USER_EXCEPTION_PASSMARK_EMPTY			="userExceptionPassmarkEmpty";
+    public static final String USER_EXCEPTION_PASSMARK_GREATER100		="userExceptionPassmarkGreater100";
+    public static final String USER_EXCEPTION_FILENAME_EMPTY			="userExceptionFilenameEmpty";
+    public static final String USER_EXCEPTION_WEIGHT_MUST_EQUAL100		="userExceptionWeightMustEqual100";
 }

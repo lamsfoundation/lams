@@ -718,29 +718,57 @@ public abstract class McUtils implements McAppConstants {
     	request.getSession().removeAttribute(TIMEZONE);
     	request.getSession().removeAttribute(MODE);
     	request.getSession().removeAttribute(LEARNING_MODE);
+    	request.getSession().removeAttribute(EXPORT_USER_ID);
+    	cleanUpUserExceptions(request);
+    	logger.debug("completely cleaned the session.");
+    }
+    
+    
+    public static void cleanUpUserExceptions(HttpServletRequest request)
+    {
     	request.getSession().removeAttribute(USER_EXCEPTION_WRONG_FORMAT);
-    	request.getSession().removeAttribute(USER_EXCEPTION_UNCOMPATIBLE_IDS);
+    	request.getSession().removeAttribute(USER_EXCEPTION_INCOMPATIBLE_IDS);
     	request.getSession().removeAttribute(USER_EXCEPTION_NUMBERFORMAT);
     	request.getSession().removeAttribute(USER_EXCEPTION_CONTENT_DOESNOTEXIST);
     	request.getSession().removeAttribute(USER_EXCEPTION_TOOLSESSION_DOESNOTEXIST);
     	request.getSession().removeAttribute(USER_EXCEPTION_TOOLCONTENT_DOESNOTEXIST);
-    	request.getSession().removeAttribute(USER_EXCEPTION_LEARNER_REQUIRED);
+    	request.getSession().removeAttribute(USER_EXCEPTION_LEARNER_REQUIRED);    	
     	request.getSession().removeAttribute(USER_EXCEPTION_CONTENTID_REQUIRED);
     	request.getSession().removeAttribute(USER_EXCEPTION_TOOLSESSIONID_REQUIRED);
+    	request.getSession().removeAttribute(USER_EXCEPTION_TOOLSESSIONID_INCONSISTENT);
     	request.getSession().removeAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOT_AVAILABLE);
     	request.getSession().removeAttribute(USER_EXCEPTION_DEFAULTQUESTIONCONTENT_NOT_AVAILABLE);
     	request.getSession().removeAttribute(USER_EXCEPTION_DEFAULTOPTIONSCONTENT_NOT_AVAILABLE);
-    	request.getSession().removeAttribute(USER_EXCEPTION_USERID_NOTAVAILABLE);
+    	request.getSession().removeAttribute(USER_EXCEPTION_USERID_NOTAVAILABLE);    	
     	request.getSession().removeAttribute(USER_EXCEPTION_USERID_NOTNUMERIC);
     	request.getSession().removeAttribute(USER_EXCEPTION_ONLYCONTENT_ANDNOSESSIONS);
     	request.getSession().removeAttribute(USER_EXCEPTION_USERID_EXISTING);
     	request.getSession().removeAttribute(USER_EXCEPTION_USER_DOESNOTEXIST);
     	request.getSession().removeAttribute(USER_EXCEPTION_MONITORINGTAB_CONTENTID_REQUIRED);
     	request.getSession().removeAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP);
-    	request.getSession().removeAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS);
+    	request.getSession().removeAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS);    	
     	request.getSession().removeAttribute(USER_EXCEPTION_NO_STUDENT_ACTIVITY);
     	request.getSession().removeAttribute(USER_EXCEPTION_MODE_REQUIRED);
-    	request.getSession().removeAttribute(EXPORT_USER_ID);
-    	logger.debug("completely cleaned the session.");
+    	request.getSession().removeAttribute(USER_EXCEPTION_CONTENT_IN_USE);
+    	request.getSession().removeAttribute(USER_EXCEPTION_CONTENT_BEING_MODIFIED);
+    	request.getSession().removeAttribute(USER_EXCEPTION_CONTENT_RUNOFFLINE);
+    	request.getSession().removeAttribute(USER_EXCEPTION_CONTENT_DEFINE_LATER);
+    	request.getSession().removeAttribute(USER_EXCEPTION_MODE_INVALID);
+    	request.getSession().removeAttribute(USER_EXCEPTION_QUESTION_EMPTY);
+    	request.getSession().removeAttribute(USER_EXCEPTION_ANSWER_EMPTY);
+    	request.getSession().removeAttribute(USER_EXCEPTION_WEIGHT_TOTAL);
+    	request.getSession().removeAttribute(USER_EXCEPTION_WEIGHT_EMPTY);
+    	request.getSession().removeAttribute(USER_EXCEPTION_WEIGHT_NOTINTEGER);
+    	request.getSession().removeAttribute(USER_EXCEPTION_WEIGHT_ZERO);
+    	request.getSession().removeAttribute(USER_EXCEPTION_ANSWERS_DUPLICATE);    	
+    	request.getSession().removeAttribute(USER_EXCEPTION_OPTIONS_COUNT_ZERO);
+    	request.getSession().removeAttribute(USER_EXCEPTION_CHKBOXES_EMPTY);
+    	request.getSession().removeAttribute(USER_EXCEPTION_SUBMIT_NONE);
+    	request.getSession().removeAttribute(USER_EXCEPTION_PASSMARK_NOTINTEGER);
+    	request.getSession().removeAttribute(USER_EXCEPTION_NUMBERFORMAT);
+    	request.getSession().removeAttribute(USER_EXCEPTION_PASSMARK_EMPTY);
+    	request.getSession().removeAttribute(USER_EXCEPTION_PASSMARK_GREATER100);    	
+    	request.getSession().removeAttribute(USER_EXCEPTION_FILENAME_EMPTY);
+    	request.getSession().removeAttribute(USER_EXCEPTION_WEIGHT_MUST_EQUAL100);
     }
 }

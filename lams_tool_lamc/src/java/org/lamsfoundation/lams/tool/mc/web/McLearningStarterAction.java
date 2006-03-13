@@ -265,9 +265,10 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    
 	    if (mcSession == null)
 	    {
-	    	logger.debug("error: The tool expects mcSession.");
-	    	persistError(request,"error.toolSession.notAvailable");
 	    	McUtils.cleanUpSessionAbsolute(request);
+	    	logger.debug("error: The tool expects mcSession.");
+	    	request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
+	    	persistError(request,"error.toolSession.notAvailable");
 			return (mapping.findForward(ERROR_LIST));
 	    }
 
@@ -281,10 +282,11 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    
 	    if (mcContent == null)
 	    {
-	    	logger.debug("error: The tool expects mcContent.");
-	    	persistError(request,"error.toolContent.notAvailable");
 	    	McUtils.cleanUpSessionAbsolute(request);
-			return (mapping.findForward(ERROR_LIST));
+	    	logger.debug("error: The tool expects mcContent.");
+	    	persistError(request,"error.content.doesNotExist");
+	    	request.getSession().setAttribute(USER_EXCEPTION_CONTENT_DOESNOTEXIST, new Boolean(true).toString());
+	    	return (mapping.findForward(ERROR_LIST));
 	    }
 
 	    
@@ -350,8 +352,9 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 		    logger.debug("mcQueUsr:" + mcQueUsr);
 		    if (mcQueUsr == null)
 		    {
-		    	persistError(request, "error.learner.required");
 		    	McUtils.cleanUpSessionAbsolute(request);
+		    	persistError(request, "error.learner.required");
+		    	request.getSession().setAttribute(USER_EXCEPTION_LEARNER_REQUIRED, new Boolean(true).toString());
 				return (mapping.findForward(ERROR_LIST));
 		    }
 		    
@@ -365,8 +368,9 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 		    if  ((mcSessionLocal ==  null) ||
 				 (mcSessionLocal.getMcSessionId().longValue() != toolSessionId.longValue()))
 		    {
-		    	persistError(request, "error.learner.sessionId.inconsistent");
 		    	McUtils.cleanUpSessionAbsolute(request);
+		    	request.getSession().setAttribute(USER_EXCEPTION_TOOLSESSIONID_INCONSISTENT, new Boolean(true).toString());
+		    	persistError(request, "error.learner.sessionId.inconsistent");
 				return (mapping.findForward(ERROR_LIST));
 		    }
 			return mcLearningAction.viewAnswers(mapping, form, request, response);
@@ -379,9 +383,10 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    logger.debug("isRunOffline: " + isRunOffline);
 	    if (isRunOffline == true)
 	    {
-	    	logger.debug("warning to learner: the activity is offline.");
-	    	persistError(request,"label.learning.runOffline");
 	    	McUtils.cleanUpSessionAbsolute(request);
+	    	logger.debug("warning to learner: the activity is offline.");
+	    	request.getSession().setAttribute(USER_EXCEPTION_CONTENT_RUNOFFLINE, new Boolean(true).toString());
+	    	persistError(request,"label.learning.runOffline");
 			return (mapping.findForward(ERROR_LIST));
 	    }
 
@@ -390,10 +395,11 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    logger.debug("isDefineLater: " + isDefineLater);
 	    if (isDefineLater == true)
 	    {
+	    	McUtils.cleanUpSessionAbsolute(request);
+	    	request.getSession().setAttribute(USER_EXCEPTION_CONTENT_DEFINE_LATER, new Boolean(true).toString());
 	    	logger.debug("warning to learner: the activity is defineLater, we interpret that the content is being modified.");
 	    	persistError(request,"error.defineLater");
-	    	McUtils.cleanUpSessionAbsolute(request);
-			return (mapping.findForward(ERROR_LIST));
+	    	return (mapping.findForward(ERROR_LIST));
 	    }
 
 	    /*
@@ -613,9 +619,10 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	    if ((user == null) || (user.getUserID() == null))
 	    {
+	    	McUtils.cleanUpSessionAbsolute(request);
 	    	logger.debug("error: The tool expects userId");
 	    	persistError(request,"error.learningUser.notAvailable");
-	    	McUtils.cleanUpSessionAbsolute(request);
+	    	request.getSession().setAttribute(USER_EXCEPTION_USER_DOESNOTEXIST, new Boolean(true).toString());
 			return (mapping.findForward(ERROR_LIST));
 	    }else
 	    	userID = user.getUserID().toString();
@@ -631,9 +638,10 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    long toolSessionId=0;
 	    if ((strToolSessionId == null) || (strToolSessionId.length() == 0)) 
 	    {
-	    	persistError(request, "error.toolSessionId.required");
 	    	McUtils.cleanUpSessionAbsolute(request);
-			return (mapping.findForward(ERROR_LIST));
+	    	request.getSession().setAttribute(USER_EXCEPTION_TOOLSESSIONID_REQUIRED, new Boolean(true).toString());
+	    	persistError(request, "error.toolSessionId.required");
+	    	return (mapping.findForward(ERROR_LIST));
 	    }
 	    else
 	    {
@@ -645,10 +653,11 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 			}
 	    	catch(NumberFormatException e)
 			{
+	    		McUtils.cleanUpSessionAbsolute(request);
+	    		request.getSession().setAttribute(USER_EXCEPTION_NUMBERFORMAT, new Boolean(true).toString());
 	    		persistError(request, "error.sessionId.numberFormatException");
 	    		logger.debug("add error.sessionId.numberFormatException to ActionMessages.");
-	    		McUtils.cleanUpSessionAbsolute(request);
-				return (mapping.findForward(ERROR_LIST));
+	    		return (mapping.findForward(ERROR_LIST));
 			}
 	    }
 	    
@@ -658,15 +667,17 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    
 	    if ((mode == null) || (mode.length() == 0)) 
 	    {
-	    	persistError(request, "error.mode.required");
 	    	McUtils.cleanUpSessionAbsolute(request);
-			return (mapping.findForward(ERROR_LIST));
+	    	request.getSession().setAttribute(USER_EXCEPTION_MODE_REQUIRED, new Boolean(true).toString());
+	    	persistError(request, "error.mode.required");
+	    	return (mapping.findForward(ERROR_LIST));
 	    }
 	    
 	    if ((!mode.equals("learner")) && (!mode.equals("teacher")) && (!mode.equals("author")))
 	    {
-	    	persistError(request, "error.mode.invalid");
 	    	McUtils.cleanUpSessionAbsolute(request);
+	    	request.getSession().setAttribute(USER_EXCEPTION_MODE_INVALID, new Boolean(true).toString());
+	    	persistError(request, "error.mode.invalid");
 			return (mapping.findForward(ERROR_LIST));
 	    }
 		logger.debug("session LEARNING_MODE set to:" + mode);

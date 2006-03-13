@@ -1,4 +1,4 @@
-<%--
+<!--
 Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
 
 This program is free software; you can redistribute it and/or modify
@@ -17,31 +17,23 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 USA
 
 http://www.gnu.org/licenses/gpl.txt
---%>
-
+-->
+<!-- taglib definition-->
 <%@ taglib uri="tags-bean" prefix="bean"%> 
 <%@ taglib uri="tags-html" prefix="html"%>
 <%@ taglib uri="tags-logic" prefix="logic" %>
-<%@ taglib uri="tags-logic-el" prefix="logic-el" %>
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="fck-editor" prefix="FCK" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
-
-<c:set var="lams"><lams:LAMSURL/></c:set>
-<c:set var="tool"><lams:WebAppURL/></c:set>
 
 <!-- end of taglib definition -->
 <tr>
 	<td>
 		<table width="100%" height="190" border="0" align="center" cellpadding="5" cellspacing="0" bgcolor="#FFFFFF" summary="This table is being used for layout purposes only">
 			<tr> 
-				<td height="138" valign="top"> 
-				 <table width="90%" border="0" cellspacing="0" cellpadding="0">
-				 	<br/>
-					<br/>
-   					<%@ include file="/Errorbox.jsp" %>
-				 </table>
+				<td NOWRAP valign="top"> 
+					<font size=2> <bean:message key="error.system.mc"/> </font>
 				</td>
 			 </tr>
 		</table>

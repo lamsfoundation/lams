@@ -97,7 +97,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 		    redirect="true"
 	  	/>
 	</action>  
-  
 
  *
  */
@@ -164,8 +163,9 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 		
 		if (mcContent == null)
 		{
-			persistError(request, "error.content.doesNotExist");
 			McUtils.cleanUpSessionAbsolute(request);
+    		request.getSession().setAttribute(USER_EXCEPTION_CONTENT_DOESNOTEXIST, new Boolean(true).toString());
+    		persistError(request, "error.content.doesNotExist");
 			return false;
 		}
 	    
@@ -284,9 +284,10 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
     	 
 	    if ((strToolContentId == null) || (strToolContentId.length() == 0)) 
 	    {
-	    	persistError(request, "error.contentId.required");
 	    	McUtils.cleanUpSessionAbsolute(request);
-			return (mapping.findForward(ERROR_LIST));
+	    	persistError(request, "error.contentId.required");
+	    	request.getSession().setAttribute(USER_EXCEPTION_CONTENTID_REQUIRED, new Boolean(true).toString());
+	    	return (mapping.findForward(ERROR_LIST));
 	    }
 	    else
 	    {
@@ -298,9 +299,10 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 			}
 	    	catch(NumberFormatException e)
 			{
-	    		persistError(request, "error.contentId.numberFormatException");
-	    		logger.debug("add error.contentId.numberFormatException to ActionMessages.");
 	    		McUtils.cleanUpSessionAbsolute(request);
+		    	request.getSession().setAttribute(USER_EXCEPTION_NUMBERFORMAT, new Boolean(true).toString());
+	    		persistError(request, "error.numberFormatException");
+	    		logger.debug("add error.numberFormatException to ActionMessages.");
 				return (mapping.findForward(ERROR_LIST));
 			}
 	    }

@@ -190,6 +190,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
                                HttpServletResponse response) throws IOException,
                                                             ServletException
     {
+    	McUtils.cleanUpUserExceptions(request);
 	 	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 	 	IMcService mcService =McUtils.getToolService(request);
 	 	AuthoringUtil.readData(request, mcAuthoringForm);	 	
@@ -239,8 +240,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
             HttpServletResponse response) throws IOException,
                                       ServletException
    {
-    	logger.debug("displayMc starting..");
-    	    	
+    	McUtils.cleanUpUserExceptions(request);
     	McLearningForm mcLearningForm = (McLearningForm) form;
 	 	IMcService mcService =McUtils.getToolService(request);
 	 	
@@ -369,7 +369,8 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
             HttpServletRequest request,
             HttpServletResponse response) throws IOException,
                                          ServletException
-	{                                         
+	{   
+    	McUtils.cleanUpUserExceptions(request);
 		logger.debug("dispatching continueOptionsCombined...");
 		McLearningForm mcLearningForm = (McLearningForm) form;
 	 	IMcService mcService =McUtils.getToolService(request);
@@ -467,6 +468,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
             HttpServletResponse response) throws IOException,
                                          ServletException
 	{
+    	McUtils.cleanUpUserExceptions(request);
 		logger.debug("dispatching getNextOptions...");
 		McLearningForm mcLearningForm = (McLearningForm) form;
 	 	IMcService mcService =McUtils.getToolService(request);
@@ -513,6 +515,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
             HttpServletResponse response) throws IOException,
                                          ServletException
 	{
+    	McUtils.cleanUpUserExceptions(request);
 		logger.debug("dispatching redoQuestions...");
 		McLearningForm mcLearningForm = (McLearningForm) form;
  		IMcService mcService =McUtils.getToolService(request);
@@ -551,6 +554,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
             HttpServletResponse response) throws IOException,
                                          ServletException
 	{
+    	McUtils.cleanUpUserExceptions(request);
 		logger.debug("dispatching viewAnswers...");
 		McLearningForm mcLearningForm = (McLearningForm) form;
  		IMcService mcService =McUtils.getToolService(request);
@@ -730,6 +734,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
             HttpServletResponse response) throws IOException,
                                          ServletException
 	{
+    	McUtils.cleanUpUserExceptions(request);
 		logger.debug("dispatching viewSummary...");
 		McLearningForm mcLearningForm = (McLearningForm) form;
  		IMcService mcService =McUtils.getToolService(request);
@@ -785,6 +790,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
      */
     public ActionForward redoQuestions(HttpServletRequest request, McLearningForm mcLearningForm, ActionMapping mapping)
     {
+    	McUtils.cleanUpUserExceptions(request);
     	logger.debug("requested redoQuestions...");
     	/* reset the checked options MAP */
     	Map mapGeneralCheckedOptionsContent= new TreeMap(new McComparator());

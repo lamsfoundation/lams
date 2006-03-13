@@ -82,15 +82,7 @@ http://www.gnu.org/licenses/gpl.txt
 							  	<font size=2> <c:out value="${sessionScope.lowestMark}"/></font>
 							</td> 
 						</tr>
-			
-						<tr> 
-							<td NOWRAP align="right" valign=top>
-				  				<b> <font size=2> <bean:message key="count.max.attempt" /> </font></b>
-				  			</td>
-							<td NOWRAP valign=top>
-							  	<font size=2> <c:out value="${sessionScope.countMaxAttempt}"/></font>
-							</td> 
-						</tr>
+
 				</table>
 				</td>
 			</tr>

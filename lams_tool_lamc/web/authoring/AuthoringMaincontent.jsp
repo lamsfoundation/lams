@@ -110,30 +110,20 @@ http://www.gnu.org/licenses/gpl.txt
 					<h2><font size=2> <bean:message key="label.authoring.mc.basic"/> </font> </h2>	
 				</c:if> 				
 				
-				<table align=center> 	  
-					<tr>   
-					<td NOWRAP class=error>
-						<font size=2>
+		        	<table align=center> 	  
+						<tr>   
+						<td NOWRAP class=error>
 							<c:if test="${sessionScope.sbmtSuccess == 1}"> 			
-								<logic-el:messagesPresent> 
-								 <html:messages id="error"> 
-									    <img src="<c:out value="${tool}"/>images/success.gif" align="left" width=20 height=20>  <font size=2> <bean:write name="error"/> </font> </img>
-								 </html:messages> 
-								</logic-el:messagesPresent>
+								<img src="<c:out value="${tool}"/>images/success.gif" align="left" width=20 height=20>  
+									<font size=2> <bean:message key="sbmt.successful"/> </font> 
+								</img>
 							</c:if> 			
-							
-							
-							<c:if test="${sessionScope.sbmtSuccess != 1}"> 			
-								<logic-el:messagesPresent> 
-								 <html:messages id="error"> 
-									    <img src="<c:out value="${tool}"/>images/error.jpg" align="left" width=20 height=20>  <font size=2> <bean:write name="error"/> </font> </img>
-								 </html:messages> 
-								</logic-el:messagesPresent>
-							</c:if> 			
-						</font>
-					</td>
-					</tr> 
-				</table>
+						</td>
+						</tr> 
+						<tr> <td>
+							<jsp:include page="/McErrorBox.jsp" />
+						</td> </tr>
+					</table>
 	
 			<div id="formtablecontainer1">
 					<c:if test="${sessionScope.editOptionsMode == 0}"> 			
@@ -156,30 +146,12 @@ http://www.gnu.org/licenses/gpl.txt
 		
 	<div id='content_a'  class="tabbody content_a">
 			<h2> <font size=2> <bean:message key="label.advanced.definitions"/> </font> </h2>	
-		<table align=center> 	  
-		<tr>   
-		<td NOWRAP class=error>
-			<font size=2>
-				<c:if test="${sessionScope.sbmtSuccess == 1}"> 			
-					<logic-el:messagesPresent> 
-					 <html:messages id="error"> 
-						    <img src="<c:out value="${tool}"/>images/success.gif" align="left" width=20 height=20>  <font size=2> <bean:write name="error"/> </font> </img>
-					 </html:messages> 
-					</logic-el:messagesPresent>
-				</c:if> 			
-				
-				
-				<c:if test="${sessionScope.sbmtSuccess != 1}"> 			
-					<logic-el:messagesPresent> 
-					 <html:messages id="error"> 
-						    <img src="<c:out value="${tool}"/>images/error.jpg" align="left" width=20 height=20>  <font size=2> <bean:write name="error"/> </font> </img>
-					 </html:messages> 
-					</logic-el:messagesPresent>
-				</c:if> 			
-			</font>
-		</td>
-		</tr> 
-		</table>
+		      	<table align=center> 	  
+					<tr>   
+					<tr> <td>
+						<jsp:include page="/McErrorBox.jsp" />
+					</td> </tr>
+				</table>
 		
 		<div id="formtablecontainer2">
 			<jsp:include page="/authoring/AdvancedContent.jsp" />
@@ -187,32 +159,14 @@ http://www.gnu.org/licenses/gpl.txt
 	</div>
 	
 	<div id='content_i'  class="tabbody content_i">
-		<h2><bean:message key="label.authoring.instructions"/></h2>	
-			<table align=center> 	  
-			<tr>   
-			<td NOWRAP class=error>
-				<font size=2>
-					<c:if test="${sessionScope.sbmtSuccess == 1}"> 			
-						<logic-el:messagesPresent> 
-						 <html:messages id="error"> 
-							    <img src="<c:out value="${tool}"/>images/success.gif" align="left" width=20 height=20>  <font size=2> <bean:write name="error"/> </font> </img>
-						 </html:messages> 
-						</logic-el:messagesPresent>
-					</c:if> 			
-					
-					
-					<c:if test="${sessionScope.sbmtSuccess != 1}"> 			
-						<logic-el:messagesPresent> 
-						 <html:messages id="error"> 
-							    <img src="<c:out value="${tool}"/>images/error.jpg" align="left" width=20 height=20>  <font size=2> <bean:write name="error"/> </font> </img>
-						 </html:messages> 
-						</logic-el:messagesPresent>
-					</c:if> 			
-				</font>
-			</td>
-			</tr> 
-			</table>
-			
+		<h2><bean:message key="label.authoring.instructions"/></h2>
+		      	<table align=center> 	  
+					<tr>   
+					<tr> <td>
+						<jsp:include page="/McErrorBox.jsp" />
+					</td> </tr>
+				</table>
+
 			<div id="formtablecontainer3">
 					<jsp:include page="/authoring/InstructionsContent.jsp" />
 			</div>

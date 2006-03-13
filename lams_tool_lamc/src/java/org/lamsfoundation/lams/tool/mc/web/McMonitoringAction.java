@@ -150,6 +150,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
                                HttpServletResponse response) throws IOException,
                                                             ServletException
     {
+    	McUtils.cleanUpUserExceptions(request);
     	logger.debug("dispatching unspecified...");
     	request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(false).toString());
 	 	McMonitoringForm mcMonitoringForm = (McMonitoringForm) form;
@@ -179,6 +180,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
             HttpServletResponse response) throws IOException,
                                          ServletException
 	{
+    	McUtils.cleanUpUserExceptions(request);
     	logger.debug("dispatching submitSession...");
     	request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(false).toString());
     	McMonitoringForm mcMonitoringForm = (McMonitoringForm) form;
@@ -235,6 +237,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
             HttpServletResponse response) throws IOException,
                                          ServletException
 	{
+    	McUtils.cleanUpUserExceptions(request);
     	logger.debug("dispatching editActivity...");
     	request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(false).toString());
     	McMonitoringForm mcMonitoringForm = (McMonitoringForm) form;
@@ -268,9 +271,9 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		
 		if (isContentInUse == true)
 		{
+			McUtils.cleanUpSessionAbsolute(request);
 			logger.debug("monitoring url does not allow editActivity since the content is in use.");
 	    	persistError(request,"error.content.inUse");
-	    	McUtils.cleanUpSessionAbsolute(request);
 	    	request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(true).toString());
 			logger.debug("forwarding to: " + LOAD_MONITORING_CONTENT);
 			return (mapping.findForward(LOAD_MONITORING_CONTENT));
@@ -304,6 +307,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
                                          ServletException,
                                          ToolException
 	 {
+    	McUtils.cleanUpUserExceptions(request);
     	logger.debug("dispatching editActivityQuestions..");
     	request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(false).toString());
 	 	IMcService mcService =McUtils.getToolService(request);
@@ -327,6 +331,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		return (mapping.findForward(LOAD_MONITORING_CONTENT));
 	}
     
+    
     /**
      * switches to summary tab of the monitoring url
      * getSummary(ActionMapping mapping,
@@ -349,6 +354,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
             HttpServletResponse response) throws IOException,
                                          ServletException
 	{
+    	McUtils.cleanUpUserExceptions(request);
     	McMonitoringStarterAction mcMonitoringStarter= new McMonitoringStarterAction();
     	request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(false).toString());
     	logger.debug("init monitoring data");
@@ -393,6 +399,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
             HttpServletResponse response) throws IOException,
                                          ServletException
 	{
+    	McUtils.cleanUpUserExceptions(request);
     	logger.debug("dispatching getInstructions..." + request);
     	request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(false).toString());
     	McMonitoringStarterAction mcMonitoringStarter= new McMonitoringStarterAction();
@@ -440,6 +447,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
             HttpServletResponse response) throws IOException,
                                          ServletException
 	{
+    	McUtils.cleanUpUserExceptions(request);
     	McMonitoringStarterAction mcMonitoringStarter= new McMonitoringStarterAction();
     	request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(false).toString());
     	logger.debug("init monitoring data");
@@ -484,6 +492,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
             HttpServletResponse response) throws IOException,
                                          ServletException
 	{
+    	McUtils.cleanUpUserExceptions(request);
     	logger.debug("dispatching proxy addNewQuestion...");
     	request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(false).toString());
     	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
@@ -518,6 +527,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
             HttpServletResponse response) throws IOException,
                                          ServletException
 	{
+    	McUtils.cleanUpUserExceptions(request);
     	logger.debug("dispatching proxy removeQuestion...");
     	request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(false).toString());
     	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
@@ -552,6 +562,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
             HttpServletResponse response) throws IOException,
                                          ServletException
     {
+    	McUtils.cleanUpUserExceptions(request);
     	logger.debug("dispatching proxy editOptions..." + request);
     	request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(false).toString());
     	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
@@ -586,6 +597,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
             HttpServletResponse response) throws IOException,
                                          ServletException
     {
+    	McUtils.cleanUpUserExceptions(request);
     	logger.debug("dispatching proxy addOption..."+ request);
     	request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(false).toString());
     	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
@@ -619,6 +631,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
             HttpServletResponse response) throws IOException,
                                          ServletException
     {
+    	McUtils.cleanUpUserExceptions(request);
     	logger.debug("dispatching proxy removeOption..." + request);
     	request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(false).toString());
     	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
@@ -654,6 +667,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
             HttpServletResponse response) throws IOException,
                                          ServletException
     {
+    	McUtils.cleanUpUserExceptions(request);
     	logger.debug("dispatching proxy moveQuestionDown..." + request);
     	request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(false).toString());
     	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
@@ -688,6 +702,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
             HttpServletResponse response) throws IOException,
                                          ServletException
     {
+    	McUtils.cleanUpUserExceptions(request);
     	logger.debug("dispatching proxy moveQuestionUp..." + request);
     	request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(false).toString());
     	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
@@ -721,6 +736,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
             HttpServletResponse response) throws IOException,
                                          ServletException
     {
+    	McUtils.cleanUpUserExceptions(request);
     	logger.debug("dispatching proxy doneOptions...");
     	request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(false).toString());
     	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
@@ -756,6 +772,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
                                          ServletException
 
     {
+    	McUtils.cleanUpUserExceptions(request);
     	logger.debug("dispatching proxy submitQuestions..." + request);
     	request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(false).toString());
     	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
@@ -795,6 +812,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
                                          ServletException
 
     {
+    	McUtils.cleanUpUserExceptions(request);
     	logger.debug("dispatching proxy deleteOfflineFile..." + request);
     	request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(false).toString());
     	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
@@ -829,6 +847,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
                                          ServletException
 
     {
+    	McUtils.cleanUpUserExceptions(request);
     	logger.debug("dispatching proxy deleteOnlineFile...");
     	request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(false).toString());
     	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
@@ -866,6 +885,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
                                          ServletException,
                                          RepositoryCheckedException
     {
+    	McUtils.cleanUpUserExceptions(request);
     	logger.debug("dispatching proxy deleteOnlineFile..." + request);
     	request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(false).toString());
     	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
@@ -902,6 +922,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
                                          ServletException,
                                          RepositoryCheckedException
     {
+    	McUtils.cleanUpUserExceptions(request);
     	logger.debug("dispatching proxy submitOnlineFiles..." + request);
     	request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(false).toString());
     	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
@@ -935,6 +956,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
             HttpServletResponse response) throws IOException,
                                          ServletException
     {
+    	McUtils.cleanUpUserExceptions(request);
     	logger.debug("dispatching proxy doneAdvancedTab...");
     	request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(false).toString());
     	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
@@ -969,6 +991,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
             HttpServletResponse response) throws IOException,
                                          ServletException
     {
+    	McUtils.cleanUpUserExceptions(request);
     	logger.debug("dispatching proxy doneInstructionsTab...");
     	request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(false).toString());
     	request.setAttribute(SOURCE_MC_STARTER, "monitoring");
@@ -1005,8 +1028,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
     {
     	McUtils.cleanUpSessionAbsolute(request);
     	request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(false).toString());
-    	/*forward outside of the app. Currently it is index.jsp */
-    	return (mapping.findForward(LOAD_STARTER)); 
+    	return (mapping.findForward(LOAD_MONITORING_CONTENT));
     }
     
     

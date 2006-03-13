@@ -206,15 +206,11 @@ http://www.gnu.org/licenses/gpl.txt
 								</c:if> 				
 							</c:if> 											
 							<c:if test="${isMonitoredContentInUse == 'true'}"> 			
-									<table align=center> 	  
-									<tr>   
-									<td NOWRAP class=error>
-										<font size=2>
-											<%@ include file="/McErrorBox.jsp" %> <!-- show any error messages here -->
-										</font>
-									</td>
-									</tr> 
-									</table>
+										<table border="0" cellspacing="2" cellpadding="2">									
+											<tr> <td NOWRAP valign=top>
+													<font size=2> <bean:message key="error.content.inUse"/> </font>
+											</td> </tr>
+										</table>
 							</c:if> 																									
 						</div>
 		        </c:when>

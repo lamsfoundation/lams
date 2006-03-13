@@ -86,6 +86,7 @@ public class McExportAction extends LamsDispatchAction implements McAppConstants
     		HttpServletRequest request,
     		HttpServletResponse response)
     {
+    	McUtils.cleanUpUserExceptions(request);
         return mapping.findForward(EXPORT_PORTFOLIO);
     }
     
@@ -102,6 +103,7 @@ public class McExportAction extends LamsDispatchAction implements McAppConstants
      */
     public ActionForward learner(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
     {
+    	McUtils.cleanUpUserExceptions(request);
     	logger.debug("dispatching export portfolio for learner...");
     	McUtils.cleanUpSessionAbsolute(request);
     	
@@ -132,8 +134,9 @@ public class McExportAction extends LamsDispatchAction implements McAppConstants
 		logger.debug("mcSession: " + mcSession);
 		if (mcSession == null)
 		{
+			McUtils.cleanUpSessionAbsolute(request);
         	persistError(request, "error.toolSession.doesNoExist");
-        	McUtils.cleanUpSessionAbsolute(request);
+        	request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
         	return (mapping.findForward(ERROR_LIST));
 		}
 		
@@ -147,8 +150,9 @@ public class McExportAction extends LamsDispatchAction implements McAppConstants
 		logger.debug("existing tool user mcQueUsr : " + mcQueUsr);
 		if (mcQueUsr == null)
 		{
+			McUtils.cleanUpSessionAbsolute(request);
+			request.getSession().setAttribute(USER_EXCEPTION_LEARNER_REQUIRED, new Boolean(true).toString());
         	persistError(request, "error.learner.user.doesNoExist");
-        	McUtils.cleanUpSessionAbsolute(request);
         	return (mapping.findForward(ERROR_LIST));
 		}
 		
@@ -157,8 +161,9 @@ public class McExportAction extends LamsDispatchAction implements McAppConstants
 		logger.debug("mcContent : " + mcContent);
 		if (mcContent == null)
 		{
-			persistError(request, "error.content.doesNotExist");
         	McUtils.cleanUpSessionAbsolute(request);
+			persistError(request, "error.content.doesNotExist");
+			request.getSession().setAttribute(USER_EXCEPTION_CONTENT_DOESNOTEXIST, new Boolean(true).toString());
         	return (mapping.findForward(ERROR_LIST));
 		}
                
@@ -179,6 +184,7 @@ public class McExportAction extends LamsDispatchAction implements McAppConstants
      */
     public ActionForward teacher(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
     {
+    	McUtils.cleanUpUserExceptions(request);
         //given the toolcontentId as a parameter
     	logger.debug("dispatching export portfolio for teacher...");
     	McUtils.cleanUpSessionAbsolute(request);
@@ -210,8 +216,9 @@ public class McExportAction extends LamsDispatchAction implements McAppConstants
 		
 		if (mcContent == null)
 		{
+			McUtils.cleanUpSessionAbsolute(request);
 			persistError(request, "error.content.doesNotExist");
-        	McUtils.cleanUpSessionAbsolute(request);
+			request.getSession().setAttribute(USER_EXCEPTION_CONTENT_DOESNOTEXIST, new Boolean(true).toString());
         	return (mapping.findForward(ERROR_LIST));
 		}
         
@@ -232,12 +239,14 @@ public class McExportAction extends LamsDispatchAction implements McAppConstants
      */
     protected boolean validateLearnerExportParameters(ActionForm form, HttpServletRequest request)
     {
+    	McUtils.cleanUpUserExceptions(request);
         String strToolSessionId=request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
         
         if ((strToolSessionId == null) || (strToolSessionId.length() == 0)) 
         {
-        	persistError(request, "error.toolSessionId.required");
         	McUtils.cleanUpSessionAbsolute(request);
+        	request.getSession().setAttribute(USER_EXCEPTION_TOOLSESSIONID_REQUIRED, new Boolean(true).toString());
+        	persistError(request, "error.toolSessionId.required");
         	return false;
         }
         else
@@ -249,10 +258,11 @@ public class McExportAction extends LamsDispatchAction implements McAppConstants
     		}
         	catch(NumberFormatException e)
     		{
+        		McUtils.cleanUpSessionAbsolute(request);
+        		request.getSession().setAttribute(USER_EXCEPTION_NUMBERFORMAT, new Boolean(true).toString());
         		persistError(request, "error.sessionId.numberFormatException");
         		logger.debug("add error.sessionId.numberFormatException to ActionMessages.");
-        		McUtils.cleanUpSessionAbsolute(request);
-            	return false;
+        		return false;
     		}
         }
         
@@ -261,8 +271,9 @@ public class McExportAction extends LamsDispatchAction implements McAppConstants
     	logger.debug("userId: " + userId);
     	if ((userId == null) || (userId.length() == 0)) 
     	{
-    		persistError(request, "error.learner.userId.required");
     		McUtils.cleanUpSessionAbsolute(request);
+    		persistError(request, "error.learner.userId.required");
+    		request.getSession().setAttribute(USER_EXCEPTION_USER_DOESNOTEXIST, new Boolean(true).toString());
         	return false;
     	}
     	request.getSession().setAttribute(EXPORT_USER_ID,new Long(userId));
@@ -281,13 +292,15 @@ public class McExportAction extends LamsDispatchAction implements McAppConstants
      */
     protected boolean validateTeacherExportParameters(ActionForm form, HttpServletRequest request)
     {
+    	McUtils.cleanUpUserExceptions(request);
     	String strToolContentId=request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
     	logger.debug("strToolContentId: " + strToolContentId);
     	 
 	    if ((strToolContentId == null) || (strToolContentId.length() == 0)) 
 	    {
-	    	persistError(request, "error.contentId.required");
 	    	McUtils.cleanUpSessionAbsolute(request);
+	    	persistError(request, "error.contentId.required");
+	    	request.getSession().setAttribute(USER_EXCEPTION_CONTENTID_REQUIRED, new Boolean(true).toString());
 	    	return false;
 	    }
 	    else
@@ -300,9 +313,10 @@ public class McExportAction extends LamsDispatchAction implements McAppConstants
 			}
 	    	catch(NumberFormatException e)
 			{
-	    		persistError(request, "error.contentId.numberFormatException");
-	    		logger.debug("add error.contentId.numberFormatException to ActionMessages.");
 	    		McUtils.cleanUpSessionAbsolute(request);
+	    		request.getSession().setAttribute(USER_EXCEPTION_NUMBERFORMAT, new Boolean(true).toString());
+	    		persistError(request, "error.numberFormatException");
+	    		logger.debug("add error.contentId.numberFormatException to ActionMessages.");
 	    		return false;
 			}
 	    }
