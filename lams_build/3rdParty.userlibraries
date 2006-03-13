@@ -34,7 +34,7 @@
 <archive path="/lams_build/lib/middlegen/velocity-1.4-dev.jar"/>
 <archive path="/lams_build/lib/middlegen/middlegen-2.1.jar"/>
 <archive path="/lams_build/lib/middlegen/middlegen-hibernate-plugin-2.1.jar"/>
-<archive path="/lams_build/lib/mysql/mysql-connector-java-3.1.7-bin.jar"/>
+<archive path="/lams_build/lib/mysql/mysql-connector-java-3.1.12-bin.jar"/>
 <archive path="/lams_build/lib/odmg/odmg-3.0.jar"/>
 <archive path="/lams_build/lib/quartz/quartz.jar"/>
 <archive path="/lams_build/lib/spring/spring-aop.jar"/>

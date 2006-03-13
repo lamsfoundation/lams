@@ -133,7 +133,7 @@
 		<java>log4j-1.2.9.jar</java>
 	</module>
 	<module>
-		<java>mysql-connector-java-3.1.7-bin.jar</java>
+		<java>mysql-connector-java-3.1.12-bin.jar</java>
 	</module>
 	<module>
 		<java>odmg-3.0.jar</java>
