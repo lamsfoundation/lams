@@ -39,6 +39,10 @@
 	<bean id="toolDataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
 		<property name="jndiName"><value>java:jdbc/tool-ds</value></property>
 	</bean>
+	
+	<bean id="quartzDataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+		<property name="jndiName"><value>java:jdbc/quartz-ds</value></property>
+	</bean>
 
 	<!--  Transaction manager for all transactions involving the core classes or the content repository. -->
 	
