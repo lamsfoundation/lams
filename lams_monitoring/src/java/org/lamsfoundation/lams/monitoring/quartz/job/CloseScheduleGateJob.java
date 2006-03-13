@@ -20,63 +20,49 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 
-package org.lamsfoundation.lams.monitoring.service;
+package org.lamsfoundation.lams.monitoring.quartz.job;
 
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
-import org.springframework.scheduling.quartz.QuartzJobBean;
 
 
 /**
- * The Quartz sheduling job that opens the gate. It is configured as a Spring
+ * The Quartz sheduling job that closes the gate. It is configured as a Spring
  * bean and will be triggered by the scheduler to perform its work.
+ * 
  * @author Jacky Fang
  * @since  2005-4-12
  * @version 1.1
- * 
  */
-public class OpenScheduleGateJob extends QuartzJobBean
+public class CloseScheduleGateJob extends MonitoringJob
 {
+
     //---------------------------------------------------------------------
     // Instance variables
     //---------------------------------------------------------------------
-	private static Logger log = Logger.getLogger(OpenScheduleGateJob.class);
-    private IMonitoringService monitoringService;
-    
-    //---------------------------------------------------------------------
-    // Inverse of control - method injection
-    //---------------------------------------------------------------------
-    /**
-     * @param monitoringService The monitoringService to set.
-     */
-    public void setMonitoringService(IMonitoringService monitoringService)
-    {
-        this.monitoringService = monitoringService;
-    }
-    
-    //---------------------------------------------------------------------
-    // Overridden method
-    //---------------------------------------------------------------------
+	private static Logger log = Logger.getLogger(CloseScheduleGateJob.class);
+
     /**
      * @see org.springframework.scheduling.quartz.QuartzJobBean#executeInternal(org.quartz.JobExecutionContext)
      */
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException
     {
+    	IMonitoringService monitoringService = getMonitoringService(context);
+    	
         //getting gate id set from scheduler
         Map properties = context.getJobDetail().getJobDataMap();
         Long gateId = (Long)properties.get("gateId");
         
         if(log.isDebugEnabled())
-            log.debug("Openning gate......["+gateId.longValue()+"]");
+            log.debug("Closing gate......["+gateId.longValue()+"]");
         
-        monitoringService.openGate(gateId);
+        monitoringService.closeGate(gateId);
         
         if(log.isDebugEnabled())
-            log.debug("Gate......["+gateId.longValue()+"] opened");
+            log.debug("Gate......["+gateId.longValue()+"] Closed");
     }
-    
-
 }

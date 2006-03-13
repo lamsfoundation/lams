@@ -482,10 +482,10 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         
         JobDetail startLessonJob = getStartScheduleLessonJob();
         //setup the message for scheduling job
-        startLessonJob.setName("startLessonOnSchedule");
+        startLessonJob.setName("startLessonOnSchedule:" + lessonId);
         startLessonJob.getJobDataMap().put(MonitoringConstants.KEY_LESSON_ID,new Long(lessonId));
         //create customized triggers
-        Trigger startLessonTrigger = new SimpleTrigger("startLessonOnScheduleTrigger",
+        Trigger startLessonTrigger = new SimpleTrigger("startLessonOnScheduleTrigger:"+ lessonId,
                                                     Scheduler.DEFAULT_GROUP, 
                                                     startDate);
         //start the scheduling job
@@ -521,10 +521,10 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 
         JobDetail finishLessonJob = getFinishScheduleLessonJob();
         //setup the message for scheduling job
-        finishLessonJob.setName("finishLessonOnSchedule");
+        finishLessonJob.setName("finishLessonOnSchedule:"+lessonId);
         finishLessonJob.getJobDataMap().put(MonitoringConstants.KEY_LESSON_ID,new Long(lessonId));
         //create customized triggers
-        Trigger finishLessonTrigger = new SimpleTrigger("finishLessonOnScheduleTrigger",
+        Trigger finishLessonTrigger = new SimpleTrigger("finishLessonOnScheduleTrigger:"+lessonId,
                                                     Scheduler.DEFAULT_GROUP, 
                                                     endDate);
         //start the scheduling job
@@ -1420,19 +1420,19 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         JobDetail openScheduleGateJob = getOpenScheduleGateJob();
         JobDetail closeScheduleGateJob = getCloseScheduleGateJob();
         //setup the message for scheduling job
-        openScheduleGateJob.setName("openGate");
+        openScheduleGateJob.setName("openGate:" + scheduleGate.getActivityId());
         openScheduleGateJob.getJobDataMap().put("gateId",scheduleGate.getActivityId());
         closeScheduleGateJob.setName("closeGate");
         closeScheduleGateJob.getJobDataMap().put("gateId",scheduleGate.getActivityId());
 
         
         //create customized triggers
-        Trigger openGateTrigger = new SimpleTrigger("openGateTrigger",
+        Trigger openGateTrigger = new SimpleTrigger("openGateTrigger:" + scheduleGate.getActivityId(),
                                                     Scheduler.DEFAULT_GROUP, 
                                                     scheduleGate.getLessonGateOpenTime(lessonStartTime));
         
         
-        Trigger closeGateTrigger = new SimpleTrigger("closeGateTrigger",
+        Trigger closeGateTrigger = new SimpleTrigger("closeGateTrigger:" + scheduleGate.getActivityId(),
                                                     Scheduler.DEFAULT_GROUP,
                                                     scheduleGate.getLessonGateCloseTime(lessonStartTime));
 

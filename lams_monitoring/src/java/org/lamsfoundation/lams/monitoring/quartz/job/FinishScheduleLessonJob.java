@@ -18,35 +18,25 @@
  *
  *http://www.gnu.org/licenses/gpl.txt
  */
-package org.lamsfoundation.lams.monitoring.service;
+package org.lamsfoundation.lams.monitoring.quartz.job;
 
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.monitoring.MonitoringConstants;
+import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
-import org.springframework.scheduling.quartz.QuartzJobBean;
 
-public class FinishScheduleLesson extends QuartzJobBean{
+public class FinishScheduleLessonJob extends MonitoringJob{
     //---------------------------------------------------------------------
     // Instance variables
     //---------------------------------------------------------------------
-	private static Logger log = Logger.getLogger(FinishScheduleLesson.class);
-    private IMonitoringService monitoringService;
-    
-    //---------------------------------------------------------------------
-    // Inverse of control - method injection
-    //---------------------------------------------------------------------
-    /**
-     * @param monitoringService The monitoringService to set.
-     */
-    public void setMonitoringService(IMonitoringService monitoringService)
-    {
-        this.monitoringService = monitoringService;
-    }
+	private static Logger log = Logger.getLogger(FinishScheduleLessonJob.class);
     
 	protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
+		IMonitoringService monitoringService = getMonitoringService(context);
+		
         //getting gate id set from scheduler
         Map properties = context.getJobDetail().getJobDataMap();
         long lessonId = ((Long)properties.get(MonitoringConstants.KEY_LESSON_ID)).longValue();
