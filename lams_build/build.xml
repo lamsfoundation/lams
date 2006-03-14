@@ -202,6 +202,13 @@
 	</target>
 	
 	<!-- ============================================================================== -->
+	<!--  Rebuild the LAMS Database														-->						
+	<!-- ============================================================================== -->
+	<target name="rebuild-db" description="Rebuild the LAMS Database.">
+		<ant antfile="../${lams_common}/build.xml" target="rebuild-db" inheritAll="false" />
+	</target>
+	
+	<!-- ============================================================================== -->
 	<!-- Copy the third party jar files and cofiguration files for deployment           -->
 	<!-- ============================================================================== -->
 	<target name="makeconfdir">
