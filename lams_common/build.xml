@@ -263,24 +263,14 @@ Ant build file.
 			<classpath>
 				<pathelement location="${db.driver.jar}"/>
 			</classpath>
+			<transaction src="${db.scripts}/create_lams_11_db.sql"/>
 			<transaction src="${db.scripts}/drop_lams_11_tables.sql"/>
 			<transaction src="${db.scripts}/create_lams_11_tables.sql"/>
 			<transaction src="${db.scripts}/insert_types_data.sql"/>
 			<transaction src="${db.scripts}/insert_users.sql"/>
-		</sql>
-		<!-- Create Quartz table --> 
-	    <sql
-	        driver="${db.driver}"
-	        url="${db.url}"
-	        userid="${db.username}"
-	        password="${db.password}">
-	
-	        <classpath>
-	            <pathelement location="${db.driver.jar}"/>
-	        </classpath>
+			<!-- Create Quartz table --> 
 	    	<transaction src="${db.scripts}/create_quartz_table.sql"/>
-	    </sql>
-		
+		</sql>
 		
 		<delete dir="${contentrepository.directory}"/>
 	</target>
