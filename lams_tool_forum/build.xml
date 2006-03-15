@@ -4,6 +4,7 @@
 	<!-- import properties from the specified file -->
 	<property file="build.properties"/>
 	<property file="../lams_build/common.properties"/>
+	<property file="../lams_build/${osPropertiesName}.properties" />
 	
 	<property name="project.displayname" value="${project} - ${project.displayname}"/>
 	<property name="project.description" value="${project} - ${project.description}"/>

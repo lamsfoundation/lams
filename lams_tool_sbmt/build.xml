@@ -25,6 +25,7 @@
 	<!-- import properties from the specified file -->
 	<property file="build.properties"/>
 	<property file="../lams_build/common.properties"/>
+	<property file="../lams_build/${osPropertiesName}.properties" />
 	<path id="all-libs">
 			<fileset dir="${sharedlib}">
 				<include name="**/*.jar"/>
@@ -275,6 +276,7 @@
 	   				<include name="**/*.*"/>
 	   				<exclude name="web.xml"/>
 	   				<exclude name="classes/**"/>
+	   				
 	   			</webinf>
 	   			<classes dir="${build.classes.java}"/>	
 	   			<!-- front end programs like HTML, JSP, CSS etc. -->

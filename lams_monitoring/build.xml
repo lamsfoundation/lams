@@ -7,6 +7,7 @@
 	<!-- import properties from the specified file -->
 	<property file="build.properties"/>
 	<property file="../lams_build/common.properties"/>
+	<property file="../lams_build/${osPropertiesName}.properties" />
 
 	<path id="all-libs">
 		<fileset dir="${sharedlib}">
