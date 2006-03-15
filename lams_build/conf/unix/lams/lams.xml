@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE Lams PUBLIC "-//LAMS//DTD LAMS//EN" "file:///usr/local/lamsconf/lams.dtd">
 <Lams>
-	<ServerURL></ServerURL>
+	<ServerURL>http://shaun.melcoe.mq.edu.au/lams/</ServerURL>
 	<LamsHome>/var/opt/lams</LamsHome>
 	<TempDir>/var/opt/lams/temp</TempDir>
 	<DumpDir>/var/opt/lams/dump</DumpDir>
