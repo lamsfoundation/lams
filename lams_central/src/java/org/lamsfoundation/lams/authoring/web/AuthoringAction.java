@@ -168,6 +168,7 @@ public class AuthoringAction extends LamsDispatchAction{
 		    Vector licenses = authoringService.getAvailableLicenses();
     		flashMessage = new FlashMessage("getAvailableLicenses",licenses);
 		} catch (Exception e) {
+			log.error("getAvailableLicenses: License details unavailable due to system error.",e);
 			flashMessage = new FlashMessage("getAvailableLicenses",
 					"License details unavailable due to system error :" + e.getMessage(),
 					FlashMessage.ERROR);
