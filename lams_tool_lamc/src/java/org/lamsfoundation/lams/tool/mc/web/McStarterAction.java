@@ -653,6 +653,16 @@ public class McStarterAction extends Action implements McAppConstants {
     	logger.debug("Check the mapWeights: " + mapWeights);
     	request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);
     	
+    	/*get existing feedback maps*/
+    	Map mapIncorrectFeedback = AuthoringUtil.rebuildIncorrectFeedbackMapfromDB(request, new Long(toolContentId));
+    	logger.debug("existing mapIncorrectFeedback:" + mapIncorrectFeedback);
+    	request.getSession().setAttribute(MAP_INCORRECT_FEEDBACK, mapIncorrectFeedback);
+    	
+    	Map mapCorrectFeedback = AuthoringUtil.rebuildCorrectFeedbackMapfromDB(request, new Long(toolContentId));
+    	logger.debug("existing mapCorrectFeedback:" + mapCorrectFeedback);
+    	request.getSession().setAttribute(MAP_CORRECT_FEEDBACK, mapCorrectFeedback);
+    	
+    	
     	Map mapQuestionsContent=AuthoringUtil.rebuildQuestionMapfromDB(request, new Long(toolContentId));
     	logger.debug("mapQuestionsContent:" + mapQuestionsContent);
     	request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
@@ -837,11 +847,11 @@ public class McStarterAction extends Action implements McAppConstants {
 		Map mapSelectedOptions= new TreeMap(new McComparator());
 		request.getSession().setAttribute(MAP_SELECTED_OPTIONS, mapSelectedOptions);
 		
-		Map mapFeedbackIncorrect= new TreeMap(new McComparator());
-		request.getSession().setAttribute(MAP_FEEDBACK_INCORRECT, mapFeedbackIncorrect);
+		Map mapIncorrectFeedback= new TreeMap(new McComparator());
+		request.getSession().setAttribute(MAP_INCORRECT_FEEDBACK, mapIncorrectFeedback);
 		
-		Map mapFeedbackCorrect= new TreeMap(new McComparator());
-		request.getSession().setAttribute(MAP_FEEDBACK_CORRECT, mapFeedbackCorrect);
+		Map mapCorrectFeedback= new TreeMap(new McComparator());
+		request.getSession().setAttribute(MAP_CORRECT_FEEDBACK, mapCorrectFeedback);
 		
 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 		logger.debug("resetting  EDIT_OPTIONS_MODE to 0");

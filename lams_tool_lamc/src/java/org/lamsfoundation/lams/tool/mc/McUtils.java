@@ -239,22 +239,23 @@ public abstract class McUtils implements McAppConstants {
 			request.getSession().setAttribute(RICHTEXT_INSTRUCTIONS,richTextInstructions);
 		}
 		
-		String richTextFeedbackCorrect=request.getParameter(RICHTEXT_FEEDBACK_CORRECT);
-		logger.debug("read parameter richTextFeedbackCorrect: " + richTextFeedbackCorrect);
+		String richTextIncorrectFeedback=request.getParameter(RICHTEXT_INCORRECT_FEEDBACK);
+		logger.debug("read parameter richTextIncorrectFeedback: " + richTextIncorrectFeedback);
 		
-		String richTextFeedbackInCorrect=request.getParameter(RICHTEXT_FEEDBACK_INCORRECT);
-		logger.debug("read parameter richTextFeedbackInCorrect: " + richTextFeedbackInCorrect);
-		
-		if ((richTextFeedbackCorrect != null) && (richTextFeedbackCorrect.length() > 0))
+		if ((richTextIncorrectFeedback != null) && (richTextIncorrectFeedback.length() > 0))
 		{
-			request.getSession().setAttribute(RICHTEXT_FEEDBACK_CORRECT,richTextFeedbackCorrect);
+			request.getSession().setAttribute(RICHTEXT_INCORRECT_FEEDBACK,richTextIncorrectFeedback);
 		}
 		
-		if ((richTextFeedbackInCorrect != null) && (richTextFeedbackInCorrect.length() > 0))
-		{
-			request.getSession().setAttribute(RICHTEXT_FEEDBACK_INCORRECT,richTextFeedbackInCorrect);
-		}
+
+		String richTextCorrectFeedback=request.getParameter(RICHTEXT_CORRECT_FEEDBACK);
+		logger.debug("read parameter richTextCorrectFeedback: " + richTextCorrectFeedback);
 		
+		if ((richTextCorrectFeedback != null) && (richTextCorrectFeedback.length() > 0))
+		{
+			request.getSession().setAttribute(RICHTEXT_CORRECT_FEEDBACK,richTextCorrectFeedback);
+		}
+
 		
 		String richTextReportTitle=request.getParameter(RICHTEXT_REPORT_TITLE);
 		logger.debug("read parameter richTextReportTitle: " + richTextReportTitle);
@@ -271,6 +272,8 @@ public abstract class McUtils implements McAppConstants {
 		{
 			request.getSession().setAttribute(RICHTEXT_END_LEARNING_MSG,richTextEndLearningMessage);
 		}
+		
+		Map mapIncorrectFeedback=(Map)request.getSession().getAttribute(MAP_INCORRECT_FEEDBACK);
 	}
 	
 	

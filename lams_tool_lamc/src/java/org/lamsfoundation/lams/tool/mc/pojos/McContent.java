@@ -225,12 +225,14 @@ public class McContent implements Serializable {
      */
     public Set deepCopyMcQueContent(McContent newMcContent)
     {
+    	
     	Set newMcQueContent = new TreeSet();
         for (Iterator i = this.getMcQueContents().iterator(); i.hasNext();)
         {
             McQueContent queContent = (McQueContent) i.next();
             if (queContent.getMcContent() != null)
             {
+            	logger.debug("deep copying queContent: " + queContent.getFeedbackIncorrect());
             	McQueContent mcQueContent=McQueContent.newInstance(queContent,
 															newMcContent);
             	newMcQueContent.add(mcQueContent);

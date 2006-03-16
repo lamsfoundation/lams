@@ -502,6 +502,32 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     	request.getSession().setAttribute(SELECTED_QUESTION_INDEX, questionIndex);
     	logger.debug("set SELECTED_QUESTION_INDEX to:" + questionIndex);
     	
+    	/*presenting incorrect feedback data*/
+    	Map mapIncorrectFeedback=(Map)request.getSession().getAttribute(MAP_INCORRECT_FEEDBACK);
+    	logger.debug("mapIncorrectFeedback:" + mapIncorrectFeedback);
+    	String incorrectFeedback="";
+    	if (mapIncorrectFeedback.size() > 0)
+    	{
+    		logger.debug("mapIncorrectFeedback size  > 0");
+        	incorrectFeedback=(String)mapIncorrectFeedback.get(questionIndex);
+    	}
+    	logger.debug("incorrectFeedback:" + incorrectFeedback);
+    	request.getSession().setAttribute(RICHTEXT_INCORRECT_FEEDBACK,incorrectFeedback);
+ 	
+
+    	/*presenting correct feedback data*/
+    	Map mapCorrectFeedback=(Map)request.getSession().getAttribute(MAP_CORRECT_FEEDBACK);
+    	logger.debug("mapCorrectFeedback:" + mapCorrectFeedback);
+    	String correctFeedback="";
+    	if (mapCorrectFeedback.size() > 0)
+    	{
+    		logger.debug("mapCorrectFeedback size  > 0");
+    		correctFeedback=(String)mapCorrectFeedback.get(questionIndex);
+    	}
+    	logger.debug("correctFeedback:" + correctFeedback);
+    	request.getSession().setAttribute(RICHTEXT_CORRECT_FEEDBACK,correctFeedback);
+
+    	
     	String editableQuestionEntry=(String)mapQuestionsContent.get(questionIndex);
     	logger.debug("editableQuestionEntry:" + editableQuestionEntry);
     	request.getSession().setAttribute(SELECTED_QUESTION, editableQuestionEntry);
@@ -611,33 +637,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     	logger.debug("optionsCacheDataFound to be checked: " +  optionsCacheDataFound);
     	if (optionsCacheDataFound == true)
     	{
-        	Map mapFeedbackIncorrect =(Map)request.getSession().getAttribute(MAP_FEEDBACK_INCORRECT);
-    		logger.debug("cached MAP_FEEDBACK_INCORRECT :" + mapFeedbackIncorrect);
-    		if (mapFeedbackIncorrect != null)
-    		{
-    			String richTextFeedbackInCorrect=(String)mapFeedbackIncorrect.get(selectedQuestionIndex);
-    			logger.debug("cached richTextFeedbackInCorrect:" + richTextFeedbackInCorrect);
-    			request.getSession().setAttribute(RICHTEXT_FEEDBACK_INCORRECT,richTextFeedbackInCorrect);	
-    		}
-    		else
-    		{
-    			logger.debug("mapFeedbackIncorrect is null");
-    			request.getSession().setAttribute(RICHTEXT_FEEDBACK_INCORRECT,"");
-    		}
-    		
-    		Map mapFeedbackCorrect =(Map)request.getSession().getAttribute(MAP_FEEDBACK_CORRECT);
-    		logger.debug("Submit final MAP_FEEDBACK_CORRECT :" + mapFeedbackCorrect);
-    		if (mapFeedbackCorrect != null)
-    		{
-    			String richTextFeedbackCorrect=(String)mapFeedbackCorrect.get(selectedQuestionIndex);
-    			logger.debug("cached richTextFeedbackCorrect:" + richTextFeedbackCorrect);
-    			request.getSession().setAttribute(RICHTEXT_FEEDBACK_CORRECT,richTextFeedbackCorrect);
-    		}
-    		else
-    		{
-    			logger.debug("mapFeedbackCorrect is null");
-    			request.getSession().setAttribute(RICHTEXT_FEEDBACK_CORRECT,"");
-    		}
+        	logger.debug("we should not arrive here.");
     	}
     	else
     	{
@@ -920,27 +920,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapGeneralSelectedOptionsContent);
 		logger.debug("updated  MAP_GENERAL_SELECTED_OPTIONS_CONTENT after add: " + mapGeneralSelectedOptionsContent);
 		
-		/* update feedback Maps*/
-		Map mapFeedbackIncorrect =(Map)request.getSession().getAttribute(MAP_FEEDBACK_INCORRECT);
-		logger.debug("current mapFeedbackIncorrect:" +  mapFeedbackIncorrect);
-		String richTextFeedbackInCorrect=(String) request.getSession().getAttribute(RICHTEXT_FEEDBACK_INCORRECT);
-		logger.debug("richTextFeedbackInCorrect: " + richTextFeedbackInCorrect);
-		
-		if (richTextFeedbackInCorrect == null) richTextFeedbackInCorrect="";
-    	mapFeedbackIncorrect.put(selectedQuestionIndex, richTextFeedbackInCorrect);
-    	request.getSession().setAttribute(MAP_FEEDBACK_INCORRECT, mapFeedbackIncorrect);
-		logger.debug("updated MAP_FEEDBACK_INCORRECT:" +  mapFeedbackIncorrect);
-		
-		Map mapFeedbackCorrect =(Map)request.getSession().getAttribute(MAP_FEEDBACK_CORRECT);
-		logger.debug("current mapFeedbackCorrect:" +  mapFeedbackCorrect);
-		String richTextFeedbackCorrect=(String) request.getSession().getAttribute(RICHTEXT_FEEDBACK_CORRECT);
-    	logger.debug("richTextFeedbackCorrect: " + richTextFeedbackCorrect);
-    	
-    	if (richTextFeedbackCorrect == null) richTextFeedbackCorrect="";
-    	mapFeedbackCorrect.put(selectedQuestionIndex, richTextFeedbackCorrect);
-    	request.getSession().setAttribute(MAP_FEEDBACK_CORRECT, mapFeedbackCorrect);
-		logger.debug("updated MAP_FEEDBACK_INCORRECT:" +  mapFeedbackCorrect);
- 		
  		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
 		logger.debug("resetting  EDIT_OPTIONS_MODE to 1");
  		mcAuthoringForm.resetUserAction();
@@ -1065,26 +1044,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		logger.debug("updated  MAP_GENERAL_SELECTED_OPTIONS_CONTENT after add: " + mapGeneralSelectedOptionsContent);
 		
 		/* update feedback Maps*/
-		Map mapFeedbackIncorrect =(Map)request.getSession().getAttribute(MAP_FEEDBACK_INCORRECT);
-		logger.debug("current mapFeedbackIncorrect:" +  mapFeedbackIncorrect);
-		String richTextFeedbackInCorrect=(String) request.getSession().getAttribute(RICHTEXT_FEEDBACK_INCORRECT);
-		logger.debug("richTextFeedbackInCorrect: " + richTextFeedbackInCorrect);
-		
-		if (richTextFeedbackInCorrect == null) richTextFeedbackInCorrect="";
-    	mapFeedbackIncorrect.put(selectedQuestionIndex, richTextFeedbackInCorrect);
-    	request.getSession().setAttribute(MAP_FEEDBACK_INCORRECT, mapFeedbackIncorrect);
-		logger.debug("updated MAP_FEEDBACK_INCORRECT:" +  mapFeedbackIncorrect);
-		
-		Map mapFeedbackCorrect =(Map)request.getSession().getAttribute(MAP_FEEDBACK_CORRECT);
-		logger.debug("current mapFeedbackCorrect:" +  mapFeedbackCorrect);
-		String richTextFeedbackCorrect=(String) request.getSession().getAttribute(RICHTEXT_FEEDBACK_CORRECT);
-    	logger.debug("richTextFeedbackCorrect: " + richTextFeedbackCorrect);
-    	
-    	if (richTextFeedbackCorrect == null) richTextFeedbackCorrect="";
-    	mapFeedbackCorrect.put(selectedQuestionIndex, richTextFeedbackCorrect);
-    	request.getSession().setAttribute(MAP_FEEDBACK_CORRECT, mapFeedbackCorrect);
-		logger.debug("updated MAP_FEEDBACK_INCORRECT:" +  mapFeedbackCorrect);
-		
  	 	request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
 		logger.debug("resetting  EDIT_OPTIONS_MODE to 1");
 		mcAuthoringForm.resetUserAction();
@@ -1189,6 +1148,24 @@ public class McAction extends LamsDispatchAction implements McAppConstants
                 	logger.debug("mapWeights after move down: " + mapWeights);
                 	request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);	
             	}
+            	
+            	Map mapIncorrectFeedback=(Map)request.getSession().getAttribute(MAP_INCORRECT_FEEDBACK);
+            	logger.debug("mapIncorrectFeedback: " + mapIncorrectFeedback);
+            	if (mapIncorrectFeedback.size() > 0)
+            	{
+            		mapIncorrectFeedback= AuthoringUtil.shiftFeedbackMap(mapIncorrectFeedback, questionIndex, "down");
+                	logger.debug("mapIncorrectFeedback: " + mapIncorrectFeedback);
+                	request.getSession().setAttribute(MAP_INCORRECT_FEEDBACK, mapIncorrectFeedback);	
+            	}
+            	
+            	Map mapCorrectFeedback=(Map)request.getSession().getAttribute(MAP_CORRECT_FEEDBACK);
+            	logger.debug("mapCorrectFeedback: " + mapCorrectFeedback);
+            	if (mapCorrectFeedback.size() > 0)
+            	{
+            		mapCorrectFeedback= AuthoringUtil.shiftFeedbackMap(mapCorrectFeedback, questionIndex, "down");
+                	logger.debug("mapCorrectFeedback: " + mapCorrectFeedback);
+                	request.getSession().setAttribute(MAP_CORRECT_FEEDBACK, mapCorrectFeedback);	
+            	}
         	}
      	}
     	
@@ -1258,7 +1235,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		Map mapQuestionsContent=AuthoringUtil.repopulateMap(request, "questionContent");
 	 	logger.debug("mapQuestionsContent before move down: " + mapQuestionsContent);
 	 	
-     	//perform a move up if there are at least 2 questions
+     	/* perform a move up if there are at least 2 questions */
      	if (mapQuestionsContent.size() > 1)
      	{
      		String questionIndex =mcAuthoringForm.getQuestionIndex();
@@ -1298,7 +1275,28 @@ public class McAction extends LamsDispatchAction implements McAppConstants
             		mapWeights= AuthoringUtil.shiftWeightsMap(mapWeights, questionIndex, "up");
                 	logger.debug("mapWeights after move down: " + mapWeights);
                 	request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);	
-            	}        		
+            	}
+            	
+            	
+            	Map mapIncorrectFeedback=(Map)request.getSession().getAttribute(MAP_INCORRECT_FEEDBACK);
+            	logger.debug("mapIncorrectFeedback: " + mapIncorrectFeedback);
+            	if (mapIncorrectFeedback.size() > 0)
+            	{
+            		mapIncorrectFeedback= AuthoringUtil.shiftFeedbackMap(mapIncorrectFeedback, questionIndex, "up");
+                	logger.debug("mapIncorrectFeedback: " + mapIncorrectFeedback);
+                	request.getSession().setAttribute(MAP_INCORRECT_FEEDBACK, mapIncorrectFeedback);	
+            	}
+            	
+            	
+            	Map mapCorrectFeedback=(Map)request.getSession().getAttribute(MAP_CORRECT_FEEDBACK);
+            	logger.debug("mapCorrectFeedback: " + mapCorrectFeedback);
+            	if (mapCorrectFeedback.size() > 0)
+            	{
+            		mapCorrectFeedback= AuthoringUtil.shiftFeedbackMap(mapCorrectFeedback, questionIndex, "up");
+                	logger.debug("mapCorrectFeedback: " + mapCorrectFeedback);
+                	request.getSession().setAttribute(MAP_CORRECT_FEEDBACK, mapCorrectFeedback);	
+            	}
+
         	}
      	}
 
@@ -1421,27 +1419,31 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		logger.debug("updated  MAP_GENERAL_SELECTED_OPTIONS_CONTENT after add: " + mapGeneralSelectedOptionsContent);
 		
 		
-		/* update feedback Maps*/
-		Map mapFeedbackIncorrect =(Map)request.getSession().getAttribute(MAP_FEEDBACK_INCORRECT);
-		logger.debug("current mapFeedbackIncorrect:" +  mapFeedbackIncorrect);
-		String richTextFeedbackInCorrect=(String) request.getSession().getAttribute(RICHTEXT_FEEDBACK_INCORRECT);
-		logger.debug("richTextFeedbackInCorrect: " + richTextFeedbackInCorrect);
 		
-		if (richTextFeedbackInCorrect == null) richTextFeedbackInCorrect="";
-    	mapFeedbackIncorrect.put(selectedQuestionIndex, richTextFeedbackInCorrect);
-    	request.getSession().setAttribute(MAP_FEEDBACK_INCORRECT, mapFeedbackIncorrect);
-		logger.debug("updated MAP_FEEDBACK_INCORRECT:" +  mapFeedbackIncorrect);
+		/*new code*/
+		Map mapIncorrectFeedback=(Map)request.getSession().getAttribute(MAP_INCORRECT_FEEDBACK);
+		logger.debug("mapIncorrectFeedback:" +  mapIncorrectFeedback);
 		
-		Map mapFeedbackCorrect =(Map)request.getSession().getAttribute(MAP_FEEDBACK_CORRECT);
-		logger.debug("current mapFeedbackCorrect:" +  mapFeedbackCorrect);
-		String richTextFeedbackCorrect=(String) request.getSession().getAttribute(RICHTEXT_FEEDBACK_CORRECT);
-    	logger.debug("richTextFeedbackCorrect: " + richTextFeedbackCorrect);
-    	
-    	if (richTextFeedbackCorrect == null) richTextFeedbackCorrect="";
-    	mapFeedbackCorrect.put(selectedQuestionIndex, richTextFeedbackCorrect);
-    	request.getSession().setAttribute(MAP_FEEDBACK_CORRECT, mapFeedbackCorrect);
-		logger.debug("updated MAP_FEEDBACK_CORRECT:" +  mapFeedbackCorrect);
+		String richTextIncorrectFeedback=(String)request.getSession().getAttribute(RICHTEXT_INCORRECT_FEEDBACK);
+		logger.debug("richTextIncorrectFeedback:" +  richTextIncorrectFeedback);
+		if (richTextIncorrectFeedback == null) richTextIncorrectFeedback="";
 		
+		mapIncorrectFeedback.put(selectedQuestionIndex,richTextIncorrectFeedback);
+		logger.debug("mapIncorrectFeedback:" +  mapIncorrectFeedback);
+    	request.getSession().setAttribute(MAP_INCORRECT_FEEDBACK, mapIncorrectFeedback);
+		
+
+    	Map mapCorrectFeedback=(Map)request.getSession().getAttribute(MAP_CORRECT_FEEDBACK);
+		logger.debug("mapCorrectFeedback:" +  mapCorrectFeedback);
+		
+		String richTextCorrectFeedback=(String)request.getSession().getAttribute(RICHTEXT_CORRECT_FEEDBACK);
+		logger.debug("richTextCorrectFeedback:" +  richTextCorrectFeedback);
+		if (richTextCorrectFeedback == null) richTextCorrectFeedback="";
+		
+		mapCorrectFeedback.put(selectedQuestionIndex,richTextCorrectFeedback);
+		logger.debug("mapCorrectFeedback:" +  mapCorrectFeedback);
+    	request.getSession().setAttribute(MAP_CORRECT_FEEDBACK, mapCorrectFeedback);
+
 		
 		Map mapGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_OPTIONS_CONTENT);
 		logger.debug("current mapGeneralOptionsContent: " + mapGeneralOptionsContent);
@@ -1868,11 +1870,14 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		mapQuestionsContent=(Map) request.getSession().getAttribute(MAP_QUESTIONS_CONTENT);
 		logger.debug("Submit final MAP_QUESTIONS_CONTENT :" + mapQuestionsContent);
 		
-		Map mapFeedbackIncorrect =(Map)request.getSession().getAttribute(MAP_FEEDBACK_INCORRECT);
-		logger.debug("Submit final MAP_FEEDBACK_INCORRECT :" + mapFeedbackIncorrect);
+		
+		Map mapIncorrectFeedback =(Map)request.getSession().getAttribute(MAP_INCORRECT_FEEDBACK);
+		logger.debug("Submit final MAP_FEEDBACK_INCORRECT :" + mapIncorrectFeedback);
 	
-		Map mapFeedbackCorrect =(Map)request.getSession().getAttribute(MAP_FEEDBACK_CORRECT);
+	
+		Map mapFeedbackCorrect =(Map)request.getSession().getAttribute(MAP_CORRECT_FEEDBACK);
 		logger.debug("Submit final MAP_FEEDBACK_CORRECT :" + mapFeedbackCorrect);
+		
 		
 		AuthoringUtil.refreshMaps(request, toolContentId.longValue());
 		logger.debug("refreshed maps...");
@@ -1888,7 +1893,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		AuthoringUtil.cleanupRedundantQuestions(request, existingQuestions, mapQuestionsContent, mcContent);
 		
 		logger.debug("calling selectAndPersistQuestions: " + existingQuestions);
-		AuthoringUtil.selectAndPersistQuestions(request, existingQuestions, mapQuestionsContent, mapFeedbackIncorrect, mapFeedbackCorrect, mapGeneralOptionsContent, mapWeights, mcContent);
+		AuthoringUtil.selectAndPersistQuestions(request, existingQuestions, mapQuestionsContent, mapIncorrectFeedback, mapFeedbackCorrect, mapGeneralOptionsContent, mapWeights, mcContent);
 		logger.debug("finished processing questions content...");
 		
 		logger.debug("start processing options content...");
@@ -2431,6 +2436,5 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		logger.debug("add " + message +"  to ActionMessages:");
 		saveErrors(request,errors);	    	    
 	}
-    
 }
     

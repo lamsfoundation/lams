@@ -184,11 +184,12 @@ public class McQueContent implements Serializable, Comparable {
     										McContent newMcContent)
     										
     {
+    	logger.debug("deep copying queContent: " + queContent.getFeedbackIncorrect());
     	McQueContent newQueContent = new McQueContent(queContent.getQuestion(),
 													  queContent.getDisplayOrder(),
 													  queContent.getWeight(),
 													  queContent.isDisabled(),
-													  queContent.getFeedbackCorrect(),
+													  queContent.getFeedbackIncorrect(),
 													  queContent.getFeedbackCorrect(),
 													  newMcContent,
                                                       new TreeSet(),

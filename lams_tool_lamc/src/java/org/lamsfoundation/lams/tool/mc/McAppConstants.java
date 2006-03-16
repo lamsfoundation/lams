@@ -121,6 +121,8 @@ public interface McAppConstants {
     public static final String MAP_CHECKBOX_STATES						="mapCheckBoxStates";
     public static final String MAP_SELECTED_OPTIONS						="mapSelectedOptions";
     public static final String MAP_FEEDBACK_INCORRECT					="mapFeedbackIncorrect";
+    public static final String MAP_INCORRECT_FEEDBACK					="mapIncorrectFeedback";
+    public static final String MAP_CORRECT_FEEDBACK						="mapCorrectFeedback";
     public static final String MAP_FEEDBACK_CORRECT						="mapFeedbackCorrect";
     
     
@@ -140,6 +142,8 @@ public interface McAppConstants {
     public static final String ON										="ON";
     public static final String OFF										="OFF";
     public static final String RICHTEXT_FEEDBACK_CORRECT				="richTextFeedbackCorrect";
+    public static final String RICHTEXT_INCORRECT_FEEDBACK				="richTextIncorrectFeedback";
+    public static final String RICHTEXT_CORRECT_FEEDBACK				="richTextCorrectFeedback";
     public static final String RICHTEXT_FEEDBACK_INCORRECT				="richTextFeedbackInCorrect";
     public static final String RICHTEXT_OFFLINEINSTRUCTIONS				="richTextOfflineInstructions";
     public static final String RICHTEXT_ONLINEINSTRUCTIONS				="richTextOnlineInstructions";

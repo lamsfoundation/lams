@@ -166,13 +166,34 @@ http://www.gnu.org/licenses/gpl.txt
 							&nbsp
 					  	</td>
 					</tr>
-					<tr>
-	 				 	<td colspan=4 align=center valign=top>								
-							&nbsp
-					  	</td>
+
+
+					<tr> 
+						<td NOWRAP class="formlabel" valign=top>
+							<font size=2>
+	    	      				<b> <bean:message key="label.feedback.incorrect" />: <b>
+	    	      			</font>
+	          			</td>
+						<td NOWRAP colspan=3 class="formcontrol" valign=top>
+						<FCK:editor id="richTextIncorrectFeedback" basePath="/lams/fckeditor/">
+							  <c:out value="${richTextIncorrectFeedback}" escapeXml="false" />						  
+						</FCK:editor>
+						</td> 
 					</tr>
 
-			
+					<tr> 
+						<td NOWRAP class="formlabel" valign=top>
+							<font size=2>
+	    	      				<b> <bean:message key="label.feedback.correct" />: <b>
+	    	      			</font>
+	          			</td>
+						<td NOWRAP colspan=3 class="formcontrol" valign=top>
+						<FCK:editor id="richTextCorrectFeedback" basePath="/lams/fckeditor/">
+							  <c:out value="${richTextCorrectFeedback}" escapeXml="false" />						  
+						</FCK:editor>
+						</td> 
+					</tr>
+
 	 				 <tr>
 	 				 <td valign=top> </td>
 	 				 <td class="input" align=left colspan=3 valign=top>
