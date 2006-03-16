@@ -92,7 +92,7 @@
 
 	<!-- cruise control task : build lams -->
 	<target name="lams-cruise" depends="assemble-ear, rebuild-db, deploy-ear, deploy-tools, copyfiles" description="builds entire LAMS (used for CruiseControl instance)"> 
-		<echo>Building LAMS</echo>
+		<echo>Building LAMS using CruiseControl</echo>
 	</target>
 	
 	<!-- assemble ear -->
