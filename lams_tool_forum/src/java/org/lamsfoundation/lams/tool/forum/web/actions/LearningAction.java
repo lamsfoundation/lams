@@ -472,13 +472,15 @@ public class LearningAction extends Action {
 		Forum forum = toolSession.getForum();
 		ForumUser currentUser = getCurrentUser(request);
 		ForumUser forumCreatedBy = forum.getCreatedBy();
-
-		if (currentUser.getUserId().equals(forumCreatedBy.getUserId())) {
+	
+		// TODO Skipping permissions for now, currently having issues with default learning designs not having an create_by field
+		// we should be looking at whether a user is a teacher and more specifically staff
+//		if (currentUser.getUserId().equals(forumCreatedBy.getUserId())) {
 			forumService.updateMessageHideFlag(msgId, hideFlag.booleanValue());
-		} else {
-			log.info(currentUser + "does not have permission to hide/show postings in forum: " + forum.getUid());
-			log.info("Forum created by :" + forumCreatedBy.getUid() + ", Current User is: " + currentUser.getUid());
-		}
+//		} else {
+//			log.info(currentUser + "does not have permission to hide/show postings in forum: " + forum.getUid());
+//			log.info("Forum created by :" + forumCreatedBy.getUid() + ", Current User is: " + currentUser.getUid());
+//		}
 
 		
 		// echo back this topic thread into page

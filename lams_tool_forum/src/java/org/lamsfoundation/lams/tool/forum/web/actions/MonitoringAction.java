@@ -76,8 +76,8 @@ public class MonitoringAction extends Action {
 			throws Exception {
 		String param = mapping.getParameter();
 
-		if (param.equals("listContentUsers")) {
-			return listContentUsers(mapping, form, request, response);
+		if (param.equals("init")) {
+			return init(mapping, form, request, response);
 		}
 		// ***************** Marks Functions ********************
 		if (param.equals("viewAllMarks")) {
@@ -96,34 +96,49 @@ public class MonitoringAction extends Action {
 			return updateMark(mapping, form, request, response);
 		}
 
-		// ***************** Activity and Instructions ********************
-		if (param.equals("viewActivity")) {
-			return viewActivity(mapping, form, request, response);
-		}
-		if (param.equals("editActivity")) {
-			return editActivity(mapping, form, request, response);
-		}
-		if (param.equals("updateActivity")) {
-			return updateActivity(mapping, form, request, response);
-		}
-		if (param.equals("viewInstructions")) {
-			return viewInstructions(mapping, form, request, response);
-		}
-		// ***************** Statistic ********************
-		if (param.equals("statistic")) {
-			return statistic(mapping, form, request, response);
-		}
-
 		// ***************** Miscellaneous ********************
 		if (param.equals("viewTopic")) {
 			return viewTopic(mapping, form, request, response);
 		}
 		return mapping.findForward("error");
 	}
-
+	
+    /**
+     * Default ActionForward for Monitor
+     *  (non-Javadoc)
+     * @see org.apache.struts.actions.DispatchAction#unspecified(org.apache.struts.action.ActionMapping, org.apache.struts.action.ActionForm, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+     */
+	
+	/**
+	 * The initial method for monitoring
+	 */
+	private ActionForward init(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response) {
+		// read in parameters and set session attributes.
+		Long toolContentID = new Long(WebUtil.readLongParam(request,
+				AttributeNames.PARAM_TOOL_CONTENT_ID));
+		request.getSession().setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID,
+				toolContentID);
+		request.getSession().setAttribute(AttributeNames.PARAM_MODE,
+				ToolAccessMode.TEACHER);
+		
+		// perform the actions for all the tabs.
+		doTabs(mapping, form, request, response);
+		
+		return mapping.findForward("load");
+	}
+	
+	private ActionForward doTabs(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+   	 	this.listContentUsers(mapping, form, request, response);
+   	 	this.viewInstructions(mapping, form, request, response);
+   	 	this.viewActivity(mapping, form, request, response);
+   	 	this.statistic(mapping, form, request, response);
+      	return mapping.findForward("load");
+	}
+	
 	/**
 	 * The initial method for monitoring. List all users according to given
-	 * Content ID. 
+	 * Content ID.
 	 * 
 	 * @param mapping
 	 * @param form
@@ -134,14 +149,7 @@ public class MonitoringAction extends Action {
 	private ActionForward listContentUsers(ActionMapping mapping,
 			ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
-		Long toolContentID = new Long(WebUtil.readLongParam(request,
-				AttributeNames.PARAM_TOOL_CONTENT_ID));
-		request.getSession().setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID,
-				toolContentID);
-		
-		request.getSession().setAttribute(AttributeNames.PARAM_MODE, ToolAccessMode.TEACHER);					
-		
-		return userList(mapping, request);		
+		return userList(mapping, request);
 	}
 
 	/**
@@ -164,7 +172,7 @@ public class MonitoringAction extends Action {
 		Map topicsByUser = getTopicsSortedByAuthor(topicList);
 		request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, sessionID);
 		request.setAttribute("report", topicsByUser);
-	
+
 		return mapping.findForward("success");
 	}
 
@@ -302,7 +310,7 @@ public class MonitoringAction extends Action {
 	 * @param response
 	 * @return
 	 */
-	private ActionForward viewUserMark(ActionMapping mapping, ActionForm form,
+	public ActionForward viewUserMark(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
 		Long userUid = new Long(WebUtil.readLongParam(request,
 				ForumConstants.USER_UID));
@@ -429,7 +437,9 @@ public class MonitoringAction extends Action {
 		}
 		String title = forum.getTitle();
 		String instruction = forum.getInstructions();
-
+			
+		boolean isForumEditable = ForumWebUtils.isForumEditable(forum);
+		request.setAttribute(ForumConstants.PAGE_EDITABLE, new Boolean(isForumEditable));
 		request.setAttribute("title", title);
 		request.setAttribute("instruction", instruction);
 		return mapping.findForward("success");
@@ -508,8 +518,9 @@ public class MonitoringAction extends Action {
 					"error.fail.get.forum"));
 		}
 		if (StringUtils.isEmpty(title)) {
-			errors.add("activity.title", new ActionMessage(
-					"error.title.empty"));
+			errors
+					.add("activity.title", new ActionMessage(
+							"error.title.empty"));
 		}
 		// echo back to screen
 		request.setAttribute("title", title);

@@ -6,5 +6,5 @@
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams" %>
-<%@ taglib uri="tags-fck-editor" prefix="FCK"%>
+<%@ taglib uri="fck-editor" prefix="FCK"%>
 

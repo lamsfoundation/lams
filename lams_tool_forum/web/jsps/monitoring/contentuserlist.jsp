@@ -1,36 +1,26 @@
 <%@ include file="/includes/taglibs.jsp"%>
-
 <html:errors />
-<html:xhtml />
 
-<div id="datatablecontainer">
+<div class="datatablecontainer">
 	<c:forEach var="element" items="${sessionUserMap}">
 		<c:set var="toolSessionDto" value="${element.key}" />
 		<c:set var="userlist" value="${element.value}" />
 		<c:set var="toolAccessMode" value="${mode}" />
 
-		<!--  need to find cleaner way to contruct url -->
-		<c:url value="/learning/viewForum.do" var="viewForumUrl">
-			<c:param name="mode" value="${toolAccessMode}" />
-			<c:param name="toolSessionID" value="${toolSessionDto.sessionID}" />
-		</c:url>
-
-		<html:link href="${viewForumUrl}" styleClass="button" target="_blank">
-			<fmt:message key="label.monitoring.summary.view.forum" />
-		</html:link>
-
 		<br />
 
 		<table class="forms">
 			<tr>
-				<td style="border-bottom:1px #000 solid;" colspan="4">
+				<th style="border-bottom:1px #000 solid;" colspan="3">
 					<b>
 						<fmt:message key="message.session.name" />
 						:
 					</b>
 					<c:out value="${toolSessionDto.sessionName}" />
-				</td>
+				</th>
+
 			</tr>
+
 			<c:forEach var="user" items="${userlist}">
 				<tr>
 
@@ -42,7 +32,7 @@
 						<c:out value="${user.loginName}" />
 					</td>
 					<td class="formcontrol">
-						<html:form action="/monitoring/viewUserMark">
+						<html:form action="/monitoring/viewUserMark" target="_blank">
 							<html:hidden property="toolSessionID" value="${toolSessionDto.sessionID}" />
 							<html:hidden property="userID" value="${user.uid}" />
 							<html:submit property="Mark">
@@ -50,20 +40,45 @@
 							</html:submit>
 						</html:form>
 					</td>
-
 				</tr>
 			</c:forEach>
+
 			<c:if test="${empty userlist}">
 				<tr>
-					<td colspan="3">
+					<td>
 						<fmt:message key="message.monitoring.summary.no.users" />
 					</td>
 				</tr>
 			</c:if>
 
 			<tr>
+				<td colspan="3">
+					&nbsp;
+				</td>
+
+			</tr>
+
+			<tr>
+
 				<td class="formcontrol">
-					<html:form action="/monitoring/viewAllMarks">
+
+					<c:url value="/learning/viewForum.do" var="url">
+						<c:param name="mode" value="${toolAccessMode}" />
+						<c:param name="toolSessionID" value="${toolSessionDto.sessionID}" />
+					</c:url>
+					
+					<c:set var="viewForumUrl">
+						<html:rewrite href="${url}" />
+					</c:set>
+					
+					<html:link href="${viewForumUrl}" target="_blank">
+						<fmt:message key="label.monitoring.summary.view.forum" />
+					</html:link>
+
+				</td>
+
+				<td class="formcontrol">
+					<html:form action="/monitoring/viewAllMarks" target="_blank">
 						<html:hidden property="toolSessionID" value="${toolSessionDto.sessionID}" />
 						<html:submit property="Mark">
 							<fmt:message key="lable.topic.title.mark" />
@@ -78,9 +93,11 @@
 						</html:submit>
 					</html:form>
 				</td>
+
+
 			</tr>
 		</table>
-		<br />
+
 		<br />
 	</c:forEach>
 	<c:if test="${empty sessionUserMap}">

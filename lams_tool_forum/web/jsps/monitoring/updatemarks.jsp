@@ -2,7 +2,7 @@
 <script type="text/javascript" src="<html:rewrite page='/includes/scripts.jsp'/>"></script>
 
 <html:form action="/monitoring/updateMark"  method="post">	
-<c_rt:set var="formBean" value="<%= session.getAttribute("markForm") %>" />
+<c:set var="formBean" value="<%= session.getAttribute("markForm") %>" />
   <b><fmt:message key="message.assign.mark"/>
   		 <c:out value="${formBean.user.loginName}" /> , <c:out value="${formBean.user.firstName}" />  <c:out value="${formBean.user.lastName}" /> 	
   </b></p>
