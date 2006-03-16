@@ -33,7 +33,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -309,7 +308,7 @@ public class MonitoringAction extends Action {
 	 * @param response
 	 * @return
 	 */
-	public ActionForward viewUserMark(ActionMapping mapping, ActionForm form,
+	private ActionForward viewUserMark(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
 		Long userUid = new Long(WebUtil.readLongParam(request,
 				ForumConstants.USER_UID));
@@ -441,97 +440,6 @@ public class MonitoringAction extends Action {
 		request.setAttribute(ForumConstants.PAGE_EDITABLE, new Boolean(isForumEditable));
 		request.setAttribute("title", title);
 		request.setAttribute("instruction", instruction);
-		return mapping.findForward("success");
-	}
-
-	/**
-	 * Show edit page for a content activity.
-	 * 
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return
-	 */
-	private ActionForward editActivity(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) {
-		MonitorForm monitorForm = (MonitorForm) form;
-
-		Long toolContentId = (Long) request.getSession().getAttribute(
-				AttributeNames.PARAM_TOOL_CONTENT_ID);
-		forumService = getForumService();
-		Forum forum = forumService.getForumByContentId(toolContentId);
-
-		// if can not find out forum, echo back error message
-		if (forum == null) {
-			ActionErrors errors = new ActionErrors();
-			errors.add("activity.globel", new ActionMessage(
-					"error.fail.get.forum"));
-			this.addErrors(request, errors);
-			log.error("Forum is null");
-			return mapping.getInputForward();
-		}
-		String title = forum.getTitle();
-		String instruction = forum.getInstructions();
-		request.setAttribute("title", title);
-		request.setAttribute("instruction", instruction);
-
-		if (ForumWebUtils.isForumEditable(forum)) {
-			request.setAttribute(ForumConstants.PAGE_EDITABLE, "true");
-			log.debug("Forum is editable");
-
-			// set up the request parameters to append to the URL
-			Map map = new HashMap();
-			map.put(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentId);
-			monitorForm.setParametersToAppend(map);
-		} else {
-			request.setAttribute(ForumConstants.PAGE_EDITABLE, "false");
-			log.debug("Forum is not editable");
-		}
-		return mapping.findForward("success");
-	}
-
-	/**
-	 * Update activity for a content.
-	 * 
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return
-	 */
-	private ActionForward updateActivity(ActionMapping mapping,
-			ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) {
-		Long contentId = (Long) request.getSession().getAttribute(
-				AttributeNames.PARAM_TOOL_CONTENT_ID);
-		String title = request.getParameter("title");
-		String instruction = request.getParameter("instruction");
-
-		forumService = getForumService();
-		Forum forum = forumService.getForumByContentId(contentId);
-		// if can not find out forum, echo back error message
-		ActionErrors errors = new ActionErrors();
-		if (forum == null) {
-			errors.add("activity.globel", new ActionMessage(
-					"error.fail.get.forum"));
-		}
-		if (StringUtils.isEmpty(title)) {
-			errors
-					.add("activity.title", new ActionMessage(
-							"error.title.empty"));
-		}
-		// echo back to screen
-		request.setAttribute("title", title);
-		request.setAttribute("instruction", instruction);
-		if (!errors.isEmpty()) {
-			this.addErrors(request, errors);
-			return mapping.getInputForward();
-		}
-		forum.setTitle(title);
-		forum.setInstructions(instruction);
-		forumService.updateForum(forum);
-
 		return mapping.findForward("success");
 	}
 
