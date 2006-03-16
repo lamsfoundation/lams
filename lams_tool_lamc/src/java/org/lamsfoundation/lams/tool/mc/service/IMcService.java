@@ -26,11 +26,10 @@ import java.io.InputStream;
 import java.util.List;
 
 import org.lamsfoundation.lams.contentrepository.ITicket;
-import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.lesson.Lesson;
-import org.lamsfoundation.lams.tool.BasicToolVO;
+import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
@@ -186,7 +185,7 @@ public interface IMcService
 
     public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException, ToolException;
     
-    public BasicToolVO getToolBySignature(String toolSignature) throws McApplicationException;
+    public IToolVO getToolBySignature(String toolSignature) throws McApplicationException;
     
     public long getToolDefaultContentIdBySignature(String toolSignature) throws McApplicationException;
     

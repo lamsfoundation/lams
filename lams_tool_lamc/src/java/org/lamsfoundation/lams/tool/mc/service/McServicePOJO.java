@@ -45,7 +45,7 @@ import org.lamsfoundation.lams.contentrepository.service.RepositoryProxy;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.lesson.Lesson;
-import org.lamsfoundation.lams.tool.BasicToolVO;
+import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
@@ -1737,10 +1737,10 @@ public class McServicePOJO implements
 
     }
     
-    public BasicToolVO getToolBySignature(String toolSignature) throws McApplicationException
+    public IToolVO getToolBySignature(String toolSignature) throws McApplicationException
     {
     	logger.debug("attempt retrieving tool with signature : " + toolSignature);
-    	BasicToolVO tool=toolService.getToolBySignature(toolSignature);
+    	IToolVO tool=toolService.getToolBySignature(toolSignature);
     	logger.debug("retrieved tool: " + tool);
 	    return tool;
     }

@@ -24,7 +24,7 @@ package org.lamsfoundation.lams.tool.service;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.tool.BasicToolVO;
+import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 
 
@@ -51,7 +51,7 @@ public interface ILamsToolService
      */
     public List getAllPotentialLearners(long toolContentID) throws LamsToolServiceException;
     
-    public BasicToolVO getToolBySignature(final String toolSignature);
+    public IToolVO getToolBySignature(final String toolSignature);
     
     public long getToolDefaultContentIdBySignature(final String toolSignature);
 }

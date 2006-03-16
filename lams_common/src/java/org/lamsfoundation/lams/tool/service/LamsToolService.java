@@ -24,7 +24,7 @@ package org.lamsfoundation.lams.tool.service;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.tool.BasicToolVO;
+import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.dao.IToolDAO;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
@@ -51,7 +51,7 @@ public class LamsToolService implements ILamsToolService
         return null;
     }
     
-    public BasicToolVO getToolBySignature(final String toolSignature)
+    public IToolVO getToolBySignature(final String toolSignature)
     {
     	Tool tool = toolDAO.getToolBySignature(toolSignature);  	
     	return tool.createBasicToolVO();    	

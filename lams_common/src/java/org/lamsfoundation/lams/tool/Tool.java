@@ -569,9 +569,31 @@ public class Tool implements Serializable {
     	return new AuthoringToolDTO(this);
     }
 
-    public BasicToolVO createBasicToolVO() {
-    	BasicToolVO vo = new BasicToolVO();
-    	vo.setAuthorUrl(this.getAuthorUrl());
+    public IToolVO createBasicToolVO() {
+    	IToolVO vo = new BasicToolVO(
+    			this.toolId, 
+    			this.supportsGrouping, 
+    			this.learnerUrl, 
+    			this.learnerPreviewUrl, 
+    			this.learnerProgressUrl, 
+    			this.authorUrl, 
+    			this.defineLaterUrl, 
+    			this.exportPortfolioLearnerUrl, 
+    			this.exportPortfolioClassUrl, 
+    			this.monitorUrl,
+    			this.contributeUrl,
+    			this.moderationUrl,
+    			this.supportsRunOffline,
+    			this.defaultToolContentId, 
+    			this.toolSignature, 
+    			this.toolDisplayName, 
+    			this.description, 
+    			this.serviceName, 
+    			this.createDateTime,
+    			this.groupingSupportTypeId,
+    			this.toolIdentifier, 
+    			this.toolVersion, 
+    			this.languageFile);
     	return vo;
     }
 
