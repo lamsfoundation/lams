@@ -90,6 +90,11 @@
 		
 	</target>
 
+	<!-- cruise control task : build lams -->
+	<target name="lams-cruise" depends="assemble-ear, rebuild-db, deploy-ear, deploy-tools, copyfiles" description="builds entire LAMS (used for CruiseControl instance)"> 
+		<echo>Building LAMS</echo>
+	</target>
+	
 	<!-- assemble ear -->
 	<target name="assemble-ear" depends="init, clean, build-subprojects"
 		description="Assemble lams ear in exploded form">
