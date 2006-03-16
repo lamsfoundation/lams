@@ -50,7 +50,7 @@
 		<!--   FCKEditor Tag Library -->
 		<!--  ======================================================== -->	
 		<taglib>
-		    <taglib-uri>tags-fck-editor</taglib-uri>
+		    <taglib-uri>fck-editor</taglib-uri>
 		    <taglib-location>/WEB-INF/fckeditor/tlds/FCKeditor.tld</taglib-location>
 		</taglib>
 		

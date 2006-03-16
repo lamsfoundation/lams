@@ -1,5 +1,5 @@
 <global-forwards>
-	<forward name="forwardToAuthorPage" path="/authoring/init.do" />
+
 </global-forwards>
 
 

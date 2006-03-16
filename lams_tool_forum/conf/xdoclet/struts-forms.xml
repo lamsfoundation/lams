@@ -1,2 +1,1 @@
-
-<form-bean name="emptyForm" type="org.apache.struts.action.DynaActionForm"/>
+<form-bean name="emptyForm" type="org.apache.struts.action.DynaActionForm" />
