@@ -104,6 +104,9 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		
 		
 	}
+	
+	
+	
     public function setupPI(){
 		if(USE_PROPERTY_INSPECTOR){
 			initPropertyInspector();
@@ -438,7 +441,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 			return true;
 		}else{
 			var fn:Function = Proxy.create(ref,confirmedClearDesign, ref);
-			LFMessage.showMessageConfirm("__Are you sure you want to clear your design?__", fn,null);
+			LFMessage.showMessageConfirm(Dictionary.getValue('new_confirm_msg'), fn,null);
 			Debugger.log('Set design failed as old design could not be cleared',Debugger.CRITICAL,"setDesign",'Canvas');		
 		}
 		
@@ -483,10 +486,11 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	 * @return  
 	 */
 	public function setPastedItem(o:Object):Object{
+		trace("called on right click");
 		if (o instanceof CanvasActivity){
 			//clone the activity
 			var newToolActivity:ToolActivity = o.activity.clone();
-			newToolActivity.title = "__Copy of__"+newToolActivity.title;
+			newToolActivity.title = Dictionary.getValue('prefix_copyof')+newToolActivity.title;
 			newToolActivity.activityUIID = _ddm.newUIID();
 			
 			_ddm.addActivity(newToolActivity);
@@ -564,48 +568,6 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		Cursor.showCursor(Application.C_DEFAULT);
 		canvasModel.activeTool = null;
 	}
-	
-	/**
-	 * Method to open Preview popup window.
-	 */
-	public function launchPreviewWindow():Void{
-		if(_ddm.validDesign){
-			 
-			var designID = _ddm.learningDesignID
-			var uID = Config.getInstance().userID;
-			Debugger.log('Launching Preview Window',Debugger.GEN,'launchPreviewWindow','Canvas');
-			var callback:Function = Proxy.create(this,onLaunchPreviewResponse); 
-			Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=startPreviewLesson&userID='+uID+'&learningDesignID='+designID+'&title=preview&description=started%20automatically ',callback, false);
-			
-			
-		}//Cursor.showCursor(Application.C_GATE);
-		//canvasModel.activeTool = null;    //CanvasModel.GATE_TOOL;
-	}
-
-	/**
-	 * now contains a Lession ID response from wddx packet
-	 * Returns the lessionID to send it to popup method in JsPopup .
-	 * @usage   http://localhost:8080/lams/learning/learner.do?method=joinLesson&userId=4&lessonId=12 
-	 * @param   r //the validation response
-	 * @return  
-	 */
-	public function onLaunchPreviewResponse(r):Void{
-		//Debugger.log('Response:'+ObjectUtils.printObject(response),Debugger.GEN,'onStoreDesignResponse','Canvas');
-		if(r instanceof LFError){
-			r.showMessageConfirm();
-		}else{
-			var uID = Config.getInstance().userID;
-			var serverUrl = Config.getInstance().serverUrl;
-			//Create an instance of JsPopup to access launchPopupWindow method.
-			JsPopup.getInstance().launchPopupWindow(serverUrl+'learning/learner.do?method=joinLesson&userId='+uID+'&lessonId='+r.lessionID, 'Preview of Lession '+r.lessionID, 570, 796, true, true, true);
-			//_global.breakpoint();
-			//Debugger.log('_ddm.learningDesignID:'+_ddm.learningDesignID,Debugger.GEN,'onStoreDesignResponse','Canvas');		
-			
-			//var msg:String = "Congratulations! - Your design is valid has been saved with ID:"+r.learningDesignID;
-		}
-	}
-	
-	
 	public function startGroupTool(){
 		Debugger.log('Starting group tool',Debugger.GEN,'startGateTool','Canvas');
 		Cursor.showCursor(Application.C_GROUP);
@@ -641,7 +603,47 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		canvasModel.stopTransitionTool();
 	}
 	
-	
+	/**
+	 * Method to open Preview popup window.
+	 */
+	public function launchPreviewWindow():Void{
+		if(_ddm.validDesign){
+			 
+			var designID = _ddm.learningDesignID
+			var uID = Config.getInstance().userID;
+			Debugger.log('Launching Preview Window',Debugger.GEN,'launchPreviewWindow','Canvas');
+			var callback:Function = Proxy.create(this,onLaunchPreviewResponse); 
+			Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=startPreviewLesson&userID='+uID+'&learningDesignID='+designID+'&title=preview&description=started%20automatically ',callback, false);
+			
+			
+		}//Cursor.showCursor(Application.C_GATE);
+		//canvasModel.activeTool = null;    //CanvasModel.GATE_TOOL;
+	}
+
+	/**
+	 * now contains a Lession ID response from wddx packet
+	 * Returns the lessionID to send it to popup method in JsPopup .
+	 * @usage   http://localhost:8080/lams/learning/learner.do?method=joinLesson&userId=4&lessonId=12 
+	 * @param   r //the validation response
+	 * @return  
+	 */
+	public function onLaunchPreviewResponse(r):Void{
+		//Debugger.log('Response:'+ObjectUtils.printObject(response),Debugger.GEN,'onStoreDesignResponse','Canvas');
+		if(r instanceof LFError){
+			r.showMessageConfirm();
+		}else{
+			//LFMessage.showMessageAlert('calling javascript from Austhor.jsp');
+			var uID = Config.getInstance().userID;
+			var serverUrl = Config.getInstance().serverUrl;
+			//Create an instance of JsPopup to access launchPopupWindow method.
+			JsPopup.getInstance().launchPopupWindow(serverUrl+'learning/learner.do?method=joinLesson&userId='+uID+'&lessonId='+r, 'Preview of Lession '+r.startPreviewSession, 570, 796, true, true, true);
+			Debugger.log('Recieved Lesson ID: '+r ,Debugger.GEN,'onLaunchPreviewResponse','Canvas');
+			//_global.breakpoint();
+			//Debugger.log('_ddm.learningDesignID:'+_ddm.learningDesignID,Debugger.GEN,'onStoreDesignResponse','Canvas');		
+			
+			//var msg:String = "Congratulations! - Your design is valid has been saved with ID:"+r.learningDesignID;
+		}
+	}
 	/*
 	public function cut():Void{
 		Debugger.log('Cut',Debugger.GEN,'cut','Canvas');
