@@ -29,6 +29,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
    
     public function activityClick(ca:Object):Void{
 	   Debugger.log('activityClick CanvasActivity:'+ca.activity.activityUIID,Debugger.GEN,'activityClick','CanvasController');
+	    Debugger.log('Check if transition tool active :'+_canvasModel.isTransitionToolActive(),Debugger.GEN,'activityClick','CanvasController');
 	   //if transition tool active
 	    if(_canvasModel.isTransitionToolActive()){
 		   var transitionTarget = createValidTransitionTarget(ca);
@@ -149,6 +150,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
    
    public function activityReleaseOutside(ca:Object):Void{
 	   Debugger.log('activityReleaseOutside CanvasActivity:'+ca.activity.activityUIID,Debugger.GEN,'activityReleaseOutside','CanvasController');
+	   Debugger.log('activityReleaseOutside Check if Transition tool active:'+_canvasModel.isTransitionToolActive(),Debugger.GEN,'activityReleaseOutside','CanvasController');
 	   if(_canvasModel.isTransitionToolActive()){
 				
 			
@@ -288,17 +290,22 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	
 	private function createValidTransitionTarget(transitionTargetObj:Object):Object{
 			var targetCA:Object;
+			Debugger.log("My transitionTargetObj is :"+transitionTargetObj.activity.activityUIID, Debugger.GEN,'createValidTransitionTarget','CanvasController');
 			//see what we can cast to
 			if(CanvasActivity(transitionTargetObj)!=null){
-				Debugger.log("Casting to CanvasActivity", Debugger.GEN,'activityReleaseOutside','CanvasController');
+				Debugger.log("Casting to CanvasActivity", Debugger.GEN,'createValidTransitionTarget','CanvasController');
 				targetCA = CanvasActivity(transitionTargetObj);
 				return targetCA;
 			}else if(CanvasParallelActivity(transitionTargetObj)!=null){
-				Debugger.log("Casting to CanvasParallelActivity", Debugger.GEN,'activityReleaseOutside','CanvasController');
+				Debugger.log("Casting to CanvasParallelActivity", Debugger.GEN,'createValidTransitionTarget','CanvasController');
 				targetCA = CanvasParallelActivity(transitionTargetObj);
 				return targetCA;
+			}else if(CanvasOptionalActivity(transitionTargetObj)!=null){
+				Debugger.log("Casting to CanvasOptionalActivity", Debugger.GEN,'createValidTransitionTarget','CanvasController');
+				targetCA = CanvasOptionalActivity(transitionTargetObj);
+				return targetCA;
 			}else{
-				var e = new LFError("__You cannot create a transition to this object__","activityReleaseOutside",this,String(transitionTargetObj));
+				var e = new LFError(Dictionary.getValue('cv_invalid_trans_target'),"createValidTransitionTarget",this,String(transitionTargetObj));
 				//bail
 				return e;
 			}
