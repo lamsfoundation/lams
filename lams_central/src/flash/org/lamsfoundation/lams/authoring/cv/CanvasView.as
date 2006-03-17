@@ -29,6 +29,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends AbstractView{
 	private var _canvas_mc:MovieClip;
 	private var canvas_scp:ScrollPane;
     private var bkg_pnl:Panel;
+	//private var act_pnl:Panel;
 	
     private var _gridLayer_mc:MovieClip;
     private var _transitionLayer_mc:MovieClip;
@@ -41,6 +42,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends AbstractView{
     private var dispatchEvent:Function;     
     public var addEventListener:Function;
     public var removeEventListener:Function;
+	//public var menu:ContextMenu;
 
 	
 	/**
@@ -65,14 +67,37 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends AbstractView{
         //Set up parameters for the grid
 		H_GAP = 10;
 		V_GAP = 10;
-       
+        setupCM();
 	   //register to recive updates form the model
 		CanvasModel(m).addEventListener('viewUpdate',this);
         
 		MovieClipUtils.doLater(Proxy.create(this,draw)); 
     }    
     
-
+	public function setupCM():Void{
+		trace("Value for this: "+this)
+		var myCopy:Array = new Array();
+		var menuArr:Array = new Array();
+		menuArr[0] =["Copy Activity", getCopy];
+		menuArr[1] = ["Paste Activity",getPaste];
+		
+		for (var i=0; i<menuArr.length; i++){
+			var myObj:Object = new Object();
+			myObj.cmlabel = menuArr[i][0];
+			myObj.handler = menuArr[i][1]; 
+			myCopy[i]= myObj;
+			
+		} 
+		var this_cm = Application.getInstance().showCustomCM(true, myCopy);
+		_root.menu = this_cm; 
+	}
+	
+	public function getCopy(){
+		Application.getInstance().copy();
+	}
+	public function getPaste(){
+		Application.getInstance().paste();
+	}
 	
 /**
  * Recieved update events from the CanvasModel. Dispatches to relevent handler depending on update.Type
@@ -203,7 +228,7 @@ public function viewUpdate(event:Object):Void{
 		if(a.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE){
 			var children:Array = cm.getCanvas().ddm.getComplexActivityChildren(a.activityUIID);
 			//var newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasParallelActivity",DepthManager.kTop,{_activity:a,_children:children,_canvasController:cvc,_canvasView:cvv});
-			var newActivity_mc = _activityLayerComplex_mc.createChildAtDepth("CanvasOptionalActivity",DepthManager.kTop,{_activity:a,_children:children,_canvasController:cvc,_canvasView:cvv});
+			var newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasOptionalActivity",DepthManager.kTop,{_activity:a,_children:children,_canvasController:cvc,_canvasView:cvv});
 			cm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
 			Debugger.log('Optional activity Type a.title:'+a.title+','+a.activityUIID+' added to the cm.activitiesDisplayed hashtable :'+newActivity_mc,4,'drawActivity','CanvasView');
 			
