@@ -56,7 +56,8 @@ class JsPopup{
 	 */
 	public function launchPopupWindow(url:String, windowTitle:String, height:Number, width:Number, resize:Boolean, status:Boolean, scrollbar:Boolean):Void{
 			//(args, title, h, w, resize, status, scrollbar)
-			getURL("javascript:openPopUp("+url+", "+windowTitle+", "+height+", "+width+", "+resize+", "+status+", "+scrollbar+")");
+			getURL(url,"_blank");
+			//getURL("javascript:openPopUp("+url+", "+windowTitle+");");
 	}
 	
 }
