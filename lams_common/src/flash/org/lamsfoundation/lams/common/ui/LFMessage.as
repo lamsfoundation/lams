@@ -36,6 +36,7 @@ class LFMessage{
 	//TODO: increase line breaks to account for stoopid bug in MMs alert.  
 	// if an icon is being used then the width of the icon is not taken into account
 	//msg += "\n  \n  \n  \n  ";
+	Alert.okLabel = Dictionary.getValue('al_ok');
 	if(okHandler != undefined){
 	   //alt = Alert.show(msg,"__Message__",Alert.OK,null,okHandler,"alertIcon_gen",Alert.OK);
 	   alt = Alert.show(msg,Dictionary.getValue('al_alert'),Alert.OK,null,okHandler,null,Alert.OK);
