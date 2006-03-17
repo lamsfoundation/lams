@@ -25,7 +25,7 @@ class ToolkitView extends AbstractView {
 	private var dragIcon_mcl:MovieClipLoader;
 	
 	private var dragIconListener:Object;
-	
+	private var _dictionary:Dictionary;
 	private var _tm:ThemeManager;
 	
 	//sorry mvc guru but i disagree - little state var here
@@ -43,7 +43,9 @@ class ToolkitView extends AbstractView {
 	public function ToolkitView(){	
         //Set up this class to use the Flash event delegation model
         EventDispatcher.initialize(this);     
-		_tm = ThemeManager.getInstance();		//Debugger.log('Running',4,'Constructor','ToolkitView');
+		_tm = ThemeManager.getInstance();
+		_dictionary = Dictionary.getInstance();
+		_dictionary.addEventListener('init',Proxy.create(this,setupLabels));		//Debugger.log('Running',4,'Constructor','ToolkitView');
 	}
 		/**
 	* Initialisation - sets up the mvc relations ship Abstract view.
@@ -54,6 +56,7 @@ class ToolkitView extends AbstractView {
 		super (m, c);
 		//Debugger.log('Running',4,'init','ToolkitView');
 		_dragging = false;
+		
 		dragIconListener = new Object();
 		dragIconListener.cRef = this;
 		dragIcon_mcl = new MovieClipLoader();
@@ -77,9 +80,26 @@ class ToolkitView extends AbstractView {
 			*/
 		}
 		
+		
+		
+		//Application.getInstance().setupAppCM(false)
+		
 		//Create a clip that will wait a frame before dispatching init to give components time to setup		this.onEnterFrame = createToolkit;
 	}
-    
+	
+    public function getCopy(){
+		Application.getInstance().copy();
+	}
+	
+	public function getPaste(){
+		Application.getInstance().paste();
+	}
+	public function setupLabels(){
+		
+		title_lbl.text = "<b>"+Dictionary.getValue('tk_title')+"</b>:";
+		
+
+	}
 	/**
 	* Sets up the toolkit, its actually attached in toolkit.as
 	*/
@@ -88,7 +108,7 @@ class ToolkitView extends AbstractView {
         _scrollPanelWidthDiff = bkg_pnl.width - toolkitLibraries_sp.width;
 		delete this.onEnterFrame;		_depth = this.getNextHighestDepth();
 		
-		title_lbl.text = Dictionary.getValue('tk_title');
+		
         setStyles();
         //dispatch load event
         dispatchEvent({type:'load',target:this});
@@ -164,7 +184,7 @@ class ToolkitView extends AbstractView {
         this._y = p.y;
     }
 	/**
-	* Updates learning library activities.  Creates a templateActivity mc / class for each one.	* NOTE: Each library element contains an array of templateActivities.  
+	* Updates learning library activities.  Creates a templateActivity mc / class for each one.	* NOTE: Each library element contains an array of templateActivities.
 	* templateActivities array may contain just one ToolActivity, or a container activity
 	* like Parralel and corresponding child activities
 	*
