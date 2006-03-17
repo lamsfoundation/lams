@@ -111,9 +111,15 @@ class WorkspaceDialog extends MovieClip{
 		//Set the text on the labels
         
         //Set the text for buttons
+		currentPath_lbl.text = "<b>"+Dictionary.getValue('ws_dlg_location_button')+"</b>:"
         ok_btn.label = Dictionary.getValue('ws_dlg_ok_button');
         cancel_btn.label = Dictionary.getValue('ws_dlg_cancel_button');
 		viewLicense_btn.label = Dictionary.getValue('ws_view_license_button');
+		new_btn.label = Dictionary.getValue('new_btn');
+		copy_btn.label = Dictionary.getValue('copy_btn');
+		paste_btn.label = Dictionary.getValue('paste_btn');
+		delete_btn.label = Dictionary.getValue('delete_btn');
+		rename_btn.label = Dictionary.getValue('rename_btn');
 		//TODO: Dictionary calls for all the rest of the buttons
 		
 		//TODO: Make setStyles more efficient
@@ -537,12 +543,12 @@ class WorkspaceDialog extends MovieClip{
 			//var rid:Number = Number(snode.attributes.data.resourceID);
 			if(snode.attributes.data.resourceType==_workspaceModel.RT_LD){
 				//run a confirm dialogue as user is about to overwrite a design!
-				LFMessage.showMessageConfirm("LOOKOUT ABOUT TO OVERWRITE A RESOURCE!", Proxy.create(this,doWorkspaceDispatch,true), Proxy.create(this,closeThisDialogue));
+				LFMessage.showMessageConfirm(Dictionary.getValue('ws_chk_overwrite_resource'), Proxy.create(this,doWorkspaceDispatch,true), Proxy.create(this,closeThisDialogue));
 	
 			}else if (snode.attributes.data.resourceType==_workspaceModel.RT_FOLDER){
 				doWorkspaceDispatch(false);
 			}else{
-				LFMessage.showMessageAlert("__Please click on either a Folder to save in, or a Design to overwrite__",null);
+				LFMessage.showMessageAlert(Dictionary.getValue('ws_click_folder_file'),null);
 			}
 		}else{
 			doWorkspaceDispatch(true);
