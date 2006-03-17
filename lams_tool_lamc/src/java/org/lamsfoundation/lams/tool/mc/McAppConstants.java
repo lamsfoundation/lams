@@ -122,6 +122,9 @@ public interface McAppConstants {
     public static final String MAP_SELECTED_OPTIONS						="mapSelectedOptions";
     public static final String MAP_FEEDBACK_INCORRECT					="mapFeedbackIncorrect";
     public static final String MAP_INCORRECT_FEEDBACK					="mapIncorrectFeedback";
+    
+    public static final String MAP_INCORRECT_FEEDBACK_LEARNER			="mapIncorrectFeedbackLearner";
+    public static final String MAP_CORRECT_FEEDBACK_LEARNER				="mapCorrectFeedbackLearner";
     public static final String MAP_CORRECT_FEEDBACK						="mapCorrectFeedback";
     public static final String MAP_FEEDBACK_CORRECT						="mapFeedbackCorrect";
     
@@ -178,7 +181,10 @@ public interface McAppConstants {
     public static final String MAP_TOOL_SESSIONS						="mapToolSessions";
     public static final Integer MAX_TOOL_SESSION_COUNT					=new Integer(500);
     public static final String IS_TOOL_SESSION_CHANGED					="isToolSessionChanged";
-    public static final String OPTION_OFF								="false";    
+    public static final String OPTION_OFF								="false";
+    public static final String ACTIVITY_TITLE 							= "activityTitle";
+    public static final String ACTIVITY_INSTRUCTIONS					= "activityInstructions";
+
         
     /*
      * user actions

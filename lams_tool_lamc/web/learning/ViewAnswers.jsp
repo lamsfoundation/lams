@@ -43,7 +43,8 @@ http://www.gnu.org/licenses/gpl.txt
 				<table align=center bgcolor="#FFFFFF">
 					  <tr>
 					  	<td NOWRAP align=left class="input" valign=top bgColor="#333366" colspan=2> 
-						  	<font size=2 color="#FFFFFF"> <b>  <bean:message key="label.assessment"/> </b> </font>
+						  	<font size=2 color="#FFFFFF"> <b>  <bean:message key="label.assessment"/> </b> 
+						  	<c:out value="${reportTitleLearner}" escapeXml="false" /> </font>
 					  	</td>
 					  </tr>
 				

@@ -39,6 +39,7 @@ http://www.gnu.org/licenses/gpl.txt
 </head>
 <body>
 
+
 <html:form  action="/learning?method=displayMc&validate=false" method="POST" target="_self">
 		<c:choose> 
 		  <c:when test="${sessionScope.questionListingMode == sessionScope.questionListingModeSequential}" > 

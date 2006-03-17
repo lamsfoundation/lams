@@ -35,7 +35,8 @@ http://www.gnu.org/licenses/gpl.txt
 				<table align=center bgcolor="#FFFFFF">
 					  <tr>
 					  	<td NOWRAP align=left class="input" valign=top bgColor="#333366" colspan=2> 
-						  	<font size=2 color="#FFFFFF"> <b>  <bean:message key="label.assessment"/> </b> </font>
+						  	<font size=2 color="#FFFFFF"> <b>  <bean:message key="label.assessment"/> </b> 
+						  	<c:out value="${reportTitleLearner}" escapeXml="false" /></font>
 					  	</td>
 					  </tr>
 				
@@ -181,7 +182,7 @@ http://www.gnu.org/licenses/gpl.txt
 																	<c:if test="${mainEntry.value == 'true'}"> 		
 																		<c:forEach var="feedbackEntry" items="${sessionScope.mapLeanerFeedbackCorrect}">
 																			<c:if test="${feedbackEntry.key == sessionScope.queIndex}"> 		
-																					<c:out value="${feedbackEntry.value}"/>
+																				<c:out value="${feedbackEntry.value}" escapeXml="false" />
 																			</c:if> 																																				
 																		</c:forEach>											
 																	</c:if> 														
@@ -189,7 +190,7 @@ http://www.gnu.org/licenses/gpl.txt
 																	<c:if test="${mainEntry.value == 'false'}"> 		
 																		<c:forEach var="feedbackEntry" items="${sessionScope.mapLeanerFeedbackIncorrect}">
 																			<c:if test="${feedbackEntry.key == sessionScope.queIndex}"> 		
-																					<c:out value="${feedbackEntry.value}"/>
+																				<c:out value="${feedbackEntry.value}" escapeXml="false" />
 																			</c:if> 																																				
 																		</c:forEach>											
 																	</c:if> 														

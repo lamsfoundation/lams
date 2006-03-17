@@ -151,6 +151,11 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  *
  */
 
+/**
+ *
+ * Note:  Because of MCQ's learning reporting structure, Show Learner Report is always ON even if in authoring it is set to false.
+ */
+
 public class McLearningStarterAction extends Action implements McAppConstants {
 	static Logger logger = Logger.getLogger(McLearningStarterAction.class.getName());
 	 /* Since the toolSessionId is passed, we will derive toolContentId from the toolSessionId
@@ -564,6 +569,9 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    logger.debug("IS_CONTENT_IN_USE: " + mcContent.isContentInUse());
 	    request.getSession().setAttribute(IS_CONTENT_IN_USE, new Boolean(mcContent.isContentInUse()).toString());
 	    
+	    request.getSession().setAttribute(ACTIVITY_TITLE, mcContent.getTitle());
+	    request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, mcContent.getInstructions());
+	    
 	    
 	    /*
 	     * Is the tool activity been checked as Run Offline in the property inspector?
@@ -591,6 +599,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    Map mapLeanerAssessmentResults= new TreeMap(new McComparator());
 	    request.getSession().setAttribute(MAP_LEARNER_ASSESSMENT_RESULTS, mapLeanerAssessmentResults);
 	    
+	    
 	    Map mapLeanerFeedbackIncorrect=AuthoringUtil.buildInCorrectFeedbackMap(request, mcContent.getMcContentId());
 	    request.getSession().setAttribute(MAP_LEARNER_FEEDBACK_INCORRECT, mapLeanerFeedbackIncorrect);
 	    logger.debug("MAP_LEARNER_FEEDBACK_INCORRECT: " + mapLeanerFeedbackIncorrect);
@@ -598,6 +607,19 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    Map mapLeanerFeedbackCorrect=AuthoringUtil.buildCorrectFeedbackMap(request, mcContent.getMcContentId());
 	    request.getSession().setAttribute(MAP_LEARNER_FEEDBACK_CORRECT, mapLeanerFeedbackCorrect);
 	    logger.debug("MAP_LEARNER_FEEDBACK_CORRECT: " + mapLeanerFeedbackCorrect);
+
+	    
+	    
+	    /*
+    	Map mapIncorrectFeedback = AuthoringUtil.rebuildIncorrectFeedbackMapfromDB(request, mcContent.getMcContentId());
+    	logger.debug("existing mapIncorrectFeedback:" + mapIncorrectFeedback);
+    	request.getSession().setAttribute(MAP_INCORRECT_FEEDBACK_LEARNER, mapIncorrectFeedback);
+    	
+    	Map mapCorrectFeedback = AuthoringUtil.rebuildCorrectFeedbackMapfromDB(request, mcContent.getMcContentId());
+    	logger.debug("existing mapCorrectFeedback:" + mapCorrectFeedback);
+    	request.getSession().setAttribute(MAP_CORRECT_FEEDBACK_LEARNER, mapCorrectFeedback);
+    	*/
+	    
 	    
 	    Map mapQuestionWeights=LearningUtil.buildWeightsMap(request, mcContent.getMcContentId());
 	    request.getSession().setAttribute(MAP_QUESTION_WEIGHTS, mapQuestionWeights);

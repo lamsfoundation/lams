@@ -39,7 +39,19 @@ http://www.gnu.org/licenses/gpl.txt
 					  	</td>
 					  </tr>
 					  
-
+  					  <tr>
+					  	<td NOWRAP align=left class="input" valign=top bgColor="white" colspan=2> 
+						  	<c:out value="${activityTitle}" escapeXml="false" /> 
+					  	</td>
+					  </tr>
+					  
+					  <tr>
+					  	<td NOWRAP align=left class="input" valign=top bgColor="white" colspan=2> 
+						  	<c:out value="${activityInstructions}" escapeXml="false" /> 
+					  	</td>
+					  </tr>
+					  
+			
 			 		<c:if test="${sessionScope.isRetries == 'true'}"> 		
 					  <tr>
 					  	<td NOWRAP align=center class="input" valign=top colspan=2> 

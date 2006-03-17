@@ -1026,7 +1026,8 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
             HttpServletResponse response) throws IOException,
                                          ServletException
     {
-    	McUtils.cleanUpSessionAbsolute(request);
+    	/*not doing anything for the moment*/
+    	/*McUtils.cleanUpSessionAbsolute(request); */
     	request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(false).toString());
     	return (mapping.findForward(LOAD_MONITORING_CONTENT));
     }
