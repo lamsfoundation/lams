@@ -340,7 +340,7 @@ class DebugDialog extends MovieClip implements Dialog{
     
             //align buttons        
             clear_btn._y = showProps_btn._y = serialize_btn._y = assign_btn._y = load_btn._y = h - 75;
-            
+            sendData_btn._y = h - 35;
             input_ti.setSize(w-40,input_ti.height);
             input_ti._y = h - 104;
         }
