@@ -26,17 +26,19 @@ class org.lamsfoundation.lams.authoring.Application {
 	public static var C_GROUP:String = "c_group";
 	public static var C_DEFAULT:String = "default";
 	
+	
 	private static var SHOW_DEBUGGER:Boolean = false;
 	/*
     private static var TOOLBAR_X:Number = 10;
     private static var TOOLBAR_Y:Number = 35;*/
+	private static var _controlKeyPressed:String;
 	private static var TOOLBAR_X:Number = 0;
     private static var TOOLBAR_Y:Number = 21;
     private static var TOOLKIT_X:Number = 0;
-    private static var TOOLKIT_Y:Number = 74;
+    private static var TOOLKIT_Y:Number = 55;
     
     private static var CANVAS_X:Number = 180;
-    private static var CANVAS_Y:Number = 74;
+    private static var CANVAS_Y:Number = 55;
     private static var CANVAS_W:Number = 1000;
     private static var CANVAS_H:Number = 200;
     
@@ -57,6 +59,8 @@ class org.lamsfoundation.lams.authoring.Application {
     private static var QUESTION_MARK_KEY:Number = 191;
     private static var X_KEY:Number = 88;
     private static var C_KEY:Number = 67;
+	private static var D_KEY:Number = 68;
+	//private static var T_KEY:Number = 84;
     private static var V_KEY:Number = 86;
     private static var Z_KEY:Number = 90; 
     private static var Y_KEY:Number = 89;
@@ -97,9 +101,12 @@ class org.lamsfoundation.lams.authoring.Application {
     private var _canvasLoaded:Boolean;
     private var _toolkitLoaded:Boolean;
     private var _menuLoaded:Boolean;
+	private var _showCMItem:Boolean;
 	
 	//clipboard
 	private var _clipboardData:Object;
+	// set up Key Listener
+	//private var keyListener:Object;
     
     //Application instance is stored as a static in the application class
     private static var _instance:Application = null;     
@@ -116,6 +123,7 @@ class org.lamsfoundation.lams.authoring.Application {
         _canvasLoaded  = false;
         _menuLoaded = false;
         _toolbarLoaded = false;  
+		//Mouse.addListener(someListener);
     }
     
     /**
@@ -252,12 +260,12 @@ class org.lamsfoundation.lams.authoring.Application {
 						Debugger.log('raeached time out waiting to load dict and themes, giving up.',Debugger.CRITICAL,'checkUILoaded','Application');
 						var msg:String = "";
 						if(!_themeEventDispatched){
-							msg+="__The theme data has not been loaded__";
+							msg+=Dictionary.getValue("app_chk_themeload");
 						}
 						if(!_dictionaryEventDispatched){
-							msg+="__The lanaguage data has not been loaded__";
+							msg+="The lanaguage data has not been loaded.";
 						}
-						msg+="__The application cannot continue.  Please contact support__";
+						msg+=Dictionary.getValue("app_fail_continue");
 						var e:LFError = new LFError(msg,"Canvas.setDroppedTemplateActivity",this,'_themeEventDispatched:'+_themeEventDispatched+' _dictionaryEventDispatched:'+_dictionaryEventDispatched);
 						e.showErrorAlert();
 						//todo:  give the user a message
@@ -303,15 +311,58 @@ class org.lamsfoundation.lams.authoring.Application {
         }   
     }
     
+	public function showCustomCM(showCMItem:Boolean, cmItems):Object{
+		
+		var root_cm:ContextMenu = new ContextMenu();  
+		root_cm.hideBuiltInItems();  
+		trace("CM Item label: "+cmItems.cmlabel)
+		for (var i=0; i<cmItems.length; i++){
+			trace("CM Item length: "+cmItems[i].handler)
+			var menuItem_cmi:ContextMenuItem = new ContextMenuItem(cmItems[i].cmlabel.toString(), cmItems[i].handler);
+			root_cm.customItems.push(menuItem_cmi);
+		}
+		
+		if (showCMItem == false) {
+			for(var i=0; i<root_cm.customItems.length; i++){
+				root_cm.customItems[i].enabled = false;
+			}
+		} else {
+			for(var i=0; i<root_cm.customItems.length; i++){
+				root_cm.customItems[i].enabled = true;
+			}
+		}
+
+		
+		
+		//this.menu = root_cm;  
+		//_root.menu = root_cm;   
+		return root_cm;
+	}
+	
+	
+		
+		
+	
     /**
     * Create all UI Elements
     */
     private function setupUI(){
-		//Make the base context menu hide built in items so we don't have zoom in etc  
-		var root_cm:ContextMenu = new ContextMenu();  
-		root_cm.hideBuiltInItems();  
-		_root.menu = root_cm;   
-        
+		//Make the base context menu hide built in items so we don't have zoom in etc 
+		// Change this to false to remove
+		 var myCopy:Array = new Array();
+		var menuArr:Array = new Array();
+		menuArr[0] =["Copy", copy];
+		menuArr[1] = ["Paste", paste];
+		
+		for (var i=0; i<menuArr.length; i++){
+			var myObj:Object = new Object();
+			myObj.cmlabel = menuArr[i][0];
+			myObj.handler = menuArr[i][1]; 
+			myCopy[i]= myObj;
+			
+		} 
+        var test_cm = showCustomCM(false, myCopy, this)
+		_root.menu = test_cm; 
         //Create the application root
         _appRoot_mc = _container_mc.createEmptyMovieClip('appRoot_mc',APP_ROOT_DEPTH);
         //Create screen elements
@@ -374,6 +425,28 @@ class org.lamsfoundation.lams.authoring.Application {
         //Get the stage width and height and call onResize for stage based objects
         var w:Number = Stage.width;
         var h:Number = Stage.height;
+		
+		var someListener:Object = new Object();
+		someListener.onMouseUp = function () {
+			
+		//Menu - only need to worry about width
+        _menu_mc.setSize(w,_menu_mc._height);
+
+        //Canvas
+        _canvas.setSize(w-_toolkit.width,h-CANVAS_Y);
+        _toolkit.setSize(_toolkit.width,h-TOOLKIT_Y);
+
+        //Toolbar
+        _toolbar.setSize(w,_toolbar.height);
+		//Property Inspector
+		var pi = _canvas.getPropertyInspector();
+		//pi._y = h;//- pi._height;
+		pi._y = h - 210;
+		
+		}
+		//Mouse.addListener(someListener);
+
+
         
         //Menu - only need to worry about width
         _menu_mc.setSize(w,_menu_mc._height);
@@ -394,11 +467,26 @@ class org.lamsfoundation.lams.authoring.Application {
 		
 		
     }
+	
+	/**
+    * Handles KEY Releases for Application
+    */
+	private function onKeyUp(){
+		var c:String = Cursor.getCurrentCursor();
+		if(c == C_TRANSITION){	
+			_controlKeyPressed = "";
+			//Cursor.showCursor(C_DEFAULT);
+			_canvas.stopTransitionTool()
+		}
+		
+	}
     
     /**
     * Handles KEY presses for Application
     */
     private function onKeyDown(){
+		
+		//var mouseListener:Object = new Object();
         //Debugger.log('Key.isDown(Key.CONTROL): ' + Key.isDown(Key.CONTROL),Debugger.GEN,'onKeyDown','Application');
         //Debugger.log('Key: ' + Key.getCode(),Debugger.GEN,'onKeyDown','Application');
 		//the debug window:
@@ -437,9 +525,29 @@ class org.lamsfoundation.lams.authoring.Application {
 			
         }		
 		
+		if (Key.isDown(Key.CONTROL)) {
+			//_canvas.toggleTransitionTool()
+			var c:String = Cursor.getCurrentCursor();
+			if(c != C_TRANSITION){	
+				_controlKeyPressed = "transition";
+				//Cursor.showCursor(C_TRANSITION);
+				//_canvas.model.selectedItem = null;
+				//_canvas.model.resetTransitionTool();
+				//_canvas.model.setActiveTool("TRANSITION") ;
+				_canvas.startTransitionTool()
+			}
+			
+			
+	    }
 		
     }
 	
+	public function transition_keyPressed(){
+		_controlKeyPressed = "transition";
+		if(_canvas.model.activeTool != "TRANSITION"){
+			_canvas.toggleTransitionTool();
+		}
+	}
 	public function showDebugger():Void{
 		_debugDialog = PopUpManager.createPopUp(Application.root, LFWindow, false,{title:'Debug',closeButton:true,scrollContentPath:'debugDialog'});
 	}
@@ -456,6 +564,7 @@ class org.lamsfoundation.lams.authoring.Application {
 	 */
 	public function setClipboardData(obj:Object):Void{
 		_clipboardData = obj;
+		trace("clipBoard data id"+_clipboardData);
 	}
 	
 	/**
@@ -474,10 +583,12 @@ class org.lamsfoundation.lams.authoring.Application {
 	}
 	
 	public function copy():Void{
+		trace("testing copy");
 		 setClipboardData(_canvas.model.selectedItem);
 	}
 	
 	public function paste():Void{
+		trace("testing paste");
 		_canvas.setPastedItem(getClipboardData());
 	}
 	
@@ -511,7 +622,9 @@ class org.lamsfoundation.lams.authoring.Application {
     public function getCanvas():Canvas{
         return _canvas;
     }
-	
+	public function get controlKeyPressed():String{
+        return _controlKeyPressed;
+    }
     /**
     * returns the the workspace instance
     */
