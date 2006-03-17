@@ -25,7 +25,7 @@ import java.io.InputStream;
 import java.util.List;
 
 import org.lamsfoundation.lams.contentrepository.ITicket;
-import org.lamsfoundation.lams.tool.BasicToolVO;
+import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.qa.QaApplicationException;
@@ -212,7 +212,7 @@ public interface IQaService
      */
     public String leaveToolSession(Long toolSessionId,Long learnerId) throws DataMissingException, ToolException;
     
-    public BasicToolVO getToolBySignature(String toolSignature) throws QaApplicationException;
+    public IToolVO getToolBySignature(String toolSignature) throws QaApplicationException;
     
     public long getToolDefaultContentIdBySignature(String toolSignature) throws QaApplicationException;
     
