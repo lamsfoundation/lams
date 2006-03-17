@@ -96,9 +96,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		}
 				//childActivities_mc.createChildAtDepth("Bin",DepthManager.kTop);
 				this.createEmptyMovieClip("clickTarget_mc", this.getNextHighestDepth());
-				clickTarget_mc.attachMovie("clickTarget_mc", "clickTarget_mc", this.getNextHighestDepth(), {_alpha:50});
+				clickTarget_mc.attachMovie("clickTarget_MC", "clickTarget_mc", this.getNextHighestDepth(), {_alpha:50});
 				
-				
+				//clickTarget_mc.swapDepths(this);
 				clickTarget_mc.onPress = Proxy.create(this,localOnPress);
 				clickTarget_mc.onRelease = Proxy.create(this,localOnRelease);
 				clickTarget_mc.onReleaseOutside = Proxy.create(this,localOnReleaseOutside);
@@ -128,9 +128,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 	private function draw(numOfChildren:Number){
 			
 			panelHeight = CHILD_OFFSET_Y + (numOfChildren*CHILD_INCRE);
-			if (numOfChildren <= 1){
-				panelHeight = 120;
-			}
 			setStyles()
 			
 			//write text
@@ -149,14 +146,15 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 			
 			//dimentions of container (this)
 			if (numOfChildren > 1){
-				container_pnl._height = panelHeight;
+				container_pnl._height = CHILD_OFFSET_Y + (numOfChildren*CHILD_INCRE);
+				
 			}
 			
 			if(_locked){
 				padlockClosed_mc._visible = true;
 				padlockOpen_mc._visible = false;
-				//clickTarget_mc.swapDepths(children_mc[numOfChildren-1]);
-				clickTarget_mc._height = panelHeight;
+				clickTarget_mc._height = container_pnl._height;
+				
 			}else{
 				padlockOpen_mc._visible = true;
 				padlockClosed_mc._visible = false;
