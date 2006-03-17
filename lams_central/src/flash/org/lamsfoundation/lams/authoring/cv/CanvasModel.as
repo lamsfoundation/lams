@@ -24,7 +24,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	
 	
 	private var _cv:Canvas;
-	private var _ddm:DesignDataModel;	//UI State variabls	private var _isDirty:Boolean;
+	private var _ddm:DesignDataModel;
+	//UI State variabls	private var _isDirty:Boolean;
 	private var _activeTool:String;
 	private var _selectedItem:Object;  // the currently selected thing - could be activity, transition etc.
 	private var _isDrawingTransition:Boolean;
@@ -94,8 +95,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		s.h = __height;
 		return s;
 	}
-	
-	
 	
 	/**
 	* Used by application to set the Position
@@ -795,6 +794,16 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	 * @return  
 	 */
 	public function set activeTool (newactivetool:String):Void {
+		_activeTool = newactivetool;
+	}
+	
+	/**
+	 * 
+	 * @usage   
+	 * @param   newactivetool 
+	 * @return  
+	 */
+	public function setActiveTool (newactivetool):Void {
 		_activeTool = newactivetool;
 	}
 	/**
