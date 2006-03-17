@@ -71,6 +71,14 @@ http://www.gnu.org/licenses/gpl.txt
 		<put name="content" value="/admin/usersremoveContent.jsp" />	
 		<put name="footer" value="footer.jsp"/>	
 	</definition>
+	
+	<definition name=".admin.joblist" path="/template.jsp">
+		<put name="title" value="LAMS :: List scheduled jobs in Quartz queue"/>
+		<put name="pageHeader" value="List scheduled jobs in Quartz queue"/>
+		<put name="header" value="adminHeader.jsp"/>
+		<put name="content" value="/admin/joblist.jsp" />	
+		<put name="footer" value="footer.jsp"/>	
+	</definition>
 
 	<definition name=".sysadmin" path="/template.jsp">
 		<put name="title" value="LAMS :: Maintain LAMS"/>

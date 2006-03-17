@@ -470,7 +470,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
      * Start lesson on schedule.
      * @param lessonId
      * @param startDate 
-     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#startLessonOnSchedule(long , Date)
+     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#startLessonOnSchedule(long , Date, User)
      */
     public void startLessonOnSchedule(long lessonId, Date startDate){
 
@@ -483,6 +483,9 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         JobDetail startLessonJob = getStartScheduleLessonJob();
         //setup the message for scheduling job
         startLessonJob.setName("startLessonOnSchedule:" + lessonId);
+        
+        startLessonJob.setDescription(requestedLesson.getLessonName()+":" 
+        		+ (requestedLesson.getUser() == null?"":requestedLesson.getUser().getFullName()));
         startLessonJob.getJobDataMap().put(MonitoringConstants.KEY_LESSON_ID,new Long(lessonId));
         //create customized triggers
         Trigger startLessonTrigger = new SimpleTrigger("startLessonOnScheduleTrigger:"+ lessonId,
@@ -510,7 +513,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
      * Finish lesson on schedule.
      * @param lessonId
      * @param endDate 
-     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#finishLessonOnSchedule(long , Date)
+     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#finishLessonOnSchedule(long , Date , User)
      */
 	public void finishLessonOnSchedule(long lessonId, Date endDate) {
         //we get the lesson want to finish
@@ -522,6 +525,8 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         JobDetail finishLessonJob = getFinishScheduleLessonJob();
         //setup the message for scheduling job
         finishLessonJob.setName("finishLessonOnSchedule:"+lessonId);
+        finishLessonJob.setDescription(requestedLesson.getLessonName()+":" 
+        		+ (requestedLesson.getUser() == null?"":requestedLesson.getUser().getFullName()));
         finishLessonJob.getJobDataMap().put(MonitoringConstants.KEY_LESSON_ID,new Long(lessonId));
         //create customized triggers
         Trigger finishLessonTrigger = new SimpleTrigger("finishLessonOnScheduleTrigger:"+lessonId,
@@ -576,7 +581,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
             //if it is schedule gate, we need to initialize the sheduler for it.
             if(activity.getActivityTypeId().intValue() == Activity.SCHEDULE_GATE_ACTIVITY_TYPE) {
             	ScheduleGateActivity gateActivity = (ScheduleGateActivity) activityDAO.getActivityByActivityId(activity.getActivityId());
-                runGateScheduler(gateActivity,lessonStartTime); 
+                runGateScheduler(gateActivity,lessonStartTime,requestedLesson.getLessonName()); 
             }
         //update lesson status
         }
@@ -1412,7 +1417,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
      * @param scheduleGate the gate that needs to be scheduled.
      */
     private void runGateScheduler(ScheduleGateActivity scheduleGate,
-                                  Date lessonStartTime)
+                                  Date lessonStartTime, String lessonName)
     {
     	
         if(log.isDebugEnabled())
@@ -1421,9 +1426,11 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         JobDetail closeScheduleGateJob = getCloseScheduleGateJob();
         //setup the message for scheduling job
         openScheduleGateJob.setName("openGate:" + scheduleGate.getActivityId());
+        openScheduleGateJob.setDescription(scheduleGate.getTitle()+":"+lessonName);
         openScheduleGateJob.getJobDataMap().put("gateId",scheduleGate.getActivityId());
         closeScheduleGateJob.setName("closeGate");
         closeScheduleGateJob.getJobDataMap().put("gateId",scheduleGate.getActivityId());
+        closeScheduleGateJob.setDescription(scheduleGate.getTitle()+":"+lessonName);
 
         
         //create customized triggers

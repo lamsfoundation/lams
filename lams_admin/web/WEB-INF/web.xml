@@ -222,24 +222,25 @@ http://www.gnu.org/licenses/gpl.txt
 		</taglib>
 	</jsp-config>
 
-   <!--
-   To set up security settings for your web app, create a file named web-security.xml, put it in your project's mergedir.
-   Organize web-security.xml following this DTD slice:
+  	<!--  Security Constraint -->
+	<security-constraint>
+	   	<web-resource-collection>
+	    	<web-resource-name>Secure Content</web-resource-name>
+			<url-pattern>/*</url-pattern>
+    	</web-resource-collection>
+    	<auth-constraint>
+    		<role-name>ADMIN</role-name>
+    		<role-name>SYSADMIN</role-name>
+    	</auth-constraint>
+    </security-constraint>
 
-   <!ELEMENT security-constraint (display-name?, web-resource-collection+, auth-constraint?, user-data-constraint?)>
-   <!ELEMENT web-resource-collection (web-resource-name, description?, url-pattern*, http-method*)>
-   <!ELEMENT web-resource-name (#PCDATA)>
-   <!ELEMENT url-pattern (#PCDATA)>
-   <!ELEMENT http-method (#PCDATA)>
-   <!ELEMENT user-data-constraint (description?, transport-guarantee)>
-   <!ELEMENT transport-guarantee (#PCDATA)>
-
-   <!ELEMENT login-config (auth-method?, realm-name?, form-login-config?)>
-   <!ELEMENT auth-method (#PCDATA)>
-   <!ELEMENT realm-name (#PCDATA)>
-   <!ELEMENT form-login-config (form-login-page, form-error-page)>
-   <!ELEMENT form-login-page (#PCDATA)>
-   <!ELEMENT form-error-page (#PCDATA)>
-   -->
+	<!--  Login Configuration -->
+  	<login-config>
+   		<auth-method>FORM</auth-method>
+		<realm-name>LAMS</realm-name>
+   		<form-login-config>
+    		<form-login-page>/login.jsp</form-login-page>
+   		</form-login-config>
+   	</login-config>
 
 </web-app>

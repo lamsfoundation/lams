@@ -74,6 +74,18 @@
       />
     </action>
     <action
+      path="/jobList"
+      type="org.lamsfoundation.lams.admin.web.ScheduledJobListAction"
+      unknown="false"
+      validate="true"
+    >
+      <forward
+        name="list"
+        path=".admin.joblist"
+        redirect="false"
+      />
+    </action>
+    <action
       path="/admin/organisation"
       type="org.lamsfoundation.lams.admin.web.OrganisationAction"
       name="OrganisationActionForm"

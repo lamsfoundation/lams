@@ -27,7 +27,14 @@ import org.quartz.SchedulerContext;
 import org.quartz.SchedulerException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.quartz.QuartzJobBean;
-
+/**
+ * All Quartz Job Bean super classes in monitoring. It provides a simple helper method to 
+ * get monitoringService.
+ * 
+ * @author Steve.Ni
+ * 
+ * @version $Revision$
+ */
 public abstract class MonitoringJob extends QuartzJobBean{
 	private static final String CONTEXT_NAME = "monitoringApplicationContext";
 	private static final String SERVICE_NAME = "monitoringService";
