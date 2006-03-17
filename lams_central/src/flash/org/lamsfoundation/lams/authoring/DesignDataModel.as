@@ -538,6 +538,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		for(var i=0; i<acts.length;i++){
 			if(acts[i].activityTypeID == Activity.GROUPING_ACTIVITY_TYPE){
 				gActs.push(acts[i]);
+				//trace("Grouping "+gActs[i]+" has "+ gActs[i].groupingUIID );
 			}
 		}
 		Debugger.log('Returning '+gActs.length+' grouping activities',Debugger.GEN,'getGroupingActivities','DesignDataModel');
