@@ -34,6 +34,8 @@ class Theme {
         visualElements.put(element.name,element);
     }
     
+	
+	
     /**
     * Returns reqeusted visual element
     */
@@ -62,6 +64,7 @@ class Theme {
         for (var i=0;i<hashValues.length;i++) {
             //Call toData method on each value to get the data only
             obj.visualElements[i] = hashValues[i].toData();
+			trace("Visual Elements data "+ i + " "+ obj.visualElements[i].name)
         }
         return obj;
     }
@@ -76,12 +79,17 @@ class Theme {
         //Create new instance of this
         var obj:Theme = new Theme(dataObj.name,tmpStyleObject);
         //Add the visual styles
+		//Debugger.log('VisualElement lenght : '+dataObj.visualElements.length,Debugger.HIGH,'createFromData','Theme');
         for(var i=0;i<dataObj.visualElements.length;i++){
             var tmpVisualElement:VisualElement = VisualElement.createfromData(dataObj.visualElements[i]);
+			
             obj.addVisualElement(tmpVisualElement);
+			//trace("Visual Elements "+ i + " "+obj.addVisualElement(tmpVisualElement))
         }
         return obj;
     }
+	
+		
     
 	//Getters+Setters
 	function get name():String{
