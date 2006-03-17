@@ -79,8 +79,8 @@ class ThemeManager {
             Cursor.showCursor(Application.C_DEFAULT);            
         }else {
 			//testing style creator
-			createThemeFromCode(theme);
-            //openFromServer(theme);
+			//createThemeFromCode(theme);
+            openFromServer(theme);
         }        
     }
     
@@ -140,7 +140,7 @@ class ThemeManager {
                 buttonSO.setStyle('themeColor', 0x669BF2);
                 
 				buttonSO.setStyle('fontFamily', 'Verdana');
-                buttonSO.setStyle('fontSize', 10);
+                buttonSO.setStyle('fontSize', 9);
                 buttonSO.setStyle('emphasizedStyleDeclaration', 0x669BF2);
                 
                 //Visual Element
@@ -168,6 +168,7 @@ class ThemeManager {
                 labelSO.setStyle('fontFamily', 'Verdana');
                 labelSO.setStyle('fontSize', 10);
                 labelSO.setStyle('color', 0x333648);
+				labelSO.setStyle('embedFonts', false);
                 //Visual Element
                 var labelVisualElement = new VisualElement('label',labelSO);
                 //add visual element to the default theme
@@ -201,35 +202,7 @@ class ThemeManager {
                 _theme.addVisualElement(LFWindowVisualElement);
                 //-----------------------------------------------------
 				
-				//----Scroll pane ---------------------------------------
-				/*
-				Style
-				 Theme
-				 Description
-				 
-				themeColor  Halo
-				 The base color scheme of a component. Possible values are "haloGreen", "haloBlue", and "haloOrange". The default value is "haloGreen".
-				 
-				border styles
-				 Both
-				 The ScrollPane component uses a RectBorder instance as its border and responds to the styles defined on that class. See RectBorder class.
-				
-				
-				The default border style is "inset".
-				 
-				scrollTrackColor  Sample
-				 The background color for the scroll track. The default value is 0xCCCCCC (light gray).
-				 
-				symbolColor  Sample
-				 The color of the check mark. The default value is 0x000000 (black). 
-				 
-				symbolDisabledColor  Sample
-				  The color of the disabled check mark. The default value is 0x848384 (dark gray). 
- 
-
-
-				*/
-                //Style object
+				//Style object
                 var spSO = new mx.styles.CSSStyleDeclaration();
                 spSO.setStyle('themeColor', 0x669BF2);
                 //Visual Element
@@ -285,6 +258,7 @@ class ThemeManager {
                 smlLabelSO.setStyle('fontFamily', 'Tahoma');
                 smlLabelSO.setStyle('fontSize', 9);
                 smlLabelSO.setStyle('color', 0x333648);
+				
                 //Visual Element
                 var smlLabelVisualElement = new VisualElement('smlLabel',smlLabelSO);
                 //add visual element to the default theme
@@ -330,7 +304,19 @@ class ThemeManager {
                 //add visual element to the default TAPanelVisualElement
                 _theme.addVisualElement(BGPanelVisualElement);
                 //------------------------------------------------------
-			
+				
+				//----ACTPanel-------------------------------------------
+                //Style object
+                var ACTPanelSO = new mx.styles.CSSStyleDeclaration();
+				ACTPanelSO.setStyle('borderStyle', 'none');
+				ACTPanelSO.setStyle('backgroundColor', 0xC2D5FE);
+				
+                //Visual Element
+			var ACTPanelVisualElement = new VisualElement('ACTPanel',ACTPanelSO);
+                //add visual element to the default ACTPanelVisualElement
+                _theme.addVisualElement(ACTPanelVisualElement);
+                //------------------------------------------------------
+				
 				//----TAPanel-------------------------------------------
                 //Style object
                 var TAPanelSO = new mx.styles.CSSStyleDeclaration();
@@ -359,6 +345,8 @@ class ThemeManager {
                 _theme.addVisualElement(CAPanelVisualElement);
                 //------------------------------------------------------
 				
+				
+				
                 //----LFBUTTON----------------------------------------------
                 //NOTE:This style is used in conjunction with LFButtonSkin class. For usage, see common.style.LFButtonSkin.as
                 //Style object
@@ -380,156 +368,6 @@ class ThemeManager {
                 */
                 //----------------------------------------------------------
                 break;
-            case 'lime' :
-                //Base style object for 'default' theme
-                var baseStyleObj = new mx.styles.CSSStyleDeclaration();
-                baseStyleObj.setStyle('color', 0x333648);
-                baseStyleObj.setStyle('themeColor', 0xBFFFBF);
-                baseStyleObj.setStyle('borderStyle', 'inset');
-                
-                //Create default theme
-                _theme = new Theme('lime',baseStyleObj);
-        
-                //----BUTTON------------------------------------------------
-                //Style object
-                var buttonSO = new mx.styles.CSSStyleDeclaration();
-                buttonSO.setStyle('fontFamily', '_sans');
-                buttonSO.setStyle('fontSize', 10);
-                buttonSO.setStyle('color', 0x333648);
-                buttonSO.setStyle('themeColor', 0xBFFFBF);
-                buttonSO.setStyle('emphasizedStyleDeclaration', 0x669BF2);
-                
-                //Visual Element
-                var buttonVisualElement = new VisualElement('button',buttonSO);
-                //add visual element to the default theme
-                _theme.addVisualElement(buttonVisualElement);
-                //----------------------------------------------------------
-        
-                //----LABEL-------------------------------------------------
-                //Style object
-                var labelSO = new mx.styles.CSSStyleDeclaration();
-                labelSO.setStyle('fontFamily', '_sans');
-                labelSO.setStyle('fontSize', 14);
-                labelSO.setStyle('color', 0x007300);
-                //Visual Element
-                var labelVisualElement = new VisualElement('label',labelSO);
-                //add visual element to the default theme
-                _theme.addVisualElement(labelVisualElement);
-                //--------------------------------------------------------
-                
-                //----LFWINDOW--------------------------------------------
-                //Style object
-                var LFWindowSO = new mx.styles.CSSStyleDeclaration();
-                LFWindowSO.setStyle('fontFamily', '_sans');
-                LFWindowSO.setStyle('fontSize', 14);
-                LFWindowSO.setStyle('color', 0x333648);
-                LFWindowSO.setStyle('themeColor', 0x669BF2);
-                LFWindowSO.setStyle('borderStyle', 'inset');
-                //Visual Element
-                var LFWindowVisualElement = new VisualElement('LFWindow',LFWindowSO);
-                //add visual element to the default theme
-                _theme.addVisualElement(LFWindowVisualElement);
-                //-----------------------------------------------------
-        
-                //----TREE VIEW ---------------------------------------
-                //Style object
-                var treeviewSO = new mx.styles.CSSStyleDeclaration();
-                treeviewSO.setStyle('fontFamily', '_sans');
-                treeviewSO.setStyle('fontSize', 14);
-                treeviewSO.setStyle('color', 0x333648);
-                treeviewSO.setStyle('themeColor', 0xBFFFBF);
-                //treeviewSO.setStyle('rollOverColor', 0xC4C7D5);
-                treeviewSO.setStyle('openEasing', 'Elastic');
-                //Visual Element
-                var treeviewVisualElement = new VisualElement('treeview',treeviewSO);
-                //add visual element to the default theme
-                _theme.addVisualElement(treeviewVisualElement);
-                //------------------------------------------------------
-                
-                //----DATA GRID------------------------------------------
-                //Style object
-                var datagridSO = new mx.styles.CSSStyleDeclaration();
-                datagridSO.setStyle('fontFamily', '_sans');
-                datagridSO.setStyle('fontSize', 14);
-                datagridSO.setStyle('color', 0x333648);
-                datagridSO.setStyle('themeColor', 0x669BF2);
-                //datagridSO.setStyle('rollOverColor', 0xC4C7D5);
-                datagridSO.setStyle('openEasing', 'Elastic');
-                //Visual Element
-                var datagridVisualElement = new VisualElement('datagrid',datagridSO);
-                //add visual element to the default theme
-                _theme.addVisualElement(datagridVisualElement);
-                //------------------------------------------------------
-        
-        
-                //----COMBO------------------------------------------
-                //Style object
-                var comboSO = new mx.styles.CSSStyleDeclaration();
-                comboSO.setStyle('fontFamily', '_sans');
-                comboSO.setStyle('fontSize', 14);
-                comboSO.setStyle('color', 0x333648);
-                comboSO.setStyle('themeColor', 0xBFFFBF);
-                comboSO.setStyle('openEasing', Elastic.easeOut);
-                //Visual Element
-                var comboVisualElement = new VisualElement('combo',comboSO);
-                //add visual element to the default theme
-                _theme.addVisualElement(comboVisualElement);
-                //------------------------------------------------------
-        
-                //----LF MENU-------------------------------------------
-                //Style object
-                var lfMenuSO = new mx.styles.CSSStyleDeclaration();
-                lfMenuSO.setStyle('fontFamily', '_sans');
-                lfMenuSO.setStyle('fontSize', 14);
-                lfMenuSO.setStyle('color', 0x333648);
-                lfMenuSO.setStyle('themeColor', 0x669BF2);
-                lfMenuSO.setStyle('openEasing', Elastic.easeOut);
-                //Visual Element
-                var lfMenuVisualElement = new VisualElement('LFMenuBar',lfMenuSO);
-                //add visual element to the default theme
-                _theme.addVisualElement(lfMenuVisualElement);
-                //------------------------------------------------------
-        
-                //----LFBUTTON----------------------------------------------
-                //NOTE:This style is used in conjunction with LFButtonSkin class. For usage, see common.style.LFButtonSkin.as
-                //Style object
-                var LFButtonSO = new mx.styles.CSSStyleDeclaration();
-                LFButtonSO.setStyle('fontFamily', 'Tahoma');
-                LFButtonSO.setStyle('fontSize', 10);
-                LFButtonSO.setStyle('color', 0xff0000);
-                LFButtonSO.setStyle('themeColor', 0xff0000);
-                LFButtonSO.setStyle('borderStyle', 'outset');
-                //Custom LAMS styles
-                LFButtonSO.setStyle('up', 0xCCCCCC);
-                LFButtonSO.setStyle('over', 0xFAF270);
-                LFButtonSO.setStyle('down', 0xccff3c);
-                //Visual Element
-                var LFButtonVisualElement = new VisualElement('LFButton',LFButtonSO);
-                //add visual element to the default theme
-                _theme.addVisualElement(LFButtonVisualElement);
-                //----------------------------------------------------------
-                break;
-            case 'ruby' :
-                //Base style object for 'default' theme
-                var baseStyleObj = new mx.styles.CSSStyleDeclaration();
-                baseStyleObj.setStyle('fontFamily', '_sans');
-                baseStyleObj.setStyle('fontSize', 10);
-                baseStyleObj.setStyle('color', 0xBE0101);
-                baseStyleObj.setStyle('themeColor', 0xFF0000);
-                baseStyleObj.setStyle('borderStyle', 'outset');
-
-                //Create default theme
-                _theme = new Theme('ruby',baseStyleObj);
-        
-                //----BUTTON------------------------------------------------
-                //Style object
-                var buttonSO = new mx.styles.CSSStyleDeclaration();
-                buttonSO.setStyle('color', 0x6D78D1);
-                
-                //Visual Element
-                var buttonVisualElement = new VisualElement('button',buttonSO);
-                //add visual element to the default theme
-                _theme.addVisualElement(buttonVisualElement);
             default:        
         }
         
@@ -545,8 +383,10 @@ class ThemeManager {
 	
 	private function setGlobalDefaults():Void{
 		//go throughu the _theme and set the _global styles
-		_global.styles.Label.setStyle('styleName',getStyleObject('label'));
-		
+		//_global.styles.Label.setStyle('styleName',getStyleObject('label'));
+		var BGPanelVisualElement = new VisualElement('BGPanel',getStyleObject('BGPanel'));
+		//add visual element to the default theme
+		_theme.addVisualElement(BGPanelVisualElement);
 		
 	}
     
@@ -580,7 +420,7 @@ class ThemeManager {
         //TODO DI 06/05/05 implement, for now just return style for visual element
 
         //Get base style object theme + overwrite properties with ones in visual element for selected theme if found 
-        //var baseSO = _theme.baseStyleObject;
+        var baseSO = _theme.baseStyleObject;
 		
 		
 
@@ -592,8 +432,8 @@ class ThemeManager {
 			Debugger.log('Visual element "'+visualElementId+'" not found, returning default',Debugger.HIGH,'getStyleObject','ThemeManager');
 			return _theme.getVisualElement(visualElementId).styleObject;
 		}
-/*		
-* //this bit is v.inefficent, seems to crash player - esp in toolkit
+		
+ //this bit is v.inefficent, seems to crash player - esp in toolkit
 		
         //Was it found?
         if(visualElement) {
@@ -612,7 +452,7 @@ class ThemeManager {
             }  
             
             //Convert back
-            baseSO = dataToStyleObject(baseSO);
+            baseSO = dataToStyleObject(customSO);
 			
 			
         }
@@ -620,7 +460,7 @@ class ThemeManager {
         //Construct style object by superimposing base style and visua
         return baseSO;
 		
-		*/
+		
     }
     
     /**
@@ -642,6 +482,8 @@ class ThemeManager {
     */
     public function createFromData(dataObj):Object{
         _theme = Theme.createFromData(dataObj);
+		
+		Debugger.log('Theme data: '+_theme+' found, returning'+dataObj,Debugger.HIGH,'getStyleObject','ThemeManager');
 		//New theme loaded so dispatch a load event
         dispatchEvent({type:'load',target:this});
         return this;
@@ -667,6 +509,37 @@ class ThemeManager {
         createFromData(dataObj);
     }
     
+	public static function DecToHex(number:Number):String {
+		//converts dec to integer
+		var I:Number = Math.floor(number);
+		//hexadecimal array
+		var hex:Array = ("0123456789ABCDEF").split("");
+		
+		//internal use
+		var res:String = "";
+		var count:Number = 0;
+		
+		while(I >= 16){
+		I/=16;
+		count++;
+		}
+		for(var n:Number=count; n>0; n--){
+		res += hex[Math.floor(I)];
+		I = (I-Math.floor(I))*16;
+		}
+		
+		res += hex[I];
+		/* WARNING SECTION - Can be removed */
+		//warns if given dec was not integer
+		//dec was converted to integer
+		//if(this != Math.floor(this)){
+		//trace("Warning: Given number "+this+" was not integer.");
+		//trace(" Integer "+Math.floor(this)+" was used instead.");
+		//}
+		/* ENDS WARNING SECTION */
+		
+		return res;
+		}
     /**
      * Converts style object to a data format that can be serialized
      * @param   so - an MX style object
@@ -681,6 +554,8 @@ class ThemeManager {
             if(typeof(so[prop])!='function'){
                 //Assign style object property to object property of same name
                 obj[prop] = so.getStyle(String(prop));  
+				
+				Debugger.log('From XML Theme data : '+prop+' found, returning'+so.getStyle(prop),Debugger.HIGH,'getStyleObject','ThemeManager');
             }
         }
         return obj;
@@ -693,11 +568,21 @@ class ThemeManager {
     * @return  
     */
     public static function dataToStyleObject(dataObj:Object):mx.styles.CSSStyleDeclaration{
+		
+		
         //Create Style Object
         var so = new mx.styles.CSSStyleDeclaration();     
         //Parse data object and copy over properties
         for(var prop in dataObj) {
-            so.setStyle(String(prop),dataObj[prop]);
+			//if (dataObj[prop] 
+			if (typeof(dataObj[prop])=='number'){
+				var dataVal = DecToHex(dataObj[prop])
+				so.setStyle(String(prop), 0+"\x"+dataVal);
+				trace("style parsed for "+String(prop)+ " is: "+0+"\x"+dataVal)
+			}else {
+				so.setStyle(String(prop), dataObj[prop]);
+				trace("style parsed for "+String(prop)+ " is: "+dataObj[prop])
+			}
         }
         return so;
     }    
