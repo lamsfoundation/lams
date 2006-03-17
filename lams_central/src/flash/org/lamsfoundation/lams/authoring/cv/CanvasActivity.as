@@ -4,8 +4,12 @@ import org.lamsfoundation.lams.common.util.ui.*;
 import org.lamsfoundation.lams.authoring.*;
 import org.lamsfoundation.lams.authoring.cv.*;
 import org.lamsfoundation.lams.common.style.*
-import com.polymercode.Draw;
 
+import com.polymercode.Draw;
+import mx.managers.*
+import mx.containers.*;
+import mx.events.*
+import mx.utils.*
 
 /**  
 * CanvasActivity - 
@@ -28,10 +32,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	private var _activity:Activity;
 	
 	private var _isSelected:Boolean;
-	
+	private var app:Application;
 	//locals
 	private var icon_mc:MovieClip;
 	private var icon_mcl:MovieClipLoader;
+	private var bkg_pnl:MovieClip;
+	private var act_pnl:MovieClip;
 	private var title_lbl:MovieClip;
 	private var groupIcon_mc:MovieClip;
 	private var stopSign_mc:MovieClip;	
@@ -49,6 +55,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	function CanvasActivity(){
 		//Debugger.log("_activity:"+_activity.title,4,'Constructor','CanvasActivity');
 		_tm = ThemeManager.getInstance();
+		//Get reference to application and design data model
+		app = Application.getInstance();
 		//let it wait one frame to set up the components.
 		//this has to be set b4 the do later :)
 		if(_activity.isGateActivity()){
@@ -93,6 +101,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	private function showAssets(isVisible:Boolean){
 		groupIcon_mc._visible = isVisible;
 		title_lbl._visible = isVisible;
+		act_pnl._visible = isVisible;
 		icon_mc._visible = isVisible;
 		stopSign_mc._visible = isVisible;
 		canvasActivity_mc._visible = isVisible;
@@ -187,7 +196,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	 * @return  
 	 */
 	private function draw(){		Debugger.log(_activity.title+',_activity.isGateActivity():'+_activity.isGateActivity(),4,'draw','CanvasActivity');
-		
+		setStyles();
 		
 		var theIcon_mc:MovieClip;
 		title_lbl._visible = true;
@@ -197,7 +206,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		if(_activity.isGateActivity()){
 			stopSign_mc._visible = true;
 			canvasActivity_mc._visible=false;
-			title_lbl.visible=false;
+			title_lbl._visible=false;
+			act_pnl._visible = false;
 			clickTarget_mc._width = CanvasActivity.GATE_ACTIVITY_WIDTH;
 			clickTarget_mc._height= CanvasActivity.GATE_ACTIVITY_HEIGHT;
 			stopSign_mc._height= CanvasActivity.GATE_ACTIVITY_HEIGHT;
@@ -271,11 +281,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			var now:Number = new Date().getTime();
 			
 			if((now - _dcStartTime) <= Config.DOUBLE_CLICK_DELAY){
-				//Debugger.log('DoubleClicking:'+this,Debugger.GEN,'onPress','CanvasActivity');
-				_doubleClicking = true;
-				_canvasController.activityDoubleClick(this);
-				
-				
+				//Debugger.log('DoubleClicking: '+_canvasModel.activeTool,Debugger.GEN,'onPress','CanvasActivity');
+				if (app.controlKeyPressed != "transition"){
+					_doubleClicking = true;
+					_canvasController.activityDoubleClick(this);
+				}
 				/*
 				if(workspaceRef.inspecting){
 			// click to zoom in / zoom out
@@ -287,7 +297,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 				*/
 				
 			}else{
-				//Debugger.log('SingleClicking:+'+this,Debugger.GEN,'onPress','CanvasActivity');
+				Debugger.log('SingleClicking:+'+this,Debugger.GEN,'onPress','CanvasActivity');
 				_doubleClicking = false;
 				
 				//Debugger.log('_canvasController:'+_canvasController,Debugger.GEN,'onPress','CanvasActivity');
@@ -321,7 +331,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	
 	private function onRelease():Void{
 		if(!_doubleClicking){
-			//Debugger.log('Releasing:'+this,Debugger.GEN,'onRelease','CanvasActivity');
+			Debugger.log('Releasing:'+this,Debugger.GEN,'onRelease','CanvasActivity');
 								
 			_canvasController.activityRelease(this);
 		}
@@ -329,7 +339,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	}
 	
 	private function onReleaseOutside():Void{
-		//Debugger.log('ReleasingOutside:'+this,Debugger.GEN,'onReleaseOutside','CanvasActivity');
+		Debugger.log('ReleasingOutside:'+this,Debugger.GEN,'onReleaseOutside','CanvasActivity');
 
 		_canvasController.activityReleaseOutside(this);
 	}
@@ -386,11 +396,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		
 		title_lbl.setStyle('styleName',styleObj);
 		title_lbl.setStyle('textAlign', 'center');
-		//title_lbl.setStyle('textAlign','center');
 		
-		
-		
-		
+		styleObj = _tm.getStyleObject('ACTPanel')
+		act_pnl.setStyle('styleName',styleObj);
+			
     }
     
 
