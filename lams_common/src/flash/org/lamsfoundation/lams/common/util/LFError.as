@@ -32,6 +32,7 @@ class LFError extends Error{
   public function showErrorAlert(okHandler){
 	title = Dictionary.getValue('al_alert')
 	var a:Alert;
+	Alert.okLabel = Dictionary.getValue('al_ok');
 	if(okHandler != undefined){
 		
 		//TODO: Fix the problem of size calculation with icons
@@ -55,6 +56,8 @@ class LFError extends Error{
 	var alt:Alert;
 	var customTitle = Dictionary.getValue(msgTitle)
 	var handlerObj = new Object();
+	Alert.okLabel = Dictionary.getValue('al_ok');
+	Alert.cancelLabel = Dictionary.getValue('al_cancel');
 	handlerObj.click = function(e){
 		if(e.detail == Alert.OK){
 			okHandler();
