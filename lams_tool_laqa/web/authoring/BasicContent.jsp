@@ -64,7 +64,9 @@ http://www.gnu.org/licenses/gpl.txt
                                      <div>
                                          <a href="javascript:doTextToHTML('Title'); doWYSWYGEdit('Title','small')"><font size=2> <b> <bean:message key="label.openEditor"/></a>
                                      </div>
-                                     <textarea class="smallTextareaPanel" name="title" id="txTitle.textarea"><c:out value="${QaAuthoringForm.title}" escapeXml="false" /></textarea>
+                                     <textarea class="smallTextareaPanel" name="title" id="txTitle.textarea">
+	                                     <c:out value="${QaAuthoringForm.title}" escapeXml="false"/>
+                                     </textarea>
                                  </span>
                                 
 							</td> 
@@ -82,7 +84,9 @@ http://www.gnu.org/licenses/gpl.txt
                                     <div>
                                         <a href="javascript:doTextToHTML('Instructions'); doWYSWYGEdit('Instructions')"><font size=2> <b><bean:message key="label.openEditor"/></a>
                                     </div>
-                                    <textarea class="textareaPanel" name="instructions" id="txInstructions.textarea"><c:out value="${QaAuthoringForm.instructions}" escapeXml="false" /></textarea>
+                                    <textarea class="textareaPanel" name="instructions" id="txInstructions.textarea">
+	                                    <c:out value="${QaAuthoringForm.instructions}" escapeXml="false"/>
+                                    </textarea>
                                 </span>
 							</td>
 						</tr>

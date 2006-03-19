@@ -312,7 +312,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    	    
 	    /*
 	     * The content we retrieved above must have been created before in Authoring time. 
-	     * And the passed tool session id already refers to it.
+	     * And the passed tool session id refers to it.
 	     */
 	    
 	    logger.debug("ACTIVITY_TITLE: " + qaContent.getTitle());
@@ -395,8 +395,6 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 			teacher
 			learner
 		*/
-    	/* ? CHECK THIS: how do we determine whether preview is requested? Mode is not enough on its own.*/
-	    
 	    /*handling PREVIEW mode*/
 	    String mode=(String) request.getSession().getAttribute(LEARNING_MODE);
 	    logger.debug("mode: " + mode);
@@ -405,7 +403,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
     		logger.debug("Author requests for a preview of the content.");
 			logger.debug("existing qaContent:" + qaContent);
 			
-			/* overwrite qiestionListing mode for preview*/
+			/* overwrite questionListing mode for preview*/
 			request.getSession().setAttribute(QUESTION_LISTING_MODE, QUESTION_LISTING_MODE_PREVIEW);
 			logger.debug("forwarding to for preview: " + LOAD_LEARNER);
 			return (mapping.findForward(LOAD_LEARNER));	
@@ -509,24 +507,21 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 		/*
 	     * obtain and setup the current user's data 
 	     */
-		
+
 	    String userID = "";
-	    /* get session from shared session.*/
 	    HttpSession ss = SessionManager.getSession();
-	    /* get back login user DTO*/
-	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	    if ((user == null) || (user.getUserID() == null))
-	    {
-	    	QaUtils.cleanUpSessionAbsolute(request);
-	    	logger.debug("error: The tool expects userId");
-	    	request.getSession().setAttribute(USER_EXCEPTION_USER_DOESNOTEXIST, new Boolean(true).toString());			
-	    	persistError(request,"error.learningUser.notAvailable");
-			return (mapping.findForward(ERROR_LIST_LEARNER));
-	    }else
-	    	userID = user.getUserID().toString();
+	    logger.debug("ss: " + ss);
 	    
-	    logger.debug("retrieved userId: " + userID);
-    	request.getSession().setAttribute(USER_ID, userID);
+	    if (ss != null)
+	    {
+		    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+		    if ((user != null) || (user.getUserID() != null))
+		    {
+		    	userID = user.getUserID().toString();
+			    logger.debug("retrieved userId: " + userID);
+		    	request.getSession().setAttribute(USER_ID, userID);
+		    }
+	    }
 		
 	    
 	    /*

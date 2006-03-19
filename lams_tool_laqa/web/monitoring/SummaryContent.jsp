@@ -40,7 +40,7 @@ http://www.gnu.org/licenses/gpl.txt
 	</c:if>					
 	
 	<div id="datatablecontainer">
-		<c:if test="${(userExceptionNoStudentActivity == 'true') || (userExceptionNoToolSessions == 'true') }"> 	
+		<c:if test="${(userExceptionNoToolSessions == 'true')}"> 	
 				<table class="forms" align="center">
 					<tr> 
 						<td NOWRAP valign=top align=center> 
@@ -51,7 +51,7 @@ http://www.gnu.org/licenses/gpl.txt
 		</c:if>			
 					
 
-		<c:if test="${(userExceptionNoStudentActivity != 'true')  && (userExceptionNoToolSessions  != 'true') }"> 	
+		<c:if test="${(userExceptionNoToolSessions != 'true') }"> 	
 			<html:hidden property="selectedToolSessionId"/>							
 			<input type="hidden" name="isToolSessionChanged"/>
 				<table class="forms">

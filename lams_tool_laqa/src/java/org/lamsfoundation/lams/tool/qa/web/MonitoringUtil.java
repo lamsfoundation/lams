@@ -76,8 +76,6 @@ public class MonitoringUtil implements QaAppConstants{
 	
 	return true;
 	}
-	
-	
 
 	
 	/**
@@ -548,7 +546,8 @@ public class MonitoringUtil implements QaAppConstants{
 		logger.debug("final mapMonitoredUserContainerDTO:..." + mapMonitoredUserContainerDTO);
 		return mapMonitoredUserContainerDTO;
 	}
-
+	
+	
 	public static Map convertToMcMonitoredUserDTOMap(List list)
 	{
 		logger.debug("using convertToQaMonitoredUserDTOMap: " + list);

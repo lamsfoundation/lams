@@ -143,7 +143,6 @@ import java.util.TreeMap;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.Globals;
@@ -162,8 +161,6 @@ import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.QaUtils;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
-import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
@@ -239,23 +236,6 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		String sourceMcStarter = (String) request.getAttribute(SOURCE_MC_STARTER);
 		logger.debug("sourceMcStarter: " + sourceMcStarter);
 		
-		
-	    /*
-	     * obtain and setup the current user's data 
-	     * get session from shared session. */
-	   
-		HttpSession ss = SessionManager.getSession();
-	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	    if ((user == null) || (user.getUserID() == null))
-	    {
-	    	QaUtils.cleanUpSessionAbsolute(request);
-	    	logger.debug("error: The tool expects userId");
-	    	request.getSession().setAttribute(USER_EXCEPTION_USER_DOESNOTEXIST, new Boolean(true).toString());	    	
-	    	persistError(request,"error.authoringUser.notAvailable");
-			logger.debug("forwarding to: " + ERROR_LIST);
-			return (mapping.findForward(ERROR_LIST));
-	    }
-	    
 	    ActionForward validateSignature=readSignature(request,mapping);
 		logger.debug("validateSignature:  " + validateSignature);
 		if (validateSignature != null)
@@ -349,6 +329,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
         
 		if (!existsContent(new Long(strToolContentId).longValue(), qaService)) 
 		{
+			logger.debug("getting default content");
 			/*fetch default content*/
 			String defaultContentIdStr=(String) request.getSession().getAttribute(DEFAULT_CONTENT_ID_STR);
 			logger.debug("defaultContentIdStr:" + defaultContentIdStr);
@@ -356,10 +337,11 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		}
         else
         {
+        	logger.debug("getting existing content");
         	/* it is possible that the content is in use by learners.*/
         	QaContent qaContent=qaService.loadQa(new Long(strToolContentId).longValue());
         	logger.debug("qaContent: " + qaContent);
-        	if (qaService.studentActivityOccurred(qaContent))
+        	if (qaService.studentActivityOccurredGlobal(qaContent))
     		{
         		QaUtils.cleanUpSessionAbsolute(request);
     			logger.debug("student activity occurred on this content:" + qaContent);
@@ -411,6 +393,15 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		QaUtils.setDefaultSessionAttributes(request, qaContent, qaAuthoringForm);
         QaUtils.populateUploadedFilesData(request, qaContent, qaService);
 	    request.getSession().setAttribute(IS_DEFINE_LATER, new Boolean(qaContent.isDefineLater()));
+	    
+	    
+		qaAuthoringForm.setTitle(qaContent.getTitle());
+		qaAuthoringForm.setInstructions(qaContent.getInstructions());
+		request.getSession().setAttribute(ACTIVITY_TITLE, qaContent.getTitle());
+		request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, qaContent.getInstructions());
+		
+		logger.debug("Title is: " + qaContent.getTitle());
+		logger.debug("Instructions is: " + qaContent.getInstructions());
 	    
 	    
 	    /*

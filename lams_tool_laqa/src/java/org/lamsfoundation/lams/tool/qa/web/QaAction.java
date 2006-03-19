@@ -226,10 +226,10 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants
         
         
         /*to remove deleted entries in the questions table based on mapQuestionContent */
-        authoringUtil.removeRedundantQuestions(mapQuestionContent, qaService, qaAuthoringForm);
+        authoringUtil.removeRedundantQuestions(mapQuestionContent, qaService, qaAuthoringForm, request);
         logger.debug("end of removing unused entries... ");
         
-        QaContent qaContent=authoringUtil.saveOrUpdateQaContent(mapQuestionContent, qaService, qaAuthoringForm);
+        QaContent qaContent=authoringUtil.saveOrUpdateQaContent(mapQuestionContent, qaService, qaAuthoringForm, request);
         logger.debug("qaContent: " + qaContent);
         
         authoringUtil.reOrganizeDisplayOrder(mapQuestionContent, qaService, qaAuthoringForm, qaContent);
@@ -397,6 +397,15 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants
      	     	
      	String toolContentId=qaAuthoringForm.getToolContentId();
      	logger.debug("toolContentId: " + toolContentId);
+     	if ((toolContentId== null) || toolContentId.equals(""))
+     	{
+     		logger.debug("getting toolContentId from session.");
+     		Long longToolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+     		toolContentId=longToolContentId.toString();
+     		logger.debug("toolContentId: " + toolContentId);
+     	}
+    	
+     	
 		QaUtils.setDefineLater(request, true, toolContentId);
 		
 		logger.debug("forwarding to : " + LOAD_QUESTIONS);

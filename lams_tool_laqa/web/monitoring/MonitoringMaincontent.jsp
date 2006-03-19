@@ -219,17 +219,6 @@ http://www.gnu.org/licenses/gpl.txt
 		        <c:otherwise> 
 						<div class="tabbody content_b" >
 							<jsp:include page="/monitoring/SummaryContent.jsp" />
-								<table align=right> 	  
-									<tr>   
-										<td NOWRAP>
-											<font size=2>
-												<html:submit onclick="javascript:submitMethod('doneMonitoring');" styleClass="button">
-													<bean:message key="button.done"/>
-												</html:submit>	 				 		  					
-											</font>
-										</td>
-									</tr> 
-								</table>
 						</div>		         							
 		        </c:otherwise>
 		</c:choose>

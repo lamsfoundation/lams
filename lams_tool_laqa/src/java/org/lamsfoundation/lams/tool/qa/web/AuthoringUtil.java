@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
@@ -158,7 +159,7 @@ public class AuthoringUtil implements QaAppConstants {
     }
 
 
-    public QaContent saveOrUpdateQaContent(Map mapQuestionContent, IQaService qaService, QaAuthoringForm qaAuthoringForm)
+    public QaContent saveOrUpdateQaContent(Map mapQuestionContent, IQaService qaService, QaAuthoringForm qaAuthoringForm, HttpServletRequest request)
     {
         UserDTO toolUser = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
         
@@ -182,59 +183,118 @@ public class AuthoringUtil implements QaAppConstants {
         String usernameVisible = qaAuthoringForm.getUsernameVisible();
         logger.debug("usernameVisible: " + usernameVisible);
         
+        boolean setCommonContent=true; 
+        if ((questionsSequenced == null) || (synchInMonitor == null) || (usernameVisible == null))
+        {
+        	setCommonContent=false;
+        }
+        logger.debug("setCommonContent: " + setCommonContent);
+		
+        String activeModule=(String)request.getSession().getAttribute(ACTIVE_MODULE);
+        logger.debug("activeModule: " + activeModule);
+
         boolean questionsSequencedBoolean=false;
-        if (questionsSequenced.equalsIgnoreCase(ON))
-        	questionsSequencedBoolean=true;
-        
         boolean synchInMonitorBoolean=false;
-        if (synchInMonitor.equalsIgnoreCase(ON))
-        	synchInMonitorBoolean=true;
-        
         boolean usernameVisibleBoolean=false;
-        if (usernameVisible.equalsIgnoreCase(ON))
-        	usernameVisibleBoolean=true;
-        
-        long userId = toolUser.getUserID().longValue();
-        
-        
-        QaContent qa = qaService.loadQa(Long.parseLong(qaAuthoringForm.getToolContentId()));
-        if(qa==null)
-            qa = new QaContent();
+        if (setCommonContent)
+        {
+            if (questionsSequenced.equalsIgnoreCase(ON))
+            	questionsSequencedBoolean=true;
             
-        qa.setTitle(richTextTitle);
-        qa.setInstructions(richTextInstructions);
-        qa.setUpdateDate(new Date(System.currentTimeMillis())); /**keep updating this one*/
-        qa.setCreatedBy(userId); /**make sure we are setting the userId from the User object above*/
-        qa.setUsernameVisible(isUsernameVisible);
-        qa.setQuestionsSequenced(isQuestionsSequenced); /**the default question listing in learner mode will be all in the same page*/
-        qa.setSynchInMonitor(isSynchInMonitor);
-        qa.setOnlineInstructions(richTextOnlineInstructions);
-        qa.setOfflineInstructions(richTextOfflineInstructions);
-        qa.setEndLearningMessage(endLearningMessage);
-        qa.setReportTitle(reportTitle);
-        qa.setMonitoringReportTitle(monitoringReportTitle);
-        qa.setUsernameVisible(usernameVisibleBoolean);
-        qa.setQuestionsSequenced(questionsSequencedBoolean);
-        qa.setSynchInMonitor(synchInMonitorBoolean);
-    
-        /**
-         * TODO: right now the code simply remove all the questions and recreate them.
-         *       Ideally, when existing questions changed it should be updated accordingly
-         *       and when new questions is added it should be created in the in the database.  
-         */
+            if (synchInMonitor.equalsIgnoreCase(ON))
+            	synchInMonitorBoolean=true;
             
-        if(qa.getQaContentId() == null){
-            qa.setQaContentId(new Long(qaAuthoringForm.getToolContentId()));
-            logger.debug("will create: " + qa);
-            qaService.createQa(qa);
+            
+            if (usernameVisible.equalsIgnoreCase(ON))
+            	usernameVisibleBoolean=true;
+        }
+        
+        
+        long userId=0;
+        if (toolUser != null)
+        {
+        	userId = toolUser.getUserID().longValue();	
         }
         else
         {
-        	logger.debug("will update: " + qa);
-            qaService.updateQa(qa);
+    		HttpSession ss = SessionManager.getSession();
+    		logger.debug("ss: " + ss);
+    		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+    		logger.debug("user" + user);
+    		if (user != null)
+    		{
+    			userId = user.getUserID().longValue();	
+    		}
+    		else
+    		{
+    			logger.debug("should not reach here");
+    			userId=0;
+    		}
+        }
+        logger.debug("userId: " + userId);
+        
+        
+        String toolContentId=qaAuthoringForm.getToolContentId();
+    	logger.debug("toolContentId:  " + toolContentId);
+     	if ((toolContentId == null) || toolContentId.equals(""))
+     	{
+     		logger.debug("getting toolContentId from session.");
+     		Long longToolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+     		toolContentId=longToolContentId.toString();
+     		logger.debug("toolContentId: " + toolContentId);
+     	}
+     	logger.debug("final toolContentId: " + toolContentId);
+     	QaContent qaContent=qaService.loadQa(new Long(toolContentId).longValue());
+     	logger.debug("qaContent: " + qaContent);
+     	
+     	boolean newContent=false;
+        if(qaContent == null)
+        {
+        	qaContent = new QaContent();
+        	newContent=true;
+        }
+
+
+    	logger.debug("setting common content values...");
+    	qaContent.setQaContentId(new Long(toolContentId));
+     	qaContent.setTitle(richTextTitle);
+     	qaContent.setInstructions(richTextInstructions);
+     	qaContent.setUpdateDate(new Date(System.currentTimeMillis())); /**keep updating this one*/
+     	qaContent.setCreatedBy(userId); /**make sure we are setting the userId from the User object above*/
+
+     	
+        if ((!activeModule.equals(DEFINE_LATER)) && (setCommonContent))
+		{
+        	logger.debug("setting other content values...");
+         	qaContent.setUsernameVisible(isUsernameVisible);
+         	qaContent.setQuestionsSequenced(isQuestionsSequenced); /**the default question listing in learner mode will be all in the same page*/
+         	qaContent.setSynchInMonitor(isSynchInMonitor);
+         	qaContent.setOnlineInstructions(richTextOnlineInstructions);
+         	qaContent.setOfflineInstructions(richTextOfflineInstructions);
+         	qaContent.setEndLearningMessage(endLearningMessage);
+         	qaContent.setReportTitle(reportTitle);
+         	qaContent.setMonitoringReportTitle(monitoringReportTitle);
+         	qaContent.setUsernameVisible(usernameVisibleBoolean);
+         	qaContent.setQuestionsSequenced(questionsSequencedBoolean);
+         	qaContent.setSynchInMonitor(synchInMonitorBoolean);	
+		}
+        
+	
+ 
+        if (newContent)
+        {
+        	logger.debug("will create: " + qaContent);
+         	qaService.createQa(qaContent);
+        }
+        else
+        {
+        	logger.debug("will update: " + qaContent);
+            qaService.updateQa(qaContent);
         }
         
-        QaContent qaContent=qaService.loadQa(new Long(qaAuthoringForm.getToolContentId()).longValue());
+        qaContent=qaService.loadQa(new Long(toolContentId).longValue());
+     	logger.debug("qaContent: " + qaContent);
+        
         qaContent=createQuestionContent(mapQuestionContent, qaService, qaContent);
         
         return qaContent;
@@ -249,13 +309,24 @@ public class AuthoringUtil implements QaAppConstants {
      * @param qaService
      * @param qaAuthoringForm
      */
-    public void removeRedundantQuestions (Map mapQuestionContent, IQaService qaService, QaAuthoringForm qaAuthoringForm)
+    public void removeRedundantQuestions (Map mapQuestionContent, IQaService qaService, QaAuthoringForm qaAuthoringForm, HttpServletRequest request)
 	{
     	logger.debug("removing unused entries... ");
     	logger.debug("mapQuestionContent:  " + mapQuestionContent);
-    	logger.debug("qaAuthoringForm.getToolContentId():  " + qaAuthoringForm.getToolContentId());
     	
-    	QaContent qaContent=qaService.loadQa(new Long(qaAuthoringForm.getToolContentId()).longValue());
+    	String toolContentId=qaAuthoringForm.getToolContentId();
+    	logger.debug("toolContentId:  " + toolContentId);
+     	if ((toolContentId == null) || toolContentId.equals(""))
+     	{
+     		logger.debug("getting toolContentId from session.");
+     		Long longToolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+     		toolContentId=longToolContentId.toString();
+     		logger.debug("toolContentId: " + toolContentId);
+     	}
+     	logger.debug("final toolContentId: " + toolContentId);
+    	
+    	
+    	QaContent qaContent=qaService.loadQa( new Long(toolContentId).longValue());
     	logger.debug("qaContent:  " + qaContent);
     	
     	if (qaContent != null)
@@ -324,16 +395,6 @@ public class AuthoringUtil implements QaAppConstants {
         List questions=qaService.retrieveQaQueContentsByToolContentId(qaContent.getUid().longValue());
         logger.debug("questions: " + questions);
 
-        /*
-		Iterator listIterator=questions.iterator();
-		Long mapIndex=new Long(1);
-		while (listIterator.hasNext())
-		{
-			QaQueContent queContent=(QaQueContent)listIterator.next();
-			logger.debug("queContent data: " + queContent);
-			logger.debug("queContent: " + queContent.getQuestion() + "" + queContent.getDisplayOrder());
-		}
-        */
         
         Iterator itMap = mapQuestionContent.entrySet().iterator();
         int diplayOrder=0;

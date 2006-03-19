@@ -98,6 +98,11 @@ public abstract class QaUtils implements QaAppConstants {
 
 		qaAuthoringForm.setTitle(defaultQaContent.getTitle());
 		qaAuthoringForm.setInstructions(defaultQaContent.getInstructions());
+		request.getSession().setAttribute(ACTIVITY_TITLE, defaultQaContent.getTitle());
+		request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, defaultQaContent.getInstructions());
+		
+	    logger.debug("ACTIVITY_INSTRUCTIONS: " + defaultQaContent.getInstructions());
+		
 		qaAuthoringForm.setReportTitle(defaultQaContent.getReportTitle());
         qaAuthoringForm.setMonitoringReportTitle(defaultQaContent.getMonitoringReportTitle());
 		qaAuthoringForm.setEndLearningMessage(defaultQaContent.getEndLearningMessage());
@@ -109,6 +114,42 @@ public abstract class QaUtils implements QaAppConstants {
         qaAuthoringForm.setUsernameVisible(defaultQaContent.isUsernameVisible()?ON:OFF);
         qaAuthoringForm.setSynchInMonitor(defaultQaContent.isSynchInMonitor()?ON:OFF);
         qaAuthoringForm.setQuestionsSequenced(defaultQaContent.isQuestionsSequenced()?ON:OFF);
+	}
+    
+    
+    public static void persistRichText(HttpServletRequest request)
+	{
+		String richTextOfflineInstructions=request.getParameter(RICHTEXT_OFFLINEINSTRUCTIONS);
+		logger.debug("read parameter richTextOfflineInstructions: " + richTextOfflineInstructions);
+		String richTextOnlineInstructions=request.getParameter(RICHTEXT_ONLINEINSTRUCTIONS);
+		logger.debug("read parameter richTextOnlineInstructions: " + richTextOnlineInstructions);
+		
+		if ((richTextOfflineInstructions != null) && (richTextOfflineInstructions.length() > 0))
+		{
+			request.getSession().setAttribute(RICHTEXT_OFFLINEINSTRUCTIONS,richTextOfflineInstructions);	
+		}
+		
+		if ((richTextOnlineInstructions != null) && (richTextOnlineInstructions.length() > 0))
+		{
+			request.getSession().setAttribute(RICHTEXT_ONLINEINSTRUCTIONS,richTextOnlineInstructions);	
+		}
+		
+	
+		String richTextTitle=request.getParameter(RICHTEXT_TITLE);
+		logger.debug("read parameter richTextTitle: " + richTextTitle);
+		String richTextInstructions=request.getParameter(RICHTEXT_INSTRUCTIONS);
+		logger.debug("read parameter richTextInstructions: " + richTextInstructions);
+		
+		
+		if ((richTextTitle != null) && (richTextTitle.length() > 0))
+		{
+			request.getSession().setAttribute(RICHTEXT_TITLE,richTextTitle);
+		}
+		
+		if ((richTextInstructions != null) && (richTextInstructions.length() > 0))
+		{
+			request.getSession().setAttribute(RICHTEXT_INSTRUCTIONS,richTextInstructions);
+		}
 	}
     
     
@@ -212,45 +253,6 @@ public abstract class QaUtils implements QaAppConstants {
 	    request.getSession().setAttribute(TIMEZONE_ID, timeZone.getID());
 	}
 
-
-	/**
-	 * stores the rich text values on the forms into the session scope
-	 * persistRichText(HttpServletRequest request)
-	 * @param request
-	 */
-	public static void persistRichText(HttpServletRequest request)
-	{
-		String richTextOfflineInstructions=request.getParameter(RICHTEXT_OFFLINEINSTRUCTIONS);
-		logger.debug("read parameter richTextOfflineInstructions: " + richTextOfflineInstructions);
-		String richTextOnlineInstructions=request.getParameter(RICHTEXT_ONLINEINSTRUCTIONS);
-		logger.debug("read parameter richTextOnlineInstructions: " + richTextOnlineInstructions);
-		
-		if ((richTextOfflineInstructions != null) && (richTextOfflineInstructions.length() > 0))
-		{
-			request.getSession().setAttribute(RICHTEXT_OFFLINEINSTRUCTIONS,richTextOfflineInstructions);	
-		}
-		
-		if ((richTextOnlineInstructions != null) && (richTextOnlineInstructions.length() > 0))
-		{
-			request.getSession().setAttribute(RICHTEXT_ONLINEINSTRUCTIONS,richTextOnlineInstructions);	
-		}
-		
-		String richTextTitle=request.getParameter(RICHTEXT_TITLE);
-		logger.debug("read parameter richTextTitle: " + richTextTitle);
-		String richTextInstructions=request.getParameter(RICHTEXT_INSTRUCTIONS);
-		logger.debug("read parameter richTextInstructions: " + richTextInstructions);
-		
-		if ((richTextTitle != null) && (richTextTitle.length() > 0))
-		{
-			request.getSession().setAttribute(RICHTEXT_TITLE,richTextTitle);
-		}
-		
-		if ((richTextInstructions != null) && (richTextInstructions.length() > 0))
-		{
-			request.getSession().setAttribute(RICHTEXT_INSTRUCTIONS,richTextInstructions);
-		}
-	}
-	
 	
 	public static void configureContentRepository(HttpServletRequest request)
 	{

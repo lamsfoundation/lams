@@ -44,9 +44,9 @@ activity_ui_id
 VALUES
 (
 NULL
-, 'Question and Answer Description'
+, 'Allows creation and use of question and answer format'
 , 'Question and Answer'
-, 'Put some help text here.'
+, 'Help text'
 , NULL
 , NULL
 , NULL

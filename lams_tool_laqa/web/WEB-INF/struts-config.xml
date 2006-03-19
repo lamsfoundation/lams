@@ -53,7 +53,7 @@
 		name="QaAuthoringForm"
 		scope="session"
 		unknown="false"
-		validate="false"
+		validate="true"
     >
 
 		<exception
@@ -83,17 +83,23 @@
 	      	path="/authoring/AuthoringTabsHolder.jsp"
 	      	redirect="false"
 	    />
-	
+
 	  	<forward
 			name="loadMonitoring"
 			path="/monitoring/MonitoringMaincontent.jsp"
-			redirect="true"
+			redirect="false"
+	  	/>
+	
+	  	<forward
+			name="refreshMonitoring"
+			path="/monitoring/MonitoringMaincontent.jsp"
+			redirect="false"
 	  	/>
 	
 	  	<forward
 			name="errorList"
 			path="/QaErrorBox.jsp"
-			redirect="true"
+			redirect="false"
 	  	/>
 	</action>  
 	
@@ -101,9 +107,9 @@
       path="/authoring"
       type="org.lamsfoundation.lams.tool.qa.web.QaAction"
       name="QaAuthoringForm"
-      scope="session"
       input="/AuthoringMaincontent.jsp"
       parameter="dispatch"
+      scope="session"
       unknown="false"
       validate="true"
     >
@@ -127,13 +133,19 @@
 	  	<forward
 	        name="load"
 	        path="/AuthoringMaincontent.jsp"
-	        redirect="true"
+	        redirect="false"
 		/>
 	
 	  	<forward
-		    name="loadMonitoring"
+			name="loadMonitoring"
+			path="/monitoring/MonitoringMaincontent.jsp"
+			redirect="false"
+	  	/>
+	
+	  	<forward
+		    name="refreshMonitoring"
 		    path="/monitoring/MonitoringMaincontent.jsp"
-		    redirect="true"
+		    redirect="false"
 	  	/>
 	  
 	    <forward
@@ -145,7 +157,7 @@
 	  	<forward
 	        name="starter"
 	        path="/index.jsp"
-	        redirect="true"
+	        redirect="false"
 	  	/>
   </action>
 	
@@ -153,7 +165,11 @@
    <action 
    		path="/learningStarter" 
    		type="org.lamsfoundation.lams.tool.qa.web.QaLearningStarterAction" 
-   		name="QaLearningForm" input="/learningIndex.jsp"> 
+   		name="QaLearningForm" 
+   		scope="session"
+	    unknown="false"
+    	validate="false"
+   		input="/learningIndex.jsp"> 
    			
 		<exception
 			key="error.exception.QaApplication"
@@ -183,8 +199,15 @@
 	        redirect="true"
 	      />
 
+
 	  	<forward
-		    name="loadMonitoring"
+			name="loadMonitoring"
+			path="/monitoring/MonitoringMaincontent.jsp"
+			redirect="true"
+	  	/>
+
+	  	<forward
+		    name="refreshMonitoring"
 		    path="/monitoring/MonitoringMaincontent.jsp"
 		    redirect="true"
 	  	/>
@@ -210,7 +233,7 @@
       input="/learning/AnswersContent.jsp"
       parameter="method"
       unknown="false"
-      validate="true">
+      validate="false">
 
 		<exception
 			key="error.exception.QaApplication"
@@ -233,9 +256,15 @@
 		    path="/learning/AnswersContent.jsp"	        
 		    redirect="true"
 	      />
-
+	      
 	  	<forward
-		    name="loadMonitoring"
+			name="loadMonitoring"
+			path="/monitoring/MonitoringMaincontent.jsp"
+			redirect="true"
+	  	/>
+	      
+	  	<forward
+		    name="refreshMonitoring"
 		    path="/monitoring/MonitoringMaincontent.jsp"
 		    redirect="true"
 	  	/>
@@ -264,6 +293,7 @@
    	path="/defineLaterStarter" 
    	type="org.lamsfoundation.lams.tool.qa.web.QaDLStarterAction" 
    	name="QaAuthoringForm" 
+	scope="session"
    	input="/index.jsp"> 
 
 		<exception
@@ -285,13 +315,13 @@
 	  	<forward
 		    name="load"
           	path="/AuthoringMaincontent.jsp"
-		    redirect="true"
+		    redirect="false"
 	  	/>
 	  	
 	  	<forward
 	        name="starter"
 	        path="/index.jsp"
-	        redirect="true"
+	        redirect="false"
 	     />
 	  
         <forward
@@ -303,7 +333,7 @@
 	  	<forward
 		    name="errorList"
 		    path="/QaErrorBox.jsp"
-		    redirect="true"
+		    redirect="false"
 	  	/>
 	</action>  
 	
@@ -314,7 +344,7 @@
 		scope="session"
 		parameter="method"
 		unknown="false"
-		validate="false">
+		validate="true">
 		
 		<exception
 			key="error.exception.QaApplication"
@@ -333,15 +363,21 @@
 		/>	         			
 		
 	  	<forward
-		    name="loadMonitoring"
+			name="loadMonitoring"
+			path="/monitoring/MonitoringMaincontent.jsp"
+			redirect="false"
+	  	/>
+		
+	  	<forward
+		    name="refreshMonitoring"
 		    path="/monitoring/MonitoringMaincontent.jsp"
-		    redirect="true"
+		    redirect="false"
 	  	/>
 	      
    	  	<forward
 		    name="errorList"
 		    path="/QaErrorBox.jsp"
-		    redirect="true"
+		    redirect="false"
 	  	/>
 	</action>
 
@@ -352,7 +388,7 @@
 	      scope="session"
 	      parameter="method"
 	      unknown="false"
-	      validate="false">
+	      validate="true">
 	      
 		<exception
 			key="error.exception.QaApplication"
@@ -371,9 +407,15 @@
 		/>	         			
 	      
 	  	<forward
-		    name="loadMonitoring"
+			name="loadMonitoring"
+			path="/monitoring/MonitoringMaincontent.jsp"
+			redirect="false"
+	  	/>
+	      
+	  	<forward
+		    name="refreshMonitoring"
 		    path="/monitoring/MonitoringMaincontent.jsp"
-		    redirect="true"
+		    redirect="false"
 	  	/>
 
         <forward
@@ -391,13 +433,13 @@
 	    <forward
 	        name="starter"
 	        path="/index.jsp"
-	        redirect="true"
+	        redirect="false"
 	     />
 	      
    	  	<forward
 		    name="errorList"
 		    path="/QaErrorBox.jsp"
-		    redirect="true"
+		    redirect="false"
 	  	/>
 	</action>
 	
@@ -409,7 +451,7 @@
       scope="session"
       parameter="mode"
       unknown="false"
-      validate="false"
+      validate="true"
     >
 	    
 		<exception
@@ -437,7 +479,7 @@
 	  	<forward
 		    name="errorList"
 		    path="/QaErrorBox.jsp"
-		    redirect="true"
+		    redirect="false"
 	  	/>
     </action>
  </action-mappings>
