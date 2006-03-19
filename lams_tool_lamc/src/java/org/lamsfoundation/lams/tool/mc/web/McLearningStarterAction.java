@@ -635,22 +635,19 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	     */
 		
 	    String userID = "";
-	    /* get session from shared session.*/
 	    HttpSession ss = SessionManager.getSession();
-	    /* get back login user DTO*/
-	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	    if ((user == null) || (user.getUserID() == null))
-	    {
-	    	McUtils.cleanUpSessionAbsolute(request);
-	    	logger.debug("error: The tool expects userId");
-	    	persistError(request,"error.learningUser.notAvailable");
-	    	request.getSession().setAttribute(USER_EXCEPTION_USER_DOESNOTEXIST, new Boolean(true).toString());
-			return (mapping.findForward(ERROR_LIST));
-	    }else
-	    	userID = user.getUserID().toString();
+	    logger.debug("ss: " + ss);
 	    
-	    logger.debug("retrieved userId: " + userID);
-    	request.getSession().setAttribute(USER_ID, userID);
+	    if (ss != null)
+	    {
+		    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+		    if ((user != null) || (user.getUserID() != null))
+		    {
+		    	userID = user.getUserID().toString();
+			    logger.debug("retrieved userId: " + userID);
+		    	request.getSession().setAttribute(USER_ID, userID);
+		    }
+	    }
 		
 	    
 	    /*

@@ -885,6 +885,15 @@ public class McStarterAction extends Action implements McAppConstants {
 	}
 	
 	
+	public ActionForward executeGetMonitoringTab(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
+	throws IOException, ServletException, McApplicationException
+	{
+		logger.debug("CURRENT_MONITORING_TAB: " + request.getSession().getAttribute(CURRENT_MONITORING_TAB));
+		logger.debug("starting executeGetMonitoringTab for: " + LOAD_MONITORING_CONTENT);
+		return (mapping.findForward(LOAD_MONITORING_CONTENT));
+	}
+
+	
 	
 	/**
      * persists error messages to request scope

@@ -327,6 +327,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		
 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 		logger.debug("setting  EDIT_OPTIONS_MODE to 0");
+		logger.debug("fwd ing to : " + LOAD_MONITORING_CONTENT);
 		
 		return (mapping.findForward(LOAD_MONITORING_CONTENT));
 	}
@@ -363,8 +364,12 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 
     	logger.debug("dispatching getSummary..."+ request);
     	McMonitoringForm mcMonitoringForm = (McMonitoringForm) form;
+    	logger.debug("mcMonitoringForm: "+ mcMonitoringForm);
+    	
+    	
 	 	IMcService mcService =McUtils.getToolService(request);
-    	if (mcService == null)
+	 	logger.debug("mcService: "+ mcService);
+	 	if (mcService == null)
 		{
 			logger.debug("will retrieve mcService");
 			mcService = McServiceProxy.getMcService(getServlet().getServletContext());
@@ -372,8 +377,10 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		}
 	    request.getSession().setAttribute(TOOL_SERVICE, mcService);
 	 	
- 		request.getSession().setAttribute(CURRENT_MONITORING_TAB, "summary");   
- 		return (mapping.findForward(LOAD_MONITORING_CONTENT));
+ 		request.getSession().setAttribute(CURRENT_MONITORING_TAB, "summary");
+ 		
+ 		McStarterAction mcStarterAction= new McStarterAction();
+ 		return mcStarterAction.executeGetMonitoringTab(mapping, form, request, response);
 	}
     
     
@@ -408,6 +415,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		logger.debug("monitoring data initialised..");
     	
     	McMonitoringForm mcMonitoringForm = (McMonitoringForm) form;
+    	
 	 	IMcService mcService =McUtils.getToolService(request);
 	 	logger.debug("mcService: " + mcService);
     	
@@ -418,10 +426,10 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		    logger.debug("retrieving mcService from cache: " + mcService);
 		}
 	    request.getSession().setAttribute(TOOL_SERVICE, mcService);
-	 	
 	 	request.getSession().setAttribute(CURRENT_MONITORING_TAB, "instructions");
-	 	logger.debug("forwarding to: " + LOAD_MONITORING_CONTENT);
- 		return (mapping.findForward(LOAD_MONITORING_CONTENT));
+	 	
+	 	McStarterAction mcStarterAction= new McStarterAction();
+	 	return mcStarterAction.executeGetMonitoringTab(mapping, form, request, response);
 	}
 
     
@@ -456,7 +464,8 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 
     	logger.debug("dispatching getStats..." + request);
     	McMonitoringForm mcMonitoringForm = (McMonitoringForm) form;
-	 	IMcService mcService =McUtils.getToolService(request);
+    	
+    	IMcService mcService =McUtils.getToolService(request);
     	if (mcService == null)
 		{
 			logger.debug("will retrieve mcService");
@@ -464,9 +473,12 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		    logger.debug("retrieving mcService from cache: " + mcService);
 		}
 	    request.getSession().setAttribute(TOOL_SERVICE, mcService);
+	    logger.debug("mcService : " + mcService);
 	 	
  		request.getSession().setAttribute(CURRENT_MONITORING_TAB, "stats");
- 		return (mapping.findForward(LOAD_MONITORING_CONTENT));
+ 		
+ 		McStarterAction mcStarterAction= new McStarterAction();
+	 	return mcStarterAction.executeGetMonitoringTab(mapping, form, request, response);
 	}
     
     
@@ -1027,9 +1039,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
                                          ServletException
     {
     	/*not doing anything for the moment*/
-    	/*McUtils.cleanUpSessionAbsolute(request); */
-    	request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(false).toString());
-    	return (mapping.findForward(LOAD_MONITORING_CONTENT));
+    	return null;
     }
     
     

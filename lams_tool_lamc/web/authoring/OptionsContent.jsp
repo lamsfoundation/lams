@@ -171,7 +171,7 @@ http://www.gnu.org/licenses/gpl.txt
 					<tr> 
 						<td NOWRAP class="formlabel" valign=top>
 							<font size=2>
-	    	      				<b> <bean:message key="label.feedback.incorrect" />: <b>
+	    	      				<b> <bean:message key="label.feedback.incorrect" /> <b>
 	    	      			</font>
 	          			</td>
 						<td NOWRAP colspan=3 class="formcontrol" valign=top>
@@ -184,7 +184,7 @@ http://www.gnu.org/licenses/gpl.txt
 					<tr> 
 						<td NOWRAP class="formlabel" valign=top>
 							<font size=2>
-	    	      				<b> <bean:message key="label.feedback.correct" />: <b>
+	    	      				<b> <bean:message key="label.feedback.correct" /> <b>
 	    	      			</font>
 	          			</td>
 						<td NOWRAP colspan=3 class="formcontrol" valign=top>

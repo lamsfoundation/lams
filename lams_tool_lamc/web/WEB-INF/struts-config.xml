@@ -32,6 +32,7 @@
    <action path="/authoringStarter" 
    			type="org.lamsfoundation.lams.tool.mc.web.McStarterAction" 
    			name="McAuthoringForm" 
+	      	scope="session"
    			input="/index.jsp"> 
 	
 		<exception
@@ -53,43 +54,43 @@
 	  	<forward
 		    name="load"
 		    path="/authoring/AuthoringMaincontent.jsp"
-		    redirect="true"
+		    redirect="false"
 	  	/>
 
 	  	<forward
-		    name="loadMonitoringContent"
+		    name="loadMonitoring"
 		    path="/monitoring/MonitoringMaincontent.jsp"
-		    redirect="true"
+		    redirect="false"
 	  	/>
-	  	
+
 	  	<forward
 		    name="loadMonitoringEditActivity"
 		    path="/monitoring/MonitoringMaincontent.jsp"
-		    redirect="true"
+		    redirect="false"
 	  	/>
 	  	
 	  	<forward
 		    name="loadLearner"
 		    path="/learning/AnswersContent.jsp"
-		    redirect="true"
+		    redirect="false"
 	  	/>
 
 	  	<forward
 	        name="starter"
 	        path="/index.jsp"
-	        redirect="true"
+	        redirect="false"
 	     />
 	     
 	     <forward
 	        name="preview"
 	        path="/learning/Preview.jsp"
-	        redirect="true"
+	        redirect="false"
 	     />
 	  	
 	  	<forward
 		    name="errorList"
 		    path="/McErrorBox.jsp"
-		    redirect="true"
+		    redirect="false"
 	  	/>
 	</action>  
 	
@@ -100,9 +101,7 @@
     	  	name="McAuthoringForm"
 	      	scope="session"
     	  	input="/authoring/AuthoringMaincontent.jsp"
-      		parameter="dispatch"
-      		unknown="false"
-      		validate="true">
+      		parameter="dispatch">
 	
 		<exception
 	        key="error.exception.McApplication"
@@ -123,31 +122,31 @@
 	      <forward
 	        name="load"
 	        path="/authoring/AuthoringMaincontent.jsp"
-	        redirect="true"
+	        redirect="false"
 	      />
 	    
 	      <forward
 	        name="starter"
 	        path="/index.jsp"
-	        redirect="true"
+	        redirect="false"
 	      />
 	      
 	  	<forward
-		    name="loadMonitoringContent"
+		    name="loadMonitoring"
 		    path="/monitoring/MonitoringMaincontent.jsp"
-		    redirect="true"
+		    redirect="false"
 	  	/>
-
+	  	
 	     <forward
 	        name="preview"
 	        path="/learning/Preview.jsp"
-	        redirect="true"
+	        redirect="false"
 	     />
 	  	
 	  	<forward
 		    name="errorList"
 		    path="/McErrorBox.jsp"
-		    redirect="true"
+		    redirect="false"
 	  	/>
 	      
     </action>
@@ -178,19 +177,19 @@
 	  	<forward
 		    name="load"
 		    path="/authoring/AuthoringMaincontent.jsp"
-		    redirect="true"
+		    redirect="false"
 	  	/>
 	  	
 	  	<forward
 	        name="starter"
 	        path="/index.jsp"
-	        redirect="true"
+	        redirect="false"
 	     />
 	  	
 	  	<forward
 		    name="errorList"
 		    path="/McErrorBox.jsp"
-		    redirect="true"
+		    redirect="false"
 	  	/>
 	</action>  
     
@@ -199,6 +198,9 @@
    <action 	path="/learningStarter" 
    			type="org.lamsfoundation.lams.tool.mc.web.McLearningStarterAction" 
    			name="McLearningForm" 
+	      	scope="session"
+	      	validate="false"
+	      	unknown="false"
    			input="/learningIndex.jsp"> 
 
 		<exception
@@ -263,7 +265,7 @@
       		input="/learning/AnswersContent.jsp"
       		parameter="method"
       		unknown="false"
-      		validate="true">
+      		validate="false">
 	
 		<exception
 	        key="error.exception.McApplication"
@@ -340,7 +342,10 @@
     <!--Monitoring Starter Action: initializes the Monitoring module -->
    <action 	path="/monitoringStarter" 
    			type="org.lamsfoundation.lams.tool.mc.web.McMonitoringStarterAction" 
+	      	scope="session"
    			name="McMonitoringForm" 
+      		unknown="false"
+      		validate="true"
    			input="/monitoringIndex.jsp"> 
 
 		<exception
@@ -360,27 +365,27 @@
 	      />	         			   			
    			
 	  	<forward
-		    name="loadMonitoringContent"
+		    name="loadMonitoring"
 		    path="/monitoring/MonitoringMaincontent.jsp"
-		    redirect="true"
+		    redirect="false"
 	  	/>
-
+	  	
        <forward
 	        name="load"
 	        path="/authoring/AuthoringMaincontent.jsp"
-	        redirect="true"
+	        redirect="false"
 	    />
 	    
 	    <forward
 	        name="starter"
 	        path="/index.jsp"
-	        redirect="true"
+	        redirect="false"
 	     />
 
 	  	<forward
 		    name="errorList"
 		    path="/McErrorBox.jsp"
-		    redirect="true"
+		    redirect="false"
 	  	/>
 	</action>  
     
@@ -412,33 +417,40 @@
 	      />	         			      		
 
 	  	<forward
-		    name="loadMonitoringContent"
+		    name="loadMonitoring"
 		    path="/monitoring/MonitoringMaincontent.jsp"
-		    redirect="true"
+		    redirect="false"
 	  	/>
+	  	
+	  	<forward
+		    name="MonitoringContent"
+		    path="/monitoring/MonitoringMaincontent.jsp"
+		    redirect="false"
+	  	/>
+	  	
 	  	
 	  	<forward
 		    name="loadMonitoringEditActivity"
 		    path="/monitoring/MonitoringMaincontent.jsp"
-		    redirect="true"
+		    redirect="false"
 	  	/>
 	  	
        <forward
 	        name="load"
 	        path="/authoring/AuthoringMaincontent.jsp"
-	        redirect="true"
+	        redirect="false"
 	    />
 	    
 	    <forward
 	        name="starter"
 	        path="/index.jsp"
-	        redirect="true"
+	        redirect="false"
 	     />
 
 	  	<forward
 		    name="errorList"
 		    path="/McErrorBox.jsp"
-		    redirect="true"
+		    redirect="false"
 	  	/>
 	</action>  
 
@@ -450,7 +462,7 @@
 		      scope="session"
 		      parameter="mode"
 		      unknown="false"
-		      validate="false"
+		      validate="true"
 	    >
 		<exception
 	        key="error.exception.McApplication"
@@ -467,7 +479,7 @@
 	  	<forward
 		    name="errorList"
 		    path="/McErrorBox.jsp"
-		    redirect="true"
+		    redirect="false"
 	  	/>
     </action>
  </action-mappings>

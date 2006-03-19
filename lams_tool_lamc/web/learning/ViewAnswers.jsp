@@ -207,17 +207,6 @@ http://www.gnu.org/licenses/gpl.txt
 					</c:if> 																		
 					
 				  	<html:hidden property="doneLearnerProgress"/>						   
-					<c:if test="${sessionScope.learnerProgress == 'true'}"> 							  
-		  	   		  <tr>
-		  	   		    <td colspan=2 align=right class="input" valign=top>
-			  	   		    <font size=2>
-								 <html:submit onclick="javascript:submitLearnerProgressMethod('doneLearnerProgress');" styleClass="button">
-										<bean:message key="button.done"/>
-								</html:submit>
-							</font>
-					  	 </td>
-					  </tr>
-					</c:if> 		
 				</table>
 	</html:form>
 

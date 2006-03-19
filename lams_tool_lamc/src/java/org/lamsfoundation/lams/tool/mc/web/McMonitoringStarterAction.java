@@ -121,6 +121,7 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 		if (initData == false)
 			return (mapping.findForward(ERROR_LIST));
 		
+		request.getSession().setAttribute(CURRENT_MONITORING_TAB, "summary");
 	    return (mapping.findForward(LOAD_MONITORING_CONTENT));	
 	}
 
@@ -259,25 +260,6 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 	protected ActionForward validateParameters(HttpServletRequest request, ActionMapping mapping)
 	{
 		logger.debug("start validating monitoring parameters...");
-		/*
-	     * obtain and setup the current user's data 
-	     */
-		/*
-	    String userID = "";
-	    HttpSession ss = SessionManager.getSession();
-	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	    if ((user == null) || (user.getUserID() == null))
-	    {
-	    	logger.debug("error: The tool expects userId");
-	    	persistError(request,"error.learningUser.notAvailable");
-	    	McUtils.cleanUpSessionAbsolute(request);
-	    	return (mapping.findForward(ERROR_LIST));
-	    }else
-	    	userID = user.getUserID().toString();
-	    
-	    logger.debug("retrieved userId: " + userID);
-    	request.getSession().setAttribute(USER_ID, userID);
-    	*/
     	
     	String strToolContentId=request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
     	logger.debug("strToolContentId: " + strToolContentId);
@@ -309,6 +291,7 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 	    return null;
 	}
 
+	
 	
 	/**
      * persists error messages to request scope

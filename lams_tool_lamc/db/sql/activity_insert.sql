@@ -46,7 +46,7 @@ VALUES
 NULL
 , 'Allows creation and use of multiple choice questioning format'
 , 'Multiple Choice Questions'
-, 'Put some help text here.'
+, 'Help text'
 , NULL
 , NULL
 , NULL
