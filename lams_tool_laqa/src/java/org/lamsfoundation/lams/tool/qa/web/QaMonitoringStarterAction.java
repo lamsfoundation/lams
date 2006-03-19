@@ -114,6 +114,9 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 		request.getSession().setAttribute(CURRENT_MONITORING_TAB, "summary");
 		request.getSession().setAttribute(EDIT_RESPONSE, new Boolean(false));
 		
+		/*by default display summary data*/
+		request.setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(false).toString());
+		
 		/*
 	     * persist time zone information to session scope. 
 	     */

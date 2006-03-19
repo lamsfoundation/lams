@@ -508,6 +508,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	     * obtain and setup the current user's data 
 	     */
 
+
 	    String userID = "";
 	    HttpSession ss = SessionManager.getSession();
 	    logger.debug("ss: " + ss);

@@ -161,15 +161,18 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    QaContent qaContent=qaService.loadQa(toolContentId.longValue());
 		logger.debug("existing qaContent:" + qaContent);
 		
-		Map summaryToolSessions=MonitoringUtil.populateToolSessions(request, qaContent, qaService);
-		logger.debug("summaryToolSessions: " + summaryToolSessions);
-		if (summaryToolSessions.isEmpty())
+		
+		if (qaService.studentActivityOccurredGlobal(qaContent))
 		{
-			/* inform in the Summary tab that the tool has no active sessions */
+			request.setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(false).toString());
+			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
+		}
+		else
+		{
 			request.setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
 			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to true");
 		}
-    	
+
     	refreshStatsData(request);
     	request.getSession().setAttribute(EDIT_RESPONSE, new Boolean(false));
     	
@@ -217,15 +220,17 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    QaContent qaContent=qaService.loadQa(toolContentId.longValue());
 		logger.debug("existing qaContent:" + qaContent);
 		
-		Map summaryToolSessions=MonitoringUtil.populateToolSessions(request, qaContent, qaService);
-		logger.debug("summaryToolSessions: " + summaryToolSessions);
-		if (summaryToolSessions.isEmpty())
+		if (qaService.studentActivityOccurredGlobal(qaContent))
 		{
-			/* inform in the Summary tab that the tool has no active sessions */
+			request.setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(false).toString());
+			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
+		}
+		else
+		{
 			request.setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
 			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to true");
 		}
-
+		
     	refreshInstructionsData(request, qaContent);
     	request.getSession().setAttribute(EDIT_RESPONSE, new Boolean(false));
 
@@ -339,19 +344,23 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
     	/* this section is related to summary tab. Starts here. */
 		Map summaryToolSessions=MonitoringUtil.populateToolSessions(request, qaContent, qaService);
 		logger.debug("summaryToolSessions: " + summaryToolSessions);
-		if (summaryToolSessions.isEmpty())
-		{
-			/* inform in the Summary tab that the tool has no active sessions */
-			request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
-			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to true");
-		}
-		
 		request.getSession().setAttribute(SUMMARY_TOOL_SESSIONS, summaryToolSessions);
 	    logger.debug("SUMMARY_TOOL_SESSIONS: " + request.getSession().getAttribute(SUMMARY_TOOL_SESSIONS));
 	    /* ends here. */
-    	
- 		request.getSession().setAttribute(CURRENT_MONITORING_TAB, "summary");
- 		
+	    
+		
+		if (qaService.studentActivityOccurredGlobal(qaContent))
+		{
+			request.setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(false).toString());
+			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
+		}
+		else
+		{
+			request.setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
+			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to true");
+		}
+
+    	request.getSession().setAttribute(CURRENT_MONITORING_TAB, "summary");
  		return (mapping.findForward(LOAD_MONITORING));
 	}
 
@@ -705,14 +714,20 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		/* this section is related to summary tab. Starts here. */
 		Map summaryToolSessions=MonitoringUtil.populateToolSessions(request, qaContent, qaService);
 		logger.debug("summaryToolSessions: " + summaryToolSessions);
-		if (summaryToolSessions.isEmpty())
+		request.getSession().setAttribute(SUMMARY_TOOL_SESSIONS, summaryToolSessions);
+		
+		
+		if (qaService.studentActivityOccurredGlobal(qaContent))
 		{
-			QaUtils.cleanUpSessionAbsolute(request);
-			/* inform in the Summary tab that the tool has no active sessions */
+			request.setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(false).toString());
+			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
+		}
+		else
+		{
 			request.setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
 			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to true");
 		}
-		request.getSession().setAttribute(SUMMARY_TOOL_SESSIONS, summaryToolSessions);
+		
 	    	    
 	    Map summaryToolSessionsId=MonitoringUtil.populateToolSessionsId(request, qaContent, qaService);
 		logger.debug("summaryToolSessionsId: " + summaryToolSessionsId);

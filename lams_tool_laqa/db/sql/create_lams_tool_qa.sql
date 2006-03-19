@@ -2,12 +2,12 @@ CREATE TABLE lams.tl_laqa11_content (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
      , qa_content_id BIGINT(20) NOT NULL
      , title VARCHAR(250) NOT NULL DEFAULT 'Questions and Answers'
-     , instructions VARCHAR(250) NOT NULL DEFAULT 'Please, take a minute to answer the following questions.'
+     , instructions VARCHAR(250) NOT NULL DEFAULT 'Please answer the following questions.'
      , creation_date VARCHAR(100)
      , update_date DATETIME
      , questions_sequenced TINYINT(1) NOT NULL
      , username_visible TINYINT(1) NOT NULL DEFAULT 0
-     , monitoring_report_title VARCHAR(100) DEFAULT 'Combined Learner Results'
+     , monitoring_report_title VARCHAR(100) DEFAULT 'Learner Results'
      , report_title VARCHAR(100) DEFAULT 'Report'
      , created_by BIGINT(20) NOT NULL DEFAULT 0
      , run_offline TINYINT(1) DEFAULT 0
