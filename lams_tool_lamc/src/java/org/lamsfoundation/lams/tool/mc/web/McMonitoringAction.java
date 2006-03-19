@@ -318,8 +318,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		    logger.debug("retrieving mcService from cache: " + mcService);
 		}
 	    request.getSession().setAttribute(TOOL_SERVICE, mcService);
-	 	
-	 	request.getSession().setAttribute(CURRENT_MONITORING_TAB, "editActivity");
+	    request.getSession().setAttribute(CURRENT_MONITORING_TAB, "editActivity");
 	 	
 
 		request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(true));
@@ -327,8 +326,20 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		
 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 		logger.debug("setting  EDIT_OPTIONS_MODE to 0");
-		logger.debug("fwd ing to : " + LOAD_MONITORING_CONTENT);
 		
+		Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    logger.debug("toolContentId: " + toolContentId);
+	    
+	    McContent mcContent=mcService.retrieveMc(toolContentId);
+		logger.debug("mcContent:" + mcContent);
+		
+	    request.getSession().setAttribute(RICHTEXT_TITLE, mcContent.getTitle());
+	    request.getSession().setAttribute(RICHTEXT_INSTRUCTIONS, mcContent.getInstructions());
+
+		logger.debug("Title is: " + mcContent.getTitle());
+		logger.debug("Instructions is: " + mcContent.getInstructions());
+		
+		logger.debug("fwd ing to : " + LOAD_MONITORING_CONTENT);
 		return (mapping.findForward(LOAD_MONITORING_CONTENT));
 	}
     

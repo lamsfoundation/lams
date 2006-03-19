@@ -199,7 +199,7 @@
    			type="org.lamsfoundation.lams.tool.mc.web.McLearningStarterAction" 
    			name="McLearningForm" 
 	      	scope="session"
-	      	validate="false"
+	      	validate="true"
 	      	unknown="false"
    			input="/learningIndex.jsp"> 
 
@@ -222,37 +222,37 @@
 	  	<forward
 		    name="loadLearner"
 		    path="/learning/AnswersContent.jsp"
-		    redirect="true"
+		    redirect="false"
 	  	/>
 
 	  	<forward
 		    name="viewAnswers"
 		    path="/learning/ViewAnswers.jsp"
-		    redirect="true"
+		    redirect="false"
 	  	/>
 
 	  	<forward
 		    name="redoQuestions"
 		    path="/learning/RedoQuestions.jsp"
-		    redirect="true"
+		    redirect="false"
 	  	/>
 	  	
 	     <forward
 	        name="preview"
 	        path="/learning/Preview.jsp"
-	        redirect="true"
+		    redirect="false"
 	     />
 
 	  	<forward
 		    name="learningStarter"
 		    path="/learningIndex.jsp"
-		    redirect="true"
+		    redirect="false"
 	  	/>
 	  	
 	  	<forward
 		    name="errorList"
 		    path="/McErrorBox.jsp"
-		    redirect="true"
+		    redirect="false"
 	  	/>
 	</action>  
 	
@@ -265,7 +265,7 @@
       		input="/learning/AnswersContent.jsp"
       		parameter="method"
       		unknown="false"
-      		validate="false">
+      		validate="true">
 	
 		<exception
 	        key="error.exception.McApplication"
@@ -286,55 +286,55 @@
 	  	<forward
 		    name="loadLearner"
 		    path="/learning/AnswersContent.jsp"
-		    redirect="true"
+		    redirect="false"
 	  	/>
 	  	
 	  	<forward
 		    name="individualReport"
 		    path="/learning/IndividualLearnerResults.jsp"
-		    redirect="true"
+		    redirect="false"
 	  	/>
 	  	
 	  	<forward
 		    name="redoQuestions"
 		    path="/learning/RedoQuestions.jsp"
-		    redirect="true"
+		    redirect="false"
 	  	/>
 
 	  	<forward
 		    name="viewAnswers"
 		    path="/learning/ViewAnswers.jsp"
-		    redirect="true"
+		    redirect="false"
 	  	/>
 
 	  	<forward
 		    name="resultsSummary"
 		    path="/learning/ResultsSummary.jsp"
-		    redirect="true"
+		    redirect="false"
 	  	/>
 
 	  	<forward
 		    name="errorList"
 		    path="/McErrorBox.jsp"
-		    redirect="true"
+		    redirect="false"
 	  	/>
 
 	  	<forward
 	        name="starter"
 	        path="/index.jsp"
-	        redirect="true"
+		    redirect="false"
 	     />
 
 	  	<forward
 		    name="learningStarter"
 		    path="/learningIndex.jsp"
-		    redirect="true"
+		    redirect="false"
 	  	/>
 
 	     <forward
 	        name="preview"
 	        path="/learning/Preview.jsp"
-	        redirect="true"
+		    redirect="false"
 	     />
     </action>
     
