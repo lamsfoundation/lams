@@ -74,11 +74,11 @@ message.msg.maxFileSize = 最大 250K
 title.messageTopic.open = 更多
 
 title.message.add = 发消息
-title.message.open = 察看消息
+title.message.open = 查看消息
 title.message.reply = 回复消息
 title.message.edit = 编辑消息
 title.message.view=消息板
-title.message.view.topic=察看消息
+title.message.view.topic=查看消息
 title.message.delete=删除消息
 
 message.label.subject = 主题
@@ -92,7 +92,7 @@ message.link.reply = 回复
 label.open = 打开
 label.delete = 删除
 label.download = 下载
-label.view = 察看
+label.view = 查看
 label.edit = 编辑
 label.reply = 回复
 label.done = 完成
