@@ -5,7 +5,7 @@ CREATE TABLE lams.tl_laqa11_content (
      , instructions VARCHAR(250) NOT NULL DEFAULT 'Please answer the following questions.'
      , creation_date VARCHAR(100)
      , update_date DATETIME
-     , questions_sequenced TINYINT(1) NOT NULL
+     , questions_sequenced TINYINT(1) NOT NULL DEFAULT 0
      , username_visible TINYINT(1) NOT NULL DEFAULT 0
      , monitoring_report_title VARCHAR(100) DEFAULT 'Learner Results'
      , report_title VARCHAR(100) DEFAULT 'Report'
