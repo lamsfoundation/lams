@@ -52,8 +52,7 @@ http://www.gnu.org/licenses/gpl.txt
 					<table align=center> 
 						<tr> 
 					 		<td valign="top"><font size=2> <b> <bean:message key="label.authoring.title"/>: </b></font> </td>
-					 		<td NOWRAP width=700> 
-                                
+					 		<td valign="top"> 
                                  <span id="previewTitle" style="visibility: hidden; display: none;">
                                      <div>
                                          <a href="javascript:doWYSWYGEdit('Title','small')"><font size=2> <b> <bean:message key="label.openEditor"/></a>
@@ -73,7 +72,7 @@ http://www.gnu.org/licenses/gpl.txt
 					  	</tr>
 					  	<tr> 
 					 		<td valign="top"><font size=2> <b> <bean:message key="label.authoring.instructions"/>:  </b></font></td>
-					 		<td NOWRAP width=700> 
+					 		<td valign="top"> 
                                 <span id="previewInstructions" style="visibility: hidden; display: none;">
                                     <div>
                                         <a href="javascript:doWYSWYGEdit('Instructions')"><font size=2> <b> <bean:message key="label.openEditor"/></a>
@@ -96,7 +95,7 @@ http://www.gnu.org/licenses/gpl.txt
 						  	<td valign="top"> 
 						 		<font size=2> <b> <bean:message key="label.question1"/>:  </b></font>
 						 	</td>
-						  	<td>
+						  	<td valign="top">
                                 <span id="previewQuestion0" style="visibility: hidden; display: none;">
                                     <div>
                                         <a href="javascript:doWYSWYGEdit('Question0')"><bean:message key="label.openEditor"/></a>
@@ -121,7 +120,7 @@ http://www.gnu.org/licenses/gpl.txt
 								<c:set var="queIndex" scope="session" value="${queIndex +1}"/>
 								  <tr>
 								  	<td valign="top"> <font size=2> <b> <c:out value="Question ${queIndex}"/>:  </b></font></td>
-								  	<td>
+								  	<td valign="top">
   
                                         <span id="preview<c:out value="Question${queIndex-1}"/>" style="visibility: hidden; display: none;">
                                             <div>

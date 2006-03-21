@@ -156,6 +156,9 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 		
 		/* this section is related to instructions tab. Starts here. */
 	    /* ends here. */
+		request.getSession().setAttribute(ACTIVITY_TITLE, qaContent.getTitle());
+	    request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, qaContent.getInstructions());
+		
 		return true;
 	}
 

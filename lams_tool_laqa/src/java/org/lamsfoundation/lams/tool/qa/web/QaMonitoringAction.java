@@ -294,6 +294,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 			logger.debug("forwarding to: " + LOAD_MONITORING);
 			return (mapping.findForward(LOAD_MONITORING));
 		}
+		request.getSession().setAttribute(ACTIVITY_TITLE, qaContent.getTitle());
+	    request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, qaContent.getInstructions());
 		
 	    return qaStarterAction.executeDefineLater(mapping, form, request, response, qaService);
 	}

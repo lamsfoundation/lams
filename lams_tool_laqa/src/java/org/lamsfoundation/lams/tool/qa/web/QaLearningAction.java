@@ -174,6 +174,13 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
     			mapAnswers.put(new Long(1).toString(), qaLearningForm.getAnswer());
     			
     		}
+    		else 
+    		{
+    			logger.debug("totalQuestionCount is > 1: " + qaLearningForm.getAnswer());
+    			int mapSize=mapAnswers.size();
+    			logger.debug("mapSize: " + mapSize);
+    			mapAnswers.put(new Long(mapSize+1).toString() , qaLearningForm.getAnswer());
+    		}
     		
     	}
     	logger.debug(logger + " " + this.getClass().getName() +  "final mapAnswers: " + mapAnswers);

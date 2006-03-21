@@ -409,7 +409,10 @@ public abstract class QaUtils implements QaAppConstants {
 	}
 
 	/**
-	 * the only attributes kept are TOOL_SESSION and TOOL_CONTENT_ID 
+	 * the only attributes kept are TOOL_SESSION and TOOL_CONTENT_ID
+	 * and 
+	 * ACTIVITY_TITLE
+	   ACTIVITY_INSTRUCTIONS 
 	 * cleanUpSessionAbsolute(HttpServletRequest request)
 	 * @param request
 	 */
@@ -515,8 +518,6 @@ public abstract class QaUtils implements QaAppConstants {
 		request.getSession().removeAttribute(SUBMIT_SUCCESS);
 		request.getSession().removeAttribute(DELETED_ATTACHMENT_LIST);
 		request.getSession().removeAttribute(UUID);
-		request.getSession().removeAttribute(ACTIVITY_TITLE);
-		request.getSession().removeAttribute(ACTIVITY_INSTRUCTIONS);
 		request.getSession().removeAttribute(IS_USERNAME_VISIBLE);
 		request.getSession().removeAttribute(CURRENT_ANSWER);
 		request.getSession().removeAttribute(ACTIVE_MODULE);

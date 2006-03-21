@@ -396,16 +396,30 @@ public class QaStarterAction extends Action implements QaAppConstants {
         QaUtils.populateUploadedFilesData(request, qaContent, qaService);
 	    request.getSession().setAttribute(IS_DEFINE_LATER, new Boolean(qaContent.isDefineLater()));
 	    
-	    
-		qaAuthoringForm.setTitle(qaContent.getTitle());
+	    qaAuthoringForm.setTitle(qaContent.getTitle());
 		qaAuthoringForm.setInstructions(qaContent.getInstructions());
-		request.getSession().setAttribute(ACTIVITY_TITLE, qaContent.getTitle());
-		request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, qaContent.getInstructions());
+		//request.getSession().setAttribute(ACTIVITY_TITLE, qaContent.getTitle());
+		//request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, qaContent.getInstructions());
 		
 		logger.debug("Title is: " + qaContent.getTitle());
 		logger.debug("Instructions is: " + qaContent.getInstructions());
+		if ((qaAuthoringForm.getTitle() == null) || (qaAuthoringForm.getTitle().equals("")))
+		{
+			logger.debug("resetting title");
+			String activityTitle=(String)request.getSession().getAttribute(ACTIVITY_TITLE);
+			logger.debug("activityTitle: " + activityTitle);
+			qaAuthoringForm.setTitle(activityTitle);
+		}
 	    
-	    
+		if ((qaAuthoringForm.getInstructions() == null) || (qaAuthoringForm.getInstructions().equals("")))
+		{
+			logger.debug("resetting instructions");
+			String activityInstructions=(String)request.getSession().getAttribute(ACTIVITY_INSTRUCTIONS);
+			logger.debug("activityInstructions: " + activityInstructions);
+			qaAuthoringForm.setInstructions(activityInstructions);
+		}
+
+		
 	    /*
 		 * get the existing question content
 		 */
@@ -436,10 +450,12 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		request.getSession().setAttribute(MAP_QUESTION_CONTENT, mapQuestionContent);
 		logger.debug("starter initialized the Comparable Map: " + request.getSession().getAttribute("mapQuestionContent") );
 
+		logger.debug("final title: " + qaAuthoringForm.getTitle());
+		logger.debug("final ins: " + qaAuthoringForm.getInstructions());
+		
 		/*
 		 * load questions page
 		 */
-		logger.debug("RENDER_MONITORING_EDITACTIVITY: " + request.getAttribute(RENDER_MONITORING_EDITACTIVITY));
 		qaAuthoringForm.resetUserAction();
 	}
 
