@@ -1,7 +1,5 @@
-# Connection: ROOT LOCAL
-# Host: localhost
-# Saved: 2005-04-07 10:50:55
-# 
+-- CVS ID: $Id$
+
 INSERT INTO lams_learning_library
 (
 description,

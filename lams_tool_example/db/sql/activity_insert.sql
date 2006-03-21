@@ -1,7 +1,5 @@
-# Connection: ROOT LOCAL
-# Host: localhost
-# Saved: 2005-04-07 11:08:32
-# 
+-- CVS ID: $Id$
+
 INSERT INTO lams_learning_activity
 (
 activity_ui_id
