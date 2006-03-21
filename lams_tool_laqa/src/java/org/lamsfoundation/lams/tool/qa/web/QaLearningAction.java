@@ -142,13 +142,18 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
                                          ServletException
 	{
     	logger.debug("dispatching submitAnswersContent..." + request);
+    	QaLearningForm qaLearningForm = (QaLearningForm) form;
     	
     	Map mapQuestions=(Map)request.getSession().getAttribute(MAP_QUESTION_CONTENT_LEARNER);
         logger.debug("MAP_QUESTION_CONTENT_LEARNER:" + request.getSession().getAttribute(MAP_QUESTION_CONTENT_LEARNER));
         
         Map mapAnswers=(Map)request.getSession().getAttribute(MAP_ANSWERS);    	
         logger.debug(logger + " " + this.getClass().getName() +  "submit the responses: " + mapAnswers);
+        
+        String totalQuestionCount=(String)request.getSession().getAttribute(TOTAL_QUESTION_COUNT);
+        logger.debug("totalQuestionCount: " + totalQuestionCount);
     	
+        
     	String questionListingMode=(String) request.getSession().getAttribute(QUESTION_LISTING_MODE);
         /* if the listing mode is QUESTION_LISTING_MODE_COMBINED populate  the answers here*/
     	if (questionListingMode.equalsIgnoreCase(QUESTION_LISTING_MODE_COMBINED))
@@ -161,10 +166,20 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
                 mapAnswers.put(new Long(questionIndex).toString(), answer);
             }
     	}
+    	else
+    	{
+    		if (totalQuestionCount.equals("1"))
+    		{
+    			logger.debug("totalQuestionCount is 1: " + qaLearningForm.getAnswer());
+    			mapAnswers.put(new Long(1).toString(), qaLearningForm.getAnswer());
+    			
+    		}
+    		
+    	}
     	logger.debug(logger + " " + this.getClass().getName() +  "final mapAnswers: " + mapAnswers);
+    	request.getSession().setAttribute(MAP_ANSWERS, mapAnswers);
     	
-    	QaLearningForm qaLearningForm = (QaLearningForm) form;
-
+    	
     	IQaService qaService = (IQaService)request.getSession().getAttribute(TOOL_SERVICE);
 		logger.debug("qaService: " + qaService);
 		if (qaService == null)
@@ -210,7 +225,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
     	QaMonitoringAction qaMonitoringAction= new QaMonitoringAction();
     	/*the report should have all the users' entries OR
     	 * the report should have only the current session's entries*/
-    	qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, isUserNamesVisible, true, currentSessionId, null);
+    	qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, isUserNamesVisible, true, currentSessionId, userID);
     	
 		request.getSession().setAttribute(REQUEST_LEARNING_REPORT, new Boolean(true).toString());
 		logger.debug("fwd'ing to." + LEARNER_REPORT);

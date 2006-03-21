@@ -413,7 +413,10 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
     	 * check if the mode is teacher and request is for Learner Progress
     	 */
 		logger.debug("userId: " + userId);
-		if ((userId != null) && (mode.equals("teacher")))
+		String learnerProgressUserId=request.getParameter(USER_ID);
+		logger.debug("learnerProgressUserId: " + learnerProgressUserId);
+		
+		if ((learnerProgressUserId != null) && (mode.equals("teacher")))
 		{
 			logger.debug("start generating learner progress report.");
 	    	Long currentToolSessionId=(Long)request.getSession().getAttribute(TOOL_SESSION_ID);
@@ -421,7 +424,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    	
 	    	/* the report should have only this user's entries(with userId)*/
 	    	QaMonitoringAction qaMonitoringAction= new QaMonitoringAction();
-	    	qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, true, true, currentToolSessionId.toString(), userId);
+	    	qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, true, true, currentToolSessionId.toString(), learnerProgressUserId);
 	    	
     		request.getSession().setAttribute(REQUEST_LEARNING_REPORT, new Boolean(true).toString());
     		request.getSession().setAttribute(REQUEST_LEARNING_REPORT_PROGRESS, new Boolean(true).toString());
@@ -449,38 +452,45 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	     * 
 	     * if the user's tool session id AND user id exists in the tool tables go to learner's report.
 	     */
-	    QaQueUsr qaQueUsr=qaService.loadQaQueUsr(new Long(userId));
-	    logger.debug("QaQueUsr:" + qaQueUsr);
-	    if (qaQueUsr != null)
+	    if (userId != null)
 	    {
-	    		QaSession checkSession=qaQueUsr.getQaSession();
-	    		logger.debug("checkSession:" + checkSession);
-	    		Long currentToolSessionId=(Long)request.getSession().getAttribute(TOOL_SESSION_ID);
-		    	logger.debug("currentToolSessionId: " + currentToolSessionId);
-		    	
-	    		if (checkSession != null)
-	    		{
-	    			Long checkQaSessionId=checkSession.getQaSessionId();
-	    			logger.debug("checkQaSessionId:" + checkQaSessionId);
-	    			if (checkQaSessionId.toString().equals(currentToolSessionId.toString()))
-	    			{
-	    				logger.debug("the learner is in the same session and has already responsed to this content, just generate a read-only report.");
-	    		    	Boolean isUserNamesVisibleBoolean=(Boolean)request.getSession().getAttribute(IS_USERNAME_VISIBLE);
-	    		    	boolean isUserNamesVisible=isUserNamesVisibleBoolean.booleanValue();
-	    		    	logger.debug("isUserNamesVisible: " + isUserNamesVisible);
+		    QaQueUsr qaQueUsr=qaService.loadQaQueUsr(new Long(userId));
+		    logger.debug("QaQueUsr:" + qaQueUsr);
+		    if (qaQueUsr != null)
+		    {
+		    		QaSession checkSession=qaQueUsr.getQaSession();
+		    		logger.debug("checkSession:" + checkSession);
+		    		Long currentToolSessionId=(Long)request.getSession().getAttribute(TOOL_SESSION_ID);
+			    	logger.debug("currentToolSessionId: " + currentToolSessionId);
+			    	
+		    		if (checkSession != null)
+		    		{
+		    			Long checkQaSessionId=checkSession.getQaSessionId();
+		    			logger.debug("checkQaSessionId:" + checkQaSessionId);
+		    			if (checkQaSessionId.toString().equals(currentToolSessionId.toString()))
+		    			{
+		    				logger.debug("the learner is in the same session and has already responsed to this content, just generate a read-only report.");
+		    		    	Boolean isUserNamesVisibleBoolean=(Boolean)request.getSession().getAttribute(IS_USERNAME_VISIBLE);
+		    		    	boolean isUserNamesVisible=isUserNamesVisibleBoolean.booleanValue();
+		    		    	logger.debug("isUserNamesVisible: " + isUserNamesVisible);
 
-	    		    	
-	    		    	QaMonitoringAction qaMonitoringAction= new QaMonitoringAction();
-	    		    	/*the report should have all the users' entries OR
-	    		    	 * the report should have only the current session's entries*/
-	    		    	request.getSession().setAttribute(REQUEST_LEARNING_REPORT_VIEWONLY, new Boolean(true).toString());
-	    		    	qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, isUserNamesVisible, true, currentToolSessionId.toString(), null);
-	    		    	
-	    	    		request.getSession().setAttribute(REQUEST_LEARNING_REPORT, new Boolean(true).toString());
-	    	    		logger.debug("fwd'ing to." + LEARNER_REPORT);
-	    	    		return (mapping.findForward(LEARNER_REPORT));
-	    			}
-	    		}
+		    		    	
+		    		    	QaMonitoringAction qaMonitoringAction= new QaMonitoringAction();
+		    		    	/*the report should have all the users' entries OR
+		    		    	 * the report should have only the current session's entries*/
+		    		    	request.getSession().setAttribute(REQUEST_LEARNING_REPORT_VIEWONLY, new Boolean(true).toString());
+		    		    	qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, isUserNamesVisible, true, currentToolSessionId.toString(), null);
+		    		    	
+		    	    		request.getSession().setAttribute(REQUEST_LEARNING_REPORT, new Boolean(true).toString());
+		    	    		logger.debug("fwd'ing to." + LEARNER_REPORT);
+		    	    		return (mapping.findForward(LEARNER_REPORT));
+		    			}
+		    		}
+		    }
+	    }
+	    else
+	    {
+	    	logger.debug("userId is null, it should not be, report this.");
 	    }
 	    
         /*

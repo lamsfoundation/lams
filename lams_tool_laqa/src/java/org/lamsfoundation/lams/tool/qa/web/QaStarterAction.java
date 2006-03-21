@@ -391,6 +391,8 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		logger.debug("QaContent: " + qaContent);
 		
 		QaUtils.setDefaultSessionAttributes(request, qaContent, qaAuthoringForm);
+		logger.debug("form title is: : " + qaAuthoringForm.getTitle());
+		
         QaUtils.populateUploadedFilesData(request, qaContent, qaService);
 	    request.getSession().setAttribute(IS_DEFINE_LATER, new Boolean(qaContent.isDefineLater()));
 	    
@@ -537,7 +539,6 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	    		return (mapping.findForward(LOAD_QUESTIONS));
 			}
 			logger.debug("using qaQueContent uid: " + qaQueContent.getUid());
-			//request.getSession().setAttribute(DEFAULT_QUESTION_UID, new Long(queContentUID));
 			request.getSession().setAttribute(DEFAULT_QUESTION_CONTENT, qaQueContent.getQuestion());
 		}
 		catch(Exception e)

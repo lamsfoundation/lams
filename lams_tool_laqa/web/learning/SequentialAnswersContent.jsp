@@ -55,7 +55,8 @@ http://www.gnu.org/licenses/gpl.txt
 			<table>
 				<tr>
 				<c:choose>  
-				  <c:when test="${sessionScope.currentQuestionIndex == sessionScope.totalQuestionCount}"> 
+				  <c:when test="${(sessionScope.currentQuestionIndex == sessionScope.totalQuestionCount) && 
+				  				  (sessionScope.totalQuestionCount !=1) }"> 
 					 <td NOWRAP class="input" valign=top> 
 						<html:submit onclick="javascript:submitMethod('getPreviousQuestion');" styleClass="button">
 									<bean:message key="button.getPreviousQuestion"/>
@@ -66,6 +67,17 @@ http://www.gnu.org/licenses/gpl.txt
 						</html:submit>	 				 		  					
 					</td> 
 				  </c:when> 
+
+  				  <c:when test="${(sessionScope.currentQuestionIndex == sessionScope.totalQuestionCount) && 
+				  				  (sessionScope.totalQuestionCount == 1) }"> 
+					 <td NOWRAP class="input" valign=top> 
+						<html:submit onclick="javascript:submitMethod('submitAnswersContent');" styleClass="button">
+									<bean:message key="button.done"/>
+						</html:submit>	 				 		  					
+					</td> 
+				  </c:when> 
+				  
+				  
  				  <c:when test="${sessionScope.currentQuestionIndex != sessionScope.totalQuestionCount && sessionScope.currentQuestionIndex > 1}"> 
 					 <td NOWRAP class="input" valign=top> 
 						<html:submit onclick="javascript:submitMethod('getPreviousQuestion');" styleClass="button">
@@ -77,6 +89,7 @@ http://www.gnu.org/licenses/gpl.txt
 						</html:submit>	 				 		  					
 					</td> 
   				  </c:when> 
+  				  
 				  <c:otherwise>
 					 <td NOWRAP class="input" valign=top> 
 						<html:submit onclick="javascript:submitMethod('getNextQuestion');" styleClass="button">
