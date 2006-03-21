@@ -1,0 +1,245 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 2.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
+    
+<hibernate-mapping>
+<!-- 
+    Created by the Middlegen Hibernate plugin 2.1
+
+    http://boss.bekk.no/boss/middlegen/
+    http://www.hibernate.org/
+-->
+
+<class 
+    name="org.lamsfoundation.lams.tool.example.Example" 
+    table="tl_laex11_example"
+>
+    <meta attribute="class-description" inherit="false">
+       @hibernate.class
+        table="tl_laex11_example"
+    </meta>
+    <meta attribute="implement-equals" inherit="false">true</meta>
+
+    <id
+        name="uid"
+        type="java.lang.Long"
+        column="uid"
+    >
+        <meta attribute="field-description">
+           @hibernate.id
+            generator-class="native"
+            type="java.lang.Long"
+            column="uid"
+
+
+        </meta>
+        <meta attribute="use-in-equals">true</meta>
+        <generator class="native" />
+    </id>
+
+    <property
+        name="createDate"
+        type="java.sql.Timestamp"
+        column="create_date"
+        length="19"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="create_date"
+            length="19"
+        </meta>    
+    </property>
+    <property
+        name="updateDate"
+        type="java.sql.Timestamp"
+        column="update_date"
+        length="19"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="update_date"
+            length="19"
+        </meta>    
+    </property>
+    <property
+        name="createBy"
+        type="java.lang.Long"
+        column="create_by"
+        length="20"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="create_by"
+            length="20"
+        </meta>    
+    </property>
+    <property
+        name="title"
+        type="java.lang.String"
+        column="title"
+        length="255"
+    >
+        <meta attribute="use-in-tostring">true</meta>
+        <meta attribute="field-description">
+           @hibernate.property
+            column="title"
+            length="255"
+        </meta>    
+    </property>
+    <property
+        name="instructions"
+        type="java.lang.String"
+        column="instructions"
+        length="65535"
+    >
+        <meta attribute="use-in-tostring">true</meta>
+        <meta attribute="field-description">
+           @hibernate.property
+            column="instructions"
+            length="65535"
+        </meta>    
+    </property>
+    <property
+        name="runOffline"
+        type="java.lang.Boolean"
+        column="run_offline"
+        length="1"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="run_offline"
+            length="1"
+        </meta>    
+    </property>
+    <property
+        name="lockOnFinished"
+        type="java.lang.Boolean"
+        column="lock_on_finished"
+        length="1"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="lock_on_finished"
+            length="1"
+        </meta>    
+    </property>
+    <property
+        name="onlineInstructions"
+        type="java.lang.String"
+        column="online_instructions"
+        length="65535"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="online_instructions"
+            length="65535"
+        </meta>    
+    </property>
+    <property
+        name="offlineInstructions"
+        type="java.lang.String"
+        column="offline_instructions"
+        length="65535"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="offline_instructions"
+            length="65535"
+        </meta>    
+    </property>
+    <property
+        name="contentInUse"
+        type="java.lang.Boolean"
+        column="content_in_use"
+        length="1"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="content_in_use"
+            length="1"
+        </meta>    
+    </property>
+    <property
+        name="defineLater"
+        type="java.lang.Boolean"
+        column="define_later"
+        length="1"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="define_later"
+            length="1"
+        </meta>    
+    </property>
+    <property
+        name="toolContentId"
+        type="java.lang.Long"
+        column="tool_content_id"
+        length="20"
+    >
+        <meta attribute="use-in-tostring">true</meta>
+        <meta attribute="field-description">
+           @hibernate.property
+            column="tool_content_id"
+            length="20"
+        </meta>    
+    </property>
+
+    <!-- Associations -->
+  
+    <!-- bi-directional one-to-many association to ExampleAttachment -->
+    <set
+        name="exampleAttachments"
+        lazy="true"
+        inverse="true"
+		cascade="none"
+    >
+        <meta attribute="field-description">
+           @hibernate.set
+            lazy="false"
+            inverse="true"
+            cascade="none"
+
+           @hibernate.collection-key
+            column="example_uid"
+
+           @hibernate.collection-one-to-many
+            class="org.lamsfoundation.lams.tool.example.ExampleAttachment"
+        </meta>
+        <key>
+            <column name="example_uid" />
+        </key>
+        <one-to-many 
+            class="org.lamsfoundation.lams.tool.example.ExampleAttachment"
+        />
+    </set>
+    <!-- bi-directional one-to-many association to ExampleSession -->
+    <set
+        name="exampleSessions"
+        lazy="true"
+        inverse="true"
+		cascade="none"
+    >
+        <meta attribute="field-description">
+           @hibernate.set
+            lazy="true"
+            inverse="true"
+            cascade="none"
+
+           @hibernate.collection-key
+            column="example_uid"
+
+           @hibernate.collection-one-to-many
+            class="org.lamsfoundation.lams.tool.example.ExampleSession"
+        </meta>
+        <key>
+            <column name="example_uid" />
+        </key>
+        <one-to-many 
+            class="org.lamsfoundation.lams.tool.example.ExampleSession"
+        />
+    </set>
+
+</class>
+</hibernate-mapping>

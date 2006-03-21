@@ -1,0 +1,101 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 2.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
+    
+<hibernate-mapping>
+<!-- 
+    Created by the Middlegen Hibernate plugin 2.1
+
+    http://boss.bekk.no/boss/middlegen/
+    http://www.hibernate.org/
+-->
+
+<class 
+    name="org.lamsfoundation.lams.tool.example.ExampleUser" 
+    table="tl_laex11_user"
+>
+    <meta attribute="class-description" inherit="false">
+       @hibernate.class
+        table="tl_laex11_user"
+    </meta>
+    <meta attribute="implement-equals" inherit="false">true</meta>
+
+    <id
+        name="uid"
+        type="java.lang.Long"
+        column="uid"
+    >
+        <meta attribute="field-description">
+           @hibernate.id
+            generator-class="sequence"
+            type="java.lang.Long"
+            column="uid"
+
+
+           @hibernate.generator-param
+	        name="sequence"
+	        value=""
+        </meta>
+        <meta attribute="use-in-equals">true</meta>
+        <generator class="sequence">
+            <param name="sequence"></param>
+        </generator>
+    </id>
+
+    <property
+        name="userId"
+        type="java.lang.Long"
+        column="user_id"
+        length="20"
+    >
+        <meta attribute="use-in-tostring">true</meta>
+        <meta attribute="field-description">
+           @hibernate.property
+            column="user_id"
+            length="20"
+        </meta>    
+    </property>
+    <property
+        name="lastName"
+        type="java.lang.String"
+        column="last_name"
+        length="255"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="last_name"
+            length="255"
+        </meta>    
+    </property>
+    <property
+        name="firstName"
+        type="java.lang.String"
+        column="first_name"
+        length="255"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="first_name"
+            length="255"
+        </meta>    
+    </property>
+
+    <!-- Associations -->
+  
+    <!-- bi-directional many-to-one association to ExampleSession -->
+    <many-to-one
+        name="exampleSession"
+        class="org.lamsfoundation.lams.tool.example.ExampleSession"
+        not-null="true"
+    >
+        <meta attribute="field-description">
+           @hibernate.many-to-one
+            not-null="true"
+           @hibernate.column name="session_id"         
+        </meta>
+        <column name="session_id" />
+    </many-to-one>
+
+</class>
+</hibernate-mapping>

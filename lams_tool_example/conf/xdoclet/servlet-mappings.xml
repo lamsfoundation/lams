@@ -1,0 +1,11 @@
+<servlet-mapping>
+	<servlet-name>action</servlet-name>
+    <url-pattern>*.do</url-pattern>
+</servlet-mapping>
+
+<!--  FCKEditor Connector Configuration -->
+<servlet-mapping>
+    <servlet-name>Connector</servlet-name>
+    <url-pattern>/fckeditor/editor/filemanager/browser/default/connectors/jsp/connector</url-pattern>
+</servlet-mapping>
+

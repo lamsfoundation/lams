@@ -1,0 +1,150 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 2.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
+    
+<hibernate-mapping>
+<!-- 
+    Created by the Middlegen Hibernate plugin 2.1
+
+    http://boss.bekk.no/boss/middlegen/
+    http://www.hibernate.org/
+-->
+
+<class 
+    name="org.lamsfoundation.lams.tool.example.ExampleSession" 
+    table="tl_laex11_session"
+>
+    <meta attribute="class-description" inherit="false">
+       @hibernate.class
+        table="tl_laex11_session"
+    </meta>
+    <meta attribute="implement-equals" inherit="false">true</meta>
+
+    <id
+        name="uid"
+        type="java.lang.Long"
+        column="uid"
+    >
+        <meta attribute="field-description">
+           @hibernate.id
+            generator-class="native"
+            type="java.lang.Long"
+            column="uid"
+
+
+        </meta>
+        <meta attribute="use-in-equals">true</meta>
+        <generator class="native" />
+    </id>
+
+    <property
+        name="sessionEndDate"
+        type="java.sql.Timestamp"
+        column="session_end_date"
+        length="19"
+    >
+        <meta attribute="use-in-tostring">true</meta>
+        <meta attribute="field-description">
+           @hibernate.property
+            column="session_end_date"
+            length="19"
+        </meta>    
+    </property>
+    <property
+        name="sessionStartDate"
+        type="java.sql.Timestamp"
+        column="session_start_date"
+        length="19"
+    >
+        <meta attribute="use-in-tostring">true</meta>
+        <meta attribute="field-description">
+           @hibernate.property
+            column="session_start_date"
+            length="19"
+        </meta>    
+    </property>
+    <property
+        name="status"
+        type="java.lang.Integer"
+        column="status"
+        length="11"
+    >
+        <meta attribute="use-in-tostring">true</meta>
+        <meta attribute="field-description">
+           @hibernate.property
+            column="status"
+            length="11"
+        </meta>    
+    </property>
+    <property
+        name="sessionId"
+        type="java.lang.Long"
+        column="session_id"
+        length="20"
+    >
+        <meta attribute="use-in-tostring">true</meta>
+        <meta attribute="field-description">
+           @hibernate.property
+            column="session_id"
+            length="20"
+        </meta>    
+    </property>
+    <property
+        name="sessionName"
+        type="java.lang.String"
+        column="session_name"
+        length="250"
+    >
+        <meta attribute="use-in-tostring">true</meta>
+        <meta attribute="field-description">
+           @hibernate.property
+            column="session_name"
+            length="250"
+        </meta>    
+    </property>
+
+    <!-- Associations -->
+  
+    <!-- bi-directional many-to-one association to Example -->
+    <many-to-one
+        name="example"
+        class="org.lamsfoundation.lams.tool.example.Example"
+        not-null="true"
+    >
+        <meta attribute="field-description">
+           @hibernate.many-to-one
+            not-null="true"
+           @hibernate.column name="example_uid"         
+        </meta>
+        <column name="example_uid" />
+    </many-to-one>
+    <!-- bi-directional one-to-many association to ExampleUser -->
+    <set
+        name="exampleUsers"
+        lazy="true"
+        inverse="true"
+		cascade="none"
+    >
+        <meta attribute="field-description">
+           @hibernate.set
+            lazy="true"
+            inverse="true"
+            cascade="none"
+
+           @hibernate.collection-key
+            column="session_id"
+
+           @hibernate.collection-one-to-many
+            class="org.lamsfoundation.lams.tool.example.ExampleUser"
+        </meta>
+        <key>
+            <column name="session_id" />
+        </key>
+        <one-to-many 
+            class="org.lamsfoundation.lams.tool.example.ExampleUser"
+        />
+    </set>
+
+</class>
+</hibernate-mapping>

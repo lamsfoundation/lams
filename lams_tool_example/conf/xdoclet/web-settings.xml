@@ -1,0 +1,14 @@
+<context-param>
+	<param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
+  	<param-value>org.lamsfoundation.lams.applicationResources</param-value>
+</context-param>
+
+<context-param> 
+	<param-name>contextConfigLocation</param-name>
+	<param-value>
+				classpath:/org/lamsfoundation/lams/applicationContext.xml
+            	classpath:/org/lamsfoundation/lams/tool/toolApplicationContext.xml
+				classpath:/org/lamsfoundation/lams/contentrepository/applicationContext.xml
+				classpath:/org/lamsfoundation/lams/tool/example/applicationContext.xml
+	</param-value>
+</context-param>

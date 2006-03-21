@@ -1,0 +1,122 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 2.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
+    
+<hibernate-mapping>
+<!-- 
+    Created by the Middlegen Hibernate plugin 2.1
+
+    http://boss.bekk.no/boss/middlegen/
+    http://www.hibernate.org/
+-->
+
+<class 
+    name="org.lamsfoundation.lams.tool.example.ExampleAttachment" 
+    table="tl_laex11_attachment"
+>
+    <meta attribute="class-description" inherit="false">
+       @hibernate.class
+        table="tl_laex11_attachment"
+    </meta>
+    <meta attribute="implement-equals" inherit="false">true</meta>
+
+    <id
+        name="uid"
+        type="java.lang.Long"
+        column="uid"
+    >
+        <meta attribute="field-description">
+           @hibernate.id
+            generator-class="native"
+            type="java.lang.Long"
+            column="uid"
+
+
+        </meta>
+        <meta attribute="use-in-equals">true</meta>
+        <generator class="native" />
+    </id>
+
+    <property
+        name="fileVersionId"
+        type="java.lang.Long"
+        column="file_version_id"
+        length="20"
+    >
+        <meta attribute="use-in-tostring">true</meta>
+        <meta attribute="field-description">
+           @hibernate.property
+            column="file_version_id"
+            length="20"
+        </meta>    
+    </property>
+    <property
+        name="fileType"
+        type="java.lang.String"
+        column="file_type"
+        length="255"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="file_type"
+            length="255"
+        </meta>    
+    </property>
+    <property
+        name="fileName"
+        type="java.lang.String"
+        column="file_name"
+        length="255"
+    >
+        <meta attribute="use-in-tostring">true</meta>
+        <meta attribute="field-description">
+           @hibernate.property
+            column="file_name"
+            length="255"
+        </meta>    
+    </property>
+    <property
+        name="fileUuid"
+        type="java.lang.Long"
+        column="file_uuid"
+        length="20"
+    >
+        <meta attribute="use-in-tostring">true</meta>
+        <meta attribute="field-description">
+           @hibernate.property
+            column="file_uuid"
+            length="20"
+        </meta>    
+    </property>
+    <property
+        name="createDate"
+        type="java.sql.Timestamp"
+        column="create_date"
+        length="19"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="create_date"
+            length="19"
+        </meta>    
+    </property>
+
+    <!-- Associations -->
+  
+    <!-- bi-directional many-to-one association to Example -->
+    <many-to-one
+        name="example"
+        class="org.lamsfoundation.lams.tool.example.Example"
+        not-null="true"
+    >
+        <meta attribute="field-description">
+           @hibernate.many-to-one
+            not-null="true"
+           @hibernate.column name="example_uid"         
+        </meta>
+        <column name="example_uid" />
+    </many-to-one>
+
+</class>
+</hibernate-mapping>
