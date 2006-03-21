@@ -444,34 +444,43 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
     	
     	/*
 	     * Verify that userId does not already exist in the db.
-	     * If it does exist, that means, that user already responded to the content and 
+	     * If it does exist and the passed tool session id exists in the db, that means the user already responded to the content and 
 	     * his answers must be displayed  read-only
 	     * 
-	     * NEW: if the user's tool session id AND user id exists in the tool tables go to learner's report.
+	     * if the user's tool session id AND user id exists in the tool tables go to learner's report.
 	     */
 	    QaQueUsr qaQueUsr=qaService.loadQaQueUsr(new Long(userId));
 	    logger.debug("QaQueUsr:" + qaQueUsr);
 	    if (qaQueUsr != null)
 	    {
-		    	logger.debug("the learner has already responsed to this content, just generate a read-only report.");
-		    	
-	    	    Boolean isUserNamesVisibleBoolean=(Boolean)request.getSession().getAttribute(IS_USERNAME_VISIBLE);
-		    	boolean isUserNamesVisible=isUserNamesVisibleBoolean.booleanValue();
-		    	logger.debug("isUserNamesVisible: " + isUserNamesVisible);
-
-		    	Long currentToolSessionId=(Long)request.getSession().getAttribute(TOOL_SESSION_ID);
+	    		QaSession checkSession=qaQueUsr.getQaSession();
+	    		logger.debug("checkSession:" + checkSession);
+	    		Long currentToolSessionId=(Long)request.getSession().getAttribute(TOOL_SESSION_ID);
 		    	logger.debug("currentToolSessionId: " + currentToolSessionId);
 		    	
-		    	QaMonitoringAction qaMonitoringAction= new QaMonitoringAction();
-		    	/*the report should have all the users' entries OR
-		    	 * the report should have only the current session's entries*/
-		    	request.getSession().setAttribute(REQUEST_LEARNING_REPORT_VIEWONLY, new Boolean(true).toString());
-		    	qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, isUserNamesVisible, true, currentToolSessionId.toString(), null);
-		    	
-	    		request.getSession().setAttribute(REQUEST_LEARNING_REPORT, new Boolean(true).toString());
-	    		logger.debug("fwd'ing to." + LEARNER_REPORT);
-	    		return (mapping.findForward(LEARNER_REPORT));
+	    		if (checkSession != null)
+	    		{
+	    			Long checkQaSessionId=checkSession.getQaSessionId();
+	    			logger.debug("checkQaSessionId:" + checkQaSessionId);
+	    			if (checkQaSessionId.toString().equals(currentToolSessionId.toString()))
+	    			{
+	    				logger.debug("the learner is in the same session and has already responsed to this content, just generate a read-only report.");
+	    		    	Boolean isUserNamesVisibleBoolean=(Boolean)request.getSession().getAttribute(IS_USERNAME_VISIBLE);
+	    		    	boolean isUserNamesVisible=isUserNamesVisibleBoolean.booleanValue();
+	    		    	logger.debug("isUserNamesVisible: " + isUserNamesVisible);
 
+	    		    	
+	    		    	QaMonitoringAction qaMonitoringAction= new QaMonitoringAction();
+	    		    	/*the report should have all the users' entries OR
+	    		    	 * the report should have only the current session's entries*/
+	    		    	request.getSession().setAttribute(REQUEST_LEARNING_REPORT_VIEWONLY, new Boolean(true).toString());
+	    		    	qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, isUserNamesVisible, true, currentToolSessionId.toString(), null);
+	    		    	
+	    	    		request.getSession().setAttribute(REQUEST_LEARNING_REPORT, new Boolean(true).toString());
+	    	    		logger.debug("fwd'ing to." + LEARNER_REPORT);
+	    	    		return (mapping.findForward(LEARNER_REPORT));
+	    			}
+	    		}
 	    }
 	    
         /*
@@ -516,7 +525,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    if (ss != null)
 	    {
 		    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-		    if ((user != null) || (user.getUserID() != null))
+		    if ((user != null) && (user.getUserID() != null))
 		    {
 		    	userID = user.getUserID().toString();
 			    logger.debug("retrieved userId: " + userID);
