@@ -1,3 +1,5 @@
+-- $Id$
+
 CREATE TABLE lams.tl_laqa11_content (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
      , qa_content_id BIGINT(20) NOT NULL
