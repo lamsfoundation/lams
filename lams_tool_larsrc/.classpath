@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="com.genuitec.eclipse.j2eedt.core.J2EE14_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/reload_2_0_1/castor-0.9.5.3-xml.jar"/>
+	<classpathentry kind="lib" path="lib/reload_2_0_1/jdom.jar"/>
+	<classpathentry kind="lib" path="lib/reload_2_0_1/moonunitsrc.jar"/>
+	<classpathentry kind="lib" path="lib/reload_2_0_1/reload-diva.jar"/>
+	<classpathentry kind="lib" path="lib/reload_2_0_1/reload-editor.jar"/>
+	<classpathentry kind="lib" path="lib/reload_2_0_1/reload-jdom.jar"/>
+	<classpathentry kind="lib" path="lib/reload_2_0_1/reload-moonunit.jar"/>
+	<classpathentry kind="lib" path="lib/reload_2_0_1/xercesImpl.jar"/>
+	<classpathentry kind="lib" path="lib/reload_2_0_1/xml-apis.jar"/>
+	<classpathentry kind="lib" path="lib/jaxen/jaxen-full.jar"/>
+	<classpathentry kind="lib" path="lib/jaxen/sax.jar"/>
+	<classpathentry kind="lib" path="lib/jaxen/saxpath.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/3rdParty"/>
+	<classpathentry kind="output" path="web/WEB-INF/classes"/>
+</classpath>

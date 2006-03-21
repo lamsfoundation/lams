@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+	<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="basename"><value>org.lamsfoundation.lams.tool.rsrc.ApplicationResources</value></property>
+	</bean>
+	<bean id="messageService" class="org.lamsfoundation.lams.util.MessageService" singleton="true">
+		<property name="messageSource"><ref local="messageSource"/></property>										
+	</bean>
+    <!-- Hibernate SessionFactory -->
+    <bean id="resourceSessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<property name="dataSource"><ref bean="toolDataSource"/></property>
+		<property name="hibernateProperties"><ref bean="hibernateProperties"/></property>
+
+        <!-- Must references all OR mapping files. -->
+        <property name="mappingResources">
+            <list>
+               <value>org/lamsfoundation/lams/tool/rsrc/model/Resource.hbm.xml</value>
+               <value>org/lamsfoundation/lams/tool/rsrc/model/ResourceItem.hbm.xml</value>
+               <value>org/lamsfoundation/lams/tool/rsrc/model/ResourceAttachment.hbm.xml</value>
+               <value>org/lamsfoundation/lams/tool/rsrc/model/ResourceUser.hbm.xml</value>
+               <value>org/lamsfoundation/lams/tool/rsrc/model/ResourceSession.hbm.xml</value>
+            </list>
+        </property>
+    </bean>
+
+    <!-- core beans -->
+    <bean id="resourceDao" class="org.lamsfoundation.lams.tool.rsrc.dao.hibernate.ResourceDAO">
+        <property name="sessionFactory">
+            <ref local="resourceSessionFactory"/>
+        </property>
+    </bean>
+    <bean id="resourceItemDao" class="org.lamsfoundation.lams.tool.rsrc.dao.hibernate.ResourceItemDAO">
+        <property name="sessionFactory">
+            <ref local="resourceSessionFactory"/>
+        </property>
+    </bean>
+
+   <bean id="resourceAttachmentDao" class="org.lamsfoundation.lams.tool.rsrc.dao.hibernate.ResourceAttachmentDAO">
+        <property name="sessionFactory">
+            <ref local="resourceSessionFactory"/>
+        </property>
+    </bean>
+
+   <bean id="ResourceUserDao" class="org.lamsfoundation.lams.tool.rsrc.dao.hibernate.ResourceUserDAO">
+        <property name="sessionFactory">
+            <ref local="resourceSessionFactory"/>
+        </property>
+    </bean>
+
+   <bean id="resourceSessionDao" class="org.lamsfoundation.lams.tool.rsrc.dao.hibernate.ResourceSessionDAO">
+        <property name="sessionFactory">
+            <ref local="resourceSessionFactory"/>
+        </property>
+    </bean>
+
+
+    <!-- Managers -->
+	<bean id="resourceToolContentHandler" class="org.lamsfoundation.lams.tool.rsrc.util.ResourceToolContentHandler">
+	 		<property name="repositoryService"><ref bean="repositoryService"/></property>
+	</bean> 
+	
+    <bean id="resourceManagerTarget" class="org.lamsfoundation.lams.tool.rsrc.service.ResourceService">
+        <property name="resourceDao">
+            <ref local="resourceDao"/>
+        </property>
+        <property name="resourceItemDao">
+            <ref local="resourceItemDao"/>
+        </property>
+        <property name="resourceAttachmentDao">
+            <ref local="resourceAttachmentDao"/>
+        </property>
+        <property name="ResourceUserDao">
+            <ref local="ResourceUserDao"/>
+        </property>
+        <property name="resourceSessionDao">
+            <ref local="resourceSessionDao"/>
+        </property>
+        <property name="resourceToolContentHandler">
+            <ref local="resourceToolContentHandler"/>
+        </property>
+        <property name="repositoryService">
+            <ref bean="repositoryService"/>
+        </property>
+   		<property name="toolService">
+   			<ref bean="lamsToolService"/>
+   		</property>
+   		<property name="learnerService">
+   			<ref bean="learnerService"/>
+   		</property>
+   		<property name="messageService"><ref bean="messageService"/></property>
+    </bean>
+
+    <bean id="resourceService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+        <property name="target">
+            <ref local="resourceManagerTarget"/>
+        </property>
+        <property name="proxyTargetClass">
+            <value>false</value>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="createRootTopic">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+            </props>
+        </property>
+    </bean>
+
+</beans>

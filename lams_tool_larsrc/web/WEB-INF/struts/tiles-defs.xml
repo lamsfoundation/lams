@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!--
+Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+USA
+
+http://www.gnu.org/licenses/gpl.txt
+-->
+
+<tiles-definitions>
+	<!--
+		This is a default layout which has a header and body
+	-->
+	<definition name="tiles:defaultLayout" path="/includes/defaultLayout.jsp">
+    	<put name="body" value=""/>
+    	<put name="header" value="/includes/header.jsp"/>
+	</definition>
+
+	<definition name="tiles:layout" path="/includes/layout.jsp">
+    	<put name="pageTitleKey" value=""/>
+    	<put name="body" value=""/>
+    	<put name="header" value="/includes/header.jsp"/>
+    	<put name="footer" value="/includes/footer.jsp"/>
+	</definition>
+
+	<definition name="tiles:monitoring:layout" path="/includes/tablayout.jsp">
+    	<put name="pageTitleKey" value=""/>
+    	<put name="body" value=""/>
+    	<put name="tab" value="/jsps/monitoring/tabmenu.jsp"/>
+    	<put name="header" value="/includes/header.jsp"/>
+    	<put name="footer" value="/includes/footer.jsp"/>
+	</definition>
+
+	<!-- B: Generic -->
+	<definition name="tiles:/error" extends="tiles:layout">
+    	<put name="body" value="/includes/error.jsp"/>
+	</definition>
+
+	<definition name="tiles:/blank" extends="tiles:layout">
+    	<put name="body" value="/includes/blank.jsp"/>
+	</definition>
+	<!-- E: Generic -->
+	
+	<!-- B: Authoring -->
+	<definition name="tiles:/monitoring/forum/defineLater" extends="tiles:layout">
+    	<put name="pageTitleKey" value="page.title.monitoring.definelater"/>
+    	<put name="body" value="/jsps/monitoring/definelater.jsp"/>
+	</definition>
+	
+    <definition name="tiles:/authoring/forum/newTopic" extends="tiles:layout">
+    	<put name="pageTitleKey" value="title.message.add"/>
+    	<put name="body" value="/jsps/authoring/message/create.jsp"/>
+	</definition>
+	<definition name="tiles:/authoring/forum/viewTopic" extends="tiles:layout">
+    	<put name="pageTitleKey" value="title.message.view"/>
+    	<put name="body" value="/jsps/authoring/message/view.jsp"/>
+	</definition>
+	<definition name="tiles:/authoring/forum/editTopic" extends="tiles:layout">
+    	<put name="pageTitleKey" value="title.message.edit"/>
+    	<put name="body" value="/jsps/authoring/message/edit.jsp"/>
+	</definition>
+	<definition name="tiles:/authoring/forum/forbiddenEditTopic" extends="tiles:layout">
+    	<put name="pageTitleKey" value="title.message.edit"/>
+    	<put name="body" value="/jsps/authoring/message/forbiddenedit.jsp"/>
+	</definition>
+	<!-- E: Authoring -->
+
+	<!-- B: Learning -->
+	<!-- MAIN PAGE for learner -->	
+	<definition name="tiles:/learning/forum/viewForum" extends="tiles:layout">
+    	<put name="pageTitleKey" value="title.message.view"/>
+    	<put name="body" value="/jsps/learning/viewforum.jsp"/>
+	</definition>
+	
+	<definition name="tiles:/learning/forum/viewTopic" extends="tiles:layout">
+    	<put name="pageTitleKey" value="title.message.view.topic"/>
+    	<put name="body" value="/jsps/learning/viewtopic.jsp"/>
+	</definition>
+	
+    <definition name="tiles:/learning/forum/newTopic" extends="tiles:layout">
+    	<put name="pageTitleKey" value="title.message.add"/>
+    	<put name="body" value="/jsps/learning/create.jsp"/>
+	</definition>
+
+    <definition name="tiles:/learning/forum/replyTopic" extends="tiles:layout">
+          <put name="pageTitleKey" value="title.message.reply"/>
+          <put name="body" value="/jsps/learning/reply.jsp"/>
+    </definition>
+    
+    <definition name="tiles:/learning/forum/editTopic" extends="tiles:layout">
+    	<put name="pageTitleKey" value="title.message.edit"/>
+    	<put name="body" value="/jsps/learning/edit.jsp"/>
+	</definition>
+	<!-- E: Authoring -->
+	
+	<!-- B: Monitoring -->
+	
+	<definition name="tiles:/monitoring/forum/main" extends="tiles:monitoring:layout">
+    	<put name="pageTitleKey" value="page.title.monitoring.init"/>
+    	<put name="body" value="/jsps/monitoring/monitoring.jsp"/>
+	</definition>
+	
+	<definition name="tiles:/monitoring/forum/init" extends="tiles:layout">
+    	<put name="pageTitleKey" value="page.title.monitoring.init"/>
+    	<put name="body" value="/jsps/monitoring/monitoring.jsp"/>
+	</definition>
+	
+	<definition name="tiles:/monitoring/forum/listContentUsers" extends="tiles:monitoring:layout">
+    	<put name="pageTitleKey" value="page.title.monitoring.content.userlist"/>
+    	<put name="body" value="/jsps/monitoring/contentuserlist.jsp"/>
+	</definition>
+	<definition name="tiles:/monitoring/forum/viewAllMarks" extends="tiles:monitoring:layout">
+    	<put name="pageTitleKey" value="page.title.monitoring.view.user.mark"/>
+    	<put name="body" value="/jsps/monitoring/viewallmarks.jsp"/>
+	</definition>
+	<definition name="tiles:/monitoring/forum/viewUserMark" extends="tiles:layout">
+    	<put name="pageTitleKey" value="page.title.monitoring.view.user.mark"/>
+    	<put name="body" value="/jsps/monitoring/usermarklist.jsp"/>
+	</definition>
+	<definition name="tiles:/monitoring/forum/editUserMark" extends="tiles:monitoring:layout">
+    	<put name="pageTitleKey" value="page.title.monitoring.edit.user.mark"/>
+    	<put name="body" value="/jsps/monitoring/updatemarks.jsp"/>
+	</definition>
+	<definition name="tiles:/monitoring/forum/viewActivity" extends="tiles:monitoring:layout">
+    	<put name="pageTitleKey" value="page.title.monitoring.view.activity"/>
+    	<put name="body" value="/jsps/monitoring/viewactivity.jsp"/>
+	</definition>
+	<definition name="tiles:/monitoring/forum/editActivity" extends="tiles:monitoring:layout">
+    	<put name="pageTitleKey" value="page.title.monitoring.edit.activity"/>
+    	<put name="body" value="/jsps/monitoring/editactivity.jsp"/>
+	</definition>
+	<definition name="tiles:/monitoring/forum/viewInstructions" extends="tiles:monitoring:layout">
+    	<put name="pageTitleKey" value="page.title.monitoring.view.instructions"/>
+    	<put name="body" value="/jsps/monitoring/instructions.jsp"/>
+	</definition>
+	
+	<definition name="tiles:/monitoring/forum/statistic" extends="tiles:monitoring:layout">
+    	<put name="pageTitleKey" value="page.title.monitoring.statistic"/>
+    	<put name="body" value="/jsps/monitoring/statistic.jsp"/>
+	</definition>
+	
+	<definition name="tiles:/monitoring/forum/viewTopic" extends="tiles:layout">
+    	<put name="pageTitleKey" value="page.title.monitoring.view.topic"/>
+    	<put name="body" value="/jsps/monitoring/viewtopic.jsp"/>
+	</definition>
+	
+	<!-- E: Monitoring -->
+	
+</tiles-definitions>

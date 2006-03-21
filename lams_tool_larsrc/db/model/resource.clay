@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<clay-model clay-version="1.2.0">
+<database-model alias="" author="" begin-script="" end-script="" name="imscp" remarks="" sql-dialect-id="jp.azzurri.clay.model.physical.dialect.MySQL_4_0_Dialect" version="1.0">
+<database-model-description></database-model-description>
+<schema-list>
+<schema alias="" name="LAMS" remarks="">
+<schema-description></schema-description>
+<domain-list/>
+<table-list/>
+</schema>
+<schema alias="" name="DEFAULT_SCHEMA" remarks="">
+<schema-description></schema-description>
+<domain-list/>
+<table-list/>
+</schema>
+</schema-list>
+</database-model>
+</clay-model>

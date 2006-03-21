@@ -1,0 +1,1 @@
+Class-Path: ./lams.jar ./lams-tool-larsrc11.jar ./lams-contentrepository.jar

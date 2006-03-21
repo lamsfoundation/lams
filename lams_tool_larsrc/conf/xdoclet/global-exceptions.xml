@@ -1,0 +1,7 @@
+    <!-- B: global exceptions 
+    <global-exceptions>
+	    <exception key="error.operation.failed"
+		    type="java.lang.Exception" path="tiles:/error"/>
+    </global-exceptions>
+    -->
+    <!-- B: end of global exceptions -->
