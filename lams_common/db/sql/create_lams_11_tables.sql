@@ -1,3 +1,5 @@
+-- CVS ID: $Id$
+
 CREATE TABLE lams_gate_activity_level (
        gate_activity_level_id INT(11) NOT NULL DEFAULT 0
      , description VARCHAR(128) NOT NULL

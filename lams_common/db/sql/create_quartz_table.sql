@@ -1,3 +1,5 @@
+-- CVS ID: $Id$
+
 # LAMS1.1: quartz 1.5.2 table definition
 #
 # Quartz seems to work best with the driver mm.mysql-2.0.7-bin.jar

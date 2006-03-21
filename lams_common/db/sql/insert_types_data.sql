@@ -1,3 +1,5 @@
+-- CVS ID: $Id$
+
 INSERT INTO lams_role VALUES (1, 'SYSADMIN', 'LAMS System Adminstrator', NOW());
 INSERT INTO lams_role VALUES (2, 'ADMIN', 'Organization Adminstrator', NOW());
 INSERT INTO lams_role VALUES (3, 'AUTHOR', 'Authors Learning Designs', NOW());

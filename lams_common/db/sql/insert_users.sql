@@ -1,3 +1,5 @@
+-- CVS ID: $Id$
+
 -- this is similar to insert test data except that it only load
 -- user/organisation and workspace data. it does not load learning design
 -- or tool related details.

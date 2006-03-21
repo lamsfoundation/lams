@@ -1,8 +1,4 @@
--- MySQL Script
--- Modify your server name
--- Modify username and password for the lams db
--- Create lams database for LAMS
--- 13/DEC/2004
+-- CVS ID: $Id$
 
 SET FOREIGN_KEY_CHECKS=0;
 DROP DATABASE IF EXISTS lams;

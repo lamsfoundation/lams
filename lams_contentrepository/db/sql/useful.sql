@@ -1,3 +1,5 @@
+-- CVS ID: $Id$
+
 -- List all nodes, their versions and properties
 select * from lams_cr_node node
        left join lams_cr_node_version nv on node.node_id = nv.node_id

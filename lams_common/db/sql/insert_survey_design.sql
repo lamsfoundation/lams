@@ -1,3 +1,5 @@
+-- CVS ID: $Id$
+
 insert into lams_learning_design(learning_design_ui_id,description,title,first_activity_id,max_id,valid_design_flag,
 								 read_only_flag,user_id,help_text,copy_type_id,create_date_time,version,
 								 parent_learning_design_id,workspace_folder_id)
