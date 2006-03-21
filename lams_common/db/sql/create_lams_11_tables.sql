@@ -251,7 +251,8 @@ CREATE TABLE lams_user (
      , base_organisation_id BIGINT(20) NOT NULL DEFAULT 0
      , locale_language CHAR(2) NOT NULL DEFAULT 'en'
      , locale_country CHAR(2)
-     , theme_id BIGINT(20)
+     , flash_theme_id BIGINT(20)
+     , html_theme_id BIGINT(20)
      , PRIMARY KEY (user_id)
      , INDEX (authentication_method_id)
      , CONSTRAINT FK_lams_user_1 FOREIGN KEY (authentication_method_id)
@@ -261,11 +262,18 @@ CREATE TABLE lams_user (
                   REFERENCES lams_workspace (workspace_id) ON DELETE NO ACTION ON UPDATE NO ACTION
      , INDEX (base_organisation_id)
      , CONSTRAINT FK_lams_user_3 FOREIGN KEY (base_organisation_id)
-                  REFERENCES lams_organisation (organisation_id) ON DELETE NO ACTION ON UPDATE NO ACTION
-     , INDEX (theme_id)
-     , CONSTRAINT FK_lams_user_4 FOREIGN KEY (theme_id)
+                  REFERENCES lams_organisation (organisation_id)
+     , INDEX (flash_theme_id)
+     , CONSTRAINT FK_lams_user_4 FOREIGN KEY (flash_theme_id)
+                  REFERENCES lams_css_theme_ve (theme_ve_id) ON DELETE NO ACTION ON UPDATE NO ACTION
+     , INDEX (html_theme_id)
+     , CONSTRAINT FK_lams_user_5 FOREIGN KEY (html_theme_id)
                   REFERENCES lams_css_theme_ve (theme_ve_id) ON DELETE NO ACTION ON UPDATE NO ACTION
 )TYPE=InnoDB;
+ALTER TABLE lams_user MODIFY COLUMN locale_language CHAR(2) NOT NULL DEFAULT 'en'
+      COMMENT 'ISO 639-1 Language Code (2 letter version) Java only supports 2 letter properly, not the 3 letter codes.';
+ALTER TABLE lams_user MODIFY COLUMN locale_country CHAR(2)
+      COMMENT 'ISO 3166 Country Code';
 CREATE UNIQUE INDEX UQ_lams_user_login ON lams_user (login ASC);
 CREATE INDEX login ON lams_user (login ASC);
 

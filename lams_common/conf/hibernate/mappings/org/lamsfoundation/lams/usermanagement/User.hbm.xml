@@ -367,9 +367,9 @@
         <meta attribute="field-description">
            @hibernate.many-to-one
             not-null="true"
-           @hibernate.column name="theme_id"         
+           @hibernate.column name="flash_theme_id"         
         </meta>
-        <column name="theme_id" />
+        <column name="flash_theme_id" />
     </many-to-one>
     
 	<!-- bi-directional one-to-many association to LearnerProgress -->
