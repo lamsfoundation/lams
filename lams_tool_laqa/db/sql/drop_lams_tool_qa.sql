@@ -1,4 +1,4 @@
--- $Id$
+-- $Id$  
 
 SET FOREIGN_KEY_CHECKS=0;
 DROP TABLE IF EXISTS tl_laqa11_usr_resp;

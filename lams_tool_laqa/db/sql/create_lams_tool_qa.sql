@@ -1,4 +1,4 @@
--- $Id$
+-- $Id$  
 
 CREATE TABLE lams.tl_laqa11_content (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
