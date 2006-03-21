@@ -1,2 +1,0 @@
--- This file has been replaced with the add_test_data script 
--- in the lams_common project.

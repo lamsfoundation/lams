@@ -1,2 +1,0 @@
--- This file has been replaced with the create script 
--- in the lams_common project.
