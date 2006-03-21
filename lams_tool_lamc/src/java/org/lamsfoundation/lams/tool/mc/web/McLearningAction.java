@@ -484,7 +484,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     	
     	if (intTotalQuestionCount-1 == intCurrentQuestionIndex)
     	{
-    		logger.debug("totalQuestionCount has been reached :" + totalQuestionCount);
+    			logger.debug("totalQuestionCount has been reached :" + totalQuestionCount);
         		request.getSession().setAttribute(TOTAL_COUNT_REACHED, new Boolean(true).toString());
         	}
     		

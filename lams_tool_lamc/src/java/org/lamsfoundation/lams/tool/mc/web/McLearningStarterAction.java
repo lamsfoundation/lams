@@ -202,7 +202,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	     */
 	    McUtils.persistTimeZone(request);
 	    ActionForward validateParameters=validateParameters(request, mapping);
-	    logger.debug("validateParamaters: " + validateParameters);
+	    logger.debug("validateParameters: " + validateParameters);
 	    if (validateParameters != null)
 	    {
 	    	return validateParameters;
@@ -608,19 +608,6 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    request.getSession().setAttribute(MAP_LEARNER_FEEDBACK_CORRECT, mapLeanerFeedbackCorrect);
 	    logger.debug("MAP_LEARNER_FEEDBACK_CORRECT: " + mapLeanerFeedbackCorrect);
 
-	    
-	    
-	    /*
-    	Map mapIncorrectFeedback = AuthoringUtil.rebuildIncorrectFeedbackMapfromDB(request, mcContent.getMcContentId());
-    	logger.debug("existing mapIncorrectFeedback:" + mapIncorrectFeedback);
-    	request.getSession().setAttribute(MAP_INCORRECT_FEEDBACK_LEARNER, mapIncorrectFeedback);
-    	
-    	Map mapCorrectFeedback = AuthoringUtil.rebuildCorrectFeedbackMapfromDB(request, mcContent.getMcContentId());
-    	logger.debug("existing mapCorrectFeedback:" + mapCorrectFeedback);
-    	request.getSession().setAttribute(MAP_CORRECT_FEEDBACK_LEARNER, mapCorrectFeedback);
-    	*/
-	    
-	    
 	    Map mapQuestionWeights=LearningUtil.buildWeightsMap(request, mcContent.getMcContentId());
 	    request.getSession().setAttribute(MAP_QUESTION_WEIGHTS, mapQuestionWeights);
 	    logger.debug("MAP_QUESTION_WEIGHTS: " + mapQuestionWeights);
@@ -641,7 +628,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    if (ss != null)
 	    {
 		    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-		    if ((user != null) || (user.getUserID() != null))
+		    if ((user != null) && (user.getUserID() != null))
 		    {
 		    	userID = user.getUserID().toString();
 			    logger.debug("retrieved userId: " + userID);
