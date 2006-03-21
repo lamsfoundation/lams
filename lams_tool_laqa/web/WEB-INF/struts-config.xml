@@ -53,7 +53,7 @@
 		name="QaAuthoringForm"
 		scope="session"
 		unknown="false"
-		validate="true"
+		validate="false"
     >
 
 		<exception
@@ -111,7 +111,7 @@
       parameter="dispatch"
       scope="session"
       unknown="false"
-      validate="true"
+      validate="false"
     >
     
 		<exception
@@ -168,7 +168,7 @@
    		name="QaLearningForm" 
    		scope="session"
 	    unknown="false"
-    	validate="true"
+    	validate="false"
    		input="/learningIndex.jsp"> 
    			
 		<exception
@@ -233,7 +233,7 @@
       input="/learning/AnswersContent.jsp"
       parameter="method"
       unknown="false"
-      validate="true">
+      validate="false">
 
 		<exception
 			key="error.exception.QaApplication"
