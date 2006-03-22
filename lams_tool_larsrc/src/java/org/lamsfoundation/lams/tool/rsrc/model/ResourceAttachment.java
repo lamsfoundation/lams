@@ -10,7 +10,7 @@ import org.apache.log4j.Logger;
  * @author Dapeng Ni
  *
  * A Wrapper class for uploaded files. An Attachment cannot exist independently
- * and must belong to a Forum.
+ * and must belong to a Resource.
  * 
  *
  * @hibernate.class table="tl_larsrc11_attachment"

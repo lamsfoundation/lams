@@ -23,7 +23,13 @@ package org.lamsfoundation.lams.tool.rsrc.model;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
-
+/**
+ * Resource
+ * @author Dapeng Ni
+ *
+ * @hibernate.class  table="tl_larsrc11_user"
+ *
+ */
 public class ResourceUser {
 	private static final long serialVersionUID = -7043502180037866257L;
 	private static Logger log = Logger.getLogger(ResourceUser.class);
@@ -33,6 +39,7 @@ public class ResourceUser {
 	private String firstName;
 	private String lastName;
 	private String loginName;
+	private ResourceSession session;
 	
 	public ResourceUser(){
 	}
@@ -120,7 +127,19 @@ public class ResourceUser {
 	public void setLoginName(String loginName) {
 		this.loginName = loginName;
 	}
+	/**
+	 * @hibernate.many-to-one column="session_id"
+	 * 			cascade="none"
+	 * @return
+	 */
+	public ResourceSession getSession() {
+		return session;
+	}
 
+	public void setSession(ResourceSession session) {
+		this.session = session;
+	}
+	
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;

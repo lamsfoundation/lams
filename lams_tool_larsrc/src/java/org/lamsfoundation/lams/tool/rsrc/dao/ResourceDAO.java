@@ -18,8 +18,8 @@
  *
  *http://www.gnu.org/licenses/gpl.txt
  */
-package org.lamsfoundation.lams.tool.rsrc.model;
+package org.lamsfoundation.lams.tool.rsrc.dao;
 
-public class ResourceItem {
+public interface ResourceDAO  extends DAO {
 
 }

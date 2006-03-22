@@ -16,6 +16,9 @@
 		<fileset dir="${sharedlib}">
 			<include name="**/*.jar"/>
 		</fileset>
+		<fileset dir="lib">
+			<include name="**/*.jar"/>
+		</fileset>
 		<fileset dir="${j2eelibs}">
 			<include name="**/*.jar"/>
 		</fileset>

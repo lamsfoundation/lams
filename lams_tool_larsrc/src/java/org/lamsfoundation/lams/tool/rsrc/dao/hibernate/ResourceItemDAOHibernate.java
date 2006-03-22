@@ -18,8 +18,10 @@
  *
  *http://www.gnu.org/licenses/gpl.txt
  */
-package org.lamsfoundation.lams.tool.rsrc.model;
+package org.lamsfoundation.lams.tool.rsrc.dao.hibernate;
 
-public class ResourceSession {
+import org.lamsfoundation.lams.tool.rsrc.dao.ResourceItemDAO;
+
+public class ResourceItemDAOHibernate extends BaseDAOHibernate implements ResourceItemDAO{
 
 }

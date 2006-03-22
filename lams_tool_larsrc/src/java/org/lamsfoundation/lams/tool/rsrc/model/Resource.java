@@ -315,7 +315,7 @@ public class Resource implements Cloneable{
      * 					order-by="create_date desc"
      * @hibernate.collection-key column="resource_uid"
      * @hibernate.collection-one-to-many
-     * 			class="org.lamsfoundation.lams.tool.rsrc.model.Attachment"
+     * 			class="org.lamsfoundation.lams.tool.rsrc.model.ResourceAttachment"
      *
      * @return a set of Attachments to this Message.
      */

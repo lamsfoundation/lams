@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
+    "http://www.springframework.org/dtd/spring-beans.dtd">
+
 <beans>
+
 	<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
 		<property name="basename"><value>org.lamsfoundation.lams.tool.rsrc.ApplicationResources</value></property>
 	</bean>
@@ -25,30 +28,30 @@
     </bean>
 
     <!-- core beans -->
-    <bean id="resourceDao" class="org.lamsfoundation.lams.tool.rsrc.dao.hibernate.ResourceDAO">
+    <bean id="resourceDao" class="org.lamsfoundation.lams.tool.rsrc.dao.hibernate.ResourceDAOHibernate">
         <property name="sessionFactory">
             <ref local="resourceSessionFactory"/>
         </property>
     </bean>
-    <bean id="resourceItemDao" class="org.lamsfoundation.lams.tool.rsrc.dao.hibernate.ResourceItemDAO">
-        <property name="sessionFactory">
-            <ref local="resourceSessionFactory"/>
-        </property>
-    </bean>
-
-   <bean id="resourceAttachmentDao" class="org.lamsfoundation.lams.tool.rsrc.dao.hibernate.ResourceAttachmentDAO">
+    <bean id="resourceItemDao" class="org.lamsfoundation.lams.tool.rsrc.dao.hibernate.ResourceItemDAOHibernate">
         <property name="sessionFactory">
             <ref local="resourceSessionFactory"/>
         </property>
     </bean>
 
-   <bean id="ResourceUserDao" class="org.lamsfoundation.lams.tool.rsrc.dao.hibernate.ResourceUserDAO">
+   <bean id="resourceAttachmentDao" class="org.lamsfoundation.lams.tool.rsrc.dao.hibernate.ResourceAttachmentDAOHibernate">
         <property name="sessionFactory">
             <ref local="resourceSessionFactory"/>
         </property>
     </bean>
 
-   <bean id="resourceSessionDao" class="org.lamsfoundation.lams.tool.rsrc.dao.hibernate.ResourceSessionDAO">
+   <bean id="resourceUserDao" class="org.lamsfoundation.lams.tool.rsrc.dao.hibernate.ResourceUserDAOHibernate">
+        <property name="sessionFactory">
+            <ref local="resourceSessionFactory"/>
+        </property>
+    </bean>
+
+   <bean id="resourceSessionDao" class="org.lamsfoundation.lams.tool.rsrc.dao.hibernate.ResourceSessionDAOHibernate">
         <property name="sessionFactory">
             <ref local="resourceSessionFactory"/>
         </property>
@@ -60,7 +63,7 @@
 	 		<property name="repositoryService"><ref bean="repositoryService"/></property>
 	</bean> 
 	
-    <bean id="resourceManagerTarget" class="org.lamsfoundation.lams.tool.rsrc.service.ResourceService">
+    <bean id="resourceManagerTarget" class="org.lamsfoundation.lams.tool.rsrc.service.ResourceServiceImpl">
         <property name="resourceDao">
             <ref local="resourceDao"/>
         </property>
@@ -70,8 +73,8 @@
         <property name="resourceAttachmentDao">
             <ref local="resourceAttachmentDao"/>
         </property>
-        <property name="ResourceUserDao">
-            <ref local="ResourceUserDao"/>
+        <property name="resourceUserDao">
+            <ref local="resourceUserDao"/>
         </property>
         <property name="resourceSessionDao">
             <ref local="resourceSessionDao"/>
@@ -82,12 +85,14 @@
         <property name="repositoryService">
             <ref bean="repositoryService"/>
         </property>
+        <!-- 
    		<property name="toolService">
    			<ref bean="lamsToolService"/>
    		</property>
    		<property name="learnerService">
    			<ref bean="learnerService"/>
    		</property>
+   		-->
    		<property name="messageService"><ref bean="messageService"/></property>
     </bean>
 
@@ -105,5 +110,5 @@
             </props>
         </property>
     </bean>
-
 </beans>
+
