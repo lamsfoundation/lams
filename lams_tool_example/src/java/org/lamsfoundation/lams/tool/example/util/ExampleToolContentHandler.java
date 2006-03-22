@@ -18,14 +18,14 @@ USA
 
 http://www.gnu.org/licenses/gpl.txt 
 */
+
+/* $Id$ */ 
 package org.lamsfoundation.lams.tool.example.util;
 
 import org.lamsfoundation.lams.contentrepository.client.ToolContentHandler;
 
 /**
  * Simple client for accessing the content repository.
- * 
- * $Id$
  */
 public class ExampleToolContentHandler extends ToolContentHandler {
 

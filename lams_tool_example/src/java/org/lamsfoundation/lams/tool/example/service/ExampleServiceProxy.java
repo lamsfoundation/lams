@@ -18,6 +18,8 @@
  *
  *http://www.gnu.org/licenses/gpl.txt
  */
+
+/* $Id$ */ 
 package org.lamsfoundation.lams.tool.example.service;
 
 import javax.servlet.ServletContext;
@@ -34,8 +36,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * In this way, the presentation tier will no longer be aware of the changes in
  * service layer. Therefore we can feel free to switch the business logic
  * implementation.</p>
- * 
- *     $Id$
  */
 
 public class ExampleServiceProxy {

@@ -1,3 +1,5 @@
+<!-- $Id$ -->
+
 <context-param>
 	<param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
   	<param-value>org.lamsfoundation.lams.applicationResources</param-value>

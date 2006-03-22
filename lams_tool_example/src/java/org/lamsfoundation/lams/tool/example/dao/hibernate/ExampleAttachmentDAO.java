@@ -18,6 +18,8 @@
  *
  *http://www.gnu.org/licenses/gpl.txt
  */
+
+/* $Id$ */ 
 package org.lamsfoundation.lams.tool.example.dao.hibernate;
 
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
@@ -25,8 +27,6 @@ import org.lamsfoundation.lams.tool.example.dao.IExampleAttachmentDAO;
 
 /**
  * DAO for accessing the ExampleAttachment objects - Hibernate specific code.
- * 
- * $Id$
  */
 public class ExampleAttachmentDAO extends BaseDAO implements IExampleAttachmentDAO {
 

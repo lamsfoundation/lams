@@ -18,9 +18,9 @@
  *
  *http://www.gnu.org/licenses/gpl.txt
  */
+
+/* $Id$ */ 
 package org.lamsfoundation.lams.tool.example;
-
-
 
 /**
  * 
@@ -30,8 +30,6 @@ package org.lamsfoundation.lams.tool.example;
  * 
  *        @hibernate.class
  *         table="tl_laex11_user"
- *     
- *  $Id$
  */
 
 public class ExampleUser  implements java.io.Serializable {

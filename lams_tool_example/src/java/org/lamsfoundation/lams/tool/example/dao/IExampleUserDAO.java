@@ -18,6 +18,8 @@
  *
  *http://www.gnu.org/licenses/gpl.txt
  */
+
+/* $Id$ */ 
 package org.lamsfoundation.lams.tool.example.dao;
 
 import org.lamsfoundation.lams.dao.IBaseDAO;
@@ -25,8 +27,6 @@ import org.lamsfoundation.lams.dao.IBaseDAO;
 /**
  * DAO for accessing the ExampleUser objects - interface defining
  * methods to be implemented by the Hibernate or other implementation.
- * 
- * $Id$
  */
 public interface IExampleUserDAO extends IBaseDAO{
 

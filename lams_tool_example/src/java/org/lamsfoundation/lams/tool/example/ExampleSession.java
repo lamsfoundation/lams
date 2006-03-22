@@ -18,6 +18,8 @@
  *
  *http://www.gnu.org/licenses/gpl.txt
  */
+
+/* $Id$ */ 
 package org.lamsfoundation.lams.tool.example;
 
 import java.util.Date;
@@ -31,8 +33,6 @@ import java.util.Set;
  * 
  *        @hibernate.class
  *         table="tl_laex11_session"
- *    
- *  $Id$
  */
 
 public class ExampleSession  implements java.io.Serializable {

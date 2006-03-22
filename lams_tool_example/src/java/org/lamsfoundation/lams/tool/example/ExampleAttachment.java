@@ -18,7 +18,8 @@
  *
  *http://www.gnu.org/licenses/gpl.txt
  */
-/*  $Id$ */
+
+/* $Id$ */ 
 package org.lamsfoundation.lams.tool.example;
 
 import java.util.Date;
