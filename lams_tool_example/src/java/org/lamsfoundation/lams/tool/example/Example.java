@@ -23,8 +23,8 @@ package org.lamsfoundation.lams.tool.example;
 import java.util.Date;
 import java.util.Set;
 
-
-/**
+// $Id$ 
+/**  
  *        @hibernate.class
  *         table="tl_laex11_example"
  * 
