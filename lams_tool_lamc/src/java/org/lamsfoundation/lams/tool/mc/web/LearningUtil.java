@@ -798,6 +798,7 @@ public class LearningUtil implements McAppConstants {
 
     public static int getLearnerMarkAtLeast(Integer passMark, Map mapQuestionWeights)
     {
+    	logger.debug("doing getLearnerMarkAtLeast");
     	logger.debug("passMark:" + passMark);
         logger.debug("mapQuestionWeights:" + mapQuestionWeights);
         
@@ -818,6 +819,7 @@ public class LearningUtil implements McAppConstants {
 
     public static int calculateMinimumQuestionCountToPass(Integer passMark, Map mapQuestionWeights)
     {
+    	logger.debug("calculating minimumQuestionCountToPass: mapQuestionWeights: " + mapQuestionWeights + " passmark: " + passMark);
     	logger.debug("passMark: " + passMark);
     	logger.debug("original mapQuestionWeights: " + mapQuestionWeights);
     	
@@ -825,12 +827,19 @@ public class LearningUtil implements McAppConstants {
     	int totalHighestWeights=0;
     	while (totalHighestWeights <= passMark.intValue())
     	{
+    		logger.debug("totalHighestWeights versus passMark: " + totalHighestWeights + " versus" + passMark);
         	int highestWeight=getHighestWeight(mapQuestionWeights);
+        	logger.debug("highestWeight: " + highestWeight);
         	totalHighestWeights=totalHighestWeights + highestWeight;
         	logger.debug("totalHighestWeights: " + totalHighestWeights);
         	mapQuestionWeights=rebuildWeightsMapExcludeHighestWeight(mapQuestionWeights, highestWeight);
     		logger.debug("mapQuestionWeights: " + mapQuestionWeights);
     		++minimumQuestionCount;
+    		if (mapQuestionWeights.size() == 0)
+    		{
+    			logger.debug("no more weights: ");
+    			break;
+    		}
     	}
     	logger.debug("returning minimumQuestionCount: " + minimumQuestionCount);
     	return minimumQuestionCount;
@@ -839,6 +848,15 @@ public class LearningUtil implements McAppConstants {
     
 	public static int getHighestWeight(Map mapQuestionWeights)
 	{
+	   
+		if (mapQuestionWeights.size() == 1)
+		{
+			logger.debug("using map with 1 question only");
+			/*the only alternative is 100*/
+			return 100;
+		}
+		
+		logger.debug("using map with > 1 questions");
 	   Iterator itMap = mapQuestionWeights.entrySet().iterator();
  	   int highestWeight=0; 	   
        while (itMap.hasNext()) 
@@ -856,6 +874,9 @@ public class LearningUtil implements McAppConstants {
 	
 	public static Map rebuildWeightsMapExcludeHighestWeight(Map mapQuestionWeights, int highestWeight)
 	{
+		logger.debug("doing rebuildWeightsMapExcludeHighestWeight: " + mapQuestionWeights);
+		logger.debug("doing highestWeight: " + highestWeight);
+		
 	   Map mapWeightsExcludeHighestWeight= new TreeMap(new McComparator());
 	   
 	   Iterator itMap = mapQuestionWeights.entrySet().iterator();
@@ -865,6 +886,8 @@ public class LearningUtil implements McAppConstants {
        		Map.Entry pair = (Map.Entry)itMap.next();
        		String weight=pair.getValue().toString();
        		int intWeight=new Integer(weight).intValue();
+       		logger.debug("intWeight: " + intWeight);
+       		logger.debug("intWeight versus highestWeight:" + intWeight + " versus" + highestWeight);
        		if (intWeight != highestWeight)
        		{
            		mapWeightsExcludeHighestWeight.put(mapIndex.toString(),weight);

@@ -187,10 +187,10 @@ http://www.gnu.org/licenses/gpl.txt
 																		</c:forEach>											
 																	</c:if> 														
 																	
-																	<c:if test="${mainEntry.value == 'false'}"> 		
-																		<c:forEach var="feedbackEntry" items="${sessionScope.mapLeanerFeedbackIncorrect}">
-																			<c:if test="${feedbackEntry.key == sessionScope.queIndex}"> 		
-																				<c:out value="${feedbackEntry.value}" escapeXml="false" />
+																	<c:if test="${mainEntry.value != 'true'}"> 		
+																		<c:forEach var="feedbackEntryIncorrect" items="${sessionScope.mapLeanerFeedbackIncorrect}">
+																			<c:if test="${feedbackEntryIncorrect.key == sessionScope.queIndex}"> 		
+																				<c:out value="${feedbackEntryIncorrect.value}" escapeXml="false" />
 																			</c:if> 																																				
 																		</c:forEach>											
 																	</c:if> 														

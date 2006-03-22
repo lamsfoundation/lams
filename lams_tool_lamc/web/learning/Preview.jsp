@@ -166,15 +166,6 @@ http://www.gnu.org/licenses/gpl.txt
 			  	   </tr>
 			  	   
 		  	<html:hidden property="donePreview"/>						   
-  	  	   		  <tr>
-				  	<td NOWRAP colspan=2 align=right class="input" valign=top> 
-					  	<font size=2>
-						 <html:submit onclick="javascript:submitMethod('donePreview');" styleClass="button">
-								<bean:message key="button.done"/>
-						</html:submit>
-						</font>
-				  	 </td>
-				  </tr>
 		</table>
 	<!--options content ends here-->
 </html:form>	

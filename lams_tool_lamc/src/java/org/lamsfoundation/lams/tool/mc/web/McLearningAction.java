@@ -441,6 +441,9 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
         logger.debug("updated highestAttemptOrder:" + intHighestAttemptOrder);
         request.getSession().setAttribute(LEARNER_LAST_ATTEMPT_ORDER, new Integer(intHighestAttemptOrder).toString());
         
+        logger.debug("before getLearnerMarkAtLeast: passMark" + passMark);
+        logger.debug("before getLearnerMarkAtLeast: mapQuestionWeights" + mapQuestionWeights);
+        
         int learnerMarkAtLeast=LearningUtil.getLearnerMarkAtLeast(passMark,mapQuestionWeights);
         logger.debug("learnerMarkAtLeast:" + learnerMarkAtLeast);
         request.getSession().setAttribute(LEARNER_MARK_ATLEAST, new Integer(learnerMarkAtLeast).toString());
