@@ -103,6 +103,8 @@ public class SessionManager{
 		//initialize a new one
 		HttpSession session = getInstance().new SessionImpl(sessionId);
 		getInstance().sessionContainer.put(sessionId,session);
+		// TODO remove this debugging - only put in to diagnose Ozgur's session problem
+		log.debug("SessionManager: creating new session "+sessionId);
 	}
 	
 	/**
@@ -165,6 +167,11 @@ public class SessionManager{
 		if(cookie != null){
 			currentSessionId = cookie.getValue();
 			Object obj = getSession(currentSessionId);
+			// TODO remove this debugging - only put in to diagnose Ozgur's session problem
+			if ( log.isDebugEnabled() ) {
+				log.debug("SessionManager: cookie is not null, currentSessionId="+currentSessionId
+						+" session="+obj);
+			}
 			//if cookie exist, but session does not. This usually menas seesion expired. 
 			//then delete the cookie first and set it null in order to create a new one
 			if(obj == null){
@@ -176,6 +183,10 @@ public class SessionManager{
 		}
 		//can not be in else!
 		if(cookie == null){
+			// TODO remove this debugging - only put in to diagnose Ozgur's session problem
+			if ( log.isDebugEnabled() ) {
+				log.debug("SessionManager: cookie is null, generating a new session");
+			}
 			//create new session and set it into cookie
 			currentSessionId = (String) new UUIDHexGenerator().generate(null,null);
 			createSession(currentSessionId);
