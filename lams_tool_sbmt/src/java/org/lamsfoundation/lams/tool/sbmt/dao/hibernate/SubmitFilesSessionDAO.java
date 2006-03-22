@@ -8,7 +8,7 @@ package org.lamsfoundation.lams.tool.sbmt.dao.hibernate;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.learningdesign.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
 import org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesSessionDAO;
 

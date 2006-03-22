@@ -24,10 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.FlushMode;
-import org.hibernate.Hibernate;
-import org.hibernate.type.Type;
 
-import org.lamsfoundation.lams.learningdesign.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.tool.sbmt.Learner;
 import org.lamsfoundation.lams.tool.sbmt.dao.ILearnerDAO;
 

@@ -6,7 +6,7 @@
  */
 package org.lamsfoundation.lams.tool.sbmt.dao;
 
-import org.lamsfoundation.lams.learningdesign.dao.IBaseDAO;
+import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 
 /**

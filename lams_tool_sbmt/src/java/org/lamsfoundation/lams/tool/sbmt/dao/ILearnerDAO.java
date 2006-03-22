@@ -22,7 +22,7 @@ package org.lamsfoundation.lams.tool.sbmt.dao;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.learningdesign.dao.IBaseDAO;
+import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.tool.sbmt.Learner;
 
 public interface ILearnerDAO extends IBaseDAO  {

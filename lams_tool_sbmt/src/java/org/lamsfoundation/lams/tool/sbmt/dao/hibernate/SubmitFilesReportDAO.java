@@ -9,7 +9,7 @@ package org.lamsfoundation.lams.tool.sbmt.dao.hibernate;
 import java.util.List;
 
 import org.hibernate.FlushMode;
-import org.lamsfoundation.lams.learningdesign.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesReport;
 import org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesReportDAO;
 
