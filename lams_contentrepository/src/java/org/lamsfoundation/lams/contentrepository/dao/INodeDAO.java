@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.lamsfoundation.lams.contentrepository.CrNode;
 import org.lamsfoundation.lams.contentrepository.CrNodeVersion;
-import org.lamsfoundation.lams.learningdesign.dao.IBaseDAO;
+import org.lamsfoundation.lams.dao.IBaseDAO;
 
 /**
  * Data access routines for Nodes, versions and properties

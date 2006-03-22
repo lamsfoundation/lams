@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.CrNode;
 import org.lamsfoundation.lams.contentrepository.CrNodeVersion;
 import org.lamsfoundation.lams.contentrepository.dao.INodeDAO;
-import org.lamsfoundation.lams.learningdesign.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 
 
 

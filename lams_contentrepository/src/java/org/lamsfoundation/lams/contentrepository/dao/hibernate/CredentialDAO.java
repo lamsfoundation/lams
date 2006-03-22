@@ -35,7 +35,7 @@ import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.IWorkspace;
 import org.lamsfoundation.lams.contentrepository.RepositoryRuntimeException;
 import org.lamsfoundation.lams.contentrepository.dao.ICredentialDAO;
-import org.lamsfoundation.lams.learningdesign.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 
 
 /**

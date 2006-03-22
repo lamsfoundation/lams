@@ -25,7 +25,7 @@ import org.lamsfoundation.lams.contentrepository.CrCredential;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.IWorkspace;
 import org.lamsfoundation.lams.contentrepository.RepositoryRuntimeException;
-import org.lamsfoundation.lams.learningdesign.dao.IBaseDAO;
+import org.lamsfoundation.lams.dao.IBaseDAO;
 
 public interface ICredentialDAO extends IBaseDAO {
 

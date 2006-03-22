@@ -25,7 +25,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import org.lamsfoundation.lams.contentrepository.CrWorkspace;
-import org.lamsfoundation.lams.learningdesign.dao.IBaseDAO;
+import org.lamsfoundation.lams.dao.IBaseDAO;
 
 
 /**

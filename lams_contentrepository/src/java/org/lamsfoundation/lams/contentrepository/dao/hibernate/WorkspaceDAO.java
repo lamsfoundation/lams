@@ -30,7 +30,7 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.CrWorkspace;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.dao.IWorkspaceDAO;
-import org.lamsfoundation.lams.learningdesign.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.springframework.orm.hibernate3.HibernateObjectRetrievalFailureException;
 
 
