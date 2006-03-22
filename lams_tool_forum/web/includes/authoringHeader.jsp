@@ -26,13 +26,17 @@
 	var themeName="aqua";
         
 	function init(){
-		initTabSize(4);
+		initTabSize(3);
             
 //		var tag = document.getElementById("currentTab");
 //		if(tag.value != "")
 //			selectTab(tag.value);
 //      else
 			selectTab(1);
+			
+	   initEditor("BasicInstructions");
+	   initEditor("OnlineInstructions");
+	   initEditor("OfflineInstructions");
 	}  
         
 	function doSelectTab(tabId) {
@@ -47,6 +51,11 @@
 //		document.forumMonitoringForm.method.value=method;
 		document.forumMonitoringForm.submit();
 	}
+	
+    // TabController code here
+           
+
+	
 	//]]>        
 	</script>
 
@@ -57,4 +66,3 @@
 	</script>
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 </head>
-

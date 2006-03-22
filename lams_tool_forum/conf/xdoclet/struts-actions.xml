@@ -15,7 +15,7 @@
 			scope="session" 
 			parameter="initPage" 
 			validate="false">
-			<forward name="success" path="/jsps/authoring/authoring.jsp" />
+			<forward name="success" path="tiles:/authoring/forum/main" />
 		</action>
 		
 		<action path="/authoring/update"
@@ -24,7 +24,7 @@
 			scope="session" 
 			parameter="updateContent" 
 			validate="false">
-			<forward name="author" path="/jsps/authoring/authoring.jsp" />
+			<forward name="author" path="tiles:/authoring/forum/main" />
 			<forward name="monitor" path="tiles:/monitoring/forum/defineLater" />
 		</action>
 
@@ -34,7 +34,7 @@
 			scope="session" 
 			parameter="uploadOnlineFile" 
 			validate="false">
-			<forward name="success" path="/jsps/authoring/authoring.jsp" />
+			<forward name="success" path="tiles:/authoring/forum/main" />
 		</action>
 		
 		<action path="/authoring/uploadOffline"
@@ -43,7 +43,7 @@
 			scope="session" 
 			validate="false"
 			parameter="uploadOfflineFile" >
-			<forward name="success" path="/jsps/authoring/authoring.jsp" />
+			<forward name="success" path="tiles:/authoring/forum/main" />
 		</action>
 		
 		<action path="/authoring/deleteOnline"
@@ -52,7 +52,7 @@
 			scope="session" 
 			validate="false"
 			parameter="deleteOnlineFile" >
-			<forward name="success" path="/jsps/authoring/authoring.jsp" />
+			<forward name="success" path="tiles:/authoring/forum/main" />
 		</action>
 		
 		<action path="/authoring/deleteOffline"
@@ -61,7 +61,7 @@
 			scope="session" 
 			validate="false"
 			parameter="deleteOfflineFile" >
-			<forward name="success" path="/jsps/authoring/authoring.jsp" />
+			<forward name="success" path="tiles:/authoring/forum/main" />
 		</action>
 						
 		<action path="/authoring/newTopic"
@@ -137,7 +137,7 @@
 			scope="session" 
 			validate="false"
 			parameter="finishTopic" >
-			<forward name="author" path="/jsps/authoring/authoring.jsp" />
+			<forward name="author" path="tiles:/authoring/forum/main" />
 			<forward name="monitor" path="tiles:/monitoring/forum/defineLater" />
 		</action>
 		
