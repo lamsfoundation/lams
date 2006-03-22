@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.learningdesign.dao;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 ;
 /**

@@ -22,6 +22,7 @@
  */
 package org.lamsfoundation.lams.learningdesign.dao.hibernate;
 
+import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.learningdesign.ChosenGrouping;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.RandomGrouping;

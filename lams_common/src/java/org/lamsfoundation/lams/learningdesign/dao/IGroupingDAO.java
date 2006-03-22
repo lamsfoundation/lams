@@ -22,6 +22,7 @@
  */
 package org.lamsfoundation.lams.learningdesign.dao;
 
+import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 
 /**

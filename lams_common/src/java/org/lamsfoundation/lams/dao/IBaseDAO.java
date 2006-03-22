@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-package org.lamsfoundation.lams.learningdesign.dao;
+package org.lamsfoundation.lams.dao;
 
 import java.io.Serializable;
 import java.util.List;

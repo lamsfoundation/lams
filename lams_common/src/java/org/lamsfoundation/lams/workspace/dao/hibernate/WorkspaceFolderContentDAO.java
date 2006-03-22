@@ -25,7 +25,7 @@ package org.lamsfoundation.lams.workspace.dao.hibernate;
 import java.util.Iterator;
 import java.util.List;
 
-import org.lamsfoundation.lams.learningdesign.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.workspace.WorkspaceFolderContent;
 import org.lamsfoundation.lams.workspace.dao.IWorkspaceFolderContentDAO;
 

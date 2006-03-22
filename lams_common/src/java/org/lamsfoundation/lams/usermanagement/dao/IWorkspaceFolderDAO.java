@@ -24,7 +24,7 @@ package org.lamsfoundation.lams.usermanagement.dao;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.learningdesign.dao.IBaseDAO;
+import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 
 /**

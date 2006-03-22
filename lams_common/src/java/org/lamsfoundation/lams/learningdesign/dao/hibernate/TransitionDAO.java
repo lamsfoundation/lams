@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.learningdesign.dao.hibernate;
 import java.util.List;
 
 import org.hibernate.Query;
+import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.ITransitionDAO;

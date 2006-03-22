@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.learningdesign.dao.hibernate;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.learningdesign.LearningLibrary;
 import org.lamsfoundation.lams.learningdesign.dao.ILearningLibraryDAO;
 

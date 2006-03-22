@@ -22,8 +22,8 @@
  */
 package org.lamsfoundation.lams.learningdesign.dao;
 
+import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.License;
-import org.lamsfoundation.lams.learningdesign.dao.IBaseDAO;
 
 /**
  * @author Manpreet Minhas

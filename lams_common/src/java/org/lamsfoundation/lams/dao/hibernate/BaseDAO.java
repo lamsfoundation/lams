@@ -20,14 +20,14 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-package org.lamsfoundation.lams.learningdesign.dao.hibernate;
+package org.lamsfoundation.lams.dao.hibernate;
 
 import java.io.Serializable;
 import java.util.List;
 
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
-import org.lamsfoundation.lams.learningdesign.dao.IBaseDAO;
+import org.lamsfoundation.lams.dao.IBaseDAO;
 
 /**
  * @author Manpreet Minhas

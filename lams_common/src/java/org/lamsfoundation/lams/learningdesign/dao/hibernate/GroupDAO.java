@@ -22,6 +22,7 @@
  */
 package org.lamsfoundation.lams.learningdesign.dao.hibernate;
 
+import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupDAO;
 
