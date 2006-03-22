@@ -1,1 +1,1 @@
-Class-Path: ./lams.jar ./lams-contentrepository.jar
+Class-Path: ./lams.jar ./lams-tool-laex11.jar ./lams-contentrepository.jar ./lams-learning.jar

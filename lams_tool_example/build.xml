@@ -198,68 +198,7 @@ Ant build file.
 	</target>
 
 
-	<!-- =================================================================== -->
-	<!-- Run Middlegen                                                     -->
-	<!-- =================================================================== -->
 
-	   <target 
-	      name="middlegen" 
-	      description="Run Middlegen" 
-	      unless="middlegen.skip"
-	      depends=""
-	   >
-	      <taskdef
-	         name="middlegen"
-	         classname="middlegen.MiddlegenTask"
-	         classpathref="all-libs"
-	      />
-
-	      <middlegen
-	         appname="${name}"
-	         prefsdir="${middlegen}"
-	         gui="${middlegen.gui}"
-	         databaseurl="${db.url}"
-	         initialContextFactory="${java.naming.factory.initial}"
-	         providerURL="${java.naming.provider.url}"
-	         datasourceJNDIName="${datasource.jndi.name}"
-	         driver="${db.driver}"
-	         username="${db.username}"
-	         password="${db.password}"
-	         schema="${db.schema}"
-	         catalog="lams"
-	         includeViews="false"
-	      >
-
-	         <hibernate 
-	            destination="${conf.dir}/hibernate/mappings"
-	            package="${package.name}"
-	            genXDocletTags="true"
-	            javaTypeMapper="middlegen.plugins.hibernate.HibernateJavaTypeMapper"
-	         	
-	         />
-
-			<table name="tl_laex11_example" />
-	      	<table name="tl_laex11_session" />
-	      	<table name="tl_laex11_user" />
-	      	<table name="tl_laex11_attachment" />
-	      </middlegen>
-
-	   </target>
-	
-    <taskdef name="hibernatetool"
-        classname="org.hibernate.tool.ant.HibernateToolTask"
-        classpathref="maven.dependency.classpath"/>
-
-    <hibernatetool destdir="src/java">
-        <configuration configurationfile="src/main/hibernate/hibernate.cfg.xml">
-            <fileset dir="${conf.dir}/hibernate/mappings">
-                <include name="**/*.hbm.xml"/>
-            </fileset>
-        </configuration>
-
-        <hbm2java />
-    </hibernatetool>
-	
 	<!-- =================================================================== -->
 	<!-- Generate hibernate xml files                             			 -->
 	<!-- =================================================================== -->

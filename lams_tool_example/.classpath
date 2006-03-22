@@ -7,5 +7,8 @@
 	<classpathentry kind="src" path="conf/hibernate/mappings"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/3rdParty"/>
 	<classpathentry sourcepath="/lams_common" kind="lib" path="/lams_build/lib/lams/lams.jar"/>
+	<classpathentry kind="con" path="melibrary.com.genuitec.eclipse.hibernate.MYECLIPSE_HIBERNATE3_CORE"/>
+	<classpathentry sourcepath="/lams_contentrepository" kind="lib" path="/lams_build/lib/lams/lams-contentrepository.jar"/>
+	<classpathentry sourcepath="/lams_learning" kind="lib" path="/lams_build/lib/lams/lams-learning.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

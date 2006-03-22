@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+ 	<!--
+ 	- Application context definition for Example tool business layer.
+	-->
+<beans>
+
+	<!-- ========================= GENERAL DEFINITIONS ========================= -->
+
+	<!-- ========================= RESOURCE DEFINITIONS ========================= -->
+	<!-- Hibernate SessionFactory -->
+	  <bean id="exampleSessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<property name="dataSource"><ref bean="toolDataSource"/></property>
+		<property name="mappingResources">
+			<list>	
+				<value>org/lamsfoundation/lams/tool/example/Example.hbm.xml</value>
+				<value>org/lamsfoundation/lams/tool/example/ExampleSession.hbm.xml</value>
+				<value>org/lamsfoundation/lams/tool/example/ExampleUser.hbm.xml</value>
+				<value>org/lamsfoundation/lams/tool/example/ExampleAttachment.hbm.xml</value> 
+			</list>
+		</property>
+		<property name="hibernateProperties"><ref bean="hibernateProperties"/></property>
+	</bean>
+
+	<!-- ========================= BUSINESS OBJECT DEFINITIONS ======================== -->
+	<bean id="exampleService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+		<property name ="target">
+			<bean class="org.lamsfoundation.lams.tool.example.service.ExampleService">
+				<property name="exampleAttachmentDAO"><ref bean="exampleAttachmentDAO"/></property>
+				<property name="exampleSessionDAO"><ref bean="exampleSessionDAO"/></property>
+				<property name="exampleUserDAO"><ref bean="exampleUserDAO"/></property>
+				<property name="exampleDAO"><ref bean="exampleDAO"/></property>
+				<property name="toolService"><ref bean="lamsToolService"/></property>
+				<property name="learnerService"><ref bean="learnerService"/></property>			
+ 				<property name="exampleToolContentHandler"><ref bean="exampleToolContentHandler"/></property>
+			</bean>
+		</property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="create*">PROPAGATION_REQUIRED</prop>
+				<prop key="copy*">PROPAGATION_REQUIRED</prop>
+				<prop key="update*">PROPAGATION_REQUIRED</prop>
+				<prop key="get*">PROPAGATION_REQUIRED</prop>
+				<prop key="save*">PROPAGATION_REQUIRED</prop>
+				<prop key="retrieve*">PROPAGATION_REQUIRED</prop>
+				<prop key="remove*">PROPAGATION_REQUIRED</prop>
+				<prop key="add*">PROPAGATION_REQUIRED</prop>
+				<prop key="leaveToolSession">PROPAGATION_REQUIRED</prop>
+                <prop key="setAsDefineLater">PROPAGATION_REQUIRED</prop>
+                <prop key="setAsRunOffline">PROPAGATION_REQUIRED</prop>
+                <prop key="exportToolSession">PROPAGATION_REQUIRED</prop>
+				
+			</props>
+		</property>
+	</bean> 
+
+
+
+	<!--  DAO classes -->
+	<bean id="exampleDAO" class="org.lamsfoundation.lams.tool.example.dao.hibernate.ExampleDAO">
+		<property name="sessionFactory"><ref local="exampleSessionFactory"/></property>
+	</bean>  
+
+	<bean id="exampleSessionDAO" class="org.lamsfoundation.lams.tool.example.dao.hibernate.ExampleSessionDAO">
+		<property name="sessionFactory"><ref local="exampleSessionFactory"/></property>
+	</bean>
+	
+	<bean id="exampleUserDAO" class="org.lamsfoundation.lams.tool.example.dao.hibernate.ExampleUserDAO">
+		<property name="sessionFactory"><ref local="exampleSessionFactory"/></property>
+	</bean>
+	
+	<bean id="exampleAttachmentDAO" class="org.lamsfoundation.lams.tool.example.dao.hibernate.ExampleAttachmentDAO">
+		<property name="sessionFactory"><ref local="exampleSessionFactory"/></property>
+	</bean>
+	
+ 	<bean id="exampleToolContentHandler" class="org.lamsfoundation.lams.tool.example.util.ExampleToolContentHandler">
+ 		<property name="repositoryService"><ref bean="repositoryService"/></property>
+	</bean>  
+
+</beans>

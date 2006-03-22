@@ -22,12 +22,19 @@ package org.lamsfoundation.lams.tool.example.service;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
+import org.lamsfoundation.lams.tool.example.dao.IExampleAttachmentDAO;
+import org.lamsfoundation.lams.tool.example.dao.IExampleDAO;
+import org.lamsfoundation.lams.tool.example.dao.IExampleSessionDAO;
+import org.lamsfoundation.lams.tool.example.dao.IExampleUserDAO;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
+import org.lamsfoundation.lams.tool.service.ILamsToolService;
 
 /**
 * An implementation of the NoticeboardService interface.
@@ -38,11 +45,21 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
 public class ExampleService implements ToolSessionManager, ToolContentManager,
 		IExampleService {
 
+	private IExampleDAO exampleDAO=null;
+	private IExampleSessionDAO exampleSessionDAO = null;
+	private IExampleUserDAO exampleUserDAO=null;
+	private IExampleAttachmentDAO exampleAttachmentDAO = null;
+	
+	private ILearnerService learnerService;
+	private ILamsToolService toolService;
+	private IToolContentHandler exampleToolContentHandler = null;
+
 	public ExampleService() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
+	/* ************ Methods from ToolSessionManager, ToolContentManager ***********************/
 	public void createToolSession(Long toolSessionId, String toolSessionName,
 			Long toolContentId) throws ToolException {
 		// TODO Auto-generated method stub
@@ -52,7 +69,8 @@ public class ExampleService implements ToolSessionManager, ToolContentManager,
 	public String leaveToolSession(Long toolSessionId, Long learnerId)
 			throws DataMissingException, ToolException {
 		// TODO Auto-generated method stub
-		return null;
+		// Do tool status stuff first e.g. set learner to complete within the tool
+		return learnerService.completeToolSession(toolSessionId, learnerId);
 	}
 
 	public ToolSessionExportOutputData exportToolSession(Long toolSessionId)
@@ -95,6 +113,63 @@ public class ExampleService implements ToolSessionManager, ToolContentManager,
 			throws SessionDataExistsException, ToolException {
 		// TODO Auto-generated method stub
 
+	}
+
+	/* ******************* Used by Spring to "inject" the linked objects **************************/
+	public IExampleAttachmentDAO getExampleAttachmentDAO() {
+		return exampleAttachmentDAO;
+	}
+
+	public void setExampleAttachmentDAO(IExampleAttachmentDAO attachmentDAO) {
+		this.exampleAttachmentDAO = attachmentDAO;
+	}
+
+	public IExampleDAO getExampleDAO() {
+		return exampleDAO;
+	}
+
+	public void setExampleDAO(IExampleDAO exampleDAO) {
+		this.exampleDAO = exampleDAO;
+	}
+
+	public IToolContentHandler getExampleToolContentHandler() {
+		return exampleToolContentHandler;
+	}
+
+	public void setExampleToolContentHandler(IToolContentHandler exampleToolContentHandler) {
+		this.exampleToolContentHandler = exampleToolContentHandler;
+	}
+
+	public IExampleSessionDAO getExampleSessionDAO() {
+		return exampleSessionDAO;
+	}
+
+	public void setExampleSessionDAO(IExampleSessionDAO sessionDAO) {
+		this.exampleSessionDAO = sessionDAO;
+	}
+
+	public ILamsToolService getToolService() {
+		return toolService;
+	}
+
+	public void setToolService(ILamsToolService toolService) {
+		this.toolService = toolService;
+	}
+
+	public IExampleUserDAO getExampleUserDAO() {
+		return exampleUserDAO;
+	}
+
+	public void setExampleUserDAO(IExampleUserDAO userDAO) {
+		this.exampleUserDAO = userDAO;
+	}
+
+	public ILearnerService getLearnerService() {
+		return learnerService;
+	}
+
+	public void setLearnerService(ILearnerService learnerService) {
+		this.learnerService = learnerService;
 	}
 
 }

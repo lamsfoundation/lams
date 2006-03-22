@@ -1,245 +1,180 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
+
 <!DOCTYPE hibernate-mapping PUBLIC
-    "-//Hibernate/Hibernate Mapping DTD 2.0//EN"
-    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
-    
-<hibernate-mapping>
-<!-- 
-    Created by the Middlegen Hibernate plugin 2.1
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN" 
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 
-    http://boss.bekk.no/boss/middlegen/
-    http://www.hibernate.org/
--->
-
-<class 
-    name="org.lamsfoundation.lams.tool.example.Example" 
-    table="tl_laex11_example"
+<hibernate-mapping
 >
-    <meta attribute="class-description" inherit="false">
-       @hibernate.class
+    <class
+        name="org.lamsfoundation.lams.tool.example.Example"
         table="tl_laex11_example"
-    </meta>
-    <meta attribute="implement-equals" inherit="false">true</meta>
-
-    <id
-        name="uid"
-        type="java.lang.Long"
-        column="uid"
     >
-        <meta attribute="field-description">
-           @hibernate.id
-            generator-class="native"
-            type="java.lang.Long"
+
+        <id
+            name="uid"
             column="uid"
+            type="java.lang.Long"
+        >
+            <generator class="native">
+              <!--  
+                  To add non XDoclet generator parameters, create a file named 
+                  hibernate-generator-params-Example.xml 
+                  containing the additional parameters and place it in your merge dir. 
+              --> 
+            </generator>
+        </id>
 
-
-        </meta>
-        <meta attribute="use-in-equals">true</meta>
-        <generator class="native" />
-    </id>
-
-    <property
-        name="createDate"
-        type="java.sql.Timestamp"
-        column="create_date"
-        length="19"
-    >
-        <meta attribute="field-description">
-           @hibernate.property
+        <property
+            name="createDate"
+            type="java.util.Date"
+            update="true"
+            insert="true"
             column="create_date"
-            length="19"
-        </meta>    
-    </property>
-    <property
-        name="updateDate"
-        type="java.sql.Timestamp"
-        column="update_date"
-        length="19"
-    >
-        <meta attribute="field-description">
-           @hibernate.property
+        />
+
+        <property
+            name="updateDate"
+            type="java.util.Date"
+            update="true"
+            insert="true"
             column="update_date"
-            length="19"
-        </meta>    
-    </property>
-    <property
-        name="createBy"
-        type="java.lang.Long"
-        column="create_by"
-        length="20"
-    >
-        <meta attribute="field-description">
-           @hibernate.property
+        />
+
+        <property
+            name="createBy"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
             column="create_by"
             length="20"
-        </meta>    
-    </property>
-    <property
-        name="title"
-        type="java.lang.String"
-        column="title"
-        length="255"
-    >
-        <meta attribute="use-in-tostring">true</meta>
-        <meta attribute="field-description">
-           @hibernate.property
+        />
+
+        <property
+            name="title"
+            type="java.lang.String"
+            update="true"
+            insert="true"
             column="title"
             length="255"
-        </meta>    
-    </property>
-    <property
-        name="instructions"
-        type="java.lang.String"
-        column="instructions"
-        length="65535"
-    >
-        <meta attribute="use-in-tostring">true</meta>
-        <meta attribute="field-description">
-           @hibernate.property
+        />
+
+        <property
+            name="instructions"
+            type="java.lang.String"
+            update="true"
+            insert="true"
             column="instructions"
             length="65535"
-        </meta>    
-    </property>
-    <property
-        name="runOffline"
-        type="java.lang.Boolean"
-        column="run_offline"
-        length="1"
-    >
-        <meta attribute="field-description">
-           @hibernate.property
+        />
+
+        <property
+            name="runOffline"
+            type="java.lang.Boolean"
+            update="true"
+            insert="true"
             column="run_offline"
             length="1"
-        </meta>    
-    </property>
-    <property
-        name="lockOnFinished"
-        type="java.lang.Boolean"
-        column="lock_on_finished"
-        length="1"
-    >
-        <meta attribute="field-description">
-           @hibernate.property
+        />
+
+        <property
+            name="lockOnFinished"
+            type="java.lang.Boolean"
+            update="true"
+            insert="true"
             column="lock_on_finished"
             length="1"
-        </meta>    
-    </property>
-    <property
-        name="onlineInstructions"
-        type="java.lang.String"
-        column="online_instructions"
-        length="65535"
-    >
-        <meta attribute="field-description">
-           @hibernate.property
+        />
+
+        <property
+            name="onlineInstructions"
+            type="java.lang.String"
+            update="true"
+            insert="true"
             column="online_instructions"
             length="65535"
-        </meta>    
-    </property>
-    <property
-        name="offlineInstructions"
-        type="java.lang.String"
-        column="offline_instructions"
-        length="65535"
-    >
-        <meta attribute="field-description">
-           @hibernate.property
+        />
+
+        <property
+            name="offlineInstructions"
+            type="java.lang.String"
+            update="true"
+            insert="true"
             column="offline_instructions"
             length="65535"
-        </meta>    
-    </property>
-    <property
-        name="contentInUse"
-        type="java.lang.Boolean"
-        column="content_in_use"
-        length="1"
-    >
-        <meta attribute="field-description">
-           @hibernate.property
+        />
+
+        <property
+            name="contentInUse"
+            type="java.lang.Boolean"
+            update="true"
+            insert="true"
             column="content_in_use"
             length="1"
-        </meta>    
-    </property>
-    <property
-        name="defineLater"
-        type="java.lang.Boolean"
-        column="define_later"
-        length="1"
-    >
-        <meta attribute="field-description">
-           @hibernate.property
+        />
+
+        <property
+            name="defineLater"
+            type="java.lang.Boolean"
+            update="true"
+            insert="true"
             column="define_later"
             length="1"
-        </meta>    
-    </property>
-    <property
-        name="toolContentId"
-        type="java.lang.Long"
-        column="tool_content_id"
-        length="20"
-    >
-        <meta attribute="use-in-tostring">true</meta>
-        <meta attribute="field-description">
-           @hibernate.property
+        />
+
+        <property
+            name="toolContentId"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
             column="tool_content_id"
             length="20"
-        </meta>    
-    </property>
+        />
 
-    <!-- Associations -->
-  
-    <!-- bi-directional one-to-many association to ExampleAttachment -->
-    <set
-        name="exampleAttachments"
-        lazy="true"
-        inverse="true"
-		cascade="none"
-    >
-        <meta attribute="field-description">
-           @hibernate.set
+        <set
+            name="exampleAttachments"
             lazy="false"
             inverse="true"
             cascade="none"
+            sort="unsorted"
+        >
 
-           @hibernate.collection-key
-            column="example_uid"
+            <key
+                column="example_uid"
+            >
+            </key>
 
-           @hibernate.collection-one-to-many
-            class="org.lamsfoundation.lams.tool.example.ExampleAttachment"
-        </meta>
-        <key>
-            <column name="example_uid" />
-        </key>
-        <one-to-many 
-            class="org.lamsfoundation.lams.tool.example.ExampleAttachment"
-        />
-    </set>
-    <!-- bi-directional one-to-many association to ExampleSession -->
-    <set
-        name="exampleSessions"
-        lazy="true"
-        inverse="true"
-		cascade="none"
-    >
-        <meta attribute="field-description">
-           @hibernate.set
+            <one-to-many
+                  class="org.lamsfoundation.lams.tool.example.ExampleAttachment"
+            />
+
+        </set>
+
+        <set
+            name="exampleSessions"
             lazy="true"
             inverse="true"
             cascade="none"
+            sort="unsorted"
+        >
 
-           @hibernate.collection-key
-            column="example_uid"
+            <key
+                column="example_uid"
+            >
+            </key>
 
-           @hibernate.collection-one-to-many
-            class="org.lamsfoundation.lams.tool.example.ExampleSession"
-        </meta>
-        <key>
-            <column name="example_uid" />
-        </key>
-        <one-to-many 
-            class="org.lamsfoundation.lams.tool.example.ExampleSession"
-        />
-    </set>
+            <one-to-many
+                  class="org.lamsfoundation.lams.tool.example.ExampleSession"
+            />
 
-</class>
+        </set>
+
+        <!--
+            To add non XDoclet property mappings, create a file named
+                hibernate-properties-Example.xml
+            containing the additional properties and place it in your merge dir.
+        -->
+
+    </class>
+
 </hibernate-mapping>

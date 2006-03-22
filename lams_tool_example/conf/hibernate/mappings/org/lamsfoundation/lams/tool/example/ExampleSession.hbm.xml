@@ -1,150 +1,111 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
+
 <!DOCTYPE hibernate-mapping PUBLIC
-    "-//Hibernate/Hibernate Mapping DTD 2.0//EN"
-    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
-    
-<hibernate-mapping>
-<!-- 
-    Created by the Middlegen Hibernate plugin 2.1
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN" 
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 
-    http://boss.bekk.no/boss/middlegen/
-    http://www.hibernate.org/
--->
-
-<class 
-    name="org.lamsfoundation.lams.tool.example.ExampleSession" 
-    table="tl_laex11_session"
+<hibernate-mapping
 >
-    <meta attribute="class-description" inherit="false">
-       @hibernate.class
+    <class
+        name="org.lamsfoundation.lams.tool.example.ExampleSession"
         table="tl_laex11_session"
-    </meta>
-    <meta attribute="implement-equals" inherit="false">true</meta>
-
-    <id
-        name="uid"
-        type="java.lang.Long"
-        column="uid"
     >
-        <meta attribute="field-description">
-           @hibernate.id
-            generator-class="native"
-            type="java.lang.Long"
+
+        <id
+            name="uid"
             column="uid"
+            type="java.lang.Long"
+        >
+            <generator class="native">
+              <!--  
+                  To add non XDoclet generator parameters, create a file named 
+                  hibernate-generator-params-ExampleSession.xml 
+                  containing the additional parameters and place it in your merge dir. 
+              --> 
+            </generator>
+        </id>
 
-
-        </meta>
-        <meta attribute="use-in-equals">true</meta>
-        <generator class="native" />
-    </id>
-
-    <property
-        name="sessionEndDate"
-        type="java.sql.Timestamp"
-        column="session_end_date"
-        length="19"
-    >
-        <meta attribute="use-in-tostring">true</meta>
-        <meta attribute="field-description">
-           @hibernate.property
+        <property
+            name="sessionEndDate"
+            type="java.util.Date"
+            update="true"
+            insert="true"
             column="session_end_date"
-            length="19"
-        </meta>    
-    </property>
-    <property
-        name="sessionStartDate"
-        type="java.sql.Timestamp"
-        column="session_start_date"
-        length="19"
-    >
-        <meta attribute="use-in-tostring">true</meta>
-        <meta attribute="field-description">
-           @hibernate.property
+        />
+
+        <property
+            name="sessionStartDate"
+            type="java.util.Date"
+            update="true"
+            insert="true"
             column="session_start_date"
-            length="19"
-        </meta>    
-    </property>
-    <property
-        name="status"
-        type="java.lang.Integer"
-        column="status"
-        length="11"
-    >
-        <meta attribute="use-in-tostring">true</meta>
-        <meta attribute="field-description">
-           @hibernate.property
+        />
+
+        <property
+            name="status"
+            type="java.lang.Integer"
+            update="true"
+            insert="true"
             column="status"
             length="11"
-        </meta>    
-    </property>
-    <property
-        name="sessionId"
-        type="java.lang.Long"
-        column="session_id"
-        length="20"
-    >
-        <meta attribute="use-in-tostring">true</meta>
-        <meta attribute="field-description">
-           @hibernate.property
+        />
+
+        <property
+            name="sessionId"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
             column="session_id"
             length="20"
-        </meta>    
-    </property>
-    <property
-        name="sessionName"
-        type="java.lang.String"
-        column="session_name"
-        length="250"
-    >
-        <meta attribute="use-in-tostring">true</meta>
-        <meta attribute="field-description">
-           @hibernate.property
+        />
+
+        <property
+            name="sessionName"
+            type="java.lang.String"
+            update="true"
+            insert="true"
             column="session_name"
             length="250"
-        </meta>    
-    </property>
+        />
 
-    <!-- Associations -->
-  
-    <!-- bi-directional many-to-one association to Example -->
-    <many-to-one
-        name="example"
-        class="org.lamsfoundation.lams.tool.example.Example"
-        not-null="true"
-    >
-        <meta attribute="field-description">
-           @hibernate.many-to-one
-            not-null="true"
-           @hibernate.column name="example_uid"         
-        </meta>
-        <column name="example_uid" />
-    </many-to-one>
-    <!-- bi-directional one-to-many association to ExampleUser -->
-    <set
-        name="exampleUsers"
-        lazy="true"
-        inverse="true"
-		cascade="none"
-    >
-        <meta attribute="field-description">
-           @hibernate.set
+        <many-to-one
+            name="example"
+            class="org.lamsfoundation.lams.tool.example.Example"
+            cascade="none"
+            outer-join="auto"
+            update="true"
+            insert="true"
+        >
+            <column
+                name="example_uid" 
+            />
+        </many-to-one>
+
+        <set
+            name="exampleUsers"
             lazy="true"
             inverse="true"
             cascade="none"
+            sort="unsorted"
+        >
 
-           @hibernate.collection-key
-            column="session_id"
+            <key
+                column="session_id"
+            >
+            </key>
 
-           @hibernate.collection-one-to-many
-            class="org.lamsfoundation.lams.tool.example.ExampleUser"
-        </meta>
-        <key>
-            <column name="session_id" />
-        </key>
-        <one-to-many 
-            class="org.lamsfoundation.lams.tool.example.ExampleUser"
-        />
-    </set>
+            <one-to-many
+                  class="org.lamsfoundation.lams.tool.example.ExampleUser"
+            />
 
-</class>
+        </set>
+
+        <!--
+            To add non XDoclet property mappings, create a file named
+                hibernate-properties-ExampleSession.xml
+            containing the additional properties and place it in your merge dir.
+        -->
+
+    </class>
+
 </hibernate-mapping>
