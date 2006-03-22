@@ -18,6 +18,7 @@
  *
  *http://www.gnu.org/licenses/gpl.txt
  */
+/*  $Id$ */
 package org.lamsfoundation.lams.tool.example;
 
 import java.util.Date;
@@ -31,7 +32,6 @@ import java.util.Date;
  *        @hibernate.class
  *         table="tl_laex11_attachment"
  *     
- *  $Id$
  */
 
 public class ExampleAttachment  implements java.io.Serializable {
