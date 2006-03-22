@@ -25,6 +25,8 @@ package org.lamsfoundation.lams.tool.example.service;
 
 /**
  * Defines the services available to the web layer from the Example Service
+ * 
+ *  $Id$
  */
 public interface IExampleService {
 	

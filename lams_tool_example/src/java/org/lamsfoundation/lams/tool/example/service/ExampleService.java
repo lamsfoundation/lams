@@ -40,6 +40,8 @@ import org.lamsfoundation.lams.tool.service.ILamsToolService;
 * An implementation of the NoticeboardService interface.
 * 
 * As a requirement, all LAMS tool's service bean must implement ToolContentManager and ToolSessionManager.
+* 
+* $Id$
 */
 
 public class ExampleService implements ToolSessionManager, ToolContentManager,

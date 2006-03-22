@@ -34,6 +34,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * In this way, the presentation tier will no longer be aware of the changes in
  * service layer. Therefore we can feel free to switch the business logic
  * implementation.</p>
+ * 
+ *     $Id$
  */
 
 public class ExampleServiceProxy {
