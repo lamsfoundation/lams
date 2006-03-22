@@ -247,7 +247,7 @@
 				distributable="false" sessiontimeout="${sessiontimeout}"/>
 			
          <strutsconfigxml validatexml="true" version="1.2" mergedir="${conf.xdoclet.dir}"/>
-         <strutsdynaformvalidationxml destdir="${conf.struts.dir}" mergedir="${conf.xdoclet.dir}" version="1.1.3"  />
+         <strutsdynaformvalidationxml destdir="${conf.webinf.dir}" mergedir="${conf.xdoclet.dir}" version="1.1.3"  />
 
       </webdoclet>
 

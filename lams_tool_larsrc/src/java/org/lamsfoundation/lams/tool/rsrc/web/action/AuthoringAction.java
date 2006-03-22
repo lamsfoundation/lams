@@ -44,12 +44,12 @@ public class AuthoringAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 		
-//		String param = mapping.getParameter();
-//		//-----------------------Forum Author function ---------------------------
-//	  	if (param.equals("initPage")) {
-////	  		request.getSession().setAttribute(ForumConstants.MODE,ForumConstants.AUTHOR_MODE);
-//       		return initPage(mapping, form, request, response);
-//        }
+		String param = mapping.getParameter();
+		//-----------------------Forum Author function ---------------------------
+	  	if (param.equals("initPage")) {
+//	  		request.getSession().setAttribute(ForumConstants.MODE,ForumConstants.AUTHOR_MODE);
+       		return initPage(mapping, form, request, response);
+        }
 //	  	if (param.equals("monitoringInitPage")) {
 ////	  		request.getSession().setAttribute(ForumConstants.MODE,ForumConstants.MONITOR_MODE);
 //	  		return initPage(mapping, form, request, response);
@@ -102,5 +102,9 @@ public class AuthoringAction extends Action {
 	//******************************************************************************************************************
 	//              Forum Author functions
 	//******************************************************************************************************************
+
+	private ActionForward initPage(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+		return null;
+	}
 	
 }
