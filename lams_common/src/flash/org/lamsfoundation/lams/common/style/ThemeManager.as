@@ -74,13 +74,18 @@ class ThemeManager {
         //Cookie or server?
         if(CookieMonster.cookieExists('theme.'+theme)&&Config.USE_CACHE) {
             //Whilst waiting for theme to load from disk - show busy
-            Cursor.showCursor(Application.C_HOURGLASS);            
-            openFromDisk(theme);
-            Cursor.showCursor(Application.C_DEFAULT);            
+			
+			Cursor.showCursor(Application.C_HOURGLASS);  
+			openFromDisk(theme);
+			
+			// show default cursor
+			Cursor.showCursor(Application.C_DEFAULT);
+		
         }else {
 			//testing style creator
 			//createThemeFromCode(theme);
-            openFromServer(theme);
+			
+			openFromServer(theme);
         }        
     }
     
@@ -106,9 +111,10 @@ class ThemeManager {
         Debugger.log('theme back from server',Debugger.GEN,'themeBackFromServer','ThemeManager');
         //Create from the server response
         createFromData(themeDTO);
-
-        //Now that theme has been loaded by server, cache it 
+		//Now that theme has been loaded by server, cache it 
         saveToDisk();
+		
+		
     }
     
     
@@ -574,14 +580,13 @@ class ThemeManager {
         var so = new mx.styles.CSSStyleDeclaration();     
         //Parse data object and copy over properties
         for(var prop in dataObj) {
-			//if (dataObj[prop] 
-			if (typeof(dataObj[prop])=='number'){
-				var dataVal = DecToHex(dataObj[prop])
-				so.setStyle(String(prop), 0+"\x"+dataVal);
-				trace("style parsed for "+String(prop)+ " is: "+0+"\x"+dataVal)
-			}else {
+			if (typeof(dataObj[prop])=='number' && String(prop)!='fontSize'){
+					var dataVal = DecToHex(dataObj[prop]);
+					so.setStyle(String(prop), 0+"\x"+dataVal);
+					trace("style parsed for "+String(prop)+ " is: "+0+"\x"+dataVal);
+			} else {
 				so.setStyle(String(prop), dataObj[prop]);
-				trace("style parsed for "+String(prop)+ " is: "+dataObj[prop])
+				trace("style parsed for "+String(prop)+ " is: "+dataObj[prop]);
 			}
         }
         return so;
