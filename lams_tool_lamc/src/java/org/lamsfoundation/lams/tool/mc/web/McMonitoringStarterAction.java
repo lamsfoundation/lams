@@ -170,7 +170,7 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 			return false;
 		}
 	    
-		Map summaryToolSessions=MonitoringUtil.populateToolSessions(request, mcContent);
+		Map summaryToolSessions=MonitoringUtil.populateToolSessions(request, mcContent, mcService);
 		logger.debug("summaryToolSessions: " + summaryToolSessions);
 		if (summaryToolSessions.isEmpty())
 		{
@@ -178,6 +178,9 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 			request.setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true));
 		}
 		
+		Map summaryToolSessionsId=MonitoringUtil.populateToolSessionsId(request, mcContent, mcService);
+		logger.debug("summaryToolSessionsId: " + summaryToolSessionsId);
+		request.getSession().setAttribute(SUMMARY_TOOL_SESSIONS_ID, summaryToolSessionsId);
 		
 		/* this section is related to summary tab. Starts here. */ 
 		request.getSession().setAttribute(SUMMARY_TOOL_SESSIONS, summaryToolSessions);

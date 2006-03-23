@@ -59,15 +59,12 @@ public class MonitoringUtil implements McAppConstants{
 	 * @param mcContent
 	 * @return Map
 	 */
-	public static Map populateToolSessions(HttpServletRequest request, McContent mcContent)
+	public static Map populateToolSessions(HttpServletRequest request, McContent mcContent, IMcService mcService)
 	{
-		logger.debug("populating tool sessions for content:..." + mcContent);
-    	IMcService mcService =McUtils.getToolService(request);
-    	
-    	List sessionsList=mcService.getSessionsFromContent(mcContent);
+		List sessionsList=mcService.getSessionNamesFromContent(mcContent);
     	logger.debug("sessionsList size is:..." + sessionsList.size());
     	
-    	Map sessionsMap=McUtils.convertToStringMap(sessionsList, "Long");
+    	Map sessionsMap=McUtils.convertToStringMap(sessionsList, "String");
     	logger.debug("generated sessionsMap:..." + sessionsMap);
     	logger.debug("sessionsMap size:..." + sessionsMap.size());
     	
@@ -83,8 +80,12 @@ public class MonitoringUtil implements McAppConstants{
     	}
     	
     	logger.debug("final sessionsMap:" + sessionsMap);
-    	return sessionsMap;
+    	return sessionsMap;		
+		
+		
 	}
+	
+	
 	
 	
 	/**
@@ -147,7 +148,7 @@ public class MonitoringUtil implements McAppConstants{
     	Map mapMonitoredAttemptsContainerDTO= new TreeMap(new McStringComparator());
     	List listMonitoredAttemptsContainerDTO= new LinkedList();
     	
-    	Map summaryToolSessions=populateToolSessions(request, mcContent);
+    	Map summaryToolSessions=populateToolSessionsId(request, mcContent, mcService);
     	logger.debug("summaryToolSessions: " + summaryToolSessions);
     	
     	Iterator itMap = summaryToolSessions.entrySet().iterator();
@@ -253,6 +254,31 @@ public class MonitoringUtil implements McAppConstants{
 		logger.debug("final mapMonitoredUserContainerDTO:..." + mapMonitoredUserContainerDTO);
 		return mapMonitoredUserContainerDTO;
 	}
+	
+	public static Map populateToolSessionsId(HttpServletRequest request, McContent mcContent, IMcService mcService)
+	{
+		List sessionsList=mcService.getSessionsFromContent(mcContent);
+    	logger.debug("sessionsList size is:..." + sessionsList.size());
+    	
+    	Map sessionsMap=McUtils.convertToStringMap(sessionsList, "Long");
+    	logger.debug("generated sessionsMap:..." + sessionsMap);
+    	logger.debug("sessionsMap size:..." + sessionsMap.size());
+    	
+    	if (sessionsMap.isEmpty())
+		{
+    		logger.debug("sessionsMap size is 0:");
+        	sessionsMap.put(new Long(1).toString() , "None");
+		}
+    	else
+    	{
+    		logger.debug("sessionsMap has some entries: " +  sessionsMap.size());
+    		sessionsMap.put(new Long(sessionsMap.size()+ 1).toString() , "All");	
+    	}
+    	
+    	logger.debug("final sessionsMap:" + sessionsMap);
+    	return sessionsMap;
+	}
+
 	
 
 	public static Map convertToMap(List list)

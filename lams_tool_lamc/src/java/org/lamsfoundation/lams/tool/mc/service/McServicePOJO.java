@@ -566,7 +566,7 @@ public class McServicePOJO implements
        }
 	}
    
-    
+
     public List refreshQuestionContent(final Long mcContentId) throws McApplicationException
 	{
         try
@@ -700,6 +700,21 @@ public class McServicePOJO implements
                                               e);
         }
     }
+   
+    public List getSessionNamesFromContent(McContent mcContent) throws McApplicationException
+    {
+        try
+        {
+        	return mcSessionDAO.getSessionNamesFromContent(mcContent);
+        }
+        catch (DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is getting session names from content: "
+                                                         + e.getMessage(),
+														   e);
+        }
+    }
+
     
     
     public void updateMc(McContent mc) throws McApplicationException

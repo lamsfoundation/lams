@@ -127,7 +127,9 @@ public interface IMcService
     
     public void deleteMcById(Long mcId) throws McApplicationException;
     
-    public void deleteMcSession(McSession mcSession) throws McApplicationException; 
+    public void deleteMcSession(McSession mcSession) throws McApplicationException;
+    
+    public List getSessionNamesFromContent(McContent mcContent) throws McApplicationException;
     
     public void removeAttempt (McUsrAttempt attempt) throws McApplicationException;
 	
@@ -213,9 +215,7 @@ public interface IMcService
 	
 	public List retrieveMcUploadedFiles(Long mcContentId, boolean fileOnline) throws McApplicationException;
 	
-	//public List retrieveMcUploadedOfflineFilesUuidPlusFilename(Long mcContentId) throws McApplicationException;
-	
-    public void cleanUploadedFilesMetaData() throws McApplicationException;
+	public void cleanUploadedFilesMetaData() throws McApplicationException;
     
     public void persistFile(String uuid, boolean isOnlineFile, String fileName, McContent mcContent) throws McApplicationException;
     

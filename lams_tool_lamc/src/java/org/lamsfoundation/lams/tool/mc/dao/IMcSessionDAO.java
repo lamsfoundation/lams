@@ -115,6 +115,7 @@ public interface IMcSessionDAO {
      */
     public List getSessionsFromContent(McContent mcContent);
     
+    public List getSessionNamesFromContent(McContent mcContent);
     
     public int countSessionComplete();
 

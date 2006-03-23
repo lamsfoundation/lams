@@ -53,6 +53,8 @@ public class McSessionDAO extends HibernateDaoSupport implements IMcSessionDAO {
     
     private static final String COUNT_SESSION_INCOMPLETE = "from mcSession in class McSession where mcSession.sessionStatus='INCOMPLETE'";
     
+    private static final String GET_SESSIONNAMES_FROM_CONTENT 	= "select mcs.session_name from McSession mcs where mcs.mcContent=:mcContent order by mcs.mcSessionId";
+    
     public McSession getMcSessionByUID(Long uid)
 	{
 		 return (McSession) this.getHibernateTemplate()
@@ -187,4 +189,12 @@ public class McSessionDAO extends HibernateDaoSupport implements IMcSessionDAO {
 	            "mcContent",
 				mcContent));
 	}
+	
+	public List getSessionNamesFromContent(McContent mcContent)
+	{
+	    return (getHibernateTemplate().findByNamedParam(GET_SESSIONNAMES_FROM_CONTENT,
+	            "mcContent",
+				mcContent));
+	}
+
 }

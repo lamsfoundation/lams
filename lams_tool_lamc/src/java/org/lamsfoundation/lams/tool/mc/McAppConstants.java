@@ -237,6 +237,7 @@ public interface McAppConstants {
     public static final String MONITORING_ERROR							="monitoringError";
     public static final String MAP_MONITORING_QUESTIONS					="mapMonitoringQuestions";
     public static final String SUMMARY_TOOL_SESSIONS					="summaryToolSessions";
+    public static final String SUMMARY_TOOL_SESSIONS_ID					="summaryToolSessionsId";
     public static final String MONITORED_CONTENT_ID				   		="monitoredContentId";
     public static final String EDITACTIVITY_EDITMODE	   		   		="editActivityEditMode";
     public static final String FORM_INDEX	   		   			   		="formIndex";

@@ -47,32 +47,39 @@ http://www.gnu.org/licenses/gpl.txt
 			<html:hidden property="selectedToolSessionId"/>							
 			<input type="hidden" name="isToolSessionChanged"/>
 				<table class="forms">
-					<tr> 
-						<td NOWRAP class="formlabel" valign=top align=center><font size=2> <b> <bean:message key="label.selectGroup"/> </b>
-								<select name="monitoredToolSessionId" onchange="javascript:submitSession(this.value,'submitSession');">
-								<c:forEach var="toolSessionId" items="${sessionScope.summaryToolSessions}">
-										<c:set var="SELECTED_SESSION" scope="request" value=""/>
-										<c:if test="${sessionScope.selectionCase == 2}"> 			
-											<c:set var="currentMonitoredToolSession" scope="session" value="All"/>
-										</c:if>						
+						<tr> 
+							<td NOWRAP class="formlabel" valign=top align=center><font size=2> <b> <bean:message key="label.selectGroup"/> </b>
+									<select name="monitoredToolSessionId" onchange="javascript:submitSession(this.value,'submitSession');">
+									<c:forEach var="toolSessionName" items="${sessionScope.summaryToolSessions}">
+										<c:forEach var="toolSessionId" items="${sessionScope.summaryToolSessionsId}">
+											<c:out value="${toolSessionName.key}"/> -<c:out value="${toolSessionId.value}"/>
 										
-										<c:if test="${toolSessionId.value == sessionScope.currentMonitoredToolSession}"> 			
-												<c:set var="SELECTED_SESSION" scope="request" value="SELECTED"/>
-										</c:if>						
-										
-										<c:if test="${toolSessionId.value != 'All'}"> 		
-											<option value="<c:out value="${toolSessionId.value}"/>"  <c:out value="${requestScope.SELECTED_SESSION}"/>> Group <c:out value="${toolSessionId.key}"/>  </option>						
-										</c:if>						
-										
-										<c:if test="${toolSessionId.value == 'All'}"> 	
-											<option value="<c:out value="${toolSessionId.value}"/>"  <c:out value="${requestScope.SELECTED_SESSION}"/>>  All  </option>						
-										</c:if>						
-								</c:forEach>		  	
-								</select>
-							</font>
-						</td> 
-					<tr>
-				
+												<c:if test="${toolSessionName.key == toolSessionId.key}"> 			
+											
+													<c:set var="SELECTED_SESSION" scope="request" value=""/>
+													<c:if test="${sessionScope.selectionCase == 2}"> 			
+														<c:set var="currentMonitoredToolSession" scope="session" value="All"/>
+													</c:if>						
+													
+													<c:if test="${toolSessionId.value == sessionScope.currentMonitoredToolSession}"> 			
+															<c:set var="SELECTED_SESSION" scope="request" value="SELECTED"/>
+													</c:if>						
+													
+													<c:if test="${toolSessionId.value != 'All'}"> 		
+														<option value="<c:out value="${toolSessionId.value}"/>"  <c:out value="${requestScope.SELECTED_SESSION}"/>> <c:out value="${toolSessionName.value}"/>  </option>						
+													</c:if>						
+													
+													<c:if test="${toolSessionId.value == 'All'}"> 	
+														<option value="<c:out value="${toolSessionId.value}"/>"  <c:out value="${requestScope.SELECTED_SESSION}"/>>  All  </option>						
+													</c:if>						
+											</c:if>							
+										</c:forEach>		  	
+									</c:forEach>		  	
+									</select>
+								</font>
+							</td> 
+						<tr>					
+					
 					<c:forEach var="currentDto" items="${sessionScope.listMonitoredAnswersContainerDto}">
 			  	 		<c:set var="currentQuestionId" scope="request" value="${currentDto.questionUid}"/>
 			  	 		<tr>
