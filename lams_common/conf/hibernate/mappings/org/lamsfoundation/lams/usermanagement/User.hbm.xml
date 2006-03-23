@@ -359,7 +359,7 @@
     </many-to-one>
     <!-- bi-directional many-to-one association to CSSTheme -->
     <many-to-one
-        name="theme"
+        name="flashTheme"
         lazy="false"
         class="org.lamsfoundation.lams.themes.CSSThemeVisualElement"
         not-null="true"
@@ -370,6 +370,21 @@
            @hibernate.column name="flash_theme_id"         
         </meta>
         <column name="flash_theme_id" />
+    </many-to-one>
+    
+    <!-- bi-directional many-to-one association to CSSTheme -->
+    <many-to-one
+        name="htmlTheme"
+        lazy="false"
+        class="org.lamsfoundation.lams.themes.CSSThemeVisualElement"
+        not-null="true"
+    >
+        <meta attribute="field-description">
+           @hibernate.many-to-one
+            not-null="true"
+           @hibernate.column name="html_theme_id"         
+        </meta>
+        <column name="html_theme_id" />
     </many-to-one>
     
 	<!-- bi-directional one-to-many association to LearnerProgress -->

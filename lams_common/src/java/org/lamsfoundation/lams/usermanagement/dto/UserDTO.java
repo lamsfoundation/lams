@@ -36,8 +36,8 @@ public class UserDTO {
 	private String localeCountry;
     private String email;
    // private CSSThemeVisualElement theme;
-    private CSSThemeBriefDTO theme;
-	
+    private CSSThemeBriefDTO flashTheme;
+    private CSSThemeBriefDTO htmlTheme;
 
 //	public UserDTO(Integer userID, String firstName, String lastName,
 //			String login, String email, CSSThemeVisualElement theme) {		
@@ -51,7 +51,7 @@ public class UserDTO {
 	
 	public UserDTO(Integer userID, String firstName, String lastName,
 			String login, String localeLanguage, 
-			String localeCountry, String email, CSSThemeBriefDTO theme) {		
+			String localeCountry, String email, CSSThemeBriefDTO flashTheme, CSSThemeBriefDTO htmlTheme) {		
 		this.userID = userID;
 		this.firstName = firstName;
 		this.lastName = lastName;
@@ -59,7 +59,8 @@ public class UserDTO {
 		this.localeCountry = localeCountry;
 		this.localeLanguage = localeLanguage;
 		this.email = email;
-		this.theme = theme;
+		this.flashTheme = flashTheme;
+		this.htmlTheme = htmlTheme;
 	}
 	
 	/**
@@ -108,16 +109,24 @@ public class UserDTO {
 	}
 
 
-	public CSSThemeBriefDTO getTheme() {
-		return theme;
+	public CSSThemeBriefDTO getFlashTheme() {
+		return flashTheme;
 	}
 
 
-	public void setTheme(CSSThemeBriefDTO theme) {
-		this.theme = theme;
+	public void setFlashTheme(CSSThemeBriefDTO flashTheme) {
+		this.flashTheme = flashTheme;
+	}
+
+	public CSSThemeBriefDTO getHtmlTheme() {
+		return htmlTheme;
 	}
 
 
+	public void setHtmlTheme(CSSThemeBriefDTO htmlTheme) {
+		this.htmlTheme = htmlTheme;
+	}
+	
 	public String getEmail() {
 		return email;
 	}

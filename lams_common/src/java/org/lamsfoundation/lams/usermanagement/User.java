@@ -97,7 +97,10 @@ public class User implements Serializable {
     private Organisation baseOrganisation;
     
     /** persistent field */
-    private CSSThemeVisualElement theme;
+    private CSSThemeVisualElement flashTheme;
+    
+    /** persistent field */
+    private CSSThemeVisualElement htmlTheme;
 
     /** persistent field */
     private Set learnerProgresses;
@@ -115,7 +118,7 @@ public class User implements Serializable {
     private Set lessons;
     
     /** full constructor */
-    public User(String login, String password, String title, String firstName, String lastName, String addressLine1, String addressLine2, String addressLine3, String city, String state, String country, String dayPhone, String eveningPhone, String mobilePhone, String fax, String email, Boolean disabledFlag, Date createDate, Workspace workspace, AuthenticationMethod authenticationMethod, CSSThemeVisualElement theme, Set userOrganisations, Organisation baseOrganisation, Set learnerProgresses, Set userToolSessions, Set userGroups, Set learningDesigns, Set lessons) {
+    public User(String login, String password, String title, String firstName, String lastName, String addressLine1, String addressLine2, String addressLine3, String city, String state, String country, String dayPhone, String eveningPhone, String mobilePhone, String fax, String email, Boolean disabledFlag, Date createDate, Workspace workspace, AuthenticationMethod authenticationMethod, CSSThemeVisualElement flashTheme, CSSThemeVisualElement htmlTheme, Set userOrganisations, Organisation baseOrganisation, Set learnerProgresses, Set userToolSessions, Set userGroups, Set learningDesigns, Set lessons) {
         this.login = login;
         this.password = password;
         this.title = title;
@@ -136,7 +139,8 @@ public class User implements Serializable {
         this.createDate = createDate;
         this.workspace = workspace;
         this.authenticationMethod = authenticationMethod;
-        this.theme = theme;
+        this.flashTheme = flashTheme;
+        this.htmlTheme = htmlTheme;
         this.userOrganisations = userOrganisations;
         this.baseOrganisation = baseOrganisation;
         this.learnerProgresses = learnerProgresses;
@@ -475,16 +479,32 @@ public class User implements Serializable {
     /** 
      *            @hibernate.many-to-one
      *             not-null="false"
-     *            @hibernate.column name="theme_id"         
+     *            @hibernate.column name="flash_theme_id"         
      *         
      */
-    public CSSThemeVisualElement getTheme() {
-        return this.theme;
+    public CSSThemeVisualElement getFlashTheme() {
+        return this.flashTheme;
     }
-
-    public void setTheme(CSSThemeVisualElement theme) {
-        this.theme = theme;
+    
+    public void setFlashTheme(CSSThemeVisualElement flashTheme) {
+        this.flashTheme = flashTheme;
     }
+    
+    
+    /** 
+     *            @hibernate.many-to-one
+     *             not-null="false"
+     *            @hibernate.column name="html_theme_id"         
+     *         
+     */
+    public CSSThemeVisualElement getHtmlTheme() {
+        return this.htmlTheme;
+    }
+    
+    public void setHtmlTheme(CSSThemeVisualElement htmlTheme) {
+        this.htmlTheme = htmlTheme;
+    }
+    
     
     /** 
      *            @hibernate.many-to-one
@@ -647,7 +667,8 @@ public class User implements Serializable {
 							this.localeLanguage,
 							this.localeCountry,
 							this.email,
-							new CSSThemeBriefDTO(this.theme));
+							new CSSThemeBriefDTO(this.flashTheme),
+							new CSSThemeBriefDTO(this.htmlTheme));
     }
 	
 	/**This method checks whether user is a member of the 
