@@ -26,7 +26,8 @@
       type="org.lamsfoundation.lams.tool.forum.web.forms.MessageForm"
     />
 
-<form-bean name="emptyForm" type="org.apache.struts.action.DynaActionForm"/>
+   <form-bean name="emptyForm" type="org.apache.struts.action.DynaActionForm" />
+
   </form-beans>
 
   <!-- ========== Global Exceptions Definitions =================================== -->
@@ -39,12 +40,9 @@
     <!-- B: end of global exceptions -->
 
   <!-- ========== Global Forward Definitions =================================== -->
-  	<!-- B: global forwards
-	<global-forwards>
-        <forward   name="forum.error"	path="tiles:/error.jsp"/>
-	</global-forwards>
-	 -->
-	<!-- E: global forwards -->
+  <global-forwards>
+
+</global-forwards>
 
   <!-- ========== Action Mapping Definitions =================================== -->
    <action-mappings>
@@ -65,16 +63,15 @@
 			scope="session" 
 			parameter="initPage" 
 			validate="false">
-			<forward name="success" path="/jsps/authoring/authoring.jsp" />
+			<forward name="success" path="tiles:/authoring/forum/main" />
 		</action>
-
 		<action path="/authoring/update"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
 			name="forumForm" 
 			scope="session" 
 			parameter="updateContent" 
 			validate="false">
-			<forward name="author" path="/jsps/authoring/authoring.jsp" />
+			<forward name="author" path="tiles:/authoring/forum/main" />
 			<forward name="monitor" path="tiles:/monitoring/forum/defineLater" />
 		</action>
 
@@ -84,7 +81,7 @@
 			scope="session" 
 			parameter="uploadOnlineFile" 
 			validate="false">
-			<forward name="success" path="/jsps/authoring/authoring.jsp" />
+			<forward name="success" path="tiles:/authoring/forum/main" />
 		</action>
 		<action path="/authoring/uploadOffline"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
@@ -92,7 +89,7 @@
 			scope="session" 
 			validate="false"
 			parameter="uploadOfflineFile" >
-			<forward name="success" path="/jsps/authoring/authoring.jsp" />
+			<forward name="success" path="tiles:/authoring/forum/main" />
 		</action>
 		<action path="/authoring/deleteOnline"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
@@ -100,7 +97,7 @@
 			scope="session" 
 			validate="false"
 			parameter="deleteOnlineFile" >
-			<forward name="success" path="/jsps/authoring/authoring.jsp" />
+			<forward name="success" path="tiles:/authoring/forum/main" />
 		</action>
 		<action path="/authoring/deleteOffline"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
@@ -108,7 +105,7 @@
 			scope="session" 
 			validate="false"
 			parameter="deleteOfflineFile" >
-			<forward name="success" path="/jsps/authoring/authoring.jsp" />
+			<forward name="success" path="tiles:/authoring/forum/main" />
 		</action>
 		<action path="/authoring/newTopic"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
@@ -176,14 +173,14 @@
 			scope="session" 
 			validate="false"
 			parameter="finishTopic" >
-			<forward name="author" path="/jsps/authoring/authoring.jsp" />
+			<forward name="author" path="tiles:/authoring/forum/main" />
 			<forward name="monitor" path="tiles:/monitoring/forum/defineLater" />
 		</action>
 		<!-- ========== END: Authroing Definitions ============================== -->
 		<!-- ========== BEGIN: Learning Definitions ============================== -->
 		<action path="/learning/viewForum"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"
-			parameter="viewForum" scope="request">
+			parameter="viewForum" scope="request" name="emptyForm">
 			<forward name="success" path="tiles:/learning/forum/viewForum" />
 		</action>
 		<action path="/learning/viewTopic"
@@ -239,6 +236,12 @@
 			scope="session">
 			<forward name="success" path="tiles:/learning/forum/viewTopic" />
 		</action>
+		<action path="/learning/updateMessageHideFlag"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"
+			parameter="updateMessageHideFlag" 
+			scope="session">
+			<forward name="success" path="tiles:/learning/forum/viewTopic" />
+		</action>	
 		<action path="/learning/deleteAttachment"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"
 			name="messageForm" 
@@ -254,18 +257,11 @@
 		</action>
 		<!-- ========== END: Learning  Definitions ============================== -->
 		<!-- ========== START: Monitoring  Definitions ============================== -->
-		<action path="/monitoring/listContentUsers"
+		<action path="/monitoring" 
 			type="org.lamsfoundation.lams.tool.forum.web.actions.MonitoringAction"
-			parameter="listContentUsers" >
-			<forward name="success" path="tiles:/monitoring/forum/listContentUsers" />
-		</action>
-		<action path="/monitoring/releaseMarks"
-			type="org.lamsfoundation.lams.tool.forum.web.actions.MonitoringAction"
-			name="emptyForm"
-			scope="request"
-			validate="false"
-			parameter="releaseMarks" >
-			<forward name="success" path="tiles:/monitoring/forum/listContentUsers" />
+		    scope="request"
+		    parameter="init" >
+			<forward name="load" path="tiles:/monitoring/forum/main" redirect="false" />	        
 		</action>
 		<action path="/monitoring/downloadMarks"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.MonitoringAction"
@@ -309,44 +305,6 @@
 			validate="true"
 			parameter="updateMark" >
 			<forward name="success" path="tiles:/monitoring/forum/viewUserMark" />
-		</action>
-		<action path="/monitoring/viewActivity"
-			type="org.lamsfoundation.lams.tool.forum.web.actions.MonitoringAction"
-			input="tiles:/monitoring/forum/viewActivity"
-			name="emptyForm"
-			scope="request"
-			validate="false"
-			parameter="viewActivity" >
-			<forward name="success" path="tiles:/monitoring/forum/viewActivity" />
-		</action>
-		<action path="/monitoring/editActivity"
-			type="org.lamsfoundation.lams.tool.forum.web.actions.MonitoringAction"
-			input="tiles:/monitoring/forum/editActivity"
-			name="emptyForm"
-			scope="request"
-			validate="false"			
-			parameter="editActivity" >
-			<forward name="success" path="tiles:/monitoring/forum/editActivity" />
-		</action>
-		<action path="/monitoring/updateActivity"
-			type="org.lamsfoundation.lams.tool.forum.web.actions.MonitoringAction"
-			input="tiles:/monitoring/forum/editActivity"
-			name="emptyForm"
-			scope="request"
-			validate="false"
-			parameter="updateActivity" >
-			<forward name="success" path="tiles:/monitoring/forum/viewActivity" />
-		</action>
-		<action path="/monitoring/viewInstructions"
-			input="tiles:/monitoring/forum/viewInstructions"
-			type="org.lamsfoundation.lams.tool.forum.web.actions.MonitoringAction"
-			parameter="viewInstructions" >
-			<forward name="success" path="tiles:/monitoring/forum/viewInstructions" />
-		</action>
-		<action path="/monitoring/statistic"
-			type="org.lamsfoundation.lams.tool.forum.web.actions.MonitoringAction"
-			parameter="statistic" >
-			<forward name="success" path="tiles:/monitoring/forum/statistic" />
 		</action>
 		<action path="/monitoring/viewTopic"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.MonitoringAction"

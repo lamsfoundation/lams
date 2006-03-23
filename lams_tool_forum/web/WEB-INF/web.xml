@@ -49,6 +49,10 @@
 	         <filter-class>
 			   org.lamsfoundation.lams.web.filter.LocaleFilter
 	         </filter-class>
+	        <init-param>
+            	<param-name>encoding</param-name>
+	            <param-value>UTF-8</param-value>
+	        </init-param>
 	</filter>
 
     <filter-mapping>
@@ -209,7 +213,7 @@
 		<!--   FCKEditor Tag Library -->
 		<!--  ======================================================== -->	
 		<taglib>
-		    <taglib-uri>tags-fck-editor</taglib-uri>
+		    <taglib-uri>fck-editor</taglib-uri>
 		    <taglib-location>/WEB-INF/fckeditor/tlds/FCKeditor.tld</taglib-location>
 		</taglib>
 		<!--  ======================================================== -->	
