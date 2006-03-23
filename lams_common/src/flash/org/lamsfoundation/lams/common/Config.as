@@ -32,7 +32,9 @@ class Config {
 	//Config instance is stored as a static in the class
     private static var _instance:Config = null;   
     private static var CONFIG_PREFIX:String = 'config.';    //All config items stored in a cookie with prefix 'config.' 
-  
+	private static var CONFIG_BUILD:String = 'build';
+	private static var DICT_PREFIX:String = 'dictionary.';
+	private static var THEME_PREFIX:String = 'theme.';
 	
 	
     private var _configData:Object      //Object that stores configuration data
@@ -50,8 +52,10 @@ class Config {
     private var _userID:Number;
 	//where are we? 1=authoring, 2=monitor
 	private var _mode:Number;
+	
+	private var _build:String;
 
-
+	private var removeCache:Boolean = false;
     
     //These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
@@ -94,6 +98,7 @@ class Config {
     private function loadServerDefaults(){
         //createFromCode();
         //serverDefaultsLoaded(_configData);
+		
         var callBack = Proxy.create(this,serverDefaultsLoaded);
 
         _comms.getRequest('flashxml/configData.xml',callBack)
@@ -161,7 +166,40 @@ class Config {
         
 		//store data from server in local private variable
         _configData = serverConfigData;
-		
+		var success:Boolean = false;
+		var buildObj:Object = {};
+		Debugger.log('Build param value: '+_root.build,Debugger.GEN,'serverDefaultsLoaded','Config');
+		try {	
+			if (CookieMonster.cookieExists(CONFIG_PREFIX+CONFIG_BUILD)) {
+				buildObj = CookieMonster.open(CONFIG_PREFIX+CONFIG_BUILD,true);
+				Debugger.log('Build cookie exists: '+String(buildObj),Debugger.GEN,'serverDefaultsLoaded','Config');
+				
+				var buildRt:Number = parseFloat(_root.build);
+				var buildNo:Number = Number(buildObj);
+				
+				trace('build root no.: ' + buildRt);
+				trace('build no.: ' + buildNo);
+				trace(typeof buildNo);
+				trace(typeof buildRt);
+				
+				if(buildNo != buildRt) {
+					Debugger.log('Purging cookie data',Debugger.GEN,'serverDefaultsLoaded','Config');
+					if(CookieMonster.deleteCookie(CONFIG_PREFIX + CONFIG_BUILD)) {
+						saveBuild(_root.build);
+					}
+					CookieMonster.deleteCookie(CONFIG_PREFIX + 'theme');
+					CookieMonster.deleteCookie(CONFIG_PREFIX + 'language');
+					removeCache=true;
+				}
+				
+			} else {
+				saveBuild(_root.build);
+			}
+		} catch(err:Error) {
+			Debugger.log('Error occured: '+err.message,Debugger.CRITICAL,'serverDefaultsLoaded','Config');
+		} finally {
+			_build = _root.build;
+		}
 		
 		//Go through server defaults and create config items
         //Loop through server defaults and overwrite if a local version exists
@@ -175,11 +213,26 @@ class Config {
                 //If language config not in cookie, check browser locale before using server
                 if(prop=='language'){
                     _configData[prop] = getLanguage();
+					saveItem(prop);
+					
+					// Remove cached data if new build
+					if(removeCache) {
+						CookieMonster.deleteCookie(DICT_PREFIX+_configData[prop]);
+					}
+					
                 } else if(prop=='theme') {
                     //Default to 'default' if theme can't be found locally
-                    _configData[prop] = 'default';
+                    _configData[prop] = getTheme();
+					saveItem(prop);
+					
+					// Remove cached data if new build
+					if(removeCache) {
+						CookieMonster.deleteCookie(THEME_PREFIX+_configData[prop]);
+					}
                 }
                 //...else if(prop=='...'){
+					
+				
             }
         }
         
@@ -195,19 +248,55 @@ class Config {
         dispatchEvent({type:'load',target:this});
     }
     
+	/**
+	* saves the config build value in a cookie
+	*/
+	private function saveBuild(build:Object):Void{
+		
+		if(build == null) {
+			Debugger.log('Could not save build with null value',Debugger.CRITICAL,'saveBuild','Config');
+			return;
+		}
+		
+		var success:Boolean = false;
+		
+		success = CookieMonster.save(build,CONFIG_PREFIX + CONFIG_BUILD,true);
+		if (!success) {
+			Debugger.log('Config item could not be saved: ' +  CONFIG_BUILD ,Debugger.CRITICAL,'saveBuild','Config');
+		}
+		
+		return;
+	}
+	
     /**
     * gets the language from the root that was passed in by the JSP page containing the SWF
     */
     private function getLanguage():String{
         //TODO: make this a real call to get browser lcoale!
 		//return 'en';
-        return 'en';
-        /*
-        if(_root.language){
-            return _root.language;
-        }
-        */
+        //return 'en';
+        
+        if(_root.lang){
+			Debugger.log('Getting language from root: '+String(_root.lang),Debugger.GEN,'getLanguage','Config');
+            return _root.lang;
+        } else {
+			return 'en';
+		}
+        
     }
+	
+	/**
+	* gets the theme from the root that was passed in by author JSP page containing the SWF
+	*/
+	private function getTheme():String{
+		if(_root.theme){
+			Debugger.log('Getting theme from root: '+String(_root.theme),Debugger.GEN,'getTheme','Config');
+			return _root.theme;
+			
+		} else {
+			return 'default';
+		}
+	}
     
     
     /**
