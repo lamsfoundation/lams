@@ -37,10 +37,7 @@ public class CSSThemeVisualElement implements Serializable {
 
     /** nullable persistent field */
     private CSSThemeVisualElement parentTheme;
-
-    /** persistent field */
-    private Set users;
-
+    
     /** persistent field */
     private Set styles;
 
@@ -48,14 +45,13 @@ public class CSSThemeVisualElement implements Serializable {
     private Set elements;
 
     /** full constructor */
-    public CSSThemeVisualElement(Long id, String name, String description, boolean theme, CSSThemeVisualElement parentTheme, Set styles, Set users, Set elements) {
+    public CSSThemeVisualElement(Long id, String name, String description, boolean theme, CSSThemeVisualElement parentTheme, Set styles, Set elements) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.theme = theme;
         this.parentTheme = parentTheme;
         this.styles = styles;
-        this.users = users;
         this.elements = elements;
     }
 
@@ -187,44 +183,6 @@ public class CSSThemeVisualElement implements Serializable {
         this.styles = styles;
     }
 
-    /**
-     * 
-     * Users who have this theme as their style.
-     *  
-     *            @hibernate.set
-     *             lazy="false"
-     *             inverse="true"
-     *             cascade="none"
-     *            @hibernate.collection-key
-     *             column="theme_id"
-     *            @hibernate.collection-one-to-many
-     *             class="org.lamsfoundation.lams.usermanagement.User"
-     *         
-     */
-    private Set getUsers() {
-        return this.users;
-    }
-
-    private void setUsers(Set users) {
-        this.users = users;
-    }
-
-     public void clearUsers() {
-        if ( getUsers() != null ) {
-            getUsers().clear();
-        } 
-    }
-
-    public void addUser(User user) {
-        if ( getUsers() == null ) {
-            Set set = new HashSet();
-            set.add(user);
-            setUsers(set);
-        } else {
-            getUsers().add(user);
-        }
-        user.setTheme(this);
-    }
     
     /**
      * 
