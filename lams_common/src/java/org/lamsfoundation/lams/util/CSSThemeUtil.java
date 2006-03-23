@@ -33,7 +33,7 @@ public class CSSThemeUtil {
 	   	if ( ss != null ) {
 	   		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	   		if ( user != null ) {
-	   			theme = user.getTheme();
+	   			theme = user.getHtmlTheme();
 	   			
 	   			if (theme != null & theme.getName() != null)
 	   				themeList.add(theme.getName());
@@ -54,7 +54,7 @@ public class CSSThemeUtil {
 	   	if ( ss != null ) {
 	   		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	   		if ( user != null ) {
-	   			theme = user.getTheme();
+	   			theme = user.getHtmlTheme();
 	   		} 
 	   	}
 	   	
