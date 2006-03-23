@@ -55,6 +55,8 @@ class org.lamsfoundation.lams.authoring.Application {
     
     private static var UI_LOAD_CHECK_INTERVAL:Number = 50;
 	private static var UI_LOAD_CHECK_TIMEOUT_COUNT:Number = 200;
+	private static var DATA_LOAD_CHECK_INTERVAL:Number = 50;
+	private static var DATA_LOAD_CHECK_TIMEOUT_COUNT:Number = 200;
 
     private static var QUESTION_MARK_KEY:Number = 191;
     private static var X_KEY:Number = 88;
@@ -68,6 +70,7 @@ class org.lamsfoundation.lams.authoring.Application {
 	
 
 	private var _uiLoadCheckCount = 0;				// instance counter for number of times we have checked to see if theme and dict are loaded
+	private var _dataLoadCheckCount = 0;			
 	
 	private var _ddm:DesignDataModel;
     private var _toolbar:Toolbar;
@@ -96,6 +99,8 @@ class org.lamsfoundation.lams.authoring.Application {
     private var _UILoadCheckIntervalID:Number;         //Interval ID for periodic check on UILoad status
     private var _UILoaded:Boolean;                     //UI Loading status
     
+	private var _DataLoadCheckIntervalID:Number;
+	
     //UI Elements
     private var _toolbarLoaded:Boolean;                //These are flags set to true when respective element is 'loaded'
     private var _canvasLoaded:Boolean;
@@ -172,15 +177,15 @@ class org.lamsfoundation.lams.authoring.Application {
         //Now that the config class is ready setup the UI and data, call to setupData() first in 
 		//case UI element constructors use objects instantiated with setupData()
         setupData();
-        setupUI();
-        //Start off polling check for UI load status
-        checkUILoaded();
+		checkDataLoaded();
+		
     }
     
     /**
     * Loads and sets up event listeners for Theme, Dictionary etc.  
     */
     private function setupData() {
+		
         //Get the language, create+load dictionary and setup load handler.
         var language:String = String(_config.getItem('language'));
         _dictionary = Dictionary.getInstance();
@@ -219,11 +224,38 @@ class org.lamsfoundation.lams.authoring.Application {
     private function onThemeLoad(evt:Object) {
         if(evt.type=='load'){
             _themeLoaded = true; 
-			Debugger.log('!Theme loaded :',Debugger.CRITICAL,'onThemeLoad','Application');			
+			Debugger.log('!Theme loaded :',Debugger.CRITICAL,'onThemeLoad','Application');		
         } else {
             Debugger.log('event type not recognised :'+evt.type,Debugger.CRITICAL,'onThemeLoad','Application');
         }
+		
     }
+	
+	/**
+	* Periodically checks if data has been loaded
+	*/
+	private function checkDataLoaded() {
+		// first time through set interval for method polling
+		if(!_DataLoadCheckIntervalID) {
+			_DataLoadCheckIntervalID = setInterval(Proxy.create(this, checkDataLoaded), DATA_LOAD_CHECK_INTERVAL);
+		} else {
+			_dataLoadCheckCount++;
+			// if dictionary and theme data loaded setup UI
+			if(_dictionaryLoaded && _themeLoaded) {
+				clearInterval(_DataLoadCheckIntervalID);
+				
+				setupUI();
+				checkUILoaded();
+				
+        
+			} else if(_dataLoadCheckCount >= DATA_LOAD_CHECK_TIMEOUT_COUNT) {
+				Debugger.log('reached timeout waiting for data to load.',Debugger.CRITICAL,'checkUILoaded','Application');
+				clearInterval(_UILoadCheckIntervalID);
+				
+        
+			}
+		}
+	}
     
     /**
     * Runs periodically and dispatches events as they are ready
