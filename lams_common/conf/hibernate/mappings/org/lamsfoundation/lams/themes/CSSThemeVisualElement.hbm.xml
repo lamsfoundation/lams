@@ -84,30 +84,7 @@
 
     <!-- Associations -->
   
-    <!-- bi-directional one-to-many association to LamsUser -->
-    <set
-        name="users"
-        lazy="true"
-        inverse="true"
-		cascade="none"
-    >
-        <meta attribute="field-description">
-               @hibernate.set
-                 lazy="false"
-                 inverse="true"
-                 cascade="none"
-                @hibernate.collection-key
-                 column="theme_id"
-                @hibernate.collection-one-to-many
-                 class="org.lamsfoundation.lams.usermanagement.User"
-        </meta>
-        <key>
-            <column name="theme_id" />
-        </key>
-        <one-to-many 
-            class="org.lamsfoundation.lams.usermanagement.User"
-        />
-    </set>
+    
     <!-- bi-directional one-to-many association to Style. Is really 1-1 but we want to -->
     <!--  to use the cascade delete orphan, so using a set is easier. If stylesheets ever -->
     <!--  change to have more than one style per element, we'll be ready <grin> -->
