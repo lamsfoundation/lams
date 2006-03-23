@@ -22,6 +22,7 @@ class ToolbarView extends AbstractView {
 	private var trans_btn:Button;
 	private var optional_btn:Button;
 	private var gate_btn:Button;
+	private var group_btn:Button;
 	private var preview_btn:Button;
 	private var bkg_pnl:Panel;
 	private var _dictionary:Dictionary;
@@ -177,6 +178,7 @@ class ToolbarView extends AbstractView {
 		trans_btn.setStyle('styleName',styleObj);
 		optional_btn.setStyle('styleName',styleObj);
 		gate_btn.setStyle('styleName',styleObj);
+		group_btn.setStyle('styleName', styleObj);
 		preview_btn.setStyle('styleName',styleObj);
 		styleObj = _tm.getStyleObject('BGPanel');
 		bkg_pnl.setStyle('styleName',styleObj);
