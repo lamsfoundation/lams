@@ -18,14 +18,28 @@
  *
  *http://www.gnu.org/licenses/gpl.txt
  */
-package org.lamsfoundation.lams.tool.rsrc.dao;
+package org.lamsfoundation.lams.tool.rsrc.service;
 
-import org.lamsfoundation.lams.tool.rsrc.model.Resource;
+public class ResourceApplicationException extends Exception{
 
-public interface ResourceDAO  extends DAO {
+	public ResourceApplicationException() {
+		super();
+		
+	}
 
-	Resource getByContentId(Long contentId);
+	public ResourceApplicationException(String message, Throwable cause) {
+		super(message, cause);
+		
+	}
 
-	Resource getByUid(Long resourceUid);
+	public ResourceApplicationException(String message) {
+		super(message);
+		
+	}
+
+	public ResourceApplicationException(Throwable cause) {
+		super(cause);
+		
+	}
 
 }

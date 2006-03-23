@@ -21,8 +21,23 @@
 package org.lamsfoundation.lams.tool.rsrc.dao.hibernate;
 
 import org.lamsfoundation.lams.tool.rsrc.dao.ResourceDAO;
+import org.lamsfoundation.lams.tool.rsrc.model.Resource;
 
-
+/**
+ * 
+ * @author Steve.Ni
+ * 
+ * @version $Revision$
+ */
 public class ResourceDAOHibernate extends BaseDAOHibernate implements ResourceDAO{
+	private static final String GET_RESOURCE_BY_CONTENTID = "from "+Resource.class.getName()+" as r where r.contentId=?";
+	
+	public Resource getByContentId(Long contentId) {
+		return (Resource) getHibernateTemplate().find(GET_RESOURCE_BY_CONTENTID,contentId);
+	}
+
+	public Resource getByUid(Long resourceUid) {
+		return (Resource) getObject(Resource.class,resourceUid);
+	}
 
 }

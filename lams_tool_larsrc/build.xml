@@ -225,6 +225,7 @@
 			<fileset dir="${build.classes.java}">
 			</fileset>
 			<fileset dir="${conf.hibernate.mapping.dir}">
+				<exclude name="**/hibernate.properties"/>
 			</fileset>
 		</jar> 
 	</target>
@@ -261,20 +262,25 @@
 		<war warfile="${build.lib}/${product}.war" 
   				webxml="${conf.webinf.dir}/web.xml" manifest="${conf.dir}/war/META-INF/MANIFEST.MF">
 			<webinf dir="${conf.webinf.dir}">
-				<include name="**/*.tld"/>
+				<include name="*.tld"/>
 				<include name="*.xml"/>
-				<include name="struts/*"/>
-				<include name="tags/*"/>
-				<include name="fckeditor/*"/>
-				<exclude name="web.xml"/>
+				<include name="tags/**"/>
 			</webinf>
 			<classes dir="${build.classes.java}"/>	
 			<fileset dir="${conf.web.dir}">
 				<include name="*"/>
 				<include name="includes/**"/>
 				<include name="images/**"/>
-				<include name="jsps/**"/> 
+				<include name="pages/**"/> 
+				<include name="common/**"/> 
+				<include name="layout/**"/> 
 			</fileset>
+			<lib dir="${weblib}/jaxen">  
+				<include name="*.jar"/> 
+			</lib> 
+			<lib dir="${weblib}/reload_2_0_1">
+				<include name="*.jar"/>
+			</lib>
 		</war>
 	</target>
 

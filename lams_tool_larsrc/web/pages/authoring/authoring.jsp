@@ -1,6 +1,4 @@
-<%@ include file="../sharing/share.jsp" %>
-<%@ taglib uri="fck-editor" prefix="FCK"%>
-<%@ taglib uri="tags-lams" prefix="lams" %>
+<%@ include file="/common/taglib.jsp" %>
 <%@ page import="java.util.HashSet" %>
 <%@ page import="java.util.Set" %>
 
@@ -18,7 +16,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html:html locale="true">
 <head>
-	<title>Submit Files</title>
+	<title><fmt:message key="label.author.title"/></title>
 	<!-- depending on user / site preference this will get changed probbably use passed in variable from flash to select which one to use-->
     <link href="<c:out value="${tool}"/>author_page/css/aqua.css" rel="stylesheet" type="text/css">
     

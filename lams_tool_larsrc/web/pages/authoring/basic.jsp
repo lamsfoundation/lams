@@ -1,8 +1,4 @@
-
-<%@ taglib uri="tags-html" prefix="html" %>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
-<%@ taglib uri="tags-lams" prefix="lams" %>
+<%@ include file="/common/taglib.jsp" %>
 
 	<!---------------------------Basic Tab Content ------------------------>
 	<table class="forms">

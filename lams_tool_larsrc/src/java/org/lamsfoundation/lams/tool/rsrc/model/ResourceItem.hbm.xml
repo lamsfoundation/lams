@@ -25,6 +25,93 @@
             </generator>
         </id>
 
+        <property
+            name="crUuid"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
+            column="cr_uuid"
+        />
+
+        <property
+            name="crVersionId"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
+            column="cr_version_id"
+        />
+
+        <property
+            name="description"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="description"
+        />
+
+        <property
+            name="imsSchema"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="ims_schema"
+        />
+
+        <property
+            name="initialItem"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="init_item"
+        />
+
+        <set
+            name="itemInstructions"
+            lazy="true"
+            inverse="false"
+            cascade="all"
+            sort="unsorted"
+            order-by="sequence_id desc"
+        >
+
+            <key
+                column="item_uid"
+            >
+            </key>
+
+            <one-to-many
+                  class="org.lamsfoundation.lams.tool.rsrc.model.ResourceItemInstruction"
+            />
+
+        </set>
+
+        <property
+            name="organizationXml"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="organization_xml"
+            length="65535"
+        />
+
+        <property
+            name="title"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="title"
+            length="255"
+        />
+
+        <property
+            name="url"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="title"
+            length="65535"
+        />
+
         <!--
             To add non XDoclet property mappings, create a file named
                 hibernate-properties-ResourceItem.xml

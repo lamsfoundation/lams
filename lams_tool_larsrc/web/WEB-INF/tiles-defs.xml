@@ -29,6 +29,15 @@ http://www.gnu.org/licenses/gpl.txt
     	<put name="header" value="/common/header.jsp"/>
     	<put name="footer" value="/common/footer.jsp"/>
 	</definition>
+	
+	<!-- B: Authoring -->
+	<definition name="tiles:authoring/main" extends="tiles:layout">
+    	<put name="pageTitleKey" value="Shared resource authoring"/>
+    	<put name="body" value="/pages/authoring/authoring.jsp"/>
+	</definition>
+	<!-- E: Authoring -->
+	
+	
 	<!-- B: Monitoring -->
 	
 	<!-- E: Monitoring -->

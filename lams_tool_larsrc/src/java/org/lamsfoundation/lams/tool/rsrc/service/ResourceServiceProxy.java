@@ -24,6 +24,8 @@ package org.lamsfoundation.lams.tool.rsrc.service;
 
 import javax.servlet.ServletContext;
 
+import org.lamsfoundation.lams.tool.ToolContentManager;
+import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -47,25 +49,25 @@ public class ResourceServiceProxy
      * @param servletContext the servletContext for current application
      * @return mcq service object.
      */
-    public static final IResourceService getMcService(ServletContext servletContext)
+    public static final IResourceService getResourceService(ServletContext servletContext)
     {
-        return (IResourceService)getMcDomainService(servletContext);
+        return (IResourceService)getResourceDomainService(servletContext);
     }
-//    
-//    public static final ToolSessionManager getMcSessionManager(ServletContext servletContext)
-//    {
-//        return (ToolSessionManager)getMcDomainService(servletContext);
-//    }
-//    
-//    public static final ToolContentManager getMcContentManager(ServletContext servletContext)
-//    {
-//        return (ToolContentManager)getMcDomainService(servletContext);
-//    }
+    
+    public static final ToolSessionManager getMcSessionManager(ServletContext servletContext)
+    {
+        return (ToolSessionManager)getResourceDomainService(servletContext);
+    }
+    
+    public static final ToolContentManager getMcContentManager(ServletContext servletContext)
+    {
+        return (ToolContentManager)getResourceDomainService(servletContext);
+    }
 
-    private static Object getMcDomainService(ServletContext servletContext)
+    private static Object getResourceDomainService(ServletContext servletContext)
     {
         WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
-        return wac.getBean("mcService");
+        return wac.getBean("resourceService");
     }
     
 }

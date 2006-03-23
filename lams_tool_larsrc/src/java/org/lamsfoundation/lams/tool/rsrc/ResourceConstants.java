@@ -18,14 +18,21 @@
  *
  *http://www.gnu.org/licenses/gpl.txt
  */
-package org.lamsfoundation.lams.tool.rsrc.dao;
+package org.lamsfoundation.lams.tool.rsrc;
 
-import org.lamsfoundation.lams.tool.rsrc.model.Resource;
-
-public interface ResourceDAO  extends DAO {
-
-	Resource getByContentId(Long contentId);
-
-	Resource getByUid(Long resourceUid);
+public class ResourceConstants {
+	public static final String TOOL_SIGNNATURE = "larsrc11";
+	public static final String RESOURCE_SERVICE = "resourceService";
+	
+	//for action forward name
+	public static final String SUCCESS = "success";
+	public static final String ERROR = "error";
+	
+	//for parameters' name
+	public static final String PARAM_TOOL_CONTENT_ID = "toolContentID";
+	
+	//for request attribute name
+	public static final String AUTHORING_RESOURCE_LIST = "resourceList";
+	public static final String INSTRUCTION_ATTACHMENT_LIST = "instructionAttachmentList";
 
 }

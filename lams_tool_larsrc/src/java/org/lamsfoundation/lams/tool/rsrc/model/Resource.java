@@ -8,6 +8,11 @@ import java.util.Set;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
+import org.lamsfoundation.lams.contentrepository.NodeKey;
+import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
+import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
+import org.lamsfoundation.lams.tool.rsrc.util.ResourceToolContentHandler;
 
 /**
  * Resource
@@ -48,6 +53,9 @@ public class Resource implements Cloneable{
 	
 	//resource Items
 	private Set resourceItems;
+	
+	//*************** NON Persist Fields ********************
+	private IToolContentHandler toolContentHandler;
 	/**
 	 * Default contruction method. 
 	 *
@@ -59,6 +67,13 @@ public class Resource implements Cloneable{
 //  **********************************************************
   	//		Function method for Resource
 //  **********************************************************
+	public static Resource newInstance(Resource defaultContent, Long contentId, ResourceToolContentHandler resourceToolContentHandler) {
+		Resource toContent = new Resource();
+		defaultContent.toolContentHandler = resourceToolContentHandler;
+		toContent = (Resource) defaultContent.clone();
+		toContent.setContentId(contentId);
+		return toContent;
+	}
   	public Object clone(){
   		
   		Resource resource = null;
@@ -72,23 +87,23 @@ public class Resource implements Cloneable{
   				while(iter.hasNext()){
   					ResourceAttachment file = (ResourceAttachment)iter.next(); 
   					ResourceAttachment newFile = (ResourceAttachment) file.clone();
-  					//if toolContentHandle is null, just clone old file without duplicate it in repository
-//  					if(toolContentHandler != null){
-//						//duplicate file node in repository
-//						NodeKey keys = toolContentHandler.copyFile(file.getFileUuid());
-//						newFile.setFileUuid(keys.getUuid());
-//						newFile.setFileVersionId(keys.getVersion());
-//  					}
+//  					if toolContentHandle is null, just clone old file without duplicate it in repository
+  					if(toolContentHandler != null){
+						//duplicate file node in repository
+						NodeKey keys = toolContentHandler.copyFile(file.getFileUuid());
+						newFile.setFileUuid(keys.getUuid());
+						newFile.setFileVersionId(keys.getVersion());
+  					}
 					set.add(newFile);
   				}
   				resource.attachments = set;
   			}
 		} catch (CloneNotSupportedException e) {
 			log.error("When clone " + Resource.class + " failed");
-//		} catch (ItemNotFoundException e) {
-//			log.error("When clone " + Resource.class + " failed");
-//		} catch (RepositoryCheckedException e) {
-//			log.error("When clone " + Resource.class + " failed");
+		} catch (ItemNotFoundException e) {
+			log.error("When clone " + Resource.class + " failed");
+		} catch (RepositoryCheckedException e) {
+			log.error("When clone " + Resource.class + " failed");
 		}
   		
   		return resource;
@@ -423,5 +438,6 @@ public class Resource implements Cloneable{
 	public void setRunAuto(boolean runAuto) {
 		this.runAuto = runAuto;
 	}
+
 
 }

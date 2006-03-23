@@ -22,6 +22,11 @@
 
 package org.lamsfoundation.lams.tool.rsrc.service;
 
+import java.util.Set;
+
+import org.lamsfoundation.lams.contentrepository.IVersionedNode;
+import org.lamsfoundation.lams.tool.rsrc.model.Resource;
+
 /**
  * @author Dapeng.Ni
  * 
@@ -29,5 +34,13 @@ package org.lamsfoundation.lams.tool.rsrc.service;
  */
 public interface IResourceService 
 {
+
+	IVersionedNode getFileNode(Long packageId, String relPathString) throws ResourceApplicationException ;
+
+	Resource getResourceByContentId(Long contentId);
+
+	Resource getDefaultContent(Long contentId) throws ResourceApplicationException;
+
+	Set getAuthoredItems(Long resourceUid);
 }
 

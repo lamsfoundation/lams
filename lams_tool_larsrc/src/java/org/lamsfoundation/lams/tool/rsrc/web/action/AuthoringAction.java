@@ -21,6 +21,10 @@
 package org.lamsfoundation.lams.tool.rsrc.web.action;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -31,7 +35,13 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.tool.rsrc.ResourceConstants;
+import org.lamsfoundation.lams.tool.rsrc.model.Resource;
 import org.lamsfoundation.lams.tool.rsrc.service.IResourceService;
+import org.lamsfoundation.lams.tool.rsrc.web.form.ResourceForm;
+import org.lamsfoundation.lams.util.WebUtil;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author Steve.Ni
@@ -97,14 +107,77 @@ public class AuthoringAction extends Action {
 //        if (param.equals("finishTopic")) {
 //       		return finishTopic(mapping, form, request, response);
 //        }
-        return mapping.findForward("error");
+        return mapping.findForward(ResourceConstants.ERROR);
 	}
 	//******************************************************************************************************************
 	//              Forum Author functions
 	//******************************************************************************************************************
 
 	private ActionForward initPage(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-		return null;
+
+		Long contentId = new Long(WebUtil.readLongParam(request,ResourceConstants.PARAM_TOOL_CONTENT_ID));
+		ResourceForm forumForm = (ResourceForm)form;
+		//get back the topic list and display them on page
+		IResourceService service = getResourceService();
+
+		Set topics = null;
+		Resource resource = null;
+		try {
+			resource = service.getResourceByContentId(contentId);
+			//if forum does not exist, try to use default content instead.
+			if(resource == null){
+				resource = service.getDefaultContent(contentId);
+				if(resource.getResourceItems() != null){
+					topics = resource.getResourceItems();
+				}else
+					topics = null;
+			}else
+				topics = service.getAuthoredItems(resource.getUid());
+			//initialize instruction attachment list
+			List attachmentList = getAttachmentList(request);
+			attachmentList.addAll(resource.getAttachments());
+
+			forumForm.setResource(resource);
+		} catch (Exception e) {
+			log.error(e);
+			return mapping.findForward("error");
+		}
+		
+		//set back STRUTS component value
+		//init it to avoid null exception in following handling
+		if(topics == null)
+			topics = new HashSet();
+		request.getSession().setAttribute(ResourceConstants.AUTHORING_RESOURCE_LIST, topics);
+		return mapping.findForward(ResourceConstants.SUCCESS);
 	}
 	
+	//*************************************************************************************
+	// Private method 
+	//*************************************************************************************
+	private IResourceService getResourceService() {
+	      WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
+	      return (IResourceService) wac.getBean(ResourceConstants.RESOURCE_SERVICE);
+	}
+	/**
+	 * @param request
+	 * @return
+	 */
+	private List getAttachmentList(HttpServletRequest request) {
+		return getListFromSession(request,ResourceConstants.INSTRUCTION_ATTACHMENT_LIST);
+	}
+	/**
+	 * Get <code>java.util.List</code> from HttpSession by given name.
+	 * 
+	 * @param request
+	 * @param name
+	 * @return
+	 */
+	private List getListFromSession(HttpServletRequest request,String name) {
+		List list = (List) request.getSession().getAttribute(name);
+		if(list == null){
+			list = new ArrayList();
+			request.getSession().setAttribute(name,list);
+		}
+		return list;
+	}	
 }

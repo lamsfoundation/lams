@@ -21,6 +21,7 @@
 package org.lamsfoundation.lams.tool.rsrc.model;
 
 import java.util.Date;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
@@ -43,7 +44,8 @@ public class ResourceSession implements Cloneable{
 	private Date sessionEndDate;
 	//finish or not
 	private int status;
-	
+	//resource Items
+	private Set resourceItems;
 //  **********************************************************
   	//		Function method for ForumToolSession
 //  **********************************************************
@@ -52,7 +54,7 @@ public class ResourceSession implements Cloneable{
   		ResourceSession session = null;
   		try{
   			session = (ResourceSession) super.clone();
-  		
+  			//TODO: need clone ResourceItems
 		} catch (CloneNotSupportedException e) {
 			log.error("When clone " + ResourceSession.class + " failed");
 		}
@@ -144,6 +146,24 @@ public class ResourceSession implements Cloneable{
 		this.sessionName = sessionName;
 	}
 
+	/**
+	 * 
+	 * 
+	 * @hibernate.set lazy="true"
+	 *                inverse="true"
+	 *                cascade="none"
+	 *                order-by="create_date desc"
+	 * @hibernate.collection-key column="session_uid"
+	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.rsrc.model.ResourceItem"
+	 * 
+	 * @return
+	 */
+	public Set getResourceItems() {
+		return resourceItems;
+	}
+	public void setResourceItems(Set resourceItems) {
+		this.resourceItems= resourceItems;
+	}
 
 
 }

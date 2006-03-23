@@ -1,10 +1,11 @@
 		<!-- ========== Action Mapping Definitions ============================== 
-		<action path="/defineLater"
-			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
-			name="forumForm" 
+		<!-- ========== BEGIN: Authroing Definitions ============================== -->
+		<action path="/authoring/init"
+			type="org.lamsfoundation.lams.tool.rcrs.web.action.AuthoringAction"
+			name="resourceForm" 
 			scope="session" 
-			validate="false"
-			parameter="defineLater">
-			<forward name="success" path="tiles:/monitoring/forum/defineLater" />
+			parameter="initPage" 
+			validate="false">
+			<forward name="success" path="tiles:/authoring/main" />
 		</action>
-   		-->
+		

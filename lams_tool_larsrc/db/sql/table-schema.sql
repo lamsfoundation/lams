@@ -1,9 +1,11 @@
 alter table tl_larsrc11_attachment drop foreign key FK1E7009430E79035;
+alter table tl_larsrc11_item_instruction drop foreign key FKA5665013980570ED;
 alter table tl_larsrc11_resource drop foreign key FK89093BF758092FB;
 alter table tl_larsrc11_resource_item drop foreign key FKF52D1F9330E79035;
 alter table tl_larsrc11_session drop foreign key FK24AA78C530E79035;
 alter table tl_larsrc11_user drop foreign key FK30113BFC506CD584;
 drop table if exists tl_larsrc11_attachment;
+drop table if exists tl_larsrc11_item_instruction;
 drop table if exists tl_larsrc11_resource;
 drop table if exists tl_larsrc11_resource_item;
 drop table if exists tl_larsrc11_session;
@@ -16,6 +18,13 @@ create table tl_larsrc11_attachment (
    file_uuid bigint,
    create_date datetime,
    resource_uid bigint,
+   primary key (uid)
+);
+create table tl_larsrc11_item_instruction (
+   uid bigint not null auto_increment,
+   description varchar(255),
+   sequence_id integer,
+   item_uid bigint,
    primary key (uid)
 );
 create table tl_larsrc11_resource (
@@ -40,6 +49,13 @@ create table tl_larsrc11_resource (
 );
 create table tl_larsrc11_resource_item (
    uid bigint not null auto_increment,
+   cr_uuid bigint,
+   cr_version_id bigint,
+   description varchar(255),
+   ims_schema varchar(255),
+   init_item varchar(255),
+   organization_xml text,
+   title varchar(255),
    resource_uid bigint,
    primary key (uid)
 );
@@ -63,6 +79,7 @@ create table tl_larsrc11_user (
    primary key (uid)
 );
 alter table tl_larsrc11_attachment add index FK1E7009430E79035 (resource_uid), add constraint FK1E7009430E79035 foreign key (resource_uid) references tl_larsrc11_resource (uid);
+alter table tl_larsrc11_item_instruction add index FKA5665013980570ED (item_uid), add constraint FKA5665013980570ED foreign key (item_uid) references tl_larsrc11_resource_item (uid);
 alter table tl_larsrc11_resource add index FK89093BF758092FB (create_by), add constraint FK89093BF758092FB foreign key (create_by) references tl_larsrc11_user (uid);
 alter table tl_larsrc11_resource_item add index FKF52D1F9330E79035 (resource_uid), add constraint FKF52D1F9330E79035 foreign key (resource_uid) references tl_larsrc11_resource (uid);
 alter table tl_larsrc11_session add index FK24AA78C530E79035 (resource_uid), add constraint FK24AA78C530E79035 foreign key (resource_uid) references tl_larsrc11_resource (uid);
