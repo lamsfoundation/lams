@@ -95,7 +95,7 @@ public class UserTag extends TagSupport {
 				
 		        try {
 		            value = PropertyUtils.getProperty(user, property);
-		            if( property.equals("theme")) {
+		            if( property.equals("flashTheme") || property.equals("htmlTheme")) {
 		            	CSSThemeBriefDTO cssTheme = (CSSThemeBriefDTO) value;
 		            	value = (String) cssTheme.getName();
 		            }
