@@ -42,7 +42,7 @@ import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import com.allaire.wddx.WddxDeserializationException;
 import org.lamsfoundation.lams.util.MessageService;
 
-import org.lamsfoundation.lams.themes.exception.NoSuchThemeException;
+import org.lamsfoundation.lams.themes.exception.ThemeException;
 
 /**
  * 
@@ -193,14 +193,14 @@ public class ThemeService implements IThemeService {
 	 * @return String The acknowledgement or error in WDDX format
 	 * @throws IOException
 	 */
-	private FlashMessage setTheme(Integer userId, Long themeId, String type) throws IOException, NoSuchThemeException, UserException {
+	private FlashMessage setTheme(Integer userId, Long themeId, String type) throws IOException, ThemeException, UserException {
 		User user = userDAO.getUserById(userId);
 		CSSThemeVisualElement theme = themeDAO.getThemeById(themeId);
 		
 		if(theme==null)
-			throw new NoSuchThemeException();
+			throw new ThemeException(messageService.getMessage(IThemeService.NO_SUCH_THEME_KEY));
 		else if(user==null)
-			throw new UserException();
+			throw new UserException(messageService.getMessage(IThemeService.NO_SUCH_USER_KEY));
 		else{
 			if(type==null) {
 				user.setHtmlTheme(theme);
@@ -225,7 +225,7 @@ public class ThemeService implements IThemeService {
 	 * @return FlashMessage The acknowledgement or error in WDDX format
 	 * @throws IOException
 	 */
-	public FlashMessage setTheme(Integer userId, Long themeId) throws IOException, NoSuchThemeException, UserException {
+	public FlashMessage setTheme(Integer userId, Long themeId) throws IOException, ThemeException, UserException {
 		return setTheme(userId, themeId, null);
 	}
 	
@@ -235,7 +235,7 @@ public class ThemeService implements IThemeService {
 	 * @return FlashMessage The acknowledgement or error in WDDX format
 	 * @throws IOException
 	 */
-	public FlashMessage setHtmlTheme(Integer userId, Long themeId) throws IOException, NoSuchThemeException, UserException {
+	public FlashMessage setHtmlTheme(Integer userId, Long themeId) throws IOException, ThemeException, UserException {
 		return setTheme(userId, themeId, IThemeService.HTML_KEY);
 	}
 	
@@ -245,7 +245,7 @@ public class ThemeService implements IThemeService {
 	 * @return FlashMessage The acknowledgement or error in WDDX format
 	 * @throws IOException
 	 */
-	public FlashMessage setFlashTheme(Integer userId, Long themeId) throws IOException, NoSuchThemeException, UserException {
+	public FlashMessage setFlashTheme(Integer userId, Long themeId) throws IOException, ThemeException, UserException {
 		return setTheme(userId, themeId, IThemeService.FLASH_KEY);
 	}
 	

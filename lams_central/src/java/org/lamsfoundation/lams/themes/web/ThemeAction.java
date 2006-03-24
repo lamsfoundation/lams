@@ -42,7 +42,9 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
-import org.lamsfoundation.lams.themes.exception.NoSuchThemeException;
+import org.lamsfoundation.lams.themes.exception.ThemeException;
+
+import org.lamsfoundation.lams.util.MessageService;
 
 /**
  * 
@@ -74,6 +76,8 @@ public class ThemeAction extends LamsDispatchAction {
 	public static final String TYPE_PARAMETER = "type";
 	public static final String HTML_TYPE = "html";
 	public static final String FLASH_TYPE = "flash";
+	
+	
 	
 	/** for sending acknowledgment/error messages back to flash */
 	private FlashMessage flashMessage;
@@ -164,6 +168,8 @@ public class ThemeAction extends LamsDispatchAction {
 		Integer userId = new Integer(WebUtil.readIntParam(request,USER_ID_PARAMETER));
 		String type = WebUtil.readStrParam(request, TYPE_PARAMETER, true);
 		IThemeService themeService = getThemeService();
+		MessageService messageService = themeService.getMessageService();
+		
 		flashMessage = null;
 		
 		try {
@@ -173,10 +179,12 @@ public class ThemeAction extends LamsDispatchAction {
 				flashMessage = themeService.setFlashTheme(userId, themeId);
 			else if(type.equals(HTML_TYPE))
 				flashMessage = themeService.setHtmlTheme(userId, themeId);
-		} catch (NoSuchThemeException e) {
-		     flashMessage = FlashMessage.getNoSuchTheme("wddxPacket",themeId);
+			else
+				throw new ThemeException(messageService.getMessage(IThemeService.NO_SUCH_THEME_TYPE_KEY));
+		} catch (ThemeException e) {
+		     flashMessage = new FlashMessage("wddxPacket", e.getMessage(), FlashMessage.ERROR);
 		} catch (UserException e) {
-		     flashMessage = FlashMessage.getNoSuchUserExists("wddxPacket", userId);
+			flashMessage = new FlashMessage("wddxPacket", e.getMessage(), FlashMessage.ERROR);
 		} catch ( Exception e) {
 		     flashMessage = FlashMessage.getExceptionOccured("setTheme", e.getMessage());
 		}

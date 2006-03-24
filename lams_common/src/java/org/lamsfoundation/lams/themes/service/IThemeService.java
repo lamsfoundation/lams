@@ -27,7 +27,8 @@ import java.io.IOException;
 import org.lamsfoundation.lams.usermanagement.dao.IUserDAO;
 import org.lamsfoundation.lams.themes.dao.ICSSThemeDAO;
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
-import org.lamsfoundation.lams.themes.exception.NoSuchThemeException;
+import org.lamsfoundation.lams.themes.exception.ThemeException;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 
 /**
@@ -49,7 +50,15 @@ public interface IThemeService {
 	/** Key for saving Html Theme for user */
 	public static final String HTML_KEY = "theme.service.setTheme.saved";
 	
+	public static final String NO_SUCH_THEME_TYPE_KEY = "theme.service.setTheme.type.invalid";
 	
+	public static final String NO_SUCH_THEME_KEY = "theme.service.setTheme.noSuchTheme";
+	
+	public static final String NO_SUCH_USER_KEY = "theme.service.setTheme.noSuchUser";
+	
+	public void setMessageService(MessageService messageService);
+	
+	public MessageService getMessageService();
 	
 	/**
      * Set IThemeDAO
@@ -97,10 +106,10 @@ public interface IThemeService {
 	public String getThemes() throws IOException;
 	
 	
-	public FlashMessage setTheme(Integer userId, Long themeId) throws IOException, NoSuchThemeException, UserException;
+	public FlashMessage setTheme(Integer userId, Long themeId) throws IOException, ThemeException, UserException;
 	
-	public FlashMessage setHtmlTheme(Integer userId, Long themeId) throws IOException, NoSuchThemeException, UserException;
+	public FlashMessage setHtmlTheme(Integer userId, Long themeId) throws IOException, ThemeException, UserException;
 	
-	public FlashMessage setFlashTheme(Integer userId, Long themeId) throws IOException, NoSuchThemeException, UserException;
+	public FlashMessage setFlashTheme(Integer userId, Long themeId) throws IOException, ThemeException, UserException;
 }
 
