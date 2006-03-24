@@ -26,6 +26,9 @@ import java.io.IOException;
 
 import org.lamsfoundation.lams.usermanagement.dao.IUserDAO;
 import org.lamsfoundation.lams.themes.dao.ICSSThemeDAO;
+import org.lamsfoundation.lams.usermanagement.exception.UserException;
+import org.lamsfoundation.lams.themes.exception.NoSuchThemeException;
+import org.lamsfoundation.lams.util.wddx.FlashMessage;
 
 /**
  * 
@@ -39,6 +42,14 @@ public interface IThemeService {
 	
 	/** Message key for successful saved theme - setTheme() method */
 	public static final String SET_THEME_SAVED_MESSAGE_KEY = "theme.service.setTheme.saved";
+	
+	/** Key for saving Flash theme for user */
+	public static final String FLASH_KEY = "flash";
+	
+	/** Key for saving Html Theme for user */
+	public static final String HTML_KEY = "theme.service.setTheme.saved";
+	
+	
 	
 	/**
      * Set IThemeDAO
@@ -86,6 +97,10 @@ public interface IThemeService {
 	public String getThemes() throws IOException;
 	
 	
-	public String setTheme(Integer userId, Long themeId) throws IOException;
+	public FlashMessage setTheme(Integer userId, Long themeId) throws IOException, NoSuchThemeException, UserException;
+	
+	public FlashMessage setHtmlTheme(Integer userId, Long themeId) throws IOException, NoSuchThemeException, UserException;
+	
+	public FlashMessage setFlashTheme(Integer userId, Long themeId) throws IOException, NoSuchThemeException, UserException;
 }
 

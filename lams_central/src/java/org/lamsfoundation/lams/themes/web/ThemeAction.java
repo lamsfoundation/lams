@@ -36,9 +36,13 @@ import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.themes.service.IThemeService;
 import org.lamsfoundation.lams.themes.web.ThemeConstants;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import org.lamsfoundation.lams.usermanagement.exception.UserException;
+import org.lamsfoundation.lams.themes.exception.NoSuchThemeException;
 
 /**
  * 
@@ -66,6 +70,14 @@ public class ThemeAction extends LamsDispatchAction {
 	/** Id of user setting the new theme */
 	public static final String USER_ID_PARAMETER = "userID";
 		
+	/** The type the theme should be set for i.e. flash or jsp */
+	public static final String TYPE_PARAMETER = "type";
+	public static final String HTML_TYPE = "html";
+	public static final String FLASH_TYPE = "flash";
+	
+	/** for sending acknowledgment/error messages back to flash */
+	private FlashMessage flashMessage;
+	
 	public IThemeService getThemeService(){
 		WebApplicationContext webContext = WebApplicationContextUtils.getRequiredWebApplicationContext(this.getServlet().getServletContext());
 		return (IThemeService) webContext.getBean(ThemeConstants.THEME_SERVICE_BEAN_NAME);		
@@ -150,11 +162,26 @@ public class ThemeAction extends LamsDispatchAction {
 		
 		Long themeId = new Long(WebUtil.readLongParam(request,THEME_ID_PARAMETER));
 		Integer userId = new Integer(WebUtil.readIntParam(request,USER_ID_PARAMETER));
-		
+		String type = WebUtil.readStrParam(request, TYPE_PARAMETER, true);
 		IThemeService themeService = getThemeService();
-		String message = themeService.setTheme(userId, themeId);
-		request.getSession().setAttribute("message",message);
-		return outputPacket(mapping, request, response, message, "message");
+		flashMessage = null;
+		
+		try {
+			if(type==null)
+				flashMessage = themeService.setTheme(userId, themeId);
+			else if(type.equals(FLASH_TYPE))
+				flashMessage = themeService.setFlashTheme(userId, themeId);
+			else if(type.equals(HTML_TYPE))
+				flashMessage = themeService.setHtmlTheme(userId, themeId);
+		} catch (NoSuchThemeException e) {
+		     flashMessage = FlashMessage.getNoSuchTheme("wddxPacket",themeId);
+		} catch (UserException e) {
+		     flashMessage = FlashMessage.getNoSuchUserExists("wddxPacket", userId);
+		} catch ( Exception e) {
+		     flashMessage = FlashMessage.getExceptionOccured("setTheme", e.getMessage());
+		}
+		request.getSession().setAttribute("message", flashMessage.serializeMessage());
+		return outputPacket(mapping, request, response, flashMessage.serializeMessage(), "message");
 		
 	}
 	
