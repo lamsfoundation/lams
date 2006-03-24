@@ -25,19 +25,19 @@ package org.lamsfoundation.lams.themes.exception;
 /**
  * @author Mitchell Seaton
  */
-public class NoSuchThemeException extends Exception {
+public class ThemeException extends Exception {
 	
-	public NoSuchThemeException(){
+	public ThemeException(){
 		
 	}
-	public NoSuchThemeException(String message){
+	public ThemeException(String message){
 		super(message);
 	}
 	/**
      * Constructor for wrapping the throwable object
      * @param cause
      */
-    public NoSuchThemeException(Throwable cause)
+    public ThemeException(Throwable cause)
     {
         super(cause);
     }
@@ -48,7 +48,7 @@ public class NoSuchThemeException extends Exception {
      * @param message
      * @param cause
      */
-    public NoSuchThemeException(String message, Throwable cause)
+    public ThemeException(String message, Throwable cause)
     {
         super(message, cause);
     }
