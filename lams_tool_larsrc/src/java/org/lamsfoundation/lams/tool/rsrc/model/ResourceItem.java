@@ -173,7 +173,10 @@ public class ResourceItem {
 			this.url = url;
 		}
 		/**
-		 * @hibernate.property column="create_by"
+	     * @hibernate.many-to-one
+	     *      cascade="none"
+	     * 		column="create_by"
+		 * 
 		 * @return
 		 */
 		public ResourceUser getCreateBy() {

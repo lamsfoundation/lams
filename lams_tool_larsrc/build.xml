@@ -248,7 +248,7 @@
 				distributable="false" sessiontimeout="${sessiontimeout}"/>
 			
          <strutsconfigxml validatexml="true" version="1.2" mergedir="${conf.xdoclet.dir}"/>
-         <strutsdynaformvalidationxml destdir="${conf.webinf.dir}" mergedir="${conf.xdoclet.dir}" version="1.1.3"  />
+         <!-- <strutsdynaformvalidationxml destdir="${conf.webinf.dir}" mergedir="${conf.xdoclet.dir}" version="1.1.3"  /> -->
 
       </webdoclet>
 
@@ -262,9 +262,9 @@
 		<war warfile="${build.lib}/${product}.war" 
   				webxml="${conf.webinf.dir}/web.xml" manifest="${conf.dir}/war/META-INF/MANIFEST.MF">
 			<webinf dir="${conf.webinf.dir}">
-				<include name="*.tld"/>
 				<include name="*.xml"/>
 				<include name="tags/**"/>
+				<include name="tlds/**"/>
 			</webinf>
 			<classes dir="${build.classes.java}"/>	
 			<fileset dir="${conf.web.dir}">

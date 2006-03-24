@@ -20,6 +20,8 @@
  */
 package org.lamsfoundation.lams.tool.rsrc.dao.hibernate;
 
+import java.util.List;
+
 import org.lamsfoundation.lams.tool.rsrc.dao.ResourceDAO;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
 
@@ -33,7 +35,11 @@ public class ResourceDAOHibernate extends BaseDAOHibernate implements ResourceDA
 	private static final String GET_RESOURCE_BY_CONTENTID = "from "+Resource.class.getName()+" as r where r.contentId=?";
 	
 	public Resource getByContentId(Long contentId) {
-		return (Resource) getHibernateTemplate().find(GET_RESOURCE_BY_CONTENTID,contentId);
+		List list = getHibernateTemplate().find(GET_RESOURCE_BY_CONTENTID,contentId);
+		if(list.size() > 0)
+			return (Resource) list.get(0);
+		else
+			return null;
 	}
 
 	public Resource getByUid(Long resourceUid) {

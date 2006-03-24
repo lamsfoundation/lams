@@ -22,43 +22,19 @@
 	
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/> 
 
+    <link href="<html:rewrite page='/includes/css/aqua.css'/>" rel="stylesheet" type="text/css">
+	<!-- this is the custom CSS for hte tool -->
+	<link href="<html:rewrite page='/includes/css/tool_custom.css'/>" rel="stylesheet" type="text/css">
+    <link href="<html:rewrite page='/includes/css/fckeditor_style.css'/>" rel="stylesheet" type="text/css">
+
+ 	<!-- ******************** FCK Editor related javascript & HTML ********************** -->
+    <script type="text/javascript" src="${lams}fckeditor/fckeditor.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
-	<script type="text/javascript" src="${tool}includes/javascript/tabcontroller.js"></script>
-	<script type="text/javascript" src="${tool}includes/javascript/xmlrequest.js"></script>
-	<script type="text/javascript">
-     //<![CDATA[
-	var imgRoot="${lams}images/";
-	var themeName="aqua";
-        
-	function init(){
-		initTabSize(4);
-            
-//		var tag = document.getElementById("currentTab");
-//		if(tag.value != "")
-//			selectTab(tag.value);
-//      else
-			selectTab(1);
-	}  
-        
-	function doSelectTab(tabId) {
-		var tag = document.getElementById("currentTab");
-		tag.value = tabId;
-		selectTab(tabId);
-	}
+	
+    <script type="text/javascript" src="<html:rewrite page='/includes/javascript/fckcontroller.js'/>"></script>
+    <script type="text/javascript" src="<html:rewrite page='/includes/javascript/tabcontroller.js'/>"></script>    
+	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/prototype.js'/>"></script>
 
-	function doSubmit(method, tabId) {
-//		if(tabId != null)
-//			document.forumMonitoringForm.currentTab.value=tabId;
-//		document.forumMonitoringForm.method.value=method;
-		document.forumMonitoringForm.submit();
-	}
-	//]]>        
-	</script>
 
-	<script type="text/javascript">
-	//<![CDATA[
-		<html:javascript dynamicJavascript="false" staticJavascript="true"/>
-	//]]>		
-	</script>
 </head>
 

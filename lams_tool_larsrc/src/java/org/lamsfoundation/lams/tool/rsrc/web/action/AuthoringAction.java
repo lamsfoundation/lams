@@ -49,7 +49,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class AuthoringAction extends Action {
 	private static Logger log = Logger.getLogger(AuthoringAction.class);
-	private IResourceService rsrcService;
 	
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -64,9 +63,9 @@ public class AuthoringAction extends Action {
 ////	  		request.getSession().setAttribute(ForumConstants.MODE,ForumConstants.MONITOR_MODE);
 //	  		return initPage(mapping, form, request, response);
 //	  	}
-//        if (param.equals("updateContent")) {
-//       		return updateContent(mapping, form, request, response);
-//        }
+        if (param.equals("updateContent")) {
+       		return updateContent(mapping, form, request, response);
+        }
 //        if (param.equals("uploadOnlineFile")) {
 //       		return uploadOnline(mapping, form, request, response);
 //        }
@@ -116,11 +115,11 @@ public class AuthoringAction extends Action {
 	private ActionForward initPage(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 
 		Long contentId = new Long(WebUtil.readLongParam(request,ResourceConstants.PARAM_TOOL_CONTENT_ID));
-		ResourceForm forumForm = (ResourceForm)form;
+		ResourceForm resourceForm = (ResourceForm)form;
 		//get back the topic list and display them on page
 		IResourceService service = getResourceService();
 
-		Set topics = null;
+		Set item = null;
 		Resource resource = null;
 		try {
 			resource = service.getResourceByContentId(contentId);
@@ -128,16 +127,16 @@ public class AuthoringAction extends Action {
 			if(resource == null){
 				resource = service.getDefaultContent(contentId);
 				if(resource.getResourceItems() != null){
-					topics = resource.getResourceItems();
+					item = resource.getResourceItems();
 				}else
-					topics = null;
+					item = null;
 			}else
-				topics = service.getAuthoredItems(resource.getUid());
+				item = service.getAuthoredItems(resource.getUid());
 			//initialize instruction attachment list
 			List attachmentList = getAttachmentList(request);
 			attachmentList.addAll(resource.getAttachments());
 
-			forumForm.setResource(resource);
+			resourceForm.setResource(resource);
 		} catch (Exception e) {
 			log.error(e);
 			return mapping.findForward("error");
@@ -145,12 +144,16 @@ public class AuthoringAction extends Action {
 		
 		//set back STRUTS component value
 		//init it to avoid null exception in following handling
-		if(topics == null)
-			topics = new HashSet();
-		request.getSession().setAttribute(ResourceConstants.AUTHORING_RESOURCE_LIST, topics);
+		if(item == null)
+			item = new HashSet();
+		request.getSession().setAttribute(ResourceConstants.AUTHORING_RESOURCE_LIST, item);
 		return mapping.findForward(ResourceConstants.SUCCESS);
 	}
-	
+
+	private ActionForward updateContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+		return null;
+	}
 	//*************************************************************************************
 	// Private method 
 	//*************************************************************************************

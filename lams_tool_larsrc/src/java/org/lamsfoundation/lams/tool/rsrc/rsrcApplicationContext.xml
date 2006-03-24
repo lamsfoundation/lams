@@ -18,10 +18,11 @@
         <!-- Must references all OR mapping files. -->
         <property name="mappingResources">
             <list>
+               <value>org/lamsfoundation/lams/tool/rsrc/model/ResourceUser.hbm.xml</value>
                <value>org/lamsfoundation/lams/tool/rsrc/model/Resource.hbm.xml</value>
                <value>org/lamsfoundation/lams/tool/rsrc/model/ResourceItem.hbm.xml</value>
+               <value>org/lamsfoundation/lams/tool/rsrc/model/ResourceItemInstruction.hbm.xml</value>
                <value>org/lamsfoundation/lams/tool/rsrc/model/ResourceAttachment.hbm.xml</value>
-               <value>org/lamsfoundation/lams/tool/rsrc/model/ResourceUser.hbm.xml</value>
                <value>org/lamsfoundation/lams/tool/rsrc/model/ResourceSession.hbm.xml</value>
             </list>
         </property>
@@ -85,14 +86,12 @@
         <property name="repositoryService">
             <ref bean="repositoryService"/>
         </property>
-        <!-- 
    		<property name="toolService">
    			<ref bean="lamsToolService"/>
    		</property>
    		<property name="learnerService">
    			<ref bean="learnerService"/>
    		</property>
-   		-->
    		<property name="messageService"><ref bean="messageService"/></property>
     </bean>
 

@@ -81,5 +81,8 @@ alter table tl_larsrc11_session add index FK24AA78C530E79035 (resource_uid), add
 alter table tl_larsrc11_user add index FK30113BFC506CD584 (session_id), add constraint FK30113BFC506CD584 foreign key (session_id) references tl_larsrc11_session (uid);
 
 
-INSERT INTO tl_larsrc11_resource(title,instructions,online_instructions,offline_instructions,content_id,run_offline,lock_on_finished,content_in_use,define_later) VALUES("LAMS Shared Resources","Instruction","Online instruction","Offline instruction",${default_content_id},0,0,0,0);
+
+
+INSERT INTO `tl_larsrc11_resource` (`uid`, `create_date`, `update_date`, `create_by`, `title`, `run_offline`, `lock_on_finished`, `instructions`, `online_instructions`, `offline_instructions`, `content_in_use`, `define_later`, `content_id`, `allow_add_files`, `allow_add_urls`, `min_view_resource_number`, `allow_auto_run`) VALUES
+  (2,NULL,NULL,NULL,'LAMS Shared Resources','\0','\0','Instruction','Online instruction','Offline instruction',1,1,${default_content_id},1,1,1,1);
 SET FOREIGN_KEY_CHECKS=1;

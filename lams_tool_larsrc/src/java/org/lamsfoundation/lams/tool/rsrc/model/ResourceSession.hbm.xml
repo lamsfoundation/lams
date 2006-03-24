@@ -76,6 +76,26 @@
             length="250"
         />
 
+        <set
+            name="resourceItems"
+            lazy="true"
+            inverse="true"
+            cascade="none"
+            sort="unsorted"
+            order-by="create_date desc"
+        >
+
+            <key
+                column="session_uid"
+            >
+            </key>
+
+            <one-to-many
+                  class="org.lamsfoundation.lams.tool.rsrc.model.ResourceItem"
+            />
+
+        </set>
+
         <!--
             To add non XDoclet property mappings, create a file named
                 hibernate-properties-ResourceSession.xml
