@@ -1,0 +1,150 @@
+/*This is a theme CSS file.  Which one will be loaded into the JSP depends on a variable passed in from FLASH.*/
+
+body {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	background-color: #A2BCF9;
+	
+}
+
+h1 {
+	font-size: large;
+	background-color: #B4C8FE;
+	border-top-width: 1px;
+	border-top-style: solid;
+	border-top-color: #999999;
+	border-left-width: 1px;
+	border-left-style: solid;
+	border-left-color: #999999;
+}
+h2 {
+	font-size: small;
+	border-bottom-style: solid;
+	border-bottom-width: 1px;
+	border-bottom-color: #666666;
+	margin-bottom: 1px;
+    
+ 
+}
+
+th {
+	font-size: small;
+	color: #FFFFFF;
+	background-color: #075A8B;
+	text-align: left;
+}
+
+.formtablecontainer{
+	text-align:center;
+}
+
+.datatablecontainer{
+	width:100%;
+}
+
+.buttoncontainer {
+	
+}
+
+
+input, select, textarea {
+	font-family: 'Verdana', 'Arial', 'Helvetica', sans-serif;
+	font-size: small;
+}
+
+.forms {
+	border: 1px solid #999999;
+	font-size: small;
+	font-style: normal;
+	width: 100%;
+}
+
+.formlabel {
+	font-size: small;
+	font-style: normal;
+	text-align: right;
+	width: 20%;
+}
+
+.formcontrol {
+	font-size: small;
+	font-style: normal;
+	text-align: left;
+}
+
+/********* tab styles **********/
+/*tab styles*/
+.tab{
+	text-align:center;
+}
+
+.tab a{
+	font-size: 11px;
+	color: #000000;
+	text-decoration:none;
+}
+.tab a:hover{
+	font-size: 11px;
+	color: #000000;
+	text-decoration:underline
+}
+.tabcentre{
+	background-image:url(../images/aqua_tab_centre.gif);
+	background-repeat:repeat-x;
+}
+
+.tabcentre_selected{
+	background-image:url(../images/aqua_tab_s_centre.gif);
+	background-repeat:repeat-x;
+}
+
+.tabcentre_inactive{
+	background-image:url(../images/aqua_tab_i_centre.gif);
+	background-repeat:repeat-x;
+}
+
+/** Non Selected tab style **/
+.tableft td{
+	background: url(../images/aqua_tab_left.gif) no-repeat;
+}
+.tabright td{
+	background: url(../images/aqua_tab_right.gif) no-repeat;
+}
+
+/** Selected tab style **/
+.tableft_selected td{
+	background: url(../images/aqua_tab_s_left.gif) no-repeat;
+}
+
+.tableft_inactive td{
+	background: url(../images/aqua_tab_i_left.gif) no-repeat;
+}
+
+.tabright_selected td{
+	background: url(../images/aqua_tab_s_right.gif) no-repeat;
+}
+
+.tabright_inactive td{
+	background: url(../images/aqua_tab_i_right.gif) no-repeat;
+}
+
+/*Tab content containers*/
+.tabbody{
+	width: 98%;
+	
+	background-color : #D9E8FF;
+	float:left;
+
+	margin : 0px 0px 0px 0px;
+	border-right-width: 1px;
+	border-left-width: 1px;
+	border-right-style: solid;
+	border-left-style: solid;
+	border-right-color: #0D3F59;
+	border-left-color:  #0D3F59;
+	
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	border-bottom-color: #0D3F59;
+	padding:5px;	
+
+}

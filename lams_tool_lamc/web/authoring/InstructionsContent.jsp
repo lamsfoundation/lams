@@ -31,6 +31,12 @@ http://www.gnu.org/licenses/gpl.txt
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
+		    	<table align=center> 	  
+					<tr> <td>
+						<jsp:include page="/McErrorBox.jsp" />
+					</td> </tr>
+				</table>
+
 				<table class="forms">
 				<tr> 
 					<td NOWRAP class="formlabel" valign=top>
@@ -38,10 +44,8 @@ http://www.gnu.org/licenses/gpl.txt
     	      				<b> <bean:message key="label.offlineInstructions" />: <b>
     	      			</font>
           			</td>
-					<td NOWRAP colspan=3 class="formcontrol" valign=top>
-					<FCK:editor id="richTextOfflineInstructions" basePath="/lams/fckeditor/">
-						  <c:out value="${richTextOfflineInstructions}" escapeXml="false" />						  
-					</FCK:editor>
+					<td NOWRAP colspan=3 valign=top>
+						<lams:SetEditor id="richTextOfflineInstructions" text="${richTextOfflineInstructions}" small="true"/>																			
 					</td> 
 				</tr>
 				
@@ -105,10 +109,8 @@ http://www.gnu.org/licenses/gpl.txt
     	      				<b> <bean:message key="label.onlineInstructions" /> </b>
     	      			</font>
           			</td>
-					<td NOWRAP colspan=3 class="formcontrol" valign=top>
-					<FCK:editor id="richTextOnlineInstructions" basePath="/lams/fckeditor/">
-						  <c:out value="${sessionScope.richTextOnlineInstructions}" escapeXml="false" />						  
-					</FCK:editor>
+					<td NOWRAP colspan=3 valign=top>
+						<lams:SetEditor id="richTextOnlineInstructions" text="${sessionScope.richTextOnlineInstructions}" small="true"/>					
 					</td> 
 				</tr>
 				
@@ -177,16 +179,4 @@ http://www.gnu.org/licenses/gpl.txt
 				  	</td>
 				</tr>
  				 
- 				 <tr>
-				 	<td NOWRAP valign=top>								
-				  	</td>
-					 <td NOWRAP colspan=3 valign=top> 
-						 <font size=2>
-							 <html:submit onclick="javascript:submitMethod('doneInstructionsTab');" styleClass="button">
-								  <bean:message key="button.done"/> 
-							</html:submit>
-						</font>						
-					</td> 
- 				 </tr>
-
 			</table>	  	

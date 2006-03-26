@@ -781,5 +781,6 @@ public abstract class McUtils implements McAppConstants {
     	request.getSession().removeAttribute(USER_EXCEPTION_PASSMARK_GREATER100);    	
     	request.getSession().removeAttribute(USER_EXCEPTION_FILENAME_EMPTY);
     	request.getSession().removeAttribute(USER_EXCEPTION_WEIGHT_MUST_EQUAL100);
+    	request.getSession().removeAttribute(USER_EXCEPTION_SINGLE_OPTION);
     }
 }

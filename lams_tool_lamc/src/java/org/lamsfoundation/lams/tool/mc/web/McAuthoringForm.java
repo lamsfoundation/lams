@@ -32,7 +32,8 @@ import org.lamsfoundation.lams.tool.mc.McAppConstants;
  */
 public class McAuthoringForm extends McLearningForm implements McAppConstants {
 	/* form controllers */
-	protected String addOptionContent;	
+	protected String addOptionContent;
+	protected String currentTab;
 	
 	protected String questionIndex;
 	protected String optionIndex;
@@ -65,12 +66,16 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
 	protected String choiceAdvanced;
 	protected String choiceInstructions;
 	
+	protected String submit;
+	
 	/* basic content */
 	protected String title;
 	protected String instructions;
 	
 	protected String isRemoveContent;
 	protected String toolContentId;
+	protected String toolContentID;
+	
 	/* instructions content */
 	protected String onlineInstructions;
 	protected String offlineInstructions;
@@ -125,6 +130,7 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
     	this.editActivityMonitoring=null;
     	this.statsMonitoring=null;
     	this.edit=null;
+    	this.submit=null;
     }
 	
 	public void reset()
@@ -161,6 +167,7 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
 		this.deletableOptionIndex=null;
 		this.isRemoveContent=null;
 		this.toolContentId=null;
+		this.toolContentID=null;
 
 		this.onlineInstructions=null;
 		this.offlineInstructions=null;
@@ -183,6 +190,7 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
     	this.editActivityMonitoring=null;
     	this.statsMonitoring=null;
     	this.edit=null;
+    	this.submit=null;
 	}
 	
 	public void resetRadioBoxes()
@@ -775,4 +783,42 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
 	public void setUuid(String uuid) {
 		this.uuid = uuid;
 	}
+	/**
+	 * @return Returns the currentTab.
+	 */
+	public String getCurrentTab() {
+		return currentTab;
+	}
+	/**
+	 * @param currentTab The currentTab to set.
+	 */
+	public void setCurrentTab(String currentTab) {
+		this.currentTab = currentTab;
+	}
+	/**
+	 * @return Returns the toolContentID.
+	 */
+	public String getToolContentID() {
+		return toolContentID;
+	}
+	/**
+	 * @param toolContentID The toolContentID to set.
+	 */
+	public void setToolContentID(String toolContentID) {
+		this.toolContentID = toolContentID;
+	}
+	
+	/**
+	 * @return Returns the submit.
+	 */
+	public String getSubmit() {
+		return submit;
+	}
+	/**
+	 * @param submit The submit to set.
+	 */
+	public void setSubmit(String submit) {
+		this.submit = submit;
+	}
+
 }

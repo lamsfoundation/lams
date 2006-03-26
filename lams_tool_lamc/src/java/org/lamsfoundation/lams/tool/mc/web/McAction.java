@@ -1388,6 +1388,26 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		
  		Map mapOptionsContent=AuthoringUtil.repopulateMap(request, "optionContent");
 	 	logger.debug("mapOptionsContent after shrinking: " + mapOptionsContent);
+	 	
+	 	if (mapOptionsContent.size() == 1)
+	 	{
+	 		logger.debug("mapOptionsContent size is 1)");
+ 			ActionMessages errors= new ActionMessages();
+ 			request.getSession().setAttribute(USER_EXCEPTION_SINGLE_OPTION, new Boolean(true).toString());
+			errors.add(Globals.ERROR_KEY,new ActionMessage("error.singleOption"));
+			logger.debug("add error.singleOption to ActionMessages");
+			saveErrors(request,errors);
+			mcAuthoringForm.resetUserAction();
+			logger.debug("return to destination to fix error.");
+			
+			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
+			logger.debug("setting  EDIT_OPTIONS_MODE to 1");
+	    	
+			McUtils.debugMaps(request);
+			return (mapping.findForward(destination));
+	 	}
+	 	
+	 	
 	 	request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
 		logger.debug("final done  MAP_OPTIONS_CONTENT: " + mapOptionsContent);
 	 	

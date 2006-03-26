@@ -31,26 +31,43 @@ http://www.gnu.org/licenses/gpl.txt
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
-				<table class="forms">
+				<c:if test="${sessionScope.activeModule != 'defineLater'}"> 			
+					<h2><font size=2> <bean:message key="label.authoring.mc.basic"/> </font> </h2>	
+				</c:if> 				
+				
+		    	<table align=center> 	  
+					<tr>   
+					<td NOWRAP class=error>
+						<c:if test="${sessionScope.sbmtSuccess == 1}"> 			
+							<img src="<c:out value="${tool}"/>images/success.gif" align="left" width=20 height=20>  
+								<font size=2> <bean:message key="sbmt.successful"/> </font> 
+							</img>
+						</c:if> 			
+					</td>
+					</tr> 
+					<tr> <td>
+						<jsp:include page="/McErrorBox.jsp" />
+					</td> </tr>
+				</table>
+				
+				
+
+			<table class="forms">
 					
 				<c:if test="${ (sessionScope.activeModule == 'authoring') ||  
 							   (sessionScope.defineLaterInEditMode == 'true') 
 							  }"> 			
  						<tr> 
 					 		<td NOWRAP class="formlabel" valign=top> <b> <font size=2> <bean:message key="label.authoring.title"/>: </font> </b> </td>
-							<td NOWRAP class="formcontrol" valign=top>
-								<FCK:editor id="richTextTitle" basePath="/lams/fckeditor/">
-									  <c:out value="${sessionScope.richTextTitle}" escapeXml="false" />						  
-								</FCK:editor>
+							<td NOWRAP valign=top>
+								<lams:SetEditor id="richTextTitle" text="${sessionScope.richTextTitle}" small="true"/>								
 							</td> 
 					  	</tr>
 					  	
 					  	<tr> 
 					 		<td NOWRAP class="formlabel" valign=top> <b> <font size=2> <bean:message key="label.authoring.instructions"/>: </font> </b> </td>
-							<td NOWRAP class="formcontrol" valign=top>
-								<FCK:editor id="richTextInstructions" basePath="/lams/fckeditor/">
-									  <c:out value="${sessionScope.richTextInstructions}" escapeXml="false" />						  
-								</FCK:editor>
+							<td NOWRAP valign=top>
+								<lams:SetEditor id="richTextInstructions" text="${sessionScope.richTextInstructions}" small="true"/>																
 							</td>
 						</tr>
 					</c:if> 										
@@ -254,9 +271,15 @@ http://www.gnu.org/licenses/gpl.txt
 	 						<td NOWRAP valign=top> </td> 
 							<td NOWRAP class="input" colspan=3 align=left valign=top>								
 								<font size=2>
-									<html:submit onclick="javascript:submitMethod('submitQuestions');" styleClass="button">
-										<bean:message key="button.submit"/>
-									</html:submit>	 				 		  					
+									<p align="right">
+										<html:link href="javascript:submitMethod('submitQuestions');" property="submit" styleClass="button">
+											<bean:message key="button.submit" />
+										</html:link>
+										<html:link href="javascript:;" property="cancel"
+											onclick="window.close()" styleClass="button">
+											<bean:message key="button.cancel" />
+										</html:link>
+									</p>
 								</font>	
 			 			  	</td>
 							<td NOWRAP valign=top> </td> 

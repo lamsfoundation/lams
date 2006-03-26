@@ -175,9 +175,7 @@ http://www.gnu.org/licenses/gpl.txt
 	    	      			</font>
 	          			</td>
 						<td NOWRAP colspan=3 class="formcontrol" valign=top>
-						<FCK:editor id="richTextIncorrectFeedback" basePath="/lams/fckeditor/">
-							  <c:out value="${richTextIncorrectFeedback}" escapeXml="false" />						  
-						</FCK:editor>
+							<lams:SetEditor id="richTextIncorrectFeedback" text="${sessionScope.richTextIncorrectFeedback}" small="true"/>																						
 						</td> 
 					</tr>
 
@@ -188,9 +186,7 @@ http://www.gnu.org/licenses/gpl.txt
 	    	      			</font>
 	          			</td>
 						<td NOWRAP colspan=3 class="formcontrol" valign=top>
-						<FCK:editor id="richTextCorrectFeedback" basePath="/lams/fckeditor/">
-							  <c:out value="${richTextCorrectFeedback}" escapeXml="false" />						  
-						</FCK:editor>
+							<lams:SetEditor id="richTextCorrectFeedback" text="${sessionScope.richTextCorrectFeedback}" small="true"/>																											
 						</td> 
 					</tr>
 

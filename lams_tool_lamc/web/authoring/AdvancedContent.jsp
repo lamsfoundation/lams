@@ -32,7 +32,7 @@ http://www.gnu.org/licenses/gpl.txt
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
 
-			<table class="forms">
+			<table>
 				<tr>
 	      			<td NOWRAP class="formlabel" valign=top>
 		      			<font size=2> 
@@ -97,11 +97,9 @@ http://www.gnu.org/licenses/gpl.txt
 					 		<b>	<bean:message key="label.report.title"/>: </b>
 				 		</font>
 				 	</td>
-	  				<td NOWRAP class="formcontrol" valign=top>
+	  				<td NOWRAP valign=top>
 		  				<font size=2>
-							<FCK:editor id="richTextReportTitle" basePath="/lams/fckeditor/">
-								  <c:out value="${sessionScope.richTextReportTitle}" escapeXml="false" />						  
-							</FCK:editor>
+							<lams:SetEditor id="richTextReportTitle" text="${sessionScope.richTextReportTitle}" small="true"/>							
 						</font>
 					</td> 
 			  	</tr>
@@ -112,11 +110,9 @@ http://www.gnu.org/licenses/gpl.txt
 					 		<b>	<bean:message key="label.report.endLearningMessage"/>: </b>
 			 			</font>
 			 		</td>
-	  				<td NOWRAP class="formcontrol">
+	  				<td NOWRAP>
 		  				<font size=2>
-							<FCK:editor id="richTextEndLearningMsg" basePath="/lams/fckeditor/">
-								  <c:out value="${sessionScope.richTextEndLearningMsg}" escapeXml="false" />						  
-							</FCK:editor>
+							<lams:SetEditor id="richTextEndLearningMsg" text="${sessionScope.richTextEndLearningMsg}" small="true"/>														
 						</font>
 					</td> 
 			  	</tr>
@@ -127,18 +123,6 @@ http://www.gnu.org/licenses/gpl.txt
 				  	</td>
 				</tr>
 
-				<tr>
-				 	<td NOWRAP valign=top>								
-						&nbsp&nbsp
-				  	</td>
-					 <td NOWRAP valign=top> 
-		 			 <font size=2>
-						 <html:submit onclick="javascript:submitMethod('doneAdvancedTab');" styleClass="button">
-								<bean:message key="button.done"/>
-						</html:submit>
-					 </font>
-					</td> 
- 				 </tr>
 			</table>	  	
 		
 			

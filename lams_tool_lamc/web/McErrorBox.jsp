@@ -191,6 +191,12 @@ http://www.gnu.org/licenses/gpl.txt
 						<font size=2> <bean:message key="error.mode.invalid"/> </font>
 			</td> </tr>
 		</c:if> 				    
+
+		<c:if test="${userExceptionSingleOption == 'true'}"> 			
+			<tr> <td NOWRAP valign=top>
+						<font size=2> <bean:message key="error.singleOption"/> </font>
+			</td> </tr>
+		</c:if> 				    
 		
 </table>
 

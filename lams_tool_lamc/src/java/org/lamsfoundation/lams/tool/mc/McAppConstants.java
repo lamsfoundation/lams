@@ -302,4 +302,5 @@ public interface McAppConstants {
     public static final String USER_EXCEPTION_PASSMARK_GREATER100		="userExceptionPassmarkGreater100";
     public static final String USER_EXCEPTION_FILENAME_EMPTY			="userExceptionFilenameEmpty";
     public static final String USER_EXCEPTION_WEIGHT_MUST_EQUAL100		="userExceptionWeightMustEqual100";
+    public static final String USER_EXCEPTION_SINGLE_OPTION				="userExceptionSingleOption";
 }
