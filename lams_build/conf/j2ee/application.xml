@@ -64,6 +64,9 @@
             <context-root>/lams/learning</context-root>
 	</web>
     </module> 
+	<module>
+		<java>lams-dictionary.jar</java>
+	</module>
 
     <!--  Third Party JAR Files -->
 	<module>
