@@ -111,6 +111,12 @@
 			<fileset dir="${build.classes.test}">
 			</fileset>			
 		</jar>
+		<copy overwrite="yes" todir="${build.lib}/language/${monitoring.path}">
+			<fileset dir="${conf.language.dir}">
+				<include name="**/*.properties"/>
+				<include name="**/*.txt"/>
+			</fileset>
+		</copy>
 	</target>
 
 	<!-- = = = = = = = = = = = = = = = = = = = = = = = =  -->

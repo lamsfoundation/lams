@@ -144,6 +144,12 @@ http://www.gnu.org/licenses/gpl.txt
 			<fileset dir="${build.classes.test}">
 			</fileset>			
 		</jar>
+		<copy overwrite="yes" todir="${build.lib}/language/${learning.path}">
+			<fileset dir="${conf.language.dir}">
+				<include name="**/*.properties"/>
+				<include name="**/*.txt"/>
+			</fileset>
+		</copy>
 	</target>
 	<!-- =================================================================== -->
 	<!-- Fails if XDoclet 1.2.x is not on classpath                          -->
