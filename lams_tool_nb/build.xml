@@ -435,7 +435,7 @@ Ant build file.
 					lamsEarPath="${jboss.deploy}"
 					toolContext="${toolContext}"
 					toolWebUri="${product}.war"
-					languageFilesPackage="org.lamsfoundation.lams.tool.web">
+					languageFilesPackage="org.lamsfoundation.lams.tool.noticeboard.web">
 
 					<!-- language files go as a fileset. Not nice but can't work out how to embed them in a tag. -->
 					<fileset dir="${conf.dir}/language/">
