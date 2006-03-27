@@ -270,6 +270,8 @@ public class DeployToolConfig extends DeployConfig {
            this.setDbDriverUrl(config.getDbDriverUrl());
        if (config.getDbDriverClass() != null)
            this.setDbDriverClass(config.getDbDriverClass());
+       if (config.getLanguageFilesPackage() != null)
+    	   this.setLanguageFilesPackage(config.getLanguageFilesPackage());
        
        if (config.getToolSignature() != null)
            this.toolSignature = config.getToolSignature();
@@ -312,6 +314,7 @@ public class DeployToolConfig extends DeployConfig {
        System.out.println("DbPassword: " + getDbPassword());
        System.out.println("DbDriverClass: " + getDbDriverClass());
        System.out.println("DbDriverUrl: " + getDbDriverUrl());  
+       System.out.println("LanguageFilesPackage: " + getLanguageFilesPackage());  
        ArrayList list = this.deployFiles;
        for(int i=0; i<list.size(); i++)
        {

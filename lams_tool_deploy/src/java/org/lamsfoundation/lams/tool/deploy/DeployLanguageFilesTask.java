@@ -51,7 +51,7 @@ public class DeployLanguageFilesTask extends FilesTask
     	File dictionaryDir = getLamsDictionary();
         for (String languageFilename : deployFiles)
         {
-        	System.out.println("Copying file "+languageFilename);
+        	System.out.println("Copying file "+languageFilename+" to "+dictionaryDir);
             copyFile(languageFilename, dictionaryDir);
         }
     }
@@ -62,6 +62,12 @@ public class DeployLanguageFilesTask extends FilesTask
      * the directory (as long as the lams ear exists). */
     private File getLamsDictionary() throws DeployException {
     	
+    	// convert dictionary packet org.lamsfoundation.lams.tool.web to org/lamsfoundation/lams/tool/web
+    	if ( dictionaryPacket != null ) {
+    		System.out.println("dictionaryPacket "+dictionaryPacket+" being updated");
+    		dictionaryPacket = dictionaryPacket.replace('.',File.separatorChar);
+    		System.out.println("dictionaryPacket now"+dictionaryPacket);
+    	}
     	String packageName = lamsEarPath+File.separator+LANGUAGE_JAR_DIRECTORY+File.separator+dictionaryPacket;
     	File dictionaryDir = new File(packageName);
 	    if (!dictionaryDir.exists())
@@ -85,6 +91,7 @@ public class DeployLanguageFilesTask extends FilesTask
 	}
 
 	public void setDictionaryPacket(String dictionaryPacket) {
+		System.out.println("DeployLanguageFile: Setting dictionary packet to "+dictionaryPacket);
 		this.dictionaryPacket = dictionaryPacket;
 	}
 

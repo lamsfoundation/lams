@@ -111,7 +111,7 @@ public class Deploy
             if ( files != null && files.size() > 0 ) {
 	            DeployLanguageFilesTask deployLanguageFilesTask = new DeployLanguageFilesTask();
 	            deployLanguageFilesTask.setLamsEarPath(config.getLamsEarPath());
-	            deployLanguageFilesTask.setDictionaryPacket(config.getToolSignature());
+	            deployLanguageFilesTask.setDictionaryPacket(config.getLanguageFilesPackage());
 	            deployLanguageFilesTask.setDeployFiles(config.getLanguageFiles());
 	            deployLanguageFilesTask.execute();
             }

@@ -64,6 +64,7 @@ public abstract class DeployConfig {
     public static final String DB_DRIVER_URL = "dbDriverUrl";
     public static final String TOOL_SIGNATURE = "toolSignature";    
     public static final String TOOL_ACTIVITY_INSERT_SCRIPT_PATH = "toolActivityInsertScriptPath";
+    public static final String I8N_LANGUAGE_FILES_PACKAGE = "languageFilesPackage";
     
     protected transient String validationError = "";
     protected transient XStream xstream;
@@ -89,7 +90,13 @@ public abstract class DeployConfig {
      */
     private String dbPassword;
     
-        
+    
+    /** 
+     * Holds the value of the package where I8N files are store
+     * Export format org.lamsfoundation.lams.tool.web 
+     */
+    private String languageFilesPackage;
+    
     public DeployConfig()
     {
         this.validationError = "";
@@ -215,6 +222,10 @@ public abstract class DeployConfig {
         if ( key.equalsIgnoreCase(DB_DRIVER_URL) ) {
             setDbDriverUrl(value);
         }       
+
+        if ( key.equalsIgnoreCase(I8N_LANGUAGE_FILES_PACKAGE) ) {
+            setLanguageFilesPackage(value);
+        }       
     }
     
     /**
@@ -284,4 +295,12 @@ public abstract class DeployConfig {
     public void setDbUsername(String dbUsername) {
         this.dbUsername = dbUsername;
     }
+
+	public String getLanguageFilesPackage() {
+		return languageFilesPackage;
+	}
+
+	public void setLanguageFilesPackage(String languageFilesPackage) {
+		this.languageFilesPackage = languageFilesPackage;
+	}
 }
