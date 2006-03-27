@@ -57,7 +57,7 @@
 		<ant antfile="../${lams_admin}/build.xml" target="build-war" inheritAll="false"/>
 	</target>
 
-	<!-- build sub-projects -->
+	<!-- build tool deployment utility -->
 	<target name="build-tool-deploy-utility"
 		description="builds the tool deploy utility and copy to lams_build">
 
@@ -128,27 +128,37 @@
 					<include name="wddx/*.jar" />
 					<include name="concurrent/*.jar" />					
 				</patternset>
-			</fileset>
+			</fileset> 
 			<fileset dir="..">
-				<include name="${lams.jar}" />
-				<include name="${lams-contentrepository.jar}" />
-				<include name="${lams-central.war}" />
-				<include name="${lams-central.jar}" />
-				<include name="${lams-monitoring.jar}"/>
-				<include name="${lams-monitoring.war}"/>
-				<include name="${lams-learning.jar}"/>
-				<include name="${lams-learning.war}"/>
-				<include name="${lams-admin.jar}"/>
-				<include name="${lams-admin.war}"/>
+				<include name="${lams_common}/${sub.build.lib}/*.jar" />
+				<include name="${lams_contentrepository}/${sub.build.lib}/*.jar" />
+				<include name="${lams_central}/${sub.build.lib}/*.war" />
+				<include name="${lams_central}/${sub.build.lib}/*.jar" />
+				<include name="${lams_monitoring}/${sub.build.lib}/*.jar"/>
+				<include name="${lams_monitoring}/${sub.build.lib}/*.war"/>
+				<include name="${lams_learning}/${sub.build.lib}/*.jar"/>
+				<include name="${lams_learning}/${sub.build.lib}/*.war"/>
+				<include name="${lams_admin}/${sub.build.lib}/*.jar"/>
+				<include name="${lams_admin}/${sub.build.lib}/*.war"/>
 			</fileset>
+		</copy> 
+		<!-- Pull out all the language files -->
+		<mkdir dir="${assembly}/temp/lams-dictionary.jar" />
+		<copy todir="${assembly}/temp/lams-dictionary.jar" failonerror="true">
+			<fileset dir="../${lams_common}/${sub.build.language}"><include name="**" /></fileset>
+			<fileset dir="../${lams_contentrepository}/${sub.build.language}"><include name="**" /></fileset> 
+			<fileset dir="../${lams_central}/${sub.build.language}"><include name="**" /></fileset>
+			<fileset dir="../${lams_monitoring}/${sub.build.language}"><include name="**" /></fileset>
+			<fileset dir="../${lams_learning}/${sub.build.language}"><include name="**" /></fileset>
+			<fileset dir="../${lams_admin}/${sub.build.language}"><include name="**" /></fileset>
 		</copy>
 		<!-- create a temporary ear -->
 		<ear destfile="${assembly.temp.ear}" compress="false"
 			appxml="${app.xml}">
-			<fileset dir="${assembly}/temp" includes="*" />
+			<fileset dir="${assembly}/temp" includes="**" />
 		</ear>
 		<!-- remove temp lib -->
-		<delete dir="${assembly}/temp" includeEmptyDirs="true" />
+<!--		<delete dir="${assembly}/temp" includeEmptyDirs="true" /> -->
 		<!-- explode the ear (Why doesn't the EAR task support exploded format?) -->
 		<unjar src="${assembly.temp.ear}" dest="${assembly.lams.ear}" />
 		<!-- delete temp.ear -->

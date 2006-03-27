@@ -127,6 +127,12 @@
 				<!--<fileset dir="${conf.hibernate.mapping.dir}"/>-->
 				<fileset dir="${build.web}"/>
 			</jar>
+			<copy overwrite="yes" todir="${build.lib}/language/org/lamsfoundation/lams/admin">
+				<fileset dir="${conf.language.dir}">
+					<include name="**/*.properties"/>
+					<include name="**/*.txt"/>
+				</fileset>
+			</copy>
 		</target>
 	
 	   <!-- =================================================================== -->
