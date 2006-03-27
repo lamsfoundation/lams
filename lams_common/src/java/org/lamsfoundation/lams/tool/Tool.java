@@ -113,6 +113,11 @@ public class Tool implements Serializable {
 	 * this activity. e.g. org.lamsfoundation.lams.tool.sbmt.SbmtResources.properties. */
 	private String languageFile;
 
+	/** 
+	 * Entries for an tool in a language property file 
+	 */
+	public static final String I8N_DISPLAY_NAME = "tool.display.name";
+	public static final String I8N_DESCRIPTION = "tool.description";
 
     /** full constructor */
     public Tool(Long toolId, 

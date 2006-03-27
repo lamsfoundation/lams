@@ -22,6 +22,8 @@
  */
 package org.lamsfoundation.lams.learningdesign.dto;
 
+import java.util.Date;
+
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Grouping;
@@ -33,13 +35,7 @@ import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.SynchGateActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
-import org.lamsfoundation.lams.learningdesign.dto.GroupingDTO;
-import org.lamsfoundation.lams.tool.dto.AuthoringToolDTO;
 import org.lamsfoundation.lams.tool.Tool;
-import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Set;
 
 public class LibraryActivityDTO extends BaseDTO
 {
@@ -66,11 +62,15 @@ public class LibraryActivityDTO extends BaseDTO
 	private Boolean defineLater;
 	private Date createDateTime;
 	private Integer groupingSupportType;
+	/** Name of the file (including the package) that contains the text strings for
+	 * this activity. e.g. org.lamsfoundation.lams.tool.sbmt.SbmtResources.properties. */
+	private String languageFile;
 	
 	/* Properties Specific to ToolActivity */
 	private Long toolID;
 	private Long toolContentID;
-	private String toolDisplayName;	
+	private String toolDisplayName;
+	private String toolLanguageFile;
 	private Boolean supportsDefineLater;
 	private Boolean supportsRunOffline;
 	private Boolean supportsModeration;
@@ -119,6 +119,7 @@ public class LibraryActivityDTO extends BaseDTO
 	    this.defineLater = activity.getDefineLater();
 	    this.createDateTime = activity.getCreateDateTime();
 	    this.groupingSupportType = activity.getGroupingSupportType();
+	    this.languageFile = activity.getLanguageFile();
 	    processActivityType(activity);
 	    
 	}
@@ -144,8 +145,8 @@ public class LibraryActivityDTO extends BaseDTO
 		
 	}
 	private void addGroupingActivityAttributes(GroupingActivity groupingActivity){
-		Grouping grouping = groupingActivity.getCreateGrouping();		
-	/*	this.groupingDTO = grouping.getGroupingDTO();
+		/*	Grouping grouping = groupingActivity.getCreateGrouping();		
+		this.groupingDTO = grouping.getGroupingDTO();
 		this.createGroupingID = grouping.getGroupingId();
 		this.createGroupingUIID = grouping.getGroupingUIID();
 		this.groupingType = grouping.getGroupingTypeId(); */
@@ -167,6 +168,7 @@ public class LibraryActivityDTO extends BaseDTO
 	        this.toolID = tool.getToolId();
 			this.toolContentID = new Long(tool.getDefaultToolContentId());
 			this.toolDisplayName = tool.getToolDisplayName();
+			this.toolLanguageFile = tool.getLanguageFile();
 			this.supportsDefineLater = new Boolean(tool.getSupportsDefineLater());
 			this.supportsRunOffline = new Boolean(tool.getSupportsRunOffline());
 			this.supportsModeration = new Boolean(tool.getSupportsModeration());
@@ -442,4 +444,40 @@ public class LibraryActivityDTO extends BaseDTO
     public String getOptionsInstructions() {
         return optionsInstructions;
     }
+
+    /**
+     * @return Returns the languge file for the activity (for I8N).
+     */
+ 	public String getLanguageFile() {
+		return languageFile;
+	}
+
+    /**
+     * @return Returns the languge file for the tool (for I8N).
+     */
+	public String getToolLanguageFile() {
+		return toolLanguageFile;
+	}
+
+	/** Set the activity's description */
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	/** Set the activity's help text */
+	public void setHelpText(String helpText) {
+		this.helpText = helpText;
+	}
+
+	/** Set the activity's title */
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	/** Set the tool's display name (similar to title) */
+	public void setToolDisplayName(String toolDisplayName) {
+		this.toolDisplayName = toolDisplayName;
+	}
+
+
 }

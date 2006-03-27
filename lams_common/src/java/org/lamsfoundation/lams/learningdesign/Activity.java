@@ -91,6 +91,15 @@ public abstract class Activity implements Serializable,Nullable {
 	public static final int GROUPING_SUPPORT_REQUIRED = 3;
 	/******************************************************************/
 	
+	
+	/** 
+	 * Entries for an activity in a language property file 
+	 */
+	public static final String I8N_TITLE = "activity.title";
+	public static final String I8N_DESCRIPTION = "activity.description";
+	public static final String I8N_HELP_TEXT = "activity.helptext";
+
+	
     //---------------------------------------------------------------------
     // Instance variables
     //---------------------------------------------------------------------
