@@ -139,6 +139,16 @@
 		</property>
 	</bean>
 		
+	<!--  Access a message service related to a programatically loaded message file. -->
+	<!--  Can be used to arbitrarily access any message file that is on the classpath -->
+	<!--  as long as you know the file's name and full path.                          -->
+	<bean id="loadedMessageSourceService" class="org.lamsfoundation.lams.util.LoadedMessageSourceService" singleton="true">
+    </bean>
+    	
+    <!--  Each message service created by loadedMessageService is a ResourceBundleMessageSource -->
+	<bean id="loadedMessageSource" class="org.springframework.context.support.ResourceBundleMessageSource"  singleton="false">
+	</bean>
+		
 	<!-- Learning Design related beans-->
 	
 	<bean id="activityDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO">
