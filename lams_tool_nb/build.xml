@@ -434,11 +434,12 @@ Ant build file.
 					toolInsertScriptPath="${db.scripts}/tool_insert.sql"
 					lamsEarPath="${jboss.deploy}"
 					toolContext="${toolContext}"
-					toolWebUri="${product}.war">
+					toolWebUri="${product}.war"
+					languageFilesPackage="org.lamsfoundation.lams.tool.web">
 
 					<!-- language files go as a fileset. Not nice but can't work out how to embed them in a tag. -->
 					<fileset dir="${conf.dir}/language/">
-						<include name="*.properties"/>
+						<include name="**/*.properties"/>
 					</fileset>
 						
 				</generateDeployProperties>

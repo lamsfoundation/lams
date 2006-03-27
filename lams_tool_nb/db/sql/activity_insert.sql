@@ -98,5 +98,5 @@ NULL
 , NULL
 , NULL
 , NULL
-, 'lanb11.ApplicationResources'
+, 'org.lamsfoundation.lams.tool.noticeboard.web.ApplicationResources'
 )
