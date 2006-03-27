@@ -2,7 +2,7 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
 	<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
-		<property name="basename"><value>org.lamsfoundation.lams.tool.forum.web.ApplicationResources</value></property>
+		<property name="basename"><value>org.lamsfoundation.lams.tool.forum.ApplicationResources</value></property>
 	</bean>
 	<bean id="messageService" class="org.lamsfoundation.lams.util.MessageService" singleton="true">
 		<property name="messageSource"><ref local="messageSource"/></property>										

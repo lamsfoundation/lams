@@ -303,6 +303,7 @@
 		<mkdir dir="${build.deploy}"/>
 		<mkdir dir="${build.deploy}/lib"/> 
 		<mkdir dir="${build.deploy}/sql"/> 
+		<mkdir dir="${build.deploy}/language"/>
 		 
 		<copy overwrite="yes" todir="${build.deploy}/sql">
 			<fileset dir="${db.scripts}/">
@@ -325,6 +326,13 @@
 				<include name="*.jar"/>
 			</fileset>
 		</copy>
+		
+		<copy overwrite="yes" todir="${build.deploy}/language">
+			<fileset dir="${conf.language.dir}">
+				<include name="*.properties"/>
+				<include name="*.txt"/>
+			</fileset>
+		</copy>		
 
 		<taskdef name="generateDeployProperties" 
 			classname="org.lamsfoundation.lams.tool.deploy.CreateToolPackageTask">
@@ -348,7 +356,16 @@
 			lamsEarPath="${jboss.deploy}"
 			toolContext="${toolContext}"
 			toolWebUri="${product}.war"
-			/>
+			languageFilesPackage="org.lamsfoundation.lams.tool.forum">
+
+			<!-- language files go as a fileset. Not nice but can't work out how to embed them in a tag. -->
+			<fileset dir="${build.deploy}/language">
+				<include name="**/*.properties"/>
+				<include name="**/*.txt"/>
+			</fileset>
+				
+		</generateDeployProperties>
+		
 	</target>
 
 	<target name="deploy-tool" depends="create-deploy-package" 

@@ -384,6 +384,7 @@ Ant build file.
 				<mkdir dir="${build.deploy}/lib"/> 
 				<mkdir dir="${build.deploy}/sql"/> 
 				<mkdir dir="${build.deploy}/lang"/> 
+				<mkdir dir="${build.deploy}/language"/>
 				 
 				<copy overwrite="yes" todir="${build.deploy}/sql">
 					<fileset dir="${db.scripts}/">
@@ -407,8 +408,8 @@ Ant build file.
 					</fileset>
 				</copy>
 
-				<copy overwrite="yes" todir="${build.deploy}/lang">
-					<fileset dir="${conf.dir}/language">
+				<copy overwrite="yes" todir="${build.deploy}/language">
+					<fileset dir="${conf.language.dir}">
 						<include name="*.properties"/>
 					</fileset>
 				</copy>
@@ -435,11 +436,12 @@ Ant build file.
 					lamsEarPath="${jboss.deploy}"
 					toolContext="${toolContext}"
 					toolWebUri="${product}.war"
-					languageFilesPackage="org.lamsfoundation.lams.tool.noticeboard.web">
+					languageFilesPackage="org.lamsfoundation.lams.tool.noticeboard">
 
 					<!-- language files go as a fileset. Not nice but can't work out how to embed them in a tag. -->
-					<fileset dir="${conf.dir}/language/">
+					<fileset dir="${build.deploy}/language">
 						<include name="**/*.properties"/>
+						<include name="**/*.txt"/>
 					</fileset>
 						
 				</generateDeployProperties>

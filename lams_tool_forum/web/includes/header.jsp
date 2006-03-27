@@ -9,8 +9,8 @@
 
 <head>
 	<title>
-		<bean:message key="appName" />
-	</title>
+		<bean:message key="activity.title" />
+  	</title>
 	<lams:css />
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
     <script type="text/javascript" src="${lams}fckeditor/fckeditor.js"></script>

@@ -49,6 +49,6 @@ NULL,
 'tool/lafrum11/exportPortfolio?mode=teacher',
 'tool/lafrum11/contribute.do',
 'tool/lafrum11/moderate.do',
-'org.lamsfoundation.lams.tool.forum.web.ApplicationResources',
+'org.lamsfoundation.lams.tool.forum.ApplicationResources',
 NOW()
 )

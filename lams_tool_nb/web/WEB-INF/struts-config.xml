@@ -193,7 +193,7 @@
 
    <!-- Define your Struts controller in a file called struts-controller.xml and place it in your merge directory. -->
 
-  <message-resources parameter="org.lamsfoundation.lams.tool.noticeboard.web.ApplicationResources" />
+  <message-resources parameter="org.lamsfoundation.lams.tool.noticeboard.ApplicationResources" />
 
   <!-- ===================== Plugin Definition  ======================== -->
 <plug-in className="org.apache.struts.tiles.TilesPlugin">

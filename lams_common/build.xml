@@ -222,6 +222,12 @@ Ant build file.
 				<include name="org/lamsfoundation/lams/web/session/*"/>
 			</fileset>
 		</jar>
+		<copy overwrite="yes" todir="${build.lib}/language/org/lamsfoundation/lams">
+			<fileset dir="${conf.language.dir}">
+				<include name="**/*.properties"/>
+				<include name="**/*.txt"/>
+			</fileset>
+		</copy>
 	</target>
 	<!-- ================================================================ -->
 	<!-- copy jar archive of org.lamsfoundation.lams.web.session.* for   -->

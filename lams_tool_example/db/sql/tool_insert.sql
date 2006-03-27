@@ -49,6 +49,6 @@ NULL,
 'tool/laex11/exportPortfolio?mode=teacher',
 'tool/laex11/contribute.do',
 'tool/laex11/moderate.do',
-'org.lamsfoundation.lams.tool.example.web.ApplicationResources',
+'org.lamsfoundation.lams.tool.example.ApplicationResources',
 NOW()
 )

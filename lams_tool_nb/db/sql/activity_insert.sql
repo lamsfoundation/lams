@@ -98,5 +98,5 @@ NULL
 , NULL
 , NULL
 , NULL
-, 'org.lamsfoundation.lams.tool.noticeboard.web.ApplicationResources'
+, 'org.lamsfoundation.lams.tool.noticeboard.ApplicationResources'
 )

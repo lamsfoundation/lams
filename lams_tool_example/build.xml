@@ -96,11 +96,6 @@ Ant build file.
 					<include name="*.properties"/>
 			</fileset>
 		</copy>
-		<copy overwrite="yes" todir="${build.classes.java}/${package}/web">
-			<fileset dir="${src.java.dir}/${package}/web">
-					<include name="*.properties"/>
-			</fileset>
-		</copy>
 	</target>
 
 	<target name="compile-test" depends="compile-java">
@@ -298,7 +293,7 @@ Ant build file.
 				<mkdir dir="${build.deploy}"/>
 				<mkdir dir="${build.deploy}/lib"/> 
 				<mkdir dir="${build.deploy}/sql"/> 
-				<mkdir dir="${build.deploy}/lang"/> 
+				<mkdir dir="${build.deploy}/language"/>
 				 
 				<copy overwrite="yes" todir="${build.deploy}/sql">
 					<fileset dir="${db.scripts}/">
@@ -322,8 +317,8 @@ Ant build file.
 					</fileset>
 				</copy>
 
-				<copy overwrite="yes" todir="${build.deploy}/lang">
-					<fileset dir="${conf.dir}/language">
+				<copy overwrite="yes" todir="${build.deploy}/language">
+					<fileset dir="${conf.language.dir}">
 						<include name="*.properties"/>
 					</fileset>
 				</copy>
@@ -342,18 +337,20 @@ Ant build file.
 					dbDriverClass="com.mysql.jdbc.Driver"
 					deployFiles="${build.lib}/${product}.war,${build.lib}/${product}.jar"
 					toolSignature="${signature}"
-					toolTablesScriptPath="${db.scripts}/create_lams_tool_example.sql"
-					toolTablesDeleteScriptPath="${db.scripts}/drop_lams_tool_example.sql"
-					toolActivityInsertScriptPath="${db.scripts}/activity_insert.sql"
-					toolLibraryInsertScriptPath="${db.scripts}/library_insert.sql"
-					toolInsertScriptPath="${db.scripts}/tool_insert.sql"
+					toolTablesScriptPath="${build.deploy}/sql/create_lams_tool_example.sql"
+					toolTablesDeleteScriptPath="${build.deploy}/sql/drop_lams_tool_example.sql"
+					toolActivityInsertScriptPath="${build.deploy}/sql/activity_insert.sql"
+					toolLibraryInsertScriptPath="${build.deploy}/sql/library_insert.sql"
+					toolInsertScriptPath="${build.deploy}/sql/tool_insert.sql"
 					lamsEarPath="${jboss.deploy}"
 					toolContext="${toolContext}"
-					toolWebUri="${product}.war">
+					toolWebUri="${product}.war"
+					languageFilesPackage="org.lamsfoundation.lams.tool.example">
 
 					<!-- language files go as a fileset. Not nice but can't work out how to embed them in a tag. -->
-					<fileset dir="${conf.dir}/language/">
+					<fileset dir="${build.deploy}/language">
 						<include name="*.properties"/>
+						<include name="**/*.txt"/>
 					</fileset>
 						
 				</generateDeployProperties>

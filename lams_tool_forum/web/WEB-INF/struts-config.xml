@@ -324,7 +324,7 @@
 
    <!-- Define your Struts controller in a file called struts-controller.xml and place it in your merge directory. -->
 
-  <message-resources parameter="org.lamsfoundation.lams.tool.forum.web.ApplicationResources" />
+  <message-resources parameter="org.lamsfoundation.lams.tool.forum.ApplicationResources" />
 
   <!-- Put custom struts plugin here -->
 <plug-in className="org.apache.struts.validator.ValidatorPlugIn">

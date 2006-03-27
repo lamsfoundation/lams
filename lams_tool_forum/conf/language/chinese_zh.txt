@@ -1,0 +1,142 @@
+# CVS ID: $Id: #
+# Language strings for the Forum tool.
+
+# ========== Values for tool and library activity. Sent to Flash as part of the learning design toolkit.  ======
+activity.title=Forum
+activity.description=Online threaded discussion tool (asynchronous).
+activity.helptext=Discussion tool useful for long running collaborations and situations where learners are not all on line at the same time.
+
+tool.display.name=Forum Tool
+tool.description=Tool for forums, also known as message boards.
+
+#=========================labels===========================#
+#-------------------------Authoring Labels-----------------#
+label.authoring.heading.basic.desc=基本信息
+label.authoring.heading.instructions.desc=请输入在线和脱机指导
+label.authoring.heading.advance.desc=请输入高级选项
+label.authoring.create.new.topic=发消息
+
+label.authoring.basic.title=标题
+label.authoring.basic.instruction=指导
+label.authoring.online.instruction =在线指导
+label.authoring.offline.instruction=脱机指导
+label.authoring.online.file =上传在线指导
+label.authoring.offline.file=上传脱机指导
+label.authoring.advance.lock.on.finished=完成后锁定
+
+label.authoring.save.button=保存
+label.authoring.cancel.button=取消
+label.authoring.choosefile.button=选择文件
+label.authoring.upload.online.button=上传在线
+label.authoring.upload.offline.button=上传脱机
+label.authoring.online.filelist=在线文件列表
+label.authoring.offline.filelist=脱机文件列表
+label.authoring.online.delete=删除
+label.authoring.offline.delete=脱机
+label.authoring.advance.allow.edit=容许编辑
+label.authoring.advance.use.richeditor=容许高级编辑器
+label.authoring.advance.limited.input=限制输入字符
+
+lable.topic.title.subject=主题
+lable.topic.title.body=内容
+lable.topic.title.update=前一个消息
+lable.topic.title.author=作者
+lable.topic.title.startedby=首贴于
+lable.topic.title.replies=回复
+lable.topic.title.mark=标注
+lable.topic.subject.by=由
+label.back.to.forum=返回论坛
+label.monitoring.edit.activity.cancel=取消
+label.monitoring.edit.activity.update=更新
+label.monitoring.edit.activity.edit=编辑
+lable.topic.title.message.number=消息# 
+lable.topic.title.average.mark= 平均分
+label.monitoring.statistic.average.mark= 消息平均分
+lable.monitoring.statistic.total.message= 总消息 # 
+authoring.exception= 在编辑页发生问题,原因是{0}
+#-------------------------END Authoring Labels END-----------------#
+page.title.monitoring.content.userlist=监控用户列表
+page.title.monitoring.view.user.mark=查看用户分数
+page.title.monitoring.edit.user.mark=编辑用户分数
+page.title.monitoring.view.activity=查看活动
+page.title.monitoring.edit.activity=编辑活动
+page.title.monitoring.view.instructions=查看指导
+page.title.monitoring.view.topic=查看主题
+page.title.monitoring.statistic=统计
+page.title.monitoring.definelater=论坛工具定义
+## errors
+errors.header=<b class="error">
+errors.footer=</b>
+
+#error.title = 系统出错
+error.valueReqd = 必须输入值
+error.inputFileTooLarge = 超过文件大小上限
+error.uploading = 上传出错
+error.mark.needNumber= 分数必须是整数
+error.mark.invalid.number= 分数是无效的数字格式
+error.fail.get.forum=没有可利用的论坛
+error.title.empty=标题不能为空
+#General Messages
+message.msg.maxFileSize = 最大 250K
+
+##Message
+title.messageTopic.open = 更多
+
+title.message.add = 发消息
+title.message.open = 查看消息
+title.message.reply = 回复消息
+title.message.edit = 编辑消息
+title.message.view=消息板
+title.message.view.topic=查看消息
+title.message.delete=删除消息
+
+message.label.subject = 主题
+message.label.body = 内容
+message.label.attachment = 附件
+message.label.postedOn = 发布:
+message.label.threadReplies  = 消息树
+message.link.reply = 回复
+
+##Labels
+label.open = 打开
+label.delete = 删除
+label.download = 下载
+label.view = 查看
+label.edit = 编辑
+label.reply = 回复
+label.done = 完成
+label.finish= 完成
+label.newtopic= 新消息
+label.refresh= 刷新
+lable.char.left=剩余字符
+label.basic=基本
+label.advanced=高级
+label.instructions=指导
+##Buttons
+button.upload = 上传
+button.done = 完成
+button.submit = 提交
+button.on = 在
+button.off = 关
+button.add = 添加
+button.cancel = 取消
+
+js.error.invalid.number=输入是无效的数字格式 
+js.error.min.number=输入必须大于0
+js.error.title=有下列错误发生：
+
+
+monitoring.tab.summary=总计
+monitoring.tab.instructions=指导
+monitoring.tab.edit.activity=编辑活动
+monitoring.tab.edit.statistics=统计
+monitoring.user.post.topic=发布下列消息:
+lable.topic.title.comment=评论
+message.not.avaliable=不可用
+lable.update.mark=更新分数
+message.assign.mark= 请给出分数和评论 
+message.session.name=会话名
+message.monitoring.summary.no.users=没有可用用户
+message.view.all.marks=查看全部分数
+message.download.marks=下载分数
+label.monitoring.summary.view.forum=查看论坛

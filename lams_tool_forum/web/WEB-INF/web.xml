@@ -7,7 +7,7 @@
 </description>
 <context-param>
 	<param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
-	<param-value>org.lamsfoundation.lams.tool.forum.web.ApplicationResources</param-value>
+	<param-value>org.lamsfoundation.lams.tool.forum.ApplicationResources</param-value>
 </context-param>
 <context-param>
 	<param-name>contextConfigLocation</param-name>

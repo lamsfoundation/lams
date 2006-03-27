@@ -49,6 +49,6 @@ NULL,
 'tool/lanb11/portfolioExport?mode=teacher',
 NULL,
 NULL,
-'org.lamsfoundation.lams.tool.noticeboard.web.ApplicationResources',
+'org.lamsfoundation.lams.tool.noticeboard.ApplicationResources',
 NOW()
 );

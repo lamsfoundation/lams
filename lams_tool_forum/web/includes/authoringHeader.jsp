@@ -9,7 +9,7 @@
 
 <head>
 	<title>
-		<bean:message key="appName" />
+		<bean:message key="activity.title" />
 	</title>
 	<lams:css />
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
