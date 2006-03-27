@@ -33,7 +33,9 @@ import java.util.Set;
 public class ResourceItem {
 
 	private Long uid;
-
+	//Resource Type:1=URL,2=File,3=Website,4=Learning Object
+	private short type;
+	
 	private String title;
 
 	private String description;
@@ -214,5 +216,15 @@ public class ResourceItem {
 		}
 		public void setHide(boolean isHide) {
 			this.isHide = isHide;
+		}
+		/**
+		 * @hibernate.property column="item_type" 
+		 * @return
+		 */
+		public short getType() {
+			return type;
+		}
+		public void setType(short type) {
+			this.type = type;
 		}
 }

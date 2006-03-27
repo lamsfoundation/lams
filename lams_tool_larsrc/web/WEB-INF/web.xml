@@ -175,38 +175,38 @@
 		<!--  ======================================================== -->	
 		<taglib>
 		    <taglib-uri>tags-bean</taglib-uri>
-		    <taglib-location>/WEB-INF/struts/tlds/struts-bean.tld</taglib-location>
+		    <taglib-location>/WEB-INF/tlds/struts/struts-bean.tld</taglib-location>
 		</taglib>
 		<taglib>
 		    <taglib-uri>tags-html</taglib-uri>
-		    <taglib-location>/WEB-INF/struts/tlds/struts-html.tld</taglib-location>
+		    <taglib-location>/WEB-INF/tlds/struts/struts-html.tld</taglib-location>
 		</taglib>
 		<taglib>
 		    <taglib-uri>tags-logic</taglib-uri>
-		    <taglib-location>/WEB-INF/struts/tlds/struts-logic.tld</taglib-location>
+		    <taglib-location>/WEB-INF/tlds/struts/struts-logic.tld</taglib-location>
 		</taglib>
 		<taglib>
 		    <taglib-uri>tags-tiles</taglib-uri>
-		    <taglib-location>/WEB-INF/struts/tlds/struts-tiles.tld</taglib-location>
+		    <taglib-location>/WEB-INF/tlds/struts/struts-tiles.tld</taglib-location>
 		</taglib>
 		<!--  ======================================================== -->	
 		<!--  JSTL 1.2 Tag Library 									   -->
 		<!--  ======================================================== -->	
 		  <taglib>
 		    <taglib-uri>tags-fmt</taglib-uri>
-		    <taglib-location>/WEB-INF/jstl/tlds/fmt.tld</taglib-location>
+		    <taglib-location>/WEB-INF/tlds/jstl/fmt.tld</taglib-location>
 		  </taglib>
 		  <taglib>
 		    <taglib-uri>tags-core</taglib-uri>
-		    <taglib-location>/WEB-INF/jstl/tlds/c.tld</taglib-location>
+		    <taglib-location>/WEB-INF/tlds/jstl/c.tld</taglib-location>
 		  </taglib>
 		  <taglib>
 		    <taglib-uri>tags-function</taglib-uri>
-		    <taglib-location>/WEB-INF/jstl/tlds/fn.tld</taglib-location>
+		    <taglib-location>/WEB-INF/tlds/jstl/fn.tld</taglib-location>
 		  </taglib>
 		  <taglib>
 		    <taglib-uri>tags-xml</taglib-uri>
-		    <taglib-location>/WEB-INF/jstl/tlds/x.tld</taglib-location>
+		    <taglib-location>/WEB-INF/tlds/jstl/x.tld</taglib-location>
 		  </taglib>
 		<!--  ======================================================== -->	
 		<!--   FCKEditor Tag Library -->

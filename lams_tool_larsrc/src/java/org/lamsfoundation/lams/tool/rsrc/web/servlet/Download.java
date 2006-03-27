@@ -18,7 +18,7 @@ USA
 
 http://www.gnu.org/licenses/gpl.txt 
 */
-package org.lamsfoundation.lams.tool.rsrc.web;
+package org.lamsfoundation.lams.tool.rsrc.web.servlet;
 
 import java.io.IOException;
 import java.io.InputStream;

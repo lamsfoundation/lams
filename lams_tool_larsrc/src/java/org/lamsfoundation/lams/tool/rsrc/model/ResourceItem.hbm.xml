@@ -146,6 +146,14 @@
             column="is_hide"
         />
 
+        <property
+            name="type"
+            type="short"
+            update="true"
+            insert="true"
+            column="item_type"
+        />
+
         <!--
             To add non XDoclet property mappings, create a file named
                 hibernate-properties-ResourceItem.xml
