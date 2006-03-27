@@ -96,7 +96,7 @@ http://www.gnu.org/licenses/gpl.txt
    </servlet>
    <servlet>
       <servlet-name>storeTheme</servlet-name>
-      <servlet-class>org.lamsfoundation.lams.authoring.web.StoreThemeServlet</servlet-class>
+      <servlet-class>org.lamsfoundation.lams.themes.web.StoreThemeServlet</servlet-class>
 
    </servlet>
 
@@ -256,7 +256,7 @@ http://www.gnu.org/licenses/gpl.txt
    </servlet-mapping>
    <servlet-mapping>
       <servlet-name>storeTheme</servlet-name>
-      <url-pattern>/authoring/storeTheme</url-pattern>
+      <url-pattern>/themes/storeTheme</url-pattern>
    </servlet-mapping>
 
    <session-config>

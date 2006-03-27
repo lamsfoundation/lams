@@ -120,6 +120,7 @@ public class AuthoringAction extends LamsDispatchAction{
 											HttpServletResponse response)throws ServletException, IOException{
 		IAuthoringService authoringService = getAuthoringService();
 		String wddxPacket = authoringService.getAllLearningDesignDetails();
+		log.debug("getAllLearningDesignDetails: returning "+wddxPacket);
 		return outputPacket(mapping, request, response, wddxPacket, "details");
 	}
 
@@ -129,6 +130,7 @@ public class AuthoringAction extends LamsDispatchAction{
 													  HttpServletResponse response)throws ServletException, IOException{
 		IAuthoringService authoringService = getAuthoringService();
 		String wddxPacket = authoringService.getAllLearningLibraryDetails();
+		log.debug("getAllLearningLibraryDetails: returning "+wddxPacket);
 		return outputPacket(mapping, request, response, wddxPacket, "details");
 	}
 	

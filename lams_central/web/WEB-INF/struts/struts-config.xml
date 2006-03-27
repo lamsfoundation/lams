@@ -106,6 +106,16 @@
       />
     </action>
     <action
+      path="/theme"
+      type="org.lamsfoundation.lams.themes.web.ThemeAction"
+      name="ThemeAction"
+      scope="request"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+    </action>
+    <action
       path="/workspace"
       type="org.lamsfoundation.lams.workspace.web.WorkspaceAction"
       parameter="method"
