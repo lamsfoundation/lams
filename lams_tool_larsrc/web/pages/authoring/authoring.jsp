@@ -78,7 +78,6 @@
 	focus="title"  enctype="multipart/form-data">
 		<html:hidden property="toolContentID"/>
 		<html:hidden property="currentTab" styleId="currentTab" />
-		<html:hidden property="dispatch"/>
 
 <h1><fmt:message key="label.authoring.heading" /></h1>
 

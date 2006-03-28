@@ -22,6 +22,7 @@ package org.lamsfoundation.lams.tool.rsrc.web.action;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -30,6 +31,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -48,6 +50,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @version $Revision$
  */
 public class AuthoringAction extends Action {
+	private static final int INIT_INSTRUCTION_COUNT = 2;
 	private static Logger log = Logger.getLogger(AuthoringAction.class);
 	
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
@@ -78,10 +81,17 @@ public class AuthoringAction extends Action {
 //        if (param.equals("deleteOfflineFile")) {
 //        	return deleteOfflineFile(mapping, form, request, response);
 //        }
-//        //-----------------------Topic function ---------------------------
-//	  	if (param.equals("newTopic")) {
-//       		return newTopic(mapping, form, request, response);
-//        }
+        //----------------------- Add resource function ---------------------------
+        if (param.equals("addUrl")) {
+        	return addUrl(mapping, form, request, response);
+        }
+        if (param.equals("removeUrl")) {
+        	return removeUrl(mapping, form, request, response);
+        }
+        //-----------------------Instruction function ---------------------------
+	  	if (param.equals("newInstruction")) {
+       		return newInstruction(mapping, form, request, response);
+        }
 //	  	if (param.equals("createTopic")) {
 //       		return createTopic(mapping, form, request, response);
 //        }
@@ -107,6 +117,43 @@ public class AuthoringAction extends Action {
 //       		return finishTopic(mapping, form, request, response);
 //        }
         return mapping.findForward(ResourceConstants.ERROR);
+	}
+	private ActionForward addUrl(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+		List instructionList = new ArrayList(INIT_INSTRUCTION_COUNT);
+		for(int idx=0;idx<INIT_INSTRUCTION_COUNT;idx++){
+			instructionList.add("");
+		}
+		request.setAttribute("instructionList",instructionList);
+		return mapping.findForward(ResourceConstants.SUCCESS);
+	}
+	private ActionForward newInstruction(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+		int count = NumberUtils.stringToInt(request.getParameter("instructionCount"),0);
+		List instructionList = new ArrayList(++count);
+		for(int idx=0;idx<count;idx++){
+			String item = request.getParameter("instructionItem"+idx);
+			if(item == null)
+				instructionList.add("");
+			else
+				instructionList.add(item);
+		}
+		request.setAttribute("instructionList",instructionList);
+		return mapping.findForward(ResourceConstants.SUCCESS);
+	}
+	private ActionForward removeUrl(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+		int count = NumberUtils.stringToInt(request.getParameter("instructionCount"),0);
+		int removeIdx = NumberUtils.stringToInt(request.getParameter("removeIdx"),-1);
+		List instructionList = new ArrayList(count-1);
+		for(int idx=0;idx<count;idx++){
+			String item = request.getParameter("instructionItem"+idx);
+			if(idx == removeIdx)
+				continue;
+			if(item == null)
+				instructionList.add("");
+			else
+				instructionList.add(item);
+		}
+		request.setAttribute("instructionList",instructionList);
+		return mapping.findForward(ResourceConstants.SUCCESS);
 	}
 	//******************************************************************************************************************
 	//              Forum Author functions

@@ -6,14 +6,14 @@
 	 * Launches the popup window for the instruction files
 	 */
 	function showMessage(url) {
-		var area=document.getElementById("itemArea");
+		var area=document.getElementById("reourceInputArea");
 		area.style.width="100%";
 		area.style.height="100%";
 		area.src=url;
 		area.style.display="block";
 	}
 	function hideMessage(){
-		var area=document.getElementById("itemArea");
+		var area=document.getElementById("reourceInputArea");
 		area.style.width="0px";
 		area.style.height="0px";
 		area.style.display="none";
@@ -43,7 +43,7 @@
 				<table class="forms">
 					<tr>
 						<td>
-							<a href="javascript:showMessage('<html:rewrite page="/pages/authoring/parts/addurl.jsp"/>');">
+							<a href="javascript:showMessage('<html:rewrite page="/authoring/addUrl.do"/>');">
 								<fmt:message key="label.authoring.basic.add.url" />
 							</a>
 						</td>
@@ -69,7 +69,7 @@
 		<tr>
 			<td  colspan="2">
 				<iframe onload="javascript:this.style.height=this.contentWindow.document.body.scrollHeight+'px'" 
-					id="itemArea" name="itemArea" style="width:0px;height:0px;border:0px;display:none" frameborder="no" scrolling="no">
+					id="reourceInputArea" name="reourceInputArea" style="width:0px;height:0px;border:0px;display:none" frameborder="no" scrolling="no">
 				</iframe>
 			</td>
 		</tr>

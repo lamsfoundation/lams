@@ -17,3 +17,18 @@
 			<forward name="success" path="/pages/authoring/authoring.jsp" />
 		</action>
 		
+		<action path="/authoring/addUrl"
+			type="org.lamsfoundation.lams.tool.rsrc.web.action.AuthoringAction"
+			parameter="addUrl">
+			<forward name="success" path="/pages/authoring/parts/addurl.jsp" />
+		</action>
+		<action path="/authoring/newInstruction"
+			type="org.lamsfoundation.lams.tool.rsrc.web.action.AuthoringAction"
+			parameter="newInstruction">
+			<forward name="success" path="/pages/authoring/parts/instructions.jsp" />
+		</action>
+		<action path="/authoring/removeInstruction"
+			type="org.lamsfoundation.lams.tool.rsrc.web.action.AuthoringAction"
+			parameter="removeInstruction">
+			<forward name="success" path="/pages/authoring/parts/instructions.jsp" />
+		</action>

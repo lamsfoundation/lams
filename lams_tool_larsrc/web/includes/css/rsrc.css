@@ -6,3 +6,18 @@
 
 	margin : 0px 0px 0px 0px;
 }
+
+.innerforms {
+	border: 0px;
+	font-size: small;
+	font-style: normal;
+	width:100%;
+}
+
+.buttonStyle{
+	font-size: 12px;
+	color: #000000;
+	text-decoration:none;
+	text-align: center;
+	background-color:#B4C8FE;
+}
