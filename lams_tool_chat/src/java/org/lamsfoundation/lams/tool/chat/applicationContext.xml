@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+	<!--  $Id$ -->
+ 	<!--
+ 	- Application context definition for Chat tool business layer.
+	-->
+<beans>
+
+	<!-- ========================= GENERAL DEFINITIONS ========================= -->
+
+	<!-- ========================= RESOURCE DEFINITIONS ========================= -->
+	<!-- Hibernate SessionFactory -->
+	  <bean id="chatSessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<property name="dataSource"><ref bean="toolDataSource"/></property>
+		<property name="mappingResources">
+			<list>	
+				<value>org/lamsfoundation/lams/tool/chat/Chat.hbm.xml</value>
+				<value>org/lamsfoundation/lams/tool/chat/ChatSession.hbm.xml</value>
+				<value>org/lamsfoundation/lams/tool/chat/ChatUser.hbm.xml</value>
+				<value>org/lamsfoundation/lams/tool/chat/ChatAttachment.hbm.xml</value> 
+			</list>
+		</property>
+		<property name="hibernateProperties"><ref bean="hibernateProperties"/></property>
+	</bean>
+
+	<!-- ========================= BUSINESS OBJECT DEFINITIONS ======================== -->
+	<bean id="chatService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+		<property name ="target">
+			<bean class="org.lamsfoundation.lams.tool.chat.service.ChatService">
+				<property name="chatAttachmentDAO"><ref bean="chatAttachmentDAO"/></property>
+				<property name="chatSessionDAO"><ref bean="chatSessionDAO"/></property>
+				<property name="chatUserDAO"><ref bean="chatUserDAO"/></property>
+				<property name="chatDAO"><ref bean="chatDAO"/></property>
+				<property name="toolService"><ref bean="lamsToolService"/></property>
+				<property name="learnerService"><ref bean="learnerService"/></property>			
+ 				<property name="chatToolContentHandler"><ref bean="chatToolContentHandler"/></property>
+			</bean>
+		</property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="create*">PROPAGATION_REQUIRED</prop>
+				<prop key="copy*">PROPAGATION_REQUIRED</prop>
+				<prop key="update*">PROPAGATION_REQUIRED</prop>
+				<prop key="get*">PROPAGATION_REQUIRED</prop>
+				<prop key="save*">PROPAGATION_REQUIRED</prop>
+				<prop key="retrieve*">PROPAGATION_REQUIRED</prop>
+				<prop key="remove*">PROPAGATION_REQUIRED</prop>
+				<prop key="add*">PROPAGATION_REQUIRED</prop>
+				<prop key="leaveToolSession">PROPAGATION_REQUIRED</prop>
+                <prop key="setAsDefineLater">PROPAGATION_REQUIRED</prop>
+                <prop key="setAsRunOffline">PROPAGATION_REQUIRED</prop>
+                <prop key="exportToolSession">PROPAGATION_REQUIRED</prop>
+				
+			</props>
+		</property>
+	</bean> 
+
+
+
+	<!--  DAO classes -->
+	<bean id="chatDAO" class="org.lamsfoundation.lams.tool.chat.dao.hibernate.ChatDAO">
+		<property name="sessionFactory"><ref local="chatSessionFactory"/></property>
+	</bean>  
+
+	<bean id="chatSessionDAO" class="org.lamsfoundation.lams.tool.chat.dao.hibernate.ChatSessionDAO">
+		<property name="sessionFactory"><ref local="chatSessionFactory"/></property>
+	</bean>
+	
+	<bean id="chatUserDAO" class="org.lamsfoundation.lams.tool.chat.dao.hibernate.ChatUserDAO">
+		<property name="sessionFactory"><ref local="chatSessionFactory"/></property>
+	</bean>
+	
+	<bean id="chatAttachmentDAO" class="org.lamsfoundation.lams.tool.chat.dao.hibernate.ChatAttachmentDAO">
+		<property name="sessionFactory"><ref local="chatSessionFactory"/></property>
+	</bean>
+	
+ 	<bean id="chatToolContentHandler" class="org.lamsfoundation.lams.tool.chat.util.ChatToolContentHandler">
+ 		<property name="repositoryService"><ref bean="repositoryService"/></property>
+	</bean>  
+
+</beans>
