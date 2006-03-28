@@ -18,9 +18,11 @@
  *
  *http://www.gnu.org/licenses/gpl.txt
  */
-
+/* $$Id$$ */
 package org.lamsfoundation.lams.tool.deploy;
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Deploys required language files to the lams ear. Copies all the language files
@@ -29,7 +31,8 @@ import java.io.File;
  */
 public class DeployLanguageFilesTask extends FilesTask
 {
-    
+    public static final String NUM_FILES = "numFiles";
+   
 	private static final String LANGUAGE_JAR_DIRECTORY = "lams-dictionary.jar";
     
     /**
@@ -38,9 +41,10 @@ public class DeployLanguageFilesTask extends FilesTask
     protected String dictionaryPacket;
 
     /**
-     *Executes the task
+     * Copy the application resources / language files to the lams-dictionary.jar folder
+     * @return Map containing key "numFiles", value Long
      */
-    public void execute() throws DeployException
+    public Map<String,Object> execute() throws DeployException
     {
     	// check the lams ear is okay by getting the file object - this will check 
     	// for any problems with the lams ear.
@@ -49,12 +53,17 @@ public class DeployLanguageFilesTask extends FilesTask
     	// Go through each language file and copy it into the directory named for the tool's signature.
     	// This means the file ends up as <toolsignature>.ApplicationResources
     	File dictionaryDir = getLamsDictionary();
+    	int count = 0;
         for (String languageFilename : deployFiles)
         {
         	System.out.println("Copying file "+languageFilename+" to "+dictionaryDir);
             copyFile(languageFilename, dictionaryDir);
+            count++;
         }
-    }
+        Map<String,Object> map = new HashMap<String,Object>();
+        map.put(NUM_FILES, new Long(count));
+        return map;
+     }
     
     /** Gets the package directory in the dictionary directory in the LAMS ear directory and 
      * checks that it exists, is a directory and is writable. Assumes that lams.ear exists and it 
@@ -64,9 +73,7 @@ public class DeployLanguageFilesTask extends FilesTask
     	
     	// convert dictionary packet org.lamsfoundation.lams.tool.web to org/lamsfoundation/lams/tool/web
     	if ( dictionaryPacket != null ) {
-    		System.out.println("dictionaryPacket "+dictionaryPacket+" being updated");
     		dictionaryPacket = dictionaryPacket.replace('.',File.separatorChar);
-    		System.out.println("dictionaryPacket now"+dictionaryPacket);
     	}
     	String packageName = lamsEarPath+File.separator+LANGUAGE_JAR_DIRECTORY+File.separator+dictionaryPacket;
     	File dictionaryDir = new File(packageName);

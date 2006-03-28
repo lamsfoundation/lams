@@ -18,11 +18,7 @@ USA
 
 http://www.gnu.org/licenses/gpl.txt 
 */
-
-/*
- * Created on 24/11/2005
- *
- */
+/* $$Id$$ */
 package org.lamsfoundation.lams.tool.deploy.libraryActivity;
 
 import java.io.IOException;
@@ -122,6 +118,8 @@ public class DeployLibraryConfig extends DeployConfig {
 	        this.setDbDriverClass(config.getDbDriverClass());   
         if (config.getLearningLibraryList() != null)
 	        this.setLearningLibraryList(config.getLearningLibraryList());
+        if (config.getLamsEarPath() != null)
+            this.setLamsEarPath(config.getLamsEarPath());
     }
     
     public void printObjectProperties()
@@ -158,6 +156,7 @@ public class DeployLibraryConfig extends DeployConfig {
         valid = valid && validateStringProperty(getDbDriverClass(), DB_PASSWORD);
         valid = valid && validateStringProperty(getDbDriverUrl(), DB_DRIVER_URL);
         valid = valid && validateListProperty(getLearningLibraryList(),LEARNING_LIBRARY_LIST);
+        valid = valid && validateStringProperty(getLamsEarPath(), LAMS_EAR_PATH);
         
         //iterate through learning libraries
         ArrayList learningLibraries = getLearningLibraryList();

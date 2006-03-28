@@ -18,7 +18,7 @@ USA
 
 http://www.gnu.org/licenses/gpl.txt 
 */
-
+/* $$Id$$ */
 /*
  * Created on 24/11/2005
  */
@@ -64,6 +64,7 @@ public abstract class DeployConfig {
     public static final String DB_DRIVER_URL = "dbDriverUrl";
     public static final String TOOL_SIGNATURE = "toolSignature";    
     public static final String TOOL_ACTIVITY_INSERT_SCRIPT_PATH = "toolActivityInsertScriptPath";
+    public static final String LAMS_EAR_PATH = "lamsEarPath";
     public static final String I8N_LANGUAGE_FILES_PACKAGE = "languageFilesPackage";
     
     protected transient String validationError = "";
@@ -89,6 +90,11 @@ public abstract class DeployConfig {
      * Holds value of property dbPassword.
      */
     private String dbPassword;
+    /**
+     * Holds value of property lamsEarPath.
+     */
+    private String lamsEarPath;
+    
     
     
     /** 
@@ -226,6 +232,11 @@ public abstract class DeployConfig {
         if ( key.equalsIgnoreCase(I8N_LANGUAGE_FILES_PACKAGE) ) {
             setLanguageFilesPackage(value);
         }       
+
+        if ( key.equalsIgnoreCase(LAMS_EAR_PATH) ) {
+            setLamsEarPath(value);
+        }
+
     }
     
     /**
@@ -303,4 +314,18 @@ public abstract class DeployConfig {
 	public void setLanguageFilesPackage(String languageFilesPackage) {
 		this.languageFilesPackage = languageFilesPackage;
 	}
+    /**
+     * @return Returns the lamsEarPath.
+     */
+    public String getLamsEarPath() {
+        return lamsEarPath;
+    }
+    /**
+     * @param lamsEarPath The lamsEarPath to set.
+     */
+    public void setLamsEarPath(String lamsEarPath) {
+        this.lamsEarPath = lamsEarPath;
+    }
+
 }
+

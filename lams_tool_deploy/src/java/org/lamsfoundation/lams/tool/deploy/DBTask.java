@@ -18,13 +18,14 @@
  *
  *http://www.gnu.org/licenses/gpl.txt
  */
-
+/* $$Id$$ */
 package org.lamsfoundation.lams.tool.deploy;
 
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 
@@ -60,7 +61,7 @@ public abstract class DBTask implements Task
     {
     }
     
-    public abstract void execute() throws DeployException;
+    public abstract Map<String,Object> execute() throws DeployException;
 
     /**
      * Setter for property jdbcDriver.

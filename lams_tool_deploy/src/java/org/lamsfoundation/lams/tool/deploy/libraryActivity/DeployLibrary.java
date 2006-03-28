@@ -18,11 +18,15 @@ USA
 
 http://www.gnu.org/licenses/gpl.txt 
 */
-
-/*
- * Created on 17/11/2005
- */
+/* $$Id$$ */
 package org.lamsfoundation.lams.tool.deploy.libraryActivity;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.lamsfoundation.lams.tool.deploy.DeployLanguageFilesTask;
 
 /**
  * @author mtruong
@@ -44,16 +48,47 @@ public class DeployLibrary {
     {
         if ((args.length < 1) || (args[0] == null))
         {
-            throw new IllegalArgumentException("Usage: Deployer <properties_file_path>." );
+            throw new IllegalArgumentException("Usage: Deployer <properties_file_path> <language file directory>." );
         }
         
+        String languageFileDirectoryName = args[1]; 
+        File languageFileDirectory = null;
+        if ( languageFileDirectoryName != null && languageFileDirectoryName.trim().length() > 0) {
+        	languageFileDirectory = new File(languageFileDirectoryName);
+        	if ( ! languageFileDirectory.exists() || ! languageFileDirectory.isDirectory() 
+        			|| ! languageFileDirectory.canRead() ) {
+        		throw new IllegalArgumentException("Unable to access language files. Directory "+languageFileDirectory
+        				+" is missing, is not a directory or is not readable.");
+        	}
+        }
+
         System.out.println("Starting Library Deploy");
         
        try
        {
             DeployLibraryConfig config= new DeployLibraryConfig(args[0]);
             LibraryDBDeployTask deployTask = new LibraryDBDeployTask(config);
-            deployTask.execute();   
+            Map<String,Object> deployValues = deployTask.execute();
+            System.out.println("Updated database");
+
+            if ( languageFileDirectory != null ) {
+            	String[] files = languageFileDirectory.list();
+	            if ( files != null && files.length > 0 ) {
+	            	// generate package name in which the language files are placed.
+	            	Long learningLibraryId = (Long) deployValues.get(LibraryDBDeployTask.LEARNING_LIBRARY_ID);
+	            	String packagePath = "org.lamsfoundation.lams.library.llid"+learningLibraryId.toString();
+	            		
+	            	// copy the files to the lams-dictionary.jar
+		            DeployLanguageFilesTask deployLanguageFilesTask = new DeployLanguageFilesTask();
+		            deployLanguageFilesTask.setLamsEarPath(config.getLamsEarPath());
+		            deployLanguageFilesTask.setDictionaryPacket(packagePath);
+		            List<String> fileList = createLanguageFilesList(languageFileDirectoryName,files);
+		            deployLanguageFilesTask.setDeployFiles(fileList);
+		            deployLanguageFilesTask.execute();
+	            }
+	            System.out.println("Copied language files");
+            }
+            
             System.out.println("Library Deployed");
             
        }
@@ -67,4 +102,19 @@ public class DeployLibrary {
         
     }
     
+    /**
+     * Sets the list of file paths to operate on.
+     * @param deployFiles New value of property deployFiles.
+     */
+    private static List<String> createLanguageFilesList(String path, String[] deployFilesArray)
+    {
+    	List<String> deployFiles = new ArrayList<String>(deployFilesArray!=null?deployFilesArray.length:0);
+        for ( String filename: deployFilesArray ) {
+        	deployFiles.add(path+File.separator+filename);
+        }
+        return deployFiles;
+    }
+
+
+
 }

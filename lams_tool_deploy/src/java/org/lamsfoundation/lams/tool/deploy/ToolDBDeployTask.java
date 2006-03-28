@@ -18,7 +18,7 @@
  *
  *http://www.gnu.org/licenses/gpl.txt
  */
-
+/* $$Id$$ */
 package org.lamsfoundation.lams.tool.deploy;
 
 import java.io.File;
@@ -38,7 +38,9 @@ import org.apache.commons.dbutils.DbUtils;
  */
 public class ToolDBDeployTask extends DBTask
 {
-    
+    public static final String TOOL_ID = "toolId";
+    public static final String LIB_ID = "libId";
+
     /**
      * Holds value of property toolInsertScriptPath.
      */
@@ -113,7 +115,7 @@ public class ToolDBDeployTask extends DBTask
         this.toolTablesScriptPath = toolTablesScriptPath;
     }
     
-    public void execute() throws DeployException
+    public Map<String,Object> execute() throws DeployException
     {
         toolInsertScript = new File(toolInsertScriptPath);
         toolLibraryInsertScript = new File(toolLibraryInsertScriptPath);
@@ -146,7 +148,7 @@ public class ToolDBDeployTask extends DBTask
             updateToolLibraryId(toolId, learningLibraryId, conn);
             
             //put the library id into the activity insert script
-            Map replacementMap = new HashMap(1);
+            Map<String,String> replacementMap = new HashMap<String,String>(1);
             replacementMap.put("tool_id", Long.toString(toolId));
             replacementMap.put("learning_library_id", Long.toString(learningLibraryId));
             FileTokenReplacer activityScriptReplacer = new FileTokenReplacer(toolActivityInsertScript, replacementMap);
@@ -157,7 +159,7 @@ public class ToolDBDeployTask extends DBTask
             
             //put the tool id and and defualt content id into
             //the tool tables script
-            replacementMap = new HashMap(1);
+            replacementMap = new HashMap<String,String>(1);
             replacementMap.put("tool_id", Long.toString(toolId));
             replacementMap.put("default_content_id", Long.toString(defaultContentId));
             FileTokenReplacer toolTablesScriptReplacer = new FileTokenReplacer(toolTablesScript, replacementMap);
@@ -197,6 +199,11 @@ public class ToolDBDeployTask extends DBTask
         {
             DbUtils.closeQuietly(conn);
         }
+        
+        Map<String,Object> map = new HashMap<String,Object>();
+        map.put(TOOL_ID, new Long(toolId));
+        map.put(LIB_ID, new Long(learningLibraryId));
+        return map;
     }
     
     /**

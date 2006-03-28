@@ -18,11 +18,7 @@ USA
 
 http://www.gnu.org/licenses/gpl.txt 
 */
-
-/*
- * Created on 24/11/2005
- *
- */
+/* $$Id$$ */
 package org.lamsfoundation.lams.tool.deploy;
 
 import java.io.IOException;
@@ -51,7 +47,6 @@ public class DeployToolConfig extends DeployConfig {
     
     private static final String TOOL_WEB_URI = "toolWebUri";
     private static final String TOOL_CONTEXT = "toolContext";
-    private static final String LAMS_EAR_PATH = "lamsEarPath";
     private static final String TOOL_INSERT_SCRIPT_PATH = "toolInsertScriptPath";
     private static final String TOOL_LIBRARY_INSERT_SCRIPT_PATH = "toolLibraryInsertScriptPath";
     private static final String TOOL_TABLES_SCRIPT_PATH = "toolTablesScriptPath";
@@ -73,11 +68,6 @@ public class DeployToolConfig extends DeployConfig {
      * Holds value of property toolContextRoot.
      */
     private String toolContext;
-    
-    /**
-     * Holds value of property lamsEarPath.
-     */
-    private String lamsEarPath;
     
     /**
      * Holds value of property toolInsertScriptPath.
@@ -172,10 +162,6 @@ public class DeployToolConfig extends DeployConfig {
            toolContext = value;
        }
 
-       if ( key.equalsIgnoreCase(LAMS_EAR_PATH) ) {
-           lamsEarPath  = value;
-       }
-
        if ( key.equalsIgnoreCase(TOOL_INSERT_SCRIPT_PATH) ) {
            toolInsertScriptPath  = value;
        }
@@ -238,7 +224,7 @@ public class DeployToolConfig extends DeployConfig {
 
        valid = validateStringProperty(toolWebUri, TOOL_WEB_URI);
        valid = valid && validateStringProperty(toolContext, TOOL_CONTEXT);
-       valid = valid && validateStringProperty(lamsEarPath, LAMS_EAR_PATH);
+       valid = valid && validateStringProperty(getLamsEarPath(), LAMS_EAR_PATH);
        valid = valid && validateStringProperty(toolInsertScriptPath, TOOL_INSERT_SCRIPT_PATH);
        valid = valid && validateStringProperty(toolLibraryInsertScriptPath, TOOL_LIBRARY_INSERT_SCRIPT_PATH);
        valid = valid && validateStringProperty(toolActivityInsertScriptPath, TOOL_ACTIVITY_INSERT_SCRIPT_PATH);
@@ -272,6 +258,8 @@ public class DeployToolConfig extends DeployConfig {
            this.setDbDriverClass(config.getDbDriverClass());
        if (config.getLanguageFilesPackage() != null)
     	   this.setLanguageFilesPackage(config.getLanguageFilesPackage());
+       if (config.getLamsEarPath() != null)
+           this.setLamsEarPath(config.getLamsEarPath());
        
        if (config.getToolSignature() != null)
            this.toolSignature = config.getToolSignature();
@@ -279,8 +267,6 @@ public class DeployToolConfig extends DeployConfig {
            this.toolWebUri = config.getToolWebUri();
        if (config.getToolContext() != null)
            this.toolContext = config.getToolContext();
-       if (config.getLamsEarPath() != null)
-           this.lamsEarPath = config.getLamsEarPath();
        if (config.getToolInsertScriptPath() != null)
            this.toolInsertScriptPath = config.getToolInsertScriptPath();
        if (config.getToolLibraryInsertScriptPath() != null)
@@ -304,7 +290,6 @@ public class DeployToolConfig extends DeployConfig {
        System.out.println("Tool Signature: " + this.toolSignature);
        System.out.println("ToolWebUri: " + this.toolWebUri);
        System.out.println("ToolContext: " + this.toolContext);
-       System.out.println("LamsEarPath: " + this.lamsEarPath);
        System.out.println("ToolInsertScriptPath: " + this.toolInsertScriptPath);
        System.out.println("ToolLibraryInsertScriptPath: " + this.toolLibraryInsertScriptPath);
        System.out.println("ToolActivityInsertScriptPath: " + this.toolActivityInsertScriptPath);
@@ -315,6 +300,7 @@ public class DeployToolConfig extends DeployConfig {
        System.out.println("DbDriverClass: " + getDbDriverClass());
        System.out.println("DbDriverUrl: " + getDbDriverUrl());  
        System.out.println("LanguageFilesPackage: " + getLanguageFilesPackage());  
+       System.out.println("LamsEarPath: " + getLamsEarPath());
        ArrayList list = this.deployFiles;
        for(int i=0; i<list.size(); i++)
        {
@@ -345,18 +331,6 @@ public class DeployToolConfig extends DeployConfig {
      */
     public void setDeployFiles(ArrayList<String> deployFiles) {
         this.deployFiles = deployFiles;
-    }
-    /**
-     * @return Returns the lamsEarPath.
-     */
-    public String getLamsEarPath() {
-        return lamsEarPath;
-    }
-    /**
-     * @param lamsEarPath The lamsEarPath to set.
-     */
-    public void setLamsEarPath(String lamsEarPath) {
-        this.lamsEarPath = lamsEarPath;
     }
     /**
      * @return Returns the toolActivityInsertScriptPath.

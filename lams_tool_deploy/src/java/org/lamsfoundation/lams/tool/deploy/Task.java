@@ -18,8 +18,10 @@
  *
  *http://www.gnu.org/licenses/gpl.txt
  */
-
+/* $$Id$$ */
 package org.lamsfoundation.lams.tool.deploy;
+
+import java.util.Map;
 
 /**
  * Defines a Task in the tool deploy or undeploy process.
@@ -30,7 +32,9 @@ public interface Task
     /**
      * Executes the task.
      * @throws DeployException if Task cannot be executed.
+     * @return Map of possibly useful values, such as the new ids 
+     * created in the database. Values will vary from Task to Task.
      *
      */
-    public void execute() throws DeployException;
+    public Map<String,Object> execute() throws DeployException;
 }

@@ -18,18 +18,14 @@ USA
 
 http://www.gnu.org/licenses/gpl.txt 
 */
-
-/*
- * Created on 17/11/2005
- *
- */
+/* $$Id$$ */
 package org.lamsfoundation.lams.tool.deploy.libraryActivity;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -37,8 +33,7 @@ import java.util.Map;
 
 import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory; 
-
+import org.apache.commons.logging.LogFactory;
 import org.lamsfoundation.lams.tool.deploy.DBTask;
 import org.lamsfoundation.lams.tool.deploy.DeployException;
 import org.lamsfoundation.lams.tool.deploy.FileTokenReplacer;
@@ -54,8 +49,10 @@ import org.lamsfoundation.lams.tool.deploy.ScriptRunner;
 public class LibraryDBDeployTask extends DBTask {
     
    private static Log log = LogFactory.getLog(LibraryDBDeployTask.class);
-    
+   
    private ArrayList learningLibraries;
+   
+   public static final String LEARNING_LIBRARY_ID = "learningLibraryId";
    
    public LibraryDBDeployTask()
    {}
@@ -77,10 +74,13 @@ public class LibraryDBDeployTask extends DBTask {
     * 		a) Find the tool_id that matches the tool_signature
     * 		b) Update tool activity script with tool_id and parent_activity_id equal to the activity_id from step 3
     * 		c) run the tool activity script
+    * 
+    * @return Map with one key "learningLibraryId" a with Long value 
     */
 	
-	 public void execute() throws DeployException
+	 public Map<String,Object> execute() throws DeployException
 	 { 
+		 long learningLibraryId = -1;
 	     Connection conn = getConnection();
 	        try
 	        {
@@ -94,12 +94,12 @@ public class LibraryDBDeployTask extends DBTask {
 	                
 	                String libraryInsertScriptPath = learningLibrary.getLibraryInsertScriptPath();
 	                File libraryInsertScript = new File(libraryInsertScriptPath);
-	                long learningLibraryId = runLibraryScript(readFile(libraryInsertScript), conn, "lams_learning_library");
+	                learningLibraryId = runLibraryScript(readFile(libraryInsertScript), conn, "lams_learning_library");
 	                
 	                log.debug("The learning_library_id is learningLibraryId");
 	               
 	                //put the library id into the library activity insert script
-	                Map replacementMap = new HashMap(1);
+	                Map<String,String> replacementMap = new HashMap<String,String>(1);
 	                replacementMap.put("learning_library_id", Long.toString(learningLibraryId));
 	                FileTokenReplacer activityScriptReplacer = new FileTokenReplacer(new File(learningLibrary.getTemplateActivityInsertScriptPath()), replacementMap);
 	                String libraryActivityScriptSQL = activityScriptReplacer.replace();
@@ -120,7 +120,7 @@ public class LibraryDBDeployTask extends DBTask {
 	                   long toolId = getToolId(toolActivity.getToolSignature(), conn);
 	                   
 	                   //put the tool_id and parent_activity_id into the tool activity insert script
-	                   replacementMap = new HashMap(1);
+	                   replacementMap = new HashMap<String,String>(1);
 	                   replacementMap.put("tool_id", Long.toString(toolId));
 	                   replacementMap.put("parent_activity_id", Long.toString(parentActivityId));
 	                   FileTokenReplacer toolTablesScriptReplacer = new FileTokenReplacer(new File(toolActivity.getToolActivityInsertScriptPath()), replacementMap);
@@ -162,6 +162,11 @@ public class LibraryDBDeployTask extends DBTask {
 	        {
 	            DbUtils.closeQuietly(conn);
 	        }
+	        
+	        Map<String,Object> map = new HashMap<String,Object>();
+	        map.put(LEARNING_LIBRARY_ID, new Long(learningLibraryId));
+	        return map;
+	 
 	  
 	 }
 	 

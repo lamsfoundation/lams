@@ -18,7 +18,7 @@
  *
  *http://www.gnu.org/licenses/gpl.txt
  */
-
+/* $$Id$$ */
 package org.lamsfoundation.lams.tool.deploy;
         
 import java.io.File;
@@ -62,7 +62,7 @@ public class FileTokenReplacer
     
     
     /** Creates a new instance of FileTokenReplacer */
-    public FileTokenReplacer(final File file, final Map replacementMap)
+    public FileTokenReplacer(final File file, final Map<String,String> replacementMap)
     {
         if (file == null)
         {

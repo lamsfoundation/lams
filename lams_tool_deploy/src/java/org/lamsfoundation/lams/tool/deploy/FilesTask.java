@@ -18,10 +18,11 @@
  *
  *http://www.gnu.org/licenses/gpl.txt
  */
-
+/* $$Id$$ */
 package org.lamsfoundation.lams.tool.deploy;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
@@ -68,7 +69,7 @@ public abstract class FilesTask implements Task
         this.deployFiles = deployFiles;
     }
 
-     /**
+    /**
     * Copy a file to a given directory
     */
    protected void copyFile(String fileName, File directory) throws DeployException

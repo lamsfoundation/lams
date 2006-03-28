@@ -18,9 +18,11 @@
  *
  *http://www.gnu.org/licenses/gpl.txt
  */
-
+/* $$Id$$ */
 package org.lamsfoundation.lams.tool.deploy;
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Deploys required files to the lams ear.
@@ -28,19 +30,26 @@ import java.io.File;
  */
 public class DeployFilesTask extends FilesTask
 {
-    
+    public static final String NUM_FILES = "numFiles";
 
     
     /**
-     *Executes the task
+     * Copies files to lams.ear. 
+     * @return Map containing key "numFiles", value Long
      */
-    public void execute() throws DeployException
+    public Map<String,Object> execute() throws DeployException
     {
         File lamsEar =  getLamsEar();
-        for (int i = 0, size = deployFiles.size(); i < size; i++)
+        int size = deployFiles.size();
+        for (int i = 0; i < size; i++)
         {
             copyFile(deployFiles.get(i), lamsEar);
         }
+        
+        Map<String,Object> map = new HashMap<String,Object>();
+        map.put(NUM_FILES, new Long(size));
+        return map;
+        
     }
     
 

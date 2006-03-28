@@ -18,10 +18,7 @@ USA
 
 http://www.gnu.org/licenses/gpl.txt 
 */
-
-/*
- * Created on 29/11/2005
- */
+/* $$Id$$ */
 package org.lamsfoundation.lams.tool.deploy;
 
 import java.io.BufferedWriter;

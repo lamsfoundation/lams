@@ -18,11 +18,12 @@
  *
  *http://www.gnu.org/licenses/gpl.txt
  */
-
+/* $$Id$$ */
 package org.lamsfoundation.lams.tool.deploy;
 
 
 import java.io.IOException;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -102,14 +103,17 @@ public abstract class UpdateApplicationXmlTask implements Task
     /**
      * Execute the task
      * @throws org.apache.tools.ant.DeployException In case of any problems
+     * @return null
      */
-    public void execute() throws DeployException
+    public Map<String,Object> execute() throws DeployException
     {
         Document doc = parseApplicationXml();
         
         updateApplicationXml(doc);
         
         writeApplicationXml(doc);
+        
+        return null;
     }
     
     /**

@@ -18,12 +18,13 @@
  *
  *http://www.gnu.org/licenses/gpl.txt
  */
-
+/* $$Id$$ */
 package org.lamsfoundation.lams.tool.deploy;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Map;
 
 import org.apache.commons.dbutils.DbUtils;
 
@@ -49,7 +50,10 @@ public class ToolDBActivateTask extends DBTask
     {
     }
     
-    public void execute() throws DeployException
+    /** Activates the tool and library. 
+     * @return null;
+     */
+    public Map<String,Object> execute() throws DeployException
     {
         Connection conn = getConnection();
         try
@@ -88,6 +92,7 @@ public class ToolDBActivateTask extends DBTask
         {
             DbUtils.closeQuietly(conn);
         }
+        return null;
     }
     
     /**
