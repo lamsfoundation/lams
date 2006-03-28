@@ -1,4 +1,4 @@
-# CVS ID: $Id: #
+# CVS ID: $Id$ #
 # Language strings for the Forum tool.
 
 # ========== Values for tool and library activity. Sent to Flash as part of the learning design toolkit.  ======
