@@ -29,6 +29,7 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.Vector;
@@ -537,6 +538,7 @@ public class AuthoringService implements IAuthoringService {
 
 	private void internationaliseActivities(Collection activities) {		
 		Iterator iter = activities.iterator();
+		Locale locale = LocaleContextHolder.getLocale();
 		while (iter.hasNext()) {
 			LibraryActivityDTO activity = (LibraryActivityDTO) iter.next();
 			// update the activity fields
@@ -544,9 +546,9 @@ public class AuthoringService implements IAuthoringService {
 			if ( languageFilename  != null ) {
 				MessageSource toolMessageSource = toolActMessageService.getMessageService(languageFilename);
 				if ( toolMessageSource != null ) {
-					activity.setTitle(toolMessageSource.getMessage(Activity.I8N_TITLE,null,activity.getTitle(),LocaleContextHolder.getLocale()));
-					activity.setDescription(toolMessageSource.getMessage(Activity.I8N_DESCRIPTION,null,activity.getDescription(),LocaleContextHolder.getLocale()));
-					activity.setHelpText(toolMessageSource.getMessage(Activity.I8N_HELP_TEXT,null,activity.getHelpText(),LocaleContextHolder.getLocale()));
+					activity.setTitle(toolMessageSource.getMessage(Activity.I18N_TITLE,null,activity.getTitle(),locale));
+					activity.setDescription(toolMessageSource.getMessage(Activity.I18N_DESCRIPTION,null,activity.getDescription(),locale));
+					activity.setHelpText(toolMessageSource.getMessage(Activity.I18N_HELP_TEXT,null,activity.getHelpText(),locale));
 				} else {
 					log.warn("Unable to internationalise the library activity "+activity.getActivityID()+" "+activity.getTitle()
 							+" message file "+activity.getLanguageFile()+". Activity Message source not available");
@@ -556,7 +558,7 @@ public class AuthoringService implements IAuthoringService {
 				languageFilename = activity.getToolLanguageFile();
 				toolMessageSource = toolActMessageService.getMessageService(languageFilename);
 				if ( toolMessageSource != null ) {
-					activity.setToolDisplayName(toolMessageSource.getMessage(Tool.I8N_DISPLAY_NAME,null,activity.getToolDisplayName(),LocaleContextHolder.getLocale()));
+					activity.setToolDisplayName(toolMessageSource.getMessage(Tool.I18N_DISPLAY_NAME,null,activity.getToolDisplayName(),locale));
 				} else {
 					log.warn("Unable to internationalise the library activity "+activity.getActivityID()+" "+activity.getTitle()
 							+" message file "+activity.getLanguageFile()+". Tool Message source not available");
