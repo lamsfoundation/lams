@@ -31,17 +31,25 @@ public class LearningLibrary {
     private String libraryInsertScriptPath;
     private String templateActivityInsertScriptPath;
     private ArrayList toolActivityList;
+    private long learningLibraryId;
+    private long parentActivityId;
+    private String languageFileDirectory;
+    private String languageFileRoot;
+
    
  
    public LearningLibrary()
    {       
    }
    
-   public LearningLibrary(String libraryInsertScript, String templateActivityInsertScript, ArrayList toolActivityList)
+   public LearningLibrary(String libraryInsertScript, String templateActivityInsertScript, 
+		   ArrayList toolActivityList, String languageFileDirectory, String languageFileRoot)
    {
        this.libraryInsertScriptPath = libraryInsertScript;
        this.templateActivityInsertScriptPath = templateActivityInsertScript;
        this.toolActivityList = toolActivityList;
+       this.languageFileDirectory = languageFileDirectory;
+       this.languageFileRoot = languageFileRoot;
    }
    
   
@@ -83,4 +91,40 @@ public class LearningLibrary {
     public void setLibraryInsertScriptPath(String libraryInsertScriptPath) {
         this.libraryInsertScriptPath = libraryInsertScriptPath;
     }
+
+	public long getLearningLibraryId() {
+		return learningLibraryId;
+	}
+
+	public void setLearningLibraryId(long learningLibraryId) {
+		this.learningLibraryId = learningLibraryId;
+	}
+
+	public String getLanguageFileDirectory() {
+		return languageFileDirectory;
+	}
+
+	public void setLanguageFileDirectory(String languageFileDirectory) {
+		this.languageFileDirectory = languageFileDirectory;
+	}
+
+	public long getParentActivityId() {
+		return parentActivityId;
+	}
+
+	public void setParentActivityId(long parentActivityId) {
+		this.parentActivityId = parentActivityId;
+	}
+
+	/** Get the "root" of the language file name. This will normally be "ApplicationResources".
+	 * This is converted into <root>_<language>_<country>.properties by Java.
+	 * @return
+	 */
+	public String getLanguageFileRoot() {
+		return languageFileRoot;
+	}
+
+	public void setLanguageFileRoot(String languageFileRoot) {
+		this.languageFileRoot = languageFileRoot;
+	}
 }

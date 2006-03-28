@@ -61,7 +61,7 @@ public abstract class DBTask implements Task
     {
     }
     
-    public abstract Map<String,Object> execute() throws DeployException;
+    public abstract void execute() throws DeployException;
 
     /**
      * Setter for property jdbcDriver.

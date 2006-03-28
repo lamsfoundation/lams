@@ -19,6 +19,8 @@
 					<toolActivityInsertScriptPath>@assemblydir@/toolActivity2_insert.sql</toolActivityInsertScriptPath>	
 				</toolActivity>
 			</toolActivityList>
+		    <languageFileDirectory>@assemblylangdir@</languageFileDirectory>
+		    <languageFileRoot>ApplicationResources</languageFileRoot>
 		</learningLibrary>
 	</learningLibraryList>
 </Deploy>

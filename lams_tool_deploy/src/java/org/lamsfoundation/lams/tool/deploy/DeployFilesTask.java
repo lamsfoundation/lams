@@ -21,8 +21,6 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.deploy;
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Deploys required files to the lams ear.
@@ -30,14 +28,13 @@ import java.util.Map;
  */
 public class DeployFilesTask extends FilesTask
 {
-    public static final String NUM_FILES = "numFiles";
 
     
     /**
      * Copies files to lams.ear. 
      * @return Map containing key "numFiles", value Long
      */
-    public Map<String,Object> execute() throws DeployException
+    public void execute() throws DeployException
     {
         File lamsEar =  getLamsEar();
         int size = deployFiles.size();
@@ -45,10 +42,6 @@ public class DeployFilesTask extends FilesTask
         {
             copyFile(deployFiles.get(i), lamsEar);
         }
-        
-        Map<String,Object> map = new HashMap<String,Object>();
-        map.put(NUM_FILES, new Long(size));
-        return map;
         
     }
     

@@ -21,8 +21,6 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.deploy;
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Deploys required language files to the lams ear. Copies all the language files
@@ -42,9 +40,8 @@ public class DeployLanguageFilesTask extends FilesTask
 
     /**
      * Copy the application resources / language files to the lams-dictionary.jar folder
-     * @return Map containing key "numFiles", value Long
      */
-    public Map<String,Object> execute() throws DeployException
+    public void execute() throws DeployException
     {
     	// check the lams ear is okay by getting the file object - this will check 
     	// for any problems with the lams ear.
@@ -60,9 +57,6 @@ public class DeployLanguageFilesTask extends FilesTask
             copyFile(languageFilename, dictionaryDir);
             count++;
         }
-        Map<String,Object> map = new HashMap<String,Object>();
-        map.put(NUM_FILES, new Long(count));
-        return map;
      }
     
     /** Gets the package directory in the dictionary directory in the LAMS ear directory and 
@@ -98,7 +92,6 @@ public class DeployLanguageFilesTask extends FilesTask
 	}
 
 	public void setDictionaryPacket(String dictionaryPacket) {
-		System.out.println("DeployLanguageFile: Setting dictionary packet to "+dictionaryPacket);
 		this.dictionaryPacket = dictionaryPacket;
 	}
 

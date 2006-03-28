@@ -103,17 +103,14 @@ public abstract class UpdateApplicationXmlTask implements Task
     /**
      * Execute the task
      * @throws org.apache.tools.ant.DeployException In case of any problems
-     * @return null
      */
-    public Map<String,Object> execute() throws DeployException
+    public void execute() throws DeployException
     {
         Document doc = parseApplicationXml();
         
         updateApplicationXml(doc);
         
         writeApplicationXml(doc);
-        
-        return null;
     }
     
     /**

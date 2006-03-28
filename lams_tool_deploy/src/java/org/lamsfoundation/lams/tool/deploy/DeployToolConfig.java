@@ -52,7 +52,7 @@ public class DeployToolConfig extends DeployConfig {
     private static final String TOOL_TABLES_SCRIPT_PATH = "toolTablesScriptPath";
     private static final String TOOL_TABLES_DELETE_SCRIPT_PATH = "toolTablesDeleteScriptPath";
     private static final String DEPLOY_FILES= "deployFiles";
-    public static final String LANGUAGE_FILES= "languageFiles";
+    protected static final String LANGUAGE_FILES= "languageFiles";
   
     /**
      * Holds value of property toolSignature.
@@ -103,6 +103,7 @@ public class DeployToolConfig extends DeployConfig {
      * Holds value of property languageFiles.
      */
     private ArrayList<String> languageFiles;
+
 
     /**
      * Creates an instance of DeployToolConfig object.
@@ -198,7 +199,7 @@ public class DeployToolConfig extends DeployConfig {
        super.setFilenames(key, filenames);
 
        if ( key.equalsIgnoreCase(LANGUAGE_FILES) ) {
-           languageFiles = filenames;
+           setLanguageFiles(filenames);
        }
    }
 
@@ -225,6 +226,7 @@ public class DeployToolConfig extends DeployConfig {
        valid = validateStringProperty(toolWebUri, TOOL_WEB_URI);
        valid = valid && validateStringProperty(toolContext, TOOL_CONTEXT);
        valid = valid && validateStringProperty(getLamsEarPath(), LAMS_EAR_PATH);
+       valid = valid && validateListProperty(getLanguageFiles(),LANGUAGE_FILES);
        valid = valid && validateStringProperty(toolInsertScriptPath, TOOL_INSERT_SCRIPT_PATH);
        valid = valid && validateStringProperty(toolLibraryInsertScriptPath, TOOL_LIBRARY_INSERT_SCRIPT_PATH);
        valid = valid && validateStringProperty(toolActivityInsertScriptPath, TOOL_ACTIVITY_INSERT_SCRIPT_PATH);
@@ -234,7 +236,6 @@ public class DeployToolConfig extends DeployConfig {
        valid = valid && validateStringProperty(getDbDriverClass(), DB_PASSWORD);
        valid = valid && validateStringProperty(getDbDriverUrl(), DB_DRIVER_URL);
        valid = valid && validateListProperty(deployFiles,DEPLOY_FILES);
-       valid = valid && validateListProperty(deployFiles,LANGUAGE_FILES);
        
        if (!valid )
            throw new DeployException("Invalid deployment properties: "+validationError);
@@ -246,21 +247,9 @@ public class DeployToolConfig extends DeployConfig {
     * Only copy properties if the properties are not null
     * @param config
     */
-   private void copyProperties(DeployToolConfig config)
+   protected void copyProperties(DeployToolConfig config)
    {
-       if (config.getDbUsername() != null)
-           this.setDbUsername(config.getDbUsername());
-       if (config.getDbPassword() != null)
-           this.setDbPassword(config.getDbPassword());
-       if (config.getDbDriverUrl() != null)
-           this.setDbDriverUrl(config.getDbDriverUrl());
-       if (config.getDbDriverClass() != null)
-           this.setDbDriverClass(config.getDbDriverClass());
-       if (config.getLanguageFilesPackage() != null)
-    	   this.setLanguageFilesPackage(config.getLanguageFilesPackage());
-       if (config.getLamsEarPath() != null)
-           this.setLamsEarPath(config.getLamsEarPath());
-       
+	   super.copyProperties(config);
        if (config.getToolSignature() != null)
            this.toolSignature = config.getToolSignature();
        if (config.getToolWebUri() != null)
@@ -280,13 +269,14 @@ public class DeployToolConfig extends DeployConfig {
        if (config.getDeployFiles() != null)
 	       this.deployFiles = config.getDeployFiles();
        if (config.getLanguageFiles() != null)
-	       this.languageFiles = config.getLanguageFiles();
+	       this.setLanguageFiles(config.getLanguageFiles());
+
    }
    
    /** Used for testing purposes only */
    public void printObjectProperties()
    {
-       System.out.println("========Object Properties=======");
+	   super.printObjectProperties();
        System.out.println("Tool Signature: " + this.toolSignature);
        System.out.println("ToolWebUri: " + this.toolWebUri);
        System.out.println("ToolContext: " + this.toolContext);
@@ -295,25 +285,17 @@ public class DeployToolConfig extends DeployConfig {
        System.out.println("ToolActivityInsertScriptPath: " + this.toolActivityInsertScriptPath);
        System.out.println("ToolTableScriptPath: " + this.toolTablesScriptPath);
        System.out.println("ToolTableDeleteScriptPath: " + this.toolTablesDeleteScriptPath);
-       System.out.println("DbUsername: " + getDbUsername());
-       System.out.println("DbPassword: " + getDbPassword());
-       System.out.println("DbDriverClass: " + getDbDriverClass());
-       System.out.println("DbDriverUrl: " + getDbDriverUrl());  
-       System.out.println("LanguageFilesPackage: " + getLanguageFilesPackage());  
-       System.out.println("LamsEarPath: " + getLamsEarPath());
        ArrayList list = this.deployFiles;
        for(int i=0; i<list.size(); i++)
        {
            System.out.println("DeployFiles: " + list.get(i));
        }
-       list = this.languageFiles;
-       for(int i=0; i<list.size(); i++)
-       {
-           System.out.println("LanguageFiles: " + list.get(i));
+	   list = getLanguageFiles();
+	   for(int i=0; i<list.size(); i++)
+	   {
+	       System.out.println("LanguageFiles: " + list.get(i));
        }
-       System.out.println("========End Object Properties=======");
-      
-   }
+}
    //inherit from parents writePropertiesToFile
  /* public void writePropertiesToFile(Writer writer)
    {
@@ -438,4 +420,6 @@ public class DeployToolConfig extends DeployConfig {
 	public void setLanguageFiles(ArrayList<String> languageFiles) {
 		this.languageFiles = languageFiles;
 	}
+
+ 
 }

@@ -38,9 +38,6 @@ import org.apache.commons.dbutils.DbUtils;
  */
 public class ToolDBDeployTask extends DBTask
 {
-    public static final String TOOL_ID = "toolId";
-    public static final String LIB_ID = "libId";
-
     /**
      * Holds value of property toolInsertScriptPath.
      */
@@ -115,7 +112,7 @@ public class ToolDBDeployTask extends DBTask
         this.toolTablesScriptPath = toolTablesScriptPath;
     }
     
-    public Map<String,Object> execute() throws DeployException
+    public void execute() throws DeployException
     {
         toolInsertScript = new File(toolInsertScriptPath);
         toolLibraryInsertScript = new File(toolLibraryInsertScriptPath);
@@ -199,11 +196,6 @@ public class ToolDBDeployTask extends DBTask
         {
             DbUtils.closeQuietly(conn);
         }
-        
-        Map<String,Object> map = new HashMap<String,Object>();
-        map.put(TOOL_ID, new Long(toolId));
-        map.put(LIB_ID, new Long(learningLibraryId));
-        return map;
     }
     
     /**

@@ -19,13 +19,16 @@
  *http://www.gnu.org/licenses/gpl.txt
  */
 /* $$Id$$ */
-package org.lamsfoundation.lams.tool.deploy;
+package org.lamsfoundation.lams.tool.deploy.libraryActivity;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Map;
 
 import org.apache.commons.dbutils.DbUtils;
+import org.lamsfoundation.lams.tool.deploy.DBTask;
+import org.lamsfoundation.lams.tool.deploy.DeployException;
 
 /**
  * Task activates tool records int the lams db.
@@ -33,19 +36,15 @@ import org.apache.commons.dbutils.DbUtils;
  *
  *
  */
-public class ToolDBActivateTask extends DBTask
+public class LibraryDBActivateTask extends DBTask
 {
-    //private long defaultContentId;
-    
-    private long toolId;
-    
     /**
      * Holds value of property learningLibraryId.
      */
     private long learningLibraryId;
     
     /** Creates a new instance of InsertToolDBRecordsTask */
-    public ToolDBActivateTask()
+    public LibraryDBActivateTask()
     {
     }
     
@@ -57,9 +56,7 @@ public class ToolDBActivateTask extends DBTask
         try
         {
             conn.setAutoCommit(false);
-            activateTool(toolId, conn);
             activateLibrary(learningLibraryId, conn);
-            //activateActivity(learningLibraryId, conn);
             conn.commit();
         }
          catch (SQLException sqlex)
@@ -93,16 +90,6 @@ public class ToolDBActivateTask extends DBTask
     }
     
     /**
-     * Sets the id of the tool to activate.
-     * @param toolId New value of property toolId.
-     */
-    public void setToolId(long toolId)
-    {
-        
-        this.toolId = toolId;
-    }
-    
-    /**
      * Sets the id of the tools library.
      * @param learningLibraryId New value of property learningLibraryId.
      */
@@ -110,22 +97,6 @@ public class ToolDBActivateTask extends DBTask
     {
         
         this.learningLibraryId = learningLibraryId;
-    }
-    
-    private void activateTool(long newToolId, Connection conn) throws SQLException
-    {
-        PreparedStatement stmt = null;
-        try
-        {
-            stmt = conn.prepareStatement("UPDATE lams_tool SET valid_flag = 1 WHERE tool_id  = ?");
-            stmt.setLong(1, newToolId);
-            stmt.execute();
-        }
-        finally
-        {
-            DbUtils.closeQuietly(stmt);
-        }
-        
     }
     
     private void activateLibrary(long libraryId, Connection conn) throws SQLException
@@ -143,21 +114,5 @@ public class ToolDBActivateTask extends DBTask
         }
         
     }
-    
-//    private void activateActivity(long libraryId, Connection conn) throws SQLException
-//    {
-//        PreparedStatement stmt = null;
-//        try
-//        {
-//            stmt = conn.prepareStatement("UPDATE lams_learning_activity SET valid_flag = 1 WHERE learning_library_id  = ?");
-//            stmt.setLong(1, libraryId);
-//            stmt.execute();
-//        }
-//        finally
-//        {
-//            DbUtils.closeQuietly(stmt);
-//        }
-//        
-//    }
     
 }

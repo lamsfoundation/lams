@@ -329,7 +329,13 @@
 				</fileset>
 			</copy>
 
-		   <copy overwrite="yes" file="${package.cfg}/deployLibrary.xml"
+			<copy overwrite="yes" todir="${assembly.activity}/language">
+				<fileset dir="${package.cfg}/language">
+					<include name="*.*"/>
+				</fileset>
+			</copy>
+
+		<copy overwrite="yes" file="${package.cfg}/deployLibrary.xml"
 					   	tofile="${assembly.activity}/deploy.xml" >
 			  <!-- replace @assemblydir@ in the xml template - this allows it to run under any directory structure -->
 		        <filterchain>
@@ -339,6 +345,9 @@
 		           <replacetokens>
 		                <token key="assemblydir" value="${assembly.activity}/sql"/>
 		            </replacetokens>
+		            <replacetokens>
+			            <token key="assemblylangdir" value="${assembly.activity}/language"/>
+			        </replacetokens>
 		            <replacetokens>
 			             <token key="lamsear" value="${jboss.ear.deploy}"/>
 			        </replacetokens>
@@ -365,8 +374,6 @@
 				dbDriverUrl="${db.url}"
 				dbDriverClass="com.mysql.jdbc.Driver"	
 				/>
-		
-		
 		</target>
 
 		<!-- deploy the complex activities to the library -->

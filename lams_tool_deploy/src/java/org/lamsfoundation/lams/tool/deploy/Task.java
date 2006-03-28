@@ -32,9 +32,6 @@ public interface Task
     /**
      * Executes the task.
      * @throws DeployException if Task cannot be executed.
-     * @return Map of possibly useful values, such as the new ids 
-     * created in the database. Values will vary from Task to Task.
-     *
      */
-    public Map<String,Object> execute() throws DeployException;
+    public void execute() throws DeployException;
 }

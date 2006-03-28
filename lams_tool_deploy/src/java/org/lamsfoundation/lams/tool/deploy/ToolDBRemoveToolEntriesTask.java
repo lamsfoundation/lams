@@ -38,8 +38,6 @@ import org.apache.commons.dbutils.DbUtils;
  */
 public class ToolDBRemoveToolEntriesTask extends DBTask
 {
-    public static final String TOOL_ID = "toolId";
-    public static final String LIB_ID = "libId";
     
     /**
      * Holds value of property toolTablesDeleteScriptPath - deletes
@@ -80,9 +78,8 @@ public class ToolDBRemoveToolEntriesTask extends DBTask
     }
   
     /** Remove the tool and the related library activity. 
-     * @return Map with two keys "toolId" and "libId", with Long values 
      **/
-    public Map<String,Object> execute() throws DeployException
+    public void execute() throws DeployException
     {
         long toolId = 0;
         long libId = 0;
@@ -141,10 +138,6 @@ public class ToolDBRemoveToolEntriesTask extends DBTask
         {
             DbUtils.closeQuietly(conn);
         }
-        Map<String,Object> map = new HashMap<String,Object>();
-        map.put(TOOL_ID, new Long(toolId));
-        map.put(LIB_ID, new Long(libId));
-        return map;
     }
     
     private void cleanupToolTables(long toolId, long libraryId, Connection conn) throws DeployException

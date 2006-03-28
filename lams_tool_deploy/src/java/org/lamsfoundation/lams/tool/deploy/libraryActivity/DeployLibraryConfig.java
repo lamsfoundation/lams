@@ -50,6 +50,7 @@ public class DeployLibraryConfig extends DeployConfig {
        
     private ArrayList learningLibraryList; 
     
+    
     public DeployLibraryConfig()
     {       
         xstream.alias(ROOT_ELEMENT, DeployLibraryConfig.class);
@@ -106,29 +107,17 @@ public class DeployLibraryConfig extends DeployConfig {
 	 * 	Only copy properties if the properties are not null
      *  @param config
      */
-    private void copyProperties(DeployLibraryConfig config)
+    protected void copyProperties(DeployLibraryConfig config)
     {
-        if (config.getDbUsername() != null)
-            this.setDbUsername(config.getDbUsername());
-        if (config.getDbPassword() != null)
-	        this.setDbPassword(config.getDbPassword());
-        if (config.getDbDriverUrl() != null)
-	        this.setDbDriverUrl(config.getDbDriverUrl());
-        if (config.getDbDriverClass() != null)
-	        this.setDbDriverClass(config.getDbDriverClass());   
-        if (config.getLearningLibraryList() != null)
+    	super.copyProperties(config);
+    	if (config.getLearningLibraryList() != null)
 	        this.setLearningLibraryList(config.getLearningLibraryList());
-        if (config.getLamsEarPath() != null)
-            this.setLamsEarPath(config.getLamsEarPath());
+    	
     }
     
     public void printObjectProperties()
     {
-        System.out.println("========Object Properties=======");
-        System.out.println("DbUsername: " + getDbUsername());
-        System.out.println("DbPassword: " + getDbPassword());
-        System.out.println("DbDriverClass: " + getDbDriverClass());
-        System.out.println("DbDriverUrl: " + getDbDriverUrl());  
+    	super.printObjectProperties();
         ArrayList learningLibraries = getLearningLibraryList();
         for (int j=0; j<learningLibraries.size(); j++)
         {
@@ -144,7 +133,6 @@ public class DeployLibraryConfig extends DeployConfig {
                System.out.println("\t\tToolActivity "+ i + "-> ToolActivityScriptPath: " + a.getToolActivityInsertScriptPath());
             }        
         }
-        System.out.println("========End Object Properties=======");
     }
     
     public void validateProperties() throws DeployException {
@@ -155,7 +143,6 @@ public class DeployLibraryConfig extends DeployConfig {
         valid = valid && validateStringProperty(getDbPassword(), DB_PASSWORD);
         valid = valid && validateStringProperty(getDbDriverClass(), DB_PASSWORD);
         valid = valid && validateStringProperty(getDbDriverUrl(), DB_DRIVER_URL);
-        valid = valid && validateListProperty(getLearningLibraryList(),LEARNING_LIBRARY_LIST);
         valid = valid && validateStringProperty(getLamsEarPath(), LAMS_EAR_PATH);
         
         //iterate through learning libraries

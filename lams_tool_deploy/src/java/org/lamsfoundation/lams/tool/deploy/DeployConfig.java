@@ -95,8 +95,6 @@ public abstract class DeployConfig {
      */
     private String lamsEarPath;
     
-    
-    
     /** 
      * Holds the value of the package where I8N files are store
      * Export format org.lamsfoundation.lams.tool.web 
@@ -326,6 +324,41 @@ public abstract class DeployConfig {
     public void setLamsEarPath(String lamsEarPath) {
         this.lamsEarPath = lamsEarPath;
     }
+
+  /** Used for testing purposes only */
+   public void printObjectProperties()
+   {
+	   System.out.println("========Object Properties=======");
+	   System.out.println("DbUsername: " + getDbUsername());
+	   System.out.println("DbPassword: " + getDbPassword());
+	   System.out.println("DbDriverClass: " + getDbDriverClass());
+	   System.out.println("DbDriverUrl: " + getDbDriverUrl());  
+	   System.out.println("LanguageFilesPackage: " + getLanguageFilesPackage());  
+	   System.out.println("LamsEarPath: " + getLamsEarPath());
+   }
+   
+   /**
+    * Upon deserialisation of the xml string, a new object will be created. 
+    * The properties of this object will be copied to the calling object.
+    * Only copy properties if the properties are not null
+    * @param config
+    */
+   protected void copyProperties(DeployConfig config)
+   {
+       if (config.getDbUsername() != null)
+           this.setDbUsername(config.getDbUsername());
+       if (config.getDbPassword() != null)
+           this.setDbPassword(config.getDbPassword());
+       if (config.getDbDriverUrl() != null)
+           this.setDbDriverUrl(config.getDbDriverUrl());
+       if (config.getDbDriverClass() != null)
+           this.setDbDriverClass(config.getDbDriverClass());
+       if (config.getLanguageFilesPackage() != null)
+    	   this.setLanguageFilesPackage(config.getLanguageFilesPackage());
+       if (config.getLamsEarPath() != null)
+           this.setLamsEarPath(config.getLamsEarPath());
+   }
+   
 
 }
 

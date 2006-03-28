@@ -74,13 +74,10 @@ public class LibraryDBDeployTask extends DBTask {
     * 		a) Find the tool_id that matches the tool_signature
     * 		b) Update tool activity script with tool_id and parent_activity_id equal to the activity_id from step 3
     * 		c) run the tool activity script
-    * 
-    * @return Map with one key "learningLibraryId" a with Long value 
     */
 	
-	 public Map<String,Object> execute() throws DeployException
+	 public void execute() throws DeployException
 	 { 
-		 long learningLibraryId = -1;
 	     Connection conn = getConnection();
 	        try
 	        {
@@ -94,7 +91,7 @@ public class LibraryDBDeployTask extends DBTask {
 	                
 	                String libraryInsertScriptPath = learningLibrary.getLibraryInsertScriptPath();
 	                File libraryInsertScript = new File(libraryInsertScriptPath);
-	                learningLibraryId = runLibraryScript(readFile(libraryInsertScript), conn, "lams_learning_library");
+	                long learningLibraryId = runLibraryScript(readFile(libraryInsertScript), conn, "lams_learning_library");
 	                
 	                log.debug("The learning_library_id is learningLibraryId");
 	               
@@ -107,6 +104,9 @@ public class LibraryDBDeployTask extends DBTask {
 	                
 	               long parentActivityId = runLibraryScript(libraryActivityScriptSQL, conn, "lams_learning_activity");
 	               log.debug("Parent Learning Activity ID is: " + parentActivityId);
+	               
+	               learningLibrary.setLearningLibraryId(learningLibraryId);
+	               learningLibrary.setParentActivityId(learningLibraryId);
 	               
 	               ArrayList toolActivities = learningLibrary.getToolActivityList();
 	               
@@ -163,10 +163,6 @@ public class LibraryDBDeployTask extends DBTask {
 	            DbUtils.closeQuietly(conn);
 	        }
 	        
-	        Map<String,Object> map = new HashMap<String,Object>();
-	        map.put(LEARNING_LIBRARY_ID, new Long(learningLibraryId));
-	        return map;
-	 
 	  
 	 }
 	 
@@ -268,4 +264,5 @@ public class LibraryDBDeployTask extends DBTask {
 	public void setLearningLibraries(ArrayList learningLibraries) {
 	    this.learningLibraries = learningLibraries;
 	}
+
 }
