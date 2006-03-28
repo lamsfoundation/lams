@@ -33,7 +33,7 @@ import org.lamsfoundation.lams.learningdesign.LearningLibrary;
 public interface ILearningLibraryDAO extends IBaseDAO {
 	
 	public LearningLibrary getLearningLibraryById(Long learningLibraryId);
-	public LearningLibrary getLearningLibraryByTitle(String title);
+	/** Get all valid learning libraries */
 	public List getAllLearningLibraries();
 
 }
