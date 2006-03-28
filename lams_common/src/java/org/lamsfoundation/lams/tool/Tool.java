@@ -116,8 +116,8 @@ public class Tool implements Serializable {
 	/** 
 	 * Entries for an tool in a language property file 
 	 */
-	public static final String I8N_DISPLAY_NAME = "tool.display.name";
-	public static final String I8N_DESCRIPTION = "tool.description";
+	public static final String I18N_DISPLAY_NAME = "tool.display.name";
+	public static final String I18N_DESCRIPTION = "tool.description";
 
     /** full constructor */
     public Tool(Long toolId, 
