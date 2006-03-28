@@ -318,6 +318,7 @@
 			<mkdir dir="${assembly.activity}/"/>
 			<mkdir dir="${assembly.activity}/lib"/> 
 			<mkdir dir="${assembly.activity}/sql"/> 
+			<mkdir dir="${assembly.activity}/language"/> 
 		
 			<copy overwrite="yes" todir="${assembly.activity}/sql">
 				<fileset dir="${package.cfg}">
@@ -338,6 +339,9 @@
 		           <replacetokens>
 		                <token key="assemblydir" value="${assembly.activity}/sql"/>
 		            </replacetokens>
+		            <replacetokens>
+			             <token key="lamsear" value="${jboss.ear.deploy}"/>
+			        </replacetokens>
 		        </filterchain>
 		    </copy>
 
@@ -381,7 +385,7 @@
 					classpathref="deploy.classpath"
 					fork="true">
 						<arg file="${assembly.activity}/deploy.xml"/>
-						
+						<arg file="${assembly.activity}/language"/>
 				</java>
 							
 			</target>

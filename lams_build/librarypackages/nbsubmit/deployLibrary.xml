@@ -4,6 +4,7 @@
 	<dbPassword></dbPassword>
 	<dbDriverClass></dbDriverClass>
 	<dbDriverUrl></dbDriverUrl>
+    <lamsEarPath>D:\jboss-4.0.2\server\default\deploy\lams.ear</lamsEarPath>
 	<learningLibraryList>
 		<learningLibrary>
 			<libraryInsertScriptPath>@assemblydir@/learninglibrary1_insert.sql</libraryInsertScriptPath>
