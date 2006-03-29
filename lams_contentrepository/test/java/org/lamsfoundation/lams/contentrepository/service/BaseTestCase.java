@@ -21,13 +21,24 @@
 
 package org.lamsfoundation.lams.contentrepository.service;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Iterator;
+import java.util.List;
+
 import junit.framework.TestCase;
 
+import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
 import org.lamsfoundation.lams.contentrepository.CrWorkspace;
+import org.lamsfoundation.lams.contentrepository.FileException;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.ITicket;
+import org.lamsfoundation.lams.contentrepository.IVersionedNode;
 import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
+import org.lamsfoundation.lams.contentrepository.NodeKey;
+import org.lamsfoundation.lams.contentrepository.NodeType;
 import org.lamsfoundation.lams.contentrepository.dao.IWorkspaceDAO;
+import org.lamsfoundation.lams.contentrepository.data.CRResources;
 import org.lamsfoundation.lams.test.AbstractLamsTestCase;
 
 
@@ -127,5 +138,55 @@ public class BaseTestCase extends AbstractLamsTestCase {
 		return getNode(INITIAL_WORKSPACE_ID, TEST_DATA_NODE_ID);
 	}
 	
+	protected void checkPackage(NodeKey keys) throws AccessDeniedException, ItemNotFoundException, FileException, IOException {
+		// try getting the start file - index.html
+		checkFileInPackage(keys, null);
+		
+		// now try another file in the package
+		checkFileInPackage(keys, CRResources.zipFileIncludesFilename);
+		
+		// check that there is the expected number of files in pacakge.
+		// expect an extra node over the number of files (for the package node)
+		List nodes = repository.getPackageNodes(ticket, keys.getUuid(), null);
+		assertTrue("Expected number of nodes found. Expected " 
+				+(CRResources.zipFileNumFiles+1)+" got "
+				+(nodes != null ? nodes.size() : 0 ),
+				nodes != null && nodes.size() == (CRResources.zipFileNumFiles+1));
+		Iterator iter = nodes.iterator();
+		if ( iter.hasNext() ) {
+			SimpleVersionedNode packageNode = (SimpleVersionedNode) iter.next();
+			assertTrue("First node is the package node.",
+				packageNode.isNodeType(NodeType.PACKAGENODE));
+		}
+		while ( iter.hasNext() ) {
+			SimpleVersionedNode childNode = (SimpleVersionedNode) iter.next();
+			assertTrue("Child node is a file node.",
+					childNode.isNodeType(NodeType.FILENODE));
+		}
+	}
+
+	/**
+	 * @param keys
+	 * @param relPath
+	 * @throws AccessDeniedException
+	 * @throws ItemNotFoundException
+	 * @throws FileException
+	 * @throws IOException
+	 */
+	protected void checkFileInPackage(NodeKey keys, String relPath) throws AccessDeniedException, ItemNotFoundException, FileException, IOException {
+		IVersionedNode node = repository.getFileItem(ticket, keys.getUuid(), keys.getVersion()); 
+		InputStream isOut = node.getFile(); 
+		assertTrue("Input stream is returned for file path "+relPath, isOut != null);
+		try {
+			int ch = isOut.read();
+			assertTrue("Input stream can be read, first byte is "+ch, ch != -1);
+		} catch ( IOException e ) {
+			throw e;
+		} finally {
+			if (isOut != null)
+				isOut.close();
+		}
+	}
+
 
 }

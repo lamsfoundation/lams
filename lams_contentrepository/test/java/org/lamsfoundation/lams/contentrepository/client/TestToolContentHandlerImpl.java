@@ -20,12 +20,15 @@ http://www.gnu.org/licenses/gpl.txt
 */
 package org.lamsfoundation.lams.contentrepository.client;
 
-import org.lamsfoundation.lams.contentrepository.ITicket;
+import java.io.IOException;
+import java.io.InputStream;
+
 import org.lamsfoundation.lams.contentrepository.IVersionedNode;
 import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.data.CRResources;
 import org.lamsfoundation.lams.contentrepository.service.BaseTestCase;
+import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
 
 /**
  * @author Fiona Malikoff
@@ -92,7 +95,8 @@ public class TestToolContentHandlerImpl extends BaseTestCase {
 //        }
 //    }
 
-    /* Creates an offline and online file, checks that the properties are correct and then deletes them. */
+    /* Creates an offline and online file, checks that the properties are correct and then deletes them. 
+     * Can't properly test the deletion as the session is still open. */
     public void testUploadFile() {
         try {
             NodeKey offlineNodeKey = handler.uploadFile(CRResources.getSingleFile(), CRResources.singleFileName, 
@@ -107,12 +111,6 @@ public class TestToolContentHandlerImpl extends BaseTestCase {
             assertTrue("Offline file is marked as offline", handler.isOffline(node));
             assertFalse("Offline file is not marked as online ", handler.isOnline(node));
             handler.deleteFile(uuid);
-            try {
-                node = handler.getFileNode(uuid);
-                fail("Expected ItemNotFoundException to be thrown when trying to access deleted offline file.");
-            } catch (ItemNotFoundException ie) {
-                assertTrue("Offline node cannot be retrieved after deletion",true);
-            }
             
             uuid = onlineNodeKey.getUuid();
             node = handler.getFileNode(uuid);
@@ -121,12 +119,6 @@ public class TestToolContentHandlerImpl extends BaseTestCase {
             assertFalse("Online file is not marked as offline", handler.isOffline(node));
             assertTrue("Online file is marked as online ", handler.isOnline(node));
             handler.deleteFile(uuid);
-            try {
-                node = handler.getFileNode(uuid);
-                fail("Expected ItemNotFoundException to be thrown when trying to access deleted online file.");
-            } catch (ItemNotFoundException ie) {
-                assertTrue("Online node cannot be retrieved after deletion", true);
-            }
 
             // check deleting a missing node doesn't cause a problem
             handler.deleteFile(uuid);
@@ -137,5 +129,33 @@ public class TestToolContentHandlerImpl extends BaseTestCase {
         }
     }
 
+    public void testUploadPackage() {
+        try {
+		    // unpack the zip file so we have a directory to play with 
+    	    String tempDir = ZipFileUtil.expandZip(CRResources.getZipFile(), CRResources.zipFileName);
+		    NodeKey nodeKey = handler.uploadPackage(tempDir, "index.html"); 
 
+		    Long uuid = nodeKey.getUuid();
+            IVersionedNode node = handler.getFileNode(uuid);
+            assertNotNull("Package node can be retrieved", node);
+
+            // try getting the default file
+    		InputStream isOut = node.getFile(); 
+    		assertTrue("Default input stream can be accessed", isOut != null);
+    		try {
+    			int ch = isOut.read();
+    			assertTrue("Input stream can be read, first byte is "+ch, ch != -1);
+    		} catch ( IOException e ) {
+    			throw e;
+    		} finally {
+    			if (isOut != null)
+    				isOut.close();
+    		}
+
+        } catch ( Exception e ) {
+            e.printStackTrace();
+            fail("testUploadFile threw exception "+e.getMessage());
+        }
+    }
+    
 }

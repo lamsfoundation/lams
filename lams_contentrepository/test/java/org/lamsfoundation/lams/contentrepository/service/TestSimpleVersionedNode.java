@@ -1,5 +1,5 @@
 /* 
-  Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@ import java.util.SortedSet;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.CrNodeVersionProperty;
+import org.lamsfoundation.lams.contentrepository.CrWorkspace;
 import org.lamsfoundation.lams.contentrepository.FileException;
 import org.lamsfoundation.lams.contentrepository.IValue;
 import org.lamsfoundation.lams.contentrepository.IVersionDetail;
@@ -454,6 +455,7 @@ public class TestSimpleVersionedNode extends BaseTestCase {
 		Long newUuid = uuid;
 		IVersionedNodeAdmin testNode = getTestNode();
 
+		assertNotNull("Test node may be accessed.", testNode);
 		try {
 
 			// first try adding the file to a data node. Should fail as that's not allowed
@@ -491,6 +493,8 @@ public class TestSimpleVersionedNode extends BaseTestCase {
 						e.getMessage().indexOf("Filename is required.")!=-1);
 			}
 
+			
+			fileNode = nodeFactory.createFileNode(getWorkspace(INITIAL_WORKSPACE_ID), null, null, is, filename, null, null);
 			fileNode.setFile(is, filename, null);
 			saveCheckNode("File", NodeType.FILENODE, fileNode);
 			newUuid = fileNode.getUUID();
@@ -560,7 +564,7 @@ public class TestSimpleVersionedNode extends BaseTestCase {
 			newNode.save();
 			fail("NoSuchNodeTypeException should have been thrown");
 		} catch (Exception e) {
-			if ( NoSuchNodeTypeException.class.isInstance(e) ) {
+			if ( ValidationException.class.isInstance(e) ) {
 				assertTrue("NoSuchNodeTypeException thrown as expected ",true);
 			} else {
 				e.printStackTrace();
