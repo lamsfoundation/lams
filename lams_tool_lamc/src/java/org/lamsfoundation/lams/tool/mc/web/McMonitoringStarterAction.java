@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.tool.mc.web;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -39,6 +40,7 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McApplicationException;
+import org.lamsfoundation.lams.tool.mc.McComparator;
 import org.lamsfoundation.lams.tool.mc.McUtils;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
@@ -122,6 +124,139 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 			return (mapping.findForward(ERROR_LIST));
 		
 		request.getSession().setAttribute(CURRENT_MONITORING_TAB, "summary");
+		request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(false).toString());
+		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
+		
+		request.getSession().setAttribute(ACTIVE_MODULE, DEFINE_LATER);
+		request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(false));
+		request.getSession().setAttribute(SHOW_AUTHORING_TABS,new Boolean(false).toString());			
+
+		Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
+		logger.debug("toolContentId: " + toolContentId);
+		
+		IMcService mcService = (IMcService)request.getSession().getAttribute(TOOL_SERVICE);
+		logger.debug("mcService: " + mcService);
+		if (mcService == null)
+		{
+			logger.debug("will retrieve mcService");
+			mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+		    logger.debug("retrieving mcService from cache: " + mcService);
+		}
+
+		McContent mcContent=mcService.retrieveMc(toolContentId);
+		logger.debug("mcContent:" + mcContent);
+		boolean isContentInUse=McUtils.isContentInUse(mcContent);
+		logger.debug("isContentInUse:" + isContentInUse);
+		
+		request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(false).toString());
+		if (isContentInUse == true)
+		{
+			//McUtils.cleanUpSessionAbsolute(request);
+			logger.debug("monitoring url does not allow editActivity since the content is in use.");
+	    	persistError(request,"error.content.inUse");
+	    	request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(true).toString());
+		}
+		
+	    /* it is possible that no users has ever logged in for the activity yet*/ 
+	    int countAllUsers=mcService.getTotalNumberOfUsers();
+		logger.debug("countAllUsers: " + countAllUsers);
+		
+		
+		request.getSession().setAttribute(USER_EXCEPTION_NO_STUDENT_ACTIVITY, new Boolean(false));
+		if (countAllUsers == 0)
+		{
+	    	logger.debug("error: countAllUsers is 0");
+	    	request.getSession().setAttribute(USER_EXCEPTION_NO_STUDENT_ACTIVITY, new Boolean(true));
+		}
+		
+		/* it is possible that no users has ever attempted the activity yet*/
+		int totalAttemptCount=MonitoringUtil.getTotalAttemptCount(request);
+		logger.debug("totalAttemptCount: " + totalAttemptCount);
+		if (totalAttemptCount == 0)
+		{
+	    	logger.debug("error: totalAttemptCount is 0");
+	    	request.getSession().setAttribute(USER_EXCEPTION_NO_STUDENT_ACTIVITY, new Boolean(true));
+		}
+		
+		
+		request.getSession().setAttribute(IS_REVISITING_USER, new Boolean(false));
+		request.getSession().setAttribute(RICHTEXT_TITLE,mcContent.getTitle());
+		request.getSession().setAttribute(RICHTEXT_INSTRUCTIONS,mcContent.getInstructions());
+		request.getSession().setAttribute(PASSMARK, mcContent.getPassMark()); //Integer
+		
+    	Map mapQuestionsContent=AuthoringUtil.rebuildQuestionMapfromDB(request, toolContentId);
+    	logger.debug("mapQuestionsContent:" + mapQuestionsContent);
+    	request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
+    	logger.debug("starter initialized the existing Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
+    	
+    	Map mapWeights= AuthoringUtil.rebuildWeightsMapfromDB(request, toolContentId);
+    	logger.debug("Check the mapWeights: " + mapWeights);
+    	request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);
+    	
+    	Map mapGeneralOptionsContent= new TreeMap(new McComparator());
+		request.getSession().setAttribute(MAP_GENERAL_OPTIONS_CONTENT, mapGeneralOptionsContent);
+		
+		Map mapGeneralSelectedOptionsContent= new TreeMap(new McComparator());
+		request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapGeneralSelectedOptionsContent);
+		
+		Map mapStartupGeneralOptionsContent= new TreeMap(new McComparator());
+		request.getSession().setAttribute(MAP_STARTUP_GENERAL_OPTIONS_CONTENT, mapStartupGeneralOptionsContent);
+		
+		Map mapStartupGeneralSelectedOptionsContent= new TreeMap(new McComparator());
+		request.getSession().setAttribute(MAP_STARTUP_GENERAL_SELECTED_OPTIONS_CONTENT, mapStartupGeneralSelectedOptionsContent);
+		
+		Map mapDisabledQuestions= new TreeMap(new McComparator());
+		request.getSession().setAttribute(MAP_DISABLED_QUESTIONS, mapDisabledQuestions);
+		
+		Map mapCheckBoxStates= new TreeMap(new McComparator());
+		mapCheckBoxStates.put("1" ,"INCORRECT");
+		mapCheckBoxStates.put("2" ,"CORRECT");
+		request.getSession().setAttribute(MAP_CHECKBOX_STATES, mapCheckBoxStates);
+
+		Map mapSelectedOptions= new TreeMap(new McComparator());
+		request.getSession().setAttribute(MAP_SELECTED_OPTIONS, mapSelectedOptions);
+		
+		Map mapIncorrectFeedback= new TreeMap(new McComparator());
+		request.getSession().setAttribute(MAP_INCORRECT_FEEDBACK, mapIncorrectFeedback);
+		
+		Map mapCorrectFeedback= new TreeMap(new McComparator());
+		request.getSession().setAttribute(MAP_CORRECT_FEEDBACK, mapCorrectFeedback);
+		
+		List listUploadedOffFiles= mcService.retrieveMcUploadedOfflineFilesName(mcContent.getUid());
+		logger.debug("existing listUploadedOfflineFileNames:" + listUploadedOffFiles);
+		request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILENAMES,listUploadedOffFiles);
+		
+		List listUploadedOnFiles= mcService.retrieveMcUploadedOnlineFilesName(mcContent.getUid());
+		logger.debug("existing listUploadedOnlineFileNames:" + listUploadedOnFiles);
+		request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILENAMES,listUploadedOnFiles);
+		
+		List listOfflineFilesMetaData=mcService.getOfflineFilesMetaData(mcContent.getUid());
+	    logger.debug("existing listOfflineFilesMetaData, to be structured as McAttachmentDTO: " + listOfflineFilesMetaData);
+	    listOfflineFilesMetaData=AuthoringUtil.populateMetaDataAsAttachments(listOfflineFilesMetaData);
+	    logger.debug("populated listOfflineFilesMetaData: " + listOfflineFilesMetaData);
+	    request.getSession().setAttribute(LIST_OFFLINEFILES_METADATA, listOfflineFilesMetaData);
+	    
+	    List listUploadedOfflineFileNames=AuthoringUtil.populateMetaDataAsFilenames(listOfflineFilesMetaData);
+	    logger.debug("returned from db listUploadedOfflineFileNames: " + listUploadedOfflineFileNames);
+	    request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILENAMES, listUploadedOfflineFileNames);
+	    
+	    /*process online files metadata*/
+	    List listOnlineFilesMetaData=mcService.getOnlineFilesMetaData(mcContent.getUid());
+	    logger.debug("existing listOnlineFilesMetaData, to be structured as McAttachmentDTO: " + listOnlineFilesMetaData);
+	    listOnlineFilesMetaData=AuthoringUtil.populateMetaDataAsAttachments(listOnlineFilesMetaData);
+	    logger.debug("populated listOnlineFilesMetaData: " + listOnlineFilesMetaData);
+	    request.getSession().setAttribute(LIST_ONLINEFILES_METADATA, listOnlineFilesMetaData);
+	    
+	    List listUploadedOnlineFileNames=AuthoringUtil.populateMetaDataAsFilenames(listOnlineFilesMetaData);
+	    logger.debug("returned from db listUploadedOnlineFileNames: " + listUploadedOnlineFileNames);
+	    request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILENAMES, listUploadedOnlineFileNames);
+	    
+		logger.debug("end of execute: ");
+		logger.debug("SUMMARY_TOOL_SESSIONS_ID: " + request.getSession().getAttribute(SUMMARY_TOOL_SESSIONS_ID));
+		logger.debug("SUMMARY_TOOL_SESSIONS: " + request.getSession().getAttribute(SUMMARY_TOOL_SESSIONS));
+		logger.debug("SELECTION_CASE: " + request.getSession().getAttribute(SELECTION_CASE));
+		logger.debug("LIST_MONITORED_ANSWERS_CONTAINER_DTO: " + request.getSession().getAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO));
+
 	    return (mapping.findForward(LOAD_MONITORING_CONTENT));	
 	}
 
@@ -138,6 +273,8 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 	 */
 	public boolean initialiseMonitoringData(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
 	{
+		logger.debug("initialising MonitoringData...");
+		
 		IMcService mcService = (IMcService)request.getSession().getAttribute(TOOL_SERVICE);
 		logger.debug("mcService: " + mcService);
 		if (mcService == null)
@@ -209,7 +346,7 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 	    /* it is possible that no users has ever logged in for the activity yet*/ 
 	    int countAllUsers=mcService.getTotalNumberOfUsers();
 		logger.debug("countAllUsers: " + countAllUsers);
-		
+		request.getSession().setAttribute(USER_EXCEPTION_NO_STUDENT_ACTIVITY, new Boolean(false));
 		if (countAllUsers == 0)
 		{
 	    	logger.debug("error: countAllUsers is 0");
@@ -248,6 +385,12 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 		request.getSession().setAttribute(LOWEST_MARK, new Integer(lowestMark).toString());
 		request.getSession().setAttribute(AVERAGE_MARK, new Integer(averageMark).toString());
 		/* ends here. */
+		
+		logger.debug("end of initialiseMonitoringData: ");
+		logger.debug("SUMMARY_TOOL_SESSIONS_ID: " + request.getSession().getAttribute(SUMMARY_TOOL_SESSIONS_ID));
+		logger.debug("SUMMARY_TOOL_SESSIONS: " + request.getSession().getAttribute(SUMMARY_TOOL_SESSIONS));
+		logger.debug("SELECTION_CASE: " + request.getSession().getAttribute(SELECTION_CASE));
+		logger.debug("LIST_MONITORED_ANSWERS_CONTAINER_DTO: " + request.getSession().getAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO));
 		return true;
 	}
 

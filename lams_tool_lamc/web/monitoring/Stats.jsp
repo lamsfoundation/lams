@@ -31,8 +31,6 @@ http://www.gnu.org/licenses/gpl.txt
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
-
-	<h2><font size=2> <bean:message key="button.stats"/> </font> </h2>
 	<div id="datatablecontainer">
 		<table class="forms">
 			<tr>

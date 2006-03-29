@@ -138,7 +138,19 @@ public class McExportForm extends ActionForm {
     
     public void populateForm(McContent content)
     {
-        setTitle(content.getTitle());
-        setContent(content.getContent());
+    	String strTitle=null;
+    	if (content.getTitle() == null)
+    		strTitle="";
+    	else
+    		strTitle=content.getTitle();
+        setTitle(strTitle);
+        
+
+        String strContent=null;
+        if (content.getContent() == null)
+        	strContent="";
+        else
+        	strContent=content.getContent();
+        setContent(strContent);
     }
 }

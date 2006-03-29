@@ -19,7 +19,6 @@ USA
 http://www.gnu.org/licenses/gpl.txt
 --%>
 
-<%@ include file="../sharing/share.jsp" %>
 <%@ taglib uri="tags-bean" prefix="bean"%> 
 <%@ taglib uri="tags-html" prefix="html"%>
 <%@ taglib uri="tags-logic" prefix="logic" %>
@@ -39,6 +38,9 @@ http://www.gnu.org/licenses/gpl.txt
 		tabs.add("label.instructions");
 		pageContext.setAttribute("tabs", tabs);
 		
+		Set tabsBasic = new LinkedHashSet();
+		tabsBasic.add("label.basic");
+		pageContext.setAttribute("tabsBasic", tabsBasic);
 	%>
 
 <c:set var="lams"><lams:LAMSURL/></c:set>
@@ -48,22 +50,20 @@ http://www.gnu.org/licenses/gpl.txt
 	<html:html locale="true">
 	<head>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-		<title> <bean:message key="label.authoring"/> </title>
-    <link href="<c:out value="${tool}"/>author_page/css/aqua.css" rel="stylesheet" type="text/css">		
-	<script lang="javascript">
-	var imgRoot="<c:out value="${lams}"/>images/";
-	var themeName="aqua";
-	</script>
-	<script type="text/javascript" src="<c:out value="${tool}"/>author_page/js/tabcontroller.js"></script>    
-	<script type="text/javascript" src="<c:out value="${lams}"/>includes/javascript/common.js"></script>
-	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/xmlrequest.js'/>"></script>
+	<title> <bean:message key="label.authoring"/> </title>
 	
-	<!-- this is the custom CSS for the tool -->
-	<link href="<c:out value="${tool}"/>css/tool_custom.css" rel="stylesheet" type="text/css">
+    <link href="<c:out value="${tool}"/>author_page/css/aqua.css" rel="stylesheet" type="text/css">
+    
+	<!-- this is the custom CSS for hte tool -->
+	<link href="${tool}author_page/css/tool_custom.css" rel="stylesheet" type="text/css">
+
+	<!-- depending on user / site preference this will get changed probbably use passed in variable from flash to select which one to use-->
+
+ 	<!-- ******************** FCK Editor related javascript & HTML ********************** -->
     <script type="text/javascript" src="${lams}fckeditor/fckeditor.js"></script>
     <script type="text/javascript" src="${tool}author_page/js/fckcontroller.js"></script>
     <link href="${tool}author_page/css/fckeditor_style.css" rel="stylesheet" type="text/css">
-	
+
 	<script language="JavaScript" type="text/JavaScript">
 
 		function submitModifyQuestion(questionIndexValue, actionMethod) 
@@ -95,7 +95,7 @@ http://www.gnu.org/licenses/gpl.txt
 		  else if (innerWidth!=document.MM_pgW || innerHeight!=document.MM_pgH) location.reload();
 		}
 
-	    	var imgRoot="${lams}images/";
+    	var imgRoot="${lams}images/";
 	    var themeName="aqua";
         
         function init(){
@@ -112,7 +112,6 @@ http://www.gnu.org/licenses/gpl.txt
             initEditor("richTextInstructions");
             initEditor("richTextOnlineInstructions");
             initEditor("richTextOfflineInstructions");
-            
         }     
         
         function doSelectTab(tabId) {
@@ -129,6 +128,11 @@ http://www.gnu.org/licenses/gpl.txt
         }
 	
 	</script>
+	
+	<script type="text/javascript" src="<c:out value="${tool}"/>author_page/js/tabcontroller.js"></script>    
+	<script type="text/javascript" src="<c:out value="${lams}"/>includes/javascript/common.js"></script>
+	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/xmlrequest.js'/>"></script>
+	
 </head>
 <body onLoad="init();">
 
@@ -139,15 +143,6 @@ http://www.gnu.org/licenses/gpl.txt
 	<html:hidden property="toolContentID"/>
 	<html:hidden property="currentTab" styleId="currentTab" />
 	
-
-	<c:if test="${sessionScope.activeModule == 'defineLater'}"> 			
-		<c:if test="${sessionScope.editOptionsMode == 0}"> 			
-			<jsp:include page="/authoring/BasicContent.jsp" />
-		</c:if> 				
-		<c:if test="${sessionScope.editOptionsMode == 1}"> 			
-			<jsp:include page="/authoring/OptionsContent.jsp" />
-		</c:if> 				
-	</c:if> 			
 	<c:if test="${sessionScope.activeModule != 'defineLater' }"> 			
 		<lams:Tabs collection="${tabs}" useKey="true" control="true"/>
 		<!-- end tab buttons -->
@@ -165,7 +160,16 @@ http://www.gnu.org/licenses/gpl.txt
 		<lams:TabBody id="3" titleKey="label.instructions" page="InstructionsContent.jsp" />
 		<!-- end of content (Instructions) -->
 	</c:if> 			
-
+	
+	<c:if test="${sessionScope.activeModule == 'defineLater' }"> 			
+		<lams:Tabs collection="${tabsBasic}" useKey="true" control="true"/>
+		<!-- end tab buttons -->
+		<div class="tabbody">
+		
+		<!-- tab content 1 (Basic) -->
+		<lams:TabBody id="1" titleKey="label.basic" page="Basic.jsp"/>
+		<!-- end of content (Basic) -->
+	</c:if> 			
 	
 	<lams:HTMLEditor/>	
 	</html:form>

@@ -31,8 +31,6 @@ http://www.gnu.org/licenses/gpl.txt
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
-	<h2><font size=2> <bean:message key="button.summary"/> </font> </h2>
-	<div id="datatablecontainer">
 		<c:if test="${sessionScope.userExceptionNoStudentActivity == 'true'}"> 	
 				<table class="forms" align="center">
 					<tr> 
@@ -80,6 +78,8 @@ http://www.gnu.org/licenses/gpl.txt
 							</td> 
 						<tr>					
 					
+
+					
 					<c:forEach var="currentDto" items="${sessionScope.listMonitoredAnswersContainerDto}">
 			  	 		<c:set var="currentQuestionId" scope="request" value="${currentDto.questionUid}"/>
 			  	 		<tr>
@@ -87,6 +87,7 @@ http://www.gnu.org/licenses/gpl.txt
 			  	 		</tr>
 						<tr>			
 							<td NOWRAP valign=top align=left><b> <font size=2> <bean:message key="label.question.col"/> </b>
+							<font size=2>
 								<c:out value="${currentDto.question}"/>
 							</font> </td>
 						</tr>	
@@ -148,6 +149,6 @@ http://www.gnu.org/licenses/gpl.txt
 					</c:forEach>		  	
 				</table>
 		</c:if>						
-	</div>
+
 
 	

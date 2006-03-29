@@ -168,6 +168,7 @@ public class McExportAction extends LamsDispatchAction implements McAppConstants
 		}
                
         exportForm.populateForm(mcContent);
+        logger.debug("ppulated from with mcContent : " + mcContent.getTitle() + " and " + mcContent.getContent());
         return mapping.findForward(EXPORT_PORTFOLIO);
     }
     

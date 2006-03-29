@@ -709,15 +709,18 @@ public class McAction extends LamsDispatchAction implements McAppConstants
         			logger.debug("listDefaultOption: " + listDefaultOption);
         			
         			/** normally iterates only once */
-        			Iterator itDefaultOption=listDefaultOption.iterator();
-        	    	Long mapIndex=new Long(1);
-        	    	while (itDefaultOption.hasNext())
-        	    	{
-        	    		McOptsContent mcOptsContent=(McOptsContent)itDefaultOption.next();
-        	    		logger.debug("option text:" + mcOptsContent.getMcQueOptionText());
-        	    		mapOptionsContent.put(mapIndex.toString(),mcOptsContent.getMcQueOptionText());
-        	    		mapIndex=new Long(mapIndex.longValue()+1);
-        	    	}
+        			if (listDefaultOption != null)
+        			{
+            			Iterator itDefaultOption=listDefaultOption.iterator();
+            	    	Long mapIndex=new Long(1);
+            	    	while (itDefaultOption.hasNext())
+            	    	{
+            	    		McOptsContent mcOptsContent=(McOptsContent)itDefaultOption.next();
+            	    		logger.debug("option text:" + mcOptsContent.getMcQueOptionText());
+            	    		mapOptionsContent.put(mapIndex.toString(),mcOptsContent.getMcQueOptionText());
+            	    		mapIndex=new Long(mapIndex.longValue()+1);
+            	    	}
+        			}
         	    	logger.debug("mapOptionsContent from default content: " + mapOptionsContent);
         	    	request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
         			logger.debug("MAP_OPTIONS_CONTENT reconstructed from default option content" );
@@ -749,15 +752,18 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     			logger.debug("listDefaultOption: " + listDefaultOption);
     			
     			/* normally iterates only once */
-    			Iterator itDefaultOption=listDefaultOption.iterator();
-    	    	Long mapIndex=new Long(1);
-    	    	while (itDefaultOption.hasNext())
-    	    	{
-    	    		McOptsContent mcOptsContent=(McOptsContent)itDefaultOption.next();
-    	    		logger.debug("option text:" + mcOptsContent.getMcQueOptionText());
-    	    		mapOptionsContent.put(mapIndex.toString(),mcOptsContent.getMcQueOptionText());
-    	    		mapIndex=new Long(mapIndex.longValue()+1);
-    	    	}
+    			if (listDefaultOption != null)
+    			{
+        			Iterator itDefaultOption=listDefaultOption.iterator();
+        	    	Long mapIndex=new Long(1);
+        	    	while (itDefaultOption.hasNext())
+        	    	{
+        	    		McOptsContent mcOptsContent=(McOptsContent)itDefaultOption.next();
+        	    		logger.debug("option text:" + mcOptsContent.getMcQueOptionText());
+        	    		mapOptionsContent.put(mapIndex.toString(),mcOptsContent.getMcQueOptionText());
+        	    		mapIndex=new Long(mapIndex.longValue()+1);
+        	    	}
+    			}
     	    	logger.debug("mapOptionsContent from default content: " + mapOptionsContent);
     	    	request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
     			logger.debug("MAP_OPTIONS_CONTENT reconstructed from default option content" );
@@ -1705,24 +1711,41 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		int passmark=0;
 		
 		logger.debug("isQuestionsSequenced: " +  mcAuthoringForm.getQuestionsSequenced());
-		if (mcAuthoringForm.getQuestionsSequenced().equalsIgnoreCase(ON))
-			isQuestionsSequenced=true;
+		
+		if (mcAuthoringForm.getQuestionsSequenced() != null)
+		{
+			if (mcAuthoringForm.getQuestionsSequenced().equalsIgnoreCase(ON))
+				isQuestionsSequenced=true;	
+		}
+		
 		
 		logger.debug("isSynchInMonitor: " +  mcAuthoringForm.getSynchInMonitor());
-		if (mcAuthoringForm.getSynchInMonitor().equalsIgnoreCase(ON))
-			isSynchInMonitor=true;
+		if (mcAuthoringForm.getSynchInMonitor() != null)
+		{
+			if (mcAuthoringForm.getSynchInMonitor().equalsIgnoreCase(ON))
+				isSynchInMonitor=true;
+		}
 		
 		logger.debug("isUsernameVisible: " +  mcAuthoringForm.getUsernameVisible());
-		if (mcAuthoringForm.getUsernameVisible().equalsIgnoreCase(ON))
-			isUsernameVisible=true;
+		if (mcAuthoringForm.getUsernameVisible() != null)
+		{
+			if (mcAuthoringForm.getUsernameVisible().equalsIgnoreCase(ON))
+				isUsernameVisible=true;
+		}
 		
 		logger.debug("isRetries: " +  mcAuthoringForm.getRetries());
-		if (mcAuthoringForm.getRetries().equalsIgnoreCase(ON))
-			isRetries=true;
+		if (mcAuthoringForm.getRetries() != null)
+		{
+			if (mcAuthoringForm.getRetries().equalsIgnoreCase(ON))
+				isRetries=true;
+		}
 		
 		logger.debug("isSln" +  mcAuthoringForm.getSln());
-		if (mcAuthoringForm.getSln().equalsIgnoreCase(ON))
-			isSln=true;
+		if (mcAuthoringForm.getSln() != null)
+		{
+			if (mcAuthoringForm.getSln().equalsIgnoreCase(ON))
+				isSln=true;
+		}
 		
 		logger.debug("passmark: " +  mcAuthoringForm.getPassmark());
 		
@@ -1808,8 +1831,11 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		request.getSession().setAttribute(PASSMARK, new Integer(passmark).toString());
 				
 		logger.debug("isShowFeedback: " +  mcAuthoringForm.getShowFeedback());
-		if (mcAuthoringForm.getShowFeedback().equalsIgnoreCase(ON))
-			isShowFeedback=true;
+		if (mcAuthoringForm.getShowFeedback() != null)
+		{
+			if (mcAuthoringForm.getShowFeedback().equalsIgnoreCase(ON))
+				isShowFeedback=true;
+		}
 		    	
 		String richTextTitle=(String) request.getSession().getAttribute(RICHTEXT_TITLE);
 		logger.debug("richTextTitle: " + richTextTitle);
@@ -1862,24 +1888,44 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		McContent mcContent=mcService.retrieveMc(toolContentId);
 		logger.debug("existing mcContent:" + mcContent);
 		
+		String activeModule=(String)request.getSession().getAttribute(ACTIVE_MODULE);
+		logger.debug("activeModule:" + activeModule);
+		
+		
 		if (mcContent != null)
 		{
 			logger.debug("updating mcContent title and instructions:" + mcContent);
 			mcContent.setTitle(richTextTitle);
 			mcContent.setInstructions(richTextInstructions);
-			mcContent.setQuestionsSequenced(isQuestionsSequenced); 
-		    mcContent.setSynchInMonitor(isSynchInMonitor);
-		    mcContent.setUsernameVisible(isUsernameVisible);
-		    mcContent.setRetries(isRetries);
+			
+			if (mcAuthoringForm.getQuestionsSequenced() != null)
+				mcContent.setQuestionsSequenced(isQuestionsSequenced);
+			
+			if (mcAuthoringForm.getSynchInMonitor() != null)
+				mcContent.setSynchInMonitor(isSynchInMonitor);
+		
+			if (mcAuthoringForm.getUsernameVisible() != null)
+				mcContent.setUsernameVisible(isUsernameVisible);
+			
+			if (mcAuthoringForm.getRetries() != null)
+				mcContent.setRetries(isRetries);
+			
+			if (mcAuthoringForm.getShowFeedback() != null)
+				mcContent.setShowFeedback(isShowFeedback);
+			
+			if (mcAuthoringForm.getSln() != null)
+				mcContent.setShowReport(isSln);
+
 		    mcContent.setPassMark(new Integer(passmark));
-		    mcContent.setShowFeedback(isShowFeedback);
-		    mcContent.setShowReport(isSln);
-		    mcContent.setEndLearningMessage("Thanks");
-		    mcContent.setReportTitle(richTextReportTitle);
-		    mcContent.setMonitoringReportTitle("Monitoring Report");
-		    mcContent.setEndLearningMessage(richTextEndLearningMessage);
-		    mcContent.setOfflineInstructions(richTextOfflineInstructions);
-		    mcContent.setOnlineInstructions(richTextOnlineInstructions);
+		    if (activeModule.equals(AUTHORING))
+		    {
+		    	mcContent.setOfflineInstructions(richTextOfflineInstructions);
+			    mcContent.setOnlineInstructions(richTextOnlineInstructions);
+			    mcContent.setReportTitle(richTextReportTitle);
+			    mcContent.setMonitoringReportTitle("Monitoring Report");
+			    mcContent.setEndLearningMessage(richTextEndLearningMessage);
+		    }
+			    
 		}
 		else
 		{

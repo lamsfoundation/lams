@@ -702,7 +702,6 @@ public abstract class McUtils implements McAppConstants {
     	request.getSession().removeAttribute(MAP_USER_RESPONSES);
     	request.getSession().removeAttribute(MAP_MAIN_REPORT);
     	request.getSession().removeAttribute(MAP_STATS);
-    	//request.getSession().removeAttribute(CURRENT_MONITORING_TAB);
     	request.getSession().removeAttribute(REPORT_TITLE_MONITOR);
     	request.getSession().removeAttribute(MONITOR_USER_ID);
     	request.getSession().removeAttribute(MONITORING_REPORT);
@@ -734,7 +733,9 @@ public abstract class McUtils implements McAppConstants {
     	logger.debug("completely cleaned the session.");
     }
     
-    
+    /**
+     *removes attributes except USER_EXCEPTION_NO_STUDENT_ACTIVITY 
+     */
     public static void cleanUpUserExceptions(HttpServletRequest request)
     {
     	request.getSession().removeAttribute(USER_EXCEPTION_WRONG_FORMAT);
@@ -758,7 +759,6 @@ public abstract class McUtils implements McAppConstants {
     	request.getSession().removeAttribute(USER_EXCEPTION_MONITORINGTAB_CONTENTID_REQUIRED);
     	request.getSession().removeAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP);
     	request.getSession().removeAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS);    	
-    	request.getSession().removeAttribute(USER_EXCEPTION_NO_STUDENT_ACTIVITY);
     	request.getSession().removeAttribute(USER_EXCEPTION_MODE_REQUIRED);
     	request.getSession().removeAttribute(USER_EXCEPTION_CONTENT_IN_USE);
     	request.getSession().removeAttribute(USER_EXCEPTION_CONTENT_BEING_MODIFIED);

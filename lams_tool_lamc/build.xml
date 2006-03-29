@@ -258,6 +258,8 @@
 						<include name="authoring/*"/>
 						<include name="learning/*"/>
 						<include name="sharing/*"/>	   				
+						<include name="css/*"/>	   					   				
+						<include name="includes/*"/>	   					   				
 		   				<include name="monitoring/*"/>
 	   					<include name="images/**"/>
 		   				<include name="css/**"/>

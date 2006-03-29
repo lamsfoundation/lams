@@ -31,6 +31,13 @@ http://www.gnu.org/licenses/gpl.txt
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
+		    	<table align=center> 	  
+					<tr> <td>
+						<jsp:include page="/McErrorBox.jsp" />
+					</td> </tr>
+				</table>
+
+
 				<table class="forms" align=center>
 					<tr>
 	 				 	<td class="formlabel" align=right valign=top> 

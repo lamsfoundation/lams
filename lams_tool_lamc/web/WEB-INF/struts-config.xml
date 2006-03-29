@@ -462,7 +462,7 @@
 		      scope="session"
 		      parameter="mode"
 		      unknown="false"
-		      validate="true"
+		      validate="false"
 	    >
 		<exception
 	        key="error.exception.McApplication"

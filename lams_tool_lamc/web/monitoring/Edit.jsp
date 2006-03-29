@@ -31,35 +31,18 @@ http://www.gnu.org/licenses/gpl.txt
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
-	<div id="datatablecontainer">
-		<table class="forms">
-			<tr>
-				<td>
-					<table align="center">
-						<tr> 
-							<td NOWRAP valign=top>
-				  				<b> <font size=2> <bean:message key="label.offlineInstructions.col" /> </font> </b>
-				  			</td>
-							<td NOWRAP valign=top>
-								  <font size=2> <c:out value="${richTextOfflineInstructions}" escapeXml="false" />	</font>					  
-							</td> 
-						</tr>
-						
-						<tr>
-							<td colspan=2> &nbsp&nbsp&nbsp </td>
-						</tr>
-				
-						<tr> 
-							<td NOWRAP valign=top>
-				  				<b> <font size=2> <bean:message key="label.onlineInstructions.col" /> </font></b>
-				  			</td>
-							<td NOWRAP valign=top>
-								  <font size=2> <c:out value="${sessionScope.richTextOnlineInstructions}" escapeXml="false" />	</font>					  
-							</td> 
-						</tr>
+		<c:if test="${isMonitoredContentInUse != 'true'}"> 			
+			<c:if test="${sessionScope.editOptionsMode == 0}"> 			
+				<jsp:include page="/authoring/BasicContent.jsp" />
+			</c:if> 				
+			<c:if test="${sessionScope.editOptionsMode == 1}"> 			
+				<jsp:include page="/authoring/OptionsContent.jsp" />
+			</c:if> 				
+		</c:if> 											
+		<c:if test="${isMonitoredContentInUse == 'true'}"> 			
+					<table border="0" cellspacing="2" cellpadding="2">									
+						<tr> <td NOWRAP valign=top>
+								<font size=2> <bean:message key="error.content.inUse"/> </font>
+						</td> </tr>
 					</table>
-				</td>
-			</tr>
-		</table>
-	</div>		
-
+		</c:if> 																									

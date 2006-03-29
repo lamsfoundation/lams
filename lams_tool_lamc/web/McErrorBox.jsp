@@ -201,20 +201,4 @@ http://www.gnu.org/licenses/gpl.txt
 </table>
 
 
-<!--
-<logic-el:messagesPresent> 
-<table border="0" cellspacing="2" cellpadding="2" summary="This table is being used for layout purposes only">
-<tr>
-	<td width="10%"  align="right" >
-		<img src="<c:out value="${tool}"/>images/error.jpg" alt="Error occured"/>
-	</td>
-	<td width="90%" valign="middle" class="body" colspan="2">
-		 <html:messages id="error" message="false"> 
-			<font size=2> <c:out value="${error}" escapeXml="false"/> </font> <br>
-		 </html:messages> 
-	</td>
-</tr>
-</logic-el:messagesPresent>
--->
-
 
