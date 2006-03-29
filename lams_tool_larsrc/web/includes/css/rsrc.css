@@ -21,3 +21,7 @@
 	text-align: center;
 	background-color:#B4C8FE;
 }
+
+div.message img.icon {
+    vertical-align: middle;
+}

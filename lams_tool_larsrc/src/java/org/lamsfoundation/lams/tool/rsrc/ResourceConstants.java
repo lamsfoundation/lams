@@ -36,9 +36,18 @@ public class ResourceConstants {
 	
 	//for parameters' name
 	public static final String PARAM_TOOL_CONTENT_ID = "toolContentID";
+	public static final String PARAM_ITEM_INDEX = "itemUid";
 	
 	//for request attribute name
-	public static final String AUTHORING_RESOURCE_LIST = "resourceList";
-	public static final String INSTRUCTION_ATTACHMENT_LIST = "instructionAttachmentList";
+	public static final String ATTR_INSTRUCTION_LIST = "instructionList";
+	public static final String ATTR_RESOURCE_LIST = "resourceList";
+	public static final String ATT_ATTACHMENT_LIST = "instructionAttachmentList";
+	public static final String ATTR_DELETED_RESOURCE_LIST = "deleteResourceList";
+	public static final String ATTR_DELETED_ATTACHMENT_LIST = "deletedAttachmmentList";
+	
+	//error message keys
+	public static final String ERROR_MSG_TITLE_BLANK = "error.resource.item.title.blank";
+	public static final String ERROR_MSG_URL_BLANK = "error.resource.item.url.blank";
+	public static final String ERROR_MSG_FILE_BLANK = "error.resource.item.file.blank";
 
 }

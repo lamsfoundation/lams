@@ -18,6 +18,27 @@
 		area.style.height="0px";
 		area.style.display="none";
 	}
+	function launchPopup(url,title) {
+		var wd = null;
+		if(wd && wd.open && !wd.closed){
+			wd.close();
+		}
+		wd = window.open(url,title,'resizable,width=796,height=570,scrollbars');
+		wd.window.focus();
+	}
+	function verifyUrl(myUrl, title){
+		launchPopup(myUrl,title);
+	}
+	function previewItem(idx){
+	}
+	function editItem(idx){
+		var url = "<c:url value="/authoring/editItem.do?itemIndex="/>" + idx;
+		
+	}
+	function deleteItem(idx){
+		var url = "<c:url value="/authoring/deleteItem.do?itemUid="/>" + idx;
+		
+	}
 </script>
 	<!---------------------------Basic Tab Content ------------------------>
 	<table class="forms">
@@ -33,7 +54,7 @@
 		</tr>
 		<tr>
 			<td colspan="2">
-				<div id="messageListArea">
+				<div id="resourceListArea">
 						<%@ include file="/pages/authoring/parts/itemlist.jsp"%>
 				</div>
 			</td>
@@ -43,7 +64,7 @@
 				<table class="forms">
 					<tr>
 						<td>
-							<a href="javascript:showMessage('<html:rewrite page="/authoring/addUrl.do"/>');">
+							<a href="javascript:showMessage('<html:rewrite page="/authoring/addUrlInit.do"/>');">
 								<fmt:message key="label.authoring.basic.add.url" />
 							</a>
 						</td>
@@ -73,5 +94,7 @@
 				</iframe>
 			</td>
 		</tr>
-		<tr><td colspan="2"><html:errors/></td></tr>
+		<tr><td colspan="2">
+			<%@ include file="/common/messages.jsp" %>
+		</td></tr>
 	</table>

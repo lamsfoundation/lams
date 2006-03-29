@@ -10,8 +10,7 @@
 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/prototype.js'/>"></script>
 	
 <script type="text/javascript">
-    var insTargetDiv = "instructionArea";
-    var remvTargetDiv = "instructionArea";
+    var instructionTargetDiv = "instructionArea";
 	function removeInstruction(idx){
 		//var id = "instructionItem" + idx;
 		//Element.remove(id);
@@ -20,7 +19,7 @@
 	    var param = Form.serialize("instructionForm")+"&removeIdx="+idx+"&reqID="+reqIDVar.getTime();
 	    removeInstructionLoading();
 	    var myAjax = new Ajax.Updater(
-		    	remvTargetDiv,
+		    	instructionTargetDiv,
 		    	url,
 		    	{
 		    		method:'get',
@@ -36,7 +35,7 @@
 	    var param = Form.serialize("instructionForm")+"&reqID="+reqIDVar.getTime();
 		addInstructionLoading();
 	    var myAjax = new Ajax.Updater(
-		    	insTargetDiv,
+		    	instructionTargetDiv,
 		    	url,
 		    	{
 		    		method:'get',
@@ -47,17 +46,17 @@
 	    );
 	}
 	function removeInstructionLoading(){
-		showBusy(remvTargetDiv);
+		showBusy(instructionTargetDiv);
 	}
 	function removeInstructionComplete(){
-		hideBusy(remvTargetDiv);
+		hideBusy(instructionTargetDiv);
 	
 	}
 	function addInstructionLoading(){
-		showBusy(insTargetDiv);
+		showBusy(instructionTargetDiv);
 	}
 	function addInstructionComplete(){
-		hideBusy(insTargetDiv);
+		hideBusy(instructionTargetDiv);
 	
 	}
 	function showBusy(targetDiv){
@@ -70,6 +69,11 @@
 			Element.hide(targetDiv+"_Busy");
 		}				
 	}
+	
+	function submitResourceItem(){
+		$("instructionList").value = Form.serialize("instructionForm");
+		$(resourceItemForm).submit();
+	}
 </script>
 
 </head>
@@ -78,19 +82,23 @@
 		<!-- Basic Info Form-->
 		<tr>
 			<td>
-			<table class="innerforms">
-				<tr>
-					<td colspan="2"><h2><fmt:message key="label.authoring.basic.add.url"/></h2></td>
-				</tr>
-				<tr>
-					<td width="130px"><fmt:message key="label.authoring.basic.resource.title.input"/></td>
-					<td><input type="text" name="title" size="55"></td>
-				</tr>
-				<tr>
-					<td width="130px"><fmt:message key="label.authoring.basic.resource.url.input"/></td>
-					<td><input type="text" name="url" size="55"></td>
-				</tr>	
-			</table>
+			<%@ include file="/common/messages.jsp" %>
+			<html:form action="/authoring/addUrl" method="post" styleId="resourceItemForm">
+				<input type="hidden" name="instructionList" id="instructionList"/>
+				<table class="innerforms">
+					<tr>
+						<td colspan="2"><h2><fmt:message key="label.authoring.basic.add.url"/></h2></td>
+					</tr>
+					<tr>
+						<td width="130px"><fmt:message key="label.authoring.basic.resource.title.input"/></td>
+						<td><html:text property="title" size="55"/></td>
+					</tr>
+					<tr>
+						<td width="130px"><fmt:message key="label.authoring.basic.resource.url.input"/></td>
+						<td><html:text property="url" size="55"/></td>
+					</tr>	
+				</table>
+			</html:form>
 			</td>
 		</tr>
 		<tr>
@@ -106,7 +114,7 @@
 							<%@ include file="instructions.jsp" %>
 						</td>
 						<td width="100%" align="right" valign="bottom">
-							<input type="button" name="add" value="<fmt:message key="label.authoring.basic.add.url"/>" class="buttonStyle">
+							<input onclick="submitResourceItem()" type="button" name="add" value="<fmt:message key="label.authoring.basic.add.url"/>" class="buttonStyle">
 						</td>
 					</tr>
 				</table>

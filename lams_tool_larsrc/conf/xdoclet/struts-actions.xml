@@ -8,6 +8,7 @@
 			validate="false">
 			<forward name="success" path="/pages/authoring/authoring.jsp" />
 		</action>
+		
 		<action path="/authoring/update"
 			type="org.lamsfoundation.lams.tool.rsrc.web.action.AuthoringAction"
 			name="resourceForm" 
@@ -16,12 +17,51 @@
 			validate="false">
 			<forward name="success" path="/pages/authoring/authoring.jsp" />
 		</action>
-		
-		<action path="/authoring/addUrl"
+		<!-- ==========  Resource Item : URL ========== -->
+		<action path="/authoring/addUrlInit"
 			type="org.lamsfoundation.lams.tool.rsrc.web.action.AuthoringAction"
-			parameter="addUrl">
+			parameter="addUrlInit">
 			<forward name="success" path="/pages/authoring/parts/addurl.jsp" />
 		</action>
+		<action path="/authoring/addUrl"
+			type="org.lamsfoundation.lams.tool.rsrc.web.action.AuthoringAction"
+			input="/pages/authoring/parts/addurl.jsp"
+			parameter="addUrl"
+			name="resourceItemForm" 
+			scope="session" 
+			validate="false">
+			<forward name="success" path="/pages/authoring/parts/itemlist.jsp" />
+		</action>
+		<action path="/authoring/deleteItem"
+			type="org.lamsfoundation.lams.tool.rsrc.web.action.AuthoringAction"
+			parameter="deleteItem">
+			<forward name="success" path="/pages/authoring/parts/itemlist.jsp" />
+		</action>
+		
+		<action path="/authoring/editItemInit"
+			type="org.lamsfoundation.lams.tool.rsrc.web.action.AuthoringAction"
+			name="resourceItemForm" 
+			scope="session" 
+			parameter="editItemInit" 
+			validate="false">
+			<forward name="url" path="/pages/authoring/parts/addurl.jsp" />
+			<forward name="file" path="/pages/authoring/parts/addfile.jsp" />
+			<forward name="website" path="/pages/authoring/parts/addwebsite.jsp" />
+			<forward name="learningobject" path="/pages/authoring/parts/addlearningobject.jsp" />
+		</action>
+		<action path="/authoring/editItem"
+			type="org.lamsfoundation.lams.tool.rsrc.web.action.AuthoringAction"
+			parameter="editItem"
+			name="resourceItemForm" 
+			scope="session" 
+			validate="false">
+			<forward name="url" path="/pages/authoring/parts/addurl.jsp" />
+			<forward name="file" path="/pages/authoring/parts/addfile.jsp" />
+			<forward name="website" path="/pages/authoring/parts/addwebsite.jsp" />
+			<forward name="learningobject" path="/pages/authoring/parts/addlearningobject.jsp" />
+			<forward name="success" path="/pages/authoring/parts/itemlist.jsp" />
+		</action>
+		<!-- ==========  Resource Instruction Item  ========== -->
 		<action path="/authoring/newInstruction"
 			type="org.lamsfoundation.lams.tool.rsrc.web.action.AuthoringAction"
 			parameter="newInstruction">

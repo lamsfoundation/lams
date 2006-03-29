@@ -21,14 +21,21 @@
  * ***********************************************************************/
 
 package org.lamsfoundation.lams.tool.rsrc.service;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.ITicket;
 import org.lamsfoundation.lams.contentrepository.IVersionedNode;
+import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.LoginException;
+import org.lamsfoundation.lams.contentrepository.NodeKey;
+import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
@@ -41,6 +48,7 @@ import org.lamsfoundation.lams.tool.rsrc.dao.ResourceSessionDAO;
 import org.lamsfoundation.lams.tool.rsrc.dao.ResourceUserDAO;
 import org.lamsfoundation.lams.tool.rsrc.ims.ImscpApplicationException;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
+import org.lamsfoundation.lams.tool.rsrc.model.ResourceAttachment;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
 import org.lamsfoundation.lams.tool.rsrc.util.ResourceToolContentHandler;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
@@ -182,6 +190,23 @@ public class ResourceServiceImpl implements
 		return resource.getResourceItems();
 	}
 
+
+	public ResourceAttachment uploadInstructionFile(FormFile uploadFile, String fileType) throws ResourceApplicationException {
+		if(uploadFile == null || StringUtils.isEmpty(uploadFile.getFileName()))
+			throw new ResourceApplicationException("Could not find upload file: " + uploadFile);
+		
+		//upload file to repository
+		NodeKey nodeKey = processFile(uploadFile,fileType);
+		
+		//create new attachement
+		ResourceAttachment file = new ResourceAttachment();
+		file.setFileType(fileType);
+		file.setFileUuid(nodeKey.getUuid());
+		file.setFileVersionId(nodeKey.getVersion());
+		file.setFileName(uploadFile.getFileName());
+		
+		return file;
+	}
 	//*****************************************************************************
 	// private methods
 	//*****************************************************************************
@@ -208,6 +233,35 @@ public class ResourceServiceImpl implements
     	    throw new ResourceApplicationException(error);
     	}
 	    return contentId;
+    }
+    /**
+     * Process an uploaded file.
+     * 
+     * @param forumForm
+     * @throws ResourceApplicationException 
+     * @throws FileNotFoundException
+     * @throws IOException
+     * @throws RepositoryCheckedException
+     * @throws InvalidParameterException
+     */
+    private NodeKey processFile(FormFile file, String fileType) throws ResourceApplicationException{
+    	NodeKey node = null;
+        if (file!= null && !StringUtils.isEmpty(file.getFileName())) {
+            String fileName = file.getFileName();
+            try {
+				node = resourceToolContentHandler.uploadFile(file.getInputStream(), fileName, 
+				        file.getContentType(), fileType);
+			} catch (InvalidParameterException e) {
+				throw new ResourceApplicationException("FileNotFoundException occured while trying to upload File" + e.getMessage());
+			} catch (FileNotFoundException e) {
+				throw new ResourceApplicationException("FileNotFoundException occured while trying to upload File" + e.getMessage());
+			} catch (RepositoryCheckedException e) {
+				throw new ResourceApplicationException("FileNotFoundException occured while trying to upload File" + e.getMessage());
+			} catch (IOException e) {
+				throw new ResourceApplicationException("FileNotFoundException occured while trying to upload File" + e.getMessage());
+			}
+          }
+        return node;
     }
 
 	//*****************************************************************************
@@ -243,4 +297,5 @@ public class ResourceServiceImpl implements
 	public void setToolService(ILamsToolService toolService) {
 		this.toolService = toolService;
 	}
+
 }
