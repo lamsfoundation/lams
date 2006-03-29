@@ -13,13 +13,13 @@
 		</tr>
 		<c:forEach var="item" items="${instructionList}" varStatus="status">
 			<tr id="instructionItem${status.index}">
-				<td width="10px">${status.index}</td>
-				<td width="100px"><input type="text" name="instructionItem1" size="70" value="${item}"></td>
-				<td width="40px"><img src="<html:rewrite page='/includes/images/uparrow.gif'/>"></td>
-				<td width="40px"><img src="<html:rewrite page='/includes/images/downarrow.gif'/>"></td>
+				<td width="10px">${status.index+1}</td>
+				<td width="100px"><input type="text" name="instructionItem${status.index}" size="70" value="${item}"></td>
+				<td width="40px"><img src="<html:rewrite page='/includes/images/uparrow.gif'/>" border="0"></td>
+				<td width="40px"><img src="<html:rewrite page='/includes/images/downarrow.gif'/>" border="0"> </td>
 				<td width="40px">
 					<a href="javascript:;" onclick="removeInstruction('${status.index}')">
-						<img src="<html:rewrite page='/includes/images/cross.gif'/>">
+						<img src="<html:rewrite page='/includes/images/cross.gif'/>" border="0">
 					</a>
 				</td>
 			</tr>

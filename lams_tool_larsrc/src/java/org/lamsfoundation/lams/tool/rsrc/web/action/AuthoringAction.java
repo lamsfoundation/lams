@@ -85,13 +85,13 @@ public class AuthoringAction extends Action {
         if (param.equals("addUrl")) {
         	return addUrl(mapping, form, request, response);
         }
-        if (param.equals("removeUrl")) {
-        	return removeUrl(mapping, form, request, response);
-        }
         //-----------------------Instruction function ---------------------------
 	  	if (param.equals("newInstruction")) {
        		return newInstruction(mapping, form, request, response);
         }
+	  	if (param.equals("removeInstruction")) {
+	  		return removeInstruction(mapping, form, request, response);
+	  	}
 //	  	if (param.equals("createTopic")) {
 //       		return createTopic(mapping, form, request, response);
 //        }
@@ -139,7 +139,7 @@ public class AuthoringAction extends Action {
 		request.setAttribute("instructionList",instructionList);
 		return mapping.findForward(ResourceConstants.SUCCESS);
 	}
-	private ActionForward removeUrl(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+	private ActionForward removeInstruction(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		int count = NumberUtils.stringToInt(request.getParameter("instructionCount"),0);
 		int removeIdx = NumberUtils.stringToInt(request.getParameter("removeIdx"),-1);
 		List instructionList = new ArrayList(count-1);
