@@ -96,6 +96,21 @@ public interface IToolContentHandler {
             throws RepositoryCheckedException, InvalidParameterException,
             RepositoryCheckedException;
 
+    /**
+     * Save a directory of files in the content repository.
+     * 
+	 * @param ticket ticket issued on login. Identifies tool and workspace - mandatory 
+	 * @param dirPath directory path containing files - mandatory
+	 * @param startFile relative path of initial file - optional
+	 * @return nodeKey (uuid and version)
+     * @throws InvalidParameterException One of the mandatory parameters is missing.
+     * @throws FileException An error occured writing the files to disk.
+     * @throws RepositoryCheckedException Some other error occured.
+     */
+    public abstract NodeKey uploadPackage(String dirPath, String startFile) 
+    		throws RepositoryCheckedException, InvalidParameterException, 
+    		RepositoryCheckedException;
+ 
     /** 
      * Delete a file node.  If the node does not exist, then nothing happens (ie ItemNotFoundException is NOT thrown). 
      * @param uuid id of the file node. Mandatory

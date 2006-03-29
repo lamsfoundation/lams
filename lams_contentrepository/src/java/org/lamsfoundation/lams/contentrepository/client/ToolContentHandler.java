@@ -226,6 +226,40 @@ public abstract class ToolContentHandler implements IToolContentHandler {
     }
 
     /**
+     * Save a directory of files in the content repository.
+     * 
+	 * @param ticket ticket issued on login. Identifies tool and workspace - mandatory 
+	 * @param dirPath directory path containing files - mandatory
+	 * @param startFile relative path of initial file - optional
+	 * @return nodeKey (uuid and version)
+     * @throws InvalidParameterException One of the mandatory parameters is missing.
+     * @throws FileException An error occured writing the files to disk.
+     * @throws RepositoryCheckedException Some other error occured.
+     */
+    public NodeKey uploadPackage(String dirPath, String startFile) throws RepositoryCheckedException, InvalidParameterException, RepositoryCheckedException {
+        if ( dirPath == null )
+            throw new InvalidParameterException("uploadFile: dirPath parameter empty. Directory containing files must be supplied");
+         	    
+        NodeKey nodeKey = null;
+        try {
+		    try {
+		        nodeKey = getRepositoryService().addPackageItem(getTicket(false), dirPath, startFile, null);
+		    } catch (AccessDeniedException e) {
+		        log.warn("Unable to access repository to add directory of files. AccessDeniedException: "
+		        		+e.getMessage()+" Retrying login.");
+		        nodeKey = getRepositoryService().addPackageItem(getTicket(true), dirPath, startFile, null);
+		    }
+	        
+        } catch (RepositoryCheckedException e2) {
+	        log.warn("Unable to access repository to add directory of files. Repository Exception: "
+	        		+e2.getMessage()+" Retry not possible.");
+	        throw e2;
+	    }
+
+        return nodeKey;
+    }
+
+    /**
      * Copy an entry in the content repository.
      * 
      * @param uuid id of the file node. Mandatory
@@ -278,8 +312,8 @@ public abstract class ToolContentHandler implements IToolContentHandler {
 	    }
     }
 
-    /** Get a file node. 
-     * @param uuid id of the file node. Mandatory
+    /** Get a file or package node. 
+     * @param uuid id of the file/package node. Mandatory
      * @throws FileException An error occured writing the input stream to disk.
      * @throws ItemNotFoundException This file node does not exist, so cannot delete it.
      * @throws RepositoryCheckedException Some other error occured.
