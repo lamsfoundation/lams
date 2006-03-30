@@ -27,157 +27,141 @@ http://www.gnu.org/licenses/gpl.txt
 <%@ taglib uri="fck-editor" prefix="FCK" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
+<%@ page import="java.util.LinkedHashSet" %>
+<%@ page import="java.util.Set" %>
+
+    <% 
+		Set tabs = new LinkedHashSet();
+		tabs.add("label.basic");
+		tabs.add("label.advanced");
+		tabs.add("label.instructions");
+		pageContext.setAttribute("tabs", tabs);
+		
+		Set tabsBasic = new LinkedHashSet();
+		tabsBasic.add("label.basic");
+		pageContext.setAttribute("tabsBasic", tabsBasic);
+	%>
+
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
-<%
-String protocol = request.getProtocol();
-if(protocol.startsWith("HTTPS")){
-	protocol = "https://";
-}else{
-	protocol = "http://";
-}
-String root = protocol+request.getServerName()+":"+request.getServerPort()+request.getContextPath()+"/";
-String pathToLams = protocol+request.getServerName()+":"+request.getServerPort()+request.getContextPath()+"/../..";
+	<!DOCTYPE HTML PUBLIC "-//W3C//DTD hTML 4.01 Transitional//EN">
+	<html:html locale="true">
+	<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<title> <bean:message key="label.authoring"/> </title>
+	
+	 <lams:css/>
+	<!-- depending on user / site preference this will get changed probably use passed in variable from flash to select which one to use-->
 
-%>
+ 	<!-- ******************** FCK Editor related javascript & HTML ********************** -->
+    <script type="text/javascript" src="${lams}fckeditor/fckeditor.js"></script>
+    <script type="text/javascript" src="${tool}author_page/js/fckcontroller.js"></script>
+    <link href="${tool}author_page/css/fckeditor_style.css" rel="stylesheet" type="text/css">
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD hTML 4.01 Transitional//EN">
+	<script language="JavaScript" type="text/JavaScript">
 
-<html:html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<title><bean:message key="label.authoring"/></title>
+		function submitMethod(actionMethod) {
+			document.QaAuthoringForm.dispatch.value=actionMethod; 
+			document.QaAuthoringForm.submit();
+		}
 
-<!-- depending on user / site preference this will get changed probbably use passed in variable from flash to select which one to use-->
-<script type="text/javascript" src="author_page/js/tabcontroller.js"></script>
-<script src="<%=pathToLams%>/includes/javascript/common.js"></script>
-<!-- this is the custom CSS for hte tool -->
-<link href="<%=root%>author_page/css/tool_custom.css" rel="stylesheet" type="text/css">
-<!-- depending on user / site preference this will get changed probbably use passed in variable from flash to select which one to use-->
-<link href="author_page/css/aqua.css" rel="stylesheet" type="text/css">
-<script language="JavaScript" type="text/JavaScript">
-<!--
-function MM_reloadPage(init) {  //reloads the window if Nav4 resized
-  if (init==true) with (navigator) {if ((appName=="Netscape")&&(parseInt(appVersion)==4)) {
-    document.MM_pgW=innerWidth; document.MM_pgH=innerHeight; onresize=MM_reloadPage; }}
-  else if (innerWidth!=document.MM_pgW || innerHeight!=document.MM_pgH) location.reload();
-}
-MM_reloadPage(true);
-
-
-// The following method submit and the submit methods in the included jsp files submit the 
-// form as required for the DispatchAction. All form submissions must go via these scripts - do not
-// define an submit button with "dispatch" as the property or 
-// "document.McAuthoringForm.dispatch.value=buttonResourceText" will not work
-
-// general submit
-// actionMethod: name of the method to be called in the DispatchAction
-function submitMethod(actionMethod) {
-	document.QaAuthoringForm.dispatch.value=actionMethod; 
-	document.QaAuthoringForm.submit();
-}
-
-function pviiClassNew(obj, new_style) { //v2.7 by PVII
-    obj.className=new_style;
-}
-//-->
-</script>
-
-
-    <!-- ******************** FCK Editor related javascript & HTML ********************** -->
-    <script type="text/javascript" src="/lams/fckeditor/fckeditor.js"></script>
-    <script type="text/javascript" src="author_page/js/fckcontroller.js"></script>
-    <link href="author_page/css/fckeditor_style.css" rel="stylesheet" type="text/css">
-
-    <script>
+    	var imgRoot="${lams}images/";
+	    var themeName="aqua";
+        
         function init(){
+        
             initTabSize(3);
             
-            //using the URL anchor (the part after # in the URL) as tabId
-            var myregexp = new RegExp(/#[a-zA-Z0-9]+/);
-            var tabId = myregexp.exec(document.URL);
-            if(tabId != null){
-                tabId = tabId[0].replace("#tab", "");
-                selectTab(tabId);
-            }
-            else{
+            var tag = document.getElementById("currentTab");
+	    	if(tag.value != "")
+	    		selectTab(tag.value);
+            else
                 selectTab(1); //select the default tab;
-            }
             
-            initEditor("Title");
-            initEditor("Instructions");
-            initEditor("Question0");
-            initEditor("OnlineInstructions");
-            initEditor("OfflineInstructions");
-           
+            initEditor("title");
+            initEditor("instructions");
+            initEditor("questionContent0");
+            initEditor("onlineInstructions");
+            initEditor("offlineInstructions");
+            
             <c:set var="queIndex" scope="session" value="1"/>
             <c:forEach var="questionEntry" items="${sessionScope.mapQuestionContent}">
                 <c:set var="queIndex" scope="session" value="${queIndex +1}"/>
                 initEditor("<c:out value="Question${queIndex-1}"/>");
             </c:forEach>
-            
-        }        
-    </script>
 
-    <!-- ******************** END FCK Editor related javascript & HTML ********************** -->
-
-
+        }     
+        
+        function doSelectTab(tabId) {
+        	// start optional tab controller stuff
+        	var tag = document.getElementById("currentTab");
+	    	tag.value = tabId;
+	    	// end optional tab controller stuff
+	    	selectTab(tabId);
+        } 
+        
+        function doSubmit(method) {
+        	document.QaAuthoringForm.dispatch.value=method;
+        	document.QaAuthoringForm.submit();
+        }
+	
+	</script>
+	
+	<script type="text/javascript" src="<c:out value="${tool}"/>author_page/js/tabcontroller.js"></script>    
+	<script type="text/javascript" src="<c:out value="${lams}"/>includes/javascript/common.js"></script>
+	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/xmlrequest.js'/>"></script>
+	
 </head>
-<body onLoad="init()" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
- 
-<html:form action="/authoring" target="_self" enctype="multipart/form-data">
- <input type="hidden" name="dispatch" value=""/>
-        		<c:if test="${ (sessionScope.activeModule == 'authoring') }"> 			
-			        <jsp:include page="/authoring/AuthoringTabs.jsp" />
-				</c:if> 											  
-				
-				<c:if test="${ (sessionScope.activeModule == 'defineLater') &&  
-							   (sessionScope.defineLaterInEditMode != 'true') && 
-							   (monitoringOriginatedDefineLater != 'true')
-							  }">
+<body onLoad="init();">
 
-			        <div class="tabbody" id="tabbody1">
-			        	<tr><td>
-								<font size=3> <b> <bean:message key="label.authoring.qa"/> </b> </font>
-						</td></tr><tr> <td> &nbsp&nbsp&nbsp&nbsp</td> </tr>
-				        <jsp:include page="/authoring/BasicContentViewOnly.jsp" />
-   				    </div>
-				</c:if> 											  				
-				
-				<c:if test="${ (sessionScope.activeModule == 'defineLater') &&  
-							   (sessionScope.defineLaterInEditMode != 'true') &&
-							   (monitoringOriginatedDefineLater == 'true')							   
-							  }"> 			
-
-					<b> <font size=2> <bean:message key="label.monitoring"/> </font></b>
-			        <jsp:include page="/monitoring/MonitoringTabsHeader.jsp" />
-			        <div class="tabbody content_b" id="tabbody1">
-				        <jsp:include page="/authoring/BasicContentViewOnly.jsp" />
-   				    </div>
-				</c:if> 											  				
-				
-				<!-- switching from define later view only to editable -->
-				<c:if test="${ (sessionScope.activeModule == 'defineLater') &&  
-							   (sessionScope.defineLaterInEditMode == 'true') &&
-							   (monitoringOriginatedDefineLater != 'true')							   
-							  }"> 			
-			        <div class="tabbody" id="tabbody1">
-				        <jsp:include page="/authoring/AuthoringTabs.jsp" />				
-   				    </div>			        
-			    </c:if> 											  						
-
-
-				<c:if test="${ (sessionScope.activeModule == 'defineLater') &&  
-							   (sessionScope.defineLaterInEditMode == 'true') &&
-							   (monitoringOriginatedDefineLater == 'true')							   
-							  }"> 			
-					<b> <font size=2> <bean:message key="label.monitoring"/> </font></b>
-			        <jsp:include page="/monitoring/MonitoringTabsHeader.jsp" />
-			        <div class="tabbody content_b" id="tabbody1">
-				        <jsp:include page="/authoring/AuthoringTabs.jsp" />				
-   				    </div>			        
-			    </c:if> 											  						
-</html:form>
+	<b> <font size=2> <bean:message key="label.authoring.qa"/> </font></b>
+	
+	<html:form  action="/authoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">
+	<html:hidden property="dispatch"/>
+	<html:hidden property="toolContentID"/>
+	<html:hidden property="currentTab" styleId="currentTab" />
+	
+	<c:if test="${sessionScope.activeModule != 'defineLater' }"> 			
+		<lams:Tabs collection="${tabs}" useKey="true" control="true"/>
+		<!-- end tab buttons -->
+		<div class="tabbody">
+		
+		<!-- tab content 1 (Basic) -->
+		<lams:TabBody id="1" titleKey="label.basic" page="BasicContent.jsp"/>
+		<!-- end of content (Basic) -->
+		      
+		<!-- tab content 2 (Advanced) -->
+		<lams:TabBody id="2" titleKey="label.advanced" page="AdvancedContent.jsp" />
+		<!-- end of content (Advanced) -->
+		
+		<!-- tab content 3 (Instructions) -->
+		<lams:TabBody id="3" titleKey="label.instructions" page="InstructionsContent.jsp" />
+		<!-- end of content (Instructions) -->
+	</c:if> 			
+	
+	<c:if test="${ (sessionScope.activeModule == 'defineLater') && (sessionScope.defineLaterInEditMode != 'true') }"> 			
+		<lams:Tabs collection="${tabsBasic}" useKey="true" control="true"/>
+		<!-- end tab buttons -->
+		<div class="tabbody">
+		
+		<!-- tab content 1 (Basic) -->
+		<lams:TabBody id="1" titleKey="label.basic" page="BasicContentViewOnly.jsp"/>
+		<!-- end of content (Basic) -->
+	</c:if> 			
+	
+	<c:if test="${ (sessionScope.activeModule == 'defineLater') && (sessionScope.defineLaterInEditMode == 'true') }"> 			
+		<lams:Tabs collection="${tabsBasic}" useKey="true" control="true"/>
+		<!-- end tab buttons -->
+		<div class="tabbody">
+		
+		<!-- tab content 1 (Basic) -->
+		<lams:TabBody id="1" titleKey="label.basic" page="BasicContent.jsp"/>
+		<!-- end of content (Basic) -->
+	</c:if> 			
+	
+	
+	<lams:HTMLEditor/>	
+	</html:form>
 </body>
 </html:html>

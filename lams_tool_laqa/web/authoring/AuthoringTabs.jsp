@@ -30,102 +30,20 @@ http://www.gnu.org/licenses/gpl.txt
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
-
-<table>
-	<tr><td>
-			<font size=3> <b> <bean:message key="label.authoring.qa"/> </b> </font>
-	</td></tr><tr> <td> &nbsp&nbsp&nbsp&nbsp</td> </tr>
-</table>
+	<c:if test="${ sessionScope.showAuthoringTabs == 'true'}"> 			
+		<lams:Tabs collection="${tabs}" useKey="true" control="true"/>
+		<div class="tabbody">
+		<lams:TabBody id="1" titleKey="label.basic" page="BasicContent.jsp"/>
+		<lams:TabBody id="2" titleKey="label.advanced" page="AdvancedContent.jsp" />
+		<lams:TabBody id="3" titleKey="label.instructions" page="InstructionsContent.jsp" />
+	</c:if> 			 					
  					
-	<c:if test="${ sessionScope.showAuthoringTabs == 'true'}"> 			
-	    <!-- start tabs -->
-	    <div class="tabmenu">
-	        <ul>
-	            <li id="tab1" class="tabitem"><div class="tableft"><div class="tabright"><a href="javascript:selectTab(1);"><bean:message key="label.basic"/></a> <!-- IE CSS Bug, If you remove the space infront this comment then height of the Tab will change in IE - Anthony --></div></div></li>
-	            <li id="tab2" class="tabitem"><div class="tableft"><div class="tabright"><a href="javascript:selectTab(2);"><bean:message key="label.advanced"/></a> </div></div></li>
-	            <li id="tab3" class="tabitem"><div class="tableft"><div class="tabright"><a href="javascript:selectTab(3);"><bean:message key="label.instructions"/></a> </div></div></li>
-	        </ul>
-	    </div>
-	    <!-- end tab buttons -->
-	</c:if> 			
 	<c:if test="${ sessionScope.showAuthoringTabs != 'true'}"> 			
-	    <!-- start tabs -->
-	    <div class="tabmenu" style="visibility: hidden">
-	        <ul>
-	            <li id="tab1" class="tabitem"><div class="tableft"><div class="tabright"><a href="javascript:selectTab(1);"><bean:message key="label.basic"/></a> <!-- IE CSS Bug, If you remove the space infront this comment then height of the Tab will change in IE - Anthony --></div></div></li>
-	            <li id="tab2" class="tabitem"><div class="tableft"><div class="tabright"><a href="javascript:selectTab(2);"><bean:message key="label.advanced"/></a> </div></div></li>
-	            <li id="tab3" class="tabitem"><div class="tableft"><div class="tabright"><a href="javascript:selectTab(3);"><bean:message key="label.instructions"/></a> </div></div></li>
-	        </ul>
-	    </div>
-	    <!-- end tab buttons -->
-	</c:if> 			
-	
-    <div class="tabbody" id="tabbody1">
-        <div id="formtablecontainer">
-		            <jsp:include page="/authoring/BasicContent.jsp" />							  
-        </div>
-    
-        <hr>
-	        <a href="javascript:window.close()" class="button"><font size=2> <b> Cancel </b> </font></a>
-	        <a href="javascript:submitMethod('submitAllContent')" class="button"><font size=2> <b> <bean:message key="label.save"/> </b> </font></a>
-    </div>
+		<lams:Tabs collection="${tabsBasic}" useKey="true" control="true"/>
+		<div class="tabbody">
+		<lams:TabBody id="1" titleKey="label.basic" page="BasicContent.jsp"/>
+	</c:if> 			 					
 
-	<c:if test="${ sessionScope.showAuthoringTabs == 'true'}"> 			
-	    <div class="tabbody" id="tabbody2">
-	        <h2><font size=2> <b> <bean:message key="label.advanced.definitions"/> </b></font></h2>
-	        <div id="formtablecontainer">
-	            <jsp:include page="/authoring/AdvancedContent.jsp" />
-	        </div>
-	    </div>
-	</c:if> 				    
-	<c:if test="${ sessionScope.showAuthoringTabs != 'true'}"> 			
-	    <!-- tab content 2 Advanced-->
-	    <div class="tabbody" id="tabbody2" style="visibility: hidden">
-	        <h2><font size=2> <b> <bean:message key="label.advanced.definitions"/> </b></font></h2>
-	        <div id="formtablecontainer">
-	            <jsp:include page="/authoring/AdvancedContent.jsp" />
-	        </div>
-	    </div>	
-	</c:if> 				    
+ 					
 
-	
-	<c:if test="${ sessionScope.showAuthoringTabs == 'true'}"> 			
-	    <div class="tabbody" id="tabbody3">
-	        <h2><font size=2> <b> <bean:message key="label.authoring.instructions"/> </b></font></h2>
-	        <div id="formtablecontainer">
-	            <jsp:include page="/authoring/InstructionsContent.jsp" />
-	        </div>
-	        <hr>
-	    </div>
-	</c:if> 				    
-	<c:if test="${ sessionScope.showAuthoringTabs != 'true'}"> 				
-	    <div class="tabbody" id="tabbody3" style="visibility: hidden">
-	        <h2><font size=2> <b> <bean:message key="label.authoring.instructions"/> </b></font></h2>
-	        <div id="formtablecontainer">
-	            <jsp:include page="/authoring/InstructionsContent.jsp" />
-	        </div>
-	        <hr>
-	    </div>
-	</c:if> 				    
-    
 
-    <div id="wyswygEditorScreen" style="visibility: hidden"> <!-- position: absolute; z-index: 1000; top: 16px; left: 230px; -->
-        <div id="wyswygEditor">
-            <div>
-                <FCK:editor id="FCKeditor1" basePath="/lams/fckeditor/"
-                    imageBrowserURL="/FCKeditor/editor/filemanager/browser/default/browser.html?Type=Image&Connector=connectors/jsp/connector"
-                    linkBrowserURL="/FCKeditor/editor/filemanager/browser/default/browser.html?Connector=connectors/jsp/connector"
-                    flashBrowserURL="/FCKeditor/editor/filemanager/browser/default/browser.html?Type=Flash&Connector=connectors/jsp/connector"
-                    imageUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=Image"
-                    linkUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=File"
-                    flashUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=Flash">
-                    
-                </FCK:editor>  
-            </div>
-            <div style="text-align: center">
-                <a href="#" onClick="saveWYSWYGEdittedText(activeEditorIndex); doPreview(activeEditorIndex)"> <font size=2> <b> <bean:message key="label.save"/> </b> </font></a>
-                &nbsp&nbsp&nbsp&nbsp
-                <a href="#" onClick="doPreview(activeEditorIndex)"><font size=2> <b><bean:message key="label.cancel"/> </font> </b></a>
-            </div>
-        </div>
-    </div>

@@ -28,7 +28,6 @@ http://www.gnu.org/licenses/gpl.txt
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
  
-	<div id="basicTabContainer">	
 		           <h2><font size=2> <b> <bean:message key="label.authoring.qa.basic"/> </b></font></h2>
 		        	<table align=center> 	  
 						<tr>   
@@ -48,46 +47,21 @@ http://www.gnu.org/licenses/gpl.txt
 						</tr> 
 					</table>
 
-			<tr> <td>
+
 					<table align=center> 
 						<tr> 
 					 		<td valign="top"><font size=2> <b> <bean:message key="label.authoring.title"/>: </b></font> </td>
-					 		<td valign="top"> 
-                                 <span id="previewTitle" style="visibility: hidden; display: none;">
-                                     <div>
-                                         <a href="javascript:doWYSWYGEdit('Title','small')"><font size=2> <b> <bean:message key="label.openEditor"/></a>
-                                     </div>
-                                     <div class="smallPreviewPanel" id="previewTitle.text"></div>
-                                 </span>
-                                 <span id="txTitle">
-                                     <div>
-                                         <a href="javascript:doTextToHTML('Title'); doWYSWYGEdit('Title','small')"><font size=2> <b> <bean:message key="label.openEditor"/></a>
-                                     </div>
-                                     <textarea class="smallTextareaPanel" name="title" id="txTitle.textarea">
-	                                     <c:out value="${QaAuthoringForm.title}" escapeXml="false"/>
-                                     </textarea>
-                                 </span>
-                                
+							<td NOWRAP valign=top>
+								<lams:SetEditor id="title" text="${QaAuthoringForm.title}" small="true"/>								
 							</td> 
+							
 					  	</tr>
+
 					  	<tr> 
 					 		<td valign="top"><font size=2> <b> <bean:message key="label.authoring.instructions"/>:  </b></font></td>
-					 		<td valign="top"> 
-                                <span id="previewInstructions" style="visibility: hidden; display: none;">
-                                    <div>
-                                        <a href="javascript:doWYSWYGEdit('Instructions')"><font size=2> <b> <bean:message key="label.openEditor"/></a>
-                                    </div>
-                                    <div class="previewPanel" id="previewInstructions.text"></div>
-                                </span>
-                                <span id="txInstructions">
-                                    <div>
-                                        <a href="javascript:doTextToHTML('Instructions'); doWYSWYGEdit('Instructions')"><font size=2> <b><bean:message key="label.openEditor"/></a>
-                                    </div>
-                                    <textarea class="textareaPanel" name="instructions" id="txInstructions.textarea">
-	                                    <c:out value="${QaAuthoringForm.instructions}" escapeXml="false"/>
-                                    </textarea>
-                                </span>
-							</td>
+							<td NOWRAP valign=top>
+								<lams:SetEditor id="instructions" text="${QaAuthoringForm.instructions}" small="true"/>								
+							</td> 
 						</tr>
 				
 			 		<!--default question content, this entry can not be deleted but can be updated -->
@@ -95,20 +69,10 @@ http://www.gnu.org/licenses/gpl.txt
 						  	<td valign="top"> 
 						 		<font size=2> <b> <bean:message key="label.question1"/>:  </b></font>
 						 	</td>
-						  	<td valign="top">
-                                <span id="previewQuestion0" style="visibility: hidden; display: none;">
-                                    <div>
-                                        <a href="javascript:doWYSWYGEdit('Question0')"><bean:message key="label.openEditor"/></a>
-                                    </div>
-                                    <div class="previewPanel" id="previewQuestion0.text"></div>
-                                </span>
-                                <span id="txQuestion0">
-                                    <div>
-                                        <a href="javascript:doTextToHTML('Question0'); doWYSWYGEdit('Question0')"><font size=2> <b><bean:message key="label.openEditor"/></a>
-                                    </div>
-                                    <textarea class="textareaPanel" name="questionContent0" id="txQuestion0.textarea"><c:out value="${sessionScope.defaultQuestionContent}"/></textarea>
-                                </span>
-						  	</td>
+
+							<td NOWRAP valign=top>
+								<lams:SetEditor id="questionContent0" text="${sessionScope.defaultQuestionContent}" small="true"/>								
+							</td> 
 					  	</tr>
 		
 				  	<!--end of default question content -->
@@ -120,26 +84,14 @@ http://www.gnu.org/licenses/gpl.txt
 								<c:set var="queIndex" scope="session" value="${queIndex +1}"/>
 								  <tr>
 								  	<td valign="top"> <font size=2> <b> <c:out value="Question ${queIndex}"/>:  </b></font></td>
-								  	<td valign="top">
-  
-                                        <span id="preview<c:out value="Question${queIndex-1}"/>" style="visibility: hidden; display: none;">
-                                            <div>
-                                                <a href="javascript:doWYSWYGEdit('<c:out value="Question${queIndex-1}"/>')"><font size=2> <b><bean:message key="label.openEditor"/></a>
-                                            </div>
-                                            <div class="previewPanel" id="preview<c:out value="Question${queIndex-1}"/>.text"></div>
-                                        </span>
-                                        <span id="tx<c:out value="Question${queIndex-1}"/>">
-                                            <div>
-                                                <a href="javascript:doTextToHTML('<c:out value="Question${queIndex-1}"/>'); doWYSWYGEdit('<c:out value="Question${queIndex-1}"/>')"><font size=2> <b><bean:message key="label.openEditor"/></a>
-                                            </div>
-                                            <textarea class="textareaPanel" name="<c:out value="questionContent${queIndex-1}"/>" id="tx<c:out value="Question${queIndex-1}"/>.textarea"><c:out value="${questionEntry.value}"/></textarea>
-                                        </span>
+
+									<td NOWRAP valign=top>
+
+										<lams:SetEditor id="questionContent${queIndex-1}" text="${questionEntry.value}" small="true"/>								
                                 
 		 		 						<html:submit property="removeContent" 
                                                      styleClass="linkbutton"  
-                                                     onclick="removeQuestion(${queIndex});"
-                                                     onmouseover="pviiClassNew(this,'linkbutton')" 
-                                                     onmouseout="pviiClassNew(this,'linkbutton')">
+                                                     onclick="removeQuestion(${queIndex});">
 											<bean:message key="button.removeQuestion"/>
 										</html:submit>
                                     </td>
@@ -154,8 +106,6 @@ http://www.gnu.org/licenses/gpl.txt
                             <td align="right">
                                 <html:submit property="addContent" 
                                              styleClass="linkbutton" 
-                                             onmouseover="pviiClassNew(this,'linkbutton')" 
-                                             onmouseout="pviiClassNew(this,'linkbutton')"
                                              onclick="submitMethod('addNewQuestion');">
                                     <bean:message key="button.addNewQuestion"/>
                                 </html:submit>
@@ -163,8 +113,12 @@ http://www.gnu.org/licenses/gpl.txt
                         </tr>
 					
 					</table>
-			</td></tr>			
-</div>	
+
+        <hr>
+	        <a href="javascript:window.close()" class="button"><font size=2> <b> Cancel </b> </font></a>
+	        <a href="javascript:submitMethod('submitAllContent')" class="button"><font size=2> <b> <bean:message key="label.save"/> </b> </font></a>
+
+
 
 <SCRIPT language="JavaScript"> 
 

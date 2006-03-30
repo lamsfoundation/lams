@@ -40,7 +40,8 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 	protected String submitOfflineFile;
 	protected String submitOnlineFile;
 	protected String dispatch;
-		
+	protected String currentTab;
+	
 	protected String choice;
 	protected String choiceBasic;
 	protected String choiceAdvanced;
@@ -58,6 +59,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 	protected FormFile theOfflineFile;
 	protected FormFile theOnlineFile;
 	
+	protected String toolContentID;
 	/* advanced content */
 	protected String synchInMonitor;
 	protected String reportTitle;
@@ -126,6 +128,8 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
     	this.editActivityMonitoring=null;
     	this.statsMonitoring=null;
     	this.edit=null;
+    	this.toolContentID=null;
+    	this.currentTab=null;
 	}
 	
 	public void resetRadioBoxes()
@@ -525,5 +529,32 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 	 */
 	public void setDispatch(String dispatch) {
 		this.dispatch = dispatch;
+	}
+	
+	/**
+	 * @return Returns the toolContentID.
+	 */
+	public String getToolContentID() {
+		return toolContentID;
+	}
+	/**
+	 * @param toolContentID The toolContentID to set.
+	 */
+	public void setToolContentID(String toolContentID) {
+		this.toolContentID = toolContentID;
+	}
+	
+	
+	/**
+	 * @return Returns the currentTab.
+	 */
+	public String getCurrentTab() {
+		return currentTab;
+	}
+	/**
+	 * @param currentTab The currentTab to set.
+	 */
+	public void setCurrentTab(String currentTab) {
+		this.currentTab = currentTab;
 	}
 }

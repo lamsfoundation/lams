@@ -27,7 +27,6 @@ http://www.gnu.org/licenses/gpl.txt
 <%@ taglib uri="fck-editor" prefix="FCK" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
-<div id="advancedTabContainer">
 			<table align=center>
 				<tr>
 	      			<td NOWRAP class="formlabel" valign=top>
@@ -124,7 +123,7 @@ http://www.gnu.org/licenses/gpl.txt
 			 		</td>
 			  	</tr>
 			</table>	  	
-</div>
+
 
 
 		

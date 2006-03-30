@@ -28,7 +28,6 @@ http://www.gnu.org/licenses/gpl.txt
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
 	
-	<div id="basicTabContainer">	
 				<tr> <td>
 						<table align=center> 
 							<tr> 
@@ -88,7 +87,6 @@ http://www.gnu.org/licenses/gpl.txt
 
 						</table>
 				</td></tr>			
-	</div>	
 
 
 

@@ -72,52 +72,60 @@ input, select, textarea {
 }
 
 /********* tab styles **********/
-/** Tab layout **/
-.tabmenu ul{
-	list-style: none;
-	padding: 0px;
-	margin: 0px;
+/*tab styles*/
+.tab{
+	text-align:center;
 }
 
-.tabmenu li{
-	float: left;
-	margin: 0px 0px;
-	padding: 0px;
-	text-align: center
+.tab a{
+	font-size: 11px;
+	color: #000000;
+	text-decoration:none;
+}
+.tab a:hover{
+	font-size: 11px;
+	color: #000000;
+	text-decoration:underline
+}
+.tabcentre{
+	background-image:url(../images/aqua_tab_centre.gif);
+	background-repeat:repeat-x;
+}
+
+.tabcentre_selected{
+	background-image:url(../images/aqua_tab_s_centre.gif);
+	background-repeat:repeat-x;
+}
+
+.tabcentre_inactive{
+	background-image:url(../images/aqua_tab_i_centre.gif);
+	background-repeat:repeat-x;
 }
 
 /** Non Selected tab style **/
-.tabitem .tableft{
-	background: url(../images/aqua_tab_left.gif) no-repeat top left;
+.tableft td{
+	background: url(../images/aqua_tab_left.gif) no-repeat;
 }
-.tabitem .tabright{
-	background: url(../images/aqua_tab_right.gif) no-repeat top right;
-}
-.tabitem a, .tabitem a:hover, .tabitem a:active, .tabitem a:visited{
-    background: url(../images/aqua_tab_centre.gif) 0 0 repeat-x;
-    margin:0px 8px;
-    font-size: 11px;
-    padding: 4px 10px 1px 10px;
-    color: #000000;
-    text-decoration:none;
+.tabright td{
+	background: url(../images/aqua_tab_right.gif) no-repeat;
 }
 
 /** Selected tab style **/
-.tabitem_selected .tableft{
-	background: url(../images/aqua_tab_s_left.gif) no-repeat top left;
-}
-.tabitem_selected .tabright{
-	background: url(../images/aqua_tab_s_right.gif) no-repeat top right;
-}
-.tabitem_selected a, .tabitem_selected a:hover, .tabitem_selected a:active, .tabitem_selected a:visited{
-    background: url(../images/aqua_tab_s_centre.gif) 0 0 repeat-x;
-    margin:0px 8px;
-    font-size: 11px;
-    padding: 4px 10px 1px 10px;
-    color: #000000;
-    text-decoration:none;
+.tableft_selected td{
+	background: url(../images/aqua_tab_s_left.gif) no-repeat;
 }
 
+.tableft_inactive td{
+	background: url(../images/aqua_tab_i_left.gif) no-repeat;
+}
+
+.tabright_selected td{
+	background: url(../images/aqua_tab_s_right.gif) no-repeat;
+}
+
+.tabright_inactive td{
+	background: url(../images/aqua_tab_i_right.gif) no-repeat;
+}
 
 /*Tab content containers*/
 .tabbody{
