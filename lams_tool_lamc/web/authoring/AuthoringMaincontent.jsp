@@ -52,12 +52,8 @@ http://www.gnu.org/licenses/gpl.txt
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 	<title> <bean:message key="label.authoring"/> </title>
 	
-    <link href="<c:out value="${tool}"/>author_page/css/aqua.css" rel="stylesheet" type="text/css">
-    
-	<!-- this is the custom CSS for hte tool -->
-	<link href="${tool}author_page/css/tool_custom.css" rel="stylesheet" type="text/css">
-
-	<!-- depending on user / site preference this will get changed probbably use passed in variable from flash to select which one to use-->
+	 <lams:css/>
+	<!-- depending on user / site preference this will get changed probably use passed in variable from flash to select which one to use-->
 
  	<!-- ******************** FCK Editor related javascript & HTML ********************** -->
     <script type="text/javascript" src="${lams}fckeditor/fckeditor.js"></script>
