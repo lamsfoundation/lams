@@ -45,6 +45,25 @@
 		    	}
 	    );
 	}
+	function upItem(itemIdx){
+		if(itemIdx == 0)
+			return;
+		var currId = "instructionItemDesc" + itemIdx;
+		var repId = "instructionItemDesc" + (--itemIdx);
+		switchValue(currId,repId);
+	}
+	function downItem(itemIdx,maxSize){
+		if(itemIdx == (maxSize -1))
+			return;
+		var currId = "instructionItemDesc" + itemIdx;
+		var repId = "instructionItemDesc" + (++itemIdx);
+		switchValue(currId,repId);
+	}
+	function switchValue(currId,repId){
+		var temp = $(repId).value;
+		$(repId).value =  $(currId).value;
+		$(currId).value= temp;
+	}
 	function removeInstructionLoading(){
 		showBusy(instructionTargetDiv);
 	}
@@ -83,8 +102,10 @@
 		<tr>
 			<td>
 			<%@ include file="/common/messages.jsp" %>
-			<html:form action="/authoring/addUrl" method="post" styleId="resourceItemForm">
+			<html:form action="/authoring/saveOrUpdateItem" method="post" styleId="resourceItemForm">
 				<input type="hidden" name="instructionList" id="instructionList"/>
+				<input type="hidden" name="itemType" id="itemType" value="1"/>
+				<html:hidden property="itemIndex"/>
 				<table class="innerforms">
 					<tr>
 						<td colspan="2"><h2><fmt:message key="label.authoring.basic.add.url"/></h2></td>

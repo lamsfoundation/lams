@@ -36,7 +36,7 @@ public class ResourceConstants {
 	
 	//for parameters' name
 	public static final String PARAM_TOOL_CONTENT_ID = "toolContentID";
-	public static final String PARAM_ITEM_INDEX = "itemUid";
+	public static final String PARAM_ITEM_INDEX = "itemIndex";
 	
 	//for request attribute name
 	public static final String ATTR_INSTRUCTION_LIST = "instructionList";
@@ -48,6 +48,8 @@ public class ResourceConstants {
 	//error message keys
 	public static final String ERROR_MSG_TITLE_BLANK = "error.resource.item.title.blank";
 	public static final String ERROR_MSG_URL_BLANK = "error.resource.item.url.blank";
+	public static final String ERROR_MSG_DESC_BLANK = "error.resource.item.desc.blank";
 	public static final String ERROR_MSG_FILE_BLANK = "error.resource.item.file.blank";
+	public static final String ERROR_MSG_INVALID_URL = "error.resource.item.invalid.url";
 
 }

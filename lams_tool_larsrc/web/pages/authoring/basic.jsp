@@ -29,15 +29,49 @@
 	function verifyUrl(myUrl, title){
 		launchPopup(myUrl,title);
 	}
+	
 	function previewItem(idx){
 	}
+	
 	function editItem(idx){
-		var url = "<c:url value="/authoring/editItem.do?itemIndex="/>" + idx;
-		
+		 var reqIDVar = new Date();
+		var url = "<c:url value="/authoring/editItemInit.do?itemIndex="/>" + idx +"&reqID="+reqIDVar.getTime();
+		showMessage(url);
 	}
+	
+	var resourceListTargetDiv = "resourceListArea";
 	function deleteItem(idx){
-		var url = "<c:url value="/authoring/deleteItem.do?itemUid="/>" + idx;
-		
+		var url = "<c:url value="/authoring/removeItem.do"/>";
+	    var reqIDVar = new Date();
+		var param = "itemIndex=" + idx +"&reqID="+reqIDVar.getTime();
+		deleteItemLoading();
+	    var myAjax = new Ajax.Updater(
+		    	resourceListTargetDiv,
+		    	url,
+		    	{
+		    		method:'get',
+		    		parameters:param,
+		    		onComplete:deleteItemComplete,
+		    		evalScripts:true
+		    	}
+	    );
+	}
+	function deleteItemLoading(){
+		showBusy(resourceListTargetDiv);
+	}
+	function deleteItemComplete(){
+		hideBusy(resourceListTargetDiv);
+	
+	}
+	function showBusy(targetDiv){
+		if($(targetDiv+"_Busy") != null){
+			Element.show(targetDiv+"_Busy");
+		}
+	}
+	function hideBusy(targetDiv){
+		if($(targetDiv+"_Busy") != null){
+			Element.hide(targetDiv+"_Busy");
+		}				
 	}
 </script>
 	<!---------------------------Basic Tab Content ------------------------>
@@ -64,22 +98,22 @@
 				<table class="forms">
 					<tr>
 						<td>
-							<a href="javascript:showMessage('<html:rewrite page="/authoring/addUrlInit.do"/>');">
+							<a href="javascript:showMessage('<html:rewrite page="/authoring/newItemInit.do?itemType=1"/>');">
 								<fmt:message key="label.authoring.basic.add.url" />
 							</a>
 						</td>
 						<td>
-							<a href="javascript:showMessage('<html:rewrite page="/pages/authoring/parts/addfile.jsp"/>');">
+							<a href="javascript:showMessage('<html:rewrite page="/authoring/newItemInit.do?itemType=2"/>');">
 								<fmt:message key="label.authoring.basic.add.file" />
 							</a>
 						</td>
 						<td>
-							<a href="javascript:showMessage('<html:rewrite page="/pages/authoring/parts/addwebsite.jsp"/>');">
+							<a href="javascript:showMessage('<html:rewrite page="/authoring/newItemInit.do?itemType=3"/>');">
 								<fmt:message key="label.authoring.basic.add.website" />
 							</a>
 						</td>
 						<td>
-							<a href="javascript:showMessage('<html:rewrite page="/pages/authoring/parts/addlearningobject.jsp"/>');">
+							<a href="javascript:showMessage('<html:rewrite page="/authoring/newItemInit.do?itemType=4"/>');">
 								<fmt:message key="label.authoring.basic.add.learning.object"/>
 							</a>
 						</td>

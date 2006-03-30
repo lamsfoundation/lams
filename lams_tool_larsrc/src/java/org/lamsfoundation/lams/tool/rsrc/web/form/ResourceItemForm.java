@@ -31,8 +31,10 @@ import org.apache.struts.upload.FormFile;
  */
 public class ResourceItemForm extends ActionForm {
 	private String title;
+	private short itemType;
 	private String description;
 	private String url;
+	private String itemIndex;
 	private FormFile file;
 	
 	public String getDescription() {
@@ -58,5 +60,17 @@ public class ResourceItemForm extends ActionForm {
 	}
 	public void setUrl(String url) {
 		this.url = url;
+	}
+	public String getItemIndex() {
+		return itemIndex;
+	}
+	public void setItemIndex(String itemIndex) {
+		this.itemIndex = itemIndex;
+	}
+	public short getItemType() {
+		return itemType;
+	}
+	public void setItemType(short type) {
+		this.itemType = type;
 	}
 }

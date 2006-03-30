@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,10 +36,11 @@ import java.util.Set;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.validator.UrlValidator;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionErrors;
@@ -58,12 +60,12 @@ import org.lamsfoundation.lams.tool.rsrc.service.IResourceService;
 import org.lamsfoundation.lams.tool.rsrc.service.ResourceApplicationException;
 import org.lamsfoundation.lams.tool.rsrc.web.form.ResourceForm;
 import org.lamsfoundation.lams.tool.rsrc.web.form.ResourceItemForm;
-import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import com.sun.org.apache.bcel.internal.generic.Instruction;
 
 /**
  * @author Steve.Ni
@@ -71,6 +73,10 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class AuthoringAction extends Action {
 	private static final int INIT_INSTRUCTION_COUNT = 2;
+	private static final String INSTRUCTION_ITEM_DESC_PREFIX = "instructionItemDesc";
+	private static final String INSTRUCTION_ITEM_COUNT = "instructionCount";
+	private static final String ITEM_TYPE = "itemType";
+	
 	private static Logger log = Logger.getLogger(AuthoringAction.class);
 	
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
@@ -101,23 +107,20 @@ public class AuthoringAction extends Action {
         if (param.equals("deleteOfflineFile")) {
         	return deleteOfflineFile(mapping, form, request, response);
         }
-        //----------------------- Add resource function ---------------------------
-        if (param.equals("addUrlInit")) {
-        	return addUrlInit(mapping, form, request, response);
-        }
-        if (param.equals("addUrl")) {
-        	return addUrl(mapping, form, request, response);
+        //----------------------- Add resource item function ---------------------------
+        if (param.equals("newItemInit")) {
+        	return newItemlInit(mapping, form, request, response);
         }
         if (param.equals("editItemInit")) {
         	return editItemInit(mapping, form, request, response);
         }
-        if (param.equals("editItem")) {
-        	return editItem(mapping, form, request, response);
+        if (param.equals("saveOrUpdateItem")) {
+        	return saveOrUpdateItem(mapping, form, request, response);
         }
-        if (param.equals("deleteItem")) {
-        	return deleteItem(mapping, form, request, response);
+        if (param.equals("removeItem")) {
+        	return removeItem(mapping, form, request, response);
         }
-        //-----------------------Instruction function ---------------------------
+        //-----------------------Resource Item Instruction function ---------------------------
 	  	if (param.equals("newInstruction")) {
        		return newInstruction(mapping, form, request, response);
         }
@@ -127,7 +130,7 @@ public class AuthoringAction extends Action {
         return mapping.findForward(ResourceConstants.ERROR);
 	}
 	
-	private ActionForward deleteItem(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+	private ActionForward removeItem(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		int itemIdx = NumberUtils.stringToInt(request.getParameter(ResourceConstants.PARAM_ITEM_INDEX),-1);
 		if(itemIdx != -1){
 			List<ResourceItem> resourceList = getResourceList(request);
@@ -137,10 +140,6 @@ public class AuthoringAction extends Action {
 		}		
 		return mapping.findForward(ResourceConstants.SUCCESS);
 	}
-	private ActionForward editItem(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-		return null;
-
-	}
 
 	private ActionForward editItemInit(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		int itemIdx = NumberUtils.stringToInt(request.getParameter(ResourceConstants.PARAM_ITEM_INDEX),-1);
@@ -149,37 +148,42 @@ public class AuthoringAction extends Action {
 			List<ResourceItem> resourceList = getResourceList(request);
 			item = resourceList.get(itemIdx);
 			if(item != null){
-				popuplateItemToForm(item,(ResourceItemForm) form,request);
+				popuplateItemToForm(itemIdx, item,(ResourceItemForm) form,request);
 			}
 		}		
 		return findForward(item==null?-1:item.getType(),mapping);
 	}
-	private ActionForward addUrlInit(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+	private ActionForward newItemlInit(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+		short type = (short) NumberUtils.stringToInt(request.getParameter(ITEM_TYPE));
 		List instructionList = new ArrayList(INIT_INSTRUCTION_COUNT);
 		for(int idx=0;idx<INIT_INSTRUCTION_COUNT;idx++){
 			instructionList.add("");
 		}
 		request.setAttribute("instructionList",instructionList);
-		return mapping.findForward(ResourceConstants.SUCCESS);
+		return findForward(type,mapping);
 	}
-	private ActionForward addUrl(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+	private ActionForward saveOrUpdateItem(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		//get instructions:
 		List<String> instructionList = getInstructionsFromRequest(request);
 		
 		ResourceItemForm itemForm = (ResourceItemForm)form;
-		ActionErrors errors = new ActionErrors();
-		if(StringUtils.isEmpty(itemForm.getTitle()))
-			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(ResourceConstants.ERROR_MSG_TITLE_BLANK));
-		if(StringUtils.isEmpty(itemForm.getUrl()))
-			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(ResourceConstants.ERROR_MSG_URL_BLANK));
-		
+		ActionErrors errors = validateResourceItem(itemForm);
+			
 		if(!errors.isEmpty()){
 			this.addErrors(request,errors);
 			request.setAttribute(ResourceConstants.ATTR_INSTRUCTION_LIST,instructionList);
-			return mapping.getInputForward();
+			return findForward(itemForm.getItemType(),mapping);
 		}
 		
-		ResourceItem item = new ResourceItem();
+		//check whether it is "edit(old item)" or "add(new item)"
+		List resourceList = getResourceList(request);
+		int itemIdx = NumberUtils.stringToInt(itemForm.getItemIndex(),-1);
+		ResourceItem item;
+		if(itemIdx == -1){
+			item = new ResourceItem();
+			resourceList.add(item);
+		}else
+			item = (ResourceItem) resourceList.get(itemIdx);
 		item.setType(ResourceConstants.RESOURCE_TYPE_URL);
 		item.setTitle(itemForm.getTitle());
 		item.setUrl(itemForm.getUrl());
@@ -190,16 +194,15 @@ public class AuthoringAction extends Action {
 		item.setCreateByAuthor(true);
 		item.setHide(false);
 		//set instrcutions
-		Set instructions = new HashSet();
+		Set instructions = new LinkedHashSet();
 		int idx=0;
 		for (String ins : instructionList) {
 			ResourceItemInstruction rii = new ResourceItemInstruction();
 			rii.setDescription(ins);
 			rii.setSequenceId(idx++);
+			instructions.add(rii);
 		}
 		item.setItemInstructions(instructions);
-		List resourceList = getResourceList(request);
-		resourceList.add(item);
 		
 		//return null to close this window
 		return mapping.findForward(ResourceConstants.SUCCESS);
@@ -207,10 +210,10 @@ public class AuthoringAction extends Action {
 
 
 	private ActionForward newInstruction(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-		int count = NumberUtils.stringToInt(request.getParameter("instructionCount"),0);
+		int count = NumberUtils.stringToInt(request.getParameter(INSTRUCTION_ITEM_COUNT),0);
 		List instructionList = new ArrayList(++count);
 		for(int idx=0;idx<count;idx++){
-			String item = request.getParameter("instructionItem"+idx);
+			String item = request.getParameter(INSTRUCTION_ITEM_DESC_PREFIX+idx);
 			if(item == null)
 				instructionList.add("");
 			else
@@ -220,11 +223,11 @@ public class AuthoringAction extends Action {
 		return mapping.findForward(ResourceConstants.SUCCESS);
 	}
 	private ActionForward removeInstruction(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-		int count = NumberUtils.stringToInt(request.getParameter("instructionCount"),0);
+		int count = NumberUtils.stringToInt(request.getParameter(INSTRUCTION_ITEM_COUNT),0);
 		int removeIdx = NumberUtils.stringToInt(request.getParameter("removeIdx"),-1);
 		List instructionList = new ArrayList(count-1);
 		for(int idx=0;idx<count;idx++){
-			String item = request.getParameter("instructionItem"+idx);
+			String item = request.getParameter(INSTRUCTION_ITEM_DESC_PREFIX+idx);
 			if(idx == removeIdx)
 				continue;
 			if(item == null)
@@ -548,10 +551,10 @@ public class AuthoringAction extends Action {
 			}
 		}
 		
-		int count = NumberUtils.stringToInt(paramMap.get("instructionCount"));
+		int count = NumberUtils.stringToInt(paramMap.get(INSTRUCTION_ITEM_COUNT));
 		List<String> instructionList = new ArrayList<String>();
 		for(int idx=0;idx<count;idx++){
-			String item = paramMap.get("instructionItem"+idx);
+			String item = paramMap.get(INSTRUCTION_ITEM_DESC_PREFIX+idx);
 			if(item == null)
 				continue;
 			instructionList.add(item);
@@ -579,13 +582,55 @@ public class AuthoringAction extends Action {
 		}
 		return forward;
 	}
-	private void popuplateItemToForm(ResourceItem item, ResourceItemForm form, HttpServletRequest request) {
+	private void popuplateItemToForm(int itemIdx, ResourceItem item, ResourceItemForm form, HttpServletRequest request) {
 		form.setDescription(item.getDescription());
 		form.setTitle(item.getTitle());
 		form.setUrl(item.getUrl());
+		if(itemIdx >=0)
+			form.setItemIndex(new Integer(itemIdx).toString());
 		
-		request.setAttribute(ResourceConstants.ATTR_INSTRUCTION_LIST,item.getItemInstructions());
+		Set<ResourceItemInstruction> instructionList = item.getItemInstructions();
+		List instructions = new ArrayList();
+		for(ResourceItemInstruction in : instructionList){
+			instructions.add(in.getDescription());
+		}
+		//add extra blank line for instructions
+		for(int idx=0;idx<INIT_INSTRUCTION_COUNT;idx++){
+			instructions.add("");
+		}
+		request.setAttribute(ResourceConstants.ATTR_INSTRUCTION_LIST,instructions);
 		
+	}
+
+	/**
+	 * @param itemForm
+	 * @return
+	 */
+	private ActionErrors validateResourceItem(ResourceItemForm itemForm) {
+		ActionErrors errors = new ActionErrors();
+		if(StringUtils.isBlank(itemForm.getTitle()))
+			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(ResourceConstants.ERROR_MSG_TITLE_BLANK));
+		
+		if(itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_URL){
+			if(StringUtils.isBlank(itemForm.getUrl()))
+				errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(ResourceConstants.ERROR_MSG_URL_BLANK));
+			//URL validation: Commom URL validate(1.3.0) work not very well: it can not support http://address:port format!!!
+//			UrlValidator validator = new UrlValidator();
+//			if(!validator.isValid(itemForm.getUrl()))
+//				errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(ResourceConstants.ERROR_MSG_INVALID_URL));
+		}
+		if(itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_WEBSITE 
+				||itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT){
+			if(StringUtils.isBlank(itemForm.getDescription()))
+				errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(ResourceConstants.ERROR_MSG_DESC_BLANK));
+		}
+		if(itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_WEBSITE 
+				||itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT
+				||itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_FILE){
+			if(itemForm.getFile() == null)
+				errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(ResourceConstants.ERROR_MSG_FILE_BLANK));
+		}
+		return errors;
 	}
 
 
