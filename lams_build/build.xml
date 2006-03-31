@@ -213,6 +213,14 @@
 				inheritAll="false" >
 			<property name="jboss.deploy" location="${jboss.deploy}"/>
 		</ant> -->
+ 		<ant antfile="../${tool_chat_dir}/build.xml" target="deploy-tool"
+				inheritAll="false" >
+			<property name="jboss.deploy" location="${jboss.deploy}"/>
+		</ant>
+ 		<ant antfile="../${tool_rsrc_dir}/build.xml" target="deploy-tool"
+				inheritAll="false" >
+			<property name="jboss.deploy" location="${jboss.deploy}"/>
+		</ant>
 		<ant target="deploy-learning-libraries"/>
 	</target>
 	
