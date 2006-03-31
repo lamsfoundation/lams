@@ -28,6 +28,7 @@ import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.IVersionedNode;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceAttachment;
+import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
 
 /**
  * @author Dapeng.Ni
@@ -46,5 +47,7 @@ public interface IResourceService
 	Set getAuthoredItems(Long resourceUid);
 
 	ResourceAttachment uploadInstructionFile(FormFile file, String type) throws ResourceApplicationException;
+
+	void uploadResourceItemFile(ResourceItem item, FormFile file) throws ResourceApplicationException;
 }
 

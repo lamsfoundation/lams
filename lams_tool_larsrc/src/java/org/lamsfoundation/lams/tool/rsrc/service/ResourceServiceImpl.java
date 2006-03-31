@@ -21,8 +21,11 @@
  * ***********************************************************************/
 
 package org.lamsfoundation.lams.tool.rsrc.service;
+import java.io.File;
+import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
@@ -37,6 +40,7 @@ import org.lamsfoundation.lams.contentrepository.LoginException;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
+import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
@@ -46,13 +50,18 @@ import org.lamsfoundation.lams.tool.rsrc.dao.ResourceDAO;
 import org.lamsfoundation.lams.tool.rsrc.dao.ResourceItemDAO;
 import org.lamsfoundation.lams.tool.rsrc.dao.ResourceSessionDAO;
 import org.lamsfoundation.lams.tool.rsrc.dao.ResourceUserDAO;
+import org.lamsfoundation.lams.tool.rsrc.ims.IContentPackageConverter;
+import org.lamsfoundation.lams.tool.rsrc.ims.IMSManifestException;
 import org.lamsfoundation.lams.tool.rsrc.ims.ImscpApplicationException;
+import org.lamsfoundation.lams.tool.rsrc.ims.SimpleContentPackageConverter;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceAttachment;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
 import org.lamsfoundation.lams.tool.rsrc.util.ResourceToolContentHandler;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
+import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
 
 /**
  * 
@@ -82,7 +91,7 @@ public class ResourceServiceImpl implements
 		if ( item == null )
 			throw new ResourceApplicationException("Reource item "+itemUid+" not found.");
 
-		return getFile(item.getCrUuid(), item.getCrVersionId(), relPathString);
+		return getFile(item.getFileUuid(), item.getFileVersionId(), relPathString);
 	}
 	
 	
@@ -252,17 +261,115 @@ public class ResourceServiceImpl implements
 				node = resourceToolContentHandler.uploadFile(file.getInputStream(), fileName, 
 				        file.getContentType(), fileType);
 			} catch (InvalidParameterException e) {
-				throw new ResourceApplicationException("FileNotFoundException occured while trying to upload File" + e.getMessage());
+				throw new ResourceApplicationException("InvalidParameterException occured while trying to upload File" + e.getMessage());
 			} catch (FileNotFoundException e) {
 				throw new ResourceApplicationException("FileNotFoundException occured while trying to upload File" + e.getMessage());
 			} catch (RepositoryCheckedException e) {
-				throw new ResourceApplicationException("FileNotFoundException occured while trying to upload File" + e.getMessage());
+				throw new ResourceApplicationException("RepositoryCheckedException occured while trying to upload File" + e.getMessage());
 			} catch (IOException e) {
-				throw new ResourceApplicationException("FileNotFoundException occured while trying to upload File" + e.getMessage());
+				throw new ResourceApplicationException("IOException occured while trying to upload File" + e.getMessage());
 			}
           }
         return node;
     }
+	private NodeKey processPackage(String packageDirectory, String initFile) throws ResourceApplicationException {
+		NodeKey node = null;
+		try {
+			node = resourceToolContentHandler.uploadPackage(packageDirectory, initFile);
+		} catch (InvalidParameterException e) {
+			throw new ResourceApplicationException("InvalidParameterException occured while trying to upload Package:" + e.getMessage());
+		} catch (RepositoryCheckedException e) {
+			throw new ResourceApplicationException("RepositoryCheckedException occured while trying to upload Package:" + e.getMessage());
+		}
+        return node;
+	}
+
+	public void uploadResourceItemFile(ResourceItem item, FormFile file) throws ResourceApplicationException {
+		try {
+			InputStream is = file.getInputStream();
+			String fileName = file.getFileName();
+			String fileType = file.getContentType();
+			item.setFileType(fileType);
+			item.setFileName(fileName);
+			//For file only upload one sigle file
+			if(item.getType() == ResourceConstants.RESOURCE_TYPE_FILE){
+				NodeKey nodeKey = processFile(file,IToolContentHandler.TYPE_ONLINE);
+				item.setFileUuid(nodeKey.getUuid());
+				item.setFileVersionId(nodeKey.getVersion());
+			}
+			//need unzip upload, and check the initial item :default.htm/html or index.htm/html 
+			if(item.getType() == ResourceConstants.RESOURCE_TYPE_WEBSITE){
+				String packageDirectory = ZipFileUtil.expandZip(is, fileName);
+				String initFile = findWebsiteInitialItem(packageDirectory);
+				item.setInitialItem(initFile);
+				//upload package
+				NodeKey nodeKey = processPackage(packageDirectory,initFile);
+				item.setFileUuid(nodeKey.getUuid());
+				item.setFileVersionId(nodeKey.getVersion());
+			}
+			//need unzip upload, and parse learning object information from XML file. 
+			if(item.getType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT){
+				String packageDirectory = ZipFileUtil.expandZip(is, fileName);
+				IContentPackageConverter cpConverter = new SimpleContentPackageConverter(packageDirectory);
+				String initFile = cpConverter.getDefaultItem();
+				item.setInitialItem(initFile);
+				item.setImsSchema(cpConverter.getSchema());
+				item.setOrganizationXml(cpConverter.getOrganzationXML());
+//				upload package
+				NodeKey nodeKey = processPackage(packageDirectory,initFile);
+				item.setFileUuid(nodeKey.getUuid());
+				item.setFileVersionId(nodeKey.getVersion());
+			}
+			// create the package from the directory contents  
+		
+		} catch (ZipFileUtilException e) {
+			log.error("ZipFileUtilException occurs when Uploading Resource Item :" + e.toString());
+			throw new ResourceApplicationException(e);
+		} catch (FileNotFoundException e) {
+			log.error("FileNotFoundException occurs when Uploading Resource Item:" + e.toString());
+			throw new ResourceApplicationException(e);
+		} catch (IOException e) {
+			log.error("IOException occurs when Uploading Resource Item:" + e.toString());
+			throw new ResourceApplicationException(e);
+		} catch (IMSManifestException e) {
+			log.error("IMSManifestException occurs when Uploading Resource Item:" + e.toString());
+			throw new ResourceApplicationException(e);
+		} catch (ImscpApplicationException e) {
+			log.error("ImscpApplicationException occurs when Uploading Resource Item:" + e.toString());
+			throw new ResourceApplicationException(e);
+		}
+	}
+
+
+	/**
+	 * Find out default.htm/html or index.htm/html in the given directory folder
+	 * @param packageDirectory
+	 * @return
+	 */
+	private String findWebsiteInitialItem(String packageDirectory) {
+		File file = new File(packageDirectory);
+		if(!file.isDirectory())
+			return "";
+		
+		File[] initFiles = file.listFiles(new FileFilter(){
+			public boolean accept(File pathname) {
+				if(pathname == null || pathname.getName() == null)
+					return false;
+				String name = pathname.getName();
+				if(name.endsWith("default.html")
+					||name.endsWith("default.htm")
+					||name.endsWith("index.html")
+					||name.endsWith("index.htm"))
+					return true;
+				return false;
+			}
+		});
+		if(initFiles != null && initFiles.length > 0)
+			return initFiles[0].getName();
+		else
+			return "";
+	}
+
 
 	//*****************************************************************************
 	// set methods for Spring Bean
@@ -297,5 +404,6 @@ public class ResourceServiceImpl implements
 	public void setToolService(ILamsToolService toolService) {
 		this.toolService = toolService;
 	}
+
 
 }

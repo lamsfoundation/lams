@@ -79,6 +79,7 @@
 </c:forEach>
 </table>
 </div>
+<%-- This script will works when a new resoruce item submit in order to refresh "Resource List" panel. --%>
 <script lang="javascript">
 	window.top.hideMessage();
 	var obj = window.top.document.getElementById('resourceListArea');

@@ -47,7 +47,7 @@ import uk.ac.reload.moonunit.contentpackaging.CP_Core;
  * 
  * @author Fiona Malikoff
  */
-class SimpleContentPackageConverter implements IContentPackageConverter {
+public class SimpleContentPackageConverter implements IContentPackageConverter {
 
 	private Logger log = Logger.getLogger(SimpleContentPackageConverter.class);
 	

@@ -15,7 +15,7 @@
 		<c:forEach var="item" items="${instructionList}" varStatus="status">
 			<tr id="instructionItem${status.index}">
 				<td width="10px">${status.index+1}</td>
-				<td width="100px"><input type="text" name="instructionItemDesc${status.index}" id="name="instructionItemDesc${status.index}"" size="70" value="${item}"></td>
+				<td width="100px"><input type="text" name="instructionItemDesc${status.index}" id="instructionItemDesc${status.index}" size="70" value="${item}"></td>
 				<td width="40px">
 					<a href="javascript:;" onclick="upItem('${status.index}')">
 						<img src="<html:rewrite page='/includes/images/uparrow.gif'/>" border="0">
@@ -37,6 +37,7 @@
 	</form>
 </div>
 
+<%-- This script will adjust resource item input area height according to the new instruction item amount. --%>
 <script type="text/javascript">
 	$("instructionCount").value="${listSize}";
 	var obj = window.top.document.getElementById('reourceInputArea');

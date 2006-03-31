@@ -38,9 +38,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.math.NumberUtils;
-import org.apache.commons.validator.UrlValidator;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionErrors;
@@ -64,8 +62,6 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
-
-import com.sun.org.apache.bcel.internal.generic.Instruction;
 
 /**
  * @author Steve.Ni
@@ -162,7 +158,21 @@ public class AuthoringAction extends Action {
 		request.setAttribute("instructionList",instructionList);
 		return findForward(type,mapping);
 	}
-	private ActionForward saveOrUpdateItem(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+	/**
+	 * This method will get necessary information from resource item form and save or update into 
+	 * <code>HttpSession</code> ResourceItemList. Notice, this save is not persist them into database,  
+	 * just save <code>HttpSession</code> temporarily. Only they will be persist when the entire authoring 
+	 * page is being persisted.
+	 *  
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws ServletException
+	 */
+	private ActionForward saveOrUpdateItem(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
+		throws ServletException {
 		//get instructions:
 		List<String> instructionList = getInstructionsFromRequest(request);
 		
@@ -175,34 +185,12 @@ public class AuthoringAction extends Action {
 			return findForward(itemForm.getItemType(),mapping);
 		}
 		
-		//check whether it is "edit(old item)" or "add(new item)"
-		List resourceList = getResourceList(request);
-		int itemIdx = NumberUtils.stringToInt(itemForm.getItemIndex(),-1);
-		ResourceItem item;
-		if(itemIdx == -1){
-			item = new ResourceItem();
-			resourceList.add(item);
-		}else
-			item = (ResourceItem) resourceList.get(itemIdx);
-		item.setType(ResourceConstants.RESOURCE_TYPE_URL);
-		item.setTitle(itemForm.getTitle());
-		item.setUrl(itemForm.getUrl());
-//		TODO: set author when persist:need persit the author as well if required
-//		HttpSession ss = SessionManager.getSession();
-//		//get back login user DTO
-//		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-		item.setCreateByAuthor(true);
-		item.setHide(false);
-		//set instrcutions
-		Set instructions = new LinkedHashSet();
-		int idx=0;
-		for (String ins : instructionList) {
-			ResourceItemInstruction rii = new ResourceItemInstruction();
-			rii.setDescription(ins);
-			rii.setSequenceId(idx++);
-			instructions.add(rii);
+		try {
+			extractFormToResourceItem(request, instructionList, itemForm);
+		} catch (ResourceApplicationException e) {
+			log.error("Uploading failed. The exception is " + e.toString());
+			throw new ServletException(e);
 		}
-		item.setItemInstructions(instructions);
 		
 		//return null to close this window
 		return mapping.findForward(ResourceConstants.SUCCESS);
@@ -279,7 +267,15 @@ public class AuthoringAction extends Action {
 		request.getSession().setAttribute(ResourceConstants.ATTR_RESOURCE_LIST, new ArrayList(item));
 		return mapping.findForward(ResourceConstants.SUCCESS);
 	}
-
+	/**
+	 * This method will persist all inforamtion in this authoring page, include all resource item, information etc.
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	private ActionForward updateContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
 		return null;
@@ -599,6 +595,70 @@ public class AuthoringAction extends Action {
 			instructions.add("");
 		}
 		request.setAttribute(ResourceConstants.ATTR_INSTRUCTION_LIST,instructions);
+		
+	}
+	/**
+	 *
+	 * @param request
+	 * @param instructionList
+	 * @param itemForm
+	 * @throws ResourceApplicationException 
+	 */
+	private void extractFormToResourceItem(HttpServletRequest request, List<String> instructionList, ResourceItemForm itemForm) 
+		throws ResourceApplicationException {
+		/* BE CAREFUL: This method will copy nessary info from request form to a old or new ResourceItem instance.
+		 * It gets all info EXCEPT ResourceItem.createDate and ResourceItem.createBy, which need be set when persisting 
+		 * this resource item.
+		 */
+		
+		//check whether it is "edit(old item)" or "add(new item)"
+		List resourceList = getResourceList(request);
+		int itemIdx = NumberUtils.stringToInt(itemForm.getItemIndex(),-1);
+		ResourceItem item;
+		if(itemIdx == -1){
+			item = new ResourceItem();
+			resourceList.add(item);
+		}else
+			item = (ResourceItem) resourceList.get(itemIdx);
+		item.setType(itemForm.getItemType());
+		item.setTitle(itemForm.getTitle());
+		item.setCreateByAuthor(true);
+		item.setHide(false);
+		//set instrcutions
+		Set instructions = new LinkedHashSet();
+		int idx=0;
+		for (String ins : instructionList) {
+			ResourceItemInstruction rii = new ResourceItemInstruction();
+			rii.setDescription(ins);
+			rii.setSequenceId(idx++);
+			instructions.add(rii);
+		}
+		item.setItemInstructions(instructions);
+		
+		short type = itemForm.getItemType();
+		if(type == ResourceConstants.RESOURCE_TYPE_URL){
+			item.setUrl(itemForm.getUrl());
+		}
+		if(type == ResourceConstants.RESOURCE_TYPE_WEBSITE 
+				||itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT){
+			item.setDescription(itemForm.getDescription());
+		}
+		/* Set following fields regards to the type:
+		    item.setFileUuid();
+			item.setFileVersionId();
+			item.setFileType();
+			item.setFileName();
+			
+			item.getInitialItem()
+			item.setImsSchema()
+			item.setOrganizationXml()
+		 */
+		if(type == ResourceConstants.RESOURCE_TYPE_WEBSITE 
+				||type == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT
+				||type == ResourceConstants.RESOURCE_TYPE_FILE){
+			IResourceService service = getResourceService();
+			service.uploadResourceItemFile(item, itemForm.getFile());
+		}
 		
 	}
 

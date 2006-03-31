@@ -48,16 +48,21 @@ public class ResourceItem {
 
 	private String organizationXml;
 
-	private Long crUuid;
+	private Long fileUuid;
 
-	private Long crVersionId;
+	private Long fileVersionId;
 
+	private String fileName;
+	
+	private String fileType;
+	
 	private Set itemInstructions;
 	
 	private boolean isHide;
+	private boolean isCreateByAuthor;
+	
 	private Date createDate;
 	private ResourceUser createBy;
-	private boolean isCreateByAuthor;
 	
 //    **********************************************************
 	  	//		Get/Set methods
@@ -76,25 +81,25 @@ public class ResourceItem {
 			this.uid = userID;
 		}
 		/**
-		 * @hibernate.property column="cr_uuid"
+		 * @hibernate.property column="file_uuid"
 		 * 
 		 * @return
 		 */
-		public Long getCrUuid() {
-			return crUuid;
+		public Long getFileUuid() {
+			return fileUuid;
 		}
-		public void setCrUuid(Long crUuid) {
-			this.crUuid = crUuid;
+		public void setFileUuid(Long crUuid) {
+			this.fileUuid = crUuid;
 		}
 		/**
-		 * @hibernate.property column="cr_version_id"
+		 * @hibernate.property column="file_version_id"
 		 * @return
 		 */
-		public Long getCrVersionId() {
-			return crVersionId;
+		public Long getFileVersionId() {
+			return fileVersionId;
 		}
-		public void setCrVersionId(Long crVersionId) {
-			this.crVersionId = crVersionId;
+		public void setFileVersionId(Long crVersionId) {
+			this.fileVersionId = crVersionId;
 		}
 		/**
 		 * @hibernate.property column="description"
@@ -227,4 +232,25 @@ public class ResourceItem {
 		public void setType(short type) {
 			this.type = type;
 		}
+		  /**
+	     * @hibernate.property column="file_type"
+	     */
+	    public String getFileType() {
+	        return fileType;
+	    }
+
+	    public void setFileType(String type) {
+	        this.fileType = type;
+	    }
+
+	    /**
+	     * @hibernate.property column="file_name"
+	     */
+	    public String getFileName() {
+	        return fileName;
+	    }
+
+	    public void setFileName(String name) {
+	        this.fileName = name;
+	    }
 }

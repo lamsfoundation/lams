@@ -32,7 +32,7 @@ package org.lamsfoundation.lams.tool.rsrc.ims;
  * Note: Classes that implement this interface should be normal POJOS,
  * not singletons. This allows them to have instance data.
  */
-interface IContentPackageConverter {
+public interface IContentPackageConverter {
     
     /**
      * @return Returns the defaultItem.

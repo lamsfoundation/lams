@@ -38,7 +38,7 @@
 		var url = "<c:url value="/authoring/editItemInit.do?itemIndex="/>" + idx +"&reqID="+reqIDVar.getTime();
 		showMessage(url);
 	}
-	
+	//The panel of resource list panel
 	var resourceListTargetDiv = "resourceListArea";
 	function deleteItem(idx){
 		var url = "<c:url value="/authoring/removeItem.do"/>";
