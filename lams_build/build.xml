@@ -213,10 +213,11 @@
 				inheritAll="false" >
 			<property name="jboss.deploy" location="${jboss.deploy}"/>
 		</ant> -->
- 		<ant antfile="../${tool_chat_dir}/build.xml" target="deploy-tool"
+		<echo>CHAT DIR SHOULD BE IN THE BUILD. TEMPORARILY COMMENTED OUT TILL SHAUN IS FIXED</echo>
+<!-- 		<ant antfile="../${tool_chat_dir}/build.xml" target="deploy-tool"
 				inheritAll="false" >
 			<property name="jboss.deploy" location="${jboss.deploy}"/>
-		</ant>
+		</ant> -->
 		<!--
  		<ant antfile="../${tool_larsrc_dir}/build.xml" target="deploy-tool"
 				inheritAll="false" >
