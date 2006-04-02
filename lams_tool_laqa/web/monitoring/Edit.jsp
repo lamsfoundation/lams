@@ -30,31 +30,20 @@ http://www.gnu.org/licenses/gpl.txt
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
-		<table class="forms">
-			<tr>
-				<td>
-				<table align="center">
-						<tr> 
-							<td NOWRAP align="right" valign=top>
-				  				<b> <font size=2> <bean:message key="count.total.user" /> </font></b>
-				  			</td>
-							<td NOWRAP valign=top>
-							  	 <font size=2> <c:out value="${sessionScope.countAllUsers}"/>
-							</td> 
-						</tr>
-						
-						<tr> 
-							<td NOWRAP align="right" valign=top>
-				  				<b> <font size=2> <bean:message key="count.finished.user" /> </font></b>
-				  			</td>
-							<td NOWRAP valign=top>
-							  	 <font size=2> <c:out value="${sessionScope.countSessionComplete}"/></font>
-							</td> 
-						</tr>
-						
-				</table>
-				</td>
-			</tr>
-		</table>
+		<c:if test="${isMonitoredContentInUse != 'true'}"> 			
+			<c:if test="${defineLaterInEditMode != 'true'}"> 			
+				<jsp:include page="/authoring/BasicContentViewOnly.jsp" />
+			</c:if> 				
+			<c:if test="${defineLaterInEditMode == 'true'}"> 			
+				<jsp:include page="/authoring/BasicContent.jsp" />
+			</c:if> 				
+		</c:if> 											
 
 
+		<c:if test="${isMonitoredContentInUse == 'true'}"> 			
+					<table border="0" cellspacing="2" cellpadding="2">									
+						<tr> <td NOWRAP valign=top>
+								<font size=2> <bean:message key="error.content.inUse"/> </font>
+						</td> </tr>
+					</table>
+		</c:if> 																									

@@ -78,9 +78,23 @@ public class AuthoringUtil implements QaAppConstants {
      */
     protected void reconstructQuestionContentMapForRemove(Map mapQuestionContent, HttpServletRequest request, QaAuthoringForm qaAuthoringForm)
     {
+    		logger.debug("doing reconstructQuestionContentMapForRemove.");
     	 	String questionIndex =qaAuthoringForm.getQuestionIndex();
     	 	logger.debug("pre-delete map content:  " + mapQuestionContent);
     	 	logger.debug("questionIndex: " + questionIndex);
+    	 	
+    	 	String defLater=(String)request.getSession().getAttribute(ACTIVE_MODULE);
+    	 	logger.debug("defLater: " + defLater);
+    	 	
+    	 	String removableQuestionIndex=null;
+    	 	if (defLater.equals(MONITORING))
+    	 	{
+       	 		removableQuestionIndex=(String)request.getSession().getAttribute(REMOVABLE_QUESTION_INDEX);
+        	 	logger.debug("removableQuestionIndex: " + removableQuestionIndex);
+        	 	questionIndex=removableQuestionIndex;
+    	 	}
+    	 	logger.debug("final removableQuestionIndex: " + questionIndex);
+    	 	
     	 	
     	 	long longQuestionIndex= new Long(questionIndex).longValue();
     	 	logger.debug("pre-delete count: " + mapQuestionContent.size());
@@ -167,10 +181,16 @@ public class AuthoringUtil implements QaAppConstants {
         boolean isSynchInMonitor=false;
         boolean isUsernameVisible=false;
         String reportTitle = qaAuthoringForm.getReportTitle();
-        String richTextTitle = qaAuthoringForm.getTitle(); 
+        //String richTextTitle = qaAuthoringForm.getTitle();
+
+        String richTextTitle = request.getParameter("title");
+        String richTextInstructions = request.getParameter("instructions");
+        logger.debug("richTextTitle: " + richTextTitle);
+        logger.debug("richTextInstructions: " + richTextInstructions);
+        
         String monitoringReportTitle = qaAuthoringForm.getMonitoringReportTitle();
         String richTextOfflineInstructions = qaAuthoringForm.getOnlineInstructions(); 
-        String richTextInstructions = qaAuthoringForm.getInstructions(); 
+        //String richTextInstructions = qaAuthoringForm.getInstructions(); 
         String richTextOnlineInstructions = qaAuthoringForm.getOfflineInstructions(); 
         String endLearningMessage = qaAuthoringForm.getEndLearningMessage();
         
@@ -234,16 +254,13 @@ public class AuthoringUtil implements QaAppConstants {
         logger.debug("userId: " + userId);
         
         
-        String toolContentId=qaAuthoringForm.getToolContentId();
+        Long toolContentIdLong =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+        logger.debug("toolContentIdLong: " + toolContentIdLong);
+        
+        //String toolContentId=qaAuthoringForm.getToolContentId();
+        String toolContentId=toolContentIdLong.toString();
     	logger.debug("toolContentId:  " + toolContentId);
-     	if ((toolContentId == null) || toolContentId.equals(""))
-     	{
-     		logger.debug("getting toolContentId from session.");
-     		Long longToolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
-     		toolContentId=longToolContentId.toString();
-     		logger.debug("toolContentId: " + toolContentId);
-     	}
-     	logger.debug("final toolContentId: " + toolContentId);
+     	
      	QaContent qaContent=qaService.loadQa(new Long(toolContentId).longValue());
      	logger.debug("qaContent: " + qaContent);
      	
@@ -255,12 +272,14 @@ public class AuthoringUtil implements QaAppConstants {
         }
 
 
-    	logger.debug("setting common content values...");
+    	logger.debug("setting common content values..." + richTextTitle + " " + richTextInstructions);
     	qaContent.setQaContentId(new Long(toolContentId));
      	qaContent.setTitle(richTextTitle);
      	qaContent.setInstructions(richTextInstructions);
      	qaContent.setUpdateDate(new Date(System.currentTimeMillis())); /**keep updating this one*/
+     	logger.debug("userId: " + userId);
      	qaContent.setCreatedBy(userId); /**make sure we are setting the userId from the User object above*/
+     	logger.debug("end of setting common content values...");
 
      	
         if ((!activeModule.equals(DEFINE_LATER)) && (setCommonContent))

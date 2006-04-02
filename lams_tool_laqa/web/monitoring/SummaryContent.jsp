@@ -30,16 +30,9 @@ http://www.gnu.org/licenses/gpl.txt
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
-	<c:set var="monitoringURL">
-		<html:rewrite page="/monitoring.do" />
-	</c:set>
 
 	<html:hidden property="responseId"/>	 
-	<c:if test="${(requestLearningReport != 'true')}"> 	
-		<h2><font size=2> <bean:message key="label.summary"/> </font> </h2>
-	</c:if>					
 	
-	<div id="datatablecontainer">
 		<c:if test="${(userExceptionNoToolSessions == 'true')}"> 	
 				<table class="forms" align="center">
 					<tr> 
@@ -50,7 +43,6 @@ http://www.gnu.org/licenses/gpl.txt
 				</table>
 		</c:if>			
 					
-
 		<c:if test="${(userExceptionNoToolSessions != 'true') }"> 	
 			<html:hidden property="selectedToolSessionId"/>							
 			<input type="hidden" name="isToolSessionChanged"/>
@@ -136,6 +128,6 @@ http://www.gnu.org/licenses/gpl.txt
 
 				</table>
 		</c:if>						
-	</div>
+
 
 	

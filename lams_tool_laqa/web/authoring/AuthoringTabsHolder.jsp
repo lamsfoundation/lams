@@ -82,13 +82,11 @@ http://www.gnu.org/licenses/gpl.txt
             initEditor("title");
             initEditor("instructions");
             initEditor("questionContent0");
-            initEditor("onlineInstructions");
-            initEditor("offlineInstructions");
-            
+           
             <c:set var="queIndex" scope="session" value="1"/>
             <c:forEach var="questionEntry" items="${sessionScope.mapQuestionContent}">
                 <c:set var="queIndex" scope="session" value="${queIndex +1}"/>
-                initEditor("<c:out value="Question${queIndex-1}"/>");
+                initEditor("<c:out value="questionContent${queIndex-1}"/>");
             </c:forEach>
 
         }     

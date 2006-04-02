@@ -611,4 +611,23 @@ public abstract class QaUtils implements QaAppConstants {
 			return null;
 		}
 	}
+	
+    public static void setDefineLater(HttpServletRequest request, boolean value)
+    {
+    	IQaService qaService = (IQaService)request.getSession().getAttribute(TOOL_SERVICE);
+    	logger.debug("qaService:" + qaService);
+    	
+    	Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
+    	logger.debug("toolContentId:" + toolContentId);
+    	
+    	QaContent qaContent=qaService.loadQa(toolContentId.longValue());
+    	logger.debug("qaContent:" + qaContent);
+    	if (qaContent != null)
+    	{
+    		qaContent.setDefineLater(value);
+        	logger.debug("defineLater has been set to true");
+        	qaService.updateQa(qaContent);	
+    	}
+    }
+
 }

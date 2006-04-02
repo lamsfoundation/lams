@@ -146,6 +146,21 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	{
     	logger.debug("dispatching getStats..." + request);
     	
+    	initStatsContent(mapping, form, request, response);
+    	return (mapping.findForward(LOAD_MONITORING));
+	}
+
+    
+    
+    public void initStatsContent(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+	{
+    	logger.debug("starting  initStatsContent...");
+    	logger.debug("dispatching getStats..." + request);
+    	
     	IQaService qaService = (IQaService)request.getSession().getAttribute(TOOL_SERVICE);
 		logger.debug("qaService: " + qaService);
 		if (qaService == null)
@@ -164,12 +179,12 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		
 		if (qaService.studentActivityOccurredGlobal(qaContent))
 		{
-			request.setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(false).toString());
+			request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(false).toString());
 			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
 		}
 		else
 		{
-			request.setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
+			request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
 			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to true");
 		}
 
@@ -177,9 +192,11 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
     	request.getSession().setAttribute(EDIT_RESPONSE, new Boolean(false));
     	
     	request.getSession().setAttribute(CURRENT_MONITORING_TAB, "stats");
- 		return (mapping.findForward(LOAD_MONITORING));
+    	logger.debug("ending  initStatsContent...");
 	}
 
+    
+    
     
     /**
      * switches to instructions tab of the monitoring url.
@@ -204,6 +221,20 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
                                          ServletException
 	{
     	logger.debug("dispatching getInstructions..." + request);
+    	initInstructionsContent(mapping, form, request, response);
+
+    	return (mapping.findForward(LOAD_MONITORING));
+	}
+
+    
+    public void initInstructionsContent(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+	{
+    	logger.debug("starting initInstructionsContent...");
+    	logger.debug("dispatching getInstructions..." + request);
 
     	IQaService qaService = (IQaService)request.getSession().getAttribute(TOOL_SERVICE);
 		logger.debug("qaService: " + qaService);
@@ -222,12 +253,12 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		
 		if (qaService.studentActivityOccurredGlobal(qaContent))
 		{
-			request.setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(false).toString());
+			request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(false).toString());
 			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
 		}
 		else
 		{
-			request.setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
+			request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
 			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to true");
 		}
 		
@@ -235,9 +266,9 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
     	request.getSession().setAttribute(EDIT_RESPONSE, new Boolean(false));
 
     	request.getSession().setAttribute(CURRENT_MONITORING_TAB, "instructions");
-	 	return (mapping.findForward(LOAD_MONITORING));
+    	logger.debug("ending  initInstructionsContent...");
+	 	
 	}
-
 
     /**
      * activates editActivity screen
@@ -325,6 +356,21 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
             HttpServletResponse response) throws IOException,
                                          ServletException
 	{
+    	logger.debug("start  getSummary...");
+    	initSummaryContent(mapping, form, request, response);
+ 		return (mapping.findForward(LOAD_MONITORING));
+	}
+    
+
+    
+    public void initSummaryContent(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+	{
+    	logger.debug("start  initSummaryContent...");
+    	
     	logger.debug("dispatching getSummary..." + request);
     	request.getSession().setAttribute(EDIT_RESPONSE, new Boolean(false));
     	
@@ -350,21 +396,68 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    logger.debug("SUMMARY_TOOL_SESSIONS: " + request.getSession().getAttribute(SUMMARY_TOOL_SESSIONS));
 	    /* ends here. */
 	    
-		
+		/*true means there is at least 1 response*/
 		if (qaService.studentActivityOccurredGlobal(qaContent))
 		{
-			request.setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(false).toString());
+			request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(false).toString());
 			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
 		}
 		else
 		{
-			request.setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
+			request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
 			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to true");
 		}
 
     	request.getSession().setAttribute(CURRENT_MONITORING_TAB, "summary");
- 		return (mapping.findForward(LOAD_MONITORING));
+    	logger.debug("end  initSummaryContent...");
 	}
+
+    
+    public ActionForward editActivityQuestions(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException,
+                                         ToolException
+    {
+    	logger.debug("dispatching editActivityQuestions...");
+    	request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(false).toString());
+
+		request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(true));
+		QaUtils.setDefineLater(request, true);
+        return (mapping.findForward(LOAD_MONITORING));
+    }
+    
+    public ActionForward addNewQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
+    throws IOException, ServletException 
+	{
+    	logger.debug("dispatching proxy editActivityQuestions...");
+    	QaAction qaAction= new QaAction(); 
+    	return qaAction.addNewQuestion(mapping, form, request, response);
+	}
+
+    
+    public ActionForward removeQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
+    throws IOException, ServletException {
+    	logger.debug("dispatching proxy removeQuestion...");
+    	QaMonitoringForm qaMonitoringForm = (QaMonitoringForm) form;
+		logger.debug("qaMonitoringForm: " + qaMonitoringForm);
+		String questionIndex=qaMonitoringForm.getQuestionIndex();
+		logger.debug("questionIndex: " + questionIndex);
+		request.getSession().setAttribute(REMOVABLE_QUESTION_INDEX, questionIndex);
+    	
+    	QaAction qaAction= new QaAction(); 
+    	return qaAction.removeQuestion(mapping, form, request, response);
+    }
+    
+    public ActionForward submitAllContent(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
+    throws IOException, ServletException {
+    	logger.debug("dispatching proxy submitAllContent...");
+    	request.getSession().setAttribute(ACTIVE_MODULE, DEFINE_LATER);
+    	QaAction qaAction= new QaAction(); 
+    	return qaAction.submitAllContent(mapping, form, request, response);
+    	
+    }
 
     /**
      * gets called when the user selects a group from dropdown box in the summary tab 
@@ -721,12 +814,12 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		
 		if (qaService.studentActivityOccurredGlobal(qaContent))
 		{
-			request.setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(false).toString());
+			request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(false).toString());
 			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
 		}
 		else
 		{
-			request.setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
+			request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
 			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to true");
 		}
 		

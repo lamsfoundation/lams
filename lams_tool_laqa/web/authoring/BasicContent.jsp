@@ -27,7 +27,6 @@ http://www.gnu.org/licenses/gpl.txt
 <%@ taglib uri="fck-editor" prefix="FCK" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
- 
 		           <h2><font size=2> <b> <bean:message key="label.authoring.qa.basic"/> </b></font></h2>
 		        	<table align=center> 	  
 						<tr>   
@@ -52,7 +51,7 @@ http://www.gnu.org/licenses/gpl.txt
 						<tr> 
 					 		<td valign="top"><font size=2> <b> <bean:message key="label.authoring.title"/>: </b></font> </td>
 							<td NOWRAP valign=top>
-								<lams:SetEditor id="title" text="${QaAuthoringForm.title}" small="true"/>								
+								<lams:SetEditor id="title" text="${activityTitle}" small="true"/>								
 							</td> 
 							
 					  	</tr>
@@ -60,7 +59,7 @@ http://www.gnu.org/licenses/gpl.txt
 					  	<tr> 
 					 		<td valign="top"><font size=2> <b> <bean:message key="label.authoring.instructions"/>:  </b></font></td>
 							<td NOWRAP valign=top>
-								<lams:SetEditor id="instructions" text="${QaAuthoringForm.instructions}" small="true"/>								
+								<lams:SetEditor id="instructions" text="${activityInstructions}" small="true"/>								
 							</td> 
 						</tr>
 				
@@ -89,11 +88,21 @@ http://www.gnu.org/licenses/gpl.txt
 
 										<lams:SetEditor id="questionContent${queIndex-1}" text="${questionEntry.value}" small="true"/>								
                                 
-		 		 						<html:submit property="removeContent" 
-                                                     styleClass="linkbutton"  
-                                                     onclick="removeQuestion(${queIndex});">
-											<bean:message key="button.removeQuestion"/>
-										</html:submit>
+	                                	<c:if test="${ (sessionScope.activeModule != 'monitoring') }"> 			
+			 		 						<html:submit property="removeContent" 
+	                                                     styleClass="linkbutton"  
+	                                                     onclick="removeQuestion(${queIndex});">
+												<bean:message key="button.removeQuestion"/>
+											</html:submit>
+										</c:if> 			
+	                                	<c:if test="${ (sessionScope.activeModule == 'monitoring') }"> 			
+			 		 						<html:submit property="removeContent" 
+	                                                     styleClass="linkbutton"  
+	                                                     onclick="removeMonitoringQuestion(${queIndex});">
+												<bean:message key="button.removeQuestion"/>
+											</html:submit>
+										</c:if> 													
+										
                                     </td>
 								  </tr>
 							</c:if> 			
@@ -126,6 +135,12 @@ http://www.gnu.org/licenses/gpl.txt
 	{
 		document.QaAuthoringForm.questionIndex.value=questionIndex;
         submitMethod('removeQuestion');
+	}
+
+	function removeMonitoringQuestion(questionIndex)
+	{
+		document.QaMonitoringForm.questionIndex.value=questionIndex;
+        submitMonitoringMethod('removeQuestion');
 	}
 	
  </SCRIPT>

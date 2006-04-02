@@ -2,6 +2,9 @@
 package org.lamsfoundation.lams.tool.qa.web;
 
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.TreeMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -17,7 +20,9 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaApplicationException;
+import org.lamsfoundation.lams.tool.qa.QaComparator;
 import org.lamsfoundation.lams.tool.qa.QaContent;
+import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.QaUtils;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
@@ -91,7 +96,78 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 		if (initData == false)
 			return (mapping.findForward(ERROR_LIST));
 		
-	    return (mapping.findForward(LOAD_MONITORING));	
+		QaMonitoringForm qaMonitoringForm = (QaMonitoringForm) form;
+		logger.debug("qaMonitoringForm: " + qaMonitoringForm);
+		qaMonitoringForm.setCurrentTab("1");
+		logger.debug("setting current tab to 1: ");
+		
+		
+		request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
+		
+		QaMonitoringAction qaMonitoringAction= new QaMonitoringAction();
+		logger.debug("calling initSummaryContent.");
+		qaMonitoringAction.initSummaryContent(mapping, form, request, response);
+		logger.debug("calling initInstructionsContent.");
+		qaMonitoringAction.initInstructionsContent(mapping, form, request, response);
+		logger.debug("calling initStatsContent.");
+		qaMonitoringAction.initStatsContent(mapping, form, request, response);
+		
+
+		IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
+		
+		/* we have made sure TOOL_CONTENT_ID is passed  */
+	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    logger.debug("toolContentId: " + toolContentId);
+	    
+	    QaContent qaContent=qaService.loadQa(toolContentId.longValue());
+	    
+		logger.debug("existing qaContent:" + qaContent);
+		Map mapQuestionContent= new TreeMap(new QaComparator());
+		logger.debug("mapQuestionContent: " + mapQuestionContent);
+	    /*
+		 * get the existing question content
+		 */
+		logger.debug("setting existing content data from the db");
+		mapQuestionContent.clear();
+		Iterator queIterator=qaContent.getQaQueContents().iterator();
+		Long mapIndex=new Long(1);
+		logger.debug("mapQuestionContent: " + mapQuestionContent);
+		while (queIterator.hasNext())
+		{
+			QaQueContent qaQueContent=(QaQueContent) queIterator.next();
+			if (qaQueContent != null)
+			{
+				logger.debug("question: " + qaQueContent.getQuestion());
+	    		mapQuestionContent.put(mapIndex.toString(),qaQueContent.getQuestion());
+	    		/**
+	    		 * make the first entry the default(first) one for jsp
+	    		 */
+	    		if (mapIndex.longValue() == 1)
+	    			request.getSession().setAttribute(DEFAULT_QUESTION_CONTENT, qaQueContent.getQuestion());
+	    		mapIndex=new Long(mapIndex.longValue()+1);
+			}
+		}
+		logger.debug("Map initialized with existing contentid to: " + mapQuestionContent);
+		logger.debug("callling presentInitialUserInterface for the existing content.");
+		
+		request.getSession().setAttribute(MAP_QUESTION_CONTENT, mapQuestionContent);
+		logger.debug("execute initialized the Comparable Map: " + request.getSession().getAttribute("mapQuestionContent") );
+		
+		/*true means there is at least 1 response*/
+		if (qaService.studentActivityOccurredGlobal(qaContent))
+		{
+			request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(false).toString());
+			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
+		}
+		else
+		{
+			request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
+			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to true");
+		}
+
+		
+		request.getSession().setAttribute(ACTIVE_MODULE, MONITORING);
+		return (mapping.findForward(LOAD_MONITORING));	
 	}
 
 	
@@ -114,10 +190,8 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 		request.getSession().setAttribute(CURRENT_MONITORING_TAB, "summary");
 		request.getSession().setAttribute(EDIT_RESPONSE, new Boolean(false));
 		
-		/*by default display summary data*/
-		request.setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(false).toString());
-		
-		/*
+		request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
+				/*
 	     * persist time zone information to session scope. 
 	     */
 	    QaUtils.persistTimeZone(request);
@@ -136,6 +210,32 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 			persistError(request, "error.content.doesNotExist");
 			return false;
 		}
+		
+		
+		boolean isContentInUse=QaUtils.isContentInUse(qaContent);
+		logger.debug("isContentInUse:" + isContentInUse);
+		
+		
+		request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(false).toString());
+		if (isContentInUse == true)
+		{
+			logger.debug("monitoring url does not allow editActivity since the content is in use.");
+	    	persistError(request,"error.content.inUse");
+	    	request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(true).toString());
+		}
+		
+		
+		if (qaContent.getTitle() == null)
+		{
+			request.getSession().setAttribute(ACTIVITY_TITLE, "Questions and Answers");
+			request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, "Please answer the questions.");
+		}
+		else
+		{
+			request.getSession().setAttribute(ACTIVITY_TITLE, qaContent.getTitle());
+			request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, qaContent.getInstructions());			
+		}
+
 		
 		if (qaService.studentActivityOccurred(qaContent))
 		{
@@ -156,9 +256,8 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 		
 		/* this section is related to instructions tab. Starts here. */
 	    /* ends here. */
-		request.getSession().setAttribute(ACTIVITY_TITLE, qaContent.getTitle());
-	    request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, qaContent.getInstructions());
-		
+    
+	    logger.debug("end initializing  monitoring data...");
 		return true;
 	}
 

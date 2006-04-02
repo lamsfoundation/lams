@@ -193,6 +193,11 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		
 		IQaService qaService = (IQaService)request.getSession().getAttribute(TOOL_SERVICE);
 		logger.debug("qaService: " + qaService);
+		
+		qaAuthoringForm.setCurrentTab("1");
+		logger.debug("setting currrent tab to 1: ");
+
+		
 		if (qaService == null)
 		{
 			logger.debug("will retrieve qaService");
@@ -315,7 +320,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
         
         qaAuthoringForm.setToolContentId(strToolContentId);
         request.getSession().setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, new Long(strToolContentId));
-	    logger.debug("using TOOL_CONTENT_ID: " + strToolContentId);
+        logger.debug("using TOOL_CONTENT_ID: " + strToolContentId);
 	    
 
 		/*
@@ -398,8 +403,18 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	    
 	    qaAuthoringForm.setTitle(qaContent.getTitle());
 		qaAuthoringForm.setInstructions(qaContent.getInstructions());
-		//request.getSession().setAttribute(ACTIVITY_TITLE, qaContent.getTitle());
-		//request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, qaContent.getInstructions());
+		
+		if (qaContent.getTitle() == null)
+		{
+			request.getSession().setAttribute(ACTIVITY_TITLE, "Questions and Answers");
+			request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, "Please answer the questions.");
+		}
+		else
+		{
+			request.getSession().setAttribute(ACTIVITY_TITLE, qaContent.getTitle());
+			request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, qaContent.getInstructions());			
+		}
+
 		
 		logger.debug("Title is: " + qaContent.getTitle());
 		logger.debug("Instructions is: " + qaContent.getInstructions());

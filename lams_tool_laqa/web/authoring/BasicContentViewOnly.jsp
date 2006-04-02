@@ -34,7 +34,7 @@ http://www.gnu.org/licenses/gpl.txt
 						 		<td valign="top"><font size=2> <b> <bean:message key="label.authoring.title"/>: </b></font> </td>
 						 		<td NOWRAP width=700> 
 	 				      			<font size=2> 
-	                                     <c:out value="${QaAuthoringForm.title}" escapeXml="false"/>
+	                                     <c:out value="${activityTitle}" escapeXml="false"/>
 	    							</font>
 								</td> 
 						  	</tr>
@@ -42,7 +42,7 @@ http://www.gnu.org/licenses/gpl.txt
 						 		<td valign="top"><font size=2> <b> <bean:message key="label.authoring.instructions"/>:  </b></font></td>
 						 		<td NOWRAP width=700> 
 					      			<font size=2> 
-	                                    <c:out value="${QaAuthoringForm.instructions}" escapeXml="false"/>
+	                                    <c:out value="${activityInstructions}" escapeXml="false"/>
 	    							</font>									
 								</td>
 							</tr>
@@ -58,7 +58,6 @@ http://www.gnu.org/licenses/gpl.txt
 							  	</td>
 						  	</tr>
 	
-					  	
 				  		<!-- if there is more than just the default content start presenting them -->
 				  	 		<c:set var="queIndex" scope="session" value="1"/>
 							<c:forEach var="questionEntry" items="${sessionScope.mapQuestionContent}">

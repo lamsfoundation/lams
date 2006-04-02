@@ -420,7 +420,7 @@
 
         <forward
           name="load"
-          path="/AuthoringMaincontent.jsp"
+          path="/monitoring/MonitoringMaincontent.jsp"
           redirect="false"
         />
 	  	

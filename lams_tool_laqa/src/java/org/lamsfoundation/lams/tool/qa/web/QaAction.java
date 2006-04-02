@@ -1,3 +1,4 @@
+
 /***************************************************************************
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
@@ -182,9 +183,17 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants
     public ActionForward submitAllContent(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
         throws IOException, ServletException {
     	
+    	logger.debug("starting submitAllContent :" +form);
     	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
         QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
-        IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
+        logger.debug("qaAuthoringForm :" +qaAuthoringForm);
+        
+        IQaService qaService = (IQaService)request.getSession().getAttribute(TOOL_SERVICE);
+        if (qaService == null)        
+        	qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
+        logger.debug("qaService :" +qaService);
+        
+               	
         AuthoringUtil authoringUtil= new AuthoringUtil();
         Map mapQuestionContent=(Map)request.getSession().getAttribute(MAP_QUESTION_CONTENT);
         logger.debug("mapQuestionContent :" +mapQuestionContent);
@@ -231,6 +240,22 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants
         
         QaContent qaContent=authoringUtil.saveOrUpdateQaContent(mapQuestionContent, qaService, qaAuthoringForm, request);
         logger.debug("qaContent: " + qaContent);
+		
+		String richTextTitle = request.getParameter("title");
+        String richTextInstructions = request.getParameter("instructions");
+        logger.debug("richTextTitle: " + richTextTitle);
+        logger.debug("richTextInstructions: " + richTextInstructions);
+        
+        if (richTextTitle != null)
+        {
+    		request.getSession().setAttribute(ACTIVITY_TITLE, richTextTitle);
+        }
+
+        if (richTextInstructions != null)
+        {
+    		request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, richTextInstructions);
+        }
+
         
         authoringUtil.reOrganizeDisplayOrder(mapQuestionContent, qaService, qaAuthoringForm, qaContent);
 
@@ -248,6 +273,9 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants
         QaUtils.setDefineLater(request, false, strToolContentId.toString());
         
         saveErrors(request,errors);
+        
+        QaUtils.setDefineLater(request, false);
+        logger.debug("define later set to false");
         
         qaAuthoringForm.resetUserAction();
         return mapping.findForward(LOAD_QUESTIONS);
@@ -404,7 +432,20 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants
      		toolContentId=longToolContentId.toString();
      		logger.debug("toolContentId: " + toolContentId);
      	}
+     	
+     	QaContent qaContent=qaService.loadQa(new Long(toolContentId).longValue());
+		logger.debug("existing qaContent:" + qaContent);
     	
+		boolean isContentInUse=QaUtils.isContentInUse(qaContent);
+		logger.debug("isContentInUse:" + isContentInUse);
+		
+		request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(false).toString());
+		if (isContentInUse == true)
+		{
+			logger.debug("monitoring url does not allow editActivity since the content is in use.");
+	    	persistError(request,"error.content.inUse");
+	    	request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(true).toString());
+		}
      	
 		QaUtils.setDefineLater(request, true, toolContentId);
 		
@@ -428,13 +469,32 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants
      */
     public ActionForward addNewQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
         throws IOException, ServletException {
+    	
+    	logger.debug("dispathcing addNewQuestion");
+    	
     	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
         AuthoringUtil authoringUtil= new AuthoringUtil();
         Map mapQuestionContent=(Map)request.getSession().getAttribute(MAP_QUESTION_CONTENT);
+
+		String richTextTitle = request.getParameter("title");
+        String richTextInstructions = request.getParameter("instructions");
+        logger.debug("richTextTitle: " + richTextTitle);
+        logger.debug("richTextInstructions: " + richTextInstructions);
+        
+        if (richTextTitle != null)
+        {
+    		request.getSession().setAttribute(ACTIVITY_TITLE, richTextTitle);
+        }
+
+        if (richTextInstructions != null)
+        {
+    		request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, richTextInstructions);
+        }
         
         request.getSession().setAttribute(EDITACTIVITY_EDITMODE, new Boolean(true));  //FIXME: ??
         authoringUtil.reconstructQuestionContentMapForAdd(mapQuestionContent, request);
         
+        logger.debug("richTextInstructions: " + request.getSession().getAttribute(ACTIVITY_INSTRUCTIONS));
         return (mapping.findForward(LOAD_QUESTIONS));
     }
     
@@ -454,8 +514,25 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants
      */
     public ActionForward removeQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
         throws IOException, ServletException {
+    	logger.debug("doing removeQuestion ");
     	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
-        AuthoringUtil authoringUtil= new AuthoringUtil();
+    	
+		String richTextTitle = request.getParameter("title");
+        String richTextInstructions = request.getParameter("instructions");
+        logger.debug("richTextTitle: " + richTextTitle);
+        logger.debug("richTextInstructions: " + richTextInstructions);
+        
+        if (richTextTitle != null)
+        {
+    		request.getSession().setAttribute(ACTIVITY_TITLE, richTextTitle);
+        }
+
+        if (richTextInstructions != null)
+        {
+    		request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, richTextInstructions);
+        }
+        
+		AuthoringUtil authoringUtil= new AuthoringUtil();
         QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
         Map mapQuestionContent=(Map)request.getSession().getAttribute(MAP_QUESTION_CONTENT);
         

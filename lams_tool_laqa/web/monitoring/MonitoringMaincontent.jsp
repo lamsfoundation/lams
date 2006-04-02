@@ -27,34 +27,49 @@ http://www.gnu.org/licenses/gpl.txt
 <%@ taglib uri="fck-editor" prefix="FCK" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
+<%@ page import="java.util.LinkedHashSet" %>
+<%@ page import="java.util.Set" %>
+
+    <% 
+		Set tabs = new LinkedHashSet();
+		tabs.add("label.summary");
+		tabs.add("label.instructions");
+		tabs.add("label.editActivity");
+		tabs.add("label.stats");
+		pageContext.setAttribute("tabs", tabs);
+		
+	%>
+
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD hTML 4.01 Transitional//EN">
-<html:html>
-<head>
+	<!DOCTYPE HTML PUBLIC "-//W3C//DTD hTML 4.01 Transitional//EN">
+	<html:html locale="true">
+	<head>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-		<title> <bean:message key="label.monitoring"/> </title>
-	<script lang="javascript">
-		var imgRoot="<c:out value="${lams}"/>images/";
-		var themeName="aqua";
-	</script>
+	<title> <bean:message key="label.monitoring"/> </title>
 	
-	<script type="text/javascript" src="<c:out value="${lams}"/>includes/javascript/tabcontroller.js"></script>
-	<script src="<c:out value="${lams}"/>includes/javascript/common.js"></script>
-	
-	<!-- this is the custom CSS for hte tool -->
-	<link href="<c:out value="${tool}"/>css/tool_custom.css" rel="stylesheet" type="text/css">
-	<lams:css/>
+	 <lams:css/>
+	<!-- depending on user / site preference this will get changed probably use passed in variable from flash to select which one to use-->
+
+ 	<!-- ******************** FCK Editor related javascript & HTML ********************** -->
+    <script type="text/javascript" src="${lams}fckeditor/fckeditor.js"></script>
+    <script type="text/javascript" src="${tool}author_page/js/fckcontroller.js"></script>
+    <link href="${tool}author_page/css/fckeditor_style.css" rel="stylesheet" type="text/css">
+
 	<script language="JavaScript" type="text/JavaScript">
 
-		// general submit
-		// actionMethod: name of the method to be called in the DispatchAction
 		function submitMonitoringMethod(actionMethod) 
 		{
 			document.QaMonitoringForm.method.value=actionMethod; 
 			document.QaMonitoringForm.submit();
 		}
+		
+		function submitAuthoringMethod(actionMethod) {
+			document.QaAuthoringForm.dispatch.value=actionMethod; 
+			document.QaAuthoringForm.submit();
+		}
+		
 		
 		function submitModifyQuestion(questionIndexValue, actionMethod) 
 		{
@@ -82,154 +97,69 @@ http://www.gnu.org/licenses/gpl.txt
 			document.QaMonitoringForm.selectedToolSessionId.value=selectedToolSessionId; 
 			submitMonitoringMethod(actionMethod);
 		}
-		
-		function MM_reloadPage(init) {  //reloads the window if Nav4 resized
-		  if (init==true) with (navigator) {if ((appName=="Netscape")&&(parseInt(appVersion)==4)) {
-		    document.MM_pgW=innerWidth; document.MM_pgH=innerHeight; onresize=MM_reloadPage; }}
-		  else if (innerWidth!=document.MM_pgW || innerHeight!=document.MM_pgH) location.reload();
-		}
-		MM_reloadPage(true);
-		//-->
-	</script>	
+
+
+    	var imgRoot="${lams}images/";
+	    var themeName="aqua";
+        
+        function init(){
+        
+            initTabSize(4);
+            
+            var tag = document.getElementById("currentTab");
+	    	if(tag.value != "")
+	    		selectTab(tag.value);
+            else
+                selectTab(1); //select the default tab;
+                
+
+            initEditor("title");
+            initEditor("instructions");
+            initEditor("questionContent0");
+            
+            <c:set var="queIndex" scope="session" value="1"/>
+            <c:forEach var="questionEntry" items="${sessionScope.mapQuestionContent}">
+                <c:set var="queIndex" scope="session" value="${queIndex +1}"/>
+                initEditor("<c:out value="questionContent${queIndex-1}"/>");
+            </c:forEach>
+        }     
+        
+        function doSelectTab(tabId) {
+        	// start optional tab controller stuff
+        	var tag = document.getElementById("currentTab");
+	    	tag.value = tabId;
+	    	// end optional tab controller stuff
+	    	selectTab(tabId);
+        } 
+        
+        function doSubmit(method) {
+        	document.QaMonitoringForm.dispatch.value=method;
+        	document.QaMonitoringForm.submit();
+        }
+	
+	</script>
+	
+	<script type="text/javascript" src="<c:out value="${tool}"/>author_page/js/tabcontroller.js"></script>    
+	<script type="text/javascript" src="<c:out value="${lams}"/>includes/javascript/common.js"></script>
+	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/xmlrequest.js'/>"></script>
 	
 </head>
-
-<%-- chooses which tab to highlight --%>
-<c:choose>
-         <c:when test='${currentMonitoringTab == "instructions"}'>
-           <c:set var="tabId" value="i" />
-        </c:when>
-        <c:when test='${currentMonitoringTab == "editActivity"}'>
-           <c:set var="tabId" value="e" />
-        </c:when>
-        <c:when test='${currentMonitoringTab == "stats"}'>
-           <c:set var="tabId" value="st" />
-        </c:when>
-        <c:otherwise> 
-      	   <c:set var="tabId" value="su" />
-        </c:otherwise>
-</c:choose>
-
-<body onLoad='showMonitoringTab("<c:out value='${tabId}'/>")'>
-
+<body onLoad="init();">
+	
 	<b> <font size=2> <bean:message key="label.monitoring"/> </font></b>
 	
-		<c:set var="monitoringURL">
-			<html:rewrite page="/monitoring.do" />
-		</c:set>
+    <html:form  action="/monitoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
+	<html:hidden property="method"/>
+	<html:hidden property="toolContentID"/>
+	<html:hidden property="currentTab" styleId="currentTab" />
 
-	  <html:form  action="/monitoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
-
-		<!-- start tabs -->
-		<!-- tab holder table -->
-		<table border="0" cellspacing="0" cellpadding="0">
-		  <tr>
-		  	<td> &nbsp&nbsp</td>
-		  </tr>
-			
-		  <tr>
-			    <td valign="bottom">
-					<table border="0" cellspacing="0" cellpadding="0">
-					  <tr>
-						<td><img src="<c:out value="${lams}"/>images/aqua_tab_s_left.gif" name="tab_left_su" width="8" height="25" border="0" id="tab_left_su"/></td>
-						<td class="tab tabcentre_selected" width="90" id="tab_tbl_centre_su" ><label>
-						<a href="<c:out value='${monitoringURL}'/>?method=getSummary" id="su" >
-							<bean:message key="label.summary"/>
-						</a></label></td>
-						<td><a href="<c:out value='${monitoringURL}'/>?method=getSummary">
-							<img src="<c:out value="${lams}"/>images/aqua_tab_s_right.gif"  name="tab_right_su" width="8" height="25" border="0" id="tab_right_su"/></a></td>
-					  </tr>
-					</table>
-				</td>
-
-			    <td valign="bottom">
-					<table border="0" cellspacing="0" cellpadding="0">
-					  <tr>
-						<td><img src="<c:out value="${lams}"/>images/aqua_tab_s_left.gif" name="tab_left_i" width="8" height="25" border="0" id="tab_left_i"/></td>
-						<td class="tab tabcentre_selected" width="90" id="tab_tbl_centre_i" ><label><a
-							href="<c:out value='${monitoringURL}'/>?method=getInstructions" id="i" >
-								<bean:message key="label.instructions"/>
-							</a></label></td>
-						<td><a href="<c:out value='${monitoringURL}'/>?method=getInstructions">
-							<img src="<c:out value="${lams}"/>images/aqua_tab_s_right.gif"  name="tab_right_i" width="8" height="25" border="0" id="tab_right_i"/></a></td>
-					  </tr>
-					</table>
-				</td>
-
-				
-			    <td valign="bottom">
-					<table border="0" cellspacing="0" cellpadding="0">
-					  <tr>
-						<td><img src="<c:out value="${lams}"/>images/aqua_tab_s_left.gif" name="tab_left_e" width="8" height="25" border="0" id="tab_left_e"/></td>
-						<td class="tab tabcentre_selected" width="90" id="tab_tbl_centre_e" ><label><a
-							href="<c:out value='${monitoringURL}'/>?method=editActivity" id="e" >
-								<bean:message key="label.editActivity"/>								
-							</a></label></td>
-						<td><a href="<c:out value='${monitoringURL}'/>?method=editActivity">
-							<img src="<c:out value="${lams}"/>images/aqua_tab_s_right.gif"  name="tab_right_e" width="8" height="25" border="0" id="tab_right_e"/></a></td>
-					  </tr>
-					</table>
-				</td>
-
-							
-			    <td valign="bottom">
-					<table border="0" cellspacing="0" cellpadding="0">
-					  <tr>
-						<td><img src="<c:out value="${lams}"/>images/aqua_tab_s_left.gif" name="tab_left_s" width="8" height="25" border="0" id="tab_left_s"/></td>
-						<td class="tab tabcentre_selected" width="90" id="tab_tbl_centre_s" ><label><a
-							href="<c:out value='${monitoringURL}'/>?method=getStats" id="e" >
-								<bean:message key="label.stats"/>								
-							</a></label></td>
-						<td><a href="<c:out value='${monitoringURL}'/>?method=getStats">
-							<img src="<c:out value="${lams}"/>images/aqua_tab_s_right.gif"  name="tab_right_s" width="8" height="25" border="0" id="tab_right_s"/></a></td>
-					  </tr>
-					</table>
-				</td>
-		  </tr>
-		</table>
-
-		<!-- end tab buttons -->	
-
-
-		<html:hidden property="method"/>	 
-		<c:choose>
-		         <c:when test='${currentMonitoringTab == "instructions"}'>
-						<div class="tabbody content_b" >
-							<jsp:include page="/monitoring/Instructions.jsp" />
-						</div>
-						
-		        </c:when>
-		
-		        <c:when test='${currentMonitoringTab == "editActivity"}'>
-						<div class="tabbody content_b" >
-							<c:if test="${ sessionScope.userExceptionContentInUse == 'true'}"> 			
-									<div id="datatablecontainer">
-										<font size=2> <bean:message key="label.content.notEditable"/> </font>
-									</div>										
-							</c:if> 				    
-						</div>
-		        </c:when>
-
-		         <c:when test='${currentMonitoringTab == "stats"}'>
-						<div class="tabbody content_b" >
-							<jsp:include page="/monitoring/Stats.jsp" />
-						</div>
-		        </c:when>
-		        
-		        <c:otherwise> 
-						<div class="tabbody content_b" >
-							<jsp:include page="/monitoring/SummaryContent.jsp" />
-						</div>		         							
-		        </c:otherwise>
-		</c:choose>
+		<lams:Tabs collection="${tabs}" useKey="true" control="true"/>
+		<div class="tabbody">
+		<lams:TabBody id="1" titleKey="label.summary" page="SummaryContent.jsp"/>
+		<lams:TabBody id="2" titleKey="label.instructions" page="Instructions.jsp" />
+		<lams:TabBody id="3" titleKey="label.editActivity" page="Edit.jsp" />
+		<lams:TabBody id="4" titleKey="label.stats" page="Stats.jsp" />
+	<lams:HTMLEditor/>	
 	</html:form>
-
 </body>
 </html:html>
-
-
-
-
-
-
-

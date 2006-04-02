@@ -59,6 +59,7 @@ public interface QaAppConstants {
 	public static final String AUTHORING								="authoring";
 	public static final String MONITORING								="monitoring";
 	public static final String DEFINE_LATER_IN_EDIT_MODE				="defineLaterInEditMode";
+	public static final String REMOVABLE_QUESTION_INDEX					="removableQuestionIndex";
 	public static final String SHOW_AUTHORING_TABS						="showAuthoringTabs";
 	public static final String MONITORING_ORIGINATED_DEFINELATER		="monitoringOriginatedDefineLater";
 	public static final String DEFINE_LATER								="defineLater";
