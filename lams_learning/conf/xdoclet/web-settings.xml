@@ -36,6 +36,8 @@ http://www.gnu.org/licenses/gpl.txt
 		classpath:/org/lamsfoundation/lams/tool/qa/qaApplicationContext.xml 
 		classpath:/org/lamsfoundation/lams/tool/sbmt/submitFilesApplicationContext.xml 
 		classpath:/org/lamsfoundation/lams/tool/forum/forumApplicationContext.xml 
+		classpath:/org/lamsfoundation/lams/tool/chat/applicationContext.xml
+<!-- 		classpath:/org/lamsfoundation/lams/tool/rsrc/rsrcApplicationContext.xml -->
 	</param-value>
 </context-param>
 <listener>
