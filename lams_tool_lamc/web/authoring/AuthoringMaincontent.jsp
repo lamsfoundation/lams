@@ -106,8 +106,6 @@ http://www.gnu.org/licenses/gpl.txt
             
             initEditor("richTextTitle");
             initEditor("richTextInstructions");
-            initEditor("richTextOnlineInstructions");
-            initEditor("richTextOfflineInstructions");
         }     
         
         function doSelectTab(tabId) {
