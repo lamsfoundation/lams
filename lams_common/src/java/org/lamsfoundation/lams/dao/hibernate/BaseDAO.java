@@ -1,11 +1,11 @@
 /****************************************************************
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
  * =============================================================
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation.
  * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -20,6 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
+/* $$Id$$ */
 package org.lamsfoundation.lams.dao.hibernate;
 
 import java.io.Serializable;
