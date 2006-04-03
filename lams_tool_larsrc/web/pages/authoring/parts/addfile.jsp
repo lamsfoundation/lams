@@ -22,7 +22,7 @@
 		<tr>
 			<td>
 			<%@ include file="/common/messages.jsp" %>
-			<html:form action="/authoring/saveOrUpdateItem" method="post" styleId="resourceItemForm">
+			<html:form action="/authoring/saveOrUpdateItem" method="post" styleId="resourceItemForm"  enctype="multipart/form-data">
 				<input type="hidden" name="instructionList" id="instructionList"/>
 				<input type="hidden" name="itemType" id="itemType" value="2"/>
 				<html:hidden property="itemIndex"/>

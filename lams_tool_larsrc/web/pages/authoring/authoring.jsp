@@ -63,8 +63,7 @@
         } 
         
         function doSubmit(method) {
-        	document.SbmtAuthoringForm.dispatch.value=method;
-        	document.SbmtAuthoringForm.submit();
+        	$("authoringForm").submit();
         }
         
     </script>
@@ -74,7 +73,7 @@
 </head>
 <body onLoad="init()">
 
-<html:form action="authoring/update" method="post"
+<html:form action="authoring/update" method="post" styleId="authoringForm"
 	focus="title"  enctype="multipart/form-data">
 		<html:hidden property="toolContentID"/>
 		<html:hidden property="currentTab" styleId="currentTab" />

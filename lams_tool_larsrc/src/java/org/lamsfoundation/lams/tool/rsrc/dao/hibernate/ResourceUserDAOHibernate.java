@@ -20,9 +20,20 @@
  */
 package org.lamsfoundation.lams.tool.rsrc.dao.hibernate;
 
+import java.util.List;
+
 import org.lamsfoundation.lams.tool.rsrc.dao.ResourceUserDAO;
+import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
 
 
 public class ResourceUserDAOHibernate extends BaseDAOHibernate implements ResourceUserDAO{
+	
+	private static final String FIND_BY_USER_ID = "from " + ResourceUser.class.getName() + " as u where u.userId =?";
+	public ResourceUser getUserByUserID(Class<ResourceUser> name, Long userUid) {
+		List list = this.getHibernateTemplate().find(FIND_BY_USER_ID,userUid);
+		if(list == null || list.size() == 0)
+			return null;
+		return (ResourceUser) list.get(0);
+	}
 
 }

@@ -226,7 +226,7 @@ public class ResourceServiceImpl implements
 
 	public ResourceUser getUserByID(Long userUid) {
 		
-		return (ResourceUser) resourceUserDao.getObject(ResourceUser.class,userUid);
+		return (ResourceUser) resourceUserDao.getUserByUserID(ResourceUser.class,userUid);
 		
 	}
 

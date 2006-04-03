@@ -35,7 +35,7 @@
 				onclick="preview()" class="button">
 		</td>
 		<td width="50px">
-			<input type="button" name="ei"  value="<fmt:message key="label.authoring.basic.resource.edit" />
+			<input type="button" name="ei"  value="<fmt:message key="label.authoring.basic.resource.edit" />"
 				onclick="editItem(${status.index})" class="button">
 		</td>
 		<td width="50px">
@@ -48,7 +48,8 @@
 			<fmt:message key="label.authoring.basic.resource.website" />
 		</td>
 		<td width="50px">
-			<input type="button" name="pi" value="<fmt:message key="label.authoring.basic.resource.preview" />">
+			<input type="button" name="pi" value="<fmt:message key="label.authoring.basic.resource.preview" />"
+				onclick="preview()" class="button">
 		</td>
 		<td width="50px">
 			<input type="button" name="ei"  value="<fmt:message key="label.authoring.basic.resource.edit" />"
@@ -64,11 +65,12 @@
 			<fmt:message key="label.authoring.basic.resource.learning.object" />
 		</td>
 		<td width="50px">
-			<input type="button" name="pi" value="<fmt:message key="label.authoring.basic.resource.preview" />">
+			<input type="button" name="pi" value="<fmt:message key="label.authoring.basic.resource.preview" />"
+				onclick="preview()" class="button">
 		</td>
 		<td width="50px">
 			<input type="button" name="ei"  value="<fmt:message key="label.authoring.basic.resource.edit" />"
-				onclick="editItem(${status.index})" class="button">
+				onclick="editItem(${status.index})" class="	">
 		</td>
 		<td width="50px">
 			<input type="button" name="di" value="<fmt:message key="label.authoring.basic.resource.delete" />"

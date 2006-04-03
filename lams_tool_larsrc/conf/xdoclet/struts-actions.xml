@@ -15,7 +15,8 @@
 			scope="session" 
 			parameter="updateContent" 
 			validate="false">
-			<forward name="success" path="/pages/authoring/authoring.jsp" />
+			<forward name="author" path="/pages/authoring/authoring.jsp" />
+			<forward name="monitoring" path="/pages/monitoring/authoring.jsp" />
 		</action>
 		<!-- ==========  Resource Item : URL ========== -->
 		<action path="/authoring/newItemInit"

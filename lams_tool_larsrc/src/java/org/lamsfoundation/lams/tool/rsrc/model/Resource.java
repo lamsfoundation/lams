@@ -350,7 +350,7 @@ public class Resource implements Cloneable{
 	 * 
 	 * @hibernate.set lazy="true"
 	 *                inverse="true"
-	 *                cascade="none"
+	 *                cascade="all"
 	 *                order-by="create_date desc"
 	 * @hibernate.collection-key column="resource_uid"
 	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.rsrc.model.ResourceItem"

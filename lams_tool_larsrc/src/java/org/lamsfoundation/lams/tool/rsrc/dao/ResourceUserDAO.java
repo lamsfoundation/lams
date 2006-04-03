@@ -20,6 +20,10 @@
  */
 package org.lamsfoundation.lams.tool.rsrc.dao;
 
+import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
+
 public interface ResourceUserDAO extends DAO {
+
+	ResourceUser getUserByUserID(Class<ResourceUser> name, Long userUid);
 
 }

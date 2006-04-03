@@ -28,7 +28,6 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.lamsfoundation.lams.tool.rsrc.dao.DAO;
-import org.springframework.orm.ObjectRetrievalFailureException;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
@@ -53,11 +52,6 @@ public class BaseDAOHibernate extends HibernateDaoSupport implements DAO {
      */
     public Object getObject(Class clazz, Serializable id) {
         Object o = getHibernateTemplate().get(clazz, id);
-
-        if (o == null) {
-            throw new ObjectRetrievalFailureException(clazz, id);
-        }
-
         return o;
     }
 

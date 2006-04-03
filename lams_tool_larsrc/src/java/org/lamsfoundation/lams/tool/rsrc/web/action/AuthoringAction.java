@@ -380,18 +380,19 @@ public class AuthoringAction extends Action {
 	    		if(item.getFileUuid() != null && item.getFileVersionId() != null)
 	    			service.deleteFromRepository(item.getFileUuid(),item.getFileVersionId());
 	    	}
-
-			//initialize attachmentList again
-			attachmentList = getAttachmentList(request);
-			attachmentList.addAll(resource.getAttachments());
-			
 			//**********************************************
 			//finally persist resourcePO again
 			service.saveOrUpdateResource(resourcePO);
+			
+			//initialize attachmentList again
+			attachmentList = getAttachmentList(request);
+			attachmentList.addAll(resource.getAttachments());
 		} catch (Exception e) {
 			log.error(e);
 		}
-		
+
+		ActionMessages messages = new ActionMessages();
+		messages.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage("authoring.save.success"));
     	String mode = (String) request.getSession().getAttribute(ResourceConstants.MODE);
     	if(StringUtils.equals(mode,ResourceConstants.AUTHOR_MODE))
     		return mapping.findForward("author");
@@ -811,7 +812,7 @@ public class AuthoringAction extends Action {
 		if(itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_WEBSITE 
 				||itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT
 				||itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_FILE){
-			if(itemForm.getFile() == null)
+			if(itemForm.getFile() == null || StringUtils.isEmpty(itemForm.getFile().getFileName()))
 				errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(ResourceConstants.ERROR_MSG_FILE_BLANK));
 		}
 		return errors;
