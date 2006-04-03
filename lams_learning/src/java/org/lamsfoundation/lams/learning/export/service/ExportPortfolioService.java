@@ -384,8 +384,8 @@ public class ExportPortfolioService implements IExportPortfolioService {
 		ToolPortfolio p = new ToolPortfolio();
 		Tool tool = activity.getTool();	
 		p.setActivityId(activity.getActivityId());
-		p.setActivityName(tool.getToolDisplayName());
-		p.setActivityDescription(activity.getTitle());
+		p.setActivityName(activity.getTitle());
+		p.setActivityDescription(activity.getDescription());
 		
 		/* if the tool does not have an export url, use the url that points to the servlet that generates a page saying that the export is not supported */
 		String exportUrlForTool = null;
