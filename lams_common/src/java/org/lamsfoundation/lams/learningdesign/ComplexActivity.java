@@ -103,21 +103,16 @@ public abstract class ComplexActivity extends Activity implements Serializable {
 	}
 
 	/**
-	 * @hibernate.set lazy="true" inverse="true" cascade="none"
+	 * @hibernate.set lazy="true" inverse="true" cascade="all-delete-orphan" sort="org.lamsfoundation.lams.learningdesign.ActivityOrderComparator"
 	 * @hibernate.collection-key column="parent_activity_id"
 	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.learningdesign.Activity"
 	 *  
 	 */
 	public Set getActivities() {
-	    if(this.activities==null){
+		if(this.activities==null){
 	        setActivities(new TreeSet(new ActivityOrderComparator()));
-	        return this.activities;
 	    }	    
-	    else{
-	    	TreeSet sortedActivities = new TreeSet(new ActivityOrderComparator());
-	    	sortedActivities.addAll(this.activities);
-	    	return sortedActivities;	    	
-	    }
+		return this.activities;
 	}
 
 	public void setActivities(Set activities) {

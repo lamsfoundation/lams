@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.SortedSet;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.strategy.SequenceActivityStrategy;
@@ -55,7 +56,7 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
             Transition transitionTo,
             Transition transitionFrom,
             String languageFile,
-            java.util.Set activities) {
+            SortedSet activities) {
         super(activityId, 
                 id, 
                 description, 
@@ -96,7 +97,7 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
             Integer activityTypeId,  
             Transition transitionTo,
             Transition transitionFrom,
-            java.util.Set activities) {
+            SortedSet activities) {
       super(activityId, 
               defineLater, 
               createDateTime, 

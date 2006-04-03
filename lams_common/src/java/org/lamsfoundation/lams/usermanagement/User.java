@@ -688,13 +688,15 @@ public class User implements Serializable {
 	 * has read and write access but cannot modify anybody else's content/stuff
 	 **/
 	public boolean hasMemberAccess(WorkspaceFolder workspaceFolder){		
-		Iterator iterator = this.userOrganisations.iterator();
-		while(iterator.hasNext()){
-			UserOrganisation userOrganisation = (UserOrganisation)iterator.next();			
-			Integer folderID = userOrganisation.getOrganisation().getWorkspace().getRootFolder().getWorkspaceFolderId();
-			if(folderID==workspaceFolder.getWorkspaceFolderId())
-				return true;
-		}		
+		Integer workspaceFolderID = workspaceFolder != null ? workspaceFolder.getWorkspaceFolderId() : null;
+		if ( workspaceFolderID != null ) {
+			Iterator iterator = this.userOrganisations.iterator();
+			while(iterator.hasNext()){
+				UserOrganisation userOrganisation = (UserOrganisation)iterator.next();			
+				Integer folderID = userOrganisation.getOrganisation().getWorkspace().getRootFolder().getWorkspaceFolderId();
+				return ( workspaceFolderID.equals(folderID) );
+			}		
+		}
 		return false;
 	}
 

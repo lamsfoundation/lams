@@ -170,23 +170,24 @@ public class LearnerAction extends LamsDispatchAction
 
         //get user and lesson based on request.
         User learner = LearningWebUtil.getUserData(getServlet().getServletContext());
-        Lesson lesson = LearningWebUtil.getLessonData(request,getServlet().getServletContext());
+        long lessonID = WebUtil.readLongParam(request,LearningWebUtil.PARAM_LESSON_ID);
 
         
         if(log.isDebugEnabled())
             log.debug("The learner ["+learner.getUserId()+"],["+learner.getFullName()
-                      +"is joining the lesson ["+lesson.getLessonId()+"],["+lesson.getLessonName()+"]");
+                      +"is joining the lesson ["+lessonID+"]");
 
         //join user to the lesson on the server
-        LearnerProgress learnerProgress = learnerService.joinLesson(learner,lesson);
+        LearnerProgress learnerProgress = learnerService.joinLesson(learner,lessonID);
         
         if(log.isDebugEnabled())
             log.debug("The learner ["+learner.getUserId()+"] joined lesson. The"
                       +"porgress data is:"+learnerProgress.toString());
         
+        // TODO replace with JBOSS cache
+        //LessonLearnerDataManager.cacheLessonUser(getServlet().getServletContext(),
+        //                                         lesson,learner);
         
-        LessonLearnerDataManager.cacheLessonUser(getServlet().getServletContext(),
-                                                 lesson,learner);
         //setup session attributes
         //request.getSession().setAttribute(SessionBean.NAME,new SessionBean(learner,
         //                                                                   lesson,

@@ -106,7 +106,8 @@ public class LearningWebUtil
             ILearnerService learnerService = LearnerServiceProxy.getLearnerService(servletContext);
             long lessonId = WebUtil.readLongParam(request,PARAM_LESSON_ID);
             lesson = learnerService.getLesson(new Long(lessonId));
-            request.getSession().setAttribute(ATTR_LESSON_DATA,lesson);
+// TODO don't cache it currently - would do it via jboss cache!
+//            request.getSession().setAttribute(ATTR_LESSON_DATA,lesson);
         }
         return lesson;
     }
@@ -133,8 +134,9 @@ public class LearningWebUtil
             LearnerProgress progress = learnerService.getProgress(currentLearner,lesson);
             bean = new SessionBean(currentLearner,lesson,progress);
             
-            request.getSession().setAttribute(SessionBean.NAME,bean);
-            request.getSession().setAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE,progress);
+//          TODO don't cache it currently - would do it via jboss cache!
+//            request.getSession().setAttribute(SessionBean.NAME,bean);
+//            request.getSession().setAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE,progress);
         }
         return bean;
     }
@@ -158,7 +160,8 @@ public class LearningWebUtil
 		    
 		    learnerProgress = learnerService.getProgressById(new Long(learnerProgressId));
 
-            request.getSession().setAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE,learnerProgress);
+//          TODO don't cache it currently - would do it via jboss cache!
+//            request.getSession().setAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE,learnerProgress);
 		}
 		return learnerProgress;
 	}
@@ -182,7 +185,8 @@ public class LearningWebUtil
             
             learnerProgress = learnerService.getProgress(currentLearner,lesson);
 
-            request.getSession().setAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE,learnerProgress);
+//          TODO don't cache it currently - would do it via jboss cache!
+//            request.getSession().setAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE,learnerProgress);
 		}
 		return learnerProgress;
 	}

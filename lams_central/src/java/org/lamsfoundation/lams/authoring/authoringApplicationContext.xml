@@ -21,6 +21,19 @@
     	
 	<!-- ========================= BUSINESS OBJECT DEFINITIONS ========================= -->
 	
+	<bean id="ObjectExtractor" class="org.lamsfoundation.lams.authoring.ObjectExtractor" singleton="false">
+		<property name="learningDesignDAO"><ref bean="learningDesignDAO"/></property>
+		<property name="learningLibraryDAO"><ref bean="learningLibraryDAO"/></property>
+		<property name="userDAO"><ref bean="userDAO"/></property>
+		<property name="activityDAO"><ref bean="activityDAO"/></property>
+		<property name="workspaceFolderDAO"><ref bean="workspaceFolderDAO"/></property>
+		<property name="transitionDAO"><ref bean="transitionDAO"/></property>
+		<property name="toolDAO"><ref bean="toolDAO"/></property>
+		<property name="groupingDAO"><ref bean="groupingDAO"/></property>
+		<property name="groupDAO"><ref bean="groupDAO"/></property>
+		<property name="licenseDAO"><ref bean="licenseDAO"/></property>
+   	</bean>
+
 	<bean id="authoringServiceTarget" class="org.lamsfoundation.lams.authoring.service.AuthoringService">
 		<property name="learningDesignDAO"><ref bean="learningDesignDAO"/></property>
 		<property name="learningLibraryDAO"><ref bean="learningLibraryDAO"/></property>

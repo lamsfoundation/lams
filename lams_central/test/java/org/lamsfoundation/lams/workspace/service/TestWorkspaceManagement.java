@@ -1,10 +1,10 @@
 package org.lamsfoundation.lams.workspace.service;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.Vector;
 
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
@@ -20,27 +20,27 @@ public class TestWorkspaceManagement extends BaseWorkspaceTest {
 	private static final Integer MELCOE_WORKSPACE_FOLDER = new Integer(3);
 	private static final Integer LAMS_WORKSPACE_FOLDER = new Integer(4);
 	private static final Integer MANPREETS_WORKSPACE_FOLDER = new Integer(6);
-	private static final Integer TO_DELETE_WORKSPACE_FOLDER = new Integer(7);
-	private static final Long    LONG_DELETE_WORKSPACE_FOLDER = new Long(7);
+	//private static final Integer TO_DELETE_WORKSPACE_FOLDER = new Integer(7);
+	//private static final Long    LONG_DELETE_WORKSPACE_FOLDER = new Long(7);
 	private static final Integer DOCUMENTS_WORKSPACE_FOLDER = new Integer(8);
-	private static final Long	 LONG_DOCUMENTS_WORKSPACE_FOLDER = new Long(8);
+	private static final Integer LONG_DOCUMENTS_WORKSPACE_FOLDER = new Integer(8);
 	private static final Integer PICTURES_WORKSPACE_FOLDER = new Integer(9);
 	
 	private static final Integer MANPREETS_WORKSPACE = new Integer(6);
 	private static final Integer USER_ID = new Integer(4);
-	private static final Long 	 LD_ID = new Long(2);
 
 	public TestWorkspaceManagement(String name){
 		super(name);
 	}
     
 	public void testGetAccessibleWorkspaceFolders()throws IOException{
-		String packet = workspaceManagementService.getAccessibleWorkspaceFolders(USER_ID);		
-		System.out.println("User Accessible folders: " + packet);		
+		Vector vector = workspaceManagementService.getAccessibleOrganisationWorkspaceFolders(USER_ID);
+		assertTrue("Accessible workspace folders exists",vector!=null && vector.size()>0);
 	}
 	public void testGetFolderContents()throws Exception{
-		String packet = workspaceManagementService.getFolderContents(USER_ID,LAMS_WORKSPACE_FOLDER,WorkspaceManagementService.AUTHORING);		
-		System.out.println("FolderContents:" + packet);
+		WorkspaceFolder folder = workspaceFolderDAO.getWorkspaceFolderByID(LAMS_WORKSPACE_FOLDER);
+		Vector vector = workspaceManagementService.getFolderContents(USER_ID,folder,WorkspaceManagementService.AUTHORING);		
+		assertTrue("FolderContents exist",vector!=null && vector.size()>0);
 	}
 	
 	// TODO why does copyfolder seem to take so long
@@ -71,7 +71,7 @@ public class TestWorkspaceManagement extends BaseWorkspaceTest {
 
 		// okay - got the right folder. now delete it.
 		Integer folderId = new Integer(id.intValue());
-		String message = workspaceManagementService.deleteFolder(folderId, USER_ID);
+		workspaceManagementService.deleteFolder(folderId, USER_ID);
 		try{
 			workspaceFolderDAO.getWorkspaceFolderByID(folderId);
 			fail("Exception should be raised because this object has already been deleted");
@@ -92,7 +92,7 @@ public class TestWorkspaceManagement extends BaseWorkspaceTest {
 			newWorkspaceFolderId = MACQ_UNI_WORKSPACE_FOLDER.intValue();
 		}
 		
-		String message = workspaceManagementService.moveFolder(MANPREETS_WORKSPACE_FOLDER,new Integer(newWorkspaceFolderId), USER_ID);				
+		workspaceManagementService.moveFolder(MANPREETS_WORKSPACE_FOLDER,new Integer(newWorkspaceFolderId), USER_ID);				
 		WorkspaceFolder workspaceFolder = workspaceFolderDAO.getWorkspaceFolderByID(MANPREETS_WORKSPACE_FOLDER);
 		assertEquals(workspaceFolder.getParentWorkspaceFolder().getWorkspaceFolderId().intValue(), newWorkspaceFolderId);
 	}
@@ -112,6 +112,7 @@ public class TestWorkspaceManagement extends BaseWorkspaceTest {
 	/**This method just creates different versions of the given file. Checks the version in both 
 	 * the wddx packet and the database object. */
 	public void testUpdateWorkspaceFolderContent() throws Exception{
+
 		// create some content to play with. name must be unique or it will throw a key error.
 		String name = "testUpdateWorkspaceFolderContent"+System.currentTimeMillis();
 		String message = workspaceManagementService.createWorkspaceFolderContent(
@@ -152,7 +153,7 @@ public class TestWorkspaceManagement extends BaseWorkspaceTest {
 		assertEquals("packet version matches content value", content2.getVersionID(), nk.getVersion());
 
 		// delete a version and make sure previous version is picked up.
-		String message2 = workspaceManagementService.deleteContentWithVersion(nk.getUuid(),nk.getVersion(),folderContentId);
+		workspaceManagementService.deleteContentWithVersion(nk.getUuid(),nk.getVersion(),folderContentId);
 		nk = extractNodeKeyFromWDDXPacket(message);
 		assertEquals("packet has deleted version 5", nk.getVersion().longValue(), 5);
 
@@ -183,7 +184,7 @@ public class TestWorkspaceManagement extends BaseWorkspaceTest {
 
 		// okay, we found the content, so now we can delete it.
 		Long folderContentId = content.getFolderContentID();
-		String deleteMessage = workspaceManagementService.deleteWorkspaceFolderContent(folderContentId);
+		workspaceManagementService.deleteWorkspaceFolderContent(folderContentId);
 		try{
 			workspaceFolderContentDAO.getWorkspaceFolderContentByID(folderContentId);
 			fail("Exception should be raised because this object has already been deleted");
@@ -199,12 +200,13 @@ public class TestWorkspaceManagement extends BaseWorkspaceTest {
 	 * @param content
 	 * @return
 	 */
-	private WorkspaceFolderContent getMatchingContent(NodeKey nk, Long folderId) {
+	private WorkspaceFolderContent getMatchingContent(NodeKey nk, Integer folderId) {
 		assertNotNull(nk);
 		assertNotNull(folderId);
-		List contentList = workspaceFolderContentDAO.getContentByWorkspaceFolder(folderId);
-		assertNotNull(contentList);
-		Iterator iter = contentList.iterator();
+		WorkspaceFolder folder = workspaceFolderDAO.getWorkspaceFolderByID(folderId);
+		Set content = folder.getFolderContent();
+		assertNotNull(content);
+		Iterator iter = content.iterator();
 		while (iter.hasNext()) {
 			WorkspaceFolderContent element = (WorkspaceFolderContent) iter.next();
 			if ( element.getUuid().equals(nk.getUuid())) {

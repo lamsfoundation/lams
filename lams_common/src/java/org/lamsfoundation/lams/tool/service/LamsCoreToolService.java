@@ -105,6 +105,13 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
 
         // if haven't found an existing tool session then create one
         if( toolSession == null ) {
+
+        	if ( log.isDebugEnabled() ) {
+        		log.debug("Creating tool session for ["+activity.getActivityId()+","+activity.getTitle()
+        				+"] for learner ["+learner.getLogin()
+        				+"] lesson ["+lesson.getLessonId()+","+lesson.getLessonName()+"].");
+        	}
+
         	toolSession = activity.createToolSessionForActivity(learner,lesson);
             toolSessionDAO.saveToolSession(toolSession);
             return toolSession;

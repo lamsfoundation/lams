@@ -53,7 +53,6 @@ public interface IAuthoringService {
 	/**
 	 * Create a copy of learning design as per the requested learning design 
 	 * and saves it in the given workspacefolder. Does not set the original 
-	 * learning design field, so it should not be used for creating lesson learning designs. 
 	 * 
 	 * @param originalLearningDesign The source learning design id.
 	 * @param copyType purpose of copying the design. Can have one of the follwing values
@@ -94,15 +93,10 @@ public interface IAuthoringService {
 	 * */
 	public List getAllLearningDesigns();
 	/**
-	 * Saves the LearningDesign to the database
+	 * Saves the LearningDesign to the database. Will update if already saved.
 	 * @param learningDesign The LearningDesign to be saved 
 	 * */
 	public void saveLearningDesign(LearningDesign learningDesign);
-	/**
-	 * Updates and existing LearningDesign in the database
-	 * @param learningDesign The learningDesign to be updated 
-	 **/
-	public void updateLearningDesign(LearningDesign learningDesign);
 	 
 	/**
 	 * @return List Returns a list of all available Learning Libraries

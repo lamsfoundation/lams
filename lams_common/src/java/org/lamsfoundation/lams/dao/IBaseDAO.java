@@ -31,14 +31,25 @@ import java.util.List;
 public interface IBaseDAO {
 	
 	/**
+	 * Insert an object into the database. Should only be used if the object has not
+	 * been persisted previously.
+	 * 
 	 * @param object The object to be inserted
 	 */
 	public void insert(Object object);
 	/**
+	 * Update a previously inserted object into the database.
 	 * @param object The object to be updated
 	 */
 	public void update(Object object);
 	/**
+	 * Insert or update an object into the database. It is up to the persistence
+	 * engine to decide whether to insert or update.
+	 * @param object The object to be inserted/updated
+	 */
+	public void insertOrUpdate(Object object);
+	/**
+	 * Remove an object from the database.
 	 * @param object The object to be deleted
 	 */
 	public void delete(Object object);

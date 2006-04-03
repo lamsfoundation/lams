@@ -152,7 +152,7 @@ public class TestLearnerService extends AbstractLamsTestCase
     
     public void testJoinLesson() throws ProgressException,LamsToolServiceException
     {
-        learnerService.joinLesson(testUser,testLesson);
+        learnerService.joinLesson(testUser,Test_Lesson_ID);
         
         testProgress=learnerProgressDao.getLearnerProgressByLearner(testUser,testLesson);
         assertNotNull(testProgress);

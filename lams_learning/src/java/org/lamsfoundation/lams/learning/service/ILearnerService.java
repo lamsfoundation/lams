@@ -52,7 +52,7 @@ public interface ILearnerService
      * @param lessionID identifies the Lesson to start
      * @throws LearnerServiceException in case of problems.
      */
-    public LearnerProgress joinLesson(User learner, Lesson lesson) ;
+    public LearnerProgress joinLesson(User learner, Long lessonID) ;
     
 
     /**

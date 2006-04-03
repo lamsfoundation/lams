@@ -24,6 +24,8 @@ package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Set;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.strategy.OptionsActivityStrategy;
 
@@ -63,7 +65,7 @@ public class OptionsActivity extends ComplexActivity implements Serializable {
             Transition transitionTo,
             Transition transitionFrom,
             String languageFile,
-            java.util.Set activities, 
+            Set activities, 
             Integer maxNumberOfOptions, 
             Integer minNumberOfOptions,
 			String options_instructions) {
@@ -109,7 +111,7 @@ public class OptionsActivity extends ComplexActivity implements Serializable {
             Integer activityTypeId,  
             Transition transitionTo,
             Transition transitionFrom,
-            java.util.Set activities) {
+            Set activities) {
       super(activityId, 
               defineLater, 
               createDateTime, 

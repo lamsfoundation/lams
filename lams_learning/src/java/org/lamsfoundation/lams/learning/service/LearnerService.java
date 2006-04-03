@@ -197,8 +197,9 @@ public class LearnerService implements ILearnerService
      * @throws LamsToolServiceException
      * @throws LearnerServiceException in case of problems.
      */
-    public LearnerProgress joinLesson(User learner, Lesson lesson) 
+    public LearnerProgress joinLesson(User learner, Long lessonID)  
     {
+    	Lesson lesson = getLesson(lessonID);
         LearnerProgress learnerProgress = learnerProgressDAO.getLearnerProgressByLearner(learner,lesson);
     	
         if(learnerProgress==null)
@@ -288,7 +289,7 @@ public class LearnerService implements ILearnerService
             learnerProgress = progressEngine.calculateProgress(learner, lesson, completedActivity,learnerProgress);
             learnerProgressDAO.updateLearnerProgress(learnerProgress);
             
-            // createToolSessionsIfNecessary(learnerProgress);
+            createToolSessionsIfNecessary(learnerProgress);
         }
         catch (ProgressException e)
         {

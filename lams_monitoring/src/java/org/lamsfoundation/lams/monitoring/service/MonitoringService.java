@@ -346,7 +346,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 
             }
         }
-        authoringService.updateLearningDesign(copiedLearningDesign);
+        authoringService.saveLearningDesign(copiedLearningDesign);
         
         return createNewLesson(lessonName,lessonDescription,user,copiedLearningDesign);
 

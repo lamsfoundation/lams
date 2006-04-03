@@ -40,7 +40,17 @@ public interface IWorkspaceManagementService {
 	public static final String REPOSITORY_USERNAME ="workspaceManager";
 	public static final String REPOSITORY_PASSWORD ="flashClient";
 	public static final String REPOSITORY_WORKSPACE="FlashClientsWorkspace";
-	
+
+	/* Message keys used for Flash packets. */
+	public static final String MSG_KEY_MOVE = "moveResource";
+	public static final String MSG_KEY_COPY = "copyResource";
+	public static final String MSG_KEY_RENAME = "renameResource";
+	public static final String MSG_KEY_DELETE = "deleteResource";
+	public static final String MSG_KEY_CREATE_WKF_CONTENT = "createWorkspaceFolderContent";
+	public static final String MSG_KEY_UPDATE_WKF_CONTENT = "updateWorkspaceFolderContent";
+	public static final String MSG_KEY_DELETE_VERSION = "deleteContentWithVersion";
+	public static final String MSG_KEY_ORG_BY_ROLE = "getOrganisationsByUserRole";
+	public static final String MSG_KEY_USER_BY_ROLE = "getUsersFromOrganisationByRole";
 	/**
 	 * Get the workspace folder for a particular id. Does not check the user permissions - that will be checked if you try to get
 	 * anything from the folder.
@@ -102,7 +112,7 @@ public interface IWorkspaceManagementService {
 	 * @return A list of the FolderContentDTOs in a format suitable for WDDX 
 	 * @throws Exception
 	 */
-	public Vector getFolderContentsExcludeHome(Integer userID, WorkspaceFolder workspaceFolder, Integer mode)throws UserAccessDeniedException, RepositoryCheckedException ;
+	public Vector<FolderContentDTO> getFolderContentsExcludeHome(Integer userID, WorkspaceFolder workspaceFolder, Integer mode)throws UserAccessDeniedException, RepositoryCheckedException ;
 	
 	/**
 	 * This method creates a new folder under the given parentFolder

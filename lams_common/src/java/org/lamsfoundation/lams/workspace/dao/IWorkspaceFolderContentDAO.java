@@ -42,25 +42,6 @@ public interface IWorkspaceFolderContentDAO extends IBaseDAO {
 	public WorkspaceFolderContent getWorkspaceFolderContentByID(Long folderContentID);
 	
 	/**
-	 * This method returns the content for the given <code>WorkspaceFolder</code>
-	 * with given <code>workspaceFolderID</code>.
-	 * 
-	 * @param workspaceFolderID The <code>WorkspaceFolder</code> whose content is requested 
-	 * @return List The requested content
-	 */
-	public List getContentByWorkspaceFolder(Long workspaceFolderID);
-	
-	/**
-	 * This method returns the content of the <code>WorkspaceFolder</code>
-	 * with given <code>workspaceFolderID</code>, which is of requested <code>mimeType</code>
-	 * 
-	 * @param workspaceFolderID The <code>WorkspaceFolder</code> whose content is requested
-	 * @param mimeType The <code>mimeType</code> of the requested content
-	 * @return List The requested content
-	 */
-	public List getContentByTypeFromWorkspaceFolder(Long workspaceFolderID, String mimeType);
-	
-	/**
 	 * This method deletes the content with the given UUID, versionID
 	 * from the content table.
 	 * 

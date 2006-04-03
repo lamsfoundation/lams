@@ -211,16 +211,15 @@
     </set>
     
     <!-- bi-directional one-to-many association to Transition -->
-    <set name="transitions" lazy="false" inverse="true" cascade="all">
+    <set name="transitions" lazy="false" inverse="true" cascade="all-delete-orphan" sort="unsorted">
     	 <key><column name="learning_design_id" /></key>
     	 <one-to-many class="org.lamsfoundation.lams.learningdesign.Transition"/>
     </set>
     
     <!-- bi-directional one-to-many association to Activity -->
-    <set name="activities" lazy="false" inverse="true" cascade="all">
-       	<key><column name="learning_design_id" /></key>
-        <one-to-many class="org.lamsfoundation.lams.learningdesign.Activity"/>
+    <set name="activities" lazy="false" inverse="true" cascade="all-delete-orphan" sort="org.lamsfoundation.lams.learningdesign.ActivityOrderComparator">
+    	 <key><column name="learning_design_id" /></key>
+         <one-to-many class="org.lamsfoundation.lams.learningdesign.Activity"/>
     </set>
-
 </class>
 </hibernate-mapping>

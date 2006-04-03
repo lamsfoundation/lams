@@ -22,23 +22,23 @@
  */
 package org.lamsfoundation.lams.learningdesign;
 
-import org.lamsfoundation.lams.learningdesign.dto.DesignDetailDTO;
-import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
-import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
-import org.lamsfoundation.lams.workspace.dto.FolderContentDTO;
-
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.learningdesign.dto.DesignDetailDTO;
+import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
+import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
+import org.lamsfoundation.lams.workspace.dto.FolderContentDTO;
 
 
 /**
@@ -179,7 +179,7 @@ public class LearningDesign implements Serializable {
 			User user,
 			LearningDesign originalLearningDesign,
 			Set childLearningDesigns, Set lessons, Set transitions,
-			Set activities,
+			SortedSet activities,
 			Long duration,
 			String licenseText,
 			License license,
@@ -230,7 +230,7 @@ public class LearningDesign implements Serializable {
 			User user,
 			org.lamsfoundation.lams.learningdesign.LearningDesign originalLearningDesign,
 			Set childLearningDesigns, Set lessons, Set transitions,
-			Set activities) {
+			SortedSet activities) {
 		this.learningDesignId = learningDesignId;
 		this.validDesign = validDesign;
 		this.readOnly = readOnly;
@@ -383,6 +383,9 @@ public class LearningDesign implements Serializable {
 		this.lessons = lessons;
 	}
 	public Set getTransitions() {
+		if ( this.transitions==null) {
+	        setTransitions(new HashSet());
+		}
 		return this.transitions;
 	}
 	public void setTransitions(Set transitions) {
@@ -391,13 +394,8 @@ public class LearningDesign implements Serializable {
 	public Set getActivities() {
 		if(this.activities==null){
 	        setActivities(new TreeSet(new ActivityOrderComparator()));
-	        return this.activities;
 	    }	    
-	    else{
-	    	TreeSet sortedActivities = new TreeSet(new ActivityOrderComparator());
-	    	sortedActivities.addAll(this.activities);
-	    	return sortedActivities;	    	
-	    }		
+		return this.activities;
 	}
 	public void setActivities(Set activities) {
 		this.activities = activities;

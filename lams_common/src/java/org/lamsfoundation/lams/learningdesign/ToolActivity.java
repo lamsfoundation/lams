@@ -26,6 +26,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
@@ -304,6 +305,9 @@ public class ToolActivity extends SimpleActivity implements Serializable
 	 * @return Returns the toolSessions.
 	 */
 	public Set getToolSessions() {
+		if ( toolSessions == null ) {
+			setToolSessions(new TreeSet(new ActivityOrderComparator()));
+		}
 		return toolSessions;
 	}
 	/**

@@ -35,7 +35,7 @@ import java.util.TreeSet;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.authoring.ObjectExtractor;
+import org.lamsfoundation.lams.authoring.IObjectExtractor;
 import org.lamsfoundation.lams.authoring.ObjectExtractorException;
 import org.lamsfoundation.lams.authoring.dto.StoreLearningDesignResultsDTO;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -77,6 +77,8 @@ import org.lamsfoundation.lams.util.ILoadedMessageSourceService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 
@@ -84,7 +86,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 /**
  * @author Manpreet Minhas 
  */
-public class AuthoringService implements IAuthoringService {
+public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	
 	protected Logger log = Logger.getLogger(AuthoringService.class);	
 
@@ -105,6 +107,9 @@ public class AuthoringService implements IAuthoringService {
 	protected ILoadedMessageSourceService toolActMessageService;
 	
 	protected ToolContentIDGenerator contentIDGenerator;
+	
+	/** The bean factory is used to create ObjectExtractor objects */
+	protected BeanFactory beanFactory;
 	
 	public AuthoringService(){
 		
@@ -233,7 +238,7 @@ public class AuthoringService implements IAuthoringService {
 	 * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#saveLearningDesign(org.lamsfoundation.lams.learningdesign.LearningDesign)
 	 */
 	public void saveLearningDesign(LearningDesign learningDesign){
-		learningDesignDAO.insert(learningDesign);
+		learningDesignDAO.insertOrUpdate(learningDesign);
 	}
 	/**
 	 * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getAllLearningDesigns()
@@ -243,20 +248,20 @@ public class AuthoringService implements IAuthoringService {
 	}
 	
 	/**
-	 * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#updateLearningDesign(org.lamsfoundation.lams.learningdesign.LearningDesign)
-	 */
-	public void updateLearningDesign(LearningDesign learningDesign) {		
-		learningDesignDAO.update(learningDesign);
-	}
-	
-	/**
 	 * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getAllLearningLibraries()
 	 */
 	public List getAllLearningLibraries(){
 		return learningLibraryDAO.getAllLearningLibraries();		
 	}
 	
-	
+	public BeanFactory getBeanFactory() {
+		return beanFactory;
+	}
+
+	public void setBeanFactory(BeanFactory beanFactory) {
+		this.beanFactory = beanFactory;
+	}
+
 	/**********************************************
 	 * Utility/Service Methods
 	 * *******************************************/
@@ -265,7 +270,6 @@ public class AuthoringService implements IAuthoringService {
 	 * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getLearningDesignDetails(java.lang.Long)
 	 */
 	public String getLearningDesignDetails(Long learningDesignID)throws IOException{
-		String wddxPacket = null;
 		LearningDesign design = learningDesignDAO.getLearningDesignById(learningDesignID);
 		if(design==null)
 			flashMessage = FlashMessage.getNoSuchLearningDesignExists("getLearningDesignDetails",learningDesignID);
@@ -305,31 +309,11 @@ public class AuthoringService implements IAuthoringService {
     	newLearningDesign.setWorkspaceFolder(workspaceFolder);    	
     	learningDesignDAO.insert(newLearningDesign);
     	updateDesignActivities(originalLearningDesign,newLearningDesign); 
-    	calculateFirstActivity(originalLearningDesign,newLearningDesign);
     	updateDesignTransitions(originalLearningDesign,newLearningDesign);
+    	// set first activity assumes that the transitions are all set up correctly.
+    	newLearningDesign.setFirstActivity(newLearningDesign.calculateFirstActivity());
+    	newLearningDesign.setLearningDesignUIID(originalLearningDesign.getLearningDesignUIID());
         return newLearningDesign;
-    }
-    
-    /**
-     * Calculates the First activity of the LearningDesign.
-     * <p> 
-     * The <em>activity_ui_id</em> is unique per LearningDesign. So when a LearningDesign is deep-copied
-     * all the activities in the newDesign would have the same <em>activity_ui_id</em> as the oldDesign.  
-     * This mean that the firstActivity of the newDesign would have the same <em>activity_ui_id</em>
-     * as the oldDesign.So in order to determine the firstActivity of the newDesign we look for an 
-     * activity which has an <em>activity_ui_id</em> same as that of the oldDesign and 
-     * <em>learning_design_id</em> as the newDesign
-     * </p>
-     *   
-     * @param oldDesign The LearningDesign to be copied
-     * @param newDesign The copy of the originalLearningDesign
-     */
-    private void calculateFirstActivity(LearningDesign oldDesign,LearningDesign newDesign){
-    	Integer oldUIID  = oldDesign.getFirstActivity().getActivityUIID();
-    	Activity firstActivity = activityDAO.getActivityByUIID(oldUIID,newDesign);
-    	newDesign.setFirstActivity(firstActivity);
-    	Integer learning_design_ui_id = newDesign.getLearningDesignUIID();
-    	newDesign.setLearningDesignUIID(learning_design_ui_id);
     }
     
     /**
@@ -340,32 +324,42 @@ public class AuthoringService implements IAuthoringService {
      * @param newLearningDesign The copy of the originalLearningDesign
      */
     private void updateDesignActivities(LearningDesign originalLearningDesign, LearningDesign newLearningDesign){
-    	HashSet newActivities = new HashSet();    	
-    	TreeSet oldParentActivities = new TreeSet(new ActivityOrderComparator());
-    	oldParentActivities.addAll(originalLearningDesign.getParentActivities());    	    	
-    	Iterator iterator = oldParentActivities.iterator();    	
-    	while(iterator.hasNext()){
-    		Activity parentActivity = (Activity)iterator.next();
-    		Activity newParentActivity = getActivityCopy(parentActivity);
-    		newParentActivity.setLearningDesign(newLearningDesign);
-    		activityDAO.insert(newParentActivity);
-    		newActivities.add(newParentActivity);
-    		
-    		TreeSet oldChildActivities = new TreeSet(new ActivityOrderComparator());
-    		oldChildActivities.addAll(getChildActivities((Activity)parentActivity));    		
-    		Iterator childIterator = oldChildActivities.iterator();
-    		
-    		while(childIterator.hasNext()){
-    			Activity childActivity = (Activity)childIterator.next();
-    			Activity newChildActivity = getActivityCopy(childActivity);
-    			newChildActivity.setParentActivity(newParentActivity);
-    			newChildActivity.setParentUIID(newParentActivity.getActivityUIID());
-    			newChildActivity.setLearningDesign(newLearningDesign);
-    			activityDAO.insert(newChildActivity);
-    			newActivities.add(newChildActivity);
-    		}
+    	TreeSet newActivities = new TreeSet(new ActivityOrderComparator());   
+    	
+    	Set oldParentActivities = originalLearningDesign.getParentActivities();
+    	if ( oldParentActivities != null ) {
+	    	Iterator iterator = oldParentActivities.iterator();    	
+	    	while(iterator.hasNext()){
+	    		Activity parentActivity = (Activity)iterator.next();
+	    		Activity newParentActivity = getActivityCopy(parentActivity);
+	    		newParentActivity.setLearningDesign(newLearningDesign);
+	    		activityDAO.insert(newParentActivity);
+	    		newActivities.add(newParentActivity);
+	    		
+	    		Set oldChildActivities = getChildActivities((Activity)parentActivity);
+	    		if ( oldChildActivities != null ) {
+		    		Iterator childIterator = oldChildActivities.iterator();
+		    		while(childIterator.hasNext()){
+		    			Activity childActivity = (Activity)childIterator.next();
+		    			Activity newChildActivity = getActivityCopy(childActivity);
+		    			newChildActivity.setParentActivity(newParentActivity);
+		    			newChildActivity.setParentUIID(newParentActivity.getActivityUIID());
+		    			newChildActivity.setLearningDesign(newLearningDesign);
+		    			activityDAO.insert(newChildActivity);
+		    			newActivities.add(newChildActivity);
+		    		}
+	    		}
+	    	}
     	}
-    	newLearningDesign.setActivities(newActivities);
+    	
+    	// The activities collection in the learning design may already exist (as we have already done a save on the design).
+    	// If so, we can't just override the existing collection as the cascade causes an error.
+    	if ( newLearningDesign.getActivities() != null ) {
+    		newLearningDesign.getActivities().clear();
+    		newLearningDesign.getActivities().addAll(newActivities);
+    	} else {
+    		newLearningDesign.setActivities(newActivities);
+    	}
     }
     
     /**
@@ -384,17 +378,30 @@ public class AuthoringService implements IAuthoringService {
     		Transition newTransition = Transition.createCopy(transition);    		
     		Activity toActivity = null;
         	Activity fromActivity=null;
-    		if(newTransition.getToUIID()!=null)
+    		if(newTransition.getToUIID()!=null) {
     			toActivity = activityDAO.getActivityByUIID(newTransition.getToUIID(),newLearningDesign);
-    		if(newTransition.getFromUIID()!=null)
+    			toActivity.setTransitionTo(newTransition);
+    		}
+    		if(newTransition.getFromUIID()!=null) {
     			fromActivity = activityDAO.getActivityByUIID(newTransition.getFromUIID(),newLearningDesign);
+    			fromActivity.setTransitionFrom(newTransition);
+    		}
     		newTransition.setToActivity(toActivity);
     		newTransition.setFromActivity(fromActivity);
     		newTransition.setLearningDesign(newLearningDesign);
     		transitionDAO.insert(newTransition);
     		newTransitions.add(newTransition);
     	}
-    	newLearningDesign.setTransitions(newTransitions);
+    	
+    	// The transitions collection in the learning design may already exist (as we have already done a save on the design).
+    	// If so, we can't just override the existing collection as the cascade causes an error.
+    	if ( newLearningDesign.getTransitions() != null ) {
+    		newLearningDesign.getTransitions().clear();
+    		newLearningDesign.getTransitions().addAll(newTransitions);
+    	} else {
+        	newLearningDesign.setTransitions(newTransitions);
+    	}
+
     }
     /**
      * Determines the type of activity and returns a deep-copy of the same
@@ -402,7 +409,7 @@ public class AuthoringService implements IAuthoringService {
      * @param activity The object to be deep-copied
      * @return Activity The new deep-copied Activity object
      */
-    private Activity getActivityCopy(Activity activity){
+    private Activity getActivityCopy(final Activity activity){
     	if ( Activity.GROUPING_ACTIVITY_TYPE == activity.getActivityTypeId().intValue() ) {
     		GroupingActivity newGroupingActivity = (GroupingActivity) activity.createCopy();
     		// now we need to manually add the grouping to the session, as we can't easily
@@ -439,32 +446,29 @@ public class AuthoringService implements IAuthoringService {
 	 * @throws Exception
 	 */
 	public String storeLearningDesignDetails(String wddxPacket) throws Exception{
-		LearningDesignDTO learningDesignDTO = null;
 		Vector listOfValidationErrorDTOs = null;
 		boolean valid = true;
 		
 		Hashtable table = (Hashtable)WDDXProcessor.deserialize(wddxPacket);
-		ObjectExtractor extractor = new ObjectExtractor(userDAO,learningDesignDAO,
-														activityDAO,workspaceFolderDAO,
-														learningLibraryDAO,licenseDAO,
-														groupingDAO,toolDAO,groupDAO,transitionDAO);
+		IObjectExtractor extractor = (IObjectExtractor) beanFactory.getBean(IObjectExtractor.OBJECT_EXTRACTOR_SPRING_BEANNAME);
 		
 		try { 
-			LearningDesign design = extractor.extractLearningDesign(table);	
-			learningDesignDAO.insert(design);
+			LearningDesign design = extractor.extractSaveLearningDesign(table);	
 			listOfValidationErrorDTOs = (Vector)learningDesignService.validateLearningDesign(design);
 			
 			if (listOfValidationErrorDTOs.size() > 0)
 			{
-				valid = false;
+				valid = Boolean.FALSE;
 				flashMessage = new FlashMessage("storeLearningDesignDetails", new StoreLearningDesignResultsDTO(valid,listOfValidationErrorDTOs, design.getLearningDesignId()), FlashMessage.OBJECT_MESSAGE);
 			}
 			else
 			{
-				design.setValidDesign(new Boolean(valid));
-				learningDesignDAO.update(design);
+				valid = Boolean.TRUE;
 				flashMessage = new FlashMessage("storeLearningDesignDetails", new StoreLearningDesignResultsDTO(valid, design.getLearningDesignId()));			
 			}
+
+			design.setValidDesign(valid);
+			learningDesignDAO.insertOrUpdate(design);
 			
 			//flashMessage = new FlashMessage(IAuthoringService.STORE_LD_MESSAGE_KEY,design.getLearningDesignId());
 		} catch ( ObjectExtractorException e ) {
@@ -628,5 +632,6 @@ public class AuthoringService implements IAuthoringService {
 		// remove the learning design 
 		learningDesignDAO.delete(design);
 	}
+
 
 }

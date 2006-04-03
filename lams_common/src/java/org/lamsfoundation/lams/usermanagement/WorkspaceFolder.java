@@ -376,4 +376,9 @@ public class WorkspaceFolder implements Serializable {
 		
 		this.folderContent.add(workspaceFolderContent);
 	}
+	
+	/** Is this folder a run sequences folder? */
+	public boolean isRunSequencesFolder() {
+		return workspaceFolderType.equals(RUN_SEQUENCES);
+	}
 }

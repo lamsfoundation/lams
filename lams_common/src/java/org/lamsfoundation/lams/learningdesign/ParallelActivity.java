@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Set;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.strategy.ParallelActivityStrategy;
@@ -54,7 +55,7 @@ public class ParallelActivity extends ComplexActivity implements Serializable {
             Transition transitionTo,
             Transition transitionFrom,
             String languageFile,
-            java.util.Set activities) {
+            Set activities) {
         super(activityId, 
                 id, 
                 description, 
@@ -94,7 +95,7 @@ public class ParallelActivity extends ComplexActivity implements Serializable {
             Integer activityTypeId,  
             Transition transitionTo,
             Transition transitionFrom,
-            java.util.Set activities) {
+            Set activities) {
       super(activityId, 
               defineLater, 
               createDateTime, 

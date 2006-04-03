@@ -36,10 +36,6 @@ public class WorkspaceFolderContentDAO extends BaseDAO implements IWorkspaceFold
 	
 	private static final String TABLENAME ="lams_workspace_folder_content";
 	
-	private static final String FIND_BY_FOLDER ="from " + TABLENAME +" in class " + 
-												WorkspaceFolderContent.class.getName() +
-												" where workspace_folder_id=?";
-	
 	private static final String FIND_BY_TYPE_IN_FOLDER = "from " + TABLENAME +" in class " +
 														 WorkspaceFolderContent.class.getName() +
 														 " where workspace_folder_id=? AND mime_type=?";
@@ -56,27 +52,6 @@ public class WorkspaceFolderContentDAO extends BaseDAO implements IWorkspaceFold
 		return (WorkspaceFolderContent) super.find(WorkspaceFolderContent.class, folderContentID);
 	}
 
-	/**
-	 * (non-Javadoc)
-	 * @see org.lamsfoundation.lams.workspace.dao.IWorkspaceFolderContentDAO#getContentByWorkspaceFolder(java.lang.Long)
-	 */
-	public List getContentByWorkspaceFolder(Long workspaceFolderID) {
-		return this.getHibernateTemplate().find(FIND_BY_FOLDER,workspaceFolderID);
-	}
-
-	/**
-	 * (non-Javadoc)
-	 * @see org.lamsfoundation.lams.workspace.dao.IWorkspaceFolderContentDAO#getContentByTypeFromWorkspaceFolder(java.lang.Long, java.lang.String)
-	 */
-	public List getContentByTypeFromWorkspaceFolder(Long workspaceFolderID,String mimeType) {
-		if ( workspaceFolderID !=null ) {
-			return this.getSession().createQuery(FIND_BY_TYPE_IN_FOLDER)
-				.setLong(0,workspaceFolderID.longValue())
-				.setString(1,mimeType)
-				.list();
-		}
-		return null;
-	}
 	/**
 	 * (non-Javadoc)
 	 * @see org.lamsfoundation.lams.workspace.dao.IWorkspaceFolderContentDAO#deleteContentWithVersion(java.lang.Long, java.lang.Long, java.lang.Long)

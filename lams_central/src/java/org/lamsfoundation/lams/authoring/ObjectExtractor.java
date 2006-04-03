@@ -22,7 +22,7 @@
  */
 package org.lamsfoundation.lams.authoring;
 
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -82,8 +82,10 @@ import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
  * If the value of a field is one of the special null values, then null
  * should be persisted.
  * 
+ * Object extractor has member data, so it should not be used as a singleton.
+ * 
  */
-public class ObjectExtractor {
+public class ObjectExtractor implements IObjectExtractor {
 	
 	protected UserDAO userDAO = null;
 	protected LearningDesignDAO learningDesignDAO = null;
@@ -95,10 +97,21 @@ public class ObjectExtractor {
 	protected GroupingDAO groupingDAO = null;
 	protected ToolDAO toolDAO = null;
 	protected GroupDAO groupDAO = null;
-	
+
+	/** The newActivityMap is a local copy of all the current activities. This will include
+	 * the "top level" activities and subactivities. It is used to "crossreference" activities
+	 * as we go, without having to repull them from the database. The keys are the UIIDs
+	 * of the activities, not the IDs. It is important that the values in this map are the Activity
+	 * objects related to the Hibernate session as they are updated by the parseTransitions code.
+	 */ 
+	protected HashMap<Integer,Activity> newActivityMap = new HashMap<Integer,Activity>(); 
 	protected Logger log = Logger.getLogger(ObjectExtractor.class);	
 
-	
+	/** Constructor to be used if Spring method injection is used */
+	public ObjectExtractor() {		
+	}
+
+	/** Constructor to be used if Spring method injection is not used */
 	public ObjectExtractor(UserDAO userDAO,
 			LearningDesignDAO learningDesignDAO, ActivityDAO activityDAO,
 			WorkspaceFolderDAO workspaceFolderDAO,
@@ -116,7 +129,100 @@ public class ObjectExtractor {
 		this.groupDAO = groupDAO;
 		this.transitionDAO = transitionDAO;
 	}
-	public LearningDesign extractLearningDesign(Hashtable table) throws WDDXProcessorConversionException, ObjectExtractorException {
+	
+	/** Spring injection methods */
+	public ActivityDAO getActivityDAO() {
+		return activityDAO;
+	}
+
+	public void setActivityDAO(ActivityDAO activityDAO) {
+		this.activityDAO = activityDAO;
+	}
+
+	public GroupDAO getGroupDAO() {
+		return groupDAO;
+	}
+
+	public void setGroupDAO(GroupDAO groupDAO) {
+		this.groupDAO = groupDAO;
+	}
+
+	public GroupingDAO getGroupingDAO() {
+		return groupingDAO;
+	}
+
+	public void setGroupingDAO(GroupingDAO groupingDAO) {
+		this.groupingDAO = groupingDAO;
+	}
+
+	public LearningDesignDAO getLearningDesignDAO() {
+		return learningDesignDAO;
+	}
+
+	public void setLearningDesignDAO(LearningDesignDAO learningDesignDAO) {
+		this.learningDesignDAO = learningDesignDAO;
+	}
+
+	public LearningLibraryDAO getLearningLibraryDAO() {
+		return learningLibraryDAO;
+	}
+
+	public void setLearningLibraryDAO(LearningLibraryDAO learningLibraryDAO) {
+		this.learningLibraryDAO = learningLibraryDAO;
+	}
+
+	public LicenseDAO getLicenseDAO() {
+		return licenseDAO;
+	}
+
+	public void setLicenseDAO(LicenseDAO licenseDAO) {
+		this.licenseDAO = licenseDAO;
+	}
+
+	public HashMap<Integer, Activity> getNewActivityMap() {
+		return newActivityMap;
+	}
+
+	public void setNewActivityMap(HashMap<Integer, Activity> newActivityMap) {
+		this.newActivityMap = newActivityMap;
+	}
+
+	public ToolDAO getToolDAO() {
+		return toolDAO;
+	}
+
+	public void setToolDAO(ToolDAO toolDAO) {
+		this.toolDAO = toolDAO;
+	}
+
+	public TransitionDAO getTransitionDAO() {
+		return transitionDAO;
+	}
+
+	public void setTransitionDAO(TransitionDAO transitionDAO) {
+		this.transitionDAO = transitionDAO;
+	}
+
+	public UserDAO getUserDAO() {
+		return userDAO;
+	}
+
+	public void setUserDAO(UserDAO userDAO) {
+		this.userDAO = userDAO;
+	}
+
+	public WorkspaceFolderDAO getWorkspaceFolderDAO() {
+		return workspaceFolderDAO;
+	}
+
+	public void setWorkspaceFolderDAO(WorkspaceFolderDAO workspaceFolderDAO) {
+		this.workspaceFolderDAO = workspaceFolderDAO;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.authoring.IObjectExtractor#extractSaveLearningDesign(java.util.Hashtable)
+	 */
+	public LearningDesign extractSaveLearningDesign(Hashtable table) throws WDDXProcessorConversionException, ObjectExtractorException {
 
 		LearningDesign learningDesign = null;
 	
@@ -125,8 +231,6 @@ public class ObjectExtractor {
 		learningDesign = learningDesignId!= null ? learningDesignDAO.getLearningDesignById(learningDesignId) : new LearningDesign();
 		
 		//get the core learning design stuff
-		//LearningDesign learningDesign = new LearningDesign();
-		
 		if (keyExists(table, WDDXTAGS.LEARNING_DESIGN_UIID)) 
 		    learningDesign.setLearningDesignUIID(WDDXProcessor.convertToInteger(table,WDDXTAGS.LEARNING_DESIGN_UIID)); 
 		if (keyExists(table, WDDXTAGS.DESCRIPTION)) 
@@ -224,7 +328,7 @@ public class ObjectExtractor {
 		}
 	
 		
-		learningDesignDAO.insert(learningDesign);
+		learningDesignDAO.insertOrUpdate(learningDesign);
 	
 		// now process the "parts" of the learning design
 		//Vector v = (Vector)table.get(WDDXTAGS.GROUPINGS);
@@ -234,7 +338,7 @@ public class ObjectExtractor {
 		parseTransitions((Vector)table.get(WDDXTAGS.TRANSITIONS),learningDesign);
 
 		learningDesign.setFirstActivity(learningDesign.calculateFirstActivity());
-		learningDesignDAO.update(learningDesign);
+		learningDesignDAO.insertOrUpdate(learningDesign);
 		
 		return learningDesign;	
 		}
@@ -246,11 +350,10 @@ public class ObjectExtractor {
 	 * @param groupingsList
 	 * @param learningDesign
 	 * @throws WDDXProcessorConversionException
-	 * @throws ObjectExtractorException
 	 */
 	
 	private void parseGroupings(List groupingsList, LearningDesign learningDesign) 
-		throws WDDXProcessorConversionException, ObjectExtractorException 	
+		throws WDDXProcessorConversionException 	
 	{
 	   //iterate through the list of groupings objects
 	    //each object should contain information groupingUUID, groupingID, groupingTypeID
@@ -263,7 +366,7 @@ public class ObjectExtractor {
 	            if( groupingDetails != null )
 	            {
 	    			Grouping grouping = extractGroupingObject(groupingDetails);	
-	    			groupingDAO.insert(grouping);	    			
+	    			groupingDAO.insertOrUpdate(grouping);	    			
 	            }
 	        }
 	        
@@ -289,35 +392,28 @@ public class ObjectExtractor {
 	 */
 	private void parseActivities(List activitiesList, LearningDesign learningDesign) 
 			throws WDDXProcessorConversionException, ObjectExtractorException {
-		HashSet updatedSet = new HashSet();
-		Set currentActivities = learningDesign.getActivities();
+		
 		if(activitiesList!=null){
 			Iterator iterator = activitiesList.iterator();
 			while(iterator.hasNext()){
 				Hashtable activityDetails = (Hashtable)iterator.next();
 				Activity activity = extractActivityObject(activityDetails,learningDesign);	
-				activityDAO.insert(activity);
-				currentActivities.add(activity);
-				updatedSet.add(activity); //used to keep track of which ids that are still in use
+				activityDAO.insertOrUpdate(activity);
+				newActivityMap.put(activity.getActivityUIID(), activity); 
 			}
 		}
+
+		// clear the transitions 
+		// clear the old set and reset up the activities set. Done this way to keep the Hibernate cascading happy. 
+		// this means we don't have to manually remove the transition object.
+	    // Note: This will leave orphan content in the tool tables. It can be removed by the tool content cleaning job, 
+        // which may be run from the admin screen or via a cron job. 
+
+		learningDesign.getActivities().clear();
+		learningDesign.getActivities().addAll(newActivityMap.values());
 		
-		
-		/* Iterate through currentActivities, any activities that arent present in the updatedSet will be deleted */ 
-		Iterator itr = currentActivities.iterator();
-		
-		while (itr.hasNext())
-		{
-		    Activity activity = (Activity)itr.next();
-		    if (!updatedSet.contains(activity))
-		    { 
-			      itr.remove(); //removes object from collection;
-			      deleteActivity(activity, learningDesign);
-		    }
-		}
 		//TODO: Need to double check that the toolID/toolContentID combinations match entries in lams_tool_content table, or put FK on table.
-		learningDesign.setActivities(currentActivities);
-		learningDesignDAO.update(learningDesign);
+		learningDesignDAO.insertOrUpdate(learningDesign);
 	}
 	
 	/**
@@ -341,14 +437,14 @@ public class ObjectExtractor {
 				Hashtable activityDetails = (Hashtable)iterator.next();
 				
 				Integer activityUUID = WDDXProcessor.convertToInteger(activityDetails,WDDXTAGS.ACTIVITY_UIID);
-				Activity existingActivity = activityDAO.getActivityByUIID(activityUUID, learningDesign);
+				Activity existingActivity = newActivityMap.get(activityUUID); 
 				
 				//match up id to parent based on UIID
 				if (keyExists(activityDetails, WDDXTAGS.PARENT_UIID))
 			    {
 					Integer parentUIID = WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.PARENT_UIID);
 					if( parentUIID!=null ) {
-						Activity parentActivity = activityDAO.getActivityByUIID(parentUIID,learningDesign);
+						Activity parentActivity = newActivityMap.get(parentUIID);
 						existingActivity.setParentActivity(parentActivity);
 						existingActivity.setParentUIID(parentUIID);
 					} else {
@@ -375,41 +471,41 @@ public class ObjectExtractor {
 	 */
 	private void parseTransitions(List transitionsList, LearningDesign learningDesign) throws WDDXProcessorConversionException{
 	    
-	    HashSet updatedSet = new HashSet();
-		Set currentTransitions = learningDesign.getTransitions();
-		if (currentTransitions == null)
-		    currentTransitions = new HashSet();
+	    HashMap<Integer,Transition> newMap = new HashMap<Integer,Transition>();
 		
 		if(transitionsList!=null){
 			Iterator iterator= transitionsList.iterator();
 			while(iterator.hasNext()){
 				Hashtable transitionDetails = (Hashtable)iterator.next();
 				Transition transition = extractTransitionObject(transitionDetails,learningDesign);
-				transitionDAO.insert(transition);
-				currentTransitions.add(transition);
-				updatedSet.add(transition);
+				// Check if transition actually exists. extractTransitionObject returns null
+				// if neither the to/from activity exists.
+				if ( transition != null ) {
+					transitionDAO.insertOrUpdate(transition);
+					newMap.put(transition.getTransitionUIID(),transition);
+				}
 			}
 		}
-		
-		Iterator itr = currentTransitions.iterator();
-		
-		while (itr.hasNext())
-		{
-		    Transition transition = (Transition)itr.next();
-		    if (!updatedSet.contains(transition))
-		    {
-		       /* This will leave orphan content in the tool tables. It can be removed by the tool content cleaning job, 
-		        which may be run from the admin screen or via a cron job. However, the transitionDAO.delete() method is 
-		        called to actually delete the object */
-		        
-		        itr.remove();        
-		        transitionDAO.delete(transition);
-		     
-		    }
+
+		// clean up the links for any old transitions.
+		Iterator iter = learningDesign.getTransitions().iterator();
+		while (iter.hasNext()) {
+			Transition element = (Transition) iter.next();
+			Integer uiID = element.getTransitionUIID();
+			Transition match = newMap.get(uiID);
+			if ( match == null ) {
+				// transition is no more, clean up the old activity links
+				cleanupTransition(element);
+			}
 		}
+		// clear the old set and reset up the transition set. Done this way to keep the Hibernate cascading happy. 
+		// this means we don't have to manually remove the transition object.
+	    // Note: This will leave orphan content in the tool tables. It can be removed by the tool content cleaning job, 
+        // which may be run from the admin screen or via a cron job. 
+		learningDesign.getTransitions().clear();
+		learningDesign.getTransitions().addAll(newMap.values());
 		
-		learningDesign.setTransitions(currentTransitions);
-		learningDesignDAO.update(learningDesign);
+		learningDesignDAO.insertOrUpdate(learningDesign);
 	    
 	   
 	}
@@ -452,19 +548,6 @@ public class ObjectExtractor {
 	    if (keyExists(activityDetails, WDDXTAGS.YCOORD))
 	        activity.setYcoord(WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.YCOORD));
 
-	    if (keyExists(activityDetails, WDDXTAGS.PARENT_UIID))
-	    {
-			Integer parentUIID = WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.PARENT_UIID);
-			if( parentUIID!=null ) {
-				Activity parentActivity = activityDAO.getActivityByUIID(parentUIID,design);
-				activity.setParentActivity(parentActivity);
-				activity.setParentUIID(parentUIID);
-			} else {
-				activity.setParentActivity(null);
-				activity.setParentUIID(null);
-			}
-	    }
-		
 	    if (keyExists(activityDetails, WDDXTAGS.GROUPING_ID))
 	    {
 			Long groupingID = WDDXProcessor.convertToLong(activityDetails,WDDXTAGS.GROUPING_ID);
@@ -505,17 +588,6 @@ public class ObjectExtractor {
 		    activity.setActivityCategoryID(WDDXProcessor.convertToInteger(activityDetails,WDDXTAGS.ACTIVITY_CATEGORY_ID));
 		if (keyExists(activityDetails, WDDXTAGS.LIBRARY_IMAGE))	
 			activity.setLibraryActivityUiImage(WDDXProcessor.convertToString(activityDetails,WDDXTAGS.LIBRARY_IMAGE));
-		
-		if (keyExists(activityDetails, WDDXTAGS.LIBRARY_ACTIVITY))
-		{
-			Long libraryActivityID = WDDXProcessor.convertToLong(activityDetails,WDDXTAGS.LIBRARY_ACTIVITY);
-			if( libraryActivityID != null ){
-				Activity libraryActivity = activityDAO.getActivityByActivityId(libraryActivityID);
-				activity.setLibraryActivity(libraryActivity);
-			} else {
-				activity.setLibraryActivity(null);
-			}
-		}
 		
 		if (keyExists(activityDetails, WDDXTAGS.APPLY_GROUPING))	
 		    activity.setApplyGrouping(WDDXProcessor.convertToBoolean(activityDetails,WDDXTAGS.APPLY_GROUPING));
@@ -613,14 +685,14 @@ public class ObjectExtractor {
 	}
 	
 
-	public Grouping extractGroupingObject(Hashtable groupingDetails) throws WDDXProcessorConversionException, ObjectExtractorException{
+	public Grouping extractGroupingObject(Hashtable groupingDetails) throws WDDXProcessorConversionException{
 		
 	    //get grouping by uuid
 	    Grouping grouping;
 	    Integer groupingUUID = WDDXProcessor.convertToInteger(groupingDetails, WDDXTAGS.GROUPING_UIID);	
 	    Integer groupingTypeID=WDDXProcessor.convertToInteger(groupingDetails,WDDXTAGS.GROUPING_TYPE_ID);
 	    if (groupingTypeID== null) { 
-			throw new ObjectExtractorException("groupingTypeID is missing");
+			throw new WDDXProcessorConversionException("groupingTypeID is missing");
 		}
 	    Grouping existingGrouping = groupingDAO.getGroupingByUIID(groupingUUID);
 	    if (existingGrouping != null)
@@ -671,6 +743,11 @@ public class ObjectExtractor {
 	 * straight to the data object rather than going via the DTO, as the DTO
 	 * returns the special null values from the getter methods. This makes it
 	 * hard to set up the transaction object from the transitionDTO.
+	 * <p>
+	 * Assumes that all the activities have been read and are in the newActivityMap.
+	 * The toActivity and fromActivity are only set if the activity exists in the 
+	 * newActivityMap. If this leaves the transition with no to/from activities
+	 * then null is returned.
 	 * 
 	 * @param transitionDetails
 	 * @throws WDDXProcessorConversionException
@@ -678,16 +755,19 @@ public class ObjectExtractor {
 	private Transition extractTransitionObject(Hashtable transitionDetails, LearningDesign learningDesign) throws WDDXProcessorConversionException{
 		
 	    Integer transitionUUID = WDDXProcessor.convertToInteger(transitionDetails,WDDXTAGS.TRANSITION_UIID);
-	    Transition transition = null;	
-	    /* It is assumed that the transitionUUID will always be sent */
-	    Transition existingTransition = transitionDAO.getTransitionByUUID(transitionUUID, learningDesign);
-	 
-	    if (existingTransition == null)
-	        transition = new Transition();	   
-	    else
-	        transition = existingTransition;
+	    if ( transitionUUID == null ) { 
+	    	throw new WDDXProcessorConversionException("Transition is missing its UUID");
+	    }
 	    
-	    transition.setTransitionUIID(transitionUUID);
+	    Transition transition = null;	
+	    Transition existingTransition = findTransition(learningDesign, transitionUUID);
+		
+	    if (existingTransition == null) {
+	        transition = new Transition();
+		    transition.setTransitionUIID(transitionUUID);
+	    } else {
+	        transition = existingTransition;
+	    }
 	    
 	    if (keyExists(transitionDetails, WDDXTAGS.TRANSITION_ID))
 	    {
@@ -700,13 +780,16 @@ public class ObjectExtractor {
 	    {
 	        Integer toUIID=WDDXProcessor.convertToInteger(transitionDetails,WDDXTAGS.TO_ACTIVITY_UIID); 
 			if(toUIID!=null){
-				Activity toActivity = activityDAO.getActivityByUIID(toUIID, learningDesign);
-				transition.setToActivity(toActivity);
-				transition.setToUIID(toUIID);
-				//update the transitionTo property for the activity
-				toActivity.setTransitionTo(transition);
-				activityDAO.update(toActivity);
-				
+				Activity toActivity = newActivityMap.get(toUIID);
+				if ( toActivity  != null ) {
+					transition.setToActivity(toActivity);
+					transition.setToUIID(toUIID);
+					//update the transitionTo property for the activity
+					toActivity.setTransitionTo(transition);
+				} else {
+					transition.setToActivity(null);
+					transition.setToUIID(null);
+				}
 			}
 	    }
 		
@@ -714,13 +797,16 @@ public class ObjectExtractor {
 	    {
 	        Integer fromUIID=WDDXProcessor.convertToInteger(transitionDetails,WDDXTAGS.FROM_ACTIVITY_UIID);
 			if(fromUIID!=null){
-				Activity fromActivity = activityDAO.getActivityByUIID(fromUIID, learningDesign);
-				transition.setFromActivity(fromActivity);
-				transition.setFromUIID(fromUIID);
-				//update the transitionFrom property for the activity
-				fromActivity.setTransitionFrom(transition);
-				activityDAO.update(fromActivity);
-				
+				Activity fromActivity = newActivityMap.get(fromUIID);
+				if ( fromActivity != null ) {
+					transition.setFromActivity(fromActivity);
+					transition.setFromUIID(fromUIID);
+					//update the transitionFrom property for the activity
+					fromActivity.setTransitionFrom(transition);
+				} else {
+					transition.setFromActivity(null);
+					transition.setFromUIID(null);
+				}
 			}	
 	    }
 	    
@@ -730,9 +816,46 @@ public class ObjectExtractor {
 	        transition.setTitle(WDDXProcessor.convertToString(transitionDetails,WDDXTAGS.TITLE));
 		if(keyExists(transitionDetails, WDDXTAGS.CREATION_DATE))
 		    transition.setCreateDateTime(WDDXProcessor.convertToDate(transitionDetails,WDDXTAGS.CREATION_DATE));			
-		
-		transition.setLearningDesign(learningDesign);		
-		return transition;
+
+		if ( transition.getToActivity() != null && transition.getFromActivity() != null ) {
+			transition.setLearningDesign(learningDesign);		
+			return transition; 
+		} else {
+			// One of the to/from is missing, can't store this transition. Make sure we clean up the related activities 
+			cleanupTransition(transition);
+			transition.setLearningDesign(null);
+			return null;
+		}
+	}
+
+	/**
+	 * Wipe out any links fromany activities that may be linked to it (e.g. the case where a transition has an from activity
+	 * but not a too activity. These cases should be picked up by Flash, but just in case.
+	 */
+	private void cleanupTransition(Transition transition) {
+		if ( transition.getFromActivity() != null ) {
+			transition.getFromActivity().setTransitionFrom(null);
+		}
+		if ( transition.getToActivity() != null ) {
+			transition.getToActivity().setTransitionTo(null);
+		}
+	}
+
+	/** Search in learning design for existing object. Can't go to database as that will trigger 
+	* a Flush, and we haven't updated the rest of the design, so this would trigger a 
+	* "deleted object would be re-saved by cascade" error.
+	*/
+	private Transition findTransition(LearningDesign learningDesign, Integer transitionUUID) {
+	    Transition existingTransition = null;
+		Set transitions = learningDesign.getTransitions();
+		Iterator iter = transitions.iterator();
+		while (existingTransition==null && iter.hasNext()) {
+			Transition element = (Transition) iter.next();
+			if ( transitionUUID.equals(element.getTransitionUIID()) ) { 
+				existingTransition = element;
+			}
+		}
+		return existingTransition;
 	}		
 	
 	/**
@@ -757,7 +880,7 @@ public class ObjectExtractor {
 	 * @param activityToDelete
 	 * @param design
 	 */
-	private void deleteActivity(Activity activityToDelete, LearningDesign design)
+	private void clearTransition(Activity activityToDelete, LearningDesign design)
 	{
 	   
 	   Transition transitionFrom = activityToDelete.getTransitionFrom();	 	   
@@ -766,10 +889,8 @@ public class ObjectExtractor {
 	     
 	   Transition transitionTo = activityToDelete.getTransitionTo();
 	   if (transitionTo != null)
-	       deleteTransition(transitionTo, design);
-	
-	   activityDAO.delete(activityToDelete);
-	
+		   deleteTransition(transitionTo, design);
+
 	}
 	
 	/**
@@ -782,18 +903,13 @@ public class ObjectExtractor {
 	{
 	    Activity fromActivity = transition.getFromActivity();
 	    fromActivity.setTransitionFrom(null);
-	    activityDAO.update(fromActivity);
 	    
 		Activity toActivity = transition.getToActivity();
 		toActivity.setTransitionTo(null);
-		activityDAO.update(toActivity); 
 		
 		//This will leave orphan content in the tool tables. It will be removed by the tool content cleaning job, 
 		//which may be run from the admin screen or via a cron job
 		design.getTransitions().remove(transition);
-		
-		//actually delete the object from the table.
-		transitionDAO.delete(transition);
 	}
 }
 	

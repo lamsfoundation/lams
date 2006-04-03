@@ -24,7 +24,6 @@ package org.lamsfoundation.lams.workspace.dao;
 
 import java.io.FileInputStream;
 import java.util.Date;
-import java.util.List;
 
 import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.ITicket;
@@ -61,14 +60,6 @@ public class TestWorkspaceFolderContentDAO extends BaseWorkspaceTest {
 				"TXT",workspaceFolder);
 		workspaceFolderContentDAO.insert(workspaceFolderContent);
 		assertNotNull(workspaceFolderContent.getFolderContentID());
-	}
-	public void testGetContentByWorkspaceFolder(){		
-		List list = workspaceFolderContentDAO.getContentByWorkspaceFolder(new Long(3));		
-		assertEquals(list.size(),4);
-	}	
-	public void testGetContentByTypeFromWorkspaceFolder(){
-		List list = workspaceFolderContentDAO.getContentByTypeFromWorkspaceFolder(new Long(3),"TXT");
-		assertEquals(list.size(),2);		
 	}
 	public void testAddFlashClientWorkspaceCredentials()throws Exception{		
 		credentials = new SimpleCredentials(workspaceUser,password.toCharArray());

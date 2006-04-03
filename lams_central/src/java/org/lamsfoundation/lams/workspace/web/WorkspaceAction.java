@@ -72,13 +72,6 @@ public class WorkspaceAction extends DispatchAction {
 	 */
 	public static final Integer ORG_FOLDER_ID = new Integer(-2);
 
-	/** If you want the output given as a jsp, set the request parameter "jspoutput" to 
-     * some value other than an empty string (e.g. 1, true, 0, false, blah). 
-     * If you want it returned as a stream (ie for Flash), do not define this parameter
-     */  
-	public static String USE_JSP_OUTPUT = "jspoutput";
-	
-	
 	/**
 	 * @return
 	 */
@@ -87,35 +80,17 @@ public class WorkspaceAction extends DispatchAction {
 		return (IWorkspaceManagementService) webContext.getBean("workspaceManagementService");
 	}
 	
-	/** Output the supplied WDDX packet. If the request parameter USE_JSP_OUTPUT
-	 * is set, then it sets the session attribute "parameterName" to the wddx packet string.
-	 * If  USE_JSP_OUTPUT is not set, then the packet is written out to the 
-	 * request's PrintWriter.
-	 *   
-	 * @param mapping action mapping (for the forward to the success jsp)
-	 * @param request needed to check the USE_JSP_OUTPUT parameter
-	 * @param response to write out the wddx packet if not using the jsp
-	 * @param wddxPacket wddxPacket or message to be sent/displayed
-	 * @param parameterName session attribute to set if USE_JSP_OUTPUT is set
-	 * @throws IOException
-	 */
-	private ActionForward outputPacket(ActionMapping mapping, HttpServletRequest request, HttpServletResponse response,
-	        		String wddxPacket, String parameterName) throws IOException {
-	    String useJSP = WebUtil.readStrParam(request, USE_JSP_OUTPUT, true);
-	    if ( useJSP != null && useJSP.length() >= 0 ) {
-		    request.getSession().setAttribute(parameterName,wddxPacket);
-		    return mapping.findForward("success");
-	    } else {
-	        PrintWriter writer = response.getWriter();
-	        writer.println(wddxPacket);
-	        return null;
-	    }
-	}
-	
 	/** Send the flash message back to Flash */
 	private ActionForward returnWDDXPacket(FlashMessage flashMessage, HttpServletResponse response) throws IOException {
 	        PrintWriter writer = response.getWriter();
 	        writer.println(flashMessage.serializeMessage());
+	        return null;
+	}
+
+	/** Send the flash message back to Flash */
+	private ActionForward returnWDDXPacket(String serializedFlashMessage, HttpServletResponse response) throws IOException {
+	        PrintWriter writer = response.getWriter();
+	        writer.println(serializedFlashMessage);
 	        return null;
 	}
 
@@ -156,13 +131,13 @@ public class WorkspaceAction extends DispatchAction {
 		Integer parentFolderID = new Integer(WebUtil.readIntParam(request,"parentFolderID"));
 		String errorPacket = checkResourceNotDummyValue("createFolderForFlash", parentFolderID, FolderContentDTO.FOLDER);
 		if ( errorPacket != null)
-			return outputPacket(mapping, request, response, errorPacket, "details");
+			return returnWDDXPacket(errorPacket, response);
 
 		String folderName = (String)WebUtil.readStrParam(request,"name");
 		Integer userID = new Integer(WebUtil.readIntParam(request,AttributeNames.PARAM_USER_ID));
 		IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
 		String wddxPacket = workspaceManagementService.createFolderForFlash(parentFolderID,folderName,userID);		
-		return outputPacket(mapping, request, response, wddxPacket, "details");
+		return returnWDDXPacket(wddxPacket, response);
 	}
 	
 	/**
@@ -208,7 +183,7 @@ public class WorkspaceAction extends DispatchAction {
 		try {
 			if ( BOOTSTRAP_FOLDER_ID.equals(folderID )) {
 				// return back the dummy org DTO and the user's workspace folder
-				Vector folders = new Vector();
+				Vector<FolderContentDTO> folders = new Vector<FolderContentDTO>();
 				FolderContentDTO userFolder = workspaceManagementService.getUserWorkspaceFolder(userID);
 				if ( userFolder != null )
 					folders.add(userFolder);
@@ -245,14 +220,15 @@ public class WorkspaceAction extends DispatchAction {
 		} catch (UserAccessDeniedException e) {
 			return returnWDDXPacket(FlashMessage.getUserNotAuthorized(methodKey, userID), response);
 		} catch (Exception e) {
+			log.error("getFolderContents: Exception occured. userID "+userID+" folderID "+folderID, e);
 			return returnWDDXPacket(FlashMessage.getExceptionOccured(methodKey, e.getMessage()), response);
 		}
 	
 		return returnWDDXPacket(new FlashMessage(methodKey,packet), response);		
 	}
 
-	private Hashtable createFolderContentPacket(Integer parentWorkspaceFolderID, Integer workspaceFolderID, Vector contents){
-		Hashtable packet = new Hashtable();
+	private Hashtable<String,Object> createFolderContentPacket(Integer parentWorkspaceFolderID, Integer workspaceFolderID, Vector contents){
+		Hashtable<String,Object> packet = new Hashtable<String,Object>();
 		
 		if ( parentWorkspaceFolderID != null )
 			packet.put("parentWorkspaceFolderID", parentWorkspaceFolderID);
@@ -286,14 +262,22 @@ public class WorkspaceAction extends DispatchAction {
 		String resourceType = WebUtil.readStrParam(request,RESOURCE_TYPE);
 		String errorPacket = checkResourceNotDummyValue("deleteResource", resourceID, FolderContentDTO.FOLDER);
 		if ( errorPacket != null)
-			return outputPacket(mapping, request, response, errorPacket, "details");
+			return returnWDDXPacket(errorPacket, response);
 
 		Integer userID = new Integer(WebUtil.readIntParam(request,AttributeNames.PARAM_USER_ID));
-		IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
-		String wddxPacket = workspaceManagementService.deleteResource(resourceID,resourceType,userID);		
+		String wddxPacket = null;
+		try {
+			IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
+			wddxPacket = workspaceManagementService.deleteResource(resourceID,resourceType,userID);		
+		} catch (Exception e) {
+			log.error("deleteResource: Exception occured. userID "+userID+" folderID "+resourceID, e);
+			FlashMessage flashMessage = FlashMessage.getExceptionOccured(IWorkspaceManagementService.MSG_KEY_DELETE, e.getMessage());
+			wddxPacket = flashMessage.serializeMessage();
+		}
         PrintWriter writer = response.getWriter();
         writer.println(wddxPacket);
         return null;
+	     
 	}
 	
 	/**
@@ -317,13 +301,20 @@ public class WorkspaceAction extends DispatchAction {
 		Integer targetFolderID = new Integer(WebUtil.readIntParam(request,"targetFolderID"));
 		String errorPacket = checkResourceNotDummyValue("copyResource", targetFolderID, FolderContentDTO.FOLDER);
 		if ( errorPacket != null)
-			return outputPacket(mapping, request, response, errorPacket, "details");
+			return returnWDDXPacket(errorPacket, response);
 
+		String wddxPacket  = null;
 		Integer copyType = WebUtil.readIntParam(request, "copyType", true);
 		Integer userID = new Integer(WebUtil.readIntParam(request,AttributeNames.PARAM_USER_ID));
-		IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
-		String wddxPacket = workspaceManagementService.copyResource(resourceID,resourceType,copyType,targetFolderID,userID);
-		return outputPacket(mapping, request, response, wddxPacket, "details");
+		try {
+			IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
+			wddxPacket = workspaceManagementService.copyResource(resourceID,resourceType,copyType,targetFolderID,userID);
+		} catch (Exception e) {
+			log.error("deleteResource: Exception occured. userID "+userID+" folderID "+resourceID, e);
+			FlashMessage flashMessage = FlashMessage.getExceptionOccured(IWorkspaceManagementService.MSG_KEY_DELETE, e.getMessage());
+			wddxPacket = flashMessage.serializeMessage();
+		}
+		return returnWDDXPacket(wddxPacket, response);
 	}
 	
 	/**
@@ -349,7 +340,7 @@ public class WorkspaceAction extends DispatchAction {
 
 		String errorPacket = checkResourceNotDummyValue("copyResource", targetFolderID, FolderContentDTO.FOLDER);
 		if ( errorPacket != null)
-			return outputPacket(mapping, request, response, errorPacket, "details");
+			return returnWDDXPacket(errorPacket, response);
 
 		IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
 		String wddxPacket = workspaceManagementService.moveResource(resourceID,targetFolderID,resourceType,userID);
@@ -385,13 +376,20 @@ public class WorkspaceAction extends DispatchAction {
 		
 		String errorPacket = checkResourceNotDummyValue("createWorkspaceFolderContent", workspaceFolderID, FolderContentDTO.FOLDER);
 		if ( errorPacket != null)
-			return outputPacket(mapping, request, response, errorPacket, "details");
+			return returnWDDXPacket(errorPacket, response);
 
-		IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
-		String wddxPacket = workspaceManagementService.createWorkspaceFolderContent(contentTypeID,name,description,
+		String wddxPacket = null;
+		try {
+			IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
+			wddxPacket = workspaceManagementService.createWorkspaceFolderContent(contentTypeID,name,description,
 																				 workspaceFolderID,
 																				 mimeType,path);
-		return outputPacket(mapping, request, response, wddxPacket, "details");
+		} catch (Exception e) {
+			log.error("createWorkspaceFolderContent: Exception occured. contentTypeID "+contentTypeID+" name "+name+" workspaceFolderID "+workspaceFolderID, e);
+			FlashMessage flashMessage = FlashMessage.getExceptionOccured(IWorkspaceManagementService.MSG_KEY_CREATE_WKF_CONTENT, e.getMessage());
+			wddxPacket = flashMessage.serializeMessage();
+		}
+		return returnWDDXPacket(wddxPacket, response);
 	}
 	/**
 	 * For details please refer to
@@ -412,9 +410,16 @@ public class WorkspaceAction extends DispatchAction {
 		Long folderContentID = new Long(WebUtil.readLongParam(request,"folderContentID"));
 		String path = WebUtil.readStrParam(request,"path");
 
-		IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
-		String wddxPacket = workspaceManagementService.updateWorkspaceFolderContent(folderContentID,path);
-		return outputPacket(mapping, request, response, wddxPacket, "details");
+		String wddxPacket = null;
+		try {
+			IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
+			wddxPacket = workspaceManagementService.updateWorkspaceFolderContent(folderContentID,path);
+		} catch (Exception e) {
+			log.error("updateWorkspaceFolderContent: Exception occured. path "+path+" folderContentID "+folderContentID, e);
+			FlashMessage flashMessage = FlashMessage.getExceptionOccured(IWorkspaceManagementService.MSG_KEY_UPDATE_WKF_CONTENT, e.getMessage());
+			wddxPacket = flashMessage.serializeMessage();
+		}
+		return returnWDDXPacket(wddxPacket, response);
 	}
 	/**
 	 * For details please refer to
@@ -437,14 +442,19 @@ public class WorkspaceAction extends DispatchAction {
 
 		String errorPacket = checkResourceNotDummyValue("renameResource", resourceID, resourceType);
 		if ( errorPacket != null)
-			return outputPacket(mapping, request, response, errorPacket, "details");
+			return returnWDDXPacket(errorPacket, response);
 
 		String name = WebUtil.readStrParam(request,"name");
-		IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
-		String wddxPacket = workspaceManagementService.renameResource(resourceID,resourceType,name,userID);		
-        PrintWriter writer = response.getWriter();
-        writer.println(wddxPacket);
-        return null;
+		String wddxPacket = null;
+		try {
+			IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
+			wddxPacket = workspaceManagementService.renameResource(resourceID,resourceType,name,userID);		
+		} catch (Exception e) {
+			log.error("renameResource: Exception occured. userID "+userID+" resourceID "+resourceID+" resourceType "+resourceType, e);
+			FlashMessage flashMessage = FlashMessage.getExceptionOccured(IWorkspaceManagementService.MSG_KEY_RENAME, e.getMessage());
+			wddxPacket = flashMessage.serializeMessage();
+		}
+		return returnWDDXPacket(wddxPacket, response);
 	}
 	
 	/**
@@ -468,11 +478,18 @@ public class WorkspaceAction extends DispatchAction {
 
 		String errorPacket = checkResourceNotDummyValue("deleteContentWithVersion", folderContentID, FolderContentDTO.FOLDER);
 		if ( errorPacket != null)
-			return outputPacket(mapping, request, response, errorPacket, "details");
+			return returnWDDXPacket(errorPacket, response);
 
-		IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
-		String wddxPacket = workspaceManagementService.deleteContentWithVersion(uuID,versionID,folderContentID);
-		return outputPacket(mapping, request, response, wddxPacket, "details");
+		String wddxPacket = null;
+		try {
+			IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
+			wddxPacket = workspaceManagementService.deleteContentWithVersion(uuID,versionID,folderContentID);
+		} catch (Exception e) {
+			log.error("deleteContentWithVersion: Exception occured. uuID "+uuID+" versionID "+versionID+" folderContentID "+folderContentID, e);
+			FlashMessage flashMessage = FlashMessage.getExceptionOccured(IWorkspaceManagementService.MSG_KEY_DELETE_VERSION, e.getMessage());
+			wddxPacket = flashMessage.serializeMessage();
+		}
+		return returnWDDXPacket(wddxPacket, response);
 	}
 	
 	
@@ -482,9 +499,16 @@ public class WorkspaceAction extends DispatchAction {
 			  HttpServletResponse response)throws Exception{
 		Integer userID = new Integer(WebUtil.readIntParam(request,AttributeNames.PARAM_USER_ID));
 		String role = WebUtil.readStrParam(request, "role");
-		IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
-		String wddxPacket = workspaceManagementService.getOrganisationsByUserRole(userID, role);		
-		return outputPacket(mapping, request, response, wddxPacket, "details");
+		String wddxPacket = null;
+		try {
+			IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
+			wddxPacket = workspaceManagementService.getOrganisationsByUserRole(userID, role);		
+		} catch (Exception e) {
+			log.error("getOrganisationsByUserRole: Exception occured. userID "+userID+" role "+role, e);
+			FlashMessage flashMessage = FlashMessage.getExceptionOccured(IWorkspaceManagementService.MSG_KEY_ORG_BY_ROLE, e.getMessage());
+			wddxPacket = flashMessage.serializeMessage();
+		}
+		return returnWDDXPacket(wddxPacket, response);
 	}
 	
 	public ActionForward getUsersFromOrganisationByRole(ActionMapping mapping,
@@ -493,9 +517,16 @@ public class WorkspaceAction extends DispatchAction {
 			  HttpServletResponse response)throws Exception{
 		Integer organisationID = new Integer(WebUtil.readIntParam(request,"organisationID"));
 		String role = WebUtil.readStrParam(request, "role");
-		IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
-		String wddxPacket = workspaceManagementService.getUsersFromOrganisationByRole(organisationID, role);		
-		return outputPacket(mapping, request, response, wddxPacket, "details");
+		String wddxPacket = null;
+		try {
+			IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
+			wddxPacket = workspaceManagementService.getUsersFromOrganisationByRole(organisationID, role);		
+		} catch (Exception e) {
+			log.error("getUsersFromOrganisationByRole: Exception occured. organisationID "+organisationID+" role "+role, e);
+			FlashMessage flashMessage = FlashMessage.getExceptionOccured(IWorkspaceManagementService.MSG_KEY_USER_BY_ROLE, e.getMessage());
+			wddxPacket = flashMessage.serializeMessage();
+		}
+		return returnWDDXPacket(wddxPacket, response);
 	}
 
 }
