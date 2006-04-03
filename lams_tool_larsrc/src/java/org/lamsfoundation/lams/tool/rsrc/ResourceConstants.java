@@ -51,5 +51,11 @@ public class ResourceConstants {
 	public static final String ERROR_MSG_DESC_BLANK = "error.resource.item.desc.blank";
 	public static final String ERROR_MSG_FILE_BLANK = "error.resource.item.file.blank";
 	public static final String ERROR_MSG_INVALID_URL = "error.resource.item.invalid.url";
+	
+	//mode
+	public static final String MODE = "mode";
+	public static final String AUTHOR_MODE = "author_mode";
+	public static final String MONITOR_MODE = "monitor_mode";
+
 
 }

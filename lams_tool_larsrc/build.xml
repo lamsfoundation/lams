@@ -365,7 +365,7 @@
 			lamsEarPath="${jboss.deploy}"
 			toolContext="${toolContext}"
 			toolWebUri="${product}.war"
-			languageFilesPackage="org.lamsfoundation.lams.tool.forum">
+			languageFilesPackage="org.lamsfoundation.lams.tool.rsrc">
 
 			<!-- language files go as a fileset. -->
 			<!-- Not nice but can't work out how to embed them in a tag. -->

@@ -24,7 +24,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -36,7 +38,9 @@ import java.util.Set;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
+import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
@@ -51,6 +55,7 @@ import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.rsrc.ResourceConstants;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
+import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceAttachment;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItemInstruction;
@@ -58,7 +63,9 @@ import org.lamsfoundation.lams.tool.rsrc.service.IResourceService;
 import org.lamsfoundation.lams.tool.rsrc.service.ResourceApplicationException;
 import org.lamsfoundation.lams.tool.rsrc.web.form.ResourceForm;
 import org.lamsfoundation.lams.tool.rsrc.web.form.ResourceItemForm;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -81,7 +88,7 @@ public class AuthoringAction extends Action {
 		String param = mapping.getParameter();
 		//-----------------------Resource Author function ---------------------------
 	  	if (param.equals("initPage")) {
-//	  		request.getSession().setAttribute(ForumConstants.MODE,ForumConstants.AUTHOR_MODE);
+	  		request.getSession().setAttribute(ResourceConstants.MODE,ResourceConstants.AUTHOR_MODE);
        		return initPage(mapping, form, request, response);
         }
 //	  	if (param.equals("monitoringInitPage")) {
@@ -131,7 +138,7 @@ public class AuthoringAction extends Action {
 		if(itemIdx != -1){
 			List<ResourceItem> resourceList = getResourceList(request);
 			ResourceItem item = resourceList.remove(itemIdx);
-			List delList = getDeletedTopicList(request);
+			List delList = getDeletedResourceList(request);
 			delList.add(item);
 		}		
 		return mapping.findForward(ResourceConstants.SUCCESS);
@@ -278,7 +285,118 @@ public class AuthoringAction extends Action {
 	 */
 	private ActionForward updateContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
-		return null;
+		ResourceForm resourceForm = (ResourceForm)(form);
+		
+		Resource resource = resourceForm.getResource();
+		try {
+			IResourceService service = getResourceService();
+			
+			//*******************************Handle user*******************
+			//try to get form system session
+			HttpSession ss = SessionManager.getSession();
+			//get back login user DTO
+			UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+			ResourceUser resourceUser = service.getUserByID(new Long(user.getUserID().intValue()));
+			if(resourceUser == null){
+				resourceUser = new ResourceUser(user,null);
+				service.createUser(resourceUser);
+			}
+			
+			//**********************************Get Resource PO*********************
+			Resource resourcePO = service.getResourceByContentId(resourceForm.getToolContentID());
+			if(resourcePO == null || !resourceForm.getToolContentID().equals(resource.getContentId()) ){
+				//new Resource, create it.
+				resourcePO = resource;
+				resourcePO.setContentId(resourceForm.getToolContentID());
+			}else{
+				Long uid = resourcePO.getUid();
+				PropertyUtils.copyProperties(resourcePO,resource);
+				//get back UID
+				resourcePO.setUid(uid);
+			}
+			resourcePO.setCreatedBy(resourceUser);
+			
+			//**********************************Handle Attachement*********************
+	    	//merge attachment info
+			Set attPOSet = resourcePO.getAttachments();
+			if(attPOSet == null)
+				attPOSet = new HashSet();
+			List attachmentList = getAttachmentList(request);
+			List deleteAttachmentList = getDeletedAttachmentList(request);
+			
+			//current attachemnt in authoring instruction tab.
+			Iterator iter = attachmentList.iterator();
+			while(iter.hasNext()){
+				ResourceAttachment newAtt = (ResourceAttachment) iter.next();
+				//add new attachment if UID is not null
+				if(newAtt.getUid() == null)
+					attPOSet.add(newAtt);
+			}
+			attachmentList.clear();
+			
+			//deleted attachment. 2 possible types: one is persist another is non-persist before.
+			iter = deleteAttachmentList.iterator();
+			while(iter.hasNext()){
+				ResourceAttachment delAtt = (ResourceAttachment) iter.next();
+				iter.remove();
+				//delete from repository
+				service.deleteFromRepository(delAtt.getFileUuid(),delAtt.getFileVersionId());
+				//it is an existed att, then delete it from current attachmentPO
+				if(delAtt.getUid() != null){
+					Iterator attIter = attPOSet.iterator();
+					while(attIter.hasNext()){
+						ResourceAttachment att = (ResourceAttachment) attIter.next();
+						if(delAtt.getUid().equals(att.getUid())){
+							attIter.remove();
+							break;
+						}
+					}
+					service.deleteResourceAttachment(delAtt.getUid());
+				}//end remove from persist value
+			}
+			
+			//copy back
+			resourcePO.setAttachments(attPOSet);
+			//************************* Handle resource items *******************
+			//Handle resource items
+			List topics = getResourceList(request);
+	    	iter = topics.iterator();
+	    	while(iter.hasNext()){
+	    		ResourceItem item = (ResourceItem) iter.next();
+	    		if(item != null){
+    				//This flushs user UID info to message if this user is a new user. 
+    				item.setCreateBy(resourceUser);
+    				item.setCreateDate(new Timestamp(new Date().getTime()));
+	    		}
+	    	}
+	    	//delete them from database.
+	    	List delTopics = getDeletedResourceList(request);
+	    	iter = delTopics.iterator();
+	    	while(iter.hasNext()){
+	    		ResourceItem item = (ResourceItem) iter.next();
+	    		iter.remove();
+	    		if(item.getUid() != null)
+	    			service.deleteResourceItem(item.getUid());
+	    		if(item.getFileUuid() != null && item.getFileVersionId() != null)
+	    			service.deleteFromRepository(item.getFileUuid(),item.getFileVersionId());
+	    	}
+
+			//initialize attachmentList again
+			attachmentList = getAttachmentList(request);
+			attachmentList.addAll(resource.getAttachments());
+			
+			//**********************************************
+			//finally persist resourcePO again
+			service.saveOrUpdateResource(resourcePO);
+		} catch (Exception e) {
+			log.error(e);
+		}
+		
+    	String mode = (String) request.getSession().getAttribute(ResourceConstants.MODE);
+    	if(StringUtils.equals(mode,ResourceConstants.AUTHOR_MODE))
+    		return mapping.findForward("author");
+    	else
+    		return mapping.findForward("monitor");
 	}
 	
 	/**
@@ -489,30 +607,34 @@ public class AuthoringAction extends Action {
 	 * @param request
 	 * @return
 	 */
-	private List getDeletedAttachmentList(HttpServletRequest request) {
-		return getListFromSession(request,ResourceConstants.ATTR_DELETED_ATTACHMENT_LIST);
+	private List getAttachmentList(HttpServletRequest request) {
+		return getListFromSession(request,ResourceConstants.ATT_ATTACHMENT_LIST);
 	}
 	/**
 	 * @param request
 	 * @return
 	 */
-	private List getDeletedTopicList(HttpServletRequest request) {
-		return getListFromSession(request,ResourceConstants.ATTR_DELETED_RESOURCE_LIST);
+	private List getDeletedAttachmentList(HttpServletRequest request) {
+		return getListFromSession(request,ResourceConstants.ATTR_DELETED_ATTACHMENT_LIST);
 	}
 	/**
+	 * List save current resource items.
 	 * @param request
 	 * @return
 	 */
 	private List getResourceList(HttpServletRequest request) {
 		return getListFromSession(request,ResourceConstants.ATTR_RESOURCE_LIST);
-	}
+	}	
 	/**
+	 * List save deleted resource items, which could be persisted or non-persisted items. 
 	 * @param request
 	 * @return
 	 */
-	private List getAttachmentList(HttpServletRequest request) {
-		return getListFromSession(request,ResourceConstants.ATT_ATTACHMENT_LIST);
+	private List getDeletedResourceList(HttpServletRequest request) {
+		return getListFromSession(request,ResourceConstants.ATTR_DELETED_RESOURCE_LIST);
 	}
+
+
 	/**
 	 * Get <code>java.util.List</code> from HttpSession by given name.
 	 * 
@@ -528,6 +650,8 @@ public class AuthoringAction extends Action {
 		}
 		return list;
 	}
+	
+	
 	/**
 	 * @param request
 	 */

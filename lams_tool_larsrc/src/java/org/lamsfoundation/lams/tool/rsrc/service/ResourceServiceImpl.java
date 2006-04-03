@@ -57,6 +57,7 @@ import org.lamsfoundation.lams.tool.rsrc.ims.SimpleContentPackageConverter;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceAttachment;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
+import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
 import org.lamsfoundation.lams.tool.rsrc.util.ResourceToolContentHandler;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.util.MessageService;
@@ -216,6 +217,53 @@ public class ResourceServiceImpl implements
 		
 		return file;
 	}
+
+
+	public void createUser(ResourceUser resourceUser) {
+		resourceUserDao.saveObject(resourceUser);
+	}
+
+
+	public ResourceUser getUserByID(Long userUid) {
+		
+		return (ResourceUser) resourceUserDao.getObject(ResourceUser.class,userUid);
+		
+	}
+
+
+	public void deleteFromRepository(Long fileUuid, Long fileVersionId) throws ResourceApplicationException {
+		ITicket ticket = getRepositoryLoginTicket();
+		try {
+			repositoryService.deleteVersion(ticket, fileUuid,fileVersionId);
+		} catch (Exception e) {
+			throw new ResourceApplicationException(
+					"Exception occured while deleting files from"
+							+ " the repository " + e.getMessage());
+		}
+	}
+
+
+	public void saveOrUpdateResource(Resource resource) {
+		resourceDao.saveObject(resource);
+	}
+
+
+	public void deleteResourceAttachment(Long attachmentUid) {
+		resourceAttachmentDao.removeObject(ResourceAttachment.class, attachmentUid);
+		
+	}
+
+
+	public void saveOrUpdateResourceItem(ResourceItem item) {
+		resourceItemDao.saveObject(item);
+	}
+
+
+	public void deleteResourceItem(Long uid) {
+		resourceItemDao.removeObject(ResourceItem.class,uid);
+	}
+
+
 	//*****************************************************************************
 	// private methods
 	//*****************************************************************************
@@ -404,6 +452,5 @@ public class ResourceServiceImpl implements
 	public void setToolService(ILamsToolService toolService) {
 		this.toolService = toolService;
 	}
-
 
 }

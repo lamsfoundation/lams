@@ -51,8 +51,8 @@ create table tl_larsrc11_resource (
 );
 create table tl_larsrc11_resource_item (
    uid bigint not null auto_increment,
-   cr_uuid bigint,
-   cr_version_id bigint,
+   file_uuid bigint,
+   file_version_id bigint,
    description varchar(255),
    ims_schema varchar(255),
    init_item varchar(255),
@@ -64,6 +64,8 @@ create table tl_larsrc11_resource_item (
    create_by_author bit,
    is_hide bit,
    item_type smallint,
+   file_type varchar(255),
+   file_name varchar(255),
    resource_uid bigint,
    session_uid bigint,
    primary key (uid)

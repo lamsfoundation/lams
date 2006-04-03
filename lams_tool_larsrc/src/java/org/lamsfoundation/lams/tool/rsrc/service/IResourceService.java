@@ -29,6 +29,7 @@ import org.lamsfoundation.lams.contentrepository.IVersionedNode;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceAttachment;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
+import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
 
 /**
  * @author Dapeng.Ni
@@ -49,5 +50,18 @@ public interface IResourceService
 	ResourceAttachment uploadInstructionFile(FormFile file, String type) throws ResourceApplicationException;
 
 	void uploadResourceItemFile(ResourceItem item, FormFile file) throws ResourceApplicationException;
+
+	//********** for user methods *************
+	void createUser(ResourceUser resourceUser);
+	ResourceUser getUserByID(Long long1);
+
+	//********** Repository methods ***********************
+	void deleteFromRepository(Long fileUuid, Long fileVersionId) throws ResourceApplicationException ;
+
+	void saveOrUpdateResource(Resource Resource);
+
+	void deleteResourceAttachment(Long attachmentUid);
+
+	void deleteResourceItem(Long uid);
 }
 

@@ -23,6 +23,7 @@ package org.lamsfoundation.lams.tool.rsrc.model;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 /**
  * Resource
  * @author Dapeng Ni
@@ -42,6 +43,13 @@ public class ResourceUser {
 	private ResourceSession session;
 	
 	public ResourceUser(){
+	}
+	public ResourceUser(UserDTO user, ResourceSession session){
+		this.userId = new Long(user.getUserID().intValue());
+		this.firstName = user.getFirstName();
+		this.lastName = user.getLastName();
+		this.loginName = user.getLogin();
+		this.session = session;
 	}
 
 //  **********************************************************
