@@ -23,11 +23,16 @@
 package org.lamsfoundation.lams.tool.chat.dao;
 
 import org.lamsfoundation.lams.dao.IBaseDAO;
+import org.lamsfoundation.lams.tool.chat.Chat;
 
 /**
  * DAO for accessing the Chat objects - interface defining
  * methods to be implemented by the Hibernate or other implementation.
  */
 public interface IChatDAO extends IBaseDAO{
+
+	Chat getByContentId(Long toolContentId);
+
+	void saveOrUpdate(Chat toContent);
 
 }

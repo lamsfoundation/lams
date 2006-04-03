@@ -19,10 +19,13 @@
  *http://www.gnu.org/licenses/gpl.txt
  */
 
-/* $Id$ */ 
+/* $Id$ */
 package org.lamsfoundation.lams.tool.chat.dao.hibernate;
 
+import java.util.List;
+
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.tool.chat.ChatSession;
 import org.lamsfoundation.lams.tool.chat.dao.IChatSessionDAO;
 
 /**
@@ -30,4 +33,19 @@ import org.lamsfoundation.lams.tool.chat.dao.IChatSessionDAO;
  */
 public class ChatSessionDAO extends BaseDAO implements IChatSessionDAO {
 
+	public static final String SQL_QUERY_FIND_BY_SESSION_ID = "from "
+			+ ChatSession.class.getName() + " where session_id=?";
+
+	public void saveOrUpdate(ChatSession session) {
+		this.getHibernateTemplate().saveOrUpdate(session);
+		this.getHibernateTemplate().flush();
+	}
+
+	public ChatSession getBySessionId(Long toolSessionId) {
+		List list = this.getHibernateTemplate().find(
+				SQL_QUERY_FIND_BY_SESSION_ID, toolSessionId);
+		if (list == null || list.isEmpty())
+			return null;
+		return (ChatSession) list.get(0);
+	}
 }

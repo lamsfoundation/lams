@@ -19,10 +19,13 @@
  *http://www.gnu.org/licenses/gpl.txt
  */
 
-/* $Id$ */ 
+/* $Id$ */
 package org.lamsfoundation.lams.tool.chat.dao.hibernate;
 
+import java.util.List;
+
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.tool.chat.Chat;
 import org.lamsfoundation.lams.tool.chat.dao.IChatDAO;
 
 /**
@@ -30,4 +33,18 @@ import org.lamsfoundation.lams.tool.chat.dao.IChatDAO;
  */
 public class ChatDAO extends BaseDAO implements IChatDAO {
 
+	private static final String FIND_FORUM_BY_CONTENTID = "from Chat chat where chat.toolContentId=?";
+	
+	public Chat getByContentId(Long toolContentId) {
+		List list = getHibernateTemplate().find(FIND_FORUM_BY_CONTENTID,toolContentId);
+		if(list != null && list.size() > 0)
+			return (Chat) list.get(0);
+		else
+			return null;
+	}
+
+	public void saveOrUpdate(Chat chat) {
+		this.getHibernateTemplate().saveOrUpdate(chat);
+		this.getHibernateTemplate().flush();
+	}
 }

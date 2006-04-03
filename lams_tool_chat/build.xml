@@ -202,7 +202,7 @@ Ant build file.
 	<!-- =================================================================== -->
 
 	<target name="deploy-and-explode-war" depends="delete-exploded-tool-folder, deploy-war, explode-tool" description="composite of multiple targets">
-		
+
 	</target>
 
 	<!-- =================================================================== -->
@@ -318,9 +318,10 @@ Ant build file.
 			</fileset>
 		</copy>
 
-		<copy overwrite="yes" todir="${build.deploy}/lang">
-			<fileset dir="${conf.dir}/language">
+		<copy overwrite="yes" todir="${build.deploy}/language">
+			<fileset dir="${conf.language.dir}">
 				<include name="*.properties" />
+				<include name="*.txt" />
 			</fileset>
 		</copy>
 
@@ -328,11 +329,29 @@ Ant build file.
 			<classpath refid="deploy.lib.classpath" />
 		</taskdef>
 
-		<generateDeployProperties depends="compile" mode="development" outputPath="${build.deploy}" dbPassword="${db.password}" dbUsername="${db.username}" dbDriverUrl="${db.url}" dbDriverClass="com.mysql.jdbc.Driver" deployFiles="${build.lib}/${product}.war,${build.lib}/${product}.jar" toolSignature="${signature}" toolTablesScriptPath="${db.scripts}/create_lams_tool_chat.sql" toolTablesDeleteScriptPath="${db.scripts}/drop_lams_tool_chat.sql" toolActivityInsertScriptPath="${db.scripts}/activity_insert.sql" toolLibraryInsertScriptPath="${db.scripts}/library_insert.sql" toolInsertScriptPath="${db.scripts}/tool_insert.sql" lamsEarPath="${jboss.deploy}" toolContext="${toolContext}" toolWebUri="${product}.war">
-
-			<!-- language files go as a fileset. Not nice but can't work out how to embed them in a tag. -->
-			<fileset dir="${conf.dir}/language/">
-				<include name="*.properties" />
+		<generateDeployProperties depends="compile" 
+			mode="development" 
+			outputPath="${build.deploy}" 
+			dbPassword="${db.password}" 
+			dbUsername="${db.username}" 
+			dbDriverUrl="${db.url}" 
+			dbDriverClass="com.mysql.jdbc.Driver" 
+			deployFiles="${build.lib}/${product}.war,${build.lib}/${product}.jar" 
+			toolSignature="${signature}" 
+			toolTablesScriptPath="${db.scripts}/create_lams_tool_chat.sql" 
+			toolTablesDeleteScriptPath="${db.scripts}/drop_lams_tool_chat.sql" 
+			toolActivityInsertScriptPath="${db.scripts}/activity_insert.sql" 
+			toolLibraryInsertScriptPath="${db.scripts}/library_insert.sql" 
+			toolInsertScriptPath="${db.scripts}/tool_insert.sql" 
+			lamsEarPath="${jboss.deploy}" toolContext="${toolContext}" 
+			toolWebUri="${product}.war"
+			languageFilesPackage="org.lamsfoundation.lams.tool.chat">
+			
+			<!-- language files go as a fileset. -->
+			<!-- Not nice but can't work out how to embed them in a tag. -->
+			<fileset dir="${build.deploy}/language">
+				<include name="**/*.properties" />
+				<include name="**/*.txt" />
 			</fileset>
 
 		</generateDeployProperties>

@@ -46,5 +46,4 @@ public class MonitoringAction extends Action {
 		// TODO Auto-generated method stub
 		return mapping.findForward("success");
 	}
-
 }

@@ -8,4 +8,3 @@
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="fck-editor" prefix="fck"%>
-

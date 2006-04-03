@@ -19,190 +19,213 @@
  *http://www.gnu.org/licenses/gpl.txt
  */
 
-/* $Id$ */ 
+/* $Id$ */
 package org.lamsfoundation.lams.tool.chat;
 
 import java.util.Date;
 
+import org.apache.log4j.Logger;
 
 /**
  * 
- * The details of files attached to the tool. In most cases this
- * will be the online/offline instruction files.
+ * The details of files attached to the tool. In most cases this will be the
+ * online/offline instruction files.
  * 
- *        @hibernate.class
- *         table="tl_lachat11_attachment"
- *     
+ * @hibernate.class table="tl_lachat11_attachment"
+ * 
  */
 
-public class ChatAttachment  implements java.io.Serializable {
+public class ChatAttachment implements java.io.Serializable, Cloneable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
-     /**
+	/**
+	 * 
+	 */
+	
+	private static final Logger log = Logger.getLogger(ChatAttachment.class);
+
+	/**
 	 * 
 	 */
 	private Long uid;
-     private Long fileVersionId;
-     private String fileType;
-     private String fileName;
-     private Long fileUuid;
-     private Date createDate;
-     private Chat chat;
 
+	private Long fileVersionId;
 
-    // Constructors
+	private String fileType;
 
-    /** default constructor */
-    public ChatAttachment() {
-    }
+	private String fileName;
 
-    
-    /** full constructor */
-    public ChatAttachment(Long fileVersionId, String fileType, String fileName, Long fileUuid, Date createDate, Chat chat) {
-        this.fileVersionId = fileVersionId;
-        this.fileType = fileType;
-        this.fileName = fileName;
-        this.fileUuid = fileUuid;
-        this.createDate = createDate;
-        this.chat = chat;
-    }
+	private Long fileUuid;
 
-   
-    // Property accessors
-    /**       
-     * @hibernate.id
-     * generator-class="native"
-     * type="java.lang.Long"
-     * column="uid"
-     *         
-     */
+	private Date createDate;
 
-    public Long getUid() {
-        return this.uid;
-    }
-    
-    public void setUid(Long uid) {
-        this.uid = uid;
-    }
-    /**       
-     *            @hibernate.property
-     *             column="file_version_id"
-     *             length="20"
-     *         
-     */
+	private Chat chat;
 
-    public Long getFileVersionId() {
-        return this.fileVersionId;
-    }
-    
-    public void setFileVersionId(Long fileVersionId) {
-        this.fileVersionId = fileVersionId;
-    }
-    /**       
-     *            @hibernate.property
-     *             column="file_type"
-     *             length="255"
-     *         
-     */
+	// Constructors
 
-    public String getFileType() {
-        return this.fileType;
-    }
-    
-    public void setFileType(String fileType) {
-        this.fileType = fileType;
-    }
-    /**       
-     *            @hibernate.property
-     *             column="file_name"
-     *             length="255"
-     *         
-     */
+	/** default constructor */
+	public ChatAttachment() {
+	}
 
-    public String getFileName() {
-        return this.fileName;
-    }
-    
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
-    }
-    /**       
-     *            @hibernate.property
-     *             column="file_uuid"
-     *             length="20"
-     *         
-     */
+	/** full constructor */
+	public ChatAttachment(Long fileVersionId, String fileType, String fileName,
+			Long fileUuid, Date createDate, Chat chat) {
+		this.fileVersionId = fileVersionId;
+		this.fileType = fileType;
+		this.fileName = fileName;
+		this.fileUuid = fileUuid;
+		this.createDate = createDate;
+		this.chat = chat;
+	}
 
-    public Long getFileUuid() {
-        return this.fileUuid;
-    }
-    
-    public void setFileUuid(Long fileUuid) {
-        this.fileUuid = fileUuid;
-    }
-    /**       
-     *            @hibernate.property
-     *             column="create_date"
-     *         
-     */
+	// Property accessors
+	/**
+	 * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+	 * 
+	 */
 
-    public Date getCreateDate() {
-        return this.createDate;
-    }
-    
-    public void setCreateDate(Date createDate) {
-        this.createDate = createDate;
-    }
-    /**       
-     *            @hibernate.many-to-one
-     *             not-null="true"
-     *            @hibernate.column name="chat_uid"         
-     *         
-     */
+	public Long getUid() {
+		return this.uid;
+	}
 
-    public Chat getChat() {
-        return this.chat;
-    }
-    
-    public void setChat(Chat chat) {
-        this.chat = chat;
-    }
-   
+	public void setUid(Long uid) {
+		this.uid = uid;
+	}
 
-    /**
-     * toString
-     * @return String
-     */
-     public String toString() {
-	  StringBuffer buffer = new StringBuffer();
+	/**
+	 * @hibernate.property column="file_version_id" length="20"
+	 * 
+	 */
 
-      buffer.append(getClass().getName()).append("@").append(Integer.toHexString(hashCode())).append(" [");
-      buffer.append("fileVersionId").append("='").append(getFileVersionId()).append("' ");			
-      buffer.append("fileName").append("='").append(getFileName()).append("' ");			
-      buffer.append("fileUuid").append("='").append(getFileUuid()).append("' ");			
-      buffer.append("]");
-      
-      return buffer.toString();
-     }
+	public Long getFileVersionId() {
+		return this.fileVersionId;
+	}
 
+	public void setFileVersionId(Long fileVersionId) {
+		this.fileVersionId = fileVersionId;
+	}
 
-   public boolean equals(Object other) {
-         if ( (this == other ) ) return true;
-		 if ( (other == null ) ) return false;
-		 if ( !(other instanceof ChatAttachment) ) return false;
-		 ChatAttachment castOther = ( ChatAttachment ) other; 
-         
-		 return ( (this.getUid()==castOther.getUid()) || ( this.getUid()!=null && castOther.getUid()!=null && this.getUid().equals(castOther.getUid()) ) );
-   }
-   
-   public int hashCode() {
-         int result = 17;
-         result = 37 * result + ( getUid() == null ? 0 : this.getUid().hashCode() );
-         return result;
-   }   
+	/**
+	 * @hibernate.property column="file_type" length="255"
+	 * 
+	 */
 
+	public String getFileType() {
+		return this.fileType;
+	}
 
+	public void setFileType(String fileType) {
+		this.fileType = fileType;
+	}
 
+	/**
+	 * @hibernate.property column="file_name" length="255"
+	 * 
+	 */
 
+	public String getFileName() {
+		return this.fileName;
+	}
 
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
+
+	/**
+	 * @hibernate.property column="file_uuid" length="20"
+	 * 
+	 */
+
+	public Long getFileUuid() {
+		return this.fileUuid;
+	}
+
+	public void setFileUuid(Long fileUuid) {
+		this.fileUuid = fileUuid;
+	}
+
+	/**
+	 * @hibernate.property column="create_date"
+	 * 
+	 */
+
+	public Date getCreateDate() {
+		return this.createDate;
+	}
+
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
+	}
+
+	/**
+	 * @hibernate.many-to-one not-null="true"
+	 * @hibernate.column name="chat_uid"
+	 * 
+	 */
+
+	public Chat getChat() {
+		return this.chat;
+	}
+
+	public void setChat(Chat chat) {
+		this.chat = chat;
+	}
+
+	/**
+	 * toString
+	 * 
+	 * @return String
+	 */
+	public String toString() {
+		StringBuffer buffer = new StringBuffer();
+
+		buffer.append(getClass().getName()).append("@").append(
+				Integer.toHexString(hashCode())).append(" [");
+		buffer.append("fileVersionId").append("='").append(getFileVersionId())
+				.append("' ");
+		buffer.append("fileName").append("='").append(getFileName()).append(
+				"' ");
+		buffer.append("fileUuid").append("='").append(getFileUuid()).append(
+				"' ");
+		buffer.append("]");
+
+		return buffer.toString();
+	}
+
+	public boolean equals(Object other) {
+		if ((this == other))
+			return true;
+		if ((other == null))
+			return false;
+		if (!(other instanceof ChatAttachment))
+			return false;
+		ChatAttachment castOther = (ChatAttachment) other;
+
+		return ((this.getUid() == castOther.getUid()) || (this.getUid() != null
+				&& castOther.getUid() != null && this.getUid().equals(
+				castOther.getUid())));
+	}
+
+	public int hashCode() {
+		int result = 17;
+		result = 37 * result
+				+ (getUid() == null ? 0 : this.getUid().hashCode());
+		return result;
+	}
+
+	public Object clone() {
+		Object obj = null;
+		try {
+			obj = super.clone();
+			((ChatAttachment) obj).setUid(null);
+		} catch (CloneNotSupportedException e) {
+			log.error("Failed to clone " + ChatAttachment.class);
+		}
+
+		return obj;
+	}
 }

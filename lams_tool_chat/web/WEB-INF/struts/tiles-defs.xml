@@ -1,72 +1,100 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
+<!-- 
+<!DOCTYPE tiles-definitions PUBLIC
+       "-//Apache Software Foundation//DTD Tiles Configuration//EN"
+       "http://jakarta.apache.org/struts/dtds/tiles-config_1_1.dtd">
+       
+-->
+
 <!--
-Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
-
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-USA
-
-http://www.gnu.org/licenses/gpl.txt
+	Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+	
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
+	
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+	
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+	USA
+	
+	http://www.gnu.org/licenses/gpl.txt
 -->
 
 <tiles-definitions>
 	<!--  Begin: Layouts -->
 	<definition name="tiles:/layout:default" path="/layouts/defaultLayout.jsp">
-    	<put name="pageTitleKey" value=""/>
-    	<put name="header" value="/common/header.jsp"/>
-    	<put name="body" value=""/>
-    	<put name="footer" value="/common/footer.jsp"/>
+		<put name="pageTitleKey" value="" />
+		<put name="header" value="tiles:/header:default"/> 
+		<put name="body" value="" />
 	</definition>
+	
+	<definition name="tiles:/layout:tab" path="/layouts/tabLayout.jsp">
+		<put name="pageTitleKey" value="" />
+		<put name="header" value="tiles:/header:default"/> 
+		<put name="body" value="" />
+	</definition>
+	
 	<!--  End: Layouts -->
-	
-	
+
 	<!-- Begin: Generic -->
 	<!-- 
-	<definition name="tiles:/error" extends="tiles:layout">
-    	<put name="body" value="/includes/error.jsp"/>
-	</definition>
-
-
-	<definition name="tiles:/blank" extends="tiles:layout">
-    	<put name="body" value="/includes/blank.jsp"/>
-	</definition>
-	-->
+		<definition name="tiles:/error" extends="tiles:layout">
+		<put name="body" value="/includes/error.jsp"/>
+		</definition>
+		
+		
+		<definition name="tiles:/blank" extends="tiles:layout">
+		<put name="body" value="/includes/blank.jsp"/>
+		</definition>
+	-->	
 	<!-- End: Generic -->
 	
-	
+	<!-- Begin: Headers -->
+	<definition name="tiles:/header:default" path="/common/header.jsp">
+		<put name="script" value="" type="page"/>
+	</definition>
+	<!-- End: Headers -->
+
+
 	<!-- Begin: Authoring -->
-	<definition name="tiles:/authoring/main" extends="tiles:/layout:default">
-    	<put name="pageTitleKey" value="pageTitle.authoring"/>
-    	<put name="body" value="/pages/authoring/authoring.jsp"/>
+	<definition name="tiles:/authoring/main" extends="tiles:/layout:tab">
+		<put name="pageTitleKey" value="pageTitle.authoring" />
+		<put name="header" value="tiles:/header:authoring" type="definition" />
+		<put name="body" value="/pages/authoring/authoring.jsp" />
+	</definition>
+	
+	<definition name="tiles:/header:authoring" extends="tiles:/header:default">
+		<put name="script" value="/pages/authoring/script.jsp"/>
 	</definition>
 	<!-- End: Authoring -->
 
 
 	<!-- Begin: Learning -->
 	<definition name="tiles:/learning/main" extends="tiles:/layout:default">
-    	<put name="pageTitleKey" value="pageTitle.learning"/>
-    	<put name="body" value="/pages/learning/learning.jsp"/>
+		<put name="pageTitleKey" value="pageTitle.learning" />
+		<put name="body" value="/pages/learning/learning.jsp" />
 	</definition>
 	<!-- End: Learning -->
-	
-	
+
+
 	<!-- Begin: Monitoring -->
-	<definition name="tiles:/monitoring/main" extends="tiles:/layout:default">
-    	<put name="pageTitleKey" value="pageTitle.monitoring"/>
-    	<put name="body" value="/pages/monitoring/monitoring.jsp"/>
+	<definition name="tiles:/monitoring/main" extends="tiles:/layout:tab">
+		<put name="pageTitleKey" value="pageTitle.monitoring" />
+		<put name="header" value="tiles:/header:authoring" type="definition" />
+		<put name="body" value="/pages/monitoring/monitoring.jsp" />
+	</definition>
+	
+	<definition name="tiles:/header:authoring" extends="tiles:/header:default">
+		<put name="script" value="/pages/monitoring/script.jsp"/>
 	</definition>
 	<!-- End: Monitoring -->
-	
+
 </tiles-definitions>

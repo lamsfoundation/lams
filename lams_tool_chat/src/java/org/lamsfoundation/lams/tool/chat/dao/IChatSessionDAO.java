@@ -23,6 +23,7 @@
 package org.lamsfoundation.lams.tool.chat.dao;
 
 import org.lamsfoundation.lams.dao.IBaseDAO;
+import org.lamsfoundation.lams.tool.chat.ChatSession;
 
 /**
  * DAO for accessing the ChatSession objects - interface defining
@@ -30,4 +31,7 @@ import org.lamsfoundation.lams.dao.IBaseDAO;
  */
 public interface IChatSessionDAO extends IBaseDAO{
 
+	void saveOrUpdate(ChatSession session);
+
+	ChatSession getBySessionId(Long toolSessionId);
 }

@@ -8,14 +8,14 @@
 </c:set>
 
 <head>
-
 	<title>
-		Chat Title, TODO please to use application resources
+		<bean:message key="activity.display.name" />
 	</title>
-	<lams:css/>
+	<lams:css />
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
-    <script type="text/javascript" src="${lams}fckeditor/fckeditor.js"></script>
-   	<script type="text/javascript" src="${tool}includes/javascript/fckcontroller.js"></script>
+	<script type="text/javascript" src="${lams}fckeditor/fckeditor.js"></script>
+	<script type="text/javascript" src="${tool}includes/javascript/fckcontroller.js"></script>
 	<script type="text/javascript" src="${tool}includes/javascript/tabcontroller.js"></script>
 	<script type="text/javascript" src="${tool}includes/javascript/xmlrequest.js"></script>
+	<tiles:insert attribute="script" />
 </head>

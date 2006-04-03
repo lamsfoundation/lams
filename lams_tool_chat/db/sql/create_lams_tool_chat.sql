@@ -65,7 +65,7 @@ CREATE TABLE tl_lachat11_user (
                   REFERENCES tl_lachat11_session (uid) ON DELETE NO ACTION ON UPDATE NO ACTION
 )TYPE=InnoDB;
 
---INSERT INTO tl_lachat11_chat (title,instructions,online_instructions,offline_instructions,tool_content_id,run_offline,lock_on_finished,content_in_use,define_later) 
---VALUES("Chat Title","Chat Instruction","Online instructions","Offline instructions",${default_content_id},0,0,0,0);
+INSERT INTO tl_lachat11_chat (title,instructions,online_instructions,offline_instructions,tool_content_id,run_offline,lock_on_finished,content_in_use,define_later) 
+VALUES("LAMS Chat","Chat Instruction","Online instructions","Offline instructions",${default_content_id},0,0,0,0);
 
 SET FOREIGN_KEY_CHECKS=1;
