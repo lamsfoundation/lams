@@ -26,6 +26,7 @@ import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 import junit.framework.TestCase;
 
@@ -33,7 +34,15 @@ import junit.framework.TestCase;
  * @author Fiona Malikoff
  */
 public class TestDateUtil extends TestCase {
-
+	
+	private Date utcDate = null;
+	private Date utcCalendarDate = null;
+	private Date localDate = null;
+	
+	// used to test the UTC conversion
+	private static final Date testDate = new Date(System.currentTimeMillis());
+	private static final Date testCalendarDate = Calendar.getInstance().getTime();
+	
 	private static final String FLASH_DATE_STRING_NULL_VALUE = "1970-1-1T0:0:0";
 	private static final String FLASH_DATE_STRING_SINGLE_DIGITS = "2005-2-7T1:0:23";
 	private static final String FLASH_DATE_STRING_DOUBLE_DIGITS = "2004-12-23T11:50:23";
@@ -53,6 +62,13 @@ public class TestDateUtil extends TestCase {
 
 	// TODO Implement testConvertToUTC test
 	public void testConvertToUTC() {
+		utcDate = DateUtil.convertToUTC(testDate);
+		utcCalendarDate = DateUtil.convertToUTC(testCalendarDate);
+		System.out.println("Original Date:" + testDate.toString());
+		System.out.println("UTC Date:" + utcDate.toString());
+		System.out.println("UTC Date (Calendar):"  + utcCalendarDate.toString());
+	
+		assertNotNull("Date has converted to UTC as expected", utcDate);
 	}
 
 	// TODO Implement testConvertFromUTCToLocal test
