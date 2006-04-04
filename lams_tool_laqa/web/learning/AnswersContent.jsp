@@ -51,6 +51,7 @@ http://www.gnu.org/licenses/gpl.txt
 		MM_reloadPage(true);
 		//-->
 	</script>	
+	<lams:css/>
 </head>
 
 	  <html:form  action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self">		

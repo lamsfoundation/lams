@@ -29,6 +29,32 @@ http://www.gnu.org/licenses/gpl.txt
 
 
 			<table align=center>
+
+          		<tr> 
+					<td NOWRAP  valign=top><font size=2> <b>
+          				<bean:message key="label.onlineInstructions.col" />
+	       				</b> </font>
+          			</td>
+					<td NOWRAP width=700> 
+						<lams:SetEditor id="onlineInstructions" text="${QaAuthoringForm.onlineInstructions}" small="true"/>								
+					</td> 
+				</tr>
+				
+				<tr> 
+						<td NOWRAP  valign=top><font size=2> <b>
+	          				<bean:message key="label.onlineFiles" />
+          				</b> </font>
+          			</td>
+          			<td NOWRAP> 
+						<html:file  property="theOnlineFile"></html:file>
+					 	<html:submit property="submitOnlineFile" 
+                                     styleClass="linkbutton" 
+                                     onclick="submitMethod('addNewFile');">
+								<bean:message key="label.upload"/>
+						</html:submit>
+					</td> 
+				
+				</tr>
 				<tr> 
 					<td NOWRAP  valign=top><font size=2> <b>
           				<bean:message key="label.offlineInstructions.col" />
@@ -55,33 +81,7 @@ http://www.gnu.org/licenses/gpl.txt
 						</html:submit>
 					</td> 
 
-				</tr>
-          		<tr> 
-					<td NOWRAP  valign=top><font size=2> <b>
-          				<bean:message key="label.onlineInstructions.col" />
-	       				</b> </font>
-          			</td>
-					<td NOWRAP width=700> 
-						<lams:SetEditor id="onlineInstructions" text="${QaAuthoringForm.onlineInstructions}" small="true"/>								
-					</td> 
-				</tr>
-				
-				<tr> 
-						<td NOWRAP  valign=top><font size=2> <b>
-	          				<bean:message key="label.onlineFiles" />
-          				</b> </font>
-          			</td>
-          			<td NOWRAP> 
-						<html:file  property="theOnlineFile"></html:file>
-					 	<html:submit property="submitOnlineFile" 
-                                     styleClass="linkbutton" 
-                                     onclick="submitMethod('addNewFile');">
-								<bean:message key="label.upload"/>
-						</html:submit>
-					</td> 
-				
-				</tr>
-          		</table>	  	
+				</tr>          		</table>	  	
 		</td></tr>
 		</table>
 		

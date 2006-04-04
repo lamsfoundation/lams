@@ -52,12 +52,11 @@ http://www.gnu.org/licenses/gpl.txt
 	<title> <bean:message key="label.authoring"/> </title>
 	
 	 <lams:css/>
-	<!-- depending on user / site preference this will get changed probably use passed in variable from flash to select which one to use-->
 
  	<!-- ******************** FCK Editor related javascript & HTML ********************** -->
     <script type="text/javascript" src="${lams}fckeditor/fckeditor.js"></script>
-    <script type="text/javascript" src="${tool}author_page/js/fckcontroller.js"></script>
-    <link href="${tool}author_page/css/fckeditor_style.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="${lams}includes/javascript/fckcontroller.js"></script>
+    <link href="${lams}css/fckeditor_style.css" rel="stylesheet" type="text/css">
 
 	<script language="JavaScript" type="text/JavaScript">
 
@@ -106,8 +105,8 @@ http://www.gnu.org/licenses/gpl.txt
 	
 	</script>
 	
-	<script type="text/javascript" src="<c:out value="${tool}"/>author_page/js/tabcontroller.js"></script>    
-	<script type="text/javascript" src="<c:out value="${lams}"/>includes/javascript/common.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>    
+	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/xmlrequest.js'/>"></script>
 	
 </head>
@@ -158,7 +157,7 @@ http://www.gnu.org/licenses/gpl.txt
 		<!-- end of content (Basic) -->
 	</c:if> 			
 	
-	
+
 	<lams:HTMLEditor/>	
 	</html:form>
 </body>

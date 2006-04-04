@@ -123,11 +123,11 @@ http://www.gnu.org/licenses/gpl.txt
 					
 					</table>
 
-        <hr>
-	        <a href="javascript:window.close()" class="button"><font size=2> <b> Cancel </b> </font></a>
-	        <a href="javascript:submitMethod('submitAllContent')" class="button"><font size=2> <b> <bean:message key="label.save"/> </b> </font></a>
-
-
+	<HR>
+		<p align="right">
+	        <a href="javascript:submitMethod('submitAllContent')" class="button"><bean:message key="label.save"/></a>
+	        <a href="javascript:window.close()" class="button"><bean:message key="label.cancel"/></a>
+		</p>
 
 <SCRIPT language="JavaScript"> 
 
