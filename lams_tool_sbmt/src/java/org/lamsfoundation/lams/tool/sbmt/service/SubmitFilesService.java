@@ -80,6 +80,7 @@ import org.lamsfoundation.lams.usermanagement.dao.IUserDAO;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.util.LastNameAlphabeticComparator;
 import org.springframework.dao.DataAccessException;
+import org.lamsfoundation.lams.util.DateUtil;
 
 /**
  * @author Manpreet Minhas
@@ -471,7 +472,9 @@ public class SubmitFilesService implements ToolContentManager,
 			SubmissionDetails details = new SubmissionDetails();
 			details.setFileDescription(fileDescription);
 			details.setFilePath(uploadFile.getFileName());
-			details.setDateOfSubmission(new Date());
+			Date now = Calendar.getInstance().getTime();
+			now = DateUtil.convertToUTC(now);
+			details.setDateOfSubmission(now);
 			
 			Learner learner = learnerDAO.getLearner(sessionID,userID);
 			if(learner == null)
@@ -538,6 +541,7 @@ public class SubmitFilesService implements ToolContentManager,
 			SubmitFilesReport report = submissionDetails.getReport();
 			UserDTO user = getUserDetails(userID);
 			FileDetailsDTO detailDto = new FileDetailsDTO(submissionDetails,report, user);
+			detailDto.setDateOfSubmission(DateUtil.convertFromUTCToLocal(Calendar.getInstance().getTimeZone(), detailDto.getDateOfSubmission()));
 			details.add(detailDto);
 		}
 		return details;
@@ -564,6 +568,7 @@ public class SubmitFilesService implements ToolContentManager,
 				UserDTO user = getUserDetails(learner.getUserID());
 				
 				FileDetailsDTO detailDto = new FileDetailsDTO(submissionDetails,report,user);
+				detailDto.setDateOfSubmission(DateUtil.convertFromUTCToLocal(Calendar.getInstance().getTimeZone(), detailDto.getDateOfSubmission()));
 				userFileList = (List) map.get(user);
 				//if it is first time to this user, creating a new ArrayList for this user.
 				if(userFileList == null)
@@ -578,6 +583,7 @@ public class SubmitFilesService implements ToolContentManager,
 	}
 	public FileDetailsDTO getFileDetails(Long detailID){
 			SubmissionDetails details = submissionDetailsDAO.getSubmissionDetailsByID(detailID);
+			details.setDateOfSubmission(DateUtil.convertFromUTCToLocal(Calendar.getInstance().getTimeZone(), details.getDateOfSubmission()));
 			return new FileDetailsDTO(details);			
 	}
 	/**
@@ -637,11 +643,11 @@ public class SubmitFilesService implements ToolContentManager,
 		Iterator iter = list.iterator();
 		SubmissionDetails details;
 		SubmitFilesReport report;
-		Date now = Calendar.getInstance().getTime();
+		
 		while(iter.hasNext()){
 			details = (SubmissionDetails) iter.next();
 			report = details.getReport();
-			report.setDateMarksReleased(now);
+			report.setDateMarksReleased(DateUtil.convertToUTC(Calendar.getInstance().getTime()));
 			submitFilesReportDAO.updateReport(report);
 		}
 		//current there is no false return
