@@ -13,8 +13,7 @@
 <logic:messagesPresent message="true">
     <div class="message" id="successMessages">
         <html:messages id="message" message="true">
-            <html:img pageKey="icon.information.img" 
-                altKey="icon.information" styleClass="icon"/>
+            <html:img page="/includes/images/iconInformation.gif" styleClass="icon"/>
             <c:out value="${message}" escapeXml="false"/><br/>
         </html:messages>
     </div>

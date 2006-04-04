@@ -311,11 +311,14 @@ public class AuthoringAction extends Action {
 				//new Resource, create it.
 				resourcePO = resource;
 				resourcePO.setContentId(resourceForm.getToolContentID());
+				resourcePO.setCreated(new Timestamp(new Date().getTime()));
+				resourcePO.setUpdated(new Timestamp(new Date().getTime()));
 			}else{
 				Long uid = resourcePO.getUid();
 				PropertyUtils.copyProperties(resourcePO,resource);
 				//get back UID
 				resourcePO.setUid(uid);
+				resourcePO.setUpdated(new Timestamp(new Date().getTime()));
 			}
 			resourcePO.setCreatedBy(resourceUser);
 			
@@ -362,6 +365,7 @@ public class AuthoringAction extends Action {
 			resourcePO.setAttachments(attPOSet);
 			//************************* Handle resource items *******************
 			//Handle resource items
+			Set itemList = new LinkedHashSet();
 			List topics = getResourceList(request);
 	    	iter = topics.iterator();
 	    	while(iter.hasNext()){
@@ -370,11 +374,13 @@ public class AuthoringAction extends Action {
     				//This flushs user UID info to message if this user is a new user. 
     				item.setCreateBy(resourceUser);
     				item.setCreateDate(new Timestamp(new Date().getTime()));
+    				itemList.add(item);
 	    		}
 	    	}
+	    	resourcePO.setResourceItems(itemList);
 	    	//delete them from database.
-	    	List delTopics = getDeletedResourceList(request);
-	    	iter = delTopics.iterator();
+	    	List delResourceItemList = getDeletedResourceList(request);
+	    	iter = delResourceItemList.iterator();
 	    	while(iter.hasNext()){
 	    		ResourceItem item = (ResourceItem) iter.next();
 	    		iter.remove();
@@ -396,6 +402,7 @@ public class AuthoringAction extends Action {
 
 		ActionMessages messages = new ActionMessages();
 		messages.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage("authoring.save.success"));
+		this.addMessages(request,messages);
     	String mode = (String) request.getSession().getAttribute(ResourceConstants.MODE);
     	if(StringUtils.equals(mode,ResourceConstants.AUTHOR_MODE))
     		return mapping.findForward("author");

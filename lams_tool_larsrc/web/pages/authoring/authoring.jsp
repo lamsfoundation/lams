@@ -86,10 +86,8 @@
 <div class="tabbody">
 <table align=center> 	  
 				<tr>   
-				<td NOWRAP class=error>
-					<c:if test="${sbmtSuccess}"> 			
-						<img src="${tool}images/success.gif" align="left" width=20 height=20>  <font size=2> <bean:message key="submit.successful"/> </font> </img>
-					</c:if> 			
+				<td NOWRAP>
+						<%@ include file="/common/messages.jsp" %>
 				</td>
 				</tr> 
 </table>

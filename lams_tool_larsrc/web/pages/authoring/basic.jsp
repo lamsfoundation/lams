@@ -30,7 +30,17 @@
 		launchPopup(myUrl,title);
 	}
 	
-	function previewItem(idx){
+	function previewItem(idx,uuid,versionId){
+		//2:file, 3:website,4:learning object
+		if(idx == 2){
+		}else if(idx ==3){
+			var myUrl = "<c:url value='/download/?uuid='/>"+uuid+"&preferDownload=false";
+			launchPopup(myUrl,"Website");
+		}else if(idx ==4){
+			var myUrl = "<c:url value='/download/?uuid='/>"+uuid+"&preferDownload=false";
+			launchPopup(myUrl,"LearningObject");
+		}
+		
 	}
 	
 	function editItem(idx){
@@ -128,7 +138,4 @@
 				</iframe>
 			</td>
 		</tr>
-		<tr><td colspan="2">
-			<%@ include file="/common/messages.jsp" %>
-		</td></tr>
 	</table>

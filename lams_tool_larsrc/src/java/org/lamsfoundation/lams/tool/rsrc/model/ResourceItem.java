@@ -136,7 +136,7 @@ public class ResourceItem {
 		}
 		/**
 	     * @hibernate.set   lazy="true"
-	     * 					cascade="all"
+	     * 					cascade="all-delete-orphan"
 	     * 					inverse="false"
 	     * 					order-by="sequence_id desc"
 	     * @hibernate.collection-key column="item_uid"
