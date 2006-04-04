@@ -1,3 +1,4 @@
+-- $Id$
 
 SET FOREIGN_KEY_CHECKS=0;
 DROP TABLE tl_laqa11_uploadedfile;
