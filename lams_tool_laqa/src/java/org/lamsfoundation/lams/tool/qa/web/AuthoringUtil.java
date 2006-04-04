@@ -189,9 +189,9 @@ public class AuthoringUtil implements QaAppConstants {
         logger.debug("richTextInstructions: " + richTextInstructions);
         
         String monitoringReportTitle = qaAuthoringForm.getMonitoringReportTitle();
-        String richTextOfflineInstructions = qaAuthoringForm.getOnlineInstructions(); 
+        String richTextOnlineInstructions = qaAuthoringForm.getOnlineInstructions(); 
         //String richTextInstructions = qaAuthoringForm.getInstructions(); 
-        String richTextOnlineInstructions = qaAuthoringForm.getOfflineInstructions(); 
+        String richTextOfflineInstructions = qaAuthoringForm.getOfflineInstructions(); 
         String endLearningMessage = qaAuthoringForm.getEndLearningMessage();
         
         String questionsSequenced = qaAuthoringForm.getQuestionsSequenced();
