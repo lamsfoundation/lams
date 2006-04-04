@@ -2,6 +2,7 @@
 import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.learner.*
 import org.lamsfoundation.lams.learner.lb.*;
+import org.lamsfoundation.lams.learner.ls.Lesson;
 
 /**
 * Controller for the sequence library

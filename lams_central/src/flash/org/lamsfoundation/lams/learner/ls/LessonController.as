@@ -1,7 +1,7 @@
-﻿import org.lamsfoundation.lams.learner.ls.LessonModel;
-import org.lamsfoundation.lams.learner.ls.*;
+﻿import org.lamsfoundation.lams.learner.ls.*;
 import org.lamsfoundation.lams.common.mvc.*
 import org.lamsfoundation.lams.common.util.*
+import org.lamsfoundation.lams.common.comms.Communication;
 import org.lamsfoundation.lams.learner.*
 
 /*

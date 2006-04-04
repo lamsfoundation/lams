@@ -1,10 +1,12 @@
-﻿import org.lamsfoundation.lams.common.*;
-import org.lamsfoundation.lams.common.mvc.*;
-import org.lamsfoundation.lams.learner.*;
+﻿import org.lamsfoundation.lams.learner.*;
 import org.lamsfoundation.lams.learner.ls.*;
 import org.lamsfoundation.lams.learner.lb.*;
+
+import org.lamsfoundation.lams.common.*;
+import org.lamsfoundation.lams.common.mvc.*;
 import org.lamsfoundation.lams.common.mvc.*;
 import org.lamsfoundation.lams.common.ui.*
+import org.lamsfoundation.lams.common.util.*;
 
 import mx.managers.*;
 import mx.controls.*;
@@ -81,7 +83,6 @@ class LessonView extends AbstractView {
         //Now that view is setup dispatch loaded event
        dispatchEvent({type:'load',target:this});
 	   
-		layoutToolkit();
 	}
 	
 	/*
@@ -102,16 +103,16 @@ class LessonView extends AbstractView {
             case 'SIZE' :
                 setSize(lm);
                 break;
-			case 'NAME'
+			case 'NAME' :
                 setLessonName(lm);
                 break;
-			case 'DESCRIPTION'
+			case 'DESCRIPTION' :
 				setLessonDescription(lm);
 				break;
-			case 'STATE'
+			case 'STATE' :
 				setLessonStateID(lm);
 				break;
-			case 'STATUS'
+			case 'STATUS' :
 				setStatus(lm);
 				break;
             default :

@@ -1,6 +1,8 @@
-﻿import org.lamsfoundation.lams.learner.ls.*;
+﻿import org.lamsfoundation.lams.learner.*;
+import org.lamsfoundation.lams.learner.ls.*;
 import org.lamsfoundation.lams.learner.lb.*;
-import org.lamsfoundation.lams.common.util* ;  
+import org.lamsfoundation.lams.common.util.*;
+
 import mx.managers.*;
 /**
 * Lesson - LAMS Application
@@ -9,7 +11,7 @@ import mx.managers.*;
 class Lesson {
 	
 	// Model
-	private var lessionModel:LessonModel;
+	private var lessonModel:LessonModel;
 	// View
 	private var lessonView:LessonView;
 	private var lessonView_mc:MovieClip;
@@ -33,7 +35,8 @@ class Lesson {
 		mx.events.EventDispatcher.initialize(this);
         
 		//Create the model
-		lessonModel = new LessonModel(lessonID);
+		lessonModel = new LessonModel(this);
+		lessonModel.setLessonID(lessonID);
 		
 		//Create the view
 		lessonView_mc = target_mc.createChildAtDepth("lessonView",DepthManager.kTop);	
@@ -51,7 +54,14 @@ class Lesson {
 		
 		_libraryView = LibraryView(libraryView);
 	}
-		
+	
+	/**
+	* event broadcast when a new lesson is loaded 
+	*/ 
+	public function broadcastInit(){
+		dispatchEvent({type:'init',target:this});		
+	}
+ 
 	
 	private function viewLoaded(evt:Object){
         Debugger.log('viewLoaded called',Debugger.GEN,'viewLoaded','Lesson');
@@ -70,23 +80,25 @@ class Lesson {
 		var callback:Function = Proxy.create(this,startLesson);
 		
 		// call action
-		var lessonId:Number = _lessonModel.getLessonID();
-		var userId:Number = getUserID();
+		var lessonId:Number = lessonModel.getLessonID();
+		var userId:Number = Application.getInstance().getUserID();
 		
 		// do request
 		Application.getInstance().getComms().getRequest('learning/learner.do?method=joinLession&userId='+String(userId)+'&lessonId='+String(lessonId), callback, false);
-		
+			
+		return true;
 	}
 	
 	public function exitLesson():Boolean {
 		var callback:Function = Proxy.create(this,closeLesson);
 		
 		// call action
-		var lessonId:Number = _lessonModel.getLessonID();
+		var lessonId:Number = lessonModel.getLessonID();
 		
 		// do request
 		Application.getInstance().getComms().getRequest('learning/learner.do?method=exitLession&lessonId='+String(lessonId), callback, false);
 		
+		return true;
 	}
 	
 	private function startLesson(pkt:Object){
@@ -96,11 +108,15 @@ class Lesson {
 		//_lessonModel.setActive();
 	}  
 	
-	private fucntion closeLesson(pkt:Object){
+	private function closeLesson(pkt:Object){
 		trace('receiving message back from server...');
 		
 		// set lesson as inactive
 		//_lessonModel.setInactive();
+	}
+	
+	public function getLessonID():Number {
+		return lessonModel.getLessonID();
 	}
 	
 	/**

@@ -1,6 +1,7 @@
 ﻿import org.lamsfoundation.lams.learner.lb.*;
+import org.lamsfoundation.lams.learner.ls.Lesson;
 import org.lamsfoundation.lams.common.util.*;
-import org.lamsfoundation.lams.common.util.Observable;
+import org.lamsfoundation.lams.learner.Application;
 
 
 /*
@@ -92,7 +93,7 @@ class LibraryModel extends Observable {
 		
 		// exit current lesson and join selected lesson
 		
-		if(_lastSelectLesson != null)
+		if(_lastSelectedLesson != null)
 			_lastSelectedLesson.exitLesson();
 			
 		if(_currentlySelectedLesson != null)
@@ -133,7 +134,8 @@ class LibraryModel extends Observable {
 	}
 	
 	public function addLesson(lesson:Lesson):Boolean {
-		_learningSequences.put(lesson.lessonID, lesson);
+		_learningSequences.put(lesson.getLessonID(), lesson);
+		return true;
 	}
 	
 	public function removeLesson(lesson:Lesson):Boolean {
@@ -141,8 +143,8 @@ class LibraryModel extends Observable {
 		return true;
 	}
 	
-	public function getLesson(lessonID:key):Lesson {
-		return Lesson(_learningSequences.get(key));
+	public function getLesson(lessonID:Number):Lesson {
+		return Lesson(_learningSequences.get(lessonID));
 	}
 	
 	/**

@@ -1,5 +1,6 @@
-﻿import org.lamsfoundation.lams.learner.lb.*
-import org.lamsfoundation.lams.common.util*   
+﻿import org.lamsfoundation.lams.learner.Application;
+import org.lamsfoundation.lams.learner.lb.*;
+import org.lamsfoundation.lams.common.util.*; 
 import mx.managers.*;
 /**
 * Library - LAMS Application
@@ -23,11 +24,11 @@ class Library {
 	*
 	* @param   target_mc	Target clip for attaching view
 	*/
-	function Library(target_mc:MovieClip,x:Number,y:Number,lessonID:Number){
+	function Library(target_mc:MovieClip,x:Number,y:Number){
 		mx.events.EventDispatcher.initialize(this);
         
 		//Create the model
-		libraryModel = new LibraryModel(libraryID);
+		libraryModel = new LibraryModel(this);
 		
 		//Create the view
 		libraryView_mc = target_mc.createChildAtDepth("libraryView",DepthManager.kTop);	
@@ -44,6 +45,14 @@ class Library {
         libraryModel.setPosition(x,y);
 		
 	}
+	
+	/**
+	* event broadcast when a new library is loaded 
+	*/ 
+	public function broadcastInit(){
+		dispatchEvent({type:'init',target:this});		
+	}
+ 
 	
 	private function viewLoaded(evt:Object){
         Debugger.log('viewLoaded called',Debugger.GEN,'viewLoaded','Library');
@@ -65,7 +74,7 @@ class Library {
 		
 	}
 	
-	private function getActiveLessons(Data:Object):Void {
+	private function getLessonList(Data:Object):Void {
 		trace('received active lesson data back...');
 		// get data and create Lesson obj's
 		

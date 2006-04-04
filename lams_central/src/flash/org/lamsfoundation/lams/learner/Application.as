@@ -1,7 +1,8 @@
 ﻿import org.lamsfoundation.lams.common.comms.*       //communications
-import org.lamsfoundation.lams.common.*    ]
+import org.lamsfoundation.lams.common.util.*;		// utilities
+import org.lamsfoundation.lams.common.*;
 import org.lamsfoundation.lams.learner.ls.*;
-import org.lamsfoundation.lams.learner.ls.LessonModel;
+import org.lamsfoundation.lams.learner.lb.*;
 import mx.managers.*
 import mx.utils.*
 /**
@@ -14,22 +15,42 @@ class org.lamsfoundation.lams.learner.Application {
 	
 	// private constants
 	private var _comms:Communication;
+	private var _seqLib:Library;
 	
-	private static var LESSON_X:Number = 5;
-    private static var LESSON_Y:Number = 5;
+	private var _appRoot_mc:MovieClip;                 //Application root clip
     
 	
+	private static var LIBRARY_X:Number = 0;
+	private static var LIBRARY_Y:Number = 0;
+    
+	
+    private static var APP_ROOT_DEPTH:Number = 10; //depth of the application root
+	
 	// UI Elements
+	
+    private static var UI_LOAD_CHECK_INTERVAL:Number = 50;
+	private static var UI_LOAD_CHECK_TIMEOUT_COUNT:Number = 200;
+	
+	private var _uiLoadCheckCount = 0;				// instance counter for number of times we have checked to see if theme and dict are loaded
+	private var _UILoadCheckIntervalID:Number;         //Interval ID for periodic check on UILoad status
+    private var _UILoaded:Boolean;                     //UI Loading status
+    private var _seqLibLoaded:Boolean;                  //Seq Library loaded flag
+    private var _seqLibEventDispatched:Boolean          //Seq Library loaded flag
+    
 	
 	//Application instance is stored as a static in the application class
     private static var _instance:Application = null;     
 	private var _container_mc:MovieClip;               //Main container
     
 	
+	
+	
 	/**
     * Application - Constructor
     */
     private function Application(){
+        _seqLibLoaded = false;
+        _seqLibEventDispatched = false;
         
         
     }
@@ -55,6 +76,140 @@ class org.lamsfoundation.lams.learner.Application {
 		//Comms object - do this before any objects are created that require it for server communication
         _comms = new Communication();
 		
+		setupUI();
+		checkUILoaded();
+    }
+	
+	private function setupUI():Void {
+		
+		//Create the application root
+        _appRoot_mc = _container_mc.createEmptyMovieClip('appRoot_mc',APP_ROOT_DEPTH);
+        
+		var depth:Number = _appRoot_mc.getNextHighestDepth();
+        _seqLib = new Library(_appRoot_mc,depth++,LIBRARY_X,LIBRARY_Y);
+        _seqLib.addEventListener('load',Proxy.create(this,UIElementLoaded));
+		//_seqLib.addEventListener('init', Proxy.create(this,reload));
+	}
+	
+	/**
+    * Runs periodically and dispatches events as they are ready
+    */
+    private function checkUILoaded() {
+        //If it's the first time through then set up the interval to keep polling this method
+        if(!_UILoadCheckIntervalID) {
+            _UILoadCheckIntervalID = setInterval(Proxy.create(this,checkUILoaded),UI_LOAD_CHECK_INTERVAL);
+        } else {
+			_uiLoadCheckCount++;
+            //If all events dispatched clear interval and call start()
+            if(_seqLibEventDispatched){
+				//Debugger.log('Clearing Interval and calling start :',Debugger.CRITICAL,'checkUILoaded','Application');	
+                clearInterval(_UILoadCheckIntervalID);
+				start();
+            }else {
+                //If UI loaded check which events can be broadcast
+                if(_UILoaded){
+					//Debugger.log('ALL UI LOADED, waiting for all true to dispatch init events: _dictionaryLoaded:'+_dictionaryLoaded+'_themeLoaded:'+_themeLoaded ,Debugger.GEN,'checkUILoaded','Application');
+
+                    //If sequence library is loaded and event hasn't been dispatched - dispatch it
+                    /*if(_seqLibLoaded && !_seqLibEventDispatched){
+						_seqLibEventDispatched = true;
+                        _seqLib.broadcastInit();
+                    }*/
+					if(_seqLibLoaded){
+						clearInterval(_UILoadCheckIntervalID);
+						start();
+					}
+				
+					
+					if(_uiLoadCheckCount >= UI_LOAD_CHECK_TIMEOUT_COUNT){
+						//if we havent loaded the library by the timeout count then give up
+						Debugger.log('raeached time out waiting to load library, giving up.',Debugger.CRITICAL,'checkUILoaded','Application');
+						clearInterval(_UILoadCheckIntervalID);
+					}
+                }
+            }
+        }
+    }
+	
+	/**
+    * This is called by each UI element as it loads to notify Application that it's loaded
+    * When all UIElements are loaded the Application can set UILoaded flag true allowing events to be dispatched
+    * and methods called on the UI Elements
+    * 
+    * @param UIElementID:String - Identifier for the Element that was loaded
+    */
+    public function UIElementLoaded(evt:Object) {
+        if(evt.type=='load'){
+            //Which item has loaded
+            switch (evt.target.className) {
+                case 'Library' :
+                    _seqLibLoaded = true;
+                    break;
+                default:
+            }
+            
+            //If all of them are loaded set UILoad accordingly
+            if(_seqLibLoaded){
+                _UILoaded=true;                
+            } 
+            
+        }   
+    }
+	
+	/**
+    * Runs when application setup has completed.  At this point the init/loading screen can be removed and the user can
+    * work with the application
+    */
+    private function start(){
+		
+		_seqLib.getActiveLessons();
+		
+        //Fire off a resize to set up sizes
+        onResize();
+		
+    }
+    
+	/**
+    * Receives events from the Stage resizing
+    */
+    public function onResize(){
+		
+		//Get the stage width and height and call onResize for stage based objects
+        var w:Number = Stage.width;
+        var h:Number = Stage.height;
+		
+		var someListener:Object = new Object();
+		someListener.onMouseUp = function () {
+			_seqLib.setSize(w,h);
+		}
+		
+		_seqLib.setSize(w,h);
+		
+	}
+     
+	// onKey*** methods - TODO
+	
+	
+	public function getLibrary():Library {
+		return _seqLib;
+	}
+	
+	/**
+    * Returns the Application root, use as _root would be used
+    * 
+    * @usage    Import authoring package and then use as root e.g.
+    * 
+    *           import org.lamsfoundation.lams.authoring;
+    *           Application.root.attachMovie('myLinkageId','myInstanceName',depth);
+    */
+    static function get root():MovieClip {
+        //Return root if valid otherwise raise a big system error as app. will not work without it
+        if(_instance._appRoot_mc != undefined) {
+            return _instance._appRoot_mc;
+        } else {
+            //TODO DI 11/05/05 Raise error if _appRoot hasn't been created
+			
+        }
     }
 	
 	public function getUserID():Number {

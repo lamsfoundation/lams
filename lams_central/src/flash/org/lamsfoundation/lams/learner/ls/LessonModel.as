@@ -1,6 +1,5 @@
 ﻿import org.lamsfoundation.lams.learner.ls.*;
 import org.lamsfoundation.lams.common.util.*;
-import org.lamsfoundation.lams.common.util.Observable;
 
 
 /*
@@ -120,6 +119,10 @@ class LessonModel extends Observable {
 		notifyObservers(infoObj);
 	}
 	
+	public function getLessonStateID():Number {
+		return _lessonStateID;
+	}
+	
 	public function setActive() {
 		_active = true;
 		
@@ -145,6 +148,7 @@ class LessonModel extends Observable {
 	public function getStatus():Boolean {
 		return _active;
 	}
+	
 	
 	/**
     * set the size on the model, this in turn will set a changed flag and notify observers (views)
@@ -222,10 +226,9 @@ class LessonModel extends Observable {
         return 'LessonModel';
     }
 	
-	**
+	/**
 	 * 
-	 * @usage   
-	 * @return  
+	 * @return the Lesson  
 	 */
 	public function getLesson():Lesson{
 		return _lesson;

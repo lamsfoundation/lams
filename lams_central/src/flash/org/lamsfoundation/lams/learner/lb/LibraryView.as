@@ -5,6 +5,7 @@ import org.lamsfoundation.lams.learner.lb.*;
 import org.lamsfoundation.lams.learner.ls.*;
 import org.lamsfoundation.lams.common.mvc.*;
 import org.lamsfoundation.lams.common.ui.*
+import org.lamsfoundation.lams.common.util.*;
 
 import mx.managers.*;
 import mx.controls.*;
@@ -53,7 +54,7 @@ class LibraryView extends AbstractView {
 	* Sets up the Library (clip)
 	*/
 	public function createLibrary() {
-		_lesson_mc = this;
+		_library_mc = this;
 		_depth = this.getNextHighestDepth();
 		
 		//Add the button handlers, essentially this is handing on clicked event to controller.
@@ -82,10 +83,10 @@ class LibraryView extends AbstractView {
             case 'SIZE' :
                 setSize(lm);
                 break;
-			case 'SEQUENCES_UPDATED'
+			case 'SEQUENCES_UPDATED' :
                 updateSequences(o);
                 break;
-			case 'LESSON_SELECTED'
+			case 'LESSON_SELECTED' :
 				updateSelectedLesson(o);
 				break;
             default :
@@ -122,7 +123,7 @@ class LibraryView extends AbstractView {
 			//NOW we pass in the Lesson instance
 			var _lesson:Lesson = learningSeq.classInstanceRefs;
 			
-			var lesson_mc = learningSequences_sp.content.attachMovie("Lesson","ls_"+_lesson.lessonID,_depth++,{_lesson:Lesson,_libraryView:lbv});
+			var lesson_mc = learningSequences_sp.content.attachMovie("Lesson","ls_"+_lesson.getLessonID(),_depth++,{_lesson:Lesson,_libraryView:lbv});
 			
 			//position it
 			lesson_mc._y = yPos;
