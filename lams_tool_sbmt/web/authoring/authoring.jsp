@@ -1,6 +1,5 @@
 <%@ include file="../sharing/share.jsp" %>
 <%@ taglib uri="fck-editor" prefix="FCK"%>
-<%@ taglib uri="tags-lams" prefix="lams" %>
 <%@ page import="java.util.HashSet" %>
 <%@ page import="java.util.Set" %>
 
@@ -19,17 +18,15 @@
 <html:html locale="true">
 <head>
 	<title>Submit Files</title>
-	<!-- depending on user / site preference this will get changed probbably use passed in variable from flash to select which one to use-->
-    <link href="<c:out value="${tool}"/>author_page/css/aqua.css" rel="stylesheet" type="text/css">
+	<lams:css/>
     
-	<!-- this is the custom CSS for hte tool -->
-	<link href="${tool}author_page/css/tool_custom.css" rel="stylesheet" type="text/css">
-
+	<!-- this is the custom CSS for the tool -->
+	<link href="${tool}css/tool_custom.css" rel="stylesheet" type="text/css">
 
  	<!-- ******************** FCK Editor related javascript & HTML ********************** -->
     <script type="text/javascript" src="${lams}fckeditor/fckeditor.js"></script>
-    <script type="text/javascript" src="${tool}author_page/js/fckcontroller.js"></script>
-    <link href="${tool}author_page/css/fckeditor_style.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="${lams}includes/javascript/fckcontroller.js"></script>
+    <link href="${lams}css/fckeditor_style.css" rel="stylesheet" type="text/css">
 
     <script>
     
@@ -70,8 +67,8 @@
     <!-- ******************** END FCK Editor related javascript & HTML ********************** -->
     
     
-	<script type="text/javascript" src="<c:out value="${tool}"/>author_page/js/tabcontroller.js"></script>    
-	<script type="text/javascript" src="<c:out value="${lams}"/>includes/javascript/common.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>    
+	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/xmlrequest.js'/>"></script>
 </head>
 <body onLoad="init()">
@@ -88,7 +85,7 @@
 <lams:Tabs collection="${tabs}" useKey="true" control="true"/>
 <!-- end tab buttons -->
 <div class="tabbody">
-<table align=center> 	  
+<table "align=center"> 	  
 				<tr>   
 				<td NOWRAP class=error>
 					<c:if test="${sbmtSuccess}"> 			

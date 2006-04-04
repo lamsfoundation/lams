@@ -1,5 +1,4 @@
 <%@include file="../sharing/share.jsp" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
 <%@ taglib uri="tags-logic" prefix="logic" %>
 
 <c:set var="lams"><lams:LAMSURL/></c:set>
@@ -10,20 +9,20 @@
   <head>
     
     <title><bean:message key="label.monitoring.heading"/></title>    
-	<!-- depending on user / site preference this will get changed probbably use passed in variable from flash to select which one to use-->
-    <link href="${tool}/author_page/css/aqua.css" rel="stylesheet" type="text/css">
-	<!-- this is the custom CSS for hte tool -->
-	<link href="${tool}author_page/css/tool_custom.css" rel="stylesheet" type="text/css">
-	
-	<!-- ******************** FCK Editor related javascript & HTML ********************** -->
-	<script type="text/javascript" src="${lams}fckeditor/fckeditor.js"></script>
-    <script type="text/javascript" src="${tool}author_page/js/fckcontroller.js"></script>
-    <link href="${tool}author_page/css/fckeditor_style.css" rel="stylesheet" type="text/css">
+
+	<lams:css/>
     
+	<!-- this is the custom CSS for the tool -->
+	<link href="${tool}css/tool_custom.css" rel="stylesheet" type="text/css">
+
+ 	<!-- ******************** FCK Editor related javascript & HTML ********************** -->
+    <script type="text/javascript" src="${lams}fckeditor/fckeditor.js"></script>
+    <script type="text/javascript" src="${lams}includes/javascript/fckcontroller.js"></script>
+    <link href="${lams}css/fckeditor_style.css" rel="stylesheet" type="text/css">
+	
 	<script type="text/javascript">
 		var imgRoot="${lams}images/";
 	    var themeName="aqua";
-        
 	
 		 function init(){
             initTabSize(5);
@@ -64,7 +63,7 @@
 	</script>
 	<!-- ******************** END FCK Editor related javascript & HTML ********************** -->
     
-	<script type="text/javascript" src="${tool}author_page/js/tabcontroller.js"></script>    
+	<script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>    
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
   </head>
   
@@ -89,9 +88,9 @@
 		
 		
 		
-		<!-- tab content 1 (Summery) -->
+		<!-- tab content 1 (Summary) -->
 		<lams:TabBody id="1" titleKey="label.monitoring.heading.userlist.desc" page="alluserlist.jsp"/>
-		<!-- end of content (Summery) -->
+		<!-- end of content (Summary) -->
 		
 		<!-- tab content 2 (Instructions) -->
 		<lams:TabBody id="2" titleKey="label.monitoring.heading.instructions.desc" page="instructions.jsp"/>
@@ -120,6 +119,7 @@
 		<c:if test="${SbmtMonitoringForm.map.method == 'markFile'}">
 			<c:set var="marking_page" value="updatemarks.jsp"/>
 		</c:if>
+
 	  	<!-- tab content 5 (Marking) -->
 		<lams:TabBody id="5" titleKey="label.monitoring.heading.marking.desc" page="${marking_page}"/>
 		<!-- end of content (Marking) -->

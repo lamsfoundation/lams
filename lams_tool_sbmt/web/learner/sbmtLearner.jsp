@@ -6,7 +6,7 @@
     
     <title>Submission tool for Learner</title>    
 	<!-- depending on user / site preference this will get changed probbably use passed in variable from flash to select which one to use-->
-    <link href="<%=LAMS_WEB_ROOT%>/css/aqua.css" rel="stylesheet" type="text/css">
+    <lams:css/>
 
 	<script language="javascript">
 	var locked =  <c:out value="${learner.locked}"/>;
@@ -28,7 +28,7 @@
   </head>
   
   <body>
-  	<H1><c:out value="${learner.contentTitle}"/></H1>
+  	<H1><c:out value="${learner.contentTitle}" escapeXml="false"/></H1>
   	<H2><c:out value="${learner.contentInstruction}" escapeXml="false"/></H2>
   	<div id="datatablecontainer">
   	<!--Checks if the filesUploaded property of the SbmtLearnerForm is set -->

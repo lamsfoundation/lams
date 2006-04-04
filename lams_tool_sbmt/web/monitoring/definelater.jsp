@@ -6,7 +6,7 @@
   <head>    
     <title>Monitoring define it later</title>
     <html:base/>
-  	<link href="<%=LAMS_WEB_ROOT%>/css/aqua.css" rel="stylesheet" type="text/css">
+  	<lams:css/>
   </head>  
   <body>
   
