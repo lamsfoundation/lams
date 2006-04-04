@@ -223,7 +223,7 @@ public class MonitoringAction extends LamsDispatchAction {
 		try {
 			marks = new Long(WebUtil.readLongParam(request,"marks"));
 		} catch (IllegalArgumentException e) {
-			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage("monitoring.mark.input.error",e.getMessage()));
+			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage("errors.mark.invalid.number"));
 		}
 		//if marks is invalid long, then throw error message directly.
 		String comments = WebUtil.readStrParam(request,"comments",true);
