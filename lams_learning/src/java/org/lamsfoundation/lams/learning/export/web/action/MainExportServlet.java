@@ -186,15 +186,21 @@ public class MainExportServlet extends HttpServlet {
 	    String htmlPage;
 	    if (portfolios != null)
 	    {
-	    	StringBuffer htmlContent = new StringBuffer();
+	    	StringBuffer htmlContent = new StringBuffer(300);
+	    	htmlContent.append("<ol> ");
 	    	for (int i=0; i<portfolios.length; i++)
 		    {
 		        htmlContent.append("<li>");
-		        htmlContent.append(portfolios[i].getActivityName())
-		        .append("<a href='").append(portfolios[i].getToolLink()).append("'> ")
-		        .append(portfolios[i].getActivityDescription()).append("</a>");
+		        
+		        htmlContent.append("<a href='").append(portfolios[i].getToolLink()).append("'> ");
+		        htmlContent.append(portfolios[i].getActivityName());
+		        htmlContent.append("</a>: ");
+
+		        htmlContent.append(portfolios[i].getActivityDescription());
+		        
 		        htmlContent.append("</li>");
 		    }
+	    	htmlContent.append(" </ol>");
 		    htmlPage = resources.getMessage(ExportPortfolioConstants.EXPORT_MAINPAGE_KEY, lessonDescriptionToDisplay, htmlContent.toString());
 
 		   
