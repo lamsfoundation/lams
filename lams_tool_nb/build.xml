@@ -207,6 +207,7 @@ Ant build file.
 				<include name="spring/*"/>
 				<include name="tiles/*.xml"/>
 				<include name="struts/*"/>
+				<include name="tags/*.*"/>
 			</webinf>
 			<lib dir="${build.lib}">
 				<include name="${product}.jar"/> </lib>
@@ -216,7 +217,8 @@ Ant build file.
 				<include name="images/*"/>
 				<include name="template/*"/> <!-- used by tiles -->
 				<include name="css/**"/>
-				<include name="template2/**"/>
+				<include name="authoring/*.*"/>
+				<include name="monitoring/*.*"/>
 			</fileset>
 		</war>
 	</target>

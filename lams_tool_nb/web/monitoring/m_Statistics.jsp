@@ -1,6 +1,6 @@
-<div id="datatablecontainer">
-<h2><fmt:message key="titleHeading.statistics" /> </h2>
-<br>
+<%@ taglib uri="tags-fmt" prefix="fmt" %>
+<%@ taglib uri="tags-core" prefix="c" %>
+
 <table width="60%" border="0" cellspacing="0" cellpadding="0">
 	<c:set var="groupCounter" scope="request" value="0"/>
 	<c:forEach var="group" items="${requestScope.groupStatsMap}">
@@ -27,6 +27,3 @@
 		</td>
 	</tr>
 </table>
-</div>
-<br>
-<hr>

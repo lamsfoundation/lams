@@ -31,15 +31,6 @@
 		<put name="content" value="/learnerContent.jsp" />	
 	</definition>
 	
-<!-- ============= Noticeboard Monitoring Page Definitions ====================== -->	
-	<definition name=".monitoringContent" extends=".baseDef" >
-		<put name="title" value="Noticeboard"/>
-		<put name="pageHeader" value = "Noticeboard"/>
-	<!--  	<put name="content" value="/monitoringContent.jsp" />	-->
-		<put name="content" value="/monitor_page.jsp" />
-	</definition>
-
-	
 <!-- ============= Noticeboard Export Page Definitions ====================== -->	
 
 <definition name=".exportPortfolio" extends=".baseDef" >

@@ -103,7 +103,7 @@
       />
       <forward
         name="authoringContent"
-        path="/author_page.jsp"
+        path="/authoring/authoring.jsp"
         redirect="false"
       />
       <forward
@@ -160,7 +160,7 @@
       />
       <forward
         name="monitorPage"
-        path=".monitoringContent"
+        path="/monitoring/monitoring.jsp"
         redirect="false"
       />
     </action>

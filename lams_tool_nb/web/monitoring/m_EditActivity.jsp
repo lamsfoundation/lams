@@ -1,5 +1,7 @@
-<h2><fmt:message key="titleHeading.editActivity"/></h2>
-<br>
+<%@ taglib uri="tags-html" prefix="html" %>
+<%@ taglib uri="tags-fmt" prefix="fmt" %>
+<%@ taglib uri="tags-core" prefix="c" %>
+
 <div id="datatablecontainer">
 	<table width="100%" border="0" cellspacing="0" cellpadding="0">
 		<c:choose>
@@ -48,6 +50,4 @@
 	</c:if>
 </table>
 </div>
-<br>
-<hr>
 

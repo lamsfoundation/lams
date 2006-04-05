@@ -1,5 +1,9 @@
-<h2><fmt:message key="titleHeading.instructions"/></h2>
-<br>
+<%@ taglib uri="tags-html" prefix="html" %>
+<%@ taglib uri="tags-fmt" prefix="fmt" %>
+<%@ taglib uri="tags-core" prefix="c" %>
+<%@ taglib uri="tags-bean" prefix="bean" %>
+<%@ taglib uri="tags-logic" prefix="logic" %>
+
 <div id="datatablecontainer">
 	<table width="50%" border="0" cellspacing="0" cellpadding="0">
 		<tr>
@@ -80,5 +84,3 @@
 
  </logic:notEqual>
  </logic:present>
- <br>
-	<hr>

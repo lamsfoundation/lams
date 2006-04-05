@@ -43,7 +43,7 @@ import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService;
 import org.lamsfoundation.lams.tool.noticeboard.service.NoticeboardServiceProxy;
 import org.lamsfoundation.lams.tool.noticeboard.util.NbWebUtil;
-import org.lamsfoundation.lams.web.action.LamsLookupDispatchAction;
+import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 
 /**
  * @author mtruong
@@ -69,29 +69,24 @@ import org.lamsfoundation.lams.web.action.LamsLookupDispatchAction;
  *                          type="java.lang.NullPointerException"
  *                          path=".error"
  *                          handler="org.lamsfoundation.lams.tool.noticeboard.web.CustomStrutsExceptionHandler"
- * @struts:action-forward name="monitorPage" path=".monitoringContent"
+ * @struts:action-forward name="monitorPage" path="/monitoring/monitoring.jsp"
  * ----------------XDoclet Tags--------------------
  */
-public class NbMonitoringAction extends LamsLookupDispatchAction {
+public class NbMonitoringAction extends LamsDispatchAction {
     
     static Logger logger = Logger.getLogger(NbMonitoringAction.class.getName());
     
     public final static String FORM="NbMonitoringForm";
+    
+    public static final String SUMMARY_TABID = "1";
+    public static final String INSTRUCTIONS_TABID = "2";
+    public static final String EDITACTIVITY_TABID = "3";
+    public static final String STATISTICS_TABID = "4";
    
-    protected Map getKeyMethodMap()
-	{
-		Map map = new HashMap();
-		map.put(NoticeboardConstants.BUTTON_EDIT_ACTIVITY, "editActivity");
-		map.put(NoticeboardConstants.BUTTON_INSTRUCTIONS, "instructions");
-		map.put(NoticeboardConstants.BUTTON_STATISTICS, "statistics");
-		map.put(NoticeboardConstants.BUTTON_SUMMARY, "summary");
-		return map;
-	}
-
     /**
      * If no method parameter, or an unknown key, it will 
 	 * Setup the monitoring environment, and places values in the
-	 * formbean in session scope.
+	 * formbean in session scope and then go to the summary tab.
 	 */
     public ActionForward unspecified(
     		ActionMapping mapping,
@@ -99,10 +94,7 @@ public class NbMonitoringAction extends LamsLookupDispatchAction {
     		HttpServletRequest request,
     		HttpServletResponse response) throws NbApplicationException
     {
-        //return summary(mapping, form, request, response);
     	 NbMonitoringForm monitorForm = new NbMonitoringForm();
-         
-         INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
          NbWebUtil.cleanMonitoringSession(request);
          Long toolContentId = NbWebUtil.convertToLong(request.getParameter(NoticeboardConstants.TOOL_CONTENT_ID));
          
@@ -113,21 +105,9 @@ public class NbMonitoringAction extends LamsLookupDispatchAction {
  			throw new NbApplicationException(error);
  		}
          monitorForm.setToolContentID(toolContentId.toString());
-         
-       //  request.getSession().setAttribute(NoticeboardConstants.TOOL_CONTENT_ID_INMONITORMODE, toolContentId);
-         
-         NoticeboardContent content = nbService.retrieveNoticeboard(toolContentId);
-         if (content == null)
-         {
-             String error = "Unable to continue. Data is missing from the database. Tool content id " + toolContentId + " does not exist";
- 		    logger.error(error);
- 			throw new NbApplicationException(error);
-         }
-         NbWebUtil.copyValuesIntoSession(request, content);
-         
          request.getSession().setAttribute(FORM, monitorForm);
-      
-         return mapping.findForward(NoticeboardConstants.MONITOR_PAGE);
+         return summary(mapping, form, request, response);
+
     }
   
     /**
@@ -158,7 +138,7 @@ public class NbMonitoringAction extends LamsLookupDispatchAction {
 		    request.setAttribute(NoticeboardConstants.PAGE_EDITABLE, "true");
 		    
 		    //set up the request parameters to append to the URL
-		    Map map = new HashMap();
+		    Map<String,Object> map = new HashMap<String,Object>();
 		    map.put(NoticeboardConstants.TOOL_CONTENT_ID, monitorForm.getToolContentID());
 		    map.put(NoticeboardConstants.DEFINE_LATER, "true");
 		    
@@ -171,6 +151,8 @@ public class NbMonitoringAction extends LamsLookupDispatchAction {
 		   request.setAttribute(NoticeboardConstants.PAGE_EDITABLE, "false");
 		}
 				
+ 		// send it to the third tab.
+   		monitorForm.setCurrentTab(EDITACTIVITY_TABID);
 		return mapping.findForward(NoticeboardConstants.MONITOR_PAGE);
 		
     }
@@ -204,7 +186,9 @@ public class NbMonitoringAction extends LamsLookupDispatchAction {
 		List attachmentList = NbWebUtil.setupAttachmentList(nbService, content);
 		NbWebUtil.addUploadsToSession(request, attachmentList, null);
 		
-        return mapping.findForward(NoticeboardConstants.MONITOR_PAGE);
+ 		// send it to the second tab.
+   		monitorForm.setCurrentTab(INSTRUCTIONS_TABID);
+		return mapping.findForward(NoticeboardConstants.MONITOR_PAGE);
     }
     
     /**
@@ -219,14 +203,15 @@ public class NbMonitoringAction extends LamsLookupDispatchAction {
      * @return
      */
     public ActionForward summary(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-       // Long toolContentId = (Long)request.getSession().getAttribute(NoticeboardConstants.TOOL_CONTENT_ID_INMONITORMODE);
-       // Long toolContentId = getToolContentId(request);
-        INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
+
+    	INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
         NbMonitoringForm monitorForm = (NbMonitoringForm)form;
         Long toolContentId = NbWebUtil.convertToLong(monitorForm.getToolContentID());
    		NoticeboardContent content = nbService.retrieveNoticeboard(toolContentId);
    		NbWebUtil.copyValuesIntoSession(request, content);
-        
+   		
+ 		// send it to the first tab.
+   		monitorForm.setCurrentTab(SUMMARY_TABID);
    		return mapping.findForward(NoticeboardConstants.MONITOR_PAGE);
     }
     
@@ -269,6 +254,8 @@ public class NbMonitoringAction extends LamsLookupDispatchAction {
         }
         request.setAttribute(NoticeboardConstants.GROUP_STATS_MAP, map);
         
+ 		// send it to the fourth tab.
+   		monitorForm.setCurrentTab(STATISTICS_TABID);
         return mapping.findForward(NoticeboardConstants.MONITOR_PAGE);
     }
     

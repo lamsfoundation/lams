@@ -64,7 +64,9 @@ public class NbMonitoringForm extends ActionForm {
     
     private Map parametersToAppend;
     
-    /**
+	private String currentTab;
+
+	/**
      * @return Returns the parametersToAppend.
      */
     public Map getParametersToAppend() {
@@ -106,6 +108,12 @@ public class NbMonitoringForm extends ActionForm {
 		this.method = null;
 		this.parametersToAppend = null;		
 		
+	}
+	public String getCurrentTab() {
+		return currentTab;
+	}
+	public void setCurrentTab(String currentTab) {
+		this.currentTab = currentTab;
 	}
  
 }

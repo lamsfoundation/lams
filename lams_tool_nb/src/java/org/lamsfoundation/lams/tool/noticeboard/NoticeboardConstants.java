@@ -107,16 +107,9 @@ public class NoticeboardConstants
     // labels used in ApplicationResources.properties
     // ---------------------------------------------------------------------------
     
-    public static final String BUTTON_BASIC = "button.basic";
-    public static final String BUTTON_ADVANCED = "button.advanced";
-    public static final String BUTTON_INSTRUCTIONS = "button.instructions";
     public static final String BUTTON_SAVE = "button.save";
     public static final String BUTTON_DONE = "button.done";
     public static final String BUTTON_FINISH = "button.finish";
-   // public static final String BUTTON_CANCEL = "button.cancel";
-    public static final String BUTTON_EDIT_ACTIVITY = "button.editActivity";
-    public static final String BUTTON_SUMMARY = "button.summary";
-    public static final String BUTTON_STATISTICS = "button.statistics";
     public static final String BUTTON_EDIT = "button.edit";
     public static final String BUTTON_UPLOAD = "button.upload";
     public static final String LINK_DELETE="link.delete";

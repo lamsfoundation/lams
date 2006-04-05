@@ -86,6 +86,7 @@ public class NbAuthoringForm extends ActionForm {
 	private FormFile onlineFile;
 	private FormFile offlineFile;
 
+	private String currentTab;
 	/**
      * @return Returns the offlineFile.
      */
@@ -273,6 +274,12 @@ public class NbAuthoringForm extends ActionForm {
 	   
 	    return errors; 
 	    
+	}
+	public String getCurrentTab() {
+		return currentTab;
+	}
+	public void setCurrentTab(String currentTab) {
+		this.currentTab = currentTab;
 	}
 	
   

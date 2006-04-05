@@ -90,7 +90,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  *                          path=".error"
  *                          handler="org.lamsfoundation.lams.tool.noticeboard.web.CustomStrutsExceptionHandler"
  *
- * @struts:action-forward name="authoringContent" path="/author_page.jsp"
+ * @struts:action-forward name="authoringContent" path="/authoring/authoring.jsp"
  * @struts:action-forward name="displayMessage" path=".message"
  * 
  * ----------------XDoclet Tags--------------------
