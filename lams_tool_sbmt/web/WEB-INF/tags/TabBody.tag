@@ -32,7 +32,7 @@
  %>
 <%@ tag body-content="scriptless" %>
 <%@ attribute name="id" required="true" rtexprvalue="true" %>
-<%@ attribute name="title" required="false" rtexprvalue="true" %>
+<%@ attribute name="tabTitle" required="false" rtexprvalue="true" %>
 <%@ attribute name="titleKey" required="false" rtexprvalue="true" %>
 <%@ attribute name="page" required="false" rtexprvalue="true" %>
 <%@ taglib uri="tags-core" prefix="c" %>
@@ -40,10 +40,10 @@
 
 <!-- begin tab content -->
 <div id="tabbody${id}">
-<c:if test="${title != null}">
-	<h2><font size=2> <b><bean:write name="title" scope="page"/></b></font></h2>
+<c:if test="${tabTitle != null}">
+	<h2><font size=2> <b><bean:write name="tabTitle" scope="page"/></b></font></h2>
 </c:if>
-<c:if test="${titleKey != null && title == null}">
+<c:if test="${titleKey != null && tabTitle == null}">
 	<h2><font size=2> <b><bean:message name="titleKey" scope="page"/></b></font></h2>
 </c:if>
 
