@@ -1,10 +1,10 @@
-<!-- 
-  Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+<%-- 
+Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation; either version 2 of the License, or
-  (at your option) any later version.
+  it under the terms of the GNU General Public License version 2 as 
+  published by the Free Software Foundation.
 
   This program is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,8 +16,8 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
   USA
 
-  http://www.gnu.org/licenses/gpl.txt 
--->
+  http://www.gnu.org/licenses/gpl.txt
+--%>
 <%@ page language="java"%>
 <%@ taglib uri="tags-html" prefix="html" %>
  
