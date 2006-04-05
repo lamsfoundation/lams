@@ -29,7 +29,7 @@
 			:
 		</td>
 		<td class="formcontrol">
-			<html:text property="forum.title" />
+			<lams:SetEditor id="forum.title" text="${forumForm.forum.title}" small="true"/>
 		</td>
 	</tr>
 	<tr>
@@ -38,7 +38,7 @@
 			:
 		</td>
 		<td NOWRAP width="700">
-			<lams:SetEditor id="BasicInstructions" text="${formBean.forum.instructions}"/>
+			<lams:SetEditor id="forum.instructions" text="${forumForm.forum.instructions}"/>
 		</td>
 	</tr>
 	<!-- Topics List Row -->
@@ -66,21 +66,19 @@
 			<!-- Button Row -->
 			<HR>
 			<p align="right">
-				<html:submit property="save" styleClass="a.button">
+				<html:submit property="save" styleClass="button">
 					<fmt:message key="label.authoring.save.button" />
 				</html:submit>
-				<html:button property="cancel" onclick="window.close()" styleClass="a.button">
+				<html:button property="cancel" onclick="window.close()" styleClass="button">
 					<fmt:message key="label.authoring.cancel.button" />
 				</html:button>
 			</p>
 		</td>
 	</tr>
 	<tr>
-	 <!-- 
 		<td colspan="2">
 			<iframe onload="javascript:this.style.height=this.contentWindow.document.body.scrollHeight+'px'" id="messageArea" name="messageArea" style="width:0px;height:0px;border:0px;display:none" frameborder="no" scrolling="no">
 			</iframe>
 		</td>
-		-->
 	</tr>
 </table>

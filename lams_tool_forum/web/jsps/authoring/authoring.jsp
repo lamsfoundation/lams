@@ -5,7 +5,7 @@
 	<html:hidden property="toolContentID" />
 	<html:hidden property="currentTab" styleId="currentTab" />
 
-	<lams:Tabs>
+	<lams:Tabs useKey="true" control="true">
 		<lams:Tab id="1" key="authoring.tab.basic" />
 		<lams:Tab id="2" key="authoring.tab.advanced" />
 		<lams:Tab id="3" key="authoring.tab.instructions" />

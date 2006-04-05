@@ -34,7 +34,7 @@ public class ForumForm extends ValidatorForm {
 
 	//Forum fields
 	private Long toolContentID;
-	private int currentTab;
+	private String currentTab;
     private FormFile offlineFile;
     private FormFile onlineFile;
     private List onlineFileList;
@@ -50,6 +50,7 @@ public class ForumForm extends ValidatorForm {
     	this.toolContentID = new Long(0);
         this.forum = new Forum();
         this.forum.setTitle("New Forum");
+        this.currentTab = "";
     }
     /**
      * Initialize this form by given <code>Forum</code> instance.
@@ -140,11 +141,11 @@ public class ForumForm extends ValidatorForm {
     }
     
 
-	public int getCurrentTab() {
+	public String getCurrentTab() {
 		return currentTab;
 	}
 
-	public void setCurrentTab(int currentTab) {
+	public void setCurrentTab(String currentTab) {
 		this.currentTab = currentTab;
 	}
 

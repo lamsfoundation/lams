@@ -14,11 +14,11 @@
 	<lams:css />
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
     <script type="text/javascript" src="${lams}fckeditor/fckeditor.js"></script>
-   	<script type="text/javascript" src="${tool}includes/javascript/fckcontroller.js"></script>
-	<script type="text/javascript" src="${tool}includes/javascript/tabcontroller.js"></script>
+   	<script type="text/javascript" src="${lams}includes/javascript/fckcontroller.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>
 	<script type="text/javascript" src="${tool}includes/javascript/xmlrequest.js"></script>
 	
-	<link href="${tool}css/fckeditor_style.css" rel="stylesheet" type="text/css">
+	<link href="${lams}css/fckeditor_style.css" rel="stylesheet" type="text/css">
 	
 	<script type="text/javascript">
      //<![CDATA[
@@ -31,12 +31,13 @@
 //		var tag = document.getElementById("currentTab");
 //		if(tag.value != "")
 //			selectTab(tag.value);
-//      else
+//        else
 			selectTab(1);
-			
-	   initEditor("BasicInstructions");
-	   initEditor("OnlineInstructions");
-	   initEditor("OfflineInstructions");
+
+	   initEditor("forum.title");
+	   initEditor("forum.instructions");
+	   initEditor("forum.onlineInstructions");
+	   initEditor("forum.offlineInstructions");
 	}  
         
 	function doSelectTab(tabId) {
@@ -46,23 +47,14 @@
 	}
 
 	function doSubmit(method, tabId) {
-//		if(tabId != null)
-//			document.forumMonitoringForm.currentTab.value=tabId;
-//		document.forumMonitoringForm.method.value=method;
+		if(tabId != null)
+			document.forumMonitoringForm.currentTab.value=tabId;
+		document.forumMonitoringForm.method.value=method;
 		document.forumMonitoringForm.submit();
 	}
-	
-    // TabController code here
-           
-
 	
 	//]]>        
 	</script>
 
-	<script type="text/javascript">
-	//<![CDATA[
-		<html:javascript dynamicJavascript="false" staticJavascript="true"/>
-	//]]>		
-	</script>
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 </head>

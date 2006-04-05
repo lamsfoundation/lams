@@ -10,7 +10,7 @@
 			:
 		</td>
 		<td class="formcontrol">
-			<lams:SetEditor id="OnlineInstructions" text="${formBean.forum.onlineInstructions}"/>
+			<lams:SetEditor id="forum.onlineInstructions" text="${forumForm.forum.onlineInstructions}"/>
 		</td>
 	</tr>
 	<tr>
@@ -18,7 +18,7 @@
 		<td class="formcontrol">
 
 			<div id="onlinefile">
-				<c:forEach var="file" items="${formBean.onlineFileList}">
+				<c:forEach var="file" items="${forumForm.onlineFileList}">
 					<li>
 						<c:out value="${file.fileName}" />
 						<c:set var="viewURL">
@@ -36,7 +36,7 @@
 						</a>
 						&nbsp;
 						<c:set var="deleteonline">
-							<html:rewrite page="/authoring/deleteOnline.do?toolContentID=${formBean.toolContentID}&uuID=${file.fileUuid}&versionID=${file.fileVersionId}" />
+							<html:rewrite page="/authoring/deleteOnline.do?toolContentID=${forumForm.toolContentID}&uuID=${file.fileUuid}&versionID=${file.fileVersionId}" />
 						</c:set>
 						<html:link href="javascript:loadDoc('${deleteonline}','onlinefile')">
 							<fmt:message key="label.authoring.online.delete" />
@@ -70,14 +70,14 @@
 			:
 		</td>
 		<td class="formcontrol">
-			<lams:SetEditor id="OfflineInstructions" text="${formBean.forum.offlineInstructions}"/>
+			<lams:SetEditor id="forum.offlineInstructions" text="${forumForm.forum.offlineInstructions}"/>
 		</td>
 	</tr>
 	<tr>
 		<td></td>
 		<td class="formcontrol">
 			<div id="offlinefile">
-				<c:forEach var="file" items="${formBean.offlineFileList}">
+				<c:forEach var="file" items="${forumForm.offlineFileList}">
 					<li>
 						<c:out value="${file.fileName}" />
 						<c:set var="viewURL">
@@ -93,7 +93,7 @@
 							<fmt:message key="label.download" />
 						</html:link>
 						<c:set var="deleteoffline">
-							<html:rewrite page="/authoring/deleteOffline.do?toolContentID=${formBean.toolContentID}&uuID=${file.fileUuid}&versionID=${file.fileVersionId}" />
+							<html:rewrite page="/authoring/deleteOffline.do?toolContentID=${forumForm.toolContentID}&uuID=${file.fileUuid}&versionID=${file.fileVersionId}" />
 						</c:set>
 						<html:link href="javascript:loadDoc('${deleteoffline}','offlinefile')">
 							<fmt:message key="label.authoring.offline.delete" />
@@ -129,10 +129,10 @@
 <!-- Button Row -->
 <hr/>
 <p align="right">
-	<html:submit property="save" styleClass="a.button">
+	<html:submit property="save" styleClass="button">
 		<fmt:message key="label.authoring.save.button" />
 	</html:submit>
-	<html:button property="cancel" onclick="window.close()" styleClass="a.button">
+	<html:button property="cancel" onclick="window.close()" styleClass="button">
 		<fmt:message key="label.authoring.cancel.button" />
 	</html:button>
 </p>

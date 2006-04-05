@@ -2,43 +2,6 @@
 
 <!--   Advance Tab Content    -->
 
-<script type="text/javascript">
-	var limit = document.getElementById("limitedInput");
-	var rich = document.getElementById("richEditor");
-	var limitChar = document.getElementById("limitedChar");
-
-	limit.onclick= init;
-	function initAdvance(){
-		if(limit.checked){
-			limitChar.disabled=false;
-			rich.checked=false;
-		}else{
-			limitChar.disabled=true;
-		}
-		
-	}
-	rich.onclick = function(){
-		if(this.checked){
-			limitChar.disabled=true;
-			limit.checked=false;
-		}else{
-			limitChar.disabled=false;
-		}
-	}
-	initAdvance();
-	limitChar.onblur=function(){
-		var min = 0;
-		var errors = '';
-		var num = parseFloat(this.value);
-		if(isNaN(num)) 
-			errors = '<fmt:message key="js.error.invalid.number"/>\n';
-		else if (num <= min)
-			errors = '<fmt:message key="js.error.min.number"/>';
-		if(errors)
-			alert('<fmt:message key="js.error.title"/>\n'+errors);		
-	}
-</script>
-
 <table class="forms">
 	<!-- Instructions Row -->
 	<tr>
@@ -80,12 +43,50 @@
 <!-- Button Row -->
 <hr/>
 <p align="right">
-	<html:submit property="save" styleClass="a.button">
+	<html:submit property="save" styleClass="button">
 		<fmt:message key="label.authoring.save.button" />
 	</html:submit>
-	<html:button property="cancel" onclick="window.close()" styleClass="a.button">
+	<html:button property="cancel" onclick="window.close()" styleClass="button">
 		<fmt:message key="label.authoring.cancel.button" />
 	</html:button>
 </p>
+
+	<script type="text/javascript">
+			var limit = document.getElementById("limitedInput");
+			var rich = document.getElementById("richEditor");
+			var limitChar = document.getElementById("limitedChar");
+
+			limit.onclick= initAdvanced;
+			function initAdvanced(){
+				if(limit.checked){
+					limitChar.disabled=false;
+					rich.checked=false;
+				}else{
+					limitChar.disabled=true;
+				}
+				
+			}
+			rich.onclick = function(){
+				if(this.checked){
+					limitChar.disabled=true;
+					limit.checked=false;
+				}else{
+					limitChar.disabled=false;
+				}
+			}
+			initAdvanced();
+			limitChar.onblur=function(){
+				var min = 0;
+				var errors = '';
+				var num = parseFloat(this.value);
+				if(isNaN(num)) 
+					errors = '<fmt:message key="js.error.invalid.number"/>\n';
+				else if (num <= min)
+					errors = '<fmt:message key="js.error.min.number"/>';
+				if(errors)
+					alert('<fmt:message key="js.error.title"/>\n'+errors);
+				
+			}
+	</script>
 
 
