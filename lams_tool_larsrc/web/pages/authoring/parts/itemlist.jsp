@@ -32,7 +32,7 @@
 		<td>${resource.title}</td>
 		<td width="50px">
 			<input type="button" name="pi" value="<fmt:message key="label.authoring.basic.resource.preview" />"
-				onclick="previewItem(2,${resource.fileUuid},${resource.fileVersionId})" class="button">
+				onclick="previewItem(2,${status.index},${resource.fileUuid},${resource.fileVersionId})" class="button">
 		</td>
 		<td width="50px">
 			<input type="button" name="ei"  value="<fmt:message key="label.authoring.basic.resource.edit" />"
@@ -50,7 +50,7 @@
 		<td>${resource.title}</td>
 		<td width="50px">
 			<input type="button" name="pi" value="<fmt:message key="label.authoring.basic.resource.preview" />"
-				onclick="previewItem(3,${resource.fileUuid},${resource.fileVersionId})" class="button">
+				onclick="previewItem(3,${status.index},${resource.fileUuid},${resource.fileVersionId})" class="button">
 		</td>
 		<td width="50px">
 			<input type="button" name="ei"  value="<fmt:message key="label.authoring.basic.resource.edit" />"
@@ -68,7 +68,7 @@
 		<td>${resource.title}</td>
 		<td width="50px">
 			<input type="button" name="pi" value="<fmt:message key="label.authoring.basic.resource.preview" />"
-				onclick="previewItem(4,${resource.fileUuid},${resource.fileVersionId})" class="button">
+				onclick="previewItem(4,${status.index},${resource.fileUuid},${resource.fileVersionId})" class="button">
 		</td>
 		<td width="50px">
 			<input type="button" name="ei"  value="<fmt:message key="label.authoring.basic.resource.edit" />"

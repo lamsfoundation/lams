@@ -47,6 +47,7 @@ public class ResourceConstants {
 	public static final String ATT_ATTACHMENT_LIST = "instructionAttachmentList";
 	public static final String ATTR_DELETED_RESOURCE_LIST = "deleteResourceList";
 	public static final String ATTR_DELETED_ATTACHMENT_LIST = "deletedAttachmmentList";
+	public static final String ATT_LEARNING_OBJECT = "cpPackage";
 	
 	//error message keys
 	public static final String ERROR_MSG_TITLE_BLANK = "error.resource.item.title.blank";

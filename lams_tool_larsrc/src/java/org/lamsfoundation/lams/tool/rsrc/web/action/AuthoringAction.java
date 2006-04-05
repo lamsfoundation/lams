@@ -133,9 +133,24 @@ public class AuthoringAction extends Action {
 	  	if (param.equals("removeInstruction")) {
 	  		return removeInstruction(mapping, form, request, response);
 	  	}
+	  	
+	    //-----------------------Preview Learning Object function ---------------------------
+	  	if (param.equals("previewLearningObj")) {
+       		return previewLearningObj(mapping, form, request, response);
+        }
         return mapping.findForward(ResourceConstants.ERROR);
 	}
 	
+	private ActionForward previewLearningObj(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+		int itemIdx = NumberUtils.stringToInt(request.getParameter(ResourceConstants.PARAM_ITEM_INDEX),-1);
+		if(itemIdx != -1){
+			List<ResourceItem> resourceList = getResourceList(request);
+			ResourceItem item = resourceList.get(itemIdx);
+			request.getSession().setAttribute(ResourceConstants.ATT_LEARNING_OBJECT,item);
+		}		
+		return mapping.findForward(ResourceConstants.SUCCESS);
+	}
+
 	private ActionForward removeItem(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		int itemIdx = NumberUtils.stringToInt(request.getParameter(ResourceConstants.PARAM_ITEM_INDEX),-1);
 		if(itemIdx != -1){
@@ -750,11 +765,13 @@ public class AuthoringAction extends Action {
 		List resourceList = getResourceList(request);
 		int itemIdx = NumberUtils.stringToInt(itemForm.getItemIndex(),-1);
 		ResourceItem item;
-		if(itemIdx == -1){
+		
+		if(itemIdx == -1){ //add
 			item = new ResourceItem();
 			resourceList.add(item);
-		}else
+		}else //edit
 			item = (ResourceItem) resourceList.get(itemIdx);
+		
 		item.setType(itemForm.getItemType());
 		item.setTitle(itemForm.getTitle());
 		item.setCreateByAuthor(true);

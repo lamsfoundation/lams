@@ -69,3 +69,11 @@
 			parameter="removeInstruction">
 			<forward name="success" path="/pages/authoring/parts/instructions.jsp" />
 		</action>
+		
+		<!-- ==========  Preview Learning Object Item  ========== -->
+		<action path="/previewLearningObj"
+			type="org.lamsfoundation.lams.tool.rsrc.web.action.AuthoringAction"
+			parameter="previewLearningObj">
+			<forward name="success" path=".previewLearningObj" />
+		</action>
+		

@@ -69,7 +69,7 @@
             name="itemInstructions"
             lazy="true"
             inverse="false"
-            cascade="all"
+            cascade="all-delete-orphan"
             sort="unsorted"
             order-by="sequence_id desc"
         >

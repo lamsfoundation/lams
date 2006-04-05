@@ -30,14 +30,14 @@
 		launchPopup(myUrl,title);
 	}
 	
-	function previewItem(idx,uuid,versionId){
+	function previewItem(type,idx,uuid,versionId){
 		//2:file, 3:website,4:learning object
-		if(idx == 2){
-		}else if(idx ==3){
+		if(type == 2){
+		}else if(type ==3){
 			var myUrl = "<c:url value='/download/?uuid='/>"+uuid+"&preferDownload=false";
 			launchPopup(myUrl,"Website");
-		}else if(idx ==4){
-			var myUrl = "<c:url value='/download/?uuid='/>"+uuid+"&preferDownload=false";
+		}else if(type ==4){
+			var myUrl = "<c:url value='/previewLearningObj.do?itemIndex='/>"+idx;
 			launchPopup(myUrl,"LearningObject");
 		}
 		
