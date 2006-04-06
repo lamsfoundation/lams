@@ -23,8 +23,18 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.rsrc.dao.hibernate;
 
+import java.util.List;
+
 import org.lamsfoundation.lams.tool.rsrc.dao.ResourceItemDAO;
+import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
 
 public class ResourceItemDAOHibernate extends BaseDAOHibernate implements ResourceItemDAO{
+	
+	private static final String FIND_AUTHORING_ITEMS = "from " + ResourceItem.class.getName() + " where resource_uid = ? order by create_date asc";
+	
+	public List getAuthoringItems(Long resourceUid) {
+		
+		return this.getHibernateTemplate().find(FIND_AUTHORING_ITEMS,resourceUid); 
+	}
 
 }

@@ -2,6 +2,7 @@
 	 This is Resource Item instrcution area.
 	 */
     var instructionTargetDiv = "instructionArea";
+    var itemAttachmentTargetDiv = "itemAttachmentArea";
 // Please set these 2 variables in JSP file for using tag reason:
 //    var removeInstructionUrl = "<c:url value='/authoring/removeInstruction.do'/>";
 //    var addInstructionUrl = "<c:url value='/authoring/newInstruction.do'/>";
@@ -19,6 +20,24 @@
 		    		method:'get',
 		    		parameters:param,
 		    		onComplete:removeInstructionComplete,
+		    		evalScripts:true
+		    	}
+	    );
+	}
+	function removeItemAttachment(idx){
+		//var id = "instructionItem" + idx;
+		//Element.remove(id);
+ 		var url= removeItemAttachmentUrl;
+	    var reqIDVar = new Date();
+	    var param = "reqID="+reqIDVar.getTime();
+	    removeItemAttachmentLoading();
+	    var myAjax = new Ajax.Updater(
+		    	itemAttachmentTargetDiv,
+		    	url,
+		    	{
+		    		method:'get',
+		    		parameters:param,
+		    		onComplete:removeItemAttachmentComplete,
 		    		evalScripts:true
 		    	}
 	    );
@@ -63,7 +82,12 @@
 	}
 	function removeInstructionComplete(){
 		hideBusy(instructionTargetDiv);
-	
+	}
+	function removeItemAttachmentLoading(){
+		showBusy(itemAttachmentTargetDiv);
+	}
+	function removeItemAttachmentComplete(){
+		hideBusy(itemAttachmentTargetDiv);
 	}
 	function addInstructionLoading(){
 		showBusy(instructionTargetDiv);
@@ -86,4 +110,9 @@
 	function submitResourceItem(){
 		$("instructionList").value = Form.serialize("instructionForm");
 		$(resourceItemForm).submit();
+		//after submit, it direct to itemlist.jsp, 
+		// then refresh "basic tab" resourcelist and close this window.
+	}
+	function cancelResourceItem(){
+		window.top.hideMessage();
 	}

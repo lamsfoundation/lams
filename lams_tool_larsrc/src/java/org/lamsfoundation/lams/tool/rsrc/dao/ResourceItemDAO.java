@@ -23,6 +23,15 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.rsrc.dao;
 
+import java.util.List;
+
 public interface ResourceItemDAO extends DAO {
+	
+	/**
+	 * Return all resource items which is uploaded by author in given resourceUid.
+	 * @param resourceUid
+	 * @return
+	 */
+	List getAuthoringItems(Long resourceUid);
 
 }

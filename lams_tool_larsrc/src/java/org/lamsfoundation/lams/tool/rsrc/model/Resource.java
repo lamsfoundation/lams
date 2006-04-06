@@ -372,7 +372,7 @@ public class Resource implements Cloneable{
 	 * 
 	 * 
 	 * @hibernate.set lazy="true"
-	 *                inverse="true"
+	 *                inverse="false"
 	 *                cascade="all"
 	 *                order-by="create_date desc"
 	 * @hibernate.collection-key column="resource_uid"

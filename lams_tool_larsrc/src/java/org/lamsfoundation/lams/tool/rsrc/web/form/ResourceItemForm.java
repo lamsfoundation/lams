@@ -33,11 +33,15 @@ import org.apache.struts.upload.FormFile;
  * @version $Revision$
  */
 public class ResourceItemForm extends ActionForm {
+	private String itemIndex;
 	private String title;
 	private short itemType;
 	private String description;
 	private String url;
-	private String itemIndex;
+	private boolean hasFile;
+	private Long fileUuid;
+	private Long fileVersionId;
+	private String fileName;
 	private FormFile file;
 	
 	public String getDescription() {
@@ -75,5 +79,29 @@ public class ResourceItemForm extends ActionForm {
 	}
 	public void setItemType(short type) {
 		this.itemType = type;
+	}
+	public String getFileName() {
+		return fileName;
+	}
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
+	public Long getFileUuid() {
+		return fileUuid;
+	}
+	public void setFileUuid(Long fileUuid) {
+		this.fileUuid = fileUuid;
+	}
+	public Long getFileVersionId() {
+		return fileVersionId;
+	}
+	public void setFileVersionId(Long fileVersionId) {
+		this.fileVersionId = fileVersionId;
+	}
+	public boolean isHasFile() {
+		return hasFile;
+	}
+	public void setHasFile(boolean hasFile) {
+		this.hasFile = hasFile;
 	}
 }

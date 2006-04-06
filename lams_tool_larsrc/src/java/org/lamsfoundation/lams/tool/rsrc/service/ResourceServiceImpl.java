@@ -27,7 +27,7 @@ import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Set;
+import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -195,10 +195,8 @@ public class ResourceServiceImpl implements
 		return content;
 	}
 
-	public Set getAuthoredItems(Long resourceUid) {
-		Resource resource = resourceDao.getByUid(resourceUid);
-		
-		return resource.getResourceItems();
+	public List getAuthoredItems(Long resourceUid) {
+		return resourceItemDao.getAuthoringItems(resourceUid);
 	}
 
 

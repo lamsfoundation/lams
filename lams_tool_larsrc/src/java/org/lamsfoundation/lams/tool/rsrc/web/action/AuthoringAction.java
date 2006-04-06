@@ -58,10 +58,10 @@ import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.rsrc.ResourceConstants;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
-import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceAttachment;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItemInstruction;
+import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
 import org.lamsfoundation.lams.tool.rsrc.service.IResourceService;
 import org.lamsfoundation.lams.tool.rsrc.service.ResourceApplicationException;
 import org.lamsfoundation.lams.tool.rsrc.web.form.ResourceForm;
@@ -90,8 +90,11 @@ public class AuthoringAction extends Action {
 		
 		String param = mapping.getParameter();
 		//-----------------------Resource Author function ---------------------------
+		if(param.equals("start")){
+			request.getSession().setAttribute(ResourceConstants.MODE,ResourceConstants.AUTHOR_MODE);
+			return start(mapping, form, request, response);
+		}
 	  	if (param.equals("initPage")) {
-	  		request.getSession().setAttribute(ResourceConstants.MODE,ResourceConstants.AUTHOR_MODE);
        		return initPage(mapping, form, request, response);
         }
 //	  	if (param.equals("monitoringInitPage")) {
@@ -133,6 +136,9 @@ public class AuthoringAction extends Action {
 	  	if (param.equals("removeInstruction")) {
 	  		return removeInstruction(mapping, form, request, response);
 	  	}
+	  	if (param.equals("removeItemAttachment")) {
+	  		return removeItemAttachment(mapping, form, request, response);
+	  	}
 	  	
 	    //-----------------------Preview Learning Object function ---------------------------
 	  	if (param.equals("previewLearningObj")) {
@@ -140,11 +146,18 @@ public class AuthoringAction extends Action {
         }
         return mapping.findForward(ResourceConstants.ERROR);
 	}
-	
+
+
+	private ActionForward removeItemAttachment(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+		request.setAttribute("itemAttachment", null);
+    	return mapping.findForward("success");
+    }
+
+
 	private ActionForward previewLearningObj(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		int itemIdx = NumberUtils.stringToInt(request.getParameter(ResourceConstants.PARAM_ITEM_INDEX),-1);
 		if(itemIdx != -1){
-			List<ResourceItem> resourceList = getResourceList(request);
+			List<ResourceItem> resourceList = getResourceItemList(request);
 			ResourceItem item = resourceList.get(itemIdx);
 			request.getSession().setAttribute(ResourceConstants.ATT_LEARNING_OBJECT,item);
 		}		
@@ -154,9 +167,9 @@ public class AuthoringAction extends Action {
 	private ActionForward removeItem(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		int itemIdx = NumberUtils.stringToInt(request.getParameter(ResourceConstants.PARAM_ITEM_INDEX),-1);
 		if(itemIdx != -1){
-			List<ResourceItem> resourceList = getResourceList(request);
+			List<ResourceItem> resourceList = getResourceItemList(request);
 			ResourceItem item = resourceList.remove(itemIdx);
-			List delList = getDeletedResourceList(request);
+			List delList = getDeletedResourceItemList(request);
 			delList.add(item);
 		}		
 		return mapping.findForward(ResourceConstants.SUCCESS);
@@ -166,10 +179,10 @@ public class AuthoringAction extends Action {
 		int itemIdx = NumberUtils.stringToInt(request.getParameter(ResourceConstants.PARAM_ITEM_INDEX),-1);
 		ResourceItem item = null;
 		if(itemIdx != -1){
-			List<ResourceItem> resourceList = getResourceList(request);
+			List<ResourceItem> resourceList = getResourceItemList(request);
 			item = resourceList.get(itemIdx);
 			if(item != null){
-				popuplateItemToForm(itemIdx, item,(ResourceItemForm) form,request);
+				populateItemToForm(itemIdx, item,(ResourceItemForm) form,request);
 			}
 		}		
 		return findForward(item==null?-1:item.getType(),mapping);
@@ -254,42 +267,64 @@ public class AuthoringAction extends Action {
 	//******************************************************************************************************************
 	//              Resource Author functions
 	//******************************************************************************************************************
-
-	private ActionForward initPage(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-
+	/**
+	 * Read resource data from database and put them into HttpSession. It will redirect to init.do directly after this
+	 * method run successfully. 
+	 *  
+	 * This method will avoid read database again and lost un-saved resouce item lost when user "refresh page",
+	 * 
+	 */
+	private ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+		//save toolContentID into HTTPSession
 		Long contentId = new Long(WebUtil.readLongParam(request,ResourceConstants.PARAM_TOOL_CONTENT_ID));
-		ResourceForm resourceForm = (ResourceForm)form;
-		//get back the topic list and display them on page
+		request.getSession().setAttribute(ResourceConstants.ATTR_TOOL_CONTENT_ID,contentId);
+		
+//		get back the resource and item list and display them on page
 		IResourceService service = getResourceService();
 
-		Set item = null;
+		List items = null;
 		Resource resource = null;
+		ResourceForm resourceForm = (ResourceForm)form;
 		try {
 			resource = service.getResourceByContentId(contentId);
 			//if resource does not exist, try to use default content instead.
 			if(resource == null){
 				resource = service.getDefaultContent(contentId);
 				if(resource.getResourceItems() != null){
-					item = resource.getResourceItems();
+					items = new ArrayList(resource.getResourceItems());
 				}else
-					item = null;
+					items = null;
 			}else
-				item = service.getAuthoredItems(resource.getUid());
+				items = service.getAuthoredItems(resource.getUid());
+			
+			resourceForm.setResource(resource);
+
 			//initialize instruction attachment list
 			List attachmentList = getAttachmentList(request);
+			attachmentList.clear();
 			attachmentList.addAll(resource.getAttachments());
-
-			resourceForm.setResource(resource);
 		} catch (Exception e) {
 			log.error(e);
 			return mapping.findForward("error");
 		}
 		
-		//set back STRUTS component value
 		//init it to avoid null exception in following handling
-		if(item == null)
-			item = new HashSet();
-		request.getSession().setAttribute(ResourceConstants.ATTR_RESOURCE_LIST, new ArrayList(item));
+		if(items == null)
+			items = new ArrayList();
+		
+		//init resource item list
+		List resourceItemList = getResourceItemList(request);
+		resourceItemList.clear();
+		resourceItemList.addAll(items);
+		
+		return mapping.findForward(ResourceConstants.SUCCESS);
+	}
+
+
+
+	private ActionForward initPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+
 		return mapping.findForward(ResourceConstants.SUCCESS);
 	}
 	/**
@@ -337,7 +372,7 @@ public class AuthoringAction extends Action {
 			}
 			resourcePO.setCreatedBy(resourceUser);
 			
-			//**********************************Handle Attachement*********************
+			//**********************************Handle Authoring Instruction Attachement *********************
 	    	//merge attachment info
 			Set attPOSet = resourcePO.getAttachments();
 			if(attPOSet == null)
@@ -381,7 +416,7 @@ public class AuthoringAction extends Action {
 			//************************* Handle resource items *******************
 			//Handle resource items
 			Set itemList = new LinkedHashSet();
-			List topics = getResourceList(request);
+			List topics = getResourceItemList(request);
 	    	iter = topics.iterator();
 	    	while(iter.hasNext()){
 	    		ResourceItem item = (ResourceItem) iter.next();
@@ -394,7 +429,7 @@ public class AuthoringAction extends Action {
 	    	}
 	    	resourcePO.setResourceItems(itemList);
 	    	//delete them from database.
-	    	List delResourceItemList = getDeletedResourceList(request);
+	    	List delResourceItemList = getDeletedResourceItemList(request);
 	    	iter = delResourceItemList.iterator();
 	    	while(iter.hasNext()){
 	    		ResourceItem item = (ResourceItem) iter.next();
@@ -404,6 +439,16 @@ public class AuthoringAction extends Action {
 	    		if(item.getFileUuid() != null && item.getFileVersionId() != null)
 	    			service.deleteFromRepository(item.getFileUuid(),item.getFileVersionId());
 	    	}
+	    	//handle resource item attachment file:
+	    	List delItemAttList = getDeletedItemAttachmentList(request);
+			iter = delItemAttList.iterator();
+			while(iter.hasNext()){
+				ResourceItem delAtt = (ResourceItem) iter.next();
+				iter.remove();
+				//delete from repository
+				service.deleteFromRepository(delAtt.getFileUuid(),delAtt.getFileVersionId());
+			}
+			
 			//**********************************************
 			//finally persist resourcePO again
 			service.saveOrUpdateResource(resourcePO);
@@ -648,16 +693,26 @@ public class AuthoringAction extends Action {
 	 * @param request
 	 * @return
 	 */
-	private List getResourceList(HttpServletRequest request) {
-		return getListFromSession(request,ResourceConstants.ATTR_RESOURCE_LIST);
+	private List getResourceItemList(HttpServletRequest request) {
+		return getListFromSession(request,ResourceConstants.ATTR_RESOURCE_ITEM_LIST);
 	}	
 	/**
 	 * List save deleted resource items, which could be persisted or non-persisted items. 
 	 * @param request
 	 * @return
 	 */
-	private List getDeletedResourceList(HttpServletRequest request) {
-		return getListFromSession(request,ResourceConstants.ATTR_DELETED_RESOURCE_LIST);
+	private List getDeletedResourceItemList(HttpServletRequest request) {
+		return getListFromSession(request,ResourceConstants.ATTR_DELETED_RESOURCE_ITEM_LIST);
+	}
+	/**
+	 * If a resource item has attahment file, and the user edit this item and change the attachment
+	 * to new file, then the old file need be deleted when submitting the whole authoring page.
+	 * Save the file uuid and version id into ResourceItem object for temporarily use.
+	 * @param request
+	 * @return
+	 */
+	private List getDeletedItemAttachmentList(HttpServletRequest request) {
+		return getListFromSession(request,ResourceConstants.ATTR_DELETED_RESOURCE_ITEM_ATTACHMENT_LIST);
 	}
 
 
@@ -728,7 +783,15 @@ public class AuthoringAction extends Action {
 		}
 		return forward;
 	}
-	private void popuplateItemToForm(int itemIdx, ResourceItem item, ResourceItemForm form, HttpServletRequest request) {
+	
+	/**
+	 * This method will populate resource item information to its form for edit use.
+	 * @param itemIdx
+	 * @param item
+	 * @param form
+	 * @param request
+	 */
+	private void populateItemToForm(int itemIdx, ResourceItem item, ResourceItemForm form, HttpServletRequest request) {
 		form.setDescription(item.getDescription());
 		form.setTitle(item.getTitle());
 		form.setUrl(item.getUrl());
@@ -744,6 +807,14 @@ public class AuthoringAction extends Action {
 		for(int idx=0;idx<INIT_INSTRUCTION_COUNT;idx++){
 			instructions.add("");
 		}
+		if(item.getFileUuid() != null){
+			form.setFileUuid(item.getFileUuid());
+			form.setFileVersionId(item.getFileVersionId());
+			form.setFileName(item.getFileName());
+			form.setHasFile(true);
+		}else
+			form.setHasFile(false);
+		
 		request.setAttribute(ResourceConstants.ATTR_INSTRUCTION_LIST,instructions);
 		
 	}
@@ -762,7 +833,7 @@ public class AuthoringAction extends Action {
 		 */
 		
 		//check whether it is "edit(old item)" or "add(new item)"
-		List resourceList = getResourceList(request);
+		List resourceList = getResourceItemList(request);
 		int itemIdx = NumberUtils.stringToInt(itemForm.getItemIndex(),-1);
 		ResourceItem item;
 		
@@ -805,13 +876,25 @@ public class AuthoringAction extends Action {
 			item.setImsSchema()
 			item.setOrganizationXml()
 		 */
-		if(type == ResourceConstants.RESOURCE_TYPE_WEBSITE 
-				||type == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT
-				||type == ResourceConstants.RESOURCE_TYPE_FILE){
-			IResourceService service = getResourceService();
-			service.uploadResourceItemFile(item, itemForm.getFile());
-		}
-		
+		//if the item is edit (not new add) then the getFile may return null
+		if(itemForm.getFile() != null){
+			if(type == ResourceConstants.RESOURCE_TYPE_WEBSITE 
+					||type == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT
+					||type == ResourceConstants.RESOURCE_TYPE_FILE){
+				//if it has old file, and upload a new, then save old to deleteList
+				if(item.getFileUuid() != null){
+					List delAtt = getDeletedItemAttachmentList(request);
+					//be careful, This new ResourceItem object never be save into database
+					//just temporarily use for saving fileUuid and versionID use:
+					ResourceItem delAttItem = new ResourceItem();
+					delAttItem.setFileUuid(item.getFileUuid());
+					delAttItem.setFileVersionId(item.getFileVersionId());
+					delAtt.add(delAttItem);
+				}
+				IResourceService service = getResourceService();
+				service.uploadResourceItemFile(item, itemForm.getFile());
+			}
+		}		
 	}
 
 	/**

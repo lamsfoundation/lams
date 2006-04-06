@@ -14,6 +14,8 @@
 	   <%-- user for  rsrcresourceitem.js --%>
 	   var removeInstructionUrl = "<c:url value='/authoring/removeInstruction.do'/>";
        var addInstructionUrl = "<c:url value='/authoring/newInstruction.do'/>";
+       var removeItemAttachmentUrl = "<c:url value='/authoring/removeItemAttachment.do'/>";
+       
 	</script>
 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/rsrcresourceitem.js'/>"></script>
 
@@ -42,7 +44,12 @@
 					</tr>	
 					<tr>
 						<td width="130px"><fmt:message key="label.authoring.basic.resource.zip.file.input"/></td>
-						<td><html:file tabindex="3" property="file" size="55"  /> </td>
+						<td>
+						<c:set var="itemAttachment" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
+						<div id="itemAttachmentArea">
+							<%@ include file="/pages/authoring/parts/itemattachment.jsp"%>
+						</div>
+						</td>
 					</tr>	
 				</table>
 			</html:form>
@@ -60,7 +67,10 @@
 						<td>
 							<%@ include file="instructions.jsp" %>
 						</td>
-						<td width="100%" align="right" valign="bottom">
+						<td width="100px" align="right" valign="bottom">
+							<input onclick="cancelResourceItem()" type="button" name="cancel" value="<fmt:message key="label.cancel"/>" class="buttonStyle">
+						</td>
+						<td width="150px" align="right" valign="bottom">
 							<input onclick="submitResourceItem()" type="button" name="add" value="<fmt:message key="label.authoring.basic.add.learning.object"/>" class="buttonStyle">
 						</td>
 					</tr>

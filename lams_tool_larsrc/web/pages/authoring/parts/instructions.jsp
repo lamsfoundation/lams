@@ -4,7 +4,7 @@
 <div id="instructionArea">
 	<form id="instructionForm">
 	<input type="hidden" name="instructionCount" id="instructionCount">
-	<table>
+	<table border="0">
 		<tr>
 			<td colspan="5">
 				<fmt:message key="label.authoring.basic.resource.instructions"/>
@@ -16,17 +16,24 @@
 			<tr id="instructionItem${status.index}">
 				<td width="10px">${status.index+1}</td>
 				<td width="100px"><input type="text" name="instructionItemDesc${status.index}" id="instructionItemDesc${status.index}" size="70" value="${item}"></td>
-				<td width="40px">
-					<a href="javascript:;" onclick="upItem('${status.index}')">
-						<img src="<html:rewrite page='/includes/images/uparrow.gif'/>" border="0">
-					</a>
+				
+				<td width="20px">
+					<%-- Don't display down icon if last line --%>
+					<c:if test="${0 != status.index}">
+						<a href="javascript:;" onclick="upItem('${status.index}')">
+							<img src="<html:rewrite page='/includes/images/uparrow.gif'/>" border="0">
+						</a>
+					</c:if>
 				</td>
-				<td width="40px">
-					<a href="javascript:;" onclick="downItem('${status.index}','${listSize}')">
-						<img src="<html:rewrite page='/includes/images/downarrow.gif'/>" border="0"> 
-					</a>
+				<td width="20px">
+					<%-- Don't display down icon if last line --%>
+					<c:if test="${listSize != status.count}">
+						<a href="javascript:;" onclick="downItem('${status.index}','${listSize}')">
+							<img src="<html:rewrite page='/includes/images/downarrow.gif'/>" border="0"> 
+						</a>
+					</c:if>
 				</td>
-				<td width="40px">
+				<td width="40px" align="center">
 					<a href="javascript:;" onclick="removeInstruction('${status.index}')">
 						<img src="<html:rewrite page='/includes/images/cross.gif'/>" border="0">
 					</a>

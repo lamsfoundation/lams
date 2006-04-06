@@ -42,11 +42,13 @@ public class ResourceConstants {
 	public static final String PARAM_ITEM_INDEX = "itemIndex";
 	
 	//for request attribute name
+	public static final String ATTR_TOOL_CONTENT_ID = "toolContentID";
 	public static final String ATTR_INSTRUCTION_LIST = "instructionList";
-	public static final String ATTR_RESOURCE_LIST = "resourceList";
+	public static final String ATTR_RESOURCE_ITEM_LIST = "resourceList";
 	public static final String ATT_ATTACHMENT_LIST = "instructionAttachmentList";
-	public static final String ATTR_DELETED_RESOURCE_LIST = "deleteResourceList";
+	public static final String ATTR_DELETED_RESOURCE_ITEM_LIST = "deleteResourceList";
 	public static final String ATTR_DELETED_ATTACHMENT_LIST = "deletedAttachmmentList";
+	public static final String ATTR_DELETED_RESOURCE_ITEM_ATTACHMENT_LIST =  "deletedItemAttachmmentList";;
 	public static final String ATT_LEARNING_OBJECT = "cpPackage";
 	
 	//error message keys

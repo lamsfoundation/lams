@@ -23,7 +23,7 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.rsrc.service;
 
-import java.util.Set;
+import java.util.List;
 
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.IVersionedNode;
@@ -46,7 +46,7 @@ public interface IResourceService
 
 	Resource getDefaultContent(Long contentId) throws ResourceApplicationException;
 
-	Set getAuthoredItems(Long resourceUid);
+	List getAuthoredItems(Long resourceUid);
 
 	ResourceAttachment uploadInstructionFile(FormFile file, String type) throws ResourceApplicationException;
 
