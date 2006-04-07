@@ -40,9 +40,9 @@ import sys
 
 name = 'cvs-log.py'
 version = '0.1'
-url = 'http://lamscvs.melcoe.mq.edu.au/cgi-bin/viewcvs.cgi/cvs-log/'
+url = 'http://genie.melcoe.mq.edu.au/cgi-bin/viewcvs.cgi/cvs-log/'
 
-viewcvs_url = 'http://colis03.elceap.mq.edu.au/cgi-bin/viewcvs.cgi'
+viewcvs_url = 'http://genie.melcoe.mq.edu.au/cgi-bin/viewcvs.cgi'
 logfile = None
 users = None
 mailpipe = None
