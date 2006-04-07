@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE struts-config PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 1.2//EN" "http://jakarta.apache.org/struts/dtds/struts-config_1_2.dtd">
+<struts-config>
+	  <!-- ========== Form Bean Definitions =================================== -->
+	<form-beans>
+		<form-bean name="VoteAuthoringForm" type="org.lamsfoundation.lams.tool.vote.web.VoteAuthoringForm"/>
+		<form-bean name="VoteLearningForm" type="org.lamsfoundation.lams.tool.vote.web.VoteLearningForm"/>
+		<form-bean name="VoteMonitoringForm" type="org.lamsfoundation.lams.tool.vote.web.VoteMonitoringForm"/>
+		<form-bean name="VoteExportForm" type="org.lamsfoundation.lams.tool.vote.web.VoteExportForm"/>		
+	</form-beans>
+	
+  	<!-- ========== Global Exception Definitions =================================== -->
+	<global-exceptions>
+	      <exception
+	        key="error.exception.VoteApplication"
+	        type="org.lamsfoundation.lams.tool.vote.VoteApplicationException"
+	        handler="org.lamsfoundation.lams.util.CustomStrutsExceptionHandler"
+	        path="/SystemErrorContent.jsp"
+	        scope="request"
+	      />
+	</global-exceptions>
+
+ 	<!-- ========== Global Forward Definitions =================================== -->
+   	<global-forwards>
+		<forward name="starter" path="/authoringStarter"/>   
+	</global-forwards>
+	
+  <!-- ========== Action Mapping Definitions =================================== -->
+  <action-mappings>
+	<!--Authoring Starter Action: initializes the authoring module -->
+   <action path="/authoringStarter" 
+   			type="org.lamsfoundation.lams.tool.vote.web.VoteStarterAction" 
+   			name="VoteAuthoringForm" 
+	      	scope="session"
+   			input="/index.jsp"> 
+	
+		<exception
+	        key="error.exception.VoteApplication"
+	        type="org.lamsfoundation.lams.tool.vote.VoteApplicationException"
+	        handler="org.lamsfoundation.lams.tool.vote.web.CustomStrutsExceptionHandler"
+	        path="/VoteErrorBox.jsp"
+	        scope="request"
+	      />
+
+		<exception
+	        key="error.exception.VoteApplication"
+	        type="java.lang.NullPointerException"
+	        handler="org.lamsfoundation.lams.tool.vote.web.CustomStrutsExceptionHandler"
+	        path="/VoteErrorBox.jsp"
+	        scope="request"
+	      />	         			
+
+	  	<forward
+		    name="errorList"
+	        path="/VoteErrorBox.jsp"
+		    redirect="true"
+	  	/>
+	</action>  
+	
+
+	<!--Authoring Main Action : interacts with the authoring module user-->
+	<action path="/authoring"
+	      	type="org.lamsfoundation.lams.tool.vote.web.VoteAction"
+    	  	name="VoteAuthoringForm"
+	      	scope="session"
+    	  	input="/authoring/AuthoringMaincontent.jsp"
+      		parameter="dispatch">
+	
+		<exception
+	        key="error.exception.VoteApplication"
+	        type="org.lamsfoundation.lams.tool.vote.VoteApplicationException"
+	        handler="org.lamsfoundation.lams.tool.vote.web.CustomStrutsExceptionHandler"
+	        path="/VoteErrorBox.jsp"
+	        scope="request"
+	      />
+
+		<exception
+	        key="error.exception.VoteApplication"
+	        type="java.lang.NullPointerException"
+	        handler="org.lamsfoundation.lams.tool.vote.web.CustomStrutsExceptionHandler"
+	        path="/VoteErrorBox.jsp"
+	        scope="request"
+	      />	         			
+    	
+	  	<forward
+		    name="errorList"
+	        path="/VoteErrorBox.jsp"
+		    redirect="true"
+	  	/>
+    </action>
+    
+    
+   <!--Define Later Starter Action: initializes the DefineLater module -->
+   <action path="/defineLaterStarter" 
+   			type="org.lamsfoundation.lams.tool.vote.web.VoteDLStarterAction" 
+   			name="VoteAuthoringForm" 
+   			input="/index.jsp"> 
+	
+		<exception
+	        key="error.exception.VoteApplication"
+	        type="org.lamsfoundation.lams.tool.vote.VoteApplicationException"
+	        handler="org.lamsfoundation.lams.tool.vote.web.CustomStrutsExceptionHandler"
+	        path="/VoteErrorBox.jsp"
+	        scope="request"
+	      />
+
+		<exception
+	        key="error.exception.VoteApplication"
+	        type="java.lang.NullPointerException"
+	        handler="org.lamsfoundation.lams.tool.vote.web.CustomStrutsExceptionHandler"
+	        path="/VoteErrorBox.jsp"
+	        scope="request"
+	      />	         			
+
+	  	<forward
+		    name="errorList"
+	        path="/VoteErrorBox.jsp"
+		    redirect="true"
+	  	/>
+	</action>  
+    
+
+   <!--Learning Starter Action: initializes the Learning module -->
+   <action 	path="/learningStarter" 
+   			type="org.lamsfoundation.lams.tool.vote.web.VoteLearningStarterAction" 
+   			name="VoteLearningForm" 
+	      	scope="session"
+	      	validate="false"
+	      	unknown="false"
+   			input="/learningIndex.jsp"> 
+
+		<exception
+	        key="error.exception.VoteApplication"
+	        type="org.lamsfoundation.lams.tool.vote.VoteApplicationException"
+	        handler="org.lamsfoundation.lams.tool.vote.web.CustomStrutsExceptionHandler"
+	        path="/VoteErrorBox.jsp"
+	        scope="request"
+	      />
+
+		<exception
+	        key="error.exception.VoteApplication"
+	        type="java.lang.NullPointerException"
+	        handler="org.lamsfoundation.lams.tool.vote.web.CustomStrutsExceptionHandler"
+	        path="/VoteErrorBox.jsp"
+	        scope="request"
+	      />	         			
+
+	  	<forward
+		    name="errorList"
+	        path="/VoteErrorBox.jsp"
+		    redirect="false"
+	  	/>
+	</action>  
+	
+	
+   <!--Learning Main Action: interacts with the Learning module user -->
+	<action	path="/learning"
+		    type="org.lamsfoundation.lams.tool.vote.web.VoteLearningAction"
+			name="VoteLearningForm"
+      		scope="session"
+      		input="/learning/AnswersContent.jsp"
+      		parameter="method"
+      		unknown="false"
+      		validate="false">
+	
+		<exception
+	        key="error.exception.VoteApplication"
+	        type="org.lamsfoundation.lams.tool.vote.VoteApplicationException"
+	        handler="org.lamsfoundation.lams.tool.vote.web.CustomStrutsExceptionHandler"
+	        path="/VoteErrorBox.jsp"
+	        scope="request"
+	      />
+
+		<exception
+	        key="error.exception.VoteApplication"
+	        type="java.lang.NullPointerException"
+	        handler="org.lamsfoundation.lams.tool.vote.web.CustomStrutsExceptionHandler"
+	        path="/VoteErrorBox.jsp"
+	        scope="request"
+	      />	         			
+
+	  	<forward
+		    name="errorList"
+	        path="/VoteErrorBox.jsp"
+		    redirect="false"
+	  	/>
+
+    </action>
+    
+    
+    <!--Monitoring Starter Action: initializes the Monitoring module -->
+   <action 	path="/monitoringStarter" 
+   			type="org.lamsfoundation.lams.tool.vote.web.VoteMonitoringStarterAction" 
+	      	scope="session"
+   			name="VoteMonitoringForm" 
+      		unknown="false"
+      		validate="false"
+   			input="/monitoringIndex.jsp"> 
+
+		<exception
+	        key="error.exception.VoteApplication"
+	        type="org.lamsfoundation.lams.tool.vote.VoteApplicationException"
+	        handler="org.lamsfoundation.lams.tool.vote.web.CustomStrutsExceptionHandler"
+	        path="/VoteErrorBox.jsp"
+	        scope="request"
+	      />
+
+		<exception
+	        key="error.exception.VoteApplication"
+	        type="java.lang.NullPointerException"
+	        handler="org.lamsfoundation.lams.tool.vote.web.CustomStrutsExceptionHandler"
+	        path="/VoteErrorBox.jsp"
+	        scope="request"
+	      />	         			
+   			
+	  	<forward
+		    name="errorList"
+	        path="/VoteErrorBox.jsp"
+		    redirect="true"
+	  	/>
+	</action>  
+    
+   
+   <!--Monitoring Main Action: interacts with the Monitoring module user -->
+   <action 	path="/monitoring" 
+   			type="org.lamsfoundation.lams.tool.vote.web.VoteMonitoringAction" 
+   			name="VoteMonitoringForm" 
+	      	scope="session"
+   			input="/monitoring/MonitoringMaincontent.jsp"
+      		parameter="method"
+      		unknown="false"
+      		validate="false"> 
+
+		<exception
+	        key="error.exception.VoteApplication"
+	        type="org.lamsfoundation.lams.tool.vote.VoteApplicationException"
+	        handler="org.lamsfoundation.lams.tool.vote.web.CustomStrutsExceptionHandler"
+	        path="/VoteErrorBox.jsp"
+	        scope="request"
+	      />
+
+		<exception
+	        key="error.exception.VoteApplication"
+	        type="java.lang.NullPointerException"
+	        handler="org.lamsfoundation.lams.tool.vote.web.CustomStrutsExceptionHandler"
+	        path="/VoteErrorBox.jsp"
+	        scope="request"
+	      />	         			
+
+	  	<forward
+		    name="errorList"
+	        path="/VoteErrorBox.jsp"
+		    redirect="true"
+	  	/>
+	</action>  
+
+   <!--Export Portfolio Action -->
+	    <action
+		      path="/exportPortfolio"
+		      type="org.lamsfoundation.lams.tool.vote.web.VoteExportAction"
+		      name="VoteExportForm"
+		      scope="session"
+		      parameter="mode"
+		      unknown="false"
+		      validate="false"
+	    >
+
+		<exception
+	        key="error.exception.VoteApplication"
+	        type="org.lamsfoundation.lams.tool.vote.VoteApplicationException"
+	        handler="org.lamsfoundation.lams.tool.vote.web.CustomStrutsExceptionHandler"
+	        path="/VoteErrorBox.jsp"
+	        scope="request"
+	      />
+
+		<exception
+	        key="error.exception.VoteApplication"
+	        type="java.lang.NullPointerException"
+	        handler="org.lamsfoundation.lams.tool.vote.web.CustomStrutsExceptionHandler"
+	        path="/VoteErrorBox.jsp"
+	        scope="request"
+	      />	         			
+
+	  	<forward
+		    name="errorList"
+	        path="/VoteErrorBox.jsp"
+		    redirect="true"
+	  	/>
+    </action>
+ </action-mappings>
+	
+	<message-resources parameter="org.lamsfoundation.lams.tool.vote.VoteResources"/>
+	<plug-in className="org.apache.struts.tiles.TilesPlugin">
+		<set-property property="definitions-config"
+			value="/WEB-INF/tiles/tiles-defs.xml" />
+		<set-property property="definitions-debug" value="0" />
+		<set-property property="definitions-parser-details" value="0" />
+		<set-property property="definitions-parser-validate" value="true" />
+	</plug-in>
+</struts-config>

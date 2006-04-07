@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<!--
+  - Application context definition for lams survey business layer.
+	- Contains bean references to the transaction manager and to the DAOs in
+	- dataAccessContext.xml (see web.xml's "contextConfigLocation").
+	-->
+<beans>
+
+<!-- ========================= GENERAL DEFINITIONS ========================= -->
+
+	<!-- ========================= RESOURCE DEFINITIONS ========================= -->
+	
+	<!-- Hibernate SessionFactory -->
+	<bean id="voteSessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<property name="dataSource"><ref bean="toolDataSource"/></property>
+		<property name="mappingResources">
+			<list>	
+  			  	<value>/org/lamsfoundation/lams/tool/vote/VoteContent.hbm.xml</value> 
+				<value>/org/lamsfoundation/lams/tool/vote/VoteQueContent.hbm.xml</value>
+				<value>/org/lamsfoundation/lams/tool/vote/VoteOptsContent.hbm.xml</value>
+			  	<value>/org/lamsfoundation/lams/tool/vote/VoteSession.hbm.xml</value>
+				<value>/org/lamsfoundation/lams/tool/vote/VoteQueUsr.hbm.xml</value>
+				<value>/org/lamsfoundation/lams/tool/vote/VoteUsrAttempt.hbm.xml</value>
+				<value>/org/lamsfoundation/lams/tool/vote/VoteUploadedFile.hbm.xml</value>				
+			</list>
+		</property>
+		<property name="hibernateProperties"><ref bean="hibernateProperties"/></property>
+	</bean>
+
+	<!-- ========================= BUSINESS OBJECT DEFINITIONS ======================== -->
+
+	<!-- tool beans -->
+
+
+	<bean id="voteContentDAO" class="org.lamsfoundation.lams.tool.vote.dao.hibernate.VoteContentDAO">
+		<property name="sessionFactory"><ref local="voteSessionFactory"/></property>
+	</bean>  
+
+	<bean id="voteSessionDAO" class="org.lamsfoundation.lams.tool.vote.dao.hibernate.VoteSessionDAO">
+		<property name="sessionFactory"><ref local="voteSessionFactory"/></property>
+	</bean>
+
+	<bean id="voteUserDAO" class="org.lamsfoundation.lams.tool.vote.dao.hibernate.VoteUserDAO">
+		<property name="sessionFactory"><ref local="voteSessionFactory"/></property>
+	</bean>
+	
+	<bean id="voteQueContentDAO" class="org.lamsfoundation.lams.tool.vote.dao.hibernate.VoteQueContentDAO">
+		<property name="sessionFactory"><ref local="voteSessionFactory"/></property>
+	</bean>
+	
+	<bean id="voteOptionsContentDAO" class="org.lamsfoundation.lams.tool.vote.dao.hibernate.VoteOptionsContentDAO">
+		<property name="sessionFactory"><ref local="voteSessionFactory"/></property>
+	</bean>
+	
+	
+	<bean id="voteUsrAttemptDAO" class="org.lamsfoundation.lams.tool.vote.dao.hibernate.VoteUsrAttemptDAO">
+		<property name="sessionFactory"><ref local="voteSessionFactory"/></property>
+	</bean>
+
+
+	<bean id="voteUploadedFileDAO" class="org.lamsfoundation.lams.tool.vote.dao.hibernate.VoteUploadedFileDAO">
+		<property name="sessionFactory"><ref local="voteSessionFactory"/></property>
+	</bean>
+	
+	<bean id="voteToolContentHandler" class="org.lamsfoundation.lams.tool.vote.util.VoteToolContentHandler">
+ 		<property name="repositoryService"><ref bean="repositoryService"/></property>
+	</bean> 
+	
+
+	<!-- end of tool beans -->
+
+	<bean id="voteService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+			<property name="target">
+				<bean class="org.lamsfoundation.lams.tool.vote.service.VoteServicePOJO">
+					<property name="voteContentDAO"><ref bean="voteContentDAO"/></property>
+					<property name="voteSessionDAO"><ref bean="voteSessionDAO"/></property>
+					<property name="voteUserDAO"><ref bean="voteUserDAO"/></property>
+					<property name="voteQueContentDAO"><ref bean="voteQueContentDAO"/></property>
+					<property name="voteOptionsContentDAO"><ref bean="voteOptionsContentDAO"/></property>								
+					<property name="voteUsrAttemptDAO"><ref bean="voteUsrAttemptDAO"/></property>													
+			 		<property name="voteUploadedFileDAO"><ref bean="voteUploadedFileDAO"/></property>
+					<property name="toolService"><ref bean="lamsToolService"/></property>
+		<!-- 		<property name="repositoryService"><ref bean="repositoryService"/></property> -->
+			 		<property name="learnerService"><ref bean="learnerService"/></property>		
+					<property name="voteToolContentHandler"><ref bean="voteToolContentHandler"/></property>			
+				</bean>
+			</property>
+			<property name="transactionAttributes">
+				<props>
+					<prop key="create*">PROPAGATION_REQUIRED,-VoteApplicationException</prop>
+					<prop key="copy*">PROPAGATION_REQUIRED,-VoteApplicationException</prop>
+					<prop key="save*">PROPAGATION_REQUIRED, -VoteApplicationException</prop>
+					<prop key="update*">PROPAGATION_REQUIRED,-VoteApplicationException</prop>
+					<prop key="get*">PROPAGATION_REQUIRED,readOnly,-VoteApplicationException</prop>
+					<prop key="remove*">PROPAGATION_REQUIRED,-VoteApplicationException</prop>
+					<prop key="setAsDefineLater">PROPAGATION_REQUIRED,-VoteApplicationException</prop>
+					<prop key="setAsRunOffline">PROPAGATION_REQUIRED,-VoteApplicationException</prop>
+					<prop key="exportToolSession">PROPAGATION_REQUIRED,-VoteApplicationException</prop>
+					<prop key="leaveToolSession">PROPAGATION_REQUIRED,-VoteApplicationException</prop>
+				</props>
+			</property>
+	</bean>  
+</beans>
+

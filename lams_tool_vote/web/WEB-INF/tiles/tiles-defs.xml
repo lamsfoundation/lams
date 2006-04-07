@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE tiles-definitions PUBLIC
+   "-//Apache Software Foundation//DTD Tiles Configuration//EN"
+   "http://jakarta.apache.org/struts/dtds/tiles-config.dtd">
+
+
+<!--
+Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+USA
+
+http://www.gnu.org/licenses/gpl.txt
+-->
+ 
+<tiles-definitions>
+<!-- ============= template Definitions ====================== -->
+	<definition name=".baseDef" path="/Template.jsp">
+		<put name="title" value="Base Template Page"/>
+		<put name="pageHeader" value = "Base Template"/>
+		<put name="header" value="/Header.jsp"/>
+		<put name="content" value="/BaseContent.jsp" />	
+		<put name="footer" value="/Footer.jsp"/>	
+	</definition>
+<!-- ============= Exception Page Definitions ====================== -->	
+	<definition name=".systemError" extends=".baseDef" >
+		<put name="title" value="System Error Page"/>
+		<put name="pageHeader" value = "System Exception"/>
+		<put name="content" value="/SystemErrorContent.jsp" />	
+	</definition>
+	
+	<definition name=".mcErrorBox" extends=".baseDef" >
+		<put name="title" value="Error Page"/>
+		<put name="pageHeader" value = "Exception"/>
+		<put name="content" value="/McErrorBox.jsp" />	
+	</definition>
+
+	
+<!-- ============= Mc Authoring Module Definitions ====================== -->	
+	<definition name=".questions" extends=".baseDef" >
+		<put name="title" value="MCQ Tool Questions"/>
+		<put name="pageHeader" value = "MCQ Tool Questions"/>
+		<put name="content" value="/authoring/AuthoringMaincontent.jsp" />	
+	</definition>
+	
+	<definition name=".starter" extends=".baseDef" >
+		<put name="title" value="Starter for Multiple Choice Authoring"/>
+		<put name="pageHeader" value = "Starter for Multiple Choice Authoring"/>
+		<put name="content" value="/index.jsp" />	
+	</definition>
+	
+	<definition name=".errorList" extends=".baseDef" >
+		<put name="title" value="Error"/>
+		<put name="pageHeader" value = "Error"/>
+		<put name="content" value="/ErrorList.jsp" />	
+	</definition>
+	
+<!-- ============= Mc Learning Module Definitions ====================== -->		
+	<definition name=".answers" extends=".baseDef" >
+		<put name="title" value="MCQ Tool Answers"/>
+		<put name="pageHeader" value = "MCQ Tool Answers"/>
+		<put name="content" value="/learning/AnswersContent.jsp" />	
+	</definition>
+	
+	<definition name=".learningStarter" extends=".baseDef" >
+		<put name="title" value="Starter for MCQ Learning"/>
+		<put name="pageHeader" value = "Starter for MCQ Learning"/>
+		<put name="content" value="/learningIndex.jsp" />	
+	</definition>
+
+	<definition name=".individualReport" extends=".baseDef" >
+		<put name="title" value="MCQ Tool Individual Report"/>
+		<put name="pageHeader" value ="MCQ Tool Individual Report"/>
+		<put name="content" value="/learning/IndividualLearnerResults.jsp" />	
+	</definition>
+	
+	<definition name=".redoQuestions" extends=".baseDef" >
+		<put name="title" value="MCQ Tool Redo Questions"/>
+		<put name="pageHeader" value ="MCQ Tool Redo Questions"/>
+		<put name="content" value="/learning/RedoQuestions.jsp" />	
+	</definition>
+
+	<definition name=".singleQuestionAnswers" extends=".baseDef" >
+		<put name="title" value="MCQ Tool Answers"/>
+		<put name="pageHeader" value ="MCQ Tool Answers"/>
+		<put name="content" value="/learning/SingleQuestionAnswersContent.jsp" />	
+	</definition>
+	
+	<definition name=".viewAnswers" extends=".baseDef" >
+		<put name="title" value="MCQ Tool View Previous Answers"/>
+		<put name="pageHeader" value = "MCQ Tool View Previous Answers"/>
+		<put name="content" value="/learning/ViewAnswers.jsp" />	
+	</definition>
+
+	<definition name=".resultsSummary" extends=".baseDef" >
+		<put name="title" value="MCQ Tool Results Summary"/>
+		<put name="pageHeader" value = "MCQ Tool Results Summary"/>
+		<put name="content" value="/learning/ResultsSummary.jsp" />	
+	</definition>
+	
+	<!-- ============= Mc Monitoring Module Definitions ====================== -->		
+	<definition name=".monitoringStarter" extends=".baseDef" >
+		<put name="title" value="Starter for MCQ Monitoring"/>
+		<put name="pageHeader" value = "Starter for MCQ Monitoring"/>
+		<put name="content" value="/monitoringIndex.jsp" />	
+	</definition>
+	
+	<definition name=".monitoringContent" extends=".baseDef" >
+		<put name="title" value="MCQ Monitoring"/>
+		<put name="pageHeader" value = "MCQ Monitoring"/>
+		<put name="content" value="/monitoring/MonitoringMaincontent.jsp" />	
+	</definition>
+	
+	<definition name=".preview" extends=".baseDef" >
+		<put name="title" value="MCQ Preview"/>
+		<put name="pageHeader" value = "MCQ Preview"/>
+		<put name="content" value="/learning/Preview.jsp" />	
+	</definition>
+	
+	<definition name=".exportPortfolio" extends=".baseDef" >
+		<put name="title" value="MCQ Portfolio Export"/>
+		<put name="pageHeader" value = "MCQ Portfolio Export"/>
+		<put name="content" value="/exportPortfolio.jsp" />	
+	</definition>
+</tiles-definitions>

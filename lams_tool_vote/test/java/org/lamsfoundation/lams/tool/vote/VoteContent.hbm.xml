@@ -1,0 +1,235 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+    
+<hibernate-mapping>
+
+<class 
+    name="org.lamsfoundation.lams.tool.vote.pojos.VoteContent" 
+    table="tl_vote11_content"
+>
+    <id
+        name="uid"
+        type="java.lang.Long"
+        column="uid"
+    >
+        <generator class="native" />
+    </id>
+
+	<property
+        name="voteContentId"
+        type="java.lang.Long"
+        column="content_id"
+        not-null="true"
+        length="20"
+    >
+    </property>
+    
+    <property
+        name="title"
+        type="java.lang.String"
+        access="property"
+        column="title"
+        length="65535"
+    />
+
+    <property
+        name="instructions"
+        type="java.lang.String"
+        access="property"        
+        column="instructions"
+        length="65535"
+    />
+
+    <property
+        name="creationDate"
+        type="java.util.Date"
+        access="property"        
+        column="creation_date"
+        length="20"
+    />
+
+
+    <property
+        name="updateDate"
+        type="java.util.Date"
+        access="property"        
+        column="update_date"
+        length="20"
+    />
+
+
+   <property
+        name="questionsSequenced"
+        type="boolean"
+        access="property"
+        column="questions_sequenced"
+        length="1"        
+   />
+
+    <property
+        name="usernameVisible"
+        type="boolean"
+        access="property"        
+        column="username_visible"
+        length="1"
+    />
+
+    <property
+        name="createdBy"
+        type="long"
+        access="property"        
+        column="created_by"
+        length="20"
+    />
+    
+    <property
+        name="monitoringReportTitle"
+        type="java.lang.String"
+        access="property"        
+        column="monitoring_report_title"
+        length="100"
+    />
+
+    <property
+        name="reportTitle"
+        type="java.lang.String"
+        access="property"        
+        column="report_title"
+        length="100"
+    />
+
+   <property
+        name="runOffline"
+        type="boolean"
+        access="property"
+        column="run_offline"
+        length="1"        
+   />
+
+   <property
+        name="defineLater"
+        type="boolean"
+        access="property"
+        column="define_later"
+        length="1"        
+   />
+
+    <property
+        name="offlineInstructions"
+        type="java.lang.String"
+        access="property"        
+        column="offline_instructions"
+        length="65535"
+    />
+    
+    <property
+        name="onlineInstructions"
+        type="java.lang.String"
+        access="property"        
+        column="online_instructions"
+        length="65535"
+    />
+
+
+    <property
+        name="endLearningMessage"
+        type="java.lang.String"
+        access="property"        
+        column="end_learning_message"
+        length="65535"
+    />
+    
+    <property
+        name="contentInUse"
+        type="boolean"
+        access="property"        
+        column="content_in_use"
+        length="1"
+    />
+
+
+   <property
+        name="lockOnFinish"
+        type="boolean"
+        access="property"
+        column="lock_on_finish"
+        length="1"        
+   />
+
+    <property
+        name="retries"
+        type="boolean"
+        access="property"        
+        column="retries"
+        length="1"
+    />
+
+
+   <property
+        name="showReport"
+        type="boolean"
+        access="property"
+        column="show_report"
+        length="1"        
+   />
+
+
+    
+   	 <set
+            name="voteQueContents"
+            order-by="display_order"
+            lazy="true"
+            inverse="true"
+            cascade="all-delete-orphan"
+            sort="unsorted"
+        >
+              <key
+                  column="vote_content_id"
+              >
+              </key>
+
+              <one-to-many
+                  class="org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent"
+              />
+    </set>
+
+
+	<set
+            name="voteSessions"
+            lazy="true"
+            inverse="true"
+            cascade="all-delete-orphan"
+            sort="unsorted"
+        >
+              <key
+                  column="vote_content_id"
+              >
+              </key>
+
+              <one-to-many
+                  class="org.lamsfoundation.lams.tool.vote.pojos.VoteSession"
+              />
+
+    </set>
+    
+    	<set
+            name="voteAttachments"
+            lazy="true"
+            inverse="true"
+            cascade="all-delete-orphan"
+            sort="unsorted"
+        >
+              <key
+                  column="vote_content_id"
+              >
+              </key>
+
+              <one-to-many
+                  class="org.lamsfoundation.lams.tool.vote.pojos.VoteUploadedFile"
+              />
+    </set>
+
+</class>
+</hibernate-mapping>
