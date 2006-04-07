@@ -39,8 +39,6 @@ import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
 
 /**
  * @author Steve.Ni
- * 
- * $version$
  */
 public class TestModel extends TestCase {
 	//report data
