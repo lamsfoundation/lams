@@ -1,1 +1,90 @@
-<FlowViewLayout Version="1.1"><StrutsActivity path="/loginRepository.do" location="384,76" dimension="150,114" /><StrutsActivity path="/nodeSelection.do" location="384,265" dimension="150,114" /><StrutsActivity path="/addFileContent.do" location="375,435" dimension="150,140" /><StrutsActivity path="logout;6" location="84,1485" dimension="150,75" /><StrutsActivity path="/error.jsp" location="660,270" dimension="150,62" /><StrutsActivity path="/loginRepository.jsp" location="84,76" dimension="150,62" /><StrutsActivity path="/nodeSelection.jsp" location="90,300" dimension="150,62" /><StrutsActivity path="/packageList.jsp" location="984,493" dimension="150,62" /><StrutsActivity path="/addNode.jsp" location="615,495" dimension="150,62" /><StrutsActivity path="/loggedout.html" location="384,1834" dimension="150,62" /><StrutsActivity path="/logout.html" location="384,1485" dimension="150,62" /><StrutsActivity path="loginRepository.jsp" location="84,76" dimension="150,62" /><StrutsActivity path="bnd;6" location="84,1909" dimension="150,75" /><StrutsTransition id="/loginRepository.jsp,null,/loginRepository.do,2" routingType="0" /><StrutsTransition id="/addFileContent.do,success,/nodeSelection.do,1" routingType="0" /><StrutsTransition id="/nodeSelection.do,nodelist,/nodeSelection.jsp,1" routingType="0" /><StrutsTransition id="/loginRepository.do,success,/nodeSelection.do,1" routingType="0" /><StrutsTransition id="/nodeSelection.jsp,null,/nodeSelection.do,2" routingType="0" /><StrutsTransition id="/nodeSelection.do,error,/error.jsp,1" routingType="0" /><StrutsTransition id="logout;6,null,/loggedout.html,1" routingType="0" /><StrutsTransition id="/loginRepository.do,error,/error.jsp,1" routingType="0" /><StrutsTransition id="/addFileContent.do,error,/error.jsp,1" routingType="0" /><StrutsTransition id="/nodeSelection.do,packagelist,/packageList.jsp,1" routingType="0" /><StrutsTransition id="/addNode.jsp,null,/addFileContent.do,2" routingType="0" /></FlowViewLayout>
+<?xml version="1.0" encoding="UTF-8"?>
+<FlowViewLayout Version="1.2">
+  <StrutsActivity path="/loginRepository.do" location="384,76" dimension="150,114" />
+  <StrutsActivity path="/addFileContent.do" location="375,435" dimension="150,140" />
+  <StrutsActivity path="/nodeSelection.do" location="384,265" dimension="150,114" />
+  <StrutsActivity path="logout;6" location="84,1485" dimension="150,75" />
+  <StrutsActivity path="/error.jsp" location="660,270" dimension="150,62" />
+  <StrutsActivity path="/loginRepository.jsp" location="84,76" dimension="150,62" />
+  <StrutsActivity path="nodeSelection.jsp" location="650,150" dimension="114,49" />
+  <StrutsActivity path="/nodeSelection.jsp" location="90,300" dimension="150,62" />
+  <StrutsActivity path="/packageList.jsp" location="984,493" dimension="150,62" />
+  <StrutsActivity path="/loggedout.html" location="384,1834" dimension="150,62" />
+  <StrutsActivity path="/addNode.jsp" location="615,495" dimension="150,62" />
+  <StrutsActivity path="/logout.html" location="384,1485" dimension="150,62" />
+  <StrutsActivity path="loginRepository.jsp" location="84,76" dimension="150,62" />
+  <StrutsActivity path="bnd;6" location="84,1909" dimension="150,75" />
+  <StrutsTransition id="/loginRepository.jsp,null,/loginRepository.do,2" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="234,107" />
+      <AbsolutePoint location="384,107" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+  <StrutsTransition id="/nodeSelection.do,nodelist,/nodeSelection.jsp,1" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="384,322" />
+      <AbsolutePoint location="240,322" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+  <StrutsTransition id="nodeSelection.jsp,null,/addFileContent.do,2" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="650,174" />
+      <AbsolutePoint location="579,174" />
+      <AbsolutePoint location="579,510" />
+      <AbsolutePoint location="525,510" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+  <StrutsTransition id="/addFileContent.do,success,/nodeSelection.do,1" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="450,435" />
+      <AbsolutePoint location="450,379" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+  <StrutsTransition id="/loginRepository.do,success,/nodeSelection.do,1" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="459,190" />
+      <AbsolutePoint location="459,265" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+  <StrutsTransition id="/nodeSelection.jsp,null,/nodeSelection.do,2" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="240,352" />
+      <AbsolutePoint location="384,352" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+  <StrutsTransition id="/nodeSelection.do,error,/error.jsp,1" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="534,317" />
+      <AbsolutePoint location="660,317" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+  <StrutsTransition id="logout;6,null,/loggedout.html,1" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="159,1560" />
+      <AbsolutePoint location="159,1865" />
+      <AbsolutePoint location="384,1865" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+  <StrutsTransition id="/loginRepository.do,error,/error.jsp,1" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="534,133" />
+      <AbsolutePoint location="779,133" />
+      <AbsolutePoint location="779,270" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+  <StrutsTransition id="/nodeSelection.do,packagelist,/packageList.jsp,1" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="534,347" />
+      <AbsolutePoint location="1059,347" />
+      <AbsolutePoint location="1059,493" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+  <StrutsTransition id="/addFileContent.do,error,/error.jsp,1" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="525,478" />
+      <AbsolutePoint location="735,478" />
+      <AbsolutePoint location="735,332" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+</FlowViewLayout>
+

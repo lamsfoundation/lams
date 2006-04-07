@@ -1,29 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
-
-<web-app >
- <!--
-Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
-
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-USA
-
-http://www.gnu.org/licenses/gpl.txt
--->
-
+<web-app  xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd" version="2.4">
 <context-param>
   	<param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
   	<param-value>org.lamsfoundation.lams.learning.LearningResources</param-value>
@@ -35,7 +12,14 @@ http://www.gnu.org/licenses/gpl.txt
 		classpath:/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml
 		classpath:/org/lamsfoundation/lams/tool/toolApplicationContext.xml
 		classpath:/org/lamsfoundation/lams/learning/learningApplicationContext.xml
-		classpath*:applicationContext.xml
+		classpath:/org/lamsfoundation/lams/contentrepository/applicationContext.xml		
+		classpath:/org/lamsfoundation/lams/tool/mc/mcApplicationContext.xml 
+		classpath:/org/lamsfoundation/lams/tool/noticeboard/applicationContext.xml 
+		classpath:/org/lamsfoundation/lams/tool/qa/qaApplicationContext.xml 
+		classpath:/org/lamsfoundation/lams/tool/sbmt/submitFilesApplicationContext.xml 
+		classpath:/org/lamsfoundation/lams/tool/forum/forumApplicationContext.xml 
+		classpath:/org/lamsfoundation/lams/tool/chat/chatApplicationContext.xml
+<!-- 		classpath:/org/lamsfoundation/lams/tool/rsrc/rsrcApplicationContext.xml -->
 	</param-value>
 </context-param>
 <listener>
@@ -44,28 +28,7 @@ http://www.gnu.org/licenses/gpl.txt
 	</listener-class>
 </listener>	
 
-  <!--
-Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
-
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-USA
-
-http://www.gnu.org/licenses/gpl.txt
--->
-
-<filter>
+  <filter>
 	<filter-name>HibernateFilter</filter-name>
 	<filter-class>org.springframework.orm.hibernate3.support.OpenSessionInViewFilter</filter-class>
 	<init-param>
@@ -78,26 +41,20 @@ http://www.gnu.org/licenses/gpl.txt
 	</init-param>
 </filter>
 
-  <!--
-Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+<filter>
+       <filter-name>SystemSessionFilter</filter-name>
+         <filter-class>
+		   org.lamsfoundation.lams.web.session.SystemSessionFilter
+         </filter-class>
+</filter>
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+<filter>
+       <filter-name>LocaleFilter</filter-name>
+         <filter-class>
+		   org.lamsfoundation.lams.web.filter.LocaleFilter
+         </filter-class>
+</filter>
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-USA
-
-http://www.gnu.org/licenses/gpl.txt
--->
 <filter-mapping>
 	<filter-name>HibernateFilter</filter-name>
 	<url-pattern>*.do</url-pattern>
@@ -107,34 +64,23 @@ http://www.gnu.org/licenses/gpl.txt
 	<url-pattern>*.jsp</url-pattern>
 </filter-mapping>
 
+<filter-mapping>
+    <filter-name>SystemSessionFilter</filter-name>
+     <url-pattern>/*</url-pattern>
+</filter-mapping>
+
+  <filter-mapping>
+    <filter-name>LocaleFilter</filter-name>
+     <url-pattern>/*</url-pattern>
+</filter-mapping>
+
     <!--
     To use non XDoclet listeners, create a listeners.xml file that
     contains the additional listeners and place it in your
     project's merge dir.
     -->
 
- <!--
-Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
-
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-USA
-
-http://www.gnu.org/licenses/gpl.txt
--->
-
-<servlet>
+ <servlet>
 	<servlet-name>context</servlet-name>
 	<servlet-class>org.springframework.web.context.ContextLoaderServlet</servlet-class>
 	<load-on-startup>1</load-on-startup>
@@ -161,30 +107,43 @@ http://www.gnu.org/licenses/gpl.txt
     <load-on-startup>2</load-on-startup>
 </servlet>
 
-  <!--
-Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+<servlet>
+		<description>Export Portfolio</description>		
+		<display-name>Export Portfolio</display-name>
+		<servlet-name>exportPortfolio</servlet-name>
+		<servlet-class>org.lamsfoundation.lams.learning.export.web.action.MainExportServlet</servlet-class>
+	</servlet>
+	<servlet>
+		<description>Export Portfolio Download Page</description>		
+		<display-name>Export Portfolio Download</display-name>
+		<servlet-name>exportDownload</servlet-name>
+		<servlet-class>org.lamsfoundation.lams.learning.export.web.action.ExportDownloadServlet</servlet-class>
+	</servlet>
+	<servlet>
+		<description>Tool does not support portfolio exports</description>
+		<display-name>Export Portfolio Unavailable</display-name>
+		<servlet-name>exportNotSupported</servlet-name>
+		<servlet-class>org.lamsfoundation.lams.learning.export.web.action.ExportNotSupportedServlet</servlet-class>
+	</servlet>
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-USA
-
-http://www.gnu.org/licenses/gpl.txt
--->
-
-<servlet-mapping>
+  <servlet-mapping>
 	<servlet-name>action</servlet-name>
     <url-pattern>*.do</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+		<servlet-name>exportPortfolio</servlet-name>
+		<url-pattern>/portfolioExport</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+		<servlet-name>exportDownload</servlet-name>
+		<url-pattern>/exportDownload</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+	<servlet-name>exportNotSupported</servlet-name>
+	<url-pattern>/exportNotSupported</url-pattern>
 </servlet-mapping>
 
    <session-config>
@@ -198,111 +157,101 @@ http://www.gnu.org/licenses/gpl.txt
    <!ELEMENT mime-mapping (extension, mime-type)>
    -->
 
-   <!--
-   To specify error pages, create a file named error-pages.xml, put it in your project's mergedir.
-   Organize error-pages.xml following this DTD slice:
+  <error-page>
+	<error-code>403</error-code>
+	<location>/403.html</location>
+</error-page>  
 
-   <!ELEMENT error-page ((error-code | exception-type), location)>
-   -->
+  	<jsp-config>
+		<!--  ======================================================== -->	
+		<!-- Struts Tag Library Descriptors -->
+		<!--  ======================================================== -->	
+		<taglib>
+		    <taglib-uri>tags-bean</taglib-uri>
+		    <taglib-location>/WEB-INF/struts/tlds/struts-bean.tld</taglib-location>
+		</taglib>
+		<taglib>
+		    <taglib-uri>tags-html</taglib-uri>
+		    <taglib-location>/WEB-INF/struts/tlds/struts-html.tld</taglib-location>
+		</taglib>
+		<taglib>
+		    <taglib-uri>tags-logic</taglib-uri>
+		    <taglib-location>/WEB-INF/struts/tlds/struts-logic.tld</taglib-location>
+		</taglib>
+		<taglib>
+		    <taglib-uri>tags-tiles</taglib-uri>
+		    <taglib-location>/WEB-INF/struts/tlds/struts-tiles.tld</taglib-location>
+		</taglib>
+		<!--  ======================================================== -->	
+		<!--  JSTL 1.2 Tag Library 									   -->
+		<!--  ======================================================== -->	
+		  <taglib>
+		    <taglib-uri>tags-fmt</taglib-uri>
+		    <taglib-location>/WEB-INF/jstl/tlds/fmt.tld</taglib-location>
+		  </taglib>
+		  <taglib>
+		    <taglib-uri>tags-core</taglib-uri>
+		    <taglib-location>/WEB-INF/jstl/tlds/c.tld</taglib-location>
+		  </taglib>
+		  <taglib>
+		    <taglib-uri>tags-function</taglib-uri>
+		    <taglib-location>/WEB-INF/jstl/tlds/fn.tld</taglib-location>
+		  </taglib>
+		  <taglib>
+		    <taglib-uri>tags-xml</taglib-uri>
+		    <taglib-location>/WEB-INF/jstl/tlds/x.tld</taglib-location>
+		  </taglib>
+		<!--  ======================================================== -->	
+		<!--   Customized Tag Library -->
+		<!--  ======================================================== -->	
+		<taglib>
+		    <taglib-uri>fck-editor</taglib-uri>
+		    <taglib-location>/WEB-INF/fckeditor/tlds/FCKeditor.tld</taglib-location>
+		</taglib>
+		<!--  ======================================================== -->	
+		<!--   LAMS Tag Library -->
+		<!--  ======================================================== -->	
+		<taglib>
+		   <taglib-uri>tags-lams</taglib-uri>
+		   <taglib-location>/WEB-INF/lams.tld</taglib-location>
+		</taglib>
+	</jsp-config>
 
-  <!--
-Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+  	<!--  Security Constraint -->
+	<security-constraint>
+	   	<web-resource-collection>
+	    	<web-resource-name>Secure Content</web-resource-name>
+			<url-pattern>/*</url-pattern>
+    	</web-resource-collection>
+    	<auth-constraint>
+    		<role-name>LEARNER</role-name>
+    		<role-name>TEACHER</role-name>
+    		<role-name>STAFF</role-name>
+    		<role-name>AUTHOR</role-name>
+    		<role-name>ADMIN</role-name>
+    		<role-name>SYSADMIN</role-name>
+    	</auth-constraint>
+    </security-constraint>
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+    <security-constraint>
+	   	<web-resource-collection>
+	    	<web-resource-name>Export</web-resource-name>
+		    <url-pattern>/portfolioExport</url-pattern>
+		 </web-resource-collection>
+    	<auth-constraint>
+    		<role-name>AUTHOR</role-name> <!-- have to change this to TEACHER have it as AUTHOR so that I can test it with user mmm -->
+			<role-name>LEARNER</role-name>
+    	</auth-constraint>
+    </security-constraint>
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-USA
-
-http://www.gnu.org/licenses/gpl.txt
--->
-<!-- Struts Tag Library Defintions -->
-<taglib>
-	<taglib-uri>http://jakarta.apache.org/struts/struts-bean</taglib-uri>
-	<taglib-location>/WEB-INF/struts/struts-bean.tld</taglib-location>
-</taglib>
-<taglib>
-	<taglib-uri>http://jakarta.apache.org/struts/struts-bean-el</taglib-uri>
-	<taglib-location>/WEB-INF/struts/struts-bean-el.tld</taglib-location>
-</taglib>
-<taglib>
-	<taglib-uri>http://jakarta.apache.org/struts/struts-html</taglib-uri>
-	<taglib-location>/WEB-INF/struts/struts-html.tld</taglib-location>
-</taglib>
-<taglib>
-	<taglib-uri>http://jakarta.apache.org/struts/struts-html-el</taglib-uri>
-	<taglib-location>/WEB-INF/struts/struts-html-el.tld</taglib-location>
-</taglib>
-<taglib>
-	<taglib-uri>http://jakarta.apache.org/struts/struts-logic</taglib-uri>
-	<taglib-location>/WEB-INF/struts/struts-logic.tld</taglib-location>
-</taglib>
-<taglib>
-	<taglib-uri>http://jakarta.apache.org/struts/struts-logic-el</taglib-uri>
-	<taglib-location>/WEB-INF/struts/struts-logic-el.tld</taglib-location>
-</taglib>
-<taglib>
-	<taglib-uri>http://jakarta.apache.org/struts/struts-template</taglib-uri>
-	<taglib-location>/WEB-INF/struts/struts-template.tld</taglib-location>
-</taglib>
-<taglib>
-	<taglib-uri>http://jakarta.apache.org/struts/struts-tiles</taglib-uri>
-	<taglib-location>/WEB-INF/struts/struts-tiles.tld</taglib-location>
-</taglib>
-
-<!-- JSTL Tag Library Defintions -->
-<taglib>
-	<taglib-uri>http://java.sun.com/jstl/core</taglib-uri>
-	<taglib-location>/WEB-INF/jstl/c.tld</taglib-location>
-</taglib>
-<taglib>
-	<taglib-uri>http://java.sun.com/jstl/core_rt</taglib-uri>
-	<taglib-location>/WEB-INF/jstl/c-rt.tld</taglib-location>
-</taglib>
-<taglib>
-	<taglib-uri>http://java.sun.com/jstl/fmt</taglib-uri>
-	<taglib-location>/WEB-INF/jstl/fmt.tld</taglib-location>
-</taglib>
-<taglib>
-	<taglib-uri>http://java.sun.com/jstl/fmt_rt</taglib-uri>
-	<taglib-location>/WEB-INF/jstl/fmt-rt.tld</taglib-location>
-</taglib>
-<taglib>
-	<taglib-uri>http://java.sun.com/jstl/xml</taglib-uri>
-	<taglib-location>/WEB-INF/jstl/x.tld</taglib-location>
-</taglib>
-<taglib>
-	<taglib-uri>http://java.sun.com/jstl/xml_rt</taglib-uri>
-	<taglib-location>/WEB-INF/jstl/x-rt.tld</taglib-location>
-</taglib>
-
-   <!--
-   To set up security settings for your web app, create a file named web-security.xml, put it in your project's mergedir.
-   Organize web-security.xml following this DTD slice:
-
-   <!ELEMENT security-constraint (display-name?, web-resource-collection+, auth-constraint?, user-data-constraint?)>
-   <!ELEMENT web-resource-collection (web-resource-name, description?, url-pattern*, http-method*)>
-   <!ELEMENT web-resource-name (#PCDATA)>
-   <!ELEMENT url-pattern (#PCDATA)>
-   <!ELEMENT http-method (#PCDATA)>
-   <!ELEMENT user-data-constraint (description?, transport-guarantee)>
-   <!ELEMENT transport-guarantee (#PCDATA)>
-
-   <!ELEMENT login-config (auth-method?, realm-name?, form-login-config?)>
-   <!ELEMENT auth-method (#PCDATA)>
-   <!ELEMENT realm-name (#PCDATA)>
-   <!ELEMENT form-login-config (form-login-page, form-error-page)>
-   <!ELEMENT form-login-page (#PCDATA)>
-   <!ELEMENT form-error-page (#PCDATA)>
-   -->
+	<!--  Login Configuration -->
+  	<login-config>
+   		<auth-method>FORM</auth-method>
+		<realm-name>LAMS</realm-name>
+   		<form-login-config>
+    		<form-login-page>/login.jsp</form-login-page>
+    		<form-error-page>/login.jsp</form-error-page>
+   		</form-login-config>
+   	</login-config>
 
 </web-app>

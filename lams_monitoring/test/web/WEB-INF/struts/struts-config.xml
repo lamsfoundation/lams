@@ -13,6 +13,11 @@
   <!-- ========== Form Bean Definitions =================================== -->
   <form-beans>
 
+    <form-bean
+      name="DummyForm"
+      type="org.lamsfoundation.lams.monitoring.web.DummyForm"
+    />
+
    <form-bean name="GateForm"  type="org.apache.struts.action.DynaActionForm">
 	<form-property name="gate" type="org.lamsfoundation.lams.learningdesign.GateActivity" />
 	<form-property name="activityId" type="java.lang.Long" />
@@ -31,28 +36,7 @@
   -->
 
   <!-- ========== Global Forward Definitions =================================== -->
-  <!--
-Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
-
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-USA
-
-http://www.gnu.org/licenses/gpl.txt
--->
-
-<global-forwards>
+  <global-forwards>
 </global-forwards>
 
   <!-- ========== Action Mapping Definitions =================================== -->
@@ -79,6 +63,11 @@ http://www.gnu.org/licenses/gpl.txt
       <forward
         name="success"
         path="/index.jsp"
+        redirect="false"
+      />
+      <forward
+        name="previewdeleted"
+        path="/previewdeleted.jsp"
         redirect="false"
       />
     </action>
@@ -114,34 +103,50 @@ http://www.gnu.org/licenses/gpl.txt
         redirect="false"
       />
     </action>
+    <action
+      path="/dummy"
+      type="org.lamsfoundation.lams.monitoring.web.DummyMonitoringAction"
+      name="DummyForm"
+      scope="request"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <exception
+        key="error.system.monitor"
+        type="org.lamsfoundation.lams.monitoring.service.MonitoringServiceException"
+        handler="org.lamsfoundation.lams.web.util.CustomStrutsExceptionHandler"
+        path=".systemError"
+        scope="request"
+      />
+      <forward
+        name="detail"
+        path="/dummyDetail.jsp"
+        redirect="false"
+      />
+      <forward
+        name="start"
+        path="/dummyStart.jsp"
+        redirect="false"
+      />
+      <forward
+        name="started"
+        path="/dummyStarted.jsp"
+        redirect="false"
+      />
+      <forward
+        name="control"
+        path="/dummyControlFrame.jsp"
+        redirect="false"
+      />
+    </action>
 
     <!-- If you have non XDoclet actions, define them in a file called struts-actions.xml and place it in your merge directory. -->
   </action-mappings>
 
    <!-- Define your Struts controller in a file called struts-controller.xml and place it in your merge directory. -->
 
-  <!--
-Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
-
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-USA
-
-http://www.gnu.org/licenses/gpl.txt
--->
-
-<message-resources parameter="org.lamsfoundation.lams.monitoring.MonitoringResources" />
+  <message-resources parameter="org.lamsfoundation.lams.monitoring.MonitoringResources" />
 
   <!-- ===================== Plugin Definition  ======================== -->
 <plug-in className="org.apache.struts.tiles.TilesPlugin">

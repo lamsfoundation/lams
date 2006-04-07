@@ -119,7 +119,7 @@
 
    <!-- Define your Struts controller in a file called struts-controller.xml and place it in your merge directory. -->
 
-     <message-resources parameter="org.lamsfoundation.lams.contentrepository.struts.ApplicationResources"/>
+     <message-resources parameter="org.lamsfoundation.lams.contentrepository.applicationResources"/>
 
    <!-- Define your Struts plugins in a file called struts-plugins.xml and place it in your merge directory. -->
 
