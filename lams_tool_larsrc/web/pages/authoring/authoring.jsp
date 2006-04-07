@@ -23,6 +23,7 @@
 	<!-- this is the custom CSS for hte tool -->
 	<link href="<html:rewrite page='/includes/css/tool_custom.css'/>" rel="stylesheet" type="text/css">
     <link href="<html:rewrite page='/includes/css/fckeditor_style.css'/>" rel="stylesheet" type="text/css">
+	<link href="<html:rewrite page='/includes/css/rsrc.css'/>" rel="stylesheet" type="text/css">
 
  	<!-- ******************** FCK Editor related javascript & HTML ********************** -->
     <script type="text/javascript" src="${lams}fckeditor/fckeditor.js"></script>
@@ -31,6 +32,7 @@
     <script type="text/javascript" src="<html:rewrite page='/includes/javascript/fckcontroller.js'/>"></script>
     <script type="text/javascript" src="<html:rewrite page='/includes/javascript/tabcontroller.js'/>"></script>    
 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/prototype.js'/>"></script>
+	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/rsrccommon.js'/>"></script>
 
     <script>
     
@@ -62,9 +64,20 @@
 	    	selectTab(tabId);
         } 
         
-        function doSubmit(method) {
+        function doSubmit() {
         	$("authoringForm").submit();
         }
+        function doUploadOnline() {
+        	var myForm = $("authoringForm");
+        	myForm.action = "<c:url value='/authoring/uploadOnlineFile.do'/>";
+        	myForm.submit();
+        }
+        function doUploadOffline() {
+        	var myForm = $("authoringForm");
+        	myForm.action = "<c:url value='/authoring/uploadOfflineFile.do'/>";
+        	myForm.submit();
+        }
+        
         
     </script>
     <!-- ******************** END FCK Editor related javascript & HTML ********************** -->
@@ -74,7 +87,8 @@
 <body onLoad="init()">
 
 <html:form action="authoring/update" method="post" styleId="authoringForm"
-	focus="title"  enctype="multipart/form-data">
+	focus="resource.title"  enctype="multipart/form-data">
+<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 		<html:hidden property="toolContentID"/>
 		<html:hidden property="currentTab" styleId="currentTab" />
 
@@ -107,11 +121,10 @@
 
 <!-- Button Row -->
 		<p align="right">
-			<html:link href="javascript:doSubmit('updateContent');" property="submit" styleClass="button">
+			<html:link href="javascript:doSubmit();" property="submit" styleClass="button">
 				<fmt:message key="label.authoring.save.button" />
 			</html:link>
-			<html:link href="javascript:;" property="cancel"
-				onclick="window.close()" styleClass="button">
+			<html:link href="javascript:;" property="cancel" onclick="window.close()" styleClass="button">
 				<fmt:message key="label.authoring.cancel.button" />
 			</html:link>
 		</p>

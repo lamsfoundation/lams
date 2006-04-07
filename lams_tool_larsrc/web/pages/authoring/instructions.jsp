@@ -1,8 +1,56 @@
-<%@ taglib uri="tags-html" prefix="html" %>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
-<%@ taglib uri="tags-lams" prefix="lams" %>
+<%@ include file="/common/taglibs.jsp" %>
+<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 
+<script lang="javascript">
+<!-- Common Javascript functions for LAMS -->
+	var offlineArea = "offlinefileArea";
+	var onlineArea = "onlinefileArea";
+	function deleteOfflineFile(fileUuid,fileVersionId){
+		var url = "<c:url value="/authoring/deleteOfflineFile.do"/>";
+	    var reqIDVar = new Date();
+		var param = "fileUuid=" + fileUuid + "&fileVersionId="+ fileVersionId+"&reqID="+reqIDVar.getTime();
+		offlineLoading();
+	    var myAjax = new Ajax.Updater(
+		    	offlineArea,
+		    	url,
+		    	{
+		    		method:'get',
+		    		parameters:param,
+		    		onComplete:offlineComplete,
+		    		evalScripts:false
+		    	}
+	    );
+	}
+	function deleteOnlineFile(fileUuid,fileVersionId){
+		var url = "<c:url value="/authoring/deleteOnlineFile.do"/>";
+	    var reqIDVar = new Date();
+		var param = "fileUuid=" + fileUuid + "&fileVersionId="+ fileVersionId+"&reqID="+reqIDVar.getTime();
+		onlineLoading();
+	    var myAjax = new Ajax.Updater(
+		    	onlineArea,
+		    	url,
+		    	{
+		    		method:'get',
+		    		parameters:param,
+		    		onComplete:onlineComplete,
+		    		evalScripts:false
+		    	}
+	    );
+	}
+
+	function offlineLoading(){
+		showBusy(offlineArea);
+	}
+	function offlineComplete(){
+		hideBusy(offlineArea);
+	}
+	function onlineLoading(){
+		showBusy(onlineArea);
+	}
+	function onlineComplete(){
+		hideBusy(onlineArea);
+	}
+</script>
 	<!---------------------------Instruction Tab Content ------------------------>
 	<table class="forms">
 		<!--hidden field contentID passed by flash-->
@@ -13,35 +61,15 @@
 			<td class="formlabel"><fmt:message
 				key="label.authoring.online.instruction" />:</td>
 			<td NOWRAP width="700">
-				<lams:SetEditor id="OnlineInstruction" text="${authoring.onlineInstruction}"/>
+				<lams:SetEditor id="Resource.onlineInstructions" text="${formBean.resource.onlineInstructions}"/>
 			</td>
 		</tr>
 		<tr>
 			<td></td>
 			<td class="formcontrol">
-				<div id="onlinefile">
-				<c:forEach var="file" items="${authoring.onlineFiles}">
-					<li><c:out value="${file.name}"/>
-					<c:set var="viewURL">
-						<html:rewrite page="/download/?uuid=${file.uuID}&preferDownload=false"/>
-					</c:set>
-					<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
-						<fmt:message key="label.view"/>
-					</a>&nbsp;
-					<c:set var="downloadURL">
-							<html:rewrite page="/download/?uuid=${file.uuID}&versionID=${details.versionID}&preferDownload=true"/>
-					</c:set>
-					<a href="<c:out value='${downloadURL}' escapeXml='false'/>">
-						<fmt:message key="label.download"/>
-					</a>&nbsp;
-					<c:set var="deleteonline">
-					<html:rewrite page="/deletefile.do?method=deleteOnlineFile&toolContentID=${authoring.contentID}&uuID=${file.uuID}&versionID=${file.versionID}"/>
-					</c:set>
-					<html:link href="javascript:loadDoc('${deleteonline}','onlinefile')">
-						<fmt:message key="label.authoring.online.delete"/>
-					</html:link>					
-					</li>
-				</c:forEach>
+				<c:set var="onlineFileList" value="${formBean.onlineFileList}"/>
+				<div id="onlinefileArea">
+					<%@ include file="parts/onlinefilelist.jsp" %>
 				</div>
 			</td>
 		</tr>
@@ -50,12 +78,12 @@
 				<fmt:message key="label.authoring.online.file" />:
 			</td>
 			<td class="formcontrol">
-				<html:file property="onlineFile">
+				<html:file property="onlineFile" styleClass="buttonStyle">
 					<fmt:message key="label.authoring.choosefile.button" />
 				</html:file>
-				<html:link href="javascript:doSubmit('uploadOnline');" property="submit">
+				<html:button onclick="javascript:doUploadOnline();" property="uploadOnlineSubmit" styleClass="buttonStyle">
 					<fmt:message key="label.authoring.upload.online.button" />
-				</html:link>
+				</html:button>
 			</td>
 		</tr>	
 		<!------------Offline Instructions ----------------------->
@@ -63,29 +91,15 @@
 			<td class="formlabel"><fmt:message
 				key="label.authoring.offline.instruction" />:</td>
 			<td NOWRAP width="700">
-			<lams:SetEditor id="OfflineInstruction" text="${authoring.offlineInstruction}"/>
+			<lams:SetEditor id="Resource.offlineInstructions" text="${formBean.resource.offlineInstructions}"/>
 			</td>
 		</tr>
 		<tr>
 			<td></td>
 			<td class="formcontrol">
-				<div id="offlinefile">
-				<c:forEach var="file" items="${authoring.offlineFiles}">
-					<li><c:out value="${file.name}"/>
-					<html:link href="javascript:launchInstructionsPopup('download/?uuid=${file.uuID}&preferDownload=false')">
-						<fmt:message key="label.view"/>
-					</html:link>
-					<html:link href="../download/?uuid=${file.uuID}&preferDownload=true">
-						<fmt:message key="label.download"/>
-					</html:link>
-					<c:set var="deleteoffline">
-					<html:rewrite page="/deletefile.do?method=deleteOfflineFile&toolContentID=${authoring.contentID}&uuID=${file.uuID}&versionID=${file.versionID}"/>
-					</c:set>
-					<html:link href="javascript:loadDoc('${deleteoffline}','offlinefile')">
-						<fmt:message key="label.authoring.offline.delete"/>
-					</html:link>					
-					</li>
-				</c:forEach>
+				<c:set var="offlineFileList" value="${formBean.offlineFileList}"/>
+				<div id="offlinefileArea">
+					<%@ include file="parts/offlinefilelist.jsp" %>
 				</div>
 			</td>
 		</tr>
@@ -94,12 +108,12 @@
 				<fmt:message key="label.authoring.offline.file" />:
 			</td>
 			<td class="formcontrol">
-				<html:file property="offlineFile">
+				<html:file property="offlineFile" styleClass="buttonStyle">
 					<fmt:message key="label.authoring.choosefile.button" />
 				</html:file>
-				<html:link href="javascript:doSubmit('uploadOffline');" property="submit">
+				<html:button onclick="javascript:doUploadOffline();" property="uploadOfflineSubmit" styleClass="buttonStyle">
 					<fmt:message key="label.authoring.upload.offline.button" />
-				</html:link>
+				</html:button>
 			</td>
 		</tr>			
 		<tr><td colspan="2"><html:errors/></td></tr>

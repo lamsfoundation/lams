@@ -47,7 +47,8 @@ import org.lamsfoundation.lams.tool.rsrc.model.ResourceAttachment;
  * User: Dapeng.Ni
  */
 public class ResourceForm extends ValidatorForm {
-	private static final long serialVersionUID = -6054354910960460120L;
+	private static final long serialVersionUID = 3599879328307492312L;
+
 	private static Logger logger = Logger.getLogger(ResourceForm.class.getName());
 
 	//Forum fields
@@ -89,15 +90,6 @@ public class ResourceForm extends ValidatorForm {
         	logger.error("Initial ResourceForum failed by null value of Resource.");
         }
 	}
-    public void reset(ActionMapping mapping, HttpServletRequest request){
-    	resource.setAllowAddFiles(false);
-    	resource.setAllowAddUrls(false);
-    	resource.setLockWhenFinished(false);
-    	resource.setDefineLater(false);
-    	resource.setRunAuto(false);
-    	resource.setRunOffline(false);
-    }
-
 	public int getCurrentTab() {
 		return currentTab;
 	}

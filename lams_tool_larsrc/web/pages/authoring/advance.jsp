@@ -1,28 +1,26 @@
-
-<%@ taglib uri="tags-html" prefix="html" %>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
+<%@ include file="/common/taglibs.jsp" %>
+<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 
 <!---------------------------Advance Tab Content ------------------------>	
 	<table class="forms">
 		<!-- Instructions Row -->
 		<tr>
 			<td colspan="2 class="formcontrol">
-				<html:checkbox property="resource.lockWhenFinished" value="1">
+				<html:checkbox property="resource.lockWhenFinished">
 					<fmt:message key="label.authoring.advance.lock.on.finished" />
 				</html:checkbox>
 			</td>
 		</tr>
 		<tr>
 			<td colspan="2 class="formcontrol">
-				<html:checkbox property="resource.runAuto" value="1">
+				<html:checkbox property="resource.runAuto">
 					<fmt:message key="label.authoring.advance.run.content.auto" />
 				</html:checkbox>
 			</td>
 		</tr>
 		<tr>
 			<td class="formcontrol">
-				<html:select property="resource.minViewResourceNumber" value="1">
+				<html:select property="resource.minViewResourceNumber">
 					<html:option value="1">1</html:option>
 					<html:option value="2">2</html:option>
 					<html:option value="3">3</html:option>
@@ -36,14 +34,14 @@
 		</tr>
 		<tr>
 			<td colspan="2 class="formcontrol">
-				<html:checkbox property="resource.allowAddUrls" value="1">
+				<html:checkbox property="resource.allowAddUrls">
 					<fmt:message key="label.authoring.advance.allow.learner.add.urls" />
 				</html:checkbox>
 			</td>
 		</tr>
 		<tr>
 			<td colspan="2 class="formcontrol">
-				<html:checkbox property="resource.allowAddFiles" value="1">
+				<html:checkbox property="resource.allowAddFiles">
 					<fmt:message key="label.authoring.advance.allow.learner.add.files" />
 				</html:checkbox>
 			</td>

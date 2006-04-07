@@ -1,4 +1,5 @@
 <%@ include file="/common/taglibs.jsp" %>
+<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 <script lang="javascript">
 <!-- Common Javascript functions for LAMS -->
 
@@ -18,14 +19,7 @@
 		area.style.height="0px";
 		area.style.display="none";
 	}
-	function launchPopup(url,title) {
-		var wd = null;
-		if(wd && wd.open && !wd.closed){
-			wd.close();
-		}
-		wd = window.open(url,title,'resizable,width=796,height=570,scrollbars');
-		wd.window.focus();
-	}
+
 	function verifyUrl(myUrl, title){
 		launchPopup(myUrl,title);
 	}
@@ -33,6 +27,8 @@
 	function previewItem(type,idx,uuid,versionId){
 		//2:file, 3:website,4:learning object
 		if(type == 2){
+			var myUrl = "<c:url value='/download/?uuid='/>"+uuid+"&preferDownload=false";
+			launchPopup(myUrl,"File");
 		}else if(type ==3){
 			var myUrl = "<c:url value='/download/?uuid='/>"+uuid+"&preferDownload=false";
 			launchPopup(myUrl,"Website");
@@ -71,29 +67,18 @@
 	}
 	function deleteItemComplete(){
 		hideBusy(resourceListTargetDiv);
-	
-	}
-	function showBusy(targetDiv){
-		if($(targetDiv+"_Busy") != null){
-			Element.show(targetDiv+"_Busy");
-		}
-	}
-	function hideBusy(targetDiv){
-		if($(targetDiv+"_Busy") != null){
-			Element.hide(targetDiv+"_Busy");
-		}				
 	}
 </script>
 	<!---------------------------Basic Tab Content ------------------------>
 	<table class="forms">
 		<tr>
 			<td class="formlabel"><fmt:message key="label.authoring.basic.title" />:</td>
-			<td NOWRAP width="700"><lams:SetEditor id="Title" text="${authoring.title}" small="true"/></td>
+			<td NOWRAP width="700"><lams:SetEditor id="Resource.title" text="${formBean.resource.title}" small="true"/></td>
 		</tr>
 		<tr>
 			<td class="formlabel"><fmt:message key="label.authoring.basic.instruction" />:</td>
 			<td NOWRAP width="700">
-				<lams:SetEditor id="Instructions" text="${authoring.instruction}"/>
+				<lams:SetEditor id="Resource.instructions" text="${formBean.resource.instructions}"/>
 			</td>
 		</tr>
 		<tr>

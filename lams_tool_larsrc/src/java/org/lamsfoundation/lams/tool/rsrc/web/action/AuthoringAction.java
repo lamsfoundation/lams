@@ -555,7 +555,7 @@ public class AuthoringAction extends Action {
 			log.error("Upload instruction attachment failed:" + e.getMessage());
 		}
 		
-		return mapping.findForward("success");
+		return mapping.findForward(ResourceConstants.SUCCESS);
 
 	}
 	/**
@@ -568,7 +568,7 @@ public class AuthoringAction extends Action {
 	 */
 	public ActionForward deleteOfflineFile(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
-		return deleteFile(request, response,form, IToolContentHandler.TYPE_OFFLINE);
+		return deleteFile(mapping,request, response,form, IToolContentHandler.TYPE_OFFLINE);
 	}
 	/**
 	 * Delete online instruction file from current Resource authoring page.
@@ -580,20 +580,20 @@ public class AuthoringAction extends Action {
 	 */
 	public ActionForward deleteOnlineFile(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
-		return deleteFile(request, response,form, IToolContentHandler.TYPE_ONLINE);
+		return deleteFile(mapping, request, response,form, IToolContentHandler.TYPE_ONLINE);
 	}
 
 	/**
+	 * @param mapping 
 	 * @param request
 	 * @param response
 	 * @param form 
 	 * @param type 
 	 * @return
 	 */
-	private ActionForward deleteFile(HttpServletRequest request, HttpServletResponse response, ActionForm form, String type) {
-		Long contentID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
-		Long versionID = new Long(WebUtil.readLongParam(request,"versionID"));
-		Long uuID = new Long(WebUtil.readLongParam(request,"uuID"));
+	private ActionForward deleteFile(ActionMapping mapping, HttpServletRequest request, HttpServletResponse response, ActionForm form, String type) {
+		Long versionID = new Long(WebUtil.readLongParam(request,ResourceConstants.PARAM_FILE_VERSION_ID));
+		Long uuID = new Long(WebUtil.readLongParam(request,ResourceConstants.PARAM_FILE_UUID));
 		
 		//handle session value
 		List attachmentList = getAttachmentList(request);
@@ -606,6 +606,7 @@ public class AuthoringAction extends Action {
 			if(existAtt.getFileUuid().equals(uuID) && existAtt.getFileVersionId().equals(versionID)){
 				//if there is same name attachment, delete old one
 				deleteAttachmentList.add(existAtt);
+				//remove from attachemnt
 				iter.remove();
 				break;
 			}
@@ -626,46 +627,13 @@ public class AuthoringAction extends Action {
 				break;
 			}
 		}
-		StringBuffer sb = new StringBuffer();
-		iter = leftAttachments.iterator();
-		while(iter.hasNext()){
-//			ResourceAttachment file = (ResourceAttachment) iter.next();
-//			sb.append("<li>").append(file.getFileName()).append("\r\n");
-//			sb.append(" <a href=\"javascript:launchInstructionsPopup('download/?uuid=").append(file.getFileUuid()).append("&preferDownload=false')\">");
-//			sb.append(this.getResources(request).getMessage("label.view"));
-//			sb.append("</a>\r\n");
-//			sb.append(" <a href=\"../download/?uuid=").append(file.getFileUuid()).append("&preferDownload=true\">");
-//			sb.append(this.getResources(request).getMessage("label.download"));
-//			sb.append("</a>\r\n");
-//			sb.append("<a href=\"javascript:loadDoc('");
-//			sb.append(ForumConstants.TOOL_URL_BASE);
-//			sb.append("deletefile.do?method=");
-//			if(StringUtils.equals(type,IToolContentHandler.TYPE_OFFLINE))
-//				sb.append("deleteOffline");
-//			else
-//				sb.append("deleteOnline");
-//			sb.append("File&toolContentID=").append(contentID);
-//			sb.append("&uuID=").append(file.getFileUuid()).append("&versionID=").append(file.getFileVersionId()).append("','");
-//			if(StringUtils.equals(type,IToolContentHandler.TYPE_OFFLINE))
-//				sb.append("offlinefile");
-//			else
-//				sb.append("onlinefile");
-//			sb.append("')\">");
-//			
-//			if(StringUtils.equals(type,IToolContentHandler.TYPE_OFFLINE))
-//				sb.append(this.getResources(request).getMessage("label.authoring.offline.delete"));
-//			else
-//				sb.append(this.getResources(request).getMessage("label.authoring.online.delete"));
-//			sb.append("</a></li>\r\n");
+		if(StringUtils.equals(IToolContentHandler.TYPE_OFFLINE,type)){
+			request.setAttribute("offlineFileList",leftAttachments);
+		}else{
+			request.setAttribute("onlineFileList",leftAttachments);
 		}
-		try {
-			PrintWriter out = response.getWriter();
-			out.print(sb.toString());
-			out.flush();
-		} catch (IOException e) {
-			log.error(e);
-		}
-		return null;
+		return mapping.findForward(ResourceConstants.SUCCESS);
+
 	}
 	//*************************************************************************************
 	// Private method 

@@ -39,6 +39,8 @@ public class ResourceConstants {
 	
 	//for parameters' name
 	public static final String PARAM_TOOL_CONTENT_ID = "toolContentID";
+	public static final String PARAM_FILE_VERSION_ID = "fileVersionId";
+	public static final String PARAM_FILE_UUID = "fileUuid";
 	public static final String PARAM_ITEM_INDEX = "itemIndex";
 	
 	//for request attribute name
