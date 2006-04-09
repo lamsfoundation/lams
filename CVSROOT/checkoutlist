@@ -11,5 +11,6 @@
 #	[<whitespace>]<filename><whitespace><error message><end-of-line>
 #
 # comment lines begin with '#'
-cvs-log.py	cvs-log.py cannot be checked out
+cvs-log.py cvs-log.py cannot be checked out
+cvs-log.pl cvs-log.pl failed to check out
 #log.pl	log.pl failed to check out
