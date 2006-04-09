@@ -25,4 +25,4 @@
 # or
 #DEFAULT (echo ""; id; echo %{sVv}; date; cat) >> $CVSROOT/CVSROOT/commitlog
 #ALL /usr/local/cvsroot/CVSROOT/log.pl -f /usr/local/cvsroot/CVSROOT/commitlog -m lamsdev@melcoe.mq.edu.au %{svV}
-ALL /usr/local/cvsroot/CVSROOT/cvs-log.py -f /usr/local/cvsroot/CVSROOT/commitlog -m lamsdev@melcoe.mq.edu.au %{svV}
+ALL /usr/local/cvsroot/CVSROOT/cvs-log.pl -f /usr/local/cvsroot/CVSROOT/commitlog -m lamsdev@melcoe.mq.edu.au %{svV}
