@@ -105,8 +105,9 @@ public interface IUserManagementService {
 	public void setAuthenticationMethodDAO(IAuthenticationMethodDAO authenticationMethodDao);
 
 	/**
-     * Retrieves a user by userId.  null will be returned 
-     * if no user with the userId is found
+     * Retrieves a user by userId. Null will be returned 
+     * if no user with the userId is found. This method is more
+     * efficient than getUserByLogin() as the value is cached.
      * 
      * @param userId the user's userId
      * @return User
@@ -115,8 +116,9 @@ public interface IUserManagementService {
 
     
 	/**
-     * Retrieves a user by login.  null will be returned 
-     * if no user with the login is found
+     * Retrieves a user by login. Null will be returned 
+     * if no user with the login is found. This method is not as
+     * efficient than getUserById() as it is not cached.
      * 
      * @param login the user's login
      * @return User
@@ -154,12 +156,12 @@ public interface IUserManagementService {
      * Retrieves a userOrganisationRole by ids and name.  null will be returned 
      * if no userOrganisationRole is found
      * 
-     * @param login the user's login
+     * @param userId the id of the user
      * @param organisationId the organisation's id
      * @param roleName the role's name
      * @return UserOrganisationRole
      */
-    public UserOrganisationRole getUserOrganisationRole(String login,Integer organisationId,String roleName);
+    public UserOrganisationRole getUserOrganisationRole(Integer userId,Integer organisationId,String roleName);
 
 	/**
      * Retrieves a userOrganisation by login and id.  null will be returned 
@@ -179,7 +181,7 @@ public interface IUserManagementService {
      * @param roleName role's name
      * @return List of organisations
      */
-    public List getOrganisationsForUserByRole(User user, String roleName);
+    public List<Organisation> getOrganisationsForUserByRole(User user, String roleName);
     
 	/**
      * Retrieves child organisations of the parentOrg 
@@ -215,7 +217,7 @@ public interface IUserManagementService {
      * @param orgId organisation's id
      * @return List of roles
      */
-    public List getRolesForUserByOrganisation(User user, Integer orgId);
+    public List<Role> getRolesForUserByOrganisation(User user, Integer orgId);
 
 	/**
      * Retrieves users from the specified organisation
@@ -223,7 +225,7 @@ public interface IUserManagementService {
      * @param orgId organisation's id
      * @return List of users
      */
-    public List getUsersFromOrganisation(Integer orgId);
+    public List<User> getUsersFromOrganisation(Integer orgId);
     
     /**
      * Retrieves All the AuthenticationMethods 
@@ -234,13 +236,23 @@ public interface IUserManagementService {
 
     /**
      * Retrieves AuthenticationMethod for the user
-     * specified by login
+     * specified by login. 
      * 
      * @param login the user's login
      * @return AuthenticationMethod for this user
      */
     public AuthenticationMethod getAuthenticationMethodForUser(String login);
 
+    /**
+     * Retrieves AuthenticationMethod for the user
+     * specified by login. This implementation is more efficient 
+     * than getAuthenticationMethodForUser(String login).
+     * 
+     * @param User user
+     * @return AuthenticationMethod for this user
+     */
+    public AuthenticationMethod getAuthenticationMethodForUser(User user);
+    
     /**
      * Retrieves AuthenticationMethod 
      * specified by name

@@ -51,6 +51,8 @@ import org.lamsfoundation.lams.usermanagement.dao.IUserOrganisationDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IUserOrganisationRoleDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IWorkspaceDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IWorkspaceFolderDAO;
+import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTO;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 
 /**
@@ -61,7 +63,8 @@ import org.lamsfoundation.lams.util.wddx.FlashMessage;
  * Manually caches the user objects (by user id) in the shared cache.
  * Whenever a user object is modified, the cached version must be 
  * removed. 
- * TODO complete the caching - need to remove the user from the cache on modification.
+ * TODO complete the caching - need to remove the user from the cache on modification
+ * of user/organisation details.
  * 
  * @author Fei Yang, Manpreet Minhas
  */
@@ -93,7 +96,8 @@ public class UserManagementService implements IUserManagementService {
 
 	private FlashMessage flashMessage;
 
-	private String[] userClassParts = null; 
+	private String[] userClassParts = null;
+	
 	/**
 	 * @param workspaceFolderDAO
 	 *            The workspaceFolderDAO to set.
@@ -162,25 +166,46 @@ public class UserManagementService implements IUserManagementService {
 	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getUserById(java.lang.Integer)
 	 */
 	public User getUserById(Integer userId) {
-		if ( this.userClassParts == null ) {
-			this.userClassParts = cacheManager.getPartsFromClass(User.class);
+		if ( userClassParts == null ) { 
+			userClassParts = cacheManager.getPartsFromClass(User.class);
 		}
 
 		User user = (User) cacheManager.getItem(this.userClassParts, userId);
 		if ( user == null ) {
 			user = userDAO.getUserById(userId);
 			if ( user != null ) {
-				cacheManager.addItem(this.userClassParts,userId,user);
+				cacheManager.addItem(userClassParts,user.getUserId(),user);
+				if ( log.isDebugEnabled() ){
+					log.debug("getUserById retrieved user from database "+user.getUserId());
+				}
 			}
-		} 
+		} else if ( log.isDebugEnabled() ){
+			log.debug("getUserById retrieved user from cache "+userId);
+		}
 		return user;
 	}
-	
+
 	/**
 	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getUserByLogin(java.lang.String)
 	 */
 	public User getUserByLogin(String login) {
-		return userDAO.getUserByLogin(login);
+		User user = userDAO.getUserByLogin(login);
+		if ( user != null ) {
+			if ( userClassParts == null ) { 
+				userClassParts = cacheManager.getPartsFromClass(User.class);
+			}
+			cacheManager.addItem(userClassParts,user.getUserId(),user);
+		}
+		return user;
+	}
+
+	/** 
+	 * Clear the user from the cache - presumably the user has been updated. 
+	 */
+	private void clearUserFromCache(User user) {
+		cacheManager.removeItem(this.userClassParts,user.getUserId());
+		cacheManager.removeItem(this.userClassParts,user.getLogin());
+
 	}
 
 	/**
@@ -222,9 +247,8 @@ public class UserManagementService implements IUserManagementService {
 	/**
 	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getUserOrganisationRole(java.lang.String,java.lang.Integer,java.lang.String)
 	 */
-	public UserOrganisationRole getUserOrganisationRole(String login,
-			Integer organisationId, String roleName) {
-		User user = userDAO.getUserByLogin(login);
+	public UserOrganisationRole getUserOrganisationRole(Integer userID, Integer organisationId, String roleName) {
+		User user = this.getUserById(userID);
 		if (user == null)
 			return null;
 		UserOrganisation userOrganisation = userOrganisationDAO
@@ -257,8 +281,14 @@ public class UserManagementService implements IUserManagementService {
 	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getAuthenticationMethodForUser(java.lang.String)
 	 */
 	public AuthenticationMethod getAuthenticationMethodForUser(String login) {
-		return authenticationMethodDAO.getAuthenticationMethodByUser(userDAO
-				.getUserByLogin(login));
+		return authenticationMethodDAO.getAuthenticationMethodByUser(this.getUserByLogin(login));
+	}
+
+	/**
+	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getAuthenticationMethodForUser(org.lamsfoundation.lams.usermanagement.User)
+	 */
+	public AuthenticationMethod getAuthenticationMethodForUser(User user) {
+		return authenticationMethodDAO.getAuthenticationMethodByUser(user);
 	}
 
 	/**
@@ -279,8 +309,8 @@ public class UserManagementService implements IUserManagementService {
 	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getOrganisationsForUserByRole(org.lamsfoundation.lams.usermanagement.User,
 	 *      java.lang.String)
 	 */
-	public List getOrganisationsForUserByRole(User user, String roleName) {
-		List list = new ArrayList();
+	public List<Organisation> getOrganisationsForUserByRole(User user, String roleName) {
+		List<Organisation> list = new ArrayList<Organisation>();
 		Iterator i = userOrganisationDAO.getUserOrganisationsByUser(user)
 				.iterator();
 		while (i.hasNext()) {
@@ -310,8 +340,8 @@ public class UserManagementService implements IUserManagementService {
 	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getRolesForUserByOrganisation(org.lamsfoundation.lams.usermanagement.User,
 	 *      java.lang.Integer)
 	 */
-	public List getRolesForUserByOrganisation(User user, Integer orgId) {
-		List list = new ArrayList();
+	public List<Role> getRolesForUserByOrganisation(User user, Integer orgId) {
+		List<Role> list = new ArrayList<Role>();
 		UserOrganisation userOrg = userOrganisationDAO.getUserOrganisation(user
 				.getUserId(), orgId);
 		if (userOrg == null)
@@ -328,8 +358,8 @@ public class UserManagementService implements IUserManagementService {
 	/**
 	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getUsersFromOrganisation(int)
 	 */
-	public List getUsersFromOrganisation(Integer orgId) {
-		List list = new ArrayList();
+	public List<User> getUsersFromOrganisation(Integer orgId) {
+		List<User> list = new ArrayList<User>();
 		Iterator i = userOrganisationDAO.getUserOrganisationsByOrganisationId(
 				orgId).iterator();
 		while (i.hasNext()) {
@@ -351,6 +381,7 @@ public class UserManagementService implements IUserManagementService {
 	 */
 	public void updateUser(User user) {
 		userDAO.updateUser(user);
+		clearUserFromCache(user);
 	}
 
 	/**
@@ -358,6 +389,7 @@ public class UserManagementService implements IUserManagementService {
 	 */
 	public void saveOrUpdateUser(User user) {
 		userDAO.saveOrUpdateUser(user);
+		clearUserFromCache(user);
 	}
 
 	/**
@@ -468,8 +500,7 @@ public class UserManagementService implements IUserManagementService {
 		Workspace workspace = createWorkspace(user.getLogin());
 		WorkspaceFolder workspaceFolder = createWorkspaceFolder(workspace, user
 				.getUserId(), WorkspaceFolder.NORMAL);
-		WorkspaceFolder runSequencesFolder = createWorkspaceFolder(workspace,
-				user.getUserId(), WorkspaceFolder.RUN_SEQUENCES);
+		createWorkspaceFolder(workspace, user.getUserId(), WorkspaceFolder.RUN_SEQUENCES);
 		workspace.setRootFolder(workspaceFolder);
 		workspaceDAO.update(workspace);
 		user.setWorkspace(workspace);
@@ -530,7 +561,7 @@ public class UserManagementService implements IUserManagementService {
 	public String getWDDXForOrganisationsForUserByRole(Integer userID,
 			String roleName) throws IOException {
 		User user = userDAO.getUserById(userID);
-		Vector organisations = new Vector();
+		Vector<OrganisationDTO> organisations = new Vector<OrganisationDTO>();
 		if (user != null) {
 			Iterator iterator = getOrganisationsForUserByRole(user, roleName)
 					.iterator();
@@ -553,7 +584,7 @@ public class UserManagementService implements IUserManagementService {
 	 */
 	public String getUsersFromOrganisationByRole(Integer organisationID,
 			String roleName) throws IOException {
-		Vector users = new Vector();
+		Vector<UserDTO> users = new Vector<UserDTO>();
 		Organisation organisation = organisationDAO
 				.getOrganisationById(organisationID);
 		if (organisation != null) {
