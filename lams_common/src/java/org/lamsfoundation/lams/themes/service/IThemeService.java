@@ -62,22 +62,6 @@ public interface IThemeService {
 	public MessageService getMessageService();
 	
 	/**
-     * Set IThemeDAO
-     *
-     * @param themeDao
-     */
-	public void setThemeDAO(ICSSThemeDAO themeDao);
-
-	
-	/**
-     * Set IUserDAO
-     *
-     * @param userDao
-     */
-	public void setUserDAO(IUserDAO userDao);
-
-	
-	/**
 	 * Store a theme created on a client.
 	 * @param wddxPacket The WDDX packet received from Flash
 	 * @return String The acknowledgement in WDDX format that the theme has been

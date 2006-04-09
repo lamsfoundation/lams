@@ -28,6 +28,7 @@ import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
@@ -38,8 +39,11 @@ import org.apache.struts.actions.DispatchAction;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.context.WebApplicationContext;
 
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
 import org.lamsfoundation.lams.web.PasswordChangeActionForm;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.HttpSessionManager;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.Organisation;
@@ -72,13 +76,19 @@ public class HomeAction extends DispatchAction {
 	private static UserManagementService service = (UserManagementService) ctx.getBean("userManagementServiceTarget");
 	
 	
-	private boolean isUserInRole(String login,int orgId, String roleName)
+	private boolean isUserInRole(Integer userId,int orgId, String roleName)
 	{
-		if (service.getUserOrganisationRole(login, new Integer(orgId),roleName)==null)
+		if (service.getUserOrganisationRole(userId, new Integer(orgId),roleName)==null)
 			return false;
 		return true;
 	}
 	
+	private UserDTO getUser() {
+		HttpSession ss = SessionManager.getSession();
+		return (UserDTO) ss.getAttribute(AttributeNames.USER);
+	}
+	
+
 	/**
 	 * request for admin environment
 	 */
@@ -88,21 +98,18 @@ public class HomeAction extends DispatchAction {
 
 		try {
 			log.debug("request admin");
-			
-			String login = req.getRemoteUser();
-			
 			int orgId = new Integer(req.getParameter("orgId")).intValue();
-			
-			if ( isUserInRole(login,orgId,Role.ADMIN))
-			{
+			UserDTO user = getUser();
+			if ( user == null ) {
+				log.error("admin: User missing from session. ");
+				return mapping.findForward("error");
+			} else if ( isUserInRole(getUser().getUserID(),orgId,Role.ADMIN)) {
 				log.debug("user is admin");
 				Organisation org = service.getOrganisationById(new Integer(orgId));
 				AdminPreparer.prepare(org,req,service);
 				return mapping.findForward("admin");
-			}
-			else
-			{
-				log.error("User "+login+" tried to get admin screen but isn't admin in organisation: "+orgId);
+			} else {
+				log.error("User "+user.getLogin()+" tried to get admin screen but isn't admin in organisation: "+orgId);
 				return mapping.findForward("error");
 			}
 			
@@ -121,19 +128,16 @@ public class HomeAction extends DispatchAction {
 
 		try {
 			log.debug("request sysadmin");
-			
-			String login = req.getRemoteUser();
-			
 			int orgId = new Integer(req.getParameter("orgId")).intValue();
-			
-			if ( isUserInRole(login,orgId,Role.SYSADMIN))
-			{
+			UserDTO user = getUser();
+			if ( user == null ) {
+				log.error("admin: User missing from session. ");
+				return mapping.findForward("error");
+			} else if ( isUserInRole(user.getUserID(),orgId,Role.SYSADMIN)) {
 				log.debug("user is sysadmin");
 				return mapping.findForward("sysadmin");
-			}
-			else
-			{
-				log.error("User "+login+" tried to get sysadmin screen but isn't sysadmin in organisation: "+orgId);
+			} else {
+				log.error("User "+user.getLogin()+" tried to get sysadmin screen but isn't sysadmin in organisation: "+orgId);
 				return mapping.findForward("error");
 			}
 			
@@ -153,12 +157,12 @@ public class HomeAction extends DispatchAction {
 		try {
 			log.debug("request learner");
 			
-			String login = req.getRemoteUser();
-			
 			int orgId = new Integer(req.getParameter("orgId")).intValue();
-			
-			if ( isUserInRole(login,orgId,Role.LEARNER) )
-			{
+			UserDTO user = getUser();
+			if ( user == null ) {
+				log.error("admin: User missing from session. ");
+				return mapping.findForward("error");
+			} else if ( isUserInRole(user.getUserID(),orgId,Role.LEARNER) ) {
 				log.debug("user is learner");
 			
 				String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
@@ -168,7 +172,7 @@ public class HomeAction extends DispatchAction {
 			}
 			else
 			{
-				log.error("User "+login+" tried to get learner screen but isn't learner in organisation: "+orgId);
+				log.error("User "+user.getLogin()+" tried to get learner screen but isn't learner in organisation: "+orgId);
 				return mapping.findForward("error");
 			}
 			
@@ -188,12 +192,12 @@ public class HomeAction extends DispatchAction {
 
 		try {
 			log.debug("request author");
-			
-			String login = req.getRemoteUser();
-			
 			int orgId = new Integer(req.getParameter("orgId")).intValue();
-			
-			if ( isUserInRole(login,orgId,Role.AUTHOR) )
+			UserDTO user = getUser();
+			if ( user == null ) {
+				log.error("admin: User missing from session. ");
+				return mapping.findForward("error");
+			} else if ( isUserInRole(user.getUserID(),orgId,Role.AUTHOR) )
 			{
 				log.debug("user is author");
 			
@@ -204,7 +208,7 @@ public class HomeAction extends DispatchAction {
 			}
 			else
 			{
-				log.error("User "+login+" tried to get author screen but isn't author in organisation: "+orgId);
+				log.error("User "+user.getLogin()+" tried to get author screen but isn't author in organisation: "+orgId);
 				return mapping.findForward("error");
 			}
 			
@@ -224,12 +228,12 @@ public class HomeAction extends DispatchAction {
 
 			try {
 			log.debug("request staff");
-
-			String login = req.getRemoteUser();
-
 			int orgId = new Integer(req.getParameter("orgId")).intValue();
-
-			if (isUserInRole(login, orgId, Role.STAFF)) {
+			UserDTO user = getUser();
+			if ( user == null ) {
+				log.error("admin: User missing from session. ");
+				return mapping.findForward("error");
+			} else if (isUserInRole(user.getUserID(), orgId, Role.STAFF)) {
 				log.debug("user is staff");
 
 				String serverUrl = Configuration
@@ -238,11 +242,7 @@ public class HomeAction extends DispatchAction {
 				req.setAttribute("serverUrl", serverUrl);
 				return mapping.findForward("staff");
 			} else {
-				log
-						.error("User "
-								+ login
-								+ " tried to get staff screen but isn't staff in organisation: "
-								+ orgId);
+				log.error("User "+ user.getLogin() + " tried to get staff screen but isn't staff in organisation: " + orgId);
 				return mapping.findForward("error");
 			}
 

@@ -34,16 +34,15 @@ import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
 import org.lamsfoundation.lams.themes.dao.ICSSThemeDAO;
 import org.lamsfoundation.lams.themes.dto.CSSThemeBriefDTO;
 import org.lamsfoundation.lams.themes.dto.CSSThemeDTO;
-import org.lamsfoundation.lams.usermanagement.dao.IUserDAO;
+import org.lamsfoundation.lams.themes.exception.ThemeException;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
-import com.allaire.wddx.WddxDeserializationException;
-import org.lamsfoundation.lams.util.MessageService;
 
-import org.lamsfoundation.lams.themes.exception.ThemeException;
+import com.allaire.wddx.WddxDeserializationException;
 
 /**
  * 
@@ -56,8 +55,8 @@ public class ThemeService implements IThemeService {
 	
 	/** Required DAO's */
 	protected ICSSThemeDAO themeDAO;
-	protected IUserDAO userDAO;
 	protected MessageService messageService;
+	protected IUserManagementService userManagementService;
 	
 	/** for sending acknowledgment/error messages back to flash */
 	private FlashMessage flashMessage;
@@ -86,11 +85,12 @@ public class ThemeService implements IThemeService {
 		this.themeDAO = themeDAO;
 	}
 	
-	/**
-	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#setUserDAO(org.lamsfoundation.lams.usermanagement.dao.IUserDAO)
-	 */
-	public void setUserDAO(IUserDAO userDAO) {
-		this.userDAO = userDAO;
+    /**
+     * 
+     * @param IUserManagementService The userManagementService to set.
+     */
+	public void setUserManagementService(IUserManagementService userManagementService) {
+		this.userManagementService = userManagementService;
 	}
 	
 	/**
@@ -178,7 +178,7 @@ public class ThemeService implements IThemeService {
 	 */
 	public String getThemes() throws IOException {
 	    List themes = themeDAO.getAllThemes();
-		ArrayList themeList = new ArrayList();
+		ArrayList<CSSThemeBriefDTO> themeList = new ArrayList<CSSThemeBriefDTO>();
 		Iterator iterator = themes.iterator();
 		while(iterator.hasNext()){
 		    CSSThemeBriefDTO dto = new CSSThemeBriefDTO((CSSThemeVisualElement)iterator.next());
@@ -195,7 +195,7 @@ public class ThemeService implements IThemeService {
 	 * @throws IOException
 	 */
 	private FlashMessage setTheme(Integer userId, Long themeId, String type) throws IOException, ThemeException, UserException {
-		User user = userDAO.getUserById(userId);
+		User user = userManagementService.getUserById(userId);
 		CSSThemeVisualElement theme = themeDAO.getThemeById(themeId);
 		
 		if(theme==null)
@@ -213,7 +213,7 @@ public class ThemeService implements IThemeService {
 			else if(type.equals(IThemeService.HTML_KEY))
 				user.setHtmlTheme(theme);
 			
-			userDAO.updateUser(user);
+			userManagementService.updateUser(user);
 			flashMessage = new FlashMessage("setTheme", messageService.getMessage(IThemeService.SET_THEME_SAVED_MESSAGE_KEY));
 		}
 		
@@ -249,6 +249,6 @@ public class ThemeService implements IThemeService {
 	public FlashMessage setFlashTheme(Integer userId, Long themeId) throws IOException, ThemeException, UserException {
 		return setTheme(userId, themeId, IThemeService.FLASH_KEY);
 	}
-	
+
 	
 }
