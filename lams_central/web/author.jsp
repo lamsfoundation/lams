@@ -234,12 +234,12 @@ function checkSaved(){
   <param name="allowScriptAccess" value="sameDomain" />
 
  <!-- <param name="movie" value="lams_authoring.swf?userID=<lams:user property="userID"/>&serverURL=<%=pathToRoot%>&build=<%=authoringClientVersion%>&lang=<%=serverLanguage%>&date=<%=languageDate%>">-->
-  <param name="movie" value="lams_authoring.swf?userID=<lams:user property="userID"/>&serverURL=<%=pathToRoot%>&build=<%=authoringClientVersion%>&lang=es&date=<%=languageDate%>&theme=<lams:user property="theme"/>">
+  <param name="movie" value="lams_authoring.swf?userID=<lams:user property="userID"/>&serverURL=<%=pathToRoot%>&build=<%=authoringClientVersion%>&lang=es&date=<%=languageDate%>&theme=<lams:user property="flashTheme"/>">
   <param name="quality" value="high">
   <param name="scale" value="noscale">
   <param name="bgcolor" value="#B3B7C8">
   <embed 	
-   	  src="lams_authoring.swf?userID=<lams:user property="userID"/>&serverURL=<%=pathToRoot%>&build=<%=authoringClientVersion%>&lang=es&date=<%=languageDate%>&theme=<lams:user property="theme"/>"
+   	  src="lams_authoring.swf?userID=<lams:user property="userID"/>&serverURL=<%=pathToRoot%>&build=<%=authoringClientVersion%>&lang=es&date=<%=languageDate%>&theme=<lams:user property="flashTheme"/>"
 	  quality="high" 
 	  scale="noscale" 
 	  bgcolor="#B3B7C8"  
