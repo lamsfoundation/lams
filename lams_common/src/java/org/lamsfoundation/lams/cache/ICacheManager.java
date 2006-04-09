@@ -74,4 +74,14 @@ public interface ICacheManager {
 	 */
 	public abstract void addItem(Class clasz, Object key, Object item);
 
+	/** Clear all the nodes in the cache with the given key. 
+	 * Works on nodes starting with /org, /com and /net 
+	 */
+	public abstract void clearCache(String node);
+	
+	/**
+	 * Remove a particular item from the cache. 
+	 */
+	public abstract void removeItem(String[] classNameParts, Object key);
+
 }

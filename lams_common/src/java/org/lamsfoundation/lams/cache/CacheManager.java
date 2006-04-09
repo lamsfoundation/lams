@@ -29,7 +29,6 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import javax.management.MBeanServer;
-import javax.management.MalformedObjectNameException;
 
 import org.apache.log4j.Logger;
 import org.jboss.cache.CacheException;
@@ -124,7 +123,7 @@ public class CacheManager implements ICacheManager {
 	private Object getItem(Fqn fqn, Object key) {
 		TreeCacheMBean cache = getCache();
 		if (cache==null) {
-			log.error("Unable to get item with fqn "+fqn+" key "+key+" as we can't get the JBOSS Cache mbean.");
+			log.warn("Unable to get item with fqn "+fqn+" key "+key+" as we can't get the JBOSS Cache mbean.");
 			return null;
 		}
 		
@@ -161,7 +160,7 @@ public class CacheManager implements ICacheManager {
 	private void addItem(Fqn fqn, Object key, Object item){
 		TreeCacheMBean cache = getCache();
 		if (cache==null) {
-			log.error("Unable to get cache item with fqn "+fqn+" key "+key+" as we can't get the JBOSS Cache mbean.");
+			log.warn("Unable to get cache item with fqn "+fqn+" key "+key+" as we can't get the JBOSS Cache mbean.");
 			return;
 		}
 
@@ -176,7 +175,7 @@ public class CacheManager implements ICacheManager {
 		TreeCacheMBean cache = getCache();
 		Map allChildNames = new TreeMap();
 		if (cache==null) {
-			log.error("Unable to get cache items as we can't get the JBOSS Cache mbean.");
+			log.warn("Unable to get cache items as we can't get the JBOSS Cache mbean.");
 		} else {
 			addChildren("/", cache, allChildNames);
 		}
@@ -205,11 +204,12 @@ public class CacheManager implements ICacheManager {
 		}
 	}
 
-	/** Clear all the nodes in the cache. Works on nodes starting with /org, /com and /net */
+	/** Clear all the nodes in the cache with the given key. 
+	 * Works on nodes starting with /org, /com and /net */
 	public void clearCache(String node) {
 		TreeCacheMBean cache = getCache();
 		if (cache==null) {
-			log.error("Unable to clear cache items as we can't get the JBOSS Cache mbean.");
+			log.warn("Unable to clear cache node "+node+" as we can't get the JBOSS Cache mbean.");
 		} else {
 			try {
 				cache.remove(node);
@@ -218,6 +218,21 @@ public class CacheManager implements ICacheManager {
 			}
 		}
 	}
+	
+	/** Remove a particular item from the cache. */
+	public void removeItem(String[] classNameParts, Object key) {
+		TreeCacheMBean cache = getCache();
+		if (cache==null) {
+			log.warn("Unable to remove cache item "+classNameParts+":"+key+"as we can't get the JBOSS Cache mbean.");
+		} else {
+			try {
+				cache.remove(getFqn(classNameParts), key);
+			} catch (CacheException e) {
+				log.error("JBOSS Cache exception occured getting child names from cache",e);
+			}
+		}
+	}
+
 	/* **** Spring initialisation methods */
 	
 	public String getCacheObjectName() {
