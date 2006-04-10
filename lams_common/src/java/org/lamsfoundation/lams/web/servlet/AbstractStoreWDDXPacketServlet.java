@@ -128,7 +128,7 @@ public abstract class AbstractStoreWDDXPacketServlet extends HttpServlet {
 	 * Checks whether the WDDX packet contains any invalid
 	 * "<null/>". It returns true if there exists any such null
 	 */
-	private boolean containsNulls(String packet)
+	protected boolean containsNulls(String packet)
 	{
 		if (packet.indexOf("<null />") != -1)
 			return true;
@@ -149,7 +149,7 @@ public abstract class AbstractStoreWDDXPacketServlet extends HttpServlet {
 	 * @return
 	 * @throws IOException
 	 */
-  	private String getBody(HttpServletRequest req)
+	protected String getBody(HttpServletRequest req)
   		throws IOException
   	{
   	    int tempContentLength = req.getContentLength();
