@@ -49,7 +49,7 @@ NULL,
 'tool/lasbmt11/exportPortfolio?mode=teacher',
 'tool/lasbmt11/contribute.do',
 'tool/lasbmt11/moderation.do',
-'org.lamsfoundation.lams.tool.sbmt.SbmtResources',
+'org.lamsfoundation.lams.tool.sbmt.ApplicationResources',
 NOW()
 );
 

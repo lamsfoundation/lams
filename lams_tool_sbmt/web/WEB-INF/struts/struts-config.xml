@@ -215,7 +215,7 @@
 
    <!-- Define your Struts controller in a file called struts-controller.xml and place it in your merge directory. -->
 
-  <message-resources parameter="org.lamsfoundation.lams.tool.sbmt.SbmtResources" />
+  <message-resources parameter="org.lamsfoundation.lams.tool.sbmt.ApplicationResources" />
 
     <plug-in className="org.apache.struts.validator.ValidatorPlugIn">
     <set-property property="pathnames"
