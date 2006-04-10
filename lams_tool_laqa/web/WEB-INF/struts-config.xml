@@ -485,7 +485,7 @@
  </action-mappings>
 
   <!-- Define your Struts controller in a file called struts-controller.xml and place it in your merge directory. -->
- <message-resources parameter="org.lamsfoundation.lams.tool.qa.QaResources"/>
+ <message-resources parameter="org.lamsfoundation.lams.tool.qa.ApplicationResources"/>
 
 <!-- StrutsTestCase doesn't support tile well at the moment, Have to be 
 commented out for testing-->

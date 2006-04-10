@@ -4,7 +4,7 @@
 
 	<context-param>
 		<param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
-	  	<param-value>org.lamsfoundation.lams.tool.qa.web.QaResources</param-value>
+	  	<param-value>org.lamsfoundation.lams.tool.qa.web.ApplicationResources</param-value>
 	</context-param>
 	
 	<context-param> 

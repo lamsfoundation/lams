@@ -49,6 +49,6 @@ NULL,
 'tool/laqa11/export.do?mode=teacher',
 'tool/laqa11/monitoringStarter.do',
 'tool/laqa11/monitoringStarter.do',
-'org.lamsfoundation.lams.tool.qa.QaResources',
+'org.lamsfoundation.lams.tool.qa.ApplicationResources',
 NOW()
 )
