@@ -182,7 +182,7 @@ public class ResourceServiceImpl implements
 	public Resource getDefaultContent(Long contentId) throws ResourceApplicationException {
     	if (contentId == null)
     	{
-    	    String error="Could not retrieve default content id for Shared Resource tool";
+    		String error=messageService.getMessage("error.msg.default.content.not.find");
     	    log.error(error);
     	    throw new ResourceApplicationException(error);
     	}
@@ -200,9 +200,9 @@ public class ResourceServiceImpl implements
 	}
 
 
-	public ResourceAttachment uploadInstructionFile(FormFile uploadFile, String fileType) throws ResourceApplicationException {
+	public ResourceAttachment uploadInstructionFile(FormFile uploadFile, String fileType) throws UploadResourceFileException {
 		if(uploadFile == null || StringUtils.isEmpty(uploadFile.getFileName()))
-			throw new ResourceApplicationException("Could not find upload file: " + uploadFile);
+			throw new UploadResourceFileException(messageService.getMessage("error.msg.upload.file.not.found",new Object[]{uploadFile}));
 		
 		//upload file to repository
 		NodeKey nodeKey = processFile(uploadFile,fileType);
@@ -271,7 +271,7 @@ public class ResourceServiceImpl implements
     	Resource defaultResource = getResourceByContentId(defaultResourceId);
     	if(defaultResource == null)
     	{
-    	    String error="Could not retrieve default content record for this tool";
+    	    String error=messageService.getMessage("error.msg.default.content.not.find");
     	    log.error(error);
     	    throw new ResourceApplicationException(error);
     	}
@@ -284,7 +284,7 @@ public class ResourceServiceImpl implements
     	contentId=new Long(toolService.getToolDefaultContentIdBySignature(toolSignature));    
     	if (contentId == null)
     	{
-    	    String error="Could not retrieve default content id for this tool";
+    		String error=messageService.getMessage("error.msg.default.content.not.find");
     	    log.error(error);
     	    throw new ResourceApplicationException(error);
     	}
@@ -300,7 +300,7 @@ public class ResourceServiceImpl implements
      * @throws RepositoryCheckedException
      * @throws InvalidParameterException
      */
-    private NodeKey processFile(FormFile file, String fileType) throws ResourceApplicationException{
+    private NodeKey processFile(FormFile file, String fileType) throws UploadResourceFileException {
     	NodeKey node = null;
         if (file!= null && !StringUtils.isEmpty(file.getFileName())) {
             String fileName = file.getFileName();
@@ -308,36 +308,34 @@ public class ResourceServiceImpl implements
 				node = resourceToolContentHandler.uploadFile(file.getInputStream(), fileName, 
 				        file.getContentType(), fileType);
 			} catch (InvalidParameterException e) {
-				throw new ResourceApplicationException("InvalidParameterException occured while trying to upload File" + e.getMessage());
+				throw new UploadResourceFileException (messageService.getMessage("error.msg.invaid.param.upload"));
 			} catch (FileNotFoundException e) {
-				throw new ResourceApplicationException("FileNotFoundException occured while trying to upload File" + e.getMessage());
+				throw new UploadResourceFileException (messageService.getMessage("error.msg.file.not.found"));
 			} catch (RepositoryCheckedException e) {
-				throw new ResourceApplicationException("RepositoryCheckedException occured while trying to upload File" + e.getMessage());
+				throw new UploadResourceFileException (messageService.getMessage("error.msg.repository"));
 			} catch (IOException e) {
-				throw new ResourceApplicationException("IOException occured while trying to upload File" + e.getMessage());
+				throw new UploadResourceFileException (messageService.getMessage("error.msg.io.exception"));
 			}
           }
         return node;
     }
-	private NodeKey processPackage(String packageDirectory, String initFile) throws ResourceApplicationException {
+	private NodeKey processPackage(String packageDirectory, String initFile) throws UploadResourceFileException {
 		NodeKey node = null;
 		try {
 			node = resourceToolContentHandler.uploadPackage(packageDirectory, initFile);
 		} catch (InvalidParameterException e) {
-			throw new ResourceApplicationException("InvalidParameterException occured while trying to upload Package:" + e.getMessage());
+			throw new UploadResourceFileException (messageService.getMessage("error.msg.invaid.param.upload"));
 		} catch (RepositoryCheckedException e) {
-			throw new ResourceApplicationException("RepositoryCheckedException occured while trying to upload Package:" + e.getMessage());
+			throw new UploadResourceFileException (messageService.getMessage("error.msg.repository"));
 		}
         return node;
 	}
 
-	public void uploadResourceItemFile(ResourceItem item, FormFile file) throws ResourceApplicationException {
+	public void uploadResourceItemFile(ResourceItem item, FormFile file) throws UploadResourceFileException {
 		try {
 			InputStream is = file.getInputStream();
 			String fileName = file.getFileName();
 			String fileType = file.getContentType();
-			item.setFileType(fileType);
-			item.setFileName(fileName);
 			//For file only upload one sigle file
 			if(item.getType() == ResourceConstants.RESOURCE_TYPE_FILE){
 				NodeKey nodeKey = processFile(file,IToolContentHandler.TYPE_ONLINE);
@@ -368,22 +366,23 @@ public class ResourceServiceImpl implements
 				item.setFileVersionId(nodeKey.getVersion());
 			}
 			// create the package from the directory contents  
-		
+			item.setFileType(fileType);
+			item.setFileName(fileName);
 		} catch (ZipFileUtilException e) {
-			log.error("ZipFileUtilException occurs when Uploading Resource Item :" + e.toString());
-			throw new ResourceApplicationException(e);
+			log.error(messageService.getMessage("error.msg.zip.file.exception") + " : " + e.toString());
+			throw new UploadResourceFileException(messageService.getMessage("error.msg.zip.file.exception"));
 		} catch (FileNotFoundException e) {
-			log.error("FileNotFoundException occurs when Uploading Resource Item:" + e.toString());
-			throw new ResourceApplicationException(e);
+			log.error(messageService.getMessage("error.msg.file.not.found")+":" + e.toString());
+			throw new UploadResourceFileException(messageService.getMessage("error.msg.file.not.found"));
 		} catch (IOException e) {
-			log.error("IOException occurs when Uploading Resource Item:" + e.toString());
-			throw new ResourceApplicationException(e);
+			log.error(messageService.getMessage("error.msg.io.exception")+ ":" + e.toString());
+			throw new UploadResourceFileException(messageService.getMessage("error.msg.io.exception"));
 		} catch (IMSManifestException e) {
-			log.error("IMSManifestException occurs when Uploading Resource Item:" + e.toString());
-			throw new ResourceApplicationException(e);
+			log.error(messageService.getMessage("error.msg.ims.package")+":" + e.toString());
+			throw new UploadResourceFileException(messageService.getMessage("error.msg.ims.package"));
 		} catch (ImscpApplicationException e) {
-			log.error("ImscpApplicationException occurs when Uploading Resource Item:" + e.toString());
-			throw new ResourceApplicationException(e);
+			log.error( messageService.getMessage("error.msg.ims.application")+":" + e.toString());
+			throw new UploadResourceFileException(messageService.getMessage("error.msg.ims.application"));
 		}
 	}
 

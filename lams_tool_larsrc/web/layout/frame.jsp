@@ -17,7 +17,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   USA
 
   http://www.gnu.org/licenses/gpl.txt 
--->
+--%>
 <%@ include file="/common/taglibs.jsp" %>
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>

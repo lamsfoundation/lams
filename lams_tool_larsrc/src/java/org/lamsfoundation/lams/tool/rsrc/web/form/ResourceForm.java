@@ -90,6 +90,20 @@ public class ResourceForm extends ValidatorForm {
         	logger.error("Initial ResourceForum failed by null value of Resource.");
         }
 	}
+    public void reset(ActionMapping mapping, HttpServletRequest request){
+    	String param = mapping.getParameter();
+    	//if it is start page, all data read out from database or current session
+    	//so need not reset checkbox to refresh value!
+    	if(!StringUtils.equals(param,"start") && !StringUtils.equals(param,"initPage")){
+	    	resource.setAllowAddFiles(false);
+	    	resource.setAllowAddUrls(false);
+	    	resource.setLockWhenFinished(false);
+	    	resource.setDefineLater(false);
+	    	resource.setRunAuto(false);
+	    	resource.setRunOffline(false);
+    	}
+    }
+
 	public int getCurrentTab() {
 		return currentTab;
 	}

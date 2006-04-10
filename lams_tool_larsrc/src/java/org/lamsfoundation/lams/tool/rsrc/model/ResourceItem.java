@@ -135,7 +135,7 @@ public class ResourceItem {
 			this.initialItem = initialItem;
 		}
 		/**
-	     * @hibernate.set   lazy="true"
+	     * @hibernate.set   lazy="false"
 	     * 					cascade="all-delete-orphan"
 	     * 					inverse="false"
 	     * 					order-by="sequence_id desc"

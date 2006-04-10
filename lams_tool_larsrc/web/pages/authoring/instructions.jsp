@@ -116,5 +116,4 @@
 				</html:button>
 			</td>
 		</tr>			
-		<tr><td colspan="2"><html:errors/></td></tr>
 		</table>

@@ -17,7 +17,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   USA
 
   http://www.gnu.org/licenses/gpl.txt 
--->
+--%>
 <%@ include file="/common/taglibs.jsp" %>
 
 <table bgcolor="#9DC5EC" width="100%" border="0" cellspacing="0" cellpadding="0" align="center" summary="This table is being used for layout purposes only">

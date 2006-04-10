@@ -38,6 +38,7 @@ public class ResourceItemForm extends ActionForm {
 	private short itemType;
 	private String description;
 	private String url;
+	//flag of this item has attachment or not
 	private boolean hasFile;
 	private Long fileUuid;
 	private Long fileVersionId;

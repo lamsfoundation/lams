@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<%-- 
+<!-- 
 Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
 License Information: http://lamsfoundation.org/licensing/lams/2.0/
 

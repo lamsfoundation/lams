@@ -48,9 +48,9 @@ public interface IResourceService
 
 	List getAuthoredItems(Long resourceUid);
 
-	ResourceAttachment uploadInstructionFile(FormFile file, String type) throws ResourceApplicationException;
+	ResourceAttachment uploadInstructionFile(FormFile file, String type) throws UploadResourceFileException;
 
-	void uploadResourceItemFile(ResourceItem item, FormFile file) throws ResourceApplicationException;
+	void uploadResourceItemFile(ResourceItem item, FormFile file) throws UploadResourceFileException;
 
 	//********** for user methods *************
 	void createUser(ResourceUser resourceUser);

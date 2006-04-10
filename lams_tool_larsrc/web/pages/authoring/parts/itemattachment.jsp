@@ -1,5 +1,6 @@
 <%@ include file="/common/taglibs.jsp" %>
 <c:set var="ctxPath" value="${pageContext.request.contextPath}" scope="request"/>
+<input type="hidden" name="hasFile" value="${itemAttachment.hasFile}"/>
 <c:choose>
 	<c:when test="${itemAttachment.hasFile}">
 		<table border="0">

@@ -64,6 +64,7 @@ import org.lamsfoundation.lams.tool.rsrc.model.ResourceItemInstruction;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
 import org.lamsfoundation.lams.tool.rsrc.service.IResourceService;
 import org.lamsfoundation.lams.tool.rsrc.service.ResourceApplicationException;
+import org.lamsfoundation.lams.tool.rsrc.service.UploadResourceFileException;
 import org.lamsfoundation.lams.tool.rsrc.web.form.ResourceForm;
 import org.lamsfoundation.lams.tool.rsrc.web.form.ResourceItemForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -216,7 +217,7 @@ public class AuthoringAction extends Action {
 		
 		ResourceItemForm itemForm = (ResourceItemForm)form;
 		ActionErrors errors = validateResourceItem(itemForm);
-			
+		
 		if(!errors.isEmpty()){
 			this.addErrors(request,errors);
 			request.setAttribute(ResourceConstants.ATTR_INSTRUCTION_LIST,instructionList);
@@ -225,9 +226,14 @@ public class AuthoringAction extends Action {
 		
 		try {
 			extractFormToResourceItem(request, instructionList, itemForm);
-		} catch (ResourceApplicationException e) {
+		} catch (UploadResourceFileException e) {
 			log.error("Uploading failed. The exception is " + e.toString());
-			throw new ServletException(e);
+			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(ResourceConstants.ERROR_MSG_UPLOAD_FAILED,e.getMessage()));
+			if(!errors.isEmpty()){
+				this.addErrors(request,errors);
+				request.setAttribute(ResourceConstants.ATTR_INSTRUCTION_LIST,instructionList);
+				return findForward(itemForm.getItemType(),mapping);
+			}
 		}
 		
 		//return null to close this window
@@ -456,6 +462,8 @@ public class AuthoringAction extends Action {
 			//initialize attachmentList again
 			attachmentList = getAttachmentList(request);
 			attachmentList.addAll(resource.getAttachments());
+			resourceForm.setResource(resourcePO);
+			
 		} catch (Exception e) {
 			log.error(e);
 		}
@@ -513,6 +521,7 @@ public class AuthoringAction extends Action {
 		else
 			file = (FormFile) resourceForm.getOnlineFile();
 		
+		ActionErrors errors = new ActionErrors();
 		try {
 			IResourceService service = getResourceService();
 			//upload to repository
@@ -551,9 +560,13 @@ public class AuthoringAction extends Action {
 				}
 			}
 			list.add(att);
-		} catch (ResourceApplicationException e) {
+		} catch (UploadResourceFileException e) {
 			log.error("Upload instruction attachment failed:" + e.getMessage());
+			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(ResourceConstants.ERROR_MSG_UPLOAD_FAILED,e.getMessage()));
 		}
+		
+		if(!errors.isEmpty())
+			this.addErrors(request,errors);
 		
 		return mapping.findForward(ResourceConstants.SUCCESS);
 
@@ -794,7 +807,7 @@ public class AuthoringAction extends Action {
 	 * @throws ResourceApplicationException 
 	 */
 	private void extractFormToResourceItem(HttpServletRequest request, List<String> instructionList, ResourceItemForm itemForm) 
-		throws ResourceApplicationException {
+		throws UploadResourceFileException {
 		/* BE CAREFUL: This method will copy nessary info from request form to a old or new ResourceItem instance.
 		 * It gets all info EXCEPT ResourceItem.createDate and ResourceItem.createBy, which need be set when persisting 
 		 * this resource item.
@@ -811,7 +824,51 @@ public class AuthoringAction extends Action {
 		}else //edit
 			item = (ResourceItem) resourceList.get(itemIdx);
 		
+		short type = itemForm.getItemType();	
 		item.setType(itemForm.getItemType());
+		/* Set following fields regards to the type:
+	    item.setFileUuid();
+		item.setFileVersionId();
+		item.setFileType();
+		item.setFileName();
+		
+		item.getInitialItem()
+		item.setImsSchema()
+		item.setOrganizationXml()
+		 */
+		//if the item is edit (not new add) then the getFile may return null
+		//it may throw exception, so put it as first, to avoid other invlidate update: 
+		if(itemForm.getFile() != null){
+			if(type == ResourceConstants.RESOURCE_TYPE_WEBSITE 
+					||type == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT
+					||type == ResourceConstants.RESOURCE_TYPE_FILE){
+				//if it has old file, and upload a new, then save old to deleteList
+				ResourceItem delAttItem = new ResourceItem();
+				boolean hasOld = false;
+				if(item.getFileUuid() != null){
+					hasOld = true;
+					//be careful, This new ResourceItem object never be save into database
+					//just temporarily use for saving fileUuid and versionID use:
+					delAttItem.setFileUuid(item.getFileUuid());
+					delAttItem.setFileVersionId(item.getFileVersionId());
+				}
+				IResourceService service = getResourceService();
+				try {
+					service.uploadResourceItemFile(item, itemForm.getFile());
+				} catch (UploadResourceFileException e) {
+					//if it is new add , then remove it!
+					if(itemIdx == -1){ 
+						resourceList.remove(item);
+					}
+					throw e;
+				}
+				//put it after "upload" to ensure deleted file added into list only no exception happens during upload 
+				if(hasOld){
+					List delAtt = getDeletedItemAttachmentList(request);
+					delAtt.add(delAttItem);
+				}
+			}
+		}
 		item.setTitle(itemForm.getTitle());
 		item.setCreateByAuthor(true);
 		item.setHide(false);
@@ -825,8 +882,7 @@ public class AuthoringAction extends Action {
 			instructions.add(rii);
 		}
 		item.setItemInstructions(instructions);
-		
-		short type = itemForm.getItemType();
+
 		if(type == ResourceConstants.RESOURCE_TYPE_URL){
 			item.setUrl(itemForm.getUrl());
 		}
@@ -834,35 +890,7 @@ public class AuthoringAction extends Action {
 				||itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT){
 			item.setDescription(itemForm.getDescription());
 		}
-		/* Set following fields regards to the type:
-		    item.setFileUuid();
-			item.setFileVersionId();
-			item.setFileType();
-			item.setFileName();
-			
-			item.getInitialItem()
-			item.setImsSchema()
-			item.setOrganizationXml()
-		 */
-		//if the item is edit (not new add) then the getFile may return null
-		if(itemForm.getFile() != null){
-			if(type == ResourceConstants.RESOURCE_TYPE_WEBSITE 
-					||type == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT
-					||type == ResourceConstants.RESOURCE_TYPE_FILE){
-				//if it has old file, and upload a new, then save old to deleteList
-				if(item.getFileUuid() != null){
-					List delAtt = getDeletedItemAttachmentList(request);
-					//be careful, This new ResourceItem object never be save into database
-					//just temporarily use for saving fileUuid and versionID use:
-					ResourceItem delAttItem = new ResourceItem();
-					delAttItem.setFileUuid(item.getFileUuid());
-					delAttItem.setFileVersionId(item.getFileVersionId());
-					delAtt.add(delAttItem);
-				}
-				IResourceService service = getResourceService();
-				service.uploadResourceItemFile(item, itemForm.getFile());
-			}
-		}		
+		
 	}
 
 	/**
@@ -890,7 +918,9 @@ public class AuthoringAction extends Action {
 		if(itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_WEBSITE 
 				||itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT
 				||itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_FILE){
-			if(itemForm.getFile() == null || StringUtils.isEmpty(itemForm.getFile().getFileName()))
+			//for edit validate: file already exist
+			if(!itemForm.isHasFile() &&
+				(itemForm.getFile() == null || StringUtils.isEmpty(itemForm.getFile().getFileName())))
 				errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(ResourceConstants.ERROR_MSG_FILE_BLANK));
 		}
 		return errors;
