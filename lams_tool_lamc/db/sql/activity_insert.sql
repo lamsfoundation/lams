@@ -76,5 +76,5 @@ NULL
 , NULL
 , NULL
 , NULL
-,'org.lamsfoundation.lams.tool.mc.McResources'
+,'org.lamsfoundation.lams.tool.mc.ApplicationResources'
 )

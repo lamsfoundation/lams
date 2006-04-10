@@ -49,6 +49,6 @@ NULL,
 'tool/lamc11/portfolioExport?mode=teacher',
 'tool/lamc11/monitoringStarter.do',
 'tool/lamc11/monitoringStarter.do',
-'org.lamsfoundation.lams.tool.mc.McResources',
+'org.lamsfoundation.lams.tool.mc.ApplicationResources',
 NOW()
 )
