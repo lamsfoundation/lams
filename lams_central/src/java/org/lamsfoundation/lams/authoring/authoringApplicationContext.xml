@@ -13,7 +13,7 @@
 		<property name="messageSource">
 			<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
 				<property name="basename">
-					<value>org.lamsfoundation.lams.central.applicationResources</value>
+					<value>org.lamsfoundation.lams.central.ApplicationResources</value>
 				</property>
 			</bean>
 		</property>

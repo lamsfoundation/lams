@@ -216,7 +216,7 @@
 
    <!-- Define your Struts controller in a file called struts-controller.xml and place it in your merge directory. -->
 
-      <message-resources parameter="org.lamsfoundation.lams.admin.applicationResources"/>
+      <message-resources parameter="org.lamsfoundation.lams.admin.ApplicationResources"/>
 
 <plug-in className="org.apache.struts.tiles.TilesPlugin">
 	<set-property property="definitions-config"

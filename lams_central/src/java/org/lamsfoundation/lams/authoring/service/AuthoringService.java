@@ -559,16 +559,17 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 							+" message file "+activity.getLanguageFile()+". Activity Message source not available");
 				}
 
-				// update the tool field
-				languageFilename = activity.getToolLanguageFile();
-				toolMessageSource = toolActMessageService.getMessageService(languageFilename);
-				if ( toolMessageSource != null ) {
-					activity.setToolDisplayName(toolMessageSource.getMessage(Tool.I18N_DISPLAY_NAME,null,activity.getToolDisplayName(),locale));
-				} else {
-					log.warn("Unable to internationalise the library activity "+activity.getActivityID()+" "+activity.getTitle()
+				// update the tool field - note only tool activities have a tool entry.
+				if ( activity.getActivityTypeID()!=null && Activity.TOOL_ACTIVITY_TYPE == activity.getActivityTypeID().intValue() ) {
+					languageFilename = activity.getToolLanguageFile();
+					toolMessageSource = toolActMessageService.getMessageService(languageFilename);
+					if ( toolMessageSource != null ) {
+						activity.setToolDisplayName(toolMessageSource.getMessage(Tool.I18N_DISPLAY_NAME,null,activity.getToolDisplayName(),locale));
+					} else {
+						log.warn("Unable to internationalise the library activity "+activity.getActivityID()+" "+activity.getTitle()
 							+" message file "+activity.getLanguageFile()+". Tool Message source not available");
+					}
 				}
-				
 			} else {
 				log.warn("Unable to internationalise the library activity "+activity.getActivityID()+" "+activity.getTitle()
 						+". No message file supplied.");

@@ -1,2 +1,2 @@
 
-<message-resources parameter="org.lamsfoundation.lams.learning.LearningResources" />
+<message-resources parameter="org.lamsfoundation.lams.learning.ApplicationResources" />
