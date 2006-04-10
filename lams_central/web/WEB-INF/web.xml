@@ -82,6 +82,11 @@
 
    </servlet>
    <servlet>
+      <servlet-name>deserialise</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.web.development.DisplayDeserialisedPacketServlet</servlet-class>
+
+   </servlet>
+   <servlet>
       <servlet-name>storeLD</servlet-name>
       <servlet-class>org.lamsfoundation.lams.authoring.web.StoreLDServlet</servlet-class>
 
@@ -199,6 +204,10 @@
    <servlet-mapping>
       <servlet-name>flashCrashDump</servlet-name>
       <url-pattern>/flashCrashDump</url-pattern>
+   </servlet-mapping>
+   <servlet-mapping>
+      <servlet-name>deserialise</servlet-name>
+      <url-pattern>/deserialise</url-pattern>
    </servlet-mapping>
    <servlet-mapping>
       <servlet-name>storeLD</servlet-name>
