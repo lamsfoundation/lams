@@ -357,7 +357,7 @@
 			            <token key="assemblylangdir" value="${assembly.activity}/language"/>
 			        </replacetokens>
 		            <replacetokens>
-			             <token key="lamsear" value="${jboss.ear.deploy}"/>
+			             <token key="lamsear" value="${jboss.deploy}"/>
 			        </replacetokens>
 		        </filterchain>
 		    </copy>
