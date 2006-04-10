@@ -28,11 +28,15 @@ import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
+import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
@@ -46,28 +50,36 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  */
 public class AdminPreparer {
 
+	private static Logger log = Logger.getLogger(AdminPreparer.class);
+
 	public static void prepare(Organisation org, HttpServletRequest request, UserManagementService service){
 		UserOrganisationRole userOrgRole = null;
-		if(org.getParentOrganisation()!=null){
-			userOrgRole = service.getUserOrganisationRole(request.getRemoteUser(),org.getParentOrganisation().getOrganisationId(),Role.ADMIN);	
-		}
-		List childOrgs = service.getChildOrganisations(org);
-		for(int i=0; i<childOrgs.size();i++){
-			Organisation childOrg = (Organisation)childOrgs.get(i);
-			if(service.getUserOrganisationRole(request.getRemoteUser(),childOrg.getOrganisationId(),Role.ADMIN)==null){
-				childOrgs.remove(i);
+		HttpSession ss = SessionManager.getSession();
+		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+		if ( user == null ) {
+			log.error("Unable to prepare for admin as user is not in the shared session");
+		} else {
+			if(org.getParentOrganisation()!=null){
+				userOrgRole = service.getUserOrganisationRole(user.getUserID(),org.getParentOrganisation().getOrganisationId(),Role.ADMIN);	
 			}
-		}
-		if(childOrgs.size()!=0){
-			Set childOrganisations = new HashSet();
-			childOrganisations.addAll(childOrgs);
-			org.setChildOrganisations(childOrganisations);
-		}else{
-			org.setChildOrganisations(null);
-		}
-		request.setAttribute(AttributeNames.ADMIN_ORGANISATION,org);
-		if(userOrgRole!=null){
-			request.setAttribute(AttributeNames.ADMIN_PARENT_ACCESS,"true");
+			List childOrgs = service.getChildOrganisations(org);
+			for(int i=0; i<childOrgs.size();i++){
+				Organisation childOrg = (Organisation)childOrgs.get(i);
+				if(service.getUserOrganisationRole(user.getUserID(),childOrg.getOrganisationId(),Role.ADMIN)==null){
+					childOrgs.remove(i);
+				}
+			}
+			if(childOrgs.size()!=0){
+				Set childOrganisations = new HashSet();
+				childOrganisations.addAll(childOrgs);
+				org.setChildOrganisations(childOrganisations);
+			}else{
+				org.setChildOrganisations(null);
+			}
+			request.setAttribute(AttributeNames.ADMIN_ORGANISATION,org);
+			if(userOrgRole!=null){
+				request.setAttribute(AttributeNames.ADMIN_PARENT_ACCESS,"true");
+			}
 		}
 	}
 }
