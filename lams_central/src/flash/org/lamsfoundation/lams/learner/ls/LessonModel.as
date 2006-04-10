@@ -1,4 +1,28 @@
-﻿import org.lamsfoundation.lams.learner.ls.*;
+﻿/***************************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2.0 
+ * as published by the Free Software Foundation.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ * 
+ * http://www.gnu.org/licenses/gpl.txt
+ * ************************************************************************
+ */
+
+import org.lamsfoundation.lams.common.util.Observable;
+import org.lamsfoundation.lams.learner.ls.*;
 import org.lamsfoundation.lams.common.util.*;
 
 
@@ -34,6 +58,15 @@ class LessonModel extends Observable {
 		_lesson = lesson;
 		_active = false;
 	}
+	
+	public function populateFromDTO(dto:Object){
+		trace('populating lesson object for lesson:' + dto.lessonName);
+		_lessonID = dto.lessonID;
+		_lessonName = dto.lessonName;
+		_lessonDescription = dto.lessonDescription;
+		_lessonStateID = dto.lessonStateID;
+	}
+	
 	
 	/**
 	 * Set Lesson's unique ID
@@ -125,6 +158,7 @@ class LessonModel extends Observable {
 	
 	public function setActive() {
 		_active = true;
+		trace('setting lesson active...');
 		
 		setChanged();
 		
@@ -136,6 +170,7 @@ class LessonModel extends Observable {
 	
 	public function setInactive() {
 		_active = false;
+		trace('setting lesson inactive...');
 		
 		setChanged();
 		

@@ -1,4 +1,27 @@
-﻿import org.lamsfoundation.lams.learner.*;
+﻿/***************************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2.0 
+ * as published by the Free Software Foundation.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ * 
+ * http://www.gnu.org/licenses/gpl.txt
+ * ************************************************************************
+ */
+
+import org.lamsfoundation.lams.learner.*;
 import org.lamsfoundation.lams.learner.ls.*;
 import org.lamsfoundation.lams.learner.lb.*;
 import org.lamsfoundation.lams.common.util.*;
@@ -31,13 +54,11 @@ class Lesson {
 	*
 	* @param   target_mc	Target clip for attaching view
 	*/
-	function Lesson(target_mc:MovieClip,x:Number,y:Number,lessonID:Number, libraryView:LibraryView){
+	function Lesson(target_mc:MovieClip,x:Number,y:Number,libraryView:LibraryView){
 		mx.events.EventDispatcher.initialize(this);
         
 		//Create the model
 		lessonModel = new LessonModel(this);
-		lessonModel.setLessonID(lessonID);
-		
 		//Create the view
 		lessonView_mc = target_mc.createChildAtDepth("lessonView",DepthManager.kTop);	
 		
@@ -62,6 +83,9 @@ class Lesson {
 		dispatchEvent({type:'init',target:this});		
 	}
  
+	public function populateFromDTO(dto:Object){
+		lessonModel.populateFromDTO(dto);
+	}
 	
 	private function viewLoaded(evt:Object){
         Debugger.log('viewLoaded called',Debugger.GEN,'viewLoaded','Lesson');
@@ -81,10 +105,10 @@ class Lesson {
 		
 		// call action
 		var lessonId:Number = lessonModel.getLessonID();
-		var userId:Number = Application.getInstance().getUserID();
+		//var userId:Number = Application.getInstance().getUserID();
 		
 		// do request
-		Application.getInstance().getComms().getRequest('learning/learner.do?method=joinLession&userId='+String(userId)+'&lessonId='+String(lessonId), callback, false);
+		Application.getInstance().getComms().getRequest('learning/learner.do?method=joinLesson&userID='+_root.userID+'&lessonID='+String(lessonId), callback, false);
 			
 		return true;
 	}
@@ -96,23 +120,25 @@ class Lesson {
 		var lessonId:Number = lessonModel.getLessonID();
 		
 		// do request
-		Application.getInstance().getComms().getRequest('learning/learner.do?method=exitLession&lessonId='+String(lessonId), callback, false);
+		Application.getInstance().getComms().getRequest('learning/learner.do?method=exitLesson&lessonID='+String(lessonId), callback, false);
 		
 		return true;
 	}
 	
 	private function startLesson(pkt:Object){
-		trace('received message back from server...');
+		trace('received message back from server aftering joining lesson...');
+		
+		// check was successful join
 		
 		// set lesson as active
-		//_lessonModel.setActive();
+		lessonModel.setActive();
 	}  
 	
 	private function closeLesson(pkt:Object){
 		trace('receiving message back from server...');
 		
 		// set lesson as inactive
-		//_lessonModel.setInactive();
+		lessonModel.setInactive();
 	}
 	
 	public function getLessonID():Number {

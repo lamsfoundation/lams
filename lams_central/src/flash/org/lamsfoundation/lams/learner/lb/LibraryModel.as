@@ -1,5 +1,29 @@
-﻿import org.lamsfoundation.lams.learner.lb.*;
+﻿/***************************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2.0 
+ * as published by the Free Software Foundation.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ * 
+ * http://www.gnu.org/licenses/gpl.txt
+ * ************************************************************************
+ */
+
+import org.lamsfoundation.lams.learner.lb.*;
 import org.lamsfoundation.lams.learner.ls.Lesson;
+import org.lamsfoundation.lams.common.util.Observable;
 import org.lamsfoundation.lams.common.util.*;
 import org.lamsfoundation.lams.learner.Application;
 
@@ -41,12 +65,13 @@ class LibraryModel extends Observable {
 	}
 	
 	public function setLearningSequences(lsc:Array):Boolean {
-		
+		trace('add learning seqs to map...');
 		//clear the old lot
 		_learningSequences.clear();
 		
 		for(var i=0; i<lsc.length;i++){
-			_learningSequences.put(lsc[i].lessonID,lsc[i]);
+			trace('adding learning seq ' + lsc[i].getLessonID());
+			_learningSequences.put(lsc[i].getLessonID(),lsc[i]);
 		}
 		
 		Debugger.log('Added '+lsc.length+' Sequences to _learningSequences',4,'setLearningSequences','LibraryModel');

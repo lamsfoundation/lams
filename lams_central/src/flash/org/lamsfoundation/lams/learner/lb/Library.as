@@ -1,5 +1,29 @@
-﻿import org.lamsfoundation.lams.learner.Application;
+﻿/***************************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2.0 
+ * as published by the Free Software Foundation.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ * 
+ * http://www.gnu.org/licenses/gpl.txt
+ * ************************************************************************
+ */
+
+import org.lamsfoundation.lams.learner.Application;
 import org.lamsfoundation.lams.learner.lb.*;
+import org.lamsfoundation.lams.learner.ls.Lesson;
 import org.lamsfoundation.lams.common.util.*; 
 import mx.managers.*;
 /**
@@ -15,6 +39,11 @@ class Library {
 	
 	private var _className:String = "Library";
 	
+	public static var LESSON_X:Number = 0;
+	public static var LESSON_Y:Number = 0;
+	public static var LESSON_H:Number = 22;
+	public static var LESSON_W:Number = 123;
+	
 	private var dispatchEvent:Function;       
     public var addEventListener:Function;  
     public var removeEventListener:Function;
@@ -25,13 +54,16 @@ class Library {
 	* @param   target_mc	Target clip for attaching view
 	*/
 	function Library(target_mc:MovieClip,x:Number,y:Number){
+		trace('[new Library]');
+		
 		mx.events.EventDispatcher.initialize(this);
-        
+		
 		//Create the model
 		libraryModel = new LibraryModel(this);
 		
 		//Create the view
 		libraryView_mc = target_mc.createChildAtDepth("libraryView",DepthManager.kTop);	
+		trace(libraryView_mc);
 		
 		libraryView = LibraryView(libraryView_mc);
 		libraryView.init(libraryModel,undefined);
@@ -43,6 +75,8 @@ class Library {
 
         //Set the position by setting the model which will call update on the view
         libraryModel.setPosition(x,y);
+		
+		
 		
 	}
 	
@@ -58,27 +92,47 @@ class Library {
         Debugger.log('viewLoaded called',Debugger.GEN,'viewLoaded','Library');
 		
 		if(evt.type=='load') {
-            dispatchEvent({type:'load',target:this});
+            getActiveLessons();
         }else {
             //Raise error for unrecognized event
         }
     }
 	
 	public function getActiveLessons():Void {
-		Debugger.log('Running',Debugger.GEN,'getActiveLessons','Library');
+		trace('getting active lessons...');
 		
-		var callback:Function = Proxy.create(this, getLessonList);
+		var callback:Function = Proxy.create(this,setActiveLessons);
 		// do request
-		Application.getInstance().getComms().getRequest('learning/learner.do?method=getActiveLessons', callback, false);
+		Application.getInstance().getComms().getRequest('learning/learner.do?method=getActiveLessons&userID='+_root.userID, callback, false);
 	
 		
 	}
 	
-	private function getLessonList(Data:Object):Void {
+	private function setActiveLessons(lessons:Array):Void {
 		trace('received active lesson data back...');
 		// get data and create Lesson obj's
 		
-		// go through list of DTO's and add to hash map
+		Debugger.log('Recieved active sequences (lessons) array length:'+lessons.length,4,'setToolkitActivities','Toolkit');
+		
+		var lns = new Array();
+		
+		// go through list of DTO's and make Lesson objects to add to hash map
+		for(var i=0; i< lessons.length; i++){
+			var ln:Object = lessons[i];
+			
+			
+			
+			var lesson:Lesson = new Lesson(libraryView_mc, LESSON_X, LESSON_Y+(LESSON_H*i), libraryView);
+			lesson.populateFromDTO(ln);
+			trace('pushing lesson with id: ' + lesson.getLessonID());
+			lns.push(lesson);
+		}
+			
+		//sets these in the toolkit model in a hashtable by lib id
+		libraryModel.setLearningSequences(lns);	
+		
+		dispatchEvent({type:'load',target:this});
+		
 	}
 	
 	/**
@@ -96,6 +150,9 @@ class Library {
         libraryModel.setPosition(x,y);
     }
 	
+	public function getLesson(lessonId:Number):Lesson {
+		return libraryModel.getLesson(lessonId);
+	}
 
 	//Dimension accessor methods
 	public function get width():Number{

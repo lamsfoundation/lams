@@ -1,4 +1,27 @@
-﻿import org.lamsfoundation.lams.learner.*;
+﻿/***************************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2.0 
+ * as published by the Free Software Foundation.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ * 
+ * http://www.gnu.org/licenses/gpl.txt
+ * ************************************************************************
+ */
+
+import org.lamsfoundation.lams.learner.*;
 import org.lamsfoundation.lams.learner.ls.*;
 import org.lamsfoundation.lams.learner.lb.*;
 
@@ -75,6 +98,7 @@ class LessonView extends AbstractView {
         var controller = getController();
 		
 		_lesson_mc.join_btn.addEventListener("click",controller);
+		
 		join_btn.onPress = Proxy.create(this,this['select']);
 		join_btn.onRollOver = Proxy.create(this,this['rollOver']);
 		join_btn.onRollOut = Proxy.create(this,this['rollOut']);
@@ -94,7 +118,7 @@ class LessonView extends AbstractView {
 	public function update (o:Observable,infoObj:Object):Void {
 	    //Cast the generic observable object into the Toolbar model.
         var lm:LessonModel = LessonModel(o);
-		
+		trace('getting lesson update...');
         //Update view from info object
         switch (infoObj.updateType) {
             case 'POSITION' :
@@ -122,7 +146,7 @@ class LessonView extends AbstractView {
     
 	
 	 /**
-    * Sets the size of the Toolbar on stage, called from update
+    * Sets the size of the Lesson on stage, called from update
     */
 	private function setSize(lm:LessonModel):Void{
 		
@@ -160,7 +184,7 @@ class LessonView extends AbstractView {
 	
 	private function setStatus(lm:LessonModel):Void {
 		var status:Boolean = lm.getStatus();
-		
+		trace('inside setStatus method of View');
 		// do stuff based on status value
 		if(status) {
 			trace('joined lesson... lesson is active');

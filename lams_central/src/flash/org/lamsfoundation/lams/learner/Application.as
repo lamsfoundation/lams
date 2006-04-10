@@ -1,4 +1,27 @@
-﻿import org.lamsfoundation.lams.common.comms.*       //communications
+﻿/***************************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2.0 
+ * as published by the Free Software Foundation.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ * 
+ * http://www.gnu.org/licenses/gpl.txt
+ * ************************************************************************
+ */
+
+import org.lamsfoundation.lams.common.comms.*       //communications
 import org.lamsfoundation.lams.common.util.*;		// utilities
 import org.lamsfoundation.lams.common.*;
 import org.lamsfoundation.lams.learner.ls.*;
@@ -49,6 +72,8 @@ class org.lamsfoundation.lams.learner.Application {
     * Application - Constructor
     */
     private function Application(){
+		trace('Begin Application...');
+		
         _seqLibLoaded = false;
         _seqLibEventDispatched = false;
         
@@ -81,10 +106,11 @@ class org.lamsfoundation.lams.learner.Application {
     }
 	
 	private function setupUI():Void {
+		trace('Setting up UI...');
 		
 		//Create the application root
         _appRoot_mc = _container_mc.createEmptyMovieClip('appRoot_mc',APP_ROOT_DEPTH);
-        
+        trace('_appRoot_mc: ' + _appRoot_mc);
 		var depth:Number = _appRoot_mc.getNextHighestDepth();
         _seqLib = new Library(_appRoot_mc,depth++,LIBRARY_X,LIBRARY_Y);
         _seqLib.addEventListener('load',Proxy.create(this,UIElementLoaded));
@@ -95,38 +121,25 @@ class org.lamsfoundation.lams.learner.Application {
     * Runs periodically and dispatches events as they are ready
     */
     private function checkUILoaded() {
+		trace('checking UI loaded...');
         //If it's the first time through then set up the interval to keep polling this method
         if(!_UILoadCheckIntervalID) {
             _UILoadCheckIntervalID = setInterval(Proxy.create(this,checkUILoaded),UI_LOAD_CHECK_INTERVAL);
         } else {
 			_uiLoadCheckCount++;
-            //If all events dispatched clear interval and call start()
-            if(_seqLibEventDispatched){
-				//Debugger.log('Clearing Interval and calling start :',Debugger.CRITICAL,'checkUILoaded','Application');	
-                clearInterval(_UILoadCheckIntervalID);
-				start();
-            }else {
-                //If UI loaded check which events can be broadcast
-                if(_UILoaded){
-					//Debugger.log('ALL UI LOADED, waiting for all true to dispatch init events: _dictionaryLoaded:'+_dictionaryLoaded+'_themeLoaded:'+_themeLoaded ,Debugger.GEN,'checkUILoaded','Application');
-
-                    //If sequence library is loaded and event hasn't been dispatched - dispatch it
-                    /*if(_seqLibLoaded && !_seqLibEventDispatched){
-						_seqLibEventDispatched = true;
-                        _seqLib.broadcastInit();
-                    }*/
-					if(_seqLibLoaded){
-						clearInterval(_UILoadCheckIntervalID);
-						start();
-					}
+            
+			//If UI loaded check which events can be broadcast
+			if(_UILoaded){
+				if(_seqLibLoaded){
+					clearInterval(_UILoadCheckIntervalID);
+					start();
+				}
 				
-					
-					if(_uiLoadCheckCount >= UI_LOAD_CHECK_TIMEOUT_COUNT){
-						//if we havent loaded the library by the timeout count then give up
-						Debugger.log('raeached time out waiting to load library, giving up.',Debugger.CRITICAL,'checkUILoaded','Application');
-						clearInterval(_UILoadCheckIntervalID);
-					}
-                }
+				if(_uiLoadCheckCount >= UI_LOAD_CHECK_TIMEOUT_COUNT){
+					//if we havent loaded the library by the timeout count then give up
+					Debugger.log('raeached time out waiting to load library, giving up.',Debugger.CRITICAL,'checkUILoaded','Application');
+					clearInterval(_UILoadCheckIntervalID);
+				}
             }
         }
     }
@@ -143,6 +156,7 @@ class org.lamsfoundation.lams.learner.Application {
             //Which item has loaded
             switch (evt.target.className) {
                 case 'Library' :
+					trace('Library loaded...');
                     _seqLibLoaded = true;
                     break;
                 default:
@@ -161,12 +175,16 @@ class org.lamsfoundation.lams.learner.Application {
     * work with the application
     */
     private function start(){
-		
-		_seqLib.getActiveLessons();
+		trace('starting...');
 		
         //Fire off a resize to set up sizes
         onResize();
 		
+		// start testing - joining a lesson
+		var lessonId:Number = 1;
+		var l:Lesson = Lesson(_seqLib.getLesson(lessonId));
+		l.joinLesson();
+		// end testing
     }
     
 	/**
