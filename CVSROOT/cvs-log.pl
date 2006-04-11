@@ -26,7 +26,7 @@ my $users;
 my $login;
 my @files;
 my $logfile;
-my $viewcvs = "http://lamscvs.melcoe.mq.edu.au/cgi-bin/viewcvs.cgi/";
+my $viewcvs = "http://lamscvs.melcoe.mq.edu.au/cgi-bin/viewcvs.cgi";
 
 sub print_usage()
 {
@@ -115,8 +115,8 @@ my $lastversion;
 my $file;
 if ($viewcvs)
 {
-  if (fileno LOG)  { print LOG "web diffs:\n";  }
-  if (fileno MAIL) { print MAIL "web diffs:\n"; }
+  if (fileno LOG)  { print LOG "\nWeb Diffs:\n";  }
+  if (fileno MAIL) { print MAIL "\nWeb Diffs:\n"; }
   foreach $file (@files) 
     {
       next if ($file eq "Imported" || $file eq "sources" || $file eq "-" || $file eq "New" || $file eq "directory");
