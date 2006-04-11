@@ -38,6 +38,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -183,14 +184,16 @@ public class WorkspaceAction extends DispatchAction {
 		
 		try {
 			if ( BOOTSTRAP_FOLDER_ID.equals(folderID )) {
+				MessageService msgService = workspaceManagementService.getMessageService();
+
 				// return back the dummy org DTO and the user's workspace folder
 				Vector<FolderContentDTO> folders = new Vector<FolderContentDTO>();
 				FolderContentDTO userFolder = workspaceManagementService.getUserWorkspaceFolder(userID);
 				if ( userFolder != null )
 					folders.add(userFolder);
 				
-				// TODO I8N the organisation strings
-				FolderContentDTO dummyOrgFolder = new  FolderContentDTO("Organisations", "Folder",
+				FolderContentDTO dummyOrgFolder = new  FolderContentDTO(msgService.getMessage("organisations"), 
+						msgService.getMessage("folder"),
 						null, null, 
 						FolderContentDTO.FOLDER, new Long(ORG_FOLDER_ID.longValue()), WorkspaceFolder.READ_ACCESS,
 						null);

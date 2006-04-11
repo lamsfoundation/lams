@@ -31,6 +31,7 @@ import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.usermanagement.exception.WorkspaceFolderException;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.workspace.dto.FolderContentDTO;
 
 /**
@@ -52,6 +53,13 @@ public interface IWorkspaceManagementService {
 	public static final String MSG_KEY_DELETE_VERSION = "deleteContentWithVersion";
 	public static final String MSG_KEY_ORG_BY_ROLE = "getOrganisationsByUserRole";
 	public static final String MSG_KEY_USER_BY_ROLE = "getUsersFromOrganisationByRole";
+
+	/**
+	 * I18n Message service. The Workspace action class needs access to the message service.
+	 * @param messageSource
+	 */
+	public MessageService getMessageService();
+
 	/**
 	 * Get the workspace folder for a particular id. Does not check the user permissions - that will be checked if you try to get
 	 * anything from the folder.

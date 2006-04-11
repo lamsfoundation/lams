@@ -111,6 +111,14 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		this.messageService = messageService;
 	}
 	/**
+	 * i18n Message service. The Workspace action class needs access to the message service.
+	 * @param messageSource
+	 */
+	public MessageService getMessageService() {
+		return messageService;
+	}
+
+	/**
 	 * @param workspaceFolderContentDAO The workspaceFolderContentDAO to set.
 	 */
 	public void setWorkspaceFolderContentDAO(
