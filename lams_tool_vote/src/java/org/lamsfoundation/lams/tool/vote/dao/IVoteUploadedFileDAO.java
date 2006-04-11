@@ -20,9 +20,12 @@
  */
 package org.lamsfoundation.lams.tool.vote.dao;
 
+import java.util.Iterator;
 import java.util.List;
 
+import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteUploadedFile;
+import org.springframework.orm.hibernate3.HibernateTemplate;
 
 /**
  * 
@@ -32,49 +35,51 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteUploadedFile;
  */
 public interface IVoteUploadedFileDAO
 {
-	 	public VoteUploadedFile loadUploadedFileById(long submissionId);
+ 	public VoteUploadedFile getUploadedFileById(long submissionId);
+ 	;
+ 	public VoteUploadedFile loadUploadedFileById(long uid);
+ 	
+ 	public void updateUploadFile(VoteUploadedFile voteUploadedFile);
+     
+    public void saveUploadFile(VoteUploadedFile voteUploadedFile);
+    
+    public void createUploadFile(VoteUploadedFile voteUploadedFile); 
+    
+    public void UpdateUploadFile(VoteUploadedFile voteUploadedFile);
 
-	 	public void updateUploadFile(VoteUploadedFile mcUploadedFile);
+    public void removeOffLineFile(String filename, Long voteContentId);
 
-	    public void saveUploadFile(VoteUploadedFile mcUploadedFile);
+    public void removeOnLineFile(String filename, Long voteContentId);
+    
+    public boolean isOffLineFilePersisted(String filename);
 
-	    public void createUploadFile(VoteUploadedFile mcUploadedFile); 
+    public boolean isOnLineFilePersisted(String filename);
+    
+    public List getOnlineFilesMetaData(Long voteContentId);
 
-	    public void UpdateUploadFile(VoteUploadedFile mcUploadedFile);
+    public List getOfflineFilesMetaData(Long voteContentId);
+    
+    public boolean isUuidPersisted(String uuid);
+    
+    public void cleanUploadedFilesMetaData();
+    
+    public String getFileUuid(String filename);
+    
+    public void removeUploadFile(Long uid);
+    
+    public List retrieveVoteUploadedFiles(Long voteContentId, boolean fileOnline);
 
-	    public void removeUploadFile(Long submissionId);
+ 	public List retrieveVoteUploadedOfflineFilesUuid(Long voteContentId);
+    
+    public List retrieveVoteUploadedOnlineFilesUuid(Long voteContentId);
+    
+    public List retrieveVoteUploadedOfflineFilesUuidPlusFilename(Long voteContentId);
+    
+    public List retrieveVoteUploadedOfflineFilesName(Long voteContentId);
 
-	    public void deleteUploadFile(VoteUploadedFile mcUploadedFile);
-	    
-	    public String getFileUuid(String filename);
-
-	    public List retrieveMcUploadedFiles(Long mcContentId, boolean fileOnline);
-	    
-	    public List retrieveMcUploadedOfflineFilesUuid(Long mcContentId);
-
-	    public List retrieveMcUploadedOnlineFilesUuid(Long mcContentId);
-	    
-	    public List retrieveMcUploadedOfflineFilesName(Long mcContentId);
-	    
-	    public List retrieveMcUploadedOnlineFilesName(Long mcContentId);
-
-	    public List retrieveMcUploadedOfflineFilesUuidPlusFilename(Long mcContentId);
-
-	    public void removeOffLineFile(String filename, Long mcContentId);
-	    
-	    public void removeOnLineFile(String filename, Long mcContentId);
-	    
-	    public boolean isOffLineFilePersisted(String filename);
-	    
-	    public boolean isOnLineFilePersisted(String filename);
-	    
-	    public boolean isUuidPersisted(String uuid);
-	    
-	    public List getOnlineFilesMetaData(Long mcContentId);
-	    
-	    public List getOfflineFilesMetaData(Long mcContentId);
-	    
-	    public void cleanUploadedFilesMetaData();
-	    
-	    public void flush();
+    public List retrieveVoteUploadedOnlineFilesName(Long voteContentId);
+    
+    public void deleteUploadFile(VoteUploadedFile voteUploadedFile);
+    
+    public void flush();
 }

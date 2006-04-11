@@ -49,22 +49,22 @@ public class VoteServiceProxy
      * @param servletContext the servletContext for current application
      * @return mcq service object.
      */
-    public static final IVoteService getMcService(ServletContext servletContext)
+    public static final IVoteService getVoteService(ServletContext servletContext)
     {
-        return (IVoteService)getMcDomainService(servletContext);
+        return (IVoteService)getVoteDomainService(servletContext);
     }
     
-    public static final ToolSessionManager getMcSessionManager(ServletContext servletContext)
+    public static final ToolSessionManager getVoteSessionManager(ServletContext servletContext)
     {
-        return (ToolSessionManager)getMcDomainService(servletContext);
+        return (ToolSessionManager)getVoteDomainService(servletContext);
     }
     
-    public static final ToolContentManager getMcContentManager(ServletContext servletContext)
+    public static final ToolContentManager getVoteContentManager(ServletContext servletContext)
     {
-        return (ToolContentManager)getMcDomainService(servletContext);
+        return (ToolContentManager)getVoteDomainService(servletContext);
     }
 
-    private static Object getMcDomainService(ServletContext servletContext)
+    private static Object getVoteDomainService(ServletContext servletContext)
     {
         WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
         return wac.getBean("voteService");

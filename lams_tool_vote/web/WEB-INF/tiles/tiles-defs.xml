@@ -42,23 +42,23 @@ http://www.gnu.org/licenses/gpl.txt
 		<put name="content" value="/SystemErrorContent.jsp" />	
 	</definition>
 	
-	<definition name=".mcErrorBox" extends=".baseDef" >
+	<definition name=".voteErrorBox" extends=".baseDef" >
 		<put name="title" value="Error Page"/>
 		<put name="pageHeader" value = "Exception"/>
-		<put name="content" value="/McErrorBox.jsp" />	
+		<put name="content" value="/CoteErrorBox.jsp" />	
 	</definition>
 
 	
 <!-- ============= Mc Authoring Module Definitions ====================== -->	
 	<definition name=".questions" extends=".baseDef" >
-		<put name="title" value="MCQ Tool Questions"/>
-		<put name="pageHeader" value = "MCQ Tool Questions"/>
+		<put name="title" value="Voting Tool Questions"/>
+		<put name="pageHeader" value = "Voting Tool Questions"/>
 		<put name="content" value="/authoring/AuthoringMaincontent.jsp" />	
 	</definition>
 	
 	<definition name=".starter" extends=".baseDef" >
-		<put name="title" value="Starter for Multiple Choice Authoring"/>
-		<put name="pageHeader" value = "Starter for Multiple Choice Authoring"/>
+		<put name="title" value="Starter for Voting Authoring"/>
+		<put name="pageHeader" value = "Starter for Voting Authoring"/>
 		<put name="content" value="/index.jsp" />	
 	</definition>
 	
@@ -70,69 +70,69 @@ http://www.gnu.org/licenses/gpl.txt
 	
 <!-- ============= Mc Learning Module Definitions ====================== -->		
 	<definition name=".answers" extends=".baseDef" >
-		<put name="title" value="MCQ Tool Answers"/>
-		<put name="pageHeader" value = "MCQ Tool Answers"/>
+		<put name="title" value="Voting Tool Answers"/>
+		<put name="pageHeader" value = "Voting Tool Answers"/>
 		<put name="content" value="/learning/AnswersContent.jsp" />	
 	</definition>
 	
 	<definition name=".learningStarter" extends=".baseDef" >
-		<put name="title" value="Starter for MCQ Learning"/>
-		<put name="pageHeader" value = "Starter for MCQ Learning"/>
+		<put name="title" value="Starter for Voting Learning"/>
+		<put name="pageHeader" value = "Starter for Voting Learning"/>
 		<put name="content" value="/learningIndex.jsp" />	
 	</definition>
 
 	<definition name=".individualReport" extends=".baseDef" >
-		<put name="title" value="MCQ Tool Individual Report"/>
-		<put name="pageHeader" value ="MCQ Tool Individual Report"/>
+		<put name="title" value="Voting Tool Individual Report"/>
+		<put name="pageHeader" value ="Voting Tool Individual Report"/>
 		<put name="content" value="/learning/IndividualLearnerResults.jsp" />	
 	</definition>
 	
 	<definition name=".redoQuestions" extends=".baseDef" >
-		<put name="title" value="MCQ Tool Redo Questions"/>
-		<put name="pageHeader" value ="MCQ Tool Redo Questions"/>
+		<put name="title" value="Voting Tool Redo Questions"/>
+		<put name="pageHeader" value ="Voting Tool Redo Questions"/>
 		<put name="content" value="/learning/RedoQuestions.jsp" />	
 	</definition>
 
 	<definition name=".singleQuestionAnswers" extends=".baseDef" >
-		<put name="title" value="MCQ Tool Answers"/>
-		<put name="pageHeader" value ="MCQ Tool Answers"/>
+		<put name="title" value="Voting Tool Answers"/>
+		<put name="pageHeader" value ="Voting Tool Answers"/>
 		<put name="content" value="/learning/SingleQuestionAnswersContent.jsp" />	
 	</definition>
 	
 	<definition name=".viewAnswers" extends=".baseDef" >
-		<put name="title" value="MCQ Tool View Previous Answers"/>
-		<put name="pageHeader" value = "MCQ Tool View Previous Answers"/>
+		<put name="title" value="Voting Tool View Previous Answers"/>
+		<put name="pageHeader" value = "Voting Tool View Previous Answers"/>
 		<put name="content" value="/learning/ViewAnswers.jsp" />	
 	</definition>
 
 	<definition name=".resultsSummary" extends=".baseDef" >
-		<put name="title" value="MCQ Tool Results Summary"/>
-		<put name="pageHeader" value = "MCQ Tool Results Summary"/>
+		<put name="title" value="Voting Tool Results Summary"/>
+		<put name="pageHeader" value = "Voting Tool Results Summary"/>
 		<put name="content" value="/learning/ResultsSummary.jsp" />	
 	</definition>
 	
 	<!-- ============= Mc Monitoring Module Definitions ====================== -->		
 	<definition name=".monitoringStarter" extends=".baseDef" >
-		<put name="title" value="Starter for MCQ Monitoring"/>
-		<put name="pageHeader" value = "Starter for MCQ Monitoring"/>
+		<put name="title" value="Starter for Voting Monitoring"/>
+		<put name="pageHeader" value = "Starter for Voting Monitoring"/>
 		<put name="content" value="/monitoringIndex.jsp" />	
 	</definition>
 	
 	<definition name=".monitoringContent" extends=".baseDef" >
-		<put name="title" value="MCQ Monitoring"/>
-		<put name="pageHeader" value = "MCQ Monitoring"/>
+		<put name="title" value="Voting Monitoring"/>
+		<put name="pageHeader" value = "Voting Monitoring"/>
 		<put name="content" value="/monitoring/MonitoringMaincontent.jsp" />	
 	</definition>
 	
 	<definition name=".preview" extends=".baseDef" >
-		<put name="title" value="MCQ Preview"/>
-		<put name="pageHeader" value = "MCQ Preview"/>
+		<put name="title" value="Voting Preview"/>
+		<put name="pageHeader" value = "Voting Preview"/>
 		<put name="content" value="/learning/Preview.jsp" />	
 	</definition>
 	
 	<definition name=".exportPortfolio" extends=".baseDef" >
-		<put name="title" value="MCQ Portfolio Export"/>
-		<put name="pageHeader" value = "MCQ Portfolio Export"/>
+		<put name="title" value="Voting Portfolio Export"/>
+		<put name="pageHeader" value = "Voting Portfolio Export"/>
 		<put name="content" value="/exportPortfolio.jsp" />	
 	</definition>
 </tiles-definitions>

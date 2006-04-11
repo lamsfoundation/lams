@@ -35,35 +35,35 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
  * @author ozgurd
- * <p>Hibernate implementation for database access to McUploadedFile for the mc tool.</p>
+ * <p>Hibernate implementation for database access to VoteUploadedFile for the voting tool.</p>
  */
 public class VoteUploadedFileDAO extends HibernateDaoSupport implements IVoteUploadedFileDAO {
  	static Logger logger = Logger.getLogger(VoteUploadedFileDAO.class.getName());
  	
- 	private static final String GET_ONLINE_FILENAMES_FOR_CONTENT = "select mcUploadedFile.filename from VoteUploadedFile mcUploadedFile where mcUploadedFile.mcContentId = :mcContentId and mcUploadedFile.fileOnline=1";
- 	private static final String GET_OFFLINE_FILENAMES_FOR_CONTENT = "select mcUploadedFile.filename from VoteUploadedFile mcUploadedFile where mcUploadedFile.mcContentId = :mcContentId and mcUploadedFile.fileOnline=0";
+ 	private static final String GET_ONLINE_FILENAMES_FOR_CONTENT = "select voteUploadedFile.filename from VoteUploadedFile voteUploadedFile where voteUploadedFile.voteContentId = :voteContentId and voteUploadedFile.fileOnline=1";
+ 	private static final String GET_OFFLINE_FILENAMES_FOR_CONTENT = "select voteUploadedFile.filename from VoteUploadedFile voteUploadedFile where voteUploadedFile.voteContentId = :voteContentId and voteUploadedFile.fileOnline=0";
  	
- 	private static final String GET_ONLINE_FILES_UUID = "select mcUploadedFile.uuid from VoteUploadedFile mcUploadedFile where mcUploadedFile.mcContentId = :mcContentId and mcUploadedFile.fileOnline=1";
- 	private static final String GET_ONLINE_FILES_NAME ="select mcUploadedFile.filename from VoteUploadedFile mcUploadedFile where mcUploadedFile.mcContentId = :mcContentId and mcUploadedFile.fileOnline=1 order by mcUploadedFile.uuid";
+ 	private static final String GET_ONLINE_FILES_UUID = "select voteUploadedFile.uuid from VoteUploadedFile voteUploadedFile where voteUploadedFile.voteContentId = :voteContentId and voteUploadedFile.fileOnline=1";
+ 	private static final String GET_ONLINE_FILES_NAME ="select voteUploadedFile.filename from VoteUploadedFile voteUploadedFile where voteUploadedFile.voteContentId = :voteContentId and voteUploadedFile.fileOnline=1 order by voteUploadedFile.uuid";
  	
- 	private static final String GET_OFFLINE_FILES_UUID = "select mcUploadedFile.uuid from VoteUploadedFile mcUploadedFile where mcUploadedFile.mcContentId = :mcContentId and mcUploadedFile.fileOnline=0";
- 	private static final String GET_OFFLINE_FILES_NAME ="select mcUploadedFile.filename from VoteUploadedFile mcUploadedFile where mcUploadedFile.mcContentId = :mcContentId and mcUploadedFile.fileOnline=0 order by mcUploadedFile.uuid";
+ 	private static final String GET_OFFLINE_FILES_UUID = "select voteUploadedFile.uuid from VoteUploadedFile voteUploadedFile where voteUploadedFile.voteContentId = :voteContentId and voteUploadedFile.fileOnline=0";
+ 	private static final String GET_OFFLINE_FILES_NAME ="select voteUploadedFile.filename from VoteUploadedFile voteUploadedFile where voteUploadedFile.voteContentId = :voteContentId and voteUploadedFile.fileOnline=0 order by voteUploadedFile.uuid";
  	
- 	private static final String GET_FILES_UUID ="select mcUploadedFile.uuid from VoteUploadedFile mcUploadedFile where mcUploadedFile.filename=:filename";
+ 	private static final String GET_FILES_UUID ="select voteUploadedFile.uuid from VoteUploadedFile voteUploadedFile where voteUploadedFile.filename=:filename";
  	
- 	private static final String GET_OFFLINE_FILES_UUIDPLUSFILENAME = "select (mcUploadedFile.uuid + '~' + mcUploadedFile.filename)   from VoteUploadedFile mcUploadedFile where mcUploadedFile.mcContentId = :mcContentId and mcUploadedFile.fileOnline=0";
+ 	private static final String GET_OFFLINE_FILES_UUIDPLUSFILENAME = "select (voteUploadedFile.uuid + '~' + voteUploadedFile.filename)   from VoteUploadedFile voteUploadedFile where voteUploadedFile.voteContentId = :voteContentId and voteUploadedFile.fileOnline=0";
  	
- 	private static final String FIND_ALL_UPLOADED_FILE_DATA = "from mcUploadedFile in class VoteUploadedFile";
+ 	private static final String FIND_ALL_UPLOADED_FILE_DATA = "from voteUploadedFile in class VoteUploadedFile";
  	
- 	private static final String IS_UUID_PERSISTED ="select mcUploadedFile.uuid from VoteUploadedFile mcUploadedFile where mcUploadedFile.uuid=:uuid";
+ 	private static final String IS_UUID_PERSISTED ="select voteUploadedFile.uuid from VoteUploadedFile voteUploadedFile where voteUploadedFile.uuid=:uuid";
  	
- 	private static final String GET_ONLINE_FILES_METADATA = "from mcUploadedFile in class VoteUploadedFile where mcUploadedFile.mcContentId = :mcContentId and mcUploadedFile.fileOnline=1";
+ 	private static final String GET_ONLINE_FILES_METADATA = "from voteUploadedFile in class VoteUploadedFile where voteUploadedFile.voteContentId = :voteContentId and voteUploadedFile.fileOnline=1";
  	
- 	private static final String GET_OFFLINE_FILES_METADATA = "from mcUploadedFile in class VoteUploadedFile where mcUploadedFile.mcContentId = :mcContentId and mcUploadedFile.fileOnline=0";
+ 	private static final String GET_OFFLINE_FILES_METADATA = "from voteUploadedFile in class VoteUploadedFile where voteUploadedFile.voteContentId = :voteContentId and voteUploadedFile.fileOnline=0";
  	
- 	private static final String IS_OFFLINE_FILENAME_PERSISTED ="select mcUploadedFile from VoteUploadedFile mcUploadedFile where mcUploadedFile.mcContentId = :mcContentId and mcUploadedFile.filename=:filename and mcUploadedFile.fileOnline=0";
+ 	private static final String IS_OFFLINE_FILENAME_PERSISTED ="select voteUploadedFile from VoteUploadedFile voteUploadedFile where voteUploadedFile.voteContentId = :voteContentId and voteUploadedFile.filename=:filename and voteUploadedFile.fileOnline=0";
  	
- 	private static final String IS_ONLINE_FILENAME_PERSISTED ="select mcUploadedFile from VoteUploadedFile mcUploadedFile where mcUploadedFile.mcContentId = :mcContentId and mcUploadedFile.filename=:filename and mcUploadedFile.fileOnline=1";
+ 	private static final String IS_ONLINE_FILENAME_PERSISTED ="select voteUploadedFile from VoteUploadedFile voteUploadedFile where voteUploadedFile.voteContentId = :voteContentId and voteUploadedFile.filename=:filename and voteUploadedFile.fileOnline=1";
  	
  	
  	public VoteUploadedFile getUploadedFileById(long submissionId)
@@ -83,69 +83,69 @@ public class VoteUploadedFileDAO extends HibernateDaoSupport implements IVoteUpl
 
  	
  	
- 	public void updateUploadFile(VoteUploadedFile mcUploadedFile)
+ 	public void updateUploadFile(VoteUploadedFile voteUploadedFile)
     {
  		this.getSession().setFlushMode(FlushMode.AUTO);
-        this.getHibernateTemplate().update(mcUploadedFile);
+        this.getHibernateTemplate().update(voteUploadedFile);
 		this.getSession().setFlushMode(FlushMode.AUTO);
     }
  	
      
-    public void saveUploadFile(VoteUploadedFile mcUploadedFile) 
+    public void saveUploadFile(VoteUploadedFile voteUploadedFile) 
     {
     	this.getSession().setFlushMode(FlushMode.AUTO);
-    	this.getHibernateTemplate().save(mcUploadedFile);
+    	this.getHibernateTemplate().save(voteUploadedFile);
 		this.getSession().setFlushMode(FlushMode.AUTO);
     }
     
-    public void createUploadFile(VoteUploadedFile mcUploadedFile) 
+    public void createUploadFile(VoteUploadedFile voteUploadedFile) 
     {
     	this.getSession().setFlushMode(FlushMode.AUTO);
-    	this.getHibernateTemplate().save(mcUploadedFile);
+    	this.getHibernateTemplate().save(voteUploadedFile);
     }
     
-    public void UpdateUploadFile(VoteUploadedFile mcUploadedFile)
+    public void UpdateUploadFile(VoteUploadedFile voteUploadedFile)
     {
     	this.getSession().setFlushMode(FlushMode.AUTO);
-    	this.getHibernateTemplate().update(mcUploadedFile);	
+    	this.getHibernateTemplate().update(voteUploadedFile);	
     }
 
     
-    public void removeOffLineFile(String filename, Long mcContentId)
+    public void removeOffLineFile(String filename, Long voteContentId)
     {
     	HibernateTemplate templ = this.getHibernateTemplate();
 		List list = getSession().createQuery(IS_OFFLINE_FILENAME_PERSISTED)
 			.setString("filename", filename)
-			.setLong("mcContentId", mcContentId.longValue())
+			.setLong("voteContentId", voteContentId.longValue())
 			.list();
 		
-				if(list != null && list.size() > 0){
+			if(list != null && list.size() > 0){
 			Iterator listIterator=list.iterator();
 	    	while (listIterator.hasNext())
 	    	{
-	    		VoteUploadedFile mcFile=(VoteUploadedFile)listIterator.next();
+	    		VoteUploadedFile voteFile=(VoteUploadedFile)listIterator.next();
 				this.getSession().setFlushMode(FlushMode.AUTO);
-	    		templ.delete(mcFile);
+	    		templ.delete(voteFile);
 	    		templ.flush();
 	    	}
 		}
     }
 
-    public void removeOnLineFile(String filename, Long mcContentId)
+    public void removeOnLineFile(String filename, Long voteContentId)
     {
     	HibernateTemplate templ = this.getHibernateTemplate();
 		List list = getSession().createQuery(IS_ONLINE_FILENAME_PERSISTED)
 			.setString("filename", filename)
-			.setLong("mcContentId", mcContentId.longValue())
+			.setLong("voteContentId", voteContentId.longValue())
 			.list();
 
 		if(list != null && list.size() > 0){
 			Iterator listIterator=list.iterator();
 	    	while (listIterator.hasNext())
 	    	{
-	    		VoteUploadedFile mcFile=(VoteUploadedFile)listIterator.next();
+	    		VoteUploadedFile voteFile=(VoteUploadedFile)listIterator.next();
 				this.getSession().setFlushMode(FlushMode.AUTO);
-	    		templ.delete(mcFile);
+	    		templ.delete(voteFile);
 	    		templ.flush();
 	    	}
 		}
@@ -181,22 +181,22 @@ public class VoteUploadedFileDAO extends HibernateDaoSupport implements IVoteUpl
     }
 
     
-    public List getOnlineFilesMetaData(Long mcContentId)
+    public List getOnlineFilesMetaData(Long voteContentId)
     {
     	HibernateTemplate templ = this.getHibernateTemplate();
 		List list = getSession().createQuery(GET_ONLINE_FILES_METADATA)
-			.setLong("mcContentId", mcContentId.longValue())
+			.setLong("voteContentId", voteContentId.longValue())
 			.list();
 
 		return list;
     }
     
 
-    public List getOfflineFilesMetaData(Long mcContentId)
+    public List getOfflineFilesMetaData(Long voteContentId)
     {
     	HibernateTemplate templ = this.getHibernateTemplate();
 		List list = getSession().createQuery(GET_OFFLINE_FILES_METADATA)
-			.setLong("mcContentId", mcContentId.longValue())
+			.setLong("voteContentId", voteContentId.longValue())
 			.list();
 
 		return list;
@@ -228,9 +228,9 @@ public class VoteUploadedFileDAO extends HibernateDaoSupport implements IVoteUpl
 			Iterator listIterator=list.iterator();
 	    	while (listIterator.hasNext())
 	    	{
-	    		VoteUploadedFile mcFile=(VoteUploadedFile)listIterator.next();
+	    		VoteUploadedFile voteFile=(VoteUploadedFile)listIterator.next();
 				this.getSession().setFlushMode(FlushMode.AUTO);
-	    		templ.delete(mcFile);
+	    		templ.delete(voteFile);
 	    		templ.flush();
 	    	}
 		}
@@ -265,7 +265,7 @@ public class VoteUploadedFileDAO extends HibernateDaoSupport implements IVoteUpl
     {
     	if (uid != null ) {
     		
-    		String query = "from uploadedFile in class org.lamsfoundation.lams.tool.mc.VoteUploadedFile"
+    		String query = "from uploadedFile in class org.lamsfoundation.lams.tool.vote.VoteUploadedFile"
             + " where uploadedFile.uid = ?";
     		Object obj = this.getSession().createQuery(query)
 				.setLong(0,uid.longValue())
@@ -276,84 +276,84 @@ public class VoteUploadedFileDAO extends HibernateDaoSupport implements IVoteUpl
     	}
 	}
     
-    public List retrieveMcUploadedFiles(Long mcContentId, boolean fileOnline)
+    public List retrieveVoteUploadedFiles(Long voteContentId, boolean fileOnline)
     {
       List listFilenames=null;
     	
       if (fileOnline)
       {
       	listFilenames=(getHibernateTemplate().findByNamedParam(GET_ONLINE_FILENAMES_FOR_CONTENT,
-                "mcContentId",
-				mcContentId));	
+                "voteContentId",
+				voteContentId));	
       }
       else
       {
       	listFilenames=(getHibernateTemplate().findByNamedParam(GET_OFFLINE_FILENAMES_FOR_CONTENT,
-                "mcContentId",
-				mcContentId));  	
+                "voteContentId",
+				voteContentId));  	
       }
 	  return listFilenames;	
     }
     
     
-    public List retrieveMcUploadedOfflineFilesUuid(Long mcContentId)
+    public List retrieveVoteUploadedOfflineFilesUuid(Long voteContentId)
     {
       HibernateTemplate templ = this.getHibernateTemplate();
       List list = getSession().createQuery(GET_OFFLINE_FILES_UUID)
-			.setLong("mcContentId", mcContentId.longValue())
+			.setLong("voteContentId", voteContentId.longValue())
 			.list();
       
       
 	  return list;
     }
     
-    public List retrieveMcUploadedOnlineFilesUuid(Long mcContentId)
+    public List retrieveVoteUploadedOnlineFilesUuid(Long voteContentId)
     {
       HibernateTemplate templ = this.getHibernateTemplate();
       List list = getSession().createQuery(GET_ONLINE_FILES_UUID)
-			.setLong("mcContentId", mcContentId.longValue())
+			.setLong("voteContentId", voteContentId.longValue())
 			.list();
       
 	  return list;
     }
     
-    public List retrieveMcUploadedOfflineFilesUuidPlusFilename(Long mcContentId)
+    public List retrieveVoteUploadedOfflineFilesUuidPlusFilename(Long voteContentId)
     {
       HibernateTemplate templ = this.getHibernateTemplate();
       List list = getSession().createQuery(GET_OFFLINE_FILES_UUIDPLUSFILENAME)
-			.setLong("mcContentId", mcContentId.longValue())
+			.setLong("voteContentId", voteContentId.longValue())
 			.list();
       
 	  return list;
     }
     
     
-    public List retrieveMcUploadedOfflineFilesName(Long mcContentId)
+    public List retrieveVoteUploadedOfflineFilesName(Long voteContentId)
     {
       HibernateTemplate templ = this.getHibernateTemplate();
       List list = getSession().createQuery(GET_OFFLINE_FILES_NAME)
-			.setLong("mcContentId", mcContentId.longValue())
+			.setLong("voteContentId", voteContentId.longValue())
 			.list();
       
 	  return list;
     }
 
     
-    public List retrieveMcUploadedOnlineFilesName(Long mcContentId)
+    public List retrieveVoteUploadedOnlineFilesName(Long voteContentId)
     {
       HibernateTemplate templ = this.getHibernateTemplate();
       List list = getSession().createQuery(GET_ONLINE_FILES_NAME)
-			.setLong("mcContentId", mcContentId.longValue())
+			.setLong("voteContentId", voteContentId.longValue())
 			.list();
       
 	  return list;
     }
     
     
-    public void deleteUploadFile(VoteUploadedFile mcUploadedFile)
+    public void deleteUploadFile(VoteUploadedFile voteUploadedFile)
     {
     		this.getSession().setFlushMode(FlushMode.AUTO);
-            this.getHibernateTemplate().delete(mcUploadedFile);
+            this.getHibernateTemplate().delete(voteUploadedFile);
 	}
     
     public void flush()

@@ -179,7 +179,6 @@
     
    	 <set
             name="voteQueContents"
-            order-by="display_order"
             lazy="true"
             inverse="true"
             cascade="all-delete-orphan"

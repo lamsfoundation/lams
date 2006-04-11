@@ -68,15 +68,6 @@
     >
     </property>
     
-    <property
-        name="isNominated"
-        type="boolean"
-        access="property"        
-        column="isNominated"
-        length="1"
-    />
-
-
 
     <many-to-one
         name="voteQueContent"

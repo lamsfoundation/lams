@@ -57,7 +57,7 @@ public interface VoteAppConstants {
     public static final String LEARNER_PROGRESS_USERID					="learnerProgressUserId";
 	
     public static final String AUTHORING								="authoring";
-    public static final String SOURCE_MC_STARTER						="sourceMcStarter";
+    public static final String SOURCE_VOTE_STARTER						="sourceVoteStarter";
     public static final String AUTHORING_CANCELLED						="authoringCancelled";
     public static final String DEFINE_LATER_EDIT_ACTIVITY				="defineLaterEditActivity";
     public static final String ACTIVE_MODULE							="activeModule";
@@ -94,7 +94,11 @@ public interface VoteAppConstants {
     /*
      * authoring mode constants
      */
+    public static final String IS_DEFINE_LATER							="isDefineLater";
+    public static final String DEFAULT_CONTENT_ID_STR					="defaultContentIdStr";
+    public static final String DEFAULT_QUESTION_CONTENT					="defaultQuestionContent";
     public static final String MAP_QUESTIONS_CONTENT					="mapQuestionsContent";
+    public static final String MAP_QUESTION_CONTENT						="mapQuestionContent";
     public static final String MAP_OPTIONS_CONTENT						="mapOptionsContent";
     public static final String MAP_DEFAULTOPTIONS_CONTENT				="mapDefaultOptionsContent";
     public static final String MAP_DISABLED_QUESTIONS					="mapDisabledQuestions";

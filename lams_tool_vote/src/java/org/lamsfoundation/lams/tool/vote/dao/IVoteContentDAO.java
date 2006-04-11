@@ -28,23 +28,23 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
 
 public interface IVoteContentDAO {
-	public VoteContent getMcContentByUID(Long uid);
+	public VoteContent getVoteContentByUID(Long uid);
 
-	public VoteContent findMcContentById(Long mcContentId);
+	public VoteContent findVoteContentById(Long mcContentId);
 
-	public VoteContent getMcContentBySession(Long mcSessionId);
+	public VoteContent getVoteContentBySession(Long mcSessionId);
 
-    public void saveMcContent(VoteContent mcContent);
+    public void saveVoteContent(VoteContent mcContent);
 
-    public void updateMcContent(VoteContent mcContent);
+    public void updateVoteContent(VoteContent mcContent);
 
-    public void removeMc(VoteContent mcContent);
+    public void removeVote(VoteContent mcContent);
 
-    public void removeMcById(Long mcContentId);
+    public void removeVoteById(Long mcContentId);
 
-    public void removeMcSessions(VoteContent mcContent);
+    public void removeVoteSessions(VoteContent mcContent);
 
-    public void addMcSession(Long mcContentId, VoteSession mcSession);
+    public void addVoteSession(Long mcContentId, VoteSession mcSession);
     
     public List findAll(Class objClass);
     

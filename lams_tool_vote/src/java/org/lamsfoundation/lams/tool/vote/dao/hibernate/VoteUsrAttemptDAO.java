@@ -38,26 +38,26 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAttemptDAO {
 	 	static Logger logger = Logger.getLogger(VoteUsrAttemptDAO.class.getName());
 	 	
-	 	private static final String LOAD_HIGHEST_MARK_BY_USER_ID = "from mcUsrAttempt in class VoteUsrAttempt where mcUsrAttempt.queUsrId=:queUsrId";
+	 	private static final String LOAD_HIGHEST_MARK_BY_USER_ID = "from voteUsrAttempt in class VoteUsrAttempt where voteUsrAttempt.queUsrId=:queUsrId";
 	 	
-	 	private static final String LOAD_HIGHEST_ATTEMPT_ORDER_BY_USER_ID = "from mcUsrAttempt in class VoteUsrAttempt where mcUsrAttempt.queUsrId=:queUsrId";
+	 	private static final String LOAD_HIGHEST_ATTEMPT_ORDER_BY_USER_ID = "from voteUsrAttempt in class VoteUsrAttempt where voteUsrAttempt.queUsrId=:queUsrId";
 	 	
-	 	private static final String LOAD_ATTEMPT_FOR_QUE_CONTENT = "from mcUsrAttempt in class VoteUsrAttempt where mcUsrAttempt.queUsrId=:queUsrId and mcUsrAttempt.mcQueContentId=:mcQueContentId";
+	 	private static final String LOAD_ATTEMPT_FOR_QUE_CONTENT = "from voteUsrAttempt in class VoteUsrAttempt where voteUsrAttempt.queUsrId=:queUsrId and voteUsrAttempt.voteQueContentId=:voteQueContentId";
 	 	
-	 	private static final String LOAD_ATTEMPT_FOR_USER		 = "from mcUsrAttempt in class VoteUsrAttempt where mcUsrAttempt.queUsrId=:queUsrId";
+	 	private static final String LOAD_ATTEMPT_FOR_USER		 = "from voteUsrAttempt in class VoteUsrAttempt where voteUsrAttempt.queUsrId=:queUsrId";
 	 	
-	 	private static final String LOAD_ATTEMPT_FOR_USER_AND_QUESTION_CONTENT	 = "from mcUsrAttempt in class VoteUsrAttempt where mcUsrAttempt.queUsrId=:queUsrId and mcUsrAttempt.mcQueContentId=:mcQueContentId";
+	 	private static final String LOAD_ATTEMPT_FOR_USER_AND_QUESTION_CONTENT	 = "from voteUsrAttempt in class VoteUsrAttempt where voteUsrAttempt.queUsrId=:queUsrId and voteUsrAttempt.voteQueContentId=:voteQueContentId";
 	 	
 	 	
-	 	public VoteUsrAttempt getMcUserAttemptByUID(Long uid)
+	 	public VoteUsrAttempt getVoteUserAttemptByUID(Long uid)
 		{
 			 return (VoteUsrAttempt) this.getHibernateTemplate()
 	         .get(VoteUsrAttempt.class, uid);
 		}
 		
-		public void saveMcUsrAttempt(VoteUsrAttempt mcUsrAttempt)
+		public void saveVoteUsrAttempt(VoteUsrAttempt voteUsrAttempt)
 	    {
-	    	this.getHibernateTemplate().save(mcUsrAttempt);
+	    	this.getHibernateTemplate().save(voteUsrAttempt);
 	    }
 	    
 		
@@ -70,47 +70,45 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 			return list;
 	    }
 		
-		public List getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long mcQueContentId)
+		public List getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long voteQueContentId)
 	    {
 	        HibernateTemplate templ = this.getHibernateTemplate();
 	        List list = getSession().createQuery(LOAD_ATTEMPT_FOR_USER_AND_QUESTION_CONTENT)
 			.setLong("queUsrId", queUsrId.longValue())
-			.setLong("mcQueContentId", mcQueContentId.longValue())
+			.setLong("voteQueContentId", voteQueContentId.longValue())
 			.list();
 	        
 			return list;
 	    }
 		
 		
-		public List getAttemptForQueContent(final Long queUsrId, final Long mcQueContentId)
+		public List getAttemptForQueContent(final Long queUsrId, final Long voteQueContentId)
 	    {
 	        HibernateTemplate templ = this.getHibernateTemplate();
 	        List list = getSession().createQuery(LOAD_ATTEMPT_FOR_QUE_CONTENT)
 			.setLong("queUsrId", queUsrId.longValue())
-			.setLong("mcQueContentId", mcQueContentId.longValue())				
+			.setLong("voteQueContentId", voteQueContentId.longValue())				
 			.list();
 			return list;
 	    }
 		
 		
-		
-		public void updateMcUsrAttempt(VoteUsrAttempt mcUsrAttempt)
+		public void updateVoteUsrAttempt(VoteUsrAttempt voteUsrAttempt)
 	    {
-	    	this.getHibernateTemplate().update(mcUsrAttempt);
+	    	this.getHibernateTemplate().update(voteUsrAttempt);
 	    }
 		
-		public void removeMcUsrAttemptByUID(Long uid)
+		public void removeVoteUsrAttemptByUID(Long uid)
 	    {
-			VoteUsrAttempt mca = (VoteUsrAttempt)getHibernateTemplate().get(VoteUsrAttempt.class, uid);
+			VoteUsrAttempt votea = (VoteUsrAttempt)getHibernateTemplate().get(VoteUsrAttempt.class, uid);
 			this.getSession().setFlushMode(FlushMode.AUTO);
-	    	this.getHibernateTemplate().delete(mca);
+	    	this.getHibernateTemplate().delete(votea);
 	    }
 		
 		
-		public void removeMcUsrAttempt(VoteUsrAttempt mcUsrAttempt)
+		public void removeVoteUsrAttempt(VoteUsrAttempt voteUsrAttempt)
 	    {
 			this.getSession().setFlushMode(FlushMode.AUTO);
-	        this.getHibernateTemplate().delete(mcUsrAttempt);
+	        this.getHibernateTemplate().delete(voteUsrAttempt);
 	    }
-	 	
 } 

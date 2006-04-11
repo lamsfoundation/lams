@@ -40,133 +40,109 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 public class VoteOptionsContentDAO extends HibernateDaoSupport implements IVoteOptionsContentDAO {
 	 	static Logger logger = Logger.getLogger(VoteOptionsContentDAO.class.getName());
 	 	
-	 	private static final String FIND_VOTE_OPTIONS_CONTENT = "from " + VoteOptsContent.class.getName() + " as mco where mc_que_content_id=?";
+	 	private static final String FIND_VOTE_OPTIONS_CONTENT = "from " + VoteOptsContent.class.getName() + " as voteo where vote_que_content_id=?";
 	 	
-	 	private static final String LOAD_VOTE_CONTENT_BY_OPTION_TEXT = "from mcOptsContent in class VoteOptsContent where mcOptsContent.mcQueOptionText=:option and mcOptsContent.mcQueContentId=:mcQueContentUid";
+	 	private static final String LOAD_VOTE_CONTENT_BY_OPTION_TEXT = "from voteOptsContent in class VoteOptsContent where voteOptsContent.voteQueOptionText=:option and voteOptsContent.voteQueContentId=:voteQueContentUid";
 	 	
-	 	private static final String LOAD_PERSISTED_SELECTED_OPTIONS = "from mcOptsContent in class VoteOptsContent where mcOptsContent.mcQueContentId=:mcQueContentUid and  mcOptsContent.correctOption = 1";
-	 	
-	 	private static final String LOAD_CORRECT_OPTION = "from mcOptsContent in class VoteOptsContent where mcOptsContent.mcQueContentId=:mcQueContentUid and  mcOptsContent.correctOption = 1";
-	 	
-	 	public VoteOptsContent getMcOptionsContentByUID(Long uid)
+	 	public VoteOptsContent getVoteOptionsContentByUID(Long uid)
 		{
 			 return (VoteOptsContent) this.getHibernateTemplate()
 	         .get(VoteOptsContent.class, uid);
 		}
 		
 	 	
-	 	public List findMcOptionsContentByQueId(Long mcQueContentId)
+	 	public List findVoteOptionsContentByQueId(Long voteQueContentId)
 	    {
 			HibernateTemplate templ = this.getHibernateTemplate();
-			if ( mcQueContentId != null) {
+			if ( voteQueContentId != null) {
 				List list = getSession().createQuery(FIND_VOTE_OPTIONS_CONTENT)
-					.setLong(0,mcQueContentId.longValue())
+					.setLong(0,voteQueContentId.longValue())
 					.list();
 				return list;
 			}
 			return null;
 	    }
 
-	 	public List findMcOptionNamesByQueId(Long mcQueContentId)
+	 	public List findVoteOptionNamesByQueId(Long voteQueContentId)
 	    {
 	 		
 	 		List listOptionNames= new LinkedList();
 	 		
 			HibernateTemplate templ = this.getHibernateTemplate();
-			if ( mcQueContentId != null) {
+			if ( voteQueContentId != null) {
 				List list = getSession().createQuery(FIND_VOTE_OPTIONS_CONTENT)
-					.setLong(0,mcQueContentId.longValue())
+					.setLong(0,voteQueContentId.longValue())
 					.list();
 				
 				if(list != null && list.size() > 0){
 					Iterator listIterator=list.iterator();
 			    	while (listIterator.hasNext())
 			    	{
-			    		VoteOptsContent mcOptsContent=(VoteOptsContent)listIterator.next();
-			    		listOptionNames.add(mcOptsContent.getVoteQueOptionText());
+			    		VoteOptsContent voteOptsContent=(VoteOptsContent)listIterator.next();
+			    		listOptionNames.add(voteOptsContent.getVoteQueOptionText());
 			    	}
 				}
 			}
 			return listOptionNames;
 	    }
 	 	
-	 	public VoteOptsContent getOptionContentByOptionText(final String option, final Long mcQueContentUid)
+	 	public VoteOptsContent getOptionContentByOptionText(final String option, final Long voteQueContentUid)
 	    {
 	        HibernateTemplate templ = this.getHibernateTemplate();
 			List list = getSession().createQuery(LOAD_VOTE_CONTENT_BY_OPTION_TEXT)
 				.setString("option", option)
-				.setLong("mcQueContentUid", mcQueContentUid.longValue())				
+				.setLong("voteQueContentUid", voteQueContentUid.longValue())				
 				.list();
 			
 			if(list != null && list.size() > 0){
-				VoteOptsContent mcq = (VoteOptsContent) list.get(0);
-				return mcq;
+				VoteOptsContent voteq = (VoteOptsContent) list.get(0);
+				return voteq;
 			}
 			return null;
 	    }
 	 	
-	 	
-	 	public List getPersistedSelectedOptions(Long mcQueContentId) 
-	 	{
-	 		HibernateTemplate templ = this.getHibernateTemplate();
-			List list = getSession().createQuery(LOAD_PERSISTED_SELECTED_OPTIONS)
-				.setLong("mcQueContentUid", mcQueContentId.longValue())
-				.list();
-			
-			return list;
-	 	}
-	 	
-	 	public List getCorrectOption(Long mcQueContentId) 
-	 	{
-	 		HibernateTemplate templ = this.getHibernateTemplate();
-			List list = getSession().createQuery(LOAD_CORRECT_OPTION)
-				.setLong("mcQueContentUid", mcQueContentId.longValue())
-				.list();
-			
-			return list;
-	 	}
-		
-		public void saveMcOptionsContent(VoteOptsContent mcOptsContent)
+
+		public void saveVoteOptionsContent(VoteOptsContent voteOptsContent)
 	    {
-	    	this.getHibernateTemplate().save(mcOptsContent);
+	    	this.getHibernateTemplate().save(voteOptsContent);
 	    }
 	    
-		public void updateMcOptionsContent(VoteOptsContent mcOptsContent)
+		public void updateVoteOptionsContent(VoteOptsContent voteOptsContent)
 	    {
-	    	this.getHibernateTemplate().update(mcOptsContent);
+	    	this.getHibernateTemplate().update(voteOptsContent);
 	    }
 		
 		
-		public void removeMcOptionsContentByUID(Long uid)
+		public void removeVoteOptionsContentByUID(Long uid)
 	    {
-			VoteOptsContent mco = (VoteOptsContent)getHibernateTemplate().get(VoteOptsContent.class, uid);
-	    	this.getHibernateTemplate().delete(mco);
+			VoteOptsContent voteo = (VoteOptsContent)getHibernateTemplate().get(VoteOptsContent.class, uid);
+	    	this.getHibernateTemplate().delete(voteo);
 	    }
 		
 		
-		public void removeMcOptionsContentByQueId(Long mcQueContentId)
+		public void removeVoteOptionsContentByQueId(Long voteQueContentId)
 	    {
 			HibernateTemplate templ = this.getHibernateTemplate();
 			List list = getSession().createQuery(FIND_VOTE_OPTIONS_CONTENT)
-				.setLong(0,mcQueContentId.longValue())
+				.setLong(0,voteQueContentId.longValue())
 				.list();
 
 			if(list != null && list.size() > 0){
 				Iterator listIterator=list.iterator();
 		    	while (listIterator.hasNext())
 		    	{
-		    		VoteOptsContent mcOptsContent=(VoteOptsContent)listIterator.next();
+		    		VoteOptsContent voteOptsContent=(VoteOptsContent)listIterator.next();
 					this.getSession().setFlushMode(FlushMode.AUTO);
-		    		templ.delete(mcOptsContent);
+		    		templ.delete(voteOptsContent);
 		    	}
 			}
 	    }
 				
 		
-		public void removeMcOptionsContent(VoteOptsContent mcOptsContent)
+		public void removeVoteOptionsContent(VoteOptsContent voteOptsContent)
 	    {
 			this.getSession().setFlushMode(FlushMode.AUTO);
-	        this.getHibernateTemplate().delete(mcOptsContent);
+	        this.getHibernateTemplate().delete(voteOptsContent);
 	    }
 		
 		 public void flush()

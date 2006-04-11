@@ -24,8 +24,8 @@ package org.lamsfoundation.lams.tool.vote.dao;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
+import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
 
 /**
@@ -34,29 +34,32 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
  * 
  */
 public interface IVoteSessionDAO {
-	public VoteSession getMcSessionByUID(Long uid);
-    
-    public VoteSession findMcSessionById(Long mcSessionId);
+    public VoteSession getVoteSessionByUID(Long uid);
 	
-    public void saveMcSession(VoteSession mcSession);
-    
-    public void updateMcSession(VoteSession mcSession);
-
-    public void removeMcSessionByUID(Long uid);
-    
-    public void removeMcSessionById(Long mcSessionId);
-
-    public void removeMcSession(VoteSession mcSession);
-    
-    public VoteSession getMcSessionByUser(Long userId);
-    
-    public void addMcUsers(Long mcSessionId, VoteQueUsr user);
-    
-    public List getSessionsFromContent(VoteContent mcContent);
-    
-    public List getSessionNamesFromContent(VoteContent mcContent);
+    public VoteSession findVoteSessionById(Long voteSessionId);
     
     public int countSessionComplete();
 
     public int countSessionIncomplete();
+    
+    public void saveVoteSession(VoteSession voteSession);
+    
+    public void updateVoteSession(VoteSession voteSession);
+   
+    public void removeVoteSessionByUID(Long uid);
+    
+    public void removeVoteSessionById(Long voteSessionId);
+
+    public void removeVoteSession(VoteSession voteSession);
+
+    public VoteSession getVoteSessionByUser(final Long userId);
+	 
+    public void removeVoteUsers(VoteSession voteSession);
+	
+    public void addVoteUsers(Long voteSessionId, VoteQueUsr user);
+	
+	public List getSessionsFromContent(VoteContent voteContent);
+	
+	public List getSessionNamesFromContent(VoteContent voteContent);
+
 }

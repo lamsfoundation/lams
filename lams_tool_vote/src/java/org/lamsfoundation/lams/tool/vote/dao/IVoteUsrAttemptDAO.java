@@ -35,21 +35,21 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
  */
 public interface IVoteUsrAttemptDAO
 {
-	public VoteUsrAttempt getMcUserAttemptByUID(Long uid);
-
-	public void saveMcUsrAttempt(VoteUsrAttempt mcUsrAttempt);
-    
-	public void updateMcUsrAttempt(VoteUsrAttempt mcUsrAttempt);
-
-	public void removeMcUsrAttemptByUID(Long uid);
-
-	public void removeMcUsrAttempt(VoteUsrAttempt mcUsrAttempt);
+ 	public VoteUsrAttempt getVoteUserAttemptByUID(Long uid);
 	
-	public List getAttemptForQueContent(final Long queUsrId, final Long mcQueContentId);
+	public void saveVoteUsrAttempt(VoteUsrAttempt voteUsrAttempt);
 	
 	public List getAttemptsForUser(final Long queUsrId);
 	
-	public List getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long mcQueContentId);
+	public List getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long voteQueContentId);
+	
+	public List getAttemptForQueContent(final Long queUsrId, final Long voteQueContentId);
+	
+	public void updateVoteUsrAttempt(VoteUsrAttempt voteUsrAttempt);
+	
+	public void removeVoteUsrAttemptByUID(Long uid);
+	
+	public void removeVoteUsrAttempt(VoteUsrAttempt voteUsrAttempt);
 }
 
 

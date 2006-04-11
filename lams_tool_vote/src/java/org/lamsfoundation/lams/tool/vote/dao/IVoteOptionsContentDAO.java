@@ -33,27 +33,25 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteOptsContent;
  */
 public interface IVoteOptionsContentDAO
 {
-	public VoteOptsContent getMcOptionsContentByUID(Long uid);
+    public VoteOptsContent getVoteOptionsContentByUID(Long uid);
+ 	
+ 	public List findVoteOptionsContentByQueId(Long voteQueContentId);
 
-	public List findMcOptionsContentByQueId(Long mcQueContentId);
-
-	public VoteOptsContent getOptionContentByOptionText(final String option, final Long mcQueContentUid);
-	
-	public List getPersistedSelectedOptions(Long mcQueContentId);
-	
-	public List getCorrectOption(Long mcQueContentId);
-	
-	public void saveMcOptionsContent(VoteOptsContent mcOptionsContent);
+ 	public List findVoteOptionNamesByQueId(Long voteQueContentId);
+ 	
+ 	public VoteOptsContent getOptionContentByOptionText(final String option, final Long voteQueContentUid);
+ 	
+	public void saveVoteOptionsContent(VoteOptsContent voteOptsContent);
     
-	public void updateMcOptionsContent(VoteOptsContent mcOptionsContent);
-
-	public void removeMcOptionsContentByUID(Long uid);
-
-	public void removeMcOptionsContentByQueId(Long mcQueContentId);
-
-	public void removeMcOptionsContent(VoteOptsContent mcOptsContent);
+	public void updateVoteOptionsContent(VoteOptsContent voteOptsContent);
 	
-	public List findMcOptionNamesByQueId(Long mcQueContentId);
+	public void removeVoteOptionsContentByUID(Long uid);
+	
+	public void removeVoteOptionsContentByQueId(Long voteQueContentId);
+			
+	public void removeVoteOptionsContent(VoteOptsContent voteOptsContent);
+	
+	 public void flush();
 }
 
 

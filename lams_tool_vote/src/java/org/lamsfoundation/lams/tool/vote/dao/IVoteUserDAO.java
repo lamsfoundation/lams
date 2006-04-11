@@ -33,24 +33,23 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
  * <p></p>
  */
 public interface IVoteUserDAO {
-    
-    public VoteQueUsr getMcUserByUID(Long uid);
+    public VoteQueUsr getVoteUserByUID(Long uid);
+	
+	public VoteQueUsr findVoteUserById(Long userId);
+	
+	public List getVoteUserBySessionOnly(final VoteSession voteSession);
+	
+	public VoteQueUsr getVoteUserBySession(final Long queUsrId, final Long voteSessionId);
+	
+	public void saveVoteUser(VoteQueUsr voteUser);
+	
+    public void updateVoteUser(VoteQueUsr voteUser);
 
-    public VoteQueUsr findMcUserById(Long userId);
+    public void removeVoteUserById(Long userId);
+
+    public void removeVoteUser(VoteQueUsr voteUser);
     
-    public VoteQueUsr getMcUserBySession(Long userId, Long sessionId);
+    public int getNumberOfUsers(VoteSession voteSession);
     
-    public void saveMcUser(VoteQueUsr mcUser);
-    
-    public void updateMcUser(VoteQueUsr mcUser);
-    
-    public void removeMcUser(VoteQueUsr mcUser);
-    
-    public void removeMcUserById(Long userId);
-    
-    public int getNumberOfUsers(VoteSession mcSession);
-    
-    public List getMcUserBySessionOnly(final VoteSession mcSession);
-    
-    public int getTotalNumberOfUsers();
+    public int getTotalNumberOfUsers(); 
 }

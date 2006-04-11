@@ -37,42 +37,41 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
  * @author ozgurd
- * <p>Hibernate implementation for database access to Mc sessions for the mc tool.</p>
+ * <p>Hibernate implementation for database access to Vote sessions for the voting tool.</p>
  */
 
 public class VoteSessionDAO extends HibernateDaoSupport implements IVoteSessionDAO {
 	
-	private static final String FIND_VOTE_SESSION_CONTENT = "from " + VoteSession.class.getName() + " as mcs where mc_session_id=?";
+	private static final String FIND_VOTE_SESSION_CONTENT = "from " + VoteSession.class.getName() + " as votes where vote_session_id=?";
 	
-    private static final String LOAD_MCSESSION_BY_USER = "select ms from VoteSession ms left join fetch "
-        + "ms.mcQueUsers user where user.queUsrId=:userId";
+    private static final String LOAD_VOTESESSION_BY_USER = "select votes from VoteSession votes left join fetch "
+        + "votes.voteQueUsers user where user.queUsrId=:userId";
     
-    private static final String GET_SESSIONS_FROM_CONTENT = "select ms.mcSessionId from McSession ms where ms.mcContent=:mcContent";
+    private static final String GET_SESSIONS_FROM_CONTENT = "select votes.voteSessionId from VoteSession vote where vote.voteContent=:voteContent";
     
-    private static final String COUNT_SESSION_COMPLETE = "from mcSession in class  where mcSession.sessionStatus='COMPLETE'";
+    private static final String COUNT_SESSION_COMPLETE = "from voteSession in class  where voteSession.sessionStatus='COMPLETE'";
     
-    private static final String COUNT_SESSION_INCOMPLETE = "from mcSession in class  where mcSession.sessionStatus='INCOMPLETE'";
+    private static final String COUNT_SESSION_INCOMPLETE = "from voteSession in class  where voteSession.sessionStatus='INCOMPLETE'";
     
-    private static final String GET_SESSIONNAMES_FROM_CONTENT 	= "select mcs.session_name from VoteSession mcs where mcs.mcContent=:mcContent order by mcs.mcSessionId";
+    private static final String GET_SESSIONNAMES_FROM_CONTENT 	= "select votes.session_name from VoteSession votes where votes.voteContent=:voteContent order by votes.voteSessionId";
     
-    public VoteSession getMcSessionByUID(Long uid)
+    public VoteSession getVoteSessionByUID(Long uid)
 	{
-		 return (VoteSession) this.getHibernateTemplate()
-         .get(VoteSession.class, uid);
+		 return (VoteSession) this.getHibernateTemplate().get(VoteSession.class, uid);
 	}
 	
-    public VoteSession findMcSessionById(Long mcSessionId)
+    public VoteSession findVoteSessionById(Long voteSessionId)
     {
-    	String query = "from VoteSession mcs where mcs.mcSessionId=?";
+    	String query = "from VoteSession votes where votes.voteSessionId=?";
 		
 		HibernateTemplate templ = this.getHibernateTemplate();
 		List list = getSession().createQuery(query)
-		.setLong(0,mcSessionId.longValue())
+		.setLong(0,voteSessionId.longValue())
 		.list();
 		
 		if(list != null && list.size() > 0){
-			VoteSession mcs = (VoteSession) list.get(0);
-			return mcs;
+			VoteSession votes = (VoteSession) list.get(0);
+			return votes;
 		}
 		return null;
 	}
@@ -102,39 +101,39 @@ public class VoteSessionDAO extends HibernateDaoSupport implements IVoteSessionD
 	}
     
     
-    public void saveMcSession(VoteSession mcSession)
+    public void saveVoteSession(VoteSession voteSession)
     {
-    	this.getHibernateTemplate().save(mcSession);
+    	this.getHibernateTemplate().save(voteSession);
     }
     
 	
-    public void updateMcSession(VoteSession mcSession)
+    public void updateVoteSession(VoteSession voteSession)
     {
     	this.getSession().setFlushMode(FlushMode.AUTO);
-    	this.getHibernateTemplate().update(mcSession);
+    	this.getHibernateTemplate().update(voteSession);
     }
 
    
-    public void removeMcSessionByUID(Long uid)
+    public void removeVoteSessionByUID(Long uid)
     {
-        VoteSession ms = (VoteSession)getHibernateTemplate().get(VoteSession.class, uid);
-    	this.getHibernateTemplate().delete(ms);
+        VoteSession votes = (VoteSession)getHibernateTemplate().get(VoteSession.class, uid);
+    	this.getHibernateTemplate().delete(votes);
     }
     
-    public void removeMcSessionById(Long mcSessionId)
+    public void removeVoteSessionById(Long voteSessionId)
     {
-        String query = "from VoteSession as mcs where mcs.mcSessionId =";
+        String query = "from VoteSession as votes where votes.voteSessionId =";
         
 		HibernateTemplate templ = this.getHibernateTemplate();
-		if ( mcSessionId != null) {
+		if ( voteSessionId != null) {
 			List list = getSession().createQuery(FIND_VOTE_SESSION_CONTENT)
-				.setLong(0,mcSessionId.longValue())
+				.setLong(0,voteSessionId.longValue())
 				.list();
 			
 			if(list != null && list.size() > 0){
-				VoteSession mcs = (VoteSession) list.get(0);
+				VoteSession vote = (VoteSession) list.get(0);
 				this.getSession().setFlushMode(FlushMode.AUTO);
-				templ.delete(mcs);
+				templ.delete(vote);
 				templ.flush();
 			}
 		}
@@ -142,22 +141,22 @@ public class VoteSessionDAO extends HibernateDaoSupport implements IVoteSessionD
         
     }
 
-    public void removeMcSession(VoteSession mcSession)
+    public void removeVoteSession(VoteSession voteSession)
     {
 		this.getSession().setFlushMode(FlushMode.AUTO);
-        this.getHibernateTemplate().delete(mcSession);
+        this.getHibernateTemplate().delete(voteSession);
     }
 
     
 
-    public VoteSession getMcSessionByUser(final Long userId)
+    public VoteSession getVoteSessionByUser(final Long userId)
 	{
 		 return (VoteSession) getHibernateTemplate().execute(new HibernateCallback()
                 {
 
                     public Object doInHibernate(Session session) throws HibernateException
                     {
-                        return session.createQuery(LOAD_MCSESSION_BY_USER)
+                        return session.createQuery(LOAD_VOTESESSION_BY_USER)
                                       .setLong("userId",
                                       		userId.longValue())
                                       .uniqueResult();
@@ -166,15 +165,15 @@ public class VoteSessionDAO extends HibernateDaoSupport implements IVoteSessionD
 	}
 	
 	 
-    public void removeMcUsers(VoteSession mcSession)
+    public void removeVoteUsers(VoteSession voteSession)
     {
-    	this.getHibernateTemplate().deleteAll(mcSession.getVoteQueUsers());
+    	this.getHibernateTemplate().deleteAll(voteSession.getVoteQueUsers());
     }
 	
     
-    public void addMcUsers(Long mcSessionId, VoteQueUsr user)
+    public void addVoteUsers(Long voteSessionId, VoteQueUsr user)
 	{
-    	VoteSession session = findMcSessionById(mcSessionId);
+    	VoteSession session = findVoteSessionById(voteSessionId);
 	    user.setVoteSession(session);
 	    session.getVoteQueUsers().add(user);
 	    this.getHibernateTemplate().saveOrUpdate(user);
@@ -183,18 +182,17 @@ public class VoteSessionDAO extends HibernateDaoSupport implements IVoteSessionD
 	}
 	
 
-	public List getSessionsFromContent(VoteContent mcContent)
+	public List getSessionsFromContent(VoteContent voteContent)
 	{
 	    return (getHibernateTemplate().findByNamedParam(GET_SESSIONS_FROM_CONTENT,
-	            "mcContent",
-				mcContent));
+	            "voteContent",
+	            voteContent));
 	}
 	
-	public List getSessionNamesFromContent(VoteContent mcContent)
+	public List getSessionNamesFromContent(VoteContent voteContent)
 	{
 	    return (getHibernateTemplate().findByNamedParam(GET_SESSIONNAMES_FROM_CONTENT,
-	            "mcContent",
-				mcContent));
+	            "voteContent",
+	            voteContent));
 	}
-
 }

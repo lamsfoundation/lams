@@ -40,6 +40,7 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteOptsContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
+import org.lamsfoundation.lams.tool.vote.web.VoteAuthoringForm;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -56,7 +57,7 @@ public abstract class VoteUtils implements VoteAppConstants {
 
 	/**
 	 * returns the service object from the session cache
-	 * IMcService getToolService(HttpServletRequest request)
+	 * IVoteService getToolService(HttpServletRequest request)
 	 * 
 	 * @param request
 	 * @return
@@ -152,7 +153,7 @@ public abstract class VoteUtils implements VoteAppConstants {
 	{
 		IVoteService mcService =VoteUtils.getToolService(request);
 	    /*
-    	VoteContent mcContent=mcService.retrieveMc(toolContentId);
+    	VoteContent mcContent=mcService.retrieveVote(toolContentId);
 	    logger.debug("retrieving mcContent: " + mcContent);
 	    if (mcContent == null) 
 	    	return false;
@@ -171,7 +172,7 @@ public abstract class VoteUtils implements VoteAppConstants {
 	{
 		logger.debug("existsSession");
     	IVoteService mcService =VoteUtils.getToolService(request);
-	    VoteSession mcSession=mcService.retrieveMcSession(toolSessionId);
+	    VoteSession mcSession=mcService.retrieveVoteSession(toolSessionId);
 	    logger.debug("mcSession:" + mcSession);
     	
 	    if (mcSession == null) 
@@ -183,17 +184,17 @@ public abstract class VoteUtils implements VoteAppConstants {
 	
 	/**
 	 * returns a Map of options
-	 * generateOptionsMap(List listMcOptions)
+	 * generateOptionsMap(List listVoteOptions)
 	 * 
-	 * @param listMcOptions
+	 * @param listVoteOptions
 	 * @return Map
 	 */
-	public static Map generateOptionsMap(List listMcOptions)
+	public static Map generateOptionsMap(List listVoteOptions)
 	{
-		logger.debug("incoming listMcOptions" + listMcOptions);
+		logger.debug("incoming listVoteOptions" + listVoteOptions);
 		Map mapOptionsContent= new TreeMap(new VoteStringComparator());
 		
-		Iterator listIterator=listMcOptions.iterator();
+		Iterator listIterator=listVoteOptions.iterator();
     	Long mapIndex=new Long(1);
     	while (listIterator.hasNext())
     	{
@@ -204,6 +205,32 @@ public abstract class VoteUtils implements VoteAppConstants {
     	}
     	logger.debug("generated mcOptionsContent: " + mapOptionsContent);
     	return mapOptionsContent;
+	}
+
+
+    public static void setDefaultSessionAttributes(HttpServletRequest request, VoteContent defaultVoteContent, VoteAuthoringForm voteAuthoringForm)
+	{
+		/*should never be null anyway as default content MUST exist in the db*/
+        if(defaultVoteContent == null)
+            throw new NullPointerException("Default VoteContent cannot be null");
+
+        voteAuthoringForm.setTitle(defaultVoteContent.getTitle());
+        voteAuthoringForm.setInstructions(defaultVoteContent.getInstructions());
+		request.getSession().setAttribute(ACTIVITY_TITLE, defaultVoteContent.getTitle());
+		request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, defaultVoteContent.getInstructions());
+		
+	    logger.debug("ACTIVITY_INSTRUCTIONS: " + defaultVoteContent.getInstructions());
+		
+	    voteAuthoringForm.setReportTitle(defaultVoteContent.getReportTitle());
+	    voteAuthoringForm.setMonitoringReportTitle(defaultVoteContent.getMonitoringReportTitle());
+	    voteAuthoringForm.setEndLearningMessage(defaultVoteContent.getEndLearningMessage());
+	    voteAuthoringForm.setOnlineInstructions(defaultVoteContent.getOnlineInstructions());
+	    voteAuthoringForm.setOfflineInstructions(defaultVoteContent.getOfflineInstructions());
+	    voteAuthoringForm.setMonitoringReportTitle(defaultVoteContent.getMonitoringReportTitle());
+		
+         //determine the status of radio boxes
+	    voteAuthoringForm.setUsernameVisible(defaultVoteContent.isUsernameVisible()?ON:OFF);
+	    voteAuthoringForm.setQuestionsSequenced(defaultVoteContent.isQuestionsSequenced()?ON:OFF);
 	}
 
 	
@@ -288,23 +315,23 @@ public abstract class VoteUtils implements VoteAppConstants {
 	
 	/**
 	 * retrieves existing updated file information
-	 * populateUploadedFilesData(HttpServletRequest request, McContent defaultMcContent)
+	 * populateUploadedFilesData(HttpServletRequest request, VoteContent defaultVoteContent)
 	 * 
 	 * @param request
-	 * @param defaultMcContent
+	 * @param defaultVoteContent
 	 */
-	public static void populateUploadedFilesData(HttpServletRequest request, VoteContent defaultMcContent)
+	public static void populateUploadedFilesData(HttpServletRequest request, VoteContent defaultVoteContent)
 	{
-		logger.debug("attempt populateUploadedFilesData for: " + defaultMcContent);
+		logger.debug("attempt populateUploadedFilesData for: " + defaultVoteContent);
 		IVoteService mcService =VoteUtils.getToolService(request);
     	logger.debug("mcService: " + mcService);
 
     	/** read the uploaded offline uuid + file name pair */
-	    List listOffFilesName=mcService.retrieveMcUploadedOfflineFilesName(defaultMcContent.getUid());
+	    List listOffFilesName=mcService.retrieveVoteUploadedOfflineFilesName(defaultVoteContent.getUid());
 	    logger.debug("initial listOfflineFilesName: " + listOffFilesName);
 	    
 	    /** read the uploaded online uuid + file name pair */
-	    List listOnFilesName=mcService.retrieveMcUploadedOnlineFilesName(defaultMcContent.getUid());
+	    List listOnFilesName=mcService.retrieveVoteUploadedOnlineFilesName(defaultVoteContent.getUid());
 	    logger.debug("initial listOnlineFilesName: " + listOnFilesName);
 	    
 	    request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILENAMES, listOffFilesName);
@@ -446,7 +473,7 @@ public abstract class VoteUtils implements VoteAppConstants {
 	 * The idea of content being in use is, once any one learner starts using a particular content
 	 * that content should become unmodifiable. 
 	 * 
-	 * isContentInUse(McContent mcContent)
+	 * isContentInUse(VoteContent mcContent)
 	 * @param mcContent
 	 * @return boolean
 	 */
@@ -460,7 +487,7 @@ public abstract class VoteUtils implements VoteAppConstants {
 	/**
 	 * find out if the content is being edited in monitoring interface or not. If it is, the author can not modify it.
 	 * 
-	 * isDefineLater(McContent mcContent)
+	 * isDefineLater(VoteContent mcContent)
 	 * @param mcContent
 	 * @return boolean
 	 */
@@ -473,7 +500,7 @@ public abstract class VoteUtils implements VoteAppConstants {
 	
 	/**
 	 * find out if the content is set to run offline or online. If it is set to run offline , the learners are informed about that..
-	 * isRubnOffline(McContent mcContent)
+	 * isRubnOffline(VoteContent mcContent)
 	 * 
 	 * @param mcContent
 	 * @return boolean
@@ -499,27 +526,27 @@ public abstract class VoteUtils implements VoteAppConstants {
     	logger.debug("toolContentId:" + toolContentId);
     	logger.debug("value:" + value);
     	
-    	VoteContent mcContent=mcService.retrieveMc(toolContentId);
+    	VoteContent mcContent=mcService.retrieveVote(toolContentId);
     	logger.debug("mcContent:" + mcContent);
     	if (mcContent != null)
     	{
     	    mcContent.setDefineLater(value);
         	logger.debug("defineLater has been set to true");
-        	mcService.saveMcContent(mcContent);	
+        	mcService.saveVoteContent(mcContent);	
     	}
     }
 	
     
-	public static String getDestination(String sourceMcStarter)
+	public static String getDestination(String sourceVoteStarter)
 	{
-		logger.debug("sourceMcStarter: " + sourceMcStarter);
+		logger.debug("sourceVoteStarter: " + sourceVoteStarter);
 		
-		if ((sourceMcStarter != null) && !sourceMcStarter.equals("monitoring"))
+		if ((sourceVoteStarter != null) && !sourceVoteStarter.equals("monitoring"))
 		{
 			logger.debug("request is from authoring or define Later url. return to: " + LOAD_QUESTIONS);
 			return LOAD_QUESTIONS;	
 		}
-		else if (sourceMcStarter == null)
+		else if (sourceVoteStarter == null)
 		{
 			logger.debug("request is from authoring url. return to: " + LOAD_QUESTIONS);
 			return LOAD_QUESTIONS;	

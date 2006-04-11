@@ -83,7 +83,7 @@ public class VoteExportAction extends LamsDispatchAction implements VoteAppConst
 		logger.debug("retrieving mcService from session: " + mcService);
 		if (mcService == null)
 		{
-			mcService = VoteServiceProxy.getMcService(getServlet().getServletContext());
+			mcService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
 		    logger.debug("retrieving mcService from proxy: " + mcService);
 		    request.getSession().setAttribute(TOOL_SERVICE, mcService);		
 		}
@@ -102,7 +102,7 @@ public class VoteExportAction extends LamsDispatchAction implements VoteAppConst
 		Long toolSessionId =(Long)request.getSession().getAttribute(TOOL_SESSION_ID);
 		logger.debug("toolSessionId: " + toolSessionId);
 		
-		VoteSession mcSession=mcService.findMcSessionById(toolSessionId);
+		VoteSession mcSession=mcService.findVoteSessionById(toolSessionId);
 		logger.debug("mcSession: " + mcSession);
 		if (mcSession == null)
 		{
@@ -118,7 +118,7 @@ public class VoteExportAction extends LamsDispatchAction implements VoteAppConst
 		Long exportUserId =(Long)request.getSession().getAttribute(EXPORT_USER_ID);
 		logger.debug("exportUserId : " + exportUserId);
 		
-		VoteQueUsr mcQueUsr=mcService.getMcUserBySession(exportUserId, toolSessionUid);
+		VoteQueUsr mcQueUsr=mcService.getVoteUserBySession(exportUserId, toolSessionUid);
 		logger.debug("existing tool user mcQueUsr : " + mcQueUsr);
 		if (mcQueUsr == null)
 		{
@@ -129,7 +129,7 @@ public class VoteExportAction extends LamsDispatchAction implements VoteAppConst
 		}
 		
 		logger.debug("getting mcContent based on toolSessionId : " + toolSessionId);
-		VoteContent mcContent=mcService.retrieveMcBySessionId(toolSessionId); 
+		VoteContent mcContent=mcService.retrieveVoteBySessionId(toolSessionId); 
 		logger.debug("mcContent : " + mcContent);
 		if (mcContent == null)
 		{
@@ -166,7 +166,7 @@ public class VoteExportAction extends LamsDispatchAction implements VoteAppConst
 		logger.debug("retrieving mcService from session: " + mcService);
 		if (mcService == null)
 		{
-			mcService = VoteServiceProxy.getMcService(getServlet().getServletContext());
+			mcService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
 		    logger.debug("retrieving mcService from proxy: " + mcService);
 		    request.getSession().setAttribute(TOOL_SERVICE, mcService);		
 		}
@@ -184,7 +184,7 @@ public class VoteExportAction extends LamsDispatchAction implements VoteAppConst
 
 		Long toolContentId =(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
 		logger.debug("toolContentId: " + toolContentId);
-		VoteContent mcContent=mcService.retrieveMc(toolContentId);
+		VoteContent mcContent=mcService.retrieveVote(toolContentId);
 		logger.debug("mcContent:" + mcContent);
 		
 		if (mcContent == null)

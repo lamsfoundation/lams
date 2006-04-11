@@ -52,8 +52,6 @@ public class VoteUsrAttempt implements Serializable {
     
     private String userEntry;
     
-    private boolean isNominated;
-    
     private Long queUsrId;
     
     private Long voteQueContentId;
@@ -87,10 +85,9 @@ public class VoteUsrAttempt implements Serializable {
         this.voteOptionsContent = voteOptionsContent;
     }
 
-    public VoteUsrAttempt(String userEntry, boolean isNominated, Date attemptTime, String timeZone, org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent voteQueContent, 
+    public VoteUsrAttempt(String userEntry, Date attemptTime, String timeZone, org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent voteQueContent, 
     		org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr voteQueUsr, org.lamsfoundation.lams.tool.vote.pojos.VoteOptsContent voteOptionsContent) {
         this.userEntry=userEntry;
-        this.isNominated=isNominated;
         this.attemptTime = attemptTime;
         this.timeZone = timeZone;
         this.voteQueContent = voteQueContent;
@@ -226,16 +223,5 @@ public class VoteUsrAttempt implements Serializable {
     public void setUserEntry(String userEntry) {
         this.userEntry = userEntry;
     }
-    /**
-     * @return Returns the isNominated.
-     */
-    public boolean isNominated() {
-        return isNominated;
-    }
-    /**
-     * @param isNominated The isNominated to set.
-     */
-    public void setNominated(boolean isNominated) {
-        this.isNominated = isNominated;
-    }
+
 }

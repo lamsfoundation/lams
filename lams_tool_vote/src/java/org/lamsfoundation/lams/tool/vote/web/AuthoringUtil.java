@@ -290,13 +290,13 @@ public class AuthoringUtil implements VoteAppConstants {
     	logger.debug("doing createContent...");
     	IVoteService mcService =VoteUtils.getToolService(request);
     	
-    	/* the tool content id is passed from the container to the tool and placed into session in the McStarterAction */
+    	/* the tool content id is passed from the container to the tool and placed into session in the VoteStarterAction */
     	Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
     	if ((toolContentId != null) && (toolContentId.longValue() != 0))
     	{
     		logger.debug("passed TOOL_CONTENT_ID : " + toolContentId);
     		/*delete the existing content in the database before applying new content*/
-    		mcService.deleteMcById(toolContentId);  
+    		mcService.deleteVoteById(toolContentId);  
     		logger.debug("post-deletion existing content");
 		}
     	
@@ -422,7 +422,7 @@ public class AuthoringUtil implements VoteAppConstants {
 	    logger.debug("mc content :" +  mc);
     	
     	/*create the content in the db*/
-        mcService.createMc(mc);
+        mcService.createVote(mc);
         logger.debug("mc created with content id: " + toolContentId);
         
         return mc;
@@ -841,7 +841,7 @@ public class AuthoringUtil implements VoteAppConstants {
     {
     	IVoteService mcService =VoteUtils.getToolService(request);
     	
-    	List allOfflineFilenames=mcService.retrieveMcUploadedOfflineFilesName(mcContent.getUid());
+    	List allOfflineFilenames=mcService.retrieveVoteUploadedOfflineFilesName(mcContent.getUid());
     	logger.debug("allOfflineFilenames:" + allOfflineFilenames);
     	
     	List listOfflineFilesMetaData =(List)request.getSession().getAttribute(LIST_OFFLINEFILES_METADATA);
@@ -888,7 +888,7 @@ public class AuthoringUtil implements VoteAppConstants {
     {
     	IVoteService mcService =VoteUtils.getToolService(request);
     	
-    	List allOnlineFilenames=mcService.retrieveMcUploadedOnlineFilesName(mcContent.getUid());
+    	List allOnlineFilenames=mcService.retrieveVoteUploadedOnlineFilesName(mcContent.getUid());
     	logger.debug("allOnlineFilenames:" + allOnlineFilenames);
     	
     	List listOnlineFilesMetaData =(List)request.getSession().getAttribute(LIST_ONLINEFILES_METADATA);

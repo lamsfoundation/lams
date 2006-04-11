@@ -52,8 +52,44 @@
 	      />	         			
 
 	  	<forward
+		    name="load"
+		    path="/authoring/AuthoringMaincontent.jsp"
+		    redirect="true"
+	  	/>
+
+	  	<forward
+		    name="loadMonitoring"
+		    path="/monitoring/MonitoringMaincontent.jsp"
+		    redirect="true"
+	  	/>
+
+	  	<forward
+		    name="loadMonitoringEditActivity"
+		    path="/monitoring/MonitoringMaincontent.jsp"
+		    redirect="true"
+	  	/>
+	  	
+	  	<forward
+		    name="loadLearner"
+		    path="/learning/AnswersContent.jsp"
+		    redirect="true"
+	  	/>
+
+	  	<forward
+	        name="starter"
+	        path="/index.jsp"
+		    redirect="true"
+	     />
+	     
+	     <forward
+	        name="preview"
+	        path="/learning/Preview.jsp"
+		    redirect="true"
+	     />
+	  	
+	  	<forward
 		    name="errorList"
-	        path="/VoteErrorBox.jsp"
+		    path="/VoteErrorBox.jsp"
 		    redirect="true"
 	  	/>
 	</action>  

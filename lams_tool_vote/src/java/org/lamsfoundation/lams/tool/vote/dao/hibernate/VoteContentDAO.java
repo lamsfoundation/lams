@@ -43,33 +43,33 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 public class VoteContentDAO extends HibernateDaoSupport implements IVoteContentDAO {
 	static Logger logger = Logger.getLogger(VoteContentDAO.class.getName());
 	
-	private static final String FIND_VOTE_CONTENT = "from " + VoteContent.class.getName() + " as mc where content_id=?";
+	private static final String FIND_VOTE_CONTENT = "from " + VoteContent.class.getName() + " as vote where content_id=?";
 	
-	private static final String LOAD_VOTE_BY_SESSION = "select mc from VoteContent mc left join fetch "
-        + "mc.mcSessions session where session.mcSessionId=:sessionId";
+	private static final String LOAD_VOTE_BY_SESSION = "select vote from VoteContent vote left join fetch "
+        + "vote.voteSessions session where session.voteSessionId=:sessionId";
 
-	public VoteContent getMcContentByUID(Long uid)
+	public VoteContent getVoteContentByUID(Long uid)
 	{
 		return (VoteContent) this.getHibernateTemplate().get(VoteContent.class, uid);
 	}
 	
-	public VoteContent findMcContentById(Long mcContentId)
+	public VoteContent findVoteContentById(Long voteContentId)
 	{
-		String query = "from VoteContent as mc where mc.mcContentId = ?";
+		String query = "from VoteContent as vote where vote.voteContentId = ?";
 	    HibernateTemplate templ = this.getHibernateTemplate();
 		List list = getSession().createQuery(query)
-			.setLong(0,mcContentId.longValue())
+			.setLong(0,voteContentId.longValue())
 			.list();
 		
 		if(list != null && list.size() > 0){
-			VoteContent mc = (VoteContent) list.get(0);
-			return mc;
+			VoteContent vote = (VoteContent) list.get(0);
+			return vote;
 		}
 		return null;
 	}
     	
 
-	public VoteContent getMcContentBySession(final Long mcSessionId)
+	public VoteContent getVoteContentBySession(final Long voteSessionId)
 	{
 		 return (VoteContent) getHibernateTemplate().execute(new HibernateCallback()
                 {
@@ -78,65 +78,64 @@ public class VoteContentDAO extends HibernateDaoSupport implements IVoteContentD
                     {
                         return session.createQuery(LOAD_VOTE_BY_SESSION)
                                       .setLong("sessionId",
-                                      		mcSessionId.longValue())
+                                              voteSessionId.longValue())
                                       .uniqueResult();
                     }
                 });
 	}
 	
 	
-	public void saveMcContent(VoteContent mcContent)
+	public void saveVoteContent(VoteContent voteContent)
     {
 		this.getSession().setFlushMode(FlushMode.AUTO);
 		logger.debug("before saveOrUpdate");
-    	this.getHibernateTemplate().saveOrUpdate(mcContent);
+    	this.getHibernateTemplate().saveOrUpdate(voteContent);
     	logger.debug("after saveOrUpdate");
     }
     
-	public void updateMcContent(VoteContent mcContent)
+	public void updateVoteContent(VoteContent voteContent)
     {
 		this.getSession().setFlushMode(FlushMode.AUTO);
-    	this.getHibernateTemplate().update(mcContent);
+    	this.getHibernateTemplate().update(voteContent);
     }
 
    
-	public void removeMcById(Long mcContentId)
+	public void removeVoteById(Long voteContentId)
     {
 		HibernateTemplate templ = this.getHibernateTemplate();
-		if ( mcContentId != null) {
+		if ( voteContentId != null) {
 			List list = getSession().createQuery(FIND_VOTE_CONTENT)
-				.setLong(0,mcContentId.longValue())
+				.setLong(0,voteContentId.longValue())
 				.list();
 			
 			if(list != null && list.size() > 0){
-				VoteContent mc = (VoteContent) list.get(0);
+				VoteContent vote = (VoteContent) list.get(0);
 				this.getSession().setFlushMode(FlushMode.AUTO);
-				templ.delete(mc);
+				templ.delete(vote);
 				templ.flush();
 			}
 		}
     }
 	
-    public void removeMc(VoteContent mcContent)
+    public void removeVote(VoteContent voteContent)
     {
-        this.getHibernateTemplate().delete(mcContent);
+        this.getHibernateTemplate().delete(voteContent);
     }
    
 
-    public void removeMcSessions(VoteContent mcContent)
+    public void removeVoteSessions(VoteContent voteContent)
     {
-    	this.getHibernateTemplate().deleteAll(mcContent.getVoteSessions());
+    	this.getHibernateTemplate().deleteAll(voteContent.getVoteSessions());
     }
     
-    public void addMcSession(Long mcContentId, VoteSession mcSession)
+    public void addVoteSession(Long voteContentId, VoteSession voteSession)
     {
-        /*
-        VoteContent content = findMcContentById(mcContentId);
-        mcSession.setMcContent(content);
-        content.getMcSessions().add(mcSession);
-        this.getHibernateTemplate().saveOrUpdate(mcSession);
+        VoteContent content = findVoteContentById(voteContentId);
+        voteSession.setVoteContent(content);
+        content.getVoteSessions().add(voteSession);
+        this.getHibernateTemplate().saveOrUpdate(voteSession);
         this.getHibernateTemplate().saveOrUpdate(content);
-        */
+
     }
     
     public List findAll(Class objClass) {

@@ -77,7 +77,7 @@ import org.springframework.dao.DataAccessException;
  * 
  * @author Ozgur Demirtas
  * 
- * The POJO implementation of Mc service. All business logics of Voting tool
+ * The POJO implementation of Voting service. All business logics of Voting tool
  * are implemented in this class. It translate the request from presentation
  * layer and perform appropriate database operation.
  * 
@@ -106,7 +106,7 @@ public class VoteServicePOJO implements
     private IUserManagementService 	userManagementService;
     private ILearnerService 		learnerService;
     private ILamsToolService 		toolService;
-    private IToolContentHandler mcToolContentHandler = null;
+    private IToolContentHandler voteToolContentHandler = null;
     
     public VoteServicePOJO(){}
     
@@ -132,128 +132,113 @@ public class VoteServicePOJO implements
       }
     
     
-    public void createMc(VoteContent mcContent) throws VoteApplicationException
+    public void createVote(VoteContent voteContent) throws VoteApplicationException
     {
         try
         {
-        	logger.debug("using mcContent defineLater:" + mcContent.isDefineLater());
-        	voteContentDAO.saveMcContent(mcContent);
+        	logger.debug("using voteContent defineLater:" + voteContent.isDefineLater());
+        	voteContentDAO.saveVoteContent(voteContent);
         }
         catch (DataAccessException e)
         {
-            throw new VoteApplicationException("Exception occured when lams is creating mc content: "
+            throw new VoteApplicationException("Exception occured when lams is creating vote content: "
                                                          + e.getMessage(),
 														   e);
         }
     }
 	
     
-    public VoteContent retrieveMc(Long toolContentId) throws VoteApplicationException
+    public VoteContent retrieveVote(Long toolContentId) throws VoteApplicationException
     {
         try
         {
-            return voteContentDAO.findMcContentById(toolContentId);
+            return voteContentDAO.findVoteContentById(toolContentId);
         }
         catch (DataAccessException e)
         {
-            throw new VoteApplicationException("Exception occured when lams is loading mc content: "
+            throw new VoteApplicationException("Exception occured when lams is loading vote content: "
                                                          + e.getMessage(),
 														   e);
         }
     }
     
-    public void  updateMcContent(VoteContent mcContent) throws VoteApplicationException
+    public void  updateVoteContent(VoteContent voteContent) throws VoteApplicationException
     {
         try
         {
-            voteContentDAO.updateMcContent(mcContent);
+            voteContentDAO.updateVoteContent(voteContent);
         }
         catch (DataAccessException e)
         {
-            throw new VoteApplicationException("Exception occured when lams is updating mc content: "
+            throw new VoteApplicationException("Exception occured when lams is updating vote content: "
                                                          + e.getMessage(),
 														   e);
         }
     }
 
-    public void createMcQue(VoteQueContent mcQueContent) throws VoteApplicationException
+    public void createVoteQue(VoteQueContent voteQueContent) throws VoteApplicationException
     {
         try
         {
-        	voteQueContentDAO.saveMcQueContent(mcQueContent);
+        	voteQueContentDAO.saveVoteQueContent(voteQueContent);
         }
         catch (DataAccessException e)
         {
-            throw new VoteApplicationException("Exception occured when lams is creating mc que content: "
+            throw new VoteApplicationException("Exception occured when lams is creating vote que content: "
                                                          + e.getMessage(),
 														   e);
         }
     }
     
-    public VoteQueContent getQuestionContentByDisplayOrder(final Long displayOrder, final Long mcContentUid) throws VoteApplicationException
-	{
-        try
-        {
-        	return voteQueContentDAO.getQuestionContentByDisplayOrder(displayOrder, mcContentUid);
-        }
-        catch (DataAccessException e)
-        {
-            throw new VoteApplicationException("Exception occured when lams is getting mc que content by display order: "
-                                                         + e.getMessage(),
-														   e);
-        }    	
-	}
-    
-    
-    public VoteQueContent getMcQueContentByUID(Long uid) throws VoteApplicationException
+    public VoteQueContent getVoteQueContentByUID(Long uid) throws VoteApplicationException
     {
         try
         {
-        	return voteQueContentDAO.getMcQueContentByUID(uid);
+        	return voteQueContentDAO.getVoteQueContentByUID(uid);
         }
         catch (DataAccessException e)
         {
-            throw new VoteApplicationException("Exception occured when lams is getting mc que content by uid: "
+            throw new VoteApplicationException("Exception occured when lams is getting vote que content by uid: "
                                                          + e.getMessage(),
 														   e);
         }	
     }
     
     
-    public void saveOrUpdateMcQueContent(VoteQueContent mcQueContent) throws VoteApplicationException
+    public void saveOrUpdateVoteQueContent(VoteQueContent voteQueContent) throws VoteApplicationException
 	{
     	try
         {
-        	voteQueContentDAO.saveOrUpdateMcQueContent(mcQueContent);
+        	voteQueContentDAO.saveOrUpdateVoteQueContent(voteQueContent);
         }
         catch (DataAccessException e)
         {
-            throw new VoteApplicationException("Exception occured when lams is updating mc que content: "
+            throw new VoteApplicationException("Exception occured when lams is updating vote que content: "
                                                          + e.getMessage(),
 														   e);
         }
 	}
     
     
-    public void removeQuestionContentByMcUid(final Long mcContentUid) throws VoteApplicationException
+    public void removeQuestionContentByVoteUid(final Long voteContentUid) throws VoteApplicationException
 	{
     	try
         {
-        	voteQueContentDAO.removeQuestionContentByMcUid(mcContentUid);
+        	voteQueContentDAO.removeQuestionContentByVoteUid(voteContentUid);
         }
         catch (DataAccessException e)
         {
-            throw new VoteApplicationException("Exception occured when lams is removing mc que content by mc content id: "
+            throw new VoteApplicationException("Exception occured when lams is removing vote que content by vote content id: "
                                                          + e.getMessage(),
 														   e);
         }
 	}
     
-    public void resetAllQuestions(final Long mcContentUid) throws VoteApplicationException
+    public void resetAllQuestions(final Long voteContentUid) throws VoteApplicationException
 	{
     	try
         {
-        	voteQueContentDAO.resetAllQuestions(mcContentUid);
+        	voteQueContentDAO.resetAllQuestions(voteContentUid);
         }
         catch (DataAccessException e)
         {
@@ -265,11 +250,11 @@ public class VoteServicePOJO implements
     
     
     
-    public void cleanAllQuestions(final Long mcContentUid) throws VoteApplicationException
+    public void cleanAllQuestions(final Long voteContentUid) throws VoteApplicationException
 	{
     	try
         {
-        	voteQueContentDAO.cleanAllQuestions(mcContentUid);
+        	voteQueContentDAO.cleanAllQuestions(voteContentUid);
         }
         catch (DataAccessException e)
         {
@@ -280,150 +265,135 @@ public class VoteServicePOJO implements
 	}
     
     
-    public List getNextAvailableDisplayOrder(final long mcContentId) throws VoteApplicationException
-	{
-    	try
-        {
-        	return voteQueContentDAO.getNextAvailableDisplayOrder(mcContentId);
-        }
-        catch (DataAccessException e)
-        {
-            throw new VoteApplicationException("Exception occured when lams is getting the next available display order: "
-                                                         + e.getMessage(),
-														   e);
-        }
-	}
-    
-  
-    public void createMcSession(VoteSession mcSession) throws VoteApplicationException
+    public void createVoteSession(VoteSession voteSession) throws VoteApplicationException
     {
         try
         {
-        	voteSessionDAO.saveMcSession(mcSession);
+        	voteSessionDAO.saveVoteSession(voteSession);
         }
         catch (DataAccessException e)
         {
-            throw new VoteApplicationException("Exception occured when lams is creating mc session: "
+            throw new VoteApplicationException("Exception occured when lams is creating vote session: "
                                                          + e.getMessage(),
 														   e);
         }
     }
 
     
-    public VoteSession getMcSessionByUID(Long uid) throws VoteApplicationException
+    public VoteSession getVoteSessionByUID(Long uid) throws VoteApplicationException
     {
         try
         {
-        	return voteSessionDAO.getMcSessionByUID(uid);
+        	return voteSessionDAO.getVoteSessionByUID(uid);
         }
         catch (DataAccessException e)
         {
-            throw new VoteApplicationException("Exception occured when lams is getting mcSession my uid: "
+            throw new VoteApplicationException("Exception occured when lams is getting voteSession my uid: "
                                                          + e.getMessage(),
 														   e);
         }
     }
 
 
-    public void createMcQueUsr(VoteQueUsr mcQueUsr) throws VoteApplicationException
+    public void createVoteQueUsr(VoteQueUsr voteQueUsr) throws VoteApplicationException
     {
 	   try
         {
-	   		voteUserDAO.saveMcUser(mcQueUsr);
+	   		voteUserDAO.saveVoteUser(voteQueUsr);
         }
         catch (DataAccessException e)
         {
-            throw new VoteApplicationException("Exception occured when lams is creating mc QueUsr: "
+            throw new VoteApplicationException("Exception occured when lams is creating vote QueUsr: "
                                                          + e.getMessage(),
 														   e);
         }
     }
     
     
-    public VoteQueUsr getMcUserBySession(final Long queUsrId, final Long mcSessionId) throws VoteApplicationException
+    public VoteQueUsr getVoteUserBySession(final Long queUsrId, final Long voteSessionId) throws VoteApplicationException
 	{
  	   try
        {
-	   		return voteUserDAO.getMcUserBySession(queUsrId, mcSessionId);
+	   		return voteUserDAO.getVoteUserBySession(queUsrId, voteSessionId);
        }
        catch (DataAccessException e)
        {
-           throw new VoteApplicationException("Exception occured when lams is getting mc QueUsr: "
+           throw new VoteApplicationException("Exception occured when lams is getting vote QueUsr: "
                                                         + e.getMessage(),
 														   e);
        }    	
 	}
     
     
-    public VoteQueUsr getMcUserByUID(Long uid) throws VoteApplicationException
+    public VoteQueUsr getVoteUserByUID(Long uid) throws VoteApplicationException
     {
 	   try
         {
-	   		return voteUserDAO.getMcUserByUID(uid);
+	   		return voteUserDAO.getVoteUserByUID(uid);
         }
         catch (DataAccessException e)
         {
-            throw new VoteApplicationException("Exception occured when lams is getting the mc QueUsr by uid."
+            throw new VoteApplicationException("Exception occured when lams is getting the vote QueUsr by uid."
                                                          + e.getMessage(),
 														   e);
         }
     }
     
-    public VoteQueUsr retrieveMcQueUsr(Long userId) throws VoteApplicationException
+    public VoteQueUsr retrieveVoteQueUsr(Long userId) throws VoteApplicationException
     {
 	   try
         {
-	   		VoteQueUsr mcQueUsr=voteUserDAO.findMcUserById(userId);
-	   		return mcQueUsr;
+	   		VoteQueUsr voteQueUsr=voteUserDAO.findVoteUserById(userId);
+	   		return voteQueUsr;
         }
         catch (DataAccessException e)
         {
-            throw new VoteApplicationException("Exception occured when lams is retrieving McQueUsr: "
+            throw new VoteApplicationException("Exception occured when lams is retrieving VoteQueUsr: "
                                                          + e.getMessage(),
 														   e);
         }
     }
     
     
-    public void createMcUsrAttempt(VoteUsrAttempt mcUsrAttempt) throws VoteApplicationException
+    public void createVoteUsrAttempt(VoteUsrAttempt voteUsrAttempt) throws VoteApplicationException
     {
         try
         {
-        	voteUsrAttemptDAO.saveMcUsrAttempt(mcUsrAttempt);
+        	voteUsrAttemptDAO.saveVoteUsrAttempt(voteUsrAttempt);
         }
         catch (DataAccessException e)
         {
-            throw new VoteApplicationException("Exception occured when lams is creating mc UsrAttempt: "
+            throw new VoteApplicationException("Exception occured when lams is creating vote UsrAttempt: "
                                                          + e.getMessage(),
 														   e);
         }
     }
     
     
-    public List getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long mcQueContentId) throws VoteApplicationException
+    public List getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long voteQueContentId) throws VoteApplicationException
 	{
         try
         {
-        	return voteUsrAttemptDAO.getAttemptsForUserAndQuestionContent(queUsrId, mcQueContentId);
+        	return voteUsrAttemptDAO.getAttemptsForUserAndQuestionContent(queUsrId, voteQueContentId);
         }
         catch (DataAccessException e)
         {
-            throw new VoteApplicationException("Exception occured when lams is getting mc UsrAttempt by user id and que content id: "
+            throw new VoteApplicationException("Exception occured when lams is getting vote UsrAttempt by user id and que content id: "
                                                          + e.getMessage(),
 														   e);
         }
 	}
     
     
-	public void updateMcUsrAttempt(VoteUsrAttempt mcUsrAttempt) throws VoteApplicationException
+	public void updateVoteUsrAttempt(VoteUsrAttempt voteUsrAttempt) throws VoteApplicationException
     {
         try
         {
-        	voteUsrAttemptDAO.updateMcUsrAttempt(mcUsrAttempt);
+        	voteUsrAttemptDAO.updateVoteUsrAttempt(voteUsrAttempt);
         }
         catch (DataAccessException e)
         {
-            throw new VoteApplicationException("Exception occured when lams is updating mc UsrAttempt: "
+            throw new VoteApplicationException("Exception occured when lams is updating vote UsrAttempt: "
                                                          + e.getMessage(),
 														   e);
         }
@@ -446,11 +416,11 @@ public class VoteServicePOJO implements
 	}
 	
 	
-	public List getAttemptForQueContent(final Long queUsrId, final Long mcQueContentId) throws VoteApplicationException
+	public List getAttemptForQueContent(final Long queUsrId, final Long voteQueContentId) throws VoteApplicationException
 	{
         try
         {
-        	return voteUsrAttemptDAO.getAttemptForQueContent(queUsrId, mcQueContentId);
+        	return voteUsrAttemptDAO.getAttemptForQueContent(queUsrId, voteQueContentId);
         }
         catch (DataAccessException e)
         {
@@ -461,30 +431,30 @@ public class VoteServicePOJO implements
 	}
 	
     
-    public VoteQueContent retrieveMcQueContentByUID(Long uid) throws VoteApplicationException
+    public VoteQueContent retrieveVoteQueContentByUID(Long uid) throws VoteApplicationException
     {
         try
         {
-            return voteQueContentDAO.getMcQueContentByUID(uid);
+            return voteQueContentDAO.getVoteQueContentByUID(uid);
         }
         catch (DataAccessException e)
         {
-            throw new VoteApplicationException("Exception occured when lams is retrieving by uid  mc question content: "
+            throw new VoteApplicationException("Exception occured when lams is retrieving by uid  vote question content: "
                                                          + e.getMessage(),
 														   e);
         }
     }
    
     
-    public void cleanAllQuestionsSimple(final Long mcContentId) throws VoteApplicationException
+    public void cleanAllQuestionsSimple(final Long voteContentId) throws VoteApplicationException
 	{
     	try
         {
-            voteQueContentDAO.cleanAllQuestionsSimple(mcContentId);
+            voteQueContentDAO.cleanAllQuestionsSimple(voteContentId);
         }
         catch (DataAccessException e)
         {
-            throw new VoteApplicationException("Exception occured when lams is cleaning mc question content by mcContentId : "
+            throw new VoteApplicationException("Exception occured when lams is cleaning vote question content by voteContentId : "
                                                          + e.getMessage(),
 														   e);
         }    	
@@ -498,93 +468,62 @@ public class VoteServicePOJO implements
         }
         catch (DataAccessException e)
         {
-            throw new VoteApplicationException("Exception occured when lams is getting by uid  mc question content: "
+            throw new VoteApplicationException("Exception occured when lams is getting by uid  vote question content: "
                                                          + e.getMessage(),
 														   e);
         }
 	}
     
     
-    public void removeMcQueContentByUID(Long uid) throws VoteApplicationException
+    public void removeVoteQueContentByUID(Long uid) throws VoteApplicationException
 	{
  	   try
        {
-           voteQueContentDAO.removeMcQueContentByUID(uid);
+           voteQueContentDAO.removeVoteQueContentByUID(uid);
        }
        catch (DataAccessException e)
        {
-           throw new VoteApplicationException("Exception occured when lams is removing by uid  mc question content: "
+           throw new VoteApplicationException("Exception occured when lams is removing by uid  vote question content: "
                                                         + e.getMessage(),
 														   e);
        }
 	}
    
 
-    public List refreshQuestionContent(final Long mcContentId) throws VoteApplicationException
-	{
-        try
-        {
-            return voteQueContentDAO.refreshQuestionContent(mcContentId);
-        }
-        catch (DataAccessException e)
-        {
-            throw new VoteApplicationException("Exception occured when lams is refreshing  mc question content: "
-                                                         + e.getMessage(),
-														   e);
-        }
-    	
-	}
-    
-    public void removeMcQueContent(VoteQueContent mcQueContent) throws VoteApplicationException
+    public void removeVoteQueContent(VoteQueContent voteQueContent) throws VoteApplicationException
 	{
     	try
         {
-            voteQueContentDAO.removeMcQueContent(mcQueContent);
+            voteQueContentDAO.removeVoteQueContent(voteQueContent);
         }
         catch (DataAccessException e)
         {
-            throw new VoteApplicationException("Exception occured when lams is removing mc question content: "
+            throw new VoteApplicationException("Exception occured when lams is removing vote question content: "
                                                          + e.getMessage(),
 														   e);
         }
 	}
     
-    public void removeMcOptionsContent(VoteOptsContent mcOptsContent) throws VoteApplicationException
+    public void removeVoteOptionsContent(VoteOptsContent voteOptsContent) throws VoteApplicationException
     {
     	try
         {
-            voteOptionsContentDAO.removeMcOptionsContent(mcOptsContent);
+            voteOptionsContentDAO.removeVoteOptionsContent(voteOptsContent);
         }
         catch (DataAccessException e)
         {
             throw new VoteApplicationException("Exception occured when lams is removing"
-                                                 + " the mc options content: "
+                                                 + " the vote options content: "
                                                  + e.getMessage(),e);
         }
     }
 
-    public List getPersistedSelectedOptions(Long mcQueContentId) throws VoteApplicationException
-	{
-    	try
-        {
-            return voteOptionsContentDAO.getPersistedSelectedOptions(mcQueContentId);
-        }
-        catch (DataAccessException e)
-        {
-            throw new VoteApplicationException("Exception occured when lams is gettong persisted selected"
-                                                 + " the mc options content: "
-                                                 + e.getMessage(),e);
-        }
-    	
-	}
-    
-    
-    
-    public VoteQueContent getQuestionContentByQuestionText(final String question, final Long mcContentId)
+
+    public VoteQueContent getQuestionContentByQuestionText(final String question, final Long voteContentId)
     {
         try
         {
-            return voteQueContentDAO.getQuestionContentByQuestionText(question, mcContentId);
+            return voteQueContentDAO.getQuestionContentByQuestionText(question, voteContentId);
         }
         catch (DataAccessException e)
         {
@@ -595,41 +534,41 @@ public class VoteServicePOJO implements
     }
     
     
-    public VoteSession retrieveMcSession(Long mcSessionId) throws VoteApplicationException
+    public VoteSession retrieveVoteSession(Long voteSessionId) throws VoteApplicationException
     {
     	try
         {
-            return voteSessionDAO.findMcSessionById(mcSessionId);
+            return voteSessionDAO.findVoteSessionById(voteSessionId);
         }
         catch (DataAccessException e)
         {
-            throw new VoteApplicationException("Exception occured when lams is retrieving by id mc session : "
+            throw new VoteApplicationException("Exception occured when lams is retrieving by id vote session : "
                                                          + e.getMessage(),
 														   e);
         }
     }
     
     
-    public VoteSession findMcSessionById(Long mcSessionId) throws VoteApplicationException
+    public VoteSession findVoteSessionById(Long voteSessionId) throws VoteApplicationException
 	{
     	try
         {
-            return voteSessionDAO.findMcSessionById(mcSessionId);
+            return voteSessionDAO.findVoteSessionById(voteSessionId);
         }
         catch (DataAccessException e)
         {
-            throw new VoteApplicationException("Exception occured when lams is retrieving by id mc session : "
+            throw new VoteApplicationException("Exception occured when lams is retrieving by id vote session : "
                                                          + e.getMessage(),
 														   e);
         }
     	
 	}
    
-    public List getMcUserBySessionOnly(final VoteSession mcSession) throws VoteApplicationException
+    public List getVoteUserBySessionOnly(final VoteSession voteSession) throws VoteApplicationException
     {
      	try
         {
-            return voteUserDAO.getMcUserBySessionOnly(mcSession);
+            return voteUserDAO.getVoteUserBySessionOnly(voteSession);
         }
         catch (DataAccessException e)
         {
@@ -640,25 +579,25 @@ public class VoteServicePOJO implements
     }
     
     
-    public VoteContent retrieveMcBySessionId(Long mcSessionId) throws VoteApplicationException
+    public VoteContent retrieveVoteBySessionId(Long voteSessionId) throws VoteApplicationException
     {
         try
         {
-        	return voteContentDAO.getMcContentBySession(mcSessionId);
+        	return voteContentDAO.getVoteContentBySession(voteSessionId);
         }
         catch (DataAccessException e)
         {
-            throw new VoteApplicationException("Exception occured when lams is retrieving mc by session id: "
+            throw new VoteApplicationException("Exception occured when lams is retrieving vote by session id: "
             								+ e.getMessage(),
                                               e);
         }
     }
    
-    public List getSessionNamesFromContent(VoteContent mcContent) throws VoteApplicationException
+    public List getSessionNamesFromContent(VoteContent voteContent) throws VoteApplicationException
     {
         try
         {
-        	return voteSessionDAO.getSessionNamesFromContent(mcContent);
+        	return voteSessionDAO.getSessionNamesFromContent(voteContent);
         }
         catch (DataAccessException e)
         {
@@ -670,59 +609,59 @@ public class VoteServicePOJO implements
 
     
     
-    public void updateMc(VoteContent mc) throws VoteApplicationException
+    public void updateVote(VoteContent vote) throws VoteApplicationException
     {
         try
         {
-            voteContentDAO.updateMcContent(mc);
+            voteContentDAO.updateVoteContent(vote);
         }
         catch(DataAccessException e)
         {
             throw new VoteApplicationException("Exception occured when lams is updating"
-                                                 + " the mc content: "
+                                                 + " the vote content: "
                                                  + e.getMessage(),e);
         }
     }
 
     
-    public void updateMcSession(VoteSession mcSession) throws VoteApplicationException
+    public void updateVoteSession(VoteSession voteSession) throws VoteApplicationException
     {
     	try
         {
-            voteSessionDAO.updateMcSession(mcSession);
+            voteSessionDAO.updateVoteSession(voteSession);
         }
         catch (DataAccessException e)
         {
-            throw new VoteApplicationException("Exception occured when lams is updating mc session : "
+            throw new VoteApplicationException("Exception occured when lams is updating vote session : "
                                                          + e.getMessage(),
 														   e);
         }
     }
     
-    public void deleteMc(VoteContent mc) throws VoteApplicationException
+    public void deleteVote(VoteContent vote) throws VoteApplicationException
     {
     	try
         {
-            voteContentDAO.removeMc(mc);
+            voteContentDAO.removeVote(vote);
         }
         catch(DataAccessException e)
         {
             throw new VoteApplicationException("Exception occured when lams is removing"
-                                                 + " the mc content: "
+                                                 + " the vote content: "
                                                  + e.getMessage(),e);
         }
     }
     
-    public void deleteMcById(Long mcId) throws VoteApplicationException
+    public void deleteVoteById(Long voteId) throws VoteApplicationException
     {
     	try
         {
-            voteContentDAO.removeMcById(mcId);
+            voteContentDAO.removeVoteById(voteId);
         }
         catch(DataAccessException e)
         {
             throw new VoteApplicationException("Exception occured when lams is removing by id"
-                                                 + " the mc content: "
+                                                 + " the vote content: "
                                                  + e.getMessage(),e);
         }
     }
@@ -753,16 +692,16 @@ public class VoteServicePOJO implements
         }    	
 	}
     
-    public void deleteMcSession(VoteSession mcSession) throws VoteApplicationException 
+    public void deleteVoteSession(VoteSession voteSession) throws VoteApplicationException 
 	{
 		try
         {
-			voteSessionDAO.removeMcSession(mcSession);
+			voteSessionDAO.removeVoteSession(voteSession);
         }
 		catch(DataAccessException e)
         {
             throw new VoteApplicationException("Exception occured when lams is deleting"
-                                                 + " the mc session: "
+                                                 + " the vote session: "
                                                  + e.getMessage(),e);
         }
 	}
@@ -772,7 +711,7 @@ public class VoteServicePOJO implements
 	{
     	try
         {
-    		voteUsrAttemptDAO.removeMcUsrAttempt(attempt);
+    		voteUsrAttemptDAO.removeVoteUsrAttempt(attempt);
         }
         catch(DataAccessException e)
         {
@@ -783,11 +722,11 @@ public class VoteServicePOJO implements
 	}
     
     
-    public void deleteMcQueUsr(VoteQueUsr mcQueUsr) throws VoteApplicationException
+    public void deleteVoteQueUsr(VoteQueUsr voteQueUsr) throws VoteApplicationException
     {
     	try
         {
-    		voteUserDAO.removeMcUser(mcQueUsr);
+    		voteUserDAO.removeVoteUser(voteQueUsr);
         }
         catch(DataAccessException e)
         {
@@ -798,42 +737,42 @@ public class VoteServicePOJO implements
     }
     
     
-    public void saveMcContent(VoteContent mc) throws VoteApplicationException
+    public void saveVoteContent(VoteContent vote) throws VoteApplicationException
     {
         try
         {
-            voteContentDAO.saveMcContent(mc);
+            voteContentDAO.saveVoteContent(vote);
         }
         catch (DataAccessException e)
         {
             throw new VoteApplicationException("Exception occured when lams is saving"
-                                                 + " the mc content: "
+                                                 + " the vote content: "
                                                  + e.getMessage(),e);
         }
     }
     
     
-    public List findMcOptionsContentByQueId(Long mcQueContentId) throws VoteApplicationException
+    public List findVoteOptionsContentByQueId(Long voteQueContentId) throws VoteApplicationException
     {
     	try
         {
-            List list=voteOptionsContentDAO.findMcOptionsContentByQueId(mcQueContentId);
+            List list=voteOptionsContentDAO.findVoteOptionsContentByQueId(voteQueContentId);
             return list;
         }
         catch (DataAccessException e)
         {
             throw new VoteApplicationException("Exception occured when lams is finding by que id"
-                                                 + " the mc options: "
+                                                 + " the vote options: "
                                                  + e.getMessage(),e);
         }
     }
     
     
-    public VoteOptsContent getMcOptionsContentByUID(Long uid) throws VoteApplicationException
+    public VoteOptsContent getVoteOptionsContentByUID(Long uid) throws VoteApplicationException
 	{
     	try
         {
-            return getMcOptionsContentByUID(uid);
+            return getVoteOptionsContentByUID(uid);
         }
         catch (DataAccessException e)
         {
@@ -843,25 +782,25 @@ public class VoteServicePOJO implements
 	}
     
     
-    public void saveMcOptionsContent(VoteOptsContent mcOptsContent) throws VoteApplicationException
+    public void saveVoteOptionsContent(VoteOptsContent voteOptsContent) throws VoteApplicationException
 	{
     	try
         {
-            voteOptionsContentDAO.saveMcOptionsContent(mcOptsContent);
+            voteOptionsContentDAO.saveVoteOptionsContent(voteOptsContent);
         }
         catch (DataAccessException e)
         {
             throw new VoteApplicationException("Exception occured when lams is saving"
-                                                 + " the mc options content: "
+                                                 + " the vote options content: "
                                                  + e.getMessage(),e);
         }
 	}
     
-    public VoteOptsContent getOptionContentByOptionText(final String option, final Long mcQueContentUid)
+    public VoteOptsContent getOptionContentByOptionText(final String option, final Long voteQueContentUid)
     {
     	try
         {
-            return voteOptionsContentDAO.getOptionContentByOptionText(option, mcQueContentUid);
+            return voteOptionsContentDAO.getOptionContentByOptionText(option, voteQueContentUid);
         }
         catch (DataAccessException e)
         {
@@ -872,105 +811,91 @@ public class VoteServicePOJO implements
     }
     
 
-   public List getCorrectOption(Long mcQueContentId)
-   {
-		try
-	    {
-	        return voteOptionsContentDAO.getCorrectOption(mcQueContentId);
-	    }
-	    catch (DataAccessException e)
-	    {
-	        throw new VoteApplicationException("Exception occured when lams is returning the "
-	                                             + " correct option: "
-	                                             + e.getMessage(),e);
-	    }
-   }
-    
-    public void updateMcOptionsContent(VoteOptsContent mcOptsContent) throws VoteApplicationException
+    public void updateVoteOptionsContent(VoteOptsContent voteOptsContent) throws VoteApplicationException
 	{
     	try
         {
-            voteOptionsContentDAO.updateMcOptionsContent(mcOptsContent);
+            voteOptionsContentDAO.updateVoteOptionsContent(voteOptsContent);
         }
         catch (DataAccessException e)
         {
             throw new VoteApplicationException("Exception occured when lams is updating"
-                                                 + " the mc options content: "
+                                                 + " the vote options content: "
                                                  + e.getMessage(),e);
         }
 	}
 
-    public List getSessionsFromContent(VoteContent mcContent) throws VoteApplicationException
+    public List getSessionsFromContent(VoteContent voteContent) throws VoteApplicationException
 	{
     	try
         {
-            return voteSessionDAO.getSessionsFromContent(mcContent);
+            return voteSessionDAO.getSessionsFromContent(voteContent);
         }
         catch (DataAccessException e)
         {
             throw new VoteApplicationException("Exception occured when lams is getting"
-                                                 + " the mc sessions list: "
+                                                 + " the vote sessions list: "
                                                  + e.getMessage(),e);
         }
 	}
     
     
-    public void deleteMcOptionsContent(VoteOptsContent mcOptsContent) throws VoteApplicationException
+    public void deleteVoteOptionsContent(VoteOptsContent voteOptsContent) throws VoteApplicationException
 	{
     	try
         {
-            voteOptionsContentDAO.removeMcOptionsContent(mcOptsContent);
+            voteOptionsContentDAO.removeVoteOptionsContent(voteOptsContent);
         }
         catch (DataAccessException e)
         {
             throw new VoteApplicationException("Exception occured when lams is removing"
-                                                 + " the mc options content: "
+                                                 + " the vote options content: "
                                                  + e.getMessage(),e);
         }
 	}
     
     
-    public List findMcOptionNamesByQueId(Long mcQueContentId) throws VoteApplicationException
+    public List findVoteOptionNamesByQueId(Long voteQueContentId) throws VoteApplicationException
 	{
     	try
         {
-            return voteOptionsContentDAO.findMcOptionNamesByQueId(mcQueContentId);
+            return voteOptionsContentDAO.findVoteOptionNamesByQueId(voteQueContentId);
         }
         catch (DataAccessException e)
         {
             throw new VoteApplicationException("Exception occured when lams is finding"
-                                                 + " the mc options name: "
+                                                 + " the vote options name: "
                                                  + e.getMessage(),e);
         }
     	
 	}
     
     
-    public void removeMcOptionsContentByQueId(Long mcQueContentId) throws VoteApplicationException
+    public void removeVoteOptionsContentByQueId(Long voteQueContentId) throws VoteApplicationException
     {
     	try
         {
-            voteOptionsContentDAO.removeMcOptionsContentByQueId(mcQueContentId);
+            voteOptionsContentDAO.removeVoteOptionsContentByQueId(voteQueContentId);
         }
         catch (DataAccessException e)
         {
             throw new VoteApplicationException("Exception occured when lams is removing by que id"
-                                                 + " the mc options content: "
+                                                 + " the vote options content: "
                                                  + e.getMessage(),e);
         }
     }
     
     
-    public void deleteMcOptionsContentByUID(Long uid) throws VoteApplicationException
+    public void deleteVoteOptionsContentByUID(Long uid) throws VoteApplicationException
 	{
     	try
         {
-            voteOptionsContentDAO.removeMcOptionsContentByUID(uid);
+            voteOptionsContentDAO.removeVoteOptionsContentByUID(uid);
         }
         catch (DataAccessException e)
         {
             throw new VoteApplicationException("Exception occured when lams is removing by uid"
-                                                 + " the mc options content: "
+                                                 + " the vote options content: "
                                                  + e.getMessage(),e);
         }
 	}
@@ -984,7 +909,7 @@ public class VoteServicePOJO implements
        }
        catch (DataAccessException e)
        {
-           throw new VoteApplicationException("Exception occured when lams is retrieving total number of McQueUsr: "
+           throw new VoteApplicationException("Exception occured when lams is retrieving total number of VoteQueUsr: "
                                                         + e.getMessage(),
 														   e);
        }
@@ -1049,13 +974,13 @@ public class VoteServicePOJO implements
 	 * @return boolean
 	 * @throws VoteApplicationException
 	 */
-	public boolean studentActivityOccurredGlobal(VoteContent mcContent) throws VoteApplicationException
+	public boolean studentActivityOccurredGlobal(VoteContent voteContent) throws VoteApplicationException
 	{
-		Iterator questionIterator=mcContent.getVoteQueContents().iterator();
+		Iterator questionIterator=voteContent.getVoteQueContents().iterator();
         while (questionIterator.hasNext())
         {
-        	VoteQueContent mcQueContent=(VoteQueContent)questionIterator.next(); 
-        	Iterator attemptsIterator=mcQueContent.getVoteUsrAttempts().iterator();
+        	VoteQueContent voteQueContent=(VoteQueContent)questionIterator.next(); 
+        	Iterator attemptsIterator=voteQueContent.getVoteUsrAttempts().iterator();
         	while (attemptsIterator.hasNext())
         	{
         		logger.debug("there is at least one attempt");
@@ -1070,9 +995,9 @@ public class VoteServicePOJO implements
 	}
 	
 
-	public int countIncompleteSession(VoteContent mc) throws VoteApplicationException
+	public int countIncompleteSession(VoteContent vote) throws VoteApplicationException
 	{
-		//int countIncompleteSession=voteSessionDAO.countIncompleteSession(mc);
+		//int countIncompleteSession=voteSessionDAO.countIncompleteSession(vote);
 		int countIncompleteSession=2;
 		return countIncompleteSession;
 	}
@@ -1082,11 +1007,11 @@ public class VoteServicePOJO implements
 	 * 
 	 * find out if any student has ever used (logged in through the url  and replied) to this content
 	 * return true even if you have only one content passed as parameter referenced in the tool sessions table
-	 * @param mc
+	 * @param vote
 	 * @return boolean
 	 * @throws VoteApplicationException
 	 */
-	public boolean studentActivityOccurred(VoteContent mc) throws VoteApplicationException
+	public boolean studentActivityOccurred(VoteContent vote) throws VoteApplicationException
 	{
 		//int countStudentActivity=voteSessionDAO.studentActivityOccurred(mc);
 		int countStudentActivity=2;
@@ -1136,7 +1061,7 @@ public class VoteServicePOJO implements
             
         try
         {
-            VoteContent fromContent = voteContentDAO.findMcContentById(fromContentId);
+            VoteContent fromContent = voteContentDAO.findVoteContentById(fromContentId);
         
             if (fromContent == null)
             {
@@ -1154,17 +1079,17 @@ public class VoteServicePOJO implements
     				throw new ToolException("WARNING! default content has not been setup for signature" + MY_SIGNATURE + " Can't continue!");
     			}
     			
-    			fromContent = voteContentDAO.findMcContentById(fromContentId);
+    			fromContent = voteContentDAO.findVoteContentById(fromContentId);
     			logger.debug("using fromContent: " + fromContent);
             }
             
             logger.debug("final - retrieved fromContent: " + fromContent);
             logger.debug("final - before new instance using " + fromContent + " and " + toContentId);
-            logger.debug("final - before new instance using mcToolContentHandler: " + mcToolContentHandler);
+            logger.debug("final - before new instance using mcToolContentHandler: " + voteToolContentHandler);
             
             try
 			{
-            	VoteContent toContent = VoteContent.newInstance(mcToolContentHandler, fromContent,toContentId);
+            	VoteContent toContent = VoteContent.newInstance(voteToolContentHandler, fromContent,toContentId);
                 if (toContent == null)
                 {
                 	logger.debug("throwing ToolException: WARNING!, retrieved toContent is null.");
@@ -1173,7 +1098,7 @@ public class VoteServicePOJO implements
                 else
                 {
                 	logger.debug("retrieved toContent: " + toContent);
-    	            voteContentDAO.saveMcContent(toContent);
+    	            voteContentDAO.saveVoteContent(toContent);
     	            logger.debug("toContent has been saved successfully: " + toContent);
                 }
                 logger.debug("end of copyToolContent with ids: " + fromContentId + " and " + toContentId);
@@ -1214,23 +1139,23 @@ public class VoteServicePOJO implements
     		throw new ToolException("toolContentId is missing");
     	}
     	
-    	VoteContent mcContent = voteContentDAO.findMcContentById(toolContentId);
-    	logger.debug("retrieving mcContent: " + mcContent);
+    	VoteContent voteContent = voteContentDAO.findVoteContentById(toolContentId);
+    	logger.debug("retrieving voteContent: " + voteContent);
     	
-    	if (mcContent != null)
+    	if (voteContent != null)
     	{
             logger.error("start deleting any uploaded file for this content from the content repository");
-        	Iterator filesIterator=mcContent.getVoteAttachments().iterator();
+        	Iterator filesIterator=voteContent.getVoteAttachments().iterator();
         	while (filesIterator.hasNext())
         	{
-        		VoteUploadedFile mcUploadedFile=(VoteUploadedFile) filesIterator.next();
-        		logger.debug("iterated mcUploadedFile : " + mcUploadedFile);
-        		String filesUuid=mcUploadedFile.getUuid(); 
+        		VoteUploadedFile voteUploadedFile=(VoteUploadedFile) filesIterator.next();
+        		logger.debug("iterated voteUploadedFile : " + voteUploadedFile);
+        		String filesUuid=voteUploadedFile.getUuid(); 
         		if ((filesUuid != null) && (filesUuid.length() > 0))
         		{
         			try
 					{
-        				mcToolContentHandler.deleteFile(new Long(filesUuid));	
+        				voteToolContentHandler.deleteFile(new Long(filesUuid));	
 					}
         			catch(RepositoryCheckedException e)
 					{
@@ -1241,7 +1166,7 @@ public class VoteServicePOJO implements
         	}
         	logger.debug("end deleting any uploaded files for this content.");
     		
-    		Iterator sessionIterator=mcContent.getVoteSessions().iterator();
+    		Iterator sessionIterator=voteContent.getVoteSessions().iterator();
             while (sessionIterator.hasNext())
             {
             	if (removeSessionData == false)
@@ -1250,57 +1175,38 @@ public class VoteServicePOJO implements
             		throw new SessionDataExistsException();	
             	}
             	
-            	VoteSession mcSession=(VoteSession)sessionIterator.next(); 
-            	logger.debug("iterated mcSession : " + mcSession);
+            	VoteSession voteSession=(VoteSession)sessionIterator.next(); 
+            	logger.debug("iterated voteSession : " + voteSession);
             	
-            	Iterator sessionUsersIterator=mcSession.getVoteQueUsers().iterator();
+            	Iterator sessionUsersIterator=voteSession.getVoteQueUsers().iterator();
             	while (sessionUsersIterator.hasNext())
             	{
-            		VoteQueUsr mcQueUsr=(VoteQueUsr) sessionUsersIterator.next();
-            		logger.debug("iterated mcQueUsr : " + mcQueUsr);
+            		VoteQueUsr voteQueUsr=(VoteQueUsr) sessionUsersIterator.next();
+            		logger.debug("iterated voteQueUsr : " + voteQueUsr);
             		
-            		Iterator sessionUsersAttemptsIterator=mcQueUsr.getVoteUsrAttempts().iterator();
+            		Iterator sessionUsersAttemptsIterator=voteQueUsr.getVoteUsrAttempts().iterator();
             		while (sessionUsersAttemptsIterator.hasNext())
                 	{
-            			VoteUsrAttempt mcUsrAttempt=(VoteUsrAttempt)sessionUsersAttemptsIterator.next();
-            			logger.debug("iterated mcUsrAttempt : " + mcUsrAttempt);
-            			removeAttempt(mcUsrAttempt);
-            			logger.debug("removed mcUsrAttempt : " + mcUsrAttempt);
+            			VoteUsrAttempt voteUsrAttempt=(VoteUsrAttempt)sessionUsersAttemptsIterator.next();
+            			logger.debug("iterated voteUsrAttempt : " + voteUsrAttempt);
+            			removeAttempt(voteUsrAttempt);
+            			logger.debug("removed voteUsrAttempt : " + voteUsrAttempt);
                 	}
             	}
             }
             logger.debug("removed all existing responses of toolContent with toolContentId:" + 
             																toolContentId);   
-            voteContentDAO.removeMcById(toolContentId);        
-            logger.debug("removed mcContent:" + mcContent);
+            voteContentDAO.removeVoteById(toolContentId);        
+            logger.debug("removed voteContent:" + voteContent);
     	}
     	else
     	{
-        	logger.error("Warning!!!, We should have not come here. mcContent is null.");
+        	logger.error("Warning!!!, We should have not come here. voteContent is null.");
         	throw new ToolException("toolContentId is missing");
     	}
 	}
 
 
-    
-    /**
-     * TO BE DEFINED-FUTURE API
-     * gets called from monitoring module
-     * 
-     * update the tool session status to COMPLETE for this tool session
-     * 
-     * @param Long toolSessionId
-     */
-    public void setAsForceCompleteSession(Long toolSessionId) throws VoteApplicationException
-    {
-    	VoteSession mcSession=retrieveMcSession(toolSessionId);	
-    	mcSession.setSessionStatus(VoteSession.COMPLETED);
-    	updateMcSession(mcSession);
-   }
-
-    
-    
-    
     /**
      * Implemented as part of the tool contract. Sets the defineLater to true on this content.
      * setAsDefineLater(Long toolContentId) throws DataMissingException, ToolException
@@ -1317,14 +1223,14 @@ public class VoteServicePOJO implements
             throw new DataMissingException("toolContentId is missing");
     	}
     	
-    	VoteContent mcContent=retrieveMc(toolContentId);
-    	if (mcContent == null)
+    	VoteContent voteContent=retrieveVote(toolContentId);
+    	if (voteContent == null)
     	{
-    		logger.error("throwing DataMissingException: WARNING!: retrieved mcContent is null.");
-            throw new DataMissingException("mcContent is missing");
+    		logger.error("throwing DataMissingException: WARNING!: retrieved voteContent is null.");
+            throw new DataMissingException("voteContent is missing");
     	}
-    	mcContent.setDefineLater(true);
-    	saveMcContent(mcContent);
+    	voteContent.setDefineLater(true);
+    	saveVoteContent(voteContent);
     	logger.debug("success: end of setAsDefineLater on toolContentId:" + toolContentId);
     }
     
@@ -1345,14 +1251,14 @@ public class VoteServicePOJO implements
     		logger.error("throwing DataMissingException: WARNING!: retrieved toolContentId is null.");
             throw new DataMissingException("toolContentId is missing");
     	}
-    	VoteContent mcContent = voteContentDAO.findMcContentById(toolContentId);
-    	if (mcContent == null)
+    	VoteContent voteContent = voteContentDAO.findVoteContentById(toolContentId);
+    	if (voteContent == null)
     	{
-    		logger.error("throwing DataMissingException: WARNING!: retrieved mcContent is null.");
-            throw new DataMissingException("mcContent is missing");
+    		logger.error("throwing DataMissingException: WARNING!: retrieved voteContent is null.");
+            throw new DataMissingException("voteContent is missing");
     	}
-    	mcContent.setRunOffline(true);
-    	saveMcContent(mcContent);
+    	voteContent.setRunOffline(true);
+    	saveVoteContent(voteContent);
     	logger.debug("success: end of setAsRunOffline on toolContentId:" + toolContentId);
     }
     
@@ -1366,16 +1272,16 @@ public class VoteServicePOJO implements
 	 */
 	public boolean existsSession(Long toolSessionId) 
 	{
-		VoteSession mcSession= retrieveMcSession(toolSessionId);
+		VoteSession voteSession= retrieveVoteSession(toolSessionId);
     	
-	    if (mcSession == null) 
+	    if (voteSession == null) 
 	    {
-	    	logger.error("mcSession does not exist yet: " + toolSessionId);
+	    	logger.error("voteSession does not exist yet: " + toolSessionId);
 	    	return false;
 	    }
 	    else
 	    {
-	    	logger.debug("retrieving an existing mcSession: " + mcSession + " " + toolSessionId);
+	    	logger.debug("retrieving an existing voteSession: " + voteSession + " " + toolSessionId);
 	    }
 		return true;	
 	}
@@ -1422,12 +1328,12 @@ public class VoteServicePOJO implements
         }
     	logger.debug("final toolSessionId and toolContentId: " +  toolSessionId + " " + toolContentId);
     	
-        VoteContent mcContent = voteContentDAO.findMcContentById(toolContentId);
-        logger.debug("retrieved mcContent: " + mcContent);
+        VoteContent voteContent = voteContentDAO.findVoteContentById(toolContentId);
+        logger.debug("retrieved voteContent: " + voteContent);
         
-        if (mcContent == null)
+        if (voteContent == null)
         {
-        	logger.error("mcContent is null.");
+        	logger.error("voteContent is null.");
         	logger.error("attempt retrieving tool's default content id with signatute : " + MY_SIGNATURE);
         
 			try
@@ -1442,9 +1348,9 @@ public class VoteServicePOJO implements
 				throw new ToolException("WARNING! default content has not been setup for signature" + MY_SIGNATURE + " Can't continue!");
 			}
 
-			mcContent = voteContentDAO.findMcContentById(toolContentId);
+			voteContent = voteContentDAO.findVoteContentById(toolContentId);
         }
-        logger.debug("final - retrieved mcContent: " + mcContent);
+        logger.debug("final - retrieved voteContent: " + voteContent);
 
             
         /*
@@ -1454,16 +1360,16 @@ public class VoteServicePOJO implements
         {
         	try
 			{
-        		VoteSession mcSession = new VoteSession(toolSessionId,
+        		VoteSession voteSession = new VoteSession(toolSessionId,
                         new Date(System.currentTimeMillis()),
                         VoteSession.INCOMPLETE,
                         toolSessionName,
-                        mcContent,
+                        voteContent,
                         new TreeSet());
 
-    		    logger.debug("created mcSession: " + mcSession);
-    		    voteSessionDAO.saveMcSession(mcSession);
-    		    logger.debug("created mcSession in the db: " + mcSession);	
+    		    logger.debug("created voteSession: " + voteSession);
+    		    voteSessionDAO.saveVoteSession(voteSession);
+    		    logger.debug("created voteSession in the db: " + voteSession);	
 	
         	}
         	catch(Exception e)
@@ -1493,35 +1399,35 @@ public class VoteServicePOJO implements
     	}
     	
     	
-    	VoteSession mcSession=null;
+    	VoteSession voteSession=null;
     	try
 		{
-    		mcSession=retrieveMcSession(toolSessionId);
-    		logger.debug("retrieved mcSession: " + mcSession);
+    		voteSession=retrieveVoteSession(toolSessionId);
+    		logger.debug("retrieved voteSession: " + voteSession);
 		}
     	catch(VoteApplicationException e)
 		{
-    		throw new DataMissingException("error retrieving mcSession: " + e);
+    		throw new DataMissingException("error retrieving voteSession: " + e);
 		}
     	catch(Exception e)
 		{
-    		throw new ToolException("error retrieving mcSession: " + e);
+    		throw new ToolException("error retrieving voteSession: " + e);
 		}
     	
-    	if (mcSession == null)
+    	if (voteSession == null)
     	{
-    		logger.error("mcSession is null");
-    		throw new DataMissingException("mcSession is missing");
+    		logger.error("voteSession is null");
+    		throw new DataMissingException("voteSession is missing");
     	}
     	
     	try
 		{
-    		voteSessionDAO.removeMcSession(mcSession);
-        	logger.debug("mcSession " + mcSession + " has been deleted successfully.");	
+    		voteSessionDAO.removeVoteSession(voteSession);
+        	logger.debug("voteSession " + voteSession + " has been deleted successfully.");	
 		}
     	catch(VoteApplicationException e)
 		{
-    		throw new ToolException("error deleting mcSession:" + e);
+    		throw new ToolException("error deleting voteSession:" + e);
 		}
 	}
 	
@@ -1555,23 +1461,23 @@ public class VoteServicePOJO implements
     		throw new DataMissingException("toolSessionId is missing");
     	}
         
-        VoteSession mcSession=null;
+        VoteSession voteSession=null;
     	try
 		{
-    		mcSession=retrieveMcSession(toolSessionId);
-    		logger.debug("retrieved mcSession: " + mcSession);
+    		voteSession=retrieveVoteSession(toolSessionId);
+    		logger.debug("retrieved voteSession: " + voteSession);
 		}
     	catch(VoteApplicationException e)
 		{
-    		throw new DataMissingException("error retrieving mcSession: " + e);
+    		throw new DataMissingException("error retrieving voteSession: " + e);
 		}
     	catch(Exception e)
 		{
-    		throw new ToolException("error retrieving mcSession: " + e);
+    		throw new ToolException("error retrieving voteSession: " + e);
 		}
-    	mcSession.setSessionStatus(COMPLETED);
-    	voteSessionDAO.updateMcSession(mcSession);
-    	logger.debug("updated mcSession to COMPLETED" + mcSession);
+    	voteSession.setSessionStatus(COMPLETED);
+    	voteSessionDAO.updateVoteSession(voteSession);
+    	logger.debug("updated voteSession to COMPLETED" + voteSession);
     	
     	String nextUrl= learnerService.completeToolSession(toolSessionId,learnerId);
     	logger.debug("nextUrl: " + nextUrl);
@@ -1626,16 +1532,16 @@ public class VoteServicePOJO implements
 
     public VoteQueContent getToolDefaultQuestionContent(long contentId) throws VoteApplicationException
     {
-    	VoteQueContent mcQueContent=voteQueContentDAO.getToolDefaultQuestionContent(contentId);
-    	logger.debug("retrieved mcQueContent : " + mcQueContent);
-    	return mcQueContent; 
+    	VoteQueContent voteQueContent=voteQueContentDAO.getToolDefaultQuestionContent(contentId);
+    	logger.debug("retrieved voteQueContent : " + voteQueContent);
+    	return voteQueContent; 
     }
 
     
-    public List getToolSessionsForContent(VoteContent mc)
+    public List getToolSessionsForContent(VoteContent vote)
     {
-    	logger.debug("attempt retrieving listToolSessionIds for : " + mc);
-    	List listToolSessionIds=voteSessionDAO.getSessionsFromContent(mc);
+    	logger.debug("attempt retrieving listToolSessionIds for : " + vote);
+    	List listToolSessionIds=voteSessionDAO.getSessionsFromContent(vote);
     	return listToolSessionIds;
     }
     
@@ -1646,8 +1552,8 @@ public class VoteServicePOJO implements
 	    {
 			attachment.setVoteContent(null);
 			content.getVoteAttachments().remove(attachment);
-			mcToolContentHandler.deleteFile(new Long(attachment.getUuid()));
-			saveMcContent(content);
+			voteToolContentHandler.deleteFile(new Long(attachment.getUuid()));
+			saveVoteContent(content);
 	    }
 	    catch (DataAccessException e)
 	    {
@@ -1659,13 +1565,13 @@ public class VoteServicePOJO implements
     
     public NodeKey uploadFile(InputStream istream, String filename, String contentType, String fileType) throws RepositoryCheckedException
 	{
-	    return mcToolContentHandler.uploadFile(istream, filename, contentType, fileType); 
+	    return voteToolContentHandler.uploadFile(istream, filename, contentType, fileType); 
 	}
     
     
     public NodeKey copyFile(Long uuid) throws RepositoryCheckedException
 	{
-	    return mcToolContentHandler.copyFile(uuid);
+	    return voteToolContentHandler.copyFile(uuid);
 	}
     
 	/**
@@ -1776,11 +1682,11 @@ public class VoteServicePOJO implements
 	}
 	
 	
-	public void removeOffLineFile(String filename, Long mcContentId) throws VoteApplicationException
+	public void removeOffLineFile(String filename, Long voteContentId) throws VoteApplicationException
 	{
 	    try
         {
-            voteUploadedFileDAO.removeOffLineFile(filename, mcContentId);
+            voteUploadedFileDAO.removeOffLineFile(filename, voteContentId);
         }
         catch (DataAccessException e)
         {
@@ -1790,11 +1696,11 @@ public class VoteServicePOJO implements
         }
 	}
     
-    public void removeOnLineFile(String filename, Long mcContentId) throws VoteApplicationException
+    public void removeOnLineFile(String filename, Long voteContentId) throws VoteApplicationException
 	{
 	    try
         {
-            voteUploadedFileDAO.removeOnLineFile(filename, mcContentId);
+            voteUploadedFileDAO.removeOnLineFile(filename, voteContentId);
         }
         catch (DataAccessException e)
         {
@@ -1848,15 +1754,15 @@ public class VoteServicePOJO implements
 	}
 	
 	
-	public List getOnlineFilesMetaData(Long mcContentId) throws VoteApplicationException
+	public List getOnlineFilesMetaData(Long voteContentId) throws VoteApplicationException
 	{
-		return voteUploadedFileDAO.getOnlineFilesMetaData(mcContentId);
+		return voteUploadedFileDAO.getOnlineFilesMetaData(voteContentId);
 	}
     
 	
-    public List getOfflineFilesMetaData(Long mcContentId) throws VoteApplicationException
+    public List getOfflineFilesMetaData(Long voteContentId) throws VoteApplicationException
 	{
-    	return voteUploadedFileDAO.getOfflineFilesMetaData(mcContentId);
+    	return voteUploadedFileDAO.getOfflineFilesMetaData(voteContentId);
 	}
 	
 	public boolean isUuidPersisted(String uuid) throws VoteApplicationException
@@ -1867,13 +1773,13 @@ public class VoteServicePOJO implements
 	/**
 	 * adds a new entry to the uploaded files table
 	 */
-	public void persistFile(String uuid, boolean isOnlineFile, String fileName, VoteContent mcContent) throws VoteApplicationException {
+	public void persistFile(String uuid, boolean isOnlineFile, String fileName, VoteContent voteContent) throws VoteApplicationException {
 		
-		logger.debug("attempt persisting file to the db: " + uuid + " " + isOnlineFile + " " + fileName + " " + mcContent);
-		VoteUploadedFile mcUploadedFile= new VoteUploadedFile(uuid, isOnlineFile, fileName, mcContent);
-		logger.debug("created mcUploadedFile: " + mcUploadedFile);
-		voteUploadedFileDAO.saveUploadFile(mcUploadedFile);
-		logger.debug("persisted mcUploadedFile: " + mcUploadedFile);
+		logger.debug("attempt persisting file to the db: " + uuid + " " + isOnlineFile + " " + fileName + " " + voteContent);
+		VoteUploadedFile voteUploadedFile= new VoteUploadedFile(uuid, isOnlineFile, fileName, voteContent);
+		logger.debug("created voteUploadedFile: " + voteUploadedFile);
+		voteUploadedFileDAO.saveUploadFile(voteUploadedFile);
+		logger.debug("persisted voteUploadedFile: " + voteUploadedFile);
 	}
 
 	/**
@@ -1887,69 +1793,69 @@ public class VoteServicePOJO implements
 	}
 	
 	
-	public List retrieveMcUploadedFiles(Long mcContentId, boolean fileOnline) throws VoteApplicationException {
+	public List retrieveVoteUploadedFiles(Long voteContentId, boolean fileOnline) throws VoteApplicationException {
         try
         {
-            return voteUploadedFileDAO.retrieveMcUploadedFiles(mcContentId, fileOnline);
+            return voteUploadedFileDAO.retrieveVoteUploadedFiles(voteContentId, fileOnline);
         }
         catch (DataAccessException e)
         {
-            throw new VoteApplicationException("Exception occured when lams is loading mc uploaded files: "
+            throw new VoteApplicationException("Exception occured when lams is loading vote uploaded files: "
                                                          + e.getMessage(),
 														   e);
         }
 	}
 
-	public List retrieveMcUploadedOfflineFilesUuid(Long mcContentId) throws VoteApplicationException {
+	public List retrieveVoteUploadedOfflineFilesUuid(Long voteContentId) throws VoteApplicationException {
 		try
         {
-            return voteUploadedFileDAO.retrieveMcUploadedOfflineFilesUuid(mcContentId);
+            return voteUploadedFileDAO.retrieveVoteUploadedOfflineFilesUuid(voteContentId);
         }
         catch (DataAccessException e)
         {
-            throw new VoteApplicationException("Exception occured when lams is loading mc uploaded files: offline + uuids "
+            throw new VoteApplicationException("Exception occured when lams is loading vote uploaded files: offline + uuids "
                                                          + e.getMessage(),
 														   e);
         }
 	}
 	
 	
-	public List retrieveMcUploadedOnlineFilesUuid(Long mcContentId) throws VoteApplicationException {
+	public List retrieveVoteUploadedOnlineFilesUuid(Long voteContentId) throws VoteApplicationException {
 		try
         {
-            return voteUploadedFileDAO.retrieveMcUploadedOnlineFilesUuid(mcContentId);
+            return voteUploadedFileDAO.retrieveVoteUploadedOnlineFilesUuid(voteContentId);
         }
         catch (DataAccessException e)
         {
-            throw new VoteApplicationException("Exception occured when lams is loading mc uploaded files: online + uuids "
+            throw new VoteApplicationException("Exception occured when lams is loading vote uploaded files: online + uuids "
                                                          + e.getMessage(),
 														   e);
         }
 	}
 	
 	
-	public List retrieveMcUploadedOfflineFilesName(Long mcContentId) throws VoteApplicationException {
+	public List retrieveVoteUploadedOfflineFilesName(Long voteContentId) throws VoteApplicationException {
 		try
         {
-            return voteUploadedFileDAO.retrieveMcUploadedOfflineFilesName(mcContentId);
+            return voteUploadedFileDAO.retrieveVoteUploadedOfflineFilesName(voteContentId);
         }
         catch (DataAccessException e)
         {
-            throw new VoteApplicationException("Exception occured when lams is loading mc uploaded files: offline + fileNames "
+            throw new VoteApplicationException("Exception occured when lams is loading vote uploaded files: offline + fileNames "
                                                          + e.getMessage(),
 														   e);
         }
 	}
 
 	
-	public List retrieveMcUploadedOnlineFilesName(Long mcContentId) throws VoteApplicationException {
+	public List retrieveVoteUploadedOnlineFilesName(Long voteContentId) throws VoteApplicationException {
     	try
         {
-            return voteUploadedFileDAO.retrieveMcUploadedOnlineFilesName(mcContentId);
+            return voteUploadedFileDAO.retrieveVoteUploadedOnlineFilesName(voteContentId);
         }
         catch (DataAccessException e)
         {
-            throw new VoteApplicationException("Exception occured when lams is loading mc uploaded files: online + fileNames "
+            throw new VoteApplicationException("Exception occured when lams is loading vote uploaded files: online + fileNames "
                                                          + e.getMessage(),
 														   e);
         }
@@ -1957,10 +1863,10 @@ public class VoteServicePOJO implements
 	
 	
 	/*
-	public List retrieveMcUploadedOfflineFilesUuidPlusFilename(Long mcContentId) throws VoteApplicationException {
+	public List retrieveVoteUploadedOfflineFilesUuidPlusFilename(Long mcContentId) throws VoteApplicationException {
 		try
         {
-            return voteUploadedFileDAO.retrieveMcUploadedOfflineFilesUuidPlusFilename(mcContentId);
+            return voteUploadedFileDAO.retrieveVoteUploadedOfflineFilesUuidPlusFilename(mcContentId);
         }
         catch (DataAccessException e)
         {
@@ -2111,16 +2017,16 @@ public class VoteServicePOJO implements
 	}
 
 	/**
-	 * @return Returns the mcToolContentHandler.
+	 * @return Returns the voteToolContentHandler.
 	 */
-	public IToolContentHandler getMcToolContentHandler() {
-		return mcToolContentHandler;
+	public IToolContentHandler getVoteToolContentHandler() {
+		return voteToolContentHandler;
 	}
 	/**
 	 * @param mcToolContentHandler The mcToolContentHandler to set.
 	 */
-	public void setMcToolContentHandler(IToolContentHandler mcToolContentHandler) {
-		this.mcToolContentHandler = mcToolContentHandler;
+	public void setVoteToolContentHandler(IToolContentHandler voteToolContentHandler) {
+		this.voteToolContentHandler = voteToolContentHandler;
 	}
 	/**
 	 * @return Returns the learnerService.

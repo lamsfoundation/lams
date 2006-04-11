@@ -23,7 +23,7 @@ http://www.gnu.org/licenses/gpl.txt
 -->
 	<context-param>
 		<param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
-  	<param-value>org.lamsfoundation.lams.tool.vote.web.VoteResources</param-value>
+  	<param-value>org.lamsfoundation.lams.tool.vote.web.ApplicationResources</param-value>
 	</context-param>
 	
 	<context-param> 
@@ -52,7 +52,7 @@ http://www.gnu.org/licenses/gpl.txt
 	    </filter-class>
 		<init-param>
 			<param-name>sessionFactoryBeanName</param-name>
-		    <param-value>mcSessionFactory</param-value>
+		    <param-value>voteSessionFactory</param-value>
 		</init-param>
    </filter>
 
@@ -123,7 +123,7 @@ http://www.gnu.org/licenses/gpl.txt
 		<servlet-class>org.lamsfoundation.lams.contentrepository.client.ToolDownload</servlet-class>
 	    <init-param>
 	      <param-name>toolContentHandlerBeanName</param-name>
-	      <param-value>mcToolContentHandler</param-value>
+	      <param-value>voteToolContentHandler</param-value>
 	    </init-param>
 	    <load-on-startup>3</load-on-startup>
 	</servlet>

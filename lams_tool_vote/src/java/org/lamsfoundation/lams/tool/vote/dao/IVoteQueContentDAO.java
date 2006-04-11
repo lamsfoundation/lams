@@ -35,35 +35,31 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
  */
 public interface IVoteQueContentDAO
 {
-	public VoteQueContent getMcQueContentByUID(Long uid);
+ 	public VoteQueContent getVoteQueContentByUID(Long uid);
 
-	public VoteQueContent getToolDefaultQuestionContent(final long mcContentId);
-	
-	public VoteQueContent getQuestionContentByQuestionText(final String question, final Long mcContentUid);
+ 	public VoteQueContent getToolDefaultQuestionContent(final long voteContentId);
 
-	public VoteQueContent getQuestionContentByDisplayOrder(final Long displayOrder, final Long mcContentUid);
-	
-	public List getAllQuestionEntries(final long mcContentId);
+ 	public List getAllQuestionEntries(final long voteContentId);
+ 	
+ 	public VoteQueContent getQuestionContentByQuestionText(final String question, final Long voteContentUid);
+ 	
+ 	public void removeQuestionContentByVoteUid(final Long voteContentUid);
+ 	
+ 	public void resetAllQuestions(final Long voteContentUid);
 
-	public List refreshQuestionContent(final Long mcContentId);
-
-	public void cleanAllQuestions(final Long mcContentUid);
-
-	public void cleanAllQuestionsSimple(final Long mcContentUid);
-	
- 	public void resetAllQuestions(final Long mcContentUid);
-
-	public void removeQuestionContentByMcUid(final Long mcContentUid);
-
-	public void saveMcQueContent(VoteQueContent mcQueContent);
+ 	public void cleanAllQuestions(final Long voteContentUid);
+ 	
+ 	public void cleanAllQuestionsSimple(final Long voteContentUid);
+ 	
+ 	public void saveVoteQueContent(VoteQueContent voteQueContent);
     
-	public void updateMcQueContent(VoteQueContent mcQueContent);
-
-	public void saveOrUpdateMcQueContent(VoteQueContent mcQueContent);
+	public void updateVoteQueContent(VoteQueContent voteQueContent);
 	
-	public void removeMcQueContentByUID(Long uid);
-
-	public void removeMcQueContent(VoteQueContent mcQueContent);
+	public void saveOrUpdateVoteQueContent(VoteQueContent voteQueContent);
 	
-	public List getNextAvailableDisplayOrder(final long mcContentId);
+	public void removeVoteQueContentByUID(Long uid);
+	
+	public void removeVoteQueContent(VoteQueContent voteQueContent);
+	
+ 	public void flush();
 }

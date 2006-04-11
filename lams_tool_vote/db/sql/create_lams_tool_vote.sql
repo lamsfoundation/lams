@@ -130,7 +130,7 @@ CREATE TABLE tl_vote11_uploadedfile (
 )TYPE=InnoDB;
 
 
-INSERT INTO tl_vote11_content(uid, content_id , title , instructions , creation_date , questions_sequenced , username_visible , created_by , monitoring_report_title , report_title , run_offline , define_later, offline_instructions, online_instructions, end_learning_message, content_in_use, retries, show_feedback, show_report) VALUES (1, 1 ,'Voting Title','Voting Instructions', NOW(), 0, 0,1,'Voting Report','Report', 0, 0, 'offline instructions','online instructions','Finished Activity...', 0, 0, 0, 0);
+INSERT INTO tl_vote11_content(uid, content_id , title , instructions , creation_date , questions_sequenced , username_visible , created_by , monitoring_report_title , report_title , run_offline , define_later, offline_instructions, online_instructions, end_learning_message, content_in_use, retries, show_feedback, show_report) VALUES (1, ${default_content_id} ,'Voting Title','Voting Instructions', NOW(), 0, 0,1,'Voting Report','Report', 0, 0, 'offline instructions','online instructions','Finished Activity...', 0, 0, 0, 0);
 
 INSERT INTO tl_vote11_que_content  (uid,question,  disabled,  vote_content_id) VALUES (1, 'sample posting', 0, 1);
 
