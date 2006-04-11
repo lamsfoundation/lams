@@ -83,10 +83,10 @@ public class LocaleFilter extends OncePerRequestFilter {
 			if(user != null){
 				String lang = user.getLocaleLanguage();
 				String country = user.getLocaleCountry();
-				//language and country must both exist: 
-				//It is not good idea to combine customerized language with system default country! no en_CN!  
-				if(!StringUtils.isEmpty(lang) && !StringUtils.isEmpty(country)){
-					preferredLocale = new Locale(lang,country);
+				// would prefer both the language and country but that's not always feasible.
+				// so we may end up with some confusing situations.
+				if(!StringUtils.isEmpty(lang)){
+					preferredLocale = new Locale(lang,country!=null?country:"");
 				}
 			}
     	}
