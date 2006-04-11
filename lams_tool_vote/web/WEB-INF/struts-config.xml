@@ -326,7 +326,7 @@
     </action>
  </action-mappings>
 	
-	<message-resources parameter="org.lamsfoundation.lams.tool.vote.VoteResources"/>
+	<message-resources parameter="org.lamsfoundation.lams.tool.vote.ApplicationResources"/>
 	<plug-in className="org.apache.struts.tiles.TilesPlugin">
 		<set-property property="definitions-config"
 			value="/WEB-INF/tiles/tiles-defs.xml" />

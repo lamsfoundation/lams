@@ -57,8 +57,8 @@ http://www.gnu.org/licenses/gpl.txt
 
  	<!-- ******************** FCK Editor related javascript & HTML ********************** -->
     <script type="text/javascript" src="${lams}fckeditor/fckeditor.js"></script>
-    <script type="text/javascript" src="${tool}author_page/js/fckcontroller.js"></script>
-    <link href="${tool}author_page/css/fckeditor_style.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="${lams}includes/javascript/fckcontroller.js"></script>
+    <link href="${lams}css/fckeditor_style.css" rel="stylesheet" type="text/css">
 
 	<script language="JavaScript" type="text/JavaScript">
 
@@ -123,9 +123,8 @@ http://www.gnu.org/licenses/gpl.txt
 	
 	</script>
 	
-	<script type="text/javascript" src="<c:out value="${tool}"/>author_page/js/tabcontroller.js"></script>    
+	<script type="text/javascript" src="<c:out value="${lams}"/>includes/javascript/tabcontroller.js"></script>    
 	<script type="text/javascript" src="<c:out value="${lams}"/>includes/javascript/common.js"></script>
-	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/xmlrequest.js'/>"></script>
 	
 </head>
 <body onLoad="init();">
