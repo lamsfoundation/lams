@@ -76,7 +76,7 @@
 	<lams:Tabs collection="${tabs}" useKey="true" control="true"/>
 	<lams:Tabs control="true">
 		<lams:Tab id="1" key="label.authoring.heading.basic"/>
-		<lams:Tab id="2" key="label.authoring.heading.advance" inactive="true"/>
+		<lams:Tab id="2" key="label.authoring.heading.advanced" inactive="true"/>
 		<lams:Tab id="3" key="label.authoring.heading.instructions"/>
 	</lams:Tabs>
 	<!-- end tab buttons -->
@@ -90,7 +90,7 @@
       
 <c:if test="${requestScope.showBasicContent != 'true'}">
 	<!-- tab content 2 (Advanced) -->
-	<lams:TabBody id="2" titleKey="label.authoring.heading.advance" page="advance.jsp" />
+	<lams:TabBody id="2" titleKey="label.authoring.heading.advanced" page="advance.jsp" />
 	<!-- end of content (Advanced) -->
 
 	<!-- tab content 3 (Instructions) -->
