@@ -13,4 +13,4 @@ null,null,now(),0,
 null,null,${tool_id},null,
 null,null,null,'tool/lasbmt11/images/icon_reportsubmission.swf',
 2,0,4,
-'org.lamsfoundation.lams.tool.sbmt.SbmtResources');
+'org.lamsfoundation.lams.tool.sbmt.ApplicationResources');
