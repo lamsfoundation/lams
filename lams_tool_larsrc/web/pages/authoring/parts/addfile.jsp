@@ -1,7 +1,9 @@
 <%@ include file="/common/taglibs.jsp" %>
 <html>
 <head>
+	<c:set var="lams"><lams:LAMSURL /></c:set>
 	<c:set var="ctxPath" value="${pageContext.request.contextPath}" scope="request"/>
+	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 	<!-- depending on user / site preference this will get changed probbably use passed in variable from flash to select which one to use-->
     <link href="<html:rewrite page='/includes/css/aqua.css'/>" rel="stylesheet" type="text/css">
 	<!-- this is the custom CSS for hte tool -->
@@ -35,6 +37,10 @@
 						<td width="130px"><fmt:message key="label.authoring.basic.resource.title.input"/></td>
 						<td><html:text property="title" size="55" tabindex="1" /></td>
 					</tr>
+					<tr>
+						<td width="130px"><fmt:message key="label.authoring.basic.resource.description.input"/></td>
+						<td><lams:STRUTS-textarea rows="5" cols="55" tabindex="2" property="description"/> </td>
+					</tr>						
 					<tr>
 						<td width="130px"><fmt:message key="label.authoring.basic.resource.file.input"/></td>
 						<td>

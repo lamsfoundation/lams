@@ -29,16 +29,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
     	<put name="header" value="/common/header.jsp"/>
     	<put name="footer" value="/common/footer.jsp"/>
 	</definition>
-	<!-- for .frameBaseDef -->
-	<definition name=".frameBaseDef" path="/layout/frame.jsp">
-		<put name="title" value="Frame Base Template Page"/>
-		<put name="pageHeader" value = "Frame Base Template"/>
-		<put name="header" value="/common/headerFrame.jsp"/>
-		<put name="headerHeight" value = "30"/>
-		<put name="content" value="/common/defaultFrame.jsp" />	
- 		<put name="footer" value="/common/footerFrame.jsp"/>
-		<put name="footerHeight" value = "20"/>
-	</definition>
+	
 	<!-- B: Authoring -->
 	<definition name="tiles:authoring/main" extends="tiles:layout">
     	<put name="pageTitleKey" value="Shared resource authoring"/>
@@ -49,10 +40,4 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 	<!-- B: Monitoring -->
 	
-	<!-- E: Monitoring -->
-	<definition name=".previewLearningObj" extends=".frameBaseDef" >
-		<put name="title" value="Preview Learning Object Content Package"/>
-		<put name="pageHeader" value = "Manage Content Packages"/>
-  		<put name="navigator" value="/pages/learningobj/navigatortree.jsp" />	
-	</definition>	
 </tiles-definitions>

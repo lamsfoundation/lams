@@ -28,8 +28,8 @@
     <link href="<html:rewrite page='/includes/css/fckeditor_style.css'/>" rel="stylesheet" type="text/css">
 
  	<!-- ******************** FCK Editor related javascript & HTML ********************** -->
-    <script type="text/javascript" src="${lams}fckeditor/fckeditor.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
+    <script type="text/javascript" src="${lams}fckeditor/fckeditor.js"></script>
 	
     <script type="text/javascript" src="<html:rewrite page='/includes/javascript/fckcontroller.js'/>"></script>
     <script type="text/javascript" src="<html:rewrite page='/includes/javascript/tabcontroller.js'/>"></script>    

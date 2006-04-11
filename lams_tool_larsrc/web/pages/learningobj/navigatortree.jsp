@@ -79,7 +79,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	 	</c:when>
 	 	<c:otherwise>		
 			<p class="body"><c:out value="${cpPackage.title}"/></p>
-			<p class="lightBody"><c:out value="${cpPackage.description}"/><BR>
+			<p class="lightBody"><fmt:message key="lable.description"/><BR><c:out value="${cpPackage.description}"  escapeXml="false" /><BR>
 
 			<script language="JavaScript">
 				<!--//

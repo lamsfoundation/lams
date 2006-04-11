@@ -71,8 +71,10 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.lamsfoundation.lams.tool.rsrc.web.form.InstructionNavForm;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+
 
 /**
  * @author Steve.Ni
@@ -140,30 +142,54 @@ public class AuthoringAction extends Action {
 	  	if (param.equals("removeItemAttachment")) {
 	  		return removeItemAttachment(mapping, form, request, response);
 	  	}
+	  	//for preview top frame html page use:
+	  	if (param.equals("nextInstruction")) {
+	  		return nextInstruction(mapping, form, request, response);
+	  	}
 	  	
-	    //-----------------------Preview Learning Object function ---------------------------
-	  	if (param.equals("previewLearningObj")) {
-       		return previewLearningObj(mapping, form, request, response);
+	    //-----------------------Display Learning Object function ---------------------------
+	  	if (param.equals("reviewItem")) {
+       		return reviewItem(mapping, form, request, response);
         }
         return mapping.findForward(ResourceConstants.ERROR);
 	}
 
 
+	private ActionForward nextInstruction(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+		InstructionNavForm navForm = (InstructionNavForm) form;
+		navForm.setCurrent(navForm.getCurrent()+1);
+		return findForward(navForm.getType(),mapping);
+	}
+
+
 	private ActionForward removeItemAttachment(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		request.setAttribute("itemAttachment", null);
-    	return mapping.findForward("success");
+    	return mapping.findForward(ResourceConstants.SUCCESS);
     }
 
 
-	private ActionForward previewLearningObj(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+	private ActionForward reviewItem(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		int itemIdx = NumberUtils.stringToInt(request.getParameter(ResourceConstants.PARAM_ITEM_INDEX),-1);
 		if(itemIdx != -1){
 			List<ResourceItem> resourceList = getResourceItemList(request);
 			ResourceItem item = resourceList.get(itemIdx);
-			request.getSession().setAttribute(ResourceConstants.ATT_LEARNING_OBJECT,item);
-		}		
-		return mapping.findForward(ResourceConstants.SUCCESS);
+			
+			Set instructions = item.getItemInstructions();
+			InstructionNavForm navForm = (InstructionNavForm) form;
+			navForm.setTitle(item.getTitle());
+			navForm.setType(item.getType());
+			navForm.setCurrent(1);
+			navForm.setTotal(instructions.size());
+			navForm.setInstructions(instructions);
+			if(item.getType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT)
+				request.getSession().setAttribute(ResourceConstants.ATT_LEARNING_OBJECT,item);
+			//set url to content frame
+			request.setAttribute(ResourceConstants.ATTR_RESOURCE_REVIEW_URL,getReviewUrl(item));
+			return mapping.findForward(ResourceConstants.SUCCESS);
+		}
+		return mapping.findForward(ResourceConstants.ERROR);
 	}
+
 
 	private ActionForward removeItem(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		int itemIdx = NumberUtils.stringToInt(request.getParameter(ResourceConstants.PARAM_ITEM_INDEX),-1);
@@ -311,7 +337,7 @@ public class AuthoringAction extends Action {
 			attachmentList.addAll(resource.getAttachments());
 		} catch (Exception e) {
 			log.error(e);
-			return mapping.findForward("error");
+			return mapping.findForward(ResourceConstants.ERROR);
 		}
 		
 		//init it to avoid null exception in following handling
@@ -764,7 +790,27 @@ public class AuthoringAction extends Action {
 		}
 		return forward;
 	}
-	
+
+	private Object getReviewUrl(ResourceItem item) {
+		short type = item.getType();
+		String url = null;
+		switch (type) {
+		case ResourceConstants.RESOURCE_TYPE_URL:
+			url = item.getUrl();
+			break;
+		case ResourceConstants.RESOURCE_TYPE_FILE:
+			url = "/download/?uuid="+item.getFileUuid()+"&preferDownload=false";
+			break;
+		case ResourceConstants.RESOURCE_TYPE_WEBSITE:
+			url = "/download/?uuid="+item.getFileUuid()+"&preferDownload=false";
+			break;
+		case ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT:
+			url = "/pages/learningobject/mainframe.jsp";
+			break;
+		}
+		return url;
+	}
+
 	/**
 	 * This method will populate resource item information to its form for edit use.
 	 * @param itemIdx
@@ -886,10 +932,10 @@ public class AuthoringAction extends Action {
 		if(type == ResourceConstants.RESOURCE_TYPE_URL){
 			item.setUrl(itemForm.getUrl());
 		}
-		if(type == ResourceConstants.RESOURCE_TYPE_WEBSITE 
-				||itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT){
+//		if(type == ResourceConstants.RESOURCE_TYPE_WEBSITE 
+//				||itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT){
 			item.setDescription(itemForm.getDescription());
-		}
+//		}
 		
 	}
 
@@ -910,11 +956,11 @@ public class AuthoringAction extends Action {
 //			if(!validator.isValid(itemForm.getUrl()))
 //				errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(ResourceConstants.ERROR_MSG_INVALID_URL));
 		}
-		if(itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_WEBSITE 
-				||itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT){
+//		if(itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_WEBSITE 
+//				||itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT){
 			if(StringUtils.isBlank(itemForm.getDescription()))
 				errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(ResourceConstants.ERROR_MSG_DESC_BLANK));
-		}
+//		}
 		if(itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_WEBSITE 
 				||itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT
 				||itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_FILE){

@@ -1,8 +1,10 @@
 <%@ include file="/common/taglibs.jsp" %>
 <html>
 <head>
+	<c:set var="lams"><lams:LAMSURL /></c:set>
 	<c:set var="ctxPath" value="${pageContext.request.contextPath}" scope="request"/>
 	<!-- depending on user / site preference this will get changed probbably use passed in variable from flash to select which one to use-->
+	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
     <link href="<html:rewrite page='/includes/css/aqua.css'/>" rel="stylesheet" type="text/css">
 	<!-- this is the custom CSS for hte tool -->
 	<link href="<html:rewrite page='/includes/css/tool_custom.css'/>" rel="stylesheet" type="text/css">
@@ -35,6 +37,10 @@
 						<td><html:text property="title" size="55"/></td>
 					</tr>
 					<tr>
+						<td width="130px"><fmt:message key="label.authoring.basic.resource.description.input"/></td>
+						<td><lams:STRUTS-textarea rows="5" cols="55" tabindex="2" property="description"/> </td>
+					</tr>						
+					<tr>
 						<td width="130px"><fmt:message key="label.authoring.basic.resource.url.input"/></td>
 						<td><html:text property="url" size="55"/></td>
 					</tr>	
@@ -54,6 +60,9 @@
 						<td>
 							<%@ include file="instructions.jsp" %>
 						</td>
+						<td width="100px" align="right" valign="bottom">
+							<input onclick="cancelResourceItem()" type="button" name="cancel" value="<fmt:message key="label.cancel"/>" class="buttonStyle">
+						</td>						
 						<td width="100%" align="right" valign="bottom">
 							<input onclick="submitResourceItem()" type="button" name="add" value="<fmt:message key="label.authoring.basic.add.url"/>" class="buttonStyle">
 						</td>

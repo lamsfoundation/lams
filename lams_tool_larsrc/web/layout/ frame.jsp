@@ -45,10 +45,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<frameset rows="<%=headerHeight%>,*,<%=footerHeight%>" frameborder="no">
 		<frame src="../<%=header%>" name=headerFrame" marginheight="0" scrolling="NO">
-		<frameset cols="25%,75%" rows="*">
-			<frame src="../<%=navigator%>" name="navigatorFrame" marginheight="0"  scrolling="YES">
-			<frame src="../<%=content%>" name="contentFrame" marginheight="0" scrolling="YES">
-		</frameset>
+		<frame src="../<%=content%>" name="contentFrame" marginheight="0" scrolling="YES">
 		<frame src="../<%=footer%>" name="footerFrame" marginheight="0" scrolling="NO">
 	</frameset>
 	

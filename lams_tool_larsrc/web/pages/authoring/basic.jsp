@@ -20,23 +20,10 @@
 		area.style.display="none";
 	}
 
-	function verifyUrl(myUrl, title){
-		launchPopup(myUrl,title);
-	}
-	
-	function previewItem(type,idx,uuid,versionId){
-		//2:file, 3:website,4:learning object
-		if(type == 2){
-			var myUrl = "<c:url value='/download/?uuid='/>"+uuid+"&preferDownload=false";
-			launchPopup(myUrl,"File");
-		}else if(type ==3){
-			var myUrl = "<c:url value='/download/?uuid='/>"+uuid+"&preferDownload=false";
-			launchPopup(myUrl,"Website");
-		}else if(type ==4){
-			var myUrl = "<c:url value='/previewLearningObj.do?itemIndex='/>"+idx;
-			launchPopup(myUrl,"LearningObject");
-		}
-		
+	function previewItem(type,idx){
+		//1:url, 2:file, 3:website,4:learning object
+		var myUrl = "<c:url value='/reviewItem.do?itemIndex='/>"+idx;
+		launchPopup(myUrl,"Review");
 	}
 	
 	function editItem(idx){

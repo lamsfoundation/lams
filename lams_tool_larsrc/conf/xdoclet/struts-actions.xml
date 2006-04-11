@@ -116,11 +116,25 @@
 			parameter="removeItemAttachment">
 			<forward name="success" path="/pages/authoring/parts/itemattachment.jsp" />
 		</action>
-		
-		<!-- ==========  Preview Learning Object Item  ========== -->
-		<action path="/previewLearningObj"
+		<action path="/authoring/nextInstruction"
 			type="org.lamsfoundation.lams.tool.rsrc.web.action.AuthoringAction"
-			parameter="previewLearningObj">
-			<forward name="success" path=".previewLearningObj" />
+			name="instructionNavForm" 
+			scope="session" 
+			validate="false"
+			parameter="nextInstruction">
+			<forward name="success" path="/pages/preview/instructionsnav.jsp" />
+		</action>
+		
+		<!-- ==========  Display Item  ========== -->
+		<action path="/displayItem"
+			type="org.lamsfoundation.lams.tool.rsrc.web.action.AuthoringAction"
+			name="instructionNavForm" 
+			scope="session" 
+			validate="false"
+			parameter="displayItem">
+			<forward name="url" path=".displayUrl" />
+			<forward name="file" path=".displayFile" />
+			<forward name="website" path=".displayWebsite" />			
+			<forward name="learningobject" path=".displayLearningObj" />
 		</action>
 		
