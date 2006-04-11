@@ -466,14 +466,19 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		return permission;
 	}
 	/** This method checks if the given workspaceFolder is a subFolder of the
-	 * given rootFolder*/
+	 * given rootFolder. Returns false if they are the same folder. */
 	private boolean isSubFolder(WorkspaceFolder workspaceFolder,WorkspaceFolder rootFolder){
-		if ( workspaceFolder != null ) {
-			WorkspaceFolder parent = null;
-			do {
-				parent = workspaceFolder.getParentWorkspaceFolder();
-			} while ( parent != null && ! rootFolder.getWorkspaceFolderId().equals(parent.getWorkspaceFolderId()));
-			return ( parent != null ); 
+		if ( rootFolder != null ) {
+			// is it the same folder?
+			if ( rootFolder.getWorkspaceFolderId().equals(workspaceFolder.getWorkspaceFolderId()) ) { 
+				return false;
+			}
+			// check the parent hierarchy
+			WorkspaceFolder folder = workspaceFolder;
+			while ( folder != null && ! rootFolder.getWorkspaceFolderId().equals(folder.getWorkspaceFolderId()) ) {
+				folder = folder.getParentWorkspaceFolder();
+			} 
+			return ( folder != null ); 
 		}
 		return false;
 		
@@ -1176,7 +1181,10 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 					 */
 					if (hasWriteAccess(roles)) {
 						WorkspaceFolder orgFolder = member.getOrganisation().getWorkspace().getRootFolder();
-						folders.add(new FolderContentDTO(orgFolder,getPermissions(orgFolder,user)));
+						Integer permission = getPermissions(orgFolder,user);
+						if ( !permission.equals(WorkspaceFolder.NO_ACCESS) ) { 
+							folders.add(new FolderContentDTO(orgFolder,permission));
+						}
 					}
 				}
 			} else {
