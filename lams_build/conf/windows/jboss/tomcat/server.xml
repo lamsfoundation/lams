@@ -62,12 +62,10 @@
             -->
  
             <!-- Access logger -->
-            <!--
             <Valve className="org.apache.catalina.valves.FastCommonAccessLogValve"
                 prefix="localhost_access_log." suffix=".log"
                 pattern="common" directory="${jboss.server.home.dir}/log" 
                 resolveHosts="false" />
-            -->
 
             <!-- Uncomment to enable single sign-on across web apps
                 deployed to this host. Does not provide SSO across a cluster.     
