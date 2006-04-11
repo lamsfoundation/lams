@@ -25,6 +25,7 @@ import org.lamsfoundation.lams.learner.*;
 import org.lamsfoundation.lams.learner.ls.*;
 import org.lamsfoundation.lams.learner.lb.*;
 import org.lamsfoundation.lams.common.util.*;
+import org.lamsfoundation.lams.authoring.DesignDataModel;
 
 import mx.managers.*;
 /**
@@ -60,8 +61,8 @@ class Lesson {
 		//Create the model
 		lessonModel = new LessonModel(this);
 		//Create the view
-		lessonView_mc = target_mc.createChildAtDepth("lessonView",DepthManager.kTop);	
-		
+		lessonView_mc = target_mc.createChildAtDepth("Lesson",DepthManager.kTop);	
+		trace(lessonView_mc);
 		lessonView = LessonView(lessonView_mc);
 		lessonView.init(lessonModel,undefined);
        
@@ -106,9 +107,12 @@ class Lesson {
 		// call action
 		var lessonId:Number = lessonModel.getLessonID();
 		//var userId:Number = Application.getInstance().getUserID();
-		
+
 		// do request
 		Application.getInstance().getComms().getRequest('learning/learner.do?method=joinLesson&userID='+_root.userID+'&lessonID='+String(lessonId), callback, false);
+			
+		// get Learning Design for lesson
+		openLearningDesign();
 			
 		return true;
 	}
@@ -132,6 +136,9 @@ class Lesson {
 		
 		// set lesson as active
 		lessonModel.setActive();
+		trace('pktobject value: '+String(pkt));
+		getURL('http://localhost:8080/lams/learning'+String(pkt)+'?progressId='+lessonModel.getLessonID(),'_blank');
+		
 	}  
 	
 	private function closeLesson(pkt:Object){
@@ -139,10 +146,41 @@ class Lesson {
 		
 		// set lesson as inactive
 		lessonModel.setInactive();
+		
+		// deactivate Progress movie
+	}
+	
+	private function openLearningDesign(){
+		trace('opening learning design...');
+		var designId:Number = lessonModel.getLearningDesignID();
+
+        var callback:Function = Proxy.create(this,saveDataDesignModel);
+           
+		Application.getInstance().getComms().getRequest('authoring/author.do?method=getLearningDesignDetails&learningDesignID='+designId,callback, false);
+		
+	}
+	
+	private function saveDataDesignModel(learningDesignDTO:Object){
+		trace('returning learning design...');
+		trace('saving model data...');
+		
+		var model:DesignDataModel = new DesignDataModel();
+		model.setDesign(learningDesignDTO);
+		lessonModel.setLearningDesignModel(model);
+		
+		// activite Progress movie
 	}
 	
 	public function getLessonID():Number {
 		return lessonModel.getLessonID();
+	}
+	
+	public function checkState(stateID:Number):Boolean {
+		if(lessonModel.getLessonStateID()==stateID){
+			return true
+		} else {
+			return false;
+		}
 	}
 	
 	/**

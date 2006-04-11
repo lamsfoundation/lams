@@ -151,7 +151,7 @@ class LibraryView extends AbstractView {
 			//NOW we pass in the Lesson instance
 			var _lesson:Lesson = learningSeq.classInstanceRefs;
 			
-			var lesson_mc = learningSequences_sp.content.attachMovie("Lesson","ls_"+_lesson.getLessonID(),_depth++,{_lesson:Lesson,_libraryView:lbv});
+			var lesson_mc = learningSequences_sp.content.attachMovie("Lesson","ls_"+_lesson.getLessonID());
 			
 			//position it
 			lesson_mc._y = yPos;
@@ -212,6 +212,10 @@ class LibraryView extends AbstractView {
 	*/
 	public function getModel():LibraryModel{
 			return LibraryModel(model);
+	}
+
+	public function getScrollPane():MovieClip {
+		return learningSequences_sp;
 	}
 
     /**

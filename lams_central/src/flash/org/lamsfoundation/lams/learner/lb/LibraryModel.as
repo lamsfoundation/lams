@@ -55,6 +55,12 @@ class LibraryModel extends Observable {
 	*/
 	private var _learningSequences:Hashtable;
 
+	/**
+	* constants
+	*/
+	public static var NEW_STATE_ID:Number = 2;
+	public static var STARTED_STATE_ID:Number = 3;
+	public static var FINISHED_STATE_ID:Number = 5;
 	
 	/**
 	* Constructor.
@@ -102,6 +108,52 @@ class LibraryModel extends Observable {
 	 */
 	public function getLearningSequence(lessonID:Number):Object{
 		return _learningSequences.get(lessonID);
+	}
+	
+	public function getNewSequences():Array{
+		if(_learningSequences==null){
+			return null;
+		}
+		
+		return getSequencesByState(NEW_STATE_ID);
+	}
+	
+	public function getStartedSequences():Array{
+		if(_learningSequences==null){
+			return null;
+		}
+		
+		return getSequencesByState(STARTED_STATE_ID);
+	}
+	
+	public function getFinishedSequences():Array{
+		if(_learningSequences==null){
+			return null;
+		}
+		
+		return getSequencesByState(FINISHED_STATE_ID);
+	}
+	
+	/**
+	 * Retrieve the Learning Sequences for a specific state
+	 * 
+	 * @param   stateID The state of the sequences to return
+	 * @return  sequences
+	 */
+	
+	private function getSequencesByState(stateID:Number):Array{
+		var seqs:Array = new Array();
+		var keys:Array = _learningSequences.keys();
+		
+		for(var i=0; i<keys.length;i++){
+			var seq:Object = _learningSequences.get(keys[i]);
+			var l:Lesson = seq.classInstanceRefs;
+			if(l.checkState(stateID)){
+				seqs.push(l);
+			}
+		}
+		
+		return seqs;
 	}
 	
 	/**

@@ -54,10 +54,9 @@ class LessonView extends AbstractView {
 	
 	
 	// Lesson buttons
-	private var join_btn:Button;
-	private var export_btn:Button;
+	private var select_btn:Button;
 	
-	private var bkg_pnl:Panel;
+	private var bkg_pnl:MovieClip;
 	
 	//These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
@@ -89,6 +88,7 @@ class LessonView extends AbstractView {
 	* Sets up the lesson (clip)
 	*/
 	public function createLesson() {
+		trace('creating new Lesson ...');
         setStyles();
 		
         _lesson_mc = this;
@@ -97,11 +97,11 @@ class LessonView extends AbstractView {
 		//Add the button handlers, essentially this is handing on clicked event to controller.
         var controller = getController();
 		
-		_lesson_mc.join_btn.addEventListener("click",controller);
+		select_btn.addEventListener("click",controller);
 		
-		join_btn.onPress = Proxy.create(this,this['select']);
-		join_btn.onRollOver = Proxy.create(this,this['rollOver']);
-		join_btn.onRollOut = Proxy.create(this,this['rollOut']);
+		select_btn.onPress = Proxy.create(this,this['select']);
+		select_btn.onRollOver = Proxy.create(this,this['rollOver']);
+		select_btn.onRollOut = Proxy.create(this,this['rollOut']);
 		
 		
         //Now that view is setup dispatch loaded event
@@ -138,6 +138,11 @@ class LessonView extends AbstractView {
 				break;
 			case 'STATUS' :
 				setStatus(lm);
+				break;
+			case 'DESIGN' :
+				break;
+			case 'DESIGNMODEL' :
+				trace('updating design model for lesson..');
 				break;
             default :
                 Debugger.log('unknown update type :' + infoObj.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.LessonView');

@@ -112,7 +112,7 @@ class Library {
 		trace('received active lesson data back...');
 		// get data and create Lesson obj's
 		
-		Debugger.log('Recieved active sequences (lessons) array length:'+lessons.length,4,'setToolkitActivities','Toolkit');
+		Debugger.log('Received active sequences (lessons) array length:'+lessons.length,4,'setActiveLessons','Library');
 		
 		var lns = new Array();
 		
@@ -121,8 +121,11 @@ class Library {
 			var ln:Object = lessons[i];
 			
 			
-			
-			var lesson:Lesson = new Lesson(libraryView_mc, LESSON_X, LESSON_Y+(LESSON_H*i), libraryView);
+			var sp_mc:MovieClip = libraryView.getScrollPane();
+			sp_mc.contentPath = "empty_mc";
+			trace(sp_mc);
+			trace(sp_mc.content);
+			var lesson:Lesson = new Lesson(sp_mc.content, LESSON_X, LESSON_Y+(LESSON_H*i), libraryView);
 			lesson.populateFromDTO(ln);
 			trace('pushing lesson with id: ' + lesson.getLessonID());
 			lns.push(lesson);

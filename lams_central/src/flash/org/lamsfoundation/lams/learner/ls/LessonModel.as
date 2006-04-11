@@ -24,6 +24,7 @@
 import org.lamsfoundation.lams.common.util.Observable;
 import org.lamsfoundation.lams.learner.ls.*;
 import org.lamsfoundation.lams.common.util.*;
+import org.lamsfoundation.lams.authoring.DesignDataModel;
 
 
 /*
@@ -50,13 +51,21 @@ class LessonModel extends Observable {
 	private var _lessonName:String;
 	private var _lessonDescription:String;
 	private var _lessonStateID:Number;
+	private var _learningDesignID:Number;
+	
+	/* the learningDesignModel gets set when you join a lesson */
+	private var _learningDesignModel:DesignDataModel;
+	
 	private var _active:Boolean;
+	
+	
 	/**
 	* Constructor.
 	*/
 	public function LessonModel (lesson:Lesson){
 		_lesson = lesson;
 		_active = false;
+		_learningDesignModel = null;
 	}
 	
 	public function populateFromDTO(dto:Object){
@@ -65,6 +74,7 @@ class LessonModel extends Observable {
 		_lessonName = dto.lessonName;
 		_lessonDescription = dto.lessonDescription;
 		_lessonStateID = dto.lessonStateID;
+		_learningDesignID = dto.learningDesignID;
 	}
 	
 	
@@ -154,6 +164,36 @@ class LessonModel extends Observable {
 	
 	public function getLessonStateID():Number {
 		return _lessonStateID;
+	}
+	
+	public function setLearningDesignID(learningDesignID:Number){
+		_learningDesignID = learningDesignID;
+		
+		setChanged();
+		
+		// send update
+		infoObj = {};
+		infoObj.updateType = "DESIGN";
+		notifyObservers(infoObj);
+	}
+	
+	public function getLearningDesignID():Number{
+		return _learningDesignID;
+	}
+	
+	public function setLearningDesignModel(learningDesignModel:DesignDataModel){
+		_learningDesignModel = learningDesignModel;
+		
+		setChanged();
+		
+		// send update
+		infoObj = {};
+		infoObj.updateType = "DESIGNMODEL";
+		notifyObservers(infoObj);
+	}
+	
+	public function getLearningDesignModel():DesignDataModel{
+		return _learningDesignModel;
 	}
 	
 	public function setActive() {
