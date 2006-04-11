@@ -221,6 +221,10 @@
 				inheritAll="false" >
 			<property name="jboss.deploy" location="${jboss.deploy}"/>
 		</ant>
+ 		<ant antfile="../${tool_vote_dir}/build.xml" target="deploy-tool"
+				inheritAll="false" >
+			<property name="jboss.deploy" location="${jboss.deploy}"/>
+		</ant>
 		<ant target="deploy-learning-libraries"/>
 	</target>
 	
@@ -250,6 +254,7 @@
 				<include name="jboss-service.xml" />
 			</fileset>
 		</copy>
+		<tstamp/>
 		<copy overwrite="yes" todir="${lamsconf}">
 			<fileset dir="${conf.auth}/">
 				<include name="*.xml" />
@@ -259,6 +264,9 @@
 				<include name="*.xml" />
 				<include name="*.dtd" />
 			</fileset>
+	        <filterset>
+	                <filter token="datetimestamp" value="${DSTAMP}${TSTAMP}"/>
+	        </filterset>
 		</copy>
 		<copy overwrite="yes" todir="${jboss.ear.deploy}">
 			<fileset dir="${conf.jboss}/service">
