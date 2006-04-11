@@ -48,6 +48,17 @@
 	</init-param>
 </filter>
 
+<filter>
+	   <filter-name>LocaleFilter</filter-name>
+		 <filter-class>
+		   org.lamsfoundation.lams.web.filter.LocaleFilter
+		 </filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+</filter>
+
   <filter-mapping>
     <filter-name>SystemSessionFilter</filter-name>
      <url-pattern>/*</url-pattern>
