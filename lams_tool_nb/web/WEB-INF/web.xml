@@ -48,6 +48,17 @@
 	</init-param>
    </filter>
 
+<filter>
+	   <filter-name>LocaleFilter</filter-name>
+		 <filter-class>
+		   org.lamsfoundation.lams.web.filter.LocaleFilter
+		 </filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+</filter>
+
   <filter-mapping>
 	<filter-name>SystemSessionFilter</filter-name>
 	<url-pattern>/*</url-pattern>
@@ -57,6 +68,11 @@
 	<filter-name>hibernateFilter</filter-name>
     <url-pattern>/*</url-pattern>
 </filter-mapping>
+
+ <filter-mapping>
+     <filter-name>LocaleFilter</filter-name>
+     <url-pattern>/*</url-pattern>
+  </filter-mapping>
 
     <!--
     To use non XDoclet listeners, create a listeners.xml file that
