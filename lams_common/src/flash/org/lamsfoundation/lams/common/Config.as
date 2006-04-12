@@ -197,15 +197,15 @@ class Config {
 				buildObj = CookieMonster.open(CONFIG_PREFIX+CONFIG_BUILD,true);
 				Debugger.log('Build cookie exists: '+String(buildObj),Debugger.GEN,'serverDefaultsLoaded','Config');
 				
-				var buildRt:Number = parseFloat(_root.build);
-				var buildNo:Number = Number(buildObj);
+				//var buildRt:Number = parseFloat(_root.build);
+				//var buildNo:Number = Number(buildObj);
 				
-				trace('build root no.: ' + buildRt);
+				var buildNo:String = String(buildObj);
+				
+				trace('build root no.: ' + _root.build);
 				trace('build no.: ' + buildNo);
-				trace(typeof buildNo);
-				trace(typeof buildRt);
 				
-				if(buildNo != buildRt) {
+				if(buildNo != _root.build) {
 					Debugger.log('Purging cookie data',Debugger.GEN,'serverDefaultsLoaded','Config');
 					if(CookieMonster.deleteCookie(CONFIG_PREFIX + CONFIG_BUILD)) {
 						saveBuild(_root.build);
