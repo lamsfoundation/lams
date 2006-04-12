@@ -91,12 +91,8 @@ INSERT INTO lams_css_property (property_id, style_id, name, value, style_subset,
 INSERT INTO lams_css_property (property_id, style_id, name, value, style_subset, type) VALUES (2, 1, "color", "12452097", "_tf", 3);
 INSERT INTO lams_css_property (property_id, style_id, name, value, style_subset, type) VALUES (3, 1, "rollOverColor", "16711680", NULL, 2);
 
-INSERT INTO lams_css_style (style_id,theme_ve_id) VALUES (2,2);
-INSERT INTO lams_css_property (property_id, style_id, name, value, style_subset, type) VALUES (4, 2, "display", "block", "_tf", 1);
-INSERT INTO lams_css_property (property_id, style_id, name, value, style_subset, type) VALUES (5, 2, "selectionColor", "16711681", NULL, 3);
-
-INSERT INTO lams_css_theme_ve (theme_ve_id, name, description, parent_id, theme_flag) VALUES (1, "ruby", "cut down ruby theme for testing", null, 1);
-INSERT INTO lams_css_theme_ve (theme_ve_id, name, description, parent_id, theme_flag) VALUES (2, "button", null, 1, 0);
+INSERT INTO lams_css_theme_ve (theme_ve_id, name, description, parent_id, theme_flag) VALUES (1, "default", "Default Flash style", null, 1);
+INSERT INTO lams_css_theme_ve (theme_ve_id, name, description, parent_id, theme_flag) VALUES (2, "ruby", "Incomplete style for Flash", null, 0);
 INSERT INTO lams_css_theme_ve (theme_ve_id, name, description, parent_id, theme_flag) VALUES (3, "aqua", "JSP theme", null, 1);
 
 -- users
