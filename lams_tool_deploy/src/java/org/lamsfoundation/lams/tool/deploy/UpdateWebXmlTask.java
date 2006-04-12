@@ -162,7 +162,12 @@ public class UpdateWebXmlTask implements Task
 			}
 			contextParamElement.removeChild(valueChildren.item(vc));
 		}
-		currentValue += "  classpath:"+applicationContextPath+"\n";
+		int index = currentValue.indexOf(applicationContextPath);
+		System.out.println("Current value "+currentValue+"\n(index="+index+")");
+		if ( index < 0  ) {
+			System.out.println("Adding "+applicationContextPath+" to context");
+			currentValue += "  classpath:"+applicationContextPath+"\n";
+		}
 		contextParamElement.appendChild(doc.createTextNode(currentValue));
 	}
 
