@@ -9,12 +9,15 @@
 	
 		classpath:/org/lamsfoundation/lams/applicationContext.xml
 		classpath:/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml
-		<!--  Add tool contexts after this -->
+		<!--  This is a multi line comment. Does
+			it survive the update
+		--> 
 		classpath:/org/lamsfoundation/lams/tool/toolApplicationContext.xml
 		classpath:/org/lamsfoundation/lams/learning/learningApplicationContext.xml
   		classpath:/org/lamsfoundation/lams/authoring/authoringApplicationContext.xml
   		classpath:/org/lamsfoundation/lams/monitoring/monitoringApplicationContext.xml
 		classpath:/org/lamsfoundation/lams/contentrepository/applicationContext.xml		
+		<!--  Add tool contexts after this -->
 		
 </param-value>
 </context-param>
