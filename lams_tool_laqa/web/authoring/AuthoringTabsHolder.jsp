@@ -106,9 +106,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 	</script>
 	
-	<script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>    
-	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
-	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/xmlrequest.js'/>"></script>
+	<script type="text/javascript" src="<c:out value="${lams}"/>includes/javascript/tabcontroller.js"></script>    
+	<script type="text/javascript" src="<c:out value="${lams}"/>includes/javascript/common.js"></script>
 	
 </head>
 <body onLoad="init();">
