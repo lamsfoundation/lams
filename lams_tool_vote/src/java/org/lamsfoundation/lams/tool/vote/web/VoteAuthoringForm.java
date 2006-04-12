@@ -35,6 +35,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 	protected String currentTab;
 	
 	protected String questionIndex;
+	protected String optIndex;
 	protected String optionIndex;
 	protected String selectedIndex;
 	protected String deletableOptionIndex;
@@ -161,6 +162,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 		this.title=null;
 		this.instructions=null;
 		this.questionIndex=null;
+		this.optIndex=null;
 		this.optionIndex=null;
 		this.selectedIndex=null;
 		this.deletableOptionIndex=null;
@@ -820,4 +822,16 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 		this.submit = submit;
 	}
 
+    /**
+     * @return Returns the optIndex.
+     */
+    public String getOptIndex() {
+        return optIndex;
+    }
+    /**
+     * @param optIndex The optIndex to set.
+     */
+    public void setOptIndex(String optIndex) {
+        this.optIndex = optIndex;
+    }
 }

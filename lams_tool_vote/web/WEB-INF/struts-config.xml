@@ -119,9 +119,33 @@
 	        scope="request"
 	      />	         			
     	
+	      <forward
+	        name="load"
+	        path="/authoring/AuthoringMaincontent.jsp"
+		    redirect="true"
+	      />
+	    
+	      <forward
+	        name="starter"
+	        path="/index.jsp"
+		    redirect="true"
+	      />
+	      
+	  	<forward
+		    name="loadMonitoring"
+		    path="/monitoring/MonitoringMaincontent.jsp"
+		    redirect="true"
+	  	/>
+	  	
+	     <forward
+	        name="preview"
+	        path="/learning/Preview.jsp"
+		    redirect="true"
+	     />
+	  	
 	  	<forward
 		    name="errorList"
-	        path="/VoteErrorBox.jsp"
+		    path="/VoteErrorBox.jsp"
 		    redirect="true"
 	  	/>
     </action>
@@ -290,7 +314,6 @@
 		    redirect="true"
 	  	/>
 	</action>  
-
    <!--Export Portfolio Action -->
 	    <action
 		      path="/exportPortfolio"
@@ -327,11 +350,4 @@
  </action-mappings>
 	
 	<message-resources parameter="org.lamsfoundation.lams.tool.vote.ApplicationResources"/>
-	<plug-in className="org.apache.struts.tiles.TilesPlugin">
-		<set-property property="definitions-config"
-			value="/WEB-INF/tiles/tiles-defs.xml" />
-		<set-property property="definitions-debug" value="0" />
-		<set-property property="definitions-parser-details" value="0" />
-		<set-property property="definitions-parser-validate" value="true" />
-	</plug-in>
 </struts-config>

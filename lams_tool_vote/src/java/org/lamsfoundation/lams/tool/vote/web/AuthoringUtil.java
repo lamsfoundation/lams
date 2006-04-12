@@ -985,6 +985,87 @@ public class AuthoringUtil implements VoteAppConstants {
     }
     
     
+    
+    protected void reconstructOptionContentMapForAdd(Map mapOptionsContent, HttpServletRequest request)
+    {
+        logger.debug("doing reconstructOptionContentMapForAdd.");
+    	logger.debug("pre-add Map content: " + mapOptionsContent);
+    	logger.debug("pre-add Map size: " + mapOptionsContent.size());
+    	
+    	repopulateMap(mapOptionsContent, request);
+    	
+    	mapOptionsContent.put(new Long(mapOptionsContent.size()+1).toString(), "");
+    	request.getSession().setAttribute("mapOptionsContent", mapOptionsContent);
+	     
+    	logger.debug("post-add Map is: " + mapOptionsContent);    	
+	   	logger.debug("post-add count " + mapOptionsContent.size());
+    }
+    
+    
+    protected void reconstructOptionContentMapForRemove(Map mapOptionsContent, HttpServletRequest request, VoteAuthoringForm voteAuthoringForm)
+    {
+    		logger.debug("doing reconstructOptionContentMapForRemove.");
+    	 	//String questionIndex =voteAuthoringForm.getQuestionIndex();
+    		String optIndex =voteAuthoringForm.getOptIndex();
+    	 	logger.debug("pre-delete map content:  " + mapOptionsContent);
+    	 	logger.debug("optIndex: " + optIndex);
+    	 	
+    	 	String defLater=(String)request.getSession().getAttribute(ACTIVE_MODULE);
+    	 	logger.debug("defLater: " + defLater);
+    	 	
+    	 	String removableOptIndex=null;
+    	 	if (defLater.equals(MONITORING))
+    	 	{
+       	 		removableOptIndex=(String)request.getSession().getAttribute(REMOVABLE_QUESTION_INDEX);
+        	 	logger.debug("removableOptIndex: " + removableOptIndex);
+        	 	optIndex=removableOptIndex;
+    	 	}
+    	 	logger.debug("final removableOptIndex: " + optIndex);
+    	 	
+    	 	
+    	 	long longOptIndex= new Long(optIndex).longValue();
+    	 	logger.debug("pre-delete count: " + mapOptionsContent.size());
+    	 	
+        	repopulateMap(mapOptionsContent, request);
+        	logger.debug("post-repopulateMap optIndex: " + optIndex);
+        	
+        	mapOptionsContent.remove(new Long(longOptIndex).toString());	
+	 		logger.debug("removed the question content with index: " + longOptIndex);
+	 		request.getSession().setAttribute("mapOptionsContent", mapOptionsContent);
+	    	
+	    	logger.debug("post-delete count " + mapOptionsContent.size());
+	    	logger.debug("post-delete map content:  " + mapOptionsContent);
+    }
+
+
+    protected void repopulateMap(Map mapOptionsContent, HttpServletRequest request)
+    {
+    	logger.debug("optIndex: " + request.getSession().getAttribute("optIndex"));
+    	long optIndex= new Long(request.getSession().getAttribute("optIndex").toString()).longValue();
+    	logger.debug("optIndex: " + optIndex);
+
+    	/* if there is data in the Map remaining from previous session remove those */
+    	mapOptionsContent.clear();
+		logger.debug("Map got initialized: " + mapOptionsContent);
+		
+		for (long i=0; i < optIndex ; i++)
+		{
+			String candidateOptionEntry =request.getParameter("optionContent" + i);
+			if (i==0)
+    		{
+    			request.getSession().setAttribute("defaultOptionContent", candidateOptionEntry);
+    			logger.debug("defaultQuestionContent set to: " + candidateOptionEntry);
+    		}
+			if ((candidateOptionEntry != null) && (candidateOptionEntry.length() > 0))
+			{
+				logger.debug("using key: " + i);
+				mapOptionsContent.put(new Long(i+1).toString(), candidateOptionEntry);
+				logger.debug("added new entry.");	
+			}
+		}
+    }
+
+    
     /**
      * cleans up authoring http session 
      * cleanupAuthoringSession(HttpServletRequest request)

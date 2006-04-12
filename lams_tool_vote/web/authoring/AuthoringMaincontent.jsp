@@ -104,8 +104,16 @@ http://www.gnu.org/licenses/gpl.txt
             else
                 selectTab(1); //select the default tab;
             
-            initEditor("richTextTitle");
-            initEditor("richTextInstructions");
+            initEditor("title");
+            initEditor("instructions");
+            initEditor("posting");            
+            initEditor("optionContent0");
+           
+            <c:set var="optIndex" scope="session" value="1"/>
+            <c:forEach var="questionEntry" items="${sessionScope.mapOptionsContent}">
+                <c:set var="optIndex" scope="session" value="${optIndex +1}"/>
+                initEditor("<c:out value="optionContent${optIndex-1}"/>");
+            </c:forEach>
         }     
         
         function doSelectTab(tabId) {

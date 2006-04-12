@@ -22,6 +22,7 @@
 package org.lamsfoundation.lams.tool.vote.web;
 
 import java.io.IOException;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -114,6 +115,86 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 	 	
 	 	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
 	 	return null;
+    }
+    
+    
+    public ActionForward addNewQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
+    throws IOException, ServletException 
+    {
+		logger.debug("dispathcing addNewQuestion");
+		
+		request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
+	    AuthoringUtil authoringUtil= new AuthoringUtil();
+	    Map mapOptionsContent=(Map)request.getSession().getAttribute(MAP_OPTIONS_CONTENT);
+	
+		String richTextTitle = request.getParameter("title");
+	    String richTextInstructions = request.getParameter("instructions");
+	    String richTextPosting = request.getParameter("posting");
+	    
+	    logger.debug("richTextTitle: " + richTextTitle);
+	    logger.debug("richTextInstructions: " + richTextInstructions);
+	    logger.debug("richTextPosting: " + richTextPosting);
+	    
+	    if (richTextTitle != null)
+	    {
+			request.getSession().setAttribute(ACTIVITY_TITLE, richTextTitle);
+	    }
+	
+	    if (richTextInstructions != null)
+	    {
+			request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, richTextInstructions);
+	    }
+
+	    if (richTextPosting != null)
+	    {
+			request.getSession().setAttribute(POSTING, richTextPosting);
+	    }
+
+	    //request.getSession().setAttribute(EDITACTIVITY_EDITMODE, new Boolean(true));  
+	    authoringUtil.reconstructOptionContentMapForAdd(mapOptionsContent, request);
+	    
+	    logger.debug("richTextInstructions: " + request.getSession().getAttribute(ACTIVITY_INSTRUCTIONS));
+	    return (mapping.findForward(LOAD_QUESTIONS));
+    }
+
+
+    public ActionForward removeQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
+    throws IOException, ServletException 
+    {
+		logger.debug("doing removeQuestion ");
+		request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
+		
+		String richTextTitle = request.getParameter("title");
+	    String richTextInstructions = request.getParameter("instructions");
+	    logger.debug("richTextTitle: " + richTextTitle);
+	    logger.debug("richTextInstructions: " + richTextInstructions);
+	    String richTextPosting = request.getParameter("posting");
+	    
+	    if (richTextTitle != null)
+	    {
+			request.getSession().setAttribute(ACTIVITY_TITLE, richTextTitle);
+	    }
+	
+	    if (richTextInstructions != null)
+	    {
+			request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, richTextInstructions);
+	    }
+	    
+	    if (richTextPosting != null)
+	    {
+			request.getSession().setAttribute(POSTING, richTextPosting);
+	    }
+
+	    
+		AuthoringUtil authoringUtil= new AuthoringUtil();
+	    VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
+	    Map mapOptionsContent=(Map)request.getSession().getAttribute(MAP_OPTIONS_CONTENT);
+	    logger.debug("mapOptionsContent: " + mapOptionsContent);
+	    
+	    //request.getSession().setAttribute(EDITACTIVITY_EDITMODE, new Boolean(true));  
+	    authoringUtil.reconstructOptionContentMapForRemove(mapOptionsContent, request, voteAuthoringForm);
+	    
+	    return (mapping.findForward(LOAD_QUESTIONS));
     }
 
 

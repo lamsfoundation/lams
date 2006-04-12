@@ -97,6 +97,7 @@ public interface VoteAppConstants {
     public static final String IS_DEFINE_LATER							="isDefineLater";
     public static final String DEFAULT_CONTENT_ID_STR					="defaultContentIdStr";
     public static final String DEFAULT_QUESTION_CONTENT					="defaultQuestionContent";
+    public static final String DEFAULT_OPTION_CONTENT					="defaultOptionContent";
     public static final String MAP_QUESTIONS_CONTENT					="mapQuestionsContent";
     public static final String MAP_QUESTION_CONTENT						="mapQuestionContent";
     public static final String MAP_OPTIONS_CONTENT						="mapOptionsContent";
@@ -188,7 +189,9 @@ public interface VoteAppConstants {
     public static final String OPTION_OFF								="false";
     public static final String ACTIVITY_TITLE 							= "activityTitle";
     public static final String ACTIVITY_INSTRUCTIONS					= "activityInstructions";
-
+    public static final String POSTING									= "posting";
+    public static final String MONITORING								="monitoring";
+    public static final String REMOVABLE_QUESTION_INDEX					="removableQuestionIndex";
         
     /*
      * user actions

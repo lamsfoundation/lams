@@ -58,6 +58,15 @@ http://www.gnu.org/licenses/gpl.txt
 								<lams:SetEditor id="instructions" text="${activityInstructions}" small="true"/>								
 							</td> 
 						</tr>
+
+					  	<tr> 
+					 		<td valign="top"><font size=2> <b> <bean:message key="label.vote.posting"/>:  </b></font></td>
+							<td NOWRAP valign=top>
+								<lams:SetEditor id="posting" text="${defaultQuestionContent}" small="true"/>								
+							</td> 
+						</tr>
+
+
 				
 			 		<!--default question content, this entry can not be deleted but can be updated -->
 				 		<tr> 
@@ -66,35 +75,35 @@ http://www.gnu.org/licenses/gpl.txt
 						 	</td>
 
 							<td NOWRAP valign=top>
-								<lams:SetEditor id="questionContent0" text="${sessionScope.defaultQuestionContent}" small="true"/>								
+								<lams:SetEditor id="optionContent0" text="${defaultOptionContent}" small="true"/>								
 							</td> 
 					  	</tr>
 		
 				  	<!--end of default question content -->
 				  	
 			  		<!-- if there is more than just the default content start presenting them -->
-			  	 		<c:set var="queIndex" scope="session" value="1"/>
-						<c:forEach var="questionEntry" items="${sessionScope.mapQuestionContent}">
-					  		<c:if test="${questionEntry.key > 1}"> 			
-								<c:set var="queIndex" scope="session" value="${queIndex +1}"/>
+			  	 		<c:set var="optIndex" scope="session" value="1"/>
+						<c:forEach var="optionEntry" items="${sessionScope.mapOptionsContent}">
+					  		<c:if test="${optionEntry.key > 1}"> 			
+								<c:set var="optIndex" scope="session" value="${optIndex +1}"/>
 								  <tr>
-								  	<td valign="top"> <font size=2> <b> <c:out value="Nomination ${queIndex}"/>:  </b></font></td>
+								  	<td valign="top"> <font size=2> <b> <c:out value="Nomination ${optIndex}"/>:  </b></font></td>
 
 									<td NOWRAP valign=top>
 
-										<lams:SetEditor id="questionContent${queIndex-1}" text="${questionEntry.value}" small="true"/>								
+										<lams:SetEditor id="optionContent${optIndex-1}" text="${optionEntry.value}" small="true"/>								
                                 
 	                                	<c:if test="${ (sessionScope.activeModule != 'monitoring') }"> 			
 			 		 						<html:submit property="removeContent" 
 	                                                     styleClass="linkbutton"  
-	                                                     onclick="removeQuestion(${queIndex});">
+	                                                     onclick="removeQuestion(${optIndex});">
 												<bean:message key="button.delete"/>
 											</html:submit>
 										</c:if> 			
 	                                	<c:if test="${ (sessionScope.activeModule == 'monitoring') }"> 			
 			 		 						<html:submit property="removeContent" 
 	                                                     styleClass="linkbutton"  
-	                                                     onclick="removeMonitoringQuestion(${queIndex});">
+	                                                     onclick="removeMonitoringQuestion(${optIndex});">
 												<bean:message key="button.delete"/>
 											</html:submit>
 										</c:if> 													
@@ -103,8 +112,8 @@ http://www.gnu.org/licenses/gpl.txt
 								  </tr>
 							</c:if> 			
 						</c:forEach>
-						<html:hidden property="toolContentId" value="${QaAuthoringForm.toolContentId}"/>
-						<html:hidden property="questionIndex"/>
+						<html:hidden property="toolContentId" value="${VoteAuthoringForm.toolContentId}"/>
+						<html:hidden property="optIndex"/>
                         
                         <tr>
                             <td></td>
@@ -127,9 +136,10 @@ http://www.gnu.org/licenses/gpl.txt
 
 <SCRIPT language="JavaScript"> 
 
-	function removeQuestion(questionIndex)
+	function removeQuestion(optIndex)
 	{
-		document.VoteAuthoringForm.questionIndex.value=questionIndex;
+		document.VoteAuthoringForm.optIndex.value=optIndex;
+		alert(optIndex);
         submitMethod('removeQuestion');
 	}
 

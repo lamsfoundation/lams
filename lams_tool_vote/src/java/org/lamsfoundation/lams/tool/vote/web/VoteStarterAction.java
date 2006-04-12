@@ -97,6 +97,7 @@ import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
 import org.lamsfoundation.lams.tool.vote.VoteComparator;
 import org.lamsfoundation.lams.tool.vote.VoteUtils;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
+import org.lamsfoundation.lams.tool.vote.pojos.VoteOptsContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 import org.lamsfoundation.lams.tool.vote.service.VoteServiceProxy;
@@ -572,7 +573,7 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 
 		
 	    /*
-		 * get the existing question content
+		 * get the posting content 
 		 */
 		logger.debug("setting existing content data from the db");
 		mapQuestionContent.clear();
@@ -595,11 +596,41 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 			}
 		}
 		logger.debug("Map initialized with existing contentid to: " + mapQuestionContent);
-		
-		logger.debug("callling presentInitialUserInterface for the existing content.");
-		
 		request.getSession().setAttribute(MAP_QUESTION_CONTENT, mapQuestionContent);
 		logger.debug("starter initialized the Comparable Map: " + request.getSession().getAttribute("mapQuestionContent") );
+		
+		
+		/* collect options for the default question content into a Map*/
+		VoteQueContent voteQueContent=voteService.getToolDefaultQuestionContent(voteContent.getUid().longValue());
+		logger.debug("voteQueContent:" + voteQueContent);
+
+		/* hold all he options for this question*/
+		List list=voteService.findVoteOptionsContentByQueId(voteQueContent.getUid());
+		logger.debug("options list:" + list);
+
+		Map mapOptionsContent= new TreeMap(new VoteComparator());
+		Iterator listIterator=list.iterator();
+		Long mapOptsIndex=new Long(1);
+		while (listIterator.hasNext())
+		{
+			VoteOptsContent voteOptsContent=(VoteOptsContent)listIterator.next();
+			logger.debug("option text:" + voteOptsContent.getVoteQueOptionText());
+			mapOptionsContent.put(mapOptsIndex.toString(),voteOptsContent.getVoteQueOptionText());
+			
+    		if (mapOptsIndex.longValue() == 1)
+    			request.getSession().setAttribute(DEFAULT_OPTION_CONTENT, voteOptsContent.getVoteQueOptionText());
+			
+			mapIndex=new Long(mapOptsIndex.longValue()+1);
+		}
+		
+		logger.debug("DEFAULT_QUESTION_CONTENT: " + request.getSession().getAttribute(DEFAULT_QUESTION_CONTENT));
+		logger.debug("DEFAULT_OPTION_CONTENT: " + request.getSession().getAttribute(DEFAULT_OPTION_CONTENT));
+		request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
+		Map mapDefaultOptionsContent=mapOptionsContent;
+		request.getSession().setAttribute(MAP_DEFAULTOPTIONS_CONTENT, mapDefaultOptionsContent);
+		logger.debug("starter initialized the Options Map: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT));
+		logger.debug("starter initialized the Default Options Map: " + request.getSession().getAttribute(MAP_DEFAULTOPTIONS_CONTENT));
+
 
 		logger.debug("final title: " + voteAuthoringForm.getTitle());
 		logger.debug("final ins: " + voteAuthoringForm.getInstructions());
