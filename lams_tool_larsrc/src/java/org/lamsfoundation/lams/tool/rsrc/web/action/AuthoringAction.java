@@ -157,8 +157,14 @@ public class AuthoringAction extends Action {
 
 	private ActionForward nextInstruction(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		InstructionNavForm navForm = (InstructionNavForm) form;
-		navForm.setCurrent(navForm.getCurrent()+1);
-		return findForward(navForm.getType(),mapping);
+		List list = navForm.getAllInstructions();
+		if(list != null && navForm.getCurrent() < list.size()){
+			//current is start from 1, so, this will return next.
+			navForm.setInstruction((ResourceItemInstruction) list.get(navForm.getCurrent()));
+			navForm.setCurrent(navForm.getCurrent()+1);
+		}
+		
+		return mapping.findForward(ResourceConstants.SUCCESS);
 	}
 
 
@@ -176,11 +182,17 @@ public class AuthoringAction extends Action {
 			
 			Set instructions = item.getItemInstructions();
 			InstructionNavForm navForm = (InstructionNavForm) form;
+			navForm.setAllInstructions(new ArrayList(instructions));
 			navForm.setTitle(item.getTitle());
 			navForm.setType(item.getType());
-			navForm.setCurrent(1);
 			navForm.setTotal(instructions.size());
-			navForm.setInstructions(instructions);
+			if(instructions.size() > 0){
+				navForm.setCurrent(1);
+				navForm.setInstruction((ResourceItemInstruction) instructions.iterator().next());
+			}else{
+				navForm.setCurrent(0);
+				navForm.setInstruction(null);
+			}
 			if(item.getType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT)
 				request.getSession().setAttribute(ResourceConstants.ATT_LEARNING_OBJECT,item);
 			//set url to content frame
@@ -805,7 +817,7 @@ public class AuthoringAction extends Action {
 			url = "/download/?uuid="+item.getFileUuid()+"&preferDownload=false";
 			break;
 		case ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT:
-			url = "/pages/learningobject/mainframe.jsp";
+			url = "/pages/learningobj/mainframe.jsp";
 			break;
 		}
 		return url;

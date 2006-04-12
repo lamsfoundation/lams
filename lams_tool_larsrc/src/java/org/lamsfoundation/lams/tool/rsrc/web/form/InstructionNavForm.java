@@ -24,9 +24,11 @@
 /* $Id$ */
 package org.lamsfoundation.lams.tool.rsrc.web.form;
 
+import java.util.List;
 import java.util.Set;
 
 import org.apache.struts.action.ActionForm;
+import org.lamsfoundation.lams.tool.rsrc.model.ResourceItemInstruction;
 
 /**
  * 
@@ -39,16 +41,10 @@ public class InstructionNavForm extends ActionForm {
 	private String title;
 	private int total;
 	private int current;
-	private Set instructions;
+	private ResourceItemInstruction instruction;
+	private List allInstructions;
 	private short type;
-	
-	
-	public Set getInstructions() {
-		return instructions;
-	}
-	public void setInstructions(Set instructions) {
-		this.instructions = instructions;
-	}
+
 	public int getCurrent() {
 		return current;
 	}
@@ -72,6 +68,18 @@ public class InstructionNavForm extends ActionForm {
 	}
 	public short getType() {
 		return type;
+	}
+	public ResourceItemInstruction getInstruction() {
+		return instruction;
+	}
+	public void setInstruction(ResourceItemInstruction instruction) {
+		this.instruction = instruction;
+	}
+	public List getAllInstructions() {
+		return allInstructions;
+	}
+	public void setAllInstructions(List allInstructions) {
+		this.allInstructions = allInstructions;
 	}
 	
 }

@@ -20,11 +20,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 --%>
 <%@ include file="/common/taglibs.jsp" %>
 <html>
-<body>
-	<frameset cols="25%,75%" rows="*">
-		<frame src="navigatortree.jsp" name="navigatorFrame" marginheight="0"  scrolling="YES">
-		<frame src="defaultcontent.jsp" name="contentFrame" marginheight="0" scrolling="YES">
-	</frameset>
+<frameset cols="25%,75%" rows="*">
+	<frame src="navigatortree.jsp" name="navigatorFrame" marginheight="0"  scrolling="YES">
+	<frame src="defaultcontent.jsp" name="contentFrame" marginheight="0" scrolling="YES">
+</frameset>
 	
 <table bgcolor="#9DC5EC" width="100%" border="0" cellspacing="0" cellpadding="0" align="center" summary="This table is being used for layout purposes only">
 <TR><TD>
@@ -42,5 +41,4 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</table>
 </TD></TR>
 </table>	
-</body>
 </html>

@@ -38,7 +38,7 @@
 					</tr>
 					<tr>
 						<td width="130px"><fmt:message key="label.authoring.basic.resource.description.input"/></td>
-						<td><lams:STRUTS-textarea rows="5" cols="55" tabindex="2" property="description"/> </td>
+						<td><lams:STRUTS-textarea rows="5" cols="55" property="description"/> </td>
 					</tr>						
 					<tr>
 						<td width="130px"><fmt:message key="label.authoring.basic.resource.url.input"/></td>
@@ -63,7 +63,7 @@
 						<td width="100px" align="right" valign="bottom">
 							<input onclick="cancelResourceItem()" type="button" name="cancel" value="<fmt:message key="label.cancel"/>" class="buttonStyle">
 						</td>						
-						<td width="100%" align="right" valign="bottom">
+						<td width="150px" align="right" valign="bottom">
 							<input onclick="submitResourceItem()" type="button" name="add" value="<fmt:message key="label.authoring.basic.add.url"/>" class="buttonStyle">
 						</td>
 					</tr>

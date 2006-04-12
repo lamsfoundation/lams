@@ -19,11 +19,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt 
 --%>
 <%@ include file="/common/taglibs.jsp" %>
-<html>
-<body>
-	<frameset rows="30,*" frameborder="no">
-		<frame src="instructionsnav.jsp" name=headerFrame" marginheight="0" scrolling="NO">
-		<frame src="<c:url value='${resourceItemReviewUrl}'/>" name="contentFrame" marginheight="0" scrolling="YES">
-	</frameset>
-</body>
-</html>
+<frameset rows="150,*" frameborder="no">
+	<frame src="<c:url value="/pages/itemreview/instructionsnav.jsp"/>" name=headerFrame" marginheight="0" scrolling="NO">
+	<frame src="<c:url value='${resourceItemReviewUrl}'/>" name="contentFrame" marginheight="0" scrolling="YES">
+</frameset>
