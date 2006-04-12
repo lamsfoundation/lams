@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE Lams PUBLIC "-//LAMS//DTD LAMS//EN" "file:///C:/lamsconf/lams.dtd">
+<!DOCTYPE Lams PUBLIC "-//LAMS//DTD LAMS//EN" "file:///usr/local/lamsconf/lams.dtd">
 <Lams>
-	<ServerURL>http://localhost:8080/lams/</ServerURL>
-	<LamsHome>C:\lams</LamsHome>
-	<TempDir>C:\lams\temp</TempDir>
-	<DumpDir>C:\lams\dump</DumpDir>
+	<ServerURL>http://shaun.melcoe.mq.edu.au/lams/</ServerURL>
+	<LamsHome>/var/opt/lams</LamsHome>
+	<TempDir>/var/opt/lams/temp</TempDir>
+	<DumpDir>/var/opt/lams/dump</DumpDir>
 	<SMTPServer>mail.lib.mq.edu.au</SMTPServer>
 	<LamsSupportEmail>lams_support@melcoe.mq.edu.au</LamsSupportEmail>
-	<ContentRepositoryPath>C:\lams\repository</ContentRepositoryPath>
+	<ContentRepositoryPath>/var/opt/lams/repository</ContentRepositoryPath>
 	<UploadFileMaxSize>1048576</UploadFileMaxSize>
 	<UploadLargeFileMaxSize>10485760</UploadLargeFileMaxSize>
 	<UploadFileMaxMemorySize>4096</UploadFileMaxMemorySize>
 	<ChatServerName></ChatServerName>
 	<ChatPortNumber>9800</ChatPortNumber>
-	<FileManagerDir>d:/jboss-4.0.2/server/default/deploy/upload.war</FileManagerDir>
+	<FileManagerDir>/usr/local/jboss-4.0.2/server/default/deploy/upload.war</FileManagerDir>
 	<ExecutableExtensions>.bat,.bin,.com,.cmd,.exe,.msi,.msp,.ocx,.pif,.scr,.sct,.sh,.shs,.vbs</ExecutableExtensions>
-	<TicketFile>d:/jboss-4.0.2/server/default/conf/lams.tck</TicketFile>
+	<TicketFile>/usr/local/jboss-4.0.2/server/default/conf/lams.tck</TicketFile>
 	<!-- UserInactiveTimeout in seconds. 86400 seconds is one day-->
 	<UserInactiveTimeout>86400</UserInactiveTimeout>
 	<!-- If a user is allowed to login with different clients at the same time-->
@@ -25,11 +25,11 @@
 	<UseCacheDebugListener>false</UseCacheDebugListener>
 	<!--  Number of days after which preview session data may be deleted. Recommend 7 days -->
 	<CleanupPreviewOlderThanDays>7</CleanupPreviewOlderThanDays>
-	<!--  used for client updates -->
-	<AuthoringClientVersion>2.0.@datetimestamp@</AuthoringClientVersion>
-	<MonitorClientVersion>2.0.@datetimestamp@</MonitorClientVersion>
-	<LearnerClientVersion>2.0.@datetimestamp@</LearnerClientVersion>
-	<ServerVersionNumber>2.0.@datetimestamp@</ServerVersionNumber>
+	<!--  client updates -->
+	<AuthoringClientVersion>1.0.@datetimestamp@</AuthoringClientVersion>
+	<MonitorClientVersion>1.0.@datetimestamp@</MonitorClientVersion>
+	<LearnerClientVersion>1.0.@datetimestamp@</LearnerClientVersion>
+	<ServerVersionNumber>1.1</ServerVersionNumber>
 	<ServerLanguage>en_AU</ServerLanguage>
 	<DictionaryDates>
 		<Dictionary>
