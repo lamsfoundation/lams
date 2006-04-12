@@ -118,7 +118,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     }
     
     
-    public ActionForward addNewQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
+    public ActionForward addNewOption(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
     throws IOException, ServletException 
     {
 		logger.debug("dispathcing addNewQuestion");
@@ -154,11 +154,14 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 	    authoringUtil.reconstructOptionContentMapForAdd(mapOptionsContent, request);
 	    
 	    logger.debug("richTextInstructions: " + request.getSession().getAttribute(ACTIVITY_INSTRUCTIONS));
+	    
+	    mapOptionsContent=(Map)request.getSession().getAttribute(MAP_OPTIONS_CONTENT);
+	    logger.debug("final mapOptionsContent: " + mapOptionsContent);
 	    return (mapping.findForward(LOAD_QUESTIONS));
     }
 
 
-    public ActionForward removeQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
+    public ActionForward removeOption(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
     throws IOException, ServletException 
     {
 		logger.debug("doing removeQuestion ");
@@ -166,9 +169,12 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 		
 		String richTextTitle = request.getParameter("title");
 	    String richTextInstructions = request.getParameter("instructions");
+	    String richTextPosting = request.getParameter("posting");
+	    
 	    logger.debug("richTextTitle: " + richTextTitle);
 	    logger.debug("richTextInstructions: " + richTextInstructions);
-	    String richTextPosting = request.getParameter("posting");
+	    logger.debug("richTextPosting: " + richTextPosting);
+	    
 	    
 	    if (richTextTitle != null)
 	    {
@@ -193,6 +199,9 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 	    
 	    //request.getSession().setAttribute(EDITACTIVITY_EDITMODE, new Boolean(true));  
 	    authoringUtil.reconstructOptionContentMapForRemove(mapOptionsContent, request, voteAuthoringForm);
+	    
+	    mapOptionsContent=(Map)request.getSession().getAttribute(MAP_OPTIONS_CONTENT);
+	    logger.debug("final mapOptionsContent: " + mapOptionsContent);
 	    
 	    return (mapping.findForward(LOAD_QUESTIONS));
     }

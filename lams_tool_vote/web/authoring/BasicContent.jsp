@@ -62,13 +62,13 @@ http://www.gnu.org/licenses/gpl.txt
 					  	<tr> 
 					 		<td valign="top"><font size=2> <b> <bean:message key="label.vote.posting"/>:  </b></font></td>
 							<td NOWRAP valign=top>
-								<lams:SetEditor id="posting" text="${defaultQuestionContent}" small="true"/>								
+								<lams:SetEditor id="posting" text="${posting}" small="true"/>								
 							</td> 
 						</tr>
 
 
 				
-			 		<!--default question content, this entry can not be deleted but can be updated -->
+			 		<!--default Option content, this entry can not be deleted but can be updated -->
 				 		<tr> 
 						  	<td valign="top"> 
 						 		<font size=2> <b> Nomination 1:  </b></font>
@@ -79,7 +79,7 @@ http://www.gnu.org/licenses/gpl.txt
 							</td> 
 					  	</tr>
 		
-				  	<!--end of default question content -->
+				  	<!--end of default Option content -->
 				  	
 			  		<!-- if there is more than just the default content start presenting them -->
 			  	 		<c:set var="optIndex" scope="session" value="1"/>
@@ -96,14 +96,14 @@ http://www.gnu.org/licenses/gpl.txt
 	                                	<c:if test="${ (sessionScope.activeModule != 'monitoring') }"> 			
 			 		 						<html:submit property="removeContent" 
 	                                                     styleClass="linkbutton"  
-	                                                     onclick="removeQuestion(${optIndex});">
+	                                                     onclick="removeOption(${optIndex});">
 												<bean:message key="button.delete"/>
 											</html:submit>
 										</c:if> 			
 	                                	<c:if test="${ (sessionScope.activeModule == 'monitoring') }"> 			
 			 		 						<html:submit property="removeContent" 
 	                                                     styleClass="linkbutton"  
-	                                                     onclick="removeMonitoringQuestion(${optIndex});">
+	                                                     onclick="removeMonitoringOption(${optIndex});">
 												<bean:message key="button.delete"/>
 											</html:submit>
 										</c:if> 													
@@ -120,7 +120,7 @@ http://www.gnu.org/licenses/gpl.txt
                             <td align="right">
                                 <html:submit property="addContent" 
                                              styleClass="linkbutton" 
-                                             onclick="submitMethod('addNewQuestion');">
+                                             onclick="submitMethod('addNewOption');">
                                     <bean:message key="button.addNewQuestion"/>
                                 </html:submit>
                             </td>
@@ -136,17 +136,16 @@ http://www.gnu.org/licenses/gpl.txt
 
 <SCRIPT language="JavaScript"> 
 
-	function removeQuestion(optIndex)
+	function removeOption(optIndex)
 	{
 		document.VoteAuthoringForm.optIndex.value=optIndex;
-		alert(optIndex);
-        submitMethod('removeQuestion');
+        submitMethod('removeOption');
 	}
 
-	function removeMonitoringQuestion(questionIndex)
+	function removeMonitoringOption(optIndex)
 	{
-		document.VoteMonitoringForm.questionIndex.value=questionIndex;
-        submitMonitoringMethod('removeQuestion');
+		document.VoteMonitoringForm.optIndex.value=optIndex;
+        submitMonitoringMethod('removeOption');
 	}
 	
  </SCRIPT>

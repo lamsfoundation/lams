@@ -591,7 +591,11 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 	    		 * make the first entry the default(first) one for jsp
 	    		 */
 	    		if (mapIndex.longValue() == 1)
-	    			request.getSession().setAttribute(DEFAULT_QUESTION_CONTENT, voteQueContent.getQuestion());
+	    		{
+	    		    request.getSession().setAttribute(DEFAULT_QUESTION_CONTENT, voteQueContent.getQuestion());
+	    		    request.getSession().setAttribute(POSTING, voteQueContent.getQuestion());
+	    		}
+	    		
 	    		mapIndex=new Long(mapIndex.longValue()+1);
 			}
 		}
