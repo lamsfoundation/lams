@@ -26,9 +26,7 @@ package org.lamsfoundation.lams.tool.deploy;
 
 
 import org.apache.commons.lang.StringUtils;
-import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
@@ -41,14 +39,7 @@ import org.w3c.dom.Text;
 public class RemoveContextWebXmlTask extends UpdateWebXmlTask
 {
     
-    /** Creates a new instance of InsertContextWebXmlTask */
-    public RemoveContextWebXmlTask(final String applicationContextPath, final String lamsEarPath, final String centralWebXmlPath,
-    		final String learningWebXmlPath, final String  monitoringWebXmlPath) {
-    	super(applicationContextPath, lamsEarPath, centralWebXmlPath, learningWebXmlPath, monitoringWebXmlPath );
-    }
-
- 
-	/**
+ 	/**
  	 * Remove the tool's applicationContext entry from the param-value node of the context-param entry.
 	 * Should find and remove all the matching entries (should it somehow have have got in there m  
 	 * @param doc

@@ -38,13 +38,7 @@ import org.w3c.dom.Text;
 public class InsertContextWebXmlTask extends UpdateWebXmlTask
 {
     
-    /** Creates a new instance of InsertContextWebXmlTask */
-    public InsertContextWebXmlTask(final String applicationContextPath, final String lamsEarPath, final String centralWebXmlPath,
-    		final String learningWebXmlPath, final String  monitoringWebXmlPath) {
-    	super(applicationContextPath, lamsEarPath, centralWebXmlPath, learningWebXmlPath, monitoringWebXmlPath );
-    }
-
-	/**
+ 	/**
 	 * Update the param-value node of the context-param entry. Don't add it if it already exists. 
 	 * @param doc
 	 * @param children
