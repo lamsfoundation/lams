@@ -24,7 +24,6 @@ package org.lamsfoundation.lams.tool.vote.pojos;
 
 import java.io.Serializable;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -51,6 +50,8 @@ public class VoteQueContent implements Serializable, Comparable {
 
     /** nullable persistent field */
     private String question;
+    
+    private int displayOrder;
 
     
     /** non persistent field */
@@ -80,6 +81,15 @@ public class VoteQueContent implements Serializable, Comparable {
         this.voteUsrAttempts = voteUsrAttempts;
         this.voteOptionsContents = voteOptionsContents;
     }
+
+    public VoteQueContent(String question,  int displayOrder, VoteContent voteContent, Set voteUsrAttempts, Set voteOptionsContents) {
+        this.question = question;
+        this.displayOrder=displayOrder;
+        this.voteContent=voteContent;
+        this.voteUsrAttempts = voteUsrAttempts;
+        this.voteOptionsContents = voteOptionsContents;
+    }
+
     
     public VoteQueContent(Long voteQueContentId, String question, Set voteUsrAttempts, Set voteOptionsContents) {
         this.voteQueContentId = voteQueContentId;
@@ -116,37 +126,20 @@ public class VoteQueContent implements Serializable, Comparable {
      * @param queContent the original qa question content
      * @return the new qa question content object
      */
-    public static VoteQueContent newInstance(VoteQueContent queContent,
+    public static VoteQueContent newInstance(VoteQueContent queContent, int displayOrder,
     										VoteContent newMcContent)
     										
     {
     	VoteQueContent newQueContent = new VoteQueContent(queContent.getQuestion(),
+    	        										displayOrder, 
 													  newMcContent,
                                                       new TreeSet(),
                                                       new TreeSet());
     	
-    	newQueContent.setVoteOptionsContents(queContent.deepCopyMcOptionsContent(newQueContent));
     	return newQueContent;
     }
     
     
-    public Set deepCopyMcOptionsContent(VoteQueContent newQueContent)
-    {
-    	Set newMcOptionsContent = new TreeSet();
-        for (Iterator i = this.getVoteOptionsContents().iterator(); i.hasNext();)
-        {
-            VoteOptsContent mcOptsContent = (VoteOptsContent) i.next();
-            VoteOptsContent mcNewOptsContent= VoteOptsContent.newInstance(mcOptsContent,newQueContent);
-            
-            if (mcNewOptsContent.getVoteQueContent() != null)
-            {
-            	newMcOptionsContent.add(mcNewOptsContent);
-            }
-        }
-        return newMcOptionsContent;
-    }
-    
-
     public Long getUid() {
         return this.uid;
     }
@@ -269,5 +262,17 @@ public class VoteQueContent implements Serializable, Comparable {
      */
     public void setVoteOptionsContents(Set voteOptionsContents) {
         this.voteOptionsContents = voteOptionsContents;
+    }
+    /**
+     * @return Returns the displayOrder.
+     */
+    public int getDisplayOrder() {
+        return displayOrder;
+    }
+    /**
+     * @param displayOrder The displayOrder to set.
+     */
+    public void setDisplayOrder(int displayOrder) {
+        this.displayOrder = displayOrder;
     }
 }

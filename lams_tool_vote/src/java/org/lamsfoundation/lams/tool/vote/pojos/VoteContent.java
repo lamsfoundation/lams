@@ -60,6 +60,8 @@ public class VoteContent implements Serializable {
 
     /** nullable persistent field */
     private String instructions;
+    
+    private String posting;
 
     /** nullable persistent field */
     private boolean defineLater;
@@ -119,7 +121,7 @@ public class VoteContent implements Serializable {
     private Set voteAttachments;
 
     /** full constructor */
-    public VoteContent(Long voteContentId, String content, String title, String instructions, boolean defineLater, boolean runOffline, 
+    public VoteContent(Long voteContentId, String content, String title, String instructions, String posting, boolean defineLater, boolean runOffline, 
             Date creationDate, Date updateDate, boolean questionsSequenced, boolean usernameVisible, String reportTitle, 
             String monitoringReportTitle, long createdBy, boolean lockOnFinish, boolean contentInUse, String offlineInstructions, 
             String onlineInstructions, String endLearningMessage, boolean showReport, boolean retries, Set voteQueContents, Set voteSessions, 
@@ -128,6 +130,7 @@ public class VoteContent implements Serializable {
         this.content=content;
         this.title = title;
         this.instructions = instructions;
+        this.posting = posting;        
         this.defineLater = defineLater;
         this.runOffline = runOffline;
         this.creationDate = creationDate;
@@ -171,37 +174,38 @@ public class VoteContent implements Serializable {
      * @param newContentId the new mc content id.
      * @return the new mc content object.
      */
-    public static VoteContent newInstance(IToolContentHandler toolContentHandler, VoteContent mc,
+    public static VoteContent newInstance(IToolContentHandler toolContentHandler, VoteContent vote,
             Long newContentId)
     throws ItemNotFoundException, RepositoryCheckedException
     {
         VoteContent newContent = new VoteContent(
     				 newContentId,
-					 mc.getContent(),
-                     mc.getTitle(),
-                     mc.getInstructions(),
-                     mc.isDefineLater(),
-					 mc.isRunOffline(),
-					 mc.getCreationDate(),
-			         mc.getUpdateDate(),
-					 mc.isQuestionsSequenced(),
-                     mc.isUsernameVisible(),
-                     mc.getReportTitle(),
-					 mc.getMonitoringReportTitle(),
-					 mc.getCreatedBy(),				 
-					 mc.isLockOnFinish(),
-					 mc.isContentInUse(),
-					 mc.getOfflineInstructions(),
-					 mc.getOnlineInstructions(),
-					 mc.getEndLearningMessage(),
-					 mc.isShowReport(),
-					 mc.isRetries(),
+    				 vote.getContent(),
+    				 vote.getTitle(),
+    				 vote.getInstructions(),
+    				 vote.getPosting(),
+    				 vote.isDefineLater(),
+    				 vote.isRunOffline(),
+    				 vote.getCreationDate(),
+    				 vote.getUpdateDate(),
+    				 vote.isQuestionsSequenced(),
+    				 vote.isUsernameVisible(),
+    				 vote.getReportTitle(),
+    				 vote.getMonitoringReportTitle(),
+    				 vote.getCreatedBy(),				 
+    				 vote.isLockOnFinish(),
+    				 vote.isContentInUse(),
+    				 vote.getOfflineInstructions(),
+    				 vote.getOnlineInstructions(),
+    				 vote.getEndLearningMessage(),
+    				 vote.isShowReport(),
+    				 vote.isRetries(),
          			 new TreeSet(),
                      new TreeSet(),
                      new TreeSet()
 					 );
-    	newContent.setVoteQueContents(mc.deepCopyMcQueContent(newContent));
-    	newContent.setVoteAttachments(mc.deepCopyMcAttachments(toolContentHandler, newContent));
+    	newContent.setVoteQueContents(vote.deepCopyMcQueContent(newContent));
+    	newContent.setVoteAttachments(vote.deepCopyMcAttachments(toolContentHandler, newContent));
     	
     	return newContent;
 	}
@@ -221,7 +225,8 @@ public class VoteContent implements Serializable {
             VoteQueContent queContent = (VoteQueContent) i.next();
             if (queContent.getMcContent() != null)
             {
-            	VoteQueContent mcQueContent=VoteQueContent.newInstance(queContent,
+                int displayOrder=queContent.getDisplayOrder();
+            	VoteQueContent mcQueContent=VoteQueContent.newInstance(queContent,displayOrder,
 															newMcContent);
             	newMcQueContent.add(mcQueContent);
             }
@@ -503,5 +508,17 @@ public class VoteContent implements Serializable {
      */
     public void setVoteContentId(Long voteContentId) {
         this.voteContentId = voteContentId;
+    }
+    /**
+     * @return Returns the posting.
+     */
+    public String getPosting() {
+        return posting;
+    }
+    /**
+     * @param posting The posting to set.
+     */
+    public void setPosting(String posting) {
+        this.posting = posting;
     }
 }
