@@ -48,7 +48,7 @@ import org.xml.sax.SAXException;
  * Base class of ant tasks that change a webxml
  * @author Fiona Malikoff
  */
-public class UpdateWebXmlTask implements Task
+public abstract class UpdateWebXmlTask implements Task
 {
     
     /**
@@ -120,13 +120,9 @@ public class UpdateWebXmlTask implements Task
     	}
     }
     
-    /**
-     * Add the web uri and context root elements ot the Application xml
-     */
     protected void updateWebXml(Document doc, String documentPath) throws DeployException
     {
         
-        //find & remove web uri element
         NodeList contextParamNodeList = doc.getElementsByTagName("context-param");
         Element matchingContextParamElement = findContextParamWithMatchingParamName("contextConfigLocation", contextParamNodeList);
         if ( matchingContextParamElement == null ) {
@@ -146,30 +142,7 @@ public class UpdateWebXmlTask implements Task
     }
 
 
-	/**
-	 * Update the param-value node of the context-param entry. 
-	 * @param doc
-	 * @param children
-	 * @param childNode
-	 */
-	private void updateValue(Document doc, Node contextParamElement) {
-		NodeList valueChildren = contextParamElement.getChildNodes();
-		String currentValue = "";
-		for ( int vc=0; vc<valueChildren.getLength() ; vc++ ){
-			Node valueChild = valueChildren.item(vc);
-			if ( valueChild instanceof Text ) {
-				currentValue += valueChild.getNodeValue();
-			}
-			contextParamElement.removeChild(valueChildren.item(vc));
-		}
-		int index = currentValue.indexOf(applicationContextPath);
-		System.out.println("Current value "+currentValue+"\n(index="+index+")");
-		if ( index < 0  ) {
-			System.out.println("Adding "+applicationContextPath+" to context");
-			currentValue += "  classpath:"+applicationContextPath+"\n";
-		}
-		contextParamElement.appendChild(doc.createTextNode(currentValue));
-	}
+    protected abstract void updateValue(Document doc, Node contextParamElement) throws DeployException;
 
     /**
      * Writes the modified web.xml back out to the file system.
@@ -278,7 +251,7 @@ public class UpdateWebXmlTask implements Task
     }
 
     /**
-     * The value of the tool application context file, including the path
+     * Returns the value of the tool application context file, including the path
      * e.g. /org/lamsfoundation/lams/tool/vote/voteApplicationContext.xml
      * It should not include the "classpath:" prefix as this will be added
      * automatically.
@@ -288,6 +261,14 @@ public class UpdateWebXmlTask implements Task
 	}
 
     /**
+     * Returns the value of the tool application context file with the "classpath:" prepended.
+     * e.g. "classpath:/org/lamsfoundation/lams/tool/vote/voteApplicationContext.xml"
+     */
+	public String getApplicationContextPathWithClasspath() {
+		return  "classpath:"+applicationContextPath;
+	}
+
+	/**
      * The value of the tool application context file, including the path
      * e.g. /org/lamsfoundation/lams/tool/vote/voteApplicationContext.xml
      * It should not include the "classpath:" prefix as this will be added

@@ -42,10 +42,40 @@ public class TestUpdateWebXmlTask extends ToolDBTest {
 	        super.tearDown();
 	    }
 
-    public void testExecute() throws Exception
+    public void testInsertExecute() throws Exception
     {
-    	UpdateWebXmlTask task = new UpdateWebXmlTask("/org/lamsfoundation/lams/tool/noticeboard/applicationContext.xml",null,"test/file/web.xml",null,null);
+    	InsertContextWebXmlTask task = new InsertContextWebXmlTask("/org/lamsfoundation/lams/tool/noticeboard/applicationContext.xml",null,"test/file/web.xml",null,null);
         task.execute();
     }
+
+    public void testInsertEntryAlreadyExistsExecute() throws Exception
+    {
+    	InsertContextWebXmlTask task = new InsertContextWebXmlTask("/org/lamsfoundation/lams/tool/noticeboard/applicationContext.xml",null,"test/file/web1EntryInsert.xml",null,null);
+        task.execute();
+    }
+
+    public void testRemoveExecuteNoEntry() throws Exception
+    {
+    	// tests removing it from the end of the list of contexts
+    	RemoveContextWebXmlTask task = new RemoveContextWebXmlTask("/org/lamsfoundation/lams/tool/noticeboard/applicationContext.xml",
+    			null,"test/file/webNoEntry.xml",null,null);
+        task.execute();
+    } 
+
+    public void testRemoveExecuteEnd() throws Exception
+    {
+    	// tests removing it from the end of the list of contexts
+    	RemoveContextWebXmlTask task = new RemoveContextWebXmlTask("/org/lamsfoundation/lams/tool/noticeboard/applicationContext.xml",
+    			null,"test/file/web1Entry.xml",null,null);
+        task.execute();
+    } 
+
+    public void testRemoveExecuteBeginMidEnd() throws Exception
+    {
+    	// tests removing it from the beginning and middle of the list of contexts
+    	RemoveContextWebXmlTask task = new RemoveContextWebXmlTask("/org/lamsfoundation/lams/tool/noticeboard/applicationContext.xml",
+    			null,"test/file/web3Entry.xml",null,null);
+        task.execute();
+    } 
 
 }
