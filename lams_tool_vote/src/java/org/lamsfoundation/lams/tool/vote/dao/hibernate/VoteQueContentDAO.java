@@ -46,7 +46,7 @@ public class VoteQueContentDAO extends HibernateDaoSupport implements IVoteQueCo
 	 	
 	 	private static final String LOAD_QUESTION_CONTENT_BY_QUESTION_TEXT = "from voteQueContent in class VoteQueContent where voteQueContent.question=:question and voteQueContent.voteContentId=:voteContentUid";
 	 	
-	 	
+	 		 	
 	 	public VoteQueContent getVoteQueContentByUID(Long uid)
 		{
 			 return (VoteQueContent) this.getHibernateTemplate()
@@ -68,6 +68,10 @@ public class VoteQueContentDAO extends HibernateDaoSupport implements IVoteQueCo
 			return null;
 	    }
 	 	
+	 	
+        public List getVoteQueContentsByContentId(long voteContentId){
+            return getHibernateTemplate().findByNamedParam(LOAD_QUESTION_CONTENT_BY_CONTENT_ID, "voteContentId", new Long(voteContentId));
+        }
 	 	
 	 	public List getAllQuestionEntries(final long voteContentId)
 	    {

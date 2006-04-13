@@ -176,6 +176,20 @@ public class VoteServicePOJO implements
         }
     }
 
+    public List retrieveVoteQueContentsByToolContentId(long qaContentId) throws VoteApplicationException
+	{
+        try
+        {
+            return voteQueContentDAO.getVoteQueContentsByContentId(qaContentId);
+        }
+        catch (DataAccessException e)
+        {
+            throw new VoteApplicationException("Exception occured when lams is loading vote que usr: "
+                                                         + e.getMessage(),
+                                                           e);
+        }
+    }
+
     public void createVoteQue(VoteQueContent voteQueContent) throws VoteApplicationException
     {
         try
@@ -444,8 +458,23 @@ public class VoteServicePOJO implements
 														   e);
         }
     }
-   
     
+    public void updateVoteQueContent(VoteQueContent voteQueContent) throws VoteApplicationException
+	{
+    	try
+        {
+        	voteQueContentDAO.updateVoteQueContent(voteQueContent);
+
+        }
+        catch (DataAccessException e)
+        {
+            throw new VoteApplicationException("Exception occured when lams is updating vote content by question: "
+                                                         + e.getMessage(),
+														   e);
+        }
+    	
+	}
+
     public void cleanAllQuestionsSimple(final Long voteContentId) throws VoteApplicationException
 	{
     	try

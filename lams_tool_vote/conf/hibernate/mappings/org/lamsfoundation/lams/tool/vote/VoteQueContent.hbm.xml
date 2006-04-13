@@ -31,6 +31,13 @@
     >
     </property>
     
+    <property
+        name="displayOrder"
+        type="java.lang.Integer"
+        column="display_order"
+        length="5"
+    >
+    </property>
     
     <property
         name="voteContentId"
@@ -55,21 +62,6 @@
     >
         <column name="vote_content_id" />
     </many-to-one>
-    
-    
-    <set
-        name="voteOptionsContents"
-        lazy="true"
-        inverse="true"
-		cascade="all-delete-orphan"
-    >
-        <key>
-            <column name="vote_que_content_id" />
-        </key>
-        <one-to-many 
-            class="org.lamsfoundation.lams.tool.vote.pojos.VoteOptsContent"
-        />
-    </set>
     
     
     <set

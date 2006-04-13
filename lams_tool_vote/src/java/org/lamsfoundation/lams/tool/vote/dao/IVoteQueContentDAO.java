@@ -43,6 +43,8 @@ public interface IVoteQueContentDAO
  	
  	public VoteQueContent getQuestionContentByQuestionText(final String question, final Long voteContentUid);
  	
+ 	public List getVoteQueContentsByContentId(long qaContentId);
+ 	
  	public void removeQuestionContentByVoteUid(final Long voteContentUid);
  	
  	public void resetAllQuestions(final Long voteContentUid);

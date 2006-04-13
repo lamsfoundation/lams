@@ -512,30 +512,6 @@ public abstract class VoteUtils implements VoteAppConstants {
 	}
 
 	
-	/**
-     * sets/resets the define later flag of the content
-     * setDefineLater(HttpServletRequest request, boolean value)
-     * 
-     * @param request
-     * @param value
-     */
-    public static void setDefineLater(HttpServletRequest request, boolean value)
-    {
-    	IVoteService mcService =VoteUtils.getToolService(request);
-    	Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
-    	logger.debug("toolContentId:" + toolContentId);
-    	logger.debug("value:" + value);
-    	
-    	VoteContent mcContent=mcService.retrieveVote(toolContentId);
-    	logger.debug("mcContent:" + mcContent);
-    	if (mcContent != null)
-    	{
-    	    mcContent.setDefineLater(value);
-        	logger.debug("defineLater has been set to true");
-        	mcService.saveVoteContent(mcContent);	
-    	}
-    }
-	
     
 	public static String getDestination(String sourceVoteStarter)
 	{
@@ -557,7 +533,24 @@ public abstract class VoteUtils implements VoteAppConstants {
 			return LOAD_MONITORING_CONTENT_EDITACTIVITY;	
 		}
 	}
-	
+
+	public static void setDefineLater(HttpServletRequest request, boolean value)
+    {
+    	IVoteService voteService = (IVoteService)request.getSession().getAttribute(TOOL_SERVICE);
+    	logger.debug("voteService:" + voteService);
+    	
+    	Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
+    	logger.debug("toolContentId:" + toolContentId);
+    	
+    	VoteContent voteContent=voteService.retrieveVote(toolContentId);
+    	logger.debug("voteContent:" + voteContent);
+    	if (voteContent != null)
+    	{
+    		voteContent.setDefineLater(value);
+        	logger.debug("defineLater has been set to true");
+        	voteService.updateVote(voteContent);	
+    	}
+    }
 
 	
 	/**

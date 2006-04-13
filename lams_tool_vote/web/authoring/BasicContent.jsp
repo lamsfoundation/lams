@@ -36,7 +36,7 @@ http://www.gnu.org/licenses/gpl.txt
 						<tr>   
 						<td NOWRAP class=error>
 							<c:if test="${sessionScope.sbmtSuccess == 1}"> 			
-								<img src="images/success.gif" align="left" width=20 height=20>  <font size=2> <bean:message key="sbmt.successful"/> </font> </img>
+								<img src="<c:out value="${tool}"/>images/success.gif" align="left" width=20 height=20>  <font size=2> <bean:message key="sbmt.successful"/> </font> </img>
 							</c:if> 			
 						</td>
 						</tr> 

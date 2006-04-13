@@ -42,6 +42,7 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.springframework.dao.DataAccessException;
 
 
 /**
@@ -71,7 +72,11 @@ public interface IVoteService
     
     public void updateVoteUsrAttempt(VoteUsrAttempt mcUsrAttempt) throws VoteApplicationException;
     
-    public List getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long mcQueContentId) throws VoteApplicationException; 
+    public void updateVoteQueContent(VoteQueContent voteQueContent) throws VoteApplicationException;
+    
+    public List getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long mcQueContentId) throws VoteApplicationException;
+    
+    public List retrieveVoteQueContentsByToolContentId(long qaContentId) throws VoteApplicationException;
     
     public VoteQueContent retrieveVoteQueContentByUID(Long uid) throws VoteApplicationException;
 	

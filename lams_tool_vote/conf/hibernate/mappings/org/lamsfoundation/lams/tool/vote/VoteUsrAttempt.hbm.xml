@@ -94,19 +94,6 @@
     >
         <column name="que_usr_id" />
     </many-to-one>
-    
-    <many-to-one
-        name="voteOptionsContent"
-        class="org.lamsfoundation.lams.tool.vote.pojos.VoteOptsContent"
-        not-null="true"                
-	    cascade="none"
-	    outer-join="auto"
-	    update="true"
-	    insert="true"
-	    access="property"
-    >
-        <column name="vote_que_option_id" />
-    </many-to-one>
 
 </class>
 </hibernate-mapping>

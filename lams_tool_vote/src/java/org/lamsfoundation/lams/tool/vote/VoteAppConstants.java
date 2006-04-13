@@ -160,12 +160,15 @@ public interface VoteAppConstants {
     public static final String RICHTEXT_TITLE							="richTextTitle";
     public static final String RICHTEXT_INSTRUCTIONS					="richTextInstructions";
     public static final String RICHTEXT_BLANK							="<p>&nbsp;</p>";
+    public static final String RENDER_MONITORING_EDITACTIVITY			="renderMonitoringEditActivity";
     public static final String SUBMIT_OFFLINE_FILE						="submitOfflineFile";
     public static final String SUBMIT_ONLINE_FILE						="submitOnlineFile";
     public static final String LIST_UPLOADED_OFFLINE_FILENAMES			="listUploadedOfflineFileNames";
     public static final String LIST_UPLOADED_ONLINE_FILENAMES			="listUploadedOnlineFileNames";
     public static final String LIST_OFFLINEFILES_METADATA				="listOfflineFilesMetadata";
     public static final String LIST_ONLINEFILES_METADATA				="listOnlineFilesMetadata";
+    public static final String ATTACHMENT_LIST                          ="attachmentList";
+    public static final String DELETED_ATTACHMENT_LIST                  ="deletedAttachmentList";
     
     public static final String COUNT_SESSION_COMPLETE					="countSessionComplete";
     public static final String COUNT_ALL_USERS							="countAllUsers";
@@ -310,4 +313,5 @@ public interface VoteAppConstants {
     public static final String USER_EXCEPTION_FILENAME_EMPTY			="userExceptionFilenameEmpty";
     public static final String USER_EXCEPTION_WEIGHT_MUST_EQUAL100		="userExceptionWeightMustEqual100";
     public static final String USER_EXCEPTION_SINGLE_OPTION				="userExceptionSingleOption";
+    public static final String USER_EXCEPTION_OPTIONS_DUPLICATE			="userExceptionOptionsDuplicate";
 }

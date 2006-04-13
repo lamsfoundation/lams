@@ -25,7 +25,6 @@ DROP TABLE tl_vote11_uploadedfile;
 DROP TABLE tl_vote11_usr_attempt;
 DROP TABLE tl_vote11_que_usr;
 DROP TABLE tl_vote11_session;
-DROP TABLE tl_vote11_options_content;
 DROP TABLE tl_vote11_que_content;
 DROP TABLE tl_vote11_content;
 SET FOREIGN_KEY_CHECKS=1;

@@ -49,6 +49,7 @@ import org.lamsfoundation.lams.tool.vote.VoteAttachmentDTO;
 import org.lamsfoundation.lams.tool.vote.VoteComparator;
 import org.lamsfoundation.lams.tool.vote.VoteUtils;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
+import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteUploadedFile;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -1065,7 +1066,314 @@ public class AuthoringUtil implements VoteAppConstants {
 		}
     }
 
+    protected  void reconstructOptionsContentMapForSubmit(Map mapOptionsContent, HttpServletRequest request)
+    {
+    	logger.debug("pre-submit Map:" + mapOptionsContent);
+    	logger.debug("pre-submit Map size :" + mapOptionsContent.size());
+    	
+    	repopulateMap(mapOptionsContent, request);
+    	Map mapFinalOptionsContent = new TreeMap(new VoteComparator());
+    	
+    	Iterator itMap = mapOptionsContent.entrySet().iterator();
+	    while (itMap.hasNext()) {
+	        Map.Entry pairs = (Map.Entry)itMap.next();
+	        if ((pairs.getValue() != null) && (!pairs.getValue().equals("")))
+    		{
+	        	mapFinalOptionsContent.put(pairs.getKey(), pairs.getValue());
+	        	logger.debug("adding the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
+    		}
+	    }
+	    
+	    mapOptionsContent=(TreeMap)mapFinalOptionsContent;
+	    request.getSession().setAttribute("mapOptionsContent", mapOptionsContent);
+	    logger.debug("final mapOptionsContent:" + mapOptionsContent);
+    }
+
     
+    public void removeRedundantOptions (Map mapOptionsContent, IVoteService voteService, VoteAuthoringForm voteAuthoringForm, HttpServletRequest request)
+	{
+    	logger.debug("removing unused entries... ");
+    	logger.debug("mapOptionsContent:  " + mapOptionsContent);
+    	
+    	String toolContentId=voteAuthoringForm.getToolContentId();
+    	logger.debug("toolContentId:  " + toolContentId);
+     	if ((toolContentId == null) || toolContentId.equals(""))
+     	{
+     		logger.debug("getting toolContentId from session.");
+     		Long longToolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+     		toolContentId=longToolContentId.toString();
+     		logger.debug("toolContentId: " + toolContentId);
+     	}
+     	logger.debug("final toolContentId: " + toolContentId);
+    	
+    	
+    	VoteContent voteContent=voteService.retrieveVote(new Long(toolContentId));
+    	logger.debug("voteContent:  " + voteContent);
+    	
+    	if (voteContent != null)
+    	{
+        	logger.debug("voteContent uid: " + voteContent.getUid());
+        	List allQuestions=voteService.getAllQuestionEntries(voteContent.getUid());
+        	logger.debug("allQuestions: " + allQuestions);
+        	
+        	Iterator listIterator=allQuestions.iterator();
+    		Long mapIndex=new Long(1);
+    		boolean entryUsed=false;
+    		while (listIterator.hasNext())
+    		{
+    			VoteQueContent queContent=(VoteQueContent)listIterator.next();
+    			logger.debug("queContent data: " + queContent);
+    			
+    			entryUsed=false;
+    	        Iterator itMap = mapOptionsContent.entrySet().iterator();
+    	        while (itMap.hasNext()) 
+    		    {
+    	        	entryUsed=false;
+    		        Map.Entry pairs = (Map.Entry)itMap.next();
+    		        logger.debug("using the pair: " +  pairs.getKey() + " = " + pairs.getValue());
+    		        if (pairs.getValue().toString().length() != 0)
+    		        {
+    		        	logger.debug("text from map:" + pairs.getValue().toString());
+    		        	logger.debug("text from db:" + queContent.getQuestion());
+    		        	if (pairs.getValue().toString().equals(queContent.getQuestion()))
+    		        	{
+    		        		logger.debug("used entry in db:" + queContent.getQuestion());
+    		        		entryUsed=true;
+    		        		break;
+    		        	}
+    		        }
+    		    }
+    	        
+    	        if (entryUsed == false)
+    	        {
+    	        	logger.debug("removing unused entry in db:" + queContent.getQuestion());
+    	        	
+    	        	VoteQueContent removeableVoteQueContent=voteService.getQuestionContentByQuestionText(queContent.getQuestion(), voteContent.getUid());
+        			logger.debug("removeableVoteQueContent"  + removeableVoteQueContent);
+        			if (removeableVoteQueContent != null)
+        			{
+        				voteService.removeVoteQueContent(removeableVoteQueContent);
+            			logger.debug("removed removeableVoteQueContent from the db: " + removeableVoteQueContent);	
+        			}
+    	        	
+    	        }
+    		}    		
+    	}
+	
+	}
+
+    
+    public VoteContent saveOrUpdateVoteContent(Map mapOptionsContent, IVoteService voteService, VoteAuthoringForm voteAuthoringForm, HttpServletRequest request)
+    {
+        UserDTO toolUser = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
+        
+        boolean isQuestionsSequenced=false;
+        boolean isUsernameVisible=false;
+        String reportTitle = voteAuthoringForm.getReportTitle();
+        //String richTextTitle = voteAuthoringForm.getTitle();
+
+        String richTextTitle = request.getParameter("title");
+        String richTextInstructions = request.getParameter("instructions");
+        logger.debug("richTextTitle: " + richTextTitle);
+        logger.debug("richTextInstructions: " + richTextInstructions);
+        
+        String richTextPosting = request.getParameter("posting");
+        logger.debug("richTextPosting: " + richTextPosting);
+        
+        String monitoringReportTitle = voteAuthoringForm.getMonitoringReportTitle();
+        logger.debug("monitoringReportTitle: " + monitoringReportTitle);
+        
+        String richTextOnlineInstructions = voteAuthoringForm.getOnlineInstructions();
+        logger.debug("richTextOnlineInstructions: " + richTextOnlineInstructions);
+        
+        //String richTextInstructions = voteAuthoringForm.getInstructions(); 
+        String richTextOfflineInstructions = voteAuthoringForm.getOfflineInstructions();
+        logger.debug("richTextOfflineInstructions: " + richTextOfflineInstructions);
+        
+        String endLearningMessage = voteAuthoringForm.getEndLearningMessage();
+        logger.debug("endLearningMessage: " + endLearningMessage);
+        
+        String questionsSequenced = voteAuthoringForm.getQuestionsSequenced();
+        logger.debug("questionsSequenced: " + questionsSequenced);
+        
+        String usernameVisible = voteAuthoringForm.getUsernameVisible();
+        logger.debug("usernameVisible: " + usernameVisible);
+        
+        boolean setCommonContent=true; 
+        if ((questionsSequenced == null) || (usernameVisible == null))
+        {
+        	setCommonContent=false;
+        }
+        logger.debug("setCommonContent: " + setCommonContent);
+		
+        String activeModule=(String)request.getSession().getAttribute(ACTIVE_MODULE);
+        logger.debug("activeModule: " + activeModule);
+
+        boolean questionsSequencedBoolean=false;
+        boolean synchInMonitorBoolean=false;
+        boolean usernameVisibleBoolean=false;
+        if (setCommonContent)
+        {
+            if (questionsSequenced.equalsIgnoreCase(ON))
+            	questionsSequencedBoolean=true;
+            
+            if (usernameVisible.equalsIgnoreCase(ON))
+            	usernameVisibleBoolean=true;
+        }
+        
+        
+        long userId=0;
+        if (toolUser != null)
+        {
+        	userId = toolUser.getUserID().longValue();	
+        }
+        else
+        {
+    		HttpSession ss = SessionManager.getSession();
+    		logger.debug("ss: " + ss);
+    		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+    		logger.debug("user" + user);
+    		if (user != null)
+    		{
+    			userId = user.getUserID().longValue();	
+    		}
+    		else
+    		{
+    			logger.debug("should not reach here");
+    			userId=0;
+    		}
+        }
+        logger.debug("userId: " + userId);
+        
+        
+        Long toolContentIdLong =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+        logger.debug("toolContentIdLong: " + toolContentIdLong);
+        
+        //String toolContentId=voteAuthoringForm.getToolContentId();
+        String toolContentId=toolContentIdLong.toString();
+    	logger.debug("toolContentId:  " + toolContentId);
+     	
+     	VoteContent voteContent=voteService.retrieveVote(new Long(toolContentId));
+     	logger.debug("voteContent: " + voteContent);
+     	
+     	boolean newContent=false;
+        if(voteContent == null)
+        {
+        	voteContent = new VoteContent();
+        	newContent=true;
+        }
+
+
+    	logger.debug("setting common content values..." + richTextTitle + " " + richTextInstructions);
+    	voteContent.setVoteContentId(new Long(toolContentId));
+     	voteContent.setTitle(richTextTitle);
+     	voteContent.setInstructions(richTextInstructions);
+     	voteContent.setPosting(richTextPosting);
+     	voteContent.setUpdateDate(new Date(System.currentTimeMillis())); /**keep updating this one*/
+     	logger.debug("userId: " + userId);
+     	voteContent.setCreatedBy(userId); /**make sure we are setting the userId from the User object above*/
+     	logger.debug("end of setting common content values...");
+
+     	
+        if ((!activeModule.equals(DEFINE_LATER)) && (setCommonContent))
+		{
+        	logger.debug("setting other content values...");
+         	voteContent.setUsernameVisible(isUsernameVisible);
+         	voteContent.setQuestionsSequenced(isQuestionsSequenced); /**the default question listing in learner mode will be all in the same page*/
+         	voteContent.setOnlineInstructions(richTextOnlineInstructions);
+         	voteContent.setOfflineInstructions(richTextOfflineInstructions);
+         	voteContent.setEndLearningMessage(endLearningMessage);
+         	voteContent.setReportTitle(reportTitle);
+         	voteContent.setMonitoringReportTitle(monitoringReportTitle);
+         	voteContent.setUsernameVisible(usernameVisibleBoolean);
+         	voteContent.setQuestionsSequenced(questionsSequencedBoolean);
+         		
+		}
+        
+	
+ 
+        if (newContent)
+        {
+        	logger.debug("will create: " + voteContent);
+         	voteService.createVote(voteContent);
+        }
+        else
+        {
+        	logger.debug("will update: " + voteContent);
+            voteService.updateVote(voteContent);
+        }
+        
+        voteContent=voteService.retrieveVote(new Long(toolContentId));
+     	logger.debug("voteContent: " + voteContent);
+        
+        voteContent=createOptiosContent(mapOptionsContent, voteService, voteContent);
+        
+        return voteContent;
+    }
+    
+    protected VoteContent createOptiosContent(Map mapOptionsContent, IVoteService voteService, VoteContent voteContent)
+    {    
+        logger.debug("content uid is: " + voteContent.getUid());
+        List questions=voteService.retrieveVoteQueContentsByToolContentId(voteContent.getUid().longValue());
+        logger.debug("questions: " + questions);
+
+        
+        Iterator itMap = mapOptionsContent.entrySet().iterator();
+        int diplayOrder=0;
+        while (itMap.hasNext()) 
+	    {
+	        Map.Entry pairs = (Map.Entry)itMap.next();
+	        logger.debug("using the pair: " +  pairs.getKey() + " = " + pairs.getValue());
+	        
+	        if (pairs.getValue().toString().length() != 0)
+	        {
+	        	logger.debug("starting createQuestionContent: pairs.getValue().toString():" + pairs.getValue().toString());
+	        	logger.debug("starting createQuestionContent: voteContent: " + voteContent);
+	        	logger.debug("starting createQuestionContent: diplayOrder: " + diplayOrder);
+	        	diplayOrder=new Integer(pairs.getKey().toString()).intValue();
+	        	logger.debug("int diplayOrder: " + diplayOrder);
+	        	
+	        	
+	        	VoteQueContent queContent=  new VoteQueContent(pairs.getValue().toString(),
+	        	        									diplayOrder,
+		        											voteContent,
+															null,
+															null);
+		        
+		        
+			       /* checks if the question is already recorded*/
+			       logger.debug("question text is: " + pairs.getValue().toString());
+			       logger.debug("content uid is: " + voteContent.getUid());
+			       logger.debug("question display order is: " + diplayOrder);
+			       
+			       VoteQueContent existingVoteQueContent=voteService.getQuestionContentByQuestionText(pairs.getValue().toString(), voteContent.getUid());
+			       logger.debug("existingVoteQueContent: " + existingVoteQueContent);
+			       if (existingVoteQueContent == null)
+			       {
+			       	/*make sure a question with the same question text is not already saved*/
+			    	VoteQueContent duplicateVoteQueContent=voteService.getQuestionContentByQuestionText(pairs.getValue().toString(), voteContent.getUid());
+			    	logger.debug("duplicateVoteQueContent: " + duplicateVoteQueContent);
+			       	if (duplicateVoteQueContent == null)
+			       	{
+			       		logger.debug("adding a new question to content: " + queContent);
+			       		voteContent.getVoteQueContents().add(queContent);
+			       		queContent.setVoteContent(voteContent);
+	
+			       		voteService.createVoteQue(queContent);
+			       	}
+			       }
+			       else
+			       {
+			       		existingVoteQueContent.setQuestion(pairs.getValue().toString());
+			       		existingVoteQueContent.setDisplayOrder(diplayOrder);
+			       		logger.debug("updating the existing question content: " + existingVoteQueContent);
+			       		voteService.updateVoteQueContent(existingVoteQueContent);
+			       }
+	        }      
+	    }
+        return voteContent;
+    }
+
     /**
      * cleans up authoring http session 
      * cleanupAuthoringSession(HttpServletRequest request)

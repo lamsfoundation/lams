@@ -41,7 +41,16 @@
         column="instructions"
         length="65535"
     />
+    
 
+    <property
+        name="posting"
+        type="java.lang.String"
+        access="property"        
+        column="posting"
+        length="65535"
+    />
+    
     <property
         name="creationDate"
         type="java.util.Date"
@@ -179,7 +188,8 @@
     
    	 <set
             name="voteQueContents"
-            lazy="true"
+            order-by="display_order"
+            lazy="true"            
             inverse="true"
             cascade="all-delete-orphan"
             sort="unsorted"

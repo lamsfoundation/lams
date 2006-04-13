@@ -75,7 +75,6 @@ package org.lamsfoundation.lams.tool.vote.web;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -97,7 +96,6 @@ import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
 import org.lamsfoundation.lams.tool.vote.VoteComparator;
 import org.lamsfoundation.lams.tool.vote.VoteUtils;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
-import org.lamsfoundation.lams.tool.vote.pojos.VoteOptsContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 import org.lamsfoundation.lams.tool.vote.service.VoteServiceProxy;
@@ -322,8 +320,8 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 			 * there is no need to check if the content is in use in this case.
 			 * It is always unlocked -> not in use since it is the default content.
 			*/
-	    	Map mapQuestionContent= new TreeMap(new VoteComparator());
-			logger.debug("mapQuestionContent: " + mapQuestionContent);
+	    	Map mapOptionsContent= new TreeMap(new VoteComparator());
+			logger.debug("mapOptionsContent: " + mapOptionsContent);
 		
 			if (!existsContent(toolContentId, request))
 			{
@@ -332,7 +330,7 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 				String defaultContentIdStr=(String) request.getSession().getAttribute(DEFAULT_CONTENT_ID_STR);
 				logger.debug("defaultContentIdStr:" + defaultContentIdStr);
 				logger.debug("will get content for defaultContentIdStr:" + defaultContentIdStr);
-	            retrieveContent(request, mapping, voteAuthoringForm, mapQuestionContent, new Long(defaultContentIdStr).longValue());
+	            retrieveContent(request, mapping, voteAuthoringForm, mapOptionsContent, new Long(defaultContentIdStr).longValue());
 			}
 			else
 			{
@@ -350,7 +348,7 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 					return (mapping.findForward(ERROR_LIST));
 	    		}
 	        	logger.debug("will get content for strToolContentId:" + strToolContentId);
-	            retrieveContent(request, mapping, voteAuthoringForm, mapQuestionContent, new Long(strToolContentId).longValue());
+	            retrieveContent(request, mapping, voteAuthoringForm, mapOptionsContent, new Long(strToolContentId).longValue());
 			}
 		}
 		    
@@ -398,126 +396,85 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 	 */
 	public ActionForward readSignature(HttpServletRequest request, ActionMapping mapping)
 	{
-		IVoteService voteService =VoteUtils.getToolService(request);
-		/* retrieve the default content id based on tool signature */
-		long contentId=0;
+		IVoteService voteService = (IVoteService)request.getSession().getAttribute(TOOL_SERVICE);
+		logger.debug("voteService: " + voteService);
+		if (voteService == null)
+		{
+			logger.debug("will retrieve voteService");
+			voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
+			logger.debug("retrieving voteService from session: " + voteService);
+		}
+	    request.getSession().setAttribute(TOOL_SERVICE, voteService);
+		/*
+		 * retrieve the default content id based on tool signature
+		 */
+		long defaultContentID=0;
 		try
 		{
-			logger.debug("attempt retrieving tool with signature : " + MY_SIGNATURE);
-			contentId=voteService.getToolDefaultContentIdBySignature(MY_SIGNATURE);
-			logger.debug("retrieved tool default contentId: " + contentId);
-			if (contentId == 0) 
+			logger.debug("attempt retrieving tool with signatute : " + MY_SIGNATURE);
+            defaultContentID=voteService.getToolDefaultContentIdBySignature(MY_SIGNATURE);
+			logger.debug("retrieved tool default contentId: " + defaultContentID);
+			if (defaultContentID == 0)
 			{
 				VoteUtils.cleanUpSessionAbsolute(request);
-				logger.debug("Exception occured: No default options content");
-	    		request.getSession().setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true).toString());
-	    		persistError(request,"error.defaultContent.notSetup");
-				return (mapping.findForward(ERROR_LIST));
+				logger.debug("default content id has not been setup");
+				persistError(request,"error.defaultContent.notSetup");
+		    	request.getSession().setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true).toString());
+				return (mapping.findForward(ERROR_LIST));	
 			}
 		}
 		catch(Exception e)
 		{
 			VoteUtils.cleanUpSessionAbsolute(request);
-			logger.debug("Exception occured: No default options content");
-    		request.getSession().setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true).toString());
-    		persistError(request,"error.defaultContent.notSetup");
+			logger.debug("error getting the default content id: " + e.getMessage());
+			persistError(request,"error.defaultContent.notSetup");
+	    	request.getSession().setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true).toString());
+			logger.debug("forwarding to: " + ERROR_LIST);
 			return (mapping.findForward(ERROR_LIST));
 		}
 
+		
 		/* retrieve uid of the content based on default content id determined above */
 		long contentUID=0;
 		try
 		{
-			logger.debug("retrieve uid of the content based on default content id determined above: " + contentId);
-			VoteContent voteContent=voteService.retrieveVote(new Long(contentId));
+			logger.debug("retrieve uid of the content based on default content id determined above: " + defaultContentID);
+			VoteContent voteContent=voteService.retrieveVote(new Long(defaultContentID));
 			if (voteContent == null)
 			{
 				VoteUtils.cleanUpSessionAbsolute(request);
-				logger.debug("Exception occured: No default options content");
-	    		request.getSession().setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true).toString());
+				logger.debug("Exception occured: No default content");
 	    		persistError(request,"error.defaultContent.notSetup");
-				return (mapping.findForward(ERROR_LIST));
+	    		request.getSession().setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true).toString());
+	    		return (mapping.findForward(ERROR_LIST));
 			}
 			logger.debug("using voteContent: " + voteContent);
-			logger.debug("using voteContent uid: " + voteContent.getUid());
+			logger.debug("using mcContent uid: " + voteContent.getUid());
 			contentUID=voteContent.getUid().longValue();
+			logger.debug("contentUID: " + contentUID);
 		}
 		catch(Exception e)
 		{
 			VoteUtils.cleanUpSessionAbsolute(request);
-			logger.debug("Exception occured: No default options content");
+			logger.debug("Exception occured: No default question content");
+			persistError(request,"error.defaultContent.notSetup");
     		request.getSession().setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true).toString());
-    		persistError(request,"error.defaultContent.notSetup");
+			logger.debug("forwarding to: " + ERROR_LIST);
 			return (mapping.findForward(ERROR_LIST));
 		}
-				
-		
-		/* retrieve uid of the default question content  */
-		long queContentUID=0;
-		try
-		{
-			logger.debug("retrieve the default question content based on default content UID: " + queContentUID);
-			VoteQueContent voteQueContent=voteService.getToolDefaultQuestionContent(contentUID);
-			logger.debug("using voteQueContent: " + voteQueContent);
-			if (voteQueContent == null)
-			{
-				VoteUtils.cleanUpSessionAbsolute(request);
-				logger.debug("Exception occured: No default options content");
-	    		request.getSession().setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true).toString());
-	    		persistError(request,"error.defaultContent.notSetup");
-				return (mapping.findForward(ERROR_LIST));
-			}
-			logger.debug("using voteQueContent uid: " + voteQueContent.getUid());
-			queContentUID=voteQueContent.getUid().longValue();
-			request.getSession().setAttribute(DEFAULT_QUESTION_UID, new Long(queContentUID));
-			logger.debug("DEFAULT_QUESTION_UID: " + queContentUID);
-		}
-		catch(Exception e)
-		{
-			VoteUtils.cleanUpSessionAbsolute(request);
-			logger.debug("Exception occured: No default options content");
-    		request.getSession().setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true).toString());
-    		persistError(request,"error.defaultContent.notSetup");
-			return (mapping.findForward(ERROR_LIST));
-		}
-		
-		
-		/* retrieve default options content */
-		try
-		{
-			logger.debug("retrieve the default options content based on default question content UID: " + queContentUID);
-			List list=voteService.findVoteOptionsContentByQueId(new Long(queContentUID));
-			logger.debug("using options list: " + list);
-			if (list == null)
-			{
-				VoteUtils.cleanUpSessionAbsolute(request);
-				logger.debug("Exception occured: No default options content");
-	    		request.getSession().setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true).toString());
-	    		persistError(request,"error.defaultContent.notSetup");
-				return (mapping.findForward(ERROR_LIST));
-			}
-			
-		}
-		catch(Exception e)
-		{
-			VoteUtils.cleanUpSessionAbsolute(request);
-			logger.debug("Exception occured: No default options content");
-    		request.getSession().setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true).toString());
-    		persistError(request,"error.defaultContent.notSetup");
-			return (mapping.findForward(ERROR_LIST));
-		}		
-		
-		logger.debug("Voting tool has the default content id: " + contentId);
-		request.getSession().setAttribute(DEFAULT_CONTENT_ID, new Long(contentId).toString());
-		request.getSession().setAttribute(DEFAULT_CONTENT_ID_STR, new Long(contentId).toString());
+
+		logger.debug("Voting tool has the default content id: " + defaultContentID);
+		request.getSession().setAttribute(DEFAULT_CONTENT_ID_STR, new Long(defaultContentID).toString());
+		request.getSession().setAttribute(DEFAULT_CONTENT_ID, new Long(defaultContentID).toString());
 		return null;
+
 	}
 
 	
 	
-	protected void retrieveContent(HttpServletRequest request, ActionMapping mapping, VoteAuthoringForm voteAuthoringForm, Map mapQuestionContent, long toolContentId)
+	protected void retrieveContent(HttpServletRequest request, ActionMapping mapping, VoteAuthoringForm voteAuthoringForm, Map mapOptionsContent, long toolContentId)
 	{
-		logger.debug("starting retrieveExistingContent for toolContentId: " + toolContentId);
+		logger.debug("starting retrieve content for toolContentId: " + toolContentId);
 
 		IVoteService voteService = (IVoteService)request.getSession().getAttribute(TOOL_SERVICE);
 		logger.debug("voteService: " + voteService);
@@ -545,11 +502,13 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 		{
 			request.getSession().setAttribute(ACTIVITY_TITLE, "Questions and Answers");
 			request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, "Please answer the questions.");
+			request.getSession().setAttribute(POSTING, "sample posting");
 		}
 		else
 		{
 			request.getSession().setAttribute(ACTIVITY_TITLE, voteContent.getTitle());
-			request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, voteContent.getInstructions());			
+			request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, voteContent.getInstructions());
+			request.getSession().setAttribute(POSTING, voteContent.getPosting());
 		}
 
 		
@@ -573,74 +532,40 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 
 		
 	    /*
-		 * get the posting content 
+		 * get the nominations 
 		 */
 		logger.debug("setting existing content data from the db");
-		mapQuestionContent.clear();
+		mapOptionsContent.clear();
 		Iterator queIterator=voteContent.getVoteQueContents().iterator();
 		Long mapIndex=new Long(1);
-		logger.debug("mapQuestionContent: " + mapQuestionContent);
+		logger.debug("mapOptionsContent: " + mapOptionsContent);
 		while (queIterator.hasNext())
 		{
 			VoteQueContent voteQueContent=(VoteQueContent) queIterator.next();
 			if (voteQueContent != null)
 			{
 				logger.debug("question: " + voteQueContent.getQuestion());
-	    		mapQuestionContent.put(mapIndex.toString(),voteQueContent.getQuestion());
+				mapOptionsContent.put(mapIndex.toString(),voteQueContent.getQuestion());
 	    		/**
 	    		 * make the first entry the default(first) one for jsp
 	    		 */
 	    		if (mapIndex.longValue() == 1)
 	    		{
 	    		    request.getSession().setAttribute(DEFAULT_QUESTION_CONTENT, voteQueContent.getQuestion());
-	    		    request.getSession().setAttribute(POSTING, voteQueContent.getQuestion());
 	    		}
 	    		
 	    		mapIndex=new Long(mapIndex.longValue()+1);
 			}
 		}
-		logger.debug("Map initialized with existing contentid to: " + mapQuestionContent);
-		request.getSession().setAttribute(MAP_QUESTION_CONTENT, mapQuestionContent);
-		logger.debug("starter initialized the Comparable Map: " + request.getSession().getAttribute("mapQuestionContent") );
-		
-		
-		/* collect options for the default question content into a Map*/
-		VoteQueContent voteQueContent=voteService.getToolDefaultQuestionContent(voteContent.getUid().longValue());
-		logger.debug("voteQueContent:" + voteQueContent);
-
-		/* hold all he options for this question*/
-		List list=voteService.findVoteOptionsContentByQueId(voteQueContent.getUid());
-		logger.debug("options list:" + list);
-
-		Map mapOptionsContent= new TreeMap(new VoteComparator());
-		Iterator listIterator=list.iterator();
-		Long mapOptsIndex=new Long(1);
-		while (listIterator.hasNext())
-		{
-			VoteOptsContent voteOptsContent=(VoteOptsContent)listIterator.next();
-			logger.debug("option text:" + voteOptsContent.getVoteQueOptionText());
-			mapOptionsContent.put(mapOptsIndex.toString(),voteOptsContent.getVoteQueOptionText());
-			
-    		if (mapOptsIndex.longValue() == 1)
-    			request.getSession().setAttribute(DEFAULT_OPTION_CONTENT, voteOptsContent.getVoteQueOptionText());
-			
-			mapIndex=new Long(mapOptsIndex.longValue()+1);
-		}
-		
-		logger.debug("DEFAULT_QUESTION_CONTENT: " + request.getSession().getAttribute(DEFAULT_QUESTION_CONTENT));
-		logger.debug("DEFAULT_OPTION_CONTENT: " + request.getSession().getAttribute(DEFAULT_OPTION_CONTENT));
+		logger.debug("Map initialized with existing contentid to: " + mapOptionsContent);
 		request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
-		Map mapDefaultOptionsContent=mapOptionsContent;
-		request.getSession().setAttribute(MAP_DEFAULTOPTIONS_CONTENT, mapDefaultOptionsContent);
-		logger.debug("starter initialized the Options Map: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT));
-		logger.debug("starter initialized the Default Options Map: " + request.getSession().getAttribute(MAP_DEFAULTOPTIONS_CONTENT));
-
-
+		logger.debug("starter initialized the Comparable Map: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT) );
+		
 		logger.debug("final title: " + voteAuthoringForm.getTitle());
 		logger.debug("final ins: " + voteAuthoringForm.getInstructions());
 		
 		/*
-		 * load questions page
+		 * load nominations page
 		 */
 		voteAuthoringForm.resetUserAction();
 	}
