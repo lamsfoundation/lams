@@ -1,22 +1,22 @@
-<%--
+<%-- 
 Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License version 2 as 
+  published by the Free Software Foundation.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-USA
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+  USA
 
-http://www.gnu.org/licenses/gpl.txt
+  http://www.gnu.org/licenses/gpl.txt
 --%>
 
 <%@ taglib uri="tags-bean" prefix="bean"%> 
@@ -31,46 +31,45 @@ http://www.gnu.org/licenses/gpl.txt
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
-
 			<table>
 				<tr>
 	      			<td NOWRAP class="formlabel" valign=top>
-		      			<font size=2> 
-			      			<b> <bean:message key="radiobox.sln"/>: </b>
-		      			</font>
+		      			<font size=2> <b>
+			      			<bean:message key="radiobox.usernameVisible"/>:
+			      		</b> </font>		      			
 					</td>
 					<td NOWRAP valign=top>
 						<font size=2>
-							<html:radio property="sln"  value="ON">
-							 <bean:message key="option.on"/>
-							</html:radio>
-	
-							<html:radio property="sln"  value="OFF">
-							 <bean:message key="option.off"/>
-							</html:radio>
-						</font>
+						<html:radio property="usernameVisible" value="ON">
+						 <bean:message key="option.on"/>
+						</html:radio>
+
+						<html:radio property="usernameVisible" value="OFF">
+						 <bean:message key="option.off"/>
+						</html:radio>
+						</font>												
 	      			</td>
 		         </tr>
 		         
    				<tr>
-					<td NOWRAP class="formlabel" valign=top>
-						<font size=2>
-			      			<b> <bean:message key="radiobox.onepq"/>: </b>
-		      			</font>
+	      			<td NOWRAP class="formlabel" valign=top>
+		      			<font size=2> <b>
+			      			<bean:message key="radiobox.onepq"/>:
+			      		</b> </font>		      			
 					</td>
 					<td NOWRAP valign=top>
-						<font size=2>
-							<html:radio property="questionsSequenced" value="ON">
-							 <bean:message key="option.on"/>
-							</html:radio>
-	
-							<html:radio property="questionsSequenced" value="OFF">
-							 <bean:message key="option.off"/>
-							</html:radio>
-						</font>
+					<font size=2>
+						<html:radio property="questionsSequenced" value="ON">
+						 <bean:message key="option.on"/>
+						</html:radio>
+
+						<html:radio property="questionsSequenced" value="OFF">
+						 <bean:message key="option.off"/>
+						</html:radio>
+					</font>												
 	      			</td>
 		        </tr>
-		         
+
 		         <tr>
 					<td NOWRAP class="formlabel" valign=top>
 						<font size=2>

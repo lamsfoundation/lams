@@ -1,12 +1,11 @@
-
 /***************************************************************************
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
  * 
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License version 2.0
+ * as published by the Free Software Foundation.
  * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -28,7 +27,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.TimeZone;
 import java.util.TreeMap;
 
@@ -49,7 +47,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * @author Ozgur Demirtas
- * Common MCQ utility functions live here.
+ * Common Voting utility functions live here.
  */
 public abstract class VoteUtils implements VoteAppConstants {
 
@@ -64,8 +62,8 @@ public abstract class VoteUtils implements VoteAppConstants {
 	 */
 	public static IVoteService getToolService(HttpServletRequest request)
 	{
-		IVoteService mcService=(IVoteService)request.getSession().getAttribute(TOOL_SERVICE);
-	    return mcService;
+		IVoteService voteService=(IVoteService)request.getSession().getAttribute(TOOL_SERVICE);
+	    return voteService;
 	}
 
 	/**
@@ -151,13 +149,13 @@ public abstract class VoteUtils implements VoteAppConstants {
 	 */
 	public static boolean existsContent(Long toolContentId, HttpServletRequest request)
 	{
-		IVoteService mcService =VoteUtils.getToolService(request);
-	    /*
-    	VoteContent mcContent=mcService.retrieveVote(toolContentId);
-	    logger.debug("retrieving mcContent: " + mcContent);
-	    if (mcContent == null) 
+		IVoteService voteService =VoteUtils.getToolService(request);
+
+    	VoteContent voteContent=voteService.retrieveVote(toolContentId);
+	    logger.debug("retrieving voteContent: " + voteContent);
+	    if (voteContent == null) 
 	    	return false;
-	    */
+
 	    
 		return true;	
 	}
@@ -171,11 +169,11 @@ public abstract class VoteUtils implements VoteAppConstants {
 	public static boolean existsSession(Long toolSessionId, HttpServletRequest request)
 	{
 		logger.debug("existsSession");
-    	IVoteService mcService =VoteUtils.getToolService(request);
-	    VoteSession mcSession=mcService.retrieveVoteSession(toolSessionId);
-	    logger.debug("mcSession:" + mcSession);
+    	IVoteService voteService =VoteUtils.getToolService(request);
+	    VoteSession voteSession=voteService.retrieveVoteSession(toolSessionId);
+	    logger.debug("voteSession:" + voteSession);
     	
-	    if (mcSession == null) 
+	    if (voteSession == null) 
 	    	return false;
 	    
 		return true;	
@@ -198,12 +196,12 @@ public abstract class VoteUtils implements VoteAppConstants {
     	Long mapIndex=new Long(1);
     	while (listIterator.hasNext())
     	{
-    		VoteOptsContent mcOptionsContent = (VoteOptsContent)listIterator.next();
-    		logger.debug("mcOptionsContent:" + mcOptionsContent);
-    		mapOptionsContent.put(mapIndex.toString(),mcOptionsContent.getVoteQueOptionText());
+    		VoteOptsContent voteOptionsContent = (VoteOptsContent)listIterator.next();
+    		logger.debug("voteOptionsContent:" + voteOptionsContent);
+    		mapOptionsContent.put(mapIndex.toString(),voteOptionsContent.getVoteQueOptionText());
     		mapIndex=new Long(mapIndex.longValue()+1);
     	}
-    	logger.debug("generated mcOptionsContent: " + mapOptionsContent);
+    	logger.debug("generated voteOptionsContent: " + mapOptionsContent);
     	return mapOptionsContent;
 	}
 
@@ -236,6 +234,31 @@ public abstract class VoteUtils implements VoteAppConstants {
 	
 	public static void persistRichText(HttpServletRequest request)
 	{
+		String richTextTitle = request.getParameter(TITLE);
+	    String richTextInstructions = request.getParameter(INSTRUCTIONS);
+	    String richTextPosting = request.getParameter(POSTING);
+	    
+	    logger.debug("richTextTitle: " + richTextTitle);
+	    logger.debug("richTextInstructions: " + richTextInstructions);
+	    logger.debug("richTextPosting: " + richTextPosting);
+	    
+	    
+	    if (richTextTitle != null)
+	    {
+			request.getSession().setAttribute(ACTIVITY_TITLE, richTextTitle);
+	    }
+	
+	    if (richTextInstructions != null)
+	    {
+			request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, richTextInstructions);
+	    }
+	    
+	    if (richTextPosting != null)
+	    {
+			request.getSession().setAttribute(POSTING, richTextPosting);
+	    }
+
+	    
 		String richTextOfflineInstructions=request.getParameter(RICHTEXT_OFFLINEINSTRUCTIONS);
 		logger.debug("read parameter richTextOfflineInstructions: " + richTextOfflineInstructions);
 		String richTextOnlineInstructions=request.getParameter(RICHTEXT_ONLINEINSTRUCTIONS);
@@ -251,41 +274,7 @@ public abstract class VoteUtils implements VoteAppConstants {
 			request.getSession().setAttribute(RICHTEXT_ONLINEINSTRUCTIONS,richTextOnlineInstructions);	
 		}
 		
-	
-		String richTextTitle=request.getParameter(RICHTEXT_TITLE);
-		logger.debug("read parameter richTextTitle: " + richTextTitle);
-		String richTextInstructions=request.getParameter(RICHTEXT_INSTRUCTIONS);
-		logger.debug("read parameter richTextInstructions: " + richTextInstructions);
-		
-		
-		if ((richTextTitle != null) && (richTextTitle.length() > 0))
-		{
-			request.getSession().setAttribute(RICHTEXT_TITLE,richTextTitle);
-		}
-		
-		if ((richTextInstructions != null) && (richTextInstructions.length() > 0))
-		{
-			request.getSession().setAttribute(RICHTEXT_INSTRUCTIONS,richTextInstructions);
-		}
-		
-		String richTextIncorrectFeedback=request.getParameter(RICHTEXT_INCORRECT_FEEDBACK);
-		logger.debug("read parameter richTextIncorrectFeedback: " + richTextIncorrectFeedback);
-		
-		if ((richTextIncorrectFeedback != null) && (richTextIncorrectFeedback.length() > 0))
-		{
-			request.getSession().setAttribute(RICHTEXT_INCORRECT_FEEDBACK,richTextIncorrectFeedback);
-		}
-		
 
-		String richTextCorrectFeedback=request.getParameter(RICHTEXT_CORRECT_FEEDBACK);
-		logger.debug("read parameter richTextCorrectFeedback: " + richTextCorrectFeedback);
-		
-		if ((richTextCorrectFeedback != null) && (richTextCorrectFeedback.length() > 0))
-		{
-			request.getSession().setAttribute(RICHTEXT_CORRECT_FEEDBACK,richTextCorrectFeedback);
-		}
-
-		
 		String richTextReportTitle=request.getParameter(RICHTEXT_REPORT_TITLE);
 		logger.debug("read parameter richTextReportTitle: " + richTextReportTitle);
 		
@@ -302,66 +291,16 @@ public abstract class VoteUtils implements VoteAppConstants {
 			request.getSession().setAttribute(RICHTEXT_END_LEARNING_MSG,richTextEndLearningMessage);
 		}
 		
-		Map mapIncorrectFeedback=(Map)request.getSession().getAttribute(MAP_INCORRECT_FEEDBACK);
 	}
 	
 	
-	public static void configureContentRepository(HttpServletRequest request, IVoteService mcService)
+	public static void configureContentRepository(HttpServletRequest request, IVoteService voteService)
 	{
 		logger.debug("attempt configureContentRepository");
-    	mcService.configureContentRepository();
+    	voteService.configureContentRepository();
 	    logger.debug("configureContentRepository ran successfully");
 	}
 	
-	/**
-	 * retrieves existing updated file information
-	 * populateUploadedFilesData(HttpServletRequest request, VoteContent defaultVoteContent)
-	 * 
-	 * @param request
-	 * @param defaultVoteContent
-	 */
-	public static void populateUploadedFilesData(HttpServletRequest request, VoteContent defaultVoteContent)
-	{
-		logger.debug("attempt populateUploadedFilesData for: " + defaultVoteContent);
-		IVoteService mcService =VoteUtils.getToolService(request);
-    	logger.debug("mcService: " + mcService);
-
-    	/** read the uploaded offline uuid + file name pair */
-	    List listOffFilesName=mcService.retrieveVoteUploadedOfflineFilesName(defaultVoteContent.getUid());
-	    logger.debug("initial listOfflineFilesName: " + listOffFilesName);
-	    
-	    /** read the uploaded online uuid + file name pair */
-	    List listOnFilesName=mcService.retrieveVoteUploadedOnlineFilesName(defaultVoteContent.getUid());
-	    logger.debug("initial listOnlineFilesName: " + listOnFilesName);
-	    
-	    request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILENAMES, listOffFilesName);
-	    request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILENAMES, listOnFilesName);
-	}
-	
-	
-    /**
-     * temporary function
-     * @return
-     */
-    public static long generateId()
-	{
-		Random generator = new Random();
-		long longId=generator.nextLong();
-		if (longId < 0) longId=longId * (-1) ;
-		return longId;
-	}
-	
-    /**
-     * temporary function
-     * @return
-     */
-	public static int generateIntegerId()
-	{
-		Random generator = new Random();
-		int intId=generator.nextInt();
-		if (intId < 0) intId=intId * (-1) ;
-		return intId;
-	}
 	
 
     /**
@@ -473,42 +412,42 @@ public abstract class VoteUtils implements VoteAppConstants {
 	 * The idea of content being in use is, once any one learner starts using a particular content
 	 * that content should become unmodifiable. 
 	 * 
-	 * isContentInUse(VoteContent mcContent)
-	 * @param mcContent
+	 * isContentInUse(VoteContent voteContent)
+	 * @param voteContent
 	 * @return boolean
 	 */
-	public static boolean isContentInUse(VoteContent mcContent)
+	public static boolean isContentInUse(VoteContent voteContent)
 	{
-		logger.debug("is content inuse: " + mcContent.isContentInUse());
-		return  mcContent.isContentInUse();
+		logger.debug("is content inuse: " + voteContent.isContentInUse());
+		return  voteContent.isContentInUse();
 	}
 	
 	
 	/**
 	 * find out if the content is being edited in monitoring interface or not. If it is, the author can not modify it.
 	 * 
-	 * isDefineLater(VoteContent mcContent)
-	 * @param mcContent
+	 * isDefineLater(VoteContent voteContent)
+	 * @param voteContent
 	 * @return boolean
 	 */
-	public static boolean isDefineLater(VoteContent mcContent)
+	public static boolean isDefineLater(VoteContent voteContent)
 	{
-		logger.debug("is define later: " + mcContent.isDefineLater());
-		return  mcContent.isDefineLater();
+		logger.debug("is define later: " + voteContent.isDefineLater());
+		return  voteContent.isDefineLater();
 	}
 	
 	
 	/**
 	 * find out if the content is set to run offline or online. If it is set to run offline , the learners are informed about that..
-	 * isRubnOffline(VoteContent mcContent)
+	 * isRubnOffline(VoteContent voteContent)
 	 * 
-	 * @param mcContent
+	 * @param voteContent
 	 * @return boolean
 	 */
-	public static boolean isRunOffline(VoteContent mcContent)
+	public static boolean isRunOffline(VoteContent voteContent)
 	{
-		logger.debug("is run offline: " + mcContent.isRunOffline());
-		return mcContent.isRunOffline();
+		logger.debug("is run offline: " + voteContent.isRunOffline());
+		return voteContent.isRunOffline();
 	}
 
 	

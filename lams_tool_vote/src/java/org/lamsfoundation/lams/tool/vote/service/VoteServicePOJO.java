@@ -1,11 +1,11 @@
 /***************************************************************************
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
  * 
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License version 2.0
+ * as published by the Free Software Foundation.
  * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -56,7 +56,6 @@ import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
 import org.lamsfoundation.lams.tool.vote.dao.IVoteContentDAO;
-import org.lamsfoundation.lams.tool.vote.dao.IVoteOptionsContentDAO;
 import org.lamsfoundation.lams.tool.vote.dao.IVoteQueContentDAO;
 import org.lamsfoundation.lams.tool.vote.dao.IVoteSessionDAO;
 import org.lamsfoundation.lams.tool.vote.dao.IVoteUploadedFileDAO;
@@ -97,7 +96,6 @@ public class VoteServicePOJO implements
 	
 	private IVoteContentDAO			voteContentDAO; 
 	private IVoteQueContentDAO		voteQueContentDAO; 
-	private IVoteOptionsContentDAO 	voteOptionsContentDAO;	
 	private IVoteSessionDAO			voteSessionDAO;
 	private IVoteUserDAO			voteUserDAO;
 	private IVoteUsrAttemptDAO		voteUsrAttemptDAO;
@@ -533,20 +531,6 @@ public class VoteServicePOJO implements
         }
 	}
     
-    public void removeVoteOptionsContent(VoteOptsContent voteOptsContent) throws VoteApplicationException
-    {
-    	try
-        {
-            voteOptionsContentDAO.removeVoteOptionsContent(voteOptsContent);
-        }
-        catch (DataAccessException e)
-        {
-            throw new VoteApplicationException("Exception occured when lams is removing"
-                                                 + " the vote options content: "
-                                                 + e.getMessage(),e);
-        }
-    }
-
 
     public VoteQueContent getQuestionContentByQuestionText(final String question, final Long voteContentId)
     {
@@ -781,22 +765,6 @@ public class VoteServicePOJO implements
     }
     
     
-    public List findVoteOptionsContentByQueId(Long voteQueContentId) throws VoteApplicationException
-    {
-    	try
-        {
-            List list=voteOptionsContentDAO.findVoteOptionsContentByQueId(voteQueContentId);
-            return list;
-        }
-        catch (DataAccessException e)
-        {
-            throw new VoteApplicationException("Exception occured when lams is finding by que id"
-                                                 + " the vote options: "
-                                                 + e.getMessage(),e);
-        }
-    }
-    
-    
     public VoteOptsContent getVoteOptionsContentByUID(Long uid) throws VoteApplicationException
 	{
     	try
@@ -811,49 +779,6 @@ public class VoteServicePOJO implements
 	}
     
     
-    public void saveVoteOptionsContent(VoteOptsContent voteOptsContent) throws VoteApplicationException
-	{
-    	try
-        {
-            voteOptionsContentDAO.saveVoteOptionsContent(voteOptsContent);
-        }
-        catch (DataAccessException e)
-        {
-            throw new VoteApplicationException("Exception occured when lams is saving"
-                                                 + " the vote options content: "
-                                                 + e.getMessage(),e);
-        }
-	}
-    
-    public VoteOptsContent getOptionContentByOptionText(final String option, final Long voteQueContentUid)
-    {
-    	try
-        {
-            return voteOptionsContentDAO.getOptionContentByOptionText(option, voteQueContentUid);
-        }
-        catch (DataAccessException e)
-        {
-            throw new VoteApplicationException("Exception occured when lams is returning the"
-                                                 + " option by option text: "
-                                                 + e.getMessage(),e);
-        }
-    }
-    
-
-    public void updateVoteOptionsContent(VoteOptsContent voteOptsContent) throws VoteApplicationException
-	{
-    	try
-        {
-            voteOptionsContentDAO.updateVoteOptionsContent(voteOptsContent);
-        }
-        catch (DataAccessException e)
-        {
-            throw new VoteApplicationException("Exception occured when lams is updating"
-                                                 + " the vote options content: "
-                                                 + e.getMessage(),e);
-        }
-	}
-
     public List getSessionsFromContent(VoteContent voteContent) throws VoteApplicationException
 	{
     	try
@@ -868,67 +793,6 @@ public class VoteServicePOJO implements
         }
 	}
     
-    
-    public void deleteVoteOptionsContent(VoteOptsContent voteOptsContent) throws VoteApplicationException
-	{
-    	try
-        {
-            voteOptionsContentDAO.removeVoteOptionsContent(voteOptsContent);
-        }
-        catch (DataAccessException e)
-        {
-            throw new VoteApplicationException("Exception occured when lams is removing"
-                                                 + " the vote options content: "
-                                                 + e.getMessage(),e);
-        }
-	}
-    
-    
-    public List findVoteOptionNamesByQueId(Long voteQueContentId) throws VoteApplicationException
-	{
-    	try
-        {
-            return voteOptionsContentDAO.findVoteOptionNamesByQueId(voteQueContentId);
-        }
-        catch (DataAccessException e)
-        {
-            throw new VoteApplicationException("Exception occured when lams is finding"
-                                                 + " the vote options name: "
-                                                 + e.getMessage(),e);
-        }
-    	
-	}
-    
-    
-    public void removeVoteOptionsContentByQueId(Long voteQueContentId) throws VoteApplicationException
-    {
-    	try
-        {
-            voteOptionsContentDAO.removeVoteOptionsContentByQueId(voteQueContentId);
-        }
-        catch (DataAccessException e)
-        {
-            throw new VoteApplicationException("Exception occured when lams is removing by que id"
-                                                 + " the vote options content: "
-                                                 + e.getMessage(),e);
-        }
-    }
-    
-    
-    public void deleteVoteOptionsContentByUID(Long uid) throws VoteApplicationException
-	{
-    	try
-        {
-            voteOptionsContentDAO.removeVoteOptionsContentByUID(uid);
-        }
-        catch (DataAccessException e)
-        {
-            throw new VoteApplicationException("Exception occured when lams is removing by uid"
-                                                 + " the vote options content: "
-                                                 + e.getMessage(),e);
-        }
-	}
-
     
     public int getTotalNumberOfUsers() throws VoteApplicationException
 	{
@@ -2173,19 +2037,5 @@ public class VoteServicePOJO implements
      */
     public static void setLogger(Logger logger) {
         VoteServicePOJO.logger = logger;
-    }
-    
-    /**
-     * @return Returns the voteOptionsContentDAO.
-     */
-    public IVoteOptionsContentDAO getVoteOptionsContentDAO() {
-        return voteOptionsContentDAO;
-    }
-    /**
-     * @param voteOptionsContentDAO The voteOptionsContentDAO to set.
-     */
-    public void setVoteOptionsContentDAO(
-            IVoteOptionsContentDAO voteOptionsContentDAO) {
-        this.voteOptionsContentDAO = voteOptionsContentDAO;
     }
 }

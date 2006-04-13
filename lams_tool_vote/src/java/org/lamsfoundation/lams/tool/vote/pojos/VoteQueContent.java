@@ -1,11 +1,11 @@
 /***************************************************************************
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
  * 
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License version 2.0
+ * as published by the Free Software Foundation.
  * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,6 +19,7 @@
  * 
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
+
 
 package org.lamsfoundation.lams.tool.vote.pojos;
 
@@ -182,7 +183,7 @@ public class VoteQueContent implements Serializable, Comparable {
         return this.voteOptionsContents;
     }
 
-    public void setMcOptionsContents(Set mcOptionsContents) {
+    public void setMcOptionsContents(Set voteOptionsContents) {
         this.voteOptionsContents = voteOptionsContents;
     }
 

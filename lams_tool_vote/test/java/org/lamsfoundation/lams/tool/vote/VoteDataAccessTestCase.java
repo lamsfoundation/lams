@@ -27,7 +27,7 @@ import org.lamsfoundation.lams.test.AbstractLamsTestCase;
 /**
  * @author Ozgur Demirtas
  */
-public class McDataAccessTestCase extends AbstractLamsTestCase
+public class VoteDataAccessTestCase extends AbstractLamsTestCase
 {
 	//These both refer to the same entry in the db.
 	protected final Long DEFAULT_CONTENT_ID = new Long(10);
@@ -52,7 +52,7 @@ public class McDataAccessTestCase extends AbstractLamsTestCase
     public static String COMPLETED = "COMPLETED";
 	
 	
-	public McDataAccessTestCase(String name)
+	public VoteDataAccessTestCase(String name)
     {
         super(name);
     }
@@ -64,7 +64,7 @@ public class McDataAccessTestCase extends AbstractLamsTestCase
 
     protected String[] getContextConfigLocation()
     {
-    	return new String[] {"/org/lamsfoundation/lams/tool/vote/testmcApplicationContext.xml" };
+    	return new String[] {"/org/lamsfoundation/lams/tool/vote/testvoteApplicationContext.xml" };
     }
     
     protected String getHibernateSessionFactoryName()

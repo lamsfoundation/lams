@@ -1,11 +1,11 @@
 /***************************************************************************
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
  * 
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License version 2.0
+ * as published by the Free Software Foundation.
  * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -42,7 +42,6 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
 import org.lamsfoundation.lams.usermanagement.User;
-import org.springframework.dao.DataAccessException;
 
 
 /**
@@ -96,10 +95,6 @@ public interface IVoteService
     
     public void cleanAllQuestions(final Long mcContentUid) throws VoteApplicationException;
     
-    public void removeVoteOptionsContentByQueId(Long mcQueContentId) throws VoteApplicationException;
-    
-    public void removeVoteOptionsContent(VoteOptsContent mcOptsContent);
-    
     public VoteQueContent getQuestionContentByQuestionText(final String question, final Long mcContentUid);
     
     public void removeVoteQueContentByUID(Long uid) throws VoteApplicationException;
@@ -132,18 +127,6 @@ public interface IVoteService
 	
     public void deleteVoteQueUsr(VoteQueUsr mcQueUsr) throws VoteApplicationException;
     
-    public List findVoteOptionsContentByQueId(Long mcQueContentId) throws VoteApplicationException;
-    
-    public void saveVoteOptionsContent(VoteOptsContent mcOptsContent) throws VoteApplicationException;
-    
-    public VoteOptsContent getOptionContentByOptionText(final String option, final Long mcQueContentUid);
-    
-    public void updateVoteOptionsContent(VoteOptsContent mcOptsContent) throws VoteApplicationException;
-        
-    public void deleteVoteOptionsContent(VoteOptsContent mcOptsContent) throws VoteApplicationException;
-	
-    public void deleteVoteOptionsContentByUID(Long uid) throws VoteApplicationException;
-	
 	public User getCurrentUserData(String username) throws VoteApplicationException;
 	
 	public int getTotalNumberOfUsers() throws VoteApplicationException;
@@ -239,7 +222,6 @@ public interface IVoteService
     public List getOfflineFilesMetaData(Long mcContentId) throws VoteApplicationException;
     
     public List getSessionsFromContent(VoteContent mcContent) throws VoteApplicationException;
-    
-    public List findVoteOptionNamesByQueId(Long mcQueContentId) throws VoteApplicationException;
+
 }
 

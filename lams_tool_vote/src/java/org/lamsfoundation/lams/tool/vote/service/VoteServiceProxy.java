@@ -1,11 +1,11 @@
 /***************************************************************************
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
  * 
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License version 2.0
+ * as published by the Free Software Foundation.
  * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -30,8 +30,6 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 
-
-
 /**
  * @author Ozgur Demirtas
  *  
@@ -44,10 +42,10 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public class VoteServiceProxy
 {
     /**
-     * Return the mc domain service object. It will delegate to the Spring
+     * Return the voting domain service object. It will delegate to the Spring
      * helper method to retrieve the proper bean from Spring bean factory.
      * @param servletContext the servletContext for current application
-     * @return mcq service object.
+     * @return voting service object.
      */
     public static final IVoteService getVoteService(ServletContext servletContext)
     {

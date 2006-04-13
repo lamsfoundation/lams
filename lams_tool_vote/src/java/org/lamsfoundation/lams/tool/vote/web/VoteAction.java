@@ -1,11 +1,11 @@
 /***************************************************************************
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
  * 
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License version 2.0
+ * as published by the Free Software Foundation.
  * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,6 +19,7 @@
  * 
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
+
 package org.lamsfoundation.lams.tool.vote.web;
 
 import java.io.IOException;
@@ -37,8 +38,10 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
+import org.lamsfoundation.lams.tool.vote.VoteAttachmentDTO;
 import org.lamsfoundation.lams.tool.vote.VoteComparator;
 import org.lamsfoundation.lams.tool.vote.VoteUtils;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
@@ -113,11 +116,10 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
                                                             ServletException
     {
     	VoteUtils.cleanUpUserExceptions(request);
-	 	VoteAuthoringForm mcAuthoringForm = (VoteAuthoringForm) form;
-	 	IVoteService mcService =VoteUtils.getToolService(request);
-	 	AuthoringUtil.readData(request, mcAuthoringForm);	 	
-	 	mcAuthoringForm.resetUserAction();
-	 	
+	 	VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
+	 	IVoteService voteService =VoteUtils.getToolService(request);
+	 	VoteUtils.persistRichText(request);	 	
+	 	voteAuthoringForm.resetUserAction();
 	 	
 	 	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
 	 	return null;
@@ -137,25 +139,8 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 	    String richTextInstructions = request.getParameter("instructions");
 	    String richTextPosting = request.getParameter("posting");
 	    
-	    logger.debug("richTextTitle: " + richTextTitle);
-	    logger.debug("richTextInstructions: " + richTextInstructions);
-	    logger.debug("richTextPosting: " + richTextPosting);
+	    VoteUtils.persistRichText(request);
 	    
-	    if (richTextTitle != null)
-	    {
-			request.getSession().setAttribute(ACTIVITY_TITLE, richTextTitle);
-	    }
-	
-	    if (richTextInstructions != null)
-	    {
-			request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, richTextInstructions);
-	    }
-
-	    if (richTextPosting != null)
-	    {
-			request.getSession().setAttribute(POSTING, richTextPosting);
-	    }
-
 	    //request.getSession().setAttribute(EDITACTIVITY_EDITMODE, new Boolean(true));  
 	    authoringUtil.reconstructOptionContentMapForAdd(mapOptionsContent, request);
 	    
@@ -173,30 +158,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 		logger.debug("doing removeOption ");
 		request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
 		
-		String richTextTitle = request.getParameter("title");
-	    String richTextInstructions = request.getParameter("instructions");
-	    String richTextPosting = request.getParameter("posting");
-	    
-	    logger.debug("richTextTitle: " + richTextTitle);
-	    logger.debug("richTextInstructions: " + richTextInstructions);
-	    logger.debug("richTextPosting: " + richTextPosting);
-	    
-	    
-	    if (richTextTitle != null)
-	    {
-			request.getSession().setAttribute(ACTIVITY_TITLE, richTextTitle);
-	    }
-	
-	    if (richTextInstructions != null)
-	    {
-			request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, richTextInstructions);
-	    }
-	    
-	    if (richTextPosting != null)
-	    {
-			request.getSession().setAttribute(POSTING, richTextPosting);
-	    }
-
+		VoteUtils.persistRichText(request);
 	    
 		AuthoringUtil authoringUtil= new AuthoringUtil();
 	    VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
@@ -226,6 +188,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 	    	voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
 	    logger.debug("voteService :" +voteService);
 	    
+		VoteUtils.persistRichText(request);
 	           	
 	    AuthoringUtil authoringUtil= new AuthoringUtil();
 	    Map mapOptionsContent=(Map)request.getSession().getAttribute(MAP_OPTIONS_CONTENT);
@@ -275,32 +238,19 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 	    VoteContent voteContent=authoringUtil.saveOrUpdateVoteContent(mapOptionsContent, voteService, voteAuthoringForm, request);
 	    logger.debug("voteContent: " + voteContent);
 		
-		String richTextTitle = request.getParameter("title");
-	    String richTextInstructions = request.getParameter("instructions");
-	    String richTextPosting = request.getParameter("posting");
-	    logger.debug("richTextTitle: " + richTextTitle);
-	    logger.debug("richTextInstructions: " + richTextInstructions);
-	    logger.debug("richTextPosting: " + richTextPosting);
-	    
-	    if (richTextTitle != null)
-	    {
-			request.getSession().setAttribute(ACTIVITY_TITLE, richTextTitle);
-	    }
 	
-	    if (richTextInstructions != null)
-	    {
-			request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, richTextInstructions);
-	    }
-	
-	    if (richTextPosting != null)
-	    {
-			request.getSession().setAttribute(POSTING, richTextPosting);
-	    }
-
-	    
-	    //List attacments=saveAttachments(voteContent, attachmentList, deletedAttachmentList, mapping, request);
-	    //logger.debug("attacments: " + attacments);
-	
+		logger.debug("start persisting offline files metadata");
+		AuthoringUtil.persistFilesMetaData(request, true, voteContent);
+		logger.debug("start persisting online files metadata");
+		AuthoringUtil.persistFilesMetaData(request, false, voteContent);
+		
+		/* making sure only the filenames in the session cache are persisted and the others in the db are removed*/ 
+		logger.debug("start removing redundant offline files metadata");
+		AuthoringUtil.removeRedundantOfflineFileItems(request, voteContent);
+		
+		logger.debug("start removing redundant online files metadata");
+		AuthoringUtil.removeRedundantOnlineFileItems(request, voteContent);
+ 		logger.debug("done removing redundant files");
 	
 	    errors.clear();
 	    errors.add(Globals.ERROR_KEY, new ActionMessage("sbmt.successful"));
@@ -374,7 +324,182 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
         return errors;
     }
     
+    
+    public ActionForward submitOfflineFiles(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException,
+                                         RepositoryCheckedException
+    {
+    	VoteUtils.cleanUpUserExceptions(request);
+    	logger.debug("dispatching submitOfflineFile...");
+    	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
+    	
+    	VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
+	 	IVoteService voteService =VoteUtils.getToolService(request);
 
+		/* determine whether the request is from Monitoring url Edit Activity*/
+		String sourceVoteStarter = (String) request.getAttribute(SOURCE_VOTE_STARTER);
+		logger.debug("sourceVoteStarter: " + sourceVoteStarter);
+		String destination=VoteUtils.getDestination(sourceVoteStarter);
+		logger.debug("destination: " + destination);
+
+		VoteUtils.persistRichText(request);
+	 	
+		logger.debug("will uploadFile for offline file:");
+ 		VoteAttachmentDTO voteAttachmentDTO=AuthoringUtil.uploadFile(request, voteAuthoringForm, true);
+ 		logger.debug("returned voteAttachmentDTO:" + voteAttachmentDTO);
+ 		
+ 		if (voteAttachmentDTO == null)
+ 		{
+ 			ActionMessages errors= new ActionMessages();
+ 			errors= new ActionMessages();
+ 			request.getSession().setAttribute(USER_EXCEPTION_FILENAME_EMPTY, new Boolean(true).toString());
+ 			errors.add(Globals.ERROR_KEY,new ActionMessage("error.fileName.empty"));
+ 			saveErrors(request,errors);
+ 			voteAuthoringForm.resetUserAction();
+ 			persistError(request,"error.fileName.empty");
+ 			
+ 	   	    return (mapping.findForward(destination));	
+ 		}
+ 		
+ 		 		
+ 		List listOfflineFilesMetaData =(List)request.getSession().getAttribute(LIST_OFFLINEFILES_METADATA);
+ 		logger.debug("listOfflineFilesMetaData:" + listOfflineFilesMetaData);
+ 		listOfflineFilesMetaData.add(voteAttachmentDTO);
+ 		logger.debug("listOfflineFilesMetaData after add:" + listOfflineFilesMetaData);
+ 		request.getSession().setAttribute(LIST_OFFLINEFILES_METADATA, listOfflineFilesMetaData);
+		
+ 		voteAuthoringForm.resetUserAction();
+   	    return (mapping.findForward(destination));    
+    }
+
+    
+    public ActionForward submitOnlineFiles(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException,
+                                         RepositoryCheckedException
+    {
+    	VoteUtils.cleanUpUserExceptions(request);
+    	logger.debug("dispatching submitOnlineFiles...");
+    	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
+    	
+    	VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
+	 	IVoteService voteService =VoteUtils.getToolService(request);
+
+		/* determine whether the request is from Monitoring url Edit Activity*/
+		String sourceVoteStarter = (String) request.getAttribute(SOURCE_VOTE_STARTER);
+		logger.debug("sourceVoteStarter: " + sourceVoteStarter);
+		String destination=VoteUtils.getDestination(sourceVoteStarter);
+		logger.debug("destination: " + destination);
+
+		VoteUtils.persistRichText(request);
+	 	
+		logger.debug("will uploadFile for online file:");
+ 		VoteAttachmentDTO voteAttachmentDTO=AuthoringUtil.uploadFile(request, voteAuthoringForm, false);
+ 		logger.debug("returned voteAttachmentDTO:" + voteAttachmentDTO);
+ 		
+ 		if (voteAttachmentDTO == null)
+ 		{
+ 			ActionMessages errors= new ActionMessages();
+ 			errors= new ActionMessages();
+ 			request.getSession().setAttribute(USER_EXCEPTION_FILENAME_EMPTY, new Boolean(true).toString());
+ 			errors.add(Globals.ERROR_KEY,new ActionMessage("error.fileName.empty"));
+ 			saveErrors(request,errors);
+ 			voteAuthoringForm.resetUserAction();
+ 			persistError(request,"error.fileName.empty");
+ 			
+ 		    return (mapping.findForward(destination));	
+ 		}
+ 		 		
+ 		List listOnlineFilesMetaData =(List)request.getSession().getAttribute(LIST_ONLINEFILES_METADATA);
+ 		logger.debug("listOnlineFilesMetaData:" + listOnlineFilesMetaData);
+ 		listOnlineFilesMetaData.add(voteAttachmentDTO);
+ 		logger.debug("listOnlineFilesMetaData after add:" + listOnlineFilesMetaData);
+ 		request.getSession().setAttribute(LIST_ONLINEFILES_METADATA, listOnlineFilesMetaData);
+ 		
+        voteAuthoringForm.resetUserAction();
+   	    return (mapping.findForward(destination));
+    }
+
+
+    public ActionForward deleteOfflineFile(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+
+    {
+    	VoteUtils.cleanUpUserExceptions(request);
+    	logger.debug("dispatching deleteOfflineFile...");
+    	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
+    	
+    	VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
+	 	IVoteService voteService =VoteUtils.getToolService(request);
+	 	
+		/* determine whether the request is from Monitoring url Edit Activity*/
+		String sourceVoteStarter = (String) request.getAttribute(SOURCE_VOTE_STARTER);
+		logger.debug("sourceVoteStarter: " + sourceVoteStarter);
+		String destination=VoteUtils.getDestination(sourceVoteStarter);
+		logger.debug("destination: " + destination);
+	 	
+		VoteUtils.persistRichText(request);
+	 	
+	 	String uuid =voteAuthoringForm.getUuid();
+	 	logger.debug("uuid:" + uuid);
+	 	
+	 	List listOfflineFilesMetaData =(List)request.getSession().getAttribute(LIST_OFFLINEFILES_METADATA);
+ 		logger.debug("listOfflineFilesMetaData:" + listOfflineFilesMetaData);
+ 		listOfflineFilesMetaData=AuthoringUtil.removeFileItem(listOfflineFilesMetaData, uuid);
+ 		logger.debug("listOfflineFilesMetaData after remove:" + listOfflineFilesMetaData);
+ 		request.getSession().setAttribute(LIST_OFFLINEFILES_METADATA, listOfflineFilesMetaData);
+	 	
+        voteAuthoringForm.resetUserAction();
+    	
+        return (mapping.findForward(destination));
+    }
+
+
+    public ActionForward deleteOnlineFile(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+
+    {
+    	VoteUtils.cleanUpUserExceptions(request);
+    	logger.debug("dispatching deleteOnlineFile...");
+    	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
+    	
+    	VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
+	 	IVoteService voteService =VoteUtils.getToolService(request);
+
+		/* determine whether the request is from Monitoring url Edit Activity*/
+		String sourceVoteStarter = (String) request.getAttribute(SOURCE_VOTE_STARTER);
+		logger.debug("sourceVoteStarter: " + sourceVoteStarter);
+		String destination=VoteUtils.getDestination(sourceVoteStarter);
+		logger.debug("destination: " + destination);
+
+		VoteUtils.persistRichText(request);
+	 	
+	 	String uuid =voteAuthoringForm.getUuid();
+	 	logger.debug("uuid:" + uuid);
+	 	
+	 	List listOnlineFilesMetaData =(List)request.getSession().getAttribute(LIST_ONLINEFILES_METADATA);
+ 		logger.debug("listOnlineFilesMetaData:" + listOnlineFilesMetaData);
+ 		listOnlineFilesMetaData=AuthoringUtil.removeFileItem(listOnlineFilesMetaData, uuid);
+ 		logger.debug("listOnlineFilesMetaData after remove:" + listOnlineFilesMetaData);
+ 		request.getSession().setAttribute(LIST_ONLINEFILES_METADATA, listOnlineFilesMetaData);
+	 	
+        voteAuthoringForm.resetUserAction();
+        
+        return (mapping.findForward(destination));
+    }
+
+    
             
     /**
      * persists error messages to request scope

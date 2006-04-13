@@ -1,13 +1,11 @@
-
-
 /***************************************************************************
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
  * 
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License version 2.0
+ * as published by the Free Software Foundation.
  * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -33,7 +31,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -65,61 +62,39 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 public class AuthoringUtil implements VoteAppConstants {
 	static Logger logger = Logger.getLogger(AuthoringUtil.class.getName());
 
-	public static void readData(HttpServletRequest request, VoteAuthoringForm mcAuthoringForm)
-    {
-    	/** define the next tab as Basic tab by default*/
-     	request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
-     	
-     	VoteUtils.persistRichText(request);
-     	AuthoringUtil.populateParameters(request, mcAuthoringForm);
-    }
- 	
-	
-    protected static void populateParameters(HttpServletRequest request, VoteAuthoringForm mcAuthoringForm)
-    {
-        String selectedQuestion=request.getParameter(SELECTED_QUESTION);
-  
-        if ((selectedQuestion != null) && (selectedQuestion.length() > 0))
-    	{
-    		request.getSession().setAttribute(SELECTED_QUESTION,selectedQuestion);
-    		logger.debug("updated SELECTED_QUESTION");
-    	}
-    }
-    
-
-    protected static void setRadioboxes(VoteContent mcContent, VoteAuthoringForm mcAuthoringForm)
+    protected static void setRadioboxes(VoteContent voteContent, VoteAuthoringForm voteAuthoringForm)
 	{
-		if (mcContent.isQuestionsSequenced())
+		if (voteContent.isQuestionsSequenced())
 		{
-			mcAuthoringForm.setQuestionsSequenced(ON);
+			voteAuthoringForm.setQuestionsSequenced(ON);
 			logger.debug("setting questionsSequenced to true");
 		}
 		else
 		{
-			mcAuthoringForm.setQuestionsSequenced(OFF);	
+			voteAuthoringForm.setQuestionsSequenced(OFF);	
 			logger.debug("setting questionsSequenced to false");				
 		}
 
-		if (mcContent.isRetries())
+		if (voteContent.isRetries())
 		{
-			mcAuthoringForm.setRetries(ON);	
+			voteAuthoringForm.setRetries(ON);	
 			logger.debug("setting retries to true");
 		}
 		else
 		{
-			mcAuthoringForm.setRetries(OFF);	
+			voteAuthoringForm.setRetries(OFF);	
 			logger.debug("setting retries to false");				
 		}
 
 		
-		if (mcContent.isShowReport())
+		if (voteContent.isShowReport())
 		{
-			mcAuthoringForm.setSln(ON);	
+			voteAuthoringForm.setSln(ON);	
 			logger.debug("setting sln to true");
 		}
 		else
 		{
-			mcAuthoringForm.setSln(OFF);	
+			voteAuthoringForm.setSln(OFF);	
 			logger.debug("setting sln to false");				
 		}
 	}
@@ -285,151 +260,6 @@ public class AuthoringUtil implements VoteAppConstants {
     }
     
 	
-    
-    public static VoteContent createContent(HttpServletRequest request, VoteAuthoringForm mcAuthoringForm)
-    {
-    	logger.debug("doing createContent...");
-    	IVoteService mcService =VoteUtils.getToolService(request);
-    	
-    	/* the tool content id is passed from the container to the tool and placed into session in the VoteStarterAction */
-    	Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
-    	if ((toolContentId != null) && (toolContentId.longValue() != 0))
-    	{
-    		logger.debug("passed TOOL_CONTENT_ID : " + toolContentId);
-    		/*delete the existing content in the database before applying new content*/
-    		mcService.deleteVoteById(toolContentId);  
-    		logger.debug("post-deletion existing content");
-		}
-    	
-		String title;
-    	String instructions;
-    	Long createdBy;
-    	String monitoringReportTitle="";
-    	String reportTitle="";
-    	
-    	String offlineInstructions="";
-    	String onlineInstructions="";
-    	String endLearningMessage="";
-    	Date creationDate=null;
-    	int passmark=0;
-    	
-    	boolean isQuestionsSequenced=false;
-    	boolean isSynchInMonitor=false;
-    	boolean isUsernameVisible=false;
-    	boolean isRunOffline=false;
-    	boolean isDefineLater=false;
-    	boolean isContentInUse=false;
-    	boolean isRetries=false;
-    	boolean isShowFeedback=false;
-    	boolean isSln=false;
-    	
-    	logger.debug("isQuestionsSequenced: " +  mcAuthoringForm.getQuestionsSequenced());
-    	if (mcAuthoringForm.getQuestionsSequenced().equalsIgnoreCase(ON))
-    		isQuestionsSequenced=true;
-    	
-    	logger.debug("isSynchInMonitor: " +  mcAuthoringForm.getSynchInMonitor());
-    	if (mcAuthoringForm.getSynchInMonitor().equalsIgnoreCase(ON))
-    		isSynchInMonitor=true;
-    	
-    	logger.debug("isUsernameVisible: " +  mcAuthoringForm.getUsernameVisible());
-    	if (mcAuthoringForm.getUsernameVisible().equalsIgnoreCase(ON))
-    		isUsernameVisible=true;
-    	
-    	logger.debug("isRetries: " +  mcAuthoringForm.getRetries());
-    	if (mcAuthoringForm.getRetries().equalsIgnoreCase(ON))
-    		isRetries=true;
-    	
-		logger.debug("isSln" +  mcAuthoringForm.getSln());
-		if (mcAuthoringForm.getSln().equalsIgnoreCase(ON))
-			isSln=true;
-    	
-    	logger.debug("passmark: " +  mcAuthoringForm.getPassmark());
-    	if ((mcAuthoringForm.getPassmark() != null) && (mcAuthoringForm.getPassmark().length() > 0)) 
-    		passmark= new Integer(mcAuthoringForm.getPassmark()).intValue();
-    	
-    	logger.debug("isShowFeedback: " +  mcAuthoringForm.getShowFeedback());
-    	if (mcAuthoringForm.getShowFeedback().equalsIgnoreCase(ON))
-    		isShowFeedback=true;
-    	    	
-    	
-    	String richTextTitle="";
-    	richTextTitle = (String)request.getSession().getAttribute(RICHTEXT_TITLE);
-    	logger.debug("createContent richTextTitle from session: " + richTextTitle);
-    	if (richTextTitle == null) richTextTitle="";
-    	
-    	String richTextInstructions="";
-    	richTextInstructions = (String)request.getSession().getAttribute(RICHTEXT_INSTRUCTIONS);
-    	logger.debug("createContent richTextInstructions from session: " + richTextInstructions);
-    	if (richTextInstructions == null) richTextInstructions="";
-
-    	String richTextOfflineInstructions="";
-    	richTextOfflineInstructions = (String)request.getSession().getAttribute(RICHTEXT_OFFLINEINSTRUCTIONS);
-    	logger.debug("createContent richTextOfflineInstructions from session: " + richTextOfflineInstructions);
-    	if (richTextOfflineInstructions == null) richTextOfflineInstructions="";
-    	
-    	String richTextOnlineInstructions="";
-    	richTextOnlineInstructions = (String)request.getSession().getAttribute(RICHTEXT_ONLINEINSTRUCTIONS);
-    	logger.debug("createContent richTextOnlineInstructions from session: " + richTextOnlineInstructions);
-    	if (richTextOnlineInstructions == null) richTextOnlineInstructions="";
-    	
-    	
-    	String richTextReportTitle=(String)request.getSession().getAttribute(RICHTEXT_REPORT_TITLE);
-		logger.debug("richTextReportTitle: " + richTextReportTitle);
-		
-		String richTextEndLearningMessage=(String)request.getSession().getAttribute(RICHTEXT_END_LEARNING_MSG);
-		logger.debug("richTextEndLearningMessage: " + richTextEndLearningMessage);
-    	
-		creationDate=(Date)request.getSession().getAttribute(CREATION_DATE);
-		if (creationDate == null)
-			creationDate=new Date(System.currentTimeMillis());
-		
-		logger.debug("using creationDate: " + creationDate);
-    		
-    	/*obtain user object from the session*/
-	    HttpSession ss = SessionManager.getSession();
-	    /* get back login user DTO */
-	    UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
-    	logger.debug("retrieving toolUser: " + toolUser);
-    	logger.debug("retrieving toolUser userId: " + toolUser.getUserID());
-    	String fullName= toolUser.getFirstName() + " " + toolUser.getLastName();
-    	logger.debug("retrieving toolUser fullname: " + fullName);
-    	long userId=toolUser.getUserID().longValue();
-    	logger.debug("userId: " + userId);
-    	
-    	/* create a new qa content and leave the default content intact*/
-    	VoteContent mc = new VoteContent();
-		mc.setVoteContentId(toolContentId);
-		mc.setTitle(richTextTitle);
-		mc.setInstructions(richTextInstructions);
-		mc.setCreationDate(creationDate); /*preserve this from the db*/ 
-		mc.setUpdateDate(new Date(System.currentTimeMillis())); /* keep updating this one*/
-		mc.setCreatedBy(userId); /* make sure we are setting the userId from the User object above*/
-	    mc.setUsernameVisible(isUsernameVisible);
-	    mc.setQuestionsSequenced(isQuestionsSequenced); /* the default question listing in learner mode will be all in the same page*/
-	    mc.setOnlineInstructions(richTextOnlineInstructions);
-	    mc.setOfflineInstructions(richTextOfflineInstructions);
-	    mc.setRunOffline(false);
-	    mc.setDefineLater(false);
-	    mc.setContentInUse(isContentInUse);
-	    mc.setEndLearningMessage("Thanks");
-	    mc.setRunOffline(isRunOffline);
-	    mc.setReportTitle(richTextReportTitle);
-	    mc.setMonitoringReportTitle(monitoringReportTitle);
-	    mc.setEndLearningMessage(richTextEndLearningMessage);
-	    mc.setRetries(isRetries);
-	    mc.setShowReport(isSln);
-	    mc.setVoteQueContents(new TreeSet());
-	    mc.setVoteSessions(new TreeSet());
-	    logger.debug("mc content :" +  mc);
-    	
-    	/*create the content in the db*/
-        mcService.createVote(mc);
-        logger.debug("mc created with content id: " + toolContentId);
-        
-        return mc;
-    }
-
-    
     public static Map mergeMaps(Map map1, Map map2)
     {
     	Map mapMergedMap= new TreeMap(new VoteComparator());
@@ -510,7 +340,7 @@ public class AuthoringUtil implements VoteAppConstants {
     }
     
     
-    public static VoteAttachmentDTO uploadFile(HttpServletRequest request, VoteAuthoringForm mcAuthoringForm, boolean isOfflineFile) throws RepositoryCheckedException 
+    public static VoteAttachmentDTO uploadFile(HttpServletRequest request, VoteAuthoringForm voteAuthoringForm, boolean isOfflineFile) throws RepositoryCheckedException 
 	{
     	logger.debug("doing uploadFile...");
     	logger.debug("isOfflineFile:" + isOfflineFile);
@@ -522,7 +352,7 @@ public class AuthoringUtil implements VoteAppConstants {
     	
     	if (isOfflineFile)
     	{
-    		FormFile theOfflineFile = mcAuthoringForm.getTheOfflineFile();
+    		FormFile theOfflineFile = voteAuthoringForm.getTheOfflineFile();
     		logger.debug("retrieved theOfflineFile: " + theOfflineFile);
     		
     		try
@@ -563,7 +393,7 @@ public class AuthoringUtil implements VoteAppConstants {
     	}
     	else
     	{
-    		FormFile theOnlineFile = mcAuthoringForm.getTheOnlineFile();
+    		FormFile theOnlineFile = voteAuthoringForm.getTheOnlineFile();
     		logger.debug("retrieved theOnlineFile: " + theOnlineFile);
     		
     		try
@@ -604,7 +434,7 @@ public class AuthoringUtil implements VoteAppConstants {
     		}
     	}
     	
-    	IVoteService mcService =VoteUtils.getToolService(request);
+    	IVoteService voteService =VoteUtils.getToolService(request);
 		logger.debug("calling uploadFile with:");
 		logger.debug("istream:" + stream);
 		logger.debug("filename:" + fileName);
@@ -613,7 +443,7 @@ public class AuthoringUtil implements VoteAppConstants {
 		
 		NodeKey nodeKey=null;
 		try{
-			nodeKey=mcService.uploadFile(stream, fileName, mimeType, fileProperty);
+			nodeKey=voteService.uploadFile(stream, fileName, mimeType, fileProperty);
 			logger.debug("nodeKey:" + nodeKey);
 			logger.debug("nodeKey uuid:" + nodeKey.getUuid());	
 		}
@@ -624,13 +454,13 @@ public class AuthoringUtil implements VoteAppConstants {
 			return null;
 		}
 		
-		VoteAttachmentDTO mcAttachmentDTO= new VoteAttachmentDTO();
-		mcAttachmentDTO.setUid(null);
- 		mcAttachmentDTO.setUuid(nodeKey.getUuid().toString());
- 		mcAttachmentDTO.setFilename(fileName);
- 		mcAttachmentDTO.setOfflineFile(isOfflineFile);
+		VoteAttachmentDTO voteAttachmentDTO= new VoteAttachmentDTO();
+		voteAttachmentDTO.setUid(null);
+ 		voteAttachmentDTO.setUuid(nodeKey.getUuid().toString());
+ 		voteAttachmentDTO.setFilename(fileName);
+ 		voteAttachmentDTO.setOfflineFile(isOfflineFile);
  		
-		return mcAttachmentDTO;
+		return voteAttachmentDTO;
 	}
     
 
@@ -641,20 +471,20 @@ public class AuthoringUtil implements VoteAppConstants {
     	Iterator itList = listOfflineFilesMetaData.iterator();
     	while (itList.hasNext())
         {
-        	VoteUploadedFile mcUploadedFile=(VoteUploadedFile)itList.next();
-        	logger.debug("mcUploadedFile:" + mcUploadedFile);
-        	logger.debug("mcUploadedFile details, uid" + mcUploadedFile.getUid().toString());
-        	logger.debug("mcUploadedFile details, uuid" + mcUploadedFile.getUuid());
-        	logger.debug("mcUploadedFile details, filename" + mcUploadedFile.getFilename());
-        	logger.debug("mcUploadedFile details, isOfflineFile" + !mcUploadedFile.isFileOnline());
+        	VoteUploadedFile voteUploadedFile=(VoteUploadedFile)itList.next();
+        	logger.debug("voteUploadedFile:" + voteUploadedFile);
+        	logger.debug("voteUploadedFile details, uid" + voteUploadedFile.getUid().toString());
+        	logger.debug("voteUploadedFile details, uuid" + voteUploadedFile.getUuid());
+        	logger.debug("voteUploadedFile details, filename" + voteUploadedFile.getFilename());
+        	logger.debug("voteUploadedFile details, isOfflineFile" + !voteUploadedFile.isFileOnline());
         	
-        	VoteAttachmentDTO mcAttachmentDTO= new VoteAttachmentDTO();
-        	mcAttachmentDTO.setUid(mcUploadedFile.getUid().toString());
-     		mcAttachmentDTO.setUuid(mcUploadedFile.getUuid());
-     		mcAttachmentDTO.setFilename(mcUploadedFile.getFilename());
-     		mcAttachmentDTO.setOfflineFile(!mcUploadedFile.isFileOnline());
+        	VoteAttachmentDTO voteAttachmentDTO= new VoteAttachmentDTO();
+        	voteAttachmentDTO.setUid(voteUploadedFile.getUid().toString());
+     		voteAttachmentDTO.setUuid(voteUploadedFile.getUuid());
+     		voteAttachmentDTO.setFilename(voteUploadedFile.getFilename());
+     		voteAttachmentDTO.setOfflineFile(!voteUploadedFile.isFileOnline());
      		
-     		listAttachments.add(mcAttachmentDTO);
+     		listAttachments.add(voteAttachmentDTO);
      		logger.debug("listAttachments after add" + listAttachments);
         }
  		logger.debug("final listAttachments after populating all: " + listAttachments);
@@ -669,9 +499,9 @@ public class AuthoringUtil implements VoteAppConstants {
     	Iterator itList = listFilesMetaData.iterator();
     	while (itList.hasNext())
         {
-    		VoteAttachmentDTO mcAttachmentDTO=(VoteAttachmentDTO)itList.next();
-    		logger.debug("current filename" + mcAttachmentDTO.getFilename());
-     		listFilenames.add(mcAttachmentDTO.getFilename());
+    		VoteAttachmentDTO voteAttachmentDTO=(VoteAttachmentDTO)itList.next();
+    		logger.debug("current filename" + voteAttachmentDTO.getFilename());
+     		listFilenames.add(voteAttachmentDTO.getFilename());
      		logger.debug("listFilenames after add" + listFilenames);
         }
  		logger.debug("final listFilenames after populating all: " + listFilenames);
@@ -773,9 +603,9 @@ public class AuthoringUtil implements VoteAppConstants {
     }
     
     
-    public static void persistFilesMetaData(HttpServletRequest request, boolean isOfflineFile, VoteContent mcContent)
+    public static void persistFilesMetaData(HttpServletRequest request, boolean isOfflineFile, VoteContent voteContent)
     {
-    	IVoteService mcService =VoteUtils.getToolService(request);
+    	IVoteService voteService =VoteUtils.getToolService(request);
 
     	List listFilesMetaData=null;
     	logger.debug("doing persistFilesMetaData...");
@@ -794,21 +624,21 @@ public class AuthoringUtil implements VoteAppConstants {
     	Iterator itListFilesMetaData = listFilesMetaData.iterator();
         while (itListFilesMetaData.hasNext())
         {
-            VoteAttachmentDTO mcAttachmentDTO=(VoteAttachmentDTO)itListFilesMetaData.next();
-        	logger.debug("mcAttachmentDTO:" + mcAttachmentDTO);
-        	String uid=mcAttachmentDTO.getUid();
+            VoteAttachmentDTO voteAttachmentDTO=(VoteAttachmentDTO)itListFilesMetaData.next();
+        	logger.debug("voteAttachmentDTO:" + voteAttachmentDTO);
+        	String uid=voteAttachmentDTO.getUid();
         	logger.debug("uid:" + uid);
         	
-        	String uuid=mcAttachmentDTO.getUuid();
-        	boolean isOnlineFile=!mcAttachmentDTO.isOfflineFile();
-        	String fileName=mcAttachmentDTO.getFilename();
+        	String uuid=voteAttachmentDTO.getUuid();
+        	boolean isOnlineFile=!voteAttachmentDTO.isOfflineFile();
+        	String fileName=voteAttachmentDTO.getFilename();
         	
         	if (uid == null)
         	{
         		logger.debug("persisting files metadata...");
-        		if (!mcService.isUuidPersisted(uuid))
+        		if (!voteService.isUuidPersisted(uuid))
         		{
-        			mcService.persistFile(uuid, isOnlineFile, fileName, mcContent);
+        			voteService.persistFile(uuid, isOnlineFile, fileName, voteContent);
         		}
         	}
         }
@@ -828,8 +658,8 @@ public class AuthoringUtil implements VoteAppConstants {
     	
         while (itList.hasNext())
         {
-            VoteAttachmentDTO mcAttachmentDTO=(VoteAttachmentDTO)itList.next();
-        	String filename=mcAttachmentDTO.getFilename();
+            VoteAttachmentDTO voteAttachmentDTO=(VoteAttachmentDTO)itList.next();
+        	String filename=voteAttachmentDTO.getFilename();
         	logger.debug("extracted filename: " + filename);
         	listFilenames.add(filename);
         }
@@ -838,11 +668,11 @@ public class AuthoringUtil implements VoteAppConstants {
     }
     
     
-    public static void removeRedundantOfflineFileItems(HttpServletRequest request, VoteContent mcContent)
+    public static void removeRedundantOfflineFileItems(HttpServletRequest request, VoteContent voteContent)
     {
-    	IVoteService mcService =VoteUtils.getToolService(request);
+    	IVoteService voteService =VoteUtils.getToolService(request);
     	
-    	List allOfflineFilenames=mcService.retrieveVoteUploadedOfflineFilesName(mcContent.getUid());
+    	List allOfflineFilenames=voteService.retrieveVoteUploadedOfflineFilesName(voteContent.getUid());
     	logger.debug("allOfflineFilenames:" + allOfflineFilenames);
     	
     	List listOfflineFilesMetaData =(List)request.getSession().getAttribute(LIST_OFFLINEFILES_METADATA);
@@ -878,18 +708,18 @@ public class AuthoringUtil implements VoteAppConstants {
             if (matchFound == false)
             {
             	logger.debug("matchFound is false for filename: " + filename);
-            	mcService.removeOffLineFile(filename, mcContent.getUid()); 
+            	voteService.removeOffLineFile(filename, voteContent.getUid()); 
             	logger.debug("filename removed: " + filename);
             }
 		}
     }
     
 
-    public static void removeRedundantOnlineFileItems(HttpServletRequest request, VoteContent mcContent)
+    public static void removeRedundantOnlineFileItems(HttpServletRequest request, VoteContent voteContent)
     {
-    	IVoteService mcService =VoteUtils.getToolService(request);
+    	IVoteService voteService =VoteUtils.getToolService(request);
     	
-    	List allOnlineFilenames=mcService.retrieveVoteUploadedOnlineFilesName(mcContent.getUid());
+    	List allOnlineFilenames=voteService.retrieveVoteUploadedOnlineFilesName(voteContent.getUid());
     	logger.debug("allOnlineFilenames:" + allOnlineFilenames);
     	
     	List listOnlineFilesMetaData =(List)request.getSession().getAttribute(LIST_ONLINEFILES_METADATA);
@@ -926,7 +756,7 @@ public class AuthoringUtil implements VoteAppConstants {
             if (matchFound == false)
             {
             	logger.debug("matchFound is false for filename: " + filename);
-            	mcService.removeOnLineFile(filename, mcContent.getUid()); 
+            	voteService.removeOnLineFile(filename, voteContent.getUid()); 
             	logger.debug("filename removed: " + filename);
             }
 		}
@@ -938,7 +768,7 @@ public class AuthoringUtil implements VoteAppConstants {
      */
     public void simulatePropertyInspector_RunOffline(HttpServletRequest request)
     {
-    	IVoteService mcService =VoteUtils.getToolService(request);
+    	IVoteService voteService =VoteUtils.getToolService(request);
     	
     	String toolContentId=(String)request.getSession().getAttribute(TOOL_CONTENT_ID);
     	if ((toolContentId != null) && (!toolContentId.equals("")))
@@ -946,7 +776,7 @@ public class AuthoringUtil implements VoteAppConstants {
     		logger.debug("passed TOOL_CONTENT_ID : " + new Long(toolContentId));
     		try
 			{
-    			mcService.setAsRunOffline(new Long(toolContentId));	
+    			voteService.setAsRunOffline(new Long(toolContentId));	
 			}
     		catch(ToolException e)
 			{
@@ -965,7 +795,7 @@ public class AuthoringUtil implements VoteAppConstants {
      */
     public void simulatePropertyInspector_setAsDefineLater(HttpServletRequest request)
     {
-    	IVoteService mcService =VoteUtils.getToolService(request);
+    	IVoteService voteService =VoteUtils.getToolService(request);
     	
     	String toolContentId=(String)request.getSession().getAttribute(TOOL_CONTENT_ID);
     	if ((toolContentId != null) && (!toolContentId.equals("")))
@@ -973,7 +803,7 @@ public class AuthoringUtil implements VoteAppConstants {
     		logger.debug("passed TOOL_CONTENT_ID : " + new Long(toolContentId));
     		try
 			{
-    			mcService.setAsDefineLater(new Long(toolContentId));	
+    			voteService.setAsDefineLater(new Long(toolContentId));	
     		}
     		catch(ToolException e)
 			{
@@ -1169,8 +999,7 @@ public class AuthoringUtil implements VoteAppConstants {
         
         boolean isQuestionsSequenced=false;
         boolean isUsernameVisible=false;
-        String reportTitle = voteAuthoringForm.getReportTitle();
-        //String richTextTitle = voteAuthoringForm.getTitle();
+        //String reportTitle = voteAuthoringForm.getReportTitle();
 
         String richTextTitle = request.getParameter("title");
         String richTextInstructions = request.getParameter("instructions");
@@ -1183,21 +1012,37 @@ public class AuthoringUtil implements VoteAppConstants {
         String monitoringReportTitle = voteAuthoringForm.getMonitoringReportTitle();
         logger.debug("monitoringReportTitle: " + monitoringReportTitle);
         
-        String richTextOnlineInstructions = voteAuthoringForm.getOnlineInstructions();
-        logger.debug("richTextOnlineInstructions: " + richTextOnlineInstructions);
+        //String richTextOnlineInstructions = voteAuthoringForm.getOnlineInstructions();
+        //logger.debug("richTextOnlineInstructions: " + richTextOnlineInstructions);
         
         //String richTextInstructions = voteAuthoringForm.getInstructions(); 
-        String richTextOfflineInstructions = voteAuthoringForm.getOfflineInstructions();
-        logger.debug("richTextOfflineInstructions: " + richTextOfflineInstructions);
+        //String richTextOfflineInstructions = voteAuthoringForm.getOfflineInstructions();
+        //logger.debug("richTextOfflineInstructions: " + richTextOfflineInstructions);
         
-        String endLearningMessage = voteAuthoringForm.getEndLearningMessage();
-        logger.debug("endLearningMessage: " + endLearningMessage);
+        //String endLearningMessage = voteAuthoringForm.getEndLearningMessage();
+        //logger.debug("endLearningMessage: " + endLearningMessage);
         
         String questionsSequenced = voteAuthoringForm.getQuestionsSequenced();
         logger.debug("questionsSequenced: " + questionsSequenced);
         
         String usernameVisible = voteAuthoringForm.getUsernameVisible();
         logger.debug("usernameVisible: " + usernameVisible);
+        
+        String retries = voteAuthoringForm.getRetries();
+        logger.debug("retries: " + retries);
+        
+        String richTextReportTitle= (String)request.getSession().getAttribute(RICHTEXT_REPORT_TITLE);
+        String richTextEndLearningMessage=(String)request.getSession().getAttribute(RICHTEXT_END_LEARNING_MSG);
+        logger.debug("richTextReportTitle: " + richTextReportTitle);
+        logger.debug("richTextEndLearningMessage: " + richTextEndLearningMessage);
+        
+        
+        String richTextOfflineInstructions=(String)request.getSession().getAttribute(RICHTEXT_OFFLINEINSTRUCTIONS);
+        logger.debug("richTextOfflineInstructions: " + richTextOfflineInstructions);
+		String richTextOnlineInstructions=(String)request.getSession().getAttribute(RICHTEXT_ONLINEINSTRUCTIONS);
+		logger.debug("richTextOnlineInstructions: " + richTextOnlineInstructions);
+
+
         
         boolean setCommonContent=true; 
         if ((questionsSequenced == null) || (usernameVisible == null))
@@ -1211,6 +1056,7 @@ public class AuthoringUtil implements VoteAppConstants {
 
         boolean questionsSequencedBoolean=false;
         boolean synchInMonitorBoolean=false;
+        boolean retriesBoolean=false;
         boolean usernameVisibleBoolean=false;
         if (setCommonContent)
         {
@@ -1219,6 +1065,9 @@ public class AuthoringUtil implements VoteAppConstants {
             
             if (usernameVisible.equalsIgnoreCase(ON))
             	usernameVisibleBoolean=true;
+            
+            if (retries.equalsIgnoreCase(ON))
+                retriesBoolean=true;
         }
         
         
@@ -1278,19 +1127,16 @@ public class AuthoringUtil implements VoteAppConstants {
         if ((!activeModule.equals(DEFINE_LATER)) && (setCommonContent))
 		{
         	logger.debug("setting other content values...");
-         	voteContent.setUsernameVisible(isUsernameVisible);
-         	voteContent.setQuestionsSequenced(isQuestionsSequenced); /**the default question listing in learner mode will be all in the same page*/
+         	voteContent.setUsernameVisible(usernameVisibleBoolean);
+         	voteContent.setRetries(retriesBoolean);
+         	voteContent.setQuestionsSequenced(questionsSequencedBoolean); /**the default question listing in learner mode will be all in the same page*/
          	voteContent.setOnlineInstructions(richTextOnlineInstructions);
          	voteContent.setOfflineInstructions(richTextOfflineInstructions);
-         	voteContent.setEndLearningMessage(endLearningMessage);
-         	voteContent.setReportTitle(reportTitle);
+         	voteContent.setEndLearningMessage(richTextEndLearningMessage);
+         	voteContent.setReportTitle(richTextReportTitle);
          	voteContent.setMonitoringReportTitle(monitoringReportTitle);
-         	voteContent.setUsernameVisible(usernameVisibleBoolean);
-         	voteContent.setQuestionsSequenced(questionsSequencedBoolean);
-         		
 		}
         
-	
  
         if (newContent)
         {
