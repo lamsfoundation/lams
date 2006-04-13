@@ -75,6 +75,7 @@ package org.lamsfoundation.lams.tool.vote.web;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -563,6 +564,40 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 		
 		logger.debug("final title: " + voteAuthoringForm.getTitle());
 		logger.debug("final ins: " + voteAuthoringForm.getInstructions());
+		
+        //determine the status of radio boxes
+        voteAuthoringForm.setUsernameVisible(voteContent.isUsernameVisible()?ON:OFF);
+        voteAuthoringForm.setRetries(voteContent.isRetries()?ON:OFF);
+        voteAuthoringForm.setQuestionsSequenced(voteContent.isQuestionsSequenced()?ON:OFF);
+        
+        request.getSession().setAttribute(RICHTEXT_REPORT_TITLE, voteContent.getReportTitle());
+        request.getSession().setAttribute(RICHTEXT_END_LEARNING_MSG, voteContent.getEndLearningMessage());
+        
+        request.getSession().setAttribute(RICHTEXT_OFFLINEINSTRUCTIONS, voteContent.getOfflineInstructions());
+        request.getSession().setAttribute(RICHTEXT_ONLINEINSTRUCTIONS, voteContent.getOnlineInstructions());
+        
+        /*process offline files metadata*/
+	    List listOfflineFilesMetaData=voteService.getOfflineFilesMetaData(voteContent.getUid());
+	    logger.debug("existing listOfflineFilesMetaData, to be structured as VoteAttachmentDTO: " + listOfflineFilesMetaData);
+	    listOfflineFilesMetaData=AuthoringUtil.populateMetaDataAsAttachments(listOfflineFilesMetaData);
+	    logger.debug("populated listOfflineFilesMetaData: " + listOfflineFilesMetaData);
+	    request.getSession().setAttribute(LIST_OFFLINEFILES_METADATA, listOfflineFilesMetaData);
+	    
+	    List listUploadedOfflineFileNames=AuthoringUtil.populateMetaDataAsFilenames(listOfflineFilesMetaData);
+	    logger.debug("returned from db listUploadedOfflineFileNames: " + listUploadedOfflineFileNames);
+	    request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILENAMES, listUploadedOfflineFileNames);
+	    
+	    /*process online files metadata*/
+	    List listOnlineFilesMetaData=voteService.getOnlineFilesMetaData(voteContent.getUid());
+	    logger.debug("existing listOnlineFilesMetaData, to be structured as VoteAttachmentDTO: " + listOnlineFilesMetaData);
+	    listOnlineFilesMetaData=AuthoringUtil.populateMetaDataAsAttachments(listOnlineFilesMetaData);
+	    logger.debug("populated listOnlineFilesMetaData: " + listOnlineFilesMetaData);
+	    request.getSession().setAttribute(LIST_ONLINEFILES_METADATA, listOnlineFilesMetaData);
+	    
+	    List listUploadedOnlineFileNames=AuthoringUtil.populateMetaDataAsFilenames(listOnlineFilesMetaData);
+	    logger.debug("returned from db listUploadedOnlineFileNames: " + listUploadedOnlineFileNames);
+	    request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILENAMES, listUploadedOnlineFileNames);
+
 		
 		/*
 		 * load nominations page
