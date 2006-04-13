@@ -1,15 +1,8 @@
 <%@ include file="/common/taglibs.jsp" %>
 <html>
 <head>
-	<c:set var="lams"><lams:LAMSURL /></c:set>
-	<c:set var="ctxPath" value="${pageContext.request.contextPath}" scope="request"/>
-	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
-	<!-- depending on user / site preference this will get changed probbably use passed in variable from flash to select which one to use-->
-    <link href="<html:rewrite page='/includes/css/aqua.css'/>" rel="stylesheet" type="text/css">
-	<!-- this is the custom CSS for hte tool -->
-	<link href="<html:rewrite page='/includes/css/tool_custom.css'/>" rel="stylesheet" type="text/css">
-	<link href="<html:rewrite page='/includes/css/rsrc.css'/>" rel="stylesheet" type="text/css">
-	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/prototype.js'/>"></script>
+    <%@ include file="/common/header.jsp" %>
+    
 	<script type="text/javascript">
 	   <%-- user for  rsrcresourceitem.js --%>
 	   var removeInstructionUrl = "<c:url value='/authoring/removeInstruction.do'/>";

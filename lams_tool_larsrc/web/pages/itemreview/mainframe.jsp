@@ -21,5 +21,5 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ include file="/common/taglibs.jsp" %>
 <frameset rows="150,*" frameborder="no">
 	<frame src="<c:url value="/pages/itemreview/instructionsnav.jsp"/>" name=headerFrame" marginheight="0" scrolling="NO">
-	<frame src="<c:url value='${resourceItemReviewUrl}'/>" name="contentFrame" marginheight="0" scrolling="YES">
+	<frame src="<c:url value='${resourceItemReviewUrl}'/>" name="resourceFrame" marginheight="0" scrolling="YES">
 </frameset>

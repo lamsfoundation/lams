@@ -1,22 +1,11 @@
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="lams">
-	<lams:LAMSURL />
-</c:set>
-<c:set var="tool">
-	<lams:WebAppURL />
-</c:set>
-<c:set var="formBean" value="<%= session.getAttribute("instructionNavForm") %>" />
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 	<head>
 		<title>${formBean.title}</title>
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<!-- depending on user / site preference this will get changed probbably use passed in variable from flash to select which one to use-->
-		<link href="<html:rewrite page='/includes/css/aqua.css'/>" rel="stylesheet" type="text/css">
-		<!-- this is the custom CSS for hte tool -->
-		<link href="<html:rewrite page='/includes/css/tool_custom.css'/>" rel="stylesheet" type="text/css">
-		<link href="<html:rewrite page='/includes/css/rsrc.css'/>" rel="stylesheet" type="text/css">
+	
+		<%@ include file="/common/header.jsp"%>
 		<script language="JavaScript" type="text/JavaScript">
 <!--
 		

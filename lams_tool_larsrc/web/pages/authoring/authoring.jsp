@@ -1,9 +1,6 @@
 <%@ include file="/common/taglibs.jsp" %>
 <%@ page import="java.util.HashSet" %>
 <%@ page import="java.util.Set" %>
-
-<c:set var="lams"><lams:LAMSURL/></c:set>
-<c:set var="tool"><lams:WebAppURL/></c:set>
     <% 
     	
 		Set tabs = new HashSet();
@@ -18,22 +15,9 @@
 <head>
 	<title><fmt:message key="label.author.title"/></title>
 	
-	<!-- depending on user / site preference this will get changed probbably use passed in variable from flash to select which one to use-->
-    <link href="<html:rewrite page='/includes/css/aqua.css'/>" rel="stylesheet" type="text/css">
-	<!-- this is the custom CSS for hte tool -->
-	<link href="<html:rewrite page='/includes/css/tool_custom.css'/>" rel="stylesheet" type="text/css">
-    <link href="<html:rewrite page='/includes/css/fckeditor_style.css'/>" rel="stylesheet" type="text/css">
-	<link href="<html:rewrite page='/includes/css/rsrc.css'/>" rel="stylesheet" type="text/css">
-
- 	<!-- ******************** FCK Editor related javascript & HTML ********************** -->
-    <script type="text/javascript" src="${lams}fckeditor/fckeditor.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
-	
-    <script type="text/javascript" src="<html:rewrite page='/includes/javascript/fckcontroller.js'/>"></script>
-    <script type="text/javascript" src="<html:rewrite page='/includes/javascript/tabcontroller.js'/>"></script>    
-	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/prototype.js'/>"></script>
-	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/rsrccommon.js'/>"></script>
-
+    <%@ include file="/common/header.jsp" %>
+    <%@ include file="/common/fckeditorheader.jsp" %>
+    
     <script>
     
     	var imgRoot="${lams}images/";
