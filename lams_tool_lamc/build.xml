@@ -444,5 +444,14 @@
 				</junitreport>
 
 			</target>
-	
+
+	   <!-- =================================  -->
+	   <!--       target: convert UTF-8 language files to Java properties files using native2ascii -->
+	   <!-- ================================= -->
+	    <target name="native2ascii" 
+	    	description="convert UTF-8 language files to Java properties files using native2ascii">
+			<native2ascii encoding="UTF-8" src="${conf.language.dir}" dest="${conf.language.dir}"
+			   includes="*.txt" ext=".properties"/>
+	    </target>
+
 </project>
