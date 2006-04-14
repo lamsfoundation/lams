@@ -189,10 +189,6 @@
 				inheritAll="false" >
 			<property name="jboss.deploy" location="${jboss.deploy}"/>
 		</ant>
-<!--		<ant antfile="../${tool_imscp_dir}/build.xml" target="deploy-tool"
-				inheritAll="false" >
-			<property name="jboss.deploy" location="${jboss.deploy}"/>
-		</ant>-->
 		<ant antfile="../${tool_lamc_dir}/build.xml" target="deploy-tool"
 				inheritAll="false" >
 			<property name="jboss.deploy" location="${jboss.deploy}"/>
