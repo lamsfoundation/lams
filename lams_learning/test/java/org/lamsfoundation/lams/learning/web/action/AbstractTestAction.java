@@ -46,7 +46,7 @@ public class AbstractTestAction extends AbstractLamsStrutsTestCase {
     protected String getContextConfigLocation()
     {
         return "/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml "
-  			   +"/org/lamsfoundation/lams/tool/toolApplicationContext.xml "
+  			   +"/org/lamsfoundation/lams/toolApplicationContext.xml "
   			   +"/org/lamsfoundation/lams/localApplicationContext.xml ";
     }
     /**

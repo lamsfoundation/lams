@@ -1,1 +1,1 @@
-Class-Path: ./lams.jar ./lams-learning.jar ./lams-tool-lafrum11.jar ./lams-tool-laicp10.jar ./lams-tool-lamc11.jar ./lams-tool-lanb11.jar ./lams-tool-laqa11.jar ./lams-tool-lasbmt11.jar ./lams-tool-lasr10.jar ./lams-tool-lachat11.jar ./lams-tool-larsrc11.jar ./lams-tool-vote11.jar
+Class-Path: ./lams.jar ./lams-learning.jar 

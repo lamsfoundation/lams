@@ -108,7 +108,7 @@ public class TestExportPortfolioService extends AbstractLamsTestCase  {
     {
         return new String[] { "classpath:/org/lamsfoundation/lams/localApplicationContext.xml",
                 "classpath:/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml",
-                "classpath:/org/lamsfoundation/lams/tool/toolApplicationContext.xml",
+                "classpath:/org/lamsfoundation/lams/toolApplicationContext.xml",
                 "classpath:/org/lamsfoundation/lams/learning/learningApplicationContext.xml",
                 "classpath:*/applicationContext.xml"};
     }
