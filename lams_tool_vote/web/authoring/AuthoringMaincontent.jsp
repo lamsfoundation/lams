@@ -63,9 +63,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<script language="JavaScript" type="text/JavaScript">
 
-		function submitModifyQuestion(questionIndexValue, actionMethod) 
+		function submitModifyOption(optionIndexValue, actionMethod) 
 		{
-			document.VoteAuthoringForm.questionIndex.value=questionIndexValue; 
+			document.VoteAuthoringForm.optIndex.value=optionIndexValue; 
 			submitMethod(actionMethod);
 		}
 		
@@ -105,11 +105,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
             else
                 selectTab(1); //select the default tab;
             
+            initEditor("richTextOfflineInstructions");                                    
+            initEditor("richTextOnlineInstructions");                                    
+            
+            initEditor("richTextReportTitle");            
+            initEditor("richTextEndLearningMsg");                        
+            
             initEditor("title");
             initEditor("instructions");
             initEditor("posting");            
+            
             initEditor("optionContent0");
-           
             <c:set var="optIndex" scope="session" value="1"/>
             <c:forEach var="questionEntry" items="${sessionScope.mapOptionsContent}">
                 <c:set var="optIndex" scope="session" value="${optIndex +1}"/>

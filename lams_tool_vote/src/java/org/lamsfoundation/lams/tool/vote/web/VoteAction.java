@@ -148,6 +148,15 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 	    
 	    mapOptionsContent=(Map)request.getSession().getAttribute(MAP_OPTIONS_CONTENT);
 	    logger.debug("final mapOptionsContent: " + mapOptionsContent);
+
+	    int maxIndex=mapOptionsContent.size();
+    	request.getSession().setAttribute(MAX_OPTION_INDEX, new Integer(maxIndex));
+    	logger.debug("MAX_OPTION_INDEX: " +  request.getSession().getAttribute(MAX_OPTION_INDEX));
+    	
+    	String firstEntry=(String)mapOptionsContent.get("1");
+    	logger.debug("firstEntry: " +  firstEntry);
+    	request.getSession().setAttribute(DEFAULT_OPTION_CONTENT, firstEntry);
+    	
 	    return (mapping.findForward(LOAD_QUESTIONS));
     }
 
@@ -171,6 +180,14 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 	    mapOptionsContent=(Map)request.getSession().getAttribute(MAP_OPTIONS_CONTENT);
 	    logger.debug("final mapOptionsContent: " + mapOptionsContent);
 	    
+        int maxIndex=mapOptionsContent.size();
+    	request.getSession().setAttribute(MAX_OPTION_INDEX, new Integer(maxIndex));
+    	logger.debug("MAX_OPTION_INDEX: " +  request.getSession().getAttribute(MAX_OPTION_INDEX));
+    	
+    	String firstEntry=(String)mapOptionsContent.get("1");
+    	logger.debug("firstEntry: " +  firstEntry);
+    	request.getSession().setAttribute(DEFAULT_OPTION_CONTENT, firstEntry);
+    	
 	    return (mapping.findForward(LOAD_QUESTIONS));
     }
 
@@ -193,6 +210,15 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 	    AuthoringUtil authoringUtil= new AuthoringUtil();
 	    Map mapOptionsContent=(Map)request.getSession().getAttribute(MAP_OPTIONS_CONTENT);
 	    logger.debug("mapOptionsContent :" +mapOptionsContent);
+	    
+        int maxIndex=mapOptionsContent.size();
+    	request.getSession().setAttribute(MAX_OPTION_INDEX, new Integer(maxIndex));
+    	logger.debug("MAX_OPTION_INDEX: " +  request.getSession().getAttribute(MAX_OPTION_INDEX));
+    	
+    	String firstEntry=(String)mapOptionsContent.get("1");
+    	logger.debug("firstEntry: " +  firstEntry);
+    	request.getSession().setAttribute(DEFAULT_OPTION_CONTENT, firstEntry);
+
 	    
 	    if (mapOptionsContent == null)
 	        mapOptionsContent= new TreeMap(new VoteComparator());
@@ -268,6 +294,123 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 	    
 	    voteAuthoringForm.resetUserAction();
 	    return mapping.findForward(LOAD_QUESTIONS);
+    }
+
+    
+    public ActionForward moveOptionDown(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+    {
+    	VoteUtils.cleanUpUserExceptions(request);
+    	logger.debug("dispatching moveOptionDown...");
+    	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
+    	
+    	VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
+	 	IVoteService voteService =VoteUtils.getToolService(request);
+
+		/* determine whether the request is from Monitoring url Edit Activity*/
+		String sourceVoteStarter = (String) request.getAttribute(SOURCE_VOTE_STARTER);
+		logger.debug("sourceVoteStarter: " + sourceVoteStarter);
+		String destination=VoteUtils.getDestination(sourceVoteStarter);
+		logger.debug("destination: " + destination);
+
+		VoteUtils.persistRichText(request);
+	 	
+    	Map mapOptionsContent=AuthoringUtil.repopulateMap(request, "optionContent");
+     	logger.debug("mapOptionsContent before move down: " + mapOptionsContent);
+     	logger.debug("mapOptionsContent size move down: " + mapOptionsContent.size());
+
+     	//perform a move down if there are at least 2 questions
+     	if (mapOptionsContent.size() > 1)
+     	{
+     		String optIndex =voteAuthoringForm.getOptIndex();
+        	logger.debug("optIndex:" + optIndex);
+        	String movableOptionEntry=(String)mapOptionsContent.get(optIndex);
+        	logger.debug("movableOptionEntry:" + movableOptionEntry);
+        	
+        	if (movableOptionEntry != null && (!movableOptionEntry.equals("")))
+        	{
+        	    mapOptionsContent= AuthoringUtil.shiftMap(mapOptionsContent, optIndex,movableOptionEntry,  "down");
+            	logger.debug("mapOptionsContent after move down: " + mapOptionsContent);
+            	request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
+            	logger.debug("updated Options Map: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT));
+        	}
+     	}
+    	
+    	voteAuthoringForm.resetUserAction();
+        
+    	mapOptionsContent=(Map)request.getSession().getAttribute(MAP_OPTIONS_CONTENT);
+    	logger.debug("mapOptionsContent: " + mapOptionsContent);
+        int maxIndex=mapOptionsContent.size();
+    	request.getSession().setAttribute(MAX_OPTION_INDEX, new Integer(maxIndex));
+    	logger.debug("MAX_OPTION_INDEX: " +  request.getSession().getAttribute(MAX_OPTION_INDEX));
+    	
+    	String firstEntry=(String)mapOptionsContent.get("1");
+    	logger.debug("firstEntry: " +  firstEntry);
+    	request.getSession().setAttribute(DEFAULT_OPTION_CONTENT, firstEntry);
+
+        return (mapping.findForward(destination));	
+    }
+
+
+    
+    public ActionForward moveOptionUp(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+    {
+    	VoteUtils.cleanUpUserExceptions(request);
+    	logger.debug("dispatching moveOptionUp...");
+    	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
+    	
+    	VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
+	 	IVoteService voteService =VoteUtils.getToolService(request);
+
+		/* determine whether the request is from Monitoring url Edit Activity*/
+		String sourceVoteStarter = (String) request.getAttribute(SOURCE_VOTE_STARTER);
+		logger.debug("sourceVoteStarter: " + sourceVoteStarter);
+		String destination=VoteUtils.getDestination(sourceVoteStarter);
+		logger.debug("destination: " + destination);
+
+		VoteUtils.persistRichText(request);
+	 	
+    	Map mapOptionsContent=AuthoringUtil.repopulateMap(request, "optionContent");
+     	logger.debug("mapOptionsContent before move down: " + mapOptionsContent);
+     	logger.debug("mapOptionsContent size move down: " + mapOptionsContent.size());
+
+     	//perform a move down if there are at least 2 questions
+     	if (mapOptionsContent.size() > 1)
+     	{
+     		String optIndex =voteAuthoringForm.getOptIndex();
+        	logger.debug("optIndex:" + optIndex);
+        	String movableOptionEntry=(String)mapOptionsContent.get(optIndex);
+        	logger.debug("movableOptionEntry:" + movableOptionEntry);
+        	
+        	if (movableOptionEntry != null && (!movableOptionEntry.equals("")))
+        	{
+        	    mapOptionsContent= AuthoringUtil.shiftMap(mapOptionsContent, optIndex,movableOptionEntry,  "up");
+            	logger.debug("mapOptionsContent after move down: " + mapOptionsContent);
+            	request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
+            	logger.debug("updated Options Map: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT));
+        	}
+     	}
+    	
+    	voteAuthoringForm.resetUserAction();
+    	
+    	mapOptionsContent=(Map)request.getSession().getAttribute(MAP_OPTIONS_CONTENT);
+    	logger.debug("mapOptionsContent: " + mapOptionsContent);
+        int maxIndex=mapOptionsContent.size();
+    	request.getSession().setAttribute(MAX_OPTION_INDEX, new Integer(maxIndex));
+    	logger.debug("MAX_OPTION_INDEX: " +  request.getSession().getAttribute(MAX_OPTION_INDEX));
+
+    	String firstEntry=(String)mapOptionsContent.get("1");
+    	logger.debug("firstEntry: " +  firstEntry);
+    	request.getSession().setAttribute(DEFAULT_OPTION_CONTENT, firstEntry);
+    	
+        return (mapping.findForward(destination));	
     }
 
     

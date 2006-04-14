@@ -77,7 +77,7 @@ public interface VoteAppConstants {
 	public static final String TOOL_CONTENT_UID							= "toolContentUID";
 	public static final String TOOL_SESSION_ID 							= "toolSessionID"; 
 	public static final String USER_ID 									= "userID";
-    public static final String MAX_QUESTION_INDEX 						= "maxQuestionIndex";
+    public static final String MAX_OPTION_INDEX 						= "maxOptionIndex";
     public static final String COPY_TOOL_CONTENT 						= "copyToolContent";
     public static final String REMOVE_TOOL_CONTENT 						= "removeToolContent";
     
@@ -100,6 +100,7 @@ public interface VoteAppConstants {
     public static final String MAP_QUESTIONS_CONTENT					="mapQuestionsContent";
     public static final String MAP_QUESTION_CONTENT						="mapQuestionContent";
     public static final String MAP_OPTIONS_CONTENT						="mapOptionsContent";
+    public static final String MAP_OPTIONS_CONTENT_FCK					="mapOptionsContentFck";
     public static final String MAP_DEFAULTOPTIONS_CONTENT				="mapDefaultOptionsContent";
     public static final String MAP_DISABLED_QUESTIONS					="mapDisabledQuestions";
     public static final String MAP_GENERAL_OPTIONS_CONTENT				="mapGeneralOptionsContent";

@@ -190,6 +190,12 @@ public class AuthoringUtil implements VoteAppConstants {
     	logger.debug("parameterType: " + parameterType);
     	
     	long mapCounter=0;
+    	String optionContent0=request.getParameter("optionContent0");
+    	logger.debug("optionContent0: " + optionContent0);
+		mapCounter++;
+    	mapTempQuestionsContent.put(new Long(mapCounter).toString(), optionContent0);
+    	
+    	
     	for (long i=1; i <= MAX_QUESTION_COUNT ; i++)
 		{
 			String candidateEntry =request.getParameter(parameterType + i);
@@ -308,6 +314,64 @@ public class AuthoringUtil implements VoteAppConstants {
 	   return false;
 	}
 	
+	
+    public static Map shiftMap(Map mapOptionsContent, String optIndex , String movableOptionEntry, String direction)
+    {
+    	logger.debug("movableOptionEntry: " +  movableOptionEntry);
+    	/* map to be returned */
+    	Map mapTempOptionsContent= new TreeMap(new VoteComparator());
+    	
+    	String shiftableEntry=null;
+    	
+    	int shiftableIndex=0;
+    	if (direction.equals("down"))
+        {
+    		logger.debug("moving map down");
+    		shiftableIndex=new Integer(optIndex).intValue() + 1;
+        }
+    	else
+    	{
+    		logger.debug("moving map up");
+    		shiftableIndex=new Integer(optIndex).intValue() - 1;
+    	}
+    		
+		logger.debug("shiftableIndex: " +  shiftableIndex);
+    	shiftableEntry=(String)mapOptionsContent.get(new Integer(shiftableIndex).toString());
+    	logger.debug("shiftable entry: " +  shiftableEntry);
+    	
+    	if (shiftableEntry != null) 
+    	{
+    		Iterator itQuestionsMap = mapOptionsContent.entrySet().iterator();
+    		long mapCounter=0;
+    		while (itQuestionsMap.hasNext()) {
+            	Map.Entry pairs = (Map.Entry)itQuestionsMap.next();
+                logger.debug("comparing the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
+                mapCounter++;
+                logger.debug("mapCounter: " +  mapCounter);
+                
+                if (!pairs.getKey().equals(optIndex) && !pairs.getKey().equals(new Integer(shiftableIndex).toString()))
+                {
+                	logger.debug("normal copy " +  optIndex);
+                	mapTempOptionsContent.put(new Long(mapCounter).toString(), pairs.getValue());
+                }
+                else if (pairs.getKey().equals(optIndex))
+                {
+                	logger.debug("move type 1 " +  optIndex);
+                	mapTempOptionsContent.put(new Long(mapCounter).toString(), shiftableEntry);
+                }
+                else if (pairs.getKey().equals(new Integer(shiftableIndex).toString()))
+                {
+                    mapTempOptionsContent.put(new Long(mapCounter).toString(), movableOptionEntry);
+                }
+            }
+    	}
+    	else
+    	{
+    	    mapTempOptionsContent=mapOptionsContent;
+    	}
+    		return mapTempOptionsContent;
+    }
+
 	
 	public static boolean isOptionSelectedInMap(String optionText, Map currentOptionsMap)
 	{

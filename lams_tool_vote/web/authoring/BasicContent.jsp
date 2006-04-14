@@ -78,6 +78,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							<td NOWRAP valign=top>
 								<lams:SetEditor id="optionContent0" text="${defaultOptionContent}" small="true"/>								
 							</td> 
+							
+						  	<td NOWRAP valign=middle>			
+								 <font size=2>  <img src="<c:out value="${tool}"/>images/down.gif" align=left onclick="javascript:submitModifyOption('1','moveOptionDown');"> </font>
+							</td> 								 
+							
 					  	</tr>
 		
 				  	<!--end of default Option content -->
@@ -108,8 +113,19 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 												<bean:message key="button.delete"/>
 											</html:submit>
 										</c:if> 													
-										
                                     </td>
+	      						  	<td NOWRAP valign=middle>			
+						  				<c:if test="${maxOptionIndex == optIndex}"> 			
+		     								 <font size=2> <img src="<c:out value="${tool}"/>images/up.gif" align=left onclick="javascript:submitModifyOption('<c:out value="${optIndex}"/>','moveOptionUp');"> </font>
+		     							</c:if> 	    
+										
+		 				  				<c:if test="${maxOptionIndex != optIndex }"> 			
+			 				  				<font size=2>
+			   								    <img src="<c:out value="${tool}"/>images/down.gif" align=left onclick="javascript:submitModifyOption('<c:out value="${optIndex}"/>','moveOptionDown');">		  	   								 
+			       								<img src="<c:out value="${tool}"/>images/up.gif" align=left onclick="javascript:submitModifyOption('<c:out value="${optIndex}"/>','moveOptionUp');">		  	
+			       							</font>
+										</c:if> 	           								 
+		                         	</td>
 								  </tr>
 							</c:if> 			
 						</c:forEach>

@@ -552,7 +552,7 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 	    		 */
 	    		if (mapIndex.longValue() == 1)
 	    		{
-	    		    request.getSession().setAttribute(DEFAULT_QUESTION_CONTENT, voteQueContent.getQuestion());
+	    		    request.getSession().setAttribute(DEFAULT_OPTION_CONTENT, voteQueContent.getQuestion());
 	    		}
 	    		
 	    		mapIndex=new Long(mapIndex.longValue()+1);
@@ -561,6 +561,11 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 		logger.debug("Map initialized with existing contentid to: " + mapOptionsContent);
 		request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
 		logger.debug("starter initialized the Comparable Map: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT) );
+		
+		int maxIndex=mapOptionsContent.size();
+    	request.getSession().setAttribute(MAX_OPTION_INDEX, new Integer(maxIndex));
+    	logger.debug("MAX_OPTION_INDEX: " +  request.getSession().getAttribute(MAX_OPTION_INDEX));
+    	
 		
 		logger.debug("final title: " + voteAuthoringForm.getTitle());
 		logger.debug("final ins: " + voteAuthoringForm.getInstructions());

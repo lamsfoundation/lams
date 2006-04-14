@@ -95,4 +95,4 @@ CREATE TABLE tl_vote11_uploadedfile (
 
 INSERT INTO tl_vote11_content(uid, content_id , title , instructions , posting, creation_date , questions_sequenced , username_visible , created_by , monitoring_report_title , report_title , run_offline , define_later, offline_instructions, online_instructions, end_learning_message, content_in_use, retries,  show_report) VALUES (1, ${default_content_id} ,'Voting Title','Voting Instructions', 'sample posting', NOW(), 0, 0,1,'Voting Report','Report', 0, 0, 'offline instructions','online instructions','Finished Activity...', 0, 0, 0);
 
-INSERT INTO tl_vote11_que_content  (uid,question,  display_order, vote_content_id) VALUES (1, 'sample posting', 1, 1);
+INSERT INTO tl_vote11_que_content  (uid,question,  display_order, vote_content_id) VALUES (1, 'sample nomination', 1, 1);
