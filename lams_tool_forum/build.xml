@@ -347,12 +347,14 @@
 			dbDriverUrl="${db.url}"
 			dbDriverClass="com.mysql.jdbc.Driver"
 			deployFiles="${build.lib}/${product}.war,${build.lib}/${product}.jar"
+			toolJarFileName="${product}.jar"
 			toolSignature="${signature}"
 			toolTablesScriptPath="${db.scripts}/create_lams_tool_forum.sql"
 			toolTablesDeleteScriptPath="${db.scripts}/drop_lams_tool_forum.sql"
 			toolActivityInsertScriptPath="${db.scripts}/activity_insert.sql"
 			toolLibraryInsertScriptPath="${db.scripts}/library_insert.sql"
 			toolInsertScriptPath="${db.scripts}/tool_insert.sql"
+			toolApplicationContextPath="/org/lamsfoundation/lams/tool/forum/forumApplicationContext.xml"
 			lamsEarPath="${jboss.deploy}"
 			toolContext="${toolContext}"
 			toolWebUri="${product}.war"
@@ -447,6 +449,15 @@
 	    		<include name="**/*.xml"/>
 	    	</fileset>
         </copy>
+    </target>
+
+    <!-- ================================= 
+          target: convert UTF-8 language files to Java properties files using native2ascii
+         ================================= -->
+    <target name="native2ascii" 
+    	description="convert UTF-8 language files to Java properties files using native2ascii">
+		<native2ascii encoding="UTF-8" src="${conf.language.dir}" dest="${conf.language.dir}"
+		   includes="*.txt" ext=".properties"/>
     </target>
 
 	<!-- end tasks **************************************************************************************************-->
