@@ -36,7 +36,7 @@ public class BaseTest extends AbstractLamsTestCase {
 	protected String[] getContextConfigLocation() {
 		return new String[] {"org/lamsfoundation/lams/localApplicationContext.xml",
 				 "org/lamsfoundation/lams/contentrepository/applicationContext.xml",
-				 "org/lamsfoundation/lams/tool/toolApplicationContext.xml",
+				 "org/lamsfoundation/lams/toolApplicationContext.xml",
 				 "org/lamsfoundation/lams/lesson/lessonApplicationContext.xml",
 				 "org/lamsfoundation/lams/learning/learningApplicationContext.xml",	
 				 "org/lamsfoundation/lams/tool/forum/forumApplicationContext.xml"};

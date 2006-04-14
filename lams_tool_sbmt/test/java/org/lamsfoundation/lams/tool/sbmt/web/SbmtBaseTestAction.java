@@ -46,7 +46,7 @@ public class SbmtBaseTestAction extends MockStrutsTestCase {
 				 "org/lamsfoundation/lams/contentrepository/applicationContext.xml,"+
 				 "org/lamsfoundation/lams/lesson/lessonApplicationContext.xml,"+
 				 "org/lamsfoundation/lams/learning/learningApplicationContext.xml,"+	
-				 "org/lamsfoundation/lams/tool/toolApplicationContext.xml,");
+				 "org/lamsfoundation/lams/toolApplicationContext.xml,");
         ctxLoader.initWebApplicationContext(context);
 	}
 }

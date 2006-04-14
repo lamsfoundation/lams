@@ -62,7 +62,7 @@ public class TestMonitoringAction extends AbstractLamsStrutsTestCase
     {
         return 	"/org/lamsfoundation/lams/localApplicationContext.xml "+
 		"/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml "+
-		"/org/lamsfoundation/lams/tool/toolApplicationContext.xml "+
+		"/org/lamsfoundation/lams/toolApplicationContext.xml "+
   		"/org/lamsfoundation/lams/learning/learningApplicationContext.xml "+        					  
   		"/org/lamsfoundation/lams/authoring/authoringApplicationContext.xml "+
   		"/org/lamsfoundation/lams/monitoring/monitoringApplicationContext.xml "+

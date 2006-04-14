@@ -76,7 +76,7 @@ public class TestGateAction extends AbstractLamsStrutsTestCase
     {
         return 	"/org/lamsfoundation/lams/localApplicationContext.xml "+
 		"/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml "+
-		"/org/lamsfoundation/lams/tool/toolApplicationContext.xml "+
+		"/org/lamsfoundation/lams/toolApplicationContext.xml "+
   		"/org/lamsfoundation/lams/learning/learningApplicationContext.xml "+        					  
   		"/org/lamsfoundation/lams/authoring/authoringApplicationContext.xml "+
   		"/org/lamsfoundation/lams/monitoring/monitoringApplicationContext.xml "+
@@ -90,7 +90,7 @@ public class TestGateAction extends AbstractLamsStrutsTestCase
 		+"/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml "
 		+"/WEB-INF/spring/authoringApplicationContext.xml "
 		+"/WEB-INF/spring/learningApplicationContext.xml "
-		+"/org/lamsfoundation/lams/tool/toolApplicationContext.xml "
+		+"/org/lamsfoundation/lams/toolApplicationContext.xml "
 		+"/org/lamsfoundation/lams/tool/survey/dataAccessContext.xml "
 		+"/org/lamsfoundation/lams/tool/survey/surveyApplicationContext.xml";
     } */
