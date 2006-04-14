@@ -1,0 +1,100 @@
+appName = submitfiles 
+#language code: bg 
+#locale code:  
+
+ # CVS ID: $Id$ Exported from the LAMS Community by Fiona Malikoff on Fri Apr 14 07:52:25 GMT 2006 
+ 
+#=================== labels for Submit Files =================# 
+
+label.authoring.offline.instruction  =Офлайн инструкции
+label.authoring.heading.advance.desc  =Моля въведете опции за напреднали за изпращане
+submit.successful  =Съдържанието бе създадено успешно.
+label.authoring.heading.advance  =Напреднал
+submit.modenotsupported  =Режимът "{0}", който заявихте не се поддържа
+label.authoring.heading.instructions.desc  =Моля въведете онлайн и офлайн инструкции
+label.learner.uploadMessage  =Файловете могат да бъдат качвани на сървъра само един по един - максимален размер 1.0 MB
+learner.finish.without.upload  =Няма качени файлове на сървъра. Файловете не могат да се качат на сървъра, когато веднъж изберете ДА.
+label.monitoring.heading.userlist  =Резюме
+sbmt.web.action.upload.exception  =Качването на файл на сървъра пропадна.
+error.read.only.mode  =Режим само за четене, функцията не може да бъде завършена
+label.learner.comments  =Коментари
+monitoring.statistic.marked  =Оценени файлове:
+errors.maxfilesize  =Качваният на сървъра файл надхвърля максимално допустимият размер от {0} байта
+page.title.mark1.userlist  =Отчет на оценяването
+label.authoring.upload.offline.button  =Качване на сървъра в офлайн режим
+label.authoring.online.filelist  =Списък с онлайн файловете
+label.monitoring.Mark.button  =Оценка
+label.authoring.offline.delete  =Изтриване
+activity.title  =Изпращане на файл до сървъра
+activity.description  =Обучаемите изпращат файлове до сървъра за оценяване от преподавателя. Постиженията и коментарите могат да бъдат изнесени като фаилове на Ексел.
+activity.helptext  =Обучаемите изпращат файлове до сървъра за оценяване от преподавателя. Постиженията и коментарите за всеки обучаем се записват и могат да бъдат изнесени като файлове на Ексел.
+tool.display.name  =Инструмент на изпращане на файл до сървъра
+tool.description  =Инструмент за обучаеми да изпращат файлове за оценяване от преподавателя.
+label.view  =Преглед
+label.download  =Изтегляне от сървъра
+label.save  =Запаметяване
+label.cancel  =Отказване
+label.authoring.heading  =Изпращане на файл до сървъра
+label.authoring.heading.basic  =Основен
+errors.suffix  =
+errors.prefix  =
+label.authoring.online.instruction  =Онлайн инструкции
+errors.header  =
+label.authoring.basic.title  =Заглавие
+submit.upload.twice  =Вие вече качвате този файл на сървъра, моля изчакайте малко.
+monitoring.download.error  =Изтеглянето от сървъра пропадна поради следната причина: {0}
+label.learner.notAvailable  =Недостъпен
+monitoring.statistic.total.uploaded.file  =Всичко качени на сървъра файлове
+label.monitoring.heading.instructions.desc  =Онлайн и офлайн инструкции
+label.learner.marks  =Оценки
+label.authoring.upload.online.button  =Качване на сървъра в онлайн режим
+authoring.exception  =Има проблем с изпращането на съдържанието, причината е {0}
+label.learner.fileName  =Име на файла
+label.monitoring.updateMarks.button  =Обновяване на оценките
+label.authoring.basic.instruction  =Инструкция
+learner.form.filepath.displayname  =Качване на името на файл на сървъра
+label.authoring.heading.instructions  =Инструкции
+label.learner.noUpload  =Все още няма качени файлове на сървъра.
+label.authoring.heading.basic.desc  =Основна информация за въвеждане при изпращане
+label.monitoring.heading  =Мониторинг
+label.monitoring.heading.userlist.desc  =Описание на списъка с потребители
+label.learner.dateMarksReleased  =Данните за оценки са обявени
+label.monitoring.heading.instructions  =Инструкции
+label.monitoring.heading.edit.activity  =Редактиранре на учебната дейност
+monitoring.statistic.not.marked  =Неоценени файлове:
+label.authoring.save.button  =Запамети
+label.learner.dateOfSubmission  =Дата на изпращане
+label.authoring.cancel.button  =Отказване
+label.monitoring.heading.marking  =Оценяване
+label.authoring.choosefile.button  =Изберете файл
+label.monitoring.heading.marking.desc  =Описание на оценяването
+label.monitoring.needMarking  =Файлът(овете) се нуждаят от оценяване
+label.monitoring.done.button  =Готово
+label.authoring.offline.filelist  =Списък с офлайн файловете
+label.monitoring.viewAllMarks.button  =Прегледайте всички оценки
+label.authoring.online.delete  =Изтриване
+label.monitoring.downloadMarks.button  =Изтегляне на оценките от сървъра
+monitoring.statistic.title  =Статистика от проследяването
+label.authoring.offline.file  =Качване на файл в офлайн режим
+label.learner.time  =Време за качване на сървъра
+label.monitoring.heading.stats  =Статистики
+label.monitoring.edit.activity.update  =Обновяване на учебна дейност
+label.monitoring.releaseMarks.button  =Обявяване на оценките
+label.monitoring.finishedMarks.button  =Завършено
+label.learner.upload  =Качване на файл на сървъра
+label.monitoring.heading.stats.desc  =Описание на статистиките
+label.authoring.advance.lock.on.finished  =Заключено при завършване
+label.authoring.online.file  =Качване на файл в онлайн режим
+label.learner.finished  =Качването на сървъра завърши
+label.learner.filePath  =Файл
+label.monitoring.saveMarks.button  =Запамети оценките
+label.learner.fileDescription  =Описание на файла
+label.monitoring.edit.activity.edit  =Редактиране на учебна дейност
+errors.required  ={0} е задължително.
+label.monitoring.heading.edit.activity.desc  =Описание на редактиране на учебна дейност
+label.monitoring.edit.activity.cancel  =Отказване на редактиране
+errors.footer  =
+errors.mark.invalid.number  =Оценката е в невалиден числов формат
+
+
+#======= End labels: Exported 89 labels for bg  =====
