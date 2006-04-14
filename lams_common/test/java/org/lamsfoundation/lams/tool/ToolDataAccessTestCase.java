@@ -130,7 +130,7 @@ public class ToolDataAccessTestCase extends AbstractCommonTestCase
     protected String[] getContextConfigLocation()
     {
         return new String[] { "/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml",
-                			  "/org/lamsfoundation/lams/tool/toolApplicationContext.xml",
+                			  "/org/lamsfoundation/lams/toolApplicationContext.xml",
                 			  "org/lamsfoundation/lams/localApplicationContext.xml"};
     }
     
