@@ -40,8 +40,10 @@ import org.w3c.dom.Document;
 
 public class TestUpdateWebXmlTask extends TestCase {
 
-   public static final String dummyWarNoNBEntryPath = "test/file/test-dummy.war";
-   public static final String dummyWarNBEntryPath = "test/file/test-dummy-with-nb.war";
+   public static final String WAR_NO_NB_ENTRY = "test/file/test-dummy.war";
+   public static final String WAR_NB_ENTRY = "test/file/test-dummy-with-nb.war";
+   public static final String CONTEXT_FILE_PATH = "/org/lamsfoundation/lams/tool/noticeboard/applicationContext.xml";
+   public static final String TOOL_JAR_NAME = "lams-tool-lanb11.jar";
 
    public TestUpdateWebXmlTask(String testName)
     {
@@ -60,35 +62,35 @@ public class TestUpdateWebXmlTask extends TestCase {
 
     public void testInsertExecute() throws Exception
     {
-		InsertContextWebXmlTask task = new InsertContextWebXmlTask();
+		InsertToolContextClasspathTask task = new InsertToolContextClasspathTask();
     	webXmlFileTest(task, "test/file/web.xml");
 	    
     }
 
     public void testInsertEntryAlreadyExistsExecute() throws Exception
     {
-		InsertContextWebXmlTask task = new InsertContextWebXmlTask();
+		InsertToolContextClasspathTask task = new InsertToolContextClasspathTask();
     	webXmlFileTest(task, "test/file/web1EntryInsert.xml");
     }
 
     public void testRemoveExecuteNoEntry() throws Exception
     {
     	// tests removing it from the end of the list of contexts
-    	RemoveContextWebXmlTask task = new RemoveContextWebXmlTask();
+    	RemoveToolContextClasspathTask task = new RemoveToolContextClasspathTask();
     	webXmlFileTest(task, "test/file/webNoEntry.xml");
     } 
 
     public void testRemoveExecuteEnd() throws Exception
     {
     	// tests removing it from the end of the list of contexts
-    	RemoveContextWebXmlTask task = new RemoveContextWebXmlTask();
+    	RemoveToolContextClasspathTask task = new RemoveToolContextClasspathTask();
     	webXmlFileTest(task, "test/file/web1Entry.xml");
     } 
 
     public void testRemoveExecuteBeginMidEnd() throws Exception
     {
     	// tests removing it from the beginning and middle of the list of contexts
-    	RemoveContextWebXmlTask task = new RemoveContextWebXmlTask();
+    	RemoveToolContextClasspathTask task = new RemoveToolContextClasspathTask();
     	webXmlFileTest(task, "test/file/web3Entry.xml");
     } 
 
@@ -98,9 +100,9 @@ public class TestUpdateWebXmlTask extends TestCase {
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
-	private void webXmlFileTest(UpdateWebXmlTask task, String filename) throws FileNotFoundException, IOException {
+	private void webXmlFileTest(UpdateWarTask task, String filename) throws FileNotFoundException, IOException {
 		
-	   	task.setApplicationContextPath("/org/lamsfoundation/lams/tool/noticeboard/applicationContext.xml");
+	   	task.setApplicationContextPath(CONTEXT_FILE_PATH);
 	   	
 	    InputStream is = new FileInputStream(filename);
 		Document doc = task.parseWebXml(is);
@@ -113,23 +115,25 @@ public class TestUpdateWebXmlTask extends TestCase {
 
 	public void testAddToWar() throws Exception
     {
-    	InsertContextWebXmlTask task = new InsertContextWebXmlTask();
-    	task.setApplicationContextPath("/org/lamsfoundation/lams/tool/noticeboard/applicationContext.xml");
+    	InsertToolContextClasspathTask task = new InsertToolContextClasspathTask();
+    	task.setApplicationContextPath(CONTEXT_FILE_PATH);
     	List<String> warFiles = new LinkedList<String>();
-    	warFiles.add(dummyWarNoNBEntryPath);
-    	task.setWarsToUpdate(warFiles);
-    	task.setLamsEarPath("");
+    	warFiles.add(WAR_NO_NB_ENTRY);
+    	task.setArchivesToUpdate(warFiles);
+    	task.setLamsEarPath(".");
+    	task.setJarFileName(TOOL_JAR_NAME);
         task.execute();
     }
 
     public void testRemoveFromToWar() throws Exception
     {
-    	RemoveContextWebXmlTask task = new RemoveContextWebXmlTask();
-    	task.setApplicationContextPath("/org/lamsfoundation/lams/tool/noticeboard/applicationContext.xml");
+    	RemoveToolContextClasspathTask task = new RemoveToolContextClasspathTask();
+    	task.setApplicationContextPath(CONTEXT_FILE_PATH);
     	List<String> warFiles = new LinkedList<String>();
-    	warFiles.add(dummyWarNBEntryPath);
-    	task.setWarsToUpdate(warFiles);
-    	task.setLamsEarPath("");
+    	warFiles.add(WAR_NB_ENTRY);
+    	task.setArchivesToUpdate(warFiles);
+    	task.setLamsEarPath(".");
+    	task.setJarFileName(TOOL_JAR_NAME);
         task.execute();
     }
 }

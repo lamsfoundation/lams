@@ -12,6 +12,8 @@
 	<toolActivityInsertScriptPath>test/file/sql/activity_insert.sql</toolActivityInsertScriptPath>
 	<toolTablesScriptPath>test/file/sql/create_tool_tables.sql</toolTablesScriptPath>
 	<toolTablesDeleteScriptPath></toolTablesDeleteScriptPath>
+	<toolApplicationContextPath></toolApplicationContextPath>
+	<toolJarFileName></toolJarFileName>
 	<deployFiles>
 		<string>/some/war/file</string>
 		<string>/some/jar/file</string>

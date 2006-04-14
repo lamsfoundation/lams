@@ -24,7 +24,9 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.deploy;
 
+import java.util.LinkedList;
 import java.util.List;
+
 
 
 
@@ -98,12 +100,6 @@ public class Deploy
             dbDeployTask.setToolTablesScriptPath(config.getToolTablesScriptPath());
             dbDeployTask.execute();
             
-            AddWebAppToApplicationXmlTask addWebAppTask =  new AddWebAppToApplicationXmlTask();
-            addWebAppTask.setLamsEarPath(config.getLamsEarPath());
-            addWebAppTask.setContextRoot(config.getToolContext());
-            addWebAppTask.setWebUri(config.getToolWebUri());
-            addWebAppTask.execute();
-            
             System.out.println("Deploying files to ear");
             DeployFilesTask deployFilesTask = new DeployFilesTask();
             deployFilesTask.setLamsEarPath(config.getLamsEarPath());
@@ -119,7 +115,25 @@ public class Deploy
 	            deployLanguageFilesTask.execute();
             }
 
-            System.out.println("Activating Tool in LAMS");
+            AddWebAppToApplicationXmlTask addWebAppTask =  new AddWebAppToApplicationXmlTask();
+            addWebAppTask.setLamsEarPath(config.getLamsEarPath());
+            addWebAppTask.setContextRoot(config.getToolContext());
+            addWebAppTask.setWebUri(config.getToolWebUri());
+            addWebAppTask.execute();
+            
+            
+            List<String> warFiles = new LinkedList<String>();
+            warFiles.add("lams-central.war");
+            warFiles.add("lams-learning.war");
+            warFiles.add("lams-monitoring.war");
+            InsertToolContextClasspathTask updateWebXmlTask = new InsertToolContextClasspathTask();
+            updateWebXmlTask.setLamsEarPath(config.getLamsEarPath());
+            updateWebXmlTask.setArchivesToUpdate(warFiles);
+            updateWebXmlTask.setApplicationContextPath(config.getToolApplicationContextPath());
+            updateWebXmlTask.setJarFileName(config.getToolJarFileName());
+            updateWebXmlTask.execute();
+
+	        System.out.println("Activating Tool in LAMS");
             ToolDBActivateTask dbActivateTask = new ToolDBActivateTask();
             dbActivateTask.setDbUsername(config.getDbUsername());
             dbActivateTask.setDbPassword(config.getDbPassword());

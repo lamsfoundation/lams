@@ -25,6 +25,10 @@
 package org.lamsfoundation.lams.tool.deploy;
 
 
+import java.util.Map;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -35,7 +39,7 @@ import org.w3c.dom.Text;
  * 
  * @author Fiona Malikoff
  */
-public class InsertContextWebXmlTask extends UpdateWebXmlTask
+public class InsertToolContextClasspathTask extends UpdateWarTask
 {
     
  	/**
@@ -44,7 +48,7 @@ public class InsertContextWebXmlTask extends UpdateWebXmlTask
 	 * @param children
 	 * @param childNode
 	 */
-	protected void updateValue(Document doc, Node contextParamElement) {
+	protected void updateParamValue(Document doc, Node contextParamElement) {
 		NodeList valueChildren = contextParamElement.getChildNodes();
 		boolean foundEntry = false;
 		for ( int i=0; i<valueChildren.getLength() && ! foundEntry ; i++ ) {
@@ -66,6 +70,25 @@ public class InsertContextWebXmlTask extends UpdateWebXmlTask
 		}
 	}
 
- 
+	/** Add the jar file to the classpath in the MANIFEST.MF file */ 
+    protected void updateClasspath(Manifest manifest) throws DeployException {
+    	Attributes mainAttributes = manifest.getMainAttributes();
+    	String classpath = null; 
+        if (mainAttributes != null) {
+        	classpath = mainAttributes.getValue(Attributes.Name.CLASS_PATH);
+        }
+        
+        String newJar = getJarFileNameWithDotSlash();
+    	if ( classpath == null ) {
+    		mainAttributes.put(Attributes.Name.CLASS_PATH,newJar);
+    		System.out.println("Added "+newJar+" to classpath");
+    	} else if ( classpath.indexOf(newJar) < 0 ) {
+    		mainAttributes.put(Attributes.Name.CLASS_PATH,classpath+" "+newJar);
+    		System.out.println("Added "+newJar+" to classpath");
+    	} else {
+    		System.out.println(newJar+" already on the classpath.");
+    	}
+    }
+
     
 }

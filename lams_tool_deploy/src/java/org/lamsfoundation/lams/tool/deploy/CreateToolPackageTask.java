@@ -67,6 +67,10 @@ import org.xml.sax.SAXException;
  * scripts to be copied from the scriptPath directory to deploy/sql.
  * Generates the toolInsertScriptPath, toolLibraryInsertScriptPath,
  * toolActivityInsertScriptPath and toolTablesScriptPath entries.</LI>
+ * <LI>(Optional) toolApplicationContextPath: name and path to the 
+ * tool's context file. Generates the toolApplicationContextPath entry.</LI>
+ * <LI>(Optional) toolJarFileName: name of the tool's jar file to be added to the
+ * classpath of the core modules.</LI>
  * <LI>(Optional) languageFileScriptPath: define the directory
  * containing any tool language files. On deployment, files will
  * be copied to the lams-dictionary jar directory. 

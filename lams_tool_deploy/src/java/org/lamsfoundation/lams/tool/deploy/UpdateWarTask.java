@@ -4,8 +4,8 @@
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
  * 
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
- * as published by the Free Software Foundation.
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation.
  * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -20,10 +20,9 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-
 /* $$Id$$ */
-package org.lamsfoundation.lams.tool.deploy;
 
+package org.lamsfoundation.lams.tool.deploy;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -38,10 +37,11 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.jar.JarOutputStream;
+import java.util.jar.Manifest;
 import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-import java.util.zip.ZipOutputStream;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -60,19 +60,22 @@ import org.w3c.dom.Text;
 import org.xml.sax.SAXException;
 
 /**
- * Base class of ant tasks that change a webxml
+ * Base class of ant tasks that changes a jar file or a war file
  * @author Fiona Malikoff
  */
-public abstract class UpdateWebXmlTask implements Task
-{
-	private static final int BUFFER_SIZE = 8192;
-	protected static final String WEBXML_PATH = "WEB-INF/web.xml"; 
+public abstract class UpdateWarTask implements Task {
 
+	protected static final String WEBXML_PATH = "WEB-INF/web.xml"; 
+	protected static final String MANIFEST_PATH = "META-INF/MANIFEST.MF"; 
+
+	protected static final int BUFFER_SIZE = 8192;
     /**
      * The lams.ear path file.
      */
     protected String lamsEarPath;
     
+    protected List<String> archivesToUpdate;
+
     /**
      * The value of the tool application context file, including the path
      * e.g. /org/lamsfoundation/lams/tool/vote/voteApplicationContext.xml
@@ -81,8 +84,14 @@ public abstract class UpdateWebXmlTask implements Task
      */
     protected String applicationContextPath;
     
-    private List<String> warsToUpdate;
+    /**
+     * The name of the tool's jar file e.g. "lams-tool-lanb11.jar".
+     * This will be added to / removed from the classpath as ./[jarfilename]
+     * e.g. "./lams-tool-lanb11.jar"
+     */
+    protected String jarFileName;
     
+
     /**
      * Sets the location of the application xml file to be modified.
      * @param appxml New value of property appxml.
@@ -92,6 +101,68 @@ public abstract class UpdateWebXmlTask implements Task
         this.lamsEarPath = lamsEarPath;
     }
     
+	public List<String> getArchivesToUpdate() {
+		return archivesToUpdate;
+	}
+
+	public void setArchivesToUpdate(List<String> warsToUpdate) {
+		this.archivesToUpdate = warsToUpdate;
+	}
+    
+    /**
+     * Returns the value of the tool application context file, including the path
+     * e.g. /org/lamsfoundation/lams/tool/vote/voteApplicationContext.xml
+     * It should not include the "classpath:" prefix as this will be added
+     * automatically.
+     */
+	public String getApplicationContextPath() {
+		return applicationContextPath;
+	}
+
+    /**
+     * Returns the value of the tool application context file with the "classpath:" prepended.
+     * e.g. "classpath:/org/lamsfoundation/lams/tool/vote/voteApplicationContext.xml"
+     */
+	protected String getApplicationContextPathWithClasspath() {
+		return  "classpath:"+applicationContextPath;
+	}
+
+	/**
+     * The value of the tool application context file, including the path
+     * e.g. /org/lamsfoundation/lams/tool/vote/voteApplicationContext.xml
+     * It should not include the "classpath:" prefix as this will be added
+     * automatically.
+     */
+	public void setApplicationContextPath(String applicationContextPath) {
+		this.applicationContextPath = applicationContextPath;
+	}
+
+    /**
+     * Gets the name of the tool's jar file e.g. "lams-tool-lanb11.jar".
+     * This will be added to / removed from the classpath as ./[jarfilename]
+     * e.g. "./lams-tool-lanb11.jar"
+     */
+	public String getJarFileName() {
+		return jarFileName;
+	}
+
+    /**
+     * Gets the name of the tool's jar file converted to ./[jarfilename]
+     * e.g. "./lams-tool-lanb11.jar"
+     */
+	protected String getJarFileNameWithDotSlash() {
+		return "./"+jarFileName;
+	}
+
+	/**
+     * Sets the name of the tool's jar file e.g. "lams-tool-lanb11.jar".
+     * This will be added to / removed from the classpath as ./[jarfilename]
+     * e.g. "./lams-tool-lanb11.jar"
+     */
+	public void setJarFileName(String jarFileName) {
+		this.jarFileName = jarFileName;
+	}
+
     /**
      * Execute the task
      * @throws org.apache.tools.ant.DeployException In case of any problems
@@ -101,28 +172,28 @@ public abstract class UpdateWebXmlTask implements Task
 		if ( applicationContextPath == null ) { 
 			throw new DeployException("UpdateWebXmTask: Unable to update web.xml as the application content path is missing (applicationContextPath).");
 		}
-
-		if ( warsToUpdate != null ) {
+		
+		if ( archivesToUpdate != null ) {
 			
 			// map the old File to the new File e.g. lams_learning.war is the key, lams_learning.war.new is the value  
-			Map<File,File> filesToRename = new HashMap<File,File>(warsToUpdate.size());
+			Map<File,File> filesToRename = new HashMap<File,File>(archivesToUpdate.size());
 			
-			for ( String warFileName: warsToUpdate ) {
+			for ( String warFileName: archivesToUpdate ) {
 				
-		    	File warFile = new File(warFileName);
+		    	File warFile = new File(lamsEarPath+File.separator+warFileName);
 				if ( ! warFile.canRead() || warFile.isDirectory() ) {
-					throw new DeployException("Unable to access war file "+warFileName+". May be missing, a directory or not readable");
+					throw new DeployException("Unable to access war file "+warFile.getAbsolutePath()+". May be missing, a directory or not readable");
 				}
-				String newFilename = lamsEarPath+warFileName+".new";
+				String newFilename = lamsEarPath+File.separator+warFileName+".new";
 				File outputFile = new File(newFilename);
-				ZipOutputStream newWarOutputStream = null;
+				JarOutputStream newWarOutputStream = null;
 				ZipInputStream warInputStream = null;
 				try {
 					
-					newWarOutputStream = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(outputFile)));
-					newWarOutputStream.setMethod(ZipOutputStream.DEFLATED);
+					newWarOutputStream = new JarOutputStream(new BufferedOutputStream(new FileOutputStream(outputFile)));
+					newWarOutputStream.setMethod(JarOutputStream.DEFLATED);
 					newWarOutputStream.setLevel(Deflater.DEFAULT_COMPRESSION);
-					//newWarOutputStream.setMethod(ZipOutputStream.STORED);
+					//newWarOutputStream.setMethod(JarOutputStream.STORED);
 
 					warInputStream = new ZipInputStream(new BufferedInputStream(new FileInputStream(warFile)));
 					ZipEntry entry = null; 
@@ -130,7 +201,13 @@ public abstract class UpdateWebXmlTask implements Task
 			 		// work through each entry, copying across to the output stream. 
 					// when we hit the web.xml, we have to modify it.
 			        while( ( entry = warInputStream.getNextEntry() ) != null ) {
-			        	processEntry(newWarOutputStream, warInputStream, entry);
+			    		if ( WEBXML_PATH.equals(entry.getName()) ) {
+			    			updateWebXML(newWarOutputStream, warInputStream, entry);
+			    		} else if ( MANIFEST_PATH.equals(entry.getName()) ) {
+			    			updateManifest(newWarOutputStream, warInputStream, entry);
+			    		} else {
+			    			copyEntryToWar(newWarOutputStream, warInputStream, entry);
+			    		}
 			        }
 			        
 					warInputStream.close();
@@ -151,20 +228,53 @@ public abstract class UpdateWebXmlTask implements Task
 		    }
 			
 			copyNewFilesToOldNames(filesToRename);
-		}
-		
+		}		
     }
+
+    /* ********* Manage the archive updates, copy files, etc *********/
+
+	/** This entry in the JAR/WAR file doesn't change so copy it from the old archive to the new archive */
+	protected void copyEntryToWar(JarOutputStream newWarOutputStream, ZipInputStream warInputStream, ZipEntry entry) throws IOException {
+
+		ZipEntry newEntry = new ZipEntry(entry.getName());
+		newWarOutputStream.putNextEntry(newEntry);
+
+		byte[] data = new byte[ BUFFER_SIZE ]; 
+		int count = -1;
+	    while( (count = warInputStream.read( data, 0, BUFFER_SIZE ) ) != -1 )
+	    {
+	    	newWarOutputStream.write( data, 0, count );
+	    }
+		
+		newWarOutputStream.closeEntry();
+	}
+	
 
 	/**
 	 * Everything worked okay so rename the files
 	 * @param filesToRename
 	 */
-	private void copyNewFilesToOldNames(Map<File, File> filesToRename) throws DeployException {
+    protected void copyNewFilesToOldNames(Map<File, File> filesToRename) throws DeployException {
+		// clean up any old backup files first.
 		for ( Map.Entry<File,File> mapEntry : filesToRename.entrySet() ) {
-			Map<File,File> renamed = new HashMap<File,File>(warsToUpdate.size());
+			File origFile = mapEntry.getKey();
+			File backup = new File ( origFile.getAbsoluteFile() + ".bak");
+			if ( backup.exists() ) {
+				backup.delete();
+			}
+			if ( backup.exists() ) {
+				throw new DeployException("Error occured removing an old backup file. Please remove the file "+backup.getAbsolutePath()
+					+" and run the installation again.");
+			}
+		}
+		
+		// copy blah.war to blah.war.bak, and copy blah.war.new to blah.war
+		for ( Map.Entry<File,File> mapEntry : filesToRename.entrySet() ) {
+			Map<File,File> renamed = new HashMap<File,File>(archivesToUpdate.size());
 			
 			File origFile = mapEntry.getKey();
 			File backup = new File ( origFile.getAbsoluteFile() + ".bak");
+
 			boolean successful = origFile.renameTo(backup);
 			if ( successful ) {
 				renamed.put(origFile, backup);
@@ -175,13 +285,14 @@ public abstract class UpdateWebXmlTask implements Task
 				System.out.println("Updated web.xml in war file "+origFile.getName());
 				
 			} else {
+				// something has gone wrong so restore the backup files
 				for ( Map.Entry<File,File> renamedMapEntry : renamed.entrySet() ) {
 					File updatedFile = renamedMapEntry.getKey();
 					File backupFile = renamedMapEntry.getValue();
 					backupFile.renameTo(updatedFile);
 				}
 				String message = "Error occured renaming the war files. Tried to go back to old files but may or may not have succeeded. Check files:";
-				for ( String warFileName: warsToUpdate ) {
+				for ( String warFileName: archivesToUpdate ) {
 					message += " " + warFileName;
 				}
 				throw new DeployException(message);
@@ -190,43 +301,7 @@ public abstract class UpdateWebXmlTask implements Task
 		}
 	}
 
-	/**
-	 * @param newWarOutputStream
-	 * @param warInputStream
-	 * @param entry
-	 * @throws IOException
-	 */
-	private void processEntry(ZipOutputStream newWarOutputStream, ZipInputStream warInputStream, ZipEntry entry) throws IOException {
-		
-		if ( entry.getName().equals(WEBXML_PATH) ) {
-			
-			ZipEntry newEntry = new ZipEntry(WEBXML_PATH);
-			newWarOutputStream.putNextEntry(newEntry);
-			
-			// can't just pass the stream to the parser, as the parser will close the stream.
-			InputStream copyInputStream = copyToByteArrayInputStream(warInputStream);
-			
-			Document doc = parseWebXml(copyInputStream);
-		    updateWebXml(doc);
-		    writeWebXml(doc, newWarOutputStream);
-		    
-		} else {
-
-			ZipEntry newEntry = new ZipEntry(entry.getName());
-			newWarOutputStream.putNextEntry(newEntry);
-
-			byte[] data = new byte[ BUFFER_SIZE ]; 
-			int count = -1;
-		    while( (count = warInputStream.read( data, 0, BUFFER_SIZE ) ) != -1 )
-		    {
-		    	newWarOutputStream.write( data, 0, count );
-		    }
-		}
-		
-		newWarOutputStream.closeEntry();
-	}
-	
-	private ByteArrayInputStream copyToByteArrayInputStream(ZipInputStream warInputStream) throws IOException {
+    protected ByteArrayInputStream copyToByteArrayInputStream(ZipInputStream warInputStream) throws IOException {
 		
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		byte[] data = new byte[ BUFFER_SIZE ]; 
@@ -239,6 +314,35 @@ public abstract class UpdateWebXmlTask implements Task
 	    
 	    return new ByteArrayInputStream(os.toByteArray());
 	}
+
+    /* ********* Update the web.xml etc *********/
+
+    /** Update the param-value entry in the contextConfigLocation entry in the web.xml file */ 
+    protected abstract void updateParamValue(Document doc, Node contextParamElement) throws DeployException;
+
+    /**
+	 * Given the web.xml from the war file, update the file and write it to the new war file.
+	 * 
+	 * @param newWarOutputStream new war file
+	 * @param warInputStream existing war file
+	 * @param entry web.xml entry
+	 * @throws IOException
+	 */
+    protected void updateWebXML(JarOutputStream newWarOutputStream, ZipInputStream warInputStream, ZipEntry entry) throws IOException {
+		
+		ZipEntry newEntry = new ZipEntry(WEBXML_PATH);
+		newWarOutputStream.putNextEntry(newEntry);
+		
+		// can't just pass the stream to the parser, as the parser will close the stream.
+		InputStream copyInputStream = copyToByteArrayInputStream(warInputStream);
+		
+		Document doc = parseWebXml(copyInputStream);
+	    updateWebXml(doc);
+	    writeWebXml(doc, newWarOutputStream);
+		    
+		newWarOutputStream.closeEntry();
+	}
+	
     protected void updateWebXml(Document doc) throws DeployException
     {
         
@@ -253,15 +357,12 @@ public abstract class UpdateWebXmlTask implements Task
         	Node contextParamElement = contextParamElements.item(c);
         	if ( contextParamElement instanceof Element ) {
            		if ( "param-value".equals(contextParamElement.getNodeName()) ) {
-               		updateValue(doc, contextParamElement);
+           			updateParamValue(doc, contextParamElement);
            		}
         	}
         }
        
     }
-
-
-    protected abstract void updateValue(Document doc, Node contextParamElement) throws DeployException;
 
     /**
      * Writes the modified web.xml back out to war file
@@ -369,41 +470,30 @@ public abstract class UpdateWebXmlTask implements Task
         return null;
     }
 
-    /**
-     * Returns the value of the tool application context file, including the path
-     * e.g. /org/lamsfoundation/lams/tool/vote/voteApplicationContext.xml
-     * It should not include the "classpath:" prefix as this will be added
-     * automatically.
-     */
-	public String getApplicationContextPath() {
-		return applicationContextPath;
-	}
+    /* ********* Update the MANIFEST.MF *********/
+
+    /** Update the classpath entry in the MANIFEST.MF file */ 
+    protected abstract void updateClasspath(Manifest manifest) throws DeployException;
 
     /**
-     * Returns the value of the tool application context file with the "classpath:" prepended.
-     * e.g. "classpath:/org/lamsfoundation/lams/tool/vote/voteApplicationContext.xml"
-     */
-	public String getApplicationContextPathWithClasspath() {
-		return  "classpath:"+applicationContextPath;
+	 * Given the MANIFEST.MF from the war file, update the file and write it to the new war file.
+	 * 
+	 * @param newWarOutputStream new war file
+	 * @param warInputStream existing war file
+	 * @param entry web.xml entry
+	 * @throws IOException
+	 */
+    protected void updateManifest(JarOutputStream newWarOutputStream, ZipInputStream warInputStream, ZipEntry entry) throws IOException {
+		
+		ZipEntry newEntry = new ZipEntry(MANIFEST_PATH);
+		newWarOutputStream.putNextEntry(newEntry);
+		
+		Manifest manifest = new Manifest(warInputStream);
+		updateClasspath(manifest);
+		manifest.write(newWarOutputStream);
+		    
+		newWarOutputStream.closeEntry();
 	}
 
-	/**
-     * The value of the tool application context file, including the path
-     * e.g. /org/lamsfoundation/lams/tool/vote/voteApplicationContext.xml
-     * It should not include the "classpath:" prefix as this will be added
-     * automatically.
-     */
-	public void setApplicationContextPath(String applicationContextPath) {
-		this.applicationContextPath = applicationContextPath;
-	}
 
-	public List<String> getWarsToUpdate() {
-		return warsToUpdate;
-	}
-
-	public void setWarsToUpdate(List<String> warsToUpdate) {
-		this.warsToUpdate = warsToUpdate;
-	}
-    
-    
 }

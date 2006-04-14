@@ -54,6 +54,8 @@ public class DeployToolConfig extends DeployConfig {
     private static final String TOOL_LIBRARY_INSERT_SCRIPT_PATH = "toolLibraryInsertScriptPath";
     private static final String TOOL_TABLES_SCRIPT_PATH = "toolTablesScriptPath";
     private static final String TOOL_TABLES_DELETE_SCRIPT_PATH = "toolTablesDeleteScriptPath";
+    private static final String TOOL_APP_CONTEXT_FILE_PATH = "toolApplicationContextPath";
+    private static final String TOOL_JAR_FILE_NAME = "toolJarFileName";
     private static final String DEPLOY_FILES= "deployFiles";
     protected static final String LANGUAGE_FILES= "languageFiles";
   
@@ -97,6 +99,16 @@ public class DeployToolConfig extends DeployConfig {
      */
     private String toolTablesDeleteScriptPath;
 
+    /**
+     * Holds value of property toolTablesDeleteScriptPath.
+     */
+    private String toolApplicationContextPath;
+
+    /** 
+     * Holds the value of property toolJarFileName.
+     */
+    private String toolJarFileName;
+    
     /**
      * Holds value of property deployFiles.
      */
@@ -186,6 +198,14 @@ public class DeployToolConfig extends DeployConfig {
            toolTablesDeleteScriptPath  = value;
        }
 
+       if ( key.equalsIgnoreCase(TOOL_APP_CONTEXT_FILE_PATH) ) {
+           toolApplicationContextPath  = value;
+       }
+
+       if ( key.equalsIgnoreCase(TOOL_JAR_FILE_NAME) ) {
+    	   toolJarFileName = value;
+       }
+       
        if ( key.equalsIgnoreCase(DEPLOY_FILES) ) {
            deployFiles = convertList(value);
        }
@@ -234,6 +254,8 @@ public class DeployToolConfig extends DeployConfig {
        valid = valid && validateStringProperty(toolLibraryInsertScriptPath, TOOL_LIBRARY_INSERT_SCRIPT_PATH);
        valid = valid && validateStringProperty(toolActivityInsertScriptPath, TOOL_ACTIVITY_INSERT_SCRIPT_PATH);
        valid = valid && validateStringProperty(toolWebUri, TOOL_TABLES_SCRIPT_PATH);
+       valid = valid && validateStringProperty(toolApplicationContextPath, TOOL_APP_CONTEXT_FILE_PATH);
+       valid = valid && validateStringProperty(toolJarFileName,TOOL_JAR_FILE_NAME);
        valid = valid && validateStringProperty(getDbUsername(), DB_USERNAME);
        valid = valid && validateStringProperty(getDbPassword(), DB_PASSWORD);
        valid = valid && validateStringProperty(getDbDriverClass(), DB_PASSWORD);
@@ -269,6 +291,10 @@ public class DeployToolConfig extends DeployConfig {
 	       this.toolTablesScriptPath = config.getToolTablesScriptPath();
        if (config.getToolTablesDeleteScriptPath() != null)
 	       this.toolTablesDeleteScriptPath = config.getToolTablesDeleteScriptPath();
+       if (config.getToolApplicationContextPath() != null)
+	       this.toolApplicationContextPath = config.getToolApplicationContextPath();
+       if ( config.getToolJarFileName() != null )
+    	   this.toolJarFileName = config.getToolJarFileName();
        if (config.getDeployFiles() != null)
 	       this.deployFiles = config.getDeployFiles();
        if (config.getLanguageFiles() != null)
@@ -288,6 +314,8 @@ public class DeployToolConfig extends DeployConfig {
        System.out.println("ToolActivityInsertScriptPath: " + this.toolActivityInsertScriptPath);
        System.out.println("ToolTableScriptPath: " + this.toolTablesScriptPath);
        System.out.println("ToolTableDeleteScriptPath: " + this.toolTablesDeleteScriptPath);
+       System.out.println("ToolApplicationContextPath: " + this.toolApplicationContextPath);
+       System.out.println("ToolJarFileName: "+this.toolJarFileName);
        ArrayList list = this.deployFiles;
        for(int i=0; i<list.size(); i++)
        {
@@ -422,6 +450,22 @@ public class DeployToolConfig extends DeployConfig {
 
 	public void setLanguageFiles(ArrayList<String> languageFiles) {
 		this.languageFiles = languageFiles;
+	}
+
+	public String getToolApplicationContextPath() {
+		return toolApplicationContextPath;
+	}
+
+	public void setToolApplicationContextPath(String applicationContextPath) {
+		this.toolApplicationContextPath = applicationContextPath;
+	}
+
+	public String getToolJarFileName() {
+		return toolJarFileName;
+	}
+
+	public void setToolJarFileName(String toolJarFileName) {
+		this.toolJarFileName = toolJarFileName;
 	}
 
  
