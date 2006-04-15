@@ -218,10 +218,10 @@
 				inheritAll="false" >
 			<property name="jboss.deploy" location="${jboss.deploy}"/>
 		</ant>
- 		<ant antfile="../${tool_vote_dir}/build.xml" target="deploy-tool"
+--> 		<ant antfile="../${tool_vote_dir}/build.xml" target="deploy-tool"
 				inheritAll="false" >
 			<property name="jboss.deploy" location="${jboss.deploy}"/>
-		</ant> -->
+		</ant>
 		<ant target="deploy-learning-libraries"/>
 	</target>
 	
