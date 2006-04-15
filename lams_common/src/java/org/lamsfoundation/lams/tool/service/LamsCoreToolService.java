@@ -32,7 +32,6 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
-import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolContentIDGenerator;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolSession;
@@ -45,6 +44,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
@@ -176,15 +176,17 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
      */
     public void notifyToolsToCreateSession(ToolSession toolSession, ToolActivity activity) throws ToolException
     {
-    	// TODO remove call to isToolOnClasspath. Should throw an error if tool cannot be found.
-    	if ( isToolOnClasspath(activity) ) {
+    	try {
 	        ToolSessionManager sessionManager = (ToolSessionManager) findToolService(activity);
 	
 	        sessionManager.createToolSession(toolSession.getToolSessionId(),toolSession.getToolSessionName(),
 	                                         activity.getToolContentId());
+    	} catch ( NoSuchBeanDefinitionException e ) {
+    		String message = "A tool which is defined in the database appears to missing from the classpath. Unable to create tool session. ToolActivity "+activity;
+    		log.error(message,e);
+    		throw new ToolException(message,e);
     	}
     }
-
     /**
      * Calls the tool to copy the content for an activity. Used when copying a learning design.
      * 
@@ -196,11 +198,7 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
     		throws DataMissingException, ToolException
     {
         Long newToolcontentID = contentIDGenerator.getNextToolContentIDFor(toolActivity.getTool());
-        //This is just for testing purpose because only some tools are in the learning
-        // classpath
-        //TODO we need to remove this once all done.
-        if (isToolOnClasspath(toolActivity))
-        {
+        try {
 			ToolContentManager contentManager = (ToolContentManager) findToolService(toolActivity);
             contentManager.copyToolContent(toolActivity.getToolContentId(),
                                            newToolcontentID);
@@ -212,7 +210,12 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
                     toolActivity.getRunOffline().booleanValue() ) {
             contentManager.setAsRunOffline(newToolcontentID);
 			}
-        }
+		} catch ( NoSuchBeanDefinitionException e ) {
+			String message = "A tool which is defined in the database appears to missing from the classpath. Unable to copy the tool content. ToolActivity "+toolActivity;
+			log.error(message,e);
+			throw new ToolException(message,e);
+		}
+
         return newToolcontentID;
     }
     
@@ -225,12 +228,14 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
      */
     public void notifyToolToDeleteContent(ToolActivity toolActivity) throws ToolException
     {
-        //TODO we need to the classpath check once all tools done.
-        if (isToolOnClasspath(toolActivity))
-        {
+    	try {
 			ToolContentManager contentManager = (ToolContentManager) findToolService(toolActivity);
 			contentManager.removeToolContent(toolActivity.getToolContentId(),true);
-        }
+		} catch ( NoSuchBeanDefinitionException e ) {
+			String message = "A tool which is defined in the database appears to missing from the classpath. Unable to delete the tool content. ToolActivity "+toolActivity;
+			log.error(message,e);
+			throw new ToolException(message,e);
+		}
     }
     /**
      * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#updateToolSession(org.lamsfoundation.lams.tool.ToolSession)
@@ -359,28 +364,11 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
      * find different service such as EJB or Web service. 
      * @param toolActivity the tool activity defined in the design.
      * @return the service object from tool.
+     * @throws NoSuchBeanDefinitionException if the tool is not the classpath or the supplied service name is wrong.
      */
-    private Object findToolService(ToolActivity toolActivity)
+    private Object findToolService(ToolActivity toolActivity) throws NoSuchBeanDefinitionException
     {
         return context.getBean(toolActivity.getTool().getServiceName());
     }
 
-    /**
-     * Is this one of the tools that is currently in the learning classpath.
-     * TODO remove when all tools in the test cases are implemented.
-     * @param toolActivity the tool activity defined in the design.
-     * @return
-     */
-    private boolean isToolOnClasspath(ToolActivity toolActivity)
-    {
-    	String serviceName = toolActivity.getTool().getServiceName(); 
-        if ( serviceName == null )
-        	return false;
-    	
-    	return serviceName.equals("ImscpService") || serviceName.equals("nbService")
-			|| serviceName.equals("qaService") || serviceName.equals("mcService") || 
-			serviceName.equals("submitFilesService") || serviceName.equals("surveyService")
-	    	|| serviceName.equals("forumService") || serviceName.equals("chatService") 
-	    	|| serviceName.equals("resourceService");
-    }
 }
