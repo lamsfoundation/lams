@@ -99,7 +99,7 @@ class org.lamsfoundation.lams.common.comms.Wddx {
 			} else if (i<128) {
 				et[i] = chr(i);
 				at[i] = chr(i);
-			} else {
+			} else { 
 				et[i] = "&#x"+i.toString(16)+";";
 				etRev["&#x"+i.toString(16)+";"] = chr(i);
 				at[i] = "&#x"+i.toString(16)+";";
@@ -232,7 +232,12 @@ class org.lamsfoundation.lams.common.comms.Wddx {
 		node.appendChild(temp.createElement("string"));
 		for (var i:Number = 0; i<max; ++i) {
 			var char:String = substring(s, i+1, 1);
-			tempString += (this.et[ord(substring(s, i+1, 1))]);
+			var ord:String = ord(substring(s, i+1, 1));
+			if(ord < 256) {
+				tempString += (this.et[ord(substring(s, i+1, 1))]);
+			} else {
+				tempString += "&#x" + ord + ";";
+			}
 		}
 		node.lastChild.appendChild(temp.createTextNode(tempString));
 	}
