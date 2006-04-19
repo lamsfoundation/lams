@@ -44,6 +44,12 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 	protected String editDefaultQuestion;
 	protected String removeOptionContent;
 	
+	protected String voteChangable;
+	protected String lockOnFinish;
+	protected String allowText;
+	
+	protected String maxNominationCount;
+	
 	protected String fileItem;
 	protected String uuid;
 	
@@ -186,6 +192,10 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 		this.retries=null;
 		this.sln=null;
 		this.passmark=null;
+		this.voteChangable=null;
+		this.lockOnFinish=null;
+		this.allowText=null;
+		this.maxNominationCount=null;
 		
 		this.summaryMonitoring=null;
     	this.instructionsMonitoring=null;
@@ -203,6 +213,9 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
     	this.sln				 =OPTION_OFF;
     	this.showFeedback 		 =OPTION_OFF;
     	this.usernameVisible	 =OPTION_OFF;
+    	this.voteChangable		 =OPTION_OFF;
+		this.lockOnFinish		 =OPTION_OFF;
+		this.allowText			 =OPTION_OFF;
 	}
 
 	
@@ -834,5 +847,55 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
      */
     public void setOptIndex(String optIndex) {
         this.optIndex = optIndex;
+    }
+    
+    /**
+     * @return Returns the voteChangable.
+     */
+    public String getVoteChangable() {
+        return voteChangable;
+    }
+    /**
+     * @param voteChangable The voteChangable to set.
+     */
+    public void setVoteChangable(String voteChangable) {
+        this.voteChangable = voteChangable;
+    }
+    
+    /**
+     * @return Returns the lockOnFinish.
+     */
+    public String getLockOnFinish() {
+        return lockOnFinish;
+    }
+    /**
+     * @param lockOnFinish The lockOnFinish to set.
+     */
+    public void setLockOnFinish(String lockOnFinish) {
+        this.lockOnFinish = lockOnFinish;
+    }
+    /**
+     * @return Returns the allowText.
+     */
+    public String getAllowText() {
+        return allowText;
+    }
+    /**
+     * @param allowText The allowText to set.
+     */
+    public void setAllowText(String allowText) {
+        this.allowText = allowText;
+    }
+    /**
+     * @return Returns the maxNominationCount.
+     */
+    public String getMaxNominationCount() {
+        return maxNominationCount;
+    }
+    /**
+     * @param maxNominationCount The maxNominationCount to set.
+     */
+    public void setMaxNominationCount(String maxNominationCount) {
+        this.maxNominationCount = maxNominationCount;
     }
 }

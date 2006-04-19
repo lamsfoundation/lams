@@ -35,40 +35,61 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<tr>
 	      			<td NOWRAP class="formlabel" valign=top>
 		      			<font size=2> <b>
-			      			<bean:message key="radiobox.usernameVisible"/>:
+			      			<bean:message key="label.vote.changable"/>:
 			      		</b> </font>		      			
 					</td>
 					<td NOWRAP valign=top>
 						<font size=2>
-						<html:radio property="usernameVisible" value="ON">
+						<html:radio property="voteChangable" value="ON">
 						 <bean:message key="option.on"/>
 						</html:radio>
 
-						<html:radio property="usernameVisible" value="OFF">
+						<html:radio property="voteChangable" value="OFF">
 						 <bean:message key="option.off"/>
 						</html:radio>
 						</font>												
 	      			</td>
 		         </tr>
 		         
-   				<tr>
+				<tr>
 	      			<td NOWRAP class="formlabel" valign=top>
 		      			<font size=2> <b>
-			      			<bean:message key="radiobox.onepq"/>:
+			      			<bean:message key="label.vote.lockedOnFinish"/>:
 			      		</b> </font>		      			
 					</td>
 					<td NOWRAP valign=top>
-					<font size=2>
-						<html:radio property="questionsSequenced" value="ON">
+						<font size=2>
+						<html:radio property="lockOnFinish" value="ON">
 						 <bean:message key="option.on"/>
 						</html:radio>
 
-						<html:radio property="questionsSequenced" value="OFF">
+						<html:radio property="lockOnFinish" value="OFF">
 						 <bean:message key="option.off"/>
 						</html:radio>
-					</font>												
+						</font>												
 	      			</td>
-		        </tr>
+		         </tr>
+		         
+
+				<tr>
+	      			<td NOWRAP class="formlabel" valign=top>
+		      			<font size=2> <b>
+			      			<bean:message key="label.allowText"/>:
+			      		</b> </font>		      			
+					</td>
+					<td NOWRAP valign=top>
+						<font size=2>
+						<html:radio property="allowText" value="ON">
+						 <bean:message key="option.on"/>
+						</html:radio>
+
+						<html:radio property="allowText" value="OFF">
+						 <bean:message key="option.off"/>
+						</html:radio>
+						</font>												
+	      			</td>
+		         </tr>
+
 
 		         <tr>
 					<td NOWRAP class="formlabel" valign=top>
@@ -87,41 +108,20 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							</html:radio>
 						</font>
 	      			</td>
-
 				</tr>	      			
-		        
-		         <tr> 
-					<td NOWRAP class="formlabel" valign=top>
-						<font size=2>
-					 		<b>	<bean:message key="label.report.title"/>: </b>
-				 		</font>
-				 	</td>
-	  				<td NOWRAP valign=top>
-		  				<font size=2>
-							<lams:SetEditor id="richTextReportTitle" text="${sessionScope.richTextReportTitle}" small="true"/>							
-						</font>
-					</td> 
-			  	</tr>
-			  	
+				
 			  	<tr> 
-					<td NOWRAP class="formlabel" valign=top>
-						<font size=2>
-					 		<b>	<bean:message key="label.report.endLearningMessage"/>: </b>
-			 			</font>
+	      			<td NOWRAP class="formlabel" valign=top>
+	      			<font size=2> <b>
+				 		<bean:message key="label.maxNomCount"/>: </td>
+		      		</b> </font>		      							 					 		
+					<td NOWRAP valign=top>
+					<font size=2>
+			 			<html:text property="maxNominationCount" size="3" maxlength="3"/>
+					</font>									 			
 			 		</td>
-	  				<td NOWRAP>
-		  				<font size=2>
-							<lams:SetEditor id="richTextEndLearningMsg" text="${sessionScope.richTextEndLearningMsg}" small="true"/>														
-						</font>
-					</td> 
 			  	</tr>
-			  	
-		  		<tr>
- 				 	<td NOWRAP colspan=2 align=center valign=top>								
-						&nbsp&nbsp
-				  	</td>
-				</tr>
+				
 
 			</table>	  	
 		
-			

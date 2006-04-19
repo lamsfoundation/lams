@@ -2,24 +2,21 @@ CREATE TABLE tl_vote11_content (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
      , content_id BIGINT(20) NOT NULL
      , title TEXT NOT NULL
-     , posting TEXT
      , instructions TEXT NOT NULL
      , creation_date DATETIME
      , update_date DATETIME
+     , maxNominationCount VARCHAR(20) NOT NULL DEFAULT '0'
      , questions_sequenced TINYINT(1) NOT NULL DEFAULT 0
-     , username_visible TINYINT(1) NOT NULL DEFAULT 0
+     , allowText TINYINT(1) NOT NULL DEFAULT 0
+     , voteChangable TINYINT(1) NOT NULL DEFAULT 0
      , created_by BIGINT(20) NOT NULL DEFAULT 0
-     , monitoring_report_title TEXT NOT NULL
-     , report_title TEXT NOT NULL
      , run_offline TINYINT(1) NOT NULL DEFAULT 0
      , define_later TINYINT(1) NOT NULL DEFAULT 0
      , offline_instructions TEXT
      , online_instructions TEXT
-     , end_learning_message TEXT NOT NULL
      , content_in_use TINYINT(1) NOT NULL DEFAULT 0
      , lock_on_finish TINYINT NOT NULL DEFAULT 0
      , retries TINYINT(1) NOT NULL DEFAULT 0
-     , show_report TINYINT(1) NOT NULL DEFAULT 0
      , UNIQUE UQ_tl_lamc11_content_1 (content_id)
      , PRIMARY KEY (uid)
 )TYPE=InnoDB;
@@ -93,6 +90,7 @@ CREATE TABLE tl_vote11_uploadedfile (
                   REFERENCES tl_vote11_content (uid)
 )TYPE=InnoDB;
 
-INSERT INTO tl_vote11_content(uid, content_id , title , instructions , posting, creation_date , questions_sequenced , username_visible , created_by , monitoring_report_title , report_title , run_offline , define_later, offline_instructions, online_instructions, end_learning_message, content_in_use, retries,  show_report) VALUES (1, ${default_content_id} ,'Voting Title','Voting Instructions', 'sample posting', NOW(), 0, 0,1,'Voting Report','Report', 0, 0, 'offline instructions','online instructions','Finished Activity...', 0, 0, 0);
+
+INSERT INTO tl_vote11_content(uid, content_id , title , instructions , creation_date , questions_sequenced , created_by , run_offline , define_later, offline_instructions, online_instructions, content_in_use, retries) VALUES (1, ${default_content_id} ,'Voting Title','Voting Instructions', NOW(), 0, 1,0, 0, 'offline instructions','online instructions', 0, 0);
 
 INSERT INTO tl_vote11_que_content  (uid,question,  display_order, vote_content_id) VALUES (1, 'sample nomination', 1, 1);

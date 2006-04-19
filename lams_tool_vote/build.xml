@@ -388,6 +388,7 @@
 				toolLibraryInsertScriptPath="${db.scripts}/library_insert.sql"
 				toolInsertScriptPath="${db.scripts}/tool_insert.sql"
 				toolApplicationContextPath="/org/lamsfoundation/lams/tool/vote/voteApplicationContext.xml"
+
 				lamsEarPath="${jboss.deploy}"
 				toolContext="${toolContext}"
 				toolWebUri="${product}.war"

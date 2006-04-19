@@ -441,8 +441,10 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 		{
 			logger.debug("retrieve uid of the content based on default content id determined above: " + defaultContentID);
 			VoteContent voteContent=voteService.retrieveVote(new Long(defaultContentID));
+			logger.debug("voteContent: " + voteContent);
 			if (voteContent == null)
 			{
+			    logger.debug("voteContent is null: " + voteContent);
 				VoteUtils.cleanUpSessionAbsolute(request);
 				logger.debug("Exception occured: No default content");
 	    		persistError(request,"error.defaultContent.notSetup");
@@ -456,6 +458,7 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 		}
 		catch(Exception e)
 		{
+		    logger.debug("other problems: " + e);
 			VoteUtils.cleanUpSessionAbsolute(request);
 			logger.debug("Exception occured: No default question content");
 			persistError(request,"error.defaultContent.notSetup");

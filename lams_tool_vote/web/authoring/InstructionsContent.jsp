@@ -40,71 +40,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 				<table class="forms">
 				<tr> 
-					<td NOWRAP class="formlabel" valign=top>
-						<font size=2>
-    	      				<b> <bean:message key="label.offlineInstructions" />: <b>
-    	      			</font>
-          			</td>
-					<td NOWRAP colspan=3 valign=top>
-						<lams:SetEditor id="richTextOfflineInstructions" text="${richTextOfflineInstructions}" small="true"/>																			
-					</td> 
-				</tr>
-				
-				<tr> 
-					<td NOWRAP class="formlabel" valign=top>
-						<font size=2>
-							<b> <bean:message key="label.offlineFiles" /> <b>
-						</font>
-          			</td>
-          			<td colspan=3 NOWRAP valign=top> 
-	          			<font size=2>
-							<html:file  property="theOfflineFile"></html:file>
-						 	<html:submit onclick="javascript:submitMethod('submitOfflineFiles');" styleClass="buttonLeft">
-								 <bean:message key="button.upload"/> 
-							</html:submit>
-						</font>
-					</td> 
-
-				</tr>
-				<tr> 
-					<td NOWRAP align="right" valign=top>
-						<font size=2>
-    	      				<b> <bean:message key="label.uploadedOfflineFiles" /> </b>
-    	      			</font>
-          			</td>
-					<td NOWRAP colspan=3 align=left valign=top width="100%">
-						<table align="left" border="1">
-									<c:forEach var='file' items='${sessionScope.listOfflineFilesMetadata}'>
-											<tr>
-												<td NOWRAP valign=top>
-													<font size=2> <c:out value="${file.filename}"/> </font>
-												</td>
-												<td NOWRAP valign=top>
-													<c:set var="viewURL">
-														<html:rewrite page="/download/?uuid=${file.uuid}&preferDownload=false"/>
-													</c:set>
-													<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
-														<font size=2> <bean:message key="label.view"/> </font>
-													</a>
-												</td>
-												<td NOWRAP valign=top>
-													<c:set var="downloadURL">
-															<html:rewrite page="/download/?uuid=${file.uuid}&preferDownload=true"/>
-													</c:set>
-													<a href="<c:out value='${downloadURL}' escapeXml='false'/>">
-														<font size=2> <bean:message key="label.download"/> </font>
-													</a>
-												</td>
-												<td NOWRAP valign=top> 
-													 <font size=2>	<img src="<c:out value="${tool}"/>images/delete.gif" align=left onclick="javascript:submitDeleteFile('<c:out value="${file.uuid}"/>','deleteOfflineFile');"> </font>													
-												</td>
-											</tr>
-				         			</c:forEach>
-	         			</table>
-					</td> 
-				</tr>
-
-				<tr> 
 					<td NOWRAP align="right" valign=top>
 						<font size=2>
     	      				<b> <bean:message key="label.onlineInstructions" /> </b>
@@ -169,6 +104,73 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	         			</table>
 					</td> 
 				</tr>
+
+				
+				<tr> 
+					<td NOWRAP class="formlabel" valign=top>
+						<font size=2>
+    	      				<b> <bean:message key="label.offlineInstructions" />: <b>
+    	      			</font>
+          			</td>
+					<td NOWRAP colspan=3 valign=top>
+						<lams:SetEditor id="richTextOfflineInstructions" text="${richTextOfflineInstructions}" small="true"/>																			
+					</td> 
+				</tr>
+				
+				<tr> 
+					<td NOWRAP class="formlabel" valign=top>
+						<font size=2>
+							<b> <bean:message key="label.offlineFiles" /> <b>
+						</font>
+          			</td>
+          			<td colspan=3 NOWRAP valign=top> 
+	          			<font size=2>
+							<html:file  property="theOfflineFile"></html:file>
+						 	<html:submit onclick="javascript:submitMethod('submitOfflineFiles');" styleClass="buttonLeft">
+								 <bean:message key="button.upload"/> 
+							</html:submit>
+						</font>
+					</td> 
+
+				</tr>
+				<tr> 
+					<td NOWRAP align="right" valign=top>
+						<font size=2>
+    	      				<b> <bean:message key="label.uploadedOfflineFiles" /> </b>
+    	      			</font>
+          			</td>
+					<td NOWRAP colspan=3 align=left valign=top width="100%">
+						<table align="left" border="1">
+									<c:forEach var='file' items='${sessionScope.listOfflineFilesMetadata}'>
+											<tr>
+												<td NOWRAP valign=top>
+													<font size=2> <c:out value="${file.filename}"/> </font>
+												</td>
+												<td NOWRAP valign=top>
+													<c:set var="viewURL">
+														<html:rewrite page="/download/?uuid=${file.uuid}&preferDownload=false"/>
+													</c:set>
+													<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
+														<font size=2> <bean:message key="label.view"/> </font>
+													</a>
+												</td>
+												<td NOWRAP valign=top>
+													<c:set var="downloadURL">
+															<html:rewrite page="/download/?uuid=${file.uuid}&preferDownload=true"/>
+													</c:set>
+													<a href="<c:out value='${downloadURL}' escapeXml='false'/>">
+														<font size=2> <bean:message key="label.download"/> </font>
+													</a>
+												</td>
+												<td NOWRAP valign=top> 
+													 <font size=2>	<img src="<c:out value="${tool}"/>images/delete.gif" align=left onclick="javascript:submitDeleteFile('<c:out value="${file.uuid}"/>','deleteOfflineFile');"> </font>													
+												</td>
+											</tr>
+				         			</c:forEach>
+	         			</table>
+					</td> 
+				</tr>
+
 
 				<html:hidden property="fileItem"/>
 				<html:hidden property="offlineFile"/>				

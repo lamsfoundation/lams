@@ -1061,55 +1061,33 @@ public class AuthoringUtil implements VoteAppConstants {
     {
         UserDTO toolUser = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
         
-        boolean isQuestionsSequenced=false;
-        boolean isUsernameVisible=false;
-        //String reportTitle = voteAuthoringForm.getReportTitle();
-
         String richTextTitle = request.getParameter("title");
         String richTextInstructions = request.getParameter("instructions");
         logger.debug("richTextTitle: " + richTextTitle);
         logger.debug("richTextInstructions: " + richTextInstructions);
         
-        String richTextPosting = request.getParameter("posting");
-        logger.debug("richTextPosting: " + richTextPosting);
+        String voteChangable = voteAuthoringForm.getVoteChangable();
+        logger.debug("voteChangable: " + voteChangable);
         
-        String monitoringReportTitle = voteAuthoringForm.getMonitoringReportTitle();
-        logger.debug("monitoringReportTitle: " + monitoringReportTitle);
+        String lockedOnFinish=voteAuthoringForm.getLockOnFinish();
+        logger.debug("lockedOnFinish: " + lockedOnFinish);
         
-        //String richTextOnlineInstructions = voteAuthoringForm.getOnlineInstructions();
-        //logger.debug("richTextOnlineInstructions: " + richTextOnlineInstructions);
-        
-        //String richTextInstructions = voteAuthoringForm.getInstructions(); 
-        //String richTextOfflineInstructions = voteAuthoringForm.getOfflineInstructions();
-        //logger.debug("richTextOfflineInstructions: " + richTextOfflineInstructions);
-        
-        //String endLearningMessage = voteAuthoringForm.getEndLearningMessage();
-        //logger.debug("endLearningMessage: " + endLearningMessage);
-        
-        String questionsSequenced = voteAuthoringForm.getQuestionsSequenced();
-        logger.debug("questionsSequenced: " + questionsSequenced);
-        
-        String usernameVisible = voteAuthoringForm.getUsernameVisible();
-        logger.debug("usernameVisible: " + usernameVisible);
-        
+        String allowText=voteAuthoringForm.getAllowText();
+        logger.debug("allowText: " + allowText);
+
         String retries = voteAuthoringForm.getRetries();
         logger.debug("retries: " + retries);
         
-        String richTextReportTitle= (String)request.getSession().getAttribute(RICHTEXT_REPORT_TITLE);
-        String richTextEndLearningMessage=(String)request.getSession().getAttribute(RICHTEXT_END_LEARNING_MSG);
-        logger.debug("richTextReportTitle: " + richTextReportTitle);
-        logger.debug("richTextEndLearningMessage: " + richTextEndLearningMessage);
-        
-        
+        String maxNomcount= voteAuthoringForm.getMaxNominationCount();
+	    logger.debug("maxNomcount: " + maxNomcount);
+	    
         String richTextOfflineInstructions=(String)request.getSession().getAttribute(RICHTEXT_OFFLINEINSTRUCTIONS);
         logger.debug("richTextOfflineInstructions: " + richTextOfflineInstructions);
 		String richTextOnlineInstructions=(String)request.getSession().getAttribute(RICHTEXT_ONLINEINSTRUCTIONS);
 		logger.debug("richTextOnlineInstructions: " + richTextOnlineInstructions);
 
-
-        
         boolean setCommonContent=true; 
-        if ((questionsSequenced == null) || (usernameVisible == null))
+        if ((lockedOnFinish == null) || (voteChangable == null))
         {
         	setCommonContent=false;
         }
@@ -1121,14 +1099,20 @@ public class AuthoringUtil implements VoteAppConstants {
         boolean questionsSequencedBoolean=false;
         boolean synchInMonitorBoolean=false;
         boolean retriesBoolean=false;
-        boolean usernameVisibleBoolean=false;
+        boolean voteChangableBoolean=false;
+        boolean lockedOnFinishBoolean=false;
+        boolean allowTextBoolean=false;
+        
         if (setCommonContent)
         {
-            if (questionsSequenced.equalsIgnoreCase(ON))
-            	questionsSequencedBoolean=true;
+            if (voteChangable.equalsIgnoreCase(ON))
+                voteChangableBoolean=true;
             
-            if (usernameVisible.equalsIgnoreCase(ON))
-            	usernameVisibleBoolean=true;
+            if (lockedOnFinish.equalsIgnoreCase(ON))
+                lockedOnFinishBoolean=true;
+
+            if (allowText.equalsIgnoreCase(ON))
+                allowTextBoolean=true;
             
             if (retries.equalsIgnoreCase(ON))
                 retriesBoolean=true;
@@ -1162,7 +1146,6 @@ public class AuthoringUtil implements VoteAppConstants {
         Long toolContentIdLong =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
         logger.debug("toolContentIdLong: " + toolContentIdLong);
         
-        //String toolContentId=voteAuthoringForm.getToolContentId();
         String toolContentId=toolContentIdLong.toString();
     	logger.debug("toolContentId:  " + toolContentId);
      	
@@ -1181,7 +1164,6 @@ public class AuthoringUtil implements VoteAppConstants {
     	voteContent.setVoteContentId(new Long(toolContentId));
      	voteContent.setTitle(richTextTitle);
      	voteContent.setInstructions(richTextInstructions);
-     	voteContent.setPosting(richTextPosting);
      	voteContent.setUpdateDate(new Date(System.currentTimeMillis())); /**keep updating this one*/
      	logger.debug("userId: " + userId);
      	voteContent.setCreatedBy(userId); /**make sure we are setting the userId from the User object above*/
@@ -1191,14 +1173,13 @@ public class AuthoringUtil implements VoteAppConstants {
         if ((!activeModule.equals(DEFINE_LATER)) && (setCommonContent))
 		{
         	logger.debug("setting other content values...");
-         	voteContent.setUsernameVisible(usernameVisibleBoolean);
+         	voteContent.setVoteChangable(voteChangableBoolean);
+         	voteContent.setLockOnFinish(lockedOnFinishBoolean);
+         	voteContent.setAllowText(allowTextBoolean);
+         	voteContent.setMaxNominationCount(maxNomcount);
          	voteContent.setRetries(retriesBoolean);
-         	voteContent.setQuestionsSequenced(questionsSequencedBoolean); /**the default question listing in learner mode will be all in the same page*/
          	voteContent.setOnlineInstructions(richTextOnlineInstructions);
          	voteContent.setOfflineInstructions(richTextOfflineInstructions);
-         	voteContent.setEndLearningMessage(richTextEndLearningMessage);
-         	voteContent.setReportTitle(richTextReportTitle);
-         	voteContent.setMonitoringReportTitle(monitoringReportTitle);
 		}
         
  

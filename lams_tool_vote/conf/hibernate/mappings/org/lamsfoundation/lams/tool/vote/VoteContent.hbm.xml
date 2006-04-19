@@ -42,15 +42,6 @@
         length="65535"
     />
     
-
-    <property
-        name="posting"
-        type="java.lang.String"
-        access="property"        
-        column="posting"
-        length="65535"
-    />
-    
     <property
         name="creationDate"
         type="java.util.Date"
@@ -68,7 +59,23 @@
         length="20"
     />
 
+   <property
+        name="voteChangable"
+        type="boolean"
+        access="property"
+        column="voteChangable"
+        length="1"        
+   />
+   
+   <property
+        name="allowText"
+        type="boolean"
+        access="property"
+        column="allowText"
+        length="1"        
+   />
 
+   
    <property
         name="questionsSequenced"
         type="boolean"
@@ -77,13 +84,6 @@
         length="1"        
    />
 
-    <property
-        name="usernameVisible"
-        type="boolean"
-        access="property"        
-        column="username_visible"
-        length="1"
-    />
 
     <property
         name="createdBy"
@@ -93,22 +93,6 @@
         length="20"
     />
     
-    <property
-        name="monitoringReportTitle"
-        type="java.lang.String"
-        access="property"        
-        column="monitoring_report_title"
-        length="100"
-    />
-
-    <property
-        name="reportTitle"
-        type="java.lang.String"
-        access="property"        
-        column="report_title"
-        length="100"
-    />
-
    <property
         name="runOffline"
         type="boolean"
@@ -141,15 +125,6 @@
         length="65535"
     />
 
-
-    <property
-        name="endLearningMessage"
-        type="java.lang.String"
-        access="property"        
-        column="end_learning_message"
-        length="65535"
-    />
-    
     <property
         name="contentInUse"
         type="boolean"
@@ -175,18 +150,16 @@
         length="1"
     />
 
+    <property
+        name="maxNominationCount"
+        type="java.lang.String"
+        access="property"        
+        column="maxNominationCount"
+        length="5"
+    />
 
-   <property
-        name="showReport"
-        type="boolean"
-        access="property"
-        column="show_report"
-        length="1"        
-   />
 
-
-    
-   	 <set
+    	 <set
             name="voteQueContents"
             order-by="display_order"
             lazy="true"            

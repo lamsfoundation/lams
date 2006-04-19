@@ -60,14 +60,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							</td> 
 						</tr>
 
-					  	<tr> 
-					 		<td valign="top"><font size=2> <b> <bean:message key="label.vote.posting"/>:  </b></font></td>
-							<td NOWRAP valign=top>
-								<lams:SetEditor id="posting" text="${posting}" small="true"/>								
-							</td> 
-						</tr>
-
-
 				
 			 		<!--default Option content, this entry can not be deleted but can be updated -->
 				 		<tr> 

@@ -88,6 +88,12 @@ public class VoteContent implements Serializable {
 
     /** nullable persistent field */
     private long createdBy;
+    
+    private boolean voteChangable;
+    
+    private boolean allowText;
+    
+    private String maxNominationCount;
 
     /** nullable persistent field */
     private boolean lockOnFinish;
@@ -121,7 +127,7 @@ public class VoteContent implements Serializable {
 
     /** full constructor */
     public VoteContent(Long voteContentId, String content, String title, String instructions, String posting, boolean defineLater, boolean runOffline, 
-            Date creationDate, Date updateDate, boolean questionsSequenced, boolean usernameVisible, String reportTitle, 
+            Date creationDate, Date updateDate, boolean questionsSequenced, boolean voteChangable, boolean allowText, String maxNominationCount, boolean usernameVisible, String reportTitle, 
             String monitoringReportTitle, long createdBy, boolean lockOnFinish, boolean contentInUse, String offlineInstructions, 
             String onlineInstructions, String endLearningMessage, boolean showReport, boolean retries, Set voteQueContents, Set voteSessions, 
 			Set voteAttachments) {
@@ -135,6 +141,9 @@ public class VoteContent implements Serializable {
         this.creationDate = creationDate;
         this.updateDate = updateDate;
         this.questionsSequenced = questionsSequenced;
+        this.voteChangable=voteChangable;
+        this.maxNominationCount=maxNominationCount;
+        this.allowText=allowText;
         this.usernameVisible = usernameVisible;
         this.reportTitle = reportTitle;
         this.monitoringReportTitle = monitoringReportTitle;
@@ -188,6 +197,9 @@ public class VoteContent implements Serializable {
     				 vote.getCreationDate(),
     				 vote.getUpdateDate(),
     				 vote.isQuestionsSequenced(),
+    				 vote.isVoteChangable(),
+    				 vote.isAllowText(),
+    				 vote.getMaxNominationCount(),
     				 vote.isUsernameVisible(),
     				 vote.getReportTitle(),
     				 vote.getMonitoringReportTitle(),
@@ -519,5 +531,43 @@ public class VoteContent implements Serializable {
      */
     public void setPosting(String posting) {
         this.posting = posting;
+    }
+    
+    /**
+     * @return Returns the voteChangable.
+     */
+    public boolean isVoteChangable() {
+        return voteChangable;
+    }
+    /**
+     * @param voteChangable The voteChangable to set.
+     */
+    public void setVoteChangable(boolean voteChangable) {
+        this.voteChangable = voteChangable;
+    }
+
+    /**
+     * @return Returns the allowText.
+     */
+    public boolean isAllowText() {
+        return allowText;
+    }
+    /**
+     * @param allowText The allowText to set.
+     */
+    public void setAllowText(boolean allowText) {
+        this.allowText = allowText;
+    }    
+    /**
+     * @return Returns the maxNominationCount.
+     */
+    public String getMaxNominationCount() {
+        return maxNominationCount;
+    }
+    /**
+     * @param maxNominationCount The maxNominationCount to set.
+     */
+    public void setMaxNominationCount(String maxNominationCount) {
+        this.maxNominationCount = maxNominationCount;
     }
 }

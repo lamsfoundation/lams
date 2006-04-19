@@ -219,16 +219,24 @@ public abstract class VoteUtils implements VoteAppConstants {
 		
 	    logger.debug("ACTIVITY_INSTRUCTIONS: " + defaultVoteContent.getInstructions());
 		
-	    voteAuthoringForm.setReportTitle(defaultVoteContent.getReportTitle());
-	    voteAuthoringForm.setMonitoringReportTitle(defaultVoteContent.getMonitoringReportTitle());
-	    voteAuthoringForm.setEndLearningMessage(defaultVoteContent.getEndLearningMessage());
+	    //voteAuthoringForm.setReportTitle(defaultVoteContent.getReportTitle());
+	    //voteAuthoringForm.setMonitoringReportTitle(defaultVoteContent.getMonitoringReportTitle());
+	    //voteAuthoringForm.setEndLearningMessage(defaultVoteContent.getEndLearningMessage());
 	    voteAuthoringForm.setOnlineInstructions(defaultVoteContent.getOnlineInstructions());
 	    voteAuthoringForm.setOfflineInstructions(defaultVoteContent.getOfflineInstructions());
-	    voteAuthoringForm.setMonitoringReportTitle(defaultVoteContent.getMonitoringReportTitle());
+	    //voteAuthoringForm.setMonitoringReportTitle(defaultVoteContent.getMonitoringReportTitle());
 		
          //determine the status of radio boxes
-	    voteAuthoringForm.setUsernameVisible(defaultVoteContent.isUsernameVisible()?ON:OFF);
-	    voteAuthoringForm.setQuestionsSequenced(defaultVoteContent.isQuestionsSequenced()?ON:OFF);
+	    //voteAuthoringForm.setUsernameVisible(defaultVoteContent.isUsernameVisible()?ON:OFF);
+	    //voteAuthoringForm.setQuestionsSequenced(defaultVoteContent.isQuestionsSequenced()?ON:OFF);
+	    voteAuthoringForm.setAllowText(defaultVoteContent.isAllowText()?ON:OFF);
+	    voteAuthoringForm.setVoteChangable(defaultVoteContent.isVoteChangable()?ON:OFF);
+	    voteAuthoringForm.setLockOnFinish(defaultVoteContent.isLockOnFinish()?ON:OFF);
+	    voteAuthoringForm.setRetries(defaultVoteContent.isRetries()?ON:OFF);
+	    
+	    String maxNomcount= defaultVoteContent.getMaxNominationCount();
+	    logger.debug("maxNomcount: " + maxNomcount);
+	    voteAuthoringForm.setMaxNominationCount(maxNomcount);
 	}
 
 	
