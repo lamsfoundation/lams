@@ -22,7 +22,6 @@
  */
 
 import org.lamsfoundation.lams.common.ws.*
-import org.lamsfoundation.lams.authoring.*
 import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.common.*
 import mx.utils.*
@@ -75,7 +74,7 @@ class org.lamsfoundation.lams.common.ws.Workspace {
 	private function requestUserWorkspace():Void{
 		var callback:Function = Proxy.create(this,recievedUserWorkspace);
         var uid:Number = Config.getInstance().userID;
-		Application.getInstance().getComms().getRequest('workspace.do?method=getWorkspace&userID='+uid,callback, false);
+		ApplicationParent.getInstance().getComms().getRequest('workspace.do?method=getWorkspace&userID='+uid,callback, false);
 	}
 	
 	/**
@@ -100,8 +99,8 @@ class org.lamsfoundation.lams.common.ws.Workspace {
 	public function requestFolderContents(folderID:Number):Void{
 		var callback:Function = Proxy.create(this,recievedFolderContents);
         var uid:Number = Config.getInstance().userID;
-		Application.getInstance().getComms().getRequest('workspace.do?method=getFolderContents&folderID='+folderID+'&mode='+Config.getInstance().mode+'&userID='+uid,callback, false);
-		//Application.getInstance().getComms().getRequest('workspace.do?method=getFolderContentsExcludeHome&folderID='+folderID+'&mode='+Config.getInstance().mode+'&userID='+uid,callback, false);
+		ApplicationParent.getInstance().getComms().getRequest('workspace.do?method=getFolderContents&folderID='+folderID+'&mode='+Config.getInstance().mode+'&userID='+uid,callback, false);
+		//ApplicationParent.getInstance().getComms().getRequest('workspace.do?method=getFolderContentsExcludeHome&folderID='+folderID+'&mode='+Config.getInstance().mode+'&userID='+uid,callback, false);
 		
 	}
 	
@@ -130,7 +129,7 @@ class org.lamsfoundation.lams.common.ws.Workspace {
 		Debugger.log(resourceID+',to folder '+targetFolderID+','+resourceType,Debugger.GEN,'copyResourceResponse','Workspace');			
 		var callback:Function = Proxy.create(this,generalWorkspaceOperationResponseHandler);
         var uid:Number = Config.getInstance().userID;
-		Application.getInstance().getComms().getRequest('workspace.do?method=copyResource&resourceID='+resourceID+'&targetFolderID='+targetFolderID+'&resourceType='+resourceType+'&userID='+uid,callback, false);
+		ApplicationParent.getInstance().getComms().getRequest('workspace.do?method=copyResource&resourceID='+resourceID+'&targetFolderID='+targetFolderID+'&resourceType='+resourceType+'&userID='+uid,callback, false);
 		//http://localhost:8080/lams/workspace.do?method=copyResource&resourceID=10&targetFolderID=6&resourceType=FOLDER&userID=4
 	}
 	
@@ -161,7 +160,7 @@ class org.lamsfoundation.lams.common.ws.Workspace {
 		Debugger.log('resourceID:'+resourceID+', resourceType'+resourceType,Debugger.GEN,'copyResourceResponse','Workspace');			
 		var callback:Function = Proxy.create(this,generalWorkspaceOperationResponseHandler);
         var uid:Number = Config.getInstance().userID;
-		Application.getInstance().getComms().getRequest('workspace.do?method=deleteResource&resourceID='+resourceID+'&resourceType='+resourceType+'&userID='+uid,callback, false);
+		ApplicationParent.getInstance().getComms().getRequest('workspace.do?method=deleteResource&resourceID='+resourceID+'&resourceType='+resourceType+'&userID='+uid,callback, false);
 		
 	}
 
@@ -169,7 +168,7 @@ class org.lamsfoundation.lams.common.ws.Workspace {
 		Debugger.log('parentFolderID:'+parentFolderID+', folderName'+folderName,Debugger.GEN,'requestNewFolder','Workspace');			
 		var callback:Function = Proxy.create(this,generalWorkspaceOperationResponseHandler);
         var uid:Number = Config.getInstance().userID;
-		Application.getInstance().getComms().getRequest('workspace.do?method=createFolderForFlash&parentFolderID='+parentFolderID+'&name='+folderName+'&userID='+uid,callback, false);
+		ApplicationParent.getInstance().getComms().getRequest('workspace.do?method=createFolderForFlash&parentFolderID='+parentFolderID+'&name='+folderName+'&userID='+uid,callback, false);
 		
 	}
 
@@ -177,14 +176,14 @@ class org.lamsfoundation.lams.common.ws.Workspace {
 		Debugger.log('resourceID:'+resourceID+', resourceType'+resourceType+', newName:'+newName,Debugger.GEN,'requestRenameResource','Workspace');			
 		var callback:Function = Proxy.create(this,generalWorkspaceOperationResponseHandler);
         var uid:Number = Config.getInstance().userID;
-		Application.getInstance().getComms().getRequest('workspace.do?method=renameResource&resourceID='+resourceID+'&resourceType='+resourceType+'&name='+newName+'&userID='+uid,callback, false);
+		ApplicationParent.getInstance().getComms().getRequest('workspace.do?method=renameResource&resourceID='+resourceID+'&resourceType='+resourceType+'&name='+newName+'&userID='+uid,callback, false);
 	}
 
 	public function requestMoveResource(resourceID:Number, targetFolderID:Number, resourceType:String){
 		Debugger.log('resourceID:'+resourceID+', resourceType'+resourceType+', targetFolderID:'+targetFolderID,Debugger.GEN,'requestMoveResource','Workspace');			
 		var callback:Function = Proxy.create(this,requestMoveResourceResponse);
         var uid:Number = Config.getInstance().userID;
-		Application.getInstance().getComms().getRequest('workspace.do?method=moveResource&resourceID='+resourceID+'&resourceType='+resourceType+'&targetFolderID='+targetFolderID+'&userID='+uid,callback, false);
+		ApplicationParent.getInstance().getComms().getRequest('workspace.do?method=moveResource&resourceID='+resourceID+'&resourceType='+resourceType+'&targetFolderID='+targetFolderID+'&userID='+uid,callback, false);
 	}
 	
 	public function requestMoveResourceResponse(dto){
@@ -209,7 +208,7 @@ class org.lamsfoundation.lams.common.ws.Workspace {
 	private function requestWorkspaceFolders():Void{
 		var callback:Function = Proxy.create(this,recievedWorkspaceFolders);
         var uid:Number = Config.getInstance().userID;
-		Application.getInstance().getComms().getRequest('workspace.do?method=getAccessibleWorkspaceFoldersNew&userID='+uid,callback, false);
+		ApplicationParent.getInstance().getComms().getRequest('workspace.do?method=getAccessibleWorkspaceFoldersNew&userID='+uid,callback, false);
 		
 	}
 	
@@ -228,7 +227,7 @@ class org.lamsfoundation.lams.common.ws.Workspace {
 	public function requestAvailableLicenses(){
 		var callback:Function = Proxy.create(this,recievedAvailableLicenses);
         var uid:Number = Config.getInstance().userID;
-		Application.getInstance().getComms().getRequest('authoring/author.do?method=getAvailableLicenses',callback, false);
+		ApplicationParent.getInstance().getComms().getRequest('authoring/author.do?method=getAvailableLicenses',callback, false);
 	}
 	
 	/**

@@ -26,7 +26,7 @@ import org.lamsfoundation.lams.common.ws.*
 import org.lamsfoundation.lams.common.mvc.*
 import org.lamsfoundation.lams.common.ui.*
 import org.lamsfoundation.lams.common.dict.*
-import org.lamsfoundation.lams.authoring.*
+import org.lamsfoundation.lams.common.*
 import mx.managers.*
 import mx.events.*
 import mx.utils.*
@@ -87,9 +87,9 @@ class org.lamsfoundation.lams.common.ws.WorkspaceView extends AbstractView {
         var dialog:MovieClip;
         //Check to see whether this should be a centered or positioned dialog
         if(typeof(pos)=='string'){
-            dialog = PopUpManager.createPopUp(Application.root, LFWindow, true,{title:Dictionary.getValue('ws_dlg_title'),closeButton:true,scrollContentPath:'workspaceDialog'});
+            dialog = PopUpManager.createPopUp(ApplicationParent.root, LFWindow, true,{title:Dictionary.getValue('ws_dlg_title'),closeButton:true,scrollContentPath:'workspaceDialog'});
         } else {
-            dialog = PopUpManager.createPopUp(Application.root, LFWindow, true,{title:Dictionary.getValue('ws_dlg_title'),closeButton:true,scrollContentPath:'workspaceDialog',_x:pos.x,_y:pos.y});
+            dialog = PopUpManager.createPopUp(ApplicationParent.root, LFWindow, true,{title:Dictionary.getValue('ws_dlg_title'),closeButton:true,scrollContentPath:'workspaceDialog',_x:pos.x,_y:pos.y});
         }
 		
 		Debugger.log('_workspaceController:'+_workspaceController,4,'createWorkspaceDialogOpen','WorkspaceView');

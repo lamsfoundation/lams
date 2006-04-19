@@ -38,7 +38,7 @@ dynamic class Dictionary {
 	private var items:Hashtable;
     private var _currentLanguage:String;
 	private var comms:Communication;	
-	private var app:Application;	
+	private var app:ApplicationParent;	
     
     //Application instance is stored as a static in the application class
     private static var _instance:Dictionary = null;    
@@ -53,7 +53,7 @@ dynamic class Dictionary {
     */
     private function Dictionary() {
 		//Get comms and application references        
-        app = Application.getInstance();
+        app = ApplicationParent.getInstance();
         comms = app.getComms();		
 		mx.events.EventDispatcher.initialize(this);
         items = new Hashtable();

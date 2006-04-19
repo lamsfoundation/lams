@@ -92,7 +92,7 @@ class Config {
 		
         //Get a ref to the cookie monster 
         _cm = CookieMonster.getInstance();
-        _comms = Application.getInstance().getComms();
+        _comms = ApplicationParent.getInstance().getComms();
         init();
 	}
     

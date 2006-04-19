@@ -19,7 +19,7 @@
  * 
  * http://www.gnu.org/licenses/gpl.txt
  * ************************************************************************
- */s
+ */
 
 //import org.lamsfoundation.lams.common.util.Debugger
 import mx.core.UIComponent

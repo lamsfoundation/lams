@@ -27,14 +27,15 @@
  * 
  * @author  DI
  */
-
+import org.lamsfoundation.lams.common.*;
 import org.lamsfoundation.lams.common.ui.*
 import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.common.dict.*
 import mx.containers.*
 import mx.managers.*
 import mx.events.*
-import org.lamsfoundation.lams.authoring.*
+//import org.lamsfoundation.lams.authoring.*
+
 
 class org.lamsfoundation.lams.common.ui.Dialog {
     
@@ -81,7 +82,7 @@ class org.lamsfoundation.lams.common.ui.Dialog {
 		_inputCancelButtonLabel = cancelButtonLabel;
 		_inputOkHandler = okHandler;
 		_inputCancelHandler = cancelHandler;
-		_inputDialog = PopUpManager.createPopUp(Application.root, LFWindow, true,{title:Dictionary.getValue('ws_dlg_title'),closeButton:true,scrollContentPath:'InputDialog'});
+		_inputDialog = PopUpManager.createPopUp(ApplicationParent.root, LFWindow, true,{title:Dictionary.getValue('ws_dlg_title'),closeButton:true,scrollContentPath:'InputDialog'});
 		//Assign dialog load handler
 		_inputDialog.addEventListener('contentLoaded',Proxy.create(org.lamsfoundation.lams.common.ui.Dialog,inputDialogLoaded));
 	}

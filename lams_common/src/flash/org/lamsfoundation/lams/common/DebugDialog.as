@@ -31,7 +31,6 @@ import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.common.dict.*
 import org.lamsfoundation.lams.common.style.*
 import org.lamsfoundation.lams.common.*
-import org.lamsfoundation.lams.authoring.*
 
 /*
 * Preferences Dialog window for editing user preferences
@@ -236,7 +235,7 @@ class DebugDialog extends MovieClip implements Dialog{
                     var data = obj.toData();
                 }
                 //Get comms and serialize object
-                var comms = Application.getInstance().getComms();
+                var comms = ApplicationParent.getInstance().getComms();
                 var sx:String = comms.serializeObj(data);
                 //Write out the serialized object
                 messages_ta.html=false;
@@ -313,7 +312,7 @@ class DebugDialog extends MovieClip implements Dialog{
 	private function loadHandler(){
 		//load some wddx and 
 		var url_str:String = input_ti.text;
-		var comms = Application.getInstance().getComms();
+		var comms = ApplicationParent.getInstance().getComms();
 		comms.getRequest(url_str,testLoadXMLLoaded,true);
 		
 	}

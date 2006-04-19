@@ -24,7 +24,8 @@
 import mx.events.*
 import mx.utils.*
 import mx.transitions.easing.*
-import org.lamsfoundation.lams.common.Config
+import org.lamsfoundation.lams.common.ApplicationParent;
+import org.lamsfoundation.lams.common.Config;
 import org.lamsfoundation.lams.common.style.*
 import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.common.ui.*
@@ -71,7 +72,7 @@ class ThemeManager {
     private var _currentThemeName:String;
     private var _theme:Theme;
     private var comms:Communication;
-    private var app:Application;
+    private var app:ApplicationParent;
     
     
 	//Constructor
@@ -82,7 +83,7 @@ class ThemeManager {
         EventDispatcher.initialize(this);
 
         //Get comms and application references        
-        app = Application.getInstance();
+        app = ApplicationParent.getInstance();
         comms = app.getComms();
     }
     
@@ -98,11 +99,11 @@ class ThemeManager {
         if(CookieMonster.cookieExists('theme.'+theme)&&Config.USE_CACHE) {
             //Whilst waiting for theme to load from disk - show busy
 			
-			Cursor.showCursor(Application.C_HOURGLASS);  
+			Cursor.showCursor(ApplicationParent.C_HOURGLASS);  
 			openFromDisk(theme);
 			
 			// show default cursor
-			Cursor.showCursor(Application.C_DEFAULT);
+			Cursor.showCursor(ApplicationParent.C_DEFAULT);
 		
         }else {
 			//testing style creator
