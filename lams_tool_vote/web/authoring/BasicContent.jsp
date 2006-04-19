@@ -64,7 +64,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			 		<!--default Option content, this entry can not be deleted but can be updated -->
 				 		<tr> 
 						  	<td valign="top"> 
-						 		<font size=2> <b> Nomination 1:  </b></font>
+						 		<font size=2> <b><bean:message key="label.nomination1"/>:  </b></font>
 						 	</td>
 
 							<td NOWRAP valign=top>

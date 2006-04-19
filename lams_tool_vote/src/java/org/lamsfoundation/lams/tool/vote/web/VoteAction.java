@@ -39,6 +39,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
+import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
 import org.lamsfoundation.lams.tool.vote.VoteAttachmentDTO;
@@ -640,6 +641,67 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
         voteAuthoringForm.resetUserAction();
         
         return (mapping.findForward(destination));
+    }
+
+    
+    public ActionForward editActivityQuestions(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException,
+                                         ToolException
+    {
+    	logger.debug("dispatching editActivityQuestions...");
+    	
+    	VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
+		logger.debug("voteAuthoringForm: " + voteAuthoringForm);
+    	
+		IVoteService voteService = (IVoteService)request.getSession().getAttribute(TOOL_SERVICE);
+		logger.debug("voteService: " + voteService);
+		if (voteService == null)
+		{
+			logger.debug("will retrieve voteService");
+			voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
+			logger.debug("retrieving voteService from session: " + voteService);
+		}
+
+		/* determine whether the request is from Monitoring url Edit Activity*/
+		String sourceVoteStarter = (String) request.getAttribute(SOURCE_VOTE_STARTER);
+		logger.debug("sourceVoteStarter: " + sourceVoteStarter);
+		String destination=VoteUtils.getDestination(sourceVoteStarter);
+		logger.debug("destination: " + destination);
+
+     	request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(true));
+     	request.getSession().setAttribute(SHOW_AUTHORING_TABS,new Boolean(false).toString());
+     	     	
+     	String toolContentId=voteAuthoringForm.getToolContentId();
+     	logger.debug("toolContentId: " + toolContentId);
+     	if ((toolContentId== null) || toolContentId.equals(""))
+     	{
+     		logger.debug("getting toolContentId from session.");
+     		Long longToolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+     		toolContentId=longToolContentId.toString();
+     		logger.debug("toolContentId: " + toolContentId);
+     	}
+     	
+     	VoteContent voteContent=voteService.retrieveVote(new Long(toolContentId));
+		logger.debug("existing voteContent:" + voteContent);
+    	
+		boolean isContentInUse=VoteUtils.isContentInUse(voteContent);
+		logger.debug("isContentInUse:" + isContentInUse);
+		
+		request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(false).toString());
+		if (isContentInUse == true)
+		{
+			logger.debug("monitoring url does not allow editActivity since the content is in use.");
+	    	persistError(request,"error.content.inUse");
+	    	request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(true).toString());
+		}
+     	
+		VoteUtils.setDefineLater(request, true);
+		
+		logger.debug("forwarding to : " + destination);
+		return mapping.findForward(destination);
     }
 
     

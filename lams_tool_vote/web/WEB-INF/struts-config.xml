@@ -171,7 +171,13 @@
 	        handler="org.lamsfoundation.lams.tool.vote.web.CustomStrutsExceptionHandler"
 	        path="/VoteErrorBox.jsp"
 	        scope="request"
-	      />	         			
+	      />	
+
+	      <forward
+	        name="load"
+	        path="/authoring/AuthoringMaincontent.jsp"
+		    redirect="true"
+	      />
 
 	  	<forward
 		    name="errorList"

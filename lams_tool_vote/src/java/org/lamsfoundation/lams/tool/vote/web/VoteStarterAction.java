@@ -612,6 +612,16 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 		 */
 		voteAuthoringForm.resetUserAction();
 	}
+	
+	public ActionForward executeDefineLater(ActionMapping mapping, ActionForm form, 
+			HttpServletRequest request, HttpServletResponse response, IVoteService voteService) 
+		throws IOException, ServletException, VoteApplicationException {
+		logger.debug("passed voteService: " + voteService);
+		request.getSession().setAttribute(TOOL_SERVICE, voteService);
+		logger.debug("calling execute...");
+		return execute(mapping, form, request, response);
+	}
+	
 
 	protected boolean existsContent(long toolContentId, HttpServletRequest request)
 	{

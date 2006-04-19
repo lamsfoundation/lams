@@ -108,12 +108,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
             initEditor("richTextOfflineInstructions");                                    
             initEditor("richTextOnlineInstructions");                                    
             
-            initEditor("richTextReportTitle");            
-            initEditor("richTextEndLearningMsg");                        
-            
             initEditor("title");
             initEditor("instructions");
-            initEditor("posting");            
             
             initEditor("optionContent0");
             <c:set var="optIndex" scope="session" value="1"/>
@@ -169,15 +165,27 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<!-- end of content (Instructions) -->
 	</c:if> 			
 	
-	<c:if test="${sessionScope.activeModule == 'defineLater' }"> 			
+
+	<c:if test="${ (sessionScope.activeModule == 'defineLater') && (sessionScope.defineLaterInEditMode != 'true') }"> 			
 		<lams:Tabs collection="${tabsBasic}" useKey="true" control="true"/>
 		<!-- end tab buttons -->
 		<div class="tabbody">
 		
 		<!-- tab content 1 (Basic) -->
-		<lams:TabBody id="1" titleKey="label.basic" page="Basic.jsp"/>
+		<lams:TabBody id="1" titleKey="label.basic" page="BasicContentViewOnly.jsp"/>
 		<!-- end of content (Basic) -->
 	</c:if> 			
+	
+	<c:if test="${ (sessionScope.activeModule == 'defineLater') && (sessionScope.defineLaterInEditMode == 'true') }"> 			
+		<lams:Tabs collection="${tabsBasic}" useKey="true" control="true"/>
+		<!-- end tab buttons -->
+		<div class="tabbody">
+		
+		<!-- tab content 1 (Basic) -->
+		<lams:TabBody id="1" titleKey="label.basic" page="BasicContent.jsp"/>
+		<!-- end of content (Basic) -->
+	</c:if> 			
+
 	
 	<lams:HTMLEditor/>	
 	</html:form>

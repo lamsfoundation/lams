@@ -41,8 +41,10 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
-import org.lamsfoundation.lams.tool.vote.VoteUtils;
 import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
+import org.lamsfoundation.lams.tool.vote.VoteUtils;
+import org.lamsfoundation.lams.tool.vote.service.IVoteService;
+import org.lamsfoundation.lams.tool.vote.service.VoteServiceProxy;
 
 
 public class VoteDLStarterAction extends Action implements VoteAppConstants {
@@ -51,6 +53,12 @@ public class VoteDLStarterAction extends Action implements VoteAppConstants {
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
   								throws IOException, ServletException, VoteApplicationException {
 		VoteUtils.cleanUpSessionAbsolute(request);
-	    return null;
+		logger.debug("init defineLater mode. removed attributes...");
+		
+		IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
+		request.getSession().setAttribute(TOOL_SERVICE, voteService);
+		
+	    VoteStarterAction voteStarterAction= new VoteStarterAction();
+	    return voteStarterAction.executeDefineLater(mapping, form, request, response, voteService);
 	}
 }
