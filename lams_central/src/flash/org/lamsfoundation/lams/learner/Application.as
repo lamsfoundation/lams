@@ -32,9 +32,7 @@ import mx.utils.*
 * Application - LAMS Learner Application
 * @author   Mitchell Seaton
 */
-class org.lamsfoundation.lams.learner.Application {
-	
-	// public constants
+class org.lamsfoundation.lams.learner.Application extends ApplicationParent {
 	
 	// private constants
 	private var _comms:Communication;
@@ -73,7 +71,7 @@ class org.lamsfoundation.lams.learner.Application {
     */
     private function Application(){
 		trace('Begin Application...');
-		
+		trace("appInt: " + ApplicationParent.C_DEFAULT);
         _seqLibLoaded = false;
         _seqLibEventDispatched = false;
         
@@ -97,6 +95,9 @@ class org.lamsfoundation.lams.learner.Application {
 		
 		_container_mc = container_mc;
         _UILoaded = false;
+		
+		//add the cursors:
+		Cursor.addCursor(C_HOURGLASS);
 		
 		//Comms object - do this before any objects are created that require it for server communication
         _comms = new Communication();

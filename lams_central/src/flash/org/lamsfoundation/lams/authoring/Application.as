@@ -39,16 +39,7 @@ import mx.utils.*
 * Application - LAMS Application
 * @author   DI
 */
-class org.lamsfoundation.lams.authoring.Application {
-	
-	//public constants
-	public static var C_HOURGLASS:String = "c_hourglass";
-	public static var C_TRANSITION:String = "c_pen";
-	public static var C_OPTIONAL:String = "c_optionalBoxPen";
-	public static var C_GATE:String = "c_gate";
-	public static var C_GROUP:String = "c_group";
-	public static var C_DEFAULT:String = "default";
-	
+class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 	
 	private static var SHOW_DEBUGGER:Boolean = false;
 	/*
@@ -143,6 +134,8 @@ class org.lamsfoundation.lams.authoring.Application {
     * Application - Constructor
     */
     private function Application(){
+		super();
+		
         _themeLoaded = false;
         _themeEventDispatched = false;
         _dictionaryLoaded = false;
