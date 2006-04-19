@@ -7,7 +7,7 @@
 <hibernate-mapping
 >
     <class
-        name="org.lamsfoundation.lams.tool.chat.Chat"
+        name="org.lamsfoundation.lams.tool.chat.model.Chat"
         table="tl_lachat11_chat"
     >
 
@@ -134,8 +134,8 @@
         <set
             name="chatAttachments"
             lazy="false"
-            inverse="true"
-            cascade="none"
+            inverse="false"
+            cascade="all-delete-orphan"
             sort="unsorted"
         >
 
@@ -145,7 +145,7 @@
             </key>
 
             <one-to-many
-                  class="org.lamsfoundation.lams.tool.chat.ChatAttachment"
+                  class="org.lamsfoundation.lams.tool.chat.model.ChatAttachment"
             />
 
         </set>
@@ -164,7 +164,7 @@
             </key>
 
             <one-to-many
-                  class="org.lamsfoundation.lams.tool.chat.ChatSession"
+                  class="org.lamsfoundation.lams.tool.chat.model.ChatSession"
             />
 
         </set>

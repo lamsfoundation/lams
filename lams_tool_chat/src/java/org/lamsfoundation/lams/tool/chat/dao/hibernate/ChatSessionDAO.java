@@ -26,7 +26,7 @@ package org.lamsfoundation.lams.tool.chat.dao.hibernate;
 import java.util.List;
 
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
-import org.lamsfoundation.lams.tool.chat.ChatSession;
+import org.lamsfoundation.lams.tool.chat.model.ChatSession;
 import org.lamsfoundation.lams.tool.chat.dao.IChatSessionDAO;
 
 /**

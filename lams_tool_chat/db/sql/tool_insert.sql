@@ -49,6 +49,6 @@ NULL,
 'tool/lachat11/exportPortfolio?mode=teacher',
 'tool/lachat11/contribute.do',
 'tool/lachat11/moderate.do',
-'org.lamsfoundation.lams.tool.chat.web.ApplicationResources',
+'org.lamsfoundation.lams.tool.chat.ApplicationResources',
 NOW()
 )

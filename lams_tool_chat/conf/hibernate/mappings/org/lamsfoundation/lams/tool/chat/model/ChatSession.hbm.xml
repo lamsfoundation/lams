@@ -7,8 +7,8 @@
 <hibernate-mapping
 >
     <class
-        name="org.lamsfoundation.lams.tool.chat.ChatAttachment"
-        table="tl_lachat11_attachment"
+        name="org.lamsfoundation.lams.tool.chat.model.ChatSession"
+        table="tl_lachat11_session"
     >
 
         <id
@@ -19,59 +19,58 @@
             <generator class="native">
               <!--  
                   To add non XDoclet generator parameters, create a file named 
-                  hibernate-generator-params-ChatAttachment.xml 
+                  hibernate-generator-params-ChatSession.xml 
                   containing the additional parameters and place it in your merge dir. 
               --> 
             </generator>
         </id>
 
         <property
-            name="fileVersionId"
-            type="java.lang.Long"
-            update="true"
-            insert="true"
-            column="file_version_id"
-            length="20"
-        />
-
-        <property
-            name="fileType"
-            type="java.lang.String"
-            update="true"
-            insert="true"
-            column="file_type"
-            length="255"
-        />
-
-        <property
-            name="fileName"
-            type="java.lang.String"
-            update="true"
-            insert="true"
-            column="file_name"
-            length="255"
-        />
-
-        <property
-            name="fileUuid"
-            type="java.lang.Long"
-            update="true"
-            insert="true"
-            column="file_uuid"
-            length="20"
-        />
-
-        <property
-            name="createDate"
+            name="sessionEndDate"
             type="java.util.Date"
             update="true"
             insert="true"
-            column="create_date"
+            column="session_end_date"
+        />
+
+        <property
+            name="sessionStartDate"
+            type="java.util.Date"
+            update="true"
+            insert="true"
+            column="session_start_date"
+        />
+
+        <property
+            name="status"
+            type="java.lang.Integer"
+            update="true"
+            insert="true"
+            column="status"
+            length="11"
+        />
+
+        <property
+            name="sessionId"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
+            column="session_id"
+            length="20"
+        />
+
+        <property
+            name="sessionName"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="session_name"
+            length="250"
         />
 
         <many-to-one
             name="chat"
-            class="org.lamsfoundation.lams.tool.chat.Chat"
+            class="org.lamsfoundation.lams.tool.chat.model.Chat"
             cascade="none"
             outer-join="auto"
             update="true"
@@ -82,9 +81,28 @@
             />
         </many-to-one>
 
+        <set
+            name="chatUsers"
+            lazy="true"
+            inverse="true"
+            cascade="none"
+            sort="unsorted"
+        >
+
+            <key
+                column="session_id"
+            >
+            </key>
+
+            <one-to-many
+                  class="org.lamsfoundation.lams.tool.chat.model.ChatUser"
+            />
+
+        </set>
+
         <!--
             To add non XDoclet property mappings, create a file named
-                hibernate-properties-ChatAttachment.xml
+                hibernate-properties-ChatSession.xml
             containing the additional properties and place it in your merge dir.
         -->
 

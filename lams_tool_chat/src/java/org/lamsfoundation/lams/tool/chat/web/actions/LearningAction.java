@@ -47,6 +47,7 @@ public class LearningAction extends Action {
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		// TODO Auto-generated method stub
+		log.info("excuting learning action");
 		return mapping.findForward("success");
 	}
 

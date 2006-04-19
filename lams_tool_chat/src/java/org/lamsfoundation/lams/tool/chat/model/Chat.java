@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 /* $$Id$$ */
-package org.lamsfoundation.lams.tool.chat;
+package org.lamsfoundation.lams.tool.chat.model;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -38,15 +38,14 @@ import org.lamsfoundation.lams.tool.chat.service.ChatService;
 
 public class Chat implements java.io.Serializable, Cloneable {
 
-	static Logger log = Logger.getLogger(ChatService.class.getName());
-	
-	// Fields
-
 	/**
-	 * TODO generate proper serialVersionUID
+	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 579733009969321015L;
 
+	static Logger log = Logger.getLogger(ChatService.class.getName());
+
+	// Fields
 	/**
 	 * 
 	 */
@@ -281,9 +280,9 @@ public class Chat implements java.io.Serializable, Cloneable {
 	}
 
 	/**
-	 * @hibernate.set lazy="false" inverse="true" cascade="none"
+	 * @hibernate.set lazy="false" inverse="false" cascade="all-delete-orphan"
 	 * @hibernate.collection-key column="chat_uid"
-	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.chat.ChatAttachment"
+	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.chat.model.ChatAttachment"
 	 * 
 	 */
 
@@ -298,7 +297,7 @@ public class Chat implements java.io.Serializable, Cloneable {
 	/**
 	 * @hibernate.set lazy="true" inverse="true" cascade="none"
 	 * @hibernate.collection-key column="chat_uid"
-	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.chat.ChatSession"
+	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.chat.model.ChatSession"
 	 * 
 	 */
 
@@ -361,31 +360,29 @@ public class Chat implements java.io.Serializable, Cloneable {
 	}
 
 	protected Object clone() {
-	  		
-	  		Chat chat = null;
-	  		try{
-	  			chat = (Chat) super.clone();
-	  			chat.setUid(null);
-	  			
-	  			// copy the attachments,
-	  			if(chatAttachments != null){
-	  				Iterator iter = chatAttachments.iterator();
-	  				Set set = new HashSet();
-	  				while(iter.hasNext()){
-	  					ChatAttachment file = (ChatAttachment)iter.next(); 
-	  					ChatAttachment newFile = (ChatAttachment)file.clone();
-						set.add(newFile);
-	  				}
 
-	  			}
-	  			// TODO check what we need to do with chatSessions clone.
-  				chat.chatSessions = new HashSet();
-  				
-			} catch (CloneNotSupportedException e) {
-				log.error("Error cloning " + Chat.class);
-				//TODO is this the right thing to do ??
-				// maybe we should let the exception propagate.
+		Chat chat = null;
+		try {
+			chat = (Chat) super.clone();
+			chat.setUid(null);
+
+			if (chatAttachments != null) {
+				// create a copy of the attachments
+				Iterator iter = chatAttachments.iterator();
+				Set set = new HashSet();
+				while (iter.hasNext()) {
+					ChatAttachment originalFile = (ChatAttachment) iter.next();
+					ChatAttachment newFile = (ChatAttachment) originalFile.clone();
+					set.add(newFile);
+				}
+				chat.chatAttachments = set;
 			}
-	  		return chat;
+			// create an empty set for the chatSession
+			chat.chatSessions = new HashSet();
+
+		} catch (CloneNotSupportedException e) {
+			log.error("Error cloning " + Chat.class);
+		}
+		return chat;
 	}
 }

@@ -26,4 +26,9 @@ package org.lamsfoundation.lams.tool.chat.util;
 public interface ChatConstants {
 	public static final String TOOL_SIGNATURE = "lachat11";
 	public static final Integer COMPLETED = new Integer(1);
+	public static final String AUTHORING_DEFAULT_TAB = "1";
+	public static final String ATTACHMENT_LIST = "attachmentList";
+	public static final String DELETED_ATTACHMENT_LIST = "deletedAttachmentList";
+	public static final String AUTH_SESSION_ID_COUNTER = "authoringSessionIdCounter";
+	public static final String AUTH_SESSION_ID = "authoringSessionId";
 }

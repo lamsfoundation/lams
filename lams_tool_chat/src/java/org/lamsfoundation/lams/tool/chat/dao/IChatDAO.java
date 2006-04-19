@@ -24,7 +24,7 @@
 package org.lamsfoundation.lams.tool.chat.dao;
 
 import org.lamsfoundation.lams.dao.IBaseDAO;
-import org.lamsfoundation.lams.tool.chat.Chat;
+import org.lamsfoundation.lams.tool.chat.model.Chat;
 
 /**
  * DAO for accessing the Chat objects - interface defining
@@ -36,4 +36,6 @@ public interface IChatDAO extends IBaseDAO{
 
 	void saveOrUpdate(Chat toContent);
 
+	void deleteInstructionFile(Long toolContentId, Long uuid, Long versionId, String type);
+	
 }

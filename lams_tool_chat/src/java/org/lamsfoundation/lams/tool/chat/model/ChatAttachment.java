@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 /* $$Id$$ */
-package org.lamsfoundation.lams.tool.chat;
+package org.lamsfoundation.lams.tool.chat.model;
 
 import java.util.Date;
 
@@ -38,14 +38,12 @@ import org.apache.log4j.Logger;
 
 public class ChatAttachment implements java.io.Serializable, Cloneable {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+
 
 	/**
 	 * 
 	 */
+	private static final long serialVersionUID = 47452859888067500L;
 	
 	private static final Logger log = Logger.getLogger(ChatAttachment.class);
 

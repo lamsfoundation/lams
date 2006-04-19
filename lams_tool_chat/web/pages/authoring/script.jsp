@@ -11,13 +11,22 @@
 	var themeName="aqua";
         
 	function init(){
+
+		// initialising tabs
 		initTabSize(3);
-            
-//		var tag = document.getElementById("currentTab");
-//		if(tag.value != "")
-//			selectTab(tag.value);
-//      else
+	
+        // open the current tab    
+		var tag = document.getElementById("currentTab");
+		if(tag.value != "")
+			selectTab(tag.value);
+     	else
 			selectTab(1);
+			
+		// initialising fckeditor
+		initEditor("Title");
+		initEditor("Instructions");
+		initEditor("OnlineInstruction");
+		initEditor("OfflineInstruction");
 	}  
         
 	function doSelectTab(tabId) {
@@ -26,11 +35,15 @@
 		selectTab(tabId);
 	}
 
-	function doSubmit(method, tabId) {
-//		if(tabId != null)
-//			document.forumMonitoringForm.currentTab.value=tabId;
-//		document.forumMonitoringForm.method.value=method;
-		document.forumMonitoringForm.submit();
+	function doSubmit(method) {
+		document.authoringForm.dispatch.value=method;
+		document.authoringForm.submit();
 	}
+	
+	function deleteAttachment(dispatch, uuid) {
+		document.authoringForm.dispatch.value=dispatch;
+		document.authoringForm.deleteFileUuid.value=uuid;
+		document.authoringForm.submit();	
+	}
+	
 </script>
-

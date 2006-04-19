@@ -30,36 +30,46 @@ import org.lamsfoundation.lams.contentrepository.client.ToolContentHandler;
  */
 public class ChatToolContentHandler extends ToolContentHandler {
 
-    private static String repositoryWorkspaceName = "chatworkspace";
-    private static String repositoryUser = "chat";
-    private static char[] repositoryId = {'l','a','m','s','-','e','x'};
+	// TODO these three fields were changed to public, since accessor methods
+	// cannot be made static.  Check if we can do this a better way.
+	public static String repositoryWorkspaceName = "chatworkspace";
 
-    /**
-     * 
-     */
-    public ChatToolContentHandler() {
-        super();
-    }
+	public static String repositoryUser = "chat";
 
-    /* (non-Javadoc)
-     * @see org.lamsfoundation.lams.contentrepository.client.ToolContentHandler#getRepositoryWorkspaceName()
-     */
-    public String getRepositoryWorkspaceName() {
-        return repositoryWorkspaceName;
-    }
+	public static char[] repositoryId = { 'l', 'a', 'm', 's', '-', 'e', 'x' };
 
-    /* (non-Javadoc)
-     * @see org.lamsfoundation.lams.contentrepository.client.ToolContentHandler#getRepositoryUser()
-     */
-    public String getRepositoryUser() {
-        return repositoryUser;
-    }
+	/**
+	 * 
+	 */
+	public ChatToolContentHandler() {
+		super();
+	}
 
-    /* (non-Javadoc)
-     * @see org.lamsfoundation.lams.contentrepository.client.ToolContentHandler#getRepositoryId()
-     */
-    public char[] getRepositoryId() {
-        return repositoryId;
-    }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.lamsfoundation.lams.contentrepository.client.ToolContentHandler#getRepositoryWorkspaceName()
+	 */
+	public String getRepositoryWorkspaceName() {
+		return repositoryWorkspaceName;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.lamsfoundation.lams.contentrepository.client.ToolContentHandler#getRepositoryUser()
+	 */
+	public String getRepositoryUser() {
+		return repositoryUser;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.lamsfoundation.lams.contentrepository.client.ToolContentHandler#getRepositoryId()
+	 */
+	public char[] getRepositoryId() {
+		return repositoryId;
+	}
 
 }

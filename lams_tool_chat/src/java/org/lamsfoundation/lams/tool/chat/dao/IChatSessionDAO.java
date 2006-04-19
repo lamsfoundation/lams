@@ -24,7 +24,7 @@
 package org.lamsfoundation.lams.tool.chat.dao;
 
 import org.lamsfoundation.lams.dao.IBaseDAO;
-import org.lamsfoundation.lams.tool.chat.ChatSession;
+import org.lamsfoundation.lams.tool.chat.model.ChatSession;
 
 /**
  * DAO for accessing the ChatSession objects - interface defining

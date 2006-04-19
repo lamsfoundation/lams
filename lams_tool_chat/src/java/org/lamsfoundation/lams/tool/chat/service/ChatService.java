@@ -23,22 +23,39 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.chat.service;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.struts.upload.FormFile;
+import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
+import org.lamsfoundation.lams.contentrepository.ICredentials;
+import org.lamsfoundation.lams.contentrepository.ITicket;
+import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
+import org.lamsfoundation.lams.contentrepository.LoginException;
+import org.lamsfoundation.lams.contentrepository.NodeKey;
+import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
+import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
+import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
+import org.lamsfoundation.lams.contentrepository.service.RepositoryProxy;
+import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
-import org.lamsfoundation.lams.tool.chat.Chat;
-import org.lamsfoundation.lams.tool.chat.ChatSession;
 import org.lamsfoundation.lams.tool.chat.dao.IChatAttachmentDAO;
 import org.lamsfoundation.lams.tool.chat.dao.IChatDAO;
 import org.lamsfoundation.lams.tool.chat.dao.IChatSessionDAO;
 import org.lamsfoundation.lams.tool.chat.dao.IChatUserDAO;
+import org.lamsfoundation.lams.tool.chat.model.Chat;
+import org.lamsfoundation.lams.tool.chat.model.ChatAttachment;
+import org.lamsfoundation.lams.tool.chat.model.ChatSession;
 import org.lamsfoundation.lams.tool.chat.util.ChatConstants;
 import org.lamsfoundation.lams.tool.chat.util.ChatException;
+import org.lamsfoundation.lams.tool.chat.util.ChatToolContentHandler;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
@@ -54,6 +71,8 @@ import org.lamsfoundation.lams.tool.service.ILamsToolService;
 public class ChatService implements ToolSessionManager, ToolContentManager,
 		IChatService {
 
+	static Logger logger = Logger.getLogger(ChatService.class.getName());
+
 	private IChatDAO chatDAO = null;
 
 	private IChatSessionDAO chatSessionDAO = null;
@@ -67,17 +86,24 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 	private ILamsToolService toolService;
 
 	private IToolContentHandler chatToolContentHandler = null;
+		
+	private IRepositoryService repositoryService = null;
 
 	public ChatService() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	static Logger log = Logger.getLogger(ChatService.class.getName());
-
 	/* ************ Methods from ToolSessionManager, ToolContentManager ***** */
 	public void createToolSession(Long toolSessionId, String toolSessionName,
 			Long toolContentId) throws ToolException {
+		if (logger.isDebugEnabled()) {
+			logger.debug("entering method createToolSession:" + 
+					" toolSessionId = " + toolSessionId +
+					" toolSessionName = " + toolSessionName	+
+					" toolContentId = " + toolContentId);
+		}
+		
 		ChatSession session = new ChatSession();
 		session.setSessionId(toolSessionId);
 		session.setSessionName(toolSessionName);
@@ -88,15 +114,21 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 
 	public String leaveToolSession(Long toolSessionId, Long learnerId)
 			throws DataMissingException, ToolException {
-
+		
+		if(logger.isDebugEnabled()) {
+			logger.debug("entering method leaveToolSession:" + 
+					" toolSessionId=" + toolSessionId +
+					" learnerId=" + learnerId);
+		}
+		
 		if (toolSessionId == null) {
-			log
+			logger
 					.error("Fail to leave tool Session based on null tool session id.");
 			throw new ToolException(
 					"Fail to remove tool Session based on null tool session id.");
 		}
 		if (learnerId == null) {
-			log.error("Fail to leave tool Session based on null learner.");
+			logger.error("Fail to leave tool Session based on null learner.");
 			throw new ToolException(
 					"Fail to remove tool Session based on null learner.");
 		}
@@ -106,7 +138,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 			session.setStatus(ChatConstants.COMPLETED);
 			chatSessionDAO.saveOrUpdate(session);
 		} else {
-			log.error("Fail to leave tool Session.Could not find submit file "
+			logger.error("Fail to leave tool Session.Could not find submit file "
 					+ "session by given session id: " + toolSessionId);
 			throw new DataMissingException(
 					"Fail to leave tool Session."
@@ -136,13 +168,23 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 
 	public void copyToolContent(Long fromContentId, Long toContentId)
 			throws ToolException {
-		if (fromContentId == null || toContentId == null)
-			throw new ToolException(
-					"Failed to create the SubmitFiles tool seession");
+
+		if (logger.isDebugEnabled()) {
+			logger.debug("entering method copyToolContent:" +
+					" fromContentId=" + fromContentId +
+					" toContentId=" + toContentId);				
+		}
+		
+		if (fromContentId == null || toContentId == null) {
+			String error = "Failed to copy tool content: "
+					+ " fromContentID or toContentID is null";
+			throw new ToolException(error);
+		}
 
 		Chat fromContent = chatDAO.getByContentId(fromContentId);
 		if (fromContent == null) {
-			fromContent = getDefaultContent(fromContentId);
+			// create the fromContent using the default tool content
+			fromContent = copyDefaultContent(fromContentId);
 		}
 		Chat toContent = Chat.newInstance(fromContent, toContentId,
 				chatToolContentHandler);
@@ -167,30 +209,146 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 
 	}
 
-	/* ********** My Methods ************************************************ */
+	/* ********** IChatService Methods ************************************** */
+	public Chat copyDefaultContent(Long newContentID) {
 
-	private Chat getDefaultContent(Long contentId) {
-		// TODO This method signature should be added to IChatService
-
-		if (contentId == null) {
-			String error = "Could not retrieve default content id for Forum tool";
-			log.error(error);
+		if (newContentID == null) {
+			String error = "Cannot copy the Chat tools default content: + "
+					+ "newContentID is null";
+			logger.error(error);
 			throw new ChatException(error);
 		}
 
-		Chat defaultContent = getDefaultForum();
-		// save default content by given ID.
-		Chat content = new Chat();
-		content = Chat.newInstance(defaultContent, contentId,
+		Chat defaultContent = getDefaultContent();
+		// create new chat using the newContentID
+		Chat newContent = new Chat();
+		newContent = Chat.newInstance(defaultContent, newContentID,
 				chatToolContentHandler);
-		return null;
+		chatDAO.saveOrUpdate(newContent);
+		return newContent;
 	}
 
-	private Chat getDefaultForum() {
-		// TODO Auto-generated method stub
-		return null;
+	public Chat getDefaultContent() {
+		Long defaultContentID = getToolDefaultContentIdBySignature(ChatConstants.TOOL_SIGNATURE);
+		Chat defaultContent = getChatByContentId(defaultContentID);
+		if (defaultContent == null) {
+			String error = "Could not retrieve default content record for this tool";
+			logger.error(error);
+			throw new ChatException(error);
+		}
+		return defaultContent;
 	}
 
+	public Long getToolDefaultContentIdBySignature(String toolSignature) {
+		Long toolContentId = null;
+		toolContentId = new Long(toolService
+				.getToolDefaultContentIdBySignature(toolSignature));
+		if (toolContentId == null) {
+			String error = "Could not retrieve default content id for this tool";
+			logger.error(error);
+			throw new ChatException(error);
+		}
+		return toolContentId;
+	}
+
+	public Chat getChatByContentId(Long toolContentID) {
+		Chat chat = (Chat) chatDAO.getByContentId(toolContentID);
+		if (chat == null) {
+			logger.info("Could not find the content with toolContentID:"
+					+ toolContentID);
+		}
+		return chat;
+	}
+	
+	public ChatAttachment uploadFileToContent(Long toolContentId, FormFile file, String type) {
+		if(file == null || StringUtils.isEmpty(file.getFileName()))
+			throw new ChatException("Could not find upload file: " + file);
+		
+		NodeKey nodeKey = processFile(file, type);
+		
+		ChatAttachment attachment = new ChatAttachment();
+		attachment.setFileType(type);
+		attachment.setFileUuid(nodeKey.getUuid());		
+		attachment.setFileVersionId(nodeKey.getVersion());
+		attachment.setFileName(file.getFileName());
+		
+		return attachment;
+	}
+	
+	public void deleteFromRepository(Long uuid, Long versionID) throws ChatException {
+		ITicket ticket = getRepositoryLoginTicket();
+		try {
+			repositoryService.deleteVersion(ticket, uuid,versionID);
+		} catch (Exception e) {
+			throw new ChatException(
+					"Exception occured while deleting files from"
+							+ " the repository " + e.getMessage());
+		}
+	}
+
+	public void deleteInstructionFile(Long contentID, Long uuid, Long versionID, String type) {
+		chatDAO.deleteInstructionFile(contentID, uuid, versionID, type);
+		
+	}
+
+	public void saveOrUpdateContent(Chat persistContent) {
+		chatDAO.saveOrUpdate(persistContent);
+		
+	}
+	
+    /* ********** Private methods ********** */
+	
+	private NodeKey processFile(FormFile file, String type) {
+    	NodeKey node = null;
+        if (file!= null && !StringUtils.isEmpty(file.getFileName())) {
+            String fileName = file.getFileName();
+            try {
+				node = getChatToolContentHandler().uploadFile(file.getInputStream(), fileName, 
+				        file.getContentType(), type);
+			} catch (InvalidParameterException e) {
+				throw new ChatException("FileNotFoundException occured while trying to upload File" + e.getMessage());
+			} catch (FileNotFoundException e) {
+				throw new ChatException("FileNotFoundException occured while trying to upload File" + e.getMessage());
+			} catch (RepositoryCheckedException e) {
+				throw new ChatException("FileNotFoundException occured while trying to upload File" + e.getMessage());
+			} catch (IOException e) {
+				throw new ChatException("FileNotFoundException occured while trying to upload File" + e.getMessage());
+			}
+          }
+        return node;
+	}
+
+	/**
+	 * This method verifies the credentials of the SubmitFiles Tool and gives it
+	 * the <code>Ticket</code> to login and access the Content Repository.
+	 * 
+	 * A valid ticket is needed in order to access the content from the
+	 * repository. This method would be called evertime the tool needs to
+	 * upload/download files from the content repository.
+	 * 
+	 * @return ITicket The ticket for repostory access
+	 * @throws SubmitFilesException
+	 */
+	private ITicket getRepositoryLoginTicket() throws ChatException {
+		repositoryService = RepositoryProxy.getRepositoryService();
+		ICredentials credentials = new SimpleCredentials(
+				ChatToolContentHandler.repositoryUser,
+				ChatToolContentHandler.repositoryId);
+		try {
+			ITicket ticket = repositoryService.login(credentials,
+					ChatToolContentHandler.repositoryWorkspaceName);
+			return ticket;
+		} catch (AccessDeniedException ae) {
+			throw new ChatException("Access Denied to repository."
+					+ ae.getMessage());
+		} catch (WorkspaceNotFoundException we) {
+			throw new ChatException("Workspace not found."
+					+ we.getMessage());
+		} catch (LoginException e) {
+			throw new ChatException("Login failed." + e.getMessage());
+		}
+	}
+	
 	/* ********** Used by Spring to "inject" the linked objects ************* */
 
 	public IChatAttachmentDAO getChatAttachmentDAO() {
@@ -249,5 +407,4 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 	public void setLearnerService(ILearnerService learnerService) {
 		this.learnerService = learnerService;
 	}
-
 }

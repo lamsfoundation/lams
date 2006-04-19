@@ -85,6 +85,7 @@ Ant build file.
 
 	<target name="compile-java" depends="clean-build" description="compile java sources">
 		<javac srcdir="${src.java.dir}" compiler="modern" destdir="${build.classes.java}" deprecation="on" debug="on">
+			<compilerarg value="-Xlint:unchecked"/>
 			<classpath>
 				<path refid="project.classpath" />
 			</classpath>
@@ -201,7 +202,7 @@ Ant build file.
 	<!-- Deploy the chat struts jar and war and explode                      -->
 	<!-- =================================================================== -->
 
-	<target name="deploy-and-explode-war" depends="delete-exploded-tool-folder, deploy-war, explode-tool" description="composite of multiple targets">
+	<target name="deploy-and-explode-war" depends="deploy-war, explode-tool" description="composite of multiple targets">
 
 	</target>
 

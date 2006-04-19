@@ -47,6 +47,7 @@ public class MonitoringAction extends Action {
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		// TODO Auto-generated method stub
+		log.info("excuting monitoring action");
 		return mapping.findForward("success");
 	}
 }

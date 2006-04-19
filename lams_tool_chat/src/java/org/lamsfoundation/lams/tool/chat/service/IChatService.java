@@ -23,12 +23,74 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.chat.service;
 
-
+import org.apache.struts.upload.FormFile;
+import org.lamsfoundation.lams.tool.chat.model.Chat;
+import org.lamsfoundation.lams.tool.chat.model.ChatAttachment;
 
 /**
  * Defines the services available to the web layer from the Chat Service
  */
 public interface IChatService {
+	/**
+	 * Makes a copy of the default content and assigns it a newContentID
+	 * 
+	 * @params newContentID
+	 * @return
+	 */
+	public Chat copyDefaultContent(Long newContentID);
 	
-    
+	/**
+	 * Returns an instance of the Chat tools default content.
+	 * 
+	 * @return
+	 */
+	public Chat getDefaultContent();
+	
+	/**
+	 * 
+	 * @param toolSignature
+	 * @return
+	 */
+	public Long getToolDefaultContentIdBySignature(String toolSignature);
+	
+	/**
+	 * 
+	 * @param toolContentID
+	 * @return
+	 */
+	public Chat getChatByContentId(Long toolContentID);
+	
+	/**
+	 * 
+	 * 
+	 * @param toolContentId
+	 * @param file
+	 * @param type
+	 * @return
+	 */
+	public ChatAttachment uploadFileToContent(Long toolContentId, FormFile file, String type);
+	
+	/**
+	 * 
+	 * @param uuid
+	 * @param versionID
+	 */
+	public void deleteFromRepository(Long uuid, Long versionID);
+	
+	/**
+	 * 
+	 * @param contentID
+	 * @param uuid
+	 * @param versionID
+	 * @param type
+	 */
+	public void deleteInstructionFile(Long contentID, Long uuid, Long versionID, String type);
+	
+	/*
+	 * 
+	 */
+	public void saveOrUpdateContent(Chat persistContent);
+	
+	
+	
 }

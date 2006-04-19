@@ -30,6 +30,11 @@ package org.lamsfoundation.lams.tool.chat.util;
  */
 public class ChatException extends RuntimeException {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5518806968051758859L;
+
 	public ChatException(String message) {
 		super(message);
 	}

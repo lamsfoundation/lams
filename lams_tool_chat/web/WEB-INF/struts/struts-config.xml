@@ -13,6 +13,8 @@
   <!-- ========== Form Bean Definitions =================================== -->
   <form-beans>
 
+   <form-bean name="authoringForm" type="org.lamsfoundation.lams.tool.chat.web.forms.AuthoringForm" />
+
   </form-beans>
 
   <!-- ========== Global Exceptions Definitions =================================== -->
@@ -55,17 +57,15 @@
     <action
       path="/authoring"
       type="org.lamsfoundation.lams.tool.chat.web.actions.AuthoringAction"
+      name="authoringForm"
+      scope="request"
+      parameter="dispatch"
       unknown="false"
-      validate="true"
+      validate="false"
     >
       <forward
         name="success"
         path="tiles:/authoring/main"
-        redirect="false"
-      />
-      <forward
-        name="test"
-        path="/pages/test.html"
         redirect="false"
       />
     </action>
@@ -75,7 +75,7 @@
 
    <!-- Define your Struts controller in a file called struts-controller.xml and place it in your merge directory. -->
 
-    <message-resources    parameter="org.lamsfoundation.lams.tool.chat.applicationResources"/>
+    <message-resources    parameter="org.lamsfoundation.lams.tool.chat.ApplicationResources"/>
 
   <!-- 
 <plug-in className="org.apache.struts.validator.ValidatorPlugIn">

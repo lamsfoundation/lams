@@ -7,8 +7,8 @@
 <hibernate-mapping
 >
     <class
-        name="org.lamsfoundation.lams.tool.chat.ChatUser"
-        table="tl_lachat11_user"
+        name="org.lamsfoundation.lams.tool.chat.model.ChatAttachment"
+        table="tl_lachat11_attachment"
     >
 
         <id
@@ -19,55 +19,72 @@
             <generator class="native">
               <!--  
                   To add non XDoclet generator parameters, create a file named 
-                  hibernate-generator-params-ChatUser.xml 
+                  hibernate-generator-params-ChatAttachment.xml 
                   containing the additional parameters and place it in your merge dir. 
               --> 
             </generator>
         </id>
 
         <property
-            name="userId"
+            name="fileVersionId"
             type="java.lang.Long"
             update="true"
             insert="true"
-            column="user_id"
+            column="file_version_id"
             length="20"
         />
 
         <property
-            name="lastName"
+            name="fileType"
             type="java.lang.String"
             update="true"
             insert="true"
-            column="last_name"
+            column="file_type"
             length="255"
         />
 
         <property
-            name="firstName"
+            name="fileName"
             type="java.lang.String"
             update="true"
             insert="true"
-            column="first_name"
+            column="file_name"
             length="255"
         />
 
+        <property
+            name="fileUuid"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
+            column="file_uuid"
+            length="20"
+        />
+
+        <property
+            name="createDate"
+            type="java.util.Date"
+            update="true"
+            insert="true"
+            column="create_date"
+        />
+
         <many-to-one
-            name="chatSession"
-            class="org.lamsfoundation.lams.tool.chat.ChatSession"
+            name="chat"
+            class="org.lamsfoundation.lams.tool.chat.model.Chat"
             cascade="none"
             outer-join="auto"
             update="true"
             insert="true"
         >
             <column
-                name="session_id" 
+                name="chat_uid" 
             />
         </many-to-one>
 
         <!--
             To add non XDoclet property mappings, create a file named
-                hibernate-properties-ChatUser.xml
+                hibernate-properties-ChatAttachment.xml
             containing the additional properties and place it in your merge dir.
         -->
 

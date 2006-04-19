@@ -6,7 +6,7 @@
   j2ee-spec="1.4"
   archive="lams_tool_chat.war">
   <attributes>
-    <attribute name="webrootdir" value="WebRoot" />
+    <attribute name="webrootdir" value="/web" />
   </attributes>
 </project-module>
 

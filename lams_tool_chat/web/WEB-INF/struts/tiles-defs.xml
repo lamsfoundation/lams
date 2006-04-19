@@ -84,7 +84,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<put name="body" value="/pages/monitoring/monitoring.jsp" />
 	</definition>
 	
-	<definition name="tiles:/header:authoring" extends="tiles:/header:default">
+	<definition name="tiles:/header:monitoring" extends="tiles:/header:default">
 		<put name="script" value="/pages/monitoring/script.jsp"/>
 	</definition>
 	<!-- End: Monitoring -->

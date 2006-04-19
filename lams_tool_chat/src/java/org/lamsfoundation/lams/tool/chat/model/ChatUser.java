@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 /* $$Id$$ */
-package org.lamsfoundation.lams.tool.chat;
+package org.lamsfoundation.lams.tool.chat.model;
 
 /**
  * 
@@ -36,7 +36,11 @@ package org.lamsfoundation.lams.tool.chat;
 public class ChatUser  implements java.io.Serializable {
 
 
-    // Fields    
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -3701664859818409197L;
+	// Fields    
      private Long uid;
      private Long userId;
      private String lastName;

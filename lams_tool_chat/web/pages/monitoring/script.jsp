@@ -27,9 +27,7 @@
 	}
 
 	function doSubmit(method, tabId) {
-//		if(tabId != null)
-//			document.forumMonitoringForm.currentTab.value=tabId;
-//		document.forumMonitoringForm.method.value=method;
-		document.forumMonitoringForm.submit();
+		document.monitoringForm.method.value=method;
+		document.monitoringForm.submit();
 	}
 </script>
