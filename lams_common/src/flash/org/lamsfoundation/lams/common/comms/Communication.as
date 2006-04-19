@@ -111,7 +111,7 @@ class org.lamsfoundation.lams.common.comms.Communication {
     */
     public function getRequest(requestURL:String,handler:Function,isFullURL:Boolean):Void{
 		//if(Application != null){
-			Cursor.showCursor(Application.C_HOURGLASS);
+			Cursor.showCursor(ApplicationParent.C_HOURGLASS);
 		//}
 		//Create XML response object 
         var responseXML = new XML();
@@ -306,7 +306,7 @@ class org.lamsfoundation.lams.common.comms.Communication {
         xmlObject.onData = function(src){
 			//Debugger.log('src:'+src,Debugger.GEN,' xmlObject.onData ','Communication');		
 			//if(Application != null){
-				Cursor.showCursor(Application.C_DEFAULT);
+				Cursor.showCursor(ApplicationParent.C_DEFAULT);
            // }
 			if (src != undefined) {
                 //Check for login page
