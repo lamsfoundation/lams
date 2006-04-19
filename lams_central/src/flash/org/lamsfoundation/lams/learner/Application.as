@@ -23,6 +23,7 @@
 
 import org.lamsfoundation.lams.common.comms.*       //communications
 import org.lamsfoundation.lams.common.util.*;		// utilities
+import org.lamsfoundation.lams.common.ui.*;		// ui
 import org.lamsfoundation.lams.common.*;
 import org.lamsfoundation.lams.learner.ls.*;
 import org.lamsfoundation.lams.learner.lb.*;
@@ -35,10 +36,10 @@ import mx.utils.*
 class org.lamsfoundation.lams.learner.Application extends ApplicationParent {
 	
 	// private constants
-	private var _comms:Communication;
+	//private var _comms:Communication;
 	private var _seqLib:Library;
 	
-	private var _appRoot_mc:MovieClip;                 //Application root clip
+	//private var _appRoot_mc:MovieClip;                 //Application root clip
     
 	
 	private static var LIBRARY_X:Number = 0;
@@ -70,8 +71,9 @@ class org.lamsfoundation.lams.learner.Application extends ApplicationParent {
     * Application - Constructor
     */
     private function Application(){
+		super(this);
+		
 		trace('Begin Application...');
-		trace("appInt: " + ApplicationParent.C_DEFAULT);
         _seqLibLoaded = false;
         _seqLibEventDispatched = false;
         
@@ -100,7 +102,7 @@ class org.lamsfoundation.lams.learner.Application extends ApplicationParent {
 		Cursor.addCursor(C_HOURGLASS);
 		
 		//Comms object - do this before any objects are created that require it for server communication
-        _comms = new Communication();
+        //_comms = new Communication();
 		
 		setupUI();
 		checkUILoaded();
@@ -238,9 +240,9 @@ class org.lamsfoundation.lams.learner.Application extends ApplicationParent {
 	
 	/**
     * returns the the Comms instance
-    */
-    public function getComms():Communication{
-        return _comms;
-    }
-
+    *
+    *public function getComms():Communication{
+    *    return _comms;
+    *}
+	*/
 }

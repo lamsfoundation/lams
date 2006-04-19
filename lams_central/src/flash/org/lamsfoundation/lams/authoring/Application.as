@@ -91,25 +91,15 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
     private var _toolkit:Toolkit;
     private var _canvas:Canvas;
     private var _workspace:Workspace;
-    private var _comms:Communication;
-    private var _themeManager:ThemeManager;
-    private var _dictionary:Dictionary;
-    private var _config:Config;
     private var _debugDialog:MovieClip;                //Reference to the debug dialog
     
     
-    private var _appRoot_mc:MovieClip;                 //Application root clip
     private var _dialogueContainer_mc:MovieClip;       //Dialog container
     private var _tooltipContainer_mc:MovieClip;        //Tooltip container
     private var _cursorContainer_mc:MovieClip;         //Cursor container
     private var _menu_mc:MovieClip;                    //Menu bar clip
     private var _container_mc:MovieClip;               //Main container
     
-    //Data flags
-    private var _dictionaryLoaded:Boolean;             //Dictionary loaded flag
-    private var _dictionaryEventDispatched:Boolean     //Event status flag
-    private var _themeLoaded:Boolean;                  //Theme loaded flag
-    private var _themeEventDispatched:Boolean          //Dictionary loaded flag
     private var _UILoadCheckIntervalID:Number;         //Interval ID for periodic check on UILoad status
     private var _UILoaded:Boolean;                     //UI Loading status
     
@@ -134,12 +124,8 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
     * Application - Constructor
     */
     private function Application(){
-		super();
+		super(this);
 		
-        _themeLoaded = false;
-        _themeEventDispatched = false;
-        _dictionaryLoaded = false;
-        _dictionaryEventDispatched = false;
         _toolkitLoaded = false;
         _canvasLoaded  = false;
         _menuLoaded = false;
@@ -171,13 +157,9 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 		Cursor.addCursor(C_GATE);
 		Cursor.addCursor(C_GROUP);
 		
-		
-		//Comms object - do this before any objects are created that require it for server communication
-        _comms = new Communication();
-
-    	//Get the instance of config class
+		//Get the instance of config class
         _config = Config.getInstance();
-        
+		
         //Assign the config load event to
         _config.addEventListener('load',Delegate.create(this,configLoaded));
         
@@ -220,33 +202,7 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 		
     }
     
-    /**
-    * Called when Dictionary loaded
-	* @param evt:Object	the event object
-    */
-    private function onDictionaryLoad(evt:Object){
-        if(evt.type=='load'){
-            _dictionaryLoaded = true;
-			Debugger.log('Dictionary loaded :',Debugger.CRITICAL,'onDictionaryLoad','Application');			
-        } else {
-            Debugger.log('event type not recognised :'+evt.type,Debugger.CRITICAL,'onDictionaryLoad','Application');
-        }
-    }
     
-    /**
-    * Called when the current selected theme has been loaded
-	* @param evt:Object	the event object
-    */
-    private function onThemeLoad(evt:Object) {
-        if(evt.type=='load'){
-            _themeLoaded = true; 
-			Debugger.log('!Theme loaded :',Debugger.CRITICAL,'onThemeLoad','Application');		
-        } else {
-            Debugger.log('event type not recognised :'+evt.type,Debugger.CRITICAL,'onThemeLoad','Application');
-        }
-		
-    }
-	
 	/**
 	* Periodically checks if data has been loaded
 	*/
@@ -680,37 +636,8 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
         return _workspace;
     }
 
-    /**
-    * returns the the Comms instance
-    */
-    public function getComms():Communication{
-        return _comms;
-    }
+   
     
-    /**
-    * returns the the Dictionary instance
-    */
-    public function getDictionary():Dictionary{
-        return _dictionary;
-    }
-    
-    /**
-    * Returns the Application root, use as _root would be used
-    * 
-    * @usage    Import authoring package and then use as root e.g.
-    * 
-    *           import org.lamsfoundation.lams.authoring;
-    *           Application.root.attachMovie('myLinkageId','myInstanceName',depth);
-    */
-    static function get root():MovieClip {
-        //Return root if valid otherwise raise a big system error as app. will not work without it
-        if(_instance._appRoot_mc != undefined) {
-            return _instance._appRoot_mc;
-        } else {
-            //TODO DI 11/05/05 Raise error if _appRoot hasn't been created			
-        }
-    }
-	
 	 /**
     * Returns the Dialogue conatiner mc
     * 
