@@ -1,5 +1,5 @@
 
-<%@ page language="java"%>
+<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
 
 <%@ taglib uri="tags-html" prefix="html" %>
 <%@ taglib uri="tags-bean" prefix="bean" %>

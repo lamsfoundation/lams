@@ -1,3 +1,4 @@
+<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
 <%-- 
 Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
 License Information: http://lamsfoundation.org/licensing/lams/2.0/
@@ -33,7 +34,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html:html locale = "true">
-    
+    <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title> <bean:message key="activity.title"/> </title>
+    </head>
     <body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
       <table width="900" border="0" cellspacing="0" cellpadding="0" align="center"> 
 	        <!-- header -->

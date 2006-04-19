@@ -1,3 +1,4 @@
+<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
 <%-- 
 Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
 License Information: http://lamsfoundation.org/licensing/lams/2.0/
@@ -18,6 +19,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   http://www.gnu.org/licenses/gpl.txt
 --%>
+
 
 <%@ taglib uri="tags-bean" prefix="bean"%> 
 <%@ taglib uri="tags-html" prefix="html"%>
@@ -49,17 +51,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<!DOCTYPE HTML PUBLIC "-//W3C//DTD hTML 4.01 Transitional//EN">
 	<html:html locale="true">
 	<head>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-	<title> <bean:message key="label.authoring"/> </title>
+		<lams:headItems/>
+		<title><fmt:message key="activity.title" /></title>
 	
-	 <lams:css/>
-	<!-- depending on user / site preference this will get changed probably use passed in variable from flash to select which one to use-->
-
  	<!-- ******************** FCK Editor related javascript & HTML ********************** -->
-    <script type="text/javascript" src="${lams}fckeditor/fckeditor.js"></script>
-    <script type="text/javascript" src="${tool}author_page/js/fckcontroller.js"></script>
-    <link href="${tool}author_page/css/fckeditor_style.css" rel="stylesheet" type="text/css">
-
 	<script language="JavaScript" type="text/JavaScript">
 
 		function submitModifyQuestion(questionIndexValue, actionMethod) 
@@ -122,10 +117,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
         }
 	
 	</script>
-	
-	<script type="text/javascript" src="<c:out value="${tool}"/>author_page/js/tabcontroller.js"></script>    
-	<script type="text/javascript" src="<c:out value="${lams}"/>includes/javascript/common.js"></script>
-	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/xmlrequest.js'/>"></script>
 	
 </head>
 <body onLoad="init();">

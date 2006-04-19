@@ -1,3 +1,4 @@
+<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
 <%@ taglib uri="tags-html" prefix="html" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="tags-core" prefix="c" %>
@@ -13,7 +14,7 @@
 <html:html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<title><fmt:message key="tool.display.name"/></title>
+<title><fmt:message key="activity.title"/></title>
 
 	<lams:css/>
     

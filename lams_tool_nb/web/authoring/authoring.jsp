@@ -1,3 +1,4 @@
+<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
 <%@ taglib uri="tags-html" prefix="html" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="tags-core" prefix="c" %>
@@ -8,23 +9,16 @@
 <%@ page import="java.util.HashSet" %>
 <%@ page import="java.util.Set" %>
 
-<c:set var="lams"><lams:LAMSURL/></c:set>
-<c:set var="tool"><lams:WebAppURL/></c:set>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD hTML 4.01 Transitional//EN">
 <html:html>
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-	<title><fmt:message key="tool.display.name" /></title>
-	
-	<lams:css/>
-	
-	<!-- this is the custom CSS for the tool -->
-	<link href="${tool}css/tool_custom.css" rel="stylesheet" type="text/css">
+	<lams:headItems/>
+	<title><fmt:message key="activity.title" /></title>
 	
     <script>
     
-    	var imgRoot="${lams}images/";
+    	var imgRoot="<lams:LAMSURL />images/";
 	    var themeName="aqua";
         
         function init(){
@@ -54,10 +48,6 @@
         }
  
     </script>
-    
- 	<script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>    
-	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
-	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/xmlrequest.js'/>"></script>
     
 </head>
 

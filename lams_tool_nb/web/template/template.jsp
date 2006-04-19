@@ -18,6 +18,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   http://www.gnu.org/licenses/gpl.txt
 --%>
+<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
 <%@ taglib uri="tags-html" prefix="html" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="tags-core" prefix="c" %>
@@ -32,12 +33,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <html:html locale = "true">
     <head>
       <html:base/>
-	  <fmt:setBundle basename = "org.lamsfoundation.lams.tool.noticeboard.web.ApplicationResources" />
-      <title><tiles:getAsString name="title"/></title>
-      <script src="<c:out value="${lams}"/>includes/javascript/common.js"></script>
-      <meta http-equiv="pragma" content="no-cache">
-      <meta http-equiv="cache-control" content="no-cache">
-      <lams:css/>
+		<lams:headItems/>
+	<title><fmt:message key="activity.title" /></title>
    </head>
     
     <body summary="This table is being used for layout purposes only">

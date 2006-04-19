@@ -1,3 +1,4 @@
+<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
 <%-- 
 Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
 License Information: http://lamsfoundation.org/licensing/lams/2.0/
@@ -19,6 +20,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
+
 <%@ taglib uri="tags-bean" prefix="bean"%> 
 <%@ taglib uri="tags-html" prefix="html"%>
 <%@ taglib uri="tags-logic" prefix="logic" %>
@@ -35,6 +37,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <html:html locale="true">
   	<head>    
 	    <title><bean:message key="label.exportPortfolio"/></title>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 	</head>  
   	<body>
    		<h1><bean:message key="label.exportPortfolio.simple"/></h1>

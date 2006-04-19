@@ -19,7 +19,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
-
 <%@ taglib uri="tags-bean" prefix="bean"%> 
 <%@ taglib uri="tags-html" prefix="html"%>
 <%@ taglib uri="tags-logic" prefix="logic" %>
@@ -49,16 +48,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<!DOCTYPE HTML PUBLIC "-//W3C//DTD hTML 4.01 Transitional//EN">
 	<html:html locale="true">
 	<head>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-	<title> <bean:message key="label.authoring"/> </title>
-	
-	 <lams:css/>
+	<lams:headItems/>
+	<title><fmt:message key="activity.title" /></title>
 
  	<!-- ******************** FCK Editor related javascript & HTML ********************** -->
-    <script type="text/javascript" src="${lams}fckeditor/fckeditor.js"></script>
-    <script type="text/javascript" src="${lams}includes/javascript/fckcontroller.js"></script>
-    <link href="${lams}css/fckeditor_style.css" rel="stylesheet" type="text/css">
-
 	<script language="JavaScript" type="text/JavaScript">
 
 		function submitMethod(actionMethod) {
@@ -105,9 +98,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
         }
 	
 	</script>
-	
-	<script type="text/javascript" src="<c:out value="${lams}"/>includes/javascript/tabcontroller.js"></script>    
-	<script type="text/javascript" src="<c:out value="${lams}"/>includes/javascript/common.js"></script>
 	
 </head>
 <body onLoad="init();">

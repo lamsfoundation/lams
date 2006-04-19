@@ -18,6 +18,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   http://www.gnu.org/licenses/gpl.txt
 --%>
+<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
 
 <%@ taglib uri="tags-bean" prefix="bean"%> 
 <%@ taglib uri="tags-html" prefix="html"%>
@@ -34,7 +35,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <html:html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-		<title> <bean:message key="label.learning.report"/> </title>
+	<title> <bean:message key="activity.title"/> </title>
 	<script lang="javascript">
 		var imgRoot="<c:out value="${lams}"/>images/";
 		var themeName="aqua";

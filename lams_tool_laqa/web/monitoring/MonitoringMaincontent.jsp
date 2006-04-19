@@ -20,6 +20,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 --%>
 
 
+<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
 <%@ taglib uri="tags-bean" prefix="bean"%> 
 <%@ taglib uri="tags-html" prefix="html"%>
 <%@ taglib uri="tags-logic" prefix="logic" %>
@@ -47,17 +48,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<!DOCTYPE HTML PUBLIC "-//W3C//DTD hTML 4.01 Transitional//EN">
 	<html:html locale="true">
 	<head>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-	<title> <bean:message key="label.monitoring"/> </title>
-	
-	 <lams:css/>
-	<!-- depending on user / site preference this will get changed probably use passed in variable from flash to select which one to use-->
+	<lams:headItems/>
+	<title><fmt:message key="activity.title" /></title>
 
  	<!-- ******************** FCK Editor related javascript & HTML ********************** -->
-    <script type="text/javascript" src="${lams}fckeditor/fckeditor.js"></script>
-    <script type="text/javascript" src="${lams}includes/javascript/fckcontroller.js"></script>
-    <link href="${lams}css/fckeditor_style.css" rel="stylesheet" type="text/css">
-
 	<script language="JavaScript" type="text/JavaScript">
 
 		function submitMonitoringMethod(actionMethod) 
@@ -139,9 +133,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
         }
 	
 	</script>
-	
-	<script type="text/javascript" src="<c:out value="${lams}"/>includes/javascript/tabcontroller.js"></script>    
-	<script type="text/javascript" src="<c:out value="${lams}"/>includes/javascript/common.js"></script>
 	
 </head>
 <body onLoad="init();">

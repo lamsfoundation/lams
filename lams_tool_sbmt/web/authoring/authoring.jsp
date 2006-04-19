@@ -17,16 +17,10 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html:html locale="true">
 <head>
-	<title>Submit Files</title>
-	<lams:css/>
-    
+	<lams:headItems/>
+	<title><fmt:message key="activity.title" /></title>
 	<!-- this is the custom CSS for the tool -->
 	<link href="${tool}css/tool_custom.css" rel="stylesheet" type="text/css">
-
- 	<!-- ******************** FCK Editor related javascript & HTML ********************** -->
-    <script type="text/javascript" src="${lams}fckeditor/fckeditor.js"></script>
-    <script type="text/javascript" src="${lams}includes/javascript/fckcontroller.js"></script>
-    <link href="${lams}css/fckeditor_style.css" rel="stylesheet" type="text/css">
 
     <script>
     
@@ -67,9 +61,6 @@
     <!-- ******************** END FCK Editor related javascript & HTML ********************** -->
     
     
-	<script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>    
-	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
-	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/xmlrequest.js'/>"></script>
 </head>
 <body onLoad="init()">
 
