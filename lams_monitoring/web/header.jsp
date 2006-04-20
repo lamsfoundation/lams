@@ -20,7 +20,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 --%>
 
 <%@ taglib uri="tags-core" prefix="c" %>
-<%@ page contentType="text/html; charset=iso-8859-1" language="java" %>
 <%
 String protocol = request.getProtocol();
 if(protocol.startsWith("HTTPS")){

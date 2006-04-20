@@ -18,6 +18,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   http://www.gnu.org/licenses/gpl.txt
 --%>
+<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
 
 <%@ taglib uri="tags-tiles" prefix="tiles" %>
 <%@ taglib uri="tags-html" prefix="html" %>
@@ -27,6 +28,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html:html locale = "true">
     <head>
+       <meta http-equiv="content-type" content="text/html; charset=UTF-8">
        <html:base/>
 	  <fmt:setBundle basename = "org.lamsfoundation.lams.monitoring.MonitoringResources" />
       <title><tiles:getAsString name="title"/></title>
