@@ -23,10 +23,18 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.rsrc.dao;
 
+import java.util.List;
+
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceSession;
 
 public interface ResourceSessionDAO extends DAO {
 
 	ResourceSession getSessionBySessionId(Long sessionId);
+
+	List<ResourceSession> getByContentId(Long toolContentId);
+
+	void delete(ResourceSession session);
+
+	void deleteBySessionId(Long toolSessionId);
 
 }

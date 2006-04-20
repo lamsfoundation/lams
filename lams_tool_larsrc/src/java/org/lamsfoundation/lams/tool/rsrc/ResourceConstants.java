@@ -27,6 +27,8 @@ public class ResourceConstants {
 	public static final String TOOL_SIGNNATURE = "larsrc11";
 	public static final String RESOURCE_SERVICE = "resourceService";
 	
+	public static final int COMPLETED = 1;
+	
 	//resource type;
 	public static final short RESOURCE_TYPE_URL = 1;
 	public static final short RESOURCE_TYPE_FILE = 2;

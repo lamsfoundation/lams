@@ -31,4 +31,6 @@ public interface ResourceDAO  extends DAO {
 
 	Resource getByUid(Long resourceUid);
 
+	void delete(Resource resource);
+
 }

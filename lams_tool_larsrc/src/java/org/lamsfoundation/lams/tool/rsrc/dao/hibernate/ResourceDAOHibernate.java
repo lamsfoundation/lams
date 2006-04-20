@@ -49,4 +49,8 @@ public class ResourceDAOHibernate extends BaseDAOHibernate implements ResourceDA
 		return (Resource) getObject(Resource.class,resourceUid);
 	}
 
+	public void delete(Resource resource) {
+		this.getHibernateTemplate().delete(resource);
+	}
+
 }

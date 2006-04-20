@@ -32,11 +32,23 @@ import org.lamsfoundation.lams.tool.rsrc.model.ResourceSession;
 public class ResourceSessionDAOHibernate extends BaseDAOHibernate implements ResourceSessionDAO{
 	
 	private static final String FIND_BY_SESSION_ID = "from " + ResourceSession.class.getName() + " as p where p.sessionId=?";
+	private static final String FIND_BY_CONTENT_ID = "from " + ResourceSession.class.getName() + " as p where p.resource_uid=?";
+	
 	public ResourceSession getSessionBySessionId(Long sessionId) {
 		List list = getHibernateTemplate().find(FIND_BY_SESSION_ID,sessionId);
 		if(list == null || list.size() == 0)
 			return null;
 		return (ResourceSession) list.get(0);
+	}
+	public List<ResourceSession> getByContentId(Long toolContentId) {
+		return getHibernateTemplate().find(FIND_BY_CONTENT_ID,toolContentId);
+	}
+	
+	public void delete(ResourceSession session) {
+		this.getHibernateTemplate().delete(session);
+	}
+	public void deleteBySessionId(Long toolSessionId) {
+		this.removeObject(ResourceSession.class,toolSessionId);
 	}
 
 }

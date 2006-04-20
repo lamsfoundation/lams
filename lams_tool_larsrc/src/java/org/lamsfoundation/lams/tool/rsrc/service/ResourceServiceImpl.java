@@ -28,7 +28,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -46,6 +48,12 @@ import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
+import org.lamsfoundation.lams.tool.ToolContentManager;
+import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
+import org.lamsfoundation.lams.tool.ToolSessionManager;
+import org.lamsfoundation.lams.tool.exception.DataMissingException;
+import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
+import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.rsrc.ResourceConstants;
 import org.lamsfoundation.lams.tool.rsrc.dao.ResourceAttachmentDAO;
 import org.lamsfoundation.lams.tool.rsrc.dao.ResourceDAO;
@@ -73,7 +81,7 @@ import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
  * 
  */
 public class ResourceServiceImpl implements
-                              IResourceService
+                              IResourceService,ToolContentManager, ToolSessionManager
                
 {
 	static Logger log = Logger.getLogger(ResourceServiceImpl.class.getName());
@@ -142,7 +150,7 @@ public class ResourceServiceImpl implements
 		} 
 	}
 	/**
-	 * This method verifies the credentials of the SubmitFiles Tool and gives it
+	 * This method verifies the credentials of the Share Resource Tool and gives it
 	 * the <code>Ticket</code> to login and access the Content Repository.
 	 * 
 	 * A valid ticket is needed in order to access the content from the
@@ -150,7 +158,7 @@ public class ResourceServiceImpl implements
 	 * upload/download files from the content repository.
 	 * 
 	 * @return ITicket The ticket for repostory access
-	 * @throws SubmitFilesException
+	 * @throws ResourceApplicationException
 	 */
 	private ITicket getRepositoryLoginTicket() throws ResourceApplicationException {
 		ICredentials credentials = new SimpleCredentials(
@@ -329,7 +337,6 @@ public class ResourceServiceImpl implements
     /**
      * Process an uploaded file.
      * 
-     * @param forumForm
      * @throws ResourceApplicationException 
      * @throws FileNotFoundException
      * @throws IOException
@@ -485,6 +492,117 @@ public class ResourceServiceImpl implements
 	}
 	public void setToolService(ILamsToolService toolService) {
 		this.toolService = toolService;
+	}
+
+	//*******************************************************************************
+	//ToolContentManager, ToolSessionManager methods
+	//*******************************************************************************
+	public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
+		if (fromContentId == null || toContentId == null)
+			throw new ToolException(
+					"Failed to create the SharedResourceFiles tool seession");
+
+		Resource resource = resourceDao.getByContentId(fromContentId);
+		if ( resource == null ) {
+			try {
+				resource = getDefaultContent(fromContentId);
+			} catch (ResourceApplicationException e) {
+				throw new ToolException(e);
+			}
+		}
+		Resource toContent = Resource.newInstance(resource,toContentId,resourceToolContentHandler);
+		resourceDao.saveObject(toContent);
+		
+		//save resource items
+		Set items = toContent.getResourceItems();
+		if(items != null){
+			Iterator iter = items.iterator();
+			while(iter.hasNext()){
+				ResourceItem item = (ResourceItem) iter.next();
+//				createRootTopic(toContent.getUid(),null,msg);
+			}
+		}
+	}
+
+
+	public void setAsDefineLater(Long toolContentId) throws DataMissingException, ToolException {
+		Resource resource = resourceDao.getByContentId(toolContentId);
+		if(resource == null){
+			throw new ToolException("No found tool content by given content ID:" + toolContentId);
+		}
+		resource.setDefineLater(true);
+	}
+
+
+	public void setAsRunOffline(Long toolContentId) throws DataMissingException, ToolException {
+		Resource resource = resourceDao.getByContentId(toolContentId);
+		if(resource == null){
+			throw new ToolException("No found tool content by given content ID:" + toolContentId);
+		}
+		resource.setRunOffline(true);		
+	}
+
+
+	public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException, ToolException {
+		Resource resource = resourceDao.getByContentId(toolContentId);
+		if(removeSessionData){
+			List list = resourceSessionDao.getByContentId(toolContentId);
+			Iterator iter = list.iterator();
+			while(iter.hasNext()){
+				ResourceSession session = (ResourceSession ) iter.next();
+				resourceSessionDao.delete(session);
+			}
+		}
+		resourceDao.delete(resource);
+	}
+
+
+	public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
+		ResourceSession session = new ResourceSession();
+		session.setSessionId(toolSessionId);
+		session.setSessionName(toolSessionName);
+		Resource resource = resourceDao.getByContentId(toolContentId);
+		session.setResource(resource);
+		resourceSessionDao.saveObject(session);
+	}
+
+
+	public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
+		if(toolSessionId == null){
+			log.error("Fail to leave tool Session based on null tool session id.");
+			throw new ToolException("Fail to remove tool Session based on null tool session id.");
+		}
+		if(learnerId == null){
+			log.error("Fail to leave tool Session based on null learner.");
+			throw new ToolException("Fail to remove tool Session based on null learner.");
+		}
+		
+		ResourceSession session = resourceSessionDao.getSessionBySessionId(toolSessionId);
+		if(session != null){
+			session.setStatus(ResourceConstants.COMPLETED);
+			resourceSessionDao.saveObject(session);
+		}else{
+			log.error("Fail to leave tool Session.Could not find shared resources " +
+					"session by given session id: "+toolSessionId);
+			throw new DataMissingException("Fail to leave tool Session." +
+					"Could not find shared resource session by given session id: "+toolSessionId);
+		}
+		return learnerService.completeToolSession(toolSessionId,learnerId);
+	}
+
+
+	public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException {
+		return null;
+	}
+
+
+	public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException, ToolException {
+		return null;
+	}
+
+
+	public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException {
+		resourceSessionDao.deleteBySessionId(toolSessionId);
 	}
 
 }
