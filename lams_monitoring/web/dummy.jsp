@@ -29,7 +29,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <html:html locale="true" xhtml="true">
 
 	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+       <meta http-equiv="content-type" content="text/html; charset=UTF-8">
 		<lams:css/>
 		<title>Learner :: Staff</title>
 	</head>

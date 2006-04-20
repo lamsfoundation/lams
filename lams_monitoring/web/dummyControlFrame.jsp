@@ -31,6 +31,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <html>
   <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
 	  <lams:css/>
 
 <title>Lessons</title>
