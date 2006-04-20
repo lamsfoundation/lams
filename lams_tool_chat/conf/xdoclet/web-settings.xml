@@ -16,3 +16,4 @@
 				classpath:/org/lamsfoundation/lams/tool/chat/chatApplicationContext.xml			
 	</param-value>
 </context-param>
+

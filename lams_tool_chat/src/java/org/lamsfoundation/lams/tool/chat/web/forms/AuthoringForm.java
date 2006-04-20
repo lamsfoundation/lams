@@ -22,7 +22,7 @@
  */
 
 /* $Id$ */
-
+ 
 package org.lamsfoundation.lams.tool.chat.web.forms;
 
 import org.apache.struts.action.ActionForm;

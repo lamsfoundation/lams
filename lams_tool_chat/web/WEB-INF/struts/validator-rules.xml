@@ -3,7 +3,7 @@
           "http://jakarta.apache.org/commons/dtds/validator_1_1_3.dtd">
 <!--
   $Id$
-
+ 
    This file contains the default Struts Validator pluggable validator
    definitions.  It should be placed somewhere under /WEB-INF and
    referenced in the struts-config.xml under the plug-in element

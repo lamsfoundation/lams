@@ -22,7 +22,7 @@
  */
 
 /* $Id$ */
-
+ 
 package org.lamsfoundation.lams.tool.chat.beans;
 
 import java.util.LinkedList;

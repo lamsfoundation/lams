@@ -21,6 +21,7 @@
  * ****************************************************************
  */
 /* $$Id$$ */
+
 package org.lamsfoundation.lams.tool.chat.model;
 
 import java.util.Date;

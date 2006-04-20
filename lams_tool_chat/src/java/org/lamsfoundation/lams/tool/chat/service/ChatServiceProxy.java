@@ -21,6 +21,7 @@
  * ****************************************************************
  */
 /* $$Id$$ */
+
 package org.lamsfoundation.lams.tool.chat.service;
 
 import javax.servlet.ServletContext;

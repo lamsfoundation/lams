@@ -21,6 +21,7 @@
  * ****************************************************************
  */
 /* $$Id$$ */
+
 package org.lamsfoundation.lams.tool.chat.util;
 
 import org.lamsfoundation.lams.contentrepository.client.ToolContentHandler;

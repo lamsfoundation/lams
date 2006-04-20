@@ -21,6 +21,7 @@
  * ****************************************************************
  */
 /* $$Id$$ */
+
 package org.lamsfoundation.lams.tool.chat.dao.hibernate;
 
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;

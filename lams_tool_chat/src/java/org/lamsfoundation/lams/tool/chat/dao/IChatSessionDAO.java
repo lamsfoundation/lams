@@ -21,6 +21,7 @@
  * ****************************************************************
  */
 /* $$Id$$ */
+
 package org.lamsfoundation.lams.tool.chat.dao;
 
 import org.lamsfoundation.lams.dao.IBaseDAO;

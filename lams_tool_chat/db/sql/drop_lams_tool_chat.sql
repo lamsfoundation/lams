@@ -1,5 +1,5 @@
 -- CVS ID: $Id$
-
+ 
 SET FOREIGN_KEY_CHECKS=0;
 DROP TABLE IF EXISTS tl_lachat11_user;
 DROP TABLE IF EXISTS tl_lachat11_attachment;
