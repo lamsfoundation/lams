@@ -37,6 +37,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
 import org.lamsfoundation.lams.tool.vote.VoteUtils;
@@ -335,7 +336,95 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 		logger.debug("countSessionComplete: " + countSessionComplete);
 		request.getSession().setAttribute(COUNT_SESSION_COMPLETE, new Integer(countSessionComplete).toString());
 	}
+	
+    public ActionForward editActivityQuestions(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException,
+                                         ToolException
+    {
+    	logger.debug("dispatching editActivityQuestions...");
+    	request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(false).toString());
 
+		request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(true));
+		VoteUtils.setDefineLater(request, true);
+        return (mapping.findForward(LOAD_MONITORING));
+    }
+	
+    public ActionForward submitAllContent(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
+    throws IOException, ServletException {
+    	logger.debug("dispatching proxy submitAllContent...");
+    	request.getSession().setAttribute(ACTIVE_MODULE, DEFINE_LATER);
+    	
+    	request.setAttribute(SOURCE_VOTE_STARTER, "monitoring");
+	    logger.debug("SOURCE_VOTE_STARTER: monitoring");
+
+    	VoteAction voteAction= new VoteAction(); 
+    	return voteAction.submitAllContent(mapping, form, request, response);
+    	
+    }
+    
+    public ActionForward addNewOption(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
+    throws IOException, ServletException 
+    {
+    	logger.debug("dispatching proxy editActivityQuestions...");
+
+    	request.setAttribute(SOURCE_VOTE_STARTER, "monitoring");
+	    logger.debug("SOURCE_VOTE_STARTER: monitoring");
+    	
+    	VoteAction voteAction= new VoteAction(); 
+    	return voteAction.addNewOption(mapping, form, request, response);
+    }
+
+
+    public ActionForward removeOption(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
+    throws IOException, ServletException 
+    {
+    	logger.debug("dispatching proxy removeOption...");
+    	VoteMonitoringForm voteMonitoringForm = (VoteMonitoringForm) form;
+		logger.debug("voteMonitoringForm: " + voteMonitoringForm);
+		String optIndex=voteMonitoringForm.getOptIndex() ;
+		logger.debug("optIndex: " + optIndex);
+		request.getSession().setAttribute(REMOVABLE_QUESTION_INDEX, optIndex);
+
+    	request.setAttribute(SOURCE_VOTE_STARTER, "monitoring");
+	    logger.debug("SOURCE_VOTE_STARTER: monitoring");
+
+    	VoteAction voteAction= new VoteAction(); 
+    	return voteAction.removeOption(mapping, form, request, response);
+    }
+
+    
+    public ActionForward moveOptionDown(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+    {
+    	logger.debug("dispatching proxy moveOptionDown...");
+
+    	request.setAttribute(SOURCE_VOTE_STARTER, "monitoring");
+	    logger.debug("SOURCE_VOTE_STARTER: monitoring");
+    	
+    	VoteAction voteAction= new VoteAction(); 
+    	return voteAction.moveOptionDown(mapping, form, request, response);
+    }
+    
+    public ActionForward moveOptionUp(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+    {
+    	logger.debug("dispatching proxy moveOptionUp...");
+
+    	request.setAttribute(SOURCE_VOTE_STARTER, "monitoring");
+	    logger.debug("SOURCE_VOTE_STARTER: monitoring");
+    	
+    	VoteAction voteAction= new VoteAction(); 
+    	return voteAction.moveOptionUp(mapping, form, request, response);
+    }
 	
     
     /**

@@ -132,6 +132,12 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     {
 		logger.debug("dispathcing addNewOption");
 		
+	    /* determine whether the request is from Monitoring url Edit Activity*/
+		String sourceVoteStarter = (String) request.getAttribute(SOURCE_VOTE_STARTER);
+		logger.debug("sourceVoteStarter: " + sourceVoteStarter);
+		String destination=VoteUtils.getDestination(sourceVoteStarter);
+		logger.debug("destination: " + destination);
+
 		request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
 	    AuthoringUtil authoringUtil= new AuthoringUtil();
 	    Map mapOptionsContent=(Map)request.getSession().getAttribute(MAP_OPTIONS_CONTENT);
@@ -158,7 +164,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     	logger.debug("firstEntry: " +  firstEntry);
     	request.getSession().setAttribute(DEFAULT_OPTION_CONTENT, firstEntry);
     	
-	    return (mapping.findForward(LOAD_QUESTIONS));
+	    return (mapping.findForward(destination));
     }
 
 
@@ -168,6 +174,12 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 		logger.debug("doing removeOption ");
 		request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
 		
+	    /* determine whether the request is from Monitoring url Edit Activity*/
+		String sourceVoteStarter = (String) request.getAttribute(SOURCE_VOTE_STARTER);
+		logger.debug("sourceVoteStarter: " + sourceVoteStarter);
+		String destination=VoteUtils.getDestination(sourceVoteStarter);
+		logger.debug("destination: " + destination);
+
 		VoteUtils.persistRichText(request);
 	    
 		AuthoringUtil authoringUtil= new AuthoringUtil();
@@ -189,7 +201,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     	logger.debug("firstEntry: " +  firstEntry);
     	request.getSession().setAttribute(DEFAULT_OPTION_CONTENT, firstEntry);
     	
-	    return (mapping.findForward(LOAD_QUESTIONS));
+	    return (mapping.findForward(destination));
     }
 
     
@@ -200,6 +212,12 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 		request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
 	    VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
 	    logger.debug("voteAuthoringForm :" +voteAuthoringForm);
+	    
+	    /* determine whether the request is from Monitoring url Edit Activity*/
+		String sourceVoteStarter = (String) request.getAttribute(SOURCE_VOTE_STARTER);
+		logger.debug("sourceVoteStarter: " + sourceVoteStarter);
+		String destination=VoteUtils.getDestination(sourceVoteStarter);
+		logger.debug("destination: " + destination);
 	    
 	    IVoteService voteService = (IVoteService)request.getSession().getAttribute(TOOL_SERVICE);
 	    if (voteService == null)        
@@ -294,7 +312,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 	    logger.debug("define later set to false");
 	    
 	    voteAuthoringForm.resetUserAction();
-	    return mapping.findForward(LOAD_QUESTIONS);
+	    return mapping.findForward(destination);
     }
 
     

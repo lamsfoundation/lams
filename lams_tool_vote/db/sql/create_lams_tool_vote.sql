@@ -23,7 +23,7 @@ CREATE TABLE tl_vote11_content (
 
 CREATE TABLE tl_vote11_que_content (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
-     , question VARCHAR(255)
+     , question TEXT
      , display_order INT(5)
      , vote_content_id BIGINT(20) NOT NULL
      , PRIMARY KEY (uid)
@@ -89,7 +89,6 @@ CREATE TABLE tl_vote11_uploadedfile (
      , CONSTRAINT FK_tl_vote_uploadedfile_1 FOREIGN KEY (vote_content_id)
                   REFERENCES tl_vote11_content (uid)
 )TYPE=InnoDB;
-
 
 INSERT INTO tl_vote11_content(uid, content_id , title , instructions , creation_date , questions_sequenced , created_by , run_offline , define_later, offline_instructions, online_instructions, content_in_use, retries) VALUES (1, ${default_content_id} ,'Voting Title','Voting Instructions', NOW(), 0, 1,0, 0, 'offline instructions','online instructions', 0, 0);
 

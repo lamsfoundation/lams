@@ -332,6 +332,12 @@
 			path="/monitoring/MonitoringMaincontent.jsp"
 			redirect="false"
 	  	/>
+
+	  	<forward
+		    name="loadMonitoringEditActivity"
+		    path="/monitoring/MonitoringMaincontent.jsp"
+		    redirect="true"
+	  	/>
 	
 	  	<forward
 			name="refreshMonitoring"

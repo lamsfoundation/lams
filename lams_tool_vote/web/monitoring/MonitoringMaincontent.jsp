@@ -38,7 +38,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		tabs.add("label.editActivity");
 		tabs.add("label.stats");
 		pageContext.setAttribute("tabs", tabs);
-		
 	%>
 
 <c:set var="lams"><lams:LAMSURL/></c:set>
@@ -89,8 +88,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			submitMonitoringMethod(actionMethod);
 		}
 		
-		function deleteOption(deletableOptionIndex, actionMethod) {
-			document.VoteMonitoringForm.deletableOptionIndex.value=deletableOptionIndex; 
+		function deleteOption(optIndex, actionMethod) {
+			document.VoteMonitoringForm.optIndex.value=optIndex; 
 			submitMethod(actionMethod);
 		}
 		
@@ -98,7 +97,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			document.VoteMonitoringForm.selectedToolSessionId.value=selectedToolSessionId; 
 			submitMonitoringMethod(actionMethod);
 		}
-
+		
+		
+		function submitModifyOption(optionIndexValue, actionMethod) 
+		{
+			document.VoteMonitoringForm.optIndex.value=optionIndexValue; 
+			submitMethod(actionMethod);
+		}
+		
 
     	var imgRoot="${lams}images/";
 	    var themeName="aqua";

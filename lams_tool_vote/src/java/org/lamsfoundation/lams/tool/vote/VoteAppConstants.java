@@ -59,6 +59,7 @@ public interface VoteAppConstants {
 	
     public static final String AUTHORING								="authoring";
     public static final String SOURCE_VOTE_STARTER						="sourceVoteStarter";
+    public static final String REMOVABLE_OPTION_INDEX					="removableOptionIndex";
     public static final String AUTHORING_CANCELLED						="authoringCancelled";
     public static final String DEFINE_LATER_EDIT_ACTIVITY				="defineLaterEditActivity";
     public static final String ACTIVE_MODULE							="activeModule";

@@ -27,7 +27,7 @@
         name="question"
         type="java.lang.String"
         column="question"
-        length="255"
+        length="65535"
     >
     </property>
     

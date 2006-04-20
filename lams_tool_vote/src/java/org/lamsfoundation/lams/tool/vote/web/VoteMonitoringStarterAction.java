@@ -103,36 +103,36 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 	    VoteContent voteContent=voteService.retrieveVote(toolContentId);
 	    
 		logger.debug("existing voteContent:" + voteContent);
-		Map mapQuestionContent= new TreeMap(new VoteComparator());
-		logger.debug("mapQuestionContent: " + mapQuestionContent);
-	    /*
-		 * get the existing question content
-		 */
+		Map mapOptionsContent= new TreeMap(new VoteComparator());
+		logger.debug("mapOptionsContent: " + mapOptionsContent);
+	
 		logger.debug("setting existing content data from the db");
-		mapQuestionContent.clear();
+		mapOptionsContent.clear();
 		Iterator queIterator=voteContent.getVoteQueContents().iterator();
 		Long mapIndex=new Long(1);
-		logger.debug("mapQuestionContent: " + mapQuestionContent);
+		logger.debug("mapOptionsContent: " + mapOptionsContent);
 		while (queIterator.hasNext())
 		{
 			VoteQueContent voteQueContent=(VoteQueContent) queIterator.next();
 			if (voteQueContent != null)
 			{
 				logger.debug("question: " + voteQueContent.getQuestion());
-	    		mapQuestionContent.put(mapIndex.toString(),voteQueContent.getQuestion());
+				mapOptionsContent.put(mapIndex.toString(),voteQueContent.getQuestion());
 	    		/**
 	    		 * make the first entry the default(first) one for jsp
 	    		 */
 	    		if (mapIndex.longValue() == 1)
-	    			request.getSession().setAttribute(DEFAULT_QUESTION_CONTENT, voteQueContent.getQuestion());
+	    		{
+	    		    request.getSession().setAttribute(DEFAULT_OPTION_CONTENT, voteQueContent.getQuestion());
+	    		}
+	    		
 	    		mapIndex=new Long(mapIndex.longValue()+1);
 			}
 		}
-		logger.debug("Map initialized with existing contentid to: " + mapQuestionContent);
-		logger.debug("callling presentInitialUserInterface for the existing content.");
-		
-		request.getSession().setAttribute(MAP_QUESTION_CONTENT, mapQuestionContent);
-		logger.debug("execute initialized the Comparable Map: " + request.getSession().getAttribute("mapQuestionContent") );
+		logger.debug("Map initialized with existing contentid to: " + mapOptionsContent);
+		request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
+		logger.debug("starter initialized the Comparable Map: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT) );
+
 		
 		/*true means there is at least 1 response*/
 		if (voteService.studentActivityOccurredGlobal(voteContent))
@@ -159,6 +159,8 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 		request.getSession().setAttribute(TOOL_SERVICE, voteService);
 		
 		request.getSession().setAttribute(CURRENT_MONITORING_TAB, "summary");
+		request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
+		request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(false));
 		
 		request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
 				/*

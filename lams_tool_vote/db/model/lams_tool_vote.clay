@@ -84,8 +84,8 @@
 <column alias="" auto-increment="false" column-size="1" decimal-digits="0" default-value="0" mandatory="true" name="allowText" remarks="">
 <column-description></column-description>
 <data-type jdbc-type="-6" name="TINYINT" selected-variant-pattern="TINYINT(%n)">
-<variant type-name-pattern="TINYINT"/>
 <variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n)"/>
+<variant type-name-pattern="TINYINT"/>
 <variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n) UNSIGNED"/>
 <variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n) UNSIGNED ZEROFILL"/>
 <variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n) ZEROFILL"/>
@@ -228,11 +228,10 @@
 <variant type-name-pattern="BIGINT ZEROFILL"/>
 </data-type>
 </column>
-<column alias="" auto-increment="false" column-size="255" decimal-digits="0" default-value="" mandatory="false" name="question" remarks="">
+<column alias="" auto-increment="false" column-size="0" decimal-digits="0" default-value="" mandatory="false" name="question" remarks="">
 <column-description></column-description>
-<data-type jdbc-type="12" literal-prefix="'" literal-suffix="'" name="VARCHAR" selected-variant-pattern="VARCHAR(%n)">
-<variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n)"/>
-<variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n) BINARY"/>
+<data-type jdbc-type="-1" literal-prefix="'" literal-suffix="'" name="TEXT" selected-variant-pattern="TEXT">
+<variant type-name-pattern="TEXT"/>
 </data-type>
 </column>
 <column alias="" auto-increment="false" column-size="5" decimal-digits="0" default-value="" mandatory="false" name="display_order" remarks="">
