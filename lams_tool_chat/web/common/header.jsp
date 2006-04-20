@@ -9,7 +9,7 @@
 
 <head>
 	<title>
-		<bean:message key="activity.display.name" />
+		<bean:message key="activity.title" />
 	</title>
 	<lams:headItems/>
 	<tiles:insert attribute="script" />
