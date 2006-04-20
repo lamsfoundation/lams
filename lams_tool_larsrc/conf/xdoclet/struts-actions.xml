@@ -136,3 +136,20 @@
 			<forward name="success" path="/pages/itemreview/instructionsnav.jsp" />
 		</action>
 		
+		<!-- ========== BEGIN: Learning Definitions ============================== -->
+		<action path="/learning/start"
+			type="org.lamsfoundation.lams.tool.rsrc.web.action.LearningAction"
+			parameter="start" >
+			<forward name="success" path="/pages/learning/learningframe.jsp" />
+		</action>
+		
+		<action path="/learning/saveOrUpdateItem"
+			type="org.lamsfoundation.lams.tool.rsrc.web.action.LearningAction"
+			parameter="saveOrUpdateItem"
+			name="resourceItemForm" 
+			scope="request" 
+			validate="false">
+			<forward name="url" path="/pages/learning/addurl.jsp" />
+			<forward name="file" path="/pages/learning/addfile.jsp" />
+			<forward name="success" path="/pages/learning/success.jsp" />
+		</action>

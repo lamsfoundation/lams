@@ -27,6 +27,7 @@ import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -58,6 +59,7 @@ import org.lamsfoundation.lams.tool.rsrc.ims.SimpleContentPackageConverter;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceAttachment;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
+import org.lamsfoundation.lams.tool.rsrc.model.ResourceSession;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
 import org.lamsfoundation.lams.tool.rsrc.util.ResourceToolContentHandler;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
@@ -260,6 +262,40 @@ public class ResourceServiceImpl implements
 
 	public void deleteResourceItem(Long uid) {
 		resourceItemDao.removeObject(ResourceItem.class,uid);
+	}
+
+	public List<ResourceItem> getResourceItemsBySessionId(Long sessionId) {
+		ResourceSession session = resourceSessionDao.getSessionBySessionId(sessionId);
+		if(session == null){
+			log.error("Failed get ResourceSession by ID [" +sessionId + "]");
+			return null;
+		}
+		//add resource items from Authoring
+		Resource resource = session.getResource();
+		List<ResourceItem> items = new ArrayList<ResourceItem>(); 
+		items.addAll(resource.getResourceItems());
+		
+		//add resource items from ResourceSession
+		items.addAll(session.getResourceItems());
+		
+		return items;
+	}
+
+	public Resource getResourceBySessionId(Long sessionId){
+		ResourceSession session = resourceSessionDao.getSessionBySessionId(sessionId);
+		//construct dto fields;
+		Resource res = session.getResource();
+		res.setMinViewNumber(messageService.getMessage("label.learning.minmum.review"
+				,new Object[new Integer(res.getMinViewResourceNumber())]));
+		return res;
+	}
+	public ResourceSession getResourceSessionBySessionId(Long sessionId) {
+		return resourceSessionDao.getSessionBySessionId(sessionId);
+	}
+
+
+	public void saveOrUpdateResourceSession(ResourceSession resSession) {
+		resourceSessionDao.saveObject(resSession);
 	}
 
 

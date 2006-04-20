@@ -23,6 +23,10 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.rsrc.dao;
 
+import org.lamsfoundation.lams.tool.rsrc.model.ResourceSession;
+
 public interface ResourceSessionDAO extends DAO {
+
+	ResourceSession getSessionBySessionId(Long sessionId);
 
 }

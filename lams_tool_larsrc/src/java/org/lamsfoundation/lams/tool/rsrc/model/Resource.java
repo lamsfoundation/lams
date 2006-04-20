@@ -79,6 +79,8 @@ public class Resource implements Cloneable{
 	
 	//*************** NON Persist Fields ********************
 	private IToolContentHandler toolContentHandler;
+
+	private String minViewNumber;
 	/**
 	 * Default contruction method. 
 	 *
@@ -460,6 +462,16 @@ public class Resource implements Cloneable{
 	}
 	public void setRunAuto(boolean runAuto) {
 		this.runAuto = runAuto;
+	}
+	/**
+	 * For display use
+	 * @return
+	 */
+	public String getMinViewNumber() {
+		return minViewNumber;
+	}
+	public void setMinViewNumber(String minViewNumber) {
+		this.minViewNumber = minViewNumber;
 	}
 
 

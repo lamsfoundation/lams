@@ -30,6 +30,7 @@ import org.lamsfoundation.lams.contentrepository.IVersionedNode;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceAttachment;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
+import org.lamsfoundation.lams.tool.rsrc.model.ResourceSession;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
 
 /**
@@ -64,5 +65,17 @@ public interface IResourceService
 	void deleteResourceAttachment(Long attachmentUid);
 
 	void deleteResourceItem(Long uid);
+	
+	/**
+	 * Return all reource items within the given toolSessionID.
+	 * @param sessionId
+	 * @return
+	 */
+	List<ResourceItem> getResourceItemsBySessionId(Long sessionId);
+	Resource getResourceBySessionId(Long sessionId);
+
+	ResourceSession getResourceSessionBySessionId(Long sessionId);
+
+	void saveOrUpdateResourceSession(ResourceSession resSession);
 }
 

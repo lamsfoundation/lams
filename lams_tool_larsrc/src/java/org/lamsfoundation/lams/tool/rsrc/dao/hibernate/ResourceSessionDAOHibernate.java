@@ -23,9 +23,20 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.rsrc.dao.hibernate;
 
+import java.util.List;
+
 import org.lamsfoundation.lams.tool.rsrc.dao.ResourceSessionDAO;
+import org.lamsfoundation.lams.tool.rsrc.model.ResourceSession;
 
 
 public class ResourceSessionDAOHibernate extends BaseDAOHibernate implements ResourceSessionDAO{
+	
+	private static final String FIND_BY_SESSION_ID = "from " + ResourceSession.class.getName() + " as p where p.sessionId=?";
+	public ResourceSession getSessionBySessionId(Long sessionId) {
+		List list = getHibernateTemplate().find(FIND_BY_SESSION_ID,sessionId);
+		if(list == null || list.size() == 0)
+			return null;
+		return (ResourceSession) list.get(0);
+	}
 
 }

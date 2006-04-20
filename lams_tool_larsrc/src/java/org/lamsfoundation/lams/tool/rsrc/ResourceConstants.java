@@ -39,12 +39,14 @@ public class ResourceConstants {
 	
 	//for parameters' name
 	public static final String PARAM_TOOL_CONTENT_ID = "toolContentID";
+	public static final String PARAM_TOOL_SESSION_ID = "toolSessionID"; 
 	public static final String PARAM_FILE_VERSION_ID = "fileVersionId";
 	public static final String PARAM_FILE_UUID = "fileUuid";
 	public static final String PARAM_ITEM_INDEX = "itemIndex";
 	
 	//for request attribute name
 	public static final String ATTR_TOOL_CONTENT_ID = "toolContentID";
+	public static final String ATTR_TOOL_SESSION_ID = "toolSessionID"; 
 	public static final String ATTR_INSTRUCTION_LIST = "instructionList";
 	public static final String ATTR_RESOURCE_ITEM_LIST = "resourceList";
 	public static final String ATT_ATTACHMENT_LIST = "instructionAttachmentList";
@@ -53,6 +55,7 @@ public class ResourceConstants {
 	public static final String ATTR_DELETED_RESOURCE_ITEM_ATTACHMENT_LIST =  "deletedItemAttachmmentList";;
 	public static final String ATT_LEARNING_OBJECT = "cpPackage";
 	public static final String ATTR_RESOURCE_REVIEW_URL = "resourceItemReviewUrl";
+	public static final String ATTR_RESOURCE = "resource";
 	
 	//error message keys
 	public static final String ERROR_MSG_TITLE_BLANK = "error.resource.item.title.blank";
@@ -66,6 +69,7 @@ public class ResourceConstants {
 	public static final String MODE = "mode";
 	public static final String AUTHOR_MODE = "author_mode";
 	public static final String MONITOR_MODE = "monitor_mode";
+	
 
 
 }
