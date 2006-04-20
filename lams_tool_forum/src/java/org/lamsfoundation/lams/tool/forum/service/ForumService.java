@@ -511,7 +511,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
 		if (fromContentId == null || toContentId == null)
 			throw new ToolException(
-					"Failed to create the SubmitFiles tool seession");
+					"Failed to create the ForumFiles tool seession");
 
 		Forum fromContent = forumDao.getByContentId(fromContentId);
 		if ( fromContent == null ) {
