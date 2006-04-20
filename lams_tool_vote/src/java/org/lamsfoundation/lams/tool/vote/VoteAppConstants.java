@@ -38,6 +38,7 @@ public interface VoteAppConstants {
      */
     public static final String LOAD										="load";
     public static final String LOAD_QUESTIONS							="load";
+    public static final String LOAD_MONITORING							="refreshMonitoring";
     public static final String LOAD_STARTER								="starter";
     public static final String AUTHORING_STARTER						="starter";
 	public static final String LEARNING_STARTER							="learningStarter";

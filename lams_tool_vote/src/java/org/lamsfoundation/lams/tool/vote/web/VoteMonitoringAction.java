@@ -23,6 +23,8 @@
 package org.lamsfoundation.lams.tool.vote.web;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -38,6 +40,9 @@ import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
 import org.lamsfoundation.lams.tool.vote.VoteUtils;
+import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
+import org.lamsfoundation.lams.tool.vote.service.IVoteService;
+import org.lamsfoundation.lams.tool.vote.service.VoteServiceProxy;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 
 /**
@@ -102,7 +107,236 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	 	return null;
     }
     
+	public void refreshSummaryData(HttpServletRequest request, VoteContent voteContent, IVoteService voteService, 
+			boolean isUserNamesVisible, boolean isLearnerRequest, String currentSessionId, String userId)
+	{
+		if (voteService == null)
+		{
+			logger.debug("will retrieve voteService");
+			voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
+			logger.debug("retrieving voteService from session: " + voteService);
+		}
+		if (voteService == null)
+		{
+	    	voteService = (IVoteService)request.getSession().getAttribute(TOOL_SERVICE);
+			logger.debug("voteService: " + voteService);
+		}
+
+		
+		logger.debug("isUserNamesVisible: " + isUserNamesVisible);
+		logger.debug("isLearnerRequest: " + isLearnerRequest);
+				
+		/* this section is related to summary tab. Starts here. */
+		Map summaryToolSessions=MonitoringUtil.populateToolSessions(request, voteContent, voteService);
+		logger.debug("summaryToolSessions: " + summaryToolSessions);
+		request.getSession().setAttribute(SUMMARY_TOOL_SESSIONS, summaryToolSessions);
+		
+		
+		if (voteService.studentActivityOccurredGlobal(voteContent))
+		{
+			request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(false).toString());
+			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
+		}
+		else
+		{
+			request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
+			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to true");
+			logger.debug("error.noLearnerActivity must be displayed");
+		}
+		
+		
+		Map summaryToolSessionsId=MonitoringUtil.populateToolSessionsId(request, voteContent, voteService);
+		logger.debug("summaryToolSessionsId: " + summaryToolSessionsId);
+		request.getSession().setAttribute(SUMMARY_TOOL_SESSIONS_ID, summaryToolSessionsId);
+	    	
+	    /* SELECTION_CASE == 2 indicates start up */
+	    request.getSession().setAttribute(SELECTION_CASE, new Long(2));
+	    logger.debug("SELECTION_CASE: " + request.getSession().getAttribute(SELECTION_CASE));
+	    
+	    /* Default to All for tool Sessions so that all tool sessions' summary information gets displayed when the module starts up */
+	    request.getSession().setAttribute(CURRENT_MONITORED_TOOL_SESSION, "All");
+	    logger.debug("CURRENT_MONITORED_TOOL_SESSION: " + request.getSession().getAttribute(CURRENT_MONITORED_TOOL_SESSION));
+	    
+	    
+	    logger.debug("using allUsersData to retrieve data: " + isUserNamesVisible);
+	    List listMonitoredAnswersContainerDTO=MonitoringUtil.buildGroupsQuestionData(request, voteContent, 
+	    		isUserNamesVisible, isLearnerRequest, currentSessionId, userId);
+	    request.getSession().setAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO, listMonitoredAnswersContainerDTO);
+	    logger.debug("LIST_MONITORED_ANSWERS_CONTAINER_DTO: " + request.getSession().getAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO));
+	    /* ends here. */
+	}
+
+
     
+    public void initSummaryContent(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+	{
+    	logger.debug("start  initSummaryContent...");
+    	
+    	logger.debug("dispatching getSummary..." + request);
+   	    	
+		IVoteService voteService = (IVoteService)request.getSession().getAttribute(TOOL_SERVICE);
+		logger.debug("voteService: " + voteService);
+		if (voteService == null)
+		{
+			logger.debug("will retrieve voteService");
+			voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
+			logger.debug("retrieving voteService from session: " + voteService);
+		}
+		
+    	Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    logger.debug("toolContentId: " + toolContentId);
+	    
+	    VoteContent voteContent=voteService.retrieveVote(toolContentId);
+		logger.debug("existing voteContent:" + voteContent);
+		
+    	/* this section is related to summary tab. Starts here. */
+		Map summaryToolSessions=MonitoringUtil.populateToolSessions(request, voteContent, voteService);
+		logger.debug("summaryToolSessions: " + summaryToolSessions);
+		request.getSession().setAttribute(SUMMARY_TOOL_SESSIONS, summaryToolSessions);
+	    logger.debug("SUMMARY_TOOL_SESSIONS: " + request.getSession().getAttribute(SUMMARY_TOOL_SESSIONS));
+	    /* ends here. */
+	    
+		/*true means there is at least 1 response*/
+		if (voteService.studentActivityOccurredGlobal(voteContent))
+		{
+			request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(false).toString());
+			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
+		}
+		else
+		{
+			request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
+			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to true");
+		}
+
+    	request.getSession().setAttribute(CURRENT_MONITORING_TAB, "summary");
+    	logger.debug("end  initSummaryContent...");
+	}
+    
+    
+    public void initInstructionsContent(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+	{
+    	logger.debug("starting initInstructionsContent...");
+    	logger.debug("dispatching getInstructions..." + request);
+
+    	IVoteService voteService = (IVoteService)request.getSession().getAttribute(TOOL_SERVICE);
+		logger.debug("voteService: " + voteService);
+		if (voteService == null)
+		{
+			logger.debug("will retrieve voteService");
+			voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
+			logger.debug("retrieving voteService from session: " + voteService);
+		}
+
+	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    logger.debug("toolContentId: " + toolContentId);
+	    
+	    VoteContent voteContent=voteService.retrieveVote(toolContentId);
+		logger.debug("existing voteContent:" + voteContent);
+		
+		if (voteService.studentActivityOccurredGlobal(voteContent))
+		{
+			request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(false).toString());
+			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
+		}
+		else
+		{
+			request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
+			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to true");
+		}
+		
+    	refreshInstructionsData(request, voteContent);
+
+    	request.getSession().setAttribute(CURRENT_MONITORING_TAB, "instructions");
+    	logger.debug("ending  initInstructionsContent...");
+	}
+
+	public void refreshInstructionsData(HttpServletRequest request, VoteContent voteContent)
+	{
+	    request.getSession().setAttribute(RICHTEXT_ONLINEINSTRUCTIONS,voteContent.getOnlineInstructions());
+	    request.getSession().setAttribute(RICHTEXT_OFFLINEINSTRUCTIONS,voteContent.getOfflineInstructions());
+	}
+
+    
+    public void initStatsContent(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+	{
+    	logger.debug("starting  initStatsContent...");
+    	logger.debug("dispatching getStats..." + request);
+    	
+    	IVoteService voteService = (IVoteService)request.getSession().getAttribute(TOOL_SERVICE);
+		logger.debug("voteService: " + voteService);
+		if (voteService == null)
+		{
+			logger.debug("will retrieve voteService");
+			voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
+			logger.debug("retrieving voteService from session: " + voteService);
+		}
+
+	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    logger.debug("toolContentId: " + toolContentId);
+	    
+	    VoteContent voteContent=voteService.retrieveVote(toolContentId);
+		logger.debug("existing voteContent:" + voteContent);
+		
+		
+		if (voteService.studentActivityOccurredGlobal(voteContent))
+		{
+			request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(false).toString());
+			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
+		}
+		else
+		{
+			request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
+			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to true");
+		}
+
+    	refreshStatsData(request);
+    	
+    	request.getSession().setAttribute(CURRENT_MONITORING_TAB, "stats");
+    	logger.debug("ending  initStatsContent...");
+	}
+    
+	public void refreshStatsData(HttpServletRequest request)
+	{
+		/* it is possible that no users has ever logged in for the activity yet*/
+		IVoteService voteService = (IVoteService)request.getSession().getAttribute(TOOL_SERVICE);
+		logger.debug("voteService: " + voteService);
+		if (voteService == null)
+		{
+			logger.debug("will retrieve voteService");
+			voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
+			logger.debug("retrieving voteService from session: " + voteService);
+		}
+
+		
+	    int countAllUsers=voteService.getTotalNumberOfUsers();
+		logger.debug("countAllUsers: " + countAllUsers);
+		
+		if (countAllUsers == 0)
+		{
+	    	logger.debug("error: countAllUsers is 0");
+	    	request.getSession().setAttribute(USER_EXCEPTION_NO_STUDENT_ACTIVITY, new Boolean(true));
+		}
+		
+		request.getSession().setAttribute(COUNT_ALL_USERS, new Integer(countAllUsers).toString());
+		
+		int countSessionComplete=voteService.countSessionComplete();
+		logger.debug("countSessionComplete: " + countSessionComplete);
+		request.getSession().setAttribute(COUNT_SESSION_COMPLETE, new Integer(countSessionComplete).toString());
+	}
+
+	
     
     /**
      * persists error messages to request scope

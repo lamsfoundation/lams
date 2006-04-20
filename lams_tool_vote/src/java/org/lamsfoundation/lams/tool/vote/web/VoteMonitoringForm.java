@@ -37,6 +37,7 @@ public class VoteMonitoringForm extends VoteAuthoringForm implements VoteAppCons
 	
 	protected String isToolSessionChanged;
 	
+	
 	/**
 	 * @return Returns the isToolSessionChanged.
 	 */

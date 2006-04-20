@@ -23,6 +23,9 @@
 package org.lamsfoundation.lams.tool.vote.web;
 
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.TreeMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -38,6 +41,13 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
+import org.lamsfoundation.lams.tool.vote.VoteComparator;
+import org.lamsfoundation.lams.tool.vote.VoteUtils;
+import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
+import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
+import org.lamsfoundation.lams.tool.vote.service.IVoteService;
+import org.lamsfoundation.lams.tool.vote.service.VoteServiceProxy;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 
 /**
@@ -52,11 +62,208 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
   								throws IOException, ServletException, VoteApplicationException 
 	{
+		logger.debug("init VoteMonitoringStarterAction...");
+		VoteUtils.cleanUpSessionAbsolute(request);
+		
+	    ActionForward validateParameters=validateParameters(request, mapping);
+	    logger.debug("validateParamaters: " + validateParameters);
+	    if (validateParameters != null)
+	    {
+	    	return validateParameters;
+	    }
+
+		boolean initData=initialiseMonitoringData(mapping, form, request, response);
+		logger.debug("initData: " + initData);
+		if (initData == false)
+			return (mapping.findForward(ERROR_LIST));
+		
+		VoteMonitoringForm voteMonitoringForm = (VoteMonitoringForm) form;
+		logger.debug("voteMonitoringForm: " + voteMonitoringForm);
+		voteMonitoringForm.setCurrentTab("1");
+		logger.debug("setting current tab to 1: ");
+		
+		
+		request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
+		
+		VoteMonitoringAction voteMonitoringAction= new VoteMonitoringAction();
+		logger.debug("calling initSummaryContent.");
+		voteMonitoringAction.initSummaryContent(mapping, form, request, response);
+		logger.debug("calling initInstructionsContent.");
+		voteMonitoringAction.initInstructionsContent(mapping, form, request, response);
+		logger.debug("calling initStatsContent.");
+		voteMonitoringAction.initStatsContent(mapping, form, request, response);
+		
+
+		IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
+		
+		/* we have made sure TOOL_CONTENT_ID is passed  */
+	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    logger.debug("toolContentId: " + toolContentId);
 	    
-	    return null;
+	    VoteContent voteContent=voteService.retrieveVote(toolContentId);
+	    
+		logger.debug("existing voteContent:" + voteContent);
+		Map mapQuestionContent= new TreeMap(new VoteComparator());
+		logger.debug("mapQuestionContent: " + mapQuestionContent);
+	    /*
+		 * get the existing question content
+		 */
+		logger.debug("setting existing content data from the db");
+		mapQuestionContent.clear();
+		Iterator queIterator=voteContent.getVoteQueContents().iterator();
+		Long mapIndex=new Long(1);
+		logger.debug("mapQuestionContent: " + mapQuestionContent);
+		while (queIterator.hasNext())
+		{
+			VoteQueContent voteQueContent=(VoteQueContent) queIterator.next();
+			if (voteQueContent != null)
+			{
+				logger.debug("question: " + voteQueContent.getQuestion());
+	    		mapQuestionContent.put(mapIndex.toString(),voteQueContent.getQuestion());
+	    		/**
+	    		 * make the first entry the default(first) one for jsp
+	    		 */
+	    		if (mapIndex.longValue() == 1)
+	    			request.getSession().setAttribute(DEFAULT_QUESTION_CONTENT, voteQueContent.getQuestion());
+	    		mapIndex=new Long(mapIndex.longValue()+1);
+			}
+		}
+		logger.debug("Map initialized with existing contentid to: " + mapQuestionContent);
+		logger.debug("callling presentInitialUserInterface for the existing content.");
+		
+		request.getSession().setAttribute(MAP_QUESTION_CONTENT, mapQuestionContent);
+		logger.debug("execute initialized the Comparable Map: " + request.getSession().getAttribute("mapQuestionContent") );
+		
+		/*true means there is at least 1 response*/
+		if (voteService.studentActivityOccurredGlobal(voteContent))
+		{
+			request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(false).toString());
+			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
+		}
+		else
+		{
+			request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
+			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to true");
+		}
+
+		
+		request.getSession().setAttribute(ACTIVE_MODULE, MONITORING);
+		return (mapping.findForward(LOAD_MONITORING));
 	}
 
 	
+	public boolean initialiseMonitoringData(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+	{
+		logger.debug("start initializing  monitoring data...");
+		IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
+		request.getSession().setAttribute(TOOL_SERVICE, voteService);
+		
+		request.getSession().setAttribute(CURRENT_MONITORING_TAB, "summary");
+		
+		request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
+				/*
+	     * persist time zone information to session scope. 
+	     */
+	    VoteUtils.persistTimeZone(request);
+		
+		/* we have made sure TOOL_CONTENT_ID is passed  */
+	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    logger.debug("toolContentId: " + toolContentId);
+	    
+	    VoteContent voteContent=voteService.retrieveVote(toolContentId);
+		logger.debug("existing voteContent:" + voteContent);
+		
+		if (voteContent == null)
+		{
+			VoteUtils.cleanUpSessionAbsolute(request);
+			request.getSession().setAttribute(USER_EXCEPTION_CONTENT_DOESNOTEXIST, new Boolean(true).toString());
+			persistError(request, "error.content.doesNotExist");
+			return false;
+		}
+		
+		
+		boolean isContentInUse=VoteUtils.isContentInUse(voteContent);
+		logger.debug("isContentInUse:" + isContentInUse);
+		
+		
+		request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(false).toString());
+		if (isContentInUse == true)
+		{
+			logger.debug("monitoring url does not allow editActivity since the content is in use.");
+	    	persistError(request,"error.content.inUse");
+	    	request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(true).toString());
+		}
+		
+		
+		if (voteContent.getTitle() == null)
+		{
+			request.getSession().setAttribute(ACTIVITY_TITLE, "Voting Title");
+			request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, "Voting Instructions");
+		}
+		else
+		{
+			request.getSession().setAttribute(ACTIVITY_TITLE, voteContent.getTitle());
+			request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, voteContent.getInstructions());			
+		}
+
+		
+		if (voteService.studentActivityOccurredGlobal(voteContent))
+		{
+			VoteUtils.cleanUpSessionAbsolute(request);
+			logger.debug("student activity occurred on this content:" + voteContent);
+			request.getSession().setAttribute(USER_EXCEPTION_CONTENT_IN_USE, new Boolean(true).toString());
+		}
+		
+		VoteMonitoringAction voteMonitoringAction= new VoteMonitoringAction();
+		logger.debug("refreshing summary data...");
+		voteMonitoringAction.refreshSummaryData(request, voteContent, voteService, true, false, null, null);
+		
+		logger.debug("refreshing stats data...");
+		voteMonitoringAction.refreshStatsData(request);
+		
+		logger.debug("refreshing instructions data...");
+		voteMonitoringAction.refreshInstructionsData(request, voteContent);
+		
+		/* this section is related to instructions tab. Starts here. */
+	    /* ends here. */
+    
+	    logger.debug("end initializing  monitoring data...");
+		return true;
+	}
+
+
+	protected ActionForward validateParameters(HttpServletRequest request, ActionMapping mapping)
+	{
+		logger.debug("start validating monitoring parameters...");
+    	
+    	String strToolContentId=request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
+    	logger.debug("strToolContentId: " + strToolContentId);
+    	 
+	    if ((strToolContentId == null) || (strToolContentId.length() == 0)) 
+	    {
+	    	persistError(request, "error.contentId.required");
+	    	VoteUtils.cleanUpSessionAbsolute(request);
+			return (mapping.findForward(ERROR_LIST));
+	    }
+	    else
+	    {
+	    	try
+			{
+	    		long toolContentId=new Long(strToolContentId).longValue();
+		    	logger.debug("passed TOOL_CONTENT_ID : " + new Long(toolContentId));
+		    	request.getSession().setAttribute(TOOL_CONTENT_ID,new Long(toolContentId));	
+			}
+	    	catch(NumberFormatException e)
+			{
+	    		persistError(request, "error.contentId.numberFormatException");
+	    		logger.debug("add error.contentId.numberFormatException to ActionMessages.");
+	    		VoteUtils.cleanUpSessionAbsolute(request);
+				return (mapping.findForward(ERROR_LIST));
+			}
+	    }
+	    return null;
+	}
+
 	
 	/**
      * persists error messages to request scope

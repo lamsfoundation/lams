@@ -348,6 +348,20 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 		    		logger.debug("add error.content.inUse to ActionMessages.");
 					return (mapping.findForward(ERROR_LIST));
 	    		}
+	        	
+	        	boolean isDefineLater=VoteUtils.isDefineLater(voteContent);
+	        	logger.debug("isDefineLater:" + isDefineLater);
+	        	if (isDefineLater == true)
+	        	{
+	        		VoteUtils.cleanUpSessionAbsolute(request);
+	    			logger.debug("student activity occurred on this content:" + voteContent);
+	    	    	request.getSession().setAttribute(USER_EXCEPTION_CONTENT_IN_USE, new Boolean(true).toString());    			
+		    		persistError(request, "error.content.inUse");
+		    		logger.debug("add error.content.inUse to ActionMessages.");
+					return (mapping.findForward(ERROR_LIST));
+	        	    
+	        	}
+	        	
 	        	logger.debug("will get content for strToolContentId:" + strToolContentId);
 	            retrieveContent(request, mapping, voteAuthoringForm, mapOptionsContent, new Long(strToolContentId).longValue());
 			}

@@ -278,7 +278,20 @@
 	        handler="org.lamsfoundation.lams.tool.vote.web.CustomStrutsExceptionHandler"
 	        path="/VoteErrorBox.jsp"
 	        scope="request"
-	      />	         			
+	      />	      
+	      
+	  	<forward
+			name="loadMonitoring"
+			path="/monitoring/MonitoringMaincontent.jsp"
+			redirect="false"
+	  	/>
+	
+	  	<forward
+			name="refreshMonitoring"
+			path="/monitoring/MonitoringMaincontent.jsp"
+			redirect="false"
+	  	/>
+	         			
    			
 	  	<forward
 		    name="errorList"
@@ -313,6 +326,19 @@
 	        path="/VoteErrorBox.jsp"
 	        scope="request"
 	      />	         			
+	      
+	  	<forward
+			name="loadMonitoring"
+			path="/monitoring/MonitoringMaincontent.jsp"
+			redirect="false"
+	  	/>
+	
+	  	<forward
+			name="refreshMonitoring"
+			path="/monitoring/MonitoringMaincontent.jsp"
+			redirect="false"
+	  	/>
+	      
 
 	  	<forward
 		    name="errorList"

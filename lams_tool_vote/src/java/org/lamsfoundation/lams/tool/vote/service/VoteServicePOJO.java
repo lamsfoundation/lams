@@ -174,11 +174,26 @@ public class VoteServicePOJO implements
         }
     }
 
-    public List retrieveVoteQueContentsByToolContentId(long qaContentId) throws VoteApplicationException
+    public VoteQueUsr getVoteQueUsrById(long voteQueUsrId) throws VoteApplicationException
+	{
+ 	   try
+       {
+	   		VoteQueUsr voteQueUsr=voteUserDAO.getVoteQueUsrById(voteQueUsrId);
+	   		return voteQueUsr;
+       }
+       catch (DataAccessException e)
+       {
+           throw new VoteApplicationException("Exception occured when lams is getting vote QueUsr: "
+                                                        + e.getMessage(),
+														   e);
+       }
+	}
+    
+    public List retrieveVoteQueContentsByToolContentId(long voteContentId) throws VoteApplicationException
 	{
         try
         {
-            return voteQueContentDAO.getVoteQueContentsByContentId(qaContentId);
+            return voteQueContentDAO.getVoteQueContentsByContentId(voteContentId);
         }
         catch (DataAccessException e)
         {
@@ -230,6 +245,21 @@ public class VoteServicePOJO implements
 														   e);
         }
 	}
+    
+    
+    public List getUserBySessionOnly(final VoteSession voteSession) throws VoteApplicationException
+    {
+  	   try
+       {
+	   		return voteUserDAO.getUserBySessionOnly(voteSession);
+       }
+       catch (DataAccessException e)
+       {
+           throw new VoteApplicationException("Exception occured when lams is getting vote QueUsr by vote session "
+                                                        + e.getMessage(),
+														   e);
+       }
+    }
     
     
     public void removeQuestionContentByVoteUid(final Long voteContentUid) throws VoteApplicationException
@@ -1793,12 +1823,12 @@ public class VoteServicePOJO implements
 	
 	/*
 	   !!! COMPLETE THIS !!!
-	public IQaUploadedFileDAO getQaUploadedFileDAO() {
-		return qaUploadedFileDAO;
+	public IVoteUploadedFileDAO getVoteUploadedFileDAO() {
+		return voteUploadedFileDAO;
 	}
 	
-	public void setQaUploadedFileDAO(IQaUploadedFileDAO qaUploadedFileDAO) {
-		this.qaUploadedFileDAO = qaUploadedFileDAO;
+	public void setQaUploadedFileDAO(IVoteUploadedFileDAO voteUploadedFileDAO) {
+		this.voteUploadedFileDAO = voteUploadedFileDAO;
 	}
 	
 	*/

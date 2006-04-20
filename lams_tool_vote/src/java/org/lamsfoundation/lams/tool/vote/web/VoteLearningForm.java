@@ -48,6 +48,122 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
 	protected String donePreview;
 	protected String doneLearnerProgress;
 	
+	protected String method;
+	protected String answer;
+	protected String currentQuestionIndex;
+	protected String submitAnswersContent;
+	protected String getNextQuestion;
+	protected String getPreviousQuestion;
+	protected String endLearning;
+	
+	
+    protected void resetUserActions()
+    {
+    	this.getNextQuestion=null;
+    	this.getPreviousQuestion=null;
+    	this.endLearning=null;
+    }
+
+	
+    /**
+     * @return Returns the answer.
+     */
+    public String getAnswer() {
+        return answer;
+    }
+    /**
+     * @param answer The answer to set.
+     */
+    public void setAnswer(String answer) {
+        this.answer = answer;
+    }
+    /**
+     * @return Returns the currentQuestionIndex.
+     */
+    public String getCurrentQuestionIndex() {
+        return currentQuestionIndex;
+    }
+    /**
+     * @param currentQuestionIndex The currentQuestionIndex to set.
+     */
+    public void setCurrentQuestionIndex(String currentQuestionIndex) {
+        this.currentQuestionIndex = currentQuestionIndex;
+    }
+    /**
+     * @return Returns the endLearning.
+     */
+    public String getEndLearning() {
+        return endLearning;
+    }
+    /**
+     * @param endLearning The endLearning to set.
+     */
+    public void setEndLearning(String endLearning) {
+        this.endLearning = endLearning;
+    }
+    /**
+     * @return Returns the getNextQuestion.
+     */
+    public String getGetNextQuestion() {
+        return getNextQuestion;
+    }
+    /**
+     * @param getNextQuestion The getNextQuestion to set.
+     */
+    public void setGetNextQuestion(String getNextQuestion) {
+        this.getNextQuestion = getNextQuestion;
+    }
+    /**
+     * @return Returns the getPreviousQuestion.
+     */
+    public String getGetPreviousQuestion() {
+        return getPreviousQuestion;
+    }
+    /**
+     * @param getPreviousQuestion The getPreviousQuestion to set.
+     */
+    public void setGetPreviousQuestion(String getPreviousQuestion) {
+        this.getPreviousQuestion = getPreviousQuestion;
+    }
+    /**
+     * @return Returns the method.
+     */
+    public String getMethod() {
+        return method;
+    }
+    /**
+     * @param method The method to set.
+     */
+    public void setMethod(String method) {
+        this.method = method;
+    }
+    /**
+     * @return Returns the responseId.
+     */
+    public String getResponseId() {
+        return responseId;
+    }
+    /**
+     * @param responseId The responseId to set.
+     */
+    public void setResponseId(String responseId) {
+        this.responseId = responseId;
+    }
+    /**
+     * @return Returns the submitAnswersContent.
+     */
+    public String getSubmitAnswersContent() {
+        return submitAnswersContent;
+    }
+    /**
+     * @param submitAnswersContent The submitAnswersContent to set.
+     */
+    public void setSubmitAnswersContent(String submitAnswersContent) {
+        this.submitAnswersContent = submitAnswersContent;
+    }
+	protected String responseId;
+
+	
 	
 	
 	

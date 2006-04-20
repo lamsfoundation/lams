@@ -47,11 +47,11 @@ public class VoteSessionDAO extends HibernateDaoSupport implements IVoteSessionD
     private static final String LOAD_VOTESESSION_BY_USER = "select votes from VoteSession votes left join fetch "
         + "votes.voteQueUsers user where user.queUsrId=:userId";
     
-    private static final String GET_SESSIONS_FROM_CONTENT = "select votes.voteSessionId from VoteSession vote where vote.voteContent=:voteContent";
+    private static final String GET_SESSIONS_FROM_CONTENT = "select votes.voteSessionId from VoteSession votes where votes.voteContent=:voteContent";
     
-    private static final String COUNT_SESSION_COMPLETE = "from voteSession in class  where voteSession.sessionStatus='COMPLETE'";
+    private static final String COUNT_SESSION_COMPLETE = "from voteSession in class VoteSession where voteSession.sessionStatus='COMPLETE'";
     
-    private static final String COUNT_SESSION_INCOMPLETE = "from voteSession in class  where voteSession.sessionStatus='INCOMPLETE'";
+    private static final String COUNT_SESSION_INCOMPLETE = "from voteSession in class VoteSession where voteSession.sessionStatus='INCOMPLETE'";
     
     private static final String GET_SESSIONNAMES_FROM_CONTENT 	= "select votes.session_name from VoteSession votes where votes.voteContent=:voteContent order by votes.voteSessionId";
     
