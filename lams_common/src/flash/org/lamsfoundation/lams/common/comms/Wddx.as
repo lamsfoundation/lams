@@ -236,7 +236,7 @@ class org.lamsfoundation.lams.common.comms.Wddx {
 			if(ord < 256) {
 				tempString += (this.et[ord(substring(s, i+1, 1))]);
 			} else {
-				tempString += "&#x" + ord + ";";
+				tempString += "&#" + ord + ";";
 			}
 		}
 		node.lastChild.appendChild(temp.createTextNode(tempString));
