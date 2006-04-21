@@ -47,7 +47,7 @@ INSERT INTO lams_lesson_state VALUES (3, 'STARTED');
 INSERT INTO lams_lesson_state VALUES (4, 'SUSPENDED');
 INSERT INTO lams_lesson_state VALUES (5, 'FINISHED');
 INSERT INTO lams_lesson_state VALUES (6, 'ARCHIVED');
-INSERT INTO lams_lesson_state VALUES (7, 'DISABLED_STATE');
+INSERT INTO lams_lesson_state VALUES (7, 'REMOVED');
 
 INSERT into lams_license VALUES (1, 'Attribution-Noncommercial-ShareAlike 2.5', 'by-nc-sa', 'http://creativecommons.org/licenses/by-nc-sa/2.5/', 1, '/images/license/byncsa.jpg');
 INSERT into lams_license VALUES (2, 'Other Licensing Agreement', 'other', '',0, '');
