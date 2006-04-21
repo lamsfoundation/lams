@@ -213,6 +213,37 @@
 	      />	         			
 
 	  	<forward
+		    name="loadLearner"
+		    path="/learning/AnswersContent.jsp"
+		    redirect="false"
+	  	/>
+
+	  	<forward
+		    name="viewAnswers"
+		    path="/learning/ViewAnswers.jsp"
+		    redirect="false"
+	  	/>
+
+	  	<forward
+		    name="redoQuestions"
+		    path="/learning/RedoQuestions.jsp"
+		    redirect="false"
+	  	/>
+	  	
+	     <forward
+	        name="preview"
+	        path="/learning/Preview.jsp"
+		    redirect="false"
+	     />
+
+	  	<forward
+		    name="learningStarter"
+		    path="/learningIndex.jsp"
+		    redirect="false"
+	  	/>
+	      
+
+	  	<forward
 		    name="errorList"
 	        path="/VoteErrorBox.jsp"
 		    redirect="false"
@@ -245,6 +276,54 @@
 	        path="/VoteErrorBox.jsp"
 	        scope="request"
 	      />	         			
+
+	  	<forward
+		    name="loadLearner"
+		    path="/learning/AnswersContent.jsp"
+		    redirect="false"
+	  	/>
+	  	
+	  	<forward
+		    name="individualReport"
+		    path="/learning/IndividualLearnerResults.jsp"
+		    redirect="false"
+	  	/>
+	  	
+	  	<forward
+		    name="redoQuestions"
+		    path="/learning/RedoQuestions.jsp"
+		    redirect="false"
+	  	/>
+
+	  	<forward
+		    name="viewAnswers"
+		    path="/learning/ViewAnswers.jsp"
+		    redirect="false"
+	  	/>
+
+	  	<forward
+		    name="resultsSummary"
+		    path="/learning/ResultsSummary.jsp"
+		    redirect="false"
+	  	/>
+
+	  	<forward
+	        name="starter"
+	        path="/index.jsp"
+		    redirect="false"
+	     />
+
+	  	<forward
+		    name="learningStarter"
+		    path="/learningIndex.jsp"
+		    redirect="false"
+	  	/>
+
+	     <forward
+	        name="preview"
+	        path="/learning/Preview.jsp"
+		    redirect="false"
+	     />
 
 	  	<forward
 		    name="errorList"
