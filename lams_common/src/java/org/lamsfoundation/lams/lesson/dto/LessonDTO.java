@@ -22,6 +22,8 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.lesson.dto;
 
+import java.util.Date;
+
 
 /**
  * <p>This is a cut down version of Lesson domain object. This data transfer object
@@ -45,6 +47,8 @@ public class LessonDTO
     private String lessonName;
     private String lessonDescription;
     private Integer lessonStateID;
+	private Date createDateTime;
+	private Date startDateTime;
 
     //---------------------------------------------------------------------
     // Construtors
@@ -55,12 +59,16 @@ public class LessonDTO
     public LessonDTO(Long lessonId,
                          String lessonName,
                          String lessonDescription,
-                         Integer lessonStateId)
+                         Integer lessonStateId,
+                         Date createDateTime,
+                         Date startDateTime)
     {
         this.lessonID = lessonId;
         this.lessonName = lessonName;
         this.lessonDescription = lessonDescription;
         this.lessonStateID = lessonStateId;
+        this.createDateTime = createDateTime;
+        this.startDateTime = startDateTime;
 
     }
     //---------------------------------------------------------------------
@@ -101,6 +109,13 @@ public class LessonDTO
     {
         return lessonStateID;
     }
+    
+	public Date getCreateDateTime() {
+		return createDateTime;
+	}
+	public Date getStartDateTime() {
+		return startDateTime;
+	}
 
     /**
      * Returns the String representation of lesson data transfer object.
@@ -113,6 +128,8 @@ public class LessonDTO
         sb.append("lessonName='" + getLessonName()+"';");
         sb.append("lessonDescription='" + getLessonDescription() + "'; ");
         sb.append("lessonStateID='" + getLessonStateID() + "'; ");
+        sb.append("createDateTime='" + getCreateDateTime() + "'; ");
+        sb.append("startDateTime='" + getStartDateTime() + "'; ");
         return sb.toString();
     }
 }

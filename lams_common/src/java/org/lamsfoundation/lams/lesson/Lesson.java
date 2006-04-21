@@ -22,34 +22,29 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.lesson;
 
+import java.io.Serializable;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 import org.lamsfoundation.lams.lesson.dto.LessonDetailsDTO;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
-import java.io.Serializable;
-
-import java.util.Date;
-import java.util.HashSet;
-
-import java.util.Set;
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.apache.commons.lang.builder.ToStringBuilder;
 /** 
  * A Lesson is a learning sequence that is assocated with
  * a number of users for use in learning. A lesson needs a run time copy of
  * learning design to interact with.         
- * 
- * 
- * Hibernate definition:
- * 
- * @hibernate.class table="tool_lasr10_survey_session"
- * 
  */
 public class Lesson implements Serializable {
 
-    //---------------------------------------------------------------------
+	private static final long serialVersionUID = 5733920851084229175L;
+	
+	//---------------------------------------------------------------------
     // Class level constants
     //---------------------------------------------------------------------
     /** The state for newly created lesson. The learning design has been copied. 
@@ -72,7 +67,7 @@ public class Lesson implements Serializable {
      * but no longer visible to the learners. */
     public static final Integer ARCHIVED_STATE = new Integer(6);
     /** The state for lesssons that are removed and never can be accessed again */
-    public static final Integer DISABLED_STATE  = new Integer(7);
+    public static final Integer REMOVED_STATE  = new Integer(7);
     
     //---------------------------------------------------------------------
     // attributes
@@ -442,7 +437,9 @@ public class Lesson implements Serializable {
         return new LessonDTO(this.lessonId,
                              this.getLessonName(),
                              this.getLessonDescription(),
-                             this.lessonStateId);
+                             this.lessonStateId,
+                             this.createDateTime,
+                             this.startDateTime);
     }
     public LessonDetailsDTO getLessonDetails(){
     	return new LessonDetailsDTO(this);
