@@ -35,7 +35,7 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 /**
  * @author Ozgur Demirtas
  * 
- * <p>Hibernate implementation for database access to McQueContent for the mc tool.</p>
+ * <p>Hibernate implementation for database access to VoteQueContent for the vote tool.</p>
  */
 public class VoteQueContentDAO extends HibernateDaoSupport implements IVoteQueContentDAO {
 	 	static Logger logger = Logger.getLogger(VoteQueContentDAO.class.getName());
@@ -45,6 +45,8 @@ public class VoteQueContentDAO extends HibernateDaoSupport implements IVoteQueCo
 	 	private static final String LOAD_QUESTION_CONTENT_BY_CONTENT_ID = "from voteQueContent in class VoteQueContent where voteQueContent.voteContentId=:voteContentId";
 	 	
 	 	private static final String LOAD_QUESTION_CONTENT_BY_QUESTION_TEXT = "from voteQueContent in class VoteQueContent where voteQueContent.question=:question and voteQueContent.voteContentId=:voteContentUid";
+	 	
+	 	private static final String LOAD_QUESTION_CONTENT_BY_DISPLAY_ORDER = "from voteQueContent in class VoteQueContent where voteQueContent.displayOrder=:displayOrder and voteQueContent.voteContentId=:voteContentUid";
 	 	
 	 		 	
 	 	public VoteQueContent getVoteQueContentByUID(Long uid)
@@ -99,6 +101,22 @@ public class VoteQueContentDAO extends HibernateDaoSupport implements IVoteQueCo
 			return null;
 	    }
 	 	
+	 	
+	 	public VoteQueContent getQuestionContentByDisplayOrder(final Long displayOrder, final Long voteContentUid)
+	    {
+	        HibernateTemplate templ = this.getHibernateTemplate();
+			List list = getSession().createQuery(LOAD_QUESTION_CONTENT_BY_DISPLAY_ORDER)
+				.setLong("displayOrder", displayOrder.longValue())
+				.setLong("voteContentUid", voteContentUid.longValue())				
+				.list();
+			
+			if(list != null && list.size() > 0){
+				VoteQueContent voteq = (VoteQueContent) list.get(0);
+				return voteq;
+			}
+			return null;
+	    }
+
 	 	
 	 	public void removeQuestionContentByVoteUid(final Long voteContentUid)
 	    {

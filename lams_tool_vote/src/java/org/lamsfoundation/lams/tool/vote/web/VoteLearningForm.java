@@ -37,6 +37,8 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
 	protected String optionValue;
 	protected String checked;
 	
+	protected String userEntry;
+	
 	protected String continueOptions;
 	protected String nextOptions;
 	protected String continueOptionsCombined;
@@ -372,4 +374,18 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
 	public void setDoneLearnerProgress(String doneLearnerProgress) {
 		this.doneLearnerProgress = doneLearnerProgress;
 	}
+	
+    /**
+     * @return Returns the userEntry.
+     */
+    public String getUserEntry() {
+        return userEntry;
+    }
+    /**
+     * @param userEntry The userEntry to set.
+     */
+    public void setUserEntry(String userEntry) {
+        this.userEntry = userEntry;
+    }
+	
 }

@@ -23,6 +23,7 @@
 package org.lamsfoundation.lams.tool.vote.web;
 
 import java.io.IOException;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -35,9 +36,14 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.lamsfoundation.lams.tool.exception.DataMissingException;
+import org.lamsfoundation.lams.tool.exception.ToolException;
+import org.lamsfoundation.lams.tool.vote.web.LearningUtil;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
 import org.lamsfoundation.lams.tool.vote.VoteUtils;
+import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
+import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 
@@ -101,13 +107,191 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
                                                             ServletException
     {
     	VoteUtils.cleanUpUserExceptions(request);
-	 	VoteAuthoringForm mcAuthoringForm = (VoteAuthoringForm) form;
-	 	IVoteService mcService =VoteUtils.getToolService(request);
+	 	VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
+	 	IVoteService voteService =VoteUtils.getToolService(request);
 	 	VoteUtils.persistRichText(request);	 	
-	 	mcAuthoringForm.resetUserAction();
+	 	voteAuthoringForm.resetUserAction();
 	 	return null;
     }
 
+    public ActionForward continueOptionsCombined(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+	{   
+    	VoteUtils.cleanUpUserExceptions(request);
+		logger.debug("dispatching continueOptionsCombined...");
+		VoteLearningForm voteLearningForm = (VoteLearningForm) form;
+	 	IVoteService voteService =VoteUtils.getToolService(request);
+	 	
+	 	/* process the answers */
+		Map mapGeneralCheckedOptionsContent=(Map) request.getSession().getAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT);
+    	logger.debug("final mapGeneralCheckedOptionsContent: " + mapGeneralCheckedOptionsContent);
+    	
+    	Long toolContentId=(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+    	logger.debug("toolContentId: " + toolContentId);
+    			
+    	logger.debug("will assess");
+    	
+    	//Map mapLeanerAssessmentResults=LearningUtil.assess(request, mapGeneralCheckedOptionsContent, toolContentId);
+    	Map mapLeanerAssessmentResults=null;
+    	logger.debug("mapLeanerAssessmentResults: " + mapLeanerAssessmentResults);
+    	logger.debug("assesment complete");
+    	
+
+    	boolean isUserDefined=LearningUtil.doesUserExists(request);
+    	logger.debug("isUserDefined");
+    	if (isUserDefined == false)
+    	{
+    		LearningUtil.createUser(request);
+    		logger.debug("created user in the db");
+    	}
+    	VoteQueUsr voteQueUsr=LearningUtil.getUser(request);
+    	logger.debug("voteQueUsr: " + voteQueUsr);
+    	
+
+    	LearningUtil.createAttempt(request, voteQueUsr, mapGeneralCheckedOptionsContent);
+    	logger.debug("created user attempt in the db");
+    	
+    	voteLearningForm.resetCommands();
+		return (mapping.findForward(INDIVIDUAL_REPORT));
+    }
+
+    
+    public ActionForward displayVote(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                      ServletException
+   {
+    	VoteUtils.cleanUpUserExceptions(request);
+    	VoteLearningForm voteLearningForm = (VoteLearningForm) form;
+	 	IVoteService voteService =VoteUtils.getToolService(request);
+	 	
+    	voteLearningForm.resetParameters();
+    	LearningUtil.readParameters(request, voteLearningForm);
+    	
+    	if (voteLearningForm.getContinueOptionsCombined() != null)
+    	{
+    		setContentInUse(request);
+    		return continueOptionsCombined(mapping, form, request, response);
+    	}
+    	else if (voteLearningForm.getOptionCheckBoxSelected() != null)
+    	{
+    		logger.debug("doing getOptionCheckBoxSelected");
+    		setContentInUse(request);
+    		voteLearningForm.resetCommands();
+    		LearningUtil.selectOptionsCheckBox(request,voteLearningForm, voteLearningForm.getQuestionIndex());
+    	}
+
+    	else if (voteLearningForm.getRedoQuestions() != null)
+    	{
+    		setContentInUse(request);
+    		//return redoQuestions(mapping, form, request, response);
+    		return null;
+    	}
+    	else if (voteLearningForm.getRedoQuestionsOk() != null)
+    	{
+    		setContentInUse(request);
+    		logger.debug("requested redoQuestionsOk, user is sure to redo the questions.");
+    		voteLearningForm.resetCommands();
+    		//return redoQuestions(request, voteLearningForm, mapping);
+    		return null;
+    	}
+    	else if (voteLearningForm.getViewAnswers() != null)
+    	{
+    		setContentInUse(request);
+    		//return viewAnswers(mapping, form, request, response);
+    		return null;
+    	}
+    	else if (voteLearningForm.getViewSummary() != null)
+    	{
+    		setContentInUse(request);
+			//return viewSummary(mapping, form, request, response);
+    		return null;    		
+    	}
+    	else if (voteLearningForm.getLearnerFinished() != null)
+    	{
+    		logger.debug("requested learner finished, the learner should be directed to next activity.");
+    		
+    		Long toolSessionId = (Long) request.getSession().getAttribute(TOOL_SESSION_ID);
+    		String userID=(String) request.getSession().getAttribute(USER_ID);
+    		logger.debug("attempting to leave/complete session with toolSessionId:" + toolSessionId + " and userID:"+userID);
+    		
+    		VoteUtils.cleanUpSessionAbsolute(request);
+    		
+    		String nextUrl=null;
+    		try
+    		{
+    			nextUrl=voteService.leaveToolSession(toolSessionId, new Long(userID));
+    			logger.debug("nextUrl: "+ nextUrl);
+    		}
+    		catch (DataMissingException e)
+    		{
+    			logger.debug("failure getting nextUrl: "+ e);
+        		voteLearningForm.resetCommands();
+    			//throw new ServletException(e);
+        		return (mapping.findForward(LEARNING_STARTER));
+    		}
+    		catch (ToolException e)
+    		{
+    			logger.debug("failure getting nextUrl: "+ e);
+        		voteLearningForm.resetCommands();
+    			//throw new ServletException(e);
+        		return (mapping.findForward(LEARNING_STARTER));        		
+    		}
+    		catch (Exception e)
+    		{
+    			logger.debug("unknown exception getting nextUrl: "+ e);
+        		voteLearningForm.resetCommands();
+    			//throw new ServletException(e);
+        		return (mapping.findForward(LEARNING_STARTER));        		
+    		}
+
+    		logger.debug("success getting nextUrl: "+ nextUrl);
+    		voteLearningForm.resetCommands();
+    		
+    		/* pay attention here*/
+    		logger.debug("redirecting to the nextUrl: "+ nextUrl);
+    		response.sendRedirect(nextUrl);
+    		
+    		return null;
+    	}
+    	else if (voteLearningForm.getDonePreview() != null)
+    	{
+    		logger.debug("requested  donePreview.");
+        	voteLearningForm.resetCommands();
+        	VoteUtils.cleanUpSessionAbsolute(request);
+        	return (mapping.findForward(LEARNING_STARTER));
+    	}
+    	else if (voteLearningForm.getDoneLearnerProgress() != null)
+    	{
+    		logger.debug("requested  doneLearnerProgress.");
+        	voteLearningForm.resetCommands();
+        	VoteUtils.cleanUpSessionAbsolute(request);
+        	return (mapping.findForward(LEARNING_STARTER));
+    	}
+    	
+    	voteLearningForm.resetCommands();	
+ 		return (mapping.findForward(LOAD_LEARNER));
+   }
+
+    
+    protected void setContentInUse(HttpServletRequest request)
+    {
+    	IVoteService voteService =VoteUtils.getToolService(request);
+    	Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
+    	logger.debug("toolContentId:" + toolContentId);
+    	
+    	VoteContent voteContent=voteService.retrieveVote(toolContentId);
+    	logger.debug("voteContent:" + voteContent);
+    	voteContent.setContentInUse(true);
+    	logger.debug("content has been set to inuse");
+    	voteService.saveVoteContent(voteContent);
+    }
+
+    
     
     /**
      * persists error messages to request scope

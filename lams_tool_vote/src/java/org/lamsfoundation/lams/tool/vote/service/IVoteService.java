@@ -66,6 +66,8 @@ public interface IVoteService
     public VoteQueUsr getVoteUserBySession(final Long queUsrId, final Long mcSessionId) throws VoteApplicationException;
     
  	public VoteQueUsr retrieveVoteQueUsr(Long userId) throws VoteApplicationException;
+ 	
+ 	public VoteQueContent getQuestionContentByDisplayOrder(final Long displayOrder, final Long voteContentUid) throws VoteApplicationException;
     
     public void createVoteUsrAttempt(VoteUsrAttempt mcUsrAttempt) throws VoteApplicationException;
     

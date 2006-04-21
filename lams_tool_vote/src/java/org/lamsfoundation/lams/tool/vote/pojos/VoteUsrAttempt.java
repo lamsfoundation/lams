@@ -67,32 +67,29 @@ public class VoteUsrAttempt implements Serializable {
 
     /** full constructor */
     public VoteUsrAttempt(Long attemptId, Date attemptTime, String timeZone, org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent voteQueContent, 
-    		org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr voteQueUsr, org.lamsfoundation.lams.tool.vote.pojos.VoteOptsContent voteOptionsContent) {
+    		org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr voteQueUsr) {
         this.attemptId = attemptId;
         this.attemptTime = attemptTime;
         this.timeZone = timeZone;
         this.voteQueContent = voteQueContent;
         this.voteQueUsr = voteQueUsr;
-        this.voteOptionsContent = voteOptionsContent;
     }
 
     public VoteUsrAttempt(Date attemptTime, String timeZone, org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent voteQueContent, 
-    		org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr voteQueUsr, org.lamsfoundation.lams.tool.vote.pojos.VoteOptsContent voteOptionsContent) {
+    		org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr voteQueUsr) {
         this.attemptTime = attemptTime;
         this.timeZone = timeZone;
         this.voteQueContent = voteQueContent;
         this.voteQueUsr = voteQueUsr;
-        this.voteOptionsContent = voteOptionsContent;
     }
 
     public VoteUsrAttempt(String userEntry, Date attemptTime, String timeZone, org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent voteQueContent, 
-    		org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr voteQueUsr, org.lamsfoundation.lams.tool.vote.pojos.VoteOptsContent voteOptionsContent) {
+    		org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr voteQueUsr) {
         this.userEntry=userEntry;
         this.attemptTime = attemptTime;
         this.timeZone = timeZone;
         this.voteQueContent = voteQueContent;
         this.voteQueUsr = voteQueUsr;
-        this.voteOptionsContent = voteOptionsContent;
     }
 
     
@@ -102,11 +99,10 @@ public class VoteUsrAttempt implements Serializable {
 
     /** minimal constructor */
     public VoteUsrAttempt(Long attemptId, org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent voteQueContent, 
-            org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr voteQueUsr, org.lamsfoundation.lams.tool.vote.pojos.VoteOptsContent voteOptionsContent) {
+            org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr voteQueUsr) {
         this.attemptId = attemptId;
         this.voteQueContent = voteQueContent;
         this.voteQueUsr = voteQueUsr;
-        this.voteOptionsContent = voteOptionsContent;
     }
 
     public Long getUid() {

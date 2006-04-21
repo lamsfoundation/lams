@@ -22,6 +22,8 @@
 package org.lamsfoundation.lams.tool.vote.web;
 
 import java.io.IOException;
+import java.util.Map;
+import java.util.TreeMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -36,9 +38,16 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
+import org.lamsfoundation.lams.tool.vote.VoteComparator;
 import org.lamsfoundation.lams.tool.vote.VoteUtils;
+import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
+import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
+import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
+import org.lamsfoundation.lams.tool.vote.service.IVoteService;
+import org.lamsfoundation.lams.tool.vote.service.VoteServiceProxy;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -91,10 +100,366 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 public class VoteLearningStarterAction extends Action implements VoteAppConstants {
 	static Logger logger = Logger.getLogger(VoteLearningStarterAction.class.getName());
 
+    /*
+     * By now, the passed tool session id MUST exist in the db through the calling of:
+     * public void createToolSession(Long toolSessionId, Long toolContentId) by the container.
+     *  
+     * 
+     * make sure this session exists in tool's session table by now.
+     */
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
-  								throws IOException, ServletException, VoteApplicationException {
+		throws IOException, ServletException, VoteApplicationException {
+
+	
+	VoteUtils.cleanUpSessionAbsolute(request);
+	
+	Map mapQuestionsContent= new TreeMap(new VoteComparator());
+	Map mapAnswers= new TreeMap(new VoteComparator());
+
+	IVoteService mcService = VoteUtils.getToolService(request);
+	logger.debug("retrieving mcService from session: " + mcService);
+	if (mcService == null)
+	{
+		mcService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
+	    logger.debug("retrieving mcService from proxy: " + mcService);
+	    request.getSession().setAttribute(TOOL_SERVICE, mcService);		
+	}
+
+	VoteLearningForm mcLearningForm = (VoteLearningForm) form;
+	
+    /*
+     * persist time zone information to session scope. 
+     */
+    VoteUtils.persistTimeZone(request);
+    ActionForward validateParameters=validateParameters(request, mapping);
+    logger.debug("validateParameters: " + validateParameters);
+    if (validateParameters != null)
+    {
+    	return validateParameters;
+    }
+
+    Long toolSessionID=(Long) request.getSession().getAttribute(AttributeNames.PARAM_TOOL_SESSION_ID);
+    logger.debug("retrieved toolSessionID: " + toolSessionID);
+    
+    /* API test code from here*/
+    String createToolSession=request.getParameter("createToolSession");
+	logger.debug("createToolSession: " + createToolSession);
+	if ((createToolSession != null) && createToolSession.equals("1"))
+	{	try
+		{
+			mcService.createToolSession(toolSessionID, "toolSessionName", new Long(9876));
+			return (mapping.findForward(LEARNING_STARTER));
+		}
+		catch(ToolException e)
+		{
+			VoteUtils.cleanUpSessionAbsolute(request);
+			logger.debug("tool exception"  + e);
+		}
+	}
+	
+	String removeToolSession=request.getParameter("removeToolSession");
+	logger.debug("removeToolSession: " + removeToolSession);
+	if ((removeToolSession != null) && removeToolSession.equals("1"))
+	{	try
+		{
+			mcService.removeToolSession(toolSessionID);
+			return (mapping.findForward(LEARNING_STARTER));
+		}
+		catch(ToolException e)
+		{
+			VoteUtils.cleanUpSessionAbsolute(request);
+			logger.debug("tool exception"  + e);
+		}
+	}
+	
+	String learnerId=request.getParameter("learnerId");
+	logger.debug("learnerId: " + learnerId);
+	if (learnerId != null) 
+	{	try
+		{
+			String nextUrl=mcService.leaveToolSession(toolSessionID, new Long(learnerId));
+			logger.debug("nextUrl: "+ nextUrl);
+			return (mapping.findForward(LEARNING_STARTER));
+		}
+		catch(ToolException e)
+		{
+			VoteUtils.cleanUpSessionAbsolute(request);
+			logger.debug("tool exception"  + e);
+		}
+	}
+	/*till here*/
+    
+	
+	/*
+	 * by now, we made sure that the passed tool session id exists in the db as a new record
+	 * Make sure we can retrieve it and the relavent content
+	 */
+	
+	VoteSession mcSession=mcService.retrieveVoteSession(toolSessionID);
+    logger.debug("retrieving mcSession: " + mcSession);
+    
+    if (mcSession == null)
+    {
+    	VoteUtils.cleanUpSessionAbsolute(request);
+    	logger.debug("error: The tool expects mcSession.");
+    	request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
+    	persistError(request,"error.toolSession.notAvailable");
+		return (mapping.findForward(ERROR_LIST));
+    }
+
+    /*
+     * find out what content this tool session is referring to
+     * get the content for this tool session 
+     * Each passed tool session id points to a particular content. Many to one mapping.
+     */
+	VoteContent mcContent=mcSession.getVoteContent();
+    logger.debug("using mcContent: " + mcContent);
+    
+    if (mcContent == null)
+    {
+    	VoteUtils.cleanUpSessionAbsolute(request);
+    	logger.debug("error: The tool expects mcContent.");
+    	persistError(request,"error.content.doesNotExist");
+    	request.getSession().setAttribute(USER_EXCEPTION_CONTENT_DOESNOTEXIST, new Boolean(true).toString());
+    	return (mapping.findForward(ERROR_LIST));
+    }
+
+    
+    /*
+     * The content we retrieved above must have been created before in Authoring time. 
+     * And the passed tool session id already refers to it.
+     */
+    setupAttributes(request, mcContent);
+
+    request.getSession().setAttribute(TOOL_CONTENT_ID, mcContent.getVoteContentId());
+    logger.debug("using TOOL_CONTENT_ID: " + mcContent.getVoteContentId());
+    
+    request.getSession().setAttribute(TOOL_CONTENT_UID, mcContent.getUid());
+    logger.debug("using TOOL_CONTENT_UID: " + mcContent.getUid());
+    
+	/* Is the request for a preview by the author?
+	Preview The tool must be able to show the specified content as if it was running in a lesson. 
+	It will be the learner url with tool access mode set to ToolAccessMode.AUTHOR 
+	3 modes are:
+		author
+		teacher
+		learner
+	*/
+	/* ? CHECK THIS: how do we determine whether preview is requested? Mode is not enough on its own.*/
+    
+    /*handle PREVIEW mode*/
+    String mode=(String) request.getSession().getAttribute(LEARNING_MODE);
+    logger.debug("mode: " + mode);
+	if ((mode != null) && (mode.equals("author")))
+	{
+		logger.debug("Author requests for a preview of the content.");
+		logger.debug("existing mcContent:" + mcContent);
 		
-	    return null;	
+		commonContentSetup(request, mcContent);
+		
+    	/*only allowing combined view in the preview mode. Might be improved to support sequential view as well. */
+    	request.getSession().setAttribute(QUESTION_LISTING_MODE, QUESTION_LISTING_MODE_COMBINED);
+    	/* PREVIEW_ONLY for jsp*/
+    	request.getSession().setAttribute(PREVIEW_ONLY, new Boolean(true).toString());
+    	
+    	request.getSession().setAttribute(CURRENT_QUESTION_INDEX, "1");
+		VoteLearningAction mcLearningAction= new VoteLearningAction();
+    	//return mcLearningAction.redoQuestions(request, mcLearningForm, mapping);
+		return null;
+	}
+    
+	/* by now, we know that the mode is either teacher or learner
+	 * check if the mode is teacher and request is for Learner Progress
+	 */
+	String userId=request.getParameter(USER_ID);
+	logger.debug("userId: " + userId);
+	if ((userId != null) && (mode.equals("teacher")))
+	{
+		logger.debug("request is for learner progress");
+		commonContentSetup(request, mcContent);
+    	
+		/* LEARNER_PROGRESS for jsp*/
+		request.getSession().setAttribute(LEARNER_PROGRESS_USERID, userId);
+		request.getSession().setAttribute(LEARNER_PROGRESS, new Boolean(true).toString());
+		VoteLearningAction mcLearningAction= new VoteLearningAction();
+		/* pay attention that this userId is the learner's userId passed by the request parameter.
+		 * It is differerent than USER_ID kept in the session of the current system user*/
+		VoteQueUsr mcQueUsr=mcService.retrieveVoteQueUsr(new Long(userId));
+	    logger.debug("mcQueUsr:" + mcQueUsr);
+	    if (mcQueUsr == null)
+	    {
+	    	VoteUtils.cleanUpSessionAbsolute(request);
+	    	persistError(request, "error.learner.required");
+	    	request.getSession().setAttribute(USER_EXCEPTION_LEARNER_REQUIRED, new Boolean(true).toString());
+			return (mapping.findForward(ERROR_LIST));
+	    }
+	    
+	    /* check whether the user's session really referrs to the session id passed to the url*/
+	    Long sessionUid=mcQueUsr.getVoteSessionId();
+	    logger.debug("sessionUid" + sessionUid);
+	    VoteSession mcSessionLocal=mcService.getVoteSessionByUID(sessionUid);
+	    logger.debug("checking mcSessionLocal" + mcSessionLocal);
+	    Long toolSessionId=(Long)request.getSession().getAttribute(TOOL_SESSION_ID);
+	    logger.debug("toolSessionId: " + toolSessionId + " versus" + mcSessionLocal);
+	    if  ((mcSessionLocal ==  null) ||
+			 (mcSessionLocal.getVoteSessionId().longValue() != toolSessionId.longValue()))
+	    {
+	    	VoteUtils.cleanUpSessionAbsolute(request);
+	    	request.getSession().setAttribute(USER_EXCEPTION_TOOLSESSIONID_INCONSISTENT, new Boolean(true).toString());
+	    	persistError(request, "error.learner.sessionId.inconsistent");
+			return (mapping.findForward(ERROR_LIST));
+	    }
+		//return mcLearningAction.viewAnswers(mapping, form, request, response);
+	    return null;
+	}
+	
+	/* by now, we know that the mode is learner*/
+    
+    /* find out if the content is set to run offline or online. If it is set to run offline , the learners are informed about that. */
+    boolean isRunOffline=VoteUtils.isRunOffline(mcContent);
+    logger.debug("isRunOffline: " + isRunOffline);
+    if (isRunOffline == true)
+    {
+    	VoteUtils.cleanUpSessionAbsolute(request);
+    	logger.debug("warning to learner: the activity is offline.");
+    	request.getSession().setAttribute(USER_EXCEPTION_CONTENT_RUNOFFLINE, new Boolean(true).toString());
+    	persistError(request,"label.learning.runOffline");
+		return (mapping.findForward(ERROR_LIST));
+    }
+
+    /* find out if the content is being modified at the moment. */
+    boolean isDefineLater=VoteUtils.isDefineLater(mcContent);
+    logger.debug("isDefineLater: " + isDefineLater);
+    if (isDefineLater == true)
+    {
+    	VoteUtils.cleanUpSessionAbsolute(request);
+    	request.getSession().setAttribute(USER_EXCEPTION_CONTENT_DEFINE_LATER, new Boolean(true).toString());
+    	logger.debug("warning to learner: the activity is defineLater, we interpret that the content is being modified.");
+    	persistError(request,"error.defineLater");
+    	return (mapping.findForward(ERROR_LIST));
+    }
+
+    /*
+	 * fetch question content from content
+	 */
+    mapQuestionsContent=LearningUtil.buildQuestionContentMap(request,mcContent);
+    logger.debug("mapQuestionsContent: " + mapQuestionsContent);
+	
+	request.getSession().setAttribute(MAP_QUESTION_CONTENT_LEARNER, mapQuestionsContent);
+	logger.debug("MAP_QUESTION_CONTENT_LEARNER: " +  request.getSession().getAttribute(MAP_QUESTION_CONTENT_LEARNER));
+	logger.debug("mcContent has : " + mapQuestionsContent.size() + " entries.");
+	request.getSession().setAttribute(TOTAL_QUESTION_COUNT, new Long(mapQuestionsContent.size()).toString());
+	
+	request.getSession().setAttribute(CURRENT_QUESTION_INDEX, "1");
+	logger.debug("CURRENT_QUESTION_INDEX: " + request.getSession().getAttribute(CURRENT_QUESTION_INDEX));
+	
+	/*
+     * verify that userId does not already exist in the db.
+     * If it does exist, that means, that user already responded to the content and 
+     * his answers must be displayed  read-only
+     * 
+     */
+	String userID=(String) request.getSession().getAttribute(USER_ID);
+	logger.debug("userID:" + userID);
+    
+	VoteQueUsr mcQueUsr=mcService.retrieveVoteQueUsr(new Long(userID));
+    logger.debug("mcQueUsr:" + mcQueUsr);
+    
+    if (mcQueUsr != null)
+    {
+    	logger.debug("mcQueUsr is available in the db:" + mcQueUsr);
+    	Long queUsrId=mcQueUsr.getUid();
+		logger.debug("queUsrId: " + queUsrId);
+    }
+    else
+    {
+    	logger.debug("mcQueUsr is not available in the db:" + mcQueUsr);
+    }
+    
+    String learningMode=(String) request.getSession().getAttribute(LEARNING_MODE);
+    logger.debug("users learning mode is: " + learningMode);
+    /*if the user's session id AND user id exists in the tool tables go to redo questions.*/
+    if ((mcQueUsr != null) && learningMode.equals("learner"))
+    {
+    	Long sessionUid=mcQueUsr.getVoteSessionId();
+    	logger.debug("users sessionUid: " + sessionUid);
+    	VoteSession mcUserSession= mcService.getVoteSessionByUID(sessionUid);
+    	logger.debug("mcUserSession: " + mcUserSession);
+    	String userSessionId=mcUserSession.getVoteSessionId().toString();
+    	logger.debug("userSessionId: " + userSessionId);
+    	Long toolSessionId=(Long)request.getSession().getAttribute(TOOL_SESSION_ID);
+    	logger.debug("current toolSessionId: " + toolSessionId);
+    	if (toolSessionId.toString().equals(userSessionId))
+    	{
+    		logger.debug("the user's session id AND user id exists in the tool tables go to redo questions. " + toolSessionId + " mcQueUsr: " + 
+    				mcQueUsr + " user id: " + mcQueUsr.getQueUsrId());
+    		logger.debug("the learner has already responsed to this content, just generate a read-only report. Use redo questions for this.");
+	    	return (mapping.findForward(REDO_QUESTIONS));
+    	}
+    }
+    else if (learningMode.equals("teacher"))
+    {
+    	VoteLearningAction mcLearningAction= new VoteLearningAction();
+    	logger.debug("present to teacher learners progress...");
+    	//return mcLearningAction.viewAnswers(mapping, form, request, response);
+    	return null;
+    }
+    return (mapping.findForward(LOAD_LEARNER));	
+}
+
+
+/**
+ * sets up question and candidate answers maps
+ * commonContentSetup(HttpServletRequest request, VoteContent mcContent)
+ * 
+ * @param request
+ * @param mcContent
+ */
+protected void commonContentSetup(HttpServletRequest request, VoteContent mcContent)
+{
+	Map mapQuestionsContent= new TreeMap(new VoteComparator());
+	mapQuestionsContent=LearningUtil.buildQuestionContentMap(request,mcContent);
+    logger.debug("mapQuestionsContent: " + mapQuestionsContent);
+	
+	request.getSession().setAttribute(MAP_QUESTION_CONTENT_LEARNER, mapQuestionsContent);
+	logger.debug("MAP_QUESTION_CONTENT_LEARNER: " +  request.getSession().getAttribute(MAP_QUESTION_CONTENT_LEARNER));
+	logger.debug("mcContent has : " + mapQuestionsContent.size() + " entries.");
+	request.getSession().setAttribute(TOTAL_QUESTION_COUNT, new Long(mapQuestionsContent.size()).toString());
+	
+	request.getSession().setAttribute(CURRENT_QUESTION_INDEX, "1");
+	logger.debug("CURRENT_QUESTION_INDEX: " + request.getSession().getAttribute(CURRENT_QUESTION_INDEX));
+	
+}
+
+
+	/**
+	 * sets up session scope attributes based on content linked to the passed tool session id
+	 * setupAttributes(HttpServletRequest request, VoteContent mcContent)
+	 * 
+	 * @param request
+	 * @param mcContent
+	 */
+	protected void setupAttributes(HttpServletRequest request, VoteContent mcContent)
+	{
+	    
+	    logger.debug("IS_RETRIES: " + new Boolean(mcContent.isRetries()).toString());
+	    request.getSession().setAttribute(IS_RETRIES, new Boolean(mcContent.isRetries()).toString());
+	    
+	    logger.debug("IS_CONTENT_IN_USE: " + mcContent.isContentInUse());
+	    request.getSession().setAttribute(IS_CONTENT_IN_USE, new Boolean(mcContent.isContentInUse()).toString());
+	    
+	    request.getSession().setAttribute(ACTIVITY_TITLE, mcContent.getTitle());
+	    request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, mcContent.getInstructions());
+
+	    Map mapGeneralCheckedOptionsContent= new TreeMap(new VoteComparator());
+	    request.getSession().setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, mapGeneralCheckedOptionsContent);
+
+	    
+	    /*
+	     * Is the tool activity been checked as Run Offline in the property inspector?
+	     */
+	    logger.debug("IS_TOOL_ACTIVITY_OFFLINE: " + mcContent.isRunOffline());
+	    request.getSession().setAttribute(IS_TOOL_ACTIVITY_OFFLINE, new Boolean(mcContent.isRunOffline()).toString());
 	}
 	
 	

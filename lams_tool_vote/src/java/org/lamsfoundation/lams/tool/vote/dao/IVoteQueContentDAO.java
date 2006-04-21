@@ -42,6 +42,8 @@ public interface IVoteQueContentDAO
  	
  	public VoteQueContent getQuestionContentByQuestionText(final String question, final Long voteContentUid);
  	
+ 	public VoteQueContent getQuestionContentByDisplayOrder(final Long displayOrder, final Long voteContentUid);
+ 	
  	public List getVoteQueContentsByContentId(long qaContentId);
  	
  	public void removeQuestionContentByVoteUid(final Long voteContentUid);

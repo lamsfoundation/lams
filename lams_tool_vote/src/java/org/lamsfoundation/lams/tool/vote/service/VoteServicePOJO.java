@@ -52,6 +52,8 @@ import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
+import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
+import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
@@ -173,6 +175,22 @@ public class VoteServicePOJO implements
 														   e);
         }
     }
+    
+    
+    public VoteQueContent getQuestionContentByDisplayOrder(final Long displayOrder, final Long voteContentUid) throws VoteApplicationException
+	{
+        try
+        {
+        	return voteQueContentDAO.getQuestionContentByDisplayOrder(displayOrder, voteContentUid);
+        }
+        catch (DataAccessException e)
+        {
+            throw new VoteApplicationException("Exception occured when lams is getting vote que content by display order: "
+                                                         + e.getMessage(),
+														   e);
+        }    	
+	}
+    
 
     public VoteQueUsr getVoteQueUsrById(long voteQueUsrId) throws VoteApplicationException
 	{
@@ -893,7 +911,7 @@ public class VoteServicePOJO implements
     
 	/**
 	 * checks the parameter content in the user responses table 
-	 * @param mcContent
+	 * @param voteContent
 	 * @return boolean
 	 * @throws VoteApplicationException
 	 */
@@ -936,7 +954,7 @@ public class VoteServicePOJO implements
 	 */
 	public boolean studentActivityOccurred(VoteContent vote) throws VoteApplicationException
 	{
-		//int countStudentActivity=voteSessionDAO.studentActivityOccurred(mc);
+		//int countStudentActivity=voteSessionDAO.studentActivityOccurred(vote);
 		int countStudentActivity=2;
 		
 		if (countStudentActivity > 0)
@@ -1008,7 +1026,7 @@ public class VoteServicePOJO implements
             
             logger.debug("final - retrieved fromContent: " + fromContent);
             logger.debug("final - before new instance using " + fromContent + " and " + toContentId);
-            logger.debug("final - before new instance using mcToolContentHandler: " + voteToolContentHandler);
+            logger.debug("final - before new instance using voteToolContentHandler: " + voteToolContentHandler);
             
             try
 			{
@@ -1786,14 +1804,14 @@ public class VoteServicePOJO implements
 	
 	
 	/*
-	public List retrieveVoteUploadedOfflineFilesUuidPlusFilename(Long mcContentId) throws VoteApplicationException {
+	public List retrieveVoteUploadedOfflineFilesUuidPlusFilename(Long voteContentId) throws VoteApplicationException {
 		try
         {
-            return voteUploadedFileDAO.retrieveVoteUploadedOfflineFilesUuidPlusFilename(mcContentId);
+            return voteUploadedFileDAO.retrieveVoteUploadedOfflineFilesUuidPlusFilename(voteContentId);
         }
         catch (DataAccessException e)
         {
-            throw new VoteApplicationException("Exception occured when lams is loading mc uploaded offline file uuid plus filename:  "
+            throw new VoteApplicationException("Exception occured when lams is loading vote uploaded offline file uuid plus filename:  "
                                                          + e.getMessage(),
 														   e);
         }
@@ -1946,7 +1964,7 @@ public class VoteServicePOJO implements
 		return voteToolContentHandler;
 	}
 	/**
-	 * @param mcToolContentHandler The mcToolContentHandler to set.
+	 * @param voteToolContentHandler The voteToolContentHandler to set.
 	 */
 	public void setVoteToolContentHandler(IToolContentHandler voteToolContentHandler) {
 		this.voteToolContentHandler = voteToolContentHandler;
