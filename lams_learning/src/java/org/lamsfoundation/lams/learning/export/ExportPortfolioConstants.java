@@ -52,7 +52,7 @@ public class ExportPortfolioConstants {
 	public static final String LAMS_CSS_STYLESHEET = "/lams/css/default.css";
 	
 	//Struts Message Resource
-	public static final String MESSAGE_RESOURCE_CONFIG_PARAM = "org.lamsfoundation.lams.learning.LearningResources";
+	public static final String MESSAGE_RESOURCE_CONFIG_PARAM = "org.lamsfoundation.lams.learning.ApplicationResources";
 	public static final String EXPORT_FAILED_KEY="export.html.exportFailed";
 	public static final String EXPORT_MAINPAGE_KEY = "export.html.mainPage";
 	public static final String EXPORT_NOT_SUPPORTED_KEY = "export.html.exportNotSupported";
