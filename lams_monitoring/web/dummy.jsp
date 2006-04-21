@@ -31,7 +31,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<head>
        <meta http-equiv="content-type" content="text/html; charset=UTF-8">
 		<lams:css/>
-		<title>Learner :: Staff</title>
+		<title><fmt:message key="monitor.title"/></title>
 	</head>
 
 	<frameset rows="*" cols="178,*">

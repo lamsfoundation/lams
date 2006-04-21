@@ -38,8 +38,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<tr> 
 		<td valign="middle"> 
 			<div align="center">
-				<p class="body">This is a dummy page for Lesson Management. It is to be used until the Flash interface is ready. </p>
+				<p class="body">This is a dummy page for Lesson Management. It is to be used to manage lessons until the Flash interface is ready. </p>
             	<p class="body">Select an option from the control frame on the left hand side.</p>
+            	<p class="body">&nbsp;</p>
+            	<p class="body">Click the <A HREF="monitor.jsp" target="tWindow">"Flash Interface"</a> link on the right if you want to try the Flash work in progress.</p>
           	</div>
         </td>
     </tr>
