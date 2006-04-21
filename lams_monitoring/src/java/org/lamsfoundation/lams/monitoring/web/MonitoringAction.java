@@ -89,40 +89,9 @@ public class MonitoringAction extends LamsDispatchAction
     //---------------------------------------------------------------------
 	private static final String PREVIEW_DELETED_REPORT_SCREEN = "previewdeleted";
 
-    /** If you want the output given as a jsp, set the request parameter "jspoutput" to 
-     * some value other than an empty string (e.g. 1, true, 0, false, blah). 
-     * If you want it returned as a stream (ie for Flash), do not define this parameter
-     */  
-	public static String USE_JSP_OUTPUT = "jspoutput";
-
 	/** See deleteOldPreviewLessons */
 	public static final String NUM_DELETED = "numDeleted";
 
-	/** Output the supplied WDDX packet. If the request parameter USE_JSP_OUTPUT
-	 * is set, then it sets the session attribute "parameterName" to the wddx packet string.
-	 * If  USE_JSP_OUTPUT is not set, then the packet is written out to the 
-	 * request's PrintWriter.
-	 *   
-	 * @param mapping action mapping (for the forward to the success jsp)
-	 * @param request needed to check the USE_JSP_OUTPUT parameter
-	 * @param response to write out the wddx packet if not using the jsp
-	 * @param wddxPacket wddxPacket or message to be sent/displayed
-	 * @param parameterName session attribute to set if USE_JSP_OUTPUT is set
-	 * @throws IOException
-	 */
-	private ActionForward outputPacket(ActionMapping mapping, HttpServletRequest request, HttpServletResponse response,
-	        		String wddxPacket, String parameterName) throws IOException {
-	    String useJSP = WebUtil.readStrParam(request, USE_JSP_OUTPUT, true);
-	    if ( useJSP != null && useJSP.length() >= 0 ) {
-		    request.getSession().setAttribute(parameterName,wddxPacket);
-		    return mapping.findForward("success");
-	    } else {
-	        PrintWriter writer = response.getWriter();
-	        writer.println(wddxPacket);
-	        return null;
-	    }
-	}
-	
     /**
 	 * @param wddxPacket
 	 * @return
@@ -192,7 +161,9 @@ public class MonitoringAction extends LamsDispatchAction
 		
 		String message =  flashMessage.serializeMessage();
 		
-        return outputPacket(mapping,request,response,message,"details");
+        PrintWriter writer = response.getWriter();
+        writer.println(message);
+        return null;
     }
 
     /**
@@ -235,10 +206,10 @@ public class MonitoringAction extends LamsDispatchAction
 		}
 		
 		String message =  flashMessage.serializeMessage();
-		
-        return outputPacket(mapping,request,response,message,"details");
-        
-        //return mapping.findForward(SCHEDULER);
+				
+        PrintWriter writer = response.getWriter();
+        writer.println(message);
+        return null;
     }
     /**
      * The Struts dispatch method that starts a lesson on schedule that has been created
@@ -284,9 +255,10 @@ public class MonitoringAction extends LamsDispatchAction
     	
     	String message =  flashMessage.serializeMessage();
     	
-    	return outputPacket(mapping,request,response,message,"details");
-    	
-    	//return mapping.findForward(SCHEDULER);
+		
+        PrintWriter writer = response.getWriter();
+        writer.println(message);
+        return null;
     }
     
     /**
@@ -331,9 +303,11 @@ public class MonitoringAction extends LamsDispatchAction
     				FlashMessage.ERROR);
     	}
     	
-    	String message =  flashMessage.serializeMessage();
-    	
-    	return outputPacket(mapping,request,response,message,"details");
+    	String message =  flashMessage.serializeMessage();	
+		
+        PrintWriter writer = response.getWriter();
+        writer.println(message);
+        return null;
     }
     
     /**
@@ -374,7 +348,10 @@ public class MonitoringAction extends LamsDispatchAction
 		
 		String message =  flashMessage.serializeMessage();
 		
-        return outputPacket(mapping,request,response,message,"details");
+		
+        PrintWriter writer = response.getWriter();
+        writer.println(message);
+        return null;
     }
     /**
      * The purpose of suspending is to hide the lesson from learners temporarily. 
@@ -412,8 +389,11 @@ public class MonitoringAction extends LamsDispatchAction
     	
     	String message =  flashMessage.serializeMessage();
     	
-    	return outputPacket(mapping,request,response,message,"details");
-    }
+		
+        PrintWriter writer = response.getWriter();
+        writer.println(message);
+        return null;
+   }
     /**
      * Unsuspend a lesson which state must be Lesson.SUPSENDED_STATE. Otherwise a error message will return to 
      * flash client.
@@ -446,13 +426,15 @@ public class MonitoringAction extends LamsDispatchAction
     	}
     	
     	String message =  flashMessage.serializeMessage();
-    	
-    	return outputPacket(mapping,request,response,message,"details");
+		
+        PrintWriter writer = response.getWriter();
+        writer.println(message);
+        return null;
     		}
     /**
      * <P>
      * The STRUTS action will send back a WDDX message after marking the lesson by the given lesson ID
-     * as <code>Lesson.DISABLED_STATE</code> status.
+     * as <code>Lesson.REMOVED_STATE</code> status.
      * </P>
      * <P>
      * This action need a lession ID as input.
@@ -484,7 +466,10 @@ public class MonitoringAction extends LamsDispatchAction
 					FlashMessage.ERROR);
 		}
 		String message =  flashMessage.serializeMessage();
-    	return outputPacket(mapping,request,response,message,"details");
+		
+        PrintWriter writer = response.getWriter();
+        writer.println(message);
+        return null;
     	
     }
     /**
@@ -530,7 +515,10 @@ public class MonitoringAction extends LamsDispatchAction
 					FlashMessage.ERROR);
 		}
 		String message =  flashMessage.serializeMessage();
-    	return outputPacket(mapping,request,response,message,"details");
+		
+        PrintWriter writer = response.getWriter();
+        writer.println(message);
+        return null;
     	
     }
     public ActionForward getAllLessons(ActionMapping mapping,
@@ -539,8 +527,10 @@ public class MonitoringAction extends LamsDispatchAction
                                      HttpServletResponse response)throws IOException{
     	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
     	String wddxPacket = monitoringService.getAllLessonsWDDX();
-    	return outputPacket(mapping, request, response, wddxPacket, "details");
-    }
+        PrintWriter writer = response.getWriter();
+        writer.println(wddxPacket);
+        return null;
+   }
     public ActionForward getLessonDetails(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
@@ -548,7 +538,9 @@ public class MonitoringAction extends LamsDispatchAction
     	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
     	Long lessonID = new Long(WebUtil.readLongParam(request,"lessonID"));
     	String wddxPacket = monitoringService.getLessonDetails(lessonID);
-    	return outputPacket(mapping, request, response, wddxPacket, "details");
+        PrintWriter writer = response.getWriter();
+        writer.println(wddxPacket);
+        return null;
     }
     public ActionForward getLessonLearners(ActionMapping mapping,
             ActionForm form,
@@ -557,7 +549,9 @@ public class MonitoringAction extends LamsDispatchAction
     	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
     	Long lessonID = new Long(WebUtil.readLongParam(request,"lessonID"));
     	String wddxPacket = monitoringService.getLessonLearners(lessonID);
-    	return outputPacket(mapping, request, response, wddxPacket, "details");
+        PrintWriter writer = response.getWriter();
+        writer.println(wddxPacket);
+        return null;
     }
     public ActionForward getLearningDesignDetails(ActionMapping mapping,
             ActionForm form,
@@ -566,7 +560,9 @@ public class MonitoringAction extends LamsDispatchAction
     	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
     	Long lessonID = new Long(WebUtil.readLongParam(request,"lessonID"));
     	String wddxPacket = monitoringService.getLearningDesignDetails(lessonID);
-    	return outputPacket(mapping, request, response, wddxPacket, "details");
+        PrintWriter writer = response.getWriter();
+        writer.println(wddxPacket);
+        return null;
     }
     public ActionForward getAllLearnersProgress(ActionMapping mapping,
             ActionForm form,
@@ -575,7 +571,9 @@ public class MonitoringAction extends LamsDispatchAction
     	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
     	Long lessonID = new Long(WebUtil.readLongParam(request,"lessonID"));
     	String wddxPacket = monitoringService.getAllLearnersProgress(lessonID);
-    	return outputPacket(mapping, request, response, wddxPacket, "details");
+        PrintWriter writer = response.getWriter();
+        writer.println(wddxPacket);
+        return null;
     }
     public ActionForward getAllContributeActivities(ActionMapping mapping,
             ActionForm form,
@@ -584,7 +582,9 @@ public class MonitoringAction extends LamsDispatchAction
     	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
     	Long lessonID = new Long(WebUtil.readLongParam(request,"lessonID"));
     	String wddxPacket = monitoringService.getAllContributeActivities(lessonID);
-    	return outputPacket(mapping, request, response, wddxPacket, "details");
+        PrintWriter writer = response.getWriter();
+        writer.println(wddxPacket);
+        return null;
     }
     
     public ActionForward getLearnerActivityURL(ActionMapping mapping,
@@ -599,7 +599,6 @@ public class MonitoringAction extends LamsDispatchAction
     	String wddxPacket = monitoringService.getLearnerActivityURL(activityID,userID);
     	String url = extractURL(wddxPacket);
     	response.sendRedirect(response.encodeRedirectURL(url));
-    	
     	return null;
     }
     public ActionForward getActivityContributionURL(ActionMapping mapping,
@@ -609,7 +608,9 @@ public class MonitoringAction extends LamsDispatchAction
     	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());    	
     	Long activityID = new Long(WebUtil.readLongParam(request,"activityID"));
     	String wddxPacket = monitoringService.getActivityContributionURL(activityID);
-    	return outputPacket(mapping, request, response, wddxPacket, "details");
+        PrintWriter writer = response.getWriter();
+        writer.println(wddxPacket);
+        return null;
     }
     public ActionForward moveLesson(ActionMapping mapping,
             ActionForm form,
@@ -620,7 +621,9 @@ public class MonitoringAction extends LamsDispatchAction
     	Integer userID = new Integer(WebUtil.readIntParam(request,"userID"));
     	Integer targetWorkspaceFolderID = new Integer(WebUtil.readIntParam(request,"folderID"));
     	String wddxPacket = monitoringService.moveLesson(lessonID,targetWorkspaceFolderID,userID);
-    	return outputPacket(mapping, request, response, wddxPacket, "details");
+        PrintWriter writer = response.getWriter();
+        writer.println(wddxPacket);
+        return null;
     }
     public ActionForward renameLesson(ActionMapping mapping,
             ActionForm form,
@@ -631,7 +634,9 @@ public class MonitoringAction extends LamsDispatchAction
     	Integer userID = new Integer(WebUtil.readIntParam(request,"userID"));
     	String name = WebUtil.readStrParam(request,"name"); 
     	String wddxPacket = monitoringService.renameLesson(lessonID,name,userID);
-    	return outputPacket(mapping, request, response, wddxPacket, "details");
+        PrintWriter writer = response.getWriter();
+        writer.println(wddxPacket);
+        return null;
     }
     
     public ActionForward checkGateStatus(ActionMapping mapping,
@@ -643,8 +648,9 @@ public class MonitoringAction extends LamsDispatchAction
         Long activityID = new Long(WebUtil.readLongParam(request, "activityID"));
         Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
         String wddxPacket = monitoringService.checkGateStatus(activityID, lessonID);
-       // request.setAttribute(USE_JSP_OUTPUT, "1");
-        return outputPacket(mapping, request, response, wddxPacket, "details");
+        PrintWriter writer = response.getWriter();
+        writer.println(wddxPacket);
+        return null;
         
     }
     
@@ -655,8 +661,9 @@ public class MonitoringAction extends LamsDispatchAction
         IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
         Long activityID = new Long(WebUtil.readLongParam(request, "activityID"));
         String wddxPacket = monitoringService.releaseGate(activityID);
-       // request.setAttribute(USE_JSP_OUTPUT, "1");
-        return outputPacket(mapping, request, response, wddxPacket, "details");
+        PrintWriter writer = response.getWriter();
+        writer.println(wddxPacket);
+        return null;
     }
 
 	public ActionForward startPreviewLesson(ActionMapping mapping,

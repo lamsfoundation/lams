@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.monitoring.web;
 
 import java.io.IOException;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -258,7 +257,7 @@ public class DummyMonitoringAction extends LamsDispatchAction
 
     /**
      * The Struts dispatch method to remove a lesson (marking the lesson by the given lesson ID
-     * as <code>Lesson.DISABLED_STATE</code> status).  Forwards to the control
+     * as <code>Lesson.REMOVED_STATE</code> status).  Forwards to the control
      * list jsp.
      * 
      * @param mapping An ActionMapping class that will be used by the Action class to tell

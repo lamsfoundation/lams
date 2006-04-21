@@ -62,7 +62,6 @@ import org.lamsfoundation.lams.lesson.LessonClass;
 import org.lamsfoundation.lams.lesson.dao.ILessonClassDAO;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.monitoring.MonitoringConstants;
-import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
@@ -684,7 +683,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         	throw new MonitoringServiceException("Lesson for id="+lessonId+" is missing. Unable to remove lesson.");
         }
 
-        requestedLesson.setLessonStateId(Lesson.DISABLED_STATE);
+        requestedLesson.setLessonStateId(Lesson.REMOVED_STATE);
         lessonDAO.updateLesson(requestedLesson);
     	
     }
