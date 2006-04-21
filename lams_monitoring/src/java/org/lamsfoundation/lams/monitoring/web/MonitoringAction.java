@@ -69,8 +69,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  *                          type="org.lamsfoundation.lams.monitoring.service.MonitoringServiceException"
  *                          path=".systemError"
  * 							handler="org.lamsfoundation.lams.web.util.CustomStrutsExceptionHandler"
- * @struts:action-forward name="scheduler" path="/TestScheduler.jsp"
- * @struts.action-forward name = "success" path = "/index.jsp"
  * @struts.action-forward name = "previewdeleted" path = "/previewdeleted.jsp"
  * 
  * ----------------XDoclet Tags--------------------
