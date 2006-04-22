@@ -257,10 +257,8 @@
 			name="VoteLearningForm"
       		scope="session"
       		input="/learning/AnswersContent.jsp"
-      		parameter="method"
-      		unknown="false"
-      		validate="false">
-	
+      		parameter="dispatch">
+      		
 		<exception
 	        key="error.exception.VoteApplication"
 	        type="org.lamsfoundation.lams.tool.vote.VoteApplicationException"

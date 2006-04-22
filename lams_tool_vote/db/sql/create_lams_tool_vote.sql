@@ -64,11 +64,10 @@ CREATE TABLE tl_vote11_usr_attempt (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
      , que_usr_id BIGINT(20) NOT NULL
      , vote_que_content_id BIGINT(20) NOT NULL
-     , vote_que_option_id BIGINT(20) NOT NULL
      , attempt_time DATETIME
      , time_zone VARCHAR(255)
      , userEntry VARCHAR(255)
-     , isNominated TINYINT NOT NULL
+     , isNominated TINYINT NOT NULL DEFAULT 0
      , PRIMARY KEY (uid)
      , INDEX (que_usr_id)
      , CONSTRAINT FK_tl_vote_usr_attempt_1 FOREIGN KEY (que_usr_id)

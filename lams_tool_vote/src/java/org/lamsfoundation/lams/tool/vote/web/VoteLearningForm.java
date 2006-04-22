@@ -38,6 +38,8 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
 	protected String checked;
 	
 	protected String userEntry;
+	protected String dispatch;
+	protected String toolContentID;
 	
 	protected String continueOptions;
 	protected String nextOptions;
@@ -387,5 +389,32 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
     public void setUserEntry(String userEntry) {
         this.userEntry = userEntry;
     }
+    
+    /**
+     * @return Returns the dispatch.
+     */
+    public String getDispatch() {
+        return dispatch;
+    }
+    /**
+     * @param dispatch The dispatch to set.
+     */
+    public void setDispatch(String dispatch) {
+        this.dispatch = dispatch;
+    }
+
+    /**
+     * @return Returns the toolContentID.
+     */
+    public String getToolContentID() {
+        return toolContentID;
+    }
+    /**
+     * @param toolContentID The toolContentID to set.
+     */
+    public void setToolContentID(String toolContentID) {
+        this.toolContentID = toolContentID;
+    }
+
 	
 }

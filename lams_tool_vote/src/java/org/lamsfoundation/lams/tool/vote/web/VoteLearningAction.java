@@ -120,8 +120,10 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
             HttpServletResponse response) throws IOException,
                                          ServletException
 	{   
-    	VoteUtils.cleanUpUserExceptions(request);
+        VoteUtils.cleanUpUserExceptions(request);
 		logger.debug("dispatching continueOptionsCombined...");
+		
+		setContentInUse(request);
 		VoteLearningForm voteLearningForm = (VoteLearningForm) form;
 	 	IVoteService voteService =VoteUtils.getToolService(request);
 	 	
@@ -132,11 +134,9 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
     	Long toolContentId=(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
     	logger.debug("toolContentId: " + toolContentId);
     			
-    	logger.debug("will assess");
-    	
     	//Map mapLeanerAssessmentResults=LearningUtil.assess(request, mapGeneralCheckedOptionsContent, toolContentId);
-    	Map mapLeanerAssessmentResults=null;
-    	logger.debug("mapLeanerAssessmentResults: " + mapLeanerAssessmentResults);
+    	//Map mapLeanerAssessmentResults=null;
+    	//logger.debug("mapLeanerAssessmentResults: " + mapLeanerAssessmentResults);
     	logger.debug("assesment complete");
     	
 
@@ -159,6 +159,30 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
     }
 
     
+    public ActionForward selectOption(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                      ServletException
+   {
+        logger.debug("dispatching selectOption...");
+    	VoteUtils.cleanUpUserExceptions(request);
+    	VoteLearningForm voteLearningForm = (VoteLearningForm) form;
+	 	IVoteService voteService =VoteUtils.getToolService(request);
+	 	
+    	voteLearningForm.resetParameters();
+    	LearningUtil.readParameters(request, voteLearningForm);
+    	
+    	
+		logger.debug("doing getOptionCheckBoxSelected");
+		setContentInUse(request);
+		voteLearningForm.resetCommands();
+		LearningUtil.selectOptionsCheckBox(request,voteLearningForm, voteLearningForm.getQuestionIndex());
+    	voteLearningForm.resetCommands();	
+ 		return (mapping.findForward(LOAD_LEARNER));
+   }
+
+
     public ActionForward displayVote(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
@@ -276,7 +300,8 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
     	voteLearningForm.resetCommands();	
  		return (mapping.findForward(LOAD_LEARNER));
    }
-
+    
+    
     
     protected void setContentInUse(HttpServletRequest request)
     {

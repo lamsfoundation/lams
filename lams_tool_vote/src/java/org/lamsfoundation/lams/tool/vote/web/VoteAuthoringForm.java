@@ -64,9 +64,6 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 	protected String submitOfflineFile;
 	protected String submitOnlineFile;
 	
-	// dispatch controls which method is called by the Lookup map */
-	protected String dispatch;	
-	
 	/* tab controller, these may go away once the Flash wraps the jsp */
 	protected String choice;
 	protected String choiceBasic;
@@ -81,7 +78,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 	
 	protected String isRemoveContent;
 	protected String toolContentId;
-	protected String toolContentID;
+	
 	
 	/* instructions content */
 	protected String onlineInstructions;
@@ -130,7 +127,6 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
     	this.submitOfflineFile=null;
     	this.submitOnlineFile=null;
     	
-    	this.dispatch=null;
     	
     	this.summaryMonitoring=null;
     	this.instructionsMonitoring=null;
@@ -159,8 +155,6 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 		this.submitOnlineFile=null;
 		this.offlineFile=null;
 
-    	this.dispatch=null;
-
     	this.choice=null;
 		this.choiceBasic=null;
 		this.choiceAdvanced=null;
@@ -175,7 +169,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 		this.deletableOptionIndex=null;
 		this.isRemoveContent=null;
 		this.toolContentId=null;
-		this.toolContentID=null;
+		
 
 		this.onlineInstructions=null;
 		this.offlineInstructions=null;
@@ -766,13 +760,6 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 		this.receivedFile = receivedFile;
 	}
 
-	public String getDispatch() {
-		return dispatch;
-	}
-
-	public void setDispatch(String buttonValue) {
-		this.dispatch = buttonValue;
-	}
 	
 	/**
 	 * @return Returns the offlineFile.
@@ -810,19 +797,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 	public void setCurrentTab(String currentTab) {
 		this.currentTab = currentTab;
 	}
-	/**
-	 * @return Returns the toolContentID.
-	 */
-	public String getToolContentID() {
-		return toolContentID;
-	}
-	/**
-	 * @param toolContentID The toolContentID to set.
-	 */
-	public void setToolContentID(String toolContentID) {
-		this.toolContentID = toolContentID;
-	}
-	
+
 	/**
 	 * @return Returns the submit.
 	 */

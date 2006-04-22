@@ -134,6 +134,7 @@ public class LearningUtil implements VoteAppConstants {
     
     public static void createAttempt(HttpServletRequest request, VoteQueUsr voteQueUsr, Map mapGeneralCheckedOptionsContent)
 	{
+        logger.debug("doing createAttempt: " + mapGeneralCheckedOptionsContent);
 		IVoteService voteService =VoteUtils.getToolService(request);
 		Date attempTime=VoteUtils.getGMTDateTime();
 		String timeZone= VoteUtils.getCurrentTimeZone();
@@ -148,7 +149,6 @@ public class LearningUtil implements VoteAppConstants {
 	        while (itCheckedMap.hasNext()) 
 	        {
 	        	Map.Entry checkedPairs = (Map.Entry)itCheckedMap.next();
-	            Map mapCheckedOptions=(Map) checkedPairs.getValue();
 	            Long questionDisplayOrder=new Long(checkedPairs.getKey().toString());
 	            
 	            logger.debug("questionDisplayOrder: " + questionDisplayOrder);
@@ -158,35 +158,24 @@ public class LearningUtil implements VoteAppConstants {
 	            logger.debug("voteQueContent: " + voteQueContent);
 	            if (voteQueContent != null)
 	            {
-	                createIndividualOptions(request, mapCheckedOptions, voteQueContent, voteQueUsr, attempTime, timeZone);    
+	                createIndividualOptions(request, voteQueContent, voteQueUsr, attempTime, timeZone);    
 	            }
 	        }			
 		}
 	 }
 
-    public static void createIndividualOptions(HttpServletRequest request, Map mapCheckedOptions, VoteQueContent voteQueContent, VoteQueUsr voteQueUsr, Date attempTime, String timeZone)
+    public static void createIndividualOptions(HttpServletRequest request, VoteQueContent voteQueContent, VoteQueUsr voteQueUsr, Date attempTime, String timeZone)
     {
+        logger.debug("doing createIndividualOptions");
     	IVoteService voteService =VoteUtils.getToolService(request);
     	
     	logger.debug("voteQueContent: " + voteQueContent);
-    	logger.debug("mapCheckedOptions: " + mapCheckedOptions);
-    	
     	if (voteQueContent != null)
     	{
-    	    if (mapCheckedOptions != null)
-        	{
-        	    Iterator itCheckedMap = mapCheckedOptions.entrySet().iterator();
-                while (itCheckedMap.hasNext()) 
-                {
-                	Map.Entry checkedPairs = (Map.Entry)itCheckedMap.next();
-                	//VoteOptsContent voteOptsContent= voteService.getOptionContentByOptionText(checkedPairs.getValue().toString(), voteQueContent.getUid());
-                	//logger.debug("voteOptsContent: " + voteOptsContent);
-                	
-                	    VoteUsrAttempt voteUsrAttempt=new VoteUsrAttempt(attempTime, timeZone, voteQueContent, voteQueUsr);
-                    	voteService.createVoteUsrAttempt(voteUsrAttempt);
-                    	logger.debug("created voteUsrAttempt in the db :" + voteUsrAttempt);    
-                }    
-        	}    
+        	    VoteUsrAttempt voteUsrAttempt=new VoteUsrAttempt(attempTime, timeZone, voteQueContent, voteQueUsr);
+        	    logger.debug("voteUsrAttempt: " + voteUsrAttempt);
+            	voteService.createVoteUsrAttempt(voteUsrAttempt);
+            	logger.debug("created voteUsrAttempt in the db :" + voteUsrAttempt);    
     	}
     }
 

@@ -33,13 +33,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html:html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<title> <bean:message key="label.learning"/> </title>
+	<jsp:include page="/learning/learningHeader.jsp" />
 </head>
 <body>
 
+<html:form  action="/learning?validate=false" enctype="multipart/form-data"method="POST" target="_self">
+	<html:hidden property="dispatch"/>
+	<html:hidden property="toolContentID"/>
 
-<html:form  action="/learning?method=displayVote&validate=false" method="POST" target="_self">
 	<!--options content goes here-->
 				<table align=center bgcolor="#FFFFFF">
 					  
@@ -85,7 +86,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 																							{
 																								document.forms[0].checked.value=false;
 																							}
-																							document.forms[0].submit();" CHECKED> 
+																							
+																							submitMethod('selectOption');" CHECKED> 
 																						</font>
 																					</td> 
 																					<td NOWRAP align=left class="input" valign=top> 
@@ -119,7 +121,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 																							{
 																								document.forms[0].checked.value=false;
 																							}
-																							document.forms[0].submit();"> 
+																							submitMethod('selectOption');"> 
 																						</font>
 																					</td> 
 																					<td NOWRAP align=left class="input" valign=top> 
@@ -155,9 +157,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	  	   		  <tr>
 				  	<td NOWRAP align=right class="input" valign=top> 
 					  	<font size=2>
-				  			<html:submit property="continueOptionsCombined" styleClass="button">
-								<bean:message key="button.continue"/>
-							</html:submit>	 				 		  					
+                            <html:submit property="continueOptionsCombined" 
+                                         styleClass="linkbutton" 
+                                         onclick="submitMethod('continueOptionsCombined');">
+								<bean:message key="button.submit"/>
+                            </html:submit>
 						</font>
 				  	 </td>
 				  </tr>
