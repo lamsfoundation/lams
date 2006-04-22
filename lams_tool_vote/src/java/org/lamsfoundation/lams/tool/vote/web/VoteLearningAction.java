@@ -38,7 +38,6 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
-import org.lamsfoundation.lams.tool.vote.web.LearningUtil;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
 import org.lamsfoundation.lams.tool.vote.VoteUtils;
@@ -114,6 +113,30 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 	 	return null;
     }
 
+    
+    public ActionForward viewAllResults(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+	{   
+        VoteUtils.cleanUpUserExceptions(request);
+		logger.debug("dispatching viewAllResults...");
+		
+		setContentInUse(request);
+		VoteLearningForm voteLearningForm = (VoteLearningForm) form;
+	 	IVoteService voteService =VoteUtils.getToolService(request);
+	 	
+	 	Long toolContentId=(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+    	logger.debug("toolContentId: " + toolContentId);
+    			
+    	
+    	voteLearningForm.resetCommands();
+		return (mapping.findForward(INDIVIDUAL_REPORT));
+    }
+    
+    
+    
     public ActionForward continueOptionsCombined(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
@@ -134,12 +157,18 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
     	Long toolContentId=(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
     	logger.debug("toolContentId: " + toolContentId);
     			
-    	//Map mapLeanerAssessmentResults=LearningUtil.assess(request, mapGeneralCheckedOptionsContent, toolContentId);
-    	//Map mapLeanerAssessmentResults=null;
-    	//logger.debug("mapLeanerAssessmentResults: " + mapLeanerAssessmentResults);
-    	logger.debug("assesment complete");
+    	String userEntry=voteLearningForm.getUserEntry();
+    	logger.debug("userEntry: " + userEntry);
     	
-
+    	boolean userEntryAvailable=false;
+    	if ((userEntry != null) && (userEntry.length() > 0))
+    	{
+    	    logger.debug("userEntry available: " + userEntry);
+    	    userEntryAvailable=true;
+    	}
+    	logger.debug("userEntryAvailable " + userEntryAvailable);
+    	
+    	
     	boolean isUserDefined=LearningUtil.doesUserExists(request);
     	logger.debug("isUserDefined");
     	if (isUserDefined == false)
@@ -151,7 +180,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
     	logger.debug("voteQueUsr: " + voteQueUsr);
     	
 
-    	LearningUtil.createAttempt(request, voteQueUsr, mapGeneralCheckedOptionsContent);
+    	LearningUtil.createAttempt(request, voteQueUsr, mapGeneralCheckedOptionsContent, userEntry);
     	logger.debug("created user attempt in the db");
     	
     	voteLearningForm.resetCommands();

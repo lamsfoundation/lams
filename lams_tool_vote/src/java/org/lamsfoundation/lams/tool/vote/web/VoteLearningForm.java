@@ -51,6 +51,7 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
 	protected String redoQuestionsOk;
 	protected String donePreview;
 	protected String doneLearnerProgress;
+	protected String viewAllResults;
 	
 	protected String method;
 	protected String answer;
@@ -66,6 +67,7 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
     	this.getNextQuestion=null;
     	this.getPreviousQuestion=null;
     	this.endLearning=null;
+    	this.viewAllResults=null;
     }
 
 	
@@ -417,4 +419,16 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
     }
 
 	
+    /**
+     * @return Returns the viewAllResults.
+     */
+    public String getViewAllResults() {
+        return viewAllResults;
+    }
+    /**
+     * @param viewAllResults The viewAllResults to set.
+     */
+    public void setViewAllResults(String viewAllResults) {
+        this.viewAllResults = viewAllResults;
+    }
 }

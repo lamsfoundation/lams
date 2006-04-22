@@ -30,9 +30,6 @@ import java.util.TreeSet;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.tool.vote.VoteComparator;
-import org.lamsfoundation.lams.tool.vote.web.VoteLearningForm;
-import org.lamsfoundation.lams.tool.vote.web.VoteLearningForm;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.VoteComparator;
 import org.lamsfoundation.lams.tool.vote.VoteUtils;
@@ -132,9 +129,12 @@ public class LearningUtil implements VoteAppConstants {
 	}
     
     
-    public static void createAttempt(HttpServletRequest request, VoteQueUsr voteQueUsr, Map mapGeneralCheckedOptionsContent)
+    public static void createAttempt(HttpServletRequest request, VoteQueUsr voteQueUsr, Map mapGeneralCheckedOptionsContent, String userEntry)
 	{
         logger.debug("doing createAttempt: " + mapGeneralCheckedOptionsContent);
+        
+        logger.debug("userEntry: " + userEntry);
+        
 		IVoteService voteService =VoteUtils.getToolService(request);
 		Date attempTime=VoteUtils.getGMTDateTime();
 		String timeZone= VoteUtils.getCurrentTimeZone();
@@ -158,21 +158,24 @@ public class LearningUtil implements VoteAppConstants {
 	            logger.debug("voteQueContent: " + voteQueContent);
 	            if (voteQueContent != null)
 	            {
-	                createIndividualOptions(request, voteQueContent, voteQueUsr, attempTime, timeZone);    
+	                createIndividualOptions(request, voteQueContent, voteQueUsr, attempTime, timeZone, userEntry);    
 	            }
 	        }			
 		}
 	 }
 
-    public static void createIndividualOptions(HttpServletRequest request, VoteQueContent voteQueContent, VoteQueUsr voteQueUsr, Date attempTime, String timeZone)
+    public static void createIndividualOptions(HttpServletRequest request, VoteQueContent voteQueContent, VoteQueUsr voteQueUsr, Date attempTime, String timeZone, String userEntry)
     {
         logger.debug("doing createIndividualOptions");
+
+        logger.debug("userEntry: " + userEntry);
+
     	IVoteService voteService =VoteUtils.getToolService(request);
     	
     	logger.debug("voteQueContent: " + voteQueContent);
     	if (voteQueContent != null)
     	{
-        	    VoteUsrAttempt voteUsrAttempt=new VoteUsrAttempt(attempTime, timeZone, voteQueContent, voteQueUsr);
+        	    VoteUsrAttempt voteUsrAttempt=new VoteUsrAttempt(attempTime, timeZone, voteQueContent, voteQueUsr, userEntry);
         	    logger.debug("voteUsrAttempt: " + voteUsrAttempt);
             	voteService.createVoteUsrAttempt(voteUsrAttempt);
             	logger.debug("created voteUsrAttempt in the db :" + voteUsrAttempt);    

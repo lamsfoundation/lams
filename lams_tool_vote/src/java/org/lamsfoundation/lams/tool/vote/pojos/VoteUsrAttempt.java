@@ -83,6 +83,17 @@ public class VoteUsrAttempt implements Serializable {
         this.voteQueUsr = voteQueUsr;
     }
 
+    public VoteUsrAttempt(Date attemptTime, String timeZone, org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent voteQueContent, 
+    		org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr voteQueUsr, String userEntry) {
+        this.attemptTime = attemptTime;
+        this.timeZone = timeZone;
+        this.voteQueContent = voteQueContent;
+        this.voteQueUsr = voteQueUsr;
+        this.userEntry=userEntry;
+    }
+
+    
+
     public VoteUsrAttempt(String userEntry, Date attemptTime, String timeZone, org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent voteQueContent, 
     		org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr voteQueUsr) {
         this.userEntry=userEntry;
