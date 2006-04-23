@@ -39,6 +39,7 @@
     >
     </property>
     
+    
     <property
         name="voteContentId"
         type="java.lang.Long"

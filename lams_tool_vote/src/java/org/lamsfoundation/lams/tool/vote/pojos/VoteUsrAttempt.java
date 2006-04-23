@@ -52,7 +52,11 @@ public class VoteUsrAttempt implements Serializable {
     
     private String userEntry;
     
+    private int nominationCount;
+    
     private Long queUsrId;
+    
+    private boolean singleUserEntry;
     
     private Long voteQueContentId;
 
@@ -92,6 +96,28 @@ public class VoteUsrAttempt implements Serializable {
         this.userEntry=userEntry;
     }
 
+    public VoteUsrAttempt(Date attemptTime, String timeZone, org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent voteQueContent, 
+    		org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr voteQueUsr, String userEntry, int nominationCount) {
+        this.attemptTime = attemptTime;
+        this.timeZone = timeZone;
+        this.voteQueContent = voteQueContent;
+        this.voteQueUsr = voteQueUsr;
+        this.userEntry=userEntry;
+        this.nominationCount=nominationCount;
+    }
+
+    public VoteUsrAttempt(Date attemptTime, String timeZone, org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent voteQueContent, 
+    		org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr voteQueUsr, String userEntry, int nominationCount, boolean singleUserEntry) {
+        this.attemptTime = attemptTime;
+        this.timeZone = timeZone;
+        this.voteQueContent = voteQueContent;
+        this.voteQueUsr = voteQueUsr;
+        this.userEntry=userEntry;
+        this.nominationCount=nominationCount;
+        this.singleUserEntry=singleUserEntry;
+    }
+
+    
     
 
     public VoteUsrAttempt(String userEntry, Date attemptTime, String timeZone, org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent voteQueContent, 
@@ -231,4 +257,30 @@ public class VoteUsrAttempt implements Serializable {
         this.userEntry = userEntry;
     }
 
+    /**
+     * @return Returns the nominationCount.
+     */
+    public int getNominationCount() {
+        return nominationCount;
+    }
+    /**
+     * @param nominationCount The nominationCount to set.
+     */
+    public void setNominationCount(int nominationCount) {
+        this.nominationCount = nominationCount;
+    }
+    
+    /**
+     * @return Returns the singleUserEntry.
+     */
+    public boolean isSingleUserEntry() {
+        return singleUserEntry;
+    }
+    /**
+     * @param singleUserEntry The singleUserEntry to set.
+     */
+    public void setSingleUserEntry(boolean singleUserEntry) {
+        this.singleUserEntry = singleUserEntry;
+    }
+    
 }

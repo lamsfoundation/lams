@@ -44,10 +44,12 @@ public interface VoteAppConstants {
 	public static final String LEARNING_STARTER							="learningStarter";
 	public static final String MONITORING_STARTER						="monitoringStarter";
 	public static final String LOAD_LEARNER								="loadLearner";
+	public static final String ALL_NOMINATIONS							="allNominations";
     public static final String LOAD_MONITORING_CONTENT							="loadMonitoring";
     public static final String LOAD_MONITORING_CONTENT_EDITACTIVITY				="loadMonitoringEditActivity";
     public static final String EXPORT_PORTFOLIO 						= "exportPortfolio";
     public static final String INDIVIDUAL_REPORT						="individualReport";
+    public static final String EXIT_PAGE								="exitPage";
     public static final String VIEW_SUMMARY								="viewSummary";
     public static final String REDO_QUESTIONS							="redoQuestions";
     public static final String SINGLE_QUESTION_ANSWERS					="singleQuestionAnswers";

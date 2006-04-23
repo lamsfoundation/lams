@@ -22,11 +22,13 @@
 
 package org.lamsfoundation.lams.tool.vote.dao.hibernate;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.tool.vote.dao.IVoteUsrAttemptDAO;
+import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
@@ -70,7 +72,27 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 			return list;
 	    }
 		
-		public List getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long voteQueContentId)
+		public void removeAttemptsForUser(final Long queUsrId)
+	    {
+	        HibernateTemplate templ = this.getHibernateTemplate();
+	        List list = getSession().createQuery(LOAD_ATTEMPT_FOR_USER)
+			.setLong("queUsrId", queUsrId.longValue())
+			.list();
+			
+			if(list != null && list.size() > 0){
+				Iterator listIterator=list.iterator();
+		    	while (listIterator.hasNext())
+		    	{
+		    	    VoteUsrAttempt attempt=(VoteUsrAttempt)listIterator.next();
+					this.getSession().setFlushMode(FlushMode.AUTO);
+		    		templ.delete(attempt);
+		    		templ.flush();
+		    	}
+			}
+	    }
+
+
+		public VoteUsrAttempt getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long voteQueContentId)
 	    {
 	        HibernateTemplate templ = this.getHibernateTemplate();
 	        List list = getSession().createQuery(LOAD_ATTEMPT_FOR_USER_AND_QUESTION_CONTENT)
@@ -78,9 +100,41 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 			.setLong("voteQueContentId", voteQueContentId.longValue())
 			.list();
 	        
-			return list;
+	        if(list != null && list.size() > 0){
+			    VoteUsrAttempt voteA = (VoteUsrAttempt) list.get(0);
+				return voteA;
+			}
+	        
+			return null;
 	    }
+
 		
+		public List getAttemptsListForUserAndQuestionContent(final Long queUsrId, final Long voteQueContentId)
+	    {
+	        HibernateTemplate templ = this.getHibernateTemplate();
+	        List list = getSession().createQuery(LOAD_ATTEMPT_FOR_USER_AND_QUESTION_CONTENT)
+			.setLong("queUsrId", queUsrId.longValue())
+			.setLong("voteQueContentId", voteQueContentId.longValue())
+			.list();
+	        return list;
+	    }
+
+		
+		public int  getLastNominationCount(Long userId)
+		{
+	        HibernateTemplate templ = this.getHibernateTemplate();
+	        List list = getSession().createQuery(LOAD_ATTEMPT_FOR_USER)
+			.setLong("queUsrId", userId.longValue())
+			.list();
+			
+	        
+			if(list != null && list.size() > 0){
+			    VoteUsrAttempt vote = (VoteUsrAttempt) list.get(0);
+				return vote.getNominationCount();
+			}
+			return 0;
+		}
+				
 		
 		public List getAttemptForQueContent(final Long queUsrId, final Long voteQueContentId)
 	    {

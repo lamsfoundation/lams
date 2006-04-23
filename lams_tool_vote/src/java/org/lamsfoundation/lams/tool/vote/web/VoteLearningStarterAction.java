@@ -116,16 +116,16 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	Map mapQuestionsContent= new TreeMap(new VoteComparator());
 	Map mapAnswers= new TreeMap(new VoteComparator());
 
-	IVoteService mcService = VoteUtils.getToolService(request);
-	logger.debug("retrieving mcService from session: " + mcService);
-	if (mcService == null)
+	IVoteService voteService = VoteUtils.getToolService(request);
+	logger.debug("retrieving voteService from session: " + voteService);
+	if (voteService == null)
 	{
-		mcService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
-	    logger.debug("retrieving mcService from proxy: " + mcService);
-	    request.getSession().setAttribute(TOOL_SERVICE, mcService);		
+		voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
+	    logger.debug("retrieving voteService from proxy: " + voteService);
+	    request.getSession().setAttribute(TOOL_SERVICE, voteService);		
 	}
 
-	VoteLearningForm mcLearningForm = (VoteLearningForm) form;
+	VoteLearningForm voteLearningForm = (VoteLearningForm) form;
 	
     /*
      * persist time zone information to session scope. 
@@ -147,7 +147,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	if ((createToolSession != null) && createToolSession.equals("1"))
 	{	try
 		{
-			mcService.createToolSession(toolSessionID, "toolSessionName", new Long(9876));
+			voteService.createToolSession(toolSessionID, "toolSessionName", new Long(9876));
 			return (mapping.findForward(LEARNING_STARTER));
 		}
 		catch(ToolException e)
@@ -162,7 +162,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	if ((removeToolSession != null) && removeToolSession.equals("1"))
 	{	try
 		{
-			mcService.removeToolSession(toolSessionID);
+			voteService.removeToolSession(toolSessionID);
 			return (mapping.findForward(LEARNING_STARTER));
 		}
 		catch(ToolException e)
@@ -177,7 +177,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	if (learnerId != null) 
 	{	try
 		{
-			String nextUrl=mcService.leaveToolSession(toolSessionID, new Long(learnerId));
+			String nextUrl=voteService.leaveToolSession(toolSessionID, new Long(learnerId));
 			logger.debug("nextUrl: "+ nextUrl);
 			return (mapping.findForward(LEARNING_STARTER));
 		}
@@ -195,13 +195,13 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	 * Make sure we can retrieve it and the relavent content
 	 */
 	
-	VoteSession mcSession=mcService.retrieveVoteSession(toolSessionID);
-    logger.debug("retrieving mcSession: " + mcSession);
+	VoteSession voteSession=voteService.retrieveVoteSession(toolSessionID);
+    logger.debug("retrieving voteSession: " + voteSession);
     
-    if (mcSession == null)
+    if (voteSession == null)
     {
     	VoteUtils.cleanUpSessionAbsolute(request);
-    	logger.debug("error: The tool expects mcSession.");
+    	logger.debug("error: The tool expects voteSession.");
     	request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
     	persistError(request,"error.toolSession.notAvailable");
 		return (mapping.findForward(ERROR_LIST));
@@ -212,13 +212,13 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
      * get the content for this tool session 
      * Each passed tool session id points to a particular content. Many to one mapping.
      */
-	VoteContent mcContent=mcSession.getVoteContent();
-    logger.debug("using mcContent: " + mcContent);
+	VoteContent voteContent=voteSession.getVoteContent();
+    logger.debug("using voteContent: " + voteContent);
     
-    if (mcContent == null)
+    if (voteContent == null)
     {
     	VoteUtils.cleanUpSessionAbsolute(request);
-    	logger.debug("error: The tool expects mcContent.");
+    	logger.debug("error: The tool expects voteContent.");
     	persistError(request,"error.content.doesNotExist");
     	request.getSession().setAttribute(USER_EXCEPTION_CONTENT_DOESNOTEXIST, new Boolean(true).toString());
     	return (mapping.findForward(ERROR_LIST));
@@ -229,13 +229,13 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
      * The content we retrieved above must have been created before in Authoring time. 
      * And the passed tool session id already refers to it.
      */
-    setupAttributes(request, mcContent);
+    setupAttributes(request, voteContent, voteLearningForm);
 
-    request.getSession().setAttribute(TOOL_CONTENT_ID, mcContent.getVoteContentId());
-    logger.debug("using TOOL_CONTENT_ID: " + mcContent.getVoteContentId());
+    request.getSession().setAttribute(TOOL_CONTENT_ID, voteContent.getVoteContentId());
+    logger.debug("using TOOL_CONTENT_ID: " + voteContent.getVoteContentId());
     
-    request.getSession().setAttribute(TOOL_CONTENT_UID, mcContent.getUid());
-    logger.debug("using TOOL_CONTENT_UID: " + mcContent.getUid());
+    request.getSession().setAttribute(TOOL_CONTENT_UID, voteContent.getUid());
+    logger.debug("using TOOL_CONTENT_UID: " + voteContent.getUid());
     
 	/* Is the request for a preview by the author?
 	Preview The tool must be able to show the specified content as if it was running in a lesson. 
@@ -253,18 +253,16 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	if ((mode != null) && (mode.equals("author")))
 	{
 		logger.debug("Author requests for a preview of the content.");
-		logger.debug("existing mcContent:" + mcContent);
+		logger.debug("existing voteContent:" + voteContent);
 		
-		commonContentSetup(request, mcContent);
+		commonContentSetup(request, voteContent);
 		
-    	/*only allowing combined view in the preview mode. Might be improved to support sequential view as well. */
-    	request.getSession().setAttribute(QUESTION_LISTING_MODE, QUESTION_LISTING_MODE_COMBINED);
-    	/* PREVIEW_ONLY for jsp*/
+		/* PREVIEW_ONLY for jsp*/
     	request.getSession().setAttribute(PREVIEW_ONLY, new Boolean(true).toString());
     	
     	request.getSession().setAttribute(CURRENT_QUESTION_INDEX, "1");
-		VoteLearningAction mcLearningAction= new VoteLearningAction();
-    	//return mcLearningAction.redoQuestions(request, mcLearningForm, mapping);
+		VoteLearningAction voteLearningAction= new VoteLearningAction();
+    	//return voteLearningAction.redoQuestions(request, voteLearningForm, mapping);
 		return null;
 	}
     
@@ -276,17 +274,17 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	if ((userId != null) && (mode.equals("teacher")))
 	{
 		logger.debug("request is for learner progress");
-		commonContentSetup(request, mcContent);
+		commonContentSetup(request, voteContent);
     	
 		/* LEARNER_PROGRESS for jsp*/
 		request.getSession().setAttribute(LEARNER_PROGRESS_USERID, userId);
 		request.getSession().setAttribute(LEARNER_PROGRESS, new Boolean(true).toString());
-		VoteLearningAction mcLearningAction= new VoteLearningAction();
+		VoteLearningAction voteLearningAction= new VoteLearningAction();
 		/* pay attention that this userId is the learner's userId passed by the request parameter.
 		 * It is differerent than USER_ID kept in the session of the current system user*/
-		VoteQueUsr mcQueUsr=mcService.retrieveVoteQueUsr(new Long(userId));
-	    logger.debug("mcQueUsr:" + mcQueUsr);
-	    if (mcQueUsr == null)
+		VoteQueUsr voteQueUsr=voteService.retrieveVoteQueUsr(new Long(userId));
+	    logger.debug("voteQueUsr:" + voteQueUsr);
+	    if (voteQueUsr == null)
 	    {
 	    	VoteUtils.cleanUpSessionAbsolute(request);
 	    	persistError(request, "error.learner.required");
@@ -295,28 +293,28 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	    }
 	    
 	    /* check whether the user's session really referrs to the session id passed to the url*/
-	    Long sessionUid=mcQueUsr.getVoteSessionId();
+	    Long sessionUid=voteQueUsr.getVoteSessionId();
 	    logger.debug("sessionUid" + sessionUid);
-	    VoteSession mcSessionLocal=mcService.getVoteSessionByUID(sessionUid);
-	    logger.debug("checking mcSessionLocal" + mcSessionLocal);
+	    VoteSession voteSessionLocal=voteService.getVoteSessionByUID(sessionUid);
+	    logger.debug("checking voteSessionLocal" + voteSessionLocal);
 	    Long toolSessionId=(Long)request.getSession().getAttribute(TOOL_SESSION_ID);
-	    logger.debug("toolSessionId: " + toolSessionId + " versus" + mcSessionLocal);
-	    if  ((mcSessionLocal ==  null) ||
-			 (mcSessionLocal.getVoteSessionId().longValue() != toolSessionId.longValue()))
+	    logger.debug("toolSessionId: " + toolSessionId + " versus" + voteSessionLocal);
+	    if  ((voteSessionLocal ==  null) ||
+			 (voteSessionLocal.getVoteSessionId().longValue() != toolSessionId.longValue()))
 	    {
 	    	VoteUtils.cleanUpSessionAbsolute(request);
 	    	request.getSession().setAttribute(USER_EXCEPTION_TOOLSESSIONID_INCONSISTENT, new Boolean(true).toString());
 	    	persistError(request, "error.learner.sessionId.inconsistent");
 			return (mapping.findForward(ERROR_LIST));
 	    }
-		//return mcLearningAction.viewAnswers(mapping, form, request, response);
+		//return voteLearningAction.viewAnswers(mapping, form, request, response);
 	    return null;
 	}
 	
 	/* by now, we know that the mode is learner*/
     
     /* find out if the content is set to run offline or online. If it is set to run offline , the learners are informed about that. */
-    boolean isRunOffline=VoteUtils.isRunOffline(mcContent);
+    boolean isRunOffline=VoteUtils.isRunOffline(voteContent);
     logger.debug("isRunOffline: " + isRunOffline);
     if (isRunOffline == true)
     {
@@ -328,7 +326,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
     }
 
     /* find out if the content is being modified at the moment. */
-    boolean isDefineLater=VoteUtils.isDefineLater(mcContent);
+    boolean isDefineLater=VoteUtils.isDefineLater(voteContent);
     logger.debug("isDefineLater: " + isDefineLater);
     if (isDefineLater == true)
     {
@@ -342,13 +340,12 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
     /*
 	 * fetch question content from content
 	 */
-    mapQuestionsContent=LearningUtil.buildQuestionContentMap(request,mcContent);
+    mapQuestionsContent=LearningUtil.buildQuestionContentMap(request,voteContent);
     logger.debug("mapQuestionsContent: " + mapQuestionsContent);
 	
 	request.getSession().setAttribute(MAP_QUESTION_CONTENT_LEARNER, mapQuestionsContent);
 	logger.debug("MAP_QUESTION_CONTENT_LEARNER: " +  request.getSession().getAttribute(MAP_QUESTION_CONTENT_LEARNER));
-	logger.debug("mcContent has : " + mapQuestionsContent.size() + " entries.");
-	request.getSession().setAttribute(TOTAL_QUESTION_COUNT, new Long(mapQuestionsContent.size()).toString());
+	logger.debug("voteContent has : " + mapQuestionsContent.size() + " entries.");
 	
 	request.getSession().setAttribute(CURRENT_QUESTION_INDEX, "1");
 	logger.debug("CURRENT_QUESTION_INDEX: " + request.getSession().getAttribute(CURRENT_QUESTION_INDEX));
@@ -362,46 +359,46 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	String userID=(String) request.getSession().getAttribute(USER_ID);
 	logger.debug("userID:" + userID);
     
-	VoteQueUsr mcQueUsr=mcService.retrieveVoteQueUsr(new Long(userID));
-    logger.debug("mcQueUsr:" + mcQueUsr);
+	VoteQueUsr voteQueUsr=voteService.retrieveVoteQueUsr(new Long(userID));
+    logger.debug("voteQueUsr:" + voteQueUsr);
     
-    if (mcQueUsr != null)
+    if (voteQueUsr != null)
     {
-    	logger.debug("mcQueUsr is available in the db:" + mcQueUsr);
-    	Long queUsrId=mcQueUsr.getUid();
+    	logger.debug("voteQueUsr is available in the db:" + voteQueUsr);
+    	Long queUsrId=voteQueUsr.getUid();
 		logger.debug("queUsrId: " + queUsrId);
     }
     else
     {
-    	logger.debug("mcQueUsr is not available in the db:" + mcQueUsr);
+    	logger.debug("voteQueUsr is not available in the db:" + voteQueUsr);
     }
     
     String learningMode=(String) request.getSession().getAttribute(LEARNING_MODE);
     logger.debug("users learning mode is: " + learningMode);
     /*if the user's session id AND user id exists in the tool tables go to redo questions.*/
-    if ((mcQueUsr != null) && learningMode.equals("learner"))
+    if ((voteQueUsr != null) && learningMode.equals("learner"))
     {
-    	Long sessionUid=mcQueUsr.getVoteSessionId();
+    	Long sessionUid=voteQueUsr.getVoteSessionId();
     	logger.debug("users sessionUid: " + sessionUid);
-    	VoteSession mcUserSession= mcService.getVoteSessionByUID(sessionUid);
-    	logger.debug("mcUserSession: " + mcUserSession);
-    	String userSessionId=mcUserSession.getVoteSessionId().toString();
+    	VoteSession voteUserSession= voteService.getVoteSessionByUID(sessionUid);
+    	logger.debug("voteUserSession: " + voteUserSession);
+    	String userSessionId=voteUserSession.getVoteSessionId().toString();
     	logger.debug("userSessionId: " + userSessionId);
     	Long toolSessionId=(Long)request.getSession().getAttribute(TOOL_SESSION_ID);
     	logger.debug("current toolSessionId: " + toolSessionId);
     	if (toolSessionId.toString().equals(userSessionId))
     	{
-    		logger.debug("the user's session id AND user id exists in the tool tables go to redo questions. " + toolSessionId + " mcQueUsr: " + 
-    				mcQueUsr + " user id: " + mcQueUsr.getQueUsrId());
+    		logger.debug("the user's session id AND user id exists in the tool tables go to redo questions. " + toolSessionId + " voteQueUsr: " + 
+    				voteQueUsr + " user id: " + voteQueUsr.getQueUsrId());
     		logger.debug("the learner has already responsed to this content, just generate a read-only report. Use redo questions for this.");
 	    	return (mapping.findForward(REDO_QUESTIONS));
     	}
     }
     else if (learningMode.equals("teacher"))
     {
-    	VoteLearningAction mcLearningAction= new VoteLearningAction();
+    	VoteLearningAction voteLearningAction= new VoteLearningAction();
     	logger.debug("present to teacher learners progress...");
-    	//return mcLearningAction.viewAnswers(mapping, form, request, response);
+    	//return voteLearningAction.viewAnswers(mapping, form, request, response);
     	return null;
     }
     return (mapping.findForward(LOAD_LEARNER));	
@@ -410,20 +407,20 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 
 /**
  * sets up question and candidate answers maps
- * commonContentSetup(HttpServletRequest request, VoteContent mcContent)
+ * commonContentSetup(HttpServletRequest request, VoteContent voteContent)
  * 
  * @param request
- * @param mcContent
+ * @param voteContent
  */
-protected void commonContentSetup(HttpServletRequest request, VoteContent mcContent)
+protected void commonContentSetup(HttpServletRequest request, VoteContent voteContent)
 {
 	Map mapQuestionsContent= new TreeMap(new VoteComparator());
-	mapQuestionsContent=LearningUtil.buildQuestionContentMap(request,mcContent);
+	mapQuestionsContent=LearningUtil.buildQuestionContentMap(request,voteContent);
     logger.debug("mapQuestionsContent: " + mapQuestionsContent);
 	
 	request.getSession().setAttribute(MAP_QUESTION_CONTENT_LEARNER, mapQuestionsContent);
 	logger.debug("MAP_QUESTION_CONTENT_LEARNER: " +  request.getSession().getAttribute(MAP_QUESTION_CONTENT_LEARNER));
-	logger.debug("mcContent has : " + mapQuestionsContent.size() + " entries.");
+	logger.debug("voteContent has : " + mapQuestionsContent.size() + " entries.");
 	request.getSession().setAttribute(TOTAL_QUESTION_COUNT, new Long(mapQuestionsContent.size()).toString());
 	
 	request.getSession().setAttribute(CURRENT_QUESTION_INDEX, "1");
@@ -434,32 +431,50 @@ protected void commonContentSetup(HttpServletRequest request, VoteContent mcCont
 
 	/**
 	 * sets up session scope attributes based on content linked to the passed tool session id
-	 * setupAttributes(HttpServletRequest request, VoteContent mcContent)
+	 * setupAttributes(HttpServletRequest request, VoteContent voteContent)
 	 * 
 	 * @param request
-	 * @param mcContent
+	 * @param voteContent
 	 */
-	protected void setupAttributes(HttpServletRequest request, VoteContent mcContent)
+	protected void setupAttributes(HttpServletRequest request, VoteContent voteContent, VoteLearningForm voteLearningForm)
 	{
 	    
-	    logger.debug("IS_RETRIES: " + new Boolean(mcContent.isRetries()).toString());
-	    request.getSession().setAttribute(IS_RETRIES, new Boolean(mcContent.isRetries()).toString());
+	    logger.debug("IS_RETRIES: " + new Boolean(voteContent.isRetries()).toString());
+	    //request.getSession().setAttribute(IS_RETRIES, new Boolean(voteContent.isRetries()).toString());
 	    
-	    logger.debug("IS_CONTENT_IN_USE: " + mcContent.isContentInUse());
-	    request.getSession().setAttribute(IS_CONTENT_IN_USE, new Boolean(mcContent.isContentInUse()).toString());
+	    logger.debug("IS_CONTENT_IN_USE: " + voteContent.isContentInUse());
 	    
-	    request.getSession().setAttribute(ACTIVITY_TITLE, mcContent.getTitle());
-	    request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, mcContent.getInstructions());
+	    //request.getSession().setAttribute(ACTIVITY_TITLE, voteContent.getTitle());
+	    //request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, voteContent.getInstructions());
 
 	    Map mapGeneralCheckedOptionsContent= new TreeMap(new VoteComparator());
 	    request.getSession().setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, mapGeneralCheckedOptionsContent);
-
-	    
 	    /*
 	     * Is the tool activity been checked as Run Offline in the property inspector?
 	     */
-	    logger.debug("IS_TOOL_ACTIVITY_OFFLINE: " + mcContent.isRunOffline());
-	    request.getSession().setAttribute(IS_TOOL_ACTIVITY_OFFLINE, new Boolean(mcContent.isRunOffline()).toString());
+	    logger.debug("IS_TOOL_ACTIVITY_OFFLINE: " + voteContent.isRunOffline());
+	    //request.getSession().setAttribute(IS_TOOL_ACTIVITY_OFFLINE, new Boolean(voteContent.isRunOffline()).toString());
+	    
+	    
+	    logger.debug("advanced properties isRetries: " + new Boolean(voteContent.isRetries()).toString());
+	    logger.debug("advanced properties maxNominationCount: " + voteContent.getMaxNominationCount());
+	    logger.debug("advanced properties isAllowText(): " + new Boolean(voteContent.isAllowText()).toString());
+	    logger.debug("advanced properties isVoteChangable(): " + new Boolean(voteContent.isVoteChangable()).toString());
+	    
+	    logger.debug("advanced properties isRunOffline(): " + new Boolean(voteContent.isRunOffline()).toString());
+	    logger.debug("advanced properties isRetries(): " + new Boolean(voteContent.isRetries()).toString());
+	    logger.debug("advanced properties isLockOnFinish(): " + new Boolean(voteContent.isLockOnFinish()).toString());
+	    
+	    
+	    voteLearningForm.setActivityTitle(voteContent.getTitle());
+	    voteLearningForm.setActivityInstructions(voteContent.getInstructions());
+	    voteLearningForm.setActivityRetries(new Boolean(voteContent.isRetries()).toString());
+	    voteLearningForm.setActivityRunOffline(new Boolean(voteContent.isRunOffline()).toString());
+	    
+	    voteLearningForm.setMaxNominationCount(voteContent.getMaxNominationCount());
+	    voteLearningForm.setAllowTextEntry(new Boolean(voteContent.isAllowText()).toString());
+	    voteLearningForm.setLockOnFinish(new Boolean(voteContent.isLockOnFinish()).toString());
+	    voteLearningForm.setVoteChangable(new Boolean(voteContent.isVoteChangable()).toString());
 	}
 	
 	

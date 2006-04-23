@@ -52,8 +52,6 @@ import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
-import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
-import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
@@ -191,7 +189,6 @@ public class VoteServicePOJO implements
         }    	
 	}
     
-
     public VoteQueUsr getVoteQueUsrById(long voteQueUsrId) throws VoteApplicationException
 	{
  	   try
@@ -429,8 +426,22 @@ public class VoteServicePOJO implements
         }
     }
     
+    public void removeAttemptsForUser(final Long queUsrId) throws VoteApplicationException
+    {
+        try
+        {
+        	voteUsrAttemptDAO.removeAttemptsForUser(queUsrId);
+        }
+        catch (DataAccessException e)
+        {
+            throw new VoteApplicationException("Exception occured when lams is removing voteUsrAttempts: "
+                                                         + e.getMessage(),
+														   e);
+        }
+    }
     
-    public List getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long voteQueContentId) throws VoteApplicationException
+    
+    public VoteUsrAttempt getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long voteQueContentId) throws VoteApplicationException
 	{
         try
         {
@@ -444,6 +455,22 @@ public class VoteServicePOJO implements
         }
 	}
     
+
+    public List getAttemptsListForUserAndQuestionContent(final Long queUsrId, final Long voteQueContentId) throws VoteApplicationException
+    {
+        try
+        {
+        	return voteUsrAttemptDAO.getAttemptsListForUserAndQuestionContent(queUsrId, voteQueContentId);
+        }
+        catch (DataAccessException e)
+        {
+            throw new VoteApplicationException("Exception occured when lams is getting vote UsrAttempt by user id and que content id: "
+                                                         + e.getMessage(),
+														   e);
+        }
+        
+    }
+
     
 	public void updateVoteUsrAttempt(VoteUsrAttempt voteUsrAttempt) throws VoteApplicationException
     {
@@ -782,6 +809,22 @@ public class VoteServicePOJO implements
         }
 	}
     
+    public int  getLastNominationCount(Long userId) throws VoteApplicationException
+    {
+	   try
+        {
+	   		int lastNomCount=voteUsrAttemptDAO.getLastNominationCount(userId);
+	   		return lastNomCount;
+        }
+        catch (DataAccessException e)
+        {
+            throw new VoteApplicationException("Exception occured when lams is retrieving lastNominationount: "
+                                                         + e.getMessage(),
+														   e);
+        }
+    }
+    
+
     
     public void deleteVoteQueUsr(VoteQueUsr voteQueUsr) throws VoteApplicationException
     {

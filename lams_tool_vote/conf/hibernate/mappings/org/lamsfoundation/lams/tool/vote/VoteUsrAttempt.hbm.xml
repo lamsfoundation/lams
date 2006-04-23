@@ -68,6 +68,23 @@
     >
     </property>
     
+    <property
+        name="nominationCount"
+        type="java.lang.Integer"
+        column="nominationCount"
+        length="5"
+    >
+    </property>
+    
+    
+   <property
+        name="singleUserEntry"
+        type="boolean"
+        access="property"
+        column="singleUserEntry"
+        length="1"        
+   />
+    
 
     <many-to-one
         name="voteQueContent"

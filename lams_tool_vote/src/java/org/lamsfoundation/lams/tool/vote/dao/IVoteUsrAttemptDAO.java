@@ -41,7 +41,13 @@ public interface IVoteUsrAttemptDAO
 	
 	public List getAttemptsForUser(final Long queUsrId);
 	
-	public List getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long voteQueContentId);
+	public void removeAttemptsForUser(final Long queUsrId);
+	
+	public int  getLastNominationCount(Long userId);
+	
+	public VoteUsrAttempt getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long voteQueContentId);
+	
+	public List getAttemptsListForUserAndQuestionContent(final Long queUsrId, final Long voteQueContentId);
 	
 	public List getAttemptForQueContent(final Long queUsrId, final Long voteQueContentId);
 	

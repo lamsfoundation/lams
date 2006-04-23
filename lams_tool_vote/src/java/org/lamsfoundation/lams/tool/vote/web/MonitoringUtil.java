@@ -233,7 +233,7 @@ public class MonitoringUtil implements VoteAppConstants{
 		    		if (voteQueUsr != null)
 		    		{
 		    			logger.debug("getting listUserAttempts for user id: " + voteQueUsr.getUid() + " and que content id: " + questionUid);
-		    			List listUserAttempts=voteService.getAttemptsForUserAndQuestionContent(voteQueUsr.getUid(), new Long(questionUid));
+		    			List listUserAttempts=voteService.getAttemptsListForUserAndQuestionContent(voteQueUsr.getUid(), new Long(questionUid));
 		    			logger.debug("listUserAttempts: " + listUserAttempts);
 	
 		    			Iterator itAttempts=listUserAttempts.iterator();
@@ -276,7 +276,7 @@ public class MonitoringUtil implements VoteAppConstants{
 			    		if (voteQueUsr != null)
 			    		{
 			    			logger.debug("getting listUserAttempts for user id: " + voteQueUsr.getUid() + " and que content id: " + questionUid);
-			    			List listUserAttempts=voteService.getAttemptsForUserAndQuestionContent(voteQueUsr.getUid(), new Long(questionUid));
+			    			List listUserAttempts=voteService.getAttemptsListForUserAndQuestionContent(voteQueUsr.getUid(), new Long(questionUid));
 			    			logger.debug("listUserAttempts: " + listUserAttempts);
 		
 			    			Iterator itAttempts=listUserAttempts.iterator();
@@ -318,7 +318,7 @@ public class MonitoringUtil implements VoteAppConstants{
 				    		if (voteQueUsr != null)
 				    		{
 				    			logger.debug("getting listUserAttempts for user id: " + voteQueUsr.getUid() + " and que content id: " + questionUid);
-				    			List listUserAttempts=voteService.getAttemptsForUserAndQuestionContent(voteQueUsr.getUid(), new Long(questionUid));
+				    			List listUserAttempts=voteService.getAttemptsListForUserAndQuestionContent(voteQueUsr.getUid(), new Long(questionUid));
 				    			logger.debug("listUserAttempts: " + listUserAttempts);
 		
 				    			Iterator itAttempts=listUserAttempts.iterator();
@@ -368,7 +368,7 @@ public class MonitoringUtil implements VoteAppConstants{
 		    		if (voteQueUsr != null)
 		    		{
 		    			logger.debug("getting listUserAttempts for user id: " + voteQueUsr.getUid() + " and que content id: " + questionUid);
-		    			List listUserAttempts=voteService.getAttemptsForUserAndQuestionContent(voteQueUsr.getUid(), new Long(questionUid));
+		    			List listUserAttempts=voteService.getAttemptsListForUserAndQuestionContent(voteQueUsr.getUid(), new Long(questionUid));
 		    			logger.debug("listUserAttempts: " + listUserAttempts);
 
 		    			Iterator itAttempts=listUserAttempts.iterator();

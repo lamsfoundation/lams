@@ -66,8 +66,9 @@ CREATE TABLE tl_vote11_usr_attempt (
      , vote_que_content_id BIGINT(20) NOT NULL
      , attempt_time DATETIME
      , time_zone VARCHAR(255)
+     , nominationCount INT(5) NOT NULL DEFAULT 0
      , userEntry VARCHAR(255)
-     , isNominated TINYINT NOT NULL DEFAULT 0
+     , singleUserEntry TINYINT(1) NOT NULL DEFAULT 0
      , PRIMARY KEY (uid)
      , INDEX (que_usr_id)
      , CONSTRAINT FK_tl_vote_usr_attempt_1 FOREIGN KEY (que_usr_id)

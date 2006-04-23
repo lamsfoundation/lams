@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.tool.vote.web;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -40,6 +41,7 @@ import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
+import org.lamsfoundation.lams.tool.vote.VoteComparator;
 import org.lamsfoundation.lams.tool.vote.VoteUtils;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
@@ -127,6 +129,24 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 		VoteLearningForm voteLearningForm = (VoteLearningForm) form;
 	 	IVoteService voteService =VoteUtils.getToolService(request);
 	 	
+    	voteLearningForm.resetCommands();
+	    return (mapping.findForward(ALL_NOMINATIONS));
+    }
+    
+    
+    public ActionForward viewAnswers(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+	{   
+        VoteUtils.cleanUpUserExceptions(request);
+		logger.debug("dispatching viewAnswers...");
+		
+		setContentInUse(request);
+		VoteLearningForm voteLearningForm = (VoteLearningForm) form;
+	 	IVoteService voteService =VoteUtils.getToolService(request);
+	 	
 	 	Long toolContentId=(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
     	logger.debug("toolContentId: " + toolContentId);
     			
@@ -135,6 +155,83 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 		return (mapping.findForward(INDIVIDUAL_REPORT));
     }
     
+
+    public ActionForward redoQuestionsOk(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+	{   
+        VoteUtils.cleanUpUserExceptions(request);
+		logger.debug("dispatching redoQuestionsOk...");
+		
+		VoteLearningForm voteLearningForm = (VoteLearningForm) form;
+	 	IVoteService voteService =VoteUtils.getToolService(request);
+
+
+	 	setContentInUse(request);
+		logger.debug("requested redoQuestionsOk, user is sure to redo the questions.");
+		voteLearningForm.resetCommands();
+		return redoQuestions(mapping, form, request, response);
+	}
+
+    
+    public ActionForward learnerFinished(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+	{   
+        logger.debug("dispatching learnerFinished");
+		logger.debug("requested learner finished, the learner should be directed to next activity.");
+
+		VoteLearningForm voteLearningForm = (VoteLearningForm) form;
+	 	IVoteService voteService =VoteUtils.getToolService(request);
+	 	
+		Long toolSessionId = (Long) request.getSession().getAttribute(TOOL_SESSION_ID);
+		String userID=(String) request.getSession().getAttribute(USER_ID);
+		logger.debug("attempting to leave/complete session with toolSessionId:" + toolSessionId + " and userID:"+userID);
+		
+		VoteUtils.cleanUpSessionAbsolute(request);
+		
+		String nextUrl=null;
+		try
+		{
+			nextUrl=voteService.leaveToolSession(toolSessionId, new Long(userID));
+			logger.debug("nextUrl: "+ nextUrl);
+		}
+		catch (DataMissingException e)
+		{
+			logger.debug("failure getting nextUrl: "+ e);
+    		voteLearningForm.resetCommands();
+			//throw new ServletException(e);
+    		return (mapping.findForward(LEARNING_STARTER));
+		}
+		catch (ToolException e)
+		{
+			logger.debug("failure getting nextUrl: "+ e);
+    		voteLearningForm.resetCommands();
+			//throw new ServletException(e);
+    		return (mapping.findForward(LEARNING_STARTER));        		
+		}
+		catch (Exception e)
+		{
+			logger.debug("unknown exception getting nextUrl: "+ e);
+    		voteLearningForm.resetCommands();
+			//throw new ServletException(e);
+    		return (mapping.findForward(LEARNING_STARTER));        		
+		}
+
+		logger.debug("success getting nextUrl: "+ nextUrl);
+		voteLearningForm.resetCommands();
+		
+		/* pay attention here*/
+		logger.debug("redirecting to the nextUrl: "+ nextUrl);
+		response.sendRedirect(nextUrl);
+		
+		return null;
+
+    }
     
     
     public ActionForward continueOptionsCombined(ActionMapping mapping,
@@ -149,6 +246,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 		setContentInUse(request);
 		VoteLearningForm voteLearningForm = (VoteLearningForm) form;
 	 	IVoteService voteService =VoteUtils.getToolService(request);
+	 	
 	 	
 	 	/* process the answers */
 		Map mapGeneralCheckedOptionsContent=(Map) request.getSession().getAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT);
@@ -179,14 +277,97 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
     	VoteQueUsr voteQueUsr=LearningUtil.getUser(request);
     	logger.debug("voteQueUsr: " + voteQueUsr);
     	
-
-    	LearningUtil.createAttempt(request, voteQueUsr, mapGeneralCheckedOptionsContent, userEntry);
-    	logger.debug("created user attempt in the db");
+    	String maxNominationCount=voteLearningForm.getMaxNominationCount();
+    	logger.debug("current maxNominationCount: " + maxNominationCount);
     	
+    	int intMaxNominationCount=0;
+    	if (maxNominationCount != null)
+    	    intMaxNominationCount=new Integer(maxNominationCount).intValue();
+    	
+    	logger.debug("intMaxNominationCount: " + intMaxNominationCount);
+    	
+    	
+    	int nominationCount=voteService.getLastNominationCount(voteQueUsr.getQueUsrId());
+    	logger.debug("current nominationCount: " + nominationCount);
+    	
+
+    	if (intMaxNominationCount != 0)
+    	{
+        	if (nominationCount >= intMaxNominationCount)
+        	{
+        	    logger.debug("max nom count reached...");
+        	    logger.debug("fwd'ing to: " + EXIT_PAGE);
+        	    return (mapping.findForward(EXIT_PAGE));
+        	}
+    	}
+    	
+    	logger.debug("new nominationCount: " + nominationCount+1);
+    	
+    	logger.debug("creating attemps with mapGeneralCheckedOptionsContent " + mapGeneralCheckedOptionsContent);
+    	voteService.removeAttemptsForUser(voteQueUsr.getUid());
+    	logger.debug("nominations deleted for user: " + voteQueUsr.getUid());
+    	LearningUtil.createAttempt(request, voteQueUsr, mapGeneralCheckedOptionsContent, userEntry, nominationCount++, false);
+    	
+    	if (mapGeneralCheckedOptionsContent.size() == 0)
+    	{
+    		logger.debug("mapGeneralCheckedOptionsContent size is 0");
+    		Map mapLeanerCheckedOptionsContent= new TreeMap(new VoteComparator());
+    		mapLeanerCheckedOptionsContent.put("101", userEntry);
+			//request.getSession().setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, mapLeanerCheckedOptionsContent);
+			logger.debug("after mapsize check  mapLeanerCheckedOptionsContent " + mapLeanerCheckedOptionsContent);
+			logger.debug("using nominationCount: " + nominationCount);
+			if (userEntry.length() > 0)
+			{
+			    logger.debug("creating entry for: " + userEntry);
+			    LearningUtil.createAttempt(request, voteQueUsr, mapLeanerCheckedOptionsContent, userEntry, nominationCount, true);    
+			}
+			        
+	    	
+	    	
+    	}
+    	
+    	logger.debug("created user attempt in the db");
     	voteLearningForm.resetCommands();
+
+    	mapGeneralCheckedOptionsContent=(Map) request.getSession().getAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT);
+    	logger.debug("final mapGeneralCheckedOptionsContent: " + mapGeneralCheckedOptionsContent);
+
 		return (mapping.findForward(INDIVIDUAL_REPORT));
     }
 
+    public ActionForward redoQuestions(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                      ServletException
+   {
+        logger.debug("dispatching redoQuestions...");
+    	VoteUtils.cleanUpUserExceptions(request);
+    	VoteLearningForm voteLearningForm = (VoteLearningForm) form;
+	 	IVoteService voteService =VoteUtils.getToolService(request);
+	 	
+    	Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
+    	logger.debug("toolContentId:" + toolContentId);
+    	
+    	VoteContent voteContent=voteService.retrieveVote(toolContentId);
+    	logger.debug("voteContent:" + voteContent);
+
+    	Map mapQuestionsContent= new TreeMap(new VoteComparator());
+    	mapQuestionsContent=LearningUtil.buildQuestionContentMap(request,voteContent);
+	    logger.debug("mapQuestionsContent: " + mapQuestionsContent);
+		
+		request.getSession().setAttribute(MAP_QUESTION_CONTENT_LEARNER, mapQuestionsContent);
+		logger.debug("MAP_QUESTION_CONTENT_LEARNER: " +  request.getSession().getAttribute(MAP_QUESTION_CONTENT_LEARNER));
+		logger.debug("voteContent has : " + mapQuestionsContent.size() + " entries.");
+		
+		Map mapGeneralCheckedOptionsContent= new TreeMap(new VoteComparator());
+	    request.getSession().setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, mapGeneralCheckedOptionsContent);
+	    
+	    voteLearningForm.setUserEntry("");
+	    return (mapping.findForward(LOAD_LEARNER));
+   }
+
+    
     
     public ActionForward selectOption(ActionMapping mapping,
             ActionForm form,

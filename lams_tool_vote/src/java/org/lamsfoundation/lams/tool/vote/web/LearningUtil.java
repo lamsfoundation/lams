@@ -129,11 +129,12 @@ public class LearningUtil implements VoteAppConstants {
 	}
     
     
-    public static void createAttempt(HttpServletRequest request, VoteQueUsr voteQueUsr, Map mapGeneralCheckedOptionsContent, String userEntry)
+    public static void createAttempt(HttpServletRequest request, VoteQueUsr voteQueUsr, Map mapGeneralCheckedOptionsContent, String userEntry, int nominationCount, boolean singleUserEntry)
 	{
         logger.debug("doing createAttempt: " + mapGeneralCheckedOptionsContent);
-        
+        logger.debug("nominationCount: " + nominationCount);
         logger.debug("userEntry: " + userEntry);
+        logger.debug("singleUserEntry: " + singleUserEntry);
         
 		IVoteService voteService =VoteUtils.getToolService(request);
 		Date attempTime=VoteUtils.getGMTDateTime();
@@ -153,32 +154,60 @@ public class LearningUtil implements VoteAppConstants {
 	            
 	            logger.debug("questionDisplayOrder: " + questionDisplayOrder);
 	            
-	            
 	            VoteQueContent voteQueContent=voteService.getQuestionContentByDisplayOrder(questionDisplayOrder, toolContentUID);
 	            logger.debug("voteQueContent: " + voteQueContent);
 	            if (voteQueContent != null)
 	            {
-	                createIndividualOptions(request, voteQueContent, voteQueUsr, attempTime, timeZone, userEntry);    
+	                createIndividualOptions(request, voteQueContent, voteQueUsr, attempTime, timeZone, userEntry, nominationCount, false);    
 	            }
+	            else if ((voteQueContent == null) && (questionDisplayOrder.toString().equals("101")))
+	            {
+	                logger.debug("creating user entry record");
+	                VoteQueContent localVoteQueContent=voteService.getToolDefaultQuestionContent(1);
+	                logger.debug("localVoteQueContent: " + localVoteQueContent);
+	                createIndividualOptions(request, localVoteQueContent, voteQueUsr, attempTime, timeZone, userEntry, nominationCount, true);    
+	            }
+	            
 	        }			
 		}
 	 }
 
-    public static void createIndividualOptions(HttpServletRequest request, VoteQueContent voteQueContent, VoteQueUsr voteQueUsr, Date attempTime, String timeZone, String userEntry)
+    public static void createIndividualOptions(HttpServletRequest request, VoteQueContent voteQueContent, VoteQueUsr voteQueUsr, Date attempTime, String timeZone, String userEntry, int nominationCount, boolean singleUserEntry)
     {
         logger.debug("doing createIndividualOptions");
-
+        logger.debug("nominationCount: " + nominationCount);
         logger.debug("userEntry: " + userEntry);
+        logger.debug("singleUserEntry: " + singleUserEntry);
 
     	IVoteService voteService =VoteUtils.getToolService(request);
     	
     	logger.debug("voteQueContent: " + voteQueContent);
+    	logger.debug("user " + voteQueUsr.getQueUsrId());
+    	logger.debug("voteQueContent.getVoteContentId() " +voteQueContent.getVoteContentId());
+    	
     	if (voteQueContent != null)
     	{
-        	    VoteUsrAttempt voteUsrAttempt=new VoteUsrAttempt(attempTime, timeZone, voteQueContent, voteQueUsr, userEntry);
+    	    VoteUsrAttempt existingVoteUsrAttempt=voteService.getAttemptsForUserAndQuestionContent(voteQueUsr.getQueUsrId(),voteQueContent.getVoteContentId());
+    	    logger.debug("existingVoteUsrAttempt: " + existingVoteUsrAttempt);
+    	    
+    	    if (existingVoteUsrAttempt != null)
+    	    {
+    	        logger.debug("update existingVoteUsrAttempt: " + existingVoteUsrAttempt);
+    	        existingVoteUsrAttempt.setNominationCount(nominationCount);
+    	        existingVoteUsrAttempt.setUserEntry(userEntry);
+    	        existingVoteUsrAttempt.setAttemptTime(attempTime);
+    	        existingVoteUsrAttempt.setTimeZone(timeZone);
+    	        voteService.updateVoteUsrAttempt(existingVoteUsrAttempt);
+    	        logger.debug("done updating existingVoteUsrAttempt: " + existingVoteUsrAttempt);
+    	    }
+    	    else
+    	    {
+    	        logger.debug("create new attempt");
+        	    VoteUsrAttempt voteUsrAttempt=new VoteUsrAttempt(attempTime, timeZone, voteQueContent, voteQueUsr, userEntry, nominationCount , singleUserEntry);
         	    logger.debug("voteUsrAttempt: " + voteUsrAttempt);
             	voteService.createVoteUsrAttempt(voteUsrAttempt);
             	logger.debug("created voteUsrAttempt in the db :" + voteUsrAttempt);    
+    	    }
     	}
     }
 

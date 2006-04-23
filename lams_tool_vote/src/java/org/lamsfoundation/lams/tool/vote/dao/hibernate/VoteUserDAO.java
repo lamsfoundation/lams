@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.vote.dao.hibernate;
 import java.util.List;
 
 import org.hibernate.FlushMode;
+import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
 import org.lamsfoundation.lams.tool.vote.dao.IVoteUserDAO;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;

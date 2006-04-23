@@ -41,6 +41,15 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
 	protected String dispatch;
 	protected String toolContentID;
 	
+	protected String maxNominationCount;
+	protected String allowTextEntry;;
+	protected String lockOnFinish;
+	protected String voteChangable;
+	protected String activityRunOffline;
+	protected String activityRetries;
+	protected String activityTitle;
+	protected String activityInstructions;
+	
 	protected String continueOptions;
 	protected String nextOptions;
 	protected String continueOptionsCombined;
@@ -430,5 +439,103 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
      */
     public void setViewAllResults(String viewAllResults) {
         this.viewAllResults = viewAllResults;
+    }
+    
+    /**
+     * @return Returns the activityInstructions.
+     */
+    public String getActivityInstructions() {
+        return activityInstructions;
+    }
+    /**
+     * @param activityInstructions The activityInstructions to set.
+     */
+    public void setActivityInstructions(String activityInstructions) {
+        this.activityInstructions = activityInstructions;
+    }
+    /**
+     * @return Returns the activityTitle.
+     */
+    public String getActivityTitle() {
+        return activityTitle;
+    }
+    /**
+     * @param activityTitle The activityTitle to set.
+     */
+    public void setActivityTitle(String activityTitle) {
+        this.activityTitle = activityTitle;
+    }    
+
+    /**
+     * @return Returns the activityRetries.
+     */
+    public String getActivityRetries() {
+        return activityRetries;
+    }
+    /**
+     * @param activityRetries The activityRetries to set.
+     */
+    public void setActivityRetries(String activityRetries) {
+        this.activityRetries = activityRetries;
+    }
+    /**
+     * @return Returns the activityRunOffline.
+     */
+    public String getActivityRunOffline() {
+        return activityRunOffline;
+    }
+    /**
+     * @param activityRunOffline The activityRunOffline to set.
+     */
+    public void setActivityRunOffline(String activityRunOffline) {
+        this.activityRunOffline = activityRunOffline;
+    }
+    /**
+     * @return Returns the voteChangable.
+     */
+    public String getVoteChangable() {
+        return voteChangable;
+    }
+    /**
+     * @param voteChangable The voteChangable to set.
+     */
+    public void setVoteChangable(String voteChangable) {
+        this.voteChangable = voteChangable;
+    }
+    /**
+     * @return Returns the lockOnFinish.
+     */
+    public String getLockOnFinish() {
+        return lockOnFinish;
+    }
+    /**
+     * @param lockOnFinish The lockOnFinish to set.
+     */
+    public void setLockOnFinish(String lockOnFinish) {
+        this.lockOnFinish = lockOnFinish;
+    }
+    /**
+     * @return Returns the allowTextEntry.
+     */
+    public String getAllowTextEntry() {
+        return allowTextEntry;
+    }
+    /**
+     * @param allowTextEntry The allowTextEntry to set.
+     */
+    public void setAllowTextEntry(String allowTextEntry) {
+        this.allowTextEntry = allowTextEntry;
+    }
+    /**
+     * @return Returns the maxNominationCount.
+     */
+    public String getMaxNominationCount() {
+        return maxNominationCount;
+    }
+    /**
+     * @param maxNominationCount The maxNominationCount to set.
+     */
+    public void setMaxNominationCount(String maxNominationCount) {
+        this.maxNominationCount = maxNominationCount;
     }
 }
