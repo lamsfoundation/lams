@@ -29,7 +29,6 @@ import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
@@ -40,10 +39,7 @@ import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
-import org.lamsfoundation.lams.web.session.SessionManager;
-import org.lamsfoundation.lams.web.util.AttributeNames;
 
 
 /** 
@@ -60,7 +56,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  *                          type="org.lamsfoundation.lams.learning.service.LearnerServiceException"
  *                          path=".systemError"
  * 							handler="org.lamsfoundation.lams.learning.util.CustomStrutsExceptionHandler"
- * @struts:action-forward name="controlActivity" path="/controlBottomFrame.jsp"
+ * @struts:action-forward name="controlActivity" path="/dummyControlBottomFrame.jsp"
  * 
  * ----------------XDoclet Tags--------------------
  * 

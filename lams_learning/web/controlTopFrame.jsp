@@ -19,7 +19,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
-<%@ page language="java"%>
+<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
 <%@ taglib uri="tags-html" prefix="html"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
@@ -29,7 +29,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <html:html locale="true" xhtml="true">
 
 	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<link href="<lams:LAMSURL/>/css/default.css" rel="stylesheet" type="text/css"/>
 		<title>Learner :: LAMS</title>
 	</head>

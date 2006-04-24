@@ -19,7 +19,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
-<%@ page language="java"%>
+<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
 <%@ taglib uri="tags-bean" prefix="bean"%>
 <%@ taglib uri="tags-html" prefix="html"%>
 <%@ taglib uri="tags-tiles" prefix="tiles"%>
@@ -31,15 +31,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <html:html locale="true" xhtml="true">
 
 	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
 		<lams:css/>
-		<title>Learner :: LAMS</title>
+		<title><fmt:message key="learner.title"/></title>
 	</head>
 
 	<frameset rows="40,*" cols="*" framespacing="0" frameborder="NO" border="0">
 		<frame src="controlTopFrame.jsp" name="topFrame" scrolling="NO" noresize >
-		<!-- real frame, which uses Flash <frame src="controlBottomFrame.jsp" name="bottomFrame" scrolling="NO"> -->
-		<frame src="dummylearner.do?method=getActiveLessons" name="bottomFrame" scrolling="NO">
+		<frame src="controlBottomFrame.jsp" name="bottomFrame" scrolling="NO">
 	</frameset>
 	
 	<noframes>

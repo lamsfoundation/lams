@@ -19,7 +19,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
-<%@ page language="java"%>
+<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
+<%@ page import="org.lamsfoundation.lams.util.Configuration" import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
 <%@ taglib uri="tags-html" prefix="html"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
@@ -29,72 +30,46 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <html:html locale="true" xhtml="true">
 
 	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<link href="<lams:LAMSURL/>/css/default.css" rel="stylesheet" type="text/css"/>
-		<title>Learner :: LAMS</title>
-		<script language="JavaScript" type="text/JavaScript">
-			<!--
-			
-			var thePopUp = null;
-			
-			function openPopUp(args){
-				if(thePopUp && thePopUp.open && !thePopUp.closed){		
-						thePopUp.focus();	
-				}else{
-					//alert('opening:'+args);
-					thePopUp = window.open(args,"learnerPop","HEIGHT=400,WIDTH=550,resizable,scrollbars");
-				}
-			}
-			
-			//-->
-		</script>
-
+		<title<fmt:message key="learner.title"/></title>
 	</head>
 	<body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
 
-		<!-- URL's used in the movie-->
-		<!-- text used in the movie-->
-		<!--Flash UI component-->
-		<!-- OBJECT classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
-				codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,0,0" name="leftUI"
-				WIDTH="100%" HEIGHT="100%" ALIGN="" id="leftUI"-->
-			<!-- PARAM NAME=movie VALUE="LearnerLeftUI.swf" -->
-			<!-- PARAM NAME=quality VALUE="high" -->
-			<!-- PARAM NAME=scale VALUE="noscale" -->
-			<!-- PARAM NAME=salign VALUE="LT" -->
-			<!-- PARAM NAME=flashvars VALUE="pollInterval=10000" -->
-			<!--<PARAM NAME=bgcolor VALUE=#D0D0E8 -->
-			<!-- EMBED src="LearnerLeftUI.swf?pollInterval=10000"  WIDTH="100%" HEIGHT="100%" ALIGN="" quality=high scale=noscale salign=LT
-					TYPE="application/x-shockwave-flash" PLUGINSPAGE="http://www.macromedia.com/go/getflashplayer" swliveconnect=true name="leftUI"-->
-			<!-- /EMBED-->
-		<!-- /OBJECT-->
-		
+	<% 
+	String clientVersion = Configuration.get(ConfigurationKeys.LEARNER_CLIENT_VERSION);
+	String serverLanguage = Configuration.get(ConfigurationKeys.SERVER_LANGUAGE);
+	String languageDate = Configuration.getDictionaryDateForLanguage(serverLanguage);
+	%>
 
-		<h2>Available Lessons</H2>
-		<p>[Flash component goes here]</p>
-		<table width="100%" border="0" cellspacing="2" cellpadding="2" summary="This table is being used for layout purposes only">
-			<TR><TD><A HREF="<lams:WebAppURL/>dummylearner.do?method=getActiveLessons">Refresh List</A></TD></TR>
-		<c:forEach var="lesson" items="${lessons}">
-		<c:if test="${lesson.lessonStateID<6}">
-			<TR><TD>
-				<STRONG><c:out value="${lesson.lessonName}"/></STRONG>
-			<c:choose>
-				<c:when test="${lesson.lessonStateID==1}">[Created]</c:when>
-				<c:when test="${lesson.lessonStateID==2}">[Scheduled]</c:when>
-				<c:when test="${lesson.lessonStateID==3}">[Started]</c:when>
-				<c:when test="${lesson.lessonStateID==4}">[Suspended]</c:when>
-				<c:when test="${lesson.lessonStateID==5}">[Finished]</c:when>
-			</c:choose>
-			<c:if test="${lesson.lessonDescription}">
-				<BR><c:out value="${lesson.lessonDescription}"/>
-			</c:if>
-			<BR><A HREF="<lams:WebAppURL/>learner.do?method=joinLesson&userId=<lams:user property="userID"/>&lessonId=<c:out value="${lesson.lessonID}"/>" target="contentFrame">Participate</A>
-			<BR><A HREF=javascript:openPopUp('<lams:WebAppURL/>exportWaitingPage.jsp?mode=learner&lessonID=<c:out value="${lesson.lessonID}"/>');>Export Portfolio</A>
-			</TD></TR>
-			<TR><TD><HR></TD></TR>
-		</c:if>
-		</c:forEach>
-		</table>
+	<c:set var="learnerurl">lams_learning.swf?userID=<lams:user property="userID"/>&serverURL=<lams:LAMSURL/>&build=<%=clientVersion%>&lang=<%=serverLanguage%>&date=<%=languageDate%>&theme=<lams:user property="flashTheme"/></c:set>
+
+	<!-- URL's used in the movie-->
+	<!-- text used in the movie-->
+	<!--Library-->
+	<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+	 codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,47,0" name="learning"
+	 width="100%" height="100%" align="left" id="learning">
+	  <param name="allowScriptAccess" value="sameDomain" />
+
+	  <param name="movie" value="<c:out value="${learnerurl}" escapeXml="false"/>"/>
+	  <param name="quality" value="high">
+	  <param name="scale" value="noscale">
+	  <param name="bgcolor" value="#B3B7C8">
+	  <embed 	
+		  src="<c:out value="${learnerurl}" escapeXml="false"/>"
+		  quality="high" 
+		  scale="noscale" 
+		  bgcolor="#B3B7C8"  
+		  width="100%" 
+		  height="100%" 
+		  swliveconnect=true 
+		  id="authoring" 
+		  name="authoring" 
+		  align=""
+		  type="application/x-shockwave-flash" 
+		  pluginspage="http://www.macromedia.com/go/getflashplayer" />
+	</object>
 
 	</body>
 </html:html>

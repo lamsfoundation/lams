@@ -122,7 +122,7 @@
       />
       <forward
         name="controlActivity"
-        path="/controlBottomFrame.jsp"
+        path="/dummyControlBottomFrame.jsp"
         redirect="false"
       />
     </action>
@@ -277,7 +277,7 @@
 
    <!-- Define your Struts controller in a file called struts-controller.xml and place it in your merge directory. -->
 
-<message-resources parameter="org.lamsfoundation.lams.learning.LearningResources" />
+<message-resources parameter="org.lamsfoundation.lams.learning.ApplicationResources" />
 
 <plug-in className="org.apache.struts.tiles.TilesPlugin">
 	<set-property property="definitions-config" value="/WEB-INF/struts/tiles-defs.xml" />

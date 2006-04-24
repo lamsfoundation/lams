@@ -19,6 +19,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
+<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="tags-logic" prefix="logic" %>
@@ -43,6 +44,7 @@ String downloadServlet = learning_root + "exportDownload?fileLocation=";
 <html>
   <head>
     <title>Generating Export</title>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <script type ="text/javascript">
     	var READY_STATE_UNINITIALIZED=0;
 		var READY_STATE_LOADING=1;
