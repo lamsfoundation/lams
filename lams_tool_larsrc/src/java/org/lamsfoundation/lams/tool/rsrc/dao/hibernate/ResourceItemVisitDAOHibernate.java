@@ -25,20 +25,27 @@ package org.lamsfoundation.lams.tool.rsrc.dao.hibernate;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.tool.rsrc.dao.ResourceItemDAO;
-import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
+import org.lamsfoundation.lams.tool.rsrc.dao.ResourceItemVisitDAO;
+import org.lamsfoundation.lams.tool.rsrc.model.ResourceItemVisitLog;
 
-public class ResourceItemDAOHibernate extends BaseDAOHibernate implements ResourceItemDAO{
+public class ResourceItemVisitDAOHibernate extends BaseDAOHibernate implements ResourceItemVisitDAO{
 	
-	private static final String FIND_AUTHORING_ITEMS = "from " + ResourceItem.class.getName() + " where resource_uid = ? order by create_date asc";
-	
-	public List getAuthoringItems(Long resourceUid) {
-		
-		return this.getHibernateTemplate().find(FIND_AUTHORING_ITEMS,resourceUid); 
+	private static final String FIND_BY_ITEM_AND_USER = "from " + ResourceItemVisitLog.class.getName() + " where user.uid = ? and resourceItem.uid=?";
+	private static final String FIND_VIEW_COUNT_BY_USER = "select count(*) from " + ResourceItemVisitLog.class.getName() 
+			+ " where user.uid = ?";
+
+	public ResourceItemVisitLog getResourceItemLog(Long userUid,Long itemUid){
+		List list = getHibernateTemplate().find(FIND_BY_ITEM_AND_USER,new Object[]{userUid,itemUid});
+		if(list == null || list.size() ==0)
+			return null;
+		return (ResourceItemVisitLog) list.get(0);
 	}
 
-	public ResourceItem getByUid(Long resourceItemUid) {
-		return (ResourceItem) this.getObject(ResourceItem.class,resourceItemUid);
+	public int getUserViewLogCount(Long userUid) {
+		List list = getHibernateTemplate().find(FIND_VIEW_COUNT_BY_USER,new Object[]{userUid});
+		if(list == null || list.size() ==0)
+			return 0;
+		return ((Integer) list.get(0)).intValue();
 	}
 
 }

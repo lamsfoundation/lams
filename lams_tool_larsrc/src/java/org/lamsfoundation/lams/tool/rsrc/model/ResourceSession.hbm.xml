@@ -79,8 +79,8 @@
         <set
             name="resourceItems"
             lazy="true"
-            inverse="true"
-            cascade="none"
+            inverse="false"
+            cascade="all"
             sort="unsorted"
             order-by="create_date desc"
         >

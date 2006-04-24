@@ -40,23 +40,24 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
+import org.apache.struts.action.ActionError;
 import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.rsrc.ResourceConstants;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceSession;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
 import org.lamsfoundation.lams.tool.rsrc.service.IResourceService;
+import org.lamsfoundation.lams.tool.rsrc.service.ResourceApplicationException;
 import org.lamsfoundation.lams.tool.rsrc.service.UploadResourceFileException;
-import org.lamsfoundation.lams.tool.rsrc.web.form.ResourceForm;
 import org.lamsfoundation.lams.tool.rsrc.web.form.ResourceItemForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
@@ -79,10 +80,73 @@ public class LearningAction extends Action {
 		if(param.equals("start")){
 			return start(mapping, form, request, response);
 		}
+		if(param.equals("complete")){
+			return complete(mapping, form, request, response);
+		}
+		if(param.equals("view")){
+			return view(mapping, form, request, response);
+		}
+		if(param.equals("finish")){
+			return finish(mapping, form, request, response);
+		}
         if (param.equals("saveOrUpdateItem")) {
         	return saveOrUpdateItem(mapping, form, request, response);
         }
 		return  mapping.findForward(ResourceConstants.ERROR);
+	}
+	
+	private ActionForward finish(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+		Long sessionId = (Long) request.getSession().getAttribute(
+				AttributeNames.PARAM_TOOL_SESSION_ID);
+		HttpSession ss = SessionManager.getSession();
+		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+		Long userID = new Long(user.getUserID().longValue());
+		
+		IResourceService service = getResourceService();
+		int miniViewFlag = service.checkMiniView(sessionId,userID);
+		//if current user view less than reqired view count number, then just return error message.
+		if(miniViewFlag > 0){
+			ActionMessages errors = new ActionMessages();
+			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionError("lable.learning.minimum.view.number.less",miniViewFlag));
+			this.addErrors(request,errors);
+			return mapping.getInputForward();
+			
+		}
+		ToolAccessMode mode = (ToolAccessMode) request.getSession()
+				.getAttribute(AttributeNames.ATTR_MODE);
+		if (mode == ToolAccessMode.LEARNER) {
+			// get sessionId from HttpServletRequest
+			String nextActivityUrl = null ;
+			try {
+				nextActivityUrl = service.finishToolSession(sessionId,userID);
+				response.sendRedirect(nextActivityUrl);
+			} catch (IOException e) {
+				log.error("Failed send redirect:" + nextActivityUrl);
+			} catch (ResourceApplicationException e) {
+				log.error("Failed get next activity url:" + e.getMessage());
+			}
+			return null;
+		}
+
+		return mapping.findForward("success");
+	}
+	private ActionForward view(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+		Long resourceUid = new Long(request.getParameter(ResourceConstants.PARAM_RESOURCE_ITEM_UID));
+		IResourceService service = getResourceService();
+		HttpSession ss = SessionManager.getSession();
+		//get back login user DTO
+		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+		service.setItemAccess(resourceUid,new Long(user.getUserID().intValue()));
+		return  mapping.findForward(ResourceConstants.SUCCESS);
+	}
+	private ActionForward complete(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+		Long resourceUid = new Long(request.getParameter(ResourceConstants.PARAM_RESOURCE_ITEM_UID));
+		IResourceService service = getResourceService();
+		HttpSession ss = SessionManager.getSession();
+		//get back login user DTO
+		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+		service.setItemComplete(resourceUid,new Long(user.getUserID().intValue()));
+		return  mapping.findForward(ResourceConstants.SUCCESS);
 	}
 	/**
 	 * Save file or url resource item into database.
@@ -148,6 +212,7 @@ public class LearningAction extends Action {
 		}
 		items.add(item);
 		service.saveOrUpdateResourceSession(resSession);
+		request.setAttribute("addType",new Short(type));
 		return  mapping.findForward(ResourceConstants.SUCCESS);
 	}
 	/**
@@ -164,6 +229,15 @@ public class LearningAction extends Action {
 		
 //		get back the resource and item list and display them on page
 		IResourceService service = getResourceService();
+		//try to get form system session
+		HttpSession ss = SessionManager.getSession();
+		//get back login user DTO
+		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+		ResourceUser resourceUser = service.getUserByID(new Long(user.getUserID().intValue()));
+		if(resourceUser == null){
+			resourceUser = new ResourceUser(user,null);
+			service.createUser(resourceUser);
+		}
 
 		List items = null;
 		Resource resource;
@@ -179,6 +253,9 @@ public class LearningAction extends Action {
 		resourceItemList.clear();
 		if(items != null)
 			resourceItemList.addAll(items);
+		
+		//set complete flag for display purpose
+		service.retrieveComplete(resourceItemList, resourceUser);
 		
 		request.setAttribute(ResourceConstants.ATTR_RESOURCE,resource);
 		return mapping.findForward(ResourceConstants.SUCCESS);

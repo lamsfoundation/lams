@@ -42,7 +42,7 @@
 									<fmt:message key="label.authoring.basic.resource.file.input" />
 									<input type="file" name="file" size="25"  /> 
 								</td>
-								<td>
+								<td  align="center" valign="bottom">
 									<input type="submit" name="add" value="<fmt:message key="button.upload"/>" class="buttonStyle">
 								</td>
 							</tr>

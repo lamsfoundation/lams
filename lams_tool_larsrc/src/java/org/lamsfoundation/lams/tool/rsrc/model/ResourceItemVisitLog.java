@@ -37,6 +37,7 @@ public class ResourceItemVisitLog {
 	private Long uid;
 	private ResourceUser user;
 	private ResourceItem resourceItem;
+	private boolean complete;
 	private Date accessDate;
 	/**
 	 * @hibernate.property column="access_date"
@@ -80,6 +81,16 @@ public class ResourceItemVisitLog {
 	}
 	public void setUser(ResourceUser user) {
 		this.user = user;
+	}
+	/**
+	 * @hibernate.property column="complete"
+	 * @return
+	 */
+	public boolean isComplete() {
+		return complete;
+	}
+	public void setComplete(boolean complete) {
+		this.complete = complete;
 	}
 	
 	

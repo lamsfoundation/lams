@@ -24,7 +24,12 @@
 package org.lamsfoundation.lams.tool.rsrc.model;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
+
+import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.contentrepository.NodeKey;
 
 /**
  * Resource
@@ -33,8 +38,9 @@ import java.util.Set;
  * @hibernate.class  table="tl_larsrc11_resource_item"
  *
  */
-public class ResourceItem {
-
+public class ResourceItem  implements Cloneable{
+	private static final Logger log = Logger.getLogger(ResourceItem.class);
+	
 	private Long uid;
 	//Resource Type:1=URL,2=File,3=Website,4=Learning Object
 	private short type;
@@ -67,6 +73,32 @@ public class ResourceItem {
 	private Date createDate;
 	private ResourceUser createBy;
 	
+	//***********************************************
+	//DTO fields:
+	private boolean complete;
+	
+    public Object clone(){
+    	ResourceItem obj = null;
+		try {
+			obj = (ResourceItem) super.clone();
+//			clone attachment
+  			if(itemInstructions != null){
+  				Iterator iter = itemInstructions.iterator();
+  				Set set = new HashSet();
+  				while(iter.hasNext()){
+  					ResourceItemInstruction instruct = (ResourceItemInstruction)iter.next(); 
+  					ResourceItemInstruction newInsruct = (ResourceItemInstruction) instruct.clone();
+					set.add(newInsruct);
+  				}
+  				obj.itemInstructions = set;
+  			}
+			((ResourceItem)obj).setUid(null);
+		} catch (CloneNotSupportedException e) {
+			log.error("When clone " + ResourceItem.class + " failed");
+		}
+		
+		return obj;
+	}	
 //    **********************************************************
 	  	//		Get/Set methods
 //	  **********************************************************
@@ -256,4 +288,11 @@ public class ResourceItem {
 	    public void setFileName(String name) {
 	        this.fileName = name;
 	    }
+	    
+		public void setComplete(boolean complete) {
+			this.complete=complete;
+		}
+		public boolean isComplete() {
+			return complete;
+		}
 }

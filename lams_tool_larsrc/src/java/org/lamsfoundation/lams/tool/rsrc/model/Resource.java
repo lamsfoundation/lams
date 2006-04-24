@@ -105,6 +105,23 @@ public class Resource implements Cloneable{
   		try{
   			resource = (Resource) super.clone();
   			resource.setUid(null);
+  			if(resourceItems != null){
+  				Iterator iter = resourceItems.iterator();
+  				Set set = new HashSet();
+  				while(iter.hasNext()){
+  					ResourceItem item = (ResourceItem)iter.next(); 
+  					ResourceItem newItem = (ResourceItem) item.clone();
+//  					if toolContentHandle is null, just clone old file without duplicate it in repository
+  					if(toolContentHandler != null){
+						//duplicate file node in repository
+						NodeKey keys = toolContentHandler.copyFile(item.getFileUuid());
+						newItem.setFileUuid(keys.getUuid());
+						newItem.setFileVersionId(keys.getVersion());
+  					}
+					set.add(newItem);
+  				}
+  				resource.resourceItems = set;
+  			}
   			//clone attachment
   			if(attachments != null){
   				Iterator iter = attachments.iterator();

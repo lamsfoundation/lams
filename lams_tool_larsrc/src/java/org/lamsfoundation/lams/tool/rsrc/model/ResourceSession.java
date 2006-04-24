@@ -153,8 +153,8 @@ public class ResourceSession implements Cloneable{
 	 * 
 	 * 
 	 * @hibernate.set lazy="true"
-	 *                inverse="true"
-	 *                cascade="none"
+	 *                inverse="false"
+	 *                cascade="all"
 	 *                order-by="create_date desc"
 	 * @hibernate.collection-key column="session_uid"
 	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.rsrc.model.ResourceItem"

@@ -23,10 +23,11 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.rsrc.dao;
 
-import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
+import org.lamsfoundation.lams.tool.rsrc.model.ResourceItemVisitLog;
 
-public interface ResourceUserDAO extends DAO {
+public interface ResourceItemVisitDAO extends DAO {
 
-	ResourceUser getUserByUserID( Long userUid);
+	public ResourceItemVisitLog getResourceItemLog(Long userUid,Long itemUid);
 
+	public int getUserViewLogCount(Long userUid);
 }

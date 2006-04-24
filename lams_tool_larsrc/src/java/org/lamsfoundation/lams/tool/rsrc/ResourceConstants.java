@@ -45,6 +45,7 @@ public class ResourceConstants {
 	public static final String PARAM_FILE_VERSION_ID = "fileVersionId";
 	public static final String PARAM_FILE_UUID = "fileUuid";
 	public static final String PARAM_ITEM_INDEX = "itemIndex";
+	public static final String PARAM_RESOURCE_ITEM_UID = "itemUid";
 	
 	//for request attribute name
 	public static final String ATTR_TOOL_CONTENT_ID = "toolContentID";

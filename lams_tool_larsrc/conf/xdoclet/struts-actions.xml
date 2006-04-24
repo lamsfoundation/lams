@@ -142,6 +142,21 @@
 			parameter="start" >
 			<forward name="success" path="/pages/learning/learningframe.jsp" />
 		</action>
+		<action path="/learning/viewItem"
+			type="org.lamsfoundation.lams.tool.rsrc.web.action.LearningAction"
+			parameter="view" >
+			<forward name="success" path="/pages/learning/learning.jsp" />
+		</action>
+		<action path="/learning/completeItem"
+			type="org.lamsfoundation.lams.tool.rsrc.web.action.LearningAction"
+			parameter="complete" >
+			<forward name="success" path="/pages/learning/learning.jsp" />
+		</action>
+		<action path="/learning/finish"
+			type="org.lamsfoundation.lams.tool.rsrc.web.action.LearningAction"
+			input="/pages/learning/learning.jsp"
+			parameter="finish" >
+		</action>
 		
 		<action path="/learning/saveOrUpdateItem"
 			type="org.lamsfoundation.lams.tool.rsrc.web.action.LearningAction"

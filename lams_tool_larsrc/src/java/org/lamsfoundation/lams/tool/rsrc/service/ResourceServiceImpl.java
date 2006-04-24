@@ -27,7 +27,9 @@ import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -58,6 +60,7 @@ import org.lamsfoundation.lams.tool.rsrc.ResourceConstants;
 import org.lamsfoundation.lams.tool.rsrc.dao.ResourceAttachmentDAO;
 import org.lamsfoundation.lams.tool.rsrc.dao.ResourceDAO;
 import org.lamsfoundation.lams.tool.rsrc.dao.ResourceItemDAO;
+import org.lamsfoundation.lams.tool.rsrc.dao.ResourceItemVisitDAO;
 import org.lamsfoundation.lams.tool.rsrc.dao.ResourceSessionDAO;
 import org.lamsfoundation.lams.tool.rsrc.dao.ResourceUserDAO;
 import org.lamsfoundation.lams.tool.rsrc.ims.IContentPackageConverter;
@@ -67,6 +70,7 @@ import org.lamsfoundation.lams.tool.rsrc.ims.SimpleContentPackageConverter;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceAttachment;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
+import org.lamsfoundation.lams.tool.rsrc.model.ResourceItemVisitLog;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceSession;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
 import org.lamsfoundation.lams.tool.rsrc.util.ResourceToolContentHandler;
@@ -90,6 +94,7 @@ public class ResourceServiceImpl implements
 	private ResourceAttachmentDAO resourceAttachmentDao;
 	private ResourceUserDAO resourceUserDao;
 	private ResourceSessionDAO resourceSessionDao;
+	private ResourceItemVisitDAO resourceItemVisitDao;
 	//tool service
 	private ResourceToolContentHandler resourceToolContentHandler;
 	private MessageService messageService;
@@ -235,7 +240,7 @@ public class ResourceServiceImpl implements
 
 	public ResourceUser getUserByID(Long userUid) {
 		
-		return (ResourceUser) resourceUserDao.getUserByUserID(ResourceUser.class,userUid);
+		return (ResourceUser) resourceUserDao.getUserByUserID(userUid);
 		
 	}
 
@@ -293,7 +298,7 @@ public class ResourceServiceImpl implements
 		ResourceSession session = resourceSessionDao.getSessionBySessionId(sessionId);
 		//construct dto fields;
 		Resource res = session.getResource();
-		res.setMinViewNumber(messageService.getMessage("label.learning.minmum.review"
+		res.setMinViewNumber(messageService.getMessage("label.learning.minimum.review"
 				,new Object[new Integer(res.getMinViewResourceNumber())]));
 		return res;
 	}
@@ -304,6 +309,66 @@ public class ResourceServiceImpl implements
 
 	public void saveOrUpdateResourceSession(ResourceSession resSession) {
 		resourceSessionDao.saveObject(resSession);
+	}
+
+
+
+	public void retrieveComplete(List<ResourceItem> resourceItemList, ResourceUser user) {
+		for(ResourceItem item:resourceItemList){
+			ResourceItemVisitLog log = resourceItemVisitDao.getResourceItemLog(user.getUid(),item.getUid());
+			item.setComplete(log.isComplete());
+		}
+	}
+
+
+	public void setItemComplete(Long resourceItemUid, Long userUid) {
+		ResourceItemVisitLog log = resourceItemVisitDao.getResourceItemLog(resourceItemUid,userUid);
+		log.setComplete(true);
+		resourceItemVisitDao.saveObject(log);
+	}
+
+
+	public void setItemAccess(Long resourceItemUid, Long userUid){
+		ResourceItemVisitLog log = resourceItemVisitDao.getResourceItemLog(userUid,resourceItemUid);
+		if(log == null){
+			log = new ResourceItemVisitLog();
+			ResourceItem item = resourceItemDao.getByUid(resourceItemUid);
+			log.setResourceItem(item);
+			ResourceUser user = resourceUserDao.getUserByUserID(userUid); 
+			log.setUser(user);
+			log.setComplete(false);
+			log.setAccessDate(new Timestamp(new Date().getTime()));
+			resourceItemVisitDao.saveObject(log);
+		}
+	}
+
+
+	public String finishToolSession(Long toolSessionId, Long userId) throws ResourceApplicationException {
+		ResourceSession session = resourceSessionDao.getSessionBySessionId(toolSessionId);
+		session.setStatus(ResourceConstants.COMPLETED);
+		resourceSessionDao.saveObject(session);
+		
+		String nextUrl = null;
+		try {
+			nextUrl = this.leaveToolSession(toolSessionId,userId);
+		} catch (DataMissingException e) {
+			throw new ResourceApplicationException(e);
+		} catch (ToolException e) {
+			throw new ResourceApplicationException(e);
+		}
+		return nextUrl;
+	}
+
+	public int checkMiniView(Long toolSessionId, Long userUid) {
+		int miniView = resourceItemVisitDao.getUserViewLogCount(userUid);
+		ResourceSession session = resourceSessionDao.getSessionBySessionId(toolSessionId);
+		if(session == null){
+			log.error("Failed get session by ID [" + toolSessionId + "]");
+			return 0;
+		}
+		int reqView = session.getResource().getMinViewResourceNumber();
+		
+		return (reqView - miniView);
 	}
 
 
@@ -494,6 +559,13 @@ public class ResourceServiceImpl implements
 		this.toolService = toolService;
 	}
 
+	public ResourceItemVisitDAO getResourceItemVisitDao() {
+		return resourceItemVisitDao;
+	}
+	public void setResourceItemVisitDao(ResourceItemVisitDAO resourceItemVisitDao) {
+		this.resourceItemVisitDao = resourceItemVisitDao;
+	}
+
 	//*******************************************************************************
 	//ToolContentManager, ToolSessionManager methods
 	//*******************************************************************************
@@ -513,7 +585,7 @@ public class ResourceServiceImpl implements
 		Resource toContent = Resource.newInstance(resource,toContentId,resourceToolContentHandler);
 		resourceDao.saveObject(toContent);
 		
-		//save resource items
+		//save resource items as well
 		Set items = toContent.getResourceItems();
 		if(items != null){
 			Iterator iter = items.iterator();
@@ -604,5 +676,6 @@ public class ResourceServiceImpl implements
 	public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException {
 		resourceSessionDao.deleteBySessionId(toolSessionId);
 	}
+
 
 }

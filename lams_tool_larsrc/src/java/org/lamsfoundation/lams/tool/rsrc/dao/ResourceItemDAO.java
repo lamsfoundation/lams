@@ -25,6 +25,8 @@ package org.lamsfoundation.lams.tool.rsrc.dao;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
+
 public interface ResourceItemDAO extends DAO {
 	
 	/**
@@ -33,5 +35,7 @@ public interface ResourceItemDAO extends DAO {
 	 * @return
 	 */
 	List getAuthoringItems(Long resourceUid);
+
+	ResourceItem getByUid(Long resourceItemUid);
 
 }

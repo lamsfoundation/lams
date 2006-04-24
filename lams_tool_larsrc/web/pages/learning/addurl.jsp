@@ -39,10 +39,10 @@
 							</tr>
 							<tr>
 								<td>
-									<fmt:message key="label.authoring.basic.resource.file.input" />
+									<fmt:message key="label.authoring.basic.resource.url.input" />
 									<input type="url" name="url" size="40"  /> 
 								</td>
-								<td>
+								<td align="center" valign="bottom">
 									<input type="submit" name="add" value="<fmt:message key="button.upload"/>" class="buttonStyle">
 								</td>
 							</tr>

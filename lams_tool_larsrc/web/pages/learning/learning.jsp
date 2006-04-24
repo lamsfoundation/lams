@@ -14,6 +14,18 @@
 			parent.newResourceFrame.location = "<c:url value="/pages/learning/addfile.jsp"/>";
 	      	parent.newResourceFrame.focus();
 		}
+		function checkNew(){
+			parent.learningFrame.location = "<c:url value="/learning/start.do"/>?toolSessionID=${toolSessionID}";
+		}
+		function viewItem(itemUid){
+			parent.learningFrame.location = "<c:url value="/learning/viewItem.do"/>?itemUid=" + itemUid;
+		}
+		function completeItem(itemUid){
+			parent.learningFrame.location = "<c:url value="/learning/completeItem.do"/>?itemUid=" + itemUid;
+		}
+		function finishSession(){
+			location.href='<c:url value="/learning/finish.do?toolSessionID=${toolSessionID}&mode=learner"/>';
+		}
 	-->        
     </script>
 </head>
@@ -32,6 +44,7 @@
 			</td>
 		</tr>
 	</table>
+	<%@ include file="/common/messages.jsp"%>
 	<table border="0" align="center" class="forms" width="95%">
 		<tr>
 			<th scope="col">
@@ -41,22 +54,30 @@
 				<fmt:message key="label.completed" />
 			</th>
 			<th scope="col" style="width:200px">
-				<a href="javascript:;" style="width:120px" class="button"><fmt:message key="label.check.for.new" /></a>
+				<a href="javascript:;" style="width:120px" class="button" onclick="checkNew()"><fmt:message key="label.check.for.new" /></a>
 			</th>
 		</tr>
 		<c:forEach var="item" items="${resourceList}">
 			<tr>
-				<td></td>
-				<td></td>
+				<td>${item.title}</td>
 				<td>
-					<a href="javascript:;" class="button"><fmt:message key="label.view" /></a>
-					<a href="javascript:;" class="button"><fmt:message key="label.completed" /></a>
+					<c:if test="${item.complete}">
+						<img src="<html:rewrite page='/includes/images/cross.gif'/>" border="0">
+					</c:if>
+				
+				</td>
+				
+				<td>
+					<a href="javascript:;" class="button" onclick="viewItem(${item.uid})" ><fmt:message key="label.view" /></a>
+					<a href="javascript:;" class="button" onclick="completeItem(${item.uid})"><fmt:message key="label.completed" /></a>
 				</td>
 			</tr>
 		</c:forEach>
 		<tr>
 			<td colspan="3" align="right">
-				<a href="javascript:;" class="button"><fmt:message key="label.finished" /></a>
+				<a href="javascript:;" class="button" onclick="finishSession()">
+					<fmt:message key="label.finished" />
+				</a>
 			</td>
 		</tr>
 		<c:if test="${resource.minViewNumber}">

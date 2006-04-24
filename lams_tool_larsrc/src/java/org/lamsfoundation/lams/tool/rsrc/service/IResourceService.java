@@ -32,6 +32,7 @@ import org.lamsfoundation.lams.tool.rsrc.model.ResourceAttachment;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceSession;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
+import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * @author Dapeng.Ni
@@ -77,5 +78,22 @@ public interface IResourceService
 	ResourceSession getResourceSessionBySessionId(Long sessionId);
 
 	void saveOrUpdateResourceSession(ResourceSession resSession);
+	
+	void retrieveComplete(List<ResourceItem> resourceItemList, ResourceUser user);
+	void setItemComplete(Long resourceItemUid, Long userUid);
+	void setItemAccess(Long resourceItemUid, Long userUid);
+	/**
+	 * the reqired number minus the count of view of the given user.
+	 * @param userUid
+	 * @return
+	 */
+	int checkMiniView(Long toolSessionId, Long userUid);
+	/**
+	 * If success return next activity's url, otherwise return null.
+	 * @param toolSessionId
+	 * @param userId
+	 * @return
+	 */
+	String finishToolSession(Long toolSessionId, Long userId)  throws ResourceApplicationException;
 }
 

@@ -24,19 +24,32 @@
 package org.lamsfoundation.lams.tool.rsrc.model;
 
 import java.util.Set;
+
+import org.apache.log4j.Logger;
 /**
  * @hibernate.class table="tl_larsrc11_item_instruction"
  * @author Steve.Ni
  * 
  * @version $Revision$
  */
-public class ResourceItemInstruction {
-
+public class ResourceItemInstruction  implements Cloneable{
+	private static final Logger log = Logger.getLogger(ResourceItemInstruction.class);
+	
 	private Long uid;
 	private int sequenceId;
 	private String description;
 
-
+    public Object clone(){
+		Object obj = null;
+		try {
+			obj = super.clone();
+			((ResourceItemInstruction)obj).setUid(null);
+		} catch (CloneNotSupportedException e) {
+			log.error("When clone " + ResourceItemInstruction.class + " failed");
+		}
+		
+		return obj;
+	}
 // **********************************************************
 	  	//		Get/Set methods
 //	  **********************************************************
