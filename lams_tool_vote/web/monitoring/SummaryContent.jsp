@@ -90,7 +90,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			  	 			<td> &nbsp&nbsp&nbsp</td>
 			  	 		</tr>
 						<tr>			
-							<td NOWRAP valign=top align=left><b> <font size=2> <bean:message key="label.question"/> </b>
+							<td NOWRAP valign=top align=left><b> <font size=2> <bean:message key="label.nomination"/> </b>
 								<c:out value="${currentDto.question}" escapeXml="false"/>
 							</font> </td>
 						</tr>	
@@ -109,7 +109,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								  	 		<c:set var="userData" scope="request" value="${sData.value}"/>
 								  	 		<c:set var="responseUid" scope="request" value="${userData.uid}"/>
 
-	  	 									<c:if test="${currentQuestionId == userData.questionUid}"> 			
+	  	 									<c:if test="${currentQuestionId == userData.questionUid}">
 		  	 									<c:if test="${sessionScope.currentMonitoredToolSession == 'All'}"> 			
 															<jsp:include page="/monitoring/UserResponses.jsp" />
 												</c:if>														  					 									  			

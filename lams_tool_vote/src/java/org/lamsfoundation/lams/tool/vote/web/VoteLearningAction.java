@@ -23,6 +23,8 @@
 package org.lamsfoundation.lams.tool.vote.web;
 
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -44,7 +46,9 @@ import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
 import org.lamsfoundation.lams.tool.vote.VoteComparator;
 import org.lamsfoundation.lams.tool.vote.VoteUtils;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
+import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
+import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 
@@ -149,10 +153,35 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 	 	
 	 	Long toolContentId=(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
     	logger.debug("toolContentId: " + toolContentId);
-    			
+
+    	VoteQueUsr voteQueUsr=LearningUtil.getUser(request);
+    	logger.debug("voteQueUsr: " + voteQueUsr);
+
+    	List attempts=voteService.getAttemptsForUser(voteQueUsr.getUid());
+    	logger.debug("attempts: " + attempts);
+    	
+    	Map mapQuestionsContent= new TreeMap(new VoteComparator());
+		Iterator listIterator=attempts.iterator();
+		int order=0;
+    	while (listIterator.hasNext())
+    	{
+    	    VoteUsrAttempt attempt=(VoteUsrAttempt)listIterator.next();
+        	logger.debug("attempt: " + attempt);
+        	VoteQueContent voteQueContent=attempt.getVoteQueContent();
+        	logger.debug("voteQueContent: " + voteQueContent);        	
+        	order++;
+    		if (voteQueContent != null)
+    		{
+            	mapQuestionsContent.put(new Integer(order).toString(),voteQueContent.getQuestion());
+    		}
+    	}
+    	request.getSession().setAttribute(MAP_VIEWONLY_QUESTION_CONTENT_LEARNER, mapQuestionsContent);
+    	logger.debug("MAP_VIEWONLY_QUESTION_CONTENT_LEARNER: " +  request.getSession().getAttribute(MAP_VIEWONLY_QUESTION_CONTENT_LEARNER));
+    	
     	
     	voteLearningForm.resetCommands();
-		return (mapping.findForward(INDIVIDUAL_REPORT));
+    	logger.debug("fwd'ing to : " + VIEW_ANSWERS);
+		return (mapping.findForward(VIEW_ANSWERS));
     }
     
 
@@ -301,19 +330,21 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
         	}
     	}
     	
-    	logger.debug("new nominationCount: " + nominationCount+1);
-    	
+    	int newNominationCount=nominationCount+1;
+    	logger.debug("newNominationCount: " + newNominationCount);
     	logger.debug("creating attemps with mapGeneralCheckedOptionsContent " + mapGeneralCheckedOptionsContent);
     	voteService.removeAttemptsForUser(voteQueUsr.getUid());
     	logger.debug("nominations deleted for user: " + voteQueUsr.getUid());
-    	LearningUtil.createAttempt(request, voteQueUsr, mapGeneralCheckedOptionsContent, userEntry, nominationCount++, false);
+    	LearningUtil.createAttempt(request, voteQueUsr, mapGeneralCheckedOptionsContent, userEntry, newNominationCount, false);
+
+    	logger.debug("using nominationCount: " + nominationCount);
     	
-    	if (mapGeneralCheckedOptionsContent.size() == 0)
+    	if ((mapGeneralCheckedOptionsContent.size() == 0  && (userEntryAvailable == true)))
     	{
     		logger.debug("mapGeneralCheckedOptionsContent size is 0");
     		Map mapLeanerCheckedOptionsContent= new TreeMap(new VoteComparator());
     		mapLeanerCheckedOptionsContent.put("101", userEntry);
-			//request.getSession().setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, mapLeanerCheckedOptionsContent);
+
 			logger.debug("after mapsize check  mapLeanerCheckedOptionsContent " + mapLeanerCheckedOptionsContent);
 			logger.debug("using nominationCount: " + nominationCount);
 			if (userEntry.length() > 0)
@@ -321,10 +352,22 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 			    logger.debug("creating entry for: " + userEntry);
 			    LearningUtil.createAttempt(request, voteQueUsr, mapLeanerCheckedOptionsContent, userEntry, nominationCount, true);    
 			}
-			        
-	    	
-	    	
     	}
+    	if ((mapGeneralCheckedOptionsContent.size() > 0) && (userEntryAvailable == true))
+    	{
+    		logger.debug("mapGeneralCheckedOptionsContent size is > 0" + userEntry);
+    		Map mapLeanerCheckedOptionsContent= new TreeMap(new VoteComparator());
+    		mapLeanerCheckedOptionsContent.put("102", userEntry);
+
+			logger.debug("after mapsize check  mapLeanerCheckedOptionsContent " + mapLeanerCheckedOptionsContent);
+			logger.debug("using nominationCount: " + nominationCount);
+			if (userEntry.length() > 0)
+			{
+			    logger.debug("creating entry for: " + userEntry);
+			    LearningUtil.createAttempt(request, voteQueUsr, mapLeanerCheckedOptionsContent, userEntry, nominationCount, false);    
+			}
+    	}
+
     	
     	logger.debug("created user attempt in the db");
     	voteLearningForm.resetCommands();
@@ -364,6 +407,17 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 	    request.getSession().setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, mapGeneralCheckedOptionsContent);
 	    
 	    voteLearningForm.setUserEntry("");
+	    
+	    String previewOnly=(String)request.getSession().getAttribute(PREVIEW_ONLY);
+	    logger.debug("previewOnly : " + previewOnly);
+	    if (previewOnly != null)
+	    {
+		    if (previewOnly.equals("true"))
+		    {
+		        logger.debug("request is for previewOnly : " + previewOnly);
+		        return (mapping.findForward(PREVIEW));
+		    }
+	    }
 	    return (mapping.findForward(LOAD_LEARNER));
    }
 
@@ -393,126 +447,6 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
    }
 
 
-    public ActionForward displayVote(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response) throws IOException,
-                                      ServletException
-   {
-    	VoteUtils.cleanUpUserExceptions(request);
-    	VoteLearningForm voteLearningForm = (VoteLearningForm) form;
-	 	IVoteService voteService =VoteUtils.getToolService(request);
-	 	
-    	voteLearningForm.resetParameters();
-    	LearningUtil.readParameters(request, voteLearningForm);
-    	
-    	if (voteLearningForm.getContinueOptionsCombined() != null)
-    	{
-    		setContentInUse(request);
-    		return continueOptionsCombined(mapping, form, request, response);
-    	}
-    	else if (voteLearningForm.getOptionCheckBoxSelected() != null)
-    	{
-    		logger.debug("doing getOptionCheckBoxSelected");
-    		setContentInUse(request);
-    		voteLearningForm.resetCommands();
-    		LearningUtil.selectOptionsCheckBox(request,voteLearningForm, voteLearningForm.getQuestionIndex());
-    	}
-
-    	else if (voteLearningForm.getRedoQuestions() != null)
-    	{
-    		setContentInUse(request);
-    		//return redoQuestions(mapping, form, request, response);
-    		return null;
-    	}
-    	else if (voteLearningForm.getRedoQuestionsOk() != null)
-    	{
-    		setContentInUse(request);
-    		logger.debug("requested redoQuestionsOk, user is sure to redo the questions.");
-    		voteLearningForm.resetCommands();
-    		//return redoQuestions(request, voteLearningForm, mapping);
-    		return null;
-    	}
-    	else if (voteLearningForm.getViewAnswers() != null)
-    	{
-    		setContentInUse(request);
-    		//return viewAnswers(mapping, form, request, response);
-    		return null;
-    	}
-    	else if (voteLearningForm.getViewSummary() != null)
-    	{
-    		setContentInUse(request);
-			//return viewSummary(mapping, form, request, response);
-    		return null;    		
-    	}
-    	else if (voteLearningForm.getLearnerFinished() != null)
-    	{
-    		logger.debug("requested learner finished, the learner should be directed to next activity.");
-    		
-    		Long toolSessionId = (Long) request.getSession().getAttribute(TOOL_SESSION_ID);
-    		String userID=(String) request.getSession().getAttribute(USER_ID);
-    		logger.debug("attempting to leave/complete session with toolSessionId:" + toolSessionId + " and userID:"+userID);
-    		
-    		VoteUtils.cleanUpSessionAbsolute(request);
-    		
-    		String nextUrl=null;
-    		try
-    		{
-    			nextUrl=voteService.leaveToolSession(toolSessionId, new Long(userID));
-    			logger.debug("nextUrl: "+ nextUrl);
-    		}
-    		catch (DataMissingException e)
-    		{
-    			logger.debug("failure getting nextUrl: "+ e);
-        		voteLearningForm.resetCommands();
-    			//throw new ServletException(e);
-        		return (mapping.findForward(LEARNING_STARTER));
-    		}
-    		catch (ToolException e)
-    		{
-    			logger.debug("failure getting nextUrl: "+ e);
-        		voteLearningForm.resetCommands();
-    			//throw new ServletException(e);
-        		return (mapping.findForward(LEARNING_STARTER));        		
-    		}
-    		catch (Exception e)
-    		{
-    			logger.debug("unknown exception getting nextUrl: "+ e);
-        		voteLearningForm.resetCommands();
-    			//throw new ServletException(e);
-        		return (mapping.findForward(LEARNING_STARTER));        		
-    		}
-
-    		logger.debug("success getting nextUrl: "+ nextUrl);
-    		voteLearningForm.resetCommands();
-    		
-    		/* pay attention here*/
-    		logger.debug("redirecting to the nextUrl: "+ nextUrl);
-    		response.sendRedirect(nextUrl);
-    		
-    		return null;
-    	}
-    	else if (voteLearningForm.getDonePreview() != null)
-    	{
-    		logger.debug("requested  donePreview.");
-        	voteLearningForm.resetCommands();
-        	VoteUtils.cleanUpSessionAbsolute(request);
-        	return (mapping.findForward(LEARNING_STARTER));
-    	}
-    	else if (voteLearningForm.getDoneLearnerProgress() != null)
-    	{
-    		logger.debug("requested  doneLearnerProgress.");
-        	voteLearningForm.resetCommands();
-        	VoteUtils.cleanUpSessionAbsolute(request);
-        	return (mapping.findForward(LEARNING_STARTER));
-    	}
-    	
-    	voteLearningForm.resetCommands();	
- 		return (mapping.findForward(LOAD_LEARNER));
-   }
-    
-    
-    
     protected void setContentInUse(HttpServletRequest request)
     {
     	IVoteService voteService =VoteUtils.getToolService(request);

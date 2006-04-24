@@ -18,7 +18,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   http://www.gnu.org/licenses/gpl.txt
 --%>
-
 <%@ taglib uri="tags-bean" prefix="bean"%> 
 <%@ taglib uri="tags-html" prefix="html"%>
 <%@ taglib uri="tags-logic" prefix="logic" %>
@@ -31,72 +30,59 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
-		<html:form  action="/learning?method=displayMc&validate=false" method="POST" target="_self">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html:html locale="true">
+<head>
+	<jsp:include page="/learning/learningHeader.jsp" />
+</head>
+<body>
+
+<html:form  action="/learning?validate=false" enctype="multipart/form-data"method="POST" target="_self">
+	<html:hidden property="dispatch"/>
+	<html:hidden property="toolContentID"/>
+
 				<table align=center bgcolor="#FFFFFF">
 					  <tr>
-					  	<td NOWRAP align=left class="input" valign=top bgColor="#333366" colspan=2> 
-						  	<font size=2 color="#FFFFFF"> <b>  <bean:message key="label.assessment"/> </b> </font>
+					  	<td NOWRAP align=center class="input" valign=top bgColor="#333366" colspan=2> 
+						  	<font size=2 color="#FFFFFF"> <b>  <bean:message key="label.progressiveResults"/> </b> </font>
 					  	</td>
 					  </tr>
 				
-			 		<c:if test="${sessionScope.isRetries == 'true'}"> 		
-						  <tr>
-						  	<td NOWRAP align=center class="input" valign=top colspan=2> 
-							  	<font size=3> <b>  <bean:message key="label.individual.results.withRetries"/> </b> </font>
-						  	</td>
-						  </tr>
-  					</c:if> 			
-
-					<c:if test="${sessionScope.isRetries == 'false'}"> 							  
-						  <tr>
-						  	<td NOWRAP align=center class="input" valign=top colspan=2> 
-							  	<font size=3> <b>  <bean:message key="label.individual.results.withoutRetries"/> </b> </font>
-						  	</td>
-						  </tr>
-					</c:if> 			
-
-
-					  <tr>
-					  	<td NOWRAP align=center class="input" valign=top colspan=2> 
-						  	<font size=3>  <bean:message key="label.learner.redo"/> </font>
-					  	</td>
-					  </tr>	
-
 					  <tr>
 					  	<td NOWRAP align=right class="input" valign=top colspan=2> 
 							&nbsp
 					  	</td>
 					  </tr>	
 
-
 					  <tr>
 					  	<td NOWRAP align=center class="input" valign=top colspan=2> 
-						  	<font size=2>  <bean:message key="label.learner.bestMark"/>
-						  	<b>   <c:out value="${sessionScope.learnerBestMark}"/> </b> 
-						  	<bean:message key="label.outof"/> 
-						  	<b> <c:out value="${sessionScope.totalQuestionCount}"/> </b> </font>
+								CHART FOR ALL RESULTS 
 					  	</td>
 					  </tr>	
-					  
-					<tr> 
-				 		<td NOWRAP colspan=2 class="input" valign=top> 
-				 		&nbsp
-				 		</td>
-			  	   </tr>
-					  
-					  
+
+
+
 				  <tr>
 				  	<td NOWRAP colspan=2 align=center class="input" valign=top> 
 					  	<font size=2>
-				  			<html:submit property="viewAnswers" styleClass="button">
-								<bean:message key="label.view.answers"/>
-							</html:submit>	 		
+                                <html:submit property="viewAnswers" 
+                                             styleClass="linkbutton" 
+                                             onclick="submitMethod('viewAnswers');">
+                                    <bean:message key="label.view.answers"/>
+                                </html:submit>
 	   						&nbsp&nbsp&nbsp&nbsp&nbsp
-	   						<html:submit property="redoQuestionsOk" styleClass="button">
-								<bean:message key="label.redo.questions"/>
-							</html:submit>	 				 		  					
+                                <html:submit property="redoQuestionsOk" 
+                                             styleClass="linkbutton" 
+                                             onclick="submitMethod('redoQuestionsOk');">
+                                    <bean:message key="label.retake"/>
+                                </html:submit>
 						</font>
 				  	 </td>
 				  </tr>
-		</html:form>
+</html:form>
+
+</body>
+</html:html>
+
+
 

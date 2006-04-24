@@ -64,45 +64,37 @@ public class VoteQueContent implements Serializable, Comparable {
     /** persistent field */
     private Set voteUsrAttempts;
 
-    /** persistent field */
-    private Set voteOptionsContents;
-
     /** full constructor */
-    public VoteQueContent(Long voteQueContentId, String question,  VoteContent voteContent, Set voteUsrAttempts, Set voteOptionsContents) {
+    public VoteQueContent(Long voteQueContentId, String question,  VoteContent voteContent, Set voteUsrAttempts) {
         this.voteQueContentId = voteQueContentId;
         this.question = question;
         this.voteContent=voteContent;
         this.voteUsrAttempts = voteUsrAttempts;
-        this.voteOptionsContents = voteOptionsContents;
     }
     
-    public VoteQueContent(String question,  VoteContent voteContent, Set voteUsrAttempts, Set voteOptionsContents) {
+    public VoteQueContent(String question,  VoteContent voteContent, Set voteUsrAttempts) {
         this.question = question;
         this.voteContent=voteContent;
         this.voteUsrAttempts = voteUsrAttempts;
-        this.voteOptionsContents = voteOptionsContents;
     }
 
-    public VoteQueContent(String question,  int displayOrder, VoteContent voteContent, Set voteUsrAttempts, Set voteOptionsContents) {
+    public VoteQueContent(String question,  int displayOrder, VoteContent voteContent, Set voteUsrAttempts) {
         this.question = question;
         this.displayOrder=displayOrder;
         this.voteContent=voteContent;
         this.voteUsrAttempts = voteUsrAttempts;
-        this.voteOptionsContents = voteOptionsContents;
     }
 
     
-    public VoteQueContent(Long voteQueContentId, String question, Set voteUsrAttempts, Set voteOptionsContents) {
+    public VoteQueContent(Long voteQueContentId, String question, Set voteUsrAttempts) {
         this.voteQueContentId = voteQueContentId;
         this.question = question;
         this.voteUsrAttempts = voteUsrAttempts;
-        this.voteOptionsContents = voteOptionsContents;
     }
     
-    public VoteQueContent(String question, Set voteUsrAttempts, Set voteOptionsContents) {
+    public VoteQueContent(String question, Set voteUsrAttempts) {
         this.question = question;
         this.voteUsrAttempts = voteUsrAttempts;
-        this.voteOptionsContents = voteOptionsContents;
     }
     
     
@@ -112,11 +104,10 @@ public class VoteQueContent implements Serializable, Comparable {
     }
 
     /** minimal constructor */
-    public VoteQueContent(Long voteQueContentId, org.lamsfoundation.lams.tool.vote.pojos.VoteContent voteContent, Set voteUsrAttempts, Set voteOptionsContents) {
+    public VoteQueContent(Long voteQueContentId, org.lamsfoundation.lams.tool.vote.pojos.VoteContent voteContent, Set voteUsrAttempts) {
         this.voteQueContentId = voteQueContentId;
         this.voteContent = voteContent;
         this.voteUsrAttempts = voteUsrAttempts;
-        this.voteOptionsContents = voteOptionsContents;
     }
     
     
@@ -134,7 +125,6 @@ public class VoteQueContent implements Serializable, Comparable {
     	VoteQueContent newQueContent = new VoteQueContent(queContent.getQuestion(),
     	        										displayOrder, 
 													  newMcContent,
-                                                      new TreeSet(),
                                                       new TreeSet());
     	
     	return newQueContent;
@@ -177,16 +167,6 @@ public class VoteQueContent implements Serializable, Comparable {
     }
 
     
-    public Set getVoteOptionsContents() {
-    	if (this.voteOptionsContents == null)
-        	setVoteOptionsContents(new HashSet());
-        return this.voteOptionsContents;
-    }
-
-    public void setMcOptionsContents(Set voteOptionsContents) {
-        this.voteOptionsContents = voteOptionsContents;
-    }
-
     public String toString() {
         return new ToStringBuilder(this)
             .append("uid", getUid())
@@ -258,12 +238,7 @@ public class VoteQueContent implements Serializable, Comparable {
     public void setVoteUsrAttempts(Set voteUsrAttempts) {
         this.voteUsrAttempts = voteUsrAttempts;
     }
-    /**
-     * @param voteOptionsContents The voteOptionsContents to set.
-     */
-    public void setVoteOptionsContents(Set voteOptionsContents) {
-        this.voteOptionsContents = voteOptionsContents;
-    }
+
     /**
      * @return Returns the displayOrder.
      */

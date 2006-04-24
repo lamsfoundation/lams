@@ -64,39 +64,6 @@ public class AuthoringUtil implements VoteAppConstants {
 
     protected static void setRadioboxes(VoteContent voteContent, VoteAuthoringForm voteAuthoringForm)
 	{
-		if (voteContent.isQuestionsSequenced())
-		{
-			voteAuthoringForm.setQuestionsSequenced(ON);
-			logger.debug("setting questionsSequenced to true");
-		}
-		else
-		{
-			voteAuthoringForm.setQuestionsSequenced(OFF);	
-			logger.debug("setting questionsSequenced to false");				
-		}
-
-		if (voteContent.isRetries())
-		{
-			voteAuthoringForm.setRetries(ON);	
-			logger.debug("setting retries to true");
-		}
-		else
-		{
-			voteAuthoringForm.setRetries(OFF);	
-			logger.debug("setting retries to false");				
-		}
-
-		
-		if (voteContent.isShowReport())
-		{
-			voteAuthoringForm.setSln(ON);	
-			logger.debug("setting sln to true");
-		}
-		else
-		{
-			voteAuthoringForm.setSln(OFF);	
-			logger.debug("setting sln to false");				
-		}
 	}
 
     
@@ -1075,9 +1042,6 @@ public class AuthoringUtil implements VoteAppConstants {
         String allowText=voteAuthoringForm.getAllowText();
         logger.debug("allowText: " + allowText);
 
-        String retries = voteAuthoringForm.getRetries();
-        logger.debug("retries: " + retries);
-        
         String maxNomcount= voteAuthoringForm.getMaxNominationCount();
 	    logger.debug("maxNomcount: " + maxNomcount);
 	    
@@ -1096,9 +1060,6 @@ public class AuthoringUtil implements VoteAppConstants {
         String activeModule=(String)request.getSession().getAttribute(ACTIVE_MODULE);
         logger.debug("activeModule: " + activeModule);
 
-        boolean questionsSequencedBoolean=false;
-        boolean synchInMonitorBoolean=false;
-        boolean retriesBoolean=false;
         boolean voteChangableBoolean=false;
         boolean lockedOnFinishBoolean=false;
         boolean allowTextBoolean=false;
@@ -1113,9 +1074,6 @@ public class AuthoringUtil implements VoteAppConstants {
 
             if (allowText.equalsIgnoreCase(ON))
                 allowTextBoolean=true;
-            
-            if (retries.equalsIgnoreCase(ON))
-                retriesBoolean=true;
         }
         
         
@@ -1177,7 +1135,6 @@ public class AuthoringUtil implements VoteAppConstants {
          	voteContent.setLockOnFinish(lockedOnFinishBoolean);
          	voteContent.setAllowText(allowTextBoolean);
          	voteContent.setMaxNominationCount(maxNomcount);
-         	voteContent.setRetries(retriesBoolean);
          	voteContent.setOnlineInstructions(richTextOnlineInstructions);
          	voteContent.setOfflineInstructions(richTextOfflineInstructions);
 		}
@@ -1228,7 +1185,6 @@ public class AuthoringUtil implements VoteAppConstants {
 	        	VoteQueContent queContent=  new VoteQueContent(pairs.getValue().toString(),
 	        	        									diplayOrder,
 		        											voteContent,
-															null,
 															null);
 		        
 		        

@@ -91,25 +91,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		         </tr>
 
 
-		         <tr>
-					<td NOWRAP class="formlabel" valign=top>
-						<font size=2>
-			      			<b> <bean:message key="radiobox.retries"/>: </b>
-		      			</font>
-					</td>
-					<td NOWRAP valign=top>
-						<font size=2>
-							<html:radio property="retries" value="ON">
-							 <bean:message key="option.on"/>
-							</html:radio>
-	
-							<html:radio property="retries" value="OFF">
-							 <bean:message key="option.off"/>
-							</html:radio>
-						</font>
-	      			</td>
-				</tr>	      			
-				
 			  	<tr> 
 	      			<td NOWRAP class="formlabel" valign=top>
 	      			<font size=2> <b>

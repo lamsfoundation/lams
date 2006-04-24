@@ -521,13 +521,11 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 		{
 			request.getSession().setAttribute(ACTIVITY_TITLE, "Questions and Answers");
 			request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, "Please answer the questions.");
-			request.getSession().setAttribute(POSTING, "sample posting");
 		}
 		else
 		{
 			request.getSession().setAttribute(ACTIVITY_TITLE, voteContent.getTitle());
 			request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, voteContent.getInstructions());
-			request.getSession().setAttribute(POSTING, voteContent.getPosting());
 		}
 
 		
@@ -588,14 +586,6 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 		logger.debug("final title: " + voteAuthoringForm.getTitle());
 		logger.debug("final ins: " + voteAuthoringForm.getInstructions());
 		
-        //determine the status of radio boxes
-        voteAuthoringForm.setUsernameVisible(voteContent.isUsernameVisible()?ON:OFF);
-        voteAuthoringForm.setRetries(voteContent.isRetries()?ON:OFF);
-        voteAuthoringForm.setQuestionsSequenced(voteContent.isQuestionsSequenced()?ON:OFF);
-        
-        request.getSession().setAttribute(RICHTEXT_REPORT_TITLE, voteContent.getReportTitle());
-        request.getSession().setAttribute(RICHTEXT_END_LEARNING_MSG, voteContent.getEndLearningMessage());
-        
         request.getSession().setAttribute(RICHTEXT_OFFLINEINSTRUCTIONS, voteContent.getOfflineInstructions());
         request.getSession().setAttribute(RICHTEXT_ONLINEINSTRUCTIONS, voteContent.getOnlineInstructions());
         

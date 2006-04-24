@@ -48,6 +48,8 @@ public class VoteMonitoredUserDTO implements Comparable
 	
 	private String response;
 	
+	private String userEntry;
+	
 	private String sessionId;
 	
 	private String questionUid;
@@ -190,4 +192,16 @@ public class VoteMonitoredUserDTO implements Comparable
 	public void setQuestionUid(String questionUid) {
 		this.questionUid = questionUid;
 	}
+    /**
+     * @return Returns the userEntry.
+     */
+    public String getUserEntry() {
+        return userEntry;
+    }
+    /**
+     * @param userEntry The userEntry to set.
+     */
+    public void setUserEntry(String userEntry) {
+        this.userEntry = userEntry;
+    }
 }

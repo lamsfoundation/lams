@@ -89,19 +89,6 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 	protected String richTextOfflineInstructions;
 	protected String richTextOnlineInstructions;
 	
-	/* advanced content */
-	protected String synchInMonitor;
-	protected String showFeedback;
-	protected String retries;
-	protected String sln;
-	
-	protected String passmark;
-	
-	protected String reportTitle;
-	protected String monitoringReportTitle;
-	protected String endLearningMessage;
-	protected String usernameVisible;
-	protected String questionsSequenced;
 	
 	/* proxy controllers for Monitoring tabs */ 
 	protected String summaryMonitoring;
@@ -170,22 +157,12 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 		this.isRemoveContent=null;
 		this.toolContentId=null;
 		
-
 		this.onlineInstructions=null;
 		this.offlineInstructions=null;
 		
 		this.richTextOfflineInstructions=null;
 		this.richTextOnlineInstructions=null;
 	
-		this.endLearningMessage=null;
-		this.synchInMonitor=null;
-		this.reportTitle=null;
-		this.monitoringReportTitle=null;
-		this.questionsSequenced=null;
-		this.showFeedback=null;
-		this.retries=null;
-		this.sln=null;
-		this.passmark=null;
 		this.voteChangable=null;
 		this.lockOnFinish=null;
 		this.allowText=null;
@@ -201,12 +178,6 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 	
 	public void resetRadioBoxes()
 	{
-		this.synchInMonitor		 =OPTION_OFF;
-		this.questionsSequenced	 =OPTION_OFF;
-    	this.retries 			 =OPTION_OFF;
-    	this.sln				 =OPTION_OFF;
-    	this.showFeedback 		 =OPTION_OFF;
-    	this.usernameVisible	 =OPTION_OFF;
     	this.voteChangable		 =OPTION_OFF;
 		this.lockOnFinish		 =OPTION_OFF;
 		this.allowText			 =OPTION_OFF;
@@ -347,18 +318,6 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 		this.onlineInstructions = onlineInstructions;
 	}
 	
-	/**
-	 * @return Returns the syncInMonitor.
-	 */
-	public String getSynchInMonitor() {
-		return synchInMonitor;
-	}
-	/**
-	 * @param syncInMonitor The syncInMonitor to set.
-	 */
-	public void setSynchInMonitor(String synchInMonitor) {
-		this.synchInMonitor = synchInMonitor;
-	}
 	
 	/**
 	 * @return Returns the choiceAdvanced.
@@ -408,30 +367,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 	public void setChoice(String choice) {
 		this.choice = choice;
 	}
-	/**
-	 * @return Returns the reportTitle.
-	 */
-	public String getReportTitle() {
-		return reportTitle;
-	}
-	/**
-	 * @param reportTitle The reportTitle to set.
-	 */
-	public void setReportTitle(String reportTitle) {
-		this.reportTitle = reportTitle;
-	}
-	/**
-	 * @return Returns the usernameVisible.
-	 */
-	public String getUsernameVisible() {
-		return usernameVisible;
-	}
-	/**
-	 * @param usernameVisible The usernameVisible to set.
-	 */
-	public void setUsernameVisible(String usernameVisible) {
-		this.usernameVisible = usernameVisible;
-	}
+
 	/**
 	 * @return Returns the submitTabDone.
 	 */
@@ -445,42 +381,6 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 		this.submitTabDone = submitTabDone;
 	}
 	
-	/**
-	 * @return Returns the questionsSequenced.
-	 */
-	public String getQuestionsSequenced() {
-		return questionsSequenced;
-	}
-	/**
-	 * @param questionsSequenced The questionsSequenced to set.
-	 */
-	public void setQuestionsSequenced(String questionsSequenced) {
-		this.questionsSequenced = questionsSequenced;
-	}
-	/**
-	 * @return Returns the endLearningMessage.
-	 */
-	public String getEndLearningMessage() {
-		return endLearningMessage;
-	}
-	/**
-	 * @param endLearningMessage The endLearningMessage to set.
-	 */
-	public void setEndLearningMessage(String endLearningMessage) {
-		this.endLearningMessage = endLearningMessage;
-	}
-	/**
-	 * @return Returns the monitoringReportTitle.
-	 */
-	public String getMonitoringReportTitle() {
-		return monitoringReportTitle;
-	}
-	/**
-	 * @param monitoringReportTitle The monitoringReportTitle to set.
-	 */
-	public void setMonitoringReportTitle(String monitoringReportTitle) {
-		this.monitoringReportTitle = monitoringReportTitle;
-	}
 	/**
 	 * @return Returns the editActivityMonitoring.
 	 */
@@ -663,42 +563,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 	public void setOptionIndex(String optionIndex) {
 		this.optionIndex = optionIndex;
 	}
-	/**
-	 * @return Returns the retries.
-	 */
-	public String getRetries() {
-		return retries;
-	}
-	/**
-	 * @param retries The retries to set.
-	 */
-	public void setRetries(String retries) {
-		this.retries = retries;
-	}
-	/**
-	 * @return Returns the showFeedback.
-	 */
-	public String getShowFeedback() {
-		return showFeedback;
-	}
-	/**
-	 * @param showFeedback The showFeedback to set.
-	 */
-	public void setShowFeedback(String showFeedback) {
-		this.showFeedback = showFeedback;
-	}
-	/**
-	 * @return Returns the passmark.
-	 */
-	public String getPassmark() {
-		return passmark;
-	}
-	/**
-	 * @param passmark The passmark to set.
-	 */
-	public void setPassmark(String passmark) {
-		this.passmark = passmark;
-	}
+
 	/**
 	 * @return Returns the selectedIndex.
 	 */
@@ -723,18 +588,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 	public void setDeletableOptionIndex(String deletableOptionIndex) {
 		this.deletableOptionIndex = deletableOptionIndex;
 	}
-	/**
-	 * @return Returns the sln.
-	 */
-	public String getSln() {
-		return sln;
-	}
-	/**
-	 * @param sln The sln to set.
-	 */
-	public void setSln(String sln) {
-		this.sln = sln;
-	}
+
 	/**
 	 * @return Returns the fileItem.
 	 */

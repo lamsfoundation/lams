@@ -36,7 +36,6 @@ import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
-import org.lamsfoundation.lams.tool.vote.pojos.VoteOptsContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
@@ -94,8 +93,6 @@ public interface IVoteService
     public void saveOrUpdateVoteQueContent(VoteQueContent mcQueContent) throws VoteApplicationException;
     
     public void removeQuestionContentByVoteUid(final Long mcContentUid) throws VoteApplicationException;
-    
-    public VoteOptsContent getVoteOptionsContentByUID(Long uid) throws VoteApplicationException;
     
     public void cleanAllQuestionsSimple(final Long mcContentUid) throws VoteApplicationException;
     

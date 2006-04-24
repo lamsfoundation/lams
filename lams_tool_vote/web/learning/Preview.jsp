@@ -18,7 +18,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   http://www.gnu.org/licenses/gpl.txt
 --%>
-
 <%@ taglib uri="tags-bean" prefix="bean"%> 
 <%@ taglib uri="tags-html" prefix="html"%>
 <%@ taglib uri="tags-logic" prefix="logic" %>
@@ -32,153 +31,73 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html:html>
+<html:html locale="true">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<title> <bean:message key="label.preview"/> </title>
-	<script language="JavaScript" type="text/JavaScript">
-		function submitMethod(actionMethod) 
-		{
-			document.McLearningForm.donePreview.value=1; 
-			document.McLearningForm.submit();
-		}
-	</script>
+	<jsp:include page="/learning/learningHeader.jsp" />
 </head>
 <body>
-<html:form  action="/learning?method=displayMc&validate=false" method="POST" target="_self">
-	<!--options content goes here-->
+
+<html:form  action="/learning?validate=false" enctype="multipart/form-data"method="POST" target="_self">
+	<html:hidden property="dispatch"/>
+	<html:hidden property="toolContentID"/>
+
 				<table align=center bgcolor="#FFFFFF">
-					  <tr>
-					  	<td NOWRAP align=left class="input" valign=top bgColor="#333366" colspan=2> 
-						  	<font size=2 color="#FFFFFF"> <b>  <bean:message key="label.assessment"/> </b> </font>
-					  	</td>
-					  </tr>
-					  
 
-			 		<c:if test="${sessionScope.isRetries == 'true'}"> 		
-					  <tr>
-					  	<td NOWRAP align=center class="input" valign=top colspan=2> 
-						  	<font size=3> <b>  <bean:message key="label.withRetries"/> </b> </font>
-					  	</td>
-					  </tr>
-					</c:if> 			
-				
-					<c:if test="${sessionScope.isRetries == 'false'}"> 		
-					  <tr>
-					  	<td NOWRAP align=center class="input" valign=top colspan=2> 
-						  	<font size=3> <b>  <bean:message key="label.withoutRetries"/> </b> </font>
-					  	</td>
-					  </tr>
-					</c:if> 			
-
-			 		<c:if test="${sessionScope.isRetries == 'true' && sessionScope.passMark > 0}"> 		
-					  <tr>
-					  	<td NOWRAP align=left class="input" valign=top colspan=2> 
-						  	<font size=2> <b>  <bean:message key="label.learner.message"/> (<c:out value="${sessionScope.passMark}"/><bean:message key="label.percent"/> ) 
-						  	</b> </font>
-					  	</td>
-					  </tr>
-					</c:if> 								  
-				
-  		  	 		<c:set var="mainQueIndex" scope="session" value="0"/>
-					<c:forEach var="questionEntry" items="${sessionScope.mapQuestionContentLearner}">
-					<c:set var="mainQueIndex" scope="session" value="${mainQueIndex +1}"/>
-						  <tr>
-						  	<td NOWRAP align=left class="input" valign=top bgColor="#999966" colspan=2> 
-							  	<font color="#FFFFFF"> 
-								  	<font size=2>
-								  		<c:out value="${questionEntry.value}"/> 
-							  		</font>
-							  	</font> 
+	  					  <tr>
+						  	<td NOWRAP align=center class="input" valign=top bgColor="white" colspan=2> 
+					 	  		<c:out value="${VoteLearningForm.activityTitle}"/> 						 			
 						  	</td>
 						  </tr>
+						  
+						  <tr>
+						  	<td  NOWRAP align=left class="input" valign=top bgColor="white" colspan=2> 
+					 	  		<c:out value="${VoteLearningForm.activityInstructions}"/> 						 									  	
+						  	</td>
+						  </tr>
+	
+	
+							  <tr>						 
+								<td NOWRAP align=left>
+								<table align=left>
+					  		  	 		<c:set var="queIndex" scope="session" value="0"/>
+											  		<c:forEach var="subEntry" items="${sessionScope.mapQuestionContentLearner}">
+												  		<c:set var="queIndex" scope="session" value="${queIndex +1}"/>
+															<tr> 
+																<td NOWRAP align=left class="input" valign=top> 
+																	<font size=2>
+																		<input type="checkbox" 
+																		name=optionCheckBox<c:out value="${sessionScope.queIndex}"/>-<c:out value="${subEntry.key}"/>> 
+																		<c:out value="${subEntry.value}"/>																		
+																	</font>
+																</td> 
+															</tr>	
+													</c:forEach>
+														<tr> 
+															<td NOWRAP align=left class="input" valign=top  colspan=2> 
+												      			<font size=2> <b>
+															 		<bean:message key="label.other"/>: 
+														      		</b> 
+														 			<html:text property="userEntry" size="30" maxlength="100"/>
+																</font>									 			
+													 		</td>
+													  	</tr>
+								</table>
+								</td>
+							</tr>
+							  
 
-								  								  
-						  <tr>						 
-							<td NOWRAP align=left>
-							<table align=left>
-			  		  	 		<c:set var="queIndex" scope="session" value="0"/>
-								<c:forEach var="mainEntry" items="${sessionScope.mapGeneralOptionsContent}">
-									<c:set var="queIndex" scope="session" value="${queIndex +1}"/>
-										<c:if test="${sessionScope.mainQueIndex == sessionScope.queIndex}"> 		
-									  		<c:forEach var="subEntry" items="${mainEntry.value}">
-									  		
+				
+					  	   	<html:hidden property="optionCheckBoxSelected"/>
+							<html:hidden property="questionIndex"/>
+							<html:hidden property="optionIndex"/>
+							<html:hidden property="optionValue"/>						
+							<html:hidden property="checked"/>
+				  	   
+				  	<html:hidden property="donePreview"/>						   
 
-							  		  	 		<c:set var="checkedOptionFound" scope="request" value="0"/>
-												<!-- traverse the selected option from here --> 									  		
-	  											<c:forEach var="selectedMainEntry" items="${sessionScope.mapGeneralCheckedOptionsContent}">
-														<c:if test="${selectedMainEntry.key == sessionScope.queIndex}"> 		
-													  		<c:forEach var="selectedSubEntry" items="${selectedMainEntry.value}">
-
-																<c:if test="${subEntry.key == selectedSubEntry.key}"> 		
-									  							
-																	<tr> 
-																		<td NOWRAP align=left class="input" valign=top> 
-																			<font size=2>
-																				<input type="checkbox" name=optionCheckBox/>
-																			</font>
-																		</td> 
-																		<td NOWRAP align=left class="input" valign=top> 
-																			<font size=2>
-																				<font color="#CCCC99"> 	<c:out value="${subEntry.value}"/> </font>
-																			</font>
-																		</td>
-																	</tr>	
-												  		  	 		<c:set var="checkedOptionFound" scope="request" value="1"/>
-				  												</c:if> 			
-
-														</c:forEach>																						
-	  												</c:if> 			
-												</c:forEach>									
-												<!-- till  here --> 									  					
-
-												<c:if test="${requestScope.checkedOptionFound == 0}"> 		
-																	<tr> 
-																		<td NOWRAP align=left class="input" valign=top> 
-																			<font size=2>
-																				<input type="checkbox" name=optionCheckBox/>																			</font>
-																		</td> 
-																		<td NOWRAP align=left class="input" valign=top> 
-																			<font size=2>
-																				<font color="#CCCC99"> <c:out value="${subEntry.value}"/> </font>
-																			</font>
-																		</td>
-																	</tr>	
-  												</c:if> 			
-
-											</c:forEach>
-										</c:if> 			
-								</c:forEach>
-							</table>
-							</td>
-						</tr>
-					</c:forEach>
-
-			  	   	<tr> 
-				  	   	<html:hidden property="optionCheckBoxSelected"/>
-						<html:hidden property="questionIndex"/>
-						<html:hidden property="optionIndex"/>
-						<html:hidden property="optionValue"/>						
-						<html:hidden property="checked"/>
-				 		<td NOWRAP colspan=2 class="input" valign=top> 
-				 		&nbsp
-				 		</td>
-			  	   </tr>
-			  	   
-		  	<html:hidden property="donePreview"/>						   
-		</table>
-	<!--options content ends here-->
-</html:form>	
+				</table>
+</html:form>
 
 </body>
 </html:html>
 
-
-
-
-
-
-
-
-
-	

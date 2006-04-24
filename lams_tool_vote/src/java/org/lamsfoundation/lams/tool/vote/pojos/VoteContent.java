@@ -60,9 +60,7 @@ public class VoteContent implements Serializable {
     /** nullable persistent field */
     private String instructions;
     
-    private String posting;
-
-    /** nullable persistent field */
+       /** nullable persistent field */
     private boolean defineLater;
 
     /** nullable persistent field */
@@ -74,18 +72,7 @@ public class VoteContent implements Serializable {
     /** nullable persistent field */
     private Date updateDate;
 
-    /** nullable persistent field */
-    private boolean questionsSequenced;
-
-    /** nullable persistent field */
-    private boolean usernameVisible;
-
-    /** nullable persistent field */
-    private String reportTitle;
-
-    /** nullable persistent field */
-    private String monitoringReportTitle;
-
+   
     /** nullable persistent field */
     private long createdBy;
     
@@ -107,15 +94,7 @@ public class VoteContent implements Serializable {
     /** nullable persistent field */
     private String onlineInstructions;
 
-    /** nullable persistent field */
-    private String endLearningMessage;
-
-    /** nullable persistent field */
-    private boolean retries;
-    
-    private boolean showReport;
-    
-	
+   
     /** persistent field */
     private Set voteQueContents;
 
@@ -126,35 +105,27 @@ public class VoteContent implements Serializable {
     private Set voteAttachments;
 
     /** full constructor */
-    public VoteContent(Long voteContentId, String content, String title, String instructions, String posting, boolean defineLater, boolean runOffline, 
-            Date creationDate, Date updateDate, boolean questionsSequenced, boolean voteChangable, boolean allowText, String maxNominationCount, boolean usernameVisible, String reportTitle, 
-            String monitoringReportTitle, long createdBy, boolean lockOnFinish, boolean contentInUse, String offlineInstructions, 
-            String onlineInstructions, String endLearningMessage, boolean showReport, boolean retries, Set voteQueContents, Set voteSessions, 
+    public VoteContent(Long voteContentId, String content, String title, String instructions, boolean defineLater, boolean runOffline, 
+            Date creationDate, Date updateDate, boolean voteChangable, boolean allowText, String maxNominationCount, 
+            long createdBy, boolean lockOnFinish, boolean contentInUse, String offlineInstructions, 
+            String onlineInstructions, Set voteQueContents, Set voteSessions, 
 			Set voteAttachments) {
         this.voteContentId = voteContentId;
         this.content=content;
         this.title = title;
         this.instructions = instructions;
-        this.posting = posting;        
         this.defineLater = defineLater;
         this.runOffline = runOffline;
         this.creationDate = creationDate;
         this.updateDate = updateDate;
-        this.questionsSequenced = questionsSequenced;
         this.voteChangable=voteChangable;
         this.maxNominationCount=maxNominationCount;
         this.allowText=allowText;
-        this.usernameVisible = usernameVisible;
-        this.reportTitle = reportTitle;
-        this.monitoringReportTitle = monitoringReportTitle;
         this.createdBy = createdBy;
         this.lockOnFinish = lockOnFinish;
         this.contentInUse = contentInUse;
         this.offlineInstructions = offlineInstructions;
         this.onlineInstructions = onlineInstructions;
-        this.endLearningMessage = endLearningMessage;
-        this.retries=retries;
-        this.showReport = showReport;
         this.voteQueContents = voteQueContents;
         this.voteSessions = voteSessions;
         this.voteAttachments = voteAttachments;
@@ -191,26 +162,18 @@ public class VoteContent implements Serializable {
     				 vote.getContent(),
     				 vote.getTitle(),
     				 vote.getInstructions(),
-    				 vote.getPosting(),
     				 vote.isDefineLater(),
     				 vote.isRunOffline(),
     				 vote.getCreationDate(),
     				 vote.getUpdateDate(),
-    				 vote.isQuestionsSequenced(),
     				 vote.isVoteChangable(),
     				 vote.isAllowText(),
     				 vote.getMaxNominationCount(),
-    				 vote.isUsernameVisible(),
-    				 vote.getReportTitle(),
-    				 vote.getMonitoringReportTitle(),
     				 vote.getCreatedBy(),				 
     				 vote.isLockOnFinish(),
     				 vote.isContentInUse(),
     				 vote.getOfflineInstructions(),
     				 vote.getOnlineInstructions(),
-    				 vote.getEndLearningMessage(),
-    				 vote.isShowReport(),
-    				 vote.isRetries(),
          			 new TreeSet(),
                      new TreeSet(),
                      new TreeSet()
@@ -318,38 +281,6 @@ public class VoteContent implements Serializable {
         this.updateDate = updateDate;
     }
 
-    public boolean isQuestionsSequenced() {
-        return this.questionsSequenced;
-    }
-
-    public void setQuestionsSequenced(boolean questionsSequenced) {
-        this.questionsSequenced = questionsSequenced;
-    }
-
-    public boolean isUsernameVisible() {
-        return this.usernameVisible;
-    }
-
-    public void setUsernameVisible(boolean usernameVisible) {
-        this.usernameVisible = usernameVisible;
-    }
-
-    public String getReportTitle() {
-        return this.reportTitle;
-    }
-
-    public void setReportTitle(String reportTitle) {
-        this.reportTitle = reportTitle;
-    }
-
-    public String getMonitoringReportTitle() {
-        return this.monitoringReportTitle;
-    }
-
-    public void setMonitoringReportTitle(String monitoringReportTitle) {
-        this.monitoringReportTitle = monitoringReportTitle;
-    }
-
     public long getCreatedBy() {
         return this.createdBy;
     }
@@ -381,14 +312,6 @@ public class VoteContent implements Serializable {
 
     public void setOnlineInstructions(String onlineInstructions) {
         this.onlineInstructions = onlineInstructions;
-    }
-
-    public String getEndLearningMessage() {
-        return this.endLearningMessage;
-    }
-
-    public void setEndLearningMessage(String endLearningMessage) {
-        this.endLearningMessage = endLearningMessage;
     }
 
     
@@ -433,31 +356,6 @@ public class VoteContent implements Serializable {
             .toString();
     }
     
-    /**
-	 * @return Returns the retries.
-	 */
-	public boolean isRetries() {
-		return retries;
-	}
-	/**
-	 * @param retries The retries to set.
-	 */
-	public void setRetries(boolean retries) {
-		this.retries = retries;
-	}
-
-	/**
-	 * @return Returns the showReport.
-	 */
-	public boolean isShowReport() {
-		return showReport;
-	}
-	/**
-	 * @param showReport The showReport to set.
-	 */
-	public void setShowReport(boolean showReport) {
-		this.showReport = showReport;
-	}
 	
     /**
      * @return Returns the voteAttachments.
@@ -519,18 +417,6 @@ public class VoteContent implements Serializable {
      */
     public void setVoteContentId(Long voteContentId) {
         this.voteContentId = voteContentId;
-    }
-    /**
-     * @return Returns the posting.
-     */
-    public String getPosting() {
-        return posting;
-    }
-    /**
-     * @param posting The posting to set.
-     */
-    public void setPosting(String posting) {
-        this.posting = posting;
     }
     
     /**

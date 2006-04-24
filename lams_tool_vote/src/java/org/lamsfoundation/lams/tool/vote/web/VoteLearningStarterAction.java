@@ -262,8 +262,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
     	
     	request.getSession().setAttribute(CURRENT_QUESTION_INDEX, "1");
 		VoteLearningAction voteLearningAction= new VoteLearningAction();
-    	//return voteLearningAction.redoQuestions(request, voteLearningForm, mapping);
-		return null;
+    	return voteLearningAction.redoQuestions(mapping, form, request, response);
 	}
     
 	/* by now, we know that the mode is either teacher or learner
@@ -439,40 +438,29 @@ protected void commonContentSetup(HttpServletRequest request, VoteContent voteCo
 	protected void setupAttributes(HttpServletRequest request, VoteContent voteContent, VoteLearningForm voteLearningForm)
 	{
 	    
-	    logger.debug("IS_RETRIES: " + new Boolean(voteContent.isRetries()).toString());
-	    //request.getSession().setAttribute(IS_RETRIES, new Boolean(voteContent.isRetries()).toString());
-	    
 	    logger.debug("IS_CONTENT_IN_USE: " + voteContent.isContentInUse());
 	    
-	    //request.getSession().setAttribute(ACTIVITY_TITLE, voteContent.getTitle());
-	    //request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, voteContent.getInstructions());
-
 	    Map mapGeneralCheckedOptionsContent= new TreeMap(new VoteComparator());
 	    request.getSession().setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, mapGeneralCheckedOptionsContent);
 	    /*
 	     * Is the tool activity been checked as Run Offline in the property inspector?
 	     */
 	    logger.debug("IS_TOOL_ACTIVITY_OFFLINE: " + voteContent.isRunOffline());
-	    //request.getSession().setAttribute(IS_TOOL_ACTIVITY_OFFLINE, new Boolean(voteContent.isRunOffline()).toString());
-	    
-	    
-	    logger.debug("advanced properties isRetries: " + new Boolean(voteContent.isRetries()).toString());
+
 	    logger.debug("advanced properties maxNominationCount: " + voteContent.getMaxNominationCount());
 	    logger.debug("advanced properties isAllowText(): " + new Boolean(voteContent.isAllowText()).toString());
 	    logger.debug("advanced properties isVoteChangable(): " + new Boolean(voteContent.isVoteChangable()).toString());
-	    
 	    logger.debug("advanced properties isRunOffline(): " + new Boolean(voteContent.isRunOffline()).toString());
-	    logger.debug("advanced properties isRetries(): " + new Boolean(voteContent.isRetries()).toString());
 	    logger.debug("advanced properties isLockOnFinish(): " + new Boolean(voteContent.isLockOnFinish()).toString());
 	    
 	    
 	    voteLearningForm.setActivityTitle(voteContent.getTitle());
 	    voteLearningForm.setActivityInstructions(voteContent.getInstructions());
-	    voteLearningForm.setActivityRetries(new Boolean(voteContent.isRetries()).toString());
 	    voteLearningForm.setActivityRunOffline(new Boolean(voteContent.isRunOffline()).toString());
 	    
 	    voteLearningForm.setMaxNominationCount(voteContent.getMaxNominationCount());
 	    voteLearningForm.setAllowTextEntry(new Boolean(voteContent.isAllowText()).toString());
+	    logger.debug("allow text entry is: " + voteLearningForm.getAllowTextEntry());
 	    voteLearningForm.setLockOnFinish(new Boolean(voteContent.isLockOnFinish()).toString());
 	    voteLearningForm.setVoteChangable(new Boolean(voteContent.isVoteChangable()).toString());
 	}

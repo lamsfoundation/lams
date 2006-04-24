@@ -230,6 +230,12 @@
 		    redirect="false"
 	  	/>
 	  	
+	  	<forward
+		    name="allNominations"
+		    path="/learning/AllNominations.jsp"
+		    redirect="false"
+	  	/>
+	  	
 	     <forward
 	        name="preview"
 	        path="/learning/Preview.jsp"
@@ -282,6 +288,13 @@
 	  	/>
 	  	
 	  	<forward
+		    name="allNominations"
+		    path="/learning/AllNominations.jsp"
+		    redirect="false"
+	  	/>
+
+	  	
+	  	<forward
 		    name="individualReport"
 		    path="/learning/IndividualLearnerResults.jsp"
 		    redirect="false"
@@ -299,11 +312,13 @@
 		    redirect="false"
 	  	/>
 
+
 	  	<forward
-		    name="resultsSummary"
-		    path="/learning/ResultsSummary.jsp"
+		    name="exitPage"
+		    path="/learning/ExitLearning.jsp"
 		    redirect="false"
 	  	/>
+	  	
 
 	  	<forward
 	        name="starter"

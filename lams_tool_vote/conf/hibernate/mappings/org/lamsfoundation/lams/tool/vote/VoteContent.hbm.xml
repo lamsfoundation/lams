@@ -76,15 +76,6 @@
    />
 
    
-   <property
-        name="questionsSequenced"
-        type="boolean"
-        access="property"
-        column="questions_sequenced"
-        length="1"        
-   />
-
-
     <property
         name="createdBy"
         type="long"
@@ -141,14 +132,6 @@
         column="lock_on_finish"
         length="1"        
    />
-
-    <property
-        name="retries"
-        type="boolean"
-        access="property"        
-        column="retries"
-        length="1"
-    />
 
     <property
         name="maxNominationCount"

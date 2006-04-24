@@ -49,28 +49,27 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					  </tr>
 				
 					  <tr>
-					  	<td NOWRAP align=right class="input" valign=top colspan=2> 
-							&nbsp
+					  	<td NOWRAP align=center class="input" valign=top colspan=2> 
+							 CHART FOR ALL RESULTS 
 					  	</td>
 					  </tr>	
-
-			  		<c:forEach var="entry" items="${sessionScope.mapViewOnlyQuestionContentLearner}">
-						  <tr>
-						  	<td NOWRAP align=left class="input" valign=top  colspan=2> 
-									<c:out value="${entry.value}"/> 
-						  	</td>
-						  </tr>
-					</c:forEach>
-
 
 				  <tr>
 				  	<td NOWRAP colspan=2 align=center class="input" valign=top> 
 					  	<font size=2>
-                                <html:submit property="redoQuestionsOk" 
+                                <html:submit property="viewAnswers" 
                                              styleClass="linkbutton" 
-                                             onclick="submitMethod('redoQuestionsOk');">
-                                    <bean:message key="label.retake"/>
+                                             onclick="submitMethod('viewAnswers');">
+                                    <bean:message key="label.view.answers"/>
                                 </html:submit>
+	   						&nbsp&nbsp&nbsp&nbsp&nbsp
+								<c:if test="${VoteLearningForm.voteChangable == 'true'}"> 				   						
+			                                <html:submit property="redoQuestionsOk" 
+			                                             styleClass="linkbutton" 
+			                                             onclick="submitMethod('redoQuestionsOk');">
+			                                    <bean:message key="label.retake"/>
+			                                </html:submit>
+								</c:if> 		                                
 	   						&nbsp&nbsp&nbsp&nbsp&nbsp                                
                                 <html:submit property="learnerFinished" 
                                              styleClass="linkbutton" 
@@ -80,6 +79,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						</font>
 				  	 </td>
 				  </tr>
+
+					  
 </html:form>
 
 </body>

@@ -144,11 +144,9 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 	
 		String richTextTitle = request.getParameter("title");
 	    String richTextInstructions = request.getParameter("instructions");
-	    String richTextPosting = request.getParameter("posting");
 	    
 	    VoteUtils.persistRichText(request);
 	    
-	    //request.getSession().setAttribute(EDITACTIVITY_EDITMODE, new Boolean(true));  
 	    authoringUtil.reconstructOptionContentMapForAdd(mapOptionsContent, request);
 	    
 	    logger.debug("richTextInstructions: " + request.getSession().getAttribute(ACTIVITY_INSTRUCTIONS));
@@ -187,7 +185,6 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 	    Map mapOptionsContent=(Map)request.getSession().getAttribute(MAP_OPTIONS_CONTENT);
 	    logger.debug("mapOptionsContent: " + mapOptionsContent);
 	    
-	    //request.getSession().setAttribute(EDITACTIVITY_EDITMODE, new Boolean(true));  
 	    authoringUtil.reconstructOptionContentMapForRemove(mapOptionsContent, request, voteAuthoringForm);
 	    
 	    mapOptionsContent=(Map)request.getSession().getAttribute(MAP_OPTIONS_CONTENT);
@@ -463,23 +460,6 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
         {
             errors.add(Globals.ERROR_KEY, new ActionMessage("error.defaultoption.empt"));
             logger.debug("add error.defaultoption.empt to ActionMessages: ");
-        }
-        
-        Boolean renderMonitoringEditActivity=(Boolean)request.getSession().getAttribute(RENDER_MONITORING_EDITACTIVITY);
-        if ((renderMonitoringEditActivity != null) && (!renderMonitoringEditActivity.booleanValue()))
-        {
-
-            if ((voteAuthoringForm.getReportTitle() == null) || (voteAuthoringForm.getReportTitle().length() == 0))
-            {
-                errors.add(Globals.ERROR_KEY, new ActionMessage("error.reportTitle"));
-                logger.debug("add reportTitle to ActionMessages: ");
-            }
-            
-            if ((voteAuthoringForm.getMonitoringReportTitle() == null) || (voteAuthoringForm.getMonitoringReportTitle().length() == 0))
-            {
-                errors.add(Globals.ERROR_KEY, new ActionMessage("error.monitorReportTitle"));
-                logger.debug("add monitorReportTitle to ActionMessages: ");
-            }
         }
         
         saveErrors(request,errors);

@@ -117,27 +117,9 @@ public interface VoteAppConstants {
     public static final String MAP_GENERAL_CHECKED_OPTIONS_CONTENT		="mapGeneralCheckedOptionsContent";
     public static final String MAP_LEARNER_QUESTIONS_CONTENT			="mapLearnerQuestionsContent";
     public static final String MAP_LEARNER_CHECKED_OPTIONS_CONTENT		="mapLearnerCheckedOptionsContent";
-    public static final String MAP_LEARNER_ASSESSMENT_RESULTS			="mapLearnerAssessmentResults";
-    public static final String MAP_LEARNER_FEEDBACK_INCORRECT			="mapLeanerFeedbackIncorrect";
-    public static final String MAP_LEARNER_FEEDBACK_CORRECT				="mapLeanerFeedbackCorrect";
-    public static final String MAP_QUESTION_WEIGHTS						="mapQuestionWeights";
+    public static final String MAP_VIEWONLY_QUESTION_CONTENT_LEARNER		="mapViewOnlyQuestionContentLearner";
     public static final String MAP_QUE_ATTEMPTS							="mapQueAttempts";
-    public static final String MAP_QUE_CORRECT_ATTEMPTS					="mapQueCorrectAttempts";
-    public static final String MAP_QUE_INCORRECT_ATTEMPTS				="mapQueIncorrectAttempts";
         
-    
-    public static final String MAP_WEIGHTS								="mapWeights";
-    public static final String MAP_CHECKBOX_STATES						="mapCheckBoxStates";
-    public static final String MAP_SELECTED_OPTIONS						="mapSelectedOptions";
-    public static final String MAP_FEEDBACK_INCORRECT					="mapFeedbackIncorrect";
-    public static final String MAP_INCORRECT_FEEDBACK					="mapIncorrectFeedback";
-    
-    public static final String MAP_INCORRECT_FEEDBACK_LEARNER			="mapIncorrectFeedbackLearner";
-    public static final String MAP_CORRECT_FEEDBACK_LEARNER				="mapCorrectFeedbackLearner";
-    public static final String MAP_CORRECT_FEEDBACK						="mapCorrectFeedback";
-    public static final String MAP_FEEDBACK_CORRECT						="mapFeedbackCorrect";
-    
-    
     public static final String SELECTED_QUESTION						="selectedQuestion";
     public static final String SELECTED_QUESTION_INDEX					="selectedQuestionIndex";
     public static final String DEFAULT_QUESTION_UID						="defaultQuestionUid";
@@ -146,8 +128,6 @@ public interface VoteAppConstants {
     public static final String INSTRUCTIONS								="instructions";
     public static final String CREATION_DATE							="creationDate";
     public static final String DEFINE_LATER								="defineLater";
-    public static final String RETRIES									="retries";
-    public static final String PASSMARK									="passMark";
     public static final String VIEW_ANSWERS								="viewAnswers";
     public static final String SHOW_AUTHORING_TABS						="showAuthoringTabs";
     
@@ -159,12 +139,9 @@ public interface VoteAppConstants {
     public static final String RICHTEXT_FEEDBACK_INCORRECT				="richTextFeedbackInCorrect";
     public static final String RICHTEXT_OFFLINEINSTRUCTIONS				="richTextOfflineInstructions";
     public static final String RICHTEXT_ONLINEINSTRUCTIONS				="richTextOnlineInstructions";
-    public static final String RICHTEXT_REPORT_TITLE					="richTextReportTitle";
-    public static final String RICHTEXT_END_LEARNING_MSG				="richTextEndLearningMsg";
     public static final String RICHTEXT_TITLE							="richTextTitle";
     public static final String RICHTEXT_INSTRUCTIONS					="richTextInstructions";
     public static final String RICHTEXT_BLANK							="<p>&nbsp;</p>";
-    public static final String RENDER_MONITORING_EDITACTIVITY			="renderMonitoringEditActivity";
     public static final String SUBMIT_OFFLINE_FILE						="submitOfflineFile";
     public static final String SUBMIT_ONLINE_FILE						="submitOnlineFile";
     public static final String LIST_UPLOADED_OFFLINE_FILENAMES			="listUploadedOfflineFileNames";
@@ -177,10 +154,6 @@ public interface VoteAppConstants {
     public static final String COUNT_SESSION_COMPLETE					="countSessionComplete";
     public static final String COUNT_ALL_USERS							="countAllUsers";
     public static final String COUNT_MAX_ATTEMPT						="countMaxAttempt";
-    public static final String TOP_MARK									="topMark";
-    public static final String LOWEST_MARK								="lowestMark";
-    public static final String AVERAGE_MARK								="averageMark";
-
     
     /*
      * the learner or monitoring environment provides toolSessionId
@@ -196,7 +169,6 @@ public interface VoteAppConstants {
     public static final String OPTION_OFF								="false";
     public static final String ACTIVITY_TITLE 							= "activityTitle";
     public static final String ACTIVITY_INSTRUCTIONS					= "activityInstructions";
-    public static final String POSTING									= "posting";
     public static final String MONITORING								="monitoring";
     public static final String REMOVABLE_QUESTION_INDEX					="removableQuestionIndex";
         
@@ -214,24 +186,13 @@ public interface VoteAppConstants {
     public static final String MAP_QUESTION_CONTENT_LEARNER				="mapQuestionContentLearner";
     public static final String CURRENT_QUESTION_INDEX					="currentQuestionIndex";
     public static final String TOTAL_QUESTION_COUNT						="totalQuestionCount";
-    public static final String LEARNER_MARK								="learnerMark";
-    public static final String LEARNER_BEST_MARK						="learnerBestMark";
-    public static final String LEARNER_LAST_ATTEMPT_ORDER				="learnerLastAttemptOrder";
-    public static final String LEARNER_MARK_ATLEAST						="learnerMarkAtLeast";
     public static final String MAP_ANSWERS								="mapAnswers";
     public static final String CURRENT_ANSWER							="currentAnswer";
-    public static final String USER_FEEDBACK							="userFeedback";
     public static final String REPORT_TITLE_LEARNER						="reportTitleLearner"; 
-    public static final String TOTAL_COUNT_REACHED						="totalCountReached";
-    
     
     public static final String IS_TOOL_ACTIVITY_OFFLINE					="isToolActivityOffline";
-    public static final String IS_USERNAME_VISIBLE						="isUsernameVisible";
     public static final String IS_CONTENT_IN_USE						="isContentInUse";
     public static final String IS_MONITORED_CONTENT_IN_USE				="isMonitoredContentInUse";
-    public static final String IS_RETRIES								="isRetries";
-    public static final String IS_SHOW_FEEDBACK							="isShowFeedback";
-    public static final String IS_SHOW_LEARNERS_REPORT					="isShowLearnersReport";    
     public static final String IS_ALL_SESSIONS_COMPLETED				="isAllSessionsCompleted";
     public static final String CHECK_ALL_SESSIONS_COMPLETED				="checkAllSessionsCompleted";
     public static final String FROM_TOOL_CONTENT_ID						="fromToolContentId";
@@ -259,15 +220,10 @@ public interface VoteAppConstants {
     public static final String SELECTION_CASE							="selectionCase";
     public static final String LIST_MONITORED_ANSWERS_CONTAINER_DTO		="listMonitoredAnswersContainerDto";
     public static final String TIMEZONE									="timeZone";
-    
-    public static final String QUESTION_LISTING_MODE					="questionListingMode";
-    public static final String QUESTION_LISTING_MODE_SEQUENTIAL			="questionListingModeSequential";
-    public static final String QUESTION_LISTING_MODE_COMBINED			="questionListingModeCombined";
     public static final String PREVIEW_ONLY								="previewOnly";
     
     public static final String MODE										="mode";
     public static final String LEARNING_MODE							="learningMode";
-    
     public static final String EXPORT_USER_ID							="exportUserId";
     
     /*

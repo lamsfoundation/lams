@@ -62,7 +62,6 @@ import org.lamsfoundation.lams.tool.vote.dao.IVoteUploadedFileDAO;
 import org.lamsfoundation.lams.tool.vote.dao.IVoteUserDAO;
 import org.lamsfoundation.lams.tool.vote.dao.IVoteUsrAttemptDAO;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
-import org.lamsfoundation.lams.tool.vote.pojos.VoteOptsContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
@@ -855,19 +854,6 @@ public class VoteServicePOJO implements
         }
     }
     
-    
-    public VoteOptsContent getVoteOptionsContentByUID(Long uid) throws VoteApplicationException
-	{
-    	try
-        {
-            return getVoteOptionsContentByUID(uid);
-        }
-        catch (DataAccessException e)
-        {
-            throw new VoteApplicationException("Exception occured when lams is getting opt content by uid"
-                                                 + e.getMessage(),e);
-        }
-	}
     
     
     public List getSessionsFromContent(VoteContent voteContent) throws VoteApplicationException
@@ -1881,19 +1867,6 @@ public class VoteServicePOJO implements
 	public void setCred(ICredentials cred) {
 		this.cred = cred;
 	}
-	
-	/*
-	   !!! COMPLETE THIS !!!
-	public IVoteUploadedFileDAO getVoteUploadedFileDAO() {
-		return voteUploadedFileDAO;
-	}
-	
-	public void setQaUploadedFileDAO(IVoteUploadedFileDAO voteUploadedFileDAO) {
-		this.voteUploadedFileDAO = voteUploadedFileDAO;
-	}
-	
-	*/
-	
 	
 	/**
 	 * @return Returns the repositoryId.

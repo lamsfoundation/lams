@@ -18,6 +18,9 @@
 <body>
 
 <html:form  action="/learning?validate=false" enctype="multipart/form-data"method="POST" target="_self">
+	<html:hidden property="dispatch"/>
+	<html:hidden property="toolContentID"/>
+				
 				<table align=center bgcolor="#FFFFFF">
 
 					  <tr>
@@ -33,24 +36,17 @@
 						</td> 
 					</tr>
 					
-					<c:forEach var="optionEntry" items="${mapGeneralCheckedOptionsContent}">
+			  		<c:forEach var="entry" items="${sessionScope.mapGeneralCheckedOptionsContent}">
 						  <tr>
 						  	<td NOWRAP align=left class="input" valign=top  colspan=2> 
-							  	<font color="#FFFFFF"> 
-								  	<font size=2>
-								  		<c:out value="${optionEntry.value}"/> 
-								  	</font>
-							  	</font> 
+									<c:out value="${entry.value}"/> 
 						  	</td>
 						  </tr>
-
 					</c:forEach>
-					
+										
 						<tr> 
 							<td NOWRAP align=left class="input" valign=top colspan=2> 
-				      			<font size=2> 
 						 	  		<c:out value="${VoteLearningForm.userEntry}"/> 						 			
-								</font>									 			
 					 		</td>
 					  	</tr>
 

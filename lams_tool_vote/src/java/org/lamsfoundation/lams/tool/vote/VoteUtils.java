@@ -35,7 +35,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
-import org.lamsfoundation.lams.tool.vote.pojos.VoteOptsContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 import org.lamsfoundation.lams.tool.vote.web.VoteAuthoringForm;
@@ -180,32 +179,6 @@ public abstract class VoteUtils implements VoteAppConstants {
 	}
 	
 	
-	/**
-	 * returns a Map of options
-	 * generateOptionsMap(List listVoteOptions)
-	 * 
-	 * @param listVoteOptions
-	 * @return Map
-	 */
-	public static Map generateOptionsMap(List listVoteOptions)
-	{
-		logger.debug("incoming listVoteOptions" + listVoteOptions);
-		Map mapOptionsContent= new TreeMap(new VoteStringComparator());
-		
-		Iterator listIterator=listVoteOptions.iterator();
-    	Long mapIndex=new Long(1);
-    	while (listIterator.hasNext())
-    	{
-    		VoteOptsContent voteOptionsContent = (VoteOptsContent)listIterator.next();
-    		logger.debug("voteOptionsContent:" + voteOptionsContent);
-    		mapOptionsContent.put(mapIndex.toString(),voteOptionsContent.getVoteQueOptionText());
-    		mapIndex=new Long(mapIndex.longValue()+1);
-    	}
-    	logger.debug("generated voteOptionsContent: " + mapOptionsContent);
-    	return mapOptionsContent;
-	}
-
-
     public static void setDefaultSessionAttributes(HttpServletRequest request, VoteContent defaultVoteContent, VoteAuthoringForm voteAuthoringForm)
 	{
 		/*should never be null anyway as default content MUST exist in the db*/
@@ -214,28 +187,18 @@ public abstract class VoteUtils implements VoteAppConstants {
 
         voteAuthoringForm.setTitle(defaultVoteContent.getTitle());
         voteAuthoringForm.setInstructions(defaultVoteContent.getInstructions());
-		request.getSession().setAttribute(ACTIVITY_TITLE, defaultVoteContent.getTitle());
-		request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, defaultVoteContent.getInstructions());
-		
-	    logger.debug("ACTIVITY_INSTRUCTIONS: " + defaultVoteContent.getInstructions());
-		
-	    //voteAuthoringForm.setReportTitle(defaultVoteContent.getReportTitle());
-	    //voteAuthoringForm.setMonitoringReportTitle(defaultVoteContent.getMonitoringReportTitle());
-	    //voteAuthoringForm.setEndLearningMessage(defaultVoteContent.getEndLearningMessage());
 	    voteAuthoringForm.setOnlineInstructions(defaultVoteContent.getOnlineInstructions());
 	    voteAuthoringForm.setOfflineInstructions(defaultVoteContent.getOfflineInstructions());
-	    //voteAuthoringForm.setMonitoringReportTitle(defaultVoteContent.getMonitoringReportTitle());
-		
-         //determine the status of radio boxes
-	    //voteAuthoringForm.setUsernameVisible(defaultVoteContent.isUsernameVisible()?ON:OFF);
-	    //voteAuthoringForm.setQuestionsSequenced(defaultVoteContent.isQuestionsSequenced()?ON:OFF);
+
+        //determine the status of radio boxes
 	    voteAuthoringForm.setAllowText(defaultVoteContent.isAllowText()?ON:OFF);
 	    voteAuthoringForm.setVoteChangable(defaultVoteContent.isVoteChangable()?ON:OFF);
 	    voteAuthoringForm.setLockOnFinish(defaultVoteContent.isLockOnFinish()?ON:OFF);
-	    voteAuthoringForm.setRetries(defaultVoteContent.isRetries()?ON:OFF);
-	    
+
 	    String maxNomcount= defaultVoteContent.getMaxNominationCount();
 	    logger.debug("maxNomcount: " + maxNomcount);
+	    if (maxNomcount.equals(""))
+	        maxNomcount="0";
 	    voteAuthoringForm.setMaxNominationCount(maxNomcount);
 	}
 
@@ -244,11 +207,9 @@ public abstract class VoteUtils implements VoteAppConstants {
 	{
 		String richTextTitle = request.getParameter(TITLE);
 	    String richTextInstructions = request.getParameter(INSTRUCTIONS);
-	    String richTextPosting = request.getParameter(POSTING);
 	    
 	    logger.debug("richTextTitle: " + richTextTitle);
 	    logger.debug("richTextInstructions: " + richTextInstructions);
-	    logger.debug("richTextPosting: " + richTextPosting);
 	    
 	    
 	    if (richTextTitle != null)
@@ -260,12 +221,6 @@ public abstract class VoteUtils implements VoteAppConstants {
 	    {
 			request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, richTextInstructions);
 	    }
-	    
-	    if (richTextPosting != null)
-	    {
-			request.getSession().setAttribute(POSTING, richTextPosting);
-	    }
-
 	    
 		String richTextOfflineInstructions=request.getParameter(RICHTEXT_OFFLINEINSTRUCTIONS);
 		logger.debug("read parameter richTextOfflineInstructions: " + richTextOfflineInstructions);
@@ -281,24 +236,6 @@ public abstract class VoteUtils implements VoteAppConstants {
 		{
 			request.getSession().setAttribute(RICHTEXT_ONLINEINSTRUCTIONS,richTextOnlineInstructions);	
 		}
-		
-
-		String richTextReportTitle=request.getParameter(RICHTEXT_REPORT_TITLE);
-		logger.debug("read parameter richTextReportTitle: " + richTextReportTitle);
-		
-		String richTextEndLearningMessage=request.getParameter(RICHTEXT_END_LEARNING_MSG);
-		logger.debug("read parameter richTextEndLearningMessage: " + richTextEndLearningMessage);
-		
-		if ((richTextReportTitle != null) && (richTextReportTitle.length() > 0))
-		{
-			request.getSession().setAttribute(RICHTEXT_REPORT_TITLE,richTextReportTitle);
-		}
-		
-		if ((richTextEndLearningMessage != null) && (richTextEndLearningMessage.length() > 0))
-		{
-			request.getSession().setAttribute(RICHTEXT_END_LEARNING_MSG,richTextEndLearningMessage);
-		}
-		
 	}
 	
 	

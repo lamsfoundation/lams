@@ -66,8 +66,6 @@ public class VoteUsrAttempt implements Serializable {
     /** persistent field */
     private org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr voteQueUsr;
 
-    /** persistent field */
-    private org.lamsfoundation.lams.tool.vote.pojos.VoteOptsContent voteOptionsContent;
 
     /** full constructor */
     public VoteUsrAttempt(Long attemptId, Date attemptTime, String timeZone, org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent voteQueContent, 
@@ -231,19 +229,7 @@ public class VoteUsrAttempt implements Serializable {
             org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr voteQueUsr) {
         this.voteQueUsr = voteQueUsr;
     }
-    /**
-     * @return Returns the voteOptionsContent.
-     */
-    public org.lamsfoundation.lams.tool.vote.pojos.VoteOptsContent getVoteOptionsContent() {
-        return voteOptionsContent;
-    }
-    /**
-     * @param voteOptionsContent The voteOptionsContent to set.
-     */
-    public void setVoteOptionsContent(
-            org.lamsfoundation.lams.tool.vote.pojos.VoteOptsContent voteOptionsContent) {
-        this.voteOptionsContent = voteOptionsContent;
-    }
+    
     /**
      * @return Returns the userEntry.
      */

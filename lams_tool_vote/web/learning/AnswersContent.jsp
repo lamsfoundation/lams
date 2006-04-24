@@ -41,133 +41,139 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<html:hidden property="dispatch"/>
 	<html:hidden property="toolContentID"/>
 
-	<!--options content goes here-->
 				<table align=center bgcolor="#FFFFFF">
-					  
-  					  <tr>
-					  	<td NOWRAP align=center class="input" valign=top bgColor="white" colspan=2> 
-						  	<c:out value="${activityTitle}" escapeXml="false" /> 
-					  	</td>
-					  </tr>
-					  
-					  <tr>
-					  	<td  NOWRAP align=left class="input" valign=top bgColor="white" colspan=2> 
-						  	<c:out value="${activityInstructions}" escapeXml="false" /> 
-					  	</td>
-					  </tr>
-
-
-						  <tr>						 
-							<td NOWRAP align=left>
-							<table align=left>
-			  		  	 		<c:set var="queIndex" scope="session" value="0"/>
-									  		<c:forEach var="subEntry" items="${sessionScope.mapQuestionContentLearner}">
-										  		<c:set var="queIndex" scope="session" value="${queIndex +1}"/>
-										  		
-								  		  	 		<c:set var="checkedOptionFound" scope="request" value="0"/>
-													<!-- traverse the selected option from here --> 									  		
-																<c:if test="${subEntry.key == sessionScope.queIndex}"> 		
-																  		<c:forEach var="selectedSubEntry" items="${sessionScope.mapGeneralCheckedOptionsContent}">
-																			<c:if test="${subEntry.value == selectedSubEntry.value}"> 		
-																				<tr> 
-																					<td NOWRAP align=left class="input" valign=top> 
-																						<font size=2>
-																							<input type="checkbox" 
-																							name=optionCheckBox<c:out value="${sessionScope.queIndex}"/>-<c:out value="${subEntry.key}"/>
-																							onclick="javascript:document.forms[0].optionCheckBoxSelected.value=1; 
-																							document.forms[0].questionIndex.value=<c:out value="${sessionScope.queIndex}"/>; 
-																							document.forms[0].optionValue.value='<c:out value="${subEntry.value}"/>';
-																							
-																							if (this.checked == 1)
-																							{
-																								document.forms[0].checked.value=true;
-																							}
-																							else
-																							{
-																								document.forms[0].checked.value=false;
-																							}
-																							
-																							submitMethod('selectOption');" CHECKED> 
-																						</font>
-																					</td> 
-																					<td NOWRAP align=left class="input" valign=top> 
-																						<font size=2>
-																							<font color="#CCCC99"> 	<c:out value="${subEntry.value}"/> </font>
-																						</font>
-																					</td>
-																				</tr>	
-															  		  	 		<c:set var="checkedOptionFound" scope="request" value="1"/>
-							  												</c:if> 			
-																	</c:forEach>																						
-			  												</c:if> 			
+					<c:if test="${VoteLearningForm.activityRunOffline == 'true'}"> 			
+						<tr> <td class="error">
+							<bean:message key="label.learning.forceOfflineMessage"/>
+						</td></tr>
+					</c:if> 		
 	
-													<!-- till  here --> 									  					
+					<c:if test="${VoteLearningForm.activityRunOffline != 'true'}"> 			
+	  					  <tr>
+						  	<td NOWRAP align=center class="input" valign=top bgColor="white" colspan=2> 
+					 	  		<c:out value="${VoteLearningForm.activityTitle}"/> 						 			
+						  	</td>
+						  </tr>
+						  
+						  <tr>
+						  	<td  NOWRAP align=left class="input" valign=top bgColor="white" colspan=2> 
+					 	  		<c:out value="${VoteLearningForm.activityInstructions}"/> 						 									  	
+						  	</td>
+						  </tr>
 	
-															<c:if test="${requestScope.checkedOptionFound == 0}"> 		
-																				<tr> 
-																					<td NOWRAP align=left class="input" valign=top> 
-																						<font size=2>
-																							<input type="checkbox" 
-																							name=optionCheckBox<c:out value="${sessionScope.queIndex}"/>-<c:out value="${subEntry.key}"/>
-																							onclick="javascript:document.forms[0].optionCheckBoxSelected.value=1; 
-																							document.forms[0].questionIndex.value=<c:out value="${sessionScope.queIndex}"/>; 
-																							document.forms[0].optionValue.value='<c:out value="${subEntry.value}"/>';																			
+	
+							  <tr>						 
+								<td NOWRAP align=left>
+								<table align=left>
+				  		  	 		<c:set var="queIndex" scope="session" value="0"/>
+										  		<c:forEach var="subEntry" items="${sessionScope.mapQuestionContentLearner}">
+											  		<c:set var="queIndex" scope="session" value="${queIndex +1}"/>
+											  		
+									  		  	 		<c:set var="checkedOptionFound" scope="request" value="0"/>
+														<!-- traverse the selected option from here --> 									  		
+																	<c:if test="${subEntry.key == sessionScope.queIndex}"> 		
+																	  		<c:forEach var="selectedSubEntry" items="${sessionScope.mapGeneralCheckedOptionsContent}">
+																				<c:if test="${subEntry.value == selectedSubEntry.value}"> 		
+																					<tr> 
+																						<td NOWRAP align=left class="input" valign=top> 
+																							<font size=2>
+																								<input type="checkbox" 
+																								name=optionCheckBox<c:out value="${sessionScope.queIndex}"/>-<c:out value="${subEntry.key}"/>
+																								onclick="javascript:document.forms[0].optionCheckBoxSelected.value=1; 
+																								document.forms[0].questionIndex.value=<c:out value="${sessionScope.queIndex}"/>; 
+																								document.forms[0].optionValue.value='<c:out value="${subEntry.value}"/>';
+																								
+																								if (this.checked == 1)
+																								{
+																									document.forms[0].checked.value=true;
+																								}
+																								else
+																								{
+																									document.forms[0].checked.value=false;
+																								}
+																								
+																								submitMethod('selectOption');" CHECKED> 
+																							</font>
+																						</td> 
+																						<td NOWRAP align=left class="input" valign=top> 
+																							<font size=2>
+																								<font color="#CCCC99"> 	<c:out value="${subEntry.value}"/> </font>
+																							</font>
+																						</td>
+																					</tr>	
+																  		  	 		<c:set var="checkedOptionFound" scope="request" value="1"/>
+								  												</c:if> 			
+																		</c:forEach>																						
+				  												</c:if> 			
+		
+														<!-- till  here --> 									  					
+		
+																<c:if test="${requestScope.checkedOptionFound == 0}"> 		
+																					<tr> 
+																						<td NOWRAP align=left class="input" valign=top> 
+																							<font size=2>
+																								<input type="checkbox" 
+																								name=optionCheckBox<c:out value="${sessionScope.queIndex}"/>-<c:out value="${subEntry.key}"/>
+																								onclick="javascript:document.forms[0].optionCheckBoxSelected.value=1; 
+																								document.forms[0].questionIndex.value=<c:out value="${sessionScope.queIndex}"/>; 
+																								document.forms[0].optionValue.value='<c:out value="${subEntry.value}"/>';																			
+					
+																								if (this.checked == 1)
+																								{
+																									document.forms[0].checked.value=true;
+																								}
+																								else
+																								{
+																									document.forms[0].checked.value=false;
+																								}
+																								submitMethod('selectOption');"> 
+																							</font>
+																						</td> 
+																						<td NOWRAP align=left class="input" valign=top> 
+																							<font size=2>
+																								<font color="#CCCC99"> <c:out value="${subEntry.value}"/> </font>
+																							</font>
+																						</td>
+																					</tr>	
+				  												</c:if> 			
+												</c:forEach>
+								</table>
+								</td>
+							</tr>
+							  
+							<c:if test="${VoteLearningForm.allowTextEntry == 'true'}"> 			
+									<tr> 
+										<td NOWRAP align=left class="input" valign=top bgColor="#999966" colspan=2> 
+							      			<font size=2> <b>
+										 		<bean:message key="label.other"/>: 
+									      		</b> 
+									 			<html:text property="userEntry" size="30" maxlength="100"/>
+											</font>									 			
+								 		</td>
+								  	</tr>
+							</c:if> 									  	
 				
-																							if (this.checked == 1)
-																							{
-																								document.forms[0].checked.value=true;
-																							}
-																							else
-																							{
-																								document.forms[0].checked.value=false;
-																							}
-																							submitMethod('selectOption');"> 
-																						</font>
-																					</td> 
-																					<td NOWRAP align=left class="input" valign=top> 
-																						<font size=2>
-																							<font color="#CCCC99"> <c:out value="${subEntry.value}"/> </font>
-																						</font>
-																					</td>
-																				</tr>	
-			  												</c:if> 			
-											</c:forEach>
-							</table>
-							</td>
-						</tr>
-						  
-						  
-						<tr> 
-							<td NOWRAP align=left class="input" valign=top bgColor="#999966" colspan=2> 
-				      			<font size=2> <b>
-							 		<bean:message key="label.other"/>: 
-						      		</b> 
-						 			<html:text property="userEntry" size="30" maxlength="100"/>
-								</font>									 			
-					 		</td>
-					  	</tr>
-			
-				  	   	<html:hidden property="optionCheckBoxSelected"/>
-						<html:hidden property="questionIndex"/>
-						<html:hidden property="optionIndex"/>
-						<html:hidden property="optionValue"/>						
-						<html:hidden property="checked"/>
-			  	   
-			  	<html:hidden property="donePreview"/>						   
-	  	   		  <tr>
-				  	<td NOWRAP align=right class="input" valign=top> 
-					  	<font size=2>
-                            <html:submit property="continueOptionsCombined" 
-                                         styleClass="linkbutton" 
-                                         onclick="submitMethod('continueOptionsCombined');">
-								<bean:message key="button.submit"/>
-                            </html:submit>
-						</font>
-				  	 </td>
-				  </tr>
-		</table>
-	<!--options content ends here-->
-
+					  	   	<html:hidden property="optionCheckBoxSelected"/>
+							<html:hidden property="questionIndex"/>
+							<html:hidden property="optionIndex"/>
+							<html:hidden property="optionValue"/>						
+							<html:hidden property="checked"/>
+				  	   
+				  	<html:hidden property="donePreview"/>						   
+		  	   		  <tr>
+					  	<td NOWRAP align=right class="input" valign=top> 
+						  	<font size=2>
+	                            <html:submit property="continueOptionsCombined" 
+	                                         styleClass="linkbutton" 
+	                                         onclick="submitMethod('continueOptionsCombined');">
+									<bean:message key="button.submit"/>
+	                            </html:submit>
+							</font>
+					  	 </td>
+					  </tr>
+					
+					</c:if> 		
+				</table>
 </html:form>
 
 </body>

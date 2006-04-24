@@ -60,27 +60,11 @@ public class LearningUtil implements VoteAppConstants {
     		VoteQueContent voteQueContent=(VoteQueContent)contentIterator.next();
     		if (voteQueContent != null)
     		{
-    			//int displayOrder=voteQueContent.getDisplayOrder().intValue();
     		    int displayOrder=voteQueContent.getDisplayOrder();
         		if (displayOrder != 0)
         		{
         			/* add the question to the questions Map in the displayOrder*/
         			mapQuestionsContent.put(new Integer(displayOrder).toString(),voteQueContent.getQuestion());
-        		}
-        		
-        		/* prepare the first question's candidate answers for presentation*/ 
-        		if (displayOrder == 1)
-        		{
-        		    /*
-        			logger.debug("first question... ");
-        			Long uid=voteQueContent.getUid();
-        			logger.debug("uid : " + uid);
-        			List listVoteOptions=voteService.findVoteOptionsContentByQueId(uid);
-        			logger.debug("listVoteOptions : " + listVoteOptions);
-        			Map mapOptionsContent=VoteUtils.generateOptionsMap(listVoteOptions);
-        			request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
-        			logger.debug("updated Options Map: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT));
-        			*/
         		}
     		}
     	}
@@ -162,11 +146,19 @@ public class LearningUtil implements VoteAppConstants {
 	            }
 	            else if ((voteQueContent == null) && (questionDisplayOrder.toString().equals("101")))
 	            {
-	                logger.debug("creating user entry record");
+	                logger.debug("creating user entry record, 101");
 	                VoteQueContent localVoteQueContent=voteService.getToolDefaultQuestionContent(1);
 	                logger.debug("localVoteQueContent: " + localVoteQueContent);
 	                createIndividualOptions(request, localVoteQueContent, voteQueUsr, attempTime, timeZone, userEntry, nominationCount, true);    
 	            }
+	            else if ((voteQueContent == null) && (questionDisplayOrder.toString().equals("102")))
+	            {
+	                logger.debug("creating user entry record, 102");
+	                VoteQueContent localVoteQueContent=voteService.getToolDefaultQuestionContent(1);
+	                logger.debug("localVoteQueContent: " + localVoteQueContent);
+	                createIndividualOptions(request, localVoteQueContent, voteQueUsr, attempTime, timeZone, userEntry, nominationCount, false);    
+	            }
+
 	            
 	        }			
 		}
@@ -311,7 +303,5 @@ public class LearningUtil implements VoteAppConstants {
     	mapGeneralCheckedOptionsContent=(Map) request.getSession().getAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT);
     	logger.debug("final mapGeneralCheckedOptionsContent: " + mapGeneralCheckedOptionsContent);
     }
-
-    
 }
 
