@@ -261,7 +261,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 	 	logger.debug("verifyDuplicatesOptionsMap: " + verifyDuplicatesOptionsMap);
 	 	request.getSession().removeAttribute(USER_EXCEPTION_OPTIONS_DUPLICATE);
 	 	if (verifyDuplicatesOptionsMap == false)
-			{
+		{
 			errors= new ActionMessages();
 			errors.add(Globals.ERROR_KEY,new ActionMessage("error.options.duplicate"));
 			request.getSession().setAttribute(USER_EXCEPTION_OPTIONS_DUPLICATE, new Boolean(true).toString());
@@ -269,7 +269,8 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 			saveErrors(request,errors);
 			voteAuthoringForm.resetUserAction();
 	        return (mapping.findForward(LOAD_QUESTIONS));
-			}
+		}
+	 	
 	    
 	 	logger.debug("submitting mapOptionsContent:" + mapOptionsContent);
 	    
@@ -280,6 +281,33 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 	    VoteContent voteContent=authoringUtil.saveOrUpdateVoteContent(mapOptionsContent, voteService, voteAuthoringForm, request);
 	    logger.debug("voteContent: " + voteContent);
 		
+	    String maxNomCount=voteAuthoringForm.getMaxNominationCount();
+	    logger.debug("maxNomCount:" + maxNomCount);
+	    
+	    if (maxNomCount.equals("0"))
+	    {
+			errors= new ActionMessages();
+			errors.add(Globals.ERROR_KEY,new ActionMessage("error.maxNominationCount.invalid"));
+			logger.debug("add error.maxNominationCount.invalid to ActionMessages");
+			saveErrors(request,errors);
+			voteAuthoringForm.resetUserAction();
+	        return (mapping.findForward(LOAD_QUESTIONS));
+	    }
+	    
+    	try
+		{
+    		int intMaxNomCount=new Integer(maxNomCount).intValue();
+	    	logger.debug("intMaxNomCount : " +intMaxNomCount);
+		}
+    	catch(NumberFormatException e)
+		{
+    	    errors= new ActionMessages();
+    		errors.add(Globals.ERROR_KEY,new ActionMessage("error.maxNominationCount.invalid"));
+    		saveErrors(request,errors);
+			voteAuthoringForm.resetUserAction();
+    		return (mapping.findForward(LOAD_QUESTIONS));
+		}
+
 	
 		logger.debug("start persisting offline files metadata");
 		AuthoringUtil.persistFilesMetaData(request, true, voteContent);
