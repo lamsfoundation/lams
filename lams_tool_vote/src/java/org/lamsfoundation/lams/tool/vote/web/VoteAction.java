@@ -262,11 +262,9 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 	 	request.getSession().removeAttribute(USER_EXCEPTION_OPTIONS_DUPLICATE);
 	 	if (verifyDuplicatesOptionsMap == false)
 		{
-			errors= new ActionMessages();
-			errors.add(Globals.ERROR_KEY,new ActionMessage("error.options.duplicate"));
 			request.getSession().setAttribute(USER_EXCEPTION_OPTIONS_DUPLICATE, new Boolean(true).toString());
 			logger.debug("add error.options.duplicate to ActionMessages");
-			saveErrors(request,errors);
+			persistError(request,"error.options.duplicate");
 			voteAuthoringForm.resetUserAction();
 	        return (mapping.findForward(LOAD_QUESTIONS));
 		}
@@ -286,10 +284,8 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 	    
 	    if (maxNomCount.equals("0"))
 	    {
-			errors= new ActionMessages();
-			errors.add(Globals.ERROR_KEY,new ActionMessage("error.maxNominationCount.invalid"));
-			logger.debug("add error.maxNominationCount.invalid to ActionMessages");
-			saveErrors(request,errors);
+			request.setAttribute(USER_EXCEPTION_MAXNOMINATION_INVALID, new Boolean(true).toString());
+			persistError(request,"error.maxNominationCount.invalid");
 			voteAuthoringForm.resetUserAction();
 	        return (mapping.findForward(LOAD_QUESTIONS));
 	    }
@@ -301,9 +297,8 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 		}
     	catch(NumberFormatException e)
 		{
-    	    errors= new ActionMessages();
-    		errors.add(Globals.ERROR_KEY,new ActionMessage("error.maxNominationCount.invalid"));
-    		saveErrors(request,errors);
+    		request.setAttribute(USER_EXCEPTION_MAXNOMINATION_INVALID, new Boolean(true).toString());
+    		persistError(request,"error.maxNominationCount.invalid");
 			voteAuthoringForm.resetUserAction();
     		return (mapping.findForward(LOAD_QUESTIONS));
 		}

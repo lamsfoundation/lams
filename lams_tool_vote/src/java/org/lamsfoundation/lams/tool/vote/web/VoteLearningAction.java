@@ -316,7 +316,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
     	logger.debug("intMaxNominationCount: " + intMaxNominationCount);
     	
     	
-    	int nominationCount=voteService.getLastNominationCount(voteQueUsr.getQueUsrId());
+    	int nominationCount=voteService.getLastNominationCount(voteQueUsr.getUid());
     	logger.debug("current nominationCount: " + nominationCount);
     	
 

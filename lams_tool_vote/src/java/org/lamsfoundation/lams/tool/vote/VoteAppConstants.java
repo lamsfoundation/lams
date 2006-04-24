@@ -274,4 +274,5 @@ public interface VoteAppConstants {
     public static final String USER_EXCEPTION_WEIGHT_MUST_EQUAL100		="userExceptionWeightMustEqual100";
     public static final String USER_EXCEPTION_SINGLE_OPTION				="userExceptionSingleOption";
     public static final String USER_EXCEPTION_OPTIONS_DUPLICATE			="userExceptionOptionsDuplicate";
+    public static final String USER_EXCEPTION_MAXNOMINATION_INVALID		="userExceptionMaxNominationInvalid";
 }
