@@ -417,7 +417,21 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	        	order++;
 	    		if (voteQueContent != null)
 	    		{
-	    		    localMapQuestionsContent.put(new Integer(order).toString(),voteQueContent.getQuestion());
+	    		    String entry=voteQueContent.getQuestion(); 
+	    		    logger.debug("entry: " + entry);
+	    		    if (entry != null)
+	    		    {
+		    		    if (entry.equals("sample nomination"))
+		    		    {
+		    		        logger.debug("this nomination entry points to a user entered nomination: " + attempt.getUserEntry());
+		    		        localMapQuestionsContent.put(new Integer(order).toString(), attempt.getUserEntry());
+		    		    }
+		    		    else
+		    		    {
+		    		        logger.debug("this nomination entry points to a standard nomination: " + voteQueContent.getQuestion());
+		    		        localMapQuestionsContent.put(new Integer(order).toString(),voteQueContent.getQuestion());    
+		    		    }
+	    		    }
 	    		}
 	    	}
 	    	request.getSession().setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, localMapQuestionsContent);

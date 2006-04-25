@@ -76,14 +76,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 			  		<c:forEach var="entry" items="${sessionScope.mapGeneralCheckedOptionsContent}">
 						  <tr>
-						  	<td NOWRAP align=left valign=top  colspan=2> 
+						  	<td NOWRAP align=center valign=top  colspan=2> 
 								  <c:out value="${entry.value}" escapeXml="false" />									
 						  	</td>
 						  </tr>
 					</c:forEach>
 
 						<tr> 
-							<td NOWRAP align=left class="input" valign=top colspan=2> 
+							<td NOWRAP align=center class="input" valign=top colspan=2> 
 						 	  		<c:out value="${VoteLearningForm.userEntry}"/> 						 			
 					 		</td>
 					  	</tr>
@@ -107,12 +107,26 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				                                    <bean:message key="label.retake"/>
 				                                </html:submit>
 								</c:if> 		          								                      
-	                            <html:submit property="continueOptionsCombined" 
-	                                         styleClass="linkbutton" 
-	                                         onclick="submitMethod('continueOptionsCombined');">
-									<bean:message key="button.submit"/>
-	                            </html:submit>
-	   						&nbsp&nbsp&nbsp&nbsp&nbsp                                	   						
+								
+								<c:if test="${VoteLearningForm.revisitingUser == 'false' }"> 							
+		                            <html:submit property="continueOptionsCombined" 
+		                                         styleClass="linkbutton" 
+		                                         onclick="submitMethod('continueOptionsCombined');">
+										<bean:message key="button.submit"/>
+		                            </html:submit>
+		   						&nbsp&nbsp&nbsp&nbsp&nbsp                                	   						
+								</c:if> 		          		
+
+								<c:if test="${VoteLearningForm.revisitingUser == 'true' && VoteLearningForm.lockOnFinish != 'true'}"> 							
+		                            <html:submit property="continueOptionsCombined" 
+		                                         styleClass="linkbutton" 
+		                                         onclick="submitMethod('continueOptionsCombined');">
+										<bean:message key="button.submit"/>
+		                            </html:submit>
+		   						&nbsp&nbsp&nbsp&nbsp&nbsp                                	   						
+								</c:if> 		          		
+
+														                      	   						
                                 <html:submit property="learnerFinished" 
                                              styleClass="linkbutton" 
                                              onclick="submitMethod('learnerFinished');">
