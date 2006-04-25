@@ -55,31 +55,58 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						</td></tr>
 					</c:if> 		
 					  
-					  
-				
 					  <tr>
 					  	<td NOWRAP align=center class="input" valign=top colspan=2> 
 							 CHART FOR ALL RESULTS 
 					  	</td>
 					  </tr>	
 
+
+					  <tr>
+					  	<td NOWRAP align=center class="input" valign=top colspan=2> 
+								&nbsp&nbsp&nbsp&nbsp
+					  	</td>
+					  </tr>	
+
+					  <tr>
+					  	<td NOWRAP align=center class="input" valign=top bgColor="#333366" colspan=2> 
+						  	<font size=2 color="#FFFFFF"> <b>  <bean:message key="label.learner.nominations"/> </b> </font>
+					  	</td>
+					  </tr>
+
+			  		<c:forEach var="entry" items="${sessionScope.mapGeneralCheckedOptionsContent}">
+						  <tr>
+						  	<td NOWRAP align=left valign=top  colspan=2> 
+								  <c:out value="${entry.value}" escapeXml="false" />									
+						  	</td>
+						  </tr>
+					</c:forEach>
+
+						<tr> 
+							<td NOWRAP align=left class="input" valign=top colspan=2> 
+						 	  		<c:out value="${VoteLearningForm.userEntry}"/> 						 			
+					 		</td>
+					  	</tr>
+
+
 				  <tr>
 				  	<td NOWRAP colspan=2 align=center class="input" valign=top> 
 					  	<font size=2>
-                                <html:submit property="viewAnswers" 
-                                             styleClass="linkbutton" 
-                                             onclick="submitMethod('viewAnswers');">
-                                    <bean:message key="label.view.answers"/>
-                                </html:submit>
-	   						&nbsp&nbsp&nbsp&nbsp&nbsp
-								<c:if test="${VoteLearningForm.voteChangable == 'true'}"> 				   						
+					  	
+								<c:if test="${VoteLearningForm.voteChangable == 'true' && VoteLearningForm.lockOnFinish != 'true'}"> 				   						
 			                                <html:submit property="redoQuestionsOk" 
 			                                             styleClass="linkbutton" 
 			                                             onclick="submitMethod('redoQuestionsOk');">
 			                                    <bean:message key="label.retake"/>
 			                                </html:submit>
-								</c:if> 		                                
-	   						&nbsp&nbsp&nbsp&nbsp&nbsp                                
+								</c:if> 		          
+								<c:if test="${VoteLearningForm.voteChangable == 'true' && VoteLearningForm.lockOnFinish == 'true' && VoteLearningForm.revisitingUser == 'false' }"> 				   						
+				                                <html:submit property="redoQuestionsOk" 
+				                                             styleClass="linkbutton" 
+				                                             onclick="submitMethod('redoQuestionsOk');">
+				                                    <bean:message key="label.retake"/>
+				                                </html:submit>
+								</c:if> 		          								                      
 	                            <html:submit property="continueOptionsCombined" 
 	                                         styleClass="linkbutton" 
 	                                         onclick="submitMethod('continueOptionsCombined');">

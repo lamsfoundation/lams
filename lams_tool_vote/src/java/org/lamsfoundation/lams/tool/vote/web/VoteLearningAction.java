@@ -381,7 +381,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
     	logger.debug("nominations deleted for user: " + voteQueUsr.getUid());
     	LearningUtil.createAttempt(request, voteQueUsr, mapGeneralCheckedOptionsContent, userEntry, newNominationCount, false);
 
-    	logger.debug("using nominationCount: " + nominationCount);
+    	logger.debug("using nominationCount: " + newNominationCount);
     	
     	if ((mapGeneralCheckedOptionsContent.size() == 0  && (userEntryAvailable == true)))
     	{
@@ -394,7 +394,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 			if (userEntry.length() > 0)
 			{
 			    logger.debug("creating entry for: " + userEntry);
-			    LearningUtil.createAttempt(request, voteQueUsr, mapLeanerCheckedOptionsContent, userEntry, nominationCount, true);    
+			    LearningUtil.createAttempt(request, voteQueUsr, mapLeanerCheckedOptionsContent, userEntry, newNominationCount, true);    
 			}
     	}
     	if ((mapGeneralCheckedOptionsContent.size() > 0) && (userEntryAvailable == true))
@@ -408,7 +408,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 			if (userEntry.length() > 0)
 			{
 			    logger.debug("creating entry for: " + userEntry);
-			    LearningUtil.createAttempt(request, voteQueUsr, mapLeanerCheckedOptionsContent, userEntry, nominationCount, false);    
+			    LearningUtil.createAttempt(request, voteQueUsr, mapLeanerCheckedOptionsContent, userEntry, newNominationCount, false);    
 			}
     	}
 

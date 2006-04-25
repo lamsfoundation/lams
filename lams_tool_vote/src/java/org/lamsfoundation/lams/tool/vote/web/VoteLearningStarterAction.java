@@ -22,6 +22,8 @@
 package org.lamsfoundation.lams.tool.vote.web;
 
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -44,8 +46,10 @@ import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
 import org.lamsfoundation.lams.tool.vote.VoteComparator;
 import org.lamsfoundation.lams.tool.vote.VoteUtils;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
+import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
+import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 import org.lamsfoundation.lams.tool.vote.service.VoteServiceProxy;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -127,6 +131,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 
 	VoteLearningForm voteLearningForm = (VoteLearningForm) form;
 	voteLearningForm.setRevisitingUser(new Boolean(false).toString());
+	voteLearningForm.setUserEntry("");
     /*
      * persist time zone information to session scope. 
      */
@@ -392,7 +397,32 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
     		logger.debug("the learner has already responsed to this content, just generate a read-only report. Use redo questions for this.");
     		
     		voteLearningForm.setRevisitingUser(new Boolean(true).toString());
-	    	return (mapping.findForward(REDO_QUESTIONS));
+    		
+    		logger.debug("start building MAP_GENERAL_CHECKED_OPTIONS_CONTENT");
+		 	Long toolContentId=(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    	logger.debug("toolContentId: " + toolContentId);
+
+	    	List attempts=voteService.getAttemptsForUser(voteQueUsr.getUid());
+	    	logger.debug("attempts: " + attempts);
+	    	
+	    	Map localMapQuestionsContent= new TreeMap(new VoteComparator());
+			Iterator listIterator=attempts.iterator();
+			int order=0;
+	    	while (listIterator.hasNext())
+	    	{
+	    	    VoteUsrAttempt attempt=(VoteUsrAttempt)listIterator.next();
+	        	logger.debug("attempt: " + attempt);
+	        	VoteQueContent voteQueContent=attempt.getVoteQueContent();
+	        	logger.debug("voteQueContent: " + voteQueContent);        	
+	        	order++;
+	    		if (voteQueContent != null)
+	    		{
+	    		    localMapQuestionsContent.put(new Integer(order).toString(),voteQueContent.getQuestion());
+	    		}
+	    	}
+	    	request.getSession().setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, localMapQuestionsContent);
+    		logger.debug("end building MAP_GENERAL_CHECKED_OPTIONS_CONTENT: " + localMapQuestionsContent);
+    		return (mapping.findForward(ALL_NOMINATIONS));
     	}
     }
     else if (learningMode.equals("teacher"))
