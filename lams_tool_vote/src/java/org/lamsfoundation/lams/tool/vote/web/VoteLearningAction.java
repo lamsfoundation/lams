@@ -48,6 +48,7 @@ import org.lamsfoundation.lams.tool.vote.VoteUtils;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
+import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
@@ -111,8 +112,11 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
                                HttpServletResponse response) throws IOException,
                                                             ServletException
     {
-    	VoteUtils.cleanUpUserExceptions(request);
-	 	VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
+        VoteLearningForm voteLearningForm = (VoteLearningForm) form;
+        voteLearningForm.setNominationsSubmited(new Boolean(false).toString());
+    	
+        VoteUtils.cleanUpUserExceptions(request);
+    	VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
 	 	IVoteService voteService =VoteUtils.getToolService(request);
 	 	VoteUtils.persistRichText(request);	 	
 	 	voteAuthoringForm.resetUserAction();
@@ -128,10 +132,11 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 	{   
         VoteUtils.cleanUpUserExceptions(request);
 		logger.debug("dispatching viewAllResults...");
+		VoteLearningForm voteLearningForm = (VoteLearningForm) form;
+		voteLearningForm.setNominationsSubmited(new Boolean(false).toString());
 		
 		setContentInUse(request);
-		VoteLearningForm voteLearningForm = (VoteLearningForm) form;
-	 	IVoteService voteService =VoteUtils.getToolService(request);
+		IVoteService voteService =VoteUtils.getToolService(request);
 	 	
     	voteLearningForm.resetCommands();
 	    return (mapping.findForward(ALL_NOMINATIONS));
@@ -147,39 +152,51 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
         VoteUtils.cleanUpUserExceptions(request);
 		logger.debug("dispatching viewAnswers...");
 		
-		setContentInUse(request);
 		VoteLearningForm voteLearningForm = (VoteLearningForm) form;
+		voteLearningForm.setNominationsSubmited(new Boolean(false).toString());
 	 	IVoteService voteService =VoteUtils.getToolService(request);
+	 	setContentInUse(request);
 	 	
-	 	Long toolContentId=(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
-    	logger.debug("toolContentId: " + toolContentId);
+	 	String isRevisitingUser=voteLearningForm.getRevisitingUser();
+	 	logger.debug("isRevisitingUser: " + isRevisitingUser);
+	 	
+	 	if (isRevisitingUser.equals("true"))
+	 	{
+	 	    logger.debug("this is a revisiting user, get the nominations from the db: " + isRevisitingUser);
+		 	Long toolContentId=(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    	logger.debug("toolContentId: " + toolContentId);
 
-    	VoteQueUsr voteQueUsr=LearningUtil.getUser(request);
-    	logger.debug("voteQueUsr: " + voteQueUsr);
+	    	VoteQueUsr voteQueUsr=LearningUtil.getUser(request);
+	    	logger.debug("voteQueUsr: " + voteQueUsr);
 
-    	List attempts=voteService.getAttemptsForUser(voteQueUsr.getUid());
-    	logger.debug("attempts: " + attempts);
-    	
-    	Map mapQuestionsContent= new TreeMap(new VoteComparator());
-		Iterator listIterator=attempts.iterator();
-		int order=0;
-    	while (listIterator.hasNext())
-    	{
-    	    VoteUsrAttempt attempt=(VoteUsrAttempt)listIterator.next();
-        	logger.debug("attempt: " + attempt);
-        	VoteQueContent voteQueContent=attempt.getVoteQueContent();
-        	logger.debug("voteQueContent: " + voteQueContent);        	
-        	order++;
-    		if (voteQueContent != null)
-    		{
-            	mapQuestionsContent.put(new Integer(order).toString(),voteQueContent.getQuestion());
-    		}
-    	}
-    	request.getSession().setAttribute(MAP_VIEWONLY_QUESTION_CONTENT_LEARNER, mapQuestionsContent);
-    	logger.debug("MAP_VIEWONLY_QUESTION_CONTENT_LEARNER: " +  request.getSession().getAttribute(MAP_VIEWONLY_QUESTION_CONTENT_LEARNER));
-    	
-    	
-    	voteLearningForm.resetCommands();
+	    	List attempts=voteService.getAttemptsForUser(voteQueUsr.getUid());
+	    	logger.debug("attempts: " + attempts);
+	    	
+	    	Map mapQuestionsContent= new TreeMap(new VoteComparator());
+			Iterator listIterator=attempts.iterator();
+			int order=0;
+	    	while (listIterator.hasNext())
+	    	{
+	    	    VoteUsrAttempt attempt=(VoteUsrAttempt)listIterator.next();
+	        	logger.debug("attempt: " + attempt);
+	        	VoteQueContent voteQueContent=attempt.getVoteQueContent();
+	        	logger.debug("voteQueContent: " + voteQueContent);        	
+	        	order++;
+	    		if (voteQueContent != null)
+	    		{
+	            	mapQuestionsContent.put(new Integer(order).toString(),voteQueContent.getQuestion());
+	    		}
+	    	}
+	    	//request.getSession().setAttribute(MAP_VIEWONLY_QUESTION_CONTENT_LEARNER, mapQuestionsContent);
+	    	//logger.debug("MAP_VIEWONLY_QUESTION_CONTENT_LEARNER: " +  request.getSession().getAttribute(MAP_VIEWONLY_QUESTION_CONTENT_LEARNER));
+	    	request.getSession().setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, mapQuestionsContent);
+	 	}
+	 	else
+	 	{
+	 	   logger.debug("this is not a revisiting user: " + isRevisitingUser);
+	 	}
+	 	
+	 	voteLearningForm.resetCommands();
     	logger.debug("fwd'ing to : " + VIEW_ANSWERS);
 		return (mapping.findForward(VIEW_ANSWERS));
     }
@@ -195,6 +212,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 		logger.debug("dispatching redoQuestionsOk...");
 		
 		VoteLearningForm voteLearningForm = (VoteLearningForm) form;
+		voteLearningForm.setNominationsSubmited(new Boolean(false).toString());
 	 	IVoteService voteService =VoteUtils.getToolService(request);
 
 
@@ -215,6 +233,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 		logger.debug("requested learner finished, the learner should be directed to next activity.");
 
 		VoteLearningForm voteLearningForm = (VoteLearningForm) form;
+		voteLearningForm.setNominationsSubmited(new Boolean(false).toString());
 	 	IVoteService voteService =VoteUtils.getToolService(request);
 	 	
 		Long toolSessionId = (Long) request.getSession().getAttribute(TOOL_SESSION_ID);
@@ -222,6 +241,17 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 		logger.debug("attempting to leave/complete session with toolSessionId:" + toolSessionId + " and userID:"+userID);
 		
 		VoteUtils.cleanUpSessionAbsolute(request);
+		
+
+		/*this section is temorarrily here, from here... */
+        VoteSession voteSession=null;
+		voteSession=voteService.retrieveVoteSession(toolSessionId);
+		logger.debug("retrieved voteSession: " + voteSession);
+		voteSession.setSessionStatus(COMPLETED);
+		voteService.updateVoteSession(voteSession);
+    	logger.debug("updated voteSession to COMPLETED" + voteSession);
+		/*...till  here... */
+
 		
 		String nextUrl=null;
 		try
@@ -261,7 +291,22 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 		return null;
 
     }
-    
+
+    public ActionForward nominateVotes(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+	{   
+        VoteUtils.cleanUpUserExceptions(request);
+		logger.debug("dispatching nominateVotes...");
+		
+		VoteLearningForm voteLearningForm = (VoteLearningForm) form;
+		voteLearningForm.setNominationsSubmited(new Boolean(false).toString());
+	 	IVoteService voteService =VoteUtils.getToolService(request);
+		return (mapping.findForward(INDIVIDUAL_REPORT));
+	}
+
     
     public ActionForward continueOptionsCombined(ActionMapping mapping,
             ActionForm form,
@@ -272,13 +317,12 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
         VoteUtils.cleanUpUserExceptions(request);
 		logger.debug("dispatching continueOptionsCombined...");
 		
-		setContentInUse(request);
 		VoteLearningForm voteLearningForm = (VoteLearningForm) form;
+		voteLearningForm.setNominationsSubmited(new Boolean(false).toString());
 	 	IVoteService voteService =VoteUtils.getToolService(request);
 	 	
-	 	
-	 	/* process the answers */
-		Map mapGeneralCheckedOptionsContent=(Map) request.getSession().getAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT);
+		setContentInUse(request);
+	 	Map mapGeneralCheckedOptionsContent=(Map) request.getSession().getAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT);
     	logger.debug("final mapGeneralCheckedOptionsContent: " + mapGeneralCheckedOptionsContent);
     	
     	Long toolContentId=(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
@@ -374,8 +418,10 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 
     	mapGeneralCheckedOptionsContent=(Map) request.getSession().getAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT);
     	logger.debug("final mapGeneralCheckedOptionsContent: " + mapGeneralCheckedOptionsContent);
-
-		return (mapping.findForward(INDIVIDUAL_REPORT));
+    	
+    	voteLearningForm.setNominationsSubmited(new Boolean(true).toString());
+    	logger.debug("fwd ing to: " + ALL_NOMINATIONS);
+    	return (mapping.findForward(ALL_NOMINATIONS));
     }
 
     public ActionForward redoQuestions(ActionMapping mapping,
@@ -387,6 +433,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
         logger.debug("dispatching redoQuestions...");
     	VoteUtils.cleanUpUserExceptions(request);
     	VoteLearningForm voteLearningForm = (VoteLearningForm) form;
+    	voteLearningForm.setNominationsSubmited(new Boolean(false).toString());
 	 	IVoteService voteService =VoteUtils.getToolService(request);
 	 	
     	Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
@@ -432,6 +479,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
         logger.debug("dispatching selectOption...");
     	VoteUtils.cleanUpUserExceptions(request);
     	VoteLearningForm voteLearningForm = (VoteLearningForm) form;
+    	voteLearningForm.setNominationsSubmited(new Boolean(false).toString());
 	 	IVoteService voteService =VoteUtils.getToolService(request);
 	 	
     	voteLearningForm.resetParameters();

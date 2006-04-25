@@ -39,7 +39,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							<c:if test="${sessionScope.sbmtSuccess == 1}"> 			
 								<img src="<c:out value="${tool}"/>images/success.gif" align="left" width=20 height=20>  <font size=2> <bean:message key="sbmt.successful"/> </font> </img>
 							</c:if> 			
-							<c:if test="${sessionScope.sbmtSuccess != 1}"> 			
+
+							<c:if test="${VoteAuthoringForm.exceptionMaxNominationInvalid == 'true'}"> 										
 									<img src="<c:out value="${tool}"/>images/error.jpg" align="left" width=20 height=20>  <font size=2> <bean:message key="error.maxNominationCount.invalid"/> </font> </img>
 							</c:if> 			
 						</td>
@@ -62,7 +63,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								<lams:SetEditor id="instructions" text="${activityInstructions}" small="true"/>								
 							</td> 
 						</tr>
-
 				
 			 		<!--default Option content, this entry can not be deleted but can be updated -->
 				 		<tr> 

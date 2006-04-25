@@ -98,6 +98,8 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 
 	protected String edit;
 	
+	protected String exceptionMaxNominationInvalid;
+	
 	public void resetUserAction()
     {
 		this.editDefaultQuestion=null;
@@ -726,5 +728,18 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
      */
     public void setMaxNominationCount(String maxNominationCount) {
         this.maxNominationCount = maxNominationCount;
+    }
+    /**
+     * @return Returns the exceptionMaxNominationInvalid.
+     */
+    public String getExceptionMaxNominationInvalid() {
+        return exceptionMaxNominationInvalid;
+    }
+    /**
+     * @param exceptionMaxNominationInvalid The exceptionMaxNominationInvalid to set.
+     */
+    public void setExceptionMaxNominationInvalid(
+            String exceptionMaxNominationInvalid) {
+        this.exceptionMaxNominationInvalid = exceptionMaxNominationInvalid;
     }
 }

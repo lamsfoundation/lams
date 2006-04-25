@@ -47,6 +47,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						  	<font size=2 color="#FFFFFF"> <b>  <bean:message key="label.progressiveResults"/> </b> </font>
 					  	</td>
 					  </tr>
+					  
+ 					<c:if test="${VoteLearningForm.nominationsSubmited == 'true'}"> 			
+						<tr> <td class="error" align=center>
+								<img src="<c:out value="${tool}"/>images/success.gif" align="left" width=20 height=20>  
+								<font size=2> <bean:message key="sbmt.learner.nominations.successful"/> </font> </img>
+						</td></tr>
+					</c:if> 		
+					  
+					  
 				
 					  <tr>
 					  	<td NOWRAP align=center class="input" valign=top colspan=2> 
@@ -71,6 +80,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			                                </html:submit>
 								</c:if> 		                                
 	   						&nbsp&nbsp&nbsp&nbsp&nbsp                                
+	                            <html:submit property="continueOptionsCombined" 
+	                                         styleClass="linkbutton" 
+	                                         onclick="submitMethod('continueOptionsCombined');">
+									<bean:message key="button.submit"/>
+	                            </html:submit>
+	   						&nbsp&nbsp&nbsp&nbsp&nbsp                                	   						
                                 <html:submit property="learnerFinished" 
                                              styleClass="linkbutton" 
                                              onclick="submitMethod('learnerFinished');">

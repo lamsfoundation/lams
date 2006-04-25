@@ -71,11 +71,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
                                     <bean:message key="label.view.answers"/>
                                 </html:submit>
 	   						&nbsp&nbsp&nbsp&nbsp&nbsp
-                                <html:submit property="redoQuestionsOk" 
-                                             styleClass="linkbutton" 
-                                             onclick="submitMethod('redoQuestionsOk');">
-                                    <bean:message key="label.retake"/>
-                                </html:submit>
+								<c:if test="${VoteLearningForm.lockOnFinish != 'true'}"> 				   						
+	                                <html:submit property="redoQuestionsOk" 
+	                                             styleClass="linkbutton" 
+	                                             onclick="submitMethod('redoQuestionsOk');">
+	                                    <bean:message key="label.retake"/>
+	                                </html:submit>
+								</c:if> 		                                                                
 						</font>
 				  	 </td>
 				  </tr>

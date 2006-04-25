@@ -52,6 +52,8 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
 	
 	protected String continueOptions;
 	protected String nextOptions;
+	protected String nominateVotes;
+	
 	protected String continueOptionsCombined;
 	protected String redoQuestions;
 	protected String viewSummary;
@@ -62,6 +64,7 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
 	protected String doneLearnerProgress;
 	protected String viewAllResults;
 	
+	protected String responseId;
 	protected String method;
 	protected String answer;
 	protected String currentQuestionIndex;
@@ -70,8 +73,10 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
 	protected String getPreviousQuestion;
 	protected String endLearning;
 	
+	protected String nominationsSubmited;
+	protected String revisitingUser;
 	
-    protected void resetUserActions()
+	protected void resetUserActions()
     {
     	this.getNextQuestion=null;
     	this.getPreviousQuestion=null;
@@ -176,12 +181,8 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
     public void setSubmitAnswersContent(String submitAnswersContent) {
         this.submitAnswersContent = submitAnswersContent;
     }
-	protected String responseId;
-
 	
-	
-	
-	
+    	
 	public void resetCommands()
 	{
 		this.setContinueOptions(null);
@@ -538,4 +539,44 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
     public void setMaxNominationCount(String maxNominationCount) {
         this.maxNominationCount = maxNominationCount;
     }
+    /**
+     * @return Returns the nominateVotes.
+     */
+    public String getNominateVotes() {
+        return nominateVotes;
+    }
+    /**
+     * @param nominateVotes The nominateVotes to set.
+     */
+    public void setNominateVotes(String nominateVotes) {
+        this.nominateVotes = nominateVotes;
+    }
+    
+    
+    /**
+     * @return Returns the nominationsSubmited.
+     */
+    public String getNominationsSubmited() {
+        return nominationsSubmited;
+    }
+    /**
+     * @param nominationsSubmited The nominationsSubmited to set.
+     */
+    public void setNominationsSubmited(String nominationsSubmited) {
+        this.nominationsSubmited = nominationsSubmited;
+    }
+
+    /**
+     * @return Returns the revisitingUser.
+     */
+    public String getRevisitingUser() {
+        return revisitingUser;
+    }
+    /**
+     * @param revisitingUser The revisitingUser to set.
+     */
+    public void setRevisitingUser(String revisitingUser) {
+        this.revisitingUser = revisitingUser;
+    }
+
 }

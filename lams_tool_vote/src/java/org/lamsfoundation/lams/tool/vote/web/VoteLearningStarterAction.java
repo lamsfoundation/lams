@@ -126,7 +126,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	}
 
 	VoteLearningForm voteLearningForm = (VoteLearningForm) form;
-	
+	voteLearningForm.setRevisitingUser(new Boolean(false).toString());
     /*
      * persist time zone information to session scope. 
      */
@@ -390,6 +390,8 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
     		logger.debug("the user's session id AND user id exists in the tool tables go to redo questions. " + toolSessionId + " voteQueUsr: " + 
     				voteQueUsr + " user id: " + voteQueUsr.getQueUsrId());
     		logger.debug("the learner has already responsed to this content, just generate a read-only report. Use redo questions for this.");
+    		
+    		voteLearningForm.setRevisitingUser(new Boolean(true).toString());
 	    	return (mapping.findForward(REDO_QUESTIONS));
     	}
     }

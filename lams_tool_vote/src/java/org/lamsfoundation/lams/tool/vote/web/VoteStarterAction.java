@@ -124,6 +124,7 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 		    logger.debug("retrieving voteService from cache: " + voteService);
 		}
 	    request.getSession().setAttribute(TOOL_SERVICE, voteService);
+	    request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
 
 		String servletPath=request.getServletPath();
 		logger.debug("getServletPath: "+ servletPath);
@@ -153,6 +154,7 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 		
 		VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
 		voteAuthoringForm.resetRadioBoxes();
+		voteAuthoringForm.setExceptionMaxNominationInvalid(new Boolean(false).toString());
 		
 		ActionForward validateSignature=readSignature(request,mapping);
 		logger.debug("validateSignature:  " + validateSignature);

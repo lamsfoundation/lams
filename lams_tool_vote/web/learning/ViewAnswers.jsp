@@ -44,7 +44,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<table align=center bgcolor="#FFFFFF">
 					  <tr>
 					  	<td NOWRAP align=center class="input" valign=top bgColor="#333366" colspan=2> 
-						  	<font size=2 color="#FFFFFF"> <b>  <bean:message key="label.progressiveResults"/> </b> </font>
+						  	<font size=2 color="#FFFFFF"> <b>  <bean:message key="label.viewNominations"/> </b> </font>
 					  	</td>
 					  </tr>
 				
@@ -54,7 +54,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					  	</td>
 					  </tr>	
 
-			  		<c:forEach var="entry" items="${sessionScope.mapViewOnlyQuestionContentLearner}">
+			  		<c:forEach var="entry" items="${sessionScope.mapGeneralCheckedOptionsContent}">
 						  <tr>
 						  	<td NOWRAP align=left class="input" valign=top  colspan=2> 
 									<c:out value="${entry.value}"/> 
@@ -66,11 +66,21 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				  <tr>
 				  	<td NOWRAP colspan=2 align=center class="input" valign=top> 
 					  	<font size=2>
-                                <html:submit property="redoQuestionsOk" 
-                                             styleClass="linkbutton" 
-                                             onclick="submitMethod('redoQuestionsOk');">
-                                    <bean:message key="label.retake"/>
-                                </html:submit>
+					  	
+								<c:if test="${VoteLearningForm.voteChangable == 'true' && VoteLearningForm.lockOnFinish != 'true'}"> 				   						
+			                                <html:submit property="redoQuestionsOk" 
+			                                             styleClass="linkbutton" 
+			                                             onclick="submitMethod('redoQuestionsOk');">
+			                                    <bean:message key="label.retake"/>
+			                                </html:submit>
+								</c:if> 		          
+								<c:if test="${VoteLearningForm.voteChangable == 'true' && VoteLearningForm.lockOnFinish == 'true' && VoteLearningForm.revisitingUser == 'false' }"> 				   						
+				                                <html:submit property="redoQuestionsOk" 
+				                                             styleClass="linkbutton" 
+				                                             onclick="submitMethod('redoQuestionsOk');">
+				                                    <bean:message key="label.retake"/>
+				                                </html:submit>
+									</c:if> 		          								                      
 	   						&nbsp&nbsp&nbsp&nbsp&nbsp                                
                                 <html:submit property="learnerFinished" 
                                              styleClass="linkbutton" 

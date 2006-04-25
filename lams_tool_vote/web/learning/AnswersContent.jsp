@@ -51,13 +51,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<c:if test="${VoteLearningForm.activityRunOffline != 'true'}"> 			
 	  					  <tr>
 						  	<td NOWRAP align=center class="input" valign=top bgColor="white" colspan=2> 
-					 	  		<c:out value="${VoteLearningForm.activityTitle}"/> 						 			
+								  <c:out value="${VoteLearningForm.activityTitle}" escapeXml="false" />						  								
 						  	</td>
 						  </tr>
 						  
 						  <tr>
 						  	<td  NOWRAP align=left class="input" valign=top bgColor="white" colspan=2> 
-					 	  		<c:out value="${VoteLearningForm.activityInstructions}"/> 						 									  	
+								  <c:out value="${VoteLearningForm.activityInstructions}" escapeXml="false" />						  																
 						  	</td>
 						  </tr>
 	
@@ -96,10 +96,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 																							</font>
 																						</td> 
 																						<td NOWRAP align=left class="input" valign=top> 
-																							<font size=2>
-																								<font color="#CCCC99"> 	<c:out value="${subEntry.value}"/> </font>
-																							</font>
-																						</td>
+																							<c:out value="${subEntry.value}" escapeXml="false" />														
+								  														</td>
 																					</tr>	
 																  		  	 		<c:set var="checkedOptionFound" scope="request" value="1"/>
 								  												</c:if> 			
@@ -130,10 +128,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 																							</font>
 																						</td> 
 																						<td NOWRAP align=left class="input" valign=top> 
-																							<font size=2>
-																								<font color="#CCCC99"> <c:out value="${subEntry.value}"/> </font>
-																							</font>
-																						</td>
+																							<c:out value="${subEntry.value}" escapeXml="false" />																									</td>
 																					</tr>	
 				  												</c:if> 			
 												</c:forEach>
@@ -163,10 +158,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		  	   		  <tr>
 					  	<td NOWRAP align=right class="input" valign=top> 
 						  	<font size=2>
-	                            <html:submit property="continueOptionsCombined" 
+	                            <html:submit property="nominateVotes" 
 	                                         styleClass="linkbutton" 
-	                                         onclick="submitMethod('continueOptionsCombined');">
-									<bean:message key="button.submit"/>
+	                                         onclick="submitMethod('nominateVotes');">
+									<bean:message key="label.nominated"/>
 	                            </html:submit>
 							</font>
 					  	 </td>

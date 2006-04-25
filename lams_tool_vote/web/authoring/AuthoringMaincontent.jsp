@@ -51,7 +51,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<html:html locale="true">
 	<head>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-	<title> <bean:message key="label.authoring"/> </title>
+	<title> <bean:message key="activity.title"/>  </title>
 	
 	 <lams:css/>
 	<!-- depending on user / site preference this will get changed probably use passed in variable from flash to select which one to use-->
