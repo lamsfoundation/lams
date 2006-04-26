@@ -96,6 +96,14 @@
 		    AND (lams_user_group.user_id = :userId)
 		    AND ({lesson}.learning_design_id = lams_learning_design.learning_design_id)
 		    AND (lams_learning_design.copy_type_id=2)
+		    
+		UNION
+		
+		SELECT DISTINCT {lesson.*}
+		  FROM lams_lesson {lesson}
+		  WHERE ({lesson}.user_id = :userId)
+		    AND ({lesson}.class_grouping_id IS NULL)
+		    AND NOT ({lesson}.lesson_state_id = 7)		    
 	</sql-query>
 
 	<sql-query name="activeLessons">
