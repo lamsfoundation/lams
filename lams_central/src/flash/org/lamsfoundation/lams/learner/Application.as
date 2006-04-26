@@ -183,10 +183,10 @@ class org.lamsfoundation.lams.learner.Application extends ApplicationParent {
         //Fire off a resize to set up sizes
         onResize();
 		
-		// start testing - joining a lesson
-		var lessonId:Number = 1;
-		var l:Lesson = Lesson(_seqLib.getLesson(lessonId));
-		l.joinLesson();
+		// start testing - joining a lesson/seq
+		var seqId:Number = 1;
+		var s:Sequence = Sequence(_seqLib.getSequence(seqId));
+		//_seqLib.select(s);
 		// end testing
     }
     
