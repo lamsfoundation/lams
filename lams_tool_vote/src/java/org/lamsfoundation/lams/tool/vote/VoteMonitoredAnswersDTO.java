@@ -36,7 +36,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  */
 public class VoteMonitoredAnswersDTO implements Comparable
 {
-	private String questionUid;
+	protected String questionUid;
 	
 	private String question;
 	

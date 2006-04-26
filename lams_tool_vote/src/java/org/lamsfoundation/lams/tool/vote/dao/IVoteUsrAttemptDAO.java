@@ -41,6 +41,8 @@ public interface IVoteUsrAttemptDAO
 	
 	public List getAttemptsForUser(final Long queUsrId);
 	
+	public List getUserEntries();
+	
 	public void removeAttemptsForUser(final Long queUsrId);
 	
 	public int  getLastNominationCount(Long userId);

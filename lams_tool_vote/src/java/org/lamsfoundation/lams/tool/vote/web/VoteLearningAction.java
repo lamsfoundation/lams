@@ -381,8 +381,12 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
     	logger.debug("creating attemps with mapGeneralCheckedOptionsContent " + mapGeneralCheckedOptionsContent);
     	voteService.removeAttemptsForUser(voteQueUsr.getUid());
     	logger.debug("nominations deleted for user: " + voteQueUsr.getUid());
-    	LearningUtil.createAttempt(request, voteQueUsr, mapGeneralCheckedOptionsContent, userEntry, newNominationCount, false);
-
+    	
+    	logger.debug("mapGeneralCheckedOptionsContent size: " + mapGeneralCheckedOptionsContent.size());
+    	if (mapGeneralCheckedOptionsContent.size() > 0)
+    	{
+    	    LearningUtil.createAttempt(request, voteQueUsr, mapGeneralCheckedOptionsContent, userEntry, newNominationCount, false);    
+    	}
     	logger.debug("using nominationCount: " + newNominationCount);
     	
     	if ((mapGeneralCheckedOptionsContent.size() == 0  && (userEntryAvailable == true)))

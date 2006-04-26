@@ -23,6 +23,8 @@
 package org.lamsfoundation.lams.tool.vote.web;
 
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -40,8 +42,11 @@ import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
+import org.lamsfoundation.lams.tool.vote.VoteMonitoredAnswersDTO;
 import org.lamsfoundation.lams.tool.vote.VoteUtils;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
+import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
+import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 import org.lamsfoundation.lams.tool.vote.service.VoteServiceProxy;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
@@ -165,6 +170,31 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	    request.getSession().setAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO, listMonitoredAnswersContainerDTO);
 	    logger.debug("LIST_MONITORED_ANSWERS_CONTAINER_DTO: " + request.getSession().getAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO));
 	    /* ends here. */
+	    
+	    logger.debug("start getting user entries: ");
+	    List userEntries=voteService.getUserEntries();
+	    logger.debug("userEntries: " + userEntries);
+	    
+	    List listUserEntries=new LinkedList();
+	    
+	    Iterator itListQuestions = userEntries.iterator();
+	    while (itListQuestions.hasNext())
+	    {
+	    	String  userEntry =(String)itListQuestions.next();
+	    	logger.debug("userEntry:..." + userEntry);
+	    	
+	    	if (userEntry != null)
+	    	{
+	    		VoteMonitoredAnswersDTO voteMonitoredAnswersDTO= new VoteMonitoredAnswersDTO();
+	    		logger.debug("adding uwer entry : " + userEntry);
+	    		voteMonitoredAnswersDTO.setQuestion(userEntry);
+	    		
+	    		listUserEntries.add(voteMonitoredAnswersDTO);
+			}
+		}
+	    logger.debug("finish getting user entries: " + listUserEntries);
+	    request.getSession().setAttribute(LIST_USER_ENTRIES, listUserEntries);
+	    
 	}
 
 

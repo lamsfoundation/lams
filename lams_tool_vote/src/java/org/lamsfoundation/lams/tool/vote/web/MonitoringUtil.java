@@ -256,13 +256,13 @@ public class MonitoringUtil implements VoteAppConstants{
 		    	    			voteMonitoredUserDTO.setUserEntry(voteUsrResp.getUserEntry());
 		    	    			
 		    	    			logger.debug("attempt: " + voteUsrResp);
-		    	            	VoteQueContent localVoteQueContent=voteUsrResp.getVoteQueContent();
-		    	            	logger.debug("localVoteQueContent: " + localVoteQueContent);        	
-		    	            	logger.debug("localVoteQueContent question : " + localVoteQueContent.getQuestion());
-		    	            	voteMonitoredUserDTO.setResponse(localVoteQueContent.getQuestion());
+		    	            	//VoteQueContent localVoteQueContent=voteUsrResp.getVoteQueContent();
+		    	            	//logger.debug("localVoteQueContent: " + localVoteQueContent);        	
+		    	            	//logger.debug("localVoteQueContent question : " + localVoteQueContent.getQuestion());
+		    	            	//voteMonitoredUserDTO.setResponse(localVoteQueContent.getQuestion());
 		    	            	voteMonitoredUserDTO.setQuestionUid(questionUid);
 		    	            	
-		    	            	
+		    	            	/*
 		    	            	boolean isSingleUserEntry=voteUsrResp.isSingleUserEntry();
 		    	            	logger.debug("isSingleUserEntry: " + isSingleUserEntry);
 		    	            	logger.debug("userEntry: " + voteUsrResp.getUserEntry());
@@ -281,6 +281,25 @@ public class MonitoringUtil implements VoteAppConstants{
 		    	            	    userEntryVoteMonitoredUserDTO.setResponse(voteUsrResp.getUserEntry());
 			    	    			listMonitoredUserContainerDTO.add(userEntryVoteMonitoredUserDTO);
 		    	            	}
+		    	            	*/
+		    	            	
+		    	            	VoteQueContent voteQueContent=voteUsrResp.getVoteQueContent();
+		    		        	logger.debug("voteQueContent: " + voteQueContent);        
+		    	            	String entry=voteQueContent.getQuestion(); 
+		    	    		    logger.debug("entry: " + entry);
+		    	    		    if (entry != null)
+		    	    		    {
+		    		    		    if (entry.equals("sample nomination"))
+		    		    		    {
+		    		    		        logger.debug("this nomination entry points to a user entered nomination: " + voteUsrResp.getUserEntry());
+		    		    		        voteMonitoredUserDTO.setResponse(voteUsrResp.getUserEntry());
+		    		    		    }
+		    		    		    else
+		    		    		    {
+		    		    		        logger.debug("this nomination entry points to a standard nomination: " + voteQueContent.getQuestion());
+		    		    		        voteMonitoredUserDTO.setResponse(voteQueContent.getQuestion());    
+		    		    		    }
+		    	    		    }
 		    	    			listMonitoredUserContainerDTO.add(voteMonitoredUserDTO);
 		    	    		}
 		    			}
@@ -327,12 +346,13 @@ public class MonitoringUtil implements VoteAppConstants{
 			    	    			//voteMonitoredUserDTO.setResponse(voteUsrResp.getUserEntry());
 			    	    			
 			    	    			logger.debug("attempt: " + voteUsrResp);
-			    	            	VoteQueContent localVoteQueContent=voteUsrResp.getVoteQueContent();
-			    	            	logger.debug("localVoteQueContent: " + localVoteQueContent);        	
-			    	            	logger.debug("localVoteQueContent question : " + localVoteQueContent.getQuestion());
-			    	            	voteMonitoredUserDTO.setResponse(localVoteQueContent.getQuestion());
+			    	            	//VoteQueContent localVoteQueContent=voteUsrResp.getVoteQueContent();
+			    	            	//logger.debug("localVoteQueContent: " + localVoteQueContent);        	
+			    	            	//logger.debug("localVoteQueContent question : " + localVoteQueContent.getQuestion());
+			    	            	//voteMonitoredUserDTO.setResponse(localVoteQueContent.getQuestion());
 			    	            	voteMonitoredUserDTO.setQuestionUid(questionUid);
-			    	            	
+
+			    	            	/*
 			    	            	boolean isSingleUserEntry=voteUsrResp.isSingleUserEntry();
 			    	            	logger.debug("isSingleUserEntry: " + isSingleUserEntry);
 			    	            	logger.debug("userEntry: " + voteUsrResp.getUserEntry());
@@ -351,6 +371,25 @@ public class MonitoringUtil implements VoteAppConstants{
 			    	            	    userEntryVoteMonitoredUserDTO.setResponse(voteUsrResp.getUserEntry());
 				    	    			listMonitoredUserContainerDTO.add(userEntryVoteMonitoredUserDTO);
 			    	            	}
+			    	            	*/
+			    	            	
+			    	            	VoteQueContent voteQueContent=voteUsrResp.getVoteQueContent();
+			    		        	logger.debug("voteQueContent: " + voteQueContent);        
+			    	            	String entry=voteQueContent.getQuestion(); 
+			    	    		    logger.debug("entry: " + entry);
+			    	    		    if (entry != null)
+			    	    		    {
+			    		    		    if (entry.equals("sample nomination"))
+			    		    		    {
+			    		    		        logger.debug("this nomination entry points to a user entered nomination: " + voteUsrResp.getUserEntry());
+			    		    		        voteMonitoredUserDTO.setResponse(voteUsrResp.getUserEntry());
+			    		    		    }
+			    		    		    else
+			    		    		    {
+			    		    		        logger.debug("this nomination entry points to a standard nomination: " + voteQueContent.getQuestion());
+			    		    		        voteMonitoredUserDTO.setResponse(voteQueContent.getQuestion());    
+			    		    		    }
+			    	    		    }
 			    	    			listMonitoredUserContainerDTO.add(voteMonitoredUserDTO);
 			    	    		}
 			    			}
@@ -407,13 +446,14 @@ public class MonitoringUtil implements VoteAppConstants{
 				    	    			//voteMonitoredUserDTO.setResponse(voteUsrResp.getUserEntry());
 
 				    	    			logger.debug("attempt: " + voteUsrResp);
-				    	            	VoteQueContent localVoteQueContent=voteUsrResp.getVoteQueContent();
-				    	            	logger.debug("localVoteQueContent: " + localVoteQueContent);        	
-				    	            	logger.debug("localVoteQueContent question : " + localVoteQueContent.getQuestion());
-				    	            	voteMonitoredUserDTO.setResponse(localVoteQueContent.getQuestion());
+				    	            	//VoteQueContent localVoteQueContent=voteUsrResp.getVoteQueContent();
+				    	            	//logger.debug("localVoteQueContent: " + localVoteQueContent);        	
+				    	            	//logger.debug("localVoteQueContent question : " + localVoteQueContent.getQuestion());
+				    	            	//voteMonitoredUserDTO.setResponse(localVoteQueContent.getQuestion());
 				    	            	voteMonitoredUserDTO.setQuestionUid(questionUid);
 				    	            	voteMonitoredUserDTO.setUserEntry(voteUsrResp.getUserEntry());
 				    	            	
+				    	            	/*
 				    	            	boolean isSingleUserEntry=voteUsrResp.isSingleUserEntry();
 				    	            	logger.debug("isSingleUserEntry: " + isSingleUserEntry);
 				    	            	logger.debug("userEntry: " + voteUsrResp.getUserEntry());
@@ -432,6 +472,25 @@ public class MonitoringUtil implements VoteAppConstants{
 				    	            	    userEntryVoteMonitoredUserDTO.setResponse(voteUsrResp.getUserEntry());
 					    	    			listMonitoredUserContainerDTO.add(userEntryVoteMonitoredUserDTO);
 				    	            	}
+				    	            	*/
+				    	            	
+				    	            	VoteQueContent voteQueContent=voteUsrResp.getVoteQueContent();
+				    		        	logger.debug("voteQueContent: " + voteQueContent);        
+				    	            	String entry=voteQueContent.getQuestion(); 
+				    	    		    logger.debug("entry: " + entry);
+				    	    		    if (entry != null)
+				    	    		    {
+				    		    		    if (entry.equals("sample nomination"))
+				    		    		    {
+				    		    		        logger.debug("this nomination entry points to a user entered nomination: " + voteUsrResp.getUserEntry());
+				    		    		        voteMonitoredUserDTO.setResponse(voteUsrResp.getUserEntry());
+				    		    		    }
+				    		    		    else
+				    		    		    {
+				    		    		        logger.debug("this nomination entry points to a standard nomination: " + voteQueContent.getQuestion());
+				    		    		        voteMonitoredUserDTO.setResponse(voteQueContent.getQuestion());    
+				    		    		    }
+				    	    		    }
 				    	    			listMonitoredUserContainerDTO.add(voteMonitoredUserDTO);
 
 				    	    		}
@@ -478,12 +537,13 @@ public class MonitoringUtil implements VoteAppConstants{
 			    	    			//voteMonitoredUserDTO.setResponse(voteUsrResp.getUserEntry());
 
 			    	    			logger.debug("attempt: " + voteUsrResp);
-			    	            	VoteQueContent localVoteQueContent=voteUsrResp.getVoteQueContent();
-			    	            	logger.debug("localVoteQueContent: " + localVoteQueContent);        	
-			    	            	logger.debug("localVoteQueContent question : " + localVoteQueContent.getQuestion());
-			    	            	voteMonitoredUserDTO.setResponse(localVoteQueContent.getQuestion());
+			    	            	//VoteQueContent localVoteQueContent=voteUsrResp.getVoteQueContent();
+			    	            	//logger.debug("localVoteQueContent: " + localVoteQueContent);        	
+			    	            	//logger.debug("localVoteQueContent question : " + localVoteQueContent.getQuestion());
+			    	            	//voteMonitoredUserDTO.setResponse(localVoteQueContent.getQuestion());
 			    	            	voteMonitoredUserDTO.setQuestionUid(questionUid);
 			    	            	
+			    	            	/*
 			    	            	boolean isSingleUserEntry=voteUsrResp.isSingleUserEntry();
 			    	            	logger.debug("isSingleUserEntry: " + isSingleUserEntry);
 			    	            	logger.debug("userEntry: " + voteUsrResp.getUserEntry());
@@ -502,6 +562,26 @@ public class MonitoringUtil implements VoteAppConstants{
 			    	            	    userEntryVoteMonitoredUserDTO.setResponse(voteUsrResp.getUserEntry());
 				    	    			listMonitoredUserContainerDTO.add(userEntryVoteMonitoredUserDTO);
 			    	            	}
+			    	            	*/
+			    	            	
+			    	            	VoteQueContent voteQueContent=voteUsrResp.getVoteQueContent();
+			    		        	logger.debug("voteQueContent: " + voteQueContent);        
+			    	            	String entry=voteQueContent.getQuestion(); 
+			    	    		    logger.debug("entry: " + entry);
+			    	    		    if (entry != null)
+			    	    		    {
+			    		    		    if (entry.equals("sample nomination"))
+			    		    		    {
+			    		    		        logger.debug("this nomination entry points to a user entered nomination: " + voteUsrResp.getUserEntry());
+			    		    		        voteMonitoredUserDTO.setResponse(voteUsrResp.getUserEntry());
+			    		    		    }
+			    		    		    else
+			    		    		    {
+			    		    		        logger.debug("this nomination entry points to a standard nomination: " + voteQueContent.getQuestion());
+			    		    		        voteMonitoredUserDTO.setResponse(voteQueContent.getQuestion());    
+			    		    		    }
+			    	    		    }
+
 			    	    			listMonitoredUserContainerDTO.add(voteMonitoredUserDTO);
 		    	    			}
 		    	    		}

@@ -100,6 +100,8 @@ public interface IVoteService
     
     public void cleanAllQuestions(final Long mcContentUid) throws VoteApplicationException;
     
+    public List getUserEntries() throws VoteApplicationException;
+    
     public VoteQueContent getQuestionContentByQuestionText(final String question, final Long mcContentUid);
     
     public void removeVoteQueContentByUID(Long uid) throws VoteApplicationException;

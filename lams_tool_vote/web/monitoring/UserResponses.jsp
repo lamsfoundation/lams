@@ -35,7 +35,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.userName}"/> </font>  </td>  
 			 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.attemptTime}"/> </font> </td>
 			 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.timeZone}"/> </font> </td>
-			 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.response}"/> </font> </td>
 	</tr>		
 	
 

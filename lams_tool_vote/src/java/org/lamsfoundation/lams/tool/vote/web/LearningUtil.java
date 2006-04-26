@@ -158,8 +158,6 @@ public class LearningUtil implements VoteAppConstants {
 	                logger.debug("localVoteQueContent: " + localVoteQueContent);
 	                createIndividualOptions(request, localVoteQueContent, voteQueUsr, attempTime, timeZone, userEntry, nominationCount, false);    
 	            }
-
-	            
 	        }			
 		}
 	 }
