@@ -48,7 +48,7 @@ class org.lamsfoundation.lams.monitoring.ls.LessonView extends AbstractView {
 	private var _lesson_mc:MovieClip;
 	
 	private var lessonState_acc:MovieClip;
-	
+	private var lsns:MovieClip;
 	//These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
     public var addEventListener:Function;
@@ -132,9 +132,9 @@ class org.lamsfoundation.lams.monitoring.ls.LessonView extends AbstractView {
 		lessonState_acc.createChild("View", "disabled", {label: "Disabled"});
 		lessonState_acc.createChild("View", "archive", {label: "Archive"});
 		//myAccordion.setSize(240, 400);
-		//trace("---> "+myAccordion.height)
-		var lsns:MovieClip = lessonState_acc.active.createChild("DataGrid", "Data_dtg");
-		lsns.setSize(lessonState_acc.width, lessonState_acc.height-63);
+		trace("---> LessonState Height: "+lessonState_acc._height)
+		lsns = lessonState_acc.active.createChild("DataGrid", "Data_dtg");
+		lsns.setSize(lessonState_acc._width, lessonState_acc._height-63);
 		
 		//set SP the content path:
 		//learningSequences_sp.contentPath = "empty_mc";
@@ -152,16 +152,13 @@ class org.lamsfoundation.lams.monitoring.ls.LessonView extends AbstractView {
 			
 			//trace('attaching lesson movie for id: ' + keys[i]);
 			var learningSeq:Object = mySeqs.get(keys[i]);
-			//for (var j in learningSeq){		
-			
-			//NOW we pass in the Lesson instance
-			//var seq:Sequence = learningSeq.classInstanceRefs;
-				
-				
+						
 			trace("values for Lesson Name is: "+learningSeq.getSequenceName()+", Sequence ID is: "+learningSeq.getSequenceID()+ " and Status is: "+learningSeq.getSequenceStateID() );
 			//learningSeq
-			lsns.dataProvider = [{Lesson:learningSeq.getSequenceName(), ID:learningSeq.getSequenceID(), Status:learningSeq.getSequenceStateID()}];
-			//}
+			var anObject= {Lesson:learningSeq.getSequenceName(), ID:learningSeq.getSequenceID(), Status:learningSeq.getSequenceStateID()};
+			lsns.addItem(anObject);
+
+			
 			
 		}
 		
@@ -207,6 +204,7 @@ class org.lamsfoundation.lams.monitoring.ls.LessonView extends AbstractView {
         var accHeight:Number = bkg_pnl._height;
         
 		lessonState_acc.setSize(accWidth, accHeight);
+		lsns.setSize(accWidth, accHeight-63);
         //Scrollpane
         //if(spWidth > 0 && spHeight>0) {
            //toolkitLibraries_sp.setSize(spWidth,spHeight);
