@@ -296,10 +296,12 @@ public class ResourceServiceImpl implements
 
 	public Resource getResourceBySessionId(Long sessionId){
 		ResourceSession session = resourceSessionDao.getSessionBySessionId(sessionId);
-		//construct dto fields;
+		//to skip GCLib problem
 		Resource res = session.getResource();
-		res.setMinViewNumber(messageService.getMessage("label.learning.minimum.review"
-				,new Object[new Integer(res.getMinViewResourceNumber())]));
+		log.debug("Resource Uid:"+res.getUid()+"-Resource miniView:"+res.getMiniViewResourceNumber());
+		//construct dto fields;
+		res.setMiniViewNumberStr(messageService.getMessage("label.learning.minimum.review"
+				,new Object[new Integer(res.getMiniViewResourceNumber())]));
 		return res;
 	}
 	public ResourceSession getResourceSessionBySessionId(Long sessionId) {
@@ -377,7 +379,7 @@ public class ResourceServiceImpl implements
 			log.error("Failed get session by ID [" + toolSessionId + "]");
 			return 0;
 		}
-		int reqView = session.getResource().getMinViewResourceNumber();
+		int reqView = session.getResource().getMiniViewResourceNumber();
 		
 		return (reqView - miniView);
 	}

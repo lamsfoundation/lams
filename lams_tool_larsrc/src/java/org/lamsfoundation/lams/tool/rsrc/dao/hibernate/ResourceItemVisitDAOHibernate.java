@@ -30,9 +30,9 @@ import org.lamsfoundation.lams.tool.rsrc.model.ResourceItemVisitLog;
 
 public class ResourceItemVisitDAOHibernate extends BaseDAOHibernate implements ResourceItemVisitDAO{
 	
-	private static final String FIND_BY_ITEM_AND_USER = "from " + ResourceItemVisitLog.class.getName() + " where user.userId = ? and resourceItem.uid=?";
+	private static final String FIND_BY_ITEM_AND_USER = "from " + ResourceItemVisitLog.class.getName() + " as r where r.user.userId = ? and r.resourceItem.uid=?";
 	private static final String FIND_VIEW_COUNT_BY_USER = "select count(*) from " + ResourceItemVisitLog.class.getName() 
-			+ " where user.uid = ?";
+			+ " as r where r.user.userId =?";
 
 	public ResourceItemVisitLog getResourceItemLog(Long itemUid,Long userId){
 		List list = getHibernateTemplate().find(FIND_BY_ITEM_AND_USER,new Object[]{userId,itemUid});

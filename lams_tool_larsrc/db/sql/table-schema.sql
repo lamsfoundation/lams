@@ -48,7 +48,7 @@ create table tl_larsrc11_resource (
    content_id bigint unique,
    allow_add_files bit,
    allow_add_urls bit,
-   min_view_resource_number integer,
+   mini_view_resource_number integer,
    allow_auto_run bit,
    primary key (uid)
 );

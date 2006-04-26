@@ -37,4 +37,5 @@ public interface ResourceSessionDAO extends DAO {
 
 	void deleteBySessionId(Long toolSessionId);
 
+
 }

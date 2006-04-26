@@ -57,7 +57,7 @@ public class Resource implements Cloneable{
 	//advance
 	private boolean runOffline;
 	private boolean runAuto;
-	private int minViewResourceNumber;
+	private int miniViewResourceNumber;
 	private boolean allowAddFiles;
 	private boolean allowAddUrls;
 	
@@ -80,7 +80,7 @@ public class Resource implements Cloneable{
 	//*************** NON Persist Fields ********************
 	private IToolContentHandler toolContentHandler;
 
-	private String minViewNumber;
+	private String miniViewNumberStr;
 	/**
 	 * Default contruction method. 
 	 *
@@ -461,14 +461,14 @@ public class Resource implements Cloneable{
 		this.allowAddUrls = allowAddUrls;
 	}
 	/**
-	 *  @hibernate.property column="min_view_resource_number"
+	 *  @hibernate.property column="mini_view_resource_number"
 	 * @return
 	 */
-	public int getMinViewResourceNumber() {
-		return minViewResourceNumber;
+	public int getMiniViewResourceNumber() {
+		return miniViewResourceNumber;
 	}
-	public void setMinViewResourceNumber(int minViewResourceNumber) {
-		this.minViewResourceNumber = minViewResourceNumber;
+	public void setMiniViewResourceNumber(int minViewResourceNumber) {
+		this.miniViewResourceNumber = minViewResourceNumber;
 	}
 	/**
 	 * @hibernate.property column="allow_auto_run"
@@ -484,11 +484,11 @@ public class Resource implements Cloneable{
 	 * For display use
 	 * @return
 	 */
-	public String getMinViewNumber() {
-		return minViewNumber;
+	public String getMiniViewNumberStr() {
+		return miniViewNumberStr;
 	}
-	public void setMinViewNumber(String minViewNumber) {
-		this.minViewNumber = minViewNumber;
+	public void setMiniViewNumberStr(String minViewNumber) {
+		this.miniViewNumberStr = minViewNumber;
 	}
 
 

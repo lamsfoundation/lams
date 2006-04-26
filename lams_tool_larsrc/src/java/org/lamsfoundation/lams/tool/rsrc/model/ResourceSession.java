@@ -35,7 +35,7 @@ import org.apache.log4j.Logger;
  * @hibernate.class  table="tl_larsrc11_session"
  *
  */
-public class ResourceSession implements Cloneable{
+public class ResourceSession{
 	
 	private static Logger log = Logger.getLogger(ResourceSession.class);
 	
@@ -49,20 +49,6 @@ public class ResourceSession implements Cloneable{
 	private int status;
 	//resource Items
 	private Set resourceItems;
-//  **********************************************************
-  	//		Function method for ForumToolSession
-//  **********************************************************
-  	public Object clone(){
-  		
-  		ResourceSession session = null;
-  		try{
-  			session = (ResourceSession) super.clone();
-  			//TODO: need clone ResourceItems
-		} catch (CloneNotSupportedException e) {
-			log.error("When clone " + ResourceSession.class + " failed");
-		}
-  		return session;
-  	}
 
   	
 //  **********************************************************

@@ -87,7 +87,7 @@
 				</a>
 			</td>
 		</tr>
-		<c:if test="${resource.minViewNumber}">
+		<c:if test="${resource.miniViewNumberStr}">
 			<tr>
 				<td colspan="4" align="left">
 					<b><fmt:message key="label.learning.minmum.review" /></b>

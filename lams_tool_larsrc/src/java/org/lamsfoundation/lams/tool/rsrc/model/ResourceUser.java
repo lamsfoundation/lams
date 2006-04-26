@@ -55,23 +55,6 @@ public class ResourceUser {
 		this.session = session;
 	}
 
-//  **********************************************************
-  	//		Function method for ForumUser
-//  **********************************************************
-	/* (non-Javadoc)
-	 * @see java.lang.Object#clone()
-	 */
-	public Object clone() {
-		
-		Object obj = null;
-		try {
-			obj = super.clone();
-		} catch (CloneNotSupportedException e) {
-			log.error("When clone " + ResourceUser.class + " failed");
-		}
-		return obj;
-	}
-
 
 //  **********************************************************
   	//		Get/Set methods

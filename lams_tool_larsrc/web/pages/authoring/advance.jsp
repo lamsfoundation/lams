@@ -20,7 +20,7 @@
 		</tr>
 		<tr>
 			<td class="formcontrol">
-				<html:select property="resource.minViewResourceNumber">
+				<html:select property="resource.miniViewResourceNumber">
 					<html:option value="1">1</html:option>
 					<html:option value="2">2</html:option>
 					<html:option value="3">3</html:option>
