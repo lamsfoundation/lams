@@ -107,7 +107,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				                                    <bean:message key="label.retake"/>
 				                                </html:submit>
 								</c:if> 		          								                      
-								
+
+
 								<c:if test="${VoteLearningForm.revisitingUser == 'false' }"> 							
 		                            <html:submit property="continueOptionsCombined" 
 		                                         styleClass="linkbutton" 
@@ -117,7 +118,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		   						&nbsp&nbsp&nbsp&nbsp&nbsp                                	   						
 								</c:if> 		          		
 
-								<c:if test="${VoteLearningForm.revisitingUser == 'true' && VoteLearningForm.lockOnFinish != 'true'}"> 							
+								<c:if test="${VoteLearningForm.voteChangable == 'true' && VoteLearningForm.lockOnFinish != 'true' && VoteLearningForm.revisitingUser == 'true' && VoteLearningForm.revisitingPageActive != 'true'}"> 	
 		                            <html:submit property="continueOptionsCombined" 
 		                                         styleClass="linkbutton" 
 		                                         onclick="submitMethod('continueOptionsCombined');">
@@ -126,7 +127,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		   						&nbsp&nbsp&nbsp&nbsp&nbsp                                	   						
 								</c:if> 		          		
 
-														                      	   						
                                 <html:submit property="learnerFinished" 
                                              styleClass="linkbutton" 
                                              onclick="submitMethod('learnerFinished');">

@@ -75,6 +75,7 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
 	
 	protected String nominationsSubmited;
 	protected String revisitingUser;
+	protected String revisitingPageActive;
 	
 	protected void resetUserActions()
     {
@@ -577,6 +578,18 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
      */
     public void setRevisitingUser(String revisitingUser) {
         this.revisitingUser = revisitingUser;
+    }
+    /**
+     * @return Returns the revisitingPageActive.
+     */
+    public String getRevisitingPageActive() {
+        return revisitingPageActive;
+    }
+    /**
+     * @param revisitingPageActive The revisitingPageActive to set.
+     */
+    public void setRevisitingPageActive(String revisitingPageActive) {
+        this.revisitingPageActive = revisitingPageActive;
     }
 
 }

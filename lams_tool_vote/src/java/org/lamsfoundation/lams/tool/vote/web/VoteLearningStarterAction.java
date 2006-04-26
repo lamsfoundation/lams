@@ -131,6 +131,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 
 	VoteLearningForm voteLearningForm = (VoteLearningForm) form;
 	voteLearningForm.setRevisitingUser(new Boolean(false).toString());
+	voteLearningForm.setRevisitingPageActive(new Boolean(false).toString());
 	voteLearningForm.setUserEntry("");
     /*
      * persist time zone information to session scope. 
@@ -397,6 +398,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
     		logger.debug("the learner has already responsed to this content, just generate a read-only report. Use redo questions for this.");
     		
     		voteLearningForm.setRevisitingUser(new Boolean(true).toString());
+     		voteLearningForm.setRevisitingPageActive(new Boolean(true).toString());
     		
     		logger.debug("start building MAP_GENERAL_CHECKED_OPTIONS_CONTENT");
 		 	Long toolContentId=(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);

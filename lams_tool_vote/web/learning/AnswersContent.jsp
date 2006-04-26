@@ -49,6 +49,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</c:if> 		
 	
 					<c:if test="${VoteLearningForm.activityRunOffline != 'true'}"> 			
+						  <tr>
+						  	<td NOWRAP align=left class="input" valign=top bgColor="#333366" colspan=2> 
+							  	<font size=2 color="#FFFFFF"> <b>  <bean:message key="label.choose.nominations"/> </b> </font>
+						  	</td>
+						  </tr>
+					
 	  					  <tr>
 						  	<td NOWRAP align=center valign=top colspan=2> 
 								  <c:out value="${VoteLearningForm.activityTitle}" escapeXml="false" />						  								
