@@ -59,8 +59,8 @@ class ApplicationParent {
     
 
 	// constructor
-	public function ApplicationParent(app:Application) {
-		_instance = app;
+	public function ApplicationParent(app:Object) {
+		_instance = ApplicationParent(app);
 		
 		_themeLoaded = false;
         _themeEventDispatched = false;
