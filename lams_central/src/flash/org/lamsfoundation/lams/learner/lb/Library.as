@@ -202,7 +202,7 @@ class Library {
 		var seq:Sequence = Sequence(libraryModel.getSelectedSequence());
 		trace(seq);
 		trace('pktobject value: '+String(pkt));
-		getURL('http://localhost:8080/lams/learning'+String(pkt)+'?progressId='+seq.getSequenceID(),'_blank');
+		getURL('http://localhost:8080/lams/learning'+String(pkt)+'?progressId='+seq.getSequenceID(),'contentFrame');
 		
 	}  
 	
