@@ -20,12 +20,11 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ************************************************************************
  */
-
+import org.lamsfoundation.lams.common.Sequence;
 import org.lamsfoundation.lams.common.mvc.*
 import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.learner.*
 import org.lamsfoundation.lams.learner.lb.*;
-import org.lamsfoundation.lams.learner.ls.Lesson;
 
 /**
 * Controller for the sequence library
@@ -47,16 +46,24 @@ class LibraryController extends AbstractController {
 	
 	/**
 	*Called by Lesson when one in clicked
-	* @param lesson - the lesson that was clicked
+	* @param seq - the lesson/sequence that was clicked (selected)
 	*/
-	public function selectLesson(lesson:Lesson):Void{
+	public function selectSequence(seq:Sequence):Void{
 		_libraryModel = LibraryModel(model);
-		_libraryModel.setSelectedLesson(lesson);
+		_libraryModel.setSelectedSequence(seq);
 	}
 	
-	public function getActiveLessons():Void {
+	public function getActiveSequences():Void {
 		_libraryModel = LibraryModel(model);
-		_libraryModel.getLibrary().getActiveLessons();
+		_libraryModel.getLibrary().getActiveSequences();
+	}
+	
+	public function cellPress(evt):Void{
+		trace(String(evt.target));
+		trace("Item index: " + evt.itemIndex);
+		trace('onClick event: joining lesson...');
+		var seqID:Number = evt.target.getItemAt(evt.itemIndex).ID;
+		selectSequence(_libraryModel.getSequence(seqID));
 	}
 	
 }

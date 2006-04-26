@@ -22,10 +22,8 @@
  */
 
 import org.lamsfoundation.lams.common.*;
-import org.lamsfoundation.lams.common.mvc.*;
 import org.lamsfoundation.lams.learner.*;
 import org.lamsfoundation.lams.learner.lb.*;
-import org.lamsfoundation.lams.learner.ls.*;
 import org.lamsfoundation.lams.common.mvc.*;
 import org.lamsfoundation.lams.common.ui.*
 import org.lamsfoundation.lams.common.util.*;
@@ -47,7 +45,10 @@ class LibraryView extends AbstractView {
 	
 	private var _library_mc:MovieClip;
 	
-	private var learningSequences_sp:MovieClip;
+	private var seqState_acc:MovieClip;
+	private var lsns:MovieClip;
+	
+	//private var learningSequences_sp:MovieClip;
 	
 	//These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
@@ -112,8 +113,8 @@ class LibraryView extends AbstractView {
 			case 'SEQUENCES_UPDATED' :
                 updateSequences(o);
                 break;
-			case 'LESSON_SELECTED' :
-				updateSelectedLesson(o);
+			case 'SEQ_SELECTED' :
+				updateSelectedSequence(o);
 				break;
             default :
                 Debugger.log('unknown update type :' + infoObj.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.LibraryView');
@@ -127,39 +128,62 @@ class LibraryView extends AbstractView {
 	* @param   o   		The model object that is broadcasting an update.
 	*/
 	private function updateSequences(o:Observable){
-
-		var yPos:Number = 0;
+		
+		seqState_acc.createChild("View", "started", {label: "Started sequences"});
+		seqState_acc.createChild("View", "finished", {label: "Finished sequences"});
 		
 		//set SP the content path:
-		learningSequences_sp.contentPath = "empty_mc";
+		//learningSequences_sp.contentPath = "empty_mc";
+		var controller = getController();
 		
 		var lbv = LibraryView(this);
 		var lbm = LibraryModel(o);
 		
 		//get the hashtable
-		var mySeqs:Hashtable = lbm.getLearningSequences();
-	
-		//loop through the sequences
-		var keys:Array = mySeqs.keys();
+		var myStartedSeqs:Array = lbm.getStartedSequences();
+		var myFinishedSeqs:Array = lbm.getFinishedSequences();
 		
-		for(var i=0; i<keys.length; i++){
+		//loop through the sequences
+		//var keys:Array = mySeqs.keys();
+		lsns = seqState_acc.started.createChild("DataGrid", "Data_dtg");
+		lsns.setSize(seqState_acc.width, seqState_acc.height-43);
+		lsns.addEventListener("cellPress", controller);
+		
+		trace('doing started seq list');
+		for(var i=0; i<myStartedSeqs.length; i++){
 			
-			trace('attaching lesson movie for id: ' + keys[i]);
+			trace('attaching sequence');
 			
-			var learningSeq:Object = mySeqs.get(keys[i]);
+			var learningSeq:Object = myStartedSeqs[i];
 			
 			//NOW we pass in the Lesson instance
-			var _lesson:Lesson = learningSeq.classInstanceRefs;
+			//var _seq:Sequence = learningSeq.classInstanceRefs;
 			
-			var lesson_mc = learningSequences_sp.content.attachMovie("Lesson","ls_"+_lesson.getLessonID());
-			
-			//position it
-			lesson_mc._y = yPos;
-			yPos += lesson_mc._height;
+			var seqObject = {Lesson:learningSeq.getSequenceName(), ID:learningSeq.getSequenceID(), Status:learningSeq.getSequenceStateID()};
+			lsns.addItem(seqObject);
 						
 			
 		}
 		
+		lsns = seqState_acc.finished.createChild("DataGrid", "Data_dtg");
+		lsns.setSize(seqState_acc.width, seqState_acc.height-43);
+		lsns.addEventListener("cellPress", controller);
+		
+		trace('doing finished seq list');
+		for(var i=0; i<myFinishedSeqs.length; i++){
+			
+			trace('attaching sequence');
+			
+			var learningSeq:Object = myFinishedSeqs[i];
+			
+			//NOW we pass in the Lesson instance
+			//var _seq:Sequence = learningSeq.classInstanceRefs;
+			
+			var seqObject = {Lesson:learningSeq.getSequenceName(), ID:learningSeq.getSequenceID(), Status:learningSeq.getSequenceStateID()};
+			lsns.addItem(seqObject);
+						
+			
+		}
 		
 	}
 	
@@ -169,16 +193,9 @@ class LibraryView extends AbstractView {
 	* 
 	* @param   o   		The model object that is broadcasting an update.
 	*/
-	private function updateSelectedLesson(o:Observable):Void{
+	private function updateSelectedSequence(o:Observable):Void{
 
-		//get the model
-		var lm = LibraryModel(o);
-		
-		//set the states of Lessons
-		var l = lm.getLastSelectedLesson();
-		l.setInactive();
-		var c = lm.getSelectedLesson();
-		c.setActive();
+		// view changes - based on active/inactive setting
 		
 		
 	}
@@ -213,11 +230,11 @@ class LibraryView extends AbstractView {
 	public function getModel():LibraryModel{
 			return LibraryModel(model);
 	}
-
+/*
 	public function getScrollPane():MovieClip {
 		return learningSequences_sp;
 	}
-
+*/
     /**
     * Returns the default controller for this view (LibraryController).
 	* Overrides AbstractView.defaultController()

@@ -22,7 +22,7 @@
  */
 
 import org.lamsfoundation.lams.learner.lb.*;
-import org.lamsfoundation.lams.learner.ls.Lesson;
+import org.lamsfoundation.lams.common.Sequence;
 import org.lamsfoundation.lams.common.util.Observable;
 import org.lamsfoundation.lams.common.util.*;
 import org.lamsfoundation.lams.learner.Application;
@@ -46,11 +46,11 @@ class LibraryModel extends Observable {
 	/**
 	* View state data
 	*/
-	private var _currentlySelectedLesson:Lesson;
-	private var _lastSelectedLesson:Lesson;
+	private var _currentlySelectedSequence:Sequence;
+	private var _lastSelectedSequence:Sequence;
 	
 	/**
-	* Sequence (Lesson) Library container
+	* Sequence (Sequence) Library container
 	* 
 	*/
 	private var _learningSequences:Hashtable;
@@ -58,14 +58,19 @@ class LibraryModel extends Observable {
 	/**
 	* constants
 	*/
+	public static var CREATE_STATE_ID:Number = 1;
 	public static var NEW_STATE_ID:Number = 2;
 	public static var STARTED_STATE_ID:Number = 3;
+	public static var SUSPENDED_STATE_ID:Number = 4;
 	public static var FINISHED_STATE_ID:Number = 5;
+	public static var ARCHIVED_STATE_ID:Number = 6;
+	public static var REMOVED_STATE_ID:Number = 7;
 	
 	/**
 	* Constructor.
 	*/
 	public function LibraryModel (library:Library){
+		trace('new lib model created...');
 		_library = library;
 		_learningSequences = new Hashtable();
 	}
@@ -76,8 +81,8 @@ class LibraryModel extends Observable {
 		_learningSequences.clear();
 		
 		for(var i=0; i<lsc.length;i++){
-			trace('adding learning seq ' + lsc[i].getLessonID());
-			_learningSequences.put(lsc[i].getLessonID(),lsc[i]);
+			trace('adding learning seq ' + lsc[i].getSequenceID());
+			_learningSequences.put(lsc[i].getSequenceID(),lsc[i]);
 		}
 		
 		Debugger.log('Added '+lsc.length+' Sequences to _learningSequences',4,'setLearningSequences','LibraryModel');
@@ -94,7 +99,7 @@ class LibraryModel extends Observable {
 	}
 	
 	/**
-	* Gets sequence (lesson) library data
+	* Gets sequence (seq) library data
 	*/
 	public function getLearningSequences():Hashtable{
 		return _learningSequences;
@@ -106,8 +111,8 @@ class LibraryModel extends Observable {
 	 * @param   lessonID
 	 * @return  
 	 */
-	public function getLearningSequence(lessonID:Number):Object{
-		return _learningSequences.get(lessonID);
+	public function getLearningSequence(seqID:Number):Object{
+		return _learningSequences.get(seqID);
 	}
 	
 	public function getNewSequences():Array{
@@ -147,9 +152,9 @@ class LibraryModel extends Observable {
 		
 		for(var i=0; i<keys.length;i++){
 			var seq:Object = _learningSequences.get(keys[i]);
-			var l:Lesson = seq.classInstanceRefs;
-			if(l.checkState(stateID)){
-				seqs.push(l);
+			//var s:Sequence = seq.classInstanceRefs;
+			if(seq.checkState(stateID)){
+				seqs.push(seq);
 			}
 		}
 		
@@ -157,71 +162,83 @@ class LibraryModel extends Observable {
 	}
 	
 	/**
-	* Sets currently selected Lesson
+	* Sets currently selected Sequence
 	*/
-	public function setSelectedLesson(lesson:Lesson):Void{
+	public function setSelectedSequence(seq:Sequence):Void{
 		//Debugger.log('templateActivity:'+templateActivity,4,'setSelectedTemplateActivity','ToolkitModel');
 		
 		
 		//_global.breakpoint();
 		//set the sates
-		_lastSelectedLesson = _currentlySelectedLesson;
-		_currentlySelectedLesson = lesson;
+		_lastSelectedSequence = _currentlySelectedSequence;
+		_currentlySelectedSequence = seq;
 		
-		// exit current lesson and join selected lesson
+		// exit current seq and join selected seq
 		
-		if(_lastSelectedLesson != null)
-			_lastSelectedLesson.exitLesson();
-			
-		if(_currentlySelectedLesson != null)
-			_currentlySelectedLesson.joinLesson();
-		
+		if(_lastSelectedSequence != null) {
+			getLibrary().exitSequence(_lastSelectedSequence);
+			_lastSelectedSequence.setInactive();
+		}	
+		if(_currentlySelectedSequence != null) {
+			getLibrary().joinSequence(_currentlySelectedSequence);
+			_currentlySelectedSequence.setActive();
+		}
 		
 		//for observer thang
 		setChanged();
 		//send an update
 		infoObj = {};
-		infoObj.updateType = "LESSON_SELECTED";
+		infoObj.updateType = "SEQ_SELECTED";
 		notifyObservers(infoObj);
 	}
 	
 	/**
-	* Gets currecntly selected Lesson
+	* Gets currecntly selected Sequence
 	*/
-	public function getSelectedLesson():Lesson{
-		return _currentlySelectedLesson;
+	public function getSelectedSequence():Sequence{
+		return _currentlySelectedSequence;
 	}
 	
 	/**
-	* Gets last selected Lesson
+	* Gets last selected Sequence
 	*/
-	public function getLastSelectedLesson():Lesson{
-		return _lastSelectedLesson;
+	public function getLastSelectedSequence():Sequence{
+		return _lastSelectedSequence;
 	}
 	
+	/**
+	 * Add sequence to the Library
+	 * 
+	 * @param   seq 
+	 * @return  
+	 */
 	
-	public function addLessonToLibrary(LessonDTO:Object):Boolean {
-		
+	public function addSequence(seq:Sequence):Boolean {
+		_learningSequences.put(seq.getSequenceID(), seq);
 		return true;
 	}
 	
-	private function createLessonFromDTO(LessonDTO:Object):Lesson {
-		// convert to DTO to Lesson object
-		return null;
-	}
+	/**
+	 * Remove sequence from the Library
+	 *   
+	 * @param   seq 
+	 * @return  
+	 */
 	
-	public function addLesson(lesson:Lesson):Boolean {
-		_learningSequences.put(lesson.getLessonID(), lesson);
+	public function removeSequence(seq:Sequence):Boolean {
+		_learningSequences.remove(seq);
 		return true;
 	}
 	
-	public function removeLesson(lesson:Lesson):Boolean {
-		_learningSequences.remove(lesson);
-		return true;
-	}
+	/**
+	 * Retrieve a Sequence from the Library
+	 * 
+	 * @param   seqID 
+	 * @return  
+	 */
 	
-	public function getLesson(lessonID:Number):Lesson {
-		return Lesson(_learningSequences.get(lessonID));
+	public function getSequence(seqID:Number):Sequence {
+		return Sequence(_learningSequences.get(seqID));
 	}
 	
 	/**

@@ -22,8 +22,9 @@
  */
 
 import org.lamsfoundation.lams.learner.Application;
+import org.lamsfoundation.lams.common.Sequence;
+import org.lamsfoundation.lams.authoring.DesignDataModel;
 import org.lamsfoundation.lams.learner.lb.*;
-import org.lamsfoundation.lams.learner.ls.Lesson;
 import org.lamsfoundation.lams.common.util.*; 
 import mx.managers.*;
 /**
@@ -67,7 +68,7 @@ class Library {
 		
 		libraryView = LibraryView(libraryView_mc);
 		libraryView.init(libraryModel,undefined);
-       
+		trace(libraryView);
         libraryView_mc.addEventListener('load',Proxy.create(this,viewLoaded));
         
 		//Register view with model to receive update events
@@ -75,7 +76,7 @@ class Library {
 
         //Set the position by setting the model which will call update on the view
         libraryModel.setPosition(x,y);
-		
+		libraryModel.setSize(null,Stage.height-y);
 		
 		
 	}
@@ -92,43 +93,45 @@ class Library {
         Debugger.log('viewLoaded called',Debugger.GEN,'viewLoaded','Library');
 		
 		if(evt.type=='load') {
-            getActiveLessons();
+            getActiveSequences();
         }else {
             //Raise error for unrecognized event
         }
     }
 	
-	public function getActiveLessons():Void {
-		trace('getting active lessons...');
+	public function getActiveSequences():Void {
+		trace('getting active sequences...');
 		
-		var callback:Function = Proxy.create(this,setActiveLessons);
+		var callback:Function = Proxy.create(this,setActiveSequences);
 		// do request
-		Application.getInstance().getComms().getRequest('learning/learner.do?method=getActiveLessons&userID='+_root.userID, callback, false);
+		Application.getInstance().getComms().getRequest('learning/learner.do?method=getActiveLessons&userId='+_root.userID, callback, false);
 	
 		
 	}
 	
-	private function setActiveLessons(lessons:Array):Void {
-		trace('received active lesson data back...');
-		// get data and create Lesson obj's
+	private function setActiveSequences(seqs:Array):Void {
+		trace('received active lesson/seq data back...');
+		// get data and create Sequence obj's
 		
-		Debugger.log('Received active sequences (lessons) array length:'+lessons.length,4,'setActiveLessons','Library');
+		Debugger.log('Received active sequences (lessons) array length:'+seqs.length,4,'setActiveLessons','Library');
 		
 		var lns = new Array();
 		
 		// go through list of DTO's and make Lesson objects to add to hash map
-		for(var i=0; i< lessons.length; i++){
-			var ln:Object = lessons[i];
+		for(var i=0; i< seqs.length; i++){
+			var s:Object = seqs[i];
 			
 			
-			var sp_mc:MovieClip = libraryView.getScrollPane();
-			sp_mc.contentPath = "empty_mc";
-			trace(sp_mc);
-			trace(sp_mc.content);
-			var lesson:Lesson = new Lesson(sp_mc.content, LESSON_X, LESSON_Y+(LESSON_H*i), libraryView);
-			lesson.populateFromDTO(ln);
-			trace('pushing lesson with id: ' + lesson.getLessonID());
-			lns.push(lesson);
+			//var sp_mc:MovieClip = libraryView.getScrollPane();
+			//sp_mc.contentPath = "empty_mc";
+			//trace(sp_mc);
+			//trace(sp_mc.content);
+			//var lesson:Lesson = new Lesson(sp_mc.content, LESSON_X, LESSON_Y+(LESSON_H*i), libraryView);
+			
+			var seq:Sequence = new Sequence();
+			seq.populateFromDTO(s);
+			trace('pushing seq with id: ' + seq.getSequenceID());
+			lns.push(seq);
 		}
 			
 		//sets these in the toolkit model in a hashtable by lib id
@@ -153,8 +156,86 @@ class Library {
         libraryModel.setPosition(x,y);
     }
 	
-	public function getLesson(lessonId:Number):Lesson {
-		return libraryModel.getLesson(lessonId);
+	public function getSequence(seqId:Number):Sequence {
+		return libraryModel.getSequence(seqId);
+	}
+	
+	public function select(seq:Sequence):Void {
+		var libraryController = libraryView.getController();
+		libraryController.selectSequence(seq);	
+	}
+
+	public function joinSequence(seq:Object):Boolean {
+		
+		var callback:Function = Proxy.create(this,startSequence);
+		
+		// call action
+		var seqId:Number = seq.getSequenceID();
+
+		// do request
+		Application.getInstance().getComms().getRequest('learning/learner.do?method=joinLesson&userId='+_root.userID+'&lessonId='+String(seqId), callback, false);
+			
+		// get Learning Design for lesson
+		openLearningDesign(seq);
+			
+		return true;
+	}
+	
+	public function exitSequence(seq:Object):Boolean {
+		var callback:Function = Proxy.create(this,closeSequence);
+		
+		// call action
+		var seqId:Number = seq.getSequenceID();
+		
+		// do request
+		Application.getInstance().getComms().getRequest('learning/learner.do?method=exitLesson&lessonID='+String(seqId), callback, false);
+		
+		return true;
+	}
+	
+	private function startSequence(pkt:Object){
+		trace('received message back from server aftering joining lesson...');
+		
+		// check was successful join
+		
+		// start the selected sequence
+		var seq:Sequence = Sequence(libraryModel.getSelectedSequence());
+		trace(seq);
+		trace('pktobject value: '+String(pkt));
+		getURL('http://localhost:8080/lams/learning'+String(pkt)+'?progressId='+seq.getSequenceID(),'_blank');
+		
+	}  
+	
+	private function closeSequence(pkt:Object){
+		trace('receiving message back from server...');
+		
+		// stop current sequence
+		
+		// deactivate Progress movie
+		
+	}
+	
+	private function openLearningDesign(seq:Object){
+		trace('opening learning design...');
+		var designId:Number = seq.getLearningDesignID();
+
+        var callback:Function = Proxy.create(this,saveDataDesignModel);
+           
+		Application.getInstance().getComms().getRequest('authoring/author.do?method=getLearningDesignDetails&learningDesignID='+designId,callback, false);
+		
+	}
+	
+	private function saveDataDesignModel(learningDesignDTO:Object){
+		trace('returning learning design...');
+		trace('saving model data...');
+		var seq:Sequence = Sequence(libraryModel.getSelectedSequence());
+		var model:DesignDataModel = new DesignDataModel();
+		
+		model.setDesign(learningDesignDTO);
+		seq.setLearningDesignModel(model);
+		
+		// activite Progress movie
+		
 	}
 
 	//Dimension accessor methods
