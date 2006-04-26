@@ -50,6 +50,7 @@ public class LessonDTO
 	private Integer organisationID;
 	private Date createDateTime;
 	private Date startDateTime;
+	private Long learningDesignID;
 
     //---------------------------------------------------------------------
     // Construtors
@@ -62,6 +63,7 @@ public class LessonDTO
                          String lessonDescription,
                          Integer lessonStateId,
                          Integer organisationId,
+                         Long learningDesignId,
                          Date createDateTime,
                          Date startDateTime)
     {
@@ -69,6 +71,7 @@ public class LessonDTO
         this.lessonName = lessonName;
         this.lessonDescription = lessonDescription;
         this.lessonStateID = lessonStateId;
+        this.learningDesignID = learningDesignId;
         this.organisationID = organisationId;
         this.createDateTime = createDateTime;
         this.startDateTime = startDateTime;
@@ -120,6 +123,12 @@ public class LessonDTO
 		return startDateTime;
 	}
 
+	public Integer getOrganisationID() {
+		return organisationID;
+	}
+	public Long getLearningDesignID() {
+		return learningDesignID;
+	}
     /**
      * Returns the String representation of lesson data transfer object.
      * @see java.lang.Object#toString()
@@ -131,12 +140,10 @@ public class LessonDTO
         sb.append("lessonName='" + getLessonName()+"';");
         sb.append("lessonDescription='" + getLessonDescription() + "'; ");
         sb.append("lessonStateID='" + getLessonStateID() + "'; ");
+        sb.append("learningDesignID='" + getLearningDesignID() + "'; ");
         sb.append("organisationID='" + getOrganisationID() + "'; ");
         sb.append("createDateTime='" + getCreateDateTime() + "'; ");
         sb.append("startDateTime='" + getStartDateTime() + "'; ");
         return sb.toString();
     }
-	public Integer getOrganisationID() {
-		return organisationID;
-	}
 }

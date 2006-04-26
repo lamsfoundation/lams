@@ -439,10 +439,12 @@ public class Lesson implements Serializable {
                              this.getLessonDescription(),
                              this.lessonStateId,
                              this.organisation!=null?this.organisation.getOrganisationId():null,
+                             this.learningDesign!=null?this.learningDesign.getLearningDesignId():null,
                              this.createDateTime,
                              this.startDateTime);
     }
     public LessonDetailsDTO getLessonDetails(){
     	return new LessonDetailsDTO(this);
     }
+    
 }
