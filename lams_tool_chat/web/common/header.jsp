@@ -11,6 +11,8 @@
 	<title>
 		<bean:message key="activity.title" />
 	</title>
-	<lams:headItems/>
-	<tiles:insert attribute="script" />
+	<lams:headItems />
+	<logic:notEmpty name="script">
+		<tiles:insert attribute="script" />
+	</logic:notEmpty>
 </head>

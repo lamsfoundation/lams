@@ -72,6 +72,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<!-- Begin: Learning -->
 	<definition name="tiles:/learning/main" extends="tiles:/layout:default">
 		<put name="pageTitleKey" value="pageTitle.learning" />
+		<put name="header" value="tiles:/header:default" />
 		<put name="body" value="/pages/learning/learning.jsp" />
 	</definition>
 	<!-- End: Learning -->
@@ -80,7 +81,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<!-- Begin: Monitoring -->
 	<definition name="tiles:/monitoring/main" extends="tiles:/layout:tab">
 		<put name="pageTitleKey" value="pageTitle.monitoring" />
-		<put name="header" value="tiles:/header:authoring" type="definition" />
+		<put name="header" value="tiles:/header:monitoring" type="definition" />
 		<put name="body" value="/pages/monitoring/monitoring.jsp" />
 	</definition>
 	
