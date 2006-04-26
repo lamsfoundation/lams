@@ -1,4 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="formBean" value="<%= session.getAttribute("instructionNavForm") %>" />
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>

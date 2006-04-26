@@ -22,6 +22,7 @@
                <value>org/lamsfoundation/lams/tool/rsrc/model/Resource.hbm.xml</value>
                <value>org/lamsfoundation/lams/tool/rsrc/model/ResourceItem.hbm.xml</value>
                <value>org/lamsfoundation/lams/tool/rsrc/model/ResourceItemInstruction.hbm.xml</value>
+               <value>org/lamsfoundation/lams/tool/rsrc/model/ResourceItemVisitLog.hbm.xml</value>
                <value>org/lamsfoundation/lams/tool/rsrc/model/ResourceAttachment.hbm.xml</value>
                <value>org/lamsfoundation/lams/tool/rsrc/model/ResourceSession.hbm.xml</value>
             </list>
@@ -35,6 +36,11 @@
         </property>
     </bean>
     <bean id="resourceItemDao" class="org.lamsfoundation.lams.tool.rsrc.dao.hibernate.ResourceItemDAOHibernate">
+        <property name="sessionFactory">
+            <ref local="resourceSessionFactory"/>
+        </property>
+    </bean>
+    <bean id="resourceItemVisitDao" class="org.lamsfoundation.lams.tool.rsrc.dao.hibernate.ResourceItemVisitDAOHibernate">
         <property name="sessionFactory">
             <ref local="resourceSessionFactory"/>
         </property>
@@ -70,6 +76,9 @@
         </property>
         <property name="resourceItemDao">
             <ref local="resourceItemDao"/>
+        </property>
+        <property name="resourceItemVisitDao">
+            <ref local="resourceItemVisitDao"/>
         </property>
         <property name="resourceAttachmentDao">
             <ref local="resourceAttachmentDao"/>

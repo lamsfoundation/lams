@@ -112,7 +112,7 @@ public class Resource implements Cloneable{
   					ResourceItem item = (ResourceItem)iter.next(); 
   					ResourceItem newItem = (ResourceItem) item.clone();
 //  					if toolContentHandle is null, just clone old file without duplicate it in repository
-  					if(toolContentHandler != null){
+  					if(toolContentHandler != null && item.getFileUuid() != null){
 						//duplicate file node in repository
 						NodeKey keys = toolContentHandler.copyFile(item.getFileUuid());
 						newItem.setFileUuid(keys.getUuid());

@@ -142,65 +142,16 @@ public class AuthoringAction extends Action {
 	  	if (param.equals("removeItemAttachment")) {
 	  		return removeItemAttachment(mapping, form, request, response);
 	  	}
-	  	//for preview top frame html page use:
-	  	if (param.equals("nextInstruction")) {
-	  		return nextInstruction(mapping, form, request, response);
-	  	}
-	  	
-	    //-----------------------Display Learning Object function ---------------------------
-	  	if (param.equals("reviewItem")) {
-       		return reviewItem(mapping, form, request, response);
-        }
+
         return mapping.findForward(ResourceConstants.ERROR);
 	}
 
-
-	private ActionForward nextInstruction(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-		InstructionNavForm navForm = (InstructionNavForm) form;
-		List list = navForm.getAllInstructions();
-		if(list != null && navForm.getCurrent() < list.size()){
-			//current is start from 1, so, this will return next.
-			navForm.setInstruction((ResourceItemInstruction) list.get(navForm.getCurrent()));
-			navForm.setCurrent(navForm.getCurrent()+1);
-		}
-		
-		return mapping.findForward(ResourceConstants.SUCCESS);
-	}
 
 
 	private ActionForward removeItemAttachment(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		request.setAttribute("itemAttachment", null);
     	return mapping.findForward(ResourceConstants.SUCCESS);
     }
-
-
-	private ActionForward reviewItem(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-		int itemIdx = NumberUtils.stringToInt(request.getParameter(ResourceConstants.PARAM_ITEM_INDEX),-1);
-		if(itemIdx != -1){
-			List<ResourceItem> resourceList = getResourceItemList(request);
-			ResourceItem item = resourceList.get(itemIdx);
-			
-			Set instructions = item.getItemInstructions();
-			InstructionNavForm navForm = (InstructionNavForm) form;
-			navForm.setAllInstructions(new ArrayList(instructions));
-			navForm.setTitle(item.getTitle());
-			navForm.setType(item.getType());
-			navForm.setTotal(instructions.size());
-			if(instructions.size() > 0){
-				navForm.setCurrent(1);
-				navForm.setInstruction((ResourceItemInstruction) instructions.iterator().next());
-			}else{
-				navForm.setCurrent(0);
-				navForm.setInstruction(null);
-			}
-			if(item.getType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT)
-				request.getSession().setAttribute(ResourceConstants.ATT_LEARNING_OBJECT,item);
-			//set url to content frame
-			request.setAttribute(ResourceConstants.ATTR_RESOURCE_REVIEW_URL,getReviewUrl(item));
-			return mapping.findForward(ResourceConstants.SUCCESS);
-		}
-		return mapping.findForward(ResourceConstants.ERROR);
-	}
 
 
 	private ActionForward removeItem(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
@@ -803,25 +754,6 @@ public class AuthoringAction extends Action {
 		return forward;
 	}
 
-	private Object getReviewUrl(ResourceItem item) {
-		short type = item.getType();
-		String url = null;
-		switch (type) {
-		case ResourceConstants.RESOURCE_TYPE_URL:
-			url = item.getUrl();
-			break;
-		case ResourceConstants.RESOURCE_TYPE_FILE:
-			url = "/download/?uuid="+item.getFileUuid()+"&preferDownload=false";
-			break;
-		case ResourceConstants.RESOURCE_TYPE_WEBSITE:
-			url = "/download/?uuid="+item.getFileUuid()+"&preferDownload=false";
-			break;
-		case ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT:
-			url = "/pages/learningobj/mainframe.jsp";
-			break;
-		}
-		return url;
-	}
 
 	/**
 	 * This method will populate resource item information to its form for edit use.

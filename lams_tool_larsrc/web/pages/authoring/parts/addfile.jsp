@@ -12,7 +12,7 @@
 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/rsrcresourceitem.js'/>"></script>
 
 </head>
-<body>
+<body class="tabpart">
 	<table class="forms">
 		<!-- Basic Info Form-->
 		<tr>

@@ -27,7 +27,7 @@ import org.lamsfoundation.lams.tool.rsrc.model.ResourceItemVisitLog;
 
 public interface ResourceItemVisitDAO extends DAO {
 
-	public ResourceItemVisitLog getResourceItemLog(Long userUid,Long itemUid);
+	public ResourceItemVisitLog getResourceItemLog(Long itemUid,Long userId);
 
 	public int getUserViewLogCount(Long userUid);
 }

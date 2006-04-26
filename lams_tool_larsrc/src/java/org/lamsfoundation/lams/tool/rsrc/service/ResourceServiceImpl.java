@@ -315,26 +315,37 @@ public class ResourceServiceImpl implements
 
 	public void retrieveComplete(List<ResourceItem> resourceItemList, ResourceUser user) {
 		for(ResourceItem item:resourceItemList){
-			ResourceItemVisitLog log = resourceItemVisitDao.getResourceItemLog(user.getUid(),item.getUid());
-			item.setComplete(log.isComplete());
+			ResourceItemVisitLog log = resourceItemVisitDao.getResourceItemLog(item.getUid(),user.getUserId());
+			if(log == null)
+				item.setComplete(false);
+			else
+				item.setComplete(log.isComplete());
 		}
 	}
 
 
-	public void setItemComplete(Long resourceItemUid, Long userUid) {
-		ResourceItemVisitLog log = resourceItemVisitDao.getResourceItemLog(resourceItemUid,userUid);
+	public void setItemComplete(Long resourceItemUid, Long userId) {
+		ResourceItemVisitLog log = resourceItemVisitDao.getResourceItemLog(resourceItemUid,userId);
+		if(log == null){
+			log = new ResourceItemVisitLog();
+			ResourceItem item = resourceItemDao.getByUid(resourceItemUid);
+			log.setResourceItem(item);
+			ResourceUser user = resourceUserDao.getUserByUserID(userId); 
+			log.setUser(user);
+			log.setAccessDate(new Timestamp(new Date().getTime()));
+		}
 		log.setComplete(true);
 		resourceItemVisitDao.saveObject(log);
 	}
 
 
-	public void setItemAccess(Long resourceItemUid, Long userUid){
-		ResourceItemVisitLog log = resourceItemVisitDao.getResourceItemLog(userUid,resourceItemUid);
+	public void setItemAccess(Long resourceItemUid, Long userId){
+		ResourceItemVisitLog log = resourceItemVisitDao.getResourceItemLog(resourceItemUid,userId);
 		if(log == null){
 			log = new ResourceItemVisitLog();
 			ResourceItem item = resourceItemDao.getByUid(resourceItemUid);
 			log.setResourceItem(item);
-			ResourceUser user = resourceUserDao.getUserByUserID(userUid); 
+			ResourceUser user = resourceUserDao.getUserByUserID(userId); 
 			log.setUser(user);
 			log.setComplete(false);
 			log.setAccessDate(new Timestamp(new Date().getTime()));
@@ -370,6 +381,11 @@ public class ResourceServiceImpl implements
 		
 		return (reqView - miniView);
 	}
+
+	public ResourceItem getResourceItemByUid(Long itemUid) {
+		return resourceItemDao.getByUid(itemUid);
+	}
+
 
 
 	//*****************************************************************************

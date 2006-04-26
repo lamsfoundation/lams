@@ -4,32 +4,39 @@
 	<title><fmt:message key="label.learning.title" /></title>
 	<%@ include file="/common/header.jsp"%>
 
-	<script>
+	<script type="text/javascript">
 	<!--
 		function gotoURL(){
-			parent.newResourceFrame.location = "<c:url value="/pages/learning/addurl.jsp"/>";
+ 		    var reqIDVar = new Date();
+			parent.newResourceFrame.location = "<c:url value="/pages/learning/addurl.jsp"/>?&reqID="+reqIDVar.getTime();
 	      	parent.newResourceFrame.focus();
 		}
 		function gotoFile(){
-			parent.newResourceFrame.location = "<c:url value="/pages/learning/addfile.jsp"/>";
+ 		    var reqIDVar = new Date();
+			parent.newResourceFrame.location = "<c:url value="/pages/learning/addfile.jsp"/>?&reqID="+reqIDVar.getTime();
 	      	parent.newResourceFrame.focus();
 		}
 		function checkNew(){
-			parent.learningFrame.location = "<c:url value="/learning/start.do"/>?toolSessionID=${toolSessionID}";
+ 		    var reqIDVar = new Date();
+			parent.learningFrame.location = "<c:url value="/learning/start.do"/>?toolSessionID=${toolSessionID}&reqID="+reqIDVar.getTime();
 		}
 		function viewItem(itemUid){
-			parent.learningFrame.location = "<c:url value="/learning/viewItem.do"/>?itemUid=" + itemUid;
+			var myUrl = "<c:url value="/reviewItem.do"/>?itemUid=" + itemUid;
+			launchPopup(myUrl,"Review");
 		}
 		function completeItem(itemUid){
 			parent.learningFrame.location = "<c:url value="/learning/completeItem.do"/>?itemUid=" + itemUid;
 		}
 		function finishSession(){
-			location.href='<c:url value="/learning/finish.do?toolSessionID=${toolSessionID}&mode=learner"/>';
+			parent.learningFrame.location='<c:url value="/learning/finish.do?toolSessionID=${toolSessionID}&mode=learner"/>';
 		}
 	-->        
     </script>
 </head>
 <body>
+	<script type="text/javascript">
+		alert("enter");
+    </script>
 	<table border="0" align="center" class="forms" width="95%">
 		<tr>
 			<td>

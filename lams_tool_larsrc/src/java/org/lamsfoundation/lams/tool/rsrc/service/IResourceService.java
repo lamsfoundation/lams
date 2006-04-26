@@ -80,14 +80,14 @@ public interface IResourceService
 	void saveOrUpdateResourceSession(ResourceSession resSession);
 	
 	void retrieveComplete(List<ResourceItem> resourceItemList, ResourceUser user);
-	void setItemComplete(Long resourceItemUid, Long userUid);
-	void setItemAccess(Long resourceItemUid, Long userUid);
+	void setItemComplete(Long resourceItemUid, Long userId);
+	void setItemAccess(Long resourceItemUid, Long userId);
 	/**
 	 * the reqired number minus the count of view of the given user.
 	 * @param userUid
 	 * @return
 	 */
-	int checkMiniView(Long toolSessionId, Long userUid);
+	int checkMiniView(Long toolSessionId, Long userId);
 	/**
 	 * If success return next activity's url, otherwise return null.
 	 * @param toolSessionId
@@ -95,5 +95,7 @@ public interface IResourceService
 	 * @return
 	 */
 	String finishToolSession(Long toolSessionId, Long userId)  throws ResourceApplicationException;
+
+	ResourceItem getResourceItemByUid(Long itemUid);
 }
 

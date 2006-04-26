@@ -83,9 +83,7 @@ public class LearningAction extends Action {
 		if(param.equals("complete")){
 			return complete(mapping, form, request, response);
 		}
-		if(param.equals("view")){
-			return view(mapping, form, request, response);
-		}
+
 		if(param.equals("finish")){
 			return finish(mapping, form, request, response);
 		}
@@ -106,8 +104,8 @@ public class LearningAction extends Action {
 		int miniViewFlag = service.checkMiniView(sessionId,userID);
 		//if current user view less than reqired view count number, then just return error message.
 		if(miniViewFlag > 0){
-			ActionMessages errors = new ActionMessages();
-			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionError("lable.learning.minimum.view.number.less",miniViewFlag));
+			ActionErrors errors = new ActionErrors();
+			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage("lable.learning.minimum.view.number.less",miniViewFlag));
 			this.addErrors(request,errors);
 			return mapping.getInputForward();
 			
@@ -130,15 +128,7 @@ public class LearningAction extends Action {
 
 		return mapping.findForward("success");
 	}
-	private ActionForward view(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-		Long resourceUid = new Long(request.getParameter(ResourceConstants.PARAM_RESOURCE_ITEM_UID));
-		IResourceService service = getResourceService();
-		HttpSession ss = SessionManager.getSession();
-		//get back login user DTO
-		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-		service.setItemAccess(resourceUid,new Long(user.getUserID().intValue()));
-		return  mapping.findForward(ResourceConstants.SUCCESS);
-	}
+
 	private ActionForward complete(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		Long resourceUid = new Long(request.getParameter(ResourceConstants.PARAM_RESOURCE_ITEM_UID));
 		IResourceService service = getResourceService();
