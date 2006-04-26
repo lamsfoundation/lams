@@ -853,7 +853,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getAllLessons(java.lang.Integer)
      */
     public List getAllLessons(Integer userID)throws IOException{
-    	return lessonDAO.getLessonsCreatedByUser(userID);
+    	return lessonDAO.getLessonsForMonitoring(userID);
     }
 
     /**
