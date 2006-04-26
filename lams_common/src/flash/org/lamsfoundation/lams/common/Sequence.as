@@ -79,6 +79,7 @@ class Sequence {
 		_seqName = dto.lessonName;
 		_seqDescription = dto.lessonDescription;
 		_seqStateID = dto.lessonStateID;
+		_learningDesignID = dto.learningDesignID;
 		_seqCreatedDate = dto.createDateTime;
 		_seqStartDate = dto.startDateTime;
 	}
