@@ -47,6 +47,7 @@ public class LessonDTO
     private String lessonName;
     private String lessonDescription;
     private Integer lessonStateID;
+	private Integer organisationID;
 	private Date createDateTime;
 	private Date startDateTime;
 
@@ -60,6 +61,7 @@ public class LessonDTO
                          String lessonName,
                          String lessonDescription,
                          Integer lessonStateId,
+                         Integer organisationId,
                          Date createDateTime,
                          Date startDateTime)
     {
@@ -67,6 +69,7 @@ public class LessonDTO
         this.lessonName = lessonName;
         this.lessonDescription = lessonDescription;
         this.lessonStateID = lessonStateId;
+        this.organisationID = organisationId;
         this.createDateTime = createDateTime;
         this.startDateTime = startDateTime;
 
@@ -128,8 +131,12 @@ public class LessonDTO
         sb.append("lessonName='" + getLessonName()+"';");
         sb.append("lessonDescription='" + getLessonDescription() + "'; ");
         sb.append("lessonStateID='" + getLessonStateID() + "'; ");
+        sb.append("organisationID='" + getOrganisationID() + "'; ");
         sb.append("createDateTime='" + getCreateDateTime() + "'; ");
         sb.append("startDateTime='" + getStartDateTime() + "'; ");
         return sb.toString();
     }
+	public Integer getOrganisationID() {
+		return organisationID;
+	}
 }

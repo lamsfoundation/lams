@@ -175,6 +175,29 @@ public class LessonDAO extends HibernateDaoSupport implements ILessonDAO
     }
    
    /**
+    * Gets all lessons for which this user is in the staff group. Does not return 
+    * disabled lessons or preview lessons. This is the list of lessons that a user may monitor/moderate/manage.
+    * @param user a User that identifies the teacher/staff member.
+    * @return a List with all appropriate lessons in it.
+    */
+   public List getLessonsForMonitoring(final int userID)
+   {
+	   List lessons = null;
+   	
+       HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
+   		lessons = (List)hibernateTemplate.execute(
+           new HibernateCallback() {
+               public Object doInHibernate(Session session) throws HibernateException {
+       	    	Query query = session.getNamedQuery("lessonsForMonitoring");
+       	    	query.setInteger("userId", userID);
+       	    	List result = query.list();
+                   return result;
+               }
+           }
+       );
+       return lessons;
+   }
+   /**
     * Get all the preview lessons more with the creation date before the given date.
     * 
     * @param startDate UTC date 

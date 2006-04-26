@@ -82,6 +82,14 @@ public interface ILessonDAO
     public List getLessonsCreatedByUser(Integer userID);
     
     /**
+     * Gets all lessons for which this user is in the staff group. Does not return 
+     * disabled lessons or preview lessons. This is the list of lessons that a user may monitor/moderate/manage.
+     * @param user a User that identifies the teacher/staff member.
+     * @return a List with all appropriate lessons in it.
+     */
+    public List getLessonsForMonitoring(final int userID);
+
+    /**
      * Returns the all the learners that have started the requested lesson.
      * 
      * @param lessonId the id of the requested lesson.

@@ -438,6 +438,7 @@ public class Lesson implements Serializable {
                              this.getLessonName(),
                              this.getLessonDescription(),
                              this.lessonStateId,
+                             this.organisation!=null?this.organisation.getOrganisationId():null,
                              this.createDateTime,
                              this.startDateTime);
     }
