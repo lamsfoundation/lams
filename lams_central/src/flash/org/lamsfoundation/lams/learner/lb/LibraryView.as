@@ -47,6 +47,7 @@ class LibraryView extends AbstractView {
 	
 	private var seqState_acc:MovieClip;
 	private var lsns:MovieClip;
+	private var lsnf:MovieClip;
 	
 	//private var learningSequences_sp:MovieClip;
 	
@@ -165,9 +166,9 @@ class LibraryView extends AbstractView {
 			
 		}
 		
-		lsns = seqState_acc.finished.createChild("DataGrid", "Data_dtg");
-		lsns.setSize(seqState_acc.width, seqState_acc.height-43);
-		lsns.addEventListener("cellPress", controller);
+		lsnf = seqState_acc.finished.createChild("DataGrid", "Data_dtg");
+		lsnf.setSize(seqState_acc.width, seqState_acc.height-43);
+		lsnf.addEventListener("cellPress", controller);
 		
 		trace('doing finished seq list');
 		for(var i=0; i<myFinishedSeqs.length; i++){
@@ -180,7 +181,7 @@ class LibraryView extends AbstractView {
 			//var _seq:Sequence = learningSeq.classInstanceRefs;
 			
 			var seqObject = {Lesson:learningSeq.getSequenceName(), ID:learningSeq.getSequenceID(), Status:learningSeq.getSequenceStateID()};
-			lsns.addItem(seqObject);
+			lsnf.addItem(seqObject);
 						
 			
 		}
