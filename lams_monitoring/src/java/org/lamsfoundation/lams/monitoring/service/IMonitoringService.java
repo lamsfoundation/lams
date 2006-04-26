@@ -34,9 +34,8 @@ import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.Organisation;
-import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
+import org.lamsfoundation.lams.util.MessageService;
 
 
 /**
@@ -50,6 +49,9 @@ import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedExceptio
  */
 public interface IMonitoringService
 {
+
+	/** Get the message service, which gives access to the I18N text */
+	public MessageService getMessageService();
 
     /**
      * Initialize a new lesson so as to start the learning process. It needs to 
@@ -89,7 +91,7 @@ public interface IMonitoringService
      * @param lessionPackage
      * @return
      */
-    public String createLessonClassForLessonWDDX(Integer creatorUserId,String lessionPackage);
+    public String createLessonClassForLessonWDDX(Integer creatorUserId,String lessionPackage) throws UserAccessDeniedException;
     
     /**
      * Setup the lesson class and organization for a lesson according to the 
@@ -103,30 +105,33 @@ public interface IMonitoringService
      * @param staffs a list of staffs who will be in charge of this lesson.
      * @return the lesson with lesson class and organization
      */
-    public Lesson createLessonClassForLesson(long lessonId, Organisation organisation,String leanerGroupName, List organizationUsers,String staffGroupName, List staffs);
+    public Lesson createLessonClassForLesson(long lessonId, Organisation organisation,String leanerGroupName, List organizationUsers,String staffGroupName, List staffs, Integer userID) throws UserAccessDeniedException;
     
     /**
      * Start the specified the lesson. It must be created before calling this
      * service.
      * @param lessonId the specified the lesson id.
+     * @param userId checks that the user is a staff member for this lesson
      * @throws LamsToolServiceException the exception occurred during the
      * 									lams and tool interaction to start a
      * 									lesson.
      */
-    public void startLesson(long lessonId);
+    public void startLesson(long lessonId, Integer userId) throws UserAccessDeniedException;
     /**
      * Start a lesson on schedule datetime.
      * @param lessonId
      * @param startDate the lesson start date and time.
+     * @param userId checks that the user is a staff member for this lesson
      * @see org.lamsfoundation.lams.monitoring.service#startLesson(long)
      */
-    public void startLessonOnSchedule(long lessonId, Date startDate);
+    public void startLessonOnSchedule(long lessonId, Date startDate, Integer userId) throws UserAccessDeniedException;
     /**
      * Finish a lesson on schedule datetime.
      * @param lessonId
-     * @param endDate teh lesson end date and time.
+     * @param endDate the lesson end date and time.
+     * @param userId checks that the user is a staff member for this lesson
      */
-    public void finishLessonOnSchedule(long lessonId, Date endDate);
+    public void finishLessonOnSchedule(long lessonId, Date endDate, Integer userId) throws UserAccessDeniedException;
     /**
      * Finish a lesson.A Finished lesson can be viewed on the monitoring interface. 
      * It should be an "inactive" lesson. A Finished lesson is listed on the learner 
@@ -134,9 +139,10 @@ public interface IMonitoringService
      * export portfolio - they cannot access any of the tool screens.
      *  
      * @param lessonId
+     * @param userId checks that the user is a staff member for this lesson
      * @param endDate teh lesson end date and time.
      */
-    public void finishLesson(long lessonId);
+    public void finishLesson(long lessonId, Integer userId) throws UserAccessDeniedException;
     
     /**
      * Force Complete works on an individual user. The teacher may complete it up to a particular activity, 
@@ -155,20 +161,23 @@ public interface IMonitoringService
      * Archive the specified lesson. When archived, the data is retained
      * but the learners cannot access the details. 
      * @param lessonId the specified the lesson id.
+     * @param userId checks that the user is a staff member for this lesson
      */
-    public void archiveLesson(long lessonId);
+    public void archiveLesson(long lessonId, Integer userId) throws UserAccessDeniedException;
     /**
      * A lesson can only be suspended if it is started. The purpose of suspending is 
      * to hide the lesson from learners temporarily. If the teacher tries to suspend a lesson that 
      * is not in the STARTED_STATE, then an error should be returned. 
      * @param lessonId the lesson ID which will be suspended.
+     * @param userId checks that the user is a staff member for this lesson
      */
-    public void suspendLesson(long lessonId);
+    public void suspendLesson(long lessonId, Integer userId) throws UserAccessDeniedException;
     /**
      * Unsuspend a lesson, which state must be Lesson.SUSPEND_STATE. Otherwise an exception will be thrown.
      * @param lessonId
+     * @param userId checks that the user is a staff member for this lesson
      */
-    public void unsuspendLesson(long lessonId);
+    public void unsuspendLesson(long lessonId, Integer userId) throws UserAccessDeniedException;
 
     /**
      * <P>
@@ -176,16 +185,10 @@ public interface IMonitoringService
      * wish to remove them and never access them again. This function disables 
      * the lesson - it does not remove the contents from the database
      * </P>
-     * @param lessonId 
-     * 		the specified the lesson id.
+     * @param lessonId the specified the lesson id.
+     * @param userId checks that the user is a staff member for this lesson
      */
-	public void removeLesson(long lessonId);
-   /**
-    * 
-    * Permanently remove a lesson from the database. This can not be undone - once deleted the 
-    * data is gone forever.
-     */
-    public void deleteLesson(Lesson lesson); 
+	public void removeLesson(long lessonId, Integer userId) throws UserAccessDeniedException;
      /**
      * Set the gate to open to let all the learners through. This learning service
      * is triggerred by the system scheduler. Will return true GateActivity (or subclass)
@@ -203,48 +206,27 @@ public interface IMonitoringService
     public GateActivity closeGate(Long gateId);
     
     /**
-     * This method returns a A list of all available Lessons.
-     * Note - this is all the lessons (for all users, for all states, including disabled).
+     * This method returns a string representing a list of all lessons
+     * for the current user. See getAllLessons(). 
+     * 
+     * @return String The requested list of Lessons in wddx format
+     * @throws IOException
+     */
+    public String getAllLessonsWDDX(Integer userID) throws IOException;
+    
+    /**
+    * This method returns a list of all available Lessons. This is all the lessons
+     * created by the current user and all the lessons for which the user is in the
+     * staff group. It does not return removed lessons.
+     * 
      * If the data is to be sent to Flash, then use  getAllLessonsWDDX()
-     * 
-     * @return List The requested list of Lessons
-     * @throws IOException
-     */
-    public List getAllLessons() throws IOException;
-
-    /**
-     * This method returns a string representing a list of all 
-     * Note - this is all the lessons (for all users, for all states, including disabled).
-     * available Lessons in the WDDX format
-     * 
-     * @return String The requested list of Lessons in wddx format
-     * @throws IOException
-     */
-    public String getAllLessonsWDDX() throws IOException;
-    
-    /**
-     * This method returns a string representing a list of all 
-     * available Lessons for a given user. If the data is to be 
-     * sent to Flash, then use  getAllLessonsWDDX(Integer userID)
-     * 
+     *
      * @param userID The user_id of the user for whom the lessons 
      * 				 are being fetched.
      * @return List The requested list of Lessons
      * @throws IOException
      */
-    public List getAllLessons(Integer userID)throws IOException;
-    
-
-    /**
-     * This method returns a string representing a list of all 
-     * available Lessons for a given user in the WDDX format
-     * 
-     * @param userID The user_id of the user for whom the lessons 
-     * 				 are being fetched.
-     * @return String The requested list of Lessons in wddx format
-     * @throws IOException
-     */
-    public String getAllLessonsWDDX(Integer userID)throws IOException;
+    public List getAllLessons(Integer userID) throws IOException;
     
     /**
      * This method returns the details for the given Lesson in

@@ -27,6 +27,7 @@ import java.util.Set;
 
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
+import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * A type of Grouping that represents all the Learners in a Lesson. The
@@ -70,12 +71,12 @@ public class LessonClass extends Grouping {
 
     /**
      * @see org.lamsfoundation.lams.learningdesign.Grouping#isLearnerGroup(org.lamsfoundation.lams.learningdesign.Group)
+     * Returns false if group is null
      */
     public boolean isLearnerGroup(Group group)
     {
         if(group.getGroupId()==null||staffGroup.getGroupId()==null)
-            throw new IllegalArgumentException("Can't check up whether group" +
-            		" is learner group without group id.");
+        	return false;
         
         return staffGroup.getGroupId()!=group.getGroupId();
     }
@@ -90,6 +91,17 @@ public class LessonClass extends Grouping {
     	lessonClass.staffGroup = this.staffGroup;
     	lessonClass.lesson = this.lesson;
     	return lessonClass;
+    }
+
+    /** 
+     * Is this user a staff member for this lesson class? Returns false if the userID is null.
+     */
+    public boolean isStaffMember(User user) {
+    	if ( user == null )
+    		return false;
+    	
+    	Group staff = getStaffGroup();
+    	return staff!=null && staff.hasLearner(user); 
     }
 
 }

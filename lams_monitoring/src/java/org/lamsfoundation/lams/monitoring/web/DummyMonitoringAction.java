@@ -111,8 +111,7 @@ public class DummyMonitoringAction extends LamsDispatchAction
 
     	setupServices();
 
-    	User user = getUser();
-    	List lessons = monitoringService.getAllLessons(user.getUserId());
+    	List lessons = monitoringService.getAllLessons(getUserId());
 	    request.getSession().setAttribute(LESSONS_PARAMETER,lessons);
     	return mapping.findForward(CONTROL_FORWARD);
 
@@ -125,12 +124,10 @@ public class DummyMonitoringAction extends LamsDispatchAction
                                          HttpServletResponse response)throws IOException{
     	setupServices();
 
-    	User user = getUser();
-    	
-    	List designs = monitoringService.getLearningDesigns(new Long(user.getUserId().longValue()));
+    	List designs = monitoringService.getLearningDesigns(new Long(getUserId().longValue()));
 	    request.getSession().setAttribute(DESIGNS_PARAMETER,designs);
     	
-    	List organisations = monitoringService.getOrganisationsUsers(user.getUserId());
+    	List organisations = monitoringService.getOrganisationsUsers(getUserId());
 	    request.getSession().setAttribute(ORGS_PARAMETER,organisations);
 	    
     	return mapping.findForward(START_LESSON_FORWARD);
@@ -168,7 +165,7 @@ public class DummyMonitoringAction extends LamsDispatchAction
 
     	// Must have User, rather than UserDTO as the createLessonClassForLesson must have 
     	// a proper user objcet in the staffs list.
-        User user = getUser();
+        User user = usermanageService.getUserById(getUserId());
 
         Long ldId = dummyForm.getLearningDesignId();
     	if ( ldId == null )
@@ -207,14 +204,15 @@ public class DummyMonitoringAction extends LamsDispatchAction
         		"Learner Group",
 				learners,
 				"Staff Group",
-                staffs);
+                staffs,
+                getUserId());
 
         // start the lesson.
         Calendar startDate = dummyForm.getStartDate();
         if ( startDate == null ) {
-            monitoringService.startLesson(testLesson.getLessonId().longValue());
+            monitoringService.startLesson(testLesson.getLessonId().longValue(),getUserId());
         } else {
-        	monitoringService.startLessonOnSchedule(testLesson.getLessonId().longValue(),startDate.getTime());
+        	monitoringService.startLessonOnSchedule(testLesson.getLessonId().longValue(),startDate.getTime(),getUserId());
         }
 
     	return mapping.findForward(LESSON_STARTED_FORWARD);
@@ -250,7 +248,7 @@ public class DummyMonitoringAction extends LamsDispatchAction
 //		cal.add(Calendar.MILLISECOND, 5000);
 //		monitoringService.finishLessonOnSchedule(lessonId,cal.getTime());
 
-        monitoringService.archiveLesson(lessonId);
+        monitoringService.archiveLesson(lessonId,getUserId());
 
         return unspecified(mapping, form, request, response);
     }
@@ -281,7 +279,7 @@ public class DummyMonitoringAction extends LamsDispatchAction
         this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
 
         long lessonId = WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID);
-		monitoringService.removeLesson(lessonId);
+		monitoringService.removeLesson(lessonId,getUserId());
 
         return unspecified(mapping, form, request, response);
     }
@@ -309,9 +307,8 @@ public class DummyMonitoringAction extends LamsDispatchAction
     	
     	setupServices();
 
-    	User user = getUser();
     	Long lessonId = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID));
-    	List lessons = monitoringService.getAllLessons(user.getUserId());
+    	List lessons = monitoringService.getAllLessons(getUserId());
     	
     	Iterator iter = lessons.iterator();
 		boolean found = false;
@@ -359,14 +356,11 @@ public class DummyMonitoringAction extends LamsDispatchAction
     	this.usermanageService= (IUserManagementService) wac.getBean("userManagementService");
 
     }
-    private User getUser() throws IOException {
-    	HttpSession ss = SessionManager.getSession();
-    	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-    	if ( user != null ) {
-    		return usermanageService.getUserById(user.getUserID());
-    	}
-    	throw new IOException("Unable to get user. User in session manager is "+user);
-    }
+	private Integer getUserId() {
+		HttpSession ss = SessionManager.getSession();
+		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+		return user != null ? user.getUserID() : null;
+	}
     
     public ActionForward gotoLearnerActivityURL(ActionMapping mapping,
             ActionForm form,

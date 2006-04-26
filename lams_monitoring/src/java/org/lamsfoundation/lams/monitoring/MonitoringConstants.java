@@ -24,7 +24,6 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.monitoring;
 
-import java.util.Hashtable;
 
 
 public class MonitoringConstants {
@@ -34,6 +33,7 @@ public class MonitoringConstants {
 	public static final String PERFORM_CHOSEN_GROUPING_KEY = "performChosenGrouping";
 	public static final String KEY_ORGANISATION_ID = "organisationID";
 	public static final String KEY_LESSON_ID = "lessonID";
+	public static final String KEY_USER_ID = "userID";
 	public static final String KEY_STAFF = "staff";
 	public static final String KEY_LEARNER = "learners";
 	public static final String JOB_START_LESSON = "startScheduleLessonJob";

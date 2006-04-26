@@ -28,9 +28,14 @@ import org.lamsfoundation.lams.usermanagement.User;
 /**
  * The current ticket doesn't have sufficient rights for the requested action.
  */
-public class UserAccessDeniedException extends Exception {
+public class UserAccessDeniedException extends RuntimeException {
 	
    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 456802622742034527L;
+
+  /**
 	* Constructs a new instance of this class.
 	*/
     public UserAccessDeniedException() {
@@ -84,4 +89,19 @@ public class UserAccessDeniedException extends Exception {
 	  super("Access Denied for user userID="+user.getUserId().toString(), cause);
 	   }
 	
+  /**
+	* Constructs a new instance of this class.
+	*/
+ public UserAccessDeniedException(Integer userId) {
+	   super("Access Denied for user userID="+userId);
+ }
+	
+/**
+	* Constructs a new instance of this class given a root throwable.
+	*
+	* @param cause root failure cause
+	*/
+public UserAccessDeniedException(Integer userId, Throwable cause) {
+	  super("Access Denied for user userID="+userId, cause);
+	   }
 }

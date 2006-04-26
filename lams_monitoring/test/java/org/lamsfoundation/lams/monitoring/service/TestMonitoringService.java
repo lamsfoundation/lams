@@ -193,7 +193,8 @@ public class TestMonitoringService extends AbstractLamsTestCase
                                                                          "leaner group",
                                                                          learners,
                                                                          "staff group",
-                                                                         staffs);
+                                                                         staffs,
+                                                                         TEST_STAFF_ID);
         Lesson createdLesson = lessonDao.getLesson(TEST_LESSON_ID);
         
         assertEquals("verify the staff group",staffs.size(),createdLesson.getLessonClass().getStaffGroup().getUsers().size());
@@ -207,7 +208,7 @@ public class TestMonitoringService extends AbstractLamsTestCase
     
     public void testStartlesson() throws LamsToolServiceException
     {
-        monitoringService.startLesson(TEST_LESSON_ID.longValue());
+        monitoringService.startLesson(TEST_LESSON_ID.longValue(),TEST_STAFF_ID);
         assertTrue(true);
         
         Lesson startedLesson = lessonDao.getLesson(TEST_LESSON_ID);
@@ -237,7 +238,7 @@ public class TestMonitoringService extends AbstractLamsTestCase
     }
     
     public void testGetAllLessons()throws IOException{
-    	String packet = monitoringService.getAllLessonsWDDX();    	
+    	String packet = monitoringService.getAllLessonsWDDX(TEST_STAFF_ID);    	
     	System.out.print(packet);
     }
     public void testGetLessonDetails() throws IOException{
@@ -351,7 +352,7 @@ public class TestMonitoringService extends AbstractLamsTestCase
 	        assertNotNull("Lesson returned from create class",newLesson);
 	        assertSame("Lesson updated from create class", newLesson.getLessonId(),previewLesson.getLessonId());
 
-	        monitoringService.startLesson(previewLesson.getLessonId().longValue());
+	        monitoringService.startLesson(previewLesson.getLessonId().longValue(),TEST_STAFF_ID);
 
 			return previewLesson;
 		} catch (UserAccessDeniedException e) {

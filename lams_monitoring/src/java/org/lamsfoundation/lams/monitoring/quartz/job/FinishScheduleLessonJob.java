@@ -44,12 +44,12 @@ public class FinishScheduleLessonJob extends MonitoringJob{
         //getting gate id set from scheduler
         Map properties = context.getJobDetail().getJobDataMap();
         long lessonId = ((Long)properties.get(MonitoringConstants.KEY_LESSON_ID)).longValue();
-        
+        Integer userId = (Integer)properties.get(MonitoringConstants.KEY_USER_ID);
         if(log.isDebugEnabled())
             log.debug("Lesson ["+lessonId+"] is stopping...");
         
 		
-		monitoringService.finishLesson(lessonId);
+		monitoringService.finishLesson(lessonId,userId);
         
         if(log.isDebugEnabled())
             log.debug("Lesson ["+lessonId+"] stopped");
