@@ -130,12 +130,22 @@ public class LearningAction extends Action {
 	}
 
 	private ActionForward complete(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-		Long resourceUid = new Long(request.getParameter(ResourceConstants.PARAM_RESOURCE_ITEM_UID));
+		
+		Long resourceItemUid = new Long(request.getParameter(ResourceConstants.PARAM_RESOURCE_ITEM_UID));
 		IResourceService service = getResourceService();
 		HttpSession ss = SessionManager.getSession();
 		//get back login user DTO
 		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-		service.setItemComplete(resourceUid,new Long(user.getUserID().intValue()));
+		service.setItemComplete(resourceItemUid,new Long(user.getUserID().intValue()));
+		
+		//set resource item complete tag
+		List<ResourceItem> resourceItemList = getResourceItemList(request);
+		for(ResourceItem item:resourceItemList){
+			if(item.getUid().equals(resourceItemUid)){
+				item.setComplete(true);
+				break;
+			}
+		}
 		return  mapping.findForward(ResourceConstants.SUCCESS);
 	}
 	/**
@@ -202,6 +212,12 @@ public class LearningAction extends Action {
 		}
 		items.add(item);
 		service.saveOrUpdateResourceSession(resSession);
+		
+		//update session value
+		List<ResourceItem> resourceItemList = getResourceItemList(request);
+		resourceItemList.add(item);
+		
+		//URL or file upload
 		request.setAttribute("addType",new Short(type));
 		return  mapping.findForward(ResourceConstants.SUCCESS);
 	}
@@ -233,6 +249,7 @@ public class LearningAction extends Action {
 		Resource resource;
 		try {
 			items = service.getResourceItemsBySessionId(sessionId);
+			ResourceSession session = service.getResourceSessionBySessionId(sessionId);
 			resource = service.getResourceBySessionId(sessionId);
 		} catch (Exception e) {
 			log.error(e);
@@ -247,7 +264,7 @@ public class LearningAction extends Action {
 		//set complete flag for display purpose
 		service.retrieveComplete(resourceItemList, resourceUser);
 		
-		request.setAttribute(ResourceConstants.ATTR_RESOURCE,resource);
+		request.getSession().setAttribute(ResourceConstants.ATTR_RESOURCE,resource);
 		return mapping.findForward(ResourceConstants.SUCCESS);
 	}
 	//*************************************************************************************

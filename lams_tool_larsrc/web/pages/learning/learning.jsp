@@ -8,27 +8,32 @@
 	<!--
 		function gotoURL(){
  		    var reqIDVar = new Date();
-			parent.newResourceFrame.location = "<c:url value="/pages/learning/addurl.jsp"/>?&reqID="+reqIDVar.getTime();
+			parent.frames['newResourceFrame'].location = "<c:url value="/pages/learning/addurl.jsp"/>?&reqID="+reqIDVar.getTime();
 	      	parent.newResourceFrame.focus();
+	      	return false;
 		}
 		function gotoFile(){
  		    var reqIDVar = new Date();
-			parent.newResourceFrame.location = "<c:url value="/pages/learning/addfile.jsp"/>?&reqID="+reqIDVar.getTime();
+			parent.frames['newResourceFrame'].location = "<c:url value="/pages/learning/addfile.jsp"/>?&reqID="+reqIDVar.getTime();
 	      	parent.newResourceFrame.focus();
+	      	return false;
 		}
 		function checkNew(){
  		    var reqIDVar = new Date();
-			parent.learningFrame.location = "<c:url value="/learning/start.do"/>?toolSessionID=${toolSessionID}&reqID="+reqIDVar.getTime();
+			parent.frames['learningFrame'].location= "<c:url value="/learning/start.do"/>?toolSessionID=${toolSessionID}&reqID="+reqIDVar.getTime();
+ 		    return false;
 		}
 		function viewItem(itemUid){
 			var myUrl = "<c:url value="/reviewItem.do"/>?itemUid=" + itemUid;
 			launchPopup(myUrl,"Review");
 		}
 		function completeItem(itemUid){
-			parent.learningFrame.location = "<c:url value="/learning/completeItem.do"/>?itemUid=" + itemUid;
+			parent.frames['learningFrame'].location = "<c:url value="/learning/completeItem.do"/>?itemUid=" + itemUid;
+			return false;
 		}
 		function finishSession(){
-			parent.learningFrame.location='<c:url value="/learning/finish.do?toolSessionID=${toolSessionID}&mode=learner"/>';
+			parent.location ='<c:url value="/learning/finish.do?toolSessionID=${toolSessionID}&mode=learner"/>';
+			return false;
 		}
 	-->        
     </script>
@@ -43,11 +48,9 @@
 				<h1>
 					<fmt:message key="label.learning.heading" />
 				</h1>
-			</td>
-		</tr>
-		<tr>
-			<td class="formlabel">
-				${resource.instructions}
+				<h2>
+					${resource.instructions}
+				</h2>
 			</td>
 		</tr>
 	</table>
@@ -61,7 +64,7 @@
 				<fmt:message key="label.completed" />
 			</th>
 			<th scope="col" style="width:200px">
-				<a href="javascript:;" style="width:120px" class="button" onclick="checkNew()"><fmt:message key="label.check.for.new" /></a>
+				<a href="#" style="width:120px" class="button" onclick="return checkNew()"><fmt:message key="label.check.for.new" /></a>
 			</th>
 		</tr>
 		<c:forEach var="item" items="${resourceList}">
@@ -76,21 +79,21 @@
 				
 				<td>
 					<a href="javascript:;" class="button" onclick="viewItem(${item.uid})" ><fmt:message key="label.view" /></a>
-					<a href="javascript:;" class="button" onclick="completeItem(${item.uid})"><fmt:message key="label.completed" /></a>
+					<a href="#" class="button" onclick="return completeItem(${item.uid})"><fmt:message key="label.completed" /></a>
 				</td>
 			</tr>
 		</c:forEach>
 		<tr>
 			<td colspan="3" align="right">
-				<a href="javascript:;" class="button" onclick="finishSession()">
+				<a href="#" class="button" onclick="return finishSession()">
 					<fmt:message key="label.finished" />
 				</a>
 			</td>
 		</tr>
-		<c:if test="${resource.miniViewNumberStr}">
+		<c:if test="${resource.miniViewResourceNumber > 0}">
 			<tr>
 				<td colspan="4" align="left">
-					<b><fmt:message key="label.learning.minmum.review" /></b>
+					<b>${resource.miniViewNumberStr}</b>
 				</td>
 			</tr>
 		</c:if>

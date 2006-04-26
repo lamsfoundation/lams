@@ -296,12 +296,12 @@ public class ResourceServiceImpl implements
 
 	public Resource getResourceBySessionId(Long sessionId){
 		ResourceSession session = resourceSessionDao.getSessionBySessionId(sessionId);
-		//to skip GCLib problem
-		Resource res = session.getResource();
-		log.debug("Resource Uid:"+res.getUid()+"-Resource miniView:"+res.getMiniViewResourceNumber());
+		//to skip CGLib problem
+		Long contentId = session.getResource().getContentId();
+		Resource res = resourceDao.getByContentId(contentId);
+		int miniView = res.getMiniViewResourceNumber();
 		//construct dto fields;
-		res.setMiniViewNumberStr(messageService.getMessage("label.learning.minimum.review"
-				,new Object[new Integer(res.getMiniViewResourceNumber())]));
+		res.setMiniViewNumberStr(messageService.getMessage("label.learning.minimum.review",new Object[]{new Integer(miniView)}));
 		return res;
 	}
 	public ResourceSession getResourceSessionBySessionId(Long sessionId) {

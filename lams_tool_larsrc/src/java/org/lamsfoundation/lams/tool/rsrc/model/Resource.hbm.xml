@@ -181,11 +181,11 @@
         />
 
         <property
-            name="minViewResourceNumber"
+            name="miniViewResourceNumber"
             type="int"
             update="true"
             insert="true"
-            column="min_view_resource_number"
+            column="mini_view_resource_number"
         />
 
         <property

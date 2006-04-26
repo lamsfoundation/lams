@@ -5,7 +5,7 @@
 	</head>
 	<body>
 		<script type="text/javascript">
-			parent.learningFrame.location = "<c:url value="/learning/start.do"/>?toolSessionID=${toolSessionID}";
+			parent.frames['learningFrame'].location  = "<c:url value="/learning/start.do"/>?toolSessionID=${toolSessionID}";
 		</script>
 		<div style="align:center">
 			<c:if test="${addType == 1}">
