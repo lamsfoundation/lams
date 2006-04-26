@@ -71,6 +71,7 @@ class org.lamsfoundation.lams.monitoring.ls.Lesson {
 
         //Set the position by setting the model which will call update on the view
         lessonModel.setPosition(x,y);
+		lessonModel.setSize(null,Stage.height-y);
 	}
 	
 	/**
