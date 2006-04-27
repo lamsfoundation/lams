@@ -67,7 +67,7 @@
 		<c:forEach var="item" items="${resourceList}">
 			<tr>
 				<td>${item.title}</td>
-				<td>
+				<td align="center">
 					<c:if test="${item.complete}">
 						<img src="<html:rewrite page='/includes/images/cross.gif'/>" border="0">
 					</c:if>

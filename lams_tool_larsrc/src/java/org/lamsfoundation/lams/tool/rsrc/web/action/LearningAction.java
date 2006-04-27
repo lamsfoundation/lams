@@ -100,7 +100,8 @@ public class LearningAction extends Action {
 		if(resourceItemUid != null){
 			doComplete(request);
 			request.setAttribute(ResourceConstants.ATTR_RUN_AUTO,true);
-		}
+		}else
+			request.setAttribute(ResourceConstants.ATTR_RUN_AUTO,false);
 		Long sessionId = (Long) request.getSession().getAttribute(
 				AttributeNames.PARAM_TOOL_SESSION_ID);
 		HttpSession ss = SessionManager.getSession();
