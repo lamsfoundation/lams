@@ -100,14 +100,14 @@ public class ToolAccessMode implements Serializable
 		return new HashCodeBuilder().append(name).toHashCode();
 	}
     
-    public boolean isTeacher(ToolAccessMode mode){
-    	return TEACHER.equals(mode);
+    public boolean isTeacher(){
+    	return TEACHER.equals(this);
     }
-    public boolean isLearner(ToolAccessMode mode){
-    	return LEARNER.equals(mode);
+    public boolean isLearner(){
+    	return LEARNER.equals(this);
     }
-    public boolean isAuthor(ToolAccessMode mode){
-    	return AUTHOR.equals(mode);
+    public boolean isAuthor(){
+    	return AUTHOR.equals(this);
     }
     
 
