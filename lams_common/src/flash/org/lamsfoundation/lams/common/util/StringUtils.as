@@ -222,6 +222,19 @@ class StringUtils {
 	
 	
 	/**
+	 * Enter description here
+	 * 
+	 * @usage   		To Convert Month Number into full Month Name
+	 * @param   		month number
+	 * @return  		Month Name String
+	 */
+	public static function getMonthAsString(month:Number):String {
+		var monthNames_array:Array = new Array("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December");
+		return monthNames_array[month];
+}
+
+	
+	/**
 	 * Checks to see if the value passed in is null, undefined or a blank string
 	 * @usage   
 	 * @param   v 
