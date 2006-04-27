@@ -23,6 +23,7 @@
 
 import org.lamsfoundation.lams.learner.Application;
 import org.lamsfoundation.lams.common.Sequence;
+import org.lamsfoundation.lams.common.Progress;
 import org.lamsfoundation.lams.authoring.DesignDataModel;
 import org.lamsfoundation.lams.learner.lb.*;
 import org.lamsfoundation.lams.common.util.*; 
@@ -160,6 +161,10 @@ class Library {
 		return libraryModel.getSequence(seqId);
 	}
 	
+	public function getSelectedSequence():Sequence {
+		return libraryModel.getSelectedSequence();
+	}
+	
 	public function select(seq:Sequence):Void {
 		var libraryController = libraryView.getController();
 		libraryController.selectSequence(seq);	
@@ -177,7 +182,8 @@ class Library {
 			
 		// get Learning Design for lesson
 		openLearningDesign(seq);
-			
+		getProgressData(seq);
+		
 		return true;
 	}
 	
@@ -188,7 +194,7 @@ class Library {
 		var seqId:Number = seq.getSequenceID();
 		
 		// do request
-		Application.getInstance().getComms().getRequest('learning/learner.do?method=exitLesson&lessonID='+String(seqId), callback, false);
+		Application.getInstance().getComms().getRequest('learning/learner.do?method=exitLesson&lessonId='+String(seqId), callback, false);
 		
 		return true;
 	}
@@ -204,7 +210,7 @@ class Library {
 		trace('pktobject value: '+String(pkt));
 		getURL('http://localhost:8080/lams/learning'+String(pkt)+'?progressId='+seq.getSequenceID(),'contentFrame');
 		
-	}  
+	} 
 	
 	private function closeSequence(pkt:Object){
 		trace('receiving message back from server...');
@@ -225,6 +231,14 @@ class Library {
 		
 	}
 	
+	private function getProgressData(seq:Object){
+		trace('getting progress data...');
+		var progessId:Number = seq.getSequenceID();
+		
+		var callback:Function = Proxy.create(this, saveProgressData);
+		Application .getInstance().getComms().getRequest('learning/learner.do?method=getFlashProgressData&progressId=' + progessId, callback, false);
+	}
+	
 	private function saveDataDesignModel(learningDesignDTO:Object){
 		trace('returning learning design...');
 		trace('saving model data...');
@@ -236,6 +250,16 @@ class Library {
 		
 		// activite Progress movie
 		
+	}
+	
+	private function saveProgressData(progressDTO:Object){
+		trace('returning progress data...');
+		var progress:Progress = new Progress();
+		progress.populateFromDTO(progressDTO);
+		var seq:Sequence = Sequence(libraryModel.getSelectedSequence());
+		seq.setProgress(progress);
+		
+		trace('progress data saved...');
 	}
 
 	//Dimension accessor methods
