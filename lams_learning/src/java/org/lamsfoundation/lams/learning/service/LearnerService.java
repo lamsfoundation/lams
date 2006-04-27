@@ -97,7 +97,10 @@ public class LearnerService implements ILearnerService
 		this.messageService = messageService;
 	}
 
-    /**
+    public MessageService getMessageService() {
+		return messageService;
+	}
+	/**
      * @param toolSessionDAO The toolSessionDAO to set.
      */
     public void setToolSessionDAO(IToolSessionDAO toolSessionDAO)

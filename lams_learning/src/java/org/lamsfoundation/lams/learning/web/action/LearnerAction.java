@@ -41,14 +41,9 @@ import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learning.web.util.LessonLearnerDataManager;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.dto.ProgressActivityDTO;
-
-
-
 import org.lamsfoundation.lams.lesson.LearnerProgress;
-import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 import org.lamsfoundation.lams.usermanagement.User;
-
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
@@ -83,6 +78,7 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
  * 							handler="org.lamsfoundation.lams.learning.util.CustomStrutsExceptionHandler"
  * @struts:action-forward name="displayActivity" path="/DisplayActivity.do"
  * @struts:action-forward name="welcome" path=".welcome"
+ * @struts:action-forward name="exit" path=".exit"
  * 
  * ----------------XDoclet Tags--------------------
  * 
@@ -99,6 +95,17 @@ public class LearnerAction extends LamsDispatchAction
     //---------------------------------------------------------------------
     private static final String DISPLAY_ACTIVITY = "displayActivity";
     private static final String WELCOME = "welcome";
+    private static final String EXIT = "exit";
+    
+	  private FlashMessage handleException(Exception e, String methodKey, ILearnerService learnerService) {
+			log.error("Exception thrown "+methodKey,e);
+			String[] msg = new String[1];
+			msg[0] = e.getMessage();
+			return new FlashMessage(methodKey,
+					learnerService.getMessageService().getMessage("error.system.error", msg),
+				FlashMessage.CRITICAL_ERROR);
+	    }
+
     /**
      * <p>The Struts dispatch method that retrieves all active lessons for a 
      * requested user from flash. The returned is structured as dto format 
@@ -125,20 +132,27 @@ public class LearnerAction extends LamsDispatchAction
     {
         //initialize service object
         ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
-
-        //get learner.
-        User learner = LearningWebUtil.getUserData(getServlet().getServletContext());
+        FlashMessage message = null;
+    	try {
+	
+	        //get learner.
+	        User learner = LearningWebUtil.getUserData(getServlet().getServletContext());
+	        if(log.isDebugEnabled())
+	            log.debug("Getting active lessons for leaner:"+learner.getFullName()+"["+learner.getUserId()+"]");
+	
+	        LessonDTO [] lessons = learnerService.getActiveLessonsFor(learner);
+	        
+	        message = new FlashMessage("getActiveLessons",lessons);
+	        		
+    	} catch (Exception e ) {
+    		message = handleException(e, "getActiveLessons", learnerService);
+    	}
+    	
+        String wddxPacket = WDDXProcessor.serialize(message);
         if(log.isDebugEnabled())
-            log.debug("Getting active lessons for leaner:"+learner.getFullName()+"["+learner.getUserId()+"]");
-
-        LessonDTO [] lessons = learnerService.getActiveLessonsFor(learner);
+            log.debug("Sending flash active lessons message:"+message);
         
-        String activeLessons = WDDXProcessor.serialize(new FlashMessage("getActiveLessons",lessons));
-        
-        if(log.isDebugEnabled())
-            log.debug("Sending flash active lessons message:"+activeLessons);
-        
-        response.getWriter().print(activeLessons);
+        response.getWriter().print(wddxPacket);
         
         //don't need to return a action forward because it sent the wddx packet
         //back already.
@@ -171,46 +185,50 @@ public class LearnerAction extends LamsDispatchAction
         //initialize service object
         ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 
-        //get user and lesson based on request.
-        User learner = LearningWebUtil.getUserData(getServlet().getServletContext());
-        long lessonID = WebUtil.readLongParam(request,LearningWebUtil.PARAM_LESSON_ID);
-
-        
+        FlashMessage message = null;
+    	try {
+	
+	        //get user and lesson based on request.
+	        User learner = LearningWebUtil.getUserData(getServlet().getServletContext());
+	        long lessonID = WebUtil.readLongParam(request,LearningWebUtil.PARAM_LESSON_ID);
+	
+	        
+	        if(log.isDebugEnabled())
+	            log.debug("The learner ["+learner.getUserId()+"],["+learner.getFullName()
+	                      +"is joining the lesson ["+lessonID+"]");
+	
+	        //join user to the lesson on the server
+	        LearnerProgress learnerProgress = learnerService.joinLesson(learner,lessonID);
+	        
+	        if(log.isDebugEnabled())
+	            log.debug("The learner ["+learner.getUserId()+"] joined lesson. The"
+	                      +"porgress data is:"+learnerProgress.toString());
+	        
+	        // TODO replace with JBOSS cache
+	        //LessonLearnerDataManager.cacheLessonUser(getServlet().getServletContext(),
+	        //                                         lesson,learner);
+	        
+	        //setup session attributes
+	        //request.getSession().setAttribute(SessionBean.NAME,new SessionBean(learner,
+	        //                                                                   lesson,
+	        //                                                                   learnerProgress));
+	        request.getSession().setAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE,learnerProgress);
+	
+	        //serialize a acknowledgement flash message with the path of display next
+	        //activity
+	        message = new FlashMessage("joinLesson", mapping.findForward(DISPLAY_ACTIVITY).getPath());
+	
+    	} catch (Exception e ) {
+    		message = handleException(e, "joinLesson", learnerService);
+    	}
+    	
+        String wddxPacket = WDDXProcessor.serialize(message);
         if(log.isDebugEnabled())
-            log.debug("The learner ["+learner.getUserId()+"],["+learner.getFullName()
-                      +"is joining the lesson ["+lessonID+"]");
-
-        //join user to the lesson on the server
-        LearnerProgress learnerProgress = learnerService.joinLesson(learner,lessonID);
+            log.debug("Sending Lesson joined acknowledge message to flash:"+wddxPacket);
         
-        if(log.isDebugEnabled())
-            log.debug("The learner ["+learner.getUserId()+"] joined lesson. The"
-                      +"porgress data is:"+learnerProgress.toString());
-        
-        // TODO replace with JBOSS cache
-        //LessonLearnerDataManager.cacheLessonUser(getServlet().getServletContext(),
-        //                                         lesson,learner);
-        
-        //setup session attributes
-        //request.getSession().setAttribute(SessionBean.NAME,new SessionBean(learner,
-        //                                                                   lesson,
-        //                                                                   learnerProgress));
-        request.getSession().setAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE,learnerProgress);
-
-        //serialize a acknowledgement flash message with the path of display next
-        //activity
-        String lessonJoined = WDDXProcessor.serialize(new FlashMessage("joinLesson",
-                                                                       mapping.findForward(DISPLAY_ACTIVITY).getPath()));
-
-        if(log.isDebugEnabled())
-            log.debug("Sending Lesson joined acknowledge message to flash:"+lessonJoined);
-
         //we hand over the control to flash. 
-        response.getWriter().print(lessonJoined);
-
-        //TODO this should return null once flash side is done, it should be 
-        //called by flash side
-        return mapping.findForward(DISPLAY_ACTIVITY);
+        response.getWriter().print(wddxPacket);
+        return null;
     }
     
 
@@ -244,25 +262,32 @@ public class LearnerAction extends LamsDispatchAction
         //initialize service object
         ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 
-        //SessionBean sessionBean = LearningWebUtil.getSessionBean(request,getServlet().getServletContext());
-        LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgressByUser(request,getServlet().getServletContext());
-        
+        FlashMessage message = null;
+    	try {
+	
+	        //SessionBean sessionBean = LearningWebUtil.getSessionBean(request,getServlet().getServletContext());
+	        LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgressByUser(request,getServlet().getServletContext());
+	        
+	        if(log.isDebugEnabled())
+	            log.debug("Lesson id is: "+learnerProgress.getLesson().getLessonId());
+	        
+	        learnerService.exitLesson(learnerProgress);
+	        
+	        LessonLearnerDataManager.removeLessonUserFromCache(getServlet().getServletContext(),
+	                                                           learnerProgress.getLesson(),
+	                                                           learnerProgress.getUser());
+	        //send acknowledgment to flash as it is triggerred by flash
+	        message = new FlashMessage("exitLesson",mapping.findForward(EXIT).getPath());
+
+    	} catch (Exception e ) {
+    		message = handleException(e, "exitLesson", learnerService);
+    	}
+    	
+        String wddxPacket = WDDXProcessor.serialize(message);
         if(log.isDebugEnabled())
-            log.debug("Lesson id is: "+learnerProgress.getLesson().getLessonId());
-        
-        learnerService.exitLesson(learnerProgress);
-        
-        LessonLearnerDataManager.removeLessonUserFromCache(getServlet().getServletContext(),
-                                                           learnerProgress.getLesson(),
-                                                           learnerProgress.getUser());
-        //send acknowledgment to flash as it is triggerred by flash
-        String lessonExitted = WDDXProcessor.serialize(new FlashMessage("exitLesson",null));
-        if(log.isDebugEnabled())
-            log.debug("Sending Exit Lesson acknowledge message to flash:"+lessonExitted);
-        response.getWriter().print(lessonExitted);
-        
-        //forward to welcome page
-        return mapping.findForward(WELCOME);
+            log.debug("Sending Exit Lesson acknowledge message to flash:"+wddxPacket);
+        response.getWriter().print(wddxPacket);
+        return null;
     }
     
     /**
@@ -298,15 +323,22 @@ public class LearnerAction extends LamsDispatchAction
         if(log.isDebugEnabled())
             log.debug("Getting Flash progress data...");
         
-        //SessionBean sessionBean = LearningWebUtil.getSessionBean(request,getServlet().getServletContext());
-        LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgressByID(request,getServlet().getServletContext());
-        
-        String progressData = WDDXProcessor.serialize(new FlashMessage("getFlashProgressData",
-                                                                       learnerProgress.getLearnerProgressData()));
+        FlashMessage message = null;
+    	try {
+	
+	        //SessionBean sessionBean = LearningWebUtil.getSessionBean(request,getServlet().getServletContext());
+	        LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgressByID(request,getServlet().getServletContext());
+	        
+	        message = new FlashMessage("getFlashProgressData",learnerProgress.getLearnerProgressData());
 
+    	} catch (Exception e ) {
+    		message = handleException(e, "getFlashProgressData", LearnerServiceProxy.getLearnerService(getServlet().getServletContext()));
+    	}
+    	
+        String wddxPacket = WDDXProcessor.serialize(message);
         if(log.isDebugEnabled())
-            log.debug("Sending learner progress data to flash:"+progressData);
-        response.getWriter().print(progressData);
+            log.debug("Sending learner progress data to flash:"+wddxPacket);
+        response.getWriter().print(wddxPacket);
 
         //don't need to return a action forward because it sent the wddx packet
         //back already.
@@ -339,29 +371,36 @@ public class LearnerAction extends LamsDispatchAction
     {
         if(log.isDebugEnabled())
             log.debug("Getting url for learner activity...");
-        //get parameter
-        long activityId = WebUtil.readLongParam(request,LearningWebUtil.PARAM_ACTIVITY_ID);
-        
-        //initialize service object
-        ActivityMapping activityMapping = LearnerServiceProxy.getActivityMapping(this.getServlet().getServletContext());
-        ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 
-        //getting requested object according to coming parameters
-        User learner = LearningWebUtil.getUserData(getServlet().getServletContext());
-        Activity requestedActivity = learnerService.getActivity(new Long(activityId));
-        
-        //preparing tranfer object for flash
-        ProgressActivityDTO activityDTO = new ProgressActivityDTO(new Long(activityId),
-                                                                  activityMapping.calculateActivityURLForProgressView(learner,requestedActivity));
-        //send data back to flash.
-        String learnerActivityURL = WDDXProcessor.serialize(new FlashMessage("getLearnerActivityURL",
-                                                                             activityDTO));
+        FlashMessage message = null;
+    	try {
+	
+	        //get parameter
+	        long activityId = WebUtil.readLongParam(request,LearningWebUtil.PARAM_ACTIVITY_ID);
+	        
+	        //initialize service object
+	        ActivityMapping activityMapping = LearnerServiceProxy.getActivityMapping(this.getServlet().getServletContext());
+	        ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+	
+	        //getting requested object according to coming parameters
+	        User learner = LearningWebUtil.getUserData(getServlet().getServletContext());
+	        Activity requestedActivity = learnerService.getActivity(new Long(activityId));
+	        
+	        //preparing tranfer object for flash
+	        ProgressActivityDTO activityDTO = new ProgressActivityDTO(new Long(activityId),
+	                                                                  activityMapping.calculateActivityURLForProgressView(learner,requestedActivity));
+	        //send data back to flash.
+	        message = new FlashMessage("getLearnerActivityURL",activityDTO);
 
+    	} catch (Exception e ) {
+    		message = handleException(e, "getLearnerActivityURL", LearnerServiceProxy.getLearnerService(getServlet().getServletContext()));
+    	}
+    	
+        String wddxPacket = WDDXProcessor.serialize(message);
         if(log.isDebugEnabled())
-            log.debug("Sending learner activity url data to flash:"+learnerActivityURL);
+            log.debug("Sending learner activity url data to flash:"+wddxPacket);
         
-        //don't need to return a action forward because it sent the wddx packet
-        //back already.
+        response.getWriter().print(wddxPacket);
         return null;
     }
 }

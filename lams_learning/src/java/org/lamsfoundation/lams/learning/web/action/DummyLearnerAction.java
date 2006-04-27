@@ -37,8 +37,12 @@ import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
+import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.wddx.FlashMessage;
+import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 
 
@@ -57,6 +61,7 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
  *                          path=".systemError"
  * 							handler="org.lamsfoundation.lams.learning.util.CustomStrutsExceptionHandler"
  * @struts:action-forward name="controlActivity" path="/dummyControlBottomFrame.jsp"
+ * @struts:action-forward name="displayActivity" path="/DisplayActivity.do"
  * 
  * ----------------XDoclet Tags--------------------
  * 
@@ -72,7 +77,8 @@ public class DummyLearnerAction extends LamsDispatchAction
     // Class level constants - Struts forward
     //---------------------------------------------------------------------
     private static final String CONTROL_ACTIVITY = "controlActivity";
-    
+    private static final String DISPLAY_ACTIVITY = "displayActivity";
+   
     // Session attributes
     private static final String PARAM_LESSONS = "lessons";
     
@@ -113,5 +119,52 @@ public class DummyLearnerAction extends LamsDispatchAction
     }
 
 
+    /**
+     * <p>The structs dispatch action that joins a learner into a lesson. The
+     * learner could either start a lesson or resume a lesson.</p>
+     * 
+     * @param mapping An ActionMapping class that will be used by the Action class to tell
+     * the ActionServlet where to send the end-user.
+     * 
+     * @param form The ActionForm class that will contain any data submitted
+     * by the end-user via a form.
+     * @param request A standard Servlet HttpServletRequest class.
+     * @param response A standard Servlet HttpServletResponse class.
+     * @return An ActionForward class that will be returned to the ActionServlet indicating where
+     *         the user is to go next.
+     * 
+     * @throws IOException
+     * @throws ServletException
+     */
+    public ActionForward joinLesson(ActionMapping mapping,
+                                    ActionForm form,
+                                    HttpServletRequest request,
+                                    HttpServletResponse response) throws IOException,
+                                                                          ServletException
+    {
+        //initialize service object
+        ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+
+        //get user and lesson based on request.
+        User learner = LearningWebUtil.getUserData(getServlet().getServletContext());
+        long lessonID = WebUtil.readLongParam(request,LearningWebUtil.PARAM_LESSON_ID);
+
+        
+        if(log.isDebugEnabled())
+            log.debug("The learner ["+learner.getUserId()+"],["+learner.getFullName()
+                      +"is joining the lesson ["+lessonID+"]");
+
+        //join user to the lesson on the server
+        LearnerProgress learnerProgress = learnerService.joinLesson(learner,lessonID);
+        
+        if(log.isDebugEnabled())
+            log.debug("The learner ["+learner.getUserId()+"] joined lesson. The"
+                      +"porgress data is:"+learnerProgress.toString());
+        
+        request.getSession().setAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE,learnerProgress);
+        return mapping.findForward(DISPLAY_ACTIVITY);
+    }
+    
+    
 
 }

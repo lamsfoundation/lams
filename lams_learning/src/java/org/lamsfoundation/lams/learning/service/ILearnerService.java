@@ -33,6 +33,7 @@ import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.util.MessageService;
 /**
  *
  * @author chris
@@ -40,6 +41,8 @@ import org.lamsfoundation.lams.usermanagement.User;
 public interface ILearnerService
 {
 
+	/** Get the I18N service. Used by actions for internationalising errors that go back to Flash */
+   public MessageService getMessageService();
 
     /**
      * Gets the lesson object for the given key.

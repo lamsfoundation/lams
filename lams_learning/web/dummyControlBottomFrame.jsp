@@ -72,7 +72,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<c:if test="${lesson.lessonDescription}">
 				<BR><c:out value="${lesson.lessonDescription}"/>
 			</c:if>
-			<BR><A HREF="<lams:WebAppURL/>learner.do?method=joinLesson&userId=<lams:user property="userID"/>&lessonId=<c:out value="${lesson.lessonID}"/>" target="contentFrame">Participate</A>
+			<BR><A HREF="<lams:WebAppURL/>dummylearner.do?method=joinLesson&userId=<lams:user property="userID"/>&lessonId=<c:out value="${lesson.lessonID}"/>" target="contentFrame">Participate</A>
 			<BR><A HREF=javascript:openPopUp('<lams:WebAppURL/>exportWaitingPage.jsp?mode=learner&lessonID=<c:out value="${lesson.lessonID}"/>');>Export Portfolio</A>
 			</TD></TR>
 			<TR><TD><HR></TD></TR>
