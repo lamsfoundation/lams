@@ -25,6 +25,7 @@ import org.lamsfoundation.lams.common.comms.*       //communications
 import org.lamsfoundation.lams.common.util.*;		// utilities
 import org.lamsfoundation.lams.common.ui.*;		// ui
 import org.lamsfoundation.lams.common.*;
+import org.lamsfoundation.lams.learner.Header;
 import org.lamsfoundation.lams.learner.ls.*;
 import org.lamsfoundation.lams.learner.lb.*;
 import mx.managers.*
@@ -38,15 +39,18 @@ class org.lamsfoundation.lams.learner.Application extends ApplicationParent {
 	// private constants
 	//private var _comms:Communication;
 	private var _seqLib:Library;
+	private var _header_mc:MovieClip;
 	
 	//private var _appRoot_mc:MovieClip;                 //Application root clip
     
-	
+	private static var HEADER_X:Number = -1;
+	private static var HEADER_Y:Number = -13.5;
 	private static var LIBRARY_X:Number = 0;
-	private static var LIBRARY_Y:Number = 0;
+	private static var LIBRARY_Y:Number = 40;
     
 	
     private static var APP_ROOT_DEPTH:Number = 10; //depth of the application root
+	private static var HEADER_DEPTH:Number = 20;
 	
 	// UI Elements
 	
@@ -57,7 +61,9 @@ class org.lamsfoundation.lams.learner.Application extends ApplicationParent {
 	private var _UILoadCheckIntervalID:Number;         //Interval ID for periodic check on UILoad status
     private var _UILoaded:Boolean;                     //UI Loading status
     private var _seqLibLoaded:Boolean;                  //Seq Library loaded flag
-    private var _seqLibEventDispatched:Boolean          //Seq Library loaded flag
+    //private var _seqLibEventDispatched:Boolean          //Seq Library loaded flag
+	private var _headerLoaded:Boolean;
+	//private var _headerEventDispatched:Boolean;
     
 	
 	//Application instance is stored as a static in the application class
@@ -75,7 +81,9 @@ class org.lamsfoundation.lams.learner.Application extends ApplicationParent {
 		
 		trace('Begin Application...');
         _seqLibLoaded = false;
-        _seqLibEventDispatched = false;
+        //_seqLibEventDispatched = false;
+		_headerLoaded = false;
+		//_headerEventDispatched = false;
         
         
     }
@@ -114,8 +122,12 @@ class org.lamsfoundation.lams.learner.Application extends ApplicationParent {
 		//Create the application root
         _appRoot_mc = _container_mc.createEmptyMovieClip('appRoot_mc',APP_ROOT_DEPTH);
         trace('_appRoot_mc: ' + _appRoot_mc);
-		var depth:Number = _appRoot_mc.getNextHighestDepth();
-        _seqLib = new Library(_appRoot_mc,depth++,LIBRARY_X,LIBRARY_Y);
+		//var depth:Number = _appRoot_mc.getNextHighestDepth();
+		
+        _header_mc = _container_mc.attachMovie('Header','_header_mc',HEADER_DEPTH, {_x:HEADER_X,_y:HEADER_Y});
+	    _header_mc.addEventListener('load',Proxy.create(this,UIElementLoaded));
+
+		_seqLib = new Library(_appRoot_mc,LIBRARY_X,LIBRARY_Y);
         _seqLib.addEventListener('load',Proxy.create(this,UIElementLoaded));
 		//_seqLib.addEventListener('init', Proxy.create(this,reload));
 	}
@@ -133,10 +145,10 @@ class org.lamsfoundation.lams.learner.Application extends ApplicationParent {
             
 			//If UI loaded check which events can be broadcast
 			if(_UILoaded){
-				if(_seqLibLoaded){
+				//if(_seqLibLoaded && _headerLoaded){
 					clearInterval(_UILoadCheckIntervalID);
 					start();
-				}
+				//}
 				
 				if(_uiLoadCheckCount >= UI_LOAD_CHECK_TIMEOUT_COUNT){
 					//if we havent loaded the library by the timeout count then give up
@@ -162,11 +174,15 @@ class org.lamsfoundation.lams.learner.Application extends ApplicationParent {
 					trace('Library loaded...');
                     _seqLibLoaded = true;
                     break;
+				case 'Header' :
+					trace('Header loaded...');
+					_headerLoaded = true;
+					break;
                 default:
             }
             
             //If all of them are loaded set UILoad accordingly
-            if(_seqLibLoaded){
+            if(_seqLibLoaded && _headerLoaded){
                 _UILoaded=true;                
             } 
             
