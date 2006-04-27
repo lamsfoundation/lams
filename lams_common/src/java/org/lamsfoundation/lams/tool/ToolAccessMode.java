@@ -26,6 +26,9 @@ package org.lamsfoundation.lams.tool;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+
 /**
  * <p>ToolAccessMode is implemented using Ordinal-based typesafe enum pattern. 
  * It resolves the performance and potential hard coding error problems of using
@@ -84,7 +87,28 @@ public class ToolAccessMode implements Serializable
     {
         return VALUES[ordinal];
     }
+
+	@Override
+	public boolean equals(Object obj) {
+		if(!(obj instanceof ToolAccessMode))
+			return false;
+		return StringUtils.equals(((ToolAccessMode)obj).name,this.name);
+	}
+
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder().append(name).toHashCode();
+	}
     
+    public boolean isTeacher(ToolAccessMode mode){
+    	return TEACHER.equals(mode);
+    }
+    public boolean isLearner(ToolAccessMode mode){
+    	return LEARNER.equals(mode);
+    }
+    public boolean isAuthor(ToolAccessMode mode){
+    	return AUTHOR.equals(mode);
+    }
     
 
 }
