@@ -51,6 +51,8 @@ class Sequence {
 	private var _learningDesignID:Number;
 	private var _learningDesignModel:DesignDataModel;
 	
+	private var _progress:Progress;
+	
 	private var _active:Boolean;
 	
 	
@@ -60,6 +62,7 @@ class Sequence {
 	public function Sequence (){
 		_active = false;
 		_learningDesignModel = null;
+		_progress = null;
 	}
 	
 	/**
@@ -203,6 +206,14 @@ class Sequence {
 	
 	public function getStatus():Boolean {
 		return _active;
+	}
+	
+	public function setProgress(progress:Progress){
+		_progress = progress;
+	}
+	
+	public function getProgress():Progress{
+		return progress;
 	}
 
 	public function checkState(stateID:Number):Boolean {
