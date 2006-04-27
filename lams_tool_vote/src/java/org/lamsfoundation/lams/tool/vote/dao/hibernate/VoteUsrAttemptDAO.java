@@ -50,6 +50,8 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 	 	private static final String LOAD_ATTEMPT_FOR_USER_AND_QUESTION_CONTENT	 = "from voteUsrAttempt in class VoteUsrAttempt where voteUsrAttempt.queUsrId=:queUsrId and voteUsrAttempt.voteQueContentId=:voteQueContentId";
 	 	
 	 	private static final String LOAD_USER_ENTRIES = "select distinct voteUsrAttempt.userEntry from VoteUsrAttempt voteUsrAttempt";
+	 	
+	 	private static final String LOAD_USER_ENTRY_RECORDS = "from voteUsrAttempt in class VoteUsrAttempt where voteUsrAttempt.userEntry=:userEntry and voteUsrAttempt.voteQueContentId=1 ";
             
 	 	
 	 	public VoteUsrAttempt getVoteUserAttemptByUID(Long uid)
@@ -151,6 +153,16 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 	        List list = getSession().createQuery(LOAD_ATTEMPT_FOR_QUE_CONTENT)
 			.setLong("queUsrId", queUsrId.longValue())
 			.setLong("voteQueContentId", voteQueContentId.longValue())				
+			.list();
+			return list;
+	    }
+		
+
+		public List getUserRecords(final String userEntry)
+	    {
+	        HibernateTemplate templ = this.getHibernateTemplate();
+	        List list = getSession().createQuery(LOAD_USER_ENTRY_RECORDS)
+			.setString("userEntry", userEntry)				
 			.list();
 			return list;
 	    }

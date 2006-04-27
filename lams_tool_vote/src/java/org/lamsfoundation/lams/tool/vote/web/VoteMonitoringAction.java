@@ -43,9 +43,9 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
 import org.lamsfoundation.lams.tool.vote.VoteMonitoredAnswersDTO;
+import org.lamsfoundation.lams.tool.vote.VoteMonitoredUserDTO;
 import org.lamsfoundation.lams.tool.vote.VoteUtils;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
-import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 import org.lamsfoundation.lams.tool.vote.service.VoteServiceProxy;
@@ -171,6 +171,14 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	    logger.debug("LIST_MONITORED_ANSWERS_CONTAINER_DTO: " + request.getSession().getAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO));
 	    /* ends here. */
 	    
+	    List listUserEntries=processUserEnteredNominations(voteService);
+	    logger.debug("listUserEntries: " + listUserEntries);
+	    request.getSession().setAttribute(LIST_USER_ENTRIES, listUserEntries);
+	}
+
+
+	public List processUserEnteredNominations(IVoteService voteService)
+	{
 	    logger.debug("start getting user entries: ");
 	    List userEntries=voteService.getUserEntries();
 	    logger.debug("userEntries: " + userEntries);
@@ -186,19 +194,46 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	    	if (userEntry != null)
 	    	{
 	    		VoteMonitoredAnswersDTO voteMonitoredAnswersDTO= new VoteMonitoredAnswersDTO();
-	    		logger.debug("adding uwer entry : " + userEntry);
+	    		logger.debug("adding user entry : " + userEntry);
 	    		voteMonitoredAnswersDTO.setQuestion(userEntry);
 	    		
+	    		List userRecords=voteService.getUserRecords(userEntry);
+	    		logger.debug("userRecords: " + userRecords);
+	    		
+	    		logger.debug("start processing user records: ");
+	    		
+	    		List listMonitoredUserContainerDTO= new LinkedList();
+				
+	    	    Iterator itUserRecords= userRecords.iterator();
+	    	    while (itUserRecords.hasNext())
+	    	    {
+	    	        VoteMonitoredUserDTO voteMonitoredUserDTO = new VoteMonitoredUserDTO();
+	    	        logger.debug("new DTO created");
+	    	        VoteUsrAttempt voteUsrAttempt =(VoteUsrAttempt)itUserRecords.next();
+	    	    	logger.debug("voteUsrAttempt: " + voteUsrAttempt);
+	    			voteMonitoredUserDTO.setAttemptTime(voteUsrAttempt.getAttemptTime().toString());
+	    			voteMonitoredUserDTO.setTimeZone(voteUsrAttempt.getTimeZone());
+	    			voteMonitoredUserDTO.setUserName(voteUsrAttempt.getVoteQueUsr().getUsername());
+	    			voteMonitoredUserDTO.setQueUsrId(voteUsrAttempt.getVoteQueUsr().getUid().toString());
+	    			voteMonitoredUserDTO.setUserEntry(voteUsrAttempt.getUserEntry());
+	    			
+	    	    	logger.debug("adding user entry: " + voteUsrAttempt.getUserEntry());
+	    	    	listMonitoredUserContainerDTO.add(voteMonitoredUserDTO);
+	    	    }
+	    	    
+	    		logger.debug("final listMonitoredUserContainerDTO: " + listMonitoredUserContainerDTO);
+	    		Map mapMonitoredUserContainerDTO=MonitoringUtil.convertToVoteMonitoredUserDTOMap(listMonitoredUserContainerDTO);
+	    		logger.debug("final user entry mapMonitoredUserContainerDTO:..." + mapMonitoredUserContainerDTO);
+
+	    	    voteMonitoredAnswersDTO.setQuestionAttempts(mapMonitoredUserContainerDTO);
 	    		listUserEntries.add(voteMonitoredAnswersDTO);
 			}
 		}
 	    logger.debug("finish getting user entries: " + listUserEntries);
-	    request.getSession().setAttribute(LIST_USER_ENTRIES, listUserEntries);
-	    
+	    return listUserEntries;
 	}
 
-
-    
+	
     public void initSummaryContent(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,

@@ -76,6 +76,8 @@ public interface IVoteService
     
     public void updateVoteUsrAttempt(VoteUsrAttempt mcUsrAttempt) throws VoteApplicationException;
     
+    public List getUserRecords(final String userEntry) throws VoteApplicationException;
+    
     public List getUserBySessionOnly(final VoteSession voteSession) throws VoteApplicationException;
     
     public void updateVoteQueContent(VoteQueContent voteQueContent) throws VoteApplicationException;

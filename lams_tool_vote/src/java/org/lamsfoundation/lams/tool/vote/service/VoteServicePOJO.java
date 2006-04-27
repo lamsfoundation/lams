@@ -469,6 +469,21 @@ public class VoteServicePOJO implements
         }
 	}
     
+    
+    public List getUserRecords(final String userEntry) throws VoteApplicationException
+    {
+        try
+        {
+        	return voteUsrAttemptDAO.getUserRecords(userEntry);
+        }
+        catch (DataAccessException e)
+        {
+            throw new VoteApplicationException("Exception occured when lams is getting user records for user entry: "
+                                                         + e.getMessage(),
+														   e);
+        }
+    }
+    
 
     public List getAttemptsListForUserAndQuestionContent(final Long queUsrId, final Long voteQueContentId) throws VoteApplicationException
     {

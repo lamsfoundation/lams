@@ -124,7 +124,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								</table>
 							</td>  
 			  			</tr>
-					</c:forEach>		  	
+					</c:forEach>		  
+						
 					
 					
 				<c:forEach var="currentDto" items="${sessionScope.listUserEntries}">
@@ -146,20 +147,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				  						 <td NOWRAP valign=top> <b> <font size=2> <bean:message key="label.attemptTime"/></font> </b></td>
 				  						 <td NOWRAP valign=top> <b> <font size=2> <bean:message key="label.timezone"/> </font>	</b></td>
 						  			</tr>				 
-									<tr> 
-										 <td NOWRAP valign=top>  <font size=2> other data1 </font>  </td>  
-				  						 <td NOWRAP valign=top>  <font size=2> other data2 </font> </td>
-				  						 <td NOWRAP valign=top>  <font size=2> other data3 </font>	</td>
-						  			</tr>				 
+
+		  							<c:forEach var="questionAttemptData" items="${currentDto.questionAttempts}">
+								  	 		<c:set var="userData" scope="request" value="${questionAttemptData.value}"/>
+												<jsp:include page="/monitoring/UserResponses.jsp" />										
+									</c:forEach>		  	
 						  			
 								</table>
 							</td>  
 			  			</tr>
 					</c:forEach>		  	
-					
-					
-					
-					
 
 				</table>
 		</c:if>						
