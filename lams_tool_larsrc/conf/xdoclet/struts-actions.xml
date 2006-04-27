@@ -151,7 +151,8 @@
 			type="org.lamsfoundation.lams.tool.rsrc.web.action.LearningAction"
 			input="/pages/learning/learning.jsp"
 			parameter="finish" >
-			<forward name="success" path="/pages/learning/finish.jsp" />
+			<forward name="finish" path="/pages/learning/finish.jsp" />
+			<forward name="previewfinish" path="/pages/learning/previewfinish.jsp" />
 		</action>
 		
 		<action path="/learning/saveOrUpdateItem"

@@ -96,10 +96,11 @@ public class LearningAction extends Action {
 	
 	private ActionForward finish(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		//auto run mode, when use finish the only one resource item, mark it as complete then finish this activity as well.
-		Long resourceItemUid = new Long(request.getParameter(ResourceConstants.PARAM_RESOURCE_ITEM_UID));
-		if(resourceItemUid != null)
+		String resourceItemUid = request.getParameter(ResourceConstants.PARAM_RESOURCE_ITEM_UID);
+		if(resourceItemUid != null){
 			doComplete(request);
-		
+			request.setAttribute(ResourceConstants.ATTR_RUN_AUTO,true);
+		}
 		Long sessionId = (Long) request.getSession().getAttribute(
 				AttributeNames.PARAM_TOOL_SESSION_ID);
 		HttpSession ss = SessionManager.getSession();
@@ -123,13 +124,12 @@ public class LearningAction extends Action {
 			try {
 				nextActivityUrl = service.finishToolSession(sessionId,userID);
 				request.setAttribute(ResourceConstants.ATTR_NEXT_ACTIVITY_URL,nextActivityUrl);
-				return mapping.findForward("finish");
 			} catch (ResourceApplicationException e) {
 				log.error("Failed get next activity url:" + e.getMessage());
 			}
-		}
-
-		return mapping.findForward("success");
+			return mapping.findForward("finish");
+		}else
+			return mapping.findForward("previewfinish");
 	}
 
 	private ActionForward complete(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {

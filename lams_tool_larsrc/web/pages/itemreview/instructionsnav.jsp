@@ -9,28 +9,21 @@
 		<%@ include file="/common/header.jsp"%>
 		<script language="JavaScript" type="text/JavaScript">
 <!--
-		
-		function finish()
-		{
+		function finishIns(){
 			if(${mode.learner}){
 			   var reqIDVar = new Date();
 			   //if auto run mode, the opener will be null
 			   if(window.parent.opener != null) 
 				   window.parent.opener.parent.frames['learningFrame'].location.href="<c:url value="/learning/completeItem.do"/>?itemUid=${itemUid}&reqID="+reqIDVar.getTime();
 			   else{
-			   //set complete flag and finish this activity as well.
-			       window.parent.opener.parent.frames['learningFrame'].location.href='<c:url value="/learning/finish.do?toolSessionID=${toolSessionID}&itemUid=${itemUid}"/>';
+			  		//set complete flag and finish this activity as well.
+			        window.parent.location.href='<c:url value="/learning/finish.do?toolSessionID=${toolSessionID}&itemUid=${itemUid}"/>';
 			   }
 			}
 		   if(window.parent.opener != null) {
 				window.parent.opener=null;
 				window.parent.close();
 			}
-		}
-
-		function finishIns(){
-			window.parent.opener=null;
-			window.parent.close();
 		}
 		function nextIns(currIns){
 			document.location.href="<c:url value='/nextInstruction.do?currInstructonId='/>" + currIns;
