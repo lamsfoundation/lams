@@ -86,12 +86,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			submitMethod(actionMethod);
 		}
 		
-		function MM_reloadPage(init) {  //reloads the window if Nav4 resized
-		  if (init==true) with (navigator) {if ((appName=="Netscape")&&(parseInt(appVersion)==4)) {
-		    document.MM_pgW=innerWidth; document.MM_pgH=innerHeight; onresize=MM_reloadPage; }}
-		  else if (innerWidth!=document.MM_pgW || innerHeight!=document.MM_pgH) location.reload();
-		}
-
     	var imgRoot="${lams}images/";
 	    var themeName="aqua";
         
@@ -105,8 +99,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
             else
                 selectTab(1); //select the default tab;
             
+
             initEditor("richTextOfflineInstructions");                                    
-            initEditor("richTextOnlineInstructions");                                    
+	        initEditor("richTextOnlineInstructions");                                    
+
             
             initEditor("title");
             initEditor("instructions");
@@ -146,6 +142,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<html:hidden property="dispatch"/>
 	<html:hidden property="toolContentID"/>
 	<html:hidden property="currentTab" styleId="currentTab" />
+	<html:hidden property="activeModule"/>
 	
 	<c:if test="${sessionScope.activeModule != 'defineLater' }"> 			
 		<lams:Tabs collection="${tabs}" useKey="true" control="true"/>

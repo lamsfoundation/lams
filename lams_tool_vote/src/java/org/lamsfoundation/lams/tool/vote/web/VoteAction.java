@@ -291,38 +291,53 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 	    String maxNomCount=voteAuthoringForm.getMaxNominationCount();
 	    logger.debug("maxNomCount:" + maxNomCount);
 	    
-	    if (maxNomCount.equals("0"))
-	    {
-	        voteAuthoringForm.setExceptionMaxNominationInvalid(new Boolean(true).toString());
-			persistError(request,"error.maxNominationCount.invalid");
-			return (mapping.findForward(LOAD_QUESTIONS));
-	    }
 	    
-    	try
-		{
-    		int intMaxNomCount=new Integer(maxNomCount).intValue();
-	    	logger.debug("intMaxNomCount : " +intMaxNomCount);
-		}
-    	catch(NumberFormatException e)
-		{
-    		persistError(request,"error.maxNominationCount.invalid");
-    		voteAuthoringForm.setExceptionMaxNominationInvalid(new Boolean(true).toString());
-			return (mapping.findForward(LOAD_QUESTIONS));
-		}
+	    String activeModule=voteAuthoringForm.getActiveModule();
+	    logger.debug("activeModule:" + activeModule);
+	    
+	    if (activeModule != null)
+	    {
+		    if (activeModule.equals(AUTHORING))
+		    {
+			    if (maxNomCount != null)
+			    {
+				    if (maxNomCount.equals("0"))
+				    {
+				        voteAuthoringForm.setExceptionMaxNominationInvalid(new Boolean(true).toString());
+						persistError(request,"error.maxNominationCount.invalid");
+						return (mapping.findForward(LOAD_QUESTIONS));
+				    }
+				    
+			    	try
+					{
+			    		int intMaxNomCount=new Integer(maxNomCount).intValue();
+				    	logger.debug("intMaxNomCount : " +intMaxNomCount);
+					}
+			    	catch(NumberFormatException e)
+					{
+			    		persistError(request,"error.maxNominationCount.invalid");
+			    		voteAuthoringForm.setExceptionMaxNominationInvalid(new Boolean(true).toString());
+						return (mapping.findForward(LOAD_QUESTIONS));
+					}
+			    }
 
-	
-		logger.debug("start persisting offline files metadata");
-		AuthoringUtil.persistFilesMetaData(request, true, voteContent);
-		logger.debug("start persisting online files metadata");
-		AuthoringUtil.persistFilesMetaData(request, false, voteContent);
-		
-		/* making sure only the filenames in the session cache are persisted and the others in the db are removed*/ 
-		logger.debug("start removing redundant offline files metadata");
-		AuthoringUtil.removeRedundantOfflineFileItems(request, voteContent);
-		
-		logger.debug("start removing redundant online files metadata");
-		AuthoringUtil.removeRedundantOnlineFileItems(request, voteContent);
- 		logger.debug("done removing redundant files");
+			
+				logger.debug("start persisting offline files metadata");
+				AuthoringUtil.persistFilesMetaData(request, true, voteContent);
+				logger.debug("start persisting online files metadata");
+				AuthoringUtil.persistFilesMetaData(request, false, voteContent);
+		        
+			
+			/* making sure only the filenames in the session cache are persisted and the others in the db are removed*/ 
+			logger.debug("start removing redundant offline files metadata");
+			AuthoringUtil.removeRedundantOfflineFileItems(request, voteContent);
+			
+			logger.debug("start removing redundant online files metadata");
+			AuthoringUtil.removeRedundantOnlineFileItems(request, voteContent);
+	 		logger.debug("done removing redundant files");
+	 		
+		    }
+	    }
 	
 	    errors.clear();
 	    errors.add(Globals.ERROR_KEY, new ActionMessage("sbmt.successful"));

@@ -48,6 +48,8 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 	protected String lockOnFinish;
 	protected String allowText;
 	
+	protected String activeModule;
+	
 	protected String maxNominationCount;
 	
 	protected String fileItem;
@@ -741,5 +743,17 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
     public void setExceptionMaxNominationInvalid(
             String exceptionMaxNominationInvalid) {
         this.exceptionMaxNominationInvalid = exceptionMaxNominationInvalid;
+    }
+    /**
+     * @return Returns the activeModule.
+     */
+    public String getActiveModule() {
+        return activeModule;
+    }
+    /**
+     * @param activeModule The activeModule to set.
+     */
+    public void setActiveModule(String activeModule) {
+        this.activeModule = activeModule;
     }
 }

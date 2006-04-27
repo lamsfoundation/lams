@@ -113,6 +113,38 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	 	return null;
     }
     
+    
+    public ActionForward submitSession(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+	{
+    	logger.debug("dispatching submitSession...");
+    	
+    	VoteMonitoringForm voteMonitoringForm = (VoteMonitoringForm) form;
+	 	String currentMonitoredToolSession=voteMonitoringForm.getSelectedToolSessionId(); 
+	    logger.debug("currentMonitoredToolSession: " + currentMonitoredToolSession);
+	    
+	    if (currentMonitoredToolSession.equals("All"))
+	    {
+		    request.getSession().setAttribute(SELECTION_CASE, new Long(2));
+	    }
+	    else
+	    {
+	    	/* SELECTION_CASE == 1 indicates a selected group other than "All" */
+		    request.getSession().setAttribute(SELECTION_CASE, new Long(1));
+	    }
+	    logger.debug("SELECTION_CASE: " + request.getSession().getAttribute(SELECTION_CASE));
+	    
+	    
+	    request.getSession().setAttribute(CURRENT_MONITORED_TOOL_SESSION, currentMonitoredToolSession);
+	    logger.debug("CURRENT_MONITORED_TOOL_SESSION: " + request.getSession().getAttribute(CURRENT_MONITORED_TOOL_SESSION));
+	    
+    	return (mapping.findForward(LOAD_MONITORING));	
+	}
+
+    
 	public void refreshSummaryData(HttpServletRequest request, VoteContent voteContent, IVoteService voteService, 
 			boolean isUserNamesVisible, boolean isLearnerRequest, String currentSessionId, String userId, boolean showUserEntriesBySession)
 	{
@@ -193,7 +225,7 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	    	String  userEntry =(String)itListQuestions.next();
 	    	logger.debug("userEntry:..." + userEntry);
 	    	
-	    	if (userEntry != null)
+	    	if ((userEntry != null) && (userEntry.length() > 0))
 	    	{
 	    		VoteMonitoredAnswersDTO voteMonitoredAnswersDTO= new VoteMonitoredAnswersDTO();
 	    		logger.debug("adding user entry : " + userEntry);

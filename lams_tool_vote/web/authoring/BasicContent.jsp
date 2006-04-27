@@ -101,6 +101,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 												<bean:message key="button.delete"/>
 											</html:submit>
 										</c:if> 			
+										
 	                                	<c:if test="${ (sessionScope.activeModule == 'monitoring') }"> 			
 			 		 						<html:submit property="removeContent" 
 	                                                     styleClass="linkbutton"  

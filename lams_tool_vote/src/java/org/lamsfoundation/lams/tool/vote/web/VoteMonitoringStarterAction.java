@@ -65,6 +65,7 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 		logger.debug("init VoteMonitoringStarterAction...");
 		VoteUtils.cleanUpSessionAbsolute(request);
 		
+		
 	    ActionForward validateParameters=validateParameters(request, mapping);
 	    logger.debug("validateParamaters: " + validateParameters);
 	    if (validateParameters != null)
@@ -161,6 +162,7 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 		request.getSession().setAttribute(CURRENT_MONITORING_TAB, "summary");
 		request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
 		request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(false));
+		request.getSession().setAttribute(REQUEST_LEARNING_REPORT, new Boolean(false).toString());
 		
 		request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
 				/*

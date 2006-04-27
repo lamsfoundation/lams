@@ -115,8 +115,11 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 		VoteUtils.cleanUpSessionAbsolute(request);
 		logger.debug("init authoring mode. removed attributes...");
 		
+		VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
+		
 		IVoteService voteService = (IVoteService)request.getSession().getAttribute(TOOL_SERVICE);
 		logger.debug("voteService: " + voteService);
+		
 		if (voteService == null)
 		{
 			logger.debug("will retrieve voteService");
@@ -132,6 +135,7 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 		{
 			logger.debug("request is for authoring module");
 			request.getSession().setAttribute(ACTIVE_MODULE, AUTHORING);
+			voteAuthoringForm.setActiveModule(AUTHORING);
 			request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(true));
 			request.getSession().setAttribute(SHOW_AUTHORING_TABS,new Boolean(true).toString());
 		}
@@ -139,6 +143,7 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 		{
 			logger.debug("request is for define later module. either direct or by monitoring module");
 			request.getSession().setAttribute(ACTIVE_MODULE, DEFINE_LATER);
+			voteAuthoringForm.setActiveModule(DEFINE_LATER);
 			request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(false));
 			request.getSession().setAttribute(SHOW_AUTHORING_TABS,new Boolean(false).toString());			
 		}
@@ -152,7 +157,7 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 		logger.debug("sourceVoteStarter: " + sourceVoteStarter);
 
 		
-		VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
+		
 		voteAuthoringForm.resetRadioBoxes();
 		voteAuthoringForm.setExceptionMaxNominationInvalid(new Boolean(false).toString());
 		
@@ -375,6 +380,8 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 		logger.debug("will return to jsp with: " + sourceVoteStarter);
 		String destination=VoteUtils.getDestination(sourceVoteStarter);
 		logger.debug("destination: " + destination);
+		
+		logger.debug("active module is: " + voteAuthoringForm.getActiveModule());
 		return (mapping.findForward(destination));
 	} 
 	

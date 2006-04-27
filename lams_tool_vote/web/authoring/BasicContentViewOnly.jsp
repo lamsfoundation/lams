@@ -33,17 +33,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							<tr> 
 						 		<td valign="top"><font size=2> <b> <bean:message key="label.authoring.title"/>: </b></font> </td>
 						 		<td NOWRAP width=700> 
-	 				      			<font size=2> 
 	                                     <c:out value="${activityTitle}" escapeXml="false"/>
-	    							</font>
 								</td> 
 						  	</tr>
 						  	<tr> 
 						 		<td valign="top"><font size=2> <b> <bean:message key="label.authoring.instructions"/>:  </b></font></td>
 						 		<td NOWRAP width=700> 
-					      			<font size=2> 
 	                                    <c:out value="${activityInstructions}" escapeXml="false"/>
-	    							</font>									
 								</td>
 							</tr>
 					
@@ -52,9 +48,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							 		<font size=2> <b> <bean:message key="label.nomination1"/>:  </b></font>
 							 	</td>
 							  	<td>
-					      			<font size=2> 
 										<c:out value="${defaultOptionContent}"  escapeXml="false"/>
-									</font>																		
 							  	</td>
 						  	</tr>
 	
@@ -64,7 +58,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					  		<c:if test="${optionEntry.key > 1}"> 			
 								<c:set var="optIndex" scope="session" value="${optIndex +1}"/>
 								  <tr>
-								  	<td valign="top"> <font size=2> <b> <c:out value="Nomination ${optIndex}"/>:  </b></font></td>
+								  	<td valign="top">  <b> <c:out value="Nomination ${optIndex}"/>:  </b> </td>
 
 									<td NOWRAP valign=top>
 										<c:out value="${optionEntry.value}"  escapeXml="false"/>										
