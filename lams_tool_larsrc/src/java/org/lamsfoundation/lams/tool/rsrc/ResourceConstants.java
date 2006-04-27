@@ -59,7 +59,9 @@ public class ResourceConstants {
 	public static final String ATT_LEARNING_OBJECT = "cpPackage";
 	public static final String ATTR_RESOURCE_REVIEW_URL = "resourceItemReviewUrl";
 	public static final String ATTR_RESOURCE = "resource";
-	
+	public static final String ATTR_RUN_AUTO = "runAuto";
+	public static final String ATTR_RESOURCE_ITEM_UID = "itemUid";
+	public static final String ATTR_NEXT_ACTIVITY_URL = "nextActivityUrl";
 	//error message keys
 	public static final String ERROR_MSG_TITLE_BLANK = "error.resource.item.title.blank";
 	public static final String ERROR_MSG_URL_BLANK = "error.resource.item.url.blank";
@@ -68,10 +70,6 @@ public class ResourceConstants {
 	public static final String ERROR_MSG_INVALID_URL = "error.resource.item.invalid.url";
 	public static final String ERROR_MSG_UPLOAD_FAILED = "error.upload.failed";
 	
-	//mode
-	public static final String MODE = "mode";
-	public static final String AUTHOR_MODE = "author_mode";
-	public static final String MONITOR_MODE = "monitor_mode";
 	
 
 

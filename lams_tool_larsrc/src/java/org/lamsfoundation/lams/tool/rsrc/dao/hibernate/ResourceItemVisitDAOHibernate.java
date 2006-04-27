@@ -32,7 +32,7 @@ public class ResourceItemVisitDAOHibernate extends BaseDAOHibernate implements R
 	
 	private static final String FIND_BY_ITEM_AND_USER = "from " + ResourceItemVisitLog.class.getName() + " as r where r.user.userId = ? and r.resourceItem.uid=?";
 	private static final String FIND_VIEW_COUNT_BY_USER = "select count(*) from " + ResourceItemVisitLog.class.getName() 
-			+ " as r where r.user.userId =?";
+			+ " as r where  r.sessionId=? and  r.user.userId =?";
 
 	public ResourceItemVisitLog getResourceItemLog(Long itemUid,Long userId){
 		List list = getHibernateTemplate().find(FIND_BY_ITEM_AND_USER,new Object[]{userId,itemUid});
@@ -41,8 +41,8 @@ public class ResourceItemVisitDAOHibernate extends BaseDAOHibernate implements R
 		return (ResourceItemVisitLog) list.get(0);
 	}
 
-	public int getUserViewLogCount(Long userUid) {
-		List list = getHibernateTemplate().find(FIND_VIEW_COUNT_BY_USER,new Object[]{userUid});
+	public int getUserViewLogCount(Long toolSessionId ,Long userUid) {
+		List list = getHibernateTemplate().find(FIND_VIEW_COUNT_BY_USER,new Object[]{toolSessionId, userUid});
 		if(list == null || list.size() ==0)
 			return 0;
 		return ((Integer) list.get(0)).intValue();

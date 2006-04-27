@@ -140,7 +140,7 @@
 		<action path="/learning/start"
 			type="org.lamsfoundation.lams.tool.rsrc.web.action.LearningAction"
 			parameter="start" >
-			<forward name="success" path="/pages/learning/learningframe.jsp" />
+			<forward name="success" path="/pages/learning/start.jsp" />
 		</action>
 		<action path="/learning/completeItem"
 			type="org.lamsfoundation.lams.tool.rsrc.web.action.LearningAction"
@@ -151,6 +151,7 @@
 			type="org.lamsfoundation.lams.tool.rsrc.web.action.LearningAction"
 			input="/pages/learning/learning.jsp"
 			parameter="finish" >
+			<forward name="success" path="/pages/learning/finish.jsp" />
 		</action>
 		
 		<action path="/learning/saveOrUpdateItem"

@@ -56,6 +56,7 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
+import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.rsrc.ResourceConstants;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceAttachment;
@@ -93,8 +94,8 @@ public class AuthoringAction extends Action {
 		
 		String param = mapping.getParameter();
 		//-----------------------Resource Author function ---------------------------
+		request.getSession().setAttribute(AttributeNames.ATTR_MODE,ToolAccessMode.AUTHOR);
 		if(param.equals("start")){
-			request.getSession().setAttribute(ResourceConstants.MODE,ResourceConstants.AUTHOR_MODE);
 			return start(mapping, form, request, response);
 		}
 	  	if (param.equals("initPage")) {
@@ -460,8 +461,8 @@ public class AuthoringAction extends Action {
 		ActionMessages messages = new ActionMessages();
 		messages.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage("authoring.save.success"));
 		this.addMessages(request,messages);
-    	String mode = (String) request.getSession().getAttribute(ResourceConstants.MODE);
-    	if(StringUtils.equals(mode,ResourceConstants.AUTHOR_MODE))
+		ToolAccessMode mode = (ToolAccessMode) request.getSession().getAttribute(AttributeNames.ATTR_MODE);
+    	if(mode.isAuthor())
     		return mapping.findForward("author");
     	else
     		return mapping.findForward("monitor");

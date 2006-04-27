@@ -12,9 +12,20 @@
 		
 		function finish()
 		{
-			window.parent.opener.location.href='urlcontent.do?method=setContentDone&sessionId=27534&urlId=7365&mode=resume&actor=learner';
-			window.parent.opener=null;
-			window.parent.close();
+			if(${mode.learner}){
+			   var reqIDVar = new Date();
+			   //if auto run mode, the opener will be null
+			   if(window.parent.opener != null) 
+				   window.parent.opener.parent.frames['learningFrame'].location.href="<c:url value="/learning/completeItem.do"/>?itemUid=${itemUid}&reqID="+reqIDVar.getTime();
+			   else{
+			   //set complete flag and finish this activity as well.
+			       window.parent.opener.parent.frames['learningFrame'].location.href='<c:url value="/learning/finish.do?toolSessionID=${toolSessionID}&itemUid=${itemUid}"/>';
+			   }
+			}
+		   if(window.parent.opener != null) {
+				window.parent.opener=null;
+				window.parent.close();
+			}
 		}
 
 		function finishIns(){

@@ -80,8 +80,8 @@ public interface IResourceService
 	void saveOrUpdateResourceSession(ResourceSession resSession);
 	
 	void retrieveComplete(List<ResourceItem> resourceItemList, ResourceUser user);
-	void setItemComplete(Long resourceItemUid, Long userId);
-	void setItemAccess(Long resourceItemUid, Long userId);
+	void setItemComplete(Long resourceItemUid, Long userId , Long sessionId);
+	void setItemAccess(Long resourceItemUid, Long userId, Long sessionId);
 	/**
 	 * the reqired number minus the count of view of the given user.
 	 * @param userUid

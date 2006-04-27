@@ -1,11 +1,14 @@
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="lams"><lams:LAMSURL/></c:set>
+<c:set var="tool"><lams:WebAppURL/></c:set>
 <html>
 	<head>
 		<%@ include file="/common/header.jsp"%>
 	</head>
 	<body>
 		<script type="text/javascript">
-			parent.frames['learningFrame'].location  = "<c:url value="/learning/start.do"/>?toolSessionID=${toolSessionID}";
+			var reqIDVar = new Date();
+			parent.frames['learningFrame'].location  = "${tool}/pages/learning/learning.jsp?reqID="+reqIDVar.getTime();
 		</script>
 		<div style="align:center">
 			<c:if test="${addType == 1}">

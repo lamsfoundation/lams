@@ -29,5 +29,5 @@ public interface ResourceItemVisitDAO extends DAO {
 
 	public ResourceItemVisitLog getResourceItemLog(Long itemUid,Long userId);
 
-	public int getUserViewLogCount(Long userUid);
+	public int getUserViewLogCount(Long sessionId, Long userUid);
 }

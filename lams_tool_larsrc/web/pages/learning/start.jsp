@@ -1,12 +1,18 @@
-<%@ include file="/common/taglibs.jsp" %>
+<%@ include file="/common/taglibs.jsp"%>
 <html>
-<body>
-<form action="<c:url value='/learning/init.do'/>" method="post" id="startForm">
-	<input type="hidden" name="toolContentID" value="${toolContentID}"/>
-</form>
+	<body>
 
-<script type="text/javascript">
-document.getElementById("startForm").submit();
-</script>
-<body>
+		<c:choose>
+			<c:when test="${runAuto}">
+				<script type="text/javascript">
+					document.location = "<c:url value="/reviewItem.do"/>?itemUid=${itemUid}";
+				</script>
+			</c:when>
+			<c:otherwise>
+				<script type="text/javascript">
+					document.location = "<c:url value="/pages/learning/learningframe.jsp"/>"
+				</script>
+			</c:otherwise>
+		</c:choose>
+	<body>
 </html>

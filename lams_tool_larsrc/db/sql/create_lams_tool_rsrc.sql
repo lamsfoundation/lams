@@ -70,6 +70,7 @@ create table tl_larsrc11_resource_item_visit_log (
    resource_item_uid bigint,
    user_uid bigint,
    complete bit,
+   session_id bigint,
    primary key (uid)
 );
 create table tl_larsrc11_session (
@@ -101,7 +102,6 @@ alter table tl_larsrc11_resource_item_visit_log add index FK693580A438BF8DFE (re
 alter table tl_larsrc11_resource_item_visit_log add index FK693580A441F9365D (user_uid), add constraint FK693580A441F9365D foreign key (user_uid) references tl_larsrc11_user (uid);
 alter table tl_larsrc11_session add index FK24AA78C530E79035 (resource_uid), add constraint FK24AA78C530E79035 foreign key (resource_uid) references tl_larsrc11_resource (uid);
 alter table tl_larsrc11_user add index FK30113BFC506CD584 (session_id), add constraint FK30113BFC506CD584 foreign key (session_id) references tl_larsrc11_session (uid);
-
 
 
 

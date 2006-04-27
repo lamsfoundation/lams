@@ -39,6 +39,7 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.rsrc.ResourceConstants;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItemInstruction;
@@ -81,14 +82,18 @@ public class ViewItemAction extends Action {
 	}
 
 	private ActionForward reviewItem(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-		int itemIdx = NumberUtils.stringToInt(request.getParameter(ResourceConstants.PARAM_ITEM_INDEX),-1);
-		Long itemUid = NumberUtils.createLong(request.getParameter(ResourceConstants.PARAM_RESOURCE_ITEM_UID));
+		ToolAccessMode mode = (ToolAccessMode) request.getSession().getAttribute(AttributeNames.ATTR_MODE);
 		ResourceItem item = null;
-		if(itemIdx != -1){
+		if(mode.isAuthor()){
+			int itemIdx = NumberUtils.stringToInt(request.getParameter(ResourceConstants.PARAM_ITEM_INDEX),-1);
 			//authoring: does not save item yet, so only has ItemList from session and identity by Index
 			List<ResourceItem> resourceList = getResourceItemList(request);
 			item = resourceList.get(itemIdx);
-		}else if(itemUid != null){
+		}else if(mode.isLearner()){
+			Long itemUid = NumberUtils.createLong(request.getParameter(ResourceConstants.PARAM_RESOURCE_ITEM_UID));
+			//save itemUid to HttpSession
+			request.getSession().setAttribute(ResourceConstants.ATTR_RESOURCE_ITEM_UID,itemUid);
+			Long sessionId =  (Long) request.getSession().getAttribute(ResourceConstants.ATTR_TOOL_SESSION_ID);
 			//learning, list from database, so get item by Uid
 //			get back the resource and item list and display them on page
 			IResourceService service = getResourceService();			
@@ -96,7 +101,7 @@ public class ViewItemAction extends Action {
 			HttpSession ss = SessionManager.getSession();
 			//get back login user DTO
 			UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-			service.setItemAccess(itemUid,new Long(user.getUserID().intValue()));
+			service.setItemAccess(itemUid,new Long(user.getUserID().intValue()),sessionId);
 		}
 		if(item != null){
 			Set instructions = item.getItemInstructions();

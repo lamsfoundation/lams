@@ -76,6 +76,7 @@ public class LearningAction extends Action {
 			HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 		
 		String param = mapping.getParameter();
+		request.getSession().setAttribute(AttributeNames.ATTR_MODE,ToolAccessMode.LEARNER);
 		//-----------------------Resource Learner function ---------------------------
 		if(param.equals("start")){
 			return start(mapping, form, request, response);
@@ -94,6 +95,11 @@ public class LearningAction extends Action {
 	}
 	
 	private ActionForward finish(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+		//auto run mode, when use finish the only one resource item, mark it as complete then finish this activity as well.
+		Long resourceItemUid = new Long(request.getParameter(ResourceConstants.PARAM_RESOURCE_ITEM_UID));
+		if(resourceItemUid != null)
+			doComplete(request);
+		
 		Long sessionId = (Long) request.getSession().getAttribute(
 				AttributeNames.PARAM_TOOL_SESSION_ID);
 		HttpSession ss = SessionManager.getSession();
@@ -110,20 +116,17 @@ public class LearningAction extends Action {
 			return mapping.getInputForward();
 			
 		}
-		ToolAccessMode mode = (ToolAccessMode) request.getSession()
-				.getAttribute(AttributeNames.ATTR_MODE);
-		if (mode == ToolAccessMode.LEARNER) {
+		ToolAccessMode mode = (ToolAccessMode) request.getSession().getAttribute(AttributeNames.ATTR_MODE);
+		if (mode.isLearner()) {
 			// get sessionId from HttpServletRequest
 			String nextActivityUrl = null ;
 			try {
 				nextActivityUrl = service.finishToolSession(sessionId,userID);
-				response.sendRedirect(nextActivityUrl);
-			} catch (IOException e) {
-				log.error("Failed send redirect:" + nextActivityUrl);
+				request.setAttribute(ResourceConstants.ATTR_NEXT_ACTIVITY_URL,nextActivityUrl);
+				return mapping.findForward("finish");
 			} catch (ResourceApplicationException e) {
 				log.error("Failed get next activity url:" + e.getMessage());
 			}
-			return null;
 		}
 
 		return mapping.findForward("success");
@@ -131,23 +134,11 @@ public class LearningAction extends Action {
 
 	private ActionForward complete(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		
-		Long resourceItemUid = new Long(request.getParameter(ResourceConstants.PARAM_RESOURCE_ITEM_UID));
-		IResourceService service = getResourceService();
-		HttpSession ss = SessionManager.getSession();
-		//get back login user DTO
-		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-		service.setItemComplete(resourceItemUid,new Long(user.getUserID().intValue()));
-		
-		//set resource item complete tag
-		List<ResourceItem> resourceItemList = getResourceItemList(request);
-		for(ResourceItem item:resourceItemList){
-			if(item.getUid().equals(resourceItemUid)){
-				item.setComplete(true);
-				break;
-			}
-		}
+		doComplete(request);
 		return  mapping.findForward(ResourceConstants.SUCCESS);
 	}
+
+	
 	/**
 	 * Save file or url resource item into database.
 	 * @param mapping
@@ -265,6 +256,20 @@ public class LearningAction extends Action {
 		service.retrieveComplete(resourceItemList, resourceUser);
 		
 		request.getSession().setAttribute(ResourceConstants.ATTR_RESOURCE,resource);
+		
+		//check whether there is only one resource item and run auto flag is true or not.
+		boolean runAuto = false;
+		int itemsNumber = 0;
+		if(resource.getResourceItems() != null){
+			itemsNumber = resource.getResourceItems().size();
+			if(resource.isRunAuto() && itemsNumber == 1){
+				runAuto = true;
+				ResourceItem item = (ResourceItem) resource.getResourceItems().iterator().next();
+				request.setAttribute(ResourceConstants.ATTR_RESOURCE_ITEM_UID,item.getUid());
+			}
+		}
+		request.setAttribute(ResourceConstants.ATTR_RUN_AUTO,new Boolean(runAuto));
+		
 		return mapping.findForward(ResourceConstants.SUCCESS);
 	}
 	//*************************************************************************************
@@ -356,6 +361,27 @@ public class LearningAction extends Action {
 		}
 		return errors;
 	}
-
+	/**
+	 * Set complete flag for given resource item.
+	 * @param request
+	 */
+	private void doComplete(HttpServletRequest request) {
+		Long resourceItemUid = new Long(request.getParameter(ResourceConstants.PARAM_RESOURCE_ITEM_UID));
+		IResourceService service = getResourceService();
+		HttpSession ss = SessionManager.getSession();
+		//get back login user DTO
+		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+		Long sessionId =  (Long) request.getSession().getAttribute(ResourceConstants.ATTR_TOOL_SESSION_ID);
+		service.setItemComplete(resourceItemUid,new Long(user.getUserID().intValue()),sessionId);
+		
+		//set resource item complete tag
+		List<ResourceItem> resourceItemList = getResourceItemList(request);
+		for(ResourceItem item:resourceItemList){
+			if(item.getUid().equals(resourceItemUid)){
+				item.setComplete(true);
+				break;
+			}
+		}
+	}
 
 }

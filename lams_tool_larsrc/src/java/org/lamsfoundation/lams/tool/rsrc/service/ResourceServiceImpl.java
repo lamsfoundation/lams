@@ -326,7 +326,7 @@ public class ResourceServiceImpl implements
 	}
 
 
-	public void setItemComplete(Long resourceItemUid, Long userId) {
+	public void setItemComplete(Long resourceItemUid, Long userId, Long sessionId) {
 		ResourceItemVisitLog log = resourceItemVisitDao.getResourceItemLog(resourceItemUid,userId);
 		if(log == null){
 			log = new ResourceItemVisitLog();
@@ -334,6 +334,7 @@ public class ResourceServiceImpl implements
 			log.setResourceItem(item);
 			ResourceUser user = resourceUserDao.getUserByUserID(userId); 
 			log.setUser(user);
+			log.setSessionId(sessionId);
 			log.setAccessDate(new Timestamp(new Date().getTime()));
 		}
 		log.setComplete(true);
@@ -341,7 +342,7 @@ public class ResourceServiceImpl implements
 	}
 
 
-	public void setItemAccess(Long resourceItemUid, Long userId){
+	public void setItemAccess(Long resourceItemUid, Long userId, Long sessionId){
 		ResourceItemVisitLog log = resourceItemVisitDao.getResourceItemLog(resourceItemUid,userId);
 		if(log == null){
 			log = new ResourceItemVisitLog();
@@ -350,6 +351,7 @@ public class ResourceServiceImpl implements
 			ResourceUser user = resourceUserDao.getUserByUserID(userId); 
 			log.setUser(user);
 			log.setComplete(false);
+			log.setSessionId(sessionId);
 			log.setAccessDate(new Timestamp(new Date().getTime()));
 			resourceItemVisitDao.saveObject(log);
 		}
@@ -373,7 +375,7 @@ public class ResourceServiceImpl implements
 	}
 
 	public int checkMiniView(Long toolSessionId, Long userUid) {
-		int miniView = resourceItemVisitDao.getUserViewLogCount(userUid);
+		int miniView = resourceItemVisitDao.getUserViewLogCount(toolSessionId,userUid);
 		ResourceSession session = resourceSessionDao.getSessionBySessionId(toolSessionId);
 		if(session == null){
 			log.error("Failed get session by ID [" + toolSessionId + "]");

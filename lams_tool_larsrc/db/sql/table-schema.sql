@@ -79,6 +79,7 @@ create table tl_larsrc11_resource_item_visit_log (
    resource_item_uid bigint,
    user_uid bigint,
    complete bit,
+   session_id bigint,
    primary key (uid)
 );
 create table tl_larsrc11_session (

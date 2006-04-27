@@ -61,6 +61,14 @@
             column="complete"
         />
 
+        <property
+            name="sessionId"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
+            column="session_id"
+        />
+
         <!--
             To add non XDoclet property mappings, create a file named
                 hibernate-properties-ResourceItemVisitLog.xml

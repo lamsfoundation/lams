@@ -39,6 +39,8 @@ public class ResourceItemVisitLog {
 	private ResourceItem resourceItem;
 	private boolean complete;
 	private Date accessDate;
+	private Long sessionId;
+	
 	/**
 	 * @hibernate.property column="access_date"
 	 * @return
@@ -92,6 +94,18 @@ public class ResourceItemVisitLog {
 	public void setComplete(boolean complete) {
 		this.complete = complete;
 	}
+	/**
+	 * @hibernate.property column="session_id"
+	 * @return
+	 */
+	public Long getSessionId() {
+		return sessionId;
+	}
+	public void setSessionId(Long sessionId) {
+		this.sessionId = sessionId;
+	}
+
+
 	
 	
 }

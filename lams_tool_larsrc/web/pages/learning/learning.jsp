@@ -20,7 +20,7 @@
 		}
 		function checkNew(){
  		    var reqIDVar = new Date();
-			parent.frames['learningFrame'].location= "<c:url value="/learning/start.do"/>?toolSessionID=${toolSessionID}&reqID="+reqIDVar.getTime();
+			parent.frames['learningFrame'].location= "<c:url value="/pages/learning/learning.jsp"/>?reqID="+reqIDVar.getTime();
  		    return false;
 		}
 		function viewItem(itemUid){
@@ -32,16 +32,13 @@
 			return false;
 		}
 		function finishSession(){
-			parent.location ='<c:url value="/learning/finish.do?toolSessionID=${toolSessionID}&mode=learner"/>';
+			parent.frames['learningFrame'].location ='<c:url value="/learning/finish.do?toolSessionID=${toolSessionID}"/>';
 			return false;
 		}
 	-->        
     </script>
 </head>
 <body>
-	<script type="text/javascript">
-		alert("enter");
-    </script>
 	<table border="0" align="center" class="forms" width="95%">
 		<tr>
 			<td>
