@@ -249,39 +249,13 @@ public class MonitoringUtil implements VoteAppConstants{
 		    	    			VoteMonitoredUserDTO voteMonitoredUserDTO = new VoteMonitoredUserDTO();
 		    	    			voteMonitoredUserDTO.setAttemptTime(voteUsrResp.getAttemptTime().toString());
 		    	    			voteMonitoredUserDTO.setTimeZone(voteUsrResp.getTimeZone());
-		    	    			//voteMonitoredUserDTO.setUid(voteUsrResp.getResponseId().toString());
 		    	    			voteMonitoredUserDTO.setUserName(voteQueUsr.getUsername());
 		    	    			voteMonitoredUserDTO.setQueUsrId(voteQueUsr.getUid().toString());
 		    	    			voteMonitoredUserDTO.setSessionId(sessionId.toString());
 		    	    			voteMonitoredUserDTO.setUserEntry(voteUsrResp.getUserEntry());
 		    	    			
 		    	    			logger.debug("attempt: " + voteUsrResp);
-		    	            	//VoteQueContent localVoteQueContent=voteUsrResp.getVoteQueContent();
-		    	            	//logger.debug("localVoteQueContent: " + localVoteQueContent);        	
-		    	            	//logger.debug("localVoteQueContent question : " + localVoteQueContent.getQuestion());
-		    	            	//voteMonitoredUserDTO.setResponse(localVoteQueContent.getQuestion());
 		    	            	voteMonitoredUserDTO.setQuestionUid(questionUid);
-		    	            	
-		    	            	/*
-		    	            	boolean isSingleUserEntry=voteUsrResp.isSingleUserEntry();
-		    	            	logger.debug("isSingleUserEntry: " + isSingleUserEntry);
-		    	            	logger.debug("userEntry: " + voteUsrResp.getUserEntry());
-		    	            	if ((isSingleUserEntry == false) && (voteUsrResp.getUserEntry().length() > 0))
-		    	            	{
-		    	            	    logger.debug("userEntry available and must be added " + voteUsrResp.getUserEntry());
-		    	            	    VoteMonitoredUserDTO userEntryVoteMonitoredUserDTO = new VoteMonitoredUserDTO();
-
-		    	            	    userEntryVoteMonitoredUserDTO.setAttemptTime(voteUsrResp.getAttemptTime().toString());
-		    	            	    userEntryVoteMonitoredUserDTO.setTimeZone(voteUsrResp.getTimeZone());
-		    	            	    userEntryVoteMonitoredUserDTO.setUserName(voteQueUsr.getUsername());
-		    	            	    userEntryVoteMonitoredUserDTO.setQueUsrId(voteQueUsr.getUid().toString());
-		    	            	    userEntryVoteMonitoredUserDTO.setSessionId(sessionId.toString());
-		    	            	    voteMonitoredUserDTO.setUserEntry(voteUsrResp.getUserEntry());
-
-		    	            	    userEntryVoteMonitoredUserDTO.setResponse(voteUsrResp.getUserEntry());
-			    	    			listMonitoredUserContainerDTO.add(userEntryVoteMonitoredUserDTO);
-		    	            	}
-		    	            	*/
 		    	            	
 		    	            	VoteQueContent voteQueContent=voteUsrResp.getVoteQueContent();
 		    		        	logger.debug("voteQueContent: " + voteQueContent);        
@@ -343,35 +317,8 @@ public class MonitoringUtil implements VoteAppConstants{
 			    	    			voteMonitoredUserDTO.setQueUsrId(voteQueUsr.getUid().toString());
 			    	    			voteMonitoredUserDTO.setSessionId(sessionId.toString());
 			    	    			voteMonitoredUserDTO.setUserEntry(voteUsrResp.getUserEntry());
-			    	    			//voteMonitoredUserDTO.setResponse(voteUsrResp.getUserEntry());
-			    	    			
 			    	    			logger.debug("attempt: " + voteUsrResp);
-			    	            	//VoteQueContent localVoteQueContent=voteUsrResp.getVoteQueContent();
-			    	            	//logger.debug("localVoteQueContent: " + localVoteQueContent);        	
-			    	            	//logger.debug("localVoteQueContent question : " + localVoteQueContent.getQuestion());
-			    	            	//voteMonitoredUserDTO.setResponse(localVoteQueContent.getQuestion());
 			    	            	voteMonitoredUserDTO.setQuestionUid(questionUid);
-
-			    	            	/*
-			    	            	boolean isSingleUserEntry=voteUsrResp.isSingleUserEntry();
-			    	            	logger.debug("isSingleUserEntry: " + isSingleUserEntry);
-			    	            	logger.debug("userEntry: " + voteUsrResp.getUserEntry());
-			    	            	if ((isSingleUserEntry == false) && (voteUsrResp.getUserEntry().length() > 0))
-			    	            	{
-			    	            	    logger.debug("userEntry available and must be added " + voteUsrResp.getUserEntry());
-			    	            	    VoteMonitoredUserDTO userEntryVoteMonitoredUserDTO = new VoteMonitoredUserDTO();
-
-			    	            	    userEntryVoteMonitoredUserDTO.setAttemptTime(voteUsrResp.getAttemptTime().toString());
-			    	            	    userEntryVoteMonitoredUserDTO.setTimeZone(voteUsrResp.getTimeZone());
-			    	            	    userEntryVoteMonitoredUserDTO.setUserName(voteQueUsr.getUsername());
-			    	            	    userEntryVoteMonitoredUserDTO.setQueUsrId(voteQueUsr.getUid().toString());
-			    	            	    userEntryVoteMonitoredUserDTO.setSessionId(sessionId.toString());
-			    	            	    voteMonitoredUserDTO.setUserEntry(voteUsrResp.getUserEntry());
-
-			    	            	    userEntryVoteMonitoredUserDTO.setResponse(voteUsrResp.getUserEntry());
-				    	    			listMonitoredUserContainerDTO.add(userEntryVoteMonitoredUserDTO);
-			    	            	}
-			    	            	*/
 			    	            	
 			    	            	VoteQueContent voteQueContent=voteUsrResp.getVoteQueContent();
 			    		        	logger.debug("voteQueContent: " + voteQueContent);        
@@ -443,36 +390,10 @@ public class MonitoringUtil implements VoteAppConstants{
 				    	    			
 				    	    			voteMonitoredUserDTO.setQueUsrId(voteQueUsr.getUid().toString());
 				    	    			voteMonitoredUserDTO.setSessionId(sessionId.toString());
-				    	    			//voteMonitoredUserDTO.setResponse(voteUsrResp.getUserEntry());
 
 				    	    			logger.debug("attempt: " + voteUsrResp);
-				    	            	//VoteQueContent localVoteQueContent=voteUsrResp.getVoteQueContent();
-				    	            	//logger.debug("localVoteQueContent: " + localVoteQueContent);        	
-				    	            	//logger.debug("localVoteQueContent question : " + localVoteQueContent.getQuestion());
-				    	            	//voteMonitoredUserDTO.setResponse(localVoteQueContent.getQuestion());
 				    	            	voteMonitoredUserDTO.setQuestionUid(questionUid);
 				    	            	voteMonitoredUserDTO.setUserEntry(voteUsrResp.getUserEntry());
-				    	            	
-				    	            	/*
-				    	            	boolean isSingleUserEntry=voteUsrResp.isSingleUserEntry();
-				    	            	logger.debug("isSingleUserEntry: " + isSingleUserEntry);
-				    	            	logger.debug("userEntry: " + voteUsrResp.getUserEntry());
-				    	            	if ((isSingleUserEntry == false) && (voteUsrResp.getUserEntry().length() > 0))
-				    	            	{
-				    	            	    logger.debug("userEntry available and must be added " + voteUsrResp.getUserEntry());
-				    	            	    VoteMonitoredUserDTO userEntryVoteMonitoredUserDTO = new VoteMonitoredUserDTO();
-
-				    	            	    userEntryVoteMonitoredUserDTO.setAttemptTime(voteUsrResp.getAttemptTime().toString());
-				    	            	    userEntryVoteMonitoredUserDTO.setTimeZone(voteUsrResp.getTimeZone());
-				    	            	    userEntryVoteMonitoredUserDTO.setUserName(voteQueUsr.getUsername());
-				    	            	    userEntryVoteMonitoredUserDTO.setQueUsrId(voteQueUsr.getUid().toString());
-				    	            	    userEntryVoteMonitoredUserDTO.setSessionId(sessionId.toString());
-				    	            	    voteMonitoredUserDTO.setUserEntry(voteUsrResp.getUserEntry());
-
-				    	            	    userEntryVoteMonitoredUserDTO.setResponse(voteUsrResp.getUserEntry());
-					    	    			listMonitoredUserContainerDTO.add(userEntryVoteMonitoredUserDTO);
-				    	            	}
-				    	            	*/
 				    	            	
 				    	            	VoteQueContent voteQueContent=voteUsrResp.getVoteQueContent();
 				    		        	logger.debug("voteQueContent: " + voteQueContent);        
@@ -534,35 +455,9 @@ public class MonitoringUtil implements VoteAppConstants{
 			    	    			voteMonitoredUserDTO.setQueUsrId(voteQueUsr.getUid().toString());
 			    	    			voteMonitoredUserDTO.setSessionId(sessionId.toString());
 			    	    			voteMonitoredUserDTO.setUserEntry(voteUsrResp.getUserEntry());
-			    	    			//voteMonitoredUserDTO.setResponse(voteUsrResp.getUserEntry());
-
 			    	    			logger.debug("attempt: " + voteUsrResp);
-			    	            	//VoteQueContent localVoteQueContent=voteUsrResp.getVoteQueContent();
-			    	            	//logger.debug("localVoteQueContent: " + localVoteQueContent);        	
-			    	            	//logger.debug("localVoteQueContent question : " + localVoteQueContent.getQuestion());
-			    	            	//voteMonitoredUserDTO.setResponse(localVoteQueContent.getQuestion());
 			    	            	voteMonitoredUserDTO.setQuestionUid(questionUid);
 			    	            	
-			    	            	/*
-			    	            	boolean isSingleUserEntry=voteUsrResp.isSingleUserEntry();
-			    	            	logger.debug("isSingleUserEntry: " + isSingleUserEntry);
-			    	            	logger.debug("userEntry: " + voteUsrResp.getUserEntry());
-			    	            	if ((isSingleUserEntry == false) && (voteUsrResp.getUserEntry().length() > 0))
-			    	            	{
-			    	            	    logger.debug("userEntry available and must be added " + voteUsrResp.getUserEntry());
-			    	            	    VoteMonitoredUserDTO userEntryVoteMonitoredUserDTO = new VoteMonitoredUserDTO();
-
-			    	            	    userEntryVoteMonitoredUserDTO.setAttemptTime(voteUsrResp.getAttemptTime().toString());
-			    	            	    userEntryVoteMonitoredUserDTO.setTimeZone(voteUsrResp.getTimeZone());
-			    	            	    userEntryVoteMonitoredUserDTO.setUserName(voteQueUsr.getUsername());
-			    	            	    userEntryVoteMonitoredUserDTO.setQueUsrId(voteQueUsr.getUid().toString());
-			    	            	    userEntryVoteMonitoredUserDTO.setSessionId(sessionId.toString());
-			    	            	    voteMonitoredUserDTO.setUserEntry(voteUsrResp.getUserEntry());
-
-			    	            	    userEntryVoteMonitoredUserDTO.setResponse(voteUsrResp.getUserEntry());
-				    	    			listMonitoredUserContainerDTO.add(userEntryVoteMonitoredUserDTO);
-			    	            	}
-			    	            	*/
 			    	            	
 			    	            	VoteQueContent voteQueContent=voteUsrResp.getVoteQueContent();
 			    		        	logger.debug("voteQueContent: " + voteQueContent);        

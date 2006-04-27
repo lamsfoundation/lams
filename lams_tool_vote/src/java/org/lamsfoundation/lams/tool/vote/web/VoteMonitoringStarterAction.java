@@ -218,7 +218,7 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 		
 		VoteMonitoringAction voteMonitoringAction= new VoteMonitoringAction();
 		logger.debug("refreshing summary data...");
-		voteMonitoringAction.refreshSummaryData(request, voteContent, voteService, true, false, null, null);
+		voteMonitoringAction.refreshSummaryData(request, voteContent, voteService, true, false, null, null, false);
 		
 		logger.debug("refreshing stats data...");
 		voteMonitoringAction.refreshStatsData(request);

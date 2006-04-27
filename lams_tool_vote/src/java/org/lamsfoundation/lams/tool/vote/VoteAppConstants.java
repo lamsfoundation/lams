@@ -67,6 +67,8 @@ public interface VoteAppConstants {
     public static final String ACTIVE_MODULE							="activeModule";
     public static final String DEFINE_LATER_IN_EDIT_MODE				="defineLaterInEditMode";
     public static final String SUBMIT_SUCCESS							="sbmtSuccess";
+    public static final String REQUEST_LEARNING_REPORT					="requestLearningReport";
+    public static final String REQUEST_LEARNING_REPORT_PROGRESS			="requestLearningReportProgress";
     
     /*
      * authoring mode controllers

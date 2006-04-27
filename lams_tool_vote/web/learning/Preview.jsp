@@ -45,13 +45,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	  					  <tr>
 						  	<td NOWRAP align=center class="input" valign=top bgColor="white" colspan=2> 
-					 	  		<c:out value="${VoteLearningForm.activityTitle}"/> 						 			
+								  <c:out value="${VoteLearningForm.activityTitle}" escapeXml="false" />					 	  		
 						  	</td>
 						  </tr>
 						  
 						  <tr>
 						  	<td  NOWRAP align=left class="input" valign=top bgColor="white" colspan=2> 
-					 	  		<c:out value="${VoteLearningForm.activityInstructions}"/> 						 									  	
+								  <c:out value="${VoteLearningForm.activityInstructions}" escapeXml="false" />					 	  						 	  							  	
 						  	</td>
 						  </tr>
 	
@@ -67,7 +67,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 																	<font size=2>
 																		<input type="checkbox" 
 																		name=optionCheckBox<c:out value="${sessionScope.queIndex}"/>-<c:out value="${subEntry.key}"/>> 
-																		<c:out value="${subEntry.value}"/>																		
+																			  <c:out value="${subEntry.value}" escapeXml="false" />																			
 																	</font>
 																</td> 
 															</tr>	

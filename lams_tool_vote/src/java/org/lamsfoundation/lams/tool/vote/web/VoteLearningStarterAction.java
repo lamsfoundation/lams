@@ -274,46 +274,25 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	/* by now, we know that the mode is either teacher or learner
 	 * check if the mode is teacher and request is for Learner Progress
 	 */
-	String userId=request.getParameter(USER_ID);
-	logger.debug("userId: " + userId);
-	if ((userId != null) && (mode.equals("teacher")))
+	
+	String learnerProgressUserId=request.getParameter(USER_ID);
+	logger.debug("learnerProgressUserId: " + learnerProgressUserId);
+	
+	if ((learnerProgressUserId != null) && (mode.equals("teacher")))
 	{
-		logger.debug("request is for learner progress");
-		commonContentSetup(request, voteContent);
+		logger.debug("start generating learner progress report.");
+    	Long currentToolSessionId=(Long)request.getSession().getAttribute(TOOL_SESSION_ID);
+    	logger.debug("currentToolSessionId: " + currentToolSessionId);
     	
-		/* LEARNER_PROGRESS for jsp*/
-		request.getSession().setAttribute(LEARNER_PROGRESS_USERID, userId);
-		request.getSession().setAttribute(LEARNER_PROGRESS, new Boolean(true).toString());
-		VoteLearningAction voteLearningAction= new VoteLearningAction();
-		/* pay attention that this userId is the learner's userId passed by the request parameter.
-		 * It is differerent than USER_ID kept in the session of the current system user*/
-		VoteQueUsr voteQueUsr=voteService.retrieveVoteQueUsr(new Long(userId));
-	    logger.debug("voteQueUsr:" + voteQueUsr);
-	    if (voteQueUsr == null)
-	    {
-	    	VoteUtils.cleanUpSessionAbsolute(request);
-	    	persistError(request, "error.learner.required");
-	    	request.getSession().setAttribute(USER_EXCEPTION_LEARNER_REQUIRED, new Boolean(true).toString());
-			return (mapping.findForward(ERROR_LIST));
-	    }
-	    
-	    /* check whether the user's session really referrs to the session id passed to the url*/
-	    Long sessionUid=voteQueUsr.getVoteSessionId();
-	    logger.debug("sessionUid" + sessionUid);
-	    VoteSession voteSessionLocal=voteService.getVoteSessionByUID(sessionUid);
-	    logger.debug("checking voteSessionLocal" + voteSessionLocal);
-	    Long toolSessionId=(Long)request.getSession().getAttribute(TOOL_SESSION_ID);
-	    logger.debug("toolSessionId: " + toolSessionId + " versus" + voteSessionLocal);
-	    if  ((voteSessionLocal ==  null) ||
-			 (voteSessionLocal.getVoteSessionId().longValue() != toolSessionId.longValue()))
-	    {
-	    	VoteUtils.cleanUpSessionAbsolute(request);
-	    	request.getSession().setAttribute(USER_EXCEPTION_TOOLSESSIONID_INCONSISTENT, new Boolean(true).toString());
-	    	persistError(request, "error.learner.sessionId.inconsistent");
-			return (mapping.findForward(ERROR_LIST));
-	    }
-		//return voteLearningAction.viewAnswers(mapping, form, request, response);
-	    return null;
+    	/* the report should have only this user's entries(with userId)*/
+    	VoteMonitoringAction voteMonitoringAction= new VoteMonitoringAction();
+    	voteMonitoringAction.refreshSummaryData(request, voteContent, voteService, true, true, currentToolSessionId.toString(), learnerProgressUserId, true);
+    	
+		request.getSession().setAttribute(REQUEST_LEARNING_REPORT, new Boolean(true).toString());
+		request.getSession().setAttribute(REQUEST_LEARNING_REPORT_PROGRESS, new Boolean(true).toString());
+		logger.debug("fwd'ing to for learner progress" + LEARNER_REPORT);
+		return (mapping.findForward(LEARNER_REPORT));		
+
 	}
 	
 	/* by now, we know that the mode is learner*/

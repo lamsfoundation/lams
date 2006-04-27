@@ -19,6 +19,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
+
 <%@ taglib uri="tags-bean" prefix="bean"%> 
 <%@ taglib uri="tags-html" prefix="html"%>
 <%@ taglib uri="tags-logic" prefix="logic" %>
@@ -30,30 +31,30 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD hTML 4.01 Transitional//EN">
-<html:html>
-<head>
+	<!DOCTYPE HTML PUBLIC "-//W3C//DTD hTML 4.01 Transitional//EN">
+	<html:html locale="true">
+	<head>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-		<title> <bean:message key="label.learning.report"/> </title>
-	<script lang="javascript">
-		var imgRoot="<c:out value="${lams}"/>images/";
-		var themeName="aqua";
-	</script>
+	<title> <bean:message key="label.learning.report"/> </title>
 	
-	<script type="text/javascript" src="<c:out value="${lams}"/>includes/javascript/tabcontroller.js"></script>
-	<script src="<c:out value="${lams}"/>includes/javascript/common.js"></script>
+	 <lams:css/>
 	
-	<!-- this is the custom CSS for hte tool -->
-	<link href="<c:out value="${tool}"/>css/tool_custom.css" rel="stylesheet" type="text/css">
-	<lams:css/>
+	<!-- depending on user / site preference this will get changed probably use passed in variable from flash to select which one to use-->
+
+ 	<!-- ******************** FCK Editor related javascript & HTML ********************** -->
+    <script type="text/javascript" src="${lams}fckeditor/fckeditor.js"></script>
+    <script type="text/javascript" src="${lams}includes/javascript/fckcontroller.js"></script>
+    <link href="${lams}css/fckeditor_style.css" rel="stylesheet" type="text/css">
+	
+	
 	<script language="JavaScript" type="text/JavaScript">
 
 		// general submit
 		// actionMethod: name of the method to be called in the DispatchAction
 		function submitMonitoringMethod(actionMethod) 
 		{
-			document.QaMonitoringForm.method.value=actionMethod; 
-			document.QaMonitoringForm.submit();
+			document.VoteMonitoringForm.method.value=actionMethod; 
+			document.VoteMonitoringForm.submit();
 		}
 		
 		function submitMethod(actionMethod) 
@@ -61,12 +62,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			submitMonitoringMethod(actionMethod);
 		}
 		
-		function MM_reloadPage(init) {  //reloads the window if Nav4 resized
-		  if (init==true) with (navigator) {if ((appName=="Netscape")&&(parseInt(appVersion)==4)) {
-		    document.MM_pgW=innerWidth; document.MM_pgH=innerHeight; onresize=MM_reloadPage; }}
-		  else if (innerWidth!=document.MM_pgW || innerHeight!=document.MM_pgH) location.reload();
-		}
-		MM_reloadPage(true);
 		//-->
 	</script>	
 </head>
@@ -93,10 +88,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 			<c:if test="${ requestLearningReportViewOnly != 'true'}"> 			
 				<table align=right> 	  
-				<tr> <td> 
-					<c:out value="${sessionScope.endLearningMessage}" escapeXml="false"/>
-				</td> </tr>
-			
 				<tr>
 					 <td> 
 						<html:submit onclick="javascript:submitMethod('endLearning');" styleClass="button">

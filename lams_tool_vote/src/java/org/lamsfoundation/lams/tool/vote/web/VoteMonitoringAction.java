@@ -114,7 +114,7 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
     }
     
 	public void refreshSummaryData(HttpServletRequest request, VoteContent voteContent, IVoteService voteService, 
-			boolean isUserNamesVisible, boolean isLearnerRequest, String currentSessionId, String userId)
+			boolean isUserNamesVisible, boolean isLearnerRequest, String currentSessionId, String userId, boolean showUserEntriesBySession)
 	{
 		if (voteService == null)
 		{
@@ -171,15 +171,17 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	    logger.debug("LIST_MONITORED_ANSWERS_CONTAINER_DTO: " + request.getSession().getAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO));
 	    /* ends here. */
 	    
-	    List listUserEntries=processUserEnteredNominations(voteService);
+	    List listUserEntries=processUserEnteredNominations(voteService, currentSessionId, showUserEntriesBySession);
 	    logger.debug("listUserEntries: " + listUserEntries);
 	    request.getSession().setAttribute(LIST_USER_ENTRIES, listUserEntries);
 	}
 
 
-	public List processUserEnteredNominations(IVoteService voteService)
+	public List processUserEnteredNominations(IVoteService voteService, String currentSessionId, boolean showUserEntriesBySession)
 	{
-	    logger.debug("start getting user entries: ");
+	    logger.debug("start getting user entries, showUserEntriesBySession: " + showUserEntriesBySession);
+	    logger.debug("start getting user entries, currentSessionId: " + currentSessionId);
+	    
 	    List userEntries=voteService.getUserEntries();
 	    logger.debug("userEntries: " + userEntries);
 	    
@@ -211,13 +213,30 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	    	        logger.debug("new DTO created");
 	    	        VoteUsrAttempt voteUsrAttempt =(VoteUsrAttempt)itUserRecords.next();
 	    	    	logger.debug("voteUsrAttempt: " + voteUsrAttempt);
-	    			voteMonitoredUserDTO.setAttemptTime(voteUsrAttempt.getAttemptTime().toString());
-	    			voteMonitoredUserDTO.setTimeZone(voteUsrAttempt.getTimeZone());
-	    			voteMonitoredUserDTO.setUserName(voteUsrAttempt.getVoteQueUsr().getUsername());
-	    			voteMonitoredUserDTO.setQueUsrId(voteUsrAttempt.getVoteQueUsr().getUid().toString());
-	    			voteMonitoredUserDTO.setUserEntry(voteUsrAttempt.getUserEntry());
-	    			
-	    	    	logger.debug("adding user entry: " + voteUsrAttempt.getUserEntry());
+	    	    	
+	    	    	if (showUserEntriesBySession == false)
+	    	    	{
+		    			voteMonitoredUserDTO.setAttemptTime(voteUsrAttempt.getAttemptTime().toString());
+		    			voteMonitoredUserDTO.setTimeZone(voteUsrAttempt.getTimeZone());
+		    			voteMonitoredUserDTO.setUserName(voteUsrAttempt.getVoteQueUsr().getUsername());
+		    			voteMonitoredUserDTO.setQueUsrId(voteUsrAttempt.getVoteQueUsr().getUid().toString());
+		    			voteMonitoredUserDTO.setUserEntry(voteUsrAttempt.getUserEntry());
+	    	    	}
+	    	    	else
+	    	    	{
+	    	    	    logger.debug("showUserEntriesBySession is true");
+	    	    	    String userSessionId=voteUsrAttempt.getVoteQueUsr().getVoteSession().getVoteSessionId().toString() ;
+	    	    	    logger.debug("userSessionId versus currentSessionId: " + userSessionId + " versus " +  currentSessionId);
+	    	    	    if (userSessionId.equals(currentSessionId))
+	    	    	    {
+	    	    	        logger.debug("this is a requested session id: "  + currentSessionId);
+			    			voteMonitoredUserDTO.setAttemptTime(voteUsrAttempt.getAttemptTime().toString());
+			    			voteMonitoredUserDTO.setTimeZone(voteUsrAttempt.getTimeZone());
+			    			voteMonitoredUserDTO.setUserName(voteUsrAttempt.getVoteQueUsr().getUsername());
+			    			voteMonitoredUserDTO.setQueUsrId(voteUsrAttempt.getVoteQueUsr().getUid().toString());
+			    			voteMonitoredUserDTO.setUserEntry(voteUsrAttempt.getUserEntry());
+	    	    	    }
+	    	    	}
 	    	    	listMonitoredUserContainerDTO.add(voteMonitoredUserDTO);
 	    	    }
 	    	    
@@ -491,6 +510,44 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
     	return voteAction.moveOptionUp(mapping, form, request, response);
     }
 	
+    /**
+     * calls learning action endLearning functionality 
+     * ActionForward endLearning(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException, ToolException
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     * @throws ToolException
+     */
+    public ActionForward endLearning(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException, ToolException
+    {
+    	logger.debug("dispatching proxy endLearning to learning module...");
+    	IVoteService voteService = (IVoteService)request.getSession().getAttribute(TOOL_SERVICE);
+		logger.debug("voteService: " + voteService);
+		if (voteService == null)
+		{
+			logger.debug("will retrieve voteService");
+			voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
+			logger.debug("retrieving voteService from session: " + voteService);
+		}
+
+    	VoteLearningAction voteLearningAction= new VoteLearningAction();
+    	return null; 
+    }
+
+    
     
     /**
      * persists error messages to request scope
