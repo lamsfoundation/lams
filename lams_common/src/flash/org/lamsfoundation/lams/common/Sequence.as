@@ -22,9 +22,8 @@
  */
 
 import org.lamsfoundation.lams.common.*;
-
 import org.lamsfoundation.lams.common.util.Observable;
-import org.lamsfoundation.lams.monitoring.ls.*;
+//import org.lamsfoundation.lams.monitoring.ls.*;
 import org.lamsfoundation.lams.common.util.*;
 import org.lamsfoundation.lams.authoring.DesignDataModel;
 
@@ -49,6 +48,7 @@ class Sequence {
 	private var _seqStartDate:Date;
 	
 	private var _learningDesignID:Number;
+	private var _organisationID:Number;
 	private var _learningDesignModel:DesignDataModel;
 	
 	private var _progress:Progress;
@@ -85,6 +85,7 @@ class Sequence {
 		_learningDesignID = dto.learningDesignID;
 		_seqCreatedDate = dto.createDateTime;
 		_seqStartDate = dto.startDateTime;
+		_organisationID = dto.organisationID;
 	}
 	
 	
@@ -98,14 +99,33 @@ class Sequence {
 		_seqID = seqID;
 	}
 	
+	public function getSequenceID():Number {
+		return _seqID;
+	}
 	/**
 	 * Get Sequence's unique ID
 	 *   
 	 * @return  Sequence ID
 	 */
+	 
+	 /**
+	 * Set User Organisation ID
+	 * 
+	 * @param   organisationIDID 
+	 */
 	
-	public function getSequenceID():Number {
-		return _seqID;
+	public function setOrganisationID(organisationID:Number){
+		_organisationID = organisationID;
+	}
+	
+	/**
+	 * Get User Organisation ID
+	 *   
+	 * @return  Organisation ID
+	 */
+	
+	public function getOrganisationID():Number {
+		return _organisationID;
 	}
     
 	/**
@@ -188,8 +208,10 @@ class Sequence {
 		_seqStartDate = seqStartDate;
 	}
 	
-	public function getStartDateTime():Date{
-		return _seqStartDate;
+	public function getStartDateTime():String{
+		var mytest:String = (_seqStartDate.getDate()+" "+(StringUtils.getMonthAsString(_seqStartDate.getMonth()+1))+" "+_seqStartDate.getFullYear());;
+		return mytest;
+		//return _seqStartDate;
 	}
 	
 	public function setActive() {
@@ -213,7 +235,7 @@ class Sequence {
 	}
 	
 	public function getProgress():Progress{
-		return progress;
+		return _progress;
 	}
 
 	public function checkState(stateID:Number):Boolean {
