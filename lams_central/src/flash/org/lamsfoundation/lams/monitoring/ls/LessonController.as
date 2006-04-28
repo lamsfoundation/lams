@@ -46,6 +46,27 @@ class org.lamsfoundation.lams.monitoring.ls.LessonController extends AbstractCon
 	// control methods
 	
 	/**
+	 * Recieves the click events from the Lesson buttons.  Based on the label
+	 * the relevent method is called to action the user request
+	 * @param   evt 
+	 */
+	public function cellPress(evt):Void{
+		trace(String(evt.target));
+		trace("Item index: " + evt.itemIndex);
+		trace('onClick event: joining lesson...');
+		var seqID:String = evt.target.getItemAt(evt.itemIndex).Lesson;
+		trace("Lesson Name: "+seqID);	
+		//_lessonModel = LessonModel(model);
+		//_lessonModel.getLesson().joinLesson();
+		
+		/*
+		Debugger.log('click evt.target.label:'+evt.target.label,Debugger.GEN,'click','LessonController');
+		var tgt:String = new String(evt.target);
+		if(tgt.indexOf("join") != -1){
+			_lessonModel.getLesson().joinLesson();
+		}*/
+	}
+	/**
 	*Called by Lesson when one in clicked
 	* @param lesson - the lesson that was clicked
 	

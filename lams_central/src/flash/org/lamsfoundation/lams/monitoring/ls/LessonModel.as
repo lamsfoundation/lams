@@ -23,6 +23,7 @@
 
 import org.lamsfoundation.lams.monitoring.ls.*;
 //import org.lamsfoundation.lams.monitoring.ls.Lesson;
+import org.lamsfoundation.lams.common.Sequence;
 import org.lamsfoundation.lams.common.util.Observable;
 import org.lamsfoundation.lams.common.util.*;
 import org.lamsfoundation.lams.monitoring.Application;
@@ -47,8 +48,14 @@ class org.lamsfoundation.lams.monitoring.ls.LessonModel extends Observable {
 	* Sequence (Lesson) Lesson container
 	* 
 	*/
+	
 	private var _lessonSequences:Hashtable;
 	
+	/**
+	* View state data
+	*/
+	private var _currentlySelectedSequence:Sequence;
+	private var _lastSelectedSequence:Sequence;
 	/**
 	* Constructor.
 	*/

@@ -48,7 +48,9 @@ class org.lamsfoundation.lams.monitoring.ls.LessonView extends AbstractView {
 	private var _lesson_mc:MovieClip;
 	
 	private var lessonState_acc:MovieClip;
-	private var lsns:MovieClip;
+	private var lsns_Active:MovieClip;
+	private var lsns_Archive:MovieClip;
+	private var lsns_Disabled:MovieClip;
 	//These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
     public var addEventListener:Function;
@@ -128,23 +130,24 @@ class org.lamsfoundation.lams.monitoring.ls.LessonView extends AbstractView {
 	*/
 	private function updateSequences(o:Observable){
 
-		lessonState_acc.createChild("View", "active", {label: "Active"});
-		lessonState_acc.createChild("View", "disabled", {label: "Disabled"});
-		lessonState_acc.createChild("View", "archive", {label: "Archive"});
-		//myAccordion.setSize(240, 400);
-		trace("---> LessonState Height: "+lessonState_acc._height)
-		lsns = lessonState_acc.active.createChild("DataGrid", "Data_dtg");
-		lsns.setSize(lessonState_acc._width, lessonState_acc._height-63);
-		
-		//set SP the content path:
-		//learningSequences_sp.contentPath = "empty_mc";
-		
-		var lbv = LessonView(this);
+		//get a reference to Observed LessonModel
 		var lbm = LessonModel(o);
 		
 		//get the hashtable
 		var mySeqs:Hashtable = lbm.getLessonSequences();
 	
+		lessonState_acc.createChild("View", "active", {label: "Active"});
+		lessonState_acc.createChild("View", "disabled", {label: "Disabled"});
+		lessonState_acc.createChild("View", "archive", {label: "Archive"});
+	
+		lsns_Active = lessonState_acc.active.createChild("DataGrid", "Data_dtg");
+		lsns_Active.setSize(lessonState_acc._width, lessonState_acc._height-63);
+		lsns_Archive = lessonState_acc.archive.createChild("DataGrid", "Data_dtg");
+		lsns_Archive.setSize(lessonState_acc._width, lessonState_acc._height-63);
+		lsns_Disabled = lessonState_acc.disabled.createChild("DataGrid", "Data_dtg");
+		lsns_Disabled.setSize(lessonState_acc._width, lessonState_acc._height-63);
+		var lvc = getController();
+		lsns_Active.addEventListener("cellPress",lvc);
 		//loop through the sequences
 		var keys:Array = mySeqs.keys();
 		trace("Length of Keys: "+keys.length)
@@ -152,16 +155,27 @@ class org.lamsfoundation.lams.monitoring.ls.LessonView extends AbstractView {
 			
 			//trace('attaching lesson movie for id: ' + keys[i]);
 			var learningSeq:Object = mySeqs.get(keys[i]);
-						
-			trace("values for Lesson Name is: "+learningSeq.getSequenceName()+", Sequence ID is: "+learningSeq.getSequenceID()+ " and Status is: "+learningSeq.getSequenceStateID() );
-			//learningSeq
-			var anObject= {Lesson:learningSeq.getSequenceName(), ID:learningSeq.getSequenceID(), Status:learningSeq.getSequenceStateID()};
-			lsns.addItem(anObject);
-
 			
+			var anObject= {Lesson:learningSeq.getSequenceName(), Started:learningSeq.getStartDateTime()};
+			
+			// Organize Sequences based on their StateID "7" for DISABLED, "6" for ARCHIVED and all the rest of them for ACTIVE.
+			switch (learningSeq.getSequenceStateID().toString()) {
+                case '6' :
+                    lsns_Archive.addItem(anObject);
+                    break;
+				case '7' :
+					lsns_Disabled.addItem(anObject);
+                    break;
+                default:
+					lsns_Active.addItem(anObject);
+            }
 			
 		}
 		
+		
+		//lsns_Active.onRelease = Proxy.create(this,this['select']);
+		 //Now that view is setup dispatch loaded event
+       //dispatchEvent({type:'load',target:this});
 		
 	}
 	
@@ -204,12 +218,10 @@ class org.lamsfoundation.lams.monitoring.ls.LessonView extends AbstractView {
         var accHeight:Number = bkg_pnl._height;
         
 		lessonState_acc.setSize(accWidth, accHeight);
-		lsns.setSize(accWidth, accHeight-63);
-        //Scrollpane
-        //if(spWidth > 0 && spHeight>0) {
-           //toolkitLibraries_sp.setSize(spWidth,spHeight);
-        //}
-        
+		lsns_Active.setSize(accWidth, accHeight-63);
+		lsns_Archive.setSize(accWidth, accHeight-63);
+		lsns_Disabled.setSize(accWidth, accHeight-63);
+             
 	}
 	
     /**
@@ -231,7 +243,10 @@ class org.lamsfoundation.lams.monitoring.ls.LessonView extends AbstractView {
 			return LessonModel(model);
 	}
 
-	
+	public function getController():LessonController{
+		var l:Controller = super.getController();
+		return LessonController(l);
+	}
     /**
     * Returns the default controller for this view (LessonController).
 	* Overrides AbstractView.defaultController()

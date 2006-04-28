@@ -477,8 +477,8 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
         var w:Number = Stage.width;
         var h:Number = Stage.height;
 		
-		var someListener:Object = new Object();
-		someListener.onMouseUp = function () {
+		//var someListener:Object = new Object();
+		//someListener.onMouseUp = function () {
 			
 		//Menu - only need to worry about width
         _menu_mc.setSize(w,_menu_mc._height);
@@ -488,21 +488,16 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
         //_toolkit.setSize(_toolkit.width,h-TOOLKIT_Y);
 
         //Toolbar
-        _toolbar.setSize(w,_toolbar.height);
+        _toolbar.setSize(null,_toolbar.height);
 		//Property Inspector
 		//var pi = _canvas.getPropertyInspector();
 		//pi._y = h;//- pi._height;
 		//pi._y = h - 210;
 		
-		}
+		//}
 		//Mouse.addListener(someListener);
-
-
-        
-        //Menu - only need to worry about width
-        _menu_mc.setSize(w,_menu_mc._height);
-
-        //Canvas
+       
+       //Canvas
        // _canvas.setSize(w-_toolkit.width,h-CANVAS_Y);
         _lessons.setSize(_lessons.width,h-LESSONS_Y);
 
