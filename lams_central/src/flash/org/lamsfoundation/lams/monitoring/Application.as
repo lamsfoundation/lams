@@ -53,10 +53,10 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
     private static var LESSONS_X:Number = 0;
     private static var LESSONS_Y:Number = 55;
     
-    private static var CANVAS_X:Number = 180;
-    private static var CANVAS_Y:Number = 55;
-    private static var CANVAS_W:Number = 1000;
-    private static var CANVAS_H:Number = 200;
+    private static var MONITOR_X:Number = 240;
+    private static var MONITOR_Y:Number = 55;
+    private static var MONITOR_W:Number = 550;
+    private static var MONITOR_H:Number = 550;
     
     private static var WORKSPACE_X:Number = 200;
     private static var WORKSPACE_Y:Number = 200;
@@ -91,7 +91,7 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
 	//private var _ddm:DesignDataModel;
     private var _toolbar:Toolbar;
     private var _lessons:Lesson;
-    //private var _canvas:Canvas;
+    private var _monitor:Monitor;
     private var _workspace:Workspace;
     private var _comms:Communication;
     private var _themeManager:ThemeManager;
@@ -119,7 +119,7 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
 	
     //UI Elements
     private var _toolbarLoaded:Boolean;                //These are flags set to true when respective element is 'loaded'
-    private var _canvasLoaded:Boolean;
+    private var _monitorLoaded:Boolean;
     private var _lessonsLoaded:Boolean;
     private var _menuLoaded:Boolean;
 	private var _showCMItem:Boolean;
@@ -136,7 +136,7 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
     * Application - Constructor
     */
     private function Application(){
-		super();
+		super(this);
         _menuLoaded = false;
         _lessonsLoaded = false;
 		_toolbarLoaded = false;
@@ -338,8 +338,8 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
                 case 'Lesson' :
 					_lessonsLoaded = true;
                     break;
-                case 'Canvas' :
-                    _canvasLoaded = true;
+                case 'Monitor' :
+                    _monitorLoaded = true;
                     break;
                 case 'LFMenuBar' :
                     _menuLoaded = true;
@@ -351,7 +351,7 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
             }
             
             //If all of them are loaded set UILoad accordingly
-			if(_menuLoaded && _toolbarLoaded && _lessonsLoaded){
+			if(_menuLoaded && _toolbarLoaded && _lessonsLoaded && _monitorLoaded){
                 _UILoaded=true;                
             } 
             //if(_toolkitLoaded && _canvasLoaded && _menuLoaded && _toolbarLoaded){
@@ -430,11 +430,12 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
         var depth:Number = _appRoot_mc.getNextHighestDepth();
         _toolbar = new Toolbar(_appRoot_mc,TOOLBAR_X,TOOLBAR_Y);
         _toolbar.addEventListener('load',Proxy.create(this,UIElementLoaded));
-		/*
-        //CANVAS
-        _canvas = new Canvas(_appRoot_mc,depth++,CANVAS_X,CANVAS_Y,CANVAS_W,CANVAS_H);
-        _canvas.addEventListener('load',Proxy.create(this,UIElementLoaded));
+		
+        //MONITOR
+        _monitor = new Monitor(_appRoot_mc,depth++,MONITOR_X,MONITOR_Y,MONITOR_W,MONITOR_H);
+        _monitor.addEventListener('load',Proxy.create(this,UIElementLoaded));
         
+		/*
         //WORKSPACE
         _workspace = new Workspace();
         //_workspace.addEventListener('load',Proxy.create(this,UIElementLoaded));
@@ -483,8 +484,8 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
 		//Menu - only need to worry about width
         _menu_mc.setSize(w,_menu_mc._height);
 
-        //Canvas
-       // _canvas.setSize(w-_toolkit.width,h-CANVAS_Y);
+        //MONITOR
+        _monitor.setSize(w-_lessons.width,h-MONITOR_Y);
         //_toolkit.setSize(_toolkit.width,h-TOOLKIT_Y);
 
         //Toolbar
@@ -571,7 +572,7 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
 
     
 	/**
-	* get the ddm form the canvas.. this method is here as the ddm used to be stored inthe application.
+	* get the ddm from the canvas.. this method is here as the ddm used to be stored inthe application.
     * returns the the Design Data Model
     
     public function getDesignDataModel():DesignDataModel{
@@ -595,9 +596,9 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
     /**
     * returns the the canvas instance
     */
-    //public function getCanvas():Canvas{
-   //     return _canvas;
-   // }
+    public function getMonitor():Monitor{
+        return _monitor;
+    }
 	public function get controlKeyPressed():String{
         return _controlKeyPressed;
     }
