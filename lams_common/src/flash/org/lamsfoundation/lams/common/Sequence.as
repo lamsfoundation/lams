@@ -47,6 +47,7 @@ class Sequence {
 	
 	private var _seqCreatedDate:Date;
 	private var _seqStartDate:Date;
+	private var _seqFinishDate:Date;
 	
 	private var _learningDesignID:Number;
 	private var _organisationID:Number;
@@ -215,6 +216,15 @@ class Sequence {
 		var mytest:String = (_seqStartDate.getDate()+" "+(StringUtils.getMonthAsString(_seqStartDate.getMonth()+1))+" "+_seqStartDate.getFullYear());;
 		return mytest;
 		//return _seqStartDate;
+	}
+	
+	public function setFinishDateTime(seqFinishDate:Date){
+		_seqFinishDate = seqFinishDate;
+	}
+	
+	public function getFinishDateTime():String{
+		var finishDate:String = (_seqFinishDate.getDate()+" "+(StringUtils.getMonthAsString(_seqFinishDate.getMonth()+1))+" "+_seqFinishDate.getFullYear());;
+		return finishDate;
 	}
 	
 	public function setActive() {
