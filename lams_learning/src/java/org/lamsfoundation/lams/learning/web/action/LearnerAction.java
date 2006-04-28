@@ -78,7 +78,7 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
  * 							handler="org.lamsfoundation.lams.learning.util.CustomStrutsExceptionHandler"
  * @struts:action-forward name="displayActivity" path="/DisplayActivity.do"
  * @struts:action-forward name="welcome" path=".welcome"
- * @struts:action-forward name="exit" path=".exit"
+ * @struts:action-forward name="exit" path="/exit.do"
  * 
  * ----------------XDoclet Tags--------------------
  * 
