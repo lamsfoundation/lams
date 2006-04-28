@@ -6,7 +6,9 @@
 <action path="/content"
 	type="org.apache.struts.actions.ForwardAction"
 	parameter=".welcome" />
-
+<action path="/exit"
+	type="org.apache.struts.actions.ForwardAction"
+	parameter=".exit" />
 <action path="/requestDisplay"
 	type="org.apache.struts.actions.ForwardAction"
 	parameter=".requestDisplay"/>
