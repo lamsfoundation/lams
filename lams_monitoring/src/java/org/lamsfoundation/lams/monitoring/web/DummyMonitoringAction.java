@@ -411,8 +411,8 @@ public class DummyMonitoringAction extends LamsDispatchAction
     		index = url.indexOf("</string>");
     		url = url.substring(0,index);
     	}
-    	// replace any &amp; with &
-    	url = url.replace("&amp;","&");
+    	// replace any &amp;amp; (which is the special wddx & escaping)  with &
+    	url = url.replace("&amp;amp;","&");
     	url = WebUtil.convertToFullURL(url);
     	
 		return url;
