@@ -22,8 +22,8 @@
  */
 
 import org.lamsfoundation.lams.common.*;
+
 import org.lamsfoundation.lams.common.util.Observable;
-//import org.lamsfoundation.lams.monitoring.ls.*;
 import org.lamsfoundation.lams.common.util.*;
 import org.lamsfoundation.lams.authoring.DesignDataModel;
 
@@ -36,6 +36,7 @@ class Sequence {
 	
 	private static var _instance:Sequence = null;
 	
+	public static var FINISHED_STATE_ID:Number = 5;
 	/**
 	* View state data
 	*/
@@ -99,16 +100,17 @@ class Sequence {
 		_seqID = seqID;
 	}
 	
-	public function getSequenceID():Number {
-		return _seqID;
-	}
 	/**
 	 * Get Sequence's unique ID
 	 *   
 	 * @return  Sequence ID
 	 */
-	 
-	 /**
+	
+	public function getSequenceID():Number {
+		return _seqID;
+	}
+
+    /**
 	 * Set User Organisation ID
 	 * 
 	 * @param   organisationIDID 
@@ -128,6 +130,7 @@ class Sequence {
 		return _organisationID;
 	}
     
+
 	/**
 	 * Set the seq's name
 	 * 
@@ -244,6 +247,10 @@ class Sequence {
 		} else {
 			return false;
 		}
+	}
+	
+	public function isFinished():Boolean {
+		return checkState(FINISHED_STATE_ID);
 	}
 
 	function get className():String{
