@@ -236,6 +236,13 @@
 		    redirect="false"
 	  	/>
 	  	
+
+	  	<forward
+		    name="exitPage"
+		    path="/learning/ExitLearning.jsp"
+		    redirect="false"
+	  	/>
+	  	
 	  	<forward
 		    name="allNominations"
 		    path="/learning/AllNominations.jsp"

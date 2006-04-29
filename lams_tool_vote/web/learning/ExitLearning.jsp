@@ -28,7 +28,27 @@
 					  	</td>
 					  </tr>
 				
-
+					<tr>
+						<td NOWRAP align=right class="input" valign=top colspan=2> 
+							<hr>
+						</td> 
+					</tr>
+				
+				  <tr>
+				  	<td NOWRAP align=left class="input" valign=top bgColor="#333366" colspan=2> 
+					  	<font size=2 color="#FFFFFF"> <b>  <bean:message key="label.learning.reportMessage.past"/> </b> </font>
+				  	</td>
+				  </tr>
+				
+			  		<c:forEach var="entry" items="${sessionScope.mapGeneralCheckedOptionsContent}">
+						  <tr>
+						  	<td NOWRAP align=left valign=top colspan=2> 
+								  <c:out value="${entry.value}" escapeXml="false" />						  																	
+						  	</td>
+						  </tr>
+					</c:forEach>
+				
+				
 		  	   		  <tr>
 					  	<td NOWRAP colspan=2 align=center class="input" valign=top> 
 						  	<font size=2>

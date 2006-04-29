@@ -52,7 +52,7 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
 	
 	protected String continueOptions;
 	protected String nextOptions;
-	protected String nominateVotes;
+	protected String castVotes;
 	
 	protected String continueOptionsCombined;
 	protected String redoQuestions;
@@ -76,6 +76,8 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
 	protected String nominationsSubmited;
 	protected String revisitingUser;
 	protected String revisitingPageActive;
+	protected String maxNominationCountReached;
+	protected int 	 castVoteCount;
 	
 	protected void resetUserActions()
     {
@@ -540,20 +542,7 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
     public void setMaxNominationCount(String maxNominationCount) {
         this.maxNominationCount = maxNominationCount;
     }
-    /**
-     * @return Returns the nominateVotes.
-     */
-    public String getNominateVotes() {
-        return nominateVotes;
-    }
-    /**
-     * @param nominateVotes The nominateVotes to set.
-     */
-    public void setNominateVotes(String nominateVotes) {
-        this.nominateVotes = nominateVotes;
-    }
-    
-    
+
     /**
      * @return Returns the nominationsSubmited.
      */
@@ -592,4 +581,41 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
         this.revisitingPageActive = revisitingPageActive;
     }
 
+    /**
+     * @return Returns the castVoteCount.
+     */
+    public int getCastVoteCount() {
+        return castVoteCount;
+    }
+    /**
+     * @param castVoteCount The castVoteCount to set.
+     */
+    public void setCastVoteCount(int castVoteCount) {
+        this.castVoteCount = castVoteCount;
+    }
+    
+    /**
+     * @return Returns the castVotes.
+     */
+    public String getCastVotes() {
+        return castVotes;
+    }
+    /**
+     * @param castVotes The castVotes to set.
+     */
+    public void setCastVotes(String castVotes) {
+        this.castVotes = castVotes;
+    }
+    /**
+     * @return Returns the maxNominationCountReached.
+     */
+    public String getMaxNominationCountReached() {
+        return maxNominationCountReached;
+    }
+    /**
+     * @param maxNominationCountReached The maxNominationCountReached to set.
+     */
+    public void setMaxNominationCountReached(String maxNominationCountReached) {
+        this.maxNominationCountReached = maxNominationCountReached;
+    }
 }

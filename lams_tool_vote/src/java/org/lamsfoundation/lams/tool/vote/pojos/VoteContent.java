@@ -37,7 +37,7 @@ import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 /**
  * <p>Persistent  object/bean that defines the content for the Voting tool.
  * Provides accessors and mutators to get/set attributes
- * It maps to database table: tl_vote11_content
+ * It maps to database table: tl_lavote11_content
  * </p>
  * 
  * @author Ozgur Demirtas

@@ -32,7 +32,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 /**
  * <p>Persistent  object/bean that defines the content for the Voting tool.
  * Provides accessors and mutators to get/set attributes
- * It maps to database table: tl_vote11_session
+ * It maps to database table: tl_lavote11_session
  * </p>
  * 
  * @author Ozgur Demirtas

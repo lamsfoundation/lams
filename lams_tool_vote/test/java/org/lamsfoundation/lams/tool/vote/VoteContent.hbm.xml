@@ -7,7 +7,7 @@
 
 <class 
     name="org.lamsfoundation.lams.tool.vote.pojos.VoteContent" 
-    table="tl_vote11_content"
+    table="tl_lavote11_content"
 >
     <id
         name="uid"
@@ -41,7 +41,7 @@
         column="instructions"
         length="65535"
     />
-
+    
     <property
         name="creationDate"
         type="java.util.Date"
@@ -59,23 +59,23 @@
         length="20"
     />
 
-
    <property
-        name="questionsSequenced"
+        name="voteChangable"
         type="boolean"
         access="property"
-        column="questions_sequenced"
+        column="voteChangable"
+        length="1"        
+   />
+   
+   <property
+        name="allowText"
+        type="boolean"
+        access="property"
+        column="allowText"
         length="1"        
    />
 
-    <property
-        name="usernameVisible"
-        type="boolean"
-        access="property"        
-        column="username_visible"
-        length="1"
-    />
-
+   
     <property
         name="createdBy"
         type="long"
@@ -84,22 +84,6 @@
         length="20"
     />
     
-    <property
-        name="monitoringReportTitle"
-        type="java.lang.String"
-        access="property"        
-        column="monitoring_report_title"
-        length="100"
-    />
-
-    <property
-        name="reportTitle"
-        type="java.lang.String"
-        access="property"        
-        column="report_title"
-        length="100"
-    />
-
    <property
         name="runOffline"
         type="boolean"
@@ -132,15 +116,6 @@
         length="65535"
     />
 
-
-    <property
-        name="endLearningMessage"
-        type="java.lang.String"
-        access="property"        
-        column="end_learning_message"
-        length="65535"
-    />
-    
     <property
         name="contentInUse"
         type="boolean"
@@ -159,28 +134,18 @@
    />
 
     <property
-        name="retries"
-        type="boolean"
+        name="maxNominationCount"
+        type="java.lang.String"
         access="property"        
-        column="retries"
-        length="1"
+        column="maxNominationCount"
+        length="5"
     />
 
 
-   <property
-        name="showReport"
-        type="boolean"
-        access="property"
-        column="show_report"
-        length="1"        
-   />
-
-
-    
-   	 <set
+    	 <set
             name="voteQueContents"
             order-by="display_order"
-            lazy="true"
+            lazy="true"            
             inverse="true"
             cascade="all-delete-orphan"
             sort="unsorted"

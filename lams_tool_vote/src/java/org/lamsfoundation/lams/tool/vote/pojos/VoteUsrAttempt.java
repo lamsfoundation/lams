@@ -31,7 +31,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 /**
  * <p>Persistent  object/bean that defines the user attempt for the MCQ tool.
  * Provides accessors and mutators to get/set attributes
- * It maps to database table: tl_vote11_usr_attempt
+ * It maps to database table: tl_lavote11_usr_attempt
  * </p>
  * 
  * @author Ozgur Demirtas
@@ -51,8 +51,6 @@ public class VoteUsrAttempt implements Serializable {
     private String timeZone;
     
     private String userEntry;
-    
-    private int nominationCount;
     
     private Long queUsrId;
     
@@ -94,30 +92,18 @@ public class VoteUsrAttempt implements Serializable {
         this.userEntry=userEntry;
     }
 
-    public VoteUsrAttempt(Date attemptTime, String timeZone, org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent voteQueContent, 
-    		org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr voteQueUsr, String userEntry, int nominationCount) {
-        this.attemptTime = attemptTime;
-        this.timeZone = timeZone;
-        this.voteQueContent = voteQueContent;
-        this.voteQueUsr = voteQueUsr;
-        this.userEntry=userEntry;
-        this.nominationCount=nominationCount;
-    }
 
     public VoteUsrAttempt(Date attemptTime, String timeZone, org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent voteQueContent, 
-    		org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr voteQueUsr, String userEntry, int nominationCount, boolean singleUserEntry) {
+    		org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr voteQueUsr, String userEntry, boolean singleUserEntry) {
         this.attemptTime = attemptTime;
         this.timeZone = timeZone;
         this.voteQueContent = voteQueContent;
         this.voteQueUsr = voteQueUsr;
         this.userEntry=userEntry;
-        this.nominationCount=nominationCount;
         this.singleUserEntry=singleUserEntry;
     }
 
     
-    
-
     public VoteUsrAttempt(String userEntry, Date attemptTime, String timeZone, org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent voteQueContent, 
     		org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr voteQueUsr) {
         this.userEntry=userEntry;
@@ -243,19 +229,6 @@ public class VoteUsrAttempt implements Serializable {
         this.userEntry = userEntry;
     }
 
-    /**
-     * @return Returns the nominationCount.
-     */
-    public int getNominationCount() {
-        return nominationCount;
-    }
-    /**
-     * @param nominationCount The nominationCount to set.
-     */
-    public void setNominationCount(int nominationCount) {
-        this.nominationCount = nominationCount;
-    }
-    
     /**
      * @return Returns the singleUserEntry.
      */

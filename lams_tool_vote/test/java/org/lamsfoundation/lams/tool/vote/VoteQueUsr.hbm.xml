@@ -7,7 +7,7 @@
 
 <class 
     name="org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr" 
-    table="tl_vote11_que_usr"
+    table="tl_lavote11_usr"
 >
     <id
         name="uid"
@@ -20,7 +20,7 @@
 	<property
         name="queUsrId"
         type="java.lang.Long"
-        column="que_usr_id"
+        column="user_id"
         not-null="true"
         length="20"
     >

@@ -47,14 +47,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							<bean:message key="label.learning.forceOfflineMessage"/>
 						</td></tr>
 					</c:if> 		
+					
+					<c:if test="${VoteLearningForm.maxNominationCountReached == 'true'}"> 			
+						<tr> <td class="error">
+							<bean:message key="error.maxNominationCount.reached"/>
+						</td></tr>
+					</c:if> 		
+					
 	
 					<c:if test="${VoteLearningForm.activityRunOffline != 'true'}"> 			
-						  <tr>
-						  	<td NOWRAP align=left class="input" valign=top bgColor="#333366" colspan=2> 
-							  	<font size=2 color="#FFFFFF"> <b>  <bean:message key="label.choose.nominations"/> </b> </font>
-						  	</td>
-						  </tr>
-					
 	  					  <tr>
 						  	<td NOWRAP align=center valign=top colspan=2> 
 								  <c:out value="${VoteLearningForm.activityTitle}" escapeXml="false" />						  								
@@ -164,10 +165,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		  	   		  <tr>
 					  	<td NOWRAP align=right class="input" valign=top> 
 						  	<font size=2>
-	                            <html:submit property="nominateVotes" 
+	                            <html:submit property="castVotes" 
 	                                         styleClass="linkbutton" 
-	                                         onclick="submitMethod('nominateVotes');">
-									<bean:message key="label.nominated"/>
+	                                         onclick="submitMethod('castVotes');">
+									<bean:message key="label.submit.vote"/>
 	                            </html:submit>
 							</font>
 					  	 </td>

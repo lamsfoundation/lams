@@ -6,7 +6,7 @@
 <hibernate-mapping>
 <class 
     name="org.lamsfoundation.lams.tool.vote.pojos.VoteSession" 
-    table="tl_vote11_session"
+    table="tl_lavote11_session"
 >
     <id
         name="uid"

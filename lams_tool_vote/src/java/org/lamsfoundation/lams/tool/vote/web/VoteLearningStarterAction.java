@@ -133,6 +133,9 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	voteLearningForm.setRevisitingUser(new Boolean(false).toString());
 	voteLearningForm.setRevisitingPageActive(new Boolean(false).toString());
 	voteLearningForm.setUserEntry("");
+	voteLearningForm.setCastVoteCount(0);
+	voteLearningForm.setMaxNominationCountReached(new Boolean(false).toString());
+	
     /*
      * persist time zone information to session scope. 
      */
@@ -370,15 +373,11 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
     	logger.debug("userSessionId: " + userSessionId);
     	Long toolSessionId=(Long)request.getSession().getAttribute(TOOL_SESSION_ID);
     	logger.debug("current toolSessionId: " + toolSessionId);
+
     	if (toolSessionId.toString().equals(userSessionId))
     	{
-    		logger.debug("the user's session id AND user id exists in the tool tables go to redo questions. " + toolSessionId + " voteQueUsr: " + 
-    				voteQueUsr + " user id: " + voteQueUsr.getQueUsrId());
-    		logger.debug("the learner has already responsed to this content, just generate a read-only report. Use redo questions for this.");
-    		
-    		voteLearningForm.setRevisitingUser(new Boolean(true).toString());
-     		voteLearningForm.setRevisitingPageActive(new Boolean(true).toString());
-    		
+    	    logger.debug("the learner has already responsed to this content, just generate a read-only report. Use redo questions for this.");
+    	    
     		logger.debug("start building MAP_GENERAL_CHECKED_OPTIONS_CONTENT");
 		 	Long toolContentId=(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
 	    	logger.debug("toolContentId: " + toolContentId);
@@ -417,6 +416,27 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	    	}
 	    	request.getSession().setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, localMapQuestionsContent);
     		logger.debug("end building MAP_GENERAL_CHECKED_OPTIONS_CONTENT: " + localMapQuestionsContent);
+    
+    	    
+    	    
+    	    boolean isSessionCompleted=isSessionCompleted(userSessionId, voteService);
+    	    logger.debug("isSessionCompleted: " + isSessionCompleted);
+    	    
+    	    String isContentLockOnFinish=voteLearningForm.getLockOnFinish();
+    	    logger.debug("isContentLockOnFinish: " + isContentLockOnFinish);
+    	    if ((isContentLockOnFinish.equals(new Boolean(true).toString()) && (isSessionCompleted == true)))
+            {
+        	    logger.debug("user with session id: "  + userSessionId + " should not redo votes. session  is locked.");
+        	    logger.debug("fwd'ing to: " + EXIT_PAGE);
+        	    return (mapping.findForward(EXIT_PAGE));
+            }
+    	    
+    	    
+    		logger.debug("the user's session id AND user id exists in the tool tables go to redo questions. " + toolSessionId + " voteQueUsr: " + 
+    				voteQueUsr + " user id: " + voteQueUsr.getQueUsrId());
+    		voteLearningForm.setRevisitingUser(new Boolean(true).toString());
+     		voteLearningForm.setRevisitingPageActive(new Boolean(true).toString());
+    		
     		return (mapping.findForward(ALL_NOMINATIONS));
     	}
     }
@@ -431,28 +451,28 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 }
 
 
-/**
- * sets up question and candidate answers maps
- * commonContentSetup(HttpServletRequest request, VoteContent voteContent)
- * 
- * @param request
- * @param voteContent
- */
-protected void commonContentSetup(HttpServletRequest request, VoteContent voteContent)
-{
-	Map mapQuestionsContent= new TreeMap(new VoteComparator());
-	mapQuestionsContent=LearningUtil.buildQuestionContentMap(request,voteContent);
-    logger.debug("mapQuestionsContent: " + mapQuestionsContent);
-	
-	request.getSession().setAttribute(MAP_QUESTION_CONTENT_LEARNER, mapQuestionsContent);
-	logger.debug("MAP_QUESTION_CONTENT_LEARNER: " +  request.getSession().getAttribute(MAP_QUESTION_CONTENT_LEARNER));
-	logger.debug("voteContent has : " + mapQuestionsContent.size() + " entries.");
-	request.getSession().setAttribute(TOTAL_QUESTION_COUNT, new Long(mapQuestionsContent.size()).toString());
-	
-	request.getSession().setAttribute(CURRENT_QUESTION_INDEX, "1");
-	logger.debug("CURRENT_QUESTION_INDEX: " + request.getSession().getAttribute(CURRENT_QUESTION_INDEX));
-	
-}
+	/**
+	 * sets up question and candidate answers maps
+	 * commonContentSetup(HttpServletRequest request, VoteContent voteContent)
+	 * 
+	 * @param request
+	 * @param voteContent
+	 */
+	protected void commonContentSetup(HttpServletRequest request, VoteContent voteContent)
+	{
+		Map mapQuestionsContent= new TreeMap(new VoteComparator());
+		mapQuestionsContent=LearningUtil.buildQuestionContentMap(request,voteContent);
+	    logger.debug("mapQuestionsContent: " + mapQuestionsContent);
+		
+		request.getSession().setAttribute(MAP_QUESTION_CONTENT_LEARNER, mapQuestionsContent);
+		logger.debug("MAP_QUESTION_CONTENT_LEARNER: " +  request.getSession().getAttribute(MAP_QUESTION_CONTENT_LEARNER));
+		logger.debug("voteContent has : " + mapQuestionsContent.size() + " entries.");
+		request.getSession().setAttribute(TOTAL_QUESTION_COUNT, new Long(mapQuestionsContent.size()).toString());
+		
+		request.getSession().setAttribute(CURRENT_QUESTION_INDEX, "1");
+		logger.debug("CURRENT_QUESTION_INDEX: " + request.getSession().getAttribute(CURRENT_QUESTION_INDEX));
+		
+	}
 
 
 	/**
@@ -570,6 +590,20 @@ protected void commonContentSetup(HttpServletRequest request, VoteContent voteCo
 	    return null;
 	}
 
+	
+	boolean isSessionCompleted(String userSessionId, IVoteService voteService)
+	{
+		logger.debug("userSessionId:" + userSessionId);
+		VoteSession voteSession=voteService.retrieveVoteSession(new Long(userSessionId));
+	    logger.debug("retrieving voteSession: " + voteSession);
+	    logger.debug("voteSession status : " + voteSession.getSessionStatus());
+	    if  ((voteSession.getSessionStatus() != null) &&  (voteSession.getSessionStatus().equals(VoteAppConstants.COMPLETED)))
+	    {
+	        logger.debug("this session is COMPLETED voteSession status : " + userSessionId  + "->" + voteSession.getSessionStatus());
+	        return true;
+	    }
+	    return false;
+	}
 	
 	/**
      * persists error messages to request scope

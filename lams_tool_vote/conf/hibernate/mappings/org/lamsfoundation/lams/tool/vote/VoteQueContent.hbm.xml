@@ -13,7 +13,7 @@
 
 <class 
     name="org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent" 
-    table="tl_vote11_que_content"
+    table="tl_lavote11_nomination_content"
 >
     <id
         name="uid"
@@ -26,7 +26,7 @@
     <property
         name="question"
         type="java.lang.String"
-        column="question"
+        column="nomination"
         length="65535"
     >
     </property>

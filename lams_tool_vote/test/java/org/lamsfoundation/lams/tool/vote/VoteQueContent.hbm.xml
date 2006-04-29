@@ -13,7 +13,7 @@
 
 <class 
     name="org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent" 
-    table="tl_vote11_que_content"
+    table="tl_lavote11_nomination_content"
 >
     <id
         name="uid"
@@ -24,10 +24,18 @@
     </id>
     
     <property
-        name="question"
+        name="nomination"
         type="java.lang.String"
         column="question"
-        length="255"
+        length="65535"
+    >
+    </property>
+    
+    <property
+        name="displayOrder"
+        type="java.lang.Integer"
+        column="display_order"
+        length="5"
     >
     </property>
     
@@ -55,21 +63,6 @@
     >
         <column name="vote_content_id" />
     </many-to-one>
-    
-    
-    <set
-        name="voteOptionsContents"
-        lazy="true"
-        inverse="true"
-		cascade="all-delete-orphan"
-    >
-        <key>
-            <column name="vote_que_content_id" />
-        </key>
-        <one-to-many 
-            class="org.lamsfoundation.lams.tool.vote.pojos.VoteOptsContent"
-        />
-    </set>
     
     
     <set

@@ -133,16 +133,6 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 		
 		public int  getLastNominationCount(Long userId)
 		{
-	        HibernateTemplate templ = this.getHibernateTemplate();
-	        List list = getSession().createQuery(LOAD_ATTEMPT_FOR_USER)
-			.setLong("queUsrId", userId.longValue())
-			.list();
-			
-	        
-			if(list != null && list.size() > 0){
-			    VoteUsrAttempt vote = (VoteUsrAttempt) list.get(0);
-				return vote.getNominationCount();
-			}
 			return 0;
 		}
 				

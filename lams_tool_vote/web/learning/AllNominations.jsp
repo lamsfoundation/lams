@@ -100,6 +100,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			                                    <bean:message key="label.retake"/>
 			                                </html:submit>
 								</c:if> 		          
+
 								<c:if test="${VoteLearningForm.voteChangable == 'true' && VoteLearningForm.lockOnFinish == 'true' && VoteLearningForm.revisitingUser == 'false' }"> 				   						
 				                                <html:submit property="redoQuestionsOk" 
 				                                             styleClass="linkbutton" 
@@ -107,25 +108,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				                                    <bean:message key="label.retake"/>
 				                                </html:submit>
 								</c:if> 		          								                      
-
-
-								<c:if test="${VoteLearningForm.revisitingUser == 'false' }"> 							
-		                            <html:submit property="continueOptionsCombined" 
-		                                         styleClass="linkbutton" 
-		                                         onclick="submitMethod('continueOptionsCombined');">
-										<bean:message key="button.submit"/>
-		                            </html:submit>
-		   						&nbsp&nbsp&nbsp&nbsp&nbsp                                	   						
-								</c:if> 		          		
-
-								<c:if test="${VoteLearningForm.voteChangable == 'true' && VoteLearningForm.lockOnFinish != 'true' && VoteLearningForm.revisitingUser == 'true' && VoteLearningForm.revisitingPageActive != 'true'}"> 	
-		                            <html:submit property="continueOptionsCombined" 
-		                                         styleClass="linkbutton" 
-		                                         onclick="submitMethod('continueOptionsCombined');">
-										<bean:message key="button.submit"/>
-		                            </html:submit>
-		   						&nbsp&nbsp&nbsp&nbsp&nbsp                                	   						
-								</c:if> 		          		
 
                                 <html:submit property="learnerFinished" 
                                              styleClass="linkbutton" 

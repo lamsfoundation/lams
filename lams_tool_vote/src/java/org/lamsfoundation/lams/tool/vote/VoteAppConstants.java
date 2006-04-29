@@ -28,7 +28,7 @@ package org.lamsfoundation.lams.tool.vote;
  */
 public interface VoteAppConstants {
 
-	public static final String MY_SIGNATURE 							="vote11";
+	public static final String MY_SIGNATURE 							="lavote11";
 	public static final String DEFAULT_CONTENT_ID 						="defaultContentId";
 	public static final String TOOL_SERVICE								="tool_service";
 	public static final String ERROR_VOTEAPPLICATION 					= "error.exception.VoteApplication";

@@ -7,7 +7,7 @@
 
 <class 
     name="org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt" 
-    table="tl_vote11_usr_attempt"
+    table="tl_lavote11_usr_attempt"
 >
     <id
         name="uid"
@@ -67,15 +67,6 @@
         length="255"
     >
     </property>
-    
-    <property
-        name="nominationCount"
-        type="java.lang.Integer"
-        column="nominationCount"
-        length="5"
-    >
-    </property>
-    
     
    <property
         name="singleUserEntry"

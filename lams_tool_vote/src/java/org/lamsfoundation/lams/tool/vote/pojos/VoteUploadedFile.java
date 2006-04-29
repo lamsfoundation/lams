@@ -34,7 +34,7 @@ import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 /**
  * <p>Persistent  object/bean that defines the uploaded file for the MCQ tool.
  * Provides accessors and mutators to get/set attributes
- * It maps to database table: tl_vote11_uploadedfile
+ * It maps to database table: tl_lavote11_uploadedfile
  * </p>
  * 
  * @author Ozgur Demirtas

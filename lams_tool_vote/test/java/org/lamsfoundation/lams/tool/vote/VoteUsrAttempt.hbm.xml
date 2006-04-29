@@ -7,7 +7,7 @@
 
 <class 
     name="org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt" 
-    table="tl_vote11_usr_attempt"
+    table="tl_lavote11_usr_attempt"
 >
     <id
         name="uid"
@@ -68,15 +68,14 @@
     >
     </property>
     
-    <property
-        name="isNominated"
+   <property
+        name="singleUserEntry"
         type="boolean"
-        access="property"        
-        column="isNominated"
-        length="1"
-    />
-
-
+        access="property"
+        column="singleUserEntry"
+        length="1"        
+   />
+    
 
     <many-to-one
         name="voteQueContent"
@@ -102,19 +101,6 @@
 	    access="property"
     >
         <column name="que_usr_id" />
-    </many-to-one>
-    
-    <many-to-one
-        name="voteOptionsContent"
-        class="org.lamsfoundation.lams.tool.vote.pojos.VoteOptsContent"
-        not-null="true"                
-	    cascade="none"
-	    outer-join="auto"
-	    update="true"
-	    insert="true"
-	    access="property"
-    >
-        <column name="vote_que_option_id" />
     </many-to-one>
 
 </class>

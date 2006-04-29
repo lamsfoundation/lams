@@ -113,10 +113,9 @@ public class LearningUtil implements VoteAppConstants {
 	}
     
     
-    public static void createAttempt(HttpServletRequest request, VoteQueUsr voteQueUsr, Map mapGeneralCheckedOptionsContent, String userEntry, int nominationCount, boolean singleUserEntry)
+    public static void createAttempt(HttpServletRequest request, VoteQueUsr voteQueUsr, Map mapGeneralCheckedOptionsContent, String userEntry,  boolean singleUserEntry)
 	{
         logger.debug("doing createAttempt: " + mapGeneralCheckedOptionsContent);
-        logger.debug("nominationCount: " + nominationCount);
         logger.debug("userEntry: " + userEntry);
         logger.debug("singleUserEntry: " + singleUserEntry);
         
@@ -142,30 +141,29 @@ public class LearningUtil implements VoteAppConstants {
 	            logger.debug("voteQueContent: " + voteQueContent);
 	            if (voteQueContent != null)
 	            {
-	                createIndividualOptions(request, voteQueContent, voteQueUsr, attempTime, timeZone, userEntry, nominationCount, false);    
+	                createIndividualOptions(request, voteQueContent, voteQueUsr, attempTime, timeZone, userEntry, false);    
 	            }
 	            else if ((voteQueContent == null) && (questionDisplayOrder.toString().equals("101")))
 	            {
 	                logger.debug("creating user entry record, 101");
 	                VoteQueContent localVoteQueContent=voteService.getToolDefaultQuestionContent(1);
 	                logger.debug("localVoteQueContent: " + localVoteQueContent);
-	                createIndividualOptions(request, localVoteQueContent, voteQueUsr, attempTime, timeZone, userEntry, nominationCount, true);    
+	                createIndividualOptions(request, localVoteQueContent, voteQueUsr, attempTime, timeZone, userEntry, true);    
 	            }
 	            else if ((voteQueContent == null) && (questionDisplayOrder.toString().equals("102")))
 	            {
 	                logger.debug("creating user entry record, 102");
 	                VoteQueContent localVoteQueContent=voteService.getToolDefaultQuestionContent(1);
 	                logger.debug("localVoteQueContent: " + localVoteQueContent);
-	                createIndividualOptions(request, localVoteQueContent, voteQueUsr, attempTime, timeZone, userEntry, nominationCount, false);    
+	                createIndividualOptions(request, localVoteQueContent, voteQueUsr, attempTime, timeZone, userEntry, false);    
 	            }
 	        }			
 		}
 	 }
 
-    public static void createIndividualOptions(HttpServletRequest request, VoteQueContent voteQueContent, VoteQueUsr voteQueUsr, Date attempTime, String timeZone, String userEntry, int nominationCount, boolean singleUserEntry)
+    public static void createIndividualOptions(HttpServletRequest request, VoteQueContent voteQueContent, VoteQueUsr voteQueUsr, Date attempTime, String timeZone, String userEntry, boolean singleUserEntry)
     {
         logger.debug("doing createIndividualOptions");
-        logger.debug("nominationCount: " + nominationCount);
         logger.debug("userEntry: " + userEntry);
         logger.debug("singleUserEntry: " + singleUserEntry);
 
@@ -183,7 +181,6 @@ public class LearningUtil implements VoteAppConstants {
     	    if (existingVoteUsrAttempt != null)
     	    {
     	        logger.debug("update existingVoteUsrAttempt: " + existingVoteUsrAttempt);
-    	        existingVoteUsrAttempt.setNominationCount(nominationCount);
     	        existingVoteUsrAttempt.setUserEntry(userEntry);
     	        existingVoteUsrAttempt.setAttemptTime(attempTime);
     	        existingVoteUsrAttempt.setTimeZone(timeZone);
@@ -193,7 +190,7 @@ public class LearningUtil implements VoteAppConstants {
     	    else
     	    {
     	        logger.debug("create new attempt");
-        	    VoteUsrAttempt voteUsrAttempt=new VoteUsrAttempt(attempTime, timeZone, voteQueContent, voteQueUsr, userEntry, nominationCount , singleUserEntry);
+        	    VoteUsrAttempt voteUsrAttempt=new VoteUsrAttempt(attempTime, timeZone, voteQueContent, voteQueUsr, userEntry, singleUserEntry);
         	    logger.debug("voteUsrAttempt: " + voteUsrAttempt);
             	voteService.createVoteUsrAttempt(voteUsrAttempt);
             	logger.debug("created voteUsrAttempt in the db :" + voteUsrAttempt);    
@@ -245,16 +242,16 @@ public class LearningUtil implements VoteAppConstants {
     }
 
     
-    public static  void selectOptionsCheckBox(HttpServletRequest request,VoteLearningForm voteLearningForm, String questionIndex)
+    public static Map selectOptionsCheckBox(HttpServletRequest request,VoteLearningForm voteLearningForm, String questionIndex, 
+            Map mapGeneralCheckedOptionsContent)
     {
     	logger.debug("requested optionCheckBoxSelected...");
     	logger.debug("questionIndex: " + voteLearningForm.getQuestionIndex());
     	logger.debug("optionIndex: " + voteLearningForm.getOptionIndex());
     	logger.debug("optionValue: " + voteLearningForm.getOptionValue());
     	logger.debug("checked: " + voteLearningForm.getChecked());
-    	
-    	Map mapGeneralCheckedOptionsContent=(Map) request.getSession().getAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT);
-    	logger.debug("mapGeneralCheckedOptionsContent: " + mapGeneralCheckedOptionsContent);
+
+    	Map mapFinal= new TreeMap(new VoteComparator());
     	
     	if (mapGeneralCheckedOptionsContent.size() == 0)
     	{
@@ -266,7 +263,8 @@ public class LearningUtil implements VoteAppConstants {
     		else
     			mapLeanerCheckedOptionsContent.remove(voteLearningForm.getQuestionIndex());
     		
-			request.getSession().setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, mapLeanerCheckedOptionsContent);
+			
+    		mapFinal=mapLeanerCheckedOptionsContent;
     	}
     	else
     	{
@@ -282,7 +280,8 @@ public class LearningUtil implements VoteAppConstants {
     			
     			logger.debug("updated mapCurrentOptions: " + mapCurrentOptions);
     			
-    			request.getSession().setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, mapCurrentOptions);	
+    			mapFinal=mapCurrentOptions;
+    			//request.getSession().setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, mapCurrentOptions);	
     		}
     		else
     		{
@@ -292,14 +291,17 @@ public class LearningUtil implements VoteAppConstants {
     			if (voteLearningForm.getChecked().equals("true"))
     				mapLeanerCheckedOptionsContent.put(voteLearningForm.getQuestionIndex(), voteLearningForm.getOptionValue());
     			else
-    				mapLeanerCheckedOptionsContent.remove(voteLearningForm.getOptionIndex());        			
+    				mapLeanerCheckedOptionsContent.remove(voteLearningForm.getOptionIndex());
     			
-    			request.getSession().setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, mapLeanerCheckedOptionsContent);
+    			mapFinal=mapLeanerCheckedOptionsContent;
+    			//request.getSession().setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, mapLeanerCheckedOptionsContent);
     		}
     	}
     	
-    	mapGeneralCheckedOptionsContent=(Map) request.getSession().getAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT);
-    	logger.debug("final mapGeneralCheckedOptionsContent: " + mapGeneralCheckedOptionsContent);
+    	//mapGeneralCheckedOptionsContent=(Map) request.getSession().getAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT);
+    	//logger.debug("final mapGeneralCheckedOptionsContent: " + mapGeneralCheckedOptionsContent);
+    	logger.debug("mapFinal: " + mapFinal);
+    	return mapFinal;
     }
 }
 

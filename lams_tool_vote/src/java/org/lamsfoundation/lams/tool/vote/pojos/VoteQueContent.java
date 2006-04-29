@@ -35,7 +35,7 @@ import org.apache.log4j.Logger;
 /**
  * <p>Persistent  object/bean that defines the question content for the Voting tool.
  * Provides accessors and mutators to get/set attributes
- * It maps to database table: tl_vote11_que_content
+ * It maps to database table: tl_lavote11_que_content
  * </p>
  * 
  * @author Ozgur Demirtas
