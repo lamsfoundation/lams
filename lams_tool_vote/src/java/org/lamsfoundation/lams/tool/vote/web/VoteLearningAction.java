@@ -253,12 +253,14 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 		
 		
         /* REMOVE THIS this is temp code from here **/
+		/*
 		VoteSession voteSession=null;
 		voteSession=voteService.retrieveVoteSession(toolSessionId);
 		logger.debug("retrieved voteSession: " + voteSession);
     	voteSession.setSessionStatus(VoteAppConstants.COMPLETED);
     	voteService.updateVoteSession(voteSession);
     	logger.debug("updated voteSession to COMPLETED" + voteSession);
+    	*/
     	/* till here*/
 
 	
@@ -387,20 +389,48 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
     	}
     	logger.debug("userEntryAvailable " + userEntryAvailable);
     	
+    	Long toolSessionId=(Long)request.getSession().getAttribute(TOOL_SESSION_ID);
+    	logger.debug("toolSessionId " + toolSessionId);
     	
-    	boolean isUserDefined=LearningUtil.doesUserExists(request);
-    	logger.debug("isUserDefined");
+    	VoteSession voteSession=voteService.retrieveVoteSession(toolSessionId);
+        logger.debug("retrieving voteSession: " + voteSession);
+
+    	
+    	boolean isUserDefined=false;
+    	String userID=(String)request.getSession().getAttribute(USER_ID);
+    	logger.debug("userID: " + userID);
+    	VoteQueUsr existingVoteQueUsr=voteService.getVoteUserBySession(new Long(userID), voteSession.getUid());
+    	logger.debug("existingVoteQueUsr: " + existingVoteQueUsr);
+    	
+    	if (existingVoteQueUsr != null)
+    	    isUserDefined=true;
+    	
+    	logger.debug("isUserDefined: " + isUserDefined);
+    	
+    	
+    	VoteQueUsr voteQueUsr=null;
     	if (isUserDefined == false)
     	{
-    		LearningUtil.createUser(request);
+    	    voteQueUsr=LearningUtil.createUser(request);
     		logger.debug("created user in the db");
+    		logger.debug("new create");
     	}
-    	VoteQueUsr voteQueUsr=LearningUtil.getUser(request);
+    	else
+    	{
+    	    voteQueUsr=existingVoteQueUsr;
+    	    logger.debug("assign");
+    	}
+    	
     	logger.debug("voteQueUsr: " + voteQueUsr);
+    	//VoteQueUsr voteQueUsr=LearningUtil.getUser(request);
+    	logger.debug("voteQueUsr is : " + voteQueUsr);
     	
     	logger.debug("creating attemps with mapGeneralCheckedOptionsContent " + mapGeneralCheckedOptionsContent);
-    	voteService.removeAttemptsForUser(voteQueUsr.getUid());
-    	logger.debug("nominations deleted for user: " + voteQueUsr.getUid());
+    	if (existingVoteQueUsr != null)
+    	{
+        	voteService.removeAttemptsForUser(existingVoteQueUsr.getUid());
+        	logger.debug("nominations deleted for user: " + voteQueUsr.getUid());
+    	}
     	
     	logger.debug("mapGeneralCheckedOptionsContent size: " + mapGeneralCheckedOptionsContent.size());
     	if (mapGeneralCheckedOptionsContent.size() > 0)

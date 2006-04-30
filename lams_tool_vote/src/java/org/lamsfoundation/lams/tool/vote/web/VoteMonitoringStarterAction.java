@@ -85,6 +85,8 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 		
 		
 		request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
+		request.getSession().setAttribute(COUNT_ALL_USERS, new Integer(0).toString());
+		request.getSession().setAttribute(COUNT_SESSION_COMPLETE, new Integer(0).toString());
 		
 		VoteMonitoringAction voteMonitoringAction= new VoteMonitoringAction();
 		logger.debug("calling initSummaryContent.");

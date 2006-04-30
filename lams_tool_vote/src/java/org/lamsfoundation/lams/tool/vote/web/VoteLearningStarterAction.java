@@ -346,7 +346,9 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	String userID=(String) request.getSession().getAttribute(USER_ID);
 	logger.debug("userID:" + userID);
     
-	VoteQueUsr voteQueUsr=voteService.retrieveVoteQueUsr(new Long(userID));
+	logger.debug("voteSession uid :" + voteSession.getUid());
+	//VoteQueUsr voteQueUsr=voteService.retrieveVoteQueUsr(new Long(userID));
+	VoteQueUsr voteQueUsr=voteService.getVoteUserBySession(new Long(userID), voteSession.getUid());
     logger.debug("voteQueUsr:" + voteQueUsr);
     
     if (voteQueUsr != null)

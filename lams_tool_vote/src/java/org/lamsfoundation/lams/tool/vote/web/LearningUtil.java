@@ -85,7 +85,7 @@ public class LearningUtil implements VoteAppConstants {
 	}
 
 
-    public static void createUser(HttpServletRequest request)
+    public static VoteQueUsr createUser(HttpServletRequest request)
 	{
 		IVoteService voteService =VoteUtils.getToolService(request);
 	    Long queUsrId=VoteUtils.getUserId();
@@ -101,6 +101,7 @@ public class LearningUtil implements VoteAppConstants {
 										new TreeSet());		
 		voteService.createVoteQueUsr(voteQueUsr);
 		logger.debug("created voteQueUsr in the db: " + voteQueUsr);
+		return voteQueUsr;
 	}
 
     
