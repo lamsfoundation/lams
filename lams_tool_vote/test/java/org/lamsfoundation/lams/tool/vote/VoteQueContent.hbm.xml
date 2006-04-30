@@ -24,9 +24,9 @@
     </id>
     
     <property
-        name="nomination"
+        name="question"
         type="java.lang.String"
-        column="question"
+        column="nomination"
         length="65535"
     >
     </property>
@@ -73,7 +73,7 @@
 	>
 
         <key>
-            <column name="vote_que_content_id" />
+            <column name="vote_nomination_content_id" />
         </key>
         <one-to-many 
             class="org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt"

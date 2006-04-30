@@ -38,7 +38,7 @@
  	<property
         name="voteQueContentId"
         type="java.lang.Long"
-        column="vote_que_content_id"
+        column="vote_nomination_content_id"
         not-null="true"
    	    update="false"
 	    insert="false"
@@ -58,7 +58,17 @@
     >
     </property>
     
-    
+ 	<property
+        name="voteSessionId"
+        type="java.lang.Long"
+        column="vote_session_id"
+        not-null="true"
+   	    update="false"
+	    insert="false"
+        length="20"
+    >
+    </property>
+
     <property
         name="userEntry"
         type="java.lang.String"
@@ -87,7 +97,7 @@
 	    insert="true"
 	    access="property"
     >
-        <column name="vote_que_content_id" />
+        <column name="vote_nomination_content_id" />
     </many-to-one>
     
     <many-to-one
@@ -101,6 +111,20 @@
 	    access="property"
     >
         <column name="que_usr_id" />
+    </many-to-one>
+
+
+    <many-to-one
+        name="voteSession"
+        class="org.lamsfoundation.lams.tool.vote.pojos.VoteSession"
+        not-null="true"        
+	    cascade="none"
+	    outer-join="auto"
+	    update="true"
+	    insert="true"
+	    access="property"
+    >
+        <column name="vote_session_id" />
     </many-to-one>
 
 </class>

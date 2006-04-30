@@ -114,8 +114,9 @@ public class LearningUtil implements VoteAppConstants {
 	}
     
     
-    public static void createAttempt(HttpServletRequest request, VoteQueUsr voteQueUsr, Map mapGeneralCheckedOptionsContent, String userEntry,  boolean singleUserEntry)
+    public static void createAttempt(HttpServletRequest request, VoteQueUsr voteQueUsr, Map mapGeneralCheckedOptionsContent, String userEntry,  boolean singleUserEntry, VoteSession voteSession)
 	{
+        logger.debug("doing voteSession: " + voteSession);
         logger.debug("doing createAttempt: " + mapGeneralCheckedOptionsContent);
         logger.debug("userEntry: " + userEntry);
         logger.debug("singleUserEntry: " + singleUserEntry);
@@ -142,29 +143,29 @@ public class LearningUtil implements VoteAppConstants {
 	            logger.debug("voteQueContent: " + voteQueContent);
 	            if (voteQueContent != null)
 	            {
-	                createIndividualOptions(request, voteQueContent, voteQueUsr, attempTime, timeZone, userEntry, false);    
+	                createIndividualOptions(request, voteQueContent, voteQueUsr, attempTime, timeZone, userEntry, false, voteSession);    
 	            }
 	            else if ((voteQueContent == null) && (questionDisplayOrder.toString().equals("101")))
 	            {
 	                logger.debug("creating user entry record, 101");
 	                VoteQueContent localVoteQueContent=voteService.getToolDefaultQuestionContent(1);
 	                logger.debug("localVoteQueContent: " + localVoteQueContent);
-	                createIndividualOptions(request, localVoteQueContent, voteQueUsr, attempTime, timeZone, userEntry, true);    
+	                createIndividualOptions(request, localVoteQueContent, voteQueUsr, attempTime, timeZone, userEntry, true, voteSession);    
 	            }
 	            else if ((voteQueContent == null) && (questionDisplayOrder.toString().equals("102")))
 	            {
 	                logger.debug("creating user entry record, 102");
 	                VoteQueContent localVoteQueContent=voteService.getToolDefaultQuestionContent(1);
 	                logger.debug("localVoteQueContent: " + localVoteQueContent);
-	                createIndividualOptions(request, localVoteQueContent, voteQueUsr, attempTime, timeZone, userEntry, false);    
+	                createIndividualOptions(request, localVoteQueContent, voteQueUsr, attempTime, timeZone, userEntry, false, voteSession);    
 	            }
 	        }			
 		}
 	 }
 
-    public static void createIndividualOptions(HttpServletRequest request, VoteQueContent voteQueContent, VoteQueUsr voteQueUsr, Date attempTime, String timeZone, String userEntry, boolean singleUserEntry)
+    public static void createIndividualOptions(HttpServletRequest request, VoteQueContent voteQueContent, VoteQueUsr voteQueUsr, Date attempTime, String timeZone, String userEntry, boolean singleUserEntry, VoteSession voteSession)
     {
-        logger.debug("doing createIndividualOptions");
+        logger.debug("doing voteSession: " + voteSession);
         logger.debug("userEntry: " + userEntry);
         logger.debug("singleUserEntry: " + singleUserEntry);
 
@@ -176,7 +177,8 @@ public class LearningUtil implements VoteAppConstants {
     	
     	if (voteQueContent != null)
     	{
-    	    VoteUsrAttempt existingVoteUsrAttempt=voteService.getAttemptsForUserAndQuestionContent(voteQueUsr.getQueUsrId(),voteQueContent.getVoteContentId());
+    	    //VoteUsrAttempt existingVoteUsrAttempt=voteService.getAttemptsForUserAndQuestionContent(voteQueUsr.getQueUsrId(),voteQueContent.getVoteContentId());
+    	    VoteUsrAttempt existingVoteUsrAttempt=voteService.getAttemptsForUserAndQuestionContentAndSession(voteQueUsr.getQueUsrId(),voteQueContent.getVoteContentId(), voteSession.getUid());
     	    logger.debug("existingVoteUsrAttempt: " + existingVoteUsrAttempt);
     	    
     	    if (existingVoteUsrAttempt != null)
@@ -191,7 +193,7 @@ public class LearningUtil implements VoteAppConstants {
     	    else
     	    {
     	        logger.debug("create new attempt");
-        	    VoteUsrAttempt voteUsrAttempt=new VoteUsrAttempt(attempTime, timeZone, voteQueContent, voteQueUsr, userEntry, singleUserEntry);
+        	    VoteUsrAttempt voteUsrAttempt=new VoteUsrAttempt(attempTime, timeZone, voteQueContent, voteQueUsr, voteSession, userEntry, singleUserEntry);
         	    logger.debug("voteUsrAttempt: " + voteUsrAttempt);
             	voteService.createVoteUsrAttempt(voteUsrAttempt);
             	logger.debug("created voteUsrAttempt in the db :" + voteUsrAttempt);    

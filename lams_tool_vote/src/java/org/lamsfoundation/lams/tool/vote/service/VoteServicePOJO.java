@@ -500,6 +500,19 @@ public class VoteServicePOJO implements
         
     }
 
+    public VoteUsrAttempt getAttemptsForUserAndQuestionContentAndSession(final Long queUsrId, final Long voteQueContentId, final Long toolSessionUid) throws VoteApplicationException
+    {
+        try
+        {
+        	return voteUsrAttemptDAO.getAttemptsForUserAndQuestionContentAndSession(queUsrId, voteQueContentId, toolSessionUid);
+        }
+        catch (DataAccessException e)
+        {
+            throw new VoteApplicationException("Exception occured when lams is updating vote UsrAttempt: "
+                                                         + e.getMessage(),
+														   e);
+        }
+    }
     
 	public void updateVoteUsrAttempt(VoteUsrAttempt voteUsrAttempt) throws VoteApplicationException
     {
@@ -515,6 +528,19 @@ public class VoteServicePOJO implements
         }
     }
 	
+	public void removeAttemptsForUserandSession(final Long queUsrId, final Long voteSessionId) throws VoteApplicationException
+	{
+    	try
+        {
+            voteUsrAttemptDAO.removeAttemptsForUserandSession(queUsrId, voteSessionId);
+        }
+        catch (DataAccessException e)
+        {
+            throw new VoteApplicationException("Exception occured when lams is removing by user and votesession id : "
+                                                         + e.getMessage(),
+														   e);
+        }
+	}
    
 	public List getAttemptsForUser(final Long queUsrId) throws VoteApplicationException
 	{

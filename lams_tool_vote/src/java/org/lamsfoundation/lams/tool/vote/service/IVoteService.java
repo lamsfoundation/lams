@@ -84,6 +84,8 @@ public interface IVoteService
     
     public VoteUsrAttempt getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long voteQueContentId) throws VoteApplicationException;
     
+    public VoteUsrAttempt getAttemptsForUserAndQuestionContentAndSession(final Long queUsrId, final Long voteQueContentId, final Long toolSessionUid) throws VoteApplicationException;
+    
     public List retrieveVoteQueContentsByToolContentId(long qaContentId) throws VoteApplicationException;
     
     public VoteQueContent retrieveVoteQueContentByUID(Long uid) throws VoteApplicationException;
@@ -111,6 +113,8 @@ public interface IVoteService
     public VoteQueUsr getVoteUserByUID(Long uid) throws VoteApplicationException;
     
     public void removeAttemptsForUser(final Long queUsrId) throws VoteApplicationException;
+    
+    public void removeAttemptsForUserandSession(final Long queUsrId, final Long voteSessionId) throws VoteApplicationException;
     
     public List getAllQuestionEntries(final Long mcContentId) throws VoteApplicationException;
     

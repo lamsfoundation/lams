@@ -100,7 +100,7 @@
 </table>
 <table alias="" name="tl_lavote11_usr_attempt" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="117" width="206" x="889" y="66"/>
+<table-figure-bounds height="137" width="241" x="889" y="66"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="">
 <column-description></column-description>
@@ -128,11 +128,24 @@
 <variant type-name-pattern="BIGINT ZEROFILL"/>
 </data-type>
 </column>
-<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="vote_que_content_id" remarks="">
+<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="vote_session_id" remarks="">
 <column-description></column-description>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
 <variant type-name-pattern="BIGINT"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="vote_nomination_content_id" remarks="">
+<column-description></column-description>
+<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
@@ -188,12 +201,19 @@
 </foreign-key-figure>
 <foreign-key-column column-name="que_usr_id" referenced-key-column-name="uid"/>
 </foreign-key>
+<foreign-key alias="" name="FK_tl_lavote11_usr_attempt_4" on-delete="" on-update="" referenced-key="PK_TL_LAVOTE11_SESSION" referenced-table="tl_lavote11_session" referenced-table-schema="lams" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="">
+<foreign-key-description></foreign-key-description>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="vote_session_id" referenced-key-column-name="uid"/>
+</foreign-key>
 <foreign-key alias="" name="FK_tl_lavote11_usr_attempt_3" on-delete="" on-update="" referenced-key="PK_TL_LAVOTE11_NOMINATION_CONTENT" referenced-table="tl_lavote11_nomination_content" referenced-table-schema="lams" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="">
 <foreign-key-description></foreign-key-description>
 <foreign-key-figure>
 <fk-fig-bendpoint-list/>
 </foreign-key-figure>
-<foreign-key-column column-name="vote_que_content_id" referenced-key-column-name="uid"/>
+<foreign-key-column column-name="vote_nomination_content_id" referenced-key-column-name="uid"/>
 </foreign-key>
 </foreign-key-list>
 <index-list/>
@@ -274,7 +294,7 @@
 </table>
 <table alias="" name="tl_lavote11_usr" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="95" width="184" x="548" y="79"/>
+<table-figure-bounds height="95" width="184" x="507" y="18"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="">
 <column-description></column-description>

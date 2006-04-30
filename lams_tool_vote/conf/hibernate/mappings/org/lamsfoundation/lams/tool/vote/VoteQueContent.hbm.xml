@@ -73,7 +73,7 @@
 	>
 
         <key>
-            <column name="vote_que_content_id" />
+            <column name="vote_nomination_content_id" />
         </key>
         <one-to-many 
             class="org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt"

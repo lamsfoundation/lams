@@ -49,6 +49,8 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 	 	
 	 	private static final String LOAD_ATTEMPT_FOR_USER_AND_QUESTION_CONTENT	 = "from voteUsrAttempt in class VoteUsrAttempt where voteUsrAttempt.queUsrId=:queUsrId and voteUsrAttempt.voteQueContentId=:voteQueContentId";
 	 	
+	 	private static final String LOAD_ATTEMPT_FOR_USER_AND_QUESTION_CONTENT_AND_SESSION	 = "from voteUsrAttempt in class VoteUsrAttempt where voteUsrAttempt.queUsrId=:queUsrId and voteUsrAttempt.voteQueContentId=:voteQueContentId and voteUsrAttempt.voteSessionId=:voteSessionId";
+	 	
 	 	private static final String LOAD_USER_ENTRIES = "select distinct voteUsrAttempt.userEntry from VoteUsrAttempt voteUsrAttempt";
 	 	
 	 	private static final String LOAD_USER_ENTRY_RECORDS = "from voteUsrAttempt in class VoteUsrAttempt where voteUsrAttempt.userEntry=:userEntry and voteUsrAttempt.voteQueContentId=1 ";
@@ -102,7 +104,29 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 			}
 	    }
 
+		public void removeAttemptsForUserandSession(final Long queUsrId, final Long voteSessionId)
+	    {
+			String strGetUser = "from voteUsrAttempt in class VoteUsrAttempt where voteUsrAttempt.queUsrId=:queUsrId and voteUsrAttempt.voteSessionId=:voteSessionId";
+	        HibernateTemplate templ = this.getHibernateTemplate();
+			List list = getSession().createQuery(strGetUser)
+				.setLong("queUsrId", queUsrId.longValue())
+				.setLong("voteSessionId", voteSessionId.longValue())				
+				.list();
+			
+			if(list != null && list.size() > 0){
+				Iterator listIterator=list.iterator();
+		    	while (listIterator.hasNext())
+		    	{
+		    	    VoteUsrAttempt attempt=(VoteUsrAttempt)listIterator.next();
+					this.getSession().setFlushMode(FlushMode.AUTO);
+		    		templ.delete(attempt);
+		    		templ.flush();
+		    	}
+			}
+	    }
 
+
+		
 		public VoteUsrAttempt getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long voteQueContentId)
 	    {
 	        HibernateTemplate templ = this.getHibernateTemplate();
@@ -119,6 +143,26 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 			return null;
 	    }
 
+
+		public VoteUsrAttempt getAttemptsForUserAndQuestionContentAndSession(final Long queUsrId, final Long voteQueContentId, final Long voteSessionId)
+	    {
+	        HibernateTemplate templ = this.getHibernateTemplate();
+	        List list = getSession().createQuery(LOAD_ATTEMPT_FOR_USER_AND_QUESTION_CONTENT_AND_SESSION)
+			.setLong("queUsrId", queUsrId.longValue())
+			.setLong("voteQueContentId", voteQueContentId.longValue())
+			.setLong("voteSessionId", voteSessionId.longValue())			
+			.list();
+	        
+	        if(list != null && list.size() > 0){
+			    VoteUsrAttempt voteA = (VoteUsrAttempt) list.get(0);
+				return voteA;
+			}
+	        
+			return null;
+	    }
+
+		
+		
 		
 		public List getAttemptsListForUserAndQuestionContent(final Long queUsrId, final Long voteQueContentId)
 	    {

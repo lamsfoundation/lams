@@ -425,17 +425,18 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
     	//VoteQueUsr voteQueUsr=LearningUtil.getUser(request);
     	logger.debug("voteQueUsr is : " + voteQueUsr);
     	
-    	logger.debug("creating attemps with mapGeneralCheckedOptionsContent " + mapGeneralCheckedOptionsContent);
     	if (existingVoteQueUsr != null)
     	{
-        	voteService.removeAttemptsForUser(existingVoteQueUsr.getUid());
-        	logger.debug("nominations deleted for user: " + voteQueUsr.getUid());
+        	//voteService.removeAttemptsForUser(existingVoteQueUsr.getUid());
+    	    logger.debug("attempt removing attempts for user id and session id:" + existingVoteQueUsr.getUid() + " " + voteSession.getUid() );
+    	    voteService.removeAttemptsForUserandSession(existingVoteQueUsr.getUid(), voteSession.getUid() );
+        	logger.debug("votes deleted for user: " + voteQueUsr.getUid());
     	}
     	
     	logger.debug("mapGeneralCheckedOptionsContent size: " + mapGeneralCheckedOptionsContent.size());
     	if (mapGeneralCheckedOptionsContent.size() > 0)
     	{
-    	    LearningUtil.createAttempt(request, voteQueUsr, mapGeneralCheckedOptionsContent, userEntry, false);    
+    	    LearningUtil.createAttempt(request, voteQueUsr, mapGeneralCheckedOptionsContent, userEntry, false, voteSession);    
     	}
     	
     	
@@ -449,7 +450,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 			if (userEntry.length() > 0)
 			{
 			    logger.debug("creating entry for: " + userEntry);
-			    LearningUtil.createAttempt(request, voteQueUsr, mapLeanerCheckedOptionsContent, userEntry, true);    
+			    LearningUtil.createAttempt(request, voteQueUsr, mapLeanerCheckedOptionsContent, userEntry, true, voteSession);    
 			}
     	}
     	if ((mapGeneralCheckedOptionsContent.size() > 0) && (userEntryAvailable == true))
@@ -462,7 +463,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 			if (userEntry.length() > 0)
 			{
 			    logger.debug("creating entry for: " + userEntry);
-			    LearningUtil.createAttempt(request, voteQueUsr, mapLeanerCheckedOptionsContent, userEntry, false);    
+			    LearningUtil.createAttempt(request, voteQueUsr, mapLeanerCheckedOptionsContent, userEntry, false, voteSession);    
 			}
     	}
 
