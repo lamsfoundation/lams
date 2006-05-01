@@ -60,7 +60,6 @@ CREATE TABLE tl_lavote11_nomination_content (
 CREATE TABLE tl_lavote11_usr_attempt (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
      , que_usr_id BIGINT(20) NOT NULL
-     , vote_session_id BIGINT(20) NOT NULL
      , vote_nomination_content_id BIGINT(20) NOT NULL
      , attempt_time DATETIME
      , time_zone VARCHAR(255)
@@ -70,9 +69,6 @@ CREATE TABLE tl_lavote11_usr_attempt (
      , INDEX (que_usr_id)
      , CONSTRAINT FK_tl_lavote11_usr_attempt_2 FOREIGN KEY (que_usr_id)
                   REFERENCES tl_lavote11_usr (uid)
-     , INDEX (vote_session_id)
-     , CONSTRAINT FK_tl_lavote11_usr_attempt_4 FOREIGN KEY (vote_session_id)
-                  REFERENCES tl_lavote11_session (uid)
      , INDEX (vote_nomination_content_id)
      , CONSTRAINT FK_tl_lavote11_usr_attempt_3 FOREIGN KEY (vote_nomination_content_id)
                   REFERENCES tl_lavote11_nomination_content (uid)
@@ -89,7 +85,6 @@ CREATE TABLE tl_lavote11_uploadedfile (
      , CONSTRAINT FK_tl_lavote11_uploadedfile_1 FOREIGN KEY (vote_content_id)
                   REFERENCES tl_lavote11_content (uid)
 )TYPE=InnoDB;
-
 
 INSERT INTO tl_lavote11_content(uid, content_id , title , instructions , creation_date , created_by , run_offline , define_later, offline_instructions, online_instructions, content_in_use, retries) VALUES (1, ${default_content_id} ,'Voting Title','Voting Instructions', NOW(), 1,0, 0, 'offline instructions','online instructions', 0, 0);
 

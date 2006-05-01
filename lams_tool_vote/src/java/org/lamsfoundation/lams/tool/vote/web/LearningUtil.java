@@ -193,7 +193,7 @@ public class LearningUtil implements VoteAppConstants {
     	    else
     	    {
     	        logger.debug("create new attempt");
-        	    VoteUsrAttempt voteUsrAttempt=new VoteUsrAttempt(attempTime, timeZone, voteQueContent, voteQueUsr, voteSession, userEntry, singleUserEntry);
+        	    VoteUsrAttempt voteUsrAttempt=new VoteUsrAttempt(attempTime, timeZone, voteQueContent, voteQueUsr, userEntry, singleUserEntry);
         	    logger.debug("voteUsrAttempt: " + voteUsrAttempt);
             	voteService.createVoteUsrAttempt(voteUsrAttempt);
             	logger.debug("created voteUsrAttempt in the db :" + voteUsrAttempt);    

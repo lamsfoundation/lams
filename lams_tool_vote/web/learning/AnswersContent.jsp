@@ -50,7 +50,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					
 					<c:if test="${VoteLearningForm.maxNominationCountReached == 'true'}"> 			
 						<tr> <td class="error">
-							<bean:message key="error.maxNominationCount.reached"/>
+							<bean:message key="error.maxNominationCount.reached"/> 
+							<c:out value="${VoteLearningForm.maxNominationCount}"/>	
+							<bean:message key="label.nominations"/>
 						</td></tr>
 					</c:if> 		
 					
@@ -165,11 +167,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		  	   		  <tr>
 					  	<td NOWRAP align=right class="input" valign=top> 
 						  	<font size=2>
-	                            <html:submit property="castVotes" 
-	                                         styleClass="linkbutton" 
-	                                         onclick="submitMethod('castVotes');">
-									<bean:message key="label.submit.vote"/>
-	                            </html:submit>
+		                            <html:submit property="continueOptionsCombined" 
+		                                         styleClass="linkbutton" 
+		                                         onclick="submitMethod('continueOptionsCombined');">
+										<bean:message key="label.submit.vote"/>
+		                            </html:submit>
 							</font>
 					  	 </td>
 					  </tr>

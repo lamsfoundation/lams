@@ -365,20 +365,72 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
         VoteUtils.cleanUpUserExceptions(request);
 		logger.debug("dispatching continueOptionsCombined...");
 		
+		
+		
+		
+		
 		VoteLearningForm voteLearningForm = (VoteLearningForm) form;
 		voteLearningForm.setRevisitingPageActive(new Boolean(false).toString());
 		voteLearningForm.setNominationsSubmited(new Boolean(false).toString());
 		voteLearningForm.setMaxNominationCountReached(new Boolean(false).toString());
+
+		Map mapGeneralCheckedOptionsContent=(Map) request.getSession().getAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT);
+    	logger.debug("mapGeneralCheckedOptionsContent: " + mapGeneralCheckedOptionsContent);
+
+    	int castVoteCount=mapGeneralCheckedOptionsContent.size();
+    	logger.debug("castVoteCount pre user entry count: " + castVoteCount);
+    	
+    	String userEntry=voteLearningForm.getUserEntry();
+    	logger.debug("userEntry: " + userEntry);
+    	
+    	if ((userEntry != null) && (userEntry.length() > 0))
+    	{
+    	    logger.debug("userEntry available: " + userEntry);
+    	    ++castVoteCount;
+    	}
+    	logger.debug("castVoteCount post user entry count: " + castVoteCount);
+    	
+
+		String maxNominationCount=voteLearningForm.getMaxNominationCount();
+    	logger.debug("maxNominationCount: " + maxNominationCount);
+    	
+    	int intMaxNominationCount=0;
+    	if (maxNominationCount != null)
+    	    intMaxNominationCount=new Integer(maxNominationCount).intValue();
+    	logger.debug("intMaxNominationCount: " + intMaxNominationCount);
+    	logger.debug("intMaxNominationCount versus current voting count: " + intMaxNominationCount + " versus " + castVoteCount );
+
+    	if (castVoteCount > intMaxNominationCount )
+    	{
+    	    voteLearningForm.setMaxNominationCountReached(new Boolean(true).toString());
+    	    persistError(request, "error.maxNominationCount.reached");
+	        logger.debug("give warning,  max nom count reached...");
+    	    logger.debug("fwd'ing to: " + LOAD_LEARNER);
+    	    return (mapping.findForward(LOAD_LEARNER));
+    	}
+
+		
+		
+		
+		
+		
+		
+		
+		
+		//VoteLearningForm voteLearningForm = (VoteLearningForm) form;
+		//voteLearningForm.setRevisitingPageActive(new Boolean(false).toString());
+		//voteLearningForm.setNominationsSubmited(new Boolean(false).toString());
+		//voteLearningForm.setMaxNominationCountReached(new Boolean(false).toString());
 		
 	 	IVoteService voteService =VoteUtils.getToolService(request);
 	 	setContentInUse(request);
-	 	Map mapGeneralCheckedOptionsContent=(Map) request.getSession().getAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT);
+	 	//Map mapGeneralCheckedOptionsContent=(Map) request.getSession().getAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT);
     	logger.debug("final mapGeneralCheckedOptionsContent: " + mapGeneralCheckedOptionsContent);
     	
     	Long toolContentId=(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
     	logger.debug("toolContentId: " + toolContentId);
     			
-    	String userEntry=voteLearningForm.getUserEntry();
+    	//String userEntry=voteLearningForm.getUserEntry();
     	logger.debug("userEntry: " + userEntry);
     	
     	boolean userEntryAvailable=false;
@@ -475,8 +527,10 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
     	logger.debug("final mapGeneralCheckedOptionsContent: " + mapGeneralCheckedOptionsContent);
     	
     	voteLearningForm.setNominationsSubmited(new Boolean(true).toString());
-    	logger.debug("fwd ing to: " + ALL_NOMINATIONS);
-    	return (mapping.findForward(ALL_NOMINATIONS));
+    	//logger.debug("fwd ing to: " + ALL_NOMINATIONS);
+    	//return (mapping.findForward(ALL_NOMINATIONS));
+    	
+    	return (mapping.findForward(INDIVIDUAL_REPORT));
     }
 
     public ActionForward redoQuestions(ActionMapping mapping,

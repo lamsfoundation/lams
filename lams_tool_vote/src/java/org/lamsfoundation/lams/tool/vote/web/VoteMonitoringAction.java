@@ -46,6 +46,7 @@ import org.lamsfoundation.lams.tool.vote.VoteMonitoredAnswersDTO;
 import org.lamsfoundation.lams.tool.vote.VoteMonitoredUserDTO;
 import org.lamsfoundation.lams.tool.vote.VoteUtils;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
+import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 import org.lamsfoundation.lams.tool.vote.service.VoteServiceProxy;
@@ -122,9 +123,29 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	{
     	logger.debug("dispatching submitSession...");
     	
+    	IVoteService voteService=null;
+		logger.debug("will retrieve voteService");
+		voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
+		logger.debug("retrieving voteService from session: " + voteService);
+
+		if (voteService == null)
+		{
+	    	voteService = (IVoteService)request.getSession().getAttribute(TOOL_SERVICE);
+			logger.debug("voteService: " + voteService);
+		}
+
+    	
     	VoteMonitoringForm voteMonitoringForm = (VoteMonitoringForm) form;
 	 	String currentMonitoredToolSession=voteMonitoringForm.getSelectedToolSessionId(); 
 	    logger.debug("currentMonitoredToolSession: " + currentMonitoredToolSession);
+	    
+		VoteSession voteSession=voteService.retrieveVoteSession(new Long(currentMonitoredToolSession));
+	    logger.debug("retrieving voteSession: " + voteSession);
+	    
+		VoteContent voteContent=voteSession.getVoteContent();
+	    logger.debug("using voteContent: " + voteContent);
+
+	    refreshSummaryData(request, voteContent, voteService, true, false, currentMonitoredToolSession, null, true);
 	    
 	    if (currentMonitoredToolSession.equals("All"))
 	    {

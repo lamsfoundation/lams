@@ -54,8 +54,6 @@ public class VoteUsrAttempt implements Serializable {
     
     private Long queUsrId;
     
-    private Long voteSessionId;
-    
     private boolean singleUserEntry;
     
     private Long voteQueContentId;
@@ -66,10 +64,7 @@ public class VoteUsrAttempt implements Serializable {
     /** persistent field */
     private org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr voteQueUsr;
 
-    /** persistent field */
-    private org.lamsfoundation.lams.tool.vote.pojos.VoteSession voteSession;
-
-
+    
     /** full constructor */
     public VoteUsrAttempt(Long attemptId, Date attemptTime, String timeZone, org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent voteQueContent, 
     		org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr voteQueUsr) {
@@ -108,19 +103,7 @@ public class VoteUsrAttempt implements Serializable {
         this.singleUserEntry=singleUserEntry;
     }
 
-    public VoteUsrAttempt(Date attemptTime, String timeZone, org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent voteQueContent, 
-    		org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr voteQueUsr, VoteSession voteSession, String userEntry, boolean singleUserEntry) {
-        this.attemptTime = attemptTime;
-        this.timeZone = timeZone;
-        this.voteQueContent = voteQueContent;
-        this.voteQueUsr = voteQueUsr;
-        this.voteSession= voteSession;
-        this.userEntry=userEntry;
-        this.singleUserEntry=singleUserEntry;
-    }
 
-    
-    
     public VoteUsrAttempt(String userEntry, Date attemptTime, String timeZone, org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent voteQueContent, 
     		org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr voteQueUsr) {
         this.userEntry=userEntry;
@@ -259,29 +242,4 @@ public class VoteUsrAttempt implements Serializable {
         this.singleUserEntry = singleUserEntry;
     }
     
-    /**
-     * @return Returns the voteSessionId.
-     */
-    public Long getVoteSessionId() {
-        return voteSessionId;
-    }
-    /**
-     * @param voteSessionId The voteSessionId to set.
-     */
-    public void setVoteSessionId(Long voteSessionId) {
-        this.voteSessionId = voteSessionId;
-    }
-    /**
-     * @return Returns the voteSession.
-     */
-    public org.lamsfoundation.lams.tool.vote.pojos.VoteSession getVoteSession() {
-        return voteSession;
-    }
-    /**
-     * @param voteSession The voteSession to set.
-     */
-    public void setVoteSession(
-            org.lamsfoundation.lams.tool.vote.pojos.VoteSession voteSession) {
-        this.voteSession = voteSession;
-    }
 }

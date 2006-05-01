@@ -66,23 +66,6 @@
                                     <bean:message key="label.retake"/>
                                 </html:submit>
 
-								<c:if test="${VoteLearningForm.revisitingUser == 'false' }"> 							
-		                            <html:submit property="continueOptionsCombined" 
-		                                         styleClass="linkbutton" 
-		                                         onclick="submitMethod('continueOptionsCombined');">
-										<bean:message key="button.submit"/>
-		                            </html:submit>
-		   						&nbsp&nbsp&nbsp&nbsp&nbsp                                	   						
-								</c:if> 		          		
-
-								<c:if test="${VoteLearningForm.voteChangable == 'true' && VoteLearningForm.lockOnFinish != 'true' && VoteLearningForm.revisitingUser == 'true' && VoteLearningForm.revisitingPageActive != 'true'}"> 	
-		                            <html:submit property="continueOptionsCombined" 
-		                                         styleClass="linkbutton" 
-		                                         onclick="submitMethod('continueOptionsCombined');">
-										<bean:message key="button.submit"/>
-		                            </html:submit>
-		   						&nbsp&nbsp&nbsp&nbsp&nbsp                                	   						
-								</c:if> 		          		
 								
                                 <html:submit property="viewAllResults" 
                                              styleClass="linkbutton" 
