@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.IVersionedNode;
+import org.lamsfoundation.lams.tool.rsrc.dto.Summary;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceAttachment;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
@@ -97,5 +98,18 @@ public interface IResourceService
 	String finishToolSession(Long toolSessionId, Long userId)  throws ResourceApplicationException;
 
 	ResourceItem getResourceItemByUid(Long itemUid);
+
+	List<Summary> getSummary(Long contentId);
+
+	List<ResourceUser> getUserListBySessionItem(Long sessionId, Long itemUid);
+
+	/**
+	 * Set a resource item visible or not.
+	 * @param itemUid
+	 * @param visible true, item is visible. False, item is invisible.
+	 */
+	void setItemVisible(Long itemUid, boolean visible);
+	
+	
 }
 

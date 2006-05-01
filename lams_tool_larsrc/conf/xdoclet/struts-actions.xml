@@ -165,3 +165,26 @@
 			<forward name="file" path="/pages/learning/addfile.jsp" />
 			<forward name="success" path="/pages/learning/success.jsp" />
 		</action>
+		
+		<!-- ========== BEGIN: Monitoring Definitions ============================== -->
+		<action path="/learning/summary"
+			type="org.lamsfoundation.lams.tool.rsrc.web.action.MonitoringAction"
+			parameter="summary" >
+			<forward name="success" path="/pages/learning/monitoring.jsp" />
+		</action>
+		<action path="/learning/listuser"
+			type="org.lamsfoundation.lams.tool.rsrc.web.action.MonitoringAction"
+			parameter="listuser" >
+			<forward name="success" path="/pages/learning/listuser.jsp" />
+		</action>
+		<action path="/learning/hideitem"
+			type="org.lamsfoundation.lams.tool.rsrc.web.action.MonitoringAction"
+			parameter="hideitem" >
+			<forward name="success" path="/pages/learning/monitoring.jsp" />
+		</action>
+		<action path="/learning/showitem"
+			type="org.lamsfoundation.lams.tool.rsrc.web.action.MonitoringAction"
+			parameter="showitem" >
+			<forward name="success" path="/pages/learning/monitoring.jsp" />
+		</action>
+				

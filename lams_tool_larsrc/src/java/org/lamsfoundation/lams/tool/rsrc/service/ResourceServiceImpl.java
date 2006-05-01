@@ -63,6 +63,7 @@ import org.lamsfoundation.lams.tool.rsrc.dao.ResourceItemDAO;
 import org.lamsfoundation.lams.tool.rsrc.dao.ResourceItemVisitDAO;
 import org.lamsfoundation.lams.tool.rsrc.dao.ResourceSessionDAO;
 import org.lamsfoundation.lams.tool.rsrc.dao.ResourceUserDAO;
+import org.lamsfoundation.lams.tool.rsrc.dto.Summary;
 import org.lamsfoundation.lams.tool.rsrc.ims.IContentPackageConverter;
 import org.lamsfoundation.lams.tool.rsrc.ims.IMSManifestException;
 import org.lamsfoundation.lams.tool.rsrc.ims.ImscpApplicationException;
@@ -113,7 +114,7 @@ public class ResourceServiceImpl implements
 	
 	
 	//*******************************************************************************
-	// Private method
+	// Service method
 	//*******************************************************************************
 	/** Try to get the file. If forceLogin = false and an access denied exception occurs, call this method
 	 * again to get a new ticket and retry file lookup. If forceLogin = true and it then fails 
@@ -389,7 +390,24 @@ public class ResourceServiceImpl implements
 	public ResourceItem getResourceItemByUid(Long itemUid) {
 		return resourceItemDao.getByUid(itemUid);
 	}
+	public List<Summary> getSummary(Long contentId) {
+		return resourceItemVisitDao.getSummary(contentId);
+	}
 
+	public List<ResourceUser> getUserListBySessionItem(Long sessionId, Long itemUid) {
+		List<ResourceItemVisitLog> logList = resourceItemVisitDao.getResourceItemLogBySession(sessionId,itemUid);
+		List<ResourceUser> userList = new ArrayList(logList.size());
+		for(ResourceItemVisitLog visit : logList){
+			userList.add(visit.getUser());
+		}
+		return userList;
+	}
+
+	public void setItemVisible(Long itemUid, boolean visible) {
+		ResourceItem item = resourceItemDao.getByUid(itemUid);
+		item.setHide(!visible);
+		resourceItemDao.saveObject(item);
+	}
 
 
 	//*****************************************************************************
@@ -696,6 +714,7 @@ public class ResourceServiceImpl implements
 	public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException {
 		resourceSessionDao.deleteBySessionId(toolSessionId);
 	}
+
 
 
 }

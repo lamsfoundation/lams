@@ -62,6 +62,9 @@ public class ResourceConstants {
 	public static final String ATTR_RUN_AUTO = "runAuto";
 	public static final String ATTR_RESOURCE_ITEM_UID = "itemUid";
 	public static final String ATTR_NEXT_ACTIVITY_URL = "nextActivityUrl";
+	public static final String ATTR_SUMMARY_LIST = "summaryList";
+	public static final String ATTR_USER_LIST = "userList";
+	
 	//error message keys
 	public static final String ERROR_MSG_TITLE_BLANK = "error.resource.item.title.blank";
 	public static final String ERROR_MSG_URL_BLANK = "error.resource.item.url.blank";
