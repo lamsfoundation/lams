@@ -25,11 +25,13 @@ import org.lamsfoundation.lams.monitoring.mv.*;
 import org.lamsfoundation.lams.common.Sequence;
 import org.lamsfoundation.lams.common.util.Observable;
 import org.lamsfoundation.lams.common.util.*;
-
+import org.lamsfoundation.lams.monitoring.Application;
+import mx.events.*
 /*
 * Model for the Monitoring Tabs 
 */
-class MonitorModel extends Observable{
+class org.lamsfoundation.lams.monitoring.mv.MonitorModel extends Observable{
+	
 	private var _className:String = "MonitorModel";
    
 	private var __width:Number;
@@ -49,30 +51,75 @@ class MonitorModel extends Observable{
 	// state data
 	private var _showLearners:Boolean;
 	
+	//These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
+    private var dispatchEvent:Function;     
+    public var addEventListener:Function;
+    public var removeEventListener:Function;
 	/**
 	* Constructor.
 	*/
 	public function MonitorModel (monitor:Monitor){
+		
+		//Set up this class to use the Flash event delegation model
+       //EventDispatcher.initialize(this);
+
 		_monitor = monitor;
 		_showLearners = true;
 	}
 	
-	// add get/set methods
-	
-	public function setSequence(activeSeq:Sequence){
-		_activeSeq = activeSeq;
+	public function setSize(width:Number,height:Number) {
+		__width = width;
+		__height = height;
 		
 		setChanged();
 		
 		//send an update
 		infoObj = {};
-		infoObj.updateType = "SEQUENCE";
+		infoObj.updateType = "SIZE";
 		notifyObservers(infoObj);
-	}
+		//broadcastViewUpdate("SIZE");
+    }
 	
-	public function getSequence():Sequence{
-		return _activeSeq;
-	}
+	/**
+	* Used by View to get the size
+	* @returns Object containing width(w) & height(h).  obj.w & obj.h
+	*/
+	public function getSize():Object{
+		var s:Object = {};
+		s.w = __width;
+		s.h = __height;
+		return s;
+	}  
+	
+	/**
+    * sets the model x + y vars
+	*/
+	public function setPosition(x:Number,y:Number){
+        
+		__x = x;
+		__y = y;
+        //Set flag for notify observers
+		setChanged();
+        
+		//build and send update object
+		infoObj = {};
+		infoObj.updateType = "POSITION";
+		notifyObservers(infoObj);
+		//broadcastViewUpdate("POSITION");
+	}  
+
+	/**
+	* Used by View to get the size
+	* @returns Object containing width(w) & height(h).  obj.w & obj.h
+	*/
+	public function getPosition():Object{
+		var p:Object = {};
+		p.x = __x;
+		p.y = __y;
+		return p;
+	}  
+	
+	
 	/**
 	public function setClass(class:Class){
 		_class = class;
@@ -106,6 +153,23 @@ class MonitorModel extends Observable{
 	
 	*/
 	
+	// add get/set methods
+	
+	public function setSequence(activeSeq:Sequence){
+		_activeSeq = activeSeq;
+		
+		setChanged();
+		
+		//send an update
+		infoObj = {};
+		infoObj.updateType = "SEQUENCE";
+		notifyObservers(infoObj);
+	}
+	
+	public function getSequence():Sequence{
+		return _activeSeq;
+	}
+	
 	public function showLearners(){
 		_showLearners = true;
 		
@@ -132,55 +196,14 @@ class MonitorModel extends Observable{
 		return _showLearners;
 	}
 	
-	public function setSize(width:Number,height:Number) {
-		__width = width;
-		__height = height;
-		
-		setChanged();
-		
-		//send an update
-		infoObj = {};
-		infoObj.updateType = "SIZE";
-		notifyObservers(infoObj);
+	
+	/**
+    * Notify registered listeners that a data model change has happened
+    */
+    public function broadcastViewUpdate(_updateType,_data){
+        dispatchEvent({type:'viewUpdate',target:this,updateType:_updateType,data:_data});
+        trace('broadcast');
     }
-	
-	/**
-	* Used by View to get the size
-	* @returns Object containing width(w) & height(h).  obj.w & obj.h
-	*/
-	public function getSize():Object{
-		var s:Object = {};
-		s.w = __width;
-		s.h = __height;
-		return s;
-	}  
-	
-	/**
-    * sets the model x + y vars
-	*/
-	public function setPosition(x:Number,y:Number):Void{
-        //Set state variables
-		__x = x;
-		__y = y;
-        //Set flag for notify observers
-		setChanged();
-        
-		//build and send update object
-		infoObj = {};
-		infoObj.updateType = "POSITION";
-		notifyObservers(infoObj);
-	}  
-
-	/**
-	* Used by View to get the size
-	* @returns Object containing width(w) & height(h).  obj.w & obj.h
-	*/
-	public function getPosition():Object{
-		var p:Object = {};
-		p.x = x;
-		p.y = y;
-		return p;
-	}  
 	
 	//Accessors for x + y coordinates
     public function get x():Number{
@@ -207,5 +230,6 @@ class MonitorModel extends Observable{
 	public function getMonitor():Monitor{
 		return _monitor;
 	}
+	
 	
 }
