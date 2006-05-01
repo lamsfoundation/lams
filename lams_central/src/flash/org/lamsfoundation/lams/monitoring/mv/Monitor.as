@@ -23,6 +23,7 @@
 import org.lamsfoundation.lams.monitoring.Application;
 import org.lamsfoundation.lams.monitoring.mv.*;
 import org.lamsfoundation.lams.common.ui.*
+import org.lamsfoundation.lams.common.util.*;
 import org.lamsfoundation.lams.common.dict.*
 import org.lamsfoundation.lams.common.* 
 
@@ -30,7 +31,7 @@ import mx.utils.*
 import mx.managers.*;
 import mx.events.*;
 
-class Monitor {
+class org.lamsfoundation.lams.monitoring.mv.Monitor {
 	//Constants
 	public static var USE_PROPERTY_INSPECTOR = true;
 	
@@ -58,8 +59,8 @@ class Monitor {
 	 * @usage   
 	 * @return  target_mc		//Target clip for attaching view
 	 */
-	public function Monitor(target_mc:MovieClip, x:Number, y:Number,w:Number,h:Number){
-		EventDispatcher.initialize(this);
+	public function Monitor(target_mc:MovieClip,depth:Number,x:Number,y:Number,w:Number,h:Number){
+		mx.events.EventDispatcher.initialize(this);
 		
 		//Create the model
 		monitorModel = new MonitorModel(this);
@@ -71,10 +72,11 @@ class Monitor {
 		trace(monitorView_mc);
 		
 		monitorView = MonitorView(monitorView_mc);
+		
 		monitorView.init(monitorModel,undefined,x,y,w,h);
        
-        monitorView_mc.addEventListener('load',Proxy.create(this,viewLoaded));
-        _dictionary.addEventListener('init',Proxy.create(this,setupPI));
+        monitorView.addEventListener('load',Proxy.create(this,viewLoaded));
+       //dictionary.addEventListener('init',Proxy.create(this,setupPI));
 		
 		//Register view with model to receive update events
 		monitorModel.addObserver(monitorView);
@@ -84,7 +86,7 @@ class Monitor {
 		monitorModel.setSize(w,h);
 
 		//Get reference to application and design data model
-		app = Application.getInstance();
+		//app = Application.getInstance();
 		
 		
 	}
@@ -107,53 +109,7 @@ class Monitor {
         }
     }
 	
-	/**
-	 * Event dispatcher to setup Property inspector once dictionary items are loaded.
-	 * 
-	 * @usage   
-	 * @return  
-	 */
-	public function setupPI(){
-		if(USE_PROPERTY_INSPECTOR){
-			initPropertyInspector();
-		}
-	}
-
-	/**
-	 * Initialises the property inspector
-	 * @usage   
-	 */
-	public function initPropertyInspector():Void{
-		//note the init obnject parameters are passed into the _container object in the embeded class (*in this case PropertyInspector)
-		//we are setting up a view so we need to pass the model and controller to it
-		
-		var mm:MonitorController = monitorView.getController();
-		_pi = PopUpManager.createPopUp(Application.root, LFWindow, false,{title:Dictionary.getValue('property_inspector_title'),closeButton:true,scrollContentPath:"PropertyInspector",_monitorModel:monitorModel,_monitorController:mm});
-		
-		//Assign dialog load handler
-        _pi.addEventListener('contentLoaded',Delegate.create(this,piLoaded));
-        //okClickedCallback = callBack;
-    }
 	
-	/**
-	 * Fired whern property inspector's contentLoaded is fired
-	 * Positions the PI
-	 * @usage   
-	 * @param   evt 
-	 * @return  
-	 */
-	public function piLoaded(evt:Object) {
-        if(evt.type == 'contentLoaded'){
-			//call a resize to line up the PI
-			Application.getInstance().onResize();
-			
-           
-        }else {
-            //TODO raise wrong event type error 
-        }
-		
-	}
-
 	/**
 	* Used by application to set the size
 	* @param width The desired width

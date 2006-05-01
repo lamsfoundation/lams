@@ -24,15 +24,14 @@
 import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.common.ui.*
 import org.lamsfoundation.lams.common.style.*
-import org.lamsfoundation.lams.authoring.cv.*
-import org.lamsfoundation.lams.authoring.*
+import org.lamsfoundation.lams.monitoring.mv.*
+import org.lamsfoundation.lams.monitoring.*;
 import org.lamsfoundation.lams.common.dict.*
 import org.lamsfoundation.lams.common.mvc.*
 import mx.managers.*
 import mx.containers.*;
 import mx.events.*
 import mx.utils.*
-import mx.events.ItemClickEvent;
 import mx.controls.TabBar;
 
 
@@ -52,9 +51,9 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 	
 	//Canvas clip
 	private var _monitor_mc:MovieClip;
-	private var monitor_scp:ScrollPane;
-	private var monitorTabs_tb:TabBar;
-    private var bkg_pnl:Panel;
+	private var monitor_scp:MovieClip;
+	private var monitorTabs_tb:MovieClip;
+    private var bkg_pnl:MovieClip;
 	//private var act_pnl:Panel;
 	
     private var _gridLayer_mc:MovieClip;
@@ -95,7 +94,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 		V_GAP = 10;
         //setupCM();
 	   //register to recive updates form the model
-		MonitorModel(m).addEventListener('viewUpdate',this);
+		//MonitorModel(m).addEventListener('update',this);
         
 		MovieClipUtils.doLater(Proxy.create(this,draw)); 
     }    
@@ -105,21 +104,19 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
  * @usage   
  * @param   event
  */
-public function viewUpdate(event:Object):Void{
-		Debugger.log('Recived an Event dispather UPDATE!, updateType:'+event.updateType+', target'+event.target,4,'viewUpdate','CanvasView');
-		 //Update view from info object
-        //Debugger.log('Recived an UPDATE!, updateType:'+infoObj.updateType,4,'update','CanvasView');
-       var cm:CanvasModel = event.target;
+public function update (o:Observable,infoObj:Object):Void{
+		
+       var mm:MonitorModel = MonitorModel(o);
 	   
-	   switch (event.updateType){
+	   switch (infoObj.updateType){
             case 'POSITION' :
-                setPosition(cm);
+				setPosition(mm);
                 break;
             case 'SIZE' :
-                setSize(cm);
+			    setSize(mm);
                 break;
             default :
-                Debugger.log('unknown update type :' + event.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.CanvasView');
+                Debugger.log('unknown update type :' + infoObj.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.CanvasView');
 		}
 
 	}
@@ -133,22 +130,21 @@ public function viewUpdate(event:Object):Void{
 		//Debugger.log('_canvas_mc'+_canvas_mc,Debugger.GEN,'draw','CanvasView');
 		
     
-		var tab_arr:Array = [{label:"Lesson", data:"lesson"}, {label:"Monitor", data:"monitor"}, {label:"Learners", data:"learners"}, {label:"Todo", data:"todo"}];
-		
-		monitorTabs_tb.dataProvider = tab_arr;
-		monitorTabs_tb.selectedIndex = 0;
-		
-		monitorTabs_tb.addEventListener("change", Delegate.create(this,clickEvt));
-		
 		bkg_pnl = _monitor_mc.createClassObject(Panel, "bkg_pnl", getNextHighestDepth());
 
 		//set up the 
 		//_canvas_mc = this;
 		_gridLayer_mc = _monitor_mc.createEmptyMovieClip("_gridLayer_mc", _monitor_mc.getNextHighestDepth());
 		
-		bkg_pnl.useHandCursor = false;
+		//bkg_pnl.useHandCursor = false;
+		var tab_arr:Array = [{label:"Lesson", data:"lesson"}, {label:"Monitor", data:"monitor"}, {label:"Learners", data:"learners"}, {label:"Todo", data:"todo"}];
 		
+		monitorTabs_tb.dataProvider = tab_arr;
+		monitorTabs_tb.selectedIndex = 0;
+		
+		monitorTabs_tb.addEventListener("change", Delegate.create(this,clickEvt));
 		//setStyles();
+		
 	    dispatchEvent({type:'load',target:this});
 	}
 	
@@ -159,7 +155,7 @@ public function viewUpdate(event:Object):Void{
 	 * @param   evt 
 	 * @return  
 	 */
-	private function clickEvt(evt:ItemClickEvent):Void{
+	private function clickEvt(evt):Void{
 		   trace(evt.target);
 		   trace("test: "+ String(evt.target.selectedIndex))
 					//forClick.text="label is: " + evt.itemIndex.label + " index is: " + evt.index + " capital is: " +               targetComp.dataProvider[evt.index].data;
@@ -169,11 +165,33 @@ public function viewUpdate(event:Object):Void{
     */
 	private function setSize(mm:MonitorModel):Void{
         var s:Object = mm.getSize();
+		trace("Monitor Tab Widtht: "+s.w+" Monitor Tab Height: "+s.h);
 		monitor_scp.setSize(s.w,s.h);
 		bkg_pnl.setSize(s.w,s.h);
-
-		//Create the grid.  The gris is re-drawn each time the canvas is resized.
+		//Create the grid.  The grid is re-drawn each time the canvas is resized.
 		var grid_mc = Grid.drawGrid(_gridLayer_mc,Math.round(s.w),Math.round(s.h),V_GAP,H_GAP);
 				
+	}
+	
+	 /**
+    * Sets the position of the canvas on stage, called from update
+    * @param cm Canvas model object 
+    */
+	private function setPosition(mm:MonitorModel):Void{
+        var p:Object = mm.getPosition();
+		trace("X pos set in Model is: "+p.x+" and Y pos set in Model is "+p.y)
+        this._x = p.x;
+        this._y = p.y;
+	}
+	
+	
+	/**
+	 * Overrides method in abstract view to ensure cortect type of controller is returned
+	 * @usage   
+	 * @return  CanvasController
+	 */
+	public function getController():MonitorController{
+		var c:Controller = super.getController();
+		return MonitorController(c);
 	}
 }
