@@ -21,17 +21,16 @@
  * ************************************************************************
  */
 
+import org.lamsfoundation.lams.monitoring.*;
 import org.lamsfoundation.lams.monitoring.mv.*;
 import org.lamsfoundation.lams.common.Sequence;
 import org.lamsfoundation.lams.common.util.Observable;
 import org.lamsfoundation.lams.common.util.*;
-import org.lamsfoundation.lams.monitoring.Application;
-import mx.events.*
+
 /*
 * Model for the Monitoring Tabs 
 */
-class org.lamsfoundation.lams.monitoring.mv.MonitorModel extends Observable{
-	
+class MonitorModel extends Observable{
 	private var _className:String = "MonitorModel";
    
 	private var __width:Number;
@@ -45,113 +44,18 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorModel extends Observable{
 	
 	// add model data
 	private var _activeSeq:Sequence;
-	//private var _class:Class;	// session class
-	//private var _todos:Array;  // Array of ToDo ContributeActivities
-	
+	private var _org:Organisation;
+	private var _todos:Array;  // Array of ToDo ContributeActivity(s)
 	// state data
 	private var _showLearners:Boolean;
 	
-	//These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
-    private var dispatchEvent:Function;     
-    public var addEventListener:Function;
-    public var removeEventListener:Function;
 	/**
 	* Constructor.
 	*/
 	public function MonitorModel (monitor:Monitor){
-		
-		//Set up this class to use the Flash event delegation model
-       //EventDispatcher.initialize(this);
-
 		_monitor = monitor;
 		_showLearners = true;
 	}
-	
-	public function setSize(width:Number,height:Number) {
-		__width = width;
-		__height = height;
-		
-		setChanged();
-		
-		//send an update
-		infoObj = {};
-		infoObj.updateType = "SIZE";
-		notifyObservers(infoObj);
-		//broadcastViewUpdate("SIZE");
-    }
-	
-	/**
-	* Used by View to get the size
-	* @returns Object containing width(w) & height(h).  obj.w & obj.h
-	*/
-	public function getSize():Object{
-		var s:Object = {};
-		s.w = __width;
-		s.h = __height;
-		return s;
-	}  
-	
-	/**
-    * sets the model x + y vars
-	*/
-	public function setPosition(x:Number,y:Number){
-        
-		__x = x;
-		__y = y;
-        //Set flag for notify observers
-		setChanged();
-        
-		//build and send update object
-		infoObj = {};
-		infoObj.updateType = "POSITION";
-		notifyObservers(infoObj);
-		//broadcastViewUpdate("POSITION");
-	}  
-
-	/**
-	* Used by View to get the size
-	* @returns Object containing width(w) & height(h).  obj.w & obj.h
-	*/
-	public function getPosition():Object{
-		var p:Object = {};
-		p.x = __x;
-		p.y = __y;
-		return p;
-	}  
-	
-	
-	/**
-	public function setClass(class:Class){
-		_class = class;
-		
-		setChanged();
-		
-		//send an update
-		infoObj = {};
-		infoObj.updateType = "CLASS";
-		notifyObservers(infoObj);
-	}
-	
-	public function getClass():Class{
-		return _class;
-	}
-	
-	public function setToDos(todos:Array){
-		_todos = todos;
-		
-		setChanged();
-		
-		//send an update
-		infoObj = {};
-		infoObj.updateType = "TODOS";
-		notifyObservers(infoObj);
-	}
-	
-	public function getToDos():Array{
-		return _todos;
-	}
-	
-	*/
 	
 	// add get/set methods
 	
@@ -168,6 +72,46 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorModel extends Observable{
 	
 	public function getSequence():Sequence{
 		return _activeSeq;
+	}
+	
+	public function setOrganisation(org:Organisation){
+		_org = org;
+		
+		setChanged();
+		
+		//send an update
+		infoObj = {};
+		infoObj.updateType = "ORG";
+		notifyObservers(infoObj);
+	}
+	
+	public function getOrganisation():Organisation{
+		return _org;
+	}
+	
+	
+	
+	public function setToDos(todos:Array){
+		
+		_todos = new Array();
+		
+		for(var i=0; i< todos.length; i++){
+			var t:Object = todos[i];
+			var todo:ContributeActivity = new ContributeActivity();
+			todo.populateFromDTO(t);
+			_todos.push(todo);
+		}
+		
+		setChanged();
+		
+		//send an update
+		infoObj = {};
+		infoObj.updateType = "TODOS";
+		notifyObservers(infoObj);
+	}
+	
+	public function getToDos():Array{
+		return _todos;
 	}
 	
 	public function showLearners(){
@@ -196,14 +140,55 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorModel extends Observable{
 		return _showLearners;
 	}
 	
+	public function setSize(width:Number,height:Number) {
+		__width = width;
+		__height = height;
+		
+		setChanged();
+		
+		//send an update
+		infoObj = {};
+		infoObj.updateType = "SIZE";
+		notifyObservers(infoObj);
+    }
 	
 	/**
-    * Notify registered listeners that a data model change has happened
-    */
-    public function broadcastViewUpdate(_updateType,_data){
-        dispatchEvent({type:'viewUpdate',target:this,updateType:_updateType,data:_data});
-        trace('broadcast');
-    }
+	* Used by View to get the size
+	* @returns Object containing width(w) & height(h).  obj.w & obj.h
+	*/
+	public function getSize():Object{
+		var s:Object = {};
+		s.w = __width;
+		s.h = __height;
+		return s;
+	}  
+	
+	/**
+    * sets the model x + y vars
+	*/
+	public function setPosition(x:Number,y:Number):Void{
+        //Set state variables
+		__x = x;
+		__y = y;
+        //Set flag for notify observers
+		setChanged();
+        
+		//build and send update object
+		infoObj = {};
+		infoObj.updateType = "POSITION";
+		notifyObservers(infoObj);
+	}  
+
+	/**
+	* Used by View to get the size
+	* @returns Object containing width(w) & height(h).  obj.w & obj.h
+	*/
+	public function getPosition():Object{
+		var p:Object = {};
+		p.x = __x;
+		p.y = __y;
+		return p;
+	}  
 	
 	//Accessors for x + y coordinates
     public function get x():Number{
@@ -230,6 +215,5 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorModel extends Observable{
 	public function getMonitor():Monitor{
 		return _monitor;
 	}
-	
 	
 }
