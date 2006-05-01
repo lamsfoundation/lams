@@ -213,7 +213,9 @@ class Library {
 	} 
 	
 	private function closeSequence(pkt:Object){
-		trace('receiving message back from server...');
+		trace('receiving message back from server after exiting lesson...');
+		trace('loading exit page... ' + String(pkt));
+		getURL('http://localhost:8080/lams/learning' + String(pkt), 'contentFrame');
 		
 		// stop current sequence
 		
