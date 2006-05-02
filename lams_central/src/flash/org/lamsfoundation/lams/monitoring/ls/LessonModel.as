@@ -102,11 +102,13 @@ class org.lamsfoundation.lams.monitoring.ls.LessonModel extends Observable {
 	 * @usage   
 	 * @param   lessonID
 	 * @return  
-	 
-	public function getLearningSequence(lessonID:Number):Object{
-		return _learningSequences.get(lessonID);
+	 */
+	public function getLessonSequence(lessonID:Number):Object{
+		return _lessonSequences.get(lessonID);
 	}
+	//}
 	
+	/**
 	public function getNewSequences():Array{
 		if(_learningSequences==null){
 			return null;
