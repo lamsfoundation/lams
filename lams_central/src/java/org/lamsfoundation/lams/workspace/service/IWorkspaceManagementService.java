@@ -318,10 +318,10 @@ public interface IWorkspaceManagementService {
 	 * Retrieves the list of organisations in which the user has the specified role.
 	 * in WDDX format
 	 * @param userID
-	 * @param role
+	 * @param roles
 	 * @return
 	 */
-	public String getOrganisationsByUserRole(Integer userID, String role) throws IOException;
+	public String getOrganisationsByUserRole(Integer userID, String[] roles) throws IOException;
 	
 	/**
 	 * Returns the users within the Organisation with <code>organisationID</code>

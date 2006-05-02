@@ -31,6 +31,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.HashSet;
 import java.util.SortedSet;
 import java.util.Vector;
 
@@ -1399,20 +1400,25 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	/**
 	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#getOrganisationsByUserRole(Integer, String)
 	 */
-	public String getOrganisationsByUserRole(Integer userID, String role) throws IOException
+	public String getOrganisationsByUserRole(Integer userID, String[] roles) throws IOException
 	{
 		User user = userDAO.getUserById(userID);
-		Vector<OrganisationDTO> organisations = new Vector<OrganisationDTO>();
+		Set organisations = new HashSet();
+			
 		if (user!=null) {
-			
-			Iterator iterator = userMgmtService.getOrganisationsForUserByRole(user, role).iterator();
-			
-			while (iterator.hasNext()) {
-				Organisation organisation = (Organisation) iterator.next();
-				organisations.add(organisation.getOrganisationDTO());
+			for(int i=0; i<roles.length; i++) {
+				Iterator iterator = userMgmtService.getOrganisationsForUserByRole(user, roles[i]).iterator();
+				
+				while (iterator.hasNext()) {
+					Organisation organisation = (Organisation) iterator.next();
+					organisations.add(organisation.getOrganisationDTO());
+				}
 			}
+			
+			Vector<OrganisationDTO> orgs = new Vector<OrganisationDTO>(organisations);
+			
 			flashMessage = new FlashMessage(
-					MSG_KEY_ORG_BY_ROLE, organisations);
+					MSG_KEY_ORG_BY_ROLE, orgs);
 		} else
 			flashMessage = FlashMessage.getNoSuchUserExists(
 					MSG_KEY_ORG_BY_ROLE, userID);
@@ -1424,9 +1430,9 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	/** 
 	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#getUsersFromOrganisationByRole(Integer, String)
 	 */
-	public String getUsersFromOrganisationByRole(Integer organisationID, String role) throws IOException
+	public String getUsersFromOrganisationByRole(Integer organisationID, String roleName) throws IOException
 	{
-		return userMgmtService.getUsersFromOrganisationByRole(organisationID, role);
+		return userMgmtService.getUsersFromOrganisationByRole(organisationID, roleName);
 	}
 	
 	
