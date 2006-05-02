@@ -59,6 +59,7 @@ public class WorkspaceAction extends DispatchAction {
 	
 	public static final String RESOURCE_ID = "resourceID";
 	public static final String RESOURCE_TYPE = "resourceType";
+	public static final String ROLE_DELIMITER = ",";
 	
 	/** 
 	 * Special value for folderID on getFolderContents(). Triggers getting the 
@@ -502,13 +503,14 @@ public class WorkspaceAction extends DispatchAction {
 			  HttpServletRequest request,
 			  HttpServletResponse response)throws Exception{
 		Integer userID = new Integer(WebUtil.readIntParam(request,AttributeNames.PARAM_USER_ID));
-		String role = WebUtil.readStrParam(request, "role");
+		String roles_str = WebUtil.readStrParam(request, "roles");
+		String[] roles = roles_str.split(ROLE_DELIMITER);
 		String wddxPacket = null;
 		try {
 			IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
-			wddxPacket = workspaceManagementService.getOrganisationsByUserRole(userID, role);		
+			wddxPacket = workspaceManagementService.getOrganisationsByUserRole(userID, roles);		
 		} catch (Exception e) {
-			log.error("getOrganisationsByUserRole: Exception occured. userID "+userID+" role "+role, e);
+			log.error("getOrganisationsByUserRole: Exception occured. userID "+userID+" role "+roles.toString(), e);
 			FlashMessage flashMessage = FlashMessage.getExceptionOccured(IWorkspaceManagementService.MSG_KEY_ORG_BY_ROLE, e.getMessage());
 			wddxPacket = flashMessage.serializeMessage();
 		}
@@ -521,6 +523,7 @@ public class WorkspaceAction extends DispatchAction {
 			  HttpServletResponse response)throws Exception{
 		Integer organisationID = new Integer(WebUtil.readIntParam(request,"organisationID"));
 		String role = WebUtil.readStrParam(request, "role");
+
 		String wddxPacket = null;
 		try {
 			IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
