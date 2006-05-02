@@ -22,6 +22,7 @@
  */
 import org.lamsfoundation.lams.monitoring.Application;
 import org.lamsfoundation.lams.monitoring.mv.*;
+import org.lamsfoundation.lams.monitoring.mv.tabviews.*;
 import org.lamsfoundation.lams.common.ui.*
 import org.lamsfoundation.lams.common.util.*;
 import org.lamsfoundation.lams.common.dict.*
@@ -42,7 +43,9 @@ class org.lamsfoundation.lams.monitoring.mv.Monitor {
 	private var monitorModel:MonitorModel;
 	// View
 	private var monitorView:MonitorView;
+	private var lessonTabView:LessonTabView;
 	private var monitorView_mc:MovieClip;
+	private var lessonTabView_mc:MovieClip;
 
 	private var app:Application;
 	private var _dictionary:Dictionary;
@@ -69,17 +72,26 @@ class org.lamsfoundation.lams.monitoring.mv.Monitor {
 
 		//Create the view
 		monitorView_mc = target_mc.createChildAtDepth("monitorView",DepthManager.kTop);	
+		
 		trace(monitorView_mc);
 		
 		monitorView = MonitorView(monitorView_mc);
 		
+		
 		monitorView.init(monitorModel,undefined,x,y,w,h);
-       
+		
         monitorView.addEventListener('load',Proxy.create(this,viewLoaded));
+		//lessonTabView_mc = monitorView_mc.
+		lessonTabView = LessonTabView(lessonTabView_mc);
+		lessonTabView.init(monitorModel,undefined);
        //dictionary.addEventListener('init',Proxy.create(this,setupPI));
 		
 		//Register view with model to receive update events
 		monitorModel.addObserver(monitorView);
+		monitorModel.addObserver(lessonTabView);
+		//monitorModel.addObserver(monitorView);
+		//monitorModel.addObserver(monitorView);
+		//monitorModel.addObserver(monitorView);
 
         //Set the position by setting the model which will call update on the view
         monitorModel.setPosition(x,y);
@@ -145,4 +157,10 @@ class org.lamsfoundation.lams.monitoring.mv.Monitor {
     function get className():String { 
         return _className;
     }
+	public function getMM():MonitorModel{
+		return monitorModel;
+	}
+	public function getMV():MonitorView{
+		return monitorView;
+	}
 }
