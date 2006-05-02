@@ -64,6 +64,7 @@ String pathToShare = protocol+request.getServerName()+":"+request.getServerPort(
 						<H1><fmt:message key="message.activity.loading" /></H1>
 					</td>
 				</tr>
+				<!-- Tool summary is <c:out value="${activityForm.progressSummary}" escapeXml="false" /> -->
 			</table>
 		</div>
 			
