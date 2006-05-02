@@ -134,7 +134,7 @@ public function update (o:Observable,infoObj:Object):Void{
 				trace('DATE_TIME');
                 break;
 			case 'SEQUENCE' :
-				trace("TabID for Selected tab is: "+infoObj.tabID)
+				trace("TabID for Selected tab is (LessonTab): "+infoObj.tabID)
 				if (infoObj.tabID == _tabID){
 					MovieClipUtils.doLater(Proxy.create(this,draw));
 				}
