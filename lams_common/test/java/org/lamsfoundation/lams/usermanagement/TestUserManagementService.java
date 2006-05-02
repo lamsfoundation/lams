@@ -80,13 +80,11 @@ public class TestUserManagementService extends AbstractCommonTestCase {
 		user.setAuthenticationMethod(authenticationMethodDAO.getAuthenticationMethodById(new Integer(2)));
 		user.setBaseOrganisation(organisationDAO.getOrganisationById(new Integer(1)));		
 		assertNotNull(userManagementService.saveUser(user, new Integer(3)));		
-	}	
-	public void testGetOrganisationsForUserByRole()throws IOException{
-		String packet = userManagementService.getWDDXForOrganisationsForUserByRole(new Integer(4),"AUTHOR");
-		System.out.println(packet);
 	}
+	/**
 	public void testGetUsersFromOrganisationByRole() throws IOException{
 		String packet = userManagementService.getUsersFromOrganisationByRole(new Integer(4),"AUTHOR");
 		System.out.println(packet);
 	}
+	*/
 }
