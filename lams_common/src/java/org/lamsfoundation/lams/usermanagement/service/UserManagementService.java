@@ -554,29 +554,6 @@ public class UserManagementService implements IUserManagementService {
 	public void setLearningDesignDAO(ILearningDesignDAO learningDesignDAO) {
 		this.learningDesignDAO = learningDesignDAO;
 	}
-	/**
-	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getWDDXForOrganisationsForUserByRole(java.lang.Integer,
-	 *      java.lang.String)
-	 */
-	public String getWDDXForOrganisationsForUserByRole(Integer userID,
-			String roleName) throws IOException {
-		User user = userDAO.getUserById(userID);
-		Vector<OrganisationDTO> organisations = new Vector<OrganisationDTO>();
-		if (user != null) {
-			Iterator iterator = getOrganisationsForUserByRole(user, roleName)
-					.iterator();
-			while (iterator.hasNext()) {
-				Organisation organisation = (Organisation) iterator.next();
-				organisations.add(organisation.getOrganisationDTO());
-			}
-			flashMessage = new FlashMessage(
-					"getWDDXForOrganisationsForUserByRole", organisations);
-		} else
-			flashMessage = FlashMessage.getNoSuchUserExists(
-					"getWDDXForOrganisationsForUserByRole", userID);
-
-		return flashMessage.serializeMessage();
-	}
 
 	/**
 	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getUsersFromOrganisationByRole(java.lang.Integer,

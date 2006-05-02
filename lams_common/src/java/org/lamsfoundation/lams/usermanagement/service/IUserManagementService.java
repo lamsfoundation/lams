@@ -360,19 +360,6 @@ public interface IUserManagementService {
 	public WorkspaceFolder createWorkspaceFolder(Workspace workspace,Integer userID, Integer workspaceFolderType);		
 	
 	/**
-	 * This method returns the same information as
-     * in above method 
-     * <code>getOrganisationsForUserByRole(User user, String roleName)</code>
-     * with the only difference being that it is in WDDX format
-     * 
-	 * @param userID The user_id of the user
-	 * @param roleName The role name
-	 * @return String The required information in WDDX format
-	 * @throws IOException
-	 */
-	public String getWDDXForOrganisationsForUserByRole(Integer userID, String roleName)throws IOException;
-	
-	/**
 	 * This method returns the users in the Organisation with
 	 * given <code> organisationID</code> and <code>roleName</code>
 	 * in WDDX format.
