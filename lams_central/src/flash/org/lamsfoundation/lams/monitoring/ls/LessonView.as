@@ -156,18 +156,19 @@ class org.lamsfoundation.lams.monitoring.ls.LessonView extends AbstractView {
 			//trace('attaching lesson movie for id: ' + keys[i]);
 			var learningSeq:Object = mySeqs.get(keys[i]);
 			
-			var anObject= {Lesson:learningSeq.getSequenceName(), Started:learningSeq.getStartDateTime()};
+			var anObject= {Lesson:learningSeq.getSequenceName(), Started:learningSeq.getStartDateTime(), data:learningSeq.getSequenceID()};
 			
 			// Organize Sequences based on their StateID "7" for DISABLED, "6" for ARCHIVED and all the rest of them for ACTIVE.
 			switch (learningSeq.getSequenceStateID().toString()) {
                 case '6' :
                     lsns_Archive.addItem(anObject);
-                    break;
+					break;
 				case '7' :
 					lsns_Disabled.addItem(anObject);
                     break;
                 default:
 					lsns_Active.addItem(anObject);
+					lsns_Active.removeColumnAt(2);
             }
 			
 		}
