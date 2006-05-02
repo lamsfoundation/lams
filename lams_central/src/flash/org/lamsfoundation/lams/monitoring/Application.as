@@ -24,6 +24,7 @@
 //import org.lamsfoundation.lams.authoring.*       	//Design Data model n stuffimport org.lamsfoundation.lams.authoring.*       	//Design Data model n stuff
 import org.lamsfoundation.lams.monitoring.*
 import org.lamsfoundation.lams.monitoring.ls.*       //Lessons
+import org.lamsfoundation.lams.monitoring.mv.* 		 //Monitor
 import org.lamsfoundation.lams.authoring.tb.*       //Toolbar
 //import org.lamsfoundation.lams.authoring.cv.*       //Canvas
 import org.lamsfoundation.lams.common.ws.*          //Workspace
@@ -431,7 +432,11 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
         _toolbar = new Toolbar(_appRoot_mc,TOOLBAR_X,TOOLBAR_Y);
         _toolbar.addEventListener('load',Proxy.create(this,UIElementLoaded));
 		
-        //MONITOR
+		//LESSONS  
+		_lessons = new Lesson(_appRoot_mc,LESSONS_X,LESSONS_Y);
+        _lessons.addEventListener('load',Proxy.create(this,UIElementLoaded));
+       
+	   //MONITOR
         _monitor = new Monitor(_appRoot_mc,depth++,MONITOR_X,MONITOR_Y,MONITOR_W,MONITOR_H);
         _monitor.addEventListener('load',Proxy.create(this,UIElementLoaded));
         
@@ -440,9 +445,7 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
         _workspace = new Workspace();
         //_workspace.addEventListener('load',Proxy.create(this,UIElementLoaded));
 		*/
-		//LESSONS  
-		_lessons = new Lesson(_appRoot_mc,LESSONS_X,LESSONS_Y);
-        _lessons.addEventListener('load',Proxy.create(this,UIElementLoaded));
+		
 		
     }
     
@@ -482,10 +485,10 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
 		//someListener.onMouseUp = function () {
 			
 		//Menu - only need to worry about width
-        _menu_mc.setSize(w,_menu_mc._height);
+        _menu_mc.setSize(w,_menu_mc.height);
 
         //MONITOR
-        _monitor.setSize(w-_lessons.width,h-MONITOR_Y);
+        //_monitor.setSize(w-_lessons.width,h-MONITOR_Y);
         //_toolkit.setSize(_toolkit.width,h-TOOLKIT_Y);
 
         //Toolbar
@@ -499,8 +502,9 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
 		//Mouse.addListener(someListener);
        
        //Canvas
-       // _canvas.setSize(w-_toolkit.width,h-CANVAS_Y);
-        _lessons.setSize(_lessons.width,h-LESSONS_Y);
+	   _lessons.setSize(_lessons.width,h-LESSONS_Y);
+        _monitor.setSize(w-MONITOR_X,h-MONITOR_Y);
+        
 
         //Toolbar
         //_toolbar.setSize(w,_toolbar.height);
