@@ -106,7 +106,19 @@ public class ViewItemAction extends Action {
 		if(item != null){
 			Set instructions = item.getItemInstructions();
 			InstructionNavForm navForm = (InstructionNavForm) form;
-			navForm.setAllInstructions(new ArrayList(instructions));
+			//For Learner upload item, its instruction will display description/comment fields in ReosourceItem.
+			if(!item.isCreateByAuthor()){
+				List<ResourceItemInstruction> navItems = new ArrayList<ResourceItemInstruction>(1);
+				//create a new instruction and put ResourceItem description into it: just for display use.
+				ResourceItemInstruction ins = new ResourceItemInstruction();
+				ins.setSequenceId(1);
+				ins.setDescription(item.getDescription());
+				navItems.add(ins);
+				navForm.setAllInstructions(navItems);
+				instructions.add(ins);
+			}else{
+				navForm.setAllInstructions(new ArrayList(instructions));
+			}
 			navForm.setTitle(item.getTitle());
 			navForm.setType(item.getType());
 			navForm.setTotal(instructions.size());

@@ -61,7 +61,7 @@
 				<fmt:message key="label.completed" />
 			</th>
 			<th scope="col" style="width:200px">
-				<a href="#" style="width:120px" class="button" onclick="return checkNew()"><fmt:message key="label.check.for.new" /></a>
+				<a href="#" style="width:120px" class="button" onclick="return 	"><fmt:message key="label.check.for.new" /></a>
 			</th>
 		</tr>
 		<c:forEach var="item" items="${resourceList}">
@@ -69,14 +69,14 @@
 				<td>${item.title}</td>
 				<td align="center">
 					<c:if test="${item.complete}">
-						<img src="<html:rewrite page='/includes/images/cross.gif'/>" border="0">
+						<img src="<html:rewrite page='/includes/images/tick.gif'/>" border="0">
 					</c:if>
 				
 				</td>
 				
 				<td>
-					<a href="javascript:;" class="button" onclick="viewItem(${item.uid})" ><fmt:message key="label.view" /></a>
 					<a href="#" class="button" onclick="return completeItem(${item.uid})"><fmt:message key="label.completed" /></a>
+					<a href="javascript:;" class="button" onclick="viewItem(${item.uid})" ><fmt:message key="label.view" /></a>
 				</td>
 			</tr>
 		</c:forEach>

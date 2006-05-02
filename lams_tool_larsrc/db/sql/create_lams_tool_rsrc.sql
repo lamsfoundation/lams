@@ -29,18 +29,18 @@ create table tl_larsrc11_resource (
    update_date datetime,
    create_by bigint,
    title varchar(255),
-   run_offline bit,
-   lock_on_finished bit,
+   run_offline tinyint,
+   lock_on_finished tinyint,
    instructions text,
    online_instructions text,
    offline_instructions text,
-   content_in_use bit,
-   define_later bit,
+   content_in_use tinyint,
+   define_later tinyint,
    content_id bigint unique,
-   allow_add_files bit,
-   allow_add_urls bit,
+   allow_add_files tinyint,
+   allow_add_urls tinyint,
    mini_view_resource_number integer,
-   allow_auto_run bit,
+   allow_auto_run tinyint,
    primary key (uid)
 );
 create table tl_larsrc11_resource_item (
@@ -55,8 +55,8 @@ create table tl_larsrc11_resource_item (
    url text,
    create_by bigint,
    create_date datetime,
-   create_by_author bit,
-   is_hide bit,
+   create_by_author tinyint,
+   is_hide tinyint,
    item_type smallint,
    file_type varchar(255),
    file_name varchar(255),
@@ -69,7 +69,7 @@ create table tl_larsrc11_resource_item_visit_log (
    access_date datetime,
    resource_item_uid bigint,
    user_uid bigint,
-   complete bit,
+   complete tinyint,
    session_id bigint,
    primary key (uid)
 );
@@ -106,5 +106,5 @@ alter table tl_larsrc11_user add index FK30113BFC506CD584 (session_id), add cons
 
 
 INSERT INTO `tl_larsrc11_resource` (`uid`, `create_date`, `update_date`, `create_by`, `title`, `run_offline`, `lock_on_finished`, `instructions`, `online_instructions`, `offline_instructions`, `content_in_use`, `define_later`, `content_id`, `allow_add_files`, `allow_add_urls`, `mini_view_resource_number`, `allow_auto_run`) VALUES
-  (2,NULL,NULL,NULL,'LAMS Shared Resources','\0','\0','Instruction','Online instruction','Offline instruction',1,1,${default_content_id},1,1,1,1);
+  (2,NULL,NULL,NULL,'LAMS Shared Resources','0','0','Instruction','Online instruction','Offline instruction',1,1,${default_content_id},1,1,1,1);
 SET FOREIGN_KEY_CHECKS=1;

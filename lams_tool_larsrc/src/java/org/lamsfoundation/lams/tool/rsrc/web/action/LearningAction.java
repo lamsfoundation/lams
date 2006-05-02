@@ -237,21 +237,26 @@ public class LearningAction extends Action {
 			service.createUser(resourceUser);
 		}
 
-		List items = null;
+		List<ResourceItem> items = null;
 		Resource resource;
 		try {
 			items = service.getResourceItemsBySessionId(sessionId);
-			ResourceSession session = service.getResourceSessionBySessionId(sessionId);
 			resource = service.getResourceBySessionId(sessionId);
 		} catch (Exception e) {
 			log.error(e);
 			return mapping.findForward(ResourceConstants.ERROR);
 		}
 		//init resource item list
-		List resourceItemList = getResourceItemList(request);
+		List<ResourceItem> resourceItemList = getResourceItemList(request);
 		resourceItemList.clear();
-		if(items != null)
-			resourceItemList.addAll(items);
+		if(items != null){
+			//remove hidden items.
+			for(ResourceItem item : items){
+				if(!item.isHide()){
+					resourceItemList.add(item);
+				}
+			}
+		}
 		
 		//set complete flag for display purpose
 		service.retrieveComplete(resourceItemList, resourceUser);
