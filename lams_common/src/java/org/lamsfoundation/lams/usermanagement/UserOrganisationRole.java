@@ -97,6 +97,14 @@ public class UserOrganisationRole implements Serializable {
         this.role = role;
     }
 
+    public boolean hasRole(String[] roles) {
+    	for(int i=0; i<= roles.length; i++) {
+    		if(this.role.getName().equals(roles[i]))
+    			return true;
+    	}
+    	return false;
+    }
+    
     public String toString() {
         return new ToStringBuilder(this)
             .append("userOrganisationRoleId", getUserOrganisationRoleId())
