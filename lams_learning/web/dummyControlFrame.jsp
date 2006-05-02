@@ -20,9 +20,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 --%>
 
 <%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
-<%@ taglib uri="tags-bean" prefix="bean"%>
 <%@ taglib uri="tags-html" prefix="html"%>
-<%@ taglib uri="tags-tiles" prefix="tiles"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
@@ -32,19 +30,55 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<lams:css/>
-		<title><fmt:message key="learner.title"/></title>
+		<link href="<lams:LAMSURL/>/css/default.css" rel="stylesheet" type="text/css"/>
+		<title>Learner :: LAMS</title>
+		<script language="JavaScript" type="text/JavaScript">
+			<!--
+			
+			var thePopUp = null;
+			
+			function openPopUp(args){
+				if(thePopUp && thePopUp.open && !thePopUp.closed){		
+						thePopUp.focus();	
+				}else{
+					//alert('opening:'+args);
+					thePopUp = window.open(args,"learnerPop","HEIGHT=400,WIDTH=550,resizable,scrollbars");
+				}
+			}
+			
+			//-->
+		</script>
+
 	</head>
+	<body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
 
-	<frameset rows="40,*" cols="*" framespacing="0" frameborder="NO" border="0">
-		<frame src="controlTopFrame.jsp" name="topFrame" scrolling="NO" noresize >
-		<frame src="dummylearner.do?method=getActiveLessons" name="bottomFrame" scrolling="YES">
-	</frameset>
-	
-	<noframes>
-		<body>
-			<fmt:message key="message.activity.parallel.noFrames" />
-		</body>
-	</noframes>
+	   <H2>Flash Interface</H2>
+		<p>Switch to the <A HREF="controlFrame.jsp">Flash interface<a/> (under development).</p>
 
+		<h2>Available Lessons</H2>
+		<table width="100%" border="0" cellspacing="2" cellpadding="2" summary="This table is being used for layout purposes only">
+			<TR><TD><A HREF="<lams:WebAppURL/>dummylearner.do?method=getActiveLessons">Refresh List</A></TD></TR>
+		<c:forEach var="lesson" items="${lessons}">
+		<c:if test="${lesson.lessonStateID<6}">
+			<TR><TD>
+				<STRONG><c:out value="${lesson.lessonName}"/></STRONG>
+			<c:choose>
+				<c:when test="${lesson.lessonStateID==1}">[Created]</c:when>
+				<c:when test="${lesson.lessonStateID==2}">[Scheduled]</c:when>
+				<c:when test="${lesson.lessonStateID==3}">[Started]</c:when>
+				<c:when test="${lesson.lessonStateID==4}">[Suspended]</c:when>
+				<c:when test="${lesson.lessonStateID==5}">[Finished]</c:when>
+			</c:choose>
+			<c:if test="${lesson.lessonDescription}">
+				<BR><c:out value="${lesson.lessonDescription}"/>
+			</c:if>
+			<BR><A HREF="<lams:WebAppURL/>dummylearner.do?method=joinLesson&userId=<lams:user property="userID"/>&lessonId=<c:out value="${lesson.lessonID}"/>" target="contentFrame">Participate</A>
+			<BR><A HREF=javascript:openPopUp('<lams:WebAppURL/>exportWaitingPage.jsp?mode=learner&lessonID=<c:out value="${lesson.lessonID}"/>');>Export Portfolio</A>
+			</TD></TR>
+			<TR><TD><HR></TD></TR>
+		</c:if>
+		</c:forEach>
+		</table>
+
+	</body>
 </html:html>
