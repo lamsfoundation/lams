@@ -56,7 +56,7 @@
 		</set>
 
 		<!-- bi-directional many-to-one association to User -->
-		<many-to-one name="user"
+		<many-to-one name="user" lazy="false"
 			class="org.lamsfoundation.lams.usermanagement.User"
 			not-null="true">
 			<column name="user_id" />
