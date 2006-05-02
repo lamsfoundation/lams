@@ -78,6 +78,7 @@ public class ResourceItemVisitDAOHibernate extends BaseDAOHibernate implements R
 		int idx=0;
 		for(Object[] list : result){
 			Summary sum = new Summary();
+			idx=0;
 			sum.setSessionId((Long) list[idx++]);
 			sum.setSessionName((String) list[idx++]);
 			sum.setItemUid((Long) list[idx++]);

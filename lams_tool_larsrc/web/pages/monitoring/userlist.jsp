@@ -13,13 +13,13 @@
 				<fmt:message key="monitoring.label.user.name" />
 			</th>
 		</tr>
-		<c:forEach var="user" items="userList">
+		<c:forEach var="user" items="${userList}">
 			<tr>
 				<td>
 					${user.loginName}
 				</td>
 				<td>
-					${user.firstName},${user.secondName}
+					${user.firstName},${user.lastName}
 				</td>
 			</tr>
 		</c:forEach>

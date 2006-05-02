@@ -75,6 +75,19 @@ public class MonitoringAction extends Action {
 		Long itemUid = WebUtil.readLongParam(request, ResourceConstants.PARAM_RESOURCE_ITEM_UID);
 		IResourceService service = getResourceService();
 		service.setItemVisible(itemUid,false);
+		
+		//update session value
+		List<List> groupList = (List<List>) request.getSession().getAttribute(ResourceConstants.ATTR_SUMMARY_LIST);
+		if(groupList != null)
+			for(List<Summary> group : groupList){
+				for(Summary sum: group){
+					if(itemUid.equals(sum.getItemUid())){
+						sum.setItemHide(true);
+						break;
+					}
+				}
+			}
+
 		return mapping.findForward(ResourceConstants.SUCCESS);
 	}
 
@@ -83,6 +96,18 @@ public class MonitoringAction extends Action {
 		Long itemUid = WebUtil.readLongParam(request, ResourceConstants.PARAM_RESOURCE_ITEM_UID);
 		IResourceService service = getResourceService();
 		service.setItemVisible(itemUid,true);
+		
+		//update session value
+		List<List> groupList = (List<List>) request.getSession().getAttribute(ResourceConstants.ATTR_SUMMARY_LIST);
+		if(groupList != null)
+			for(List<Summary> group : groupList){
+				for(Summary sum: group){
+					if(itemUid.equals(sum.getItemUid())){
+						sum.setItemHide(false);
+						break;
+					}
+				}
+			}
 		return mapping.findForward(ResourceConstants.SUCCESS);
 	}
 

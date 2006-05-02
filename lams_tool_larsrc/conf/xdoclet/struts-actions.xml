@@ -175,7 +175,7 @@
 		<action path="/monitoring/listuser"
 			type="org.lamsfoundation.lams.tool.rsrc.web.action.MonitoringAction"
 			parameter="listuser" >
-			<forward name="success" path="/pages/monitoring/listuser.jsp" />
+			<forward name="success" path="/pages/monitoring/userlist.jsp" />
 		</action>
 		<action path="/monitoring/hideitem"
 			type="org.lamsfoundation.lams.tool.rsrc.web.action.MonitoringAction"

@@ -2,6 +2,7 @@
 
 <table border="0" cellspacing="3" width="98%">
 	<c:forEach var="group" items="${summaryList}">
+		<c:set var="groupSize" value="${fn:length(group)}"/>
 		<c:forEach var="item" items="${group}" varStatus="status">
 			<%-- display group name on first row--%>
 			<c:if test="${status.index == 0}">
@@ -28,7 +29,7 @@
 									<fmt:message key="monitoring.label.number.learners" />
 								</th>
 							</tr>
-							</c:if>
+				</c:if>
 							<tr>
 								<td>
 									<c:choose>
@@ -61,11 +62,11 @@
 									<a href="#" onclick="launchPopup('${listUrl}','listuser')"> ${item.viewNumber}<a>
 								</td>
 							</tr>
-							<c:if test="${status.index == 0}">
+				<c:if test="${status.count == groupSize}">
 						</table>
 					</td>
 				</tr>
-							</c:if>
+				</c:if>
 		</c:forEach>
 	</c:forEach>
 </table>

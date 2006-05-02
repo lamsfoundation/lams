@@ -2,6 +2,7 @@
 
 <table border="0" cellspacing="3" width="98%">
 	<c:forEach var="group" items="${summaryList}">
+		<c:set var="groupSize" value="${fn:length(group)}"/>
 		<c:forEach var="item" items="${group}" varStatus="status">
 			<%-- display group name on first row--%>
 			<c:if test="${status.index == 0}">
@@ -31,7 +32,7 @@
 									<!--hide/show-->
 								</th>
 							</tr>
-							</c:if>
+				</c:if>
 							<tr>
 								<td>
 									<c:choose>
@@ -63,24 +64,24 @@
 									</c:set>
 									<a href="#" onclick="launchPopup('${listUrl}','listuser')"> ${item.viewNumber}<a>
 								</td>
-								<td>
+								<td align="center">
 									<c:if test="${!item.itemCreateByAuthor}">
 										<c:choose>
 											<c:when test="${item.itemHide}">
-												<a href="<c:url value='/monitoring/showitem.do'/>?itemUid=${item.itemUid}"> <fmt:message key="monitoring.label.show" /> </a>
+												<a href="<c:url value='/monitoring/showitem.do'/>?itemUid=${item.itemUid}" class="button"> <fmt:message key="monitoring.label.show" /> </a>
 											</c:when>
 											<c:otherwise>
-												<a href="<c:url value='/monitoring/hideitem.do'/>?itemUid=${item.itemUid}"> <fmt:message key="monitoring.label.hide" /> </a>
+												<a href="<c:url value='/monitoring/hideitem.do'/>?itemUid=${item.itemUid}" class="button"> <fmt:message key="monitoring.label.hide" /> </a>
 											</c:otherwise>
 										</c:choose>
 									</c:if>
 								</td>
 							</tr>
-							<c:if test="${status.index == 0}">
+				<c:if test="${status.count == groupSize}">
 						</table>
 					</td>
 				</tr>
-							</c:if>
+				</c:if>
 		</c:forEach>
 	</c:forEach>
 </table>
