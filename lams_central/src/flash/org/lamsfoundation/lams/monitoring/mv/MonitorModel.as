@@ -67,6 +67,7 @@ class MonitorModel extends Observable{
 		//send an update
 		infoObj = {};
 		infoObj.updateType = "SEQUENCE";
+		infoObj.tabID = getMonitor().getMV().getMonitorTab().selectedIndex;
 		notifyObservers(infoObj);
 	}
 	
