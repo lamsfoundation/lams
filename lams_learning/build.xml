@@ -232,6 +232,7 @@
 				<include name="struts/tlds/*"/>
 				<include name="jstl/*"/>
 				<include name="jstl/tlds/*"/>
+				<include name="tags/*"/>
 				<include name="lams.tld"/>
 				<exclude name="web.xml"/>
 			</webinf>
@@ -300,6 +301,11 @@
 		<copy file="${build.lib}/${product}.jar"
 				todir="${jboss.deploy}"/>
 		<copy file="${build.lib}/${product}.war"
+				todir="${jboss.deploy}"/>
+	</target>
+
+	<target name="deploy-jar" depends="build-jar">
+		<copy file="${build.lib}/${product}.jar"
 				todir="${jboss.deploy}"/>
 	</target>
 
