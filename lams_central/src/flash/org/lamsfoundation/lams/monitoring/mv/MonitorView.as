@@ -41,6 +41,8 @@ import mx.controls.TabBar;
 */
 
 class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
+	
+	private var _className = "MonitorView";
 	//constants:
 	private var GRID_HEIGHT:Number;
 	private var GRID_WIDTH:Number;
@@ -109,6 +111,10 @@ public function update (o:Observable,infoObj:Object):Void{
        var mm:MonitorModel = MonitorModel(o);
 	   
 	   switch (infoObj.updateType){
+		   case 'SEQUENCE' :
+				trace("TabID for Selected tab is: "+infoObj.tabID)
+				showData(mm);
+                break;
             case 'POSITION' :
 				setPosition(mm);
                 break;
@@ -119,6 +125,17 @@ public function update (o:Observable,infoObj:Object):Void{
                 Debugger.log('unknown update type :' + infoObj.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.CanvasView');
 		}
 
+	}
+	
+	/**
+    * Sets the size of the canvas on stage, called from update
+    */
+	private function showData(mm:MonitorModel):Void{
+        var s:Object = mm.getSequence();
+		//for (var i in s){
+			trace("Item Description is : "+s._seqDescription);
+		//}
+					
 	}
 	
 	/**
@@ -142,7 +159,9 @@ public function update (o:Observable,infoObj:Object):Void{
 		monitorTabs_tb.dataProvider = tab_arr;
 		monitorTabs_tb.selectedIndex = 0;
 		
-		monitorTabs_tb.addEventListener("change", Delegate.create(this,clickEvt));
+		//monitorTabs_tb.addEventListener("change", Delegate.create('controller',getController().clickEvt));
+		var mcontroller = getController();
+		monitorTabs_tb.addEventListener("change",mcontroller);
 		//setStyles();
 		
 	    dispatchEvent({type:'load',target:this});
@@ -155,11 +174,11 @@ public function update (o:Observable,infoObj:Object):Void{
 	 * @param   evt 
 	 * @return  
 	 */
-	private function clickEvt(evt):Void{
-		   trace(evt.target);
-		   trace("test: "+ String(evt.target.selectedIndex))
+	//private function clickEvt(evt):Void{
+		  // trace(evt.target);
+		  // trace("test: "+ String(evt.target.selectedIndex))
 					//forClick.text="label is: " + evt.itemIndex.label + " index is: " + evt.index + " capital is: " +               targetComp.dataProvider[evt.index].data;
-		}
+		//}
 	/**
     * Sets the size of the canvas on stage, called from update
     */
@@ -194,4 +213,14 @@ public function update (o:Observable,infoObj:Object):Void{
 		var c:Controller = super.getController();
 		return MonitorController(c);
 	}
+	
+	public function getMonitorTab():MovieClip{
+		return monitorTabs_tb;
+	}
+	 /*
+    * Returns the default controller for this view.
+    */
+    public function defaultController (model:Observable):Controller {
+        return new MonitorController(model);
+    }
 }
