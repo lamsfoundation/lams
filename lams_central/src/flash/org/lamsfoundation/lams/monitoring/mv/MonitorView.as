@@ -25,6 +25,7 @@ import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.common.ui.*
 import org.lamsfoundation.lams.common.style.*
 import org.lamsfoundation.lams.monitoring.mv.*
+import org.lamsfoundation.lams.monitoring.mv.tabviews.*;
 import org.lamsfoundation.lams.monitoring.*;
 import org.lamsfoundation.lams.common.dict.*
 import org.lamsfoundation.lams.common.mvc.*
@@ -51,6 +52,8 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 	
 	private var _tm:ThemeManager;
 	
+	private var _monitorView_mc:MovieClip;
+	
 	//Canvas clip
 	private var _monitor_mc:MovieClip;
 	private var monitor_scp:MovieClip;
@@ -65,6 +68,11 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 	
 	//private var _transitionPropertiesOK:Function;
     private var _monitorView:MonitorView;
+	
+	
+	private var lessonTabView:LessonTabView;
+	private var lessonTabView_mc:MovieClip;
+	
     //Defined so compiler can 'see' events added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
     public var addEventListener:Function;
@@ -90,16 +98,41 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 		//if(c==undefined){
 		//	c==defaultController();
 		//}
+		_monitorView_mc = this;
+		
 		super (m, c);
         //Set up parameters for the grid
 		H_GAP = 10;
 		V_GAP = 10;
+		
+		lessonTabView_mc = _monitorView_mc.monitor_scp.attachMovie("LessonTabView", "lessonTabView_mc",DepthManager.kTop)
+		lessonTabView = LessonTabView(lessonTabView_mc);
+		
+		lessonTabView.init(m, c);
+		lessonTabView.addEventListener('load',Proxy.create(this,tabLoaded));
+		
+		trace('lesson tab view: ' + lessonTabView_mc);
+		
+		var mm:MonitorModel = MonitorModel(m);
+		m.addObserver(lessonTabView);
+		
+		
         //setupCM();
 	   //register to recive updates form the model
 		//MonitorModel(m).addEventListener('update',this);
         
 		MovieClipUtils.doLater(Proxy.create(this,draw)); 
     }    
+	
+	private function tabLoaded(evt:Object){
+        Debugger.log('viewLoaded called',Debugger.GEN,'tabLoaded','MonitorView');
+		
+		if(evt.type=='load') {
+            //dispatchEvent({type:'load',target:this});
+        }else {
+            //Raise error for unrecognized event
+        }
+    }
 	
 	/**
  * Recieved update events from the CanvasModel. Dispatches to relevent handler depending on update.Type
@@ -135,6 +168,7 @@ public function update (o:Observable,infoObj:Object):Void{
 		//for (var i in s){
 			trace("Item Description is : "+s._seqDescription);
 		//}
+		//monitor_scp.contentPath = lessonTabView;
 					
 	}
 	

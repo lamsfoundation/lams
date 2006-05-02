@@ -43,9 +43,7 @@ class org.lamsfoundation.lams.monitoring.mv.Monitor {
 	private var monitorModel:MonitorModel;
 	// View
 	private var monitorView:MonitorView;
-	private var lessonTabView:LessonTabView;
 	private var monitorView_mc:MovieClip;
-	private var lessonTabView_mc:MovieClip;
 
 	private var app:Application;
 	private var _dictionary:Dictionary;
@@ -82,13 +80,12 @@ class org.lamsfoundation.lams.monitoring.mv.Monitor {
 		
         monitorView.addEventListener('load',Proxy.create(this,viewLoaded));
 		//lessonTabView_mc = monitorView_mc.
-		lessonTabView = LessonTabView(lessonTabView_mc);
-		lessonTabView.init(monitorModel,undefined);
+		
        //dictionary.addEventListener('init',Proxy.create(this,setupPI));
 		
 		//Register view with model to receive update events
 		monitorModel.addObserver(monitorView);
-		monitorModel.addObserver(lessonTabView);
+		
 		//monitorModel.addObserver(monitorView);
 		//monitorModel.addObserver(monitorView);
 		//monitorModel.addObserver(monitorView);
