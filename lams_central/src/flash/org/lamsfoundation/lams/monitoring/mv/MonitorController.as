@@ -37,11 +37,23 @@ class MonitorController extends AbstractController {
 	*
 	* @param   cm   The model to modify.
 	*/
-	public function MonitorController (cm:Observable) {
-		super (cm);
+	public function MonitorController (mm:Observable) {
+		super (mm);
 		_monitorModel = MonitorModel(model);
 	}
 	
 	// add control methods
 	
+	/**
+	 * Event listener for when when tab is clicked
+	 * 
+	 * @usage   
+	 * @param   evt 
+	 * @return  
+	 */
+	public function change(evt):Void{
+		   trace(evt.target);
+		   trace("test: "+ String(evt.target.selectedIndex))
+					//forClick.text="label is: " + evt.itemIndex.label + " index is: " + evt.index + " capital is: " +               targetComp.dataProvider[evt.index].data;
+		}
 }
