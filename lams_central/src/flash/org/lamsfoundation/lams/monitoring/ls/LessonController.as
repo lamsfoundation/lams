@@ -23,6 +23,7 @@
 
 import org.lamsfoundation.lams.common.mvc.*;
 import org.lamsfoundation.lams.common.util.*;
+import org.lamsfoundation.lams.common.*;
 import org.lamsfoundation.lams.monitoring.*;
 import org.lamsfoundation.lams.monitoring.ls.*;
 //import org.lamsfoundation.lams.monitoring.ls.Lesson;
@@ -52,11 +53,13 @@ class org.lamsfoundation.lams.monitoring.ls.LessonController extends AbstractCon
 	 */
 	public function cellPress(evt):Void{
 		trace(String(evt.target));
-		trace("Item index: " + evt.itemIndex);
+		trace("Item index: " + evt.target.getItemAt(evt.itemIndex).data);
 		trace('onClick event: joining lesson...');
-		var seqID:String = evt.target.getItemAt(evt.itemIndex).Lesson;
+		var seqID:Number = evt.target.getItemAt(evt.itemIndex).data;
 		trace("Lesson Name: "+seqID);	
-		//_lessonModel = LessonModel(model);
+		var seq:Sequence = Sequence(_lessonModel.getLessonSequence(seqID));
+		Application.getInstance().getMonitor().getMM().setSequence(seq);
+		
 		//_lessonModel.getLesson().joinLesson();
 		
 		/*
