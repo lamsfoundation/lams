@@ -20,9 +20,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 --%>
 
 <%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
-<%@ taglib uri="tags-bean" prefix="bean"%>
+<%@ page import="org.lamsfoundation.lams.util.Configuration" import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
 <%@ taglib uri="tags-html" prefix="html"%>
-<%@ taglib uri="tags-tiles" prefix="tiles"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
@@ -31,20 +30,46 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <html:html locale="true" xhtml="true">
 
 	<head>
-	    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-		<lams:css/>
-		<title><fmt:message key="learner.title"/></title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<link href="<lams:LAMSURL/>/css/default.css" rel="stylesheet" type="text/css"/>
+		<title<fmt:message key="learner.title"/></title>
 	</head>
+	<body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
 
-	<frameset rows="40,*" cols="*" framespacing="0" frameborder="NO" border="0">
-		<frame src="controlTopFrame.jsp" name="topFrame" scrolling="NO" noresize >
-		<frame src="controlBottomFrame.jsp" name="bottomFrame" scrolling="NO">
-	</frameset>
-	
-	<noframes>
-		<body>
-			<fmt:message key="message.activity.parallel.noFrames" />
-		</body>
-	</noframes>
+	<% 
+	String clientVersion = Configuration.get(ConfigurationKeys.LEARNER_CLIENT_VERSION);
+	String serverLanguage = Configuration.get(ConfigurationKeys.SERVER_LANGUAGE);
+	String languageDate = Configuration.getDictionaryDateForLanguage(serverLanguage);
+	%>
 
+	<c:set var="learnerurl">lams_learner.swf?userID=<lams:user property="userID"/>&serverURL=<lams:LAMSURL/>&build=<%=clientVersion%>&lang=<%=serverLanguage%>&date=<%=languageDate%>&theme=<lams:user property="flashTheme"/></c:set>
+
+	<!-- URL's used in the movie-->
+	<!-- text used in the movie-->
+	<!--Library-->  
+	<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+	 codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,47,0" name="learning"
+	 width="100%" height="100%" align="left" id="learning">
+	  <param name="allowScriptAccess" value="sameDomain" />
+
+	  <param name="movie" value="<c:out value="${learnerurl}" escapeXml="false"/>"/>
+	  <param name="quality" value="high">
+	  <param name="scale" value="noscale">
+	  <param name="bgcolor" value="#B3B7C8">
+	  <embed 	
+		  src="<c:out value="${learnerurl}" escapeXml="false"/>"
+		  quality="high" 
+		  scale="noscale" 
+		  bgcolor="#B3B7C8"  
+		  width="100%" 
+		  height="100%" 
+		  swliveconnect=true 
+		  id="authoring" 
+		  name="authoring" 
+		  align=""
+		  type="application/x-shockwave-flash" 
+		  pluginspage="http://www.macromedia.com/go/getflashplayer" />
+	</object>
+
+	</body>
 </html:html>
