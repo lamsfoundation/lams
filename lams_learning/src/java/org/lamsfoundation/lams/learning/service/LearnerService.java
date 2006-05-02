@@ -35,6 +35,7 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learning.progress.ProgressEngine;
 import org.lamsfoundation.lams.learning.progress.ProgressException;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
+import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Grouping;
@@ -47,7 +48,6 @@ import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dao.ILearnerProgressDAO;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
-import org.lamsfoundation.lams.tool.ToolContentIDGenerator;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.dao.IToolSessionDAO;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
@@ -240,7 +240,7 @@ public class LearnerService implements ILearnerService
 
 
     /**
-     * Returns the current progress data of the User.
+     * Returns the current progress data of the User. 
      * @param learner the Learner
      * @param lesson the Lesson to get progress from.
      * @return LearnerProgess contains the learner's progress for the lesson.
@@ -331,9 +331,15 @@ public class LearnerService implements ILearnerService
     public String completeActivity(User learner,Activity activity,Lesson lesson)
     {
         //build up the url for next activity.
+    	
+    	// need to update the learner progress in the special user's session or the Flash 
+    	// side won't be notified of the correct progress (via the display activity screen).
+    	// this isn't nice as the service layer is calling the web layer, but as this
+    	// is triggered from a tool calling completeToolSession, its a bit hard to avoid.
     	try 
     	{
 	    	LearnerProgress nextLearnerProgress = calculateProgress(activity, learner,lesson);
+	    	LearningWebUtil.setLearnerProgress(nextLearnerProgress);
 	    	return activityMapping.getProgressURL(nextLearnerProgress);
     	}
         catch (UnsupportedEncodingException e)

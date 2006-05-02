@@ -57,10 +57,8 @@ public class LearningWebUtil
     //---------------------------------------------------------------------
     // Class level constants - session attributes
     //---------------------------------------------------------------------
-	public static final String PARAM_USER_ID = "userId";
+	public static final String ATTR_LESSON_DATA = "lesson";
 	public static final String PARAM_LESSON_ID = "lessonId";
-	public static final String ATTR_USER_DATA = "user";
-	public static final String ATTR_LESSON_DATA ="lesson";
 	public static final String PARAM_ACTIVITY_ID = "activityId";
 	public static final String PARAM_PROGRESS_ID = "progressId";
     
@@ -100,7 +98,8 @@ public class LearningWebUtil
      */
     public static Lesson getLessonData(HttpServletRequest request, ServletContext servletContext)
     {
-        Lesson lesson = (Lesson)request.getAttribute(ATTR_LESSON_DATA);
+        HttpSession ss = SessionManager.getSession();
+        Lesson lesson = (Lesson)ss.getAttribute(ATTR_LESSON_DATA);
         
         if(lesson ==null)
         {
@@ -108,12 +107,31 @@ public class LearningWebUtil
             ILearnerService learnerService = LearnerServiceProxy.getLearnerService(servletContext);
             long lessonId = WebUtil.readLongParam(request,PARAM_LESSON_ID);
             lesson = learnerService.getLesson(new Long(lessonId));
-// TODO don't cache it currently - would do it via jboss cache!
-//            request.getSession().setAttribute(ATTR_LESSON_DATA,lesson);
+            setLessonData(lesson);
         }
         return lesson;
     }
     
+ 
+    /**
+     * Put the lesson data in the user's special session object, so that
+     * it can be retrieved by getLessonData() 
+     * 
+     * @param request A standard Servlet HttpServletRequest class.
+     * @param learnerService leaner service facade.
+     * @param servletContext the servlet container that has all resources
+     * @return The requested lesson.
+     */
+    public static void setLessonData(Lesson lesson)
+    {
+        HttpSession ss = SessionManager.getSession();
+        if ( lesson != null ) {
+        	ss.setAttribute(ATTR_LESSON_DATA, lesson);
+        } else {
+        	ss.removeAttribute(ATTR_LESSON_DATA);
+        }
+    }
+   
     /**
      * Helper method to get session bean. 
      * TODO resolve the duplicate code in activity action.
@@ -144,26 +162,34 @@ public class LearningWebUtil
     }
 
 	/** 
+	 * Put the learner progress in the user's special session object.
+	 */
+	public static void setLearnerProgress(LearnerProgress progress) {
+		HttpSession ss = SessionManager.getSession();
+		if ( progress != null ) {
+			ss.setAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE, progress);
+		} else {
+			ss.removeAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE);
+		}
+	}
+	
+	/** 
 	 * Get the current learner progress. The http session attributes are checked
 	 * first, if not in request then a new LearnerProgress is loaded by id using
 	 * the LearnerService. The LearnerProgress is also stored in the
 	 * session so that the Flash requests don't have to reload it.
 	 */
 	public static LearnerProgress getLearnerProgressByID(HttpServletRequest request,ServletContext servletContext) {
-		//TODO need to be retrieved from proper cache when caching done properly.
-	    LearnerProgress learnerProgress = (LearnerProgress)request.getSession().getAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE);
+        HttpSession ss = SessionManager.getSession();
+        LearnerProgress learnerProgress = (LearnerProgress)ss.getAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE);
 		
 		if (learnerProgress == null) 
 		{
             //initialize service object
             ILearnerService learnerService = LearnerServiceProxy.getLearnerService(servletContext);
-		    
 		    long learnerProgressId = WebUtil.readLongParam(request,LearningWebUtil.PARAM_PROGRESS_ID);
-		    
 		    learnerProgress = learnerService.getProgressById(new Long(learnerProgressId));
-
-//          TODO don't cache it currently - would do it via jboss cache!
-//            request.getSession().setAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE,learnerProgress);
+		    setLearnerProgress(learnerProgress);
 		}
 		return learnerProgress;
 	}
@@ -175,20 +201,17 @@ public class LearningWebUtil
 	 */
 	public static LearnerProgress getLearnerProgressByUser(HttpServletRequest request,ServletContext servletContext) {
 		
-	    LearnerProgress learnerProgress = (LearnerProgress)request.getSession().getAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE);
+        HttpSession ss = SessionManager.getSession();
+        LearnerProgress learnerProgress = (LearnerProgress)ss.getAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE);
 		
 		if (learnerProgress == null) 
 		{
             //initialize service object
             ILearnerService learnerService = LearnerServiceProxy.getLearnerService(servletContext);
-		    
             User currentLearner = getUserData(servletContext);
             Lesson lesson = getLessonData(request,servletContext);
-            
             learnerProgress = learnerService.getProgress(currentLearner,lesson);
-
-//          TODO don't cache it currently - would do it via jboss cache!
-//            request.getSession().setAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE,learnerProgress);
+		    setLearnerProgress(learnerProgress);
 		}
 		return learnerProgress;
 	}

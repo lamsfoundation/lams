@@ -60,7 +60,7 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
  *                          type="org.lamsfoundation.lams.learning.service.LearnerServiceException"
  *                          path=".systemError"
  * 							handler="org.lamsfoundation.lams.learning.util.CustomStrutsExceptionHandler"
- * @struts:action-forward name="controlActivity" path="/dummyControlBottomFrame.jsp"
+ * @struts:action-forward name="controlActivity" path="/dummyControlFrame.jsp"
  * @struts:action-forward name="displayActivity" path="/DisplayActivity.do"
  * 
  * ----------------XDoclet Tags--------------------

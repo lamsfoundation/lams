@@ -81,7 +81,6 @@ public class TestLearnerAction extends AbstractTestAction
     public void testGetActiveLessons()
     {
         addRequestParameter("method", "getActiveLessons");
-        addRequestParameter(LearningWebUtil.PARAM_USER_ID, TEST_USER_ID);
 
         actionPerform();
 
@@ -91,7 +90,6 @@ public class TestLearnerAction extends AbstractTestAction
     public void testJoinLesson()
     {
         addRequestParameter("method", "joinLesson");
-        addRequestParameter(LearningWebUtil.PARAM_USER_ID, TEST_USER_ID);
         addRequestParameter(LearningWebUtil.PARAM_LESSON_ID, TEST_LESSON_ID);
         
         actionPerform();
@@ -112,7 +110,6 @@ public class TestLearnerAction extends AbstractTestAction
     {
         httpSession.setAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE,testLearnerProgress);
         addRequestParameter("method", "getFlashProgressData");
-        addRequestParameter(LearningWebUtil.PARAM_USER_ID, TEST_USER_ID);
         addRequestParameter(LearningWebUtil.PARAM_LESSON_ID, TEST_LESSON_ID);
         
         actionPerform();
@@ -122,7 +119,6 @@ public class TestLearnerAction extends AbstractTestAction
     public void testExitLesson()
     {
         addRequestParameter("method", "exitLesson");
-        addRequestParameter(LearningWebUtil.PARAM_USER_ID, TEST_USER_ID);
         addRequestParameter(LearningWebUtil.PARAM_LESSON_ID, TEST_LESSON_ID);
         
         actionPerform();
@@ -135,7 +131,6 @@ public class TestLearnerAction extends AbstractTestAction
     public void testGetLearnerActivityURL()
     {
         addRequestParameter("method", "getLearnerActivityURL");
-        addRequestParameter(LearningWebUtil.PARAM_USER_ID, TEST_USER_ID);
         addRequestParameter(LearningWebUtil.PARAM_ACTIVITY_ID, TEST_ACTIVITY_ID);
         
         actionPerform();

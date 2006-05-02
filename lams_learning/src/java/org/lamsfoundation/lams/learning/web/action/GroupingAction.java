@@ -127,10 +127,7 @@ public class GroupingAction extends LamsDispatchAction
                                        currentLearners);
 
         LearningWebUtil.putActivityInRequest(request, learnerProgress.getNextActivity(), learnerService);
-        request.getSession().setAttribute(LearningWebUtil.ATTR_USER_DATA, 
-                                          learnerProgress.getUser());
-        request.getSession().setAttribute(LearningWebUtil.ATTR_LESSON_DATA,
-                                          learnerProgress.getLesson());
+        LearningWebUtil.setLessonData(learnerProgress.getLesson());
         
         return mapping.findForward(VIEW_GROUPING);
     }

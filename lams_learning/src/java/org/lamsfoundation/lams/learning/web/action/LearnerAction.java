@@ -204,15 +204,7 @@ public class LearnerAction extends LamsDispatchAction
 	            log.debug("The learner ["+learner.getUserId()+"] joined lesson. The"
 	                      +"porgress data is:"+learnerProgress.toString());
 	        
-	        // TODO replace with JBOSS cache
-	        //LessonLearnerDataManager.cacheLessonUser(getServlet().getServletContext(),
-	        //                                         lesson,learner);
-	        
-	        //setup session attributes
-	        //request.getSession().setAttribute(SessionBean.NAME,new SessionBean(learner,
-	        //                                                                   lesson,
-	        //                                                                   learnerProgress));
-	        request.getSession().setAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE,learnerProgress);
+	        LearningWebUtil.setLearnerProgress(learnerProgress);
 	
 	        //serialize a acknowledgement flash message with the path of display next
 	        //activity

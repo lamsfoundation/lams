@@ -85,7 +85,6 @@ public class TestGroupingAction extends AbstractTestAction
     {
         addRequestParameter("method", "performGrouping");
         addRequestParameter(LearningWebUtil.PARAM_PROGRESS_ID,TEST_LERNER_PROGRESS_ID);
-        addRequestParameter(LearningWebUtil.PARAM_USER_ID, TEST_LEARNER_ID);
         addRequestParameter(LearningWebUtil.PARAM_ACTIVITY_ID,TEST_RGRP_ACTIVITY_ID);
         addRequestParameter(LearningWebUtil.PARAM_LESSON_ID, TEST_LESSON_ID);
         
@@ -108,7 +107,6 @@ public class TestGroupingAction extends AbstractTestAction
     public void testViewGrouping()
     {
         addRequestParameter("method", "viewGrouping");
-        addRequestParameter(LearningWebUtil.PARAM_USER_ID, TEST_LEARNER_ID);
         addRequestParameter(LearningWebUtil.PARAM_LESSON_ID, TEST_LESSON_ID);
         LearningWebUtil.putActivityInRequest(request,groupingActivity,learnerService);
         
@@ -125,7 +123,6 @@ public class TestGroupingAction extends AbstractTestAction
     public void testCompleteActivity()
     {
         addRequestParameter("method", "completeActivity");
-        addRequestParameter(LearningWebUtil.PARAM_USER_ID, TEST_LEARNER_ID);
         addRequestParameter(LearningWebUtil.PARAM_LESSON_ID, TEST_LESSON_ID);
         request.setAttribute(ActivityAction.ACTIVITY_REQUEST_ATTRIBUTE,groupingActivity);
 

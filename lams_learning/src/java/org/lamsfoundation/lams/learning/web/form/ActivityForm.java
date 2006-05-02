@@ -24,10 +24,11 @@
 /* $$Id$$ */	
 package org.lamsfoundation.lams.learning.web.form;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.apache.struts.action.ActionErrors;
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
@@ -49,19 +50,8 @@ public class ActivityForm extends ActionForm {
 	/** List of ActivityURL, will only contain one if a simple activity */
 	private List activityURLs;
 	
-
-	/** 
-	 * Method validate
-	 * @param mapping
-	 * @param request
-	 * @return ActionErrors
-	 */
-	public ActionErrors validate(
-		ActionMapping mapping,
-		HttpServletRequest request) {
-
-		throw new UnsupportedOperationException("Generated method 'validate(...)' not implemented.");
-	}
+	/** Progress summary suitable for Flash. In the form attempted=13_14&completed=10_11&current=12.*/
+	private String progressSummary;
 
 	/** 
 	 * Method reset
@@ -90,5 +80,13 @@ public class ActivityForm extends ActionForm {
 	    if(this.activityURLs ==null)
 	        this.activityURLs = new ArrayList();
 	    this.activityURLs.add(activityUrl);	    
+	}
+
+	public String getProgressSummary() {
+		return progressSummary;
+	}
+
+	public void setProgressSummary(String progressSummary) {
+		this.progressSummary = progressSummary;
 	}
 }

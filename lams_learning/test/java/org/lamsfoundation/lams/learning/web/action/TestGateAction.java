@@ -87,7 +87,6 @@ public class TestGateAction extends AbstractTestAction
     {
         addRequestParameter("method", "knockGate");
         addRequestParameter(LearningWebUtil.PARAM_PROGRESS_ID,TEST_LERNER_PROGRESS_ID);
-        addRequestParameter(LearningWebUtil.PARAM_USER_ID, TEST_LEARNER_ID);
         addRequestParameter(LearningWebUtil.PARAM_ACTIVITY_ID,TEST_GATE_ACTIVITY_ID);
         addRequestParameter(LearningWebUtil.PARAM_LESSON_ID, TEST_LESSON_ID);
         
@@ -104,7 +103,6 @@ public class TestGateAction extends AbstractTestAction
     {
         addRequestParameter("method", "knockGate");
         addRequestParameter(LearningWebUtil.PARAM_PROGRESS_ID,TEST_LERNER_PROGRESS_ID);
-        addRequestParameter(LearningWebUtil.PARAM_USER_ID, TEST_LEARNER_ID);
         addRequestParameter(LearningWebUtil.PARAM_ACTIVITY_ID,TEST_GATE_ACTIVITY_ID);
         addRequestParameter(LearningWebUtil.PARAM_LESSON_ID, TEST_LESSON_ID);
         
@@ -139,7 +137,6 @@ public class TestGateAction extends AbstractTestAction
         if(!singleUser)
         {
             request.getSession().removeAttribute("user");
-            addRequestParameter(LearningWebUtil.PARAM_USER_ID, "1");
             User testUser2 = LearningWebUtil.getUserData(context);
             LessonLearnerDataManager.cacheLessonUser(context,lesson,testUser2);
         }
