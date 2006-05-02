@@ -3,8 +3,27 @@
 <html>
 	<head>
 		 <%@ include file="/common/header.jsp" %>
+	 <script>
+	    
+	    	var imgRoot="${lams}images/";
+		    var themeName="aqua";
+	        
+	        function init(){
+	        
+	            initTabSize(2);
+	            
+                selectTab(1); //select the default tab;
+	        }     
+	        
+	        function doSelectTab(tabId) {
+		    	// end optional tab controller stuff
+		    	selectTab(tabId);
+	        } 
+	        
+	        
+	    </script>		 
 	</head>
-	<body>
+	<body onLoad="init()">
 		<lams:Tabs>
 			<lams:Tab id="1" key="monitoring.tab.summary" />
 			<lams:Tab id="2" key="monitoring.tab.statistics" />

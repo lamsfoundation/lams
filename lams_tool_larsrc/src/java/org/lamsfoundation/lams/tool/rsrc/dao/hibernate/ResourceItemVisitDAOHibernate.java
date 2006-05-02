@@ -28,7 +28,11 @@ import java.util.List;
 
 import org.lamsfoundation.lams.tool.rsrc.dao.ResourceItemVisitDAO;
 import org.lamsfoundation.lams.tool.rsrc.dto.Summary;
+import org.lamsfoundation.lams.tool.rsrc.model.Resource;
+import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItemVisitLog;
+import org.lamsfoundation.lams.tool.rsrc.model.ResourceSession;
+import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
 
 public class ResourceItemVisitDAOHibernate extends BaseDAOHibernate implements ResourceItemVisitDAO{
 	
@@ -36,22 +40,22 @@ public class ResourceItemVisitDAOHibernate extends BaseDAOHibernate implements R
 			+ " as r where r.user.userId = ? and r.resourceItem.uid=?";
 
 	private static final String FIND_BY_ITEM_BYSESSION = "from " + ResourceItemVisitLog.class.getName()
-			+ " as r where r.session_id = ? and r.resourceItem.uid=?";
+			+ " as r where r.sessionId = ? and r.resourceItem.uid=?";
 	
 	private static final String FIND_VIEW_COUNT_BY_USER = "select count(*) from " + ResourceItemVisitLog.class.getName() 
 			+ " as r where  r.sessionId=? and  r.user.userId =?";
 
-	private static final String FIND_SUMMARY = "select v.session_id, s.session_name,i.uid,i.item_type ,i.create_by_author" +
-			", i.is_hide, i.title, u.login_name, count(v.resource_item_uid) "
-		+" from tl_larsrc11_resource_item_visit_log as v , "
-		+" tl_larsrc11_resource_item as i, "
-		+" tl_larsrc11_user as u, "
-		+" tl_larsrc11_session as s, "
-		+"  tl_larsrc11_resource as r "
-		+" where i.uid = v.resource_item_uid and i.create_by = u.uid and v.session_id = s.session_id "
-		+" and s.resource_uid = r.uid "
-		+" and r.content_id =? "
-		+" group by v.session_id, .v.resource_item_uid ";
+	private static final String FIND_SUMMARY = "select v.sessionId, s.sessionName,i.uid,i.type ,i.createByAuthor" +
+			", i.hide, i.title, u.loginName, count(v.resourceItem) from  "
+		+ ResourceItemVisitLog.class.getName() + " as v , "
+		+ ResourceItem.class.getName() + "  as i, "
+		+ ResourceUser.class.getName() + "  as u, "
+		+ ResourceSession.class.getName() + " as s, "
+		+ Resource.class.getName() + "  as r "
+		+" where i.uid = v.resourceItem.uid and i.createBy.uid = u.uid and v.sessionId = s.sessionId "
+		+" and s.resource.uid = r.uid "
+		+" and r.contentId =? "
+		+" group by v.sessionId, v.resourceItem.uid ";
 	
 	public ResourceItemVisitLog getResourceItemLog(Long itemUid,Long userId){
 		List list = getHibernateTemplate().find(FIND_BY_ITEM_AND_USER,new Object[]{userId,itemUid});
@@ -69,21 +73,21 @@ public class ResourceItemVisitDAOHibernate extends BaseDAOHibernate implements R
 
 	public List<Summary> getSummary(Long contentId) {
 		
-		List result =  getHibernateTemplate().find(FIND_SUMMARY,contentId);
-		List<Summary> summaryList = new ArrayList(result);
+		List<Object[]> result =  getHibernateTemplate().find(FIND_SUMMARY,contentId);
+		List<Summary> summaryList = new ArrayList<Summary>(result.size());
 		int idx=0;
-		for(Object obj : result){
-			List list = (List) obj;
+		for(Object[] list : result){
 			Summary sum = new Summary();
-			sum.setSessionId((Long) list.get(idx++));
-			sum.setSessionName((String) list.get(idx++));
-			sum.setItemUid((Long) list.get(idx++));
-			sum.setItemType((Short) list.get(idx++));
-			sum.setItemCreateByAuthor((Boolean) list.get(idx++));
-			sum.setItemHide((Boolean) list.get(idx++));
-			sum.setItemTitle((String) list.get(idx++));
-			sum.setUsername((String) list.get(idx++));
-			sum.setViewNumber((Integer) list.get(idx++));
+			sum.setSessionId((Long) list[idx++]);
+			sum.setSessionName((String) list[idx++]);
+			sum.setItemUid((Long) list[idx++]);
+			sum.setItemType((Short) list[idx++]);
+			sum.setItemCreateByAuthor((Boolean) list[idx++]);
+			sum.setItemHide((Boolean) list[idx++]);
+			sum.setItemTitle((String) list[idx++]);
+			sum.setUsername((String) list[idx++]);
+			sum.setViewNumber((Integer) list[idx++]);
+			summaryList.add(sum);
 		}
 		return summaryList;
 		

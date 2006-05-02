@@ -167,24 +167,24 @@
 		</action>
 		
 		<!-- ========== BEGIN: Monitoring Definitions ============================== -->
-		<action path="/learning/summary"
+		<action path="/monitoring/summary"
 			type="org.lamsfoundation.lams.tool.rsrc.web.action.MonitoringAction"
 			parameter="summary" >
-			<forward name="success" path="/pages/learning/monitoring.jsp" />
+			<forward name="success" path="/pages/monitoring/monitoring.jsp" />
 		</action>
-		<action path="/learning/listuser"
+		<action path="/monitoring/listuser"
 			type="org.lamsfoundation.lams.tool.rsrc.web.action.MonitoringAction"
 			parameter="listuser" >
-			<forward name="success" path="/pages/learning/listuser.jsp" />
+			<forward name="success" path="/pages/monitoring/listuser.jsp" />
 		</action>
-		<action path="/learning/hideitem"
+		<action path="/monitoring/hideitem"
 			type="org.lamsfoundation.lams.tool.rsrc.web.action.MonitoringAction"
 			parameter="hideitem" >
-			<forward name="success" path="/pages/learning/monitoring.jsp" />
+			<forward name="success" path="/pages/monitoring/monitoring.jsp" />
 		</action>
-		<action path="/learning/showitem"
+		<action path="/monitoring/showitem"
 			type="org.lamsfoundation.lams.tool.rsrc.web.action.MonitoringAction"
 			parameter="showitem" >
-			<forward name="success" path="/pages/learning/monitoring.jsp" />
+			<forward name="success" path="/pages/monitoring/monitoring.jsp" />
 		</action>
 				

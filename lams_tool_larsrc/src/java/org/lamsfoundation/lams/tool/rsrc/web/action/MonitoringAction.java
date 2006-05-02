@@ -96,7 +96,6 @@ public class MonitoringAction extends Action {
 		List<List> groupList = new ArrayList<List>();
 		Long sId = new Long(-1);
 		List<Summary> group = new ArrayList<Summary>();
-		;
 		for (Summary sum : list) {
 			if (!sId.equals(sum.getSessionId())) {
 				group = new ArrayList<Summary>();
