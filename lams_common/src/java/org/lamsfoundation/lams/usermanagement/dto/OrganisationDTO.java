@@ -32,21 +32,24 @@ import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 public class OrganisationDTO {
 
 	private Integer organisationID;
+	private Integer parentID;
 	private String name;
 	private String description;
 	
 	public OrganisationDTO(){
 		
 	}	
-	public OrganisationDTO(Integer organisationID, String name,
+	public OrganisationDTO(Integer organisationID, Integer parentID, String name,
 			String description) {
 		super();
 		this.organisationID = organisationID;
+		this.parentID = parentID;
 		this.name = name;
 		this.description = description;
 	}
 	public OrganisationDTO(Organisation organisation){
 		this.organisationID = organisation.getOrganisationId();
+		this.parentID = organisation.getParentOrganisation().getOrganisationId();
 		this.name = organisation.getName();
 		this.description = organisation.getDescription();
 	}
@@ -67,5 +70,12 @@ public class OrganisationDTO {
 	 */
 	public Integer getOrganisationID() {
 		return organisationID!=null?organisationID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+	}
+	
+	/** 
+	 * @return Returns the parent organisationID.
+	 */
+	public Integer getParentID() {
+		return parentID!=null?parentID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
 	}
 }
