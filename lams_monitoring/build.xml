@@ -239,6 +239,7 @@
 				<pathelement location="${build.classes.test}" />
 				<pathelement location="${conf.hibernate.mapping.dir}" />
 				<pathelement location="${conf.web.dir}" />
+				<pathelement location="lib/lams/lams-tool-survey.jar" />
 				<path refid="project.classpath" />
 			</classpath>
 		</junit>
@@ -254,11 +255,29 @@
 		</junitreport>
 	</target>
 
-	
+
+	<!-- used for development only - should always use deploy-tool when building for release -->
 	<target name="deploy-war" depends="build-war">
 		<copy file="${build.lib}/${product}.jar"
 				todir="${jboss.deploy}"/>
 		<copy file="${build.lib}/${product}.war"
 				todir="${jboss.deploy}"/>
+		<copy overwrite="yes" todir="${jboss.deploy}/lams-dictionary.jar/org/lamsfoundation/lams/monitoring">
+			<fileset dir="${conf.language.dir}">
+				<include name="**/*.properties"/>
+				<include name="**/*.txt"/>
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="deploy-jar" depends="build-jar">
+		<copy file="${build.lib}/${product}.jar"
+				todir="${jboss.deploy}"/>
+		<copy overwrite="yes" todir="${jboss.deploy}/lams-dictionary.jar/org/lamsfoundation/lams/monitoring">
+			<fileset dir="${conf.language.dir}">
+				<include name="**/*.properties"/>
+				<include name="**/*.txt"/>
+			</fileset>
+		</copy>
 	</target>
 </project>
