@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-/* $$Id$$ */
+/* $Id$ */
 package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.usermanagement.User;
 
 
@@ -43,7 +44,9 @@ import org.lamsfoundation.lams.usermanagement.User;
 public class ChosenGrouper implements Grouper,Serializable
 {
 
-    /**
+	private static Logger log = Logger.getLogger(ChosenGrouper.class);
+
+	/**
      * @see org.lamsfoundation.lams.learningdesign.Grouper#doGrouping(org.lamsfoundation.lams.learningdesign.Grouping,java.lang.String, org.lamsfoundation.lams.usermanagement.User)
      */
     public void doGrouping(Grouping chosenGrouping, String groupName, User learner)
@@ -60,7 +63,12 @@ public class ChosenGrouper implements Grouper,Serializable
      */
     public void doGrouping(Grouping chosenGrouping,String groupName, List learners)
     {
-        chosenGrouping.getGroups().add(Group.createLearnerGroup(chosenGrouping,groupName,
+    	String newGroupName = groupName;
+    	if ( newGroupName == null ) {
+    		newGroupName = "Group"+System.currentTimeMillis();
+    		log.warn("Chosen grouper for grouping "+chosenGrouping.toString()+" didn't get a group name. Selecting default name of "+newGroupName);
+    	}
+        chosenGrouping.getGroups().add(Group.createLearnerGroup(chosenGrouping,newGroupName,
                                                                 new HashSet(learners)));
     }
 
