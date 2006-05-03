@@ -8,11 +8,13 @@
 			<c:if test="${status.index == 0}">
 				<tr>
 					<td>
-						<fmt:message key="monitoring.label.group" />
-						${item.sessionName}
-						<c:if test="${firstGroup.index==0}">
-							<fmt:message key="monitoring.summary.note" />
-						</c:if>
+						<B><fmt:message key="monitoring.label.group" />
+						${item.sessionName}</B>
+						<SPAN style="font-size: 12px;">
+							<c:if test="${firstGroup.index==0}">
+								<fmt:message key="monitoring.summary.note" />
+							</c:if>
+						</SPAN>
 					</td>
 				</tr>
 				<tr>

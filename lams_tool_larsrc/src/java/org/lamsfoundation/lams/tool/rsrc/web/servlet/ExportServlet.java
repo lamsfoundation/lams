@@ -25,6 +25,7 @@
 
 package org.lamsfoundation.lams.tool.rsrc.web.servlet;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.Cookie;
@@ -103,7 +104,9 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			throw new ResourceApplicationException(error);
 		}
 		List<Summary> group = service.exportBySessionId(toolSessionID);
-		request.getSession().setAttribute(ResourceConstants.ATTR_RESOURCE_ITEM_LIST, group);
+		List<List> groupList = new ArrayList<List>();
+		groupList.add(group);
+		request.getSession().setAttribute(ResourceConstants.ATTR_SUMMARY_LIST, groupList);
 	}
 
 	public void teacher(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies)
@@ -127,7 +130,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		List<List> groupList = service.exportByContentId(toolContentID);
 		
 		// put it into HTTPSession
-		request.getSession().setAttribute(ResourceConstants.ATTR_RESOURCE_ITEM_LIST, groupList);
+		request.getSession().setAttribute(ResourceConstants.ATTR_SUMMARY_LIST, groupList);
 	}
 
 }

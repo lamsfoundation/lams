@@ -3,7 +3,6 @@
 <html:html locale="true">
 <head>
 	<title><fmt:message key="export.title" /></title>
-	<html:base />
 	<c:set var="lams">
 		<lams:LAMSURL />
 	</c:set>
@@ -30,18 +29,12 @@
 					<tr>
 						<td>
 							<c:choose>
-								<c:when test="${item.isInitGroup}">
-									<fmt:message key="export.init.resource" />
-									<c:if test="${firstGroup.index==0}">
-										<fmt:message key="monitoring.summary.note" />
-									</c:if>
+								<c:when test="${item.initGroup}">
+									<B><fmt:message key="export.init.resource" /></B>
 								</c:when>
 								<c:otherwise>
-									<fmt:message key="monitoring.label.group" />
-									${item.sessionName}
-									<c:if test="${firstGroup.index==0}">
-										<fmt:message key="monitoring.summary.note" />
-									</c:if>
+									<B><fmt:message key="monitoring.label.group" />
+									${item.sessionName}</B>
 								</c:otherwise>
 							</c:choose>
 						</td>
@@ -85,14 +78,12 @@
 										${item.itemTitle}
 									</td>
 									<td>
-										<c:if test="${!item.itemCreateByAuthor}">
 										${item.username}
-									</c:if>
 									</td>
 									<td align="center">
 										<c:choose>
 											<c:when test="${item.itemType == 1}">
-												<a href="#" onclick="launchPopup('${item.url}','openurl');"> <fmt:message key="label.authoring.basic.resource.preview" /> </a>
+												<a href="javascript:;" onclick="launchPopup('${item.url}','openurl');"> <fmt:message key="label.authoring.basic.resource.preview" /> </a>
 											</c:when>
 											<c:when test="${item.itemType == 2}">
 												<c:set var="downloadUrl">

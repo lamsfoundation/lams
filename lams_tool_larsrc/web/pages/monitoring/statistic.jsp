@@ -8,8 +8,8 @@
 			<c:if test="${status.index == 0}">
 				<tr>
 					<td>
-						<fmt:message key="monitoring.label.group" />
-						${item.sessionName}
+						<B><fmt:message key="monitoring.label.group" />
+						${item.sessionName}</B>
 					</td>
 				</tr>
 				<tr>
