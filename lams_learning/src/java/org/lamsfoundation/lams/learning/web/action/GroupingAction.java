@@ -123,7 +123,7 @@ public class GroupingAction extends LamsDispatchAction
         List currentLearners = LessonLearnerDataManager.getAllLessonLearners(getServlet().getServletContext(),
                                                                              learnerProgress.getLesson().getLessonId().longValue(),
                                                                              learnerService);
-        learnerService.performGrouping((GroupingActivity)learnerProgress.getNextActivity(),
+        learnerService.performGrouping(learnerProgress.getNextActivity().getActivityId(),
                                        currentLearners);
 
         LearningWebUtil.putActivityInRequest(request, learnerProgress.getNextActivity(), learnerService);
@@ -228,7 +228,7 @@ public class GroupingAction extends LamsDispatchAction
      */
     private boolean isNextActivityValid(LearnerProgress learnerProgress)
     {
-        return learnerProgress.getNextActivity()!=null&&(learnerProgress.getNextActivity() instanceof GroupingActivity);
+        return learnerProgress.getNextActivity()!=null&&(learnerProgress.getNextActivity().isGroupingActivity());
     }
 
 }

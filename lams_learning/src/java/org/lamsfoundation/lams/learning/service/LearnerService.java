@@ -47,6 +47,7 @@ import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dao.ILearnerProgressDAO;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
+import org.lamsfoundation.lams.lesson.dto.LearnerProgressDTO;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.dao.IToolSessionDAO;
@@ -260,6 +261,14 @@ public class LearnerService implements ILearnerService
     }
     
     /**
+     * @see org.lamsfoundation.lams.learning.service.ILearnerService#getProgressDTOById(java.lang.Long)
+     */
+    public LearnerProgressDTO getProgressDTOById(Long progressId)
+    {
+        return learnerProgressDAO.getLearnerProgress(progressId).getLearnerProgressData();
+    }
+
+    /**
      * @see org.lamsfoundation.lams.learning.service.ILearnerService#chooseActivity(org.lamsfoundation.lams.usermanagement.User, org.lamsfoundation.lams.lesson.Lesson, org.lamsfoundation.lams.learningdesign.Activity)
      */
     public LearnerProgress chooseActivity(User learner, Lesson lesson, Activity activity) 
@@ -313,8 +322,6 @@ public class LearnerService implements ILearnerService
      */
     public String completeToolSession(Long toolSessionId, Long learnerId) 
     {
-    	User learner = userManagementService.getUserById(new Integer(learnerId.intValue()));
-    	
         //update tool session state in lams
         ToolSession toolSession = lamsCoreToolService.getToolSessionById(toolSessionId);
     	
@@ -322,9 +329,18 @@ public class LearnerService implements ILearnerService
         
         lamsCoreToolService.updateToolSession(toolSession);
         
+    	User learner = userManagementService.getUserById(new Integer(learnerId.intValue()));
         return completeActivity(learner, toolSession.getToolActivity(), toolSession.getLesson());
     }
     
+    /**
+     * @see org.lamsfoundation.lams.learning.service.ILearnerService#completeActivity(org.lamsfoundation.lams.usermanagement.User, java.lang.Long, org.lamsfoundation.lams.lesson.Lesson)
+     */
+    public String completeActivity(User learner,Long activityId,Lesson lesson) {
+    	Activity activity = getActivity(activityId);
+    	return completeActivity(learner, activity,lesson);
+    }
+
     /**
      * @see org.lamsfoundation.lams.learning.service.ILearnerService#completeActivity(org.lamsfoundation.lams.usermanagement.User, org.lamsfoundation.lams.learningdesign.Activity, org.lamsfoundation.lams.lesson.Lesson)
      */
@@ -353,10 +369,17 @@ public class LearnerService implements ILearnerService
      * Exit a lesson.
      * @see org.lamsfoundation.lams.learning.service.ILearnerService#exitLesson(org.lamsfoundation.lams.lesson.LearnerProgress)
      */
-    public void exitLesson(LearnerProgress progress)
+    public void exitLesson(Long progressId)
     {
-       progress.setRestarting(true);
-       learnerProgressDAO.updateLearnerProgress(progress);
+       LearnerProgress progress = learnerProgressDAO.getLearnerProgress(progressId);
+       if ( progress != null ) {
+    	   progress.setRestarting(true);
+    	   learnerProgressDAO.updateLearnerProgress(progress);
+       } else { 
+    	   String error = "Learner Progress "+progressId+" does not exist. Cannot exit lesson successfully.";
+    	   log.error(error);
+    	   throw new LearnerServiceException(error);
+       }
     }
     
     /**
@@ -368,48 +391,89 @@ public class LearnerService implements ILearnerService
     }
     
     /**
-     * @see org.lamsfoundation.lams.learning.service.ILearnerService#performGrouping(org.lamsfoundation.lams.learningdesign.GroupingActivity, java.util.List)
+     * @see org.lamsfoundation.lams.learning.service.ILearnerService#performGrouping(java.lang.Long, java.util.List)
      */
-    public void performGrouping(GroupingActivity groupingActivity, List learners)
+    public void performGrouping(Long groupingActivityId, List learners)
     {
-        Grouping grouping = groupingActivity.getCreateGrouping();
-        
-        grouping.doGrouping(learners);
-        
-        groupingDAO.update(grouping);
+    	GroupingActivity groupingActivity = (GroupingActivity) activityDAO.getActivityByActivityId(groupingActivityId, GroupingActivity.class);
+    	if ( groupingActivity != null ) { 
+    		performGrouping(groupingActivity, learners);
+    		
+    	} else {
+
+    		String error = "Grouping activity "+groupingActivityId+" does not exist. Cannot perform grouping.";
+            log.error(error);
+    		throw new LearnerServiceException(error);
+
+    	}
        
     }
+
+    /**
+     * @see org.lamsfoundation.lams.learning.service.ILearnerService#performGrouping(org.lamsfoundation.lams.learningdesign.GroupingActivity, java.util.List)
+     */
+    public void performGrouping(GroupingActivity groupingActivity, List learners) {
+
+	    Grouping grouping = groupingActivity.getCreateGrouping();
+		grouping.doGrouping(learners);
+		groupingDAO.update(grouping);
+    }
+    
+	
     /**
      * @see org.lamsfoundation.lams.learning.service.ILearnerService#performGrouping(org.lamsfoundation.lams.learningdesign.GroupingActivity, org.lamsfoundation.lams.usermanagement.User)
      */
-    public void performGrouping(GroupingActivity groupingActivity, User learner)
+    public void performGrouping(Long groupingActivityId, User learner)
     {
-        Grouping grouping = groupingActivity.getCreateGrouping();
-        
-        grouping.doGrouping(learner);
-        
-        groupingDAO.update(grouping);
+    	GroupingActivity groupingActivity = (GroupingActivity) activityDAO.getActivityByActivityId(groupingActivityId, GroupingActivity.class);
+    	if ( groupingActivity != null ) { 
+
+	        Grouping grouping = groupingActivity.getCreateGrouping();
+	        grouping.doGrouping(learner);
+	        groupingDAO.update(grouping);
+	        
+    	} else {
+
+    		String error = "Grouping activity "+groupingActivityId+" does not exist. Cannot perform grouping.";
+            log.error(error);
+    		throw new LearnerServiceException(error);
+
+    	}
         
     }
     
+    /**
+     * @see org.lamsfoundation.lams.learning.service.ILearnerService#knockGate(java.lang.Long, org.lamsfoundation.lams.usermanagement.User, java.util.List)
+     */
+    public boolean knockGate(Long gateActivityId, User knocker, List lessonLearners) {
+    	GateActivity gate = (GateActivity) activityDAO.getActivityByActivityId(gateActivityId, GateActivity.class);
+    	if ( gate != null ) {
+    		return knockGate(gate,knocker,lessonLearners);
+    	} 
+    	
+		String error = "Gate activity "+gateActivityId+" does not exist. Cannot knock on gate.";
+        log.error(error);
+		throw new LearnerServiceException(error);
+    }
     /**
      * @see org.lamsfoundation.lams.learning.service.ILearnerService#knockGate(org.lamsfoundation.lams.learningdesign.GateActivity, org.lamsfoundation.lams.usermanagement.User, java.util.List)
      */
     public boolean knockGate(GateActivity gate, User knocker, List lessonLearners)
     {
-        boolean gateOpen = false;
-        //knock the gate.
-        if(gate.shouldOpenGateFor(knocker,lessonLearners))
-            gateOpen = true;
-        else
-            gateOpen = false;
-        
-        //update gate including updating the waiting list and gate status in
-        //the database.
-        activityDAO.update(gate);
-        
-        return gateOpen;
+	        boolean gateOpen = false;
+	        //knock the gate.
+	        if(gate.shouldOpenGateFor(knocker,lessonLearners))
+	            gateOpen = true;
+	        else
+	            gateOpen = false;
+	        
+	        //update gate including updating the waiting list and gate status in
+	        //the database.
+	        activityDAO.update(gate);
+	        return gateOpen;
+	        
     }
+    
     //---------------------------------------------------------------------
     // Helper Methods
     //---------------------------------------------------------------------

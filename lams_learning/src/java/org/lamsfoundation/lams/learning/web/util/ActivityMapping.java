@@ -324,8 +324,8 @@ public class ActivityMapping implements Serializable
 
         if (activity != null)
         {
-            String query = "?activityId=" + activity.getActivityId();
-            url += query;
+       		url += url.indexOf("?") > -1 ? "&" : "?";
+       		url += "activityId=" + activity.getActivityId();
         }
         if (useContext)
         {

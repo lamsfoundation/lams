@@ -40,6 +40,7 @@ import org.lamsfoundation.lams.learning.service.LearnerServiceException;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learning.web.util.LessonLearnerDataManager;
+import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
@@ -116,21 +117,25 @@ public class GateAction extends LamsDispatchAction
                                                                                    learnerProgress.getLesson().getLessonId().longValue(),
                                                                                    learnerService);
         //knock the gate
-        boolean gateOpen = learnerService.knockGate((GateActivity)learnerProgress.getNextActivity(),
+        boolean gateOpen = learnerService.knockGate(learnerProgress.getNextActivity().getActivityId(),
                                                     learnerProgress.getUser(),
                                                     currentLessonLearners);
-        //if the gate is open, let the learner go to the next activity.
+        //if the gate is open, let the learner go to the next activity ( updating the cached learner progress on the way )
         if(gateOpen)
         {
             String nextActivityUrl = learnerService.completeActivity(learnerProgress.getUser(),
-                                                                     learnerProgress.getNextActivity(),
+                                                                     learnerProgress.getNextActivity().getActivityId(),
                                                                      learnerProgress.getLesson());
-    		response.sendRedirect(nextActivityUrl);
+            // get the update
+            LearningWebUtil.setLearnerProgress(learnerService.getProgressById(learnerProgress.getLearnerProgressId()));
+            response.sendRedirect(nextActivityUrl);
             return null;
         }
-        //if the gate is closed, ask the learner to wait
-        else
+        //if the gate is closed, ask the learner to wait ( updating the cached learner progress on the way )
+        else {
+            LearningWebUtil.setLearnerProgress(learnerService.getProgressById(learnerProgress.getLearnerProgressId()));
             return mapping.findForward(WAITING);
+        }
     }
 	
     //---------------------------------------------------------------------
@@ -148,7 +153,7 @@ public class GateAction extends LamsDispatchAction
         if(!isNextActivityValid(learnerProgress))
             throw new LearnerServiceException("Error in progress engine. Getting "
                                               +learnerProgress.getNextActivity().toString()
-                                              +" where it should be grouping activity");
+                                              +" where it should be gate activity");
     }
 
     /**
@@ -157,6 +162,6 @@ public class GateAction extends LamsDispatchAction
      */
     private boolean isNextActivityValid(LearnerProgress learnerProgress)
     {
-        return learnerProgress.getNextActivity()!=null&&(learnerProgress.getNextActivity() instanceof GateActivity);
+        return learnerProgress.getNextActivity()!=null&&(learnerProgress.getNextActivity().isGateActivity());
     }	
 }

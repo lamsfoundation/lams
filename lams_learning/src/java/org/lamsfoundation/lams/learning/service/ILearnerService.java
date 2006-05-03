@@ -29,8 +29,9 @@ import java.util.List;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
-import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.lesson.dto.LearnerProgressDTO;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.MessageService;
@@ -78,6 +79,14 @@ public interface ILearnerService
     public LearnerProgress getProgressById(Long progressId);
     
     /**
+     * Return the current progress data against progress id.
+     * Returns a DTO suitable to send to Flash.
+     * @param progressId
+     * @return
+     */
+    public LearnerProgressDTO getProgressDTOById(Long progressId);
+
+    /**
      * Marks an activity as attempted. Called when a user selects an OptionsActivity.
      * @param learner the Learner
      * @param lesson the Lesson to get progress from.
@@ -113,18 +122,29 @@ public interface ILearnerService
      * Complete the activity in the progress engine and delegate to the progress 
      * engine to calculate the next activity in the learning design. This 
      * process might be triggerred by system controlled the activity, such as
-     * grouping and gate. It might also be triggerred by complete tool session
-     * progress from tool. Therefore, the transaction demarcation needs to be 
-     * configured as <code>REQURIED</code>.
-     * 
+     * grouping and gate. This method should be used when we don't have an activity
+     * that is already part of the Hibernate session. 
      * 
      * @param learner the learner who are running this activity in the design.
-     * @param activity the activity is being runned.
+     * @param activity the activity is being run.
+     * @param lesson the lesson this learner is currently in.
+     * @return the url for next activity.
+     */
+    public String completeActivity(User learner,Long activityId,Lesson lesson);
+  
+    /**
+     * Complete the activity in the progress engine and delegate to the progress 
+     * engine to calculate the next activity in the learning design. This method should 
+     * be used when we t have an activity that is already part of the Hibernate session. 
+     * It is currently triggered by complete tool session progress from tool.
+     * 
+     * @param learner the learner who are running this activity in the design.
+     * @param activity the activity is being run.
      * @param lesson the lesson this learner is currently in.
      * @return the url for next activity.
      */
     public String completeActivity(User learner,Activity activity,Lesson lesson);
-  
+
     /**
      * Retrieve all lessons that has been started, suspended or finished. All
      * finished but archived lesson should not be loaded.
@@ -136,10 +156,11 @@ public interface ILearnerService
     
     /**
      * Mark the learner progress as restarting to indicate the current learner
-     * has exit the lesson
-     * @param progress the current learner progress.
+     * has exit the lesson. Doesn't use the cached progress object in case it 
+     * 
+     * @param progressId the current learner progress.
      */
-    public void exitLesson(LearnerProgress progress);
+    public void exitLesson(Long progressId);
     
     /**
      * Returns an activity according to the activity id.
@@ -157,25 +178,52 @@ public interface ILearnerService
     
     /**
      * Perform random grouping for a list of learners based on the grouping
-     * activity.
-     * @param groupingActivity the activity that has create grouping.
+     * activity. This method should be used when we don't have an grouping activity
+     * that is already part of the Hibernate session. 
+     * 
+     * @param groupingActivityId the activity that has create grouping.
      * @param learners the list of learners need to be grouped.
      */
     public void performGrouping(GroupingActivity groupingActivity, List learners);
     
+
     /**
-     * Perform random grouping a single learner based on the grouping activity.
-     * @param groupingActivity the activity that has create grouping.
-     * @param learner the learner needs to be grouped
+     * Perform random grouping for a list of learners based on the grouping
+     * activity. This method should be used when we do have an grouping activity
+     * that is already part of the Hibernate session. 
+     * @param groupingActivityId the activity that has create grouping.
+     * @param learners the list of learners need to be grouped.
      */
-    public void performGrouping(GroupingActivity groupingActivity, User learner);
+    public void performGrouping(Long groupingActivityId, List learners);
     
     /**
-     * Check up the gate status to go through the gate.
-     * @param gate the gate that current learner is facing. It could be 
+     * Perform random grouping a single learner based on the grouping activity.
+     * @param groupingActivityId the activity that has create grouping.
+     * @param learner the learner needs to be grouped
+     */
+    public void performGrouping(Long groupingActivityId, User learner);
+    
+    /**
+     * Check up the gate status to go through the gate. This also updates the gate.
+     * This method should be used when we do not have an grouping activity
+     * that is already part of the Hibernate session. 
+     * @param gateid the gate that current learner is facing. It could be 
      * 			   synch gate, schedule gate or permission gate.
      * @param knocker the learner who wants to go through the gate.
      * @param lessonLearners the entire lesson learners.
      */
-    public boolean knockGate(GateActivity gate,User knocker,List lessonLearners);
+    public boolean knockGate(Long gateActivityId,User knocker,List lessonLearners);
+
+    /**
+     * Check up the gate status to go through the gate. This also updates the gate.
+     * This method should be used when we do have an grouping activity
+     * that is already part of the Hibernate session. 
+     * @param gate the gate that current learner is facing. It could be 
+     * 			   synch gate, schedule gate or permission gate.
+     * 			   Don't supply the actual gate from the cached web version
+     * 			   as it might be out of date or not attached to the session
+     * @param knocker the learner who wants to go through the gate.
+     * @param lessonLearners the entire lesson learners.
+     */
+    public boolean knockGate(GateActivity gateActivity,User knocker,List lessonLearners);
 }

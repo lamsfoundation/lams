@@ -42,6 +42,7 @@ import org.lamsfoundation.lams.learning.web.util.LessonLearnerDataManager;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.dto.ProgressActivityDTO;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.lesson.dto.LearnerProgressDTO;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -97,14 +98,22 @@ public class LearnerAction extends LamsDispatchAction
     private static final String WELCOME = "welcome";
     private static final String EXIT = "exit";
     
-	  private FlashMessage handleException(Exception e, String methodKey, ILearnerService learnerService) {
-			log.error("Exception thrown "+methodKey,e);
-			String[] msg = new String[1];
-			msg[0] = e.getMessage();
-			return new FlashMessage(methodKey,
-					learnerService.getMessageService().getMessage("error.system.error", msg),
+	/** Handle an exception - either thrown by the service or by the web layer. Allows the exception
+	 * to be logged properly and ensure that an actual message goes back to Flash.
+	 * 
+	 * @param e
+	 * @param methodKey
+	 * @param learnerService
+	 * @return
+	 */
+	protected FlashMessage handleException(Exception e, String methodKey, ILearnerService learnerService) {
+		log.error("Exception thrown "+methodKey,e);
+		String[] msg = new String[1];
+		msg[0] = e.getMessage();
+		return new FlashMessage(methodKey,
+				learnerService.getMessageService().getMessage("error.system.error", msg),
 				FlashMessage.CRITICAL_ERROR);
-	    }
+	}
 
     /**
      * <p>The Struts dispatch method that retrieves all active lessons for a 
@@ -263,7 +272,7 @@ public class LearnerAction extends LamsDispatchAction
 	        if(log.isDebugEnabled())
 	            log.debug("Lesson id is: "+learnerProgress.getLesson().getLessonId());
 	        
-	        learnerService.exitLesson(learnerProgress);
+	        learnerService.exitLesson(learnerProgress.getLearnerProgressId());
 	        
 	        LessonLearnerDataManager.removeLessonUserFromCache(getServlet().getServletContext(),
 	                                                           learnerProgress.getLesson(),
@@ -288,6 +297,10 @@ public class LearnerAction extends LamsDispatchAction
      * A wddx packet with object data struture is sent back in the end of this 
      * call. It is used to construct or restore the flash learner progress
      * bar</p>
+     * 
+     * <p>Gets the most recent copy from the database - not the cached version.
+     * That way if the cached version has problems, at least we start off right!
+     * </p>
      * 
      * <p>As this process is expensive, the server is only expecting this call
      * whenever is necessary. For example, starting, resuming and restoring
@@ -319,9 +332,12 @@ public class LearnerAction extends LamsDispatchAction
     	try {
 	
 	        //SessionBean sessionBean = LearningWebUtil.getSessionBean(request,getServlet().getServletContext());
-	        LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgressByID(request,getServlet().getServletContext());
+    		
+	        ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+		    long learnerProgressId = WebUtil.readLongParam(request,LearningWebUtil.PARAM_PROGRESS_ID);
+		    LearnerProgressDTO learnerProgress = learnerService.getProgressDTOById(new Long(learnerProgressId));
 	        
-	        message = new FlashMessage("getFlashProgressData",learnerProgress.getLearnerProgressData());
+	        message = new FlashMessage("getFlashProgressData",learnerProgress);
 
     	} catch (Exception e ) {
     		message = handleException(e, "getFlashProgressData", LearnerServiceProxy.getLearnerService(getServlet().getServletContext()));
