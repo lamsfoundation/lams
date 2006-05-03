@@ -23,6 +23,9 @@
 
 /* $Id$ */
 package org.lamsfoundation.lams.tool.rsrc.dto;
+
+import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
+
 /**
  * List contains following element: <br>
  * 
@@ -51,7 +54,28 @@ public class Summary {
 	private String username;
 	private int viewNumber;
 	
+	//following is used for export portfolio programs:
+	private String url;
+	private Long fileUuid;
+	private Long fileVersionId;
+	//true: initial group item, false, belong to some group.
+	private boolean isInitGroup;
+	public Summary(){}
 	
+	public Summary(String sessionName, ResourceItem item,boolean isInitGroup){
+		this.sessionName = sessionName;
+		this.itemUid = item.getUid();
+		this.itemType = item.getType();
+		this.itemCreateByAuthor = item.isCreateByAuthor();
+		this.itemHide = item.isHide();
+		this.itemTitle = item.getTitle();
+		this.username = item.getCreateBy() == null?"":item.getCreateBy().getLoginName();
+		this.url = item.getUrl();
+		this.fileUuid = item.getFileUuid();
+		this.fileVersionId = item.getFileVersionId();
+		
+		this.isInitGroup = isInitGroup;
+	}
 	public boolean isItemCreateByAuthor() {
 		return itemCreateByAuthor;
 	}
@@ -105,6 +129,32 @@ public class Summary {
 	}
 	public void setViewNumber(int viewNumber) {
 		this.viewNumber = viewNumber;
+	}
+	public Long getFileUuid() {
+		return fileUuid;
+	}
+	public void setFileUuid(Long fileUuid) {
+		this.fileUuid = fileUuid;
+	}
+	public Long getFileVersionId() {
+		return fileVersionId;
+	}
+	public void setFileVersionId(Long fileVersionId) {
+		this.fileVersionId = fileVersionId;
+	}
+	public String getUrl() {
+		return url;
+	}
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
+	public boolean isInitGroup() {
+		return isInitGroup;
+	}
+
+	public void setInitGroup(boolean isInitGroup) {
+		this.isInitGroup = isInitGroup;
 	}
 	
 	

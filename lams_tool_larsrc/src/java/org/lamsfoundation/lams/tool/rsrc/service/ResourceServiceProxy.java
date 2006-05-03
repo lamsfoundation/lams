@@ -45,22 +45,22 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public class ResourceServiceProxy
 {
     /**
-     * Return the mc domain service object. It will delegate to the Spring
+     * Return the domain service object. It will delegate to the Spring
      * helper method to retrieve the proper bean from Spring bean factory.
      * @param servletContext the servletContext for current application
-     * @return mcq service object.
+     * @return Shared resource service object.
      */
     public static final IResourceService getResourceService(ServletContext servletContext)
     {
         return (IResourceService)getResourceDomainService(servletContext);
     }
     
-    public static final ToolSessionManager getMcSessionManager(ServletContext servletContext)
+    public static final ToolSessionManager getSessionManager(ServletContext servletContext)
     {
         return (ToolSessionManager)getResourceDomainService(servletContext);
     }
     
-    public static final ToolContentManager getMcContentManager(ServletContext servletContext)
+    public static final ToolContentManager getContentManager(ServletContext servletContext)
     {
         return (ToolContentManager)getResourceDomainService(servletContext);
     }

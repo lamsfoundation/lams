@@ -82,7 +82,7 @@
 
 <servlet>
 		<servlet-name>exportPortfolio</servlet-name>
-		<servlet-class>org.lamsfoundation.lams.tool.rsrc.web.action.ExportServlet</servlet-class>
+		<servlet-class>org.lamsfoundation.lams.tool.rsrc.web.servlet.ExportServlet</servlet-class>
 </servlet>
 
 <servlet>

@@ -33,7 +33,6 @@ import org.lamsfoundation.lams.tool.rsrc.model.ResourceAttachment;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceSession;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
-import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * @author Dapeng.Ni
@@ -109,7 +108,9 @@ public interface IResourceService
 	 * @param visible true, item is visible. False, item is invisible.
 	 */
 	void setItemVisible(Long itemUid, boolean visible);
+
 	
-	
+	public List<Summary> exportBySessionId(Long sessionId);
+	public List<List> exportByContentId(Long contentId); 
 }
 

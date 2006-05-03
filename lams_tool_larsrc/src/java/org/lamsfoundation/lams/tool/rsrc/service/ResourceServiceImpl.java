@@ -294,7 +294,50 @@ public class ResourceServiceImpl implements
 		
 		return items;
 	}
-
+	public List<Summary> exportBySessionId(Long sessionId) {
+		ResourceSession session = resourceSessionDao.getSessionBySessionId(sessionId);
+		if(session == null){
+			log.error("Failed get ResourceSession by ID [" +sessionId + "]");
+			return null;
+		}
+		
+		//add resource items from ResourceSession
+		List<Summary> itemList = new ArrayList();
+		//get this session's all resource items
+		Set<ResourceItem> resList =session.getResourceItems();
+		for(ResourceItem item:resList){
+			if(!item.isCreateByAuthor()){
+				Summary sum = new Summary(session.getSessionName(),item,false);
+				itemList.add(sum);
+			}
+		}
+		
+		return itemList;
+	}
+	public List<List> exportByContentId(Long contentId) {
+		Resource resource = resourceDao.getByContentId(contentId);
+		List<List> groupList = new ArrayList();
+		
+		//create init resource items list
+		List<Summary> initList = new ArrayList();
+		groupList.add(initList);
+		Set<ResourceItem> resList = resource.getResourceItems();
+		for(ResourceItem item:resList){
+			if(item.isCreateByAuthor()){
+				Summary sum = new Summary(null,item,true);
+				initList.add(sum);
+			}
+		}
+		
+		//session by session
+		List<ResourceSession> sessionList = resourceSessionDao.getByContentId(contentId);
+		for(ResourceSession session:sessionList){
+			List<Summary> group = exportBySessionId(session.getSessionId());
+			groupList.add(group);
+		}
+		
+		return groupList;
+	}
 	public Resource getResourceBySessionId(Long sessionId){
 		ResourceSession session = resourceSessionDao.getSessionBySessionId(sessionId);
 		//to skip CGLib problem
@@ -408,7 +451,6 @@ public class ResourceServiceImpl implements
 		item.setHide(!visible);
 		resourceItemDao.saveObject(item);
 	}
-
 
 	//*****************************************************************************
 	// private methods
@@ -714,7 +756,6 @@ public class ResourceServiceImpl implements
 	public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException {
 		resourceSessionDao.deleteBySessionId(toolSessionId);
 	}
-
 
 
 }
