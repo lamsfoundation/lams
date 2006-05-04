@@ -55,6 +55,11 @@
 									<th width="300" align="center">
 										<fmt:message key="export.label.resource" />
 									</th>
+									<c:if test="${mode == 'teacher'}">
+										<th width="50" align="center">
+											<!-- hide/show -->
+										</th>
+									</c:if>
 								</tr>
 								</c:if>
 								<tr>
@@ -102,6 +107,15 @@
 											</c:when>
 										</c:choose>
 									</td>
+									<c:if test="${mode == 'teacher'}">
+										<td align="center">
+											<c:if test="${!item.itemCreateByAuthor}">
+												<c:if test="${item.itemHide}">
+													<fmt:message key="monitoring.label.hidden" />
+												</c:if>
+											</c:if>
+										</td>
+									</c:if>
 								</tr>
 								<c:if test="${status.count == groupSize}">
 							</table>

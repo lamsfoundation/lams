@@ -109,8 +109,15 @@ public interface IResourceService
 	 */
 	void setItemVisible(Long itemUid, boolean visible);
 
-	
-	public List<Summary> exportBySessionId(Long sessionId);
+	/**
+	 * Get resource item <code>Summary</code> list according to sessionId and skipHide flag.
+	 *  
+	 * @param sessionId
+	 * @param skipHide true, don't get resource item if its <code>isHide</code> flag is true.
+	 * 				  Otherwise, get all resource item  
+	 * @return
+	 */
+	public List<Summary> exportBySessionId(Long sessionId, boolean skipHide);
 	public List<List> exportByContentId(Long contentId); 
 }
 

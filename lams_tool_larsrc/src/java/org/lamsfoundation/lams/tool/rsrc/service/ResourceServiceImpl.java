@@ -295,7 +295,7 @@ public class ResourceServiceImpl implements
 		
 		return items;
 	}
-	public List<Summary> exportBySessionId(Long sessionId) {
+	public List<Summary> exportBySessionId(Long sessionId, boolean skipHide) {
 		ResourceSession session = resourceSessionDao.getSessionBySessionId(sessionId);
 		if(session == null){
 			log.error("Failed get ResourceSession by ID [" +sessionId + "]");
@@ -305,6 +305,9 @@ public class ResourceServiceImpl implements
 		List<Summary> itemList = new ArrayList();
 		Set<ResourceItem> resList = session.getResource().getResourceItems();
 		for(ResourceItem item:resList){
+			if(skipHide && item.isHide())
+				continue;
+			//if item is ha
 			if(item.isCreateByAuthor()){
 				Summary sum = new Summary(session.getSessionName(),item,false);
 				itemList.add(sum);
@@ -314,6 +317,9 @@ public class ResourceServiceImpl implements
 		//get this session's all resource items
 		Set<ResourceItem> sessList =session.getResourceItems();
 		for(ResourceItem item:sessList){
+			if(skipHide && item.isHide())
+				continue;
+			
 			//to skip all item create by author
 			if(!item.isCreateByAuthor()){
 				Summary sum = new Summary(session.getSessionName(),item,false);
@@ -341,7 +347,16 @@ public class ResourceServiceImpl implements
 		//session by session
 		List<ResourceSession> sessionList = resourceSessionDao.getByContentId(contentId);
 		for(ResourceSession session:sessionList){
-			List<Summary> group = exportBySessionId(session.getSessionId());
+			List<Summary> group = new ArrayList<Summary>();
+			//get this session's all resource items
+			Set<ResourceItem> sessList =session.getResourceItems();
+			for(ResourceItem item:sessList){
+				//to skip all item create by author
+				if(!item.isCreateByAuthor()){
+					Summary sum = new Summary(session.getSessionName(),item,false);
+					group.add(sum);
+				}
+			}
 			groupList.add(group);
 		}
 		

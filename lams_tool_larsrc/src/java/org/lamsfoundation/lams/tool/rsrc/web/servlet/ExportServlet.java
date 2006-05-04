@@ -43,6 +43,7 @@ import org.lamsfoundation.lams.tool.rsrc.service.IResourceService;
 import org.lamsfoundation.lams.tool.rsrc.service.ResourceApplicationException;
 import org.lamsfoundation.lams.tool.rsrc.service.ResourceServiceProxy;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * Export portfolio servlet to export all shared resource into offline HTML
@@ -62,8 +63,10 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	public String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies) {
 		try {
 			if (StringUtils.equals(mode, ToolAccessMode.LEARNER.toString())) {
+				request.getSession().setAttribute(AttributeNames.ATTR_MODE,ToolAccessMode.LEARNER);
 				learner(request, response, directoryName, cookies);
 			} else if (StringUtils.equals(mode, ToolAccessMode.TEACHER.toString())) {
+				request.getSession().setAttribute(AttributeNames.ATTR_MODE,ToolAccessMode.TEACHER);
 				teacher(request, response, directoryName, cookies);
 			}
 		} catch (ResourceApplicationException e) {
@@ -103,7 +106,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			logger.error(error);
 			throw new ResourceApplicationException(error);
 		}
-		List<Summary> group = service.exportBySessionId(toolSessionID);
+		List<Summary> group = service.exportBySessionId(toolSessionID,true);
 		List<List> groupList = new ArrayList<List>();
 		groupList.add(group);
 		request.getSession().setAttribute(ResourceConstants.ATTR_SUMMARY_LIST, groupList);
