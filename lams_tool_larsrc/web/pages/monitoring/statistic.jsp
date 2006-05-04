@@ -56,10 +56,17 @@
 									</c:if>
 								</td>
 								<td align="center">
-									<c:set var="listUrl">
-										<c:url value='/monitoring/listuser.do?toolSessionID=${item.sessionId}&itemUid=${item.itemUid}'/>
-									</c:set>
-									<a href="#" onclick="launchPopup('${listUrl}','listuser')"> ${item.viewNumber}<a>
+									<c:choose>
+										<c:when test="${item.viewNumber > 0}">
+											<c:set var="listUrl">
+												<c:url value='/monitoring/listuser.do?toolSessionID=${item.sessionId}&itemUid=${item.itemUid}'/>
+											</c:set>
+											<a href="#" onclick="launchPopup('${listUrl}','listuser')"> ${item.viewNumber}<a>
+										</c:when>
+										<c:otherwise>
+											0
+										</c:otherwise>
+									</c:choose>
 								</td>
 							</tr>
 				<c:if test="${status.count == groupSize}">

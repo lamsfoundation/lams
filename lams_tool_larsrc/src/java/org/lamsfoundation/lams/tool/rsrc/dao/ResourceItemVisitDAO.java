@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.tool.rsrc.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import org.lamsfoundation.lams.tool.rsrc.dto.Summary;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItemVisitLog;
@@ -35,22 +36,12 @@ public interface ResourceItemVisitDAO extends DAO {
 
 	public int getUserViewLogCount(Long sessionId, Long userUid);
 	/**
-	 * Return list which contains following element: <br>
-	 * 
-	 * <li>session_id</li>
-	 * <li>session_name</li>
-	 * <li>ResourceItem.uid</li>
-	 * <li>ResourceItem.item_type</li>
-	 * <li>ResourceItem.create_by_author</li>
-	 * <li>ResourceItem.is_hide</li>
-	 * <li>ResourceItem.title</li>
-	 * <li>User.login_name</li>
-	 * <li>count(resource_item_uid)</li>
+	 * Return list which contains key pair which key is resource item uid, value is number view.
 	 * 
 	 * @param contentId
 	 * @return
 	 */
-	public List<Summary> getSummary(Long contentId);
+	public Map<Long,Integer> getSummary(Long contentId);
 	
 	public List<ResourceItemVisitLog> getResourceItemLogBySession(Long sessionId,Long itemUid);
 

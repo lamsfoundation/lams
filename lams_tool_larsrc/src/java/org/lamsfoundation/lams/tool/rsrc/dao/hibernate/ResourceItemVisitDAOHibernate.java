@@ -24,7 +24,9 @@
 package org.lamsfoundation.lams.tool.rsrc.dao.hibernate;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.lamsfoundation.lams.tool.rsrc.dao.ResourceItemVisitDAO;
 import org.lamsfoundation.lams.tool.rsrc.dto.Summary;
@@ -45,14 +47,11 @@ public class ResourceItemVisitDAOHibernate extends BaseDAOHibernate implements R
 	private static final String FIND_VIEW_COUNT_BY_USER = "select count(*) from " + ResourceItemVisitLog.class.getName() 
 			+ " as r where  r.sessionId=? and  r.user.userId =?";
 
-	private static final String FIND_SUMMARY = "select v.sessionId, s.sessionName,i.uid,i.type ,i.createByAuthor" +
-			", i.hide, i.title, u.loginName, count(v.resourceItem) from  "
+	private static final String FIND_SUMMARY = "select v.resourceItem.uid, count(v.resourceItem) from  "
 		+ ResourceItemVisitLog.class.getName() + " as v , "
-		+ ResourceItem.class.getName() + "  as i, "
-		+ ResourceUser.class.getName() + "  as u, "
 		+ ResourceSession.class.getName() + " as s, "
 		+ Resource.class.getName() + "  as r "
-		+" where i.uid = v.resourceItem.uid and i.createBy.uid = u.uid and v.sessionId = s.sessionId "
+		+" where v.sessionId = s.sessionId "
 		+" and s.resource.uid = r.uid "
 		+" and r.contentId =? "
 		+" group by v.sessionId, v.resourceItem.uid ";
@@ -71,24 +70,12 @@ public class ResourceItemVisitDAOHibernate extends BaseDAOHibernate implements R
 		return ((Integer) list.get(0)).intValue();
 	}
 
-	public List<Summary> getSummary(Long contentId) {
+	public Map<Long,Integer> getSummary(Long contentId) {
 		
 		List<Object[]> result =  getHibernateTemplate().find(FIND_SUMMARY,contentId);
-		List<Summary> summaryList = new ArrayList<Summary>(result.size());
-		int idx=0;
+		Map<Long,Integer>  summaryList = new HashMap<Long,Integer> (result.size());
 		for(Object[] list : result){
-			Summary sum = new Summary();
-			idx=0;
-			sum.setSessionId((Long) list[idx++]);
-			sum.setSessionName((String) list[idx++]);
-			sum.setItemUid((Long) list[idx++]);
-			sum.setItemType((Short) list[idx++]);
-			sum.setItemCreateByAuthor((Boolean) list[idx++]);
-			sum.setItemHide((Boolean) list[idx++]);
-			sum.setItemTitle((String) list[idx++]);
-			sum.setUsername((String) list[idx++]);
-			sum.setViewNumber((Integer) list[idx++]);
-			summaryList.add(sum);
+			summaryList.put((Long)list[0],(Integer)list[1]);
 		}
 		return summaryList;
 		

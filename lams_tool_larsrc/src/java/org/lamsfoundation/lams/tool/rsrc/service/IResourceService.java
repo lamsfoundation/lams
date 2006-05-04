@@ -98,7 +98,7 @@ public interface IResourceService
 
 	ResourceItem getResourceItemByUid(Long itemUid);
 
-	List<Summary> getSummary(Long contentId);
+	List<List> getSummary(Long contentId);
 
 	List<ResourceUser> getUserListBySessionItem(Long sessionId, Long itemUid);
 

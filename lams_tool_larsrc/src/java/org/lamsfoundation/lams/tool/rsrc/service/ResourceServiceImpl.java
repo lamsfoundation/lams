@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
@@ -300,12 +301,20 @@ public class ResourceServiceImpl implements
 			log.error("Failed get ResourceSession by ID [" +sessionId + "]");
 			return null;
 		}
-		
-		//add resource items from ResourceSession
+		//initial resource items list
 		List<Summary> itemList = new ArrayList();
-		//get this session's all resource items
-		Set<ResourceItem> resList =session.getResourceItems();
+		Set<ResourceItem> resList = session.getResource().getResourceItems();
 		for(ResourceItem item:resList){
+			if(item.isCreateByAuthor()){
+				Summary sum = new Summary(session.getSessionName(),item,false);
+				itemList.add(sum);
+			}
+		}
+
+		//get this session's all resource items
+		Set<ResourceItem> sessList =session.getResourceItems();
+		for(ResourceItem item:sessList){
+			//to skip all item create by author
 			if(!item.isCreateByAuthor()){
 				Summary sum = new Summary(session.getSessionName(),item,false);
 				itemList.add(sum);
@@ -433,8 +442,47 @@ public class ResourceServiceImpl implements
 	public ResourceItem getResourceItemByUid(Long itemUid) {
 		return resourceItemDao.getByUid(itemUid);
 	}
-	public List<Summary> getSummary(Long contentId) {
-		return resourceItemVisitDao.getSummary(contentId);
+	public List<List> getSummary(Long contentId) {
+		List<List> groupList = new ArrayList<List>();
+		List<Summary> group = new ArrayList<Summary>();
+		
+		//get all item which is accessed by user
+		Map<Long,Integer> visitCountMap = resourceItemVisitDao.getSummary(contentId);
+		
+		Resource resource = resourceDao.getByContentId(contentId);
+		Set<ResourceItem> resItemList = resource.getResourceItems();
+
+		//get all sessions in a resource and retrieve all resource items under this session
+		//plus initial resource items by author creating (resItemList) 
+		List<ResourceSession> sessionList = resourceSessionDao.getByContentId(contentId);
+		for(ResourceSession session:sessionList){
+			//one new group for one session.
+			group = new ArrayList<Summary>();
+			//firstly, put all initial resource item into this group.
+			for(ResourceItem item:resItemList){
+				Summary sum = new Summary(session.getSessionId(),session.getSessionName(),item);
+				//set viewNumber according visit log
+				if(visitCountMap.containsKey(item.getUid()))
+					sum.setViewNumber(visitCountMap.get(item.getUid()).intValue());
+				group.add(sum);
+			}
+			//get this session's all resource items
+			Set<ResourceItem> sessItemList =session.getResourceItems();
+			for(ResourceItem item : sessItemList){
+				//to skip all item create by author
+				if(!item.isCreateByAuthor()){
+					Summary sum = new Summary(session.getSessionId(),session.getSessionName(),item);
+					//set viewNumber according visit log
+					if(visitCountMap.containsKey(item.getUid()))
+						sum.setViewNumber(visitCountMap.get(item.getUid()).intValue());					
+					group.add(sum);
+				}
+			}
+			groupList.add(group);
+		}
+		
+		return groupList;
+
 	}
 
 	public List<ResourceUser> getUserListBySessionItem(Long sessionId, Long itemUid) {

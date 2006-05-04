@@ -61,7 +61,35 @@ public class Summary {
 	//true: initial group item, false, belong to some group.
 	private boolean isInitGroup;
 	public Summary(){}
-	
+	/**
+	 * Contruction method for monitoring summary function. 
+	 * 
+	 * <B>Don't not set isInitGroup and viewNumber fields</B>
+	 * @param sessionName
+	 * @param item
+	 * @param isInitGroup
+	 */
+	public Summary(Long sessionId, String sessionName, ResourceItem item){
+		this.sessionId = sessionId;
+		this.sessionName = sessionName;
+		this.itemUid = item.getUid();
+		this.itemType = item.getType();
+		this.itemCreateByAuthor = item.isCreateByAuthor();
+		this.itemHide = item.isHide();
+		this.itemTitle = item.getTitle();
+		this.username = item.getCreateBy() == null?"":item.getCreateBy().getLoginName();
+		this.url = item.getUrl();
+		this.fileUuid = item.getFileUuid();
+		this.fileVersionId = item.getFileVersionId();
+	}
+	/**
+	 * Contruction method for export profolio function. 
+	 * 
+	 * <B>Don't not set sessionId and viewNumber fields</B>
+	 * @param sessionName
+	 * @param item
+	 * @param isInitGroup
+	 */
 	public Summary(String sessionName, ResourceItem item,boolean isInitGroup){
 		this.sessionName = sessionName;
 		this.itemUid = item.getUid();

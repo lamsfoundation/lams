@@ -115,20 +115,7 @@ public class MonitoringAction extends Action {
 			HttpServletResponse response) {
 		Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 		IResourceService service = getResourceService();
-		List<Summary> list = service.getSummary(contentId);
-
-		// grouping the all item according to different group
-		List<List> groupList = new ArrayList<List>();
-		Long sId = new Long(-1);
-		List<Summary> group = new ArrayList<Summary>();
-		for (Summary sum : list) {
-			if (!sId.equals(sum.getSessionId())) {
-				group = new ArrayList<Summary>();
-				groupList.add(group);
-				sId = sum.getSessionId();
-			}
-			group.add(sum);
-		}
+		List<List> groupList = service.getSummary(contentId);
 		
 		//put it into HTTPSession
 		request.getSession().setAttribute(ResourceConstants.ATTR_SUMMARY_LIST, groupList);
