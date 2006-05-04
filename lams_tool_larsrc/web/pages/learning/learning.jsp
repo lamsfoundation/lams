@@ -8,19 +8,19 @@
 	<!--
 		function gotoURL(){
  		    var reqIDVar = new Date();
-			parent.frames['newResourceFrame'].location = "<c:url value="/pages/learning/addurl.jsp"/>?&reqID="+reqIDVar.getTime();
-	      	parent.newResourceFrame.focus();
+			var gurl = "<c:url value="/pages/learning/addurl.jsp"/>?&reqID="+reqIDVar.getTime();
+	      	showMessage(gurl);
 	      	return false;
 		}
 		function gotoFile(){
  		    var reqIDVar = new Date();
-			parent.frames['newResourceFrame'].location = "<c:url value="/pages/learning/addfile.jsp"/>?&reqID="+reqIDVar.getTime();
-	      	parent.newResourceFrame.focus();
+ 		    var gurl = "<c:url value="/pages/learning/addfile.jsp"/>?&reqID="+reqIDVar.getTime();
+	      	showMessage(gurl);
 	      	return false;
 		}
 		function checkNew(){
  		    var reqIDVar = new Date();
-			parent.frames['learningFrame'].location= "<c:url value="/pages/learning/learning.jsp"/>?reqID="+reqIDVar.getTime();
+			document.location.href = "<c:url value="/pages/learning/learning.jsp"/>?reqID="+reqIDVar.getTime();
  		    return false;
 		}
 		function viewItem(itemUid){
@@ -28,12 +28,19 @@
 			launchPopup(myUrl,"Review");
 		}
 		function completeItem(itemUid){
-			parent.frames['learningFrame'].location = "<c:url value="/learning/completeItem.do"/>?itemUid=" + itemUid;
+			document.location.href = "<c:url value="/learning/completeItem.do"/>?itemUid=" + itemUid;
 			return false;
 		}
 		function finishSession(){
-			parent.frames['learningFrame'].location ='<c:url value="/learning/finish.do?toolSessionID=${toolSessionID}"/>';
+			document.location.href ='<c:url value="/learning/finish.do?toolSessionID=${toolSessionID}"/>';
 			return false;
+		}
+		function showMessage(url) {
+			var area=document.getElementById("reourceInputArea");
+			area.style.width="100%";
+			area.style.height="100%";
+			area.src=url;
+			area.style.display="block";
 		}
 	-->        
     </script>
@@ -61,7 +68,7 @@
 				<fmt:message key="label.completed" />
 			</th>
 			<th scope="col" style="width:200px">
-				<a href="#" style="width:120px" class="button" onclick="return 	"><fmt:message key="label.check.for.new" /></a>
+				<a href="#" style="width:120px" class="button" onclick="return checkNew()"><fmt:message key="label.check.for.new" /></a>
 			</th>
 		</tr>
 		<c:forEach var="item" items="${resourceList}">
@@ -95,15 +102,57 @@
 			</tr>
 		</c:if>
 	</table>
-	<table border="0" align="center" class="forms" width="95%">
-		<tr>
-			<td style="align:left" >
-				<fmt:message key="label.suggest.new"/> 
-				<input type="radio" name="suggest" value="url" checked="true" onclick="gotoURL()"><fmt:message key="label.authoring.basic.resource.url.input"/> |
-				<input type="radio" name="suggest" value="file"  onclick="gotoFile()"><fmt:message key="label.authoring.basic.resource.file.input"/> 
-			</td>
-		</tr>
-	</table>
+	<c:if test="${resource.allowAddFiles || resource.allowAddUrls}">
+		<table border="0" align="center" class="forms" width="95%">
+			<tr>
+				<td style="align:left" >
+					<fmt:message key="label.suggest.new"/> 
+					<c:choose>
+						<c:when test="${resource.allowAddFiles && resource.allowAddUrls}">
+							<input type="radio" name="suggest" value="url" checked="true" onclick="gotoURL()"><fmt:message key="label.authoring.basic.resource.url.input"/> |
+							<input type="radio" name="suggest" value="file"  onclick="gotoFile()"><fmt:message key="label.authoring.basic.resource.file.input"/> 
+						</c:when>
+						<c:when test="${resource.allowAddFiles && !resource.allowAddUrls}">
+							<input type="radio" name="suggest" value="file"  checked="true" onclick="gotoFile()"><fmt:message key="label.authoring.basic.resource.file.input"/> 
+						</c:when>
+						<c:when test="${!resource.allowAddFiles && resource.allowAddUrls}">
+							<input type="radio" name="suggest" value="url" checked="true" onclick="gotoURL()"><fmt:message key="label.authoring.basic.resource.url.input"/>
+						</c:when>
+					</c:choose>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<iframe onload="javascript:this.style.height=this.contentWindow.document.body.scrollHeight+'px'" 
+						id="reourceInputArea" name="reourceInputArea" style="width:0px;height:0px;border:0px;display:none" frameborder="no" scrolling="no">
+					</iframe>
+				</td>
+			</tr>			
+		</table>
+	</c:if>
+	<c:choose>
+		<c:when test="${resource.allowAddFiles && resource.allowAddUrls}">
+			<script type="text/javascript">
+				<!--
+					showMessage("<c:url value='/pages/learning/addurl.jsp'/>");
+				-->
+			</script>
+		</c:when>
+		<c:when test="${resource.allowAddFiles && !resource.allowAddUrls}">
+			<script type="text/javascript">
+				<!--
+					showMessage("<c:url value='/pages/learning/addfile.jsp'/>");
+				-->
+			</script>
+		</c:when>
+		<c:when test="${!resource.allowAddFiles && resource.allowAddUrls}">
+			<script type="text/javascript">
+				<!--
+					showMessage("<c:url value='/pages/learning/addurl.jsp'/>");
+				-->
+			</script>
+		</c:when>
+	</c:choose>		
 </body>
 </html:html>
 

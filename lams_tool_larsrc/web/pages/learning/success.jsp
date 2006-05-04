@@ -8,7 +8,7 @@
 	<body>
 		<script type="text/javascript">
 			var reqIDVar = new Date();
-			parent.frames['learningFrame'].location  = "${tool}/pages/learning/learning.jsp?reqID="+reqIDVar.getTime();
+			window.parent.location.href  = "${tool}/pages/learning/learning.jsp?reqID="+reqIDVar.getTime();
 		</script>
 		<div style="align:center">
 			<c:if test="${addType == 1}">

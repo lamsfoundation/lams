@@ -4,10 +4,7 @@
 	<body>
 	<script type="text/javascript">
 	<!--
-		if(${runAuto})
-			document.location.href = "${nextActivityUrl}";
-		else
-			parent.location = "${nextActivityUrl}";
+		document.location.href = "${nextActivityUrl}";
 	-->        
     </script>
 	

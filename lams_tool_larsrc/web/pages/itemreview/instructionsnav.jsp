@@ -14,7 +14,7 @@
 			   var reqIDVar = new Date();
 			   //if auto run mode, the opener will be null
 			   if(window.parent.opener != null) 
-				   window.parent.opener.parent.frames['learningFrame'].location.href="<c:url value="/learning/completeItem.do"/>?itemUid=${itemUid}&reqID="+reqIDVar.getTime();
+				    window.parent.opener.location.href="<c:url value="/learning/completeItem.do"/>?itemUid=${itemUid}&reqID="+reqIDVar.getTime();
 			   else{
 			  		//set complete flag and finish this activity as well.
 			        window.parent.location.href='<c:url value="/learning/finish.do?toolSessionID=${toolSessionID}&itemUid=${itemUid}"/>';

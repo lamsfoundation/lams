@@ -10,7 +10,7 @@
 			</c:when>
 			<c:otherwise>
 				<script type="text/javascript">
-					document.location = "<c:url value="/pages/learning/learningframe.jsp"/>"
+					document.location = "<c:url value="/pages/learning/learning.jsp"/>"
 				</script>
 			</c:otherwise>
 		</c:choose>
