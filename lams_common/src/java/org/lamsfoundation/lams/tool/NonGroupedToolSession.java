@@ -24,6 +24,8 @@
 package org.lamsfoundation.lams.tool;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -69,4 +71,14 @@ public class NonGroupedToolSession extends ToolSession {
 	public void setUser(User user) {
 		this.user = user;
 	}
+	
+	   /** Get all the learners who may be part of this tool session. */
+    public Set<User> getLearners() {
+    	HashSet<User> users = new HashSet<User>();
+    	if ( user != null ) {
+    		users.add(user);
+    	}
+   		return users;
+    }
+
 }

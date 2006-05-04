@@ -23,12 +23,17 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.service;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.Tool;
+import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.dao.IToolDAO;
+import org.lamsfoundation.lams.tool.dao.IToolSessionDAO;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
+import org.lamsfoundation.lams.usermanagement.User;
 
 
 /**
@@ -42,14 +47,24 @@ import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
  */
 public class LamsToolService implements ILamsToolService
 {
+	private static Logger log = Logger.getLogger(LamsToolService.class);
+ 
 	public IToolDAO toolDAO;
+	public IToolSessionDAO toolSessionDAO;
+	
     /**
-     * TODO Implement me!
      * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#getAllPotentialLearners(long)
      */
-    public List getAllPotentialLearners(long toolContentID) throws LamsToolServiceException
+    public Set<User> getAllPotentialLearners(long toolSessionId) throws LamsToolServiceException
     {
-        return null;
+    	
+    	ToolSession session = toolSessionDAO.getToolSession(toolSessionId);
+    	if ( session != null ) {
+    		return session.getLearners();
+    	} else {
+    		log.error("No tool session found for "+toolSessionId+". No potential learners being returned.");
+    		return new HashSet<User>();
+    	}
     }
     
     public IToolVO getToolBySignature(final String toolSignature)
@@ -74,5 +89,13 @@ public class LamsToolService implements ILamsToolService
 	 */
 	public void setToolDAO(IToolDAO toolDAO) {
 		this.toolDAO = toolDAO;
+	}
+
+	public IToolSessionDAO getToolSessionDAO() {
+		return toolSessionDAO;
+	}
+
+	public void setToolSessionDAO(IToolSessionDAO toolSessionDAO) {
+		this.toolSessionDAO = toolSessionDAO;
 	}
 }

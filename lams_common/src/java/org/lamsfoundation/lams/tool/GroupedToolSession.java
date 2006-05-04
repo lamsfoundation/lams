@@ -24,10 +24,13 @@
 package org.lamsfoundation.lams.tool;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.usermanagement.User;
 
 
 /**
@@ -76,4 +79,14 @@ public class GroupedToolSession extends ToolSession {
 	public void setSessionGroup(Group sessionGroup) {
 		this.sessionGroup = sessionGroup;
 	}
+	
+    /** Get all the learners who may be part of this tool session. */
+    public Set<User> getLearners() {
+    	HashSet<User> users = new HashSet<User>();
+    	if ( sessionGroup != null ) {
+    		users.addAll(sessionGroup.getUsers());
+    	}
+   		return users;
+    }
+
 }

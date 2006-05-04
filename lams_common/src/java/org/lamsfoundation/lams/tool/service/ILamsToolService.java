@@ -22,10 +22,11 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.service;
 
-import java.util.List;
+import java.util.Set;
 
 import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
+import org.lamsfoundation.lams.usermanagement.User;
 
 
 /**
@@ -49,7 +50,7 @@ public interface ILamsToolService
      * @return a List of all the Learners who are scheduled to use the content.
      * @exception in case of any problems.
      */
-    public List getAllPotentialLearners(long toolContentID) throws LamsToolServiceException;
+    public Set<User> getAllPotentialLearners(long toolSessionID) throws LamsToolServiceException;
     
     public IToolVO getToolBySignature(final String toolSignature);
     

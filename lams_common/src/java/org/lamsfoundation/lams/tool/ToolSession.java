@@ -23,14 +23,16 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool;
 
-import org.lamsfoundation.lams.learningdesign.ToolActivity;
-import org.lamsfoundation.lams.lesson.Lesson;
-
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Set;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.usermanagement.User;
 
 
 /** 
@@ -69,6 +71,9 @@ public abstract class ToolSession implements Serializable {
     private String uniqueKey;
     
     private Lesson lesson;
+
+    /** Get all the learners who may be part of this tool session. */
+    public abstract Set<User> getLearners(); 
 
     /** full constructor */
     public ToolSession(Long toolSessionId, 
