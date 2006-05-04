@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.learningdesign.strategy;
 import java.util.ArrayList;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ContributionTypes;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 
@@ -51,11 +52,11 @@ public class GroupingActivityStrategy extends SimpleActivityStrategy {
     /**
      * @see org.lamsfoundation.lams.learningdesign.strategy.SimpleActivityStrategy#setUpContributionType(org.lamsfoundation.lams.learningdesign.Activity, java.util.ArrayList)
      */
-    protected void setUpContributionType(ArrayList contributionTypes)
+    protected void setUpContributionType(ArrayList<Integer> contributionTypes)
     {
 		if ( groupingActivity != null ) {
-			if(groupingActivity.getCreateGrouping().getGroupingTypeId()== Grouping.CHOSEN_GROUPING_TYPE)
-			    contributionTypes.add(CHOSEN_GROUPING);
+			if( Grouping.CHOSEN_GROUPING_TYPE.equals(groupingActivity.getCreateGrouping().getGroupingTypeId()) )
+			    contributionTypes.add(ContributionTypes.CHOSEN_GROUPING);
 		}
     }
     

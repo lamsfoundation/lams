@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -62,6 +61,7 @@ import org.lamsfoundation.lams.lesson.LessonClass;
 import org.lamsfoundation.lams.lesson.dao.ILessonClassDAO;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
+import org.lamsfoundation.lams.monitoring.ContributeDTOFactory;
 import org.lamsfoundation.lams.monitoring.MonitoringConstants;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
@@ -926,8 +926,10 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     	Lesson lesson = lessonDAO.getLesson(lessonID);
     	FlashMessage flashMessage;
     	if(lesson!=null){
-    		Vector sortedSet = getOrderedActivityTree(lesson.getLearningDesign());
-    		flashMessage = new FlashMessage("getAllContributeActivities",sortedSet);
+    		ContributeActivitiesProcessor processor = new ContributeActivitiesProcessor(lesson.getLearningDesign(),activityDAO);
+    		processor.parseLearningDesign();
+    		Vector activities = processor.getMainActivityList();
+    		flashMessage = new FlashMessage("getAllContributeActivities",activities);
     	}else{
     		flashMessage = new FlashMessage("getAllContributeActivities",
     										messageService.getMessage("NO.SUCH.LESSON",new Object[]{lessonID}),
@@ -963,43 +965,14 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     }	
 	/**
 	 * (non-Javadoc)
-	 * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getActivityContributionURL(java.lang.Long)
-	 */
-	public String getActivityContributionURL(Long activityID)throws IOException{
-		Activity activity = activityDAO.getActivityByActivityId(activityID);
-    	FlashMessage flashMessage = null;
-		if(activity!=null){
-			if(activity.isToolActivity()){
-				ToolActivity toolActivity = (ToolActivity)activity;
-				String contributionURL = toolActivity.getTool().getContributeUrl();
-				flashMessage = new FlashMessage("getActivityContributionURL",contributionURL);
-			}
-		}else
-			flashMessage = FlashMessage.getNoSuchActivityExists("getActivityContributionURL",activityID);
-		
-		return flashMessage.serializeMessage();
-	}
-	/**
-	 * (non-Javadoc)
 	 * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getActivityDefineLaterURL(java.lang.Long)
 	 */
 	public String getActivityDefineLaterURL(Long activityID)throws IOException{
 		Activity activity = activityDAO.getActivityByActivityId(activityID);
     	FlashMessage flashMessage = null;
 		if(activity!=null){
-			if(activity.isToolActivity()){
-				ToolActivity toolActivity = (ToolActivity)activity;
-				String url = toolActivity.getTool().getDefineLaterUrl();
-				Long toolContentId = toolActivity.getToolContentId();
-				if ( url !=null &&  toolContentId != null ) {
-					url = WebUtil.appendParameterToURL(url,
-								AttributeNames.PARAM_TOOL_CONTENT_ID,
-								toolActivity.getToolContentId().toString());
-					flashMessage = new FlashMessage("getActivityDefineLaterURL",new ProgressActivityDTO(activityID, url));
-				} else {
-					flashMessage = generateDataMissingPacket(activityID, url, "Define Late URL", toolContentId, "Tool Content ID");
-				}
-			}
+			String url = ContributeDTOFactory.getActivityDefineLaterURL(activity);
+			flashMessage = new FlashMessage("getActivityDefineLaterURL",new ProgressActivityDTO(activityID, url));
 		}else
 			flashMessage = FlashMessage.getNoSuchActivityExists("getActivityDefineLaterURL",activityID);
 		
@@ -1337,54 +1310,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     	FlashMessage flashMessage = new FlashMessage("getAllLessons",lessonObjects);
     	return flashMessage.serializeMessage();    	
     }
-	/**
-     * This method assigns an orderID to all the activties in the LearningDesign
-     * based on the transitions. Once this is done it just packages it in a container 
-     * to be serialized and sent to flash
-     * 
-     * @param learningDesign The learningdesign whose activities have to be ordered
-     * @return Vector The activities with orderID assigned.
-     */
-	private Vector getOrderedActivityTree(LearningDesign learningDesign){
-		int order = 0;		
-		HashMap activityTree = learningDesign.getActivityTree();		
-		Vector<Activity> activityVector = new Vector<Activity>();		
-		
-		Activity nextActivity = learningDesign.getFirstActivity();
-		while(nextActivity!=null){
-			order = addActivityToVector(order, activityTree, activityVector, nextActivity);
-			nextActivity = transitionDAO.getNextActivity(nextActivity.getActivityId());	
-		}				
-		return activityVector;
-	}	
 
-    /**
-     * Used by getOrderedActivityTree(LearningDesign learningDesign)
-     * 
-	 * @param order
-	 * @param activityTree
-	 * @param activityVector
-	 * @param nextActivity
-	 * @return
-	 */
-	private int addActivityToVector(int order, HashMap activityTree, Vector activityVector, Activity nextActivity) {
-		nextActivity.setOrderId(new Integer(order));
-		Set childActivities = (Set) activityTree.get(nextActivity.getActivityId());			
-		if(childActivities.size()!=0){
-			Iterator iterator = childActivities.iterator();
-			while(iterator.hasNext()){					
-				Activity simpleActivity= (Activity)iterator.next();
-				activityVector.add(simpleActivity.getMonitoringActivityDTO());
-			}
-		}else{
-			// we are assuming that this is a simple activity.
-			// the original code for this branch only added it if it had a valid contribution 
-			// type, but the code for the if branch above didn't. Can add it in 
-			// again later if it causes Flash problems.
-			activityVector.add(nextActivity.getMonitoringActivityDTO());
-		}
-		return order + 1;
-	}
 	//---------------------------------------------------------------------
     // Helper Methods - scheduling
     //---------------------------------------------------------------------

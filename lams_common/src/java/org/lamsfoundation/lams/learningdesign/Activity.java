@@ -37,13 +37,10 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LibraryActivityDTO;
-import org.lamsfoundation.lams.learningdesign.dto.MonitoringActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ProgressActivityDTO;
-import org.lamsfoundation.lams.learningdesign.strategy.SimpleActivityStrategy;
 import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.util.Nullable;
-
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.Nullable;
 
 /**
  * Base class for all activities. If you add another subclass, 
@@ -199,8 +196,6 @@ public abstract class Activity implements Serializable,Nullable {
 	 * this activity. e.g. org.lamsfoundation.lams.tool.sbmt.SbmtResources.properties. */
 	private String languageFile;
 
-	protected SimpleActivityStrategy simpleActivityStrategy;
-	
     //---------------------------------------------------------------------
     // Object constructors
     //---------------------------------------------------------------------
@@ -793,15 +788,6 @@ public abstract class Activity implements Serializable,Nullable {
 	    return new ProgressActivityDTO(this.activityId);
 	}
 	
-
-	/** Get the monitoring DTO for this activity. Overridden by SimpleActivity
-	 * to include the contribution types */ 
-	public Set getMonitoringActivityDTO()
-	{
-		HashSet dtoSet = new HashSet();
-		dtoSet.add(new MonitoringActivityDTO(this,null));
-		return dtoSet;
-	}
 
 	/** Get the authoring DTO for this activity. Overidden by ComplexActivity.
 	 */

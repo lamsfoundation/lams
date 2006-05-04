@@ -299,14 +299,6 @@ public interface IMonitoringService
      */
     public String getLearnerActivityURL(Long activityID,Integer userID)throws IOException,LamsToolServiceException;
     
-     /**
-     * This method returns the contribute url for the given activity
-     * 
-     * @param activityID The activity_id of the Activity whose URL will be returned
-     * @return String The required information in WDDX format
-     * @throws IOException
-     */
-    public String getActivityContributionURL(Long activityID)throws IOException;
     /**
      * This method returns the define later url for the given activity
      * 

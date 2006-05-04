@@ -97,7 +97,7 @@ public abstract class GateActivityStrategy extends SimpleActivityStrategy
     /**
      * @see org.lamsfoundation.lams.learningdesign.strategy.SimpleActivityStrategy#setUpContributionType(org.lamsfoundation.lams.learningdesign.Activity, java.util.ArrayList)
      */
-    protected abstract void setUpContributionType(ArrayList contributionTypes);
+    protected abstract void setUpContributionType(ArrayList<Integer> contributionTypes);
 
     /**
      * Get the activity for this strategy. The activity should be set

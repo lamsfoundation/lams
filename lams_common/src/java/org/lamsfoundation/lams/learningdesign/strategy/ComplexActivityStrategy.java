@@ -81,7 +81,10 @@ public abstract class ComplexActivityStrategy implements Serializable
 
     /**
      * This method get next activity that should be progressed against the
-     * requested incomplete parent activity. 
+     * requested incomplete parent activity. This is designed to be used 
+     * by the progress engine, so for some complex activities it will be the 
+     * parent activity (for an options activity) or a special waiting activity
+     * (for the parallel activity) 
      * 
      * Changes made to remove casting (by Fiona Malikoff) made the assumption
      * that the parent is always a ComplexActivity. If this is not correct
@@ -93,6 +96,7 @@ public abstract class ComplexActivityStrategy implements Serializable
      */
     public abstract Activity getNextActivityByParent(ComplexActivity parent, Activity currentChild);
     
+ 
     /** 
      * Get the strategy's activity as a Complex Activity. Needed for areChildrenCompleted() 
      */

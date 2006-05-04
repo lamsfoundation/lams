@@ -48,16 +48,6 @@ import org.lamsfoundation.lams.learningdesign.Activity;
  */
 public abstract class SimpleActivityStrategy implements Serializable
 {
-    //---------------------------------------------------------------------
-    // Class level constants - Contribution types
-    //---------------------------------------------------------------------
-    public static final Integer MODERATION = new Integer(1);
-    public static final Integer DEFINE_LATER = new Integer(2);
-    public static final Integer PERMISSION_GATE = new Integer(3);
-    public static final Integer SYNC_GATE = new Integer(4);
-    public static final Integer SCHEDULE_GATE = new Integer(5);
-    public static final Integer CHOSEN_GROUPING = new Integer(6);
-    public static final Integer CONTRIBUTION = new Integer(7);
 
     //---------------------------------------------------------------------
     // Template methods
@@ -70,9 +60,7 @@ public abstract class SimpleActivityStrategy implements Serializable
      */
     public Integer[] getContributionType()
     {
-    	Activity activity = getActivity();
-    	
-		ArrayList contributionTypes = new ArrayList();
+		ArrayList<Integer> contributionTypes = new ArrayList<Integer>();
 		
 		//abstract method to polymorphically setup contribute type.
 		setUpContributionType(contributionTypes);
@@ -89,7 +77,7 @@ public abstract class SimpleActivityStrategy implements Serializable
      * 				   for.
      * @param contributionTypes the list that holds contribution types.
      */
-    protected abstract void setUpContributionType(ArrayList contributionTypes);
+    protected abstract void setUpContributionType(ArrayList<Integer> contributionTypes);
     
     /**
      * Get the activity for this strategy. The activity should be set

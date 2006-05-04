@@ -20,8 +20,11 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-/* $$Id$$ */
+/* $Id$ */
 package org.lamsfoundation.lams.usermanagement.dto;
+
+import java.util.Collection;
+import java.util.TreeMap;
 
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
@@ -32,26 +35,30 @@ import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 public class OrganisationDTO {
 
 	private Integer organisationID;
-	private Integer parentID;
+	private TreeMap<Integer,OrganisationDTO> childOrganisations;
 	private String name;
 	private String description;
+	private Integer parentID;
 	
 	public OrganisationDTO(){
 		
 	}	
-	public OrganisationDTO(Integer organisationID, Integer parentID, String name,
-			String description) {
+	public OrganisationDTO(Integer organisationID, Integer parentID, String description, String name) {
 		super();
 		this.organisationID = organisationID;
-		this.parentID = parentID;
 		this.name = name;
 		this.description = description;
+		this.childOrganisations = new TreeMap<Integer,OrganisationDTO>();
+		this.parentID = parentID;
 	}
+	
 	public OrganisationDTO(Organisation organisation){
 		this.organisationID = organisation.getOrganisationId();
-		this.parentID = organisation.getParentOrganisation().getOrganisationId();
 		this.name = organisation.getName();
 		this.description = organisation.getDescription();
+		this.childOrganisations = new TreeMap<Integer,OrganisationDTO>();
+		if ( organisation.getParentOrganisation() != null )
+			this.parentID = organisation.getParentOrganisation().getOrganisationId();
 	}
 	/**
 	 * @return Returns the description.
@@ -71,11 +78,19 @@ public class OrganisationDTO {
 	public Integer getOrganisationID() {
 		return organisationID!=null?organisationID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
 	}
-	
-	/** 
-	 * @return Returns the parent organisationID.
-	 */
-	public Integer getParentID() {
-		return parentID!=null?parentID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+
+	/** Gets all the child organisations. This is a recursive structure */
+	public Collection<OrganisationDTO> getChildOrganisations() {
+		return childOrganisations.values();
 	}
+	
+	/** Add a child organisation. Adds it into a sorted map so that the values always come out 
+	 * in the same order. */
+	public void addChildOrganisation(OrganisationDTO orgDTO) {
+		childOrganisations.put(orgDTO.getOrganisationID(),orgDTO);
+	}
+	public Integer getParentID() {
+		return parentID;
+	}
+	
 }

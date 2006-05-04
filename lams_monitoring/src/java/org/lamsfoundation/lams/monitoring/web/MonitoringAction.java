@@ -602,17 +602,6 @@ public class MonitoringAction extends LamsDispatchAction
     	response.sendRedirect(response.encodeRedirectURL(url));
     	return null;
     }
-    public ActionForward getActivityContributionURL(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response)throws IOException{
-    	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());    	
-    	Long activityID = new Long(WebUtil.readLongParam(request,"activityID"));
-    	String wddxPacket = monitoringService.getActivityContributionURL(activityID);
-        PrintWriter writer = response.getWriter();
-        writer.println(wddxPacket);
-        return null;
-    }
     public ActionForward moveLesson(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,

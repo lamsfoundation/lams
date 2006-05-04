@@ -288,11 +288,6 @@ public class TestMonitoringService extends AbstractLamsTestCase
         testOrganisation = usermanageService.getOrganisationById(TEST_ORGANIZATION_ID);
     }
    
-   public void testGetActivityContributionURL() throws IOException{
-    	String packet = monitoringService.getActivityContributionURL(new Long(29));    	
-    	System.out.println(packet);
-    } 
-    
     public void testCheckGateStatus() throws IOException
     {
 	     Long syncGateID = new Long(33);

@@ -25,11 +25,8 @@ package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.lamsfoundation.lams.learningdesign.dto.MonitoringActivityDTO;
 import org.lamsfoundation.lams.learningdesign.strategy.SimpleActivityStrategy;
 
 
@@ -115,15 +112,8 @@ public abstract class SimpleActivity extends Activity implements Serializable
         .toString();
     }
 
-    
-	public Set getMonitoringActivityDTO()
-	{
-		HashSet dtoSet = new HashSet();
-		Integer[] contributionType = simpleActivityStrategy.getContributionType();
-		for(int i=0;i<contributionType.length;i++){
-			dtoSet.add(new MonitoringActivityDTO(this,contributionType[i]));
-		}
-		return dtoSet;
+	public SimpleActivityStrategy getSimpleActivityStrategy() {
+		return simpleActivityStrategy;
 	}
 
 }

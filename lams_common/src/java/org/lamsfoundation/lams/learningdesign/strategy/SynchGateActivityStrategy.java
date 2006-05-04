@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.lamsfoundation.lams.learningdesign.ContributionTypes;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.usermanagement.User;
 
@@ -78,9 +79,9 @@ public class SynchGateActivityStrategy extends GateActivityStrategy
     /**
      * @see org.lamsfoundation.lams.learningdesign.strategy.SimpleActivityStrategy#setUpContributionType(org.lamsfoundation.lams.learningdesign.Activity, java.util.ArrayList)
      */
-    protected void setUpContributionType(ArrayList contributionTypes)
+    protected void setUpContributionType(ArrayList<Integer> contributionTypes)
     {
-        contributionTypes.add(SYNC_GATE);   
+        contributionTypes.add(ContributionTypes.SYNC_GATE);   
     }
 
 

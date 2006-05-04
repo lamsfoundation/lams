@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.learningdesign.strategy;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.lamsfoundation.lams.learningdesign.ContributionTypes;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 
 /**
@@ -48,9 +49,9 @@ public class PermissionGateActivityStrategy extends GateActivityStrategy {
     /**
      * @see org.lamsfoundation.lams.learningdesign.strategy.GateActivityStrategy#setUpContributionType(org.lamsfoundation.lams.learningdesign.Activity, java.util.ArrayList)
      */
-    protected void setUpContributionType(ArrayList contributionTypes)
+    protected void setUpContributionType(ArrayList<Integer> contributionTypes)
     {
-        contributionTypes.add(PERMISSION_GATE);
+        contributionTypes.add(ContributionTypes.PERMISSION_GATE);
     }
 
     /**
