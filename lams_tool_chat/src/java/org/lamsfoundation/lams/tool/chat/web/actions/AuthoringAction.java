@@ -105,7 +105,7 @@ public class AuthoringAction extends LamsDispatchAction {
 		if (chat == null) {
 			chat = chatService.copyDefaultContent(toolContentID);
 			chat.setCreateDate(new Date());
-			chatService.saveOrUpdateContent(chat);
+			chatService.saveOrUpdateChat(chat);
 			// TODO NOTE: this causes DB orphans when LD not saved.
 		}
 
@@ -182,7 +182,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
 		// saving changes.
 		content.setUpdateDate(new Date());
-		chatService.saveOrUpdateContent(content);
+		chatService.saveOrUpdateChat(content);
 
 		request.setAttribute("updateContentSuccess", new Boolean(true));
 
