@@ -26,10 +26,21 @@ package org.lamsfoundation.lams.tool.chat.util;
 
 public interface ChatConstants {
 	public static final String TOOL_SIGNATURE = "lachat11";
-	public static final Integer COMPLETED = new Integer(1);
+	
+	// Chat session status
+	public static final Integer SESSION_NOT_STARTED = new Integer(0);
+	public static final Integer SESSION_IN_PROGRESS = new Integer(1);
+	public static final Integer SESSION_COMPLETED = new Integer(2);	
+	
 	public static final String AUTHORING_DEFAULT_TAB = "1";
 	public static final String ATTACHMENT_LIST = "attachmentList";
 	public static final String DELETED_ATTACHMENT_LIST = "deletedAttachmentList";
 	public static final String AUTH_SESSION_ID_COUNTER = "authoringSessionIdCounter";
 	public static final String AUTH_SESSION_ID = "authoringSessionId";
+	
+	// TODO this is temporary for developement.  this should not remain here.
+	static final String XMPPDOMAIN = "shaun.melcoe.mq.edu.au";
+	static final String XMPPCONFERENCE = "conference.shaun.melcoe.mq.edu.au";
+	static final String XMPP_ADMIN_USERNAME = "admin";
+	static final String XMPP_ADMIN_PASSWORD = "wildfire";
 }
