@@ -7,5 +7,8 @@
 	<classpathentry sourcepath="/lams_common" kind="lib" path="/lams_build/lib/lams/lams.jar"/>
 	<classpathentry sourcepath="/lams_contentrepository" kind="lib" path="/lams_build/lib/lams/lams-contentrepository.jar"/>
 	<classpathentry sourcepath="/lams_learning" kind="lib" path="/lams_build/lib/lams/lams-learning.jar"/>
+	<classpathentry kind="lib" path="lib/smack-2.2.0/smack.jar"/>
+	<classpathentry kind="lib" path="lib/smack-2.2.0/smackx.jar"/>
+	<classpathentry kind="lib" path="lib/smack-2.2.0/smackx-debug.jar"/>
 	<classpathentry kind="output" path="build/classes/java"/>
 </classpath>
