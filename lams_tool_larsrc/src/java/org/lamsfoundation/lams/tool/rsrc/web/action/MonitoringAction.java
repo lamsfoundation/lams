@@ -25,13 +25,13 @@
 package org.lamsfoundation.lams.tool.rsrc.web.action;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -39,13 +39,19 @@ import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.rsrc.ResourceConstants;
 import org.lamsfoundation.lams.tool.rsrc.dto.Summary;
+import org.lamsfoundation.lams.tool.rsrc.model.Resource;
 import org.lamsfoundation.lams.tool.rsrc.service.IResourceService;
+import org.lamsfoundation.lams.tool.rsrc.service.ResourceApplicationException;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import sun.util.logging.resources.logging;
+
 public class MonitoringAction extends Action {
+	private static Logger log = Logger.getLogger(MonitoringAction.class);
+	
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) throws IOException, ServletException {
 		String param = mapping.getParameter();
@@ -121,6 +127,11 @@ public class MonitoringAction extends Action {
 		
 		//put it into HTTPSession
 		request.getSession().setAttribute(ResourceConstants.ATTR_SUMMARY_LIST, groupList);
+		
+		Resource resource = service.getResourceByContentId(contentId);
+		request.getSession().setAttribute(ResourceConstants.PAGE_EDITABLE, new Boolean(isResourceEditable(resource)));
+		request.getSession().setAttribute(ResourceConstants.ATTR_RESOURCE, resource);
+		request.getSession().setAttribute(ResourceConstants.ATTR_TOOL_CONTENT_ID, contentId);
 		return mapping.findForward(ResourceConstants.SUCCESS);
 	}
 
@@ -146,4 +157,19 @@ public class MonitoringAction extends Action {
 				.getServletContext());
 		return (IResourceService) wac.getBean(ResourceConstants.RESOURCE_SERVICE);
 	}
+	
+	private boolean isResourceEditable(Resource resource) {
+        if ( (resource.isDefineLater() == true) && (resource.isContentInUse()==true) )
+        {
+//            throw new ResourceApplicationException("An exception has occurred: There is a bug in this tool, conflicting flags are set");
+        	 log.error("An exception has occurred: There is a bug in this tool, conflicting flags are set");
+             return false;
+        }
+        else if ( (resource.isDefineLater() == true) && (resource.isContentInUse() == false))
+            return true;
+        else if ( (resource.isDefineLater() == false) && (resource.isContentInUse() == false))
+            return true;
+        else //  (content.isContentInUse()==true && content.isDefineLater() == false)
+            return false;
+	}	
 }

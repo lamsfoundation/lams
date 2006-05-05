@@ -1,7 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <table border="0" cellspacing="3" width="98%">
-	<c:forEach var="group" items="${summaryList}">
+	<c:forEach var="group" items="${summaryList}"  varStatus="firstGroup">
 		<c:set var="groupSize" value="${fn:length(group)}"/>
 		<c:forEach var="item" items="${group}" varStatus="status">
 			<%-- display group name on first row--%>
@@ -10,6 +10,11 @@
 					<td>
 						<B><fmt:message key="monitoring.label.group" />
 						${item.sessionName}</B>
+						<SPAN style="font-size: 12px;">
+							<c:if test="${firstGroup.index==0}">
+								<fmt:message key="monitoring.summary.note" />
+							</c:if>
+						</SPAN>						
 					</td>
 				</tr>
 				<tr>

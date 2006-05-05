@@ -75,7 +75,6 @@ public class ResourceConstants {
 	public static final String ERROR_MSG_UPLOAD_FAILED = "error.upload.failed";
 	
 	
-	
-
+	public static final String PAGE_EDITABLE = "isPageEditable";
 
 }
