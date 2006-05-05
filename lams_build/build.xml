@@ -214,11 +214,12 @@
 				inheritAll="false" >
 			<property name="jboss.deploy" location="${jboss.deploy}"/>
 		</ant>
- 		<ant antfile="../${tool_larsrc_dir}/build.xml" target="deploy-tool"
+-->
+		<ant antfile="../${tool_larsrc_dir}/build.xml" target="deploy-tool"
 				inheritAll="false" >
 			<property name="jboss.deploy" location="${jboss.deploy}"/>
 		</ant>
---> 		<ant antfile="../${tool_vote_dir}/build.xml" target="deploy-tool"
+ 		<ant antfile="../${tool_vote_dir}/build.xml" target="deploy-tool"
 				inheritAll="false" >
 			<property name="jboss.deploy" location="${jboss.deploy}"/>
 		</ant>
@@ -289,17 +290,16 @@
 
 	<target name="test-report" description="Run all the test cases across the system. Takes a long time.">
 		<!-- Core projects first -->
-<!-- 		<ant antfile="../${lams_common}/build.xml" target="insert-test-data" inheritAll="false"/>
+ 		<ant antfile="../${lams_common}/build.xml" target="insert-test-data" inheritAll="false"/>
  		<ant antfile="../${lams_common}/build.xml" target="test-report" inheritAll="false"/>
  		<ant antfile="../${lams_contentrepository}/build.xml" target="test-report" inheritAll="false"/>
  		<ant antfile="../${lams_common}/build.xml" target="insert-test-data" inheritAll="false"/>
 		<ant antfile="../${lams_central}/build.xml" target="test-report" inheritAll="false"/>
--->
  		<ant antfile="../${lams_common}/build.xml" target="insert-test-data" inheritAll="false"/>
  		<ant antfile="../${tool_survey_dir}/build.xml" target="build-db" inheritAll="false"/> 
 <!--  		<ant antfile="../${tool_survey_dir}/build.xml" target="build-jar" inheritAll="false"/>  -->
-		<ant antfile="../${lams_monitoring}/build.xml" target="test" inheritAll="false"/> 
-<!-- 		<ant antfile="../${lams_learning}/build.xml" target="test-report" inheritAll="false"/> -->
+		<ant antfile="../${lams_monitoring}/build.xml" target="test-report" inheritAll="false"/> 
+ 		<ant antfile="../${lams_learning}/build.xml" target="test-report" inheritAll="false"/> 
 
 		<!--  Now the tools -->
 <!-- 		<ant antfile="../${lams_common}/build.xml" target="insert-test-data" inheritAll="false"/>
