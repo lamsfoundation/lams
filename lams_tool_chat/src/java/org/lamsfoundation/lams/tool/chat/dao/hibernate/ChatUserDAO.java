@@ -24,12 +24,34 @@
 
 package org.lamsfoundation.lams.tool.chat.dao.hibernate;
 
+import java.util.List;
+
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.tool.chat.dao.IChatUserDAO;
+import org.lamsfoundation.lams.tool.chat.model.ChatUser;
 
 /**
  * DAO for accessing the ChatUser objects - Hibernate specific code.
  */
 public class ChatUserDAO extends BaseDAO implements IChatUserDAO {
 
+	public static final String SQL_QUERY_FIND_BY_USER_ID_SESSION_ID = "from "
+			+ ChatUser.class.getName() + " as f"
+			+ " where user_id=? and f.session.sessionId=?";
+
+	public ChatUser getByUserIdAndSessionId(Long userId, Long toolSessionId) {
+		List list = this.getHibernateTemplate().find(
+				SQL_QUERY_FIND_BY_USER_ID_SESSION_ID,
+				new Object[] { userId, toolSessionId });
+
+		if (list == null || list.isEmpty())
+			return null;
+
+		return (ChatUser) list.get(0);
+	}
+
+	public void saveOrUpdate(ChatUser chatUser) {
+		this.getHibernateTemplate().saveOrUpdate(chatUser);
+		this.getHibernateTemplate().flush();
+	}
 }

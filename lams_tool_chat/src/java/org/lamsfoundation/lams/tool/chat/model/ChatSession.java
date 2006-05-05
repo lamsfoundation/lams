@@ -61,6 +61,8 @@ public class ChatSession implements java.io.Serializable {
 	private Chat chat;
 
 	private Set chatUsers = new HashSet(0);
+	
+	private String jabberRoom;
 
 	// Constructors
 
@@ -187,6 +189,17 @@ public class ChatSession implements java.io.Serializable {
 
 	public void setChatUsers(Set chatUsers) {
 		this.chatUsers = chatUsers;
+	}
+	
+	/**
+	 * @hibernate.property column="jabber_room" length="250"
+	 */
+	public String getJabberRoom() {
+		return jabberRoom;
+	}
+
+	public void setJabberRoom(String jabberRoom) {
+		this.jabberRoom = jabberRoom;
 	}
 
 	/**

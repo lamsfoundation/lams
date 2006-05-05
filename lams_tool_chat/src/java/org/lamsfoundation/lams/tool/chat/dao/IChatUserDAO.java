@@ -25,11 +25,20 @@
 package org.lamsfoundation.lams.tool.chat.dao;
 
 import org.lamsfoundation.lams.dao.IBaseDAO;
+import org.lamsfoundation.lams.tool.chat.model.ChatUser;
 
 /**
  * DAO for accessing the ChatUser objects - interface defining
  * methods to be implemented by the Hibernate or other implementation.
  */
 public interface IChatUserDAO extends IBaseDAO{
+	/**
+	 * 
+	 * @param userId
+	 * @param toolSessionId
+	 * @return
+	 */
+	ChatUser getByUserIdAndSessionId(Long userId, Long toolSessionId);
 
+	void saveOrUpdate(ChatUser chatUser);
 }

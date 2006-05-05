@@ -24,152 +24,179 @@
 
 package org.lamsfoundation.lams.tool.chat.model;
 
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+
 /**
  * 
- * Caches the user details. This allows the tool to be more efficient at 
- * displaying user names but means that when people's names change, they
- * won't change in the "old" tool data.
+ * Caches the user details. This allows the tool to be more efficient at
+ * displaying user names but means that when people's names change, they won't
+ * change in the "old" tool data.
  * 
- *        @hibernate.class
- *         table="tl_lachat11_user"
+ * @hibernate.class table="tl_lachat11_user"
  */
 
-public class ChatUser  implements java.io.Serializable {
+public class ChatUser implements java.io.Serializable {
 
-
-    /**
+	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -3701664859818409197L;
-	// Fields    
-     private Long uid;
-     private Long userId;
-     private String lastName;
-     private String firstName;
-     private ChatSession chatSession;
 
+	// Fields
+	private Long uid;
 
-    // Constructors
+	private Long userId;
 
-    /** default constructor */
-    public ChatUser() {
-    }
+	private String lastName;
 
-    
-    /** full constructor */
-    public ChatUser(Long userId, String lastName, String firstName, ChatSession chatSession) {
-        this.userId = userId;
-        this.lastName = lastName;
-        this.firstName = firstName;
-        this.chatSession = chatSession;
-    }
+	private String firstName;
 
-   
-    // Property accessors
-    /**       
-     *            @hibernate.id
-     *             generator-class="native"
-     *             type="java.lang.Long"
-     *             column="uid"
-     */
+	private String loginName;
 
-    public Long getUid() {
-        return this.uid;
-    }
-    
-    public void setUid(Long uid) {
-        this.uid = uid;
-    }
-    /**       
-     *            @hibernate.property
-     *             column="user_id"
-     *             length="20"
-     *         
-     */
+	private ChatSession chatSession;
+	
+	private String jabberId;
 
-    public Long getUserId() {
-        return this.userId;
-    }
-    
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-    /**       
-     *            @hibernate.property
-     *             column="last_name"
-     *             length="255"
-     *         
-     */
+	// Constructors
 
-    public String getLastName() {
-        return this.lastName;
-    }
-    
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-    /**       
-     *            @hibernate.property
-     *             column="first_name"
-     *             length="255"
-     *         
-     */
+	/** default constructor */
+	public ChatUser() {
+	}
 
-    public String getFirstName() {
-        return this.firstName;
-    }
-    
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-    /**       
-     *            @hibernate.many-to-one
-     *             not-null="true"
-     *            @hibernate.column name="session_id"         
-     *         
-     */
+	public ChatUser(UserDTO user, ChatSession chatSession) {
+		this.userId = new Long(user.getUserID().intValue());
+		this.firstName = user.getFirstName();
+		this.lastName = user.getLastName();
+		this.loginName = user.getLogin();
+		this.chatSession = chatSession;
+	}
 
-    public ChatSession getChatSession() {
-        return this.chatSession;
-    }
-    
-    public void setChatSession(ChatSession chatSession) {
-        this.chatSession = chatSession;
-    }
-   
+	/** full constructor */
+	public ChatUser(Long userId, String lastName, String firstName,
+			ChatSession chatSession) {
+		this.userId = userId;
+		this.lastName = lastName;
+		this.firstName = firstName;
+		this.chatSession = chatSession;
+	}
 
-    /**
-     * toString
-     * @return String
-     */
-     public String toString() {
-	  StringBuffer buffer = new StringBuffer();
+	// Property accessors
+	/**
+	 * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+	 */
+	public Long getUid() {
+		return this.uid;
+	}
 
-      buffer.append(getClass().getName()).append("@").append(Integer.toHexString(hashCode())).append(" [");
-      buffer.append("userId").append("='").append(getUserId()).append("' ");			
-      buffer.append("]");
-      
-      return buffer.toString();
-     }
+	public void setUid(Long uid) {
+		this.uid = uid;
+	}
 
+	/**
+	 * @hibernate.property column="user_id" length="20"
+	 * 
+	 */
+	public Long getUserId() {
+		return this.userId;
+	}
 
-   public boolean equals(Object other) {
-         if ( (this == other ) ) return true;
-		 if ( (other == null ) ) return false;
-		 if ( !(other instanceof ChatUser) ) return false;
-		 ChatUser castOther = ( ChatUser ) other; 
-         
-		 return ( (this.getUid()==castOther.getUid()) || ( this.getUid()!=null && castOther.getUid()!=null && this.getUid().equals(castOther.getUid()) ) );
-   }
-   
-   public int hashCode() {
-         int result = 17;
-         result = 37 * result + ( getUid() == null ? 0 : this.getUid().hashCode() );
-         return result;
-   }   
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
+	/**
+	 * @hibernate.property column="last_name" length="255"
+	 * 
+	 */
+	public String getLastName() {
+		return this.lastName;
+	}
 
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+	
+	/**
+	 * @hibernate.property column="login_name" length="255"
+	 * 
+	 */
+	public String getLoginName() {
+		return loginName;
+	}
 
+	public void setLoginName(String loginName) {
+		this.loginName = loginName;
+	}
 
+	/**
+	 * @hibernate.property column="first_name" length="255"
+	 * 
+	 */
+	public String getFirstName() {
+		return this.firstName;
+	}
 
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+	
+	/**
+	 * @hibernate.property column="jabber_id" length="255"
+	 */
+	public String getJabberId() {
+		return jabberId;
+	}
 
+	public void setJabberId(String jabberId) {
+		this.jabberId = jabberId;
+	}
+
+	/**
+	 * @hibernate.many-to-one not-null="true"
+	 * @hibernate.column name="session_id"
+	 * 
+	 */
+	public ChatSession getChatSession() {
+		return this.chatSession;
+	}
+
+	public void setChatSession(ChatSession chatSession) {
+		this.chatSession = chatSession;
+	}
+
+	/**
+	 * toString
+	 * 
+	 * @return String
+	 */
+	public String toString() {
+		StringBuffer buffer = new StringBuffer();
+
+		buffer.append(getClass().getName()).append("@").append(
+				Integer.toHexString(hashCode())).append(" [");
+		buffer.append("userId").append("='").append(getUserId()).append("' ");
+		buffer.append("]");
+
+		return buffer.toString();
+	}
+
+	public boolean equals(Object other) {
+		if ((this == other))
+			return true;
+		if ((other == null))
+			return false;
+		if (!(other instanceof ChatUser))
+			return false;
+		ChatUser castOther = (ChatUser) other;
+
+		return ((this.getUid() == castOther.getUid()) || (this.getUid() != null
+				&& castOther.getUid() != null && this.getUid().equals(
+				castOther.getUid())));
+	}
+
+	public int hashCode() {
+		int result = 17;
+		result = 37 * result
+				+ (getUid() == null ? 0 : this.getUid().hashCode());
+		return result;
+	}
 }
