@@ -50,7 +50,7 @@
 		<tr>
 			<td>
 				<h1>
-					<fmt:message key="label.learning.heading" />
+					${resource.title}
 				</h1>
 				<h2>
 					${resource.instructions}

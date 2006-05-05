@@ -42,29 +42,87 @@ import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
 public interface IResourceService 
 {
 
+	/**
+	 * Get file <code>IVersiondNode</code> by given package id and path.
+	 * @param packageId
+	 * @param relPathString
+	 * @return
+	 * @throws ResourceApplicationException
+	 */
 	IVersionedNode getFileNode(Long packageId, String relPathString) throws ResourceApplicationException ;
-
+	
+	/**
+	 * Get <code>Resource</code> by toolContentID.
+	 * @param contentId
+	 * @return
+	 */
 	Resource getResourceByContentId(Long contentId);
-
+	/**
+	 * Get a cloned copy of  tool default tool content (Resource) and assign the toolContentId of that copy as the 
+	 * given <code>contentId</code> 
+	 * @param contentId
+	 * @return
+	 * @throws ResourceApplicationException
+	 */
 	Resource getDefaultContent(Long contentId) throws ResourceApplicationException;
-
+	
+	/**
+	 * Get list of resource items by given resourceUid. These resource items must be created by author.
+	 * @param resourceUid
+	 * @return
+	 */
 	List getAuthoredItems(Long resourceUid);
-
+	/**
+	 * Upload instruciton file into repository.
+	 * @param file
+	 * @param type
+	 * @return
+	 * @throws UploadResourceFileException
+	 */
 	ResourceAttachment uploadInstructionFile(FormFile file, String type) throws UploadResourceFileException;
-
+	
+	/**
+	 * Upload resource item file to repository. i.e., single file, websize zip file, or learning object zip file.
+	 * @param item
+	 * @param file
+	 * @throws UploadResourceFileException
+	 */
 	void uploadResourceItemFile(ResourceItem item, FormFile file) throws UploadResourceFileException;
 
 	//********** for user methods *************
+	/**
+	 * Create a new user in database.
+	 */
 	void createUser(ResourceUser resourceUser);
-	ResourceUser getUserByID(Long long1);
+	/**
+	 * Get user by given userID.
+	 * @param long1
+	 * @return
+	 */
+	ResourceUser getUserByID(Long userID);
 
 	//********** Repository methods ***********************
+	/**
+	 * Delete file from repository.
+	 */
 	void deleteFromRepository(Long fileUuid, Long fileVersionId) throws ResourceApplicationException ;
 
+	/**
+	 * Save or update resource into database.
+	 * @param Resource
+	 */
 	void saveOrUpdateResource(Resource Resource);
-
+	/**
+	 * Delete reource attachment(i.e., offline/online instruction file) from database. This method does not
+	 * delete the file from repository.
+	 * 
+	 * @param attachmentUid
+	 */
 	void deleteResourceAttachment(Long attachmentUid);
-
+	/**
+	 * Delete resoruce item from database.
+	 * @param uid
+	 */
 	void deleteResourceItem(Long uid);
 	
 	/**
@@ -73,10 +131,23 @@ public interface IResourceService
 	 * @return
 	 */
 	List<ResourceItem> getResourceItemsBySessionId(Long sessionId);
+	/**
+	 * Get resource which is relative with the special toolSession.
+	 * @param sessionId
+	 * @return
+	 */
 	Resource getResourceBySessionId(Long sessionId);
-
+	/**
+	 * Get resource toolSession by toolSessionId
+	 * @param sessionId
+	 * @return
+	 */
 	ResourceSession getResourceSessionBySessionId(Long sessionId);
 
+	/**
+	 * Save or update resource session.
+	 * @param resSession
+	 */
 	void saveOrUpdateResourceSession(ResourceSession resSession);
 	
 	void retrieveComplete(List<ResourceItem> resourceItemList, ResourceUser user);

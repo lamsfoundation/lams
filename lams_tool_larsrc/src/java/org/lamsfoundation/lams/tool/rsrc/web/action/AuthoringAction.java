@@ -94,10 +94,14 @@ public class AuthoringAction extends Action {
 		
 		String param = mapping.getParameter();
 		//-----------------------Resource Author function ---------------------------
-		request.getSession().setAttribute(AttributeNames.ATTR_MODE,ToolAccessMode.AUTHOR);
 		if(param.equals("start")){
+			request.getSession().setAttribute(AttributeNames.ATTR_MODE,ToolAccessMode.AUTHOR);
 			return start(mapping, form, request, response);
 		}
+		if (param.equals("definelater")) {
+			request.getSession().setAttribute(AttributeNames.ATTR_MODE,ToolAccessMode.TEACHER);
+			return start(mapping, form, request, response);
+		}		
 	  	if (param.equals("initPage")) {
        		return initPage(mapping, form, request, response);
         }
@@ -147,14 +151,30 @@ public class AuthoringAction extends Action {
         return mapping.findForward(ResourceConstants.ERROR);
 	}
 
-
-
+	/**
+	 * Remove resource item attachment, such as single file, learning object ect. It is a ajax call and just temporarily 
+	 * remove from page, all permenant change will happen only when user sumbit this resource item again. 
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	private ActionForward removeItemAttachment(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		request.setAttribute("itemAttachment", null);
     	return mapping.findForward(ResourceConstants.SUCCESS);
     }
 
-
+	/**
+	 * Remove resource item from HttpSession list and update page display. As authoring rule, all persist only happen when 
+	 * user submit whole page. So this remove is just impact HttpSession values.
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	private ActionForward removeItem(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		int itemIdx = NumberUtils.stringToInt(request.getParameter(ResourceConstants.PARAM_ITEM_INDEX),-1);
 		if(itemIdx != -1){
@@ -165,7 +185,15 @@ public class AuthoringAction extends Action {
 		}		
 		return mapping.findForward(ResourceConstants.SUCCESS);
 	}
-
+	
+	/**
+	 * Display edit page for existed resource item.
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	private ActionForward editItemInit(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		int itemIdx = NumberUtils.stringToInt(request.getParameter(ResourceConstants.PARAM_ITEM_INDEX),-1);
 		ResourceItem item = null;
@@ -178,6 +206,14 @@ public class AuthoringAction extends Action {
 		}		
 		return findForward(item==null?-1:item.getType(),mapping);
 	}
+	/**
+	 * Display empty page for new resource item.
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	private ActionForward newItemlInit(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		short type = (short) NumberUtils.stringToInt(request.getParameter(ITEM_TYPE));
 		List instructionList = new ArrayList(INIT_INSTRUCTION_COUNT);
@@ -230,7 +266,14 @@ public class AuthoringAction extends Action {
 		return mapping.findForward(ResourceConstants.SUCCESS);
 	}
 
-
+	/**
+	 * Ajax call, will add one more input line for new resource item instruction.
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	private ActionForward newInstruction(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		int count = NumberUtils.stringToInt(request.getParameter(INSTRUCTION_ITEM_COUNT),0);
 		List instructionList = new ArrayList(++count);
@@ -244,6 +287,14 @@ public class AuthoringAction extends Action {
 		request.setAttribute(ResourceConstants.ATTR_INSTRUCTION_LIST,instructionList);
 		return mapping.findForward(ResourceConstants.SUCCESS);
 	}
+	/**
+	 * Ajax call, remove the given line of instruction of resource item.
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	private ActionForward removeInstruction(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		int count = NumberUtils.stringToInt(request.getParameter(INSTRUCTION_ITEM_COUNT),0);
 		int removeIdx = NumberUtils.stringToInt(request.getParameter("removeIdx"),-1);
@@ -260,9 +311,7 @@ public class AuthoringAction extends Action {
 		request.setAttribute(ResourceConstants.ATTR_INSTRUCTION_LIST,instructionList);
 		return mapping.findForward(ResourceConstants.SUCCESS);
 	}
-	//******************************************************************************************************************
-	//              Resource Author functions
-	//******************************************************************************************************************
+
 	/**
 	 * Read resource data from database and put them into HttpSession. It will redirect to init.do directly after this
 	 * method run successfully. 
@@ -317,11 +366,21 @@ public class AuthoringAction extends Action {
 	}
 
 
-
+	/**
+	 * Display same entire authoring page content from HttpSession variable.
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	private ActionForward initPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
-
-		return mapping.findForward(ResourceConstants.SUCCESS);
+		ToolAccessMode mode = (ToolAccessMode) request.getSession().getAttribute(AttributeNames.ATTR_MODE);
+		if(mode.isAuthor())
+			return mapping.findForward(ResourceConstants.SUCCESS);
+		else
+			return mapping.findForward(ResourceConstants.DEFINE_LATER);
 	}
 	/**
 	 * This method will persist all inforamtion in this authoring page, include all resource item, information etc.
@@ -335,7 +394,8 @@ public class AuthoringAction extends Action {
 	private ActionForward updateContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
 		ResourceForm resourceForm = (ResourceForm)(form);
-		
+		ToolAccessMode mode = (ToolAccessMode) request.getSession().getAttribute(AttributeNames.ATTR_MODE);
+    	
 		Resource resource = resourceForm.getResource();
 		try {
 			IResourceService service = getResourceService();
@@ -360,10 +420,15 @@ public class AuthoringAction extends Action {
 				resourcePO.setCreated(new Timestamp(new Date().getTime()));
 				resourcePO.setUpdated(new Timestamp(new Date().getTime()));
 			}else{
-				Long uid = resourcePO.getUid();
-				PropertyUtils.copyProperties(resourcePO,resource);
-				//get back UID
-				resourcePO.setUid(uid);
+				if(mode.isAuthor()){
+					Long uid = resourcePO.getUid();
+					PropertyUtils.copyProperties(resourcePO,resource);
+					//get back UID
+					resourcePO.setUid(uid);
+				}else{ //if it is Teacher, then just update basic tab content (definelater)
+					resourcePO.setInstructions(resource.getInstructions());
+					resourcePO.setTitle(resource.getTitle());
+				}
 				resourcePO.setUpdated(new Timestamp(new Date().getTime()));
 			}
 			resourcePO.setCreatedBy(resourceUser);
@@ -461,7 +526,6 @@ public class AuthoringAction extends Action {
 		ActionMessages messages = new ActionMessages();
 		messages.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage("authoring.save.success"));
 		this.addMessages(request,messages);
-		ToolAccessMode mode = (ToolAccessMode) request.getSession().getAttribute(AttributeNames.ATTR_MODE);
     	if(mode.isAuthor())
     		return mapping.findForward("author");
     	else
@@ -587,6 +651,7 @@ public class AuthoringAction extends Action {
 	}
 
 	/**
+	 * General method to delete file (online or offline)
 	 * @param mapping 
 	 * @param request
 	 * @param response
@@ -641,6 +706,9 @@ public class AuthoringAction extends Action {
 	//*************************************************************************************
 	// Private method 
 	//*************************************************************************************
+	/**
+	 * Return ResourceService bean.
+	 */
 	private IResourceService getResourceService() {
 	      WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
 	      return (IResourceService) wac.getBean(ResourceConstants.RESOURCE_SERVICE);
@@ -705,6 +773,7 @@ public class AuthoringAction extends Action {
 	
 	
 	/**
+	 * Get resource items instruction from <code>HttpRequest</code>
 	 * @param request
 	 */
 	private List<String> getInstructionsFromRequest(HttpServletRequest request) {
@@ -733,6 +802,12 @@ public class AuthoringAction extends Action {
 		}
 		return instructionList;
 	}
+	/**
+	 * Get back relative <code>ActionForward</code> from request.
+	 * @param type
+	 * @param mapping
+	 * @return
+	 */
 	private ActionForward findForward(short type, ActionMapping mapping) {
 		ActionForward forward;
 		switch (type) {
@@ -791,7 +866,7 @@ public class AuthoringAction extends Action {
 		
 	}
 	/**
-	 *
+	 * Extract web from content to resource item.
 	 * @param request
 	 * @param instructionList
 	 * @param itemForm
@@ -885,6 +960,7 @@ public class AuthoringAction extends Action {
 	}
 
 	/**
+	 * Vaidate resource item regards to their type (url/file/learning object/website zip file)
 	 * @param itemForm
 	 * @return
 	 */

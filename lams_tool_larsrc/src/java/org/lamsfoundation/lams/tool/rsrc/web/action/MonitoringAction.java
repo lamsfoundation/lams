@@ -67,8 +67,10 @@ public class MonitoringAction extends Action {
 			return hideitem(mapping, form, request, response);
 		}
 
+
 		return mapping.findForward(ResourceConstants.ERROR);
 	}
+
 
 	private ActionForward hideitem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {

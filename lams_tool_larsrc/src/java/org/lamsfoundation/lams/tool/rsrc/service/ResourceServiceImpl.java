@@ -208,7 +208,6 @@ public class ResourceServiceImpl implements
     	//save default content by given ID.
     	Resource content = new Resource();
     	content = Resource.newInstance(defaultContent,contentId,resourceToolContentHandler);
-    	//TODO: does it need replicate the content's resource items?
 		return content;
 	}
 

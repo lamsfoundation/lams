@@ -38,6 +38,7 @@ public class ResourceConstants {
 	//for action forward name
 	public static final String SUCCESS = "success";
 	public static final String ERROR = "error";
+	public static final String DEFINE_LATER = "definelater";
 	
 	//for parameters' name
 	public static final String PARAM_TOOL_CONTENT_ID = "toolContentID";
@@ -72,6 +73,7 @@ public class ResourceConstants {
 	public static final String ERROR_MSG_FILE_BLANK = "error.resource.item.file.blank";
 	public static final String ERROR_MSG_INVALID_URL = "error.resource.item.invalid.url";
 	public static final String ERROR_MSG_UPLOAD_FAILED = "error.upload.failed";
+	
 	
 	
 
