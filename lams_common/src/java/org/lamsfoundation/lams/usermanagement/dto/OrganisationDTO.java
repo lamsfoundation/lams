@@ -23,11 +23,15 @@
 /* $Id$ */
 package org.lamsfoundation.lams.usermanagement.dto;
 
-import java.util.Collection;
-import java.util.TreeMap;
 
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Vector;
+
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
+
 
 /**
  * @author Manpreet Minhas
@@ -35,30 +39,29 @@ import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 public class OrganisationDTO {
 
 	private Integer organisationID;
-	private TreeMap<Integer,OrganisationDTO> childOrganisations;
+	private Integer parentID;
 	private String name;
 	private String description;
-	private Integer parentID;
+	private Vector<OrganisationDTO> nodes;
 	
 	public OrganisationDTO(){
 		
 	}	
-	public OrganisationDTO(Integer organisationID, Integer parentID, String description, String name) {
+	public OrganisationDTO(Integer organisationID, Integer parentID, String name,
+			String description) {
 		super();
 		this.organisationID = organisationID;
+		this.parentID = parentID;
 		this.name = name;
 		this.description = description;
-		this.childOrganisations = new TreeMap<Integer,OrganisationDTO>();
-		this.parentID = parentID;
+		this.nodes = new Vector<OrganisationDTO>();
 	}
-	
 	public OrganisationDTO(Organisation organisation){
 		this.organisationID = organisation.getOrganisationId();
+		this.parentID = organisation.getParentOrganisation().getOrganisationId();
 		this.name = organisation.getName();
 		this.description = organisation.getDescription();
-		this.childOrganisations = new TreeMap<Integer,OrganisationDTO>();
-		if ( organisation.getParentOrganisation() != null )
-			this.parentID = organisation.getParentOrganisation().getOrganisationId();
+		this.nodes = new Vector<OrganisationDTO>();
 	}
 	/**
 	 * @return Returns the description.
@@ -78,19 +81,44 @@ public class OrganisationDTO {
 	public Integer getOrganisationID() {
 		return organisationID!=null?organisationID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
 	}
-
-	/** Gets all the child organisations. This is a recursive structure */
-	public Collection<OrganisationDTO> getChildOrganisations() {
-		return childOrganisations.values();
-	}
 	
-	/** Add a child organisation. Adds it into a sorted map so that the values always come out 
-	 * in the same order. */
-	public void addChildOrganisation(OrganisationDTO orgDTO) {
-		childOrganisations.put(orgDTO.getOrganisationID(),orgDTO);
-	}
+	/** 
+	 * @return Returns the parent organisationID.
+	 */
 	public Integer getParentID() {
-		return parentID;
+		return parentID!=null?parentID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
 	}
 	
+	public void addNode(OrganisationDTO organisation){
+		nodes.add(organisation);
+	}
+	
+	public void addNodes(Collection<OrganisationDTO> list){
+		Iterator it = list.iterator();
+		while(it.hasNext()){
+			this.addNode((OrganisationDTO) it.next());
+		}
+	}
+	
+	public Vector getNodes(){
+		return nodes;
+	}
+	
+	/** Two OrganisationDTOs are equals if both have a valid (not null) organisationID
+	 * and the organisationID's are the same.
+	 */ 
+	public boolean equals(Object other) {
+		if ((this == other))
+			return true;
+		if (!(other instanceof OrganisationDTO))
+			return false;
+		OrganisationDTO castOther = (OrganisationDTO) other;
+		return this.getOrganisationID() != null && 
+			this.getOrganisationID().equals(castOther.getOrganisationID());
+	}
+	
+	public int hashCode() {
+		return new HashCodeBuilder().append(getOrganisationID()).toHashCode();
+	}
+
 }
