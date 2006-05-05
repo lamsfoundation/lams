@@ -56,6 +56,7 @@ public class TestAuthoringService extends AbstractLamsTestCase {
 	}
 	protected String[] getContextConfigLocation() {
 		return new String[] {"org/lamsfoundation/lams/localApplicationContext.xml",
+							 "org/lamsfoundation/lams/toolApplicationContext.xml",
 							 "org/lamsfoundation/lams/authoring/authoringApplicationContext.xml"};	
 	}
 	public void testCopyLearningdesign()throws UserException, WorkspaceFolderException, LearningDesignException, IOException{			

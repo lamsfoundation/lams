@@ -73,6 +73,7 @@ public class BaseWorkspaceTest extends AbstractLamsTestCase {
 	protected String[] getContextConfigLocation() {
 		return new String[] {"org/lamsfoundation/lams/contentrepository/applicationContext.xml",
 							 "org/lamsfoundation/lams/localApplicationContext.xml",
+							 "org/lamsfoundation/lams/toolApplicationContext.xml",
 							 "org/lamsfoundation/lams/authoring/authoringApplicationContext.xml",
 							 "org/lamsfoundation/lams/workspace/workspaceApplicationContext.xml"};
 	}

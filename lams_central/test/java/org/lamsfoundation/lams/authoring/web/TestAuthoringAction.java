@@ -43,7 +43,9 @@ public class TestAuthoringAction extends MockStrutsTestCase {
         							XmlWebApplicationContext.class.getName());
 
         context.setInitParameter(ContextLoader.CONFIG_LOCATION_PARAM,
-                                "/org/lamsfoundation/lams/localApplicationContext.xml,/org/lamsfoundation/lams/authoring/authoringApplicationContext.xml");        
+                                "/org/lamsfoundation/lams/localApplicationContext.xml," +
+                                "org/lamsfoundation/lams/toolApplicationContext.xml," +
+        						"/org/lamsfoundation/lams/authoring/authoringApplicationContext.xml");        
         ctxLoader.initWebApplicationContext(context);
 	}
 	public void testGetLearningDesign(){

@@ -50,25 +50,27 @@ public class TestWorkspaceManagement extends BaseWorkspaceTest {
 	private static final Integer PICTURES_WORKSPACE_FOLDER = new Integer(9);
 	
 	private static final Integer MANPREETS_WORKSPACE = new Integer(6);
-	private static final Integer USER_ID = new Integer(4);
+	private static final Integer MMM_USER_ID = new Integer(4);
+	private static final Integer TEST1_USER_ID = new Integer(5);
+
 
 	public TestWorkspaceManagement(String name){
 		super(name);
 	}
     
 	public void testGetAccessibleWorkspaceFolders()throws IOException{
-		Vector vector = workspaceManagementService.getAccessibleOrganisationWorkspaceFolders(USER_ID);
+		Vector vector = workspaceManagementService.getAccessibleOrganisationWorkspaceFolders(MMM_USER_ID);
 		assertTrue("Accessible workspace folders exists",vector!=null && vector.size()>0);
 	}
 	public void testGetFolderContents()throws Exception{
 		WorkspaceFolder folder = workspaceFolderDAO.getWorkspaceFolderByID(LAMS_WORKSPACE_FOLDER);
-		Vector vector = workspaceManagementService.getFolderContents(USER_ID,folder,WorkspaceManagementService.AUTHORING);		
+		Vector vector = workspaceManagementService.getFolderContents(MMM_USER_ID,folder,WorkspaceManagementService.AUTHORING);		
 		assertTrue("FolderContents exist",vector!=null && vector.size()>0);
 	}
 	
 	// TODO why does copyfolder seem to take so long
 	public void testCopyFolder() throws IOException{
-		String packet = workspaceManagementService.copyFolder(MACQ_UNI_WORKSPACE_FOLDER,DOCUMENTS_WORKSPACE_FOLDER,USER_ID);
+		String packet = workspaceManagementService.copyFolder(MACQ_UNI_WORKSPACE_FOLDER,DOCUMENTS_WORKSPACE_FOLDER,MMM_USER_ID);
 
 		Map ids = extractIdMapFromWDDXPacket(packet);
 		assertTrue("Two ids returned as expected", ids != null && ids.size()==2);
@@ -84,7 +86,7 @@ public class TestWorkspaceManagement extends BaseWorkspaceTest {
 	public void testDeleteFolder() throws Exception{
 		// create a folder so we can delete it.
 		String folderName = "testDeleteFolder";
-		String packet = workspaceManagementService.createFolderForFlash(MANPREETS_WORKSPACE_FOLDER,folderName,USER_ID);
+		String packet = workspaceManagementService.createFolderForFlash(MANPREETS_WORKSPACE_FOLDER,folderName,MMM_USER_ID);
 		Map ids = extractIdMapFromWDDXPacket(packet);
 		assertNotNull(ids);
 		Double id = (Double) ids.get("folderID");
@@ -94,7 +96,7 @@ public class TestWorkspaceManagement extends BaseWorkspaceTest {
 
 		// okay - got the right folder. now delete it.
 		Integer folderId = new Integer(id.intValue());
-		workspaceManagementService.deleteFolder(folderId, USER_ID);
+		workspaceManagementService.deleteFolder(folderId, MMM_USER_ID);
 		try{
 			workspaceFolderDAO.getWorkspaceFolderByID(folderId);
 			fail("Exception should be raised because this object has already been deleted");
@@ -115,7 +117,7 @@ public class TestWorkspaceManagement extends BaseWorkspaceTest {
 			newWorkspaceFolderId = MACQ_UNI_WORKSPACE_FOLDER.intValue();
 		}
 		
-		workspaceManagementService.moveFolder(MANPREETS_WORKSPACE_FOLDER,new Integer(newWorkspaceFolderId), USER_ID);				
+		workspaceManagementService.moveFolder(MANPREETS_WORKSPACE_FOLDER,new Integer(newWorkspaceFolderId), MMM_USER_ID);				
 		WorkspaceFolder workspaceFolder = workspaceFolderDAO.getWorkspaceFolderByID(MANPREETS_WORKSPACE_FOLDER);
 		assertEquals(workspaceFolder.getParentWorkspaceFolder().getWorkspaceFolderId().intValue(), newWorkspaceFolderId);
 	}
@@ -326,5 +328,41 @@ public class TestWorkspaceManagement extends BaseWorkspaceTest {
     	return new NodeKey(new Long(uuid.longValue()), new Long(version.longValue()));
 	}
 
+	/** Test the getOrganisationsByUserRoleOneTree call for the mmm user, who has all their orgs in one hierarchy */ 
+	public void testGetOrganisationsByUserRoleOneTree() {
+		try {
+			String packet = workspaceManagementService.getOrganisationsByUserRole(MMM_USER_ID,new String[]{"TEACHER","STAFF"});
+			System.out.println("getOrganisationsByUserRole: mmm: "+packet);
+			checkContainsOnce(packet, "Macquarie University");
+			checkContainsOnce(packet, "Macquarie E-Learning Centre Of Excellence");
+			checkContainsOnce(packet, "LAMS Project Team");
+			checkContainsOnce(packet, "MAMS Project Team");
+		} catch ( IOException e ) {
+			e.printStackTrace();
+			fail("IOException thrown"+e.getMessage());
+		}
+
+	}
+
+	private void checkContainsOnce(String packet, String name) {
+		int firstIndexOf = packet.indexOf(name);
+		int lastIndexOf = packet.lastIndexOf(name);
+		assertTrue("Packet contains "+name+" exactly once.", firstIndexOf>-1 && firstIndexOf==lastIndexOf);
+	}
 	
+	/** Test the getOrganisationsByUserRoleOneTree call for the test1 user, whose orgs are spread over two hierarchies */ 
+	public void testGetOrganisationsByUserRoleTwoTrees() {
+		try {
+			String packet = workspaceManagementService.getOrganisationsByUserRole(TEST1_USER_ID,new String[]{"TEACHER","STAFF"});
+			System.out.println("getOrganisationsByUserRole: test1: "+packet);
+			checkContainsOnce(packet, "LAMS Project Team");
+			checkContainsOnce(packet, "Computing Courses");
+			checkContainsOnce(packet, "Intro Computing");
+			checkContainsOnce(packet, "Computing Science");
+		} catch ( IOException e ) {
+			e.printStackTrace();
+			fail("IOException thrown"+e.getMessage());
+		}
+
+	}	
 }

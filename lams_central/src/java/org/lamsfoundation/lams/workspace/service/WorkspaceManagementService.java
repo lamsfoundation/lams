@@ -1403,22 +1403,16 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	public String getOrganisationsByUserRole(Integer userID, String[] roles) throws IOException
 	{
 		User user = userDAO.getUserById(userID);
-		Set organisations = new HashSet();
-			
+		Set<OrganisationDTO> organisations = new HashSet<OrganisationDTO>();
+		
 		if (user!=null) {
 			for(int i=0; i<roles.length; i++) {
-				Iterator iterator = userMgmtService.getOrganisationsForUserByRole(user, roles[i]).iterator();
-				
-				while (iterator.hasNext()) {
-					Organisation organisation = (Organisation) iterator.next();
-					organisations.add(organisation.getOrganisationDTO());
-				}
+				organisations = OrganisationDTOFactory.convertToDTOs(
+						userMgmtService.getOrganisationsForUserByRole(user, roles[i]), organisations);
 			}
 			
-			Vector<OrganisationDTO> orgs = new Vector<OrganisationDTO>(organisations);
-			
 			flashMessage = new FlashMessage(
-					MSG_KEY_ORG_BY_ROLE, orgs);
+					MSG_KEY_ORG_BY_ROLE, OrganisationDTOFactory.createTree(organisations, null));
 		} else
 			flashMessage = FlashMessage.getNoSuchUserExists(
 					MSG_KEY_ORG_BY_ROLE, userID);
@@ -1426,7 +1420,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		return flashMessage.serializeMessage();
 		
 	}
-	
+		
 	/** 
 	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#getUsersFromOrganisationByRole(Integer, String)
 	 */
