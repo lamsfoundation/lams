@@ -25,12 +25,18 @@ import org.lamsfoundation.lams.common.mvc.*;
 import org.lamsfoundation.lams.common.util.*;
 import org.lamsfoundation.lams.monitoring.*;
 import org.lamsfoundation.lams.monitoring.mv.*;
+import org.lamsfoundation.lams.monitoring.mv.tabviews.*;
 
 /**
 * Controller for the sequence library
 */
 class MonitorController extends AbstractController {
 	private var _monitorModel:MonitorModel;
+	//private var _monitorView:MonitorView;
+	//private var _lessonTabView:LessonTabView;
+	//private var _canvasView:CanvasView;
+	//private var _canvasView:CanvasView;
+	//private var _canvasView:CanvasView;
 	
 	/**
 	* Constructor
@@ -40,6 +46,10 @@ class MonitorController extends AbstractController {
 	public function MonitorController (mm:Observable) {
 		super (mm);
 		_monitorModel = MonitorModel(model);
+		//get a view if ther is not one
+		//if(!_lessonTabView){
+		//	_lessonTabView =  LessonTabView(getView());
+		//}
 	}
 	
 	// add control methods
@@ -52,8 +62,14 @@ class MonitorController extends AbstractController {
 	 * @return  
 	 */
 	public function change(evt):Void{
-		   trace(evt.target);
-		   trace("test: "+ String(evt.target.selectedIndex))
-					//forClick.text="label is: " + evt.itemIndex.label + " index is: " + evt.index + " capital is: " +               targetComp.dataProvider[evt.index].data;
+		trace(evt.target);
+		trace("test: "+ String(evt.target.selectedIndex))
+		if (_monitorModel.getSequence() == null){
+			trace ("None of Sequence is selected yet!");
+		}else {
+			_monitorModel.changeTab(evt.target.selectedIndex);
 		}
+	
+	
+	}
 }

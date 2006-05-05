@@ -23,6 +23,8 @@
 
 import org.lamsfoundation.lams.monitoring.*;
 import org.lamsfoundation.lams.monitoring.mv.*;
+import org.lamsfoundation.lams.authoring.Activity;
+import org.lamsfoundation.lams.authoring.Transition;
 import org.lamsfoundation.lams.common.Sequence;
 import org.lamsfoundation.lams.common.util.Observable;
 import org.lamsfoundation.lams.common.util.*;
@@ -48,20 +50,30 @@ class MonitorModel extends Observable{
 	private var _todos:Array;  // Array of ToDo ContributeActivity(s)
 	// state data
 	private var _showLearners:Boolean;
+	//these are hashtables of mc refs MOVIECLIPS (like CanvasActivity or CanvasTransition)
+	//each on contains a reference to the emelment in the ddm (activity or transition)
+	private var _activitiesDisplayed:Hashtable;
+	private var _transitionsDisplayed:Hashtable;
 	
+	//These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
+    private var dispatchEvent:Function;     
+    public var addEventListener:Function;
+    public var removeEventListener:Function;
 	/**
 	* Constructor.
 	*/
 	public function MonitorModel (monitor:Monitor){
 		_monitor = monitor;
 		_showLearners = true;
+		_activitiesDisplayed = new Hashtable("_activitiesDisplayed");
+		_transitionsDisplayed = new Hashtable("_transitionsDisplayed");
 	}
 	
 	// add get/set methods
 	
 	public function setSequence(activeSeq:Sequence){
 		_activeSeq = activeSeq;
-		
+		_monitor.openLearningDesign(_activeSeq)
 		setChanged();
 		
 		//send an update
@@ -133,12 +145,91 @@ class MonitorModel extends Observable{
 		
 		//send an update
 		infoObj = {};
-		infoObj.updateType = "SHOW_LEARNERS";
+		infoObj.updateType = "HIDE_LEARNERS";
 		notifyObservers(infoObj);
 	}
 	
 	public function isShowLearners():Boolean{
 		return _showLearners;
+	}
+	
+	/**
+	 * get the design in the DesignDataModel and update the Monitor Model accordingly.
+	 * NOTE: Design elements are added to the DDM here.
+	 * 
+	 * @usage   
+	 * @return  
+	 */
+	public function drawDesign(tabID:Number){
+		
+		//porobbably need to get a bit more granular
+		//go through the design and get the activities and transitions 
+		var indexArray:Array;
+		var dataObj:Object;
+		var ddmActivity_keys:Array = _monitor.ddm.activities.keys();
+			
+		
+		
+		indexArray = ddmActivity_keys;
+		trace("Length of Activities in DDM: "+indexArray.length)
+		
+		//loop through and do comparison
+		for(var i=0;i<indexArray.length;i++){
+					
+			var keyToCheck:Number = indexArray[i];
+			
+			
+			var ddm_activity:Activity = _monitor.ddm.activities.get(keyToCheck);
+			
+			broadcastViewUpdate("DRAW_ACTIVITY",ddm_activity, tabID);
+			//dataObj.activity = ddm_activity;
+		}
+		
+		//now check the transitions:
+		var ddmTransition_keys:Array = _monitor.ddm.transitions.keys();
+				
+		//chose which array we are going to loop over
+		var trIndexArray:Array;
+		trIndexArray = ddmTransition_keys;
+		
+		//loop through and do comparison
+		for(var i=0;i<trIndexArray.length;i++){
+			
+			var transitionKeyToCheck:Number = trIndexArray[i];
+
+			var ddmTransition:Transition = _monitor.ddm.transitions.get(transitionKeyToCheck);
+			
+			//NOTE!: we are passing in a ref to the tns in the ddm so if we change any props of this, we are changing the ddm
+			broadcastViewUpdate("DRAW_TRANSITION",ddmTransition, tabID);	
+			//dataObj.trans = ddmTransition;
+		}
+		
+	}
+	
+	public function broadcastViewUpdate(updateType, data, tabID){
+		//getMonitor().getMV().clearView();
+		setChanged();
+		
+		//send an update
+		infoObj = {};
+		infoObj.updateType = updateType;
+		infoObj.drawData = data;
+		infoObj.tabID = tabID;
+		notifyObservers(infoObj);
+		
+	}
+	
+	
+	public function changeTab(tabID:Number){
+		//getMonitor().getMV().clearView();
+		setChanged();
+		
+		//send an update
+		infoObj = {};
+		infoObj.updateType = "TABCHANGE";
+		infoObj.tabID = tabID;
+		notifyObservers(infoObj);
+		
 	}
 	
 	public function setSize(width:Number,height:Number) {
@@ -212,6 +303,26 @@ class MonitorModel extends Observable{
 	public function get className():String{
         return 'MonitorModel';
     }
+	/**
+	 * Returns a reference to the Activity Movieclip for the UIID passed in.  Gets from _activitiesDisplayed Hashable
+	 * @usage   
+	 * @param   UIID 
+	 * @return  Activity Movie clip
+	 */
+	public function getActivityMCByUIID(UIID:Number):MovieClip{
+		
+		var a_mc:MovieClip = _activitiesDisplayed.get(UIID);
+		//Debugger.log('UIID:'+UIID+'='+a_mc,Debugger.GEN,'getActivityMCByUIID','CanvasModel');
+		return a_mc;
+	}
+	
+	public function get activitiesDisplayed():Hashtable{
+		return _activitiesDisplayed;
+	}
+	
+	public function get transitionsDisplayed():Hashtable{
+		return _transitionsDisplayed;
+	}
 	
 	public function getMonitor():Monitor{
 		return _monitor;

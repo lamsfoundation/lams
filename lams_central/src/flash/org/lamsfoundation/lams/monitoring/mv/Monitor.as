@@ -23,6 +23,7 @@
 import org.lamsfoundation.lams.monitoring.Application;
 import org.lamsfoundation.lams.monitoring.mv.*;
 import org.lamsfoundation.lams.monitoring.mv.tabviews.*;
+import org.lamsfoundation.lams.authoring.DesignDataModel;
 import org.lamsfoundation.lams.common.ui.*
 import org.lamsfoundation.lams.common.util.*;
 import org.lamsfoundation.lams.common.dict.*
@@ -46,6 +47,7 @@ class org.lamsfoundation.lams.monitoring.mv.Monitor {
 	private var monitorView_mc:MovieClip;
 
 	private var app:Application;
+	private var _ddm:DesignDataModel;
 	private var _dictionary:Dictionary;
 
 	private var _pi:MovieClip; //Property inspector
@@ -65,7 +67,7 @@ class org.lamsfoundation.lams.monitoring.mv.Monitor {
 		
 		//Create the model
 		monitorModel = new MonitorModel(this);
-		
+		_ddm = new DesignDataModel();
 		_dictionary = Dictionary.getInstance();
 
 		//Create the view
@@ -120,6 +122,58 @@ class org.lamsfoundation.lams.monitoring.mv.Monitor {
 	
 	
 	/**
+	 * server call for learning Dseign and sent it to the save it in DataDesignModel
+	 * 
+	 * @usage   
+	 * @param   		seq type Sequence;
+	 * @return  		Void
+	 */
+	public function openLearningDesign(seq:Sequence){
+		trace('opening learning design...'+ seq.getLearningDesignID());
+		var designID:Number  = seq.getLearningDesignID();
+		//var designId:Number = seq._learningDesignID;
+
+        var callback:Function = Proxy.create(this,saveDataDesignModel);
+           
+		Application.getInstance().getComms().getRequest('authoring/author.do?method=getLearningDesignDetails&learningDesignID='+designID,callback, false);
+		
+	}
+	
+	/*
+	private function getProgressData(seq:Object){
+		trace('getting progress data...');
+		var progessId:Number = seq.getSequenceID();
+		
+		var callback:Function = Proxy.create(this, saveProgressData);
+		Application .getInstance().getComms().getRequest('learning/learner.do?method=getFlashProgressData&progressId=' + progessId, callback, false);
+	}
+	*/
+	
+	private function saveDataDesignModel(learningDesignDTO:Object){
+		trace('returning learning design...');
+		trace('saving model data...');
+		var seq:Sequence = Sequence(monitorModel.getSequence());
+				
+		_ddm.setDesign(learningDesignDTO);
+		seq.setLearningDesignModel(_ddm);
+		
+		// activite Progress movie
+		//monitorModel.drawDesign();
+	}
+	
+	/*
+	private function saveProgressData(progressDTO:Object)
+		trace('returning progress data...');
+		var progress:Progress = new Progress();
+		progress.populateFromDTO(progressDTO);
+		var seq:Sequence = Sequence(libraryModel.getSelectedSequence());
+		seq.setProgress(progress);
+		
+		trace('progress data saved...');
+	}
+	*/
+	
+	/**
 	* Used by application to set the size
 	* @param width The desired width
 	* @param height the desired height
@@ -159,5 +213,9 @@ class org.lamsfoundation.lams.monitoring.mv.Monitor {
 	}
 	public function getMV():MonitorView{
 		return monitorView;
+	}
+	
+	public function get ddm():DesignDataModel{
+		return _ddm;
 	}
 }

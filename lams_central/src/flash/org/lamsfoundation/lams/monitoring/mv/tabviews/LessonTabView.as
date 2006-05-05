@@ -44,27 +44,44 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	private var _className = "LessonTabView";
 	//constants:
 	private var _tm:ThemeManager;
+	private var mm:MonitorModel;
 	
 	//TabView clips
-	private var _monitor_mc:MovieClip;
+	private var _monitorReqTask_mc:MovieClip;
 	private var requiredTask_scp:MovieClip;
 	private var monitorTabs_tb:MovieClip;
-	
+	private var _lessonStateArr:Array;
+	//Labels
+	private var status_lbl:Label;
+	private var learner_lbl:Label;
+	private var class_lbl:Label;
+	private var elapsed_lbl:Label;
+	private var manageClass_lbl:Label;
+	private var manageStatus_lbl:Label;
+	private var manageStart_lbl:Label;
+	private var manageMin_lbl:Label;
+	private var manageHour_lbl:Label;
+	private var manageDate_lbl:Label;
+		
 	//Text Items
-    private var LSTitle_txt:TextInput;
-	private var LSDescription_txt:TextArea;
-	private var sessionStatus_txt:TextInput;
-	private var numLearners_txt:TextInput;
-	private var group_txt:TextInput;
-	private var duration_txt:TextInput;
+    private var LSTitle_txt:TextField;
+	private var LSDescription_txt:TextField;
+	private var sessionStatus_txt:TextField;
+	private var numLearners_txt:TextField;
+	private var group_txt:TextField;
+	private var duration_txt:TextField;
 	
 	//Button
-	private var viewLearners:Button;
-	private var editClass:Button;
-	private var selectClass:Button;
-	private var status1:Button;
-	private var status2:Button;
-	private var setDateTime:Button;
+	private var viewLearners_btn:Button;
+	private var editClass_btn:Button;
+	private var selectClass_btn:Button;
+	private var status1_btn:Button;
+	private var status2_btn:Button;
+	private var setDateTime_btn:Button;
+	
+	private var startDate_dt:Date;
+	private var startHour_stp:NumericStepper;
+	private var startMin_stp:NumericStepper;
 	
     //private var _transitionLayer_mc:MovieClip;
 	//private var _activityLayerComplex_mc:MovieClip;
@@ -82,8 +99,9 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	/**
 	* Constructor
 	*/
-	function LesssonTabView(){
+	function LessonTabView(){
 		_lessonTabView = this;
+		this._visible = false;
 		_tm = ThemeManager.getInstance();
         //Init for event delegation
         mx.events.EventDispatcher.initialize(this);
@@ -93,20 +111,8 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	* Called to initialise Canvas  . CAlled by the Canvas container
 	*/
 	public function init(m:Observable,c:Controller){
-		//Invoke superconstructor, which sets up MVC relationships.
-		//if(c==undefined){
-		//	c==defaultController();
-		//}
 		super (m, c);
-        //Set up parameters for the grid
-		//H_GAP = 10;
-		//V_GAP = 10;
-        //setupCM();
-	    //register to recive updates form the model
-		//MonitorModel(m).addEventListener('update',this);
-        
-		//MovieClipUtils.doLater(Proxy.create(this,draw)); 
-    }    
+	}    
 	
 	/**
  * Recieved update events from the CanvasModel. Dispatches to relevent handler depending on update.Type
@@ -115,7 +121,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
  */
 public function update (o:Observable,infoObj:Object):Void{
 		
-       var mm:MonitorModel = MonitorModel(o);
+       mm = MonitorModel(o);
 	   
 	   switch (infoObj.updateType){
 		    case 'SIZE' :
@@ -130,13 +136,22 @@ public function update (o:Observable,infoObj:Object):Void{
 			case 'STATUS' :
 				trace('STATUS');
                 break;
-			case 'DATE_TIME' :
-				trace('DATE_TIME');
-                break;
-			case 'SEQUENCE' :
-				trace("TabID for Selected tab is (LessonTab): "+infoObj.tabID)
+			case 'TABCHANGE' :
 				if (infoObj.tabID == _tabID){
+				trace("TabID for Selected tab is (LessonTab TABCHANGE): "+infoObj.tabID)
+					this._visible = true;
 					MovieClipUtils.doLater(Proxy.create(this,draw));
+				}else {
+					this._visible = false;
+				}
+				break;
+			case 'SEQUENCE' :
+				if (infoObj.tabID == _tabID){
+				trace("TabID for Selected tab is (LessonTab): "+infoObj.tabID)
+					this._visible = true;
+					MovieClipUtils.doLater(Proxy.create(this,draw));
+				}else {
+					this._visible = false;
 				}
 				break;
             default :
@@ -149,31 +164,66 @@ public function update (o:Observable,infoObj:Object):Void{
     * layout visual elements on the canvas on initialisation
     */
 	private function draw(){
-		//get the content path for the sp
-		//_monitor_mc = requiredTask_scp.content;
-		//Debugger.log('_canvas_mc'+_canvas_mc,Debugger.GEN,'draw','CanvasView');
 		
-		trace("Loaded LessonTabView Data")
-		//set up the 
-		//_canvas_mc = this;
+		this.onEnterFrame = setupLabels;
+		//get the content path for the sp
+		_monitorReqTask_mc = requiredTask_scp.content;
+		
+		//Debugger.log('_canvas_mc'+_canvas_mc,Debugger.GEN,'draw','CanvasView');
+	
+		trace("Loaded LessonTabView Data"+ this)
 		
 		//setStyles();
+		populateLessonDetails();
+		dispatchEvent({type:'load',target:this});
+	}
+	
+	public function setupLabels(){
 		
-	    dispatchEvent({type:'load',target:this});
+		//max_lbl.text = Dictionary.getValue('pi_max_act');
+		
+		//populate the synch type combo:
+		status_lbl.text = "Status:"
+		learner_lbl.text = "Learners:"
+		class_lbl.text = "Class:"
+		elapsed_lbl.text = "Elapsed duration:"
+		manageClass_lbl.text = "Class:"
+		manageStatus_lbl.text = "Status:"
+		manageStart_lbl.text = "Start:"
+		manageMin_lbl.text = "Minutes"
+		manageHour_lbl.text = "Hour"
+		manageDate_lbl.text = "Date"
+			
+		//Button
+		viewLearners_btn.label = "View Learners"
+		editClass_btn.label = "Edit Class"
+		selectClass_btn.label = "Select Class"
+		status1_btn.label = "Archive"
+		status2_btn.label = "Disable"
+		setDateTime_btn.label = "Start Now"
+		
+		_lessonStateArr = ["CREATED", "NOT_STARTED", "STARTED", "SUSPENDED", "FINISHED", "ARCHIVED", "DISABLED"];
+		//Call to apply style to all the labels and input fields
+		//setStyles();
+		delete this.onEnterFrame; 
+			
 	}
 	
 	/**
-	 * Event listener for when when tab is clicked
-	 * 
-	 * @usage   
-	 * @param   evt 
-	 * @return  
-	 */
-	//private function clickEvt(evt):Void{
-		  // trace(evt.target);
-		  // trace("test: "+ String(evt.target.selectedIndex))
-					//forClick.text="label is: " + evt.itemIndex.label + " index is: " + evt.index + " capital is: " +               targetComp.dataProvider[evt.index].data;
-		//}
+	 * Populate the lesson details from HashTable Sequence in MOnitorModel
+	*/
+	private function populateLessonDetails():Void{
+		//var mm:Observable = getModel();
+		var s:Object = mm.getSequence();
+		trace("Item Description (Lesson Tab View) is : "+s._seqDescription);
+		LSTitle_txt.text = s._seqName;
+		LSDescription_txt.text = s._seqDescription;
+		//sessionStatus_txt.text = _lessonStateArr(s._seqStateID);
+		//numLearners_txt.text = s._seqDescription
+		//group_txt.text = s._seqDescription
+		//duration_txt.text = s._seqDescription
+		  
+	}
 	/**
     * Sets the size of the canvas on stage, called from update
     */
@@ -195,4 +245,11 @@ public function update (o:Observable,infoObj:Object):Void{
 		var c:Controller = super.getController();
 		return MonitorController(c);
 	}
+	
+	 /*
+    * Returns the default controller for this view.
+    */
+    public function defaultController (model:Observable):Controller {
+        return new MonitorController(model);
+    }
 }

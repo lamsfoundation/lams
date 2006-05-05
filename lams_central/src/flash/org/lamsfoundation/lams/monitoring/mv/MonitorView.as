@@ -62,16 +62,23 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 	//private var act_pnl:Panel;
 	
     private var _gridLayer_mc:MovieClip;
-    //private var _transitionLayer_mc:MovieClip;
+    private var _lessonTabLayer_mc:MovieClip;
+	private var _monitorTabLayer_mc:MovieClip;
+	private var _learnerTabLayer_mc:MovieClip;
+	private var _todoTabLayer_mc:MovieClip;
 	//private var _activityLayerComplex_mc:MovieClip;
 	//private var _activityLayer_mc:MovieClip;
 	
 	//private var _transitionPropertiesOK:Function;
     private var _monitorView:MonitorView;
 	
-	
+	//Tab Views Initialisers
+	//LessonTabView
 	private var lessonTabView:LessonTabView;
 	private var lessonTabView_mc:MovieClip;
+	//MonitorTabView
+	private var monitorTabView:MonitorTabView;
+	private var monitorTabView_mc:MovieClip;
 	
     //Defined so compiler can 'see' events added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
@@ -98,30 +105,18 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 		//if(c==undefined){
 		//	c==defaultController();
 		//}
-		_monitorView_mc = this;
-		
 		super (m, c);
         //Set up parameters for the grid
 		H_GAP = 10;
 		V_GAP = 10;
 		
-		lessonTabView_mc = _monitorView_mc.monitor_scp.attachMovie("LessonTabView", "lessonTabView_mc",DepthManager.kTop)
-		lessonTabView = LessonTabView(lessonTabView_mc);
+		MovieClipUtils.doLater(Proxy.create(this,draw)); 
 		
-		lessonTabView.init(m, c);
-		lessonTabView.addEventListener('load',Proxy.create(this,tabLoaded));
-		
-		trace('lesson tab view: ' + lessonTabView_mc);
-		
-		var mm:MonitorModel = MonitorModel(m);
-		m.addObserver(lessonTabView);
-		
-		
-        //setupCM();
+        //setupTabInit(m, c);
 	   //register to recive updates form the model
 		//MonitorModel(m).addEventListener('update',this);
         
-		MovieClipUtils.doLater(Proxy.create(this,draw)); 
+		
     }    
 	
 	private function tabLoaded(evt:Object){
@@ -146,7 +141,7 @@ public function update (o:Observable,infoObj:Object):Void{
 	   switch (infoObj.updateType){
 		   case 'SEQUENCE' :
 				trace("TabID for Selected tab is: "+infoObj.tabID)
-				showData(mm);
+				//showData(mm);
                 break;
             case 'POSITION' :
 				setPosition(mm);
@@ -154,6 +149,9 @@ public function update (o:Observable,infoObj:Object):Void{
             case 'SIZE' :
 			    setSize(mm);
                 break;
+			case 'TABCHANGE' :
+				showData(mm);
+				break;
             default :
                 Debugger.log('unknown update type :' + infoObj.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.CanvasView');
 		}
@@ -166,7 +164,8 @@ public function update (o:Observable,infoObj:Object):Void{
 	private function showData(mm:MonitorModel):Void{
         var s:Object = mm.getSequence();
 		//for (var i in s){
-			trace("Item Description is : "+s._seqDescription);
+			trace("Item Description is : "+s._learningDesignID);
+			
 		//}
 		//monitor_scp.contentPath = lessonTabView;
 					
@@ -181,12 +180,16 @@ public function update (o:Observable,infoObj:Object):Void{
 		//Debugger.log('_canvas_mc'+_canvas_mc,Debugger.GEN,'draw','CanvasView');
 		
     
-		bkg_pnl = _monitor_mc.createClassObject(Panel, "bkg_pnl", getNextHighestDepth());
+		//bkg_pnl = _monitor_mc.createClassObject(Panel, "bkg_pnl", getNextHighestDepth());
 
 		//set up the 
 		//_canvas_mc = this;
-		_gridLayer_mc = _monitor_mc.createEmptyMovieClip("_gridLayer_mc", _monitor_mc.getNextHighestDepth());
 		
+		//_gridLayer_mc = _monitor_mc.createEmptyMovieClip("_gridLayer_mc", _monitor_mc.getNextHighestDepth());
+		
+		_lessonTabLayer_mc = _monitor_mc.createEmptyMovieClip("_lessonTabLayer_mc", _monitor_mc.getNextHighestDepth());
+		_monitorTabLayer_mc = _monitor_mc.createEmptyMovieClip("_monitorTabLayer_mc", _monitor_mc.getNextHighestDepth());
+		//trace('lesson tab view: ' + _tabsLayer_mc);
 		//bkg_pnl.useHandCursor = false;
 		var tab_arr:Array = [{label:"Lesson", data:"lesson"}, {label:"Monitor", data:"monitor"}, {label:"Learners", data:"learners"}, {label:"Todo", data:"todo"}];
 		
@@ -197,9 +200,36 @@ public function update (o:Observable,infoObj:Object):Void{
 		var mcontroller = getController();
 		monitorTabs_tb.addEventListener("change",mcontroller);
 		//setStyles();
-		
+		setupTabInit()
 	    dispatchEvent({type:'load',target:this});
+		
 	}
+	
+	private function setupTabInit(){
+		
+		var mm:Observable = getModel();
+		// Inititialsation for Lesson Tab View 
+		lessonTabView_mc = _lessonTabLayer_mc.attachMovie("LessonTabView", "lessonTabView_mc",DepthManager.kTop)
+		lessonTabView_mc._visible = false;
+		lessonTabView = LessonTabView(lessonTabView_mc);
+		lessonTabView.init(mm, undefined);
+		lessonTabView.addEventListener('load',Proxy.create(this,tabLoaded));
+			
+		// Inititialsation for Monitor Tab View 
+		monitorTabView_mc = _monitorTabLayer_mc.attachMovie("MonitorTabView", "monitorTabView_mc",DepthManager.kTop)
+		monitorTabView_mc._visible = false;
+		monitorTabView = MonitorTabView(monitorTabView_mc);
+		monitorTabView.init(mm, undefined);
+		monitorTabView.addEventListener('load',Proxy.create(this,tabLoaded));
+		
+		//Observers for All the Tab Views
+		
+		mm.addObserver(lessonTabView);
+		mm.addObserver(monitorTabView);
+		
+	}
+	
+
 	
 	/**
 	 * Event listener for when when tab is clicked
@@ -220,9 +250,6 @@ public function update (o:Observable,infoObj:Object):Void{
         var s:Object = mm.getSize();
 		trace("Monitor Tab Widtht: "+s.w+" Monitor Tab Height: "+s.h);
 		monitor_scp.setSize(s.w,s.h);
-		bkg_pnl.setSize(s.w,s.h);
-		//Create the grid.  The grid is re-drawn each time the canvas is resized.
-		var grid_mc = Grid.drawGrid(_gridLayer_mc,Math.round(s.w),Math.round(s.h),V_GAP,H_GAP);
 				
 	}
 	
@@ -257,4 +284,5 @@ public function update (o:Observable,infoObj:Object):Void{
     public function defaultController (model:Observable):Controller {
         return new MonitorController(model);
     }
+	
 }
