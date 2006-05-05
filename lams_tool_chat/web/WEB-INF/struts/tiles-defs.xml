@@ -72,9 +72,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<!-- Begin: Learning -->
 	<definition name="tiles:/learning/main" extends="tiles:/layout:default">
 		<put name="pageTitleKey" value="pageTitle.learning" />
-		<put name="header" value="tiles:/header:default" />
+		<put name="header" value="tiles:/header:learning" />
 		<put name="body" value="/pages/learning/learning.jsp" />
 	</definition>
+	
+	<definition name="tiles:/header:learning" extends="tiles:/header:default">
+		<put name="script" value="/pages/learning/script.jsp"/>
+	</definition>	
 	<!-- End: Learning -->
 
 
