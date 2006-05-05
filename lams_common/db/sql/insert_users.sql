@@ -96,9 +96,9 @@ INSERT INTO lams_css_theme_ve (theme_ve_id, name, description, parent_id, theme_
 INSERT INTO lams_css_theme_ve (theme_ve_id, name, description, parent_id, theme_flag) VALUES (3, "aqua", "JSP theme", null, 1);
 
 -- users
-INSERT INTO lams_user VALUES(1, 'sysadmin','sysadmin','Mr','Fei','Yang',null,null,null,'Sydney','NSW','Australia',null,null,null,null,'fyang@melcoe.mq.edu.au',0,NOW(),1,null,1,'en','au',1,3);
-INSERT INTO lams_user VALUES(2, 'test','test','Dr','Testing','LDAP',null,null,null,'Sydney','NSW','Australia',null,null,null,null,'test@xx.xx.xx',0,NOW(),3,null,2,'mi','nz',1,3);
-INSERT INTO lams_user VALUES(3, 'lamskh01','dummy','Mr','Jacky','Fang',null,null,null,'Sydney','NSW','Australia',null,null,null,null,'jfang@melcoe.mq.edu.au',0,NOW(),2,null,3,'en','nz',1,3);
+INSERT INTO lams_user VALUES(1, 'sysadmin','sysadmin','Mr','Fei','Yang',null,null,null,'Sydney','NSW','Australia',null,null,null,null,'fyang@melcoe.mq.edu.au',0,NOW(),1,null,1,'en','au',1,3,null);
+INSERT INTO lams_user VALUES(2, 'test','test','Dr','Testing','LDAP',null,null,null,'Sydney','NSW','Australia',null,null,null,null,'test@xx.xx.xx',0,NOW(),3,null,2,'mi','nz',1,3,null);
+INSERT INTO lams_user VALUES(3, 'lamskh01','dummy','Mr','Jacky','Fang',null,null,null,'Sydney','NSW','Australia',null,null,null,null,'jfang@melcoe.mq.edu.au',0,NOW(),2,null,3,'en','nz',1,3,null);
 
 insert into lams_user (user_id,login,password,title,first_name,last_name,address_line_1,address_line_2,address_line_3,
 city,state,country,day_phone,evening_phone,mobile_phone,

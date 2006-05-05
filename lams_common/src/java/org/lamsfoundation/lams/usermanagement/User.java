@@ -125,6 +125,9 @@ public class User implements Serializable {
     /** persistent field */
     private CSSThemeVisualElement htmlTheme;
 
+    /** nullable persistent field */
+    private String chatId;
+
     /** persistent field */
     private Set learnerProgresses;
     
@@ -141,7 +144,7 @@ public class User implements Serializable {
     private Set lessons;
     
     /** full constructor */
-    public User(String login, String password, String title, String firstName, String lastName, String addressLine1, String addressLine2, String addressLine3, String city, String state, String country, String dayPhone, String eveningPhone, String mobilePhone, String fax, String email, Boolean disabledFlag, Date createDate, Workspace workspace, AuthenticationMethod authenticationMethod, CSSThemeVisualElement flashTheme, CSSThemeVisualElement htmlTheme, Set userOrganisations, Organisation baseOrganisation, Set learnerProgresses, Set userToolSessions, Set userGroups, Set learningDesigns, Set lessons) {
+    public User(String login, String password, String title, String firstName, String lastName, String addressLine1, String addressLine2, String addressLine3, String city, String state, String country, String dayPhone, String eveningPhone, String mobilePhone, String fax, String email, Boolean disabledFlag, Date createDate, Workspace workspace, AuthenticationMethod authenticationMethod, CSSThemeVisualElement flashTheme, CSSThemeVisualElement htmlTheme, Set userOrganisations, Organisation baseOrganisation, String chatId, Set learnerProgresses, Set userToolSessions, Set userGroups, Set learningDesigns, Set lessons) {
         this.login = login;
         this.password = password;
         this.title = title;
@@ -164,6 +167,7 @@ public class User implements Serializable {
         this.authenticationMethod = authenticationMethod;
         this.flashTheme = flashTheme;
         this.htmlTheme = htmlTheme;
+        this.chatId = chatId;
         this.userOrganisations = userOrganisations;
         this.baseOrganisation = baseOrganisation;
         this.learnerProgresses = learnerProgresses;
@@ -528,7 +532,21 @@ public class User implements Serializable {
         this.htmlTheme = htmlTheme;
     }
     
-    
+    /** 
+     *            @hibernate.property
+     *             column="chat_id"
+     *             length="255"
+     *         
+     */
+    public String getChatId() {
+        return this.chatId;
+    }
+
+    public void setChatId(String chatId) {
+        this.chatId = chatId;
+    }
+
+
     /** 
      *            @hibernate.many-to-one
      *             not-null="true"

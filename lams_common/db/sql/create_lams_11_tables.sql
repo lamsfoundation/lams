@@ -255,6 +255,7 @@ CREATE TABLE lams_user (
      , locale_country CHAR(2)
      , flash_theme_id BIGINT(20)
      , html_theme_id BIGINT(20)
+     , chat_id VARCHAR(255)
      , PRIMARY KEY (user_id)
      , INDEX (authentication_method_id)
      , CONSTRAINT FK_lams_user_1 FOREIGN KEY (authentication_method_id)

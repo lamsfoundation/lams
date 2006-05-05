@@ -290,6 +290,19 @@
         </meta>    
     </property>
     
+    <property
+        name="chatId"
+        type="java.lang.String"
+        column="chat_id"
+        length="255"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="chat_id"
+            length="255"
+        </meta>    
+    </property>
+    
     <!-- Associations -->
   
     <!-- bi-directional many-to-one association to Workspace -->
