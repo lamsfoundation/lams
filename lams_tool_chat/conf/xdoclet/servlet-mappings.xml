@@ -14,3 +14,8 @@
 	<url-pattern>/download/*</url-pattern>
 </servlet-mapping>
 
+<!--  Jabber HTTP Bind -->
+<servlet-mapping>
+	<servlet-name>Jabber HTTP Binding Servlet</servlet-name>
+	<url-pattern>/JHB/</url-pattern>
+</servlet-mapping>
