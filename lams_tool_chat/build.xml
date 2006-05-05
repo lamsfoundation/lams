@@ -16,9 +16,9 @@ Ant build file.
 	<property file="../lams_build/${osPropertiesName}.properties" />
 
 	<path id="all-libs">
-		<!-- 	<fileset dir="${lib}">
+	 	<fileset dir="lib">
 			<include name="**/*.jar"/>
-		</fileset> -->
+		</fileset>
 		<fileset dir="${sharedlib}">
 			<include name="**/*.jar" />
 		</fileset>
@@ -32,6 +32,11 @@ Ant build file.
 		<!-- Java CLASSPATH should be added as the last item -->
 		<!-- This property is supposed to be set in eclipse  -->
 		<pathelement location="${java.class.path}" />
+	</path>
+	
+	<path id="schemaexport.classpath">
+		<path refid="project.classpath"/>
+		<pathelement location="${build.classes.java}"/>
 	</path>
 
 	<target name="usage">
@@ -182,6 +187,9 @@ Ant build file.
 				<include name="template/**" />
 				<!-- used by tiles -->
 			</fileset>
+			<lib dir="${weblib}/smack-2.2.0">
+				<include name="*.jar" />
+			</lib>
 		</war>
 	</target>
 
@@ -221,6 +229,29 @@ Ant build file.
 			</fileset>
 			<hibernate version="3.0" />
 		</hibernatedoclet>
+	</target>
+	
+	<!-- exports all the hbm mappings to the specified database -->
+	<target name="schemaexport" description="Exports all hbm.xml files in {conf.hibernate.mapping.dir}/hbm"
+		depends="clean-build,generate-hbm-files">
+	    <echo message="Run the schema export for all hbm.xml files in ${conf.hibernate.mapping.dir}/hbm"/>
+		<taskdef
+			name="schemaexport"
+			classname="org.hibernate.tool.hbm2ddl.SchemaExportTask"
+			classpathref="schemaexport.classpath"
+			>
+		</taskdef>
+		<schemaexport
+			properties="${conf.hibernate.mapping.dir}/hibernate.properties"
+			quiet="no"
+			text="no"
+			drop="no"
+			delimiter=";"
+			output="${db.scripts}/table-schema.sql">
+			<fileset dir="${conf.hibernate.mapping.dir}">
+				<include name="**/*.hbm.xml"/>
+			</fileset>
+		</schemaexport>	
 	</target>
 
 
@@ -408,9 +439,9 @@ Ant build file.
 		</delete>
 	</target>
 
-	<!-- ================================= 
-	          target: synchronize-jsp              
-	         ================================= -->
+	<!-- ================================= -->
+	<!--          target: synchronize-jsp  -->            
+	<!--  ================================= -->
 	<target name="synchronize-deploy" description="copy non-java file into deploy folder">
 		<copy verbose="yes" todir="${jboss.deploy}/${product}.war">
 			<fileset dir="${conf.web.dir}">
@@ -418,7 +449,5 @@ Ant build file.
 			</fileset>
 		</copy>
 	</target>
-
-
 </project>
 
