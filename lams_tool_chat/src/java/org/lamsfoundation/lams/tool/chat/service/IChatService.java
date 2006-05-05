@@ -27,6 +27,10 @@ package org.lamsfoundation.lams.tool.chat.service;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.tool.chat.model.Chat;
 import org.lamsfoundation.lams.tool.chat.model.ChatAttachment;
+import org.lamsfoundation.lams.tool.chat.model.ChatSession;
+import org.lamsfoundation.lams.tool.chat.model.ChatUser;
+import org.lamsfoundation.lams.tool.chat.util.ChatException;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 /**
  * Defines the services available to the web layer from the Chat Service
@@ -42,28 +46,23 @@ public interface IChatService {
 	
 	/**
 	 * Returns an instance of the Chat tools default content.
-	 * 
 	 * @return
 	 */
 	public Chat getDefaultContent();
 	
 	/**
-	 * 
 	 * @param toolSignature
 	 * @return
 	 */
-	public Long getToolDefaultContentIdBySignature(String toolSignature);
+	public Long getDefaultContentIdBySignature(String toolSignature);
 	
 	/**
-	 * 
 	 * @param toolContentID
 	 * @return
 	 */
 	public Chat getChatByContentId(Long toolContentID);
 	
 	/**
-	 * 
-	 * 
 	 * @param toolContentId
 	 * @param file
 	 * @param type
@@ -72,14 +71,12 @@ public interface IChatService {
 	public ChatAttachment uploadFileToContent(Long toolContentId, FormFile file, String type);
 	
 	/**
-	 * 
 	 * @param uuid
 	 * @param versionID
 	 */
-	public void deleteFromRepository(Long uuid, Long versionID);
+	public void deleteFromRepository(Long uuid, Long versionID) throws ChatException;
 	
 	/**
-	 * 
 	 * @param contentID
 	 * @param uuid
 	 * @param versionID
@@ -87,11 +84,50 @@ public interface IChatService {
 	 */
 	public void deleteInstructionFile(Long contentID, Long uuid, Long versionID, String type);
 	
-	/*
-	 * 
+	/**
+	 * @param chat
 	 */
-	public void saveOrUpdateContent(Chat persistContent);
+	public void saveOrUpdateChat(Chat chat);
 	
+
+	/**
+	 * @param toolSessionId
+	 * @return
+	 */
+	public ChatSession getSessionBySessionId(Long toolSessionId);
+
 	
+	/**
+	 * @param chatSession
+	 */
+	public void saveOrUpdateChatSession(ChatSession chatSession);
+	
+	/**
+	 * 
+	 * @param userId
+	 * @param toolSessionId
+	 * @return
+	 */
+	public ChatUser getUserByUserIdAndSessionId(Long userId, Long toolSessionId);
+
+	/**
+	 * 
+	 * @param chatUser
+	 */
+	public void saveOrUpdateChatUser(ChatUser chatUser);
+	
+	/**
+	 * 
+	 * @param user
+	 * @param chatSession
+	 * @return
+	 */
+	public ChatUser createChatUser(UserDTO user, ChatSession chatSession);
+	
+	/**
+	 * 
+	 * @param chatSession
+	 */
+	public void createJabberRoom(ChatSession chatSession);
 	
 }

@@ -26,11 +26,18 @@ package org.lamsfoundation.lams.tool.chat.service;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.upload.FormFile;
+import org.jivesoftware.smack.AccountManager;
+import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smackx.Form;
+import org.jivesoftware.smackx.FormField;
+import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.ITicket;
@@ -54,6 +61,7 @@ import org.lamsfoundation.lams.tool.chat.dao.IChatUserDAO;
 import org.lamsfoundation.lams.tool.chat.model.Chat;
 import org.lamsfoundation.lams.tool.chat.model.ChatAttachment;
 import org.lamsfoundation.lams.tool.chat.model.ChatSession;
+import org.lamsfoundation.lams.tool.chat.model.ChatUser;
 import org.lamsfoundation.lams.tool.chat.util.ChatConstants;
 import org.lamsfoundation.lams.tool.chat.util.ChatException;
 import org.lamsfoundation.lams.tool.chat.util.ChatToolContentHandler;
@@ -61,6 +69,7 @@ import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 /**
  * An implementation of the NoticeboardService interface.
@@ -87,7 +96,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 	private ILamsToolService toolService;
 
 	private IToolContentHandler chatToolContentHandler = null;
-		
+
 	private IRepositoryService repositoryService = null;
 
 	public ChatService() {
@@ -99,15 +108,18 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 	public void createToolSession(Long toolSessionId, String toolSessionName,
 			Long toolContentId) throws ToolException {
 		if (logger.isDebugEnabled()) {
-			logger.debug("entering method createToolSession:" + 
-					" toolSessionId = " + toolSessionId +
-					" toolSessionName = " + toolSessionName	+
-					" toolContentId = " + toolContentId);
+			logger.debug("entering method createToolSession:"
+					+ " toolSessionId = " + toolSessionId
+					+ " toolSessionName = " + toolSessionName
+					+ " toolContentId = " + toolContentId);
 		}
-		
+
 		ChatSession session = new ChatSession();
 		session.setSessionId(toolSessionId);
 		session.setSessionName(toolSessionName);
+		session.setJabberRoom(null); // we will create this when the first
+		// learner starts
+		// TODO need to also set other fields.
 		Chat chat = chatDAO.getByContentId(toolContentId);
 		session.setChat(chat);
 		chatSessionDAO.saveOrUpdate(session);
@@ -115,37 +127,41 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 
 	public String leaveToolSession(Long toolSessionId, Long learnerId)
 			throws DataMissingException, ToolException {
-		
-		if(logger.isDebugEnabled()) {
-			logger.debug("entering method leaveToolSession:" + 
-					" toolSessionId=" + toolSessionId +
-					" learnerId=" + learnerId);
-		}
-		
-		if (toolSessionId == null) {
-			logger
-					.error("Fail to leave tool Session based on null tool session id.");
-			throw new ToolException(
-					"Fail to remove tool Session based on null tool session id.");
-		}
-		if (learnerId == null) {
-			logger.error("Fail to leave tool Session based on null learner.");
-			throw new ToolException(
-					"Fail to remove tool Session based on null learner.");
-		}
 
-		ChatSession session = chatSessionDAO.getBySessionId(toolSessionId);
-		if (session != null) {
-			session.setStatus(ChatConstants.COMPLETED);
-			chatSessionDAO.saveOrUpdate(session);
-		} else {
-			logger.error("Fail to leave tool Session.Could not find submit file "
-					+ "session by given session id: " + toolSessionId);
-			throw new DataMissingException(
-					"Fail to leave tool Session."
-							+ "Could not find submit file session by given session id: "
-							+ toolSessionId);
-		}
+		// TODO issues with session status/start date/ end date. Need to
+		// reimplement method.
+
+		// if (logger.isDebugEnabled()) {
+		// logger.debug("entering method leaveToolSession:"
+		// + " toolSessionId=" + toolSessionId + " learnerId="
+		// + learnerId);
+		// }
+		//
+		// if (toolSessionId == null) {
+		// logger
+		// .error("Fail to leave tool Session based on null tool session id.");
+		// throw new ToolException(
+		// "Fail to remove tool Session based on null tool session id.");
+		// }
+		// if (learnerId == null) {
+		// logger.error("Fail to leave tool Session based on null learner.");
+		// throw new ToolException(
+		// "Fail to remove tool Session based on null learner.");
+		// }
+		//
+		// ChatSession session = chatSessionDAO.getBySessionId(toolSessionId);
+		// if (session != null) {
+		// session.setStatus(ChatConstants.SESSION_COMPLETED);
+		// chatSessionDAO.saveOrUpdate(session);
+		// } else {
+		// logger
+		// .error("Fail to leave tool Session.Could not find submit file "
+		// + "session by given session id: " + toolSessionId);
+		// throw new DataMissingException(
+		// "Fail to leave tool Session."
+		// + "Could not find submit file session by given session id: "
+		// + toolSessionId);
+		// }
 		return learnerService.completeToolSession(toolSessionId, learnerId);
 	}
 
@@ -171,11 +187,10 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 			throws ToolException {
 
 		if (logger.isDebugEnabled()) {
-			logger.debug("entering method copyToolContent:" +
-					" fromContentId=" + fromContentId +
-					" toContentId=" + toContentId);				
+			logger.debug("entering method copyToolContent:" + " fromContentId="
+					+ fromContentId + " toContentId=" + toContentId);
 		}
-		
+
 		if (fromContentId == null || toContentId == null) {
 			String error = "Failed to copy tool content: "
 					+ " fromContentID or toContentID is null";
@@ -211,6 +226,29 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 	}
 
 	/* ********** IChatService Methods ************************************** */
+	public Long getDefaultContentIdBySignature(String toolSignature) {
+		Long toolContentId = null;
+		toolContentId = new Long(toolService
+				.getToolDefaultContentIdBySignature(toolSignature));
+		if (toolContentId == null) {
+			String error = "Could not retrieve default content id for this tool";
+			logger.error(error);
+			throw new ChatException(error);
+		}
+		return toolContentId;
+	}
+
+	public Chat getDefaultContent() {
+		Long defaultContentID = getDefaultContentIdBySignature(ChatConstants.TOOL_SIGNATURE);
+		Chat defaultContent = getChatByContentId(defaultContentID);
+		if (defaultContent == null) {
+			String error = "Could not retrieve default content record for this tool";
+			logger.error(error);
+			throw new ChatException(error);
+		}
+		return defaultContent;
+	}
+
 	public Chat copyDefaultContent(Long newContentID) {
 
 		if (newContentID == null) {
@@ -229,57 +267,49 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 		return newContent;
 	}
 
-	public Chat getDefaultContent() {
-		Long defaultContentID = getToolDefaultContentIdBySignature(ChatConstants.TOOL_SIGNATURE);
-		Chat defaultContent = getChatByContentId(defaultContentID);
-		if (defaultContent == null) {
-			String error = "Could not retrieve default content record for this tool";
-			logger.error(error);
-			throw new ChatException(error);
-		}
-		return defaultContent;
-	}
-
-	public Long getToolDefaultContentIdBySignature(String toolSignature) {
-		Long toolContentId = null;
-		toolContentId = new Long(toolService
-				.getToolDefaultContentIdBySignature(toolSignature));
-		if (toolContentId == null) {
-			String error = "Could not retrieve default content id for this tool";
-			logger.error(error);
-			throw new ChatException(error);
-		}
-		return toolContentId;
-	}
-
 	public Chat getChatByContentId(Long toolContentID) {
 		Chat chat = (Chat) chatDAO.getByContentId(toolContentID);
 		if (chat == null) {
-			logger.info("Could not find the content with toolContentID:"
+			logger.debug("Could not find the content with toolContentID:"
 					+ toolContentID);
 		}
 		return chat;
 	}
-	
-	public ChatAttachment uploadFileToContent(Long toolContentId, FormFile file, String type) {
-		if(file == null || StringUtils.isEmpty(file.getFileName()))
+
+	public ChatSession getSessionBySessionId(Long toolSessionId) {
+		ChatSession chatSession = chatSessionDAO.getBySessionId(toolSessionId);
+		if (chatSession == null) {
+			logger.debug("Could not find the chat session with toolSessionID:"
+					+ toolSessionId);
+		}
+		return chatSession;
+	}
+
+	public ChatUser getUserByUserIdAndSessionId(Long userId, Long toolSessionId) {
+		return chatUserDAO.getByUserIdAndSessionId(userId, toolSessionId);
+	}
+
+	public ChatAttachment uploadFileToContent(Long toolContentId,
+			FormFile file, String type) {
+		if (file == null || StringUtils.isEmpty(file.getFileName()))
 			throw new ChatException("Could not find upload file: " + file);
-		
+
 		NodeKey nodeKey = processFile(file, type);
-		
+
 		ChatAttachment attachment = new ChatAttachment();
 		attachment.setFileType(type);
-		attachment.setFileUuid(nodeKey.getUuid());		
+		attachment.setFileUuid(nodeKey.getUuid());
 		attachment.setFileVersionId(nodeKey.getVersion());
 		attachment.setFileName(file.getFileName());
-		
+
 		return attachment;
 	}
-	
-	public void deleteFromRepository(Long uuid, Long versionID) throws ChatException {
+
+	public void deleteFromRepository(Long uuid, Long versionID)
+			throws ChatException {
 		ITicket ticket = getRepositoryLoginTicket();
 		try {
-			repositoryService.deleteVersion(ticket, uuid,versionID);
+			repositoryService.deleteVersion(ticket, uuid, versionID);
 		} catch (Exception e) {
 			throw new ChatException(
 					"Exception occured while deleting files from"
@@ -287,36 +317,129 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 		}
 	}
 
-	public void deleteInstructionFile(Long contentID, Long uuid, Long versionID, String type) {
+	public void deleteInstructionFile(Long contentID, Long uuid,
+			Long versionID, String type) {
 		chatDAO.deleteInstructionFile(contentID, uuid, versionID, type);
-		
+
 	}
 
-	public void saveOrUpdateContent(Chat persistContent) {
-		chatDAO.saveOrUpdate(persistContent);
-		
+	public void saveOrUpdateChat(Chat chat) {
+		chatDAO.saveOrUpdate(chat);
 	}
-	
-    /* ********** Private methods ********** */
-	
-	private NodeKey processFile(FormFile file, String type) {
-    	NodeKey node = null;
-        if (file!= null && !StringUtils.isEmpty(file.getFileName())) {
-            String fileName = file.getFileName();
-            try {
-				node = getChatToolContentHandler().uploadFile(file.getInputStream(), fileName, 
-				        file.getContentType(), type);
-			} catch (InvalidParameterException e) {
-				throw new ChatException("FileNotFoundException occured while trying to upload File" + e.getMessage());
-			} catch (FileNotFoundException e) {
-				throw new ChatException("FileNotFoundException occured while trying to upload File" + e.getMessage());
-			} catch (RepositoryCheckedException e) {
-				throw new ChatException("FileNotFoundException occured while trying to upload File" + e.getMessage());
-			} catch (IOException e) {
-				throw new ChatException("FileNotFoundException occured while trying to upload File" + e.getMessage());
+
+	public void saveOrUpdateChatSession(ChatSession chatSession) {
+		chatSessionDAO.saveOrUpdate(chatSession);
+	}
+
+	public void saveOrUpdateChatUser(ChatUser chatUser) {
+		chatUserDAO.saveOrUpdate(chatUser);
+	}
+
+	public ChatUser createChatUser(UserDTO user, ChatSession chatSession) {
+		ChatUser chatUser = new ChatUser(user, chatSession);
+		chatUser.setJabberId(createJabberId(user));
+		// persist chatUser to db
+		saveOrUpdateChatUser(chatUser);
+		return chatUser;
+	}
+
+	public void createJabberRoom(ChatSession chatSession) {
+		try {
+			XMPPConnection con = new XMPPConnection(ChatConstants.XMPPDOMAIN);
+
+			con.login(ChatConstants.XMPP_ADMIN_USERNAME,
+					ChatConstants.XMPP_ADMIN_PASSWORD);
+
+			// Create a MultiUserChat using an XMPPConnection for a room
+			String jabberRoom = chatSession.getSessionName() + "_"
+					+ new Long(System.currentTimeMillis()).toString() + "@"
+					+ ChatConstants.XMPPCONFERENCE;
+			
+			MultiUserChat muc = new MultiUserChat(con, jabberRoom);
+
+			// Create the room
+			muc.create(ChatConstants.XMPP_ADMIN_USERNAME);
+
+			// Get the the room's configuration form
+			Form form = muc.getConfigurationForm();
+
+			// Create a new form to submit based on the original form
+			Form submitForm = form.createAnswerForm();
+
+			// Add default answers to the form to submit
+			for (Iterator fields = form.getFields(); fields.hasNext();) {
+				FormField field = (FormField) fields.next();
+				if (!FormField.TYPE_HIDDEN.equals(field.getType())
+						&& field.getVariable() != null) {
+					// Sets the default value as the answer
+					submitForm.setDefaultAnswer(field.getVariable());
+				}
 			}
-          }
-        return node;
+
+			// Sets the new owner of the room
+			submitForm.setAnswer("muc#roomconfig_persistentroom", true);
+			// Send the completed form (with default values) to the server to
+			// configure the room
+			muc.sendConfigurationForm(submitForm);
+			
+			chatSession.setJabberRoom(jabberRoom);
+		} catch (XMPPException e) {
+			logger.error(e);
+		}
+	}
+
+	/* ********** Private methods ********** */
+
+	/**
+	 * Registers a new Jabber Id on the jabber server using the users login as
+	 * the jabber name and password TODO This is only temporary, most likely it
+	 * will need to be moved to the lams core service since it will be used by
+	 * both IM Chat Tool. Users in the system should only have a single jabber
+	 * id
+	 */
+	private String createJabberId(UserDTO user) {
+		try {
+			XMPPConnection con = new XMPPConnection(ChatConstants.XMPPDOMAIN);
+
+			AccountManager manager = con.getAccountManager();
+			if (manager.supportsAccountCreation()) {
+				// using the lams username as jabber username and password.
+				manager.createAccount(user.getLogin(), user.getLogin());
+			}
+
+		} catch (XMPPException e) {
+			logger.error(e);
+		}
+		return user.getLogin() + "@" + ChatConstants.XMPPDOMAIN;
+	}
+
+	private NodeKey processFile(FormFile file, String type) {
+		NodeKey node = null;
+		if (file != null && !StringUtils.isEmpty(file.getFileName())) {
+			String fileName = file.getFileName();
+			try {
+				node = getChatToolContentHandler().uploadFile(
+						file.getInputStream(), fileName, file.getContentType(),
+						type);
+			} catch (InvalidParameterException e) {
+				throw new ChatException(
+						"InvalidParameterException occured while trying to upload File"
+								+ e.getMessage());
+			} catch (FileNotFoundException e) {
+				throw new ChatException(
+						"FileNotFoundException occured while trying to upload File"
+								+ e.getMessage());
+			} catch (RepositoryCheckedException e) {
+				throw new ChatException(
+						"RepositoryCheckedException occured while trying to upload File"
+								+ e.getMessage());
+			} catch (IOException e) {
+				throw new ChatException(
+						"IOException occured while trying to upload File"
+								+ e.getMessage());
+			}
+		}
+		return node;
 	}
 
 	/**
@@ -343,13 +466,12 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 			throw new ChatException("Access Denied to repository."
 					+ ae.getMessage());
 		} catch (WorkspaceNotFoundException we) {
-			throw new ChatException("Workspace not found."
-					+ we.getMessage());
+			throw new ChatException("Workspace not found." + we.getMessage());
 		} catch (LoginException e) {
 			throw new ChatException("Login failed." + e.getMessage());
 		}
 	}
-	
+
 	/* ********** Used by Spring to "inject" the linked objects ************* */
 
 	public IChatAttachmentDAO getChatAttachmentDAO() {
