@@ -66,10 +66,11 @@ NULL,
 'tool/lavote11/authoringStarter.do',
 'tool/lavote11/monitoringStarter.do',
 'tool/lavote11/defineLaterStarter.do',
-'tool/lavote11/portfolioExport?mode=learner',
-'tool/lavote11/portfolioExport?mode=teacher',
+'tool/lavote11/exportPortfolio?mode=learner',
+'tool/lavote11/exportPortfolio?mode=teacher',
 'tool/lavote11/monitoringStarter.do',
 'tool/lavote11/monitoringStarter.do',
 'org.lamsfoundation.lams.tool.vote.VoteResources',
 NOW()
 )
+
