@@ -23,9 +23,6 @@
 package org.lamsfoundation.lams.tool.vote.web;
 
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.TreeMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -41,10 +38,8 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
-import org.lamsfoundation.lams.tool.vote.VoteComparator;
 import org.lamsfoundation.lams.tool.vote.VoteUtils;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
-import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 import org.lamsfoundation.lams.tool.vote.service.VoteServiceProxy;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -98,50 +93,26 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 		
 
 		IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
-		
-		/* we have made sure TOOL_CONTENT_ID is passed  */
 	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
 	    logger.debug("toolContentId: " + toolContentId);
-	    
-	    VoteContent voteContent=voteService.retrieveVote(toolContentId);
-	    
-		logger.debug("existing voteContent:" + voteContent);
-		Map mapOptionsContent= new TreeMap(new VoteComparator());
-		logger.debug("mapOptionsContent: " + mapOptionsContent);
-	
-		logger.debug("setting existing content data from the db");
-		mapOptionsContent.clear();
-		Iterator queIterator=voteContent.getVoteQueContents().iterator();
-		Long mapIndex=new Long(1);
-		logger.debug("mapOptionsContent: " + mapOptionsContent);
-		while (queIterator.hasNext())
-		{
-			VoteQueContent voteQueContent=(VoteQueContent) queIterator.next();
-			if (voteQueContent != null)
-			{
-				logger.debug("question: " + voteQueContent.getQuestion());
-				mapOptionsContent.put(mapIndex.toString(),voteQueContent.getQuestion());
-	    		/**
-	    		 * make the first entry the default(first) one for jsp
-	    		 */
-	    		if (mapIndex.longValue() == 1)
-	    		{
-	    		    request.getSession().setAttribute(DEFAULT_OPTION_CONTENT, voteQueContent.getQuestion());
-	    		}
-	    		
-	    		mapIndex=new Long(mapIndex.longValue()+1);
-			}
-		}
-		logger.debug("Map initialized with existing contentid to: " + mapOptionsContent);
-		request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
-		logger.debug("starter initialized the Comparable Map: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT) );
 
-		
+		logger.debug("calling  prepareChartData: " + toolContentId);
+    	MonitoringUtil.prepareChartData(request, voteService, toolContentId);
+	    
+    	VoteContent voteContent=voteService.retrieveVote(toolContentId);
+	    int allUserEntriesCount=voteService.getAllEntriesCount();
+	    logger.debug("allUserEntriesCount: " + allUserEntriesCount);
+
 		/*true means there is at least 1 response*/
 		if (voteService.studentActivityOccurredGlobal(voteContent))
 		{
+				request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(false).toString());
+				logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
+		}
+		else if (allUserEntriesCount > 0)
+		{
 			request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(false).toString());
-			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
+			logger.debug("allUserEntriesCount is:" + allUserEntriesCount + " USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
 		}
 		else
 		{
@@ -167,9 +138,6 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 		request.getSession().setAttribute(REQUEST_LEARNING_REPORT, new Boolean(false).toString());
 		
 		request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
-				/*
-	     * persist time zone information to session scope. 
-	     */
 	    VoteUtils.persistTimeZone(request);
 		
 		/* we have made sure TOOL_CONTENT_ID is passed  */
@@ -230,9 +198,6 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 		logger.debug("refreshing instructions data...");
 		voteMonitoringAction.refreshInstructionsData(request, voteContent);
 		
-		/* this section is related to instructions tab. Starts here. */
-	    /* ends here. */
-    
 	    logger.debug("end initializing  monitoring data...");
 		return true;
 	}

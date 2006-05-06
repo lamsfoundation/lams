@@ -57,14 +57,19 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					  
 					  <tr>
 					  	<td NOWRAP align=center class="input" valign=top colspan=2> 
-							 CHART FOR ALL RESULTS 
+							<c:set var="viewURL">
+								<html:rewrite page="/chartGenerator?type=pie"/>
+							</c:set>
+							<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
+								 <font size=2>	<bean:message key="label.view.chart"/>  </font>
+							</a>
+								
 					  	</td>
 					  </tr>	
 
-
 					  <tr>
 					  	<td NOWRAP align=center class="input" valign=top colspan=2> 
-								&nbsp&nbsp&nbsp&nbsp
+								&nbsp&nbsp&nbsp&nbsp								
 					  	</td>
 					  </tr>	
 

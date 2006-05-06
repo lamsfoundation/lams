@@ -82,6 +82,12 @@ public interface IVoteService
     
     public void updateVoteQueContent(VoteQueContent voteQueContent) throws VoteApplicationException;
     
+    public int getAttemptsForQuestionContent(final Long voteQueContentId) throws VoteApplicationException;
+    
+	public int getAllEntriesCount() throws VoteApplicationException;
+	
+	public int getUserRecordsEntryCount(final String userEntry) throws VoteApplicationException;
+    
     public VoteUsrAttempt getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long voteQueContentId) throws VoteApplicationException;
     
     public VoteUsrAttempt getAttemptsForUserAndQuestionContentAndSession(final Long queUsrId, final Long voteQueContentId, final Long toolSessionUid) throws VoteApplicationException;

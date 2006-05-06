@@ -268,9 +268,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 		
 		/* PREVIEW_ONLY for jsp*/
     	request.getSession().setAttribute(PREVIEW_ONLY, new Boolean(true).toString());
-    	
-    	request.getSession().setAttribute(CURRENT_QUESTION_INDEX, "1");
-		VoteLearningAction voteLearningAction= new VoteLearningAction();
+    	VoteLearningAction voteLearningAction= new VoteLearningAction();
     	return voteLearningAction.redoQuestions(mapping, form, request, response);
 	}
     
@@ -332,10 +330,8 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	
 	request.getSession().setAttribute(MAP_QUESTION_CONTENT_LEARNER, mapQuestionsContent);
 	logger.debug("MAP_QUESTION_CONTENT_LEARNER: " +  request.getSession().getAttribute(MAP_QUESTION_CONTENT_LEARNER));
-	logger.debug("voteContent has : " + mapQuestionsContent.size() + " entries.");
+	request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapQuestionsContent);
 	
-	request.getSession().setAttribute(CURRENT_QUESTION_INDEX, "1");
-	logger.debug("CURRENT_QUESTION_INDEX: " + request.getSession().getAttribute(CURRENT_QUESTION_INDEX));
 	
 	/*
      * verify that userId does not already exist in the db.
@@ -470,10 +466,6 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 		logger.debug("MAP_QUESTION_CONTENT_LEARNER: " +  request.getSession().getAttribute(MAP_QUESTION_CONTENT_LEARNER));
 		logger.debug("voteContent has : " + mapQuestionsContent.size() + " entries.");
 		request.getSession().setAttribute(TOTAL_QUESTION_COUNT, new Long(mapQuestionsContent.size()).toString());
-		
-		request.getSession().setAttribute(CURRENT_QUESTION_INDEX, "1");
-		logger.debug("CURRENT_QUESTION_INDEX: " + request.getSession().getAttribute(CURRENT_QUESTION_INDEX));
-		
 	}
 
 

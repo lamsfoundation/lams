@@ -188,6 +188,7 @@ public class VoteServicePOJO implements
         }    	
 	}
     
+    
     public VoteQueUsr getVoteQueUsrById(long voteQueUsrId) throws VoteApplicationException
 	{
  	   try
@@ -453,7 +454,51 @@ public class VoteServicePOJO implements
 														   e);
         }
     }
+
     
+    public int getAllEntriesCount() throws VoteApplicationException
+    {
+        try
+        {
+        	return voteUsrAttemptDAO.getAllEntriesCount();
+        }
+        catch (DataAccessException e)
+        {
+            throw new VoteApplicationException("Exception occured when lams is getting all attempts entries count: "
+                                                         + e.getMessage(),
+														   e);
+        }        
+    }
+    
+    
+    public int getUserRecordsEntryCount(final String userEntry) throws VoteApplicationException
+    {
+        try
+        {
+        	return voteUsrAttemptDAO.getUserRecordsEntryCount(userEntry);
+        }
+        catch (DataAccessException e)
+        {
+            throw new VoteApplicationException("Exception occured when lams is getting userrecords entry count: "
+                                                         + e.getMessage(),
+														   e);
+        }
+        
+    }
+    
+    public int getAttemptsForQuestionContent(final Long voteQueContentId) throws VoteApplicationException
+    {
+        try
+        {
+        	return voteUsrAttemptDAO.getAttemptsForQuestionContent(voteQueContentId);
+        }
+        catch (DataAccessException e)
+        {
+            throw new VoteApplicationException("Exception occured when lams is getting vote UsrAttempt by question content id only: "
+                                                         + e.getMessage(),
+														   e);
+        }        
+    }
     
     public VoteUsrAttempt getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long voteQueContentId) throws VoteApplicationException
 	{

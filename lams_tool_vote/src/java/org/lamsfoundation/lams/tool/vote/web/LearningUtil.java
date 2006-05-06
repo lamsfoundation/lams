@@ -177,7 +177,6 @@ public class LearningUtil implements VoteAppConstants {
     	
     	if (voteQueContent != null)
     	{
-    	    //VoteUsrAttempt existingVoteUsrAttempt=voteService.getAttemptsForUserAndQuestionContent(voteQueUsr.getQueUsrId(),voteQueContent.getVoteContentId());
     	    VoteUsrAttempt existingVoteUsrAttempt=voteService.getAttemptsForUserAndQuestionContentAndSession(voteQueUsr.getQueUsrId(),voteQueContent.getVoteContentId(), voteSession.getUid());
     	    logger.debug("existingVoteUsrAttempt: " + existingVoteUsrAttempt);
     	    
@@ -284,7 +283,6 @@ public class LearningUtil implements VoteAppConstants {
     			logger.debug("updated mapCurrentOptions: " + mapCurrentOptions);
     			
     			mapFinal=mapCurrentOptions;
-    			//request.getSession().setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, mapCurrentOptions);	
     		}
     		else
     		{
@@ -297,12 +295,9 @@ public class LearningUtil implements VoteAppConstants {
     				mapLeanerCheckedOptionsContent.remove(voteLearningForm.getOptionIndex());
     			
     			mapFinal=mapLeanerCheckedOptionsContent;
-    			//request.getSession().setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, mapLeanerCheckedOptionsContent);
     		}
     	}
     	
-    	//mapGeneralCheckedOptionsContent=(Map) request.getSession().getAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT);
-    	//logger.debug("final mapGeneralCheckedOptionsContent: " + mapGeneralCheckedOptionsContent);
     	logger.debug("mapFinal: " + mapFinal);
     	return mapFinal;
     }

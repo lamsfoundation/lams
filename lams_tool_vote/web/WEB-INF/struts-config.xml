@@ -8,6 +8,7 @@
 		<form-bean name="VoteLearningForm" type="org.lamsfoundation.lams.tool.vote.web.VoteLearningForm"/>
 		<form-bean name="VoteMonitoringForm" type="org.lamsfoundation.lams.tool.vote.web.VoteMonitoringForm"/>
 		<form-bean name="VoteExportForm" type="org.lamsfoundation.lams.tool.vote.web.VoteExportForm"/>		
+		<form-bean name="VoteChartForm" type="org.lamsfoundation.lams.tool.vote.web.VoteChartForm"/>				
 	</form-beans>
 	
   	<!-- ========== Global Exception Definitions =================================== -->

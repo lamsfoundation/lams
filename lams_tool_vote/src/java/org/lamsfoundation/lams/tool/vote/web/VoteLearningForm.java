@@ -67,7 +67,6 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
 	protected String responseId;
 	protected String method;
 	protected String answer;
-	protected String currentQuestionIndex;
 	protected String submitAnswersContent;
 	protected String getNextQuestion;
 	protected String getPreviousQuestion;
@@ -99,18 +98,6 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
      */
     public void setAnswer(String answer) {
         this.answer = answer;
-    }
-    /**
-     * @return Returns the currentQuestionIndex.
-     */
-    public String getCurrentQuestionIndex() {
-        return currentQuestionIndex;
-    }
-    /**
-     * @param currentQuestionIndex The currentQuestionIndex to set.
-     */
-    public void setCurrentQuestionIndex(String currentQuestionIndex) {
-        this.currentQuestionIndex = currentQuestionIndex;
     }
     /**
      * @return Returns the endLearning.

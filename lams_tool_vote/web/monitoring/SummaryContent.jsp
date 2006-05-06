@@ -31,7 +31,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
-
 	<html:hidden property="responseId"/>	 
 	
 		<c:if test="${(userExceptionNoToolSessions == 'true')}"> 	
@@ -43,13 +42,32 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<tr>
 				</table>
 		</c:if>			
-					
+
 		<c:if test="${(userExceptionNoToolSessions != 'true') }"> 	
+		
 			<html:hidden property="selectedToolSessionId"/>							
 			<input type="hidden" name="isToolSessionChanged"/>
 				<table class="forms">
 
 				<c:if test="${(requestLearningReport != 'true')}"> 	
+					<tr> 
+						<td NOWRAP valign=top align=left>
+							<c:set var="viewURL">
+								<html:rewrite page="/chartGenerator?type=pie"/>
+							</c:set>
+							<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
+								 <font size=2>	<bean:message key="label.view.chart"/>  </font>
+							</a>
+						</td>
+					</tr>
+		
+					<tr> 
+						<td NOWRAP class="formlabel" valign=top>
+						&nbsp&nbsp&nbsp
+						</td>
+					</tr>
+				
+				
 						<tr> 
 							<td NOWRAP class="formlabel" valign=top align=center><font size=2> <b> <bean:message key="label.selectGroup"/> </b>
 									<select name="monitoredToolSessionId" onchange="javascript:submitSession(this.value,'submitSession');">

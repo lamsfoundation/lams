@@ -544,6 +544,25 @@ public class MonitoringUtil implements VoteAppConstants{
 	}
 
 	
+	public static double calculateTotal(Map mapVoteRatesContent)
+	{
+	    logger.debug("calculating total for: " +  mapVoteRatesContent);
+	    double total=0d;
+		Iterator itMap = mapVoteRatesContent.entrySet().iterator();
+		while (itMap.hasNext()) {
+	    	Map.Entry pairs = (Map.Entry)itMap.next();
+	        logger.debug("using the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
+	        
+	        if (pairs.getValue() != null) 
+	        {
+	            total=total+ new Double(pairs.getValue().toString()).doubleValue();
+	        }
+	        logger.debug("total: " + total);
+		}
+		return total;
+	}
+
+	
 	public static Map convertToMap(List list)
 	{
 		logger.debug("using convertToMap: " + list);
@@ -560,5 +579,125 @@ public class MonitoringUtil implements VoteAppConstants{
 		}
 		return map;
 	}
+
+	
+	public static void prepareChartData(HttpServletRequest request, IVoteService voteService, Long toolContentId)
+	{
+	    logger.debug("starting prepareChartData: " + toolContentId);
+	    VoteContent voteContent=voteService.retrieveVote(toolContentId);
+	    
+		logger.debug("existing voteContent:" + voteContent);
+		Map mapOptionsContent= new TreeMap(new VoteComparator());
+		logger.debug("mapOptionsContent: " + mapOptionsContent);
+		
+		Map mapVoteRatesContent= new TreeMap(new VoteComparator());
+		logger.debug("mapVoteRatesContent: " + mapVoteRatesContent);
+		
+		int allEntriesCount=voteService.getAllEntriesCount();
+		logger.debug("allEntriesCount: " + allEntriesCount);
+		
+		List userEntries=voteService.getUserEntries();
+	    logger.debug("userEntries: " + userEntries);
+	    int distinctEntriesCount= userEntries.size();
+	    logger.debug("distinctEntriesCount: " + distinctEntriesCount);
+	    
 	    	
+		logger.debug("setting existing content data from the db");
+		mapOptionsContent.clear();
+		Iterator queIterator=voteContent.getVoteQueContents().iterator();
+		Long mapIndex=new Long(1);
+		logger.debug("mapOptionsContent: " + mapOptionsContent);
+		while (queIterator.hasNext())
+		{
+			VoteQueContent voteQueContent=(VoteQueContent) queIterator.next();
+			if (voteQueContent != null)
+			{
+				logger.debug("question: " + voteQueContent.getQuestion());
+				mapOptionsContent.put(mapIndex.toString(),voteQueContent.getQuestion());
+				
+				int votesCount=voteService.getAttemptsForQuestionContent(voteQueContent.getUid());
+				logger.debug("votesCount for questionContent uid: " + votesCount + " for" + voteQueContent.getUid());
+				
+				double voteRate=0d;
+				if (allEntriesCount != 0)
+				{
+				    voteRate=((votesCount * 100)/ allEntriesCount);
+				}
+				logger.debug("voteRate" + voteRate);
+				
+				mapVoteRatesContent.put(mapIndex.toString(), new Double(voteRate).toString());
+				
+				
+	    		/**
+	    		 * make the first entry the default(first) one for jsp
+	    		 */
+	    		if (mapIndex.longValue() == 1)
+	    		{
+	    		    request.getSession().setAttribute(DEFAULT_OPTION_CONTENT, voteQueContent.getQuestion());
+	    		}
+	    		
+	    		mapIndex=new Long(mapIndex.longValue()+1);
+			}
+		}
+		logger.debug("Map initialized with existing contentid to: " + mapOptionsContent);
+		
+		Iterator itListQuestions = userEntries.iterator();
+	    int mapVoteRatesSize=mapVoteRatesContent.size();
+	    logger.debug("mapVoteRatesSize: " + mapVoteRatesSize);
+	    mapIndex=new Long(mapVoteRatesSize+1);
+	    logger.debug("updated mapIndex: " + mapIndex);
+	    
+	    double total=MonitoringUtil.calculateTotal(mapVoteRatesContent);
+	    logger.debug("updated mapIndex: " + mapIndex);
+	    double share=100d-total ; 
+	    logger.debug("share: " + share);
+
+	    double totalUserRate=0d;
+	    while (itListQuestions.hasNext())
+	    {
+	    	String  userEntry =(String)itListQuestions.next();
+	    	logger.debug("userEntry:..." + userEntry);
+	    	
+	    	if ((userEntry != null) && (userEntry.length() > 0))
+	    	{
+	    	    
+	    	    int userEntryRate=voteService.getUserRecordsEntryCount(userEntry);
+				logger.debug("userEntryRate: " + userEntryRate);
+				totalUserRate=totalUserRate + userEntryRate; 
+	    	}
+	    }
+	    logger.debug("totalUserRate: " + totalUserRate);
+	    
+
+	    itListQuestions = userEntries.iterator();
+	    while (itListQuestions.hasNext())
+	    {
+	    	String  userEntry =(String)itListQuestions.next();
+	    	logger.debug("userEntry:..." + userEntry);
+	    	logger.debug("mapIndex: " + mapIndex);
+	    	
+	    	if ((userEntry != null) && (userEntry.length() > 0))
+	    	{
+	    	    
+	    	    int userEntryRate=voteService.getUserRecordsEntryCount(userEntry);
+				logger.debug("userEntryRate: " + userEntryRate);
+				
+				double votesShare= (userEntryRate * share) / totalUserRate ;
+				logger.debug("votesShare: " + votesShare);
+	    	    
+	    	    mapVoteRatesContent.put(mapIndex.toString(), new Double(votesShare).toString());
+	    	    
+	    	    mapOptionsContent.put(mapIndex.toString() ,userEntry);
+	    	    mapIndex=new Long(mapIndex.longValue()+1);
+	    	}
+	    }
+		
+		
+		logger.debug("Map initialized with mapVoteRatesContent: " + mapVoteRatesContent);
+		request.getSession().setAttribute(MAP_VOTERATES_CONTENT, mapVoteRatesContent);
+		logger.debug("starter initialized the MAP_VOTERATES_CONTENT Map: " + request.getSession().getAttribute(MAP_VOTERATES_CONTENT));
+		
+		request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
+		logger.debug("final starter initialized the MAP_OPTIONS_CONTENT Map: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT) );
+	}
 }

@@ -251,19 +251,6 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 		
 		VoteUtils.cleanUpSessionAbsolute(request);
 		
-		
-        /* REMOVE THIS this is temp code from here **/
-		/*
-		VoteSession voteSession=null;
-		voteSession=voteService.retrieveVoteSession(toolSessionId);
-		logger.debug("retrieved voteSession: " + voteSession);
-    	voteSession.setSessionStatus(VoteAppConstants.COMPLETED);
-    	voteService.updateVoteSession(voteSession);
-    	logger.debug("updated voteSession to COMPLETED" + voteSession);
-    	*/
-    	/* till here*/
-
-	
 		String nextUrl=null;
 		try
 		{
@@ -365,10 +352,6 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
         VoteUtils.cleanUpUserExceptions(request);
 		logger.debug("dispatching continueOptionsCombined...");
 		
-		
-		
-		
-		
 		VoteLearningForm voteLearningForm = (VoteLearningForm) form;
 		voteLearningForm.setRevisitingPageActive(new Boolean(false).toString());
 		voteLearningForm.setNominationsSubmited(new Boolean(false).toString());
@@ -409,28 +392,12 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
     	    return (mapping.findForward(LOAD_LEARNER));
     	}
 
-		
-		
-		
-		
-		
-		
-		
-		
-		//VoteLearningForm voteLearningForm = (VoteLearningForm) form;
-		//voteLearningForm.setRevisitingPageActive(new Boolean(false).toString());
-		//voteLearningForm.setNominationsSubmited(new Boolean(false).toString());
-		//voteLearningForm.setMaxNominationCountReached(new Boolean(false).toString());
-		
-	 	IVoteService voteService =VoteUtils.getToolService(request);
+		IVoteService voteService =VoteUtils.getToolService(request);
 	 	setContentInUse(request);
-	 	//Map mapGeneralCheckedOptionsContent=(Map) request.getSession().getAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT);
     	logger.debug("final mapGeneralCheckedOptionsContent: " + mapGeneralCheckedOptionsContent);
     	
     	Long toolContentId=(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
     	logger.debug("toolContentId: " + toolContentId);
-    			
-    	//String userEntry=voteLearningForm.getUserEntry();
     	logger.debug("userEntry: " + userEntry);
     	
     	boolean userEntryAvailable=false;
@@ -474,12 +441,10 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
     	}
     	
     	logger.debug("voteQueUsr: " + voteQueUsr);
-    	//VoteQueUsr voteQueUsr=LearningUtil.getUser(request);
     	logger.debug("voteQueUsr is : " + voteQueUsr);
     	
     	if (existingVoteQueUsr != null)
     	{
-        	//voteService.removeAttemptsForUser(existingVoteQueUsr.getUid());
     	    logger.debug("attempt removing attempts for user id and session id:" + existingVoteQueUsr.getUid() + " " + voteSession.getUid() );
     	    voteService.removeAttemptsForUserandSession(existingVoteQueUsr.getUid(), voteSession.getUid() );
         	logger.debug("votes deleted for user: " + voteQueUsr.getUid());
@@ -527,8 +492,9 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
     	logger.debug("final mapGeneralCheckedOptionsContent: " + mapGeneralCheckedOptionsContent);
     	
     	voteLearningForm.setNominationsSubmited(new Boolean(true).toString());
-    	//logger.debug("fwd ing to: " + ALL_NOMINATIONS);
-    	//return (mapping.findForward(ALL_NOMINATIONS));
+    	
+    	logger.debug("calling  prepareChartData: " + toolContentId);
+    	MonitoringUtil.prepareChartData(request, voteService, toolContentId);
     	
     	return (mapping.findForward(INDIVIDUAL_REPORT));
     }

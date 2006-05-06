@@ -62,11 +62,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 public class AuthoringUtil implements VoteAppConstants {
 	static Logger logger = Logger.getLogger(AuthoringUtil.class.getName());
 
-    protected static void setRadioboxes(VoteContent voteContent, VoteAuthoringForm voteAuthoringForm)
-	{
-	}
-
-    
     public static boolean verifyDuplicatesOptionsMap(Map mapOptionsContent)
 	{
     	Map originalMapOptionsContent=mapOptionsContent;

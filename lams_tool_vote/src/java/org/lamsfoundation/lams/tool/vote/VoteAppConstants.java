@@ -44,6 +44,7 @@ public interface VoteAppConstants {
 	public static final String LEARNING_STARTER							="learningStarter";
 	public static final String MONITORING_STARTER						="monitoringStarter";
 	public static final String LOAD_LEARNER								="loadLearner";
+	public static final String GENERATE_CHART							="generateChart";
 	public static final String ALL_NOMINATIONS							="allNominations";
     public static final String LOAD_MONITORING_CONTENT							="loadMonitoring";
     public static final String LOAD_MONITORING_CONTENT_EDITACTIVITY				="loadMonitoringEditActivity";
@@ -106,6 +107,7 @@ public interface VoteAppConstants {
     public static final String MAP_QUESTIONS_CONTENT					="mapQuestionsContent";
     public static final String MAP_QUESTION_CONTENT						="mapQuestionContent";
     public static final String MAP_OPTIONS_CONTENT						="mapOptionsContent";
+    public static final String MAP_VOTERATES_CONTENT					="mapVoteRatesContent";
     public static final String MAP_OPTIONS_CONTENT_FCK					="mapOptionsContentFck";
     public static final String MAP_DEFAULTOPTIONS_CONTENT				="mapDefaultOptionsContent";
     public static final String MAP_DISABLED_QUESTIONS					="mapDisabledQuestions";

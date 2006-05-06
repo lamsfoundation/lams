@@ -45,6 +45,12 @@ public interface IVoteUsrAttemptDAO
 	
 	public List getUserEntries();
 	
+	public int getAllEntriesCount();
+	
+	public int getUserRecordsEntryCount(final String userEntry);
+	
+	public int getAttemptsForQuestionContent(final Long voteQueContentId);
+	
 	public void removeAttemptsForUser(final Long queUsrId);
 	
 	public void removeAttemptsForUserandSession(final Long queUsrId, final Long voteSessionId);
