@@ -36,7 +36,7 @@
 </head>
 <body>
 
-		ozgur's export portf  
+		portfolio data, to be defined
 
 </body>
 </html:html>

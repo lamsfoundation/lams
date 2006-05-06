@@ -134,7 +134,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
                                 <html:submit property="addContent" 
                                              styleClass="linkbutton" 
                                              onclick="submitMethod('addNewOption');">
-                                    <bean:message key="button.addNewQuestion"/>
+                                    <bean:message key="button.add"/>
                                 </html:submit>
                             </td>
                         </tr>
