@@ -153,8 +153,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 </head>
 <body onLoad="init();">
 	
-	<b> <font size=2> <bean:message key="label.monitoring"/> </font></b>
 	
+	<c:if test="${(isPortfolioExport != 'true') }"> 	
+		<b> <font size=2> <bean:message key="label.monitoring"/> </font></b>
+	</c:if> 				
+				
     <html:form  action="/monitoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
 	<html:hidden property="method"/>
 	<html:hidden property="toolContentID"/>

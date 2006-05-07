@@ -124,6 +124,8 @@ public interface VoteAppConstants {
     public static final String MAP_VIEWONLY_QUESTION_CONTENT_LEARNER		="mapViewOnlyQuestionContentLearner";
     public static final String MAP_QUE_ATTEMPTS							="mapQueAttempts";
     public static final String LIST_USER_ENTRIES						="listUserEntries";
+    public static final String IS_PORTFOLIO_EXPORT						="isPortfolioExport";
+    public static final String PORTFOLIO_EXPORT_MODE					="portfolioExportMode";
         
     public static final String SELECTED_QUESTION						="selectedQuestion";
     public static final String SELECTED_QUESTION_INDEX					="selectedQuestionIndex";

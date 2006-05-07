@@ -24,9 +24,6 @@
 
 package org.lamsfoundation.lams.tool.vote.web;
 
-import java.util.List;
-import java.util.Map;
-
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -34,6 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
+import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
@@ -42,7 +40,7 @@ import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 import org.lamsfoundation.lams.tool.vote.service.VoteServiceProxy;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 
-public class ExportServlet  extends AbstractExportPortfolioServlet {
+public class ExportServlet  extends AbstractExportPortfolioServlet implements VoteAppConstants{
 	static Logger logger = Logger.getLogger(ExportServlet.class.getName());
 	private static final long serialVersionUID = -4529093489007108143L;
 	private final String FILENAME = "vote_main.html";
@@ -51,13 +49,15 @@ public class ExportServlet  extends AbstractExportPortfolioServlet {
 	public String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies)
 	{
 	    logger.debug("dispathcing doExport");
+	    request.getSession().setAttribute(IS_PORTFOLIO_EXPORT, new Boolean(true).toString());
+	    String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+request.getContextPath();
+
 		if (StringUtils.equals(mode,ToolAccessMode.LEARNER.toString())){
-			learner(request,response,directoryName,cookies);
+		    learner(request,response,directoryName,cookies);
 		}else if (StringUtils.equals(mode,ToolAccessMode.TEACHER.toString())){
 			teacher(request,response,directoryName,cookies);
 		}
 		
-		String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+request.getContextPath();
 		logger.debug("basePath: " + basePath);
 		writeResponseToFile(basePath+"/export/exportportfolio.jsp",directoryName,FILENAME,cookies);
 		
@@ -66,7 +66,8 @@ public class ExportServlet  extends AbstractExportPortfolioServlet {
     
 	public void learner(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies)
     {
-	    logger.debug("starting learner...");
+	    logger.debug("starting learner mode...");
+	    request.getSession().setAttribute(PORTFOLIO_EXPORT_MODE, "learner");
         
     	IVoteService voteService = VoteServiceProxy.getVoteService(getServletContext());
     	logger.debug("voteService:" + voteService);
@@ -105,15 +106,17 @@ public class ExportServlet  extends AbstractExportPortfolioServlet {
             throw new VoteApplicationException(error);
         }
 
-
-        Map topicsByUser = null;
+        logger.debug("calling learning mode toolSessionID:" + toolSessionID + " userID: " + userID );
+    	VoteMonitoringAction voteMonitoringAction= new VoteMonitoringAction();
+    	voteMonitoringAction.refreshSummaryData(request, content, voteService, true, true, toolSessionID.toString(), userID.toString() , true);
+        
         logger.debug("ending learner mode: ");
-		request.getSession().setAttribute("report",topicsByUser);
     }
     
     public void teacher(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies)
     {
-        logger.debug("starting teacher...");
+        logger.debug("starting teacher mode...");
+        request.getSession().setAttribute(PORTFOLIO_EXPORT_MODE, "teacher");
         
         IVoteService voteService = VoteServiceProxy.getVoteService(getServletContext());
         logger.debug("voteService:" + voteService);
@@ -136,7 +139,10 @@ public class ExportServlet  extends AbstractExportPortfolioServlet {
             throw new VoteApplicationException(error);
         }
 		
+        VoteMonitoringAction voteMonitoringAction= new VoteMonitoringAction();
+        logger.debug("starting refreshSummaryData.");
+        voteMonitoringAction.refreshSummaryData(request, content, voteService, true, false, null, null, false);
+        
         logger.debug("ending teacher mode: ");
-		request.getSession().setAttribute("report",null);
     }
 }

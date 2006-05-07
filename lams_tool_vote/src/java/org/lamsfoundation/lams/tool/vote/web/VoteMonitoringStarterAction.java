@@ -186,7 +186,18 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 			VoteUtils.cleanUpSessionAbsolute(request);
 			logger.debug("student activity occurred on this content:" + voteContent);
 			request.getSession().setAttribute(USER_EXCEPTION_CONTENT_IN_USE, new Boolean(true).toString());
+			
+			request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(false).toString());
+			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
 		}
+		else
+		{
+			request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
+			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to true");
+			logger.debug("error.noLearnerActivity must be displayed");
+		}
+		
+		
 		
 		VoteMonitoringAction voteMonitoringAction= new VoteMonitoringAction();
 		logger.debug("refreshing summary data...");

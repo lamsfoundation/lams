@@ -78,13 +78,13 @@ public class MonitoringUtil implements VoteAppConstants{
 	}
 
 	public static List buildGroupsQuestionData(HttpServletRequest request, VoteContent voteContent, 
-			boolean isUserNamesVisible, boolean isLearnerRequest, String currentSessionId, String userId)
+			boolean isUserNamesVisible, boolean isLearnerRequest, String currentSessionId, String userId, IVoteService voteService)
 	{
 		logger.debug("isUserNamesVisible: " + isUserNamesVisible);
 		logger.debug("isLearnerRequest: " + isLearnerRequest);
 		logger.debug("userId: " + userId);
 		
-		IVoteService voteService = (IVoteService)request.getSession().getAttribute(TOOL_SERVICE);
+		//IVoteService voteService = (IVoteService)request.getSession().getAttribute(TOOL_SERVICE);
 		logger.debug("voteService: " + voteService);
     	
 		logger.debug("will be building groups question data  for content:..." + voteContent);
@@ -107,7 +107,7 @@ public class MonitoringUtil implements VoteAppConstants{
 	    		
 	    		logger.debug("using allUsersData to retrieve users data: " + isUserNamesVisible);
 				Map questionAttemptData= buildGroupsAttemptData(request, voteContent, voteQueContent, voteQueContent.getUid().toString(), 
-						isUserNamesVisible,isLearnerRequest, currentSessionId, userId);
+						isUserNamesVisible,isLearnerRequest, currentSessionId, userId, voteService);
 				logger.debug("questionAttemptData:..." + questionAttemptData);
 				voteMonitoredAnswersDTO.setQuestionAttempts(questionAttemptData);
 				listMonitoredAnswersContainerDTO.add(voteMonitoredAnswersDTO);
@@ -120,7 +120,7 @@ public class MonitoringUtil implements VoteAppConstants{
 	
 
 	public static Map buildGroupsAttemptData(HttpServletRequest request, VoteContent voteContent, VoteQueContent voteQueContent, String questionUid, 
-			boolean isUserNamesVisible, boolean isLearnerRequest, String currentSessionId, String userId)
+			boolean isUserNamesVisible, boolean isLearnerRequest, String currentSessionId, String userId, IVoteService voteService)
 	{
 		logger.debug("isUserNamesVisible: " + isUserNamesVisible);
 		logger.debug("isLearnerRequest: " + isLearnerRequest);
@@ -128,8 +128,7 @@ public class MonitoringUtil implements VoteAppConstants{
 		logger.debug("userId: " + userId);
 		
 		logger.debug("doing buildGroupsAttemptData...");
-		IVoteService voteService = (IVoteService)request.getSession().getAttribute(TOOL_SERVICE);
-    	logger.debug("voteService: " + voteService);
+		logger.debug("voteService: " + voteService);
 
     	Map mapMonitoredAttemptsContainerDTO= new TreeMap(new VoteComparator());
     	List listMonitoredAttemptsContainerDTO= new LinkedList();
@@ -158,7 +157,7 @@ public class MonitoringUtil implements VoteAppConstants{
                 		List listUsers=voteService.getUserBySessionOnly(voteSession);	
                 		logger.debug("listMcUsers for session id:"  + voteSession.getVoteSessionId() +  " = " + listUsers);
                 		Map sessionUsersAttempts=populateSessionUsersAttempts(request,voteSession.getVoteSessionId(), listUsers, questionUid, 
-                				isUserNamesVisible, isLearnerRequest, userId);
+                				isUserNamesVisible, isLearnerRequest, userId, voteService);
                 		listMonitoredAttemptsContainerDTO.add(sessionUsersAttempts);
                 	}
                 }
@@ -187,7 +186,7 @@ public class MonitoringUtil implements VoteAppConstants{
                     		List listUsers=voteService.getUserBySessionOnly(voteSession);	
                     		logger.debug("listMcUsers for session id:"  + voteSession.getVoteSessionId() +  " = " + listUsers);
                     		Map sessionUsersAttempts=populateSessionUsersAttempts(request,voteSession.getVoteSessionId(), listUsers, questionUid, 
-                    				isUserNamesVisible, isLearnerRequest, userId);
+                    				isUserNamesVisible, isLearnerRequest, userId, voteService);
                     		listMonitoredAttemptsContainerDTO.add(sessionUsersAttempts);
                     	}
                 	}
@@ -203,7 +202,7 @@ public class MonitoringUtil implements VoteAppConstants{
 	
 	
 	public static Map populateSessionUsersAttempts(HttpServletRequest request,Long sessionId, List listUsers, String questionUid, 
-			boolean isUserNamesVisible, boolean isLearnerRequest, String userId)
+			boolean isUserNamesVisible, boolean isLearnerRequest, String userId, IVoteService voteService)
 	{
 	    logger.debug("doing populateSessionUsersAttempts for: " +questionUid);
 		logger.debug("isUserNamesVisible: " + isUserNamesVisible);
@@ -211,8 +210,7 @@ public class MonitoringUtil implements VoteAppConstants{
 		logger.debug("userId: " + userId);
 		
 		logger.debug("doing populateSessionUsersAttempts...");
-		IVoteService voteService = (IVoteService)request.getSession().getAttribute(TOOL_SERVICE);
-    	logger.debug("voteService: " + voteService);
+		logger.debug("voteService: " + voteService);
 		
 		Map mapMonitoredUserContainerDTO= new TreeMap(new VoteStringComparator());
 		List listMonitoredUserContainerDTO= new LinkedList();

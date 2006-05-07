@@ -50,56 +50,60 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<table class="forms">
 
 				<c:if test="${(requestLearningReport != 'true')}"> 	
-					<tr> 
-						<td NOWRAP valign=top align=left>
-							<c:set var="viewURL">
-								<html:rewrite page="/chartGenerator?type=pie"/>
-							</c:set>
-							<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
-								 <font size=2>	<bean:message key="label.view.chart"/>  </font>
-							</a>
-						</td>
-					</tr>
-		
-					<tr> 
-						<td NOWRAP class="formlabel" valign=top>
-						&nbsp&nbsp&nbsp
-						</td>
-					</tr>
-				
-				
+						<c:if test="${(isPortfolioExport != 'true') }"> 	
+							<tr> 
+								<td NOWRAP valign=top align=left>
+									<c:set var="viewURL">
+										<html:rewrite page="/chartGenerator?type=pie"/>
+									</c:set>
+									<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
+										 <font size=2>	<bean:message key="label.view.chart"/>  </font>
+									</a>
+								</td>
+							</tr>
+	
+			
 						<tr> 
-							<td NOWRAP class="formlabel" valign=top align=center><font size=2> <b> <bean:message key="label.selectGroup"/> </b>
-									<select name="monitoredToolSessionId" onchange="javascript:submitSession(this.value,'submitSession');">
-									<c:forEach var="toolSessionName" items="${sessionScope.summaryToolSessions}">
-										<c:forEach var="toolSessionId" items="${sessionScope.summaryToolSessionsId}">
-											<c:out value="${toolSessionName.key}"/> -<c:out value="${toolSessionId.value}"/>
-										
-												<c:if test="${toolSessionName.key == toolSessionId.key}"> 			
-											
-													<c:set var="SELECTED_SESSION" scope="request" value=""/>
-													<c:if test="${sessionScope.selectionCase == 2}"> 			
-														<c:set var="currentMonitoredToolSession" scope="session" value="All"/>
-													</c:if>						
+							<td NOWRAP class="formlabel" valign=top>
+							&nbsp&nbsp&nbsp
+							</td>
+						</tr>
+					
+	
+								<tr> 
+									<td NOWRAP class="formlabel" valign=top align=center><font size=2> <b> <bean:message key="label.selectGroup"/> </b>
+											<select name="monitoredToolSessionId" onchange="javascript:submitSession(this.value,'submitSession');">
+											<c:forEach var="toolSessionName" items="${sessionScope.summaryToolSessions}">
+												<c:forEach var="toolSessionId" items="${sessionScope.summaryToolSessionsId}">
+													<c:out value="${toolSessionName.key}"/> -<c:out value="${toolSessionId.value}"/>
+												
+														<c:if test="${toolSessionName.key == toolSessionId.key}"> 			
 													
-													<c:if test="${toolSessionId.value == sessionScope.currentMonitoredToolSession}"> 			
-															<c:set var="SELECTED_SESSION" scope="request" value="SELECTED"/>
-													</c:if>						
-													
-													<c:if test="${toolSessionId.value != 'All'}"> 		
-														<option value="<c:out value="${toolSessionId.value}"/>"  <c:out value="${requestScope.SELECTED_SESSION}"/>> <c:out value="${toolSessionName.value}"/>  </option>						
-													</c:if>						
-													
-													<c:if test="${toolSessionId.value == 'All'}"> 	
-														<option value="<c:out value="${toolSessionId.value}"/>"  <c:out value="${requestScope.SELECTED_SESSION}"/>>  All  </option>						
-													</c:if>						
-											</c:if>							
-										</c:forEach>		  	
-									</c:forEach>		  	
-									</select>
-								</font>
-							</td> 
-						<tr>
+															<c:set var="SELECTED_SESSION" scope="request" value=""/>
+															<c:if test="${sessionScope.selectionCase == 2}"> 			
+																<c:set var="currentMonitoredToolSession" scope="session" value="All"/>
+															</c:if>						
+															
+															<c:if test="${toolSessionId.value == sessionScope.currentMonitoredToolSession}"> 			
+																	<c:set var="SELECTED_SESSION" scope="request" value="SELECTED"/>
+															</c:if>						
+															
+															<c:if test="${toolSessionId.value != 'All'}"> 		
+																<option value="<c:out value="${toolSessionId.value}"/>"  <c:out value="${requestScope.SELECTED_SESSION}"/>> <c:out value="${toolSessionName.value}"/>  </option>						
+															</c:if>						
+															
+															<c:if test="${toolSessionId.value == 'All'}"> 	
+																<option value="<c:out value="${toolSessionId.value}"/>"  <c:out value="${requestScope.SELECTED_SESSION}"/>>  All  </option>						
+															</c:if>						
+													</c:if>							
+												</c:forEach>		  	
+											</c:forEach>		  	
+											</select>
+										</font>
+									</td> 
+								<tr>
+	
+						</c:if>								
 					</c:if>			
 
 					<c:forEach var="currentDto" items="${sessionScope.listMonitoredAnswersContainerDto}">
@@ -108,7 +112,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			  	 			<td> &nbsp&nbsp&nbsp</td>
 			  	 		</tr>
 						<tr>			
-							<td NOWRAP valign=top align=left><b> <font size=2> <bean:message key="label.nomination"/> </b>
+							<td NOWRAP valign=top align=left><b> <font size=2> <bean:message key="label.nomination"/>: </b>
 								<c:out value="${currentDto.question}" escapeXml="false"/>
 							</font> </td>
 						</tr>	

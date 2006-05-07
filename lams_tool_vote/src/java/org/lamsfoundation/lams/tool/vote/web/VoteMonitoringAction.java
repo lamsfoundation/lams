@@ -136,25 +136,26 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 
     	
     	VoteMonitoringForm voteMonitoringForm = (VoteMonitoringForm) form;
-	 	String currentMonitoredToolSession=voteMonitoringForm.getSelectedToolSessionId(); 
+	 	
+    	String currentMonitoredToolSession=voteMonitoringForm.getSelectedToolSessionId(); 
 	    logger.debug("currentMonitoredToolSession: " + currentMonitoredToolSession);
-	    
-		VoteSession voteSession=voteService.retrieveVoteSession(new Long(currentMonitoredToolSession));
-	    logger.debug("retrieving voteSession: " + voteSession);
-	    
-		VoteContent voteContent=voteSession.getVoteContent();
-	    logger.debug("using voteContent: " + voteContent);
 
-	    refreshSummaryData(request, voteContent, voteService, true, false, currentMonitoredToolSession, null, true);
-	    
-	    if (currentMonitoredToolSession.equals("All"))
+    	/* SELECTION_CASE == 1 indicates a selected group other than "All" */
+		if (currentMonitoredToolSession.equals("All"))
 	    {
 		    request.getSession().setAttribute(SELECTION_CASE, new Long(2));
 	    }
 	    else
 	    {
-	    	/* SELECTION_CASE == 1 indicates a selected group other than "All" */
+		    VoteSession voteSession=voteService.retrieveVoteSession(new Long(currentMonitoredToolSession));
+		    logger.debug("retrieving voteSession: " + voteSession);
+		    
+			VoteContent voteContent=voteSession.getVoteContent();
+		    logger.debug("using voteContent: " + voteContent);
+
+		    refreshSummaryData(request, voteContent, voteService, true, false, currentMonitoredToolSession, null, true);
 		    request.getSession().setAttribute(SELECTION_CASE, new Long(1));
+
 	    }
 	    logger.debug("SELECTION_CASE: " + request.getSession().getAttribute(SELECTION_CASE));
 	    
@@ -181,6 +182,7 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 			logger.debug("voteService: " + voteService);
 		}
 
+		logger.debug("voteService: " + voteService);
 		
 		logger.debug("isUserNamesVisible: " + isUserNamesVisible);
 		logger.debug("isLearnerRequest: " + isLearnerRequest);
@@ -219,21 +221,25 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	    
 	    logger.debug("using allUsersData to retrieve data: " + isUserNamesVisible);
 	    List listMonitoredAnswersContainerDTO=MonitoringUtil.buildGroupsQuestionData(request, voteContent, 
-	    		isUserNamesVisible, isLearnerRequest, currentSessionId, userId);
+	    		isUserNamesVisible, isLearnerRequest, currentSessionId, userId, voteService);
 	    request.getSession().setAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO, listMonitoredAnswersContainerDTO);
 	    logger.debug("LIST_MONITORED_ANSWERS_CONTAINER_DTO: " + request.getSession().getAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO));
 	    /* ends here. */
 	    
-	    List listUserEntries=processUserEnteredNominations(voteService, currentSessionId, showUserEntriesBySession);
+	    logger.debug("decide processing user entered values based on isLearnerRequest: " + isLearnerRequest);
+
+	    List listUserEntries=processUserEnteredNominations(voteService, currentSessionId, showUserEntriesBySession, userId, isLearnerRequest);
 	    logger.debug("listUserEntries: " + listUserEntries);
-	    request.getSession().setAttribute(LIST_USER_ENTRIES, listUserEntries);
+	    request.getSession().setAttribute(LIST_USER_ENTRIES, listUserEntries);    
 	}
 
 
-	public List processUserEnteredNominations(IVoteService voteService, String currentSessionId, boolean showUserEntriesBySession)
+	public List processUserEnteredNominations(IVoteService voteService, String currentSessionId, boolean showUserEntriesBySession, String userId, boolean showUserEntriesByUserId)
 	{
 	    logger.debug("start getting user entries, showUserEntriesBySession: " + showUserEntriesBySession);
 	    logger.debug("start getting user entries, currentSessionId: " + currentSessionId);
+	    logger.debug("start getting user entries, showUserEntriesByUserId: " + showUserEntriesByUserId);
+	    logger.debug("start getting user entries, userId: " + userId);
 	    
 	    List userEntries=voteService.getUserEntries();
 	    logger.debug("userEntries: " + userEntries);
@@ -280,14 +286,37 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	    	    	    logger.debug("showUserEntriesBySession is true");
 	    	    	    String userSessionId=voteUsrAttempt.getVoteQueUsr().getVoteSession().getVoteSessionId().toString() ;
 	    	    	    logger.debug("userSessionId versus currentSessionId: " + userSessionId + " versus " +  currentSessionId);
-	    	    	    if (userSessionId.equals(currentSessionId))
+
+	    	    	    if (showUserEntriesByUserId == true)
 	    	    	    {
-	    	    	        logger.debug("this is a requested session id: "  + currentSessionId);
-			    			voteMonitoredUserDTO.setAttemptTime(voteUsrAttempt.getAttemptTime().toString());
-			    			voteMonitoredUserDTO.setTimeZone(voteUsrAttempt.getTimeZone());
-			    			voteMonitoredUserDTO.setUserName(voteUsrAttempt.getVoteQueUsr().getUsername());
-			    			voteMonitoredUserDTO.setQueUsrId(voteUsrAttempt.getVoteQueUsr().getUid().toString());
-			    			voteMonitoredUserDTO.setUserEntry(voteUsrAttempt.getUserEntry());
+		    	    	    logger.debug("showUserEntriesByUserId is true");
+		    	    	    if (userSessionId.equals(currentSessionId))
+		    	    	    {
+		    	    	        String localUserId=voteUsrAttempt.getVoteQueUsr().getQueUsrId().toString(); 
+		    	    	        if (userId.equals(localUserId))
+			    	    	    {
+			    	    	        logger.debug("this is requested by user id: "  + userId);
+					    			voteMonitoredUserDTO.setAttemptTime(voteUsrAttempt.getAttemptTime().toString());
+					    			voteMonitoredUserDTO.setTimeZone(voteUsrAttempt.getTimeZone());
+					    			voteMonitoredUserDTO.setUserName(voteUsrAttempt.getVoteQueUsr().getUsername());
+					    			voteMonitoredUserDTO.setQueUsrId(voteUsrAttempt.getVoteQueUsr().getUid().toString());
+					    			voteMonitoredUserDTO.setUserEntry(voteUsrAttempt.getUserEntry());
+			    	    	        
+			    	    	    }
+		    	    	    }
+	    	    	    }
+	    	    	    else
+	    	    	    {
+	    	    	        logger.debug("showUserEntriesByUserId is false");
+		    	    	    if (userSessionId.equals(currentSessionId))
+		    	    	    {
+		    	    	        logger.debug("this is requested by session id: "  + currentSessionId);
+				    			voteMonitoredUserDTO.setAttemptTime(voteUsrAttempt.getAttemptTime().toString());
+				    			voteMonitoredUserDTO.setTimeZone(voteUsrAttempt.getTimeZone());
+				    			voteMonitoredUserDTO.setUserName(voteUsrAttempt.getVoteQueUsr().getUsername());
+				    			voteMonitoredUserDTO.setQueUsrId(voteUsrAttempt.getVoteQueUsr().getUid().toString());
+				    			voteMonitoredUserDTO.setUserEntry(voteUsrAttempt.getUserEntry());
+		    	    	    }
 	    	    	    }
 	    	    	}
 	    	    	listMonitoredUserContainerDTO.add(voteMonitoredUserDTO);
