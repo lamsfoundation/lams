@@ -156,7 +156,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			  	 			<td> &nbsp&nbsp&nbsp</td>
 			  	 		</tr>
 						<tr>			
-							<td NOWRAP valign=top align=left><b> <font size=2> <bean:message key="label.nomination"/> </b>
+							<td NOWRAP valign=top align=left><b> <font size=2> <bean:message key="label.nomination"/>: </b>
 								<c:out value="${currentDto.question}" escapeXml="false"/>
 							</font> </td>
 						</tr>	
