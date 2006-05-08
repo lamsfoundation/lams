@@ -44,11 +44,29 @@
         />
 
         <property
+            name="loginName"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="login_name"
+            length="255"
+        />
+
+        <property
             name="firstName"
             type="java.lang.String"
             update="true"
             insert="true"
             column="first_name"
+            length="255"
+        />
+
+        <property
+            name="jabberId"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="jabber_id"
             length="255"
         />
 
