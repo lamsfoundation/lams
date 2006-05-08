@@ -1412,7 +1412,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 			}
 			
 			flashMessage = new FlashMessage(
-					MSG_KEY_ORG_BY_ROLE, OrganisationDTOFactory.createTree(organisations, null));
+					MSG_KEY_ORG_BY_ROLE, OrganisationDTOFactory.createTree(organisations));
 		} else
 			flashMessage = FlashMessage.getNoSuchUserExists(
 					MSG_KEY_ORG_BY_ROLE, userID);
