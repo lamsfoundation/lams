@@ -16,14 +16,20 @@ insert into lams_workspace values(7,null,null,'One Test');
 insert into lams_workspace values(8,null,null,'Two Test');
 insert into lams_workspace values(9,null,null,'Three Test');
 insert into lams_workspace values(10,null,null,'Four Test');
+insert into lams_workspace values(11,null,null,'Computing Courses');
+insert into lams_workspace values(12,null,null,'COMP100');
+insert into lams_workspace values(13,null,null,'COMP225');
 
 INSERT INTO lams_organisation VALUES (1, 'Root', 'Root Organisation',null,1,NOW(),1);
 INSERT INTO lams_organisation VALUES (2, 'Maquarie Uni', 'Macquarie University',1,2,NOW(),2);
 INSERT INTO lams_organisation VALUES (3, 'MELCOE', 'Macquarie E-Learning Centre Of Excellence',2,3,NOW(),3);
 INSERT INTO lams_organisation VALUES (4, 'LAMS', 'LAMS Project Team',3,3,NOW(),4);
 INSERT INTO lams_organisation VALUES (5, 'MAMS', 'MAMS Project Team',3,3,NOW(),5);
+INSERT INTO lams_organisation VALUES (6, 'Computing', 'Computing Courses',2,3,NOW(),11);
+INSERT INTO lams_organisation VALUES (7, 'COMP100', 'Intro Computing',6,3,NOW(),12);
+INSERT INTO lams_organisation VALUES (8, 'COMP225', 'Computing Science',6,3,NOW(),13);
 
-
+-- user_organisation_id, organisation_id, user_id
 INSERT INTO lams_user_organisation VALUES (1, 1, 1);
 INSERT INTO lams_user_organisation VALUES (2, 2, 2);
 INSERT INTO lams_user_organisation VALUES (3, 3, 2);
@@ -36,11 +42,16 @@ INSERT INTO lams_user_organisation VALUES (8, 2, 4);
 INSERT INTO lams_user_organisation VALUES (9, 3, 4);
 INSERT INTO lams_user_organisation VALUES (10,5, 4);
 
+-- test1 thru test4 have access to LAMS
 INSERT INTO lams_user_organisation VALUES (11,4, 5);
 INSERT INTO lams_user_organisation VALUES (12,4, 6);
 INSERT INTO lams_user_organisation VALUES (13,4, 7);
 INSERT INTO lams_user_organisation VALUES (14,4, 8);
 
+-- test1 has access to the Computing orgs
+INSERT INTO lams_user_organisation VALUES (15,6, 5);
+INSERT INTO lams_user_organisation VALUES (16,7, 5);
+INSERT INTO lams_user_organisation VALUES (17,8, 5);
 
 INSERT INTO lams_user_organisation_role VALUES (1, 1, 1);
 INSERT INTO lams_user_organisation_role VALUES (2, 2, 2);
@@ -84,6 +95,21 @@ INSERT INTO lams_user_organisation_role VALUES (35, 13, 5);
 INSERT INTO lams_user_organisation_role VALUES (36, 14, 3);
 INSERT INTO lams_user_organisation_role VALUES (37, 14, 4);
 INSERT INTO lams_user_organisation_role VALUES (38, 14, 5);
+
+-- test1 in the Computing orgs is author, learner, staff and teacher
+-- user_organisation_role_id, user_organisation_id, role_id
+INSERT INTO lams_user_organisation_role VALUES (39, 15, 3);
+INSERT INTO lams_user_organisation_role VALUES (40, 15, 4);
+INSERT INTO lams_user_organisation_role VALUES (41, 15, 5);
+INSERT INTO lams_user_organisation_role VALUES (42, 15, 6);
+INSERT INTO lams_user_organisation_role VALUES (43, 16, 3);
+INSERT INTO lams_user_organisation_role VALUES (44, 16, 4);
+INSERT INTO lams_user_organisation_role VALUES (45, 16, 5);
+INSERT INTO lams_user_organisation_role VALUES (46, 16, 6);
+INSERT INTO lams_user_organisation_role VALUES (47, 17, 3);
+INSERT INTO lams_user_organisation_role VALUES (48, 17, 4);
+INSERT INTO lams_user_organisation_role VALUES (49, 17, 5);
+INSERT INTO lams_user_organisation_role VALUES (50, 17, 6);
 
 -- themes and styles 
 INSERT INTO lams_css_style (style_id, theme_ve_id) VALUES (1,1);
@@ -215,6 +241,15 @@ values(19,4,'Four Test Workspace',10,8,'20041223','20041223',1);
 insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,workspace_id,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
 values(20,19,'Four Test Run Sequences Folder',10,8,'20041223','20041223',2);
 
+insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,workspace_id,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
+values(21,1,'Computing Courses',11,1,'20041223','20041223',1);
+
+insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,workspace_id,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
+values(22,1,'COMP100',12,1,'20041223','20041223',1);
+
+insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,workspace_id,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
+values(23,1,'COMP225',13,1,'20041223','20041223',1);
+
 update lams_workspace set root_folder_id = 1 where workspace_id = 1;
 update lams_workspace set root_folder_id = 2 where workspace_id = 2;
 update lams_workspace set root_folder_id = 3 where workspace_id = 3;
@@ -225,6 +260,9 @@ update lams_workspace set root_folder_id = 13 where workspace_id = 7;
 update lams_workspace set root_folder_id = 15 where workspace_id = 8;
 update lams_workspace set root_folder_id = 17 where workspace_id = 9;
 update lams_workspace set root_folder_id = 19 where workspace_id = 10;
+update lams_workspace set root_folder_id = 21 where workspace_id = 11;
+update lams_workspace set root_folder_id = 22 where workspace_id = 12;
+update lams_workspace set root_folder_id = 23 where workspace_id = 13;
 
 update lams_workspace set def_run_seq_fld_id = 7 where workspace_id = 6;
 update lams_workspace set def_run_seq_fld_id = 14 where workspace_id = 7;
