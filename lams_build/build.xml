@@ -123,6 +123,8 @@
 					<include name="mysql/*.jar" />
 					<include name="odmg/*.jar" />
 					<include name="quartz/*.jar" />
+					<include name="smack.jar"/>
+					<include name="smackx.jar"/>
 					<include name="spring/*.jar" />
 					<include name="struts/*.jar" />
 					<include name="wddx/*.jar" />

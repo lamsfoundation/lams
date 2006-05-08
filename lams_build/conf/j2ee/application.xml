@@ -160,6 +160,12 @@
 		<java>quartz.jar</java>
 	</module>
 	<module>
+		<java>smack.jar</java>
+	</module>
+	<module>
+		<java>smackx.jar</java>
+	</module>
+	<module>
 		<java>spring-aop.jar</java>
 	</module>
 	<module>

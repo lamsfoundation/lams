@@ -37,6 +37,8 @@
 <archive path="/lams_build/lib/mysql/mysql-connector-java-3.1.12-bin.jar"/>
 <archive path="/lams_build/lib/odmg/odmg-3.0.jar"/>
 <archive path="/lams_build/lib/quartz/quartz.jar"/>
+<archive path="/lams_build/lib/smack/smack.jar"/>
+<archive path="/lams_build/lib/smack/smackx.jar"/>
 <archive path="/lams_build/lib/spring/spring-aop.jar"/>
 <archive path="/lams_build/lib/spring/spring-beans.jar"/>
 <archive path="/lams_build/lib/spring/spring-context.jar"/>
