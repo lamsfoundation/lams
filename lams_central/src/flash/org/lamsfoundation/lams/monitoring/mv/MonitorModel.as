@@ -35,6 +35,9 @@ import org.lamsfoundation.lams.common.util.*;
 class MonitorModel extends Observable{
 	private var _className:String = "MonitorModel";
    
+   public var RT_FOLDER:String = "Folder";
+   public var RT_ORG:String = "Organisation";
+   
 	private var __width:Number;
 	private var __height:Number;
 	private var __x:Number;
@@ -50,15 +53,17 @@ class MonitorModel extends Observable{
 	private var _todos:Array;  // Array of ToDo ContributeActivity(s)
 	// state data
 	private var _showLearners:Boolean;
+	
 	//these are hashtables of mc refs MOVIECLIPS (like CanvasActivity or CanvasTransition)
 	//each on contains a reference to the emelment in the ddm (activity or transition)
 	private var _activitiesDisplayed:Hashtable;
 	private var _transitionsDisplayed:Hashtable;
 	
-	//These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
-    private var dispatchEvent:Function;     
-    public var addEventListener:Function;
-    public var removeEventListener:Function;
+	//this is the dataprovider for the org tree
+	private var _treeDP:XML;
+	private var _orgResources:Array;	
+	private var _orgs:Array;
+	private var _selectedTreeNode:XMLNode;
 	/**
 	* Constructor.
 	*/
@@ -67,6 +72,8 @@ class MonitorModel extends Observable{
 		_showLearners = true;
 		_activitiesDisplayed = new Hashtable("_activitiesDisplayed");
 		_transitionsDisplayed = new Hashtable("_transitionsDisplayed");
+
+		_orgResources = new Array();
 	}
 	
 	// add get/set methods
@@ -102,7 +109,13 @@ class MonitorModel extends Observable{
 		return _org;
 	}
 	
+	public function saveOrgs(orgs:Array){
+		_orgs = orgs;
+	}
 	
+	public function getOrgs():Array{
+		return _orgs;
+	}
 	
 	public function setToDos(todos:Array){
 		
@@ -282,6 +295,80 @@ class MonitorModel extends Observable{
 		return p;
 	}  
 	
+	/**
+	 * Sets up the tree for the 1st time
+	 * 
+	 * @usage   
+	 * @return  
+	 */
+	public function initOrganisationTree(){
+		_treeDP = new XML();
+		_orgResources = new Array();
+		//add top level
+		//create the data obj:
+		var mdto= {};
+		mdto.organisationID = null;
+		mdto.description = "";
+		// use Dictionary.getValue
+		mdto.name = "Classes";
+		mdto.parentID = null;
+		mdto.resourceID="-1";
+		
+		
+		var rootNode = _treeDP.addTreeNode(mdto.name,mdto);
+		rootNode.attributes.isBranch = true;
+		setOrganisationResource(RT_ORG+'_'+mdto.resourceID,rootNode);
+		
+	}
+	
+	/**
+	 * 
+	 * @usage   
+	 * @param   neworgResources 
+	 * @return  
+	 */
+	public function setOrganisationResource(key:String,neworgResources:XMLNode):Void {
+		Debugger.log(key+'='+neworgResources,Debugger.GEN,'setOrganisationResource','org.lamsfoundation.lams.monitoring.mv.MonitorModel');
+		_orgResources[key] = neworgResources;
+	}
+	/**
+	 * 
+	 * @usage   
+	 * @return  
+	 */
+	public function getOrganisationResource(key:String):XMLNode{
+		Debugger.log(key+' is returning '+_orgResources[key],Debugger.GEN,'getOrganisationResource','org.lamsfoundation.lams.monitoring.mv.MonitorModel');
+		return _orgResources[key];
+		
+	}
+
+	
+	public function get treeDP():XML{
+		return _treeDP;
+	}
+
+	
+	/**
+	 * 
+	 * @usage   
+	 * @param   newselectedTreeNode 
+	 * @return  
+	 */
+	public function setSelectedTreeNode (newselectedTreeNode:XMLNode):Void {
+		_selectedTreeNode = newselectedTreeNode;
+		//dispatch an update to the view
+		broadcastViewUpdate('ITEM_SELECTED',_selectedTreeNode);
+	}
+	/**
+	 * 
+	 * @usage   
+	 * @return  
+	 */
+	public function getSelectedTreeNode ():XMLNode {
+		return _selectedTreeNode;
+	}
+
+	
 	//Accessors for x + y coordinates
     public function get x():Number{
         return __x;
@@ -303,6 +390,7 @@ class MonitorModel extends Observable{
 	public function get className():String{
         return 'MonitorModel';
     }
+
 	/**
 	 * Returns a reference to the Activity Movieclip for the UIID passed in.  Gets from _activitiesDisplayed Hashable
 	 * @usage   
@@ -322,8 +410,8 @@ class MonitorModel extends Observable{
 	
 	public function get transitionsDisplayed():Hashtable{
 		return _transitionsDisplayed;
-	}
-	
+	}	
+
 	public function getMonitor():Monitor{
 		return _monitor;
 	}

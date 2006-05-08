@@ -21,19 +21,20 @@
  * ************************************************************************
  */
 import org.lamsfoundation.lams.monitoring.Application;
+import org.lamsfoundation.lams.monitoring.Organisation;
 import org.lamsfoundation.lams.monitoring.mv.*;
 import org.lamsfoundation.lams.monitoring.mv.tabviews.*;
 import org.lamsfoundation.lams.authoring.DesignDataModel;
-import org.lamsfoundation.lams.common.ui.*
+import org.lamsfoundation.lams.common.ui.*;
 import org.lamsfoundation.lams.common.util.*;
-import org.lamsfoundation.lams.common.dict.*
-import org.lamsfoundation.lams.common.* 
+import org.lamsfoundation.lams.common.dict.*;
+import org.lamsfoundation.lams.common.* ;
 
-import mx.utils.*
+import mx.utils.*;
 import mx.managers.*;
 import mx.events.*;
 
-class org.lamsfoundation.lams.monitoring.mv.Monitor {
+class Monitor {
 	//Constants
 	public static var USE_PROPERTY_INSPECTOR = true;
 	
@@ -95,7 +96,7 @@ class org.lamsfoundation.lams.monitoring.mv.Monitor {
         //Set the position by setting the model which will call update on the view
         monitorModel.setPosition(x,y);
 		monitorModel.setSize(w,h);
-
+		monitorModel.initOrganisationTree();
 		//Get reference to application and design data model
 		//app = Application.getInstance();
 		
@@ -120,7 +121,30 @@ class org.lamsfoundation.lams.monitoring.mv.Monitor {
         }
     }
 	
+	public function getOrganisations():Void{
+		var callback:Function = Proxy.create(this,showOrgList);
+           
+		Application.getInstance().getComms().getRequest('workspace.do?method=getOrganisationsByUserRole&userID='+_root.userID+'&roles=STAFF,TEACHER',callback, false);
+		
+	}
 	
+	private function showOrgList(orgs:Array):Void{
+		trace('organisations list returned...');
+		
+		var orgCol = new Array();
+		
+		for(var i=0; i< orgs.length; i++){
+			var o:Object = orgs[i];
+			trace(o.name);
+			var newOrg:Organisation = new Organisation();
+			newOrg.populateFromDTO(o);
+			trace('pushing org with name: ' + newOrg.getName());
+			orgCol.push(newOrg);
+		}
+		
+		monitorModel.saveOrgs(orgCol);
+	}
+
 	/**
 	 * server call for learning Dseign and sent it to the save it in DataDesignModel
 	 * 
@@ -138,17 +162,7 @@ class org.lamsfoundation.lams.monitoring.mv.Monitor {
 		Application.getInstance().getComms().getRequest('authoring/author.do?method=getLearningDesignDetails&learningDesignID='+designID,callback, false);
 		
 	}
-	
-	/*
-	private function getProgressData(seq:Object){
-		trace('getting progress data...');
-		var progessId:Number = seq.getSequenceID();
-		
-		var callback:Function = Proxy.create(this, saveProgressData);
-		Application .getInstance().getComms().getRequest('learning/learner.do?method=getFlashProgressData&progressId=' + progessId, callback, false);
-	}
-	*/
-	
+
 	private function saveDataDesignModel(learningDesignDTO:Object){
 		trace('returning learning design...');
 		trace('saving model data...');
@@ -158,21 +172,10 @@ class org.lamsfoundation.lams.monitoring.mv.Monitor {
 		seq.setLearningDesignModel(_ddm);
 		
 		// activite Progress movie
-		//monitorModel.drawDesign();
+		monitorModel.drawDesign();
 	}
 	
-	/*
-	private function saveProgressData(progressDTO:Object)
-		trace('returning progress data...');
-		var progress:Progress = new Progress();
-		progress.populateFromDTO(progressDTO);
-		var seq:Sequence = Sequence(libraryModel.getSelectedSequence());
-		seq.setProgress(progress);
-		
-		trace('progress data saved...');
-	}
-	*/
-	
+
 	/**
 	* Used by application to set the size
 	* @param width The desired width
@@ -214,7 +217,7 @@ class org.lamsfoundation.lams.monitoring.mv.Monitor {
 	public function getMV():MonitorView{
 		return monitorView;
 	}
-	
+
 	public function get ddm():DesignDataModel{
 		return _ddm;
 	}
