@@ -103,8 +103,8 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 		super();
 		// TODO Auto-generated constructor stub
 	}
-
-	/* ************ Methods from ToolSessionManager, ToolContentManager ***** */
+	
+	/* ************ Methods from ToolSessionManager ************* */
 	public void createToolSession(Long toolSessionId, String toolSessionName,
 			Long toolContentId) throws ToolException {
 		if (logger.isDebugEnabled()) {
@@ -182,7 +182,9 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 		// TODO Auto-generated method stub
 
 	}
-
+	
+	/* ************  Methods from ToolContentManager ************************* */	
+	
 	public void copyToolContent(Long fromContentId, Long toContentId)
 			throws ToolException {
 
@@ -345,20 +347,20 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 
 	public void createJabberRoom(ChatSession chatSession) {
 		try {
+			XMPPConnection.DEBUG_ENABLED = true;
 			XMPPConnection con = new XMPPConnection(ChatConstants.XMPPDOMAIN);
 
 			con.login(ChatConstants.XMPP_ADMIN_USERNAME,
 					ChatConstants.XMPP_ADMIN_PASSWORD);
 
 			// Create a MultiUserChat using an XMPPConnection for a room
-			String jabberRoom = chatSession.getSessionName() + "_"
-					+ new Long(System.currentTimeMillis()).toString() + "@"
-					+ ChatConstants.XMPPCONFERENCE;
-			
+			String jabberRoom = new Long(System.currentTimeMillis()).toString()
+					+ "@" + ChatConstants.XMPPCONFERENCE;
+
 			MultiUserChat muc = new MultiUserChat(con, jabberRoom);
 
 			// Create the room
-			muc.create(ChatConstants.XMPP_ADMIN_USERNAME);
+			muc.create("nick");
 
 			// Get the the room's configuration form
 			Form form = muc.getConfigurationForm();
@@ -381,7 +383,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 			// Send the completed form (with default values) to the server to
 			// configure the room
 			muc.sendConfigurationForm(submitForm);
-			
+
 			chatSession.setJabberRoom(jabberRoom);
 		} catch (XMPPException e) {
 			logger.error(e);
