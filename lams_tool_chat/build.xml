@@ -187,9 +187,6 @@ Ant build file.
 				<include name="template/**" />
 				<!-- used by tiles -->
 			</fileset>
-			<lib dir="${weblib}/smack-2.2.0">
-				<include name="*.jar" />
-			</lib>
 		</war>
 	</target>
 
