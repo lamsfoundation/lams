@@ -91,10 +91,12 @@ public class MonitoringAction extends LamsDispatchAction
 	/** See deleteOldPreviewLessons */
 	public static final String NUM_DELETED = "numDeleted";
 
-	private Integer getUserId() {
-		HttpSession ss = SessionManager.getSession();
+	private Integer getUserId(HttpServletRequest request) {
+		return new Integer(WebUtil.readIntParam(request,"userID"));
+/*		HttpSession ss = SessionManager.getSession();
 		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 		return user != null ? user.getUserID() : null;
+	*/
 	}
 	
     /**
@@ -176,7 +178,7 @@ public class MonitoringAction extends LamsDispatchAction
     		String desc = WebUtil.readStrParam(request,"lessonDescription");
     		if ( desc == null ) desc = "description";
     		long ldId = WebUtil.readLongParam(request, AttributeNames.PARAM_LEARNINGDESIGN_ID);
-    		Lesson newLesson = monitoringService.initializeLesson(title,desc,ldId,getUserId());
+    		Lesson newLesson = monitoringService.initializeLesson(title,desc,ldId,getUserId(request));
     		
     		flashMessage = new FlashMessage("initializeLesson",newLesson.getLessonId());
 		} catch (Exception e) {
@@ -222,7 +224,7 @@ public class MonitoringAction extends LamsDispatchAction
     	
     	try {
             long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-    		monitoringService.startLesson(lessonId, getUserId());
+    		monitoringService.startLesson(lessonId, getUserId(request));
     		flashMessage = new FlashMessage("startLesson",Boolean.TRUE);
 		} catch (Exception e) {
 			flashMessage = handleException(e, "startLesson", monitoringService);
@@ -264,7 +266,7 @@ public class MonitoringAction extends LamsDispatchAction
         	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
         	String dateStr = WebUtil.readStrParam(request, MonitoringConstants.PARAM_LESSON_START_DATE);
     		Date startDate = DateFormat.getInstance().parse(dateStr);
-    		monitoringService.startLessonOnSchedule(lessonId,startDate,getUserId());
+    		monitoringService.startLessonOnSchedule(lessonId,startDate,getUserId(request));
     		flashMessage = new FlashMessage("startOnScheduleLesson",Boolean.TRUE);
     	}catch (Exception e) {
 			flashMessage = handleException(e, "startOnScheduleLesson", monitoringService);
@@ -308,7 +310,7 @@ public class MonitoringAction extends LamsDispatchAction
         	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
         	String dateStr = WebUtil.readStrParam(request, MonitoringConstants.PARAM_LESSON_FINISH_DATE);
     		Date finishDate = DateFormat.getInstance().parse(dateStr);
-    		monitoringService.finishLessonOnSchedule(lessonId,finishDate,getUserId());
+    		monitoringService.finishLessonOnSchedule(lessonId,finishDate,getUserId(request));
     		flashMessage = new FlashMessage("finishOnScheduleLesson",Boolean.TRUE);
     	}catch (Exception e) {
 			flashMessage = handleException(e, "finishOnScheduleLesson", monitoringService);
@@ -349,7 +351,7 @@ public class MonitoringAction extends LamsDispatchAction
     	
     	try {
         	long lessonId = WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID);
-    		monitoringService.archiveLesson(lessonId, getUserId());
+    		monitoringService.archiveLesson(lessonId, getUserId(request));
     		flashMessage = new FlashMessage("archiveLesson",Boolean.TRUE);
 		} catch (Exception e) {
 			flashMessage = handleException(e, "archiveLesson", monitoringService);
@@ -388,7 +390,7 @@ public class MonitoringAction extends LamsDispatchAction
     	
     	try {
         	long lessonId = WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID);
-    		monitoringService.suspendLesson(lessonId, getUserId());
+    		monitoringService.suspendLesson(lessonId, getUserId(request));
     		flashMessage = new FlashMessage("suspendLesson",Boolean.TRUE);
     	} catch (Exception e) {
 			flashMessage = handleException(e, "suspendLesson", monitoringService);
@@ -424,7 +426,7 @@ public class MonitoringAction extends LamsDispatchAction
     	
     	try {
         	long lessonId = WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID);
-    		monitoringService.unsuspendLesson(lessonId, getUserId());
+    		monitoringService.unsuspendLesson(lessonId, getUserId(request));
     		flashMessage = new FlashMessage("unsuspendLesson",Boolean.TRUE);
     	} catch (Exception e) {
 			flashMessage = handleException(e, "unsuspendLesson", monitoringService);
@@ -463,7 +465,7 @@ public class MonitoringAction extends LamsDispatchAction
     	
     	try {
         	long lessonId = WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID);
-    		monitoringService.removeLesson(lessonId, getUserId());
+    		monitoringService.removeLesson(lessonId, getUserId(request));
     		flashMessage = new FlashMessage("removeLesson",Boolean.TRUE);
 		} catch (Exception e) {
 			flashMessage = handleException(e, "removeLesson", monitoringService);
@@ -527,7 +529,7 @@ public class MonitoringAction extends LamsDispatchAction
                                      HttpServletRequest request,
                                      HttpServletResponse response)throws IOException{
     	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-    	String wddxPacket = monitoringService.getAllLessonsWDDX(getUserId());
+    	String wddxPacket = monitoringService.getAllLessonsWDDX(getUserId(request));
         PrintWriter writer = response.getWriter();
         writer.println(wddxPacket);
         return null;
@@ -677,7 +679,7 @@ public class MonitoringAction extends LamsDispatchAction
 	        	long lessonID = previewLesson.getLessonId().longValue();
 				
 	        	monitoringService.createPreviewClassForLesson(userID, lessonID);
-		        monitoringService.startLesson(lessonID, getUserId());
+		        monitoringService.startLesson(lessonID, getUserId(request));
 		
 				flashMessage = new FlashMessage("startPreviewSession",new Long(lessonID));
 				
