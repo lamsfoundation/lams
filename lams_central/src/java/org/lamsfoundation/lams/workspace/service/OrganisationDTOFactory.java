@@ -56,75 +56,111 @@ public class OrganisationDTOFactory {
 		return newDTOs;
 
 	}
-	/** Convert the given list of organisation DTOs to a hierarchy of OrganisationDTOs. */
-	public static OrganisationDTO createTree(Collection<OrganisationDTO> orgs, OrganisationDTO root){
-		Vector<OrganisationDTO> neworgs = new Vector<OrganisationDTO>();
-		OrganisationDTO rootOrgDTO = root;
+	/** Convert the given list of organisation DTOs to a hierarchy of OrganisationDTOs.
+	 * 
+	 * @param orgs	Collection of Organisation DTO's 
+	 * @param root  Root Organisation DTO 
+	 * @return OrganisationDTO tree
+	 */
+	public static OrganisationDTO createTree(Collection<OrganisationDTO> orgs){
+		
+		int count = 0;								// bystander node count
+		OrganisationDTO rootOrgDTO = null;			// root DTO holder
+		
 		Iterator it = orgs.iterator();
+		
 		while(it.hasNext()){
 			if(rootOrgDTO == null) {
+				/** create dummy root for tree and add first element as child node */
 				OrganisationDTO rt = new OrganisationDTO(new Integer(-1), new Integer(-1), "Root", "Root Description");
 				OrganisationDTO initial = (OrganisationDTO) it.next();
 				rt.addNode(initial);
 				rootOrgDTO = rt;
 			} else {
+				/** position the DTO in the tree */
 				OrganisationDTO organisationDTO = (OrganisationDTO) it.next();
-				
 				OrganisationDTO parent = findParent(rootOrgDTO, organisationDTO);
+				
 				if(parent!=null) {
+					/** save amended tree */
 					rootOrgDTO = parent;
 				} else {
-					neworgs.add(organisationDTO);
+					/** make bystander node */
+					rootOrgDTO.addNode(organisationDTO);
+					count++;
 				}
 			}
 		}
 		
-		if(neworgs.size() > 0){
-			if(orgs.size() == neworgs.size())
-				rootOrgDTO.addNodes(orgs);
-			else
-				return createTree(neworgs, rootOrgDTO);
+		/** Move bystander nodes to correct position in tree */
+		if(count>0){
+			Vector<OrganisationDTO> nodes = rootOrgDTO.getNodes();
+			Iterator i = nodes.iterator();
+			while(i.hasNext()){
+				OrganisationDTO dto = (OrganisationDTO) i.next();
+				OrganisationDTO parent = findParent(rootOrgDTO, dto);
+				if(parent!= null){
+					/** remove bystander node and save amended tree */
+					i.remove();
+					rootOrgDTO = parent;
+				}
+			}
 		}
 		
 		return rootOrgDTO;
 	}
 	
+	/**
+	 *  Find the correct position for the DTO node in the tree
+	 * 
+	 * 
+	 * @param root Dummy root DTO
+	 * @param tmp DTO to position
+	 * @return The amended organisation tree if adjustment made
+	 */
 	private static OrganisationDTO findParent(OrganisationDTO root, OrganisationDTO tmp){
-		if(root.getOrganisationID().equals(tmp.getParentID())){
-			root.addNode(tmp);
-			return root;
-		} else if(root.getParentID().equals(tmp.getOrganisationID())){
-			tmp.addNode(root);
-			return tmp;
-		} else {
-			// check to see if can add to tree
+			/** check the root's child nodes
+			 * 	note: root here is substitute root */ 
 			if(checkNodes(root, tmp))
 				return root;
 			else
 				return null;
-		}
 	}
 	
+	/**
+	 * Check if passed in node is a child node of the root's child nodes.
+	 * 
+	 * @param root Root DTO
+	 * @param tmp DTO to position
+	 * @return If added to branch returns true, otherwise returns false
+	 */
 	private static boolean checkNodes(OrganisationDTO root, OrganisationDTO tmp){
+		if(root.equals(tmp))
+			return false;
+		
+		/** child DTO nodes */
 		Vector nodes = root.getNodes();
+		
 		if(nodes.size() > 0){
 			Iterator it = nodes.iterator();
 			while(it.hasNext()){
 				OrganisationDTO child = (OrganisationDTO) it.next();
-				
-				if(child.getOrganisationID().equals(tmp.getParentID())) {
-					child.addNode(tmp);
-					return true;
-				} else if(child.getParentID().equals(tmp.getOrganisationID())) {
-					OrganisationDTO temp = child;
-					it.remove();
-					tmp.addNode(temp);
-					root.addNode(tmp);
-					return true;
-				} else {
-					if(checkNodes(child, tmp))
+					if(child.getOrganisationID().equals(tmp.getParentID())) {
+						/** added as child node */ 
+						child.addNode(tmp);
 						return true;
-				}
+					} else if(child.getParentID().equals(tmp.getOrganisationID())) {
+						/** added as parent node of child node and child of root */
+						OrganisationDTO temp = child;
+						it.remove();
+						tmp.addNode(temp);
+						root.addNode(tmp);
+						return true;
+					} else {
+						/** check nodes of child */
+						if(checkNodes(child, tmp))
+							return true;
+					}
 			}
 			
 		}
