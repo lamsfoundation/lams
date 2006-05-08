@@ -35,6 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.math.NumberUtils;
+import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -52,7 +53,11 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 public class ViewItemAction extends Action {
-
+	
+	private static final Logger log = Logger.getLogger(ViewItemAction.class);
+	private static final String DEFUALT_PROTOCOL_REFIX = "http://";
+	private static final String ALLOW_PROTOCOL_REFIX = new String("[http://|https://|ftp://|nntp://]");
+	
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 		
@@ -151,7 +156,7 @@ public class ViewItemAction extends Action {
 		String url = null;
 		switch (type) {
 		case ResourceConstants.RESOURCE_TYPE_URL:
-			url = item.getUrl();
+			url = protocol(item.getUrl());
 			break;
 		case ResourceConstants.RESOURCE_TYPE_FILE:
 			url = "/download/?uuid="+item.getFileUuid()+"&preferDownload=false";
@@ -165,6 +170,23 @@ public class ViewItemAction extends Action {
 		}
 		return url;
 	}
+	/**
+	 * If there is not url prefix, such as http://, https:// or ftp:// etc, this 
+	 * method will add default url protocol.
+	 * 
+	 * @param url
+	 * @return
+	 */
+	private String protocol(String url) {
+		if(url == null)
+			return "";
+		
+		if(!url.matches("^" + ALLOW_PROTOCOL_REFIX + ".*"))
+			url = DEFUALT_PROTOCOL_REFIX + url;
+		
+		return url;
+	}
+
 	/**
 	 * List save current resource items.
 	 * @param request

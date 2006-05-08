@@ -20,7 +20,7 @@
 		}
 		function checkNew(){
  		    var reqIDVar = new Date();
-			document.location.href = "<c:url value="/pages/learning/learning.jsp"/>?reqID="+reqIDVar.getTime();
+			document.location.href = "<c:url value="/learning/start.do"/>?toolSessionID=${toolSessionID}&reqID="+reqIDVar.getTime();
  		    return false;
 		}
 		function viewItem(itemUid){

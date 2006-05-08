@@ -596,6 +596,9 @@ public class ResourceServiceImpl implements
 			if(item.getType() == ResourceConstants.RESOURCE_TYPE_WEBSITE){
 				String packageDirectory = ZipFileUtil.expandZip(is, fileName);
 				String initFile = findWebsiteInitialItem(packageDirectory);
+				if(initFile == null){
+					throw new UploadResourceFileException(messageService.getMessage("error.msg.website.no.initial.file"));
+				}
 				item.setInitialItem(initFile);
 				//upload package
 				NodeKey nodeKey = processPackage(packageDirectory,initFile);
@@ -645,7 +648,7 @@ public class ResourceServiceImpl implements
 	private String findWebsiteInitialItem(String packageDirectory) {
 		File file = new File(packageDirectory);
 		if(!file.isDirectory())
-			return "";
+			return null;
 		
 		File[] initFiles = file.listFiles(new FileFilter(){
 			public boolean accept(File pathname) {
@@ -663,7 +666,7 @@ public class ResourceServiceImpl implements
 		if(initFiles != null && initFiles.length > 0)
 			return initFiles[0].getName();
 		else
-			return "";
+			return null;
 	}
 
 
