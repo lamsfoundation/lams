@@ -462,14 +462,24 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
 		if(SHOW_DEBUGGER){
 			showDebugger();
 		}
+		
+		//_monitor.getOrganisations();
     }
     
     /**
     * Opens the preferences dialog
-    */
+    
     public function showPrefsDialog() {
         PopUpManager.createPopUp(Application.root, LFWindow, true,{title:Dictionary.getValue("prefs_dlg_title"),closeButton:true,scrollContentPath:'preferencesDialog'});
     }
+	*/
+	
+	/**
+    * Opens the lesson manager dialog
+    */
+    //public function showLessonManagerDialog() {
+    //    PopUpManager.createPopUp(Application.root, LFWindow, true,{title:Dictionary.getValue("lesson_dlg_title"),closeButton:true,scrollContentPath:'selectClass'});
+    //}
     
     /**
     * Receives events from the Stage resizing

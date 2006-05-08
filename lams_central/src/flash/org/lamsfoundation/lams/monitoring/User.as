@@ -42,6 +42,7 @@ class User {
 	*/
 	public function User (){
 		_userProgress = null;
+		_userRoles = new Array();
 	}
 	
 	/**

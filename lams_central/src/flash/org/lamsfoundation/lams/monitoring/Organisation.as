@@ -29,6 +29,7 @@ import org.lamsfoundation.lams.common.util.*;
 */
 class Organisation {
 	
+	private var _parentOrg:Number = null;
 	private var _orgId:Number;
 	private var _orgName:String;
 	private var _orgDesc:String;
@@ -47,6 +48,7 @@ class Organisation {
 	* Constructor.
 	*/
 	public function Organisation (){
+		_users = new Hashtable();
 	}
 	
 	/**
@@ -60,10 +62,27 @@ class Organisation {
         return Organisation._instance;
 	}
 	
-	public function createFromDTO(orgDTO:Object){
+	public function populateFromDTO(orgDTO:Object){
+		_parentOrg = orgDTO.parentID;
 		_orgId = orgDTO.organisationID;
 		_orgName = orgDTO.name;
 		_orgDesc = orgDTO.description;
+	}
+	
+	public function getOrganisationID():Number{
+		return _orgId;
+	}
+	
+	public function getName():String{
+		return _orgName;
+	}
+	
+	public function setParent(parentOrg:Number){
+		_parentOrg = parentOrg;
+	}
+	
+	public function getParent():Number{
+		return _parentOrg;
 	}
 	
 	public function setUsers(users:Array):Boolean {
@@ -136,4 +155,7 @@ class Organisation {
 		return usrs;
 	}
 	
+	function get className():String{
+        return 'Organisation';
+    }
 }
