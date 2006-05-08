@@ -87,9 +87,9 @@ public ActionForward execute(ActionMapping mapping, ActionForm form,
 		
 		// Create the room if it doesnt exist
 		if (chatSession.getJabberRoom() == null) {
-			chatService.createJabberRoom(chatSession);			
-		}
-		
+			chatService.createJabberRoom(chatSession);
+			chatService.saveOrUpdateChatSession(chatSession);
+		}		
 		
 		request.setAttribute("XMPPDOMAIN", ChatConstants.XMPPDOMAIN);
 		request.setAttribute("USERNAME", chatUser.getLoginName());
