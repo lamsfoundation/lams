@@ -32,6 +32,8 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.chat.service.ChatService;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * @hibernate.class table="tl_lachat11_chat"
@@ -351,12 +353,13 @@ public class Chat implements java.io.Serializable, Cloneable {
 		return result;
 	}
 
-	public static Chat newInstance(Chat fromContent, Long contentId,
+	public static Chat newInstance(Chat fromContent, Long toContentId,
 			IToolContentHandler chatToolContentHandler) {
 		Chat toContent = new Chat();
 		fromContent.toolContentHandler = chatToolContentHandler;
 		toContent = (Chat) fromContent.clone();
-		toContent.setToolContentId(contentId);
+		toContent.setToolContentId(toContentId);
+		toContent.setCreateDate(new Date());
 		return toContent;
 	}
 
