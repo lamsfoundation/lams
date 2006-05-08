@@ -94,7 +94,7 @@ NULL
 , NULL
 , NULL
 , NULL
-, 'tool/lanb11/images/icon_noticeboard.swf'
+, 'tool/lanb11/images/icon_htmlnb.swf'
 , NULL
 , NULL
 , NULL
