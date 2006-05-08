@@ -37,7 +37,7 @@ public class ChatUserDAO extends BaseDAO implements IChatUserDAO {
 
 	public static final String SQL_QUERY_FIND_BY_USER_ID_SESSION_ID = "from "
 			+ ChatUser.class.getName() + " as f"
-			+ " where user_id=? and f.session.sessionId=?";
+			+ " where user_id=? and f.chatSession.sessionId=?";
 
 	public ChatUser getByUserIdAndSessionId(Long userId, Long toolSessionId) {
 		List list = this.getHibernateTemplate().find(
