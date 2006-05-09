@@ -45,6 +45,9 @@ class MonitorModel extends Observable{
 	private var _isDirty:Boolean;
 	private var infoObj:Object;
 	
+	
+	private var _dialogOpen:String;		// the type of dialog currently open
+	
 	private var _monitor:Monitor;
 	
 	// add model data
@@ -219,6 +222,11 @@ class MonitorModel extends Observable{
 		
 	}
 	
+	public function setDialogOpen(dialogOpen:String){
+		_dialogOpen = dialogOpen;
+		broadcastViewUpdate(_dialogOpen, null, null);
+	}
+	
 	public function broadcastViewUpdate(updateType, data, tabID){
 		//getMonitor().getMV().clearView();
 		setChanged();
@@ -304,21 +312,6 @@ class MonitorModel extends Observable{
 	public function initOrganisationTree(){
 		_treeDP = new XML();
 		_orgResources = new Array();
-		//add top level
-		//create the data obj:
-		var mdto= {};
-		mdto.organisationID = null;
-		mdto.description = "";
-		// use Dictionary.getValue
-		mdto.name = "Classes";
-		mdto.parentID = null;
-		mdto.resourceID="-1";
-		
-		
-		var rootNode = _treeDP.addTreeNode(mdto.name,mdto);
-		rootNode.attributes.isBranch = true;
-		setOrganisationResource(RT_ORG+'_'+mdto.resourceID,rootNode);
-		
 	}
 	
 	/**
@@ -356,8 +349,12 @@ class MonitorModel extends Observable{
 	 */
 	public function setSelectedTreeNode (newselectedTreeNode:XMLNode):Void {
 		_selectedTreeNode = newselectedTreeNode;
+		trace('branch: ' + _selectedTreeNode.attributes.isBranch);
+		if(!_selectedTreeNode.attributes.isBranch){
+			getMonitor().requestOrgUsersByRole(_selectedTreeNode.attributes.data, "LEARNER");
+		}
 		//dispatch an update to the view
-		broadcastViewUpdate('ITEM_SELECTED',_selectedTreeNode);
+		//broadcastViewUpdate('ITEM_SELECTED',_selectedTreeNode);
 	}
 	/**
 	 * 
