@@ -37,10 +37,13 @@ import mx.events.*;
 class Monitor {
 	//Constants
 	public static var USE_PROPERTY_INSPECTOR = true;
-	
+	public var RT_ORG:String = "Organisation";
 
 	private var _className:String = "Monitor";
 
+	// Root movieclip
+	private var _root_mc:MovieClip;
+	
 	// Model
 	private var monitorModel:MonitorModel;
 	// View
@@ -51,11 +54,15 @@ class Monitor {
 	private var _ddm:DesignDataModel;
 	private var _dictionary:Dictionary;
 
+	private var _currentUserType:String;
+
 	private var _pi:MovieClip; //Property inspector
 	
 	private var dispatchEvent:Function;       
     public var addEventListener:Function;  
     public var removeEventListener:Function;
+	
+	private var _onOKCallBack:Function;
 	
 	/**
 	 * Monitor Constructor Function
@@ -65,6 +72,9 @@ class Monitor {
 	 */
 	public function Monitor(target_mc:MovieClip,depth:Number,x:Number,y:Number,w:Number,h:Number){
 		mx.events.EventDispatcher.initialize(this);
+		
+		// Set root movieclip
+		_root_mc = target_mc;
 		
 		//Create the model
 		monitorModel = new MonitorModel(this);
@@ -122,27 +132,72 @@ class Monitor {
     }
 	
 	public function getOrganisations():Void{
-		var callback:Function = Proxy.create(this,showOrgList);
+		var callback:Function = Proxy.create(this,showOrgTree);
            
 		Application.getInstance().getComms().getRequest('workspace.do?method=getOrganisationsByUserRole&userID='+_root.userID+'&roles=STAFF,TEACHER',callback, false);
 		
 	}
 	
-	private function showOrgList(orgs:Array):Void{
-		trace('organisations list returned...');
+	private function showOrgTree(dto:Object):Void{
+		trace('organisations tree returned...');
+		trace('creating root node...');
+		// create root (dummy) node
 		
-		var orgCol = new Array();
+		var odto = getDataObject(dto);
+			
 		
-		for(var i=0; i< orgs.length; i++){
-			var o:Object = orgs[i];
-			trace(o.name);
-			var newOrg:Organisation = new Organisation();
-			newOrg.populateFromDTO(o);
-			trace('pushing org with name: ' + newOrg.getName());
-			orgCol.push(newOrg);
+		var rootNode:XMLNode = getMM().treeDP.addTreeNode(odto.name, odto);
+		//rootNode.attributes.isBranch = true;
+		getMM().setOrganisationResource(RT_ORG+'_'+odto.organisationID,rootNode);
+		
+		// create tree xml branches
+		createXMLNodes(rootNode, dto.nodes);
+		
+	}
+
+	private function createXMLNodes(root:XMLNode, nodes:Array) {
+		for(var i=0; i<nodes.length; i++){
+			trace('creating child node...');
+			
+			var odto = getDataObject(nodes[i]);
+			var childNode:XMLNode = root.addTreeNode(odto.name, odto);
+			
+			trace('adding node with org ID: ' + odto.organisationID);
+			
+			if(nodes[i].nodes.length>0){
+				childNode.attributes.isBranch = true;
+				createXMLNodes(childNode, nodes[i].nodes);
+			} else {
+				childNode.attributes.isBranch = false;
+			}
+			
+			getMM().setOrganisationResource(RT_ORG+'_'+odto.organisationID,childNode);
+			
 		}
 		
-		monitorModel.saveOrgs(orgCol);
+	}
+
+	private function getDataObject(dto:Object):Object{
+		var odto= {};
+		odto.organisationID = dto.organisationID;
+		odto.description = dto.description;
+		odto.name = dto.name;
+		odto.parentID = dto.parentID;
+		
+		return odto;
+	}
+
+	public function requestOrgUsersByRole(data:Object, role:String){
+		trace('requesting org users by role: ' + role);
+		var callback:Function = Proxy.create(this,saveUsers);
+		_currentUserType = role;
+		Application.getInstance().getComms().getRequest('workspace.do?method=getUsersFromOrganisationByRole&organisationID='+data.organisationID+'&role='+role,callback, false);
+		
+	}
+
+	private function saveUsers(users:Array){
+		trace('retrieving back users for org by role: ' + _currentUserType);
+		
 	}
 
 	/**
@@ -175,6 +230,23 @@ class Monitor {
 		monitorModel.drawDesign();
 	}
 	
+	/**
+	 * 
+	 * @usage   
+	 * @param   newonOKCallback 
+	 * @return  
+	 */
+	public function set onOKCallback (newonOKCallback:Function):Void {
+		_onOKCallBack = newonOKCallback;
+	}
+	/**
+	 * 
+	 * @usage   
+	 * @return  
+	 */
+	public function get onOKCallback ():Function {
+		return _onOKCallBack;
+	}
 
 	/**
 	* Used by application to set the size
@@ -220,5 +292,9 @@ class Monitor {
 
 	public function get ddm():DesignDataModel{
 		return _ddm;
+	}
+	
+	public function get root():MovieClip{
+		return _root_mc;
 	}
 }
