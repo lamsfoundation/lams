@@ -43,8 +43,7 @@ import org.lamsfoundation.lams.monitoring.mv.tabviews.*
 class LessonManagerDialog extends MovieClip implements Dialog{
 	//References to components + clips 
     private var _container:MovieClip;  //The container window that holds the dialog
-    private var cfg:Config;            //local config reference
-    
+	
     private var ok_btn:Button;         //OK+Cancel buttons
     private var cancel_btn:Button;
     
@@ -67,6 +66,8 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 	
 	private var _lessonTabView:LessonTabView;
 	private var _monitorModel:MonitorModel;
+	private var _monitorView:MonitorView;
+	private var _monitorController:MonitorController;
 
 	private var _resultDTO:Object;
 	private var _selectedOrgId:Number;	// selected organisation
@@ -80,27 +81,26 @@ class LessonManagerDialog extends MovieClip implements Dialog{
     * constructor
     */
     function LessonManagerDialog(){
+		trace('initialising Lesson Manager Dialog');
         //Set up this class to use the Flash event delegation model
         EventDispatcher.initialize(this);
 		_resultDTO = new Object();
         
         //Create a clip that will wait a frame before dispatching init to give components time to setup
-        this.onEnterFrame = init;
-    }
+        MovieClipUtils.doLater(Proxy.create(this,init));
+	}
 	
 	/**
     * Called a frame after movie attached to allow components to initialise
     */
     private function init():Void{
-        //Delete the enterframe dispatcher
-        delete this.onEnterFrame;
         
-        
+        trace('now initialising ...');
         //set the reference to the StyleManager
-        themeManager = ThemeManager.getInstance();
+        //themeManager = ThemeManager.getInstance();
         
 		// Set the styles
-        setStyles();
+        //setStyles();
 		
         //Set the text for buttons
         //ok_btn.label = Dictionary.getValue('lesson_dlg_ok');
@@ -112,9 +112,9 @@ class LessonManagerDialog extends MovieClip implements Dialog{
         //Set the labels
         
         //get focus manager + set focus to OK button, focus manager is available to all components through getFocusManager
-        fm = _container.getFocusManager();
-        fm.enabled = true;
-        ok_btn.setFocus();
+        //fm = _container.getFocusManager();
+        //fm.enabled = true;
+        //ok_btn.setFocus();
 		
         //EVENTS
         //Add event listeners for ok, cancel and close buttons
@@ -131,8 +131,37 @@ class LessonManagerDialog extends MovieClip implements Dialog{
         yCancelOffset = panel._height - cancel_btn._y;
 		
 		treeview = org_dnd.getTree();
-		
+		trace('LF window: ' + _container);
+		trace('Tree: ' + treeview);
+		//fire event to say we have loaded
+		_container.contentLoaded();
     }
+	
+		/**
+	 * Called by the worspaceView after the content has loaded
+	 * @usage   
+	 * @return  
+	 */
+	public function setUpContent():Void{
+		
+		//register to recive updates form the model
+		//MonitorModel(_monitorView.getModel()).addEventListener('viewUpdate',this);
+		
+		Debugger.log('_monitorView:'+_monitorView,Debugger.GEN,'setUpContent','org.lamsfoundation.lams.LessonManagerDialog');
+		
+		//get a ref to the controller and kkep it here to listen for events:
+		_monitorController = _monitorView.getController();
+		
+		
+		 //Add event listeners for ok, cancel and close buttons
+        ok_btn.addEventListener('click',Delegate.create(this, ok));
+        cancel_btn.addEventListener('click',Delegate.create(this, cancel));
+		
+		//Set up the treeview
+        setUpTreeview();
+		
+		//itemSelected(treeview.selectedNode);
+	}
 	
     /**
     * Called on initialisation
@@ -214,6 +243,25 @@ class LessonManagerDialog extends MovieClip implements Dialog{
         //_container.deletePopUp();
     }
     
+	/**
+	 * 
+	 * @usage   
+	 * @param   newworkspaceView 
+	 * @return  
+	 */
+	public function set monitorView (newMonitorView:MonitorView):Void {
+		_monitorView = newMonitorView;
+	}
+	
+	/**
+	 * 
+	 * @usage   
+	 * @return  
+	 */
+	public function get monitorView ():MonitorView {
+		return _monitorView;
+	}
+	
     /**
     * Event dispatched by parent container when close button clicked
     */
@@ -256,7 +304,7 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 	private function setUpBranchesInit(){
 		Debugger.log('Running...',Debugger.GEN,'setUpBranchesInit','org.lamsfoundation.lams.monitoring.LessonManagerDialog');
 		//get the 1st child
-		treeview.dataProvider = MonitorModel(_lessonTabView.getModel()).treeDP;
+		treeview.dataProvider = MonitorModel(_monitorView.getModel()).treeDP.firstChild;
 		var fNode = treeview.dataProvider.firstChild;
 		setBranches(fNode);
 		treeview.refresh();
@@ -274,12 +322,10 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 		//Debugger.log('_workspaceView:'+_workspaceView,Debugger.GEN,'setUpTreeview','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
 		
 		setUpBranchesInit();
-		Debugger.log('MonitorModel(_monitorView.getModel()).treeDP:'+MonitorModel(_lessonTabView.getModel()).treeDP.toString(),Debugger.GEN,'setUpTreeview','org.lamsfoundation.lams.monitoring.LessonManagerDialog');
 		
-		
-		//treeview.addEventListener("nodeOpen", Delegate.create(_lessonManagerController, _lessonManagerController.onTreeNodeOpen));
-		//treeview.addEventListener("nodeClose", Delegate.create(_lessonManagerController, _lessonManagerController.onTreeNodeClose));
-		//treeview.addEventListener("change", Delegate.create(_lessonManagerController, _lessonManagerController.onTreeNodeChange));
+		treeview.addEventListener("nodeOpen", Delegate.create(_monitorController, _monitorController.onTreeNodeOpen));
+		treeview.addEventListener("nodeClose", Delegate.create(_monitorController, _monitorController.onTreeNodeClose));
+		treeview.addEventListener("change", Delegate.create(_monitorController, _monitorController.onTreeNodeChange));
 
 		//org_dnd.addEventListener("drag_complete", Delegate.create(_lessonManagerController, _lessonManagerController.onDragComplete));
 		
