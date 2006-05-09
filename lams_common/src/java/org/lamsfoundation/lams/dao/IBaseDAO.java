@@ -27,7 +27,7 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * @author Manpreet Minhas
+ * @author Manpreet Minhas  
  */
 public interface IBaseDAO {
 	
