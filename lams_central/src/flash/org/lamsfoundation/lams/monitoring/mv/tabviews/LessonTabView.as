@@ -21,13 +21,14 @@
  * ************************************************************************
  */
 
-import org.lamsfoundation.lams.common.util.*
-import org.lamsfoundation.lams.common.ui.*
-import org.lamsfoundation.lams.common.style.*
-import org.lamsfoundation.lams.monitoring.mv.*
+import org.lamsfoundation.lams.common.ApplicationParent;
+import org.lamsfoundation.lams.common.util.*;
+import org.lamsfoundation.lams.common.ui.*;
+import org.lamsfoundation.lams.common.style.*;
+import org.lamsfoundation.lams.monitoring.mv.*;
 import org.lamsfoundation.lams.monitoring.*;
-import org.lamsfoundation.lams.common.dict.*
-import org.lamsfoundation.lams.common.mvc.*
+import org.lamsfoundation.lams.common.dict.*;
+import org.lamsfoundation.lams.common.mvc.*;
 import mx.controls.*;
 import mx.managers.*;
 import mx.containers.*;
@@ -89,6 +90,9 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	
 	//private var _transitionPropertiesOK:Function;
     private var _lessonTabView:LessonTabView;
+	private var _monitorController:MonitorController;
+	private var _lessonManagerDialog:MovieClip;
+	
     //Defined so compiler can 'see' events added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
     public var addEventListener:Function;
@@ -112,6 +116,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	*/
 	public function init(m:Observable,c:Controller){
 		super (m, c);
+		
 	}    
 	
 	/**
@@ -154,6 +159,10 @@ public function update (o:Observable,infoObj:Object):Void{
 					this._visible = false;
 				}
 				break;
+			case 'LM_DIALOG' :
+				_monitorController = getController();
+				showLessonManagerDialog(mm);
+				break;
             default :
                 Debugger.log('unknown update type :' + infoObj.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.CanvasView');
 		}
@@ -168,7 +177,9 @@ public function update (o:Observable,infoObj:Object):Void{
 		this.onEnterFrame = setupLabels;
 		//get the content path for the sp
 		_monitorReqTask_mc = requiredTask_scp.content;
-		
+		_monitorController = getController();
+		selectClass_btn.addEventListener("click", _monitorController);
+	
 		//Debugger.log('_canvas_mc'+_canvas_mc,Debugger.GEN,'draw','CanvasView');
 	
 		trace("Loaded LessonTabView Data"+ this)
@@ -224,6 +235,37 @@ public function update (o:Observable,infoObj:Object):Void{
 		//duration_txt.text = s._seqDescription
 		  
 	}
+	
+	/**
+    * Opens the lesson manager dialog
+    */
+    public function showLessonManagerDialog(mm:MonitorModel) {
+		trace('doing Lesson Manager popup...');
+		trace('app root: ' + mm.getMonitor().root);
+		trace('lfwindow: ' + LFWindow);
+        var dialog:MovieClip = PopUpManager.createPopUp(mm.getMonitor().root, LFWindow, true,{title:"TEST",closeButton:true,scrollContentPath:'selectClass'});
+		dialog.addEventListener('contentLoaded',Delegate.create(_monitorController,_monitorController.openDialogLoaded));
+		
+    }
+	
+	/**
+	 * 
+	 * @usage   
+	 * @param   newworkspaceDialog 
+	 * @return  
+	 */
+	public function set lessonManagerDialog (newLessonManagerDialog:MovieClip):Void {
+		_lessonManagerDialog = newLessonManagerDialog;
+	}
+	/**
+	 * 
+	 * @usage   
+	 * @return  
+	 */
+	public function get lessonManagerDialog ():MovieClip {
+		return _lessonManagerDialog;
+	}
+	
 	/**
     * Sets the size of the canvas on stage, called from update
     */
