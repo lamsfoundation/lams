@@ -80,6 +80,8 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 	private var monitorTabView:MonitorTabView;
 	private var monitorTabView_mc:MovieClip;
 	
+	private var _monitorController:MonitorController;
+	
     //Defined so compiler can 'see' events added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
     public var addEventListener:Function;
@@ -137,6 +139,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 public function update (o:Observable,infoObj:Object):Void{
 		
        var mm:MonitorModel = MonitorModel(o);
+	   _monitorController = getController();
 	   
 	   switch (infoObj.updateType){
 		   case 'SEQUENCE' :
@@ -264,6 +267,9 @@ public function update (o:Observable,infoObj:Object):Void{
         this._y = p.y;
 	}
 	
+	public function getLessonTabView():LessonTabView{
+		return lessonTabView;
+	}
 	
 	/**
 	 * Overrides method in abstract view to ensure cortect type of controller is returned
