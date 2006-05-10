@@ -32,7 +32,6 @@ import java.util.Date;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -42,12 +41,10 @@ import org.lamsfoundation.lams.monitoring.MonitoringConstants;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
-import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
-import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.HttpSessionManager;
 import org.springframework.web.context.WebApplicationContext;
@@ -582,9 +579,16 @@ public class MonitoringAction extends LamsDispatchAction
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response)throws IOException{
+    	
     	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-    	Long lessonID = new Long(WebUtil.readLongParam(request,"lessonID"));
-    	String wddxPacket = monitoringService.getAllContributeActivities(lessonID);
+    	String wddxPacket = null;
+    	try {
+	    	Long lessonID = new Long(WebUtil.readLongParam(request,"lessonID"));
+	    	wddxPacket = monitoringService.getAllContributeActivities(lessonID);
+    	} catch (Exception e) {
+			FlashMessage flashMessage = handleException(e, "getAllContributeActivities", monitoringService);
+			wddxPacket = flashMessage.serializeMessage();
+		}
         PrintWriter writer = response.getWriter();
         writer.println(wddxPacket);
         return null;
@@ -597,9 +601,10 @@ public class MonitoringAction extends LamsDispatchAction
     	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
     	Integer userID = new Integer(WebUtil.readIntParam(request,"userID"));
     	Long activityID = new Long(WebUtil.readLongParam(request,"activityID"));
+    	Long lessonID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID));
     	//Show learner in monitor in a single call: extract URL and redirect it rather than returning the WDDX packet
     	
-    	String wddxPacket = monitoringService.getLearnerActivityURL(activityID,userID);
+    	String wddxPacket = monitoringService.getLearnerActivityURL(lessonID,activityID,userID);
     	String url = extractURL(wddxPacket);
     	response.sendRedirect(response.encodeRedirectURL(url));
     	return null;

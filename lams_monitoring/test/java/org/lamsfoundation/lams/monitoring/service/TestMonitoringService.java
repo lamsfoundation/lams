@@ -37,6 +37,7 @@ import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
+import org.lamsfoundation.lams.learningdesign.exception.LearningDesignProcessorException;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.lesson.dao.hibernate.LessonDAO;
@@ -258,10 +259,10 @@ public class TestMonitoringService extends AbstractLamsTestCase
     	System.out.println(packet);
     }
     public void testGetLearnerActivityURL() throws Exception{
-    	String packet = monitoringService.getLearnerActivityURL(new Long(29),TEST_LEARNER_ID);    	
+    	String packet = monitoringService.getLearnerActivityURL(TEST_LESSION_ID, new Long(29),TEST_LEARNER_ID);    	
     	System.out.println(packet);
     }
-    public void  testGellAllContributeActivities()throws IOException{
+    public void  testGellAllContributeActivities()throws IOException, LearningDesignProcessorException{
     	String packet = monitoringService.getAllContributeActivities(TEST_LESSION_ID);    	
     	System.out.println(packet);
     }

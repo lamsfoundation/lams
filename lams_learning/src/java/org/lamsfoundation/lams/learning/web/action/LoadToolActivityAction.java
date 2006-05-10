@@ -34,14 +34,14 @@ import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 import org.lamsfoundation.lams.learning.web.form.ActivityForm;
-
-import org.lamsfoundation.lams.learningdesign.*;
-import org.lamsfoundation.lams.lesson.*;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
+import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.lesson.LearnerProgress;
 
 /** 
- * Action class to forward the user to a Tool using an intermediate loading page.
+ * Action class to forward the user to a Tool using an intermediate loading page. Can handle
+ * regular tools + grouping and gates (system tools)
  * 
  * XDoclet definition:
  * 
@@ -69,21 +69,16 @@ public class LoadToolActivityAction extends ActivityAction {
 		LearnerProgress learnerProgress = getLearnerProgress(request);
 		Activity activity = LearningWebUtil.getActivityFromRequest(request, getLearnerService());
 				
-		// With Hibernate 3.x the activity is sometimes the proxy, not a true  
-		// ToolActivity.
-		if (!(activity instanceof ToolActivity)) 
-		{
+		form.setActivityId(activity.getActivityId());
+		
+		if (activity.isToolActivity() || activity.isSystemToolActivity() ) { 
+			String url = actionMappings.getLearnerToolURL(learnerProgress.getLesson().getLessonId(),
+					activity, learnerProgress.getUser());
+			form.addActivityURL(new ActivityURL(activity.getActivityId(),url));
+		} else {
 		    log.error(className+": activity not ToolActivity");
 			return mapping.findForward(ActivityMapping.ERROR);
 		}
-		
-		ToolActivity toolActivity = (ToolActivity)activity;
-		
-		form.setActivityId(activity.getActivityId());
-		
-		String url = actionMappings.getLearnerToolURL(toolActivity, learnerProgress.getUser());
-
-		form.addActivityURL(new ActivityURL(activity.getActivityId(),url));
 		
 		return mapping.findForward("displayTool");
 	}

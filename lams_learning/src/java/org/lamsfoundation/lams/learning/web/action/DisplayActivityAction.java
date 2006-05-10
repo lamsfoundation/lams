@@ -24,6 +24,9 @@
 /* $$Id$$ */	
 package org.lamsfoundation.lams.learning.web.action;
 
+import java.util.Iterator;
+import java.util.Set;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -132,4 +135,6 @@ public class DisplayActivityAction extends ActivityAction {
 		}
 		return progressSummary.toString();
 	}
+	
+
 }

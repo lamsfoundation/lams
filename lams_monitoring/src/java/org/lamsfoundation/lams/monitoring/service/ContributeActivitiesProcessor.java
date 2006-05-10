@@ -24,22 +24,19 @@
 /* $Id$ */
 package org.lamsfoundation.lams.monitoring.service;
 
-import java.util.Iterator;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.Vector;
 
 import org.apache.commons.collections.ArrayStack;
-import org.lamsfoundation.lams.learningdesign.Activity;
-import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.LearningDesignProcessor;
-import org.lamsfoundation.lams.learningdesign.NullActivity;
 import org.lamsfoundation.lams.learningdesign.SimpleActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
+import org.lamsfoundation.lams.learningdesign.exception.LearningDesignProcessorException;
 import org.lamsfoundation.lams.monitoring.ContributeActivityDTO;
 import org.lamsfoundation.lams.monitoring.ContributeDTOFactory;
+import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
+import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 
 /** 
  * Generate a hierachy of contribute activities, that can then be serialised by WDDX
@@ -73,13 +70,17 @@ public class ContributeActivitiesProcessor extends LearningDesignProcessor {
 	Vector<ContributeActivityDTO> mainActivityList;
 	ArrayStack activityListStack;
 	Vector<ContributeActivityDTO> currentActivityList;
+	ILamsCoreToolService toolService;
+	Long lessonID;
 	
-	public ContributeActivitiesProcessor(LearningDesign design,
-			IActivityDAO activityDAO) {
+	public ContributeActivitiesProcessor(LearningDesign design, Long lessonID,
+			IActivityDAO activityDAO, ILamsCoreToolService toolService) {
 		super(design, activityDAO);
-		mainActivityList = new Vector<ContributeActivityDTO>();
-		activityListStack = new ArrayStack(5);
-		currentActivityList = mainActivityList;
+		this.lessonID = lessonID;
+		this.toolService = toolService; 
+		this.mainActivityList = new Vector<ContributeActivityDTO>();
+		this.activityListStack = new ArrayStack(5);
+		this.currentActivityList = mainActivityList;
 	}
 
 	public Vector<ContributeActivityDTO> getMainActivityList() {
@@ -112,10 +113,14 @@ public class ContributeActivitiesProcessor extends LearningDesignProcessor {
 		// nothing to do - everything done by the end
 	}
 
-	public void endSimpleActivity(SimpleActivity activity) {
-		ContributeActivityDTO dto = ContributeDTOFactory.getContributeActivityDTO(activity);
-		if ( dto != null ) {
-			currentActivityList.add(dto);
+	public void endSimpleActivity(SimpleActivity activity) throws LearningDesignProcessorException {
+		try {
+			ContributeActivityDTO dto = ContributeDTOFactory.getContributeActivityDTO(lessonID, activity, toolService);
+			if ( dto != null ) {
+				currentActivityList.add(dto);
+			}
+		} catch ( LamsToolServiceException e) {
+			throw new LearningDesignProcessorException(e);
 		}
 	}
 	

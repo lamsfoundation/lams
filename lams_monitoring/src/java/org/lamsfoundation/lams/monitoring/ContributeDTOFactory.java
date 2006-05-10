@@ -24,29 +24,23 @@
 /* $Id$ */
 package org.lamsfoundation.lams.monitoring;
 
-import java.io.IOException;
-
-import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.ContributionTypes;
-import org.lamsfoundation.lams.learningdesign.LearningDesignProcessor;
 import org.lamsfoundation.lams.learningdesign.SimpleActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
-import org.lamsfoundation.lams.learningdesign.dto.ProgressActivityDTO;
 import org.lamsfoundation.lams.learningdesign.strategy.SimpleActivityStrategy;
+import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
+import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.util.wddx.FlashMessage;
-import org.lamsfoundation.lams.web.util.AttributeNames;
 
 public class ContributeDTOFactory {
 
-	private static Logger log = Logger.getLogger(LearningDesignProcessor.class);
 
 	/** Get the Contribute DTO for this activity. As a SimpleActivity
 	 * it only returns a contribute DTO if there is a contribution entry.
+	 * @throws LamsToolServiceException 
 	 */ 
-	public static ContributeActivityDTO getContributeActivityDTO(SimpleActivity activity)
+	public static ContributeActivityDTO getContributeActivityDTO(Long lessonID, SimpleActivity activity, ILamsCoreToolService toolService) throws LamsToolServiceException
 	{
 		ContributeActivityDTO dto = null;
 		SimpleActivityStrategy strategy = activity.getSimpleActivityStrategy();
@@ -56,33 +50,31 @@ public class ContributeDTOFactory {
 				dto = new ContributeActivityDTO(activity);
 				for(int i=0;i<contributionType.length;i++){
 					Integer contributionTypeEntry = contributionType[i];
-					String url = getURL(activity, contributionTypeEntry);
+					String url = getURL(lessonID, activity, contributionTypeEntry, toolService);
 					dto.addContribution(contributionTypeEntry,url);
 				}
 			}
 		}
 		return dto;
 	}
-    public static final Integer MODERATION = new Integer(1);
-    public static final Integer DEFINE_LATER = new Integer(2);
-    public static final Integer CONTRIBUTION = new Integer(7);
 
-	private static String getURL(SimpleActivity activity, Integer contributionTypeEntry) {
-		// TODO implement rest of urls.
+	private static String getURL(Long lessonID, SimpleActivity activity, Integer contributionTypeEntry, ILamsCoreToolService toolService) throws LamsToolServiceException {
+
 		String url = null;
-		if ( contributionTypeEntry.equals(ContributionTypes.MODERATION) ) { 
-			url = getActivityModerateURL(activity);
-		} else if ( contributionTypeEntry.equals(ContributionTypes.DEFINE_LATER) ) { 
-			url = getActivityDefineLaterURL(activity);
-		} else if ( contributionTypeEntry.equals(ContributionTypes.PERMISSION_GATE) ) {
-		} else if ( contributionTypeEntry.equals(ContributionTypes.SYNC_GATE) ) {
-		} else if ( contributionTypeEntry.equals(ContributionTypes.SCHEDULE_GATE) ) {
-		} else if ( contributionTypeEntry.equals(ContributionTypes.CHOSEN_GROUPING) ) {
-    	} else if ( contributionTypeEntry.equals(ContributionTypes.CONTRIBUTION) ) { 
-			url = getActivityContributionURL(activity);
-		} else {
-			log.warn("Unexpected contribution type for tool activity. Contribution type: "+contributionTypeEntry+" activity: "+activity);
+		if ( activity.isToolActivity() ) {
+			ToolActivity toolActivity = (ToolActivity) activity; 
+			if ( contributionTypeEntry.equals(ContributionTypes.MODERATION) ) {
+				url = toolService.getToolModerateURL(toolActivity);
+			} else if ( contributionTypeEntry.equals(ContributionTypes.DEFINE_LATER) ) { 
+				url = toolService.getToolDefineLaterURL(toolActivity);
+			}
 		}
+		
+		if ( url == null ) { 
+			/* PERMISSION_GAE || SYNC_GATE || SCHEDULE_GATE  || CHOSEN_GROUPING ||
+			   CONTRIBUTION   || Unknown contribution type ||  (!ToolActivity && ( MODERATION || DEFINE_LATER)) */ 
+			url = toolService.getToolContributionURL(lessonID, activity);
+		} 
 		return url != null ? WebUtil.convertToFullURL(url) : null;
 	}
 
@@ -95,48 +87,4 @@ public class ContributeDTOFactory {
 		
 	}
 
-	private static String addToolContentID(ToolActivity toolActivity, String url) {
-		String retUrl = url;
-		if ( retUrl != null ) {
-			Long toolContentId = toolActivity.getToolContentId();
-			if ( toolContentId != null ) {
-				retUrl = WebUtil.appendParameterToURL(url,
-						AttributeNames.PARAM_TOOL_CONTENT_ID,
-						toolActivity.getToolContentId().toString());
-			} else {
-				log.error("Tool activity missing tool content id. Contribution URL is goign to be wrong. Tool activity: "+toolActivity);
-			}
-		}
-		return retUrl;
-	}
-
-	/** Get the url for a contribution call. Only useful for Tool Activities - everything else returns null */
-	public static String getActivityContributionURL(Activity activity) {
-		if(activity.isToolActivity()){
-			ToolActivity toolActivity = (ToolActivity)activity;
-			return addToolContentID( toolActivity, toolActivity.getTool().getContributeUrl() );
-		} else  {
-			return null;
-		}
-	}
-
-	/** Get the url for a define later call. Only useful for Tool Activities - everything else returns null */
-	public static String getActivityDefineLaterURL(Activity activity) {
-		if(activity.isToolActivity()){
-			ToolActivity toolActivity = (ToolActivity)activity;
-			return addToolContentID( toolActivity, toolActivity.getTool().getDefineLaterUrl());
-		} else  {
-			return null;
-		}
-	}
-
-	/** Get the url for a moderate call. Only useful for Tool Activities - everything else returns null */
-	public static String getActivityModerateURL(Activity activity) {
-		if(activity.isToolActivity()){
-			ToolActivity toolActivity = (ToolActivity)activity;
-			return addToolContentID( toolActivity, toolActivity.getTool().getModerationUrl());
-		} else  {
-			return null;
-		}
-	}
 }

@@ -56,16 +56,6 @@
         scope="request"
       />
       <forward
-        name="scheduler"
-        path="/TestScheduler.jsp"
-        redirect="false"
-      />
-      <forward
-        name="success"
-        path="/index.jsp"
-        redirect="false"
-      />
-      <forward
         name="previewdeleted"
         path="/previewdeleted.jsp"
         redirect="false"

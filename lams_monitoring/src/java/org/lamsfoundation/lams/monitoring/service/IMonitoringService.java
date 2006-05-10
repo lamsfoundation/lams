@@ -31,6 +31,7 @@ import java.util.List;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
+import org.lamsfoundation.lams.learningdesign.exception.LearningDesignProcessorException;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.Organisation;
@@ -41,7 +42,6 @@ import org.lamsfoundation.lams.util.MessageService;
 /**
  * TODO Missing methods
  * 		archiveLesson
- * 		getMonitorURL
  *   
  * Interface defines all monitoring services needed by presentation tier.
  * @author Jacky Fang 2/02/2005
@@ -281,7 +281,7 @@ public interface IMonitoringService
      * @return String The required information in WDDX format
      * @throws IOException
      */
-    public String getAllContributeActivities(Long lessonID)throws IOException;
+    public String getAllContributeActivities(Long lessonID)throws IOException, LearningDesignProcessorException;
     
     /**
      * This method returns the url associated with the activity in the monitoring
@@ -291,31 +291,37 @@ public interface IMonitoringService
      * 
      * This is also known as the learner progress url.
      *  
+     * @param lessonID The lesson_id of the Lesson for which the information has
+     * 					to be fetched. 
      * @param activityID The activity_id of the activity for which the URL is required 
      * @param userID The user_id of the Learner for whom the URL is being fetched
      * @return String The required information in WDDX format
      * @throws IOException
      * @throws LamsToolServiceException
      */
-    public String getLearnerActivityURL(Long activityID,Integer userID)throws IOException,LamsToolServiceException;
+    public String getLearnerActivityURL(Long lessonID, Long activityID,Integer userID)throws IOException,LamsToolServiceException;
     
     /**
      * This method returns the define later url for the given activity
      * 
+     * @param lessonID The lesson_id of the Lesson for which the information has
+     * 					to be fetched. 
      * @param activityID The activity_id of the Activity whose URL will be returned
      * @return String The required information in WDDX format
      * @throws IOException
      */
-    public String getActivityDefineLaterURL(Long activityID)throws IOException;
+    public String getActivityDefineLaterURL(Long lessonID, Long activityID)throws IOException, LamsToolServiceException;
 
     /**
      * This method returns the monitor url for the given activity
      * 
+     * @param lessonID The lesson_id of the Lesson for which the information has
+     * 					to be fetched. 
      * @param activityID The activity_id of the Activity whose URL will be returned
      * @return String The required information in WDDX format
      * @throws IOException
      */
-    public String getActivityMonitorURL(Long activityID)throws IOException;
+    public String getActivityMonitorURL(Long lessonID, Long activityID)throws IOException, LamsToolServiceException;
   
    /**
      * This method moves the learning design corresponding to the given

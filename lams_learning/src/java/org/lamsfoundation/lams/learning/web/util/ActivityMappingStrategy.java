@@ -50,18 +50,9 @@ public class ActivityMappingStrategy implements Serializable {
 		    else if (activity.isOptionsActivity()) 
 		        strutsAction = "/DisplayOptionsActivity.do";
 		}
-		else // should be a simple activity 
+		else // should be a simple activity - can handle tool, gates and grouping
 		{
-			if ( activity.isGroupingActivity()) {
-			    strutsAction = "/grouping.do?method=performGrouping";
-			} 
-			else if (activity.isGateActivity()) {
-			    strutsAction = "/gate.do?method=knockGate";
-				// not completed so return wait URL
-			}
-			else if (activity.isToolActivity()) { 
-			    strutsAction = "/LoadToolActivity.do";
-			}
+		    strutsAction = "/LoadToolActivity.do";
 		}
 		return strutsAction;
 	}

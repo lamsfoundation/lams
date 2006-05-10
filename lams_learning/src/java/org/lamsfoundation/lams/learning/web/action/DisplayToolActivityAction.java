@@ -24,17 +24,17 @@
 /* $$Id$$ */	
 package org.lamsfoundation.lams.learning.web.action;
 
-import javax.servlet.http.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.learning.web.form.ActivityForm;
-
-import org.lamsfoundation.lams.learningdesign.*;
-import org.lamsfoundation.lams.lesson.*;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
+import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.lesson.LearnerProgress;
 
 /** 
  * Action class to forward the user to a Tool.
@@ -58,7 +58,7 @@ public class DisplayToolActivityAction extends ActivityAction {
 	                             HttpServletRequest request,
 	                             HttpServletResponse response) 
 	{
-		ActivityForm form = (ActivityForm)actionForm;
+		//ActivityForm form = (ActivityForm)actionForm;
 		ActivityMapping actionMappings = getActivityMapping();
 		
 		LearnerProgress learnerProgress = getLearnerProgress(request);
@@ -71,7 +71,8 @@ public class DisplayToolActivityAction extends ActivityAction {
 		
 		ToolActivity toolActivity = (ToolActivity)activity;
 
-		String url = actionMappings.getLearnerToolURL(toolActivity, learnerProgress.getUser());
+		String url = actionMappings.getLearnerToolURL(learnerProgress.getLesson().getLessonId(),
+				toolActivity, learnerProgress.getUser());
 		try 
 		{
 		    response.sendRedirect(url);

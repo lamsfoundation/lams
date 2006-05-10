@@ -369,7 +369,8 @@ public class DummyMonitoringAction extends LamsDispatchAction
     	this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
     	Integer userID = new Integer(WebUtil.readIntParam(request,AttributeNames.PARAM_USER_ID));
     	Long activityID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_ACTIVITY_ID));
-    	String wddxPacket = monitoringService.getLearnerActivityURL(activityID,userID);
+    	Long lessonID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID));
+    	String wddxPacket = monitoringService.getLearnerActivityURL(lessonID,activityID,userID);
     	String url = extractURL(wddxPacket);
     	response.sendRedirect(response.encodeRedirectURL(url));
     	return null;
@@ -381,7 +382,8 @@ public class DummyMonitoringAction extends LamsDispatchAction
             HttpServletResponse response)throws IOException,LamsToolServiceException{
     	this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
     	Long activityID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_ACTIVITY_ID));
-    	String wddxPacket = monitoringService.getActivityMonitorURL(activityID);
+    	Long lessonID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID));
+    	String wddxPacket = monitoringService.getActivityMonitorURL(lessonID,activityID);
     	String url = extractURL(wddxPacket);
     	response.sendRedirect(response.encodeRedirectURL(url));
     	return null;
@@ -392,7 +394,8 @@ public class DummyMonitoringAction extends LamsDispatchAction
             HttpServletResponse response)throws IOException,LamsToolServiceException{
     	this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
     	Long activityID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_ACTIVITY_ID));
-    	String wddxPacket = monitoringService.getActivityDefineLaterURL(activityID);
+    	Long lessonID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID));
+    	String wddxPacket = monitoringService.getActivityDefineLaterURL(lessonID,activityID);
     	String url = extractURL(wddxPacket);
     	response.sendRedirect(response.encodeRedirectURL(url));
     	return null;

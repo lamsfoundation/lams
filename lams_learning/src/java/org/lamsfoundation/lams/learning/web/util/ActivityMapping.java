@@ -245,7 +245,6 @@ public class ActivityMapping implements Serializable
     {
         String activityURL = null;
         
-        // TODO: lesson complete
         if (progress.isLessonComplete())
         {
             // If lesson complete forward to lesson complete action. This action will
@@ -256,8 +255,6 @@ public class ActivityMapping implements Serializable
         }
         else
         {
-            //Activity currentActivity = progress.getCurrentActivity();
-
             if (progress.isParallelWaiting())
             {
                 // progress is waiting, goto waiting page
@@ -291,17 +288,17 @@ public class ActivityMapping implements Serializable
     }
 
     /**
-     * Generates an ActivityURL for a Tool Activity. The URL is for the tool and
-     * not for the tool loading page. The URL also includes toolSessionId and all
-     * other required data.
-     * @param activity, the ToolActivity to be displayed
+     * Generates an ActivityURL for a Tool Activity or SystemToolActivity. 
+     * The URL is for the tool and not for the tool loading page. The URL also 
+     * includes toolSessionId or toolContentId and all other required data.
+     * @param activity, the Activity to be displayed
      * @param progress, the current LearnerProgress, used to get activity status
      */
-    public String getLearnerToolURL(ToolActivity activity, User learner)
+    public String getLearnerToolURL(Long lessonID, Activity activity, User learner)
     {
         try
         {
-            return toolService.getToolLearnerURL(activity,learner);
+            return toolService.getToolLearnerURL(lessonID,activity,learner);
         }
         catch (LamsToolServiceException e)
         {
@@ -372,13 +369,13 @@ public class ActivityMapping implements Serializable
      * @param activity the activity the learner want to view
      * @return the url for that tool.
      */
-    public String calculateActivityURLForProgressView(User learner,
+    public String calculateActivityURLForProgressView(Long lessonID, User learner,
                                                       Activity activity)
     {
 
         if (activity.isToolActivity())
         {
-            return getLearnerToolURL(((ToolActivity) activity), learner);
+            return getLearnerToolURL(lessonID, ((ToolActivity) activity), learner);
         }
         else if (activity.isGroupingActivity())
             //TODO need to be changed when group action servlet is done

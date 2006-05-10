@@ -106,11 +106,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						--> Activity <c:out value="${possibleChildActivity.activityID}"/> <c:out value="${possibleChildActivity.title}"/>:
 					</TD>
 					<TD class="formcontrol">
-						 <A HREF="javascript:launchPopup('/lams/monitoring/dummy.do?method=gotoMonitoringActivityURL&activityID=<c:out value="${possibleChildActivity.activityID}"/>');">
+						 <A HREF="javascript:launchPopup('/lams/monitoring/dummy.do?method=gotoMonitoringActivityURL&lessonID=<c:out value="${lesson.lessonId}"/>&activityID=<c:out value="${possibleChildActivity.activityID}"/>');">
 						 Monitor</A>
 					</TD>
 					<TD class="formcontrol">
-						 <A HREF="javascript:launchPopup('/lams/monitoring/dummy.do?method=gotoDefineLaterActivityURL&activityID=<c:out value="${possibleChildActivity.activityID}"/>');">
+						 <A HREF="javascript:launchPopup('/lams/monitoring/dummy.do?method=gotoDefineLaterActivityURL&lessonID=<c:out value="${lesson.lessonId}"/>&activityID=<c:out value="${possibleChildActivity.activityID}"/>');">
 						 Define Later</A><BR>
 					</TD>
 				</TR>
@@ -128,11 +128,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				Activity <c:out value="${activity.activityID}"/> <c:out value="${activity.title}"/>:
 			</TD>
 			<TD class="formcontrol">
-				 <A HREF="javascript:launchPopup('/lams/monitoring/dummy.do?method=gotoMonitoringActivityURL&activityID=<c:out value="${activity.activityID}"/>');">
+				 <A HREF="javascript:launchPopup('/lams/monitoring/dummy.do?method=gotoMonitoringActivityURL&lessonID=<c:out value="${lesson.lessonId}"/>&activityID=<c:out value="${activity.activityID}"/>');">
 				 Monitor</A>
 			</TD>
 			<TD class="formcontrol">
-				 <A HREF="javascript:launchPopup('/lams/monitoring/dummy.do?method=gotoDefineLaterActivityURL&activityID=<c:out value="${activity.activityID}"/>');">
+				 <A HREF="javascript:launchPopup('/lams/monitoring/dummy.do?method=gotoDefineLaterActivityURL&lessonID=<c:out value="${lesson.lessonId}"/>&activityID=<c:out value="${activity.activityID}"/>');">
 				 Define Later</A><BR>
 			</TD>
 		</TR>
@@ -152,7 +152,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<TD><c:out value="${progress.user.login}"/></TD>
 			<c:if test="${!empty progress.currentActivity}">
 				<TD>Current Activity:</TD> 
-				<TD><c:out value="${progress.currentActivity.title}"/> <A HREF="javascript:launchPopup('/lams/monitoring/dummy.do?method=gotoLearnerActivityURL&userID=<c:out value="${progress.user.userId}"/>&activityID=<c:out value="${progress.currentActivity.activityId}"/>');">View</A> 
+				<TD><c:out value="${progress.currentActivity.title}"/> <A HREF="javascript:launchPopup('/lams/monitoring/dummy.do?method=gotoLearnerActivityURL&lessonID=<c:out value="${lesson.lessonId}"/>&userID=<c:out value="${progress.user.userId}"/>&activityID=<c:out value="${progress.currentActivity.activityId}"/>');">View</A> 
 				</c:if></TD>
 		</TR>
 		<TR>
@@ -160,7 +160,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<TD valign="top">Completed Activities:</TD>
 			<TD>
 			<c:forEach var="completed" items="${progress.completedActivities}">
-				<c:out value="${completed.title}"/> <A HREF="javascript:launchPopup('/lams/monitoring/dummy.do?method=gotoLearnerActivityURL&userID=<c:out value="${progress.user.userId}"/>&activityID=<c:out value="${completed.activityId}"/>');">View</A><BR>
+				<c:out value="${completed.title}"/> <A HREF="javascript:launchPopup('/lams/monitoring/dummy.do?method=gotoLearnerActivityURL&lessonID=<c:out value="${lesson.lessonId}"/>&userID=<c:out value="${progress.user.userId}"/>&activityID=<c:out value="${completed.activityId}"/>');">View</A><BR>
 			</c:forEach>
 			</TD>
 		</TR>
