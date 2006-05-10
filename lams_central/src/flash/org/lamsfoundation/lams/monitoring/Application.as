@@ -101,7 +101,6 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
     private var _debugDialog:MovieClip;                //Reference to the debug dialog
     
     
-    private var _appRoot_mc:MovieClip;                 //Application root clip
     private var _dialogueContainer_mc:MovieClip;       //Dialog container
     private var _tooltipContainer_mc:MovieClip;        //Tooltip container
     private var _cursorContainer_mc:MovieClip;         //Cursor container
@@ -427,6 +426,8 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
         _menu_mc = _container_mc.attachMovie('LFMenuBar','_menu_mc',MENU_DEPTH, {env:'Monitoring',_x:0,_y:0});
         _menu_mc.addEventListener('load',Proxy.create(this,UIElementLoaded));
 
+		
+
         //TOOLBAR
         var depth:Number = _appRoot_mc.getNextHighestDepth();
         _toolbar = new Toolbar(_appRoot_mc,TOOLBAR_X,TOOLBAR_Y);
@@ -440,11 +441,9 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
         _monitor = new Monitor(_appRoot_mc,depth++,MONITOR_X,MONITOR_Y,MONITOR_W,MONITOR_H);
         _monitor.addEventListener('load',Proxy.create(this,UIElementLoaded));
         
-		/*
         //WORKSPACE
         _workspace = new Workspace();
         //_workspace.addEventListener('load',Proxy.create(this,UIElementLoaded));
-		*/
 		
 		
     }
@@ -616,12 +615,14 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
 	public function get controlKeyPressed():String{
         return _controlKeyPressed;
     }
-    /**
-    * returns the the workspace instance
-    */
-    public function getWorkspace():Workspace{
-        return _workspace;
-    }
+   
+	
+	/**
+	* returns the lesson instance
+	*/
+	public function getLesson():Lesson{
+		return _lessons;
+	}
 
     /**
     * Returns the Application root, use as _root would be used
@@ -672,6 +673,24 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
             return _instance._cursorContainer_mc;
         } else {
             //TODO DI 11/05/05 Raise error if mc hasn't been created
+			
+        }
+    }
+	
+	/**
+    * Returns the Application root, use as _root would be used
+    * 
+    * @usage    Import authoring package and then use as root e.g.
+    * 
+    *           import org.lamsfoundation.lams.monitoring;
+    *           Application.root.attachMovie('myLinkageId','myInstanceName',depth);
+    */
+    static function get root():MovieClip {
+        //Return root if valid otherwise raise a big system error as app. will not work without it
+        if(_instance._appRoot_mc != undefined) {
+            return _instance._appRoot_mc;
+        } else {
+            //TODO DI 11/05/05 Raise error if _appRoot hasn't been created
 			
         }
     }

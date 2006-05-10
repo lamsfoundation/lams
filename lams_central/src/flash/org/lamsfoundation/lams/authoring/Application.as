@@ -44,7 +44,7 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 	private static var SHOW_DEBUGGER:Boolean = false;
 	/*
     private static var TOOLBAR_X:Number = 10;
-    private static var TOOLBAR_Y:Number = 35;*/
+    private static var TOOLBAR_Y:Number = 35;	*/
 	private static var _controlKeyPressed:String;
 	private static var TOOLBAR_X:Number = 0;
     private static var TOOLBAR_Y:Number = 21;
@@ -679,6 +679,24 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
             return _instance._cursorContainer_mc;
         } else {
             //TODO DI 11/05/05 Raise error if mc hasn't been created
+			
+        }
+    }
+	
+	/**
+    * Returns the Application root, use as _root would be used
+    * 
+    * @usage    Import authoring package and then use as root e.g.
+    * 
+    *           import org.lamsfoundation.lams.authoring;
+    *           Application.root.attachMovie('myLinkageId','myInstanceName',depth);
+    */
+    static function get root():MovieClip {
+        //Return root if valid otherwise raise a big system error as app. will not work without it
+        if(_instance._appRoot_mc != undefined) {
+            return _instance._appRoot_mc;
+        } else {
+            //TODO DI 11/05/05 Raise error if _appRoot hasn't been created
 			
         }
     }
