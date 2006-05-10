@@ -31,7 +31,7 @@ import org.lamsfoundation.lams.common.dict.*
 import org.lamsfoundation.lams.common.mvc.*
 import org.lamsfoundation.lams.authoring.Activity;
 import org.lamsfoundation.lams.authoring.Transition;
-import org.lamsfoundation.lams.authoring.cv.*;
+//import org.lamsfoundation.lams.authoring.cv.*;
 import mx.managers.*
 import mx.containers.*;
 import mx.events.*
@@ -119,36 +119,64 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 					break;
 				case 'TABCHANGE' :
 					if (infoObj.tabID == _tabID){
-					trace("TabID for Selected tab is (MonitorTab TABCHANGE): "+infoObj.tabID)
+						
+					trace("TabID for Selected tab is (TABCHANGE): "+infoObj.tabID)
 						this._visible = true;
 						mm.drawDesign(infoObj.tabID)
-						//MovieClipUtils.doLater(Proxy.create(this,draw));
+						
 					}else {
 						this._visible = false;
 					}
 					break;
 				case 'SEQUENCE' :
-					if (infoObj.tabID == _tabID){
+					/**if (infoObj.tabID == _tabID){
+						
 					trace("TabID for Selected tab is (MonitorTab): "+infoObj.tabID)
 						this._visible = true;
 						mm.drawDesign(infoObj.tabID)
-						//MovieClipUtils.doLater(Proxy.create(this,draw));
-					}
+						
+					}*/
 					break;
 				case 'DRAW_ACTIVITY' :
 					if (infoObj.tabID == _tabID){
 						trace("DRAWING_ACTIVITY")
-						drawActivity(infoObj.drawData, mm)
+						drawActivity(infoObj.data, mm)
 						//MovieClipUtils.doLater(Proxy.create(this,draw));
 					}
 					break;
 				case 'DRAW_TRANSITION' :
 					if (infoObj.tabID == _tabID){
 						trace("DRAWING_Transition")
-						drawTransition(infoObj.drawData, mm)
+						drawTransition(infoObj.data, mm)
 					}
+					
+				case 'REMOVE_ACTIVITY' :
+					if (infoObj.tabID == _tabID){
+						trace("REMOVE_ACTIVITY")
+						removeActivity(infoObj.data, mm)
+						//MovieClipUtils.doLater(Proxy.create(this,draw));
+					}
+					break;
+				
+				case 'REMOVE_TRANSITION' :
+					if (infoObj.tabID == _tabID){
+						trace("REMOVE_ACTIVITY")
+						removeTransition(infoObj.data, mm)
+						//MovieClipUtils.doLater(Proxy.create(this,draw));
+					}
+					break;
+				case 'REDRAW_CANVAS' :
+					if (infoObj.tabID == _tabID){
+						
+					trace("TabID for Selected tab is (MonitorTab): "+infoObj.tabID)
+						this._visible = true;
+						//mm.drawDesign(infoObj.tabID)
+						mm.drawDesign(infoObj.tabID);
+						
+					}
+					break;
 				default :
-					Debugger.log('unknown update type :' + infoObj.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.CanvasView');
+					Debugger.log('unknown update type :' + infoObj.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.MonitorTabView');
 			}
 
 	}
@@ -172,6 +200,36 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 		dispatchEvent({type:'load',target:this});
 	}
 	
+	/**
+	 * Remove the activityies from screen on selection of new lesson
+	 * 
+	 * @usage   
+	 * @param   activityUIID 
+	 * @return  
+	 */
+	private function removeActivity(a:Activity,mm:MonitorModel){
+		//dispatch an event to show the design  has changed
+		trace("in removeActivity")
+		var r = mm.activitiesDisplayed.remove(a.activityUIID);
+		r.removeMovieClip();
+		var s:Boolean = (r==null) ? false : true;
+		
+	}
+	
+	/**
+	 * Remove the transitions from screen on selection of new lesson
+	 * 
+	 * @usage   
+	 * @param   activityUIID 
+	 * @return  
+	 */
+	private function removeTransition(t:Transition,mm:MonitorModel){
+		//Debugger.log('t.uiID:'+t.transitionUIID,Debugger.CRITICAL,'removeTransition','CanvasView');
+		var r = mm.transitionsDisplayed.remove(t.transitionUIID);
+		r.removeMovieClip();
+		var s:Boolean = (r==null) ? false : true;
+		return s;
+	}
 	
 	/**
 	 * Draws new activity to monitor tab view stage.
