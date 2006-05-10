@@ -151,7 +151,7 @@ class CreateLessonDialog extends MovieClip{
         
         //Register as listener with StyleManager and set Styles
         themeManager.addEventListener('themeChanged',this);
-
+		location_dnd.dragRules = TreeDnd.DENYALL;
         treeview = location_dnd.getTree();
 		//Fire contentLoaded event, this is required by all dialogs so that creator of LFWindow can know content loaded
         
