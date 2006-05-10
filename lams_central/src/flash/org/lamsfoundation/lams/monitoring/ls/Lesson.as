@@ -132,7 +132,9 @@ class org.lamsfoundation.lams.monitoring.ls.Lesson {
 		
 	}
 	
-	
+	public function refresh():Void{
+		getAllLessons();
+	}
 	
 	//public function populateFromDTO(dto:Object){
 	//	lessonModel.populateFromDTO(dto);
