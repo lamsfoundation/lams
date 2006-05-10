@@ -22,7 +22,7 @@
  */
 
 /* $Id$ */
-package org.lamsfoundation.lams.tool.dao.hibernate;
+package org.lamsfoundation.lams.tool.dao.hibernate;  
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;

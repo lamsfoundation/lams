@@ -23,7 +23,7 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool;
 
-import java.util.Date;
+import java.util.Date;  
 
 public interface IToolVO {
 

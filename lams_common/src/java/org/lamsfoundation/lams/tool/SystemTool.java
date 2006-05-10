@@ -31,7 +31,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 
-/** 
+/**  
  * Represents the URLs for the internal functionality such as grouping and gates.
  * Eventually these will become "pluggable" tools, so that we can have other
  * types of grouping/gates, without making changes to the core.
