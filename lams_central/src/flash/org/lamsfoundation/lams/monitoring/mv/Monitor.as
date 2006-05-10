@@ -210,9 +210,7 @@ class Monitor {
 	public function openLearningDesign(seq:Sequence){
 		trace('opening learning design...'+ seq.getLearningDesignID());
 		var designID:Number  = seq.getLearningDesignID();
-		//var designId:Number = seq._learningDesignID;
-
-        var callback:Function = Proxy.create(this,saveDataDesignModel);
+		var callback:Function = Proxy.create(this,saveDataDesignModel);
            
 		Application.getInstance().getComms().getRequest('authoring/author.do?method=getLearningDesignDetails&learningDesignID='+designID,callback, false);
 		
@@ -222,14 +220,43 @@ class Monitor {
 		trace('returning learning design...');
 		trace('saving model data...');
 		var seq:Sequence = Sequence(monitorModel.getSequence());
-				
+		
+		//  clear canvas
+		clearCanvas(true);
+			
 		_ddm.setDesign(learningDesignDTO);
 		seq.setLearningDesignModel(_ddm);
 		
-		// activite Progress movie
-		monitorModel.drawDesign();
+		monitorModel.broadcastViewUpdate('REDRAW_CANVAS', null, monitorModel.getSelectedTab());
 	}
 	
+	/**
+	 * Clears the design in the canvas.but leaves other state variables (undo etc..)
+	 * @usage   
+	 * @param   noWarn 
+	 * @return  
+	 */
+	public function clearCanvas(noWarn:Boolean):Boolean{
+		//_global.breakpoint();
+		var s = false;
+		var ref = this;
+		Debugger.log('noWarn:'+noWarn,4,'clearCanvas','Monitor');
+		if(noWarn){
+			
+			_ddm = new DesignDataModel();
+			//as its a new instance of the ddm,need to add the listener again
+			//_ddm.addEventListener('ddmUpdate',Proxy.create(this,onDDMUpdated));
+			Debugger.log('noWarn2:'+noWarn,4,'clearCanvas','Monitor');//_ddm.addEventListener('ddmBeforeUpdate',Proxy.create(this,onDDMBeforeUpdate));
+			//checkValidDesign();
+			monitorModel.setDirty();
+			return true;
+		}else{
+			//var fn:Function = Proxy.create(ref,confirmedClearDesign, ref);
+			//LFMessage.showMessageConfirm(Dictionary.getValue('new_confirm_msg'), fn,null);
+			Debugger.log('Set design failed as old design could not be cleared',Debugger.CRITICAL,"setDesign",'Canvas');		
+		}
+	}
+
 	/**
 	 * 
 	 * @usage   
@@ -292,9 +319,5 @@ class Monitor {
 
 	public function get ddm():DesignDataModel{
 		return _ddm;
-	}
-	
-	public function get root():MovieClip{
-		return _root_mc;
 	}
 }
