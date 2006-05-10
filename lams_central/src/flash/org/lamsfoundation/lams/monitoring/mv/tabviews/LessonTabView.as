@@ -22,13 +22,13 @@
  */
 
 import org.lamsfoundation.lams.common.ApplicationParent;
-import org.lamsfoundation.lams.common.util.*;
-import org.lamsfoundation.lams.common.ui.*;
-import org.lamsfoundation.lams.common.style.*;
-import org.lamsfoundation.lams.monitoring.mv.*;
+import org.lamsfoundation.lams.common.util.*
+import org.lamsfoundation.lams.common.ui.*
+import org.lamsfoundation.lams.common.style.*
+import org.lamsfoundation.lams.monitoring.mv.*
 import org.lamsfoundation.lams.monitoring.*;
-import org.lamsfoundation.lams.common.dict.*;
-import org.lamsfoundation.lams.common.mvc.*;
+import org.lamsfoundation.lams.common.dict.*
+import org.lamsfoundation.lams.common.mvc.*
 import mx.controls.*;
 import mx.managers.*;
 import mx.containers.*;
@@ -92,7 +92,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
     private var _lessonTabView:LessonTabView;
 	private var _monitorController:MonitorController;
 	private var _lessonManagerDialog:MovieClip;
-	
+
     //Defined so compiler can 'see' events added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
     public var addEventListener:Function;
@@ -116,7 +116,6 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	*/
 	public function init(m:Observable,c:Controller){
 		super (m, c);
-		
 	}    
 	
 	/**
@@ -164,7 +163,7 @@ public function update (o:Observable,infoObj:Object):Void{
 				showLessonManagerDialog(mm);
 				break;
             default :
-                Debugger.log('unknown update type :' + infoObj.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.CanvasView');
+                Debugger.log('unknown update type :' + infoObj.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.LessonTabView');
 		}
 
 	}
