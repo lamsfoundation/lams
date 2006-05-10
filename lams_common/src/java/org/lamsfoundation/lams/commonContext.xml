@@ -53,6 +53,7 @@
 				<value>org/lamsfoundation/lams/lesson/Lesson.hbm.xml</value>
  				
 				<!-- Tool related mapping files-->
+				<value>org/lamsfoundation/lams/tool/SystemTool.hbm.xml</value>
 				<value>org/lamsfoundation/lams/tool/Tool.hbm.xml</value>
 				<value>org/lamsfoundation/lams/tool/ToolContent.hbm.xml</value>
 				<value>org/lamsfoundation/lams/tool/ToolSession.hbm.xml</value>

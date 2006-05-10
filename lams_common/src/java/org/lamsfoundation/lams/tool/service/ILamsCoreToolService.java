@@ -30,7 +30,6 @@ import java.util.Set;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
-import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
@@ -147,27 +146,60 @@ public interface ILamsCoreToolService
 
     /**
      * Return tool activity url for a learner. See also getToolPreviewURL, getToolLearnerProgressURL
-     * @param activity the requested activity.
+     * @param lesson id  - needed for the SystemToolActivities
+     * @param activity the requested activity - should be either a ToolActivity or a SystemToolActivity
      * @param learner the current learner.
-     * @return the tool access url with tool session id and access mode.
+     * @return the tool access url with tool session id or activity id
      */
-    public String getToolLearnerURL(ToolActivity activity, User learner) throws LamsToolServiceException;
+    public String getToolLearnerURL(Long lessonID, Activity activity, User learner) throws LamsToolServiceException;
 
     /**
      * Return tool activity url for running a tool in preview mode. See also getToolLearnerURL, getToolLearnerProgressURL
-     * @param activity the requested activity.
+     * @param lesson id  - needed for the SystemToolActivities
+     * @param activity the requested activity - should be either a ToolActivity or a SystemToolActivity
      * @param learner the current learner.
-     * @return the tool access url with tool session id and access mode.
+     * @return the tool access url with tool session id or activity id
      */
-    public String getToolLearnerPreviewURL(ToolActivity activity, User learner) throws LamsToolServiceException;
+    public String getToolLearnerPreviewURL(Long lessonID, Activity activity, User learner) throws LamsToolServiceException;
 
     /**
      * Return tool activity url for running a tool in preview mode. See also getToolLearnerURL, getToolPreviewURL
-     * @param activity the requested activity.
+     * @param lesson id  - needed for the SystemToolActivities
+     * @param activity the requested activity - should be either a ToolActivity or a SystemToolActivity
      * @param learner the current learner.
-     * @return the tool access url with tool session id and access mode.
+     * @return the tool access url with tool session id or activity id
      */
-    public String getToolLearnerProgressURL(ToolActivity activity, User learner) throws LamsToolServiceException;
+    public String getToolLearnerProgressURL(Long lessonID, Activity activity, User learner) throws LamsToolServiceException;
+
+    /**
+     * Return tool activity url for monitoring. 
+     * @param lesson id  - needed for the SystemToolActivities
+     * @param activity the requested activity - should be either a ToolActivity or a SystemToolActivity
+     * @return the tool access url with tool session id or activity id
+     */
+    public String getToolMonitoringURL(Long lessonID, Activity activity) throws LamsToolServiceException;
+
+    /**
+     * Return the contribution url for monitoring.
+     * @param lesson id  - needed for the SystemToolActivities
+     * @param activity the requested activity - should be either a ToolActivity or a SystemToolActivity
+     * @return the tool access url with tool session id or activity id
+     */
+    public String getToolContributionURL(Long lessonID, Activity activity) throws LamsToolServiceException;
+
+    /**
+     * Return the define later url for monitoring. 
+     * @param activity the requested activity - must be a a ToolActivity. System Activities don't support define later.
+     * @return the tool access url with tool content id
+     */
+    public String getToolDefineLaterURL(ToolActivity activity) throws LamsToolServiceException;
+
+    /**
+     * Return the moderate url for monitoring. 
+     * @param activity the requested activity - must be a a ToolActivity. System Activities don't support moderation.
+     * @return the tool access url with tool content id
+     */
+    public String getToolModerateURL(ToolActivity activity) throws LamsToolServiceException;
 
     /**
      * Get all the tool sessions for a lesson. The resulting list is not sorted.

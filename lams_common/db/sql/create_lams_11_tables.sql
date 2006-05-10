@@ -350,6 +350,30 @@ CREATE TABLE lams_group (
                   REFERENCES lams_grouping (grouping_id) ON DELETE NO ACTION ON UPDATE NO ACTION
 )TYPE=InnoDB;
 
+CREATE TABLE lams_system_tool (
+       system_tool_id BIGINT(20) NOT NULL AUTO_INCREMENT
+     , learning_activity_type_id INT(11) NOT NULL
+     , tool_display_name VARCHAR(255) NOT NULL
+     , description TEXT
+     , learner_url TEXT
+     , learner_preview_url TEXT
+     , learner_progress_url TEXT
+     , export_pfolio_learner_url TEXT
+     , export_pfolio_class_url TEXT
+     , monitor_url TEXT
+     , contribute_url TEXT
+     , create_date_time DATETIME NOT NULL
+     , UNIQUE UQ_systool_activity_type (learning_activity_type_id)
+     , PRIMARY KEY (system_tool_id)
+     , INDEX (learning_activity_type_id)
+     , CONSTRAINT FK_lams_system_tool FOREIGN KEY (learning_activity_type_id)
+                  REFERENCES lams_learning_activity_type (learning_activity_type_id) ON DELETE NO ACTION ON UPDATE NO ACTION
+)TYPE=InnoDB;
+ALTER TABLE lams_system_tool MODIFY COLUMN learner_preview_url TEXT
+      COMMENT 'Learner screen for preview a learning design. ';
+ALTER TABLE lams_system_tool MODIFY COLUMN learner_progress_url TEXT
+      COMMENT 'Teacher''s view of a learner''s screen.';
+            
 CREATE TABLE lams_tool (
        tool_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , tool_signature VARCHAR(64) NOT NULL

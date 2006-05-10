@@ -737,6 +737,11 @@ public abstract class Activity implements Serializable,Nullable {
 			   getActivityTypeId().intValue()== OPTIONS_ACTIVITY_TYPE;
 	}
 	
+	public boolean isSystemToolActivity()
+	{
+		return isGateActivity() || isGroupingActivity();
+	}
+
 	public boolean isGateActivity()
 	{
 		return getActivityTypeId().intValue()== SCHEDULE_GATE_ACTIVITY_TYPE ||

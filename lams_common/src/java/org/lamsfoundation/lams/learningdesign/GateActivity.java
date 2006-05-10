@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-/* $$Id$$ */
+/* $Id$ */
 package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
@@ -36,7 +36,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 /**
  * @hibernate.class
  */
-public abstract class GateActivity extends SimpleActivity implements Serializable
+public abstract class GateActivity extends SystemToolActivity implements Serializable
 {
     
     public static final int LEARNER_GATE_LEVEL = 1;

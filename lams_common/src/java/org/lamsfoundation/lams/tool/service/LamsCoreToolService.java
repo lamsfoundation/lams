@@ -32,10 +32,12 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.tool.SystemTool;
 import org.lamsfoundation.lams.tool.ToolContentIDGenerator;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
+import org.lamsfoundation.lams.tool.dao.ISystemToolDAO;
 import org.lamsfoundation.lams.tool.dao.IToolSessionDAO;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
@@ -64,6 +66,7 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
     //---------------------------------------------------------------------
     private ApplicationContext context;
     private IToolSessionDAO toolSessionDAO;
+    private ISystemToolDAO systemToolDAO;
     private ToolContentIDGenerator contentIDGenerator;
     //---------------------------------------------------------------------
     // Inversion of Control Methods - Method injection
@@ -83,6 +86,14 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
     {
         this.toolSessionDAO = toolSessionDAO;
     }
+
+	public ISystemToolDAO getSystemToolDAO() {
+		return systemToolDAO;
+	}
+
+	public void setSystemToolDAO(ISystemToolDAO systemToolDAO) {
+		this.systemToolDAO = systemToolDAO;
+	}
 
     /**
      * @param contentIDGenerator The contentIDGenerator to set.
@@ -284,31 +295,124 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
 
     
     /**
-     * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#getToolLearnerURL(org.lamsfoundation.lams.learningdesign.ToolActivity, org.lamsfoundation.lams.usermanagement.User)
+     * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#getToolLearnerURL(java.lang.Long, org.lamsfoundation.lams.learningdesign.Activity, org.lamsfoundation.lams.usermanagement.User)
      */
-    public String getToolLearnerURL(ToolActivity activity,User learner) throws LamsToolServiceException
+    public String getToolLearnerURL(Long lessonID, Activity activity,User learner) throws LamsToolServiceException
     {
-    	String toolURL = activity.getTool().getLearnerUrl();
-        return setupToolURLWithToolSession(activity, learner, toolURL);
+    	if ( activity.isToolActivity() ) {
+    		ToolActivity toolActivity = (ToolActivity) activity;
+        	String toolURL = toolActivity.getTool().getLearnerUrl();
+            return setupToolURLWithToolSession(toolActivity, learner, toolURL);
+    	} else if ( activity.isSystemToolActivity() ){
+    		SystemTool sysTool = systemToolDAO.getSystemToolByActivityTypeId(activity.getActivityTypeId());
+    		if ( sysTool != null ) {
+                return setupURLWithActivityLessonID(activity, lessonID, sysTool.getLearnerUrl());
+    		}
+    	}
+    	return null;
     }
     
     /**
-     * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#getToolLearnerPreviewURL(org.lamsfoundation.lams.learningdesign.ToolActivity, org.lamsfoundation.lams.usermanagement.User)
+     * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#getToolLearnerPreviewURL(java.lang.Long, org.lamsfoundation.lams.learningdesign.Activity, org.lamsfoundation.lams.usermanagement.User)
      */
-    public String getToolLearnerPreviewURL(ToolActivity activity,User authorLearner) throws LamsToolServiceException
+    public String getToolLearnerPreviewURL(Long lessonID, Activity activity,User authorLearner) throws LamsToolServiceException
     {
-    	String toolURL = activity.getTool().getLearnerPreviewUrl();
-        return setupToolURLWithToolSession(activity, authorLearner, toolURL);
+    	if ( activity.isToolActivity() ) {
+    		ToolActivity toolActivity = (ToolActivity) activity;
+	    	String toolURL = toolActivity.getTool().getLearnerPreviewUrl();
+	        return setupToolURLWithToolSession(toolActivity, authorLearner, toolURL);
+    	} else if ( activity.isSystemToolActivity() ){
+    		SystemTool sysTool = systemToolDAO.getSystemToolByActivityTypeId(activity.getActivityTypeId());
+    		if ( sysTool != null ) {
+                return setupURLWithActivityLessonID(activity, lessonID, sysTool.getLearnerPreviewUrl());
+    		}
+    	}
+    	return null;
     }
 
     /**
-     * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#getToolLearnerProgressURL(org.lamsfoundation.lams.learningdesign.ToolActivity, org.lamsfoundation.lams.usermanagement.User)
+     * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#getToolLearnerProgressURL(java.lang.Long, org.lamsfoundation.lams.learningdesign.Activity, org.lamsfoundation.lams.usermanagement.User)
      */
-    public String getToolLearnerProgressURL(ToolActivity activity,User learner) throws LamsToolServiceException
+    public String getToolLearnerProgressURL(Long lessonID, Activity activity,User learner) throws LamsToolServiceException
     {
-    	String toolURL = activity.getTool().getLearnerProgressUrl();
-       	toolURL = appendUserIDToURL(learner, toolURL);
-        return setupToolURLWithToolSession(activity, learner, toolURL);
+    	if ( activity.isToolActivity() ) {
+    		ToolActivity toolActivity = (ToolActivity) activity;
+	    	String toolURL = toolActivity.getTool().getLearnerProgressUrl();
+	       	toolURL = appendUserIDToURL(learner, toolURL);
+	        return setupToolURLWithToolSession(toolActivity, learner, toolURL);
+    	} else if ( activity.isSystemToolActivity() ){
+    		SystemTool sysTool = systemToolDAO.getSystemToolByActivityTypeId(activity.getActivityTypeId());
+    		if ( sysTool != null ) {
+                return setupURLWithActivityLessonID(activity, lessonID, sysTool.getLearnerProgressUrl());
+    		}
+    	}
+    	return null;
+    }
+
+    /**
+     * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#getToolMonitoringURL(java.lang.Long, org.lamsfoundation.lams.learningdesign.Activity, org.lamsfoundation.lams.usermanagement.User)
+     */
+    public String getToolMonitoringURL(Long lessonID, Activity activity) throws LamsToolServiceException {
+
+    	if ( activity.isToolActivity() ) {
+    		ToolActivity toolActivity = (ToolActivity) activity;
+    		String url = toolActivity.getTool().getMonitorUrl();
+    		if ( url != null )
+    			return setupToolURLWithToolContent(toolActivity, url);
+    	} else if ( activity.isSystemToolActivity() ){
+    		SystemTool sysTool = systemToolDAO.getSystemToolByActivityTypeId(activity.getActivityTypeId());
+    		if ( sysTool != null ) {
+                return setupURLWithActivityLessonID(activity, lessonID, sysTool.getMonitorUrl());
+    		}
+    	}
+    	return null;
+    }
+
+    /**
+     * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#getToolContributionURL(java.lang.Long, org.lamsfoundation.lams.learningdesign.Activity, org.lamsfoundation.lams.usermanagement.User)
+     */
+    public String getToolContributionURL(Long lessonID, Activity activity) throws LamsToolServiceException {
+
+    	if ( activity.isToolActivity() ) {
+    		ToolActivity toolActivity = (ToolActivity) activity;
+    		String url = toolActivity.getTool().getContributeUrl();
+    		if ( url != null )
+    			return setupToolURLWithToolContent(toolActivity, url);
+    	} else if ( activity.isSystemToolActivity() ){
+    		SystemTool sysTool = systemToolDAO.getSystemToolByActivityTypeId(activity.getActivityTypeId());
+    		if ( sysTool != null ) {
+                return setupURLWithActivityLessonID(activity, lessonID, sysTool.getContributeUrl());
+    		}
+    	}
+    	return null;
+    }
+
+    /**
+     * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#getDefineLaterURL(org.lamsfoundation.lams.learningdesign.ToolActivity, org.lamsfoundation.lams.usermanagement.User)
+     */
+    public String getToolDefineLaterURL(ToolActivity activity) throws LamsToolServiceException {
+
+    	if ( activity.isToolActivity() ) {
+    		ToolActivity toolActivity = (ToolActivity) activity;
+    		String url = toolActivity.getTool().getDefineLaterUrl();
+    		if ( url != null )
+    			return setupToolURLWithToolContent(toolActivity, url);
+    	} 
+    	return null;
+    }
+
+    /**
+     * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#getModerateURL(org.lamsfoundation.lams.learningdesign.ToolActivity, org.lamsfoundation.lams.usermanagement.User)
+     */
+    public String getToolModerateURL(ToolActivity activity) throws LamsToolServiceException {
+
+    	if ( activity.isToolActivity() ) {
+    		ToolActivity toolActivity = (ToolActivity) activity;
+    		String url = toolActivity.getTool().getModerationUrl();
+    		if ( url != null )
+    			return setupToolURLWithToolContent(toolActivity, url);
+    	} 
+    	return null;
     }
 
     /**
@@ -344,6 +448,21 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
 				toolSession.getToolSessionId().toString());
     }
     
+    public String setupURLWithActivityLessonID(Activity activity, Long lessonID, String learnerURL) {
+        String url = learnerURL;
+        if ( activity != null ) {
+        	url = WebUtil.appendParameterToURL(url,
+        		AttributeNames.PARAM_ACTIVITY_ID,
+				activity.getActivityId().toString());
+        }
+        if ( lessonID != null ) {
+        	WebUtil.appendParameterToURL(url,
+               		AttributeNames.PARAM_LESSON_ID,
+               		lessonID.toString());
+        }
+       return url;
+    }
+    
     /**
      * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#setupToolURLWithToolContent(org.lamsfoundation.lams.learningdesign.ToolActivity, java.lang.String)
      */
@@ -370,5 +489,6 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
     {
         return context.getBean(toolActivity.getTool().getServiceName());
     }
+
 
 }

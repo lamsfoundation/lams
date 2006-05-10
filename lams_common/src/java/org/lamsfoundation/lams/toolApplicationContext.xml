@@ -15,6 +15,10 @@
 	<bean id="toolSessionDAO" class="org.lamsfoundation.lams.tool.dao.hibernate.ToolSessionDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
+	<bean id="systemToolDAO" class="org.lamsfoundation.lams.tool.dao.hibernate.SystemToolDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	
 	
 	<bean id="toolContentIDGeneratorTarget" class="org.lamsfoundation.lams.tool.ToolContentIDGenerator"
 		singleton="true"
@@ -36,6 +40,7 @@
 		singleton="false"
 	>
 		<property name="toolSessionDAO"><ref bean="toolSessionDAO"/></property>
+		<property name="systemToolDAO"><ref bean="systemToolDAO"/></property>
 		<property name="contentIDGenerator"><ref bean="toolContentIDGenerator"/></property>	
 	</bean>	
 	

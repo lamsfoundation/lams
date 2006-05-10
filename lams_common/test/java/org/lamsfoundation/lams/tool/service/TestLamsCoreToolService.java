@@ -93,7 +93,7 @@ public class TestLamsCoreToolService extends ToolDataAccessTestCase
     
     public void testGetToolLearnerURL() throws LamsToolServiceException
     {
-        String learnerUrl = toolService.getToolLearnerURL(testNonGroupedActivity,testUser);
+        String learnerUrl = toolService.getToolLearnerURL(TEST_LESSON_ID, testNonGroupedActivity,testUser);
         assertNotNull(learnerUrl);
         assertTrue(learnerUrl.indexOf("?")>0);
         assertTrue(learnerUrl.indexOf(AttributeNames.PARAM_TOOL_SESSION_ID)>0);
@@ -102,7 +102,7 @@ public class TestLamsCoreToolService extends ToolDataAccessTestCase
     
     public void testGetToolLearnerProgressURL() throws LamsToolServiceException
     {
-        String monitorUrl = toolService.getToolLearnerProgressURL(testNonGroupedActivity,testUser);
+        String monitorUrl = toolService.getToolLearnerProgressURL(TEST_LESSON_ID, testNonGroupedActivity,testUser);
         
         assertNotNull(monitorUrl);
         log.info("monitor url:"+monitorUrl);
@@ -113,7 +113,7 @@ public class TestLamsCoreToolService extends ToolDataAccessTestCase
     
     public void testGetToolLearnerPreviewURL() throws LamsToolServiceException
     {
-        String authorUrl = toolService.getToolLearnerPreviewURL(testNonGroupedActivity,testUser);
+        String authorUrl = toolService.getToolLearnerPreviewURL(TEST_LESSON_ID, testNonGroupedActivity,testUser);
         
         assertNotNull(authorUrl);
         log.info("author url:"+authorUrl);
@@ -124,7 +124,7 @@ public class TestLamsCoreToolService extends ToolDataAccessTestCase
     
     public void testGetToolLearnerURLForGroupedTool() throws LamsToolServiceException
     {
-        String learnerUrl = toolService.getToolLearnerURL(testGroupedActivity,testUser);
+        String learnerUrl = toolService.getToolLearnerURL(TEST_LESSON_ID, testGroupedActivity,testUser);
         
         assertNotNull(learnerUrl);
         log.info("Non grouped activity learner url:"+learnerUrl);

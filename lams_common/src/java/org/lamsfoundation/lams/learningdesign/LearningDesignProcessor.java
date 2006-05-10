@@ -30,6 +30,7 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
+import org.lamsfoundation.lams.learningdesign.exception.LearningDesignProcessorException;
 
 /** Run through a learning design, in the order of the activities. Process the learning design
  * to produce somethings else.
@@ -55,24 +56,24 @@ public abstract class LearningDesignProcessor {
 	}
 
 	/** A complex activity has been found. Do any processing needed at the start of the activity */
-	public abstract void startComplexActivity(ComplexActivity activity);
+	public abstract void startComplexActivity(ComplexActivity activity) throws LearningDesignProcessorException ;
 	
 	/** Do any processing needed at the end of a complex activity */
-	public abstract void endComplexActivity(ComplexActivity activity);
+	public abstract void endComplexActivity(ComplexActivity activity) throws LearningDesignProcessorException ;
 
 	/** A simple activity has been found. Do any processing needed at the start of the activity */
-	public abstract void startSimpleActivity(SimpleActivity activity);
+	public abstract void startSimpleActivity(SimpleActivity activity) throws LearningDesignProcessorException ;
 
 	/** Do any processing needed at the end of a complex activity */
-	public abstract void endSimpleActivity(SimpleActivity activity);
+	public abstract void endSimpleActivity(SimpleActivity activity) throws LearningDesignProcessorException;
 	
-	public void parseLearningDesign() {
+	public void parseLearningDesign() throws LearningDesignProcessorException {
 		if ( getDesign() != null ) {
 			handleActivity(getDesign().getFirstActivity());
 		}
 	}
 	
-	protected void handleActivity( Activity activity ) {
+	protected void handleActivity( Activity activity ) throws LearningDesignProcessorException {
 		if ( activity == null ) {
 			log.warn("Parsing activity method handleActivity got a null activity. Learning design was "+getDesign());
 		} else {
@@ -93,7 +94,7 @@ public abstract class LearningDesignProcessor {
 		}
 	}
 	
-	protected void handleComplexActivity( Activity activity ) {
+	protected void handleComplexActivity( Activity activity ) throws LearningDesignProcessorException {
 		// ensure it is a real activity not a CGLIB proxy
 		ComplexActivity complex = (ComplexActivity) activityDAO.getActivityByActivityId(activity.getActivityId(),SimpleActivity.class);
 		startComplexActivity(complex);
@@ -111,7 +112,7 @@ public abstract class LearningDesignProcessor {
 	}
 	
 
-	protected void handleSimpleActivity( Activity activity ) {
+	protected void handleSimpleActivity( Activity activity ) throws LearningDesignProcessorException {
 		// ensure it is a real activity not a CGLIB proxy
 		SimpleActivity simple = (SimpleActivity) activityDAO.getActivityByActivityId(activity.getActivityId(),SimpleActivity.class);
 		startSimpleActivity(simple);

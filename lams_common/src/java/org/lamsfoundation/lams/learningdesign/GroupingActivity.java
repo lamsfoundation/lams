@@ -20,11 +20,12 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-/* $$Id$$ */
+/* $Id$ */
 package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
 import java.util.Date;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.strategy.GroupingActivityStrategy;
 
@@ -35,7 +36,7 @@ import org.lamsfoundation.lams.learningdesign.strategy.GroupingActivityStrategy;
  * A GroupingActivity creates Grouping.
  * @author Manpreet Minhas
  */
-public class GroupingActivity extends SimpleActivity implements Serializable
+public class GroupingActivity extends SystemToolActivity implements Serializable
 {
 	/** The grouping_ui_id of the Grouping that this activity creates */
 	private Integer createGroupingUIID;
