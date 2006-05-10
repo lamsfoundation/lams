@@ -89,7 +89,7 @@ class CreateLessonDialog extends MovieClip{
     /**
     * constructor
     */
-    function WorkspaceDialog(){
+    function CreateLessonDialog(){
         //trace('WorkSpaceDialog.constructor');
         //Set up this class to use the Flash event delegation model
         EventDispatcher.initialize(this);
@@ -199,7 +199,7 @@ class CreateLessonDialog extends MovieClip{
 	  
 	   switch (event.updateType){
 			case 'POPULATE_LICENSE_DETAILS' :
-				populateAvailableLicenses(event.data, wm);
+				//populateAvailableLicenses(event.data, wm);
 			case 'REFRESH_TREE' :
                 refreshTree(wm);
                 break;
@@ -343,8 +343,8 @@ class CreateLessonDialog extends MovieClip{
 	 * @param   wm          
 	 * @return  
 	 */
-	private function showData(m:WorkspaceModel){
-		Debugger.log('tabToSelect:'+tabToSelect,Debugger.GEN,'showTab','org.lamsfoundation.lams.ws.WorkspaceDialog');
+	private function showData(wm:WorkspaceModel){
+		//Debugger.log('tabToSelect:'+tabToSelect,Debugger.GEN,'showTab','org.lamsfoundation.lams.ws.WorkspaceDialog');
 		//if(tabToSelect == "LOCATION"){
 			setLocationContentVisible(true);
 			
@@ -353,7 +353,7 @@ class CreateLessonDialog extends MovieClip{
 				ok_btn.label = Dictionary.getValue('ws_dlg_open_btn');
 			}else if(wm.currentMode=="SAVE" || wm.currentMode=="SAVEAS"){
 				ok_btn.label = Dictionary.getValue('ws_dlg_save_btn');
-			}else if(wm.currentMode=="CREATE LESSON"){
+			}else if(wm.currentMode=="READONLY"){
 				ok_btn.label = "Create"		//Dictionary.getValue('ws_dlg_create_btn');
 			}else{
 				Debugger.log('Dont know what mode the Workspace is in!',Debugger.CRITICAL,'showTab','org.lamsfoundation.lams.ws.WorkspaceDialog');
@@ -501,8 +501,8 @@ class CreateLessonDialog extends MovieClip{
 		
 		_resultDTO.resourceName = resourceTitle_txi.text;
 		_resultDTO.resourceDescription = resourceDesc_txa.text;
-		_resultDTO.resourceLicenseText = license_txa.text;
-		_resultDTO.resourceLicenseID = licenseID_cmb.value.licenseID;
+		//_resultDTO.resourceLicenseText = license_txa.text;
+		//_resultDTO.resourceLicenseID = licenseID_cmb.value.licenseID;
 		
 
         dispatchEvent({type:'okClicked',target:this});
