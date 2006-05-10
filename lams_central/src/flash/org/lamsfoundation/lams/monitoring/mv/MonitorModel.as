@@ -35,9 +35,13 @@ import org.lamsfoundation.lams.common.util.*;
 class MonitorModel extends Observable{
 	private var _className:String = "MonitorModel";
    
-   public var RT_FOLDER:String = "Folder";
-   public var RT_ORG:String = "Organisation";
-   
+	public var RT_FOLDER:String = "Folder";
+	public var RT_ORG:String = "Organisation";
+	   
+	private static var LEARNER_ROLE:String = "LEARNER";
+	private static var STAFF_ROLE:String = "STAFF";
+	private static var TEACHER_ROLE:String = "TEACHER";
+	   
 	private var __width:Number;
 	private var __height:Number;
 	private var __x:Number;
@@ -46,6 +50,7 @@ class MonitorModel extends Observable{
 	private var infoObj:Object;
 	private var selectedTab:Number;
 	private var _dialogOpen:String;		// the type of dialog currently open
+	
 	private var _monitor:Monitor;
 	
 	// add model data
@@ -81,7 +86,7 @@ class MonitorModel extends Observable{
 	
 	public function setSequence(activeSeq:Sequence){
 		_activeSeq = activeSeq;
-		_monitor.openLearningDesign(activeSeq)
+		_monitor.openLearningDesign(_activeSeq)
 		setChanged();
 		
 		//send an update
@@ -166,7 +171,7 @@ class MonitorModel extends Observable{
 	public function isShowLearners():Boolean{
 		return _showLearners;
 	}
-	
+
 	/**
 	 * Compares the design in the CanvasModel (what is displayed on the screen) 
 	 * against the design in the DesignDataModel and updates the Canvas Model accordingly.
@@ -229,6 +234,7 @@ class MonitorModel extends Observable{
 		}
 	}
 	
+	
 	/**
 	 * get the design in the DesignDataModel and update the Monitor Model accordingly.
 	 * NOTE: Design elements are added to the DDM here.
@@ -286,7 +292,7 @@ class MonitorModel extends Observable{
 		_dialogOpen = dialogOpen;
 		broadcastViewUpdate(_dialogOpen, null, null);
 	}
-
+	
 	public function broadcastViewUpdate(updateType, data, tabID){
 		//getMonitor().getMV().clearView();
 		setChanged();
@@ -319,7 +325,7 @@ class MonitorModel extends Observable{
 		trace("In setDirty")
 		clearDesign();
 	}
-	
+
 	public function setSize(width:Number,height:Number) {
 		__width = width;
 		__height = height;
@@ -418,7 +424,9 @@ class MonitorModel extends Observable{
 		_selectedTreeNode = newselectedTreeNode;
 		trace('branch: ' + _selectedTreeNode.attributes.isBranch);
 		if(!_selectedTreeNode.attributes.isBranch){
-			getMonitor().requestOrgUsersByRole(_selectedTreeNode.attributes.data, "LEARNER");
+			// get the organisations (node) users by role
+			var roles:Array = new Array(LEARNER_ROLE, STAFF_ROLE, TEACHER_ROLE);
+			getMonitor().requestOrgUsersByRole(_selectedTreeNode.attributes.data, roles);
 		}
 		//dispatch an update to the view
 		//broadcastViewUpdate('ITEM_SELECTED',_selectedTreeNode);
@@ -431,7 +439,6 @@ class MonitorModel extends Observable{
 	public function getSelectedTreeNode ():XMLNode {
 		return _selectedTreeNode;
 	}
-	
 	public function setSelectedTab(tabID:Number){
 		selectedTab = tabID;
 	}
