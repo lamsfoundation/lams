@@ -47,8 +47,8 @@ class MonitorController extends AbstractController {
 	*/
 	public function MonitorController (mm:Observable) {
 		super (mm);
-		_monitorController = this;
 		_monitorModel = MonitorModel(model);
+		_monitorController = this;
 		//get a view if ther is not one
 		//if(!_lessonTabView){
 		//	_lessonTabView =  LessonTabView(getView());
@@ -67,6 +67,7 @@ class MonitorController extends AbstractController {
 	public function change(evt):Void{
 		trace(evt.target);
 		trace("test: "+ String(evt.target.selectedIndex))
+		_monitorModel.setSelectedTab(evt.target.selectedIndex)
 		if (_monitorModel.getSequence() == null){
 			trace ("None of Sequence is selected yet!");
 		}else {
@@ -75,7 +76,7 @@ class MonitorController extends AbstractController {
 	
 	
 	}
-	
+
 	public function click(evt):Void{
 		trace(evt.target);
 		var tgt:String = new String(evt.target);
