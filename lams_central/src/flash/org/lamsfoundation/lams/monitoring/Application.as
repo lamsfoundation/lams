@@ -336,17 +336,17 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
         if(evt.type=='load'){
             //Which item has loaded
             switch (evt.target.className) {
-                case 'Lesson' :
-					_lessonsLoaded = true;
-                    break;
-                case 'Monitor' :
-                    _monitorLoaded = true;
-                    break;
-                case 'LFMenuBar' :
+				case 'LFMenuBar' :
                     _menuLoaded = true;
                     break;
                 case 'Toolbar' :
                     _toolbarLoaded = true;
+                    break;
+				case 'Lesson' :
+					_lessonsLoaded = true;
+                    break;
+                case 'Monitor' :
+                    _monitorLoaded = true;
                     break;
                 default:
             }
@@ -424,7 +424,7 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
 		
 
         //MENU
-        _menu_mc = _container_mc.attachMovie('LFMenuBar','_menu_mc',MENU_DEPTH, {_x:0,_y:0, env:"Monitoring"});
+        _menu_mc = _container_mc.attachMovie('LFMenuBar','_menu_mc',MENU_DEPTH, {env:'Monitoring',_x:0,_y:0});
         _menu_mc.addEventListener('load',Proxy.create(this,UIElementLoaded));
 
         //TOOLBAR
@@ -465,6 +465,21 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
 		
 		_monitor.getOrganisations();
     }
+    
+    /**
+    * Opens the preferences dialog
+    
+    public function showPrefsDialog() {
+        PopUpManager.createPopUp(Application.root, LFWindow, true,{title:Dictionary.getValue("prefs_dlg_title"),closeButton:true,scrollContentPath:'preferencesDialog'});
+    }
+	*/
+	
+	/**
+    * Opens the lesson manager dialog
+    */
+    //public function showLessonManagerDialog() {
+    //    PopUpManager.createPopUp(Application.root, LFWindow, true,{title:Dictionary.getValue("lesson_dlg_title"),closeButton:true,scrollContentPath:'selectClass'});
+    //}
     
     /**
     * Receives events from the Stage resizing
