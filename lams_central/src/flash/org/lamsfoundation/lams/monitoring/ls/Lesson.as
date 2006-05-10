@@ -99,7 +99,7 @@ class org.lamsfoundation.lams.monitoring.ls.Lesson {
 		
 		var callback:Function = Proxy.create(this,setAllLessons);
 		// do request
-		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=getAllLessons', callback);
+		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=getAllLessons&userID=4', callback);
 	
 	}
 	

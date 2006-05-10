@@ -106,7 +106,24 @@ class org.lamsfoundation.lams.monitoring.ls.LessonModel extends Observable {
 	public function getLessonSequence(lessonID:Number):Object{
 		return _lessonSequences.get(lessonID);
 	}
-	//}
+	
+	
+	/**
+	* Sets currently selected Sequence
+	*/
+	public function setLastLessonSequence(seq:Sequence):Void{
+		
+		_lastSelectedSequence = _currentlySelectedSequence;
+		_currentlySelectedSequence = seq;
+	}
+	
+	/**
+	* Gets currecntly selected Sequence
+	*/
+	public function getLastLessonSequence():Sequence{
+		return _currentlySelectedSequence;
+	}
+	
 	
 	/**
 	public function getNewSequences():Array{
@@ -153,42 +170,6 @@ class org.lamsfoundation.lams.monitoring.ls.LessonModel extends Observable {
 		}
 		
 		return seqs;
-	}
-	*/
-	/**
-	* Sets currently selected Lesson
-	
-	public function setSelectedLesson(lesson:Lesson):Void{
-		//Debugger.log('templateActivity:'+templateActivity,4,'setSelectedTemplateActivity','ToolkitModel');
-		
-		
-		//_global.breakpoint();
-		//set the sates
-		_lastSelectedLesson = _currentlySelectedLesson;
-		_currentlySelectedLesson = lesson;
-		
-		// exit current lesson and join selected lesson
-		
-		if(_lastSelectedLesson != null)
-			_lastSelectedLesson.exitLesson();
-			
-		if(_currentlySelectedLesson != null)
-			_currentlySelectedLesson.joinLesson();
-		
-		
-		//for observer thang
-		setChanged();
-		//send an update
-		infoObj = {};
-		infoObj.updateType = "LESSON_SELECTED";
-		notifyObservers(infoObj);
-	}
-	*/
-	/**
-	* Gets currecntly selected Lesson
-	
-	public function getSelectedLesson():Lesson{
-		return _currentlySelectedLesson;
 	}
 	*/
 	/**
