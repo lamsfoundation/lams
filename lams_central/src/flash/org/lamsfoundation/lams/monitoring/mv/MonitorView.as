@@ -140,11 +140,12 @@ public function update (o:Observable,infoObj:Object):Void{
 		
        var mm:MonitorModel = MonitorModel(o);
 	   _monitorController = getController();
-	   
+
 	   switch (infoObj.updateType){
 		   case 'SEQUENCE' :
 				trace("TabID for Selected tab is: "+infoObj.tabID)
 				//showData(mm);
+				//removeActivity(infoObj.removeData, mm)
                 break;
             case 'POSITION' :
 				setPosition(mm);
@@ -156,7 +157,7 @@ public function update (o:Observable,infoObj:Object):Void{
 				showData(mm);
 				break;
             default :
-                Debugger.log('unknown update type :' + infoObj.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.CanvasView');
+                Debugger.log('unknown update type :' + infoObj.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.MonitorView');
 		}
 
 	}
