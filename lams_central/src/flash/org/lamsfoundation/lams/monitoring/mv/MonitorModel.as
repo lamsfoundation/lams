@@ -44,10 +44,8 @@ class MonitorModel extends Observable{
 	private var __y:Number;
 	private var _isDirty:Boolean;
 	private var infoObj:Object;
-	
-	
+	private var selectedTab:Number;
 	private var _dialogOpen:String;		// the type of dialog currently open
-	
 	private var _monitor:Monitor;
 	
 	// add model data
@@ -83,13 +81,13 @@ class MonitorModel extends Observable{
 	
 	public function setSequence(activeSeq:Sequence){
 		_activeSeq = activeSeq;
-		_monitor.openLearningDesign(_activeSeq)
+		_monitor.openLearningDesign(activeSeq)
 		setChanged();
 		
 		//send an update
 		infoObj = {};
 		infoObj.updateType = "SEQUENCE";
-		infoObj.tabID = getMonitor().getMV().getMonitorTab().selectedIndex;
+		infoObj.tabID = getSelectedTab();
 		notifyObservers(infoObj);
 	}
 	
@@ -170,6 +168,68 @@ class MonitorModel extends Observable{
 	}
 	
 	/**
+	 * Compares the design in the CanvasModel (what is displayed on the screen) 
+	 * against the design in the DesignDataModel and updates the Canvas Model accordingly.
+	 * NOTE: Design elements are added to the DDM here, but removed in the View
+	 * 
+	 * @usage   
+	 * @return  
+	 */
+	public function clearDesign(){
+	
+		//porobbably need to get a bit more granular
+		Debugger.log('Running',Debugger.GEN,'refreshDesign','MonitorModel');
+		//go through the design and see what has changed, compare DDM to canvasModel
+		//var ddmActivity_keys:Array = _monitor.ddm.activities.keys();
+		var mmActivity_keys:Array = _activitiesDisplayed.keys();
+		//var longest = Math.max(ddmActivity_keys.length, mmActivity_keys.length);
+		var longest = mmActivity_keys.length;
+		//chose which array we are going to loop over
+		var indexArray:Array;
+		
+		//if(ddmActivity_keys.length == longest){
+		//	indexArray = ddmActivity_keys;
+		//}else{
+			indexArray = mmActivity_keys;
+		//}
+		trace("Longest: "+longest)
+		//loop through and do comparison
+		for(var i=0;i<longest;i++){
+			var keyToCheck:Number = indexArray[i];
+			//var ddm_activity:Activity = _monitor.ddm.activities.get(keyToCheck);
+			var mm_activity:Activity = _activitiesDisplayed.get(keyToCheck).activity;
+			
+			//var r_activity:Object = compareActivities(ddm_activity, mm_activity);
+			//trace("Value of R: "+r_activity)
+			//if(r_activity == "DELETE"){
+				broadcastViewUpdate("REMOVE_ACTIVITY",mm_activity, getSelectedTab());
+			//}
+			//else if(r_activity == "NEW"){
+			//	broadcastViewUpdate("DRAW_ACTIVITY",ddm_activity, getSelectedTab());
+			//}else{
+	
+			//}
+		}
+		
+		/*--------For Clearing Transitions---------*/
+		
+		var mmTransition_keys:Array = _transitionsDisplayed.keys();
+		var transLongest = mmTransition_keys.length;
+		//chose which array we are going to loop over
+		var transIndexArray:Array;
+		transIndexArray = mmTransition_keys;
+		
+		trace("Longest: "+transLongest)
+		//loop through and do comparison
+		for(var i=0;i<transLongest;i++){
+			var transkeyToCheck:Number = transIndexArray[i];
+			var mm_transition:Transition = _transitionsDisplayed.get(transkeyToCheck).transition;
+			broadcastViewUpdate("REMOVE_TRANSITION",mm_transition, getSelectedTab());
+			
+		}
+	}
+	
+	/**
 	 * get the design in the DesignDataModel and update the Monitor Model accordingly.
 	 * NOTE: Design elements are added to the DDM here.
 	 * 
@@ -226,7 +286,7 @@ class MonitorModel extends Observable{
 		_dialogOpen = dialogOpen;
 		broadcastViewUpdate(_dialogOpen, null, null);
 	}
-	
+
 	public function broadcastViewUpdate(updateType, data, tabID){
 		//getMonitor().getMV().clearView();
 		setChanged();
@@ -234,7 +294,7 @@ class MonitorModel extends Observable{
 		//send an update
 		infoObj = {};
 		infoObj.updateType = updateType;
-		infoObj.drawData = data;
+		infoObj.data = data;
 		infoObj.tabID = tabID;
 		notifyObservers(infoObj);
 		
@@ -243,6 +303,7 @@ class MonitorModel extends Observable{
 	
 	public function changeTab(tabID:Number){
 		//getMonitor().getMV().clearView();
+		selectedTab = tabID;
 		setChanged();
 		
 		//send an update
@@ -251,6 +312,12 @@ class MonitorModel extends Observable{
 		infoObj.tabID = tabID;
 		notifyObservers(infoObj);
 		
+	}
+	
+	public function setDirty(){
+		_isDirty = true;
+		trace("In setDirty")
+		clearDesign();
 	}
 	
 	public function setSize(width:Number,height:Number) {
@@ -364,7 +431,14 @@ class MonitorModel extends Observable{
 	public function getSelectedTreeNode ():XMLNode {
 		return _selectedTreeNode;
 	}
-
+	
+	public function setSelectedTab(tabID:Number){
+		selectedTab = tabID;
+	}
+	
+	public function getSelectedTab():Number{
+		return selectedTab;
+	}
 	
 	//Accessors for x + y coordinates
     public function get x():Number{
