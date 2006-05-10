@@ -22,6 +22,7 @@
  */
 import org.lamsfoundation.lams.monitoring.Application;
 import org.lamsfoundation.lams.monitoring.Organisation;
+import org.lamsfoundation.lams.monitoring.User;
 import org.lamsfoundation.lams.monitoring.mv.*;
 import org.lamsfoundation.lams.monitoring.mv.tabviews.*;
 import org.lamsfoundation.lams.authoring.DesignDataModel;
@@ -54,7 +55,7 @@ class Monitor {
 	private var _ddm:DesignDataModel;
 	private var _dictionary:Dictionary;
 
-	private var _currentUserType:String;
+	private var _currentUserRole:String;
 
 	private var _pi:MovieClip; //Property inspector
 	
@@ -131,6 +132,47 @@ class Monitor {
         }
     }
 	
+	/**
+	* Opens a design using workspace and user to select design ID
+	* passes the callback function to recieve selected ID
+	*/
+	public function openDesignBySelection(){
+        //Work space opens dialog and user will select view
+        var callback:Function = Proxy.create(this, openDesignById);
+		var ws = Application.getInstance().getWorkspace();
+        ws.userSelectDesign(callback);
+	}
+    
+	/**
+	 * Request design from server using supplied ID.
+	 * @usage   
+	 * @param   designId 
+	 * @return  
+	 */
+    private function openDesignById(workspaceResultDTO:Object){
+		
+		ObjectUtils.toString(workspaceResultDTO);
+		var designId:Number = workspaceResultDTO.selectedResourceID;
+		var lessonName:String = workspaceResultDTO.resourceName;
+		var lessonDesc:String = workspaceResultDTO.resourceDescription;
+        var callback:Function = Proxy.create(this,setLesson);
+		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=initializeLesson&learningDesignID='+designId+'&userID='+_root.userID+'&lessonName='+lessonName+'&lessonDescription='+lessonDesc,callback, false);
+
+        
+    }
+	
+	/**
+	 * Set new Lesson in Monitoring
+	 * @usage   
+	 * @param   lesson ID
+	 * @return  
+	 */
+    private function setLesson(lessonID:Number){
+       // refresh Lesson Library
+	   Application.getInstance().getLesson().refresh();
+	   
+    }
+	
 	public function getOrganisations():Void{
 		var callback:Function = Proxy.create(this,showOrgTree);
            
@@ -187,17 +229,31 @@ class Monitor {
 		return odto;
 	}
 
-	public function requestOrgUsersByRole(data:Object, role:String){
-		trace('requesting org users by role: ' + role);
-		var callback:Function = Proxy.create(this,saveUsers);
-		_currentUserType = role;
-		Application.getInstance().getComms().getRequest('workspace.do?method=getUsersFromOrganisationByRole&organisationID='+data.organisationID+'&role='+role,callback, false);
+	public function requestOrgUsersByRole(data:Object, roles:Array){
 		
+		trace('requesting org users by role');
+		var callback:Function = Proxy.create(this,saveUsers);
+		
+		for(var i=0; i<roles.length; i++){
+			_currentUserRole = roles[i];
+			trace('current role is: ' + roles[i]);
+			Application.getInstance().getComms().getRequest('workspace.do?method=getUsersFromOrganisationByRole&organisationID='+data.organisationID+'&role='+roles[i],callback, false);
+		}
 	}
 
 	private function saveUsers(users:Array){
-		trace('retrieving back users for org by role: ' + _currentUserType);
+		trace('retrieving back users for org by role: ' + users.role);
 		
+		//var users = new Array();
+		
+		for(var i=0; i< users.length; i++){
+			var u:Object = users[i];
+			var user:User = new User();
+			user.populateFromDTO(u);
+			user.addRole(_currentUserRole);
+			trace('adding user: ' + user.getFirstName() + ' ' + user.getLastName());
+			//monitorModel.addUser(user);
+		}
 	}
 
 	/**
@@ -210,7 +266,7 @@ class Monitor {
 	public function openLearningDesign(seq:Sequence){
 		trace('opening learning design...'+ seq.getLearningDesignID());
 		var designID:Number  = seq.getLearningDesignID();
-		var callback:Function = Proxy.create(this,saveDataDesignModel);
+        var callback:Function = Proxy.create(this,saveDataDesignModel);
            
 		Application.getInstance().getComms().getRequest('authoring/author.do?method=getLearningDesignDetails&learningDesignID='+designID,callback, false);
 		
@@ -229,7 +285,7 @@ class Monitor {
 		
 		monitorModel.broadcastViewUpdate('REDRAW_CANVAS', null, monitorModel.getSelectedTab());
 	}
-	
+
 	/**
 	 * Clears the design in the canvas.but leaves other state variables (undo etc..)
 	 * @usage   
