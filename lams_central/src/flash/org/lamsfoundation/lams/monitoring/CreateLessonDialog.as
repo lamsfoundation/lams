@@ -46,8 +46,6 @@ class CreateLessonDialog extends MovieClip{
     private var cancel_btn:Button;
     private var panel:MovieClip;            //The underlaying panel base
     
-	private var switchView_tab:TabBar;
-	
 	//location tab elements
 	private var treeview:Tree;              //Treeview for navigation through workspace folder structure
 	private var location_dnd:TreeDnd;
@@ -55,25 +53,14 @@ class CreateLessonDialog extends MovieClip{
 	private var currentPath_lbl:Label;
 	private var name_lbl:Label;
 	private var resourceTitle_txi:TextInput;
-	private var new_btn:Button;
-	//private var cut_btn:Button;
-	private var copy_btn:Button;
-	private var paste_btn:Button;
-	private var delete_btn:Button;
-	private var rename_btn:Button;
+
 		
 	
 	//properties
 	private var description_lbl:Label;
-	private var license_lbl:Label;
+	
     private var resourceDesc_txa:TextArea;
-    private var license_txa:TextArea;
-    private var licenseID_cmb:ComboBox;
-    private var licenseImg_pnl:MovieClip;
-    private var viewLicense_btn:Button;
-	
-	
-	
+    
     private var fm:FocusManager;            //Reference to focus manager
     private var themeManager:ThemeManager;  //Theme manager
 	
@@ -126,24 +113,13 @@ class CreateLessonDialog extends MovieClip{
         //Set the container reference
         Debugger.log('container=' + _container,Debugger.GEN,'init','org.lamsfoundation.lams.WorkspaceDialog');
 
-        //set up the tab bar:
-		
-		switchView_tab.addItem({label:Dictionary.getValue('ws_dlg_location_button'), data:'LOCATION'});
-		switchView_tab.addItem({label:Dictionary.getValue('ws_dlg_properties_button'), data:'PROPERTIES'});
-
-		
-		//Set the text on the labels
+	//Set the text on the labels
         
         //Set the text for buttons
 		currentPath_lbl.text = "<b>"+Dictionary.getValue('ws_dlg_location_button')+"</b>:"
-        ok_btn.label = Dictionary.getValue('ws_dlg_ok_button');
+        ok_btn.label = "Create"		//Dictionary.getValue('ws_dlg_ok_button');
         cancel_btn.label = Dictionary.getValue('ws_dlg_cancel_button');
-		viewLicense_btn.label = Dictionary.getValue('ws_view_license_button');
-		new_btn.label = Dictionary.getValue('new_btn');
-		copy_btn.label = Dictionary.getValue('copy_btn');
-		paste_btn.label = Dictionary.getValue('paste_btn');
-		delete_btn.label = Dictionary.getValue('delete_btn');
-		rename_btn.label = Dictionary.getValue('rename_btn');
+		
 		//TODO: Dictionary calls for all the rest of the buttons
 		
 		//TODO: Make setStyles more efficient
@@ -201,20 +177,7 @@ class CreateLessonDialog extends MovieClip{
 		 //Add event listeners for ok, cancel and close buttons
         ok_btn.addEventListener('click',Delegate.create(this, ok));
         cancel_btn.addEventListener('click',Delegate.create(this, cancel));
-		switchView_tab.addEventListener("change",Delegate.create(this, switchTab));
 		//think this is failing....
-		switchView_tab.setSelectedIndex(0); 
-		
-		new_btn.addEventListener('click',Delegate.create(_workspaceController, _workspaceController.fileOperationRequest));
-		//cut_btn.addEventListener('click',Delegate.create(_workspaceController, _workspaceController.fileOperationRequest));
-		copy_btn.addEventListener('click',Delegate.create(_workspaceController, _workspaceController.fileOperationRequest));
-		paste_btn.addEventListener('click',Delegate.create(_workspaceController, _workspaceController.fileOperationRequest));
-		delete_btn.addEventListener('click',Delegate.create(_workspaceController, _workspaceController.fileOperationRequest));
-		rename_btn.addEventListener('click',Delegate.create(_workspaceController, _workspaceController.fileOperationRequest));
-		
-		viewLicense_btn.addEventListener('click',Delegate.create(this, openLicenseURL));
-		licenseID_cmb.addEventListener('change',Delegate.create(this, onLicenseComboSelect));
-		
 		//Set up the treeview
         setUpTreeview();
 		
@@ -251,8 +214,8 @@ class CreateLessonDialog extends MovieClip{
 			case 'REFRESH_FOLDER' :
 				refreshFolder(event.data, wm);
 				break;
-			case 'SHOW_TAB' :
-				showTab(event.data,wm);
+			case 'SHOW_DATA' :
+				showData(wm);
 				break;
 			case 'SET_UP_BRANCHES_INIT' :
 				setUpBranchesInit();
@@ -351,20 +314,7 @@ class CreateLessonDialog extends MovieClip{
 			resourceTitle_txi.text = nodeData.name;
 			resourceDesc_txa.text = nodeData.description;
 			Debugger.log('nodeData.licenseID:'+nodeData.licenseID,Debugger.GEN,'itemSelected','org.lamsfoundation.lams.ws.WorkspaceDialog');
-			//find the SI of the license we need:
-			//check if a license ID has been selected:
-			if(nodeData.licenseID > 0){
-				for(var i=0; i<licenseID_cmb.dataProvider.length; i++){
-					if(licenseID_cmb.dataProvider[i].data.licenseID == nodeData.licenseID){
-						licenseID_cmb.selectedIndex = i;
-					}
-				}
-			}else{
-				licenseID_cmb.selectedIndex = 0;
-			}
-			
-			
-			
+					
 			//TODO These Items must also be in the FolderContentsDTO
 			/*
 			license_txa.text = ;
@@ -375,42 +325,6 @@ class CreateLessonDialog extends MovieClip{
 		
 	}
 	
-	private function populateAvailableLicenses(licenses:Array, wm:WorkspaceModel){
-		Debugger.log('Got this many:'+licenses.length,Debugger.GEN,'populateAvailableLicenses','org.lamsfoundation.lams.ws.WorkspaceDialog');
-		//add the blank one
-		var lic_dp = new Array();
-		lic_dp.addItem({label:Dictionary.getValue('license_not_selected'),data:""});
-		licenseID_cmb.dataProvider = lic_dp;
-		for (var i=0;i<licenses.length;i++){
-			lic_dp.addItem({label:licenses[i].name,data:licenses[i]});
-		}
-		
-	}
-	
-	public function onLicenseComboSelect(evt:Object){
-		
-		//load the picture into the panel
-		licenseImg_pnl.createEmptyMovieClip("image_mc", this.getNextHighestDepth());
-		licenseImg_pnl.image_mc.loadMovie(licenseID_cmb.value.pictureURL);
-
-		//license_txa.text = StringUtils.cleanNull(evt.target.data.
-		
-		if(licenseID_cmb.value.url == undefined){
-			viewLicense_btn.enabled = false;
-		}else{
-			viewLicense_btn.enabled = true;
-		}
-	}
-		
-	public function openLicenseURL(evt:Object){
-		var urlToOpen:String = licenseID_cmb.value.url;
-		if(urlToOpen != undefined){
-			getURL(urlToOpen,'_blank');
-		}
-	}
-	
-	
-	
 	private function setLocationContentVisible(v:Boolean){
 		Debugger.log('v:'+v,Debugger.GEN,'setLocationContentVisible','org.lamsfoundation.lams.ws.WorkspaceDialog');
 		treeview.visible = v;
@@ -418,29 +332,10 @@ class CreateLessonDialog extends MovieClip{
 		currentPath_lbl.visible = v;
 		name_lbl.visible = v;
 		resourceTitle_txi.visible = v;
-		new_btn.visible = v;
-		//cut_btn.visible = v;
-		copy_btn.visible = v;
-		paste_btn.visible = v;
-		delete_btn.visible = v;
-		rename_btn.visible = v;
-	
-	}
-	
-	private function setPropertiesContentVisible(v:Boolean){
-		Debugger.log('v:'+v,Debugger.GEN,'setPropertiesContentVisible','org.lamsfoundation.lams.ws.WorkspaceDialog');
 		description_lbl.visible = v;
-		license_lbl.visible = v;
 		resourceDesc_txa.visible = v;
-		license_txa.visible = v;
-		licenseImg_pnl.visible = v;
-		viewLicense_btn.visible = v;
-		
-	
-
 	}
 	
-		
 	/**
 	 * updates the view to show the right controls for the tab
 	 * @usage   
@@ -448,31 +343,23 @@ class CreateLessonDialog extends MovieClip{
 	 * @param   wm          
 	 * @return  
 	 */
-	private function showTab(tabToSelect:String,wm:WorkspaceModel){
+	private function showData(m:WorkspaceModel){
 		Debugger.log('tabToSelect:'+tabToSelect,Debugger.GEN,'showTab','org.lamsfoundation.lams.ws.WorkspaceDialog');
-		if(tabToSelect == "LOCATION"){
+		//if(tabToSelect == "LOCATION"){
 			setLocationContentVisible(true);
-			setPropertiesContentVisible(false);
 			
-				
-				
-		}else if(tabToSelect == "PROPERTIES"){
-			setLocationContentVisible(false);
-			setPropertiesContentVisible(true);
-			
-		
-		}
-		
 		//set the right label on the 'doit' button
-		if(wm.currentMode=="OPEN"){
-			ok_btn.label = Dictionary.getValue('ws_dlg_open_btn');
-		}else if(wm.currentMode=="SAVE" || wm.currentMode=="SAVEAS"){
-			ok_btn.label = Dictionary.getValue('ws_dlg_save_btn');
-		}else{
-			Debugger.log('Dont know what mode the Workspace is in!',Debugger.CRITICAL,'showTab','org.lamsfoundation.lams.ws.WorkspaceDialog');
-			ok_btn.label = Dictionary.getValue('ws_dlg_ok_btn');
-		}
-		
+			if(wm.currentMode=="OPEN"){
+				ok_btn.label = Dictionary.getValue('ws_dlg_open_btn');
+			}else if(wm.currentMode=="SAVE" || wm.currentMode=="SAVEAS"){
+				ok_btn.label = Dictionary.getValue('ws_dlg_save_btn');
+			}else if(wm.currentMode=="CREATE LESSON"){
+				ok_btn.label = "Create"		//Dictionary.getValue('ws_dlg_create_btn');
+			}else{
+				Debugger.log('Dont know what mode the Workspace is in!',Debugger.CRITICAL,'showTab','org.lamsfoundation.lams.ws.WorkspaceDialog');
+				ok_btn.label = Dictionary.getValue('ws_dlg_ok_btn');
+			}
+		//}
 	}
 	
 	
@@ -630,26 +517,6 @@ class CreateLessonDialog extends MovieClip{
 
 	
 	/**
-	 * Called when the tabs are clicked
-	 * @usage   
-	 * @param   e 
-	 * @return  
-	 */
-	private function switchTab(e){
-		Debugger.log('Switch tab called!',Debugger.GEN,'switchTab','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
-		if(e.newIndex == 0){			
-			dispatchEvent({type:'locationTabClick',target:this});
-		}else if(e.newIndex ==1){
-			dispatchEvent({type:'propertiesTabClick',target:this});
-		}
-		/*
-		for (var item:String in e) {	
-			trace("Item: " + item + "=" + e[item]);
-		}
-		*/
-	}
-    
-    /**
     * Event dispatched by parent container when close button clicked
     */
     private function click(e:Object){
