@@ -320,4 +320,8 @@ class Monitor {
 	public function get ddm():DesignDataModel{
 		return _ddm;
 	}
+	
+	public function get root():MovieClip{
+		return _root_mc;
+	}
 }
