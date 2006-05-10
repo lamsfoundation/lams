@@ -44,7 +44,7 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
     private var edit_menu:Menu;
     private var tools_menu:Menu;
     private var help_menu:Menu;
-    
+    private var env:String;
     private var view_xml:XML; // to illustrate creating a menu with xml
     
     private var app:Application;
@@ -62,17 +62,19 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
         //Set up init for next frame and make invisible this frame
         this.onEnterFrame = init;
         this._visible = false;
-        
+       
+		
         //Get a reference to the application, ThemeManager and Dictionary
         app = Application.getInstance();
         tm = ThemeManager.getInstance();
+	
 		_dictionary = Dictionary.getInstance();
 		_dictionary.addEventListener('init',Delegate.create(this,setupMenuItems));
     }
 
     public function init() {
 		Debugger.log('init called',Debugger.GEN,'init','LFMenuBar');
-
+		
         //Kill enter frame 
         delete this.onEnterFrame;
         
@@ -87,8 +89,11 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
 	* Set up the actual menu items
 	*/
 	private function setupMenuItems(){
-
-        /*=================
+		
+		//trace("Called From: "+env)
+		if (env != "Monitoring"){
+			
+		/*=================
             FILE MENU
         =================*/
         file_menu = _mb.addMenu(Dictionary.getValue('mnu_file'));
@@ -148,7 +153,46 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
 		//Now that menu items have been set up make the menu bar visible
 		this._visible = true;
 		Debugger.log('Finished setting up set visible to:'+this._visible,Debugger.GEN,'setupMenuItems','LFMenuBar');
-
+		
+		}else{
+		
+		/*=================
+            LESSON MENU
+        =================*/
+		//_global.breakpoint();
+        tools_menu = _mb.addMenu(Dictionary.getValue('mnu_tools'));
+		
+        tools_menu.addMenuItem({label:Dictionary.getValue('mnu_lesson_create'), instanceName:"drawTransitionalItem"});
+        tools_menu.addMenuItem({label:Dictionary.getValue('mnu_lesson_disable'), instanceName:"drawOptionalItem"});
+        tools_menu.addMenuItem({type:"separator"});
+        tools_menu.addMenuItem({label:Dictionary.getValue('mnu_lesson_archive'), instanceName:"prefsItem"});
+		
+		/*=================
+            EDIT MENU
+        =================*/
+        edit_menu = _mb.addMenu(Dictionary.getValue("mnu_edit"));
+        
+        // "new" is the linkage id of the movie clip to be used as the icon for the "New" menu item.
+		edit_menu.addMenuItem({label:Dictionary.getValue('mnu_edit_cut'), instanceName:"cutItem"});
+        edit_menu.addMenuItem({label:Dictionary.getValue('mnu_edit_copy'), instanceName:"copyItem"});
+        edit_menu.addMenuItem({label:Dictionary.getValue('mnu_edit_paste'), instanceName:"pasteItem"});
+		
+		/*=================
+            HELP MENU
+        =================*/
+        help_menu = _mb.addMenu(Dictionary.getValue('mnu_help'));
+        help_menu.addMenuItem({label:Dictionary.getValue('mnu_help_abt'), instanceName:"aboutItem"});
+        
+        //set up listeners
+        // register the listeners with the separate menus
+        file_menu.addEventListener("change", Delegate.create(this,fileMenuClicked));
+        edit_menu.addEventListener("change", Delegate.create(this,editMenuClicked));
+        tools_menu.addEventListener("change", Delegate.create(this,toolsMenuClicked));
+		
+		//Now that menu items have been set up make the menu bar visible
+		this._visible = true;
+		Debugger.log('Finished setting up set visible to:'+this._visible,Debugger.GEN,'setupMenuItems','LFMenuBar');
+		}
 	}
     
     /**
