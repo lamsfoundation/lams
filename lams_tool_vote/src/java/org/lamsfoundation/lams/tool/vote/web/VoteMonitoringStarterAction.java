@@ -97,7 +97,7 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 	    logger.debug("toolContentId: " + toolContentId);
 
 		logger.debug("calling  prepareChartData: " + toolContentId);
-    	//MonitoringUtil.prepareChartData(request, voteService, toolContentId);
+    	//MonitoringUtil.prepareChartData(request, voteService, toolContentId, null);
 	    
     	VoteContent voteContent=voteService.retrieveVote(toolContentId);
 	    int allUserEntriesCount=voteService.getAllEntriesCount();

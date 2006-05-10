@@ -87,12 +87,26 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 			return list;
 	    }
 		
-		public List getUserEntries()
+		public Set getUserEntries()
 	    {
 	        HibernateTemplate templ = this.getHibernateTemplate();
 	        List list = getSession().createQuery(LOAD_USER_ENTRIES)
 			.list();
-			return list;
+	        
+	        Set set= new HashSet();
+	        
+	        Set userEntries= new HashSet();
+			if(list != null && list.size() > 0){
+				Iterator listIterator=list.iterator();
+		    	while (listIterator.hasNext())
+		    	{
+		    	    String entry=(String)listIterator.next();
+		    	    logger.debug("entry: " + entry);
+		    	    if ((entry != null) && (entry.length() > 0))  
+		    	        userEntries.add(entry);
+		    	}
+			}
+			return userEntries;
 	    }
 		
 
@@ -111,7 +125,8 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 		    	    logger.debug("attempt: " + attempt);
 		    	    if (attempt.getVoteQueUsr().getVoteSession().getUid().toString().equals(voteSessionUid.toString()))
 		    	    {
-		    	        sessionUserEntries.add(attempt.getUserEntry());
+			    	    if ((attempt.getUserEntry() != null) && (attempt.getUserEntry().length() > 0))
+			    	        sessionUserEntries.add(attempt.getUserEntry());
 		    	    }
 		    	}
 			}
@@ -129,6 +144,7 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 			if(list != null && list.size() > 0){
 			    return list.size();
 			}
+			
 			return 0;
 	    }
 		

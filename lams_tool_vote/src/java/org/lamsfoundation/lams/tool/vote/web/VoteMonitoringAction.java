@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -139,8 +140,9 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	 	
     	String currentMonitoredToolSession=voteMonitoringForm.getSelectedToolSessionId(); 
 	    logger.debug("currentMonitoredToolSession: " + currentMonitoredToolSession);
-
-    	/* SELECTION_CASE == 1 indicates a selected group other than "All" */
+	    
+	    
+	    /* SELECTION_CASE == 1 indicates a selected group other than "All" */
 		if (currentMonitoredToolSession.equals("All"))
 	    {
 		    request.getSession().setAttribute(SELECTION_CASE, new Long(2));
@@ -152,6 +154,10 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 		    
 			VoteContent voteContent=voteSession.getVoteContent();
 		    logger.debug("using voteContent: " + voteContent);
+		    
+		    logger.debug("preparing chart data for content id: " + voteContent.getVoteContentId());
+		    logger.debug("preparing chart data for currentMonitoredToolSession: " + currentMonitoredToolSession);
+		    MonitoringUtil.prepareChartData(request, voteService, voteContent.getVoteContentId(), new Long(currentMonitoredToolSession));
 
 		    refreshSummaryData(request, voteContent, voteService, true, false, currentMonitoredToolSession, null, true);
 		    request.getSession().setAttribute(SELECTION_CASE, new Long(1));
@@ -241,7 +247,7 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	    logger.debug("start getting user entries, showUserEntriesByUserId: " + showUserEntriesByUserId);
 	    logger.debug("start getting user entries, userId: " + userId);
 	    
-	    List userEntries=voteService.getUserEntries();
+	    Set userEntries=voteService.getUserEntries();
 	    logger.debug("userEntries: " + userEntries);
 	    
 	    List listUserEntries=new LinkedList();

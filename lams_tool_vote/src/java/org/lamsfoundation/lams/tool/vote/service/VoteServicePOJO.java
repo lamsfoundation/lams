@@ -234,7 +234,7 @@ public class VoteServicePOJO implements
     }
     
     
-    public List getUserEntries() throws VoteApplicationException 
+    public Set getUserEntries() throws VoteApplicationException 
     {
         try
         {

@@ -113,7 +113,7 @@ public class VoteChartGenerator extends HttpServlet implements VoteAppConstants 
             data.setValue(pairs.getValue().toString(), new Double(voteRate));
 		}
         
-        JFreeChart chart=ChartFactory.createPieChart("All Votes Chart", data, true, true, false);
+        JFreeChart chart=ChartFactory.createPieChart("Session Votes Chart", data, true, true, false);
         return chart;
         
     }

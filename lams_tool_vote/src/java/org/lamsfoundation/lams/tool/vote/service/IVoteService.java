@@ -115,7 +115,7 @@ public interface IVoteService
     
     public void cleanAllQuestions(final Long mcContentUid) throws VoteApplicationException;
     
-    public List getUserEntries() throws VoteApplicationException;
+    public Set getUserEntries() throws VoteApplicationException;
     
     public int getSessionUserRecordsEntryCount(final String userEntry, final Long voteSessionUid, IVoteService voteService) throws VoteApplicationException;
     

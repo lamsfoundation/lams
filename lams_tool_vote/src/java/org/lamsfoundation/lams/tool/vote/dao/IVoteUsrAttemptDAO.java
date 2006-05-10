@@ -45,7 +45,7 @@ public interface IVoteUsrAttemptDAO
 	
 	public List getUserRecords(final String userEntry);
 	
-	public List getUserEntries();
+	public Set getUserEntries();
 	
 	public int getAllEntriesCount();
 	

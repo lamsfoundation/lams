@@ -592,17 +592,27 @@ public class MonitoringUtil implements VoteAppConstants{
 		Map mapVoteRatesContent= new TreeMap(new VoteComparator());
 		logger.debug("mapVoteRatesContent: " + mapVoteRatesContent);
 		
-		//int allEntriesCount=voteService.getAllEntriesCount();
-		//logger.debug("allEntriesCount: " + allEntriesCount);
-		int sessionEntriesCount=voteService.getSessionEntriesCount(toolSessionUid);
-		logger.debug("sessionEntriesCount: " + sessionEntriesCount);
-
 		
-		//List userEntries=voteService.getUserEntries();
-	    //logger.debug("userEntries: " + userEntries);
+		boolean sessionLevelCharting=true;
+		int entriesCount=0;
+		Set userEntries=null;
+		if (toolSessionUid != null)
+		{
+		    logger.debug("process for session: " + toolSessionUid);
+		    entriesCount=voteService.getSessionEntriesCount(toolSessionUid);
+		    userEntries=voteService.getSessionUserEntries(toolSessionUid);
+		}
+		else
+		{
+		    sessionLevelCharting=false;
+		    logger.debug("process for content: ");
+		    entriesCount=voteService.getAllEntriesCount();
+		    userEntries=voteService.getUserEntries();
+		}
+		logger.debug("entriesCount: " + entriesCount);
+		logger.debug("userEntries: " + userEntries);
+		logger.debug("sessionLevelCharting: " + sessionLevelCharting);
 		
-		Set sessionUserEntries=voteService.getSessionUserEntries(toolSessionUid);
-	    logger.debug("sessionUserEntries: " + sessionUserEntries);
 
 		logger.debug("setting existing content data from the db");
 		mapOptionsContent.clear();
@@ -620,15 +630,26 @@ public class MonitoringUtil implements VoteAppConstants{
 				//int votesCount=voteService.getAttemptsForQuestionContent(voteQueContent.getUid());
 				//logger.debug("votesCount for questionContent uid: " + votesCount + " for" + voteQueContent.getUid());
 
-				int votesCount=voteService.getAttemptsForQuestionContentAndSessionUid(voteQueContent.getUid(), toolSessionUid);
-				logger.debug("votesCount for questionContent uid: " + votesCount + " for" + voteQueContent.getUid());
-
+				int votesCount=0;
+				if (sessionLevelCharting == true)
+				{
+				    logger.debug("getting votesCount based on session: " + toolSessionUid);
+					votesCount=voteService.getAttemptsForQuestionContentAndSessionUid(voteQueContent.getUid(), toolSessionUid);
+					logger.debug("votesCount for questionContent uid: " + votesCount + " for" + voteQueContent.getUid());
+				}
+				else
+				{
+				    logger.debug("getting votesCount based on content: " + voteQueContent.getUid());
+				    votesCount=voteService.getAttemptsForQuestionContent(voteQueContent.getUid());
+					logger.debug("votesCount for questionContent uid: " + votesCount + " for" + voteQueContent.getUid());
+				}
 				
 				double voteRate=0d;
-				if (sessionEntriesCount != 0)
+				if (entriesCount != 0)
 				{
-				    voteRate=((votesCount * 100)/ sessionEntriesCount);
+				    voteRate=((votesCount * 100)/ entriesCount);
 				}
+
 				logger.debug("voteRate" + voteRate);
 				
 				mapVoteRatesContent.put(mapIndex.toString(), new Double(voteRate).toString());
@@ -647,7 +668,7 @@ public class MonitoringUtil implements VoteAppConstants{
 		}
 		logger.debug("Map initialized with existing contentid to: " + mapOptionsContent);
 		
-		Iterator itListQuestions = sessionUserEntries.iterator();
+		Iterator itListQuestions = userEntries.iterator();
 	    int mapVoteRatesSize=mapVoteRatesContent.size();
 	    logger.debug("mapVoteRatesSize: " + mapVoteRatesSize);
 	    mapIndex=new Long(mapVoteRatesSize+1);
@@ -666,9 +687,19 @@ public class MonitoringUtil implements VoteAppConstants{
 	    	
 	    	if ((userEntry != null) && (userEntry.length() > 0))
 	    	{
-	    	    
 	    	    //int userEntryRate=voteService.getUserRecordsEntryCount(userEntry);
-	    	    int userEntryRate=voteService.getSessionUserRecordsEntryCount(userEntry, toolSessionUid,voteService);
+	    	    int userEntryRate=0;
+				if (sessionLevelCharting == true)
+				{
+				    logger.debug("getting total for userEntryRate based on session: " + toolSessionUid);
+				    userEntryRate=voteService.getSessionUserRecordsEntryCount(userEntry, toolSessionUid,voteService);    
+				}
+				else
+				{
+				    logger.debug("getting total for userEntryRate based on content: ");
+				    userEntryRate=voteService.getUserRecordsEntryCount(userEntry);
+				}
+	    	    
 				logger.debug("userEntryRate: " + userEntryRate);
 				totalUserRate=totalUserRate + userEntryRate; 
 	    	}
@@ -676,7 +707,7 @@ public class MonitoringUtil implements VoteAppConstants{
 	    logger.debug("totalUserRate: " + totalUserRate);
 	    
 
-	    itListQuestions = sessionUserEntries.iterator();
+	    itListQuestions = userEntries.iterator();
 	    while (itListQuestions.hasNext())
 	    {
 	    	String  userEntry =(String)itListQuestions.next();
@@ -686,9 +717,19 @@ public class MonitoringUtil implements VoteAppConstants{
 	    	if ((userEntry != null) && (userEntry.length() > 0))
 	    	{
 	    	    
-	    	    int userEntryRate=voteService.getSessionUserRecordsEntryCount(userEntry, toolSessionUid,voteService);
+	    	    int userEntryRate=0;
+				if (sessionLevelCharting == true)
+				{
+				    logger.debug("getting userEntryRate based on session: " + toolSessionUid);
+				    userEntryRate=voteService.getSessionUserRecordsEntryCount(userEntry, toolSessionUid,voteService);    
+				}
+				else
+				{
+				    logger.debug("getting userEntryRate based on session: " + toolSessionUid);
+				    userEntryRate=voteService.getUserRecordsEntryCount(userEntry);
+				}
 				logger.debug("userEntryRate: " + userEntryRate);
-				
+
 				double votesShare= (userEntryRate * share) / totalUserRate ;
 				logger.debug("votesShare: " + votesShare);
 	    	    

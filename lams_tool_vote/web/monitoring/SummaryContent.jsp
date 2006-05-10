@@ -49,20 +49,22 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<input type="hidden" name="isToolSessionChanged"/>
 				<table class="forms">
 
+
+
 				<c:if test="${(requestLearningReport != 'true')}"> 	
 						<c:if test="${(isPortfolioExport != 'true') }"> 	
-							<tr> 
-								<td NOWRAP valign=top align=left>
-									<c:set var="viewURL">
-										<html:rewrite page="/chartGenerator?type=pie"/>
-									</c:set>
-									<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
-										 <font size=2>	<bean:message key="label.view.chart"/>  </font>
-									</a>
-								</td>
-							</tr>
-	
-			
+							<c:if test="${sessionScope.selectionCase != 2}"> 			
+								<tr> 
+									<td NOWRAP valign=top align=left>
+										<c:set var="viewURL">
+											<html:rewrite page="/chartGenerator?type=pie"/>
+										</c:set>
+										<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
+											 <font size=2>	<bean:message key="label.view.chart"/>  </font>
+										</a>
+									</td>
+								</tr>
+							</c:if>			
 						<tr> 
 							<td NOWRAP class="formlabel" valign=top>
 							&nbsp&nbsp&nbsp
