@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
@@ -246,6 +247,22 @@ public class VoteServicePOJO implements
 														   e);
         }
     }
+   
+
+    public Set getSessionUserEntries(final Long voteSessionUid) throws VoteApplicationException
+    {
+        try
+        {
+        	return voteUsrAttemptDAO.getSessionUserEntries(voteSessionUid);
+        }
+        catch (DataAccessException e)
+        {
+            throw new VoteApplicationException("Exception occured when lams is getting session user entries: "
+                                                         + e.getMessage(),
+														   e);
+        }        
+    }
+    
     
     public VoteQueContent getVoteQueContentByUID(Long uid) throws VoteApplicationException
     {
@@ -470,6 +487,21 @@ public class VoteServicePOJO implements
         }        
     }
     
+    public int getSessionEntriesCount(final Long voteSessionUid) throws VoteApplicationException
+    {
+        try
+        {
+        	return voteUsrAttemptDAO.getSessionEntriesCount(voteSessionUid);
+        }
+        catch (DataAccessException e)
+        {
+            throw new VoteApplicationException("Exception occured when lams is getting all attempts session entries count: "
+                                                         + e.getMessage(),
+														   e);
+        }        
+    }
+
+    
     
     public int getUserRecordsEntryCount(final String userEntry) throws VoteApplicationException
     {
@@ -480,6 +512,22 @@ public class VoteServicePOJO implements
         catch (DataAccessException e)
         {
             throw new VoteApplicationException("Exception occured when lams is getting userrecords entry count: "
+                                                         + e.getMessage(),
+														   e);
+        }
+        
+    }
+
+    
+    public int getSessionUserRecordsEntryCount(final String userEntry, final Long voteSessionUid, IVoteService voteService) throws VoteApplicationException
+    {
+        try
+        {
+        	return voteUsrAttemptDAO.getSessionUserRecordsEntryCount(userEntry, voteSessionUid, voteService);
+        }
+        catch (DataAccessException e)
+        {
+            throw new VoteApplicationException("Exception occured when lams is getting session userrecords entry count: "
                                                          + e.getMessage(),
 														   e);
         }
@@ -499,6 +547,22 @@ public class VoteServicePOJO implements
 														   e);
         }        
     }
+    
+    public int getAttemptsForQuestionContentAndSessionUid(final Long voteQueContentId, final Long voteSessionUid) throws VoteApplicationException
+    {
+        try
+        {
+        	return voteUsrAttemptDAO.getAttemptsForQuestionContentAndSessionUid(voteQueContentId, voteSessionUid);
+        }
+        catch (DataAccessException e)
+        {
+            throw new VoteApplicationException("Exception occured when lams is getting vote UsrAttempt by question content id and session uid: "
+                                                         + e.getMessage(),
+														   e);
+        }        
+    }
+
+    
     
     public VoteUsrAttempt getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long voteQueContentId) throws VoteApplicationException
 	{

@@ -397,9 +397,12 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	    		{
 	    		    String entry=voteQueContent.getQuestion(); 
 	    		    logger.debug("entry: " + entry);
+	    		    
+	    		    String voteQueContentId=attempt.getVoteQueContentId().toString();	    
+	    		    logger.debug("voteQueContentId: " + voteQueContentId);
 	    		    if (entry != null)
 	    		    {
-		    		    if (entry.equals("sample nomination"))
+		    		    if (entry.equals("sample nomination")  &&  (voteQueContentId.equals("1")))
 		    		    {
 		    		        logger.debug("this nomination entry points to a user entered nomination: " + attempt.getUserEntry());
 		    		        localMapQuestionsContent.put(new Integer(order).toString(), attempt.getUserEntry());

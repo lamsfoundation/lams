@@ -409,10 +409,13 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
     	logger.debug("userEntryAvailable " + userEntryAvailable);
     	
     	Long toolSessionId=(Long)request.getSession().getAttribute(TOOL_SESSION_ID);
-    	logger.debug("toolSessionId " + toolSessionId);
+    	logger.debug("toolSessionId: " + toolSessionId);
     	
     	VoteSession voteSession=voteService.retrieveVoteSession(toolSessionId);
         logger.debug("retrieving voteSession: " + voteSession);
+        
+        Long toolSessionUid=voteSession.getUid();
+        logger.debug("toolSessionUid: " + toolSessionUid);
 
     	
     	boolean isUserDefined=false;
@@ -494,7 +497,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
     	voteLearningForm.setNominationsSubmited(new Boolean(true).toString());
     	
     	logger.debug("calling  prepareChartData: " + toolContentId);
-    	MonitoringUtil.prepareChartData(request, voteService, toolContentId);
+    	MonitoringUtil.prepareChartData(request, voteService, toolContentId, toolSessionUid);
     	
     	return (mapping.findForward(INDIVIDUAL_REPORT));
     }

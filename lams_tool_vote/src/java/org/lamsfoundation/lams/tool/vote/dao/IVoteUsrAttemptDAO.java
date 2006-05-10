@@ -23,8 +23,10 @@
 package org.lamsfoundation.lams.tool.vote.dao;
 
 import java.util.List;
+import java.util.Set;
 
 import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
+import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 
 
 /**
@@ -47,9 +49,17 @@ public interface IVoteUsrAttemptDAO
 	
 	public int getAllEntriesCount();
 	
+	public Set getSessionUserEntries(final Long voteSessionUid);
+	
+	public int getSessionEntriesCount(final Long voteSessionId);
+	
+	public int getSessionUserRecordsEntryCount(final String userEntry, final Long voteSessionUid, IVoteService voteService);
+	
 	public int getUserRecordsEntryCount(final String userEntry);
 	
 	public int getAttemptsForQuestionContent(final Long voteQueContentId);
+	
+	public int getAttemptsForQuestionContentAndSessionUid(final Long voteQueContentId, final Long voteSessionUid);
 	
 	public void removeAttemptsForUser(final Long queUsrId);
 	

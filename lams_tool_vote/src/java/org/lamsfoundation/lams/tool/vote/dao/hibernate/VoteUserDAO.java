@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.tool.vote.dao.hibernate;
 import java.util.List;
 
 import org.hibernate.FlushMode;
-import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
 import org.lamsfoundation.lams.tool.vote.dao.IVoteUserDAO;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
@@ -49,8 +48,18 @@ public class VoteUserDAO extends HibernateDaoSupport implements IVoteUserDAO {
 	 
    public VoteQueUsr getVoteUserByUID(Long uid)
 	{
-		 return (VoteQueUsr) this.getHibernateTemplate()
-         .get(VoteQueUsr.class, uid);
+		String query = "from VoteQueUsr user where user.uid=?";
+		
+			HibernateTemplate templ = this.getHibernateTemplate();
+			List list = getSession().createQuery(query)
+			.setLong(0,uid.longValue())
+			.list();
+			
+			if(list != null && list.size() > 0){
+				VoteQueUsr voteu = (VoteQueUsr) list.get(0);
+				return voteu;
+			}
+			return null;	
 	}
 	
 	

@@ -22,13 +22,19 @@
 
 package org.lamsfoundation.lams.tool.vote.dao.hibernate;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.hibernate.FlushMode;
+import org.lamsfoundation.lams.tool.vote.dao.IVoteUserDAO;
 import org.lamsfoundation.lams.tool.vote.dao.IVoteUsrAttemptDAO;
+import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
+import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
@@ -38,6 +44,8 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  */
 public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAttemptDAO {
 	 	static Logger logger = Logger.getLogger(VoteUsrAttemptDAO.class.getName());
+	 	
+	 	private IVoteUserDAO			voteUserDAO;
 	 	
 	 	private static final String LOAD_ATTEMPT_FOR_QUE_CONTENT = "from voteUsrAttempt in class VoteUsrAttempt where voteUsrAttempt.queUsrId=:queUsrId and voteUsrAttempt.voteQueContentId=:voteQueContentId";
 	 	
@@ -55,8 +63,8 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 	 	
 	 	private static final String LOAD_DISTINCT_USER_ENTRY_RECORDS = "select distinct voteUsrAttempt.queUsrId from VoteUsrAttempt voteUsrAttempt where voteUsrAttempt.userEntry=:userEntry";
 	 	
-	 	private static final String LOAD_ALL_ENTRIES = "select voteUsrAttempt.userEntry from VoteUsrAttempt voteUsrAttempt";
-            
+	 	private static final String LOAD_ALL_ENTRIES = "from voteUsrAttempt in class VoteUsrAttempt";
+	 	
 	 	
 	 	public VoteUsrAttempt getVoteUserAttemptByUID(Long uid)
 		{
@@ -87,6 +95,29 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 			return list;
 	    }
 		
+
+		public Set getSessionUserEntries(final Long voteSessionUid)
+	    {
+	        HibernateTemplate templ = this.getHibernateTemplate();
+	        List list = getSession().createQuery(LOAD_ALL_ENTRIES)
+			.list();
+
+	        Set sessionUserEntries= new HashSet();
+			if(list != null && list.size() > 0){
+				Iterator listIterator=list.iterator();
+		    	while (listIterator.hasNext())
+		    	{
+		    	    VoteUsrAttempt attempt=(VoteUsrAttempt)listIterator.next();
+		    	    logger.debug("attempt: " + attempt);
+		    	    if (attempt.getVoteQueUsr().getVoteSession().getUid().toString().equals(voteSessionUid.toString()))
+		    	    {
+		    	        sessionUserEntries.add(attempt.getUserEntry());
+		    	    }
+		    	}
+			}
+			return sessionUserEntries;
+	    }
+
 		
 		public int getUserRecordsEntryCount(final String userEntry)
 	    {
@@ -100,6 +131,36 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 			}
 			return 0;
 	    }
+		
+
+		public int getSessionUserRecordsEntryCount(final String userEntry, final Long voteSessionUid, IVoteService voteService)
+	    {
+	        HibernateTemplate templ = this.getHibernateTemplate();
+	        List list = getSession().createQuery(LOAD_DISTINCT_USER_ENTRY_RECORDS)
+			.setString("userEntry", userEntry)				
+			.list();
+	        
+	        int entryCount=0;
+
+			if(list != null && list.size() > 0){
+				Iterator listIterator=list.iterator();
+		    	while (listIterator.hasNext())
+		    	{
+		    	    Long userId=(Long)listIterator.next();
+		    	    logger.debug("userId: " + userId);
+		    	    logger.debug("voteService: " + voteService);
+		    	    VoteQueUsr voteQueUsr=voteService.getVoteUserByUID(userId);
+		    	    logger.debug("voteQueUsr: " + voteQueUsr);
+		    	    
+		    	    if (voteQueUsr.getVoteSession().getUid().toString().equals(voteSessionUid.toString()))
+		    	    {
+		    	        ++entryCount;		    	        
+		    	    }
+		    	}
+			}
+			return entryCount;
+	    }
+
 		
 		
 		public void removeAttemptsForUser(final Long queUsrId)
@@ -161,6 +222,30 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 	    }
 
 		
+		public int getAttemptsForQuestionContentAndSessionUid(final Long voteQueContentId, final Long voteSessionUid)
+	    {
+	        HibernateTemplate templ = this.getHibernateTemplate();
+	        List list = getSession().createQuery(LOAD_ATTEMPT_FOR_QUESTION_CONTENT)
+			.setLong("voteQueContentId", voteQueContentId.longValue())
+			.list();
+	        
+	        List userEntries= new ArrayList();
+			if(list != null && list.size() > 0){
+				Iterator listIterator=list.iterator();
+		    	while (listIterator.hasNext())
+		    	{
+		    	    VoteUsrAttempt attempt=(VoteUsrAttempt)listIterator.next();
+		    	    if (attempt.getVoteQueUsr().getVoteSession().getUid().toString().equals(voteSessionUid.toString()))
+		    	    {
+		    	        userEntries.add(attempt);
+		    	    }
+		    	}
+			}
+			return userEntries.size();
+
+	    }
+
+		
 		public VoteUsrAttempt getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long voteQueContentId)
 	    {
 	        HibernateTemplate templ = this.getHibernateTemplate();
@@ -191,6 +276,7 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 		    	while (listIterator.hasNext())
 		    	{
 		    	    VoteUsrAttempt attempt=(VoteUsrAttempt)listIterator.next();
+		    	    logger.debug("attempt: " + attempt);
 		    	    if (attempt.getVoteQueUsr().getVoteSession().getUid().toString().equals(voteSessionId.toString()))
 		    	    {
 		    	        return attempt;
@@ -244,6 +330,29 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 	        List list = getSession().createQuery(LOAD_ALL_ENTRIES)
 			.list();
 			return list.size();
+	    }
+		
+
+		public int getSessionEntriesCount(final Long voteSessionUid)
+	    {
+	        HibernateTemplate templ = this.getHibernateTemplate();
+	        List list = getSession().createQuery(LOAD_ALL_ENTRIES)
+			.list();
+	        
+	        int totalSessionAttemptsCount=0;
+			if(list != null && list.size() > 0){
+				Iterator listIterator=list.iterator();
+		    	while (listIterator.hasNext())
+		    	{
+		    	    VoteUsrAttempt attempt=(VoteUsrAttempt)listIterator.next();
+		    	    logger.debug("attempt: " + attempt);
+		    	    if (attempt.getVoteQueUsr().getVoteSession().getUid().toString().equals(voteSessionUid.toString()))
+		    	    {
+		    	        ++totalSessionAttemptsCount;
+		    	    }
+		    	}
+			}
+			return totalSessionAttemptsCount;
 	    }
 
 		

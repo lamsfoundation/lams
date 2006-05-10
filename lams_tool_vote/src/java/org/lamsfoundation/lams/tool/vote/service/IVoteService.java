@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.tool.vote.service;
 
 import java.io.InputStream;
 import java.util.List;
+import java.util.Set;
 
 import org.lamsfoundation.lams.contentrepository.ITicket;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
@@ -84,7 +85,11 @@ public interface IVoteService
     
     public int getAttemptsForQuestionContent(final Long voteQueContentId) throws VoteApplicationException;
     
+    public int getAttemptsForQuestionContentAndSessionUid(final Long voteQueContentId, final Long voteSessionId) throws VoteApplicationException;
+    
 	public int getAllEntriesCount() throws VoteApplicationException;
+	
+	public int getSessionEntriesCount(final Long voteSessionId) throws VoteApplicationException;
 	
 	public int getUserRecordsEntryCount(final String userEntry) throws VoteApplicationException;
     
@@ -111,6 +116,10 @@ public interface IVoteService
     public void cleanAllQuestions(final Long mcContentUid) throws VoteApplicationException;
     
     public List getUserEntries() throws VoteApplicationException;
+    
+    public int getSessionUserRecordsEntryCount(final String userEntry, final Long voteSessionUid, IVoteService voteService) throws VoteApplicationException;
+    
+    public Set getSessionUserEntries(final Long voteSessionId) throws VoteApplicationException;
     
     public VoteQueContent getQuestionContentByQuestionText(final String question, final Long mcContentUid);
     

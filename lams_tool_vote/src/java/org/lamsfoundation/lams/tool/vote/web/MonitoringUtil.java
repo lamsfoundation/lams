@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
@@ -84,7 +85,6 @@ public class MonitoringUtil implements VoteAppConstants{
 		logger.debug("isLearnerRequest: " + isLearnerRequest);
 		logger.debug("userId: " + userId);
 		
-		//IVoteService voteService = (IVoteService)request.getSession().getAttribute(TOOL_SERVICE);
 		logger.debug("voteService: " + voteService);
     	
 		logger.debug("will be building groups question data  for content:..." + voteContent);
@@ -579,9 +579,10 @@ public class MonitoringUtil implements VoteAppConstants{
 	}
 
 	
-	public static void prepareChartData(HttpServletRequest request, IVoteService voteService, Long toolContentId)
+	public static void prepareChartData(HttpServletRequest request, IVoteService voteService, Long toolContentId, Long toolSessionUid)
 	{
-	    logger.debug("starting prepareChartData: " + toolContentId);
+	    logger.debug("starting prepareChartData, toolContentId: " + toolContentId);
+	    logger.debug("starting prepareChartData, toolSessionUid: " + toolSessionUid);
 	    VoteContent voteContent=voteService.retrieveVote(toolContentId);
 	    
 		logger.debug("existing voteContent:" + voteContent);
@@ -591,15 +592,18 @@ public class MonitoringUtil implements VoteAppConstants{
 		Map mapVoteRatesContent= new TreeMap(new VoteComparator());
 		logger.debug("mapVoteRatesContent: " + mapVoteRatesContent);
 		
-		int allEntriesCount=voteService.getAllEntriesCount();
-		logger.debug("allEntriesCount: " + allEntriesCount);
+		//int allEntriesCount=voteService.getAllEntriesCount();
+		//logger.debug("allEntriesCount: " + allEntriesCount);
+		int sessionEntriesCount=voteService.getSessionEntriesCount(toolSessionUid);
+		logger.debug("sessionEntriesCount: " + sessionEntriesCount);
+
 		
-		List userEntries=voteService.getUserEntries();
-	    logger.debug("userEntries: " + userEntries);
-	    int distinctEntriesCount= userEntries.size();
-	    logger.debug("distinctEntriesCount: " + distinctEntriesCount);
-	    
-	    	
+		//List userEntries=voteService.getUserEntries();
+	    //logger.debug("userEntries: " + userEntries);
+		
+		Set sessionUserEntries=voteService.getSessionUserEntries(toolSessionUid);
+	    logger.debug("sessionUserEntries: " + sessionUserEntries);
+
 		logger.debug("setting existing content data from the db");
 		mapOptionsContent.clear();
 		Iterator queIterator=voteContent.getVoteQueContents().iterator();
@@ -613,13 +617,17 @@ public class MonitoringUtil implements VoteAppConstants{
 				logger.debug("question: " + voteQueContent.getQuestion());
 				mapOptionsContent.put(mapIndex.toString(),voteQueContent.getQuestion());
 				
-				int votesCount=voteService.getAttemptsForQuestionContent(voteQueContent.getUid());
+				//int votesCount=voteService.getAttemptsForQuestionContent(voteQueContent.getUid());
+				//logger.debug("votesCount for questionContent uid: " + votesCount + " for" + voteQueContent.getUid());
+
+				int votesCount=voteService.getAttemptsForQuestionContentAndSessionUid(voteQueContent.getUid(), toolSessionUid);
 				logger.debug("votesCount for questionContent uid: " + votesCount + " for" + voteQueContent.getUid());
+
 				
 				double voteRate=0d;
-				if (allEntriesCount != 0)
+				if (sessionEntriesCount != 0)
 				{
-				    voteRate=((votesCount * 100)/ allEntriesCount);
+				    voteRate=((votesCount * 100)/ sessionEntriesCount);
 				}
 				logger.debug("voteRate" + voteRate);
 				
@@ -639,7 +647,7 @@ public class MonitoringUtil implements VoteAppConstants{
 		}
 		logger.debug("Map initialized with existing contentid to: " + mapOptionsContent);
 		
-		Iterator itListQuestions = userEntries.iterator();
+		Iterator itListQuestions = sessionUserEntries.iterator();
 	    int mapVoteRatesSize=mapVoteRatesContent.size();
 	    logger.debug("mapVoteRatesSize: " + mapVoteRatesSize);
 	    mapIndex=new Long(mapVoteRatesSize+1);
@@ -659,7 +667,8 @@ public class MonitoringUtil implements VoteAppConstants{
 	    	if ((userEntry != null) && (userEntry.length() > 0))
 	    	{
 	    	    
-	    	    int userEntryRate=voteService.getUserRecordsEntryCount(userEntry);
+	    	    //int userEntryRate=voteService.getUserRecordsEntryCount(userEntry);
+	    	    int userEntryRate=voteService.getSessionUserRecordsEntryCount(userEntry, toolSessionUid,voteService);
 				logger.debug("userEntryRate: " + userEntryRate);
 				totalUserRate=totalUserRate + userEntryRate; 
 	    	}
@@ -667,7 +676,7 @@ public class MonitoringUtil implements VoteAppConstants{
 	    logger.debug("totalUserRate: " + totalUserRate);
 	    
 
-	    itListQuestions = userEntries.iterator();
+	    itListQuestions = sessionUserEntries.iterator();
 	    while (itListQuestions.hasNext())
 	    {
 	    	String  userEntry =(String)itListQuestions.next();
@@ -677,7 +686,7 @@ public class MonitoringUtil implements VoteAppConstants{
 	    	if ((userEntry != null) && (userEntry.length() > 0))
 	    	{
 	    	    
-	    	    int userEntryRate=voteService.getUserRecordsEntryCount(userEntry);
+	    	    int userEntryRate=voteService.getSessionUserRecordsEntryCount(userEntry, toolSessionUid,voteService);
 				logger.debug("userEntryRate: " + userEntryRate);
 				
 				double votesShare= (userEntryRate * share) / totalUserRate ;
