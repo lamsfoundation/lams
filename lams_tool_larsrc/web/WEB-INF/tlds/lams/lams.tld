@@ -33,6 +33,7 @@
       <body-content>empty</body-content>
 
       <attribute>
+         <description>Output details from the shared session UserDTO object</description>
          <name>property</name>
          <required>true</required>
 
@@ -63,6 +64,7 @@
       <body-content>empty</body-content>
 
       <attribute>
+         <description>Output stylesheet based on the user preferences.</description>
          <name>localLink</name>
          <required>false</required>
 
@@ -271,6 +273,10 @@
    	<tag-file>
        <name>SetEditor</name>
        <path>/WEB-INF/tags/SetEditor.tag</path>
+   	</tag-file>
+   	<tag-file>
+       <name>AuthoringButton</name>
+       <path>/WEB-INF/tags/AuthoringButton.tag</path>
    	</tag-file>
 
 </taglib>

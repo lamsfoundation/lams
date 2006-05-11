@@ -55,6 +55,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.upload.FormFile;
+import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.rsrc.ResourceConstants;
@@ -523,9 +524,7 @@ public class AuthoringAction extends Action {
 			log.error(e);
 		}
 
-		ActionMessages messages = new ActionMessages();
-		messages.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage("authoring.save.success"));
-		this.addMessages(request,messages);
+		request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG,Boolean.TRUE);
     	if(mode.isAuthor())
     		return mapping.findForward("author");
     	else

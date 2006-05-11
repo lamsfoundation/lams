@@ -19,5 +19,6 @@
 	<classpathentry sourcepath="/lams_contentrepository" kind="lib" path="/lams_build/lib/lams/lams-contentrepository.jar"/>
 	<classpathentry sourcepath="/lams_common" kind="lib" path="/lams_build/lib/lams/lams.jar"/>
 	<classpathentry sourcepath="/lams_learning" kind="lib" path="/lams_build/lib/lams/lams-learning.jar"/>
+	<classpathentry sourcepath="/lams_central/src" kind="lib" path="/lams_build/lib/lams/lams-central.jar"/>
 	<classpathentry kind="output" path="web/WEB-INF/classes"/>
 </classpath>

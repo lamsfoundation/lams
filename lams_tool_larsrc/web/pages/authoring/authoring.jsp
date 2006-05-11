@@ -1,24 +1,22 @@
-<%@ include file="/common/taglibs.jsp" %>
-<%@ page import="java.util.HashSet" %>
-<%@ page import="java.util.Set" %>
-    <% 
-    	
-		Set tabs = new HashSet();
-		tabs.add("label.authoring.heading.basic");
-		tabs.add("label.authoring.heading.advance");
-		tabs.add("label.authoring.heading.instructions");
-		pageContext.setAttribute("tabs", tabs);
-		
-	%>
+<%@ include file="/common/taglibs.jsp"%>
+<%@ page import="java.util.HashSet"%>
+<%@ page import="java.util.Set"%>
+<%Set tabs = new HashSet();
+			tabs.add("label.authoring.heading.basic");
+			tabs.add("label.authoring.heading.advance");
+			tabs.add("label.authoring.heading.instructions");
+			pageContext.setAttribute("tabs", tabs);
+
+			%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html:html locale="true">
 <head>
-	<title><fmt:message key="label.author.title"/></title>
-	
-    <%@ include file="/common/header.jsp" %>
-    <%@ include file="/common/fckeditorheader.jsp" %>
-    
-    <script>
+	<title><fmt:message key="label.author.title" /></title>
+
+	<%@ include file="/common/header.jsp"%>
+	<%@ include file="/common/fckeditorheader.jsp"%>
+
+	<script>
     
     	var imgRoot="${lams}images/";
 	    var themeName="aqua";
@@ -47,10 +45,7 @@
 	    	// end optional tab controller stuff
 	    	selectTab(tabId);
         } 
-        
-        function doSubmit() {
-        	$("authoringForm").submit();
-        }
+
         function doUploadOnline() {
         	var myForm = $("authoringForm");
         	myForm.action = "<c:url value='/authoring/uploadOnlineFile.do'/>";
@@ -64,58 +59,61 @@
         
         
     </script>
-    <!-- ******************** END FCK Editor related javascript & HTML ********************** -->
-    
-    
+	<!-- ******************** END FCK Editor related javascript & HTML ********************** -->
+
+
 </head>
 <body onLoad="init()">
 
-<html:form action="authoring/update" method="post" styleId="authoringForm"
-	focus="resource.title"  enctype="multipart/form-data">
-<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
-		<html:hidden property="toolContentID"/>
+	<html:form action="authoring/update" method="post" styleId="authoringForm" focus="resource.title" enctype="multipart/form-data">
+		<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
+		<html:hidden property="toolContentID" />
 		<html:hidden property="currentTab" styleId="currentTab" />
 
-<h1><fmt:message key="label.authoring.heading" /></h1>
+		<h1>
+			<fmt:message key="label.authoring.heading" />
+		</h1>
 
-<!-- start tabs -->
-<lams:Tabs collection="${tabs}" useKey="true" control="true"/>
-<!-- end tab buttons -->
-<div class="tabbody">
-<table align=center> 	  
-				<tr>   
-				<td NOWRAP>
-						<%@ include file="/common/messages.jsp" %>
-				</td>
-				</tr> 
-</table>
+		<!-- start tabs -->
+		<lams:Tabs collection="${tabs}" useKey="true" control="true" />
+		<!-- end tab buttons -->
+		<div class="tabbody">
+			<table align=center>
+				<tr>
+					<td NOWRAP>
+						<%@ include file="/common/messages.jsp"%>
+					</td>
+				</tr>
+			</table>
 
-<!-- tab content 1 (Basic) -->
-<lams:TabBody id="1" titleKey="label.authoring.heading.basic.desc" page="basic.jsp"/>
-<!-- end of content (Basic) -->
-      
-<!-- tab content 2 (Advanced) -->
-<lams:TabBody id="2" titleKey="label.authoring.heading.advance.desc" page="advance.jsp" />
-<!-- end of content (Advanced) -->
+			<!-- tab content 1 (Basic) -->
+			<lams:TabBody id="1" titleKey="label.authoring.heading.basic.desc" page="basic.jsp" />
+			<!-- end of content (Basic) -->
 
-<!-- tab content 3 (Instructions) -->
-<lams:TabBody id="3" titleKey="label.authoring.heading.instructions.desc" page="instructions.jsp" />
-<!-- end of content (Instructions) -->
+			<!-- tab content 2 (Advanced) -->
+			<lams:TabBody id="2" titleKey="label.authoring.heading.advance.desc" page="advance.jsp" />
+			<!-- end of content (Advanced) -->
+
+			<!-- tab content 3 (Instructions) -->
+			<lams:TabBody id="3" titleKey="label.authoring.heading.instructions.desc" page="instructions.jsp" />
+			<!-- end of content (Instructions) -->
 
 
-<!-- Button Row -->
-		<p align="right">
-			<html:link href="javascript:doSubmit();" property="submit" styleClass="button">
-				<fmt:message key="label.authoring.save.button" />
-			</html:link>
-			<html:link href="javascript:;" property="cancel" onclick="window.close()" styleClass="button">
-				<fmt:message key="label.authoring.cancel.button" />
-			</html:link>
-		</p>
-</div>
-<lams:HTMLEditor/>
-	
+			<!-- Button Row -->
+			<%--  Default value 
+				<c:set var="cancelButtonLabelKey">label.authoring.cancel.button</c:set>
+				<c:set var="saveButtonLabelKey">label.authoring.save.button</c:set>
+				<c:set var="cancelConfirmMsgKey">authoring.msg.cancel.save</c:set>
+			--%>
+			<c:set var="toolSignature">
+				<fmt:message key="signature" />
+			</c:set>
+			<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="${toolSignature}" toolContentID="${formBean.toolContentID}" />
 
-</html:form>
+		</div>
+		<lams:HTMLEditor />
+
+
+	</html:form>
 </body>
 </html:html>

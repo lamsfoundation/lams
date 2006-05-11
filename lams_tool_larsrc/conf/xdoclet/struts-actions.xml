@@ -196,4 +196,8 @@
 			parameter="showitem" >
 			<forward name="success" path="/pages/monitoring/monitoring.jsp" />
 		</action>
+		<!-- ========== BEGIN: Common ============================== -->
+		<action path="/clearsession"
+			type="org.lamsfoundation.lams.tool.rsrc.web.action.ClearSessionAction">
+		</action>
 				
