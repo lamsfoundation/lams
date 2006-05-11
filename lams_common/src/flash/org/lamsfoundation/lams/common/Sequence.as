@@ -61,10 +61,14 @@ class Sequence {
 	/**
 	* Constructor.
 	*/
-	public function Sequence (){
+	
+	public function Sequence(dto:Object){
 		_active = false;
 		_learningDesignModel = null;
 		_progress = null;
+		if(dto != null){
+			populateFromDTO(dto);
+		}
 	}
 	
 	/**
