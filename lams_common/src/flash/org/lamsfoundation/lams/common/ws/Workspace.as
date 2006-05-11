@@ -255,6 +255,16 @@ class org.lamsfoundation.lams.common.ws.Workspace {
     }
 	
 	/**
+	* Shows the workspace browsing dialogue to open a design for use in Monitoring
+	* read-only mode
+	*/
+	public function userSelectDesign(callback){
+		_onOKCallBack = callback;
+		workspaceModel.currentMode = "READONLY";
+		workspaceModel.openDesignBySelection();
+	}
+	
+	/**
 	 * Shows the workspace browsing dialoge to set a design;s properties
 	 * Usually used for saving a design by the canvas.
 	 * @usage   
