@@ -28,6 +28,8 @@ import org.lamsfoundation.lams.common.ui.*          //User interface
 import org.lamsfoundation.lams.common.style.*       //Themes/Styles
 import org.lamsfoundation.lams.common.comms.*       //communications
 import org.lamsfoundation.lams.authoring.*
+import org.lamsfoundation.lams.authoring.cv.Canvas;
+import org.lamsfoundation.lams.common.ws.*;
 import org.lamsfoundation.lams.learner.*
 
 class ApplicationParent {
@@ -45,6 +47,7 @@ class ApplicationParent {
     private var _themeManager:ThemeManager;
     private var _dictionary:Dictionary;
     private var _config:Config;
+    private var _workspace:Workspace;
 	
 	//Data flags
     private var _dictionaryLoaded:Boolean;             //Dictionary loaded flag
@@ -61,7 +64,7 @@ class ApplicationParent {
 	// constructor
 	public function ApplicationParent(app:Object) {
 		_instance = ApplicationParent(app);
-		
+
 		_themeLoaded = false;
         _themeEventDispatched = false;
         _dictionaryLoaded = false;
@@ -124,6 +127,13 @@ class ApplicationParent {
         return _dictionary;
     }
     
+	 /**
+    * returns the the workspace instance
+    */
+    public function getWorkspace():Workspace{
+        return _workspace;
+    }
+	
 	/**
     * Returns the Application root, use as _root would be used
     * 
