@@ -238,7 +238,23 @@
 				todir="${jboss.deploy}"/>
 		<copy file="${build.lib}/${product}.war"
 				todir="${jboss.deploy}"/>
+		<copy overwrite="yes" todir="${jboss.deploy}/lams-dictionary.jar/org/lamsfoundation/lams/central">
+			<fileset dir="${conf.language.dir}">
+				<include name="**/*.properties"/>
+			</fileset>
+		</copy>
 	</target>
 	
+	<!-- deploy-war : for convenience during development. Should be deployed via the master build -->
+	<target name="deploy-jar" depends="build-jar">
+		<copy file="${build.lib}/${product}.jar"
+				todir="${jboss.deploy}"/>
+		<copy overwrite="yes" todir="${jboss.deploy}/lams-dictionary.jar/org/lamsfoundation/lams/central">
+			<fileset dir="${conf.language.dir}">
+				<include name="**/*.properties"/>
+			</fileset>
+		</copy>
+	</target>
+
 </project>
 
