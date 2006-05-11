@@ -20,10 +20,10 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ************************************************************************
  */
-
+import org.lamsfoundation.lams.common.ApplicationParent;
 import org.lamsfoundation.lams.common.ui.*
 import org.lamsfoundation.lams.common.util.*
-import org.lamsfoundation.lams.authoring.*
+//import org.lamsfoundation.lams.authoring.*
 import org.lamsfoundation.lams.common.style.*
 import org.lamsfoundation.lams.common.dict.*
 import mx.controls.*
@@ -47,7 +47,7 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
     private var env:String;
     private var view_xml:XML; // to illustrate creating a menu with xml
     
-    private var app:Application;
+    private var app:ApplicationParent;
     private var tm:ThemeManager;
 	private var _dictionary:Dictionary;
     
@@ -65,7 +65,7 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
        
 		
         //Get a reference to the application, ThemeManager and Dictionary
-        app = Application.getInstance();
+        app = ApplicationParent.getInstance();
         tm = ThemeManager.getInstance();
 	
 		_dictionary = Dictionary.getInstance();
@@ -162,10 +162,10 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
 		//_global.breakpoint();
         tools_menu = _mb.addMenu(Dictionary.getValue('mnu_tools'));
 		
-        tools_menu.addMenuItem({label:Dictionary.getValue('mnu_lesson_create'), instanceName:"drawTransitionalItem"});
-        tools_menu.addMenuItem({label:Dictionary.getValue('mnu_lesson_disable'), instanceName:"drawOptionalItem"});
+        tools_menu.addMenuItem({label:Dictionary.getValue('mnu_lesson_create'), instanceName:"createLesson"});
+        tools_menu.addMenuItem({label:Dictionary.getValue('mnu_lesson_disable'), instanceName:"disableLesson"});
         tools_menu.addMenuItem({type:"separator"});
-        tools_menu.addMenuItem({label:Dictionary.getValue('mnu_lesson_archive'), instanceName:"prefsItem"});
+        tools_menu.addMenuItem({label:Dictionary.getValue('mnu_lesson_archive'), instanceName:"archiveLesson"});
 		
 		/*=================
             EDIT MENU
@@ -218,13 +218,13 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
                 break;
 			case eventObj.menu.saveItem:
 				Debugger.log('Clicked Flie > Save',Debugger.GEN,'fileMenuClicked','LFMenuBar');
-                app.getCanvas().saveDesign();
+                org.lamsfoundation.lams.authoring.Application(app).getCanvas().saveDesign();
                 break;
 				
 			case eventObj.menu.saveItemAs:
 			//TODO: go through workspace to save design in location
 				Debugger.log('Clicked Flie > Save As',Debugger.GEN,'fileMenuClicked','LFMenuBar');
-                app.getCanvas().saveDesignToServerAs();
+                org.lamsfoundation.lams.authoring.Application(app).getCanvas().saveDesignToServerAs();
                 break;
 				
 		
@@ -239,19 +239,19 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
         switch (eventObj.menuItem) {
             case eventObj.menu.undoItem : 
                 trace('new selected');
-				 app.getCanvas().undo();
+				org.lamsfoundation.lams.authoring.Application(app).getCanvas().undo();
                 break;
             case eventObj.menu.redoItem :
-                app.getCanvas().redo();
+               org.lamsfoundation.lams.authoring.Application(app).getCanvas().redo();
                 break;
 			 case eventObj.menu.cutItem :
-                app.cut();
+                org.lamsfoundation.lams.authoring.Application(app).cut();
                 break;
 			 case eventObj.menu.copyItem :
-                app.copy();
+                org.lamsfoundation.lams.authoring.Application(app).copy();
                 break;
 			 case eventObj.menu.pasteItem :
-                app.paste();
+                org.lamsfoundation.lams.authoring.Application(app).paste();
                 break;
 			
 		
@@ -264,12 +264,15 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
     private function toolsMenuClicked(eventObj:Object):Void{
         //Which item was clicked ?
         switch (eventObj.menuItem) {
+			case eventObj.menu.createLesson :
+				org.lamsfoundation.lams.monitoring.Application(app).getMonitor().openDesignBySelection();
+				break;
             case eventObj.menu.prefsItem : 
-                app.showPrefsDialog();
+                org.lamsfoundation.lams.authoring.Application(app).showPrefsDialog();
                 break;
 				
 			case eventObj.menu.drawTransitionalItem :
-				app.getCanvas().toggleTransitionTool();
+				org.lamsfoundation.lams.authoring.Application(app).getCanvas().toggleTransitionTool();
 				break;
         }        
     }    
