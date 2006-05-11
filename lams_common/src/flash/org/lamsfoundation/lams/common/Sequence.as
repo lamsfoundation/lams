@@ -217,8 +217,13 @@ class Sequence {
 	}
 	
 	public function getStartDateTime():String{
-		var mytest:String = (_seqStartDate.getDate()+" "+(StringUtils.getMonthAsString(_seqStartDate.getMonth()+1))+" "+_seqStartDate.getFullYear());;
-		return mytest;
+		var dateFormated:String
+		if (_seqStartDate.getDate() == undefined || _seqStartDate.getDate() == null){
+			dateFormated = "Not Started"
+		}else{
+			var dateFormated:String = (_seqStartDate.getDate()+" "+(StringUtils.getMonthAsString(_seqStartDate.getMonth()+1))+" "+_seqStartDate.getFullYear());;
+		}
+		return dateFormated;
 		//return _seqStartDate;
 	}
 	
