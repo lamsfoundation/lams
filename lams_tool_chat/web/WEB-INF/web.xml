@@ -124,6 +124,12 @@
 	<load-on-startup>3</load-on-startup>
 </servlet>
 
+<!--  Jabber HTTP Bind -->
+<servlet>
+	<servlet-name>Jabber HTTP Binding Servlet</servlet-name>
+	<servlet-class>org.lamsfoundation.lams.tool.chat.JabberHTTPBind.JHBServlet</servlet-class>
+</servlet>
+
   <servlet-mapping>
 	<servlet-name>action</servlet-name>
     <url-pattern>*.do</url-pattern>
@@ -138,6 +144,12 @@
 <servlet-mapping>
 	<servlet-name>download</servlet-name>
 	<url-pattern>/download/*</url-pattern>
+</servlet-mapping>
+
+<!--  Jabber HTTP Bind -->
+<servlet-mapping>
+	<servlet-name>Jabber HTTP Binding Servlet</servlet-name>
+	<url-pattern>/JHB/</url-pattern>
 </servlet-mapping>
 
    <session-config>

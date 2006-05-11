@@ -259,6 +259,7 @@
     	</web-resource-collection>
     	<auth-constraint>
     		<role-name>STAFF</role-name>
+    		<role-name>TEACHER</role-name>
     	</auth-constraint>
     </security-constraint>
 
@@ -271,6 +272,7 @@
     	<auth-constraint>
     		<role-name>AUTHOR</role-name>
     		<role-name>STAFF</role-name>
+    		<role-name>TEACHER</role-name>
     		<role-name>ADMIN</role-name>
     		<role-name>SYSADMIN</role-name>
     	</auth-constraint>
