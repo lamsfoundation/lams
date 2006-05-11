@@ -248,7 +248,7 @@ class MonitorModel extends Observable{
 		//go through the design and get the activities and transitions 
 		var indexArray:Array;
 		var dataObj:Object;
-		var ddmActivity_keys:Array = _monitor.ddm.activities.keys();
+		var ddmActivity_keys:Array = _activeSeq.getLearningDesignModel().activities.keys();
 			
 		
 		
@@ -261,14 +261,14 @@ class MonitorModel extends Observable{
 			var keyToCheck:Number = indexArray[i];
 			
 			
-			var ddm_activity:Activity = _monitor.ddm.activities.get(keyToCheck);
+			var ddm_activity:Activity = _activeSeq.getLearningDesignModel().activities.get(keyToCheck);
 			
 			broadcastViewUpdate("DRAW_ACTIVITY",ddm_activity, tabID);
 			//dataObj.activity = ddm_activity;
 		}
 		
 		//now check the transitions:
-		var ddmTransition_keys:Array = _monitor.ddm.transitions.keys();
+		var ddmTransition_keys:Array = _activeSeq.getLearningDesignModel().transitions.keys();
 				
 		//chose which array we are going to loop over
 		var trIndexArray:Array;
@@ -279,7 +279,7 @@ class MonitorModel extends Observable{
 			
 			var transitionKeyToCheck:Number = trIndexArray[i];
 
-			var ddmTransition:Transition = _monitor.ddm.transitions.get(transitionKeyToCheck);
+			var ddmTransition:Transition = _activeSeq.getLearningDesignModel().transitions.get(transitionKeyToCheck);
 			
 			//NOTE!: we are passing in a ref to the tns in the ddm so if we change any props of this, we are changing the ddm
 			broadcastViewUpdate("DRAW_TRANSITION",ddmTransition, tabID);	
