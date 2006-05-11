@@ -39,7 +39,6 @@ class ContributeActivity extends ToolActivity {
 	public static var CONTRIBUTION:Number = 7;
 	
 	private var _childActivities:Array;
-	private var _
 	private var _contributeEntries:Array;
 	private var _contributionType:Number;
 	private var _URL:String;
@@ -83,7 +82,7 @@ class ContributeActivity extends ToolActivity {
 		if(dto.contributeEntries != null){
 			// create entries
 			for(var i=0; i<dto.contributeEntries.length;i++){
-				var ca:ContributeActivitiy = new ContributeActivity();
+				var ca:ContributeActivity = new ContributeActivity();
 				ca.populateFromDTO(dto.contributeEntries[i]);
 				_contributeEntries.push();
 			}
@@ -100,6 +99,29 @@ class ContributeActivity extends ToolActivity {
 	}
 	public function get contributionType():Number{
 		return _contributionType;
+	}
+	
+	public function set contributeEntries(a:Array):Void{
+		_contributeEntries = a;
+	}
+	
+	public function get contributeEntries():Array{
+		return _contributeEntries;
+	}
+	
+	public function set childActivities(a:Array):Void{
+		_childActivities = a;
+	}
+	public function get childActivities():Array{
+		return _childActivities;
+	}
+	
+	public function set URL(a:String):Void{
+		_URL = a;
+	}
+	
+	public function get URL():String{
+		return _URL;
 	}
 	
 	public function set description(a:String):Void{
