@@ -219,12 +219,12 @@ public class LessonDataAccessTestCase extends AbstractCommonTestCase
         //create learner class group
         Set learnergroups = new HashSet();
         //make a copy of lazily initialized users
-        Set users = new HashSet(testOrg.getUsers());
+        learnergroups.add(testUser);
         Group learnerClassGroup = new Group(null,//group id
         									TEST_GROUP_NAME_LEARNER,
                                             testLessonClass.getNextGroupOrderId(),
                                             testLessonClass,
-                                            users,
+                                            learnergroups,
                                             new HashSet());//tool session, should be empty now
 
         learnergroups.add(learnerClassGroup);

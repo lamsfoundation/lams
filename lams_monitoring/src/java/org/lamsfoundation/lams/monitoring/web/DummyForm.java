@@ -30,10 +30,8 @@ import java.util.GregorianCalendar;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
 
 /**
  * See DummyMonitoringAction
@@ -45,7 +43,6 @@ public class DummyForm extends ActionForm {
 	private String title;
 	private String desc;
 	private Long learningDesignId;
-	private Integer organisationId;
 	private Integer startDay;
 	private Integer startMonth;
 	private Integer startYear;
@@ -94,15 +91,6 @@ public class DummyForm extends ActionForm {
 		this.title = title;
 	}
 
-
-	public Integer getOrganisationId() {
-		return organisationId;
-	}
-
-
-	public void setOrganisationId(Integer organisationId) {
-		this.organisationId = organisationId;
-	}
 
 	public Integer getStartDay() {
 		return startDay;

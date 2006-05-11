@@ -199,6 +199,7 @@ public class TestMonitoringService extends AbstractLamsTestCase
         Lesson createdLesson = lessonDao.getLesson(TEST_LESSON_ID);
         
         assertEquals("verify the staff group",staffs.size(),createdLesson.getLessonClass().getStaffGroup().getUsers().size());
+		assertNotNull("verify lesson has organisation",createdLesson.getOrganisation());
         assertEquals("verify the organization",TEST_ORGANIZATION_ID,createdLesson.getOrganisation().getOrganisationId());
         assertEquals("verify number of the learners",1,createdLesson.getAllLearners().size());
         assertEquals("verify the lesson class",Grouping.CLASS_GROUPING_TYPE,createdLesson.getLessonClass().getGroupingTypeId());

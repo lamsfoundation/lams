@@ -12,8 +12,8 @@ INSERT INTO lams_authentication_method_type VALUES(2, 'WEB_AUTH');
 INSERT INTO lams_authentication_method_type VALUES(3, 'LDAP');
 
 INSERT INTO lams_organisation_type VALUES(1, 'ROOT ORGANISATION', 'root all other organisations: controlled by Sysadmin');
-INSERT INTO lams_organisation_type VALUES(2, 'BASE ORGANISATION', 'base organization: represents a real seperate organization sucha s a university ');
-INSERT INTO lams_organisation_type VALUES(3, 'SUB-ORGANISATION', 'sub organization of a base organization');
+INSERT INTO lams_organisation_type VALUES(2, 'COURSE ORGANISATION', 'main organisation level - equivalent to an entire course.');
+INSERT INTO lams_organisation_type VALUES(3, 'CLASS', 'runtime organisation level - lessons are run for classes.');
 
 INSERT INTO lams_grouping_type VALUES (1, 'RANDOM_GROUPING');
 INSERT INTO lams_grouping_type VALUES (2, 'CHOSEN_GROUPING');

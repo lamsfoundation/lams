@@ -71,11 +71,11 @@ import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.usermanagement.Workspace;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dao.IOrganisationDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IUserDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IWorkspaceFolderDAO;
+import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTO;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
@@ -274,8 +274,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
      * <li>2. Go through all the tool activities defined in the learning design,
      * 		  create a runtime copy of all tool's content.</li>
      * 
-     * <P>Tries to copy the design into the user's default runtime sequence folder. If
-     * this is not available, then it is copied into the existing folder.</P>
+     * <P>As a runtime design, it is not copied into any folder.</P>
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#initializeLesson(String, String, long, Integer)
      */
     public Lesson initializeLesson(String lessonName,
@@ -292,15 +291,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         // The duplicated sequence should go in the run sequences folder, so we had better 
         // wourk out what the folder is!
     	User user = (userID != null ? userManagementService.getUserById(userID) : null);
-        Workspace workspace = (user != null ? user.getWorkspace() : null);
-        WorkspaceFolder destinationFolder = ( workspace!=null ? workspace.getDefaultRunSequencesFolder() : null);
-        if ( destinationFolder == null ) {
-        	log.error("initializeLesson: Copying learning design "+learningDesignId+" for userID "+userID
-        			+". Unable to determine runtime sequence folder - copying into folder of the original design");
-        	destinationFolder = originalLearningDesign.getWorkspaceFolder(); 
-        }
-        
-        return initializeLesson(lessonName, lessonDescription, originalLearningDesign, user, LearningDesign.COPY_TYPE_LESSON, destinationFolder);
+        return initializeLesson(lessonName, lessonDescription, originalLearningDesign, user, LearningDesign.COPY_TYPE_LESSON);
         
     }
     
@@ -320,21 +311,21 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         }
     	User user = (userID != null ? userManagementService.getUserById(userID) : null);
 
-        return initializeLesson(lessonName, lessonDescription, originalLearningDesign, user, LearningDesign.COPY_TYPE_PREVIEW, null);
+        return initializeLesson(lessonName, lessonDescription, originalLearningDesign, user, LearningDesign.COPY_TYPE_PREVIEW);
     }
 
     public Lesson initializeLesson(String lessonName,
             String lessonDescription,
             LearningDesign originalLearningDesign,
             User user,
-            int copyType,
-            WorkspaceFolder folder) { 
+            int copyType) { 
     
         //copy the current learning design
         LearningDesign copiedLearningDesign = authoringService.copyLearningDesign(originalLearningDesign,
                                                                                   new Integer(copyType),
                                                                                   user,
-                                                                                  folder, true);
+                                                                                  null,
+                                                                                  true);
         // copy the tool content
         // unfortuanately, we have to reaccess the activities to make sure we get the
         // subclass, not a hibernate proxy.
@@ -1431,21 +1422,6 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 	    return table;
     }
   
-    /* ** Temporary methods to support the dummy monitoring pages */
-    /** Get a map of organisations. Their users shoulc  and their users. */
-    public List getOrganisationsUsers(Integer userId) {
-    	
-    	User user = userManagementService.getUserById(userId);
-    	List orgs = userManagementService.getOrganisationsForUserByRole(user, Role.STAFF);
-    	// Make sure the users are loaded
-    	Iterator iter = orgs.iterator();
-    	while (iter.hasNext()) {
-			Organisation element = (Organisation) iter.next();
-			element.getUsers();
-		}
-    	return orgs;
-    }
-   
     /** Get all the learning designs for this user */
     public List getLearningDesigns(Long userId) {
     	
@@ -1464,7 +1440,6 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
            if ( user == null ) {
            	throw new UserAccessDeniedException("User "+userID+" not found");
            }
-           Organisation organisation = user.getBaseOrganisation();
            
            // create the lesson class - add the teacher as the learner and as staff
            LinkedList<User> learners = new LinkedList<User>();
@@ -1474,7 +1449,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
            staffs.add(user);
            
            return createLessonClassForLesson(lessonID,
-           		organisation,
+           		null,
            		"Learner Group",
    				learners,
    				"Staff Group",

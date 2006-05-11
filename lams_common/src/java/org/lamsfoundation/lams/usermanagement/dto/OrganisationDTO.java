@@ -42,18 +42,22 @@ public class OrganisationDTO {
 	private Integer parentID;
 	private String name;
 	private String description;
+	private Vector<String> roleNames;
 	private Vector<OrganisationDTO> nodes;
+	private Integer organisationTypeId;
 	
 	public OrganisationDTO(){
 		
 	}	
 	public OrganisationDTO(Integer organisationID, Integer parentID, String name,
-			String description) {
+			String description, Integer organisationTypeId) {
 		super();
 		this.organisationID = organisationID;
 		this.parentID = parentID;
 		this.name = name;
 		this.description = description;
+		this.organisationTypeId = organisationTypeId;
+		this.roleNames = new Vector<String>();
 		this.nodes = new Vector<OrganisationDTO>();
 	}
 	public OrganisationDTO(Organisation organisation){
@@ -61,6 +65,8 @@ public class OrganisationDTO {
 		this.parentID = organisation.getParentOrganisation().getOrganisationId();
 		this.name = organisation.getName();
 		this.description = organisation.getDescription();
+		this.organisationTypeId = organisation.getOrganisationType().getOrganisationTypeId();
+		this.roleNames = new Vector<String>();
 		this.nodes = new Vector<OrganisationDTO>();
 	}
 	/**
@@ -89,6 +95,11 @@ public class OrganisationDTO {
 		return parentID!=null?parentID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
 	}
 	
+	/** Get the organisation type id - 1 for root, 2 for course and 3 for class */
+	public Integer getOrganisationTypeId() {
+		return organisationTypeId;
+	}
+
 	public void addNode(OrganisationDTO organisation){
 		nodes.add(organisation);
 	}
@@ -100,10 +111,17 @@ public class OrganisationDTO {
 		}
 	}
 	
-	public Vector getNodes(){
+	public Vector<OrganisationDTO> getNodes(){
 		return nodes;
 	}
 	
+	public Vector<String> getRoleNames() {
+		return roleNames;
+	}
+	public void addRoleName(String roleName) {
+		roleNames.add(roleName);
+	}
+
 	/** Two OrganisationDTOs are equals if both have a valid (not null) organisationID
 	 * and the organisationID's are the same.
 	 */ 
@@ -120,5 +138,5 @@ public class OrganisationDTO {
 	public int hashCode() {
 		return new HashCodeBuilder().append(getOrganisationID()).toHashCode();
 	}
-
+	
 }

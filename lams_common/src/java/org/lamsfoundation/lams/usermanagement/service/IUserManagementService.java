@@ -23,24 +23,27 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.usermanagement.service;
 
-import java.io.IOException;
 import java.util.List;
-import org.lamsfoundation.lams.usermanagement.dao.IUserDAO;
-import org.lamsfoundation.lams.usermanagement.dao.IRoleDAO;
-import org.lamsfoundation.lams.usermanagement.dao.IOrganisationDAO;
-import org.lamsfoundation.lams.usermanagement.dao.IOrganisationTypeDAO;
-import org.lamsfoundation.lams.usermanagement.dao.IUserOrganisationDAO;
-import org.lamsfoundation.lams.usermanagement.dao.IUserOrganisationRoleDAO;
-import org.lamsfoundation.lams.usermanagement.dao.IAuthenticationMethodDAO;
-import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.usermanagement.Role;
+import java.util.Vector;
+
+import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
+import org.lamsfoundation.lams.usermanagement.Role;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
-import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.Workspace;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
+import org.lamsfoundation.lams.usermanagement.dao.IAuthenticationMethodDAO;
+import org.lamsfoundation.lams.usermanagement.dao.IOrganisationDAO;
+import org.lamsfoundation.lams.usermanagement.dao.IOrganisationTypeDAO;
+import org.lamsfoundation.lams.usermanagement.dao.IRoleDAO;
+import org.lamsfoundation.lams.usermanagement.dao.IUserDAO;
+import org.lamsfoundation.lams.usermanagement.dao.IUserOrganisationDAO;
+import org.lamsfoundation.lams.usermanagement.dao.IUserOrganisationRoleDAO;
+import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTO;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 /**
  * User Management Service Interface to handle communication between 
@@ -174,14 +177,19 @@ public interface IUserManagementService {
     public UserOrganisation getUserOrganisation(Integer userId,Integer organisationId);
     
     /**
-     * Retrieves organisations in which the user 
-     * has the specified role 
+     * Retrieves a tree of organisations for a user. The top of the tree is a "dummy" root
+     * organisation, just so that we have a real tree. This makes life easier for Flash.
+     * 
+     * If restrictToRoleNames contains any role names (ie not null and size > 0 )
+     * then it will restrict the organisations to those in which the user has one of the
+     * given roles. If restrictToRoleNames is null/empty then till return all organisations
+     * to which the user belongs. 
      * 
      * @param user the user
-     * @param roleName role's name
-     * @return List of organisations
+     * @param restrictToRoleNames role names to which to restrict the user
+     * @return List of organisationDTOs
      */
-    public List<Organisation> getOrganisationsForUserByRole(User user, String roleName);
+    public OrganisationDTO getOrganisationsForUserByRole(User user, List<String> restrictToRoleNames);
     
 	/**
      * Retrieves child organisations of the parentOrg 
@@ -199,15 +207,6 @@ public interface IUserManagementService {
      */
     public List getUserOrganisationsForUser(User user);
 
-    
-	/**
-     * Retrieves the base organisation
-     * 
-     * @param organisation the organisation
-     * @return Base Organisation of the organisation specified by the
-     * 			parameter
-     */
-    public Organisation getBaseOrganisation(Organisation organisation);
     
 	/**
      * Retrieves roles in which the user 
@@ -362,13 +361,11 @@ public interface IUserManagementService {
 	/**
 	 * This method returns the users in the Organisation with
 	 * given <code> organisationID</code> and <code>roleName</code>
-	 * in WDDX format.
 	 * 
 	 * @param organisationID
 	 * @param roleName
-	 * @return
-	 * @throws IOException
+	 * @return UserDTO objects (in a Vector to suit WDDX)
 	 */
-	public String getUsersFromOrganisationByRole(Integer organisationID, String roleName)throws IOException;	
+	public Vector<UserDTO> getUsersFromOrganisationByRole(Integer organisationID, String roleName);	
 	
 }

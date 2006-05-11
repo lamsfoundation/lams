@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.workspace.web;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Vector;
 
@@ -37,6 +38,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -502,13 +504,20 @@ public class WorkspaceAction extends DispatchAction {
 			  ActionForm form,
 			  HttpServletRequest request,
 			  HttpServletResponse response)throws Exception{
+		
 		Integer userID = new Integer(WebUtil.readIntParam(request,AttributeNames.PARAM_USER_ID));
+		
 		String roles_str = WebUtil.readStrParam(request, "roles");
 		String[] roles = roles_str.split(ROLE_DELIMITER);
+		ArrayList<String> roleList = new ArrayList<String>();
+		for ( String role: roles ) {
+			roleList.add(role);
+		}
+		
 		String wddxPacket = null;
 		try {
 			IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
-			wddxPacket = workspaceManagementService.getOrganisationsByUserRole(userID, roles);		
+			wddxPacket = workspaceManagementService.getOrganisationsByUserRole(userID, roleList);		
 		} catch (Exception e) {
 			log.error("getOrganisationsByUserRole: Exception occured. userID "+userID+" role "+roles.toString(), e);
 			FlashMessage flashMessage = FlashMessage.getExceptionOccured(IWorkspaceManagementService.MSG_KEY_ORG_BY_ROLE, e.getMessage());
@@ -524,15 +533,17 @@ public class WorkspaceAction extends DispatchAction {
 		Integer organisationID = new Integer(WebUtil.readIntParam(request,"organisationID"));
 		String role = WebUtil.readStrParam(request, "role");
 
-		String wddxPacket = null;
+		FlashMessage flashMessage = null; 
 		try {
 			IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
-			wddxPacket = workspaceManagementService.getUsersFromOrganisationByRole(organisationID, role);		
+			Vector<UserDTO> users = workspaceManagementService.getUsersFromOrganisationByRole(organisationID, role);
+			flashMessage = new FlashMessage("getUsersFromOrganisationByRole",users);
+
 		} catch (Exception e) {
 			log.error("getUsersFromOrganisationByRole: Exception occured. organisationID "+organisationID+" role "+role, e);
-			FlashMessage flashMessage = FlashMessage.getExceptionOccured(IWorkspaceManagementService.MSG_KEY_USER_BY_ROLE, e.getMessage());
-			wddxPacket = flashMessage.serializeMessage();
+			flashMessage = FlashMessage.getExceptionOccured(IWorkspaceManagementService.MSG_KEY_USER_BY_ROLE, e.getMessage());
 		}
+		String wddxPacket = flashMessage.serializeMessage();
 		return returnWDDXPacket(wddxPacket, response);
 	}
 

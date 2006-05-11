@@ -1910,19 +1910,6 @@
 <variant type-name-pattern="BIGINT ZEROFILL"/>
 </data-type>
 </column>
-<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="0" mandatory="true" name="base_organisation_id" remarks="">
-<column-description></column-description>
-<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
-<variant type-name-pattern="BIGINT"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
-<variant type-name-pattern="BIGINT UNSIGNED"/>
-<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
-<variant type-name-pattern="BIGINT ZEROFILL"/>
-</data-type>
-</column>
 <column alias="" auto-increment="false" column-size="2" decimal-digits="0" default-value="en" mandatory="true" name="locale_language" remarks="ISO 639-1 Language Code (2 letter version) Java only supports 2 letter properly, not the 3 letter codes.">
 <column-description></column-description>
 <data-type jdbc-type="1" literal-prefix="'" literal-suffix="'" name="CHAR" selected-variant-pattern="CHAR(%n)">
@@ -1993,13 +1980,6 @@
 </foreign-key-figure>
 <foreign-key-column column-name="workspace_id" referenced-key-column-name="workspace_id"/>
 </foreign-key>
-<foreign-key alias="" name="FK_lams_user_3" on-delete="" on-update="" referenced-key="PRIMARY" referenced-table="lams_organisation" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="">
-<foreign-key-description></foreign-key-description>
-<foreign-key-figure>
-<fk-fig-bendpoint-list/>
-</foreign-key-figure>
-<foreign-key-column column-name="base_organisation_id" referenced-key-column-name="organisation_id"/>
-</foreign-key>
 <foreign-key alias="" name="FK_lams_user_4" on-delete="NO ACTION" on-update="NO ACTION" referenced-key="PK_LAMS_CSS_THEME_VE" referenced-table="lams_css_theme_ve" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="">
 <foreign-key-description></foreign-key-description>
 <foreign-key-figure>
@@ -2040,7 +2020,7 @@
 </table>
 <table alias="" name="lams_user_organisation" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="-1" width="-1" x="483" y="112"/>
+<table-figure-bounds height="-1" width="-1" x="561" y="163"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="user_organisation_id" remarks="">
 <column-description></column-description>
@@ -2228,19 +2208,6 @@
 <variant type-name-pattern="BIGINT ZEROFILL"/>
 </data-type>
 </column>
-<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="def_run_seq_fld_id" remarks="">
-<column-description></column-description>
-<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
-<variant type-name-pattern="BIGINT"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
-<variant type-name-pattern="BIGINT UNSIGNED"/>
-<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
-<variant type-name-pattern="BIGINT ZEROFILL"/>
-</data-type>
-</column>
 <column alias="" auto-increment="false" column-size="255" decimal-digits="0" default-value="" mandatory="false" name="name" remarks="">
 <column-description></column-description>
 <data-type jdbc-type="12" literal-prefix="'" literal-suffix="'" name="VARCHAR" selected-variant-pattern="VARCHAR(%n)">
@@ -2261,13 +2228,6 @@
 <fk-fig-bendpoint-list/>
 </foreign-key-figure>
 <foreign-key-column column-name="root_folder_id" referenced-key-column-name="workspace_folder_id"/>
-</foreign-key>
-<foreign-key alias="" name="FK_wkspce_default_run" on-delete="" on-update="" referenced-key="PRIMARY" referenced-table="lams_workspace_folder" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="">
-<foreign-key-description></foreign-key-description>
-<foreign-key-figure>
-<fk-fig-bendpoint-list/>
-</foreign-key-figure>
-<foreign-key-column column-name="def_run_seq_fld_id" referenced-key-column-name="workspace_folder_id"/>
 </foreign-key>
 </foreign-key-list>
 <index-list>
@@ -4657,8 +4617,8 @@ Each style may have a subset of properties, such as "_tf"</table-description>
 <column alias="" auto-increment="false" column-size="11" decimal-digits="0" default-value="" mandatory="true" name="learning_activity_type_id" remarks="">
 <column-description>Unique signature for each version of a tool. &lt;organisation&gt;&lt;tool&gt;&lt;version&gt;</column-description>
 <data-type jdbc-type="4" name="INT" selected-variant-pattern="INT(%n)">
-<variant type-name-pattern="INT"/>
 <variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n)"/>
+<variant type-name-pattern="INT"/>
 <variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n) UNSIGNED"/>
 <variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n) UNSIGNED ZEROFILL"/>
 <variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n) ZEROFILL"/>

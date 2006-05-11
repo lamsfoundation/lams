@@ -67,13 +67,10 @@ public class Organisation implements Serializable {
     private Set childOrganisations;
     
     /** persistent field */
-    private Set users;
-
-    /** persistent field */
     private Set lessons;
     
     /** full constructor */
-    public Organisation(String name, String description, Organisation parentOrganisation, Date createDate, Workspace workspace, OrganisationType organisationType, Set userOrganisations, Set childOrganisations, Set users, Set lessons) {
+    public Organisation(String name, String description, Organisation parentOrganisation, Date createDate, Workspace workspace, OrganisationType organisationType, Set userOrganisations, Set childOrganisations, Set lessons) {
         this.name = name;
         this.description = description;
         this.parentOrganisation = parentOrganisation;
@@ -82,7 +79,6 @@ public class Organisation implements Serializable {
         this.organisationType = organisationType;
         this.userOrganisations = userOrganisations;
         this.childOrganisations = childOrganisations;
-        this.users = users;
         this.lessons = lessons;
     }
 
@@ -91,12 +87,11 @@ public class Organisation implements Serializable {
     }
 
     /** minimal constructor */
-    public Organisation(Date createDate, Workspace workspace, OrganisationType organisationType, Set userOrganisations, Set users, Set lessons) {
+    public Organisation(Date createDate, Workspace workspace, OrganisationType organisationType, Set userOrganisations, Set lessons) {
         this.createDate = createDate;
         this.workspace = workspace;
         this.organisationType = organisationType;
         this.userOrganisations = userOrganisations;
-        this.users = users;
         this.lessons = lessons;
     }
     public Organisation(String name, 
@@ -247,25 +242,6 @@ public class Organisation implements Serializable {
 		this.childOrganisations = childOrganisations;
 	}
 	
-	/** 
-     *            @hibernate.set
-     *             lazy="true"
-     *             inverse="true"
-     *             cascade="none"
-     *            @hibernate.collection-key
-     *             column="base_organisation_id"
-     *            @hibernate.collection-one-to-many
-     *             class="org.lamsfoundation.lams.usermanagement.User"
-     *         
-     */
-    public Set getUsers() {
-        return this.users;
-    }
-
-    public void setUsers(Set users) {
-        this.users = users;
-    }
-
     /** 
      *            @hibernate.set
      *             lazy="true"

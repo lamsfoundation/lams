@@ -117,9 +117,6 @@ public class User implements Serializable {
     private Set userOrganisations;
     
     /** persistent field */
-    private Organisation baseOrganisation;
-    
-    /** persistent field */
     private CSSThemeVisualElement flashTheme;
     
     /** persistent field */
@@ -144,7 +141,7 @@ public class User implements Serializable {
     private Set lessons;
     
     /** full constructor */
-    public User(String login, String password, String title, String firstName, String lastName, String addressLine1, String addressLine2, String addressLine3, String city, String state, String country, String dayPhone, String eveningPhone, String mobilePhone, String fax, String email, Boolean disabledFlag, Date createDate, Workspace workspace, AuthenticationMethod authenticationMethod, CSSThemeVisualElement flashTheme, CSSThemeVisualElement htmlTheme, Set userOrganisations, Organisation baseOrganisation, String chatId, Set learnerProgresses, Set userToolSessions, Set userGroups, Set learningDesigns, Set lessons) {
+    public User(String login, String password, String title, String firstName, String lastName, String addressLine1, String addressLine2, String addressLine3, String city, String state, String country, String dayPhone, String eveningPhone, String mobilePhone, String fax, String email, Boolean disabledFlag, Date createDate, Workspace workspace, AuthenticationMethod authenticationMethod, CSSThemeVisualElement flashTheme, CSSThemeVisualElement htmlTheme, Set userOrganisations, String chatId, Set learnerProgresses, Set userToolSessions, Set userGroups, Set learningDesigns, Set lessons) {
         this.login = login;
         this.password = password;
         this.title = title;
@@ -169,7 +166,6 @@ public class User implements Serializable {
         this.htmlTheme = htmlTheme;
         this.chatId = chatId;
         this.userOrganisations = userOrganisations;
-        this.baseOrganisation = baseOrganisation;
         this.learnerProgresses = learnerProgresses;
         this.userToolSessions = userToolSessions;
         this.userGroups = userGroups;
@@ -182,7 +178,7 @@ public class User implements Serializable {
     }
 
     /** minimal constructor */
-    public User(String login, String password, Boolean disabledFlag, Date createDate, Workspace workspace, AuthenticationMethod authenticationMethod, Set userOrganisations, Organisation baseOrganisation, Set learnerProgresses, Set userToolSessions, Set userGroups, Set learningDesigns, Set lessons) {
+    public User(String login, String password, Boolean disabledFlag, Date createDate, Workspace workspace, AuthenticationMethod authenticationMethod, Set userOrganisations, Set learnerProgresses, Set userToolSessions, Set userGroups, Set learningDesigns, Set lessons) {
         this.login = login;
         this.password = password;
         this.disabledFlag = disabledFlag;
@@ -190,7 +186,6 @@ public class User implements Serializable {
         this.workspace = workspace;
         this.authenticationMethod = authenticationMethod;
         this.userOrganisations = userOrganisations;
-        this.baseOrganisation = baseOrganisation;
         this.learnerProgresses = learnerProgresses;
         this.userToolSessions = userToolSessions;
         this.userGroups = userGroups;
@@ -546,20 +541,6 @@ public class User implements Serializable {
         this.chatId = chatId;
     }
 
-
-    /** 
-     *            @hibernate.many-to-one
-     *             not-null="true"
-     *            @hibernate.column name="base_organisation_id"         
-     *         
-     */
-    public Organisation getBaseOrganisation() {
-        return this.baseOrganisation;
-    }
-
-    public void setBaseOrganisation(Organisation baseOrganisation) {
-        this.baseOrganisation = baseOrganisation;
-    }
 
     /** 
      *            @hibernate.set

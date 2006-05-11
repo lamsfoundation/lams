@@ -113,23 +113,5 @@
         <column name="root_folder_id" />
     </many-to-one>
 
-    <!-- bi-directional many-to-one association to WorkspaceFolder -->
-     <many-to-one
-            name="defaultRunSequencesFolder"
-            class="org.lamsfoundation.lams.usermanagement.WorkspaceFolder"
-	        not-null="true"
-	        lazy="false"
-        >
-        <meta attribute="field-description">
-           @hibernate.many-to-one
-            not-null="true"
-  	        lazy="false"
-           @hibernate.column name="def_run_seq_fld_id"         
-        </meta>
-            <column
-                name="def_run_seq_fld_id" 
-            />
-        </many-to-one>
-
 </class>
 </hibernate-mapping>

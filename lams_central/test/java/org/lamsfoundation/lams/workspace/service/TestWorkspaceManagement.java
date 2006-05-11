@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.workspace.service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -331,7 +332,10 @@ public class TestWorkspaceManagement extends BaseWorkspaceTest {
 	/** Test the getOrganisationsByUserRoleOneTree call for the mmm user, who has all their orgs in one hierarchy */ 
 	public void testGetOrganisationsByUserRoleOneTree() {
 		try {
-			String packet = workspaceManagementService.getOrganisationsByUserRole(MMM_USER_ID,new String[]{"TEACHER","STAFF"});
+			ArrayList<String> list = new ArrayList<String>();
+			list.add("TEACHER");
+			list.add("STAFF");
+			String packet = workspaceManagementService.getOrganisationsByUserRole(MMM_USER_ID,list);
 			System.out.println("getOrganisationsByUserRole: mmm: "+packet);
 			checkContainsOnce(packet, "Macquarie University");
 			checkContainsOnce(packet, "Macquarie E-Learning Centre Of Excellence");
@@ -353,7 +357,10 @@ public class TestWorkspaceManagement extends BaseWorkspaceTest {
 	/** Test the getOrganisationsByUserRoleOneTree call for the test1 user, whose orgs are spread over two hierarchies */ 
 	public void testGetOrganisationsByUserRoleTwoTrees() {
 		try {
-			String packet = workspaceManagementService.getOrganisationsByUserRole(TEST1_USER_ID,new String[]{"TEACHER","STAFF"});
+			ArrayList<String> list = new ArrayList<String>();
+			list.add("TEACHER");
+			list.add("STAFF");
+			String packet = workspaceManagementService.getOrganisationsByUserRole(TEST1_USER_ID,list);
 			System.out.println("getOrganisationsByUserRole: test1: "+packet);
 			checkContainsOnce(packet, "LAMS Project Team");
 			checkContainsOnce(packet, "Computing Courses");

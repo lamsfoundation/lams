@@ -161,15 +161,11 @@ CREATE TABLE lams_workspace_folder (
 CREATE TABLE lams_workspace (
        workspace_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , root_folder_id BIGINT(20)
-     , def_run_seq_fld_id BIGINT(20)
      , name VARCHAR(255)
      , PRIMARY KEY (workspace_id)
      , INDEX (root_folder_id)
      , CONSTRAINT FK_lams_workspace_1 FOREIGN KEY (root_folder_id)
                   REFERENCES lams_workspace_folder (workspace_folder_id) ON DELETE NO ACTION ON UPDATE NO ACTION
-     , INDEX (def_run_seq_fld_id)
-     , CONSTRAINT FK_wkspce_default_run FOREIGN KEY (def_run_seq_fld_id)
-                  REFERENCES lams_workspace_folder (workspace_folder_id)
 )TYPE=InnoDB;
 
 CREATE TABLE lams_organisation (
@@ -250,7 +246,6 @@ CREATE TABLE lams_user (
      , create_date DATETIME NOT NULL
      , authentication_method_id BIGINT(20) NOT NULL DEFAULT 0
      , workspace_id BIGINT(20)
-     , base_organisation_id BIGINT(20) NOT NULL DEFAULT 0
      , locale_language CHAR(2) NOT NULL DEFAULT 'en'
      , locale_country CHAR(2)
      , flash_theme_id BIGINT(20)
@@ -263,9 +258,6 @@ CREATE TABLE lams_user (
      , INDEX (workspace_id)
      , CONSTRAINT FK_lams_user_2 FOREIGN KEY (workspace_id)
                   REFERENCES lams_workspace (workspace_id) ON DELETE NO ACTION ON UPDATE NO ACTION
-     , INDEX (base_organisation_id)
-     , CONSTRAINT FK_lams_user_3 FOREIGN KEY (base_organisation_id)
-                  REFERENCES lams_organisation (organisation_id)
      , INDEX (flash_theme_id)
      , CONSTRAINT FK_lams_user_4 FOREIGN KEY (flash_theme_id)
                   REFERENCES lams_css_theme_ve (theme_ve_id) ON DELETE NO ACTION ON UPDATE NO ACTION

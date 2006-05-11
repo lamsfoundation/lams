@@ -85,7 +85,7 @@ public class DummyMonitoringAction extends LamsDispatchAction
     //---------------------------------------------------------------------
 	private IMonitoringService monitoringService;
     private IUserManagementService usermanageService;
-
+    private Integer everybodyClass = new Integer(3);
     //---------------------------------------------------------------------
     // Class level constants - session attributes
     //---------------------------------------------------------------------
@@ -99,7 +99,6 @@ public class DummyMonitoringAction extends LamsDispatchAction
     private static final String LESSON_PARAMETER = "lesson";
     private static final String LESSONS_PARAMETER = "lessons";
     private static final String ACTIVITIES_PARAMETER = "activities";
-    private static final String ORGS_PARAMETER = "organisations";
     private static final String DESIGNS_PARAMETER = "designs";
     
     
@@ -126,10 +125,6 @@ public class DummyMonitoringAction extends LamsDispatchAction
 
     	List designs = monitoringService.getLearningDesigns(new Long(getUserId().longValue()));
 	    request.getSession().setAttribute(DESIGNS_PARAMETER,designs);
-    	
-    	List organisations = monitoringService.getOrganisationsUsers(getUserId());
-	    request.getSession().setAttribute(ORGS_PARAMETER,organisations);
-	    
     	return mapping.findForward(START_LESSON_FORWARD);
     }
 
@@ -171,12 +166,10 @@ public class DummyMonitoringAction extends LamsDispatchAction
     	if ( ldId == null )
     		throw new IOException("Learning design id must be set");
     	
-        Integer organisationId = dummyForm.getOrganisationId();
-    	if ( organisationId == null )
-    		throw new IOException("Organisation must be set");
-        Organisation organisation = usermanageService.getOrganisationById(organisationId);
+    	// hardcode to use the Playpen:Everybody class
+        Organisation organisation = usermanageService.getOrganisationById(everybodyClass);
     	if ( organisation == null )
-    		throw new IOException("Organisation cannot be found. Id was "+organisationId);
+    		throw new IOException("Organisation cannot be found. Id was "+everybodyClass);
 
     	String title = dummyForm.getTitle();
         if ( title == null ) title = "lesson";
@@ -186,17 +179,14 @@ public class DummyMonitoringAction extends LamsDispatchAction
         // initialize the lesson
         Lesson testLesson = monitoringService.initializeLesson(title,desc,ldId.longValue(),user.getUserId());
 
-        // create the lesson class - add all the users in this organisation to the lesson class
+        // create the lesson class - add all the users in this organisation to the lesson class irrespective of
+        // role. normally would check they are learners but too much hassle for dummy code.
         // add user as staff
-        LinkedList learners = new LinkedList();
-        Iterator iter = organisation.getUsers().iterator();
-        learners.add(user);
-        while (iter.hasNext()) {
-			User element = (User) iter.next();
-			learners.add(element);
-		}
+        LinkedList<User> learners = new LinkedList<User>();
+        List<User> users = usermanageService.getUsersFromOrganisation(everybodyClass);
+        learners.addAll(users);
 
-        LinkedList staffs = new LinkedList();
+        LinkedList<User> staffs = new LinkedList<User>();
         staffs.add(user);
         
         testLesson = monitoringService.createLessonClassForLesson(testLesson.getLessonId().longValue(),

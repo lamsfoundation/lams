@@ -31,7 +31,6 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.HashSet;
 import java.util.SortedSet;
 import java.util.Vector;
 
@@ -53,7 +52,6 @@ import org.lamsfoundation.lams.contentrepository.service.RepositoryProxy;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO;
-import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
@@ -65,7 +63,7 @@ import org.lamsfoundation.lams.usermanagement.dao.IUserDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IUserOrganisationDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IWorkspaceDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IWorkspaceFolderDAO;
-import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTO;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.usermanagement.exception.WorkspaceFolderException;
@@ -457,8 +455,6 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 			else
 				permission = WorkspaceFolder.OWNER_ACCESS;
 		}
-		else if (isParentOrganisationFolder(workspaceFolder,user))
-			permission = WorkspaceFolder.MEMBERSHIP_ACCESS;
 		else if(user.hasMemberAccess(workspaceFolder))
 				permission = WorkspaceFolder.MEMBERSHIP_ACCESS;
 		else
@@ -484,22 +480,6 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		return false;
 		
 	}
-	/**
-	 * This method checks if the given <code>workspaceFolder</code> is the
-	 * workspaceFolder of the parentOrganisation of which the user is a member.
-	 *  
-	 * @param workspaceFolder
-	 * @param user
-	 * @return true/false
-	 */
-	private boolean isParentOrganisationFolder(WorkspaceFolder workspaceFolder, User user){
-		Integer workspaceFolderID = workspaceFolder != null ? workspaceFolder.getWorkspaceFolderId() : null;
-		if ( workspaceFolderID != null ) {
-			WorkspaceFolder parentOrganisationFolder = user.getBaseOrganisation().getWorkspace().getRootFolder();
-			return (parentOrganisationFolder!=null && workspaceFolderID.equals(parentOrganisationFolder.getWorkspaceFolderId()) );
-		}
-		return false;
-	}	
 	
 	private Vector getFolderContentDTO(List designs, Integer permissions,Vector<FolderContentDTO> folderContent){		
 		Iterator iterator = designs.iterator();
@@ -1173,18 +1153,24 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 				Iterator memberships = userMemberships.iterator();
 				while (memberships.hasNext()) {
 					UserOrganisation member = (UserOrganisation) memberships.next();
-					// Get a list of roles that the user has in this organisation
-					Set roles = member.getUserOrganisationRoles();
 					
-					/*Check if the user has write access, which is available
-					 * only if the user has an AUTHOR, TEACHER or STAFF role. If
-					 * he has acess add that folder to the list.
-					 */
-					if (hasWriteAccess(roles)) {
-						WorkspaceFolder orgFolder = member.getOrganisation().getWorkspace().getRootFolder();
-						Integer permission = getPermissions(orgFolder,user);
-						if ( !permission.equals(WorkspaceFolder.NO_ACCESS) ) { 
-							folders.add(new FolderContentDTO(orgFolder,permission));
+					// Only courses have folders - classes don't!
+					Workspace workspace = member.getOrganisation().getWorkspace();
+					
+					if ( workspace != null ) {
+						WorkspaceFolder orgFolder = workspace.getRootFolder();
+						if ( orgFolder != null ) {
+						
+							// Check if the user has write access, which is available
+						    // only if the user has an AUTHOR, TEACHER or STAFF role. If
+							// user has access add that folder to the list. 
+							Set roles = member.getUserOrganisationRoles();
+							if (hasWriteAccess(roles)) {
+								Integer permission = getPermissions(orgFolder,user);
+								if ( !permission.equals(WorkspaceFolder.NO_ACCESS) ) { 
+									folders.add(new FolderContentDTO(orgFolder,permission));
+								}
+							}
 						}
 					}
 				}
@@ -1208,11 +1194,15 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		if (user != null) {
 			//add the user's own folder to the list
 			WorkspaceFolder privateFolder = user.getWorkspace().getRootFolder();
-			Integer permissions = getPermissions(privateFolder,user);
-			return new FolderContentDTO(privateFolder, permissions);
+			if ( privateFolder != null ) {
+				Integer permissions = getPermissions(privateFolder,user);
+				return new FolderContentDTO(privateFolder, permissions);
+			} else {
+				log.warn("getUserWorkspaceFolder: User "+userID+" does not have a root folder. Returning no folders.");
+			}
 			
 		} else {
-			log.warn("getAccessibleWorkspaceFolders: User "+userID+" does not exist. Returning no folders.");
+			log.warn("getUserWorkspaceFolder: User "+userID+" does not exist. Returning no folders.");
 		}
 		
 		return null;
@@ -1400,19 +1390,13 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	/**
 	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#getOrganisationsByUserRole(Integer, String)
 	 */
-	public String getOrganisationsByUserRole(Integer userID, String[] roles) throws IOException
+	public String getOrganisationsByUserRole(Integer userID, List<String> roleNames) throws IOException
 	{
 		User user = userDAO.getUserById(userID);
-		Set<OrganisationDTO> organisations = new HashSet<OrganisationDTO>();
 		
 		if (user!=null) {
-			for(int i=0; i<roles.length; i++) {
-				organisations = OrganisationDTOFactory.convertToDTOs(
-						userMgmtService.getOrganisationsForUserByRole(user, roles[i]), organisations);
-			}
-			
 			flashMessage = new FlashMessage(
-					MSG_KEY_ORG_BY_ROLE, OrganisationDTOFactory.createTree(organisations));
+					MSG_KEY_ORG_BY_ROLE, userMgmtService.getOrganisationsForUserByRole(user, roleNames));
 		} else
 			flashMessage = FlashMessage.getNoSuchUserExists(
 					MSG_KEY_ORG_BY_ROLE, userID);
@@ -1424,7 +1408,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	/** 
 	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#getUsersFromOrganisationByRole(Integer, String)
 	 */
-	public String getUsersFromOrganisationByRole(Integer organisationID, String roleName) throws IOException
+	public Vector<UserDTO> getUsersFromOrganisationByRole(Integer organisationID, String roleName) 
 	{
 		return userMgmtService.getUsersFromOrganisationByRole(organisationID, roleName);
 	}

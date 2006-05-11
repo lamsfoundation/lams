@@ -195,7 +195,6 @@ public class ExcelUserImportFileParser implements IUserImportFileParser{
 				{
 					if(!existingUsersOnly){
 						user.setCreateDate(new Date());
-						user.setBaseOrganisation(service.getBaseOrganisation(org));
 						service.createUser(user);
 					}
 					UserOrganisation userOrg = new UserOrganisation();

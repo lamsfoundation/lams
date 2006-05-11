@@ -1,9 +1,11 @@
 <%@ page contentType="text/html; charset=iso-8859-1" language="java" %>
-<%@ page import="java.util.List" %>
+<%@ page import="java.util.*" %>
 <%@ page import="org.springframework.web.context.support.WebApplicationContextUtils" %>
 <%@ page import="org.springframework.web.context.WebApplicationContext" %>
 <%@ page import="org.lamsfoundation.lams.usermanagement.service.UserManagementService" %>
-<%@ page import="org.lamsfoundation.lams.usermanagement.*" %>
+<%@ page import="org.lamsfoundation.lams.usermanagement.Role" %>
+<%@ page import="org.lamsfoundation.lams.usermanagement.User" %>
+<%@ page import="org.lamsfoundation.lams.usermanagement.dto.OrganisationDTO" %>
 <%@ taglib uri="http://java.sun.com/jstl/core" prefix="c" %>
 <html>
 <head>
@@ -50,85 +52,70 @@
 					</td>
 					<td width="50%" align="right" valign="top">
 						<table border="0" cellpadding="0" cellspacing="3">
-							<%List list = service.getOrganisationsForUserByRole(user,Role.SYSADMIN);
-								if(list.size()>0){%>
+							<!-- If we are a sysadmin for any org, then we are sysadmin for everything -->
+							<% ArrayList roleList = new ArrayList();
+							   roleList.add(Role.SYSADMIN);
+							   OrganisationDTO orgDTO = service.getOrganisationsForUserByRole(user,roleList);
+								if(orgDTO!=null){%>
 								<tr>
-									<td align="left">
-										<input name="sysadmin" type="button" id="sysadmin" onClick="openSysadmin();" value="System Adminstration" style="width:100" />
-									</td>
-									<td align="left">
-										<select name="orgIdForAdmin">
-										<%for(int i=0;i<list.size();i++){
-											Organisation org = (Organisation)list.get(i);%>
-											<option value="<%=org.getOrganisationId()%>"><%=org.getName()%></option>
-										<%}%>
-										</select> 
+									<td align="left" colspan="4">
+										<input name="sysadmin" type="button" id="sysadmin" onClick="openSysadmin(1);" value="System Adminstration"/>
 									</td>
 								</tr>
 							<%}%>
-							<%list = service.getOrganisationsForUserByRole(user,Role.ADMIN);
-								if(list.size()>0){%>
-								<tr>
-									<td align="left">
-										<input name="admin" type="button" id="admin" onClick="openAdmin();" value="Adminstration" style="width:100" />
-									</td>
-									<td align="left">
-										<select name="orgIdForAdmin">
-										<%for(int i=0;i<list.size();i++){
-											Organisation org = (Organisation)list.get(i);%>
-											<option value="<%=org.getOrganisationId()%>"><%=org.getName()%></option>
-										<%}%>
-										</select> 
-									</td>
-								</tr>
-							<%}%>
-							<%list = service.getOrganisationsForUserByRole(user,Role.STAFF);
-								if(list.size()>0){%>
-								<tr>
-									<td align="left">
-										<input name="staff" type="button" id="staff" onClick="openStaff();" value="Staff" style="width:100" />
-									</td>
-									<td align="left">
-										<select name="orgIdForStaff">
-										<%for(int i=0;i<list.size();i++){
-											Organisation org = (Organisation)list.get(i);%>
-											<option value="<%=org.getOrganisationId()%>"><%=org.getName()%></option>
-										<%}%>
-										</select> 
-									</td>
-								</tr>
-							<%}%>
-							<%list = service.getOrganisationsForUserByRole(user,Role.AUTHOR);
-								if(list.size()>0){%>
-								<tr>
-									<td align="left">
-										<input name="author" type="button" id="author" onClick="openAuthor();" value="Author" style="width:100" />
-									</td>
-									<td align="left">
-										<select name="orgIdForAuthor">
-										<%for(int i=0;i<list.size();i++){
-											Organisation org = (Organisation)list.get(i);%>
-											<option value="<%=org.getOrganisationId()%>"><%=org.getName()%></option>
-										<%}%>
-									</select> 
-									</td>
-								</tr>
-							<%}%>
-							<%list = service.getOrganisationsForUserByRole(user,Role.LEARNER);
-							if(list.size()>0){%>
-								<tr>
-									<td align="left">
-										<input name="learner" type="button" id="learner" onClick="openLearner();" value="Learner" style="width:100" />
-									</td>
-									<td align="left">
-										<select name="orgIdForLearner">
-										<%for(int i=0;i<list.size();i++){
-											Organisation org = (Organisation)list.get(i);%>
-											<option value="<%=org.getOrganisationId()%>"><%=org.getName()%></option>
-										<%}%>
-										</select> 
-									</td>
-								</tr>
+							<%orgDTO = service.getOrganisationsForUserByRole(user,null);
+	  						  if(orgDTO!=null){
+	  						  		Vector courses = orgDTO.getNodes();
+	  						  		Iterator courseIter = courses.iterator();
+	  						  		while ( courseIter.hasNext() ) {
+	  						  		
+										OrganisationDTO course = (OrganisationDTO)courseIter.next();%>
+	
+										<tr><td align="left">Course: <%=course.getName()%>:</td>
+										<td align="left" >
+										<% Vector roleNames	= course.getRoleNames();
+											if ( roleNames.contains(Role.AUTHOR) ) {%>
+											    <input name="author" type="button" id="author" onClick="openAuthor(<%=course.getOrganisationID()%>);" value="Author"/> 
+										<% } %> 
+										</td>
+										<td align="left" >
+										<% if ( roleNames.contains(Role.STAFF) || roleNames.contains(Role.TEACHER) ) {%>
+												<input name="staff" type="button" id="staff" onClick="openStaff(<%=course.getOrganisationID()%>);" value="Staff"/>
+	 							    	<% } %> 
+		 							    </td>
+										<td align="left" >
+										<% if ( roleNames.contains(Role.LEARNER) ) {%>
+												<input name="learner" type="button" id="learner" onClick="openLearner(<%=course.getOrganisationID()%>);" value="Learner"/>
+	 								    <% } %> 
+		 							    </td>
+		 							    </tr>
+		 							    
+		 							    <% 
+		 							    Vector classes = course.getNodes();
+		  						  		Iterator classIter = classes.iterator();
+		  						  		while ( classIter.hasNext() ) {
+		  									OrganisationDTO courseClass = (OrganisationDTO)classIter.next(); %>
+		  											  		
+											<tr><td align="left">Class: <%=courseClass.getName()%>:</td>
+											<td align="left" >
+											<% Vector classRoleNames	= courseClass.getRoleNames();
+												if ( classRoleNames.contains(Role.AUTHOR) ) {%>
+												    <input name="author" type="button" id="author" onClick="openAuthor(<%=courseClass.getOrganisationID()%>);" value="Author"/> 
+											<% } %> 
+											</td>
+											<td align="left" >
+											<% if ( classRoleNames.contains(Role.STAFF) || classRoleNames.contains(Role.TEACHER) ) {%>
+													<input name="staff" type="button" id="staff" onClick="openStaff(<%=courseClass.getOrganisationID()%>);" value="Staff"/>
+		 							    	<% } %> 
+			 							    </td>
+											<td align="left" >
+											<% if ( classRoleNames.contains(Role.LEARNER) ) {%>
+													<input name="learner" type="button" id="learner" onClick="openLearner(<%=courseClass.getOrganisationID()%>);" value="Learner"/>
+		 								    <% } %> 
+			 							    </td>
+											</tr>
+		  						  		<% }%>
+		  						  <% } %>
 							<%}%>
 						</table>
 					</td>

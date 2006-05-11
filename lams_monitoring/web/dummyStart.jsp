@@ -47,9 +47,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<P>Authoring does not support the entry of a title or description for a design yet, so all we are able to display is the list
 	of learning design ids.</p>
 	
-	<P>Please select the organisation to which the lesson should be created. The lesson
-	will be started with all the users that are members of that organisation.</P>
-
+	<p>All lessons will be run with the users from the "Playpen:Everybody" class.</p>
+	
 	<html:form action="/dummy" target="_self" method="POST">
 	
 	<table width="100%" border="0" cellspacing="2" cellpadding="2" summary="This table is being used for layout purposes only">
@@ -80,17 +79,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<html:text property="startYear" maxlength="4"  size="5"/>&nbsp;&nbsp;
 			<html:text property="startHour" maxlength="2"  size="3"/>:
 			<html:text property="startMinute" maxlength="2"  size="3"/>			
-		</td></tr>
-
-		<tr><td class="formlabel">Organisation</td>
-		<td class="formcontrol">
-			<select name="organisationId">
-				<c:forEach items="${organisations}" var="org">
-					<option value="<c:out value="${org.organisationId}"/>"><c:out value="${org.name}"/>
-						(<c:forEach items="${org.users}" var="user"  varStatus="status"><c:out value="${user.login}"/><c:if test="${not status.last}">,</c:if></c:forEach>)
-					</option>
-				</c:forEach>
-			</select>
 		</td></tr>
 
 		<tr><td class="formlabel" colspan="2">

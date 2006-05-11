@@ -122,10 +122,10 @@ public class OrganisationAction extends Action {
 	        		org.setParentOrganisation(parentOrg);
 	        		org.setCreateDate(new Date());
 	        		OrganisationType orgType;
-	        		if(parentOrg.getOrganisationType().getName().equals(OrganisationType.ROOT)){
-	        			orgType = service.getOrganisationTypeByName(OrganisationType.BASE);
+	        		if(parentOrg.getOrganisationType().getName().equals(OrganisationType.ROOT_DESCRIPTION)){
+	        			orgType = service.getOrganisationTypeByName(OrganisationType.COURSE_DESCRIPTION);
 	        		}else{
-	        			orgType = service.getOrganisationTypeByName(OrganisationType.SUB);
+	        			orgType = service.getOrganisationTypeByName(OrganisationType.CLASS_DESCRIPTION);
 	        		}
 	        		org.setOrganisationType(orgType);
 	        		service.saveOrUpdateOrganisation(org);

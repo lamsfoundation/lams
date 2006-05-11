@@ -78,7 +78,6 @@ public class TestUserManagementService extends AbstractCommonTestCase {
 		user.setDisabledFlag(new Boolean(false));
 		user.setCreateDate(new Date());
 		user.setAuthenticationMethod(authenticationMethodDAO.getAuthenticationMethodById(new Integer(2)));
-		user.setBaseOrganisation(organisationDAO.getOrganisationById(new Integer(1)));		
 		assertNotNull(userManagementService.saveUser(user, new Integer(3)));		
 	}
 	/**

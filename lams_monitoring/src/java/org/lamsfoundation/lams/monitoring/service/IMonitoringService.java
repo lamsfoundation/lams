@@ -408,6 +408,7 @@ public interface IMonitoringService
 	//---------------------------------------------------------------------
 	/**
 	 * Create the lesson class and the staff class for a preview lesson.
+	 * The lesson is not attached to any organisation.
 	 * 
 	 * @param userID User ID of the teacher running the preview. Mandatory.
 	 * @param lessonID ID of the lesson
@@ -438,7 +439,6 @@ public interface IMonitoringService
 	public abstract int deleteAllOldPreviewLessons();
 
     /* TODO Dummy methods - to be removed */
-    public List getOrganisationsUsers(Integer userId);
     public List getLearningDesigns(Long userId);
 	
 

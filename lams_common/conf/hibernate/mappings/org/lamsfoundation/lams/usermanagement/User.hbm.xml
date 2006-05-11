@@ -357,19 +357,6 @@
         </meta>
         <column name="authentication_method_id" />
     </many-to-one>
-    <!-- bi-directional many-to-one association to Organisation -->
-    <many-to-one
-        name="baseOrganisation"
-        class="org.lamsfoundation.lams.usermanagement.Organisation"
-        not-null="true"
-    >
-        <meta attribute="field-description">
-           @hibernate.many-to-one
-            not-null="true"
-           @hibernate.column name="base_organisation_id"         
-        </meta>
-        <column name="base_organisation_id" />
-    </many-to-one>
     <!-- bi-directional many-to-one association to CSSTheme -->
     <many-to-one
         name="flashTheme"

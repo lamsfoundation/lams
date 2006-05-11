@@ -24,10 +24,12 @@
 package org.lamsfoundation.lams.workspace.service;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Vector;
 
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.usermanagement.exception.WorkspaceFolderException;
@@ -321,15 +323,15 @@ public interface IWorkspaceManagementService {
 	 * @param roles
 	 * @return
 	 */
-	public String getOrganisationsByUserRole(Integer userID, String[] roles) throws IOException;
+	public String getOrganisationsByUserRole(Integer userID, List<String> roleNames) throws IOException;
 	
 	/**
 	 * Returns the users within the Organisation with <code>organisationID</code>
-	 * and <code>role</code> in WDDX format
+	 * and <code>role</code>.
 	 * @param organisationID
 	 * @param role
 	 * @return
 	 */
-	public String getUsersFromOrganisationByRole(Integer organisationID, String role) throws IOException;
+	public Vector<UserDTO> getUsersFromOrganisationByRole(Integer organisationID, String role) throws IOException;
 
 }

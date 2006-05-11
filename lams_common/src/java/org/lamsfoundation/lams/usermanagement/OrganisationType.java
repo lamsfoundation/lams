@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-/* $$Id$$ */
+/* $Id$ */
 package org.lamsfoundation.lams.usermanagement;
 
 import java.io.Serializable;
@@ -36,11 +36,9 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 */
 public class OrganisationType implements Serializable {
 	
-	public static final String ROOT = "ROOT ORGANISATION";
-	
-	public static final String BASE = "BASE ORGANISATION";
-	
-	public static final String SUB = "SUB-ORGANISATION";
+	public static final String ROOT_DESCRIPTION = "ROOT ORGANISATION";
+	public static final String COURSE_DESCRIPTION = "COURSE ORGANISATION";
+	public static final String CLASS_DESCRIPTION = "CLASS ORGANISATION";
 
     /** identifier field */
     private Integer organisationTypeId;

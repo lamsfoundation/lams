@@ -233,7 +233,7 @@ public class HomeAction extends DispatchAction {
 			if ( user == null ) {
 				log.error("admin: User missing from session. ");
 				return mapping.findForward("error");
-			} else if (isUserInRole(user.getUserID(), orgId, Role.STAFF)) {
+			} else if (isUserInRole(user.getUserID(), orgId, Role.STAFF) || isUserInRole(user.getUserID(), orgId, Role.TEACHER)) {
 				log.debug("user is staff");
 
 				String serverUrl = Configuration

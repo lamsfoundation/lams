@@ -22,40 +22,14 @@
  */
 
 /* $Id$ */
-package org.lamsfoundation.lams.workspace.service;
+package org.lamsfoundation.lams.usermanagement.dto;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
 import java.util.Vector;
-
-import org.lamsfoundation.lams.usermanagement.Organisation;
-import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTO;
 
 public class OrganisationDTOFactory {
 
-	/** Convert the given list of organisation objects to organisationDTOs, and put in the organisationDTOs set.
-	 * If organisationDTOs is null, then creates a new set. This allows the call function to build up 
-	 * an overall set of organisations more efficiently.
-	 * 
-	 * Returns the organisationDTOs set. 
-	 * @param organisations
-	 * @param organisationDTOs
-	 */
-	public static Set<OrganisationDTO> convertToDTOs(List<Organisation> organisations, Set<OrganisationDTO> organisationDTOs) {
-		Set<OrganisationDTO> newDTOs = organisationDTOs != null ? organisationDTOs : new HashSet<OrganisationDTO>();
-		Iterator iterator = organisations.iterator();
-		
-		while (iterator.hasNext()) {
-			Organisation organisation = (Organisation) iterator.next();
-			newDTOs.add(organisation.getOrganisationDTO());
-		}
-		
-		return newDTOs;
-
-	}
 	/** Convert the given list of organisation DTOs to a hierarchy of OrganisationDTOs.
 	 * 
 	 * @param orgs	Collection of Organisation DTO's 
@@ -72,7 +46,7 @@ public class OrganisationDTOFactory {
 		while(it.hasNext()){
 			if(rootOrgDTO == null) {
 				/** create dummy root for tree and add first element as child node */
-				OrganisationDTO rt = new OrganisationDTO(new Integer(-1), new Integer(-1), "Root", "Root Description");
+				OrganisationDTO rt = new OrganisationDTO(new Integer(-1), new Integer(-1), "Root", "Root Description", new Integer(1));
 				OrganisationDTO initial = (OrganisationDTO) it.next();
 				rt.addNode(initial);
 				rootOrgDTO = rt;

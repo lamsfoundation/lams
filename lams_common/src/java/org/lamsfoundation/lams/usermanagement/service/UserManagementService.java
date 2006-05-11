@@ -20,10 +20,9 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-/* $$Id$$ */
+/* $Id$ */
 package org.lamsfoundation.lams.usermanagement.service;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -52,14 +51,14 @@ import org.lamsfoundation.lams.usermanagement.dao.IUserOrganisationRoleDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IWorkspaceDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IWorkspaceFolderDAO;
 import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTO;
+import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTOFactory;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.util.wddx.FlashMessage;
 
 /**
  * <p>
  * <a href="UserManagementService.java.html"> <i>View Source </i> </a>
  * </p>
- * 
+ *  
  * Manually caches the user objects (by user id) in the shared cache.
  * Whenever a user object is modified, the cached version must be 
  * removed. 
@@ -93,8 +92,6 @@ public class UserManagementService implements IUserManagementService {
 	protected ILearningDesignDAO learningDesignDAO;
 
 	protected ICacheManager cacheManager;
-
-	private FlashMessage flashMessage;
 
 	private String[] userClassParts = null;
 	
@@ -223,21 +220,6 @@ public class UserManagementService implements IUserManagementService {
 	}
 
 	/**
-	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getBaseOrganisation(org.lamsfoundation.lams.usermanagement.Organisation)
-	 */
-	public Organisation getBaseOrganisation(Organisation organisation) {
-		if (organisation.getOrganisationType().getName().equals(
-				OrganisationType.ROOT)) {
-			return null;
-		} else if (organisation.getOrganisationType().getName().equals(
-				OrganisationType.BASE)) {
-			return organisation;
-		} else {
-			return getBaseOrganisation(organisation.getParentOrganisation());
-		}
-	}
-
-	/**
 	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getRoleByName(java.lang.String)
 	 */
 	public Role getRoleByName(String roleName) {
@@ -306,27 +288,34 @@ public class UserManagementService implements IUserManagementService {
 	}
 
 	/**
-	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getOrganisationsForUserByRole(org.lamsfoundation.lams.usermanagement.User,
-	 *      java.lang.String)
+	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getOrganisationRolesForUser(org.lamsfoundation.lams.usermanagement.User, java.util.List<String>)
 	 */
-	public List<Organisation> getOrganisationsForUserByRole(User user, String roleName) {
-		List<Organisation> list = new ArrayList<Organisation>();
-		Iterator i = userOrganisationDAO.getUserOrganisationsByUser(user)
-				.iterator();
+	public OrganisationDTO getOrganisationsForUserByRole(User user, List<String> restrictToRoleNames) {
+		List<OrganisationDTO> list = new ArrayList<OrganisationDTO>();
+		Iterator i = userOrganisationDAO.getUserOrganisationsByUser(user).iterator();
+		// work out whether or not the restriction applies once only - performance tweak
+		boolean restrictRoles = restrictToRoleNames != null && restrictToRoleNames.size() > 0;  
+		
 		while (i.hasNext()) {
 			UserOrganisation userOrganisation = (UserOrganisation) i.next();
-			Iterator i2 = userOrganisation.getUserOrganisationRoles()
-					.iterator();
+			OrganisationDTO dto = userOrganisation.getOrganisation().getOrganisationDTO();
+			Iterator i2 = userOrganisation.getUserOrganisationRoles().iterator();
+
+			boolean roleFound = false;
 			while (i2.hasNext()) {
-				UserOrganisationRole userOrgansiationRole = (UserOrganisationRole) i2
-						.next();
-				if (userOrgansiationRole.getRole().getName().equals(roleName)) {
-					list.add(userOrgansiationRole.getUserOrganisation()
-							.getOrganisation());
+				
+				UserOrganisationRole userOrganisationRole = (UserOrganisationRole) i2.next();
+				String roleName = userOrganisationRole.getRole().getName();
+				if ( ! restrictRoles || restrictToRoleNames.contains(roleName) ) {
+					dto.addRoleName(roleName);
+					roleFound = true;
 				}
 			}
+			if ( roleFound ) {
+				list.add(dto);
+			}
 		}
-		return list;
+		return OrganisationDTOFactory.createTree(list);
 	}
 
 	/**
@@ -520,7 +509,6 @@ public class UserManagementService implements IUserManagementService {
 	 */
 	private Integer createUserOrganisation(User user, Integer roleID) {
 		UserOrganisation userOrganisation = new UserOrganisation();
-		userOrganisation.setOrganisation(user.getBaseOrganisation());
 		userOrganisation.setUser(user);
 		userOrganisationDAO.saveUserOrganisation(userOrganisation);
 		userOrganisation.addUserOrganisationRole(createUserOrganisationRole(
@@ -559,35 +547,23 @@ public class UserManagementService implements IUserManagementService {
 	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getUsersFromOrganisationByRole(java.lang.Integer,
 	 *      java.lang.String)
 	 */
-	public String getUsersFromOrganisationByRole(Integer organisationID,
-			String roleName) throws IOException {
+	public Vector<UserDTO> getUsersFromOrganisationByRole(Integer organisationID, String roleName) {
+		
 		Vector<UserDTO> users = new Vector<UserDTO>();
-		Organisation organisation = organisationDAO
-				.getOrganisationById(organisationID);
+		Organisation organisation = organisationDAO.getOrganisationById(organisationID);
 		if (organisation != null) {
 			Iterator iterator = organisation.getUserOrganisations().iterator();
 			while (iterator.hasNext()) {
-				UserOrganisation userOrganisation = (UserOrganisation) iterator
-						.next();
-				Iterator userOrganisationRoleIterator = userOrganisation
-						.getUserOrganisationRoles().iterator();
+				UserOrganisation userOrganisation = (UserOrganisation) iterator.next();
+				Iterator userOrganisationRoleIterator = userOrganisation.getUserOrganisationRoles().iterator();
 				while (userOrganisationRoleIterator.hasNext()) {
-					UserOrganisationRole userOrganisationRole = (UserOrganisationRole) userOrganisationRoleIterator
-							.next();
-					if (userOrganisationRole.getRole().getName().equals(
-							roleName))
+					UserOrganisationRole userOrganisationRole = (UserOrganisationRole) userOrganisationRoleIterator.next();
+					if (userOrganisationRole.getRole().getName().equals(roleName))
 						users.add(userOrganisation.getUser().getUserDTO());
 				}
 			}
-			flashMessage = new FlashMessage("getUsersFromOrganisationByRole",
-					users);
-
-		} else
-			flashMessage = new FlashMessage("getUsersFromOrganisationByRole",
-					"No such Organisation with an organisation_id of:"
-							+ organisationID + " exists", FlashMessage.ERROR);
-
-		return flashMessage.serializeMessage();
+		}
+		return users;
 	}
 
 }
