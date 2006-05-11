@@ -85,11 +85,24 @@ class org.lamsfoundation.lams.common.ws.WorkspaceView extends AbstractView {
     */
     public function createWorkspaceDialog(pos:Object){
         var dialog:MovieClip;
+		var m:WorkspaceModel = WorkspaceModel(getModel());
+		var mode:String = m.currentMode
+		trace('mode returned: ' + mode);
+		var classRoot:MovieClip;
+		if(mode == "READONLY"){
+			classRoot = org.lamsfoundation.lams.monitoring.Application.root;
+		} else {
+			classRoot = org.lamsfoundation.lams.authoring.Application.root;
+		}
+		
+		
+		trace('root output: ' + classRoot);
+		
         //Check to see whether this should be a centered or positioned dialog
         if(typeof(pos)=='string'){
-            dialog = PopUpManager.createPopUp(ApplicationParent.root, LFWindow, true,{title:Dictionary.getValue('ws_dlg_title'),closeButton:true,scrollContentPath:'workspaceDialog'});
+            dialog = PopUpManager.createPopUp(classRoot, LFWindow, true,{title:Dictionary.getValue('ws_dlg_title'),closeButton:true,scrollContentPath:'workspaceDialog'});
         } else {
-            dialog = PopUpManager.createPopUp(ApplicationParent.root, LFWindow, true,{title:Dictionary.getValue('ws_dlg_title'),closeButton:true,scrollContentPath:'workspaceDialog',_x:pos.x,_y:pos.y});
+            dialog = PopUpManager.createPopUp(classRoot, LFWindow, true,{title:Dictionary.getValue('ws_dlg_title'),closeButton:true,scrollContentPath:'workspaceDialog',_x:pos.x,_y:pos.y});
         }
 		
 		Debugger.log('_workspaceController:'+_workspaceController,4,'createWorkspaceDialogOpen','WorkspaceView');
