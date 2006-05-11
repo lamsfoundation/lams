@@ -240,6 +240,18 @@ public interface IMonitoringService
     public String getLessonDetails(Long lessonID)throws IOException;
     
     /**
+     * This method returns the data for the given Lesson in
+     * WDDX format
+     * 
+     * @param lessonID The lesson_id of the Lesson for which the details have 
+     * 				   to be fetched
+     * @return String The requested data in wddx format
+     * @throws IOException
+     */
+    public String getLessonData(Long lessonID)throws IOException;
+    
+    
+    /**
      * Returns a list of learners participating in the given Lesson
      * 
      * @param lessonID The lesson_id of the Lesson

@@ -542,6 +542,19 @@ public class MonitoringAction extends LamsDispatchAction
         writer.println(wddxPacket);
         return null;
     }
+    
+    public ActionForward getLessonData(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response)throws IOException{
+    	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+    	Long lessonID = new Long(WebUtil.readLongParam(request,"lessonID"));
+    	String wddxPacket = monitoringService.getLessonData(lessonID);
+        PrintWriter writer = response.getWriter();
+        writer.println(wddxPacket);
+        return null;
+    }
+    
     public ActionForward getLessonLearners(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
