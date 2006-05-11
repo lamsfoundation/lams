@@ -276,6 +276,21 @@ Ant build file.
 			<transaction src="${db.scripts}/insert_users.sql"/>
 			<!-- Create Quartz table --> 
 	    	<transaction src="${db.scripts}/create_quartz_table.sql"/>
+			<!-- Test the scripts for shaun 
+            <transaction src="${db.scripts}/shaun/lams_user_swedish.sql"/>
+            <transaction src="${db.scripts}/shaun/lams_user_french.sql"/>
+            <transaction src="${db.scripts}/shaun/lams_user_bulgarian.sql"/>
+            <transaction src="${db.scripts}/shaun/lams_user_chinese.sql"/>
+            <transaction src="${db.scripts}/shaun/lams_user_german.sql"/>
+            <transaction src="${db.scripts}/shaun/lams_user_norwegian.sql"/>
+            <transaction src="${db.scripts}/shaun/lams_user_portbr.sql"/>
+            <transaction src="${db.scripts}/shaun/lams_user_italian.sql"/>
+            <transaction src="${db.scripts}/shaun/lams_user_polish.sql"/>
+            <transaction src="${db.scripts}/shaun/lams_user_korean.sql"/>
+            <transaction src="${db.scripts}/shaun/lams_user_spanish.sql"/>
+            <transaction src="${db.scripts}/shaun/lams_user_maori.sql"/>
+            <transaction src="${db.scripts}/shaun/lams_user_hungarian.sql"/>
+            -->
 		</sql>
 		
 		<delete dir="${contentrepository.directory}"/>
