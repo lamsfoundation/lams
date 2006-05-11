@@ -29,6 +29,15 @@ import org.lamsfoundation.lams.authoring.ToolActivity;
 */
 class ContributeActivity extends ToolActivity {
 	
+	/* Contribution Types - defined in org.lamsfoundation.lams.learningdesign.ContributionTypes */
+	public static var MODERATION:Number = 1;
+	public static var DEFINE_LATER:Number = 2;
+	public static var PERMISSION_GATE:Number = 3;
+	public static var SYNC_GATE:Number = 4;
+	public static var SCHEDULE_GATE:Number = 5;
+	public static var CHOSEN_GROUPING:Number = 6;
+	public static var CONTRIBUTION:Number = 7;
+	
 	private var _contributionType:Number;
 	private var _description:String;
 	private var _isRequired:Boolean;
