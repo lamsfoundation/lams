@@ -119,11 +119,10 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 					break;
 				case 'TABCHANGE' :
 					if (infoObj.tabID == _tabID){
-						
-					trace("TabID for Selected tab is (TABCHANGE): "+infoObj.tabID)
+						mm.getMonitor().clearCanvas(true);
+						trace("TabID for Selected tab is (TABCHANGE): "+infoObj.tabID)
 						this._visible = true;
-						mm.drawDesign(infoObj.tabID)
-						
+						mm.drawDesign(infoObj.tabID);
 					}else {
 						this._visible = false;
 					}
