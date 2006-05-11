@@ -29,8 +29,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
 <html:html locale="true" xhtml="true">
 
 <head>
@@ -69,8 +67,8 @@ String languageDate = Configuration.getDictionaryDateForLanguage(serverLanguage)
 	  width="100%" 
 	  height="100%" 
 	  swliveconnect=true 
-	  id="authoring" 
-	  name="authoring" 
+	  id="monitoring" 
+	  name="monitoring" 
 	  align=""
 	  type="application/x-shockwave-flash" 
 	  pluginspage="http://www.macromedia.com/go/getflashplayer" />
