@@ -51,6 +51,7 @@ class org.lamsfoundation.lams.monitoring.ls.LessonView extends AbstractView {
 	private var lsns_Active:MovieClip;
 	private var lsns_Archive:MovieClip;
 	private var lsns_Disabled:MovieClip;
+	private var lsViewExist:Boolean 
 	//These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
     public var addEventListener:Function;
@@ -71,6 +72,7 @@ class org.lamsfoundation.lams.monitoring.ls.LessonView extends AbstractView {
 	public function init(m:Observable, c:Controller){
 		//Invoke superconstructor, which sets up MVC relationships.
 		super (m, c);
+		lsViewExist = false;
 		trace('Initiating lesson view...');
 		this.onEnterFrame = createLessons;
 	}
@@ -135,19 +137,24 @@ class org.lamsfoundation.lams.monitoring.ls.LessonView extends AbstractView {
 		
 		//get the hashtable
 		var mySeqs:Hashtable = lbm.getLessonSequences();
-	
-		lessonState_acc.createChild("View", "active", {label: "Active"});
-		lessonState_acc.createChild("View", "disabled", {label: "Disabled"});
-		lessonState_acc.createChild("View", "archive", {label: "Archive"});
-	
-		lsns_Active = lessonState_acc.active.createChild("DataGrid", "Data_dtg");
-		lsns_Active.setSize(lessonState_acc._width, lessonState_acc._height-63);
-		lsns_Archive = lessonState_acc.archive.createChild("DataGrid", "Data_dtg");
-		lsns_Archive.setSize(lessonState_acc._width, lessonState_acc._height-63);
-		lsns_Disabled = lessonState_acc.disabled.createChild("DataGrid", "Data_dtg");
-		lsns_Disabled.setSize(lessonState_acc._width, lessonState_acc._height-63);
-		var lvc = getController();
-		lsns_Active.addEventListener("cellPress",lvc);
+		if (!lsViewExist){
+			lessonState_acc.createChild("View", "active", {label: "Active"});
+			lessonState_acc.createChild("View", "disabled", {label: "Disabled"});
+			lessonState_acc.createChild("View", "archive", {label: "Archive"});
+		
+			lsns_Active = lessonState_acc.active.createChild("DataGrid", "Data_dtg");
+			lsns_Active.setSize(lessonState_acc._width, lessonState_acc._height-63);
+			lsns_Archive = lessonState_acc.archive.createChild("DataGrid", "Data_dtg");
+			lsns_Archive.setSize(lessonState_acc._width, lessonState_acc._height-63);
+			lsns_Disabled = lessonState_acc.disabled.createChild("DataGrid", "Data_dtg");
+			lsns_Disabled.setSize(lessonState_acc._width, lessonState_acc._height-63);
+			var lvc = getController();
+			lsns_Active.addEventListener("cellPress",lvc);
+			lsViewExist = true;
+		}
+		lsns_Active.removeAll(); 
+		lsns_Archive.removeAll();
+		lsns_Disabled.removeAll();
 		//loop through the sequences
 		var keys:Array = mySeqs.keys();
 		trace("Length of Keys: "+keys.length)
