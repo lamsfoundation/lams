@@ -4,6 +4,17 @@
 <html>
 	<head>
 		<lams:css />
+		<STYLE>
+		.buttonStyle{
+			font-size: 12px;
+			color: #000000;
+			text-decoration:none;
+			text-align: center;
+			background-color:#B4C8FE;
+			width: 150px;
+			height: 25px;
+		}
+		</STYLE>
 		<script type="text/javascript">
 			  function closeWindow() {
 	        	window.opener = "authoring"
@@ -15,18 +26,18 @@
 		<table border="0" cellspacing="5" cellpadding="5" width="90%" align="center">
 			<tr>
 				<td align="center">
-					<fmt:message key="authoring.msg.save.success" />
+					<h1><fmt:message key="authoring.msg.save.success" /></h1>
 				</td>
 			</tr>
 			<tr>
 				<td align="center">
 					<!-- Button Row -->
-					<html:link href="javascript:closeWindow();" property="close" styleClass="button">
-						<fmt:message key="label.authoring.close" />
-					</html:link>
-					<html:link href="${param.reEditUrl}" property="reedit" styleClass="button">
+					<html:button onclick="javascript:location.href='${param.reEditUrl}'" property="reedit" styleClass="buttonStyle">
 						<fmt:message key="label.authoring.re.edit" />
-					</html:link>
+					</html:button>
+					<html:button onclick="javascript:closeWindow();" property="close" styleClass="buttonStyle">
+						<fmt:message key="label.authoring.close" />
+					</html:button>
 				</td>
 			</tr>
 		</table>
