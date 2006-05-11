@@ -61,7 +61,7 @@ class User {
 		_firstName = userDTO.firstName;
 		_lastName = userDTO.lastName;
 		_userName = userDTO.login;
-		setRoles(userDTO.roles);
+		//setRoles(userDTO.roles);
 	}
 	
 	public function getUserId():Number{
@@ -88,6 +88,11 @@ class User {
 			var r:String = String(roles[i]);
 			_userRoles.push(r);
 		}
+		return true;
+	}
+	
+	public function addRole(role:String):Boolean{
+		_userRoles.push(role);
 		return true;
 	}
 	
