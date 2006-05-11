@@ -38,8 +38,11 @@ class ContributeActivity extends ToolActivity {
 	public static var CHOSEN_GROUPING:Number = 6;
 	public static var CONTRIBUTION:Number = 7;
 	
+	private var _childActivities:Array;
+	private var _
+	private var _contributeEntries:Array;
 	private var _contributionType:Number;
-	private var _description:String;
+	private var _URL:String;
 	private var _isRequired:Boolean;
 	
 	private static var _instance:ContributeActivity = null;
@@ -48,6 +51,8 @@ class ContributeActivity extends ToolActivity {
 	* Constructor.
 	*/
 	public function ContributeActivity (){
+		_childActivities = new Array();
+		_contributeEntries = new Array();
 	}
 	
 	/**
@@ -63,11 +68,30 @@ class ContributeActivity extends ToolActivity {
 	
 	public function populateFromDTO(dto:Object){
 		_activityID = dto.activityID;
+		_parentActivityID = dto.parentActivityID;
 		_activityTypeID = dto.activityTypeID;
-		_orderID = dto.orderID;
+		
+		if(dto.childActivities != null){
+			// create children
+			for(var i=0; i<dto.childActivities.length;i++){
+				var ca:ContributeActivity = new ContributeActivity();
+				ca.populateFromDTO(dto.childActivities[i]);
+				_childActivities.push();
+			}
+		}
+		
+		if(dto.contributeEntries != null){
+			// create entries
+			for(var i=0; i<dto.contributeEntries.length;i++){
+				var ca:ContributeActivitiy = new ContributeActivity();
+				ca.populateFromDTO(dto.contributeEntries[i]);
+				_contributeEntries.push();
+			}
+		}
 		_title = dto.title;
-		_contributionType = dto.contributionType;
 		_description = dto.description;
+		_URL = dto.URL;
+		_contributionType = dto.contributionType;
 		_isRequired = dto.isRequired;
 	}
 	
