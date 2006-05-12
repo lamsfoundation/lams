@@ -177,7 +177,8 @@ class WorkspaceDialog extends MovieClip{
 
         treeview = location_dnd.getTree();
 		//Fire contentLoaded event, this is required by all dialogs so that creator of LFWindow can know content loaded
-        _container.contentLoaded();
+        
+		_container.contentLoaded();
     }
 	
 	/**
@@ -465,6 +466,8 @@ class WorkspaceDialog extends MovieClip{
 			ok_btn.label = Dictionary.getValue('ws_dlg_open_btn');
 		}else if(wm.currentMode=="SAVE" || wm.currentMode=="SAVEAS"){
 			ok_btn.label = Dictionary.getValue('ws_dlg_save_btn');
+		}else if(wm.currentMode=="READONLY"){
+			ok_btn.label = "Create" //Dictionary.getValue('ws_dlg_create_btn');
 		}else{
 			Debugger.log('Dont know what mode the Workspace is in!',Debugger.CRITICAL,'showTab','org.lamsfoundation.lams.ws.WorkspaceDialog');
 			ok_btn.label = Dictionary.getValue('ws_dlg_ok_btn');
