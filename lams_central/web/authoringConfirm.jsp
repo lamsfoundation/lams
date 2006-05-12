@@ -17,8 +17,12 @@
 		</STYLE>
 		<script type="text/javascript">
 			  function closeWindow() {
-	        	window.opener = "authoring"
-	        	window.close();
+				//just for depress alert window when call window.close()
+	        	//only available for IE browser			  
+				var userAgent=navigator.userAgent;
+	        	if(userAgent.indexOf('MSIE') != -1)
+		        	window.opener = "authoring"
+		    	window.close();
    	          }  				
 		</script>
 	</head>

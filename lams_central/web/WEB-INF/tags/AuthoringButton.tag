@@ -66,7 +66,10 @@
         	if(confirm("<fmt:message key='${cancelConfirmMsgKey}'/>")){
 	        	location.href="<c:url value='${clearSessionActionUrl}?action=cancel&mode=learner'/>";
 	        	//just for depress alert window when call window.close()
-	        	window.opener = "authoring"
+	        	//only available for IE browser
+	        	var userAgent=navigator.userAgent;
+	        	if(userAgent.indexOf('MSIE') != -1)
+		        	window.opener = "authoring"
 	        	window.close();
 			}
         }  				
