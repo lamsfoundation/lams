@@ -13,11 +13,11 @@ values(20,'maori','maori','Dr','Maori','Test','20', 'Maori Ave',null,'Auckland',
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (52, 2, 20);
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (53, 3, 20);
 
--- need a new user_organisation_role_id for each row, use the same role_ids (3,4,6) for author, learner, teacher
+-- need a new user_organisation_role_id for each row, use the same role_ids (3,5,6) for author, learner, teacher
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (127,52,3);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (128,52,4);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (128,52,5);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (129,52,6);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (130,53,4);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (130,53,5);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (131,53,6);
 
 SET FOREIGN_KEY_CHECKS=1;

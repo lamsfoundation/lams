@@ -13,11 +13,11 @@ values(19,'spanish','spanish','Dr','Spanish','Test','19', 'Spanish Ave',null,'Ma
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (50, 2, 19);
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (51, 3, 19);
 
--- need a new user_organisation_role_id for each row, use the same role_ids (3,4,6) for author, learner, teacher
+-- need a new user_organisation_role_id for each row, use the same role_ids (3,5,6) for author, learner, teacher
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (122,50,3);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (123,50,4);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (123,50,5);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (124,50,6);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (125,51,4);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (125,51,5);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (126,51,6);
 
 

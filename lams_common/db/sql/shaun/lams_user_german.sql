@@ -13,11 +13,11 @@ values(13,'german','german','Dr','German','Test','13', 'German Ave',null,'Berlin
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (38, 2, 13);
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (39, 3, 13);
 
--- need a new user_organisation_role_id for each row, use the same role_ids (3,4,6) for author, learner, teacher
+-- need a new user_organisation_role_id for each row, use the same role_ids (3,5,6) for author, learner, teacher
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (92,38,3);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (93,38,4);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (93,38,5);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (94,38,6);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (95,39,4);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (95,39,5);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (96,39,6);
 
 SET FOREIGN_KEY_CHECKS=1;
