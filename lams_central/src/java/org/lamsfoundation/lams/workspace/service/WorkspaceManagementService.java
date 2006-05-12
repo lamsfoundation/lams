@@ -446,20 +446,15 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 
 		if  ( workspaceFolder==null || user==null ) {
 			permission = WorkspaceFolder.NO_ACCESS;
-		} else if (workspaceFolder.getUserID().equals(user.getUserId()))
+		} else if (workspaceFolder.getUserID().equals(user.getUserId())) {
 			permission = WorkspaceFolder.OWNER_ACCESS;
-		else if (isSubFolder(workspaceFolder,userRootFolder))
-		{			
-			if(workspaceFolder.isRunSequencesFolder())
-				permission = WorkspaceFolder.READ_ACCESS;
-			else
-				permission = WorkspaceFolder.OWNER_ACCESS;
-		}
-		else if(user.hasMemberAccess(workspaceFolder))
-				permission = WorkspaceFolder.MEMBERSHIP_ACCESS;
-		else
+		} else if (isSubFolder(workspaceFolder,userRootFolder)) {			
+			permission = WorkspaceFolder.OWNER_ACCESS;
+		} else if(user.hasMemberAccess(workspaceFolder)) {
+			permission = WorkspaceFolder.MEMBERSHIP_ACCESS;
+		} else {
 			permission = WorkspaceFolder.NO_ACCESS;
-		
+		}
 		return permission;
 	}
 	/** This method checks if the given workspaceFolder is a subFolder of the
@@ -1219,15 +1214,14 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	 * 				access or not.
 	 */
 	private boolean hasWriteAccess(Set roles) {
-		boolean access = false;
 		Iterator roleIterator = roles.iterator();
 		while (roleIterator.hasNext()) {
 			UserOrganisationRole userOrganisationRole = (UserOrganisationRole) roleIterator.next();
 			Role role = userOrganisationRole.getRole();
 			if (role.isAuthor() || role.isStaff() || role.isTeacher())
-				access = true;
+				return true;
 		}
-		return access;
+		return false;
 	}	
 	/**
 	 * This method moves a Learning Design from one workspace 

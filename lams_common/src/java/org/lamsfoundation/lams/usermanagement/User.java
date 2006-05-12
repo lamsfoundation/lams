@@ -706,22 +706,51 @@ public class User implements Serializable {
 		return false;		
 	}
 	/** This method checks whether the user has membership access to 
-	 * the given workspaceFolder. Membership access means that the user 
+	 * the given workspaceFolder. Membership access means I am a member of the 
+	 * organisation relating to this folder (either as the root folder or a folder under
+	 * the root folder). 
+	 * 
+	 * Membership access means that the user
 	 * has read and write access but cannot modify anybody else's content/stuff
 	 **/
 	public boolean hasMemberAccess(WorkspaceFolder workspaceFolder){		
+		boolean foundMemberFolder = false;
 		Integer workspaceFolderID = workspaceFolder != null ? workspaceFolder.getWorkspaceFolderId() : null;
 		if ( workspaceFolderID != null ) {
 			Iterator iterator = this.userOrganisations.iterator();
-			while(iterator.hasNext()){
-				UserOrganisation userOrganisation = (UserOrganisation)iterator.next();			
-				Integer folderID = userOrganisation.getOrganisation().getWorkspace().getRootFolder().getWorkspaceFolderId();
-				return ( workspaceFolderID.equals(folderID) );
+			while(iterator.hasNext() && ! foundMemberFolder){
+				UserOrganisation userOrganisation = (UserOrganisation)iterator.next();
+				// not all orgs have a folder
+				Workspace workspace = userOrganisation.getOrganisation().getWorkspace();
+				if ( workspace != null ) {
+					foundMemberFolder = checkFolders(workspace.getRootFolder(),workspaceFolderID); 
+				}
 			}		
 		}
-		return false;
+		return foundMemberFolder;
 	}
 
+	private boolean checkFolders(WorkspaceFolder folder, Integer desiredWorkspaceFolderId) {
+		boolean foundMemberFolder = false;
+		if ( folder != null ) {
+			Integer folderID = folder.getWorkspaceFolderId();
+			if ( folderID.equals(desiredWorkspaceFolderId) ) {
+				foundMemberFolder = true;
+			} else {
+				Set childFolders = folder.getChildWorkspaceFolders();
+				if ( childFolders != null ) {
+					Iterator iter = childFolders.iterator();
+					while (iter.hasNext() && !foundMemberFolder) {
+						WorkspaceFolder child = (WorkspaceFolder) iter.next();
+						foundMemberFolder = checkFolders(child, desiredWorkspaceFolderId);
+					}
+				}
+			}
+			
+		}
+		return foundMemberFolder;
+	}
+	
 	/**
 	 * @hibernate.property column="locale_country" length="2"
 	 * @param localeCountry
