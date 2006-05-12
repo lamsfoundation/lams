@@ -211,6 +211,10 @@
 			      />
 		</action>
 
+		<!-- ========== BEGIN: Common ============================== -->
+		<action path="/clearsession"
+			type="org.lamsfoundation.lams.tool.sbmt.web.ClearSessionAction">
+		</action>
   </action-mappings>
 
    <!-- Define your Struts controller in a file called struts-controller.xml and place it in your merge directory. -->

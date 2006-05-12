@@ -174,7 +174,7 @@
 		</target>
 
 		<target name="compile" depends="clean" description="compile java sources">
-			<javac srcdir="${src.java.dir}" compiler="modern"
+			<javac srcdir="${src.java.dir}" compiler="modern" source="1.5"
 		         	 	destdir="${build.classes.java}" deprecation="on" debug="on">
 				<classpath>					
 					<path refid="project.classpath"/>
@@ -184,7 +184,7 @@
 		</target>
 
 		<target name="compile.test" depends="compile">
-			<javac srcdir="${src.test.dir}" destdir="${build.classes.test}" compiler="modern">
+			<javac srcdir="${src.test.dir}" destdir="${build.classes.test}" source="1.5" compiler="modern">
 				<classpath>
 					<pathelement location="${build.classes.java}"/>
 					<path refid="project.classpath"/>

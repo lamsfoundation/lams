@@ -65,10 +65,10 @@
 <body onLoad="init()">
 
 <html:form action="authoring" method="post"
-	focus="title"  enctype="multipart/form-data">
+	focus="title" styleId="authoringForm" enctype="multipart/form-data">
 		<html:hidden property="toolContentID"/>
 		<html:hidden property="currentTab" styleId="currentTab" />
-		<html:hidden property="dispatch"/>
+		<html:hidden property="dispatch" value="updateContent"/>
 
 <h1><fmt:message key="label.authoring.heading" /></h1>
 
@@ -100,15 +100,14 @@
 
 
 <!-- Button Row -->
-		<p align="right">
-			<html:link href="javascript:doSubmit('updateContent');" property="submit" styleClass="button">
-				<fmt:message key="label.authoring.save.button" />
-			</html:link>
-			<html:link href="javascript:;" property="cancel"
-				onclick="window.close()" styleClass="button">
-				<fmt:message key="label.authoring.cancel.button" />
-			</html:link>
-		</p>
+<%--  Default value 
+		cancelButtonLabelKey="label.authoring.cancel.button"
+		saveButtonLabelKey="label.authoring.save.button"
+		cancelConfirmMsgKey="authoring.msg.cancel.save"
+		accessMode="author"
+	--%>
+	<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="lasbmt11" toolContentID="${toolContentID}" />
+
 </div>
 <lams:HTMLEditor/>
 	

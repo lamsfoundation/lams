@@ -17,3 +17,7 @@
 			      />
 		</action>
 
+		<!-- ========== BEGIN: Common ============================== -->
+		<action path="/clearsession"
+			type="org.lamsfoundation.lams.tool.sbmt.web.ClearSessionAction">
+		</action>

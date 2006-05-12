@@ -44,6 +44,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.DynaActionForm;
 import org.apache.struts.upload.FormFile;
+import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.sbmt.InstructionFiles;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
@@ -151,6 +152,8 @@ public class AuthoringAction extends LamsDispatchAction {
 		} catch (Exception e) {
 			log.error(e);
 		}
+		
+		request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG,Boolean.TRUE);
 		return mapping.findForward("success");
 	}
 	/**
@@ -246,7 +249,7 @@ public class AuthoringAction extends LamsDispatchAction {
 			HttpServletRequest request, HttpServletResponse response) {
 
 		Long contentID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
-		
+		request.getSession().setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID,contentID);
 		//get back the upload file list and display them on page
 		submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this
 				.getServlet().getServletContext());
