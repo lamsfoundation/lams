@@ -140,6 +140,10 @@ public function update (o:Observable,infoObj:Object):Void{
 			case 'STATUS' :
 				trace('STATUS');
                 break;
+			case 'TODOS' :
+				trace('TODOS');
+				populateContributeActivities();
+				break;
 			case 'TABCHANGE' :
 				if (infoObj.tabID == _tabID){
 				trace("TabID for Selected tab is (LessonTab TABCHANGE): "+infoObj.tabID)
@@ -185,6 +189,12 @@ public function update (o:Observable,infoObj:Object):Void{
 		
 		//setStyles();
 		populateLessonDetails();
+		if(mm.getToDos() == null){
+			mm.getMonitor().getContributeActivities(mm.getSequence().getSequenceID());
+		} else {
+			populateContributeActivities();
+		}
+		
 		dispatchEvent({type:'load',target:this});
 	}
 	
@@ -233,6 +243,17 @@ public function update (o:Observable,infoObj:Object):Void{
 		//group_txt.text = s._seqDescription
 		//duration_txt.text = s._seqDescription
 		  
+	}
+	
+	/**
+	* Populate the required tasks for the active Sequence 
+	*/
+	private function populateContributeActivities():Void{
+		// get contribute activities
+		var todos:Array = mm.getToDos();
+		trace('contrib. act length: ' + todos.length);
+		// show isRequired activities in scrollpane
+		
 	}
 	
 	/**
