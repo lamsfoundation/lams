@@ -169,7 +169,7 @@ class Monitor {
 	 */
     private function setLesson(lessonID:Number){
        // refresh Lesson Library
-	   Application.getInstance().getLesson().refresh();
+	   Application.getInstance().getLesson().addNew(lessonID);
 	   
     }
 	
@@ -284,6 +284,14 @@ class Monitor {
 		seq.setLearningDesignModel(_ddm);
 		
 		monitorModel.broadcastViewUpdate('REDRAW_CANVAS', null, monitorModel.getSelectedTab());
+	}
+
+	public function getContributeActivities(seqID:Number):Void{
+		trace('getting all contribute activities for sequence: ' + seqID);
+        var callback:Function = Proxy.create(monitorModel,monitorModel.setToDos);
+           
+		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=getAllContributeActivities&lessonID='+seqID,callback, false);
+		
 	}
 
 	/**
