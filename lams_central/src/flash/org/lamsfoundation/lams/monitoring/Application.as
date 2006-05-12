@@ -462,8 +462,7 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
 		if(SHOW_DEBUGGER){
 			showDebugger();
 		}
-		
-		_monitor.getOrganisations();
+
     }
     
     /**
