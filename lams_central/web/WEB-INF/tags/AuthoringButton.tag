@@ -39,6 +39,8 @@
 <%@ attribute name="toolContentID" required="true" rtexprvalue="true" %>
 <%@ attribute name="clearSessionActionUrl" required="true" rtexprvalue="true" %>
 
+<%-- Optional attribute --%>
+<%@ attribute name="accessMode" required="false" rtexprvalue="true" %>
 <%@ attribute name="cancelButtonLabelKey" required="false" rtexprvalue="true" %>
 <%@ attribute name="saveButtonLabelKey" required="false" rtexprvalue="true" %>
 <%@ attribute name="cancelConfirmMsgKey" required="false" rtexprvalue="true" %>
@@ -53,18 +55,21 @@
 <c:if test="${empty cancelConfirmMsgKey}">
 	<c:set var="cancelConfirmMsgKey" value="authoring.msg.cancel.save" scope="request"/>
 </c:if>
+<c:if test="${empty accessMode}">
+	<c:set var="accessMode" value="author" scope="request"/>
+</c:if>
 
 <!-- begin tab content -->
 <script type="text/javascript">
 	if(<c:choose><c:when test="${LAMS_AUTHORING_SUCCESS_FLAG == true}">true</c:when><c:otherwise>false</c:otherwise></c:choose>){
-        	location.href="<c:url value='${clearSessionActionUrl}?action=confirm&mode=learner&signature=${toolSignature}&toolContentID=${toolContentID}'/>";
+        	location.href="<c:url value='${clearSessionActionUrl}?action=confirm&mode=${accessMode}&signature=${toolSignature}&toolContentID=${toolContentID}'/>";
 		}
         function doSubmit() {
         	document.getElementById("${formID}").submit();
         }
         function doCancel() {
         	if(confirm("<fmt:message key='${cancelConfirmMsgKey}'/>")){
-	        	location.href="<c:url value='${clearSessionActionUrl}?action=cancel&mode=learner'/>";
+	        	location.href="<c:url value='${clearSessionActionUrl}?action=cancel&mode=${accessMode}'/>";
 	        	//just for depress alert window when call window.close()
 	        	//only available for IE browser
 	        	var userAgent=navigator.userAgent;

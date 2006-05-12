@@ -4,17 +4,6 @@
 <html>
 	<head>
 		<lams:css />
-		<STYLE>
-		.buttonStyle{
-			font-size: 12px;
-			color: #000000;
-			text-decoration:none;
-			text-align: center;
-			background-color:#B4C8FE;
-			width: 150px;
-			height: 25px;
-		}
-		</STYLE>
 		<script type="text/javascript">
 			  function closeWindow() {
 				//just for depress alert window when call window.close()
@@ -36,10 +25,10 @@
 			<tr>
 				<td align="center">
 					<!-- Button Row -->
-					<html:button onclick="javascript:location.href='${param.reEditUrl}'" property="reedit" styleClass="buttonStyle">
+					<html:button onclick="javascript:location.href='${param.reEditUrl}'" property="reedit" style="width:150;height:25"  styleClass="buttonStyle">
 						<fmt:message key="label.authoring.re.edit" />
 					</html:button>
-					<html:button onclick="javascript:closeWindow();" property="close" styleClass="buttonStyle">
+					<html:button onclick="javascript:closeWindow();" property="close"  style="width:150;height:25"  styleClass="buttonStyle">
 						<fmt:message key="label.authoring.close" />
 					</html:button>
 				</td>

@@ -235,3 +235,12 @@ a.button:active{
 		border-top-color: #0D3F59;
 		border-right-color: #FFFFFF;
 }
+/* For  <input type="button"> style */
+.buttonStyle{
+	font-size: 12px;
+	color: #000000;
+	text-decoration:none;
+	text-align: center;
+	background-color:#B4C8FE;
+	width: 80px;
+}
