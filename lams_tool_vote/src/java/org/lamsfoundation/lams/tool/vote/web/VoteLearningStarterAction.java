@@ -211,8 +211,8 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
     {
     	VoteUtils.cleanUpSessionAbsolute(request);
     	logger.debug("error: The tool expects voteSession.");
-    	request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
-    	persistError(request,"error.toolSession.notAvailable");
+    	//request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
+    	//persistError(request,"error.toolSession.notAvailable");
 		return (mapping.findForward(ERROR_LIST));
     }
 

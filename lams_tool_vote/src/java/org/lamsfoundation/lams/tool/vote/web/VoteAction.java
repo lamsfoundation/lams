@@ -235,7 +235,12 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 	    AuthoringUtil authoringUtil= new AuthoringUtil();
 	    Map mapOptionsContent=(Map)request.getSession().getAttribute(MAP_OPTIONS_CONTENT);
 	    logger.debug("mapOptionsContent :" +mapOptionsContent);
-	    
+
+	    if (mapOptionsContent == null)
+	        mapOptionsContent= new TreeMap(new VoteComparator());
+
+	    logger.debug("mapOptionsContent :" +mapOptionsContent);
+
         int maxIndex=mapOptionsContent.size();
     	request.getSession().setAttribute(MAX_OPTION_INDEX, new Integer(maxIndex));
     	logger.debug("MAX_OPTION_INDEX: " +  request.getSession().getAttribute(MAX_OPTION_INDEX));
@@ -244,10 +249,6 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     	logger.debug("firstEntry: " +  firstEntry);
     	request.getSession().setAttribute(DEFAULT_OPTION_CONTENT, firstEntry);
 
-	    
-	    if (mapOptionsContent == null)
-	        mapOptionsContent= new TreeMap(new VoteComparator());
-	    logger.debug("mapOptionsContent :" +mapOptionsContent);
 	    
 	    ActionMessages errors= new ActionMessages();
 	    /* full form validation should be performed only in standard authoring mode, but not in monitoring EditActivity */

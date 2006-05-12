@@ -627,9 +627,6 @@ public class MonitoringUtil implements VoteAppConstants{
 				logger.debug("question: " + voteQueContent.getQuestion());
 				mapOptionsContent.put(mapIndex.toString(),voteQueContent.getQuestion());
 				
-				//int votesCount=voteService.getAttemptsForQuestionContent(voteQueContent.getUid());
-				//logger.debug("votesCount for questionContent uid: " + votesCount + " for" + voteQueContent.getUid());
-
 				int votesCount=0;
 				if (sessionLevelCharting == true)
 				{
@@ -687,7 +684,6 @@ public class MonitoringUtil implements VoteAppConstants{
 	    	
 	    	if ((userEntry != null) && (userEntry.length() > 0))
 	    	{
-	    	    //int userEntryRate=voteService.getUserRecordsEntryCount(userEntry);
 	    	    int userEntryRate=0;
 				if (sessionLevelCharting == true)
 				{
