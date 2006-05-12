@@ -99,7 +99,7 @@ class org.lamsfoundation.lams.monitoring.ls.Lesson {
 		
 		var callback:Function = Proxy.create(this,setAllLessons);
 		// do request
-		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=getAllLessons&userID=4', callback);
+		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=getAllLessons&userID=' + _root.userID, callback);
 	
 	}
 	
@@ -132,8 +132,11 @@ class org.lamsfoundation.lams.monitoring.ls.Lesson {
 		
 	}
 	
-	public function refresh():Void{
-		getAllLessons();
+	public function addNew(lessonID:Number):Void{
+		var callback:Function = Proxy.create(lessonModel,lessonModel.addNewSequence);
+		// do request
+		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=getLessonData&lessonID=' + String(lessonID), callback);
+	
 	}
 	
 	//public function populateFromDTO(dto:Object){
