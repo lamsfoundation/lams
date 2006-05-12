@@ -27,6 +27,7 @@ import org.lamsfoundation.lams.common.ui.*
 import org.lamsfoundation.lams.common.style.*
 import org.lamsfoundation.lams.monitoring.mv.*
 import org.lamsfoundation.lams.monitoring.*;
+//import org.lamsfoundation.lams.monitoring.ContributeActivity;
 import org.lamsfoundation.lams.common.dict.*
 import org.lamsfoundation.lams.common.mvc.*
 import mx.controls.*;
@@ -49,7 +50,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	
 	//TabView clips
 	private var _monitorReqTask_mc:MovieClip;
-	private var requiredTask_scp:MovieClip;
+	private var reqTasks_scp:MovieClip;
 	private var monitorTabs_tb:MovieClip;
 	private var _lessonStateArr:Array;
 	//Labels
@@ -179,7 +180,7 @@ public function update (o:Observable,infoObj:Object):Void{
 		
 		this.onEnterFrame = setupLabels;
 		//get the content path for the sp
-		_monitorReqTask_mc = requiredTask_scp.content;
+		_monitorReqTask_mc = reqTasks_scp.content;
 		_monitorController = getController();
 		selectClass_btn.addEventListener("click", _monitorController);
 	
@@ -189,13 +190,90 @@ public function update (o:Observable,infoObj:Object):Void{
 		
 		//setStyles();
 		populateLessonDetails();
-		if(mm.getToDos() == null){
+		
+		trace('seq id: ' + mm.getSequence().getSequenceID());
+		trace('last seq id: ' + mm.getLastSelectedSequence().getSequenceID());
+		if (mm.getSequence().getSequenceID() == mm.getLastSelectedSequence().getSequenceID()){
+			if(mm.getToDos() == null){
+				mm.getMonitor().getContributeActivities(mm.getSequence().getSequenceID());
+			} else {
+				populateContributeActivities();
+			}
+		}else{
 			mm.getMonitor().getContributeActivities(mm.getSequence().getSequenceID());
-		} else {
-			populateContributeActivities();
 		}
 		
 		dispatchEvent({type:'load',target:this});
+	}
+	
+	/**
+	 * Populate the lesson details from HashTable Sequence in MOnitorModel
+	*/
+	private function populateLessonDetails():Void{
+		//var mm:Observable = getModel();
+		var s:Object = mm.getSequence();
+		trace("Item Description (Lesson Tab View) is : "+s._seqDescription);
+		LSTitle_txt.text = s._seqName;
+		LSDescription_txt.text = s._seqDescription;
+		//sessionStatus_txt.text = _lessonStateArr(s._seqStateID);
+		//numLearners_txt.text = s._seqDescription
+		//group_txt.text = s._seqDescription
+		//duration_txt.text = s._seqDescription
+		  
+	}
+	
+	/**
+	* Populate the required tasks for the active Sequence 
+	*/
+	private function populateContributeActivities():Void{
+		var cAct:ContributeActivity = ContributeActivity.getInstance()
+		// get contribute activities
+		var todos:Array = mm.getToDos();
+		trace('contrib. act length: ' + todos.length);
+		// show isRequired activities in scrollpane
+		for (var i=0; i<todos.length; i++){
+			trace("_monitorReqTask_mc.Show Title"+todos[i].title)
+			if (todos[i]._childActivities.length !=0){
+				for (var j=0; j<todos[i]._childActivities.length; j++){
+					trace("Contribute Child Activity "+j+" is: "+todos[i]._childActivities)
+				}
+			}else {
+				
+			}
+			//}
+		}
+		
+		
+	}
+	
+	/**
+    * Opens the lesson manager dialog
+    */
+    public function showLessonManagerDialog(mm:MonitorModel) {
+		trace('doing Lesson Manager popup...');
+		trace('app root: ' + mm.getMonitor().root);
+		trace('lfwindow: ' + LFWindow);
+        var dialog:MovieClip = PopUpManager.createPopUp(mm.getMonitor().root, LFWindow, true,{title:"TEST",closeButton:true,scrollContentPath:'selectClass'});
+		dialog.addEventListener('contentLoaded',Delegate.create(_monitorController,_monitorController.openDialogLoaded));
+		
+    }
+	
+	/**
+	 * 
+	 * @usage   
+	 * @param   newworkspaceDialog 
+	 * @return  
+	 */
+	public function set lessonManagerDialog (newLessonManagerDialog:MovieClip):Void {
+		_lessonManagerDialog = newLessonManagerDialog;
+	}
+	/**
+	 * 
+	 * @usage   
+	 * @return  
+	 */
+	public function get lessonManagerDialog ():MovieClip {
+		return _lessonManagerDialog;
 	}
 	
 	public function setupLabels(){
@@ -230,69 +308,12 @@ public function update (o:Observable,infoObj:Object):Void{
 	}
 	
 	/**
-	 * Populate the lesson details from HashTable Sequence in MOnitorModel
-	*/
-	private function populateLessonDetails():Void{
-		//var mm:Observable = getModel();
-		var s:Object = mm.getSequence();
-		trace("Item Description (Lesson Tab View) is : "+s._seqDescription);
-		LSTitle_txt.text = s._seqName;
-		LSDescription_txt.text = s._seqDescription;
-		//sessionStatus_txt.text = _lessonStateArr(s._seqStateID);
-		//numLearners_txt.text = s._seqDescription
-		//group_txt.text = s._seqDescription
-		//duration_txt.text = s._seqDescription
-		  
-	}
-	
-	/**
-	* Populate the required tasks for the active Sequence 
-	*/
-	private function populateContributeActivities():Void{
-		// get contribute activities
-		var todos:Array = mm.getToDos();
-		trace('contrib. act length: ' + todos.length);
-		// show isRequired activities in scrollpane
-		
-	}
-	
-	/**
-    * Opens the lesson manager dialog
-    */
-    public function showLessonManagerDialog(mm:MonitorModel) {
-		trace('doing Lesson Manager popup...');
-		trace('app root: ' + mm.getMonitor().root);
-		trace('lfwindow: ' + LFWindow);
-        var dialog:MovieClip = PopUpManager.createPopUp(mm.getMonitor().root, LFWindow, true,{title:"TEST",closeButton:true,scrollContentPath:'selectClass'});
-		dialog.addEventListener('contentLoaded',Delegate.create(_monitorController,_monitorController.openDialogLoaded));
-		
-    }
-	
-	/**
-	 * 
-	 * @usage   
-	 * @param   newworkspaceDialog 
-	 * @return  
-	 */
-	public function set lessonManagerDialog (newLessonManagerDialog:MovieClip):Void {
-		_lessonManagerDialog = newLessonManagerDialog;
-	}
-	/**
-	 * 
-	 * @usage   
-	 * @return  
-	 */
-	public function get lessonManagerDialog ():MovieClip {
-		return _lessonManagerDialog;
-	}
-	
-	/**
     * Sets the size of the canvas on stage, called from update
     */
 	private function setSize(mm:MonitorModel):Void{
         var s:Object = mm.getSize();
 		trace("Monitor Tab Widtht: "+s.w+" Monitor Tab Height: "+s.h);
-		requiredTask_scp.setSize(s.w,s.h);
+		//reqTasks_scp.setSize(s.w,s.h);
 		
 				
 	}
