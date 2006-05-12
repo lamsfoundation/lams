@@ -38,7 +38,6 @@ import mx.events.*;
 class Monitor {
 	//Constants
 	public static var USE_PROPERTY_INSPECTOR = true;
-	public var RT_ORG:String = "Organisation";
 
 	private var _className:String = "Monitor";
 
@@ -64,6 +63,8 @@ class Monitor {
     public var removeEventListener:Function;
 	
 	private var _onOKCallBack:Function;
+	
+	
 	
 	/**
 	 * Monitor Constructor Function
@@ -99,6 +100,8 @@ class Monitor {
 		
 		//Register view with model to receive update events
 		monitorModel.addObserver(monitorView);
+		monitorModel.addEventListener('learnersLoad',Proxy.create(this,onUserLoad));
+		monitorModel.addEventListener('staffLoad',Proxy.create(this,onUserLoad));
 		
 		//monitorModel.addObserver(monitorView);
 		//monitorModel.addObserver(monitorView);
@@ -131,6 +134,23 @@ class Monitor {
             //Raise error for unrecognized event
         }
     }
+	
+	/**
+    * Called when Users loaded for role type
+	* @param evt:Object	the event object
+    */
+    private function onUserLoad(evt:Object){
+        if(evt.type=='staffLoad'){
+            monitorModel.staffLoaded = true;
+			Debugger.log('Staff loaded :',Debugger.CRITICAL,'onUserLoad','Monitor');			
+        } else if(evt.type=='learnersLoad'){
+			monitorModel.learnersLoaded = true;
+			Debugger.log('Learners loaded :',Debugger.CRITICAL,'onUserLoad','Monitor');			
+		} else {
+            Debugger.log('event type not recognised :'+evt.type,Debugger.CRITICAL,'onUserLoad','Monitor');
+        }
+    }
+	
 	
 	/**
 	* Opens a design using workspace and user to select design ID
@@ -172,88 +192,10 @@ class Monitor {
 	   Application.getInstance().getLesson().addNew(lessonID);
 	   
     }
+
+	public function requestUsers(role:String, orgID:Number, callback:Function){
+		Application.getInstance().getComms().getRequest('workspace.do?method=getUsersFromOrganisationByRole&organisationID='+orgID+'&role='+role,callback, false);
 	
-	public function getOrganisations():Void{
-		var callback:Function = Proxy.create(this,showOrgTree);
-           
-		Application.getInstance().getComms().getRequest('workspace.do?method=getOrganisationsByUserRole&userID='+_root.userID+'&roles=STAFF,TEACHER',callback, false);
-		
-	}
-	
-	private function showOrgTree(dto:Object):Void{
-		trace('organisations tree returned...');
-		trace('creating root node...');
-		// create root (dummy) node
-		
-		var odto = getDataObject(dto);
-			
-		
-		var rootNode:XMLNode = getMM().treeDP.addTreeNode(odto.name, odto);
-		//rootNode.attributes.isBranch = true;
-		getMM().setOrganisationResource(RT_ORG+'_'+odto.organisationID,rootNode);
-		
-		// create tree xml branches
-		createXMLNodes(rootNode, dto.nodes);
-		
-	}
-
-	private function createXMLNodes(root:XMLNode, nodes:Array) {
-		for(var i=0; i<nodes.length; i++){
-			trace('creating child node...');
-			
-			var odto = getDataObject(nodes[i]);
-			var childNode:XMLNode = root.addTreeNode(odto.name, odto);
-			
-			trace('adding node with org ID: ' + odto.organisationID);
-			
-			if(nodes[i].nodes.length>0){
-				childNode.attributes.isBranch = true;
-				createXMLNodes(childNode, nodes[i].nodes);
-			} else {
-				childNode.attributes.isBranch = false;
-			}
-			
-			getMM().setOrganisationResource(RT_ORG+'_'+odto.organisationID,childNode);
-			
-		}
-		
-	}
-
-	private function getDataObject(dto:Object):Object{
-		var odto= {};
-		odto.organisationID = dto.organisationID;
-		odto.description = dto.description;
-		odto.name = dto.name;
-		odto.parentID = dto.parentID;
-		
-		return odto;
-	}
-
-	public function requestOrgUsersByRole(data:Object, roles:Array){
-		
-		trace('requesting org users by role');
-		var callback:Function = Proxy.create(this,saveUsers);
-		
-		for(var i=0; i<roles.length; i++){
-			_currentUserRole = roles[i];
-			trace('current role is: ' + roles[i]);
-			Application.getInstance().getComms().getRequest('workspace.do?method=getUsersFromOrganisationByRole&organisationID='+data.organisationID+'&role='+roles[i],callback, false);
-		}
-	}
-
-	private function saveUsers(users:Array){
-		trace('retrieving back users for org by role: ' + users.role);
-		
-		//var users = new Array();
-		
-		for(var i=0; i< users.length; i++){
-			var u:Object = users[i];
-			var user:User = new User();
-			user.populateFromDTO(u);
-			user.addRole(_currentUserRole);
-			trace('adding user: ' + user.getFirstName() + ' ' + user.getLastName());
-			//monitorModel.addUser(user);
-		}
 	}
 
 	/**
