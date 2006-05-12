@@ -25,7 +25,7 @@
 import org.lamsfoundation.lams.monitoring.*
 import org.lamsfoundation.lams.monitoring.ls.*       //Lessons
 import org.lamsfoundation.lams.monitoring.mv.* 		 //Monitor
-import org.lamsfoundation.lams.authoring.tb.*       //Toolbar
+//import org.lamsfoundation.lams.authoring.tb.*       //Toolbar
 //import org.lamsfoundation.lams.authoring.cv.*       //Canvas
 import org.lamsfoundation.lams.common.ws.*          //Workspace
 import org.lamsfoundation.lams.common.comms.*       //communications
@@ -52,7 +52,7 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
 	private static var TOOLBAR_X:Number = 0;
     private static var TOOLBAR_Y:Number = 21;
     private static var LESSONS_X:Number = 0;
-    private static var LESSONS_Y:Number = 55;
+    private static var LESSONS_Y:Number = 21;
     
     private static var MONITOR_X:Number = 240;
     private static var MONITOR_Y:Number = 55;
@@ -90,7 +90,7 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
 	private var _dataLoadCheckCount = 0;			
 	
 	//private var _ddm:DesignDataModel;
-    private var _toolbar:Toolbar;
+    //private var _toolbar:Toolbar;
     private var _lessons:Lesson;
     private var _monitor:Monitor;
     private var _workspace:Workspace;
@@ -118,7 +118,7 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
 	private var _DataLoadCheckIntervalID:Number;
 	
     //UI Elements
-    private var _toolbarLoaded:Boolean;                //These are flags set to true when respective element is 'loaded'
+    //private var _toolbarLoaded:Boolean;                //These are flags set to true when respective element is 'loaded'
     private var _monitorLoaded:Boolean;
     private var _lessonsLoaded:Boolean;
     private var _menuLoaded:Boolean;
@@ -139,7 +139,8 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
 		super(this);
         _menuLoaded = false;
         _lessonsLoaded = false;
-		_toolbarLoaded = false;
+		_monitorLoaded = false;
+		//_toolbarLoaded = false;
 		//Mouse.addListener(someListener);
     }
     
@@ -338,9 +339,9 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
 				case 'LFMenuBar' :
                     _menuLoaded = true;
                     break;
-                case 'Toolbar' :
-                    _toolbarLoaded = true;
-                    break;
+                //case 'Toolbar' :
+                //  _toolbarLoaded = true;
+				//	break;
 				case 'Lesson' :
 					_lessonsLoaded = true;
                     break;
@@ -351,7 +352,7 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
             }
             
             //If all of them are loaded set UILoad accordingly
-			if(_menuLoaded && _toolbarLoaded && _lessonsLoaded && _monitorLoaded){
+			if(_menuLoaded && _lessonsLoaded && _monitorLoaded){
                 _UILoaded=true;                
             } 
             //if(_toolkitLoaded && _canvasLoaded && _menuLoaded && _toolbarLoaded){
@@ -430,8 +431,8 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
 
         //TOOLBAR
         var depth:Number = _appRoot_mc.getNextHighestDepth();
-        _toolbar = new Toolbar(_appRoot_mc,TOOLBAR_X,TOOLBAR_Y);
-        _toolbar.addEventListener('load',Proxy.create(this,UIElementLoaded));
+        //_toolbar = new Toolbar(_appRoot_mc,TOOLBAR_X,TOOLBAR_Y);
+        //_toolbar.addEventListener('load',Proxy.create(this,UIElementLoaded));
 		
 		//LESSONS  
 		_lessons = new Lesson(_appRoot_mc,LESSONS_X,LESSONS_Y);
@@ -501,7 +502,7 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
         //_toolkit.setSize(_toolkit.width,h-TOOLKIT_Y);
 
         //Toolbar
-        _toolbar.setSize(null,_toolbar.height);
+        //_toolbar.setSize(null,_toolbar.height);
 		//Property Inspector
 		//var pi = _canvas.getPropertyInspector();
 		//pi._y = h;//- pi._height;
