@@ -22,12 +22,12 @@
  */
 
 import org.lamsfoundation.lams.monitoring.*;
-import org.lamsfoundation.lams.authoring.ToolActivity;
+import org.lamsfoundation.lams.authoring.Activity;
 
 /*
 * Contribute Activity - singleton class representing a contributing activity
 */
-class ContributeActivity extends ToolActivity {
+class ContributeActivity extends Activity {
 	
 	/* Contribution Types - defined in org.lamsfoundation.lams.learningdesign.ContributionTypes */
 	public static var MODERATION:Number = 1;
@@ -50,6 +50,7 @@ class ContributeActivity extends ToolActivity {
 	* Constructor.
 	*/
 	public function ContributeActivity (){
+		super(null);
 		_childActivities = new Array();
 		_contributeEntries = new Array();
 	}
@@ -66,6 +67,7 @@ class ContributeActivity extends ToolActivity {
 	}
 	
 	public function populateFromDTO(dto:Object){
+		trace('populating from dto...');
 		_activityID = dto.activityID;
 		_parentActivityID = dto.parentActivityID;
 		_activityTypeID = dto.activityTypeID;
@@ -75,7 +77,8 @@ class ContributeActivity extends ToolActivity {
 			for(var i=0; i<dto.childActivities.length;i++){
 				var ca:ContributeActivity = new ContributeActivity();
 				ca.populateFromDTO(dto.childActivities[i]);
-				_childActivities.push();
+				_childActivities.push(ca);
+				trace('adding a child');
 			}
 		}
 		
@@ -84,7 +87,8 @@ class ContributeActivity extends ToolActivity {
 			for(var i=0; i<dto.contributeEntries.length;i++){
 				var ca:ContributeActivity = new ContributeActivity();
 				ca.populateFromDTO(dto.contributeEntries[i]);
-				_contributeEntries.push();
+				_contributeEntries.push(ca);
+				trace('adding a entry');
 			}
 		}
 		_title = dto.title;
@@ -124,12 +128,6 @@ class ContributeActivity extends ToolActivity {
 		return _URL;
 	}
 	
-	public function set description(a:String):Void{
-		_description = a;
-	}
-	public function get description():String{
-		return _description;
-	}
 	public function set isRequired(a:Boolean):Void{
 		_isRequired = a;
 	}
