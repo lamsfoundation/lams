@@ -87,6 +87,7 @@ class MonitorModel extends Observable{
 	public function setSequence(activeSeq:Sequence){
 		_activeSeq = activeSeq;
 		_monitor.openLearningDesign(_activeSeq)
+		//_monitor.getContributeActivities(_activeSeq.getSequenceID());
 		setChanged();
 		
 		//send an update
@@ -124,7 +125,7 @@ class MonitorModel extends Observable{
 	}
 	
 	public function setToDos(todos:Array){
-		
+		trace('saving contrib activities...');
 		_todos = new Array();
 		
 		for(var i=0; i< todos.length; i++){
