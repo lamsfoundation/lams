@@ -31,6 +31,7 @@ class Organisation {
 	
 	private var _parentOrg:Number = null;
 	private var _orgId:Number;
+	private var _orgTypeId:Number;
 	private var _orgName:String;
 	private var _orgDesc:String;
 	private var _users:Hashtable;
@@ -47,8 +48,11 @@ class Organisation {
 	/**
 	* Constructor.
 	*/
-	public function Organisation (){
+	public function Organisation (dto:Object){
 		_users = new Hashtable();
+		if(dto != null) { 
+			populateFromDTO(dto);
+		}
 	}
 	
 	/**
@@ -65,6 +69,7 @@ class Organisation {
 	public function populateFromDTO(orgDTO:Object){
 		_parentOrg = orgDTO.parentID;
 		_orgId = orgDTO.organisationID;
+		_orgTypeId = orgDTO.organisationTypeId;
 		_orgName = orgDTO.name;
 		_orgDesc = orgDTO.description;
 	}
