@@ -41,6 +41,10 @@ import org.lamsfoundation.lams.monitoring.mv.tabviews.*
 * @author  DI
 */
 class LessonManagerDialog extends MovieClip implements Dialog{
+	
+	
+	public var RT_ORG:String = "Organisation";
+	
 	//References to components + clips 
     private var _container:MovieClip;  //The container window that holds the dialog
 	
@@ -151,14 +155,16 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 		
 		//get a ref to the controller and kkep it here to listen for events:
 		_monitorController = _monitorView.getController();
-		
+		_monitorModel = MonitorModel(_monitorView.getModel());
 		
 		 //Add event listeners for ok, cancel and close buttons
         ok_btn.addEventListener('click',Delegate.create(this, ok));
         cancel_btn.addEventListener('click',Delegate.create(this, cancel));
 		
+		getOrganisations();
+		
 		//Set up the treeview
-        setUpTreeview();
+        //setUpTreeview();
 		
 		//itemSelected(treeview.selectedNode);
 	}
@@ -330,6 +336,67 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 		//org_dnd.addEventListener("drag_complete", Delegate.create(_lessonManagerController, _lessonManagerController.onDragComplete));
 		
     }
+	
+	private function getOrganisations():Void{
+		var callback:Function = Proxy.create(this,showOrgTree);
+           
+		Application.getInstance().getComms().getRequest('workspace.do?method=getOrganisationsByUserRole&userID='+_root.userID+'&roles=STAFF,TEACHER',callback, false);
+		
+	}
+	
+	private function showOrgTree(dto:Object):Void{
+		trace('organisations tree returned...');
+		trace('creating root node...');
+		// create root (dummy) node
+		
+		var odto = getDataObject(dto);
+			
+		
+		var rootNode:XMLNode = _monitorModel.treeDP.addTreeNode(odto.name, odto);
+		//rootNode.attributes.isBranch = true;
+		_monitorModel.setOrganisationResource(RT_ORG+'_'+odto.organisationID,rootNode);
+		
+		// create tree xml branches
+		createXMLNodes(rootNode, dto.nodes);
+		
+		// set up the tree
+		setUpTreeview();
+		
+	}
+
+	private function createXMLNodes(root:XMLNode, nodes:Array) {
+		for(var i=0; i<nodes.length; i++){
+			trace('creating child node...');
+			
+			var odto = getDataObject(nodes[i]);
+			var childNode:XMLNode = root.addTreeNode(odto.name, odto);
+			
+			trace('adding node with org ID: ' + odto.organisationID);
+			
+			if(nodes[i].nodes.length>0){
+				childNode.attributes.isBranch = true;
+				createXMLNodes(childNode, nodes[i].nodes);
+			} else {
+				childNode.attributes.isBranch = false;
+			}
+			
+			_monitorModel.setOrganisationResource(RT_ORG+'_'+odto.organisationID,childNode);
+			
+		}
+		
+	}
+
+	private function getDataObject(dto:Object):Object{
+		var odto= {};
+		odto.organisationID = dto.organisationID;
+		odto.organisationTypeId = dto.organisationTypeId;
+		odto.description = dto.description;
+		odto.name = dto.name;
+		odto.parentID = dto.parentID;
+		
+		return odto;
+	}
+	
 	
     /**
     * Main resize method, called by scrollpane container/parent
