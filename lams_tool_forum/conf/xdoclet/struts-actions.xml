@@ -294,4 +294,7 @@
 		<action path="/blank" type="org.apache.struts.actions.ForwardAction"
 			parameter="tiles:/blank" />
 							
-				
+		<!-- ========== BEGIN: Common ============================== -->
+		<action path="/clearsession"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.ClearSessionAction">
+		</action>				

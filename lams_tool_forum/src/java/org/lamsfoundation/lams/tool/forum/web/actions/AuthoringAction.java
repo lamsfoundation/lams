@@ -49,6 +49,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.upload.FormFile;
+import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.forum.dto.MessageDTO;
 import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
@@ -323,6 +324,7 @@ public class AuthoringAction extends Action {
 		}
 		
     	String mode = (String) request.getSession().getAttribute(ForumConstants.MODE);
+    	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG,Boolean.TRUE);
     	if(StringUtils.equals(mode,ForumConstants.AUTHOR_MODE))
     		return mapping.findForward("author");
     	else

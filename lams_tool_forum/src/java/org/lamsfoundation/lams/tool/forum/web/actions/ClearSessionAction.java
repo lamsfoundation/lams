@@ -22,14 +22,13 @@
  */
 
 /* $Id$ */
-package org.lamsfoundation.lams.tool.rsrc.web.action;
+package org.lamsfoundation.lams.tool.forum.web.actions;
 
 import javax.servlet.http.HttpSession;
 
 import org.lamsfoundation.lams.authoring.web.LamsAuthoringFinishAction;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
-import org.lamsfoundation.lams.tool.rsrc.ResourceConstants;
-import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
 
 /**
  * This class give a chance to clear HttpSession when user save/close authoring page.
@@ -42,13 +41,12 @@ public class ClearSessionAction extends LamsAuthoringFinishAction {
 	@Override
 	public void clearSession(HttpSession session, ToolAccessMode mode) {
 		if(mode.isAuthor()){
-			session.removeAttribute(AttributeNames.ATTR_MODE);
-			session.removeAttribute(ResourceConstants.ATTR_TOOL_CONTENT_ID);
-			session.removeAttribute(ResourceConstants.ATT_ATTACHMENT_LIST);
-			session.removeAttribute(ResourceConstants.ATTR_DELETED_ATTACHMENT_LIST);
-			session.removeAttribute(ResourceConstants.ATTR_RESOURCE_ITEM_LIST);
-			session.removeAttribute(ResourceConstants.ATTR_DELETED_RESOURCE_ITEM_LIST);
-			session.removeAttribute(ResourceConstants.ATTR_DELETED_RESOURCE_ITEM_ATTACHMENT_LIST);
+			session.removeAttribute(ForumConstants.MODE);
+			session.removeAttribute(ForumConstants.AUTHORING_TOPICS_LIST);
+			session.removeAttribute(ForumConstants.ATTACHMENT_LIST);
+			session.removeAttribute(ForumConstants.DELETED_ATTACHMENT_LIST);
+			session.removeAttribute(ForumConstants.DELETED_ATTACHMENT_LIST);
+			session.removeAttribute(ForumConstants.DELETED_AUTHORING_TOPICS_LIST);
 		}
 	}
 

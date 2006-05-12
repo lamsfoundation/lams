@@ -126,13 +126,3 @@
 		</td>
 	</tr>
 </table>
-<!-- Button Row -->
-<hr/>
-<p align="right">
-	<html:submit property="save" styleClass="button">
-		<fmt:message key="label.authoring.save.button" />
-	</html:submit>
-	<html:button property="cancel" onclick="window.close()" styleClass="button">
-		<fmt:message key="label.authoring.cancel.button" />
-	</html:button>
-</p>

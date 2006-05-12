@@ -63,20 +63,6 @@
 	</tr>
 	<tr>
 		<td colspan="2">
-			<!-- Button Row -->
-			<HR>
-			<p align="right">
-				<html:submit property="save" styleClass="button">
-					<fmt:message key="label.authoring.save.button" />
-				</html:submit>
-				<html:button property="cancel" onclick="window.close()" styleClass="button">
-					<fmt:message key="label.authoring.cancel.button" />
-				</html:button>
-			</p>
-		</td>
-	</tr>
-	<tr>
-		<td colspan="2">
 			<iframe onload="javascript:this.style.height=this.contentWindow.document.body.scrollHeight+'px'" id="messageArea" name="messageArea" style="width:0px;height:0px;border:0px;display:none" frameborder="no" scrolling="no">
 			</iframe>
 		</td>

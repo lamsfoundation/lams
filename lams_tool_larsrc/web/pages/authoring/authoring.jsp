@@ -101,9 +101,10 @@
 
 			<!-- Button Row -->
 			<%--  Default value 
-				<c:set var="cancelButtonLabelKey">label.authoring.cancel.button</c:set>
-				<c:set var="saveButtonLabelKey">label.authoring.save.button</c:set>
-				<c:set var="cancelConfirmMsgKey">authoring.msg.cancel.save</c:set>
+				cancelButtonLabelKey="label.authoring.cancel.button"
+				saveButtonLabelKey="label.authoring.save.button"
+				cancelConfirmMsgKey="authoring.msg.cancel.save"
+				accessMode="author"
 			--%>
 			<c:set var="toolSignature">
 				<fmt:message key="signature" />

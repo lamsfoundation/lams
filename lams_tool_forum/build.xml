@@ -65,7 +65,7 @@
 			
 	<target name="compile-java" description="Compiles the Task" depends="init">
 		<javac srcdir="${src.java.dir}"
-            source="1.4"
+            source="1.5"
             debug="on"
             compiler="modern"
             classpathref="project.classpath"
