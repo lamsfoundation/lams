@@ -97,6 +97,28 @@ class org.lamsfoundation.lams.monitoring.ls.LessonModel extends Observable {
 		return true;
 	}
 	
+	public function addNewSequence(seqDTO:Object):Boolean{
+		// create new Sequence from DTO
+		var seq:Sequence = new Sequence(seqDTO);
+		
+		_lessonSequences.put(seq.getSequenceID(),seq);
+		
+		Application.getInstance().getMonitor().getMM().setSequence(seq);
+		
+		Debugger.log('Added New Sequence to _lessonSequences with ID: ' + seq.getSequenceID(),4,'addNewSequence','LessonModel');
+		
+		
+		setChanged();
+		
+		//notify the view there has been a change
+		infoObj = {};
+		infoObj.updateType = "SEQUENCES_UPDATED";
+
+		notifyObservers(infoObj);
+		
+		return true;
+	}
+	
 	/**
 	 * Gets a learning sequence (lesson) using its ID
 	 * @usage   
