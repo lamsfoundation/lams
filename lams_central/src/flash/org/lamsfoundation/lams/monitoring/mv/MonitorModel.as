@@ -28,6 +28,9 @@ import org.lamsfoundation.lams.authoring.Transition;
 import org.lamsfoundation.lams.common.Sequence;
 import org.lamsfoundation.lams.common.util.Observable;
 import org.lamsfoundation.lams.common.util.*;
+import mx.managers.*
+import mx.utils.*
+import mx.events.*;
 
 /*
 * Model for the Monitoring Tabs 
@@ -51,11 +54,15 @@ class MonitorModel extends Observable{
 	private var selectedTab:Number;
 	private var _dialogOpen:String;		// the type of dialog currently open
 	
+	private var _staffLoaded:Boolean;
+	private var _learnersLoaded:Boolean;
+	
 	private var _monitor:Monitor;
 	
 	// add model data
 	private var _activeSeq:Sequence;
 	private var _lastSelectedSeq:Sequence;
+	
 	private var _org:Organisation;
 	private var _todos:Array;  // Array of ToDo ContributeActivity(s)
 	// state data
@@ -71,6 +78,17 @@ class MonitorModel extends Observable{
 	private var _orgResources:Array;	
 	private var _orgs:Array;
 	private var _selectedTreeNode:XMLNode;
+	
+	private static var USER_LOAD_CHECK_INTERVAL:Number = 50;
+	private static var USER_LOAD_CHECK_TIMEOUT_COUNT:Number = 200;
+	private var _UserLoadCheckIntervalID:Number;         //Interval ID for periodic check on User Load status
+	private var _userLoadCheckCount = 0;				// instance counter for number of times we have checked to see if users are loaded	
+	
+	
+	private var dispatchEvent:Function;       
+    public var addEventListener:Function;  
+    public var removeEventListener:Function;
+	
 	/**
 	* Constructor.
 	*/
@@ -81,19 +99,24 @@ class MonitorModel extends Observable{
 		_transitionsDisplayed = new Hashtable("_transitionsDisplayed");
 
 		_orgResources = new Array();
+		_staffLoaded = false;
+		_learnersLoaded = false;
+		
+		mx.events.EventDispatcher.initialize(this);
 	}
 	
 	// add get/set methods
 	
 	public function setSequence(activeSeq:Sequence){
+		
 		if(_activeSeq == null){ 
 			setLastSelectedSequence(activeSeq);
 		} else {
 			setLastSelectedSequence(_activeSeq);
 		}
+
 		_activeSeq = activeSeq;
 		_monitor.openLearningDesign(_activeSeq)
-		
 		//_monitor.getContributeActivities(_activeSeq.getSequenceID());
 		setChanged();
 		
@@ -107,6 +130,7 @@ class MonitorModel extends Observable{
 	public function getSequence():Sequence{
 		return _activeSeq;
 	}
+	
 	/**
 	* Sets last selected Sequence
 	*/
@@ -120,7 +144,7 @@ class MonitorModel extends Observable{
 	public function getLastSelectedSequence():Sequence{
 		return _lastSelectedSeq;
 	}
-	
+
 	public function setOrganisation(org:Organisation){
 		_org = org;
 		
@@ -128,7 +152,7 @@ class MonitorModel extends Observable{
 		
 		//send an update
 		infoObj = {};
-		infoObj.updateType = "ORG";
+		infoObj.updateType = "ORGANISATION_UPDATED";
 		notifyObservers(infoObj);
 	}
 	
@@ -341,6 +365,83 @@ class MonitorModel extends Observable{
 		
 	}
 	
+	
+	/**
+	* Periodically checks if users have been loaded
+	*/
+	private function checkUsersLoaded() {
+		// first time through set interval for method polling
+		if(!_UserLoadCheckIntervalID) {
+			_UserLoadCheckIntervalID = setInterval(Proxy.create(this, checkUsersLoaded), USER_LOAD_CHECK_INTERVAL);
+		} else {
+			_userLoadCheckCount++;
+			// if dictionary and theme data loaded setup UI
+			if(_staffLoaded && _learnersLoaded) {
+				clearInterval(_UserLoadCheckIntervalID);
+				
+				
+				trace('ALL USERS LOADED -CONTINUE');
+				// populate learner/staff scrollpanes
+				//broadcastViewUpdate("", null, null);
+				
+			} else if(_userLoadCheckCount >= USER_LOAD_CHECK_TIMEOUT_COUNT) {
+				Debugger.log('reached timeout waiting for data to load.',Debugger.CRITICAL,'checkUsersLoaded','MonitorModel');
+				clearInterval(_UserLoadCheckIntervalID);		
+			}
+		}
+	}
+	
+	private function requestLearners(data:Object){
+		
+		trace('requesting learners...');
+		var callback:Function = Proxy.create(this,saveLearners);
+		_monitor.requestUsers(LEARNER_ROLE, data.organisationID, callback);
+	}
+
+	
+	private function requestStaff(data:Object){
+		
+		trace('requesting staff members...');
+		var callback:Function = Proxy.create(this,saveStaff);
+		
+		_monitor.requestUsers(STAFF_ROLE, data.organisationID, callback);
+	}
+	
+	public function saveLearners(users:Array){
+		trace('retrieving back users for org by role: ' + MonitorModel.LEARNER_ROLE);
+		
+		saveUsers(users, LEARNER_ROLE);
+		
+		dispatchEvent({type:'learnersLoad',target:this});
+	}
+	
+	public function saveStaff(users:Array){
+		trace('retrieving back users for org by role: ' + STAFF_ROLE);
+		
+		saveUsers(users, STAFF_ROLE);
+		
+		dispatchEvent({type:'staffLoad',target:this});
+	}
+
+	private function saveUsers(users:Array, role:String):Void{
+		for(var i=0; i< users.length; i++){
+			var u:Object = users[i];
+			
+			var user:User = User(organisation.getUser(u.userID));
+			if(user != null){
+				trace('adding role to existing user: ' + user.getFirstName() + ' ' + user.getLastName());
+				user.addRole(role);
+			} else {
+				user = new User();
+				user.populateFromDTO(u);
+				user.addRole(role);
+				
+				trace('adding user: ' + user.getFirstName() + ' ' + user.getLastName() + ' ' + user.getUserId());
+				organisation.addUser(user);
+			}
+		}
+	}
+	
 	public function setDirty(){
 		_isDirty = true;
 		trace("In setDirty")
@@ -434,6 +535,9 @@ class MonitorModel extends Observable{
 		return _treeDP;
 	}
 
+	public function get organisation():Organisation{
+		return _org;
+	}
 	
 	/**
 	 * 
@@ -446,9 +550,17 @@ class MonitorModel extends Observable{
 		trace('branch: ' + _selectedTreeNode.attributes.isBranch);
 		if(!_selectedTreeNode.attributes.isBranch){
 			// get the organisations (node) users by role
-			var roles:Array = new Array(LEARNER_ROLE, STAFF_ROLE, TEACHER_ROLE);
-			getMonitor().requestOrgUsersByRole(_selectedTreeNode.attributes.data, roles);
+			//var roles:Array = new Array(LEARNER_ROLE, STAFF_ROLE, TEACHER_ROLE);
+			setOrganisation(new Organisation(_selectedTreeNode.attributes.data));
+			
+			// polling method - waiting for all users to load before displaying users in UI
+			checkUsersLoaded();
+			
+			// load users
+			requestLearners(_selectedTreeNode.attributes.data);
+			requestStaff(_selectedTreeNode.attributes.data);
 		}
+		
 		//dispatch an update to the view
 		//broadcastViewUpdate('ITEM_SELECTED',_selectedTreeNode);
 	}
@@ -466,6 +578,22 @@ class MonitorModel extends Observable{
 	
 	public function getSelectedTab():Number{
 		return selectedTab;
+	}
+	
+	public function get learnersLoaded():Boolean{
+		return _learnersLoaded;
+	}
+	
+	public function set learnersLoaded(a:Boolean):Void{
+		_learnersLoaded = a;
+	}
+	
+	public function get staffLoaded():Boolean{
+		return _staffLoaded;
+	}
+	
+	public function set staffLoaded(a:Boolean):Void{
+		_staffLoaded = a;
 	}
 	
 	//Accessors for x + y coordinates
