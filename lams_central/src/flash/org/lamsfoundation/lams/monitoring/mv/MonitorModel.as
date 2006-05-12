@@ -55,6 +55,7 @@ class MonitorModel extends Observable{
 	
 	// add model data
 	private var _activeSeq:Sequence;
+	private var _lastSelectedSeq:Sequence;
 	private var _org:Organisation;
 	private var _todos:Array;  // Array of ToDo ContributeActivity(s)
 	// state data
@@ -85,8 +86,14 @@ class MonitorModel extends Observable{
 	// add get/set methods
 	
 	public function setSequence(activeSeq:Sequence){
+		if(_activeSeq == null){ 
+			setLastSelectedSequence(activeSeq);
+		} else {
+			setLastSelectedSequence(_activeSeq);
+		}
 		_activeSeq = activeSeq;
 		_monitor.openLearningDesign(_activeSeq)
+		
 		//_monitor.getContributeActivities(_activeSeq.getSequenceID());
 		setChanged();
 		
@@ -99,6 +106,19 @@ class MonitorModel extends Observable{
 	
 	public function getSequence():Sequence{
 		return _activeSeq;
+	}
+	/**
+	* Sets last selected Sequence
+	*/
+	public function setLastSelectedSequence(seq:Sequence):Void{
+		_lastSelectedSeq = seq;
+	}
+	
+	/**
+	* Gets last selected Sequence
+	*/
+	public function getLastSelectedSequence():Sequence{
+		return _lastSelectedSeq;
 	}
 	
 	public function setOrganisation(org:Organisation){
