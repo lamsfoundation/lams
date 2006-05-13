@@ -32,6 +32,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
+	                                     
 		           <h2><font size=2> <b> <bean:message key="label.authoring.vote.basic"/> </b></font></h2>
 		        	<table align=center> 	  
 						<tr>   
@@ -43,6 +44,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							<c:if test="${VoteAuthoringForm.exceptionMaxNominationInvalid == 'true'}"> 										
 									<img src="<c:out value="${tool}"/>images/error.jpg" align="left" width=20 height=20>  <font size=2> <bean:message key="error.maxNominationCount.invalid"/> </font> </img>
 							</c:if> 			
+
+							<c:if test="${validationError == 'true'}"> 			
+									<img src="<c:out value="${tool}"/>images/error.jpg" align="left" width=20 height=20>  <font size=2> <bean:message key="error.fields.mandatory"/> </font> </img>
+							</c:if> 			
+							
 						</td>
 						</tr> 
 					</table>
@@ -93,8 +99,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									<td NOWRAP valign=top>
 
 										<lams:SetEditor id="optionContent${optIndex-1}" text="${optionEntry.value}" small="true"/>								
-                                
-	                                	<c:if test="${ (sessionScope.activeModule != 'monitoring') }"> 			
+	                                	<c:if test="${ activeModule != 'monitoring' }"> 			
 			 		 						<html:submit property="removeContent" 
 	                                                     styleClass="linkbutton"  
 	                                                     onclick="removeOption(${optIndex});">
@@ -102,7 +107,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 											</html:submit>
 										</c:if> 			
 										
-	                                	<c:if test="${ (sessionScope.activeModule == 'monitoring') }"> 			
+	                                	<c:if test="${ activeModule == 'monitoring' }"> 			
 			 		 						<html:submit property="removeContent" 
 	                                                     styleClass="linkbutton"  
 	                                                     onclick="removeMonitoringOption(${optIndex});">

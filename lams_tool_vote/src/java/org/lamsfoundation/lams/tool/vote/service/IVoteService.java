@@ -53,17 +53,17 @@ public interface IVoteService
 {
 	public void configureContentRepository() throws VoteApplicationException;    
         
-    public void createVote(VoteContent mcContent) throws VoteApplicationException;
+    public void createVote(VoteContent voteContent) throws VoteApplicationException;
     
     public VoteContent retrieveVote(Long toolContentId) throws VoteApplicationException;
     
-    public void createVoteQue(VoteQueContent mcQueContent) throws VoteApplicationException;
+    public void createVoteQue(VoteQueContent voteQueContent) throws VoteApplicationException;
     
-    public void createVoteSession(VoteSession mcSession) throws VoteApplicationException;
+    public void createVoteSession(VoteSession voteSession) throws VoteApplicationException;
   
-    public void createVoteQueUsr(VoteQueUsr mcQueUsr) throws VoteApplicationException;
+    public void createVoteQueUsr(VoteQueUsr voteQueUsr) throws VoteApplicationException;
     
-    public VoteQueUsr getVoteUserBySession(final Long queUsrId, final Long mcSessionId) throws VoteApplicationException;
+    public VoteQueUsr getVoteUserBySession(final Long queUsrId, final Long voteSessionId) throws VoteApplicationException;
     
  	public VoteQueUsr retrieveVoteQueUsr(Long userId) throws VoteApplicationException;
  	
@@ -73,9 +73,9 @@ public interface IVoteService
  	
  	public int getLastNominationCount(Long userId) throws VoteApplicationException;
     
-    public void createVoteUsrAttempt(VoteUsrAttempt mcUsrAttempt) throws VoteApplicationException;
+    public void createVoteUsrAttempt(VoteUsrAttempt voteUsrAttempt) throws VoteApplicationException;
     
-    public void updateVoteUsrAttempt(VoteUsrAttempt mcUsrAttempt) throws VoteApplicationException;
+    public void updateVoteUsrAttempt(VoteUsrAttempt voteUsrAttempt) throws VoteApplicationException;
     
     public List getUserRecords(final String userEntry) throws VoteApplicationException;
     
@@ -101,19 +101,19 @@ public interface IVoteService
     
     public VoteQueContent retrieveVoteQueContentByUID(Long uid) throws VoteApplicationException;
 	
-    public void removeVoteQueContent(VoteQueContent mcQueContent) throws VoteApplicationException;
+    public void removeVoteQueContent(VoteQueContent voteQueContent) throws VoteApplicationException;
     
     public VoteQueContent getVoteQueContentByUID(Long uid) throws VoteApplicationException;
     
-    public void saveOrUpdateVoteQueContent(VoteQueContent mcQueContent) throws VoteApplicationException;
+    public void saveOrUpdateVoteQueContent(VoteQueContent voteQueContent) throws VoteApplicationException;
     
-    public void removeQuestionContentByVoteUid(final Long mcContentUid) throws VoteApplicationException;
+    public void removeQuestionContentByVoteUid(final Long voteContentUid) throws VoteApplicationException;
     
-    public void cleanAllQuestionsSimple(final Long mcContentUid) throws VoteApplicationException;
+    public void cleanAllQuestionsSimple(final Long voteContentUid) throws VoteApplicationException;
     
-    public void resetAllQuestions(final Long mcContentUid) throws VoteApplicationException;
+    public void resetAllQuestions(final Long voteContentUid) throws VoteApplicationException;
     
-    public void cleanAllQuestions(final Long mcContentUid) throws VoteApplicationException;
+    public void cleanAllQuestions(final Long voteContentUid) throws VoteApplicationException;
     
     public Set getUserEntries() throws VoteApplicationException;
     
@@ -121,7 +121,7 @@ public interface IVoteService
     
     public Set getSessionUserEntries(final Long voteSessionId) throws VoteApplicationException;
     
-    public VoteQueContent getQuestionContentByQuestionText(final String question, final Long mcContentUid);
+    public VoteQueContent getQuestionContentByQuestionText(final String question, final Long voteContentUid);
     
     public void removeVoteQueContentByUID(Long uid) throws VoteApplicationException;
     
@@ -131,33 +131,33 @@ public interface IVoteService
     
     public void removeAttemptsForUserandSession(final Long queUsrId, final Long voteSessionId) throws VoteApplicationException;
     
-    public List getAllQuestionEntries(final Long mcContentId) throws VoteApplicationException;
+    public List getAllQuestionEntries(final Long voteContentId) throws VoteApplicationException;
     
     public VoteQueUsr getVoteQueUsrById(long voteQueUsrId) throws VoteApplicationException;
     
-    public VoteSession retrieveVoteSession(Long mcSessionId) throws VoteApplicationException;
+    public VoteSession retrieveVoteSession(Long voteSessionId) throws VoteApplicationException;
     
-    public VoteContent retrieveVoteBySessionId(Long mcSessionId) throws VoteApplicationException;
+    public VoteContent retrieveVoteBySessionId(Long voteSessionId) throws VoteApplicationException;
     
-    public void updateVote(VoteContent mc) throws VoteApplicationException;
+    public void updateVote(VoteContent vote) throws VoteApplicationException;
     
-    public void updateVoteSession(VoteSession mcSession) throws VoteApplicationException;
+    public void updateVoteSession(VoteSession voteSession) throws VoteApplicationException;
     
-    public List getVoteUserBySessionOnly(final VoteSession mcSession) throws VoteApplicationException;
+    public List getVoteUserBySessionOnly(final VoteSession voteSession) throws VoteApplicationException;
     
     public VoteSession getVoteSessionByUID(Long uid) throws VoteApplicationException;
     
-    public void deleteVote(VoteContent mc) throws VoteApplicationException;
+    public void deleteVote(VoteContent vote) throws VoteApplicationException;
     
-    public void deleteVoteById(Long mcId) throws VoteApplicationException;
+    public void deleteVoteById(Long voteId) throws VoteApplicationException;
     
-    public void deleteVoteSession(VoteSession mcSession) throws VoteApplicationException;
+    public void deleteVoteSession(VoteSession voteSession) throws VoteApplicationException;
     
-    public List getSessionNamesFromContent(VoteContent mcContent) throws VoteApplicationException;
+    public List getSessionNamesFromContent(VoteContent voteContent) throws VoteApplicationException;
     
     public void removeAttempt (VoteUsrAttempt attempt) throws VoteApplicationException;
 	
-    public void deleteVoteQueUsr(VoteQueUsr mcQueUsr) throws VoteApplicationException;
+    public void deleteVoteQueUsr(VoteQueUsr voteQueUsr) throws VoteApplicationException;
     
 	public User getCurrentUserData(String username) throws VoteApplicationException;
 	
@@ -165,13 +165,13 @@ public interface IVoteService
     
     public Lesson getCurrentLesson(long lessonId) throws VoteApplicationException;
     
-    public void saveVoteContent(VoteContent mc) throws VoteApplicationException;
+    public void saveVoteContent(VoteContent vote) throws VoteApplicationException;
     
-	public boolean studentActivityOccurredGlobal(VoteContent mcContent) throws VoteApplicationException;
+	public boolean studentActivityOccurredGlobal(VoteContent voteContent) throws VoteApplicationException;
 	
-	public int countIncompleteSession(VoteContent mc) throws VoteApplicationException;
+	public int countIncompleteSession(VoteContent vote) throws VoteApplicationException;
 	
-	public boolean studentActivityOccurred(VoteContent mc) throws VoteApplicationException;
+	public boolean studentActivityOccurred(VoteContent vote) throws VoteApplicationException;
 	
 	public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException;
     
@@ -199,7 +199,7 @@ public interface IVoteService
     
     public VoteQueContent getToolDefaultQuestionContent(long contentId) throws VoteApplicationException;
 
-    public List getToolSessionsForContent(VoteContent mc);
+    public List getToolSessionsForContent(VoteContent vote);
     
     public ITicket getRepositoryLoginTicket() throws VoteApplicationException;
 	
@@ -211,27 +211,27 @@ public interface IVoteService
 	
 	public String getFileUuid(String filename) throws VoteApplicationException;
 	
-	public List retrieveVoteUploadedOfflineFilesUuid(Long mcContentId) throws VoteApplicationException;
+	public List retrieveVoteUploadedOfflineFilesUuid(Long voteContentId) throws VoteApplicationException;
 	
-	public List retrieveVoteUploadedOnlineFilesUuid(Long mcContentId) throws VoteApplicationException;
+	public List retrieveVoteUploadedOnlineFilesUuid(Long voteContentId) throws VoteApplicationException;
 	
-	public List retrieveVoteUploadedOfflineFilesName(Long mcContentId) throws VoteApplicationException;
+	public List retrieveVoteUploadedOfflineFilesName(Long voteContentId) throws VoteApplicationException;
 	
-	public List retrieveVoteUploadedOnlineFilesName(Long mcContentId) throws VoteApplicationException;
+	public List retrieveVoteUploadedOnlineFilesName(Long voteContentId) throws VoteApplicationException;
 	
-	public List retrieveVoteUploadedFiles(Long mcContentId, boolean fileOnline) throws VoteApplicationException;
+	public List retrieveVoteUploadedFiles(Long voteContentId, boolean fileOnline) throws VoteApplicationException;
 	
 	public void cleanUploadedFilesMetaData() throws VoteApplicationException;
     
-    public void persistFile(String uuid, boolean isOnlineFile, String fileName, VoteContent mcContent) throws VoteApplicationException;
+    public void persistFile(String uuid, boolean isOnlineFile, String fileName, VoteContent voteContent) throws VoteApplicationException;
     
-    public List getAttemptForQueContent(final Long queUsrId, final Long mcQueContentId) throws VoteApplicationException;
+    public List getAttemptForQueContent(final Long queUsrId, final Long voteQueContentId) throws VoteApplicationException;
 	
 	public List getAttemptsForUser(final Long queUsrId) throws VoteApplicationException;
 	
 	public int countSessionComplete() throws VoteApplicationException;
 	
-	public VoteSession findVoteSessionById(Long mcSessionId) throws VoteApplicationException;
+	public VoteSession findVoteSessionById(Long voteSessionId) throws VoteApplicationException;
 	
 	public int countSessionIncomplete() throws VoteApplicationException;
     
@@ -239,9 +239,9 @@ public interface IVoteService
     
     public NodeKey copyFile(Long uuid) throws RepositoryCheckedException;
     
-    public void removeOffLineFile(String filename, Long mcContentId) throws VoteApplicationException;
+    public void removeOffLineFile(String filename, Long voteContentId) throws VoteApplicationException;
     
-    public void removeOnLineFile(String filename, Long mcContentId) throws VoteApplicationException;
+    public void removeOnLineFile(String filename, Long voteContentId) throws VoteApplicationException;
     
     public boolean isOffLineFilePersisted(String filename) throws VoteApplicationException;
     
@@ -249,9 +249,9 @@ public interface IVoteService
     
     public boolean isUuidPersisted(String uuid) throws VoteApplicationException;
     
-    public List getOnlineFilesMetaData(Long mcContentId) throws VoteApplicationException;
+    public List getOnlineFilesMetaData(Long voteContentId) throws VoteApplicationException;
     
-    public List getOfflineFilesMetaData(Long mcContentId) throws VoteApplicationException;
+    public List getOfflineFilesMetaData(Long voteContentId) throws VoteApplicationException;
     
     public List getSessionsFromContent(VoteContent mcContent) throws VoteApplicationException;
 

@@ -102,6 +102,8 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 	
 	protected String exceptionMaxNominationInvalid;
 	
+	protected String submissionAttempt;
+	
 	public void resetUserAction()
     {
 		this.editDefaultQuestion=null;
@@ -178,6 +180,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
     	this.statsMonitoring=null;
     	this.edit=null;
     	this.submit=null;
+    	this.submissionAttempt=null;
 	}
 	
 	public void resetRadioBoxes()
@@ -755,5 +758,17 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
      */
     public void setActiveModule(String activeModule) {
         this.activeModule = activeModule;
+    }
+    /**
+     * @return Returns the submissionAttempt.
+     */
+    public String getSubmissionAttempt() {
+        return submissionAttempt;
+    }
+    /**
+     * @param submissionAttempt The submissionAttempt to set.
+     */
+    public void setSubmissionAttempt(String submissionAttempt) {
+        this.submissionAttempt = submissionAttempt;
     }
 }

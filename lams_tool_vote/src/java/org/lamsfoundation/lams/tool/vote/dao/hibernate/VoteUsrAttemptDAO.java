@@ -110,6 +110,44 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 	    }
 		
 
+		public Set getUserEntriesByContentId(final Long voteQueContentId)
+	    {
+	        HibernateTemplate templ = this.getHibernateTemplate();
+	        List list = getSession().createQuery(LOAD_USER_ENTRIES)
+			.list();
+	        
+	        Set set= new HashSet();
+	        
+	        Set userEntries= new HashSet();
+			if(list != null && list.size() > 0){
+				Iterator listIterator=list.iterator();
+		    	while (listIterator.hasNext())
+		    	{
+		    	    String entry=(String)listIterator.next();
+		    	    logger.debug("entry: " + entry);
+		    	    if ((entry != null) && (entry.length() > 0))  
+		    	        userEntries.add(entry);
+		    	}
+			}
+			
+	        Set contentEntries= new HashSet();
+	        if(userEntries != null && userEntries.size() > 0){
+				Iterator setIterator=userEntries.iterator();
+		    	while (setIterator.hasNext())
+		    	{
+		    	    String entry=(String)setIterator.next();
+		    	    logger.debug("entry: " + entry);
+		    	    if ((entry != null) && (entry.length() > 0))
+		    	        
+		    	        contentEntries.add(entry);
+		    	}
+			}
+
+			return userEntries;
+	    }
+
+		
+		
 		public Set getSessionUserEntries(final Long voteSessionUid)
 	    {
 	        HibernateTemplate templ = this.getHibernateTemplate();

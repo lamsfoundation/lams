@@ -1006,9 +1006,17 @@ public class AuthoringUtil implements VoteAppConstants {
     	        	
     	        	VoteQueContent removeableVoteQueContent=voteService.getQuestionContentByQuestionText(queContent.getQuestion(), voteContent.getUid());
         			logger.debug("removeableVoteQueContent"  + removeableVoteQueContent);
+        			
+        			
         			if (removeableVoteQueContent != null)
         			{
+        			    logger.debug("doing association removal for nomination: "  + removeableVoteQueContent);
+        			    logger.debug("doing association removal, for question: "  + removeableVoteQueContent.getQuestion());
+        			    logger.debug("doing association removal for nomination list: "  + voteContent.getVoteQueContents());
+        			    voteContent.getVoteQueContents().remove(removeableVoteQueContent);
+        			    
         				voteService.removeVoteQueContent(removeableVoteQueContent);
+        				
             			logger.debug("removed removeableVoteQueContent from the db: " + removeableVoteQueContent);	
         			}
     	        	

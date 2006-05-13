@@ -102,25 +102,14 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 	    logger.debug("toolContentId: " + toolContentId);
 
 		logger.debug("calling  prepareChartData: " + toolContentId);
-    	//MonitoringUtil.prepareChartData(request, voteService, toolContentId, null);
 	    
     	VoteContent voteContent=voteService.retrieveVote(toolContentId);
-	    int allUserEntriesCount=voteService.getAllEntriesCount();
-	    logger.debug("allUserEntriesCount: " + allUserEntriesCount);
-
 		/*true means there is at least 1 response*/
 		if (voteService.studentActivityOccurredGlobal(voteContent))
 		{
 				request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(false).toString());
 				logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
 		}
-		/*
-		else if (allUserEntriesCount > 0)
-		{
-			request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(false).toString());
-			logger.debug("allUserEntriesCount is:" + allUserEntriesCount + " USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
-		}
-		*/
 		else
 		{
 			request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
@@ -129,7 +118,8 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 
 		
 		request.getSession().setAttribute(ACTIVE_MODULE, MONITORING);
-		return (mapping.findForward(LOAD_MONITORING));
+		voteMonitoringForm.setSelectedToolSessionId("All");
+		return voteMonitoringAction.submitSession(mapping, form,  request, response);
 	}
 
 	
@@ -247,7 +237,7 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 		
 		logger.debug("refreshing instructions data...");
 		voteMonitoringAction.refreshInstructionsData(request, voteContent);
-		
+		    		
 	    logger.debug("end initializing  monitoring data...");
 		return true;
 	}

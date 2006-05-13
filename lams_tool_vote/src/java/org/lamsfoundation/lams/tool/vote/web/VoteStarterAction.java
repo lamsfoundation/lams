@@ -128,6 +128,7 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 		}
 	    request.getSession().setAttribute(TOOL_SERVICE, voteService);
 	    request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
+	    voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
 
 		String servletPath=request.getServletPath();
 		logger.debug("getServletPath: "+ servletPath);

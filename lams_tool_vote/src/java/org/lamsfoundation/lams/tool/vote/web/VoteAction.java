@@ -123,6 +123,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 	 	voteAuthoringForm.resetUserAction();
 	 	
 	 	voteAuthoringForm.setExceptionMaxNominationInvalid(new Boolean(false).toString());
+	 	request.getSession().setAttribute(VALIDATION_ERROR, new Boolean(false).toString());
 	 	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
 	 	return null;
     }
@@ -135,6 +136,8 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 		VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
 	    logger.debug("voteAuthoringForm :" +voteAuthoringForm);
 	    voteAuthoringForm.setExceptionMaxNominationInvalid(new Boolean(false).toString());
+	    voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
+	    request.getSession().setAttribute(VALIDATION_ERROR, new Boolean(false).toString());
 		
 	    /* determine whether the request is from Monitoring url Edit Activity*/
 		String sourceVoteStarter = (String) request.getAttribute(SOURCE_VOTE_STARTER);
@@ -166,6 +169,32 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     	logger.debug("firstEntry: " +  firstEntry);
     	request.getSession().setAttribute(DEFAULT_OPTION_CONTENT, firstEntry);
     	
+    	
+    	IVoteService voteService = (IVoteService)request.getSession().getAttribute(TOOL_SERVICE);
+	    if (voteService == null)        
+	    	voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
+	    logger.debug("voteService :" +voteService);
+	    
+	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    logger.debug("toolContentId: " + toolContentId);
+
+    	VoteContent voteContent=voteService.retrieveVote(toolContentId);
+		/*true means there is at least 1 response*/
+    	if (voteContent != null)
+    	{
+    		if (voteService.studentActivityOccurredGlobal(voteContent))
+    		{
+    				request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(false).toString());
+    				logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
+    		}
+    		else
+    		{
+    			request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
+    			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to true");
+    		}
+    	}
+
+    	
 	    return (mapping.findForward(destination));
     }
 
@@ -177,6 +206,8 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 		VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
 	    logger.debug("voteAuthoringForm :" +voteAuthoringForm);
 	    voteAuthoringForm.setExceptionMaxNominationInvalid(new Boolean(false).toString());
+	    voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
+	    request.getSession().setAttribute(VALIDATION_ERROR, new Boolean(false).toString());
 		
 		request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
 		
@@ -205,6 +236,30 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     	logger.debug("firstEntry: " +  firstEntry);
     	request.getSession().setAttribute(DEFAULT_OPTION_CONTENT, firstEntry);
     	
+    	IVoteService voteService = (IVoteService)request.getSession().getAttribute(TOOL_SERVICE);
+	    if (voteService == null)        
+	    	voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
+	    logger.debug("voteService :" +voteService);
+	    
+	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    logger.debug("toolContentId: " + toolContentId);
+
+    	VoteContent voteContent=voteService.retrieveVote(toolContentId);
+		/*true means there is at least 1 response*/
+    	if (voteContent != null)
+    	{
+    		if (voteService.studentActivityOccurredGlobal(voteContent))
+    		{
+    				request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(false).toString());
+    				logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
+    		}
+    		else
+    		{
+    			request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
+    			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to true");
+    		}
+    	}
+
 	    return (mapping.findForward(destination));
     }
 
@@ -217,6 +272,8 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 	    VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
 	    logger.debug("voteAuthoringForm :" +voteAuthoringForm);
 	    voteAuthoringForm.setExceptionMaxNominationInvalid(new Boolean(false).toString());
+	    voteAuthoringForm.setSubmissionAttempt(new Boolean(true).toString());
+	    request.getSession().setAttribute(VALIDATION_ERROR, new Boolean(false).toString());
 		
 	    
 	    /* determine whether the request is from Monitoring url Edit Activity*/
@@ -230,9 +287,42 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 	    	voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
 	    logger.debug("voteService :" +voteService);
 	    
+	    
+	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    logger.debug("toolContentId: " + toolContentId);
+
+    	VoteContent voteContent=voteService.retrieveVote(toolContentId);
+		/*true means there is at least 1 response*/
+    	if (voteContent != null)
+    	{
+    		if (voteService.studentActivityOccurredGlobal(voteContent))
+    		{
+    				request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(false).toString());
+    				logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
+    		}
+    		else
+    		{
+    			request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
+    			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to true");
+    		}
+    	}
+	    
 		VoteUtils.persistRichText(request);
 	           	
-	    AuthoringUtil authoringUtil= new AuthoringUtil();
+	    ActionMessages errors= new ActionMessages();
+	    errors=validateSubmit(request, errors, voteAuthoringForm);
+	
+	    if (errors.size() > 0)  
+	    {
+	        logger.debug("returning back to from to fix errors:");
+	        request.getSession().setAttribute(EDITACTIVITY_EDITMODE, new Boolean(true));
+	        request.getSession().setAttribute(VALIDATION_ERROR, new Boolean(true).toString());
+	        return mapping.findForward(destination);
+	    }
+	    
+	    List attachmentList = (List) request.getSession().getAttribute(ATTACHMENT_LIST);
+	    List deletedAttachmentList = (List) request.getSession().getAttribute(DELETED_ATTACHMENT_LIST);
+	
 	    Map mapOptionsContent=(Map)request.getSession().getAttribute(MAP_OPTIONS_CONTENT);
 	    logger.debug("mapOptionsContent :" +mapOptionsContent);
 
@@ -249,21 +339,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     	logger.debug("firstEntry: " +  firstEntry);
     	request.getSession().setAttribute(DEFAULT_OPTION_CONTENT, firstEntry);
 
-	    
-	    ActionMessages errors= new ActionMessages();
-	    /* full form validation should be performed only in standard authoring mode, but not in monitoring EditActivity */
-	    errors=validateSubmit(request, errors, voteAuthoringForm);
-	
-	    if (errors.size() > 0)  
-	    {
-	        logger.debug("returning back to from to fix errors:");
-	        request.getSession().setAttribute(EDITACTIVITY_EDITMODE, new Boolean(true));
-	        return (mapping.findForward(LOAD_QUESTIONS));
-	    }
-	    
-	    List attachmentList = (List) request.getSession().getAttribute(ATTACHMENT_LIST);
-	    List deletedAttachmentList = (List) request.getSession().getAttribute(DELETED_ATTACHMENT_LIST);
-	
+    	AuthoringUtil authoringUtil= new AuthoringUtil();
 	    authoringUtil.reconstructOptionsContentMapForSubmit(mapOptionsContent, request);
 	    logger.debug("before saveOrUpdateVoteContent.");
 	    
@@ -276,7 +352,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 			logger.debug("add error.options.duplicate to ActionMessages");
 			persistError(request,"error.options.duplicate");
 			voteAuthoringForm.resetUserAction();
-	        return (mapping.findForward(LOAD_QUESTIONS));
+			return mapping.findForward(destination);
 		}
 	 	
 	    
@@ -286,7 +362,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 	    authoringUtil.removeRedundantOptions(mapOptionsContent, voteService, voteAuthoringForm, request);
 	    logger.debug("end of removing unused entries... ");
 	    
-	    VoteContent voteContent=authoringUtil.saveOrUpdateVoteContent(mapOptionsContent, voteService, voteAuthoringForm, request);
+	    voteContent=authoringUtil.saveOrUpdateVoteContent(mapOptionsContent, voteService, voteAuthoringForm, request);
 	    logger.debug("voteContent: " + voteContent);
 		
 	    String maxNomCount=voteAuthoringForm.getMaxNominationCount();
@@ -370,6 +446,8 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     	VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
 	    logger.debug("voteAuthoringForm :" +voteAuthoringForm);
 	    voteAuthoringForm.setExceptionMaxNominationInvalid(new Boolean(false).toString());
+	    voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
+	    request.getSession().setAttribute(VALIDATION_ERROR, new Boolean(false).toString());
 		
     	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
     	IVoteService voteService =VoteUtils.getToolService(request);
@@ -414,6 +492,26 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     	String firstEntry=(String)mapOptionsContent.get("1");
     	logger.debug("firstEntry: " +  firstEntry);
     	request.getSession().setAttribute(DEFAULT_OPTION_CONTENT, firstEntry);
+    	
+	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    logger.debug("toolContentId: " + toolContentId);
+
+    	VoteContent voteContent=voteService.retrieveVote(toolContentId);
+		/*true means there is at least 1 response*/
+    	if (voteContent != null)
+    	{
+    		if (voteService.studentActivityOccurredGlobal(voteContent))
+    		{
+    				request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(false).toString());
+    				logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
+    		}
+    		else
+    		{
+    			request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
+    			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to true");
+    		}
+    	}
+
 
         return (mapping.findForward(destination));	
     }
@@ -433,6 +531,8 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     	
     	logger.debug("voteAuthoringForm :" +voteAuthoringForm);
     	voteAuthoringForm.setExceptionMaxNominationInvalid(new Boolean(false).toString());
+    	voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
+    	request.getSession().setAttribute(VALIDATION_ERROR, new Boolean(false).toString());
 	 	IVoteService voteService =VoteUtils.getToolService(request);
 
 		/* determine whether the request is from Monitoring url Edit Activity*/
@@ -476,6 +576,26 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     	logger.debug("firstEntry: " +  firstEntry);
     	request.getSession().setAttribute(DEFAULT_OPTION_CONTENT, firstEntry);
     	
+	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    logger.debug("toolContentId: " + toolContentId);
+
+    	VoteContent voteContent=voteService.retrieveVote(toolContentId);
+		/*true means there is at least 1 response*/
+    	if (voteContent != null)
+    	{
+    		if (voteService.studentActivityOccurredGlobal(voteContent))
+    		{
+    				request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(false).toString());
+    				logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
+    		}
+    		else
+    		{
+    			request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
+    			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to true");
+    		}
+    	}
+
+    	
         return (mapping.findForward(destination));	
     }
 
@@ -490,16 +610,15 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
         String instructions = voteAuthoringForm.getInstructions();
         logger.debug("instructions: " + instructions);
         
+        boolean validateSuccess=true;
         if ((title == null) || (title.trim().length() == 0) || title.equalsIgnoreCase(RICHTEXT_BLANK))
         {
-            errors.add(Globals.ERROR_KEY,new ActionMessage("error.title"));
-            logger.debug("add title to ActionMessages");
+            validateSuccess=false;
         }
 
         if ((instructions == null) || (instructions.trim().length() == 0) || instructions.equalsIgnoreCase(RICHTEXT_BLANK))
         {
-            errors.add(Globals.ERROR_KEY, new ActionMessage("error.instructions"));
-            logger.debug("add instructions to ActionMessages: ");
+            validateSuccess=false;
         }
 
         /*
@@ -508,8 +627,12 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
         String defaultOptionEntry =request.getParameter("optionContent0");
         if ((defaultOptionEntry == null) || (defaultOptionEntry.length() == 0))
         {
-            errors.add(Globals.ERROR_KEY, new ActionMessage("error.defaultoption.empt"));
-            logger.debug("add error.defaultoption.empt to ActionMessages: ");
+            validateSuccess=false;        }
+        
+        if (validateSuccess == false)
+        {
+            errors.add(Globals.ERROR_KEY, new ActionMessage("error.fields.mandatory"));
+            logger.debug("validate success is false");
         }
         
         saveErrors(request,errors);
@@ -529,6 +652,8 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     	VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
     	logger.debug("voteAuthoringForm :" +voteAuthoringForm);
     	voteAuthoringForm.setExceptionMaxNominationInvalid(new Boolean(false).toString());
+    	voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
+    	request.getSession().setAttribute(VALIDATION_ERROR, new Boolean(false).toString());
 
     	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
     	IVoteService voteService =VoteUtils.getToolService(request);
@@ -581,7 +706,9 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     	logger.debug("dispatching submitOnlineFiles...");
     	VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
     	logger.debug("voteAuthoringForm :" +voteAuthoringForm);
-    	voteAuthoringForm.setExceptionMaxNominationInvalid(new Boolean(false).toString());    	
+    	voteAuthoringForm.setExceptionMaxNominationInvalid(new Boolean(false).toString());
+    	voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
+    	request.getSession().setAttribute(VALIDATION_ERROR, new Boolean(false).toString());
     	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
     	
 	 	IVoteService voteService =VoteUtils.getToolService(request);
@@ -633,7 +760,9 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     	logger.debug("dispatching deleteOfflineFile...");
     	VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
     	logger.debug("voteAuthoringForm :" +voteAuthoringForm);
-    	voteAuthoringForm.setExceptionMaxNominationInvalid(new Boolean(false).toString());    	
+    	voteAuthoringForm.setExceptionMaxNominationInvalid(new Boolean(false).toString());
+    	voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
+    	request.getSession().setAttribute(VALIDATION_ERROR, new Boolean(false).toString());
     	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
     	
 	 	IVoteService voteService =VoteUtils.getToolService(request);
@@ -672,7 +801,9 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     	logger.debug("dispatching deleteOnlineFile...");
     	VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
     	logger.debug("voteAuthoringForm :" +voteAuthoringForm);
-    	voteAuthoringForm.setExceptionMaxNominationInvalid(new Boolean(false).toString());    	
+    	voteAuthoringForm.setExceptionMaxNominationInvalid(new Boolean(false).toString());
+    	voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
+    	request.getSession().setAttribute(VALIDATION_ERROR, new Boolean(false).toString());
     	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
     	
 	 	IVoteService voteService =VoteUtils.getToolService(request);
@@ -710,7 +841,9 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     	logger.debug("dispatching editActivityQuestions...");
     	VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
     	logger.debug("voteAuthoringForm :" +voteAuthoringForm);
-    	voteAuthoringForm.setExceptionMaxNominationInvalid(new Boolean(false).toString());    	
+    	voteAuthoringForm.setExceptionMaxNominationInvalid(new Boolean(false).toString());
+    	voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
+    	request.getSession().setAttribute(VALIDATION_ERROR, new Boolean(false).toString());
     	
 		IVoteService voteService = (IVoteService)request.getSession().getAttribute(TOOL_SERVICE);
 		logger.debug("voteService: " + voteService);

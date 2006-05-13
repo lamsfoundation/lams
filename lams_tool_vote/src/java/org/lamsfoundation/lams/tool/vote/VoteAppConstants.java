@@ -222,6 +222,7 @@ public interface VoteAppConstants {
     public static final String SUMMARY_TOOL_SESSIONS_ID					="summaryToolSessionsId";
     public static final String MONITORED_CONTENT_ID				   		="monitoredContentId";
     public static final String EDITACTIVITY_EDITMODE	   		   		="editActivityEditMode";
+    public static final String VALIDATION_ERROR	   		   				="validationError";
     public static final String FORM_INDEX	   		   			   		="formIndex";
     public static final String CURRENT_MONITORED_TOOL_SESSION 			="currentMonitoredToolSession";
     public static final String SELECTION_CASE							="selectionCase";
