@@ -37,6 +37,8 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
 	protected String optionValue;
 	protected String checked;
 	
+    protected String sbmtSuccess;
+    
 	protected String userEntry;
 	protected String dispatch;
 	protected String toolContentID;
@@ -605,4 +607,18 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
     public void setMaxNominationCountReached(String maxNominationCountReached) {
         this.maxNominationCountReached = maxNominationCountReached;
     }
+    
+    /**
+     * @return Returns the sbmtSuccess.
+     */
+    public String getSbmtSuccess() {
+        return sbmtSuccess;
+    }
+    /**
+     * @param sbmtSuccess The sbmtSuccess to set.
+     */
+    public void setSbmtSuccess(String sbmtSuccess) {
+        this.sbmtSuccess = sbmtSuccess;
+    }
+
 }

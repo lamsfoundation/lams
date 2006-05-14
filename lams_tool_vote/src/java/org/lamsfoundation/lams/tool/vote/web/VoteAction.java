@@ -124,28 +124,21 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 	 	
 	 	voteAuthoringForm.setExceptionMaxNominationInvalid(new Boolean(false).toString());
 	 	request.getSession().setAttribute(VALIDATION_ERROR, new Boolean(false).toString());
-	 	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
+		voteAuthoringForm.setSbmtSuccess(new Boolean(false).toString());
 	 	return null;
     }
     
     
-    public ActionForward addNewOption(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
-    throws IOException, ServletException 
+    public boolean isNewOptionAdded(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
     {
-		logger.debug("dispathcing addNewOption");
+		logger.debug("doing isNewOptionAdded");
 		VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
 	    logger.debug("voteAuthoringForm :" +voteAuthoringForm);
 	    voteAuthoringForm.setExceptionMaxNominationInvalid(new Boolean(false).toString());
 	    voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
 	    request.getSession().setAttribute(VALIDATION_ERROR, new Boolean(false).toString());
+	    voteAuthoringForm.setSbmtSuccess(new Boolean(false).toString());
 		
-	    /* determine whether the request is from Monitoring url Edit Activity*/
-		String sourceVoteStarter = (String) request.getAttribute(SOURCE_VOTE_STARTER);
-		logger.debug("sourceVoteStarter: " + sourceVoteStarter);
-		String destination=VoteUtils.getDestination(sourceVoteStarter);
-		logger.debug("destination: " + destination);
-
-		request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
 	    AuthoringUtil authoringUtil= new AuthoringUtil();
 	    Map mapOptionsContent=(Map)request.getSession().getAttribute(MAP_OPTIONS_CONTENT);
 	
@@ -194,29 +187,37 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     		}
     	}
 
+	    return true;
+        
+    }
+    
+    public ActionForward addNewOption(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
+    throws IOException, ServletException 
+    {
+		logger.debug("dispathcing addNewOption");
+		boolean isNewOptionAdded=isNewOptionAdded(mapping, form, request, response);
+		logger.debug("isNewOptionAdded:" + isNewOptionAdded);
+		
+		/* determine whether the request is from Monitoring url Edit Activity*/
+		String sourceVoteStarter = (String) request.getAttribute(SOURCE_VOTE_STARTER);
+		logger.debug("sourceVoteStarter: " + sourceVoteStarter);
+		String destination=VoteUtils.getDestination(sourceVoteStarter);
+		logger.debug("destination: " + destination);
     	
 	    return (mapping.findForward(destination));
     }
 
 
-    public ActionForward removeOption(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
-    throws IOException, ServletException 
+    public boolean isOptionRemoved(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
     {
-		logger.debug("doing removeOption ");
+        logger.debug("starting isOptionRemoved ");
 		VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
 	    logger.debug("voteAuthoringForm :" +voteAuthoringForm);
 	    voteAuthoringForm.setExceptionMaxNominationInvalid(new Boolean(false).toString());
 	    voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
 	    request.getSession().setAttribute(VALIDATION_ERROR, new Boolean(false).toString());
+		voteAuthoringForm.setSbmtSuccess(new Boolean(false).toString());
 		
-		request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
-		
-	    /* determine whether the request is from Monitoring url Edit Activity*/
-		String sourceVoteStarter = (String) request.getAttribute(SOURCE_VOTE_STARTER);
-		logger.debug("sourceVoteStarter: " + sourceVoteStarter);
-		String destination=VoteUtils.getDestination(sourceVoteStarter);
-		logger.debug("destination: " + destination);
-
 		VoteUtils.persistRichText(request);
 	    
 		AuthoringUtil authoringUtil= new AuthoringUtil();
@@ -260,27 +261,38 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     		}
     	}
 
-	    return (mapping.findForward(destination));
+    	return true;
     }
 
     
-    public ActionForward submitAllContent(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
-    throws IOException, ServletException {
-	
-		logger.debug("starting submitAllContent :" +form);
-		request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
-	    VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
-	    logger.debug("voteAuthoringForm :" +voteAuthoringForm);
-	    voteAuthoringForm.setExceptionMaxNominationInvalid(new Boolean(false).toString());
-	    voteAuthoringForm.setSubmissionAttempt(new Boolean(true).toString());
-	    request.getSession().setAttribute(VALIDATION_ERROR, new Boolean(false).toString());
+    public ActionForward removeOption(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
+    throws IOException, ServletException 
+    {
+		logger.debug("doing removeOption ");
+		boolean isOptionRemoved=isOptionRemoved(mapping, form, request, response);
+		logger.debug("isOptionRemoved:" + isOptionRemoved);
 		
-	    
 	    /* determine whether the request is from Monitoring url Edit Activity*/
 		String sourceVoteStarter = (String) request.getAttribute(SOURCE_VOTE_STARTER);
 		logger.debug("sourceVoteStarter: " + sourceVoteStarter);
 		String destination=VoteUtils.getDestination(sourceVoteStarter);
 		logger.debug("destination: " + destination);
+		
+	    return (mapping.findForward(destination));
+    }
+
+
+    public boolean submitContent(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+    {
+        logger.debug("doing submitContent..");
+
+	    VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
+	    logger.debug("voteAuthoringForm :" +voteAuthoringForm);
+	    voteAuthoringForm.setExceptionMaxNominationInvalid(new Boolean(false).toString());
+	    voteAuthoringForm.setSubmissionAttempt(new Boolean(true).toString());
+	    request.getSession().setAttribute(VALIDATION_ERROR, new Boolean(false).toString());
+	    voteAuthoringForm.setSbmtSuccess(new Boolean(false).toString());
+		
 	    
 	    IVoteService voteService = (IVoteService)request.getSession().getAttribute(TOOL_SERVICE);
 	    if (voteService == null)        
@@ -317,7 +329,8 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 	        logger.debug("returning back to from to fix errors:");
 	        request.getSession().setAttribute(EDITACTIVITY_EDITMODE, new Boolean(true));
 	        request.getSession().setAttribute(VALIDATION_ERROR, new Boolean(true).toString());
-	        return mapping.findForward(destination);
+	        //return mapping.findForward(destination);
+	        return false;
 	    }
 	    
 	    List attachmentList = (List) request.getSession().getAttribute(ATTACHMENT_LIST);
@@ -346,16 +359,17 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 	    boolean verifyDuplicatesOptionsMap=AuthoringUtil.verifyDuplicatesOptionsMap(mapOptionsContent);
 	 	logger.debug("verifyDuplicatesOptionsMap: " + verifyDuplicatesOptionsMap);
 	 	request.getSession().removeAttribute(USER_EXCEPTION_OPTIONS_DUPLICATE);
+	 	
 	 	if (verifyDuplicatesOptionsMap == false)
 		{
 			request.getSession().setAttribute(USER_EXCEPTION_OPTIONS_DUPLICATE, new Boolean(true).toString());
 			logger.debug("add error.options.duplicate to ActionMessages");
 			persistError(request,"error.options.duplicate");
 			voteAuthoringForm.resetUserAction();
-			return mapping.findForward(destination);
+			//return mapping.findForward(destination);
+			return false;
 		}
 	 	
-	    
 	 	logger.debug("submitting mapOptionsContent:" + mapOptionsContent);
 	    
 	    /*to remove deleted entries in the questions table based on mapQuestionContent */
@@ -367,7 +381,6 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 		
 	    String maxNomCount=voteAuthoringForm.getMaxNominationCount();
 	    logger.debug("maxNomCount:" + maxNomCount);
-	    
 	    
 	    String activeModule=voteAuthoringForm.getActiveModule();
 	    logger.debug("activeModule:" + activeModule);
@@ -382,7 +395,8 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 				    {
 				        voteAuthoringForm.setExceptionMaxNominationInvalid(new Boolean(true).toString());
 						persistError(request,"error.maxNominationCount.invalid");
-						return (mapping.findForward(LOAD_QUESTIONS));
+						//return (mapping.findForward(LOAD_QUESTIONS));
+						return false;
 				    }
 				    
 			    	try
@@ -394,7 +408,8 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 					{
 			    		persistError(request,"error.maxNominationCount.invalid");
 			    		voteAuthoringForm.setExceptionMaxNominationInvalid(new Boolean(true).toString());
-						return (mapping.findForward(LOAD_QUESTIONS));
+						//return (mapping.findForward(LOAD_QUESTIONS));
+			    		return false;
 					}
 			    }
 
@@ -418,7 +433,8 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 	
 	    errors.clear();
 	    errors.add(Globals.ERROR_KEY, new ActionMessage("sbmt.successful"));
-	    request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(1));
+	    //request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(1));
+	    voteAuthoringForm.setSbmtSuccess(new Boolean(true).toString());
 	    logger.debug("setting SUBMIT_SUCCESS to 1.");
 	    
 	    Long strToolContentId=(Long)request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
@@ -431,16 +447,44 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 	    logger.debug("define later set to false");
 	    
 	    voteAuthoringForm.resetUserAction();
-	    return mapping.findForward(destination);
+	    return true;
+    }
+    
+    
+    public ActionForward submitAllContent(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
+    throws IOException, ServletException {
+	
+		logger.debug("starting submitAllContent :" +form);
+		
+	    VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
+	    logger.debug("voteAuthoringForm :" +voteAuthoringForm);
+	    voteAuthoringForm.setSbmtSuccess(new Boolean(false).toString());
+
+		
+		/* determine whether the request is from Monitoring url Edit Activity*/
+		String sourceVoteStarter = (String) request.getAttribute(SOURCE_VOTE_STARTER);
+		logger.debug("sourceVoteStarter: " + sourceVoteStarter);
+		String destination=VoteUtils.getDestination(sourceVoteStarter);
+		logger.debug("destination: " + destination);
+
+		
+		boolean isContentSubmitted=submitContent(mapping, form, request, response);
+		logger.debug("isContentSubmitted :" +isContentSubmitted);
+		
+		if (isContentSubmitted == true)
+		    voteAuthoringForm.setSbmtSuccess(new Boolean(true).toString());
+		    
+		logger.debug("final submit status :" +voteAuthoringForm.getSbmtSuccess());
+        return (mapping.findForward(destination));	
     }
 
-    
-    public ActionForward moveOptionDown(ActionMapping mapping,
+
+    public boolean isMoveOptionDown(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
-            HttpServletResponse response) throws IOException,
-                                         ServletException
+            HttpServletResponse response) 
     {
+    	logger.debug("starting isMoveOptionDown...");
     	VoteUtils.cleanUpUserExceptions(request);
     	logger.debug("dispatching moveOptionDown...");
     	VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
@@ -448,15 +492,10 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 	    voteAuthoringForm.setExceptionMaxNominationInvalid(new Boolean(false).toString());
 	    voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
 	    request.getSession().setAttribute(VALIDATION_ERROR, new Boolean(false).toString());
-		
-    	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
+	    voteAuthoringForm.setSbmtSuccess(new Boolean(false).toString());
+	    
+    	//request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
     	IVoteService voteService =VoteUtils.getToolService(request);
-
-		/* determine whether the request is from Monitoring url Edit Activity*/
-		String sourceVoteStarter = (String) request.getAttribute(SOURCE_VOTE_STARTER);
-		logger.debug("sourceVoteStarter: " + sourceVoteStarter);
-		String destination=VoteUtils.getDestination(sourceVoteStarter);
-		logger.debug("destination: " + destination);
 
 		VoteUtils.persistRichText(request);
 	 	
@@ -512,28 +551,45 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     		}
     	}
 
-
-        return (mapping.findForward(destination));	
+    	return true;
     }
-
-
     
-    public ActionForward moveOptionUp(ActionMapping mapping,
+    
+    public ActionForward moveOptionDown(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response) throws IOException,
                                          ServletException
     {
+		/* determine whether the request is from Monitoring url Edit Activity*/
+		String sourceVoteStarter = (String) request.getAttribute(SOURCE_VOTE_STARTER);
+		logger.debug("sourceVoteStarter: " + sourceVoteStarter);
+		String destination=VoteUtils.getDestination(sourceVoteStarter);
+		logger.debug("destination: " + destination);
+
+		boolean isMoveOptionDown=isMoveOptionDown(mapping, form, request, response);
+		logger.debug("isMoveOptionDown:" + isMoveOptionDown);
+
+        return (mapping.findForward(destination));	
+    }
+
+
+    public boolean isMoveOptionUp(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response)
+    {
+        logger.debug("starting  isMoveOptionUp...");
     	VoteUtils.cleanUpUserExceptions(request);
-    	logger.debug("dispatching moveOptionUp...");
+    	
     	VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;    	
-    	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
+    	voteAuthoringForm.setSbmtSuccess(new Boolean(false).toString());
     	
     	logger.debug("voteAuthoringForm :" +voteAuthoringForm);
     	voteAuthoringForm.setExceptionMaxNominationInvalid(new Boolean(false).toString());
     	voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
     	request.getSession().setAttribute(VALIDATION_ERROR, new Boolean(false).toString());
-	 	IVoteService voteService =VoteUtils.getToolService(request);
+    	IVoteService voteService =VoteUtils.getToolService(request);
 
 		/* determine whether the request is from Monitoring url Edit Activity*/
 		String sourceVoteStarter = (String) request.getAttribute(SOURCE_VOTE_STARTER);
@@ -595,15 +651,33 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     		}
     	}
 
-    	
-        return (mapping.findForward(destination));	
+        return true;
     }
 
+    
+    public ActionForward moveOptionUp(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+    {
+		/* determine whether the request is from Monitoring url Edit Activity*/
+		String sourceVoteStarter = (String) request.getAttribute(SOURCE_VOTE_STARTER);
+		logger.debug("sourceVoteStarter: " + sourceVoteStarter);
+		String destination=VoteUtils.getDestination(sourceVoteStarter);
+		logger.debug("destination: " + destination);
+
+		boolean isMoveOptionUp=isMoveOptionUp(mapping, form, request, response);
+		logger.debug("isMoveOptionUp:" + isMoveOptionUp);
+
+        return (mapping.findForward(destination));	
+    }
     
     
     protected ActionMessages validateSubmit(HttpServletRequest request, ActionMessages errors, VoteAuthoringForm voteAuthoringForm)
     {
-    	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
+    	//request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
+        voteAuthoringForm.setSbmtSuccess(new Boolean(false).toString());
         String title = voteAuthoringForm.getTitle();
         logger.debug("title: " + title);
 
@@ -655,7 +729,8 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     	voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
     	request.getSession().setAttribute(VALIDATION_ERROR, new Boolean(false).toString());
 
-    	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
+    	//request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
+    	voteAuthoringForm.setSbmtSuccess(new Boolean(false).toString());
     	IVoteService voteService =VoteUtils.getToolService(request);
 
 		/* determine whether the request is from Monitoring url Edit Activity*/
@@ -709,7 +784,8 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     	voteAuthoringForm.setExceptionMaxNominationInvalid(new Boolean(false).toString());
     	voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
     	request.getSession().setAttribute(VALIDATION_ERROR, new Boolean(false).toString());
-    	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
+    	//request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
+    	voteAuthoringForm.setSbmtSuccess(new Boolean(false).toString());
     	
 	 	IVoteService voteService =VoteUtils.getToolService(request);
 
@@ -763,7 +839,8 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     	voteAuthoringForm.setExceptionMaxNominationInvalid(new Boolean(false).toString());
     	voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
     	request.getSession().setAttribute(VALIDATION_ERROR, new Boolean(false).toString());
-    	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
+    	//request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
+    	voteAuthoringForm.setSbmtSuccess(new Boolean(false).toString());
     	
 	 	IVoteService voteService =VoteUtils.getToolService(request);
 	 	
@@ -804,7 +881,8 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     	voteAuthoringForm.setExceptionMaxNominationInvalid(new Boolean(false).toString());
     	voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
     	request.getSession().setAttribute(VALIDATION_ERROR, new Boolean(false).toString());
-    	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
+    	//request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
+    	voteAuthoringForm.setSbmtSuccess(new Boolean(false).toString());
     	
 	 	IVoteService voteService =VoteUtils.getToolService(request);
 
@@ -844,6 +922,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     	voteAuthoringForm.setExceptionMaxNominationInvalid(new Boolean(false).toString());
     	voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
     	request.getSession().setAttribute(VALIDATION_ERROR, new Boolean(false).toString());
+    	voteAuthoringForm.setSbmtSuccess(new Boolean(false).toString());
     	
 		IVoteService voteService = (IVoteService)request.getSession().getAttribute(TOOL_SERVICE);
 		logger.debug("voteService: " + voteService);

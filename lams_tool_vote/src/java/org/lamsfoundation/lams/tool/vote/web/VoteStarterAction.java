@@ -127,9 +127,9 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 		    logger.debug("retrieving voteService from cache: " + voteService);
 		}
 	    request.getSession().setAttribute(TOOL_SERVICE, voteService);
-	    request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
 	    voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
-
+	    voteAuthoringForm.setSbmtSuccess(new Boolean(false).toString());
+	    
 		String servletPath=request.getServletPath();
 		logger.debug("getServletPath: "+ servletPath);
 		if (servletPath.indexOf("authoringStarter") > 0)
@@ -138,7 +138,6 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 			request.getSession().setAttribute(ACTIVE_MODULE, AUTHORING);
 			voteAuthoringForm.setActiveModule(AUTHORING);
 			request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(true));
-			request.getSession().setAttribute(SHOW_AUTHORING_TABS,new Boolean(true).toString());
 		}
 		else
 		{
@@ -146,7 +145,6 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 			request.getSession().setAttribute(ACTIVE_MODULE, DEFINE_LATER);
 			voteAuthoringForm.setActiveModule(DEFINE_LATER);
 			request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(false));
-			request.getSession().setAttribute(SHOW_AUTHORING_TABS,new Boolean(false).toString());			
 		}
 		 
 		initialiseAttributes(request);

@@ -118,7 +118,9 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 
 		
 		request.getSession().setAttribute(ACTIVE_MODULE, MONITORING);
+		voteMonitoringForm.setActiveModule(MONITORING);
 		voteMonitoringForm.setSelectedToolSessionId("All");
+		voteMonitoringForm.setSbmtSuccess(new Boolean(false).toString());
 		return voteMonitoringAction.submitSession(mapping, form,  request, response);
 	}
 
@@ -126,11 +128,15 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 	public boolean initialiseMonitoringData(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
 	{
 		logger.debug("start initializing  monitoring data...");
+		
+		VoteMonitoringForm voteMonitoringForm = (VoteMonitoringForm) form;
+		
 		IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
 		request.getSession().setAttribute(TOOL_SERVICE, voteService);
 		
 		request.getSession().setAttribute(CURRENT_MONITORING_TAB, "summary");
-		request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
+		//request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
+		voteMonitoringForm.setSbmtSuccess(new Boolean(false).toString());		
 		request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(false));
 		request.getSession().setAttribute(REQUEST_LEARNING_REPORT, new Boolean(false).toString());
 		

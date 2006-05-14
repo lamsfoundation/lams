@@ -181,6 +181,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
     	this.edit=null;
     	this.submit=null;
     	this.submissionAttempt=null;
+    	this.sbmtSuccess=null;
 	}
 	
 	public void resetRadioBoxes()
@@ -771,4 +772,5 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
     public void setSubmissionAttempt(String submissionAttempt) {
         this.submissionAttempt = submissionAttempt;
     }
+
 }

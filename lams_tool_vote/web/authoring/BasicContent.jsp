@@ -37,7 +37,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		        	<table align=center> 	  
 						<tr>   
 						<td NOWRAP class=error>
-							<c:if test="${sessionScope.sbmtSuccess == 1}"> 			
+							<c:if test="${VoteAuthoringForm.sbmtSuccess == 'true' || VoteMonitoringForm.sbmtSuccess == 'true'}"> 			
 								<img src="<c:out value="${tool}"/>images/success.gif" align="left" width=20 height=20>  <font size=2> <bean:message key="sbmt.successful"/> </font> </img>
 							</c:if> 			
 

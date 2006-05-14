@@ -586,14 +586,35 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
     throws IOException, ServletException {
     	logger.debug("dispatching proxy submitAllContent...");
     	request.getSession().setAttribute(ACTIVE_MODULE, DEFINE_LATER);
-    	
+
     	request.setAttribute(SOURCE_VOTE_STARTER, "monitoring");
 	    logger.debug("SOURCE_VOTE_STARTER: monitoring");
 
     	VoteAction voteAction= new VoteAction(); 
-    	return voteAction.submitAllContent(mapping, form, request, response);
     	
+    	VoteMonitoringForm voteMonitoringForm = (VoteMonitoringForm) form;
+	    logger.debug("voteMonitoringForm :" +voteMonitoringForm);
+	    voteMonitoringForm.setSbmtSuccess(new Boolean(false).toString());
+	    voteMonitoringForm.setActiveModule(DEFINE_LATER);
+
+		
+		/* determine whether the request is from Monitoring url Edit Activity*/
+		String sourceVoteStarter = (String) request.getAttribute(SOURCE_VOTE_STARTER);
+		logger.debug("sourceVoteStarter: " + sourceVoteStarter);
+		String destination=VoteUtils.getDestination(sourceVoteStarter);
+		logger.debug("destination: " + destination);
+
+		
+		boolean isContentSubmitted=voteAction.submitContent(mapping, form, request, response);
+		logger.debug("isContentSubmitted :" +isContentSubmitted);
+		
+		if (isContentSubmitted == true)
+		    voteMonitoringForm.setSbmtSuccess(new Boolean(true).toString());
+		    
+		logger.debug("final submit status :" +voteMonitoringForm.getSbmtSuccess());
+        return (mapping.findForward(destination));	
     }
+    
     
     public ActionForward addNewOption(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
     throws IOException, ServletException 
@@ -603,8 +624,20 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
     	request.setAttribute(SOURCE_VOTE_STARTER, "monitoring");
 	    logger.debug("SOURCE_VOTE_STARTER: monitoring");
     	
+	    VoteMonitoringForm voteMonitoringForm = (VoteMonitoringForm) form;
+	    voteMonitoringForm.setSbmtSuccess(new Boolean(false).toString());
+
+		/* determine whether the request is from Monitoring url Edit Activity*/
+		String sourceVoteStarter = (String) request.getAttribute(SOURCE_VOTE_STARTER);
+		logger.debug("sourceVoteStarter: " + sourceVoteStarter);
+		String destination=VoteUtils.getDestination(sourceVoteStarter);
+		logger.debug("destination: " + destination);
+
     	VoteAction voteAction= new VoteAction(); 
-    	return voteAction.addNewOption(mapping, form, request, response);
+    	
+    	boolean isNewOptionAdded=voteAction.isNewOptionAdded(mapping, form, request, response);
+		logger.debug("isNewOptionAdded:" + isNewOptionAdded);
+        return (mapping.findForward(destination));
     }
 
 
@@ -622,7 +655,17 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	    logger.debug("SOURCE_VOTE_STARTER: monitoring");
 
     	VoteAction voteAction= new VoteAction(); 
-    	return voteAction.removeOption(mapping, form, request, response);
+    	
+		/* determine whether the request is from Monitoring url Edit Activity*/
+		String sourceVoteStarter = (String) request.getAttribute(SOURCE_VOTE_STARTER);
+		logger.debug("sourceVoteStarter: " + sourceVoteStarter);
+		String destination=VoteUtils.getDestination(sourceVoteStarter);
+		logger.debug("destination: " + destination);
+		
+		boolean isOptionRemoved=voteAction.isOptionRemoved(mapping, form, request, response);
+		logger.debug("isOptionRemoved :" +isOptionRemoved);
+
+		return (mapping.findForward(destination));
     }
 
     
@@ -638,8 +681,19 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	    logger.debug("SOURCE_VOTE_STARTER: monitoring");
     	
     	VoteAction voteAction= new VoteAction(); 
-    	return voteAction.moveOptionDown(mapping, form, request, response);
+
+    	/* determine whether the request is from Monitoring url Edit Activity*/
+		String sourceVoteStarter = (String) request.getAttribute(SOURCE_VOTE_STARTER);
+		logger.debug("sourceVoteStarter: " + sourceVoteStarter);
+		String destination=VoteUtils.getDestination(sourceVoteStarter);
+		logger.debug("destination: " + destination);
+    	
+		boolean isMoveOptionDown=voteAction.isMoveOptionDown(mapping, form, request, response);
+		logger.debug("isMoveOptionDown :" +isMoveOptionDown);
+
+		return (mapping.findForward(destination));
     }
+    
     
     public ActionForward moveOptionUp(ActionMapping mapping,
             ActionForm form,
@@ -651,9 +705,19 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 
     	request.setAttribute(SOURCE_VOTE_STARTER, "monitoring");
 	    logger.debug("SOURCE_VOTE_STARTER: monitoring");
-    	
+
+    	/* determine whether the request is from Monitoring url Edit Activity*/
+		String sourceVoteStarter = (String) request.getAttribute(SOURCE_VOTE_STARTER);
+		logger.debug("sourceVoteStarter: " + sourceVoteStarter);
+		String destination=VoteUtils.getDestination(sourceVoteStarter);
+		logger.debug("destination: " + destination);
+
     	VoteAction voteAction= new VoteAction(); 
-    	return voteAction.moveOptionUp(mapping, form, request, response);
+		boolean isMoveOptionUp=voteAction.isMoveOptionUp(mapping, form, request, response);
+		logger.debug("isMoveOptionUp:" + isMoveOptionUp);
+		
+		return (mapping.findForward(destination));
+
     }
 	
     /**

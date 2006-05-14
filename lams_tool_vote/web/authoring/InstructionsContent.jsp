@@ -32,12 +32,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
-		    	<table align=center> 	  
-					<tr> <td>
-						<jsp:include page="/VoteErrorBox.jsp" />
-					</td> </tr>
-				</table>
-
 				<table class="forms">
 				<tr> 
 					<td NOWRAP align="right" valign=top>
