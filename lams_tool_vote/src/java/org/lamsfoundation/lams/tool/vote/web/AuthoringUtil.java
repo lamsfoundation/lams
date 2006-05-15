@@ -62,7 +62,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 public class AuthoringUtil implements VoteAppConstants {
 	static Logger logger = Logger.getLogger(AuthoringUtil.class.getName());
 
-    public static boolean verifyDuplicatesOptionsMap(Map mapOptionsContent)
+    public static boolean verifyDuplicateNominations(Map mapOptionsContent)
 	{
     	Map originalMapOptionsContent=mapOptionsContent;
     	Map backupMapOptionsContent=mapOptionsContent;
@@ -87,11 +87,11 @@ public class AuthoringUtil implements VoteAppConstants {
     				}
     				
             		if (optionCount > 1)
-            			return false;	
+            			return true;	
         		}
     		}	
 		}
-    	return true;
+    	return false;
 	}
     
     

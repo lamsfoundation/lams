@@ -485,18 +485,11 @@ public abstract class VoteUtils implements VoteAppConstants {
     	request.getSession().removeAttribute(USER_EXCEPTION_MODE_INVALID);
     	request.getSession().removeAttribute(USER_EXCEPTION_QUESTION_EMPTY);
     	request.getSession().removeAttribute(USER_EXCEPTION_ANSWER_EMPTY);
-    	request.getSession().removeAttribute(USER_EXCEPTION_WEIGHT_TOTAL);
-    	request.getSession().removeAttribute(USER_EXCEPTION_WEIGHT_EMPTY);
-    	request.getSession().removeAttribute(USER_EXCEPTION_WEIGHT_NOTINTEGER);
-    	request.getSession().removeAttribute(USER_EXCEPTION_WEIGHT_ZERO);
     	request.getSession().removeAttribute(USER_EXCEPTION_ANSWERS_DUPLICATE);    	
     	request.getSession().removeAttribute(USER_EXCEPTION_OPTIONS_COUNT_ZERO);
     	request.getSession().removeAttribute(USER_EXCEPTION_CHKBOXES_EMPTY);
     	request.getSession().removeAttribute(USER_EXCEPTION_SUBMIT_NONE);
-    	request.getSession().removeAttribute(USER_EXCEPTION_PASSMARK_NOTINTEGER);
     	request.getSession().removeAttribute(USER_EXCEPTION_NUMBERFORMAT);
-    	request.getSession().removeAttribute(USER_EXCEPTION_PASSMARK_EMPTY);
-    	request.getSession().removeAttribute(USER_EXCEPTION_PASSMARK_GREATER100);    	
     	request.getSession().removeAttribute(USER_EXCEPTION_FILENAME_EMPTY);
     	request.getSession().removeAttribute(USER_EXCEPTION_WEIGHT_MUST_EQUAL100);
     	request.getSession().removeAttribute(USER_EXCEPTION_SINGLE_OPTION);

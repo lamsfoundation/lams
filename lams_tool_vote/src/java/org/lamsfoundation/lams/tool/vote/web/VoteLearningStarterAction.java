@@ -135,6 +135,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	voteLearningForm.setUserEntry("");
 	voteLearningForm.setCastVoteCount(0);
 	voteLearningForm.setMaxNominationCountReached(new Boolean(false).toString());
+	voteLearningForm.setActivityRunOffline(new Boolean(false).toString());
 	
     /*
      * persist time zone information to session scope. 
@@ -304,6 +305,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
     	VoteUtils.cleanUpSessionAbsolute(request);
     	logger.debug("warning to learner: the activity is offline.");
     	request.getSession().setAttribute(USER_EXCEPTION_CONTENT_RUNOFFLINE, new Boolean(true).toString());
+    	voteLearningForm.setActivityRunOffline(new Boolean(true).toString());
     	persistError(request,"label.learning.runOffline");
 		return (mapping.findForward(ERROR_LIST));
     }
@@ -341,7 +343,6 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	logger.debug("userID:" + userID);
     
 	logger.debug("voteSession uid :" + voteSession.getUid());
-	//VoteQueUsr voteQueUsr=voteService.retrieveVoteQueUsr(new Long(userID));
 	VoteQueUsr voteQueUsr=voteService.getVoteUserBySession(new Long(userID), voteSession.getUid());
     logger.debug("voteQueUsr:" + voteQueUsr);
     
@@ -416,8 +417,6 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	    	request.getSession().setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, localMapQuestionsContent);
     		logger.debug("end building MAP_GENERAL_CHECKED_OPTIONS_CONTENT: " + localMapQuestionsContent);
     
-    	    
-    	    
     	    boolean isSessionCompleted=isSessionCompleted(userSessionId, voteService);
     	    logger.debug("isSessionCompleted: " + isSessionCompleted);
     	    

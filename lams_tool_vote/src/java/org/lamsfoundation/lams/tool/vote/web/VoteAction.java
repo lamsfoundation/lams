@@ -121,10 +121,6 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 	 	IVoteService voteService =VoteUtils.getToolService(request);
 	 	VoteUtils.persistRichText(request);	 	
 	 	voteAuthoringForm.resetUserAction();
-	 	
-	 	voteAuthoringForm.setExceptionMaxNominationInvalid(new Boolean(false).toString());
-	 	request.getSession().setAttribute(VALIDATION_ERROR, new Boolean(false).toString());
-		voteAuthoringForm.setSbmtSuccess(new Boolean(false).toString());
 	 	return null;
     }
     
@@ -134,10 +130,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 		logger.debug("doing isNewOptionAdded");
 		VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
 	    logger.debug("voteAuthoringForm :" +voteAuthoringForm);
-	    voteAuthoringForm.setExceptionMaxNominationInvalid(new Boolean(false).toString());
 	    voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
-	    request.getSession().setAttribute(VALIDATION_ERROR, new Boolean(false).toString());
-	    voteAuthoringForm.setSbmtSuccess(new Boolean(false).toString());
 		
 	    AuthoringUtil authoringUtil= new AuthoringUtil();
 	    Map mapOptionsContent=(Map)request.getSession().getAttribute(MAP_OPTIONS_CONTENT);
@@ -213,10 +206,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
         logger.debug("starting isOptionRemoved ");
 		VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
 	    logger.debug("voteAuthoringForm :" +voteAuthoringForm);
-	    voteAuthoringForm.setExceptionMaxNominationInvalid(new Boolean(false).toString());
 	    voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
-	    request.getSession().setAttribute(VALIDATION_ERROR, new Boolean(false).toString());
-		voteAuthoringForm.setSbmtSuccess(new Boolean(false).toString());
 		
 		VoteUtils.persistRichText(request);
 	    
@@ -288,11 +278,8 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 
 	    VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
 	    logger.debug("voteAuthoringForm :" +voteAuthoringForm);
-	    voteAuthoringForm.setExceptionMaxNominationInvalid(new Boolean(false).toString());
 	    voteAuthoringForm.setSubmissionAttempt(new Boolean(true).toString());
-	    request.getSession().setAttribute(VALIDATION_ERROR, new Boolean(false).toString());
-	    voteAuthoringForm.setSbmtSuccess(new Boolean(false).toString());
-		
+	    request.setAttribute(VALIDATION_ERROR, new Boolean(false).toString());
 	    
 	    IVoteService voteService = (IVoteService)request.getSession().getAttribute(TOOL_SERVICE);
 	    if (voteService == null)        
@@ -323,12 +310,12 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 	           	
 	    ActionMessages errors= new ActionMessages();
 	    errors=validateSubmit(request, errors, voteAuthoringForm);
-	
+	    
 	    if (errors.size() > 0)  
 	    {
 	        logger.debug("returning back to from to fix errors:");
 	        request.getSession().setAttribute(EDITACTIVITY_EDITMODE, new Boolean(true));
-	        request.getSession().setAttribute(VALIDATION_ERROR, new Boolean(true).toString());
+	        request.setAttribute(VALIDATION_ERROR, new Boolean(true).toString());
 	        //return mapping.findForward(destination);
 	        return false;
 	    }
@@ -343,6 +330,16 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 	        mapOptionsContent= new TreeMap(new VoteComparator());
 
 	    logger.debug("mapOptionsContent :" +mapOptionsContent);
+	    boolean nominationsDuplicate=AuthoringUtil.verifyDuplicateNominations(mapOptionsContent);
+	    logger.debug("nominationsDuplicate :" +nominationsDuplicate);
+	    
+	    if (nominationsDuplicate == true)
+	    {
+	        logger.debug("back to user, nominationsDuplicate :" +nominationsDuplicate);
+	        request.setAttribute(USER_EXCEPTION_OPTIONS_DUPLICATE, new Boolean(true).toString());
+	        return false;
+	    }
+	    
 
         int maxIndex=mapOptionsContent.size();
     	request.getSession().setAttribute(MAX_OPTION_INDEX, new Integer(maxIndex));
@@ -379,9 +376,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 			    {
 				    if (maxNomCount.equals("0"))
 				    {
-				        voteAuthoringForm.setExceptionMaxNominationInvalid(new Boolean(true).toString());
-						persistError(request,"error.maxNominationCount.invalid");
-						//return (mapping.findForward(LOAD_QUESTIONS));
+				        request.setAttribute(USER_EXCEPTION_MAXNOMINATION_INVALID, new Boolean(true).toString());
 						return false;
 				    }
 				    
@@ -392,9 +387,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 					}
 			    	catch(NumberFormatException e)
 					{
-			    		persistError(request,"error.maxNominationCount.invalid");
-			    		voteAuthoringForm.setExceptionMaxNominationInvalid(new Boolean(true).toString());
-						//return (mapping.findForward(LOAD_QUESTIONS));
+				        request.setAttribute(USER_EXCEPTION_MAXNOMINATION_INVALID, new Boolean(true).toString());
 			    		return false;
 					}
 			    }
@@ -419,8 +412,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 	
 	    errors.clear();
 	    errors.add(Globals.ERROR_KEY, new ActionMessage("sbmt.successful"));
-	    //request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(1));
-	    voteAuthoringForm.setSbmtSuccess(new Boolean(true).toString());
+        request.setAttribute(SUBMIT_SUCCESS, new Boolean(true).toString());
 	    logger.debug("setting SUBMIT_SUCCESS to 1.");
 	    
 	    Long strToolContentId=(Long)request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
@@ -444,8 +436,6 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 		
 	    VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
 	    logger.debug("voteAuthoringForm :" +voteAuthoringForm);
-	    voteAuthoringForm.setSbmtSuccess(new Boolean(false).toString());
-
 		
 		/* determine whether the request is from Monitoring url Edit Activity*/
 		String sourceVoteStarter = (String) request.getAttribute(SOURCE_VOTE_STARTER);
@@ -461,6 +451,8 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 		    voteAuthoringForm.setSbmtSuccess(new Boolean(true).toString());
 		    
 		logger.debug("final submit status :" +voteAuthoringForm.getSbmtSuccess());
+		logger.debug("final duplicate status :" +request.getAttribute(USER_EXCEPTION_OPTIONS_DUPLICATE));
+		logger.debug("fwding to destination :" +destination);
         return (mapping.findForward(destination));	
     }
 
@@ -475,12 +467,8 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     	logger.debug("dispatching moveOptionDown...");
     	VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
 	    logger.debug("voteAuthoringForm :" +voteAuthoringForm);
-	    voteAuthoringForm.setExceptionMaxNominationInvalid(new Boolean(false).toString());
 	    voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
-	    request.getSession().setAttribute(VALIDATION_ERROR, new Boolean(false).toString());
-	    voteAuthoringForm.setSbmtSuccess(new Boolean(false).toString());
-	    
-    	//request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
+
     	IVoteService voteService =VoteUtils.getToolService(request);
 
 		VoteUtils.persistRichText(request);
@@ -569,12 +557,10 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     	VoteUtils.cleanUpUserExceptions(request);
     	
     	VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;    	
-    	voteAuthoringForm.setSbmtSuccess(new Boolean(false).toString());
     	
     	logger.debug("voteAuthoringForm :" +voteAuthoringForm);
-    	voteAuthoringForm.setExceptionMaxNominationInvalid(new Boolean(false).toString());
     	voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
-    	request.getSession().setAttribute(VALIDATION_ERROR, new Boolean(false).toString());
+    	
     	IVoteService voteService =VoteUtils.getToolService(request);
 
 		/* determine whether the request is from Monitoring url Edit Activity*/
@@ -662,8 +648,6 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     
     protected ActionMessages validateSubmit(HttpServletRequest request, ActionMessages errors, VoteAuthoringForm voteAuthoringForm)
     {
-    	//request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
-        voteAuthoringForm.setSbmtSuccess(new Boolean(false).toString());
         String title = voteAuthoringForm.getTitle();
         logger.debug("title: " + title);
 
@@ -711,12 +695,8 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     	logger.debug("dispatching submitOfflineFile...");
     	VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
     	logger.debug("voteAuthoringForm :" +voteAuthoringForm);
-    	voteAuthoringForm.setExceptionMaxNominationInvalid(new Boolean(false).toString());
     	voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
-    	request.getSession().setAttribute(VALIDATION_ERROR, new Boolean(false).toString());
-
-    	//request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
-    	voteAuthoringForm.setSbmtSuccess(new Boolean(false).toString());
+    	
     	IVoteService voteService =VoteUtils.getToolService(request);
 
 		/* determine whether the request is from Monitoring url Edit Activity*/
@@ -767,11 +747,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     	logger.debug("dispatching submitOnlineFiles...");
     	VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
     	logger.debug("voteAuthoringForm :" +voteAuthoringForm);
-    	voteAuthoringForm.setExceptionMaxNominationInvalid(new Boolean(false).toString());
     	voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
-    	request.getSession().setAttribute(VALIDATION_ERROR, new Boolean(false).toString());
-    	//request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
-    	voteAuthoringForm.setSbmtSuccess(new Boolean(false).toString());
     	
 	 	IVoteService voteService =VoteUtils.getToolService(request);
 
@@ -822,11 +798,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     	logger.debug("dispatching deleteOfflineFile...");
     	VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
     	logger.debug("voteAuthoringForm :" +voteAuthoringForm);
-    	voteAuthoringForm.setExceptionMaxNominationInvalid(new Boolean(false).toString());
     	voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
-    	request.getSession().setAttribute(VALIDATION_ERROR, new Boolean(false).toString());
-    	//request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
-    	voteAuthoringForm.setSbmtSuccess(new Boolean(false).toString());
     	
 	 	IVoteService voteService =VoteUtils.getToolService(request);
 	 	
@@ -864,11 +836,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     	logger.debug("dispatching deleteOnlineFile...");
     	VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
     	logger.debug("voteAuthoringForm :" +voteAuthoringForm);
-    	voteAuthoringForm.setExceptionMaxNominationInvalid(new Boolean(false).toString());
     	voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
-    	request.getSession().setAttribute(VALIDATION_ERROR, new Boolean(false).toString());
-    	//request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
-    	voteAuthoringForm.setSbmtSuccess(new Boolean(false).toString());
     	
 	 	IVoteService voteService =VoteUtils.getToolService(request);
 
@@ -905,10 +873,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     	logger.debug("dispatching editActivityQuestions...");
     	VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
     	logger.debug("voteAuthoringForm :" +voteAuthoringForm);
-    	voteAuthoringForm.setExceptionMaxNominationInvalid(new Boolean(false).toString());
     	voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
-    	request.getSession().setAttribute(VALIDATION_ERROR, new Boolean(false).toString());
-    	voteAuthoringForm.setSbmtSuccess(new Boolean(false).toString());
     	
 		IVoteService voteService = (IVoteService)request.getSession().getAttribute(TOOL_SERVICE);
 		logger.debug("voteService: " + voteService);

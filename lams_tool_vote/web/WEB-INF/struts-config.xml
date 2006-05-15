@@ -54,43 +54,43 @@
 	  	<forward
 		    name="load"
 		    path="/authoring/AuthoringMaincontent.jsp"
-		    redirect="true"
+		    redirect="false"
 	  	/>
 
 	  	<forward
 		    name="loadMonitoring"
 		    path="/monitoring/MonitoringMaincontent.jsp"
-		    redirect="true"
+		    redirect="false"
 	  	/>
 
 	  	<forward
 		    name="loadMonitoringEditActivity"
 		    path="/monitoring/MonitoringMaincontent.jsp"
-		    redirect="true"
+		    redirect="false"
 	  	/>
 	  	
 	  	<forward
 		    name="loadLearner"
 		    path="/learning/AnswersContent.jsp"
-		    redirect="true"
+		    redirect="false"
 	  	/>
 
 	  	<forward
 	        name="starter"
 	        path="/index.jsp"
-		    redirect="true"
+		    redirect="false"
 	     />
 	     
 	     <forward
 	        name="preview"
 	        path="/learning/Preview.jsp"
-		    redirect="true"
+		    redirect="false"
 	     />
 	  	
 	  	<forward
 		    name="errorList"
 		    path="/VoteErrorBox.jsp"
-		    redirect="true"
+		    redirect="false"
 	  	/>
 	</action>  
 	
@@ -122,31 +122,31 @@
 	      <forward
 	        name="load"
 	        path="/authoring/AuthoringMaincontent.jsp"
-		    redirect="true"
+		    redirect="false"
 	      />
 	    
 	      <forward
 	        name="starter"
 	        path="/index.jsp"
-		    redirect="true"
+		    redirect="false"
 	      />
 	      
 	  	<forward
 		    name="loadMonitoring"
 		    path="/monitoring/MonitoringMaincontent.jsp"
-		    redirect="true"
+		    redirect="false"
 	  	/>
 	  	
 	     <forward
 	        name="preview"
 	        path="/learning/Preview.jsp"
-		    redirect="true"
+		    redirect="false"
 	     />
 	  	
 	  	<forward
 		    name="errorList"
 		    path="/VoteErrorBox.jsp"
-		    redirect="true"
+		    redirect="false"
 	  	/>
     </action>
     
@@ -176,13 +176,13 @@
 	      <forward
 	        name="load"
 	        path="/authoring/AuthoringMaincontent.jsp"
-		    redirect="true"
+		    redirect="false"
 	      />
 
 	  	<forward
 		    name="errorList"
 	        path="/VoteErrorBox.jsp"
-		    redirect="true"
+		    redirect="false"
 	  	/>
 	</action>  
     
@@ -401,7 +401,7 @@
 	  	<forward
 		    name="errorList"
 	        path="/VoteErrorBox.jsp"
-		    redirect="true"
+		    redirect="false"
 	  	/>
 	</action>  
     
@@ -441,7 +441,7 @@
 	  	<forward
 		    name="loadMonitoringEditActivity"
 		    path="/monitoring/MonitoringMaincontent.jsp"
-		    redirect="true"
+		    redirect="false"
 	  	/>
 	
 	  	<forward
@@ -454,7 +454,7 @@
 	  	<forward
 		    name="errorList"
 	        path="/VoteErrorBox.jsp"
-		    redirect="true"
+		    redirect="false"
 	  	/>
 	</action>  
  </action-mappings>

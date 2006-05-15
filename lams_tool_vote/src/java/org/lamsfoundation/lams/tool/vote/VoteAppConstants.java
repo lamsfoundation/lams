@@ -267,17 +267,10 @@ public interface VoteAppConstants {
     public static final String USER_EXCEPTION_MODE_INVALID				="userExceptionModeInvalid";
     public static final String USER_EXCEPTION_QUESTION_EMPTY			="userExceptionQuestionEmpty";
     public static final String USER_EXCEPTION_ANSWER_EMPTY				="userExceptionAnswerEmpty";
-    public static final String USER_EXCEPTION_WEIGHT_TOTAL				="userExceptionWeightTotal";
-    public static final String USER_EXCEPTION_WEIGHT_EMPTY				="userExceptionWeightEmpty";
-    public static final String USER_EXCEPTION_WEIGHT_NOTINTEGER			="userExceptionWeightNotInteger";
-    public static final String USER_EXCEPTION_WEIGHT_ZERO				="userExceptionWeightZero";
     public static final String USER_EXCEPTION_ANSWERS_DUPLICATE			="userExceptionAnswersDuplicate";
     public static final String USER_EXCEPTION_OPTIONS_COUNT_ZERO		="userExceptionOptionsCountZero";
     public static final String USER_EXCEPTION_CHKBOXES_EMPTY			="userExceptionChkboxesEmpty";
     public static final String USER_EXCEPTION_SUBMIT_NONE				="userExceptionSubmitNone";
-    public static final String USER_EXCEPTION_PASSMARK_NOTINTEGER		="userExceptionPassmarkNotInteger";
-    public static final String USER_EXCEPTION_PASSMARK_EMPTY			="userExceptionPassmarkEmpty";
-    public static final String USER_EXCEPTION_PASSMARK_GREATER100		="userExceptionPassmarkGreater100";
     public static final String USER_EXCEPTION_FILENAME_EMPTY			="userExceptionFilenameEmpty";
     public static final String USER_EXCEPTION_WEIGHT_MUST_EQUAL100		="userExceptionWeightMustEqual100";
     public static final String USER_EXCEPTION_SINGLE_OPTION				="userExceptionSingleOption";
