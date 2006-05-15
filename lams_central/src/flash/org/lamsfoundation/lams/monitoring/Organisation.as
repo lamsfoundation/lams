@@ -41,9 +41,9 @@ class Organisation {
 	/**
 	* constants
 	*/
-	public static var TEACHER_ROLE:String = "teacher";
-	public static var STAFF_ROLE:String = "staff";
-	public static var LEARNER_ROLE:String = "learner";
+	public static var TEACHER_ROLE:String = "TEACHER";
+	public static var STAFF_ROLE:String = "STAFF";
+	public static var LEARNER_ROLE:String = "LEARNER";
 	
 	/**
 	* Constructor.
@@ -148,16 +148,20 @@ class Organisation {
 	private function getUsersByRole(roleName:String):Array{
 		var usrs:Array = new Array();
 		var keys:Array = _users.keys();
-		
+		trace('getting users by role...');
 		for(var i=0; i<keys.length;i++){
-			var user:Object = _users.get(keys[i]);
-			var u:User = user.classInstanceRefs;
-			if(u.hasRole(roleName)){
-				usrs.push(u);
+			var user:User = User(_users.get(keys[i]));
+			//var u:User = user.classInstanceRefs;
+			if(user.hasRole(roleName)){
+				usrs.push(user);
 			}
 		}
 		
 		return usrs;
+	}
+	
+	public function clearUsers():Void{
+		_users.clear();
 	}
 	
 	function get className():String{
