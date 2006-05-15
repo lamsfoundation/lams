@@ -27,6 +27,7 @@ import org.lamsfoundation.lams.common.ui.*
 import org.lamsfoundation.lams.common.style.*
 import org.lamsfoundation.lams.monitoring.mv.*
 import org.lamsfoundation.lams.monitoring.*;
+import org.lamsfoundation.lams.monitoring.ContributeActivity;
 import org.lamsfoundation.lams.authoring.Activity;
 import org.lamsfoundation.lams.common.dict.*
 import org.lamsfoundation.lams.common.mvc.*
@@ -167,6 +168,10 @@ public function update (o:Observable,infoObj:Object):Void{
 				_monitorController = getController();
 				showLessonManagerDialog(mm);
 				break;
+			case 'USERS_LOADED' :
+				_lessonManagerDialog.loadLearners(mm.organisation.getLearners());
+				_lessonManagerDialog.loadStaff(mm.organisation.getStaff());
+				break;
             default :
                 Debugger.log('unknown update type :' + infoObj.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.LessonTabView');
 		}
@@ -221,6 +226,7 @@ public function update (o:Observable,infoObj:Object):Void{
 		//duration_txt.text = s._seqDescription
 		  
 	}
+
 	/**
 	* Populate the required tasks for the active Sequence 
 	*/
@@ -246,6 +252,7 @@ public function update (o:Observable,infoObj:Object):Void{
 		
 		
 	}
+
 	/**
 	* Populate the required tasks for the active Sequence 
 	*/
