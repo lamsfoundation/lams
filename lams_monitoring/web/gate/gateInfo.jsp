@@ -21,7 +21,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <!-- general information section--> 
 <tr>
-    <td class="subHeader"><fmt:message key="lable.description"/></td>
+    <td class="subHeader"><fmt:message key="label.description"/></td>
 </tr> 
 <tr>
     <td class="body"><c:out value="${GateForm.map.gate.description}"/></td>
@@ -33,7 +33,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <!--waiting learner information table-->
 <tr> 
 	<td class="bodyBold">
-	<c:out value="${GateForm.map.waitingLearners}"/> out of <c:out value="${GateForm.map.totalLearners}"/>
-	are waiting in front of the gate.
+		<fmt:message key="label.gate.waiting.learners">  
+			<fmt:param value="${GateForm.map.waitingLearners}"/>
+			<fmt:param value="${GateForm.map.totalLearners}"/>
+		</fmt:message>
 	</td>
 </tr>

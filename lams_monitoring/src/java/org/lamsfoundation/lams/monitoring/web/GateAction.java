@@ -30,7 +30,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -47,6 +46,7 @@ import org.lamsfoundation.lams.monitoring.service.MonitoringServiceException;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 
 /**
@@ -91,7 +91,7 @@ public class GateAction extends LamsDispatchAction
     //---------------------------------------------------------------------
     // Instance variables
     //---------------------------------------------------------------------
-	private static Logger log = Logger.getLogger(GateAction.class);
+	// private static Logger log = Logger.getLogger(GateAction.class);
 	
 	private IMonitoringService monitoringService;
 	private ILearnerService learnerService;
@@ -101,12 +101,9 @@ public class GateAction extends LamsDispatchAction
     private static final String VIEW_SYNCH_GATE = "viewSynchGate";
     private static final String VIEW_PERMISSION_GATE = "viewPermissionGate";
     private static final String VIEW_SCHEDULE_GATE="viewScheduleGate";
-    //---------------------------------------------------------------------
-    // Class level constants - session attributes
-    //---------------------------------------------------------------------
-    private static final String PARAM_GATE_ACTIVITY_ID = "activityId";
-    private static final String PARAM_LESSON_ID = "lessonId";
-    
+	private static final String ACTIVITY_FORM_FIELD = "activityId";
+	private static final String TOTAL_LEARNERS_FORM_FIELD = "totalLearners";
+
     //---------------------------------------------------------------------
     // Struts Dispatch Method
     //---------------------------------------------------------------------
@@ -146,9 +143,14 @@ public class GateAction extends LamsDispatchAction
     {
         DynaActionForm gateForm = (DynaActionForm)form;
         
-        long lessonId = WebUtil.readLongParam(request,PARAM_LESSON_ID);
-
-        Long gateIdLong = (Long)gateForm.get("activityId");
+        long lessonId = WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID);
+        
+        // if this is the initial call then activity id will be in the request, otherwise
+        // get it from the form (if being called from openGate.jsp
+        Long gateIdLong = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID, true);
+        if ( gateIdLong == null ) {
+        	gateIdLong = (Long)gateForm.get(ACTIVITY_FORM_FIELD);
+        }
         long gateId = gateIdLong != null ? gateIdLong.longValue() : -1 ;
         
         this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
@@ -159,8 +161,8 @@ public class GateAction extends LamsDispatchAction
         //setup the total learners
         int totalLearners = LessonLearnerDataManager.getAllLessonLearners(getServlet().getServletContext(),lessonId,learnerService)
                                                     .size();
-        gateForm.set("totalLearners",new Integer(totalLearners));
-        
+        gateForm.set(TOTAL_LEARNERS_FORM_FIELD,new Integer(totalLearners));
+        gateForm.set(ACTIVITY_FORM_FIELD,gateIdLong);        
         
         return findViewByGateType(mapping, gateForm, gate);
     }
@@ -189,7 +191,7 @@ public class GateAction extends LamsDispatchAction
 
         DynaActionForm gateForm = (DynaActionForm)form;
         
-        GateActivity gate = monitoringService.openGate((Long)gateForm.get("activityId"));
+        GateActivity gate = monitoringService.openGate((Long)gateForm.get(ACTIVITY_FORM_FIELD));
             
         return findViewByGateType(mapping, gateForm, gate);
     }
@@ -213,16 +215,21 @@ public class GateAction extends LamsDispatchAction
                                              Activity gate)
     {
         //dispatch the view according to the type of the gate.
-        if(gate.isSynchGate())
-            return viewSynchGate(mapping,gateForm,(SynchGateActivity)gate);
-        else if(gate.isScheduleGate())
-            return viewScheduleGate(mapping,gateForm,(ScheduleGateActivity)gate);
-        else if(gate.isPermissionGate())
-            return viewPermissionGate(mapping,gateForm,(PermissionGateActivity)gate);
-        else
-            throw new MonitoringServiceException("Invalid gate activity. " +
-            		"gate id ["+gate.getActivityId()+"] - the type ["+
-            		gate.getActivityTypeId()+"] is not a gate type");
+    	if ( gate != null ) {
+	        if(gate.isSynchGate())
+	            return viewSynchGate(mapping,gateForm,(SynchGateActivity)gate);
+	        else if(gate.isScheduleGate())
+	            return viewScheduleGate(mapping,gateForm,(ScheduleGateActivity)gate);
+	        else if(gate.isPermissionGate())
+	            return viewPermissionGate(mapping,gateForm,(PermissionGateActivity)gate);
+	        else
+	            throw new MonitoringServiceException("Invalid gate activity. " +
+	            		"gate id ["+gate.getActivityId()+"] - the type ["+
+	            		gate.getActivityTypeId()+"] is not a gate type");
+    	} else {
+    		throw new MonitoringServiceException("Gate activity missing. " +
+        		"gate id ["+gate.getActivityId()+"]");
+    	}
     }
 
 

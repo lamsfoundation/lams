@@ -34,7 +34,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
                 <table width="90%" border="0" cellspacing="0" cellpadding="0" summary="This table is being used for layout purposes only"> 
 					<tr><td>&nbsp; </td></tr> 
 					<tr> 
-					    <td height="31" colspan="3"> <div class="heading" align="center"><fmt:message key="label.permission.gate"/></div></td> 
+					    <td height="31" colspan="3"> <div class="heading" align="center"><fmt:message key="label.permission.gate.title"/></div></td> 
 					</tr> 					  
 				    <%@ include file="gateInfo.jsp" %>
 			        <tr><td>&nbsp; </td></tr>

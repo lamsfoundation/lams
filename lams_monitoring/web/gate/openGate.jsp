@@ -20,7 +20,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 --%>
 
 <tr>
-	<td class="body" valign="middle">Class cannot continue until the gate is opened by you</td>
+	<td class="body" valign="middle"><fmt:message key="label.gate.you.open.message"/></td>
 	<td width="90" align="center" valign="middle" class="bodyBold">
 		<c:if test="${not GateForm.map.gate.gateOpen}" >
 			<html:form action="/gate?method=openGate" target="_self">
@@ -28,15 +28,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</html:form>
 		</c:if>
 		<c:if test="${GateForm.map.gate.gateOpen}">
-			 Gate has been opened
+			 <fmt:message key="label.gate.gate.open"/>
 		</c:if>
 	</td>
 	<td width="100" align="center" valign="middle">
 		<c:if test="${not GateForm.map.gate.gateOpen}">
-			<img height="43" src="../images/synch_active.gif" width="37"><br><span class="bodyBold"> Active</span>
+			<img height="43" src="../images/synch_active.gif" width="37"><br><span class="bodyBold"><fmt:message key="label.gate.closed"/></span>
 		</c:if>
 		<c:if test="${GateForm.map.gate.gateOpen}">
-			<img height="43" src="../images/synch_not_active.gif" width="37"><br><span class="bodyBold"> Active</span>
+			<img height="43" src="../images/synch_not_active.gif" width="37"><br><span class="bodyBold"><fmt:message key="label.gate.gate.open"/></span>
 		</c:if>
 	</td>
 </tr>   
