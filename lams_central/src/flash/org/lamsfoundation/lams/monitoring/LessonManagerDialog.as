@@ -44,6 +44,8 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 	
 	
 	public var RT_ORG:String = "Organisation";
+	public static var USERS_X:Number = 0;
+	public static var USER_OFFSET:Number = 20;
 	
 	//References to components + clips 
     private var _container:MovieClip;  //The container window that holds the dialog
@@ -72,6 +74,9 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 	private var _monitorModel:MonitorModel;
 	private var _monitorView:MonitorView;
 	private var _monitorController:MonitorController;
+
+	private var _learnerList:Array;
+	private var _staffList:Array;
 
 	private var _resultDTO:Object;
 	private var _selectedOrgId:Number;	// selected organisation
@@ -395,6 +400,43 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 		odto.parentID = dto.parentID;
 		
 		return odto;
+	}
+	
+	/**
+	 * Load learners into scrollpane
+	 * @param   users Users to load
+	 */
+	
+	public function loadLearners(users:Array):Void{
+		trace('loading Learners...');
+		_learnerList = new Array();
+		trace('list length: ' + users.length);
+		for(var i=0; i<users.length; i++){
+			var user:User = User(users[i]);
+			
+			_learnerList[i] = learner_scp.attachMovie('staff_learner_dataRow', 'userDataRow' + i, DepthManager.kTop, {fullName:user.getFirstName(),_x:USERS_X,_y:USER_OFFSET * i});
+			trace('new row: ' + _learnerList[i]);
+			trace('loading: user ' + user.getFirstName() + ' ' + user.getLastName());
+			learner_scp.refreshPane();
+		}
+	}
+	
+	/**
+	* Load staff into scrollpane
+	* @param 	users Users to load
+	*/
+	public function loadStaff(users:Array):Void{
+		trace('loading Staff....');
+		trace('list length: ' + users.length);
+		_staffList = new Array();
+		for(var i=0; i<users.length; i++){
+			//_staffList[i] = staff_scp.attachmovie();
+			//_staffList[i]._x = USERS_X;
+			//_staffList[i[._y = USER_OFFSET * i;
+			var user:User = User(users[i]);
+			trace('loading: user ' + user.getFirstName() + ' ' + user.getLastName());
+			staff_scp.refresh();
+		}
 	}
 	
 	
