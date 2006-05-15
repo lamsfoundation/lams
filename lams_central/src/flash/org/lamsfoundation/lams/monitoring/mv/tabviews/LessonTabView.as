@@ -284,15 +284,15 @@ public function update (o:Observable,infoObj:Object):Void{
 		var todos:Array = mm.getToDos();
 		// show isRequired activities in scrollpane
 		for (var i=0; i<todos.length; i++){
-			getEntries(todos[i]);
 			trace('main CA title: ' + todos[i].title);
+			getEntries(todos[i]);
 		}
 	}
 	
-	private function getEntries(ca:Object){
+	private function getEntries(ca:Object):Void{
 		for (var i=0; i<ca.childActivities.length; i++){
 			trace(ca.title+"'s Child Activity "+i+" is: "+ca.childActivities[i].title)
-			getEntries(ca);
+			getEntries(ca.childActivities[i]);
 		}
 		for (var j=0; j<ca.contributeEntries.length; j++){ 
 			trace("Contribute Entry for "+ca.title+" is: "+ca.contributeEntries[j].contributionType)
