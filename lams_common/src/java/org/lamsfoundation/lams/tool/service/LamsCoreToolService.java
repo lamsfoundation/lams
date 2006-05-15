@@ -456,7 +456,7 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
 				activity.getActivityId().toString());
         }
         if ( lessonID != null ) {
-        	WebUtil.appendParameterToURL(url,
+        	url = WebUtil.appendParameterToURL(url,
                		AttributeNames.PARAM_LESSON_ID,
                		lessonID.toString());
         }
