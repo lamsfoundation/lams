@@ -356,20 +356,6 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 	    authoringUtil.reconstructOptionsContentMapForSubmit(mapOptionsContent, request);
 	    logger.debug("before saveOrUpdateVoteContent.");
 	    
-	    boolean verifyDuplicatesOptionsMap=AuthoringUtil.verifyDuplicatesOptionsMap(mapOptionsContent);
-	 	logger.debug("verifyDuplicatesOptionsMap: " + verifyDuplicatesOptionsMap);
-	 	request.getSession().removeAttribute(USER_EXCEPTION_OPTIONS_DUPLICATE);
-	 	
-	 	if (verifyDuplicatesOptionsMap == false)
-		{
-			request.getSession().setAttribute(USER_EXCEPTION_OPTIONS_DUPLICATE, new Boolean(true).toString());
-			logger.debug("add error.options.duplicate to ActionMessages");
-			persistError(request,"error.options.duplicate");
-			voteAuthoringForm.resetUserAction();
-			//return mapping.findForward(destination);
-			return false;
-		}
-	 	
 	 	logger.debug("submitting mapOptionsContent:" + mapOptionsContent);
 	    
 	    /*to remove deleted entries in the questions table based on mapQuestionContent */

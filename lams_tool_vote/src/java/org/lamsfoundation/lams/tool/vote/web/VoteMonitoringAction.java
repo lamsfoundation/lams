@@ -136,7 +136,7 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 			logger.debug("retrieving voteService from session: " + voteService);
 		}
     	VoteMonitoringForm voteMonitoringForm = (VoteMonitoringForm) form;
-	 	
+    	
     	String currentMonitoredToolSession=voteMonitoringForm.getSelectedToolSessionId(); 
 	    logger.debug("currentMonitoredToolSession: " + currentMonitoredToolSession);
 	    
@@ -168,6 +168,8 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	    request.getSession().setAttribute(CURRENT_MONITORED_TOOL_SESSION, currentMonitoredToolSession);
 	    logger.debug("CURRENT_MONITORED_TOOL_SESSION: " + request.getSession().getAttribute(CURRENT_MONITORED_TOOL_SESSION));
 	    
+	    voteMonitoringForm.setSbmtSuccess(new Boolean(false).toString());
+	    request.getSession().setAttribute(REQUEST_LEARNING_REPORT, new Boolean(false).toString());
     	return (mapping.findForward(LOAD_MONITORING));	
 	}
 
@@ -545,9 +547,13 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
                                          ToolException
     {
     	logger.debug("dispatching editActivityQuestions...");
+    	
+	    VoteMonitoringForm voteMonitoringForm = (VoteMonitoringForm) form;
+	    logger.debug("voteMonitoringForm :" +voteMonitoringForm);
+	    
     	request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(false).toString());
-
 		request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(true));
+		
 		VoteUtils.setDefineLater(request, true);
 		
 	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
@@ -577,8 +583,9 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 
     	request.setAttribute(SOURCE_VOTE_STARTER, "monitoring");
 	    logger.debug("SOURCE_VOTE_STARTER: monitoring");
-
-		
+    	
+	    voteMonitoringForm.setSbmtSuccess(new Boolean(false).toString());
+	    logger.debug("submit success is false");
         return (mapping.findForward(LOAD_MONITORING));
     }
 	

@@ -35,11 +35,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 <table border="0" cellspacing="2" cellpadding="2" summary="This table is being used for layout purposes only">
-		<c:if test="${userExceptionQuestionEmpty == 'true'}"> 			
-			<tr> <td NOWRAP valign=top>
-						<font size=2> <bean:message key="error.question.empty"/> </font>
-			</td> </tr>
-		</c:if> 				    
 
 		<c:if test="${userExceptionWeightTotal == 'true'}"> 			
 			<tr> <td NOWRAP valign=top>
@@ -89,13 +84,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</td> </tr>
 		</c:if> 				    
 
-		<c:if test="${userExceptionNoToolSessions == 'true'}"> 			
-			<tr> <td NOWRAP valign=top>
-						<font size=2> <bean:message key="error.toolSession.doesNoExist"/> </font>
-			</td> </tr>
-		</c:if> 				
-		
-
 		<c:if test="${userExceptionWeightMustEqual100 == 'true'}"> 			
 			<tr> <td NOWRAP valign=top>
 						<font size=2> <bean:message key="error.weights.total.invalid"/> </font>
@@ -107,12 +95,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<font size=2> <bean:message key="error.checkBoxes.empty"/> </font>
 			</td> </tr>
 		</c:if> 				
-
-		<c:if test="${userExceptionLearnerRequired == 'true'}"> 			
-			<tr> <td NOWRAP valign=top>
-						<font size=2> <bean:message key="error.learner.user.doesNoExist"/> </font>
-			</td> </tr>
-		</c:if> 				    
 
 		<c:if test="${userExceptionContentDoesNotExist == 'true'}"> 			
 			<tr> <td NOWRAP valign=top>
@@ -132,21 +114,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</td> </tr>
 		</c:if> 				    
 
-		<c:if test="${userExceptionUserDoesNotExist == 'true'}"> 			
-			<tr> <td NOWRAP valign=top>
-						<font size=2> <bean:message key="error.learner.userId.required"/> </font>
-			</td> </tr>
-		</c:if> 				    
-
 		<c:if test="${userExceptionContentIdRequired == 'true'}"> 			
 			<tr> <td NOWRAP valign=top>
 						<font size=2> <bean:message key="error.contentId.required"/> </font>
-			</td> </tr>
-		</c:if> 				    
-
-		<c:if test="${userExceptionToolSessionIdInconsistent == 'true'}"> 			
-			<tr> <td NOWRAP valign=top>
-						<font size=2> <bean:message key="error.learner.sessionId.inconsistent"/> </font>
 			</td> </tr>
 		</c:if> 				    
 
@@ -175,21 +145,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</td> </tr>
 		</c:if> 				    
 
-		<c:if test="${userExceptionContentBeingModified == 'true'}"> 			
-			<tr> <td NOWRAP valign=top>
-						<font size=2> <bean:message key="error.content.beingModified"/> </font>
-			</td> </tr>
-		</c:if> 				    
-
 		<c:if test="${userExceptionDefaultContentNotSetup == 'true'}"> 			
 			<tr> <td NOWRAP valign=top>
 						<font size=2> <bean:message key="error.defaultContent.notSetup"/> </font>
-			</td> </tr>
-		</c:if> 				    
-
-		<c:if test="${userExceptionModeInvalid == 'true'}"> 			
-			<tr> <td NOWRAP valign=top>
-						<font size=2> <bean:message key="error.mode.invalid"/> </font>
 			</td> </tr>
 		</c:if> 				    
 

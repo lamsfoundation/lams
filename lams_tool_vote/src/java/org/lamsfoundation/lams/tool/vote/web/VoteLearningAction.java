@@ -581,6 +581,9 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 		
 		request.getSession().setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, mapLeanerCheckedOptionsContent);
 		
+		Map mapQuestionContentLearner=(Map)request.getSession().getAttribute(MAP_QUESTION_CONTENT_LEARNER);
+		logger.debug("mapQuestionContentLearner: " + mapQuestionContentLearner);
+		
     	voteLearningForm.resetCommands();	
  		return (mapping.findForward(LOAD_LEARNER));
    }

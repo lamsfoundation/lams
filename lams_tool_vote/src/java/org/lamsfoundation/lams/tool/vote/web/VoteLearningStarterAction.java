@@ -211,8 +211,6 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
     {
     	VoteUtils.cleanUpSessionAbsolute(request);
     	logger.debug("error: The tool expects voteSession.");
-    	//request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
-    	//persistError(request,"error.toolSession.notAvailable");
 		return (mapping.findForward(ERROR_LIST));
     }
 
@@ -569,16 +567,14 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	    if ((mode == null) || (mode.length() == 0)) 
 	    {
 	    	VoteUtils.cleanUpSessionAbsolute(request);
-	    	request.getSession().setAttribute(USER_EXCEPTION_MODE_REQUIRED, new Boolean(true).toString());
-	    	persistError(request, "error.mode.required");
+	    	logger.error("mode missing: ");
 	    	return (mapping.findForward(ERROR_LIST));
 	    }
 	    
 	    if ((!mode.equals("learner")) && (!mode.equals("teacher")) && (!mode.equals("author")))
 	    {
 	    	VoteUtils.cleanUpSessionAbsolute(request);
-	    	request.getSession().setAttribute(USER_EXCEPTION_MODE_INVALID, new Boolean(true).toString());
-	    	persistError(request, "error.mode.invalid");
+	    	logger.error("mode invalid: ");
 			return (mapping.findForward(ERROR_LIST));
 	    }
 		logger.debug("session LEARNING_MODE set to:" + mode);

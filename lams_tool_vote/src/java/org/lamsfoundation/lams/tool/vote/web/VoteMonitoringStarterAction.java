@@ -121,6 +121,7 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 		voteMonitoringForm.setActiveModule(MONITORING);
 		voteMonitoringForm.setSelectedToolSessionId("All");
 		voteMonitoringForm.setSbmtSuccess(new Boolean(false).toString());
+		request.getSession().setAttribute(REQUEST_LEARNING_REPORT, new Boolean(false).toString());
 		return voteMonitoringAction.submitSession(mapping, form,  request, response);
 	}
 
@@ -272,8 +273,8 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 			}
 	    	catch(NumberFormatException e)
 			{
-	    		persistError(request, "error.contentId.numberFormatException");
-	    		logger.debug("add error.contentId.numberFormatException to ActionMessages.");
+	    		persistError(request, "error.numberFormatException");
+	    		logger.debug("add error.numberFormatException to ActionMessages.");
 	    		VoteUtils.cleanUpSessionAbsolute(request);
 				return (mapping.findForward(ERROR_LIST));
 			}

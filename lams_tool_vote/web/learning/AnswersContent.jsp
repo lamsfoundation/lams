@@ -70,13 +70,19 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						  	</td>
 						  </tr>
 	
-	
+
+mapQuestionContentLearner: <c:out value="${sessionScope.mapQuestionContentLearner}"  />						
+sessionScope.mapGeneralCheckedOptionsContent: <c:out value="${sessionScope.mapGeneralCheckedOptionsContent}"  />						
+								
+						<c:out value="${subEntry.value}" escapeXml="false" />																				
+																								
 							  <tr>						 
 								<td NOWRAP align=left>
 								<table align=left>
 				  		  	 		<c:set var="queIndex" scope="session" value="0"/>
 										  		<c:forEach var="subEntry" items="${sessionScope.mapQuestionContentLearner}">
 											  		<c:set var="queIndex" scope="session" value="${queIndex +1}"/>
+											  		queIndex: <c:out value="${sessionScope.queIndex}"  />						
 											  		
 									  		  	 		<c:set var="checkedOptionFound" scope="request" value="0"/>
 														<!-- traverse the selected option from here --> 									  		

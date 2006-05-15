@@ -34,7 +34,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<table width="100%" height="190" border="0" align="center" cellpadding="5" cellspacing="0" bgcolor="#FFFFFF" summary="This table is being used for layout purposes only">
 			<tr> 
 				<td NOWRAP valign="top"> 
-					<font size=2> <bean:message key="error.system.mc"/> </font>
+					<font size=2> <bean:message key="error.system.vote"/> </font>
 				</td>
 			 </tr>
 		</table>

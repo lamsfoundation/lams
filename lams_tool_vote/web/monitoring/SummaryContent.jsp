@@ -51,7 +51,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 
-				<c:if test="${(requestLearningReport != 'true')}"> 	
+					<c:if test="${(requestLearningReport != 'true')}"> 	
 						<c:if test="${(isPortfolioExport != 'true') }"> 	
 							<c:if test="${sessionScope.selectionCase != 2}"> 			
 								<tr> 
