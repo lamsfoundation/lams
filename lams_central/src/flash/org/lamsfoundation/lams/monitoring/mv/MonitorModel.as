@@ -379,16 +379,23 @@ class MonitorModel extends Observable{
 			if(_staffLoaded && _learnersLoaded) {
 				clearInterval(_UserLoadCheckIntervalID);
 				
-				
 				trace('ALL USERS LOADED -CONTINUE');
 				// populate learner/staff scrollpanes
-				//broadcastViewUpdate("", null, null);
+				broadcastViewUpdate("USERS_LOADED", null, null);
+				
 				
 			} else if(_userLoadCheckCount >= USER_LOAD_CHECK_TIMEOUT_COUNT) {
 				Debugger.log('reached timeout waiting for data to load.',Debugger.CRITICAL,'checkUsersLoaded','MonitorModel');
 				clearInterval(_UserLoadCheckIntervalID);		
 			}
 		}
+	}
+	
+	private function resetUserFlags():Void{
+		staffLoaded = false;
+		learnersLoaded = false;
+		_userLoadCheckCount = 0;
+		_UserLoadCheckIntervalID = null;
 	}
 	
 	private function requestLearners(data:Object){
@@ -424,6 +431,7 @@ class MonitorModel extends Observable{
 	}
 
 	private function saveUsers(users:Array, role:String):Void{
+		
 		for(var i=0; i< users.length; i++){
 			var u:Object = users[i];
 			
@@ -552,13 +560,16 @@ class MonitorModel extends Observable{
 			// get the organisations (node) users by role
 			//var roles:Array = new Array(LEARNER_ROLE, STAFF_ROLE, TEACHER_ROLE);
 			setOrganisation(new Organisation(_selectedTreeNode.attributes.data));
-			
+			resetUserFlags();
 			// polling method - waiting for all users to load before displaying users in UI
 			checkUsersLoaded();
 			
 			// load users
 			requestLearners(_selectedTreeNode.attributes.data);
 			requestStaff(_selectedTreeNode.attributes.data);
+			
+			trace(staffLoaded);
+			trace(learnersLoaded);
 		}
 		
 		//dispatch an update to the view
