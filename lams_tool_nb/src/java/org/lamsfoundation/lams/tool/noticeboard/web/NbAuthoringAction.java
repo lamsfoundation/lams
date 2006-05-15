@@ -43,6 +43,7 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.upload.FormFile;
 import org.apache.struts.util.MessageResources;
+import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
@@ -310,6 +311,7 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
 		    	if (request.getSession().getAttribute(NoticeboardConstants.MODE).equals(DEFINE_LATER_MODE))
 		    		request.setAttribute(SHOW_BASIC_TAB, "true");
 		    		
+		    	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG,Boolean.TRUE);		    	
 		    	return mapping.findForward(NoticeboardConstants.AUTHOR_PAGE);
 		    	
     		}

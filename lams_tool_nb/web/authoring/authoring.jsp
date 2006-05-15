@@ -52,7 +52,7 @@
 </head>
 
 <body onLoad="init()">
-<html:form action="/authoring" target="_self" enctype="multipart/form-data">
+<html:form action="/authoring" styleId="authoringForm" target="_self" enctype="multipart/form-data">
 <html:hidden property="currentTab" styleId="currentTab" />
 
 <h1><fmt:message key="activity.title" /></h1>
@@ -90,10 +90,18 @@
 
 <!-- Button Row -->
 <hr>
-<p align="right">
-<html:submit property="method" styleClass="button"><fmt:message key="button.save" /></html:submit>
-<html:button property="method" onclick="window.close()" styleClass="button"><fmt:message key="button.cancel" /></html:button>
-</p>
+<%--  Default value
+	cancelButtonLabelKey="label.authoring.cancel.button"
+	saveButtonLabelKey="label.authoring.save.button"
+	cancelConfirmMsgKey="authoring.msg.cancel.save"
+	accessMode="author"
+--%>
+<c:set var="dispactchMethodName">
+	<fmt:message key="button.save"/>
+</c:set>
+<html:hidden property="method" value="${dispactchMethodName}"/>
+<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="lanb11" toolContentID="${toolContentID}" cancelButtonLabelKey="button.cancel" saveButtonLabelKey="button.save"/>
+
 </div>
 
 </html:form>

@@ -78,6 +78,13 @@
       />
     </action>
     <action
+      path="/clearsession"
+      type="org.lamsfoundation.lams.tool.noticeboard.web.ClearSessionAction"
+      unknown="false"
+      validate="false"
+    >
+    </action>
+    <action
       path="/authoring"
       type="org.lamsfoundation.lams.tool.noticeboard.web.NbAuthoringAction"
       name="NbAuthoringForm"
