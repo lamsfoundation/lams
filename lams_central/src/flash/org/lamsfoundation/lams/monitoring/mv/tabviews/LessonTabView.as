@@ -27,7 +27,7 @@ import org.lamsfoundation.lams.common.ui.*
 import org.lamsfoundation.lams.common.style.*
 import org.lamsfoundation.lams.monitoring.mv.*
 import org.lamsfoundation.lams.monitoring.*;
-//import org.lamsfoundation.lams.monitoring.ContributeActivity;
+import org.lamsfoundation.lams.authoring.Activity;
 import org.lamsfoundation.lams.common.dict.*
 import org.lamsfoundation.lams.common.mvc.*
 import mx.controls.*;
@@ -221,12 +221,35 @@ public function update (o:Observable,infoObj:Object):Void{
 		//duration_txt.text = s._seqDescription
 		  
 	}
-	
+	/**
+	* Populate the required tasks for the active Sequence 
+	*/
+	private function populateCCActivities(CCAct:Activity):Void{
+		//var cAct:ContributeActivity = ContributeActivity.getInstance()
+		// get contribute activities
+		var todos:Array = mm.getToDos();
+		trace("Looking for contribute entries for: "+CCAct.activityID);
+		// show isRequired activities in scrollpane
+		for (var i=0; i<todos.length; i++){
+			for (var k=0; k<todos[i]._childActivities.length; k++){
+				//trace("Activity IDs in todo list are: "+todos[i].activityID);
+				if (todos[i]._childActivities[k].activityID == CCAct.activityID) {
+					if (todos[i]._childActivities[k]._contributeEntries.length !=0){
+						for (var j=0; j<todos[i]._childActivities[k]._contributeEntries.length; j++){ 
+							trace("Contribute Entries for child "+todos[i]._childActivities[k].title+" is: "+todos[i]._childActivities[k]._contributeEntries[j]._contributionType)
+						}
+					}
+				}
+				
+			}
+		}
+		
+		
+	}
 	/**
 	* Populate the required tasks for the active Sequence 
 	*/
 	private function populateContributeActivities():Void{
-		var cAct:ContributeActivity = ContributeActivity.getInstance()
 		// get contribute activities
 		var todos:Array = mm.getToDos();
 		trace('contrib. act length: ' + todos.length);
@@ -235,10 +258,15 @@ public function update (o:Observable,infoObj:Object):Void{
 			trace("_monitorReqTask_mc.Show Title"+todos[i].title)
 			if (todos[i]._childActivities.length !=0){
 				for (var j=0; j<todos[i]._childActivities.length; j++){
-					trace("Contribute Child Activity "+j+" is: "+todos[i]._childActivities)
+					trace(todos[i].title+"'s Child Activity "+j+" is: "+todos[i]._childActivities[j].title)
+					populateCCActivities(todos[i]._childActivities[j])
 				}
 			}else {
-				
+				if (todos[i]._contributeEntries.length !=0){
+					for (var j=0; j<todos[i]._contributeEntries.length; j++){ 
+						trace("Contribute Entry for "+j+" is: "+todos[i]._contributeEntries[j]._contributionType)
+					}
+				}
 			}
 			//}
 		}
