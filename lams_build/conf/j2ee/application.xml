@@ -124,10 +124,10 @@
 		<java>jdom.jar</java>
 	</module>
 	<module>
-		<java>jfreechart-0.9.21.jar</java>
+		<java>jfreechart-1.0.1.jar</java>
 	</module>
 	<module>
-		<java>jcommon-0.9.6.jar</java>
+		<java>jcommon-1.0.0.jar</java>
 	</module>
 	<module>
 		<java>gnujaxp.jar</java>
