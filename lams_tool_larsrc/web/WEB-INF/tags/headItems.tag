@@ -23,40 +23,34 @@
  */
  
  /**
-  * TabBody.tag
-  *	Author: Mitchell Seaton
-  *	Description: Creates the body container for a tab element
-  * Wiki: 
+  * Standard Head Items
+  *	Author: Fiona Malikoff
+  *	Description: Includes all the standard head items e.g. the 
+  * lams css files, sets the content type, standard javascript files.
   */
  
  %>
-<%@ tag body-content="scriptless" %>
-<%@ attribute name="id" required="true" rtexprvalue="true" %>
-<%@ attribute name="tabTitle" required="false" rtexprvalue="true" %>
-<%@ attribute name="titleKey" required="false" rtexprvalue="true" %>
-<%@ attribute name="page" required="false" rtexprvalue="true" %>
+<%@ tag body-content="empty" %>
+
 <%@ taglib uri="tags-core" prefix="c" %>
-<%@ taglib uri="tags-bean" prefix="bean" %>
+<%@ taglib uri="tags-lams" prefix="lams" %>
+<%@ taglib uri="tags-fmt" prefix="fmt" %>
 
-<!-- begin tab content -->
-<div id="tabbody${id}">
-<c:if test="${tabTitle != null}">
-	<h2><font size=2> <b><bean:write name="tabTitle" scope="page"/></b></font></h2>
-</c:if>
-<c:if test="${titleKey != null && tabTitle == null}">
-	<h2><font size=2> <b><bean:message name="titleKey" scope="page"/></b></font></h2>
-</c:if>
+<c:set var="lams">
+	<lams:LAMSURL />
+</c:set>
+<c:set var="tool">
+	<lams:WebAppURL />
+</c:set>
 
-<div id="formtablecontainer">
-<c:choose>
-	<c:when test="${page != null}">
-		<jsp:include page="${page}"/>
-	</c:when>
-	<c:otherwise>
-		<jsp:doBody/>
-	</c:otherwise>
-</c:choose>
-</div>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 
-</div>
-<!-- end tab content -->
+<lams:css />
+<link href="${lams}css/fckeditor_style.css" rel="stylesheet" type="text/css">
+
+<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
+<script type="text/javascript" src="${lams}fckeditor/fckeditor.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/fckcontroller.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>
+<script type="text/javascript" src="${tool}includes/javascript/xmlrequest.js"></script>
+	
