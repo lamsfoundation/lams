@@ -278,5 +278,9 @@
        <name>AuthoringButton</name>
        <path>/WEB-INF/tags/AuthoringButton.tag</path>
    	</tag-file>   	
+   	<tag-file>
+       <name>headItems</name>
+       <path>/WEB-INF/tags/headItems.tag</path>
+   	</tag-file>   	
 
 </taglib>
