@@ -44,7 +44,7 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 	
 	
 	public var RT_ORG:String = "Organisation";
-	public static var USERS_X:Number = 0;
+	public static var USERS_X:Number = 10;
 	public static var USER_OFFSET:Number = 20;
 	
 	//References to components + clips 
@@ -58,10 +58,10 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 	private var treeview:Tree;              //Treeview for navigation through workspace folder structure
 	private var org_dnd:TreeDnd;
 	
-	private var staff_scp:MovieClip;		// staff/teachers container
-	private var learner_scp:MovieClip;		// learners container
-	
-    private var fm:FocusManager;            //Reference to focus manager
+	private var staff_scp		// staff/teachers container
+	private var learner_scp		// learners container
+	private var learner_cb:CheckBox;
+	private var fm:FocusManager;            //Reference to focus manager
     private var themeManager:ThemeManager;  //Theme manager
 	
 	//Dimensions for resizing
@@ -402,6 +402,20 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 		return odto;
 	}
 	
+	/*
+	* Clear Method to clear movies from scrollpane
+	* 
+	*/
+	public function clearScp(array:Array):Array{
+		if(array != null){
+			for (var i=0; i <array.length; i++){
+				array[i].removeMovieClip();
+			}
+		}
+		array = new Array();
+	return array;
+	}
+	
 	/**
 	 * Load learners into scrollpane
 	 * @param   users Users to load
@@ -409,16 +423,26 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 	
 	public function loadLearners(users:Array):Void{
 		trace('loading Learners...');
-		_learnerList = new Array();
+		_learnerList = clearScp(_learnerList);
+		var movieDepth:Number = 5000
+		var learner_mc:MovieClip = learner_scp.content;
 		trace('list length: ' + users.length);
 		for(var i=0; i<users.length; i++){
-			var user:User = User(users[i]);
 			
-			_learnerList[i] = learner_scp.attachMovie('staff_learner_dataRow', 'userDataRow' + i, DepthManager.kTop, {fullName:user.getFirstName(),_x:USERS_X,_y:USER_OFFSET * i});
-			trace('new row: ' + _learnerList[i]);
-			trace('loading: user ' + user.getFirstName() + ' ' + user.getLastName());
-			learner_scp.refreshPane();
+			
+			_learnerList[i] = learner_mc.attachMovie("staff_learner_dataRow", "learnerRow"+i, movieDepth+i);
+			_learnerList[i]._x = 10;
+			_learnerList[i]._y = 20 * i;
+			learner_mc.refreshPane();
+			var user:User = User(users[i]);
+			_learnerList[i].fullName.text = user.getFirstName()+" "+user.getLastName();
+			_learnerList[i].learner_cb.selected = true;
+			//trace('new row: ' + _learnerList[i]);
+			//trace('loading: user ' + user.getFirstName() + ' ' + user.getLastName());
+			//_learnerList[i]._parent._parent.learner_scp.refreshPane();
+			
 		}
+		
 	}
 	
 	/**
@@ -428,14 +452,22 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 	public function loadStaff(users:Array):Void{
 		trace('loading Staff....');
 		trace('list length: ' + users.length);
-		_staffList = new Array();
-		for(var i=0; i<users.length; i++){
+		var staff_mc:MovieClip = staff_scp.content;
+		_staffList = clearScp(_staffList);
+		var movieDepth:Number = 6000
+		for(var i=0; i<15; i++){
 			//_staffList[i] = staff_scp.attachmovie();
 			//_staffList[i]._x = USERS_X;
 			//_staffList[i[._y = USER_OFFSET * i;
+			_staffList[i] = staff_mc.attachMovie("staff_learner_dataRow", "staffRow"+i, movieDepth+i);
+			_staffList[i]._x = 10;
+			_staffList[i]._y = 20 * i;
+			staff_mc.refreshPane();
 			var user:User = User(users[i]);
+			_staffList[i].fullName.text = user.getFirstName()+" "+user.getLastName()+ i;
+			_staffList[i].learner_cb.selected = true;
 			trace('loading: user ' + user.getFirstName() + ' ' + user.getLastName());
-			staff_scp.refresh();
+			
 		}
 	}
 	
