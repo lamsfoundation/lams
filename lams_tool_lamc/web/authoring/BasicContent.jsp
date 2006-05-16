@@ -270,17 +270,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		 				 <tr>
 	 						<td NOWRAP valign=top> </td> 
 							<td NOWRAP class="input" colspan=3 align=left valign=top>								
-								<font size=2>
-									<p align="right">
-										<html:link href="javascript:submitMethod('submitQuestions');" property="submit" styleClass="button">
-											<bean:message key="button.submit" />
-										</html:link>
-										<html:link href="javascript:;" property="cancel"
-											onclick="window.close()" styleClass="button">
-											<bean:message key="button.cancel" />
-										</html:link>
-									</p>
-								</font>	
+								<!-- Button Row -->
+								<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
+								<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="lamc11" 
+									cancelButtonLabelKey="button.cancel" saveButtonLabelKey="button.submit" toolContentID="${formBean.toolContentID}" />									
 			 			  	</td>
 							<td NOWRAP valign=top> </td> 
 							<td NOWRAP valign=top> </td>

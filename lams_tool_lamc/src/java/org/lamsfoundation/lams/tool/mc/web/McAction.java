@@ -39,6 +39,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
@@ -2045,6 +2046,10 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		}
     	
 		McUtils.debugMaps(request);
+		
+		//because button (and javascript) will display in LamsTag tab, so put it into session instead of request
+		//it will be remove immediately in clearSessionAction.
+        request.getSession().setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG,Boolean.TRUE);
 		return (mapping.findForward(destination));
     }
 

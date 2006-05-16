@@ -482,6 +482,10 @@
 		    redirect="false"
 	  	/>
     </action>
+	
+	<action path="/clearsession"
+		type="org.lamsfoundation.lams.tool.mc.web.ClearSessionAction">
+	</action>       
  </action-mappings>
 	
 	<message-resources parameter="org.lamsfoundation.lams.tool.mc.ApplicationResources"/>

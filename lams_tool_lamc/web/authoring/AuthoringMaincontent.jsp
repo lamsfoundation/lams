@@ -123,8 +123,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<b> <font size=2> <bean:message key="label.authoring.mc"/> </font></b>
 	
-	<html:form  action="/authoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">
-	<html:hidden property="dispatch"/>
+	<html:form  action="/authoring?validate=false" styleId="authoringForm" enctype="multipart/form-data" method="POST" target="_self">
+	<html:hidden property="dispatch" value="submitQuestions"/>
 	<html:hidden property="toolContentID"/>
 	<html:hidden property="currentTab" styleId="currentTab" />
 	
