@@ -117,6 +117,8 @@ public interface IVoteService
     
     public Set getUserEntries() throws VoteApplicationException;
     
+    public Set getContentEntries(final Long voteContentUid) throws VoteApplicationException;
+    
     public int getSessionUserRecordsEntryCount(final String userEntry, final Long voteSessionUid, IVoteService voteService) throws VoteApplicationException;
     
     public Set getSessionUserEntries(final Long voteSessionId) throws VoteApplicationException;

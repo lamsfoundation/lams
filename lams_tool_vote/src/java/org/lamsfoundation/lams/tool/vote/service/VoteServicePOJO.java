@@ -234,6 +234,21 @@ public class VoteServicePOJO implements
     }
     
     
+    public Set getContentEntries(final Long voteContentUid) throws VoteApplicationException 
+    {
+        try
+        {
+        	return voteUsrAttemptDAO.getContentEntries(voteContentUid);
+        }
+        catch (DataAccessException e)
+        {
+            throw new VoteApplicationException("Exception occured when lams is getting content entries: "
+                                                         + e.getMessage(),
+														   e);
+        }
+    }
+
+    
     public Set getUserEntries() throws VoteApplicationException 
     {
         try
@@ -472,7 +487,6 @@ public class VoteServicePOJO implements
         }
     }
 
-    
     public int getAllEntriesCount() throws VoteApplicationException
     {
         try

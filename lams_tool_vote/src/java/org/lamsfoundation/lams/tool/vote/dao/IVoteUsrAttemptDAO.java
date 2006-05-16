@@ -45,6 +45,8 @@ public interface IVoteUsrAttemptDAO
 	
 	public List getUserRecords(final String userEntry);
 	
+	public Set getContentEntries(final Long voteContentUid);
+	
 	public Set getUserEntries();
 	
 	public int getAllEntriesCount();

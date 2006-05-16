@@ -47,9 +47,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		
 			<html:hidden property="selectedToolSessionId"/>							
 			<input type="hidden" name="isToolSessionChanged"/>
-				<table class="forms">
-
-
+				<table>
 
 					<c:if test="${(requestLearningReport != 'true')}"> 	
 						<c:if test="${(isPortfolioExport != 'true') }"> 	
@@ -65,15 +63,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									</td>
 								</tr>
 							</c:if>			
-						<tr> 
-							<td NOWRAP class="formlabel" valign=top>
-							&nbsp&nbsp&nbsp
-							</td>
-						</tr>
-					
-	
 								<tr> 
-									<td NOWRAP class="formlabel" valign=top align=center><font size=2> <b> <bean:message key="label.selectGroup"/> </b>
+									<td NOWRAP class="formlabel" valign=top>
+									&nbsp&nbsp&nbsp
+									</td>
+								</tr>
+							
+			
+								<tr> 
+									<td NOWRAP  valign=top align=right><font size=2> <b> <bean:message key="label.selectGroup"/> </b>
 											<select name="monitoredToolSessionId" onchange="javascript:submitSession(this.value,'submitSession');">
 											<c:forEach var="toolSessionName" items="${sessionScope.summaryToolSessions}">
 												<c:forEach var="toolSessionId" items="${sessionScope.summaryToolSessionsId}">
@@ -107,80 +105,64 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 						</c:if>								
 					</c:if>			
-
-					<c:forEach var="currentDto" items="${sessionScope.listMonitoredAnswersContainerDto}">
-			  	 		<c:set var="currentQuestionId" scope="request" value="${currentDto.questionUid}"/>
-			  	 		<tr>
-			  	 			<td> &nbsp&nbsp&nbsp</td>
-			  	 		</tr>
-						<tr>			
-							<td NOWRAP valign=top align=left><b> <font size=2> <bean:message key="label.nomination"/>: </b>
-								<c:out value="${currentDto.question}" escapeXml="false"/>
-							</font> </td>
-						</tr>	
-						
-						<tr> 
-							<td NOWRAP class="formlabel" valign=top>
-								<table align=center>
-									<tr> 
-										 <td NOWRAP valign=top> <b> <font size=2> <bean:message key="label.user"/> </font> </b> </td>  
-				  						 <td NOWRAP valign=top> <b> <font size=2> <bean:message key="label.attemptTime"/></font> </b></td>
-				  						 <td NOWRAP valign=top> <b> <font size=2> <bean:message key="label.timezone"/> </font>	</b></td>
-						  			</tr>				 
-		  							<c:forEach var="questionAttemptData" items="${currentDto.questionAttempts}">
-										<c:forEach var="sData" items="${questionAttemptData.value}">
-								  	 		<c:set var="userData" scope="request" value="${sData.value}"/>
-								  	 		<c:set var="responseUid" scope="request" value="${userData.uid}"/>
-
-	  	 									<c:if test="${currentQuestionId == userData.questionUid}">
-		  	 									<c:if test="${sessionScope.currentMonitoredToolSession == 'All'}"> 			
-															<jsp:include page="/monitoring/UserResponses.jsp" />
-												</c:if>														  					 									  			
-												
-		  	 									<c:if test="${sessionScope.currentMonitoredToolSession != 'All'}"> 			
-		  	 										<c:if test="${sessionScope.currentMonitoredToolSession == userData.sessionId}"> 			
-															<jsp:include page="/monitoring/UserResponses.jsp" />										
-													</c:if>														  					 									  													  			
-												</c:if>														  					 									  													  			
-											</c:if>														  					 
-	 									</c:forEach>		  	
-									</c:forEach>		  	
-								</table>
-							</td>  
-			  			</tr>
-					</c:forEach>		  
-						
 					
 					
-				<c:forEach var="currentDto" items="${sessionScope.listUserEntries}">
-			  	 		<c:set var="currentQuestionId" scope="request" value="${currentDto.questionUid}"/>
-			  	 		<tr>
-			  	 			<td> &nbsp&nbsp&nbsp</td>
-			  	 		</tr>
-						<tr>			
-							<td NOWRAP valign=top align=left><b> <font size=2> <bean:message key="label.nomination"/>: </b>
-								<c:out value="${currentDto.question}" escapeXml="false"/>
-							</font> </td>
-						</tr>	
-						
-						<tr> 
-							<td NOWRAP class="formlabel" valign=top>
-								<table align=center>
-									<tr> 
-										 <td NOWRAP valign=top> <b> <font size=2> <bean:message key="label.user"/> </font> </b> </td>  
-				  						 <td NOWRAP valign=top> <b> <font size=2> <bean:message key="label.attemptTime"/></font> </b></td>
-				  						 <td NOWRAP valign=top> <b> <font size=2> <bean:message key="label.timezone"/> </font>	</b></td>
-						  			</tr>				 
+	  				<c:if test="${currentMonitoredToolSession == 'All'}"> 				
+						<tr>
+					 		<td NOWRAP colspan=2> <b> <font size=2> <bean:message key="label.select.session"/> </b> </td>
+						</tr>
+					</c:if> 	    
 
-		  							<c:forEach var="questionAttemptData" items="${currentDto.questionAttempts}">
-								  	 		<c:set var="userData" scope="request" value="${questionAttemptData.value}"/>
-												<jsp:include page="/monitoring/UserResponses.jsp" />										
-									</c:forEach>		  	
-						  			
-								</table>
-							</td>  
-			  			</tr>
-					</c:forEach>		  	
+	  				<c:if test="${currentMonitoredToolSession != 'All'}"> 				
+	  					<tr>
+					 		<td NOWRAP> <b> <font size=2> <bean:message key="label.total.students"/> </b> </td>
+					 		<td> 1 </td>
+						</tr>
+
+	  					<tr>
+					 		<td NOWRAP> <b> <font size=2> <bean:message key="label.total.completed.students"/> </b> </td> 
+					 		<td> 2 </td>
+						</tr>
+	  				
+						<tr>
+					 		<td NOWRAP colspan=2> 
+		                            <c:out value="${activityInstructions}" escapeXml="false"/>
+							</td>
+						</tr>
+						
+
+						<tr>
+					 		<td NOWRAP> &nbsp&nbsp </td>
+						</tr>
+						
+	
+						<tr>
+					 		<td NOWRAP> <b> <font size=2> <bean:message key="label.nomination"/> </b> </td>
+							<td NOWRAP> <b> <font size=2> <bean:message key="label.total.votes"/> </b> </td>
+						</tr>
+						
+						<c:forEach var="currentNomination" items="${mapStandardNominationsContent}">
+				  	 		<c:set var="currentNominationKey" scope="request" value="${currentNomination.key}"/>
+				  	 		
+				  	 		<c:forEach var="currentRate" items="${mapStandardRatesContent}">
+					  	 		<c:set var="currentRateKey" scope="request" value="${currentRate.key}"/>
+		
+				  				<c:if test="${currentNominationKey == currentRateKey}"> 				
+									<tr>			
+										<td NOWRAP valign=top align=left>
+											<c:out value="${currentNomination.value}" escapeXml="false"/>
+										</font> </td>
+										
+										<td NOWRAP valign=top align=left>
+											<c:out value="${currentRate.value}"/>
+										</font> </td>
+									</tr>	
+								</c:if> 	    
+								
+							</c:forEach>		  
+						</c:forEach>	
+					
+					</c:if> 	    	  
 
 				</table>
 		</c:if>						

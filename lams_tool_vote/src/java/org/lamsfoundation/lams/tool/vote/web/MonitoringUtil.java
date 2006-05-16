@@ -636,6 +636,8 @@ public class MonitoringUtil implements VoteAppConstants{
 	    logger.debug("starting prepareChartData, toolContentId: " + toolContentId);
 	    logger.debug("starting prepareChartData, toolSessionUid: " + toolSessionUid);
 	    VoteContent voteContent=voteService.retrieveVote(toolContentId);
+	    logger.debug("starting prepareChartData, voteContent uid: " + voteContent.getUid());
+	    
 	    
 		logger.debug("existing voteContent:" + voteContent);
 		Map mapOptionsContent= new TreeMap(new VoteComparator());
@@ -658,9 +660,13 @@ public class MonitoringUtil implements VoteAppConstants{
 		{
 		    sessionLevelCharting=false;
 		    logger.debug("process for content: ");
-		    entriesCount=voteService.getAllEntriesCount();
-		    userEntries=voteService.getUserEntries();
+		    //entriesCount=voteService.getAllEntriesCount();
+		    //userEntries=voteService.getUserEntries();
+		    //entriesCount=voteService.getContentEntriesCount(voteContent.getUid());
+		    userEntries=voteService.getContentEntries(voteContent.getUid());
+		    entriesCount=userEntries.size();
 		}
+		
 		logger.debug("entriesCount: " + entriesCount);
 		logger.debug("userEntries: " + userEntries);
 		logger.debug("sessionLevelCharting: " + sessionLevelCharting);
@@ -716,6 +722,14 @@ public class MonitoringUtil implements VoteAppConstants{
 			}
 		}
 		logger.debug("Map initialized with existing contentid to: " + mapOptionsContent);
+		Map mapStandardNominationsContent= new TreeMap(new VoteComparator());
+		mapStandardNominationsContent=mapOptionsContent;
+		logger.debug("mapStandardNominationsContent: " + mapStandardNominationsContent);
+		
+		Map mapStandardRatesContent= new TreeMap(new VoteComparator());
+		mapStandardRatesContent=mapVoteRatesContent;
+		logger.debug("mapStandardRatesContent: " + mapStandardRatesContent);
+		
 		
 		Iterator itListQuestions = userEntries.iterator();
 	    int mapVoteRatesSize=mapVoteRatesContent.size();
@@ -727,6 +741,16 @@ public class MonitoringUtil implements VoteAppConstants{
 	    logger.debug("updated mapIndex: " + mapIndex);
 	    double share=100d-total ; 
 	    logger.debug("share: " + share);
+	    
+	    
+	    mapStandardNominationsContent.put(mapIndex.toString(), "Open vote");
+	    mapStandardRatesContent.put(mapIndex.toString(), new Double(share).toString());
+
+		request.getSession().setAttribute(MAP_STANDARD_NOMINATIONS_CONTENT, mapStandardNominationsContent);
+		logger.debug("MAP_STANDARD_NOMINATIONS_CONTENT: " + request.getSession().getAttribute(MAP_STANDARD_NOMINATIONS_CONTENT));
+
+		request.getSession().setAttribute(MAP_STANDARD_RATES_CONTENT, mapStandardRatesContent);
+		logger.debug("MAP_STANDARD_RATES_CONTENT: " + request.getSession().getAttribute(MAP_STANDARD_RATES_CONTENT));
 
 	    double totalUserRate=0d;
 	    while (itListQuestions.hasNext())

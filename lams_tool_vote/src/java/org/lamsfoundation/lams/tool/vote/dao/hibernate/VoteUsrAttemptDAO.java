@@ -86,6 +86,40 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 			.list();
 			return list;
 	    }
+
+		public Set getContentEntries(final Long voteContentUid)
+	    {
+	        HibernateTemplate templ = this.getHibernateTemplate();
+	        List list = getSession().createQuery(LOAD_ALL_ENTRIES)
+			.list();
+
+	        Set contentEntries= new HashSet();
+	        Iterator listIterator=list.iterator();
+	        logger.debug("looking for voteContentUid: " + voteContentUid);
+	    	while (listIterator.hasNext())
+	    	{
+	    	    VoteUsrAttempt attempt=(VoteUsrAttempt)listIterator.next();
+	    	    logger.debug("attempt: " + attempt);
+	    	    if (attempt.getVoteQueUsr().getVoteSession().getVoteContent().getUid().toString().equals(voteContentUid.toString()))
+	    	    {
+	    	        logger.debug("found content: " + voteContentUid);
+	    	        if (attempt.getVoteQueContentId().toString().equals("1"))
+	    	        {
+	    	            logger.debug("user entered nomination: " + attempt.getUserEntry());
+	    	            if ((attempt.getUserEntry() != null) && (attempt.getUserEntry().length() > 0))
+			    	        contentEntries.add(attempt.getUserEntry());    
+	    	        }
+	    	        else
+	    	        {
+	    	            logger.debug("standard content nomination: " + attempt.getVoteQueContent().getQuestion());
+	    	            contentEntries.add(attempt.getVoteQueContent().getQuestion());
+	    	        }
+	    	    }
+	    	}
+	    	
+	    	return contentEntries;
+	    }
+
 		
 		public Set getUserEntries()
 	    {

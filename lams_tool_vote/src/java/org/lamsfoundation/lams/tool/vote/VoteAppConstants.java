@@ -108,6 +108,8 @@ public interface VoteAppConstants {
     public static final String MAP_QUESTION_CONTENT						="mapQuestionContent";
     public static final String MAP_OPTIONS_CONTENT						="mapOptionsContent";
     public static final String MAP_VOTERATES_CONTENT					="mapVoteRatesContent";
+    public static final String MAP_STANDARD_NOMINATIONS_CONTENT			="mapStandardNominationsContent";
+    public static final String MAP_STANDARD_RATES_CONTENT				="mapStandardRatesContent";
     public static final String MAP_OPTIONS_CONTENT_FCK					="mapOptionsContentFck";
     public static final String MAP_DEFAULTOPTIONS_CONTENT				="mapDefaultOptionsContent";
     public static final String MAP_DISABLED_QUESTIONS					="mapDisabledQuestions";
