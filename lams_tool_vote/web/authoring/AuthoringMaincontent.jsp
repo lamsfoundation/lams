@@ -162,7 +162,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<!-- end of content (Instructions) -->
 		<!-- Button Row -->
 		<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
-		<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession" toolSignature="lavote11" 
+		<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="lavote11" 
 			cancelButtonLabelKey="label.cancel" saveButtonLabelKey="label.save" toolContentID="${formBean.toolContentID}" />		
 		
 	</c:if> 			
@@ -188,7 +188,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<!-- end of content (Basic) -->
 		<!-- Button Row -->
 		<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
-		<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession" toolSignature="lavote11" 
+		<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="lavote11" 
 			cancelButtonLabelKey="label.cancel" saveButtonLabelKey="label.save" toolContentID="${formBean.toolContentID}" />			
 	</c:if> 			
 
