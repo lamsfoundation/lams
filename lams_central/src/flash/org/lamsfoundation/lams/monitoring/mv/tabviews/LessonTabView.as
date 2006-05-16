@@ -285,22 +285,80 @@ public function update (o:Observable,infoObj:Object):Void{
 		// show isRequired activities in scrollpane
 		for (var i=0; i<todos.length; i++){
 			trace('main CA title: ' + todos[i].title);
-			getEntries(todos[i]);
+			var array:Array = getEntries(todos[i]);
+			drawIsRequiredTasks(todos[i], array, 0);
 		}
 	}
 	
-	private function getEntries(ca:Object):Void{
+	/**
+	 * Return isRequired entries
+	 * 
+	 * @usage   
+	 * @param   ca ContributeActivity
+	 * @return  Array of isRequired entries
+	 */
+	
+	private function getEntries(ca:Object):Array{
+		var array:Array = new Array();
 		for (var i=0; i<ca.childActivities.length; i++){
 			trace(ca.title+"'s Child Activity "+i+" is: "+ca.childActivities[i].title)
-			getEntries(ca.childActivities[i]);
+			var tmp:Array = getEntries(ca.childActivities[i]);
+			if(tmp.length > 0){
+				var obj:Object = {}
+				obj.entries = tmp;
+				obj.child= ca.childActivities[i];
+				array.push(obj);
+			}
+			
+			//var tmp:Array = getEntries(ca.childActivities[i]);
+			//drawIsRequiredChildTasks(ca, ca.childActivities[i], tmp);
+			//return null;
 		}
 		for (var j=0; j<ca.contributeEntries.length; j++){ 
 			trace("Contribute Entry for "+ca.title+" is: "+ca.contributeEntries[j].contributionType)
 			if(ca.contributeEntries[j].isRequired){
 				// show isRequired entry
+				array.push(ca.contributeEntries[j]);
+			}
+		}
+		return array;
+	}
+	
+	/**
+	 * Draws isRequired tasks
+	 *   
+	 * @param   ca    
+	 * @param   array Holds CA required entries for CA and child CA's
+	 * @return  
+	 */
+	
+	private function drawIsRequiredTasks(ca:Object, array:Array, x:Number):Void{
+		//var o:Object;
+		
+		if(array.length > 0){
+			// write ca title / details to screen with x position
+			trace('write CA title with x:' + x);
+		}
+		
+		for(var i=0; i<array.length; i++){
+			var o:Object = array[i];
+			
+			if(o instanceof ContributeActivity){
+				
+				// normal CA entries
+				trace('write out entry with GO link');
+			}else{
+				// child CA
+				trace('child entries length:' + o.entries.length)
+				if(o.entries.length > 0){
+					trace('now drawing child');
+					// write child ca title (indented - x + 10 position)
+					drawIsRequiredTasks(o.child, o.entries, x+10);
+				}
 				
 			}
 		}
+		
 	}
 	
 	/**
