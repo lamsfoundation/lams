@@ -104,8 +104,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<b> <font size=2> <bean:message key="label.authoring.qa"/> </font></b>
 	
-	<html:form  action="/authoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">
-	<html:hidden property="dispatch"/>
+	<html:form  action="/authoring?validate=false" styleId="authoringForm" enctype="multipart/form-data" method="POST" target="_self">
+	<html:hidden property="dispatch" value="submitAllContent"/>
 	<html:hidden property="toolContentID"/>
 	<html:hidden property="currentTab" styleId="currentTab" />
 	
@@ -125,6 +125,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<!-- tab content 3 (Instructions) -->
 		<lams:TabBody id="3" titleKey="label.instructions" page="InstructionsContent.jsp" />
 		<!-- end of content (Instructions) -->
+		<!-- Button Row -->
+		<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
+		<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="laqa11" 
+			cancelButtonLabelKey="label.cancel" saveButtonLabelKey="label.save" toolContentID="${formBean.toolContentID}" />
+
 	</c:if> 			
 	
 	<c:if test="${ (sessionScope.activeModule == 'defineLater') && (sessionScope.defineLaterInEditMode != 'true') }"> 			
@@ -145,6 +150,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<!-- tab content 1 (Basic) -->
 		<lams:TabBody id="1" titleKey="label.basic" page="BasicContent.jsp"/>
 		<!-- end of content (Basic) -->
+		<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
+		<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="laqa11" 
+			cancelButtonLabelKey="label.cancel" saveButtonLabelKey="label.save" toolContentID="${formBean.toolContentID}" />
 	</c:if> 			
 	
 

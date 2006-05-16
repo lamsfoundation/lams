@@ -482,6 +482,9 @@
 		    redirect="false"
 	  	/>
     </action>
+	<action path="/clearsession"
+		type="org.lamsfoundation.lams.tool.qa.web.ClearSessionAction">
+	</action>    
  </action-mappings>
 
   <!-- Define your Struts controller in a file called struts-controller.xml and place it in your merge directory. -->

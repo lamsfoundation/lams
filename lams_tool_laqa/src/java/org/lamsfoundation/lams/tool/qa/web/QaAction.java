@@ -43,6 +43,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.upload.FormFile;
+import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
@@ -279,6 +280,8 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants
         logger.debug("define later set to false");
         
         qaAuthoringForm.resetUserAction();
+        
+        request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG,Boolean.TRUE);
         return mapping.findForward(LOAD_QUESTIONS);
     }
 

@@ -123,12 +123,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					
 					</table>
 
-	<HR>
-		<p align="right">
-	        <a href="javascript:submitMethod('submitAllContent')" class="button"><bean:message key="label.save"/></a>
-	        <a href="javascript:window.close()" class="button"><bean:message key="label.cancel"/></a>
-		</p>
-
 <SCRIPT language="JavaScript"> 
 
 	function removeQuestion(questionIndex)
