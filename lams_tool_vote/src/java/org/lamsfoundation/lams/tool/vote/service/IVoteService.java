@@ -91,6 +91,8 @@ public interface IVoteService
 	
 	public int getSessionEntriesCount(final Long voteSessionId) throws VoteApplicationException;
 	
+	public int getCompletedSessionEntriesCount(final Long voteSessionUid) throws VoteApplicationException;
+	
 	public int getUserRecordsEntryCount(final String userEntry) throws VoteApplicationException;
     
     public VoteUsrAttempt getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long voteQueContentId) throws VoteApplicationException;

@@ -455,7 +455,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 		logger.debug("final duplicate status :" +request.getAttribute(USER_EXCEPTION_OPTIONS_DUPLICATE));
 		logger.debug("fwding to destination :" +destination);
 		
-        //request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG,Boolean.TRUE);
+        request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG,Boolean.TRUE);
         return (mapping.findForward(destination));	
     }
 

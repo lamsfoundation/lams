@@ -156,7 +156,7 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 		    
 		    logger.debug("preparing chart data for content id: " + voteContent.getVoteContentId());
 		    logger.debug("preparing chart data for currentMonitoredToolSession: " + currentMonitoredToolSession);
-		    MonitoringUtil.prepareChartData(request, voteService, voteContent.getVoteContentId(), new Long(currentMonitoredToolSession));
+		    MonitoringUtil.prepareChartData(request, voteService, voteMonitoringForm, voteContent.getVoteContentId(), new Long(currentMonitoredToolSession));
 
 		    refreshSummaryData(request, voteContent, voteService, true, false, currentMonitoredToolSession, null, true);
 		    request.getSession().setAttribute(SELECTION_CASE, new Long(1));

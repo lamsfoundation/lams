@@ -497,7 +497,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
     	voteLearningForm.setNominationsSubmited(new Boolean(true).toString());
     	
     	logger.debug("calling  prepareChartData: " + toolContentId);
-    	MonitoringUtil.prepareChartData(request, voteService, toolContentId, toolSessionUid);
+    	MonitoringUtil.prepareChartData(request, voteService, null, toolContentId, toolSessionUid);
     	
     	return (mapping.findForward(INDIVIDUAL_REPORT));
     }

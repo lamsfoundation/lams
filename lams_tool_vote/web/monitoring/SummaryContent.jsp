@@ -51,24 +51,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 					<c:if test="${(requestLearningReport != 'true')}"> 	
 						<c:if test="${(isPortfolioExport != 'true') }"> 	
-							<c:if test="${sessionScope.selectionCase != 2}"> 			
-								<tr> 
-									<td NOWRAP valign=top align=left>
-										<c:set var="viewURL">
-											<html:rewrite page="/chartGenerator?type=pie"/>
-										</c:set>
-										<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
-											 <font size=2>	<bean:message key="label.view.chart"/>  </font>
-										</a>
-									</td>
-								</tr>
-							</c:if>			
-								<tr> 
-									<td NOWRAP class="formlabel" valign=top>
-									&nbsp&nbsp&nbsp
-									</td>
-								</tr>
-							
 			
 								<tr> 
 									<td NOWRAP  valign=top align=right><font size=2> <b> <bean:message key="label.selectGroup"/> </b>
@@ -109,19 +91,23 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					
 	  				<c:if test="${currentMonitoredToolSession == 'All'}"> 				
 						<tr>
-					 		<td NOWRAP colspan=2> <b> <font size=2> <bean:message key="label.select.session"/> </b> </td>
+					 		<td NOWRAP colspan=2> <font size=2> <bean:message key="label.select.session"/>  </td>
 						</tr>
 					</c:if> 	    
 
 	  				<c:if test="${currentMonitoredToolSession != 'All'}"> 				
 	  					<tr>
 					 		<td NOWRAP> <b> <font size=2> <bean:message key="label.total.students"/> </b> </td>
-					 		<td> 1 </td>
+					 		<td> <c:out value="${VoteMonitoringForm.sessionUserCount}"/> </td>
 						</tr>
 
 	  					<tr>
 					 		<td NOWRAP> <b> <font size=2> <bean:message key="label.total.completed.students"/> </b> </td> 
-					 		<td> 2 </td>
+					 		<td> <c:out value="${VoteMonitoringForm.completedSessionUserCount}"/> </td>
+						</tr>
+
+						<tr>
+					 		<td NOWRAP colspan=2 > &nbsp&nbsp </td>
 						</tr>
 	  				
 						<tr>
@@ -132,9 +118,22 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						
 
 						<tr>
-					 		<td NOWRAP> &nbsp&nbsp </td>
+					 		<td NOWRAP colspan=2 > &nbsp&nbsp </td>
 						</tr>
 						
+	
+
+						<tr> 
+							<td NOWRAP valign=top align=left colspan=2>
+								<c:set var="viewURL">
+									<html:rewrite page="/chartGenerator?type=pie"/>
+								</c:set>
+								<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
+									 <font size=2>	<bean:message key="label.view.chart"/>  </font>
+								</a>
+							</td>
+						</tr>
+
 	
 						<tr>
 					 		<td NOWRAP> <b> <font size=2> <bean:message key="label.nomination"/> </b> </td>
@@ -151,11 +150,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									<tr>			
 										<td NOWRAP valign=top align=left>
 											<c:out value="${currentNomination.value}" escapeXml="false"/>
-										</font> </td>
+										 </td>
 										
 										<td NOWRAP valign=top align=left>
-											<c:out value="${currentRate.value}"/>
-										</font> </td>
+											<font size=2> (<c:out value="${currentRate.value}"/> <bean:message key="label.percent"/>) </font>
+										</td>
 									</tr>	
 								</c:if> 	    
 								

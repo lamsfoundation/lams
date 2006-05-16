@@ -459,7 +459,8 @@
 	</action>  
 	
 	<action path="/clearsession"
-		type="org.lamsfoundation.lams.tool.vote.web.ClearSessionAction">
+		type="org.lamsfoundation.lams.tool.vote.web.ClearSessionAction"
+		name="VoteAuthoringForm" >
 	</action>    	
  </action-mappings>
 	

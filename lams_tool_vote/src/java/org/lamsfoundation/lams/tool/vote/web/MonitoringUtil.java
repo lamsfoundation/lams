@@ -631,13 +631,14 @@ public class MonitoringUtil implements VoteAppConstants{
 	}
 
 	
-	public static void prepareChartData(HttpServletRequest request, IVoteService voteService, Long toolContentId, Long toolSessionUid)
+	public static void prepareChartData(HttpServletRequest request, IVoteService voteService, VoteMonitoringForm voteMonitoringForm, Long toolContentId, Long toolSessionUid)
 	{
 	    logger.debug("starting prepareChartData, toolContentId: " + toolContentId);
 	    logger.debug("starting prepareChartData, toolSessionUid: " + toolSessionUid);
 	    VoteContent voteContent=voteService.retrieveVote(toolContentId);
 	    logger.debug("starting prepareChartData, voteContent uid: " + voteContent.getUid());
 	    
+	    logger.debug("starting prepareChartData, voteMonitoringForm: " + voteMonitoringForm);
 	    
 		logger.debug("existing voteContent:" + voteContent);
 		Map mapOptionsContent= new TreeMap(new VoteComparator());
@@ -655,6 +656,16 @@ public class MonitoringUtil implements VoteAppConstants{
 		    logger.debug("process for session: " + toolSessionUid);
 		    entriesCount=voteService.getSessionEntriesCount(toolSessionUid);
 		    userEntries=voteService.getSessionUserEntries(toolSessionUid);
+		    logger.debug("sessionUserCount: " + userEntries.size());
+		    
+		    int completedEntriesCount=voteService.getCompletedSessionEntriesCount(toolSessionUid);
+		    logger.debug("completedEntriesCount: " + completedEntriesCount);
+
+		    if (voteMonitoringForm != null)
+		    {
+		        voteMonitoringForm.setSessionUserCount(new Integer(entriesCount).toString());
+		        voteMonitoringForm.setCompletedSessionUserCount(new Integer(completedEntriesCount).toString());
+		    }
 		}
 		else
 		{

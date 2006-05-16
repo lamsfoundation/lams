@@ -53,8 +53,8 @@ public class VoteChartGenerator extends HttpServlet implements VoteAppConstants 
     {
         logger.debug("dispatching doGet for VoteChartGenerator...");
         
-        logger.debug("MAP_VOTERATES_CONTENT Map: " + request.getSession().getAttribute(MAP_VOTERATES_CONTENT));
-        logger.debug("MAP_OPTIONS_CONTENT Map: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT));
+        logger.debug("MAP_STANDARD_RATES_CONTENT Map: " + request.getSession().getAttribute(MAP_STANDARD_RATES_CONTENT));
+        logger.debug("MAP_STANDARD_NOMINATIONS_CONTENT Map: " + request.getSession().getAttribute(MAP_STANDARD_NOMINATIONS_CONTENT));
         OutputStream out= response.getOutputStream(); 
         
         try{
@@ -96,10 +96,10 @@ public class VoteChartGenerator extends HttpServlet implements VoteAppConstants 
         logger.debug("starting createPieChart...");
         DefaultPieDataset data= new DefaultPieDataset();
         
-        Map mapNominationsContent=(Map)request.getSession().getAttribute(MAP_OPTIONS_CONTENT);
+        Map mapNominationsContent=(Map)request.getSession().getAttribute(MAP_STANDARD_NOMINATIONS_CONTENT);
         logger.error("mapNominationsContent: " + mapNominationsContent);
         
-        Map mapVoteRatesContent=(Map)request.getSession().getAttribute(MAP_VOTERATES_CONTENT);
+        Map mapVoteRatesContent=(Map)request.getSession().getAttribute(MAP_STANDARD_RATES_CONTENT);
         logger.error("mapVoteRatesContent: " + mapVoteRatesContent);
 
         Iterator itMap = mapNominationsContent.entrySet().iterator();

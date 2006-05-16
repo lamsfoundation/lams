@@ -264,6 +264,20 @@ public class VoteServicePOJO implements
     }
    
 
+    public int getCompletedSessionEntriesCount(final Long voteSessionUid) throws VoteApplicationException
+    {
+        try
+        {
+        	return voteUsrAttemptDAO.getCompletedSessionEntriesCount(voteSessionUid);
+        }
+        catch (DataAccessException e)
+        {
+            throw new VoteApplicationException("Exception occured when lams is getting completed session user entries count: "
+                                                         + e.getMessage(),
+														   e);
+        }        
+    }
+    
     public Set getSessionUserEntries(final Long voteSessionUid) throws VoteApplicationException
     {
         try

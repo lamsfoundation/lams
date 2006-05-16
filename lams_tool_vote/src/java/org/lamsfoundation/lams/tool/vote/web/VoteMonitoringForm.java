@@ -38,6 +38,11 @@ public class VoteMonitoringForm extends VoteAuthoringForm implements VoteAppCons
 	
 	protected String isToolSessionChanged;
 	
+	protected String sessionUserCount;
+	
+	protected String completedSessionUserCount;
+	
+	
 	
 	/**
 	 * @return Returns the isToolSessionChanged.
@@ -77,4 +82,28 @@ public class VoteMonitoringForm extends VoteAuthoringForm implements VoteAppCons
 		this.method = method;
 	}
 
+    /**
+     * @return Returns the completedSessionUserCount.
+     */
+    public String getCompletedSessionUserCount() {
+        return completedSessionUserCount;
+    }
+    /**
+     * @param completedSessionUserCount The completedSessionUserCount to set.
+     */
+    public void setCompletedSessionUserCount(String completedSessionUserCount) {
+        this.completedSessionUserCount = completedSessionUserCount;
+    }
+    /**
+     * @return Returns the sessionUserCount.
+     */
+    public String getSessionUserCount() {
+        return sessionUserCount;
+    }
+    /**
+     * @param sessionUserCount The sessionUserCount to set.
+     */
+    public void setSessionUserCount(String sessionUserCount) {
+        this.sessionUserCount = sessionUserCount;
+    }
 }
