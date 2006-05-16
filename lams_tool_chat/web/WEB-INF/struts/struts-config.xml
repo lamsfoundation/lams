@@ -55,6 +55,13 @@
       />
     </action>
     <action
+      path="/clearsession"
+      type="org.lamsfoundation.lams.tool.chat.web.actions.ClearSessionAction"
+      unknown="false"
+      validate="false"
+    >
+    </action>
+    <action
       path="/authoring"
       type="org.lamsfoundation.lams.tool.chat.web.actions.AuthoringAction"
       name="authoringForm"

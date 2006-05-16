@@ -40,6 +40,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.upload.FormFile;
+import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.chat.beans.AuthoringSessionBean;
 import org.lamsfoundation.lams.tool.chat.model.Chat;
@@ -189,6 +190,8 @@ public class AuthoringAction extends LamsDispatchAction {
 		// update form and return to page.
 		resetAuthSession(authSession, content);
 		authForm.setAuthSession(authSession);
+		
+        request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG,Boolean.TRUE);
 		return mapping.findForward("success");
 	}
 

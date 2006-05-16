@@ -10,5 +10,6 @@
 	<classpathentry kind="lib" path="lib/smack-2.2.0/smack.jar"/>
 	<classpathentry kind="lib" path="lib/smack-2.2.0/smackx.jar"/>
 	<classpathentry kind="lib" path="lib/smack-2.2.0/smackx-debug.jar"/>
+	<classpathentry sourcepath="/lams_central/src" kind="lib" path="/lams_build/lib/lams/lams-central.jar"/>
 	<classpathentry kind="output" path="build/classes/java"/>
 </classpath>

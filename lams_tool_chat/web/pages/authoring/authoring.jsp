@@ -7,10 +7,10 @@
 </lams:Tabs>
 
 <div class="tabbody">
-	<html:form action="/authoring" method="post" enctype="multipart/form-data">
+	<html:form action="/authoring" styleId="authoringForm" method="post" enctype="multipart/form-data">
 		<html:hidden property="toolContentID" />
 		<html:hidden property="currentTab" styleId="currentTab" />
-		<html:hidden property="dispatch" />
+		<html:hidden property="dispatch" value="updateContent"/>
 		<html:hidden property="authSessionId" />
 
 		<div id="message" align="center">
@@ -34,14 +34,10 @@
 		<hr />
 
 		<%-- Form Controls --%>
-		<div align="right">
-			<html:link href="javascript:doSubmit('updateContent');" property="submit" styleClass="button">
-				<fmt:message key="button.save" />
-			</html:link>
-			<html:link href="javascript:;" property="cancel" onclick="window.close()" styleClass="button">
-				<fmt:message key="button.cancel" />
-			</html:link>
-		</div>
+		<!-- Button Row -->
+		<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
+		<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="lachat11" 
+			cancelButtonLabelKey="button.cancel" saveButtonLabelKey="button.save" toolContentID="${formBean.toolContentID}" />					
 	</html:form>
 </div>
 
