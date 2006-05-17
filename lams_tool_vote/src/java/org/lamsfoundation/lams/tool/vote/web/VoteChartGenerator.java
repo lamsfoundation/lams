@@ -53,8 +53,8 @@ public class VoteChartGenerator extends HttpServlet implements VoteAppConstants 
     {
         logger.debug("dispatching doGet for VoteChartGenerator...");
         
-        logger.debug("MAP_STANDARD_RATES_CONTENT Map: " + request.getSession().getAttribute(MAP_STANDARD_RATES_CONTENT));
-        logger.debug("MAP_STANDARD_NOMINATIONS_CONTENT Map: " + request.getSession().getAttribute(MAP_STANDARD_NOMINATIONS_CONTENT));
+        logger.debug("test6: MAP_STANDARD_NOMINATIONS_CONTENT: " + request.getSession().getAttribute(MAP_STANDARD_NOMINATIONS_CONTENT));
+		logger.debug("test6: MAP_STANDARD_RATES_CONTENT: " + request.getSession().getAttribute(MAP_STANDARD_RATES_CONTENT));
         OutputStream out= response.getOutputStream(); 
         
         try{

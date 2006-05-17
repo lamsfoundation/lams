@@ -38,14 +38,14 @@
 					
 			  		<c:forEach var="entry" items="${sessionScope.mapGeneralCheckedOptionsContent}">
 						  <tr>
-						  	<td NOWRAP align=left valign=top colspan=2> 
+						  	<td NOWRAP align=center valign=top colspan=2> 
 								  <c:out value="${entry.value}" escapeXml="false" />						  																	
 						  	</td>
 						  </tr>
 					</c:forEach>
 										
 						<tr> 
-							<td NOWRAP align=left valign=top colspan=2> 
+							<td NOWRAP align=center valign=top colspan=2> 
 						 	  		<c:out value="${VoteLearningForm.userEntry}"/> 						 			
 					 		</td>
 					  	</tr>

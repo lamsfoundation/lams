@@ -65,6 +65,8 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 	 	
 	 	private static final String LOAD_ALL_ENTRIES = "from voteUsrAttempt in class VoteUsrAttempt";
 	 	
+	 	private static final String LOAD_DISTINCT_USER_ENTRIES = "select distinct voteUsrAttempt.queUsrId from VoteUsrAttempt voteUsrAttempt";
+	 	
 	 	
 	 	public VoteUsrAttempt getVoteUserAttemptByUID(Long uid)
 		{
@@ -443,6 +445,8 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 			return totalSessionAttemptsCount;
 	    }
 
+		
+		
 		
 		public int getCompletedSessionEntriesCount(final Long voteSessionUid)
 	    {

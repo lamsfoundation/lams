@@ -22,6 +22,7 @@
 
 package org.lamsfoundation.lams.tool.vote.dao.hibernate;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.hibernate.FlushMode;
@@ -88,6 +89,40 @@ public class VoteUserDAO extends HibernateDaoSupport implements IVoteUserDAO {
 		.list();
 		return list;
     }
+
+	public List getVoteUserBySessionUid(final Long voteSessionUid)
+    {
+        HibernateTemplate templ = this.getHibernateTemplate();
+        List list = getSession().createQuery(LOAD_USER_FOR_SESSION)
+		.setLong("voteSessionId", voteSessionUid.longValue())				
+		.list();
+		return list;
+    }
+
+	public int getCompletedVoteUserBySessionUid(final Long voteSessionUid)
+    {
+        HibernateTemplate templ = this.getHibernateTemplate();
+        List list = getSession().createQuery(LOAD_USER_FOR_SESSION)
+		.setLong("voteSessionId", voteSessionUid.longValue())				
+		.list();
+        
+        int completedSessionUserCount=0;
+		if(list != null && list.size() > 0){
+			Iterator listIterator=list.iterator();
+	    	while (listIterator.hasNext())
+	    	{
+	    	    VoteQueUsr user=(VoteQueUsr)listIterator.next();
+	    	    logger.debug("user: " + user);
+	    	    if (user.getVoteSession().getSessionStatus().equals("COMPLETED"))
+	    	    {
+	    	        ++completedSessionUserCount;
+	    	    }
+	    	}
+		}
+
+		return completedSessionUserCount;
+    }
+
 	
 	public VoteQueUsr getVoteUserBySession(final Long queUsrId, final Long voteSessionId)
 	{

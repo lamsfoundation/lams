@@ -32,6 +32,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
 	<html:hidden property="responseId"/>	 
+	<html:hidden property="selectedToolSessionId"/>							
+	<input type="hidden" name="isToolSessionChanged"/>
 	
 		<c:if test="${(userExceptionNoToolSessions == 'true')}"> 	
 				<table class="forms" align="center">
@@ -43,59 +45,34 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</table>
 		</c:if>			
 
+
 		<c:if test="${(userExceptionNoToolSessions != 'true') }"> 	
 		
-			<html:hidden property="selectedToolSessionId"/>							
-			<input type="hidden" name="isToolSessionChanged"/>
-				<table>
+			<c:if test="${currentMonitoredToolSession == 'All'}"> 				
+				<table class="forms" align="center">
+				<tr>
+			 		<td NOWRAP> <font size=2> <bean:message key="label.select.session"/>  </td>
+			 		<td NOWRAP align=right> <font size=2> 
+						<jsp:include page="/monitoring/PullDownMenu.jsp" />
+			 		</td>
+				</tr>
+				</table>
+			</c:if> 	    
 
-					<c:if test="${(requestLearningReport != 'true')}"> 	
-						<c:if test="${(isPortfolioExport != 'true') }"> 	
-			
-								<tr> 
-									<td NOWRAP  valign=top align=right><font size=2> <b> <bean:message key="label.selectGroup"/> </b>
-											<select name="monitoredToolSessionId" onchange="javascript:submitSession(this.value,'submitSession');">
-											<c:forEach var="toolSessionName" items="${sessionScope.summaryToolSessions}">
-												<c:forEach var="toolSessionId" items="${sessionScope.summaryToolSessionsId}">
-													<c:out value="${toolSessionName.key}"/> -<c:out value="${toolSessionId.value}"/>
-												
-														<c:if test="${toolSessionName.key == toolSessionId.key}"> 			
-													
-															<c:set var="SELECTED_SESSION" scope="request" value=""/>
-															<c:if test="${sessionScope.selectionCase == 2}"> 			
-																<c:set var="currentMonitoredToolSession" scope="session" value="All"/>
-															</c:if>						
-															
-															<c:if test="${toolSessionId.value == sessionScope.currentMonitoredToolSession}"> 			
-																	<c:set var="SELECTED_SESSION" scope="request" value="SELECTED"/>
-															</c:if>						
-															
-															<c:if test="${toolSessionId.value != 'All'}"> 		
-																<option value="<c:out value="${toolSessionId.value}"/>"  <c:out value="${requestScope.SELECTED_SESSION}"/>> <c:out value="${toolSessionName.value}"/>  </option>						
-															</c:if>						
-															
-															<c:if test="${toolSessionId.value == 'All'}"> 	
-																<option value="<c:out value="${toolSessionId.value}"/>"  <c:out value="${requestScope.SELECTED_SESSION}"/>>  All  </option>						
-															</c:if>						
-													</c:if>							
-												</c:forEach>		  	
-											</c:forEach>		  	
-											</select>
-										</font>
-									</td> 
-								<tr>
-	
-						</c:if>								
-					</c:if>			
-					
-					
-	  				<c:if test="${currentMonitoredToolSession == 'All'}"> 				
-						<tr>
-					 		<td NOWRAP colspan=2> <font size=2> <bean:message key="label.select.session"/>  </td>
+			<c:if test="${currentMonitoredToolSession != 'All'}"> 							
+
+				<table class="forms" align="center">
+						<tr> 
+					 		<td NOWRAP> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp  </td>
+							<td NOWRAP align=right>
+								<jsp:include page="/monitoring/PullDownMenu.jsp" />					
+							</td> 
 						</tr>
-					</c:if> 	    
 
-	  				<c:if test="${currentMonitoredToolSession != 'All'}"> 				
+						<tr>
+					 		<td NOWRAP colspan=2 > &nbsp&nbsp </td>
+						</tr>
+
 	  					<tr>
 					 		<td NOWRAP> <b> <font size=2> <bean:message key="label.total.students"/> </b> </td>
 					 		<td> <c:out value="${VoteMonitoringForm.sessionUserCount}"/> </td>
@@ -121,10 +98,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					 		<td NOWRAP colspan=2 > &nbsp&nbsp </td>
 						</tr>
 						
-	
-
 						<tr> 
-							<td NOWRAP valign=top align=left colspan=2>
+							<td> </td>
+							<td NOWRAP valign=top align=left >
 								<c:set var="viewURL">
 									<html:rewrite page="/chartGenerator?type=pie"/>
 								</c:set>
@@ -142,28 +118,30 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						
 						<c:forEach var="currentNomination" items="${mapStandardNominationsContent}">
 				  	 		<c:set var="currentNominationKey" scope="request" value="${currentNomination.key}"/>
-				  	 		
-				  	 		<c:forEach var="currentRate" items="${mapStandardRatesContent}">
-					  	 		<c:set var="currentRateKey" scope="request" value="${currentRate.key}"/>
-		
-				  				<c:if test="${currentNominationKey == currentRateKey}"> 				
-									<tr>			
-										<td NOWRAP valign=top align=left>
-											<c:out value="${currentNomination.value}" escapeXml="false"/>
-										 </td>
-										
-										<td NOWRAP valign=top align=left>
-											<font size=2> (<c:out value="${currentRate.value}"/> <bean:message key="label.percent"/>) </font>
-										</td>
-									</tr>	
-								</c:if> 	    
-								
-							</c:forEach>		  
-						</c:forEach>	
-					
-					</c:if> 	    	  
+				  	 		 <tr>
+	  	 						<td NOWRAP valign=top align=left>
+									<c:out value="${currentNomination.value}" escapeXml="false"/>
+								 </td>
 
+								<td NOWRAP valign=top align=left>				  	 		
+						  	 		<c:forEach var="currentUserCount" items="${mapStandardUserCount}">
+							  	 		<c:set var="currentUserKey" scope="request" value="${currentUserCount.key}"/>
+						  				<c:if test="${currentNominationKey == currentUserKey}"> 				
+													<font size=2> <c:out value="${currentUserCount.value}"/>  </font>
+										</c:if> 	    
+									</c:forEach>		  
+
+						  	 		<c:forEach var="currentRate" items="${mapStandardRatesContent}">
+							  	 		<c:set var="currentRateKey" scope="request" value="${currentRate.key}"/>
+						  				<c:if test="${currentNominationKey == currentRateKey}"> 				
+													<font size=2> &nbsp(<c:out value="${currentRate.value}"/> <bean:message key="label.percent"/>) </font>
+										</c:if> 	    
+									</c:forEach>		  
+								</td>								
+							</tr>	
+						</c:forEach>	
 				</table>
+			</c:if> 	    	  
 		</c:if>						
 
 

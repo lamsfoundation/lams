@@ -41,6 +41,10 @@ public interface IVoteUserDAO {
 	
 	public VoteQueUsr getVoteUserBySession(final Long queUsrId, final Long voteSessionId);
 	
+	public int getCompletedVoteUserBySessionUid(final Long voteSessionUid);
+	
+	public List getVoteUserBySessionUid(final Long voteSessionUid);
+	
 	public VoteQueUsr getVoteQueUsrById(long voteQueUsrId);
 	
 	public void saveVoteUser(VoteQueUsr voteUser);

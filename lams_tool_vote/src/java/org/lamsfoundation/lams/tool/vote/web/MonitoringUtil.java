@@ -22,6 +22,7 @@
 
 package org.lamsfoundation.lams.tool.vote.web;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -648,6 +649,7 @@ public class MonitoringUtil implements VoteAppConstants{
 		logger.debug("mapVoteRatesContent: " + mapVoteRatesContent);
 		
 		
+		List distinctSessionUsers=new ArrayList();
 		boolean sessionLevelCharting=true;
 		int entriesCount=0;
 		Set userEntries=null;
@@ -658,13 +660,29 @@ public class MonitoringUtil implements VoteAppConstants{
 		    userEntries=voteService.getSessionUserEntries(toolSessionUid);
 		    logger.debug("sessionUserCount: " + userEntries.size());
 		    
+		    distinctSessionUsers=voteService.getVoteUserBySessionUid(toolSessionUid);
+		    logger.debug("distinctSessionUsers: " + distinctSessionUsers);
+		    
+		    int completedSessionUserCount=voteService.getCompletedVoteUserBySessionUid(toolSessionUid);
+		    logger.debug("completedSessionUserCount: " + completedSessionUserCount);
+		    
+		    
 		    int completedEntriesCount=voteService.getCompletedSessionEntriesCount(toolSessionUid);
 		    logger.debug("completedEntriesCount: " + completedEntriesCount);
 
 		    if (voteMonitoringForm != null)
 		    {
-		        voteMonitoringForm.setSessionUserCount(new Integer(entriesCount).toString());
-		        voteMonitoringForm.setCompletedSessionUserCount(new Integer(completedEntriesCount).toString());
+		        if (distinctSessionUsers != null)
+		        {
+		            logger.debug("distinctSessionUsers count: " + distinctSessionUsers.size());
+		            voteMonitoringForm.setSessionUserCount(new Integer(distinctSessionUsers.size()).toString());
+		        }
+		        else
+		        {
+		            voteMonitoringForm.setSessionUserCount(new Integer(0).toString());
+		        }
+		        
+		        voteMonitoringForm.setCompletedSessionUserCount(new Integer(completedSessionUserCount).toString());
 		    }
 		}
 		else
@@ -682,12 +700,15 @@ public class MonitoringUtil implements VoteAppConstants{
 		logger.debug("userEntries: " + userEntries);
 		logger.debug("sessionLevelCharting: " + sessionLevelCharting);
 		
+		
+		Map mapStandardUserCount= new TreeMap(new VoteComparator());
 
 		logger.debug("setting existing content data from the db");
 		mapOptionsContent.clear();
 		Iterator queIterator=voteContent.getVoteQueContents().iterator();
 		Long mapIndex=new Long(1);
 		logger.debug("mapOptionsContent: " + mapOptionsContent);
+		int totalStandardVotesCount=0;
 		while (queIterator.hasNext())
 		{
 			VoteQueContent voteQueContent=(VoteQueContent) queIterator.next();
@@ -702,6 +723,8 @@ public class MonitoringUtil implements VoteAppConstants{
 				    logger.debug("getting votesCount based on session: " + toolSessionUid);
 					votesCount=voteService.getAttemptsForQuestionContentAndSessionUid(voteQueContent.getUid(), toolSessionUid);
 					logger.debug("votesCount for questionContent uid: " + votesCount + " for" + voteQueContent.getUid());
+					mapStandardUserCount.put(mapIndex.toString(),new Integer(votesCount).toString());
+					totalStandardVotesCount=totalStandardVotesCount + votesCount;
 				}
 				else
 				{
@@ -719,28 +742,18 @@ public class MonitoringUtil implements VoteAppConstants{
 				logger.debug("voteRate" + voteRate);
 				
 				mapVoteRatesContent.put(mapIndex.toString(), new Double(voteRate).toString());
-				
-				
-	    		/**
-	    		 * make the first entry the default(first) one for jsp
-	    		 */
-	    		if (mapIndex.longValue() == 1)
-	    		{
-	    		    request.getSession().setAttribute(DEFAULT_OPTION_CONTENT, voteQueContent.getQuestion());
-	    		}
-	    		
 	    		mapIndex=new Long(mapIndex.longValue()+1);
 			}
 		}
-		logger.debug("Map initialized with existing contentid to: " + mapOptionsContent);
+		logger.debug("test1: Map initialized with existing contentid to: " + mapOptionsContent);
 		Map mapStandardNominationsContent= new TreeMap(new VoteComparator());
 		mapStandardNominationsContent=mapOptionsContent;
 		logger.debug("mapStandardNominationsContent: " + mapStandardNominationsContent);
 		
 		Map mapStandardRatesContent= new TreeMap(new VoteComparator());
 		mapStandardRatesContent=mapVoteRatesContent;
-		logger.debug("mapStandardRatesContent: " + mapStandardRatesContent);
-		
+		logger.debug("test1: mapStandardRatesContent: " + mapStandardRatesContent);
+		logger.debug("test1: mapStandardUserCount: " + mapStandardUserCount);
 		
 		Iterator itListQuestions = userEntries.iterator();
 	    int mapVoteRatesSize=mapVoteRatesContent.size();
@@ -753,15 +766,26 @@ public class MonitoringUtil implements VoteAppConstants{
 	    double share=100d-total ; 
 	    logger.debug("share: " + share);
 	    
+	    logger.debug("totalStandardVotesCount: " + totalStandardVotesCount);
 	    
-	    mapStandardNominationsContent.put(mapIndex.toString(), "Open vote");
+	    logger.debug("distinctSessionUsers: " + distinctSessionUsers);
+	    int userEnteredVotesCount=0;
+        if (distinctSessionUsers != null)
+        {
+            userEnteredVotesCount=totalStandardVotesCount- distinctSessionUsers.size();    
+        }
+        else
+        {
+            userEnteredVotesCount=totalStandardVotesCount;
+        }
+        
+        logger.debug("userEnteredVotesCount: " + userEnteredVotesCount);
+	    
+	    mapStandardNominationsContent.put(mapIndex.toString(), "Open Vote");
 	    mapStandardRatesContent.put(mapIndex.toString(), new Double(share).toString());
-
-		request.getSession().setAttribute(MAP_STANDARD_NOMINATIONS_CONTENT, mapStandardNominationsContent);
-		logger.debug("MAP_STANDARD_NOMINATIONS_CONTENT: " + request.getSession().getAttribute(MAP_STANDARD_NOMINATIONS_CONTENT));
-
-		request.getSession().setAttribute(MAP_STANDARD_RATES_CONTENT, mapStandardRatesContent);
-		logger.debug("MAP_STANDARD_RATES_CONTENT: " + request.getSession().getAttribute(MAP_STANDARD_RATES_CONTENT));
+	    mapStandardUserCount.put(mapIndex.toString(), new Integer(userEnteredVotesCount).toString());
+        
+	    /*
 
 	    double totalUserRate=0d;
 	    while (itListQuestions.hasNext())
@@ -822,13 +846,26 @@ public class MonitoringUtil implements VoteAppConstants{
 	    	    mapIndex=new Long(mapIndex.longValue()+1);
 	    	}
 	    }
+	    
+	    */
 		
 		
+	    /*
 		logger.debug("Map initialized with mapVoteRatesContent: " + mapVoteRatesContent);
 		request.getSession().setAttribute(MAP_VOTERATES_CONTENT, mapVoteRatesContent);
 		logger.debug("starter initialized the MAP_VOTERATES_CONTENT Map: " + request.getSession().getAttribute(MAP_VOTERATES_CONTENT));
 		
 		request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
 		logger.debug("final starter initialized the MAP_OPTIONS_CONTENT Map: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT) );
+		*/
+	    
+		request.getSession().setAttribute(MAP_STANDARD_NOMINATIONS_CONTENT, mapStandardNominationsContent);
+		logger.debug("test2: MAP_STANDARD_NOMINATIONS_CONTENT: " + request.getSession().getAttribute(MAP_STANDARD_NOMINATIONS_CONTENT));
+
+		request.getSession().setAttribute(MAP_STANDARD_RATES_CONTENT, mapStandardRatesContent);
+		logger.debug("test2: MAP_STANDARD_RATES_CONTENT: " + request.getSession().getAttribute(MAP_STANDARD_RATES_CONTENT));
+		
+		request.getSession().setAttribute(MAP_STANDARD_USER_COUNT, mapStandardUserCount);
+		logger.debug("test2: MAP_STANDARD_USER_COUNT: " + request.getSession().getAttribute(MAP_STANDARD_USER_COUNT));
 	}
 }

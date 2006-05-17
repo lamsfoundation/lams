@@ -123,6 +123,8 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
                                          ServletException
 	{
     	logger.debug("dispatching submitSession...");
+		logger.debug("test3: MAP_STANDARD_NOMINATIONS_CONTENT: " + request.getSession().getAttribute(MAP_STANDARD_NOMINATIONS_CONTENT));
+		logger.debug("test3: MAP_STANDARD_RATES_CONTENT: " + request.getSession().getAttribute(MAP_STANDARD_RATES_CONTENT));
     	
     	IVoteService voteService=null;
 
@@ -170,6 +172,9 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	    
 	    voteMonitoringForm.setSbmtSuccess(new Boolean(false).toString());
 	    request.getSession().setAttribute(REQUEST_LEARNING_REPORT, new Boolean(false).toString());
+	    
+		logger.debug("test4: MAP_STANDARD_NOMINATIONS_CONTENT: " + request.getSession().getAttribute(MAP_STANDARD_NOMINATIONS_CONTENT));
+		logger.debug("test4: MAP_STANDARD_RATES_CONTENT: " + request.getSession().getAttribute(MAP_STANDARD_RATES_CONTENT));
     	return (mapping.findForward(LOAD_MONITORING));	
 	}
 

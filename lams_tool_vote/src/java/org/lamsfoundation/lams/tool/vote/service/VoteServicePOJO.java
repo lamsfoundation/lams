@@ -843,7 +843,36 @@ public class VoteServicePOJO implements
         }
     	
 	}
-   
+    
+    public int getCompletedVoteUserBySessionUid(final Long voteSessionUid) throws VoteApplicationException
+    {
+     	try
+        {
+            return voteUserDAO.getCompletedVoteUserBySessionUid(voteSessionUid);
+        }
+        catch (DataAccessException e)
+        {
+            throw new VoteApplicationException("Exception occured when lams is retrieving completed users by session uid: "
+                                                         + e.getMessage(),
+														   e);
+        }
+    }
+
+	public List getVoteUserBySessionUid(final Long voteSessionUid) throws VoteApplicationException
+	{
+     	try
+        {
+            return voteUserDAO.getVoteUserBySessionUid(voteSessionUid);
+        }
+        catch (DataAccessException e)
+        {
+            throw new VoteApplicationException("Exception occured when lams is retrieving users by session uid: "
+                                                         + e.getMessage(),
+														   e);
+        }	    
+	}
+
+    
     public List getVoteUserBySessionOnly(final VoteSession voteSession) throws VoteApplicationException
     {
      	try
@@ -946,6 +975,7 @@ public class VoteServicePOJO implements
         }
     }
 
+    
 	public int countSessionComplete() throws VoteApplicationException
 	{
 		try
@@ -958,7 +988,8 @@ public class VoteServicePOJO implements
                                                  + e.getMessage(),e);
         }		
 	}
-
+	
+	
     public int countSessionIncomplete() throws VoteApplicationException
 	{
 		try

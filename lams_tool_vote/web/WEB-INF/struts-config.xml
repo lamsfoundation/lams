@@ -458,10 +458,10 @@
 	  	/>
 	</action>  
 	
-	<action path="/clearsession"
-		type="org.lamsfoundation.lams.tool.vote.web.ClearSessionAction"
-		name="VoteAuthoringForm" >
-	</action>    	
+   <action 	path="/clearsession" 
+   			type="org.lamsfoundation.lams.tool.vote.web.ClearSessionAction"> 
+	</action>     			
+	
  </action-mappings>
 	
 	<message-resources parameter="org.lamsfoundation.lams.tool.vote.ApplicationResources"/>
