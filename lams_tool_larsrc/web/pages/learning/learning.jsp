@@ -25,7 +25,7 @@
 		}
 		function viewItem(itemUid){
 			var myUrl = "<c:url value="/reviewItem.do"/>?itemUid=" + itemUid;
-			launchPopup(myUrl,"Review");
+			launchPopup(myUrl,"LearnerView");
 		}
 		function completeItem(itemUid){
 			document.location.href = "<c:url value="/learning/completeItem.do"/>?itemUid=" + itemUid;
