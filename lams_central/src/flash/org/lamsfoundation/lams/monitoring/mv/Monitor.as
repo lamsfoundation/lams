@@ -235,6 +235,38 @@ class Monitor {
 		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=getAllContributeActivities&lessonID='+seqID,callback, false);
 		
 	}
+	
+	public function getCELiteral(taskType:Number):String{
+		trace("Type passed: "+taskType)
+		var seqStat:String;
+		switch(String(taskType)){
+			case '1' :
+				seqStat = "Moderation"
+				break;
+			case '2' :
+				seqStat = "Define Later"
+				break;
+			case '3' :
+				seqStat = "Permission Gate"
+				break;
+			case '4' :
+				seqStat = "Syncronise Gate"
+				break;
+			case '5' :
+				seqStat = "Schedule Gate"
+				break;
+			case '6' :
+				seqStat = "Choose Grouping"
+				break;
+			case '7' :
+				seqStat = "Contribution"
+				break;
+			default:
+				seqStat = "Not yet set"
+		}
+		return seqStat;
+	}
+	
 
 	/**
 	 * Clears the design in the canvas.but leaves other state variables (undo etc..)
