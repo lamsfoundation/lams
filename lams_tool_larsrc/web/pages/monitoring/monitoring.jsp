@@ -22,7 +22,7 @@
 	        
 		    function viewItem(itemUid){
 				var myUrl = "<c:url value="/reviewItem.do"/>?itemUid=" + itemUid;
-				launchPopup(myUrl,"Review");
+				launchPopup(myUrl,"MonitoringReview");
 			}
 	    </script>		 
 	</head>
