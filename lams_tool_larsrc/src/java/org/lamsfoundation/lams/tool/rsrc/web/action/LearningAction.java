@@ -269,9 +269,12 @@ public class LearningAction extends Action {
 		if(resource.getResourceItems() != null){
 			itemsNumber = resource.getResourceItems().size();
 			if(resource.isRunAuto() && itemsNumber == 1){
-				runAuto = true;
 				ResourceItem item = (ResourceItem) resource.getResourceItems().iterator().next();
-				request.setAttribute(ResourceConstants.ATTR_RESOURCE_ITEM_UID,item.getUid());
+				//only visible item can be run auto.
+				if(!item.isHide()){
+					runAuto = true;
+					request.setAttribute(ResourceConstants.ATTR_RESOURCE_ITEM_UID,item.getUid());
+				}
 			}
 		}
 		request.setAttribute(ResourceConstants.ATTR_RUN_AUTO,new Boolean(runAuto));
