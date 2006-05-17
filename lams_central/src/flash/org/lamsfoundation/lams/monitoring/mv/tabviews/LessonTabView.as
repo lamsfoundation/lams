@@ -49,6 +49,9 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	private var mm:MonitorModel;
 	
 	//TabView clips
+	private var reqTasks_depth:Number = 4000;
+	private var listCount:Number = 0; 
+	private var requiredTaskList:Array = new Array();
 	private var _monitorReqTask_mc:MovieClip;
 	private var reqTasks_scp:MovieClip;
 	private var monitorTabs_tb:MovieClip;
@@ -72,18 +75,21 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	private var numLearners_txt:TextField;
 	private var group_txt:TextField;
 	private var duration_txt:TextField;
+	private var lessonManager:TextField;
+	private var taskManager:TextField;
 	
 	//Button
 	private var viewLearners_btn:Button;
 	private var editClass_btn:Button;
-	private var selectClass_btn:Button;
-	private var status1_btn:Button;
-	private var status2_btn:Button;
+	private var statusApply_btn:Button;
 	private var setDateTime_btn:Button;
 	
-	private var startDate_dt:Date;
+	private var startDate_dt:DateField;
 	private var startHour_stp:NumericStepper;
 	private var startMin_stp:NumericStepper;
+	
+	//COMBO
+	private var changeStatus_cmb:ComboBox;
 	
     //private var _transitionLayer_mc:MovieClip;
 	//private var _activityLayerComplex_mc:MovieClip;
@@ -132,19 +138,12 @@ public function update (o:Observable,infoObj:Object):Void{
 		    case 'SIZE' :
 			    setSize(mm);
                 break;
-			case 'REQUIREDTASKS' :
-				trace('REQUIREDTASKS');
-                break;
-			case 'CLASS' :
-				trace('CLASS');
-                break;
-			case 'STATUS' :
-				trace('STATUS');
+			case 'POSITION' :
+				setPosition(mm);
                 break;
 			case 'TODOS' :
-				trace('TODOS');
 				populateContributeActivities();
-				break;
+                break;
 			case 'TABCHANGE' :
 				if (infoObj.tabID == _tabID){
 				trace("TabID for Selected tab is (LessonTab TABCHANGE): "+infoObj.tabID)
@@ -181,12 +180,12 @@ public function update (o:Observable,infoObj:Object):Void{
     * layout visual elements on the canvas on initialisation
     */
 	private function draw(){
-		
+		listCount = 0; 
 		this.onEnterFrame = setupLabels;
 		//get the content path for the sp
 		_monitorReqTask_mc = reqTasks_scp.content;
 		_monitorController = getController();
-		selectClass_btn.addEventListener("click", _monitorController);
+		editClass_btn.addEventListener("click", _monitorController);
 	
 		//Debugger.log('_canvas_mc'+_canvas_mc,Debugger.GEN,'draw','CanvasView');
 	
@@ -219,13 +218,27 @@ public function update (o:Observable,infoObj:Object):Void{
 		trace("Item Description (Lesson Tab View) is : "+s._seqDescription);
 		LSTitle_txt.text = s._seqName;
 		LSDescription_txt.text = s._seqDescription;
-		//sessionStatus_txt.text = _lessonStateArr(s._seqStateID);
+		sessionStatus_txt.text = showStatus(s._seqStateID);
 		//numLearners_txt.text = s._seqDescription
 		//group_txt.text = s._seqDescription
 		//duration_txt.text = s._seqDescription
 		  
 	}
 
+	private function showStatus(seqStatus:Number):String{
+		var seqStat:String;
+		switch(String(seqStatus)){
+			case '6' :
+				seqStat = "Archive"
+				break;
+			case '7' :
+				seqStat = "Disabled"
+				break;
+			default:
+				seqStat = "Active"
+		}
+		return seqStat
+	}
 	/**
 	* Populate the required tasks for the active Sequence 
 	
@@ -337,28 +350,52 @@ public function update (o:Observable,infoObj:Object):Void{
 		
 		if(array.length > 0){
 			// write ca title / details to screen with x position
-			trace('write CA title with x:' + x);
+			requiredTaskList[listCount] = _monitorReqTask_mc.attachMovie("contributeActivityRow", "contributeActivityRow"+listCount, this._monitorReqTask_mc.getNextHighestDepth(), {_x:x, _y:19*listCount})
+			reqTasks_scp.redraw(true);
+			requiredTaskList[listCount].contributeActivity.background = true;
+			requiredTaskList[listCount].contributeActivity._width=reqTasks_scp._width-20
+			
+			if (ca._parentActivityID == null){
+				requiredTaskList[listCount].contributeActivity.text = "  "+ca.title
+				requiredTaskList[listCount].contributeActivity.backgroundColor = 0xD5E6FF;
+			}else {
+				requiredTaskList[listCount].contributeActivity.text = "\t"+ca.title
+				requiredTaskList[listCount].contributeActivity.backgroundColor = 0xF9F2DD;
+			}
+			
+			listCount++
 		}
 		
 		for(var i=0; i<array.length; i++){
 			var o:Object = array[i];
 			
 			if(o instanceof ContributeActivity){
-				
 				// normal CA entries
-				trace('write out entry with GO link');
+				trace('write out entry with GO link'+o.taskURL);
+				requiredTaskList[listCount] =_monitorReqTask_mc.attachMovie("contributeEntryRow", "contributeEntryRow"+listCount, this._monitorReqTask_mc.getNextHighestDepth(), {_x:x, _y:19*listCount})
+				reqTasks_scp.redraw(true);
+				requiredTaskList[listCount].contributeEntry.text = "\t\t"+mm.getMonitor().getCELiteral(o._contributionType);
+				requiredTaskList[listCount].goContribute._x = reqTasks_scp._width-50
+				requiredTaskList[listCount].goContribute.onRelease = function (){
+					trace("Contrybute Type is: "+o.taskURL);
+					getURL(String(o.taskURL), "_blank");
+					//getURL("http://localhost:8080/lams/monitoring/monitoring.do?method=getAllContributeActivities&lessonID=4", "_blank");
+				}
+				requiredTaskList[listCount].goContribute.setStyle("fontSize", "9"); 
+				listCount++
 			}else{
 				// child CA
 				trace('child entries length:' + o.entries.length)
 				if(o.entries.length > 0){
 					trace('now drawing child');
 					// write child ca title (indented - x + 10 position)
-					drawIsRequiredTasks(o.child, o.entries, x+10);
+					drawIsRequiredTasks(o.child, o.entries, x);
 				}
 				
 			}
 		}
 		
+		reqTasks_scp.redraw(true)
 	}
 	
 	/**
@@ -410,17 +447,67 @@ public function update (o:Observable,infoObj:Object):Void{
 		//Button
 		viewLearners_btn.label = "View Learners"
 		editClass_btn.label = "Edit Class"
-		selectClass_btn.label = "Select Class"
-		status1_btn.label = "Archive"
-		status2_btn.label = "Disable"
+		statusApply_btn.label = "Apply"
 		setDateTime_btn.label = "Start Now"
 		
 		_lessonStateArr = ["CREATED", "NOT_STARTED", "STARTED", "SUSPENDED", "FINISHED", "ARCHIVED", "DISABLED"];
+		
+		taskManager.border = true
+		taskManager.borderColor = 0x003366;
+		lessonManager.border = true
+		lessonManager.borderColor = 0x003366;
+		taskManager.background = true
+		taskManager.backgroundColor = 0xEAEAEA;
+		lessonManager.background = true
+		lessonManager.backgroundColor = 0xEAEAEA;
 		//Call to apply style to all the labels and input fields
-		//setStyles();
 		delete this.onEnterFrame; 
+		setStyles();
 			
 	}
+	
+	/**
+	 * Get the CSSStyleDeclaration objects for each component and apply them
+	 * directly to the instance
+	 * @usage   
+	 * @return  
+	 */
+	private function setStyles() {
+        
+		//LABELS
+		var styleObj = _tm.getStyleObject('label');
+		status_lbl.setStyle('styleName',styleObj);
+		learner_lbl.setStyle('styleName',styleObj);
+		class_lbl.setStyle('styleName',styleObj);
+		manageClass_lbl.setStyle('styleName',styleObj);
+		manageStatus_lbl.setStyle('styleName',styleObj);
+		manageStart_lbl.setStyle('styleName',styleObj);
+		manageMin_lbl.setStyle('styleName',styleObj);
+		manageHour_lbl.setStyle('styleName',styleObj);
+		manageDate_lbl.setStyle('styleName',styleObj);
+		
+		//BUTTONS
+		styleObj = _tm.getStyleObject('button');
+		viewLearners_btn.setStyle('styleName',styleObj);
+		editClass_btn.setStyle('styleName',styleObj);
+		setDateTime_btn.setStyle('styleName',styleObj);
+		statusApply_btn.setStyle('styleName',styleObj);
+		
+		//COMBO
+		styleObj = _tm.getStyleObject('combo');
+		changeStatus_cmb.setStyle('styleName',styleObj);
+		startDate_dt.setStyle('styleName',styleObj);
+		
+		//STEPPER
+		styleObj = _tm.getStyleObject('numericstepper');
+		startHour_stp.setStyle('styleName',styleObj);
+		startMin_stp.setStyle('styleName',styleObj);
+		
+		//SCROLLPANE
+		reqTasks_scp.border_mc.setStyle('_visible',false);
+		
+    }
+    
 	
 	/**
     * Sets the size of the canvas on stage, called from update
@@ -428,12 +515,31 @@ public function update (o:Observable,infoObj:Object):Void{
 	private function setSize(mm:MonitorModel):Void{
         var s:Object = mm.getSize();
 		trace("Monitor Tab Widtht: "+s.w+" Monitor Tab Height: "+s.h);
-		//reqTasks_scp.setSize(s.w,s.h);
-		
+		lessonManager.setSize(s.w-20,lessonManager._height);
+		taskManager.setSize(s.w-20,lessonManager._height);
+		//qTasks_scp.setSize(s.w._width,reqTasks_scp._height);
+		reqTasks_scp.setSize(s.w-30,reqTasks_scp._height);
+		for (var i=0; i<requiredTaskList.length; i++){
+			requiredTaskList[i].contributeActivity._width = reqTasks_scp._width-20;
+		}
+		//contributeActivity.textWidth
 				
 	}
 	
-
+	 /**
+    * Sets the position of the canvas on stage, called from update
+    * @param cm Canvas model object 
+    */
+	private function setPosition(mm:MonitorModel):Void{
+        var p:Object = mm.getPosition();
+		trace("X pos set in Model is: "+p.x+" and Y pos set in Model is "+p.y)
+		for (var i=0; i<requiredTaskList.length; i++){
+			requiredTaskList[i].goContribute._x = reqTasks_scp._width-50;
+		}	
+        //this._x = p.x;
+        //this._y = p.y;
+	}
+	
 	/**
 	 * Overrides method in abstract view to ensure cortect type of controller is returned
 	 * @usage   
