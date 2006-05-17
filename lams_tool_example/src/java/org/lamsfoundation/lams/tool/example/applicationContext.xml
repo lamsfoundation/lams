@@ -34,6 +34,7 @@
 				<property name="exampleUserDAO"><ref bean="exampleUserDAO"/></property>
 				<property name="exampleDAO"><ref bean="exampleDAO"/></property>
 				<property name="toolService"><ref bean="lamsToolService"/></property>
+		   		<property name="auditService"><ref bean="auditService"/></property>
 				<property name="learnerService"><ref bean="learnerService"/></property>			
  				<property name="exampleToolContentHandler"><ref bean="exampleToolContentHandler"/></property>
 			</bean>

@@ -39,6 +39,7 @@ import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
+import org.lamsfoundation.lams.util.audit.IAuditService;
 
 /**
 * An implementation of the NoticeboardService interface.
@@ -55,6 +56,7 @@ public class ExampleService implements ToolSessionManager, ToolContentManager,
 	private IExampleAttachmentDAO exampleAttachmentDAO = null;
 	
 	private ILearnerService learnerService;
+	private IAuditService auditService;
 	private ILamsToolService toolService;
 	private IToolContentHandler exampleToolContentHandler = null;
 
@@ -176,4 +178,11 @@ public class ExampleService implements ToolSessionManager, ToolContentManager,
 		this.learnerService = learnerService;
 	}
 
+	public IAuditService getAuditService() {
+		return auditService;
+	}
+
+	public void setAuditService(IAuditService auditService) {
+		this.auditService = auditService;
+	}
 }
