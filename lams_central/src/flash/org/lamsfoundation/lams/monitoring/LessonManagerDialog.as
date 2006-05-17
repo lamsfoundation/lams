@@ -58,10 +58,12 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 	private var treeview:Tree;              //Treeview for navigation through workspace folder structure
 	private var org_dnd:TreeDnd;
 	
-	private var staff_scp		// staff/teachers container
-	private var learner_scp		// learners container
-	private var learner_cb:CheckBox;
-	private var fm:FocusManager;            //Reference to focus manager
+	private var staff_scp:MovieClip;		// staff/teachers container
+	private var learner_scp:MovieClip;		// learners container
+	private var _learner_mc:MovieClip;
+	private var _staff_mc:MovieClip;
+	
+    private var fm:FocusManager;            //Reference to focus manager
     private var themeManager:ThemeManager;  //Theme manager
 	
 	//Dimensions for resizing
@@ -163,8 +165,8 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 		_monitorModel = MonitorModel(_monitorView.getModel());
 		
 		 //Add event listeners for ok, cancel and close buttons
-        ok_btn.addEventListener('click',Delegate.create(this, ok));
-        cancel_btn.addEventListener('click',Delegate.create(this, cancel));
+        ok_btn.addEventListener('onPress',Delegate.create(this, ok));
+        cancel_btn.addEventListener('onPress',Delegate.create(this, cancel));
 		
 		getOrganisations();
 		
@@ -224,18 +226,31 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 		
 		var snode = treeview.selectedNode;
 		_selectedOrgId = Number(snode.attributes.data.organisationID);
+		resultDTO.selectedOrgId = _selectedOrgId;
+		
+		trace('selected org ID is: ' + _selectedOrgId);
+		
+		// add selected users to dto
+		trace('learners')
+		for(var i=0; i<learnerList.length;i++){
+			if(learnerList[i].user_cb.selected){
+				trace('select item: ' + learnerList[i].fullName.text);
+			}
+		}
+
+		trace('staff')
+		for(var i=0; i<staffList.length;i++){
+			if(staffList[i].user_cb.selected){
+				trace('select item: ' + staffList[i].fullName.text);
+			}
+		}
 		
 		doOrganisationDispatch();
     }
     
 	public function doOrganisationDispatch(){
 		
-		var snode = treeview.selectedNode;
-		_resultDTO.selectedOrgID = Number(snode.attributes.data.resourceID);
-
-		// add selected users to dto
-
-        dispatchEvent({type:'okClicked',target:this});
+        //dispatchEvent({type:'okClicked',target:this});
 	   
         closeThisDialogue();
 		
@@ -402,6 +417,7 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 		return odto;
 	}
 	
+
 	/*
 	* Clear Method to clear movies from scrollpane
 	* 
@@ -416,6 +432,7 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 	return array;
 	}
 	
+
 	/**
 	 * Load learners into scrollpane
 	 * @param   users Users to load
@@ -424,25 +441,23 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 	public function loadLearners(users:Array):Void{
 		trace('loading Learners...');
 		_learnerList = clearScp(_learnerList);
-		var movieDepth:Number = 5000
-		var learner_mc:MovieClip = learner_scp.content;
+		_learner_mc = learner_scp.content;
+		//_view_mc = _learner_mc.createEmptyMovieClip('_view_mc', _learner_mc.getNextHighestDepth());
+			
 		trace('list length: ' + users.length);
 		for(var i=0; i<users.length; i++){
-			
-			
-			_learnerList[i] = learner_mc.attachMovie("staff_learner_dataRow", "learnerRow"+i, movieDepth+i);
-			_learnerList[i]._x = 10;
-			_learnerList[i]._y = 20 * i;
-			learner_mc.refreshPane();
 			var user:User = User(users[i]);
-			_learnerList[i].fullName.text = user.getFirstName()+" "+user.getLastName();
-			_learnerList[i].learner_cb.selected = true;
-			//trace('new row: ' + _learnerList[i]);
-			//trace('loading: user ' + user.getFirstName() + ' ' + user.getLastName());
-			//_learnerList[i]._parent._parent.learner_scp.refreshPane();
 			
+			_learnerList[i] = this._learner_mc.attachMovie('staff_learner_dataRow', 'staff_learner_dataRow' + i, this._learner_mc.getNextHighestDepth());
+			_learnerList[i].fullName.text = user.getFirstName();
+			_learnerList[i]._x = USERS_X;
+			_learnerList[i]._y = USER_OFFSET * i;
+			_learnerList[i].user_cb.selected = true;
+			trace('new row: ' + _learnerList[i]);
+			trace('loading: user ' + user.getFirstName() + ' ' + user.getLastName());
+			
+			learner_scp.redraw(true);
 		}
-		
 	}
 	
 	/**
@@ -452,22 +467,19 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 	public function loadStaff(users:Array):Void{
 		trace('loading Staff....');
 		trace('list length: ' + users.length);
-		var staff_mc:MovieClip = staff_scp.content;
 		_staffList = clearScp(_staffList);
-		var movieDepth:Number = 6000
-		for(var i=0; i<15; i++){
-			//_staffList[i] = staff_scp.attachmovie();
-			//_staffList[i]._x = USERS_X;
-			//_staffList[i[._y = USER_OFFSET * i;
-			_staffList[i] = staff_mc.attachMovie("staff_learner_dataRow", "staffRow"+i, movieDepth+i);
-			_staffList[i]._x = 10;
-			_staffList[i]._y = 20 * i;
-			staff_mc.refreshPane();
+		_staff_mc = staff_scp.content;
+		
+		for(var i=0; i<users.length; i++){
 			var user:User = User(users[i]);
-			_staffList[i].fullName.text = user.getFirstName()+" "+user.getLastName()+ i;
-			_staffList[i].learner_cb.selected = true;
-			trace('loading: user ' + user.getFirstName() + ' ' + user.getLastName());
 			
+			_staffList[i] = this._staff_mc.attachMovie('staff_learner_dataRow', 'staff_learner_dataRow' + i, this._staff_mc.getNextHighestDepth());
+			_staffList[i].fullName.text = user.getFirstName();
+			_staffList[i]._x = USERS_X;
+			_staffList[i]._y = USER_OFFSET * i;
+			_staffList[i].user_cb.selected = true;
+			trace('loading: user ' + user.getFirstName() + ' ' + user.getLastName());
+			staff_scp.redraw(true);
 		}
 	}
 	
@@ -503,6 +515,14 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 	 */
 	public function get resultDTO():Object {
 		return _resultDTO;
+	}
+	
+	public function get learnerList():Array{
+		return _learnerList;
+	}
+	
+	public function get staffList():Array{
+		return _staffList;
 	}
 
 }
