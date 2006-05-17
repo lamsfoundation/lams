@@ -27,8 +27,8 @@
 <archive path="/lams_build/lib/jboss/jgroups.jar"/>
 <archive path="/lams_build/lib/jdom/jdom.jar"/>
 <archive path="/lams_build/lib/junit/junit.jar"/>
-<archive path="/lams_build/lib/jfreechart/jfreechart-0.9.21.jar"/>
-<archive path="/lams_build/lib/jfreechart/jcommon-0.9.6.jar"/>
+<archive path="/lams_build/lib/jfreechart/jfreechart-1.0.1.jar"/>
+<archive path="/lams_build/lib/jfreechart/jcommon-1.0.0.jar"/>
 <archive path="/lams_build/lib/jfreechart/gnujaxp.jar"/>
 <archive path="/lams_build/lib/log4j/log4j-1.2.9.jar"/>
 <archive path="/lams_build/lib/middlegen/velocity-1.4-dev.jar"/>
