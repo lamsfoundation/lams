@@ -109,10 +109,8 @@
 									</td>
 									<c:if test="${mode == 'teacher'}">
 										<td align="center">
-											<c:if test="${!item.itemCreateByAuthor}">
-												<c:if test="${item.itemHide}">
-													<fmt:message key="monitoring.label.hidden" />
-												</c:if>
+											<c:if test="${item.itemHide}">
+												<fmt:message key="monitoring.label.hidden" />
 											</c:if>
 										</td>
 									</c:if>

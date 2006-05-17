@@ -3,7 +3,7 @@
 <div id="itemList">
 <h2><fmt:message key="label.authoring.basic.resource.list.title" />
 <img src="${ctxPath}/includes/images/indicator.gif" style="display:none" id="resourceListArea_Busy" /></h2>
-<table class="forms">
+<table class="forms" id="itemTable">
 <c:forEach var="resource" items="${resourceList}" varStatus="status">
 	<tr>
 	<%-- Resource Type:1=URL,2=File,3=Website,4=Learning Object --%>
@@ -85,7 +85,10 @@
 </div>
 <%-- This script will works when a new resoruce item submit in order to refresh "Resource List" panel. --%>
 <script lang="javascript">
-	window.top.hideMessage();
-	var obj = window.top.document.getElementById('resourceListArea');
-	obj.innerHTML= document.getElementById("itemList").innerHTML;
+
+	if(window.top != null){
+		window.top.hideMessage();
+		var obj = window.top.document.getElementById('resourceListArea');
+		obj.innerHTML= document.getElementById("itemList").innerHTML;
+	}
 </script>

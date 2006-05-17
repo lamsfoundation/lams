@@ -129,6 +129,7 @@ public class MonitoringAction extends Action {
 		request.getSession().setAttribute(ResourceConstants.ATTR_SUMMARY_LIST, groupList);
 		
 		Resource resource = service.getResourceByContentId(contentId);
+		resource.toDTO();
 		request.getSession().setAttribute(ResourceConstants.PAGE_EDITABLE, new Boolean(isResourceEditable(resource)));
 		request.getSession().setAttribute(ResourceConstants.ATTR_RESOURCE, resource);
 		request.getSession().setAttribute(ResourceConstants.ATTR_TOOL_CONTENT_ID, contentId);

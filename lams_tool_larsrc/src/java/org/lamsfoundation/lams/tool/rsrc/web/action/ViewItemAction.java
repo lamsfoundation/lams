@@ -94,7 +94,7 @@ public class ViewItemAction extends Action {
 			//authoring: does not save item yet, so only has ItemList from session and identity by Index
 			List<ResourceItem> resourceList = getResourceItemList(request);
 			item = resourceList.get(itemIdx);
-		}else if(mode.isLearner()){
+		}else if(mode.isLearner() || mode.isTeacher()){
 			Long itemUid = NumberUtils.createLong(request.getParameter(ResourceConstants.PARAM_RESOURCE_ITEM_UID));
 			//save itemUid to HttpSession
 			request.getSession().setAttribute(ResourceConstants.ATTR_RESOURCE_ITEM_UID,itemUid);

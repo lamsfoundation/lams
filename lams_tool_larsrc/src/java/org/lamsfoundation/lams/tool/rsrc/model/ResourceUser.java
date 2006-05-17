@@ -23,6 +23,8 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.rsrc.model;
 
+import java.util.Date;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
@@ -44,6 +46,10 @@ public class ResourceUser {
 	private String lastName;
 	private String loginName;
 	private ResourceSession session;
+	
+	//=============== NON Persisit value: for display use ===========
+	//the user access some reousrce item date time. Use in monitoring summary page
+	private Date accessDate;
 	
 	public ResourceUser(){
 	}
@@ -151,6 +157,12 @@ public class ResourceUser {
 		return new HashCodeBuilder().append(uid).append(firstName)
 		.append(lastName).append(loginName)
 		.toHashCode();
+	}
+	public Date getAccessDate() {
+		return accessDate;
+	}
+	public void setAccessDate(Date accessDate) {
+		this.accessDate = accessDate;
 	}
 
 }

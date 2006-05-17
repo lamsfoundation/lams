@@ -23,11 +23,14 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.rsrc.model;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
@@ -81,6 +84,8 @@ public class Resource implements Cloneable{
 	private IToolContentHandler toolContentHandler;
 
 	private String miniViewNumberStr;
+	private List<ResourceAttachment> onlineFileList;
+	private List<ResourceAttachment> offlineFileList;
 	/**
 	 * Default contruction method. 
 	 *
@@ -190,6 +195,19 @@ public class Resource implements Cloneable{
 		this.setUpdated(new Date(now));
 	}
 
+	public void toDTO(){
+		onlineFileList = new ArrayList<ResourceAttachment>();
+		offlineFileList = new ArrayList<ResourceAttachment>();
+		Set<ResourceAttachment> fileSet = this.getAttachments();
+		if(fileSet != null){
+			for(ResourceAttachment file:fileSet){
+				if(StringUtils.equalsIgnoreCase(file.getFileType(),IToolContentHandler.TYPE_OFFLINE))
+					offlineFileList.add(file);
+				else
+					onlineFileList.add(file);
+			}
+		}
+	}
 	//**********************************************************
 	// get/set methods
 	//**********************************************************
@@ -489,6 +507,18 @@ public class Resource implements Cloneable{
 	}
 	public void setMiniViewNumberStr(String minViewNumber) {
 		this.miniViewNumberStr = minViewNumber;
+	}
+	public List<ResourceAttachment> getOfflineFileList() {
+		return offlineFileList;
+	}
+	public void setOfflineFileList(List<ResourceAttachment> offlineFileList) {
+		this.offlineFileList = offlineFileList;
+	}
+	public List<ResourceAttachment> getOnlineFileList() {
+		return onlineFileList;
+	}
+	public void setOnlineFileList(List<ResourceAttachment> onlineFileList) {
+		this.onlineFileList = onlineFileList;
 	}
 
 

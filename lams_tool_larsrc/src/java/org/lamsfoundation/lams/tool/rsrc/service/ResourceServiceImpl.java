@@ -503,7 +503,9 @@ public class ResourceServiceImpl implements
 		List<ResourceItemVisitLog> logList = resourceItemVisitDao.getResourceItemLogBySession(sessionId,itemUid);
 		List<ResourceUser> userList = new ArrayList(logList.size());
 		for(ResourceItemVisitLog visit : logList){
-			userList.add(visit.getUser());
+			ResourceUser user = visit.getUser();
+			user.setAccessDate(visit.getAccessDate());
+			userList.add(user);
 		}
 		return userList;
 	}

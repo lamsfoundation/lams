@@ -56,7 +56,7 @@
 									</c:choose>
 								</td>
 								<td>
-									${item.itemTitle}
+									<a href="javascript:;" onclick="viewItem(${item.itemUid})">${item.itemTitle}</a>
 								</td>
 								<td>
 									<c:if test="${!item.itemCreateByAuthor}">
@@ -77,16 +77,14 @@
 									</c:choose>
 								</td>
 								<td align="center">
-									<c:if test="${!item.itemCreateByAuthor}">
-										<c:choose>
-											<c:when test="${item.itemHide}">
-												<a href="<c:url value='/monitoring/showitem.do'/>?itemUid=${item.itemUid}" class="button"> <fmt:message key="monitoring.label.show" /> </a>
-											</c:when>
-											<c:otherwise>
-												<a href="<c:url value='/monitoring/hideitem.do'/>?itemUid=${item.itemUid}" class="button"> <fmt:message key="monitoring.label.hide" /> </a>
-											</c:otherwise>
-										</c:choose>
-									</c:if>
+									<c:choose>
+										<c:when test="${item.itemHide}">
+											<a href="<c:url value='/monitoring/showitem.do'/>?itemUid=${item.itemUid}" class="button"> <fmt:message key="monitoring.label.show" /> </a>
+										</c:when>
+										<c:otherwise>
+											<a href="<c:url value='/monitoring/hideitem.do'/>?itemUid=${item.itemUid}" class="button"> <fmt:message key="monitoring.label.hide" /> </a>
+										</c:otherwise>
+									</c:choose>
 								</td>
 							</tr>
 				<c:if test="${status.count == groupSize}">

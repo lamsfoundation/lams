@@ -13,14 +13,13 @@
 			</td>
 		</tr>
 		<tr>
-			<td colspan="2">
+			<td>
 				&nbsp;
 			</td>
-			<%--
 			<td class="formcontrol">
 
 				<div id="onlinefile">
-					<c:forEach var="file" items="${formBean.onlineFileList}">
+					<c:forEach var="file" items="${resource.onlineFileList}">
 						<li>
 							<c:out value="${file.fileName}" />
 							<c:set var="viewURL">
@@ -36,18 +35,10 @@
 							<a href="<c:out value='${downloadURL}' escapeXml='false'/>">
 								<fmt:message key="label.download" />
 							</a>
-							&nbsp;
-							<c:set var="deleteonline">
-								<html:rewrite page="/authoring/deleteOnline.do?toolContentID=${toolContentID}&uuID=${file.fileUuid}&versionID=${file.fileVersionId}" />
-							</c:set>
-							<html:link href="javascript:loadDoc('${deleteonline}','onlinefile')">
-								<fmt:message key="label.authoring.online.delete" />
-							</html:link>
 						</li>
 					</c:forEach>
 				</div>
 			</td>
-			--%>
 		</tr>
 
 
@@ -61,13 +52,12 @@
 			</td>
 		</tr>
 		<tr>
-			<td colspan="2">
+			<td >
 				&nbsp;
 			</td>
-			<%--
 			<td class="formcontrol">
 				<div id="offlinefile">
-					<c:forEach var="file" items="${formBean.offlineFileList}">
+					<c:forEach var="file" items="${resource.offlineFileList}">
 						<li>
 							<c:out value="${file.fileName}" />
 							<c:set var="viewURL">
@@ -82,17 +72,10 @@
 							<html:link href="${downloadURL}">
 								<fmt:message key="label.download" />
 							</html:link>
-							<c:set var="deleteoffline">
-								<html:rewrite page="/authoring/deleteOffline.do?toolContentID=${toolContentID}&uuID=${file.fileUuid}&versionID=${file.fileVersionId}" />
-							</c:set>
-							<html:link href="javascript:loadDoc('${deleteoffline}','offlinefile')">
-								<fmt:message key="label.authoring.offline.delete" />
-							</html:link>
 						</li>
 					</c:forEach>
 				</div>
 			</td>
-			--%>
 		</tr>
 		<%--
 		<tr>

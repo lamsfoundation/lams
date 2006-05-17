@@ -73,7 +73,11 @@
 		</tr>
 		<c:forEach var="item" items="${resourceList}">
 			<tr>
-				<td>${item.title}</td>
+				<td>${item.title}
+				<c:if test="${!item.createByAuthor}">
+					[${item.createBy.loginName}]
+				</c:if>
+				</td>
 				<td align="center">
 					<c:if test="${item.complete}">
 						<img src="<html:rewrite page='/includes/images/tick.gif'/>" border="0">

@@ -20,12 +20,17 @@
 		</tr>
 		<tr>
 			<td class="formcontrol">
-				<html:select property="resource.miniViewResourceNumber">
-					<html:option value="1">1</html:option>
-					<html:option value="2">2</html:option>
-					<html:option value="3">3</html:option>
-					<html:option value="4">4</html:option>
-					<html:option value="5">5</html:option>
+				<html:select property="resource.miniViewResourceNumber" styleId="viewNumList">
+					<c:forEach begin="1" end="${fn:length(resourceList)}" varStatus="status">
+						<c:choose>
+							<c:when test="${formBean.resource.miniViewResourceNumber == status.index}">
+								<option value="${status.index}" selected="true">${status.index}</option>
+							</c:when>
+							<c:otherwise>
+								<option value="${status.index}">${status.index}</option>
+							</c:otherwise>
+						</c:choose>
+					</c:forEach>
 				</html:select>
 			</td>
 			<td class="formcontrol"  width="97%">

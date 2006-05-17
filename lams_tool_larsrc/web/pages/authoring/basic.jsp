@@ -55,6 +55,7 @@
 	function deleteItemComplete(){
 		hideBusy(resourceListTargetDiv);
 	}
+
 </script>
 	<!---------------------------Basic Tab Content ------------------------>
 	<table class="forms">

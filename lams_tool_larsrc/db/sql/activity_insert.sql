@@ -45,7 +45,7 @@ VALUES
 (
 NULL
 , 'Share Resources'
-, 'Share Resoruces'
+, 'Share Resources'
 , 'Put some help text here.'
 , NULL
 , NULL

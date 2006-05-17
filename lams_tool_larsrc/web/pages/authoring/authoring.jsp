@@ -46,6 +46,10 @@
 	    	tag.value = tabId;
 	    	// end optional tab controller stuff
 	    	selectTab(tabId);
+	    	
+	    	//for advanceTab
+	    	if(tabId == 2)
+	    		changeViewNum();	    	
         } 
 
         function doUploadOnline() {
@@ -59,6 +63,34 @@
         	myForm.submit();
         }
         
+        function changeViewNum(){
+			var tb = document.getElementById("itemTable");
+			var num = tb.getElementsByTagName("tr");
+			var sel = document.getElementById("viewNumList");
+			var newField = sel.options;
+			var len = sel.length;
+			var selIdx=-1;
+			//there is bug in Opera8.5: if add alert before this loop, it will work,weird.
+			for (var idx=0;idx<len;idx++)
+			{
+				if(newField[0].selected && selIdx == -1)
+					selIdx = newField[0].value;
+				sel.removeChild(newField[0]);
+			}
+		
+			for(var i=1;i<=num.length;i++){
+				var opt = document.createElement("option");
+				var optT =document.createTextNode(i);
+				opt.value=i;
+				if(selIdx > 0 && selIdx==i){
+					opt.selected = true;
+				}else{
+					opt.selected = false;
+				}
+				opt.appendChild(optT);
+				sel.appendChild(opt);
+			}
+	}
         
     </script>
 	<!-- ******************** END FCK Editor related javascript & HTML ********************** -->

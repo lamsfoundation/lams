@@ -185,6 +185,4 @@ public class Summary {
 		this.isInitGroup = isInitGroup;
 	}
 	
-	
-	
 }
