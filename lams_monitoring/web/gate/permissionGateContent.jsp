@@ -41,7 +41,7 @@
 
 					<c:if test="${not GateForm.map.gate.gateOpen}" >
 						<html:form action="/gate?method=openGate" target="_self">
-							<html:submit styleClass="button" value="Open Gate" onmouseover="pviiClassNew(this,'buttonover')" onmouseout="pviiClassNew(this,'button')" /> 
+							<html:submit styleClass="button"><fmt:message key="label.gate.open"/></html:submit> 
 						</html:form>
 					</c:if>
 				</td>
