@@ -25,6 +25,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-tiles" prefix="tiles"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-lams" prefix="lams" %>
+<%@ taglib uri="tags-fmt" prefix="fmt" %>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
 <html:html locale="true" xhtml="true">
@@ -36,23 +37,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<title><c:out value="${pageTitle}" /></title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<lams:css/>
-	  <script language="JavaScript" type="text/JavaScript">
-	        <!--
-	        function pviiClassNew(obj, new_style) { //v2.7 by PVII
-	            obj.className=new_style;
-	        }
-	        //-->
-	  </script>	
-	  
+		<META HTTP-EQUIV="Refresh" CONTENT="60;URL=<lams:WebAppURL/>/gate.do?method=knockGate">
 	  </head>
 
 	<body>
 		<table width="95%" border="0" cellpadding="0" cellspacing="0" summary="This table is being used for layout purposes">
-			<tr>
-				<td valign="top">
-						<tiles:insert attribute="body" />
-				</td>
-			</tr>
+		<!-- Table has one column -->
+			<tiles:insert attribute="body" />
+			<tr><td>&nbsp;</td></tr>
+			<%@ include file="../gate/gateNext.jsp" %>			  
 		</table>
 	</body>
 

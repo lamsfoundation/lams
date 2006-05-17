@@ -28,6 +28,16 @@
 
    <form-bean name="GroupingForm"  type="org.apache.struts.validator.DynaValidatorForm">
 </form-bean>
+
+<form-bean name="GateForm"  type="org.apache.struts.action.DynaActionForm">
+	<form-property name="gate" type="org.lamsfoundation.lams.learningdesign.GateActivity" />
+	<form-property name="activityId" type="java.lang.Long" />
+	<form-property name="waitingLearners" type="java.lang.Integer"/>
+	<form-property name="totalLearners" type="java.lang.Integer" />
+	<form-property name="startingTime" type="java.util.Date" />
+	<form-property name="endingTime" type="java.util.Date" />
+</form-bean>
+
   </form-beans>
 
   <!-- ========== Global Exceptions Definitions =================================== -->
@@ -47,6 +57,8 @@
     <action
       path="/gate"
       type="org.lamsfoundation.lams.learning.web.action.GateAction"
+      name="GateForm"
+      scope="request"
       parameter="method"
       unknown="false"
       validate="false"
@@ -59,8 +71,18 @@
         scope="request"
       />
       <forward
-        name="waiting"
-        path=".gateWaiting"
+        name="permissionGate"
+        path=".permissionGate"
+        redirect="false"
+      />
+      <forward
+        name="scheduleGate"
+        path=".scheduleGate"
+        redirect="false"
+      />
+      <forward
+        name="synchGate"
+        path=".synchGate"
         redirect="false"
       />
     </action>

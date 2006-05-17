@@ -123,14 +123,14 @@ public interface ILearnerService
      * engine to calculate the next activity in the learning design. This 
      * process might be triggerred by system controlled the activity, such as
      * grouping and gate. This method should be used when we don't have an activity
-     * that is already part of the Hibernate session. 
+     * or a lesson that is already part of the Hibernate session. 
      * 
      * @param learner the learner who are running this activity in the design.
      * @param activity the activity is being run.
-     * @param lesson the lesson this learner is currently in.
+     * @param lesson id the lesson this learner is currently in.
      * @return the url for next activity.
      */
-    public String completeActivity(User learner,Long activityId,Lesson lesson);
+    public String completeActivity(User learner,Long activityId,Long lessonId);
   
     /**
      * Complete the activity in the progress engine and delegate to the progress 

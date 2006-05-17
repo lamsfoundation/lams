@@ -19,29 +19,28 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
-<%@ page language="java"%>
-
-<%@ taglib uri="tags-bean" prefix="bean" %>
 <%@ taglib uri="tags-html" prefix="html" %>
+<%@ taglib uri="tags-bean" prefix="bean" %>
 <%@ taglib uri="tags-logic" prefix="logic" %>
-<%@ taglib uri="tags-tiles" prefix="tiles" %>
+<%@ taglib uri="tags-core" prefix="c" %>		
+<%@ taglib uri="tags-fmt" prefix="fmt" %>
+
+<tr> 
+	<td><H1><fmt:message key="label.synch.gate.title"/></H1></td> 
+</tr> 				  
+<tr> 
+	<td><fmt:message key="label.synch.gate.message"/></td> 
+</tr>
+<tr> 
+	<td>&nbsp;</td> 
+</tr>
+<tr> 
+	<td>
+		<fmt:message key="label.gate.waiting.learners">  
+			<fmt:param value="${GateForm.map.waitingLearners}"/>
+			<fmt:param value="${GateForm.map.totalLearners}"/>
+		</fmt:message>
+	</td>
+</tr>			 				  
 
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html:html locale="true">
-  <head>
-    <html:base />
-    
-    <title>gateWaiting.jsp</title>
-    
-    <meta http-equiv="pragma" content="no-cache">
-    <meta http-equiv="cache-control" content="no-cache">
-    <meta http-equiv="expires" content="0">    
-    <meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
-    <meta http-equiv="description" content="This is my page">
-  </head>
-  
-  <body>
-    This a struts page. <br>
-  </body>
-</html:html>

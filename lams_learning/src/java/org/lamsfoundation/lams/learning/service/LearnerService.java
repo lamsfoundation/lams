@@ -334,15 +334,16 @@ public class LearnerService implements ILearnerService
     }
     
     /**
-     * @see org.lamsfoundation.lams.learning.service.ILearnerService#completeActivity(org.lamsfoundation.lams.usermanagement.User, java.lang.Long, org.lamsfoundation.lams.lesson.Lesson)
+     * @see org.lamsfoundation.lams.learning.service.ILearnerService#completeActivity(org.lamsfoundation.lams.usermanagement.User, java.lang.Long, java.lang.Long)
      */
-    public String completeActivity(User learner,Long activityId,Lesson lesson) {
+    public String completeActivity(User learner,Long activityId,Long lessonId) {
     	Activity activity = getActivity(activityId);
+		Lesson lesson = getLesson(lessonId); 
     	return completeActivity(learner, activity,lesson);
     }
 
     /**
-     * @see org.lamsfoundation.lams.learning.service.ILearnerService#completeActivity(org.lamsfoundation.lams.usermanagement.User, org.lamsfoundation.lams.learningdesign.Activity, org.lamsfoundation.lams.lesson.Lesson)
+     * @see org.lamsfoundation.lams.learning.service.ILearnerService#completeActivity(org.lamsfoundation.lams.usermanagement.User, org.lamsfoundation.lams.learningdesign.Activity,org.lamsfoundation.lams.lesson.Lesson )
      */
     public String completeActivity(User learner,Activity activity,Lesson lesson)
     {

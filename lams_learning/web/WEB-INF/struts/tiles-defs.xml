@@ -37,6 +37,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<put name="body" value=""/>
 	</definition>
 	
+	<!-- Standard layout for a gate page. -->
+	<definition name=".gateLayout" path="/layout/gateLayout.jsp">
+		<put name="pageTitle" value="LAMS"/>
+		<put name="title" value="LAMS"/>
+		<put name="body" value=""/>
+	</definition>
+
 	<definition name=".systemError" extends=".activityLayout" >
 		<put name="title" value="System Error Page"/>
 		<put name="body" value="/error.jsp" />	
@@ -89,10 +96,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<put name="title" value="Grouping" />
 		<put name="body" value="/grouping/grouping.jsp"/>
 	</definition>
-	<!-- -->
-	<definition name=".gateWaiting" extends=".activityLayout">
-		<put name="pageTitle" value="Gate Waiting Page" />
-		<put name="title" value="Gate" />
-		<put name="body" value="/gate/gateWaiting.jsp"/>
+	<!-- Gate definitions -->
+	<definition name=".synchGate" extends=".gateLayout">
+		<put name="body" value="/gate/synchGateContent.jsp"/>
+	</definition>
+	<definition name=".permissionGate" extends=".gateLayout">
+		<put name="body" value="/gate/permissionGateContent.jsp"/>
+	</definition>
+	<definition name=".scheduleGate" extends=".gateLayout">
+		<put name="body" value="/gate/scheduleGateContent.jsp"/>
 	</definition>
 </tiles-definitions>
