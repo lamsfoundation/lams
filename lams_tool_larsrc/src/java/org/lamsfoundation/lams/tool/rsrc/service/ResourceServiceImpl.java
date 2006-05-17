@@ -78,6 +78,7 @@ import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
 import org.lamsfoundation.lams.tool.rsrc.util.ResourceToolContentHandler;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
 
@@ -104,6 +105,7 @@ public class ResourceServiceImpl implements
 	private IRepositoryService repositoryService;
 	private ILamsToolService toolService;
 	private ILearnerService learnerService;
+	private IAuditService auditService;
 
 	public IVersionedNode getFileNode(Long itemUid, String relPathString) throws ResourceApplicationException {
 		ResourceItem item = (ResourceItem) resourceItemDao.getObject(ResourceItem.class,itemUid);
@@ -512,8 +514,12 @@ public class ResourceServiceImpl implements
 
 	public void setItemVisible(Long itemUid, boolean visible) {
 		ResourceItem item = resourceItemDao.getByUid(itemUid);
-		item.setHide(!visible);
-		resourceItemDao.saveObject(item);
+		if ( item != null ) {
+			auditService.logHide(ResourceConstants.TOOL_SIGNATURE, item.getCreateBy().getUserId(), 
+					item.getCreateBy().getLoginName(), item.toString());
+			item.setHide(!visible);
+			resourceItemDao.saveObject(item);
+		}
 	}
 
 	//*****************************************************************************
@@ -675,6 +681,9 @@ public class ResourceServiceImpl implements
 	//*****************************************************************************
 	// set methods for Spring Bean
 	//*****************************************************************************
+	public void setAuditService(IAuditService auditService) {
+		this.auditService = auditService;
+	}
 	public void setLearnerService(ILearnerService learnerService) {
 		this.learnerService = learnerService;
 	}

@@ -101,6 +101,9 @@
    		<property name="learnerService">
    			<ref bean="learnerService"/>
    		</property>
+   		<property name="auditService">
+   			<ref bean="auditService"/>
+   		</property>
    		<property name="messageService"><ref bean="messageService"/></property>
     </bean>
 
