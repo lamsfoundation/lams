@@ -1,6 +1,8 @@
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="java.util.HashSet"%>
 <%@ page import="java.util.Set"%>
+<%@ page import="org.lamsfoundation.lams.tool.rsrc.ResourceConstants"%>
+
 <%Set tabs = new HashSet();
 			tabs.add("label.authoring.heading.basic");
 			tabs.add("label.authoring.heading.advance");
@@ -106,10 +108,7 @@
 				cancelConfirmMsgKey="authoring.msg.cancel.save"
 				accessMode="author"
 			--%>
-			<c:set var="toolSignature">
-				<fmt:message key="signature" />
-			</c:set>
-			<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="${toolSignature}" toolContentID="${formBean.toolContentID}" />
+			<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="<%=ResourceConstants.TOOL_SIGNATURE%>" toolContentID="${formBean.toolContentID}" />
 
 		</div>
 		<lams:HTMLEditor />

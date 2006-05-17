@@ -518,7 +518,7 @@ public class ResourceServiceImpl implements
 	// private methods
 	//*****************************************************************************
 	private Resource getDefaultResource() throws ResourceApplicationException {
-    	Long defaultResourceId = getToolDefaultContentIdBySignature(ResourceConstants.TOOL_SIGNNATURE);
+    	Long defaultResourceId = getToolDefaultContentIdBySignature(ResourceConstants.TOOL_SIGNATURE);
     	Resource defaultResource = getResourceByContentId(defaultResourceId);
     	if(defaultResource == null)
     	{

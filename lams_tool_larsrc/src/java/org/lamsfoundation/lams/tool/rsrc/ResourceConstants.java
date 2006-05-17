@@ -24,7 +24,7 @@
 package org.lamsfoundation.lams.tool.rsrc;
 
 public class ResourceConstants {
-	public static final String TOOL_SIGNNATURE = "larsrc11";
+	public static final String TOOL_SIGNATURE = "larsrc11";
 	public static final String RESOURCE_SERVICE = "resourceService";
 	
 	public static final int COMPLETED = 1;
