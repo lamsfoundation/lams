@@ -150,6 +150,11 @@
 	<bean id="loadedMessageSource" class="org.springframework.context.support.ResourceBundleMessageSource"  singleton="false">
 	</bean>
 		
+	<!-- auditing service -->
+	<bean id="auditService" class="org.lamsfoundation.lams.util.audit.AuditService"  singleton="true">
+		<property name="messageService"><ref bean="commonMessageService"/></property>
+    </bean>
+
 	<!-- Learning Design related beans-->
 	
 	<bean id="activityDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO">
