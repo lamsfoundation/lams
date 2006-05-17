@@ -41,7 +41,7 @@ class ContributeActivity extends Activity {
 	private var _childActivities:Array;
 	private var _contributeEntries:Array;
 	private var _contributionType:Number;
-	private var _URL:String;
+	private var _taskURL:String;
 	private var _isRequired:Boolean;
 	
 	private static var _instance:ContributeActivity = null;
@@ -65,6 +65,7 @@ class ContributeActivity extends Activity {
         }
         return ContributeActivity._instance;
 	}
+	
 	
 	public function populateFromDTO(dto:Object){
 		trace('populating from dto...');
@@ -93,7 +94,8 @@ class ContributeActivity extends Activity {
 		}
 		_title = dto.title;
 		_description = dto.description;
-		_URL = dto.URL;
+		_taskURL = dto.URL;
+		trace("URL in DTO for "+dto.title+ " is: "+dto.URL)
 		_contributionType = dto.contributionType;
 		_isRequired = dto.isRequired;
 	}
@@ -120,12 +122,12 @@ class ContributeActivity extends Activity {
 		return _childActivities;
 	}
 	
-	public function set URL(a:String):Void{
-		_URL = a;
+	public function set taskURL(a:String):Void{
+		_taskURL = a;
 	}
 	
-	public function get URL():String{
-		return _URL;
+	public function get taskURL():String{
+		return _taskURL;
 	}
 	
 	public function set isRequired(a:Boolean):Void{
