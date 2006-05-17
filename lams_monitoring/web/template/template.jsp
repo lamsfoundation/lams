@@ -24,17 +24,18 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-html" prefix="html" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="tags-core" prefix="c" %>
+<%@ taglib uri="tags-lams" prefix="lams" %>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html:html locale = "true">
     <head>
        <meta http-equiv="content-type" content="text/html; charset=UTF-8">
        <html:base/>
+	   <lams:css/>
 	  <fmt:setBundle basename = "org.lamsfoundation.lams.monitoring.MonitoringResources" />
       <title><tiles:getAsString name="title"/></title>
       <meta http-equiv="pragma" content="no-cache">
       <meta http-equiv="cache-control" content="no-cache">
-	  <link href="../learner.css" rel="stylesheet" type="text/css">
 	  <script language="JavaScript" type="text/JavaScript">
 	        <!--
 	        function pviiClassNew(obj, new_style) { //v2.7 by PVII

@@ -21,9 +21,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <!-- general information section--> 
 <tr>
-    <td class="subHeader"><fmt:message key="label.description"/></td>
-</tr> 
-<tr>
     <td class="body"><c:out value="${GateForm.map.gate.description}"/></td>
 </tr> 
 <!-- end of general information section--> 

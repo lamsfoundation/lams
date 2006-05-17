@@ -1,53 +1,55 @@
-<%-- 
-Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
-License Information: http://lamsfoundation.org/licensing/lams/2.0/
+	<%-- 
+	Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+	License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License version 2 as 
-  published by the Free Software Foundation.
+	  This program is free software; you can redistribute it and/or modify
+	  it under the terms of the GNU General Public License version 2 as 
+	  published by the Free Software Foundation.
 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
+	  This program is distributed in the hope that it will be useful,
+	  but WITHOUT ANY WARRANTY; without even the implied warranty of
+	  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	  GNU General Public License for more details.
 
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-  USA
+	  You should have received a copy of the GNU General Public License
+	  along with this program; if not, write to the Free Software
+	  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+	  USA
 
-  http://www.gnu.org/licenses/gpl.txt
---%>
+	  http://www.gnu.org/licenses/gpl.txt
+	--%>
 
-<%@ taglib uri="tags-html" prefix="html" %>
-<%@ taglib uri="tags-bean" prefix="bean" %>
-<%@ taglib uri="tags-logic" prefix="logic" %>
-<%@ taglib uri="tags-core" prefix="c" %>		
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
+	<%@ taglib uri="tags-html" prefix="html" %>
+	<%@ taglib uri="tags-bean" prefix="bean" %>
+	<%@ taglib uri="tags-logic" prefix="logic" %>
+	<%@ taglib uri="tags-core" prefix="c" %>		
+	<%@ taglib uri="tags-fmt" prefix="fmt" %>
 
-<tr>
-	<td>
-        <table width="100%" height="295" border="0" align="center" cellpadding="5" cellspacing="0" bgcolor="#FFFFFF" summary="This table is being used for layout purposes only"> 
-          <tr> 
-            <td valign="top"> <div align="center"> 
-                <!-- Page Content table--> 
-                <table width="90%" border="0" cellspacing="0" cellpadding="0" summary="This table is being used for layout purposes only"> 
-					<tr><td>&nbsp; </td></tr> 
-					<tr> 
-					    <td height="31" colspan="3"> <div class="heading" align="center"><fmt:message key="label.permission.gate.title"/></div></td> 
-					</tr> 					  
-				    <%@ include file="gateInfo.jsp" %>
-			        <tr><td>&nbsp; </td></tr>
-			        <tr><td>&nbsp; </td></tr>
-				    <%@ include file="openGate.jsp" %>
-                </table> 
-                <!-- end of Page Content table--> 
-              </div></td> 
-          </tr> 
-		  <tr height="50">
-		  	<td></td>
-		  </tr>
-        </table>
+	<tr>
+		<td>
+			<!-- Page Content table--> 
+			<table width="90%" border="0" cellspacing="0" cellpadding="0" summary="This table is being used for layout purposes only"> 
+				<tr><td>&nbsp; </td></tr> 
+				<tr> 
+					<td><H1><fmt:message key="label.permission.gate.title"/></H1></td> 
+				</tr> 					  
+				<%@ include file="gateInfo.jsp" %>
+				<tr><td>&nbsp; </td></tr>
+				<tr><td>&nbsp; </td></tr>
+				<tr> 
+					<td class="body" valign="middle"><fmt:message key="label.gate.you.open.message"/>
 
-	</td>
-</tr>
+					<c:if test="${not GateForm.map.gate.gateOpen}" >
+						<html:form action="/gate?method=openGate" target="_self">
+							<html:submit styleClass="button" value="Open Gate" onmouseover="pviiClassNew(this,'buttonover')" onmouseout="pviiClassNew(this,'button')" /> 
+						</html:form>
+					</c:if>
+				</td>
+				</tr>
+				<tr>
+					<td align="right"><%@ include file="gateStatus.jsp" %></td>
+				</tr>
+			</table> 
+			<!-- end of Page Content table--> 
+		</td>
+	</tr>

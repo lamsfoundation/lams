@@ -26,38 +26,31 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <tr>
 	<td>
-        <table width="100%" height="295" border="0" align="center" cellpadding="5" cellspacing="0" bgcolor="#FFFFFF" summary="This table is being used for layout purposes only"> 
-          <tr> 
-            <td valign="top"> <div align="center"> 
-                <!-- Page Content table--> 
-                <table width="90%" border="0" cellspacing="0" cellpadding="0" summary="This table is being used for layout purposes only"> 
-					<tr><td>&nbsp; </td></tr> 
-					<tr> 
-					    <td height="31" colspan="3"> <div class="heading" align="center"><fmt:message key="label.schedule.gate.title"/></div></td> 
-					</tr> 					  
-				    <%@ include file="gateInfo.jsp" %>
-			        <tr><td>&nbsp; </td></tr>
-			        <tr><td>&nbsp; </td></tr>
-					<tr>
-						<td width="50%" class="body"><fmt:message key="label.schedule.gate.open.message"/></td>
-						<td width="50%" class="bodyBold">
-							<fmt:formatDate value="${GateForm.map.startingTime}" type="both" dateStyle="full" timeStyle="full"/>
-						</td>
-					</tr>		
-					<tr>
-						<td width="50%" class="body"><fmt:message key="label.schedule.gate.open.message"/></td>
-						<td width="50%" class="bodyBold">
-							<fmt:formatDate value="${GateForm.map.endingTime}" type="both" dateStyle="full" timeStyle="full"/>
-						</td>
-					</tr>
-                </table> 
-                <!-- end of Page Content table--> 
-              </div></td> 
-          </tr> 
-		  <tr height="50">
-		  	<td></td>
-		  </tr>
-        </table>
-
+		<!-- Page Content table--> 
+		<table width="90%" border="0" cellspacing="0" cellpadding="0" summary="This table is being used for layout purposes only"> 
+			<tr><td>&nbsp; </td></tr> 
+			<tr> 
+				<td height="31" colspan="3"><H1><fmt:message key="label.schedule.gate.title"/></H1></td> 
+			</tr> 					  
+			<%@ include file="gateInfo.jsp" %>
+			<tr><td>&nbsp; </td></tr>
+			<tr><td>&nbsp; </td></tr>
+			<tr>
+				<td width="50%" class="body"><fmt:message key="label.schedule.gate.open.message"/></td>
+				<td width="50%" class="bodyBold">
+					<fmt:formatDate value="${GateForm.map.startingTime}" type="both" dateStyle="full" timeStyle="full"/>
+				</td>
+			</tr>		
+			<tr>
+				<td width="50%" class="body"><fmt:message key="label.schedule.gate.close.message"/></td>
+				<td width="50%" class="bodyBold">
+					<fmt:formatDate value="${GateForm.map.endingTime}" type="both" dateStyle="full" timeStyle="full"/>
+				</td>
+			</tr>
+			<tr>
+				<td align="right" colspan="2"><%@ include file="gateStatus.jsp" %></td>
+			</tr>
+		</table> 
+		<!-- end of Page Content table--> 
 	</td>
 </tr>
