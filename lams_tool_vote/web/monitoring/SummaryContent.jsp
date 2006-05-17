@@ -36,7 +36,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<input type="hidden" name="isToolSessionChanged"/>
 	
 		<c:if test="${(userExceptionNoToolSessions == 'true')}"> 	
-				<table class="forms" align="center">
+				<table align="center">
 					<tr> 
 						<td NOWRAP valign=top align=center> 
 							<b> <font size=2> <bean:message key="error.noLearnerActivity"/> </font></b>
@@ -49,7 +49,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<c:if test="${(userExceptionNoToolSessions != 'true') }"> 	
 		
 			<c:if test="${currentMonitoredToolSession == 'All'}"> 				
-				<table class="forms" align="center">
+				<table align="left">
 				<tr>
 			 		<td NOWRAP> <font size=2> <bean:message key="label.select.session"/>  </td>
 			 		<td NOWRAP align=right> <font size=2> 
@@ -61,9 +61,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 			<c:if test="${currentMonitoredToolSession != 'All'}"> 							
 
-				<table class="forms" align="center">
+				<table align="left">
 						<tr> 
-					 		<td NOWRAP> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp  </td>
+					 		<td NOWRAP> </td>
 							<td NOWRAP align=right>
 								<jsp:include page="/monitoring/PullDownMenu.jsp" />					
 							</td> 
@@ -75,12 +75,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	  					<tr>
 					 		<td NOWRAP> <b> <font size=2> <bean:message key="label.total.students"/> </b> </td>
-					 		<td> <c:out value="${VoteMonitoringForm.sessionUserCount}"/> </td>
+					 		<td> <font size=2> <c:out value="${VoteMonitoringForm.sessionUserCount}"/> </font></td>
 						</tr>
 
 	  					<tr>
 					 		<td NOWRAP> <b> <font size=2> <bean:message key="label.total.completed.students"/> </b> </td> 
-					 		<td> <c:out value="${VoteMonitoringForm.completedSessionUserCount}"/> </td>
+					 		<td> <font size=2> <c:out value="${VoteMonitoringForm.completedSessionUserCount}"/> </font></td>
 						</tr>
 
 						<tr>
@@ -98,48 +98,54 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					 		<td NOWRAP colspan=2 > &nbsp&nbsp </td>
 						</tr>
 						
-						<tr> 
-							<td> </td>
-							<td NOWRAP valign=top align=left >
-								<c:set var="viewURL">
-									<html:rewrite page="/chartGenerator?type=pie"/>
-								</c:set>
-								<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
-									 <font size=2>	<bean:message key="label.view.chart"/>  </font>
-								</a>
+						<tr>
+							<td NOWRAP valign=top align=left>
+							<table align=center>
+								<tr> 
+									<td> </td>
+									<td NOWRAP valign=top align=left >
+										<c:set var="viewURL">
+											<html:rewrite page="/chartGenerator?type=pie"/>
+										</c:set>
+										<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
+											 <font size=2>	<bean:message key="label.view.chart"/>  </font>
+										</a>
+									</td>
+								</tr>
+							
+									<tr>
+								 		<td NOWRAP> <b> <font size=2> <bean:message key="label.nomination"/> </b> </td>
+										<td NOWRAP> <b> <font size=2> <bean:message key="label.total.votes"/> </b> </td>
+									</tr>
+									
+									<c:forEach var="currentNomination" items="${mapStandardNominationsContent}">
+							  	 		<c:set var="currentNominationKey" scope="request" value="${currentNomination.key}"/>
+							  	 		 <tr>
+				  	 						<td NOWRAP valign=top align=left>
+												<c:out value="${currentNomination.value}" escapeXml="false"/>
+											 </td>
+			
+											<td NOWRAP valign=top align=left>				  	 		
+									  	 		<c:forEach var="currentUserCount" items="${mapStandardUserCount}">
+										  	 		<c:set var="currentUserKey" scope="request" value="${currentUserCount.key}"/>
+									  				<c:if test="${currentNominationKey == currentUserKey}"> 				
+																<font size=2> <c:out value="${currentUserCount.value}"/>  </font>
+													</c:if> 	    
+												</c:forEach>		  
+			
+									  	 		<c:forEach var="currentRate" items="${mapStandardRatesContent}">
+										  	 		<c:set var="currentRateKey" scope="request" value="${currentRate.key}"/>
+									  				<c:if test="${currentNominationKey == currentRateKey}"> 				
+																<font size=2> &nbsp(<c:out value="${currentRate.value}"/> <bean:message key="label.percent"/>) </font>
+													</c:if> 	    
+												</c:forEach>		  
+											</td>								
+										</tr>	
+									</c:forEach>	
+							</table>
 							</td>
 						</tr>
-
-	
-						<tr>
-					 		<td NOWRAP> <b> <font size=2> <bean:message key="label.nomination"/> </b> </td>
-							<td NOWRAP> <b> <font size=2> <bean:message key="label.total.votes"/> </b> </td>
-						</tr>
 						
-						<c:forEach var="currentNomination" items="${mapStandardNominationsContent}">
-				  	 		<c:set var="currentNominationKey" scope="request" value="${currentNomination.key}"/>
-				  	 		 <tr>
-	  	 						<td NOWRAP valign=top align=left>
-									<c:out value="${currentNomination.value}" escapeXml="false"/>
-								 </td>
-
-								<td NOWRAP valign=top align=left>				  	 		
-						  	 		<c:forEach var="currentUserCount" items="${mapStandardUserCount}">
-							  	 		<c:set var="currentUserKey" scope="request" value="${currentUserCount.key}"/>
-						  				<c:if test="${currentNominationKey == currentUserKey}"> 				
-													<font size=2> <c:out value="${currentUserCount.value}"/>  </font>
-										</c:if> 	    
-									</c:forEach>		  
-
-						  	 		<c:forEach var="currentRate" items="${mapStandardRatesContent}">
-							  	 		<c:set var="currentRateKey" scope="request" value="${currentRate.key}"/>
-						  				<c:if test="${currentNominationKey == currentRateKey}"> 				
-													<font size=2> &nbsp(<c:out value="${currentRate.value}"/> <bean:message key="label.percent"/>) </font>
-										</c:if> 	    
-									</c:forEach>		  
-								</td>								
-							</tr>	
-						</c:forEach>	
 				</table>
 			</c:if> 	    	  
 		</c:if>						
