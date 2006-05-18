@@ -846,8 +846,7 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
     	VoteMonitoringForm voteMonitoringForm = (VoteMonitoringForm) form;
     	voteMonitoringForm.setShowOpenVotesSection(new Boolean(false).toString());
     	
-    	logger.debug("showOpen votes set to true: ");
-
+    	logger.debug("showOpen votes set to false: ");
         
     	return (mapping.findForward(LOAD_MONITORING));
      }

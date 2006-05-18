@@ -37,6 +37,7 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.general.DefaultPieDataset;
+import org.jfree.data.general.Series;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 
 /**
@@ -62,22 +63,14 @@ public class VoteChartGenerator extends HttpServlet implements VoteAppConstants 
             logger.debug("type: " + type);
             JFreeChart chart=null;
             
-            if (type.equals("pie"))
-            {
-                logger.debug("creating pie chart");
-                chart=createPieChart(request);
-            }
-            else if (type.equals("bar"))
-            {
-                logger.debug("creating bar chart");
-                chart=createBarChart();
-            }
+            logger.debug("creating pie chart" + type);
+            chart=createPieChart(request, type);
             
             logger.debug("chart:" + chart);
             if (chart != null)
             {
                 response.setContentType("image/png");
-                ChartUtilities.writeChartAsPNG(out, chart, 400, 300);
+                ChartUtilities.writeChartAsPNG(out, chart, 300, 200);
             }
                     
         }
@@ -91,8 +84,10 @@ public class VoteChartGenerator extends HttpServlet implements VoteAppConstants 
         }
     }
     
-    private JFreeChart createPieChart(HttpServletRequest request)
+    private JFreeChart createPieChart(HttpServletRequest request, String chartType)
     {
+        logger.debug("chartType: " + chartType);
+        
         logger.debug("starting createPieChart...");
         DefaultPieDataset data= new DefaultPieDataset();
         
@@ -113,15 +108,21 @@ public class VoteChartGenerator extends HttpServlet implements VoteAppConstants 
             data.setValue(pairs.getValue().toString(), new Double(voteRate));
 		}
         
-        JFreeChart chart=ChartFactory.createPieChart("Session Votes Chart", data, true, true, false);
+    	JFreeChart chart=null;
+    	if (chartType.equals("pie"))
+    	{
+    	    chart=ChartFactory.createPieChart3D("Session Votes Chart", data, true, true, false);    
+    	}
+    	else
+    	{
+    	    String series1="Votes";
+    	    
+    	    String category="Votes";
+    	    
+    	    //chart=ChartFactory.createBarChart3D("Session Votes Chart", data, true, true, false);
+    	}
         return chart;
         
-    }
-
-
-    private JFreeChart createBarChart()
-    {
-        return null;
     }
 	
 }
