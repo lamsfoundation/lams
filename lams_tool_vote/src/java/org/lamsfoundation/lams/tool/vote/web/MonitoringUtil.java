@@ -660,9 +660,6 @@ public class MonitoringUtil implements VoteAppConstants{
 		    userEntries=voteService.getSessionUserEntries(toolSessionUid);
 		    logger.debug("sessionUserCount: " + userEntries.size());
 		    
-		    distinctSessionUsers=voteService.getVoteUserBySessionUid(toolSessionUid);
-		    logger.debug("distinctSessionUsers: " + distinctSessionUsers);
-		    
 		    int completedSessionUserCount=voteService.getCompletedVoteUserBySessionUid(toolSessionUid);
 		    logger.debug("completedSessionUserCount: " + completedSessionUserCount);
 		    
@@ -672,16 +669,7 @@ public class MonitoringUtil implements VoteAppConstants{
 
 		    if (voteMonitoringForm != null)
 		    {
-		        if (distinctSessionUsers != null)
-		        {
-		            logger.debug("distinctSessionUsers count: " + distinctSessionUsers.size());
-		            voteMonitoringForm.setSessionUserCount(new Integer(distinctSessionUsers.size()).toString());
-		        }
-		        else
-		        {
-		            voteMonitoringForm.setSessionUserCount(new Integer(0).toString());
-		        }
-		        
+		    	voteMonitoringForm.setSessionUserCount(Integer.toString(voteService.getVoteSessionPotentialLearnersCount(toolSessionUid)));
 		        voteMonitoringForm.setCompletedSessionUserCount(new Integer(completedSessionUserCount).toString());
 		    }
 		}

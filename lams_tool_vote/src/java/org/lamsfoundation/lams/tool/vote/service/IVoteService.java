@@ -155,6 +155,13 @@ public interface IVoteService
     
     public VoteSession getVoteSessionByUID(Long uid) throws VoteApplicationException;
     
+    /** Get the count of all the potential learners for the vote session. This will include
+     * the people that have never logged into the lesson. Not great, but it is a better estimate of 
+     * how many users there will be eventually than the number of people already known to the tool. 
+     * @param voteSessionId The tool session id 
+     */
+    public int getVoteSessionPotentialLearnersCount(Long voteSessionId) throws VoteApplicationException;
+    
     public void deleteVote(VoteContent vote) throws VoteApplicationException;
     
     public void deleteVoteById(Long voteId) throws VoteApplicationException;

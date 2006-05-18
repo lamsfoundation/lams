@@ -51,6 +51,7 @@ import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
+import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
@@ -406,12 +407,26 @@ public class VoteServicePOJO implements
         }
         catch (DataAccessException e)
         {
-            throw new VoteApplicationException("Exception occured when lams is getting voteSession my uid: "
+            throw new VoteApplicationException("Exception occured when lams is getting voteSession by uid: "
                                                          + e.getMessage(),
 														   e);
         }
     }
 
+    public int getVoteSessionPotentialLearnersCount(Long voteSessionId) throws VoteApplicationException
+    {
+        try
+        {
+        	Set potentialLearners = toolService.getAllPotentialLearners(voteSessionId);
+        	return potentialLearners != null ? potentialLearners.size() : 0;
+        }
+        catch (LamsToolServiceException e)
+        {
+            throw new VoteApplicationException("Exception occured when lams is getting count of potential voteSession learners: "
+                                                         + e.getMessage(),
+														   e);
+        }
+    }
 
     public void createVoteQueUsr(VoteQueUsr voteQueUsr) throws VoteApplicationException
     {
