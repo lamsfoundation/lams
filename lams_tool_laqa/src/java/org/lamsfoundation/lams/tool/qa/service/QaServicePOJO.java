@@ -65,9 +65,11 @@ import org.lamsfoundation.lams.tool.qa.dao.IQaQueUsrDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaSessionDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaUploadedFileDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaUsrRespDAO;
+import org.lamsfoundation.lams.tool.qa.util.QAConstants;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.springframework.dao.DataAccessException;
 
 
@@ -114,6 +116,7 @@ public class QaServicePOJO
     private IUserManagementService userManagementService;
     private ILamsToolService toolService;
     private ILearnerService learnerService;
+	private IAuditService auditService;
 
     public void configureContentRepository() throws QaApplicationException {
     	logger.debug("retrieved repService: " + repositoryService);
@@ -642,6 +645,9 @@ public class QaServicePOJO
 	{
     	try
         {
+    		auditService.logChange(QAConstants.TOOL_SIGNATURE,
+    				resp.getQaQueUser().getQueUsrId(),resp.getQaQueUser().getUsername(),
+    				resp.getAnswer(), null);
     		qaUsrRespDAO.removeUserResponse(resp);
         }
         catch(DataAccessException e)
@@ -1839,4 +1845,16 @@ public class QaServicePOJO
 	public void setQaToolContentHandler(IToolContentHandler qaToolContentHandler) {
 		this.qaToolContentHandler = qaToolContentHandler;
 	}
+
+
+	public IAuditService getAuditService() {
+		return auditService;
+	}
+
+
+	public void setAuditService(IAuditService auditService) {
+		this.auditService = auditService;
+	}
+	
+	
 }

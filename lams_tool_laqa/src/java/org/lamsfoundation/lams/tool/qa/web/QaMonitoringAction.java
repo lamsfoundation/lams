@@ -105,6 +105,7 @@ import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.QaUtils;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
+import org.lamsfoundation.lams.tool.qa.util.QAConstants;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
@@ -581,6 +582,13 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    logger.debug("updatedResponse: " + updatedResponse);
 	    QaUsrResp qaUsrResp= qaService.retrieveQaUsrResp(new Long(responseId).longValue());
 	    logger.debug("qaUsrResp: " + qaUsrResp);
+	    
+	    // write out the audit log entry. If you move this after the update of the response,
+	    // then make sure you update the audit call to use a copy of the original answer
+	    qaService.getAuditService().logChange(QAConstants.TOOL_SIGNATURE,
+	    		qaUsrResp.getQaQueUser().getQueUsrId(),qaUsrResp.getQaQueUser().getUsername(),
+	    		qaUsrResp.getAnswer(), updatedResponse);
+
 	    qaUsrResp.setAnswer(updatedResponse);
 	    qaService.updateQaUsrResp(qaUsrResp);
 	    logger.debug("response updated.");

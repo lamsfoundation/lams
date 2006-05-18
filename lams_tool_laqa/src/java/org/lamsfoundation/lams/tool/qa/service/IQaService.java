@@ -37,6 +37,7 @@ import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.QaUploadedFile;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.util.audit.IAuditService;
 
 
 
@@ -242,5 +243,9 @@ public interface IQaService
     public void cleanUploadedFilesMetaData() throws QaApplicationException;
     
     public List retrieveQaQueContentsByToolContentId(long toolContentId);
+    
+    /** Get the LAMS audit service. Needed as the web layer controls the staff updating of an answer,
+     * so the log entry must be made by the web layer. */
+    public IAuditService getAuditService();
 }
 
