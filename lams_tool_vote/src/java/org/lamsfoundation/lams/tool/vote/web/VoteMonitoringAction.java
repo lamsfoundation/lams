@@ -304,6 +304,8 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 			    			voteMonitoredUserDTO.setUserName(voteUsrAttempt.getVoteQueUsr().getUsername());
 			    			voteMonitoredUserDTO.setQueUsrId(voteUsrAttempt.getVoteQueUsr().getUid().toString());
 			    			voteMonitoredUserDTO.setUserEntry(voteUsrAttempt.getUserEntry());
+			    			voteMonitoredUserDTO.setUid(voteUsrAttempt.getUid().toString());
+			    			voteMonitoredUserDTO.setVisible(new Boolean(voteUsrAttempt.isVisible()).toString());
 	    	    	        listMonitoredUserContainerDTO.add(voteMonitoredUserDTO);
 	    	    	    }
 	    	    	}
@@ -330,7 +332,9 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 						    			voteMonitoredUserDTO.setUserName(voteUsrAttempt.getVoteQueUsr().getUsername());
 						    			voteMonitoredUserDTO.setQueUsrId(voteUsrAttempt.getVoteQueUsr().getUid().toString());
 						    			voteMonitoredUserDTO.setUserEntry(voteUsrAttempt.getUserEntry());
-						    			listMonitoredUserContainerDTO.add(voteMonitoredUserDTO);				    	    	        
+						    			listMonitoredUserContainerDTO.add(voteMonitoredUserDTO);
+						    			voteMonitoredUserDTO.setUid(voteUsrAttempt.getUid().toString());
+						    			voteMonitoredUserDTO.setVisible(new Boolean(voteUsrAttempt.isVisible()).toString());						    			
 				    	    	    }
 			    	    	    }
 		    	    	    }
@@ -350,6 +354,8 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 					    			voteMonitoredUserDTO.setQueUsrId(voteUsrAttempt.getVoteQueUsr().getUid().toString());
 					    			voteMonitoredUserDTO.setUserEntry(voteUsrAttempt.getUserEntry());
 			    	    	        listMonitoredUserContainerDTO.add(voteMonitoredUserDTO);
+					    			voteMonitoredUserDTO.setUid(voteUsrAttempt.getUid().toString());
+					    			voteMonitoredUserDTO.setVisible(new Boolean(voteUsrAttempt.isVisible()).toString());					    			
 			    	    	    }	    	    	            
 	    	    	        }
 	    	    	    }
@@ -791,7 +797,30 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
     	voteMonitoringForm.setShowOpenVotesSection(new Boolean(true).toString());
     	
     	logger.debug("showOpen votes set to true: ");
+    	
+    	Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    logger.debug("toolContentId: " + toolContentId);
+	    
+	    VoteContent voteContent=voteService.retrieveVote(toolContentId);
+		logger.debug("existing voteContent:" + voteContent);
 
+    	String currentMonitoredToolSession=voteMonitoringForm.getSelectedToolSessionId(); 
+	    logger.debug("currentMonitoredToolSession: " + currentMonitoredToolSession);
+
+		refreshSummaryData(request, voteContent, voteService, true, false, currentMonitoredToolSession, null, true);
+		
+		if (currentMonitoredToolSession.equals("All"))
+	    {
+		    request.getSession().setAttribute(SELECTION_CASE, new Long(2));
+	    }
+	    else
+	    {
+		    request.getSession().setAttribute(SELECTION_CASE, new Long(1));
+	    }
+	    logger.debug("SELECTION_CASE: " + request.getSession().getAttribute(SELECTION_CASE));
+
+	    request.getSession().setAttribute(CURRENT_MONITORED_TOOL_SESSION, currentMonitoredToolSession);
+	    logger.debug("CURRENT_MONITORED_TOOL_SESSION: " + request.getSession().getAttribute(CURRENT_MONITORED_TOOL_SESSION));
         
     	return (mapping.findForward(LOAD_MONITORING));
      }
@@ -822,7 +851,115 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
         
     	return (mapping.findForward(LOAD_MONITORING));
      }
+    
+    
 
+    public ActionForward hideOpenVote(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException, ToolException
+     {
+        logger.debug("dispatching hideOpenVote...");
+        IVoteService voteService=null;
+	    voteService = (IVoteService)request.getSession().getAttribute(TOOL_SERVICE);
+		
+		if (voteService == null)
+		{
+			logger.debug("will retrieve voteService");
+			voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
+		}
+		logger.debug("voteService: " + voteService);
+		
+    	VoteMonitoringForm voteMonitoringForm = (VoteMonitoringForm) form;
+    	String currentUid=voteMonitoringForm.getCurrentUid();
+    	logger.debug("currentUid: " + currentUid);
+        VoteUsrAttempt voteUsrAttempt =voteService.getAttemptByUID(new Long(currentUid));
+        logger.debug("voteUsrAttempt: " + voteUsrAttempt);
+        voteUsrAttempt.setVisible(false);
+        voteService.updateVoteUsrAttempt(voteUsrAttempt);
+        
+    	Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    logger.debug("toolContentId: " + toolContentId);
+	    
+	    VoteContent voteContent=voteService.retrieveVote(toolContentId);
+		logger.debug("existing voteContent:" + voteContent);
+
+    	String currentMonitoredToolSession=voteMonitoringForm.getSelectedToolSessionId(); 
+	    logger.debug("currentMonitoredToolSession: " + currentMonitoredToolSession);
+
+		refreshSummaryData(request, voteContent, voteService, true, false, currentMonitoredToolSession, null, true);
+		
+		if (currentMonitoredToolSession.equals("All"))
+	    {
+		    request.getSession().setAttribute(SELECTION_CASE, new Long(2));
+	    }
+	    else
+	    {
+		    request.getSession().setAttribute(SELECTION_CASE, new Long(1));
+	    }
+	    logger.debug("SELECTION_CASE: " + request.getSession().getAttribute(SELECTION_CASE));
+	    request.getSession().setAttribute(CURRENT_MONITORED_TOOL_SESSION, currentMonitoredToolSession);
+	    logger.debug("CURRENT_MONITORED_TOOL_SESSION: " + request.getSession().getAttribute(CURRENT_MONITORED_TOOL_SESSION));
+        
+    	return (mapping.findForward(LOAD_MONITORING));
+     }
+
+    public ActionForward showOpenVote(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException, ToolException
+     {
+        logger.debug("dispatching showOpenVote...");
+        IVoteService voteService=null;
+	    voteService = (IVoteService)request.getSession().getAttribute(TOOL_SERVICE);
+		
+		if (voteService == null)
+		{
+			logger.debug("will retrieve voteService");
+			voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
+		}
+		logger.debug("voteService: " + voteService);
+		
+    	VoteMonitoringForm voteMonitoringForm = (VoteMonitoringForm) form;
+
+    	String currentUid=voteMonitoringForm.getCurrentUid();
+    	logger.debug("currentUid: " + currentUid);
+        VoteUsrAttempt voteUsrAttempt =voteService.getAttemptByUID(new Long(currentUid));
+        logger.debug("voteUsrAttempt: " + voteUsrAttempt);
+        voteUsrAttempt.setVisible(true);
+        voteService.updateVoteUsrAttempt(voteUsrAttempt);
+
+    	Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    logger.debug("toolContentId: " + toolContentId);
+	    
+	    VoteContent voteContent=voteService.retrieveVote(toolContentId);
+		logger.debug("existing voteContent:" + voteContent);
+
+    	String currentMonitoredToolSession=voteMonitoringForm.getSelectedToolSessionId(); 
+	    logger.debug("currentMonitoredToolSession: " + currentMonitoredToolSession);
+
+		refreshSummaryData(request, voteContent, voteService, true, false, currentMonitoredToolSession, null, true);
+		
+		if (currentMonitoredToolSession.equals("All"))
+	    {
+		    request.getSession().setAttribute(SELECTION_CASE, new Long(2));
+	    }
+	    else
+	    {
+		    request.getSession().setAttribute(SELECTION_CASE, new Long(1));
+	    }
+	    logger.debug("SELECTION_CASE: " + request.getSession().getAttribute(SELECTION_CASE));
+
+	    request.getSession().setAttribute(CURRENT_MONITORED_TOOL_SESSION, currentMonitoredToolSession);
+	    logger.debug("CURRENT_MONITORED_TOOL_SESSION: " + request.getSession().getAttribute(CURRENT_MONITORED_TOOL_SESSION));
+
+        
+    	return (mapping.findForward(LOAD_MONITORING));
+     }
+
+    
     
     /**
      * persists error messages to request scope

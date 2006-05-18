@@ -40,6 +40,8 @@ public class VoteMonitoredAnswersDTO implements Comparable
 	
 	private String question;
 	
+	private String attemptUid;
+	
 	private List candidateAnswers;
 	
 	private Map questionAttempts;
@@ -111,4 +113,16 @@ public class VoteMonitoredAnswersDTO implements Comparable
 			return (int) (new Long(questionUid).longValue() - new Long(voteMonitoredAnswersDTO.questionUid).longValue());
     }
 	
+    /**
+     * @return Returns the attemptUid.
+     */
+    public String getAttemptUid() {
+        return attemptUid;
+    }
+    /**
+     * @param attemptUid The attemptUid to set.
+     */
+    public void setAttemptUid(String attemptUid) {
+        this.attemptUid = attemptUid;
+    }
 }

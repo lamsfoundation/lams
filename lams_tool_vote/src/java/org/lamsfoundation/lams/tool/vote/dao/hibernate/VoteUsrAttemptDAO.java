@@ -73,6 +73,25 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 			 return (VoteUsrAttempt) this.getHibernateTemplate()
 	         .get(VoteUsrAttempt.class, uid);
 		}
+	 	
+	 	
+	    public VoteUsrAttempt getAttemptByUID(Long uid)
+		{
+			String query = "from VoteUsrAttempt attempt where attempt.uid=?";
+			
+			HibernateTemplate templ = this.getHibernateTemplate();
+			List list = getSession().createQuery(query)
+			.setLong(0,uid.longValue())
+			.list();
+			
+			if(list != null && list.size() > 0){
+			    VoteUsrAttempt attempt = (VoteUsrAttempt) list.get(0);
+				return attempt;
+			}
+			return null;	
+		}
+
+	 	
 		
 		public void saveVoteUsrAttempt(VoteUsrAttempt voteUsrAttempt)
 	    {
@@ -479,6 +498,7 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 		
 		public void updateVoteUsrAttempt(VoteUsrAttempt voteUsrAttempt)
 	    {
+			this.getSession().setFlushMode(FlushMode.AUTO);
 	    	this.getHibernateTemplate().update(voteUsrAttempt);
 	    }
 		

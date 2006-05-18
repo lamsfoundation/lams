@@ -545,6 +545,20 @@ public class VoteServicePOJO implements
     }
 
     
+    public VoteUsrAttempt getAttemptByUID(Long uid) throws VoteApplicationException
+    {
+        try
+        {
+        	return voteUsrAttemptDAO.getAttemptByUID(uid);
+        }
+        catch (DataAccessException e)
+        {
+            throw new VoteApplicationException("Exception occured when lams is getting attemptby uid: "
+                                                         + e.getMessage(),
+														   e);
+        }        
+    }
+    
     
     public int getUserRecordsEntryCount(final String userEntry) throws VoteApplicationException
     {

@@ -65,6 +65,7 @@ CREATE TABLE tl_lavote11_usr_attempt (
      , time_zone VARCHAR(255)
      , userEntry VARCHAR(255)
      , singleUserEntry TINYINT(1) NOT NULL DEFAULT 0
+     , visible TINYINT(1) NOT NULL DEFAULT 1
      , PRIMARY KEY (uid)
      , INDEX (que_usr_id)
      , CONSTRAINT FK_tl_lavote11_usr_attempt_2 FOREIGN KEY (que_usr_id)

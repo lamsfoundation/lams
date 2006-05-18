@@ -54,6 +54,8 @@ public class VoteUsrAttempt implements Serializable {
     
     private Long queUsrId;
     
+    private boolean visible;
+    
     private boolean singleUserEntry;
     
     private Long voteQueContentId;
@@ -103,6 +105,15 @@ public class VoteUsrAttempt implements Serializable {
         this.singleUserEntry=singleUserEntry;
     }
 
+    public VoteUsrAttempt(Date attemptTime, String timeZone, org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent voteQueContent, 
+    		org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr voteQueUsr, String userEntry, boolean singleUserEntry, boolean visible) {
+        this.attemptTime = attemptTime;
+        this.timeZone = timeZone;
+        this.voteQueContent = voteQueContent;
+        this.voteQueUsr = voteQueUsr;
+        this.userEntry=userEntry;
+        this.visible=visible;
+    }
 
     public VoteUsrAttempt(String userEntry, Date attemptTime, String timeZone, org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent voteQueContent, 
     		org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr voteQueUsr) {
@@ -241,5 +252,18 @@ public class VoteUsrAttempt implements Serializable {
     public void setSingleUserEntry(boolean singleUserEntry) {
         this.singleUserEntry = singleUserEntry;
     }
+    
+    /**
+     * @return Returns the visible.
+     */
+    public boolean isVisible() {
+        return visible;
+    }
+    /**
+     * @param visible The visible to set.
+     */
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+    }    
     
 }

@@ -48,8 +48,38 @@ public class VoteMonitoringForm extends VoteAuthoringForm implements VoteAppCons
 	
 	protected String closeOpenVotes;
 	
+	protected String hideOpenVote;
+	
+	protected String showOpenVote;
+	
+	protected String currentUid;
 	
 	
+	
+    /**
+     * @return Returns the currentUid.
+     */
+    public String getCurrentUid() {
+        return currentUid;
+    }
+    /**
+     * @param currentUid The currentUid to set.
+     */
+    public void setCurrentUid(String currentUid) {
+        this.currentUid = currentUid;
+    }
+    /**
+     * @return Returns the hideOpenVote.
+     */
+    public String getHideOpenVote() {
+        return hideOpenVote;
+    }
+    /**
+     * @param hideOpenVote The hideOpenVote to set.
+     */
+    public void setHideOpenVote(String hideOpenVote) {
+        this.hideOpenVote = hideOpenVote;
+    }
     /**
      * @return Returns the closeOpenVotes.
      */
@@ -147,5 +177,17 @@ public class VoteMonitoringForm extends VoteAuthoringForm implements VoteAppCons
      */
     public void setShowOpenVotesSection(String showOpenVotesSection) {
         this.showOpenVotesSection = showOpenVotesSection;
+    }
+    /**
+     * @return Returns the showOpenVote.
+     */
+    public String getShowOpenVote() {
+        return showOpenVote;
+    }
+    /**
+     * @param showOpenVote The showOpenVote to set.
+     */
+    public void setShowOpenVote(String showOpenVote) {
+        this.showOpenVote = showOpenVote;
     }
 }

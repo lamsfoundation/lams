@@ -50,6 +50,8 @@ public class VoteMonitoredUserDTO implements Comparable
 	
 	private String userEntry;
 	
+	private String visible;
+	
 	private String sessionId;
 	
 	private String questionUid;
@@ -203,5 +205,17 @@ public class VoteMonitoredUserDTO implements Comparable
      */
     public void setUserEntry(String userEntry) {
         this.userEntry = userEntry;
+    }
+    /**
+     * @return Returns the visible.
+     */
+    public String getVisible() {
+        return visible;
+    }
+    /**
+     * @param visible The visible to set.
+     */
+    public void setVisible(String visible) {
+        this.visible = visible;
     }
 }

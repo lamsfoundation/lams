@@ -57,6 +57,8 @@ public interface IVoteService
     
     public VoteContent retrieveVote(Long toolContentId) throws VoteApplicationException;
     
+    public VoteUsrAttempt getAttemptByUID(Long uid) throws VoteApplicationException;
+    
     public void createVoteQue(VoteQueContent voteQueContent) throws VoteApplicationException;
     
     public void createVoteSession(VoteSession voteSession) throws VoteApplicationException;

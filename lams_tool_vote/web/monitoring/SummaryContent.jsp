@@ -32,6 +32,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
 	<html:hidden property="responseId"/>	 
+	<html:hidden property="currentUid"/>
 	<html:hidden property="selectedToolSessionId"/>							
 	<input type="hidden" name="isToolSessionChanged"/>
 	
@@ -163,17 +164,22 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						</tr>
 
 						<c:if test="${VoteMonitoringForm.showOpenVotesSection == 'true'}"> 										
-							<HR>
+
 							<tr>
 						 		<td NOWRAP colspan=2 > &nbsp&nbsp </td>
 							</tr>
+						
+							<tr>
+						 		<td NOWRAP colspan=2 > <HR> </td>
+							</tr>
+
 							<tr>
 						 		<td NOWRAP colspan=2 > &nbsp&nbsp </td>
 							</tr>
 	
 							<tr>
 						 		<td NOWRAP colspan=2>
-					 			<table align=left border=1>
+					 			<table align=left>
 					 					<tr>
 									 		<td NOWRAP align=center> 
 												<b> <font size=2> <bean:message key="label.openVotes"/> </b>
@@ -181,35 +187,60 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 										</tr>
 					 			
 									<c:forEach var="currentDto" items="${sessionScope.listUserEntries}">
-							  	 		<c:set var="currentQuestionId" scope="request" value="${currentDto.questionUid}"/>
+
 										<tr>			
 											<td NOWRAP valign=top align=left><b> <font size=2> <bean:message key="label.vote"/>: </b>
 												<c:out value="${currentDto.question}" escapeXml="false"/>
-											</font> </td>
+											</font> 
+											</td>
 										</tr>	
 										
 										<tr> 
 											<td NOWRAP valign=top>
 												<table align=center>
 													<tr> 
-														 <td NOWRAP valign=top> <b> <font size=2> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<bean:message key="label.user"/> </font> </b> </td>  
-								  						 <td NOWRAP valign=top> <b> <font size=2> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<bean:message key="label.attemptTime"/></font> </b></td>
-								  						 <td NOWRAP valign=top> <b> <font size=2> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<bean:message key="label.timezone"/> </font>	</b></td>
+														 <td NOWRAP valign=top align=left>   &nbsp&nbsp&nbsp&nbsp&nbsp </td>  
+														 <td NOWRAP valign=top align=left> <b> <font size=2>  <bean:message key="label.user"/> </font> </b> </td>  
+								  						 <td NOWRAP valign=top align=left> <b> <font size=2>  <bean:message key="label.attemptTime"/></font> </b></td>
+								  						 <td NOWRAP valign=top align=left> <b> <font size=2>  <bean:message key="label.timezone"/> </font>	</b></td>
+								  						 <td NOWRAP valign=top align=left> <b> <font size=2>  &nbsp&nbsp&nbsp&nbsp&nbsp </td>								  						 
 										  			</tr>				 
 				
 						  							<c:forEach var="questionAttemptData" items="${currentDto.questionAttempts}">
 											  	 		<c:set var="userData" scope="request" value="${questionAttemptData.value}"/>
+	  	 									  	 		<c:set var="currentUid" scope="request" value="${userData.uid}"/>
 														<tr> 
-																 <td NOWRAP valign=top>  &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<font size=2> <c:out value="${userData.userName}"/> </font>  </td>  
-																 <td NOWRAP valign=top>  &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<font size=2> <c:out value="${userData.attemptTime}"/> </font> </td>
-																 <td NOWRAP valign=top>  &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<font size=2> <c:out value="${userData.timeZone}"/> </font> </td>
+																 <td NOWRAP valign=top align=left>   &nbsp&nbsp&nbsp&nbsp&nbsp </td>  
+																 <td NOWRAP valign=top align=left>   <font size=2> <c:out value="${userData.userName}"/> </font>  </td>  
+																 <td NOWRAP valign=top align=left>   <font size=2> <c:out value="${userData.attemptTime}"/> </font> </td>
+																 <td NOWRAP valign=top align=left>   <font size=2> <c:out value="${userData.timeZone}"/> </font> </td>
+																 <td NOWRAP valign=top align=left>   <font size=2>
+
+																<c:if test="${userData.visible == 'true' }"> 			
+											                                <html:submit property="hideOpenVote" 
+											                                             styleClass="linkbutton" 
+									                                                     onclick="submitOpenVote(${currentUid}, 'hideOpenVote');">						                                             
+											                                    <bean:message key="label.hide"/>
+											                                </html:submit>
+																</c:if> 													
+					
+																<c:if test="${userData.visible != 'true' }"> 			
+											                                <html:submit property="showOpenVote" 
+											                                             styleClass="linkbutton" 
+									                                                     onclick="submitOpenVote(${currentUid}, 'showOpenVote');">						                                             
+											                                    <bean:message key="label.show"/>
+											                                </html:submit>
+											                                <font size=2> <i><bean:message key="label.hidden"/> </i> </font>											                                
+																</c:if> 													
+															</td>											
+																 
 														</tr>		
 													</c:forEach>		  	
 												</table>
 											</td>  
 							  			</tr>
 									</c:forEach>		
-								<table> 
+								</table> 
 								</td>
 							</tr>
 							
@@ -218,5 +249,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</table>
 			</c:if> 	    	  
 		</c:if>						
+
 
 
