@@ -64,7 +64,7 @@ public class AuditService implements IAuditService {
 
 	private final String AUDIT_CHANGE_I18N_KEY = "audit.change.entry";
 	private final String AUDIT_HIDE_I18N_KEY = "audit.hide.entry";
-	
+	private final String AUDIT_SHOW_I18N_KEY = "audit.show.entry";
 	protected MessageService messageService;
 
 	private String getUserString() {
@@ -92,11 +92,19 @@ public class AuditService implements IAuditService {
 		log(moduleName, message);
 	}
 
-	public void logHide(String moduleName, Long originalUserId, String originalUserLogin, String hiddenItem) {
+	public void logHideEntry(String moduleName, Long originalUserId, String originalUserLogin, String hiddenItem) {
 		String[] args = new String[3];
 		args[0] = originalUserLogin+"("+originalUserId+")";
 		args[1] = hiddenItem;
 		String message = messageService.getMessage(AUDIT_HIDE_I18N_KEY, args);
+		log(moduleName, message);
+	}
+
+	public void logShowEntry(String moduleName, Long originalUserId, String originalUserLogin, String hiddenItem) {
+		String[] args = new String[3];
+		args[0] = originalUserLogin+"("+originalUserId+")";
+		args[1] = hiddenItem;
+		String message = messageService.getMessage(AUDIT_SHOW_I18N_KEY, args);
 		log(moduleName, message);
 	}
 

@@ -54,6 +54,16 @@ public interface IAuditService {
 	 * @param originalUserID the userID of the user who created the text initially
 	 * @param originalUserLogin the login of the user who created the text initially
 	 */
-	public void logHide(String moduleName, Long originalUserId, String originalUserLogin, String hiddenItem);
+	public void logHideEntry(String moduleName, Long originalUserId, String originalUserLogin, String hiddenItem);
 
+	/** 
+	 * Log staff member showing a user entry. The username, date, moduleName and hidden entry are 
+	 * recorded in the audit log. Presumably the item was hidden previously.
+	 * @param moduleName tool generating the audit entry  
+	 * @param hiddenItem String version of the item that has been hidden
+	 * @param newText the text after it was changed
+	 * @param originalUserID the userID of the user who created the text initially
+	 * @param originalUserLogin the login of the user who created the text initially
+	 */
+	public void logShowEntry(String moduleName, Long originalUserId, String originalUserLogin, String hiddenItem);
 }
