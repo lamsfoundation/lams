@@ -163,34 +163,56 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						</tr>
 
 						<c:if test="${VoteMonitoringForm.showOpenVotesSection == 'true'}"> 										
+							<HR>
 							<tr>
 						 		<td NOWRAP colspan=2 > &nbsp&nbsp </td>
 							</tr>
 							<tr>
 						 		<td NOWRAP colspan=2 > &nbsp&nbsp </td>
 							</tr>
-	
 	
 							<tr>
 						 		<td NOWRAP colspan=2>
-						 			<table align=left>
-										<tr>
-									 		<td NOWRAP colspan=2 align=center> 
+					 			<table align=left border=1>
+					 					<tr>
+									 		<td NOWRAP align=center> 
 												<b> <font size=2> <bean:message key="label.openVotes"/> </b>
 											</td>
 										</tr>
+					 			
+									<c:forEach var="currentDto" items="${sessionScope.listUserEntries}">
+							  	 		<c:set var="currentQuestionId" scope="request" value="${currentDto.questionUid}"/>
+										<tr>			
+											<td NOWRAP valign=top align=left><b> <font size=2> <bean:message key="label.vote"/>: </b>
+												<c:out value="${currentDto.question}" escapeXml="false"/>
+											</font> </td>
+										</tr>	
 										
-										<tr>
-									 		<td NOWRAP> 
-												<b> <font size=2> <bean:message key="label.user"/> </b>
-											</td>
-									 		<td NOWRAP> 
-												<b> <font size=2> <bean:message key="label.open.vote"/> </b>
-											</td>
-										</tr>
-									<table> 
+										<tr> 
+											<td NOWRAP valign=top>
+												<table align=center>
+													<tr> 
+														 <td NOWRAP valign=top> <b> <font size=2> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<bean:message key="label.user"/> </font> </b> </td>  
+								  						 <td NOWRAP valign=top> <b> <font size=2> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<bean:message key="label.attemptTime"/></font> </b></td>
+								  						 <td NOWRAP valign=top> <b> <font size=2> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<bean:message key="label.timezone"/> </font>	</b></td>
+										  			</tr>				 
+				
+						  							<c:forEach var="questionAttemptData" items="${currentDto.questionAttempts}">
+											  	 		<c:set var="userData" scope="request" value="${questionAttemptData.value}"/>
+														<tr> 
+																 <td NOWRAP valign=top>  &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<font size=2> <c:out value="${userData.userName}"/> </font>  </td>  
+																 <td NOWRAP valign=top>  &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<font size=2> <c:out value="${userData.attemptTime}"/> </font> </td>
+																 <td NOWRAP valign=top>  &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<font size=2> <c:out value="${userData.timeZone}"/> </font> </td>
+														</tr>		
+													</c:forEach>		  	
+												</table>
+											</td>  
+							  			</tr>
+									</c:forEach>		
+								<table> 
 								</td>
 							</tr>
+							
 						</c:if> 			
 
 				</table>
