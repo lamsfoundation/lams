@@ -42,8 +42,38 @@ public class VoteMonitoringForm extends VoteAuthoringForm implements VoteAppCons
 	
 	protected String completedSessionUserCount;
 	
+	protected String viewOpenVotes;
+	
+	protected String showOpenVotesSection;
+	
+	protected String closeOpenVotes;
 	
 	
+	
+    /**
+     * @return Returns the closeOpenVotes.
+     */
+    public String getCloseOpenVotes() {
+        return closeOpenVotes;
+    }
+    /**
+     * @param closeOpenVotes The closeOpenVotes to set.
+     */
+    public void setCloseOpenVotes(String closeOpenVotes) {
+        this.closeOpenVotes = closeOpenVotes;
+    }
+    /**
+     * @return Returns the viewOpenVotes.
+     */
+    public String getViewOpenVotes() {
+        return viewOpenVotes;
+    }
+    /**
+     * @param viewOpenVotes The viewOpenVotes to set.
+     */
+    public void setViewOpenVotes(String viewOpenVotes) {
+        this.viewOpenVotes = viewOpenVotes;
+    }
 	/**
 	 * @return Returns the isToolSessionChanged.
 	 */
@@ -105,5 +135,17 @@ public class VoteMonitoringForm extends VoteAuthoringForm implements VoteAppCons
      */
     public void setSessionUserCount(String sessionUserCount) {
         this.sessionUserCount = sessionUserCount;
+    }
+    /**
+     * @return Returns the showOpenVotesSection.
+     */
+    public String getShowOpenVotesSection() {
+        return showOpenVotesSection;
+    }
+    /**
+     * @param showOpenVotesSection The showOpenVotesSection to set.
+     */
+    public void setShowOpenVotesSection(String showOpenVotesSection) {
+        this.showOpenVotesSection = showOpenVotesSection;
     }
 }

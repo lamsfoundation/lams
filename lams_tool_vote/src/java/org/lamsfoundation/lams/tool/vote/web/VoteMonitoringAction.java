@@ -769,7 +769,60 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
     	return null; 
     }
 
+
+    public ActionForward viewOpenVotes(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException, ToolException
+     {
+        logger.debug("dispatching viewOpenVotes...");
+        IVoteService voteService=null;
+	    voteService = (IVoteService)request.getSession().getAttribute(TOOL_SERVICE);
+		
+		if (voteService == null)
+		{
+			logger.debug("will retrieve voteService");
+			voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
+		}
+		logger.debug("voteService: " + voteService);
+		
+    	VoteMonitoringForm voteMonitoringForm = (VoteMonitoringForm) form;
+    	voteMonitoringForm.setShowOpenVotesSection(new Boolean(true).toString());
+    	
+    	logger.debug("showOpen votes set to true: ");
+
+        
+    	return (mapping.findForward(LOAD_MONITORING));
+     }
     
+
+    public ActionForward closeOpenVotes(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException, ToolException
+     {
+        logger.debug("dispatching closeOpenVotes...");
+        IVoteService voteService=null;
+	    voteService = (IVoteService)request.getSession().getAttribute(TOOL_SERVICE);
+		
+		if (voteService == null)
+		{
+			logger.debug("will retrieve voteService");
+			voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
+		}
+		logger.debug("voteService: " + voteService);
+		
+    	VoteMonitoringForm voteMonitoringForm = (VoteMonitoringForm) form;
+    	voteMonitoringForm.setShowOpenVotesSection(new Boolean(false).toString());
+    	
+    	logger.debug("showOpen votes set to true: ");
+
+        
+    	return (mapping.findForward(LOAD_MONITORING));
+     }
+
     
     /**
      * persists error messages to request scope

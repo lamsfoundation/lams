@@ -89,7 +89,23 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	  				
 						<tr>
 					 		<td NOWRAP colspan=2> 
-		                            <c:out value="${activityInstructions}" escapeXml="false"/>
+		                            <c:out value="${activityInstructions}" escapeXml="false"/> &nbsp
+
+									<c:if test="${VoteMonitoringForm.showOpenVotesSection == 'false'}"> 										
+		                                <html:submit property="viewOpenVotes" 
+		                                             styleClass="linkbutton" 
+		                                             onclick="submitMethod('viewOpenVotes');">
+		                                    <bean:message key="label.view.openVotes"/>
+		                                </html:submit>
+									</c:if> 					                                
+		                                
+									<c:if test="${VoteMonitoringForm.showOpenVotesSection == 'true'}"> 										
+		                                <html:submit property="closeOpenVotes" 
+		                                             styleClass="linkbutton" 
+		                                             onclick="submitMethod('closeOpenVotes');">
+		                                    <bean:message key="label.view.closeVotes"/>
+		                                </html:submit>
+									</c:if> 					                                		                                
 							</td>
 						</tr>
 						
@@ -145,10 +161,40 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							</table>
 							</td>
 						</tr>
-						
+
+						<c:if test="${VoteMonitoringForm.showOpenVotesSection == 'true'}"> 										
+							<tr>
+						 		<td NOWRAP colspan=2 > &nbsp&nbsp </td>
+							</tr>
+							<tr>
+						 		<td NOWRAP colspan=2 > &nbsp&nbsp </td>
+							</tr>
+	
+	
+							<tr>
+						 		<td NOWRAP colspan=2>
+						 			<table align=left>
+										<tr>
+									 		<td NOWRAP colspan=2 align=center> 
+												<b> <font size=2> <bean:message key="label.openVotes"/> </b>
+											</td>
+										</tr>
+										
+										<tr>
+									 		<td NOWRAP> 
+												<b> <font size=2> <bean:message key="label.user"/> </b>
+											</td>
+									 		<td NOWRAP> 
+												<b> <font size=2> <bean:message key="label.open.vote"/> </b>
+											</td>
+										</tr>
+									<table> 
+								</td>
+							</tr>
+						</c:if> 			
+
 				</table>
 			</c:if> 	    	  
 		</c:if>						
 
 
-	

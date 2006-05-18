@@ -122,6 +122,7 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 		voteMonitoringForm.setSelectedToolSessionId("All");
 		voteMonitoringForm.setSbmtSuccess(new Boolean(false).toString());
 		request.getSession().setAttribute(REQUEST_LEARNING_REPORT, new Boolean(false).toString());
+		voteMonitoringForm.setShowOpenVotesSection(new Boolean(false).toString());
 		return voteMonitoringAction.submitSession(mapping, form,  request, response);
 	}
 

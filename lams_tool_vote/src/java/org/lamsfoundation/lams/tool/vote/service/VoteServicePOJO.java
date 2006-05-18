@@ -417,7 +417,7 @@ public class VoteServicePOJO implements
     {
         try
         {
-        	Set potentialLearners = toolService.getAllPotentialLearners(voteSessionId);
+        	Set potentialLearners = toolService.getAllPotentialLearners(voteSessionId.longValue());
         	return potentialLearners != null ? potentialLearners.size() : 0;
         }
         catch (LamsToolServiceException e)
