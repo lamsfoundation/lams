@@ -265,6 +265,16 @@ class org.lamsfoundation.lams.common.ws.Workspace {
 	}
 	
 	/**
+	* Shows the workspace browsing tree to select a design for use in Add Sequence Wizard
+	* read-only mode
+	*/
+	public function wizardSelectDesign(callback){
+		_onOKCallBack = callback;
+		workspaceModel.currentMode = "READONLY";
+		workspaceModel.openDesignByWizard();
+	}
+	
+	/**
 	 * Shows the workspace browsing dialoge to set a design;s properties
 	 * Usually used for saving a design by the canvas.
 	 * @usage   
@@ -314,7 +324,9 @@ class org.lamsfoundation.lams.common.ws.Workspace {
 		return _onOKCallBack;
 	}
 	
-	
+	public function getWorkspaceModel():WorkspaceModel{
+		return workspaceModel;
+	}
 	
 	
 }

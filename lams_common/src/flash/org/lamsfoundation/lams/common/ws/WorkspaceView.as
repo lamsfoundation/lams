@@ -27,6 +27,7 @@ import org.lamsfoundation.lams.common.mvc.*
 import org.lamsfoundation.lams.common.ui.*
 import org.lamsfoundation.lams.common.dict.*
 import org.lamsfoundation.lams.common.*
+import org.lamsfoundation.lams.wizard.*
 import mx.managers.*
 import mx.events.*
 import mx.utils.*
@@ -70,8 +71,9 @@ class org.lamsfoundation.lams.common.ws.WorkspaceView extends AbstractView {
             case 'CREATE_DIALOG' :
                 createWorkspaceDialog(event.data.pos,event.data.tabToSelect);
                 break;
-			
-			break;
+			case 'CREATE_TREE' :
+				createWorkspaceWizard();
+				break;
             default :
                 Debugger.log('unknown update type :' + event.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.WorkspaceView');
 		}
@@ -111,7 +113,15 @@ class org.lamsfoundation.lams.common.ws.WorkspaceView extends AbstractView {
 		
     }
 	
-
+	/**
+    * Create workspace in wizard
+    */
+    public function createWorkspaceWizard(){
+		var m:WorkspaceModel = WorkspaceModel(getModel());
+		var wizard:Wizard = org.lamsfoundation.lams.wizard.Application.getInstance().getWizard();
+		wizard.getWV().workspaceView = this;
+		wizard.initWorkspace();
+	}
 	
 	
 	/**

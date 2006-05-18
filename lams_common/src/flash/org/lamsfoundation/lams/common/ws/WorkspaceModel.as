@@ -113,6 +113,17 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 	}
 	
 	/**
+	 * Open the workspace in wizard
+	 * Pass in the function to be called when a design is selected
+	 * @usage   
+	 * @return  
+	 */
+	public function openDesignByWizard(){
+		broadcastViewUpdate('CREATE_TREE',null);
+		
+	}
+	
+	/**
 	 * Pops up a dialogue with inputs to set the meta data for the design.
 	 * @usage   
 	 * @param   _ddm        
