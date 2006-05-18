@@ -5,7 +5,7 @@
 		<c:choose>
 			<c:when test="${runAuto}">
 				<script type="text/javascript">
-					document.location = "<c:url value="/reviewItem.do"/>?itemUid=${itemUid}";
+					document.location = "<c:url value="/reviewItem.do"/>?mode=learner&toolSessionID=${toolSessionID}&itemUid=${itemUid}";
 				</script>
 			</c:when>
 			<c:otherwise>

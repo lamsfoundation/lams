@@ -119,18 +119,15 @@ public class LearningAction extends Action {
 			
 		}
 		ToolAccessMode mode = (ToolAccessMode) request.getSession().getAttribute(AttributeNames.ATTR_MODE);
-		if (mode.isLearner()) {
-			// get sessionId from HttpServletRequest
-			String nextActivityUrl = null ;
-			try {
-				nextActivityUrl = service.finishToolSession(sessionId,userID);
-				request.setAttribute(ResourceConstants.ATTR_NEXT_ACTIVITY_URL,nextActivityUrl);
-			} catch (ResourceApplicationException e) {
-				log.error("Failed get next activity url:" + e.getMessage());
-			}
-			return mapping.findForward("finish");
-		}else
-			return mapping.findForward("previewfinish");
+		// get sessionId from HttpServletRequest
+		String nextActivityUrl = null ;
+		try {
+			nextActivityUrl = service.finishToolSession(sessionId,userID);
+			request.setAttribute(ResourceConstants.ATTR_NEXT_ACTIVITY_URL,nextActivityUrl);
+		} catch (ResourceApplicationException e) {
+			log.error("Failed get next activity url:" + e.getMessage());
+		}
+		return mapping.findForward("finish");
 	}
 
 	private ActionForward complete(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {

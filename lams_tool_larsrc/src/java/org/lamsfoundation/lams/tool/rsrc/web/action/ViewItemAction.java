@@ -42,11 +42,12 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.rsrc.ResourceConstants;
+import org.lamsfoundation.lams.tool.rsrc.dto.InstructionNavDTO;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItemInstruction;
 import org.lamsfoundation.lams.tool.rsrc.service.IResourceService;
-import org.lamsfoundation.lams.tool.rsrc.web.form.InstructionNavForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
@@ -73,79 +74,120 @@ public class ViewItemAction extends Action {
 
         return mapping.findForward(ResourceConstants.ERROR);
 	}
-
+	/**
+	 * Return next instrucion to page. It need four input parameters, mode, itemIndex or itemUid, and insIdx.
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	private ActionForward nextInstruction(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-		InstructionNavForm navForm = (InstructionNavForm) form;
-		List list = navForm.getAllInstructions();
-		if(list != null && navForm.getCurrent() < list.size()){
-			//current is start from 1, so, this will return next.
-			navForm.setInstruction((ResourceItemInstruction) list.get(navForm.getCurrent()));
-			navForm.setCurrent(navForm.getCurrent()+1);
+		String mode = request.getParameter(AttributeNames.ATTR_MODE);
+		ResourceItem item = getResourceItem(request, mode);
+		if(item == null){
+			return mapping.findForward(ResourceConstants.ERROR);
 		}
 		
+		int currIns = NumberUtils.stringToInt(request.getParameter(ResourceConstants.PARAM_CURRENT_INSTRUCTION_INDEX),0);
+		
+		Set instructions = item.getItemInstructions();
+		InstructionNavDTO navDto = new InstructionNavDTO();
+		//For Learner upload item, its instruction will display description/comment fields in ReosourceItem.
+		if(!item.isCreateByAuthor()){
+			List<ResourceItemInstruction> navItems = new ArrayList<ResourceItemInstruction>(1);
+			//create a new instruction and put ResourceItem description into it: just for display use.
+			ResourceItemInstruction ins = new ResourceItemInstruction();
+			ins.setSequenceId(1);
+			ins.setDescription(item.getDescription());
+			navItems.add(ins);
+			navDto.setAllInstructions(navItems);
+			instructions.add(ins);
+		}else{
+			navDto.setAllInstructions(new ArrayList(instructions));
+		}
+		navDto.setTitle(item.getTitle());
+		navDto.setType(item.getType());
+		navDto.setTotal(instructions.size());
+		if(instructions.size() > 0){
+			navDto.setInstruction((ResourceItemInstruction) new ArrayList(instructions).get(currIns));
+			navDto.setCurrent(currIns+1);
+		}else{
+			navDto.setCurrent(0);
+			navDto.setInstruction(null);
+		}
+			
+		request.setAttribute(ResourceConstants.ATTR_RESOURCE_INSTRUCTION,navDto);
 		return mapping.findForward(ResourceConstants.SUCCESS);
 	}
 
+	/**
+	 * Display main frame to display instrcution and item content.
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	private ActionForward reviewItem(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-		ToolAccessMode mode = (ToolAccessMode) request.getSession().getAttribute(AttributeNames.ATTR_MODE);
-		ResourceItem item = null;
-		if(mode.isAuthor()){
-			int itemIdx = NumberUtils.stringToInt(request.getParameter(ResourceConstants.PARAM_ITEM_INDEX),-1);
-			//authoring: does not save item yet, so only has ItemList from session and identity by Index
-			List<ResourceItem> resourceList = getResourceItemList(request);
-			item = resourceList.get(itemIdx);
-		}else if(mode.isLearner() || mode.isTeacher()){
-			Long itemUid = NumberUtils.createLong(request.getParameter(ResourceConstants.PARAM_RESOURCE_ITEM_UID));
-			//save itemUid to HttpSession
-			request.getSession().setAttribute(ResourceConstants.ATTR_RESOURCE_ITEM_UID,itemUid);
-			Long sessionId =  (Long) request.getSession().getAttribute(ResourceConstants.ATTR_TOOL_SESSION_ID);
-			//learning, list from database, so get item by Uid
-//			get back the resource and item list and display them on page
+		String mode = request.getParameter(AttributeNames.ATTR_MODE);
+		ResourceItem item = getResourceItem(request, mode);
+
+		String idStr = request.getParameter(ResourceConstants.ATTR_TOOL_SESSION_ID);
+		Long sessionId = NumberUtils.createLong(idStr);
+		//mark this item access flag if it is learner
+		if(ToolAccessMode.LEARNER.toString().equals(mode)){
 			IResourceService service = getResourceService();			
-			item = service.getResourceItemByUid(itemUid);
 			HttpSession ss = SessionManager.getSession();
 			//get back login user DTO
 			UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-			service.setItemAccess(itemUid,new Long(user.getUserID().intValue()),sessionId);
-		}
-		if(item != null){
-			Set instructions = item.getItemInstructions();
-			InstructionNavForm navForm = (InstructionNavForm) form;
-			//For Learner upload item, its instruction will display description/comment fields in ReosourceItem.
-			if(!item.isCreateByAuthor()){
-				List<ResourceItemInstruction> navItems = new ArrayList<ResourceItemInstruction>(1);
-				//create a new instruction and put ResourceItem description into it: just for display use.
-				ResourceItemInstruction ins = new ResourceItemInstruction();
-				ins.setSequenceId(1);
-				ins.setDescription(item.getDescription());
-				navItems.add(ins);
-				navForm.setAllInstructions(navItems);
-				instructions.add(ins);
-			}else{
-				navForm.setAllInstructions(new ArrayList(instructions));
-			}
-			navForm.setTitle(item.getTitle());
-			navForm.setType(item.getType());
-			navForm.setTotal(instructions.size());
-			if(instructions.size() > 0){
-				navForm.setCurrent(1);
-				navForm.setInstruction((ResourceItemInstruction) instructions.iterator().next());
-			}else{
-				navForm.setCurrent(0);
-				navForm.setInstruction(null);
-			}
-			if(item.getType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT)
-				request.getSession().setAttribute(ResourceConstants.ATT_LEARNING_OBJECT,item);
-			//set url to content frame
-			request.setAttribute(ResourceConstants.ATTR_RESOURCE_REVIEW_URL,getReviewUrl(item));
-			return mapping.findForward(ResourceConstants.SUCCESS);
+			service.setItemAccess(item.getUid(),new Long(user.getUserID().intValue()),sessionId);
 		}
 		
-		return mapping.findForward(ResourceConstants.ERROR);
+		if(item == null){
+			return mapping.findForward(ResourceConstants.ERROR);
+		}
+		if(item.getType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT)
+			request.getSession().setAttribute(ResourceConstants.ATT_LEARNING_OBJECT,item);
+		//set url to content frame
+		request.setAttribute(ResourceConstants.ATTR_RESOURCE_REVIEW_URL,getReviewUrl(item));
+		
+		//these attribute will be use to instruction navigator page
+		request.setAttribute(AttributeNames.ATTR_MODE,mode);
+		int itemIdx = NumberUtils.stringToInt(request.getParameter(ResourceConstants.PARAM_ITEM_INDEX));
+		request.setAttribute(ResourceConstants.PARAM_ITEM_INDEX,itemIdx);
+		Long itemUid = NumberUtils.createLong(request.getParameter(ResourceConstants.PARAM_RESOURCE_ITEM_UID));
+		request.setAttribute(ResourceConstants.PARAM_RESOURCE_ITEM_UID,itemUid);
+		request.setAttribute(ResourceConstants.ATTR_TOOL_SESSION_ID,sessionId);
+		
+		return mapping.findForward(ResourceConstants.SUCCESS);
+		
 	}
 	//*************************************************************************************
 	// Private method 
 	//*************************************************************************************
+	/**
+	 * Return resoruce item according to ToolAccessMode.
+	 * @param request
+	 * @param mode
+	 * @return
+	 */
+	private ResourceItem getResourceItem(HttpServletRequest request, String mode) {
+		ResourceItem item = null;		
+		if(ToolAccessMode.AUTHOR.toString().equals(mode)){
+			int itemIdx = NumberUtils.stringToInt(request.getParameter(ResourceConstants.PARAM_ITEM_INDEX),0);
+			//authoring: does not save item yet, so only has ItemList from session and identity by Index
+			List<ResourceItem> resourceList = getResourceItemList(request);
+			item = resourceList.get(itemIdx);
+		}else if(ToolAccessMode.LEARNER.toString().equals(mode) || ToolAccessMode.TEACHER.toString().equals(mode)){
+			Long itemUid = NumberUtils.createLong(request.getParameter(ResourceConstants.PARAM_RESOURCE_ITEM_UID));
+//			get back the resource and item list and display them on page
+			IResourceService service = getResourceService();			
+			item = service.getResourceItemByUid(itemUid);
+		}
+		return item;
+	}
+	
 	private IResourceService getResourceService() {
 	      WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
 	      return (IResourceService) wac.getBean(ResourceConstants.RESOURCE_SERVICE);

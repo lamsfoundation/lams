@@ -21,7 +21,7 @@
 	        } 
 	        
 		    function viewItem(itemUid){
-				var myUrl = "<c:url value="/reviewItem.do"/>?itemUid=" + itemUid;
+				var myUrl = "<c:url value="/reviewItem.do"/>?mode=teacher&itemUid=" + itemUid;
 				launchPopup(myUrl,"MonitoringReview");
 			}
 	    </script>		 

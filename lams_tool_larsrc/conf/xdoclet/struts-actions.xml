@@ -129,18 +129,11 @@
 		<!-- ==========  Display Item  ========== -->
 		<action path="/reviewItem"
 			type="org.lamsfoundation.lams.tool.rsrc.web.action.ViewItemAction"
-			name="instructionNavForm" 
-			scope="session" 
-			validate="false"
 			parameter="reviewItem">
 			<forward name="success" path="/pages/itemreview/mainframe.jsp" />
 		</action>
-		
 		<action path="/nextInstruction"
 			type="org.lamsfoundation.lams.tool.rsrc.web.action.ViewItemAction"
-			name="instructionNavForm" 
-			scope="session" 
-			validate="false"
 			parameter="nextInstruction">
 			<forward name="success" path="/pages/itemreview/instructionsnav.jsp" />
 		</action>
@@ -161,7 +154,6 @@
 			input="/pages/learning/learning.jsp"
 			parameter="finish" >
 			<forward name="finish" path="/pages/learning/finish.jsp" />
-			<forward name="previewfinish" path="/pages/learning/previewfinish.jsp" />
 		</action>
 		
 		<action path="/learning/saveOrUpdateItem"

@@ -22,7 +22,7 @@
 
 	function previewItem(type,idx){
 		//1:url, 2:file, 3:website,4:learning object
-		var myUrl = "<c:url value='/reviewItem.do?itemIndex='/>"+idx;
+		var myUrl = "<c:url value='/reviewItem.do?mode=author&itemIndex='/>"+idx;
 		launchPopup(myUrl,"Review");
 	}
 	

@@ -170,7 +170,7 @@ public class ResourceItem  implements Cloneable{
 	     * @hibernate.set   lazy="false"
 	     * 					cascade="all-delete-orphan"
 	     * 					inverse="false"
-	     * 					order-by="sequence_id desc"
+	     * 					order-by="sequence_id asc"
 	     * @hibernate.collection-key column="item_uid"
 	     * @hibernate.collection-one-to-many
 	     * 			class="org.lamsfoundation.lams.tool.rsrc.model.ResourceItemInstruction"

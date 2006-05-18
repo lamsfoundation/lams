@@ -22,21 +22,18 @@
  */
 
 /* $Id$ */
-package org.lamsfoundation.lams.tool.rsrc.web.form;
+package org.lamsfoundation.lams.tool.rsrc.dto;
 
 import java.util.List;
-import java.util.Set;
 
-import org.apache.struts.action.ActionForm;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItemInstruction;
 
 /**
  * 
  * @author Steve.Ni
- * @struts.form name="instructionNavForm"
  * @version $Revision$
  */
-public class InstructionNavForm extends ActionForm {
+public class InstructionNavDTO {
 	
 	private String title;
 	private int total;

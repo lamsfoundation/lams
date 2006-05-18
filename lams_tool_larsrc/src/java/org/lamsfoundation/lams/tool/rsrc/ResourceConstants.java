@@ -47,6 +47,7 @@ public class ResourceConstants {
 	public static final String PARAM_FILE_UUID = "fileUuid";
 	public static final String PARAM_ITEM_INDEX = "itemIndex";
 	public static final String PARAM_RESOURCE_ITEM_UID = "itemUid";
+	public static final String PARAM_CURRENT_INSTRUCTION_INDEX = "insIdx";
 	
 	//for request attribute name
 	public static final String ATTR_TOOL_CONTENT_ID = "toolContentID";
@@ -65,6 +66,7 @@ public class ResourceConstants {
 	public static final String ATTR_NEXT_ACTIVITY_URL = "nextActivityUrl";
 	public static final String ATTR_SUMMARY_LIST = "summaryList";
 	public static final String ATTR_USER_LIST = "userList";
+	public static final String ATTR_RESOURCE_INSTRUCTION = "instructions";
 	
 	//error message keys
 	public static final String ERROR_MSG_TITLE_BLANK = "error.resource.item.title.blank";
