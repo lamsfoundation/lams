@@ -33,7 +33,7 @@ import mx.utils.*
 class WizardController extends AbstractController {
 	private var _wizardModel:WizardModel;
 	private var _wizardController:WizardController;
-	
+	private var _isBusy:Boolean;
 	/**
 	* Constructor
 	*
@@ -43,7 +43,7 @@ class WizardController extends AbstractController {
 		super (wm);
 		_wizardModel = WizardModel(model);
 		_wizardController = this;
-
+		_isBusy = false;
 	}
 	
 	// add control methods
@@ -51,6 +51,8 @@ class WizardController extends AbstractController {
 
 	public function click(evt):Void{
 		trace(evt.target);
+		var tgt:String = new String(evt.target);
+		
 		// button click event handler - next, prev, finish, cancel
 	}
 	
@@ -93,11 +95,24 @@ class WizardController extends AbstractController {
 	public function onTreeNodeChange (evt:Object){
 		Debugger.log('type::'+evt.type,Debugger.GEN,'onTreeNodeChange','org.lamsfoundation.lams.MonitorController');
 		var treeview = evt.target;
-		_wizardModel.setSelectedTreeNode(treeview.selectedNode);
+		if(!_isBusy){
+			setBusy();
+			_wizardModel.setSelectedTreeNode(treeview.selectedNode);
+		} else {
+			treeview.selectedNode = _wizardModel.getSelectedTreeNode();
+		}
 	}
 	
 	private function getView():WizardView{
 		return WizardView(super.getView());
+	}
+	
+	public function setBusy(){
+		_isBusy = true;
+	}
+	
+	public function clearBusy(){
+		_isBusy = false;
 	}
 	
 }
