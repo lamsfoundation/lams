@@ -52,7 +52,6 @@ import org.lamsfoundation.lams.tool.forum.persistence.Forum;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumException;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumToolSession;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
-import org.lamsfoundation.lams.tool.forum.persistence.ForumUserDao;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
 import org.lamsfoundation.lams.tool.forum.persistence.PersistenceException;
 import org.lamsfoundation.lams.tool.forum.service.ForumServiceProxy;
@@ -449,15 +448,29 @@ public class LearningAction extends Action {
 
 		MessageForm messageForm = (MessageForm) form;
 		Message message = messageForm.getMessage();
+		
+		boolean makeAuditEntry = ToolAccessMode.TEACHER.equals((ToolAccessMode) request.getSession().getAttribute(ForumConstants.MODE));
+		String oldMessageString = null;
+
 		// get PO from database and sync with Form
 		Message messagePO = forumService.getMessage(topicId);
+		if ( makeAuditEntry ) {
+			oldMessageString = messagePO.toString();
+		}
 		messagePO.setSubject(message.getSubject());
 		messagePO.setBody(message.getBody());
 		messagePO.setUpdated(new Date());
 		messagePO.setModifiedBy(getCurrentUser(request));
 		setAttachment(messageForm, messagePO);
 
+		if ( makeAuditEntry ) {
+			forumService.getAuditService().logChange(ForumConstants.TOOL_SIGNATURE,
+		 			messagePO.getCreatedBy().getUserId(), messagePO.getCreatedBy().getLoginName(),
+		 			oldMessageString, messagePO.toString());
+		 } 
+
 		// save message into database
+ 	    // if we are in monitoring then we are probably editing some else's entry so log the change.
 		forumService.updateTopic(messagePO);
 
 		// echo back this topic thread into page
@@ -536,11 +549,25 @@ public class LearningAction extends Action {
 		Long uuID = new Long(WebUtil.readLongParam(request, "uuid"));
 		forumService = getForumManager();
 		forumService.deleteFromRepository(uuID, versionID);
+		
+		boolean makeAuditEntry = ToolAccessMode.TEACHER.equals((ToolAccessMode) request.getSession().getAttribute(ForumConstants.MODE));
+		String oldMessageString = null;
+		
 		// get value from HttpSession
 		Message messagePO = forumService.getMessage(topicId);
+		if ( makeAuditEntry ) {
+			oldMessageString = messagePO.toString();
+		}
 		messagePO.setUpdated(new Date());
 		messagePO.setModifiedBy(getCurrentUser(request));
 		messagePO.setAttachments(null);
+		
+		if ( makeAuditEntry ) {
+			forumService.getAuditService().logChange(ForumConstants.TOOL_SIGNATURE,
+		 			messagePO.getCreatedBy().getUserId(), messagePO.getCreatedBy().getLoginName(),
+		 			oldMessageString, messagePO.toString());
+		 } 
+
 		// save message into database
 		forumService.updateTopic(messagePO);
 

@@ -33,6 +33,7 @@ import org.lamsfoundation.lams.tool.forum.persistence.ForumToolSession;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
 import org.lamsfoundation.lams.tool.forum.persistence.PersistenceException;
+import org.lamsfoundation.lams.util.audit.IAuditService;
 
 /**
  * User: conradb
@@ -266,4 +267,8 @@ public interface IForumService {
 	// Miscellaneous Method
 	//************************************************************************************	
 	public void releaseMarksForSession(Long sessionID);
+	
+	/** The topic updates (for monitoring) are done in the web layer, so need the audit service to log the updates */
+	public IAuditService getAuditService( );
+
 }

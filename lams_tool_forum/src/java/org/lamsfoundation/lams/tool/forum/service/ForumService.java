@@ -79,6 +79,7 @@ import org.lamsfoundation.lams.tool.forum.util.ForumToolContentHandler;
 import org.lamsfoundation.lams.tool.forum.util.TopicComparator;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.audit.IAuditService;
 
 /**
  * 
@@ -100,15 +101,24 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	private ForumToolContentHandler forumToolContentHandler;
 	private IRepositoryService repositoryService;
 	private ILearnerService learnerService;
+	private IAuditService auditService;
     private MessageService messageService;
 	//---------------------------------------------------------------------
     // Inversion of Control Methods - Method injection
     //---------------------------------------------------------------------
+	public void setAuditService(IAuditService auditService) {
+		this.auditService = auditService;
+	}
+
+	public IAuditService getAuditService( ) {
+		return auditService;
+	}
+
 	public void setMessageService(MessageService messageService) {
 		this.messageService = messageService;
 	}
 	
-    public Forum updateForum(Forum forum) throws PersistenceException {
+	public Forum updateForum(Forum forum) throws PersistenceException {
         forumDao.saveOrUpdate(forum);
         return forum;
     }
@@ -162,6 +172,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
     }
 
      public Message updateTopic(Message message) throws PersistenceException {
+    	 
     	 //update message
     	messageDao.saveOrUpdate(message);
     	
@@ -178,10 +189,20 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
     public Message updateMessageHideFlag(Long messageId, boolean hideFlag) {
     	
     	Message message = getMessage(messageId);
-    	message.setHideFlag(hideFlag);
-    	
-    	// update message
-    	messageDao.update(message);
+    	if ( message !=null ) {
+			if ( hideFlag ) {
+				auditService.logHideEntry(ForumConstants.TOOL_SIGNATURE, message.getCreatedBy().getUserId(), 
+						message.getCreatedBy().getLoginName(), message.toString());
+			} else {
+				auditService.logShowEntry(ForumConstants.TOOL_SIGNATURE, message.getCreatedBy().getUserId(), 
+						message.getCreatedBy().getLoginName(), message.toString());
+			}
+
+	    	message.setHideFlag(hideFlag);
+	    	
+	    	// update message
+	    	messageDao.update(message);
+    	}
     	return message;
      }
 
@@ -293,7 +314,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		List unsortedThread =  messageSeqDao.getTopicThread(rootTopicId);
 		Iterator iter = unsortedThread.iterator();
 		MessageSeq msgSeq;
-		SortedMap map = new TreeMap(new TopicComparator());
+		SortedMap<MessageSeq,Message> map = new TreeMap<MessageSeq,Message>(new TopicComparator());
 		while(iter.hasNext()){
 			msgSeq = (MessageSeq) iter.next();
 			map.put(msgSeq,msgSeq.getMessage());
@@ -313,7 +334,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		
 		//sorted by last post date
 		Message msg;
-		SortedMap map = new TreeMap(new DateComparator());
+		SortedMap<Date,Message> map = new TreeMap<Date,Message>(new DateComparator());
 		Iterator iter = topicsBySession.iterator();
 		while(iter.hasNext()){
 			msg = (Message) iter.next();
@@ -324,7 +345,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 			msg = (Message) iter.next();
 			map.put(msg.getLastReplyDate(),msg);
 		}
-		return 	MessageDTO.getMessageDTO(new ArrayList(map.values()));
+		return 	MessageDTO.getMessageDTO(new ArrayList<Message>(map.values()));
 		
 	}
 
@@ -355,14 +376,14 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	public List getAuthoredTopics(Long forumUid) {
 		List list = messageDao.getTopicsFromAuthor(forumUid);
 		
-		TreeMap map = new TreeMap(new DateComparator());
+		TreeMap<Date,Message> map = new TreeMap<Date,Message>(new DateComparator());
 		//sorted by create date
 		Iterator iter = list.iterator();
 		while(iter.hasNext()){
 			Message topic = (Message) iter.next();
 			map.put(topic.getCreated(),topic);
 		}
-		return MessageDTO.getMessageDTO(new ArrayList(map.values()));
+		return MessageDTO.getMessageDTO(new ArrayList<Message>(map.values()));
 	}
 
 	public void updateSession(ForumToolSession session) {
@@ -419,10 +440,10 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	 * @param map
 	 * @return
 	 */
-	private List getSortedMessageDTO(SortedMap map) {
+	private List getSortedMessageDTO(SortedMap<MessageSeq,Message> map) {
 		Iterator iter;
 		MessageSeq msgSeq;
-		List msgDtoList = new ArrayList();
+		List<MessageDTO> msgDtoList = new ArrayList<MessageDTO>();
 		iter =map.entrySet().iterator();
 		while(iter.hasNext()){
 			Map.Entry entry = (Entry) iter.next();
@@ -491,7 +512,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		}
 	}
     private Forum getDefaultForum(){
-    	Long defaultForumId = getToolDefaultContentIdBySignature(ForumConstants.TOOLSIGNNATURE);
+    	Long defaultForumId = getToolDefaultContentIdBySignature(ForumConstants.TOOL_SIGNATURE);
     	Forum defaultForum = getForumByContentId(defaultForumId);
     	if(defaultForum == null)
     	{

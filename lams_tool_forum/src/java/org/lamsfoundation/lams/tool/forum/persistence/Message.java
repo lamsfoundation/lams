@@ -31,6 +31,7 @@ import java.util.TreeSet;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
@@ -452,5 +453,11 @@ public class Message implements Cloneable{
 	public void setReport(ForumReport report) {
 		this.report = report;
 	}
-
+	
+	public String toString() {
+		return new ToStringBuilder(this).
+			append("uid",uid).
+			append("subject",subject).
+			append("body",body).toString();
+	}
 }
