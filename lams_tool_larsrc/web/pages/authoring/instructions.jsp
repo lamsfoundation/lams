@@ -78,7 +78,7 @@
 				<fmt:message key="label.authoring.online.file" />:
 			</td>
 			<td class="formcontrol">
-				<html:file property="onlineFile" styleClass="buttonStyle">
+				<html:file property="onlineFile">
 					<fmt:message key="label.authoring.choosefile.button" />
 				</html:file>
 				<html:button onclick="javascript:doUploadOnline();" property="uploadOnlineSubmit" styleClass="buttonStyle">
@@ -108,7 +108,7 @@
 				<fmt:message key="label.authoring.offline.file" />:
 			</td>
 			<td class="formcontrol">
-				<html:file property="offlineFile" styleClass="buttonStyle">
+				<html:file property="offlineFile">
 					<fmt:message key="label.authoring.choosefile.button" />
 				</html:file>
 				<html:button onclick="javascript:doUploadOffline();" property="uploadOfflineSubmit" styleClass="buttonStyle">
