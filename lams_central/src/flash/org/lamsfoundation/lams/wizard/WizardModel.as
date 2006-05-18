@@ -349,7 +349,7 @@ class WizardModel extends Observable{
 	 * @usage   
 	 * @return  
 	 */
-	public function getSelectedOrgTreeNode ():XMLNode {
+	public function getSelectedTreeNode ():XMLNode {
 		return _selectedOrgTreeNode;
 	}
 
