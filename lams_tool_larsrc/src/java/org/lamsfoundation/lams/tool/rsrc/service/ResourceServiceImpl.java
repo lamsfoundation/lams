@@ -515,8 +515,13 @@ public class ResourceServiceImpl implements
 	public void setItemVisible(Long itemUid, boolean visible) {
 		ResourceItem item = resourceItemDao.getByUid(itemUid);
 		if ( item != null ) {
-			auditService.logHide(ResourceConstants.TOOL_SIGNATURE, item.getCreateBy().getUserId(), 
+			if ( visible ) {
+				auditService.logShowEntry(ResourceConstants.TOOL_SIGNATURE, item.getCreateBy().getUserId(), 
 					item.getCreateBy().getLoginName(), item.toString());
+			} else {
+				auditService.logHideEntry(ResourceConstants.TOOL_SIGNATURE, item.getCreateBy().getUserId(), 
+						item.getCreateBy().getLoginName(), item.toString());
+			}
 			item.setHide(!visible);
 			resourceItemDao.saveObject(item);
 		}
