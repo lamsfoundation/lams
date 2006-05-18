@@ -61,8 +61,18 @@ class WizardView extends AbstractView {
     //private var bkg_pnl:MovieClip;
 
 	private var org_treeview:Tree;              //Treeview for navigation through workspace folder structure
+	
+	// step 1 UI elements
+	private var currentPath_lbl:Label;
 	private var location_treeview:Tree;
 
+	// step 2 UI elements
+	private var title_lbl:Label;
+	private var resourceTitle_txi:TextInput;
+	private var desc_lbl:Label;
+    private var resourceDesc_txa:TextArea;
+	
+	// step 3 UI elements
 	private var _staffList:Array;
 	private var _learnerList:Array;
 	private var _learner_mc:MovieClip;
@@ -72,12 +82,20 @@ class WizardView extends AbstractView {
 	private var learner_scp:MovieClip;		// learners container
 	private var learner_lbl:Label;
 	
-	//private var input_txt:TextInput;
-	private var currentPath_lbl:Label;
-	private var title_lbl:Label;
-	private var resourceTitle_txi:TextInput;
-	private var desc_lbl:Label;
-    private var resourceDesc_txa:TextArea;
+	// step 4 UI elements
+	private var staff_grp_lbl:Label;
+	private var learner_grp_lbl:Label;
+	private var staff_grp_txi:TextInput;
+	private var learner_grp_txi:TextInput;
+	
+	// step 5 UI elements
+	private var schedule_cb:CheckBox;
+	private var start_btn:Button;
+	private var schedule_time:MovieClip;
+	private var summery_lbl:Label;
+	private var summery_scp:MovieClip;
+	private var _summery_mc:MovieClip;
+	private var _summeryList:Array;
 	
 	//Dimensions for resizing
     private var xOkOffset:Number;
@@ -131,6 +149,8 @@ class WizardView extends AbstractView {
 		
 		currentPath_lbl.text = "<b>"+Dictionary.getValue('ws_dlg_location_button')+"</b>:"
 
+		// event listeners		
+		
 		trace('org tree:' + org_treeview);
 		MovieClipUtils.doLater(Proxy.create(this,draw)); 
 		
@@ -153,6 +173,7 @@ class WizardView extends AbstractView {
 			case 'USERS_LOADED' :
 				loadLearners(wm.organisation.getLearners());
 				loadStaff(wm.organisation.getStaff());
+				_wizardController.clearBusy();
 				break;
             case 'POSITION' :
 				setPosition(wm);
@@ -226,6 +247,9 @@ class WizardView extends AbstractView {
 		prev_btn.addEventListener('click',Delegate.create(this, prev));
 		finish_btn.addEventListener('click',Delegate.create(this, finish));
 		cancel_btn.addEventListener('click',Delegate.create(this, cancel));
+		start_btn.addEventListener('click', Delegate.create(this, start));
+		schedule_cb.addEventListener("click", Delegate.create(this, scheduleChange));
+
 		//Set up the treeview
         setUpTreeview();
 		//itemSelected(location_treeview.selectedNode, WorkspaceModel(workspaceView.getModel()));
@@ -278,12 +302,16 @@ class WizardView extends AbstractView {
 	 * @usage   
 	 * @return  
 	 */
-	private function setUpBranchesInit(treeview:Tree, data:XML){
+	private function setUpBranchesInit(treeview:Tree, data:XML, hideRoot:Boolean){
 		Debugger.log('Running...',Debugger.GEN,'setUpBranchesInit','org.lamsfoundation.lams.wizard.WizardView');
 		//get the 1st child
 		trace(data)
-		treeview.dataProvider = data;
-		var fNode = location_treeview.dataProvider.firstChild;
+		if(hideRoot){
+			treeview.dataProvider = data.firstChild;
+		} else {
+			treeview.dataProvider = data;
+		}
+		var fNode = treeview.dataProvider.firstChild;
 		trace(fNode);
 		setBranches(fNode);
 		treeview.refresh();
@@ -298,7 +326,7 @@ class WizardView extends AbstractView {
 	 */
 	private function setUpTreeview(){
 			
-		setUpBranchesInit(location_treeview, WorkspaceModel(workspaceView.getModel()).treeDP);
+		setUpBranchesInit(location_treeview, WorkspaceModel(workspaceView.getModel()).treeDP, false);
 		_workspaceController = _workspaceView.getController();
 		location_treeview.addEventListener("nodeOpen", Delegate.create(_workspaceController, _workspaceController.onTreeNodeOpen));
 		location_treeview.addEventListener("nodeClose", Delegate.create(_workspaceController, _workspaceController.onTreeNodeClose));
@@ -315,7 +343,7 @@ class WizardView extends AbstractView {
 			
 		//Debugger.log('_workspaceView:'+_workspaceView,Debugger.GEN,'setUpTreeview','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
 		
-		setUpBranchesInit(org_treeview, WizardModel(getModel()).treeDP);
+		setUpBranchesInit(org_treeview, WizardModel(getModel()).treeDP, true);
 		
 		org_treeview.addEventListener("nodeOpen", Delegate.create(_wizardController, _wizardController.onTreeNodeOpen));
 		org_treeview.addEventListener("nodeClose", Delegate.create(_wizardController, _wizardController.onTreeNodeClose));
@@ -393,7 +421,7 @@ class WizardView extends AbstractView {
     * Called by the NEXT button
 	*
 	*/
-    private function next(){
+    private function next(evt:Object){
         trace('NEXT CLICKED');
 		_global.breakpoint();
 		var wm:WizardModel = WizardModel(getModel());
@@ -403,23 +431,36 @@ class WizardView extends AbstractView {
 		}
     }
 	
-	private function prev(){
+	private function prev(evt:Object){
 		trace('PREV CLICKED');
 		var wm:WizardModel = WizardModel(getModel());
-		if(validateStep(wm)){
-			wm.stepID--;
-			trace('new step ID: ' + wm.stepID);
-		}
+		wm.stepID--;
+		trace('new step ID: ' + wm.stepID);
 	}
 	
-	private function finish(){
+	private function finish(evt:Object){
 		trace('FINISH CLICKED');
 	}
 	
-	private function cancel(){
+	private function start(evt:Object){
+		trace('START CLICKED');
+	}
+	
+	private function cancel(evt:Object){
 		// close window
 		trace('CANCEL CLICKED');
 		//getURL('javascript:window.close()');
+	}
+	
+	private function scheduleChange(evt:Object){
+		trace(evt.target);
+		trace('schedule clicked : ' + schedule_cb.selected);
+		var isSelected:Boolean = schedule_cb.selected;
+		if(isSelected){
+			schedule_time.f_enableTimeSelect(true);
+		} else {
+			schedule_time.f_enableTimeSelect(false);
+		}
 	}
 	
 	// SCREEN UPDATES
@@ -442,6 +483,11 @@ class WizardView extends AbstractView {
 			case 4:
 				clearStep4();
 				break;
+			case 5:
+				clearStep5();
+				break;
+			default:
+				trace('unknown step');
 		}
 		
 		switch(sh_step){
@@ -460,6 +506,11 @@ class WizardView extends AbstractView {
 			case 4:
 				showStep4();
 				break;
+			case 5:
+				showStep5();
+				break;
+			default:
+				trace('unknown step');
 		}
 		
 		
@@ -480,6 +531,9 @@ class WizardView extends AbstractView {
 				break;
 			case 4:
 				return validateStep4(wm);
+				break;
+			case 4:
+				return validateStep5(wm);
 				break;
 			default:
 				return false;
@@ -518,6 +572,19 @@ class WizardView extends AbstractView {
 		staff_scp.visible = false;
 		learner_lbl.visible = false;
 		learner_scp.visible = false;
+		
+		// hide step 4 (Startup)
+		staff_grp_lbl.visible = false;
+		learner_grp_lbl.visible = false;
+		staff_grp_txi.visible = false;
+		learner_grp_txi.visible = false;
+		
+		// hide step 5 (Startup)
+		start_btn.visible = false;
+		summery_scp.visible = false;
+		summery_lbl.visible = false;
+		schedule_cb.visible = false;
+		schedule_time._visible = false;
 	}
 	
 	private function clearStep1():Void{
@@ -580,6 +647,10 @@ class WizardView extends AbstractView {
 			valid = false;
 		}
 		
+		if(valid){
+			resultDTO.resourceTitle = resourceTitle_txi.text;
+			resultDTO.resourceDescription = resourceDesc_txa.text;
+		} 
 		return valid;
 	}
 	
@@ -605,18 +676,164 @@ class WizardView extends AbstractView {
 		learner_scp.visible = false;
 	}
 	private function validateStep3(wm:WizardModel):Boolean{
-		return true;
+		_global.breakpoint();
+		
+		var valid:Boolean = true;
+		var snode = org_treeview.selectedNode;
+		var pnode = snode.parentNode;
+		var learnerCount:Number = 0;
+		var staffCount:Number = 0;
+			
+		if(snode == null){
+			trace('no course/class selected');
+			return false;
+		} else {
+			// add selected users to dto
+			trace('learners')
+			
+			
+			for(var i=0; i<learnerList.length;i++){
+				if(learnerList[i].user_cb.selected){
+					trace('select item: ' + learnerList[i].fullName.text);
+					learnerCount++;
+				}
+			}
+			
+	
+			trace('staff')
+			for(var i=0; i<staffList.length;i++){
+				if(staffList[i].user_cb.selected){
+					trace('select item: ' + staffList[i].fullName.text);
+					staffCount++;
+				}
+			}
+			
+			if(learnerCount <= 0){
+				trace('no learners selected');
+				valid = false;
+			}
+			
+			if(staffCount <= 0){
+				trace('no staff selected');
+				valid = false;
+			}
+			
+		}
+		
+		if(valid){
+			var selectedOrgID:Number = Number(snode.attributes.data.organisationID);
+			resultDTO.organisationID = selectedOrgID;
+			
+			if(snode.attributes.isBranch){
+				resultDTO.courseName = snode.attributes.data.name;
+				resultDTO.className = "";
+			} else {
+				resultDTO.className = snode.attributes.data.name;
+				resultDTO.courseName = pnode.attributes.data.name;
+			}
+			
+			resultDTO.staffCount = staffCount;
+			resultDTO.learnerCount = learnerCount;
+			
+			
+			trace('selected org ID is: ' + selectedOrgID);
+			
+		}
+		
+		return valid;
 	}
+	
 	
 	private function showStep4():Void{
 		trace('showing step 4');
-	}
-	
-	private function clearStep4():Void{
+		
+		staff_grp_lbl.visible = true;
+		learner_grp_lbl.visible = true;
+		staff_grp_txi.visible = true;
+		learner_grp_txi.visible = true;
+		
+		// set default values
+		var orgName:String = org_treeview.selectedNode.attributes.data.name;
+		staff_grp_txi.text = orgName + ' staff';
+		learner_grp_txi.text = orgName + ' learners';
 		
 	}
 	
+	private function clearStep4():Void{
+		staff_grp_lbl.visible = false;
+		learner_grp_lbl.visible = false;
+		staff_grp_txi.visible = false;
+		learner_grp_txi.visible = false;
+	}
+	
 	private function validateStep4(wm:WizardModel):Boolean{
+		var valid:Boolean = true;
+		
+		if(staff_grp_txi.text == ""){
+			trace('missing staff group name')
+			valid = false;
+		}
+		
+		if(learner_grp_txi.text == ""){
+			trace('missing learners group name');
+			valid = false;
+		}
+		
+		if(valid){
+			resultDTO.staffgroup = staff_grp_txi.text;
+			resultDTO.learnergroup = learner_grp_txi.text;
+		}
+		
+		return valid;
+	}
+	
+	private function showStep5():Void{
+		
+		writeSummery();
+		
+		summery_lbl.visible = true;
+		summery_scp.visible = true;
+		schedule_cb.visible = true;
+		start_btn.visible = true;
+		if(schedule_cb.selected){
+			schedule_time.f_enableTimeSelect(true);
+		} else {
+			schedule_time.f_enableTimeSelect(false);
+		}
+		schedule_time._visible = true;
+		next_btn.enabled = false;
+		finish_btn.enabled = true;
+	}
+	
+	private function writeSummery():Void{
+		if(_summery_mc != null){
+			_summery_mc.removeMovieClip();
+		}
+		_summery_mc = summery_scp.content.attachMovie('wizardSummery', 'wizardSummery', 0, {_x:0, _y:0});
+		_summery_mc.design_txt.text = resultDTO.designName;
+		_summery_mc.title_txt.text = resultDTO.resourceTitle;
+		_summery_mc.desc_txt.text = resultDTO.resourceDescription;
+		_summery_mc.coursename_txt.text = resultDTO.courseName;
+		_summery_mc.classname_txt.text = resultDTO.className;
+		_summery_mc.staffgroup_txt.text = resultDTO.staffgroup;
+		_summery_mc.learnergroup_txt.text = resultDTO.learnergroup;
+		_summery_mc.staff_txt.text = String(resultDTO.staffCount) + '/' + staffList.length;
+		_summery_mc.learners_txt.text = String(resultDTO.learnerCount) + '/' + learnerList.length;
+	}
+	
+	
+	
+	private function clearStep5():Void{
+		summery_lbl.visible = false;
+		summery_scp.visible = false;
+		schedule_cb.visible = false;
+		start_btn.visible = false;
+		schedule_time._visible = false;
+		next_btn.enabled = true;
+		finish_btn.enabled = false;
+	}
+	
+	private function validateStep5(wm:WizardModel):Boolean{
 		return true;
 	}
 	
@@ -637,20 +854,17 @@ class WizardView extends AbstractView {
 		
 		if(useResourceID){
 			//its an LD
-			_resultDTO.selectedResourceID = Number(snode.attributes.data.resourceID);
-			_resultDTO.targetWorkspaceFolderID = Number(snode.attributes.data.workspaceFolderID);
+			resultDTO.selectedResourceID = Number(snode.attributes.data.resourceID);
+			resultDTO.targetWorkspaceFolderID = Number(snode.attributes.data.workspaceFolderID);
+			resultDTO.designName = snode.attributes.data.name;
 		}else{
 			//its a folder
-			_resultDTO.selectedResourceID  = null;
-			_resultDTO.targetWorkspaceFolderID = Number(snode.attributes.data.resourceID);
-			
+			resultDTO.selectedResourceID  = null;
+			resultDTO.targetWorkspaceFolderID = Number(snode.attributes.data.resourceID);
+			resultDTO.designName = snode.attributes.data.name;
 		}
-		
-		_resultDTO.resourceName = resourceTitle_txi.text;
-		_resultDTO.resourceDescription = resourceDesc_txa.text;
-		
 
-        dispatchEvent({type:'okClicked',target:this});
+       dispatchEvent({type:'okClicked',target:this});
 		
 	}
 	
@@ -658,7 +872,7 @@ class WizardView extends AbstractView {
 	* Clear Method to clear movies from scrollpane
 	* 
 	*/
-	public function clearScp(array:Array):Array{
+	public static function clearScp(array:Array):Array{
 		if(array != null){
 			for (var i=0; i <array.length; i++){
 				array[i].removeMovieClip();
@@ -676,7 +890,7 @@ class WizardView extends AbstractView {
 	
 	public function loadLearners(users:Array):Void{
 		trace('loading Learners...');
-		_learnerList = clearScp(_learnerList);
+		_learnerList = WizardView.clearScp(_learnerList);
 		_learner_mc = learner_scp.content;
 			
 		trace('list length: ' + users.length);
@@ -687,12 +901,13 @@ class WizardView extends AbstractView {
 			_learnerList[i].fullName.text = user.getFirstName();
 			_learnerList[i]._x = USERS_X;
 			_learnerList[i]._y = USER_OFFSET * i;
-			_learnerList[i].user_cb.selected = true;
+			var listItem:MovieClip = MovieClip(_learnerList[i]);
+			listItem.attachMovie('CheckBox', 'user_cb', listItem.getNextHighestDepth(), {_x:0, _y:3, selected:true})
 			trace('new row: ' + _learnerList[i]);
 			trace('loading: user ' + user.getFirstName() + ' ' + user.getLastName());
 			
-			learner_scp.redraw(true);
 		}
+		learner_scp.redraw(true);
 	}
 	
 	/**
@@ -702,7 +917,7 @@ class WizardView extends AbstractView {
 	public function loadStaff(users:Array):Void{
 		trace('loading Staff....');
 		trace('list length: ' + users.length);
-		_staffList = clearScp(_staffList);
+		_staffList = WizardView.clearScp(_staffList);
 		_staff_mc = staff_scp.content;
 		
 		for(var i=0; i<users.length; i++){
@@ -712,10 +927,13 @@ class WizardView extends AbstractView {
 			_staffList[i].fullName.text = user.getFirstName();
 			_staffList[i]._x = USERS_X;
 			_staffList[i]._y = USER_OFFSET * i;
-			_staffList[i].user_cb.selected = true;
+			var listItem:MovieClip = MovieClip(_staffList[i]);
+			listItem.attachMovie('CheckBox', 'user_cb', listItem.getNextHighestDepth(), {_x:0, _y:3, selected:true})
+			
 			trace('loading: user ' + user.getFirstName() + ' ' + user.getLastName());
-			staff_scp.redraw(true);
+			
 		}
+		staff_scp.redraw(true);
 	}
 	
 	/**
