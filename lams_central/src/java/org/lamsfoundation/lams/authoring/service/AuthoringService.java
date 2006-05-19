@@ -271,11 +271,10 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	 * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getLearningDesignDetails(java.lang.Long)
 	 */
 	public String getLearningDesignDetails(Long learningDesignID)throws IOException{
-		LearningDesign design = learningDesignDAO.getLearningDesignById(learningDesignID);
-		if(design==null)
+		LearningDesignDTO learningDesignDTO = learningDesignService.getLearningDesignDTO(learningDesignID);
+		if(learningDesignDTO==null)
 			flashMessage = FlashMessage.getNoSuchLearningDesignExists("getLearningDesignDetails",learningDesignID);
 		else{
-			LearningDesignDTO learningDesignDTO = design.getLearningDesignDTO();
 			flashMessage = new FlashMessage("getLearningDesignDetails",learningDesignDTO);
 		}
 		return flashMessage.serializeMessage();

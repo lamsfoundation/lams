@@ -549,18 +549,22 @@ public class ObjectExtractor implements IObjectExtractor {
 	    if (keyExists(activityDetails, WDDXTAGS.YCOORD))
 	        activity.setYcoord(WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.YCOORD));
 
-	    if (keyExists(activityDetails, WDDXTAGS.GROUPING_ID))
+	    if (keyExists(activityDetails, WDDXTAGS.GROUPING_UIID))
 	    {
-			Long groupingID = WDDXProcessor.convertToLong(activityDetails,WDDXTAGS.GROUPING_ID);
 			Integer groupingUIID = WDDXProcessor.convertToInteger(activityDetails,WDDXTAGS.GROUPING_UIID);
-			if( groupingID!=null ){
-				Grouping grouping = groupingDAO.getGroupingById(groupingID);
-				activity.setGrouping(grouping);
-				activity.setGroupingUIID(groupingUIID);
+			if ( groupingUIID != null ){
+				Grouping grouping = groupingDAO.getGroupingByUIID(groupingUIID);
+				if ( grouping != null ) {
+					setGrouping(activity, grouping, groupingUIID);
+				} else {
+					log.warn("Unable to find matching grouping for groupingUIID"+groupingUIID+". Activity UUID"+activityUUID+" will not be grouped.");
+					clearGrouping(activity);
+				}
 			} else {
-				activity.setGrouping(null);
-				activity.setGroupingUIID(null);
+				clearGrouping(activity);
 			}
+	    } else {
+			clearGrouping(activity);
 	    }
 		
 		if (keyExists(activityDetails, WDDXTAGS.ORDER_ID))
@@ -590,13 +594,24 @@ public class ObjectExtractor implements IObjectExtractor {
 		if (keyExists(activityDetails, WDDXTAGS.LIBRARY_IMAGE))	
 			activity.setLibraryActivityUiImage(WDDXProcessor.convertToString(activityDetails,WDDXTAGS.LIBRARY_IMAGE));
 		
-		if (keyExists(activityDetails, WDDXTAGS.APPLY_GROUPING))	
-		    activity.setApplyGrouping(WDDXProcessor.convertToBoolean(activityDetails,WDDXTAGS.APPLY_GROUPING));
 		if (keyExists(activityDetails, WDDXTAGS.GROUPING_SUPPORT_TYPE))	
 			activity.setGroupingSupportType(WDDXProcessor.convertToInteger(activityDetails,WDDXTAGS.GROUPING_SUPPORT_TYPE));
 		
 		return activity;
-	}	 
+	}
+
+	private void clearGrouping(Activity activity) {
+		activity.setGrouping(null);
+		activity.setGroupingUIID(null);
+		activity.setApplyGrouping(false);
+	}
+	
+	private void setGrouping(Activity activity, Grouping grouping, Integer groupingUIID) {
+		activity.setGrouping(grouping);
+		activity.setGroupingUIID(groupingUIID);
+		activity.setApplyGrouping(true);
+	}
+
 	private  void processActivityType(Activity activity, Hashtable activityDetails) 
 			throws WDDXProcessorConversionException, ObjectExtractorException {
 		if(activity.isGroupingActivity())
