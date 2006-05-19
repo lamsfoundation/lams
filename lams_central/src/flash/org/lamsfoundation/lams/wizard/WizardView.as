@@ -51,7 +51,11 @@ class WizardView extends AbstractView {
 	public var RT_ORG:String = "Organisation";
 	public static var USERS_X:Number = 10;
 	public static var USER_OFFSET:Number = 20;
-
+	
+	// submission modes
+	public static var FINISH_MODE:Number = 0;
+	public static var START_MODE:Number = 1;
+	public static var START_SCH_MODE:Number = 2;
 
 	private var _wizardView:WizardView;
 	private var _tm:ThemeManager;
@@ -96,7 +100,8 @@ class WizardView extends AbstractView {
 	private var summery_scp:MovieClip;
 	private var _summery_mc:MovieClip;
 	private var _summeryList:Array;
-	
+	private var scheduleDate_dt:DateField;
+
 	//Dimensions for resizing
     private var xOkOffset:Number;
     private var yOkOffset:Number;
@@ -113,6 +118,7 @@ class WizardView extends AbstractView {
 	private var cancel_btn:Button;
 	private var next_btn:Button;
 	private var prev_btn:Button;
+	private var close_btn:Button;
 	
 	private var _resultDTO:Object;
 
@@ -174,6 +180,12 @@ class WizardView extends AbstractView {
 				loadLearners(wm.organisation.getLearners());
 				loadStaff(wm.organisation.getStaff());
 				_wizardController.clearBusy();
+				break;
+			case 'SAVED_LC' :
+				conclusionStep(infoObj.data, wm);
+				break;
+			case 'LESSON_STARTED' :
+				conclusionStep(infoObj.data, wm);
 				break;
             case 'POSITION' :
 				setPosition(wm);
@@ -247,6 +259,7 @@ class WizardView extends AbstractView {
 		prev_btn.addEventListener('click',Delegate.create(this, prev));
 		finish_btn.addEventListener('click',Delegate.create(this, finish));
 		cancel_btn.addEventListener('click',Delegate.create(this, cancel));
+		close_btn.addEventListener('click', Delegate.create(this, close));
 		start_btn.addEventListener('click', Delegate.create(this, start));
 		schedule_cb.addEventListener("click", Delegate.create(this, scheduleChange));
 
@@ -440,10 +453,20 @@ class WizardView extends AbstractView {
 	
 	private function finish(evt:Object){
 		trace('FINISH CLICKED');
+		resultDTO.mode = FINISH_MODE;
+		_wizardController.initializeLesson(resultDTO);
 	}
 	
 	private function start(evt:Object){
 		trace('START CLICKED');
+		if(schedule_cb.selected){
+			resultDTO.scheduleDateTime = getScheduleDateTime(scheduleDate_dt.selectedDate, schedule_time.f_returnTime());
+			trace(resultDTO.scheduleDateTime);
+			resultDTO.mode = START_SCH_MODE;
+		} else {
+			resultDTO.mode = START_MODE;
+		}
+		_wizardController.initializeLesson(resultDTO);
 	}
 	
 	private function cancel(evt:Object){
@@ -452,14 +475,20 @@ class WizardView extends AbstractView {
 		//getURL('javascript:window.close()');
 	}
 	
+	private function close(evt:Object){
+		trace('CLOSE WINDOW');
+	}
+	
 	private function scheduleChange(evt:Object){
 		trace(evt.target);
 		trace('schedule clicked : ' + schedule_cb.selected);
 		var isSelected:Boolean = schedule_cb.selected;
 		if(isSelected){
 			schedule_time.f_enableTimeSelect(true);
+			scheduleDate_dt.enabled = true;
 		} else {
 			schedule_time.f_enableTimeSelect(false);
+			scheduleDate_dt.enabled = false;
 		}
 	}
 	
@@ -486,6 +515,9 @@ class WizardView extends AbstractView {
 			case 5:
 				clearStep5();
 				break;
+			case 6:
+				clearFinish();
+				break;
 			default:
 				trace('unknown step');
 		}
@@ -508,6 +540,9 @@ class WizardView extends AbstractView {
 				break;
 			case 5:
 				showStep5();
+				break;
+			case 6:
+				showFinish();
 				break;
 			default:
 				trace('unknown step');
@@ -558,6 +593,7 @@ class WizardView extends AbstractView {
 		finish_btn.enabled = false;
 		prev_btn.enabled = false;
 		next_btn.enabled = true;
+		close_btn.visible = false;
 		
 		// hide step 2 (Startup)
 		title_lbl.visible = false;
@@ -585,6 +621,7 @@ class WizardView extends AbstractView {
 		summery_lbl.visible = false;
 		schedule_cb.visible = false;
 		schedule_time._visible = false;
+		scheduleDate_dt.visible = false;
 	}
 	
 	private function clearStep1():Void{
@@ -681,8 +718,8 @@ class WizardView extends AbstractView {
 		var valid:Boolean = true;
 		var snode = org_treeview.selectedNode;
 		var pnode = snode.parentNode;
-		var learnerCount:Number = 0;
-		var staffCount:Number = 0;
+		var selectedLearners:Array = new Array();
+		var selectedStaff:Array = new Array();
 			
 		if(snode == null){
 			trace('no course/class selected');
@@ -695,7 +732,7 @@ class WizardView extends AbstractView {
 			for(var i=0; i<learnerList.length;i++){
 				if(learnerList[i].user_cb.selected){
 					trace('select item: ' + learnerList[i].fullName.text);
-					learnerCount++;
+					selectedLearners.push(learnerList[i].data.userID);
 				}
 			}
 			
@@ -704,16 +741,16 @@ class WizardView extends AbstractView {
 			for(var i=0; i<staffList.length;i++){
 				if(staffList[i].user_cb.selected){
 					trace('select item: ' + staffList[i].fullName.text);
-					staffCount++;
+					selectedStaff.push(staffList[i].data.userID);
 				}
 			}
 			
-			if(learnerCount <= 0){
+			if(selectedLearners.length <= 0){
 				trace('no learners selected');
 				valid = false;
 			}
 			
-			if(staffCount <= 0){
+			if(selectedStaff.length <= 0){
 				trace('no staff selected');
 				valid = false;
 			}
@@ -732,8 +769,8 @@ class WizardView extends AbstractView {
 				resultDTO.courseName = pnode.attributes.data.name;
 			}
 			
-			resultDTO.staffCount = staffCount;
-			resultDTO.learnerCount = learnerCount;
+			resultDTO.selectedStaff = selectedStaff;
+			resultDTO.selectedLearners = selectedLearners;
 			
 			
 			trace('selected org ID is: ' + selectedOrgID);
@@ -780,8 +817,8 @@ class WizardView extends AbstractView {
 		}
 		
 		if(valid){
-			resultDTO.staffgroup = staff_grp_txi.text;
-			resultDTO.learnergroup = learner_grp_txi.text;
+			resultDTO.staffGroupName = staff_grp_txi.text;
+			resultDTO.learnersGroupName = learner_grp_txi.text;
 		}
 		
 		return valid;
@@ -797,10 +834,13 @@ class WizardView extends AbstractView {
 		start_btn.visible = true;
 		if(schedule_cb.selected){
 			schedule_time.f_enableTimeSelect(true);
+			scheduleDate_dt.enabled = true;
 		} else {
 			schedule_time.f_enableTimeSelect(false);
+			scheduleDate_dt.enabled = false;
 		}
 		schedule_time._visible = true;
+		scheduleDate_dt.visible = true;
 		next_btn.enabled = false;
 		finish_btn.enabled = true;
 	}
@@ -810,15 +850,15 @@ class WizardView extends AbstractView {
 			_summery_mc.removeMovieClip();
 		}
 		_summery_mc = summery_scp.content.attachMovie('wizardSummery', 'wizardSummery', 0, {_x:0, _y:0});
-		_summery_mc.design_txt.text = resultDTO.designName;
+		_summery_mc.design_txt.text = resultDTO.resourceName;
 		_summery_mc.title_txt.text = resultDTO.resourceTitle;
 		_summery_mc.desc_txt.text = resultDTO.resourceDescription;
 		_summery_mc.coursename_txt.text = resultDTO.courseName;
 		_summery_mc.classname_txt.text = resultDTO.className;
-		_summery_mc.staffgroup_txt.text = resultDTO.staffgroup;
-		_summery_mc.learnergroup_txt.text = resultDTO.learnergroup;
-		_summery_mc.staff_txt.text = String(resultDTO.staffCount) + '/' + staffList.length;
-		_summery_mc.learners_txt.text = String(resultDTO.learnerCount) + '/' + learnerList.length;
+		_summery_mc.staffgroup_txt.text = resultDTO.staffGroupName;
+		_summery_mc.learnergroup_txt.text = resultDTO.learnersGroupName;
+		_summery_mc.staff_txt.text = String(resultDTO.selectedStaff.length) + '/' + staffList.length;
+		_summery_mc.learners_txt.text = String(resultDTO.selectedLearners.length) + '/' + learnerList.length;
 	}
 	
 	
@@ -829,12 +869,44 @@ class WizardView extends AbstractView {
 		schedule_cb.visible = false;
 		start_btn.visible = false;
 		schedule_time._visible = false;
+		scheduleDate_dt.visible = false;
 		next_btn.enabled = true;
 		finish_btn.enabled = false;
 	}
 	
 	private function validateStep5(wm:WizardModel):Boolean{
 		return true;
+	}
+	
+	private function showFinish():Void{
+		next_btn.enabled = false;
+		prev_btn.enabled = false;
+		cancel_btn.enabled = false;
+		finish_btn.visible = false;
+		close_btn.visible = true;
+	}
+	
+	private function clearFinish():Void{
+		
+	}
+	
+	private function conclusionStep(mode:Number, wm:WizardModel):Void{
+		switch(mode){
+			case FINISH_MODE : 
+				trace('step id (finish mode) ' + wm.stepID);
+				updateScreen(wm.stepID, wm.stepID+1);
+				break;
+			case START_MODE :
+				trace('start mode');
+				wm.getWizard().startLesson(false, wm.lessonID);
+				break;
+			case START_SCH_MODE :
+				trace('schedule start mode');
+				wm.getWizard().startLesson(true, wm.lessonID, wm.resultDTO.scheduleDateTime);
+				break;
+			default:
+				trace('unknown mode');
+		}
 	}
 	
 	/**
@@ -856,12 +928,12 @@ class WizardView extends AbstractView {
 			//its an LD
 			resultDTO.selectedResourceID = Number(snode.attributes.data.resourceID);
 			resultDTO.targetWorkspaceFolderID = Number(snode.attributes.data.workspaceFolderID);
-			resultDTO.designName = snode.attributes.data.name;
+			resultDTO.resourceName = snode.attributes.data.name;
 		}else{
 			//its a folder
 			resultDTO.selectedResourceID  = null;
 			resultDTO.targetWorkspaceFolderID = Number(snode.attributes.data.resourceID);
-			resultDTO.designName = snode.attributes.data.name;
+			resultDTO.resourceName = snode.attributes.data.name;
 		}
 
        dispatchEvent({type:'okClicked',target:this});
@@ -901,6 +973,7 @@ class WizardView extends AbstractView {
 			_learnerList[i].fullName.text = user.getFirstName();
 			_learnerList[i]._x = USERS_X;
 			_learnerList[i]._y = USER_OFFSET * i;
+			_learnerList[i].data = user.getDTO();
 			var listItem:MovieClip = MovieClip(_learnerList[i]);
 			listItem.attachMovie('CheckBox', 'user_cb', listItem.getNextHighestDepth(), {_x:0, _y:3, selected:true})
 			trace('new row: ' + _learnerList[i]);
@@ -927,6 +1000,7 @@ class WizardView extends AbstractView {
 			_staffList[i].fullName.text = user.getFirstName();
 			_staffList[i]._x = USERS_X;
 			_staffList[i]._y = USER_OFFSET * i;
+			_staffList[i].data = user.getDTO();
 			var listItem:MovieClip = MovieClip(_staffList[i]);
 			listItem.attachMovie('CheckBox', 'user_cb', listItem.getNextHighestDepth(), {_x:0, _y:3, selected:true})
 			
@@ -934,6 +1008,31 @@ class WizardView extends AbstractView {
 			
 		}
 		staff_scp.redraw(true);
+	}
+	
+	public function getScheduleDateTime(date:Date, timeStr:String):String{
+		var bs:String = "%2F";		// backslash char
+		var dayStr:String;
+		var monthStr:String;
+		
+		trace('output time: ' + timeStr);
+		var day = date.getDate();
+		if(day<10){
+			dayStr=String(0)+day;
+		} else {
+			dayStr=day.toString();
+		}
+		
+		var month = date.getMonth();
+		if(month<10){
+			monthStr=String(0)+month;
+		} else {
+			monthStr = month.toString();
+		}
+		
+		var dateStr = dayStr + bs + monthStr + bs + date.getFullYear();
+		trace('selected date: ' + dateStr);
+		return dateStr + '+' + timeStr;
 	}
 	
 	/**
