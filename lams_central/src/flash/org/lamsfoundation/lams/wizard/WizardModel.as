@@ -61,7 +61,7 @@ class WizardModel extends Observable{
 		
 		
 	private var _org:Organisation;
-	private var lessonID:Number;
+	private var _lessonID:Number;
 	
 	// state data
 	private var _staffLoaded:Boolean;
@@ -77,6 +77,7 @@ class WizardModel extends Observable{
 	private var _selectedLocTreeNode:XMLNode;
 
 	private var _workspaceResultDTO:Object;
+	private var _resultDTO:Object;
 	private var _stepID:Number;
 
 	private var dispatchEvent:Function;       
@@ -94,6 +95,7 @@ class WizardModel extends Observable{
 		_learnersLoaded = false;
 		
 		_workspaceResultDTO = new Object();
+		_resultDTO = new Object();
 		_stepID = 1;
 		
 		mx.events.EventDispatcher.initialize(this);
@@ -344,6 +346,27 @@ class WizardModel extends Observable{
 
 	}
 	
+	public function getLessonClassData():Object{
+		var classData:Object = new Object();
+		var r:Object = resultDTO;
+		var staff:Object = new Object();
+		var learners:Object = new Object();
+		if(r){
+			trace('getting lesson class data...');
+			if(lessonID){classData.lessonID = lessonID;}
+			if(r.selectedResourceID){classData.organisationID = r.selectedResourceID;}
+			classData.staff = staff;
+			classData.learners = learners;
+			if(r.staffGroupName){classData.staff.groupName = r.staffGroupName;}
+			if(r.selectedStaff){staff.users = r.selectedStaff;}
+			if(r.learnersGroupName){classData.learners.groupName = r.learnersGroupName;}
+			if(r.selectedLearners){classData.learners.users = r.selectedLearners;}
+			return classData;
+		} else {
+			return null;
+		}
+	}
+	
 	/**
 	 * 
 	 * @usage   
@@ -377,6 +400,14 @@ class WizardModel extends Observable{
 		_workspaceResultDTO = a;
 	}
 	
+	public function get resultDTO():Object{
+		return _resultDTO;
+	}
+	
+	public function set resultDTO(a:Object):Void{
+		_resultDTO = a;
+	}
+	
 	public function get stepID():Number{
 		return _stepID;
 	}
@@ -397,6 +428,14 @@ class WizardModel extends Observable{
 		infoObj.data = obj;
 		infoObj.updateType = "STEP_CHANGED";
 		notifyObservers(infoObj);
+	}
+	
+	public function get lessonID():Number{
+		return _lessonID;
+	}
+	
+	public function set lessonID(a:Number){
+		_lessonID = a;
 	}
 	
 	//Accessors for x + y coordinates
