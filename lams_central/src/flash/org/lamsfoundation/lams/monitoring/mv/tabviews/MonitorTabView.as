@@ -30,6 +30,9 @@ import org.lamsfoundation.lams.monitoring.*;
 import org.lamsfoundation.lams.common.dict.*
 import org.lamsfoundation.lams.common.mvc.*
 import org.lamsfoundation.lams.authoring.Activity;
+import org.lamsfoundation.lams.authoring.ComplexActivity;
+import org.lamsfoundation.lams.authoring.cv.CanvasActivity;
+//import org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity;
 import org.lamsfoundation.lams.authoring.Transition;
 //import org.lamsfoundation.lams.authoring.cv.*;
 import mx.managers.*
@@ -119,22 +122,25 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 					break;
 				case 'TABCHANGE' :
 					if (infoObj.tabID == _tabID){
-						mm.getMonitor().clearCanvas(true);
+						//mm.getMonitor().clearCanvas(true);
 						trace("TabID for Selected tab is (TABCHANGE): "+infoObj.tabID)
-						this._visible = true;
-						mm.drawDesign(infoObj.tabID);
+						//this._visible = true;
+						//mm.drawDesign(infoObj.tabID);
+						mm.getMonitor().openLearningDesign(mm.getSequence());
 					}else {
 						this._visible = false;
 					}
 					break;
 				case 'SEQUENCE' :
-					/**if (infoObj.tabID == _tabID){
-						
-					trace("TabID for Selected tab is (MonitorTab): "+infoObj.tabID)
-						this._visible = true;
-						mm.drawDesign(infoObj.tabID)
-						
-					}*/
+					if (infoObj.tabID == _tabID){
+						//mm.getMonitor().clearCanvas(true);
+						trace("TabID for Selected tab is (TABCHANGE): "+infoObj.tabID)
+						//this._visible = true;
+						//mm.drawDesign(infoObj.tabID);
+						mm.getMonitor().openLearningDesign(mm.getSequence());
+					}else {
+						this._visible = false;
+					}
 					break;
 				case 'DRAW_ACTIVITY' :
 					if (infoObj.tabID == _tabID){
