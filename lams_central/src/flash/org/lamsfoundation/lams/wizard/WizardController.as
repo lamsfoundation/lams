@@ -103,6 +103,33 @@ class WizardController extends AbstractController {
 		}
 	}
 	
+	/**
+	 * Initialize lesson returning new LessonID
+	 *   
+	 * @param   resultDTO Wizard data
+	 * @param   callback  function to return LessonID 
+	 *  
+	 */
+	
+	public function initializeLesson(resultDTO:Object, callback:Function){
+		_wizardModel.resultDTO = resultDTO;
+		var callback:Function = Proxy.create(this,saveLessonClass);
+		_wizardModel.getWizard().initializeLesson(resultDTO, callback);
+	}
+	
+	/**
+	 * Save Lesson Class after Lesson is initialized
+	 *  
+	 * @param   lessonID 
+	 * @return  
+	 */
+	
+	public function saveLessonClass(lessonID:Number){
+		trace('saving lesson class after lesson initialized');
+		_wizardModel.lessonID = lessonID;
+		_wizardModel.getWizard().createLessonClass();
+	}
+	
 	private function getView():WizardView{
 		return WizardView(super.getView());
 	}

@@ -235,6 +235,63 @@ class Wizard {
 		Application.getInstance().getComms().getRequest('workspace.do?method=getUsersFromOrganisationByRole&organisationID='+orgID+'&role='+role,callback, false);
 	
 	}
+	
+	public function initializeLesson(resultDTO:Object, callback:Function){
+		var designId:Number = resultDTO.selectedResourceID;
+		var lessonName:String = resultDTO.resourceTitle;
+		var lessonDesc:String = resultDTO.resourceDescription;
+		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=initializeLesson&learningDesignID='+designId+'&userID='+_root.userID+'&lessonName='+lessonName+'&lessonDescription='+lessonDesc,callback, false);
+	}
+	
+	public function startLesson(isScheduled:Boolean, lessonID:Number, datetime:String){
+		trace('starting lesson...');
+		var callback:Function = Proxy.create(this, onStartLesson);
+		
+		if(isScheduled){
+			Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=startOnScheduleLesson&lessonStartDate=' + datetime + '&lessonID=' + lessonID + '&userID=' + _root.userID, callback);
+		} else {
+			Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=startLesson&lessonID=' + lessonID + '&userID=' + _root.userID, callback);
+		}
+	}
+	
+	private function onStartLesson(b:Boolean){
+		trace('receive back after lesson started..');
+		if(b){
+			trace('lesson started');
+			wizardModel.broadcastViewUpdate("LESSON_STARTED", WizardView.FINISH_MODE);
+		} else {
+			// error occured
+			trace('error occurred starting lesson');
+		}
+	}
+	
+	/**
+	 * Create LessonClass using wizard data and CreateLessonClass servlet
+	 * 
+	 */
+	
+	public function createLessonClass():Void{
+		trace('creating lesson class...');
+		var dto:Object = wizardModel.getLessonClassData();
+		var callback:Function = Proxy.create(this,onCreateLessonClass);
+		
+		Application.getInstance().getComms().sendAndReceive(dto,"monitoring/createLessonClass?userID=" + _root.userID,callback,false);
+		
+	}
+	
+	public function onCreateLessonClass(r):Void{
+		if(r instanceof LFError) {
+			r.showErrorAlert();
+		} else if(r) {
+			// lesson class created
+			trace('lesson class created');
+			trace('mode: ' + wizardModel.resultDTO.mode);
+			wizardModel.broadcastViewUpdate("SAVED_LC", wizardModel.resultDTO.mode);
+		} else {
+			// failed creating lesson class
+			trace('failed creating lesson class');
+		}
+	}
 
 	/**
 	 * 
