@@ -1,5 +1,5 @@
-<%@include file="../sharing/share.jsp" %>
-<%@ taglib uri="tags-bean" prefix="bean" %>
+<%@ include file="/common/taglibs.jsp" %>
+
 	<div id="basic">
 		<h1><bean:message key="label.authoring.heading.basic.desc" /></h1>
 		<table class="forms">

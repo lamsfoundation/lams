@@ -1,4 +1,2 @@
-<%@include file="../sharing/share.jsp" %>
-<%@ taglib uri="fck-editor" prefix="FCK"%>
-<%@ taglib uri="tags-lams" prefix="lams" %>
+<%@ include file="/common/taglibs.jsp" %>
 <%@ include file="basic.jsp"%>

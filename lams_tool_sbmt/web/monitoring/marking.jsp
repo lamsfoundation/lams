@@ -1,5 +1,4 @@
-<%@include file="../sharing/share.jsp" %>
-<%@ taglib uri="tags-logic" prefix="logic" %>
+<%@ include file="/common/taglibs.jsp" %>
 				<table border="0" cellpadding="2" cellspacing="2">					
 					<tr>
 			  			<td class="formcontrol">

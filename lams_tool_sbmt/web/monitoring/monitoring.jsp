@@ -1,5 +1,4 @@
-<%@include file="../sharing/share.jsp" %>
-<%@ taglib uri="tags-logic" prefix="logic" %>
+<%@ include file="/common/taglibs.jsp" %>
 
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>

@@ -1,4 +1,4 @@
-<%@include file="../sharing/share.jsp" %>
+<%@ include file="/common/taglibs.jsp" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 		  <c:set var="details" value="${fileDetails}"/>
 		  <c:set var="user" value="${user}" />

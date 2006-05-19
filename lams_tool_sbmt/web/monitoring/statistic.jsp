@@ -1,4 +1,4 @@
-<%@include file="../sharing/share.jsp" %>
+<%@ include file="/common/taglibs.jsp" %>
 	<div class="datatablecontainer">
 		<c:forEach var="element" items="${statisticList}">
 			<c:set var="sessionName" value="${element.key.sessionName}"/>

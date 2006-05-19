@@ -98,8 +98,7 @@ public class LearnerAction extends DispatchAction {
             return listFiles(mapping, form, request, response);
         }
         else if(mode.equals(ToolAccessMode.AUTHOR) || mode.equals(ToolAccessMode.TEACHER)){
-            //TODO: implement AUTHOR and TEACHER mode
-
+        	return listFiles(mapping, form, request, response);
         }
         logger.error("Requested mode + '" + mode.toString() + "' not supported");
         return returnErrors(mapping,request,"submit.modenotsupported","upload");
@@ -185,7 +184,8 @@ public class LearnerAction extends DispatchAction {
 		
 		FormFile uploadedFile= (FormFile) authForm.get("filePath");
 		String fileDescription = (String) authForm.get("fileDescription");
-
+		authForm.set("fileDescription","");
+		
 		submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this.getServlet().getServletContext());
 		//to avoid user without patience click "upload" button too fast 
 		saveToken(request);
@@ -249,6 +249,9 @@ public class LearnerAction extends DispatchAction {
 		return returnErrors(mapping,request,"error.read.only.mode","upload");
 		
 	}
+	//**********************************************************************************************
+	//		Private mehtods
+	//**********************************************************************************************
 	/**
 	 * This is a utily function for forwarding the errors to the respective JSP
 	 * page indicated by <code>forward</code>
@@ -299,7 +302,7 @@ public class LearnerAction extends DispatchAction {
 				dto.setLocked(learner.isFinished());
 			else
 				dto.setLocked(false);
-			//if Monitoring does not release marks, then screen this mark and comment content.
+			//if Monitoring does not release marks, then skip this mark and comment content.
 			if(filesUploaded != null){
 				Iterator iter = filesUploaded.iterator();
 				while(iter.hasNext()){

@@ -269,7 +269,10 @@ public class AuthoringAction extends LamsDispatchAction {
 
 		//initialize attachmentList
 		List attachmentList = getAttachmentList(request);
+		attachmentList.clear();
 		attachmentList.addAll(persistContent.getInstructionFiles());
+		List delAttachmentList = getDeletedAttachmentList(request);
+		delAttachmentList.clear();
 		
 		//set back STRUTS component value
 		DynaActionForm authForm = (DynaActionForm) form;
@@ -278,6 +281,10 @@ public class AuthoringAction extends LamsDispatchAction {
 		authForm.set("lockOnFinished",persistContent.isLockOnFinished()?"1":null);
 		return mapping.getInputForward();
 	}
+	
+	//***********************************************************
+	//  Private/protected methods
+	//***********************************************************
 	/**
 	 * Depreciated: Just for STRUTS LookupDispatchAction mapping function.
 	 */

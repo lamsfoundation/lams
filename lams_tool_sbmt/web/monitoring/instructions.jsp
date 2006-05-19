@@ -1,4 +1,4 @@
-<%@include file="../sharing/share.jsp" %>
+<%@ include file="/common/taglibs.jsp" %>
 	<table class="forms">
 		<!--hidden field contentID passed by flash-->
 		<tr>

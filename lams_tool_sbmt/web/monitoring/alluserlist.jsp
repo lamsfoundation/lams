@@ -1,4 +1,4 @@
-<%@include file="../sharing/share.jsp" %>
+<%@include file="/common/taglibs.jsp"%>
 <%@ taglib uri="tags-logic" prefix="logic" %>
   	<div id="datatablecontainer">
   		<c:set var="sessionUserMap" scope="request" value="${sessionUserMap}"/>
