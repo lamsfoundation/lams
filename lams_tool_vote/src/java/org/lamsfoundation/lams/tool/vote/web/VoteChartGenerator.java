@@ -157,7 +157,7 @@ public class VoteChartGenerator extends HttpServlet implements VoteAppConstants 
 		}
         
     	JFreeChart chart=null;
-   	    chart=ChartFactory.createBarChart3D("Session Votes Chart", "Open Response", "Percentage", 
+   	    chart=ChartFactory.createBarChart3D("Session Votes Chart", "Open Vote", "Percentage", 
    	    									data, PlotOrientation.VERTICAL, true, true, false);
    	    logger.debug("chart: " + chart) ;
    	    return chart;

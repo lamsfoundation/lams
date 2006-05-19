@@ -91,22 +91,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<tr>
 					 		<td NOWRAP colspan=2> 
 		                            <c:out value="${activityInstructions}" escapeXml="false"/> &nbsp
-
-									<c:if test="${VoteMonitoringForm.showOpenVotesSection == 'false'}"> 										
-		                                <html:submit property="viewOpenVotes" 
-		                                             styleClass="linkbutton" 
-		                                             onclick="submitMethod('viewOpenVotes');">
-		                                    <bean:message key="label.view.openVotes"/>
-		                                </html:submit>
-									</c:if> 					                                
-		                                
-									<c:if test="${VoteMonitoringForm.showOpenVotesSection == 'true'}"> 										
-		                                <html:submit property="closeOpenVotes" 
-		                                             styleClass="linkbutton" 
-		                                             onclick="submitMethod('closeOpenVotes');">
-		                                    <bean:message key="label.view.closeVotes"/>
-		                                </html:submit>
-									</c:if> 					                                		                                
 							</td>
 						</tr>
 						
@@ -175,7 +159,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							</td>
 						</tr>
 
-						<c:if test="${VoteMonitoringForm.showOpenVotesSection == 'true'}"> 										
 
 							<tr>
 						 		<td NOWRAP colspan=2 > &nbsp&nbsp </td>
@@ -200,35 +183,32 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					 			
 									<c:forEach var="currentDto" items="${sessionScope.listUserEntries}">
 
-										<tr>			
-											<td NOWRAP valign=top align=left><b> <font size=2> <bean:message key="label.vote"/>: </b>
-												<c:out value="${currentDto.question}" escapeXml="false"/>
-											</font> 
-											</td>
-										</tr>	
-										
 										<tr> 
 											<td NOWRAP valign=top>
 												<table align=center>
 													<tr> 
-														 <td NOWRAP valign=top align=left>   &nbsp&nbsp&nbsp&nbsp&nbsp </td>  
+														 <td NOWRAP valign=top align=left> <b> <font size=2>  <bean:message key="label.vote"/> </font> </b> </td>  														 
 														 <td NOWRAP valign=top align=left> <b> <font size=2>  <bean:message key="label.user"/> </font> </b> </td>  
 								  						 <td NOWRAP valign=top align=left> <b> <font size=2>  <bean:message key="label.attemptTime"/></font> </b></td>
-								  						 <td NOWRAP valign=top align=left> <b> <font size=2>  <bean:message key="label.timezone"/> </font>	</b></td>
-								  						 <td NOWRAP valign=top align=left> <b> <font size=2>  &nbsp&nbsp&nbsp&nbsp&nbsp </td>								  						 
+								  						 <td NOWRAP valign=top align=left> <b> <font size=2>  <bean:message key="label.visible"/> </font> </b></td>								  						 
 										  			</tr>				 
 				
 						  							<c:forEach var="questionAttemptData" items="${currentDto.questionAttempts}">
 											  	 		<c:set var="userData" scope="request" value="${questionAttemptData.value}"/>
 	  	 									  	 		<c:set var="currentUid" scope="request" value="${userData.uid}"/>
 														<tr> 
-																 <td NOWRAP valign=top align=left>   &nbsp&nbsp&nbsp&nbsp&nbsp </td>  
+																<td NOWRAP valign=top align=left> 
+																	<c:out value="${currentDto.question}" escapeXml="false"/> 
+																	<c:if test="${userData.visible != 'true' }"> 			
+												                                <font size=2> <i><bean:message key="label.hidden"/> </i> </font>											                                
+																	</c:if> 								
+																</td>
+																 
 																 <td NOWRAP valign=top align=left>   <font size=2> <c:out value="${userData.userName}"/> </font>  </td>  
 																 <td NOWRAP valign=top align=left>   <font size=2> <c:out value="${userData.attemptTime}"/> </font> </td>
-																 <td NOWRAP valign=top align=left>   <font size=2> <c:out value="${userData.timeZone}"/> </font> </td>
-																 <td NOWRAP valign=top align=left>   <font size=2>
-
-																	<c:if test="${userData.visible == 'true' }"> 			
+																 
+																 <td NOWRAP valign=top align=left>
+											 						<c:if test="${userData.visible == 'true' }"> 			
 												                                <html:submit property="hideOpenVote" 
 												                                             styleClass="linkbutton" 
 										                                                     onclick="submitOpenVote(${currentUid}, 'hideOpenVote');">						                                             
@@ -242,10 +222,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 										                                                     onclick="submitOpenVote(${currentUid}, 'showOpenVote');">						                                             
 												                                    <bean:message key="label.show"/>
 												                                </html:submit>
-												                                <font size=2> <i><bean:message key="label.hidden"/> </i> </font>											                                
-																	</c:if> 								
-
-															</td>											
+																	</c:if> 						
+																</td>																			
 																 
 														</tr>		
 													</c:forEach>		  	
@@ -256,9 +234,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								</table> 
 								</td>
 							</tr>
-							
-						</c:if> 			
-
 				</table>
 			</c:if> 	    	  
 		</c:if>						

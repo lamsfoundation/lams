@@ -657,6 +657,7 @@ public class MonitoringUtil implements VoteAppConstants{
 		{
 		    logger.debug("process for session: " + toolSessionUid);
 		    entriesCount=voteService.getSessionEntriesCount(toolSessionUid);
+		    logger.debug("entriesCount: " + entriesCount);
 		    userEntries=voteService.getSessionUserEntries(toolSessionUid);
 		    logger.debug("sessionUserCount: " + userEntries.size());
 		    
@@ -703,6 +704,9 @@ public class MonitoringUtil implements VoteAppConstants{
 		Long mapIndex=new Long(1);
 		logger.debug("mapOptionsContent: " + mapOptionsContent);
 		int totalStandardVotesCount=0;
+		
+		logger.debug("using entriesCount: " + entriesCount);
+		
 		while (queIterator.hasNext())
 		{
 			VoteQueContent voteQueContent=(VoteQueContent) queIterator.next();
@@ -715,7 +719,7 @@ public class MonitoringUtil implements VoteAppConstants{
 				if (sessionLevelCharting == true)
 				{
 				    logger.debug("getting votesCount based on session: " + toolSessionUid);
-					votesCount=voteService.getAttemptsForQuestionContentAndSessionUid(voteQueContent.getUid(), toolSessionUid);
+					votesCount=voteService.getStandardAttemptsForQuestionContentAndSessionUid(voteQueContent.getUid(), toolSessionUid);
 					logger.debug("votesCount for questionContent uid: " + votesCount + " for" + voteQueContent.getUid());
 					mapStandardUserCount.put(mapIndex.toString(),new Integer(votesCount).toString());
 					totalStandardVotesCount=totalStandardVotesCount + votesCount;
@@ -761,19 +765,8 @@ public class MonitoringUtil implements VoteAppConstants{
 	    logger.debug("share: " + share);
 	    
 	    logger.debug("totalStandardVotesCount: " + totalStandardVotesCount);
-	    
-	    logger.debug("distinctSessionUsers: " + distinctSessionUsers);
-	    int userEnteredVotesCount=0;
-        if (distinctSessionUsers != null)
-        {
-            userEnteredVotesCount=totalStandardVotesCount- distinctSessionUsers.size();    
-        }
-        else
-        {
-            userEnteredVotesCount=totalStandardVotesCount;
-        }
-        
-        logger.debug("userEnteredVotesCount: " + userEnteredVotesCount);
+	    int userEnteredVotesCount=entriesCount - totalStandardVotesCount;
+        logger.debug("userEnteredVotesCount for this session: " + userEnteredVotesCount);
 	    
 	    mapStandardNominationsContent.put(mapIndex.toString(), "Open Vote");
 	    mapStandardRatesContent.put(mapIndex.toString(), new Double(share).toString());

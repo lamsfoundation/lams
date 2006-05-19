@@ -605,11 +605,11 @@ public class VoteServicePOJO implements
         }        
     }
     
-    public int getAttemptsForQuestionContentAndSessionUid(final Long voteQueContentId, final Long voteSessionUid) throws VoteApplicationException
+    public int getStandardAttemptsForQuestionContentAndSessionUid(final Long voteQueContentId, final Long voteSessionUid) throws VoteApplicationException
     {
         try
         {
-        	return voteUsrAttemptDAO.getAttemptsForQuestionContentAndSessionUid(voteQueContentId, voteSessionUid);
+        	return voteUsrAttemptDAO.getStandardAttemptsForQuestionContentAndSessionUid(voteQueContentId, voteSessionUid);
         }
         catch (DataAccessException e)
         {
