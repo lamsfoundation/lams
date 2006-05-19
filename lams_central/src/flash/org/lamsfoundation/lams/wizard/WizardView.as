@@ -87,12 +87,6 @@ class WizardView extends AbstractView {
 	private var learner_lbl:Label;
 	
 	// step 4 UI elements
-	private var staff_grp_lbl:Label;
-	private var learner_grp_lbl:Label;
-	private var staff_grp_txi:TextInput;
-	private var learner_grp_txi:TextInput;
-	
-	// step 5 UI elements
 	private var schedule_cb:CheckBox;
 	private var start_btn:Button;
 	private var schedule_time:MovieClip;
@@ -513,9 +507,6 @@ class WizardView extends AbstractView {
 				clearStep4();
 				break;
 			case 5:
-				clearStep5();
-				break;
-			case 6:
 				clearFinish();
 				break;
 			default:
@@ -539,9 +530,6 @@ class WizardView extends AbstractView {
 				showStep4();
 				break;
 			case 5:
-				showStep5();
-				break;
-			case 6:
 				showFinish();
 				break;
 			default:
@@ -566,9 +554,6 @@ class WizardView extends AbstractView {
 				break;
 			case 4:
 				return validateStep4(wm);
-				break;
-			case 4:
-				return validateStep5(wm);
 				break;
 			default:
 				return false;
@@ -610,12 +595,6 @@ class WizardView extends AbstractView {
 		learner_scp.visible = false;
 		
 		// hide step 4 (Startup)
-		staff_grp_lbl.visible = false;
-		learner_grp_lbl.visible = false;
-		staff_grp_txi.visible = false;
-		learner_grp_txi.visible = false;
-		
-		// hide step 5 (Startup)
 		start_btn.visible = false;
 		summery_scp.visible = false;
 		summery_lbl.visible = false;
@@ -771,7 +750,9 @@ class WizardView extends AbstractView {
 			
 			resultDTO.selectedStaff = selectedStaff;
 			resultDTO.selectedLearners = selectedLearners;
-			
+			var orgName:String = snode.attributes.data.name;
+			resultDTO.staffGroupName = orgName + 'staff';
+			resultDTO.learnersGroupName = orgName + 'learners';
 			
 			trace('selected org ID is: ' + selectedOrgID);
 			
@@ -782,49 +763,6 @@ class WizardView extends AbstractView {
 	
 	
 	private function showStep4():Void{
-		trace('showing step 4');
-		
-		staff_grp_lbl.visible = true;
-		learner_grp_lbl.visible = true;
-		staff_grp_txi.visible = true;
-		learner_grp_txi.visible = true;
-		
-		// set default values
-		var orgName:String = org_treeview.selectedNode.attributes.data.name;
-		staff_grp_txi.text = orgName + ' staff';
-		learner_grp_txi.text = orgName + ' learners';
-		
-	}
-	
-	private function clearStep4():Void{
-		staff_grp_lbl.visible = false;
-		learner_grp_lbl.visible = false;
-		staff_grp_txi.visible = false;
-		learner_grp_txi.visible = false;
-	}
-	
-	private function validateStep4(wm:WizardModel):Boolean{
-		var valid:Boolean = true;
-		
-		if(staff_grp_txi.text == ""){
-			trace('missing staff group name')
-			valid = false;
-		}
-		
-		if(learner_grp_txi.text == ""){
-			trace('missing learners group name');
-			valid = false;
-		}
-		
-		if(valid){
-			resultDTO.staffGroupName = staff_grp_txi.text;
-			resultDTO.learnersGroupName = learner_grp_txi.text;
-		}
-		
-		return valid;
-	}
-	
-	private function showStep5():Void{
 		
 		writeSummery();
 		
@@ -855,15 +793,13 @@ class WizardView extends AbstractView {
 		_summery_mc.desc_txt.text = resultDTO.resourceDescription;
 		_summery_mc.coursename_txt.text = resultDTO.courseName;
 		_summery_mc.classname_txt.text = resultDTO.className;
-		_summery_mc.staffgroup_txt.text = resultDTO.staffGroupName;
-		_summery_mc.learnergroup_txt.text = resultDTO.learnersGroupName;
 		_summery_mc.staff_txt.text = String(resultDTO.selectedStaff.length) + '/' + staffList.length;
 		_summery_mc.learners_txt.text = String(resultDTO.selectedLearners.length) + '/' + learnerList.length;
 	}
 	
 	
 	
-	private function clearStep5():Void{
+	private function clearStep4():Void{
 		summery_lbl.visible = false;
 		summery_scp.visible = false;
 		schedule_cb.visible = false;
@@ -874,7 +810,7 @@ class WizardView extends AbstractView {
 		finish_btn.enabled = false;
 	}
 	
-	private function validateStep5(wm:WizardModel):Boolean{
+	private function validateStep4(wm:WizardModel):Boolean{
 		return true;
 	}
 	
