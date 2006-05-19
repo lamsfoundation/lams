@@ -70,6 +70,7 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.Workspace;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dao.IOrganisationDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IUserDAO;
@@ -278,6 +279,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     public Lesson initializeLesson(String lessonName,
                                String lessonDescription,
                                long learningDesignId,
+                               Integer organisationId,
                                Integer userID) 
     {
     	
@@ -286,10 +288,20 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         	throw new MonitoringServiceException("Learning design for id="+learningDesignId+" is missing. Unable to initialize lesson.");
         }
         
-        // The duplicated sequence should go in the run sequences folder, so we had better 
-        // wourk out what the folder is!
+        // The duplicated sequence should go in the run sequences folder under the given organisation
+        WorkspaceFolder runSeqFolder = null;
+        if ( organisationId != null ) {
+        	Organisation org = organisationDAO.getOrganisationById(organisationId);
+        	if ( org!=null ) {
+        		Workspace workspace = org.getWorkspace();
+        		if ( workspace != null ) {
+        			runSeqFolder = workspace.getDefaultRunSequencesFolder();
+        		}
+        		
+        	}
+        }
     	User user = (userID != null ? userManagementService.getUserById(userID) : null);
-        return initializeLesson(lessonName, lessonDescription, originalLearningDesign, user, LearningDesign.COPY_TYPE_LESSON);
+        return initializeLesson(lessonName, lessonDescription, originalLearningDesign, user, runSeqFolder, LearningDesign.COPY_TYPE_LESSON);
         
     }
     
@@ -309,20 +321,21 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         }
     	User user = (userID != null ? userManagementService.getUserById(userID) : null);
 
-        return initializeLesson(lessonName, lessonDescription, originalLearningDesign, user, LearningDesign.COPY_TYPE_PREVIEW);
+        return initializeLesson(lessonName, lessonDescription, originalLearningDesign, user, null, LearningDesign.COPY_TYPE_PREVIEW);
     }
 
     public Lesson initializeLesson(String lessonName,
             String lessonDescription,
             LearningDesign originalLearningDesign,
             User user,
+            WorkspaceFolder workspaceFolder,
             int copyType) { 
     
         //copy the current learning design
         LearningDesign copiedLearningDesign = authoringService.copyLearningDesign(originalLearningDesign,
                                                                                   new Integer(copyType),
                                                                                   user,
-                                                                                  null,
+                                                                                  workspaceFolder,
                                                                                   true);
         // copy the tool content
         // unfortuanately, we have to reaccess the activities to make sure we get the

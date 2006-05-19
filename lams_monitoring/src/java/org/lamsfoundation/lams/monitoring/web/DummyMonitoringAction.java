@@ -86,6 +86,7 @@ public class DummyMonitoringAction extends LamsDispatchAction
 	private IMonitoringService monitoringService;
     private IUserManagementService usermanageService;
     private Integer everybodyClass = new Integer(3);
+    private Integer playpen = new Integer(2);
     //---------------------------------------------------------------------
     // Class level constants - session attributes
     //---------------------------------------------------------------------
@@ -166,9 +167,9 @@ public class DummyMonitoringAction extends LamsDispatchAction
     	if ( ldId == null )
     		throw new IOException("Learning design id must be set");
     	
-    	// hardcode to use the Playpen:Everybody class
-        Organisation organisation = usermanageService.getOrganisationById(everybodyClass);
-    	if ( organisation == null )
+    	// hardcode to use the Playpen:Everybody class as the class, Playpen as the course
+        Organisation classOrganisation = usermanageService.getOrganisationById(everybodyClass);
+    	if ( classOrganisation == null )
     		throw new IOException("Organisation cannot be found. Id was "+everybodyClass);
 
     	String title = dummyForm.getTitle();
@@ -177,7 +178,7 @@ public class DummyMonitoringAction extends LamsDispatchAction
         if ( desc == null ) desc = "description";
 
         // initialize the lesson
-        Lesson testLesson = monitoringService.initializeLesson(title,desc,ldId.longValue(),user.getUserId());
+        Lesson testLesson = monitoringService.initializeLesson(title,desc,ldId.longValue(),playpen,user.getUserId());
 
         // create the lesson class - add all the users in this organisation to the lesson class irrespective of
         // role. normally would check they are learners but too much hassle for dummy code.
@@ -190,7 +191,7 @@ public class DummyMonitoringAction extends LamsDispatchAction
         staffs.add(user);
         
         testLesson = monitoringService.createLessonClassForLesson(testLesson.getLessonId().longValue(),
-        		organisation,
+        		classOrganisation,
         		"Learner Group",
 				learners,
 				"Staff Group",

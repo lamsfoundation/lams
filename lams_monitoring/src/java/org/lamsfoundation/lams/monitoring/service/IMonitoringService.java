@@ -61,10 +61,11 @@ public interface IMonitoringService
      * @param lessonName the name of the lesson
      * @param lessonDescription the description of the lesson.
      * @param learningDesignId the selected learning design
-     * @param user user the user who want to create this lesson.
+     * @param organisationId the copied sequence will be put in the default runtime sequence folder for this org, if such a folder exists.
+     * @param userId the user who want to create this lesson.
      * @return the lesson initialized.
      */
-    public Lesson initializeLesson(String lessonName, String lessonDescription,long learningDesignId,Integer userID);
+    public Lesson initializeLesson(String lessonName, String lessonDescription,long learningDesignId,Integer organisationId,Integer userID);
     /**
      * Create new lesson according to the learning design specified by the 
      * user, but for a preview session rather than a normal learning session.

@@ -160,6 +160,7 @@ public class TestMonitoringService extends AbstractLamsTestCase
         Lesson testLesson = monitoringService.initializeLesson("Test_Lesson",
                                                                "Test_Description",
                                                                TEST_LEARNING_DESIGN_ID,
+                                                               null,
                                                                testUser.getUserId());
         TEST_LESSON_ID=testLesson.getLessonId();
         Lesson createdLesson = lessonDao.getLesson(TEST_LESSON_ID);

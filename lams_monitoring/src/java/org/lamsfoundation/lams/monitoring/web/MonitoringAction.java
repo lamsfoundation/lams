@@ -174,8 +174,9 @@ public class MonitoringAction extends LamsDispatchAction
     		if ( title == null ) title = "lesson";
     		String desc = WebUtil.readStrParam(request,"lessonDescription");
     		if ( desc == null ) desc = "description";
+    		Integer courseId = WebUtil.readIntParam(request,"courseId",true);
     		long ldId = WebUtil.readLongParam(request, AttributeNames.PARAM_LEARNINGDESIGN_ID);
-    		Lesson newLesson = monitoringService.initializeLesson(title,desc,ldId,getUserId(request));
+    		Lesson newLesson = monitoringService.initializeLesson(title,desc,ldId,courseId,getUserId(request));
     		
     		flashMessage = new FlashMessage("initializeLesson",newLesson.getLessonId());
 		} catch (Exception e) {
