@@ -535,10 +535,6 @@ public class LearningDesign implements Serializable {
 		this.onlineInstructions = onlineInstructions;
 	}
 
-
-	public LearningDesignDTO getLearningDesignDTO(){
-		return new LearningDesignDTO(this);
-	}
 	public DesignDetailDTO getDesignDetailDTO(){
 		return new DesignDetailDTO(this);
 	}

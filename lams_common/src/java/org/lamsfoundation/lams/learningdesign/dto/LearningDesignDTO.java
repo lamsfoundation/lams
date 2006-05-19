@@ -27,6 +27,7 @@ package org.lamsfoundation.lams.learningdesign.dto;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -34,6 +35,7 @@ import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.Transition;
+import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
 import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 
 /**
@@ -140,7 +142,7 @@ public class LearningDesignDTO extends BaseDTO{
 		this.activities = new ArrayList();
 		this.transitions = new ArrayList();
 	}	
-	public LearningDesignDTO(LearningDesign learningDesign){
+	public LearningDesignDTO(LearningDesign learningDesign, ActivityDAO activityDAO){
 		this.learningDesignID = learningDesign.getLearningDesignId();
 		this.learningDesignUIID = learningDesign.getLearningDesignUIID();
 		this.description = learningDesign.getDescription();
@@ -190,7 +192,7 @@ public class LearningDesignDTO extends BaseDTO{
 		this.lessonName = learningDesign.getLessonName();
 		this.lessonStartDateTime = learningDesign.getLessonStartDateTime();
 		this.lastModifiedDateTime = learningDesign.getLastModifiedDateTime();
-		this.groupings = populateGroupings(learningDesign);
+		this.groupings = populateGroupings(learningDesign,activityDAO);
 		this.activities = populateActivities(learningDesign);
 		this.transitions = populateTransitions(learningDesign);
 	}
@@ -382,52 +384,36 @@ public class LearningDesignDTO extends BaseDTO{
 	 * activities in the learning design and for all grouping activities, it will 
 	 * then retrieve the Grouping object which was created by the GroupingActivity.
 	 * @param design
+	 * @param groupingDAO DAO to reget grouping objects due to the hibernate cglib casting problems.
 	 * @return ArrayList the array of groupingDTOs
 	 */
-	public ArrayList populateGroupings(LearningDesign design)
+	public ArrayList populateGroupings(LearningDesign design, ActivityDAO activityDAO)
 	{
-	    ArrayList groupingList = new ArrayList();
-	  //go through list of activities, get the createGrouping objects
-	    Iterator parentIterator = design.getParentActivities().iterator();
+	    // Unfortunately, we can't just go through all the activities via design.getParentActivities()
+	    // as the activities returned won't cast to GroupingActivity, so we would
+	    // have to reget every activity to get the right type. So the easiest way
+	    // is to get them all in a list directly via a HQL call.
+	    ArrayList<GroupingDTO> groupingList = new ArrayList<GroupingDTO>();
+	    List groupingActivities = activityDAO.getGroupingActivitiesByLearningDesignId(design.getLearningDesignId());
+	    Iterator parentIterator = groupingActivities.iterator();
 	    while (parentIterator.hasNext())
 	    {
-	        Activity object = (Activity) parentIterator.next();			
-			if(object.isGroupingActivity()){
-			    GroupingActivity groupingActivity = (GroupingActivity)object;
-			    Grouping grouping = groupingActivity.getCreateGrouping();
-			    groupingList.add(grouping.getGroupingDTO());			    
-			}
+	        GroupingActivity groupingActivity = (GroupingActivity) parentIterator.next();			
+		    Grouping grouping = groupingActivity.getCreateGrouping();
+		    groupingList.add(grouping.getGroupingDTO());			    
 	    }
 	    return groupingList;
 	}
 
 	public ArrayList populateActivities(LearningDesign design) {
-		ArrayList activities = new ArrayList();		
+		ArrayList<AuthoringActivityDTO> activities = new ArrayList<AuthoringActivityDTO>();		
 		//ArrayList childActivities = null;
 		Iterator parentIterator = design.getParentActivities().iterator();
 		while(parentIterator.hasNext()){
 			Activity object = (Activity) parentIterator.next();
-			//method commented out below because error occurs when opening a a learning design with a complex activity. Some hibernate casting exception
-			/*	if(object.isComplexActivity()) 
-			{
-			ComplexActivity complexActivity = (ComplexActivity)object;
-				Iterator childIterator = complexActivity.getActivities().iterator();
-				childActivities = new ArrayList();
-				while(childIterator.hasNext()){
-					Activity activity =(Activity)childIterator.next();
-					childActivities.add(activity.getAuthoringActivityDTO());					
-				}				
-				activities.add(complexActivity.getAuthoringActivityDTO());
-				activities.addAll(childActivities);
-			}else{
-				activities.add(object.getAuthoringActivityDTO());
-			}		
-				
-			
-		}*/
 			if (object.isComplexActivity())
 			{
-				Set dtoSet = object.getAuthoringActivityDTOSet();
+				Set<AuthoringActivityDTO> dtoSet = object.getAuthoringActivityDTOSet();
 				activities.addAll(dtoSet);
 			}
 			else
@@ -438,7 +424,7 @@ public class LearningDesignDTO extends BaseDTO{
 		return activities;
 	}	
 	public ArrayList populateTransitions(LearningDesign design){
-		ArrayList transitions = new ArrayList();
+		ArrayList<TransitionDTO> transitions = new ArrayList<TransitionDTO>();
 		if(design.getTransitions()!=null){
 			Iterator iterator = design.getTransitions().iterator();
 			while(iterator.hasNext()){

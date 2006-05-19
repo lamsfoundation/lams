@@ -223,12 +223,12 @@ public class ToolActivity extends SimpleActivity implements Serializable
 	    				+". Falling back to a class grouping.");
 	    	}
 	
-	    	if ( learners == null ) {
+	    	if ( learners == null || learners.isNull()) {
 				LessonClass lessonClass = lesson.getLessonClass();
 				learners = this.getGroupFor(learner, lessonClass);
 			}
 	    	
-	        if ( learners != null ) {
+	        if ( learners != null && ! learners.isNull() ) {
 	        	session = new GroupedToolSession(this,
 	                    now,
 	                    ToolSession.STARTED_STATE,

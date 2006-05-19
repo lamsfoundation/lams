@@ -161,11 +161,15 @@ CREATE TABLE lams_workspace_folder (
 CREATE TABLE lams_workspace (
        workspace_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , root_folder_id BIGINT(20)
+     , def_run_seq_fld_id BIGINT(20)
      , name VARCHAR(255)
      , PRIMARY KEY (workspace_id)
      , INDEX (root_folder_id)
      , CONSTRAINT FK_lams_workspace_1 FOREIGN KEY (root_folder_id)
                   REFERENCES lams_workspace_folder (workspace_folder_id) ON DELETE NO ACTION ON UPDATE NO ACTION
+     , INDEX (def_run_seq_fld_id)
+     , CONSTRAINT FK_wkspce_default_run FOREIGN KEY (def_run_seq_fld_id)
+                  REFERENCES lams_workspace_folder (workspace_folder_id)
 )TYPE=InnoDB;
 
 CREATE TABLE lams_organisation (

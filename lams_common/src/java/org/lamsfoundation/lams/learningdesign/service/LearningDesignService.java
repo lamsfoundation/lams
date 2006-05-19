@@ -24,6 +24,13 @@
 package org.lamsfoundation.lams.learningdesign.service;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
+import org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupingDAO;
+import org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningDesignDAO;
+import org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningLibraryDAO;
+import org.lamsfoundation.lams.learningdesign.dao.hibernate.LicenseDAO;
+import org.lamsfoundation.lams.learningdesign.dao.hibernate.TransitionDAO;
+import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
@@ -35,6 +42,9 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.Vector;
 
+import org.lamsfoundation.lams.tool.dao.hibernate.ToolDAO;
+import org.lamsfoundation.lams.usermanagement.dao.hibernate.UserDAO;
+import org.lamsfoundation.lams.usermanagement.dao.hibernate.WorkspaceFolderDAO;
 import org.lamsfoundation.lams.util.MessageService;
 
 /**
@@ -53,6 +63,9 @@ public class LearningDesignService implements ILearningDesignService{
 	
 	//protected Logger log = Logger.getLogger(LearningDesignService.class);
 	protected MessageService messageService;
+	
+	protected LearningDesignDAO learningDesignDAO;
+	protected ActivityDAO activityDAO;
 	
 	/*
 	 * Default constructor
@@ -82,6 +95,16 @@ public class LearningDesignService implements ILearningDesignService{
 	/**********************************************
 	 * Service Methods
 	 * *******************************************/
+
+	/**
+	 * Get the learning design DTO, suitable to send to Flash via WDDX 
+	 * @param learningDesignId
+	 * @return LearningDesignDTO
+	 */
+	public LearningDesignDTO getLearningDesignDTO(Long learningDesignID) {
+		LearningDesign design = learningDesignID!=null ? learningDesignDAO.getLearningDesignById(learningDesignID) : null;
+		return design != null ? new LearningDesignDTO(design,activityDAO) : null;
+	}
 	
 	/**
 	 * This method calls other validation methods which apply the validation 
@@ -360,6 +383,14 @@ public class LearningDesignService implements ILearningDesignService{
 				}
 			}
 		
+	}
+
+	public void setActivityDAO(ActivityDAO activityDAO) {
+		this.activityDAO = activityDAO;
+	}
+
+	public void setLearningDesignDAO(LearningDesignDAO learningDesignDAO) {
+		this.learningDesignDAO = learningDesignDAO;
 	}
 	
 

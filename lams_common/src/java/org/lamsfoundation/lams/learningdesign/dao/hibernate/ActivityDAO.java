@@ -52,6 +52,9 @@ public class ActivityDAO extends BaseDAO implements IActivityDAO {
 	private static final String FIND_BY_LEARNING_DESIGN_ID = "from " + TABLENAME +
 															 " in class " + Activity.class.getName() +
 															 " where learning_design_id=?" ;
+	private static final String FIND_GROUPINGACTIVITY_TYPE_BY_LEARNING_DESIGN_ID = "from " + TABLENAME +
+													 " in class " + GroupingActivity.class.getName() +
+													 " where learning_design_id=?";
 	private static final String FIND_BY_UI_ID ="from " + TABLENAME +
 													  " in class " + Activity.class.getName() +
 													  " where activity_ui_id=?" + " AND " + " learning_design_id=?" ;
@@ -129,6 +132,15 @@ public class ActivityDAO extends BaseDAO implements IActivityDAO {
 	public List getActivitiesByLearningDesignId(Long learningDesignId) {
 		return this.getHibernateTemplate().find(FIND_BY_LEARNING_DESIGN_ID,learningDesignId);
 	}
+
+	/**
+	 * Get all the grouping activities for this learning design.
+	 * @param learningDesignId The id of the learningDesign
+	 * @return List of GroupingActivity objects
+	 */	
+	public List getGroupingActivitiesByLearningDesignId(Long learningDesignId) {
+		return this.getHibernateTemplate().find(FIND_GROUPINGACTIVITY_TYPE_BY_LEARNING_DESIGN_ID,learningDesignId);
+	}	
 
 	/* 
 	 * @see org.lamsfoundation.lams.learningdesign.dao.interfaces.IActivityDAO#insertActivity(org.lamsfoundation.lams.learningdesign.Activity)

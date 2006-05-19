@@ -32,8 +32,6 @@ import org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningDesignDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.TransitionDAO;
 import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
 import org.lamsfoundation.lams.test.AbstractCommonTestCase;
-import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.usermanagement.dao.hibernate.UserDAO;
 import org.lamsfoundation.lams.usermanagement.dao.hibernate.WorkspaceFolderDAO;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 
@@ -46,8 +44,8 @@ public class TestLearningDesignDAO extends AbstractCommonTestCase {
 	private LearningDesignDAO learningDesignDAO;
 	protected TransitionDAO transitionDAO;
 	protected WorkspaceFolderDAO workspaceFolderDAO;
-	private UserDAO userDAO;
-	private User user;
+	//private UserDAO userDAO;
+	//private User user;
 	private LearningDesign learningDesign;
 	
 	public TestLearningDesignDAO(String name) {
@@ -58,7 +56,7 @@ public class TestLearningDesignDAO extends AbstractCommonTestCase {
 		learningDesignDAO =(LearningDesignDAO)context.getBean("learningDesignDAO");		
 		transitionDAO =(TransitionDAO) context.getBean("transitionDAO");
 		activityDAO =(ActivityDAO) context.getBean("activityDAO");
-		userDAO = (UserDAO)context.getBean("userDAO");
+		//userDAO = (UserDAO)context.getBean("userDAO");
 	}
 	public void testCalculateFirstActivity(){
 		learningDesign = learningDesignDAO.getLearningDesignById(new Long(1));
@@ -73,7 +71,7 @@ public class TestLearningDesignDAO extends AbstractCommonTestCase {
 	}
 	public void testGetLearningDesignDTO() throws Exception{
 		learningDesign = learningDesignDAO.getLearningDesignById(new Long(1));
-		LearningDesignDTO learningDesignDTO = learningDesign.getLearningDesignDTO();		
+		LearningDesignDTO learningDesignDTO = new LearningDesignDTO(learningDesign,activityDAO);		
 		String str = WDDXProcessor.serialize(learningDesignDTO);
 		System.out.println(str);		
 	}	

@@ -18,8 +18,8 @@ INSERT INTO lams_css_theme_ve (theme_ve_id, name, description, parent_id, theme_
 
 
 insert into lams_workspace (workspace_id, root_folder_id, name) values(1,1,'ROOT');
-insert into lams_workspace (workspace_id, root_folder_id, name) values(2,2,'Developers Playpen');
-insert into lams_workspace (workspace_id, root_folder_id, name) values(3,3,'MATH111');
+insert into lams_workspace (workspace_id, root_folder_id, name, def_run_seq_fld_id) values(2,2,'Developers Playpen',21);
+insert into lams_workspace (workspace_id, root_folder_id, name, def_run_seq_fld_id) values(3,3,'MATH111',22);
 insert into lams_workspace (workspace_id, root_folder_id, name) values(4,4,'Mary Morgan');
 insert into lams_workspace (workspace_id, root_folder_id, name) values(5,5,'One Test');
 insert into lams_workspace (workspace_id, root_folder_id, name) values(6,6,'Two Test');
@@ -33,7 +33,13 @@ insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,wor
 values(2,1,'Developers Playpen',2,1,'20041223','20041223',1);
 
 insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,workspace_id,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
+values(21,2,'Lesson Sequence Folder',2,1,'20041223','20041223',2);
+
+insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,workspace_id,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
 values(3,1,'MATH111',3,1,'20041223','20041223',1);
+
+insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,workspace_id,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
+values(22,3,'Lesson Sequence Folder',3,1,'20041223','20041223',2);
 
 insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,workspace_id,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
 values(4,null,'Mary Morgan Folder',4,4,'20041223','20041223',1);

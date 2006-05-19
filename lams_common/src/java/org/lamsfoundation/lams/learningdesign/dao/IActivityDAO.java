@@ -90,6 +90,13 @@ public interface IActivityDAO extends IBaseDAO{
 	public List getActivitiesByLearningDesignId(Long learningDesignId);	
 	
 	/**
+	 * Get all the grouping activities for this learning design.
+	 * @param learningDesignId The id of the learningDesign
+	 * @return List of all the activities 
+	 */	
+	public List getGroupingActivitiesByLearningDesignId(Long learningDesignId);	
+
+	/**
 	 * Returns a list of activities associated with the LearningLibrary.
 	 * It only returns the template activities and not all activities 
 	 * with learning_library_id =libraryID. Template activity is one which

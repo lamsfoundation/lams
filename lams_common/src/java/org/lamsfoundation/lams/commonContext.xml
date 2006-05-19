@@ -108,6 +108,8 @@
 	
 	<bean id="learningDesignServiceTarget" class="org.lamsfoundation.lams.learningdesign.service.LearningDesignService">
 		<property name="messageService"><ref bean="commonMessageService"/></property>
+		<property name="learningDesignDAO"><ref bean="learningDesignDAO"/></property>
+		<property name="activityDAO"><ref bean="activityDAO"/></property>
 	</bean>
 	
 	<bean id="learningDesignService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">

@@ -24,7 +24,9 @@
 package org.lamsfoundation.lams.learningdesign.service;
 
 import java.util.Vector;
+
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
+import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
 
 /**
  * @author Mitchell Seaton
@@ -32,6 +34,13 @@ import org.lamsfoundation.lams.learningdesign.LearningDesign;
 
 public interface ILearningDesignService{
 	
+	/**
+	 * Get the learning design DTO, suitable to send to Flash via WDDX 
+	 * @param learningDesignId
+	 * @return LearningDesignDTO
+	 */
+	public LearningDesignDTO getLearningDesignDTO(Long learningDesignID);
+
 	/**
 	 * This method calls other validation methods which apply the validation 
 	 * rules to determine whether or not the learning design is valid.

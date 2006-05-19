@@ -180,9 +180,9 @@ public abstract class ComplexActivity extends Activity implements Serializable {
 	    
 	}
 	
-	public Set getAuthoringActivityDTOSet()
+	public Set<AuthoringActivityDTO> getAuthoringActivityDTOSet()
 	{
-		HashSet dtoSet = new HashSet();
+		HashSet<AuthoringActivityDTO> dtoSet = new HashSet<AuthoringActivityDTO>();
 		dtoSet.add(new AuthoringActivityDTO(this)); //add parent activity
 		
 		//add the DTO for all child activities

@@ -796,9 +796,9 @@ public abstract class Activity implements Serializable,Nullable {
 
 	/** Get the authoring DTO for this activity. Overidden by ComplexActivity.
 	 */
-	public Set getAuthoringActivityDTOSet()
+	public Set<AuthoringActivityDTO> getAuthoringActivityDTOSet()
 	{
-		HashSet dtoSet = new HashSet();
+		HashSet<AuthoringActivityDTO> dtoSet = new HashSet<AuthoringActivityDTO>();
 		dtoSet.add(new AuthoringActivityDTO(this));
 		return dtoSet;
 	}
