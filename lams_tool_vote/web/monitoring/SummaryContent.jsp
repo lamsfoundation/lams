@@ -125,10 +125,22 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 											<html:rewrite page="/chartGenerator?type=pie"/>
 										</c:set>
 										<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
-											 <font size=2>	<bean:message key="label.view.chart"/>  </font>
+											 <font size=2>	<bean:message key="label.view.piechart"/>  </font>
 										</a>
 									</td>
 								</tr>
+								<tr> 
+									<td> </td>
+									<td NOWRAP valign=top align=left >
+										<c:set var="viewURL">
+											<html:rewrite page="/chartGenerator?type=bar"/>
+										</c:set>
+										<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
+											 <font size=2>	<bean:message key="label.view.barchart"/>  </font>
+										</a>
+									</td>
+								</tr>
+
 							
 									<tr>
 								 		<td NOWRAP> <b> <font size=2> <bean:message key="label.nomination"/> </b> </td>
