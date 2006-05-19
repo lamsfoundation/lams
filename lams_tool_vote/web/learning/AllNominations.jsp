@@ -61,7 +61,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								<html:rewrite page="/chartGenerator?type=pie"/>
 							</c:set>
 							<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
-								 <font size=2>	<bean:message key="label.view.chart"/>  </font>
+								 <font size=2>	<bean:message key="label.view.piechart"/>  </font>
 							</a>
 								
 					  	</td>

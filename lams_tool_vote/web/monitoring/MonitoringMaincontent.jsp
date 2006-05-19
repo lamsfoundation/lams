@@ -168,6 +168,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<html:hidden property="toolContentID"/>
 	<html:hidden property="currentTab" styleId="currentTab" />
 
+	<html:hidden property="responseId"/>	 
+	<html:hidden property="currentUid"/>
+	<html:hidden property="selectedToolSessionId"/>							
+	<input type="hidden" name="isToolSessionChanged"/>	
+
 		<lams:Tabs collection="${tabs}" useKey="true" control="true"/>
 		<div class="tabbody">
 		<lams:TabBody id="1" titleKey="label.summary" page="SummaryContent.jsp"/>

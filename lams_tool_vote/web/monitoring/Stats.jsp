@@ -31,4 +31,33 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
  		<c:set var="statsTabActive" scope="request" value="true"/>
+ 		
+		<c:if test="${(userExceptionNoToolSessions == 'true')}"> 	
+				<table align="center">
+					<tr> 
+						<td NOWRAP valign=top align=center> 
+							<b> <font size=2> <bean:message key="error.noLearnerActivity"/> </font></b>
+						</td> 
+					<tr>
+				</table>
+		</c:if>			
+
+
+		<c:if test="${(userExceptionNoToolSessions != 'true') }"> 	
+		
+			<c:if test="${currentMonitoredToolSession == 'All'}"> 				
+				<table align="left">
+				<tr>
+			 		<td NOWRAP> <font size=2> <bean:message key="label.select.statsSession"/>  </td>
+			 		<td NOWRAP align=right> <font size=2> 
+						<jsp:include page="/monitoring/PullDownMenuStats.jsp" />
+			 		</td>
+				</tr>
+				</table>
+			</c:if> 	    
+
+			<jsp:include page="/monitoring/SummaryStatsCommon.jsp" />
+
+		</c:if>						
+ 		
 

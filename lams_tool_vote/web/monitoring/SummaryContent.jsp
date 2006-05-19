@@ -31,11 +31,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
-	<html:hidden property="responseId"/>	 
-	<html:hidden property="currentUid"/>
-	<html:hidden property="selectedToolSessionId"/>							
-	<input type="hidden" name="isToolSessionChanged"/>
-	
 		<c:if test="${(userExceptionNoToolSessions == 'true')}"> 	
 				<table align="center">
 					<tr> 

@@ -31,18 +31,26 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
-in common: statsTabActive: <c:out value="${statsTabActive}" />
-
-
 			<c:if test="${currentMonitoredToolSession != 'All'}"> 							
 
 				<table align="left">
-						<tr> 
-					 		<td NOWRAP> </td>
-							<td NOWRAP align=right>
-								<jsp:include page="/monitoring/PullDownMenu.jsp" />					
-							</td> 
-						</tr>
+				
+						<c:if test="${statsTabActive != 'true'}"> 							
+							<tr> 
+						 		<td NOWRAP> </td>
+								<td NOWRAP align=right>
+									<jsp:include page="/monitoring/PullDownMenu.jsp" />					
+								</td> 
+							</tr>
+						</c:if> 
+						<c:if test="${statsTabActive == 'true'}"> 							
+							<tr> 
+						 		<td NOWRAP> </td>
+								<td NOWRAP align=right>
+									<jsp:include page="/monitoring/PullDownMenuStats.jsp" />					
+								</td> 
+							</tr>
+						</c:if> 
 
 						<tr>
 					 		<td NOWRAP colspan=2 > &nbsp&nbsp </td>
@@ -164,7 +172,9 @@ in common: statsTabActive: <c:out value="${statsTabActive}" />
 														 <td NOWRAP valign=top align=left> <b> <font size=2>  <bean:message key="label.vote"/> </font> </b> </td>  														 
 														 <td NOWRAP valign=top align=left> <b> <font size=2>  <bean:message key="label.user"/> </font> </b> </td>  
 								  						 <td NOWRAP valign=top align=left> <b> <font size=2>  <bean:message key="label.attemptTime"/></font> </b></td>
-								  						 <td NOWRAP valign=top align=left> <b> <font size=2>  <bean:message key="label.visible"/> </font> </b></td>								  						 
+								 						 <c:if test="${statsTabActive != 'true'}"> 															  						 
+									  						 <td NOWRAP valign=top align=left> <b> <font size=2>  <bean:message key="label.visible"/> </font> </b></td>								  						 
+														 </c:if> 																					  						 
 										  			</tr>				 
 				
 						  							<c:forEach var="questionAttemptData" items="${currentDto.questionAttempts}">
@@ -181,23 +191,25 @@ in common: statsTabActive: <c:out value="${statsTabActive}" />
 																 <td NOWRAP valign=top align=left>   <font size=2> <c:out value="${userData.userName}"/> </font>  </td>  
 																 <td NOWRAP valign=top align=left>   <font size=2> <c:out value="${userData.attemptTime}"/> </font> </td>
 																 
-																 <td NOWRAP valign=top align=left>
-											 						<c:if test="${userData.visible == 'true' }"> 			
-												                                <html:submit property="hideOpenVote" 
-												                                             styleClass="linkbutton" 
-										                                                     onclick="submitOpenVote(${currentUid}, 'hideOpenVote');">						                                             
-												                                    <bean:message key="label.hide"/>
-												                                </html:submit>
-																	</c:if> 													
-						
-																	<c:if test="${userData.visible != 'true' }"> 			
-												                                <html:submit property="showOpenVote" 
-												                                             styleClass="linkbutton" 
-										                                                     onclick="submitOpenVote(${currentUid}, 'showOpenVote');">						                                             
-												                                    <bean:message key="label.show"/>
-												                                </html:submit>
-																	</c:if> 						
-																</td>																			
+										 						<c:if test="${statsTabActive != 'true'}"> 							
+																	 <td NOWRAP valign=top align=left>
+												 						<c:if test="${userData.visible == 'true' }"> 			
+													                                <html:submit property="hideOpenVote" 
+													                                             styleClass="linkbutton" 
+											                                                     onclick="submitOpenVote(${currentUid}, 'hideOpenVote');">						                                             
+													                                    <bean:message key="label.hide"/>
+													                                </html:submit>
+																		</c:if> 													
+							
+																		<c:if test="${userData.visible != 'true' }"> 			
+													                                <html:submit property="showOpenVote" 
+													                                             styleClass="linkbutton" 
+											                                                     onclick="submitOpenVote(${currentUid}, 'showOpenVote');">						                                             
+													                                    <bean:message key="label.show"/>
+													                                </html:submit>
+																		</c:if> 						
+																	</td>																			
+															</c:if> 	    																	
 																 
 														</tr>		
 													</c:forEach>		  	
