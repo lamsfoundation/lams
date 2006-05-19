@@ -64,7 +64,7 @@
 	if(<c:choose><c:when test="${LAMS_AUTHORING_SUCCESS_FLAG == true}">true</c:when><c:otherwise>false</c:otherwise></c:choose>){
         	location.href="<c:url value='${clearSessionActionUrl}?action=confirm&mode=${accessMode}&signature=${toolSignature}&toolContentID=${toolContentID}'/>";
 		}
-        function doSubmit() {
+        function doSubmit_Form_Only() {
         	document.getElementById("${formID}").submit();
         }
         function doCancel() {
@@ -80,7 +80,7 @@
         }  				
 </script>				
 <p align="right">
-	<html:link href="javascript:doSubmit();" property="submit" styleClass="button">
+	<html:link href="javascript:doSubmit_Form_Only();" property="submit" styleClass="button">
 		<fmt:message key="${saveButtonLabelKey}" /> 
 	</html:link>
 	<html:link href="javascript:;" property="cancel" onclick="javascript:doCancel()" styleClass="button">
