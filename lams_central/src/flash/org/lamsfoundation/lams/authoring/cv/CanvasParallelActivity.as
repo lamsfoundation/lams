@@ -111,18 +111,13 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 		child1.yCoord = CHILD1_OFFSET_Y;
 		child2.xCoord = CHILD_OFFSET_X;
 		child2.yCoord = CHILD2_OFFSET_Y;
-		//for some reason attachmovie is not showing mc, only the label fields!?
-		//child1_mc = childActivities_mc.createChildAtDepth("CanvasActivity",DepthManager.kTop,{_activity:child1,_canvasController:_canvasController,_canvasView:_canvasView});
-		//var child1_mc = childActivities_mc.attachMovie("CanvasActivity",'child_'+child1.activityUIID,this.getNextHighestDepth(),{_activity:child1,_canvasController:_canvasController,_canvasView:_canvasView});
-		//child2_mc = childActivities_mc.createChildAtDepth("CanvasActivity",DepthManager.kTop,{_activity:child2,_canvasController:_canvasController,_canvasView:_canvasView});
-		//var child2_mc = childActivities_mc.attachMovie("CanvasActivity",'child_'+child2.activityUIID,this.getNextHighestDepth(),{_activity:child2,_canvasController:_canvasController,_canvasView:_canvasView});
-		
+	
 		//so now it is placed on in the IDE and we just call init
 		child1_mc.init({activity:child1,canvasController:_canvasController,canvasView:_canvasView});
 		child2_mc.init({activity:child2,canvasController:_canvasController,canvasView:_canvasView});
 		
 		//let it wait one frame to set up the components.
-		childActivities_mc.createChildAtDepth("Bin",DepthManager.kTop);
+		//childActivities_mc.createChildAtDepth("Bin",DepthManager.kTop);
 		MovieClipUtils.doLater(Proxy.create(this,draw));
 		
 	}
