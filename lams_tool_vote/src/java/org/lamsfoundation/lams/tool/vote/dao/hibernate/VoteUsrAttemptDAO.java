@@ -346,10 +346,7 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 		    	    VoteUsrAttempt attempt=(VoteUsrAttempt)listIterator.next();
 		    	    if (attempt.getVoteQueUsr().getVoteSession().getUid().toString().equals(voteSessionUid.toString()))
 		    	    {
-		    	        if (!attempt.getVoteQueContentId().toString().equals("1"))
-		    	        {
 		    	            userEntries.add(attempt);    
-		    	        }
 		    	    }
 		    	}
 			}
@@ -357,8 +354,6 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 
 	    }
 		
-        //
-
 		
 		public VoteUsrAttempt getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long voteQueContentId)
 	    {

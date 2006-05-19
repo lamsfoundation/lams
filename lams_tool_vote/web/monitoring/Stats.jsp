@@ -30,3 +30,5 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
+ 		<c:set var="statsTabActive" scope="request" value="true"/>
+

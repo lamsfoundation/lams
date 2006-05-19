@@ -66,6 +66,20 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								
 					  	</td>
 					  </tr>	
+					  
+					  
+			  			<tr> 
+						  	<td NOWRAP align=center class="input" valign=top colspan=2> 
+								<c:set var="viewURL">
+									<html:rewrite page="/chartGenerator?type=bar"/>
+								</c:set>
+								<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
+									 <font size=2>	<bean:message key="label.view.barchart"/>  </font>
+								</a>
+							</td>
+						</tr>
+					  
+					  
 
 					  <tr>
 					  	<td NOWRAP align=center class="input" valign=top colspan=2> 
