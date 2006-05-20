@@ -93,7 +93,7 @@ NULL
 , NULL
 , NULL
 , NULL
-, 'tool/lamc11/images/icon_mcq.swf'
+, 'tool/lavote11/images/icon_ranking.swf'
 , NULL
 , NULL
 , NULL
