@@ -26,11 +26,13 @@ package org.lamsfoundation.lams.authoring.service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.Vector;
@@ -324,32 +326,24 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
      * @param newLearningDesign The copy of the originalLearningDesign
      */
     private void updateDesignActivities(LearningDesign originalLearningDesign, LearningDesign newLearningDesign){
-    	TreeSet newActivities = new TreeSet(new ActivityOrderComparator());   
+    	TreeSet<Activity> newActivities = new TreeSet<Activity>(new ActivityOrderComparator());   
+    	HashMap<Integer, Grouping> newGroupings = new HashMap<Integer, Grouping>();    // key is UIID
     	
     	Set oldParentActivities = originalLearningDesign.getParentActivities();
     	if ( oldParentActivities != null ) {
 	    	Iterator iterator = oldParentActivities.iterator();    	
 	    	while(iterator.hasNext()){
-	    		Activity parentActivity = (Activity)iterator.next();
-	    		Activity newParentActivity = getActivityCopy(parentActivity);
-	    		newParentActivity.setLearningDesign(newLearningDesign);
-	    		activityDAO.insert(newParentActivity);
-	    		newActivities.add(newParentActivity);
-	    		
-	    		Set oldChildActivities = getChildActivities((Activity)parentActivity);
-	    		if ( oldChildActivities != null ) {
-		    		Iterator childIterator = oldChildActivities.iterator();
-		    		while(childIterator.hasNext()){
-		    			Activity childActivity = (Activity)childIterator.next();
-		    			Activity newChildActivity = getActivityCopy(childActivity);
-		    			newChildActivity.setParentActivity(newParentActivity);
-		    			newChildActivity.setParentUIID(newParentActivity.getActivityUIID());
-		    			newChildActivity.setLearningDesign(newLearningDesign);
-		    			activityDAO.insert(newChildActivity);
-		    			newActivities.add(newChildActivity);
-		    		}
-	    		}
+	    		processActivity((Activity)iterator.next(), newLearningDesign, newActivities, newGroupings, null);
 	    	}
+    	}
+    	
+    	// Go back and find all the grouped activities and assign them the new groupings, based on the UIID. Can't
+    	// be done as we go as the grouping activity may be processed after the grouped activity.
+    	for ( Activity activity : newActivities ) {
+    		Integer groupingUIID = activity.getGroupingUIID();
+    		if ( groupingUIID != null ) {
+   				activity.setGrouping(newGroupings.get(groupingUIID));
+    		}
     	}
     	
     	// The activities collection in the learning design may already exist (as we have already done a save on the design).
@@ -362,7 +356,35 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     	}
     }
     
-    /**
+    /** As part of updateDesignActivities(), process an activity and, via recursive calls, the activity's child activities. Need to keep track
+     * of any new groupings created so we can go back and update the grouped activities with their new groupings at the end.
+     * 
+     * @param activity Activity to process. May not be null.
+     * @param newLearningDesign The new learning design. May not be null.
+     * @param newActivities Temporary set of new activities - as activities are processed they are added to the set. May not be null.
+     * @param newGroupings Temporary set of new groupings. Key is the grouping UUID. May not be null.
+     * @param parentActivity This activity's parent activity (if one exists). May be null.
+     */
+    private void processActivity(Activity activity, LearningDesign newLearningDesign, Set<Activity> newActivities, Map<Integer, Grouping> newGroupings, Activity parentActivity) {
+		Activity newActivity = getActivityCopy(activity, newGroupings);
+		newActivity.setLearningDesign(newLearningDesign);
+		if ( parentActivity != null ) {
+			newActivity.setParentActivity(parentActivity);
+			newActivity.setParentUIID(parentActivity.getActivityUIID());
+		}
+		activityDAO.insert(newActivity);
+		newActivities.add(newActivity);
+		
+		Set oldChildActivities = getChildActivities((Activity)activity);
+		if ( oldChildActivities != null ) {
+			Iterator childIterator = oldChildActivities.iterator();
+			while(childIterator.hasNext()){
+				processActivity((Activity)childIterator.next(), newLearningDesign, newActivities, newGroupings, newActivity);
+			}
+		}
+    }
+
+	/**
      * Updates the Transition information in the newLearningDesign based 
      * on the originalLearningDesign
      * 
@@ -407,16 +429,19 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
      * Determines the type of activity and returns a deep-copy of the same
      * 
      * @param activity The object to be deep-copied
+     * @param newGroupings Temporary set of new groupings. Key is the grouping UUID. May not be null.
      * @return Activity The new deep-copied Activity object
      */
-    private Activity getActivityCopy(final Activity activity){
+    private Activity getActivityCopy(final Activity activity, Map<Integer, Grouping> newGroupings){
     	if ( Activity.GROUPING_ACTIVITY_TYPE == activity.getActivityTypeId().intValue() ) {
     		GroupingActivity newGroupingActivity = (GroupingActivity) activity.createCopy();
     		// now we need to manually add the grouping to the session, as we can't easily
     		// set up a cascade
     		Grouping grouping = newGroupingActivity.getCreateGrouping();
-    		if ( grouping != null )
+    		if ( grouping != null ) {
     			groupingDAO.insert(grouping);
+    			newGroupings.put(grouping.getGroupingUIID(), grouping);
+    		}
     		return newGroupingActivity;
     	}
     	else 
