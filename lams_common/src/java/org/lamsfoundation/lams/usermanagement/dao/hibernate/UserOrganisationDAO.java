@@ -82,6 +82,15 @@ public class UserOrganisationDAO extends HibernateDaoSupport implements
 	}
 
 	/** 
+	 * @see org.lamsfoundation.lams.usermanagement.dao.IUserOrganisationDAO#getChildUserOrganisationsByUser(org.lamsfoundation.lams.usermanagement.User,org.lamsfoundation.lams.usermanagement.Organisation)
+	 */
+	public List getChildUserOrganisationsByUser(User user, Organisation parentOrganisation) {
+		String queryString = "from UserOrganisation uo where uo.user.userId=? "
+			+" and uo.organisation.parentOrganisation.organisationId=?";
+		return getHibernateTemplate().find(queryString,new Object[] {user.getUserId(), parentOrganisation.getOrganisationId()});
+	}
+
+	/** 
 	 * @see org.lamsfoundation.lams.usermanagement.dao.IUserOrganisationDAO#getUserOrganisationsByOrganisation(org.lamsfoundation.lams.usermanagement.Organisation)
 	 */
 	public List getUserOrganisationsByOrganisation(Organisation organisation) {

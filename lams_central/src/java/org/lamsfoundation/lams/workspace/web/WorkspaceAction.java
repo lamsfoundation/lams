@@ -514,10 +514,12 @@ public class WorkspaceAction extends DispatchAction {
 			roleList.add(role);
 		}
 		
+		Integer orgId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID,true);
+
 		String wddxPacket = null;
 		try {
 			IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
-			wddxPacket = workspaceManagementService.getOrganisationsByUserRole(userID, roleList);		
+			wddxPacket = workspaceManagementService.getOrganisationsByUserRole(userID, roleList,orgId);		
 		} catch (Exception e) {
 			log.error("getOrganisationsByUserRole: Exception occured. userID "+userID+" role "+roles.toString(), e);
 			FlashMessage flashMessage = FlashMessage.getExceptionOccured(IWorkspaceManagementService.MSG_KEY_ORG_BY_ROLE, e.getMessage());
@@ -530,6 +532,7 @@ public class WorkspaceAction extends DispatchAction {
 			  ActionForm form,
 			  HttpServletRequest request,
 			  HttpServletResponse response)throws Exception{
+		
 		Integer organisationID = new Integer(WebUtil.readIntParam(request,"organisationID"));
 		String role = WebUtil.readStrParam(request, "role");
 
@@ -547,5 +550,23 @@ public class WorkspaceAction extends DispatchAction {
 		return returnWDDXPacket(wddxPacket, response);
 	}
 
+	public ActionForward getUserOrganisation(ActionMapping mapping,
+			  ActionForm form,
+			  HttpServletRequest request,
+			  HttpServletResponse response)throws Exception{
+		
+		Integer userID = new Integer(WebUtil.readIntParam(request,AttributeNames.PARAM_USER_ID));
+		Integer orgId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID,true);
+
+		String wddxPacket = null;
+		try {
+			IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
+			wddxPacket = workspaceManagementService.getUserOrganisation(userID, orgId);		
+		} catch (Exception e) {
+			log.error("getUserOrganisation: Exception occured. userID "+userID+" organisationId "+orgId, e);
+			FlashMessage flashMessage = FlashMessage.getExceptionOccured(IWorkspaceManagementService.MSG_KEY_ORG_BY_ROLE, e.getMessage());
+			wddxPacket = flashMessage.serializeMessage();
+		}
+		return returnWDDXPacket(wddxPacket, response);	}
 }
 

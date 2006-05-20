@@ -291,31 +291,86 @@ public class UserManagementService implements IUserManagementService {
 	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getOrganisationRolesForUser(org.lamsfoundation.lams.usermanagement.User, java.util.List<String>)
 	 */
 	public OrganisationDTO getOrganisationsForUserByRole(User user, List<String> restrictToRoleNames) {
+		// TODO optimise db access
 		List<OrganisationDTO> list = new ArrayList<OrganisationDTO>();
 		Iterator i = userOrganisationDAO.getUserOrganisationsByUser(user).iterator();
-		// work out whether or not the restriction applies once only - performance tweak
-		boolean restrictRoles = restrictToRoleNames != null && restrictToRoleNames.size() > 0;  
 		
 		while (i.hasNext()) {
 			UserOrganisation userOrganisation = (UserOrganisation) i.next();
 			OrganisationDTO dto = userOrganisation.getOrganisation().getOrganisationDTO();
-			Iterator i2 = userOrganisation.getUserOrganisationRoles().iterator();
-
-			boolean roleFound = false;
-			while (i2.hasNext()) {
-				
-				UserOrganisationRole userOrganisationRole = (UserOrganisationRole) i2.next();
-				String roleName = userOrganisationRole.getRole().getName();
-				if ( ! restrictRoles || restrictToRoleNames.contains(roleName) ) {
-					dto.addRoleName(roleName);
-					roleFound = true;
-				}
-			}
-			if ( roleFound ) {
+			boolean aRoleFound = addRolesToDTO(restrictToRoleNames, userOrganisation, dto);
+			if ( aRoleFound ) {
 				list.add(dto);
 			}
 		}
 		return OrganisationDTOFactory.createTree(list);
+	}
+
+	/**
+	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getOrganisationRolesForUser(org.lamsfoundation.lams.usermanagement.User, java.util.List<String>, java.util.Integer)
+	 */
+	public OrganisationDTO getOrganisationsForUserByRole(User user, List<String> restrictToRoleNames, Integer organisationId) {
+		// TODO optimise db access
+		List<OrganisationDTO> dtolist = new ArrayList<OrganisationDTO>();
+		Organisation org = organisationDAO.getOrganisationById(organisationId);
+		getChildOrganisations(user, org, restrictToRoleNames, dtolist);
+		return OrganisationDTOFactory.createTree(dtolist);
+	}
+	
+	private void getChildOrganisations(User user, Organisation org, List<String> restrictToRoleNames, List<OrganisationDTO> dtolist) {
+		if ( org != null ) {
+			List<UserOrganisation> childOrgs = userOrganisationDAO.getChildUserOrganisationsByUser(user, org);
+			for ( UserOrganisation userOrganisation : childOrgs) {
+				OrganisationDTO dto = userOrganisation.getOrganisation().getOrganisationDTO();
+				boolean aRoleFound = addRolesToDTO(restrictToRoleNames, userOrganisation, dto);
+				if ( aRoleFound ) {
+					dtolist.add(dto);
+				}
+				
+				// now, process any children of this org
+				Organisation childOrganisation = userOrganisation.getOrganisation();
+				if ( org.getChildOrganisations().size() > 0 ) {
+					getChildOrganisations(user, childOrganisation, restrictToRoleNames, dtolist);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Go through the roles for this user organisation and add the roles to the dto.
+	 * @param restrictToRoleNames
+	 * @param userOrganisation
+	 * @param dto
+	 * @return true if a role is found, false otherwise
+	 */
+	private boolean addRolesToDTO(List<String> restrictToRoleNames, UserOrganisation userOrganisation, OrganisationDTO dto) {
+		Iterator iter = userOrganisation.getUserOrganisationRoles().iterator();
+
+		boolean roleFound = false;
+		while (iter.hasNext()) {
+			
+			UserOrganisationRole userOrganisationRole = (UserOrganisationRole) iter.next();
+			String roleName = userOrganisationRole.getRole().getName();
+			if ( restrictToRoleNames == null || restrictToRoleNames.size()==0 || restrictToRoleNames.contains(roleName) ) {
+				dto.addRoleName(roleName);
+				roleFound = true;
+			}
+		}
+		return roleFound;
+	}
+
+	/**
+     * Gets an organisation for a user, with the user's roles. Doesn't not return a tree of organisations.
+     * Will not return the organisation if there isn't any roles for this user.
+	 */
+	public OrganisationDTO getOrganisationForUserWithRole(User user, Integer organisationId) {
+		if ( user != null && organisationId !=null ) {
+			UserOrganisation userOrganisation = getUserOrganisation(user.getUserId(), organisationId);
+			OrganisationDTO dto = userOrganisation.getOrganisation().getOrganisationDTO();
+			addRolesToDTO(null, userOrganisation, dto);
+			return dto;
+		}
+		return null;
 	}
 
 	/**

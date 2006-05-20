@@ -53,6 +53,7 @@ public interface IWorkspaceManagementService {
 	public static final String MSG_KEY_CREATE_WKF_CONTENT = "createWorkspaceFolderContent";
 	public static final String MSG_KEY_UPDATE_WKF_CONTENT = "updateWorkspaceFolderContent";
 	public static final String MSG_KEY_DELETE_VERSION = "deleteContentWithVersion";
+	public static final String MSG_KEY_ORG = "getUserOrganisation";
 	public static final String MSG_KEY_ORG_BY_ROLE = "getOrganisationsByUserRole";
 	public static final String MSG_KEY_USER_BY_ROLE = "getUsersFromOrganisationByRole";
 
@@ -321,9 +322,10 @@ public interface IWorkspaceManagementService {
 	 * in WDDX format
 	 * @param userID
 	 * @param roles
+	 * @param organisationID if null returns all organisations, if set returns child organisations for this organisation
 	 * @return
 	 */
-	public String getOrganisationsByUserRole(Integer userID, List<String> roleNames) throws IOException;
+	public String getOrganisationsByUserRole(Integer userID, List<String> roleNames, Integer organisationId) throws IOException;
 	
 	/**
 	 * Returns the users within the Organisation with <code>organisationID</code>
@@ -333,5 +335,11 @@ public interface IWorkspaceManagementService {
 	 * @return
 	 */
 	public Vector<UserDTO> getUsersFromOrganisationByRole(Integer organisationID, String role) throws IOException;
+
+	/**
+	 * Returns a single OrganisationDTO with the user's roles included. If the user does not have 
+	 * any roles in this organisation, then no organisation is returned.
+	 */
+	public String getUserOrganisation(Integer userID, Integer organisationId) throws IOException;
 
 }

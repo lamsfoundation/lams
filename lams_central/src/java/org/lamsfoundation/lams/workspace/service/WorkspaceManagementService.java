@@ -63,6 +63,7 @@ import org.lamsfoundation.lams.usermanagement.dao.IUserDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IUserOrganisationDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IWorkspaceDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IWorkspaceFolderDAO;
+import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
@@ -1384,13 +1385,18 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	/**
 	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#getOrganisationsByUserRole(Integer, String)
 	 */
-	public String getOrganisationsByUserRole(Integer userID, List<String> roleNames) throws IOException
+	public String getOrganisationsByUserRole(Integer userID, List<String> roleNames, Integer organisationId) throws IOException
 	{
 		User user = userDAO.getUserById(userID);
 		
 		if (user!=null) {
-			flashMessage = new FlashMessage(
-					MSG_KEY_ORG_BY_ROLE, userMgmtService.getOrganisationsForUserByRole(user, roleNames));
+			if ( organisationId == null ) {
+				flashMessage = new FlashMessage(
+						MSG_KEY_ORG_BY_ROLE, userMgmtService.getOrganisationsForUserByRole(user, roleNames));
+			} else {
+				flashMessage = new FlashMessage(
+						MSG_KEY_ORG_BY_ROLE, userMgmtService.getOrganisationsForUserByRole(user, roleNames, organisationId));
+			}
 		} else
 			flashMessage = FlashMessage.getNoSuchUserExists(
 					MSG_KEY_ORG_BY_ROLE, userID);
@@ -1399,6 +1405,28 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		
 	}
 		
+	/**
+	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#getUserOrganisation(Integer, String)
+	 */
+	public String getUserOrganisation(Integer userID, Integer organisationId) throws IOException
+	{
+		User user = userDAO.getUserById(userID);
+		
+		if (user!=null) {
+			OrganisationDTO orgDTO = userMgmtService.getOrganisationForUserWithRole(user, organisationId);
+			if ( orgDTO != null ) {
+				flashMessage = new FlashMessage(MSG_KEY_ORG, orgDTO);
+			} else {
+				flashMessage = FlashMessage.getNoSuchOrganisationExists(MSG_KEY_ORG, organisationId);
+			}
+		} else
+			flashMessage = FlashMessage.getNoSuchUserExists(
+					MSG_KEY_ORG_BY_ROLE, userID);
+
+		return flashMessage.serializeMessage();
+		
+	}
+
 	/** 
 	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#getUsersFromOrganisationByRole(Integer, String)
 	 */

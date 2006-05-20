@@ -68,6 +68,14 @@ public interface IUserOrganisationDAO {
      */
     public List getUserOrganisationsByUser(User user);
 
+	/** 
+     * Gets userOrganisation objects for this user, where the organisations are child organisations of the given parent organisation
+     * @param user the userOrganisation's user
+     * @param parentOrganisation the parent organisation
+     * @return List populated list of userOrganisations
+	 */
+	public List getChildUserOrganisationsByUser(User user, Organisation parentOrganisation);
+
     /**
      * Gets userOrganisation objects based on organisation.
      * @param organisation the userOrganisation's organisation

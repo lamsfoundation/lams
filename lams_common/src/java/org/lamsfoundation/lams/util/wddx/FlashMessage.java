@@ -121,6 +121,11 @@ public class FlashMessage implements Serializable {
     							"No such User with a user_id of :" + userID + " exists",
 								ERROR);    	
     }
+    public static FlashMessage getNoSuchOrganisationExists(String methodName, Integer organisationID){
+    	return new FlashMessage(methodName,
+    							"No such Organisation with a organisationID of :" + organisationID + " exists",
+								ERROR);    	
+    }
     public static FlashMessage getUserNotAuthorized(String methodName, Integer userID){
     	return new FlashMessage(methodName,
     			"User with user_id of:" + userID +" is not authorized to perfom this action:",
