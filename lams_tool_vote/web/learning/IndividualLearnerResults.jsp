@@ -10,7 +10,6 @@
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html:html locale="true">
 <head>
 	<jsp:include page="/learning/learningHeader.jsp" />
@@ -21,11 +20,11 @@
 	<html:hidden property="dispatch"/>
 	<html:hidden property="toolContentID"/>
 				
-				<table align=center bgcolor="#FFFFFF">
+			<table width="80%" cellspacing="8" align="CENTER" class="forms">
 
 					  <tr>
-					  	<td NOWRAP align=left class="input" valign=top bgColor="#333366" colspan=2> 
-						  	<font size=2 color="#FFFFFF"> <b>  <bean:message key="label.learning.reportMessage"/> </b> </font>
+					  	<td NOWRAP align=left class="input" valign=top  colspan=2> 
+						  	<font size=2> <b>  <bean:message key="label.learning.reportMessage"/> </b> </font>
 					  	</td>
 					  </tr>
 				

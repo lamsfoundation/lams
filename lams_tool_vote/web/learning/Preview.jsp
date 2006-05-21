@@ -30,7 +30,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
 <html:html locale="true">
 <head>
 	<jsp:include page="/learning/learningHeader.jsp" />
@@ -41,16 +41,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<html:hidden property="dispatch"/>
 	<html:hidden property="toolContentID"/>
 
-				<table align=center bgcolor="#FFFFFF">
-
+				<table width="80%" cellspacing="8" align="CENTER" class="forms">
 	  					  <tr>
-						  	<td NOWRAP align=center class="input" valign=top bgColor="white" colspan=2> 
+						  	<td NOWRAP align=center class="input" valign=top colspan=2> 
 								  <c:out value="${VoteLearningForm.activityTitle}" escapeXml="false" />					 	  		
 						  	</td>
 						  </tr>
 						  
 						  <tr>
-						  	<td  NOWRAP align=left class="input" valign=top bgColor="white" colspan=2> 
+						  	<td  NOWRAP align=left class="input" valign=top colspan=2> 
 								  <c:out value="${VoteLearningForm.activityInstructions}" escapeXml="false" />					 	  						 	  							  	
 						  	</td>
 						  </tr>

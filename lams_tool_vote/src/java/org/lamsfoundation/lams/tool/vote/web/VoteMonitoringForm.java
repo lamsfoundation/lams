@@ -42,6 +42,8 @@ public class VoteMonitoringForm extends VoteAuthoringForm implements VoteAppCons
 	
 	protected String completedSessionUserCount;
 	
+	protected String completedSessionUserPercent;
+	
 	protected String viewOpenVotes;
 	
 	protected String showOpenVotesSection;
@@ -189,5 +191,18 @@ public class VoteMonitoringForm extends VoteAuthoringForm implements VoteAppCons
      */
     public void setShowOpenVote(String showOpenVote) {
         this.showOpenVote = showOpenVote;
+    }
+    /**
+     * @return Returns the completedSessionUserPercent.
+     */
+    public String getCompletedSessionUserPercent() {
+        return completedSessionUserPercent;
+    }
+    /**
+     * @param completedSessionUserPercent The completedSessionUserPercent to set.
+     */
+    public void setCompletedSessionUserPercent(
+            String completedSessionUserPercent) {
+        this.completedSessionUserPercent = completedSessionUserPercent;
     }
 }

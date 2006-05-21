@@ -63,7 +63,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	  					<tr>
 					 		<td NOWRAP> <b> <font size=2> <bean:message key="label.total.completed.students"/> </b> </td> 
-					 		<td> <font size=2> <c:out value="${VoteMonitoringForm.completedSessionUserCount}"/> </font></td>
+					 		<td> <font size=2> <c:out value="${VoteMonitoringForm.completedSessionUserCount}"/> 
+						 		&nbsp(<c:out value="${VoteMonitoringForm.completedSessionUserPercent}"/> <bean:message key="label.percent"/>)
+					 		</font></td>
 						</tr>
 
 						<tr>
@@ -162,20 +164,22 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 												<b> <font size=2> <bean:message key="label.openVotes"/> </b>
 											</td>
 										</tr>
+
+											<tr> 
+												 <td NOWRAP valign=top align=left> <b> <font size=2>  <bean:message key="label.vote"/> </font> </b> </td>  														 
+												 <td NOWRAP valign=top align=left> <b> <font size=2>  <bean:message key="label.user"/> </font> </b> </td>  
+						  						 <td NOWRAP valign=top align=left> <b> <font size=2>  <bean:message key="label.attemptTime"/></font> </b></td>
+						 						 <c:if test="${statsTabActive != 'true'}"> 															  						 
+							  						 <td NOWRAP valign=top align=left> <b> <font size=2>  <bean:message key="label.visible"/> </font> </b></td>								  						 
+												 </c:if> 																					  						 
+								  			</tr>				 
+										
 					 			
 									<c:forEach var="currentDto" items="${sessionScope.listUserEntries}">
 
 										<tr> 
 											<td NOWRAP valign=top>
 												<table align=center>
-													<tr> 
-														 <td NOWRAP valign=top align=left> <b> <font size=2>  <bean:message key="label.vote"/> </font> </b> </td>  														 
-														 <td NOWRAP valign=top align=left> <b> <font size=2>  <bean:message key="label.user"/> </font> </b> </td>  
-								  						 <td NOWRAP valign=top align=left> <b> <font size=2>  <bean:message key="label.attemptTime"/></font> </b></td>
-								 						 <c:if test="${statsTabActive != 'true'}"> 															  						 
-									  						 <td NOWRAP valign=top align=left> <b> <font size=2>  <bean:message key="label.visible"/> </font> </b></td>								  						 
-														 </c:if> 																					  						 
-										  			</tr>				 
 				
 						  							<c:forEach var="questionAttemptData" items="${currentDto.questionAttempts}">
 											  	 		<c:set var="userData" scope="request" value="${questionAttemptData.value}"/>

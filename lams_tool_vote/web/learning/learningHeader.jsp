@@ -30,8 +30,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
-
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	
+	<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+	<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	
 	<title> <bean:message key="label.learning"/> </title>
 	
 	 <lams:css/>

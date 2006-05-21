@@ -678,15 +678,23 @@ public class MonitoringUtil implements VoteAppConstants{
 		        logger.debug("potentialUserCount: " + potentialUserCount);
 		        voteMonitoringForm.setSessionUserCount(Integer.toString(potentialUserCount));
 		        voteMonitoringForm.setCompletedSessionUserCount(new Integer(completedSessionUserCount).toString());
+		        
+		        if (potentialUserCount != 0)
+		        {
+		            double completedPercent=(completedSessionUserCount*100) / potentialUserCount;
+		            logger.debug("completed percent: " + completedPercent);
+		            voteMonitoringForm.setCompletedSessionUserPercent(new Double(completedPercent).toString());    
+		        }
+		        else
+		        {
+		            voteMonitoringForm.setCompletedSessionUserPercent("Not Available");
+		        }
 		    }
 		}
 		else
 		{
 		    sessionLevelCharting=false;
 		    logger.debug("process for content: ");
-		    //entriesCount=voteService.getAllEntriesCount();
-		    //userEntries=voteService.getUserEntries();
-		    //entriesCount=voteService.getContentEntriesCount(voteContent.getUid());
 		    userEntries=voteService.getContentEntries(voteContent.getUid());
 		    entriesCount=userEntries.size();
 		}
@@ -772,80 +780,6 @@ public class MonitoringUtil implements VoteAppConstants{
 	    mapStandardRatesContent.put(mapIndex.toString(), new Double(share).toString());
 	    mapStandardUserCount.put(mapIndex.toString(), new Integer(userEnteredVotesCount).toString());
         
-	    /*
-
-	    double totalUserRate=0d;
-	    while (itListQuestions.hasNext())
-	    {
-	    	String  userEntry =(String)itListQuestions.next();
-	    	logger.debug("userEntry:..." + userEntry);
-	    	
-	    	if ((userEntry != null) && (userEntry.length() > 0))
-	    	{
-	    	    int userEntryRate=0;
-				if (sessionLevelCharting == true)
-				{
-				    logger.debug("getting total for userEntryRate based on session: " + toolSessionUid);
-				    userEntryRate=voteService.getSessionUserRecordsEntryCount(userEntry, toolSessionUid,voteService);    
-				}
-				else
-				{
-				    logger.debug("getting total for userEntryRate based on content: ");
-				    userEntryRate=voteService.getUserRecordsEntryCount(userEntry);
-				}
-	    	    
-				logger.debug("userEntryRate: " + userEntryRate);
-				totalUserRate=totalUserRate + userEntryRate; 
-	    	}
-	    }
-	    logger.debug("totalUserRate: " + totalUserRate);
-	    
-
-	    itListQuestions = userEntries.iterator();
-	    while (itListQuestions.hasNext())
-	    {
-	    	String  userEntry =(String)itListQuestions.next();
-	    	logger.debug("userEntry:..." + userEntry);
-	    	logger.debug("mapIndex: " + mapIndex);
-	    	
-	    	if ((userEntry != null) && (userEntry.length() > 0))
-	    	{
-	    	    
-	    	    int userEntryRate=0;
-				if (sessionLevelCharting == true)
-				{
-				    logger.debug("getting userEntryRate based on session: " + toolSessionUid);
-				    userEntryRate=voteService.getSessionUserRecordsEntryCount(userEntry, toolSessionUid,voteService);    
-				}
-				else
-				{
-				    logger.debug("getting userEntryRate based on session: " + toolSessionUid);
-				    userEntryRate=voteService.getUserRecordsEntryCount(userEntry);
-				}
-				logger.debug("userEntryRate: " + userEntryRate);
-
-				double votesShare= (userEntryRate * share) / totalUserRate ;
-				logger.debug("votesShare: " + votesShare);
-	    	    
-	    	    mapVoteRatesContent.put(mapIndex.toString(), new Double(votesShare).toString());
-	    	    
-	    	    mapOptionsContent.put(mapIndex.toString() ,userEntry);
-	    	    mapIndex=new Long(mapIndex.longValue()+1);
-	    	}
-	    }
-	    
-	    */
-		
-		
-	    /*
-		logger.debug("Map initialized with mapVoteRatesContent: " + mapVoteRatesContent);
-		request.getSession().setAttribute(MAP_VOTERATES_CONTENT, mapVoteRatesContent);
-		logger.debug("starter initialized the MAP_VOTERATES_CONTENT Map: " + request.getSession().getAttribute(MAP_VOTERATES_CONTENT));
-		
-		request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
-		logger.debug("final starter initialized the MAP_OPTIONS_CONTENT Map: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT) );
-		*/
-	    
 		request.getSession().setAttribute(MAP_STANDARD_NOMINATIONS_CONTENT, mapStandardNominationsContent);
 		logger.debug("test2: MAP_STANDARD_NOMINATIONS_CONTENT: " + request.getSession().getAttribute(MAP_STANDARD_NOMINATIONS_CONTENT));
 
