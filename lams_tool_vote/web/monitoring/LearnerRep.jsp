@@ -32,9 +32,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
 	<!DOCTYPE HTML PUBLIC "-//W3C//DTD hTML 4.01 Transitional//EN">
+	<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
+	
 	<html:html locale="true">
 	<head>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 	<title> <bean:message key="label.learning.report"/> </title>
 	
 	 <lams:css/>
@@ -67,41 +69,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 </head>
 <body>
 
-<c:if test="${ requestLearningReportProgress != 'true'}"> 			
-	<c:if test="${ requestLearningReportViewOnly != 'true'}"> 			
-		<b> <font size=2> <c:out value="${sessionScope.reportTitleLearner}" escapeXml="false"/> </font></b>
-	</c:if> 				    
-	<c:if test="${ requestLearningReportViewOnly == 'true'}"> 			
-		<b> <font size=2> <bean:message key="label.learning.viewOnly"/> </font></b>
-	</c:if> 				    
-
-		<c:set var="monitoringURL">
-			<html:rewrite page="/monitoring.do" />
-		</c:set>
-
-	  <html:form  action="/monitoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
-		<html:hidden property="method"/>	 
-
-			<div class="tabbody content_b" >
-				<jsp:include page="/monitoring/SummaryContent.jsp" />
-			</div>		         
-
-			<c:if test="${ requestLearningReportViewOnly != 'true'}"> 			
-				<table align=right> 	  
+		<table width="80%" cellspacing="8" align="CENTER" class="forms">
 				<tr>
-					 <td> 
-						<html:submit onclick="javascript:submitMethod('endLearning');" styleClass="button">
-							<bean:message key="button.endLearning"/>
-						</html:submit>	 				 		  					
-					</td> 
+			 		<th NOWRAP>  <bean:message key="label.learner.progress"/>   </th>
 				</tr>
-				</table>
-			</c:if> 			
-	</html:form>
-</c:if> 				    
-
-<c:if test="${ requestLearningReportProgress == 'true'}"> 			
-		 <font size=2> <b> <bean:message key="label.learner.progress"/> </b> </font>
+		</table>
 
 		<c:set var="monitoringURL">
 			<html:rewrite page="/monitoring.do" />
@@ -111,10 +83,89 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<html:hidden property="method"/>	 
 
 			<div class="tabbody content_b" >
-				<jsp:include page="/monitoring/SummaryContent.jsp" />
-			</div>		         
+			
+				<table width="80%" cellspacing="8" align="CENTER" class="forms">
+					<tr>
+						<td NOWRAP valign=top align=left>
+			 			<table align=left>
+			 			
+						<c:forEach var="currentDto" items="${sessionScope.listMonitoredAnswersContainerDto}">
+				  	 		<c:set var="currentQuestionId" scope="request" value="${currentDto.questionUid}"/>
+				  	 		<tr>
+				  	 			<td> &nbsp&nbsp</td>
+				  	 		</tr>
+							<tr>			
+								<td NOWRAP valign=top align=left><b> <font size=2> <bean:message key="label.nomination"/>: </b>
+									<c:out value="${currentDto.question}" escapeXml="false"/>
+								</font> </td>
+							</tr>	
+							
+							<tr> 
+								<td NOWRAP class="formlabel" valign=top>
+									<table align=center>
+										<tr> 
+											 <td NOWRAP valign=top> <b> <font size=2> <bean:message key="label.user"/> </font> </b> </td>  
+					  						 <td NOWRAP valign=top> <b> <font size=2> <bean:message key="label.attemptTime"/></font> </b></td>
+							  			</tr>				 
+			  							<c:forEach var="questionAttemptData" items="${currentDto.questionAttempts}">
+											<c:forEach var="sData" items="${questionAttemptData.value}">
+									  	 		<c:set var="userData" scope="request" value="${sData.value}"/>
+									  	 		<c:set var="responseUid" scope="request" value="${userData.uid}"/>
+	
+		  	 									<c:if test="${currentQuestionId == userData.questionUid}">
+			  	 									<c:if test="${sessionScope.currentMonitoredToolSession == 'All'}"> 			
+																<jsp:include page="/monitoring/UserResponses.jsp" />
+													</c:if>														  					 									  			
+													
+			  	 									<c:if test="${sessionScope.currentMonitoredToolSession != 'All'}"> 			
+			  	 										<c:if test="${sessionScope.currentMonitoredToolSession == userData.sessionId}"> 			
+																<jsp:include page="/monitoring/UserResponses.jsp" />										
+														</c:if>														  					 									  													  			
+													</c:if>														  					 									  													  			
+												</c:if>														  					 
+		 									</c:forEach>		  	
+										</c:forEach>		  	
+									</table>
+								</td>  
+				  			</tr>
+						</c:forEach>		  
+							
+						
+					<c:forEach var="currentDto" items="${sessionScope.listUserEntries}">
+				  	 		<c:set var="currentQuestionId" scope="request" value="${currentDto.questionUid}"/>
+				  	 		<tr>
+				  	 			<td> &nbsp&nbsp</td>
+				  	 		</tr>
+							<tr>			
+								<td NOWRAP valign=top align=left><b> <font size=2> <bean:message key="label.nomination"/>: </b>
+									<c:out value="${currentDto.question}" escapeXml="false"/>
+								</font> </td>
+							</tr>	
+							
+							<tr> 
+								<td NOWRAP class="formlabel" valign=top>
+									<table align=center>
+										<tr> 
+											 <td NOWRAP valign=top> <b> <font size=2> <bean:message key="label.user"/> </font> </b> </td>  
+					  						 <td NOWRAP valign=top> <b> <font size=2> <bean:message key="label.attemptTime"/></font> </b></td>
+							  			</tr>				 
+	
+			  							<c:forEach var="questionAttemptData" items="${currentDto.questionAttempts}">
+									  	 		<c:set var="userData" scope="request" value="${questionAttemptData.value}"/>
+													<jsp:include page="/monitoring/UserResponses.jsp" />										
+										</c:forEach>		  	
+							  			
+									</table>
+								</td>  
+				  			</tr>
+					</c:forEach>		  	
+
+					</table>
+			 		</td>
+				</tr>
+			</table>
+		</div>		         
 	</html:form>
-</c:if> 				    
 
 </body>
 </html:html>
