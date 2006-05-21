@@ -723,6 +723,21 @@ public class VoteServicePOJO implements
 		
 	}
 	
+	public List getUserEnteredVotesForSession(final String userEntry, final Long voteSessionUid)
+	{
+        try
+        {
+        	return voteUsrAttemptDAO.getUserEnteredVotesForSession(userEntry, voteSessionUid);
+        }
+        catch (DataAccessException e)
+        {
+            throw new VoteApplicationException("Exception occured when lams is getting user entered votes for session: "
+                                                         + e.getMessage(),
+														   e);
+        }	    
+	    
+	}
+	
 	
 	public List getAttemptForQueContent(final Long queUsrId, final Long voteQueContentId) throws VoteApplicationException
 	{

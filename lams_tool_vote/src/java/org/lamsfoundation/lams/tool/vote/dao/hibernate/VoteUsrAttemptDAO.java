@@ -432,7 +432,31 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 			.list();
 			return list;
 	    }
-		
+
+		public List getUserEnteredVotesForSession(final String userEntry, final Long voteSessionUid)
+	    {
+	        HibernateTemplate templ = this.getHibernateTemplate();
+	        List list = getSession().createQuery(LOAD_USER_ENTRY_RECORDS)
+			.setString("userEntry", userEntry)				
+			.list();
+	        
+	        
+	        List sessionUserEntries= new ArrayList();
+			if(list != null && list.size() > 0){
+				Iterator listIterator=list.iterator();
+		    	while (listIterator.hasNext())
+		    	{
+		    	    VoteUsrAttempt attempt=(VoteUsrAttempt)listIterator.next();
+		    	    logger.debug("attempt: " + attempt);
+		    	    if (attempt.getVoteQueUsr().getVoteSession().getUid().toString().equals(voteSessionUid.toString()))
+		    	    {
+			    	        sessionUserEntries.add(attempt.getUserEntry());
+		    	    }
+		    	}
+			}
+			return sessionUserEntries;
+	    }
+
 		public int getAllEntriesCount()
 	    {
 	        HibernateTemplate templ = this.getHibernateTemplate();
@@ -464,8 +488,6 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 			return totalSessionAttemptsCount;
 	    }
 
-		
-		
 		
 		public int getCompletedSessionEntriesCount(final Long voteSessionUid)
 	    {

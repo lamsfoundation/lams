@@ -33,6 +33,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <html:html locale="true">
 <head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 	<jsp:include page="/learning/learningHeader.jsp" />
 </head>
 <body>

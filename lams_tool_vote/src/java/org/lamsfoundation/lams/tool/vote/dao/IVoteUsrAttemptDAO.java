@@ -53,6 +53,8 @@ public interface IVoteUsrAttemptDAO
 	
 	public Set getSessionUserEntries(final Long voteSessionUid);
 	
+	public List getUserEnteredVotesForSession(final String userEntry, final Long voteSessionUid);
+	
 	public VoteUsrAttempt getAttemptByUID(Long uid);
 	
 	public int getCompletedSessionEntriesCount(final Long voteSessionUid);

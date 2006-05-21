@@ -32,10 +32,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
-	<!DOCTYPE HTML PUBLIC "-//W3C//DTD hTML 4.01 Transitional//EN">
+	<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+	<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
+	
 	<html:html locale="true">
 	<head>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 	<title> <bean:message key="label.title.export"/> </title>
 	
 	 <lams:css/>
@@ -54,15 +56,32 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<script type="text/javascript" src="<c:out value="${lams}"/>includes/javascript/tabcontroller.js"></script>    
 	<script type="text/javascript" src="<c:out value="${lams}"/>includes/javascript/common.js"></script>
 	
-</head>
-<body>
+	</head>
+	<body>
 	
     <html:form  action="/monitoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
 	<html:hidden property="method"/>
 	<html:hidden property="toolContentID"/>
 
-			<jsp:include page="/monitoring/SummaryContent.jsp" />
+
+		<c:if test="${(userExceptionNoToolSessions == 'true')}"> 	
+				<table align="center">
+					<tr> 
+						<td NOWRAP valign=top align=center> 
+							<b> <font size=2> <bean:message key="error.noLearnerActivity"/> </font></b>
+						</td> 
+					<tr>
+				</table>
+		</c:if>			
+
+
+		<c:if test="${(userExceptionNoToolSessions != 'true') }"> 	
+			<jsp:include page="/export/ExportContent.jsp" />
+		</c:if>						
 
 	</html:form>
 </body>
 </html:html>
+
+
+

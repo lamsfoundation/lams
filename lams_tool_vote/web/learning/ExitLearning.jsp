@@ -12,6 +12,7 @@
 
 <html:html locale="true">
 <head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 	<jsp:include page="/learning/learningHeader.jsp" />
 </head>
 <body>

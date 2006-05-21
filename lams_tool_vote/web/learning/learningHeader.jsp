@@ -33,10 +33,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 	<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 	<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
-	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 	
 	<title> <bean:message key="label.learning"/> </title>
-	
 	 <lams:css/>
 	<!-- depending on user / site preference this will get changed probably use passed in variable from flash to select which one to use-->
 
