@@ -235,7 +235,7 @@ public class VoteServicePOJO implements
     }
     
     
-    public Set getContentEntries(final Long voteContentUid) throws VoteApplicationException 
+    public List getContentEntries(final Long voteContentUid) throws VoteApplicationException 
     {
         try
         {
@@ -279,7 +279,7 @@ public class VoteServicePOJO implements
         }        
     }
     
-    public Set getSessionUserEntries(final Long voteSessionUid) throws VoteApplicationException
+    public List getSessionUserEntries(final Long voteSessionUid) throws VoteApplicationException
     {
         try
         {
@@ -293,6 +293,20 @@ public class VoteServicePOJO implements
         }        
     }
     
+    
+    public Set getSessionUserEntriesSet(final Long voteSessionUid) throws VoteApplicationException
+    {
+        try
+        {
+        	return voteUsrAttemptDAO.getSessionUserEntriesSet(voteSessionUid);
+        }
+        catch (DataAccessException e)
+        {
+            throw new VoteApplicationException("Exception occured when lams is getting session user entries: "
+                                                         + e.getMessage(),
+														   e);
+        }        
+    }
     
     public VoteQueContent getVoteQueContentByUID(Long uid) throws VoteApplicationException
     {
@@ -528,6 +542,22 @@ public class VoteServicePOJO implements
                                                          + e.getMessage(),
 														   e);
         }        
+    }
+    
+    
+    public int getStandardAttemptsForQuestionContentAndContentUid(final Long voteQueContentId, final Long voteContentUid)
+    {
+        try
+        {
+        	return voteUsrAttemptDAO.getStandardAttemptsForQuestionContentAndContentUid(voteQueContentId, voteContentUid);
+        }
+        catch (DataAccessException e)
+        {
+            throw new VoteApplicationException("Exception occured when lams is getting all standard attempts entries count: "
+                                                         + e.getMessage(),
+														   e);
+        }
+        
     }
     
     public int getSessionEntriesCount(final Long voteSessionUid) throws VoteApplicationException

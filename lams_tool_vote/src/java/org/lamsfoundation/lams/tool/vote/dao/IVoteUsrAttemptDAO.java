@@ -45,13 +45,15 @@ public interface IVoteUsrAttemptDAO
 	
 	public List getUserRecords(final String userEntry);
 	
-	public Set getContentEntries(final Long voteContentUid);
+	public List getContentEntries(final Long voteContentUid);
 	
 	public Set getUserEntries();
 	
 	public int getAllEntriesCount();
 	
-	public Set getSessionUserEntries(final Long voteSessionUid);
+	public List getSessionUserEntries(final Long voteSessionUid);
+	
+	public Set getSessionUserEntriesSet(final Long voteSessionUid);
 	
 	public List getUserEnteredVotesForSession(final String userEntry, final Long voteSessionUid);
 	
@@ -60,6 +62,8 @@ public interface IVoteUsrAttemptDAO
 	public int getCompletedSessionEntriesCount(final Long voteSessionUid);
 	
 	public int getSessionEntriesCount(final Long voteSessionId);
+	
+	public int getStandardAttemptsForQuestionContentAndContentUid(final Long voteQueContentId, final Long voteContentUid);
 	
 	public int getSessionUserRecordsEntryCount(final String userEntry, final Long voteSessionUid, IVoteService voteService);
 	

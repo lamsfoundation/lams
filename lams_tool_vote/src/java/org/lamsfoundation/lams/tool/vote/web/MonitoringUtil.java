@@ -658,7 +658,7 @@ public class MonitoringUtil implements VoteAppConstants{
 		    logger.debug("process for session: " + toolSessionUid);
 		    entriesCount=voteService.getSessionEntriesCount(toolSessionUid);
 		    logger.debug("entriesCount: " + entriesCount);
-		    userEntries=voteService.getSessionUserEntries(toolSessionUid);
+		    userEntries=voteService.getSessionUserEntriesSet(toolSessionUid);
 		    logger.debug("sessionUserCount: " + userEntries.size());
 		    
 		    int completedSessionUserCount=voteService.getCompletedVoteUserBySessionUid(toolSessionUid);
@@ -686,13 +686,6 @@ public class MonitoringUtil implements VoteAppConstants{
 		            voteMonitoringForm.setCompletedSessionUserPercent("Not Available");
 		        }
 		    }
-		}
-		else
-		{
-		    sessionLevelCharting=false;
-		    logger.debug("process for content: ");
-		    userEntries=voteService.getContentEntries(voteContent.getUid());
-		    entriesCount=userEntries.size();
 		}
 		
 		logger.debug("entriesCount: " + entriesCount);
@@ -787,10 +780,10 @@ public class MonitoringUtil implements VoteAppConstants{
 	}
 	
 	
-	public static void prepareChartDataForExport(HttpServletRequest request, IVoteService voteService, VoteMonitoringForm voteMonitoringForm, Long toolContentId, Long toolSessionUid)
+	public static void prepareChartDataForExportLearner(HttpServletRequest request, IVoteService voteService, VoteMonitoringForm voteMonitoringForm, Long toolContentId, Long toolSessionUid)
 	{
-	    logger.debug("starting prepareChartDataForExport, toolContentId: " + toolContentId);
-	    logger.debug("starting prepareChartDataForExport, toolSessionUid: " + toolSessionUid);
+	    logger.debug("starting prepareChartDataForExportLearner, toolContentId: " + toolContentId);
+	    logger.debug("starting prepareChartDataForExportLearner, toolSessionUid: " + toolSessionUid);
 	    VoteContent voteContent=voteService.retrieveVote(toolContentId);
 	    logger.debug("starting prepareChartData, voteContent uid: " + voteContent.getUid());
 	    
@@ -813,7 +806,7 @@ public class MonitoringUtil implements VoteAppConstants{
 		    logger.debug("process for session: " + toolSessionUid);
 		    entriesCount=voteService.getSessionEntriesCount(toolSessionUid);
 		    logger.debug("entriesCount: " + entriesCount);
-		    userEntries=voteService.getSessionUserEntries(toolSessionUid);
+		    userEntries=voteService.getSessionUserEntriesSet(toolSessionUid);
 		    logger.debug("sessionUserCount: " + userEntries.size());
 		    
 		    int completedSessionUserCount=voteService.getCompletedVoteUserBySessionUid(toolSessionUid);
@@ -825,21 +818,12 @@ public class MonitoringUtil implements VoteAppConstants{
 	        int potentialUserCount=voteService.getVoteSessionPotentialLearnersCount(toolSessionUid);
 	        logger.debug("potentialUserCount: " + potentialUserCount);
 	        
-	        
-	        //request.getSession().setAttribute("sessionUserCount", Integer.toString(potentialUserCount));
-	        ///request.getSession().setAttribute("completedSessionUserCount", new Integer(completedSessionUserCount).toString());
-	        
 	        if (potentialUserCount != 0)
 	        {
 	            double completedPercent=(completedSessionUserCount * 100) / potentialUserCount;
 	            logger.debug("completed percent: " + completedPercent);
-	            //request.getSession().setAttribute("completedSessionUserPercent", new Double(completedPercent).toString());
-	        }
-	        else
-	        {
-	            //request.getSession().setAttribute("completedSessionUserPercent", "Not Available");
-	        }
 
+	        }
 		}
 		
 		logger.debug("entriesCount: " + entriesCount);
@@ -958,6 +942,99 @@ public class MonitoringUtil implements VoteAppConstants{
 		request.getSession().setAttribute(MAP_STANDARD_USER_COUNT, mapStandardUserCount);
 		logger.debug("test2: MAP_STANDARD_USER_COUNT: " + request.getSession().getAttribute(MAP_STANDARD_USER_COUNT));
 	}	
+
 	
+	public static void prepareChartDataForExportTeacher(HttpServletRequest request, IVoteService voteService, VoteMonitoringForm voteMonitoringForm, Long toolContentId, Long toolSessionUid)
+	{
+	    logger.debug("starting prepareChartDataForExportTeacher, toolContentId: " + toolContentId);
+	    logger.debug("starting prepareChartDataForExportTeacher, toolSessionUid: " + toolSessionUid);
+	    VoteContent voteContent=voteService.retrieveVote(toolContentId);
+	    logger.debug("starting prepareChartData, voteContent uid: " + voteContent.getUid());
+	    logger.debug("starting prepareChartDataForExport, voteMonitoringForm: " + voteMonitoringForm);
+		logger.debug("existing voteContent:" + voteContent);
+		
+		Map mapOptionsContent= new TreeMap(new VoteComparator());
+		Map mapVoteRatesContent= new TreeMap(new VoteComparator());
+		Map mapStandardUserCount= new TreeMap(new VoteComparator());
+		
+	    Iterator queIterator=voteContent.getVoteQueContents().iterator();
+		Long mapIndex=new Long(1);
+		int totalStandardVotesCount=0;
+		int totalStandardContentVotesCount=0;
+		int entriesCount=0;
+		
+		logger.debug("get all entries for content: " + voteContent);
+		List setEntriesCount=voteService.getContentEntries(voteContent.getUid());
+		logger.debug("setEntriesCount: " +setEntriesCount);
+		entriesCount=setEntriesCount.size();
+		logger.debug("entriesCount: " + entriesCount);
+		
+		while (queIterator.hasNext())
+		{
+			VoteQueContent voteQueContent=(VoteQueContent) queIterator.next();
+			if (voteQueContent != null)
+			{
+				logger.debug("question: " + voteQueContent.getQuestion());
+				mapOptionsContent.put(mapIndex.toString(),voteQueContent.getQuestion());
+		
+				int votesCount=voteService.getStandardAttemptsForQuestionContentAndContentUid(voteQueContent.getUid(), voteContent.getUid());
+				logger.debug("standardContentAttemptCount: " + votesCount);
+				
+				mapStandardUserCount.put(mapIndex.toString(),new Integer(votesCount).toString());
+				totalStandardVotesCount=totalStandardVotesCount + votesCount;
+
+				
+				double voteRate=0d;
+				if (entriesCount != 0)
+				{
+				    voteRate=((votesCount * 100)/ entriesCount);
+				}
+
+				logger.debug("voteRate" + voteRate);
+				
+				mapVoteRatesContent.put(mapIndex.toString(), new Double(voteRate).toString());
+
+	    		mapIndex=new Long(mapIndex.longValue()+1);
+			}
+		}
+		logger.debug("test1: Map initialized with existing contentid to: " + mapOptionsContent);
+		Map mapStandardNominationsContent= new TreeMap(new VoteComparator());
+		mapStandardNominationsContent=mapOptionsContent;
+		logger.debug("mapStandardNominationsContent: " + mapStandardNominationsContent);
+		
+		Map mapStandardRatesContent= new TreeMap(new VoteComparator());
+		mapStandardRatesContent=mapVoteRatesContent;
+		logger.debug("test1: mapStandardRatesContent: " + mapStandardRatesContent);
+		logger.debug("test1: mapStandardUserCount: " + mapStandardUserCount);
+		
+	    int mapVoteRatesSize=mapVoteRatesContent.size();
+	    logger.debug("mapVoteRatesSize: " + mapVoteRatesSize);
+	    mapIndex=new Long(mapVoteRatesSize+1);
+	    logger.debug("updated mapIndex: " + mapIndex);
+	    
+	    double total=MonitoringUtil.calculateTotal(mapVoteRatesContent);
+	    logger.debug("updated mapIndex: " + mapIndex);
+	    double share=100d-total ; 
+	    logger.debug("share: " + share);
+	    
+	    logger.debug("totalStandardVotesCount: " + totalStandardVotesCount);
+	    int userEnteredVotesCount=entriesCount - totalStandardVotesCount;
+        logger.debug("userEnteredVotesCount for this session: " + userEnteredVotesCount);
+	    
+	    mapStandardNominationsContent.put(mapIndex.toString(), "Open Vote");
+	    mapStandardRatesContent.put(mapIndex.toString(), new Double(share).toString());
+	    mapStandardUserCount.put(mapIndex.toString(), new Integer(userEnteredVotesCount).toString());
+	    
+        
+		request.getSession().setAttribute(MAP_STANDARD_NOMINATIONS_CONTENT, mapStandardNominationsContent);
+		logger.debug("test2: MAP_STANDARD_NOMINATIONS_CONTENT: " + request.getSession().getAttribute(MAP_STANDARD_NOMINATIONS_CONTENT));
+
+		request.getSession().setAttribute(MAP_STANDARD_RATES_CONTENT, mapStandardRatesContent);
+		logger.debug("test2: MAP_STANDARD_RATES_CONTENT: " + request.getSession().getAttribute(MAP_STANDARD_RATES_CONTENT));
+		
+		request.getSession().setAttribute(MAP_STANDARD_USER_COUNT, mapStandardUserCount);
+		logger.debug("test2: MAP_STANDARD_USER_COUNT: " + request.getSession().getAttribute(MAP_STANDARD_USER_COUNT));
+	}	
+
 	
 }

@@ -80,6 +80,8 @@ public interface IVoteService
  	public List getAttemptsListForUserAndQuestionContent(final Long queUsrId, final Long voteQueContentId) throws VoteApplicationException;
  	
  	public int getLastNominationCount(Long userId) throws VoteApplicationException;
+ 	
+ 	public Set getSessionUserEntriesSet(final Long voteSessionUid) throws VoteApplicationException;
     
     public void createVoteUsrAttempt(VoteUsrAttempt voteUsrAttempt) throws VoteApplicationException;
     
@@ -127,11 +129,13 @@ public interface IVoteService
     
     public Set getUserEntries() throws VoteApplicationException;
     
-    public Set getContentEntries(final Long voteContentUid) throws VoteApplicationException;
+    public List getContentEntries(final Long voteContentUid) throws VoteApplicationException;
+    
+    public int getStandardAttemptsForQuestionContentAndContentUid(final Long voteQueContentId, final Long voteContentUid);
     
     public int getSessionUserRecordsEntryCount(final String userEntry, final Long voteSessionUid, IVoteService voteService) throws VoteApplicationException;
     
-    public Set getSessionUserEntries(final Long voteSessionId) throws VoteApplicationException;
+    public List getSessionUserEntries(final Long voteSessionId) throws VoteApplicationException;
     
     public VoteQueContent getQuestionContentByQuestionText(final String question, final Long voteContentUid);
     

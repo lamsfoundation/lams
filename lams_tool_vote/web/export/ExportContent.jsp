@@ -31,11 +31,24 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
+ 				
 			<table width="80%" cellspacing="8" align="CENTER" class="forms">
 						<tr>
 							<td NOWRAP valign=top align=left>
 								<table>
-								
+
+									<c:if test="${(portfolioExportMode == 'learner')}">
+										<tr>
+									 		<th NOWRAP colspan=2>  <bean:message key="label.class.summary"/>  </th>
+										</tr>
+									</c:if>											
+
+									<c:if test="${(portfolioExportMode != 'learner')}">
+										<tr>
+									 		<th NOWRAP colspan=2>  <bean:message key="label.class.summaryAll"/>  </th>
+										</tr>
+									</c:if>											
+
 										<tr>
 									 		<td NOWRAP> <b> <font size=2> <bean:message key="label.nomination"/> </b> </td>
 											<td NOWRAP> <b> <font size=2> <bean:message key="label.total.votes"/> </b> </td>
@@ -72,13 +85,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 						<tr> 
 							<td NOWRAP valign=top align=left >
-							chart 1
+								Pie Chart
 							</td>
 						</tr>
 
 						<tr> 
 							<td NOWRAP valign=top align=left >
-							chart2 
+								Bar Chart
 							</td>
 						</tr>
 
@@ -100,6 +113,19 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							<tr>
 								<td NOWRAP valign=top align=left>
 					 			<table align=left>
+					 			
+									<c:if test="${(portfolioExportMode == 'learner')}">
+										<tr>
+									 		<th NOWRAP>  <bean:message key="label.individual.learnerVotes"/>  </th>
+										</tr>
+									</c:if>											
+	
+									<c:if test="${(portfolioExportMode != 'learner')}">
+										<tr>
+									 		<th NOWRAP>  <bean:message key="label.all.learnerVotes"/>  </th>
+										</tr>
+									</c:if>											
+					 			
 
 								<c:forEach var="currentDto" items="${sessionScope.listMonitoredAnswersContainerDto}">
 						  	 		<c:set var="currentQuestionId" scope="request" value="${currentDto.questionUid}"/>

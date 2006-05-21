@@ -38,7 +38,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<html:html locale="true">
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-	<title> <bean:message key="label.title.export"/> </title>
+	<title> <bean:message key="label.export"/> </title>
 	
 	 <lams:css/>
 	<!-- depending on user / site preference this will get changed probably use passed in variable from flash to select which one to use-->
@@ -76,6 +76,24 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 		<c:if test="${(userExceptionNoToolSessions != 'true') }"> 	
+		
+			<table align="center">
+				<c:if test="${(portfolioExportMode == 'learner')}">
+					<tr> 
+						<td NOWRAP valign=top align=center> 
+							<h1> <bean:message key="label.export.learner"/>  </h1>
+						</td> 
+					<tr>
+				</c:if>			
+				<c:if test="${(portfolioExportMode != 'learner')}">
+					<tr> 
+						<td NOWRAP valign=top align=center> 
+							<h1> <bean:message key="label.export.teacher"/>  </h1>
+						</td> 
+					<tr>
+				</c:if>			
+			</table>
+		
 			<jsp:include page="/export/ExportContent.jsp" />
 		</c:if>						
 
