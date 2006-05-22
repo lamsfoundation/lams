@@ -80,7 +80,7 @@ class MonitorController extends AbstractController {
 	public function click(evt):Void{
 		trace(evt.target);
 		var tgt:String = new String(evt.target);
-		if(tgt.indexOf("selectClass_btn") != -1){
+		if(tgt.indexOf("editClass_btn") != -1){
 			trace('you clicked select button..');
 			_monitorModel.setDialogOpen("LM_DIALOG");
 		}
