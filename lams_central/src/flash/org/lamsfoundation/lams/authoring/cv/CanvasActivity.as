@@ -195,6 +195,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	
 	private function loadIcon():Void{
 		//Debugger.log('Running, _activity.libraryActivityUIImage:'+_activity.libraryActivityUIImage,4,'loadIcon','CanvasActivity');
+		trace("Icon_MC is: "+Config.getInstance().serverUrl+_activity.libraryActivityUIImage)
 		icon_mc = this.createEmptyMovieClip("icon_mc", this.getNextHighestDepth());
 		var ml = new MovieLoader(Config.getInstance().serverUrl+_activity.libraryActivityUIImage,setUpActIcon,this,icon_mc);	
 		//icon_mc = MovieLoader.movieCache[Config.getInstance().serverUrl+_activity.libraryActivityUIImage];
@@ -355,7 +356,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	private function onRelease():Void{
 		if(!_doubleClicking){
 			Debugger.log('Releasing:'+this,Debugger.GEN,'onRelease','CanvasActivity');
-								
+				trace("Activity ID is: "+this.activity.activityUIID)	
 			_canvasController.activityRelease(this);
 		}
 		
