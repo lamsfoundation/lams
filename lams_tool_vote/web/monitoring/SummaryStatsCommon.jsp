@@ -83,9 +83,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					 		<td NOWRAP colspan=2 > &nbsp&nbsp </td>
 						</tr>
 						
+						
 						<tr>
 							<td NOWRAP valign=top align=left>
 							<table align=center>
+						
+							<c:if test="${statsTabActive != 'true'}"> 							
 								<tr> 
 									<td> </td>
 									<td NOWRAP valign=top align=left >
@@ -108,7 +111,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 										</a>
 									</td>
 								</tr>
-
+							</c:if> 								
 							
 									<tr>
 								 		<td NOWRAP> <b> <font size=2> <bean:message key="label.nomination"/> </b> </td>
