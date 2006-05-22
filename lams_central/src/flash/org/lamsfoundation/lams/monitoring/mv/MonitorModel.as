@@ -307,8 +307,12 @@ class MonitorModel extends Observable{
 			
 			
 			var ddm_activity:Activity = _activeSeq.getLearningDesignModel().activities.get(keyToCheck);
-			
-			broadcastViewUpdate("DRAW_ACTIVITY",ddm_activity, tabID);
+			trace("Activities in DDM: "+ddm_activity.activityUIID)
+			if(ddm_activity.parentActivityID > 0 || ddm_activity.parentUIID > 0){
+				trace("this is Child")
+			}else {
+				broadcastViewUpdate("DRAW_ACTIVITY",ddm_activity, tabID);
+			}
 			//dataObj.activity = ddm_activity;
 		}
 		
