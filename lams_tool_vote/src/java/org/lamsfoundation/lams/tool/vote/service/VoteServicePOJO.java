@@ -279,6 +279,21 @@ public class VoteServicePOJO implements
         }        
     }
     
+    
+    public boolean isVoteVisibleForSession(final String userEntry, final Long voteSessionUid) throws VoteApplicationException
+    {
+        try
+        {
+        	return voteUsrAttemptDAO.isVoteVisibleForSession(userEntry, voteSessionUid);
+        }
+        catch (DataAccessException e)
+        {
+            throw new VoteApplicationException("Exception occured when lams is finding if the open vote is hidden: "
+                                                         + e.getMessage(),
+														   e);
+        }        
+    }
+    
     public List getSessionUserEntries(final Long voteSessionUid) throws VoteApplicationException
     {
         try

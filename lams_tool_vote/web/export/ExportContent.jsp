@@ -41,14 +41,55 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 										<tr>
 									 		<th NOWRAP colspan=2>  <bean:message key="label.class.summary"/>  </th>
 										</tr>
+										
+										<tr>
+									 		<td NOWRAP> <b> <font size=2> <bean:message key="label.nomination"/> </b> </td>
+											<td NOWRAP> <b> <font size=2> <bean:message key="label.total.votes"/> </b> </td>
+										</tr>
+										
+										
+										<c:forEach var="currentNomination" items="${mapStandardNominationsContent}">
+								  	 		<c:set var="currentNominationKey" scope="request" value="${currentNomination.key}"/>
+								  	 		 <tr>
+					  	 						<td NOWRAP valign=top align=left>
+								  	 		  		<c:forEach var="currentVoteVisibility" items="${mapStandardNominationsVisibility}">
+												  	 		<c:set var="currentVisibilityKey" scope="request" value="${currentVoteVisibility.key}"/>
+											  				<c:if test="${currentNominationKey == currentVisibilityKey}"> 				
+												  				<c:if test="${currentVoteVisibility.value == 'true'}"> 				
+																	<c:out value="${currentNomination.value}" escapeXml="false"/>		
+																</c:if> 	    
+												  				<c:if test="${currentVoteVisibility.value != 'true'}"> 				
+																	<font size=2> <bean:message key="label.hiddenLearner"/> </font>
+																</c:if> 	    
+															</c:if> 	  
+													</c:forEach>		  
+												 </td>
+				
+												<td NOWRAP valign=top align=left>				  	 		
+										  	 		<c:forEach var="currentUserCount" items="${mapStandardUserCount}">
+											  	 		<c:set var="currentUserKey" scope="request" value="${currentUserCount.key}"/>
+										  				<c:if test="${currentNominationKey == currentUserKey}"> 				
+																	<font size=2> <c:out value="${currentUserCount.value}"/>  </font>
+														</c:if> 	    
+													</c:forEach>		  
+				
+										  	 		<c:forEach var="currentRate" items="${mapStandardRatesContent}">
+											  	 		<c:set var="currentRateKey" scope="request" value="${currentRate.key}"/>
+										  				<c:if test="${currentNominationKey == currentRateKey}"> 				
+																	<font size=2> &nbsp(<c:out value="${currentRate.value}"/> <bean:message key="label.percent"/>) </font>
+														</c:if> 	    
+													</c:forEach>		  
+												</td>								
+											</tr>	
+										</c:forEach>	
 									</c:if>											
+
 
 									<c:if test="${(portfolioExportMode != 'learner')}">
 										<tr>
 									 		<th NOWRAP colspan=2>  <bean:message key="label.class.summaryAll"/>  </th>
 										</tr>
-									</c:if>											
-
+										
 										<tr>
 									 		<td NOWRAP> <b> <font size=2> <bean:message key="label.nomination"/> </b> </td>
 											<td NOWRAP> <b> <font size=2> <bean:message key="label.total.votes"/> </b> </td>
@@ -78,6 +119,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 												</td>								
 											</tr>	
 										</c:forEach>	
+									</c:if>											
+
 								</table>
 							</td>
 						</tr>

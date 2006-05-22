@@ -832,6 +832,7 @@ public class MonitoringUtil implements VoteAppConstants{
 		
 		
 		Map mapStandardUserCount= new TreeMap(new VoteComparator());
+		Map mapStandardNominationsVisibility= new TreeMap(new VoteComparator());
 
 		logger.debug("setting existing content data from the db");
 		mapOptionsContent.clear();
@@ -855,6 +856,7 @@ public class MonitoringUtil implements VoteAppConstants{
 				{
 				    logger.debug("getting votesCount based on session: " + toolSessionUid);
 					votesCount=voteService.getStandardAttemptsForQuestionContentAndSessionUid(voteQueContent.getUid(), toolSessionUid);
+					
 					logger.debug("votesCount for questionContent uid: " + votesCount + " for" + voteQueContent.getUid());
 					mapStandardUserCount.put(mapIndex.toString(),new Integer(votesCount).toString());
 					totalStandardVotesCount=totalStandardVotesCount + votesCount;
@@ -875,6 +877,7 @@ public class MonitoringUtil implements VoteAppConstants{
 				logger.debug("voteRate" + voteRate);
 				
 				mapVoteRatesContent.put(mapIndex.toString(), new Double(voteRate).toString());
+				mapStandardNominationsVisibility.put(mapIndex.toString(), new Boolean(true).toString());
 	    		mapIndex=new Long(mapIndex.longValue()+1);
 			}
 		}
@@ -887,6 +890,7 @@ public class MonitoringUtil implements VoteAppConstants{
 		mapStandardRatesContent=mapVoteRatesContent;
 		logger.debug("test1: mapStandardRatesContent: " + mapStandardRatesContent);
 		logger.debug("test1: mapStandardUserCount: " + mapStandardUserCount);
+		logger.debug("test1: mapStandardNominationsVisibility: " + mapStandardNominationsVisibility);
 		
 		Iterator itListQuestions = userEntries.iterator();
 	    int mapVoteRatesSize=mapVoteRatesContent.size();
@@ -918,6 +922,10 @@ public class MonitoringUtil implements VoteAppConstants{
 				{
 				    logger.debug("getting userEntryRate based on session: " + toolSessionUid);
 				    List voteEntries=voteService.getUserEnteredVotesForSession(userEntry, toolSessionUid);
+				    boolean isVoteVisible=voteService.isVoteVisibleForSession(userEntry, toolSessionUid);
+				    logger.debug("isVoteVisible: " + isVoteVisible);
+				    
+				    
 				    logger.debug("voteEntries: " + voteEntries);
 				    int individualUserEnteredVoteCount=voteEntries.size();
 				    logger.debug("individualUserEnteredVoteCount: " + individualUserEnteredVoteCount);
@@ -928,6 +936,7 @@ public class MonitoringUtil implements VoteAppConstants{
 					mapStandardNominationsContent.put(mapIndex.toString(), userEntry);
 					mapStandardRatesContent.put(mapIndex.toString(), new Double(votesShare).toString());
 					mapStandardUserCount.put(mapIndex.toString(), new Integer(individualUserEnteredVoteCount).toString());
+					mapStandardNominationsVisibility.put(mapIndex.toString(), new Boolean(isVoteVisible).toString());
 		    	    mapIndex=new Long(mapIndex.longValue()+1);
 			  }
 	    	}
@@ -941,7 +950,11 @@ public class MonitoringUtil implements VoteAppConstants{
 		
 		request.getSession().setAttribute(MAP_STANDARD_USER_COUNT, mapStandardUserCount);
 		logger.debug("test2: MAP_STANDARD_USER_COUNT: " + request.getSession().getAttribute(MAP_STANDARD_USER_COUNT));
+		
+		request.getSession().setAttribute(MAP_STANDARD_NOMINATIONS_VISIBILITY, mapStandardNominationsVisibility);
+		logger.debug("test2: MAP_STANDARD_NOMINATIONS_VISIBILITY: " + request.getSession().getAttribute(MAP_STANDARD_NOMINATIONS_VISIBILITY));
 	}	
+	
 
 	
 	public static void prepareChartDataForExportTeacher(HttpServletRequest request, IVoteService voteService, VoteMonitoringForm voteMonitoringForm, Long toolContentId, Long toolSessionUid)

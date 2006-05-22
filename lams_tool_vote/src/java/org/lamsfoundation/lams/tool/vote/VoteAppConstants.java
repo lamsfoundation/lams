@@ -109,6 +109,7 @@ public interface VoteAppConstants {
     public static final String MAP_OPTIONS_CONTENT						="mapOptionsContent";
     public static final String MAP_VOTERATES_CONTENT					="mapVoteRatesContent";
     public static final String MAP_STANDARD_USER_COUNT					="mapStandardUserCount";
+    public static final String MAP_STANDARD_NOMINATIONS_VISIBILITY		="mapStandardNominationsVisibility";
     public static final String MAP_STANDARD_NOMINATIONS_CONTENT			="mapStandardNominationsContent";
     public static final String MAP_STANDARD_RATES_CONTENT				="mapStandardRatesContent";
     public static final String MAP_OPTIONS_CONTENT_FCK					="mapOptionsContentFck";
