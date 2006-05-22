@@ -317,7 +317,6 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 	        logger.debug("returning back to from to fix errors:");
 	        request.getSession().setAttribute(EDITACTIVITY_EDITMODE, new Boolean(true));
 	        request.setAttribute(VALIDATION_ERROR, new Boolean(true).toString());
-	        //return mapping.findForward(destination);
 	        return false;
 	    }
 	    

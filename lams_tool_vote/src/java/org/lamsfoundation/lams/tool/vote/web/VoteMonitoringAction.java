@@ -466,16 +466,38 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to true");
 		}
 		
-    	refreshInstructionsData(request, voteContent);
+    	refreshInstructionsData(request, voteContent, voteService);
 
     	request.getSession().setAttribute(CURRENT_MONITORING_TAB, "instructions");
     	logger.debug("ending  initInstructionsContent...");
 	}
 
-	public void refreshInstructionsData(HttpServletRequest request, VoteContent voteContent)
+	public void refreshInstructionsData(HttpServletRequest request, VoteContent voteContent, IVoteService voteService)
 	{
 	    request.getSession().setAttribute(RICHTEXT_ONLINEINSTRUCTIONS,voteContent.getOnlineInstructions());
 	    request.getSession().setAttribute(RICHTEXT_OFFLINEINSTRUCTIONS,voteContent.getOfflineInstructions());
+	    
+        /*process offline files metadata*/
+	    List listOfflineFilesMetaData=voteService.getOfflineFilesMetaData(voteContent.getUid());
+	    logger.debug("existing listOfflineFilesMetaData, to be structured as VoteAttachmentDTO: " + listOfflineFilesMetaData);
+	    listOfflineFilesMetaData=AuthoringUtil.populateMetaDataAsAttachments(listOfflineFilesMetaData);
+	    logger.debug("populated listOfflineFilesMetaData: " + listOfflineFilesMetaData);
+	    request.getSession().setAttribute(LIST_OFFLINEFILES_METADATA, listOfflineFilesMetaData);
+	    
+	    List listUploadedOfflineFileNames=AuthoringUtil.populateMetaDataAsFilenames(listOfflineFilesMetaData);
+	    logger.debug("returned from db listUploadedOfflineFileNames: " + listUploadedOfflineFileNames);
+	    request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILENAMES, listUploadedOfflineFileNames);
+	    
+	    /*process online files metadata*/
+	    List listOnlineFilesMetaData=voteService.getOnlineFilesMetaData(voteContent.getUid());
+	    logger.debug("existing listOnlineFilesMetaData, to be structured as VoteAttachmentDTO: " + listOnlineFilesMetaData);
+	    listOnlineFilesMetaData=AuthoringUtil.populateMetaDataAsAttachments(listOnlineFilesMetaData);
+	    logger.debug("populated listOnlineFilesMetaData: " + listOnlineFilesMetaData);
+	    request.getSession().setAttribute(LIST_ONLINEFILES_METADATA, listOnlineFilesMetaData);
+	    
+	    List listUploadedOnlineFileNames=AuthoringUtil.populateMetaDataAsFilenames(listOnlineFilesMetaData);
+	    logger.debug("returned from db listUploadedOnlineFileNames: " + listUploadedOnlineFileNames);
+	    request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILENAMES, listUploadedOnlineFileNames);
 	}
 
     
@@ -603,7 +625,7 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
     public ActionForward submitAllContent(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
     throws IOException, ServletException {
     	logger.debug("dispatching proxy submitAllContent...");
-    	request.getSession().setAttribute(ACTIVE_MODULE, DEFINE_LATER);
+    	request.getSession().setAttribute(ACTIVE_MODULE, MONITORING);
 
     	request.setAttribute(SOURCE_VOTE_STARTER, "monitoring");
 	    logger.debug("SOURCE_VOTE_STARTER: monitoring");
@@ -628,7 +650,8 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 		
 		if (isContentSubmitted == true)
 		    voteMonitoringForm.setSbmtSuccess(new Boolean(true).toString());
-		    
+
+		request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(false));
 		logger.debug("final submit status :" +voteMonitoringForm.getSbmtSuccess());
         return (mapping.findForward(destination));	
     }

@@ -128,6 +128,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 						<tr> 
 							<td NOWRAP valign=top align=left >
+		
 								Pie Chart
 							</td>
 						</tr>

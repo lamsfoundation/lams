@@ -150,6 +150,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					
 					</table>
 
+      	<c:if test="${ activeModule != 'authoring' }"> 					
+			<HR>
+			<p align="right">
+		        <a href="javascript:submitMethod('submitAllContent')" class="button">
+		        	<bean:message key="label.save"/></a>
+			</p>
+		</c:if> 					
+
 
 <SCRIPT language="JavaScript"> 
 

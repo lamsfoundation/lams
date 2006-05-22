@@ -113,8 +113,8 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Vo
     	
     	MonitoringUtil.prepareChartDataForExportLearner(request, voteService, null, content.getVoteContentId(), voteSession.getUid());
     	logger.debug("post prepareChartDataForExport");
-        
-        logger.debug("ending learner mode: ");
+    	
+    	logger.debug("ending learner mode: ");
     }
     
     public void teacher(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies)
