@@ -71,6 +71,7 @@ class LessonManagerDialog extends MovieClip implements Dialog{
     private var yOkOffset:Number;
     private var xCancelOffset:Number;
     private var yCancelOffset:Number;
+	private var user_chk:CheckBox;
 	
 	private var _lessonTabView:LessonTabView;
 	private var _monitorModel:MonitorModel;
@@ -422,7 +423,7 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 	* Clear Method to clear movies from scrollpane
 	* 
 	*/
-	public function clearScp(array:Array):Array{
+	public static function clearScp(array:Array):Array{
 		if(array != null){
 			for (var i=0; i <array.length; i++){
 				array[i].removeMovieClip();
@@ -442,45 +443,48 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 		trace('loading Learners...');
 		_learnerList = clearScp(_learnerList);
 		_learner_mc = learner_scp.content;
-		//_view_mc = _learner_mc.createEmptyMovieClip('_view_mc', _learner_mc.getNextHighestDepth());
-			
+
 		trace('list length: ' + users.length);
 		for(var i=0; i<users.length; i++){
-			var user:User = User(users[i]);
-			
-			_learnerList[i] = this._learner_mc.attachMovie('staff_learner_dataRow', 'staff_learner_dataRow' + i, this._learner_mc.getNextHighestDepth());
-			_learnerList[i].fullName.text = user.getFirstName();
-			_learnerList[i]._x = USERS_X;
-			_learnerList[i]._y = USER_OFFSET * i;
-			_learnerList[i].user_cb.selected = true;
-			trace('new row: ' + _learnerList[i]);
-			trace('loading: user ' + user.getFirstName() + ' ' + user.getLastName());
-			
-			learner_scp.redraw(true);
+		var user:User = User(users[i]);
+
+		_learnerList[i] = this._learner_mc.attachMovie('staff_learner_dataRow', 'staff_learner_dataRow' + i, this._learner_mc.getNextHighestDepth());
+		_learnerList[i].fullName.text = user.getFirstName();
+		_learnerList[i]._x = USERS_X;
+		_learnerList[i]._y = USER_OFFSET * i;
+		var listItem:MovieClip = MovieClip(_learnerList[i]);
+		listItem.attachMovie('CheckBox', 'user_cb', listItem.getNextHighestDepth(), {_x:0, _y:3, selected:true})
+		trace('new row: ' + _learnerList[i]);
+		trace('loading: user ' + user.getFirstName() + ' ' + user.getLastName());
+
 		}
+		learner_scp.redraw(true);
 	}
-	
+ 
 	/**
 	* Load staff into scrollpane
-	* @param 	users Users to load
+	* @param  users Users to load
 	*/
 	public function loadStaff(users:Array):Void{
 		trace('loading Staff....');
 		trace('list length: ' + users.length);
 		_staffList = clearScp(_staffList);
 		_staff_mc = staff_scp.content;
-		
+
 		for(var i=0; i<users.length; i++){
-			var user:User = User(users[i]);
-			
-			_staffList[i] = this._staff_mc.attachMovie('staff_learner_dataRow', 'staff_learner_dataRow' + i, this._staff_mc.getNextHighestDepth());
-			_staffList[i].fullName.text = user.getFirstName();
-			_staffList[i]._x = USERS_X;
-			_staffList[i]._y = USER_OFFSET * i;
-			_staffList[i].user_cb.selected = true;
-			trace('loading: user ' + user.getFirstName() + ' ' + user.getLastName());
-			staff_scp.redraw(true);
+		var user:User = User(users[i]);
+
+		_staffList[i] = this._staff_mc.attachMovie('staff_learner_dataRow', 'staff_learner_dataRow' + i, this._staff_mc.getNextHighestDepth());
+		_staffList[i].fullName.text = user.getFirstName();
+		_staffList[i]._x = USERS_X;
+		_staffList[i]._y = USER_OFFSET * i;
+		var listItem:MovieClip = MovieClip(_staffList[i]);
+		listItem.attachMovie('CheckBox', 'user_cb', listItem.getNextHighestDepth(), {_x:0, _y:3, selected:true})
+
+		trace('loading: user ' + user.getFirstName() + ' ' + user.getLastName());
+
 		}
+		staff_scp.redraw(true);
 	}
 	
 	
