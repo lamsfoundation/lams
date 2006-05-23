@@ -90,29 +90,39 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	    var themeName="aqua";
         
         function init(){
-        
-            initTabSize(3);
-            
-            var tag = document.getElementById("currentTab");
-	    	if(tag.value != "")
-	    		selectTab(tag.value);
-            else
-                selectTab(1); //select the default tab;
-            
-
-            initEditor("richTextOfflineInstructions");                                    
-	        initEditor("richTextOnlineInstructions");                                    
-
-            
-            initEditor("title");
-            initEditor("instructions");
-            
-            initEditor("optionContent0");
-            <c:set var="optIndex" scope="session" value="1"/>
-            <c:forEach var="questionEntry" items="${sessionScope.mapOptionsContent}">
-                <c:set var="optIndex" scope="session" value="${optIndex +1}"/>
-                initEditor("<c:out value="optionContent${optIndex-1}"/>");
-            </c:forEach>
+			if (document.VoteAuthoringForm.activeModule.value != 'defineLater')
+			{
+	            initTabSize(3);
+	            
+	            var tag = document.getElementById("currentTab");
+		    	if(tag.value != "")
+		    		selectTab(tag.value);
+	            else
+	                selectTab(1); //select the default tab;
+	            
+	            initEditor("richTextOfflineInstructions");                                    
+		        initEditor("richTextOnlineInstructions");                                    
+			}
+			else
+			{
+	            initTabSize(1);
+	            
+	            var tag = document.getElementById("currentTab");
+		    	if(tag.value != "")
+		    		selectTab(tag.value);
+	            else
+	                selectTab(1); //select the default tab;
+			}
+			
+	            initEditor("title");
+	            initEditor("instructions");
+	            
+	            initEditor("optionContent0");
+	            <c:set var="optIndex" scope="session" value="1"/>
+	            <c:forEach var="questionEntry" items="${sessionScope.mapOptionsContent}">
+	                <c:set var="optIndex" scope="session" value="${optIndex +1}"/>
+	                initEditor("<c:out value="optionContent${optIndex-1}"/>");
+	            </c:forEach>			
         }     
         
         function doSelectTab(tabId) {

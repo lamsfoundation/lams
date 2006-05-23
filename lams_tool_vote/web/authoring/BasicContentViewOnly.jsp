@@ -58,7 +58,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					  		<c:if test="${optionEntry.key > 1}"> 			
 								<c:set var="optIndex" scope="session" value="${optIndex +1}"/>
 								  <tr>
-								  	<td valign="top">  <font size=2> <b> <c:out value="Nomination ${optIndex}"/>:  </b> </font></td>
+								  	<td NOWRAP valign="top">  <font size=2> <b> <c:out value="Nomination ${optIndex}"/>:  </b> </font></td>
 
 									<td NOWRAP valign=top>
 										<c:out value="${optionEntry.value}"  escapeXml="false"/>										
