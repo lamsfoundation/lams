@@ -103,6 +103,15 @@ class WizardController extends AbstractController {
 		}
 	}
 	
+	public function selectTreeNode(node:XMLNode){
+		if(node!=null){
+			if(!_isBusy){
+				setBusy();
+				_wizardModel.setSelectedTreeNode(node);
+			}
+		}
+	}
+	
 	/**
 	 * Initialize lesson returning new LessonID
 	 *   
