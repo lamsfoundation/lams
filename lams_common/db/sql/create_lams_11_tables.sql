@@ -131,6 +131,12 @@ CREATE TABLE lams_privilege (
 )TYPE=InnoDB;
 CREATE UNIQUE INDEX IX_lams_privilege_code ON lams_privilege (code ASC);
 
+CREATE TABLE lams_organisation_state (
+       organisation_state_id INT(3) NOT NULL
+     , description VARCHAR(255)
+     , PRIMARY KEY (organisation_state_id)
+)TYPE=InnoDB;
+
 CREATE TABLE lams_authentication_method_type (
        authentication_method_type_id INT(3) NOT NULL
      , description VARCHAR(64) NOT NULL
@@ -191,6 +197,7 @@ CREATE TABLE lams_organisation (
      , workspace_id BIGINT(20)
      , locale_language CHAR(2)
      , locale_country CHAR(2)
+     , organisation_state_id INT(3) NOT NULL
      , PRIMARY KEY (organisation_id)
      , INDEX (organisation_type_id)
      , CONSTRAINT FK_lams_organisation_1 FOREIGN KEY (organisation_type_id)
@@ -201,6 +208,9 @@ CREATE TABLE lams_organisation (
      , INDEX (parent_organisation_id)
      , CONSTRAINT FK_lams_organisation_3 FOREIGN KEY (parent_organisation_id)
                   REFERENCES lams_organisation (organisation_id) ON DELETE NO ACTION ON UPDATE NO ACTION
+     , INDEX (organisation_state_id)
+     , CONSTRAINT FK_lams_organisation_4 FOREIGN KEY (organisation_state_id)
+                  REFERENCES lams_organisation_state (organisation_state_id) ON DELETE NO ACTION ON UPDATE NO ACTION
 )TYPE=InnoDB;
 
 CREATE TABLE lams_css_theme_ve (

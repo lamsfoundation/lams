@@ -15,6 +15,11 @@ INSERT INTO lams_organisation_type VALUES(1, 'ROOT ORGANISATION', 'root all othe
 INSERT INTO lams_organisation_type VALUES(2, 'COURSE ORGANISATION', 'main organisation level - equivalent to an entire course.');
 INSERT INTO lams_organisation_type VALUES(3, 'CLASS', 'runtime organisation level - lessons are run for classes.');
 
+INSERT INTO lams_organisation_state VALUES (1, 'ACTIVE');
+INSERT INTO lams_organisation_state VALUES (2, 'HIDDEN');
+INSERT INTO lams_organisation_state VALUES (3, 'ARCHIVED');
+INSERT INTO lams_organisation_state VALUES (4, 'REMOVED');
+
 INSERT INTO lams_grouping_type VALUES (1, 'RANDOM_GROUPING');
 INSERT INTO lams_grouping_type VALUES (2, 'CHOSEN_GROUPING');
 INSERT INTO lams_grouping_type VALUES (3, 'CLASS_GROUPING');
