@@ -52,8 +52,9 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * 
+ * <p> Starts up the monitoring module </p>
+ * 
  * @author Ozgur Demirtas
- * starts up the monitoring module
  */
 
 public class VoteMonitoringStarterAction extends Action implements VoteAppConstants {

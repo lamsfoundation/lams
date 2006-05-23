@@ -30,8 +30,8 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
 
 /**
  * @author Ozgur Demirtas
- * <p></p>
  * 
+ * <p>Interface that defines the contract for VoteSession access </p>
  */
 public interface IVoteSessionDAO {
     public VoteSession getVoteSessionByUID(Long uid);

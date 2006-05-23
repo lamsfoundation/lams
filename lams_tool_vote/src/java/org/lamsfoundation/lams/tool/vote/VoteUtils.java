@@ -45,8 +45,9 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 
 
 /**
+ * <p> Common Voting utility functions live here. </p>
+ * 
  * @author Ozgur Demirtas
- * Common Voting utility functions live here.
  */
 public abstract class VoteUtils implements VoteAppConstants {
 

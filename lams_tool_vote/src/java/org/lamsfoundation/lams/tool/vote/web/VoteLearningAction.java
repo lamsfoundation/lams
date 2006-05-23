@@ -54,8 +54,6 @@ import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 
 /**
- * * @author Ozgur Demirtas
- * 
  * <p>Action class that controls the logic of tool behavior. </p>
  * 
  * <p>Note that Struts action class only has the responsibility to navigate 
@@ -69,7 +67,7 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
  * Struts action class as all of them are handled in 
  * <code>CustomStrutsExceptionHandler<code>.
  * 
-
+ * @author Ozgur Demirtas
  * 
 */
 public class VoteLearningAction extends LamsDispatchAction implements VoteAppConstants

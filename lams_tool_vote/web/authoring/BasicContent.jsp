@@ -85,7 +85,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							</td> 
 							
 						  	<td NOWRAP valign=middle>			
-								 <font size=2>  <img src="<c:out value="${tool}"/>images/down.gif" align=left onclick="javascript:submitModifyOption('1','moveOptionDown');"> </font>
+								 <font size=2>  <img src="<c:out value="${tool}"/>images/down.gif" align=left onclick="javascript:submitModifyNomination('1','moveNominationDown');"> </font>
 							</td> 								 
 							
 					  	</tr>
@@ -106,7 +106,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	                                	<c:if test="${ activeModule != 'monitoring' }"> 			
 			 		 						<html:submit property="removeContent" 
 	                                                     styleClass="linkbutton"  
-	                                                     onclick="removeOption(${optIndex});">
+	                                                     onclick="removeNomination(${optIndex});">
 												<bean:message key="button.delete"/>
 											</html:submit>
 										</c:if> 			
@@ -114,20 +114,20 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	                                	<c:if test="${ activeModule == 'monitoring' }"> 			
 			 		 						<html:submit property="removeContent" 
 	                                                     styleClass="linkbutton"  
-	                                                     onclick="removeMonitoringOption(${optIndex});">
+	                                                     onclick="removeMonitoringNomination(${optIndex});">
 												<bean:message key="button.delete"/>
 											</html:submit>
 										</c:if> 													
                                     </td>
 	      						  	<td NOWRAP valign=middle>			
 						  				<c:if test="${maxOptionIndex == optIndex}"> 			
-		     								 <font size=2> <img src="<c:out value="${tool}"/>images/up.gif" align=left onclick="javascript:submitModifyOption('<c:out value="${optIndex}"/>','moveOptionUp');"> </font>
+		     								 <font size=2> <img src="<c:out value="${tool}"/>images/up.gif" align=left onclick="javascript:submitModifyNomination('<c:out value="${optIndex}"/>','moveNominationUp');"> </font>
 		     							</c:if> 	    
 										
 		 				  				<c:if test="${maxOptionIndex != optIndex }"> 			
 			 				  				<font size=2>
-			   								    <img src="<c:out value="${tool}"/>images/down.gif" align=left onclick="javascript:submitModifyOption('<c:out value="${optIndex}"/>','moveOptionDown');">		  	   								 
-			       								<img src="<c:out value="${tool}"/>images/up.gif" align=left onclick="javascript:submitModifyOption('<c:out value="${optIndex}"/>','moveOptionUp');">		  	
+			   								    <img src="<c:out value="${tool}"/>images/down.gif" align=left onclick="javascript:submitModifyNomination('<c:out value="${optIndex}"/>','moveNominationDown');">		  	   								 
+			       								<img src="<c:out value="${tool}"/>images/up.gif" align=left onclick="javascript:submitModifyNomination('<c:out value="${optIndex}"/>','moveNominationUp');">		  	
 			       							</font>
 										</c:if> 	           								 
 		                         	</td>
@@ -142,7 +142,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
                             <td align="right">
                                 <html:submit property="addContent" 
                                              styleClass="linkbutton" 
-                                             onclick="submitMethod('addNewOption');">
+                                             onclick="submitMethod('addNewNomination');">
                                     <bean:message key="button.add"/>
                                 </html:submit>
                             </td>
@@ -161,16 +161,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <SCRIPT language="JavaScript"> 
 
-	function removeOption(optIndex)
+	function removeNomination(optIndex)
 	{
 		document.VoteAuthoringForm.optIndex.value=optIndex;
-        submitMethod('removeOption');
+        submitMethod('removeNomination');
 	}
 
-	function removeMonitoringOption(optIndex)
+	function removeMonitoringNomination(optIndex)
 	{
 		document.VoteMonitoringForm.optIndex.value=optIndex;
-        submitMonitoringMethod('removeOption');
+        submitMonitoringMethod('removeNomination');
 	}
 	
  </SCRIPT>

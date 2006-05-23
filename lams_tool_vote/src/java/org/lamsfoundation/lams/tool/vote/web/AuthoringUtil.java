@@ -55,13 +55,19 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * 
- * Keeps all operations needed for Authoring mode. 
+ * <p> Keeps all operations needed for Authoring mode. </p>
+ *  
  * @author Ozgur Demirtas
  *
  */
 public class AuthoringUtil implements VoteAppConstants {
 	static Logger logger = Logger.getLogger(AuthoringUtil.class.getName());
 
+	/**
+	 * checks if there are any duplicate entries
+	 * @param mapOptionsContent
+	 * @returnboolean
+	 */
     public static boolean verifyDuplicateNominations(Map mapOptionsContent)
 	{
     	Map originalMapOptionsContent=mapOptionsContent;
@@ -94,7 +100,11 @@ public class AuthoringUtil implements VoteAppConstants {
     	return false;
 	}
     
-    
+    /**
+     * checks if the map is empty or not
+     * @param map
+     * @return boolean
+     */
     public static boolean verifyMapNoEmptyString(Map map)
 	{
     	Iterator itMap = map.entrySet().iterator();
@@ -125,27 +135,6 @@ public class AuthoringUtil implements VoteAppConstants {
     }
 
 
-    public static Map sequenceMap(Map globalMap)
-	{
-    	logger.debug("globalMap:"+ globalMap);
-    	Map mapTemp= new TreeMap(new VoteComparator());
-    	
-    	long mapCounter=0;
-    	Iterator itMap = globalMap.entrySet().iterator();
-    	while (itMap.hasNext()) {
-        	Map.Entry pairs = (Map.Entry)itMap.next();
-            logger.debug("using the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
-            Map optionsMap=(Map)pairs.getValue();
-            logger.debug("optionsMap:"+ optionsMap);
-            mapCounter++;
-            mapTemp.put(new Long(mapCounter).toString(), optionsMap);
-		}
-    	
-    	logger.debug("final mapTemp:"+ mapTemp);
-    	return mapTemp;
-	}
-	
-
     public static Map repopulateMap(HttpServletRequest request, String parameterType)
     {
     	Map mapTempQuestionsContent= new TreeMap(new VoteComparator());
@@ -174,113 +163,9 @@ public class AuthoringUtil implements VoteAppConstants {
     	return mapTempQuestionsContent;
     }
 
-
-    /**
-     * returns the value of the entry for a given index
-     * getRequiredWeightEntry(Map mapWeights, String questionIndex)
-     * 
-     * @param mapWeights
-     * @param questionIndex
-     * @return
-     */	
-    public static String getRequiredWeightEntry(Map mapWeights, String questionIndex)
-    {
-    	logger.debug("mapWeights: " +  mapWeights);
-    	
-    	Iterator itMap = mapWeights.entrySet().iterator();
-    	while (itMap.hasNext()) {
-        	Map.Entry pairs = (Map.Entry)itMap.next();
-            logger.debug("using the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
-            if (questionIndex.equals(pairs.getKey().toString()))
-    		{
-            	String weight=pairs.getValue().toString();
-            	logger.debug("required weight:" + weight);
-            	return weight;
-    		}
-		}
-    	return null;
-    }
-    
-
-    
-    
-    /**
-     * removes options from mapGlobalOptionsContent
-	 * removeFromOptionsMap(Map mapGlobalOptionsContent, String questionIndex )
-	 * 
-	 * @param mapGlobalOptionsContent
-	 * @param questionIndex
-	 * @param direction
-	 * @return Map
-	 */
-    public static Map removeFromMap(Map mapContent, String index)
-    {
-    	/* mapGlobalOptionsContent refers to mapGenaralOptionsContent and mapGeneralSelectedlOptionsContent */
-    	/* map to be returned */
-    	Map mapTempContent= new TreeMap(new VoteComparator());
-    	mapTempContent= mapContent;
-    	
-    	mapTempContent.remove(index);
-		logger.debug("entry at index removed from mapTempContent...");
-    	
-		logger.debug("final mapTempContent: " +  mapTempContent);
-    	return mapTempContent;
-    }
-    
-	
-    public static Map mergeMaps(Map map1, Map map2)
-    {
-    	Map mapMergedMap= new TreeMap(new VoteComparator());
-    	logger.debug("merging maps now...");
-    	
-    	Iterator itMap1 = map1.entrySet().iterator();
-		while (itMap1.hasNext()) 
-        {
-        	Map.Entry pairs = (Map.Entry)itMap1.next();
-            logger.debug("using the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
-            mapMergedMap.put(pairs.getKey(), pairs.getValue());
-        }
-		
-		logger.debug("adding the other map...");
-		Iterator itMap2 = map2.entrySet().iterator();
-		while (itMap2.hasNext()) 
-        {
-        	Map.Entry pairs = (Map.Entry)itMap2.next();
-            logger.debug("using the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
-            mapMergedMap.put(pairs.getKey(), pairs.getValue());
-        }
-		
-		logger.debug("final merged map: " + mapMergedMap);
-		return mapMergedMap;
-    }
-	
-
-
-	public static boolean isOptionSelected(Map mapGeneralSelectedOptionsContent, String optionText, String questionIndex)
-	{
-	   Iterator itGSOMap = mapGeneralSelectedOptionsContent.entrySet().iterator();
-	   logger.debug("questionIndex: " + questionIndex);
-	   logger.debug("optionText: " + optionText);
-	   while (itGSOMap.hasNext()) 
-        {
-            Map.Entry pairs = (Map.Entry)itGSOMap.next();
-            if (pairs.getKey().toString().equals(questionIndex))
-            {
-            	Map currentOptionsMap= (Map)pairs.getValue();
-            	logger.debug("currentOptionsMap: " + currentOptionsMap);
-            	boolean isOptionSelectedInMap=isOptionSelectedInMap(optionText, currentOptionsMap);
-            	logger.debug("isOptionSelectedInMap: " + isOptionSelectedInMap);
-            	return isOptionSelectedInMap;
-            }
-        }
-	   return false;
-	}
-	
-	
     public static Map shiftMap(Map mapOptionsContent, String optIndex , String movableOptionEntry, String direction)
     {
     	logger.debug("movableOptionEntry: " +  movableOptionEntry);
-    	/* map to be returned */
     	Map mapTempOptionsContent= new TreeMap(new VoteComparator());
     	
     	String shiftableEntry=null;
@@ -334,38 +219,17 @@ public class AuthoringUtil implements VoteAppConstants {
     		return mapTempOptionsContent;
     }
 
-	
-	public static boolean isOptionSelectedInMap(String optionText, Map currentOptionsMap)
-	{
-		logger.debug("optionText: " + optionText);
-		Iterator itCOMap = currentOptionsMap.entrySet().iterator();
-		while (itCOMap.hasNext()) 
-	    {
-			Map.Entry pairs = (Map.Entry)itCOMap.next();
-			if (pairs.getValue().toString().equals(optionText))
-			{
-				logger.debug("option text found in the map: " + optionText);
-				return true;
-			}
-	    }
-		return false;
-	}
 
-	
-    public static void  assignStaterMapsToCurrentMaps(HttpServletRequest request)
-    {
-    	logger.debug("assigning maps..");
-		Map mapStartupGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_STARTUP_GENERAL_OPTIONS_CONTENT);
-		logger.debug("mapStartupGeneralOptionsContent: " + mapStartupGeneralOptionsContent);
-    	
-		Map mapStartupGeneralSelectedOptionsContent=(Map) request.getSession().getAttribute(MAP_STARTUP_GENERAL_SELECTED_OPTIONS_CONTENT);
-		logger.debug("mapStartupGeneralSelectedOptionsContent: " + mapStartupGeneralSelectedOptionsContent);
-    	
-		request.getSession().setAttribute(MAP_GENERAL_OPTIONS_CONTENT, mapStartupGeneralOptionsContent);
-		request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapStartupGeneralSelectedOptionsContent);
-    }
-    
-    
+    /**
+     * 
+     * Used in uploading offline and online files
+     * 
+     * @param request
+     * @param voteAuthoringForm
+     * @param isOfflineFile
+     * @return VoteAttachmentDTO
+     * @throws RepositoryCheckedException
+     */
     public static VoteAttachmentDTO uploadFile(HttpServletRequest request, VoteAuthoringForm voteAuthoringForm, boolean isOfflineFile) throws RepositoryCheckedException 
 	{
     	logger.debug("doing uploadFile...");
@@ -489,7 +353,12 @@ public class AuthoringUtil implements VoteAppConstants {
 		return voteAttachmentDTO;
 	}
     
-
+    
+	/**
+	 * returns a list of Vote attachements for listing of online and offline file information
+	 * @param listOfflineFilesMetaData
+	 * @return
+	 */
     public static List populateMetaDataAsAttachments(List listOfflineFilesMetaData)
     {
     	List listAttachments=new LinkedList();
@@ -517,7 +386,10 @@ public class AuthoringUtil implements VoteAppConstants {
     	return listAttachments;
     }
     
-    
+    /**
+     * @param listFilesMetaData
+     * @return
+     */
     public static List populateMetaDataAsFilenames(List listFilesMetaData)
     {
     	List listFilenames=new LinkedList();
@@ -535,6 +407,12 @@ public class AuthoringUtil implements VoteAppConstants {
     }
     
 
+    /**
+     * used in removing a file item listed in the jsp
+     * @param request
+     * @param filename
+     * @param offlineFile
+     */
     public static void removeFileItem(HttpServletRequest request, String filename, String offlineFile)
 	{
     	logger.debug("offlineFile:" + offlineFile);
@@ -566,8 +444,6 @@ public class AuthoringUtil implements VoteAppConstants {
     
     
     /**
-     * findFileNameIndex(List listUploadedFileNames, String filename)
-     * 
      * @param listUploadedFileNames
      * @param filename
      * @return int
@@ -591,13 +467,6 @@ public class AuthoringUtil implements VoteAppConstants {
     }
     
     
-    /**
-     * removeFileItem(List listFilesMetaData, String uuid)
-     * 
-     * @param listFilesMetaData
-     * @param uuid
-     * @return List
-     */
     public static List removeFileItem(List listFilesMetaData, String uuid)
     {
         VoteAttachmentDTO deletableAttachmentDTO=null;
@@ -627,8 +496,14 @@ public class AuthoringUtil implements VoteAppConstants {
     	
     	return listFilesMetaData;
     }
+
     
-    
+    /**
+     * Online and offline files metadata is stored into the database 
+     * @param request
+     * @param isOfflineFile
+     * @param voteContent
+     */
     public static void persistFilesMetaData(HttpServletRequest request, boolean isOfflineFile, VoteContent voteContent)
     {
     	IVoteService voteService =VoteUtils.getToolService(request);
@@ -670,13 +545,6 @@ public class AuthoringUtil implements VoteAppConstants {
         }
     }
     
-    
-    /**
-     * extractFileNames(List listFilesMetaData)
-     * 
-     * @param listFilesMetaData
-     * @return List
-     */
     public static List extractFileNames(List listFilesMetaData)
     {
     	Iterator itList = listFilesMetaData.iterator();
@@ -693,7 +561,11 @@ public class AuthoringUtil implements VoteAppConstants {
     	return listFilenames;
     }
     
-    
+    /**
+     * used if an offline file item is no more referenced
+     * @param request
+     * @param voteContent
+     */
     public static void removeRedundantOfflineFileItems(HttpServletRequest request, VoteContent voteContent)
     {
     	IVoteService voteService =VoteUtils.getToolService(request);
@@ -740,7 +612,11 @@ public class AuthoringUtil implements VoteAppConstants {
 		}
     }
     
-
+    /**
+     * used if an online file item is no more referenced
+     * @param request
+     * @param voteContent
+     */
     public static void removeRedundantOnlineFileItems(HttpServletRequest request, VoteContent voteContent)
     {
     	IVoteService voteService =VoteUtils.getToolService(request);
@@ -862,7 +738,6 @@ public class AuthoringUtil implements VoteAppConstants {
     protected void reconstructOptionContentMapForRemove(Map mapOptionsContent, HttpServletRequest request, VoteAuthoringForm voteAuthoringForm)
     {
     		logger.debug("doing reconstructOptionContentMapForRemove.");
-    	 	//String questionIndex =voteAuthoringForm.getQuestionIndex();
     		String optIndex =voteAuthoringForm.getOptIndex();
     	 	logger.debug("pre-delete map content:  " + mapOptionsContent);
     	 	logger.debug("optIndex: " + optIndex);
@@ -922,6 +797,11 @@ public class AuthoringUtil implements VoteAppConstants {
 		}
     }
 
+    /**
+     * 
+     * @param mapOptionsContent
+     * @param request
+     */
     protected  void reconstructOptionsContentMapForSubmit(Map mapOptionsContent, HttpServletRequest request)
     {
     	logger.debug("pre-submit Map:" + mapOptionsContent);
@@ -1026,7 +906,15 @@ public class AuthoringUtil implements VoteAppConstants {
 	
 	}
 
-    
+    /**
+     * persists the vote content
+     * 
+     * @param mapOptionsContent
+     * @param voteService
+     * @param voteAuthoringForm
+     * @param request
+     * @return
+     */
     public VoteContent saveOrUpdateVoteContent(Map mapOptionsContent, IVoteService voteService, VoteAuthoringForm voteAuthoringForm, HttpServletRequest request)
     {
         UserDTO toolUser = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
@@ -1162,6 +1050,14 @@ public class AuthoringUtil implements VoteAppConstants {
         return voteContent;
     }
     
+    /**
+     * creates a new vote content
+     * 
+     * @param mapOptionsContent
+     * @param voteService
+     * @param voteContent
+     * @return
+     */
     protected VoteContent createOptiosContent(Map mapOptionsContent, IVoteService voteService, VoteContent voteContent)
     {    
         logger.debug("content uid is: " + voteContent.getUid());

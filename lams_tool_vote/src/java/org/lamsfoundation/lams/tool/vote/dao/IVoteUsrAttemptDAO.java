@@ -30,10 +30,9 @@ import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 
 
 /**
- * 
  * @author Ozgur Demirtas
- * * <p></p>
- *
+ * 
+ * <p>Interface that defines the contract for VoteUsrAttempt access </p>
  */
 public interface IVoteUsrAttemptDAO
 {

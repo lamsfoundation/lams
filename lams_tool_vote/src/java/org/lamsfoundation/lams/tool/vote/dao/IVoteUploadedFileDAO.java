@@ -26,10 +26,9 @@ import java.util.List;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteUploadedFile;
 
 /**
- * 
  * @author Ozgur Demirtas
- * <p></p>
- *
+ * 
+ * <p> Interface that defines the contract for IVoteUploadedFile access </p>
  */
 public interface IVoteUploadedFileDAO
 {

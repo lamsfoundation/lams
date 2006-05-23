@@ -47,7 +47,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 /**
  * @author Ozgur Demirtas
  * 
- * Interface that defines the contract that all Voting service provider must follow.
+ * Interface that defines the contract  Voting service provider must follow.
  */
 public interface IVoteService 
 {

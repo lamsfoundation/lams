@@ -32,10 +32,27 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
+	<!DOCTYPE HTML PUBLIC "-//W3C//DTD hTML 4.01 Transitional//EN">
+	<html:html locale="true">
+	<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<title> <bean:message key="label.warning"/> </title>
+	
+	 <lams:css/>
+	<!-- depending on user / site preference this will get changed probably use passed in variable from flash to select which one to use-->
 
+ 	<!-- ******************** FCK Editor related javascript & HTML ********************** -->
+    <script type="text/javascript" src="${lams}fckeditor/fckeditor.js"></script>
+    <script type="text/javascript" src="${lams}includes/javascript/fckcontroller.js"></script>
+    <link href="${lams}css/fckeditor_style.css" rel="stylesheet" type="text/css">
 
-<table border="0" cellspacing="2" cellpadding="2" summary="This table is being used for layout purposes only">
+	<script type="text/javascript" src="<c:out value="${lams}"/>includes/javascript/tabcontroller.js"></script>    
+	<script type="text/javascript" src="<c:out value="${lams}"/>includes/javascript/common.js"></script>
+	
+</head>
+<body>
 
+		<table width="80%" cellspacing="8" align="CENTER" class="forms">
 		<c:if test="${userExceptionWeightTotal == 'true'}"> 			
 			<tr> <td NOWRAP valign=top>
 						<font size=2> <bean:message key="error.question.weight.total"/> </font>
@@ -158,6 +175,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</c:if> 				    
 		
 </table>
+
+</body>
+</html:html>
+
+
+
+
+
+
+
+
 
 
 

@@ -35,7 +35,8 @@ import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
 
 /**
- * Struts action level exception handler 
+ * <p> Struts action level exception handler </p> 
+ * 
  * @author Ozgur Demirtas
  */
 public class CustomStrutsExceptionHandler extends ExceptionHandler {

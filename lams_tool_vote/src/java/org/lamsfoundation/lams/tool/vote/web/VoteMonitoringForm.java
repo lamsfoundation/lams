@@ -25,9 +25,9 @@ package org.lamsfoundation.lams.tool.vote.web;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 
 /**
+ * <p> ActionForm for the Monitoring environment </p>
+ * 
  * @author Ozgur Demirtas
- *
- * ActionForm for the Monitoring environment
  */
 public class VoteMonitoringForm extends VoteAuthoringForm implements VoteAppConstants {
 	// controls which method is called by the Lookup map */

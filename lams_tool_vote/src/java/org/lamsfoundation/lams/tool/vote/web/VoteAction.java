@@ -68,14 +68,11 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * Struts action class as all of them are handled in 
  * <code>CustomStrutsExceptionHandler<code>.
  * 
- 
-
 */
 public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 {
 	/*
 	 * when to reset define later and synchin monitor etc..
-	 *
 	 * make sure the tool gets called on:
 	 * setAsForceComplete(Long userId) throws VoteApplicationException 
 	 */
@@ -126,9 +123,9 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     }
     
     
-    public boolean isNewOptionAdded(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+    public boolean isNewNominationAdded(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
     {
-		logger.debug("doing isNewOptionAdded");
+		logger.debug("doing isNewNominationAdded");
 		VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
 	    logger.debug("voteAuthoringForm :" +voteAuthoringForm);
 	    voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
@@ -185,12 +182,22 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
         
     }
     
-    public ActionForward addNewOption(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
+    /**
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     */
+    public ActionForward addNewNomination(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
     throws IOException, ServletException 
     {
-		logger.debug("dispathcing addNewOption");
-		boolean isNewOptionAdded=isNewOptionAdded(mapping, form, request, response);
-		logger.debug("isNewOptionAdded:" + isNewOptionAdded);
+		logger.debug("dispathcing addNewNomination");
+		boolean isNewNominationAdded=isNewNominationAdded(mapping, form, request, response);
+		logger.debug("isNewNominationAdded:" + isNewNominationAdded);
 		
 		/* determine whether the request is from Monitoring url Edit Activity*/
 		String sourceVoteStarter = (String) request.getAttribute(SOURCE_VOTE_STARTER);
@@ -202,9 +209,9 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     }
 
 
-    public boolean isOptionRemoved(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+    public boolean isNominationRemoved(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
     {
-        logger.debug("starting isOptionRemoved ");
+        logger.debug("starting isNominationRemoved");
 		VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
 	    logger.debug("voteAuthoringForm :" +voteAuthoringForm);
 	    voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
@@ -256,12 +263,12 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     }
 
     
-    public ActionForward removeOption(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
+    public ActionForward removeNomination(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
     throws IOException, ServletException 
     {
-		logger.debug("doing removeOption ");
-		boolean isOptionRemoved=isOptionRemoved(mapping, form, request, response);
-		logger.debug("isOptionRemoved:" + isOptionRemoved);
+		logger.debug("starting removeNomination ");
+		boolean isNominationRemoved=isNominationRemoved(mapping, form, request, response);
+		logger.debug("isNominationRemoved:" + isNominationRemoved);
 		
 	    /* determine whether the request is from Monitoring url Edit Activity*/
 		String sourceVoteStarter = (String) request.getAttribute(SOURCE_VOTE_STARTER);
@@ -273,6 +280,15 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     }
 
 
+    /**
+     * persists the content into the database
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     */
     public boolean submitContent(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
     {
         logger.debug("doing submitContent..");
@@ -459,14 +475,13 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     }
 
 
-    public boolean isMoveOptionDown(ActionMapping mapping,
+    public boolean isMoveNominationDown(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response) 
     {
-    	logger.debug("starting isMoveOptionDown...");
+    	logger.debug("starting isMoveNominationDown...");
     	VoteUtils.cleanUpUserExceptions(request);
-    	logger.debug("dispatching moveOptionDown...");
     	VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
 	    logger.debug("voteAuthoringForm :" +voteAuthoringForm);
 	    voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
@@ -479,7 +494,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
      	logger.debug("mapOptionsContent before move down: " + mapOptionsContent);
      	logger.debug("mapOptionsContent size move down: " + mapOptionsContent.size());
 
-     	//perform a move down if there are at least 2 questions
+     	/* perform a move down if there are at least 2 nominations*/
      	if (mapOptionsContent.size() > 1)
      	{
      		String optIndex =voteAuthoringForm.getOptIndex();
@@ -531,7 +546,18 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     }
     
     
-    public ActionForward moveOptionDown(ActionMapping mapping,
+    /**
+     * shifts the nominations map for moving down
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     */
+    public ActionForward moveNominationDown(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response) throws IOException,
@@ -543,19 +569,28 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 		String destination=VoteUtils.getDestination(sourceVoteStarter);
 		logger.debug("destination: " + destination);
 
-		boolean isMoveOptionDown=isMoveOptionDown(mapping, form, request, response);
-		logger.debug("isMoveOptionDown:" + isMoveOptionDown);
+		boolean isMoveNominationDown=isMoveNominationDown(mapping, form, request, response);
+		logger.debug("isMoveNominationDown:" + isMoveNominationDown);
 
         return (mapping.findForward(destination));	
     }
 
 
-    public boolean isMoveOptionUp(ActionMapping mapping,
+    /**
+     * shifts the nominations map for moving up
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     */
+    public boolean isMoveNominationUp(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response)
     {
-        logger.debug("starting  isMoveOptionUp...");
+        logger.debug("starting isMoveNominationUp...");
     	VoteUtils.cleanUpUserExceptions(request);
     	
     	VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;    	
@@ -577,7 +612,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
      	logger.debug("mapOptionsContent before move down: " + mapOptionsContent);
      	logger.debug("mapOptionsContent size move down: " + mapOptionsContent.size());
 
-     	//perform a move down if there are at least 2 questions
+     	/* perform a move down if there are at least 2 nominations */
      	if (mapOptionsContent.size() > 1)
      	{
      		String optIndex =voteAuthoringForm.getOptIndex();
@@ -629,7 +664,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     }
 
     
-    public ActionForward moveOptionUp(ActionMapping mapping,
+    public ActionForward moveNominationUp(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response) throws IOException,
@@ -641,13 +676,20 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 		String destination=VoteUtils.getDestination(sourceVoteStarter);
 		logger.debug("destination: " + destination);
 
-		boolean isMoveOptionUp=isMoveOptionUp(mapping, form, request, response);
-		logger.debug("isMoveOptionUp:" + isMoveOptionUp);
+		boolean isMoveNominationUp=isMoveNominationUp(mapping, form, request, response);
+		logger.debug("isMoveNominationUp:" + isMoveNominationUp);
 
         return (mapping.findForward(destination));	
     }
     
     
+    /**
+     * checks the user entries before submit is performed
+     * @param request
+     * @param errors
+     * @param voteAuthoringForm
+     * @return
+     */
     protected ActionMessages validateSubmit(HttpServletRequest request, ActionMessages errors, VoteAuthoringForm voteAuthoringForm)
     {
         String title = voteAuthoringForm.getTitle();
@@ -686,6 +728,18 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     }
     
     
+    /**
+     * persists offline files
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     * @throws RepositoryCheckedException
+     */
     public ActionForward submitOfflineFiles(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
@@ -738,6 +792,17 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     }
 
     
+    /**
+     * persists online files
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     * @throws RepositoryCheckedException
+     */
     public ActionForward submitOnlineFiles(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
@@ -789,6 +854,17 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
     }
 
 
+    /**
+     * removes an offline file from the jsp
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     */
     public ActionForward deleteOfflineFile(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
@@ -826,7 +902,17 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
         return (mapping.findForward(destination));
     }
 
-
+	/**
+	 * deletes an online file from the jsp
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws IOException
+	 * @throws ServletException
+	 */
     public ActionForward deleteOnlineFile(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
@@ -864,7 +950,18 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
         return (mapping.findForward(destination));
     }
 
-    
+    /**
+     * used in define later to switch from view-only to editable mode
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     * @throws ToolException
+     */
     public ActionForward editActivityQuestions(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
@@ -893,8 +990,6 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 		logger.debug("destination: " + destination);
 
      	request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(true));
-     	request.getSession().setAttribute(SHOW_AUTHORING_TABS,new Boolean(false).toString());
-     	     	
      	String toolContentId=voteAuthoringForm.getToolContentId();
      	logger.debug("toolContentId: " + toolContentId);
      	if ((toolContentId== null) || toolContentId.equals(""))

@@ -23,9 +23,9 @@ package org.lamsfoundation.lams.tool.vote;
 
 
 /**
- * Null Object pattern. This interface is defined to avoid the use of NULL. 
+ * <p> Null Object pattern. This interface is defined to avoid the use of NULL. 
  * The domain object that allows NULL as return value should implement this
- * interface.
+ * interface. </p>
  * 
  * @author Ozgur Demirtas
  * 

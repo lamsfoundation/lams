@@ -104,6 +104,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			document.VoteMonitoringForm.optIndex.value=optionIndexValue; 
 			submitMethod(actionMethod);
 		}
+
+		function submitModifyNomination(optionIndexValue, actionMethod) 
+		{
+			document.VoteMonitoringForm.optIndex.value=optionIndexValue; 
+			submitMethod(actionMethod);
+		}
 		
 		function submitOpenVote(currentUid, actionMethod)
 		{

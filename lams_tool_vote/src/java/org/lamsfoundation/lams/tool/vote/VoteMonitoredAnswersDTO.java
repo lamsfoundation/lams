@@ -29,8 +29,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 
 /**
- * <p> DTO that holds question/candidate answers data as well as user attempts data for jsp purposes
- * </p>
+ * <p> DTO that holds question/candidate answers data as well as user attempts data for jsp purposes </p>
  * 
  * @author Ozgur Demirtas
  */

@@ -21,12 +21,13 @@
  * ***********************************************************************/
 
 /**
+ * 
+ * <p>Starts up the Define Later module. 
+ *  It reuses majority of the functionality from existing authoring module.
+ * </p>
+ * 
  * @author Ozgur Demirtas
  * 
- * McDLStarterAction activates the Define Later module. 
- * It reuses majority of the functionality from existing authoring module.
- * 
-  
 */
 package org.lamsfoundation.lams.tool.vote.web;
 import java.io.IOException;

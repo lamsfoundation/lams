@@ -77,9 +77,9 @@ import org.springframework.dao.DataAccessException;
  * 
  * @author Ozgur Demirtas
  * 
- * The POJO implementation of Voting service. All business logics of Voting tool
- * are implemented in this class. It translate the request from presentation
- * layer and perform appropriate database operation.
+ * The POJO implementation of Voting service. All business logic of Voting tool
+ * is implemented in this class. It translates the request from presentation
+ * layer and performs appropriate database operation.
  * 
  */
 public class VoteServicePOJO implements

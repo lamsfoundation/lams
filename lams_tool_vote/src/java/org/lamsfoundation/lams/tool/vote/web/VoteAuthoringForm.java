@@ -26,9 +26,10 @@ import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 
 /**
+ * <p> ActionForm for the Authoring environment </p>
+ * 
  * @author Ozgur Demirtas
- *
- * ActionForm for the Authoring environment
+ * 
  */
 public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConstants {
 	/* form controllers */

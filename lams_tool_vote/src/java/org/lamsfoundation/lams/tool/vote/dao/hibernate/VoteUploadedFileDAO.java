@@ -72,10 +72,6 @@ public class VoteUploadedFileDAO extends HibernateDaoSupport implements IVoteUpl
                                    .load(VoteUploadedFile.class, new Long(submissionId));
     }
  	
- 	/**
- 	 * 
- 	 * return null if not found
- 	 */
  	public VoteUploadedFile loadUploadedFileById(long uid)
     {
     	return (VoteUploadedFile) this.getHibernateTemplate().get(VoteUploadedFile.class, new Long(uid));

@@ -54,8 +54,6 @@ import org.lamsfoundation.lams.tool.vote.service.VoteServiceProxy;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 
 /**
- * * @author Ozgur Demirtas
- * 
  * <p>Action class that controls the logic of tool behavior. </p>
  * 
  * <p>Note that Struts action class only has the responsibility to navigate 
@@ -68,6 +66,8 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
  * identified. No system exception error handling code should appear in the 
  * Struts action class as all of them are handled in 
  * <code>CustomStrutsExceptionHandler<code>.
+ * 
+ *  @author Ozgur Demirtas
  * 
 */
 public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppConstants
@@ -389,7 +389,6 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
                                          ServletException
 	{
     	logger.debug("start  initSummaryContent...");
-    	
     	logger.debug("dispatching getSummary..." + request);
    	    	
 		IVoteService voteService = (IVoteService)request.getSession().getAttribute(TOOL_SERVICE);
@@ -622,6 +621,7 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
         return (mapping.findForward(LOAD_MONITORING));
     }
 	
+    
     public ActionForward submitAllContent(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
     throws IOException, ServletException {
     	logger.debug("dispatching proxy submitAllContent...");
@@ -657,10 +657,10 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
     }
     
     
-    public ActionForward addNewOption(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
+    public ActionForward addNewNomination(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
     throws IOException, ServletException 
     {
-    	logger.debug("dispatching proxy addNewOption...");
+    	logger.debug("dispatching proxy addNewNomination...");
 
     	request.setAttribute(SOURCE_VOTE_STARTER, "monitoring");
 	    logger.debug("SOURCE_VOTE_STARTER: monitoring");
@@ -676,16 +676,16 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 
     	VoteAction voteAction= new VoteAction(); 
     	
-    	boolean isNewOptionAdded=voteAction.isNewOptionAdded(mapping, form, request, response);
-		logger.debug("isNewOptionAdded:" + isNewOptionAdded);
+    	boolean isNewNominationAdded=voteAction.isNewNominationAdded(mapping, form, request, response);
+		logger.debug("isNewNominationAdded:" + isNewNominationAdded);
         return (mapping.findForward(destination));
     }
 
 
-    public ActionForward removeOption(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
+    public ActionForward removeNomination(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
     throws IOException, ServletException 
     {
-    	logger.debug("dispatching proxy removeOption...");
+    	logger.debug("dispatching proxy removeNomination...");
     	VoteMonitoringForm voteMonitoringForm = (VoteMonitoringForm) form;
 		logger.debug("voteMonitoringForm: " + voteMonitoringForm);
 		String optIndex=voteMonitoringForm.getOptIndex() ;
@@ -703,20 +703,20 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 		String destination=VoteUtils.getDestination(sourceVoteStarter);
 		logger.debug("destination: " + destination);
 		
-		boolean isOptionRemoved=voteAction.isOptionRemoved(mapping, form, request, response);
-		logger.debug("isOptionRemoved :" +isOptionRemoved);
+		boolean isNominationRemoved=voteAction.isNominationRemoved(mapping, form, request, response);
+		logger.debug("isNominationRemoved :" +isNominationRemoved);
 
 		return (mapping.findForward(destination));
     }
 
     
-    public ActionForward moveOptionDown(ActionMapping mapping,
+    public ActionForward moveNominationDown(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response) throws IOException,
                                          ServletException
     {
-    	logger.debug("dispatching proxy moveOptionDown...");
+    	logger.debug("dispatching proxy moveNominationDown...");
 
     	request.setAttribute(SOURCE_VOTE_STARTER, "monitoring");
 	    logger.debug("SOURCE_VOTE_STARTER: monitoring");
@@ -729,20 +729,20 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 		String destination=VoteUtils.getDestination(sourceVoteStarter);
 		logger.debug("destination: " + destination);
     	
-		boolean isMoveOptionDown=voteAction.isMoveOptionDown(mapping, form, request, response);
-		logger.debug("isMoveOptionDown :" +isMoveOptionDown);
+		boolean isMoveNominationDown=voteAction.isMoveNominationDown(mapping, form, request, response);
+		logger.debug("isMoveNominationDown :" +isMoveNominationDown);
 
 		return (mapping.findForward(destination));
     }
     
     
-    public ActionForward moveOptionUp(ActionMapping mapping,
+    public ActionForward moveNominationUp(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response) throws IOException,
                                          ServletException
     {
-    	logger.debug("dispatching proxy moveOptionUp...");
+    	logger.debug("dispatching proxy moveNominationUp...");
 
     	request.setAttribute(SOURCE_VOTE_STARTER, "monitoring");
 	    logger.debug("SOURCE_VOTE_STARTER: monitoring");
@@ -754,8 +754,8 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 		logger.debug("destination: " + destination);
 
     	VoteAction voteAction= new VoteAction(); 
-		boolean isMoveOptionUp=voteAction.isMoveOptionUp(mapping, form, request, response);
-		logger.debug("isMoveOptionUp:" + isMoveOptionUp);
+		boolean isMoveNominationUp=voteAction.isMoveNominationUp(mapping, form, request, response);
+		logger.debug("isMoveNominationUp:" + isMoveNominationUp);
 		
 		return (mapping.findForward(destination));
 

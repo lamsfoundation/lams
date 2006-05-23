@@ -24,8 +24,7 @@ package org.lamsfoundation.lams.tool.vote;
 
 
 /**
- * <p> DTO that holds file attachment data for jsp purposes
- * </p>
+ * <p> DTO that holds file attachment data for jsp purposes</p>
  * 
  * @author Ozgur Demirtas
  */

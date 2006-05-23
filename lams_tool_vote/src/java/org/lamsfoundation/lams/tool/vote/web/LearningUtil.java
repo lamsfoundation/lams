@@ -42,7 +42,8 @@ import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 
 /**
  * 
- * Keeps all operations needed for Learning mode. 
+ * <p> Keeps all operations needed for Learning mode. </p>
+ *  
  * @author Ozgur Demirtas
  *
  */
@@ -72,6 +73,11 @@ public class LearningUtil implements VoteAppConstants {
     }
 
     
+    /**
+     * determines if a user is already in the tool's tables
+     * @param request
+     * @return
+     */
     public static boolean doesUserExists(HttpServletRequest request)
 	{
 		IVoteService voteService =VoteUtils.getToolService(request);
@@ -85,6 +91,12 @@ public class LearningUtil implements VoteAppConstants {
 	}
 
 
+    /**
+     * creates a new user for the tool
+     * 
+     * @param request
+     * @return
+     */
     public static VoteQueUsr createUser(HttpServletRequest request)
 	{
 		IVoteService voteService =VoteUtils.getToolService(request);
@@ -113,7 +125,16 @@ public class LearningUtil implements VoteAppConstants {
 		return voteQueUsr;
 	}
     
-    
+    /**
+     * creates a new vote record in the database
+     * 
+     * @param request
+     * @param voteQueUsr
+     * @param mapGeneralCheckedOptionsContent
+     * @param userEntry
+     * @param singleUserEntry
+     * @param voteSession
+     */
     public static void createAttempt(HttpServletRequest request, VoteQueUsr voteQueUsr, Map mapGeneralCheckedOptionsContent, String userEntry,  boolean singleUserEntry, VoteSession voteSession)
 	{
         logger.debug("doing voteSession: " + voteSession);
@@ -163,6 +184,7 @@ public class LearningUtil implements VoteAppConstants {
 		}
 	 }
 
+    
     public static void createIndividualOptions(HttpServletRequest request, VoteQueContent voteQueContent, VoteQueUsr voteQueUsr, Date attempTime, String timeZone, String userEntry, boolean singleUserEntry, VoteSession voteSession)
     {
         logger.debug("doing voteSession: " + voteSession);

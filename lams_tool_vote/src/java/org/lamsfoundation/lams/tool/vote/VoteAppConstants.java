@@ -23,8 +23,10 @@
 package org.lamsfoundation.lams.tool.vote;
 
 /**
+ * <p> Defines constants used throughout the application </p>
+ * 
  * @author Ozgur Demirtas
- * Defines constants used throughout the application 
+ *  
  */
 public interface VoteAppConstants {
 
@@ -140,8 +142,7 @@ public interface VoteAppConstants {
     public static final String CREATION_DATE							="creationDate";
     public static final String DEFINE_LATER								="defineLater";
     public static final String VIEW_ANSWERS								="viewAnswers";
-    public static final String SHOW_AUTHORING_TABS						="showAuthoringTabs";
-    
+        
     public static final String ON										="ON";
     public static final String OFF										="OFF";
     public static final String RICHTEXT_FEEDBACK_CORRECT				="richTextFeedbackCorrect";

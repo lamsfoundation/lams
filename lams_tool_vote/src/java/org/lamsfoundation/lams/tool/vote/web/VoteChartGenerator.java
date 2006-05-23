@@ -42,8 +42,10 @@ import org.jfree.data.general.DefaultPieDataset;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 
 /**
+ * <p> Enables generation of enerates JFreeCharts </p>
+ * 
  * @author Ozgur Demirtas
- * generates JFreeCharts 
+ *  
  */
 public class VoteChartGenerator extends HttpServlet implements VoteAppConstants {
     static Logger logger = Logger.getLogger(VoteChartGenerator.class.getName());

@@ -27,6 +27,11 @@ import java.util.List;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
 
+/**
+ * @author Ozgur Demirtas
+ * 
+ * <p>Interface that defines the contract for VoteContent access </p>
+ */
 public interface IVoteContentDAO {
 	public VoteContent getVoteContentByUID(Long uid);
 

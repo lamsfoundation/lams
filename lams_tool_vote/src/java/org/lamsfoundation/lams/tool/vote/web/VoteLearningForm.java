@@ -26,9 +26,9 @@ import org.apache.struts.action.ActionForm;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 
 /**
+ * <p> ActionForm for the Learning environment </p>
+ * 
  * @author Ozgur Demirtas
- *
- * ActionForm for the Learning environment
  */
 public class VoteLearningForm extends ActionForm implements VoteAppConstants {
 	protected String optionCheckBoxSelected;

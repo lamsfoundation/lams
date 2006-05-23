@@ -48,7 +48,8 @@ import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 
 /**
  * 
- * Keeps all operations needed for Monitoring mode. 
+ * <p> Keeps all operations needed for Monitoring mode. </p>
+ *  
  * @author Ozgur Demirtas
  *
  */
@@ -79,6 +80,19 @@ public class MonitoringUtil implements VoteAppConstants{
     	return sessionsMap;
 	}
 
+	/**
+	 * 
+	 * used in presenting user votes data 
+	 * 
+	 * @param request
+	 * @param voteContent
+	 * @param isUserNamesVisible
+	 * @param isLearnerRequest
+	 * @param currentSessionId
+	 * @param userId
+	 * @param voteService
+	 * @return
+	 */
 	public static List buildGroupsQuestionData(HttpServletRequest request, VoteContent voteContent, 
 			boolean isUserNamesVisible, boolean isLearnerRequest, String currentSessionId, String userId, IVoteService voteService)
 	{
@@ -120,6 +134,20 @@ public class MonitoringUtil implements VoteAppConstants{
 	}
 	
 
+	/**
+	 * groups user's votes
+	 * 
+	 * @param request
+	 * @param voteContent
+	 * @param voteQueContent
+	 * @param questionUid
+	 * @param isUserNamesVisible
+	 * @param isLearnerRequest
+	 * @param currentSessionId
+	 * @param userId
+	 * @param voteService
+	 * @return
+	 */
 	public static Map buildGroupsAttemptData(HttpServletRequest request, VoteContent voteContent, VoteQueContent voteQueContent, String questionUid, 
 			boolean isUserNamesVisible, boolean isLearnerRequest, String currentSessionId, String userId, IVoteService voteService)
 	{
@@ -631,7 +659,15 @@ public class MonitoringUtil implements VoteAppConstants{
 		return map;
 	}
 
-	
+	/**
+	 * generates JFreeChart for the learner module
+	 * 
+	 * @param request
+	 * @param voteService
+	 * @param voteMonitoringForm
+	 * @param toolContentId
+	 * @param toolSessionUid
+	 */
 	public static void prepareChartData(HttpServletRequest request, IVoteService voteService, VoteMonitoringForm voteMonitoringForm, Long toolContentId, Long toolSessionUid)
 	{
 	    logger.debug("starting prepareChartData, toolContentId: " + toolContentId);
@@ -779,7 +815,15 @@ public class MonitoringUtil implements VoteAppConstants{
 		logger.debug("test2: MAP_STANDARD_USER_COUNT: " + request.getSession().getAttribute(MAP_STANDARD_USER_COUNT));
 	}
 	
-	
+	/**
+	 * generates JFreeChart for the learner export portfolio
+	 *  
+	 * @param request
+	 * @param voteService
+	 * @param voteMonitoringForm
+	 * @param toolContentId
+	 * @param toolSessionUid
+	 */
 	public static void prepareChartDataForExportLearner(HttpServletRequest request, IVoteService voteService, VoteMonitoringForm voteMonitoringForm, Long toolContentId, Long toolSessionUid)
 	{
 	    logger.debug("starting prepareChartDataForExportLearner, toolContentId: " + toolContentId);
@@ -956,7 +1000,15 @@ public class MonitoringUtil implements VoteAppConstants{
 	}	
 	
 
-	
+	/**
+	 * generates JFreeChart for the teacher export portfolio
+	 * 
+	 * @param request
+	 * @param voteService
+	 * @param voteMonitoringForm
+	 * @param toolContentId
+	 * @param toolSessionUid
+	 */
 	public static void prepareChartDataForExportTeacher(HttpServletRequest request, IVoteService voteService, VoteMonitoringForm voteMonitoringForm, Long toolContentId, Long toolSessionUid)
 	{
 	    logger.debug("starting prepareChartDataForExportTeacher, toolContentId: " + toolContentId);
@@ -1048,6 +1100,5 @@ public class MonitoringUtil implements VoteAppConstants{
 		request.getSession().setAttribute(MAP_STANDARD_USER_COUNT, mapStandardUserCount);
 		logger.debug("test2: MAP_STANDARD_USER_COUNT: " + request.getSession().getAttribute(MAP_STANDARD_USER_COUNT));
 	}	
-
 	
 }

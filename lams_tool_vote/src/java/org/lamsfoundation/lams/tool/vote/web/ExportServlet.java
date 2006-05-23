@@ -39,6 +39,11 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 import org.lamsfoundation.lams.tool.vote.service.VoteServiceProxy;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
+/**
+ * <p> Enables exporting portfolio for teacher and learner modes. </p> 
+ * 
+ * @author Ozgur Demirtas
+ */
 
 public class ExportServlet  extends AbstractExportPortfolioServlet implements VoteAppConstants{
 	static Logger logger = Logger.getLogger(ExportServlet.class.getName());
@@ -150,7 +155,6 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Vo
         logger.debug("teacher uses content id: " + content.getVoteContentId());
     	MonitoringUtil.prepareChartDataForExportTeacher(request, voteService, null, content.getVoteContentId(), null);
     	logger.debug("post prepareChartDataForExportTeacher");
-
         
         logger.debug("ending teacher mode: ");
     }

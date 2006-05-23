@@ -63,7 +63,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<script language="JavaScript" type="text/JavaScript">
 
-		function submitModifyOption(optionIndexValue, actionMethod) 
+		function submitModifyNomination(optionIndexValue, actionMethod) 
 		{
 			document.VoteAuthoringForm.optIndex.value=optionIndexValue; 
 			submitMethod(actionMethod);

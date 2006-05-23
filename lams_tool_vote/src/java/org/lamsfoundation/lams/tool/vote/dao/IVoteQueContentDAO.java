@@ -27,10 +27,9 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
 
 
 /**
- * 
  * @author Ozgur Demirtas
- * <p></p>
- *
+ * 
+ * <p> Interface that defines the contract for VoteQueConten access </p>
  */
 public interface IVoteQueContentDAO
 {
