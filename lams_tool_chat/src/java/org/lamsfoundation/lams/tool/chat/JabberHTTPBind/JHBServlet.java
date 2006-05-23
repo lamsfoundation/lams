@@ -37,6 +37,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.chat.service.ChatService;
+import org.lamsfoundation.lams.tool.chat.service.ChatServiceProxy;
+import org.lamsfoundation.lams.tool.chat.service.IChatService;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -52,6 +54,8 @@ import org.xml.sax.SAXException;
 public final class JHBServlet extends HttpServlet {
 	
 	static Logger log = Logger.getLogger(JHBServlet.class.getName());
+	
+	static IChatService chatService;
 
 	public static final String APP_VERSION = "0.3";
 	public static final String APP_NAME = "Jabber HTTP Binding Servlet";
@@ -73,6 +77,10 @@ public final class JHBServlet extends HttpServlet {
 
 		janitor = new Janitor(); // cleans up sessions
 		new Thread(janitor).start();
+		
+		if (chatService == null) {
+			chatService = ChatServiceProxy.getChatService(this.getServletContext());			
+		}
 	}
 
 	public void destroy() {
@@ -286,9 +294,11 @@ public final class JHBServlet extends HttpServlet {
 						 * check if we got sth to forward to remote jabber
 						 * server
 						 */
-						if (rootNode.hasChildNodes())
+						if (rootNode.hasChildNodes()) {
 							sess.sendNodes(rootNode.getChildNodes());
-						else {
+							chatService.processIncomingMessages(doc.getElementsByTagName("message"));
+							chatService.processIncomingPresence(doc.getElementsByTagName("presence"));
+						} else {
 							/*
 							 * check if polling too frequently only empty polls
 							 * are considered harmfull
