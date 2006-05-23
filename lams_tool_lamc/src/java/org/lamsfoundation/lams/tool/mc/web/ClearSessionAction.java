@@ -29,7 +29,6 @@ import javax.servlet.http.HttpSession;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.authoring.web.LamsAuthoringFinishAction;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
-import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * This class give a chance to clear HttpSession when user save/close authoring page.
@@ -42,7 +41,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  */
 public class ClearSessionAction extends LamsAuthoringFinishAction {
 
-	@Override
 	public void clearSession(HttpSession session, ToolAccessMode mode) {
 		//only this tool save LAMS_AUTHORING_SUCCESS_FLAG into session, remove it!!!
 		session.removeAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG);

@@ -144,6 +144,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<!-- tab content 3 (Instructions) -->
 		<lams:TabBody id="3" titleKey="label.instructions" page="InstructionsContent.jsp" />
 		<!-- end of content (Instructions) -->
+		
 	</c:if> 			
 	
 	<c:if test="${sessionScope.activeModule == 'defineLater' }"> 			

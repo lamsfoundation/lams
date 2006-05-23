@@ -267,17 +267,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						  	</td>
 						</tr>
 	
-		 				 <tr>
-	 						<td NOWRAP valign=top> </td> 
-							<td NOWRAP class="input" colspan=3 align=left valign=top>								
-								<!-- Button Row -->
-								<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
-								<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="lamc11" 
-									cancelButtonLabelKey="button.cancel" saveButtonLabelKey="button.submit" toolContentID="${formBean.toolContentID}" />									
-			 			  	</td>
-							<td NOWRAP valign=top> </td> 
-							<td NOWRAP valign=top> </td>
-						</tr>
 					</c:if> 													
 					
 					<c:if test="${ (sessionScope.activeModule == 'defineLater') &&
@@ -321,3 +310,28 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						
 					</c:if> 																																						
  				</table> 	 
+
+
+	      	<c:if test="${(activeModule == 'defineLater') && (defineLaterInEditMode == 'true')}"> 					
+				<p align="right">
+				    <a href="javascript:submitMethod('submitQuestions')" class="button">
+			        	<bean:message key="label.save"/></a>
+				</p>
+			</c:if> 					
+
+	      	<c:if test="${activeModule == 'monitoring' }"> 					
+				<p align="right">
+				    <a href="javascript:submitMethod('submitQuestions')" class="button">
+			        	<bean:message key="label.save"/></a>
+				</p>
+			</c:if> 					
+
+			<c:if test="${ activeModule == 'authoring' }"> 					
+					<p align="right">
+					<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
+					<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="lamc11" 
+					cancelButtonLabelKey="label.cancel" saveButtonLabelKey="label.save" toolContentID="${formBean.toolContentID}" />		
+				</p>
+			
+			</c:if> 					
+ 				
