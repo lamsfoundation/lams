@@ -37,6 +37,7 @@ dynamic class Dictionary {
 
 	private var items:Hashtable;
     private var _currentLanguage:String;
+	private var _module:String;
 	private var comms:Communication;	
 	private var app:ApplicationParent;	
     
@@ -187,10 +188,11 @@ dynamic class Dictionary {
     * Opens Dictionary from server
     */
     public function openFromServer() {
-		Debugger.log('URL : '+ 'flashxml/' + _currentLanguage + '_dictionary.xml',Debugger.CRITICAL,'openFromServer','Dictionary');
+		this._module = app.module;
+		Debugger.log('URL : '+ 'flashxml/' + _module  + '/' + _currentLanguage + '_dictionary.xml',Debugger.CRITICAL,'openFromServer','Dictionary');
 		var callBack = Proxy.create(this,onDictionaryLoadedFromServer);
         //comms.loadXML('http://dolly.uklams.net/lams/lams_authoring/' + _currentLanguage + '_dictionary.xml',callBack,true,true);
-        comms.getRequest('flashxml/' + _currentLanguage + '_dictionary.xml',callBack,false);
+        comms.getRequest('flashxml/' + _module + '/' + _currentLanguage + '_dictionary.xml',callBack,false);
     }
     
     /**
