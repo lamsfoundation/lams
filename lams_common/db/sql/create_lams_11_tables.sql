@@ -123,6 +123,14 @@ CREATE TABLE lams_workspace_folder_content_type (
      , PRIMARY KEY (content_type_id)
 )TYPE=InnoDB;
 
+CREATE TABLE lams_privilege (
+       privilege_id BIGINT(20) NOT NULL AUTO_INCREMENT
+     , code VARCHAR(10) NOT NULL
+     , description VARCHAR(255)
+     , PRIMARY KEY (privilege_id)
+)TYPE=InnoDB;
+CREATE UNIQUE INDEX IX_lams_privilege_code ON lams_privilege (code ASC);
+
 CREATE TABLE lams_authentication_method_type (
        authentication_method_type_id INT(3) NOT NULL
      , description VARCHAR(64) NOT NULL
@@ -174,12 +182,15 @@ CREATE TABLE lams_workspace (
 
 CREATE TABLE lams_organisation (
        organisation_id BIGINT(20) NOT NULL AUTO_INCREMENT
-     , name VARCHAR(250)
+     , name VARCHAR(250) NOT NULL
+     , code VARCHAR(20)
      , description VARCHAR(250)
      , parent_organisation_id BIGINT(20)
      , organisation_type_id INT(3) NOT NULL DEFAULT 0
      , create_date DATETIME NOT NULL
      , workspace_id BIGINT(20)
+     , locale_language CHAR(2)
+     , locale_country CHAR(2)
      , PRIMARY KEY (organisation_id)
      , INDEX (organisation_type_id)
      , CONSTRAINT FK_lams_organisation_1 FOREIGN KEY (organisation_type_id)
@@ -781,4 +792,18 @@ CREATE TABLE lams_learning_transition (
      , CONSTRAINT lddefn_transition_ibfk_1 FOREIGN KEY (learning_design_id)
                   REFERENCES lams_learning_design (learning_design_id) ON DELETE NO ACTION ON UPDATE NO ACTION
 )TYPE=InnoDB;
+
+CREATE TABLE lams_role_privilege (
+       rp_id BIGINT(20) NOT NULL AUTO_INCREMENT
+     , role_id INT(6) NOT NULL
+     , privilege_id BIGINT(20) NOT NULL
+     , PRIMARY KEY (rp_id)
+     , INDEX (privilege_id)
+     , CONSTRAINT FK_lams_role_privilege_1 FOREIGN KEY (privilege_id)
+                  REFERENCES lams_privilege (privilege_id)
+     , INDEX (role_id)
+     , CONSTRAINT FK_lams_role_privilege_2 FOREIGN KEY (role_id)
+                  REFERENCES lams_role (role_id)
+)TYPE=InnoDB;
+
 
