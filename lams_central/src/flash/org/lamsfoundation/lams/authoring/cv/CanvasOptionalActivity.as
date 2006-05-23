@@ -100,7 +100,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 			children_mc [i].activity.xCoord = CHILD_OFFSET_X;
 			children_mc [i].activity.yCoord = CHILD_OFFSET_Y + (i * CHILD_INCRE);
 			children_mc [i]._visible = true;
-			children_mc [i].init({_activity : _children [i] , _canvasController : _canvasController, _canvasView : _canvasView});
 		}
 		//childActivities_mc.createChildAtDepth("Bin",DepthManager.kTop);
 		//childActivities_mc.createEmptyMovieClip("clickTarget_mc", this.getNextHighestDepth());
