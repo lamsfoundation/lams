@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.tool.chat.model;
 
 import java.util.Date;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.log4j.Logger;
 
 /**
@@ -196,18 +197,21 @@ public class ChatAttachment implements java.io.Serializable, Cloneable {
 		return buffer.toString();
 	}
 
-	public boolean equals(Object other) {
-		if ((this == other))
+	public boolean equals(Object o) {
+		if (this == o)
 			return true;
-		if ((other == null))
+		if (!(o instanceof ChatAttachment))
 			return false;
-		if (!(other instanceof ChatAttachment))
-			return false;
-		ChatAttachment castOther = (ChatAttachment) other;
 
-		return ((this.getUid() == castOther.getUid()) || (this.getUid() != null
-				&& castOther.getUid() != null && this.getUid().equals(
-				castOther.getUid())));
+		final ChatAttachment genericEntity = (ChatAttachment) o;
+
+      	return new EqualsBuilder()
+      	.append(this.uid,genericEntity.uid)
+      	.append(this.fileVersionId,genericEntity.fileVersionId)
+      	.append(this.fileName,genericEntity.fileName)
+      	.append(this.fileType,genericEntity.fileType)
+      	.append(this.createDate,genericEntity.createDate)
+      	.isEquals();
 	}
 
 	public int hashCode() {
