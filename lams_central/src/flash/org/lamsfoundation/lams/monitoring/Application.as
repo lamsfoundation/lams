@@ -45,6 +45,7 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
 	
 		
 	private static var SHOW_DEBUGGER:Boolean = false;
+	private static var MODULE:String = "monitoring";
 	/*
     private static var TOOLBAR_X:Number = 10;
     private static var TOOLBAR_Y:Number = 35;*/
@@ -83,8 +84,6 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
     private static var V_KEY:Number = 86;
     private static var Z_KEY:Number = 90; 
     private static var Y_KEY:Number = 89;
-	
-	
 
 	private var _uiLoadCheckCount = 0;				// instance counter for number of times we have checked to see if theme and dict are loaded
 	private var _dataLoadCheckCount = 0;			
@@ -140,6 +139,7 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
         _menuLoaded = false;
         _lessonsLoaded = false;
 		_monitorLoaded = false;
+		_module = Application.MODULE;
 		//_toolbarLoaded = false;
 		//Mouse.addListener(someListener);
     }

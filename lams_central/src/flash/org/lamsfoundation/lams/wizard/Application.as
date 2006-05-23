@@ -42,6 +42,8 @@ class org.lamsfoundation.lams.wizard.Application extends ApplicationParent {
 		
 	private static var SHOW_DEBUGGER:Boolean = false;
 	
+	private static var MODULE:String = "wizard";
+	
 	private static var _controlKeyPressed:String;
     
     private static var WIZARD_X:Number = 0;
@@ -115,7 +117,7 @@ class org.lamsfoundation.lams.wizard.Application extends ApplicationParent {
     */
     private function Application(){
 		super(this);
-		
+		_module = Application.MODULE;
 		// loaded flag
     }
     

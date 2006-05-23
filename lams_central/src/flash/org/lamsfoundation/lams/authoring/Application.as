@@ -42,6 +42,8 @@ import mx.utils.*
 class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 	
 	private static var SHOW_DEBUGGER:Boolean = false;
+	
+	private static var MODULE:String = "authoring";
 	/*
     private static var TOOLBAR_X:Number = 10;
     private static var TOOLBAR_Y:Number = 35;	*/
@@ -130,6 +132,7 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
         _canvasLoaded  = false;
         _menuLoaded = false;
         _toolbarLoaded = false;  
+		_module = Application.MODULE;
 		//Mouse.addListener(someListener);
     }
     
@@ -166,6 +169,7 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
         //Set up Key handler 
         //TODO take out after testing and uncomment same key handler in ready();
         Key.addListener(this);
+		
     }
     
     /**

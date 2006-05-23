@@ -41,6 +41,9 @@ class org.lamsfoundation.lams.learner.Application extends ApplicationParent {
 	private var _seqLib:Library;
 	private var _header_mc:MovieClip;
 	
+	
+	private static var MODULE:String = "learner";
+	
 	//private var _appRoot_mc:MovieClip;                 //Application root clip
     
 	private static var HEADER_X:Number = -1;
@@ -83,6 +86,7 @@ class org.lamsfoundation.lams.learner.Application extends ApplicationParent {
         _seqLibLoaded = false;
         //_seqLibEventDispatched = false;
 		_headerLoaded = false;
+		_module = Application.MODULE;
 		//_headerEventDispatched = false;
         
         
