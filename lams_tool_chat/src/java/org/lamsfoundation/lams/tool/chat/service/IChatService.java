@@ -27,10 +27,12 @@ package org.lamsfoundation.lams.tool.chat.service;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.tool.chat.model.Chat;
 import org.lamsfoundation.lams.tool.chat.model.ChatAttachment;
+import org.lamsfoundation.lams.tool.chat.model.ChatMessage;
 import org.lamsfoundation.lams.tool.chat.model.ChatSession;
 import org.lamsfoundation.lams.tool.chat.model.ChatUser;
 import org.lamsfoundation.lams.tool.chat.util.ChatException;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.w3c.dom.NodeList;
 
 /**
  * Defines the services available to the web layer from the Chat Service
@@ -95,7 +97,13 @@ public interface IChatService {
 	 * @return
 	 */
 	public ChatSession getSessionBySessionId(Long toolSessionId);
-
+	
+	/**
+	 * 
+	 * @param jabberRoom
+	 * @return
+	 */
+	public ChatSession getSessionByJabberRoom(String jabberRoom);
 	
 	/**
 	 * @param chatSession
@@ -112,9 +120,19 @@ public interface IChatService {
 
 	/**
 	 * 
+	 * @param loginName
+	 * @param sessionId
+	 * @return
+	 */
+	public ChatUser getUserByLoginNameAndSessionId(String loginName, Long sessionId);
+	
+	/**
+	 * 
 	 * @param chatUser
 	 */
 	public void saveOrUpdateChatUser(ChatUser chatUser);
+	
+	public void saveOrUpdateChatMessage(ChatMessage chatMessage);	
 	
 	/**
 	 * 
@@ -129,5 +147,17 @@ public interface IChatService {
 	 * @param chatSession
 	 */
 	public void createJabberRoom(ChatSession chatSession);
+
+	/**
+	 * 
+	 * @param messageElems
+	 */
+	public void processIncomingMessages(NodeList messageElems);
+
+	/**
+	 * 
+	 * @param presenceElems
+	 */
+	public void processIncomingPresence(NodeList presenceElems);
 	
 }

@@ -56,10 +56,12 @@ import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.chat.dao.IChatAttachmentDAO;
 import org.lamsfoundation.lams.tool.chat.dao.IChatDAO;
+import org.lamsfoundation.lams.tool.chat.dao.IChatMessageDAO;
 import org.lamsfoundation.lams.tool.chat.dao.IChatSessionDAO;
 import org.lamsfoundation.lams.tool.chat.dao.IChatUserDAO;
 import org.lamsfoundation.lams.tool.chat.model.Chat;
 import org.lamsfoundation.lams.tool.chat.model.ChatAttachment;
+import org.lamsfoundation.lams.tool.chat.model.ChatMessage;
 import org.lamsfoundation.lams.tool.chat.model.ChatSession;
 import org.lamsfoundation.lams.tool.chat.model.ChatUser;
 import org.lamsfoundation.lams.tool.chat.util.ChatConstants;
@@ -70,6 +72,9 @@ import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * An implementation of the NoticeboardService interface.
@@ -89,6 +94,8 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 
 	private IChatUserDAO chatUserDAO = null;
 
+	private IChatMessageDAO chatMessageDAO = null;
+
 	private IChatAttachmentDAO chatAttachmentDAO = null;
 
 	private ILearnerService learnerService;
@@ -103,7 +110,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 		super();
 		// TODO Auto-generated constructor stub
 	}
-	
+
 	/* ************ Methods from ToolSessionManager ************* */
 	public void createToolSession(Long toolSessionId, String toolSessionName,
 			Long toolContentId) throws ToolException {
@@ -182,9 +189,9 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 		// TODO Auto-generated method stub
 
 	}
-	
-	/* ************  Methods from ToolContentManager ************************* */	
-	
+
+	/* ************ Methods from ToolContentManager ************************* */
+
 	public void copyToolContent(Long fromContentId, Long toContentId)
 			throws ToolException {
 
@@ -287,8 +294,22 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 		return chatSession;
 	}
 
+	public ChatSession getSessionByJabberRoom(String jabberRoom) {
+		ChatSession chatSession = chatSessionDAO.getByJabberRoom(jabberRoom);
+		if (chatSession == null) {
+			logger.debug("Could not find the chat session with jabberRoom:"
+					+ jabberRoom);
+		}
+		return chatSession;
+	}
+
 	public ChatUser getUserByUserIdAndSessionId(Long userId, Long toolSessionId) {
 		return chatUserDAO.getByUserIdAndSessionId(userId, toolSessionId);
+	}
+
+	public ChatUser getUserByLoginNameAndSessionId(String loginName,
+			Long toolSessionId) {
+		return chatUserDAO.getByLoginNameAndSessionId(loginName, toolSessionId);
 	}
 
 	public ChatAttachment uploadFileToContent(Long toolContentId,
@@ -335,6 +356,10 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 
 	public void saveOrUpdateChatUser(ChatUser chatUser) {
 		chatUserDAO.saveOrUpdate(chatUser);
+	}
+
+	public void saveOrUpdateChatMessage(ChatMessage chatMessage) {
+		chatMessageDAO.saveOrUpdate(chatMessage);
 	}
 
 	public ChatUser createChatUser(UserDTO user, ChatSession chatSession) {
@@ -390,6 +415,105 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 		}
 	}
 
+	public void processIncomingMessages(NodeList messageElems) {
+		for (int i = 0; i < messageElems.getLength(); i++) {
+			// extract message attributes
+			Node message = messageElems.item(i);
+			NamedNodeMap nnm = message.getAttributes();
+
+			Node from = nnm.getNamedItem("from");
+			Node to = nnm.getNamedItem("to");
+			Node type = nnm.getNamedItem("type");
+
+			// handle message children elements
+			NodeList nl = message.getChildNodes();
+			Node body = null;
+			for (int j = 0; j < nl.getLength(); j++) {
+				// We are looking for the <body> element.
+				// More than one may exists, we will take the first one we see
+				// We ignore <subject> and <thread> elements
+				Node msgChild = nl.item(j);
+				if (msgChild.getNodeName() == "body") {
+					body = msgChild;
+					break;
+				}
+			}
+
+			// save the messages.
+			ChatMessage chatMessage = new ChatMessage();
+			String jabberRoom;
+			String toNick = "";
+
+			// setting to field
+			if (type.getNodeValue().equals("chat")) {
+				// we are sending to an individual user.
+				// extract the jabber room from the to field.
+				// format is room@domain/nick
+				int index = to.getNodeValue().lastIndexOf("/");
+				if (index == -1) {
+					logger
+							.debug("processIncomingMessages: malformed 'to' attribute :"
+									+ to.getNodeValue());
+					return; // somethings wrong, ignore packet
+				}
+				jabberRoom = to.getNodeValue().substring(0, index);
+				toNick = to.getNodeValue().substring(index + 1);
+			} else if (type.getNodeValue().equals("groupchat")) {
+				// we are sending to the whole room.
+				// format is room@domain
+				jabberRoom = to.getNodeValue();
+			} else {
+				logger.debug("processIncomingMessages: unknown type: "
+						+ type.getNodeValue());
+				return;
+			}
+
+			ChatSession chatSession = this.getSessionByJabberRoom(jabberRoom);
+			ChatUser toChatUser = getUserByLoginNameAndSessionId(toNick,
+					chatSession.getSessionId());
+			chatMessage.setToUser(toChatUser);
+
+			// setting from field
+			int index = from.getNodeValue().lastIndexOf("@");
+			if (index == -1) {
+				logger
+						.debug("processIncomingMessages: malformed 'from' attribute :"
+								+ from.getNodeValue());
+				return; // somethings wrong, ignore packet
+			}
+			String JidUsername = from.getNodeValue().substring(0, index);
+			// NB: JID and userId are the same.
+			Long userId;
+			try {
+				userId = new Long(JidUsername);
+			} catch (NumberFormatException e) {
+				logger
+						.debug("processIncomingMessages: malformed JID username: "
+								+ JidUsername);
+				return;
+			}
+			ChatUser fromUser = getUserByUserIdAndSessionId(userId, chatSession
+					.getSessionId());
+			chatMessage.setFromUser(fromUser);
+
+			logger.debug(System.getProperty("java version"));
+
+			chatMessage.setType(type.getNodeValue());
+			Node bodyText = body.getFirstChild();
+			String bodyTextStr = "";
+			if (bodyText != null) {
+				bodyTextStr = bodyText.getNodeValue();
+			}
+			chatMessage.setBody(bodyTextStr);
+			saveOrUpdateChatMessage(chatMessage);
+		}
+	}
+
+	public void processIncomingPresence(NodeList presenceElems) {
+		// TODO Auto-generated method stub
+
+	}
+
 	/* ********** Private methods ********** */
 
 	/**
@@ -405,8 +529,9 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 
 			AccountManager manager = con.getAccountManager();
 			if (manager.supportsAccountCreation()) {
-				// using the lams username as jabber username and password.
-				manager.createAccount(user.getLogin(), user.getLogin());
+				// using the lams userId as jabber username and password.
+				manager.createAccount(user.getUserID().toString(), user
+						.getUserID().toString());
 			}
 
 		} catch (XMPPException e) {
@@ -523,6 +648,14 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 
 	public void setChatUserDAO(IChatUserDAO userDAO) {
 		this.chatUserDAO = userDAO;
+	}
+
+	public IChatMessageDAO getChatMessageDAO() {
+		return chatMessageDAO;
+	}
+
+	public void setChatMessageDAO(IChatMessageDAO messageDAO) {
+		this.chatMessageDAO = messageDAO;
 	}
 
 	public ILearnerService getLearnerService() {
