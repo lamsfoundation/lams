@@ -19,7 +19,16 @@ if(StringUtils.isEmpty(mode)){
 	Debugger.log('Mode is not defined, using defualt:'+_root.mode,Debugger.CRITICAL,'main','ROOT');			
 }
 
-
+if(StringUtils.isEmpty(courseID)){
+	_root.courseID = 2;	// Playpen (test)
+	Debugger.log('CourseID is not defined, using defualt:'+_root.courseID,Debugger.CRITICAL,'main','ROOT');			
+}
+/**
+if(StringUtils.isEmpty(classID)){
+	_root.classID = 3;	// Everybody (test)
+	Debugger.log('ClassID is not defined, using defualt:'+_root.classID,Debugger.CRITICAL,'main','ROOT');			
+}
+*/
 //Set stage alignment to top left and prent scaling
 Stage.align = "TL";
 Stage.scaleMode = "noScale";
