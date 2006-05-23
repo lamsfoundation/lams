@@ -81,7 +81,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 	/**
 	* Constructor
 	*/
-	function MonitorView(){
+	function MonitorTabView(){
 		_monitorTabView = this;
 		_monitorTabViewContainer_mc = this;
 		_tm = ThemeManager.getInstance();
