@@ -30,6 +30,9 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
+import org.lamsfoundation.lams.contentrepository.NodeKey;
+import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.chat.service.ChatService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -377,6 +380,12 @@ public class Chat implements java.io.Serializable, Cloneable {
 				while (iter.hasNext()) {
 					ChatAttachment originalFile = (ChatAttachment) iter.next();
 					ChatAttachment newFile = (ChatAttachment) originalFile.clone();
+					if(toolContentHandler != null){
+						//duplicate file node in repository
+						NodeKey keys = toolContentHandler.copyFile(originalFile.getFileUuid());
+						newFile.setFileUuid(keys.getUuid());
+						newFile.setFileVersionId(keys.getVersion());
+  					}
 					set.add(newFile);
 				}
 				chat.chatAttachments = set;
@@ -384,8 +393,12 @@ public class Chat implements java.io.Serializable, Cloneable {
 			// create an empty set for the chatSession
 			chat.chatSessions = new HashSet();
 
-		} catch (CloneNotSupportedException e) {
+		} catch (CloneNotSupportedException cnse) {
 			log.error("Error cloning " + Chat.class);
+		} catch (ItemNotFoundException infe) {
+			log.error("Item Not found " + Chat.class);
+		} catch (RepositoryCheckedException rce) {
+			log.error("Repository checked exception " + Chat.class);
 		}
 		return chat;
 	}
