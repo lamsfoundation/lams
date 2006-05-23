@@ -89,6 +89,7 @@ public interface VoteAppConstants {
     public static final String MAX_OPTION_INDEX 						= "maxOptionIndex";
     public static final String COPY_TOOL_CONTENT 						= "copyToolContent";
     public static final String REMOVE_TOOL_CONTENT 						= "removeToolContent";
+    public static final String OPT_INDEX 								= "optIndex";
     
     /*
      * refers to number of questions presented initially, we have a single record for default content
