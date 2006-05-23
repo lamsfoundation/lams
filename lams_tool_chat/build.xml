@@ -185,6 +185,7 @@ Ant build file.
 				<include name="layouts/**" />
 				<include name="pages/**" />
 				<include name="template/**" />
+				<include name="chat_client/**" />
 				<!-- used by tiles -->
 			</fileset>
 		</war>
@@ -200,6 +201,12 @@ Ant build file.
 		</delete>
 		<copy file="${build.lib}/${product}.jar" todir="${jboss.deploy}" />
 		<copy file="${build.lib}/${product}.war" todir="${jboss.deploy}" />
+		<copy overwrite="yes" todir="${jboss.deploy}/lams-dictionary.jar/org/lamsfoundation/lams/tool/chat">
+		   <fileset dir="${conf.language.dir}">
+		    <include name="**/*.properties"/>
+		    <include name="**/*.txt"/>
+		   </fileset>
+		  </copy>
 	</target>
 
 
