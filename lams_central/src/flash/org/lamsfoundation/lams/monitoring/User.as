@@ -64,6 +64,16 @@ class User {
 		//setRoles(userDTO.roles);
 	}
 	
+	public function getDTO():Object{
+		var obj = new Object();
+		obj.userID = _userId;
+		obj.firstName = _firstName;
+		obj.lastName = _lastName;
+		obj.login = _userName;
+		
+		return obj;
+	}
+	
 	public function getUserId():Number{
 		return _userId;
 	}
