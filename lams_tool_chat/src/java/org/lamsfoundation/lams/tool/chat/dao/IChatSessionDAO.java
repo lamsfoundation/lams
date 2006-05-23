@@ -36,4 +36,6 @@ public interface IChatSessionDAO extends IBaseDAO{
 	void saveOrUpdate(ChatSession session);
 
 	ChatSession getBySessionId(Long toolSessionId);
+	
+	ChatSession getByJabberRoom(String jabberRoom);
 }
