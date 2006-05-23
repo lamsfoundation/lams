@@ -11,6 +11,7 @@
 	<title>
 		<bean:message key="activity.title" />
 	</title>
+	<link href="${tool}chat_client/chat_style.css" rel="stylesheet" type="text/css">
 	<lams:headItems />
-	<tiles:insert attribute="script" />
+	<tiles:insert attribute="headItems" />
 </head>
