@@ -82,6 +82,9 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 	//TodoTabView
 	private var todoTabView:TodoTabView;
 	private var todoTabView_mc:MovieClip;
+	//LearnerTabView
+	private var learnerTabView:LearnerTabView;
+	private var learnerTabView_mc:MovieClip;
 	
 	private var _monitorController:MonitorController;
 	
@@ -197,6 +200,7 @@ public function update (o:Observable,infoObj:Object):Void{
 		_lessonTabLayer_mc = _monitor_mc.createEmptyMovieClip("_lessonTabLayer_mc", _monitor_mc.getNextHighestDepth());
 		_monitorTabLayer_mc = _monitor_mc.createEmptyMovieClip("_monitorTabLayer_mc", _monitor_mc.getNextHighestDepth());
 		_todoTabLayer_mc = _monitor_mc.createEmptyMovieClip("_todoTabLayer_mc", _monitor_mc.getNextHighestDepth());
+		_learnerTabLayer_mc = _monitor_mc.createEmptyMovieClip("_learnerTabLayer_mc", _monitor_mc.getNextHighestDepth());
 		//trace('lesson tab view: ' + _tabsLayer_mc);
 		//bkg_pnl.useHandCursor = false;
 		var tab_arr:Array = [{label:"Lesson", data:"lesson"}, {label:"Monitor", data:"monitor"}, {label:"Learners", data:"learners"}, {label:"Todo", data:"todo"}];
@@ -204,7 +208,6 @@ public function update (o:Observable,infoObj:Object):Void{
 		monitorTabs_tb.dataProvider = tab_arr;
 		monitorTabs_tb.selectedIndex = 0;
 		
-		//monitorTabs_tb.addEventListener("change", Delegate.create('controller',getController().clickEvt));
 		var mcontroller = getController();
 		monitorTabs_tb.addEventListener("change",mcontroller);
 		//setStyles();
@@ -230,6 +233,13 @@ public function update (o:Observable,infoObj:Object):Void{
 		monitorTabView.init(mm, undefined);
 		monitorTabView.addEventListener('load',Proxy.create(this,tabLoaded));
 		
+		// Inititialsation for Learner Tab View 
+		learnerTabView_mc = _learnerTabLayer_mc.attachMovie("LearnerTabView", "learnerTabView_mc",DepthManager.kTop)
+		learnerTabView_mc._visible = false;
+		learnerTabView = LearnerTabView(learnerTabView_mc);
+		learnerTabView.init(mm, undefined);
+		learnerTabView.addEventListener('load',Proxy.create(this,tabLoaded));
+		
 		// Inititialsation for Todo Tab View 
 		todoTabView_mc = _todoTabLayer_mc.attachMovie("TodoTabView", "todoTabView_mc",DepthManager.kTop)
 		todoTabView_mc._visible = false;
@@ -237,11 +247,11 @@ public function update (o:Observable,infoObj:Object):Void{
 		todoTabView.init(mm, undefined);
 		todoTabView.addEventListener('load',Proxy.create(this,tabLoaded));
 		
-		
 		//Observers for All the Tab Views
 		
 		mm.addObserver(lessonTabView);
 		mm.addObserver(monitorTabView);
+		mm.addObserver(learnerTabView);
 		mm.addObserver(todoTabView);
 		
 	}
