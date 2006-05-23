@@ -30,7 +30,9 @@ import javax.servlet.http.HttpSession;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.monitoring.MonitoringConstants;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.web.servlet.AbstractStoreWDDXPacketServlet;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -43,26 +45,27 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @author Steve.Ni
  * 
  * @version $Revision$
- * @web:servlet name="createLesson"
- * @web:servlet-mapping url-pattern="/monitoring/createLesson"
+ * @web:servlet name="createLessonClass"
+ * @web:servlet-mapping url-pattern="/createLessonClass"
  */
-public class CreateLessionServlet  extends AbstractStoreWDDXPacketServlet {
+public class CreateLessonServlet  extends AbstractStoreWDDXPacketServlet {
     //---------------------------------------------------------------------
     // Instance variables
     //---------------------------------------------------------------------
-	private static Logger log = Logger.getLogger(CreateLessionServlet.class);
+	private static Logger log = Logger.getLogger(CreateLessonServlet.class);
 	private static final long serialVersionUID = 6474150792777819606L;
 
 	public IMonitoringService getMonitoringService(){
 		WebApplicationContext webContext = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
 		return (IMonitoringService) webContext.getBean(MonitoringConstants.MONITORING_SERVICE_BEAN_NAME);		
 	}
-
-	protected String process(String lessionPackage, HttpServletRequest request) throws Exception {
+	
+	protected String process(String lessonPackage, HttpServletRequest request) throws Exception {
 		//get User infomation from shared session.
 		HttpSession ss = SessionManager.getSession();
     	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-    	if(user == null || user.getUserID() == null){
+    	Integer userID = new Integer(WebUtil.readIntParam(request,AttributeNames.PARAM_USER_ID));
+    	if(userID == null){
     		log.error("Can not find valid login user information");
     		FlashMessage flashMessage = new FlashMessage("createLesson",
 					"Can not find valid login user information",
@@ -70,7 +73,7 @@ public class CreateLessionServlet  extends AbstractStoreWDDXPacketServlet {
     		return flashMessage.serializeMessage();
     	}
 		IMonitoringService monitoringService = getMonitoringService();
-		return monitoringService.createLessonClassForLessonWDDX(user.getUserID(),lessionPackage);
+			return monitoringService.createLessonClassForLessonWDDX(userID,lessonPackage);
 	}
 
 	protected String getMessageKey(String packet, HttpServletRequest request) {
