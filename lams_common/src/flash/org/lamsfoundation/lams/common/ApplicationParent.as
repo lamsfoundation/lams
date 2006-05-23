@@ -57,6 +57,7 @@ class ApplicationParent {
     
 	//Application instance is stored as a static in the application parent class
     private static var _instance:ApplicationParent = null;     
+	private var _module:String;
 
 	private var _appRoot_mc:MovieClip;                 //Application root clip
     
@@ -151,6 +152,10 @@ class ApplicationParent {
 			
         }
     }
+	
+	public function get module():String{
+		return _module;
+	}
 	
 	
 	
