@@ -41,4 +41,12 @@ public interface IChatUserDAO extends IBaseDAO{
 	ChatUser getByUserIdAndSessionId(Long userId, Long toolSessionId);
 
 	void saveOrUpdate(ChatUser chatUser);
+
+	/**
+	 * 
+	 * @param loginName
+	 * @param sessionId
+	 * @return
+	 */
+	ChatUser getByLoginNameAndSessionId(String loginName, Long toolSessionId);
 }

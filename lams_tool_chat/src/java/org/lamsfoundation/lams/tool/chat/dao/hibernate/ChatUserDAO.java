@@ -38,6 +38,10 @@ public class ChatUserDAO extends BaseDAO implements IChatUserDAO {
 	public static final String SQL_QUERY_FIND_BY_USER_ID_SESSION_ID = "from "
 			+ ChatUser.class.getName() + " as f"
 			+ " where user_id=? and f.chatSession.sessionId=?";
+	
+	public static final String SQL_QUERY_FIND_BY_LOGIN_NAME_SESSION_ID = "from "
+		+ ChatUser.class.getName() + " as f"
+		+ " where login_name=? and f.chatSession.sessionId=?";
 
 	public ChatUser getByUserIdAndSessionId(Long userId, Long toolSessionId) {
 		List list = this.getHibernateTemplate().find(
@@ -50,6 +54,19 @@ public class ChatUserDAO extends BaseDAO implements IChatUserDAO {
 		return (ChatUser) list.get(0);
 	}
 
+	public ChatUser getByLoginNameAndSessionId(String loginName, Long toolSessionId) {
+
+			List list = this.getHibernateTemplate().find(
+					SQL_QUERY_FIND_BY_LOGIN_NAME_SESSION_ID,
+					new Object[] { loginName, toolSessionId });
+
+			if (list == null || list.isEmpty())
+				return null;
+
+			return (ChatUser) list.get(0);
+		
+	}
+	
 	public void saveOrUpdate(ChatUser chatUser) {
 		this.getHibernateTemplate().saveOrUpdate(chatUser);
 		this.getHibernateTemplate().flush();
