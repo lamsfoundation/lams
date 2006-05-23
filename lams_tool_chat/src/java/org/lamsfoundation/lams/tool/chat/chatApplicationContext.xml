@@ -18,6 +18,7 @@
 				<value>org/lamsfoundation/lams/tool/chat/model/Chat.hbm.xml</value>
 				<value>org/lamsfoundation/lams/tool/chat/model/ChatSession.hbm.xml</value>
 				<value>org/lamsfoundation/lams/tool/chat/model/ChatUser.hbm.xml</value>
+				<value>org/lamsfoundation/lams/tool/chat/model/ChatMessage.hbm.xml</value>
 				<value>org/lamsfoundation/lams/tool/chat/model/ChatAttachment.hbm.xml</value> 
 			</list>
 		</property>
@@ -30,6 +31,7 @@
 		<property name ="target">
 			<bean class="org.lamsfoundation.lams.tool.chat.service.ChatService">
 				<property name="chatAttachmentDAO"><ref bean="chatAttachmentDAO"/></property>
+				<property name="chatMessageDAO"><ref bean="chatMessageDAO"/></property>				
 				<property name="chatSessionDAO"><ref bean="chatSessionDAO"/></property>
 				<property name="chatUserDAO"><ref bean="chatUserDAO"/></property>
 				<property name="chatDAO"><ref bean="chatDAO"/></property>
@@ -69,6 +71,10 @@
 	</bean>
 	
 	<bean id="chatUserDAO" class="org.lamsfoundation.lams.tool.chat.dao.hibernate.ChatUserDAO">
+		<property name="sessionFactory"><ref local="chatSessionFactory"/></property>
+	</bean>
+	
+	<bean id="chatMessageDAO" class="org.lamsfoundation.lams.tool.chat.dao.hibernate.ChatMessageDAO">
 		<property name="sessionFactory"><ref local="chatSessionFactory"/></property>
 	</bean>
 	

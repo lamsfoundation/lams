@@ -1,8 +1,11 @@
 alter table tl_lachat11_attachment drop foreign key FK9ED6CB2E1A3926E3;
+alter table tl_lachat11_message drop foreign key FKCC08C1DCC15A415F;
+alter table tl_lachat11_message drop foreign key FKCC08C1DC50B2D730;
 alter table tl_lachat11_session drop foreign key FK96E446B1A3926E3;
 alter table tl_lachat11_user drop foreign key FK4EB8216C10360A0;
 drop table if exists tl_lachat11_attachment;
 drop table if exists tl_lachat11_chat;
+drop table if exists tl_lachat11_message;
 drop table if exists tl_lachat11_session;
 drop table if exists tl_lachat11_user;
 create table tl_lachat11_attachment (
@@ -31,6 +34,14 @@ create table tl_lachat11_chat (
    tool_content_id bigint,
    primary key (uid)
 );
+create table tl_lachat11_message (
+   uid bigint not null auto_increment,
+   from_user_id bigint,
+   to_user_id bigint,
+   type varchar(255),
+   body varchar(255),
+   primary key (uid)
+);
 create table tl_lachat11_session (
    uid bigint not null auto_increment,
    session_end_date datetime,
@@ -53,5 +64,7 @@ create table tl_lachat11_user (
    primary key (uid)
 );
 alter table tl_lachat11_attachment add index FK9ED6CB2E1A3926E3 (chat_uid), add constraint FK9ED6CB2E1A3926E3 foreign key (chat_uid) references tl_lachat11_chat (uid);
+alter table tl_lachat11_message add index FKCC08C1DCC15A415F (from_user_id), add constraint FKCC08C1DCC15A415F foreign key (from_user_id) references tl_lachat11_user (uid);
+alter table tl_lachat11_message add index FKCC08C1DC50B2D730 (to_user_id), add constraint FKCC08C1DC50B2D730 foreign key (to_user_id) references tl_lachat11_user (uid);
 alter table tl_lachat11_session add index FK96E446B1A3926E3 (chat_uid), add constraint FK96E446B1A3926E3 foreign key (chat_uid) references tl_lachat11_chat (uid);
 alter table tl_lachat11_user add index FK4EB8216C10360A0 (session_id), add constraint FK4EB8216C10360A0 foreign key (session_id) references tl_lachat11_session (uid);
