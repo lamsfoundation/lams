@@ -51,7 +51,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 	<!-- Begin: Headers -->
 	<definition name="tiles:/header:default" path="/common/header.jsp">
-		<put name="script" value="" type="page"/>
+		<put name="headItems" value="" type="page"/>
 	</definition>
 	<!-- End: Headers -->
 
@@ -64,7 +64,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</definition>
 	
 	<definition name="tiles:/header:authoring" extends="tiles:/header:default">
-		<put name="script" value="/pages/authoring/script.jsp"/>
+		<put name="headItems" value="/pages/authoring/headItems.jsp"/>
 	</definition>
 	<!-- End: Authoring -->
 
@@ -72,25 +72,41 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<!-- Begin: Learning -->
 	<definition name="tiles:/learning/main" extends="tiles:/layout:default">
 		<put name="pageTitleKey" value="pageTitle.learning" />
-		<put name="header" value="tiles:/header:learning" />
-		<put name="body" value="/pages/learning/learning.jsp" />
+ 		<put name="header" value="tiles:/header:learning" />
+		<put name="body" value="/chat_client/chat_ui.jsp" />
 	</definition>
-	
+
+ 	
 	<definition name="tiles:/header:learning" extends="tiles:/header:default">
-		<put name="script" value="/pages/learning/script.jsp"/>
+		<put name="headItems" value="/pages/learning/headItems.jsp"/>
 	</definition>	
+
 	<!-- End: Learning -->
 
 
 	<!-- Begin: Monitoring -->
 	<definition name="tiles:/monitoring/main" extends="tiles:/layout:tab">
 		<put name="pageTitleKey" value="pageTitle.monitoring" />
-		<put name="header" value="tiles:/header:monitoring" type="definition" />
+		<put name="header" value="tiles:/header:monitoring/main" type="definition" />
 		<put name="body" value="/pages/monitoring/monitoring.jsp" />
 	</definition>
 	
-	<definition name="tiles:/header:monitoring" extends="tiles:/header:default">
-		<put name="script" value="/pages/monitoring/script.jsp"/>
+	<definition name="tiles:/monitoring/chat_client" extends="tiles:/layout:tab">
+		<put name="pageTitleKey" value="pageTitle.monitoring" />
+		<put name="header" value="tiles:/header:monitoring/chat_client" />
+		<put name="body" value="/chat_client/chat_ui.jsp" />
+	</definition>
+	
+	<definition name="tiles:/header:monitoring/main" extends="tiles:/header:default">
+		<put name="headItems" value="/pages/monitoring/headItems.jsp"/>
+	</definition>
+	
+	<!--  TODO: need to find a way, so that the headItems is optional. 
+		Also need to create a definition for chat_client, so we dont repeat in monitoring and 
+		learning.
+	-->	
+	<definition name="tiles:/header:monitoring/chat_client" extends="tiles:/header:default">
+		<put name="headItems" value="/pages/learning/headItems.jsp"/>
 	</definition>
 	<!-- End: Monitoring -->
 

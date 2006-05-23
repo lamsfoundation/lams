@@ -1,11 +1,11 @@
+<%-- Monitoring Head Content --%>
+
 <%@ include file="/common/taglibs.jsp"%>
 
-<c:set var="lams">
-	<lams:LAMSURL />
-</c:set>
+<c:set var="lams"><lams:LAMSURL /></c:set>
+<c:set var="tool"><lams:WebAppURL /></c:set>
 
-<%-- Monitoring Script --%>
-
+<!--  Tab Controller Script -->
 <script type="text/javascript">
 	var imgRoot="${lams}images/";
 	var themeName="aqua";
