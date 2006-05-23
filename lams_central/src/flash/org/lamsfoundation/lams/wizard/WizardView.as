@@ -312,7 +312,12 @@ class WizardView extends AbstractView {
 	private function setUpBranchesInit(treeview:Tree, data:XML, hideRoot:Boolean){
 		Debugger.log('Running...',Debugger.GEN,'setUpBranchesInit','org.lamsfoundation.lams.wizard.WizardView');
 		//get the 1st child
-		trace(data)
+		
+		trace('data value:' + data);
+		trace('hide root:' + hideRoot);
+		// clear tree
+		treeview.removeAll();
+		
 		if(hideRoot){
 			treeview.dataProvider = data.firstChild;
 		} else {
@@ -346,15 +351,18 @@ class WizardView extends AbstractView {
 	 * @usage   
 	 * @return  
 	 */
-	public function setUpOrgTree(){
+	public function setUpOrgTree(hideRoot:Boolean){
 			
 		//Debugger.log('_workspaceView:'+_workspaceView,Debugger.GEN,'setUpTreeview','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
 		
-		setUpBranchesInit(org_treeview, WizardModel(getModel()).treeDP, true);
+		setUpBranchesInit(org_treeview, WizardModel(getModel()).treeDP, hideRoot);
 		
 		org_treeview.addEventListener("nodeOpen", Delegate.create(_wizardController, _wizardController.onTreeNodeOpen));
 		org_treeview.addEventListener("nodeClose", Delegate.create(_wizardController, _wizardController.onTreeNodeClose));
 		org_treeview.addEventListener("change", Delegate.create(_wizardController, _wizardController.onTreeNodeChange));
+
+		org_treeview.selectedNode = org_treeview.firstVisibleNode;
+		getController().selectTreeNode(org_treeview.selectedNode);
 
 		//org_dnd.addEventListener("drag_complete", Delegate.create(_lessonManagerController, _lessonManagerController.onDragComplete));
 		
@@ -673,7 +681,9 @@ class WizardView extends AbstractView {
 	private function showStep3():Void{
 		trace('showing step 3');
 		
-		WizardModel(getModel()).getWizard().getOrganisations();
+		if(!resultDTO.selectedLearners && !resultDTO.selectedStaff){
+			WizardModel(getModel()).getWizard().getOrganisations(_root.courseID, _root.classID);
+		}
 		
 		org_treeview.visible = true;
 		
@@ -900,7 +910,7 @@ class WizardView extends AbstractView {
 		trace('loading Learners...');
 		_learnerList = WizardView.clearScp(_learnerList);
 		_learner_mc = learner_scp.content;
-			
+		var _selected:Boolean = true;
 		trace('list length: ' + users.length);
 		for(var i=0; i<users.length; i++){
 			var user:User = User(users[i]);
@@ -911,7 +921,8 @@ class WizardView extends AbstractView {
 			_learnerList[i]._y = USER_OFFSET * i;
 			_learnerList[i].data = user.getDTO();
 			var listItem:MovieClip = MovieClip(_learnerList[i]);
-			listItem.attachMovie('CheckBox', 'user_cb', listItem.getNextHighestDepth(), {_x:0, _y:3, selected:true})
+			
+			listItem.attachMovie('CheckBox', 'user_cb', listItem.getNextHighestDepth(), {_x:0, _y:3, selected:_selected})
 			trace('new row: ' + _learnerList[i]);
 			trace('loading: user ' + user.getFirstName() + ' ' + user.getLastName());
 			
