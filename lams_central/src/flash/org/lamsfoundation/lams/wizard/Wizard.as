@@ -93,7 +93,7 @@ class Wizard {
         //Set the position by setting the model which will call update on the view
         wizardModel.setPosition(x,y);
 		wizardModel.setSize(w,h);
-		wizardModel.initOrganisationTree();
+		//wizardModel.initOrganisationTree();
 		
 	}
 	
@@ -136,13 +136,19 @@ class Wizard {
 		wizardView.setUpContent();
 	}
 	
-	public function getOrganisations():Void{
+	public function getOrganisations(courseID:Number, classID:Number):Void{
 		// TODO check if already set
 		
 		var callback:Function = Proxy.create(this,showOrgTree);
            
-		Application.getInstance().getComms().getRequest('workspace.do?method=getOrganisationsByUserRole&userID='+_root.userID+'&roles=STAFF,TEACHER',callback, false);
-		
+		if(classID != undefined){
+			Application.getInstance().getComms().getRequest('workspace.do?method=getUserOrganisation&userID='+_root.userID+'&organisationID='+classID,callback, false);
+		}else if(courseID != undefined){
+			trace('course defined: doing request');
+			Application.getInstance().getComms().getRequest('workspace.do?method=getOrganisationsByUserRole&userID='+_root.userID+'&organisationID='+courseID+'&roles=STAFF,TEACHER',callback, false);
+		}else{
+			// TODO no course or class defined
+		}
 	}
 	
 	private function showOrgTree(dto:Object):Void{
@@ -151,18 +157,20 @@ class Wizard {
 		// create root (dummy) node
 		
 		var odto = getDataObject(dto);
-			
 		
+		wizardModel.initOrganisationTree();
 		var rootNode:XMLNode = wizardModel.treeDP.addTreeNode(odto.name, odto);
 		//rootNode.attributes.isBranch = true;
 		wizardModel.setOrganisationResource(RT_ORG+'_'+odto.organisationID,rootNode);
-		
-		// create tree xml branches
-		createXMLNodes(rootNode, dto.nodes);
-		
-		// set up the org tree
-		wizardView.setUpOrgTree();
-		
+		if(_root.classID != undefined){
+			wizardView.setUpOrgTree(false);
+		}else{
+			// create tree xml branches
+			createXMLNodes(rootNode, dto.nodes);
+			
+			// set up the org tree
+			wizardView.setUpOrgTree(true);
+		}
 	}
 
 	
