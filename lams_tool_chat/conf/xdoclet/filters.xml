@@ -12,7 +12,7 @@
     </filter-class>
 	<init-param>
 		<param-name>sessionFactoryBeanName</param-name>
-		<param-value>coreSessionFactory</param-value>
+		<param-value>chatSessionFactory</param-value>
 	</init-param>
    </filter>
    
