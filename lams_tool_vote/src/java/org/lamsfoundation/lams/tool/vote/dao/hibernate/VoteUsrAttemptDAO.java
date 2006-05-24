@@ -142,6 +142,30 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 	    }
 
 		
+		public int getUserEnteredVotesCountForContent(final Long voteContentUid)
+	    {
+	        HibernateTemplate templ = this.getHibernateTemplate();
+	        List list = getSession().createQuery(LOAD_ALL_ENTRIES)
+			.list();
+
+	        int count=0;
+	        Iterator listIterator=list.iterator();
+	        logger.debug("looking for voteContentUid: " + voteContentUid);
+	    	while (listIterator.hasNext())
+	    	{
+	    	    VoteUsrAttempt attempt=(VoteUsrAttempt)listIterator.next();
+	    	    logger.debug("attempt: " + attempt);
+	    	    
+	    	    if (attempt.getVoteQueUsr().getVoteSession().getVoteContent().getUid().toString().equals(voteContentUid.toString()))
+	    	    {
+	    	        ++count;
+	    	    }
+	    	}
+	    	
+	    	return count;
+	    }
+
+		
 		
 		public Set getUserEntries()
 	    {

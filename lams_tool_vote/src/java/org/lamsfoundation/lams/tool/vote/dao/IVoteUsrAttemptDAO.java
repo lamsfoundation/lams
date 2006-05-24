@@ -50,6 +50,8 @@ public interface IVoteUsrAttemptDAO
 	
 	public int getAllEntriesCount();
 	
+	public int getUserEnteredVotesCountForContent(final Long voteContentUid);
+	
 	public boolean isVoteVisibleForSession(final String userEntry, final Long voteSessionUid);
 	
 	public List getSessionUserEntries(final Long voteSessionUid);

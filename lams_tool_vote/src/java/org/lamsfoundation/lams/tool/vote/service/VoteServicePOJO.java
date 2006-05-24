@@ -798,6 +798,22 @@ public class VoteServicePOJO implements
         }
 	}
 	
+	
+	public int getUserEnteredVotesCountForContent(final Long voteContentUid) throws VoteApplicationException
+	{
+        try
+        {
+        	return voteUsrAttemptDAO.getUserEnteredVotesCountForContent(voteContentUid);
+        }
+        catch (DataAccessException e)
+        {
+            throw new VoteApplicationException("Exception occured when lams is getting the user entered votes count:"
+                                                         + e.getMessage(),
+														   e);
+        }
+	    
+	}
+	
     
     public VoteQueContent retrieveVoteQueContentByUID(Long uid) throws VoteApplicationException
     {
@@ -1259,21 +1275,34 @@ public class VoteServicePOJO implements
 	 */
 	public boolean studentActivityOccurredGlobal(VoteContent voteContent) throws VoteApplicationException
 	{
+	    logger.debug("voteContent uid: " +  voteContent.getUid());
 		Iterator questionIterator=voteContent.getVoteQueContents().iterator();
+		
+		boolean activityOccurred=false;
         while (questionIterator.hasNext())
         {
         	VoteQueContent voteQueContent=(VoteQueContent)questionIterator.next(); 
         	Iterator attemptsIterator=voteQueContent.getVoteUsrAttempts().iterator();
         	while (attemptsIterator.hasNext())
         	{
-        		logger.debug("there is at least one attempt");
+        		logger.debug("there is at least one attempt for the standard nominamtions");
         		/**
         		 * proved the fact that there is at least one attempt for this content.
         		 */
-        		return true;
+        		activityOccurred=true;
         	}
         } 
-        logger.debug("there is no response for this content");
+        
+        logger.debug("activityOccurred: " + activityOccurred);
+        int userEnteredVotesCount=getUserEnteredVotesCountForContent(voteContent.getUid());
+		logger.debug("userEnteredVotesCount: " + userEnteredVotesCount);
+		
+		if ((activityOccurred == true) || (userEnteredVotesCount > 0))
+		{
+		    return true;
+		}
+        
+        logger.debug("there is no votes/nominations for this content");
 		return false;
 	}
 	

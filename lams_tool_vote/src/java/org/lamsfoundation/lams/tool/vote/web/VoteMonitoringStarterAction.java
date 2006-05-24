@@ -186,6 +186,7 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 		}
 
 		
+		logger.debug("checking student activity on the standard nominations:" + voteContent);
 		if (voteService.studentActivityOccurredGlobal(voteContent))
 		{
 			VoteUtils.cleanUpSessionAbsolute(request);
