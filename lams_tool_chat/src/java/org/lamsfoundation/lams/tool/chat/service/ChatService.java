@@ -372,7 +372,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 
 	public void createJabberRoom(ChatSession chatSession) {
 		try {
-			XMPPConnection.DEBUG_ENABLED = true;
+			XMPPConnection.DEBUG_ENABLED = false;
 			XMPPConnection con = new XMPPConnection(ChatConstants.XMPPDOMAIN);
 
 			con.login(ChatConstants.XMPP_ADMIN_USERNAME,
