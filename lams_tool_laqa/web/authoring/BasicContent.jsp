@@ -123,6 +123,23 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					
 					</table>
 
+
+ac mo:       <c:out value="${activeModule}" escapeXml="false"/>
+
+	      	<c:if test="${activeModule != 'authoring'}"> 					
+				<p align="right">
+				    <a href="javascript:submitMethod('submitAllContent')" class="button">
+			        	<bean:message key="label.save"/></a>
+				</p>
+			</c:if> 					
+
+	      	<c:if test="${activeModule == 'authoring'}"> 					
+				<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
+				<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="laqa11" 
+				cancelButtonLabelKey="label.cancel" saveButtonLabelKey="label.save" toolContentID="${formBean.toolContentID}" />
+			</c:if> 						      	
+	      				
+
 <SCRIPT language="JavaScript"> 
 
 	function removeQuestion(questionIndex)

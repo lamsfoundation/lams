@@ -1,3 +1,4 @@
+
 <%-- 
 Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
 License Information: http://lamsfoundation.org/licensing/lams/2.0/
@@ -18,7 +19,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   http://www.gnu.org/licenses/gpl.txt
 --%>
-
+<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
 <%@ taglib uri="tags-bean" prefix="bean"%> 
 <%@ taglib uri="tags-html" prefix="html"%>
 <%@ taglib uri="tags-logic" prefix="logic" %>
@@ -45,9 +46,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
-	<!DOCTYPE HTML PUBLIC "-//W3C//DTD hTML 4.01 Transitional//EN">
+	<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 	<html:html locale="true">
 	<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 	<lams:headItems/>
 	<title><fmt:message key="activity.title" /></title>
 
@@ -103,7 +105,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <body onLoad="init();">
 
 	<b> <font size=2> <bean:message key="label.authoring.qa"/> </font></b>
-	
+
 	<html:form  action="/authoring?validate=false" styleId="authoringForm" enctype="multipart/form-data" method="POST" target="_self">
 	<html:hidden property="dispatch" value="submitAllContent"/>
 	<html:hidden property="toolContentID"/>
@@ -126,9 +128,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<lams:TabBody id="3" titleKey="label.instructions" page="InstructionsContent.jsp" />
 		<!-- end of content (Instructions) -->
 		<!-- Button Row -->
-		<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
-		<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="laqa11" 
-			cancelButtonLabelKey="label.cancel" saveButtonLabelKey="label.save" toolContentID="${formBean.toolContentID}" />
 
 	</c:if> 			
 	
@@ -150,9 +149,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<!-- tab content 1 (Basic) -->
 		<lams:TabBody id="1" titleKey="label.basic" page="BasicContent.jsp"/>
 		<!-- end of content (Basic) -->
-		<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
-		<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="laqa11" 
-			cancelButtonLabelKey="label.cancel" saveButtonLabelKey="label.save" toolContentID="${formBean.toolContentID}" />
 	</c:if> 			
 	
 
