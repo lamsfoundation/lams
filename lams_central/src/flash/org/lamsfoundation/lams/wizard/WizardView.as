@@ -59,15 +59,15 @@ class WizardView extends AbstractView {
 
 	private var _wizardView:WizardView;
 	private var _tm:ThemeManager;
+	private var _dictionary:Dictionary;
 	//private var _workspace:Workspace;
 	
 	private var _wizardView_mc:MovieClip;
-    //private var bkg_pnl:MovieClip;
+    private var logo:MovieClip;
 
 	private var org_treeview:Tree;              //Treeview for navigation through workspace folder structure
 	
 	// step 1 UI elements
-	private var currentPath_lbl:Label;
 	private var location_treeview:Tree;
 
 	// step 2 UI elements
@@ -97,17 +97,21 @@ class WizardView extends AbstractView {
 	private var scheduleDate_dt:DateField;
 
 	//Dimensions for resizing
-    private var xOkOffset:Number;
-    private var yOkOffset:Number;
+    private var xNextOffset:Number;
+    private var yNextOffset:Number;
+    private var xPrevOffset:Number;
+    private var yPrevOffset:Number;
     private var xCancelOffset:Number;
     private var yCancelOffset:Number;
+	private var xLogoOffset:Number;
 	
+	private var lastStageHeight:Number;
 	private var header_pnl:MovieClip;		  // top panel base
-	private var footer_pnl:MovieClip;       // bottom panel base
 	
 	private var panel:MovieClip;       //The underlaying panel base
 	
-	// common buttons
+	// common elements
+	private var wizTitle_lbl:Label;
 	private var finish_btn:Button;
 	private var cancel_btn:Button;
 	private var next_btn:Button;
@@ -134,11 +138,13 @@ class WizardView extends AbstractView {
 	*/
 	function WizardView(){
 		_wizardView = this;
-		_tm = ThemeManager.getInstance();
-		_resultDTO = new Object();
-        //_workspace = Application.getInstance().getWorkspace();
-		//Init for event delegation
         mx.events.EventDispatcher.initialize(this);
+		
+		_tm = ThemeManager.getInstance();
+		_dictionary = Dictionary.getInstance();
+		_dictionary.addEventListener('init',Proxy.create(this,setUpLabels));
+		
+		_resultDTO = new Object();
 	}
 	
 	/**
@@ -147,11 +153,16 @@ class WizardView extends AbstractView {
 	public function init(m:Observable,c:Controller){
 		super (m, c);
 		
-		currentPath_lbl.text = "<b>"+Dictionary.getValue('ws_dlg_location_button')+"</b>:"
+		xNextOffset = panel._width - next_btn._x;
+        yNextOffset = panel._height - next_btn._y;
+		xPrevOffset = panel._width - prev_btn._x;
+        yPrevOffset = panel._height - prev_btn._y;
+        xCancelOffset = panel._width - cancel_btn._x;
+        yCancelOffset = panel._height - cancel_btn._y;
+		xLogoOffset = header_pnl._width - logo._x;
 
-		// event listeners		
-		
-		trace('org tree:' + org_treeview);
+		lastStageHeight = Stage.height;
+
 		MovieClipUtils.doLater(Proxy.create(this,draw)); 
 		
     }    
@@ -232,16 +243,14 @@ class WizardView extends AbstractView {
     * layout visual elements on the canvas on initialisation
     */
 	private function draw(){
-		
+		setStyles();
 		showStep1();
 	    dispatchEvent({type:'load',target:this});
 		
 	}
 	
 	/**
-	 * Called by the wizardController after the workspace has loaded
-	 * @usage   
-	 * @return  
+	 * Called by the wizardController after the workspace has loaded 
 	 */
 	public function setUpContent():Void{
 		trace('setting up content');
@@ -262,6 +271,87 @@ class WizardView extends AbstractView {
 		//itemSelected(location_treeview.selectedNode, WorkspaceModel(workspaceView.getModel()));
 	
 	}
+	
+	/**
+	 * Sets i8n labels for UI elements 
+	 * 
+	 */
+	public function setUpLabels():Void{
+		//buttons
+		next_btn.label = Dictionary.getValue('next_btn');
+		prev_btn.label = Dictionary.getValue('prev_btn');
+		cancel_btn.label = Dictionary.getValue('cancel_btn');
+		finish_btn.label = Dictionary.getValue('finish_btn');
+		close_btn.label = Dictionary.getValue('close_btn');
+		start_btn.label = Dictionary.getValue('start_btn');
+		
+		//labels
+		setTitle(Dictionary.getValue('wizardTitle_1_lbl'));
+		title_lbl.text = Dictionary.getValue('title_lbl');
+		desc_lbl.text = Dictionary.getValue('desc_lbl');
+		staff_lbl.text = Dictionary.getValue('staff_lbl');
+		learner_lbl.text = Dictionary.getValue('learner_lbl');
+		summery_lbl.text = Dictionary.getValue('summery_lbl');
+		
+		schedule_cb.label = Dictionary.getValue('schedule_cb_lbl');
+		
+	}
+	
+	/**
+    * Set the styles for the Wizard called from init. and themeChanged event handler
+    */
+    private function setStyles() {
+		var styleObj = _tm.getStyleObject('button');
+		next_btn.setStyle('styleName',styleObj);
+		prev_btn.setStyle('styleName',styleObj);
+		finish_btn.setStyle('styleName',styleObj);
+		cancel_btn.setStyle('styleName',styleObj);
+		close_btn.setStyle('styleName',styleObj);
+		start_btn.setStyle('styleName',styleObj);
+		
+		styleObj = _tm.getStyleObject('BGPanel');
+		header_pnl.setStyle('styleName',styleObj);
+		
+		styleObj = _tm.getStyleObject('WZPanel');
+		panel.setStyle('styleName',styleObj);
+		
+		styleObj = _tm.getStyleObject('label');
+		wizTitle_lbl.setStyle('styleName',styleObj);
+		title_lbl.setStyle('styleName',styleObj);
+		desc_lbl.setStyle('styleName',styleObj);
+		staff_lbl.setStyle('styleName',styleObj);
+		learner_lbl.setStyle('styleName',styleObj);
+		summery_lbl.setStyle('styleName',styleObj);
+		staff_lbl.setStyle('styleName',styleObj);
+		schedule_cb.setStyle('styleName', styleObj);
+		
+		//styleObj = _tm.getStyleObject('treeview');
+        //org_treeview.setStyle('styleName',styleObj);
+        //location_treeview.setStyle('styleName',styleObj);
+		
+		
+		styleObj = _tm.getStyleObject('textarea');
+		resourceDesc_txa.setStyle('styleName',styleObj);
+		resourceTitle_txi.setStyle('styleName',styleObj);
+		
+		styleObj = _tm.getStyleObject('scrollpane');
+		staff_scp.setStyle('styleName',styleObj);
+		learner_scp.setStyle('styleName',styleObj);
+		summery_scp.setStyle('styleName',styleObj);
+	}
+	
+	/**
+    * Event fired by StyleManager class to notify listeners that Theme has changed
+    * it is up to listeners to then query Style Manager for relevant style info
+    */
+    public function themeChanged(event:Object){
+        if(event.type=='themeChanged') {
+            //Theme has changed so update objects to reflect new styles
+            setStyles();
+        }else {
+            Debugger.log('themeChanged event broadcast with an object.type not equal to "themeChanged"',Debugger.CRITICAL,'themeChanged','org.lamsfoundation.lams.WorkspaceDialog');
+        }
+    }
 	
 	private function itemSelected(newSelectedNode:XMLNode, wm:WorkspaceModel){
 		//update the UI with the new info
@@ -499,9 +589,6 @@ class WizardView extends AbstractView {
 	private function updateScreen(cl_step:Number, sh_step:Number){
 		
 		switch(cl_step){
-			case 0:
-				clearStartUp();
-				break;
 			case 1:
 				clearStep1();
 				break;
@@ -522,9 +609,6 @@ class WizardView extends AbstractView {
 		}
 		
 		switch(sh_step){
-			case 0:
-				showStartUp();
-				break;
 			case 1:
 				showStep1();
 				break;
@@ -571,19 +655,12 @@ class WizardView extends AbstractView {
 		
 	}
 	
-	private function showStartUp():Void{
-		trace('showing startup');
-	}
-	
-	private function clearStartUp():Void{
-		
-	}
-	
 	private function showStep1():Void{
 		trace('showing step 1');
+		setTitle(Dictionary.getValue('wizardTitle_1_lbl'));
 		location_treeview.visible = true;
 		
-		finish_btn.enabled = false;
+		finish_btn.visible = false;
 		prev_btn.enabled = false;
 		next_btn.enabled = true;
 		close_btn.visible = false;
@@ -623,6 +700,7 @@ class WizardView extends AbstractView {
 			
 			// show folder selected warning
 			trace('folder selected.. need to select LD');
+			LFMessage.showMessageAlert(Dictionary.getValue('al_validation_msg1'), null, null);
 			return false;
 		} else if(snode.attributes.data.resourceType==wm.RT_LD){
 			// set result DTO - lesson selected
@@ -634,12 +712,15 @@ class WizardView extends AbstractView {
 		} else {
 			// show general warning
 			trace('nothing selected!!!');
+			LFMessage.showMessageAlert(Dictionary.getValue('al_validation_msg1'), null, null);
 			return false;
 		}
 	}
 	
 	private function showStep2():Void{
 		trace('showing step 2');
+		
+		setTitle(Dictionary.getValue('wizardTitle_2_lbl'));
 		// enable prev button after Step 1
 		prev_btn.enabled = true;
 		
@@ -674,12 +755,16 @@ class WizardView extends AbstractView {
 		if(valid){
 			resultDTO.resourceTitle = resourceTitle_txi.text;
 			resultDTO.resourceDescription = resourceDesc_txa.text;
-		} 
+		} else {
+			LFMessage.showMessageAlert(Dictionary.getValue('al_validation_msg2'), null, null);
+		}
 		return valid;
 	}
 	
 	private function showStep3():Void{
 		trace('showing step 3');
+		
+		setTitle(Dictionary.getValue('wizardTitle_3_lbl'));
 		
 		if(!resultDTO.selectedLearners && !resultDTO.selectedStaff){
 			WizardModel(getModel()).getWizard().getOrganisations(_root.courseID, _root.classID);
@@ -712,6 +797,7 @@ class WizardView extends AbstractView {
 			
 		if(snode == null){
 			trace('no course/class selected');
+			LFMessage.showMessageAlert(Dictionary.getValue('al_validation_msg3_1'), null, null);
 			return false;
 		} else {
 			// add selected users to dto
@@ -766,6 +852,8 @@ class WizardView extends AbstractView {
 			
 			trace('selected org ID is: ' + selectedOrgID);
 			
+		}else{
+			LFMessage.showMessageAlert(Dictionary.getValue('al_validation_msg3_2'), null, null);
 		}
 		
 		return valid;
@@ -773,6 +861,9 @@ class WizardView extends AbstractView {
 	
 	
 	private function showStep4():Void{
+		
+		
+		setTitle(Dictionary.getValue('wizardTitle_4_lbl'));
 		
 		writeSummery();
 		
@@ -789,8 +880,8 @@ class WizardView extends AbstractView {
 		}
 		schedule_time._visible = true;
 		scheduleDate_dt.visible = true;
-		next_btn.enabled = false;
-		finish_btn.enabled = true;
+		next_btn.visible = false;
+		finish_btn.visible = true;
 	}
 	
 	private function writeSummery():Void{
@@ -816,8 +907,8 @@ class WizardView extends AbstractView {
 		start_btn.visible = false;
 		schedule_time._visible = false;
 		scheduleDate_dt.visible = false;
-		next_btn.enabled = true;
-		finish_btn.enabled = false;
+		next_btn.visible = true;
+		finish_btn.visible= false;
 	}
 	
 	private function validateStep4(wm:WizardModel):Boolean{
@@ -825,9 +916,11 @@ class WizardView extends AbstractView {
 	}
 	
 	private function showFinish():Void{
-		next_btn.enabled = false;
-		prev_btn.enabled = false;
-		cancel_btn.enabled = false;
+		
+		setTitle(Dictionary.getValue('wizardTitle_x_lbl'));
+		next_btn.visible = false;
+		prev_btn.visible = false;
+		cancel_btn.visible = false;
 		finish_btn.visible = false;
 		close_btn.visible = true;
 	}
@@ -988,10 +1081,36 @@ class WizardView extends AbstractView {
 	private function setSize(wm:WizardModel):Void{
         var s:Object = wm.getSize();
 		
-		header_pnl.setSize(s.w, s.h-footer_pnl._height-panel._height);
-		panel.setSize(s.w, s.h-footer_pnl._height-header_pnl._height);
-		footer_pnl.setSize(s.w,s.h-panel._height-header_pnl._height);
+		header_pnl.setSize(s.w, header_pnl._height);
+		panel.setSize(s.w, s.h-header_pnl._height);
+		
+		// move buttons
+        next_btn.move(panel._width-xNextOffset,panel._height-yNextOffset);
+		prev_btn.move(panel._width-xPrevOffset,panel._height-yPrevOffset);
+		finish_btn.move(panel._width-xNextOffset,panel._height-yNextOffset);
+		close_btn.move(panel._width-xCancelOffset,panel._height-yCancelOffset);
+        cancel_btn.move(panel._width-xCancelOffset,panel._height-yCancelOffset);
 				
+		// move logo
+		logo._x = header_pnl._width-xLogoOffset;
+		
+		// calculate height change
+		var dHeight:Number = Stage.height - lastStageHeight;
+		
+		trace('last stage height' + lastStageHeight);
+		
+		lastStageHeight = Stage.height;
+		trace('new height change: ' + dHeight);
+			
+		org_treeview.setSize(org_treeview.width, Number(org_treeview.height + dHeight));
+		location_treeview.setSize(location_treeview.width, Number(location_treeview.height + dHeight));
+		
+		resourceDesc_txa.setSize(resourceDesc_txa.width, Number(resourceDesc_txa.height + dHeight));
+		
+		staff_scp.setSize(staff_scp._width, staff_scp._height + dHeight);
+		learner_scp.setSize(learner_scp._width, learner_scp._height + dHeight);
+		
+		
 	}
 	
 	 /**
@@ -1025,6 +1144,10 @@ class WizardView extends AbstractView {
 		return _staffList;
 	}
 	
+	public function setTitle(title:String){
+		wizTitle_lbl.text = "<b>" + title + "</b>";
+	}
+	
 	/**
 	 * Overrides method in abstract view to ensure cortect type of controller is returned
 	 * @usage   
@@ -1041,5 +1164,6 @@ class WizardView extends AbstractView {
     public function defaultController (model:Observable):Controller {
         return new WizardController(model);
     }
+
 	
 }
