@@ -124,8 +124,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</table>
 
 
-ac mo:       <c:out value="${activeModule}" escapeXml="false"/>
-
 	      	<c:if test="${activeModule != 'authoring'}"> 					
 				<p align="right">
 				    <a href="javascript:submitMethod('submitAllContent')" class="button">
