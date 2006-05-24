@@ -39,6 +39,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 	private var CHILD_OFFSET_X : Number = 8;
 	private var CHILD_OFFSET_Y : Number = 57;
 	private var CHILD_INCRE : Number = 60;
+	private var fromModuleTab:String;
 	//this is set by the init object
 	private var _canvasController : CanvasController;
 	private var _canvasView : CanvasView;
@@ -94,19 +95,28 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		
 		for (var i = 0; i < _children.length; i ++)
 		{
-			children_mc [i] = childActivities_mc.attachMovie ("CanvasActivity", "CanvasActivity" + i, childActivities_mc.getNextHighestDepth (), {_activity : _children [i] , _canvasController : _canvasController, _canvasView : _canvasView});
-			
-			//set the positioning co-ords
+			if (fromModuleTab != "monitorLearnerTab"){
+				children_mc [i] = childActivities_mc.attachMovie ("CanvasActivity", "CanvasActivity" + i, childActivities_mc.getNextHighestDepth (), {_activity : _children [i] , _canvasController : _canvasController, _canvasView : _canvasView});
+				//set the positioning co-ords
 			children_mc [i].activity.xCoord = CHILD_OFFSET_X;
 			children_mc [i].activity.yCoord = CHILD_OFFSET_Y + (i * CHILD_INCRE);
+			
+			}else {
+				children_mc [i] = childActivities_mc.attachMovie ("CanvasActivityLinear_forOptional", "CanvasActivity" + i, childActivities_mc.getNextHighestDepth (), {_activity : _children [i] , _canvasController : _canvasController, _canvasView : _canvasView, actLabel:_children [i].title});
+				//set the positioning co-ords
+				if (i == 0){
+					children_mc [i]._y = (i * 21)- 21;
+				}else{
+					children_mc [i]._y = children_mc [i-1]._y+ 21;
+				}
+				children_mc [i]._x = 58;
+			
+			
+			}
 			children_mc [i]._visible = true;
 		}
-		//childActivities_mc.createChildAtDepth("Bin",DepthManager.kTop);
-		//childActivities_mc.createEmptyMovieClip("clickTarget_mc", this.getNextHighestDepth());
-		//clickTarget_mc.attachMovie("clickTarget_MC", "clickTarget_mc", clickTarget_mc.getNextHighestDepth(), {_alpha:50});
 		
 		MovieClipUtils.doLater (Proxy.create (this, draw));
-		//}
 	}
 	
 	public function get activity () : Activity
@@ -141,13 +151,18 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		act_pnl.borderType = 'inset';
 		container_pnl.setStyle ("backgroundColor", 0x4289FF);
 		//position the container (this)
-		_x = _activity.xCoord;
-		_y = _activity.yCoord;
-		//dimentions of container (this)
-		if (numOfChildren > 1)
-		{
-			container_pnl._height = CHILD_OFFSET_Y + (numOfChildren * CHILD_INCRE);
+		if (fromModuleTab != "monitorLearnerTab"){
+			if (numOfChildren > 1)
+			{
+				container_pnl._height = CHILD_OFFSET_Y + (numOfChildren * CHILD_INCRE);
+			}
+			_x = _activity.xCoord;
+			_y = _activity.yCoord;
+		}else {
+			container_pnl._height = (numOfChildren * 21);
+			container_pnl._y = - (container_pnl._height/2);
 		}
+		//dimentions of container (this)
 		if (_locked)
 		{
 			padlockClosed_mc._visible = true;
