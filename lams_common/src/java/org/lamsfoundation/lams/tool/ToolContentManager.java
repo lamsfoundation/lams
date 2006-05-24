@@ -23,6 +23,8 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool;
 
+import java.util.List;
+
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
@@ -96,4 +98,23 @@ public interface ToolContentManager
      */
     public void removeToolContent(Long toolContentId, boolean removeSessionData) 
     	throws SessionDataExistsException, ToolException;
+    
+    /**
+     * Export the XML fragment for the tool's content, along with any files needed
+     * for the content.
+     * @throws DataMissingException if no tool content matches the toolSessionId 
+     * @throws ToolException if any other error occurs
+     */
+    public String exportToolContent(Long toolContentId) 
+    	throws DataMissingException, ToolException;
+
+    /**
+     * Import the XML fragment for the tool's content, along with any files needed
+     * for the content.
+     * @throws ToolException if any other error occurs
+     */
+    public String exportToolContent(List toolContentId) 
+    	throws ToolException;
+    
+ 
 }

@@ -65,7 +65,8 @@ public interface ToolSessionManager
     	throws DataMissingException, ToolException;
 
     /**
-     * Export the XML fragment for the session export. Not sure if this is required.
+     * Export the XML fragment for the session export. Not used yet - will be used 
+     * when we do exports of designs and lesson data.
      * @throws DataMissingException if no tool session matches the toolSessionId 
      * @throws ToolException if any other error occurs
      */
@@ -73,7 +74,8 @@ public interface ToolSessionManager
     	throws DataMissingException, ToolException;
 
     /**
-     * Export the XML fragment for the session export. Not sure if this is required.
+     * Export the XML fragment for the session export. Not used yet - will be used 
+     * when we do exports of designs and lesson data.
      * @throws DataMissingException if no tool session matches the toolSessionId 
      * @throws ToolException if any other error occurs
      */

@@ -789,7 +789,28 @@ public class ResourceServiceImpl implements
 		resourceDao.delete(resource);
 	}
 
+	/**
+     * Export the XML fragment for the tool's content, along with any files needed
+     * for the content.
+     * @throws DataMissingException if no tool content matches the toolSessionId 
+     * @throws ToolException if any other error occurs
+     */
+ 	public String exportToolContent(Long toolContentId) throws DataMissingException, ToolException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
+    /**
+     * Import the XML fragment for the tool's content, along with any files needed
+     * for the content.
+     * @throws ToolException if any other error occurs
+     */
+	public String exportToolContent(List toolContentId) throws ToolException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	
 	public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 		ResourceSession session = new ResourceSession();
 		session.setSessionId(toolSessionId);

@@ -585,6 +585,28 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		}
 		forumDao.delete(forum);
 	}
+	
+	/**
+     * Export the XML fragment for the tool's content, along with any files needed
+     * for the content.
+     * @throws DataMissingException if no tool content matches the toolSessionId 
+     * @throws ToolException if any other error occurs
+     */
+ 	public String exportToolContent(Long toolContentId) throws DataMissingException, ToolException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+    /**
+     * Import the XML fragment for the tool's content, along with any files needed
+     * for the content.
+     * @throws ToolException if any other error occurs
+     */
+	public String exportToolContent(List toolContentId) throws ToolException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	/** @see org.lamsfoundation.lams.tool.ToolSessionManager#createToolSession(java.lang.Long, java.lang.String, java.lang.Long) */
 	public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 		ForumToolSession session = new ForumToolSession();
