@@ -425,7 +425,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
     	logger.debug("dispatching editActivityQuestions...");
     	request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(false).toString());
 
-		request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(true));
+		request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(true).toString());
 		QaUtils.setDefineLater(request, true);
         return (mapping.findForward(LOAD_MONITORING));
     }
@@ -456,6 +456,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
     throws IOException, ServletException {
     	logger.debug("dispatching proxy submitAllContent...");
     	request.getSession().setAttribute(ACTIVE_MODULE, DEFINE_LATER);
+    	request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(false).toString());
     	QaAction qaAction= new QaAction(); 
     	return qaAction.submitAllContent(mapping, form, request, response);
     	

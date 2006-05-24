@@ -240,6 +240,8 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants
         authoringUtil.removeRedundantQuestions(mapQuestionContent, qaService, qaAuthoringForm, request);
         logger.debug("end of removing unused entries... ");
         
+        
+        
         QaContent qaContent=authoringUtil.saveOrUpdateQaContent(mapQuestionContent, qaService, qaAuthoringForm, request);
         logger.debug("qaContent: " + qaContent);
 		
@@ -258,11 +260,15 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants
     		request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, richTextInstructions);
         }
 
-        
         authoringUtil.reOrganizeDisplayOrder(mapQuestionContent, qaService, qaAuthoringForm, qaContent);
 
-        List attacments=saveAttachments(qaContent, attachmentList, deletedAttachmentList, mapping, request);
-        logger.debug("attacments: " + attacments);
+        String activeModule=qaAuthoringForm.getActiveModule();
+        logger.debug("activeModule: " + activeModule);
+        if (activeModule.equals(AUTHORING))
+        {
+            List attacments=saveAttachments(qaContent, attachmentList, deletedAttachmentList, mapping, request);
+            logger.debug("attacments: " + attacments);
+        }
 
   
         errors.clear();
@@ -424,7 +430,7 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants
 		String sourceMcStarter = (String) request.getAttribute(SOURCE_MC_STARTER);
 		logger.debug("sourceMcStarter: " + sourceMcStarter);
 
-     	request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(true));
+     	request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(true).toString());
      	request.getSession().setAttribute(SHOW_AUTHORING_TABS,new Boolean(false).toString());
      	     	
      	String toolContentId=qaAuthoringForm.getToolContentId();

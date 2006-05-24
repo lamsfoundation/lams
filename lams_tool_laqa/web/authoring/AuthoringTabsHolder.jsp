@@ -65,26 +65,41 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	    var themeName="aqua";
         
         function init(){
-        
-            initTabSize(3);
-            
-            var tag = document.getElementById("currentTab");
-	    	if(tag.value != "")
-	    		selectTab(tag.value);
-            else
-                selectTab(1); //select the default tab;
-            
-            initEditor("title");
-            initEditor("instructions");
-            initEditor("questionContent0");
-           
-            <c:set var="queIndex" scope="session" value="1"/>
-            <c:forEach var="questionEntry" items="${sessionScope.mapQuestionContent}">
-                <c:set var="queIndex" scope="session" value="${queIndex +1}"/>
-                initEditor("<c:out value="questionContent${queIndex-1}"/>");
-            </c:forEach>
-
+			if (document.QaAuthoringForm.activeModule.value != 'defineLater')
+			{
+	            initTabSize(3);
+	            
+	            var tag = document.getElementById("currentTab");
+		    	if(tag.value != "")
+		    		selectTab(tag.value);
+	            else
+	                selectTab(1); //select the default tab;
+	            
+	            initEditor("onlineInstructions");                                    
+		        initEditor("offlineInstructions");                                    
+			}
+			else
+			{
+	            initTabSize(1);
+	            
+	            var tag = document.getElementById("currentTab");
+		    	if(tag.value != "")
+		    		selectTab(tag.value);
+	            else
+	                selectTab(1); //select the default tab;
+			}
+			
+	            initEditor("title");
+	            initEditor("instructions");
+	            
+	            initEditor("questionContent0");
+	            <c:set var="queIndex" scope="session" value="1"/>
+	            <c:forEach var="questionEntry" items="${sessionScope.mapQuestionContent}">
+	                <c:set var="queIndex" scope="session" value="${queIndex+1}"/>
+	                initEditor("<c:out value="questionContent${queIndex-1}"/>");
+	            </c:forEach>			
         }     
+        
         
         function doSelectTab(tabId) {
         	// start optional tab controller stuff
@@ -110,6 +125,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<html:hidden property="dispatch" value="submitAllContent"/>
 	<html:hidden property="toolContentID"/>
 	<html:hidden property="currentTab" styleId="currentTab" />
+	<html:hidden property="activeModule"/>
 	
 	<c:if test="${sessionScope.activeModule != 'defineLater' }"> 			
 		<lams:Tabs collection="${tabs}" useKey="true" control="true"/>
@@ -130,6 +146,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<!-- Button Row -->
 
 	</c:if> 			
+
 	
 	<c:if test="${ (sessionScope.activeModule == 'defineLater') && (sessionScope.defineLaterInEditMode != 'true') }"> 			
 		<lams:Tabs collection="${tabsBasic}" useKey="true" control="true"/>

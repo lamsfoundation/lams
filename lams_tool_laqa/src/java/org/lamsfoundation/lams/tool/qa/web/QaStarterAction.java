@@ -214,16 +214,18 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		{
 			logger.debug("request is for authoring module");
 			request.getSession().setAttribute(ACTIVE_MODULE, AUTHORING);
-			request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(true));
+			request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(true).toString());
 			request.getSession().setAttribute(SHOW_AUTHORING_TABS,new Boolean(true).toString());
+			qaAuthoringForm.setActiveModule(AUTHORING);
 			requestedModule=AUTHORING;
 		}
 		else
 		{
 			logger.debug("request is for define later module either direcly from define later url or monitoring url");
 			request.getSession().setAttribute(ACTIVE_MODULE, DEFINE_LATER);
-			request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(false));
+			request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(false).toString());
 			request.getSession().setAttribute(SHOW_AUTHORING_TABS,new Boolean(false).toString());
+			qaAuthoringForm.setActiveModule(DEFINE_LATER);			
 			requestedModule=DEFINE_LATER;
 			
 			if (servletPath.indexOf("monitoring") > 0)

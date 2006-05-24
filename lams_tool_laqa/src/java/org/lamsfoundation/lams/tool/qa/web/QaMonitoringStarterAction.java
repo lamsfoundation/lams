@@ -190,6 +190,7 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 
 		
 		request.getSession().setAttribute(ACTIVE_MODULE, MONITORING);
+		qaMonitoringForm.setActiveModule(MONITORING);
 		return (mapping.findForward(LOAD_MONITORING));	
 	}
 
@@ -235,18 +236,6 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 		}
 		
 		
-		boolean isContentInUse=QaUtils.isContentInUse(qaContent);
-		logger.debug("isContentInUse:" + isContentInUse);
-		
-		
-		request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(false).toString());
-		if (isContentInUse == true)
-		{
-			logger.debug("monitoring url does not allow editActivity since the content is in use.");
-	    	persistError(request,"error.content.inUse");
-	    	request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(true).toString());
-		}
-		
 		
 		if (qaContent.getTitle() == null)
 		{
@@ -277,9 +266,22 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 		logger.debug("refreshing instructions data...");
 		qaMonitoringAction.refreshInstructionsData(request, qaContent);
 		
-		/* this section is related to instructions tab. Starts here. */
-	    /* ends here. */
-    
+		logger.debug("populating online and ofline files data for intructions tab");
+		QaUtils.populateUploadedFilesData(request, qaContent, qaService);
+
+		
+		boolean isContentInUse=QaUtils.isContentInUse(qaContent);
+		logger.debug("isContentInUse:" + isContentInUse);
+		
+		request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(false).toString());
+		if (isContentInUse == true)
+		{
+			logger.debug("monitoring url does not allow editActivity since the content is in use.");
+	    	persistError(request,"error.content.inUse");
+	    	request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(true).toString());
+		}
+
+		logger.debug("final IS_MONITORED_CONTENT_IN_USE: " + request.getSession().getAttribute(IS_MONITORED_CONTENT_IN_USE));
 	    logger.debug("end initializing  monitoring data...");
 		return true;
 	}

@@ -47,6 +47,8 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 	protected String choiceBasic;
 	protected String choiceAdvanced;
 	protected String choiceInstructions;
+
+	protected String activeModule;
 	
 	/* basic content */
 	protected String title;
@@ -558,4 +560,17 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 	public void setCurrentTab(String currentTab) {
 		this.currentTab = currentTab;
 	}
+	
+	/**
+     * @return Returns the activeModule.
+     */
+    public String getActiveModule() {
+        return activeModule;
+    }
+    /**
+     * @param activeModule The activeModule to set.
+     */
+    public void setActiveModule(String activeModule) {
+        this.activeModule = activeModule;
+    }	
 }
