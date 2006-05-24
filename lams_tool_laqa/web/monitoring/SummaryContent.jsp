@@ -47,7 +47,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<c:if test="${(userExceptionNoToolSessions != 'true') }"> 	
 			<html:hidden property="selectedToolSessionId"/>							
 			<input type="hidden" name="isToolSessionChanged"/>
-				<table class="forms">
+				<table width="80%" cellspacing="8" align="CENTER" class="forms">
 
 				<c:if test="${(requestLearningReport != 'true')}"> 	
 						<tr> 
@@ -90,9 +90,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			  	 			<td> &nbsp&nbsp&nbsp</td>
 			  	 		</tr>
 						<tr>			
-							<td NOWRAP valign=top align=left><b> <font size=2> <bean:message key="label.question"/> </b>
+							<td NOWRAP valign=top align=left><b> <font size=2> <bean:message key="label.question"/> : </b> </font>
 								<c:out value="${currentDto.question}" escapeXml="false"/>
-							</font> </td>
+							 </td>
 						</tr>	
 						
 						<tr> 

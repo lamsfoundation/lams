@@ -28,17 +28,20 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="fck-editor" prefix="FCK" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
+<c:set var="lams"><lams:LAMSURL/></c:set>
+<c:set var="tool"><lams:WebAppURL/></c:set>
+
 			<tr> <td>
-			<table>
+			<table width="80%" cellspacing="8" align="CENTER" class="forms">
 				<c:forEach var="questionEntry" items="${sessionScope.mapQuestionContentLearner}">
 						  <tr>
-						  	<td colspan=2 NOWRAP class="input" valign=top> <font size=2> <b> <bean:message key="label.question"/> <c:out value="${questionEntry.key}" escapeXml="false"/>: </b> 
+						  	<td colspan=2 NOWRAP valign=top> <font size=2> <b> <bean:message key="label.question"/> <c:out value="${questionEntry.key}" escapeXml="false"/>:  </b>  </font> 
 						  		<c:out value="${questionEntry.value}" escapeXml="false"/> 
-						  	</font> </td>
+						  	 </td>
 						  </tr>
 						  <tr> 
-					 		<td NOWRAP class="input" valign=top > <font size=2> <b> <bean:message key="label.answer"/> </b> </font> </td>
-					 		<td  NOWRAP class="input" valign=top>
+					 		<td NOWRAP valign=top > <font size=2> <b> <bean:message key="label.answer"/> </b> </font> </td>
+					 		<td  NOWRAP valign=top>
 					 			<input type="text" name="answer<c:out value="${questionEntry.key}"  escapeXml="false"/>" size="60" maxlength="255" value=""/> 
 					 		</td>
 					  	  </tr>
@@ -46,10 +49,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</c:forEach>
 			</table>
 			
-			<hr>
-			<table>
+			<table width="80%" cellspacing="8" align="CENTER" class="forms">
 			<tr>
-				 <td> 
+				 <td align=right> 
 						<html:submit onclick="javascript:submitMethod('submitAnswersContent');" styleClass="button">
 							<bean:message key="button.submitAllContent"/>
 						</html:submit>	 				 		  					

@@ -19,8 +19,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
-<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
-
 <%@ taglib uri="tags-bean" prefix="bean"%> 
 <%@ taglib uri="tags-html" prefix="html"%>
 <%@ taglib uri="tags-logic" prefix="logic" %>
@@ -29,11 +27,18 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="fck-editor" prefix="FCK" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
-<head>
-	<title> </title>
-	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-	<script language="JavaScript" type="text/JavaScript">
+<c:set var="lams"><lams:LAMSURL/></c:set>
+<c:set var="tool"><lams:WebAppURL/></c:set>
 
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
+
+<html:html locale="true">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<jsp:include page="/learning/learningHeader.jsp" />
+	
+	<script language="JavaScript" type="text/JavaScript">
 		function submitLearningMethod(actionMethod) 
 		{
 			document.QaLearningForm.method.value=actionMethod; 
@@ -44,45 +49,36 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		{
 			submitLearningMethod(actionMethod);
 		}
-		
-		function MM_reloadPage(init) {  //reloads the window if Nav4 resized
-		  if (init==true) with (navigator) {if ((appName=="Netscape")&&(parseInt(appVersion)==4)) {
-		    document.MM_pgW=innerWidth; document.MM_pgH=innerHeight; onresize=MM_reloadPage; }}
-		  else if (innerWidth!=document.MM_pgW || innerHeight!=document.MM_pgH) location.reload();
-		}
-		MM_reloadPage(true);
-		//-->
 	</script>	
-	<lams:css/>
 </head>
+<body>
 
 	  <html:form  action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
   		<html:hidden property="method"/>	 
-		<br>
-		<table align=center bgcolor="#FFFFFF"> 
+			<table width="80%" cellspacing="8" align="CENTER" class="forms">
 		
 			<c:if test="${questionListingMode != 'questionListingModePreview'}"> 						
-				<tr><td NOWRAP class="input" valign=top>
-					<font size=2> <b> <c:out value="${sessionScope.activityTitle}" escapeXml="false"/> </b> </font>
+				<tr><td NOWRAP valign=top>
+					 <c:out value="${sessionScope.activityTitle}" escapeXml="false"/> 
 				</td></tr>
 			</c:if> 		
 			
 			<c:if test="${questionListingMode == 'questionListingModePreview'}"> 						
-				<tr><td NOWRAP class="input" valign=top>
+				<tr><th scope="col" NOWRAP valign=top>
 					<font size=2> <b> <bean:message key="label.preview"/> </b> </font>
-				</td></tr>
-				<tr><td NOWRAP class="input" valign=top>
+				</th></tr>
+				<tr><td NOWRAP valign=top>
 					&nbsp&nbsp&nbsp&nbsp&nbsp
 				</td></tr>
 			</c:if> 		
 			
 			<c:if test="${questionListingMode != 'questionListingModePreview'}"> 						
-				<tr> <td class="error">
+				<tr> <td>
 					<html:errors/>
 				</td></tr>
 
 				<c:if test="${sessionScope.isDefineLater == 'true'}"> 			
-					<tr> <td class="error">
+					<tr> <td>
 						<bean:message key="error.defineLater"/>
 					</td></tr>
 				</c:if> 		
@@ -90,17 +86,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			
 			<c:if test="${sessionScope.isDefineLater == 'false'}"> 			
 				<c:if test="${sessionScope.isToolActivityOffline == 'true'}"> 			
-					<tr> <td class="error">
+					<tr> <td>
 						<bean:message key="label.learning.forceOfflineMessage"/>
 					</td></tr>
 				</c:if> 		
 			
 				<c:if test="${sessionScope.isToolActivityOffline == 'false'}"> 			
-					<tr><td NOWRAP class="input" valign=top>
-						<font size=2> 	<c:out value="${sessionScope.activityInstructions}" escapeXml="false"/> </font>
+					<tr><td NOWRAP valign=top>
+						<c:out value="${sessionScope.activityInstructions}" escapeXml="false"/> 
 					</td></tr>
 		
-					<tr> <td class="error">
+					<tr> <td>
 						 <font size=2>	<c:out value="${sessionScope.userFeedback}" escapeXml="true"/> </font>
 					</td></tr>
 				
@@ -122,5 +118,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	 	</table>
 	</html:form>
 	
+</body>
+</html:html>
+
 	
 	

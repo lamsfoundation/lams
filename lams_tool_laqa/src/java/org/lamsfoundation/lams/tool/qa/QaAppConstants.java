@@ -223,7 +223,7 @@ public interface QaAppConstants {
     public static final String QUESTION_LISTING_MODE_COMBINED			="questionListingModeCombined";
     
     public static final String FEEDBACK_TYPE_SEQUENTIAL					="You will be presented a total of : ";
-    public static final String FEEDBACK_TYPE_COMBINED					="You are being presented a total of : ";
+    public static final String FEEDBACK_TYPE_COMBINED					="You are being presented total of: ";
     public static final String QUESTIONS								=" questions.";
 
     public static final String ATTACHMENT_LIST                          ="attachmentList";

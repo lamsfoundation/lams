@@ -19,7 +19,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
-
 <%@ taglib uri="tags-bean" prefix="bean"%> 
 <%@ taglib uri="tags-html" prefix="html"%>
 <%@ taglib uri="tags-logic" prefix="logic" %>
@@ -28,20 +27,25 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="fck-editor" prefix="FCK" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
+<c:set var="lams"><lams:LAMSURL/></c:set>
+<c:set var="tool"><lams:WebAppURL/></c:set>
+
+
 	<!--question content goes here-->
-			<tr> <td >
-			<table>
+			<tr> <td>
+			<table width="80%" cellspacing="8" align="CENTER" class="forms">
 				<c:forEach var="questionEntry" items="${sessionScope.mapQuestionContentLearner}">
 			  		<c:if test="${questionEntry.key == sessionScope.currentQuestionIndex}"> 			
 					  <tr>
-					  	<td colspan=2 NOWRAP class="input" valign=top> <font size=2> 
+					  	<td colspan=2 NOWRAP valign=top> <font size=2> 
 					  		<b> <bean:message key="label.question"/> 
-						  	<c:out value="${questionEntry.key}" escapeXml="false"/>:</b> <c:out value="${questionEntry.value}" escapeXml="false"/>
-					  	</font>
+						  	<c:out value="${questionEntry.key}" escapeXml="false"/>: </font> </b> 
+						  	<c:out value="${questionEntry.value}" escapeXml="false"/>
 					  </tr>
+
 					  <tr> 
-				 		<td NOWRAP class="input" valign=top> <font size=2> <b> <bean:message key="label.answer"/> </b> </font> </td>
-				 		<td NOWRAP class="input" valign=top> 
+				 		<td NOWRAP valign=top> <font size=2> <b> <bean:message key="label.answer"/> </b> </font> </td>
+				 		<td NOWRAP valign=top> 
 				 			<html:text property="answer" size="60" maxlength="255" value="${sessionScope.currentAnswer}"/>
 				 			<html:hidden property="currentQuestionIndex" value="${questionEntry.key}"/>
 				 		</td>
@@ -52,13 +56,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<!--question content ends here-->
 
-			<hr>
-			<table>
+
+			<table width="80%" cellspacing="8" align="CENTER" class="forms">
 				<tr>
 				<c:choose>  
 				  <c:when test="${(sessionScope.currentQuestionIndex == sessionScope.totalQuestionCount) && 
 				  				  (sessionScope.totalQuestionCount !=1) }"> 
-					 <td NOWRAP class="input" valign=top> 
+					 <td NOWRAP valign=top align=right> 
 						<html:submit onclick="javascript:submitMethod('getPreviousQuestion');" styleClass="button">
 									<bean:message key="button.getPreviousQuestion"/>
 						</html:submit>	 				 		  					
@@ -71,7 +75,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   				  <c:when test="${(sessionScope.currentQuestionIndex == sessionScope.totalQuestionCount) && 
 				  				  (sessionScope.totalQuestionCount == 1) }"> 
-					 <td NOWRAP class="input" valign=top> 
+					 <td NOWRAP valign=top align=right> 
 						<html:submit onclick="javascript:submitMethod('submitAnswersContent');" styleClass="button">
 									<bean:message key="button.done"/>
 						</html:submit>	 				 		  					
@@ -80,7 +84,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				  
 				  
  				  <c:when test="${sessionScope.currentQuestionIndex != sessionScope.totalQuestionCount && sessionScope.currentQuestionIndex > 1}"> 
-					 <td NOWRAP class="input" valign=top> 
+					 <td NOWRAP valign=top align=right> 
 						<html:submit onclick="javascript:submitMethod('getPreviousQuestion');" styleClass="button">
 									<bean:message key="button.getPreviousQuestion"/>
 						</html:submit>	 				 		  					
@@ -92,7 +96,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   				  </c:when> 
   				  
 				  <c:otherwise>
-					 <td NOWRAP class="input" valign=top> 
+					 <td NOWRAP valign=top align=right> 
 						<html:submit onclick="javascript:submitMethod('getNextQuestion');" styleClass="button">
 									<bean:message key="button.getNextQuestion"/>
 						</html:submit>	 				 		  					

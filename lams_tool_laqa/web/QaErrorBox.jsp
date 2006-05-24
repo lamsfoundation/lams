@@ -25,10 +25,37 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="fck-editor" prefix="FCK" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
-				
-		
-<div id="datatablecontainer">
-<table border="0" cellspacing="2" cellpadding="2" summary="This table is being used for layout purposes only">
+
+<c:set var="lams"><lams:LAMSURL/></c:set>
+<c:set var="tool"><lams:WebAppURL/></c:set>
+
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
+
+<html:html locale="true">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<lams:css/>
+	<!-- depending on user / site preference this will get changed probably use passed in variable from flash to select which one to use-->
+
+ 	<!-- ******************** FCK Editor related javascript & HTML ********************** -->
+    <script type="text/javascript" src="${lams}fckeditor/fckeditor.js"></script>
+    <script type="text/javascript" src="${lams}includes/javascript/fckcontroller.js"></script>
+    <link href="${lams}css/fckeditor_style.css" rel="stylesheet" type="text/css">
+
+	<script language="JavaScript" type="text/JavaScript">
+    	var imgRoot="${lams}images/";
+	    var themeName="aqua";
+	</script>
+	
+	<script type="text/javascript" src="<c:out value="${lams}"/>includes/javascript/tabcontroller.js"></script>    
+	<script type="text/javascript" src="<c:out value="${lams}"/>includes/javascript/common.js"></script>
+</head>
+
+<body>	
+	
+	<table width="80%" cellspacing="8" align="CENTER" class="forms">
 		<c:if test="${userExceptionContentDefineLater == 'true'}"> 			
 			<tr> <td NOWRAP valign=top>
 						<font size=2> <bean:message key="error.defineLater"/> </font>
@@ -100,24 +127,24 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<font size=2> <bean:message key="error.defaultContent.notSetup"/> </font>
 			</td> </tr>
 		</c:if> 				    
-		
 </table>
+	
+</body>
+</html:html>
 
-<!--
-<logic:messagesPresent> 
-<table border="0" cellspacing="2" cellpadding="2" summary="This table is being used for layout purposes only">
-<tr>
-	<td width="10%"  align="right" >
-		<img src="images/error.jpg" alt="Error occured"/>
-	</td>
-	<td width="90%" valign="middle" class="body" colspan="2">
-		 <html:messages id="error" message="false"> 
-			<font size=2> <c:out value="${error}" escapeXml="false"/> </font> <br>
-		 </html:messages> 
-	</td>
-</tr>
 
-</logic:messagesPresent>
--->
-</div>
+
+
+
+
+
+
+
+
+				
+		
+
+
+
+
 

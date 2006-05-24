@@ -86,6 +86,7 @@
 package org.lamsfoundation.lams.tool.qa.web;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -101,6 +102,7 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueUsr;
+import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -173,7 +175,6 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
     		{
     			logger.debug("totalQuestionCount is 1: " + qaLearningForm.getAnswer());
     			mapAnswers.put(new Long(1).toString(), qaLearningForm.getAnswer());
-    			
     		}
     		else 
     		{
@@ -288,7 +289,8 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
         qaLearningForm.resetUserActions(); /*resets all except submitAnswersContent */
         
         request.getSession().setAttribute(MAP_ANSWERS, mapAnswers);
-                
+        logger.debug("final MAP_ANSWERS: " + mapAnswers);
+        
         return (mapping.findForward(LOAD_LEARNER));
     }
     
@@ -369,6 +371,14 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	    logger.debug("leaving the tool: " +
 	                 "leaveToolSession() with toolSessionId: " +  toolSessionId + " and user: " + user);
+	    
+	    logger.debug("set status to COMPLETE");
+	    QaSession qaSession = qaService.retrieveQaSessionOrNullById(toolSessionId.longValue());
+	    logger.debug("qaSession: " + qaSession);
+        qaSession.setSession_end_date(new Date(System.currentTimeMillis()));
+        qaSession.setSession_status(COMPLETED); 
+        qaService.updateQaSession(qaSession);
+        logger.debug("tool session has been marked COMPLETE: " + qaSession);
 	    
 	    String nextActivityUrl = qaService.leaveToolSession(toolSessionId, new Long(user.getUserID().longValue()));
 	    response.sendRedirect(nextActivityUrl);

@@ -18,7 +18,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   http://www.gnu.org/licenses/gpl.txt
 --%>
-<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
 
 <%@ taglib uri="tags-bean" prefix="bean"%> 
 <%@ taglib uri="tags-html" prefix="html"%>
@@ -31,10 +30,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD hTML 4.01 Transitional//EN">
-<html:html>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
+
+<html:html locale="true">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 	<title> <bean:message key="activity.title"/> </title>
 	<script lang="javascript">
 		var imgRoot="<c:out value="${lams}"/>images/";
@@ -75,10 +76,21 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <c:if test="${ requestLearningReportProgress != 'true'}"> 			
 	<c:if test="${ requestLearningReportViewOnly != 'true'}"> 			
-		<b> <font size=2> <c:out value="${sessionScope.reportTitleLearner}" escapeXml="false"/> </font></b>
+		<table width="80%" cellspacing="8" align="CENTER">
+			<tr> <th scope="col">
+				 <c:out value="${sessionScope.reportTitleLearner}" escapeXml="false"/> 
+			 </th>
+			</tr>
+		</table>		
 	</c:if> 				    
+
 	<c:if test="${ requestLearningReportViewOnly == 'true'}"> 			
-		<b> <font size=2> <bean:message key="label.learning.viewOnly"/> </font></b>
+		<table width="80%" cellspacing="8" align="CENTER">
+			<tr> <th scope="col">
+				<bean:message key="label.learning.viewOnly"/>
+			 </th>
+			</tr>
+		</table>				
 	</c:if> 				    
 
 		<c:set var="monitoringURL">
@@ -88,9 +100,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	  <html:form  action="/monitoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
 		<html:hidden property="method"/>	 
 
-			<div class="tabbody content_b" >
-				<jsp:include page="/monitoring/SummaryContent.jsp" />
-			</div>		         
+			<jsp:include page="/monitoring/SummaryContent.jsp" />
 
 			<c:if test="${ requestLearningReportViewOnly != 'true'}"> 			
 				<table align=right> 	  
@@ -111,7 +121,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 </c:if> 				    
 
 <c:if test="${ requestLearningReportProgress == 'true'}"> 			
-		 <font size=2> <b> <bean:message key="label.learner.progress"/> </b> </font>
+		<table width="80%" cellspacing="8" align="CENTER">
+			<tr> <th scope="col">
+				<bean:message key="label.learner.progress"/>
+			 </th>
+			</tr>
+		</table>						 
 
 		<c:set var="monitoringURL">
 			<html:rewrite page="/monitoring.do" />
@@ -120,9 +135,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	  <html:form  action="/monitoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
 		<html:hidden property="method"/>	 
 
-			<div class="tabbody content_b" >
 				<jsp:include page="/monitoring/SummaryContent.jsp" />
-			</div>		         
+
 	</html:form>
 </c:if> 				    
 
