@@ -28,20 +28,30 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="fck-editor" prefix="FCK" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
+
+<html:html locale="true">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<jsp:include page="/learning/learningHeader.jsp" />
+</head>
+<body>
+
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
 		<html:form  action="/learning?method=displayMc&validate=false" method="POST" target="_self">
-				<table align=center bgcolor="#FFFFFF">
+				<table width="80%" cellspacing="8" align="CENTER" class="forms">
 					  <tr>
-					  	<td NOWRAP align=left class="input" valign=top bgColor="#333366" colspan=2> 
-						  	<font size=2 color="#FFFFFF"> <b>  <bean:message key="label.assessment"/> </b> </font>
-					  	</td>
+					  	<th scope="col" valign=top colspan=2> 
+						    <bean:message key="label.assessment"/> 
+					  	</th>
 					  </tr>
 				
 			 		<c:if test="${sessionScope.isRetries == 'true'}"> 		
 						  <tr>
-						  	<td NOWRAP align=center class="input" valign=top colspan=2> 
+						  	<td NOWRAP align=center valign=top colspan=2> 
 							  	<font size=3> <b>  <bean:message key="label.individual.results.withRetries"/> </b> </font>
 						  	</td>
 						  </tr>
@@ -49,7 +59,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 					<c:if test="${sessionScope.isRetries == 'false'}"> 							  
 						  <tr>
-						  	<td NOWRAP align=center class="input" valign=top colspan=2> 
+						  	<td NOWRAP align=center valign=top colspan=2> 
 							  	<font size=3> <b>  <bean:message key="label.individual.results.withoutRetries"/> </b> </font>
 						  	</td>
 						  </tr>
@@ -57,20 +67,20 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 					  <tr>
-					  	<td NOWRAP align=center class="input" valign=top colspan=2> 
+					  	<td NOWRAP align=center valign=top colspan=2> 
 						  	<font size=3>  <bean:message key="label.learner.redo"/> </font>
 					  	</td>
 					  </tr>	
 
 					  <tr>
-					  	<td NOWRAP align=right class="input" valign=top colspan=2> 
+					  	<td NOWRAP align=right valign=top colspan=2> 
 							&nbsp
 					  	</td>
 					  </tr>	
 
 
 					  <tr>
-					  	<td NOWRAP align=center class="input" valign=top colspan=2> 
+					  	<td NOWRAP align=center valign=top colspan=2> 
 						  	<font size=2>  <bean:message key="label.learner.bestMark"/>
 						  	<b>   <c:out value="${sessionScope.learnerBestMark}"/> </b> 
 						  	<bean:message key="label.outof"/> 
@@ -79,14 +89,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					  </tr>	
 					  
 					<tr> 
-				 		<td NOWRAP colspan=2 class="input" valign=top> 
+				 		<td NOWRAP colspan=2 valign=top> 
 				 		&nbsp
 				 		</td>
 			  	   </tr>
 					  
 					  
 				  <tr>
-				  	<td NOWRAP colspan=2 align=center class="input" valign=top> 
+				  	<td NOWRAP colspan=2 align=center valign=top> 
 					  	<font size=2>
 				  			<html:submit property="viewAnswers" styleClass="button">
 								<bean:message key="label.view.answers"/>
@@ -98,5 +108,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						</font>
 				  	 </td>
 				  </tr>
-		</html:form>
+
+</html:form>	
+
+</body>
+</html:html>
 

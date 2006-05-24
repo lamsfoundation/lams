@@ -31,17 +31,27 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
+
+<html:html locale="true">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<jsp:include page="/learning/learningHeader.jsp" />
+</head>
+<body>
+
 		<html:form  action="/learning?method=displayMc&validate=false" method="POST" target="_self">
-				<table align=center bgcolor="#FFFFFF">
+				<table width="80%" cellspacing="8" align="CENTER" class="forms">
 					  <tr>
-					  	<td NOWRAP align=left class="input" valign=top bgColor="#333366" colspan=2> 
-						  	<font size=2 color="#FFFFFF"> <b>  <bean:message key="label.assessment"/> </b> </font>
-					  	</td>
+					  	<th scope="col" valign=top colspan=2> 
+						  	  <bean:message key="label.assessment"/> 
+					  	</th>
 					  </tr>
 				
 			 		<c:if test="${sessionScope.isRetries == 'true'}"> 		
 						  <tr>
-						  	<td NOWRAP align=center class="input" valign=top colspan=2> 
+						  	<td NOWRAP align=center valign=top colspan=2> 
 							  	<font size=3> <b>  <bean:message key="label.withRetries.results.summary"/> </b> </font>
 						  	</td>
 						  </tr>
@@ -49,7 +59,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 					<c:if test="${sessionScope.isRetries != 'true'}"> 							  
 						  <tr>
-						  	<td NOWRAP align=center class="input" valign=top colspan=2> 
+						  	<td NOWRAP align=center valign=top colspan=2> 
 							  	<font size=3> <b>  <bean:message key="label.withoutRetries.results.summary"/> </b> </font>
 						  	</td>
 						  </tr>
@@ -57,14 +67,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 					  <tr>
-					  	<td NOWRAP align=left class="input" valign=top colspan=2> 
+					  	<td NOWRAP align=left valign=top colspan=2> 
 						  	<font size=2>  <c:out value="${sessionScope.countSessionComplete}"/> <bean:message key="label.learnersFinished.simple"/> 
 						  	</font>
 					  	</td>
 					  </tr>	
 
 					<tr>
-						<td NOWRAP align=right class="input" valign=top colspan=2> 
+						<td NOWRAP align=right valign=top colspan=2> 
 							<hr>
 						</td> 
 					</tr>
@@ -72,9 +82,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 					 <tr>
 					 <td> 
-		 				<table align=center bgcolor="#FFFFFF">
+		 				<table align=center>
 						  <tr>
-						  	<td NOWRAP align=left class="input" valign=top colspan=2> 
+						  	<td NOWRAP align=left valign=top colspan=2> 
 							  	<font size=2> <b>  <bean:message key="label.topMark"/> </b> </font> 
 							 </td> 
 							 <td NOWRAP align=right>	
@@ -85,7 +95,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						  </tr>	
 	
 						  <tr>
-						  	<td NOWRAP align=left class="input" valign=top colspan=2> 
+						  	<td NOWRAP align=left valign=top colspan=2> 
 							  	<font size=2> <b>  <bean:message key="label.avMark"/> </b>  </font>
 						  	</td>
 						  	<td NOWRAP align=right>
@@ -96,7 +106,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						  </tr>	
 	
 						  <tr>
-						  	<td NOWRAP align=left class="input" valign=top colspan=2> 
+						  	<td NOWRAP align=left valign=top colspan=2> 
 							  	<font size=2> <b>  <bean:message key="label.loMark"/> </b> </font>
 						  	</td>
 						  	<td NOWRAP align=right>
@@ -111,14 +121,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</tr>
 
 			  	   	<tr> 
-				 		<td NOWRAP colspan=2 class="input" valign=top> 
+				 		<td NOWRAP colspan=2 valign=top> 
 				 		&nbsp
 				 		</td>
 			  	   </tr>
 
 			 		<c:if test="${sessionScope.isRetries == 'true'}"> 					  	   
 		  	   		  <tr>
-					  	<td NOWRAP colspan=2 align=center class="input" valign=top> 
+					  	<td NOWRAP colspan=2 align=center valign=top> 
 						  	<font size=2>
 					  			<html:submit property="redoQuestions" styleClass="button">
 									<bean:message key="label.redo.questions"/>
@@ -134,7 +144,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 					<c:if test="${sessionScope.isRetries != 'true'}"> 							  
 		  	   		  <tr>
-		  	   		    <td NOWRAP colspan=2 align=right class="input" valign=top>
+		  	   		    <td NOWRAP colspan=2 align=right valign=top>
 			  	   		    <font size=2>
 						  	   <html:submit property="learnerFinished" styleClass="button">
 											<bean:message key="label.finished"/>
@@ -145,4 +155,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</c:if> 																		
 				</table>
 	</html:form>
+
+</body>
+</html:html>
+
 

@@ -19,7 +19,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
-
 <%@ taglib uri="tags-bean" prefix="bean"%> 
 <%@ taglib uri="tags-html" prefix="html"%>
 <%@ taglib uri="tags-logic" prefix="logic" %>
@@ -32,14 +31,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
-	<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-	<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
-	
-	<html:html locale="true">
-	<head>
-		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-	<title> <bean:message key="label.exportPortfolio"/> </title>
-	
+	<title> <bean:message key="label.learning"/> </title>
 	 <lams:css/>
 	<!-- depending on user / site preference this will get changed probably use passed in variable from flash to select which one to use-->
 
@@ -49,38 +41,25 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
     <link href="${lams}css/fckeditor_style.css" rel="stylesheet" type="text/css">
 
 	<script language="JavaScript" type="text/JavaScript">
+
+		
+		function submitMethod(actionMethod) 
+		{
+			document.McLearningForm.method.value=actionMethod; 
+			document.McLearningForm.submit();
+		}
+		
+		function MM_reloadPage(init) {  //reloads the window if Nav4 resized
+		  if (init==true) with (navigator) {if ((appName=="Netscape")&&(parseInt(appVersion)==4)) {
+		    document.MM_pgW=innerWidth; document.MM_pgH=innerHeight; onresize=MM_reloadPage; }}
+		  else if (innerWidth!=document.MM_pgW || innerHeight!=document.MM_pgH) location.reload();
+		}
+
     	var imgRoot="${lams}images/";
 	    var themeName="aqua";
+        
 	</script>
 	
 	<script type="text/javascript" src="<c:out value="${lams}"/>includes/javascript/tabcontroller.js"></script>    
 	<script type="text/javascript" src="<c:out value="${lams}"/>includes/javascript/common.js"></script>
 	
-	</head>
-
-	<body>
-
-   		<h1><bean:message key="label.exportPortfolio.simple"/></h1>
-		<h2><bean:message key="label.tool.shortname"/></h2>
-		<br>
-		<div id="datatablecontainer">
-			<table width="100%" border="0" cellspacing="0" cellpadding="0">
-				<tr>
-					<td align="center">
-					<c:out value="${McExportForm.title}" escapeXml="false"/>
-					</td>
-				</tr>
-				<tr>
-					<td>&nbsp;</td>
-					<td>&nbsp;</td>
-				</tr>
-				<tr>
-					<td align="left">
-						<c:out value="${McExportForm.content}" escapeXml="false"/>
-					</td>
-				</tr>
-			</table>
-		</div>
-
-	</body>
-</html:html>

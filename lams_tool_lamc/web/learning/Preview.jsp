@@ -1,4 +1,3 @@
-<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
 <%-- 
 Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
 License Information: http://lamsfoundation.org/licensing/lams/2.0/
@@ -33,11 +32,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
+
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html:html>
+<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
+
+<html:html locale="true">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<title> <bean:message key="label.preview"/> </title>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title> <bean:message key="label.preview"/> </title>
+
+<lams:css/>
 	<script language="JavaScript" type="text/JavaScript">
 		function submitMethod(actionMethod) 
 		{
@@ -46,20 +50,20 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		}
 	</script>
 </head>
+
 <body>
 <html:form  action="/learning?method=displayMc&validate=false" method="POST" target="_self">
-	<!--options content goes here-->
-				<table align=center bgcolor="#FFFFFF">
+				<table width="80%" cellspacing="8" align="CENTER" class="forms">
 					  <tr>
-					  	<td NOWRAP align=left class="input" valign=top bgColor="#333366" colspan=2> 
-						  	<font size=2 color="#FFFFFF"> <b>  <bean:message key="label.assessment"/> </b> </font>
-					  	</td>
+					  	<th scope="col" valign=top colspan=2> 
+						  	 <bean:message key="label.assessment"/> 
+					  	</th>
 					  </tr>
 					  
 
 			 		<c:if test="${sessionScope.isRetries == 'true'}"> 		
 					  <tr>
-					  	<td NOWRAP align=center class="input" valign=top colspan=2> 
+					  	<td NOWRAP align=center valign=top colspan=2> 
 						  	<font size=3> <b>  <bean:message key="label.withRetries"/> </b> </font>
 					  	</td>
 					  </tr>
@@ -67,7 +71,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				
 					<c:if test="${sessionScope.isRetries == 'false'}"> 		
 					  <tr>
-					  	<td NOWRAP align=center class="input" valign=top colspan=2> 
+					  	<td NOWRAP align=center valign=top colspan=2> 
 						  	<font size=3> <b>  <bean:message key="label.withoutRetries"/> </b> </font>
 					  	</td>
 					  </tr>
@@ -75,7 +79,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 			 		<c:if test="${sessionScope.isRetries == 'true' && sessionScope.passMark > 0}"> 		
 					  <tr>
-					  	<td NOWRAP align=left class="input" valign=top colspan=2> 
+					  	<td NOWRAP align=left valign=top colspan=2> 
 						  	<font size=2> <b>  <bean:message key="label.learner.message"/> (<c:out value="${sessionScope.passMark}"/><bean:message key="label.percent"/> ) 
 						  	</b> </font>
 					  	</td>
@@ -86,12 +90,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<c:forEach var="questionEntry" items="${sessionScope.mapQuestionContentLearner}">
 					<c:set var="mainQueIndex" scope="session" value="${mainQueIndex +1}"/>
 						  <tr>
-						  	<td NOWRAP align=left class="input" valign=top bgColor="#999966" colspan=2> 
-							  	<font color="#FFFFFF"> 
+						  	<td NOWRAP align=left valign=top colspan=2> 
 								  	<font size=2>
 								  		<c:out value="${questionEntry.value}"/> 
-							  		</font>
-							  	</font> 
+								  	</font> 
 						  	</td>
 						  </tr>
 
@@ -115,14 +117,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 																<c:if test="${subEntry.key == selectedSubEntry.key}"> 		
 									  							
 																	<tr> 
-																		<td NOWRAP align=left class="input" valign=top> 
+																		<td NOWRAP align=left valign=top> 
 																			<font size=2>
 																				<input type="checkbox" name=optionCheckBox/>
 																			</font>
 																		</td> 
-																		<td NOWRAP align=left class="input" valign=top> 
+																		<td NOWRAP align=left valign=top> 
 																			<font size=2>
-																				<font color="#CCCC99"> 	<c:out value="${subEntry.value}"/> </font>
+																					<c:out value="${subEntry.value}"/> 
 																			</font>
 																		</td>
 																	</tr>	
@@ -136,13 +138,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 												<c:if test="${requestScope.checkedOptionFound == 0}"> 		
 																	<tr> 
-																		<td NOWRAP align=left class="input" valign=top> 
+																		<td NOWRAP align=left valign=top> 
 																			<font size=2>
 																				<input type="checkbox" name=optionCheckBox/>																			</font>
 																		</td> 
-																		<td NOWRAP align=left class="input" valign=top> 
+																		<td NOWRAP align=left valign=top> 
 																			<font size=2>
-																				<font color="#CCCC99"> <c:out value="${subEntry.value}"/> </font>
+																				 <c:out value="${subEntry.value}"/> 
 																			</font>
 																		</td>
 																	</tr>	
