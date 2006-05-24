@@ -48,7 +48,7 @@ class org.lamsfoundation.lams.wizard.Application extends ApplicationParent {
     
     private static var WIZARD_X:Number = 0;
     private static var WIZARD_Y:Number = 0;
-    private static var WIZARD_W:Number = 550;
+    private static var WIZARD_W:Number = 584;
     private static var WIZARD_H:Number = 550;
     
     private static var APP_ROOT_DEPTH:Number = 10; //depth of the application root
