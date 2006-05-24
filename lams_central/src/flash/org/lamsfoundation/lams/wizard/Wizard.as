@@ -92,7 +92,7 @@ class Wizard {
 
         //Set the position by setting the model which will call update on the view
         wizardModel.setPosition(x,y);
-		wizardModel.setSize(w,h);
+		wizardModel.setSize(Stage.width,Stage.height);
 		//wizardModel.initOrganisationTree();
 		
 	}
