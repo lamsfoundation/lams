@@ -125,7 +125,6 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 			return (mapping.findForward(ERROR_LIST));
 		
 		request.getSession().setAttribute(CURRENT_MONITORING_TAB, "summary");
-		request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(false).toString());
 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 		
 		request.getSession().setAttribute(ACTIVE_MODULE, DEFINE_LATER);
@@ -146,17 +145,7 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 
 		McContent mcContent=mcService.retrieveMc(toolContentId);
 		logger.debug("mcContent:" + mcContent);
-		boolean isContentInUse=McUtils.isContentInUse(mcContent);
-		logger.debug("isContentInUse:" + isContentInUse);
-		
-		request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(false).toString());
-		if (isContentInUse == true)
-		{
-			//McUtils.cleanUpSessionAbsolute(request);
-			logger.debug("monitoring url does not allow editActivity since the content is in use.");
-	    	persistError(request,"error.content.inUse");
-	    	request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(true).toString());
-		}
+
 		
 	    /* it is possible that no users has ever logged in for the activity yet*/ 
 	    int countAllUsers=mcService.getTotalNumberOfUsers();
@@ -258,6 +247,18 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 		logger.debug("SELECTION_CASE: " + request.getSession().getAttribute(SELECTION_CASE));
 		logger.debug("LIST_MONITORED_ANSWERS_CONTAINER_DTO: " + request.getSession().getAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO));
 
+		boolean isContentInUse=McUtils.isContentInUse(mcContent);
+		logger.debug("isContentInUse:" + isContentInUse);
+		
+		request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(false).toString());
+		if (isContentInUse == true)
+		{
+			logger.debug("monitoring url does not allow editActivity since the content is in use.");
+	    	persistError(request,"error.content.inUse");
+	    	request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(true).toString());
+		}
+		logger.debug("final IS_MONITORED_CONTENT_IN_USE: " + request.getSession().getAttribute(IS_MONITORED_CONTENT_IN_USE));
+		
 	    return (mapping.findForward(LOAD_MONITORING_CONTENT));	
 	}
 

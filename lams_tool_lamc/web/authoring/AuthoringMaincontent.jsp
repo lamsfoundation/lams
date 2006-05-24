@@ -51,6 +51,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<!DOCTYPE HTML PUBLIC "-//W3C//DTD hTML 4.01 Transitional//EN">
 	<html:html locale="true">
 	<head>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 		<lams:headItems/>
 		<title><fmt:message key="activity.title" /></title>
 	
