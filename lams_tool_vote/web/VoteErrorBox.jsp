@@ -32,13 +32,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
+	
 	<!DOCTYPE HTML PUBLIC "-//W3C//DTD hTML 4.01 Transitional//EN">
+	<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
 	<html:html locale="true">
 	<head>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-	<title> <bean:message key="label.warning"/> </title>
-	
 	 <lams:css/>
+
 	<!-- depending on user / site preference this will get changed probably use passed in variable from flash to select which one to use-->
 
  	<!-- ******************** FCK Editor related javascript & HTML ********************** -->
