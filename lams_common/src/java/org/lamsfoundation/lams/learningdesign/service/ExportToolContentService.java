@@ -109,7 +109,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	// Private methods
 	//******************************************************************
 	private ILearningDesignService getLearningDesignService(){
-		return (ILearningDesignService) applicationContext.getBean(AuthoringConstants.LEARNING_DESIGN_SERVICE_BEAN_NAME);		
+		return (ILearningDesignService) applicationContext.getBean(LEARNING_DESIGN_SERVICE_BEAN_NAME);		
 	}
 	
 	private String getFullPath(String path, String file){
