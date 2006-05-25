@@ -120,6 +120,9 @@ class WizardView extends AbstractView {
 	private var prev_btn:Button;
 	private var close_btn:Button;
 	
+	private var desc_txa:TextArea;
+	private var desc_scr:MovieClip;
+	
 	private var _resultDTO:Object;
 
 	private var _wizardController:WizardController;
@@ -897,6 +900,15 @@ class WizardView extends AbstractView {
 		_summery_mc.classname_txt.text = resultDTO.className;
 		_summery_mc.staff_txt.text = String(resultDTO.selectedStaff.length) + '/' + staffList.length;
 		_summery_mc.learners_txt.text = String(resultDTO.selectedLearners.length) + '/' + learnerList.length;
+		//_summery_mc.redraw(true);
+		
+		trace('text height ' + _summery_mc.desc_txt.textHeight);
+		trace(_summery_mc.desc_scr);
+		if(_summery_mc.desc_txt.textHeight <= 69){
+			trace('making in visible');
+			_summery_mc.desc_scr._visible = false;
+		}
+		
 	}
 	
 	
