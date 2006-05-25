@@ -71,6 +71,7 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteUploadedFile;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.springframework.dao.DataAccessException;
 
 /**
@@ -104,6 +105,7 @@ public class VoteServicePOJO implements
 	private IVoteUploadedFileDAO  	voteUploadedFileDAO;
     private IUserManagementService 	userManagementService;
     private ILearnerService 		learnerService;
+    private IAuditService 			auditService;
     private ILamsToolService 		toolService;
     private IToolContentHandler voteToolContentHandler = null;
     
@@ -461,6 +463,9 @@ public class VoteServicePOJO implements
     {
 	   try
         {
+			auditService.logShowEntry(MY_SIGNATURE, voteQueUsr.getQueUsrId(), 
+			        voteQueUsr.getUsername(), voteQueUsr.toString());
+
 	   		voteUserDAO.saveVoteUser(voteQueUsr);
         }
         catch (DataAccessException e)
@@ -521,6 +526,9 @@ public class VoteServicePOJO implements
     {
         try
         {
+			auditService.logShowEntry(MY_SIGNATURE, voteUsrAttempt.getQueUsrId(), 
+			        voteUsrAttempt.getVoteQueUsr().getUsername(), voteUsrAttempt.toString());
+
         	voteUsrAttemptDAO.saveVoteUsrAttempt(voteUsrAttempt);
         }
         catch (DataAccessException e)
@@ -729,6 +737,9 @@ public class VoteServicePOJO implements
     {
         try
         {
+			auditService.logShowEntry(MY_SIGNATURE, voteUsrAttempt.getQueUsrId(), 
+			        voteUsrAttempt.getVoteQueUsr().getUsername(), voteUsrAttempt.toString());
+
         	voteUsrAttemptDAO.updateVoteUsrAttempt(voteUsrAttempt);
         }
         catch (DataAccessException e)
@@ -1127,6 +1138,9 @@ public class VoteServicePOJO implements
 	{
     	try
         {
+			auditService.logShowEntry(MY_SIGNATURE, attempt.getQueUsrId(), 
+			        attempt.getVoteQueUsr().getUsername(), attempt.toString());
+
     		voteUsrAttemptDAO.removeVoteUsrAttempt(attempt);
         }
         catch(DataAccessException e)
@@ -1158,6 +1172,9 @@ public class VoteServicePOJO implements
     {
     	try
         {
+			auditService.logShowEntry(MY_SIGNATURE, voteQueUsr.getQueUsrId(), 
+			        voteQueUsr.getUsername(), voteQueUsr.toString());
+    	    
     		voteUserDAO.removeVoteUser(voteQueUsr);
         }
         catch(DataAccessException e)
@@ -2469,5 +2486,17 @@ public class VoteServicePOJO implements
      */
     public static void setLogger(Logger logger) {
         VoteServicePOJO.logger = logger;
+    }
+    /**
+     * @return Returns the auditService.
+     */
+    public IAuditService getAuditService() {
+        return auditService;
+    }
+    /**
+     * @param auditService The auditService to set.
+     */
+    public void setAuditService(IAuditService auditService) {
+        this.auditService = auditService;
     }
 }
