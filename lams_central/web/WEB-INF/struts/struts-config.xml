@@ -90,8 +90,13 @@
         redirect="false"
       />
       <forward
-        name="staff"
-        path="/staff.jsp"
+        name="monitorLesson"
+        path="/monitorLesson.jsp"
+        redirect="false"
+      />
+      <forward
+        name="addLesson"
+        path="/addLesson.jsp"
         redirect="false"
       />
       <forward

@@ -45,7 +45,8 @@ String serverLanguage = Configuration.get(ConfigurationKeys.SERVER_LANGUAGE);
 String languageDate = Configuration.getDictionaryDateForLanguage(serverLanguage);
 %>
 
-<c:set var="monitoringurl">lams_monitoring.swf?userID=<lams:user property="userID"/>&serverURL=<lams:LAMSURL/>&build=<%=clientVersion%>&lang=<%=serverLanguage%>&date=<%=languageDate%>&theme=<lams:user property="flashTheme"/></c:set>
+<%-- courseID and classID are passed in as request parameters by addLesson.jsp in lams_central. --%>
+<c:set var="monitoringurl">lams_wizard.swf?userID=<lams:user property="userID"/>&serverURL=<lams:LAMSURL/>&build=<%=clientVersion%>&lang=<%=serverLanguage%>&date=<%=languageDate%>&theme=<lams:user property="flashTheme"/>&courseID=<c:out value="${param.courseID}"/>&classID=<c:out value="${param.classID}"/></c:set>
 
 <!-- URL's used in the movie-->
 <!-- text used in the movie-->

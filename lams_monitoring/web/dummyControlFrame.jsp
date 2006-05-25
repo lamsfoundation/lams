@@ -39,9 +39,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 </head>
   <body>
   
-    <H2>Flash Interface</H2>
-    <p>Switch to the <A HREF="monitor.jsp" target="tWindow">Flash interface<a/> (under development).</p>
-    
 	<H2>Select a lesson</H2>
 	
 	<p>Note: If you archive a lesson, it can no longer be accessed. This is a temporary restriction.</p>

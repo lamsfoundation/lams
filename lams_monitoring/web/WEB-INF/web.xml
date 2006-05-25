@@ -73,8 +73,8 @@
 
    </servlet>
    <servlet>
-      <servlet-name>createLesson</servlet-name>
-      <servlet-class>org.lamsfoundation.lams.monitoring.web.CreateLessionServlet</servlet-class>
+      <servlet-name>createLessonClass</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.monitoring.web.CreateLessonServlet</servlet-class>
 
    </servlet>
 
@@ -110,8 +110,8 @@
       <url-pattern>/monitoring/performChosenGrouping</url-pattern>
    </servlet-mapping>
    <servlet-mapping>
-      <servlet-name>createLesson</servlet-name>
-      <url-pattern>/monitoring/createLesson</url-pattern>
+      <servlet-name>createLessonClass</servlet-name>
+      <url-pattern>/createLessonClass</url-pattern>
    </servlet-mapping>
 
    <session-config>

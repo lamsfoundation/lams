@@ -3,7 +3,7 @@
 
 <HTML>
 <HEAD>
-<META HTTP-EQUIV="Refresh" CONTENT="0;URL=learning/main.jsp?lessonID=<c:out value="${lessonID}"/>">
+<META HTTP-EQUIV="Refresh" CONTENT="0;URL=monitoring/monitorLesson.jsp?lessonID=<c:out value="${lessonID}"/>"/>
 
 <TITLE>Learner:: LAMS</TITLE>
 </HEAD>

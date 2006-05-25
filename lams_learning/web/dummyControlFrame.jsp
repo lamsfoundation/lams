@@ -52,9 +52,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</head>
 	<body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
 
-	   <H2>Flash Interface</H2>
-		<p>Switch to the <A HREF="controlFrame.jsp">Flash interface<a/> (under development).</p>
-
 		<h2>Available Lessons</H2>
 		<table width="100%" border="0" cellspacing="2" cellpadding="2" summary="This table is being used for layout purposes only">
 			<TR><TD><A HREF="<lams:WebAppURL/>dummylearner.do?method=getActiveLessons">Refresh List</A></TD></TR>

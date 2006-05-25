@@ -5,20 +5,19 @@
 <%@ page import="org.lamsfoundation.lams.usermanagement.service.UserManagementService" %>
 <%@ page import="org.lamsfoundation.lams.usermanagement.Role" %>
 <%@ page import="org.lamsfoundation.lams.usermanagement.User" %>
+<%@ page import="org.lamsfoundation.lams.lesson.Lesson" %>
 <%@ page import="org.lamsfoundation.lams.usermanagement.dto.OrganisationDTO" %>
+<%@ page import="org.apache.commons.collections.functors.WhileClosure" %>
+
 <%@ taglib uri="http://java.sun.com/jstl/core" prefix="c" %>
-<html>
-<head>
-	<script language="JavaScript" type="text/javascript" src="includes/javascript/getSysInfo.js"></script>
-	<script language="JavaScript" type="text/javascript" src="includes/javascript/openUrls.js"></script>
-</head>
+
 <form name="form" method="post">
 <table width="98%" height="100%" border="0" align="center" cellpadding="2" cellspacing="0">
 	<tr>
 		<td align="center" valign="middle"><img height="7" src="images/spacer.gif" width="10" alt="spacer.gif"/></td>
 	</tr>
 	<tr>
-		<td height="100%" valign="top">
+		<td valign="top">
 			<%String login = request.getRemoteUser();
 			WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(request.getSession().getServletContext()); 
 			UserManagementService service = (UserManagementService)ctx.getBean("userManagementServiceTarget");
@@ -28,98 +27,121 @@
 				in but we didn't get the username. Try closing your browser and starting
 				again.</p>
 			<%}%>
-			<table width="70%" height="100%" border="0" align="center" cellpadding="2" cellspacing="0">
+		</td>
+	</tr>
+	<tr>
+		<td valign="top">
+			<table height="100%" border="0" align="center" cellpadding="2" cellspacing="0">
 				<tr>
-					<td width="50%" align="left" valign="top" >
+					<td align="center" valign="top" colspan="2">
 						<p class="mainHeader">Welcome <%=user.getFirstName()%></p>
-						<p class="body">
-							You are logged into LAMS.Please choose a workspace from the buttons on the right or
-							<a href="home.do?method=passwordChange"> Change Password </a>here.			
-						</p>
-						<script language="JavaScript" type="text/javascript">
-						<!--
-							// if it's a mac i can't just focus as i don't know if the window is open or not,
-							// need to give this warning.
-							if(isMac)
-							{
-								document.writeln(
-								'<p class="note">Note: If your workspace is already open' +
-								' clicking the button will re-load the window and unsaved work' +
-								' may be lost.</p>' );
-							}
-						//-->
-						</script>
-					</td>
-					<td width="50%" align="right" valign="top">
-						<table border="0" cellpadding="0" cellspacing="3">
-							<!-- If we are a sysadmin for any org, then we are sysadmin for everything -->
-							<% ArrayList roleList = new ArrayList();
-							   roleList.add(Role.SYSADMIN);
-							   OrganisationDTO orgDTO = service.getOrganisationsForUserByRole(user,roleList);
-								if(orgDTO!=null){%>
-								<tr>
-									<td align="left" colspan="4">
-										<input name="sysadmin" type="button" id="sysadmin" onClick="openSysadmin(1);" value="System Adminstration"/>
-									</td>
-								</tr>
-							<%}%>
-							<%orgDTO = service.getOrganisationsForUserByRole(user,null);
-	  						  if(orgDTO!=null){
-	  						  		Vector courses = orgDTO.getNodes();
-	  						  		Iterator courseIter = courses.iterator();
-	  						  		while ( courseIter.hasNext() ) {
-	  						  		
-										OrganisationDTO course = (OrganisationDTO)courseIter.next();%>
-	
-										<tr><td align="left">Course: <%=course.getName()%>:</td>
-										<td align="left" >
-										<% Vector roleNames	= course.getRoleNames();
-											if ( roleNames.contains(Role.AUTHOR) ) {%>
-											    <input name="author" type="button" id="author" onClick="openAuthor(<%=course.getOrganisationID()%>);" value="Author"/> 
-										<% } %> 
-										</td>
-										<td align="left" >
-										<% if ( roleNames.contains(Role.STAFF) || roleNames.contains(Role.TEACHER) ) {%>
-												<input name="staff" type="button" id="staff" onClick="openStaff(<%=course.getOrganisationID()%>);" value="Staff"/>
-	 							    	<% } %> 
-		 							    </td>
-										<td align="left" >
-										<% if ( roleNames.contains(Role.LEARNER) ) {%>
-												<input name="learner" type="button" id="learner" onClick="openLearner(<%=course.getOrganisationID()%>);" value="Learner"/>
-	 								    <% } %> 
-		 							    </td>
-		 							    </tr>
-		 							    
-		 							    <% 
-		 							    Vector classes = course.getNodes();
-		  						  		Iterator classIter = classes.iterator();
-		  						  		while ( classIter.hasNext() ) {
-		  									OrganisationDTO courseClass = (OrganisationDTO)classIter.next(); %>
-		  											  		
-											<tr><td align="left">Class: <%=courseClass.getName()%>:</td>
-											<td align="left" >
-											<% Vector classRoleNames	= courseClass.getRoleNames();
-												if ( classRoleNames.contains(Role.AUTHOR) ) {%>
-												    <input name="author" type="button" id="author" onClick="openAuthor(<%=courseClass.getOrganisationID()%>);" value="Author"/> 
-											<% } %> 
-											</td>
-											<td align="left" >
-											<% if ( classRoleNames.contains(Role.STAFF) || classRoleNames.contains(Role.TEACHER) ) {%>
-													<input name="staff" type="button" id="staff" onClick="openStaff(<%=courseClass.getOrganisationID()%>);" value="Staff"/>
-		 							    	<% } %> 
-			 							    </td>
-											<td align="left" >
-											<% if ( classRoleNames.contains(Role.LEARNER) ) {%>
-													<input name="learner" type="button" id="learner" onClick="openLearner(<%=courseClass.getOrganisationID()%>);" value="Learner"/>
-		 								    <% } %> 
-			 							    </td>
-											</tr>
-		  						  		<% }%>
-		  						  <% } %>
-							<%}%>
-						</table>
 					</td>
 				</tr>
+				<tr>
+				<td align="center" colspan="2">
+					<!-- If we are a sysadmin for any org, then we are sysadmin for everything -->
+					<% ArrayList roleList = new ArrayList();
+					   roleList.add(Role.SYSADMIN);
+					   OrganisationDTO orgDTO = service.getOrganisationsForUserByRole(user,roleList);
+						if(orgDTO!=null){%>
+							<input name="sysadmin" type="button" id="sysadmin" onClick="openSysadmin(1);" value="System Adminstration"/>
+					<%}%>
+					<!-- If we are a author for any org, then we show the authoring button once -->
+					<% roleList.clear();
+					   roleList.add(Role.AUTHOR);
+					   orgDTO = service.getOrganisationsForUserByRole(user,roleList);
+						if(orgDTO!=null){%>
+							 <input name="author" type="button" id="author" onClick="openAuthor(1);" value="Author"/>
+					<%}
+					   roleList.clear();
+					   roleList.add(Role.STAFF);
+					   roleList.add(Role.TEACHER); 
+					   orgDTO = service.getOrganisationsForUserByRole(user,roleList);
+						if(orgDTO!=null){%>
+					   <A HREF="monitoring/dummy.jsp" target="mWindow"/>Dummy Monitoring Screen</A>
+					<%}
+					   roleList.clear();
+					   roleList.add(Role.LEARNER);
+					   orgDTO = service.getOrganisationsForUserByRole(user,roleList);
+						if(orgDTO!=null){%>
+					   <A HREF="learning/dummymain.jsp" target="lWindow"/>Dummy Learning Screen</A>
+					<%}%>
+				</td>
+				</tr>
+
+				<%orgDTO = service.getOrganisationsForUserByRole(user,null);
+				  if(orgDTO!=null){
+						Vector courses = orgDTO.getNodes();
+						Iterator courseIter = courses.iterator();
+						while ( courseIter.hasNext() ) {
+						
+							OrganisationDTO course = (OrganisationDTO)courseIter.next();%>
+
+							<tr><td align="left">Course: <%=course.getName()%>:</td>
+							<td align="right" >
+							<% Vector roleNames	= course.getRoleNames();
+								if ( roleNames.contains(Role.STAFF) || roleNames.contains(Role.TEACHER) ) {%>
+									<input name="addLesson" type="button" id="addLesson" onClick="openAddLesson(<%=course.getOrganisationID()%>,null);" value="Add Lesson"/>
+							</td>
+							</tr>
+							<%		List lessons = service.getMonitorLessonsFromOrganisation(user.getUserId(),course.getOrganisationID());
+									Iterator lessonIterator = lessons.iterator();
+									while ( lessonIterator.hasNext() ) {
+										Lesson lesson = (Lesson) lessonIterator.next();
+							%>
+										<TR><TD align="left">Lesson: <%=lesson.getLessonName()%></TD>
+										<TD align="right"><input name="monitorLesson" type="button" id="monitorLesson" onClick="openMonitorLesson(<%=lesson.getLessonId()%>);" value="Monitoring"/></TD></TR>
+							<%		}
+								} %> 
+							<%		List lessons = service.getLearnerLessonsFromOrganisation(user.getUserId(),course.getOrganisationID());
+									Iterator lessonIterator = lessons.iterator();
+									while ( lessonIterator.hasNext() ) {
+										Lesson lesson = (Lesson) lessonIterator.next();
+							%>
+										<TR><TD align="left">Lesson: <%=lesson.getLessonName()%></TD>
+										<TD align="right"><input name="learner" type="button" id="learner" onClick="openLearner(<%=lesson.getLessonId()%>);" value="Learner"/></TD></TR>
+							<%		} %>
+							
+							<% 
+							Vector classes = course.getNodes();
+							Iterator classIter = classes.iterator();
+							while ( classIter.hasNext() ) {
+								OrganisationDTO courseClass = (OrganisationDTO)classIter.next(); %>
+												
+								<tr><td align="left">Class: <%=courseClass.getName()%>:</td>
+								<td align="right" >
+								<% Vector classRoleNames	= course.getRoleNames();
+									if ( classRoleNames.contains(Role.STAFF) || classRoleNames.contains(Role.TEACHER) ) {%>
+									<input name="addLesson" type="button" id="addLesson" onClick="openAddLesson(<%=course.getOrganisationID()%>,<%=courseClass.getOrganisationID()%>);" value="Add Lesson"/>
+								</td>
+								</tr>
+								<%		lessons = service.getMonitorLessonsFromOrganisation(user.getUserId(),courseClass.getOrganisationID());
+										lessonIterator = lessons.iterator();
+										while ( lessonIterator.hasNext() ) {
+											Lesson lesson = (Lesson) lessonIterator.next();
+								%>
+											<TR><TD align="left">Lesson: <%=lesson.getLessonName()%></TD>
+											<TD align="right"><input name="monitorLesson" type="button" id="monitorLesson" onClick="openMonitorLesson(<%=lesson.getLessonId()%>);" value="Monitoring"/></TD></TR>
+								<%		} 
+								
+								 } %> 
+								<%		lessons = service.getLearnerLessonsFromOrganisation(user.getUserId(),courseClass.getOrganisationID());
+										lessonIterator = lessons.iterator();
+										while ( lessonIterator.hasNext() ) {
+											Lesson lesson = (Lesson) lessonIterator.next();
+								%>
+											<TR><TD align="left">Lesson: <%=lesson.getLessonName()%></TD>
+											<TD align="right"><input name="learner" type="button" id="learner" onClick="openLearner(<%=lesson.getLessonId()%>);" value="Learner"/></TD></TR>
+								<%		} %>
+							<% }%>
+					  <% } %>
+				<%}%>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td valign="top">
+			<table height="100%" border="0" align="center" cellpadding="2" cellspacing="0">
 				<tr align="center" valign="bottom">
 					<td colspan="2" ><img height="274" src="images/launch_page_graphic.jpg" width="587" alt="launch_page_graphic.jpg"></td>
 				</tr>
@@ -135,11 +157,8 @@
 							\nAll rights reserved.
 							\n\nLAMS is a trademark of LAMS Foundation.
 							\nDistribution of this software is prohibited.');" 
-							class="lightNoteLink">&copy; 2002-2004 LAMS Foundation.
+							class="lightNoteLink">&copy; 2002-2006 LAMS Foundation.
 						</a>
-					</td>
-					<td align="center">
-						This copy of LAMS&#8482; is authorised for use by the registered users only.
 					</td>
 					<td align="right">Version 1.1</td>
 				</tr>

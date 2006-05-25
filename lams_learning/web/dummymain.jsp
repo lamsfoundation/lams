@@ -35,7 +35,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</head>
 
 	<frameset rows="*" cols="178,*">
-		<frame src="controlFrame.jsp?lessonID=<c:out value="${param.lessonID}"/>" name="controlFrame" scrolling="YES">
+		<frame src="dummyControlFrame.jsp?lessonID=<c:out value="${param.lessonID}"/>" name="controlFrame" scrolling="YES">
 		<frame src="content.do" name="contentFrame" scrolling="YES">
 	</frameset>
 	

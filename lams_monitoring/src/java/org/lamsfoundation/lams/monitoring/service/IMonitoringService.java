@@ -209,6 +209,7 @@ public interface IMonitoringService
     /**
      * This method returns a string representing a list of all lessons
      * for the current user. See getAllLessons(). 
+      * TODO Remove getAllLessonsWDDX, getAllLessons when the dummy interface is not needed
      * 
      * @return String The requested list of Lessons in wddx format
      * @throws IOException
@@ -216,7 +217,7 @@ public interface IMonitoringService
     public String getAllLessonsWDDX(Integer userID) throws IOException;
     
     /**
-    * This method returns a list of all available Lessons. This is all the lessons
+     * This method returns a list of all available Lessons. This is all the lessons
      * created by the current user and all the lessons for which the user is in the
      * staff group. It does not return removed lessons.
      * 
