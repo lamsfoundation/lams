@@ -49,6 +49,7 @@ class WizardView extends AbstractView {
 	
 	//constants
 	public var RT_ORG:String = "Organisation";
+	public var STRING_NULL:String = "string_null_value"
 	public static var USERS_X:Number = 10;
 	public static var USER_OFFSET:Number = 20;
 	public var SUMMERY_X:Number = 20;
@@ -735,6 +736,11 @@ class WizardView extends AbstractView {
 		desc_lbl.visible = true;
 		resourceDesc_txa.visible = true;
 		
+		// check for NULL value
+		if(resourceDesc_txa.text == STRING_NULL){
+			resourceDesc_txa.text = "";
+		}
+		
 	}
 	
 	private function clearStep2():Void{
@@ -752,13 +758,8 @@ class WizardView extends AbstractView {
 			valid = false;
 		} 
 		
-		if(resourceDesc_txa.text == ""){
-			trace('description is empty must contain value');
-			valid = false;
-		}
-		
 		if(valid){
-			resultDTO.resourceTitle = resourceTitle_txi.text;
+			if(resourceTitle_txi.text != ""){resultDTO.resourceTitle = resourceTitle_txi.text;}
 			resultDTO.resourceDescription = resourceDesc_txa.text;
 		} else {
 			LFMessage.showMessageAlert(Dictionary.getValue('al_validation_msg2'), null, null);
