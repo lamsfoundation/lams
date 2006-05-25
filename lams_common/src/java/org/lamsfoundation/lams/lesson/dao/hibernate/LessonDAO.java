@@ -92,6 +92,7 @@ public class LessonDAO extends HibernateDaoSupport implements ILessonDAO
     
      /**
      * Gets all lessons that are active for a learner.
+     * TODO remove when the dummy interface is no longer needed. Replaced with getActiveLessonsForLearner(user,org)
      * @param learner a User that identifies the learner.
      * @return a List with all active lessons in it.
      */
@@ -103,7 +104,7 @@ public class LessonDAO extends HibernateDaoSupport implements ILessonDAO
     	lessons = (List)hibernateTemplate.execute(
             new HibernateCallback() {
                 public Object doInHibernate(Session session) throws HibernateException {
-        	    	Query query = session.getNamedQuery("activeLessons");
+        	    	Query query = session.getNamedQuery("activeLessonsAllOrganisations");
         	    	query.setInteger("userId", learner.getUserId().intValue());
         	    	List result = query.list();
                     return result;
@@ -113,6 +114,31 @@ public class LessonDAO extends HibernateDaoSupport implements ILessonDAO
         return lessons;
     }
     
+    /**
+     * Gets all lessons that are active for a learner, in a given organisation
+     * @param learnerId a User that identifies the learner.
+     * @param organisationId the desired organisation.
+     * @return a List with all active lessons in it.
+     */
+    public List getActiveLessonsForLearner(final Integer learnerId, final Integer organisationId)
+    {
+    	List lessons = null;
+    	
+        HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
+    	lessons = (List)hibernateTemplate.execute(
+            new HibernateCallback() {
+                public Object doInHibernate(Session session) throws HibernateException {
+        	    	Query query = session.getNamedQuery("activeLessons");
+        	    	query.setInteger("userId", learnerId);
+        	    	query.setInteger("organisationId", organisationId);
+        	    	List result = query.list();
+                    return result;
+                }
+            }
+        );
+        return lessons;
+    }
+
     /**
      * @see org.lamsfoundation.lams.lesson.dao.ILessonDAO#getActiveLearnerByLesson(long)
      */
@@ -177,6 +203,8 @@ public class LessonDAO extends HibernateDaoSupport implements ILessonDAO
    /**
     * Gets all lessons for which this user is in the staff group. Does not return 
     * disabled lessons or preview lessons. This is the list of lessons that a user may monitor/moderate/manage.
+    * TODO remove once the dummy interface is removed - it is replaced by getLessonsForMonitoring(userId, organisationId)
+    * TODO remove the matching query in the Hibernate file.
     * @param user a User that identifies the teacher/staff member.
     * @return a List with all appropriate lessons in it.
     */
@@ -188,8 +216,32 @@ public class LessonDAO extends HibernateDaoSupport implements ILessonDAO
    		lessons = (List)hibernateTemplate.execute(
            new HibernateCallback() {
                public Object doInHibernate(Session session) throws HibernateException {
+       	    	Query query = session.getNamedQuery("lessonsForMonitoringByUser");
+       	    	query.setInteger("userId", userID);
+       	    	List result = query.list();
+                   return result;
+               }
+           }
+       );
+       return lessons;
+   }
+   /**
+    * Gets all lessons in the given organisation, for which this user is in the staff group. Does not return 
+    * disabled lessons or preview lessons. This is the list of lessons that a user may monitor/moderate/manage.
+    * @param user a User that identifies the teacher/staff member.
+    * @return a List with all appropriate lessons in it.
+    */
+   public List getLessonsForMonitoring(final int userID, final int organisationID)
+   {
+	   List lessons = null;
+   	
+       HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
+   		lessons = (List)hibernateTemplate.execute(
+           new HibernateCallback() {
+               public Object doInHibernate(Session session) throws HibernateException {
        	    	Query query = session.getNamedQuery("lessonsForMonitoring");
        	    	query.setInteger("userId", userID);
+       	    	query.setInteger("organisationId", organisationID);
        	    	List result = query.list();
                    return result;
                }

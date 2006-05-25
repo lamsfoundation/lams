@@ -32,6 +32,7 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.cache.ICacheManager;
 import org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO;
+import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
@@ -90,6 +91,8 @@ public class UserManagementService implements IUserManagementService {
 	protected IWorkspaceFolderDAO workspaceFolderDAO;
 
 	protected ILearningDesignDAO learningDesignDAO;
+
+	protected ILessonDAO lessonDAO;
 
 	protected ICacheManager cacheManager;
 
@@ -152,6 +155,13 @@ public class UserManagementService implements IUserManagementService {
 	public void setAuthenticationMethodDAO(
 			IAuthenticationMethodDAO authenticationMethodDAO) {
 		this.authenticationMethodDAO = authenticationMethodDAO;
+	}
+
+	/**
+	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#setLessonDAO(org.lamsfoundation.lams.lesson.dao.ILessonDAO)
+	 */
+	public void setLessonDAO(ILessonDAO lessonDAO) {
+		this.lessonDAO = lessonDAO;
 	}
 
 	public void setCacheManager(ICacheManager cacheManager) {
@@ -621,4 +631,18 @@ public class UserManagementService implements IUserManagementService {
 		return users;
 	}
 
+	/** Get all the lessons in an organisation that this user can monitor.
+	 * This is a temporary method to support the dummy index page. 
+	 * TODO modify/remove when the index page is implemented properly
+	 */
+	public List getMonitorLessonsFromOrganisation(Integer userID, Integer organisationID) {
+		return lessonDAO.getLessonsForMonitoring(userID, organisationID);
+	}
+	/** Get all the lessons in an organisation for which this user is a learner.
+	 * This is a temporary method to support the dummy index page. 
+	 * TODO modify/remove when the index page is implemented properly
+	 */
+	public List getLearnerLessonsFromOrganisation(Integer userID, Integer organisationID) {
+		return lessonDAO.getActiveLessonsForLearner(userID, organisationID);
+	}
 }

@@ -49,11 +49,20 @@ public interface ILessonDAO
     public Lesson getLessonWithJoinFetchedProgress(Long lessonId);
     /**
      * Gets all lessons that are active for a learner.
+     * TODO to be removed when the dummy interface is no longer needed
      * @param learner a User that identifies the learner.
      * @return a Set with all active lessons in it.
      */
     public List getActiveLessonsForLearner(User learner);
     
+    /**
+     * Gets all lessons that are active for a learner, in a given organisation
+     * @param learnerId a User that identifies the learner.
+     * @param organisationId the desired organisation .
+     * @return a List with all active lessons in it.
+     */
+    public List getActiveLessonsForLearner(final Integer learnerId, final Integer organisationID);
+
     /**
      * Saves or Updates a Lesson.
      * @param lesson the Lesson to save
@@ -88,6 +97,14 @@ public interface ILessonDAO
      * @return a List with all appropriate lessons in it.
      */
     public List getLessonsForMonitoring(final int userID);
+
+    /**
+     * Gets all lessons in the given organisation, for which this user is in the staff group. Does not return 
+     * disabled lessons or preview lessons. This is the list of lessons that a user may monitor/moderate/manage.
+     * @param user a User that identifies the teacher/staff member.
+     * @return a List with all appropriate lessons in it.
+     */
+    public List getLessonsForMonitoring(final int userID, final int organisationID);
 
     /**
      * Returns the all the learners that have started the requested lesson.

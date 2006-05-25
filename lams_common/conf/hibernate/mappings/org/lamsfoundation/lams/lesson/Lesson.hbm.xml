@@ -81,7 +81,7 @@
 
 	</class>
 	
-	<sql-query name="lessonsForMonitoring">
+	<sql-query name="lessonsForMonitoringByUser">
 		<return alias="lesson" class="org.lamsfoundation.lams.lesson.Lesson" />
 		SELECT DISTINCT {lesson.*}
 		  FROM lams_lesson {lesson},
@@ -106,7 +106,43 @@
 		    AND NOT ({lesson}.lesson_state_id = 7)		    
 	</sql-query>
 
+	<sql-query name="lessonsForMonitoring">
+		<return alias="lesson" class="org.lamsfoundation.lams.lesson.Lesson" />
+		SELECT DISTINCT {lesson.*}
+		  FROM lams_lesson {lesson},
+		    lams_grouping,
+		    lams_group,
+		    lams_user_group,
+		    lams_learning_design
+		  WHERE ({lesson}.class_grouping_id = lams_grouping.grouping_id)
+		    AND (lams_grouping.staff_group_id = lams_group.group_id)
+		    AND (lams_group.group_id = lams_user_group.group_id)
+		    AND NOT ({lesson}.lesson_state_id = 7)		    
+		    AND (lams_user_group.user_id = :userId)
+		    AND ({lesson}.learning_design_id = lams_learning_design.learning_design_id)
+		    AND (lams_learning_design.copy_type_id=2)
+		    AND ({lesson}.organisation_id = :organisationId)
+	</sql-query>
+
 	<sql-query name="activeLessons">
+		<return alias="lesson" class="org.lamsfoundation.lams.lesson.Lesson" />
+		SELECT DISTINCT {lesson.*}
+		  FROM lams_lesson {lesson},
+		    lams_grouping,
+		    lams_group,
+		    lams_user_group,
+		    lams_learning_design
+		  WHERE ({lesson}.class_grouping_id = lams_grouping.grouping_id)
+		    AND (lams_grouping.grouping_id = lams_group.grouping_id)
+		    AND (lams_group.group_id = lams_user_group.group_id)
+		    AND ({lesson}.lesson_state_id IN (3,5))		    
+		    AND (lams_user_group.user_id = :userId)
+		    AND ({lesson}.learning_design_id = lams_learning_design.learning_design_id)
+		    AND (lams_learning_design.copy_type_id=2)
+		    AND ({lesson}.organisation_id = :organisationId)
+	</sql-query>
+
+	<sql-query name="activeLessonsAllOrganisations">
 		<return alias="lesson" class="org.lamsfoundation.lams.lesson.Lesson" />
 		SELECT DISTINCT {lesson.*}
 		  FROM lams_lesson {lesson},

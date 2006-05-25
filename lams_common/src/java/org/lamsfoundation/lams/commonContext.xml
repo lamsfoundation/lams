@@ -86,6 +86,7 @@
 		<property name="workspaceFolderDAO"><ref bean="workspaceFolderDAO"/></property>
 		<property name="userManagementWorkspaceDAO"><ref bean="userManagementWorkspaceDAO"/></property>
 		<property name="learningDesignDAO"><ref bean="learningDesignDAO"/></property>
+		<property name="lessonDAO"><ref bean="lessonDAO"/></property>
 		<property name="cacheManager"><ref local="cacheManager"/></property>
 	</bean>	
 	

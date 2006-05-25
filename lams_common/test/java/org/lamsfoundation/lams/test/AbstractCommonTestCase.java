@@ -43,7 +43,8 @@ abstract public class AbstractCommonTestCase extends AbstractLamsTestCase
     }
 
     protected String[] getContextConfigLocation() {
-		return new String[] {"org/lamsfoundation/lams/localApplicationContext.xml"};
+		return new String[] {"org/lamsfoundation/lams/localApplicationContext.xml",
+				"org/lamsfoundation/lams/lesson/lessonApplicationContext.xml"};
 	}
 
     /**

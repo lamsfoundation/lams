@@ -383,5 +383,16 @@ public interface IUserManagementService {
 	 * @return UserDTO objects (in a Vector to suit WDDX)
 	 */
 	public Vector<UserDTO> getUsersFromOrganisationByRole(Integer organisationID, String roleName);	
-	
+
+	/** Get all the lessons in an organisation that this user can monitor.
+	 * This is a temporary method to support the dummy index page. 
+	 * TODO modify/remove when the index page is implemented properly
+	 */
+	public List getMonitorLessonsFromOrganisation(Integer userID, Integer organisationID);
+	/** Get all the lessons in an organisation for which this user is a learner.
+	 * This is a temporary method to support the dummy index page. 
+	 * TODO modify/remove when the index page is implemented properly
+	 */
+	public List getLearnerLessonsFromOrganisation(Integer userID, Integer organisationID);
+
 }
