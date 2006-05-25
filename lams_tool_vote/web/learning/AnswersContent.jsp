@@ -79,11 +79,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				  		  	 		<c:set var="queIndex" scope="session" value="0"/>
 										  		<c:forEach var="subEntry" items="${sessionScope.mapQuestionContentLearner}">
 											  		<c:set var="queIndex" scope="session" value="${queIndex +1}"/>
-											  		
+
 									  		  	 		<c:set var="checkedOptionFound" scope="request" value="0"/>
 														<!-- traverse the selected option from here --> 									  		
 																	<c:if test="${subEntry.key == sessionScope.queIndex}"> 		
 																	  		<c:forEach var="selectedSubEntry" items="${sessionScope.mapGeneralCheckedOptionsContent}">
+
 																				<c:if test="${subEntry.value == selectedSubEntry.value}"> 		
 																					<tr> 
 																						<td NOWRAP align=left class="input" valign=top> 
@@ -92,7 +93,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 																								name=optionCheckBox<c:out value="${sessionScope.queIndex}"/>-<c:out value="${subEntry.key}"/>
 																								onclick="javascript:document.forms[0].optionCheckBoxSelected.value=1; 
 																								document.forms[0].questionIndex.value=<c:out value="${sessionScope.queIndex}"/>; 
-																								document.forms[0].optionValue.value='<c:out value="${subEntry.value}"/>';
 																								
 																								if (this.checked == 1)
 																								{
@@ -125,8 +125,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 																								name=optionCheckBox<c:out value="${sessionScope.queIndex}"/>-<c:out value="${subEntry.key}"/>
 																								onclick="javascript:document.forms[0].optionCheckBoxSelected.value=1; 
 																								document.forms[0].questionIndex.value=<c:out value="${sessionScope.queIndex}"/>; 
-																								document.forms[0].optionValue.value='<c:out value="${subEntry.value}"/>';																			
 					
+
+																													
 																								if (this.checked == 1)
 																								{
 																									document.forms[0].checked.value=true;

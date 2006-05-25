@@ -42,11 +42,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 	String strSetDefineLater="/authoringStarter?toolContentID=" + hardCodedCopiedToolContentId + "&setDefineLater=1";
 	String strSetRunoffline="/authoringStarter?toolContentID=" + hardCodedCopiedToolContentId + "&strSetRunoffline=1";	
-	String strClearSession="/clearsession";	
-	String strClearSession1="/clearsession?action=confirm&mode=author&signature=lavote11&toolContentID=1";	
-	String strClearSession2="/clearsession?action=confirm&mode=author&signature=lavote11&toolContentID=2";	
-	
-	
 %>
 
 
@@ -99,21 +94,4 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
       <html:submit value="Set as run offline on the copied content"/>
 </html:form>
 
-<html:form action="<%=strClearSession%>" method="post">
-      <table border=1>
-      </table><br/>
-      <html:submit value="Clear session"/>
-</html:form>
-
-<html:form action="<%=strClearSession1%>" method="post">
-      <table border=1>
-      </table><br/>
-      <html:submit value="Clear session1"/>
-</html:form>
-
-<html:form action="<%=strClearSession2%>" method="post">
-      <table border=1>
-      </table><br/>
-      <html:submit value="Clear session2"/>
-</html:form>
 

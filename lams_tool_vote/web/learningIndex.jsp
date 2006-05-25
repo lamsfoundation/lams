@@ -35,12 +35,18 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 	
 	String toolSessionID2="55555555";
+	
+	String toolSessionID3="1";
+	
 	String toolUrl2="/learningStarter?toolSessionID=" + toolSessionID2 + "&mode=learner";
+	String toolUrl3="/learningStarter?toolSessionID=" + toolSessionID3 + "&mode=learner";
 	
 	String toolUrlTeacher="/learningStarter?toolSessionID=" + toolSessionID + "&mode=teacher";
 	
 	String strCreateToolSession="/learningStarter?toolSessionID=" + toolSessionID2 +  "&mode=learner" + "&createToolSession=1";
 	String strCreateToolSession2="/learningStarter?toolSessionID=" + toolSessionID +  "&mode=learner" + "&createToolSession=1";
+	String strCreateToolSession3="/learningStarter?toolSessionID=" + toolSessionID3 +  "&mode=learner" + "&createToolSession=1";
+	
 	String strRemoveToolSession="/learningStarter?toolSessionID=" + toolSessionID2 +  "&mode=learner" + "&removeToolSession=1";
 	String strLeaveToolSession="/learningStarter?toolSessionID=" + toolSessionID2 +  "&mode=learner" + "&leaveToolSession=1" +  "&learnerId=4";
 
@@ -64,10 +70,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
       <html:submit value="Create Tool Session: 88888888"/>
 </html:form>
 
-<html:form action="<%=strCreateToolSession2%>" method="post">
+<html:form action="<%=strCreateToolSession3%>" method="post">
       <table border=1>
       </table><br/><BR>
-      <html:submit value="Create Tool Session - for sysadmin: 88888888"/>
+      <html:submit value="Create Tool Session - 1"/>
 </html:form>
 
 
@@ -82,6 +88,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
       </table><br/><BR>
       <html:submit value="Session 2 - Learning Starter, mode:learner"/>
 </html:form>
+
+<html:form action="<%=toolUrl3%>" method="post">
+      <table border=1>
+      </table><br/><BR>
+      <html:submit value="Session 3 - Learning Starter, mode:learner"/>
+</html:form>
+
+
 
 <html:form action="<%=toolUrlTeacher%>" method="post">
       <table border=1>

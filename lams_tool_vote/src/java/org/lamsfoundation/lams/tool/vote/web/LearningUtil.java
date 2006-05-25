@@ -267,13 +267,16 @@ public class LearningUtil implements VoteAppConstants {
 
     
     public static Map selectOptionsCheckBox(HttpServletRequest request,VoteLearningForm voteLearningForm, String questionIndex, 
-            Map mapGeneralCheckedOptionsContent)
+            Map mapGeneralCheckedOptionsContent, Map mapQuestionContentLearner)
     {
     	logger.debug("requested optionCheckBoxSelected...");
     	logger.debug("questionIndex: " + voteLearningForm.getQuestionIndex());
-    	logger.debug("optionIndex: " + voteLearningForm.getOptionIndex());
     	logger.debug("optionValue: " + voteLearningForm.getOptionValue());
     	logger.debug("checked: " + voteLearningForm.getChecked());
+    	logger.debug("mapQuestionContentLearner: " + mapQuestionContentLearner);
+    	
+    	String selectedNomination=(String)mapQuestionContentLearner.get(voteLearningForm.getQuestionIndex());
+    	logger.debug("selectedNomination: " + selectedNomination);
 
     	Map mapFinal= new TreeMap(new VoteComparator());
     	
@@ -283,7 +286,7 @@ public class LearningUtil implements VoteAppConstants {
     		Map mapLeanerCheckedOptionsContent= new TreeMap(new VoteComparator());
     		
     		if (voteLearningForm.getChecked().equals("true"))
-    			mapLeanerCheckedOptionsContent.put(voteLearningForm.getQuestionIndex(), voteLearningForm.getOptionValue());
+    			mapLeanerCheckedOptionsContent.put(voteLearningForm.getQuestionIndex(), selectedNomination);
     		else
     			mapLeanerCheckedOptionsContent.remove(voteLearningForm.getQuestionIndex());
     		
@@ -298,7 +301,7 @@ public class LearningUtil implements VoteAppConstants {
     		if (mapCurrentOptions != null)
     		{
     			if (voteLearningForm.getChecked().equals("true"))
-    				mapCurrentOptions.put(voteLearningForm.getQuestionIndex(), voteLearningForm.getOptionValue());
+    				mapCurrentOptions.put(voteLearningForm.getQuestionIndex(), selectedNomination);
     			else
     				mapCurrentOptions.remove(voteLearningForm.getQuestionIndex());
     			
@@ -312,7 +315,7 @@ public class LearningUtil implements VoteAppConstants {
     			Map mapLeanerCheckedOptionsContent= new TreeMap(new VoteComparator());
     			        			
     			if (voteLearningForm.getChecked().equals("true"))
-    				mapLeanerCheckedOptionsContent.put(voteLearningForm.getQuestionIndex(), voteLearningForm.getOptionValue());
+    				mapLeanerCheckedOptionsContent.put(voteLearningForm.getQuestionIndex(), selectedNomination);
     			else
     				mapLeanerCheckedOptionsContent.remove(voteLearningForm.getOptionIndex());
     			
