@@ -14,3 +14,8 @@
   <servlet-name>SimpleUploader</servlet-name>
   <url-pattern>/fckeditor/editor/filemanager/upload/simpleuploader</url-pattern>
 </servlet-mapping>
+
+<servlet-mapping>
+  <servlet-name>ExportToolContent</servlet-name>
+  <url-pattern>/ExportToolContent</url-pattern>
+</servlet-mapping>
