@@ -129,6 +129,7 @@
 					<include name="struts/*.jar" />
 					<include name="wddx/*.jar" />
 					<include name="concurrent/*.jar" />					
+					<include name="xstream/*.jar" />					
 				</patternset>
 			</fileset> 
 			<fileset dir="..">
