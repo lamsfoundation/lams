@@ -51,6 +51,8 @@ class WizardView extends AbstractView {
 	public var RT_ORG:String = "Organisation";
 	public static var USERS_X:Number = 10;
 	public static var USER_OFFSET:Number = 20;
+	public var SUMMERY_X:Number = 20;
+	public var SUMMERY_Y:Number = 20;
 	
 	// submission modes
 	public static var FINISH_MODE:Number = 0;
@@ -868,7 +870,6 @@ class WizardView extends AbstractView {
 		writeSummery();
 		
 		summery_lbl.visible = true;
-		summery_scp.visible = true;
 		schedule_cb.visible = true;
 		start_btn.visible = true;
 		if(schedule_cb.selected){
@@ -888,7 +889,7 @@ class WizardView extends AbstractView {
 		if(_summery_mc != null){
 			_summery_mc.removeMovieClip();
 		}
-		_summery_mc = summery_scp.content.attachMovie('wizardSummery', 'wizardSummery', 0, {_x:0, _y:0});
+		_summery_mc = this.attachMovie('wizardSummery', 'wizardSummery', 0, {_x:SUMMERY_X+panel._x, _y:SUMMERY_Y+panel._y});
 		_summery_mc.design_txt.text = resultDTO.resourceName;
 		_summery_mc.title_txt.text = resultDTO.resourceTitle;
 		_summery_mc.desc_txt.text = resultDTO.resourceDescription;
@@ -901,8 +902,9 @@ class WizardView extends AbstractView {
 	
 	
 	private function clearStep4():Void{
+		_summery_mc.removeMovieClip();
+		
 		summery_lbl.visible = false;
-		summery_scp.visible = false;
 		schedule_cb.visible = false;
 		start_btn.visible = false;
 		schedule_time._visible = false;
@@ -1107,7 +1109,7 @@ class WizardView extends AbstractView {
 		
 		resourceDesc_txa.setSize(resourceDesc_txa.width, Number(resourceDesc_txa.height + dHeight));
 		
-		staff_scp.setSize(staff_scp._width, staff_scp._height + dHeight);
+		//staff_scp.setSize(staff_scp._width, staff_scp._height + dHeight);
 		learner_scp.setSize(learner_scp._width, learner_scp._height + dHeight);
 		
 		
