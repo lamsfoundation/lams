@@ -248,7 +248,11 @@ class Wizard {
 		var designId:Number = resultDTO.selectedResourceID;
 		var lessonName:String = resultDTO.resourceTitle;
 		var lessonDesc:String = resultDTO.resourceDescription;
-		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=initializeLesson&learningDesignID='+designId+'&userID='+_root.userID+'&lessonName='+lessonName+'&lessonDescription='+lessonDesc,callback, false);
+		if(lessonDesc == undefined){
+			Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=initializeLesson&learningDesignID='+designId+'&userID='+_root.userID+'&lessonName='+lessonName,callback, false);
+		} else {
+			Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=initializeLesson&learningDesignID='+designId+'&userID='+_root.userID+'&lessonName='+lessonName+'&lessonDescription='+lessonDesc,callback, false);
+		}
 	}
 	
 	public function startLesson(isScheduled:Boolean, lessonID:Number, datetime:String){
