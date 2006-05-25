@@ -97,6 +97,8 @@ public interface IVoteService
     
     public int getAttemptsForQuestionContent(final Long voteQueContentId) throws VoteApplicationException;
     
+    public boolean studentActivityOccurredStandardAndOpen(VoteContent voteContent) throws VoteApplicationException;
+    
     public int getUserEnteredVotesCountForContent(final Long voteContentUid) throws VoteApplicationException;
     
     public int getStandardAttemptsForQuestionContentAndSessionUid(final Long voteQueContentId, final Long voteSessionId) throws VoteApplicationException;

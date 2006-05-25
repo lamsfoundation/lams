@@ -106,7 +106,7 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 	    
     	VoteContent voteContent=voteService.retrieveVote(toolContentId);
 		/*true means there is at least 1 response*/
-		if (voteService.studentActivityOccurredGlobal(voteContent))
+		if (voteService.studentActivityOccurredStandardAndOpen(voteContent))
 		{
 				request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(false).toString());
 				logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
@@ -187,7 +187,7 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 
 		
 		logger.debug("checking student activity on the standard nominations:" + voteContent);
-		if (voteService.studentActivityOccurredGlobal(voteContent))
+		if (voteService.studentActivityOccurredStandardAndOpen(voteContent))
 		{
 			VoteUtils.cleanUpSessionAbsolute(request);
 			logger.debug("student activity occurred on this content:" + voteContent);

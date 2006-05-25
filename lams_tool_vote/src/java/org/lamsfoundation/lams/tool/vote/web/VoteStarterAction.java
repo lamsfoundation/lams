@@ -345,7 +345,7 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 	        	/* it is possible that the content is in use by learners.*/
 	        	VoteContent voteContent=voteService.retrieveVote(new Long(strToolContentId));
 	        	logger.debug("voteContent: " + voteContent);
-	        	if (voteService.studentActivityOccurredGlobal(voteContent))
+	        	if (voteService.studentActivityOccurredStandardAndOpen(voteContent))
 	    		{
 	        		VoteUtils.cleanUpSessionAbsolute(request);
 	    			logger.debug("student activity occurred on this content:" + voteContent);

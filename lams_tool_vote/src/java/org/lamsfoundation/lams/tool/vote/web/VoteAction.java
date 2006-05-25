@@ -166,7 +166,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 		/*true means there is at least 1 response*/
     	if (voteContent != null)
     	{
-    		if (voteService.studentActivityOccurredGlobal(voteContent))
+    		if (voteService.studentActivityOccurredStandardAndOpen(voteContent))
     		{
     				request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(false).toString());
     				logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
@@ -247,7 +247,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 		/*true means there is at least 1 response*/
     	if (voteContent != null)
     	{
-    		if (voteService.studentActivityOccurredGlobal(voteContent))
+    		if (voteService.studentActivityOccurredStandardAndOpen(voteContent))
     		{
     				request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(false).toString());
     				logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
@@ -311,7 +311,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 		/*true means there is at least 1 response*/
     	if (voteContent != null)
     	{
-    		if (voteService.studentActivityOccurredGlobal(voteContent))
+    		if (voteService.studentActivityOccurredStandardAndOpen(voteContent))
     		{
     				request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(false).toString());
     				logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
@@ -530,7 +530,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 		/*true means there is at least 1 response*/
     	if (voteContent != null)
     	{
-    		if (voteService.studentActivityOccurredGlobal(voteContent))
+    		if (voteService.studentActivityOccurredStandardAndOpen(voteContent))
     		{
     				request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(false).toString());
     				logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
@@ -648,7 +648,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 		/*true means there is at least 1 response*/
     	if (voteContent != null)
     	{
-    		if (voteService.studentActivityOccurredGlobal(voteContent))
+    		if (voteService.studentActivityOccurredStandardAndOpen(voteContent))
     		{
     				request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(false).toString());
     				logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");

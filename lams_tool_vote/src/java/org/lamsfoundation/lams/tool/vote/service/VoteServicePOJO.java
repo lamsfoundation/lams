@@ -1278,7 +1278,6 @@ public class VoteServicePOJO implements
 	    logger.debug("voteContent uid: " +  voteContent.getUid());
 		Iterator questionIterator=voteContent.getVoteQueContents().iterator();
 		
-		boolean activityOccurred=false;
         while (questionIterator.hasNext())
         {
         	VoteQueContent voteQueContent=(VoteQueContent)questionIterator.next(); 
@@ -1289,15 +1288,22 @@ public class VoteServicePOJO implements
         		/**
         		 * proved the fact that there is at least one attempt for this content.
         		 */
-        		activityOccurred=true;
+        		return true;
         	}
-        } 
+        }
+        return false;
+	}
+	
+	public boolean studentActivityOccurredStandardAndOpen(VoteContent voteContent) throws VoteApplicationException
+	{
+	    logger.debug("voteContent uid: " +  voteContent.getUid());
+	    boolean studentActivityOccurredGlobal= studentActivityOccurredGlobal(voteContent);
+	    logger.debug("studentActivityOccurredGlobal: " +  studentActivityOccurredGlobal);
         
-        logger.debug("activityOccurred: " + activityOccurred);
         int userEnteredVotesCount=getUserEnteredVotesCountForContent(voteContent.getUid());
 		logger.debug("userEnteredVotesCount: " + userEnteredVotesCount);
 		
-		if ((activityOccurred == true) || (userEnteredVotesCount > 0))
+		if ((studentActivityOccurredGlobal == true) || (userEnteredVotesCount > 0))
 		{
 		    return true;
 		}

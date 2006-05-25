@@ -205,7 +205,7 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 		request.getSession().setAttribute(SUMMARY_TOOL_SESSIONS, summaryToolSessions);
 		
 		
-		if (voteService.studentActivityOccurredGlobal(voteContent))
+		if (voteService.studentActivityOccurredStandardAndOpen(voteContent))
 		{
 			request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(false).toString());
 			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
@@ -414,7 +414,7 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	    /* ends here. */
 	    
 		/*true means there is at least 1 response*/
-		if (voteService.studentActivityOccurredGlobal(voteContent))
+		if (voteService.studentActivityOccurredStandardAndOpen(voteContent))
 		{
 			request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(false).toString());
 			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
@@ -454,7 +454,7 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	    VoteContent voteContent=voteService.retrieveVote(toolContentId);
 		logger.debug("existing voteContent:" + voteContent);
 		
-		if (voteService.studentActivityOccurredGlobal(voteContent))
+		if (voteService.studentActivityOccurredStandardAndOpen(voteContent))
 		{
 			request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(false).toString());
 			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
@@ -525,7 +525,7 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 		logger.debug("existing voteContent:" + voteContent);
 		
 		
-		if (voteService.studentActivityOccurredGlobal(voteContent))
+		if (voteService.studentActivityOccurredStandardAndOpen(voteContent))
 		{
 			request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(false).toString());
 			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
@@ -601,7 +601,7 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 		/*true means there is at least 1 response*/
     	if (voteContent != null)
     	{
-    		if (voteService.studentActivityOccurredGlobal(voteContent))
+    		if (voteService.studentActivityOccurredStandardAndOpen(voteContent))
     		{
     				request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(false).toString());
     				logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
