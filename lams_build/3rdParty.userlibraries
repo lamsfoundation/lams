@@ -27,8 +27,8 @@
 <archive path="/lams_build/lib/jboss/jgroups.jar"/>
 <archive path="/lams_build/lib/jdom/jdom.jar"/>
 <archive path="/lams_build/lib/junit/junit.jar"/>
-<archive path="/lams_build/lib/jfreechart/jfreechart-1.0.1.jar"/>
-<archive path="/lams_build/lib/jfreechart/jcommon-1.0.0.jar"/>
+<archive path="/lams_build/lib/jfreechart/jfreechart-0.9.21.jar"/>
+<archive path="/lams_build/lib/jfreechart/jcommon-0.9.6.jar"/>
 <archive path="/lams_build/lib/jfreechart/gnujaxp.jar"/>
 <archive path="/lams_build/lib/log4j/log4j-1.2.9.jar"/>
 <archive path="/lams_build/lib/middlegen/velocity-1.4-dev.jar"/>
@@ -37,8 +37,6 @@
 <archive path="/lams_build/lib/mysql/mysql-connector-java-3.1.12-bin.jar"/>
 <archive path="/lams_build/lib/odmg/odmg-3.0.jar"/>
 <archive path="/lams_build/lib/quartz/quartz.jar"/>
-<archive path="/lams_build/lib/smack/smack.jar"/>
-<archive path="/lams_build/lib/smack/smackx.jar"/>
 <archive path="/lams_build/lib/spring/spring-aop.jar"/>
 <archive path="/lams_build/lib/spring/spring-beans.jar"/>
 <archive path="/lams_build/lib/spring/spring-context.jar"/>
@@ -102,5 +100,13 @@
 <archive path="/lams_build/lib/fckeditor/FCKeditor-2.3.jar"/>
 <archive path="/lams_build/lib/concurrent/concurrent-1.3.4.jar"/>
 <archive path="/lams_build/lib/catalina/catalina.jar"/>
+<archive path="/lams_build/lib/xstream/xstream-1.1.jar"/>
+<archive path="/lams_build/lib/xstream/jmock-2004-03-19.jar"/>
+<archive path="/lams_build/lib/xstream/joda-time-0.98.jar"/>
+<archive path="/lams_build/lib/xstream/stax-1.1.1-dev.jar"/>
+<archive path="/lams_build/lib/xstream/stax-api-1.0.jar"/>
+<archive path="/lams_build/lib/xstream/xml-writer-0.2.jar"/>
+<archive path="/lams_build/lib/xstream/xom-1.0b3.jar"/>
+<archive path="/lams_build/lib/xstream/xpp3-1.1.3.4d_b4_min.jar"/>
 </library>
 </eclipse-userlibraries>
