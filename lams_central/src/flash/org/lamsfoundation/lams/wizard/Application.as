@@ -557,4 +557,22 @@ class org.lamsfoundation.lams.wizard.Application extends ApplicationParent {
 			
         }
     }
+	
+	/**
+    * Handles KEY presses for Application
+    */
+    private function onKeyDown(){
+		
+		//var mouseListener:Object = new Object();
+        //Debugger.log('Key.isDown(Key.CONTROL): ' + Key.isDown(Key.CONTROL),Debugger.GEN,'onKeyDown','Application');
+        //Debugger.log('Key: ' + Key.getCode(),Debugger.GEN,'onKeyDown','Application');
+		//the debug window:
+        if (Key.isDown(Key.CONTROL) && Key.isDown(Key.ALT) && Key.isDown(QUESTION_MARK_KEY)) {
+            if (!_debugDialog.content){
+                showDebugger();
+            }else {
+               hideDebugger();
+            }               
+        }
+	}
 }
