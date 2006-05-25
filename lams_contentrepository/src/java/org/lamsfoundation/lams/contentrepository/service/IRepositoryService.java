@@ -24,6 +24,7 @@
 /* $$Id$$ */	
 package org.lamsfoundation.lams.contentrepository.service;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.SortedMap;
@@ -361,7 +362,7 @@ public interface IRepositoryService {
     public void logout(ITicket ticket) throws AccessDeniedException;
     
     /** Get a complete list of all nodes in the workspace and their
-     * version histories.
+     * version histories. 
      * <p>
      * Warning: Once a workspace gets a lot of nodes, this will be
      * a very very expensive call!!!!!
@@ -370,4 +371,18 @@ public interface IRepositoryService {
      * @return SortedMap key Long uuid, value IVersionDetail version history 
      */
     public SortedMap getNodeList(ITicket ticket) throws AccessDeniedException ;
+    /**
+     * Save current version of a node to local file by given file name. If the <code>toFileName</code> is
+     * null, file name use original file name instead and file save path will be system temporary directory.
+     * <p>
+     * So far, it only support <ocde>FILENODE</code> format content.
+     * 
+     * @param ticket ticket issued on login. Identifies tool and workspace - mandatory 
+	 * @param uuid id of the file/package - mandatory
+	 * @param version desired version - if null gets latest version
+	 * 
+     * @param toFileName the local file name with directory information.
+     */
+	public void saveFile(ITicket ticket, Long uuid, Long versionId, String toFileName)
+			throws RepositoryCheckedException, AccessDeniedException, ItemNotFoundException, IOException;
 }

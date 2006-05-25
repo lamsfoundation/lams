@@ -24,7 +24,12 @@
 /* $$Id$$ */	
 package org.lamsfoundation.lams.contentrepository.service;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -43,6 +48,7 @@ import org.lamsfoundation.lams.contentrepository.CrWorkspaceCredential;
 import org.lamsfoundation.lams.contentrepository.FileException;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.ITicket;
+import org.lamsfoundation.lams.contentrepository.IValue;
 import org.lamsfoundation.lams.contentrepository.IVersionedNode;
 import org.lamsfoundation.lams.contentrepository.IVersionedNodeAdmin;
 import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
@@ -59,6 +65,8 @@ import org.lamsfoundation.lams.contentrepository.ValueFormatException;
 import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
 import org.lamsfoundation.lams.contentrepository.dao.ICredentialDAO;
 import org.lamsfoundation.lams.contentrepository.dao.IWorkspaceDAO;
+import org.lamsfoundation.lams.util.FileUtil;
+import org.lamsfoundation.lams.util.FileUtilException;
 
 
 /**
@@ -607,7 +615,47 @@ public class SimpleRepository implements IRepositoryAdmin {
 		    				+e.getMessage(), e);
 		}
     }
-
+    /* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.contentrepository.IRepository#saveFile(org.lamsfoundation.lams.contentrepository.ITicket, java.lang.Long, java.lang.String, java.lang.String, java.lang.String)
+	 */
+	public void saveFile(ITicket ticket, Long uuid, Long versionId, String toFileName) throws AccessDeniedException,
+			ItemNotFoundException, IOException, RepositoryCheckedException {
+			try {
+				IVersionedNode  node = nodeFactory.getNode(ticket.getWorkspaceId(), uuid, versionId);
+				if(!node.isNodeType(NodeType.FILENODE))
+				    throw new RepositoryCheckedException("Unsupported node type "
+							+node.getNodeType()+". Node Data is "+node.toString(),null);
+				
+	 		    if(node == null)
+	 		    	throw new ItemNotFoundException("Unable find File node by uuid [" + uuid + "]");
+	 		    
+	 		    InputStream is = node.getFile();
+	 		    if(toFileName == null){
+	 		    	IValue prop = node.getProperty(PropertyName.FILENAME);
+	 		    	toFileName = prop != null ? prop.getString() : null;
+	 		    	FileUtil.createDirectory(FileUtil.TEMP_DIR);
+	 		    	toFileName =  FileUtil.TEMP_DIR + File.separator + toFileName; 
+	 		    }
+	 		    OutputStream os = new FileOutputStream(toFileName);
+	 		    byte[] out  = new byte[8 * 1024];
+	 		    int len = -1;
+	 		    while((len = is.read(out)) != -1){
+	 		    	os.write(out,0,len);
+	 		    }
+	 		    os.close();
+	 		    is.close();
+			} catch (FileException e) {
+				// if this is thrown, then it is bug - nothing external should cause it.
+			    throw new RepositoryRuntimeException("Internal error: unable to save node. "
+			    				+e.getMessage(), e);
+			} catch (ValueFormatException e) {
+			    throw new RepositoryRuntimeException("Internal error: unable to save node. "
+			    				+e.getMessage(), e);
+			} catch (FileUtilException e) {
+				throw new RepositoryRuntimeException("Internal error: unable to save node. "
+						+e.getMessage(), e);
+			} 
+	}
     /* (non-Javadoc)
 	 * @see org.lamsfoundation.lams.contentrepository.IRepository#updatePackageItem(org.lamsfoundation.lams.contentrepository.ITicket, java.lang.Long, java.lang.String, java.lang.String, java.lang.String)
 	 */
