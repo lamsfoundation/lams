@@ -792,7 +792,11 @@ public class MonitoringUtil implements VoteAppConstants{
 			voteAllSessionsDTO.setMapStandardNominationsContent(mapStandardNominationsContent);
 			voteAllSessionsDTO.setMapStandardUserCount(mapStandardUserCount);
 			voteAllSessionsDTO.setMapStandardRatesContent(mapStandardRatesContent);
-	        
+			
+			VoteMonitoringAction voteMonitoringAction= new VoteMonitoringAction();
+			List listUserEntries=voteMonitoringAction.processUserEnteredNominations(voteService, voteContent, voteSession.getVoteSessionId().toString(), true, null, false);
+		    logger.debug("listUserEntries: " + listUserEntries);
+		    voteAllSessionsDTO.setListUserEntries(listUserEntries);
 	        
 	        listVoteAllSessionsDTO.add(voteAllSessionsDTO);
 		}

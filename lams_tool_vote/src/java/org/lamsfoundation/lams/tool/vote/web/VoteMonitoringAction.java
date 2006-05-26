@@ -155,6 +155,7 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 		    logger.debug("generate DTO for All sessions: ");
 		    List listVoteAllSessionsDTO=MonitoringUtil.prepareChartDTO(request, voteService, voteMonitoringForm, voteContent.getVoteContentId());
 		    logger.debug("listVoteAllSessionsDTO: " + listVoteAllSessionsDTO);
+		    
 		    request.getSession().setAttribute(LIST_VOTE_ALLSESSIONS_DTO, listVoteAllSessionsDTO);
 	    }
 	    else
@@ -929,7 +930,10 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	    request.getSession().setAttribute(CURRENT_MONITORED_TOOL_SESSION, currentMonitoredToolSession);
 	    logger.debug("CURRENT_MONITORED_TOOL_SESSION: " + request.getSession().getAttribute(CURRENT_MONITORED_TOOL_SESSION));
         
-    	return (mapping.findForward(LOAD_MONITORING));
+    	//return (mapping.findForward(LOAD_MONITORING));
+	    logger.debug("submitting session to refresh the data from the database: ");
+    	return submitSession(mapping, form,  request, response);
+    	
      }
 
     public ActionForward showOpenVote(ActionMapping mapping,
@@ -982,8 +986,9 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	    request.getSession().setAttribute(CURRENT_MONITORED_TOOL_SESSION, currentMonitoredToolSession);
 	    logger.debug("CURRENT_MONITORED_TOOL_SESSION: " + request.getSession().getAttribute(CURRENT_MONITORED_TOOL_SESSION));
 
-        
-    	return (mapping.findForward(LOAD_MONITORING));
+    	//return (mapping.findForward(LOAD_MONITORING));
+	    logger.debug("submitting session to refresh the data from the database: ");
+	    return submitSession(mapping, form,  request, response);	    
      }
 
     

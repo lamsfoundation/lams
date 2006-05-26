@@ -72,6 +72,7 @@ public class VoteChartGenerator extends HttpServlet implements VoteAppConstants 
             
             if (currentSessionId != null)
             {
+                logger.debug("currentSessionId is specified, generating data for all sessions dto: ");
             	IVoteService voteService=null;
         	    voteService = (IVoteService)request.getSession().getAttribute(TOOL_SERVICE);
         		logger.debug("voteService: " + voteService);

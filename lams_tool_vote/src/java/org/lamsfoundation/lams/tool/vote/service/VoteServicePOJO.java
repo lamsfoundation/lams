@@ -1551,6 +1551,16 @@ public class VoteServicePOJO implements
 		// TODO Auto-generated method stub
 		return null;
 	}
+ 	
+ 	  /**
+     * Export the XML fragment for the tool's content, along with any files needed
+     * for the content.
+     * @throws ToolException if any other error occurs
+     */
+	public String exportToolContent(List toolContentId) throws ToolException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
     /**
      * Import the XML fragment for the tool's content, along with any files needed

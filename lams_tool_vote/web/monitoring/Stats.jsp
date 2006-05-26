@@ -44,20 +44,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 		<c:if test="${(userExceptionNoToolSessions != 'true') }"> 	
-		
-			<c:if test="${currentMonitoredToolSession == 'All'}"> 				
-				<table align="left">
-				<tr>
-			 		<td NOWRAP> <font size=2> <bean:message key="label.select.statsSession"/>  </td>
-			 		<td NOWRAP align=right> <font size=2> 
-						<jsp:include page="/monitoring/PullDownMenuStats.jsp" />
-			 		</td>
-				</tr>
-				</table>
-			</c:if> 	    
-
 			<jsp:include page="/monitoring/SummaryStatsCommon.jsp" />
-
 		</c:if>						
  		
 

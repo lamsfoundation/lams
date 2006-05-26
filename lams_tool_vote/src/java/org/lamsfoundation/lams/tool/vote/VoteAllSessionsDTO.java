@@ -22,6 +22,7 @@
 
 package org.lamsfoundation.lams.tool.vote;
 
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -41,7 +42,20 @@ public class VoteAllSessionsDTO implements Comparable
 	private Map mapStandardNominationsContent;
 	private Map mapStandardUserCount;
 	private Map mapStandardRatesContent;
+	private List listUserEntries;
 	
+    /**
+     * @return Returns the listUserEntries.
+     */
+    public List getListUserEntries() {
+        return listUserEntries;
+    }
+    /**
+     * @param listUserEntries The listUserEntries to set.
+     */
+    public void setListUserEntries(List listUserEntries) {
+        this.listUserEntries = listUserEntries;
+    }
     /**
      * @return Returns the mapStandardRatesContent.
      */
