@@ -40,6 +40,8 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.general.DefaultPieDataset;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
+import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
+import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 
 /**
  * <p> Enables generation of enerates JFreeCharts </p>
@@ -64,6 +66,30 @@ public class VoteChartGenerator extends HttpServlet implements VoteAppConstants 
         try{
             String type=request.getParameter("type");
             logger.debug("type: " + type);
+            
+            String currentSessionId=request.getParameter("currentSessionId");
+            logger.debug("currentSessionId: " + currentSessionId);
+            
+            if (currentSessionId != null)
+            {
+            	IVoteService voteService=null;
+        	    voteService = (IVoteService)request.getSession().getAttribute(TOOL_SERVICE);
+        		logger.debug("voteService: " + voteService);
+        		
+        	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+        	    logger.debug("toolContentId: " + toolContentId);
+        	    
+        	    VoteContent voteContent=voteService.retrieveVote(toolContentId);
+        		logger.debug("existing voteContent:" + voteContent);
+
+                MonitoringUtil.prepareChartData(request, voteService, null, voteContent.getVoteContentId(), new Long(currentSessionId));
+                logger.debug("creating maps MAP_STANDARD_NOMINATIONS_CONTENT and MAP_STANDARD_RATES_CONTENT: " + currentSessionId);
+
+                logger.debug("post prepareChartData : MAP_STANDARD_NOMINATIONS_CONTENT: " + request.getSession().getAttribute(MAP_STANDARD_NOMINATIONS_CONTENT));
+        		logger.debug("post prepareChartData : MAP_STANDARD_RATES_CONTENT: " + request.getSession().getAttribute(MAP_STANDARD_RATES_CONTENT));
+            }
+            
+            
             JFreeChart chart=null;
             
             logger.debug("creating pie chart" + type);

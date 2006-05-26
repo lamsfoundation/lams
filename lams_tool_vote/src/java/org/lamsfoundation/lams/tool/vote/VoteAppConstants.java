@@ -161,6 +161,7 @@ public interface VoteAppConstants {
     public static final String LIST_UPLOADED_ONLINE_FILENAMES			="listUploadedOnlineFileNames";
     public static final String LIST_OFFLINEFILES_METADATA				="listOfflineFilesMetadata";
     public static final String LIST_ONLINEFILES_METADATA				="listOnlineFilesMetadata";
+    public static final String LIST_VOTE_ALLSESSIONS_DTO				="listVoteAllSessionsDTO";
     public static final String ATTACHMENT_LIST                          ="attachmentList";
     public static final String DELETED_ATTACHMENT_LIST                  ="deletedAttachmentList";
     

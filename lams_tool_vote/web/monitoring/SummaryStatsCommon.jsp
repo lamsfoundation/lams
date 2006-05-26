@@ -221,3 +221,140 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							</tr>
 				</table>
 			</c:if> 	    	  
+
+
+
+			<c:if test="${currentMonitoredToolSession == 'All'}"> 							
+				<table align="left">
+				
+						<c:if test="${statsTabActive != 'true'}"> 							
+							<tr> 
+						 		<td NOWRAP> </td>
+								<td NOWRAP align=right>
+									<jsp:include page="/monitoring/PullDownMenu.jsp" />					
+								</td> 
+							</tr>
+						</c:if> 
+						<c:if test="${statsTabActive == 'true'}"> 							
+							<tr> 
+						 		<td NOWRAP> </td>
+								<td NOWRAP align=right>
+									<jsp:include page="/monitoring/PullDownMenuStats.jsp" />					
+								</td> 
+							</tr>
+						</c:if> 
+
+						<tr>
+					 		<td NOWRAP colspan=2 > &nbsp&nbsp </td>
+						</tr>
+						
+
+						<tr> <td NOWRAP> 	
+								<c:forEach var="currentDto" items="${sessionScope.listVoteAllSessionsDTO}">
+						  	 		<c:set var="currentSessionId" scope="request" value="${currentDto.sessionId}"/>
+						  	 		
+ 							 			<table align=left>
+						  					<tr>
+										 		<td NOWRAP> <b> <font size=2> <bean:message key="label.total.students"/> </b> </td>
+										 		<td> <font size=2> <c:out value="${currentDto.sessionUserCount}"/> </font></td>
+											</tr>
+					
+						  					<tr>
+										 		<td NOWRAP> <b> <font size=2> <bean:message key="label.total.completed.students"/> </b> </td> 
+										 		<td> <font size=2> <c:out value="${currentDto.completedSessionUserCount}"/> 
+											 		&nbsp(<c:out value="${currentDto.completedSessionUserPercent}"/> <bean:message key="label.percent"/>)
+										 		</font></td>
+											</tr>
+					
+											<tr>
+										 		<td NOWRAP colspan=2 > &nbsp&nbsp </td>
+											</tr>
+						  				
+											<tr>
+										 		<td NOWRAP colspan=2> 
+							                            <c:out value="${activityInstructions}" escapeXml="false"/> &nbsp
+												</td>
+											</tr>
+											
+					
+											<tr>
+										 		<td NOWRAP colspan=2 > &nbsp&nbsp </td>
+											</tr>
+											
+
+
+											<tr>
+												<td NOWRAP valign=top align=left>
+												<table align=center>
+											
+												<c:if test="${statsTabActive != 'true'}"> 							
+													<tr> 
+														<td> </td>
+														<td NOWRAP valign=top align=left >
+															<c:set var="viewURL">
+																<html:rewrite page="/chartGenerator?type=pie&currentSessionId=${currentSessionId}"/>
+															</c:set>
+															<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
+																 <font size=2>	<bean:message key="label.view.piechart"/>  </font>
+															</a>
+														</td>
+													</tr>
+													<tr> 
+														<td> </td>
+														<td NOWRAP valign=top align=left >
+															<c:set var="viewURL">
+																<html:rewrite page="/chartGenerator?type=bar&currentSessionId=${currentSessionId}"/>
+															</c:set>
+															<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
+																 <font size=2>	<bean:message key="label.view.barchart"/>  </font>
+															</a>
+														</td>
+													</tr>
+												</c:if> 								
+												
+												</table>
+												</td>
+											</tr>
+
+
+									<tr>
+								 		<td NOWRAP> <b> <font size=2> <bean:message key="label.nomination"/> </b> </td>
+										<td NOWRAP> <b> <font size=2> <bean:message key="label.total.votes"/> </b> </td>
+									</tr>
+									
+									<c:forEach var="currentNomination" items="${currentDto.mapStandardNominationsContent}">
+							  	 		<c:set var="currentNominationKey" scope="request" value="${currentNomination.key}"/>
+							  	 		 <tr>
+				  	 						<td NOWRAP valign=top align=left>
+												<c:out value="${currentNomination.value}" escapeXml="false"/>
+											 </td>
+			
+											<td NOWRAP valign=top align=left>				  	 		
+									  	 		<c:forEach var="currentUserCount" items="${currentDto.mapStandardUserCount}">
+										  	 		<c:set var="currentUserKey" scope="request" value="${currentUserCount.key}"/>
+									  				<c:if test="${currentNominationKey == currentUserKey}"> 				
+																<font size=2> <c:out value="${currentUserCount.value}"/>  </font>
+													</c:if> 	    
+												</c:forEach>		  
+			
+									  	 		<c:forEach var="currentRate" items="${currentDto.mapStandardRatesContent}">
+										  	 		<c:set var="currentRateKey" scope="request" value="${currentRate.key}"/>
+									  				<c:if test="${currentNominationKey == currentRateKey}"> 				
+																<font size=2> &nbsp(<c:out value="${currentRate.value}"/> <bean:message key="label.percent"/>) </font>
+													</c:if> 	    
+												</c:forEach>		  
+											</td>								
+										</tr>	
+									</c:forEach>	
+
+
+											<tr>
+										 		<td NOWRAP colspan=2 > &nbsp&nbsp </td>
+											</tr>
+
+									</table>
+					
+								</c:forEach>		
+							</td> </tr>	
+					</table>
+			</c:if> 	    	  

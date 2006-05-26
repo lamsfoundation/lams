@@ -141,21 +141,24 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
     	
     	String currentMonitoredToolSession=voteMonitoringForm.getSelectedToolSessionId(); 
 	    logger.debug("currentMonitoredToolSession: " + currentMonitoredToolSession);
+
+	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    logger.debug("toolContentId: " + toolContentId);
 	    
-	    
+	    VoteContent voteContent=voteService.retrieveVote(toolContentId);
+		logger.debug("existing voteContent:" + voteContent);
+
 	    /* SELECTION_CASE == 1 indicates a selected group other than "All" */
 		if (currentMonitoredToolSession.equals("All"))
 	    {
 		    request.getSession().setAttribute(SELECTION_CASE, new Long(2));
+		    logger.debug("generate DTO for All sessions: ");
+		    List listVoteAllSessionsDTO=MonitoringUtil.prepareChartDTO(request, voteService, voteMonitoringForm, voteContent.getVoteContentId());
+		    logger.debug("listVoteAllSessionsDTO: " + listVoteAllSessionsDTO);
+		    request.getSession().setAttribute(LIST_VOTE_ALLSESSIONS_DTO, listVoteAllSessionsDTO);
 	    }
 	    else
 	    {
-		    VoteSession voteSession=voteService.retrieveVoteSession(new Long(currentMonitoredToolSession));
-		    logger.debug("retrieving voteSession: " + voteSession);
-		    
-			VoteContent voteContent=voteSession.getVoteContent();
-		    logger.debug("using voteContent: " + voteContent);
-		    
 		    logger.debug("preparing chart data for content id: " + voteContent.getVoteContentId());
 		    logger.debug("preparing chart data for currentMonitoredToolSession: " + currentMonitoredToolSession);
 		    MonitoringUtil.prepareChartData(request, voteService, voteMonitoringForm, voteContent.getVoteContentId(), new Long(currentMonitoredToolSession));
@@ -175,6 +178,8 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	    
 		logger.debug("test4: MAP_STANDARD_NOMINATIONS_CONTENT: " + request.getSession().getAttribute(MAP_STANDARD_NOMINATIONS_CONTENT));
 		logger.debug("test4: MAP_STANDARD_RATES_CONTENT: " + request.getSession().getAttribute(MAP_STANDARD_RATES_CONTENT));
+
+		logger.debug("test4: LIST_VOTE_ALLSESSIONS_DTO: " + request.getSession().getAttribute(LIST_VOTE_ALLSESSIONS_DTO));
     	return (mapping.findForward(LOAD_MONITORING));	
 	}
 

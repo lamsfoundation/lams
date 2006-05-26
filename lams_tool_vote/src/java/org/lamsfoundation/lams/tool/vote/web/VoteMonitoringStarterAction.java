@@ -102,7 +102,6 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
 	    logger.debug("toolContentId: " + toolContentId);
 
-		logger.debug("calling  prepareChartData: " + toolContentId);
 	    
     	VoteContent voteContent=voteService.retrieveVote(toolContentId);
 		/*true means there is at least 1 response*/
@@ -125,6 +124,7 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 		request.getSession().setAttribute(REQUEST_LEARNING_REPORT, new Boolean(false).toString());
 		request.getSession().setAttribute(IS_PORTFOLIO_EXPORT, new Boolean(false).toString());
 		voteMonitoringForm.setShowOpenVotesSection(new Boolean(false).toString());
+		
 		return voteMonitoringAction.submitSession(mapping, form,  request, response);
 	}
 
