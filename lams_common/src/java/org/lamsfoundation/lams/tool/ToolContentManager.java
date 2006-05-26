@@ -23,8 +23,6 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool;
 
-import java.util.List;
-
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
@@ -113,7 +111,7 @@ public interface ToolContentManager
      * for the content.
      * @throws ToolException if any other error occurs
      */
-    public String exportToolContent(List toolContentId) 
+    public String importToolContent(Long toolContentId, String reference, String directory) 
     	throws ToolException;
     
  

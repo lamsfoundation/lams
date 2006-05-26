@@ -231,7 +231,7 @@ public class SubmitFilesService implements ToolContentManager,
      * for the content.
      * @throws ToolException if any other error occurs
      */
-	public String exportToolContent(List toolContentId) throws ToolException {
+	public String importToolContent(Long toolContentId, String reference, String directory) throws ToolException {
 		// TODO Auto-generated method stub
 		return null;
 	}
