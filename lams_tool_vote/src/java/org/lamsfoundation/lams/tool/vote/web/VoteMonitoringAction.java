@@ -349,7 +349,9 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	    	    	    {
 	    	    	        logger.debug("showUserEntriesByUserId is false");
 	    	    	        logger.debug("show user  entries  by same content and same session");
-	    	    	        if (voteContent.getVoteContentId().toString().equals(localUserSession.getVoteContentId().toString()))
+	    	    	        logger.debug("voteContent.getVoteContentId() versus localUserSession.getVoteContentId().toString(): " + 
+	    	    	                voteContent.getVoteContentId() + " versus " + localUserSession.getVoteContentId());
+	    	    	        if (voteContent.getUid().toString().equals(localUserSession.getVoteContentId().toString()))
 	    	    	        {
 			    	    	    if (userSessionId.equals(currentSessionId))
 			    	    	    {

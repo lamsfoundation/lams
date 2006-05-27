@@ -63,7 +63,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	  					<tr>
 					 		<td NOWRAP> <b> <font size=2> <bean:message key="label.total.completed.students"/> </b> </td> 
-					 		<td> <font size=2> <c:out value="${VoteMonitoringForm.completedSessionUserCount}"/> 
+					 		<td NOWRAP> <font size=2> <c:out value="${VoteMonitoringForm.completedSessionUserCount}"/> 
 						 		&nbsp(<c:out value="${VoteMonitoringForm.completedSessionUserPercent}"/> <bean:message key="label.percent"/>)
 					 		</font></td>
 						</tr>
@@ -261,7 +261,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					
 						  					<tr>
 										 		<td NOWRAP> <b> <font size=2> <bean:message key="label.total.completed.students"/> </b> </td> 
-										 		<td> <font size=2> <c:out value="${currentDto.completedSessionUserCount}"/> 
+										 		<td NOWRAP> <font size=2> <c:out value="${currentDto.completedSessionUserCount}"/> 
 											 		&nbsp(<c:out value="${currentDto.completedSessionUserPercent}"/> <bean:message key="label.percent"/>)
 										 		</font></td>
 											</tr>
