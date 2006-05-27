@@ -206,28 +206,21 @@ public abstract class VoteUtils implements VoteAppConstants {
 
     public static String stripFCKTags(String htmlText)
     {
-        logger.debug("stripping html text: " + htmlText);
         String noHTMLText = htmlText.replaceAll("\\<.*?\\>","").replaceAll("&nbsp;","").replaceAll("&#[0-9][0-9][0-9][0-9];","");
-        logger.debug("noHTMLText: " + noHTMLText);
-        	    
         String[] htmlTokens = noHTMLText.split("\n");
-        logger.debug("htmlTokens: " + htmlTokens);
-        logger.debug("htmlTokens: " + htmlTokens.length);
-        String noHtmlNoNewLineTitle="";
+        String noHtmlNoNewLineStr="";
         for (int i=0; i < htmlTokens.length ; i++)
         {
-            logger.debug("htmltoken: " + htmlTokens[i]);
             if (!htmlTokens[i].trim().equals(""))
             {
-                noHtmlNoNewLineTitle= noHtmlNoNewLineTitle + " " + htmlTokens[i];
+                noHtmlNoNewLineStr= noHtmlNoNewLineStr + " " + htmlTokens[i];
             }
         }
-        logger.debug("final noHtmlNoNewLineTitle: " + noHtmlNoNewLineTitle);
         
-        if (noHtmlNoNewLineTitle.length() > 30)
-            return noHtmlNoNewLineTitle.substring(0,31);
+        if (noHtmlNoNewLineStr.length() > 50)
+            return noHtmlNoNewLineStr.substring(0,51);
         
-        return noHtmlNoNewLineTitle;
+        return noHtmlNoNewLineStr;
     }
 
     
