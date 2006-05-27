@@ -203,9 +203,37 @@ public abstract class VoteUtils implements VoteAppConstants {
 	    voteAuthoringForm.setMaxNominationCount(maxNomcount);
 	}
 
-	
+
+    public static String stripFCKTags(String htmlText)
+    {
+        logger.debug("stripping html text: " + htmlText);
+        String noHTMLText = htmlText.replaceAll("\\<.*?\\>","").replaceAll("&nbsp;","").replaceAll("&#[0-9][0-9][0-9][0-9];","");
+        logger.debug("noHTMLText: " + noHTMLText);
+        	    
+        String[] htmlTokens = noHTMLText.split("\n");
+        logger.debug("htmlTokens: " + htmlTokens);
+        logger.debug("htmlTokens: " + htmlTokens.length);
+        String noHtmlNoNewLineTitle="";
+        for (int i=0; i < htmlTokens.length ; i++)
+        {
+            logger.debug("htmltoken: " + htmlTokens[i]);
+            if (!htmlTokens[i].trim().equals(""))
+            {
+                noHtmlNoNewLineTitle= noHtmlNoNewLineTitle + " " + htmlTokens[i];
+            }
+        }
+        logger.debug("final noHtmlNoNewLineTitle: " + noHtmlNoNewLineTitle);
+        
+        if (noHtmlNoNewLineTitle.length() > 30)
+            return noHtmlNoNewLineTitle.substring(0,31);
+        
+        return noHtmlNoNewLineTitle;
+    }
+
+    
 	public static void persistRichText(HttpServletRequest request)
 	{
+	    logger.debug("doing persistRichText: ");
 		String richTextTitle = request.getParameter(TITLE);
 	    String richTextInstructions = request.getParameter(INSTRUCTIONS);
 	    
@@ -217,6 +245,10 @@ public abstract class VoteUtils implements VoteAppConstants {
 	    {
 			request.getSession().setAttribute(ACTIVITY_TITLE, richTextTitle);
 	    }
+	    String noHTMLTitle = stripFCKTags(richTextTitle);
+	    logger.debug("noHTMLTitle: " + noHTMLTitle);
+	    
+
 	
 	    if (richTextInstructions != null)
 	    {

@@ -734,7 +734,9 @@ public class MonitoringUtil implements VoteAppConstants{
 				if (voteQueContent != null)
 				{
 					logger.debug("question: " + voteQueContent.getQuestion());
-					mapOptionsContent.put(mapIndex.toString(),voteQueContent.getQuestion());
+					String noHTMLNomination = VoteUtils.stripFCKTags(voteQueContent.getQuestion());
+				    logger.debug("noHTMLNomination: " + noHTMLNomination);
+					mapOptionsContent.put(mapIndex.toString(),noHTMLNomination);
 					
 					int votesCount=0;
 				    logger.debug("getting votesCount based on session: " + voteSession.getUid());
@@ -892,7 +894,9 @@ public class MonitoringUtil implements VoteAppConstants{
 			if (voteQueContent != null)
 			{
 				logger.debug("question: " + voteQueContent.getQuestion());
-				mapOptionsContent.put(mapIndex.toString(),voteQueContent.getQuestion());
+				String noHTMLNomination = VoteUtils.stripFCKTags(voteQueContent.getQuestion());
+			    logger.debug("noHTMLNomination: " + noHTMLNomination);
+				mapOptionsContent.put(mapIndex.toString(),noHTMLNomination);
 				
 				int votesCount=0;
 				if (sessionLevelCharting == true)
@@ -1039,7 +1043,11 @@ public class MonitoringUtil implements VoteAppConstants{
 			if (voteQueContent != null)
 			{
 				logger.debug("question: " + voteQueContent.getQuestion());
-				mapOptionsContent.put(mapIndex.toString(),voteQueContent.getQuestion());
+				//mapOptionsContent.put(mapIndex.toString(),voteQueContent.getQuestion());
+				String noHTMLNomination = VoteUtils.stripFCKTags(voteQueContent.getQuestion());
+			    logger.debug("noHTMLNomination: " + noHTMLNomination);
+				mapOptionsContent.put(mapIndex.toString(),noHTMLNomination);
+				
 				
 				int votesCount=0;
 				if (sessionLevelCharting == true)
@@ -1186,8 +1194,10 @@ public class MonitoringUtil implements VoteAppConstants{
 			if (voteQueContent != null)
 			{
 				logger.debug("question: " + voteQueContent.getQuestion());
-				mapOptionsContent.put(mapIndex.toString(),voteQueContent.getQuestion());
-		
+				String noHTMLNomination = VoteUtils.stripFCKTags(voteQueContent.getQuestion());
+			    logger.debug("noHTMLNomination: " + noHTMLNomination);
+				mapOptionsContent.put(mapIndex.toString(),noHTMLNomination);
+
 				int votesCount=voteService.getStandardAttemptsForQuestionContentAndContentUid(voteQueContent.getUid(), voteContent.getUid());
 				logger.debug("standardContentAttemptCount: " + votesCount);
 				

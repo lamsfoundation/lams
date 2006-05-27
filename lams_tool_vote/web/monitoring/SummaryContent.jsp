@@ -43,8 +43,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 		<c:if test="${(userExceptionNoToolSessions != 'true') }"> 	
-			<jsp:include page="/monitoring/SummaryStatsCommon.jsp" />
+			<c:if test="${currentMonitoredToolSession != 'All'}"> 							
+					<jsp:include page="/monitoring/IndividualSessionSummary.jsp" />					
+			</c:if> 	    	  
+
+			<c:if test="${currentMonitoredToolSession == 'All'}"> 							
+					<jsp:include page="/monitoring/AllSessionsSummary.jsp" />								
+			</c:if> 	    	  
 		</c:if>						
-
-
 
