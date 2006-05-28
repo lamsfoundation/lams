@@ -24,6 +24,7 @@
 /* $$Id$$ */	
 package org.lamsfoundation.lams.contentrepository.client;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Set;
 
@@ -168,4 +169,18 @@ public interface IToolContentHandler {
      */
     public abstract void setRepositoryService(
             IRepositoryService repositoryService);
+    /**
+     * Save content in repository into local file by given <code>toFileName</code>.
+     * 
+     * <p>
+     * If the <code>toFileName</code> is null, file name use original file name instead 
+     * and file save path will be system temporary directory.
+     * 
+     * @param uuid
+     * @param toFileName file name to save. Using the original file name instead if null value given.
+     * @throws ItemNotFoundException
+     * @throws RepositoryCheckedException
+     * @throws IOException
+     */
+    public void saveFile(Long uuid, String toFileName) throws ItemNotFoundException, RepositoryCheckedException, IOException;
 }

@@ -51,6 +51,8 @@
 				<prop key="updatePackageItem">PROPAGATION_REQUIRED</prop>
 				<prop key="deleteVersion">PROPAGATION_REQUIRED</prop>
 				<prop key="deleteNode">PROPAGATION_REQUIRED</prop>
+				<prop key="copy*">PROPAGATION_REQUIRED</prop>
+				<prop key="save*">PROPAGATION_REQUIRED</prop>
 				<prop key="logout">PROPAGATION_SUPPORTS</prop>
 				<prop key="setProperty">PROPAGATION_SUPPORTS</prop>
 				<!--  Read only methods -->
