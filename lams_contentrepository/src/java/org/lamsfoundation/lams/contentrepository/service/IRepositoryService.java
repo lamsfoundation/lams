@@ -375,7 +375,6 @@ public interface IRepositoryService {
      * Save current version of a node to local file by given file name. If the <code>toFileName</code> is
      * null, file name use original file name instead and file save path will be system temporary directory.
      * <p>
-     * So far, it only support <ocde>FILENODE</code> format content.
      * 
      * @param ticket ticket issued on login. Identifies tool and workspace - mandatory 
 	 * @param uuid id of the file/package - mandatory

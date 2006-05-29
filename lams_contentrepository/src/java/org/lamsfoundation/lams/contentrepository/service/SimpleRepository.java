@@ -39,6 +39,7 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
 import org.lamsfoundation.lams.contentrepository.CrCredential;
@@ -67,6 +68,8 @@ import org.lamsfoundation.lams.contentrepository.dao.ICredentialDAO;
 import org.lamsfoundation.lams.contentrepository.dao.IWorkspaceDAO;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileUtilException;
+import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
+import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
 
 
 /**
@@ -622,28 +625,31 @@ public class SimpleRepository implements IRepositoryAdmin {
 			ItemNotFoundException, IOException, RepositoryCheckedException {
 			try {
 				IVersionedNode  node = nodeFactory.getNode(ticket.getWorkspaceId(), uuid, versionId);
-				if(!node.isNodeType(NodeType.FILENODE))
-				    throw new RepositoryCheckedException("Unsupported node type "
-							+node.getNodeType()+". Node Data is "+node.toString(),null);
-				
 	 		    if(node == null)
 	 		    	throw new ItemNotFoundException("Unable find File node by uuid [" + uuid + "]");
-	 		    
-	 		    InputStream is = node.getFile();
-	 		    if(toFileName == null){
-	 		    	IValue prop = node.getProperty(PropertyName.FILENAME);
-	 		    	toFileName = prop != null ? prop.getString() : null;
-	 		    	FileUtil.createDirectory(FileUtil.TEMP_DIR);
-	 		    	toFileName =  FileUtil.TEMP_DIR + File.separator + toFileName; 
+
+	 		    if(node.isNodeType(NodeType.FILENODE)){
+		 		    saveSigleFile(toFileName, node);
+	 		    }else if(node.isNodeType(NodeType.PACKAGENODE)){
+	 		    	Set<IVersionedNode> children = node.getChildNodes();
+	 		    	String tempRoot = FileUtil.createTempDirectory("export_package");
+	 		    	for(IVersionedNode child:children){
+	 		    		String path = child.getPath();
+	 		    		String fullname= tempRoot + File.separator + path;
+	 		    		
+	 		    		//if folder does not exist, create first.
+	 		    		FileUtil.createDirectory(FileUtil.getFileDirectory(fullname));
+	 		    		
+	 		    		saveSigleFile(fullname,child);
+	 		    	}
+	 				if(toFileName == null){
+	 					IValue prop = node.getProperty(PropertyName.FILENAME);
+	 					toFileName = prop != null ? prop.getString() : null;
+	 					FileUtil.createDirectory(FileUtil.TEMP_DIR);
+	 					toFileName =  FileUtil.TEMP_DIR + File.separator + toFileName; 
+	 				}
+	 		    	ZipFileUtil.createZipFile(FileUtil.getFileName(toFileName),tempRoot,FileUtil.getFileDirectory(toFileName));
 	 		    }
-	 		    OutputStream os = new FileOutputStream(toFileName);
-	 		    byte[] out  = new byte[8 * 1024];
-	 		    int len = -1;
-	 		    while((len = is.read(out)) != -1){
-	 		    	os.write(out,0,len);
-	 		    }
-	 		    os.close();
-	 		    is.close();
 			} catch (FileException e) {
 				// if this is thrown, then it is bug - nothing external should cause it.
 			    throw new RepositoryRuntimeException("Internal error: unable to save node. "
@@ -654,7 +660,39 @@ public class SimpleRepository implements IRepositoryAdmin {
 			} catch (FileUtilException e) {
 				throw new RepositoryRuntimeException("Internal error: unable to save node. "
 						+e.getMessage(), e);
+			} catch (ZipFileUtilException e) {
+				throw new RepositoryRuntimeException("Internal error: unable to save node. "
+						+e.getMessage(), e);
 			} 
+	}
+
+	/**
+	 * @param toFileName
+	 * @param node
+	 * @throws FileException
+	 * @throws ValueFormatException
+	 * @throws FileUtilException
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
+	private void saveSigleFile(String toFileName, IVersionedNode node) throws FileException, ValueFormatException, FileUtilException, FileNotFoundException, IOException {
+		InputStream is = node.getFile();
+		if(toFileName == null){
+			IValue prop = node.getProperty(PropertyName.FILENAME);
+			toFileName = prop != null ? prop.getString() : null;
+			FileUtil.createDirectory(FileUtil.TEMP_DIR);
+			toFileName =  FileUtil.TEMP_DIR + File.separator + toFileName; 
+		}
+		OutputStream os = new FileOutputStream(toFileName);
+		byte[] out  = new byte[8 * 1024];
+		int len = -1;
+		while((len = is.read(out)) != -1){
+			os.write(out,0,len);
+		}
+		os.close();
+		is.close();
+		
+		log.debug("File save success:" + toFileName);
 	}
     /* (non-Javadoc)
 	 * @see org.lamsfoundation.lams.contentrepository.IRepository#updatePackageItem(org.lamsfoundation.lams.contentrepository.ITicket, java.lang.Long, java.lang.String, java.lang.String, java.lang.String)
