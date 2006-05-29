@@ -109,15 +109,7 @@ public function update (o:Observable,infoObj:Object):Void{
 				if (infoObj.tabID == _tabID){
 				trace("TabID for Selected tab is (LessonTab TABCHANGE): "+infoObj.tabID)
 					this._visible = true;
-					MovieClipUtils.doLater(Proxy.create(this,draw));
-				}else {
-					this._visible = false;
-				}
-				break;
-			case 'SEQUENCE' :
-				if (infoObj.tabID == _tabID){
-				trace("TabID for Selected tab is (LessonTab): "+infoObj.tabID)
-					this._visible = true;
+					mm.setDirty();
 					MovieClipUtils.doLater(Proxy.create(this,draw));
 				}else {
 					this._visible = false;
