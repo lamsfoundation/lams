@@ -122,12 +122,14 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 					break;
 				case 'TABCHANGE' :
 					if (infoObj.tabID == _tabID){
+						this._visible = true;
 						trace("TabID for Selected tab is (TABCHANGE): "+infoObj.tabID)
 						if (mm.activitiesDisplayed.length == null || mm.activitiesDisplayed.length == undefined){
 							trace("activitiesDisplayed is null: "+infoObj.tabID)
 							mm.getMonitor().openLearningDesign(mm.getSequence());
+						}else {
+							mm.drawDesign(infoObj.tabID);
 						}
-						this._visible = true;
 					}else {
 						this._visible = false;
 					}
@@ -169,10 +171,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 				case 'DRAW_DESIGN' :
 					if (infoObj.tabID == _tabID){
 						trace("TabID for Selected tab is (MonitorTab): "+infoObj.tabID)
-						//if (mm.activitiesDisplayed == null){
-							mm.drawDesign(infoObj.tabID);
-							//mm.drawDesign(infoObj.tabID)
-						//}
+						mm.drawDesign(infoObj.tabID);
 					}
 					break;
 				default :
@@ -248,28 +247,21 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 		//take action depending on act type
 		if(a.activityTypeID==Activity.TOOL_ACTIVITY_TYPE || a.isGateActivity() || a.isGroupActivity() ){
 			var newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasActivity",DepthManager.kTop,{_activity:a,_monitorController:mc,_monitorTabView:mtv});
-			mm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
-			
 		}
 		if(a.activityTypeID==Activity.PARALLEL_ACTIVITY_TYPE){
 			//get the children
 			var children:Array = mm.getMonitor().ddm.getComplexActivityChildren(a.activityUIID);
-			
 			var newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasParallelActivity",DepthManager.kTop,{_activity:a,_children:children,_monitorController:mc,_monitorTabView:mtv});
-			mm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
-			
 		}
 		if(a.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE){
 			var children:Array = mm.getMonitor().ddm.getComplexActivityChildren(a.activityUIID);
-			
-			var newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasOptionalActivity",DepthManager.kTop,{_activity:a,_children:children,_monitorController:mc,_monitorTabView:mtv});
-			mm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
-			
-			
+			var newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasOptionalActivity",DepthManager.kTop,{_activity:a,_children:children,_monitorController:mc,_monitorTabView:mtv});	
 		}else{
 			Debugger.log('The activity:'+a.title+','+a.activityUIID+' is of unknown type, it cannot be drawn',Debugger.CRITICAL,'drawActivity','MonitorTabView');
 		}
-		
+		if (mm.activitiesDisplayed.length != mm.getActivityKeys()){
+			mm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
+		}
 		s = true;
 		//mm.getMonitor().getMV().getMonitorScp().redraw(true); 
 		return s;
@@ -290,8 +282,9 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 		var mc = getController();
 		
 		var newTransition_mc:MovieClip = _transitionLayer_mc.createChildAtDepth("MonitorTransition",DepthManager.kTop,{_transition:t,_monitorController:mc,_monitorTabView:mtv});
-		
-		mm.transitionsDisplayed.put(t.transitionUIID,newTransition_mc);
+		if (mm.transitionsDisplayed.length != mm.getTransitionKeys()){
+			mm.transitionsDisplayed.put(t.transitionUIID,newTransition_mc);
+		}
 		Debugger.log('drawn a transition:'+t.transitionUIID+','+newTransition_mc,Debugger.GEN,'drawTransition','MonitorTabView');
 		return s;
 		
