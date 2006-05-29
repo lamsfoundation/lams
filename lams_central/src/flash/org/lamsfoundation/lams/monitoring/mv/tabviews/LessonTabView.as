@@ -26,6 +26,7 @@ import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.common.ui.*
 import org.lamsfoundation.lams.common.style.*
 import org.lamsfoundation.lams.monitoring.mv.*
+import org.lamsfoundation.lams.wizard.*
 import org.lamsfoundation.lams.monitoring.*;
 import org.lamsfoundation.lams.authoring.Activity;
 import org.lamsfoundation.lams.common.dict.*
@@ -148,6 +149,7 @@ public function update (o:Observable,infoObj:Object):Void{
 				if (infoObj.tabID == _tabID){
 				trace("TabID for Selected tab is (LessonTab TABCHANGE): "+infoObj.tabID)
 					this._visible = true;
+					mm.setDirty();
 					MovieClipUtils.doLater(Proxy.create(this,draw));
 				}else {
 					this._visible = false;
@@ -192,7 +194,11 @@ public function update (o:Observable,infoObj:Object):Void{
 		trace("Loaded LessonTabView Data"+ this)
 		
 		//setStyles();
-		populateLessonDetails();
+		//populateLessonDetails();
+		var requestLessonID = mm.getSequence().getSequenceID()
+		var callback:Function = Proxy.create(this,populateLessonDetails);
+		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=getLessonLearners&lessonID='+requestLessonID,callback, false);
+		//getLessonLearners(lessonID)
 		
 		trace('seq id: ' + mm.getSequence().getSequenceID());
 		trace('last seq id: ' + mm.getLastSelectedSequence().getSequenceID());
@@ -212,14 +218,15 @@ public function update (o:Observable,infoObj:Object):Void{
 	/**
 	 * Populate the lesson details from HashTable Sequence in MOnitorModel
 	*/
-	private function populateLessonDetails():Void{
+	private function populateLessonDetails(users:Array):Void{
 		//var mm:Observable = getModel();
+		trace("Number of learners are: "+users.length)
 		var s:Object = mm.getSequence();
-		trace("Item Description (Lesson Tab View) is : "+s._seqDescription);
+		//trace("Number of Learners Sequence are : "+_wm.getLessonClassData().learners.length);
 		LSTitle_txt.text = s._seqName;
 		LSDescription_txt.text = s._seqDescription;
 		sessionStatus_txt.text = showStatus(s._seqStateID);
-		//numLearners_txt.text = s._seqDescription
+		numLearners_txt.text = " of "+String(users.length)
 		//group_txt.text = s._seqDescription
 		//duration_txt.text = s._seqDescription
 		  
