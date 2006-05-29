@@ -25,6 +25,7 @@ import org.lamsfoundation.lams.common.util. *;
 import org.lamsfoundation.lams.common.ui. *;
 import org.lamsfoundation.lams.authoring. *;
 import org.lamsfoundation.lams.authoring.cv. *;
+import org.lamsfoundation.lams.monitoring.mv. *;
 //import org.lamsfoundation.lams.authoring.cv.DesignDataModel;
 import org.lamsfoundation.lams.common.style. *;
 import mx.controls. *;
@@ -43,12 +44,15 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 	//this is set by the init object
 	private var _canvasController : CanvasController;
 	private var _canvasView : CanvasView;
+	private var _monitorController : MonitorController;
+	private var _monitorView : MonitorView;
 	//Set by the init obj
 	private var _activity : Activity;
 	private var _children : Array;
 	private var panelHeight : Number;
 	//refs to screen items:
 	private var container_pnl : Panel;
+	private var containerPanelHeader:MovieClip;
 	private var header_pnl : Panel;
 	private var act_pnl : Panel;
 	private var title_lbl : Label;
@@ -60,8 +64,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 	private var padlockOpen_mc : MovieClip;
 	private var _dcStartTime : Number = 0;
 	private var _doubleClicking : Boolean;
-	//private var child1_mc:MovieClip;
-	//private var child2_mc:MovieClip;
+
 	private var child_mc : MovieClip;
 	private var _locked : Boolean;
 	private var _visibleHeight : Number;
@@ -102,13 +105,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 			children_mc [i].activity.yCoord = CHILD_OFFSET_Y + (i * CHILD_INCRE);
 			
 			}else {
-				children_mc [i] = childActivities_mc.attachMovie ("CanvasActivityLinear_forOptional", "CanvasActivity" + i, childActivities_mc.getNextHighestDepth (), {_activity : _children [i] , _canvasController : _canvasController, _canvasView : _canvasView, actLabel:_children [i].title});
+				children_mc [i] = childActivities_mc.attachMovie ("CanvasActivityLinear_forOptional", "CanvasActivity" + i, childActivities_mc.getNextHighestDepth (), {_activity : _children [i] , _monitorController : _monitorController, _monitorView : _monitorView, _module:"monitoring", actLabel:_children [i].title});
 				//set the positioning co-ords
-				if (i == 0){
-					children_mc [i]._y = (i * 21)- 21;
-				}else{
-					children_mc [i]._y = children_mc [i-1]._y+ 21;
-				}
+				children_mc [i]._y = (i*21)+8;
 				children_mc [i]._x = 58;
 			
 			
@@ -145,7 +144,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		panelHeight = CHILD_OFFSET_Y + (numOfChildren * CHILD_INCRE);
 		setStyles ()
 		//write text
-		title_lbl.text = _activity.title = 'Optional Activities';
+		title_lbl.text = 'Optional Activities'
+		//_activity.title = 'Optional Activities';
 		actCount_lbl.text = _children.length + " activities";
 		header_pnl.borderType = 'outset';
 		act_pnl.borderType = 'inset';
@@ -159,8 +159,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 			_x = _activity.xCoord;
 			_y = _activity.yCoord;
 		}else {
-			container_pnl._height = (numOfChildren * 21);
-			container_pnl._y = - (container_pnl._height/2);
+			containerPanelHeader.title_lbl.text = 'Optional Activities'
+			container_pnl._height = 15+(numOfChildren * 21);
 		}
 		//dimentions of container (this)
 		if (_locked)
