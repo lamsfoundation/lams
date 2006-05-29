@@ -55,6 +55,22 @@ class MonitorController extends AbstractController {
 		//}
 	}
 	
+	public function activityClick(ca:Object):Void{
+	   Debugger.log('activityClick CanvasActivity:'+ca.activity.activityUIID,Debugger.GEN,'activityClick','MonitorController');
+   }
+   
+	public function activityDoubleClick(ca:Object):Void{
+	   Debugger.log('activityDoubleClick CanvasActivity:'+ca.activity.activityUIID,Debugger.GEN,'activityDoubleClick','MonitorController');
+	}
+   
+   public function activityRelease(ca:Object):Void{
+	   Debugger.log('activityRelease CanvasActivity:'+ca.activity.activityUIID,Debugger.GEN,'activityRelease','MonitorController');
+	    
+	}
+	
+   public function activityReleaseOutside(ca:Object):Void{
+	   Debugger.log('activityReleaseOutside CanvasActivity:'+ca.activity.activityUIID,Debugger.GEN,'activityReleaseOutside','MonitorController');
+   }
 	// add control methods
 	
 	/**
