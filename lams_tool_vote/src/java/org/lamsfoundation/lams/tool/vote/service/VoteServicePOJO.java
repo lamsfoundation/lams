@@ -463,9 +463,6 @@ public class VoteServicePOJO implements
     {
 	   try
         {
-			auditService.logShowEntry(MY_SIGNATURE, voteQueUsr.getQueUsrId(), 
-			        voteQueUsr.getUsername(), voteQueUsr.toString());
-
 	   		voteUserDAO.saveVoteUser(voteQueUsr);
         }
         catch (DataAccessException e)
@@ -526,9 +523,6 @@ public class VoteServicePOJO implements
     {
         try
         {
-			auditService.logShowEntry(MY_SIGNATURE, voteUsrAttempt.getQueUsrId(), 
-			        voteUsrAttempt.getVoteQueUsr().getUsername(), voteUsrAttempt.toString());
-
         	voteUsrAttemptDAO.saveVoteUsrAttempt(voteUsrAttempt);
         }
         catch (DataAccessException e)
@@ -737,9 +731,6 @@ public class VoteServicePOJO implements
     {
         try
         {
-			auditService.logShowEntry(MY_SIGNATURE, voteUsrAttempt.getQueUsrId(), 
-			        voteUsrAttempt.getVoteQueUsr().getUsername(), voteUsrAttempt.toString());
-
         	voteUsrAttemptDAO.updateVoteUsrAttempt(voteUsrAttempt);
         }
         catch (DataAccessException e)
@@ -1138,9 +1129,6 @@ public class VoteServicePOJO implements
 	{
     	try
         {
-			auditService.logShowEntry(MY_SIGNATURE, attempt.getQueUsrId(), 
-			        attempt.getVoteQueUsr().getUsername(), attempt.toString());
-
     		voteUsrAttemptDAO.removeVoteUsrAttempt(attempt);
         }
         catch(DataAccessException e)
@@ -1166,14 +1154,28 @@ public class VoteServicePOJO implements
         }
     }
     
+    
+    public void hideOpenVote(VoteUsrAttempt voteUsrAttempt) throws VoteApplicationException
+    {
+        logger.debug("hiding user entry: " + voteUsrAttempt.getUserEntry());
+		auditService.logHideEntry(MY_SIGNATURE, voteUsrAttempt.getQueUsrId(), 
+		        voteUsrAttempt.getVoteQueUsr().getUsername(), voteUsrAttempt.getUserEntry());
+    }
+    
+    public void showOpenVote(VoteUsrAttempt voteUsrAttempt) throws VoteApplicationException
+    {
+        logger.debug("showing user entry: " + voteUsrAttempt.getUserEntry());
+		auditService.logShowEntry(MY_SIGNATURE, voteUsrAttempt.getQueUsrId(), 
+		        voteUsrAttempt.getVoteQueUsr().getUsername(), voteUsrAttempt.getUserEntry());
+    }
 
     
     public void deleteVoteQueUsr(VoteQueUsr voteQueUsr) throws VoteApplicationException
     {
     	try
         {
-			auditService.logShowEntry(MY_SIGNATURE, voteQueUsr.getQueUsrId(), 
-			        voteQueUsr.getUsername(), voteQueUsr.toString());
+			//auditService.logShowEntry(MY_SIGNATURE, voteQueUsr.getQueUsrId(), 
+			//        voteQueUsr.getUsername(), voteQueUsr.toString());
     	    
     		voteUserDAO.removeVoteUser(voteQueUsr);
         }
@@ -1540,6 +1542,7 @@ public class VoteServicePOJO implements
         	throw new ToolException("toolContentId is missing");
     	}
 	}
+
 
     /**
      * Export the XML fragment for the tool's content, along with any files needed

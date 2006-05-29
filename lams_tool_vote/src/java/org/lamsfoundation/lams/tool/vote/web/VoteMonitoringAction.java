@@ -908,6 +908,8 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
         logger.debug("voteUsrAttempt: " + voteUsrAttempt);
         voteUsrAttempt.setVisible(false);
         voteService.updateVoteUsrAttempt(voteUsrAttempt);
+        logger.debug("hiding the user entry : " + voteUsrAttempt.getUserEntry());
+        voteService.hideOpenVote(voteUsrAttempt);
         
     	Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
 	    logger.debug("toolContentId: " + toolContentId);
@@ -963,7 +965,8 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
         logger.debug("voteUsrAttempt: " + voteUsrAttempt);
         voteUsrAttempt.setVisible(true);
         voteService.updateVoteUsrAttempt(voteUsrAttempt);
-
+        voteService.showOpenVote(voteUsrAttempt);
+        
     	Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
 	    logger.debug("toolContentId: " + toolContentId);
 	    

@@ -93,6 +93,10 @@ public interface IVoteService
     
     public List getUserBySessionOnly(final VoteSession voteSession) throws VoteApplicationException;
     
+    public void hideOpenVote(VoteUsrAttempt voteUsrAttempt) throws VoteApplicationException;
+    
+    public void showOpenVote(VoteUsrAttempt voteUsrAttempt) throws VoteApplicationException;
+    
     public void updateVoteQueContent(VoteQueContent voteQueContent) throws VoteApplicationException;
     
     public int getAttemptsForQuestionContent(final Long voteQueContentId) throws VoteApplicationException;
