@@ -586,15 +586,15 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		forumDao.delete(forum);
 	}
 	
+    
 	/**
      * Export the XML fragment for the tool's content, along with any files needed
      * for the content.
      * @throws DataMissingException if no tool content matches the toolSessionId 
      * @throws ToolException if any other error occurs
      */
- 	public String exportToolContent(Long toolContentId) throws DataMissingException, ToolException {
-		// TODO Auto-generated method stub
-		return null;
+
+	public void exportToolContent(Long toolContentId, String toPath) throws DataMissingException, ToolException {
 	}
 
     /**
@@ -602,9 +602,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
      * for the content.
      * @throws ToolException if any other error occurs
      */
-	public String importToolContent(Long toolContentId, String reference, String directory) throws ToolException {
-		// TODO Auto-generated method stub
-		return null;
+	public void importToolContent(Object toolContnetPOJO) throws ToolException {
 	}
 
 	/** @see org.lamsfoundation.lams.tool.ToolSessionManager#createToolSession(java.lang.Long, java.lang.String, java.lang.Long) */
@@ -639,7 +637,6 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		}
 		return learnerService.completeToolSession(toolSessionId,learnerId);
 	}
-
 	public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException {
 		return null;
 	}
@@ -648,6 +645,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		return null;
 	}
 
+	
 	public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException {
 		forumToolSessionDao.delete(toolSessionId);
 	}
@@ -765,5 +763,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	public void setLearnerService(ILearnerService learnerService) {
 		this.learnerService = learnerService;
 	}
+
+
 
 }

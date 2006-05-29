@@ -233,16 +233,14 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 		// TODO Auto-generated method stub
 
 	}
-	
 	/**
      * Export the XML fragment for the tool's content, along with any files needed
      * for the content.
      * @throws DataMissingException if no tool content matches the toolSessionId 
      * @throws ToolException if any other error occurs
      */
- 	public String exportToolContent(Long toolContentId) throws DataMissingException, ToolException {
-		// TODO Auto-generated method stub
-		return null;
+
+	public void exportToolContent(Long toolContentId, String toPath) throws DataMissingException, ToolException {
 	}
 
     /**
@@ -250,12 +248,9 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
      * for the content.
      * @throws ToolException if any other error occurs
      */
-	public String importToolContent(Long toolContentId, String reference, String directory) throws ToolException {
-		// TODO Auto-generated method stub
-		return null;
+	public void importToolContent(Object toolContnetPOJO) throws ToolException {
 	}
-
-
+	
 	/* ********** IChatService Methods ************************************** */
 	public Long getDefaultContentIdBySignature(String toolSignature) {
 		Long toolContentId = null;

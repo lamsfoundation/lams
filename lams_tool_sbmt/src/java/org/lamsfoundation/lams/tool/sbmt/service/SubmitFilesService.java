@@ -56,6 +56,8 @@ import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.contentrepository.service.RepositoryProxy;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
+import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
+import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
@@ -82,8 +84,8 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dao.IUserDAO;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.util.LastNameAlphabeticComparator;
-import org.springframework.dao.DataAccessException;
 import org.lamsfoundation.lams.util.DateUtil;
+import org.springframework.dao.DataAccessException;
 
 /**
  * @author Manpreet Minhas
@@ -104,7 +106,7 @@ public class SubmitFilesService implements ToolContentManager,
 	private ILamsToolService toolService;
 	private ILearnerService learnerService;
 	private IRepositoryService repositoryService;
-
+	private IExportToolContentService exportContentService;
 	/**
 	 * (non-Javadoc)
 	 * 
@@ -218,22 +220,24 @@ public class SubmitFilesService implements ToolContentManager,
 	/**
      * Export the XML fragment for the tool's content, along with any files needed
      * for the content.
-     * @throws DataMissingException if no tool content matches the toolSessionId 
-     * @throws ToolException if any other error occurs
+	 * @throws ExportToolContentException 
      */
- 	public String exportToolContent(Long toolContentId) throws DataMissingException, ToolException {
-		// TODO Auto-generated method stub
-		return null;
+ 	public void exportToolContent(Long toolContentId , String toPath) throws ToolException, DataMissingException{
+ 		exportContentService.registerFileHandleClass("org.lamsfoundation.lams.tool.sbmt.InstructionFiles","uuID","versionID");
+ 		SubmitFilesContent toolContentObj = submitFilesContentDAO.getContentByID(toolContentId);
+ 		if(toolContentObj == null)
+ 			throw new DataMissingException("Unable to find tool content by given id :" + toolContentId);
+ 		
+ 		toolContentObj = SubmitFilesContent.newInstance(toolContentObj,toolContentId,sbmtToolContentHandler);
+ 		toolContentObj.setToolSession(null);
+ 		toolContentObj.setToolContentHandler(null);
+		try {
+			exportContentService.exportToolContent( toolContentId, toolContentObj,sbmtToolContentHandler, toPath);
+		} catch (ExportToolContentException e) {
+			throw new ToolException(e);
+		}
 	}
-
-    /**
-     * Import the XML fragment for the tool's content, along with any files needed
-     * for the content.
-     * @throws ToolException if any other error occurs
-     */
-	public String importToolContent(Long toolContentId, String reference, String directory) throws ToolException {
-		// TODO Auto-generated method stub
-		return null;
+	public void importToolContent(Object toolContnetPOJO) throws ToolException {
 	}
 
 	/*
@@ -834,6 +838,12 @@ public class SubmitFilesService implements ToolContentManager,
 
 	public void setToolService(ILamsToolService toolService) {
 		this.toolService = toolService;
+	}
+	public IExportToolContentService getExportContentService() {
+		return exportContentService;
+	}
+	public void setExportContentService(IExportToolContentService exportContentService) {
+		this.exportContentService = exportContentService;
 	}
 	
 

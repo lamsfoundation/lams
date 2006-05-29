@@ -367,4 +367,12 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 		return obj;
 	}
 
+	public IToolContentHandler getToolContentHandler() {
+		return toolContentHandler;
+	}
+
+	public void setToolContentHandler(IToolContentHandler toolContentHandler) {
+		this.toolContentHandler = toolContentHandler;
+	}
+
 }

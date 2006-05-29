@@ -51,6 +51,8 @@ import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
+import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
+import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
@@ -106,7 +108,8 @@ public class ResourceServiceImpl implements
 	private ILamsToolService toolService;
 	private ILearnerService learnerService;
 	private IAuditService auditService;
-
+	private IExportToolContentService exportContentService;
+	
 	public IVersionedNode getFileNode(Long itemUid, String relPathString) throws ResourceApplicationException {
 		ResourceItem item = (ResourceItem) resourceItemDao.getObject(ResourceItem.class,itemUid);
 		if ( item == null )
@@ -730,6 +733,30 @@ public class ResourceServiceImpl implements
 	//*******************************************************************************
 	//ToolContentManager, ToolSessionManager methods
 	//*******************************************************************************
+	
+	public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
+		Resource toolContentObj = resourceDao.getByContentId(toolContentId);
+ 		if(toolContentObj == null)
+ 			throw new DataMissingException("Unable to find tool content by given id :" + toolContentId);
+ 		
+ 		toolContentObj = Resource.newInstance(toolContentObj,toolContentId,resourceToolContentHandler);
+ 		toolContentObj.setToolContentHandler(null);
+ 		toolContentObj.setOfflineFileList(null);
+ 		toolContentObj.setOnlineFileList(null);
+ 		toolContentObj.setMiniViewNumberStr(null);
+		try {
+			exportContentService.registerFileHandleClass("org.lamsfoundation.lams.tool.rsrc.model.ResourceAttachment","fileUuid","fileVersionId");
+			exportContentService.registerFileHandleClass("org.lamsfoundation.lams.tool.rsrc.model.ResourceItem","fileUuid","fileVersionId");
+			exportContentService.exportToolContent( toolContentId, toolContentObj,resourceToolContentHandler, rootPath);
+		} catch (ExportToolContentException e) {
+			throw new ToolException(e);
+		}
+	}
+
+
+	public void importToolContent(Object toolContnetPOJO) throws ToolException {
+	}
+
 	public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
 		if (fromContentId == null || toContentId == null)
 			throw new ToolException(
@@ -789,27 +816,6 @@ public class ResourceServiceImpl implements
 		resourceDao.delete(resource);
 	}
 
-	/**
-     * Export the XML fragment for the tool's content, along with any files needed
-     * for the content.
-     * @throws DataMissingException if no tool content matches the toolSessionId 
-     * @throws ToolException if any other error occurs
-     */
- 	public String exportToolContent(Long toolContentId) throws DataMissingException, ToolException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-    /**
-     * Import the XML fragment for the tool's content, along with any files needed
-     * for the content.
-     * @throws ToolException if any other error occurs
-     */
-	public String importToolContent(Long toolContentId, String reference, String directory) throws ToolException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	
 	public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 		ResourceSession session = new ResourceSession();
@@ -858,6 +864,17 @@ public class ResourceServiceImpl implements
 	public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException {
 		resourceSessionDao.deleteBySessionId(toolSessionId);
 	}
+
+
+	public IExportToolContentService getExportContentService() {
+		return exportContentService;
+	}
+
+
+	public void setExportContentService(IExportToolContentService exportContentService) {
+		this.exportContentService = exportContentService;
+	}
+
 
 
 }
