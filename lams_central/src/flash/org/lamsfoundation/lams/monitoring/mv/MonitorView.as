@@ -308,6 +308,11 @@ public function update (o:Observable,infoObj:Object):Void{
 	public function getMonitorTab():MovieClip{
 		return monitorTabs_tb;
 	}
+	
+	public function getMonitorScp():MovieClip{
+		trace("Called getMonitorScp")
+		return monitor_scp;
+	}
 	 /*
     * Returns the default controller for this view.
     */
