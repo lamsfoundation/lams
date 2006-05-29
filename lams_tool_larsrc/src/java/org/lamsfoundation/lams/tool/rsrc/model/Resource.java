@@ -520,6 +520,9 @@ public class Resource implements Cloneable{
 	public void setOnlineFileList(List<ResourceAttachment> onlineFileList) {
 		this.onlineFileList = onlineFileList;
 	}
+	public void setToolContentHandler(IToolContentHandler toolContentHandler) {
+		this.toolContentHandler = toolContentHandler;
+	}
 
 
 }
