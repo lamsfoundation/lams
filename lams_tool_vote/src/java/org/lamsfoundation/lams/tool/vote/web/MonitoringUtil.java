@@ -1043,7 +1043,6 @@ public class MonitoringUtil implements VoteAppConstants{
 			if (voteQueContent != null)
 			{
 				logger.debug("question: " + voteQueContent.getQuestion());
-				//mapOptionsContent.put(mapIndex.toString(),voteQueContent.getQuestion());
 				String noHTMLNomination = VoteUtils.stripFCKTags(voteQueContent.getQuestion());
 			    logger.debug("noHTMLNomination: " + noHTMLNomination);
 				mapOptionsContent.put(mapIndex.toString(),noHTMLNomination);
@@ -1123,7 +1122,6 @@ public class MonitoringUtil implements VoteAppConstants{
 				    boolean isVoteVisible=voteService.isVoteVisibleForSession(userEntry, toolSessionUid);
 				    logger.debug("isVoteVisible: " + isVoteVisible);
 				    
-				    
 				    logger.debug("voteEntries: " + voteEntries);
 				    int individualUserEnteredVoteCount=voteEntries.size();
 				    logger.debug("individualUserEnteredVoteCount: " + individualUserEnteredVoteCount);
@@ -1131,7 +1129,15 @@ public class MonitoringUtil implements VoteAppConstants{
 				    double votesShare=(individualUserEnteredVoteCount * share) / userEnteredVotesCount;
 					logger.debug("votesShare: " + votesShare);
 		    	    
-					mapStandardNominationsContent.put(mapIndex.toString(), userEntry);
+					if (isVoteVisible == true)
+					    mapStandardNominationsContent.put(mapIndex.toString(), userEntry);
+					else
+					{
+					    String nominationName="Nomination"  + mapIndex + " Hidden";
+					    logger.debug("nominationName: " + nominationName);
+					    mapStandardNominationsContent.put(mapIndex.toString(), nominationName);
+					}
+					
 					mapStandardRatesContent.put(mapIndex.toString(), new Double(votesShare).toString());
 					mapStandardUserCount.put(mapIndex.toString(), new Integer(individualUserEnteredVoteCount).toString());
 					mapStandardNominationsVisibility.put(mapIndex.toString(), new Boolean(isVoteVisible).toString());

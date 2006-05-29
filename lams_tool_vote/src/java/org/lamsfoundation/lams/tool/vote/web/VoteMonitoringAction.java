@@ -317,7 +317,7 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	    	    	}
 	    	    	else
 	    	    	{
-	    	    	    logger.debug("showUserEntriesBySession is true");
+	    	    	    logger.debug("showUserEntriesBySession is true: the case with learner export portfolio");
 	    	    	    logger.debug("show user  entries  by same content and same session and same user");
 	    	    	    String userSessionId=voteUsrAttempt.getVoteQueUsr().getVoteSession().getVoteSessionId().toString() ;
 	    	    	    logger.debug("userSessionId versus currentSessionId: " + userSessionId + " versus " +  currentSessionId);
@@ -340,7 +340,15 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 						    			voteMonitoredUserDTO.setUserEntry(voteUsrAttempt.getUserEntry());
 						    			listMonitoredUserContainerDTO.add(voteMonitoredUserDTO);
 						    			voteMonitoredUserDTO.setUid(voteUsrAttempt.getUid().toString());
-						    			voteMonitoredUserDTO.setVisible(new Boolean(voteUsrAttempt.isVisible()).toString());						    			
+						    			voteMonitoredUserDTO.setVisible(new Boolean(voteUsrAttempt.isVisible()).toString());		
+						    			logger.debug("overriding the nomination text with 'Nomination Hidden' if needed");
+						    			logger.debug("is entry visible: " + voteUsrAttempt.isVisible());
+						    			if (voteUsrAttempt.isVisible() == false)
+						    			{
+						    			    voteMonitoredAnswersDTO.setQuestion("Nomination Hidden");
+						    			    logger.debug("overwrote the nomination text");
+						    			}
+						    			    
 				    	    	    }
 			    	    	    }
 		    	    	    }
@@ -966,7 +974,8 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
         voteUsrAttempt.setVisible(true);
         voteService.updateVoteUsrAttempt(voteUsrAttempt);
         voteService.showOpenVote(voteUsrAttempt);
-        
+        logger.debug("voteUsrAttempt: " + voteUsrAttempt);
+
     	Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
 	    logger.debug("toolContentId: " + toolContentId);
 	    
