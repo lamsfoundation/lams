@@ -38,6 +38,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
+import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -50,21 +51,24 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public class ExportToolContentServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
+	public static final String EXPORT_TOOLCONTENT_SERVICE_BEAN_NAME = "exportToolContentService";
+	public static final String PARAM_LEARING_DESIGN_ID = "learningDesignID";
 	
+
 	private Logger log = Logger.getLogger(ExportToolContentServlet.class);
 	
 	/*
 	 * @see javax.servlet.http.HttpServlet.service(HttpServletRequest, HttpServletResponse)
 	 */
 	public void service(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-		Long learningDesignId = WebUtil.readLongParam(request,AuthoringConstants.PARAM_LEARING_DESIGN_ID);
+		Long learningDesignId = WebUtil.readLongParam(request,PARAM_LEARING_DESIGN_ID);
 		IExportToolContentService service = getExportService();
 		try {
-			String zipFilename = service.exportToolContent(learningDesignId);
+			String zipFilename = service.exportLearningDesign(learningDesignId);
 			
 			//write zip file as response stream. 
 			response.setContentType("application/zip");
-			response.setHeader("Content-Disposition","attachment;");
+			response.setHeader("Content-Disposition","attachment;filename="+FileUtil.getFileName(zipFilename));
 			InputStream in = new BufferedInputStream(new FileInputStream(zipFilename)); 
 			OutputStream out = response.getOutputStream();
 			try {
@@ -101,6 +105,6 @@ public class ExportToolContentServlet extends HttpServlet {
 	//***************************************************************************************
 	private IExportToolContentService getExportService(){
 		WebApplicationContext webContext = WebApplicationContextUtils.getRequiredWebApplicationContext(this.getServletContext());
-		return (IExportToolContentService) webContext.getBean(AuthoringConstants.EXPORT_TOOLCONTENT_SERVICE_BEAN_NAME);		
+		return (IExportToolContentService) webContext.getBean(EXPORT_TOOLCONTENT_SERVICE_BEAN_NAME);		
 	}
 }

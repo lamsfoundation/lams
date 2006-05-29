@@ -33,9 +33,6 @@ public class AuthoringConstants {
 	/** Spring context name for refering to the authoring service */
 	public static final String AUTHORING_SERVICE_BEAN_NAME = "authoringService";
 	public static final String TOOL_SERVICE_BEAN_NAME = "lamsToolService";
-	public static final String EXPORT_TOOLCONTENT_SERVICE_BEAN_NAME = "exportToolContentService";
-	
-	public static final String PARAM_LEARING_DESIGN_ID = "learingDesignID";
 	
 	//used by all tool authoring action class to mark the success flag.
 	public static final String LAMS_AUTHORING_SUCCESS_FLAG = "LAMS_AUTHORING_SUCCESS_FLAG";
