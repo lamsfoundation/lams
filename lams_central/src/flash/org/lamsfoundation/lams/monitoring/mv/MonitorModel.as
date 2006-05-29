@@ -72,10 +72,12 @@ class MonitorModel extends Observable{
 	//each on contains a reference to the emelment in the ddm (activity or transition)
 	private var _activitiesDisplayed:Hashtable;
 	private var _transitionsDisplayed:Hashtable;
+	private var _learnersProgress:Hashtable;
 	
 	//this is the dataprovider for the org tree
 	private var _treeDP:XML;
 	private var _orgResources:Array;	
+	private var learnerTabActArr:Array;
 	private var _orgs:Array;
 	private var _selectedTreeNode:XMLNode;
 	
@@ -97,8 +99,10 @@ class MonitorModel extends Observable{
 		_showLearners = true;
 		_activitiesDisplayed = new Hashtable("_activitiesDisplayed");
 		_transitionsDisplayed = new Hashtable("_transitionsDisplayed");
+		_learnersProgress = new Hashtable("_learnersProgress")
 
 		_orgResources = new Array();
+		learnerTabActArr = new Array();
 		_staffLoaded = false;
 		_learnersLoaded = false;
 		
@@ -129,6 +133,26 @@ class MonitorModel extends Observable{
 	
 	public function getSequence():Sequence{
 		return _activeSeq;
+	}
+	
+	public function setLessonProgressData(learnerProg:Array){
+		//clear the old lot of Learner Progress data
+		_learnersProgress.clear();
+		trace('adding learning seq for length' + learnerProg.length);
+		for(var i=0; i<learnerProg.length;i++){
+			trace('adding learning seq with ID: ' + learnerProg[i].getLearnerId());
+			_learnersProgress.put(learnerProg[i].getLearnerId(),learnerProg[i]);
+		}
+		Debugger.log('Added '+learnerProg.length+' Sequences to _lessonSequences',4,'setLessonSequences','LessonModel');
+		setChanged();
+		
+		//send an update
+		infoObj = {};
+		//infoObj.data = learnerProg[i].getLearnerId()
+		infoObj.updateType = "DRAW_DESIGN";
+		infoObj.tabID = getSelectedTab();
+		notifyObservers(infoObj);
+		
 	}
 	
 	/**
@@ -279,7 +303,9 @@ class MonitorModel extends Observable{
 		}
 	}
 	
-	
+	public function getlearnerTabActArr():Array{
+		return learnerTabActArr;
+	}
 	/**
 	 * get the design in the DesignDataModel and update the Monitor Model accordingly.
 	 * NOTE: Design elements are added to the DDM here.
@@ -287,8 +313,13 @@ class MonitorModel extends Observable{
 	 * @usage   
 	 * @return  
 	 */
-	public function drawDesign(tabID:Number){
-		
+	public function drawDesign(tabID:Number, learnerID:Number){
+		//_learnersProgress.clear();
+		//_activitiesDisplayed.clear();
+		//_transitionsDisplayed.clear();
+		if (learnerID != null){
+			learnerTabActArr.push(learnerID);
+		}
 		//porobbably need to get a bit more granular
 		//go through the design and get the activities and transitions 
 		var indexArray:Array;
@@ -300,7 +331,7 @@ class MonitorModel extends Observable{
 		indexArray = ddmActivity_keys;
 		trace("Length of Activities in DDM: "+indexArray.length)
 		
-		//loop through and do comparison
+		//loop through 
 		for(var i=0;i<indexArray.length;i++){
 					
 			var keyToCheck:Number = indexArray[i];
@@ -311,7 +342,7 @@ class MonitorModel extends Observable{
 			if(ddm_activity.parentActivityID > 0 || ddm_activity.parentUIID > 0){
 				trace("this is Child")
 			}else {
-				broadcastViewUpdate("DRAW_ACTIVITY",ddm_activity, tabID);
+				broadcastViewUpdate("DRAW_ACTIVITY",ddm_activity, tabID, learnerID);
 			}
 			//dataObj.activity = ddm_activity;
 		}
@@ -323,7 +354,7 @@ class MonitorModel extends Observable{
 		var trIndexArray:Array;
 		trIndexArray = ddmTransition_keys;
 		
-		//loop through and do comparison
+		//loop through 
 		for(var i=0;i<trIndexArray.length;i++){
 			
 			var transitionKeyToCheck:Number = trIndexArray[i];
@@ -342,7 +373,7 @@ class MonitorModel extends Observable{
 		broadcastViewUpdate(_dialogOpen, null, null);
 	}
 	
-	public function broadcastViewUpdate(updateType, data, tabID){
+	public function broadcastViewUpdate(updateType, data, tabID, learnerID){
 		//getMonitor().getMV().clearView();
 		setChanged();
 		
@@ -351,6 +382,7 @@ class MonitorModel extends Observable{
 		infoObj.updateType = updateType;
 		infoObj.data = data;
 		infoObj.tabID = tabID;
+		infoObj.learner = learnerID
 		notifyObservers(infoObj);
 		
 	}
@@ -652,6 +684,10 @@ class MonitorModel extends Observable{
 	
 	public function get transitionsDisplayed():Hashtable{
 		return _transitionsDisplayed;
+	}	
+	
+	public function get learnersProgress():Hashtable{
+		return _learnersProgress;
 	}	
 
 	public function getMonitor():Monitor{
