@@ -26,6 +26,7 @@ import org.lamsfoundation.lams.common.util.*;
 import org.lamsfoundation.lams.common.util.ui.*;
 import org.lamsfoundation.lams.authoring.*;
 import org.lamsfoundation.lams.authoring.cv.*;
+import org.lamsfoundation.lams.monitoring.mv.*;
 import org.lamsfoundation.lams.common.style.*
 
 import com.polymercode.Draw;
@@ -50,6 +51,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	//this is set by the init object
 	private var _canvasController:CanvasController;
 	private var _canvasView:CanvasView;
+	private var _monitorController:MonitorController;
+	private var _monitorView:MonitorView;
 	private var _tm:ThemeManager;
 	//TODO:This should be ToolActivity
 	private var _activity:Activity;
@@ -57,6 +60,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	private var _isSelected:Boolean;
 	private var app:Application;
 	//locals
+	private var _module:String;
 	private var icon_mc:MovieClip;
 	private var icon_mcl:MovieClipLoader;
 	private var bkg_pnl:MovieClip;
@@ -103,8 +107,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	
 	public function init(initObj):Void{
 		if(initObj){
-			_canvasView = initObj.canvasView;
-			_canvasController = initObj.canvasController;
+			_canvasView = initObj._canvasView;
+			_canvasController = initObj._canvasController;
+			if (_module == "monitoring"){
+				_monitorView = initObj._monitorView;
+				_monitorController = initObj._monitorController;
+			}
 			_activity = initObj.activity;
 		}
 		
@@ -308,6 +316,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 				//Debugger.log('DoubleClicking: '+_canvasModel.activeTool,Debugger.GEN,'onPress','CanvasActivity');
 				if (app.controlKeyPressed != "transition"){
 					_doubleClicking = true;
+					if (_module == "monitoring"){
+						_monitorController.activityDoubleClick(this);
+					}
 					_canvasController.activityDoubleClick(this);
 				}
 				/*
@@ -325,7 +336,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 				_doubleClicking = false;
 				
 				//Debugger.log('_canvasController:'+_canvasController,Debugger.GEN,'onPress','CanvasActivity');
-				
+				if (_module == "monitoring"){
+					_monitorController.activityClick(this);
+				}
 				_canvasController.activityClick(this);
 				
 				
@@ -357,6 +370,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		if(!_doubleClicking){
 			Debugger.log('Releasing:'+this,Debugger.GEN,'onRelease','CanvasActivity');
 				trace("Activity ID is: "+this.activity.activityUIID)	
+			if (_module == "monitoring"){
+				_monitorController.activityRelease(this);
+			}
 			_canvasController.activityRelease(this);
 		}
 		
@@ -364,7 +380,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	
 	private function onReleaseOutside():Void{
 		Debugger.log('ReleasingOutside:'+this,Debugger.GEN,'onReleaseOutside','CanvasActivity');
-
+		if (_module == "monitoring"){
+			_monitorController.activityReleaseOutside(this);
+		}
 		_canvasController.activityReleaseOutside(this);
 	}
 	

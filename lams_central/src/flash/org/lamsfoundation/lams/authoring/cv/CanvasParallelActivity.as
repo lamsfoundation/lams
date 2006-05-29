@@ -26,6 +26,7 @@ import org.lamsfoundation.lams.common.util.*;
 import org.lamsfoundation.lams.common.ui.*;
 import org.lamsfoundation.lams.authoring.*;
 import org.lamsfoundation.lams.authoring.cv.*;
+import org.lamsfoundation.lams.monitoring.mv.*;
 import mx.controls.*;
 import mx.managers.*
 
@@ -43,7 +44,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 	//this is set by the init object
 	private var _canvasController:CanvasController;
 	private var _canvasView:CanvasView;
-	
+	private var _monitorController:MonitorController;
+	private var _monitorView:MonitorView;
 	//Set by the init obj
 	private var _activity:Activity;
 	private var _children:Array;
@@ -113,8 +115,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 		child2.yCoord = CHILD2_OFFSET_Y;
 	
 		//so now it is placed on in the IDE and we just call init
-		child1_mc.init({activity:child1,canvasController:_canvasController,canvasView:_canvasView});
-		child2_mc.init({activity:child2,canvasController:_canvasController,canvasView:_canvasView});
+		child1_mc.init({activity:child1,_canvasController:_canvasController,_canvasView:_canvasView});
+		child2_mc.init({activity:child2,_canvasController:_canvasController,_canvasView:_canvasView});
 		
 		//let it wait one frame to set up the components.
 		//childActivities_mc.createChildAtDepth("Bin",DepthManager.kTop);
