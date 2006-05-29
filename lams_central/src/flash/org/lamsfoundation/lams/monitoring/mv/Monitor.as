@@ -29,6 +29,7 @@ import org.lamsfoundation.lams.authoring.DesignDataModel;
 import org.lamsfoundation.lams.common.ui.*;
 import org.lamsfoundation.lams.common.util.*;
 import org.lamsfoundation.lams.common.dict.*;
+import org.lamsfoundation.lams.common.Progress;
 import org.lamsfoundation.lams.common.* ;
 
 import mx.utils.*;
@@ -225,7 +226,7 @@ class Monitor {
 		_ddm.setDesign(learningDesignDTO);
 		seq.setLearningDesignModel(_ddm);
 		
-		monitorModel.broadcastViewUpdate('REDRAW_CANVAS', null, monitorModel.getSelectedTab());
+		monitorModel.broadcastViewUpdate('PROGRESS', null, monitorModel.getSelectedTab());
 	}
 
 	public function getContributeActivities(seqID:Number):Void{
@@ -234,6 +235,32 @@ class Monitor {
            
 		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=getAllContributeActivities&lessonID='+seqID,callback, false);
 		
+	}
+	
+	public function getProgressData(seq:Object){
+		trace('getting progress data...');
+		var seqId:Number = seq.getSequenceID();
+		
+		var callback:Function = Proxy.create(this, saveProgressData);
+		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=getAllLearnersProgress&lessonID=' + seqId, callback, false);
+	}
+	
+	private function saveProgressData(progressDTO:Object){
+		trace('returning progress data...'+progressDTO.length);
+		var allLearners = new Array();
+		for(var i=0; i< progressDTO.length; i++){
+			
+			var prog:Object = progressDTO[i];
+			var lessonProgress:Progress = new Progress();
+			lessonProgress.populateFromDTO(prog);
+			//trace('pushing lesson with id: ' + lessonModel.getLessonID());
+			allLearners.push(lessonProgress);
+		}
+			
+		//sets these in the monitor model in a hashtable by learnerID
+		monitorModel.setLessonProgressData(allLearners);	
+		dispatchEvent({type:'load',target:this});		
+		trace('progress data saved...');
 	}
 	
 	public function getCELiteral(taskType:Number):String{
@@ -267,7 +294,6 @@ class Monitor {
 		return seqStat;
 	}
 	
-
 	/**
 	 * Clears the design in the canvas.but leaves other state variables (undo etc..)
 	 * @usage   
@@ -352,6 +378,7 @@ class Monitor {
 		return monitorModel;
 	}
 	public function getMV():MonitorView{
+		trace("Called getMV")
 		return monitorView;
 	}
 
