@@ -288,4 +288,48 @@ public class FileUtil {
 		}
 		return dumpFilename;		
 	}
+	/**
+	 * get file name from a string which may include directory information.
+	 * For example : "c:\\dir\\ndp\\pp.txt"; will return pp.txt.?
+	 * If file has no path infomation, then just return input fileName.
+	 * 
+	 */
+	public static String getFileName(String fileName){
+		if(fileName == null)
+			return "";
+			
+		fileName = fileName.trim();
+
+		int dotPos = fileName.lastIndexOf(File.separatorChar);
+		if (dotPos == -1){
+			//just for window OS: it also can use "/" as file separatorChar.
+			dotPos = fileName.lastIndexOf("/"); 
+			if(dotPos == -1)
+				return fileName;
+		}
+		return fileName.substring(dotPos + 1, fileName.length());
+		
+	}	
+	/** 
+	 * Get file directory info.
+	 * @param fileName with path info.
+	 * @return return only path info with the given fileName
+	 */
+	public static String getFileDirectory(String fileName){
+		if(fileName == null)
+			return "";
+		
+		fileName = fileName.trim();
+
+		int dotPos = fileName.lastIndexOf(File.separatorChar);
+		if (dotPos == -1){
+			//just for window OS: it also can use "/" as file separatorChar.
+			dotPos = fileName.lastIndexOf("/"); 
+			if(dotPos == -1)
+				return fileName;
+		}
+		//return the last char is '/'
+		return fileName.substring(0,dotPos+1);
+	
+	}
 }

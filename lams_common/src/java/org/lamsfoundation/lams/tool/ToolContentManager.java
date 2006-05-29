@@ -103,7 +103,7 @@ public interface ToolContentManager
      * @throws DataMissingException if no tool content matches the toolSessionId 
      * @throws ToolException if any other error occurs
      */
-    public String exportToolContent(Long toolContentId) 
+    public void exportToolContent(Long toolContentId, String toPath) 
     	throws DataMissingException, ToolException;
 
     /**
@@ -111,7 +111,7 @@ public interface ToolContentManager
      * for the content.
      * @throws ToolException if any other error occurs
      */
-    public String importToolContent(Long toolContentId, String reference, String directory) 
+    public void importToolContent(Object toolContnetPOJO) 
     	throws ToolException;
     
  

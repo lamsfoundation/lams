@@ -145,6 +145,7 @@
 	
 	<bean id="exportToolContentServiceTarget" class="org.lamsfoundation.lams.learningdesign.service.ExportToolContentService">
 		<property name="activityDAO"><ref bean="activityDAO"/></property>
+		<property name="toolDAO"><ref bean="toolDAO"/></property>
 	</bean>
 	
 	<bean id="exportToolContentService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
@@ -160,7 +161,7 @@
 			<props>
 				<prop key="save*">PROPAGATION_REQUIRED</prop>
 				<prop key="remove*">PROPAGATION_REQUIRED</prop>
-   			    <prop key="*">PROPAGATION_REQUIRED,readOnly</prop>
+				<prop key="export*">PROPAGATION_REQUIRED</prop>
 			</props>
 		</property>
 	</bean>

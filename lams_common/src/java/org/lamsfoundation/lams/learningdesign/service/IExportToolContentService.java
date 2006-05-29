@@ -24,14 +24,55 @@
 /* $Id$ */
 package org.lamsfoundation.lams.learningdesign.service;
 
-
+import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
+/**
+ * Export tool content service provides ability to export learning design and its relative activities' tool content.
+ *   
+ * @author Steve.Ni
+ * @version $Revision$
+ */
 public interface IExportToolContentService {
 	/**
-	 * Export given learning design tool content. It includes all tools content in this learning design.
+	 * Export given learning design tool content. It includes all tools content
+	 * in this learning design.
 	 * 
 	 * @param learningDesignId
 	 * @return
 	 * @throws ExportToolContentException
 	 */
-	String exportToolContent(Long learningDesignId) throws ExportToolContentException;
+	String exportLearningDesign(Long learningDesignId) throws ExportToolContentException;
+	/**
+	 * Export tool content. 
+	 * 
+	 * @param toolContentId the tool content ID.
+	 * @param toolContentObj The POJO object to descript the tool content which need to export 
+	 * @param toolContentHandler need be used when this tool has any items in LAMS repository to be exported.
+	 * @param toPath the target local file system directory to put tool.xml and its attached files or package.
+	 * 
+	 * @throws ExportToolContentException
+	 */
+	void exportToolContent(Long toolContentId, Object toolContentObj, IToolContentHandler toolContentHandler, String toPath)
+		throws ExportToolContentException;
+	
+	/**
+	 * Register access class and relative method for item in LAMS repository. For example, there is POJO to refer to 
+	 * a tool offline instruction files:
+	 * <pre>
+	 * <code>
+	 * public class ShareResourceToolFile{
+	 * 	private Long fileUuid;
+	 * 	private Long fileVersionId;
+	 *  ...
+	 *  //set&get methods
+	 * }
+	 * </code>
+	 * </pre>
+	 *   
+	 * Tool must call this method to tell export service to get item by this fileUuid and fileVersionId properties.
+	 *  
+	 * @param fileNodeClassName The POJO class name for repository item reference  
+	 * @param fileUuidFieldName The POJO properties name for get fileUuid. There must be a get method to access this property.
+	 * @param fileVersionFieldName The POJO properties name for get fileVersion. There must be a get method to access this property.
+	 */
+	void registerFileHandleClass(String fileNodeClassName,String fileUuidFieldName, String fileVersionFieldName);
 }
