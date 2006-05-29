@@ -122,24 +122,19 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 					break;
 				case 'TABCHANGE' :
 					if (infoObj.tabID == _tabID){
-						//mm.getMonitor().clearCanvas(true);
 						trace("TabID for Selected tab is (TABCHANGE): "+infoObj.tabID)
-						//this._visible = true;
-						//mm.drawDesign(infoObj.tabID);
-						mm.getMonitor().openLearningDesign(mm.getSequence());
+						if (mm.activitiesDisplayed.length == null || mm.activitiesDisplayed.length == undefined){
+							trace("activitiesDisplayed is null: "+infoObj.tabID)
+							mm.getMonitor().openLearningDesign(mm.getSequence());
+						}
+						this._visible = true;
 					}else {
 						this._visible = false;
 					}
 					break;
-				case 'SEQUENCE' :
+				case 'PROGRESS' :
 					if (infoObj.tabID == _tabID){
-						//mm.getMonitor().clearCanvas(true);
-						trace("TabID for Selected tab is (TABCHANGE): "+infoObj.tabID)
-						//this._visible = true;
-						//mm.drawDesign(infoObj.tabID);
-						mm.getMonitor().openLearningDesign(mm.getSequence());
-					}else {
-						this._visible = false;
+						mm.getMonitor().getProgressData(mm.getSequence())
 					}
 					break;
 				case 'DRAW_ACTIVITY' :
@@ -156,28 +151,28 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 					}
 					
 				case 'REMOVE_ACTIVITY' :
-					if (infoObj.tabID == _tabID){
+					//if (infoObj.tabID == _tabID){
 						trace("REMOVE_ACTIVITY")
 						removeActivity(infoObj.data, mm)
 						//MovieClipUtils.doLater(Proxy.create(this,draw));
-					}
+					//}
 					break;
 				
 				case 'REMOVE_TRANSITION' :
-					if (infoObj.tabID == _tabID){
+					//if (infoObj.tabID == _tabID){
 						trace("REMOVE_ACTIVITY")
 						removeTransition(infoObj.data, mm)
 						//MovieClipUtils.doLater(Proxy.create(this,draw));
-					}
+					//}
 					break;
-				case 'REDRAW_CANVAS' :
+				
+				case 'DRAW_DESIGN' :
 					if (infoObj.tabID == _tabID){
-						
-					trace("TabID for Selected tab is (MonitorTab): "+infoObj.tabID)
-						this._visible = true;
-						//mm.drawDesign(infoObj.tabID)
-						mm.drawDesign(infoObj.tabID);
-						
+						trace("TabID for Selected tab is (MonitorTab): "+infoObj.tabID)
+						//if (mm.activitiesDisplayed == null){
+							mm.drawDesign(infoObj.tabID);
+							//mm.drawDesign(infoObj.tabID)
+						//}
 					}
 					break;
 				default :
@@ -276,7 +271,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 		}
 		
 		s = true;
-		
+		//mm.getMonitor().getMV().getMonitorScp().redraw(true); 
 		return s;
 	}
 	
