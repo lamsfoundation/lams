@@ -78,6 +78,8 @@ class MonitorModel extends Observable{
 	private var _treeDP:XML;
 	private var _orgResources:Array;	
 	private var learnerTabActArr:Array;
+	private var ddmActivity_keys:Array;
+	private var ddmTransition_keys:Array;
 	private var _orgs:Array;
 	private var _selectedTreeNode:XMLNode;
 	
@@ -103,6 +105,8 @@ class MonitorModel extends Observable{
 
 		_orgResources = new Array();
 		learnerTabActArr = new Array();
+		ddmActivity_keys = new Array();
+		ddmTransition_keys = new Array();
 		_staffLoaded = false;
 		_learnersLoaded = false;
 		
@@ -139,6 +143,7 @@ class MonitorModel extends Observable{
 		//clear the old lot of Learner Progress data
 		_learnersProgress.clear();
 		trace('adding learning seq for length' + learnerProg.length);
+		learnerTabActArr = learnerProg;
 		for(var i=0; i<learnerProg.length;i++){
 			trace('adding learning seq with ID: ' + learnerProg[i].getLearnerId());
 			_learnersProgress.put(learnerProg[i].getLearnerId(),learnerProg[i]);
@@ -253,36 +258,18 @@ class MonitorModel extends Observable{
 	
 		//porobbably need to get a bit more granular
 		Debugger.log('Running',Debugger.GEN,'refreshDesign','MonitorModel');
-		//go through the design and see what has changed, compare DDM to canvasModel
-		//var ddmActivity_keys:Array = _monitor.ddm.activities.keys();
 		var mmActivity_keys:Array = _activitiesDisplayed.keys();
-		//var longest = Math.max(ddmActivity_keys.length, mmActivity_keys.length);
 		var longest = mmActivity_keys.length;
-		//chose which array we are going to loop over
+		//set index array with activity keyys length
 		var indexArray:Array;
-		
-		//if(ddmActivity_keys.length == longest){
-		//	indexArray = ddmActivity_keys;
-		//}else{
-			indexArray = mmActivity_keys;
-		//}
+		indexArray = mmActivity_keys;
+	
 		trace("Longest: "+longest)
-		//loop through and do comparison
+		//loop through and remove activities
 		for(var i=0;i<longest;i++){
 			var keyToCheck:Number = indexArray[i];
-			//var ddm_activity:Activity = _monitor.ddm.activities.get(keyToCheck);
-			var mm_activity:Activity = _activitiesDisplayed.get(keyToCheck).activity;
-			
-			//var r_activity:Object = compareActivities(ddm_activity, mm_activity);
-			//trace("Value of R: "+r_activity)
-			//if(r_activity == "DELETE"){
-				broadcastViewUpdate("REMOVE_ACTIVITY",mm_activity, getSelectedTab());
-			//}
-			//else if(r_activity == "NEW"){
-			//	broadcastViewUpdate("DRAW_ACTIVITY",ddm_activity, getSelectedTab());
-			//}else{
-	
-			//}
+			var mm_activity:Activity = _activitiesDisplayed.get(keyToCheck).activity;			
+			broadcastViewUpdate("REMOVE_ACTIVITY",mm_activity, getSelectedTab());
 		}
 		
 		/*--------For Clearing Transitions---------*/
@@ -294,12 +281,11 @@ class MonitorModel extends Observable{
 		transIndexArray = mmTransition_keys;
 		
 		trace("Longest: "+transLongest)
-		//loop through and do comparison
+		//loop through and remove transitions
 		for(var i=0;i<transLongest;i++){
 			var transkeyToCheck:Number = transIndexArray[i];
 			var mm_transition:Transition = _transitionsDisplayed.get(transkeyToCheck).transition;
 			broadcastViewUpdate("REMOVE_TRANSITION",mm_transition, getSelectedTab());
-			
 		}
 	}
 	
@@ -317,15 +303,16 @@ class MonitorModel extends Observable{
 		//_learnersProgress.clear();
 		//_activitiesDisplayed.clear();
 		//_transitionsDisplayed.clear();
-		if (learnerID != null){
-			learnerTabActArr.push(learnerID);
-		}
+		
+		//if (learnerID != null){
+		//	learnerTabActArr.push(learnerID);
+		//}
 		//porobbably need to get a bit more granular
 		//go through the design and get the activities and transitions 
 		var indexArray:Array;
 		var dataObj:Object;
-		var ddmActivity_keys:Array = _activeSeq.getLearningDesignModel().activities.keys();
-			
+		ddmActivity_keys = _activeSeq.getLearningDesignModel().activities.keys();
+		
 		
 		
 		indexArray = ddmActivity_keys;
@@ -348,7 +335,7 @@ class MonitorModel extends Observable{
 		}
 		
 		//now check the transitions:
-		var ddmTransition_keys:Array = _activeSeq.getLearningDesignModel().transitions.keys();
+		ddmTransition_keys = _activeSeq.getLearningDesignModel().transitions.keys();
 				
 		//chose which array we are going to loop over
 		var trIndexArray:Array;
@@ -686,9 +673,17 @@ class MonitorModel extends Observable{
 		return _transitionsDisplayed;
 	}	
 	
-	public function get learnersProgress():Hashtable{
-		return _learnersProgress;
+	public function get allLearnersProgress():Array{
+		return learnerTabActArr;
 	}	
+	
+	public function getActivityKeys():Array{
+		return ddmActivity_keys;
+	}
+	
+	public function getTransitionKeys():Array{
+		return ddmTransition_keys;
+	}
 
 	public function getMonitor():Monitor{
 		return _monitor;
