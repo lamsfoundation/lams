@@ -172,7 +172,8 @@ public class VoteUsrAttempt implements Serializable {
     
     public String toString() {
         return new ToStringBuilder(this)
-            .append("uid", getUid())
+            .append("nomination:", voteQueContent.getQuestion())
+            .append("userEntry:", userEntry)
             .toString();
     }
 

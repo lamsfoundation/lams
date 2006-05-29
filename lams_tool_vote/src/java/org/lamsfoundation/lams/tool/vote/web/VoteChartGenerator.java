@@ -115,25 +115,24 @@ public class VoteChartGenerator extends HttpServlet implements VoteAppConstants 
     }
     
     
-    private JFreeChart createChart(HttpServletRequest request, String type)
+    public JFreeChart createChart(HttpServletRequest request, String type)
     {
         logger.debug("chartType: " + type);
         
     	if (type.equals("pie"))
     	{
-    	    return createPieChart (request, type);    
+    	    return createPieChart (request);    
     	}
     	else if (type.equals("bar"))
     	{
-    	    return createBarChart (request, type);    
+    	    return createBarChart (request);    
     	}
     	return null;
     }
 
-    private JFreeChart createPieChart(HttpServletRequest request, String chartType)
+    public JFreeChart createPieChart(HttpServletRequest request)
     {
-        logger.debug("chartType: " + chartType);
-        
+    
         logger.debug("starting createPieChart...");
         DefaultPieDataset data= new DefaultPieDataset();
         
@@ -161,10 +160,8 @@ public class VoteChartGenerator extends HttpServlet implements VoteAppConstants 
    	    return chart;
     }
     
-    private JFreeChart createBarChart(HttpServletRequest request, String chartType)
+    public JFreeChart createBarChart(HttpServletRequest request)
     {
-        logger.debug("chartType: " + chartType);
-        
         logger.debug("starting createBarChart...");
         DefaultCategoryDataset data= new DefaultCategoryDataset();
         

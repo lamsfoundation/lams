@@ -24,12 +24,20 @@
 
 package org.lamsfoundation.lams.tool.vote.web;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.jfree.chart.ChartUtilities;
+import org.jfree.chart.JFreeChart;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
@@ -62,7 +70,10 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Vo
 		}else if (StringUtils.equals(mode,ToolAccessMode.TEACHER.toString())){
 			teacher(request,response,directoryName,cookies);
 		}
-		
+
+		logger.debug("writing out chart to directoryName: " + directoryName);
+		writeOutChart(request, "pie",  directoryName);
+		writeOutChart(request, "bar",  directoryName);
 		logger.debug("basePath: " + basePath);
 		writeResponseToFile(basePath+"/export/exportportfolio.jsp",directoryName,FILENAME,cookies);
 		
@@ -158,4 +169,42 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Vo
         
         logger.debug("ending teacher mode: ");
     }
+    
+    /**
+     * creates JFreeCharts for offline visibility 
+     * @param request
+     * @param chartType
+     * @param directoryName
+     */
+    public void writeOutChart(HttpServletRequest request, String chartType, String directoryName) {
+        logger.debug("File.separator: " + File.separator) ;
+        String fileName=chartType + ".png";
+        logger.debug("output image fileName: " + fileName) ;
+        logger.debug("full folder name:" + directoryName + File.separator + fileName);
+        
+        try{
+            OutputStream out = new FileOutputStream(directoryName +  File.separator + fileName);
+            VoteChartGenerator  voteChartGenerator= new VoteChartGenerator();
+            JFreeChart chart=null;
+            if (chartType.equals("pie"))
+            {
+                chart = voteChartGenerator.createChart(request, "pie");    
+            }
+            else
+            {
+                chart = voteChartGenerator.createChart(request, "bar");
+            }
+            logger.debug("chart:" + chart);
+            
+            ChartUtilities.writeChartAsPNG(out, chart, 400, 300);
+        }
+        catch(FileNotFoundException e)
+        {
+            logger.debug("exception creating chart: " + e) ;
+        }
+        catch(IOException e)
+        {
+            logger.debug("exception creating chart: " + e) ;
+        }
+      }
 }

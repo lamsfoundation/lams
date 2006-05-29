@@ -126,18 +126,18 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						</tr>
 
 
-						<tr> 
-							<td NOWRAP valign=top align=left >
-		
-								Pie Chart
-							</td>
-						</tr>
-
-						<tr> 
-							<td NOWRAP valign=top align=left >
-								Bar Chart
-							</td>
-						</tr>
+						 <tr> 
+					       <td NOWRAP valign=top align=left >
+					        <IMG SRC="pie.png" ALT="Pie Chart"/>
+					       </td>
+					      </tr>
+					
+					      <tr> 
+					       <td NOWRAP valign=top align=left >
+					        <IMG SRC="bar.png" ALT="Bar Chart"/>
+					       </td>
+					      </tr>						
+						
 
 
 							<tr>

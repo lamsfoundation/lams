@@ -1154,14 +1154,19 @@ public class VoteServicePOJO implements
         }
     }
     
-    
+    /**
+     * logs hiding of a user entered vote 
+     */
     public void hideOpenVote(VoteUsrAttempt voteUsrAttempt) throws VoteApplicationException
     {
         logger.debug("hiding user entry: " + voteUsrAttempt.getUserEntry());
 		auditService.logHideEntry(MY_SIGNATURE, voteUsrAttempt.getQueUsrId(), 
 		        voteUsrAttempt.getVoteQueUsr().getUsername(), voteUsrAttempt.getUserEntry());
     }
-    
+
+    /**
+     * logs showing of a user entered vote 
+     */
     public void showOpenVote(VoteUsrAttempt voteUsrAttempt) throws VoteApplicationException
     {
         logger.debug("showing user entry: " + voteUsrAttempt.getUserEntry());
@@ -1174,9 +1179,6 @@ public class VoteServicePOJO implements
     {
     	try
         {
-			//auditService.logShowEntry(MY_SIGNATURE, voteQueUsr.getQueUsrId(), 
-			//        voteQueUsr.getUsername(), voteQueUsr.toString());
-    	    
     		voteUserDAO.removeVoteUser(voteQueUsr);
         }
         catch(DataAccessException e)
