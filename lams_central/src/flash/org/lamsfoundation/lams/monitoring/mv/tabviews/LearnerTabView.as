@@ -160,10 +160,8 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 				
 				case 'DRAW_DESIGN' :
 					if (infoObj.tabID == _tabID){
-						trace("TabID for Selected tab is (MonitorTab): "+infoObj.tabID)
-						ACT_X = 0;
-						mm.drawDesign(infoObj.tabID, infoObj.data);
-						ACT_Y = (ACT_Y + _activityLayer_mc._height)+ACT_Y;
+						trace("TabID for Selected tab is (LearnerTab): "+infoObj.tabID)
+						drawAllLearnersDesign(mm, infoObj.tabID)
 					}
 					break;
 				default :
@@ -205,6 +203,17 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		return prevLearner;
 	}
 	
+	private function drawAllLearnersDesign(mm:MonitorModel, tabID:Number){
+		
+		for (var j=0; j<mm.allLearnersProgress.length; j++){
+			trace("drawAllLearnersDesign")
+			mm.drawDesign(tabID);
+			ACT_X = 0;
+			ACT_Y = (ACT_Y + _activityLayer_mc._height)+ACT_Y;
+		}
+	}
+	
+	
 	/**
 	 * Remove the activityies from screen on selection of new lesson
 	 * 
@@ -237,7 +246,6 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		//take action depending on act type
 		if(a.activityTypeID==Activity.TOOL_ACTIVITY_TYPE || a.isGateActivity() || a.isGroupActivity() ){
 			var newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasActivityLinear",DepthManager.kTop,{_activity:a,_monitorController:mc,_learnerTabView:ltv, _x:ACT_X, _y:ACT_Y, actLabel:a.title});
-			mm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
 			ACT_X = newActivity_mc._x + newActivity_mc._width;
 		}
 		if(a.activityTypeID==Activity.PARALLEL_ACTIVITY_TYPE){
@@ -245,20 +253,19 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 			var children:Array = mm.getMonitor().ddm.getComplexActivityChildren(a.activityUIID);
 			
 			var newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasParallelActivity",DepthManager.kTop,{_activity:a,_children:children,_monitorController:mc,_learnerTabView:ltv, _x:xOffSet+(actWidth*actLenght), _y:ACT_Y});
-			mm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
-			
 		}
 		if(a.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE){
 			var children:Array = mm.getMonitor().ddm.getComplexActivityChildren(a.activityUIID);
 			
 			var newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasOptionalActivityLinear",DepthManager.kTop,{_activity:a,_children:children,_monitorController:mc,_learnerTabView:ltv, _x:ACT_X, _y:ACT_Y, fromModuleTab:"monitorLearnerTab"});
-			mm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
 			ACT_X = newActivity_mc._x + newActivity_mc._width;
-			
 		}else{
 			Debugger.log('The activity:'+a.title+','+a.activityUIID+' is of unknown type, it cannot be drawn',Debugger.CRITICAL,'drawActivity','MonitorTabView');
 		}
 		
+		if (mm.activitiesDisplayed.length != mm.getActivityKeys()){
+			mm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
+		}
 		s = true;
 		actLenght++;
 		//mm.getMonitor().getMV().getMonitorScp().redraw(true);
