@@ -56,9 +56,12 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 	private var H_GAP:Number;
 	private var V_GAP:Number;
 	private var ACT_X:Number = 0;
+	private var ACT_Y:Number = 20;
 	private var xOffSet:Number = 10;
 	private var actWidth:Number = 120;
 	private var actLenght:Number = 0;
+	private var activeLearner:Number;
+	private var prevLearner:Number;
 	
 	private var _tm:ThemeManager;
 	private var mm:MonitorModel;
@@ -69,7 +72,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 	private var _learnerTabViewContainer_mc:MovieClip
 	private var bkg_pnl:MovieClip;
 	private var _gridLayer_mc:MovieClip;
-	private var _transitionLayer_mc:MovieClip;
+	private var _learnersLayer_mc:MovieClip;
 	private var _activityLayerComplex_mc:MovieClip;
 	private var _activityLayer_mc:MovieClip;
 	
@@ -125,62 +128,42 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 					break;
 				case 'TABCHANGE' :
 					if (infoObj.tabID == _tabID){
-						//mm.getMonitor().clearCanvas(true);
+						this._visible = true;
 						trace("TabID for Selected tab is (TABCHANGE): "+infoObj.tabID)
-						//this._visible = true;
-						//mm.drawDesign(infoObj.tabID);
-						mm.getMonitor().openLearningDesign(mm.getSequence());
+						if (mm.activitiesDisplayed.length == null || mm.activitiesDisplayed.length == undefined){
+							trace("activitiesDisplayed is null: "+infoObj.tabID)
+							mm.getMonitor().openLearningDesign(mm.getSequence());
+						}
 					}else {
 						this._visible = false;
 					}
 					break;
-				case 'SEQUENCE' :
+				case 'PROGRESS' :
 					if (infoObj.tabID == _tabID){
-						//mm.getMonitor().clearCanvas(true);
-						trace("TabID for Selected tab is (TABCHANGE): "+infoObj.tabID)
-						//this._visible = true;
-						//mm.drawDesign(infoObj.tabID);
-						mm.getMonitor().openLearningDesign(mm.getSequence());
-					}else {
-						this._visible = false;
+						mm.getMonitor().getProgressData(mm.getSequence())
 					}
-					break;
+					break;				
 				case 'DRAW_ACTIVITY' :
 					if (infoObj.tabID == _tabID){
 						trace("DRAWING_ACTIVITY")
-						drawActivity(infoObj.data, mm)
+						drawActivity(infoObj.data, mm, infoObj.learner)
 						//MovieClipUtils.doLater(Proxy.create(this,draw));
 					}
 					break;
-				case 'DRAW_TRANSITION' :
-					if (infoObj.tabID == _tabID){
-						trace("DRAWING_Transition")
-						//drawTransition(infoObj.data, mm)
-					}
-					
 				case 'REMOVE_ACTIVITY' :
 					if (infoObj.tabID == _tabID){
 						trace("REMOVE_ACTIVITY")
-						//removeActivity(infoObj.data, mm)
+						removeActivity(infoObj.data, mm)
 						//MovieClipUtils.doLater(Proxy.create(this,draw));
 					}
 					break;
 				
-				case 'REMOVE_TRANSITION' :
+				case 'DRAW_DESIGN' :
 					if (infoObj.tabID == _tabID){
-						trace("REMOVE_ACTIVITY")
-						//removeTransition(infoObj.data, mm)
-						//MovieClipUtils.doLater(Proxy.create(this,draw));
-					}
-					break;
-				case 'REDRAW_CANVAS' :
-					if (infoObj.tabID == _tabID){
-						
-					trace("TabID for Selected tab is (MonitorTab): "+infoObj.tabID)
-						this._visible = true;
-						//mm.drawDesign(infoObj.tabID)
-						mm.drawDesign(infoObj.tabID);
-						
+						trace("TabID for Selected tab is (MonitorTab): "+infoObj.tabID)
+						ACT_X = 0;
+						mm.drawDesign(infoObj.tabID, infoObj.data);
+						ACT_Y = (ACT_Y + _activityLayer_mc._height)+ACT_Y;
 					}
 					break;
 				default :
@@ -193,13 +176,14 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
     * layout visual elements on the MonitorTabView on initialisation
     */
 	private function draw(){
-		
+		//activityArr = new Array;
 		bkg_pnl = this.attachMovie("Panel", "bkg_pnl", this.getNextHighestDepth());
 
 		//set up the 
 		//_canvas_mc = this;
+		_learnersLayer_mc = this.createEmptyMovieClip("_learnersLayer_mc", this.getNextHighestDepth());
 		_gridLayer_mc = this.createEmptyMovieClip("_gridLayer_mc", this.getNextHighestDepth());
-		_transitionLayer_mc = this.createEmptyMovieClip("_transitionLayer_mc", this.getNextHighestDepth());
+		
 		_activityLayerComplex_mc = this.createEmptyMovieClip("_activityLayerComplex_mc", this.getNextHighestDepth());
 		_activityLayer_mc = this.createEmptyMovieClip("_activityLayer_mc", this.getNextHighestDepth());
 			
@@ -207,7 +191,35 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		//setSize (mm)
 		dispatchEvent({type:'load',target:this});
 	}
+	/**
+	* Sets last selected Sequence
+	*/
+	private function setPrevLearner(learner:Number):Void{
+		prevLearner = learner;
+	}
 	
+	/**
+	* Gets last selected Sequence
+	*/
+	private function getPrevLearner():Number{
+		return prevLearner;
+	}
+	
+	/**
+	 * Remove the activityies from screen on selection of new lesson
+	 * 
+	 * @usage   
+	 * @param   activityUIID 
+	 * @return  
+	 */
+	private function removeActivity(a:Activity,mm:MonitorModel){
+		//dispatch an event to show the design  has changed
+		trace("in removeActivity")
+		var r = mm.activitiesDisplayed.remove(a.activityUIID);
+		r.removeMovieClip();
+		var s:Boolean = (r==null) ? false : true;
+		
+	}
 	/**
 	 * Draws new activity to monitor tab view stage.
 	 * @usage   
@@ -215,7 +227,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 	 * @param   cm - Refernce to the model
 	 * @return  Boolean - successfullit
 	 */
-	private function drawActivity(a:Activity,mm:MonitorModel):Boolean{
+	private function drawActivity(a:Activity,mm:MonitorModel, learner:Number):Boolean{
 		var s:Boolean = false;
 		
 		var ltv = LearnerTabView(this);
@@ -224,7 +236,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		
 		//take action depending on act type
 		if(a.activityTypeID==Activity.TOOL_ACTIVITY_TYPE || a.isGateActivity() || a.isGroupActivity() ){
-			var newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasActivityLinear",DepthManager.kTop,{_activity:a,_monitorController:mc,_learnerTabView:ltv, _x:ACT_X, _y:20, actLabel:a.title});
+			var newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasActivityLinear",DepthManager.kTop,{_activity:a,_monitorController:mc,_learnerTabView:ltv, _x:ACT_X, _y:ACT_Y, actLabel:a.title});
 			mm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
 			ACT_X = newActivity_mc._x + newActivity_mc._width;
 		}
@@ -232,14 +244,14 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 			//get the children
 			var children:Array = mm.getMonitor().ddm.getComplexActivityChildren(a.activityUIID);
 			
-			var newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasParallelActivity",DepthManager.kTop,{_activity:a,_children:children,_monitorController:mc,_learnerTabView:ltv, _x:xOffSet+(actWidth*actLenght), _y:20});
+			var newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasParallelActivity",DepthManager.kTop,{_activity:a,_children:children,_monitorController:mc,_learnerTabView:ltv, _x:xOffSet+(actWidth*actLenght), _y:ACT_Y});
 			mm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
 			
 		}
 		if(a.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE){
 			var children:Array = mm.getMonitor().ddm.getComplexActivityChildren(a.activityUIID);
 			
-			var newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasOptionalActivityLinear",DepthManager.kTop,{_activity:a,_children:children,_monitorController:mc,_learnerTabView:ltv, _x:ACT_X, _y:20, fromModuleTab:"monitorLearnerTab"});
+			var newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasOptionalActivityLinear",DepthManager.kTop,{_activity:a,_children:children,_monitorController:mc,_learnerTabView:ltv, _x:ACT_X, _y:ACT_Y, fromModuleTab:"monitorLearnerTab"});
 			mm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
 			ACT_X = newActivity_mc._x + newActivity_mc._width;
 			
@@ -249,30 +261,10 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		
 		s = true;
 		actLenght++;
+		//mm.getMonitor().getMV().getMonitorScp().redraw(true);
 		return s;
 	}
 	
-	/**
-	 * Draws a transition on the Monitor Tab View.
-	 * @usage   
-	 * @param   t  The transition to draw
-	 * @param   mm  the Monitor Model.
-	 * @return  
-	 */
-	private function drawTransition(t:Transition,mm:MonitorModel):Boolean{
-		var s:Boolean = true;
-		
-		var ltv = LearnerTabView(this);
-		
-		var mc = getController();
-		
-		var newTransition_mc:MovieClip = _transitionLayer_mc.createChildAtDepth("MonitorTransition",DepthManager.kTop,{_transition:t,_monitorController:mc,_learnerTabView:ltv});
-		
-		mm.transitionsDisplayed.put(t.transitionUIID,newTransition_mc);
-		Debugger.log('drawn a transition:'+t.transitionUIID+','+newTransition_mc,Debugger.GEN,'drawTransition','MonitorTabView');
-		return s;
-		
-	}
 	/**
     * Sets the size of the canvas on stage, called from update
     */
@@ -281,6 +273,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		trace("Monitor Tab Grid Width: "+s.w+" Monitor Tab Grid Height: "+s.h);
 		//monitor_scp.setSize(s.w,s.h);
 		bkg_pnl.setSize(s.w,s.h);
+		
 		//Create the grid.  The grid is re-drawn each time the canvas is resized.
 		var grid_mc = Grid.drawGrid(_gridLayer_mc,Math.round(s.w-10),Math.round(s.h-10),V_GAP,H_GAP);
 				
