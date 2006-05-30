@@ -167,4 +167,13 @@
 		  WHERE ({learner}.user_id = lams_learner_progress.user_id)
 		  AND   (lams_learner_progress.lesson_id  = :lessonId)
 	</sql-query>
+
+	<sql-query name="countActiveLearners">
+		<return alias="learner" class="org.lamsfoundation.lams.usermanagement.User" />
+		  SELECT COUNT(DISTINCT {learner.user_id})
+		  FROM lams_user {learner},
+		       lams_learner_progress
+		  WHERE ({learner}.user_id = lams_learner_progress.user_id)
+		  AND   (lams_learner_progress.lesson_id  = :lessonId)
+	</sql-query>
 </hibernate-mapping>

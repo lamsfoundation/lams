@@ -115,6 +115,14 @@ public interface ILessonDAO
     public List getActiveLearnerByLesson(final long lessonId);
 
     /**
+     * Returns the count of all the learners that have started the requested lesson.
+     * 
+     * @param lessonId the id of the requested lesson.
+     * @return the count of the learners.
+     */
+    public Integer getCountActiveLearnerByLesson(final long lessonId);
+ 
+    /**
      * Get all the preview lessons more with the creation date before the given date.
      * 
      * @param startDate UTC date 

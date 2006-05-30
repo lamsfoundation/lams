@@ -24,6 +24,10 @@ package org.lamsfoundation.lams.lesson.dto;
 
 import java.util.Date;
 
+import org.lamsfoundation.lams.learningdesign.LearningDesign;
+import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.usermanagement.Organisation;
+
 
 /**
  * <p>This is a cut down version of Lesson domain object. This data transfer object
@@ -58,23 +62,18 @@ public class LessonDTO
     /**
      * Full constructor 
      */
-    public LessonDTO(Long lessonId,
-                         String lessonName,
-                         String lessonDescription,
-                         Integer lessonStateId,
-                         Integer organisationId,
-                         Long learningDesignId,
-                         Date createDateTime,
-                         Date startDateTime)
+    public LessonDTO(Lesson lesson)
     {
-        this.lessonID = lessonId;
-        this.lessonName = lessonName;
-        this.lessonDescription = lessonDescription;
-        this.lessonStateID = lessonStateId;
-        this.learningDesignID = learningDesignId;
-        this.organisationID = organisationId;
-        this.createDateTime = createDateTime;
-        this.startDateTime = startDateTime;
+    	this.lessonID = lesson.getLessonId();
+        this.lessonName = lesson.getLessonName();
+        this.lessonDescription = lesson.getLessonDescription();
+        this.lessonStateID = lesson.getLessonStateId();
+        LearningDesign design = lesson.getLearningDesign();
+        this.learningDesignID = design != null ? design.getLearningDesignId() : null;
+        Organisation org = lesson.getOrganisation();
+        this.organisationID = org != null ? org.getOrganisationId() : null;
+        this.createDateTime = lesson.getCreateDateTime();
+        this.startDateTime = lesson.getStartDateTime();
 
     }
     //---------------------------------------------------------------------

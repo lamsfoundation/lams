@@ -319,28 +319,37 @@ public class UserManagementService implements IUserManagementService {
 	/**
 	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getOrganisationRolesForUser(org.lamsfoundation.lams.usermanagement.User, java.util.List<String>, java.util.Integer)
 	 */
-	public OrganisationDTO getOrganisationsForUserByRole(User user, List<String> restrictToRoleNames, Integer organisationId) {
+	public OrganisationDTO getOrganisationsForUserByRole(User user, List<String> restrictToRoleNames, Integer courseId, List<Integer> restrictToClassIds) {
 		// TODO optimise db access
 		List<OrganisationDTO> dtolist = new ArrayList<OrganisationDTO>();
-		Organisation org = organisationDAO.getOrganisationById(organisationId);
-		getChildOrganisations(user, org, restrictToRoleNames, dtolist);
-		return OrganisationDTOFactory.createTree(dtolist);
+		Organisation org = organisationDAO.getOrganisationById(courseId);
+		dtolist.add(org.getOrganisationDTO());
+		getChildOrganisations(user, org, restrictToRoleNames, restrictToClassIds, dtolist);
+		OrganisationDTO dtoTree = OrganisationDTOFactory.createTree(dtolist);
+		
+		// Want to return the course as the main node, not the dummy root.
+		Vector nodes = dtoTree.getNodes();
+		return (OrganisationDTO) nodes.get(0);
+		
 	}
 	
-	private void getChildOrganisations(User user, Organisation org, List<String> restrictToRoleNames, List<OrganisationDTO> dtolist) {
+	private void getChildOrganisations(User user, Organisation org, List<String> restrictToRoleNames, List<Integer> restrictToClassIds, List<OrganisationDTO> dtolist) {
 		if ( org != null ) {
+			boolean notCheckClassId = restrictToClassIds == null || restrictToClassIds.size() == 0;
 			List<UserOrganisation> childOrgs = userOrganisationDAO.getChildUserOrganisationsByUser(user, org);
 			for ( UserOrganisation userOrganisation : childOrgs) {
 				OrganisationDTO dto = userOrganisation.getOrganisation().getOrganisationDTO();
-				boolean aRoleFound = addRolesToDTO(restrictToRoleNames, userOrganisation, dto);
-				if ( aRoleFound ) {
-					dtolist.add(dto);
-				}
-				
-				// now, process any children of this org
-				Organisation childOrganisation = userOrganisation.getOrganisation();
-				if ( org.getChildOrganisations().size() > 0 ) {
-					getChildOrganisations(user, childOrganisation, restrictToRoleNames, dtolist);
+				if ( notCheckClassId || restrictToClassIds.contains(dto.getOrganisationID()) ) {
+					boolean aRoleFound = addRolesToDTO(restrictToRoleNames, userOrganisation, dto);
+					if ( aRoleFound ) {
+						dtolist.add(dto);
+					}
+					
+					// now, process any children of this org
+					Organisation childOrganisation = userOrganisation.getOrganisation();
+					if ( org.getChildOrganisations().size() > 0 ) {
+						getChildOrganisations(user, childOrganisation, restrictToRoleNames, restrictToClassIds, dtolist);
+					}
 				}
 			}
 		}

@@ -429,20 +429,21 @@ public class Lesson implements Serializable {
     // Domain service methods
     //---------------------------------------------------------------------
     /**
-     * Create lesson data transfer object for flash and java interaction.
+     * Create lesson data transfer object for flash and java learner interaction.
+     * Does not include the counts of the users.
+     * 
      * @return the lesson data transfer object.
      */
     public LessonDTO getLessonData()
     {
-        return new LessonDTO(this.lessonId,
-                             this.getLessonName(),
-                             this.getLessonDescription(),
-                             this.lessonStateId,
-                             this.organisation!=null?this.organisation.getOrganisationId():null,
-                             this.learningDesign!=null?this.learningDesign.getLearningDesignId():null,
-                             this.createDateTime,
-                             this.startDateTime);
+        return new LessonDTO(this);
     }
+    /**
+     * Create lesson data transfer object for flash and java monitoring interaction.
+     * Includes counts of the learners.
+     * 
+     * @return the monitoring lesson data transfer object.
+     */
     public LessonDetailsDTO getLessonDetails(){
     	return new LessonDetailsDTO(this);
     }

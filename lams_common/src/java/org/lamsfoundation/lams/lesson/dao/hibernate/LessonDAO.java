@@ -23,6 +23,7 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.lesson.dao.hibernate;
 
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
@@ -159,7 +160,23 @@ public class LessonDAO extends HibernateDaoSupport implements ILessonDAO
         );
         return learners;
     }
+
     /**
+     * @see org.lamsfoundation.lams.lesson.dao.ILessonDAO#getActiveLearnerByLesson(long)
+     */
+    public Integer getCountActiveLearnerByLesson(final long lessonId)
+    {
+        HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
+        return (Integer) hibernateTemplate.execute(new HibernateCallback() {
+            public Object doInHibernate(Session session)
+                    throws HibernateException {
+    	    	Query query = session.getNamedQuery("countActiveLearners");
+    	    	query.setLong("lessonId", lessonId);
+                return query.uniqueResult();
+            }
+        });
+    }
+/**
      * Saves or Updates a Lesson.
      * @param lesson
      */

@@ -22,4 +22,22 @@
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	
+	
+	<bean id="lessonServiceTarget" class="org.lamsfoundation.lams.lesson.service.LessonService">
+		<property name="lessonDAO"><ref bean="lessonDAO"/></property>
+	</bean>
+	
+	<bean id="lessonService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+		<property name="target"><ref local="lessonServiceTarget"/></property>
+		<property name="proxyTargetClass"><value>true</value></property> 
+		<property name="transactionAttributes">
+			<props>
+				<prop key="cacheLessonUser">PROPAGATION_REQUIRED</prop>
+				<prop key="removeLessonUserFromCache">PROPAGATION_REQUIRED</prop>
+				<prop key="getActiveLessonLearners">PROPAGATION_REQUIRED</prop>
+			</props>
+		</property>
+	</bean>
+	
 </beans>

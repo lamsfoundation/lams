@@ -185,22 +185,29 @@ public interface IUserManagementService {
      * given roles. If restrictToRoleNames is null/empty then till return all organisations
      * to which the user belongs. 
      * 
-     * @param user the user
+	 * @param user mandatory
      * @param restrictToRoleNames role names to which to restrict the user
      * @return List of organisationDTOs
      */
     public OrganisationDTO getOrganisationsForUserByRole(User user, List<String> restrictToRoleNames);
     
 	/**
-     * Retrieves a tree of child organisations for this user/organisation. The top of the 
-     * tree is a "dummy" root organisation, just so that we have a real tree. This makes life easier for Flash.
-     * 
+	 * Retrieves a tree of child of organisations in which the user has the specified role.
+	 * If courseID only is set, then return course organisationDTO and its children as its nodes 
+	 * If courseID && restrictToClassIds are set, then course organisationDTO and its the nominated class 
+	 * organisationDTOs - most cases will have only single classID
+	 * 
      * If restrictToRoleNames contains any role names (ie not null and size > 0 )
      * then it will restrict the organisations to those in which the user has one of the
-     * given roles. If restrictToRoleNames is null/empty then till return all organisations
-     * to which the user belongs.
+     * given roles.  
+     * 
+	 * @param user mandatory
+	 * @param roles optional
+	 * @param courseID mandatory
+	 * @param restrictToClassIds optional
+	 * @return organisationDTO hierarchy, in WDDX format. 
 	 */
-	public OrganisationDTO getOrganisationsForUserByRole(User user, List<String> restrictToRoleNames, Integer organisationId);
+	public OrganisationDTO getOrganisationsForUserByRole(User user, List<String> restrictToRoleNames, Integer courseId, List<Integer> restrictToClassIds);
 
 	/**
      * Gets an organisation for a user, with the user's roles. Doesn't not return a tree of organisations 

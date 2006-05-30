@@ -24,6 +24,8 @@
 package org.lamsfoundation.lams.lesson.dto;
 
 import java.util.Date;
+import java.util.Set;
+
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 
@@ -33,6 +35,8 @@ import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 public class LessonDetailsDTO {
 	
 	private Long lessonID;
+	private String lessonName;
+	private String lessonDescription;
 	private Integer lessonStateID;
 	private Date createDateTime;
 	private Date startDateTime;
@@ -43,37 +47,21 @@ public class LessonDetailsDTO {
 	private Integer workspaceFolderID;	
 	private Long licenseID;
 	private String licenseText;	
-	
 	private Long learningDesignID;
+	private Integer numberPossibleLearners;
+	private Integer numberStartedLearners;
 	
-	
-	/** Full constructor */
-	public LessonDetailsDTO(Long lessonID, Long duration, Date createDateTime,
-			Date startDateTime, Integer organisationID,
-			String organisationName, String organisationDescription,
-			Integer workspaceFolderID, Long licenseID, String licenseText,
-			Integer lessonStateID, Long learningDesignID) {		
-		this.lessonID = lessonID;
-		this.duration = duration;
-		this.createDateTime = createDateTime;
-		this.startDateTime = startDateTime;
-		this.organisationID = organisationID;
-		this.organisationName = organisationName;
-		this.organisationDescription = organisationDescription;
-		this.workspaceFolderID = workspaceFolderID;
-		this.licenseID = licenseID;
-		this.licenseText = licenseText;
-		this.lessonStateID = lessonStateID;
-		this.learningDesignID = learningDesignID;
-	}
+	/** Create the DTO based on the lesson. Sets up all the fields except numberStartedLearners */
 	public LessonDetailsDTO(Lesson lesson){
 		this.lessonID = lesson.getLessonId();
+		this.lessonName = lesson.getLessonName();
+		this.lessonDescription = lesson.getLessonDescription();
+
+		this.lessonStateID = lesson.getLessonStateId();
+		this.createDateTime = lesson.getCreateDateTime();
+		this.startDateTime = lesson.getStartDateTime();
 		
 		this.duration = lesson.getLearningDesign().getDuration();
-		
-		this.createDateTime = lesson.getCreateDateTime();
-		
-		this.startDateTime = lesson.getStartDateTime();
 		
 		this.organisationID = lesson.getOrganisation()!=null?
 							  lesson.getOrganisation().getOrganisationId():
@@ -99,9 +87,11 @@ public class LessonDetailsDTO {
 						   lesson.getLearningDesign().getLicenseText():
 					       WDDXTAGS.STRING_NULL_VALUE;
 		
-		this.lessonStateID = lesson.getLessonStateId();
-		
 		this.learningDesignID = lesson.getLearningDesign().getLearningDesignId();		
+
+		Set allLearners = lesson.getAllLearners();
+		this.numberPossibleLearners = new Integer(allLearners !=null ? allLearners.size() : 0);
+		this.numberStartedLearners = new Integer(0);
 	}	
 	/**
 	 * @return Returns the createDateTime.
@@ -174,5 +164,20 @@ public class LessonDetailsDTO {
 	 */
 	public Integer getWorkspaceFolderID() {
 		return workspaceFolderID!=null?workspaceFolderID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+	}
+	public Integer getNumberStartedLearners() {
+		return numberStartedLearners;
+	}
+	public void setNumberStartedLearners(Integer numberStartedLearners) {
+		this.numberStartedLearners = numberStartedLearners;
+	}
+	public String getLessonDescription() {
+		return lessonDescription;
+	}
+	public String getLessonName() {
+		return lessonName;
+	}
+	public Integer getNumberPossibleLearners() {
+		return numberPossibleLearners;
 	}
 }

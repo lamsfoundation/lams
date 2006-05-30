@@ -23,12 +23,10 @@
 package org.lamsfoundation.lams.learningdesign.strategy;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.lamsfoundation.lams.learningdesign.ContributionTypes;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
-import org.lamsfoundation.lams.usermanagement.User;
 
 
 /**
@@ -37,9 +35,7 @@ import org.lamsfoundation.lams.usermanagement.User;
  * defined in the abstract level.
  * 
  * @author Jacky Fang
- * @since  2005-4-6
- * @version 1.1
- * 
+ * @author Fiona Malikoff
  */
 public class SynchGateActivityStrategy extends GateActivityStrategy
 {
@@ -54,24 +50,23 @@ public class SynchGateActivityStrategy extends GateActivityStrategy
      * <p>Check up the waiting learners list and lesson learner list. If all 
      * lesson learner appears in the waiting list, we assume the open condition
      * for the sync gate is met. </p>
-     * 
-     * <p>Note, simply compares the size of two list might be proper. Waiting
-     * learners might not want to wait any more and exit the lesson, who will
-     * be removed from current lesson learner list. Therefore, it is possible
-     * that the waiting learner list is larger than the current lesson learner
-     * list. </p>
+     *
+     * <p>Given that the list of lessonLearners is everyone who has started
+     * the lesson, we can assume that # waiting is less than or equal to # in lesson.
+     * So if the two sets have some number of users, then open the gate. Small
+     * chance that the two sets won't match due to a bug elsewhere but not 
+     * worth testing for here</p>. 
      * 
      * @see org.lamsfoundation.lams.learningdesign.strategy.GateActivityStrategy#isOpenConditionMet()
      */
     protected boolean isOpenConditionMet(List lessonLearners)
     {
     	if ( gateActivity != null ) {
-	        for(Iterator i = lessonLearners.iterator();i.hasNext();)
-	        {
-	            User learner = (User)i.next();
-	            if (!gateActivity.getWaitingLearners().contains(learner))
-	                return false;
-	        }
+    		int numWaiting = gateActivity.getWaitingLearners().size();
+    		int numLesson = lessonLearners!=null?lessonLearners.size():0;
+    		if ( numWaiting < numLesson ) {
+    			return false;
+    		}
     	}
         return true;
     }

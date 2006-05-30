@@ -60,7 +60,7 @@ public abstract class GateActivityStrategy extends SimpleActivityStrategy
      * 
      * @param learner the learner who just arrived at the gate.
      * @param activity the gate activity.
-     * @param lessonLearners all learners who are currently in the lesson.
+     * @param lessonLearners all learners who have started the lesson
      * @return whether we should open it or not.
      */
     public boolean shouldOpenGateFor(User learner,List lessonLearners)
