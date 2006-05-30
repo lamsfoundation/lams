@@ -142,7 +142,7 @@ class Wizard {
 		var callback:Function = Proxy.create(this,showOrgTree);
            
 		if(classID != undefined){
-			Application.getInstance().getComms().getRequest('workspace.do?method=getUserOrganisation&userID='+_root.userID+'&organisationID='+classID,callback, false);
+			Application.getInstance().getComms().getRequest('workspace.do?method=getUserOrganisation&userID='+_root.userID+'&organisationID='+classID+'&roles=STAFF,TEACHER',callback, false);
 		}else if(courseID != undefined){
 			trace('course defined: doing request');
 			Application.getInstance().getComms().getRequest('workspace.do?method=getOrganisationsByUserRole&userID='+_root.userID+'&organisationID='+courseID+'&roles=STAFF,TEACHER',callback, false);
