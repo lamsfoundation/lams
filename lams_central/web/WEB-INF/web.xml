@@ -176,6 +176,15 @@
         <load-on-startup>1</load-on-startup>
 </servlet>
 
+<servlet>
+		<servlet-name>ExportToolContent</servlet-name>
+		<servlet-class>org.lamsfoundation.lams.authoring.web.ExportToolContentServlet</servlet-class>
+</servlet>
+<servlet>
+		<servlet-name>ImportToolContent</servlet-name>
+		<servlet-class>org.lamsfoundation.lams.authoring.web.ImportToolContentServlet</servlet-class>
+</servlet>
+
   <servlet-mapping>
 	<servlet-name>action</servlet-name>
     <url-pattern>*.do</url-pattern>
@@ -191,6 +200,16 @@
 <servlet-mapping>
   <servlet-name>SimpleUploader</servlet-name>
   <url-pattern>/fckeditor/editor/filemanager/upload/simpleuploader</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+  <servlet-name>ExportToolContent</servlet-name>
+  <url-pattern>/ExportToolContent</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+  <servlet-name>ImportToolContent</servlet-name>
+  <url-pattern>/ImportToolContent</url-pattern>
 </servlet-mapping>
 
    <servlet-mapping>

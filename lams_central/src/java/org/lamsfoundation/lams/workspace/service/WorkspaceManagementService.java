@@ -1383,19 +1383,19 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	}
 	
 	/**
-	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#getOrganisationsByUserRole(Integer, String)
+	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#getOrganisationsByUserRole(Integer, List<String>, Integer, List<Integer>)
 	 */
-	public String getOrganisationsByUserRole(Integer userID, List<String> roleNames, Integer organisationId) throws IOException
+	public String getOrganisationsByUserRole(Integer userID, List<String> roleNames, Integer courseId, List<Integer> restrictToClassIds) throws IOException
 	{
 		User user = userDAO.getUserById(userID);
 		
 		if (user!=null) {
-			if ( organisationId == null ) {
+			if ( courseId == null ) {
 				flashMessage = new FlashMessage(
 						MSG_KEY_ORG_BY_ROLE, userMgmtService.getOrganisationsForUserByRole(user, roleNames));
 			} else {
 				flashMessage = new FlashMessage(
-						MSG_KEY_ORG_BY_ROLE, userMgmtService.getOrganisationsForUserByRole(user, roleNames, organisationId));
+						MSG_KEY_ORG_BY_ROLE, userMgmtService.getOrganisationsForUserByRole(user, roleNames, courseId, restrictToClassIds));
 			}
 		} else
 			flashMessage = FlashMessage.getNoSuchUserExists(

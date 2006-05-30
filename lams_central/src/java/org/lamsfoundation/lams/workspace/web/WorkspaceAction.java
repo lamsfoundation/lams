@@ -33,6 +33,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -514,14 +516,33 @@ public class WorkspaceAction extends DispatchAction {
 			roleList.add(role);
 		}
 		
-		Integer orgId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID,true);
 
 		String wddxPacket = null;
+		Integer courseId  = null;
+		String[] classIdStrings = null;
 		try {
+			courseId = WebUtil.readIntParam(request, AttributeNames.PARAM_COURSE_ID,true);
+			classIdStrings = request.getParameterValues(AttributeNames.PARAM_CLASS_ID);
+			ArrayList<Integer> classIds = new ArrayList<Integer>();
+			if ( classIdStrings != null ) {
+				for ( String str: classIdStrings) {
+					// any number format exception will be caught by the general catch
+					int classId = Integer.parseInt(str);
+					classIds.add(new Integer(classId));
+				}
+			}
 			IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
-			wddxPacket = workspaceManagementService.getOrganisationsByUserRole(userID, roleList,orgId);		
+			wddxPacket = workspaceManagementService.getOrganisationsByUserRole(userID, roleList,courseId,classIds);
+			
 		} catch (Exception e) {
-			log.error("getOrganisationsByUserRole: Exception occured. userID "+userID+" role "+roles.toString(), e);
+			String error = new ToStringBuilder(this)
+				.append("")
+				.append("userID",userID)
+				.append("roles",roles)
+				.append("courseId",courseId)
+				.append("classIdStrings",classIdStrings)
+				.toString();
+			log.error("getOrganisationsByUserRole: Exception occured. Request data "+error, e);
 			FlashMessage flashMessage = FlashMessage.getExceptionOccured(IWorkspaceManagementService.MSG_KEY_ORG_BY_ROLE, e.getMessage());
 			wddxPacket = flashMessage.serializeMessage();
 		}

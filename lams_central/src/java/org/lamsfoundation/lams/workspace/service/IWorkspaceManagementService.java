@@ -318,14 +318,18 @@ public interface IWorkspaceManagementService {
 	public String getWorkspace(Integer userID) throws IOException;
 	
 	/** 
-	 * Retrieves the list of organisations in which the user has the specified role.
-	 * in WDDX format
+	 * Retrieves a tree of organisations in which the user has the specified role.
+	 * If courseID is not set, then returns all organisations 
+	 * If courseID only is set, then return course organisationDTO and its children as its nodes 
+	 * If courseID && classID(s) are set, then course organisationDTO and its the nominated class 
+	 * organisationDTOs - most cases will have only single classID
 	 * @param userID
 	 * @param roles
-	 * @param organisationID if null returns all organisations, if set returns child organisations for this organisation
-	 * @return
+	 * @param courseID
+	 * @param classID
+	 * @return organisationDTO hierarchy, in WDDX format. 
 	 */
-	public String getOrganisationsByUserRole(Integer userID, List<String> roleNames, Integer organisationId) throws IOException;
+	public String getOrganisationsByUserRole(Integer userID, List<String> roleNames, Integer courseId, List<Integer> restrictToClassIds) throws IOException;
 	
 	/**
 	 * Returns the users within the Organisation with <code>organisationID</code>
