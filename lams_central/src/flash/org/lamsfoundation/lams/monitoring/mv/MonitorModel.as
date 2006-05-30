@@ -81,7 +81,8 @@ class MonitorModel extends Observable{
 	private var ddmActivity_keys:Array;
 	private var ddmTransition_keys:Array;
 	private var _orgs:Array;
-	private var _selectedTreeNode:XMLNode;
+	private var _resultDTO:Object;
+	//private var _selectedTreeNode:XMLNode;
 	
 	private static var USER_LOAD_CHECK_INTERVAL:Number = 50;
 	private static var USER_LOAD_CHECK_TIMEOUT_COUNT:Number = 200;
@@ -110,6 +111,8 @@ class MonitorModel extends Observable{
 		_staffLoaded = false;
 		_learnersLoaded = false;
 		
+		_resultDTO = new Object();
+		
 		mx.events.EventDispatcher.initialize(this);
 	}
 	
@@ -137,6 +140,30 @@ class MonitorModel extends Observable{
 	
 	public function getSequence():Sequence{
 		return _activeSeq;
+	}
+	
+	
+	public function loadSequence(seqDTO:Object):Boolean{
+		// create new Sequence from DTO
+		var seq:Sequence = new Sequence(seqDTO);
+		setSequence(seq);
+		
+		return true;
+	}
+	
+	public function suspendSequence():Void{
+		var callback:Function = Proxy.create(_monitor, _monitor.reloadLessonToMonitor);
+		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=suspendLesson&lessonID=' + String(_activeSeq.ID) + '&userID=' + _root.userID,callback, false);
+	}
+	
+	public function archiveSequence():Void{
+		var callback:Function = Proxy.create(_monitor, _monitor.reloadLessonToMonitor);
+		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=archiveLesson&lessonID=' + String(_activeSeq.ID) + '&userID=' + _root.userID,callback, false);
+	}
+	
+	public function activateSequence():Void{
+		var callback:Function = Proxy.create(_monitor, _monitor.reloadLessonToMonitor);
+		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=unsuspendLesson&lessonID=' + String(_activeSeq.ID) + '&userID=' + _root.userID,callback, false);
 	}
 	
 	public function setLessonProgressData(learnerProg:Array){
@@ -421,18 +448,18 @@ class MonitorModel extends Observable{
 		_UserLoadCheckIntervalID = null;
 	}
 	
-	private function requestLearners(data:Object){
+	public function requestLearners(data:Object, callback:Function){
 		
 		trace('requesting learners...');
-		var callback:Function = Proxy.create(this,saveLearners);
+		//var callback:Function = Proxy.create(this,saveLearners);
 		_monitor.requestUsers(LEARNER_ROLE, data.organisationID, callback);
 	}
 
 	
-	private function requestStaff(data:Object){
+	public function requestStaff(data:Object, callback:Function){
 		
 		trace('requesting staff members...');
-		var callback:Function = Proxy.create(this,saveStaff);
+		//var callback:Function = Proxy.create(this,saveStaff);
 		
 		_monitor.requestUsers(STAFF_ROLE, data.organisationID, callback);
 	}
@@ -442,7 +469,8 @@ class MonitorModel extends Observable{
 		
 		saveUsers(users, LEARNER_ROLE);
 		
-		dispatchEvent({type:'learnersLoad',target:this});
+		//dispatchEvent({type:'learnersLoad',target:this});
+		broadcastViewUpdate("LEARNERS_LOADED", null, null);
 	}
 	
 	public function saveStaff(users:Array){
@@ -450,7 +478,8 @@ class MonitorModel extends Observable{
 		
 		saveUsers(users, STAFF_ROLE);
 		
-		dispatchEvent({type:'staffLoad',target:this});
+		//dispatchEvent({type:'staffLoad',target:this});
+		broadcastViewUpdate("STAFF_LOADED", null, null);
 	}
 
 	private function saveUsers(users:Array, role:String):Void{
@@ -470,6 +499,30 @@ class MonitorModel extends Observable{
 				trace('adding user: ' + user.getFirstName() + ' ' + user.getLastName() + ' ' + user.getUserId());
 				organisation.addUser(user);
 			}
+		}
+		
+		
+	}
+	
+	public function getLessonClassData():Object{
+		var classData:Object = new Object();
+		var r:Object = resultDTO;
+		var staff:Object = new Object();
+		var learners:Object = new Object();
+		if(r){
+			trace('getting lesson class data...');
+			trace('org resource id: ' + r.organisationID);
+			if(_root.lessonID){classData.lessonID = _root.lessonID;}
+			if(r.organisationID){classData.organisationID = r.organisationID;}
+			classData.staff = staff;
+			classData.learners = learners;
+			if(r.staffGroupName){classData.staff.groupName = r.staffGroupName;}
+			if(r.selectedStaff){staff.users = r.selectedStaff;}
+			if(r.learnersGroupName){classData.learners.groupName = r.learnersGroupName;}
+			if(r.selectedLearners){classData.learners.users = r.selectedLearners;}
+			return classData;
+		} else {
+			return null;
 		}
 	}
 	
@@ -575,7 +628,7 @@ class MonitorModel extends Observable{
 	 * @usage   
 	 * @param   newselectedTreeNode 
 	 * @return  
-	 */
+	 
 	public function setSelectedTreeNode (newselectedTreeNode:XMLNode):Void {
 		_selectedTreeNode = newselectedTreeNode;
 		trace('branch: ' + _selectedTreeNode.attributes.isBranch);
@@ -598,14 +651,18 @@ class MonitorModel extends Observable{
 		//dispatch an update to the view
 		//broadcastViewUpdate('ITEM_SELECTED',_selectedTreeNode);
 	}
+	*/
+	
 	/**
 	 * 
 	 * @usage   
 	 * @return  
-	 */
+	 
 	public function getSelectedTreeNode ():XMLNode {
 		return _selectedTreeNode;
 	}
+	*/
+	
 	public function setSelectedTab(tabID:Number){
 		selectedTab = tabID;
 	}
@@ -651,6 +708,14 @@ class MonitorModel extends Observable{
 	public function get className():String{
         return 'MonitorModel';
     }
+	
+	public function get resultDTO():Object{
+		return _resultDTO;
+	}
+	
+	public function set resultDTO(a:Object){
+		_resultDTO = a;
+	}
 
 	/**
 	 * Returns a reference to the Activity Movieclip for the UIID passed in.  Gets from _activitiesDisplayed Hashable
