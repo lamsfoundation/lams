@@ -93,7 +93,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 											<tr>
 												<td NOWRAP colspan=2 valign=top align=left>
-												<table align=center>
+												<table align=left>
 													<c:if test="${statsTabActive != 'true'}"> 							
 														<tr> 
 															<td> </td>
@@ -124,7 +124,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 													<td NOWRAP> <b> <font size=2> <bean:message key="label.total.votes"/> </b> </td>
 												</tr>
 												
-												<c:forEach var="currentNomination" items="${currentDto.mapStandardNominationsContent}">
+												<c:forEach var="currentNomination" items="${currentDto.mapStandardNominationsHTMLedContent}">
 										  	 		<c:set var="currentNominationKey" scope="request" value="${currentNomination.key}"/>
 										  	 		 <tr>
 							  	 						<td NOWRAP valign=top align=left>

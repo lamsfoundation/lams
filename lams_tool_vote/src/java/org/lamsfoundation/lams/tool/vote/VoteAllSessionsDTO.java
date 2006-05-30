@@ -40,6 +40,7 @@ public class VoteAllSessionsDTO implements Comparable
 	private String completedSessionUserPercent;
 	private String sessionId;
 	private Map mapStandardNominationsContent;
+	private Map mapStandardNominationsHTMLedContent;
 	private Map mapStandardUserCount;
 	private Map mapStandardRatesContent;
 	private List listUserEntries;
@@ -158,5 +159,18 @@ public class VoteAllSessionsDTO implements Comparable
     public void setMapStandardNominationsContent(
             Map mapStandardNominationsContent) {
         this.mapStandardNominationsContent = mapStandardNominationsContent;
+    }
+    /**
+     * @return Returns the mapStandardNominationsHTMLedContent.
+     */
+    public Map getMapStandardNominationsHTMLedContent() {
+        return mapStandardNominationsHTMLedContent;
+    }
+    /**
+     * @param mapStandardNominationsHTMLedContent The mapStandardNominationsHTMLedContent to set.
+     */
+    public void setMapStandardNominationsHTMLedContent(
+            Map mapStandardNominationsHTMLedContent) {
+        this.mapStandardNominationsHTMLedContent = mapStandardNominationsHTMLedContent;
     }
 }

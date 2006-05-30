@@ -117,7 +117,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 										<td NOWRAP> <b> <font size=2> <bean:message key="label.total.votes"/> </b> </td>
 									</tr>
 									
-									<c:forEach var="currentNomination" items="${mapStandardNominationsContent}">
+									<c:forEach var="currentNomination" items="${mapStandardNominationsHTMLedContent}">
 							  	 		<c:set var="currentNominationKey" scope="request" value="${currentNomination.key}"/>
 							  	 		 <tr>
 				  	 						<td NOWRAP valign=top align=left>

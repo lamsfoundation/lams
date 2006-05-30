@@ -204,7 +204,7 @@ public abstract class VoteUtils implements VoteAppConstants {
 	}
 
 
-    public static String stripFCKTags(String htmlText)
+    public static String stripHTML(String htmlText)
     {
         String noHTMLText = htmlText.replaceAll("\\<.*?\\>","").replaceAll("&nbsp;","").replaceAll("&#[0-9][0-9][0-9][0-9];","");
         String[] htmlTokens = noHTMLText.split("\n");
@@ -215,6 +215,17 @@ public abstract class VoteUtils implements VoteAppConstants {
             {
                 noHtmlNoNewLineStr= noHtmlNoNewLineStr + " " + htmlTokens[i];
             }
+        }
+        
+        logger.debug("trimmed noHtmlNoNewLineStr: " + noHtmlNoNewLineStr.trim());
+        if (noHtmlNoNewLineStr.trim().equals(""))
+        {
+            logger.debug("nomination text is just composed of html markup..." +
+            		"returning html formatted text");
+            if (htmlText.length() > 50)
+                return htmlText.substring(0,51);
+            else
+                return htmlText;
         }
         
         if (noHtmlNoNewLineStr.length() > 50)
@@ -238,9 +249,8 @@ public abstract class VoteUtils implements VoteAppConstants {
 	    {
 			request.getSession().setAttribute(ACTIVITY_TITLE, richTextTitle);
 	    }
-	    String noHTMLTitle = stripFCKTags(richTextTitle);
+	    String noHTMLTitle = stripHTML(richTextTitle);
 	    logger.debug("noHTMLTitle: " + noHTMLTitle);
-	    
 
 	
 	    if (richTextInstructions != null)

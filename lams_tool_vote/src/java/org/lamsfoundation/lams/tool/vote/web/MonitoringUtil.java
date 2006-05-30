@@ -660,7 +660,14 @@ public class MonitoringUtil implements VoteAppConstants{
 		return map;
 	}
 
-	
+	/**
+	 * Generates JFreeChart data for all sessions in the Monitoring Summary. 
+	 * @param request
+	 * @param voteService
+	 * @param voteMonitoringForm
+	 * @param toolContentId
+	 * @return 
+	 */
 	public static List prepareChartDTO(HttpServletRequest request, IVoteService voteService, VoteMonitoringForm voteMonitoringForm, Long toolContentId)
 	{
 	    logger.debug("start preparing ChartDTO with voteMonitoringForm: " + voteMonitoringForm);
@@ -727,14 +734,15 @@ public class MonitoringUtil implements VoteAppConstants{
 			int totalStandardVotesCount=0;
 			
 			logger.debug("using entriesCount: " + entriesCount);
-			
+			Map mapStandardNominationsHTMLedContent= new TreeMap(new VoteComparator());
 			while (queIterator.hasNext())
 			{
 				VoteQueContent voteQueContent=(VoteQueContent) queIterator.next();
 				if (voteQueContent != null)
 				{
 					logger.debug("question: " + voteQueContent.getQuestion());
-					String noHTMLNomination = VoteUtils.stripFCKTags(voteQueContent.getQuestion());
+					mapStandardNominationsHTMLedContent.put(mapIndex.toString(),voteQueContent.getQuestion());
+					String noHTMLNomination = VoteUtils.stripHTML(voteQueContent.getQuestion());
 				    logger.debug("noHTMLNomination: " + noHTMLNomination);
 					mapOptionsContent.put(mapIndex.toString(),noHTMLNomination);
 					
@@ -762,6 +770,7 @@ public class MonitoringUtil implements VoteAppConstants{
 			Map mapStandardNominationsContent= new TreeMap(new VoteComparator());
 			mapStandardNominationsContent=mapOptionsContent;
 			logger.debug("mapStandardNominationsContent: " + mapStandardNominationsContent);
+			logger.debug("mapStandardNominationsHTMLedContent: " + mapStandardNominationsHTMLedContent);
 			
 			Map mapStandardRatesContent= new TreeMap(new VoteComparator());
 			mapStandardRatesContent=mapVoteRatesContent;
@@ -784,14 +793,17 @@ public class MonitoringUtil implements VoteAppConstants{
 	        logger.debug("userEnteredVotesCount for this session: " + userEnteredVotesCount);
 		    
 		    mapStandardNominationsContent.put(mapIndex.toString(), "Open Vote");
+		    mapStandardNominationsHTMLedContent.put(mapIndex.toString(), "Open Vote");
 		    mapStandardRatesContent.put(mapIndex.toString(), new Double(share).toString());
 		    mapStandardUserCount.put(mapIndex.toString(), new Integer(userEnteredVotesCount).toString());
-	        
-			logger.debug("processed for prepareChartDTO: MAP_STANDARD_NOMINATIONS_CONTENT: " + request.getSession().getAttribute(MAP_STANDARD_NOMINATIONS_CONTENT));
-			logger.debug("processed for prepareChartDTO: MAP_STANDARD_RATES_CONTENT: " + request.getSession().getAttribute(MAP_STANDARD_RATES_CONTENT));
-			logger.debug("processed for prepareChartDTO: MAP_STANDARD_USER_COUNT: " + request.getSession().getAttribute(MAP_STANDARD_USER_COUNT));	        
+
+			logger.debug("processed for prepareChartDTO: mapStandardNominationsContent: " + mapStandardNominationsContent);
+			logger.debug("processed for prepareChartDTO: mapStandardNominationsHTMLedContent: " + mapStandardNominationsHTMLedContent);
+			logger.debug("processed for prepareChartDTO: mapStandardUserCount: " + mapStandardUserCount);	        
+			logger.debug("processed for prepareChartDTO: mapStandardRatesContent: " + mapStandardRatesContent);
 	        
 			voteAllSessionsDTO.setMapStandardNominationsContent(mapStandardNominationsContent);
+			voteAllSessionsDTO.setMapStandardNominationsHTMLedContent(mapStandardNominationsHTMLedContent);
 			voteAllSessionsDTO.setMapStandardUserCount(mapStandardUserCount);
 			voteAllSessionsDTO.setMapStandardRatesContent(mapStandardRatesContent);
 			
@@ -808,7 +820,8 @@ public class MonitoringUtil implements VoteAppConstants{
 	}
 	
 	/**
-	 * generates JFreeChart for the learner module
+	 * Generates JFreeChart data for the learner module and 
+	 * monitoring module Summary tab (Individual Sessions mode) 
 	 * 
 	 * @param request
 	 * @param voteService
@@ -888,13 +901,15 @@ public class MonitoringUtil implements VoteAppConstants{
 		
 		logger.debug("using entriesCount: " + entriesCount);
 		
+		Map mapStandardNominationsHTMLedContent= new TreeMap(new VoteComparator());
 		while (queIterator.hasNext())
 		{
 			VoteQueContent voteQueContent=(VoteQueContent) queIterator.next();
 			if (voteQueContent != null)
 			{
 				logger.debug("question: " + voteQueContent.getQuestion());
-				String noHTMLNomination = VoteUtils.stripFCKTags(voteQueContent.getQuestion());
+				mapStandardNominationsHTMLedContent.put(mapIndex.toString(), voteQueContent.getQuestion());
+				String noHTMLNomination = VoteUtils.stripHTML(voteQueContent.getQuestion());
 			    logger.debug("noHTMLNomination: " + noHTMLNomination);
 				mapOptionsContent.put(mapIndex.toString(),noHTMLNomination);
 				
@@ -926,10 +941,12 @@ public class MonitoringUtil implements VoteAppConstants{
 	    		mapIndex=new Long(mapIndex.longValue()+1);
 			}
 		}
+		
 		logger.debug("test1: Map initialized with existing contentid to: " + mapOptionsContent);
 		Map mapStandardNominationsContent= new TreeMap(new VoteComparator());
 		mapStandardNominationsContent=mapOptionsContent;
 		logger.debug("mapStandardNominationsContent: " + mapStandardNominationsContent);
+		logger.debug("mapStandardNominationsHTMLedContent: " + mapStandardNominationsHTMLedContent);
 		
 		Map mapStandardRatesContent= new TreeMap(new VoteComparator());
 		mapStandardRatesContent=mapVoteRatesContent;
@@ -952,11 +969,15 @@ public class MonitoringUtil implements VoteAppConstants{
         logger.debug("userEnteredVotesCount for this session: " + userEnteredVotesCount);
 	    
 	    mapStandardNominationsContent.put(mapIndex.toString(), "Open Vote");
+	    mapStandardNominationsHTMLedContent.put(mapIndex.toString(), "Open Vote");
 	    mapStandardRatesContent.put(mapIndex.toString(), new Double(share).toString());
 	    mapStandardUserCount.put(mapIndex.toString(), new Integer(userEnteredVotesCount).toString());
         
 		request.getSession().setAttribute(MAP_STANDARD_NOMINATIONS_CONTENT, mapStandardNominationsContent);
 		logger.debug("test2: MAP_STANDARD_NOMINATIONS_CONTENT: " + request.getSession().getAttribute(MAP_STANDARD_NOMINATIONS_CONTENT));
+		
+		request.getSession().setAttribute(MAP_STANDARD_NOMINATIONS_HTMLED_CONTENT, mapStandardNominationsHTMLedContent);
+		logger.debug("test2: MAP_STANDARD_NOMINATIONS_HTMLED_CONTENT: " + request.getSession().getAttribute(MAP_STANDARD_NOMINATIONS_HTMLED_CONTENT));
 
 		request.getSession().setAttribute(MAP_STANDARD_RATES_CONTENT, mapStandardRatesContent);
 		logger.debug("test2: MAP_STANDARD_RATES_CONTENT: " + request.getSession().getAttribute(MAP_STANDARD_RATES_CONTENT));
@@ -1036,14 +1057,15 @@ public class MonitoringUtil implements VoteAppConstants{
 		int totalStandardVotesCount=0;
 		
 		logger.debug("using entriesCount: " + entriesCount);
-		
+		Map mapStandardNominationsHTMLedContent= new TreeMap(new VoteComparator());
 		while (queIterator.hasNext())
 		{
 			VoteQueContent voteQueContent=(VoteQueContent) queIterator.next();
 			if (voteQueContent != null)
 			{
 				logger.debug("question: " + voteQueContent.getQuestion());
-				String noHTMLNomination = VoteUtils.stripFCKTags(voteQueContent.getQuestion());
+				mapStandardNominationsHTMLedContent.put(mapIndex.toString(),voteQueContent.getQuestion());
+				String noHTMLNomination = VoteUtils.stripHTML(voteQueContent.getQuestion());
 			    logger.debug("noHTMLNomination: " + noHTMLNomination);
 				mapOptionsContent.put(mapIndex.toString(),noHTMLNomination);
 				
@@ -1082,6 +1104,7 @@ public class MonitoringUtil implements VoteAppConstants{
 		Map mapStandardNominationsContent= new TreeMap(new VoteComparator());
 		mapStandardNominationsContent=mapOptionsContent;
 		logger.debug("mapStandardNominationsContent: " + mapStandardNominationsContent);
+		logger.debug("mapStandardNominationsHTMLedContent: " + mapStandardNominationsHTMLedContent);
 		
 		Map mapStandardRatesContent= new TreeMap(new VoteComparator());
 		mapStandardRatesContent=mapVoteRatesContent;
@@ -1130,12 +1153,16 @@ public class MonitoringUtil implements VoteAppConstants{
 					logger.debug("votesShare: " + votesShare);
 		    	    
 					if (isVoteVisible == true)
+					{
 					    mapStandardNominationsContent.put(mapIndex.toString(), userEntry);
+						mapStandardNominationsHTMLedContent.put(mapIndex.toString(), userEntry);
+					}
 					else
 					{
 					    String nominationName="Nomination"  + mapIndex + " Hidden";
 					    logger.debug("nominationName: " + nominationName);
 					    mapStandardNominationsContent.put(mapIndex.toString(), nominationName);
+					    mapStandardNominationsHTMLedContent.put(mapIndex.toString(), nominationName);
 					}
 					
 					mapStandardRatesContent.put(mapIndex.toString(), new Double(votesShare).toString());
@@ -1148,7 +1175,10 @@ public class MonitoringUtil implements VoteAppConstants{
 	    
 		request.getSession().setAttribute(MAP_STANDARD_NOMINATIONS_CONTENT, mapStandardNominationsContent);
 		logger.debug("test2: MAP_STANDARD_NOMINATIONS_CONTENT: " + request.getSession().getAttribute(MAP_STANDARD_NOMINATIONS_CONTENT));
-
+		
+		request.getSession().setAttribute(MAP_STANDARD_NOMINATIONS_HTMLED_CONTENT, mapStandardNominationsHTMLedContent);
+		logger.debug("test2: MAP_STANDARD_NOMINATIONS_HTMLED_CONTENT: " + request.getSession().getAttribute(MAP_STANDARD_NOMINATIONS_HTMLED_CONTENT));
+		
 		request.getSession().setAttribute(MAP_STANDARD_RATES_CONTENT, mapStandardRatesContent);
 		logger.debug("test2: MAP_STANDARD_RATES_CONTENT: " + request.getSession().getAttribute(MAP_STANDARD_RATES_CONTENT));
 		
@@ -1194,13 +1224,15 @@ public class MonitoringUtil implements VoteAppConstants{
 		entriesCount=setEntriesCount.size();
 		logger.debug("entriesCount: " + entriesCount);
 		
+		Map mapStandardNominationsHTMLedContent= new TreeMap(new VoteComparator());
 		while (queIterator.hasNext())
 		{
 			VoteQueContent voteQueContent=(VoteQueContent) queIterator.next();
 			if (voteQueContent != null)
 			{
 				logger.debug("question: " + voteQueContent.getQuestion());
-				String noHTMLNomination = VoteUtils.stripFCKTags(voteQueContent.getQuestion());
+				mapStandardNominationsHTMLedContent.put(mapIndex.toString(),voteQueContent.getQuestion());
+				String noHTMLNomination = VoteUtils.stripHTML(voteQueContent.getQuestion());
 			    logger.debug("noHTMLNomination: " + noHTMLNomination);
 				mapOptionsContent.put(mapIndex.toString(),noHTMLNomination);
 
@@ -1228,6 +1260,7 @@ public class MonitoringUtil implements VoteAppConstants{
 		Map mapStandardNominationsContent= new TreeMap(new VoteComparator());
 		mapStandardNominationsContent=mapOptionsContent;
 		logger.debug("mapStandardNominationsContent: " + mapStandardNominationsContent);
+		logger.debug("mapStandardNominationsHTMLedContent: " + mapStandardNominationsHTMLedContent);
 		
 		Map mapStandardRatesContent= new TreeMap(new VoteComparator());
 		mapStandardRatesContent=mapVoteRatesContent;
@@ -1249,12 +1282,15 @@ public class MonitoringUtil implements VoteAppConstants{
         logger.debug("userEnteredVotesCount for this session: " + userEnteredVotesCount);
 	    
 	    mapStandardNominationsContent.put(mapIndex.toString(), "Open Vote");
+	    mapStandardNominationsHTMLedContent.put(mapIndex.toString(), "Open Vote");
 	    mapStandardRatesContent.put(mapIndex.toString(), new Double(share).toString());
 	    mapStandardUserCount.put(mapIndex.toString(), new Integer(userEnteredVotesCount).toString());
 	    
-        
 		request.getSession().setAttribute(MAP_STANDARD_NOMINATIONS_CONTENT, mapStandardNominationsContent);
 		logger.debug("test2: MAP_STANDARD_NOMINATIONS_CONTENT: " + request.getSession().getAttribute(MAP_STANDARD_NOMINATIONS_CONTENT));
+
+		request.getSession().setAttribute(MAP_STANDARD_NOMINATIONS_HTMLED_CONTENT, mapStandardNominationsHTMLedContent);
+		logger.debug("test2: MAP_STANDARD_NOMINATIONS_HTMLED_CONTENT: " + request.getSession().getAttribute(MAP_STANDARD_NOMINATIONS_HTMLED_CONTENT));
 
 		request.getSession().setAttribute(MAP_STANDARD_RATES_CONTENT, mapStandardRatesContent);
 		logger.debug("test2: MAP_STANDARD_RATES_CONTENT: " + request.getSession().getAttribute(MAP_STANDARD_RATES_CONTENT));
