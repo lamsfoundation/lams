@@ -116,11 +116,10 @@ class WizardController extends AbstractController {
 	 * Initialize lesson returning new LessonID
 	 *   
 	 * @param   resultDTO Wizard data
-	 * @param   callback  function to return LessonID 
 	 *  
 	 */
 	
-	public function initializeLesson(resultDTO:Object, callback:Function){
+	public function initializeLesson(resultDTO:Object){
 		_wizardModel.resultDTO = resultDTO;
 		var callback:Function = Proxy.create(this,saveLessonClass);
 		_wizardModel.getWizard().initializeLesson(resultDTO, callback);
