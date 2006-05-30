@@ -635,7 +635,7 @@ public class SimpleRepository implements IRepositoryAdmin {
 	 		    	String tempRoot = FileUtil.createTempDirectory("export_package");
 	 		    	for(IVersionedNode child:children){
 	 		    		String path = child.getPath();
-	 		    		String fullname= tempRoot + File.separator + path;
+	 		    		String fullname= FileUtil.getFullPath(tempRoot,path);
 	 		    		
 	 		    		//if folder does not exist, create first.
 	 		    		FileUtil.createDirectory(FileUtil.getFileDirectory(fullname));
@@ -646,7 +646,7 @@ public class SimpleRepository implements IRepositoryAdmin {
 	 					IValue prop = node.getProperty(PropertyName.FILENAME);
 	 					toFileName = prop != null ? prop.getString() : null;
 	 					FileUtil.createDirectory(FileUtil.TEMP_DIR);
-	 					toFileName =  FileUtil.TEMP_DIR + File.separator + toFileName; 
+	 					toFileName =  FileUtil.getFullPath(FileUtil.TEMP_DIR,toFileName); 
 	 				}
 	 		    	ZipFileUtil.createZipFile(FileUtil.getFileName(toFileName),tempRoot,FileUtil.getFileDirectory(toFileName));
 	 		    }
@@ -681,7 +681,7 @@ public class SimpleRepository implements IRepositoryAdmin {
 			IValue prop = node.getProperty(PropertyName.FILENAME);
 			toFileName = prop != null ? prop.getString() : null;
 			FileUtil.createDirectory(FileUtil.TEMP_DIR);
-			toFileName =  FileUtil.TEMP_DIR + File.separator + toFileName; 
+			toFileName =  FileUtil.getFullPath(FileUtil.TEMP_DIR,toFileName); 
 		}
 		OutputStream os = new FileOutputStream(toFileName);
 		byte[] out  = new byte[8 * 1024];
