@@ -62,7 +62,7 @@ public class OrganisationDTO {
 	}
 	public OrganisationDTO(Organisation organisation){
 		this.organisationID = organisation.getOrganisationId();
-		this.parentID = organisation.getParentOrganisation().getOrganisationId();
+		this.parentID = (organisation.getParentOrganisation() == null)? new Integer(-1):organisation.getParentOrganisation().getOrganisationId();
 		this.name = organisation.getName();
 		this.description = organisation.getDescription();
 		this.organisationTypeId = organisation.getOrganisationType().getOrganisationTypeId();
