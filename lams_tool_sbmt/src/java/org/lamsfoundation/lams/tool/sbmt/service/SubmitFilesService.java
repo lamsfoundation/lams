@@ -228,7 +228,8 @@ public class SubmitFilesService implements ToolContentManager,
  		if(toolContentObj == null)
  			throw new DataMissingException("Unable to find tool content by given id :" + toolContentId);
  		
- 		toolContentObj = SubmitFilesContent.newInstance(toolContentObj,toolContentId,sbmtToolContentHandler);
+ 		//set toolContentHandler as null to avoid duplicate file node in repository.
+ 		toolContentObj = SubmitFilesContent.newInstance(toolContentObj,toolContentId,null);
  		toolContentObj.setToolSession(null);
  		toolContentObj.setToolContentHandler(null);
 		try {

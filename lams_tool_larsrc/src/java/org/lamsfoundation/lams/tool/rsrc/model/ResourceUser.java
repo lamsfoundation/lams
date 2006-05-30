@@ -36,7 +36,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
  * @hibernate.class  table="tl_larsrc11_user"
  *
  */
-public class ResourceUser {
+public class ResourceUser implements Cloneable{
 	private static final long serialVersionUID = -7043502180037866257L;
 	private static Logger log = Logger.getLogger(ResourceUser.class);
 	
@@ -60,8 +60,23 @@ public class ResourceUser {
 		this.loginName = user.getLogin();
 		this.session = session;
 	}
-
-
+	/**
+	 * Clone method from <code>java.lang.Object</code>
+	 */
+	public Object clone(){
+  		
+		ResourceUser user = null;
+  		try{
+  			user = (ResourceUser) super.clone();
+  			user.setUid(null);
+  			//never clone session
+  			user.setSession(null);
+		} catch (CloneNotSupportedException e) {
+			log.error("When clone " + ResourceUser.class + " failed");
+		}
+  		
+  		return user;
+  	}
 //  **********************************************************
   	//		Get/Set methods
 //  **********************************************************

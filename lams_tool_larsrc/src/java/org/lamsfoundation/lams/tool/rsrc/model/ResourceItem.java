@@ -93,6 +93,10 @@ public class ResourceItem  implements Cloneable{
   				obj.itemInstructions = set;
   			}
 			((ResourceItem)obj).setUid(null);
+  			//clone ReourceUser as well
+  			if(this.createBy != null)
+  				((ResourceItem)obj).setCreateBy((ResourceUser) this.createBy.clone());
+  			
 		} catch (CloneNotSupportedException e) {
 			log.error("When clone " + ResourceItem.class + " failed");
 		}

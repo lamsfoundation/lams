@@ -333,7 +333,7 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 			obj = super.clone();
 			//never clone key!
 			((SubmitFilesContent)obj).setContentID(null);
-			//clone SubmitFIleSession object
+			//clone SubmitFileSession object
 			if(toolSession != null ){
 				Iterator iter = toolSession.iterator();
 				Set set = new HashSet();
@@ -347,11 +347,13 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 				Set set = new HashSet();
 				while(iter.hasNext()){
 					InstructionFiles file = (InstructionFiles)iter.next();
-					//duplicate file node in repository
-					NodeKey keys = toolContentHandler.copyFile(file.getUuID());
 					InstructionFiles newFile = (InstructionFiles) file.clone();
-					newFile.setUuID(keys.getUuid());
-					newFile.setVersionID(keys.getVersion());
+					//duplicate file node in repository
+					if(toolContentHandler != null){
+						NodeKey keys = toolContentHandler.copyFile(file.getUuID());
+						newFile.setUuID(keys.getUuid());
+						newFile.setVersionID(keys.getVersion());
+					}
 					set.add(newFile);
 				}
 				((SubmitFilesContent)obj).instructionFiles= set;

@@ -739,7 +739,8 @@ public class ResourceServiceImpl implements
  		if(toolContentObj == null)
  			throw new DataMissingException("Unable to find tool content by given id :" + toolContentId);
  		
- 		toolContentObj = Resource.newInstance(toolContentObj,toolContentId,resourceToolContentHandler);
+ 		//set ResourceToolContentHandler as null to avoid copy file node in repository again.
+ 		toolContentObj = Resource.newInstance(toolContentObj,toolContentId,null);
  		toolContentObj.setToolContentHandler(null);
  		toolContentObj.setOfflineFileList(null);
  		toolContentObj.setOnlineFileList(null);

@@ -145,6 +145,10 @@ public class Resource implements Cloneable{
   				}
   				resource.attachments = set;
   			}
+  			//clone ReourceUser as well
+  			if(this.createdBy != null)
+  				resource.setCreatedBy((ResourceUser) this.createdBy.clone());
+  			
 		} catch (CloneNotSupportedException e) {
 			log.error("When clone " + Resource.class + " failed");
 		} catch (ItemNotFoundException e) {
