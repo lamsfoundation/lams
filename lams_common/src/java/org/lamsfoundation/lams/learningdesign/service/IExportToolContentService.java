@@ -75,4 +75,6 @@ public interface IExportToolContentService {
 	 * @param fileVersionFieldName The POJO properties name for get fileVersion. There must be a get method to access this property.
 	 */
 	void registerFileHandleClass(String fileNodeClassName,String fileUuidFieldName, String fileVersionFieldName);
+	
+	void importLearningDesign(String learningDesignPath) throws ExportToolContentException;
 }

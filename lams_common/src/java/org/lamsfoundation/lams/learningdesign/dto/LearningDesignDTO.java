@@ -196,7 +196,59 @@ public class LearningDesignDTO extends BaseDTO{
 		this.activities = populateActivities(learningDesign);
 		this.transitions = populateTransitions(learningDesign);
 	}
-
+	/**
+	 * Get learning design object from this dto.
+	 * 
+	 * user
+	 * getFirstActivity
+	 * riginalLearningDesign
+	 * setWorkspaceFolder
+	 * @return
+	 */
+	public LearningDesign getLearningDesign(){
+		LearningDesign ld = new LearningDesign();
+	
+		
+		ld.setLearningDesignId(this.learningDesignID);
+		ld.setLearningDesignUIID(this.learningDesignUIID);
+		ld.setDescription(this.description);
+		ld.setTitle(this.title);
+		
+//		ld.setFirstActivity(this.firstActivityUIID);
+		
+		ld.setMaxID(this.maxID);
+		ld.setValidDesign(this.validDesign);
+		ld.setReadOnly(this.readOnly);
+		ld.setDateReadOnly(this.dateReadOnly);
+		ld.setOfflineInstructions(this.offlineInstructions);	
+		ld.setOnlineInstructions(this.onlineInstructions);
+		
+		ld.setHelpText(this.helpText);
+		ld.setCopyTypeID(this.copyTypeID );
+		ld.setCreateDateTime(this.createDateTime);
+		ld.setVersion(this.version);
+		
+//		ld.setOriginalLearningDesign(originalLearningDesignID);
+//		
+//	    ld.setWorkspaceFolder(this.workspaceFolderID);
+								 
+		ld.setDuration(this.duration);
+		ld.setLicenseText(this.licenseText);
+		
+//		ld.setLicense(this.licenseID);
+		
+		ld.setLessonOrgID(this.lessonOrgID);
+		
+		ld.setLessonOrgName(this.lessonOrgName);
+		ld.setLessonID(this.lessonID);
+		ld.setLessonName(this.lessonName);
+		ld.setLessonStartDateTime(this.lessonStartDateTime);
+		ld.setLastModifiedDateTime(this.lastModifiedDateTime);
+//		this.groupings = populateGroupings(learningDesign,activityDAO);
+//		this.activities = populateActivities(learningDesign);
+//		this.transitions = populateTransitions(learningDesign);
+		return ld;
+	}
 	/**
 	 * @return Returns the copyTypeID.
 	 */

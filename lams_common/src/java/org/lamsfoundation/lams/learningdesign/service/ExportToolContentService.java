@@ -25,8 +25,13 @@
 package org.lamsfoundation.lams.learningdesign.service;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
 import java.io.Writer;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -42,6 +47,7 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
+import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
@@ -303,10 +309,52 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		}
 		
 	}
+	
+	/**
+	 * @see org.lamsfoundation.lams.authoring.service.IExportToolContentService.registerFileHandleClass(String,String,String)
+	 */
 	public void registerFileHandleClass(String fileNodeClassName,String fileUuidFieldName, String fileVersionFieldName){
 		fileHandleClassList.add(this.new FileHandleClassInfo(fileNodeClassName,fileUuidFieldName,fileVersionFieldName));
 		
 	}
+	/**
+	 * @throws ExportToolContentException 
+	 * @see org.lamsfoundation.lams.authoring.service.IExportToolContentService.importLearningDesign(String)
+	 */
+	public void importLearningDesign(String learningDesignPath) throws ExportToolContentException {
+		
+		try {
+			//import learning design
+			Reader ldFile = new FileReader(new File(FileUtil.getFullPath(learningDesignPath,LEARNING_DESIGN_FILE_NAME)));
+			XStream designXml = new XStream();
+			LearningDesignDTO ldDto = (LearningDesignDTO) designXml.fromXML(ldFile);
+			
+			//persist learning design to database
+			ILearningDesignService service =  getLearningDesignService();
+			log.debug("Learning design xml import success. Continue tool content import...");
+			//TODO
+			
+			//begin tool import
+			List<AuthoringActivityDTO> activities = ldDto.getActivities();
+			for(AuthoringActivityDTO activity : activities){
+				String toolPath = FileUtil.getFullPath(learningDesignPath,activity.getToolContentID().toString());
+				ToolContentManager contentManager = (ToolContentManager) findToolService(toolDAO.getToolByID(activity.getToolID()));
+				log.debug("Tool import content : " + activity.getTitle() +" by contentID :" + activity.getToolContentID());
+				
+				//change xml to Tool POJO 
+				XStream toolXml = new XStream();
+				Reader toolFile = new FileReader(new File(FileUtil.getFullPath(toolPath,TOOL_FILE_NAME)));;
+				Object toolPOJO = toolXml.fromXML(toolFile);
+				contentManager.importToolContent(toolPOJO);
+			}
+		} catch (FileNotFoundException e) {
+			throw new ExportToolContentException(e);
+		} catch (ToolException e) {
+			throw new ExportToolContentException(e);
+		}
+		
+	}
+	
 	//******************************************************************
 	// ApplicationContextAware method implementation
 	//******************************************************************

@@ -89,3 +89,7 @@
 		<servlet-name>ExportToolContent</servlet-name>
 		<servlet-class>org.lamsfoundation.lams.authoring.web.ExportToolContentServlet</servlet-class>
 </servlet>
+<servlet>
+		<servlet-name>ImportToolContent</servlet-name>
+		<servlet-class>org.lamsfoundation.lams.authoring.web.ImportToolContentServlet</servlet-class>
+</servlet>
