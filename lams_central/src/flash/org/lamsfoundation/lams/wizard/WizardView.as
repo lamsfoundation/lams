@@ -551,12 +551,15 @@ class WizardView extends AbstractView {
 	
 	private function finish(evt:Object){
 		trace('FINISH CLICKED');
+		disableButtons();
 		resultDTO.mode = FINISH_MODE;
 		_wizardController.initializeLesson(resultDTO);
 	}
 	
 	private function start(evt:Object){
 		trace('START CLICKED');
+		disableButtons();
+		
 		if(schedule_cb.selected){
 			resultDTO.scheduleDateTime = getScheduleDateTime(scheduleDate_dt.selectedDate, schedule_time.f_returnTime());
 			trace(resultDTO.scheduleDateTime);
@@ -570,11 +573,12 @@ class WizardView extends AbstractView {
 	private function cancel(evt:Object){
 		// close window
 		trace('CANCEL CLICKED');
-		//getURL('javascript:window.close()');
+		getURL('javascript:window.close()');
 	}
 	
 	private function close(evt:Object){
 		trace('CLOSE WINDOW');
+		getURL('javascript:window.close()');
 	}
 	
 	private function scheduleChange(evt:Object){
@@ -963,6 +967,14 @@ class WizardView extends AbstractView {
 		}
 	}
 	
+	private function disableButtons():Void{
+		next_btn.enabled = false;
+		prev_btn.enabled = false;
+		cancel_btn.enabled = false;
+		finish_btn.enabled = false;
+		start_btn.enabled = false;
+	}
+	
 	/**
 	 * Dispatches an event - picked up by the canvas in authoring
 	 * sends paramter containing:
@@ -1078,7 +1090,7 @@ class WizardView extends AbstractView {
 			dayStr=day.toString();
 		}
 		
-		var month = date.getMonth();
+		var month = date.getMonth()+1;
 		if(month<10){
 			monthStr=String(0)+month;
 		} else {
