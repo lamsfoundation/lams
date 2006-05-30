@@ -145,6 +145,28 @@ class Organisation {
 		return getUsersByRole(LEARNER_ROLE);
 	}
 	
+	public function isLearner(key:Number):Boolean{
+		if(_users.containsKey(key)){
+			var user:User = User(_users.get(key));
+			if(user.hasRole(LEARNER_ROLE)){
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	public function isStaff(key:Number):Boolean{
+		if(_users.containsKey(key)){
+			var user:User = User(_users.get(key));
+			if(user.hasRole(STAFF_ROLE)){
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
 	private function getUsersByRole(roleName:String):Array{
 		var usrs:Array = new Array();
 		var keys:Array = _users.keys();
