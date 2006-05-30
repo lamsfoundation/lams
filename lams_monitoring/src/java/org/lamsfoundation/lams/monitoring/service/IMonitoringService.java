@@ -40,9 +40,6 @@ import org.lamsfoundation.lams.util.MessageService;
 
 
 /**
- * TODO Missing methods
- * 		archiveLesson
- *   
  * Interface defines all monitoring services needed by presentation tier.
  * @author Jacky Fang 2/02/2005
  * @author Manpreet Minhas
@@ -207,21 +204,11 @@ public interface IMonitoringService
     public GateActivity closeGate(Long gateId);
     
     /**
-     * This method returns a string representing a list of all lessons
-     * for the current user. See getAllLessons(). 
-      * TODO Remove getAllLessonsWDDX, getAllLessons when the dummy interface is not needed
-     * 
-     * @return String The requested list of Lessons in wddx format
-     * @throws IOException
-     */
-    public String getAllLessonsWDDX(Integer userID) throws IOException;
-    
-    /**
      * This method returns a list of all available Lessons. This is all the lessons
      * created by the current user and all the lessons for which the user is in the
      * staff group. It does not return removed lessons.
      * 
-     * If the data is to be sent to Flash, then use  getAllLessonsWDDX()
+     * TODO This is to be removed when the dummy interface is no longer needed.
      *
      * @param userID The user_id of the user for whom the lessons 
      * 				 are being fetched.
@@ -232,7 +219,7 @@ public interface IMonitoringService
     
     /**
      * This method returns the details for the given Lesson in
-     * WDDX format
+     * WDDX format. Object inside the packet is a LessonDetailsDTO.
      * 
      * @param lessonID The lesson_id of the Lesson for which the details have 
      * 				   to be fetched
@@ -240,19 +227,7 @@ public interface IMonitoringService
      * @throws IOException
      */
     public String getLessonDetails(Long lessonID)throws IOException;
-    
-    /**
-     * This method returns the data for the given Lesson in
-     * WDDX format
-     * 
-     * @param lessonID The lesson_id of the Lesson for which the details have 
-     * 				   to be fetched
-     * @return String The requested data in wddx format
-     * @throws IOException
-     */
-    public String getLessonData(Long lessonID)throws IOException;
-    
-    
+        
     /**
      * Returns a list of learners participating in the given Lesson
      * 

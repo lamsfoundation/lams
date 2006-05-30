@@ -61,7 +61,6 @@ import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.LessonClass;
 import org.lamsfoundation.lams.lesson.dao.ILessonClassDAO;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
-import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 import org.lamsfoundation.lams.monitoring.MonitoringConstants;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
@@ -838,13 +837,6 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 
     /**
      * (non-Javadoc)
-     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getAllLessonsWDDX(java.lang.Integer)
-     */
-    public String getAllLessonsWDDX(Integer userID)throws IOException{
-    	return requestLessonList(getAllLessons(userID)); 
-    }
-    /**
-     * (non-Javadoc)
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getLessonDetails(java.lang.Long)
      */
     public String getLessonDetails(Long lessonID)throws IOException{
@@ -854,22 +846,6 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     		flashMessage = new FlashMessage("getLessonDetails",lesson.getLessonDetails());
     	}else
     		flashMessage = new FlashMessage("getLessonDetails",
-    										messageService.getMessage("NO.SUCH.LESSON",new Object[]{lessonID}),
-											FlashMessage.ERROR);
-    	return flashMessage.serializeMessage();    	
-    }
-    
-    /**
-     * (non-Javadoc)
-     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getLessonDetails(java.lang.Long)
-     */
-    public String getLessonData(Long lessonID)throws IOException{
-    	Lesson lesson = lessonDAO.getLesson(lessonID);
-    	FlashMessage flashMessage;
-    	if(lesson!=null){
-    		flashMessage = new FlashMessage("getLessonData",lesson.getLessonData());
-    	}else
-    		flashMessage = new FlashMessage("getLessonData",
     										messageService.getMessage("NO.SUCH.LESSON",new Object[]{lessonID}),
 											FlashMessage.ERROR);
     	return flashMessage.serializeMessage();    	
@@ -1300,24 +1276,6 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     	}
      }
     
-
-    /**
-     * This method returns the list of lessons in WDDX format
-     * 
-     * @param lessons The list of lessons to be converted into WDDX format
-     * @return String The required information in WDDX format
-     * @throws IOException
-     */
-    private String requestLessonList(List lessons)throws IOException{
-    	Vector<LessonDTO> lessonObjects = new Vector<LessonDTO>();
-		Iterator lessonIterator = lessons.iterator();
-		while(lessonIterator.hasNext()){
-			Lesson lesson = (Lesson)lessonIterator.next();
-			lessonObjects.add(lesson.getLessonData());
-		}	
-    	FlashMessage flashMessage = new FlashMessage("getAllLessons",lessonObjects);
-    	return flashMessage.serializeMessage();    	
-    }
 
 	//---------------------------------------------------------------------
     // Helper Methods - scheduling

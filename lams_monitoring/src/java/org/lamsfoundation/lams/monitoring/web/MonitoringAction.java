@@ -522,35 +522,14 @@ public class MonitoringAction extends LamsDispatchAction
         return null;
     	
     }
-    public ActionForward getAllLessons(ActionMapping mapping,
-                                     ActionForm form,
-                                     HttpServletRequest request,
-                                     HttpServletResponse response)throws IOException{
-    	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-    	String wddxPacket = monitoringService.getAllLessonsWDDX(getUserId(request));
-        PrintWriter writer = response.getWriter();
-        writer.println(wddxPacket);
-        return null;
-   }
-    public ActionForward getLessonDetails(ActionMapping mapping,
+    
+     public ActionForward getLessonDetails(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response)throws IOException{
     	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
     	Long lessonID = new Long(WebUtil.readLongParam(request,"lessonID"));
     	String wddxPacket = monitoringService.getLessonDetails(lessonID);
-        PrintWriter writer = response.getWriter();
-        writer.println(wddxPacket);
-        return null;
-    }
-    
-    public ActionForward getLessonData(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response)throws IOException{
-    	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-    	Long lessonID = new Long(WebUtil.readLongParam(request,"lessonID"));
-    	String wddxPacket = monitoringService.getLessonData(lessonID);
         PrintWriter writer = response.getWriter();
         writer.println(wddxPacket);
         return null;

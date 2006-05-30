@@ -240,10 +240,6 @@ public class TestMonitoringService extends AbstractLamsTestCase
     {
     }
     
-    public void testGetAllLessons()throws IOException{
-    	String packet = monitoringService.getAllLessonsWDDX(TEST_STAFF_ID);    	
-    	System.out.print(packet);
-    }
     public void testGetLessonDetails() throws IOException{
     	String packet = monitoringService.getLessonDetails(TEST_LESSION_ID);    	
     	System.out.print(packet);
