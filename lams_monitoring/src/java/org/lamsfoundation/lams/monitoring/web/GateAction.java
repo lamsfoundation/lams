@@ -35,7 +35,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
-import org.lamsfoundation.lams.learning.web.util.LessonLearnerDataManager;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.PermissionGateActivity;
@@ -159,8 +158,7 @@ public class GateAction extends LamsDispatchAction
         Activity gate = monitoringService.getActivityById(gateId);
         
         //setup the total learners
-        int totalLearners = LessonLearnerDataManager.getAllLessonLearners(getServlet().getServletContext(),lessonId,learnerService)
-                                                    .size();
+        int totalLearners = learnerService.getActiveLearnersByLesson(lessonId).size();
         gateForm.set(TOTAL_LEARNERS_FORM_FIELD,new Integer(totalLearners));
         gateForm.set(ACTIVITY_FORM_FIELD,gateIdLong);        
         

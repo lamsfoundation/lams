@@ -737,7 +737,6 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     public String forceCompleteLessonByUser(Integer learnerId,long lessonId,Long activityId) 
     {
 
-    	List currentLessonLearners = learnerService.getActiveLearnersByLesson(lessonId);
     	User learner = userDAO.getUserById(learnerId);
         Lesson newLesson = lessonDAO.getLesson(new Long(lessonId));
         Set activities = newLesson.getLearningDesign().getActivities();
@@ -765,7 +764,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
             		//group does not exist
             		if(grouping.isRandomGrouping()){
             			//for random grouping, create then complete it. Continue 
-            			learnerService.performGrouping(groupActivity,currentLessonLearners);
+            			learnerService.performGrouping(lessonId, groupActivity);
 //            			grouping = groupActivity.getCreateGrouping();
 //            			myGroup = grouping.getGroupBy(learner);
             			learnerService.completeActivity(learner,activity,newLesson);
@@ -782,7 +781,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
             	}
             }else if ( activity.isGateActivity() ) {
             	GateActivity gate = (GateActivity) activity;
-            	if(learnerService.knockGate(gate,learner,currentLessonLearners)){
+            	if(learnerService.knockGate(lessonId,gate,learner)){
             		//the gate is opened, continue to next activity to complete
             		learnerService.completeActivity(learner,activity,newLesson);
             		log.debug("Gate activity [" + gate.getActivityId() + "] is completed.");
