@@ -40,9 +40,13 @@ class User {
 	/**
 	* Constructor.
 	*/
-	public function User (){
+	public function User (dto:Object){
 		_userProgress = null;
 		_userRoles = new Array();
+		
+		if(dto != null) { 
+			populateFromDTO(dto);
+		}
 	}
 	
 	/**
