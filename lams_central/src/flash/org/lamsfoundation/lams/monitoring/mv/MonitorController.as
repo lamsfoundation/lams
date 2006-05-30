@@ -34,6 +34,9 @@ import mx.utils.*
 class MonitorController extends AbstractController {
 	private var _monitorModel:MonitorModel;
 	private var _monitorController:MonitorController;
+	
+	private var _isBusy:Boolean;
+	
 	//private var _monitorView:MonitorView;
 	//private var _lessonTabView:LessonTabView;
 	//private var _canvasView:CanvasView;
@@ -49,6 +52,7 @@ class MonitorController extends AbstractController {
 		super (mm);
 		_monitorModel = MonitorModel(model);
 		_monitorController = this;
+		_isBusy = false;
 		//get a view if ther is not one
 		//if(!_lessonTabView){
 		//	_lessonTabView =  LessonTabView(getView());
@@ -97,10 +101,16 @@ class MonitorController extends AbstractController {
 		trace(evt.target);
 		var tgt:String = new String(evt.target);
 		if(tgt.indexOf("editClass_btn") != -1){
-			trace('you clicked select button..');
+			trace('you clicked edit class button..');
 			_monitorModel.setDialogOpen("LM_DIALOG");
+		} else if(tgt.indexOf("viewLearners_btn") != -1){
+			_monitorModel.setDialogOpen("VM_DIALOG");
+		} else if(tgt.indexOf("start_btn") != -1){
+			trace('you clicked start class button..');
+			_monitorModel.getMonitor().startLesson(false, _root.lessonID);
 		}
 	}
+
 	
 	/**
 	 * called when the dialog is loaded, calles methods to set up content in dialogue
@@ -112,24 +122,18 @@ class MonitorController extends AbstractController {
     public function openDialogLoaded(evt:Object) {
         Debugger.log('!evt.type:'+evt.type,Debugger.GEN,'openDialogLoaded','org.lamsfoundation.lams.MonitorController');
         //Check type is correct
+		trace('open dialog evt type:' + evt.type);
         if(evt.type == 'contentLoaded'){
-            //Set up callback for ok button click
-            Debugger.log('!evt.target.scrollContent:'+evt.target.scrollContent,Debugger.GEN,'openDialogLoaded','org.lamsfoundation.lams.MonitorView');
-            evt.target.scrollContent.addEventListener('okClicked',Delegate.create(this,okClicked));
-            //evt.target.scrollContent.addEventListener('locationTabClick',Delegate.create(this,locationTabClick));
-            //evt.target.scrollContent.addEventListener('propertiesTabClick',Delegate.create(this,propertiesTabClick));
-			trace('test getView ' + getView());
 			//set a ref to the view
 			evt.target.scrollContent.monitorView = LessonTabView(getView());
+			
 			//set a ref to the dia in the view
-			LessonTabView(getView()).lessonManagerDialog = evt.target.scrollContent;
+			LessonTabView(getView()).dialog = evt.target.scrollContent;
+			
 			//set up UI
 			//note this function registeres the dialog to recieve view updates
 			evt.target.scrollContent.setUpContent();		
-			//populate the licenses drop down
-			//_workspaceModel.populateLicenseDetails();			
-			//select the right tab, dont pass anything to show the default tab
-			//_workspaceModel.showTab(_workspaceModel.currentTab);
+			
         } else {
             //TODO DI 25/05/05 raise wrong event type error 
         }
@@ -175,10 +179,48 @@ class MonitorController extends AbstractController {
 		Debugger.log('type::'+evt.type,Debugger.GEN,'onTreeNodeClose','org.lamsfoundation.lams.MonitorController');
 		var treeview = evt.target;
     }
-	
+	/**
 	public function onTreeNodeChange (evt:Object){
 		Debugger.log('type::'+evt.type,Debugger.GEN,'onTreeNodeChange','org.lamsfoundation.lams.MonitorController');
 		var treeview = evt.target;
-		_monitorModel.setSelectedTreeNode(treeview.selectedNode);
+		if(!_isBusy){
+			setBusy();
+			_monitorModel.setSelectedTreeNode(treeview.selectedNode);
+		} else {
+			treeview.selectedNode = _monitorModel.getSelectedTreeNode();
+		}
+	}
+	*/
+	
+	/**
+	public function selectTreeNode(node:XMLNode){
+		if(node!=null){
+			if(!_isBusy){
+			//	setBusy();
+			//	_monitorModel.setSelectedTreeNode(node);
+			}
+		}
+	}
+	*/
+	
+	/**
+	 * Save Lesson Class after Lesson is initialized
+	 *  
+	 * @param   lessonID 
+	 * @return  
+	 */
+	
+	public function editLessonClass(resultDTO:Object){
+		_monitorModel.resultDTO = resultDTO;
+		trace('editing lesson class');
+		_monitorModel.getMonitor().createLessonClass();
+	}
+	
+	public function setBusy(){
+		_isBusy = true;
+	}
+	
+	public function clearBusy(){
+		_isBusy = false;
 	}
 }
