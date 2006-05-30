@@ -332,4 +332,26 @@ public class FileUtil {
 		return fileName.substring(0,dotPos+1);
 	
 	}
+	/**
+	 * Merge two input parameter into full path and adjust File.separator to 
+	 * OS default separator as well.
+	 * 
+	 * @param path 
+	 * @param file could be file name,or sub directory path.
+	 * @return
+	 */
+	public static String getFullPath(String path, String file){
+		String fullpath;
+		if(path.endsWith(File.separator))
+			fullpath = path + file;
+		else
+			fullpath = path + File.separator + file;
+		if(File.separator.indexOf("\\") != -1)
+			fullpath = fullpath.replaceAll("\\/","\\\\");
+		else
+			fullpath = fullpath.replaceAll("\\",File.separator);
+		
+		return fullpath;
+		
+	}
 }

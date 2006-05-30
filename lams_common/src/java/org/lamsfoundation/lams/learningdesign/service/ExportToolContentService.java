@@ -212,14 +212,14 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		try {
 			//root temp directory, put target zip file
 			String rootDir = FileUtil.createTempDirectory(EXPORT_TOOLCONTNET_FOLDER_SUFFIX);
-			String contentDir = rootDir + File.separator + "content";
+			String contentDir = FileUtil.getFullPath(rootDir, "content");
 			FileUtil.createDirectory(contentDir);
 			
 			//zip file name with full path
 			String targetZipFileName = EXPORT_TOOLCONTNET_ZIP_PREFIX + learningDesignId + EXPORT_TOOLCONTNET_ZIP_SUFFIX;
 			
 			//learing design file name with full path
-			String ldFileName = getFullPath(contentDir,LEARNING_DESIGN_FILE_NAME);
+			String ldFileName = FileUtil.getFullPath(contentDir,LEARNING_DESIGN_FILE_NAME);
 			Writer ldFile = new FileWriter(new File(ldFileName));
 			
 			//get learning desing and serialize it to XML file.
@@ -266,11 +266,11 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 				throws ExportToolContentException {
 		try {
 			//create tool's save path
-			String toolPath = toPath+File.separator+toolContentId;
+			String toolPath = FileUtil.getFullPath(toPath,toolContentId.toString());
 			FileUtil.createDirectory(toolPath);
 			
 			//create tool xml file name : tool.xml
-			String toolFileName = getFullPath(toolPath,TOOL_FILE_NAME);
+			String toolFileName = FileUtil.getFullPath(toolPath,TOOL_FILE_NAME);
 			Writer toolFile = new FileWriter(new File(toolFileName));
 			
 			//serialize tool xml into local file.
@@ -320,13 +320,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		return (ILearningDesignService) applicationContext.getBean(LEARNING_DESIGN_SERVICE_BEAN_NAME);		
 	}
 	
-	private String getFullPath(String path, String file){
-		if(path.endsWith(File.separator))
-			return path + file;
-		else
-			return path + File.separator + file;
-	}
-    private Object findToolService(Tool tool) throws NoSuchBeanDefinitionException
+	private Object findToolService(Tool tool) throws NoSuchBeanDefinitionException
     {
         return applicationContext.getBean(tool.getServiceName());
     }
