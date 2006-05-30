@@ -95,26 +95,19 @@ class Monitor {
 		monitorView.init(monitorModel,undefined,x,y,w,h);
 		
         monitorView.addEventListener('load',Proxy.create(this,viewLoaded));
-		//lessonTabView_mc = monitorView_mc.
-		
-       //dictionary.addEventListener('init',Proxy.create(this,setupPI));
-		
+
 		//Register view with model to receive update events
 		monitorModel.addObserver(monitorView);
 		monitorModel.addEventListener('learnersLoad',Proxy.create(this,onUserLoad));
 		monitorModel.addEventListener('staffLoad',Proxy.create(this,onUserLoad));
 		
-		//monitorModel.addObserver(monitorView);
-		//monitorModel.addObserver(monitorView);
-		//monitorModel.addObserver(monitorView);
-
         //Set the position by setting the model which will call update on the view
         monitorModel.setPosition(x,y);
 		monitorModel.setSize(w,h);
 		monitorModel.initOrganisationTree();
-		//Get reference to application and design data model
-		//app = Application.getInstance();
 		
+		// load lesson from query parameter
+		loadLessonToMonitor(_root.lessonID);
 		
 	}
 	
@@ -179,8 +172,66 @@ class Monitor {
         var callback:Function = Proxy.create(this,setLesson);
 		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=initializeLesson&learningDesignID='+designId+'&userID='+_root.userID+'&lessonName='+lessonName+'&lessonDescription='+lessonDesc,callback, false);
 
-        
     }
+	
+	private function loadLessonToMonitor(lessonID:Number){
+		var callback:Function = Proxy.create(monitorModel,monitorModel.loadSequence);
+		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=getLessonDetails&lessonID=' + String(lessonID),callback, false);
+	}
+	
+	public function reloadLessonToMonitor(lessonID:Number){
+		loadLessonToMonitor(_root.lessonID);
+	}
+	
+	public function startLesson(isScheduled:Boolean, lessonID:Number, datetime:String){
+		trace('starting lesson...');
+		var callback:Function = Proxy.create(this, onStartLesson);
+		
+		if(isScheduled){
+			Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=startOnScheduleLesson&lessonStartDate=' + datetime + '&lessonID=' + lessonID + '&userID=' + _root.userID, callback);
+		} else {
+			Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=startLesson&lessonID=' + lessonID + '&userID=' + _root.userID, callback);
+		}
+	}
+	
+	private function onStartLesson(b:Boolean){
+		trace('receive back after lesson started..');
+		if(b){
+			trace('lesson started');
+			loadLessonToMonitor(_root.lessonID);
+			
+		} else {
+			// error occured
+			trace('error occurred starting lesson');
+		}
+	}
+	
+	/**
+	 * Create LessonClass using wizard data and CreateLessonClass servlet
+	 * 
+	 */
+	
+	public function createLessonClass():Void{
+		trace('creating lesson class...');
+		var dto:Object = monitorModel.getLessonClassData();
+		var callback:Function = Proxy.create(this,onCreateLessonClass);
+		
+		Application.getInstance().getComms().sendAndReceive(dto,"monitoring/createLessonClass?userID=" + _root.userID,callback,false);
+		
+	}
+	
+	public function onCreateLessonClass(r):Void{
+		if(r instanceof LFError) {
+			r.showErrorAlert();
+		} else if(r) {
+			// lesson class created
+			trace('lesson class created');
+			monitorModel.broadcastViewUpdate("SAVED_LC", null);
+		} else {
+			// failed creating lesson class
+			trace('failed creating lesson class');
+		}
+	}
 	
 	/**
 	 * Set new Lesson in Monitoring
