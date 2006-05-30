@@ -117,7 +117,7 @@ class LessonManagerDialog extends MovieClip implements Dialog{
         //Set the text for buttons
         //ok_btn.label = Dictionary.getValue('lesson_dlg_ok');
         //cancel_btn.label = Dictionary.getValue('lesson_dlg_cancel');
-		ok_btn.label = "ok";
+		ok_btn.label = "save";
 		cancel_btn.label = "cancel";
 		
 		
@@ -169,7 +169,7 @@ class LessonManagerDialog extends MovieClip implements Dialog{
         ok_btn.addEventListener('onPress',Delegate.create(this, ok));
         cancel_btn.addEventListener('onPress',Delegate.create(this, cancel));
 		
-		getOrganisations();
+		getOrganisations(_monitorModel.getSequence().organisationID, null);
 		
 		//Set up the treeview
         //setUpTreeview();
@@ -225,33 +225,82 @@ class LessonManagerDialog extends MovieClip implements Dialog{
         
 		_global.breakpoint();
 		
+		var valid:Boolean = true;
 		var snode = treeview.selectedNode;
-		_selectedOrgId = Number(snode.attributes.data.organisationID);
-		resultDTO.selectedOrgId = _selectedOrgId;
-		
-		trace('selected org ID is: ' + _selectedOrgId);
-		
-		// add selected users to dto
-		trace('learners')
-		for(var i=0; i<learnerList.length;i++){
-			if(learnerList[i].user_cb.selected){
-				trace('select item: ' + learnerList[i].fullName.text);
+		var pnode = snode.parentNode;
+		var selectedLearners:Array = new Array();
+		var selectedStaff:Array = new Array();
+			
+		if(snode == null){
+			trace('no course/class selected');
+			//LFMessage.showMessageAlert(Dictionary.getValue('al_validation_msg3_1'), null, null);
+			return false;
+		} else {
+			// add selected users to dto
+			trace('learners')
+			
+			
+			for(var i=0; i<learnerList.length;i++){
+				if(learnerList[i].user_cb.selected){
+					trace('select item: ' + learnerList[i].fullName.text);
+					selectedLearners.push(learnerList[i].data.userID);
+				}
 			}
-		}
-
-		trace('staff')
-		for(var i=0; i<staffList.length;i++){
-			if(staffList[i].user_cb.selected){
-				trace('select item: ' + staffList[i].fullName.text);
+			
+	
+			trace('staff')
+			for(var i=0; i<staffList.length;i++){
+				if(staffList[i].user_cb.selected){
+					trace('select item: ' + staffList[i].fullName.text);
+					selectedStaff.push(staffList[i].data.userID);
+				}
 			}
+			
+			if(selectedLearners.length <= 0){
+				trace('no learners selected');
+				valid = false;
+			}
+			
+			if(selectedStaff.length <= 0){
+				trace('no staff selected');
+				valid = false;
+			}
+			
 		}
 		
-		doOrganisationDispatch();
+		if(valid){
+			var selectedOrgID:Number = Number(snode.attributes.data.organisationID);
+			resultDTO.organisationID = selectedOrgID;
+			
+			if(snode.attributes.isBranch){
+				resultDTO.courseName = snode.attributes.data.name;
+				resultDTO.className = "";
+			} else {
+				resultDTO.className = snode.attributes.data.name;
+				resultDTO.courseName = pnode.attributes.data.name;
+			}
+			
+			resultDTO.selectedStaff = selectedStaff;
+			resultDTO.selectedLearners = selectedLearners;
+			var orgName:String = snode.attributes.data.name;
+			resultDTO.staffGroupName = orgName + ' staff';
+			resultDTO.learnersGroupName = orgName + ' learners';
+			
+			trace('selected org ID is: ' + selectedOrgID);
+			
+			doOrganisationDispatch();
+			
+		}else{
+			//LFMessage.showMessageAlert(Dictionary.getValue('al_validation_msg3_2'), null, null);
+		}
+		
+		
     }
     
 	public function doOrganisationDispatch(){
 		
         //dispatchEvent({type:'okClicked',target:this});
+		_monitorController.editLessonClass(resultDTO);
 	   
         closeThisDialogue();
 		
@@ -330,8 +379,12 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 	 */
 	private function setUpBranchesInit(){
 		Debugger.log('Running...',Debugger.GEN,'setUpBranchesInit','org.lamsfoundation.lams.monitoring.LessonManagerDialog');
+		
+		// clear tree
+		treeview.removeAll();
+		
 		//get the 1st child
-		treeview.dataProvider = MonitorModel(_monitorView.getModel()).treeDP.firstChild;
+		treeview.dataProvider = MonitorModel(_monitorView.getModel()).treeDP;
 		var fNode = treeview.dataProvider.firstChild;
 		setBranches(fNode);
 		treeview.refresh();
@@ -350,19 +403,39 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 		
 		setUpBranchesInit();
 		
-		treeview.addEventListener("nodeOpen", Delegate.create(_monitorController, _monitorController.onTreeNodeOpen));
-		treeview.addEventListener("nodeClose", Delegate.create(_monitorController, _monitorController.onTreeNodeClose));
-		treeview.addEventListener("change", Delegate.create(_monitorController, _monitorController.onTreeNodeChange));
+		//treeview.addEventListener("nodeOpen", Delegate.create(_monitorController, _monitorController.onTreeNodeOpen));
+		//treeview.addEventListener("nodeClose", Delegate.create(_monitorController, _monitorController.onTreeNodeClose));
+		//treeview.addEventListener("change", Delegate.create(_monitorController, _monitorController.onTreeNodeChange));
 
 		//org_dnd.addEventListener("drag_complete", Delegate.create(_lessonManagerController, _lessonManagerController.onDragComplete));
+		treeview.selectedNode = treeview.firstVisibleNode;
+		//_monitorController.selectTreeNode(treeview.selectedNode);
+		
+		_monitorModel.setOrganisation(new Organisation(treeview.selectedNode.attributes.data));
+		
+		var callback:Function = Proxy.create(this,loadStaff);
+		_monitorModel.requestStaff(treeview.selectedNode.attributes.data, callback);
+		
+		
+		callback = Proxy.create(this,loadLearners);
+		_monitorModel.requestLearners(treeview.selectedNode.attributes.data, callback);
+			
 		
     }
 	
-	private function getOrganisations():Void{
+	public function getOrganisations(courseID:Number, classID:Number):Void{
+		// TODO check if already set
+		
 		var callback:Function = Proxy.create(this,showOrgTree);
            
-		Application.getInstance().getComms().getRequest('workspace.do?method=getOrganisationsByUserRole&userID='+_root.userID+'&roles=STAFF,TEACHER',callback, false);
-		
+		if(classID != undefined){
+			Application.getInstance().getComms().getRequest('workspace.do?method=getUserOrganisation&userID='+_root.userID+'&organisationID='+classID+'&roles=STAFF,TEACHER',callback, false);
+		}else if(courseID != undefined){
+			trace('course defined: doing request');
+			Application.getInstance().getComms().getRequest('workspace.do?method=getUserOrganisation&userID='+_root.userID+'&organisationID='+courseID+'&roles=STAFF,TEACHER',callback, false);
+		}else{
+			// TODO no course or class defined
+		}
 	}
 	
 	private function showOrgTree(dto:Object):Void{
@@ -372,7 +445,7 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 		
 		var odto = getDataObject(dto);
 			
-		
+		_monitorModel.initOrganisationTree();
 		var rootNode:XMLNode = _monitorModel.treeDP.addTreeNode(odto.name, odto);
 		//rootNode.attributes.isBranch = true;
 		_monitorModel.setOrganisationResource(RT_ORG+'_'+odto.organisationID,rootNode);
@@ -446,18 +519,35 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 
 		trace('list length: ' + users.length);
 		for(var i=0; i<users.length; i++){
-		var user:User = User(users[i]);
+		var user:User = new User(users[i]);
 
 		_learnerList[i] = this._learner_mc.attachMovie('staff_learner_dataRow', 'staff_learner_dataRow' + i, this._learner_mc.getNextHighestDepth());
 		_learnerList[i].fullName.text = user.getFirstName();
 		_learnerList[i]._x = USERS_X;
 		_learnerList[i]._y = USER_OFFSET * i;
+		_learnerList[i].data = user.getDTO();
 		var listItem:MovieClip = MovieClip(_learnerList[i]);
-		listItem.attachMovie('CheckBox', 'user_cb', listItem.getNextHighestDepth(), {_x:0, _y:3, selected:true})
+		listItem.attachMovie('CheckBox', 'user_cb', listItem.getNextHighestDepth(), {_x:0, _y:3, selected:false})
 		trace('new row: ' + _learnerList[i]);
 		trace('loading: user ' + user.getFirstName() + ' ' + user.getLastName());
 
 		}
+		learner_scp.redraw(true);
+		
+		var callback:Function = Proxy.create(_monitorModel,_monitorModel.saveLearners);
+		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=getLessonLearners&lessonID='+_monitorModel.getSequence().ID,callback, false);
+	}
+ 
+	public function checkLearners(org:Organisation):Void{
+		for(var i=0; i<_learnerList.length; i++){
+			trace('checking learner list item : ' + i);
+			trace(_learnerList[i].data.userID);
+			if(org.isLearner(_learnerList[i].data.userID)){
+				trace('selecting check box');
+				_learnerList[i].user_cb.selected = true;
+			}
+		}
+		
 		learner_scp.redraw(true);
 	}
  
@@ -472,21 +562,38 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 		_staff_mc = staff_scp.content;
 
 		for(var i=0; i<users.length; i++){
-		var user:User = User(users[i]);
+		var user:User = new User(users[i]);
 
 		_staffList[i] = this._staff_mc.attachMovie('staff_learner_dataRow', 'staff_learner_dataRow' + i, this._staff_mc.getNextHighestDepth());
 		_staffList[i].fullName.text = user.getFirstName();
 		_staffList[i]._x = USERS_X;
 		_staffList[i]._y = USER_OFFSET * i;
+		_staffList[i].data = user.getDTO();
 		var listItem:MovieClip = MovieClip(_staffList[i]);
-		listItem.attachMovie('CheckBox', 'user_cb', listItem.getNextHighestDepth(), {_x:0, _y:3, selected:true})
+		listItem.attachMovie('CheckBox', 'user_cb', listItem.getNextHighestDepth(), {_x:0, _y:3, selected:false})
 
 		trace('loading: user ' + user.getFirstName() + ' ' + user.getLastName());
 
 		}
 		staff_scp.redraw(true);
+		
+		var callback:Function = Proxy.create(_monitorModel,_monitorModel.saveStaff);
+		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=getLessonStaff&lessonID='+_monitorModel.getSequence().ID,callback, false);
+		
 	}
-	
+
+	public function checkStaff(org:Organisation):Void{
+		trace('checking staff' + _staffList.length);
+		for(var i=0; i<_staffList.length; i++){
+			trace('checking staff list item : ' + i);
+			trace(_staffList[i].data.userID);
+			if(org.isStaff(_staffList[i].data.userID)){
+				_staffList[i].user_cb.selected = true;
+			}
+		}
+		
+		staff_scp.redraw(true);
+	}
 	
     /**
     * Main resize method, called by scrollpane container/parent
