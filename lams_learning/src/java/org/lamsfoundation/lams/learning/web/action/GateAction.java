@@ -25,7 +25,6 @@
 package org.lamsfoundation.lams.learning.web.action;
 
 import java.io.IOException;
-import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -39,7 +38,6 @@ import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
-import org.lamsfoundation.lams.learning.web.util.LessonLearnerDataManager;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.PermissionGateActivity;
 import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
@@ -119,14 +117,10 @@ public class GateAction extends LamsDispatchAction
         
         //initialize service object
         ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
-        //get all learners in the lesson
-        List currentLessonLearners = LessonLearnerDataManager.getAllLessonLearners(getServlet().getServletContext(),
-                                                                                   learnerProgress.getLesson().getLessonId().longValue(),
-                                                                                   learnerService);
         //knock the gate
-        boolean gateOpen = learnerService.knockGate(learnerProgress.getNextActivity().getActivityId(),
-                                                    learnerProgress.getUser(),
-                                                    currentLessonLearners);
+        boolean gateOpen = learnerService.knockGate(learnerProgress.getLesson().getLessonId(),
+        											learnerProgress.getNextActivity().getActivityId(),
+                                                    learnerProgress.getUser());
         // if the gate is open, let the learner go to the next activity ( updating the cached learner progress on the way )
         // pass only the ids in to completeActivity, so that the service level looks up the objects.
         // if we reuse our cached entries, hibernate may throw session errors (if the objects are CGLIB entities).

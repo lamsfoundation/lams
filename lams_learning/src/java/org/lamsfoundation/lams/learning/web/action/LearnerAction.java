@@ -38,7 +38,6 @@ import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
-import org.lamsfoundation.lams.learning.web.util.LessonLearnerDataManager;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.dto.ProgressActivityDTO;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
@@ -49,6 +48,7 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 
 /** 
@@ -114,59 +114,6 @@ public class LearnerAction extends LamsDispatchAction
 				learnerService.getMessageService().getMessage("error.system.error", msg),
 				FlashMessage.CRITICAL_ERROR);
 	}
-
-    /**
-     * <p>The Struts dispatch method that retrieves all active lessons for a 
-     * requested user from flash. The returned is structured as dto format 
-     * rather than the whole lesson domain object and it is serialized into
-     * a wddx packet so as to be sent back to flash.</p>
-     * 
-     * @param mapping An ActionMapping class that will be used by the Action class to tell
-     * the ActionServlet where to send the end-user.
-     *
-     * @param form The ActionForm class that will contain any data submitted
-     * by the end-user via a form.
-     * @param request A standard Servlet HttpServletRequest class.
-     * @param response A standard Servlet HttpServletResponse class.
-     * @return An ActionForward class that will be returned to the ActionServlet indicating where
-     *         the user is to go next.
-     * @throws IOException
-     * @throws ServletException
-     */
-    public ActionForward getActiveLessons(ActionMapping mapping,
-                                          ActionForm form,
-                                          HttpServletRequest request,
-                                          HttpServletResponse response) throws IOException,
-                                                                          ServletException
-    {
-        //initialize service object
-        ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
-        FlashMessage message = null;
-    	try {
-	
-	        //get learner.
-	        User learner = LearningWebUtil.getUserData(getServlet().getServletContext());
-	        if(log.isDebugEnabled())
-	            log.debug("Getting active lessons for leaner:"+learner.getFullName()+"["+learner.getUserId()+"]");
-	
-	        LessonDTO [] lessons = learnerService.getActiveLessonsFor(learner);
-	        
-	        message = new FlashMessage("getActiveLessons",lessons);
-	        		
-    	} catch (Exception e ) {
-    		message = handleException(e, "getActiveLessons", learnerService);
-    	}
-    	
-        String wddxPacket = WDDXProcessor.serialize(message);
-        if(log.isDebugEnabled())
-            log.debug("Sending flash active lessons message:"+message);
-        
-        response.getWriter().print(wddxPacket);
-        
-        //don't need to return a action forward because it sent the wddx packet
-        //back already.
-        return null;
-    }
 
     /**
      * <p>The structs dispatch action that joins a learner into a lesson. The
@@ -257,9 +204,6 @@ public class LearnerAction extends LamsDispatchAction
                                     HttpServletResponse response) throws IOException,
                                                                           ServletException
     {
-        if(log.isDebugEnabled())
-            log.debug("Exiting lesson...");
-
         //initialize service object
         ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 
@@ -270,13 +214,10 @@ public class LearnerAction extends LamsDispatchAction
 	        LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgressByUser(request,getServlet().getServletContext());
 	        
 	        if(log.isDebugEnabled())
-	            log.debug("Lesson id is: "+learnerProgress.getLesson().getLessonId());
+	            log.debug("Exiting lesson, lesson id is: "+learnerProgress.getLesson().getLessonId());
 	        
 	        learnerService.exitLesson(learnerProgress.getLearnerProgressId());
 	        
-	        LessonLearnerDataManager.removeLessonUserFromCache(getServlet().getServletContext(),
-	                                                           learnerProgress.getLesson(),
-	                                                           learnerProgress.getUser());
 	        //send acknowledgment to flash as it is triggerred by flash
 	        message = new FlashMessage("exitLesson",mapping.findForward(EXIT).getPath());
 
@@ -287,6 +228,44 @@ public class LearnerAction extends LamsDispatchAction
         String wddxPacket = WDDXProcessor.serialize(message);
         if(log.isDebugEnabled())
             log.debug("Sending Exit Lesson acknowledge message to flash:"+wddxPacket);
+        response.getWriter().print(wddxPacket);
+        return null;
+    }
+    
+    /**
+     * Gets the basic lesson details (name, descripton, etc) for a lesson. Contains a LessonDTO.
+     * Takes a single parameter lessonID
+     */
+    public ActionForward getLesson(ActionMapping mapping,
+                                    ActionForm form,
+                                    HttpServletRequest request,
+                                    HttpServletResponse response) throws IOException,
+                                                                          ServletException
+    {
+
+        //initialize service object
+        ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+
+        FlashMessage message = null;
+    	try {
+
+    		Long lessonID = WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID);
+
+            if(log.isDebugEnabled())
+                log.debug("get lesson..."+lessonID);
+
+            LessonDTO dto = learnerService.getLessonData(lessonID);
+	        
+	        //send acknowledgment to flash as it is triggerred by flash
+	        message = new FlashMessage("getLesson",dto);
+
+    	} catch (Exception e ) {
+    		message = handleException(e, "getLesson", learnerService);
+    	}
+    	
+        String wddxPacket = WDDXProcessor.serialize(message);
+        if(log.isDebugEnabled())
+            log.debug("Sending getLesson data message to flash:"+wddxPacket);
         response.getWriter().print(wddxPacket);
         return null;
     }

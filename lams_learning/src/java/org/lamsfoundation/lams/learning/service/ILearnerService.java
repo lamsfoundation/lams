@@ -51,7 +51,11 @@ public interface ILearnerService
      */
     public Lesson getLesson(Long lessonID);
 
-    
+    /**
+     * Get the lesson data for a particular lesson. In a DTO format suitable for sending to the client.
+     */
+    public LessonDTO getLessonData(Long lessonId);
+
  
     /**
      * Joins a User to a a new lesson as a learner
@@ -177,24 +181,25 @@ public interface ILearnerService
     public List getActiveLearnersByLesson(long lessonId);
     
     /**
-     * Perform random grouping for a list of learners based on the grouping
-     * activity. This method should be used when we don't have an grouping activity
-     * that is already part of the Hibernate session. 
+     * Perform random grouping for the learners who have started the lesson,
+     * based on the grouping activity. This method should be used when we don't 
+     * have an grouping activity that is already part of the Hibernate session. 
      * 
+     * @param lessonId lesson id
      * @param groupingActivityId the activity that has create grouping.
-     * @param learners the list of learners need to be grouped.
      */
-    public void performGrouping(GroupingActivity groupingActivity, List learners);
+    public void performGrouping(Long lessonId, Long groupingActivityId);
     
 
     /**
-     * Perform random grouping for a list of learners based on the grouping
-     * activity. This method should be used when we do have an grouping activity
-     * that is already part of the Hibernate session. 
+     * Perform random grouping for the learners who have started the lesson,
+     * based on the grouping activity. This method should be used when we do 
+     * have an grouping activity that is already part of the Hibernate session.
+     *  
+     * @param lessonId lesson id
      * @param groupingActivityId the activity that has create grouping.
-     * @param learners the list of learners need to be grouped.
      */
-    public void performGrouping(Long groupingActivityId, List learners);
+    public void performGrouping(Long lessonId, GroupingActivity groupingActivity);
     
     /**
      * Perform random grouping a single learner based on the grouping activity.
@@ -207,23 +212,23 @@ public interface ILearnerService
      * Check up the gate status to go through the gate. This also updates the gate.
      * This method should be used when we do not have an grouping activity
      * that is already part of the Hibernate session. 
+     * @param lessonId lesson id
      * @param gateid the gate that current learner is facing. It could be 
      * 			   synch gate, schedule gate or permission gate.
      * @param knocker the learner who wants to go through the gate.
-     * @param lessonLearners the entire lesson learners.
      */
-    public boolean knockGate(Long gateActivityId,User knocker,List lessonLearners);
+    public boolean knockGate(Long lessonId, Long gateActivityId, User knocker);
 
     /**
      * Check up the gate status to go through the gate. This also updates the gate.
      * This method should be used when we do have an grouping activity
      * that is already part of the Hibernate session. 
+     * @param lessonId lesson id
      * @param gate the gate that current learner is facing. It could be 
      * 			   synch gate, schedule gate or permission gate.
      * 			   Don't supply the actual gate from the cached web version
      * 			   as it might be out of date or not attached to the session
      * @param knocker the learner who wants to go through the gate.
-     * @param lessonLearners the entire lesson learners.
      */
-    public boolean knockGate(GateActivity gateActivity,User knocker,List lessonLearners);
+    public boolean knockGate(Long lessonId, GateActivity gateActivity, User knocker);
 }

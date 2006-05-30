@@ -28,12 +28,9 @@ import java.util.List;
 
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
-import org.lamsfoundation.lams.learning.web.util.LessonLearnerDataManager;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
-import org.lamsfoundation.lams.lesson.Lesson;
-import org.lamsfoundation.lams.usermanagement.User;
 
 
 /**
@@ -89,9 +86,6 @@ public class TestGroupingAction extends AbstractTestAction
         addRequestParameter(LearningWebUtil.PARAM_LESSON_ID, TEST_LESSON_ID);
         
         initializeLearnerProgress();
-        
-        initializeUserMap();
-        
         actionPerform();
 
         verifyNoActionErrors();
@@ -142,14 +136,4 @@ public class TestGroupingAction extends AbstractTestAction
                                  learnerProgress);
     }
     
-    /**
-     * 
-     */
-    private void initializeUserMap()
-    {
-        User testUser = LearningWebUtil.getUserData(context);
-        Lesson lesson = LearningWebUtil.getLessonData(request,context);
-        
-        LessonLearnerDataManager.cacheLessonUser(context,lesson,testUser);
-    }
 }

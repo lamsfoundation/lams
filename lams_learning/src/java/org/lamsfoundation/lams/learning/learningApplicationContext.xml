@@ -32,6 +32,7 @@
 		<property name="groupingDAO"><ref bean="groupingDAO"/></property>
 		<property name="activityMapping"><ref bean="activityMapping"/></property>
 		<property name="userManagementService"><ref bean="userManagementService"/></property>
+		<property name="lessonService"><ref bean="lessonService"/></property>
 		<property name="messageService"><ref bean="learningMessageService"/></property>
 	</bean>
 	

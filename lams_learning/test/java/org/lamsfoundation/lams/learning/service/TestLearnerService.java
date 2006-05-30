@@ -347,16 +347,10 @@ public class TestLearnerService extends AbstractLamsTestCase
     
     public void testKnockSynchGateClosed()
     {
-        //setup lesson learner list
-        List lessonLearners = new LinkedList();
-        lessonLearners.add(testUser);
-        User testUser2= usermanageService.getUserById(new Integer(1));
-        lessonLearners.add(testUser2);
-        
         //get sync gate
         GateActivity synchGate = (GateActivity)learnerService.getActivity(new Long(TEST_SYNCHGATE_ACTIVITY_ID));
         
-        boolean gateOpen = learnerService.knockGate(synchGate.getActivityId(),testUser,lessonLearners);
+        boolean gateOpen = learnerService.knockGate(Test_Lesson_ID, synchGate.getActivityId(),testUser);
         
         assertTrue("gate is closed",!gateOpen);
         synchGate = (GateActivity)learnerService.getActivity(new Long(TEST_SYNCHGATE_ACTIVITY_ID));
@@ -366,15 +360,12 @@ public class TestLearnerService extends AbstractLamsTestCase
     
     public void testKnockSynchGateOpen()
     {
-        List lessonLearners = new LinkedList();
-        lessonLearners.add(testUser);
         User testUser2= usermanageService.getUserById(new Integer(1));
-        lessonLearners.add(testUser2);
         
         //get sync gate
         GateActivity synchGate = (GateActivity)learnerService.getActivity(new Long(TEST_SYNCHGATE_ACTIVITY_ID));
 
-        boolean gateOpen = learnerService.knockGate(synchGate.getActivityId(),testUser2,lessonLearners);
+        boolean gateOpen = learnerService.knockGate(Test_Lesson_ID, synchGate.getActivityId(),testUser2);
         assertTrue("gate is closed",gateOpen);
 
         synchGate = (GateActivity)learnerService.getActivity(new Long(TEST_SYNCHGATE_ACTIVITY_ID));

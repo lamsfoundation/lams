@@ -40,7 +40,6 @@ import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
-import org.lamsfoundation.lams.learning.web.util.LessonLearnerDataManager;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
@@ -120,11 +119,8 @@ public class GroupingAction extends LamsDispatchAction
         ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 
         
-        List currentLearners = LessonLearnerDataManager.getAllLessonLearners(getServlet().getServletContext(),
-                                                                             learnerProgress.getLesson().getLessonId().longValue(),
-                                                                             learnerService);
-        learnerService.performGrouping(learnerProgress.getNextActivity().getActivityId(),
-                                       currentLearners);
+        learnerService.performGrouping(learnerProgress.getLesson().getLessonId(),
+        								learnerProgress.getNextActivity().getActivityId());
 
         LearningWebUtil.putActivityInRequest(request, learnerProgress.getNextActivity(), learnerService);
         LearningWebUtil.setLessonData(learnerProgress.getLesson());

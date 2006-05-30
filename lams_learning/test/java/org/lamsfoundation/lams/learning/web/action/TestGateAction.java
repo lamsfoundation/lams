@@ -27,11 +27,8 @@ package org.lamsfoundation.lams.learning.web.action;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
-import org.lamsfoundation.lams.learning.web.util.LessonLearnerDataManager;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
-import org.lamsfoundation.lams.lesson.Lesson;
-import org.lamsfoundation.lams.usermanagement.User;
 
 
 /**
@@ -91,8 +88,6 @@ public class TestGateAction extends AbstractTestAction
         addRequestParameter(LearningWebUtil.PARAM_LESSON_ID, TEST_LESSON_ID);
         
         initializeLearnerProgress();
-        initializeUserMap(false);
-        
         actionPerform();
         
         verifyNoActionErrors();
@@ -107,8 +102,6 @@ public class TestGateAction extends AbstractTestAction
         addRequestParameter(LearningWebUtil.PARAM_LESSON_ID, TEST_LESSON_ID);
         
         initializeLearnerProgress();
-        initializeUserMap(true);
-        
         actionPerform();
         
         verifyNoActionErrors();
@@ -124,22 +117,5 @@ public class TestGateAction extends AbstractTestAction
         learnerProgress.setNextActivity(activity);
         httpSession.setAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE,
                                  learnerProgress);
-    }
-    /**
-     * 
-     */
-    private void initializeUserMap(boolean singleUser)
-    {
-        User testUser = LearningWebUtil.getUserData(context);
-        Lesson lesson = LearningWebUtil.getLessonData(request,context);
-        LessonLearnerDataManager.cacheLessonUser(context,lesson,testUser);
-        
-        if(!singleUser)
-        {
-            request.getSession().removeAttribute("user");
-            User testUser2 = LearningWebUtil.getUserData(context);
-            LessonLearnerDataManager.cacheLessonUser(context,lesson,testUser2);
-        }
-
     }
 }
