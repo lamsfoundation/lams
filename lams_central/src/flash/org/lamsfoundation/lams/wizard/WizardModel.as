@@ -353,8 +353,9 @@ class WizardModel extends Observable{
 		var learners:Object = new Object();
 		if(r){
 			trace('getting lesson class data...');
+			trace('org resource id: ' + r.organisationID);
 			if(lessonID){classData.lessonID = lessonID;}
-			if(r.selectedResourceID){classData.organisationID = r.selectedResourceID;}
+			if(r.organisationID){classData.organisationID = r.organisationID;}
 			classData.staff = staff;
 			classData.learners = learners;
 			if(r.staffGroupName){classData.staff.groupName = r.staffGroupName;}
