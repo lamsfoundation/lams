@@ -12,25 +12,24 @@
 -->
 
 <class 
-    name="org.lamsfoundation.lams.usermanagement.Role" 
-    table="lams_role"
+    name="org.lamsfoundation.lams.usermanagement.Privilege" 
+    table="lams_privilege"
 >
     <meta attribute="class-description" inherit="false">
        @hibernate.class
-        table="lams_role"
+        table="lams_privilege"
     </meta>
-    <meta attribute="implement-equals" inherit="false">true</meta>
 
     <id
-        name="roleId"
-        type="java.lang.Integer"
-        column="role_id"
+        name="privilegeId"
+        type="java.lang.Long"
+        column="privilege_id"
     >
         <meta attribute="field-description">
            @hibernate.id
             generator-class="native"
-            type="java.lang.Integer"
-            column="role_id"
+            type="java.lang.Long"
+            column="privilege_id"
 
 
         </meta>
@@ -38,17 +37,18 @@
     </id>
 
     <property
-        name="name"
+        name="code"
         type="java.lang.String"
-        column="name"
+        column="code"
         not-null="true"
-        length="64"
+        unique="true"
+        length="10"
     >
-        <meta attribute="use-in-equals">true</meta>
         <meta attribute="field-description">
            @hibernate.property
-            column="name"
-            length="64"
+            column="code"
+            unique="true"
+            length="10"
             not-null="true"
         </meta>    
     </property>
@@ -56,45 +56,18 @@
         name="description"
         type="java.lang.String"
         column="description"
-        length="65535"
+        length="255"
     >
         <meta attribute="field-description">
            @hibernate.property
             column="description"
-            length="65535"
+            length="255"
         </meta>    
     </property>
 
     <!-- Associations -->
   
-    <!-- bi-directional one-to-many association to UserOrganisationRole -->
-    <set
-        name="userOrganisationRoles"
-        lazy="true"
-        inverse="true"
-		cascade="delete-orphan"
-    >
-        <meta attribute="field-description">
-           @hibernate.set
-            lazy="true"
-            inverse="true"
-            cascade="delete-orphan"
-
-           @hibernate.collection-key
-            column="role_id"
-
-           @hibernate.collection-one-to-many
-            class="org.lamsfoundation.lams.usermanagement.UserOrganisationRole"
-        </meta>
-        <key>
-            <column name="role_id" />
-        </key>
-        <one-to-many 
-            class="org.lamsfoundation.lams.usermanagement.UserOrganisationRole"
-        />
-    </set>
-
-    <!-- bi-directional one-to-many association to LamsRolePrivilege -->
+    <!-- bi-directional one-to-many association to RolePrivilege -->
     <set
         name="rolePrivileges"
         lazy="true"
@@ -108,13 +81,13 @@
             cascade="delete-orphan"
 
            @hibernate.collection-key
-            column="role_id"
+            column="privilege_id"
 
            @hibernate.collection-one-to-many
             class="org.lamsfoundation.lams.usermanagement.RolePrivilege"
         </meta>
         <key>
-            <column name="role_id" />
+            <column name="privilege_id" />
         </key>
         <one-to-many 
             class="org.lamsfoundation.lams.usermanagement.RolePrivilege"
