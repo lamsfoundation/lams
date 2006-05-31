@@ -162,7 +162,7 @@ public function update (o:Observable,infoObj:Object):Void{
 				if (infoObj.tabID == _tabID){
 				trace("TabID for Selected tab is (LessonTab TABCHANGE): "+infoObj.tabID)
 					this._visible = true;
-					mm.setDirty();
+					//mm.setDirty();
 					MovieClipUtils.doLater(Proxy.create(this,draw));
 				}else {
 					this._visible = false;
@@ -291,20 +291,24 @@ public function update (o:Observable,infoObj:Object):Void{
 		
 		switch(stateID){
 			case Sequence.SUSPENDED_STATE_ID :
+				changeStatus_cmb.addItem("Select Status", LessonTabView.ACTIVE_CBI);
 				changeStatus_cmb.addItem("Active", LessonTabView.ACTIVE_CBI);
 				changeStatus_cmb.addItem("Archive", LessonTabView.ARCHIVE_CBI);
 				break;
 			case Sequence.ARCHIVED_STATE_ID :
+				changeStatus_cmb.addItem("Select Status", LessonTabView.ACTIVE_CBI);
 				changeStatus_cmb.addItem("Activate", LessonTabView.ACTIVE_CBI);
 				break;
 			case Sequence.ACTIVE_STATE_ID :
+				changeStatus_cmb.addItem("Select Status", LessonTabView.ACTIVE_CBI);
 				changeStatus_cmb.addItem("Archive", LessonTabView.ARCHIVE_CBI);
 				break;
 			default :
 			//	if(mm.getSequence().isStarted()){
-					changeStatus_cmb.addItem("Disable", LessonTabView.DISABLE_CBI);
-			//	}
+				changeStatus_cmb.addItem("Select Status", LessonTabView.ARCHIVE_CBI);
+				changeStatus_cmb.addItem("Disable", LessonTabView.DISABLE_CBI);
 				changeStatus_cmb.addItem("Archive", LessonTabView.ARCHIVE_CBI);
+			//	}	changeStatus_cmb.addItem("Archive", LessonTabView.ARCHIVE_CBI);
 				
 		}
 	}
@@ -357,12 +361,14 @@ public function update (o:Observable,infoObj:Object):Void{
 	}
 
 	private function populateContributeActivities():Void{
-		var todos:Array = mm.getToDos();
-		// show isRequired activities in scrollpane
-		for (var i=0; i<todos.length; i++){
-			trace('main CA title: ' + todos[i].title);
-			var array:Array = getEntries(todos[i]);
-			drawIsRequiredTasks(todos[i], array, 0);
+		if (requiredTaskList.length == 0){
+			var todos:Array = mm.getToDos();
+			// show isRequired activities in scrollpane
+			for (var i=0; i<todos.length; i++){
+				trace('main CA title: ' + todos[i].title);
+				var array:Array = getEntries(todos[i]);
+				drawIsRequiredTasks(todos[i], array, 0);
+			}
 		}
 	}
 	
