@@ -124,11 +124,8 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 					if (infoObj.tabID == _tabID){
 						this._visible = true;
 						trace("TabID for Selected tab is (TABCHANGE): "+infoObj.tabID)
-						if (mm.activitiesDisplayed.length == null || mm.activitiesDisplayed.length == undefined){
-							trace("activitiesDisplayed is null: "+infoObj.tabID)
+						if (mm.activitiesDisplayed.isEmpty()){
 							mm.getMonitor().openLearningDesign(mm.getSequence());
-						}else {
-							mm.drawDesign(infoObj.tabID);
 						}
 					}else {
 						this._visible = false;
@@ -259,7 +256,9 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 		}else{
 			Debugger.log('The activity:'+a.title+','+a.activityUIID+' is of unknown type, it cannot be drawn',Debugger.CRITICAL,'drawActivity','MonitorTabView');
 		}
-		if (mm.activitiesDisplayed.length != mm.getActivityKeys()){
+		
+		var actItems:Number = mm.activitiesDisplayed.size()
+		if (actItems < mm.getActivityKeys().length){
 			mm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
 		}
 		s = true;
@@ -282,9 +281,12 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 		var mc = getController();
 		
 		var newTransition_mc:MovieClip = _transitionLayer_mc.createChildAtDepth("MonitorTransition",DepthManager.kTop,{_transition:t,_monitorController:mc,_monitorTabView:mtv});
-		if (mm.transitionsDisplayed.length != mm.getTransitionKeys()){
+		
+		var trnsItems:Number = mm.transitionsDisplayed.size()
+		if (trnsItems < mm.getTransitionKeys().length){
 			mm.transitionsDisplayed.put(t.transitionUIID,newTransition_mc);
 		}
+		
 		Debugger.log('drawn a transition:'+t.transitionUIID+','+newTransition_mc,Debugger.GEN,'drawTransition','MonitorTabView');
 		return s;
 		
