@@ -34,14 +34,20 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.fileupload.DiskFileUpload;
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
+import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.FileUtil;
-import org.lamsfoundation.lams.util.FileUtilException;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
@@ -54,6 +60,7 @@ public class ImportToolContentServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 	public static final String EXPORT_TOOLCONTENT_SERVICE_BEAN_NAME = "exportToolContentService";
+	public static final String USER_SERVICE_BEAN_NAME = "userManagementService";
 	public static final String PARAM_LEARING_DESIGN_ID = "learningDesignID";
 	
 
@@ -63,9 +70,16 @@ public class ImportToolContentServlet extends HttpServlet {
 	 * @see javax.servlet.http.HttpServlet.service(HttpServletRequest, HttpServletResponse)
 	 */
 	public void service(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-		
         
         try {
+        	Integer workspaceFolderUid = null;
+        	
+        	//get shared session
+			HttpSession ss = SessionManager.getSession();
+			//get back login user DTO
+			UserDTO userDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
+			User user = getUserService().getUserById(userDto.getUserID());
+			
         	FileItem file = null;
         	Map params = new HashMap();
         	String filename;
@@ -92,6 +106,7 @@ public class ImportToolContentServlet extends HttpServlet {
                 	filename = FileUtil.getFileName(fi.getName());
                     file = fi;
                 }
+                workspaceFolderUid = NumberUtils.createInteger((String) params.get("WORKSPACE_FOLDER_UID"));
             }
             if (file == null) {
             	log.error("Upload file is empty, import tool content failed.");
@@ -100,7 +115,7 @@ public class ImportToolContentServlet extends HttpServlet {
             // write the file
             ZipFileUtil.expandZip(file.getInputStream(),ldPath);
             IExportToolContentService service = getExportService();
-            service.importLearningDesign(ldPath);
+            service.importLearningDesign(ldPath,user,workspaceFolderUid);
         } catch (Exception e) {
         	log.error("Unable to import tool content: " + e.toString());
         }
@@ -111,6 +126,10 @@ public class ImportToolContentServlet extends HttpServlet {
 	//***************************************************************************************
 	// Private method
 	//***************************************************************************************
+	private IUserManagementService getUserService(){
+		WebApplicationContext webContext = WebApplicationContextUtils.getRequiredWebApplicationContext(this.getServletContext());
+		return (IUserManagementService) webContext.getBean(USER_SERVICE_BEAN_NAME);		
+	}
 	private IExportToolContentService getExportService(){
 		WebApplicationContext webContext = WebApplicationContextUtils.getRequiredWebApplicationContext(this.getServletContext());
 		return (IExportToolContentService) webContext.getBean(EXPORT_TOOLCONTENT_SERVICE_BEAN_NAME);		

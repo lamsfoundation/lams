@@ -25,6 +25,7 @@
 package org.lamsfoundation.lams.learningdesign.service;
 
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
+import org.lamsfoundation.lams.usermanagement.User;
 /**
  * Export tool content service provides ability to export learning design and its relative activities' tool content.
  *   
@@ -76,5 +77,5 @@ public interface IExportToolContentService {
 	 */
 	void registerFileHandleClass(String fileNodeClassName,String fileUuidFieldName, String fileVersionFieldName);
 	
-	void importLearningDesign(String learningDesignPath) throws ExportToolContentException;
+	void importLearningDesign(String learningDesignPath,User importer, Integer workspaceFolderUid) throws ImportToolContentException;
 }

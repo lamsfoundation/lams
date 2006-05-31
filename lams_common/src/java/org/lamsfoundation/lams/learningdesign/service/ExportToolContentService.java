@@ -38,7 +38,13 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
@@ -47,15 +53,41 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
+import org.lamsfoundation.lams.contentrepository.dao.hibernate.WorkspaceDAO;
+import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
+import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ChosenGrouping;
+import org.lamsfoundation.lams.learningdesign.Grouping;
+import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
+import org.lamsfoundation.lams.learningdesign.License;
+import org.lamsfoundation.lams.learningdesign.OptionsActivity;
+import org.lamsfoundation.lams.learningdesign.ParallelActivity;
+import org.lamsfoundation.lams.learningdesign.PermissionGateActivity;
+import org.lamsfoundation.lams.learningdesign.RandomGrouping;
+import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
+import org.lamsfoundation.lams.learningdesign.SequenceActivity;
+import org.lamsfoundation.lams.learningdesign.SynchGateActivity;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
+import org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupingDAO;
+import org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningDesignDAO;
+import org.lamsfoundation.lams.learningdesign.dao.hibernate.LicenseDAO;
+import org.lamsfoundation.lams.learningdesign.dao.hibernate.TransitionDAO;
 import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
+import org.lamsfoundation.lams.learningdesign.dto.GroupingDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
+import org.lamsfoundation.lams.learningdesign.dto.TransitionDTO;
+import org.lamsfoundation.lams.lesson.LessonClass;
 import org.lamsfoundation.lams.tool.Tool;
+import org.lamsfoundation.lams.tool.ToolContent;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.dao.hibernate.ToolDAO;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
+import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.dao.IWorkspaceFolderDAO;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileUtilException;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
@@ -93,6 +125,11 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	//spring injection properties
 	private ActivityDAO activityDAO;
 	private ToolDAO toolDAO;
+	private IWorkspaceFolderDAO workspaceFolderDAO;
+	private LicenseDAO licenseDAO;
+	private GroupingDAO groupingDAO;
+	private TransitionDAO  transitionDAO;
+	private LearningDesignDAO learningDesignDAO;
 	
 	/**
 	 * Class of tool attachment file handler information container.
@@ -111,7 +148,6 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			this.versionFieldName = versionFieldName;
 		}
 	}
-
 	
 	/**
 	 * File node information container. 
@@ -321,20 +357,17 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	 * @throws ExportToolContentException 
 	 * @see org.lamsfoundation.lams.authoring.service.IExportToolContentService.importLearningDesign(String)
 	 */
-	public void importLearningDesign(String learningDesignPath) throws ExportToolContentException {
+	public void importLearningDesign(String learningDesignPath,User importer, Integer workspaceFolderUid) throws ImportToolContentException {
 		
 		try {
 			//import learning design
 			Reader ldFile = new FileReader(new File(FileUtil.getFullPath(learningDesignPath,LEARNING_DESIGN_FILE_NAME)));
 			XStream designXml = new XStream();
 			LearningDesignDTO ldDto = (LearningDesignDTO) designXml.fromXML(ldFile);
-			
-			//persist learning design to database
-			ILearningDesignService service =  getLearningDesignService();
-			log.debug("Learning design xml import success. Continue tool content import...");
-			//TODO
-			
+			log.debug("Learning design xml deserialize to LearingDesignDTO success.");
+	
 			//begin tool import
+			Map<Long,ToolContent> toolMapper = new HashMap<Long,ToolContent>();
 			List<AuthoringActivityDTO> activities = ldDto.getActivities();
 			for(AuthoringActivityDTO activity : activities){
 				String toolPath = FileUtil.getFullPath(learningDesignPath,activity.getToolContentID().toString());
@@ -347,10 +380,12 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 				Object toolPOJO = toolXml.fromXML(toolFile);
 				contentManager.importToolContent(toolPOJO);
 			}
+			
+			saveLearningDesign(ldDto,importer,workspaceFolderUid,toolMapper);
 		} catch (FileNotFoundException e) {
-			throw new ExportToolContentException(e);
+			throw new ImportToolContentException(e);
 		} catch (ToolException e) {
-			throw new ExportToolContentException(e);
+			throw new ImportToolContentException(e);
 		}
 		
 	}
@@ -372,6 +407,282 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     {
         return applicationContext.getBean(tool.getServiceName());
     }
+	
+	private void saveLearningDesign(LearningDesignDTO dto, User importer, Integer workspaceFolderUid, Map<Long,ToolContent> toolMapper)
+			throws ImportToolContentException {
+
+		//grouping object list
+		List<GroupingDTO> groupingDtoList = dto.getGroupings();
+		Map<Long,Grouping> groupingMapper = new HashMap<Long,Grouping>();
+		for(GroupingDTO groupingDto : groupingDtoList){
+			Grouping grouping = getGrouping(groupingDto);
+			groupingMapper.put(grouping.getGroupingId(),grouping);
+			
+			//persist
+			grouping.setGroupingId(null);
+			groupingDAO.insert(grouping);
+		}
+		
+		//activity object list
+		List<AuthoringActivityDTO> actDtoList = dto.getActivities();
+		Set<Activity> actList = new LinkedHashSet<Activity>();
+		Map<Long,Activity> activityMapper = new HashMap<Long,Activity>();
+		for(AuthoringActivityDTO actDto: actDtoList){
+			Activity act = getActivity(actDto,groupingMapper,toolMapper);
+			activityMapper.put(act.getActivityId(),act);
+			actList.add(act);
+			
+			//persist
+			act.setActivityId(null);
+			activityDAO.insert(act);
+		}
+		
+
+		//transition object list
+		List<TransitionDTO> transDtoList = dto.getTransitions();
+		Set<Transition> transList = new LinkedHashSet<Transition>();
+		for(TransitionDTO transDto: transDtoList){
+			Transition trans = getTransition(transDto,activityMapper);
+			transList.add(trans);
+			
+			//persist
+			trans.setTransitionId(null);
+			transitionDAO.insert(trans);
+		}
+		
+		
+		LearningDesign ld = getLearningDesign(dto,importer,workspaceFolderUid,actList,transList);
+//		persist
+		learningDesignDAO.insert(ld);
+	}
+	/**
+	 * Get learning design object from this Learning design DTO object. It also following our
+	 * import rules:
+	 * <li>lams_license - Assume same in all lams system. Import same ID</li>
+	 * <li>lams_copy_type - Set to 1.This indicates it is "normal" design.</li>
+	 * <li>lams_workspace_folder - An input parameters to let user choose import workspace</li>
+	 * <li>User - The person who execute import action</li>
+	 * <li>OriginalLearningDesign - set to null</li>
+	 * 
+	 * @return
+	 * @throws ImportToolContentException 
+	 */
+	private LearningDesign getLearningDesign(LearningDesignDTO dto, User importer, Integer workspaceFolderUid,
+			Set<Activity> actList, Set<Transition> transList) throws ImportToolContentException {
+		LearningDesign ld = new LearningDesign();
+	
+		
+		ld.setLearningDesignId(dto.getLearningDesignID());
+		ld.setLearningDesignUIID(dto.getLearningDesignUIID());
+		ld.setDescription(dto.getDescription());
+		ld.setTitle(dto.getTitle());
+		
+		Integer actUid = dto.getFirstActivityUIID();
+		if(actUid == null)
+			ld.setFirstActivity(null);
+		else
+			ld.setFirstActivity(activityDAO.getActivityByActivityId(new Long(actUid.intValue())));
+		
+		ld.setMaxID(dto.getMaxID());
+		ld.setValidDesign(dto.getValidDesign());
+		ld.setReadOnly(dto.getReadOnly());
+		ld.setDateReadOnly(dto.getDateReadOnly());
+		ld.setOfflineInstructions(dto.getOfflineInstructions());	
+		ld.setOnlineInstructions(dto.getOnlineInstructions());
+		
+		ld.setHelpText(dto.getHelpText());
+		//set to 1
+		ld.setCopyTypeID(1);
+		ld.setCreateDateTime(dto.getCreateDateTime());
+		ld.setVersion(dto.getVersion());
+		
+		if(workspaceFolderUid != null)
+			ld.setWorkspaceFolder(workspaceFolderDAO.getWorkspaceFolderByID(workspaceFolderUid));
+								 
+		ld.setDuration(dto.getDuration());
+		ld.setLicenseText(dto.getLicenseText());
+		
+		Long licenseId = dto.getLicenseID();
+		if(licenseId != null){
+			License license = licenseDAO.getLicenseByID(licenseId);
+			if(license == null)
+				throw new ImportToolContentException("Import failed: License ["+dto.getLicenseText()+ "] does not exist in target database");
+			ld.setLicense(licenseDAO.getLicenseByID(licenseId));
+			ld.setLicenseText(dto.getLicenseText());
+		}
+		
+		ld.setLessonOrgID(dto.getLessonOrgID());
+		
+		ld.setLessonOrgName(dto.getLessonOrgName());
+		ld.setLessonID(dto.getLessonID());
+		ld.setLessonName(dto.getLessonName());
+		ld.setLessonStartDateTime(dto.getLessonStartDateTime());
+		ld.setLastModifiedDateTime(dto.getLastModifiedDateTime());
+
+		ld.setTransitions(transList);
+
+		ld.setActivities(actList);
+		
+		ld.setCreateDateTime(new Date());
+		ld.setLastModifiedDateTime(new Date());
+		ld.setUser(importer);
+		return ld;
+	}
+	/**
+	 * Return Grouping object from given GroupingDTO.
+	 * 
+	 * @param groupingDto
+	 * @return
+	 */
+	private Grouping getGrouping(GroupingDTO groupingDto) {
+		Grouping grouping = null;
+		if(groupingDto == null)
+			return grouping;
+		Integer type = groupingDto.getGroupingTypeID();
+		
+//		grouping.setActivities();
+		if (Grouping.CHOSEN_GROUPING_TYPE.equals(type)) {
+			grouping = new ChosenGrouping();
+		}else if (Grouping.RANDOM_GROUPING_TYPE.equals(type)) {
+			grouping = new RandomGrouping();
+			((RandomGrouping)grouping).setLearnersPerGroup(groupingDto.getLearnersPerGroup());
+			((RandomGrouping)grouping).setNumberOfGroups(groupingDto.getNumberOfGroups());
+		}else if (Grouping.CLASS_GROUPING_TYPE.equals(type)) {
+			grouping = new LessonClass();
+		}
+		
+		//commont fields
+		grouping.setGroupingId(groupingDto.getGroupingID());
+		grouping.setGroupingUIID(groupingDto.getGroupingUIID());
+		grouping.setMaxNumberOfGroups(groupingDto.getMaxNumberOfGroups());
+		
+		return grouping;
+	}
+	
+	private Transition getTransition(TransitionDTO transDto, Map<Long, Activity> activityMapper) {
+		Transition trans = new Transition();
+		
+		trans.setDescription(transDto.getDescription());
+		
+		trans.setFromActivity(activityMapper.get(transDto.getFromActivityID()));
+		trans.setFromUIID(transDto.getFromUIID());
+//		set to null 
+//		trans.setLearningDesign();
+		trans.setTitle(transDto.getTitle());
+		
+		trans.setToActivity(activityMapper.get(transDto.getToActivityID()));
+		trans.setToUIID(transDto.getToUIID());
+		trans.setTransitionId(transDto.getTransitionID());
+		trans.setTransitionUIID(transDto.getTransitionUIID());
+		
+		//reste value
+		trans.setCreateDateTime(new Date());
+		return trans;
+	}
+	/**
+	 * 
+	 * @param actDto
+	 * @param groupingList
+	 * @param toolMapper
+	 * @return
+	 */
+	private Activity getActivity(AuthoringActivityDTO actDto, Map<Long, Grouping> groupingList, Map<Long,ToolContent> toolMapper) {
+		Activity act = null;
+		if(actDto == null)
+			return act;
+		int type = actDto.getActivityTypeID().intValue();
+		Grouping newGrouping;
+		switch(type){
+			case Activity.TOOL_ACTIVITY_TYPE:
+				act = new ToolActivity();
+				ToolContent content = toolMapper.get(actDto.getToolID());
+				((ToolActivity)act).setTool(content.getTool());
+				((ToolActivity)act).setToolContentId(content.getToolContentId());
+				((ToolActivity)act).setToolSessions(null);
+				break;
+			case Activity.GROUPING_ACTIVITY_TYPE:
+				act = new GroupingActivity();
+				newGrouping = groupingList.get(actDto.getCreateGroupingID());
+				((GroupingActivity)act).setCreateGrouping(newGrouping);
+				((GroupingActivity)act).setCreateGroupingUIID(newGrouping.getGroupingUIID());
+				break;
+			case Activity.SYNCH_GATE_ACTIVITY_TYPE:
+				act = new SynchGateActivity();
+				((SynchGateActivity)act).setGateActivityLevelId(actDto.getGateActivityLevelID());
+				//always set false
+				((SynchGateActivity)act).setGateOpen(false);
+				((SynchGateActivity)act).setWaitingLearners(null);
+				break;
+			case Activity.SCHEDULE_GATE_ACTIVITY_TYPE:
+				act = new ScheduleGateActivity();
+				((ScheduleGateActivity)act).setGateActivityLevelId(actDto.getGateActivityLevelID());
+				((ScheduleGateActivity)act).setWaitingLearners(null);
+				//always set false
+				((ScheduleGateActivity)act).setGateOpen(false);
+				
+				((ScheduleGateActivity)act).setGateEndDateTime(actDto.getGateEndDateTime());
+				((ScheduleGateActivity)act).setGateStartDateTime(actDto.getGateStartDateTime());
+				((ScheduleGateActivity)act).setGateStartTimeOffset(actDto.getGateStartTimeOffset());
+				((ScheduleGateActivity)act).setGateEndTimeOffset(actDto.getGateEndTimeOffset());
+				break;
+			case Activity.PERMISSION_GATE_ACTIVITY_TYPE:
+				act = new PermissionGateActivity();
+				((PermissionGateActivity)act).setGateActivityLevelId(actDto.getGateActivityLevelID());
+				((PermissionGateActivity)act).setGateOpen(false);
+				((PermissionGateActivity)act).setWaitingLearners(null);
+				break;
+			case Activity.PARALLEL_ACTIVITY_TYPE:
+				act = new ParallelActivity();
+				break;
+			case Activity.OPTIONS_ACTIVITY_TYPE:
+				act = new OptionsActivity();
+				((OptionsActivity)act).setMaxNumberOfOptions(actDto.getMaxOptions());
+				((OptionsActivity)act).setMinNumberOfOptions(actDto.getMinOptions());
+				((OptionsActivity)act).setOptionsInstructions(actDto.getOptionsInstructions());
+				break;
+			case Activity.SEQUENCE_ACTIVITY_TYPE:
+				act = new SequenceActivity();
+				break;
+		}		
+		
+		act.setGroupingSupportType(actDto.getGroupingSupportType());
+		act.setActivityCategoryID(actDto.getActivityCategoryID());
+		act.setActivityId(actDto.getActivityID());
+		act.setActivityTypeId(actDto.getActivityTypeID());
+		act.setApplyGrouping(actDto.getApplyGrouping());
+		act.setDefineLater(actDto.getDefineLater());
+		act.setDescription(actDto.getDescription());
+		act.setHelpText(actDto.getHelpText());
+		act.setLanguageFile(actDto.getLanguageFile());
+//		act.setLearningDesign();
+		//TODO: be to decided by Fiona
+//		act.setLearningLibrary();
+//		actDto.getLibraryActivityID()
+//		act.setLibraryActivity();
+		act.setLibraryActivityUiImage(actDto.getLibraryActivityUIImage());
+		act.setOrderId(actDto.getOrderID());
+		
+//		actDto.getParentActivityID()
+//		act.setParentActivity();
+		
+		act.setParentUIID(actDto.getParentUIID());
+		act.setRunOffline(actDto.getRunOffline());
+		act.setTitle(actDto.getTitle());
+		
+//		act.setTransitionFrom();
+//		act.setTransitionTo();
+		
+		act.setXcoord(actDto.getxCoord());
+		act.setYcoord(actDto.getyCoord());
+		
+		//tranfer old grouping to latest
+		newGrouping = groupingList.get(actDto.getGroupingID());
+		act.setGrouping(newGrouping);
+		act.setGroupingUIID(newGrouping.getGroupingUIID());
+
+		act.setCreateDateTime(new Date());
+		return act;
+	}
 	//******************************************************************
 	// Spring injection properties set/get
 	//******************************************************************
@@ -386,6 +697,36 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	}
 	public void setToolDAO(ToolDAO toolDAO) {
 		this.toolDAO = toolDAO;
+	}
+	public IWorkspaceFolderDAO getWorkspaceFolderDAO() {
+		return workspaceFolderDAO;
+	}
+	public void setWorkspaceFolderDAO(IWorkspaceFolderDAO workspaceFolderDAO) {
+		this.workspaceFolderDAO = workspaceFolderDAO;
+	}
+	public LicenseDAO getLicenseDAO() {
+		return licenseDAO;
+	}
+	public void setLicenseDAO(LicenseDAO licenseDAO) {
+		this.licenseDAO = licenseDAO;
+	}
+	public GroupingDAO getGroupingDAO() {
+		return groupingDAO;
+	}
+	public void setGroupingDAO(GroupingDAO groupingDAO) {
+		this.groupingDAO = groupingDAO;
+	}
+	public LearningDesignDAO getLearningDesignDAO() {
+		return learningDesignDAO;
+	}
+	public void setLearningDesignDAO(LearningDesignDAO learningDesignDAO) {
+		this.learningDesignDAO = learningDesignDAO;
+	}
+	public TransitionDAO getTransitionDAO() {
+		return transitionDAO;
+	}
+	public void setTransitionDAO(TransitionDAO transitionDAO) {
+		this.transitionDAO = transitionDAO;
 	}
 
 
