@@ -27,6 +27,7 @@ import org.lamsfoundation.lams.common.ui.*;
 import org.lamsfoundation.lams.authoring.*;
 import org.lamsfoundation.lams.authoring.cv.*;
 import org.lamsfoundation.lams.monitoring.mv.*;
+import org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView;
 import mx.controls.*;
 import mx.managers.*
 
@@ -70,7 +71,15 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 	private var _visibleHeight:Number;
 	private var _visibleWidth:Number;
 	
-	
+	// Only for Monitor Optional Container children
+	private var fromModuleTab:String;
+	private var _learnerTabView:LearnerTabView;
+	private var actStatus:String;
+	private var learner:Object = new Object();
+	private var containerPanelHeader:MovieClip;
+	private var completed_mc:MovieClip;
+	private var current_mc:MovieClip;
+	private var todo_mc:MovieClip;
 	
 	
 	function CanvasParallelActivity(){
@@ -95,7 +104,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 		_ddm.getComplexActivityChildren(_activity.activityUIID);
 		_locked = true;
 		
-		
+		showStatus(false);
 		
 		var child1:Activity;
 		var child2:Activity;
@@ -108,20 +117,32 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 			child2 = _children[0];
 		
 		}
-		//set the positioning co-ords
-		child1.xCoord = CHILD_OFFSET_X;
-		child1.yCoord = CHILD1_OFFSET_Y;
-		child2.xCoord = CHILD_OFFSET_X;
-		child2.yCoord = CHILD2_OFFSET_Y;
-	
+		
 		//so now it is placed on in the IDE and we just call init
-		child1_mc.init({activity:child1,_canvasController:_canvasController,_canvasView:_canvasView});
-		child2_mc.init({activity:child2,_canvasController:_canvasController,_canvasView:_canvasView});
+		if (fromModuleTab != "monitorLearnerTab"){
+			//set the positioning co-ords
+			child1.xCoord = CHILD_OFFSET_X;
+			child1.yCoord = CHILD1_OFFSET_Y;
+			child2.xCoord = CHILD_OFFSET_X;
+			child2.yCoord = CHILD2_OFFSET_Y;
+			child1_mc.init({activity:child1,_canvasController:_canvasController,_canvasView:_canvasView});
+			child2_mc.init({activity:child2,_canvasController:_canvasController,_canvasView:_canvasView});
+		} else {
+			
+			child1_mc.init({activity:child1,_monitorController:_monitorController,_monitorView:_monitorView, learner:learner});
+			child2_mc.init({activity:child2,_monitorController:_monitorController,_monitorView:_monitorView, learner:learner});
+		}
 		
 		//let it wait one frame to set up the components.
 		//childActivities_mc.createChildAtDepth("Bin",DepthManager.kTop);
 		MovieClipUtils.doLater(Proxy.create(this,draw));
 		
+	}
+	
+	private function showStatus(isVisible:Boolean){
+		completed_mc._visible = isVisible;
+		current_mc._visible = isVisible;
+		todo_mc._visible = isVisible;
 	}
 	
 	public function get activity():Activity{
@@ -142,15 +163,33 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 	}
 	
 	private function draw(){			
-			//write text
-			title_lbl.text = _activity.title;
-			actCount_lbl.text = _children.length+" activities";
-			
+		actStatus = _learnerTabView.compareProgressData(learner, _activity.activityID);
+		switch (actStatus){
+			case 'completed_mc' :
+				//trace("TabID for Selected tab is: "+infoObj.tabID)
+				completed_mc._visible = true;
+		
+				break;
+			case 'current_mc' :
+				current_mc._visible = true;
+				break;
+			//case 'toto_mc' :
+				//todo_mc._visible = true;
+				//break;
+			default :
+				todo_mc._visible = true;
+				//Debugger.log('unknown update type :' + infoObj.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.MonitorView');
+		}
+		//write text
+		title_lbl.text = _activity.title;
+		actCount_lbl.text = _children.length+" activities";
+		
 //			_global.breakpoint();
-			
-			header_pnl.borderType='outset';
-			container_pnl.setStyle("backgroundColor",0x4289FF);
-			
+		
+		header_pnl.borderType='outset';
+		container_pnl.setStyle("backgroundColor",0x4289FF);
+		
+		if (fromModuleTab != "monitorLearnerTab"){
 			//position the container (this)
 			_x = _activity.xCoord;
 			_y = _activity.yCoord;
@@ -164,10 +203,13 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 				padlockClosed_mc._visible = false;
 				clickTarget_mc._height = 38;
 			}
-		
-			_visible = true;
-			//child1_mc._visible = true;
-						
+		}else {
+			containerPanelHeader.title_lbl.text = 'Parallel Activities'
+		}
+	
+		_visible = true;
+		//child1_mc._visible = true;
+					
 	}
 	
 	

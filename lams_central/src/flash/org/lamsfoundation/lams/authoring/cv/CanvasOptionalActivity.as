@@ -26,6 +26,7 @@ import org.lamsfoundation.lams.common.ui. *;
 import org.lamsfoundation.lams.authoring. *;
 import org.lamsfoundation.lams.authoring.cv. *;
 import org.lamsfoundation.lams.monitoring.mv. *;
+import org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView;
 //import org.lamsfoundation.lams.authoring.cv.DesignDataModel;
 import org.lamsfoundation.lams.common.style. *;
 import mx.controls. *;
@@ -40,7 +41,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 	private var CHILD_OFFSET_X : Number = 8;
 	private var CHILD_OFFSET_Y : Number = 57;
 	private var CHILD_INCRE : Number = 60;
-	private var fromModuleTab:String;
+	
 	//this is set by the init object
 	private var _canvasController : CanvasController;
 	private var _canvasView : CanvasView;
@@ -52,11 +53,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 	private var panelHeight : Number;
 	//refs to screen items:
 	private var container_pnl : Panel;
-	private var containerPanelHeader:MovieClip;
 	private var header_pnl : Panel;
 	private var act_pnl : Panel;
 	private var title_lbl : Label;
 	private var actCount_lbl : Label;
+	//locals
 	private var childActivities_mc : MovieClip;
 	private var optionalActivity_mc : MovieClip;
 	private var clickTarget_mc : MovieClip;
@@ -64,7 +65,16 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 	private var padlockOpen_mc : MovieClip;
 	private var _dcStartTime : Number = 0;
 	private var _doubleClicking : Boolean;
-
+	// Only for Monitor Optional Container children
+	private var fromModuleTab:String;
+	private var _learnerTabView:LearnerTabView;
+	private var actStatus:String;
+	private var learner:Object = new Object();
+	private var containerPanelHeader:MovieClip;
+	private var completed_mc:MovieClip;
+	private var current_mc:MovieClip;
+	private var todo_mc:MovieClip;
+	//---------------------------//
 	private var child_mc : MovieClip;
 	private var _locked : Boolean;
 	private var _visibleHeight : Number;
@@ -92,7 +102,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		
 		_ddm.getComplexActivityChildren(_activity.activityUIID);
 		_locked = false;
-		
+		showStatus(false);
 		childActivities_mc = this;
 		var children_mc : Array = new Array ();
 		
@@ -105,10 +115,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 			children_mc [i].activity.yCoord = CHILD_OFFSET_Y + (i * CHILD_INCRE);
 			
 			}else {
-				children_mc [i] = childActivities_mc.attachMovie ("CanvasActivityLinear_forOptional", "CanvasActivity" + i, childActivities_mc.getNextHighestDepth (), {_activity : _children [i] , _monitorController : _monitorController, _monitorView : _monitorView, _module:"monitoring", actLabel:_children [i].title});
+				trace("child's activityID is "+_children [i].activityID)
+				children_mc [i] = childActivities_mc.attachMovie ("CanvasActivityLinear_forOptional", "CanvasActivity" + i, childActivities_mc.getNextHighestDepth (), {_activity : _children [i] , _monitorController : _monitorController, _monitorView : _monitorView, actLabel:_children [i].title, learner:learner});
 				//set the positioning co-ords
 				children_mc [i]._y = (i*21)+8;
-				children_mc [i]._x = 58;
+				children_mc [i]._x = 57;
 			
 			
 			}
@@ -116,6 +127,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		}
 		
 		MovieClipUtils.doLater (Proxy.create (this, draw));
+	}
+	
+	private function showStatus(isVisible:Boolean){
+		completed_mc._visible = isVisible;
+		current_mc._visible = isVisible;
+		todo_mc._visible = isVisible;
 	}
 	
 	public function get activity () : Activity
@@ -137,8 +154,25 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 	{
 		_activity = a;
 	}
-	private function draw ()
-	{
+	private function draw (){
+		
+		actStatus = _learnerTabView.compareProgressData(learner, _activity.activityID);
+		switch (actStatus){
+		    case 'completed_mc' :
+				//trace("TabID for Selected tab is: "+infoObj.tabID)
+				completed_mc._visible = true;
+		
+                break;
+            case 'current_mc' :
+				current_mc._visible = true;
+                break;
+            //case 'toto_mc' :
+			    //todo_mc._visible = true;
+                //break;
+			default :
+				todo_mc._visible = true;
+                //Debugger.log('unknown update type :' + infoObj.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.MonitorView');
+		}
 		clickTarget_mc.swapDepths(childActivities_mc.getNextHighestDepth());
 		var numOfChildren = _children.length
 		panelHeight = CHILD_OFFSET_Y + (numOfChildren * CHILD_INCRE);
@@ -160,7 +194,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 			_y = _activity.yCoord;
 		}else {
 			containerPanelHeader.title_lbl.text = 'Optional Activities'
-			container_pnl._height = 15+(numOfChildren * 21);
+			container_pnl._height = 16+(numOfChildren * 21);
 		}
 		//dimentions of container (this)
 		if (_locked)
