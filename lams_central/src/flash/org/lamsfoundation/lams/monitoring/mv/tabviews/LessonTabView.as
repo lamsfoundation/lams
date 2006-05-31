@@ -47,6 +47,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	public static var _tabID:Number = 0;
 	
 	// combo box static data for status change
+	public static var NULL_CBI:Number = 0;
 	public static var ACTIVE_CBI:Number = 1;
 	public static var DISABLE_CBI:Number = 2;
 	public static var ARCHIVE_CBI:Number = 3;
@@ -226,6 +227,7 @@ public function update (o:Observable,infoObj:Object):Void{
 		var seq:Sequence = mm.getSequence();
 	
 		populateStatusList(seq.state);
+		populateLessonDetails();
 		
 		if(seq.state != Sequence.ACTIVE_STATE_ID){
 		// hide start buttons etc
@@ -235,6 +237,7 @@ public function update (o:Observable,infoObj:Object):Void{
 			schedule_btn.visible = false;
 			manageDate_lbl.visible = false;
 			//manageStart_lbl.visible = false;
+			
 		/**	
 			if(seq.isStarted()){
 				startMsg_txt.text = "Currently Started."
@@ -247,23 +250,19 @@ public function update (o:Observable,infoObj:Object):Void{
 		}
 		
 		//setStyles();
-		//populateLessonDetails();
-		var requestLessonID:Number = seq.getSequenceID()
 		
-		var callback:Function = Proxy.create(this,populateLessonDetails);
-		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=getLessonLearners&lessonID='+String(requestLessonID),callback, false);
-		//getLessonLearners(lessonID)
+		var requestLessonID:Number = seq.ID;
 		
-		trace('seq id: ' + mm.getSequence().getSequenceID());
-		trace('last seq id: ' + mm.getLastSelectedSequence().getSequenceID());
-		if (mm.getSequence().getSequenceID() == mm.getLastSelectedSequence().getSequenceID()){
+		trace('seq id: ' + mm.getSequence().ID);
+		trace('last seq id: ' + mm.getLastSelectedSequence().ID);
+		if (mm.getSequence().ID == mm.getLastSelectedSequence().ID){
 			if(mm.getToDos() == null){
-				mm.getMonitor().getContributeActivities(mm.getSequence().getSequenceID());
+				mm.getMonitor().getContributeActivities(mm.getSequence().ID);
 			} else {
 				populateContributeActivities();
 			}
 		}else{
-			mm.getMonitor().getContributeActivities(mm.getSequence().getSequenceID());
+			mm.getMonitor().getContributeActivities(mm.getSequence().ID);
 		}
 		
 		dispatchEvent({type:'load',target:this});
@@ -272,18 +271,14 @@ public function update (o:Observable,infoObj:Object):Void{
 	/**
 	 * Populate the lesson details from HashTable Sequence in MOnitorModel
 	*/
-	private function populateLessonDetails(users:Array):Void{
-		//var mm:Observable = getModel();
-		trace("Number of learners are: "+users.length)
+	private function populateLessonDetails():Void{
+		
 		var s:Object = mm.getSequence();
-		//trace("Number of Learners Sequence are : "+_wm.getLessonClassData().learners.length);
+		
 		LSTitle_txt.text = s.name;
 		LSDescription_txt.text = s.description;
 		sessionStatus_txt.text = showStatus(s.state);
-		numLearners_txt.text = " of "+String(users.length)
-		//group_txt.text = s._seqDescription
-		//duration_txt.text = s._seqDescription
-		  
+		numLearners_txt.text = String(s.noStartedLearners) + " of "+String(s.noPossibleLearners);
 	}
 	
 	private function populateStatusList(stateID:Number):Void{
@@ -291,24 +286,26 @@ public function update (o:Observable,infoObj:Object):Void{
 		
 		switch(stateID){
 			case Sequence.SUSPENDED_STATE_ID :
-				changeStatus_cmb.addItem("Select Status", LessonTabView.ACTIVE_CBI);
+				changeStatus_cmb.addItem("Select Status", LessonTabView.NULL_CBI);
 				changeStatus_cmb.addItem("Active", LessonTabView.ACTIVE_CBI);
 				changeStatus_cmb.addItem("Archive", LessonTabView.ARCHIVE_CBI);
 				break;
 			case Sequence.ARCHIVED_STATE_ID :
-				changeStatus_cmb.addItem("Select Status", LessonTabView.ACTIVE_CBI);
+				changeStatus_cmb.addItem("Select Status", LessonTabView.NULL_CBI);
 				changeStatus_cmb.addItem("Activate", LessonTabView.ACTIVE_CBI);
 				break;
 			case Sequence.ACTIVE_STATE_ID :
-				changeStatus_cmb.addItem("Select Status", LessonTabView.ACTIVE_CBI);
+				changeStatus_cmb.addItem("Select Status", LessonTabView.NULL_CBI);
+				changeStatus_cmb.addItem("Archive", LessonTabView.ARCHIVE_CBI);
+				break;
+			case Sequence.NOTSTARTED_STATE_ID :
+				changeStatus_cmb.addItem("Select Status", LessonTabView.NULL_CBI);
 				changeStatus_cmb.addItem("Archive", LessonTabView.ARCHIVE_CBI);
 				break;
 			default :
-			//	if(mm.getSequence().isStarted()){
-				changeStatus_cmb.addItem("Select Status", LessonTabView.ARCHIVE_CBI);
+				changeStatus_cmb.addItem("Select Status", LessonTabView.NULL_CBI);
 				changeStatus_cmb.addItem("Disable", LessonTabView.DISABLE_CBI);
 				changeStatus_cmb.addItem("Archive", LessonTabView.ARCHIVE_CBI);
-			//	}	changeStatus_cmb.addItem("Archive", LessonTabView.ARCHIVE_CBI);
 				
 		}
 	}
@@ -340,6 +337,10 @@ public function update (o:Observable,infoObj:Object):Void{
 	private function changeStatus(evt:Object):Void{
 		var stateID:Number = changeStatus_cmb.selectedItem.data;
 		switch(stateID){
+			case NULL_CBI :
+				// error msg
+				trace('nothing selected...');
+				break;
 			case ACTIVE_CBI :
 				mm.activateSequence();
 				break;
