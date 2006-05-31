@@ -22,6 +22,7 @@
  */
 
 import org.lamsfoundation.lams.common.ApplicationParent;
+import org.lamsfoundation.lams.common.Sequence;
 import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.common.ui.*
 import org.lamsfoundation.lams.common.style.*
@@ -44,6 +45,12 @@ import mx.utils.*;
 
 class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends AbstractView{
 	public static var _tabID:Number = 0;
+	
+	// combo box static data for status change
+	public static var ACTIVE_CBI:Number = 1;
+	public static var DISABLE_CBI:Number = 2;
+	public static var ARCHIVE_CBI:Number = 3;
+	
 	private var _className = "LessonTabView";
 	//constants:
 	private var _tm:ThemeManager;
@@ -65,9 +72,10 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	private var manageClass_lbl:Label;
 	private var manageStatus_lbl:Label;
 	private var manageStart_lbl:Label;
-	private var manageMin_lbl:Label;
-	private var manageHour_lbl:Label;
+	//private var manageMin_lbl:Label;
+	//private var manageHour_lbl:Label;
 	private var manageDate_lbl:Label;
+	
 		
 	//Text Items
     private var LSTitle_txt:TextField;
@@ -78,16 +86,19 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	private var duration_txt:TextField;
 	private var lessonManager:TextField;
 	private var taskManager:TextField;
+	private var startMsg_txt:TextField;
 	
 	//Button
 	private var viewLearners_btn:Button;
 	private var editClass_btn:Button;
 	private var statusApply_btn:Button;
-	private var setDateTime_btn:Button;
+	private var schedule_btn:Button;
+	private var start_btn:Button;
 	
-	private var startDate_dt:DateField;
-	private var startHour_stp:NumericStepper;
-	private var startMin_stp:NumericStepper;
+	private var scheduleDate_dt:DateField;
+	private var scheduleTime:MovieClip;
+	//private var startHour_stp:NumericStepper;
+	//private var startMin_stp:NumericStepper;
 	
 	//COMBO
 	private var changeStatus_cmb:ComboBox;
@@ -99,7 +110,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	//private var _transitionPropertiesOK:Function;
     private var _lessonTabView:LessonTabView;
 	private var _monitorController:MonitorController;
-	private var _lessonManagerDialog:MovieClip;
+	private var _dialog:MovieClip;
 
     //Defined so compiler can 'see' events added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
@@ -124,6 +135,8 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	*/
 	public function init(m:Observable,c:Controller){
 		super (m, c);
+		
+		
 	}    
 	
 	/**
@@ -168,9 +181,20 @@ public function update (o:Observable,infoObj:Object):Void{
 				_monitorController = getController();
 				showLessonManagerDialog(mm);
 				break;
+			case 'VM_DIALOG' :
+				_monitorController = getController();
+				showLearnersDialog(mm);
+				break;
 			case 'USERS_LOADED' :
-				_lessonManagerDialog.loadLearners(mm.organisation.getLearners());
-				_lessonManagerDialog.loadStaff(mm.organisation.getStaff());
+				//_dialog.checkLearners(mm.organisation.getLearners());
+				//_dialog.checkStaff(mm.organisation.getStaff());
+				//_monitorController.clearBusy();
+				break;
+			case 'LEARNERS_LOADED' :
+				_dialog.checkLearners(mm.organisation);
+				break;
+			case 'STAFF_LOADED' :
+				_dialog.checkStaff(mm.organisation);
 				break;
             default :
                 Debugger.log('unknown update type :' + infoObj.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.LessonTabView');
@@ -187,17 +211,47 @@ public function update (o:Observable,infoObj:Object):Void{
 		//get the content path for the sp
 		_monitorReqTask_mc = reqTasks_scp.content;
 		_monitorController = getController();
+		
 		editClass_btn.addEventListener("click", _monitorController);
-	
+		viewLearners_btn.addEventListener("click", _monitorController);
+		schedule_btn.addEventListener("click", Delegate.create(this, scheduleLessonStart));
+		start_btn.addEventListener("click", _monitorController);
+		statusApply_btn.addEventListener("click", Delegate.create(this, changeStatus))
 		//Debugger.log('_canvas_mc'+_canvas_mc,Debugger.GEN,'draw','CanvasView');
 	
 		trace("Loaded LessonTabView Data"+ this)
+	
+		startMsg_txt.visible = false;
+	
+		var seq:Sequence = mm.getSequence();
+	
+		populateStatusList(seq.state);
+		
+		if(seq.state != Sequence.ACTIVE_STATE_ID){
+		// hide start buttons etc
+			scheduleTime._visible = false;
+			scheduleDate_dt.visible = false;
+			start_btn.visible = false;
+			schedule_btn.visible = false;
+			manageDate_lbl.visible = false;
+			//manageStart_lbl.visible = false;
+		/**	
+			if(seq.isStarted()){
+				startMsg_txt.text = "Currently Started."
+			} else {
+				startMsg_txt.text = "Scheduled to start at "
+			}
+			
+			startMsg_txt.visible = true;
+			*/
+		}
 		
 		//setStyles();
 		//populateLessonDetails();
-		var requestLessonID = mm.getSequence().getSequenceID()
+		var requestLessonID:Number = seq.getSequenceID()
+		
 		var callback:Function = Proxy.create(this,populateLessonDetails);
-		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=getLessonLearners&lessonID='+requestLessonID,callback, false);
+		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=getLessonLearners&lessonID='+String(requestLessonID),callback, false);
 		//getLessonLearners(lessonID)
 		
 		trace('seq id: ' + mm.getSequence().getSequenceID());
@@ -223,83 +277,85 @@ public function update (o:Observable,infoObj:Object):Void{
 		trace("Number of learners are: "+users.length)
 		var s:Object = mm.getSequence();
 		//trace("Number of Learners Sequence are : "+_wm.getLessonClassData().learners.length);
-		LSTitle_txt.text = s._seqName;
-		LSDescription_txt.text = s._seqDescription;
-		sessionStatus_txt.text = showStatus(s._seqStateID);
+		LSTitle_txt.text = s.name;
+		LSDescription_txt.text = s.description;
+		sessionStatus_txt.text = showStatus(s.state);
 		numLearners_txt.text = " of "+String(users.length)
 		//group_txt.text = s._seqDescription
 		//duration_txt.text = s._seqDescription
 		  
+	}
+	
+	private function populateStatusList(stateID:Number):Void{
+		changeStatus_cmb.removeAll();
+		
+		switch(stateID){
+			case Sequence.SUSPENDED_STATE_ID :
+				changeStatus_cmb.addItem("Active", LessonTabView.ACTIVE_CBI);
+				changeStatus_cmb.addItem("Archive", LessonTabView.ARCHIVE_CBI);
+				break;
+			case Sequence.ARCHIVED_STATE_ID :
+				changeStatus_cmb.addItem("Activate", LessonTabView.ACTIVE_CBI);
+				break;
+			case Sequence.ACTIVE_STATE_ID :
+				changeStatus_cmb.addItem("Archive", LessonTabView.ARCHIVE_CBI);
+				break;
+			default :
+			//	if(mm.getSequence().isStarted()){
+					changeStatus_cmb.addItem("Disable", LessonTabView.DISABLE_CBI);
+			//	}
+				changeStatus_cmb.addItem("Archive", LessonTabView.ARCHIVE_CBI);
+				
+		}
 	}
 
 	private function showStatus(seqStatus:Number):String{
 		var seqStat:String;
 		switch(String(seqStatus)){
 			case '6' :
-				seqStat = "Archive"
+				seqStat = "Archived"
 				break;
-			case '7' :
-				seqStat = "Disabled"
+			case '3' :
+				seqStat = "Started"
+				break;
+			case '4' :
+				seqStat = "Suspended"
 				break;
 			default:
 				seqStat = "Active"
 		}
 		return seqStat
 	}
-	/**
-	* Populate the required tasks for the active Sequence 
 	
-	private function populateCCActivities(CCAct:ContributeActivity):Void{
-		//var cAct:ContributeActivity = ContributeActivity.getInstance()
-		// get contribute activities
-		var todos:Array = mm.getToDos();
-		trace("Looking for contribute entries for: "+CCAct.activityID);
-		// show isRequired activities in scrollpane
-		//for (var i=0; i<todos.length; i++){
-			for (var k=0; k<todos[i]._childActivities.length; k++){
-				//trace("Activity IDs in todo list are: "+todos[i].activityID);
-				//if (todos[i]._childActivities[k].activityID == CCAct.activityID) {
-					//if (todos[i]._childActivities[k]._contributeEntries.length !=0){
-						for (var j=0; j<todos[i]._childActivities[k]._contributeEntries.length; j++){ 
-							trace("Contribute Entries for child "+todos[i]._childActivities[k].title+" is: "+todos[i]._childActivities[k]._contributeEntries[j]._contributionType)
-						}
-					//}
-				//}
+	/**
+	 * Apply status change
+	 *   
+	 * 
+	 * @param   evt Apply onclick event
+	 */
+	private function changeStatus(evt:Object):Void{
+		var stateID:Number = changeStatus_cmb.selectedItem.data;
+		switch(stateID){
+			case ACTIVE_CBI :
+				mm.activateSequence();
+				break;
+			case DISABLE_CBI :
+				mm.suspendSequence();
+				break;
+			case ARCHIVE_CBI :
+				mm.archiveSequence();
+				break;
+			default :
+				trace('no such combo box item');
 				
-			}
-	//	}
-		
-		
+		}
+	}
+	
+	private function scheduleLessonStart(evt:Object):Void{
+		var datetime:String = getScheduleDateTime(scheduleDate_dt.selectedDate, scheduleTime.f_returnTime());
+		mm.getMonitor().startLesson(true, _root.lessonID, datetime);
 	}
 
-	/**
-	* Populate the required tasks for the active Sequence 
-	
-	private function populateContributeActivities():Void{
-		// get contribute activities
-		var todos:Array = mm.getToDos();
-		trace('contrib. act length: ' + todos.length);
-		// show isRequired activities in scrollpane
-		for (var i=0; i<todos.length; i++){
-			trace("_monitorReqTask_mc.Show Title"+todos[i].title)
-			if (todos[i]._childActivities.length !=0){
-				for (var j=0; j<todos[i]._childActivities.length; j++){
-					trace(todos[i].title+"'s Child Activity "+j+" is: "+todos[i]._childActivities[j].title)
-					populateCCActivities(todos[i]._childActivities[j])
-				}
-			}else {
-				if (todos[i]._contributeEntries.length !=0){
-					for (var j=0; j<todos[i]._contributeEntries.length; j++){ 
-						trace("Contribute Entry for "+j+" is: "+todos[i]._contributeEntries[j]._contributionType)
-					}
-				}
-			}
-			//}
-		}
-		
-		
-	}
-	*/
 	private function populateContributeActivities():Void{
 		var todos:Array = mm.getToDos();
 		// show isRequired activities in scrollpane
@@ -392,7 +448,7 @@ public function update (o:Observable,infoObj:Object):Void{
 				listCount++
 			}else{
 				// child CA
-				trace('child entries length:' + o.entries.length)
+				trace('child entries length:' + o.entrievs.length)
 				if(o.entries.length > 0){
 					trace('now drawing child');
 					// write child ca title (indented - x + 10 position)
@@ -412,8 +468,20 @@ public function update (o:Observable,infoObj:Object):Void{
 		trace('doing Lesson Manager popup...');
 		trace('app root: ' + mm.getMonitor().root);
 		trace('lfwindow: ' + LFWindow);
-        var dialog:MovieClip = PopUpManager.createPopUp(mm.getMonitor().root, LFWindow, true,{title:"TEST",closeButton:true,scrollContentPath:'selectClass'});
+        var dialog:MovieClip = PopUpManager.createPopUp(mm.getMonitor().root, LFWindow, true,{title:"Edit Class",closeButton:true,scrollContentPath:'selectClass'});
 		dialog.addEventListener('contentLoaded',Delegate.create(_monitorController,_monitorController.openDialogLoaded));
+		
+    }
+	
+	/**
+    * Opens the lesson manager dialog
+    */
+    public function showLearnersDialog(mm:MonitorModel) {
+		trace('doing Learners popup...');
+		trace('app root: ' + mm.getMonitor().root);
+		trace('lfwindow: ' + LFWindow);
+        var opendialog:MovieClip = PopUpManager.createPopUp(mm.getMonitor().root, LFWindow, true,{title:"View Learners",closeButton:true,scrollContentPath:'learnersDialog'});
+		opendialog.addEventListener('contentLoaded',Delegate.create(_monitorController,_monitorController.openDialogLoaded));
 		
     }
 	
@@ -423,16 +491,16 @@ public function update (o:Observable,infoObj:Object):Void{
 	 * @param   newworkspaceDialog 
 	 * @return  
 	 */
-	public function set lessonManagerDialog (newLessonManagerDialog:MovieClip):Void {
-		_lessonManagerDialog = newLessonManagerDialog;
+	public function set dialog (dialog:MovieClip):Void {
+		_dialog = dialog;
 	}
 	/**
 	 * 
 	 * @usage   
 	 * @return  
 	 */
-	public function get lessonManagerDialog ():MovieClip {
-		return _lessonManagerDialog;
+	public function get dialog ():MovieClip {
+		return _dialog;
 	}
 	
 	public function setupLabels(){
@@ -447,15 +515,14 @@ public function update (o:Observable,infoObj:Object):Void{
 		manageClass_lbl.text = "Class:"
 		manageStatus_lbl.text = "Status:"
 		manageStart_lbl.text = "Start:"
-		manageMin_lbl.text = "Minutes"
-		manageHour_lbl.text = "Hour"
 		manageDate_lbl.text = "Date"
 			
 		//Button
 		viewLearners_btn.label = "View Learners"
 		editClass_btn.label = "Edit Class"
 		statusApply_btn.label = "Apply"
-		setDateTime_btn.label = "Start Now"
+		schedule_btn.label = "Schedule"
+		start_btn.label = "Start Now"
 		
 		_lessonStateArr = ["CREATED", "NOT_STARTED", "STARTED", "SUSPENDED", "FINISHED", "ARCHIVED", "DISABLED"];
 		
@@ -489,32 +556,55 @@ public function update (o:Observable,infoObj:Object):Void{
 		manageClass_lbl.setStyle('styleName',styleObj);
 		manageStatus_lbl.setStyle('styleName',styleObj);
 		manageStart_lbl.setStyle('styleName',styleObj);
-		manageMin_lbl.setStyle('styleName',styleObj);
-		manageHour_lbl.setStyle('styleName',styleObj);
 		manageDate_lbl.setStyle('styleName',styleObj);
 		
 		//BUTTONS
 		styleObj = _tm.getStyleObject('button');
 		viewLearners_btn.setStyle('styleName',styleObj);
 		editClass_btn.setStyle('styleName',styleObj);
-		setDateTime_btn.setStyle('styleName',styleObj);
+		schedule_btn.setStyle('styleName',styleObj);
+		start_btn.setStyle('styleName',styleObj);
 		statusApply_btn.setStyle('styleName',styleObj);
 		
 		//COMBO
 		styleObj = _tm.getStyleObject('combo');
 		changeStatus_cmb.setStyle('styleName',styleObj);
-		startDate_dt.setStyle('styleName',styleObj);
+		scheduleDate_dt.setStyle('styleName',styleObj);
 		
 		//STEPPER
 		styleObj = _tm.getStyleObject('numericstepper');
-		startHour_stp.setStyle('styleName',styleObj);
-		startMin_stp.setStyle('styleName',styleObj);
+		//startHour_stp.setStyle('styleName',styleObj);
+		//startMin_stp.setStyle('styleName',styleObj);
 		
 		//SCROLLPANE
 		reqTasks_scp.border_mc.setStyle('_visible',false);
 		
     }
     
+	public function getScheduleDateTime(date:Date, timeStr:String):String{
+		var bs:String = "%2F";		// backslash char
+		var dayStr:String;
+		var monthStr:String;
+		
+		trace('output time: ' + timeStr);
+		var day = date.getDate();
+		if(day<10){
+			dayStr=String(0)+day;
+		} else {
+			dayStr=day.toString();
+		}
+		
+		var month = date.getMonth()+1;
+		if(month<10){
+			monthStr=String(0)+month;
+		} else {
+			monthStr = month.toString();
+		}
+		
+		var dateStr = dayStr + bs + monthStr + bs + date.getFullYear();
+		trace('selected date: ' + dateStr);
+		return dateStr + '+' + timeStr;
+	}
 	
 	/**
     * Sets the size of the canvas on stage, called from update
