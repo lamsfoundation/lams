@@ -1611,8 +1611,8 @@
 <column name="organisation_state_id" alias="" remarks="" mandatory="true" column-size="3" decimal-digits="0" default-value="" auto-increment="false">
 <column-description/>
 <data-type name="INT" jdbc-type="4" selected-variant-pattern="INT(%n)">
-<variant type-name-pattern="INT"/>
 <variant type-name-pattern="INT(%n)" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT"/>
 <variant type-name-pattern="INT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="10"/>
 <variant type-name-pattern="INT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
 <variant type-name-pattern="INT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
@@ -2775,7 +2775,13 @@
 <foreign-key-column column-name="previous_activity_id" referenced-key-column-name="activity_id"/>
 </foreign-key>
 </foreign-key-list>
-<index-list/>
+<index-list>
+<index name="IX_lams_learner_progress_1" alias="" remarks="" unique="true">
+<index-description/>
+<index-column name="user_id" sort="ASC"/>
+<index-column name="lesson_id" sort="ASC"/>
+</index>
+</index-list>
 </table>
 <table name="lams_tool" alias="" remarks="">
 <table-description/>
@@ -4896,8 +4902,8 @@ Each style may have a subset of properties, such as "_tf"</table-description>
 <column name="organisation_state_id" alias="" remarks="" mandatory="true" column-size="3" decimal-digits="0" default-value="" auto-increment="false">
 <column-description/>
 <data-type name="INT" jdbc-type="4" selected-variant-pattern="INT(%n)">
-<variant type-name-pattern="INT"/>
 <variant type-name-pattern="INT(%n)" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT"/>
 <variant type-name-pattern="INT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="10"/>
 <variant type-name-pattern="INT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
 <variant type-name-pattern="INT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>

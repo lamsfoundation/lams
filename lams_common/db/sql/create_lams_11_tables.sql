@@ -580,6 +580,7 @@ CREATE TABLE lams_learner_progress (
      , CONSTRAINT FK_lams_learner_progress_5 FOREIGN KEY (previous_activity_id)
                   REFERENCES lams_learning_activity (activity_id)
 )TYPE=InnoDB;
+CREATE UNIQUE INDEX IX_lams_learner_progress_1 ON lams_learner_progress (user_id ASC, lesson_id ASC);
 
 CREATE TABLE lams_cr_node (
        node_id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT
