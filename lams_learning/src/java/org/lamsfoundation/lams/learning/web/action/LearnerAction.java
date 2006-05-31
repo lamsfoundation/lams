@@ -145,19 +145,18 @@ public class LearnerAction extends LamsDispatchAction
     	try {
 	
 	        //get user and lesson based on request.
-	        User learner = LearningWebUtil.getUserData(getServlet().getServletContext());
+	        Integer learner = LearningWebUtil.getUserId(getServlet().getServletContext());
 	        long lessonID = WebUtil.readLongParam(request,LearningWebUtil.PARAM_LESSON_ID);
 	
 	        
 	        if(log.isDebugEnabled())
-	            log.debug("The learner ["+learner.getUserId()+"],["+learner.getFullName()
-	                      +"is joining the lesson ["+lessonID+"]");
+	            log.debug("The learner ["+learner+"] is joining the lesson ["+lessonID+"]");
 	
 	        //join user to the lesson on the server
 	        LearnerProgress learnerProgress = learnerService.joinLesson(learner,lessonID);
 	        
 	        if(log.isDebugEnabled())
-	            log.debug("The learner ["+learner.getUserId()+"] joined lesson. The"
+	            log.debug("The learner ["+learner+"] joined lesson. The"
 	                      +"porgress data is:"+learnerProgress.toString());
 	        
 	        LearningWebUtil.setLearnerProgress(learnerProgress);
@@ -370,7 +369,9 @@ public class LearnerAction extends LamsDispatchAction
 	        ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 	
 	        //getting requested object according to coming parameters
-	        User learner = LearningWebUtil.getUserData(getServlet().getServletContext());
+	        Integer learnerId = LearningWebUtil.getUserId(getServlet().getServletContext());
+	        User learner = LearnerServiceProxy.getUserManagementService(getServlet().getServletContext()).getUserById(learnerId);
+
 	        Activity requestedActivity = learnerService.getActivity(new Long(activityId));
 	        
 	        //preparing tranfer object for flash

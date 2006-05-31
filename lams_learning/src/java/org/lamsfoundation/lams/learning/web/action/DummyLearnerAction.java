@@ -39,10 +39,7 @@ import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
-import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.util.wddx.FlashMessage;
-import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 
 
@@ -108,9 +105,9 @@ public class DummyLearnerAction extends LamsDispatchAction
         ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 
         //get learner.
-        User learner = LearningWebUtil.getUserData(getServlet().getServletContext());
+        Integer learner = LearningWebUtil.getUserId(getServlet().getServletContext());
         if(log.isDebugEnabled())
-            log.debug("Getting active lessons for leaner:"+learner.getFullName()+"["+learner.getUserId()+"]");
+            log.debug("Getting active lessons for leaner:["+learner+"]");
 
         LessonDTO [] lessons = learnerService.getActiveLessonsFor(learner);
         request.getSession().setAttribute(PARAM_LESSONS, lessons); 
@@ -146,20 +143,19 @@ public class DummyLearnerAction extends LamsDispatchAction
         ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 
         //get user and lesson based on request.
-        User learner = LearningWebUtil.getUserData(getServlet().getServletContext());
+        Integer learner = LearningWebUtil.getUserId(getServlet().getServletContext());
         long lessonID = WebUtil.readLongParam(request,LearningWebUtil.PARAM_LESSON_ID);
 
         
         if(log.isDebugEnabled())
-            log.debug("The learner ["+learner.getUserId()+"],["+learner.getFullName()
-                      +"is joining the lesson ["+lessonID+"]");
+            log.debug("The learner ["+learner+"] is joining the lesson ["+lessonID+"]");
 
         //join user to the lesson on the server
         LearnerProgress learnerProgress = learnerService.joinLesson(learner,lessonID);
         
         if(log.isDebugEnabled())
-            log.debug("The learner ["+learner.getUserId()+"] joined lesson. The"
-                      +"porgress data is:"+learnerProgress.toString());
+            log.debug("The learner ["+learner+"] joined lesson. The"
+                      +"progress data is:"+learnerProgress.toString());
         
         LearningWebUtil.setLearnerProgress(learnerProgress);
         return mapping.findForward(DISPLAY_ACTIVITY);

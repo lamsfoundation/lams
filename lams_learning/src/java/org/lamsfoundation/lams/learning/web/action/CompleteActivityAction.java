@@ -26,19 +26,18 @@ package org.lamsfoundation.lams.learning.web.action;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
 import org.lamsfoundation.lams.learning.web.bean.SessionBean;
-import org.lamsfoundation.lams.learning.web.form.ActivityForm;
+import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
+import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
-import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
-import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 
 /**
  * @author daveg
@@ -65,7 +64,6 @@ public class CompleteActivityAction extends ActivityAction {
 			ActionForm actionForm,
 			HttpServletRequest request,
 			HttpServletResponse response) {
-		ActivityForm form = (ActivityForm)actionForm;
 		ActivityMapping actionMappings = getActivityMapping();
 		
 		SessionBean sessionBean = getSessionBean(request);
@@ -81,11 +79,9 @@ public class CompleteActivityAction extends ActivityAction {
 			return mapping.findForward(ActivityMapping.DOUBLE_SUBMIT_ERROR);
 		}
 		
-		// Get learner
-		User learner = sessionBean.getLearner();
-		Lesson lesson = sessionBean.getLesson();
-		
+		Integer learnerId = LearningWebUtil.getUserId(getServlet().getServletContext());
 		LearnerProgress progress = getLearnerProgress(request);
+		Lesson lesson = progress.getLesson();
 		Activity activity = LearningWebUtil.getActivityFromRequest(request, getLearnerService());
 		
 		if (activity == null) {
@@ -97,7 +93,7 @@ public class CompleteActivityAction extends ActivityAction {
 		
 		// Set activity as complete
 		try {
-			progress = learnerService.calculateProgress(activity, learner, lesson);
+			progress = learnerService.calculateProgress(activity, learnerId, lesson);
 		}
 		catch (LearnerServiceException e) {
 			return mapping.findForward("error");

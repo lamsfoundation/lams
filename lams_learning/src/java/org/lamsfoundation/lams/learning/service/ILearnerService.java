@@ -59,21 +59,21 @@ public interface ILearnerService
  
     /**
      * Joins a User to a a new lesson as a learner
-     * @param learner the Learner
+     * @param learnerId the Learner's userID
      * @param lessionID identifies the Lesson to start
      * @throws LearnerServiceException in case of problems.
      */
-    public LearnerProgress joinLesson(User learner, Long lessonID) ;
+    public LearnerProgress joinLesson(Integer learnerId, Long lessonID) ;
     
 
     /**
      * Returns the current progress data of the User.
-     * @param learner the Learner
+     * @param learnerId the Learner's userID
      * @param lesson the Lesson to get progress from.
      * @return LearnerProgess contains the learner's progress for the lesson.
      * @throws LearnerServiceException in case of problems.
      */
-    public LearnerProgress getProgress(User learner, Lesson lesson);
+    public LearnerProgress getProgress(Integer learnerId, Lesson lesson);
     
     /**
      * Return the current progress data against progress id.
@@ -92,12 +92,12 @@ public interface ILearnerService
 
     /**
      * Marks an activity as attempted. Called when a user selects an OptionsActivity.
-     * @param learner the Learner
+     * @param learnerId the Learner's userID
      * @param lesson the Lesson to get progress from.
      * @param activity the activity being attempted.
      * @return LearnerProgress
      */
-    public LearnerProgress chooseActivity(User learner, Lesson lesson, Activity activity);
+    public LearnerProgress chooseActivity(Integer learnerId, Lesson lesson, Activity activity);
 
     
     /**
@@ -108,13 +108,17 @@ public interface ILearnerService
      * @return the bean containing the display data for the Learner
      * @throws LearnerServiceException in case of problems.
      */
-    public LearnerProgress calculateProgress(Activity completedActivity, User learner, Lesson lesson); 
+    public LearnerProgress calculateProgress(Activity completedActivity, Integer learnerId, Lesson lesson); 
 
     
     /**
      * Marks an tool session as complete and calculates the next activity against
      * the learning design. This method is for tools to redirect the client on 
      * complete.
+     * 
+     * Do not change learnerId to Integer (to match the other calls)
+     * as all the tools expect this to be a Long.
+     * 
      * @param toolSessionId, session ID for completed tool
      * @param learnerId the learner who is completing the tool session.
      * @return the URL for the next activity
@@ -129,12 +133,12 @@ public interface ILearnerService
      * grouping and gate. This method should be used when we don't have an activity
      * or a lesson that is already part of the Hibernate session. 
      * 
-     * @param learner the learner who are running this activity in the design.
+     * @param learnerId the learner who are running this activity in the design.
      * @param activity the activity is being run.
      * @param lesson id the lesson this learner is currently in.
      * @return the url for next activity.
      */
-    public String completeActivity(User learner,Long activityId,Long lessonId);
+    public String completeActivity(Integer learnerId,Long activityId,Long lessonId);
   
     /**
      * Complete the activity in the progress engine and delegate to the progress 
@@ -142,21 +146,21 @@ public interface ILearnerService
      * be used when we t have an activity that is already part of the Hibernate session. 
      * It is currently triggered by complete tool session progress from tool.
      * 
-     * @param learner the learner who are running this activity in the design.
+     * @param learnerId the learner who are running this activity in the design.
      * @param activity the activity is being run.
      * @param lesson the lesson this learner is currently in.
      * @return the url for next activity.
      */
-    public String completeActivity(User learner,Activity activity,Lesson lesson);
+    public String completeActivity(Integer learnerId,Activity activity,Lesson lesson);
 
     /**
      * Retrieve all lessons that has been started, suspended or finished. All
      * finished but archived lesson should not be loaded.
-     * 
+     * TODO to be removed when dummy learner interface is removed
      * @param learner the user who intend to start a lesson
      * @return a list of active lessons.
      */
-    public LessonDTO[] getActiveLessonsFor(User learner);
+    public LessonDTO[] getActiveLessonsFor(Integer learnerId);
     
     /**
      * Mark the learner progress as restarting to indicate the current learner
@@ -180,6 +184,12 @@ public interface ILearnerService
      */
     public List getActiveLearnersByLesson(long lessonId);
     
+    /**
+     * Returns a count of all the active learners by lesson id.
+     * More efficient than calling getActiveLearnersByLesson(lessonId).size()
+     */
+    public Integer getCountActiveLearnersByLesson(long lessonId);
+
     /**
      * Perform random grouping for the learners who have started the lesson,
      * based on the grouping activity. This method should be used when we don't 

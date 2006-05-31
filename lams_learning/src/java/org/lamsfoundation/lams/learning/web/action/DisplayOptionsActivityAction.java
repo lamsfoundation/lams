@@ -102,11 +102,14 @@ public class DisplayOptionsActivityAction extends ActivityAction {
 			activityURLs.add(activityURL);
 		}
 		form.setActivityURLs(activityURLs);
-		if (completedCount >= optionsActivity.getMinNumberOfOptions().intValue()) {
+		
+		Integer minNum = optionsActivity.getMinNumberOfOptions();
+		Integer maxNum = optionsActivity.getMaxNumberOfOptions();
+		if ( ( minNum == null && completedCount > 0) || ( minNum != null && minNum.intValue() <= completedCount)  ){
 			form.setFinished(true);
 		}
-		form.setMinimum(optionsActivity.getMinNumberOfOptions().intValue());
-		form.setMaximum(optionsActivity.getMaxNumberOfOptions().intValue());
+		form.setMinimum(minNum!=null?optionsActivity.getMinNumberOfOptions().intValue():0);
+		form.setMaximum(maxNum!=null?optionsActivity.getMaxNumberOfOptions().intValue():subActivities.size());
 		
 		this.saveToken(request);
 		

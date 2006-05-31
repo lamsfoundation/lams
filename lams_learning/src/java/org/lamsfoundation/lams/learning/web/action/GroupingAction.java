@@ -147,16 +147,9 @@ public class GroupingAction extends LamsDispatchAction
     {
         //initialize service object
         ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
-        //get current user and lesson data via http. It ensures they are availabe
-        //in the http session. If not, we assume parameters are coming from 
-        //request or falsh and we can create learner and lesson objects.
-        User learner = LearningWebUtil.getUserData(getServlet().getServletContext());
-        Lesson lesson = LearningWebUtil.getLessonData(request,getServlet().getServletContext());
-        
+     
         Activity groupingActivity = LearningWebUtil.getActivityFromRequest(request,learnerService);
-        
-        List groups = new ArrayList(((GroupingActivity)groupingActivity).getCreateGrouping()
-                                    									.getGroups());
+        List groups = new ArrayList(((GroupingActivity)groupingActivity).getCreateGrouping().getGroups());
         request.getSession().setAttribute(GROUPS,groups);
         request.setAttribute(LearningWebUtil.PARAM_ACTIVITY_ID,
                              groupingActivity.getActivityId());
@@ -189,7 +182,7 @@ public class GroupingAction extends LamsDispatchAction
         Activity groupingActivity = LearningWebUtil.getActivityFromRequest(request,learnerService);
 
         
-        String nextActivityUrl = learnerService.completeActivity(learnerProgress.getUser(),
+        String nextActivityUrl = learnerService.completeActivity(learnerProgress.getUser().getUserId(),
                                                                   groupingActivity,
                                                                   learnerProgress.getLesson());
         

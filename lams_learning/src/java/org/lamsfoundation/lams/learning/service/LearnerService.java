@@ -179,8 +179,9 @@ public class LearnerService implements ILearnerService
      * Delegate to lesson dao to load up the lessons.
      * @see org.lamsfoundation.lams.learning.service.ILearnerService#getActiveLessonsFor(org.lamsfoundation.lams.usermanagement.User)
      */
-    public LessonDTO[] getActiveLessonsFor(User learner)
+    public LessonDTO[] getActiveLessonsFor(Integer learnerId)
     {
+    	User learner = userManagementService.getUserById(learnerId);
         List activeLessons = this.lessonDAO.getActiveLessonsForLearner(learner);
         return getLessonDataFor(activeLessons);
     }
@@ -213,15 +214,17 @@ public class LearnerService implements ILearnerService
      * current activity.</p
      * 
      * 
-     * @param learner the Learner
+     * @param learnerId the Learner's userID
      * @param lessionID identifies the Lesson to start
      * @throws LamsToolServiceException
      * @throws LearnerServiceException in case of problems.
      */
-    public LearnerProgress joinLesson(User learner, Long lessonID)  
+    public LearnerProgress joinLesson(Integer learnerId, Long lessonID)  
     {
+    	User learner = userManagementService.getUserById(learnerId);
+    	
     	Lesson lesson = getLesson(lessonID);
-        LearnerProgress learnerProgress = learnerProgressDAO.getLearnerProgressByLearner(learner,lesson);
+        LearnerProgress learnerProgress = learnerProgressDAO.getLearnerProgressByLearner(learner.getUserId(),lesson);
     	
         if(learnerProgress==null)
         {
@@ -258,14 +261,14 @@ public class LearnerService implements ILearnerService
 
     /**
      * Returns the current progress data of the User. 
-     * @param learner the Learner
+     * @param learnerId the Learner's userID
      * @param lesson the Lesson to get progress from.
      * @return LearnerProgess contains the learner's progress for the lesson.
      * @throws LearnerServiceException in case of problems.
      */
-    public LearnerProgress getProgress(User learner, Lesson lesson)
+    public LearnerProgress getProgress(Integer learnerId, Lesson lesson)
     {
-        return learnerProgressDAO.getLearnerProgressByLearner(learner, lesson);
+        return learnerProgressDAO.getLearnerProgressByLearner(learnerId, lesson);
     }
     
     /**
@@ -287,9 +290,9 @@ public class LearnerService implements ILearnerService
     /**
      * @see org.lamsfoundation.lams.learning.service.ILearnerService#chooseActivity(org.lamsfoundation.lams.usermanagement.User, org.lamsfoundation.lams.lesson.Lesson, org.lamsfoundation.lams.learningdesign.Activity)
      */
-    public LearnerProgress chooseActivity(User learner, Lesson lesson, Activity activity) 
+    public LearnerProgress chooseActivity(Integer learnerId, Lesson lesson, Activity activity) 
     {
-    	LearnerProgress progress = learnerProgressDAO.getLearnerProgressByLearner(learner, lesson);
+    	LearnerProgress progress = learnerProgressDAO.getLearnerProgressByLearner(learnerId, lesson);
     	progress.setProgressState(activity, LearnerProgress.ACTIVITY_ATTEMPTED);
     	learnerProgressDAO.saveLearnerProgress(progress);
     	return progress;
@@ -308,14 +311,14 @@ public class LearnerService implements ILearnerService
      * @throws LearnerServiceException in case of problems.
      */
     public LearnerProgress calculateProgress(Activity completedActivity, 
-                                             User learner, 
+                                             Integer learnerId, 
                                              Lesson lesson) 
     {
-        LearnerProgress learnerProgress = learnerProgressDAO.getLearnerProgressByLearner(learner,lesson);
+        LearnerProgress learnerProgress = learnerProgressDAO.getLearnerProgressByLearner(learnerId,lesson);
 
         try
         {
-            learnerProgress = progressEngine.calculateProgress(learner, lesson, completedActivity,learnerProgress);
+            learnerProgress = progressEngine.calculateProgress(learnerProgress.getUser(), lesson, completedActivity,learnerProgress);
             learnerProgressDAO.updateLearnerProgress(learnerProgress);
             
             createToolSessionsIfNecessary(learnerProgress);
@@ -334,7 +337,7 @@ public class LearnerService implements ILearnerService
     }
     
     /**
-     * @see org.lamsfoundation.lams.learning.service.ILearnerService#completeToolSession(long, User)
+     * @see org.lamsfoundation.lams.learning.service.ILearnerService#completeToolSession(java.lang.Long, java.lang.Long)
      */
     public String completeToolSession(Long toolSessionId, Long learnerId) 
     {
@@ -345,23 +348,22 @@ public class LearnerService implements ILearnerService
         
         lamsCoreToolService.updateToolSession(toolSession);
         
-    	User learner = userManagementService.getUserById(new Integer(learnerId.intValue()));
-        return completeActivity(learner, toolSession.getToolActivity(), toolSession.getLesson());
+        return completeActivity(new Integer(learnerId.intValue()), toolSession.getToolActivity(), toolSession.getLesson());
     }
     
     /**
-     * @see org.lamsfoundation.lams.learning.service.ILearnerService#completeActivity(org.lamsfoundation.lams.usermanagement.User, java.lang.Long, java.lang.Long)
+     * @see org.lamsfoundation.lams.learning.service.ILearnerService#completeActivity(java.lang.Integer, java.lang.Long, java.lang.Long)
      */
-    public String completeActivity(User learner,Long activityId,Long lessonId) {
+    public String completeActivity(Integer learnerId,Long activityId,Long lessonId) {
     	Activity activity = getActivity(activityId);
 		Lesson lesson = getLesson(lessonId); 
-    	return completeActivity(learner, activity,lesson);
+    	return completeActivity(learnerId, activity,lesson);
     }
 
     /**
-     * @see org.lamsfoundation.lams.learning.service.ILearnerService#completeActivity(org.lamsfoundation.lams.usermanagement.User, org.lamsfoundation.lams.learningdesign.Activity,org.lamsfoundation.lams.lesson.Lesson )
+     * @see org.lamsfoundation.lams.learning.service.ILearnerService#completeActivity(java.lang.Integer, org.lamsfoundation.lams.learningdesign.Activity,org.lamsfoundation.lams.lesson.Lesson )
      */
-    public String completeActivity(User learner,Activity activity,Lesson lesson)
+    public String completeActivity(Integer learnerId,Activity activity,Lesson lesson)
     {
         //build up the url for next activity.
     	
@@ -371,7 +373,7 @@ public class LearnerService implements ILearnerService
     	// is triggered from a tool calling completeToolSession, its a bit hard to avoid.
     	try 
     	{
-	    	LearnerProgress nextLearnerProgress = calculateProgress(activity, learner,lesson);
+	    	LearnerProgress nextLearnerProgress = calculateProgress(activity, learnerId, lesson);
 	    	LearningWebUtil.setLearnerProgress(nextLearnerProgress);
 	    	return activityMapping.getProgressURL(nextLearnerProgress);
     	}
@@ -584,6 +586,15 @@ public class LearnerService implements ILearnerService
      */
     public List getActiveLearnersByLesson(long lessonId)
     {
-        return this.lessonDAO.getActiveLearnerByLesson(lessonId);
+    	return lessonService.getActiveLessonLearners(lessonId);
     }
+    
+    /**
+     * @see org.lamsfoundation.lams.learning.service.ILearnerService#getCountActiveLessonLearners(long)
+     */
+    public Integer getCountActiveLearnersByLesson(long lessonId)
+    {
+    	return lessonService.getCountActiveLessonLearners(lessonId);
+    }
+
 }

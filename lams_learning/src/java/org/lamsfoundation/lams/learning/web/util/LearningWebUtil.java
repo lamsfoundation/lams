@@ -28,15 +28,12 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.web.action.ActivityAction;
-import org.lamsfoundation.lams.learning.web.bean.SessionBean;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
-import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -53,7 +50,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 public class LearningWebUtil
 {
     
-	private static Logger log = Logger.getLogger(LearningWebUtil.class);
+//	private static Logger log = Logger.getLogger(LearningWebUtil.class);
     //---------------------------------------------------------------------
     // Class level constants - session attributes
     //---------------------------------------------------------------------
@@ -71,21 +68,11 @@ public class LearningWebUtil
      * @param surveyService the service facade of survey tool
      * @return the user data value object
      */
-    public static User getUserData(ServletContext servletContext)
+    public static Integer getUserId(ServletContext servletContext)
     {
         HttpSession ss = SessionManager.getSession();
         UserDTO learner = (UserDTO) ss.getAttribute(AttributeNames.USER);
-
-        //if no session cache available, retrieve it from data source
-        if ( learner != null ) {
-	        User currentUser = LearnerServiceProxy.getUserManagementService(servletContext)
-	        								 .getUserById(learner.getUserID());
-	        if(log.isDebugEnabled()&&currentUser!=null)
-	            log.debug("user retrieved from database:"+currentUser.getUserId());
-	        
-	        return currentUser;
-        }
-        return null;
+        return learner != null ? learner.getUserID() : null;
     }
     
     /**
@@ -132,35 +119,6 @@ public class LearningWebUtil
         }
     }
    
-    /**
-     * Helper method to get session bean. 
-     * TODO resolve the duplicate code in activity action.
-     * @param request A standard Servlet HttpServletRequest class.
-     * @param servletContext the servlet container that has all resources
-     * @return The requested lesson.
-     */
-    public static SessionBean getSessionBean(HttpServletRequest request,ServletContext servletContext)
-    {
-        SessionBean bean = (SessionBean)request.getSession().getAttribute(SessionBean.NAME);
-        
-        //create new one from database
-        if(bean ==null)
-        {
-            //initialize service object
-            ILearnerService learnerService = LearnerServiceProxy.getLearnerService(servletContext);
-
-            User currentLearner = getUserData(servletContext);
-            Lesson lesson = getLessonData(request,servletContext);
-            LearnerProgress progress = learnerService.getProgress(currentLearner,lesson);
-            bean = new SessionBean(currentLearner,lesson,progress);
-            
-//          TODO don't cache it currently - would do it via jboss cache!
-//            request.getSession().setAttribute(SessionBean.NAME,bean);
-//            request.getSession().setAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE,progress);
-        }
-        return bean;
-    }
-
 	/** 
 	 * Put the learner progress in the user's special session object.
 	 */
@@ -208,7 +166,7 @@ public class LearningWebUtil
 		{
             //initialize service object
             ILearnerService learnerService = LearnerServiceProxy.getLearnerService(servletContext);
-            User currentLearner = getUserData(servletContext);
+            Integer currentLearner = getUserId(servletContext);
             Lesson lesson = getLessonData(request,servletContext);
             learnerProgress = learnerService.getProgress(currentLearner,lesson);
 		    setLearnerProgress(learnerProgress);

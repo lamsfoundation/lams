@@ -32,7 +32,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.Vector;
@@ -200,7 +199,7 @@ public class ExportPortfolioService implements IExportPortfolioService {
 	
 	    if (learner != null && lesson != null)
 	    {
-	        LearnerProgress learnerProgress = learnerService.getProgress(learner, lesson);
+	        LearnerProgress learnerProgress = learnerService.getProgress(learner.getUserId(), lesson);
 	        
 		    if (learnerProgress != null)
 		    {

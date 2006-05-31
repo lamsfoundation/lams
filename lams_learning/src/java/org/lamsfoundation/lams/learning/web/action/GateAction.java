@@ -117,6 +117,7 @@ public class GateAction extends LamsDispatchAction
         
         //initialize service object
         ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+        Integer totalNumActiveLearners =  learnerService.getCountActiveLearnersByLesson(learnerProgress.getLesson().getLessonId());
         //knock the gate
         boolean gateOpen = learnerService.knockGate(learnerProgress.getLesson().getLessonId(),
         											learnerProgress.getNextActivity().getActivityId(),
@@ -126,7 +127,7 @@ public class GateAction extends LamsDispatchAction
         // if we reuse our cached entries, hibernate may throw session errors (if the objects are CGLIB entities).
         if(gateOpen)
         {
-            String nextActivityUrl = learnerService.completeActivity(learnerProgress.getUser(),
+            String nextActivityUrl = learnerService.completeActivity(learnerProgress.getUser().getUserId(),
                                                                      learnerProgress.getNextActivity().getActivityId(),
                                                                      learnerProgress.getLesson().getLessonId());
             // get the update
@@ -138,7 +139,7 @@ public class GateAction extends LamsDispatchAction
         else {
         	learnerProgress = learnerService.getProgressById(learnerProgress.getLearnerProgressId());
             LearningWebUtil.setLearnerProgress(learnerProgress);
-            return findViewByGateType(mapping, (DynaActionForm)form, learnerProgress.getCurrentActivity());
+            return findViewByGateType(mapping, (DynaActionForm)form, learnerProgress.getCurrentActivity(), totalNumActiveLearners);
         }
     }
 	
@@ -177,15 +178,18 @@ public class GateAction extends LamsDispatchAction
      * @param gateForm The ActionForm class that will contain any data submitted
      * by the end-user via a form.
      * @param permissionGate the gate acitivty object
+     * @param totalNumActiveLearners total number of active learners in the lesson (may not all be logged in)
      * @return An ActionForward class that will be returned to the ActionServlet 
      * 		   indicating where the user is to go next.
      */
     private ActionForward findViewByGateType(ActionMapping mapping, 
                                              DynaActionForm gateForm, 
-                                             Activity gate)
+                                             Activity gate,
+                                             Integer totalNumActiveLearners)
     {
         //dispatch the view according to the type of the gate.
        	if ( gate != null ) {
+       		gateForm.set("totalLearners",totalNumActiveLearners);
 	        if(gate.isSynchGate())
 	            return viewSynchGate(mapping,gateForm,(SynchGateActivity)gate);
 	        else if(gate.isScheduleGate())
@@ -218,7 +222,6 @@ public class GateAction extends LamsDispatchAction
                                              PermissionGateActivity permissionGate)
     {
         gateForm.set("gate",permissionGate);
-        gateForm.set("waitingLearners",new Integer(permissionGate.getWaitingLearners().size()));
         return mapping.findForward(VIEW_PERMISSION_GATE);
     }
 

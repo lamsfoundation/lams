@@ -31,14 +31,11 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
-import org.lamsfoundation.lams.learning.web.bean.SessionBean;
-import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
-import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * @author daveg
@@ -62,14 +59,7 @@ public class ChooseActivityAction extends ActivityAction {
 			ActionForm actionForm,
 			HttpServletRequest request,
 			HttpServletResponse response) {
-		ActivityForm form = (ActivityForm) actionForm;
 		ActivityMapping actionMappings = getActivityMapping();
-		
-		SessionBean sessionBean = getSessionBean(request);
-		if (sessionBean == null) {
-			// forward to the no session error page
-			return mapping.findForward(ActivityMapping.NO_SESSION_ERROR);
-		}
 		
 		// check token
 		if (!this.isTokenValid(request, true)) {
@@ -78,11 +68,11 @@ public class ChooseActivityAction extends ActivityAction {
 			return mapping.findForward(ActivityMapping.DOUBLE_SUBMIT_ERROR);
 		}
 		
-		// Get learner
-		User learner = sessionBean.getLearner();
-		Lesson lesson = sessionBean.getLesson();
-		
+		// Get learner and lesson details.
+		Integer learner = LearningWebUtil.getUserId(getServlet().getServletContext());
 		LearnerProgress progress = getLearnerProgress(request);
+		Lesson lesson = progress.getLesson();
+		
 		Activity activity = LearningWebUtil.getActivityFromRequest(request, getLearnerService());
 		
 		if (activity == null) {
