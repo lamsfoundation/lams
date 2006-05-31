@@ -148,6 +148,11 @@
 	<bean id="exportToolContentServiceTarget" class="org.lamsfoundation.lams.learningdesign.service.ExportToolContentService">
 		<property name="activityDAO"><ref bean="activityDAO"/></property>
 		<property name="toolDAO"><ref bean="toolDAO"/></property>
+		<property name="workspaceFolderDAO"><ref bean="workspaceFolderDAO"/></property>
+		<property name="licenseDAO"><ref bean="licenseDAO"/></property>
+		<property name="groupingDAO"><ref bean="groupingDAO"/></property>
+		<property name="transitionDAO"><ref bean="transitionDAO"/></property>
+		<property name="learningDesignDAO"><ref bean="learningDesignDAO"/></property>
 	</bean>
 	
 	<bean id="exportToolContentService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
