@@ -118,7 +118,15 @@ public class LessonService implements ILessonService
         return lessonDAO.getActiveLearnerByLesson(lessonId);
     }
 
+	/* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.lesson.service.ILessonService#getCountActiveLessonLearners(java.lang.Long)
+	 */
+	public Integer getCountActiveLessonLearners(Long lessonId)
+    {
+        return lessonDAO.getCountActiveLearnerByLesson(lessonId);
+    }
 
+	
 	public void setLessonDAO(ILessonDAO lessonDAO) {
 		this.lessonDAO = lessonDAO;
 	}
@@ -131,7 +139,7 @@ public class LessonService implements ILessonService
 		LessonDetailsDTO dto = null;
 		if ( lesson != null ) {
 			dto = lesson.getLessonDetails();
-			Integer active = lessonDAO.getCountActiveLearnerByLesson(lessonId);
+			Integer active = getCountActiveLessonLearners(lessonId);
 			dto.setNumberStartedLearners(active!=null?active:new Integer(0));
 		}
 		return dto;

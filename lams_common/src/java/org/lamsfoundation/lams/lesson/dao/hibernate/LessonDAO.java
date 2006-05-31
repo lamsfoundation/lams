@@ -23,7 +23,6 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.lesson.dao.hibernate;
 
-import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
@@ -33,6 +32,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Expression;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
+import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -55,7 +55,10 @@ public class LessonDAO extends HibernateDaoSupport implements ILessonDAO
 					+ " lesson where lesson.learningDesign.copyTypeID="
 					+ LearningDesign.COPY_TYPE_PREVIEW 
 					+ "and lesson.startDateTime is not null and lesson.startDateTime < ?";
-	
+	private final static String COUNT_ACTIVE_LEARNERS = "select count(distinct progress.user.id)"
+					+ " from "+LearnerProgress.class.getName()+" progress"
+					+ " where progress.lesson.id = :lessonId";
+
     /**
      * Retrieves the Lesson
      * @param lessonId identifies the lesson to get
@@ -170,7 +173,7 @@ public class LessonDAO extends HibernateDaoSupport implements ILessonDAO
         return (Integer) hibernateTemplate.execute(new HibernateCallback() {
             public Object doInHibernate(Session session)
                     throws HibernateException {
-    	    	Query query = session.getNamedQuery("countActiveLearners");
+    	    	Query query = session.createQuery(COUNT_ACTIVE_LEARNERS);
     	    	query.setLong("lessonId", lessonId);
                 return query.uniqueResult();
             }

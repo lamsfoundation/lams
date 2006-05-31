@@ -43,10 +43,11 @@ public interface ILearnerProgressDAO
     
     /**
      * Retrieves the learner progress object for user in a lesson.
-     * @param user the user who owns the learner progress data.
+     * @param learnerId the user who owns the learner progress data.
+     * @param lesson the lesson for which the progress data applies
      * @return the user's progress data
      */
-    public LearnerProgress getLearnerProgressByLearner(final User learner,
+    public LearnerProgress getLearnerProgressByLearner(final Integer learnerId,
                                                       final Lesson lesson);
         
     /**

@@ -66,6 +66,11 @@ public interface ILessonService {
 	/** Get all the learners who have started the lesson. They may not be currently online.*/
 	public abstract List getActiveLessonLearners(Long lessonId);
 
+	/** 
+	 * Get the count of all the learners who have started the lesson. They may not be currently online.
+	 */
+	public Integer getCountActiveLessonLearners(Long lessonId);
+    
 	/** Get the lesson details for the LAMS client. Suitable for the monitoring client.
 	 * Contains a count of the total number of learners in the lesson and the number of active learners.
 	 * This is a pretty intensive call as it counts all the learners in the 

@@ -40,7 +40,7 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 public class LearnerProgressDAO extends HibernateDaoSupport implements ILearnerProgressDAO
 {
     private final static String LOAD_PROGRESS_BY_LEARNER = 
-        "from LearnerProgress p where p.user = :learner and p.lesson = :lesson";
+        "from LearnerProgress p where p.user.id = :learnerId and p.lesson = :lesson";
 
     /**
      * Retrieves the Lesson
@@ -71,9 +71,9 @@ public class LearnerProgressDAO extends HibernateDaoSupport implements ILearnerP
     }
 
     /**
-     * @see org.lamsfoundation.lams.lesson.dao.ILearnerProgressDAO#getLearnerProgressByLeaner(org.lamsfoundation.lams.usermanagement.User)
+     * @see org.lamsfoundation.lams.lesson.dao.ILearnerProgressDAO#getLearnerProgressByLeaner(java.lang.Integer,org.lamsfoundation.lams.lesson.Lesson)
      */
-    public LearnerProgress getLearnerProgressByLearner(final User learner, final Lesson lesson)
+    public LearnerProgress getLearnerProgressByLearner(final Integer learnerId, final Lesson lesson)
     {
         HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
 
@@ -83,7 +83,7 @@ public class LearnerProgressDAO extends HibernateDaoSupport implements ILearnerP
                  public Object doInHibernate(Session session) throws HibernateException 
                  {
                      return session.createQuery(LOAD_PROGRESS_BY_LEARNER)
-                     			   .setEntity("learner",learner)
+                     			   .setInteger("learnerId",learnerId)
                      			   .setEntity("lesson",lesson)
                      			   .uniqueResult();
                  }
