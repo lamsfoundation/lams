@@ -141,11 +141,11 @@ class Wizard {
 		
 		var callback:Function = Proxy.create(this,showOrgTree);
            
-		if(classID != undefined){
-			Application.getInstance().getComms().getRequest('workspace.do?method=getUserOrganisation&userID='+_root.userID+'&organisationID='+classID+'&roles=STAFF,TEACHER',callback, false);
+		if(classID != undefined && courseID != undefined){
+			Application.getInstance().getComms().getRequest('workspace.do?method=getOrganisationsByUserRole&userID='+_root.userID+'&courseID='+courseID+'&classID='+classID+'&roles=STAFF,TEACHER',callback, false);
 		}else if(courseID != undefined){
 			trace('course defined: doing request');
-			Application.getInstance().getComms().getRequest('workspace.do?method=getOrganisationsByUserRole&userID='+_root.userID+'&organisationID='+courseID+'&roles=STAFF,TEACHER',callback, false);
+			Application.getInstance().getComms().getRequest('workspace.do?method=getOrganisationsByUserRole&userID='+_root.userID+'&courseID='+courseID+'&roles=STAFF,TEACHER',callback, false);
 		}else{
 			// TODO no course or class defined
 		}
@@ -163,13 +163,17 @@ class Wizard {
 		//rootNode.attributes.isBranch = true;
 		wizardModel.setOrganisationResource(RT_ORG+'_'+odto.organisationID,rootNode);
 		if(_root.classID != undefined){
-			wizardView.setUpOrgTree(false);
+			// create tree xml branches
+			createXMLNodes(rootNode, dto.nodes);
+			
+			
+			wizardView.setUpOrgTree(true);
 		}else{
 			// create tree xml branches
 			createXMLNodes(rootNode, dto.nodes);
 			
 			// set up the org tree
-			wizardView.setUpOrgTree(true);
+			wizardView.setUpOrgTree(false);
 		}
 	}
 

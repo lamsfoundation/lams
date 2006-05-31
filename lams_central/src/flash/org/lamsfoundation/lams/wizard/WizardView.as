@@ -389,9 +389,10 @@ class WizardView extends AbstractView {
 	 * @param   node 
 	 * @return  
 	 */
-    private function setBranches(node:XMLNode){
+    private function setBranches(treeview:Tree, node:XMLNode, isOpen:Boolean){
 		if(node.hasChildNodes() || node.attributes.isBranch){
-			location_treeview.setIsBranch(node, true);
+			treeview.setIsBranch(node, true);
+			if(isOpen){ treeview.setIsOpen(node, true);}
 			for (var i = 0; i<node.childNodes.length; i++) {
 				var cNode = node.getTreeNodeAt(i);
 				setBranches(cNode);				
@@ -405,7 +406,7 @@ class WizardView extends AbstractView {
 	 * @usage   
 	 * @return  
 	 */
-	private function setUpBranchesInit(treeview:Tree, data:XML, hideRoot:Boolean){
+	private function setUpBranchesInit(treeview:Tree, data:XML, hideRoot:Boolean, isOpen:Boolean){
 		Debugger.log('Running...',Debugger.GEN,'setUpBranchesInit','org.lamsfoundation.lams.wizard.WizardView');
 		//get the 1st child
 		
@@ -421,7 +422,7 @@ class WizardView extends AbstractView {
 		}
 		var fNode = treeview.dataProvider.firstChild;
 		trace(fNode);
-		setBranches(fNode);
+		setBranches(treeview, fNode, isOpen);
 		treeview.refresh();
 	}
 	
@@ -434,7 +435,7 @@ class WizardView extends AbstractView {
 	 */
 	private function setUpTreeview(){
 			
-		setUpBranchesInit(location_treeview, WorkspaceModel(workspaceView.getModel()).treeDP, false);
+		setUpBranchesInit(location_treeview, WorkspaceModel(workspaceView.getModel()).treeDP, false, false);
 		_workspaceController = _workspaceView.getController();
 		location_treeview.addEventListener("nodeOpen", Delegate.create(_workspaceController, _workspaceController.onTreeNodeOpen));
 		location_treeview.addEventListener("nodeClose", Delegate.create(_workspaceController, _workspaceController.onTreeNodeClose));
@@ -451,7 +452,7 @@ class WizardView extends AbstractView {
 			
 		//Debugger.log('_workspaceView:'+_workspaceView,Debugger.GEN,'setUpTreeview','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
 		
-		setUpBranchesInit(org_treeview, WizardModel(getModel()).treeDP, hideRoot);
+		setUpBranchesInit(org_treeview, WizardModel(getModel()).treeDP, hideRoot, true);
 		
 		org_treeview.addEventListener("nodeOpen", Delegate.create(_wizardController, _wizardController.onTreeNodeOpen));
 		org_treeview.addEventListener("nodeClose", Delegate.create(_wizardController, _wizardController.onTreeNodeClose));
