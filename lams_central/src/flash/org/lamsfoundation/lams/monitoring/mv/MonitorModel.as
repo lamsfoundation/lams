@@ -110,9 +110,9 @@ class MonitorModel extends Observable{
 		ddmTransition_keys = new Array();
 		_staffLoaded = false;
 		_learnersLoaded = false;
-		
+
 		_resultDTO = new Object();
-		
+
 		mx.events.EventDispatcher.initialize(this);
 	}
 	
@@ -142,7 +142,6 @@ class MonitorModel extends Observable{
 		return _activeSeq;
 	}
 	
-	
 	public function loadSequence(seqDTO:Object):Boolean{
 		// create new Sequence from DTO
 		var seq:Sequence = new Sequence(seqDTO);
@@ -165,7 +164,7 @@ class MonitorModel extends Observable{
 		var callback:Function = Proxy.create(_monitor, _monitor.reloadLessonToMonitor);
 		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=unsuspendLesson&lessonID=' + String(_activeSeq.ID) + '&userID=' + _root.userID,callback, false);
 	}
-	
+
 	public function setLessonProgressData(learnerProg:Array){
 		//clear the old lot of Learner Progress data
 		_learnersProgress.clear();
@@ -326,21 +325,17 @@ class MonitorModel extends Observable{
 	 * @usage   
 	 * @return  
 	 */
-	public function drawDesign(tabID:Number, learnerID:Number){
-		//_learnersProgress.clear();
-		//_activitiesDisplayed.clear();
-		//_transitionsDisplayed.clear();
+	public function drawDesign(tabID:Number, learner:Object){
 		
-		//if (learnerID != null){
-		//	learnerTabActArr.push(learnerID);
-		//}
-		//porobbably need to get a bit more granular
+		if (learner != null || learner != undefined){
+			var drawLearner:Object = new Object();
+			drawLearner = learner;
+		}
+		
 		//go through the design and get the activities and transitions 
 		var indexArray:Array;
 		var dataObj:Object;
 		ddmActivity_keys = _activeSeq.getLearningDesignModel().activities.keys();
-		
-		
 		
 		indexArray = ddmActivity_keys;
 		trace("Length of Activities in DDM: "+indexArray.length)
@@ -350,17 +345,14 @@ class MonitorModel extends Observable{
 					
 			var keyToCheck:Number = indexArray[i];
 			
-			
 			var ddm_activity:Activity = _activeSeq.getLearningDesignModel().activities.get(keyToCheck);
 			trace("Activities in DDM: "+ddm_activity.activityUIID)
 			if(ddm_activity.parentActivityID > 0 || ddm_activity.parentUIID > 0){
 				trace("this is Child")
 			}else {
-				broadcastViewUpdate("DRAW_ACTIVITY",ddm_activity, tabID, learnerID);
+				broadcastViewUpdate("DRAW_ACTIVITY",ddm_activity, tabID, drawLearner);
 			}
-			//dataObj.activity = ddm_activity;
 		}
-		
 		//now check the transitions:
 		ddmTransition_keys = _activeSeq.getLearningDesignModel().transitions.keys();
 				
@@ -375,11 +367,8 @@ class MonitorModel extends Observable{
 
 			var ddmTransition:Transition = _activeSeq.getLearningDesignModel().transitions.get(transitionKeyToCheck);
 			
-			//NOTE!: we are passing in a ref to the tns in the ddm so if we change any props of this, we are changing the ddm
 			broadcastViewUpdate("DRAW_TRANSITION",ddmTransition, tabID);	
-			//dataObj.trans = ddmTransition;
-		}
-		
+		}		
 	}
 	
 	public function setDialogOpen(dialogOpen:String){
@@ -387,7 +376,7 @@ class MonitorModel extends Observable{
 		broadcastViewUpdate(_dialogOpen, null, null);
 	}
 	
-	public function broadcastViewUpdate(updateType, data, tabID, learnerID){
+	public function broadcastViewUpdate(updateType, data, tabID, learner){
 		//getMonitor().getMV().clearView();
 		setChanged();
 		
@@ -396,7 +385,7 @@ class MonitorModel extends Observable{
 		infoObj.updateType = updateType;
 		infoObj.data = data;
 		infoObj.tabID = tabID;
-		infoObj.learner = learnerID
+		infoObj.learner = learner
 		notifyObservers(infoObj);
 		
 	}
@@ -482,6 +471,7 @@ class MonitorModel extends Observable{
 		broadcastViewUpdate("STAFF_LOADED", null, null);
 	}
 
+
 	private function saveUsers(users:Array, role:String):Void{
 		
 		for(var i=0; i< users.length; i++){
@@ -500,8 +490,6 @@ class MonitorModel extends Observable{
 				organisation.addUser(user);
 			}
 		}
-		
-		
 	}
 	
 	public function getLessonClassData():Object{
@@ -525,7 +513,7 @@ class MonitorModel extends Observable{
 			return null;
 		}
 	}
-	
+
 	public function setDirty(){
 		_isDirty = true;
 		trace("In setDirty")
@@ -652,17 +640,17 @@ class MonitorModel extends Observable{
 		//broadcastViewUpdate('ITEM_SELECTED',_selectedTreeNode);
 	}
 	*/
-	
+
 	/**
 	 * 
 	 * @usage   
-	 * @return  
+	 * @return 
+ 
 	 
 	public function getSelectedTreeNode ():XMLNode {
 		return _selectedTreeNode;
 	}
 	*/
-	
 	public function setSelectedTab(tabID:Number){
 		selectedTab = tabID;
 	}
@@ -708,7 +696,7 @@ class MonitorModel extends Observable{
 	public function get className():String{
         return 'MonitorModel';
     }
-	
+
 	public function get resultDTO():Object{
 		return _resultDTO;
 	}
