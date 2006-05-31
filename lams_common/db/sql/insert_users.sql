@@ -147,7 +147,7 @@ fax,email,
 disabled_flag,create_date,authentication_method_id,workspace_id,
 flash_theme_id, html_theme_id)
 values
-(8,'test4','test4','Dr','One','Test','4','Test Ave',null,
+(8,'test4','test4','Dr','Four','Test','4','Test Ave',null,
 'Nowhere','NSW','Australia','0211111111','0211111112','0411111111',
 '0211111113','test4@xx.os',
 0,'20041223',1,8,1,3);
