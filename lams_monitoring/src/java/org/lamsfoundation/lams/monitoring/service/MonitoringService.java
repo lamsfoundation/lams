@@ -61,6 +61,8 @@ import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.LessonClass;
 import org.lamsfoundation.lams.lesson.dao.ILessonClassDAO;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
+import org.lamsfoundation.lams.lesson.dto.LessonDetailsDTO;
+import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.monitoring.MonitoringConstants;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
@@ -125,6 +127,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     private IGroupingDAO groupingDAO;
     private IAuthoringService authoringService;
     private ILearnerService learnerService;
+    private ILessonService lessonService;
     private ILamsCoreToolService lamsCoreToolService;
     private IUserManagementService userManagementService;
     private Scheduler scheduler;
@@ -175,6 +178,13 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 	 */
 	public void setLearnerService(ILearnerService learnerService) {
 		this.learnerService = learnerService;
+	}
+	/**
+	 * 
+	 * @param lessonService
+	 */
+	public void setLessonService(ILessonService lessonService) {
+		this.lessonService = lessonService;
 	}
     /**
      * @param authoringService The authoringService to set.
@@ -767,7 +777,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
             			learnerService.performGrouping(lessonId, groupActivity);
 //            			grouping = groupActivity.getCreateGrouping();
 //            			myGroup = grouping.getGroupBy(learner);
-            			learnerService.completeActivity(learner,activity,newLesson);
+            			learnerService.completeActivity(learner.getUserId(),activity,newLesson);
             			log.debug("Grouping activity [" + activity.getActivityId() + "] is completed.");
             		}else{
 	            		//except random grouping, stop here
@@ -776,14 +786,14 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
             		}
             	}else{
             		//if group already exist
-            		learnerService.completeActivity(learner,activity,newLesson);
+            		learnerService.completeActivity(learner.getUserId(),activity,newLesson);
             		log.debug("Grouping activity [" + activity.getActivityId() + "] is completed.");
             	}
             }else if ( activity.isGateActivity() ) {
             	GateActivity gate = (GateActivity) activity;
             	if(learnerService.knockGate(lessonId,gate,learner)){
             		//the gate is opened, continue to next activity to complete
-            		learnerService.completeActivity(learner,activity,newLesson);
+            		learnerService.completeActivity(learner.getUserId(),activity,newLesson);
             		log.debug("Gate activity [" + gate.getActivityId() + "] is completed.");
             	}else{
             		//the gate is closed, stop here
@@ -796,7 +806,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
             		ToolActivity toolActivity = (ToolActivity) activity;
             		try {
 						ToolSession toolSession = lamsCoreToolService.getToolSessionByActivity(learner,toolActivity);
-						learnerService.completeToolSession(toolSession.getToolSessionId(),new Long(learnerId.intValue()));
+						learnerService.completeToolSession(toolSession.getToolSessionId(),new Long(learnerId.longValue()));
 						log.debug("Tool activity [" + activity.getActivityId() + "] is completed.");
 					} catch (LamsToolServiceException e) {
 						throw new MonitoringServiceException(e);
@@ -839,10 +849,10 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getLessonDetails(java.lang.Long)
      */
     public String getLessonDetails(Long lessonID)throws IOException{
-    	Lesson lesson = lessonDAO.getLesson(lessonID);
+    	LessonDetailsDTO dto = lessonService.getLessonDetails(lessonID);
     	FlashMessage flashMessage;
-    	if(lesson!=null){
-    		flashMessage = new FlashMessage("getLessonDetails",lesson.getLessonDetails());
+    	if(dto!=null){
+    		flashMessage = new FlashMessage("getLessonDetails",dto);
     	}else
     		flashMessage = new FlashMessage("getLessonDetails",
     										messageService.getMessage("NO.SUCH.LESSON",new Object[]{lessonID}),
