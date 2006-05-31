@@ -50,7 +50,7 @@ class LearnersDialog extends MovieClip implements Dialog{
     private var _container:MovieClip;  //The container window that holds the dialog
 	
     private var close_btn:Button;         // Close window button
-    
+    private var learners_txt:TextField;
 	private var panel:MovieClip;       //The underlaying panel base
 	
 	private var learner_scp:MovieClip;		// learners container
@@ -134,6 +134,8 @@ class LearnersDialog extends MovieClip implements Dialog{
 		//get a ref to the controller and kkep it here to listen for events:
 		_monitorController = _monitorView.getController();
 		_monitorModel = MonitorModel(_monitorView.getModel());
+		
+		learners_txt.text = "Learners in class: " + _monitorModel.getSequence().organisationName;
 		
 		 //Add event listeners for ok, cancel and close buttons
         close_btn.addEventListener('onPress',Delegate.create(this, close));
