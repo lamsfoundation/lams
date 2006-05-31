@@ -239,6 +239,17 @@ public interface IMonitoringService
     public String getLessonLearners(Long lessonID)throws IOException;
     
     /**
+     * Returns a list of staff participating in the given Lesson
+     * 
+     * @param lessonID The lesson_id of the Lesson
+     * @return String The requested list in wddx format
+     * 
+     * @throws IOException
+     */
+    public String getLessonStaff(Long lessonID)throws IOException;
+    
+    
+    /**
      * This method returns the LearningDesign details for a given Lesson
      * 
      * @param lessonID The lesson_id of the Lesson whose LearningDesign details are required

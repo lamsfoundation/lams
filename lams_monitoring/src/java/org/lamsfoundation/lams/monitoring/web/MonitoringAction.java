@@ -172,7 +172,7 @@ public class MonitoringAction extends LamsDispatchAction
     	try {
     		String title = WebUtil.readStrParam(request,"lessonName");
     		if ( title == null ) title = "lesson";
-    		String desc = WebUtil.readStrParam(request,"lessonDescription");
+    		String desc = WebUtil.readStrParam(request,"lessonDescription", true);
     		if ( desc == null ) desc = "description";
     		Integer courseId = WebUtil.readIntParam(request,"courseId",true);
     		long ldId = WebUtil.readLongParam(request, AttributeNames.PARAM_LEARNINGDESIGN_ID);
@@ -546,6 +546,19 @@ public class MonitoringAction extends LamsDispatchAction
         writer.println(wddxPacket);
         return null;
     }
+    
+    public ActionForward getLessonStaff(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response)throws IOException{
+    	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+    	Long lessonID = new Long(WebUtil.readLongParam(request,"lessonID"));
+    	String wddxPacket = monitoringService.getLessonStaff(lessonID);
+        PrintWriter writer = response.getWriter();
+        writer.println(wddxPacket);
+        return null;
+    }
+    
     public ActionForward getLearningDesignDetails(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,

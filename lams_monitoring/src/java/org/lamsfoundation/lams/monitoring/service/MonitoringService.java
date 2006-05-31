@@ -871,6 +871,29 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 											 FlashMessage.ERROR);
     	return flashMessage.serializeMessage();
     }    
+    
+    /**
+     * (non-Javadoc)
+     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getLessonStaff(java.lang.Long)
+     */
+    public String getLessonStaff(Long lessonID)throws IOException{
+    	Vector lessonStaff = new Vector();
+    	Lesson lesson = lessonDAO.getLesson(lessonID);
+    	FlashMessage flashMessage;
+    	if(lesson!=null){
+    		Iterator iterator = lesson.getLessonClass().getStaffGroup().getUsers().iterator();
+    		while(iterator.hasNext()){
+    			User user = (User)iterator.next();
+    			lessonStaff.add(user.getUserDTO());
+    		}    		
+    		flashMessage = new FlashMessage("getLessonStaff",lessonStaff);
+    	}else
+    		flashMessage = new FlashMessage("getLessonStaff",
+    										 messageService.getMessage("NO.SUCH.LESSON",new Object[]{lessonID}),
+											 FlashMessage.ERROR);
+    	return flashMessage.serializeMessage();
+    }
+    
     /**
      * (non-Javadoc)
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getLearningDesignDetails(java.lang.Long)
