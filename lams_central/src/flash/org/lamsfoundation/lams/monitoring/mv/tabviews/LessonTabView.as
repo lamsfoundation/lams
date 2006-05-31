@@ -73,8 +73,6 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	private var manageClass_lbl:Label;
 	private var manageStatus_lbl:Label;
 	private var manageStart_lbl:Label;
-	//private var manageMin_lbl:Label;
-	//private var manageHour_lbl:Label;
 	private var manageDate_lbl:Label;
 	
 		
@@ -83,7 +81,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	private var LSDescription_txt:TextField;
 	private var sessionStatus_txt:TextField;
 	private var numLearners_txt:TextField;
-	private var group_txt:TextField;
+	private var class_txt:TextField;
 	private var duration_txt:TextField;
 	private var lessonManager:TextField;
 	private var taskManager:TextField;
@@ -98,17 +96,10 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	
 	private var scheduleDate_dt:DateField;
 	private var scheduleTime:MovieClip;
-	//private var startHour_stp:NumericStepper;
-	//private var startMin_stp:NumericStepper;
 	
 	//COMBO
 	private var changeStatus_cmb:ComboBox;
 	
-    //private var _transitionLayer_mc:MovieClip;
-	//private var _activityLayerComplex_mc:MovieClip;
-	//private var _activityLayer_mc:MovieClip;
-	
-	//private var _transitionPropertiesOK:Function;
     private var _lessonTabView:LessonTabView;
 	private var _monitorController:MonitorController;
 	private var _dialog:MovieClip;
@@ -137,7 +128,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	public function init(m:Observable,c:Controller){
 		super (m, c);
 		
-		
+		MovieClipUtils.doLater(Proxy.create(this,setupTab));
 	}    
 	
 	/**
@@ -186,11 +177,6 @@ public function update (o:Observable,infoObj:Object):Void{
 				_monitorController = getController();
 				showLearnersDialog(mm);
 				break;
-			case 'USERS_LOADED' :
-				//_dialog.checkLearners(mm.organisation.getLearners());
-				//_dialog.checkStaff(mm.organisation.getStaff());
-				//_monitorController.clearBusy();
-				break;
 			case 'LEARNERS_LOADED' :
 				_dialog.checkLearners(mm.organisation);
 				break;
@@ -203,6 +189,19 @@ public function update (o:Observable,infoObj:Object):Void{
 
 	}
 	
+	private function setupTab(){
+		
+		_monitorController = getController();
+		
+		editClass_btn.addEventListener("click", _monitorController);
+		viewLearners_btn.addEventListener("click", _monitorController);
+		schedule_btn.addEventListener("click", Delegate.create(this, scheduleLessonStart));
+		start_btn.addEventListener("click", _monitorController);
+		statusApply_btn.addEventListener("click", Delegate.create(this, changeStatus))
+		this.addEventListener("apply", Delegate.create(_monitorController, _monitorController.changeStatus));
+		
+	}
+	
 	/**
     * layout visual elements on the canvas on initialisation
     */
@@ -213,13 +212,6 @@ public function update (o:Observable,infoObj:Object):Void{
 		_monitorReqTask_mc = reqTasks_scp.content;
 		_monitorController = getController();
 		
-		editClass_btn.addEventListener("click", _monitorController);
-		viewLearners_btn.addEventListener("click", _monitorController);
-		schedule_btn.addEventListener("click", Delegate.create(this, scheduleLessonStart));
-		start_btn.addEventListener("click", _monitorController);
-		statusApply_btn.addEventListener("click", Delegate.create(this, changeStatus))
-		//Debugger.log('_canvas_mc'+_canvas_mc,Debugger.GEN,'draw','CanvasView');
-	
 		trace("Loaded LessonTabView Data"+ this)
 	
 		startMsg_txt.visible = false;
@@ -228,6 +220,7 @@ public function update (o:Observable,infoObj:Object):Void{
 	
 		populateStatusList(seq.state);
 		populateLessonDetails();
+		enableEditClass(seq.state);
 		
 		if(seq.state != Sequence.ACTIVE_STATE_ID){
 		// hide start buttons etc
@@ -279,6 +272,7 @@ public function update (o:Observable,infoObj:Object):Void{
 		LSDescription_txt.text = s.description;
 		sessionStatus_txt.text = showStatus(s.state);
 		numLearners_txt.text = String(s.noStartedLearners) + " of "+String(s.noPossibleLearners);
+		class_txt.text = s.organisationName;
 	}
 	
 	private function populateStatusList(stateID:Number):Void{
@@ -292,7 +286,7 @@ public function update (o:Observable,infoObj:Object):Void{
 				break;
 			case Sequence.ARCHIVED_STATE_ID :
 				changeStatus_cmb.addItem("Select Status", LessonTabView.NULL_CBI);
-				changeStatus_cmb.addItem("Activate", LessonTabView.ACTIVE_CBI);
+				//changeStatus_cmb.addItem("Activate", LessonTabView.ACTIVE_CBI);
 				break;
 			case Sequence.ACTIVE_STATE_ID :
 				changeStatus_cmb.addItem("Select Status", LessonTabView.NULL_CBI);
@@ -307,6 +301,21 @@ public function update (o:Observable,infoObj:Object):Void{
 				changeStatus_cmb.addItem("Disable", LessonTabView.DISABLE_CBI);
 				changeStatus_cmb.addItem("Archive", LessonTabView.ARCHIVE_CBI);
 				
+		}
+	}
+
+	private function enableEditClass(stateID:Number):Void{
+		
+		switch(stateID){
+			case Sequence.ACTIVE_STATE_ID :
+				editClass_btn.enabled = true;
+				break;
+			case Sequence.NOTSTARTED_STATE_ID :
+				editClass_btn.enabled = true;
+				break;
+			default :
+				editClass_btn.enabled = false;
+			
 		}
 	}
 
@@ -335,25 +344,7 @@ public function update (o:Observable,infoObj:Object):Void{
 	 * @param   evt Apply onclick event
 	 */
 	private function changeStatus(evt:Object):Void{
-		var stateID:Number = changeStatus_cmb.selectedItem.data;
-		switch(stateID){
-			case NULL_CBI :
-				// error msg
-				trace('nothing selected...');
-				break;
-			case ACTIVE_CBI :
-				mm.activateSequence();
-				break;
-			case DISABLE_CBI :
-				mm.suspendSequence();
-				break;
-			case ARCHIVE_CBI :
-				mm.archiveSequence();
-				break;
-			default :
-				trace('no such combo box item');
-				
-		}
+		dispatchEvent({type:"apply", target: this});
 	}
 	
 	private function scheduleLessonStart(evt:Object):Void{
@@ -392,10 +383,6 @@ public function update (o:Observable,infoObj:Object):Void{
 				obj.child= ca.childActivities[i];
 				array.push(obj);
 			}
-			
-			//var tmp:Array = getEntries(ca.childActivities[i]);
-			//drawIsRequiredChildTasks(ca, ca.childActivities[i], tmp);
-			//return null;
 		}
 		for (var j=0; j<ca.contributeEntries.length; j++){ 
 			trace("Contribute Entry for "+ca.title+" is: "+ca.contributeEntries[j].contributionType)
