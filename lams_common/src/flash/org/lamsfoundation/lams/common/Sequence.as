@@ -36,21 +36,43 @@ class Sequence {
 	
 	private static var _instance:Sequence = null;
 	
+	public static var ACTIVE_STATE_ID:Number = 1;
+	public static var NOTSTARTED_STATE_ID:Number = 2;
+	public static var STARTED_STATE_ID:Number = 3;
+	public static var SUSPENDED_STATE_ID:Number = 4;
 	public static var FINISHED_STATE_ID:Number = 5;
+	public static var ARCHIVED_STATE_ID:Number = 6;
+	
 	/**
 	* View state data
 	*/
+	// sequence data
 	private var _seqName:String;
 	private var _seqDescription:String;
 	private var _seqStateID:Number;
 	private var _seqID:Number;
 	
+	// sequence dates
 	private var _seqCreatedDate:Date;
 	private var _seqStartDate:Date;
-	private var _seqFinishDate:Date;
 	
-	private var _learningDesignID:Number;
+	// organisation data
 	private var _organisationID:Number;
+	private var _organisationName:String;
+	private var _organisationDescription:String;
+	
+	// LD and workspace data
+	private var _learningDesignID:Number;
+	private var _workspaceFolderID:Number;
+	
+	// statistics data
+	private var _noPossibleLearners:Number;
+	private var _noStartedLearners:Number;
+	private var _duration:Number;
+	
+	private var _licenseID:Number;
+	private var _licenseText:String;
+	
 	private var _learningDesignModel:DesignDataModel;
 	
 	private var _progress:Progress;
@@ -88,10 +110,24 @@ class Sequence {
 		_seqName = dto.lessonName;
 		_seqDescription = dto.lessonDescription;
 		_seqStateID = dto.lessonStateID;
+		
 		_learningDesignID = dto.learningDesignID;
+		
 		_seqCreatedDate = dto.createDateTime;
 		_seqStartDate = dto.startDateTime;
+		
 		_organisationID = dto.organisationID;
+		_organisationName = dto.organisationName;
+		_organisationDescription = dto.organisationDescription;
+		
+		_workspaceFolderID = dto.workspaceFolderID;
+		
+		_noPossibleLearners = dto.numberPossibleLearners;
+		_noStartedLearners = dto.numberStartedLearners;
+		_duration = dto.duration;
+		
+		_licenseID = dto.licenseID;
+		_licenseText = dto.licenseText;
 	}
 	
 	
@@ -114,6 +150,10 @@ class Sequence {
 	public function getSequenceID():Number {
 		return _seqID;
 	}
+	
+	public function get ID():Number{
+		return _seqID;
+	}
 
     /**
 	 * Set User Organisation ID
@@ -134,7 +174,6 @@ class Sequence {
 	public function getOrganisationID():Number {
 		return _organisationID;
 	}
-    
 
 	/**
 	 * Set the seq's name
@@ -154,6 +193,10 @@ class Sequence {
 	 */
 	
 	public function getSequenceName():String {
+		return _seqName;
+	}
+	
+	public function get name():String{
 		return _seqName;
 	}
 	
@@ -177,12 +220,20 @@ class Sequence {
 		return _seqDescription;
 	}
 	
+	public function get description():String{
+		return _seqDescription;
+	}
+	
 	public function setSequenceStateID(seqStateID:Number) {
 		_seqStateID = seqStateID;
 		
 	}
 	
 	public function getSequenceStateID():Number {
+		return _seqStateID;
+	}
+	
+	public function get state():Number{
 		return _seqStateID;
 	}
 	
@@ -195,6 +246,10 @@ class Sequence {
 		return _learningDesignID;
 	}
 	
+	public function get learningDesignID():Number{
+		return _learningDesignID;
+	}
+	
 	public function setLearningDesignModel(learningDesignModel:DesignDataModel){
 		_learningDesignModel = learningDesignModel;
 		
@@ -204,11 +259,15 @@ class Sequence {
 		return _learningDesignModel;
 	}
 	
-	public function setCreateDateTime(seqCreatedDate:Date){
+	public function setCreatedDateTime(seqCreatedDate:Date){
 		_seqCreatedDate = seqCreatedDate;
 	}
 	
-	public function getCreateDateTime():Date{
+	public function getCreatedDateTime():Date{
+		return _seqCreatedDate;
+	}
+	
+	public function get createddate():Date{
 		return _seqCreatedDate;
 	}
 	
@@ -227,7 +286,19 @@ class Sequence {
 		//return _seqStartDate;
 	}
 	
-	public function setFinishDateTime(seqFinishDate:Date){
+	public function get startdate():Date{
+		return _seqStartDate;
+	}
+	
+	public function get isStarted():Boolean{
+		if (_seqStartDate.getDate() == undefined || _seqStartDate.getDate() == null){
+			return false;
+		}
+		
+		return true;
+	}
+	
+	/**public function setFinishDateTime(seqFinishDate:Date){
 		_seqFinishDate = seqFinishDate;
 	}
 	
@@ -235,7 +306,7 @@ class Sequence {
 		var finishDate:String = (_seqFinishDate.getDate()+" "+(StringUtils.getMonthAsString(_seqFinishDate.getMonth()+1))+" "+_seqFinishDate.getFullYear());;
 		return finishDate;
 	}
-	
+	*/
 	public function setActive() {
 		_active = true;
 		trace('setting seq active...');
@@ -271,7 +342,43 @@ class Sequence {
 	public function isFinished():Boolean {
 		return checkState(FINISHED_STATE_ID);
 	}
-
+	
+	public function get organisationID():Number{
+		return _organisationID;
+	}
+	
+	public function get organisationName():String{
+		return _organisationName;
+	}
+	
+	public function get organisationDescription():String{
+		return _organisationDescription;
+	}
+	
+	public function get workspaceFolderID():Number{
+		return _workspaceFolderID;
+	}
+	
+	public function get duration():Number{
+		return _duration;
+	}
+	
+	public function get noPossibleLearners():Number{
+		return _noPossibleLearners;
+	}
+	
+	public function get noStartedLearners():Number{
+		return _noStartedLearners;
+	}
+	
+	public function get licenseID():Number{
+		return _licenseID;
+	}
+	
+	public function get licenseText():String{
+		return _licenseText;
+	}
+	
 	function get className():String{
         return 'Sequence';
     }
