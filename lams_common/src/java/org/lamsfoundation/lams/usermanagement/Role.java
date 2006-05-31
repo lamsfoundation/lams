@@ -78,6 +78,9 @@ public class Role implements Serializable {
     /** persistent field */
     private Set userOrganisationRoles;
 
+    /** persistent field */
+    private Set rolePrivileges;
+
     /** full constructor */
     public Role(String name, String description, Set userOrganisationRoles) {
         this.name = name;
@@ -143,7 +146,7 @@ public class Role implements Serializable {
      *            @hibernate.set
      *             lazy="true"
      *             inverse="true"
-     *             cascade="none"
+     *             cascade="delete-orphan"
      *            @hibernate.collection-key
      *             column="role_id"
      *            @hibernate.collection-one-to-many
@@ -157,7 +160,27 @@ public class Role implements Serializable {
     public void setUserOrganisationRoles(Set userOrganisationRoles) {
         this.userOrganisationRoles = userOrganisationRoles;
     }
-    public void addUserOrganisationRole(UserOrganisationRole userOrganisationRole){
+    
+    /** 
+     *            @hibernate.set
+     *             lazy="true"
+     *             inverse="true"
+     *             cascade="delete-orphan"
+     *            @hibernate.collection-key
+     *             column="role_id"
+     *            @hibernate.collection-one-to-many
+     *             class="org.lamsfoundation.lams.usermanagement.RolePrivilege"
+     *         
+     */
+    public Set getRolePrivileges() {
+		return rolePrivileges;
+	}
+
+	public void setRolePrivileges(Set rolePrivileges) {
+		this.rolePrivileges = rolePrivileges;
+	}
+
+	public void addUserOrganisationRole(UserOrganisationRole userOrganisationRole){
     	if(userOrganisationRoles==null)
     		userOrganisationRoles = new HashSet();
     	userOrganisationRoles.add(userOrganisationRole);
