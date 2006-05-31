@@ -116,7 +116,7 @@ public function update (o:Observable,infoObj:Object):Void{
 				}
 				break;
 			default :
-                Debugger.log('unknown update type :' + infoObj.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.LessonTabView');
+                Debugger.log('unknown update type :' + infoObj.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.ToDoTabView');
 		}
 
 	}
