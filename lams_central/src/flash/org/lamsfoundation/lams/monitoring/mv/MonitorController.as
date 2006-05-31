@@ -216,6 +216,42 @@ class MonitorController extends AbstractController {
 		_monitorModel.getMonitor().createLessonClass();
 	}
 	
+	/**
+	 * Apply status change
+	 *   
+	 * 
+	 * @param   evt Apply onclick event
+	 */
+	public function changeStatus(evt:Object):Void{
+		if(!_isBusy){
+			setBusy();
+			var stateID:Number = evt.target.changeStatus_cmb.selectedItem.data;
+			switch(stateID){
+				case LessonTabView.NULL_CBI :
+					// error msg
+					trace('nothing selected...');
+					break;
+				case LessonTabView.ACTIVE_CBI :
+					trace('activating...');
+					_monitorModel.activateSequence();
+					break;
+				case LessonTabView.DISABLE_CBI :
+					trace('suspending...');
+					_monitorModel.suspendSequence();
+					break;
+				case LessonTabView.ARCHIVE_CBI :
+					trace('archiving...');
+					_monitorModel.archiveSequence();
+					break;
+				default :
+					trace('no such combo box item');
+					
+			}
+			
+			clearBusy();
+		}
+	}
+	
 	public function setBusy(){
 		_isBusy = true;
 	}
