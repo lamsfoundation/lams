@@ -56,7 +56,7 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
     //private static var LESSONS_Y:Number = 21;
     
     private static var MONITOR_X:Number = 0;
-    private static var MONITOR_Y:Number = 21;
+    private static var MONITOR_Y:Number = 55;
     private static var MONITOR_W:Number = 550;
     private static var MONITOR_H:Number = 550;
     
