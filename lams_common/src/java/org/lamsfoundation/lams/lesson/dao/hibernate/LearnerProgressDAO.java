@@ -26,9 +26,7 @@ package org.lamsfoundation.lams.lesson.dao.hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
-import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dao.ILearnerProgressDAO;
-import org.lamsfoundation.lams.usermanagement.User;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
@@ -40,7 +38,7 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 public class LearnerProgressDAO extends HibernateDaoSupport implements ILearnerProgressDAO
 {
     private final static String LOAD_PROGRESS_BY_LEARNER = 
-        "from LearnerProgress p where p.user.id = :learnerId and p.lesson = :lesson";
+        "from LearnerProgress p where p.user.id = :learnerId and p.lesson.id = :lessonId";
 
     /**
      * Retrieves the Lesson
@@ -71,9 +69,9 @@ public class LearnerProgressDAO extends HibernateDaoSupport implements ILearnerP
     }
 
     /**
-     * @see org.lamsfoundation.lams.lesson.dao.ILearnerProgressDAO#getLearnerProgressByLeaner(java.lang.Integer,org.lamsfoundation.lams.lesson.Lesson)
+     * @see org.lamsfoundation.lams.lesson.dao.ILearnerProgressDAO#getLearnerProgressByLeaner(java.lang.Integer,java.lang.Long)
      */
-    public LearnerProgress getLearnerProgressByLearner(final Integer learnerId, final Lesson lesson)
+    public LearnerProgress getLearnerProgressByLearner(final Integer learnerId, final Long lessonId)
     {
         HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
 
@@ -84,7 +82,7 @@ public class LearnerProgressDAO extends HibernateDaoSupport implements ILearnerP
                  {
                      return session.createQuery(LOAD_PROGRESS_BY_LEARNER)
                      			   .setInteger("learnerId",learnerId)
-                     			   .setEntity("lesson",lesson)
+                     			   .setLong("lessonId",lessonId)
                      			   .uniqueResult();
                  }
              }

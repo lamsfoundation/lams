@@ -24,8 +24,6 @@
 package org.lamsfoundation.lams.lesson.dao;
 
 import org.lamsfoundation.lams.lesson.LearnerProgress;
-import org.lamsfoundation.lams.lesson.Lesson;
-import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * Inteface defines Lesson DAO Methods
@@ -44,11 +42,10 @@ public interface ILearnerProgressDAO
     /**
      * Retrieves the learner progress object for user in a lesson.
      * @param learnerId the user who owns the learner progress data.
-     * @param lesson the lesson for which the progress data applies
+     * @param lessonId the lesson for which the progress data applies
      * @return the user's progress data
      */
-    public LearnerProgress getLearnerProgressByLearner(final Integer learnerId,
-                                                      final Lesson lesson);
+    public LearnerProgress getLearnerProgressByLearner(final Integer learnerId, final Long lessonId);
         
     /**
      * Saves or Updates learner progress data.

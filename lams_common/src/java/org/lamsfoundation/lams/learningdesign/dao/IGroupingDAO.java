@@ -23,11 +23,14 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.learningdesign.dao;
 
+import java.util.List;
+
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 
 /**
  * @author Manpreet Minhas
+ * @author Fiona Malikoff
  */
 public interface IGroupingDAO extends IBaseDAO {
 	
@@ -40,12 +43,11 @@ public interface IGroupingDAO extends IBaseDAO {
 	 */
 	public Grouping getGroupingById(Long groupingID);	
 	
-	/**
-	 * Must return a "real" grouping object, not a CGLIB proxy object.
-	 * 
-	 * @param groupingUIID
-	 * @return Grouping populated Grouping object
-	 */
-	public Grouping getGroupingByUIID(Integer groupingUIID);
+   /**
+     * Returns the list of groupings applicable for the given learning design.
+     * @param learningDesignId
+     * @return list of Grouping objects 
+     */
+   public List getGroupingsByLearningDesign(Long learningDesignId);
 
 }

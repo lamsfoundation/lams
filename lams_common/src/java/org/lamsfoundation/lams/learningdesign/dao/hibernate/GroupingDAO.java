@@ -23,9 +23,14 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.learningdesign.dao.hibernate;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.learningdesign.ChosenGrouping;
 import org.lamsfoundation.lams.learningdesign.Grouping;
+import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.RandomGrouping;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupingDAO;
 import org.springframework.dao.DataRetrievalFailureException;
@@ -35,7 +40,9 @@ import org.springframework.dao.DataRetrievalFailureException;
  */
 public class GroupingDAO extends BaseDAO implements IGroupingDAO {
 	
-	private static final String FIND_BY_UI_ID ="from "+Grouping.class.getName()+" g where g.groupingUIID=:UIID";
+	private final static String GROUPINGS_FOR_LEARNING_DESIGN = "select grouping from "
+		+ Grouping.class.getName() + " grouping, " + GroupingActivity.class.getName() + " activity "
+		+ " where activity.createGrouping = grouping and activity.learningDesign.id = ?";
 
 	/**
 	 * @see org.lamsfoundation.lams.learningdesign.dao.interfaces.IGroupingDAO#getGroupingById(java.lang.Long)
@@ -45,19 +52,19 @@ public class GroupingDAO extends BaseDAO implements IGroupingDAO {
 		return getNonCGLibGrouping(grouping);
 	}
 
-	/**
-	 * @see org.lamsfoundation.lams.learningdesign.dao.IGroupingDAO#getGroupingByUIID(java.lang.Integer)
-	 */
-	public Grouping getGroupingByUIID(Integer groupingUIID) {
-		if ( groupingUIID != null ) {
-			Grouping grouping = (Grouping) getSession()
-									.createQuery(FIND_BY_UI_ID)
-									.setInteger("UIID",groupingUIID.intValue())
-									.uniqueResult();
-			return getNonCGLibGrouping(grouping);
-		} 
-		return null;
-	}
+    /**
+     * Returns the list of groupings applicable for the given learning design.
+     */
+   public List<Grouping> getGroupingsByLearningDesign(Long learningDesignId){
+    	List groupings = this.getHibernateTemplate().find(GROUPINGS_FOR_LEARNING_DESIGN,learningDesignId);
+    	ArrayList<Grouping> realGroupings = new ArrayList<Grouping>(groupings.size());
+    	Iterator iter = groupings.iterator();
+    	while (iter.hasNext()) {
+			Grouping element = (Grouping) iter.next();
+			realGroupings.add(getNonCGLibGrouping(element));
+		}
+    	return realGroupings;
+    }
 
 	/** we must return the real grouping, not a Hibernate proxy. So relook
 	* it up. This should be quick as it should be in the cache.
