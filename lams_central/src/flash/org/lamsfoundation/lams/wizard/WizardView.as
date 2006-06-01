@@ -1214,10 +1214,10 @@ class WizardView extends AbstractView {
 		var lessonName:String = "<b>" + resultDTO.resourceTitle +"</b>";
 		switch(mode){
 			case FINISH_MODE : 
-				msg = Dictionary.getValue('confirmMsg_1_txt', [lessonName]);
+				msg = Dictionary.getValue('confirmMsg_3_txt', [lessonName]);
 				break;
 			case START_MODE :
-				msg = Dictionary.getValue('confirmMsg_3_txt', [lessonName]);
+				msg = Dictionary.getValue('confirmMsg_1_txt', [lessonName]);
 				break;
 			case START_SCH_MODE :
 				msg = Dictionary.getValue('confirmMsg_2_txt', [lessonName, unescape(resultDTO.scheduleDateTime)]);
