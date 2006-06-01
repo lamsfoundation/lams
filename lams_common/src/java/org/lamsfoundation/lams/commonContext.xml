@@ -30,6 +30,7 @@
 				<value>org/lamsfoundation/lams/usermanagement/AuthenticationMethod.hbm.xml</value>
 				<value>org/lamsfoundation/lams/usermanagement/AuthenticationMethodType.hbm.xml</value>
 				<value>org/lamsfoundation/lams/usermanagement/Organisation.hbm.xml</value>
+				<value>org/lamsfoundation/lams/usermanagement/OrganisationState.hbm.xml</value>
 				<value>org/lamsfoundation/lams/usermanagement/OrganisationType.hbm.xml</value>
 				<value>org/lamsfoundation/lams/usermanagement/Role.hbm.xml</value>
 				<value>org/lamsfoundation/lams/usermanagement/Privilege.hbm.xml</value>
