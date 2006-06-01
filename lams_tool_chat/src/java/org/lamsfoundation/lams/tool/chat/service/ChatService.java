@@ -248,7 +248,8 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
      * for the content.
      * @throws ToolException if any other error occurs
      */
-	public void importToolContent(Object toolContnetPOJO) throws ToolException {
+	public void importToolContent(String toolContentPath) throws ToolException {
+		
 	}
 	
 	/* ********** IChatService Methods ************************************** */
