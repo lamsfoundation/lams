@@ -314,7 +314,9 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 			var tdto = design.transitions[i];
 			var newTransition:Transition = new Transition(tdto.transitionUIID,
 											tdto.fromUIID,
+											tdto.fromActivityID,
 											tdto.toUIID,
+											tdto.toActivityID,
 											tdto.learningDesignID);
 			newTransition.transitionID = tdto.transitionID;
 			_transitions.put(newTransition.transitionUIID,newTransition);
