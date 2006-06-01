@@ -105,7 +105,7 @@ public class DummyLearnerAction extends LamsDispatchAction
         ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 
         //get learner.
-        Integer learner = LearningWebUtil.getUserId(getServlet().getServletContext());
+        Integer learner = LearningWebUtil.getUserId();
         if(log.isDebugEnabled())
             log.debug("Getting active lessons for leaner:["+learner+"]");
 
@@ -143,7 +143,7 @@ public class DummyLearnerAction extends LamsDispatchAction
         ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 
         //get user and lesson based on request.
-        Integer learner = LearningWebUtil.getUserId(getServlet().getServletContext());
+        Integer learner = LearningWebUtil.getUserId();
         long lessonID = WebUtil.readLongParam(request,LearningWebUtil.PARAM_LESSON_ID);
 
         

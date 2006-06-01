@@ -72,7 +72,7 @@ public class CompleteActivityAction extends ActivityAction {
 			return mapping.findForward(ActivityMapping.DOUBLE_SUBMIT_ERROR);
 		}
 		
-		Integer learnerId = LearningWebUtil.getUserId(getServlet().getServletContext());
+		Integer learnerId = LearningWebUtil.getUserId();
 		LearnerProgress progress = getLearnerProgress(request);
 		Lesson lesson = progress.getLesson();
 		Activity activity = LearningWebUtil.getActivityFromRequest(request, getLearnerService());
@@ -86,7 +86,7 @@ public class CompleteActivityAction extends ActivityAction {
 		
 		// Set activity as complete
 		try {
-			progress = learnerService.calculateProgress(activity, learnerId, lesson);
+			progress = learnerService.calculateProgress(activity, learnerId, lesson.getLessonId());
 		}
 		catch (LearnerServiceException e) {
 			return mapping.findForward("error");

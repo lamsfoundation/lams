@@ -69,7 +69,7 @@ public class ChooseActivityAction extends ActivityAction {
 		}
 		
 		// Get learner and lesson details.
-		Integer learner = LearningWebUtil.getUserId(getServlet().getServletContext());
+		Integer learner = LearningWebUtil.getUserId();
 		LearnerProgress progress = getLearnerProgress(request);
 		Lesson lesson = progress.getLesson();
 		
@@ -81,7 +81,7 @@ public class ChooseActivityAction extends ActivityAction {
 		}
 
 		ILearnerService learnerService = getLearnerService();
-		learnerService.chooseActivity(learner, lesson, activity);
+		learnerService.chooseActivity(learner, lesson.getLessonId(), activity);
 		
 		ActionForward forward = actionMappings.getActivityForward(activity, progress, true);
 		return forward;

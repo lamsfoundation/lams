@@ -224,7 +224,7 @@ public class LearnerService implements ILearnerService
     	User learner = userManagementService.getUserById(learnerId);
     	
     	Lesson lesson = getLesson(lessonID);
-        LearnerProgress learnerProgress = learnerProgressDAO.getLearnerProgressByLearner(learner.getUserId(),lesson);
+        LearnerProgress learnerProgress = learnerProgressDAO.getLearnerProgressByLearner(learner.getUserId(),lessonID);
     	
         if(learnerProgress==null)
         {
@@ -262,13 +262,13 @@ public class LearnerService implements ILearnerService
     /**
      * Returns the current progress data of the User. 
      * @param learnerId the Learner's userID
-     * @param lesson the Lesson to get progress from.
+     * @param lessonId the Lesson to get progress from.
      * @return LearnerProgess contains the learner's progress for the lesson.
      * @throws LearnerServiceException in case of problems.
      */
-    public LearnerProgress getProgress(Integer learnerId, Lesson lesson)
+    public LearnerProgress getProgress(Integer learnerId, Long lessonId)
     {
-        return learnerProgressDAO.getLearnerProgressByLearner(learnerId, lesson);
+        return learnerProgressDAO.getLearnerProgressByLearner(learnerId, lessonId);
     }
     
     /**
@@ -288,11 +288,11 @@ public class LearnerService implements ILearnerService
     }
 
     /**
-     * @see org.lamsfoundation.lams.learning.service.ILearnerService#chooseActivity(org.lamsfoundation.lams.usermanagement.User, org.lamsfoundation.lams.lesson.Lesson, org.lamsfoundation.lams.learningdesign.Activity)
+     * @see org.lamsfoundation.lams.learning.service.ILearnerService#chooseActivity(org.lamsfoundation.lams.usermanagement.User, java.lang.Long, org.lamsfoundation.lams.learningdesign.Activity)
      */
-    public LearnerProgress chooseActivity(Integer learnerId, Lesson lesson, Activity activity) 
+    public LearnerProgress chooseActivity(Integer learnerId, Long lessonId, Activity activity) 
     {
-    	LearnerProgress progress = learnerProgressDAO.getLearnerProgressByLearner(learnerId, lesson);
+    	LearnerProgress progress = learnerProgressDAO.getLearnerProgressByLearner(learnerId, lessonId);
     	progress.setProgressState(activity, LearnerProgress.ACTIVITY_ATTEMPTED);
     	progress.setCurrentActivity(activity);
     	progress.setNextActivity(activity);
@@ -304,23 +304,22 @@ public class LearnerService implements ILearnerService
     /**
      * Calculates learner progress and returns the data required to be displayed 
      * to the learner.
-     * TODO need to initialize tool session for next activity if necessary.
      * @param completedActivityID identifies the activity just completed
      * @param learner the Learner
-     * @param lesson the Lesson in progress.
+     * @param lessonId the Lesson in progress.
      * @return the bean containing the display data for the Learner
      * @throws LamsToolServiceException
      * @throws LearnerServiceException in case of problems.
      */
     public LearnerProgress calculateProgress(Activity completedActivity, 
                                              Integer learnerId, 
-                                             Lesson lesson) 
+                                             Long lessonId) 
     {
-        LearnerProgress learnerProgress = learnerProgressDAO.getLearnerProgressByLearner(learnerId,lesson);
+        LearnerProgress learnerProgress = learnerProgressDAO.getLearnerProgressByLearner(learnerId,lessonId);
 
         try
         {
-            learnerProgress = progressEngine.calculateProgress(learnerProgress.getUser(), lesson, completedActivity,learnerProgress);
+            learnerProgress = progressEngine.calculateProgress(learnerProgress.getUser(), completedActivity,learnerProgress);
             learnerProgressDAO.updateLearnerProgress(learnerProgress);
             
             createToolSessionsIfNecessary(learnerProgress);
@@ -329,11 +328,6 @@ public class LearnerService implements ILearnerService
         {
             throw new LearnerServiceException(e.getMessage());
         }
-/*        catch (LamsToolServiceException e)
-        {
-            throw new LearnerServiceException(e.getMessage());
-        }
-*/
 
         return learnerProgress;
     }
@@ -350,7 +344,7 @@ public class LearnerService implements ILearnerService
         
         lamsCoreToolService.updateToolSession(toolSession);
         
-        return completeActivity(new Integer(learnerId.intValue()), toolSession.getToolActivity(), toolSession.getLesson());
+        return completeActivity(new Integer(learnerId.intValue()), toolSession.getToolActivity(), toolSession.getLesson().getLessonId());
     }
     
     /**
@@ -358,14 +352,13 @@ public class LearnerService implements ILearnerService
      */
     public String completeActivity(Integer learnerId,Long activityId,Long lessonId) {
     	Activity activity = getActivity(activityId);
-		Lesson lesson = getLesson(lessonId); 
-    	return completeActivity(learnerId, activity,lesson);
+    	return completeActivity(learnerId, activity,lessonId);
     }
 
     /**
-     * @see org.lamsfoundation.lams.learning.service.ILearnerService#completeActivity(java.lang.Integer, org.lamsfoundation.lams.learningdesign.Activity,org.lamsfoundation.lams.lesson.Lesson )
+     * @see org.lamsfoundation.lams.learning.service.ILearnerService#completeActivity(java.lang.Integer, org.lamsfoundation.lams.learningdesign.Activity, java.lang.Long )
      */
-    public String completeActivity(Integer learnerId,Activity activity,Lesson lesson)
+    public String completeActivity(Integer learnerId,Activity activity,Long lessonId)
     {
         //build up the url for next activity.
     	
@@ -375,7 +368,7 @@ public class LearnerService implements ILearnerService
     	// is triggered from a tool calling completeToolSession, its a bit hard to avoid.
     	try 
     	{
-	    	LearnerProgress nextLearnerProgress = calculateProgress(activity, learnerId, lesson);
+	    	LearnerProgress nextLearnerProgress = calculateProgress(activity, learnerId, lessonId);
 	    	LearningWebUtil.setLearnerProgress(nextLearnerProgress);
 	    	return activityMapping.getProgressURL(nextLearnerProgress);
     	}

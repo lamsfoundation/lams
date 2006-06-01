@@ -155,7 +155,7 @@ public class TestLearnerService extends AbstractLamsTestCase
     {
         learnerService.joinLesson(testUser.getUserId(),Test_Lesson_ID);
         
-        testProgress=learnerProgressDao.getLearnerProgressByLearner(testUser.getUserId(),testLesson);
+        testProgress=learnerProgressDao.getLearnerProgressByLearner(testUser.getUserId(),testLesson.getLessonId());
         assertNotNull(testProgress);
 
         // get the next activity, and get it by its proper class so we can analyse it!
@@ -200,7 +200,7 @@ public class TestLearnerService extends AbstractLamsTestCase
         testRootPreviousActivity = testCompletedActivity;        
         testProgress = learnerService.calculateProgress(testCompletedActivity,
                                                         testUser.getUserId(),
-                                                        testLesson);
+                                                        testLesson.getLessonId());
         assertLearnerProgress(testRootPreviousActivity,TEST_SYNCHGATE_ACTIVITY_UIID,TEST_SYNCHGATE_ACTIVITY_UIID,1,1,"sycn-gate","sycn-gate");
         assertEquals("verify temp completed activities",1,testProgress.getCurrentCompletedActivitiesList().size());
 
@@ -209,7 +209,7 @@ public class TestLearnerService extends AbstractLamsTestCase
         testRootPreviousActivity = testCompletedActivity;
         testProgress = learnerService.calculateProgress(testCompletedActivity,
                                                         testUser.getUserId(),
-                                                        testLesson);
+                                                        testLesson.getLessonId());
         assertLearnerProgress(testRootPreviousActivity,TEST_NOTEBOOK_ACTIVITY_UIID,TEST_NOTEBOOK_ACTIVITY_UIID,2,1,"random grouping","random grouping");
         assertEquals("verify temp completed activities",1,testProgress.getCurrentCompletedActivitiesList().size());
 
@@ -219,7 +219,7 @@ public class TestLearnerService extends AbstractLamsTestCase
         testRootPreviousActivity = testCompletedActivity;
         testProgress = learnerService.calculateProgress(testCompletedActivity,
                                                         testUser.getUserId(),
-                                                        testLesson);
+                                                        testLesson.getLessonId());
         assertLearnerProgress(testRootPreviousActivity,TEST_RGRP_ACTIVITY_UIID,TEST_RGRP_ACTIVITY_UIID,3,1,"random grouping","random grouping");
         assertEquals("verify temp completed activities",1,testProgress.getCurrentCompletedActivitiesList().size());
 
@@ -228,7 +228,7 @@ public class TestLearnerService extends AbstractLamsTestCase
         testRootPreviousActivity = testCompletedActivity;
         testProgress = learnerService.calculateProgress(testCompletedActivity,
                                                         testUser.getUserId(),
-                                                        testLesson);
+                                                        testLesson.getLessonId());
         assertLearnerProgress(testRootPreviousActivity,TEST_SCHEDULE_GATE_ACTIVITY_UIID,TEST_SCHEDULE_GATE_ACTIVITY_UIID,4,1,"schedule gate","schedule gate");
         assertEquals("verify temp completed activities",1,testProgress.getCurrentCompletedActivitiesList().size());
 
@@ -238,7 +238,7 @@ public class TestLearnerService extends AbstractLamsTestCase
         testRootPreviousActivity = testCompletedActivity;
         testProgress = learnerService.calculateProgress(testCompletedActivity,
                                                         testUser.getUserId(),
-                                                        testLesson);
+                                                        testLesson.getLessonId());
         assertLearnerProgress(testRootPreviousActivity,TEST_CHAT_ACTIVITY_UIID,TEST_CHAT_ACTIVITY_UIID,5,1,"chat","chat");
         assertEquals("verify temp completed activities",1,testProgress.getCurrentCompletedActivitiesList().size());
 
@@ -247,7 +247,7 @@ public class TestLearnerService extends AbstractLamsTestCase
         testRootPreviousActivity = testCompletedActivity;
         testProgress = learnerService.calculateProgress(testCompletedActivity,
                                                         testUser.getUserId(),
-                                                        testLesson);
+                                                        testLesson.getLessonId());
         assertLearnerProgress(testRootPreviousActivity,TEST_QNA_ACTIVITY_UIID,TEST_QNA_ACTIVITY_UIID,6,1,"QNA","QNA");
         assertEquals("verify temp completed activities",1,testProgress.getCurrentCompletedActivitiesList().size());
         
@@ -257,7 +257,7 @@ public class TestLearnerService extends AbstractLamsTestCase
         testRootPreviousActivity = testCompletedActivity;
         testProgress = learnerService.calculateProgress(testCompletedActivity,
                                                         testUser.getUserId(),
-                                                        testLesson);
+                                                        testLesson.getLessonId());
         assertLearnerProgress(testRootPreviousActivity,TEST_PERMISSION_GATE_ACTIVITY_UIID,TEST_PERMISSION_GATE_ACTIVITY_UIID,7,1,"permission gate","permission gate");
         assertEquals("verify temp completed activities",1,testProgress.getCurrentCompletedActivitiesList().size());
         
@@ -266,7 +266,7 @@ public class TestLearnerService extends AbstractLamsTestCase
         testRootPreviousActivity = testCompletedActivity;
         testProgress = learnerService.calculateProgress(testCompletedActivity,
                                                         testUser.getUserId(),
-                                                        testLesson);
+                                                        testLesson.getLessonId());
         assertLearnerProgress(testRootPreviousActivity,TEST_OPTIONS_ACTIVITY_UIID,TEST_OPTIONS_ACTIVITY_UIID,8,1,"OPTIONS","OPTIONS");
         assertEquals("verify temp completed activities",1,testProgress.getCurrentCompletedActivitiesList().size());
         
@@ -275,7 +275,7 @@ public class TestLearnerService extends AbstractLamsTestCase
         testRootPreviousActivity = testCompletedActivity.getParentActivity();
         testProgress = learnerService.calculateProgress(testCompletedActivity,
                                                         testUser.getUserId(),
-                                                        testLesson);
+                                                        testLesson.getLessonId());
         assertLearnerProgress(testRootPreviousActivity,TEST_PARALLEL_ACTIVITY_UIID,TEST_PARALLEL_ACTIVITY_UIID,10,1,"PARALLEL","PARALLEL");
         assertEquals("verify temp completed activities",2,testProgress.getCurrentCompletedActivitiesList().size());
         
@@ -285,7 +285,7 @@ public class TestLearnerService extends AbstractLamsTestCase
         testRootPreviousActivity = testProgress.getPreviousActivity();
         testProgress = learnerService.calculateProgress(testCompletedActivity,
                                                         testUser.getUserId(),
-                                                        testLesson);
+                                                        testLesson.getLessonId());
         assertLearnerProgress(testRootPreviousActivity,TEST_PARALLEL_ACTIVITY_UIID,TEST_WAITING_ACTIVITY_UIID,11,1,"PARALLEL","WAITING");
         assertTrue("verify waiting flag-should be waiting.",testProgress.isParallelWaiting());
         assertTrue("verify next activity",testProgress.getNextActivity()==null);
@@ -296,7 +296,7 @@ public class TestLearnerService extends AbstractLamsTestCase
         testRootPreviousActivity = testCompletedActivity.getParentActivity();
         testProgress = learnerService.calculateProgress(testCompletedActivity,
                                                         testUser.getUserId(),
-                                                        testLesson);
+                                                        testLesson.getLessonId());
         assertLearnerProgress(testRootPreviousActivity,TEST_SEQUENCE_ACTIVITY_UIID,TEST_SR_ACTIVITY_UIID,13,1,"SEQUENCE","SHARE RESOURCE");
         assertTrue("verify waiting flag-should not be waiting",!testProgress.isParallelWaiting());
         assertEquals("verify temp completed activities",2,testProgress.getCurrentCompletedActivitiesList().size());
@@ -306,7 +306,7 @@ public class TestLearnerService extends AbstractLamsTestCase
         testRootPreviousActivity = testProgress.getPreviousActivity();
         testProgress = learnerService.calculateProgress(testCompletedActivity,
                                                         testUser.getUserId(),
-                                                        testLesson);
+                                                        testLesson.getLessonId());
         assertLearnerProgress(testRootPreviousActivity,TEST_SEQUENCE_ACTIVITY_UIID,TEST_SQNA_ACTIVITY_UIID,14,2,"SEQUENCE","QNA");
         assertEquals("verify temp completed activities",1,testProgress.getCurrentCompletedActivitiesList().size());
         
@@ -314,7 +314,7 @@ public class TestLearnerService extends AbstractLamsTestCase
         testCompletedActivity = testProgress.getNextActivity();
         testProgress = learnerService.calculateProgress(testCompletedActivity,
                                                         testUser.getUserId(),
-                                                        testLesson);
+                                                        testLesson.getLessonId());
         assertTrue("verify lesson complete",testProgress.isLessonComplete());
         assertEquals("verify temp completed activities",1,testProgress.getCurrentCompletedActivitiesList().size());
     }
@@ -323,7 +323,7 @@ public class TestLearnerService extends AbstractLamsTestCase
     {
         learnerService.exitLesson(testProgress.getLearnerProgressId());
         
-        LearnerProgress progress = learnerProgressDao.getLearnerProgressByLearner(testUser.getUserId(),testLesson);
+        LearnerProgress progress = learnerProgressDao.getLearnerProgressByLearner(testUser.getUserId(),testLesson.getLessonId());
 
         assertTrue("verify it should be restarting",progress.isRestarting());
         

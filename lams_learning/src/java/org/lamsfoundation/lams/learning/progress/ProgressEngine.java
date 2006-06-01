@@ -27,9 +27,15 @@ package org.lamsfoundation.lams.learning.progress;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.lamsfoundation.lams.learningdesign.*;
+import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ComplexActivity;
+import org.lamsfoundation.lams.learningdesign.LearningDesign;
+import org.lamsfoundation.lams.learningdesign.SequenceActivity;
+import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
-import org.lamsfoundation.lams.lesson.*;
+import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.lesson.ParallelWaitActivity;
 import org.lamsfoundation.lams.usermanagement.User;
 
 /**
@@ -63,7 +69,6 @@ public class ProgressEngine
      * @throws ProgressException if progress cannot be calculated successfully.
      */
     public LearnerProgress calculateProgress(User learner,
-                                             Lesson lesson,
                                              Activity completedActivity,
                                              LearnerProgress learnerProgress) throws ProgressException
     {
@@ -78,7 +83,6 @@ public class ProgressEngine
                                              transition);
         else
             return progressParentActivity(learner,
-                                          lesson,
                                           completedActivity,
                                           learnerProgress);
     }
@@ -165,7 +169,6 @@ public class ProgressEngine
      * @throws ProgressException
      */
     private LearnerProgress progressParentActivity(User learner,
-                                                   Lesson lesson,
                                                    Activity completedActivity,
                                                    LearnerProgress learnerProgress) throws ProgressException
     {
@@ -211,7 +214,7 @@ public class ProgressEngine
             //recurvisely call back to calculateProgress to calculate completed
             //parent activity.
             else
-                calculateProgress(learner, lesson, parent, learnerProgress);
+                calculateProgress(learner, parent, learnerProgress);
         }
         //lesson is meant to be completed if there is no transition and no parent.
         else

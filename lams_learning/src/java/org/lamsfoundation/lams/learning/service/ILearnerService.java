@@ -69,11 +69,11 @@ public interface ILearnerService
     /**
      * Returns the current progress data of the User.
      * @param learnerId the Learner's userID
-     * @param lesson the Lesson to get progress from.
+     * @param lessonId the Lesson to get progress from.
      * @return LearnerProgess contains the learner's progress for the lesson.
      * @throws LearnerServiceException in case of problems.
      */
-    public LearnerProgress getProgress(Integer learnerId, Lesson lesson);
+    public LearnerProgress getProgress(Integer learnerId, Long lessonId);
     
     /**
      * Return the current progress data against progress id.
@@ -93,22 +93,22 @@ public interface ILearnerService
     /**
      * Marks an activity as attempted. Called when a user selects an OptionsActivity.
      * @param learnerId the Learner's userID
-     * @param lesson the Lesson to get progress from.
+     * @param lessonId the Lesson to get progress from.
      * @param activity the activity being attempted.
      * @return LearnerProgress
      */
-    public LearnerProgress chooseActivity(Integer learnerId, Lesson lesson, Activity activity);
+    public LearnerProgress chooseActivity(Integer learnerId, Long lessonId, Activity activity);
 
     
     /**
      * Calculates learner progress and returns the data required to be displayed to the learner (including URL(s)).
      * @param completedActivityID identifies the activity just completed
      * @param learner the Learner
-     * @param lesson the Lesson in progress.
+     * @param lessonId the Lesson in progress.
      * @return the bean containing the display data for the Learner
      * @throws LearnerServiceException in case of problems.
      */
-    public LearnerProgress calculateProgress(Activity completedActivity, Integer learnerId, Lesson lesson); 
+    public LearnerProgress calculateProgress(Activity completedActivity, Integer learnerId, Long lessonId); 
 
     
     /**
@@ -148,10 +148,10 @@ public interface ILearnerService
      * 
      * @param learnerId the learner who are running this activity in the design.
      * @param activity the activity is being run.
-     * @param lesson the lesson this learner is currently in.
+     * @param lessonId the lesson this learner is currently in.
      * @return the url for next activity.
      */
-    public String completeActivity(Integer learnerId,Activity activity,Lesson lesson);
+    public String completeActivity(Integer learnerId,Activity activity,Long lessonId);
 
     /**
      * Retrieve all lessons that has been started, suspended or finished. All

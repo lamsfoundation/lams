@@ -33,7 +33,6 @@ import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.web.action.ActivityAction;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
-import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -54,7 +53,6 @@ public class LearningWebUtil
     //---------------------------------------------------------------------
     // Class level constants - session attributes
     //---------------------------------------------------------------------
-	public static final String ATTR_LESSON_DATA = "lesson";
 	public static final String PARAM_LESSON_ID = "lessonId";
 	public static final String PARAM_ACTIVITY_ID = "activityId";
 	public static final String PARAM_PROGRESS_ID = "progressId";
@@ -68,7 +66,7 @@ public class LearningWebUtil
      * @param surveyService the service facade of survey tool
      * @return the user data value object
      */
-    public static Integer getUserId(ServletContext servletContext)
+    public static Integer getUserId()
     {
         HttpSession ss = SessionManager.getSession();
         UserDTO learner = (UserDTO) ss.getAttribute(AttributeNames.USER);
@@ -76,46 +74,43 @@ public class LearningWebUtil
     }
     
     /**
-     * Helper method to get lesson. 
+     * Helper method to get lesson id. 
      * 
      * @param request A standard Servlet HttpServletRequest class.
      * @param learnerService leaner service facade.
      * @param servletContext the servlet container that has all resources
      * @return The requested lesson.
      */
-    public static Lesson getLessonData(HttpServletRequest request, ServletContext servletContext)
+    public static Long getLessonId(HttpServletRequest request)
     {
         HttpSession ss = SessionManager.getSession();
-        Lesson lesson = (Lesson)ss.getAttribute(ATTR_LESSON_DATA);
+        Long lessonId = (Long)ss.getAttribute(PARAM_LESSON_ID);
         
-        if(lesson ==null)
+        if(lessonId ==null)
         {
-            //initialize service object
-            ILearnerService learnerService = LearnerServiceProxy.getLearnerService(servletContext);
-            long lessonId = WebUtil.readLongParam(request,PARAM_LESSON_ID);
-            lesson = learnerService.getLesson(new Long(lessonId));
-            setLessonData(lesson);
+            // not in the session - is it in the request?
+            lessonId = WebUtil.readLongParam(request,PARAM_LESSON_ID,true);
         }
-        return lesson;
+        return lessonId;
     }
     
  
     /**
-     * Put the lesson data in the user's special session object, so that
-     * it can be retrieved by getLessonData() 
+     * Put the lesson id in the user's special session object, so that
+     * it can be retrieved by getLessonId() 
      * 
      * @param request A standard Servlet HttpServletRequest class.
      * @param learnerService leaner service facade.
      * @param servletContext the servlet container that has all resources
      * @return The requested lesson.
      */
-    public static void setLessonData(Lesson lesson)
+    public static void setLessonId(Long lessonId)
     {
         HttpSession ss = SessionManager.getSession();
-        if ( lesson != null ) {
-        	ss.setAttribute(ATTR_LESSON_DATA, lesson);
+        if ( lessonId != null ) {
+        	ss.setAttribute(PARAM_LESSON_ID, lessonId);
         } else {
-        	ss.removeAttribute(ATTR_LESSON_DATA);
+        	ss.removeAttribute(PARAM_LESSON_ID);
         }
     }
    
@@ -166,9 +161,9 @@ public class LearningWebUtil
 		{
             //initialize service object
             ILearnerService learnerService = LearnerServiceProxy.getLearnerService(servletContext);
-            Integer currentLearner = getUserId(servletContext);
-            Lesson lesson = getLessonData(request,servletContext);
-            learnerProgress = learnerService.getProgress(currentLearner,lesson);
+            Integer currentLearner = getUserId();
+            Long lessonId = getLessonId(request);
+            learnerProgress = learnerService.getProgress(currentLearner,lessonId);
 		    setLearnerProgress(learnerProgress);
 		}
 		return learnerProgress;

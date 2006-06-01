@@ -199,7 +199,7 @@ public class ExportPortfolioService implements IExportPortfolioService {
 	
 	    if (learner != null && lesson != null)
 	    {
-	        LearnerProgress learnerProgress = learnerService.getProgress(learner.getUserId(), lesson);
+	        LearnerProgress learnerProgress = learnerService.getProgress(learner.getUserId(), lesson.getLessonId());
 	        
 		    if (learnerProgress != null)
 		    {

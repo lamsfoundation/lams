@@ -145,7 +145,7 @@ public class LearnerAction extends LamsDispatchAction
     	try {
 	
 	        //get user and lesson based on request.
-	        Integer learner = LearningWebUtil.getUserId(getServlet().getServletContext());
+	        Integer learner = LearningWebUtil.getUserId();
 	        long lessonID = WebUtil.readLongParam(request,LearningWebUtil.PARAM_LESSON_ID);
 	
 	        
@@ -368,7 +368,7 @@ public class LearnerAction extends LamsDispatchAction
 	        ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 	
 	        //getting requested object according to coming parameters
-	        Integer learnerId = LearningWebUtil.getUserId(getServlet().getServletContext());
+	        Integer learnerId = LearningWebUtil.getUserId();
 	        User learner = LearnerServiceProxy.getUserManagementService(getServlet().getServletContext()).getUserById(learnerId);
 
 	        Activity requestedActivity = learnerService.getActivity(new Long(activityId));
