@@ -69,9 +69,9 @@ import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 
 /**
  * @author Manpreet Minhas
- * modified by Mailing Truong
+ * @author Mailing Truong
  * 
- * This is a utitlity class for extracting the
+ * This is a utility class for extracting the
  * information from the WDDX packet sent by the FLASH.
  * 
  * The following rules are applied:
@@ -106,6 +106,9 @@ public class ObjectExtractor implements IObjectExtractor {
 	 * objects related to the Hibernate session as they are updated by the parseTransitions code.
 	 */ 
 	protected HashMap<Integer,Activity> newActivityMap = new HashMap<Integer,Activity>(); 
+	protected HashMap<Integer,Grouping> groupings = new HashMap<Integer,Grouping>();
+	protected LearningDesign learningDesign = null;
+	
 	protected Logger log = Logger.getLogger(ObjectExtractor.class);	
 
 	/** Constructor to be used if Spring method injection is used */
@@ -225,11 +228,16 @@ public class ObjectExtractor implements IObjectExtractor {
 	 */
 	public LearningDesign extractSaveLearningDesign(Hashtable table) throws WDDXProcessorConversionException, ObjectExtractorException {
 
-		LearningDesign learningDesign = null;
+		learningDesign = null;
 	
 		Long learningDesignId = WDDXProcessor.convertToLong(table, "learningDesignID");
 		//if the learningDesignID is not null, load the existing LearningDesign object from the database, otherwise create a new one.
 		learningDesign = learningDesignId!= null ? learningDesignDAO.getLearningDesignById(learningDesignId) : new LearningDesign();
+		
+		// Pull out all the existing groups. there isn't an easy way to pull them out of the db requires an outer join across
+		// three objects (learning design -> grouping activity -> grouping) so put both the existing ones and the new ones
+		// here for reference later.
+		initialiseGroupings();
 		
 		//get the core learning design stuff
 		if (keyExists(table, WDDXTAGS.LEARNING_DESIGN_UIID)) 
@@ -333,27 +341,40 @@ public class ObjectExtractor implements IObjectExtractor {
 	
 		// now process the "parts" of the learning design
 		//Vector v = (Vector)table.get(WDDXTAGS.GROUPINGS);
-		parseGroupings((Vector)table.get(WDDXTAGS.GROUPINGS), learningDesign);
-		parseActivities((Vector)table.get(WDDXTAGS.ACTIVITIES),learningDesign);
-		parseActivitiesToMatchUpParentActivityByParentUIID((Vector)table.get(WDDXTAGS.ACTIVITIES),learningDesign);
-		parseTransitions((Vector)table.get(WDDXTAGS.TRANSITIONS),learningDesign);
+		parseGroupings((Vector)table.get(WDDXTAGS.GROUPINGS));
+		parseActivities((Vector)table.get(WDDXTAGS.ACTIVITIES));
+		parseActivitiesToMatchUpParentActivityByParentUIID((Vector)table.get(WDDXTAGS.ACTIVITIES));
+		parseTransitions((Vector)table.get(WDDXTAGS.TRANSITIONS));
 
 		learningDesign.setFirstActivity(learningDesign.calculateFirstActivity());
 		learningDesignDAO.insertOrUpdate(learningDesign);
 		
 		return learningDesign;	
 		}
+	
+	/** 
+	 * Initialise the map of groupings with those in the db from a previous save.
+	 * This must be called as soon as the learning design is read from the db and before it is changed.
+	 */
+	private void initialiseGroupings() {
+		List dbGroupings = groupingDAO.getGroupingsByLearningDesign(learningDesign.getLearningDesignId());
+		Iterator iter = dbGroupings.iterator();
+		while (iter.hasNext()) {
+			Grouping grouping = (Grouping) iter.next();
+			groupings.put(grouping.getGroupingUIID(), grouping);
+		}
+	}
+	
 	/**
 	 * Parses the groupings array sent from the WDDX packet. It will create
 	 * the groupings object (ChosenGrouping, RandomGrouping) so that when the
 	 * GroupingActivity is processed, it can link to the grouping object
 	 * that has been created by this method.
 	 * @param groupingsList
-	 * @param learningDesign
 	 * @throws WDDXProcessorConversionException
 	 */
 	
-	private void parseGroupings(List groupingsList, LearningDesign learningDesign) 
+	private void parseGroupings(List groupingsList) 
 		throws WDDXProcessorConversionException 	
 	{
 	   //iterate through the list of groupings objects
@@ -367,7 +388,8 @@ public class ObjectExtractor implements IObjectExtractor {
 	            if( groupingDetails != null )
 	            {
 	    			Grouping grouping = extractGroupingObject(groupingDetails);	
-	    			groupingDAO.insertOrUpdate(grouping);	    			
+	    			groupingDAO.insertOrUpdate(grouping);	
+	    			groupings.put(grouping.getGroupingUIID(),grouping);
 	            }
 	        }
 	        
@@ -377,7 +399,47 @@ public class ObjectExtractor implements IObjectExtractor {
 	
 	}
 	
-	
+
+	public Grouping extractGroupingObject(Hashtable groupingDetails) throws WDDXProcessorConversionException{
+		
+	    Integer groupingUUID = WDDXProcessor.convertToInteger(groupingDetails, WDDXTAGS.GROUPING_UIID);	
+	    Integer groupingTypeID=WDDXProcessor.convertToInteger(groupingDetails,WDDXTAGS.GROUPING_TYPE_ID);
+	    if (groupingTypeID== null) { 
+			throw new WDDXProcessorConversionException("groupingTypeID is missing");
+		}
+
+	    Grouping grouping = groupings.get(groupingUUID);
+	    if (grouping == null) {
+	        Object object = Grouping.getGroupingInstance(groupingTypeID);
+			grouping = (Grouping)object;				
+			
+			if(keyExists(groupingDetails, WDDXTAGS.GROUPING_ID))
+				    grouping.setGroupingId(WDDXProcessor.convertToLong(groupingDetails,WDDXTAGS.GROUPING_ID));
+			if (keyExists(groupingDetails, WDDXTAGS.GROUPING_UIID))
+				    grouping.setGroupingUIID(WDDXProcessor.convertToInteger(groupingDetails,WDDXTAGS.GROUPING_UIID));
+	    }   
+	 
+	    if(grouping.isRandomGrouping())
+			createRandomGrouping((RandomGrouping)grouping,groupingDetails);
+		else if(grouping.isChosenGrouping())
+			createChosenGrouping((ChosenGrouping)grouping,groupingDetails);
+		else
+			createLessonClass((LessonClass)grouping, groupingDetails);  
+		
+		if (keyExists(groupingDetails,WDDXTAGS.MAX_NUMBER_OF_GROUPS))
+		    grouping.setMaxNumberOfGroups(WDDXProcessor.convertToInteger(groupingDetails,WDDXTAGS.MAX_NUMBER_OF_GROUPS));
+		
+		return grouping;
+	}
+	private void createRandomGrouping(RandomGrouping randomGrouping,Hashtable groupingDetails) throws WDDXProcessorConversionException{
+	    if (keyExists(groupingDetails, WDDXTAGS.LEARNERS_PER_GROUP))
+	        randomGrouping.setLearnersPerGroup(WDDXProcessor.convertToInteger(groupingDetails,WDDXTAGS.LEARNERS_PER_GROUP));
+		if (keyExists(groupingDetails, WDDXTAGS.NUMBER_OF_GROUPS))
+		    randomGrouping.setNumberOfGroups(WDDXProcessor.convertToInteger(groupingDetails,WDDXTAGS.NUMBER_OF_GROUPS));
+	}
+	private void createChosenGrouping(ChosenGrouping chosenGrouping,Hashtable groupingDetails) throws WDDXProcessorConversionException{
+		//no extra properties as yet
+	}
 	
 	/**
 	 * Parses the list of activities sent from the WDDX packet. The current activities that 
@@ -387,18 +449,17 @@ public class ObjectExtractor implements IObjectExtractor {
 	 * are deleted.
 	 * 
 	 * @param activitiesList The list of activities from the WDDX packet.
-	 * @param learningDesign
 	 * @throws WDDXProcessorConversionException
 	 * @throws ObjectExtractorException
 	 */
-	private void parseActivities(List activitiesList, LearningDesign learningDesign) 
+	private void parseActivities(List activitiesList) 
 			throws WDDXProcessorConversionException, ObjectExtractorException {
 		
 		if(activitiesList!=null){
 			Iterator iterator = activitiesList.iterator();
 			while(iterator.hasNext()){
 				Hashtable activityDetails = (Hashtable)iterator.next();
-				Activity activity = extractActivityObject(activityDetails,learningDesign);	
+				Activity activity = extractActivityObject(activityDetails);	
 				activityDAO.insertOrUpdate(activity);
 				newActivityMap.put(activity.getActivityUIID(), activity); 
 			}
@@ -428,7 +489,7 @@ public class ObjectExtractor implements IObjectExtractor {
 	 * @throws WDDXProcessorConversionException
 	 * @throws ObjectExtractorException
 	 */
-	private void parseActivitiesToMatchUpParentActivityByParentUIID(List activitiesList, LearningDesign learningDesign) throws WDDXProcessorConversionException, ObjectExtractorException
+	private void parseActivitiesToMatchUpParentActivityByParentUIID(List activitiesList) throws WDDXProcessorConversionException, ObjectExtractorException
 	{
 		if (activitiesList != null)
 		{
@@ -470,7 +531,7 @@ public class ObjectExtractor implements IObjectExtractor {
 	 * @param learningDesign
 	 * @throws WDDXProcessorConversionException
 	 */
-	private void parseTransitions(List transitionsList, LearningDesign learningDesign) throws WDDXProcessorConversionException{
+	private void parseTransitions(List transitionsList) throws WDDXProcessorConversionException{
 	    
 	    HashMap<Integer,Transition> newMap = new HashMap<Integer,Transition>();
 		
@@ -478,7 +539,7 @@ public class ObjectExtractor implements IObjectExtractor {
 			Iterator iterator= transitionsList.iterator();
 			while(iterator.hasNext()){
 				Hashtable transitionDetails = (Hashtable)iterator.next();
-				Transition transition = extractTransitionObject(transitionDetails,learningDesign);
+				Transition transition = extractTransitionObject(transitionDetails);
 				// Check if transition actually exists. extractTransitionObject returns null
 				// if neither the to/from activity exists.
 				if ( transition != null ) {
@@ -510,13 +571,13 @@ public class ObjectExtractor implements IObjectExtractor {
 	    
 	   
 	}
-	public Activity extractActivityObject(Hashtable activityDetails, LearningDesign design) throws WDDXProcessorConversionException, ObjectExtractorException {
+	public Activity extractActivityObject(Hashtable activityDetails) throws WDDXProcessorConversionException, ObjectExtractorException {
 		
 	    //it is assumed that the activityUUID will always be sent by flash.
 	    Integer activityUUID = WDDXProcessor.convertToInteger(activityDetails,WDDXTAGS.ACTIVITY_UIID);
 	    Activity activity = null;
 	    //get the activity with the particular activity uuid, if null, then new object needs to be created.
-	    Activity existingActivity = activityDAO.getActivityByUIID(activityUUID, design);
+	    Activity existingActivity = activityDAO.getActivityByUIID(activityUUID, learningDesign);
 	    if (existingActivity == null)
 	    {
 			Integer activityTypeID = WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.ACTIVITY_TYPE_ID);
@@ -553,7 +614,7 @@ public class ObjectExtractor implements IObjectExtractor {
 	    {
 			Integer groupingUIID = WDDXProcessor.convertToInteger(activityDetails,WDDXTAGS.GROUPING_UIID);
 			if ( groupingUIID != null ){
-				Grouping grouping = groupingDAO.getGroupingByUIID(groupingUIID);
+				Grouping grouping = groupings.get(groupingUIID);
 				if ( grouping != null ) {
 					setGrouping(activity, grouping, groupingUIID);
 				} else {
@@ -572,7 +633,7 @@ public class ObjectExtractor implements IObjectExtractor {
 		if (keyExists(activityDetails, WDDXTAGS.DEFINE_LATER))
 		    activity.setDefineLater(WDDXProcessor.convertToBoolean(activityDetails,WDDXTAGS.DEFINE_LATER));
 		
-		activity.setLearningDesign(design);
+		activity.setLearningDesign(learningDesign);
 		
 		if (keyExists(activityDetails, WDDXTAGS.LEARNING_LIBRARY_ID))
 		{
@@ -638,7 +699,7 @@ public class ObjectExtractor implements IObjectExtractor {
 		 * read the createGroupingUUID, get the Grouping Object, and set CreateGrouping to that object
 		 */
 	    Integer createGroupingUIID = WDDXProcessor.convertToInteger(activityDetails,WDDXTAGS.CREATE_GROUPING_UIID);	    
-	    Grouping grouping = groupingDAO.getGroupingByUIID(createGroupingUIID);
+	    Grouping grouping = groupings.get(createGroupingUIID);
 	    if (grouping!=null)
 	    {
 		    groupingActivity.setCreateGrouping(grouping);
@@ -701,51 +762,6 @@ public class ObjectExtractor implements IObjectExtractor {
 	}
 	
 
-	public Grouping extractGroupingObject(Hashtable groupingDetails) throws WDDXProcessorConversionException{
-		
-	    //get grouping by uuid
-	    Grouping grouping;
-	    Integer groupingUUID = WDDXProcessor.convertToInteger(groupingDetails, WDDXTAGS.GROUPING_UIID);	
-	    Integer groupingTypeID=WDDXProcessor.convertToInteger(groupingDetails,WDDXTAGS.GROUPING_TYPE_ID);
-	    if (groupingTypeID== null) { 
-			throw new WDDXProcessorConversionException("groupingTypeID is missing");
-		}
-	    Grouping existingGrouping = groupingDAO.getGroupingByUIID(groupingUUID);
-	    if (existingGrouping != null)
-	        grouping = existingGrouping;	   
-	    else
-	    {
-	        Object object = Grouping.getGroupingInstance(groupingTypeID);
-			grouping = (Grouping)object;				
-			
-			if(keyExists(groupingDetails, WDDXTAGS.GROUPING_ID))
-				    grouping.setGroupingId(WDDXProcessor.convertToLong(groupingDetails,WDDXTAGS.GROUPING_ID));
-			if (keyExists(groupingDetails, WDDXTAGS.GROUPING_UIID))
-				    grouping.setGroupingUIID(WDDXProcessor.convertToInteger(groupingDetails,WDDXTAGS.GROUPING_UIID));
-		}	    
-	   	    
-	 
-	    if(grouping.isRandomGrouping())
-			createRandomGrouping((RandomGrouping)grouping,groupingDetails);
-		else if(grouping.isChosenGrouping())
-			createChosenGrouping((ChosenGrouping)grouping,groupingDetails);
-		else
-			createLessonClass((LessonClass)grouping, groupingDetails);  
-		
-		if (keyExists(groupingDetails,WDDXTAGS.MAX_NUMBER_OF_GROUPS))
-		    grouping.setMaxNumberOfGroups(WDDXProcessor.convertToInteger(groupingDetails,WDDXTAGS.MAX_NUMBER_OF_GROUPS));
-		
-		return grouping;
-	}
-	private void createRandomGrouping(RandomGrouping randomGrouping,Hashtable groupingDetails) throws WDDXProcessorConversionException{
-	    if (keyExists(groupingDetails, WDDXTAGS.LEARNERS_PER_GROUP))
-	        randomGrouping.setLearnersPerGroup(WDDXProcessor.convertToInteger(groupingDetails,WDDXTAGS.LEARNERS_PER_GROUP));
-		if (keyExists(groupingDetails, WDDXTAGS.NUMBER_OF_GROUPS))
-		    randomGrouping.setNumberOfGroups(WDDXProcessor.convertToInteger(groupingDetails,WDDXTAGS.NUMBER_OF_GROUPS));
-	}
-	private void createChosenGrouping(ChosenGrouping chosenGrouping,Hashtable groupingDetails) throws WDDXProcessorConversionException{
-		//no extra properties as yet
-	}
 	private void createLessonClass(LessonClass lessonClass, Hashtable groupingDetails) throws WDDXProcessorConversionException{
 	    if (keyExists(groupingDetails, WDDXTAGS.STAFF_GROUP_ID))
 	    {
@@ -768,7 +784,7 @@ public class ObjectExtractor implements IObjectExtractor {
 	 * @param transitionDetails
 	 * @throws WDDXProcessorConversionException
 	 */
-	private Transition extractTransitionObject(Hashtable transitionDetails, LearningDesign learningDesign) throws WDDXProcessorConversionException{
+	private Transition extractTransitionObject(Hashtable transitionDetails) throws WDDXProcessorConversionException{
 		
 	    Integer transitionUUID = WDDXProcessor.convertToInteger(transitionDetails,WDDXTAGS.TRANSITION_UIID);
 	    if ( transitionUUID == null ) { 
@@ -776,7 +792,7 @@ public class ObjectExtractor implements IObjectExtractor {
 	    }
 	    
 	    Transition transition = null;	
-	    Transition existingTransition = findTransition(learningDesign, transitionUUID);
+	    Transition existingTransition = findTransition(transitionUUID);
 		
 	    if (existingTransition == null) {
 	        transition = new Transition();
@@ -861,7 +877,7 @@ public class ObjectExtractor implements IObjectExtractor {
 	* a Flush, and we haven't updated the rest of the design, so this would trigger a 
 	* "deleted object would be re-saved by cascade" error.
 	*/
-	private Transition findTransition(LearningDesign learningDesign, Integer transitionUUID) {
+	private Transition findTransition(Integer transitionUUID) {
 	    Transition existingTransition = null;
 		Set transitions = learningDesign.getTransitions();
 		Iterator iter = transitions.iterator();
@@ -896,16 +912,16 @@ public class ObjectExtractor implements IObjectExtractor {
 	 * @param activityToDelete
 	 * @param design
 	 */
-	private void clearTransition(Activity activityToDelete, LearningDesign design)
+	private void clearTransition(Activity activityToDelete)
 	{
 	   
 	   Transition transitionFrom = activityToDelete.getTransitionFrom();	 	   
 	   if (transitionFrom != null)
-	       deleteTransition(transitionFrom, design);
+	       deleteTransition(transitionFrom);
 	     
 	   Transition transitionTo = activityToDelete.getTransitionTo();
 	   if (transitionTo != null)
-		   deleteTransition(transitionTo, design);
+		   deleteTransition(transitionTo);
 
 	}
 	
@@ -915,7 +931,7 @@ public class ObjectExtractor implements IObjectExtractor {
 	 * @param transition
 	 * @param design
 	 */
-	private void deleteTransition(Transition transition, LearningDesign design)
+	private void deleteTransition(Transition transition)
 	{
 	    Activity fromActivity = transition.getFromActivity();
 	    fromActivity.setTransitionFrom(null);
@@ -925,7 +941,7 @@ public class ObjectExtractor implements IObjectExtractor {
 		
 		//This will leave orphan content in the tool tables. It will be removed by the tool content cleaning job, 
 		//which may be run from the admin screen or via a cron job
-		design.getTransitions().remove(transition);
+		learningDesign.getTransitions().remove(transition);
 	}
 }
 	
