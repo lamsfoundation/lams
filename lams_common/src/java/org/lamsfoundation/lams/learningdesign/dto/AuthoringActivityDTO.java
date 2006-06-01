@@ -121,6 +121,9 @@ public class AuthoringActivityDTO extends BaseDTO{
 	/** Instructions for OptionsActivity*/
 	private String optionsInstructions;
 	
+	/** The tool_signature of the activity */
+	private String toolSignature;
+	
 	/** The tool_id of the activity */
 	private Long toolID;
 	
@@ -199,7 +202,7 @@ public class AuthoringActivityDTO extends BaseDTO{
 			Long learningLibraryID, Date createDateTime, Boolean runOffline,
 			String languageFile,
 			Integer maxOptions, Integer minOptions,
-			String optionsInstructions, Long toolID, Long toolContentID,
+			String optionsInstructions, String toolSignature, Long toolID, Long toolContentID,
 			Integer activityCategoryID, Integer gateActivityLevelID,
 			Boolean gateOpen, Long gateStartTimeOffset, Long gateEndTimeOffset,
 			Date gateStartDateTime, Date gateEndDateTime,
@@ -230,6 +233,7 @@ public class AuthoringActivityDTO extends BaseDTO{
 		this.maxOptions = maxOptions;
 		this.minOptions = minOptions;
 		this.optionsInstructions = optionsInstructions;
+		this.toolSignature = toolSignature;
 		this.toolID = toolID;
 		this.toolContentID = toolContentID;
 		this.activityCategoryID = activityCategoryID;
@@ -329,7 +333,8 @@ public class AuthoringActivityDTO extends BaseDTO{
 	}
 	private void addToolActivityAttributes(ToolActivity toolActivity){
 		this.toolContentID = toolActivity.getToolContentId();
-		this.toolID = toolActivity.getTool().getToolId();	
+		this.toolID = toolActivity.getTool().getToolId();
+		this.toolSignature = toolActivity.getTool().getToolSignature();
 		this.authoringURL = toolActivity.getTool().getAuthorUrl();
 		this.monitoringURL = toolActivity.getTool().getMonitorUrl();
 		this.contributeURL = toolActivity.getTool().getContributeUrl();
@@ -897,5 +902,11 @@ public class AuthoringActivityDTO extends BaseDTO{
 	}
 	public void setModerationURL(String moderationURL) {
 		this.moderationURL = moderationURL;
+	}
+	public String getToolSignature() {
+		return toolSignature;
+	}
+	public void setToolSignature(String toolSignature) {
+		this.toolSignature = toolSignature;
 	}
 }

@@ -75,7 +75,12 @@ public interface IExportToolContentService {
 	 * @param fileUuidFieldName The POJO properties name for get fileUuid. There must be a get method to access this property.
 	 * @param fileVersionFieldName The POJO properties name for get fileVersion. There must be a get method to access this property.
 	 */
-	void registerFileHandleClass(String fileNodeClassName,String fileUuidFieldName, String fileVersionFieldName);
-	
+	void registerFileClassForExport(String fileNodeClassName,String fileUuidFieldName, String fileVersionFieldName);
+	void registerFileClassForImport(String fileNodeClassName, String fileUuidFieldName,
+			String fileVersionFieldName, String fileNameFieldName, String filePropertyFieldName, String mimeTypeFieldName,
+			String initialItemFieldName);
+
 	void importLearningDesign(String learningDesignPath,User importer, Integer workspaceFolderUid) throws ImportToolContentException;
+	
+	Object importToolContent(String toolContentPath,IToolContentHandler toolContentHandler) throws ImportToolContentException;
 }

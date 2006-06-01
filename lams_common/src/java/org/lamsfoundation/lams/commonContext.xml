@@ -149,6 +149,7 @@
 	<bean id="exportToolContentServiceTarget" class="org.lamsfoundation.lams.learningdesign.service.ExportToolContentService">
 		<property name="activityDAO"><ref bean="activityDAO"/></property>
 		<property name="toolDAO"><ref bean="toolDAO"/></property>
+		<property name="toolContentDAO"><ref bean="toolContentDAO"/></property>
 		<property name="workspaceFolderDAO"><ref bean="workspaceFolderDAO"/></property>
 		<property name="licenseDAO"><ref bean="licenseDAO"/></property>
 		<property name="groupingDAO"><ref bean="groupingDAO"/></property>
