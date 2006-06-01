@@ -70,6 +70,10 @@ public class Organisation implements Serializable {
     private Set lessons;
     
     private OrganisationState organisationState;
+
+	private String localeLanguage;
+
+	private String localeCountry;
     
     /** full constructor */
     public Organisation(String name, String description, Organisation parentOrganisation, Date createDate, Workspace workspace, OrganisationType organisationType, Set userOrganisations, Set childOrganisations, Set lessons) {
@@ -261,6 +265,34 @@ public class Organisation implements Serializable {
 
     public void setLessons(Set lessons) {
         this.lessons = lessons;
+    }
+
+    /** 
+     *            @hibernate.property
+     *             column="locale_language"
+     *             length="2"
+     *         
+     */
+    public String getLocaleLanguage() {
+        return this.localeLanguage;
+    }
+
+    public void setLocaleLanguage(String localeLanguage) {
+        this.localeLanguage = localeLanguage;
+    }
+
+    /** 
+     *            @hibernate.property
+     *             column="locale_country"
+     *             length="2"
+     *         
+     */
+    public String getLocaleCountry() {
+        return this.localeCountry;
+    }
+
+    public void setLocaleCountry(String localeCountry) {
+        this.localeCountry = localeCountry;
     }
 
     /** 
