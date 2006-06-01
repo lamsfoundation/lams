@@ -26,6 +26,7 @@ import org.lamsfoundation.lams.common.util.*;
 import org.lamsfoundation.lams.monitoring.*;
 import org.lamsfoundation.lams.monitoring.mv.*;
 import org.lamsfoundation.lams.monitoring.mv.tabviews.*;
+import org.lamsfoundation.lams.authoring.Activity;
 import mx.utils.*
 
 /**
@@ -60,7 +61,10 @@ class MonitorController extends AbstractController {
 	}
 	
 	public function activityClick(ca:Object):Void{
-	   Debugger.log('activityClick CanvasActivity:'+ca.activity.activityUIID,Debugger.GEN,'activityClick','MonitorController');
+		//if (ca.activityTypeID==Activity.PARALLEL_ACTIVITY_TYPE){
+			
+			Debugger.log('activityClick CanvasActivity:'+ca.activity.activityUIID,Debugger.GEN,'activityClick','MonitorController');
+		//}
    }
    
 	public function activityDoubleClick(ca:Object):Void{
@@ -215,7 +219,7 @@ class MonitorController extends AbstractController {
 		trace('editing lesson class');
 		_monitorModel.getMonitor().createLessonClass();
 	}
-	
+
 	/**
 	 * Apply status change
 	 *   
