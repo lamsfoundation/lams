@@ -65,7 +65,8 @@ public class OptionsActivityStrategy extends ComplexActivityStrategy
     protected boolean isComplete(int numOfCompletedActivities)
     {
     	if ( optionsActivity != null ) {
-    		return numOfCompletedActivities>=optionsActivity.getMaxNumberOfOptions().intValue()?true:false;
+    		
+    		return numOfCompletedActivities>=optionsActivity.getMaxNumberOfOptionsNotNull().intValue()?true:false;
     	}
     	return true;
     }

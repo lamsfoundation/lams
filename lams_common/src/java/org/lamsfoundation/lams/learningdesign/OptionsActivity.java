@@ -167,6 +167,15 @@ public class OptionsActivity extends ComplexActivity implements Serializable {
         return this.maxNumberOfOptions;
     }
 
+    /** 
+     * Get the maximum number of options, guaranteed not to return null. If the 
+     * value is null in the database, returns the number of activities
+     * in this optional activity.
+     */
+    public Integer getMaxNumberOfOptionsNotNull() {
+    	return maxNumberOfOptions!=null ? maxNumberOfOptions : getActivities().size();
+    }
+
     public void setMaxNumberOfOptions(Integer maxNumberOfOptions) {
         this.maxNumberOfOptions = maxNumberOfOptions;
     }
@@ -176,6 +185,14 @@ public class OptionsActivity extends ComplexActivity implements Serializable {
      */
     public Integer getMinNumberOfOptions() {
         return this.minNumberOfOptions;
+    }
+
+    /** 
+     * Get the manimum number of options, guaranteed not to return null. If the 
+     * value is null in the database, returns 0
+     */
+    public Integer getMinNumberOfOptionsNotNull() {
+    	return maxNumberOfOptions!=null ? maxNumberOfOptions : new Integer(0);
     }
 
     public void setMinNumberOfOptions(Integer minNumberOfOptions) {
