@@ -136,6 +136,7 @@
 				<include name="fckeditor/**"/>
 				<include name="development/**"/>
 				<include name="flashxml/**"/>
+				<include name="**/*.jsp"/>
 				<exclude name="lams_example_tool"/>
 				<exclude name="classes"/>
 			</fileset>

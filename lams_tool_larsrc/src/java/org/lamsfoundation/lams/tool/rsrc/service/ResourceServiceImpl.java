@@ -53,6 +53,7 @@ import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
+import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
@@ -746,8 +747,8 @@ public class ResourceServiceImpl implements
  		toolContentObj.setOnlineFileList(null);
  		toolContentObj.setMiniViewNumberStr(null);
 		try {
-			exportContentService.registerFileHandleClass("org.lamsfoundation.lams.tool.rsrc.model.ResourceAttachment","fileUuid","fileVersionId");
-			exportContentService.registerFileHandleClass("org.lamsfoundation.lams.tool.rsrc.model.ResourceItem","fileUuid","fileVersionId");
+			exportContentService.registerFileClassForExport("org.lamsfoundation.lams.tool.rsrc.model.ResourceAttachment","fileUuid","fileVersionId");
+			exportContentService.registerFileClassForExport("org.lamsfoundation.lams.tool.rsrc.model.ResourceItem","fileUuid","fileVersionId");
 			exportContentService.exportToolContent( toolContentId, toolContentObj,resourceToolContentHandler, rootPath);
 		} catch (ExportToolContentException e) {
 			throw new ToolException(e);
@@ -755,7 +756,17 @@ public class ResourceServiceImpl implements
 	}
 
 
-	public void importToolContent(Object toolContnetPOJO) throws ToolException {
+	public void importToolContent(String toolContentPath) throws ToolException {
+	
+		try {
+			exportContentService.registerFileClassForImport("org.lamsfoundation.lams.tool.rsrc.model.ResourceAttachment"
+					,"fileUuid","fileVersionId","fileName","fileType",null,null);
+			exportContentService.registerFileClassForImport("org.lamsfoundation.lams.tool.rsrc.model.ResourceItem"
+					,"fileUuid","fileVersionId","fileName","fileType",null,"initialItem");
+			Object toolPOJO =  exportContentService.importToolContent(toolContentPath,resourceToolContentHandler);
+		} catch (ImportToolContentException e) {
+			throw new ToolException(e);
+		}
 	}
 
 	public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {

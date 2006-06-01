@@ -82,12 +82,10 @@ public class ImportToolContentServlet extends HttpServlet {
 			
         	FileItem file = null;
         	Map params = new HashMap();
-        	String filename;
+        	String filename = null;
         	
         	String uploadPath = FileUtil.createTempDirectory("_uploaded_learningdesing");
-        	String ldPath = FileUtil.getFullPath(uploadPath,"learningdesign");
-        	FileUtil.createDirectory(ldPath);
-        	
+
         	DiskFileUpload fu = new DiskFileUpload();
         	// maximum size that will be stored in memory
         	fu.setSizeThreshold(4096);
@@ -113,7 +111,7 @@ public class ImportToolContentServlet extends HttpServlet {
             	return;
             }
             // write the file
-            ZipFileUtil.expandZip(file.getInputStream(),ldPath);
+            String ldPath = ZipFileUtil.expandZip(file.getInputStream(),filename);
             IExportToolContentService service = getExportService();
             service.importLearningDesign(ldPath,user,workspaceFolderUid);
         } catch (Exception e) {

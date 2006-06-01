@@ -602,7 +602,8 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
      * for the content.
      * @throws ToolException if any other error occurs
      */
-	public void importToolContent(Object toolContnetPOJO) throws ToolException {
+	public void importToolContent(String toolContentPath) throws ToolException {
+			
 	}
 
 	/** @see org.lamsfoundation.lams.tool.ToolSessionManager#createToolSession(java.lang.Long, java.lang.String, java.lang.Long) */

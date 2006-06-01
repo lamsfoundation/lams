@@ -58,6 +58,7 @@ import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
+import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
@@ -223,7 +224,7 @@ public class SubmitFilesService implements ToolContentManager,
 	 * @throws ExportToolContentException 
      */
  	public void exportToolContent(Long toolContentId , String toPath) throws ToolException, DataMissingException{
- 		exportContentService.registerFileHandleClass("org.lamsfoundation.lams.tool.sbmt.InstructionFiles","uuID","versionID");
+ 		exportContentService.registerFileClassForExport("org.lamsfoundation.lams.tool.sbmt.InstructionFiles","uuID","versionID");
  		SubmitFilesContent toolContentObj = submitFilesContentDAO.getContentByID(toolContentId);
  		if(toolContentObj == null)
  			throw new DataMissingException("Unable to find tool content by given id :" + toolContentId);
@@ -238,7 +239,16 @@ public class SubmitFilesService implements ToolContentManager,
 			throw new ToolException(e);
 		}
 	}
-	public void importToolContent(Object toolContnetPOJO) throws ToolException {
+ 	
+ 	public void importToolContent(String toolContentPath) throws ToolException {
+ 		
+		try {
+			exportContentService.registerFileClassForImport("org.lamsfoundation.lams.tool.sbmt.InstructionFiles",
+					"uuID","versionID","name","type",null,null);
+			Object toolPOJO =  exportContentService.importToolContent(toolContentPath,sbmtToolContentHandler);
+		} catch (ImportToolContentException e) {
+			throw new ToolException(e);
+		}
 	}
 
 	/*
