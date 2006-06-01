@@ -15,13 +15,13 @@ public class RolePrivilege implements Serializable {
     private Long rpId;
 
     /** persistent field */
-    private org.lamsfoundation.lams.usermanagement.Privilege privilege;
+    private Privilege privilege;
 
     /** persistent field */
-    private org.lamsfoundation.lams.usermanagement.Role role;
+    private Role role;
 
     /** full constructor */
-    public RolePrivilege(org.lamsfoundation.lams.usermanagement.Privilege privilege, org.lamsfoundation.lams.usermanagement.Role role) {
+    public RolePrivilege(Privilege privilege, Role role) {
         this.privilege = privilege;
         this.role = role;
     }
@@ -51,11 +51,11 @@ public class RolePrivilege implements Serializable {
      *            @hibernate.column name="privilege_id"         
      *         
      */
-    public org.lamsfoundation.lams.usermanagement.Privilege getPrivilege() {
+    public Privilege getPrivilege() {
         return this.privilege;
     }
 
-    public void setPrivilege(org.lamsfoundation.lams.usermanagement.Privilege privilege) {
+    public void setPrivilege(Privilege privilege) {
         this.privilege = privilege;
     }
 
@@ -65,11 +65,11 @@ public class RolePrivilege implements Serializable {
      *            @hibernate.column name="role_id"         
      *         
      */
-    public org.lamsfoundation.lams.usermanagement.Role getRole() {
+    public Role getRole() {
         return this.role;
     }
 
-    public void setRole(org.lamsfoundation.lams.usermanagement.Role role) {
+    public void setRole(Role role) {
         this.role = role;
     }
 
