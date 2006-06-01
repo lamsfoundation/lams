@@ -51,11 +51,15 @@ class org.lamsfoundation.lams.authoring.Transition {
 	
 	function Transition(transitionUIID,
 						fromUIID,
+						fromActivityID,
 						toUIID,
+						toActivityID,
 						learningDesignID){
 		_transitionUIID = transitionUIID;
 		_fromUIID = fromUIID;
+		_fromActivityID = fromActivityID;
 		_toUIID = toUIID;
+		_toActivityID = toActivityID;
 		_learningDesignID = learningDesignID;
 		
 		Debugger.log('Created a new transition, transitionUIID:'+transitionUIID,Debugger.GEN,'Constructor','Transition');
