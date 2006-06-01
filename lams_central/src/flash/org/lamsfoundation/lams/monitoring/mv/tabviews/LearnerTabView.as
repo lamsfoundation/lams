@@ -262,9 +262,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 	 */
 	private function drawActivity(a:Activity,mm:MonitorModel, learner:Object):Boolean{
 		
-		//var showIcon:String
-		//showIcon = compareProgressData(learner, a.activityID);
-		//showIcon = eval(showIcon)
+		Debugger.log('The activity:'+a.title+','+a.activityTypeID+' is now be drawn',Debugger.CRITICAL,'drawActivity','LearnerTabView');
 	
 		var s:Boolean = false;
 		
@@ -276,21 +274,19 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		if(a.activityTypeID==Activity.TOOL_ACTIVITY_TYPE || a.isGateActivity() || a.isGroupActivity() ){
 			var newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasActivityLinear", DepthManager.kTop,{_activity:a,_monitorController:mc,_learnerTabView:ltv, _x:ACT_X, _y:ACT_Y, actLabel:a.title, learner:learner});
 			ACT_X = newActivity_mc._x + newActivity_mc._width;
-		}
-		if(a.activityTypeID==Activity.PARALLEL_ACTIVITY_TYPE){
+		}else if(a.activityTypeID==Activity.PARALLEL_ACTIVITY_TYPE){
 			//get the children
 			var children:Array = mm.getMonitor().ddm.getComplexActivityChildren(a.activityUIID);
 			
 			var newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasParallelActivityLinear",DepthManager.kTop,{_activity:a,_children:children,_monitorController:mc,_learnerTabView:ltv, _x:ACT_X, _y:ACT_Y, fromModuleTab:"monitorLearnerTab", learner:learner});
 			ACT_X = newActivity_mc._x + newActivity_mc._width;
-		}
-		if(a.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE){
+		} else if(a.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE){
 			var children:Array = mm.getMonitor().ddm.getComplexActivityChildren(a.activityUIID);
 			trace("X pos is: "+ACT_X)
 			var newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasOptionalActivityLinear",DepthManager.kTop,{_activity:a,_children:children,_monitorController:mc,_learnerTabView:ltv, _x:ACT_X, _y:ACT_Y, fromModuleTab:"monitorLearnerTab", learner:learner});
 			ACT_X = newActivity_mc._x + newActivity_mc._width;
 		}else{
-			Debugger.log('The activity:'+a.title+','+a.activityUIID+' is of unknown type, it cannot be drawn',Debugger.CRITICAL,'drawActivity','MonitorTabView');
+			Debugger.log('The activity:'+a.title+','+a.activityUIID+' is of unknown type, it cannot be drawn',Debugger.CRITICAL,'drawActivity','LearnerTabView');
 		}
 		
 		var actItems:Number = mm.activitiesDisplayed.size()
