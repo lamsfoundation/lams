@@ -74,6 +74,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 	private var completed_mc:MovieClip;
 	private var current_mc:MovieClip;
 	private var todo_mc:MovieClip;
+	private var childHolder_mc:MovieClip;
 	//---------------------------//
 	private var child_mc : MovieClip;
 	private var _locked : Boolean;
@@ -116,14 +117,15 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 			
 			}else {
 				trace("child's activityID is "+_children [i].activityID)
-				children_mc [i] = childActivities_mc.attachMovie ("CanvasActivityLinear_forOptional", "CanvasActivity" + i, childActivities_mc.getNextHighestDepth (), {_activity : _children [i] , _monitorController : _monitorController, _monitorView : _monitorView, actLabel:_children [i].title, learner:learner});
+				children_mc [i] = childHolder_mc.attachMovie ("CanvasActivityLinear_forOptional", "CanvasActivity" + i, childHolder_mc.getNextHighestDepth (), {_activity : _children [i] , _monitorController : _monitorController, _monitorView : _monitorView, actLabel:_children [i].title, learner:learner});
 				//set the positioning co-ords
-				children_mc [i]._y = (i*21)+8;
-				children_mc [i]._x = 57;
+				children_mc [i]._y = (i*21);
+				//children_mc [i]._x = 57;
 			
 			
 			}
 			children_mc [i]._visible = true;
+			childHolder_mc._visible = false;
 		}
 		
 		MovieClipUtils.doLater (Proxy.create (this, draw));
@@ -133,6 +135,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		completed_mc._visible = isVisible;
 		current_mc._visible = isVisible;
 		todo_mc._visible = isVisible;
+		
 	}
 	
 	public function get activity () : Activity
@@ -239,9 +242,28 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 	private function localOnRelease () : Void
 	{
 		Debugger.log ('_doubleClicking:' + _doubleClicking + ', localOnRelease:' + this, Debugger.GEN, 'localOnRelease', 'CanvasOptionalActivity');
-		if ( ! _doubleClicking)
-		{
-			_canvasController.activityRelease (this);
+		if (fromModuleTab != "monitorLearnerTab"){
+			if ( ! _doubleClicking)
+			{
+				_canvasController.activityRelease (this);
+			}
+		}else {
+			if (_locked)
+			{
+				_locked = false;
+				gotoAndStop('collapse')
+				childHolder_mc._visible = false;
+				draw ();
+				
+			}else
+			{
+				_locked = true;
+				childHolder_mc._visible = true;
+				gotoAndStop('expand')
+				draw ();
+				
+			}
+			
 		}
 	}
 	private function localOnReleaseOutside () : Void
