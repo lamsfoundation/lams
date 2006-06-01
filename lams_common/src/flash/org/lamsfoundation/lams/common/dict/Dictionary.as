@@ -99,10 +99,22 @@ dynamic class Dictionary {
     /**
     * @returns a string holding the text requested
     */
-    public static function getValue(key:String):String{
+    public static function getValue(key:String, param:Array):String{
         Debugger.log('requesting :' + key + ' > ' + getInstance().items.get(key).value,Debugger.GEN,'getValue','org.lamsfoundation.lams.dict.Dictionary');
         var v:String = _instance.items.get(key).value;
 		if(v!=null){
+			if(param!=null){
+				trace('using params..');
+				for(var i=0; i<param.length; i++){
+					trace('param values: ' + param[0]);
+					// replace param {i} with value in array
+					var str_toReplace =  String.fromCharCode(123) + String(i) + String.fromCharCode(125);
+					trace(str_toReplace);
+					var newStr:String = StringUtils.replace(v, str_toReplace, String(param[i]));
+					trace(String(newStr));
+					v = newStr;
+				}
+			}
 			return v;
 		}else{
 			Debugger.log('Entry not found in '+getInstance()._currentLanguage+' dictionary, key='+key,Debugger.CRITICAL,'createFromData','Dictionary');
