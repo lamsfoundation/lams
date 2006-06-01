@@ -318,6 +318,53 @@ class MonitorModel extends Observable{
 	public function getlearnerTabActArr():Array{
 		return learnerTabActArr;
 	}
+	
+	
+	private function orderDesign(activity:Activity, order:Array):Void{
+		trace("==> "+activity.activityID);
+		order.push(activity);
+		trace("transition keys length: "+ddmTransition_keys.length);
+		for(var i=0;i<ddmTransition_keys.length;i++){
+			var transitionKeyToCheck:Number = ddmTransition_keys[i];
+			var ddmTransition:Transition = _activeSeq.getLearningDesignModel().transitions.get(transitionKeyToCheck);
+			trace("transition value is: "+ ddmTransition.transitionUIID);
+			trace("transition from activity id: "+ ddmTransition.fromActivityID);
+			
+				if (ddmTransition.fromUIID == activity.activityUIID){
+					var ddm_activity:Activity = _activeSeq.getLearningDesignModel().activities.get(ddmTransition.toUIID);
+					orderDesign(ddm_activity, order);
+				}
+				
+		}
+		
+	}
+	
+	private function setDesignOrder(){
+		trace("set Design order called")
+		ddmActivity_keys = _activeSeq.getLearningDesignModel().activities.keys();
+		ddmTransition_keys = _activeSeq.getLearningDesignModel().transitions.keys();
+		
+		var orderedActivityArr:Array = new Array();
+		var trIndexArray:Array;
+		var dataObj:Object;
+		var ddmfirstActivity_key:Number = _activeSeq.getLearningDesignModel().firstActivityID;
+		var learnerFirstActivity:Activity = _activeSeq.getLearningDesignModel().activities.get(ddmfirstActivity_key);
+		trace("first activity in desgn: "+ddmfirstActivity_key);
+		
+		//trace("==> "+learnerFirstActivity.title);
+		// recursive method to order design
+		orderDesign(learnerFirstActivity, orderedActivityArr);
+		
+		for(var i=0; i<orderedActivityArr.length; i++){
+			trace("--> "+orderedActivityArr[i].title);
+			
+		}
+		return orderedActivityArr;
+		trace("New Ordered Activities has length: "+orderedActivityArr.length)
+		
+	}
+	
+	
 	/**
 	 * get the design in the DesignDataModel and update the Monitor Model accordingly.
 	 * NOTE: Design elements are added to the DDM here.
@@ -326,6 +373,7 @@ class MonitorModel extends Observable{
 	 * @return  
 	 */
 	public function drawDesign(tabID:Number, learner:Object){
+		var indexArray:Array = setDesignOrder();
 		
 		if (learner != null || learner != undefined){
 			var drawLearner:Object = new Object();
@@ -333,20 +381,23 @@ class MonitorModel extends Observable{
 		}
 		
 		//go through the design and get the activities and transitions 
-		var indexArray:Array;
+		
 		var dataObj:Object;
 		ddmActivity_keys = _activeSeq.getLearningDesignModel().activities.keys();
 		
-		indexArray = ddmActivity_keys;
+		//indexArray = ddmActivity_keys;
 		trace("Length of Activities in DDM: "+indexArray.length)
 		
 		//loop through 
 		for(var i=0;i<indexArray.length;i++){
 					
-			var keyToCheck:Number = indexArray[i];
+			var keyToCheck:Number = indexArray[i].activityUIID;
 			
 			var ddm_activity:Activity = _activeSeq.getLearningDesignModel().activities.get(keyToCheck);
-			trace("Activities in DDM: "+ddm_activity.activityUIID)
+			trace("Activity type ID: "+ddm_activity.activityTypeID)
+			if (ddm_activity.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE){
+				trace("Activity is an optional activity "+ddm_activity.activityUIID)
+			}
 			if(ddm_activity.parentActivityID > 0 || ddm_activity.parentUIID > 0){
 				trace("this is Child")
 			}else {
