@@ -79,6 +79,20 @@
 
     <!-- Associations -->
   
+    <!-- bi-directional many-to-one association to OrganisationState -->
+    <many-to-one
+        name="OrganisationState"
+        class="org.lamsfoundation.lams.usermanagement.OrganisationState"
+        not-null="true"
+    >
+        <meta attribute="field-description">
+           @hibernate.many-to-one
+            not-null="true"
+           @hibernate.column name="organisation_state_id"         
+        </meta>
+        <column name="organisation_state_id" />
+    </many-to-one>
+
     <!-- bi-directional many-to-one association to Workspace -->
     <many-to-one
         name="workspace"
