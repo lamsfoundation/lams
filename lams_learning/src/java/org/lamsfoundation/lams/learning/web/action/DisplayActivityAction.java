@@ -80,7 +80,6 @@ public class DisplayActivityAction extends ActivityAction {
 		
 		ActivityMapping actionMappings = LearnerServiceProxy.getActivityMapping(this.getServlet().getServletContext());
 		
-		//SessionBean sessionBean = LearningWebUtil.getSessionBean(request,getServlet().getServletContext());
 		LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgressByID(request,
 		                                                                     getServlet().getServletContext());		
 		String progressSummary = getProgressSummary(learnerProgress);			

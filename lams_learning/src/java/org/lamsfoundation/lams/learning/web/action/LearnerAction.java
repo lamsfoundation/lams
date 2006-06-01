@@ -209,7 +209,6 @@ public class LearnerAction extends LamsDispatchAction
         FlashMessage message = null;
     	try {
 	
-	        //SessionBean sessionBean = LearningWebUtil.getSessionBean(request,getServlet().getServletContext());
 	        LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgressByUser(request,getServlet().getServletContext());
 	        
 	        if(log.isDebugEnabled())

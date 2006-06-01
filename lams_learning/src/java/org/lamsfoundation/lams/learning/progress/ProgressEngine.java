@@ -28,6 +28,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.lamsfoundation.lams.learningdesign.*;
+import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.lesson.*;
 import org.lamsfoundation.lams.usermanagement.User;
 
@@ -39,6 +40,8 @@ import org.lamsfoundation.lams.usermanagement.User;
  */
 public class ProgressEngine
 {
+	
+    private IActivityDAO activityDAO;
 
     /**
      * Holds a list of completed activity ids in one recursive move to next
@@ -176,8 +179,7 @@ public class ProgressEngine
                 		parent.getActivityTypeId()+" has been found");
             //move to next activity within parent if not all children are completed.
             
-            // TODO make sure we really have a complex activity, not a CGLIB proxy of activity.
-            ComplexActivity complexParent = (ComplexActivity)parent;
+            ComplexActivity complexParent = (ComplexActivity) activityDAO.getActivityByActivityId(parent.getActivityId(),ComplexActivity.class);
             if (!complexParent.areChildrenCompleted(learnerProgress))
             {
                 Activity nextActivity = complexParent.getNextActivityByParent(completedActivity);
@@ -194,7 +196,7 @@ public class ProgressEngine
                 if(isParallelWaitActivity(nextActivity))
                 {
                     learnerProgress.setParallelWaiting(true);
-                    learnerProgress.setNextActivity(null);
+                    // learnerProgress.setNextActivity(null);
                     populateCurrentCompletedActivityList(learnerProgress);
                 }
                 else
@@ -250,4 +252,8 @@ public class ProgressEngine
     {
         return nextActivity.getActivityTypeId().intValue()==ParallelWaitActivity.PARALLEL_WAIT_ACTIVITY_TYPE;
     }
+
+	public void setActivityDAO(IActivityDAO activityDAO) {
+		this.activityDAO = activityDAO;
+	}
 }

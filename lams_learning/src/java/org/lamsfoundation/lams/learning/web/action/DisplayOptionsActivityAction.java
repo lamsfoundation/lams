@@ -83,7 +83,7 @@ public class DisplayOptionsActivityAction extends ActivityAction {
 
 		form.setActivityId(activity.getActivityId());
 
-		List activityURLs = new ArrayList();
+		List<ActivityURL> activityURLs = new ArrayList<ActivityURL>();
 		Set subActivities = optionsActivity.getActivities();
 		Iterator i = subActivities.iterator();
 		int completedCount = 0;
@@ -103,13 +103,11 @@ public class DisplayOptionsActivityAction extends ActivityAction {
 		}
 		form.setActivityURLs(activityURLs);
 		
-		Integer minNum = optionsActivity.getMinNumberOfOptions();
-		Integer maxNum = optionsActivity.getMaxNumberOfOptions();
-		if ( ( minNum == null && completedCount > 0) || ( minNum != null && minNum.intValue() <= completedCount)  ){
+		if ( optionsActivity.getMinNumberOfOptionsNotNull().intValue() <= completedCount ) {
 			form.setFinished(true);
 		}
-		form.setMinimum(minNum!=null?optionsActivity.getMinNumberOfOptions().intValue():0);
-		form.setMaximum(maxNum!=null?optionsActivity.getMaxNumberOfOptions().intValue():subActivities.size());
+		form.setMinimum(optionsActivity.getMinNumberOfOptionsNotNull().intValue());
+		form.setMaximum(optionsActivity.getMaxNumberOfOptionsNotNull().intValue());
 		
 		this.saveToken(request);
 		

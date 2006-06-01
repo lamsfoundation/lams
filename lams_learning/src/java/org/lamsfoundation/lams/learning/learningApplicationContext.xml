@@ -79,6 +79,7 @@
 	</bean-->
 
 	<bean id="progressEngine" class="org.lamsfoundation.lams.learning.progress.ProgressEngine" singleton="false">
+		<property name="activityDAO"><ref bean="activityDAO"/></property>
 	</bean>
 	
 	<bean id="activityMapping" class="org.lamsfoundation.lams.learning.web.util.ActivityMapping" singleton="false">

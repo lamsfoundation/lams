@@ -24,18 +24,14 @@
 /* $$Id$$ */	
 package org.lamsfoundation.lams.learning.web.action;
 
-import javax.servlet.http.*;
+import javax.servlet.http.HttpServletRequest;
 
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
-import org.lamsfoundation.lams.learning.web.bean.SessionBean;
-import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
-
+import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.web.action.LamsAction;
-import org.lamsfoundation.lams.lesson.*;
-import org.lamsfoundation.lams.learningdesign.*;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -82,34 +78,6 @@ public class ActivityAction extends LamsAction {
 	 */
 	protected void setLearnerProgress(HttpServletRequest request, LearnerProgress learnerProgress) {
 		request.setAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE, learnerProgress);
-
-		SessionBean sessionBean = getSessionBean(request);
-		// Save progress in session for Flash request
-		sessionBean.setLearnerProgress(learnerProgress);
-		setSessionBean(sessionBean, request);
 	}
 	
-	/**
-	 * Gets the session bean from session.
-	 * @return SessionBean for this request, null if no session.
-	 */
-	protected SessionBean getSessionBean(HttpServletRequest request) {
-		HttpSession session = request.getSession(false);
-		if (session == null) {
-			return null;
-		}
-		SessionBean sessionBean = (SessionBean)session.getAttribute(SessionBean.NAME);
-		return sessionBean;
-	}
-	
-	/**
-	 * Sets the session bean for this session.
-	 */
-	protected void setSessionBean(SessionBean sessionBean, HttpServletRequest request) {
-		HttpSession session = request.getSession(false);
-		if (session == null) {
-			return;
-		}
-		session.setAttribute(SessionBean.NAME, sessionBean);
-	}
 }

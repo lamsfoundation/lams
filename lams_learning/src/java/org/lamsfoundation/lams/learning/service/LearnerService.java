@@ -294,6 +294,8 @@ public class LearnerService implements ILearnerService
     {
     	LearnerProgress progress = learnerProgressDAO.getLearnerProgressByLearner(learnerId, lesson);
     	progress.setProgressState(activity, LearnerProgress.ACTIVITY_ATTEMPTED);
+    	progress.setCurrentActivity(activity);
+    	progress.setNextActivity(activity);
     	learnerProgressDAO.saveLearnerProgress(progress);
     	return progress;
     }
@@ -512,29 +514,29 @@ public class LearnerService implements ILearnerService
      */
     private void createToolSessionsIfNecessary(LearnerProgress learnerProgress) 
     {
-        if(learnerProgress.getNextActivity()==null)
-            throw new LearnerServiceException("Error occurs in [" +
-            		"createToolSessionsIfNecessary], Can't initialize tool " +
-            		"sessions without knowing the activity.");
+    	// getNextActivity will be null if we have finished the top part of a parallel activity.
+    	
+        if(learnerProgress.getNextActivity()!=null) {
         
-        Activity nextActivity = learnerProgress.getNextActivity();
-        try
-        {
-            for(Iterator i = nextActivity.getAllToolActivities().iterator();i.hasNext();)
-            {
-            	ToolActivity toolActivity =  (ToolActivity)i.next();
-           		createToolSessionFor(toolActivity, learnerProgress.getUser(),learnerProgress.getLesson());
-            }
-        }
-        catch (LamsToolServiceException e)
-        {
-            log.error("error occurred in 'createToolSessionFor':"+e.getMessage());
-    		throw new LearnerServiceException(e.getMessage());
-        }
-        catch (ToolException e)
-        {
-            log.error("error occurred in 'createToolSessionFor':"+e.getMessage());
-    		throw new LearnerServiceException(e.getMessage());
+	        Activity nextActivity = learnerProgress.getNextActivity();
+	        try
+	        {
+	            for(Iterator i = nextActivity.getAllToolActivities().iterator();i.hasNext();)
+	            {
+	            	ToolActivity toolActivity =  (ToolActivity)i.next();
+	           		createToolSessionFor(toolActivity, learnerProgress.getUser(),learnerProgress.getLesson());
+	            }
+	        }
+	        catch (LamsToolServiceException e)
+	        {
+	            log.error("error occurred in 'createToolSessionFor':"+e.getMessage());
+	    		throw new LearnerServiceException(e.getMessage());
+	        }
+	        catch (ToolException e)
+	        {
+	            log.error("error occurred in 'createToolSessionFor':"+e.getMessage());
+	    		throw new LearnerServiceException(e.getMessage());
+	        }
         }
     }
     

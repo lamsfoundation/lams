@@ -42,9 +42,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 		<script language="JavaScript" type="text/JavaScript"><!--
 			function doRedirect() {
-				var parentWindow = window.parent;
-				//parentWindow.location.href = "DisplayActivity.do?activityId=<c:out value='${activityId}' />";
-				parentWindow.location.href = "<c:out value='${url}' escapeXml='false' />";
+				top.frames['contentFrame'].location.href = "<c:out value='${url}' escapeXml='false' />";
 			}
 			window.onload = doRedirect;
 			//-->

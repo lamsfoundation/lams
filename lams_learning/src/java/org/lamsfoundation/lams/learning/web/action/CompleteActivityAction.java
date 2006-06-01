@@ -32,7 +32,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
-import org.lamsfoundation.lams.learning.web.bean.SessionBean;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -66,12 +65,6 @@ public class CompleteActivityAction extends ActivityAction {
 			HttpServletResponse response) {
 		ActivityMapping actionMappings = getActivityMapping();
 		
-		SessionBean sessionBean = getSessionBean(request);
-		if (sessionBean == null) {
-			// forward to the no session error page
-			return mapping.findForward(ActivityMapping.NO_SESSION_ERROR);
-		}
-		
 		// check token
 		if (!this.isTokenValid(request, true)) {
 			// didn't come here from options page
@@ -99,10 +92,6 @@ public class CompleteActivityAction extends ActivityAction {
 			return mapping.findForward("error");
 		}
 		LearningWebUtil.putActivityInRequest(request, progress.getNextActivity(), learnerService);
-
-		// Save progress in session for Flash request
-		sessionBean.setLearnerProgress(progress);
-		setSessionBean(sessionBean, request);
 
 		ActionForward forward = actionMappings.getProgressForward(progress,true,request, learnerService);
 		

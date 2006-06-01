@@ -135,7 +135,7 @@ public class ActivityMapping implements Serializable
         else
         {
 
-            if (progress.isParallelWaiting())
+            if (! progress.getCurrentActivity().isParallelActivity() && progress.isParallelWaiting())
             {
                 // progress is waiting, goto waiting page
                 String strutsAction = this.getActivityMappingStrategy()
@@ -147,7 +147,7 @@ public class ActivityMapping implements Serializable
             else
             {
                 // display next activity
-                if (progress.getPreviousActivity() instanceof ParallelActivity)
+                if (progress.getPreviousActivity()!=null && progress.getPreviousActivity().isParallelActivity())
                 {
                     // if previous activity was a parallel activity then we need to
                     // clear frames.
