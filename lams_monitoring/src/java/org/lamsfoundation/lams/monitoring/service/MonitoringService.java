@@ -777,7 +777,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
             			learnerService.performGrouping(lessonId, groupActivity);
 //            			grouping = groupActivity.getCreateGrouping();
 //            			myGroup = grouping.getGroupBy(learner);
-            			learnerService.completeActivity(learner.getUserId(),activity,newLesson);
+            			learnerService.completeActivity(learner.getUserId(),activity,lessonId);
             			log.debug("Grouping activity [" + activity.getActivityId() + "] is completed.");
             		}else{
 	            		//except random grouping, stop here
@@ -786,14 +786,14 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
             		}
             	}else{
             		//if group already exist
-            		learnerService.completeActivity(learner.getUserId(),activity,newLesson);
+            		learnerService.completeActivity(learner.getUserId(),activity,lessonId);
             		log.debug("Grouping activity [" + activity.getActivityId() + "] is completed.");
             	}
             }else if ( activity.isGateActivity() ) {
             	GateActivity gate = (GateActivity) activity;
             	if(learnerService.knockGate(lessonId,gate,learner)){
             		//the gate is opened, continue to next activity to complete
-            		learnerService.completeActivity(learner.getUserId(),activity,newLesson);
+            		learnerService.completeActivity(learner.getUserId(),activity,lessonId);
             		log.debug("Gate activity [" + gate.getActivityId() + "] is completed.");
             	}else{
             		//the gate is closed, stop here
