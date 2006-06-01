@@ -141,6 +141,18 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
 		}
     }
 	
+	public function forceNodeOpen(nodeToOpen:XMLNode){
+		if(!nodeToOpen.hasChildNodes()){
+			// DC24-01-06 this resource ID must refer to a folder as its been marked as a branch
+			var resourceToOpen = nodeToOpen.attributes.data.resourceID;
+			//must be a folder ID, depoends if this event is fired for an "open" reousrce click
+			_workspaceModel.openFolderInTree(resourceToOpen);
+		}else{
+			Debugger.log('nodeToOpen already has children in cache',Debugger.GEN,'forceNodeOpen','org.lamsfoundation.lams.WorkspaceController');
+			
+		}
+	}
+	
 	/**
     * Treeview data changed event handler
     */
