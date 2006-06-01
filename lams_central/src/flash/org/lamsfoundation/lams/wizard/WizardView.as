@@ -99,6 +99,9 @@ class WizardView extends AbstractView {
 	private var _summeryList:Array;
 	private var scheduleDate_dt:DateField;
 
+	// conclusion UI elements
+	private var confirmMsg_txt:TextField;
+
 	//Dimensions for resizing
     private var xNextOffset:Number;
     private var yNextOffset:Number;
@@ -115,6 +118,7 @@ class WizardView extends AbstractView {
 	
 	// common elements
 	private var wizTitle_lbl:Label;
+	private var wizDesc_txt:TextField;
 	private var finish_btn:Button;
 	private var cancel_btn:Button;
 	private var next_btn:Button;
@@ -293,6 +297,7 @@ class WizardView extends AbstractView {
 		
 		//labels
 		setTitle(Dictionary.getValue('wizardTitle_1_lbl'));
+		setDescription(Dictionary.getValue('wizardDesc_1_lbl'));
 		title_lbl.text = Dictionary.getValue('title_lbl');
 		desc_lbl.text = Dictionary.getValue('desc_lbl');
 		staff_lbl.text = Dictionary.getValue('staff_lbl');
@@ -440,6 +445,10 @@ class WizardView extends AbstractView {
 		location_treeview.addEventListener("nodeOpen", Delegate.create(_workspaceController, _workspaceController.onTreeNodeOpen));
 		location_treeview.addEventListener("nodeClose", Delegate.create(_workspaceController, _workspaceController.onTreeNodeClose));
 		location_treeview.addEventListener("change", Delegate.create(_workspaceController, _workspaceController.onTreeNodeChange));
+		
+		var wsNode:XMLNode = location_treeview.firstVisibleNode;
+		location_treeview.setIsOpen(wsNode, true);
+		_workspaceController.forceNodeOpen(wsNode);
     }
 	
 	/**
@@ -559,15 +568,22 @@ class WizardView extends AbstractView {
 	
 	private function start(evt:Object){
 		trace('START CLICKED');
-		disableButtons();
 		
 		if(schedule_cb.selected){
 			resultDTO.scheduleDateTime = getScheduleDateTime(scheduleDate_dt.selectedDate, schedule_time.f_returnTime());
-			trace(resultDTO.scheduleDateTime);
-			resultDTO.mode = START_SCH_MODE;
+			
+			if(resultDTO.scheduleDateTime != null){
+				trace(resultDTO.scheduleDateTime);
+				resultDTO.mode = START_SCH_MODE;
+			} else {
+				LFMessage.showMessageAlert(Dictionary.getValue('al_validation_schstart'), null, null);
+				return;
+			}
 		} else {
 			resultDTO.mode = START_MODE;
 		}
+		
+		disableButtons();
 		_wizardController.initializeLesson(resultDTO);
 	}
 	
@@ -669,6 +685,7 @@ class WizardView extends AbstractView {
 	private function showStep1():Void{
 		trace('showing step 1');
 		setTitle(Dictionary.getValue('wizardTitle_1_lbl'));
+		setDescription(Dictionary.getValue('wizardDesc_2_lbl'));
 		location_treeview.visible = true;
 		
 		finish_btn.visible = false;
@@ -697,6 +714,9 @@ class WizardView extends AbstractView {
 		schedule_cb.visible = false;
 		schedule_time._visible = false;
 		scheduleDate_dt.visible = false;
+		
+		// hide final screen elements
+		confirmMsg_txt.visible = false;
 	}
 	
 	private function clearStep1():Void{
@@ -732,6 +752,7 @@ class WizardView extends AbstractView {
 		trace('showing step 2');
 		
 		setTitle(Dictionary.getValue('wizardTitle_2_lbl'));
+		setDescription(Dictionary.getValue('wizardDesc_2_lbl'));
 		// enable prev button after Step 1
 		prev_btn.enabled = true;
 		
@@ -776,6 +797,7 @@ class WizardView extends AbstractView {
 		trace('showing step 3');
 		
 		setTitle(Dictionary.getValue('wizardTitle_3_lbl'));
+		setDescription(Dictionary.getValue('wizardDesc_3_lbl'));
 		
 		if(!resultDTO.selectedLearners && !resultDTO.selectedStaff){
 			WizardModel(getModel()).getWizard().getOrganisations(_root.courseID, _root.classID);
@@ -875,6 +897,7 @@ class WizardView extends AbstractView {
 		
 		
 		setTitle(Dictionary.getValue('wizardTitle_4_lbl'));
+		setDescription(Dictionary.getValue('wizardDesc_4_lbl'));
 		
 		writeSummery();
 		
@@ -937,7 +960,9 @@ class WizardView extends AbstractView {
 	
 	private function showFinish():Void{
 		
-		setTitle(Dictionary.getValue('wizardTitle_x_lbl'));
+		setTitle(Dictionary.getValue('wizardTitle_x_lbl', [resultDTO.resourceTitle]));
+		setDescription("");
+		showConfirmMessage(resultDTO.mode);
 		next_btn.visible = false;
 		prev_btn.visible = false;
 		cancel_btn.visible = false;
@@ -1083,6 +1108,10 @@ class WizardView extends AbstractView {
 		var dayStr:String;
 		var monthStr:String;
 		
+		if(date==null){
+			return null;
+		}
+		
 		trace('output time: ' + timeStr);
 		var day = date.getDate();
 		if(day<10){
@@ -1174,6 +1203,36 @@ class WizardView extends AbstractView {
 	
 	public function setTitle(title:String){
 		wizTitle_lbl.text = "<b>" + title + "</b>";
+	}
+	
+	public function setDescription(desc:String){
+		wizDesc_txt.text = desc;
+	}
+	
+	public function showConfirmMessage(mode:Number){
+		var msg:String = "";
+		var lessonName:String = "<b>" + resultDTO.resourceTitle +"</b>";
+		switch(mode){
+			case FINISH_MODE : 
+				msg = Dictionary.getValue('confirmMsg_1_txt', [lessonName]);
+				break;
+			case START_MODE :
+				msg = Dictionary.getValue('confirmMsg_3_txt', [lessonName]);
+				break;
+			case START_SCH_MODE :
+				msg = Dictionary.getValue('confirmMsg_2_txt', [lessonName, unescape(resultDTO.scheduleDateTime)]);
+				break;
+			default:
+				trace('unknown mode');
+		}
+		confirmMsg_txt.html = true;
+		confirmMsg_txt.htmlText = msg;
+		confirmMsg_txt._width = confirmMsg_txt.textWidth + 5;
+		confirmMsg_txt._x = panel._x + (panel._width/2) - (confirmMsg_txt._width/2);
+		confirmMsg_txt._y = panel._y + (panel._height/4);
+		
+		confirmMsg_txt.visible = true;
+		
 	}
 	
 	/**
