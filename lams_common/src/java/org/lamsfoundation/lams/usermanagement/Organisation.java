@@ -69,6 +69,8 @@ public class Organisation implements Serializable {
     /** persistent field */
     private Set lessons;
     
+    private OrganisationState organisationState;
+    
     /** full constructor */
     public Organisation(String name, String description, Organisation parentOrganisation, Date createDate, Workspace workspace, OrganisationType organisationType, Set userOrganisations, Set childOrganisations, Set lessons) {
         this.name = name;
@@ -261,7 +263,21 @@ public class Organisation implements Serializable {
         this.lessons = lessons;
     }
 
-    public String toString() {
+    /** 
+     *            @hibernate.many-to-one
+     *             not-null="true"
+     *            @hibernate.column name="organisation_state_id"         
+     *         
+     */
+    public OrganisationState getOrganisationState() {
+        return this.organisationState;
+    }
+
+    public void setOrganisationState(OrganisationState organisationState) {
+        this.organisationState = organisationState;
+    }
+
+	public String toString() {
         return new ToStringBuilder(this)
             .append("organisationId", getOrganisationId())
             .toString();
