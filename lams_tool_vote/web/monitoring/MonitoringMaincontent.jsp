@@ -43,21 +43,63 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
-	<!DOCTYPE HTML PUBLIC "-//W3C//DTD hTML 4.01 Transitional//EN">
+	<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+	<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
+
 	<html:html locale="true">
 	<head>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 	<title> <bean:message key="label.monitoring"/> </title>
 	
 	 <lams:css/>
-	<!-- depending on user / site preference this will get changed probably use passed in variable from flash to select which one to use-->
 
- 	<!-- ******************** FCK Editor related javascript & HTML ********************** -->
+ 	<!-- ******************** FCK Editor related javascript & HTML ********************** -->	 
+ 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
     <script type="text/javascript" src="${lams}fckeditor/fckeditor.js"></script>
-    <script type="text/javascript" src="${lams}includes/javascript/fckcontroller.js"></script>
-    <link href="${lams}css/fckeditor_style.css" rel="stylesheet" type="text/css">
+   	<script type="text/javascript" src="${lams}includes/javascript/fckcontroller.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>
 
-	<script language="JavaScript" type="text/JavaScript">
+	<link href="${lams}css/fckeditor_style.css" rel="stylesheet" type="text/css">
+
+	<script type="text/javascript">
+		var imgRoot="${lams}images/";
+		var themeName="aqua";
+	
+        function init(){
+        
+            initTabSize(4);
+            
+            var tag = document.getElementById("currentTab");
+	    	if(tag.value != "")
+	    		selectTab(tag.value);
+            else
+                selectTab(1); //select the default tab;
+                
+
+            initEditor("title");
+            initEditor("instructions");
+            
+            initEditor("optionContent0");
+            <c:set var="optIndex" scope="session" value="1"/>
+            <c:forEach var="questionEntry" items="${sessionScope.mapOptionsContent}">
+                <c:set var="optIndex" scope="session" value="${optIndex +1}"/>
+                initEditor("<c:out value="optionContent${optIndex-1}"/>");
+            </c:forEach>
+
+        }     
+        
+        function doSelectTab(tabId) {
+        	// start optional tab controller stuff
+        	var tag = document.getElementById("currentTab");
+	    	tag.value = tabId;
+	    	// end optional tab controller stuff
+	    	selectTab(tabId);
+        } 
+        
+        function doSubmit(method) {
+        	document.VoteMonitoringForm.method.value=method;
+        	document.VoteMonitoringForm.submit();
+        }
 
 		function submitMonitoringMethod(actionMethod) 
 		{
@@ -69,7 +111,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			document.VoteAuthoringForm.dispatch.value=actionMethod; 
 			document.VoteAuthoringForm.submit();
 		}
-		
 		
 		function submitModifyQuestion(questionIndexValue, actionMethod) 
 		{
@@ -117,53 +158,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	        submitMethod(actionMethod);
 		}
 	
-    	var imgRoot="${lams}images/";
-	    var themeName="aqua";
-        
-        function init(){
-        
-            initTabSize(4);
-            
-            var tag = document.getElementById("currentTab");
-	    	if(tag.value != "")
-	    		selectTab(tag.value);
-            else
-                selectTab(1); //select the default tab;
-                
-
-            initEditor("title");
-            initEditor("instructions");
-            
-            initEditor("optionContent0");
-            <c:set var="optIndex" scope="session" value="1"/>
-            <c:forEach var="questionEntry" items="${sessionScope.mapOptionsContent}">
-                <c:set var="optIndex" scope="session" value="${optIndex +1}"/>
-                initEditor("<c:out value="optionContent${optIndex-1}"/>");
-            </c:forEach>
-
-        }     
-        
-        function doSelectTab(tabId) {
-        	// start optional tab controller stuff
-        	var tag = document.getElementById("currentTab");
-	    	tag.value = tabId;
-	    	// end optional tab controller stuff
-	    	selectTab(tabId);
-        } 
-        
-        function doSubmit(method) {
-        	document.VoteMonitoringForm.method.value=method;
-        	document.VoteMonitoringForm.submit();
-        }
-	
 	</script>
-	
-	<script type="text/javascript" src="<c:out value="${lams}"/>includes/javascript/tabcontroller.js"></script>    
-	<script type="text/javascript" src="<c:out value="${lams}"/>includes/javascript/common.js"></script>
 	
 </head>
 <body onLoad="init();">
-	
 	
 	<c:if test="${(isPortfolioExport != 'true') }"> 	
 		<b> <font size=2> <bean:message key="label.monitoring"/> </font></b>
@@ -185,7 +183,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<lams:TabBody id="2" titleKey="label.instructions" page="Instructions.jsp" />
 		<lams:TabBody id="3" titleKey="label.editActivity" page="Edit.jsp" />
 		<lams:TabBody id="4" titleKey="label.stats" page="Stats.jsp" />
-	<lams:HTMLEditor/>	
 	</html:form>
+	
+	<lams:HTMLEditor/>		
 </body>
 </html:html>

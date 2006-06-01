@@ -48,47 +48,27 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
 	<!DOCTYPE HTML PUBLIC "-//W3C//DTD hTML 4.01 Transitional//EN">
+	<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
+	
 	<html:html locale="true">
 	<head>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 	<title> <bean:message key="activity.title"/>  </title>
 	
 	 <lams:css/>
-	<!-- depending on user / site preference this will get changed probably use passed in variable from flash to select which one to use-->
 
- 	<!-- ******************** FCK Editor related javascript & HTML ********************** -->
+ 	<!-- ******************** FCK Editor related javascript & HTML ********************** -->	 
+ 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
     <script type="text/javascript" src="${lams}fckeditor/fckeditor.js"></script>
-    <script type="text/javascript" src="${lams}includes/javascript/fckcontroller.js"></script>
-    <link href="${lams}css/fckeditor_style.css" rel="stylesheet" type="text/css">
+   	<script type="text/javascript" src="${lams}includes/javascript/fckcontroller.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>
 
-	<script language="JavaScript" type="text/JavaScript">
+	<link href="${lams}css/fckeditor_style.css" rel="stylesheet" type="text/css">
 
-		function submitModifyNomination(optionIndexValue, actionMethod) 
-		{
-			document.VoteAuthoringForm.optIndex.value=optionIndexValue; 
-			submitMethod(actionMethod);
-		}
-		
-		function submitMethod(actionMethod) 
-		{
-			document.VoteAuthoringForm.dispatch.value=actionMethod; 
-			document.VoteAuthoringForm.submit();
-		}
-		
-		function deleteOption(deletableOptionIndex, actionMethod) {
-			document.VoteAuthoringForm.deletableOptionIndex.value=deletableOptionIndex; 
-			submitMethod(actionMethod);
-		}
-		
-		function submitDeleteFile(uuid, actionMethod) 
-		{
-			document.VoteAuthoringForm.uuid.value=uuid; 
-			submitMethod(actionMethod);
-		}
-		
-    	var imgRoot="${lams}images/";
-	    var themeName="aqua";
-        
+	<script type="text/javascript">
+		var imgRoot="${lams}images/";
+		var themeName="aqua";
+
         function init(){
 			if (document.VoteAuthoringForm.activeModule.value != 'defineLater')
 			{
@@ -126,10 +106,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
         }     
         
         function doSelectTab(tabId) {
-        	// start optional tab controller stuff
         	var tag = document.getElementById("currentTab");
 	    	tag.value = tabId;
-	    	// end optional tab controller stuff
 	    	selectTab(tabId);
         } 
         
@@ -137,11 +115,32 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
         	document.VoteAuthoringForm.dispatch.value=method;
         	document.VoteAuthoringForm.submit();
         }
-	
+        
+        
+		function submitModifyNomination(optionIndexValue, actionMethod) 
+		{
+			document.VoteAuthoringForm.optIndex.value=optionIndexValue; 
+			submitMethod(actionMethod);
+		}
+		
+		function submitMethod(actionMethod) 
+		{
+			document.VoteAuthoringForm.dispatch.value=actionMethod; 
+			document.VoteAuthoringForm.submit();
+		}
+		
+		function deleteOption(deletableOptionIndex, actionMethod) {
+			document.VoteAuthoringForm.deletableOptionIndex.value=deletableOptionIndex; 
+			submitMethod(actionMethod);
+		}
+		
+		function submitDeleteFile(uuid, actionMethod) 
+		{
+			document.VoteAuthoringForm.uuid.value=uuid; 
+			submitMethod(actionMethod);
+		}
+
 	</script>
-	
-	<script type="text/javascript" src="<c:out value="${lams}"/>includes/javascript/tabcontroller.js"></script>    
-	<script type="text/javascript" src="<c:out value="${lams}"/>includes/javascript/common.js"></script>
 	
 </head>
 <body onLoad="init();">
@@ -198,8 +197,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<!-- end of content (Basic) -->
 	</c:if> 			
 
-	
-	<lams:HTMLEditor/>	
 	</html:form>
+	<lams:HTMLEditor/>	
 </body>
 </html:html>

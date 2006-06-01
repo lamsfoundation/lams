@@ -204,7 +204,10 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 		logger.debug("sourceVoteStarter: " + sourceVoteStarter);
 		String destination=VoteUtils.getDestination(sourceVoteStarter);
 		logger.debug("destination: " + destination);
-    	
+
+	    Map mapOptionsContent=(Map)request.getSession().getAttribute(MAP_OPTIONS_CONTENT);
+	    logger.debug("final mapOptionsContent: " + mapOptionsContent);
+
 	    return (mapping.findForward(destination));
     }
 
@@ -275,6 +278,9 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 		logger.debug("sourceVoteStarter: " + sourceVoteStarter);
 		String destination=VoteUtils.getDestination(sourceVoteStarter);
 		logger.debug("destination: " + destination);
+		
+	    Map mapOptionsContent=(Map)request.getSession().getAttribute(MAP_OPTIONS_CONTENT);
+	    logger.debug("final mapOptionsContent: " + mapOptionsContent);
 		
 	    return (mapping.findForward(destination));
     }
@@ -470,6 +476,10 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 		logger.debug("final duplicate status :" +request.getAttribute(USER_EXCEPTION_OPTIONS_DUPLICATE));
 		logger.debug("fwding to destination :" +destination);
 		
+	    Map mapOptionsContent=(Map)request.getSession().getAttribute(MAP_OPTIONS_CONTENT);
+	    logger.debug("final mapOptionsContent: " + mapOptionsContent);
+
+		
         request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG,Boolean.TRUE);
         return (mapping.findForward(destination));	
     }
@@ -571,6 +581,9 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 
 		boolean isMoveNominationDown=isMoveNominationDown(mapping, form, request, response);
 		logger.debug("isMoveNominationDown:" + isMoveNominationDown);
+		
+	    Map mapOptionsContent=(Map)request.getSession().getAttribute(MAP_OPTIONS_CONTENT);
+	    logger.debug("final mapOptionsContent: " + mapOptionsContent);
 
         return (mapping.findForward(destination));	
     }
@@ -678,6 +691,9 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 
 		boolean isMoveNominationUp=isMoveNominationUp(mapping, form, request, response);
 		logger.debug("isMoveNominationUp:" + isMoveNominationUp);
+		
+	    Map mapOptionsContent=(Map)request.getSession().getAttribute(MAP_OPTIONS_CONTENT);
+	    logger.debug("final mapOptionsContent: " + mapOptionsContent);
 
         return (mapping.findForward(destination));	
     }
@@ -1015,7 +1031,10 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants
 		}
      	
 		VoteUtils.setDefineLater(request, true);
-		
+
+	    Map mapOptionsContent=(Map)request.getSession().getAttribute(MAP_OPTIONS_CONTENT);
+	    logger.debug("final mapOptionsContent: " + mapOptionsContent);
+
 		logger.debug("forwarding to : " + destination);
 		return mapping.findForward(destination);
     }
