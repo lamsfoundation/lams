@@ -40,7 +40,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 	<title> <bean:message key="label.export"/> </title>
 	
-	 <lams:css/>
+	 <lams:css localLink="true" />
 	<!-- depending on user / site preference this will get changed probably use passed in variable from flash to select which one to use-->
 
  	<!-- ******************** FCK Editor related javascript & HTML ********************** -->
