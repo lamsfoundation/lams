@@ -342,9 +342,9 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
                 //case 'Toolbar' :
                 //  _toolbarLoaded = true;
 				//	break;
-				case 'Lesson' :
-					_lessonsLoaded = true;
-                    break;
+				//case 'Lesson' :
+				//	_lessonsLoaded = true;
+                //    break;
                 case 'Monitor' :
                     _monitorLoaded = true;
                     break;
@@ -352,7 +352,7 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
             }
             
             //If all of them are loaded set UILoad accordingly
-			if(_menuLoaded && _lessonsLoaded && _monitorLoaded){
+			if(_menuLoaded && _monitorLoaded){
                 _UILoaded=true;                
             } 
             //if(_toolkitLoaded && _canvasLoaded && _menuLoaded && _toolbarLoaded){
