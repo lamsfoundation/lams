@@ -19,7 +19,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
-
+<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
 <%@ taglib uri="tags-bean" prefix="bean"%> 
 <%@ taglib uri="tags-html" prefix="html"%>
 <%@ taglib uri="tags-logic" prefix="logic" %>
@@ -34,14 +34,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
-
 <html:html locale="true">
 <head>
-	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 	<title> <bean:message key="label.preview"/> </title>
 
-<lams:css/>
+	<lams:css/>
 	<script language="JavaScript" type="text/JavaScript">
 		function submitMethod(actionMethod) 
 		{

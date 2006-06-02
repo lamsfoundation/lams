@@ -18,11 +18,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   http://www.gnu.org/licenses/gpl.txt
 --%>
-<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
+
+
 <%@ taglib uri="tags-bean" prefix="bean"%> 
 <%@ taglib uri="tags-html" prefix="html"%>
 <%@ taglib uri="tags-logic" prefix="logic" %>
-<%@ taglib uri="tags-logic-el" prefix="logic-el" %>
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="fck-editor" prefix="FCK" %>
@@ -31,26 +31,5 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html:html locale="true">
-<head>
-	<jsp:include page="/learning/learningHeader.jsp" />
-</head>
-<body>
-
-
-<html:form  action="/learning?method=displayMc&validate=false" method="POST" target="_self">
-		<c:choose> 
-		  <c:when test="${sessionScope.questionListingMode == sessionScope.questionListingModeSequential}" > 
-				<jsp:include page="/learning/SingleQuestionAnswersContent.jsp" /> 
-		  </c:when> 
-		  <c:otherwise>
-			  	<jsp:include page="/learning/CombinedAnswersContent.jsp" /> 
-		  </c:otherwise>
-		</c:choose> 
-</html:form>
-
-</body>
-</html:html>
-
-
+ 				
+Export Content goes here

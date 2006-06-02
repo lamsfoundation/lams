@@ -19,21 +19,26 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
+<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
 <%@ taglib uri="tags-bean" prefix="bean"%> 
 <%@ taglib uri="tags-html" prefix="html"%>
 <%@ taglib uri="tags-logic" prefix="logic" %>
-<%@ taglib uri="tags-logic-el" prefix="logic-el" %>
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="fck-editor" prefix="FCK" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
+
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
+	<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+	<html:html locale="true">
+	<head>
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-	<title> <bean:message key="label.learning"/> </title>
-	 <lams:css/>
+	<title> <bean:message key="label.exportPortfolio"/> </title>
+	
+	 <lams:css localLink="true" />
 	<!-- depending on user / site preference this will get changed probably use passed in variable from flash to select which one to use-->
 
  	<!-- ******************** FCK Editor related javascript & HTML ********************** -->
@@ -42,25 +47,19 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
     <link href="${lams}css/fckeditor_style.css" rel="stylesheet" type="text/css">
 
 	<script language="JavaScript" type="text/JavaScript">
-
-		
-		function submitMethod(actionMethod) 
-		{
-			document.McLearningForm.method.value=actionMethod; 
-			document.McLearningForm.submit();
-		}
-		
-		function MM_reloadPage(init) {  //reloads the window if Nav4 resized
-		  if (init==true) with (navigator) {if ((appName=="Netscape")&&(parseInt(appVersion)==4)) {
-		    document.MM_pgW=innerWidth; document.MM_pgH=innerHeight; onresize=MM_reloadPage; }}
-		  else if (innerWidth!=document.MM_pgW || innerHeight!=document.MM_pgH) location.reload();
-		}
-
     	var imgRoot="${lams}images/";
 	    var themeName="aqua";
-        
 	</script>
 	
 	<script type="text/javascript" src="<c:out value="${lams}"/>includes/javascript/tabcontroller.js"></script>    
 	<script type="text/javascript" src="<c:out value="${lams}"/>includes/javascript/common.js"></script>
 	
+	</head>
+	<body>
+		export portfolio content goes here
+	
+	</body>
+</html:html>
+
+
+

@@ -157,8 +157,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<lams:TabBody id="1" titleKey="label.basic" page="Basic.jsp"/>
 		<!-- end of content (Basic) -->
 	</c:if> 			
-	
-	<lams:HTMLEditor/>	
+
 	</html:form>
+	<lams:HTMLEditor/>		
 </body>
 </html:html>

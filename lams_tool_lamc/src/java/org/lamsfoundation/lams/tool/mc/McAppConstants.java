@@ -127,6 +127,8 @@ public interface McAppConstants {
     public static final String MAP_CORRECT_FEEDBACK_LEARNER				="mapCorrectFeedbackLearner";
     public static final String MAP_CORRECT_FEEDBACK						="mapCorrectFeedback";
     public static final String MAP_FEEDBACK_CORRECT						="mapFeedbackCorrect";
+    public static final String IS_PORTFOLIO_EXPORT						="isPortfolioExport";
+    public static final String PORTFOLIO_EXPORT_MODE					="portfolioExportMode";
     
     
     public static final String SELECTED_QUESTION						="selectedQuestion";
