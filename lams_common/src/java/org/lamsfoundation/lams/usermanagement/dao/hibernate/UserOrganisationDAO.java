@@ -25,7 +25,7 @@ package org.lamsfoundation.lams.usermanagement.dao.hibernate;
 
 import java.util.List;
 
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -41,7 +41,7 @@ import org.lamsfoundation.lams.usermanagement.dao.IUserOrganisationDAO;
  * 
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
-public class UserOrganisationDAO extends HibernateDaoSupport implements
+public class UserOrganisationDAO extends BaseDAO implements
 		IUserOrganisationDAO {
 
 	/** 
@@ -107,38 +107,10 @@ public class UserOrganisationDAO extends HibernateDaoSupport implements
 	}
 
 	/** 
-	 * @see org.lamsfoundation.lams.usermanagement.dao.IUserOrganisationDAO#saveUserOrganisation(org.lamsfoundation.lams.usermanagement.UserOrganisation)
-	 */
-	public void saveUserOrganisation(UserOrganisation userOrganisation) {
-		getHibernateTemplate().save(userOrganisation);
-	}
-
-	/** 
-	 * @see org.lamsfoundation.lams.usermanagement.dao.IUserOrganisationDAO#updateUserOrganisation(org.lamsfoundation.lams.usermanagement.UserOrganisation)
-	 */
-	public void updateUserOrganisation(UserOrganisation userOrganisation) {
-		getHibernateTemplate().update(userOrganisation);
-	}
-
-	/** 
-	 * @see org.lamsfoundation.lams.usermanagement.dao.IUserOrganisationDAO#saveOrUpdateUserOrganisation(org.lamsfoundation.lams.usermanagement.UserOrganisation)
-	 */
-	public void saveOrUpdateUserOrganisation(UserOrganisation userOrganisation) {
-		getHibernateTemplate().saveOrUpdate(userOrganisation);
-	}
-
-	/** 
-	 * @see org.lamsfoundation.lams.usermanagement.dao.IUserOrganisationDAO#deleteUserOrganisation(org.lamsfoundation.lams.usermanagement.UserOrganisation)
-	 */
-	public void deleteUserOrganisation(UserOrganisation userOrganisation) {
-		getHibernateTemplate().delete(userOrganisation);
-	}
-
-	/** 
 	 * @see org.lamsfoundation.lams.usermanagement.dao.IUserOrganisationDAO#deleteUserOrganisationById(java.lang.Integer)
 	 */
 	public void deleteUserOrganisationById(Integer userOrganisationId) {
-		getHibernateTemplate().delete(getUserOrganisationById(userOrganisationId));
+		delete(getUserOrganisationById(userOrganisationId));
 	}
 
 }

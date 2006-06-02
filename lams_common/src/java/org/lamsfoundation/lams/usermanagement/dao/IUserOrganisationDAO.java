@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.usermanagement.dao;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.Organisation;
@@ -38,7 +39,7 @@ import org.lamsfoundation.lams.usermanagement.Organisation;
  * 
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
-public interface IUserOrganisationDAO {
+public interface IUserOrganisationDAO extends IBaseDAO{
     /**
      * Gets a list of all the userOrganisations.
      *
@@ -90,33 +91,6 @@ public interface IUserOrganisationDAO {
      */
     public List getUserOrganisationsByOrganisationId(Integer organisationId);
     
-    /**
-     * Saves the userOrganisation
-     * @param userOrganisation the object to be saved
-     * @return UserOrganisation the saved userOrganisation object
-     */
-    public void saveUserOrganisation(UserOrganisation userOrganisation);
-
-    /**
-     * Updates the userOrganisation
-     * @param userOrganisation the object to be updated
-     * @return UserOrganisation the updated userOrganisation object
-     */
-    public void updateUserOrganisation(UserOrganisation userOrganisation);
-
-    /**
-     * Saves or updates the userOrganisation
-     * @param userOrganisation the object to be saved or updated
-     * @return UserOrganisation the saved or updated userOrganisation object
-     */
-    public void saveOrUpdateUserOrganisation(UserOrganisation userOrganisation);
-
-    /**
-     * Deletes a userOrganisation from the database
-     * @param userOrganisation the userOrganisation to be deleted
-     */
-    public void deleteUserOrganisation(UserOrganisation userOrganisation);
-
     /**
      * Deletes a userOrganisation from the database by id
      * @param userOrganisationId the userOrganisation's userOrganisationId

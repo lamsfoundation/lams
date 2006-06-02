@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.usermanagement.dao;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.usermanagement.OrganisationState;
 
 /**
@@ -37,7 +38,7 @@ import org.lamsfoundation.lams.usermanagement.OrganisationState;
  * 
  * Created at 11:01:56 on 2006-6-2
  */
-public interface IOrganisationStateDAO {
+public interface IOrganisationStateDAO extends IBaseDAO{
 
 	/**
      * Gets a list of all the organisationStates.
@@ -59,33 +60,6 @@ public interface IOrganisationStateDAO {
      * @return organisationState populated organisationState object
      */
     public OrganisationState getOrganisationStateByName(String name);
-
-    /**
-     * Saves the organisationState
-     * @param organisationState the object to be saved
-     * @return OrganisationState the saved organisationState object
-     */
-    public void saveOrganisationState(OrganisationState organisationState);
-
-    /**
-     * Updates the organisationState
-     * @param organisationState the object to be updated
-     * @return OrganisationState the updated organisationState object
-     */
-    public void updateOrganisationState(OrganisationState organisationState);
-
-    /**
-     * Saves or updates the organisationState
-     * @param organisationState the object to be saved or updated
-     * @return OrganisationState the saved or updated organisationState object
-     */
-    public void saveOrUpdateOrganisationState(OrganisationState organisationState);
-
-    /**
-     * Deletes a organisationState from the database
-     * @param organisationState the organisationState to be deleted
-     */
-    public void deleteOrganisationState(OrganisationState organisationState);
 
     /**
      * Deletes a organisationState from the database by id

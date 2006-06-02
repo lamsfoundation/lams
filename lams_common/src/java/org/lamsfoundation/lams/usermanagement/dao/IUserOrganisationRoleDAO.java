@@ -24,6 +24,8 @@
 package org.lamsfoundation.lams.usermanagement.dao;
 
 import java.util.List;
+
+import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 
 /**
@@ -33,7 +35,7 @@ import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
  * 
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
-public interface IUserOrganisationRoleDAO {
+public interface IUserOrganisationRoleDAO extends IBaseDAO{
 
     /**
      * Gets userOrganisationRole object based on userOrganisationRoleId.
@@ -57,33 +59,6 @@ public interface IUserOrganisationRoleDAO {
      */
     public List getUserOrganisationRoles(Integer userOrganisationId);
     
-    /**
-     * Saves the userOrganisationRole
-     * @param userOrganisationRole the object to be saved
-     * @return UserOrganisationRole the saved userOrganisationRole object
-     */
-    public void saveUserOrganisationRole(UserOrganisationRole userOrganisationRole);
-
-    /**
-     * Updates the userOrganisationRole
-     * @param userOrganisationRole the object to be updated
-     * @return UserOrganisationRole the updated userOrganisationRole object
-     */
-    public void updateUserOrganisationRole(UserOrganisationRole userOrganisationRole);
-
-    /**
-     * Saves or updates the userOrganisationRole
-     * @param userOrganisationRole the object to be saved or updated
-     * @return UserOrganisationRole the saved or updated userOrganisationRole object
-     */
-    public void saveOrUpdateUserOrganisationRole(UserOrganisationRole userOrganisationRole);
-
-    /**
-     * Deletes a userOrganisationRole from the database
-     * @param userOrganisationRole the userOrganisationRole to be deleted
-     */
-    public void deleteUserOrganisationRole(UserOrganisationRole userOrganisationRole);
-
     /**
      * Deletes a userOrganisationRole from the database by id
      * @param userOrganisationRoleId the userOrganisationRole's userOrganisationRoleId

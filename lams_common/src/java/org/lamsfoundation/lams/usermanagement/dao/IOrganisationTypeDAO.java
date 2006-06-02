@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.usermanagement.dao;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 
 /**
@@ -36,7 +37,7 @@ import org.lamsfoundation.lams.usermanagement.OrganisationType;
  * 
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
-public interface IOrganisationTypeDAO {
+public interface IOrganisationTypeDAO extends IBaseDAO{
 
     /**
      * Gets a list of all the organisationTypes.
@@ -58,33 +59,6 @@ public interface IOrganisationTypeDAO {
      * @return organisationType populated organisationType object
      */
     public OrganisationType getOrganisationTypeByName(String name);
-
-    /**
-     * Saves the organisationType
-     * @param organisationType the object to be saved
-     * @return OrganisationType the saved organisationType object
-     */
-    public void saveOrganisationType(OrganisationType organisationType);
-
-    /**
-     * Updates the organisationType
-     * @param organisationType the object to be updated
-     * @return OrganisationType the updated organisationType object
-     */
-    public void updateOrganisationType(OrganisationType organisationType);
-
-    /**
-     * Saves or updates the organisationType
-     * @param organisationType the object to be saved or updated
-     * @return OrganisationType the saved or updated organisationType object
-     */
-    public void saveOrUpdateOrganisationType(OrganisationType organisationType);
-
-    /**
-     * Deletes a organisationType from the database
-     * @param organisationType the organisationType to be deleted
-     */
-    public void deleteOrganisationType(OrganisationType organisationType);
 
     /**
      * Deletes a organisationType from the database by id

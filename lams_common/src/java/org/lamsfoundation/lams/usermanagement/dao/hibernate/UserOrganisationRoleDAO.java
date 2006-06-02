@@ -25,7 +25,7 @@ package org.lamsfoundation.lams.usermanagement.dao.hibernate;
 
 import java.util.List;
 
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.dao.IUserOrganisationRoleDAO;
@@ -37,7 +37,7 @@ import org.lamsfoundation.lams.usermanagement.dao.IUserOrganisationRoleDAO;
  * 
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
-public class UserOrganisationRoleDAO extends HibernateDaoSupport implements
+public class UserOrganisationRoleDAO extends BaseDAO implements
 		IUserOrganisationRoleDAO {
 
 	/** 
@@ -72,38 +72,10 @@ public class UserOrganisationRoleDAO extends HibernateDaoSupport implements
     }
 	
 	/** 
-	 * @see org.lamsfoundation.lams.usermanagement.dao.IUserOrganisationRoleDAO#saveUserOrganisationRole(org.lamsfoundation.lams.usermanagement.UserOrganisationRole)
-	 */
-	public void saveUserOrganisationRole(UserOrganisationRole userOrganisationRole) {
-		getHibernateTemplate().save(userOrganisationRole);
-	}
-
-	/** 
-	 * @see org.lamsfoundation.lams.usermanagement.dao.IUserOrganisationRoleDAO#updateUserOrganisationRole(org.lamsfoundation.lams.usermanagement.UserOrganisationRole)
-	 */
-	public void updateUserOrganisationRole(UserOrganisationRole userOrganisationRole) {
-		getHibernateTemplate().update(userOrganisationRole);
-	}
-
-	/** 
-	 * @see org.lamsfoundation.lams.usermanagement.dao.IUserOrganisationRoleDAO#saveOrUpdateUserOrganisationRole(org.lamsfoundation.lams.usermanagement.UserOrganisationRole)
-	 */
-	public void saveOrUpdateUserOrganisationRole(UserOrganisationRole userOrganisationRole) {
-		getHibernateTemplate().saveOrUpdate(userOrganisationRole);
-	}
-
-	/** 
-	 * @see org.lamsfoundation.lams.usermanagement.dao.IUserOrganisationRoleDAO#deleteUserOrganisationRole(org.lamsfoundation.lams.usermanagement.UserOrganisationRole)
-	 */
-	public void deleteUserOrganisationRole(UserOrganisationRole userOrganisationRole) {
-		getHibernateTemplate().delete(userOrganisationRole);
-	}
-
-	/** 
 	 * @see org.lamsfoundation.lams.usermanagement.dao.IUserOrganisationRoleDAO#deleteUserOrganisationRoleById(java.lang.Integer)
 	 */
 	public void deleteUserOrganisationRoleById(Integer userOrganisationRoleId) {
-		getHibernateTemplate().delete(getUserOrganisationRoleById(userOrganisationRoleId));
+		delete(getUserOrganisationRoleById(userOrganisationRoleId));
 	}
 
 }

@@ -447,22 +447,22 @@ public class UserManagementService implements IUserManagementService {
 	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#createUser(org.lamsfoundation.lams.usermanagement.User)
 	 */
 	public void createUser(User user) {
-		userDAO.saveUser(user);
+		userDAO.insert(user);
 	}
 
 	/**
 	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#updateUser(org.lamsfoundation.lams.usermanagement.User)
 	 */
 	public void updateUser(User user) {
-		userDAO.updateUser(user);
+		userDAO.update(user);
 		clearUserFromCache(user);
 	}
 
 	/**
-	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#saveOrUpdateUser(org.lamsfoundation.lams.usermanagement.User)
+	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#saveOrupdate(org.lamsfoundation.lams.usermanagement.User)
 	 */
 	public void saveOrUpdateUser(User user) {
-		userDAO.saveOrUpdateUser(user);
+		userDAO.insertOrUpdate(user);
 		clearUserFromCache(user);
 	}
 
@@ -477,30 +477,29 @@ public class UserManagementService implements IUserManagementService {
 	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#removeUserOrganisation(org.lamsfoundation.lams.usermanagement.UserOrganisation)
 	 */
 	public void removeUserOrganisation(UserOrganisation userOrganisation) {
-		userOrganisationDAO.deleteUserOrganisation(userOrganisation);
+		userOrganisationDAO.delete(userOrganisation);
 	}
 
 	/**
 	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#saveOrUpdateOrganisation(org.lamsfoundation.lams.usermanagement.Organisation)
 	 */
 	public void saveOrUpdateOrganisation(Organisation organisation) {
-		organisationDAO.saveOrUpdateOrganisation(organisation);
+		organisationDAO.insertOrUpdate(organisation);
 	}
 
 	/**
-	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#saveOrUpdateUserOrganisation(org.lamsfoundation.lams.usermanagement.UserOrganisation)
+	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#saveOrUpdateOrganisation(org.lamsfoundation.lams.usermanagement.UserOrganisation)
 	 */
 	public void saveOrUpdateUserOrganisation(UserOrganisation userOrganisation) {
-		userOrganisationDAO.saveOrUpdateUserOrganisation(userOrganisation);
+		userOrganisationDAO.insertOrUpdate(userOrganisation);
 	}
 
 	/**
-	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#saveOrUpdateUserOrganisationRole(org.lamsfoundation.lams.usermanagement.UserOrganisationRole)
+	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#saveOrUpdateOrganisationRole(org.lamsfoundation.lams.usermanagement.UserOrganisationRole)
 	 */
 	public void saveOrUpdateUserOrganisationRole(
 			UserOrganisationRole userOrganisationRole) {
-		userOrganisationRoleDAO
-				.saveOrUpdateUserOrganisationRole(userOrganisationRole);
+		userOrganisationRoleDAO.insertOrUpdate(userOrganisationRole);
 	}
 
 	/**
@@ -526,7 +525,7 @@ public class UserManagementService implements IUserManagementService {
 		workspace.setRootFolder(workspaceFolder);
 		workspaceDAO.update(workspace);
 		organisation.setWorkspace(workspace);
-		organisationDAO.saveOrganisation(organisation);
+		organisationDAO.insert(organisation);
 		return organisation.getOrganisationId();
 	}
 
@@ -566,10 +565,10 @@ public class UserManagementService implements IUserManagementService {
 	}
 
 	/**
-	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#saveUser(org.lamsfoundation.lams.usermanagement.User)
+	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#save(org.lamsfoundation.lams.usermanagement.User)
 	 */
 	public Integer saveUser(User user, Integer roleID) {
-		userDAO.saveUser(user);
+		userDAO.insert(user);
 		createUserOrganisation(user, roleID);
 		Workspace workspace = createWorkspace(user.getLogin());
 		WorkspaceFolder workspaceFolder = createWorkspaceFolder(workspace, user
@@ -578,13 +577,13 @@ public class UserManagementService implements IUserManagementService {
 		workspace.setRootFolder(workspaceFolder);
 		workspaceDAO.update(workspace);
 		user.setWorkspace(workspace);
-		userDAO.updateUser(user);
+		userDAO.update(user);
 		return user.getUserId();
 	}
 
 	/**
 	 * This is a utility method required by the above method
-	 * <code>saveUser</code>. It adds a new record to the  
+	 * <code>save</code>. It adds a new record to the  
 	 * underlying database table indicating the organisation
 	 * to which this user belongs 
 	 * 
@@ -595,10 +594,10 @@ public class UserManagementService implements IUserManagementService {
 	private Integer createUserOrganisation(User user, Integer roleID) {
 		UserOrganisation userOrganisation = new UserOrganisation();
 		userOrganisation.setUser(user);
-		userOrganisationDAO.saveUserOrganisation(userOrganisation);
+		userOrganisationDAO.insert(userOrganisation);
 		userOrganisation.addUserOrganisationRole(createUserOrganisationRole(
 				userOrganisation, roleID));
-		userOrganisationDAO.saveOrUpdateUserOrganisation(userOrganisation);
+		userOrganisationDAO.insertOrUpdate(userOrganisation);
 		return userOrganisation.getUserOrganisationId();
 	}
 
@@ -617,7 +616,7 @@ public class UserManagementService implements IUserManagementService {
 		UserOrganisationRole userOrganisationRole = new UserOrganisationRole();
 		userOrganisationRole.setUserOrganisation(userOrganisation);
 		userOrganisationRole.setRole(roleDAO.getRoleById(roleID));
-		userOrganisationRoleDAO.saveUserOrganisationRole(userOrganisationRole);
+		userOrganisationRoleDAO.insert(userOrganisationRole);
 		return userOrganisationRole;
 	}
 	/**

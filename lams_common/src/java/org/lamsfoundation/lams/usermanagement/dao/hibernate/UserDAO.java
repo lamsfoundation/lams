@@ -25,7 +25,7 @@ package org.lamsfoundation.lams.usermanagement.dao.hibernate;
 
 import java.util.List;
 
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 
 import org.lamsfoundation.lams.usermanagement.dao.IUserDAO;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
@@ -42,7 +42,7 @@ import org.lamsfoundation.lams.usermanagement.Workspace;
  *
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
 */
-public class UserDAO extends HibernateDaoSupport implements IUserDAO {
+public class UserDAO extends BaseDAO implements IUserDAO {
 
 	/** 
 	 * @see org.lamsfoundation.lams.usermanagement.dao.IUserDAO#getAllUsers()
@@ -153,45 +153,17 @@ public class UserDAO extends HibernateDaoSupport implements IUserDAO {
 	}
 
 	/**
-	 * @see org.lamsfoundation.lams.usermanagement.dao.IUserDAO#saveUser(org.lamsfoundation.lams.usermanagement.User)
-	 */
-	public void saveUser(User user) {
-		getHibernateTemplate().save(user);
-	}
-
-	/**
-	 * @see org.lamsfoundation.lams.usermanagement.dao.IUserDAO#updateUser(org.lamsfoundation.lams.usermanagement.User)
-	 */
-	public void updateUser(User user) {
-		getHibernateTemplate().update(user);
-	}
-
-	/**
-	 * @see org.lamsfoundation.lams.usermanagement.dao.IUserDAO#saveOrUpdateUser(org.lamsfoundation.lams.usermanagement.User)
-	 */
-	public void saveOrUpdateUser(User user) {
-		getHibernateTemplate().saveOrUpdate(user);
-	}
-
-	/**
-	 * @see org.lamsfoundation.lams.usermanagement.dao.IUserDAO#deleteUser(org.lamsfoundation.lams.usermanagement.User)
-	 */
-	public void deleteUser(User user) {
-		getHibernateTemplate().delete(user);
-	}
-
-	/**
 	 * @see org.lamsfoundation.lams.usermanagement.dao.IUserDAO#deleteUserById(java.lang.Integer)
 	 */
 	public void deleteUserById(Integer userId) {
-		getHibernateTemplate().delete(getUserById(userId));
+		delete(getUserById(userId));
 	}
 
 	/**
 	 * @see org.lamsfoundation.lams.usermanagement.dao.IUserDAO#deleteUserByLogin(java.lang.String)
 	 */
 	public void deleteUserByLogin(String login) {
-		getHibernateTemplate().delete(getUserByLogin(login));
+		delete(getUserByLogin(login));
 	}
 
 	/**
@@ -200,7 +172,7 @@ public class UserDAO extends HibernateDaoSupport implements IUserDAO {
     public void updatePassword(String login, String newPassword){
     	User user = getUserByLogin(login);
     	user.setPassword(newPassword);
-    	updateUser(user);
+    	update(user);
     }
 	
 }

@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.usermanagement.dao;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.Workspace;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
@@ -38,7 +39,7 @@ import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
  * 
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
-public interface IUserDAO {
+public interface IUserDAO extends IBaseDAO {
 
 	
     /**
@@ -133,33 +134,6 @@ public interface IUserDAO {
      */
     public List getUsersByAuthenticationMethod(AuthenticationMethod authenticationMethod);
     
-    /**
-     * Saves the user
-     * @param user the object to be saved
-     * @return User the saved user object
-     */
-    public void saveUser(User user);
-
-    /**
-     * Updates the user
-     * @param user the object to be updated
-     * @return User the updated user object
-     */
-    public void updateUser(User user);
-
-    /**
-     * Saves or updates the user
-     * @param user the object to be saved or updated
-     * @return User the saved or updated user object
-     */
-    public void saveOrUpdateUser(User user);
-
-    /**
-     * Deletes a user from the database
-     * @param user the user to be deleted
-     */
-    public void deleteUser(User user);
-
     /**
      * Deletes a user from the database by id
      * @param userId the user's userId

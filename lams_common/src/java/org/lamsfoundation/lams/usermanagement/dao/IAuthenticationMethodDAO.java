@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.usermanagement.dao;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.User;
 
@@ -37,7 +38,7 @@ import org.lamsfoundation.lams.usermanagement.User;
  * 
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
-public interface IAuthenticationMethodDAO {
+public interface IAuthenticationMethodDAO extends IBaseDAO{
 
     /**
      * Gets a list of all the authenticationMethods.
@@ -67,33 +68,6 @@ public interface IAuthenticationMethodDAO {
      */
     public AuthenticationMethod getAuthenticationMethodByUser(User user);
     
-    /**
-     * Saves the authenticationMethod
-     * @param authenticationMethod the object to be saved
-     * @return AuthenticationMethod the saved authenticationMethod object
-     */
-    public void saveAuthenticationMethod(AuthenticationMethod authenticationMethod);
-
-    /**
-     * Updates the authenticationMethod
-     * @param authenticationMethod the object to be updated
-     * @return AuthenticationMethod the updated authenticationMethod object
-     */
-    public void updateAuthenticationMethod(AuthenticationMethod authenticationMethod);
-
-    /**
-     * Saves or updates the authenticationMethod
-     * @param authenticationMethod the object to be saved or updated
-     * @return AuthenticationMethod the saved or updated authenticationMethod object
-     */
-    public void saveOrUpdateAuthenticationMethod(AuthenticationMethod authenticationMethod);
-
-    /**
-     * Deletes a authenticationMethod from the database
-     * @param authenticationMethod the authenticationMethod to be deleted
-     */
-    public void deleteAuthenticationMethod(AuthenticationMethod authenticationMethod);
-
     /**
      * Deletes a authenticationMethod from the database by id
      * @param authenticationMethodId the authenticationMethod's authenticationMethodId

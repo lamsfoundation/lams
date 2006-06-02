@@ -26,7 +26,7 @@ package org.lamsfoundation.lams.usermanagement.dao.hibernate;
 import java.util.List;
 import java.util.Iterator;
 
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 
 import org.lamsfoundation.lams.usermanagement.dao.IOrganisationDAO;
 import org.lamsfoundation.lams.usermanagement.Organisation;
@@ -41,7 +41,7 @@ import org.lamsfoundation.lams.usermanagement.Organisation;
  * 
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
-public class OrganisationDAO extends HibernateDaoSupport implements
+public class OrganisationDAO extends BaseDAO implements
 		IOrganisationDAO {
 	
 	private static final String TABLENAME ="lams_organisation";
@@ -80,30 +80,9 @@ public class OrganisationDAO extends HibernateDaoSupport implements
     }
 	
 	/**
-	 * @see org.lamsfoundation.lams.usermanagement.dao.IOrganisationDAO#saveOrganisation(org.lamsfoundation.lams.usermanagement.Organisation)
-	 */
-	public void saveOrganisation(Organisation organisation) {
-		getHibernateTemplate().save(organisation);
-	}
-
-	/**
-	 * @see org.lamsfoundation.lams.usermanagement.dao.IOrganisationDAO#updateOrganisation(org.lamsfoundation.lams.usermanagement.Organisation)
-	 */
-	public void updateOrganisation(Organisation organisation) {
-		getHibernateTemplate().update(organisation);
-	}
-
-	/**
-	 * @see org.lamsfoundation.lams.usermanagement.dao.IOrganisationDAO#saveOrUpdateOrganisation(org.lamsfoundation.lams.usermanagement.Organisation)
-	 */
-	public void saveOrUpdateOrganisation(Organisation organisation) {
-		getHibernateTemplate().saveOrUpdate(organisation);
-	}
-
-	/**
 	 * @see org.lamsfoundation.lams.usermanagement.dao.IOrganisationDAO#deleteOrganisation(org.lamsfoundation.lams.usermanagement.Organisation)
 	 */
-	public void deleteOrganisation(Organisation organisation) {
+	public void delete(Organisation organisation) {
 		Iterator iter = organisation.getChildOrganisations().iterator();
 		Organisation parentOrganisation = organisation.getParentOrganisation();
 		while(iter.hasNext()){
@@ -118,7 +97,7 @@ public class OrganisationDAO extends HibernateDaoSupport implements
 	 * @see org.lamsfoundation.lams.usermanagement.dao.IOrganisationDAO#deleteOrganisationById(java.lang.Integer)
 	 */
 	public void deleteOrganisationById(Integer organisationId) {
- 		deleteOrganisation(getOrganisationById(organisationId));
+ 		delete(getOrganisationById(organisationId));
 	}
 	public Organisation getOrganisationByWorkspaceID(Integer workspaceID){		
 		List list = getHibernateTemplate().find(FIND_BY_WORKSPACE,workspaceID);

@@ -25,8 +25,7 @@ package org.lamsfoundation.lams.usermanagement.dao.hibernate;
 
 import java.util.List;
 
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
-
+import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dao.IAuthenticationMethodDAO;
@@ -41,7 +40,7 @@ import org.lamsfoundation.lams.usermanagement.dao.IAuthenticationMethodDAO;
  * 
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
-public class AuthenticationMethodDAO extends HibernateDaoSupport
+public class AuthenticationMethodDAO extends BaseDAO
 		implements IAuthenticationMethodDAO {
 
 	/** 
@@ -77,38 +76,10 @@ public class AuthenticationMethodDAO extends HibernateDaoSupport
 	}
 	
 	/** 
-	 * @see org.lamsfoundation.lams.usermanagement.dao.IAuthenticationMethodDAO#saveAuthenticationMethod(org.lamsfoundation.lams.usermanagement.AuthenticationMethod)
-	 */
-	public void saveAuthenticationMethod(AuthenticationMethod authenticationMethod) {
-		getHibernateTemplate().save(authenticationMethod);
-	}
-
-	/** 
-	 * @see org.lamsfoundation.lams.usermanagement.dao.IAuthenticationMethodDAO#updateAuthenticationMethod(org.lamsfoundation.lams.usermanagement.AuthenticationMethod)
-	 */
-	public void updateAuthenticationMethod(AuthenticationMethod authenticationMethod) {
-		getHibernateTemplate().update(authenticationMethod);
-	}
-
-	/** 
-	 * @see org.lamsfoundation.lams.usermanagement.dao.IAuthenticationMethodDAO#saveOrUpdateAuthenticationMethod(org.lamsfoundation.lams.usermanagement.AuthenticationMethod)
-	 */
-	public void saveOrUpdateAuthenticationMethod(AuthenticationMethod authenticationMethod) {
-		getHibernateTemplate().saveOrUpdate(authenticationMethod);
-	}
-
-	/** 
-	 * @see org.lamsfoundation.lams.usermanagement.dao.IAuthenticationMethodDAO#deleteAuthenticationMethod(org.lamsfoundation.lams.usermanagement.AuthenticationMethod)
-	 */
-	public void deleteAuthenticationMethod(AuthenticationMethod authenticationMethod) {
-		getHibernateTemplate().delete(authenticationMethod);
-	}
-
-	/** 
 	 * @see org.lamsfoundation.lams.usermanagement.dao.IAuthenticationMethodDAO#deleteAuthenticationMethodById(java.lang.Integer)
 	 */
 	public void deleteAuthenticationMethodById(Integer authenticationMethodId) {
-		getHibernateTemplate().delete(getAuthenticationMethodById(authenticationMethodId));
+		delete(getAuthenticationMethodById(authenticationMethodId));
 	}
 
 }

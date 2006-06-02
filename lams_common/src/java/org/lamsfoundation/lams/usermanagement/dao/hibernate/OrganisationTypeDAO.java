@@ -25,7 +25,7 @@ package org.lamsfoundation.lams.usermanagement.dao.hibernate;
 
 import java.util.List;
 
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.dao.IOrganisationTypeDAO;
@@ -39,7 +39,7 @@ import org.lamsfoundation.lams.usermanagement.dao.IOrganisationTypeDAO;
  * 
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
-public class OrganisationTypeDAO extends HibernateDaoSupport implements
+public class OrganisationTypeDAO extends BaseDAO implements
 		IOrganisationTypeDAO {
 
 	/** 
@@ -67,34 +67,6 @@ public class OrganisationTypeDAO extends HibernateDaoSupport implements
 		}else{
 			return (OrganisationType)organisationTypes.get(0);
 		}
-	}
-
-	/** 
-	 * @see org.lamsfoundation.lams.usermanagement.dao.IOrganisationTypeDAO#saveOrganisationType(org.lamsfoundation.lams.usermanagement.OrganisationType)
-	 */
-	public void saveOrganisationType(OrganisationType organisationType) {
-		getHibernateTemplate().save(organisationType);
-	}
-
-	/** 
-	 * @see org.lamsfoundation.lams.usermanagement.dao.IOrganisationTypeDAO#updateOrganisationType(org.lamsfoundation.lams.usermanagement.OrganisationType)
-	 */
-	public void updateOrganisationType(OrganisationType organisationType) {
-		getHibernateTemplate().update(organisationType);
-	}
-
-	/** 
-	 * @see org.lamsfoundation.lams.usermanagement.dao.IOrganisationTypeDAO#saveOrUpdateOrganisationType(org.lamsfoundation.lams.usermanagement.OrganisationType)
-	 */
-	public void saveOrUpdateOrganisationType(OrganisationType organisationType) {
-		getHibernateTemplate().saveOrUpdate(organisationType);
-	}
-
-	/** 
-	 * @see org.lamsfoundation.lams.usermanagement.dao.IOrganisationTypeDAO#deleteOrganisationType(org.lamsfoundation.lams.usermanagement.OrganisationType)
-	 */
-	public void deleteOrganisationType(OrganisationType organisationType) {
-		getHibernateTemplate().delete(organisationType);
 	}
 
 	/** 

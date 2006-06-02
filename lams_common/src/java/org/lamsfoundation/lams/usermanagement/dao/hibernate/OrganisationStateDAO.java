@@ -25,9 +25,8 @@ package org.lamsfoundation.lams.usermanagement.dao.hibernate;
 import java.util.List;
 
 import org.lamsfoundation.lams.usermanagement.OrganisationState;
-import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.dao.IOrganisationStateDAO;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 
 /**
  * @version
@@ -40,7 +39,7 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  *
  * Created at 11:30:40 on 2006-6-2
  */
-public class OrganisationStateDAO extends HibernateDaoSupport implements
+public class OrganisationStateDAO extends BaseDAO implements
 		IOrganisationStateDAO {
 
 	/* (non-Javadoc)
@@ -72,46 +71,17 @@ public class OrganisationStateDAO extends HibernateDaoSupport implements
 	}
 
 	/* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.usermanagement.dao.IOrganisationStateDAO#saveOrganisationState(org.lamsfoundation.lams.usermanagement.OrganisationState)
-	 */
-	public void saveOrganisationState(OrganisationState organisationState) {
-		getHibernateTemplate().save(organisationState);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.usermanagement.dao.IOrganisationStateDAO#updateOrganisationState(org.lamsfoundation.lams.usermanagement.OrganisationState)
-	 */
-	public void updateOrganisationState(OrganisationState organisationState) {
-		getHibernateTemplate().update(organisationState);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.usermanagement.dao.IOrganisationStateDAO#saveOrUpdateOrganisationState(org.lamsfoundation.lams.usermanagement.OrganisationState)
-	 */
-	public void saveOrUpdateOrganisationState(
-			OrganisationState organisationState) {
-		getHibernateTemplate().saveOrUpdate(organisationState);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.usermanagement.dao.IOrganisationStateDAO#deleteOrganisationState(org.lamsfoundation.lams.usermanagement.OrganisationState)
-	 */
-	public void deleteOrganisationState(OrganisationState organisationState) {
-		getHibernateTemplate().delete(organisationState);
-	}
-
-	/* (non-Javadoc)
 	 * @see org.lamsfoundation.lams.usermanagement.dao.IOrganisationStateDAO#deleteOrganisationStateById(java.lang.Integer)
 	 */
 	public void deleteOrganisationStateById(Integer organisationStateId) {
-		getHibernateTemplate().delete(getOrganisationStateById(organisationStateId));
+		delete(getOrganisationStateById(organisationStateId));
 	}
 
 	/* (non-Javadoc)
 	 * @see org.lamsfoundation.lams.usermanagement.dao.IOrganisationStateDAO#deleteOrganisationStateByName(java.lang.String)
 	 */
 	public void deleteOrganisationStateByName(String name) {
-		getHibernateTemplate().delete(getOrganisationStateByName(name));
+		delete(getOrganisationStateByName(name));
 	}
 
 }

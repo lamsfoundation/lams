@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.usermanagement.dao;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.usermanagement.Role;
 
 /**
@@ -36,7 +37,7 @@ import org.lamsfoundation.lams.usermanagement.Role;
  * 
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
-public interface IRoleDAO {
+public interface IRoleDAO extends IBaseDAO {
 	
     /**
      * Gets a list of all the roles.
@@ -58,33 +59,6 @@ public interface IRoleDAO {
      * @return role populated role object
      */
     public Role getRoleByName(String name);
-
-    /**
-     * Saves the role
-     * @param role the object to be saved
-     * @return Role the saved role object
-     */
-    public void saveRole(Role role);
-
-    /**
-     * Updates the role
-     * @param role the object to be updated
-     * @return Role the updated role object
-     */
-    public void updateRole(Role role);
-
-    /**
-     * Saves or updates the role
-     * @param role the object to be saved or updated
-     * @return Role the saved or updated role object
-     */
-    public void saveOrUpdateRole(Role role);
-
-    /**
-     * Deletes a role from the database
-     * @param role the role to be deleted
-     */
-    public void deleteRole(Role role);
 
     /**
      * Deletes a role from the database by id
