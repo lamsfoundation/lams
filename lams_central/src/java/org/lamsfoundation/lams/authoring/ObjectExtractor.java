@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.authoring;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -105,8 +106,11 @@ public class ObjectExtractor implements IObjectExtractor {
 	 * of the activities, not the IDs. It is important that the values in this map are the Activity
 	 * objects related to the Hibernate session as they are updated by the parseTransitions code.
 	 */ 
-	protected HashMap<Integer,Activity> newActivityMap = new HashMap<Integer,Activity>(); 
+	protected HashMap<Integer,Activity> newActivityMap = new HashMap<Integer,Activity>();
+	// cache of groupings - too hard to get them from the db
 	protected HashMap<Integer,Grouping> groupings = new HashMap<Integer,Grouping>();
+	// can't delete as we go as they are linked to other items - keep a list and delete at the end.
+	protected Set<Grouping> groupingsToDelete = new HashSet<Grouping>();
 	protected LearningDesign learningDesign = null;
 	
 	protected Logger log = Logger.getLogger(ObjectExtractor.class);	
@@ -348,6 +352,7 @@ public class ObjectExtractor implements IObjectExtractor {
 
 		learningDesign.setFirstActivity(learningDesign.calculateFirstActivity());
 		learningDesignDAO.insertOrUpdate(learningDesign);
+		deleteUnwantedGroupings();
 		
 		return learningDesign;	
 		}
@@ -364,7 +369,13 @@ public class ObjectExtractor implements IObjectExtractor {
 			groupings.put(grouping.getGroupingUIID(), grouping);
 		}
 	}
-	
+
+	/** Delete the old unneeded groupings. Won't be done via a cascase */
+	private void deleteUnwantedGroupings() {
+		for ( Grouping grouping: groupingsToDelete) {
+			groupingDAO.delete(grouping);	
+		}
+	}
 	/**
 	 * Parses the groupings array sent from the WDDX packet. It will create
 	 * the groupings object (ChosenGrouping, RandomGrouping) so that when the
@@ -409,6 +420,13 @@ public class ObjectExtractor implements IObjectExtractor {
 		}
 
 	    Grouping grouping = groupings.get(groupingUUID);
+	    // check that the grouping type is still okay - if not get rid of the old hibernate object.
+	    if ( grouping != null && ! grouping.getGroupingTypeId().equals(groupingTypeID) ) {
+	    	groupings.remove(grouping.getGroupingUIID());
+	    	groupingsToDelete.add(grouping);
+			grouping = null;
+	    }
+	
 	    if (grouping == null) {
 	        Object object = Grouping.getGroupingInstance(groupingTypeID);
 			grouping = (Grouping)object;				
@@ -417,7 +435,7 @@ public class ObjectExtractor implements IObjectExtractor {
 				    grouping.setGroupingId(WDDXProcessor.convertToLong(groupingDetails,WDDXTAGS.GROUPING_ID));
 			if (keyExists(groupingDetails, WDDXTAGS.GROUPING_UIID))
 				    grouping.setGroupingUIID(WDDXProcessor.convertToInteger(groupingDetails,WDDXTAGS.GROUPING_UIID));
-	    }   
+	    } 
 	 
 	    if(grouping.isRandomGrouping())
 			createRandomGrouping((RandomGrouping)grouping,groupingDetails);
@@ -576,21 +594,21 @@ public class ObjectExtractor implements IObjectExtractor {
 	    //it is assumed that the activityUUID will always be sent by flash.
 	    Integer activityUUID = WDDXProcessor.convertToInteger(activityDetails,WDDXTAGS.ACTIVITY_UIID);
 	    Activity activity = null;
-	    //get the activity with the particular activity uuid, if null, then new object needs to be created.
+		Integer activityTypeID = WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.ACTIVITY_TYPE_ID);
+		if ( activityTypeID == null ) {
+			throw new ObjectExtractorException("activityTypeID missing");
+		}
+
+		//get the activity with the particular activity uuid, if null, then new object needs to be created.
 	    Activity existingActivity = activityDAO.getActivityByUIID(activityUUID, learningDesign);
-	    if (existingActivity == null)
-	    {
-			Integer activityTypeID = WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.ACTIVITY_TYPE_ID);
-			if ( activityTypeID == null ) {
-				throw new ObjectExtractorException("activityTypeID missing");
-			}
-			
-			Activity activityObject = Activity.getActivityInstance(activityTypeID.intValue());
-			activity =(Activity)activityObject;
-	    }
-	    else
-	    {
-	        activity = existingActivity; //otherwise load existing activity
+		if (existingActivity != null && ! existingActivity.getActivityTypeId().equals(activityTypeID) ) {
+    		existingActivity = null;
+		} 
+		
+		if ( existingActivity != null ) {
+			activity = existingActivity;
+		} else {
+			activity  = Activity.getActivityInstance(activityTypeID.intValue());
 	    }
 		processActivityType(activity,activityDetails);
 		
