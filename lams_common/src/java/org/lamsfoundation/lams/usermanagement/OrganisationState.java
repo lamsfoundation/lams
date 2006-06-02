@@ -11,6 +11,11 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  *     
 */
 public class OrganisationState implements Serializable {
+	
+	public static final Integer ACTIVE = 1;
+	public static final Integer HIDDEN = 2;
+	public static final Integer ARCHIVED = 3;
+	public static final Integer REMOVED = 4;
 
     /** identifier field */
     private Integer organisationStateId;
