@@ -337,7 +337,7 @@ public class TestLearnerService extends AbstractLamsTestCase
         
         assertTrue("verify the existance of test user",!randomGrouping.doesLearnerExist(testUser));
         
-        learnerService.performGrouping(randomGroupingActivity.getActivityId(),testUser);
+        learnerService.performGrouping(Test_Lesson_ID,randomGroupingActivity.getActivityId(),testUser.getUserId());
     
         assertTrue("verify the existance of test user",randomGrouping.doesLearnerExist(testUser));
     }

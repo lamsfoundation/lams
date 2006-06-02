@@ -50,6 +50,7 @@ import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.lesson.dto.LearnerProgressDTO;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.lesson.service.LessonServiceException;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.dao.IToolSessionDAO;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
@@ -406,58 +407,36 @@ public class LearnerService implements ILearnerService
     }
     
     /**
-     * @see org.lamsfoundation.lams.learning.service.ILearnerService#performGrouping(java.lang.Long, java.lang.Long)
+     * @throws LearnerServiceException 
+     * @see org.lamsfoundation.lams.learning.service.ILearnerService#performGrouping(java.lang.Long, java.lang.Long, java.lang.Integer)
      */
-    public void performGrouping(Long lessonId, Long groupingActivityId)
+    public boolean performGrouping(Long lessonId, Long groupingActivityId, Integer learnerId) throws LearnerServiceException
     {
     	GroupingActivity groupingActivity = (GroupingActivity) activityDAO.getActivityByActivityId(groupingActivityId, GroupingActivity.class);
-    	if ( groupingActivity != null ) { 
-    		performGrouping(lessonId, groupingActivity);
-    		
-    	} else {
-
-    		String error = "Grouping activity "+groupingActivityId+" does not exist. Cannot perform grouping.";
-            log.error(error);
-    		throw new LearnerServiceException(error);
-
-    	}
-       
-    }
-
-    /**
-     * @see org.lamsfoundation.lams.learning.service.ILearnerService#performGrouping(java.lang.Long, org.lamsfoundation.lams.learningdesign.GroupingActivity)
-     */
-    public void performGrouping(Long lessonId, GroupingActivity groupingActivity) {
+    	User learner = userManagementService.getUserById(learnerId);
     	
-        List learners = lessonService.getActiveLessonLearners(lessonId.longValue());
-	    Grouping grouping = groupingActivity.getCreateGrouping();
-		grouping.doGrouping(learners);
-		groupingDAO.update(grouping);
-    }
-    
-	
-    /**
-     * @see org.lamsfoundation.lams.learning.service.ILearnerService#performGrouping(org.lamsfoundation.lams.learningdesign.GroupingActivity, org.lamsfoundation.lams.usermanagement.User)
-     */
-    public void performGrouping(Long groupingActivityId, User learner)
-    {
-    	GroupingActivity groupingActivity = (GroupingActivity) activityDAO.getActivityByActivityId(groupingActivityId, GroupingActivity.class);
-    	if ( groupingActivity != null ) { 
-
-	        Grouping grouping = groupingActivity.getCreateGrouping();
-	        grouping.doGrouping(learner);
-	        groupingDAO.update(grouping);
-	        
-    	} else {
-
-    		String error = "Grouping activity "+groupingActivityId+" does not exist. Cannot perform grouping.";
-            log.error(error);
-    		throw new LearnerServiceException(error);
-
+    	boolean groupingDone = false;
+    	try {
+	    	if ( groupingActivity != null && groupingActivity.getCreateGrouping()!=null && learner != null ) {
+	    		Grouping grouping = groupingActivity.getCreateGrouping();
+	    		if ( grouping.isRandomGrouping() ) {
+	    			lessonService.performGrouping(lessonId, groupingActivity, learner);
+	    			groupingDone = true;
+	    		} else {
+	    			groupingDone = grouping.doesLearnerExist(learner);
+	    		}
+	    	} else {
+	    		String error = "Grouping activity "+groupingActivityId+" learner "+learnerId+" does not exist. Cannot perform grouping.";
+	            log.error(error);
+	            throw new LearnerServiceException(error);
+	    	}
+    	} catch ( LessonServiceException e ) {
+    		throw new LearnerServiceException("performGrouping failed due to "+e.getMessage(), e);
     	}
-        
+    	return groupingDone;
     }
-    
+    	
+
     /**
      * @see org.lamsfoundation.lams.learning.service.ILearnerService#knockGate(java.lang.Long, java.lang.Long, org.lamsfoundation.lams.usermanagement.User)
      */

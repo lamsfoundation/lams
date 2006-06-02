@@ -29,36 +29,19 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<html:form action="/grouping.do?method=completeActivity&userId=${user.userId}&lessonId=${lesson.lessonId}&activityId=${activityId}" target="_self">
 
-		<span class="error">
-			<%-- Struts error messages --%>
-		</span>
-		
+		<h1><fmt:message key="label.view.groups.title"/></h1>
 		<table width="100%" border="0" cellpadding="3" cellspacing="4" class="body" summary="This table is being used for layout purposes">
-			<tr bgcolor="#999999"> 
-				<td colspan="2" align="left" class="bodyBold">
-					<table width="100%" border="0" cellpadding="0" cellspacing="0">
-						<tr>
-							<td class="bodyBold"><font color="#FFFFFF">Grouping Result</font></td>
-							<td align="right" class="smallText">
-								<font color="#FFFFFF">
-								</font>
-							</td>
-						</tr>
-					</table>
-				</td>
-			</tr>
-			<logic:iterate id="group" name="groups" indexId="gId"> 
+			<logic:iterate id="group" name="groups"> 
 			<tr>
 				<td align="right" class="bodyBold" style="{border-right: solid #CCCCCC 1px; border-bottom: solid #CCCCCC 1px; }">
-					Group <c:out value="${gId+1}"/>
+					<c:out value="${group.groupName}"/>
 				</td>
 				<td width="85%" align="left" class="body"  style="{border-bottom: solid #CCCCCC 1px; }">
 					<table width="100%" border="0" cellpadding="0" cellspacing="0">
 						<c:forEach items="${group.users}" var="user">
 						<tr>
 							<td class="bodyBold">
-								<c:out value="${user.firstName}"/>,
-								<c:out value="${user.lastName}"/>
+								<c:out value="${user.firstName}"/> <c:out value="${user.lastName}"/>
 							</td>
 						</tr>
 						</c:forEach>
@@ -69,7 +52,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<tr> 
 				<td align="right" valign="top" class="bodyBold">&nbsp;</td>
 				<td align="right">
-					<html:submit styleClass="button" value="Finished" onmouseover="pviiClassNew(this,'buttonover')" onmouseout="pviiClassNew(this,'button')"/> 
+					<html:submit styleClass="button" onmouseover="pviiClassNew(this,'buttonover')" onmouseout="pviiClassNew(this,'button')"><fmt:message key="label.activity.finish"/></html:submit>
 				</td>
 			</tr>
 		</table>

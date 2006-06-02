@@ -48,4 +48,28 @@ public class LearnerServiceException extends java.lang.RuntimeException
     {
         super(msg);
     }
+    
+    /**
+     * Constructs an instance of <code>LearnerServiceException</code>
+     * for wrapping both the customized error message and 
+     * throwable exception object.
+     * @param message
+     * @param cause
+     */
+    public LearnerServiceException(String message, Throwable cause)
+    {
+        super(message, cause);
+    }
+
+    /**
+     * Constructs an instance of <code>LearnerServiceException</code>
+     * for wrapping an throwable exception object.
+     * @param message
+     * @param cause
+     */
+    public LearnerServiceException(Throwable cause)
+    {
+        super(cause);
+    }
+
 }

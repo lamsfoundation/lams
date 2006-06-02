@@ -191,33 +191,17 @@ public interface ILearnerService
     public Integer getCountActiveLearnersByLesson(long lessonId);
 
     /**
-     * Perform random grouping for the learners who have started the lesson,
-     * based on the grouping activity. This method should be used when we don't 
-     * have an grouping activity that is already part of the Hibernate session. 
+     * Perform grouping for the learners who have started the lesson,
+     * based on the grouping activity.  
      * 
      * @param lessonId lesson id
      * @param groupingActivityId the activity that has create grouping.
+     * @param learnerId the learner who triggers the grouping.
+     * @return true if grouping done, false if waiting for grouping to occur
      */
-    public void performGrouping(Long lessonId, Long groupingActivityId);
+    public boolean performGrouping(Long lessonId, Long groupingActivityId, Integer learnerId);
     
 
-    /**
-     * Perform random grouping for the learners who have started the lesson,
-     * based on the grouping activity. This method should be used when we do 
-     * have an grouping activity that is already part of the Hibernate session.
-     *  
-     * @param lessonId lesson id
-     * @param groupingActivityId the activity that has create grouping.
-     */
-    public void performGrouping(Long lessonId, GroupingActivity groupingActivity);
-    
-    /**
-     * Perform random grouping a single learner based on the grouping activity.
-     * @param groupingActivityId the activity that has create grouping.
-     * @param learner the learner needs to be grouped
-     */
-    public void performGrouping(Long groupingActivityId, User learner);
-    
     /**
      * Check up the gate status to go through the gate. This also updates the gate.
      * This method should be used when we do not have an grouping activity

@@ -25,8 +25,8 @@
 package org.lamsfoundation.lams.learning.web.action;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -41,10 +41,10 @@ import org.lamsfoundation.lams.learning.service.LearnerServiceException;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.GroupComparator;
+import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
-import org.lamsfoundation.lams.lesson.Lesson;
-import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 
 
@@ -68,8 +68,9 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
  *                          type="org.lamsfoundation.lams.learning.service.LearnerServiceException"
  *                          path=".systemError"
  * 							handler="org.lamsfoundation.lams.learning.util.CustomStrutsExceptionHandler"
- * @struts:action-forward name="viewGrouping" path="/grouping.do?method=viewGrouping"
- * @struts:action-forward name="showGroup" path=".grouping"
+ * @struts:action-forward name="viewGroup" path="/grouping.do?method=viewGrouping"
+ * @struts:action-forward name="showGroup" path=".showgroup"
+ * @struts:action-forward name="waitGroup" path=".waitgroup"
  * ----------------XDoclet Tags--------------------
  * 
  */
@@ -88,7 +89,8 @@ public class GroupingAction extends LamsDispatchAction
     //---------------------------------------------------------------------
     // Class level constants - Struts forward
     //---------------------------------------------------------------------
-    private static final String VIEW_GROUPING = "viewGrouping";
+    private static final String VIEW_GROUP = "viewGroup";
+    private static final String WAIT_GROUP = "waitGroup";
     private static final String SHOW_GROUP = "showGroup";
     
     //---------------------------------------------------------------------
@@ -117,15 +119,15 @@ public class GroupingAction extends LamsDispatchAction
         
         //initialize service object
         ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
-
         
-        learnerService.performGrouping(learnerProgress.getLesson().getLessonId(),
-        								learnerProgress.getNextActivity().getActivityId());
+        boolean groupingDone = learnerService.performGrouping(learnerProgress.getLesson().getLessonId(),
+        								learnerProgress.getNextActivity().getActivityId(), 
+        								LearningWebUtil.getUserId());
 
         LearningWebUtil.putActivityInRequest(request, learnerProgress.getNextActivity(), learnerService);
         LearningWebUtil.setLessonId(learnerProgress.getLesson().getLessonId());
         
-        return mapping.findForward(VIEW_GROUPING);
+        return mapping.findForward(groupingDone ? VIEW_GROUP : WAIT_GROUP);
     }
 
     /**
@@ -148,15 +150,19 @@ public class GroupingAction extends LamsDispatchAction
         //initialize service object
         ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
      
-        Activity groupingActivity = LearningWebUtil.getActivityFromRequest(request,learnerService);
-        List groups = new ArrayList(((GroupingActivity)groupingActivity).getCreateGrouping().getGroups());
+        SortedSet groups = new TreeSet(new GroupComparator());
+
+        Activity activity = LearningWebUtil.getActivityFromRequest(request,learnerService);
+        Grouping grouping = ((GroupingActivity)activity).getCreateGrouping();
+        if ( grouping != null)
+        	groups.addAll(grouping.getGroups());
+        
         request.getSession().setAttribute(GROUPS,groups);
-        request.setAttribute(LearningWebUtil.PARAM_ACTIVITY_ID,
-                             groupingActivity.getActivityId());
+        request.setAttribute(LearningWebUtil.PARAM_ACTIVITY_ID,	activity.getActivityId());
         
         return mapping.findForward(SHOW_GROUP);
     }
-    
+
     /**
      * Complete the current tool activity and forward to the url of next activity
      * in the learning design.

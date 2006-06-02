@@ -32,7 +32,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<lams:css/>
-		<title<fmt:message key="learner.title"/></title>
+		<title><fmt:message key="learner.title"/></title>
 	</head>
 	<body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
 
