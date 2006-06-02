@@ -44,6 +44,9 @@ public class Organisation implements Serializable {
 
     /** nullable persistent field */
     private String name;
+    
+    /** nullable persistent field */
+    private String code;
 
     /** nullable persistent field */
     private String description;
@@ -140,6 +143,20 @@ public class Organisation implements Serializable {
         this.name = name;
     }
 
+    /** 
+     *            @hibernate.property
+     *             column="code"
+     *             length="20"
+     *         
+     */
+    public String getCode() {
+        return this.code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+    
     /** 
      *            @hibernate.property
      *             column="description"
