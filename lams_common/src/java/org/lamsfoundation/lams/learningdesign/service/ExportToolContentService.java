@@ -592,7 +592,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			
 			//persist
 			trans.setTransitionId(null);
-			transitionDAO.insert(trans);
+			//leave it to learning design to save it.
+//			transitionDAO.insert(trans);
 		}
 		
 		
@@ -671,6 +672,10 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		ld.setLessonStartDateTime(dto.getLessonStartDateTime());
 		ld.setLastModifiedDateTime(dto.getLastModifiedDateTime());
 
+		//set learning design to transition.
+		for(Transition trans:transList){
+			trans.setLearningDesign(ld);
+		}
 		ld.setTransitions(transList);
 
 		ld.setActivities(actList);
