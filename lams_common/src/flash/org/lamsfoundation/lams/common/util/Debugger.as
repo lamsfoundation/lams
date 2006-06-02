@@ -26,7 +26,7 @@ import org.lamsfoundation.lams.common.comms.*
 import org.lamsfoundation.lams.common.Config
 import org.lamsfoundation.lams.common.dict.*
 import org.lamsfoundation.lams.common.ui.*
-import org.lamsfoundation.lams.authoring.Application
+import org.lamsfoundation.lams.common.ApplicationParent
 import mx.events.*/**  
 * Debug  
 * Can be used to print message to a floating windoe and to trace windoe.  SHoudl be used over trace().  
@@ -138,11 +138,26 @@ class org.lamsfoundation.lams.common.util.Debugger {
 		var sendDumpMsgLog = _crashDumpMsgLog;
 		//_global.breakpoint();
 		//Debugger.log('HI there: '+mytest,Debugger.CRITICAL,'crashDataDump','Debugger');
-		dto.ddm = Application.getInstance().getDesignDataModel().getDesignForSaving();
+		
+		// save model data depending on which application is running
+		switch(ApplicationParent.getInstance().module){
+			case 'authoring' :
+				dto.ddm = org.lamsfoundation.lams.authoring.Application.getInstance().getDesignDataModel().getDesignForSaving();
+				break;
+			case 'monitoring' :
+				dto.ddm = org.lamsfoundation.lams.monitoring.Application.getInstance().getMonitor().ddm;
+				break;
+			case 'wizard' :
+				
+				break;
+			default :
+				
+		}
+		
 		dto.crashDataLog = sendDumpMsgLog;   
 		var callback:Function = Proxy.create(Debugger,onCrashDumpResponse);
 		
-		var comms = Application.getInstance().getComms();
+		var comms = ApplicationParent.getInstance().getComms();
         comms.sendAndReceive(dto, 'flashCrashDump',callback,false)
 		
     }	
