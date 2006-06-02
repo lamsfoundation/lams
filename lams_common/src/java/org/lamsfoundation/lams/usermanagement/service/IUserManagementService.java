@@ -158,6 +158,15 @@ public interface IUserManagementService {
     public Organisation getOrganisationById(Integer organisationId);
 
 	/**
+     * Retrieves a organisationType by Id.  null will be returned 
+     * if no organisationType with the id is found
+     * 
+     * @param typeId the organisation type's Id
+     * @return OrganisationType
+     */
+    public OrganisationType getOrganisationTypeById(Integer typeId);
+
+    /**
      * Retrieves a organisationType by name.  null will be returned 
      * if no organisationType with the id is found
      * 

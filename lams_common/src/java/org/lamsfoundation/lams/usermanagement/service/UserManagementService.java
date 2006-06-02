@@ -673,4 +673,8 @@ public class UserManagementService implements IUserManagementService {
 	public OrganisationState getOrganisationStateById(Integer organisationStateId) {
 		return organisationStateDAO.getOrganisationStateById(organisationStateId);
 	}
+
+	public OrganisationType getOrganisationTypeById(Integer typeId) {
+		return organisationTypeDAO.getOrganisationTypeById(typeId);
+	}
 }
