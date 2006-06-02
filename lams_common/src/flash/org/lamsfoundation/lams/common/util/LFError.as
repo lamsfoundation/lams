@@ -79,7 +79,7 @@ class LFError extends Error{
 	var alt:Alert;
 	var customTitle = Dictionary.getValue(msgTitle)
 	var handlerObj = new Object();
-	Alert.okLabel = Dictionary.getValue('al_ok');
+	Alert.okLabel = Dictionary.getValue('al_send');
 	Alert.cancelLabel = Dictionary.getValue('al_cancel');
 	handlerObj.click = function(e){
 		if(e.detail == Alert.OK){
