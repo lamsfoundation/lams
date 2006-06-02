@@ -38,14 +38,18 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.fileupload.DiskFileUpload;
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
+import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.FileUtil;
+import org.lamsfoundation.lams.util.FileUtilException;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
+import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
@@ -114,9 +118,17 @@ public class ImportToolContentServlet extends HttpServlet {
             String ldPath = ZipFileUtil.expandZip(file.getInputStream(),filename);
             IExportToolContentService service = getExportService();
             service.importLearningDesign(ldPath,user,workspaceFolderUid);
-        } catch (Exception e) {
+        } catch (ImportToolContentException e) {
         	log.error("Unable to import tool content: " + e.toString());
-        }
+        } catch (FileUtilException e) {
+        	log.error("Unable to import tool content: " + e.toString());
+		} catch (FileUploadException e) {
+			log.error("Unable to import tool content: " + e.toString());
+		} catch (ZipFileUtilException e) {
+			log.error("Unable to import tool content: " + e.toString());
+		} catch (IOException e) {
+			log.error("Unable to import tool content: " + e.toString());
+		}
 
 	            
 	}
