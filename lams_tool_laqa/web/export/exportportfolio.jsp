@@ -19,6 +19,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
+<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
 <%@ taglib uri="tags-bean" prefix="bean"%> 
 <%@ taglib uri="tags-html" prefix="html"%>
 <%@ taglib uri="tags-logic" prefix="logic" %>
@@ -27,11 +28,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="fck-editor" prefix="FCK" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
+
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
+
+	<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+	<html:html locale="true">
+	<head>
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-	<title> <bean:message key="label.learning.qa"/> </title>
-	 <lams:css/>
+	<title> <bean:message key="label.exportPortfolio"/> </title>
+	
+	 <lams:css localLink="true" />
 	<!-- depending on user / site preference this will get changed probably use passed in variable from flash to select which one to use-->
 
  	<!-- ******************** FCK Editor related javascript & HTML ********************** -->
@@ -47,3 +54,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<script type="text/javascript" src="<c:out value="${lams}"/>includes/javascript/tabcontroller.js"></script>    
 	<script type="text/javascript" src="<c:out value="${lams}"/>includes/javascript/common.js"></script>
 	
+	</head>
+	<body>
+		export portfolio content goes here
+	
+	</body>
+</html:html>
+
+
+

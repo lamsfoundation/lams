@@ -71,6 +71,7 @@ public interface QaAppConstants {
 	
 	public static final String IS_MONITORED_CONTENT_IN_USE				="isMonitoredContentInUse";
 	public static final String LOAD_MONITORING_CONTENT_EDITACTIVITY		="loadMonitoringEditActivity";
+	public static final String IS_PORTFOLIO_EXPORT						="isPortfolioExport";
 			
     public static final Long INITIAL_QUESTION_COUNT		=new Long(1);
     
@@ -82,6 +83,7 @@ public interface QaAppConstants {
     public static final String LOAD_STARTER								="starter";
     public static final String IS_DEFINE_LATER							="isDefineLater";
     public static final String LEARNING_MODE							="learningMode";
+    public static final String PORTFOLIO_EXPORT_MODE					="portfolioExportMode";
     
     /*
      * authoring mode controllers

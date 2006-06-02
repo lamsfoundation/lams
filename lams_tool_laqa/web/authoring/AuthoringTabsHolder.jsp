@@ -168,8 +168,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<!-- end of content (Basic) -->
 	</c:if> 			
 	
-
-	<lams:HTMLEditor/>	
 	</html:form>
+	<lams:HTMLEditor/>	
 </body>
 </html:html>

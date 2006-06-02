@@ -151,7 +151,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<lams:TabBody id="2" titleKey="label.instructions" page="Instructions.jsp" />
 		<lams:TabBody id="3" titleKey="label.editActivity" page="Edit.jsp" />
 		<lams:TabBody id="4" titleKey="label.stats" page="Stats.jsp" />
-	<lams:HTMLEditor/>	
 	</html:form>
+	<lams:HTMLEditor/>		
 </body>
 </html:html>
