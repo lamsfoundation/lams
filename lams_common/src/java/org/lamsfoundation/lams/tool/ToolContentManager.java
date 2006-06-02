@@ -111,7 +111,7 @@ public interface ToolContentManager
      * for the content.
      * @throws ToolException if any other error occurs
      */
-    public void importToolContent(String toolContentPath) 
+    public void importToolContent(Long toolContentId, String toolContentPath) 
     	throws ToolException;
     
  

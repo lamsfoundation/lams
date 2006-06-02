@@ -41,10 +41,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
@@ -52,12 +52,11 @@ import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
+import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
-import org.lamsfoundation.lams.contentrepository.client.ToolContentHandler;
-import org.lamsfoundation.lams.contentrepository.dao.hibernate.WorkspaceDAO;
-import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
 import org.lamsfoundation.lams.learningdesign.ChosenGrouping;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
@@ -77,11 +76,6 @@ import org.lamsfoundation.lams.learningdesign.dao.IGroupingDAO;
 import org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO;
 import org.lamsfoundation.lams.learningdesign.dao.ILicenseDAO;
 import org.lamsfoundation.lams.learningdesign.dao.ITransitionDAO;
-import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
-import org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupingDAO;
-import org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningDesignDAO;
-import org.lamsfoundation.lams.learningdesign.dao.hibernate.LicenseDAO;
-import org.lamsfoundation.lams.learningdesign.dao.hibernate.TransitionDAO;
 import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.GroupingDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
@@ -89,15 +83,11 @@ import org.lamsfoundation.lams.learningdesign.dto.TransitionDTO;
 import org.lamsfoundation.lams.lesson.LessonClass;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolContent;
-import org.lamsfoundation.lams.tool.ToolContentIDGenerator;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.dao.IToolContentDAO;
 import org.lamsfoundation.lams.tool.dao.IToolDAO;
-import org.lamsfoundation.lams.tool.dao.hibernate.ToolContentDAO;
-import org.lamsfoundation.lams.tool.dao.hibernate.ToolDAO;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
-import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dao.IWorkspaceFolderDAO;
 import org.lamsfoundation.lams.util.FileUtil;
@@ -133,7 +123,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	
 	//save list of all tool file node class information. One tool may have over one file node, such as 
 	//in share resource tool, it has contnent attachment and shared resource item attachement. 
-	private List<FileHandleClassInfo> fileHandleClassList;
+	private List<NameInfo> fileHandleClassList;
 	
 	//spring injection properties
 	private IActivityDAO activityDAO;
@@ -145,10 +135,11 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	private ITransitionDAO  transitionDAO;
 	private ILearningDesignDAO learningDesignDAO;
 	/**
-	 * Class of tool attachment file handler information container.
+	 * Class of tool attachment file handler class and relative fields information container.
 	 */
-	private class FileHandleClassInfo{
+	private class NameInfo{
 		
+	
 		//the Class instance according to className.
 		public String className;
 		public String uuidFieldName;
@@ -158,13 +149,13 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		public String filePropertyFieldName;
 		public String initalItemFieldName;
 		
-		public FileHandleClassInfo(String className, String uuidFieldName, String versionFieldName){
+		public NameInfo(String className, String uuidFieldName, String versionFieldName){
 			this.className = className;
 			this.uuidFieldName = uuidFieldName;
 			this.versionFieldName = versionFieldName;
 		}
-		public FileHandleClassInfo(String className, String uuidFieldName, String versionFieldName,
-				String fileNameFieldName, String mimeTypeFieldName, String filePropertyFieldName,
+		public NameInfo(String className, String uuidFieldName, String versionFieldName,
+				String fileNameFieldName, String filePropertyFieldName,String mimeTypeFieldName, 
 				String initalItemFieldName) {
 			this.className = className;
 			this.uuidFieldName = uuidFieldName;
@@ -177,32 +168,26 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	}
 	
 	/**
-	 * File node information container. 
+	 * File node value information container. 
 	 */
-	private class FileNodeInfo{
+	private class ValueInfo{
+		//for unmarshal
+		public NameInfo name;
+		public Object instance;
+		
+		//for marshal
 		public Long fileUuid;
 		public Long fileVersionId;
-		public String fileName;
-		public String mimeType;
-		public String fileProperty;
-		public String initalItem;
 		
-		public FileNodeInfo(){}
+		public ValueInfo(NameInfo name, Object instance){
+			this.name = name;
+			this.instance = instance;
+		}
 		
-		public FileNodeInfo(Long uuid, Long versionId){
+		public ValueInfo(Long uuid, Long versionId){
 			this.fileUuid = uuid;
 			this.fileVersionId = versionId;
 		}
-		public FileNodeInfo(Long uuid, Long versionId, String fileName, String mimeType, String fileProperty, String initalItem){
-			this.fileUuid = uuid;
-			this.fileVersionId = versionId;
-			this.fileName = fileName;
-			this.fileProperty = fileProperty;
-			this.mimeType = mimeType;
-			this.initalItem = initalItem;
-		}
-
-		
 	}
 	/**
 	 * Proxy class for Default XStream converter.
@@ -211,87 +196,51 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	private class FileInvocationHandler implements InvocationHandler{
 		
 		private Object obj;
-		private List<FileNodeInfo> fileNodes;
-		private List<FileHandleClassInfo> fileHandleClassList;
+		private List<ValueInfo> fileNodes;
+		private List<NameInfo> fileHandleClassList;
 		public FileInvocationHandler(Object obj){
 			this.obj = obj;
-			this.fileNodes = new ArrayList<FileNodeInfo>();
+			this.fileNodes = new ArrayList<ValueInfo>();
 		}
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 			Object result;
 			try {
 		    	
 			    if(StringUtils.equals(method.getName(),"marshal")){
-			    	for(FileHandleClassInfo info:fileHandleClassList){
-				    	if(args[0] != null && info.className.equals((args[0].getClass().getName()))){
-							Long uuid = NumberUtils.createLong(BeanUtils.getProperty(args[0],info.uuidFieldName));
-							Long version = NumberUtils.createLong(BeanUtils.getProperty(args[0],info.versionFieldName));
+			    	for(NameInfo name:fileHandleClassList){
+				    	if(args[0] != null && name.className.equals((args[0].getClass().getName()))){
+							Long uuid = NumberUtils.createLong(BeanUtils.getProperty(args[0],name.uuidFieldName));
+							Long version = NumberUtils.createLong(BeanUtils.getProperty(args[0],name.versionFieldName));
 							log.debug("XStream get file node ["+uuid +"," + version +"].");
-							fileNodes.add(ExportToolContentService.this.new FileNodeInfo(uuid,version));
+							fileNodes.add(ExportToolContentService.this.new ValueInfo(uuid,version));
 				    	}
 			    	}
 			    }
-			    if(StringUtils.equals(method.getName(),"unmarshal")){
-			    	//During deserialize XML file into object, it will save file node into fileNodes
-			    	for(FileHandleClassInfo info:fileHandleClassList){
-			    		short flag = 0;
-			    		HierarchicalStreamReader reader = (HierarchicalStreamReader) args[0];
-			    		if(info.className.equals(reader.getNodeName())){
-			    			FileNodeInfo node = ExportToolContentService.this.new FileNodeInfo();
-				    		while (reader.hasMoreChildren()) {
-				    			reader.moveDown();
-				    			if(StringUtils.equals(reader.getNodeName(),info.uuidFieldName)){
-				    				node.fileUuid = NumberUtils.createLong(reader.getValue());
-				    				flag++;
-				    			}
-				    			if(StringUtils.equals(reader.getNodeName(),info.versionFieldName)){
-				    				node.fileVersionId  = NumberUtils.createLong(reader.getValue());
-				    				flag++;
-				    			}
-				    			if(StringUtils.equals(reader.getNodeName(),info.fileNameFieldName)){
-				    				node.fileName = reader.getValue();
-				    				flag++;
-				    			}
-				    			if(StringUtils.equals(reader.getNodeName(),info.filePropertyFieldName)){
-				    				node.fileProperty = reader.getValue();
-				    				flag++;
-				    			}
-				    			if(StringUtils.equals(reader.getNodeName(),info.initalItemFieldName)){
-				    				node.initalItem = reader.getValue();
-				    				flag++;
-				    			}
-				    			if(StringUtils.equals(reader.getNodeName(),info.mimeTypeFieldName)){
-				    				node.mimeType = reader.getValue();
-				    				flag++;
-				    			}
-				    			
-				    			reader.moveUp();
-				    			//already get all relative info. Need not continue to look
-				    			if(flag == 6)
-				    				break;
-				    		}
-				    		//at least get uuid
-				    		if(flag > 0){
-				    			fileNodes.add(node);
-				    		}
-				    		//if find matched FileNode class, then need not continue find other FileNode in file handler list.
-				    		break;
-			    		}
-			    			
-			    	}
-			    }
+
 			    if(StringUtils.equals(method.getName(),"canConvert")){
-			    	boolean flag = false;
-			    	for(FileHandleClassInfo info:fileHandleClassList){
+			    	boolean canConvert = false;
+			    	for(NameInfo info:fileHandleClassList){
 				    	if(args[0] != null && info.className.equals(((Class)args[0]).getName())){
 				    		log.debug("XStream will handle ["+info.className+"] as file node class.");
-				    		flag = true;
+				    		canConvert = true;
 				    		break;
 				    	}
 			    	}
-			    	return flag;
+			    	return canConvert;
 			    }
+			    
 			    result = method.invoke(obj, args);
+			    
+			    if(StringUtils.equals(method.getName(),"unmarshal")){
+			    	//During deserialize XML file into object, it will save file node into fileNodes
+			    	for(NameInfo name:fileHandleClassList){
+			    		HierarchicalStreamReader reader = (HierarchicalStreamReader) args[0];
+			    		if(name.className.equals(reader.getNodeName())){
+			    			fileNodes.add(ExportToolContentService.this.new ValueInfo(name,result));
+			    			break;
+			    		}
+			    	}
+			    }
 	        } catch (InvocationTargetException e) {
 	        	throw e.getTargetException();
 	        } catch (Exception e) {
@@ -301,13 +250,13 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			return result;
 		}
 
-		public List<FileNodeInfo> getFileNodes() {
+		public List<ValueInfo> getFileNodes() {
 			return fileNodes;
 		}
-		public List<FileHandleClassInfo> getFileHandleClassList() {
+		public List<NameInfo> getFileHandleClassList() {
 			return fileHandleClassList;
 		}
-		public void setFileHandleClassList(List<FileHandleClassInfo> fileHandleClassList) {
+		public void setFileHandleClassList(List<NameInfo> fileHandleClassList) {
 			this.fileHandleClassList = fileHandleClassList;
 		}
 	}
@@ -328,7 +277,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	 * Default contructor method.
 	 */
 	public ExportToolContentService(){
-		fileHandleClassList = new ArrayList<FileHandleClassInfo>();
+		fileHandleClassList = new ArrayList<NameInfo>();
 	}
 	/**
 	 * @see org.lamsfoundation.lams.authoring.service.IExportToolContentService.exportLearningDesign(Long)
@@ -408,8 +357,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			toolXml.toXML(toolContentObj,toolFile);
 			
 			//get out the fileNodes
-			List<FileNodeInfo> list = handler.getFileNodes();
-			for(FileNodeInfo fileNode:list){
+			List<ValueInfo> list = handler.getFileNodes();
+			for(ValueInfo fileNode:list){
 				log.debug("Tool attachement file is going to save : " + fileNode.fileUuid);
 				toolContentHandler.saveFile(fileNode.fileUuid,FileUtil.getFullPath(toolPath,fileNode.fileUuid.toString()));
 			}
@@ -433,12 +382,12 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	 * @see org.lamsfoundation.lams.authoring.service.IExportToolContentService.registerFileHandleClass(String,String,String)
 	 */
 	public void registerFileClassForExport(String fileNodeClassName,String fileUuidFieldName, String fileVersionFieldName){
-		fileHandleClassList.add(this.new FileHandleClassInfo(fileNodeClassName,fileUuidFieldName,fileVersionFieldName));
+		fileHandleClassList.add(this.new NameInfo(fileNodeClassName,fileUuidFieldName,fileVersionFieldName));
 	}
 	public void registerFileClassForImport(String fileNodeClassName, String fileUuidFieldName,
 			String fileVersionFieldName, String fileNameFieldName, String filePropertyFieldName, String mimeTypeFieldName,
 			String initialItemFieldName) {
-		fileHandleClassList.add(this.new FileHandleClassInfo(fileNodeClassName, fileUuidFieldName, fileVersionFieldName,
+		fileHandleClassList.add(this.new NameInfo(fileNodeClassName, fileUuidFieldName, fileVersionFieldName,
 				fileNameFieldName, filePropertyFieldName, mimeTypeFieldName, initialItemFieldName));
 	}
 	/**
@@ -472,11 +421,11 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 				//Invoke tool's importToolContent() method.
 				ToolContentManager contentManager = (ToolContentManager) findToolService(newTool);
 				log.debug("Tool begin to import content : " + activity.getTitle() +" by contentID :" + activity.getToolContentID());
-				contentManager.importToolContent(toolPath);
+				contentManager.importToolContent(newContent.getToolContentId(),toolPath);
 				log.debug("Tool content import success.");
 			}
 			
-//			saveLearningDesign(ldDto,importer,workspaceFolderUid,toolMapper);
+			saveLearningDesign(ldDto,importer,workspaceFolderUid,toolMapper);
 		}catch (ToolException e) {
 			throw new ImportToolContentException(e);
 		} catch (FileNotFoundException e) {
@@ -497,38 +446,72 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		//registry to new proxy convert to XStream
 		toolXml.registerConverter(myc);				
 
+		List<ValueInfo> valueList = null;
 		try {
 			Reader toolFile = new FileReader(new File(FileUtil.getFullPath(toolContentPath,TOOL_FILE_NAME)));
 			toolPOJO = toolXml.fromXML(toolFile);
 			
 			//upload file node if has
-			List<FileNodeInfo> list = handler.getFileNodes();
-			for(FileNodeInfo fileNode:list){
-				log.debug("Tool attachement files/packages are going to upload to repository " + fileNode.fileUuid);
+			valueList = handler.getFileNodes();
+			for(ValueInfo fileNode:valueList){
 				
-				String fileName = fileNode.fileUuid.toString();
-				String fullFileName = FileUtil.getFullPath(toolContentPath,fileName);
+				Long uuid = NumberUtils.createLong(BeanUtils.getProperty(fileNode.instance,fileNode.name.uuidFieldName));
+				Long version = null;
+				//optional
+				try{
+					version = NumberUtils.createLong(BeanUtils.getProperty(fileNode.instance,fileNode.name.versionFieldName));
+				} catch (Exception e ) {
+					log.debug("No method for version:" + fileNode.instance);
+				}
+				
+				//according to upload rule: the file name will be uuid.
+				String realFileName = uuid.toString();
+				String fullFileName = FileUtil.getFullPath(toolContentPath,realFileName);
+				log.debug("Tool attachement files/packages are going to upload to repository " + fullFileName);
 				
 				//to check if the file is package (with extension name ".zip") or single file (no extension name).
 				File file = new File(fullFileName); 
 				boolean isPackage = false;
 				if(!file.exists()){
 					file = new File(fullFileName+EXPORT_TOOLCONTNET_ZIP_SUFFIX);
-					fileName = fileName + EXPORT_TOOLCONTNET_ZIP_SUFFIX;
+					realFileName = realFileName + EXPORT_TOOLCONTNET_ZIP_SUFFIX;
 					isPackage = true;
+					//if this file is norpackage neither single file, throw exception.
 					if(!file.exists())
 						throw new ImportToolContentException("Content attached file/package can not be found: " + fullFileName + "(.zip)");
 				}
+				
+				//more fields values for Repository upload use
+				String fileName = BeanUtils.getProperty(fileNode.instance,fileNode.name.fileNameFieldName);
+				String fileProperty = BeanUtils.getProperty(fileNode.instance,fileNode.name.filePropertyFieldName);
+				//optional fields
+				String mimeType = null;
+				try {
+					mimeType = BeanUtils.getProperty(fileNode.instance,fileNode.name.mimeTypeFieldName);
+				} catch (Exception e ) {
+					log.debug("No method for mimeType:" + fileNode.instance);
+				}
+				String initalItem = null;
+				try {
+					initalItem = BeanUtils.getProperty(fileNode.instance,fileNode.name.initalItemFieldName);
+				} catch (Exception e ) {
+					log.debug("No method for initial item:" + fileNode.instance);
+				}
+
 				InputStream is = new FileInputStream(file);
 				//upload to repository: file or pacakge
+				NodeKey key;
 				if(!isPackage)
-					toolContentHandler.uploadFile(is,fileName,fileNode.mimeType,fileNode.fileProperty);
+					key = toolContentHandler.uploadFile(is,fileName,mimeType,fileProperty);
 				else{
-					String packageDirectory = ZipFileUtil.expandZip(is, fileName);
-					toolContentHandler.uploadPackage(packageDirectory,fileNode.initalItem);
+					String packageDirectory = ZipFileUtil.expandZip(is, realFileName);
+					key = toolContentHandler.uploadPackage(packageDirectory,initalItem);
 				}
+				
+				//refresh file node Uuid and Version value to latest.
+				BeanUtils.setProperty(fileNode.instance,fileNode.name.uuidFieldName,key.getUuid());
+				BeanUtils.setProperty(fileNode.instance,fileNode.name.versionFieldName,key.getVersion());
 			}
-			list.clear();
 		} catch (FileNotFoundException e) {
 			throw new ImportToolContentException(e);
 		} catch (InvalidParameterException e) {
@@ -537,9 +520,17 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			throw new ImportToolContentException(e);
 		} catch (ZipFileUtilException e) {
 			throw new ImportToolContentException(e);
+		} catch (IllegalAccessException e) {
+			throw new ImportToolContentException(e);
+		} catch (InvocationTargetException e) {
+			throw new ImportToolContentException(e);
+		} catch (NoSuchMethodException e) {
+			throw new ImportToolContentException(e);
 		}finally{
 			if(fileHandleClassList != null)
 				fileHandleClassList.clear();
+			if( valueList != null)
+				valueList.clear();
 		}
 		
 		return toolPOJO;
@@ -580,7 +571,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		
 		//activity object list
 		List<AuthoringActivityDTO> actDtoList = dto.getActivities();
-		Set<Activity> actList = new LinkedHashSet<Activity>();
+		Set<Activity> actList = new TreeSet<Activity> (new ActivityOrderComparator());
 		Map<Long,Activity> activityMapper = new HashMap<Long,Activity>();
 		for(AuthoringActivityDTO actDto: actDtoList){
 			Activity act = getActivity(actDto,groupingMapper,toolMapper);
@@ -591,11 +582,10 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			act.setActivityId(null);
 			activityDAO.insert(act);
 		}
-		
 
 		//transition object list
 		List<TransitionDTO> transDtoList = dto.getTransitions();
-		Set<Transition> transList = new LinkedHashSet<Transition>();
+		Set<Transition> transList = new HashSet<Transition>();
 		for(TransitionDTO transDto: transDtoList){
 			Transition trans = getTransition(transDto,activityMapper);
 			transList.add(trans);
@@ -606,7 +596,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		}
 		
 		
-		LearningDesign ld = getLearningDesign(dto,importer,workspaceFolderUid,actList,transList);
+		LearningDesign ld = getLearningDesign(dto,importer,workspaceFolderUid,actList,transList,activityMapper);
 //		persist
 		learningDesignDAO.insert(ld);
 	}
@@ -618,25 +608,32 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	 * <li>lams_workspace_folder - An input parameters to let user choose import workspace</li>
 	 * <li>User - The person who execute import action</li>
 	 * <li>OriginalLearningDesign - set to null</li>
+	 * @param activityMapper 
 	 * 
 	 * @return
 	 * @throws ImportToolContentException 
 	 */
 	private LearningDesign getLearningDesign(LearningDesignDTO dto, User importer, Integer workspaceFolderUid,
-			Set<Activity> actList, Set<Transition> transList) throws ImportToolContentException {
+			Set<Activity> actList, Set<Transition> transList, Map<Long, Activity> activityMapper) throws ImportToolContentException {
 		LearningDesign ld = new LearningDesign();
 	
+		if(dto == null)
+			return ld;
 		
 		ld.setLearningDesignId(dto.getLearningDesignID());
 		ld.setLearningDesignUIID(dto.getLearningDesignUIID());
 		ld.setDescription(dto.getDescription());
 		ld.setTitle(dto.getTitle());
 		
-		Integer actUid = dto.getFirstActivityUIID();
-		if(actUid == null)
-			ld.setFirstActivity(null);
-		else
-			ld.setFirstActivity(activityDAO.getActivityByActivityId(new Long(actUid.intValue())));
+		Integer actUiid = dto.getFirstActivityUIID();
+		if(actUiid != null){
+			for(Activity act : activityMapper.values()){
+				if(actUiid.equals(act.getActivityUIID())){
+					ld.setFirstActivity(act);
+					break;
+				}
+			}
+		}
 		
 		ld.setMaxID(dto.getMaxID());
 		ld.setValidDesign(dto.getValidDesign());
@@ -693,6 +690,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		Grouping grouping = null;
 		if(groupingDto == null)
 			return grouping;
+		
 		Integer type = groupingDto.getGroupingTypeID();
 		
 //		grouping.setActivities();
@@ -716,6 +714,9 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	
 	private Transition getTransition(TransitionDTO transDto, Map<Long, Activity> activityMapper) {
 		Transition trans = new Transition();
+		
+		if(transDto == null)
+			return trans;
 		
 		trans.setDescription(transDto.getDescription());
 		
@@ -802,6 +803,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		}		
 		
 		act.setGroupingSupportType(actDto.getGroupingSupportType());
+		act.setActivityUIID(actDto.getActivityUIID());
 		act.setActivityCategoryID(actDto.getActivityCategoryID());
 		act.setActivityId(actDto.getActivityID());
 		act.setActivityTypeId(actDto.getActivityTypeID());
@@ -834,7 +836,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		//tranfer old grouping to latest
 		newGrouping = groupingList.get(actDto.getGroupingID());
 		act.setGrouping(newGrouping);
-		act.setGroupingUIID(newGrouping.getGroupingUIID());
+		if(newGrouping != null)
+			act.setGroupingUIID(newGrouping.getGroupingUIID());
 
 		act.setCreateDateTime(new Date());
 		return act;
