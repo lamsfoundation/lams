@@ -756,7 +756,7 @@ public class ResourceServiceImpl implements
 	}
 
 
-	public void importToolContent(String toolContentPath) throws ToolException {
+	public void importToolContent(Long toolContentId, String toolContentPath) throws ToolException {
 	
 		try {
 			exportContentService.registerFileClassForImport("org.lamsfoundation.lams.tool.rsrc.model.ResourceAttachment"
@@ -764,6 +764,13 @@ public class ResourceServiceImpl implements
 			exportContentService.registerFileClassForImport("org.lamsfoundation.lams.tool.rsrc.model.ResourceItem"
 					,"fileUuid","fileVersionId","fileName","fileType",null,"initialItem");
 			Object toolPOJO =  exportContentService.importToolContent(toolContentPath,resourceToolContentHandler);
+			if(!(toolPOJO instanceof Resource))
+				throw new ImportToolContentException("Import Share resources tool content failed. Deserialized object is " + toolPOJO);
+			Resource toolContentObj = (Resource) toolPOJO;
+			
+//			reset it to new toolContentId
+			toolContentObj.setContentId(toolContentId);
+			resourceDao.saveObject(toolContentObj);
 		} catch (ImportToolContentException e) {
 			throw new ToolException(e);
 		}

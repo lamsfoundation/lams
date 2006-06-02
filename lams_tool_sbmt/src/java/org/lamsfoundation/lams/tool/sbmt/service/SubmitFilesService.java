@@ -240,12 +240,19 @@ public class SubmitFilesService implements ToolContentManager,
 		}
 	}
  	
- 	public void importToolContent(String toolContentPath) throws ToolException {
+ 	public void importToolContent(Long toolContentId, String toolContentPath) throws ToolException {
  		
 		try {
 			exportContentService.registerFileClassForImport("org.lamsfoundation.lams.tool.sbmt.InstructionFiles",
 					"uuID","versionID","name","type",null,null);
 			Object toolPOJO =  exportContentService.importToolContent(toolContentPath,sbmtToolContentHandler);
+			if(!(toolPOJO instanceof SubmitFilesContent))
+				throw new ImportToolContentException("Import Submit tool content failed. Deserialized object is " + toolPOJO);
+			SubmitFilesContent toolContentObj = (SubmitFilesContent) toolPOJO;
+			
+			//reset it to new toolContentId
+			toolContentObj.setContentID(toolContentId);
+			submitFilesContentDAO.saveOrUpdate(toolContentObj);
 		} catch (ImportToolContentException e) {
 			throw new ToolException(e);
 		}

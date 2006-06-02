@@ -896,7 +896,7 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
      * for the content.
      * @throws ToolException if any other error occurs
      */
-	public void importToolContent(String toolContentPath) throws ToolException {
+	public void importToolContent(Long toolContentId, String toolContentPath) throws ToolException {
 		
 	}
 	/* ===============Methods implemented from ToolSessionManager =============== */
