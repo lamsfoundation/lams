@@ -99,7 +99,7 @@ public class TestRandomGrouper extends TestCase
      */
     public void testDoGroupingLearnerListByNumOfGroups()
     {
-        this.groupingByNumofGroups.doGrouping(userList);
+        this.groupingByNumofGroups.getGrouper().doGrouping(groupingByNumofGroups,null,userList);
         Group groupWithLeastMember = groupingByNumofGroups.getGroupWithLeastMember();
         
         for(Iterator i = groupingByNumofGroups.getGroups().iterator();i.hasNext();)
@@ -117,7 +117,7 @@ public class TestRandomGrouper extends TestCase
      */
     public void testDoGroupingOneLearnerByNumOfGroups()
     {
-        this.groupingByNumofGroups.doGrouping((User)userList.get(5));
+        this.groupingByNumofGroups.getGrouper().doGrouping(groupingByNumofGroups, null, (User)userList.get(5));
         Group groupWithLeastMember = groupingByNumofGroups.getGroupWithLeastMember();
         
         for(Iterator i = groupingByNumofGroups.getGroups().iterator();i.hasNext();)
@@ -135,7 +135,7 @@ public class TestRandomGrouper extends TestCase
      */
     public void testDoGroupingLearnerListByLearnerPerGroups()
     {
-        this.groupingByLearnerPerGroups.doGrouping(userList);
+        this.groupingByLearnerPerGroups.getGrouper().doGrouping(groupingByLearnerPerGroups, null, userList);
         Group groupWithLeastMember = groupingByLearnerPerGroups.getGroupWithLeastMember();
 
         for(Iterator i = groupingByLearnerPerGroups.getGroups().iterator();i.hasNext();)
@@ -155,7 +155,7 @@ public class TestRandomGrouper extends TestCase
      */
     public void testDoGroupingOneLearnerByLearnerPerGroups()
     {
-        this.groupingByLearnerPerGroups.doGrouping((User)userList.get(5));
+        this.groupingByLearnerPerGroups.getGrouper().doGrouping(groupingByLearnerPerGroups, null, (User)userList.get(5));
         Group groupWithLeastMember = groupingByLearnerPerGroups.getGroupWithLeastMember();
         
         for(Iterator i = groupingByLearnerPerGroups.getGroups().iterator();i.hasNext();)
@@ -168,13 +168,13 @@ public class TestRandomGrouper extends TestCase
         assertEquals("verify group with least member",1,groupWithLeastMember.getUsers().size());
         
 
-        this.groupingByLearnerPerGroups.doGrouping((User)userList.get(1));
-        this.groupingByLearnerPerGroups.doGrouping((User)userList.get(2));
-        this.groupingByLearnerPerGroups.doGrouping((User)userList.get(3));
+        this.groupingByLearnerPerGroups.getGrouper().doGrouping(groupingByLearnerPerGroups, null, (User)userList.get(1));
+        this.groupingByLearnerPerGroups.getGrouper().doGrouping(groupingByLearnerPerGroups, null, (User)userList.get(2));
+        this.groupingByLearnerPerGroups.getGrouper().doGrouping(groupingByLearnerPerGroups, null, (User)userList.get(3));
         groupWithLeastMember = groupingByLearnerPerGroups.getGroupWithLeastMember();
         assertEquals("verify group with least member",4,groupWithLeastMember.getUsers().size());
 
-        this.groupingByLearnerPerGroups.doGrouping((User)userList.get(4));
+        this.groupingByLearnerPerGroups.getGrouper().doGrouping(groupingByLearnerPerGroups, null, (User)userList.get(4));
         groupWithLeastMember = groupingByLearnerPerGroups.getGroupWithLeastMember();
         assertEquals("verify group with least member",1,groupWithLeastMember.getUsers().size());
 
@@ -185,7 +185,7 @@ public class TestRandomGrouper extends TestCase
      */
     public void testDoGroupingDuplicateLearnerByLearnerPerGroups()
     {
-        this.groupingByLearnerPerGroups.doGrouping(userList);
+        this.groupingByLearnerPerGroups.getGrouper().doGrouping(groupingByLearnerPerGroups, null, userList);
         Group groupWithLeastMember = groupingByLearnerPerGroups.getGroupWithLeastMember();
 
         for(Iterator i = groupingByLearnerPerGroups.getGroups().iterator();i.hasNext();)
@@ -197,12 +197,12 @@ public class TestRandomGrouper extends TestCase
         assertEquals("verify number of groups created",3,groupingByLearnerPerGroups.getGroups().size());
         assertEquals("verify group with least member",3,groupWithLeastMember.getUsers().size());
         
-        this.groupingByLearnerPerGroups.doGrouping(createUser(new Integer(11),"test11"));
-        this.groupingByLearnerPerGroups.doGrouping(createUser(new Integer(12),"test12"));
+        this.groupingByLearnerPerGroups.getGrouper().doGrouping(groupingByLearnerPerGroups, null, createUser(new Integer(11),"test11"));
+        this.groupingByLearnerPerGroups.getGrouper().doGrouping(groupingByLearnerPerGroups, null, createUser(new Integer(12),"test12"));
         assertEquals("verify number of groups created",3,groupingByLearnerPerGroups.getGroups().size());
-        this.groupingByLearnerPerGroups.doGrouping(createUser(new Integer(11),"test11"));
+        this.groupingByLearnerPerGroups.getGrouper().doGrouping(groupingByLearnerPerGroups, null, createUser(new Integer(11),"test11"));
         assertEquals("verify number of groups created",3,groupingByLearnerPerGroups.getGroups().size());
-        this.groupingByLearnerPerGroups.doGrouping(createUser(new Integer(15),"test15"));
+        this.groupingByLearnerPerGroups.getGrouper().doGrouping(groupingByLearnerPerGroups, null, createUser(new Integer(15),"test15"));
         assertEquals("verify number of groups created",4,groupingByLearnerPerGroups.getGroups().size());
 
     }

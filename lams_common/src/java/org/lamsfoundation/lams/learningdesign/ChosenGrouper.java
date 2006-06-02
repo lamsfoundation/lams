@@ -30,6 +30,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.util.MessageService;
 
 
 /**
@@ -41,9 +42,10 @@ import org.lamsfoundation.lams.usermanagement.User;
  * @version 1.1
  * 
  */
-public class ChosenGrouper implements Grouper,Serializable
+public class ChosenGrouper extends Grouper implements Serializable
 {
 
+	private static final long serialVersionUID = -8498560084860150033L;
 	private static Logger log = Logger.getLogger(ChosenGrouper.class);
 
 	/**

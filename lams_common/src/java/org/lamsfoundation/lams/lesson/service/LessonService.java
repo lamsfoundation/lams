@@ -29,11 +29,19 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.learningdesign.Grouper;
+import org.lamsfoundation.lams.learningdesign.Grouping;
+import org.lamsfoundation.lams.learningdesign.GroupingActivity;
+import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
+import org.lamsfoundation.lams.learningdesign.dao.IGroupingDAO;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 import org.lamsfoundation.lams.lesson.dto.LessonDetailsDTO;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.MessageService;
 
 
 /**
@@ -58,10 +66,30 @@ import org.lamsfoundation.lams.usermanagement.User;
  */
 public class LessonService implements ILessonService
 {
-    private ILessonDAO lessonDAO;
+	private static Logger log = Logger.getLogger(LessonService.class);
+	 
+	private ILessonDAO lessonDAO;
+	private IGroupingDAO groupingDAO;
+	private MessageService messageService;
     private HashMap<Long,HashMap> lessonMaps = new HashMap<Long,HashMap>(); // contains maps of lesson users
 
-    /* (non-Javadoc)
+    /* ******* Spring injection methods ***************************************/
+	public void setLessonDAO(ILessonDAO lessonDAO) {
+		this.lessonDAO = lessonDAO;
+	}
+    
+	public void setGroupingDAO(IGroupingDAO groupingDAO) {
+		this.groupingDAO = groupingDAO;
+	}
+
+
+	public void setMessageService(MessageService messageService) {
+		this.messageService = messageService;
+	}
+
+
+	/* *********** Service methods ***********************************************/
+	/* (non-Javadoc)
 	 * @see org.lamsfoundation.lams.lesson.service.ILessonService#cacheLessonUser(org.lamsfoundation.lams.lesson.Lesson, org.lamsfoundation.lams.usermanagement.User)
 	 */
     public void cacheLessonUser(Lesson lesson, User learner)
@@ -127,10 +155,6 @@ public class LessonService implements ILessonService
     }
 
 	
-	public void setLessonDAO(ILessonDAO lessonDAO) {
-		this.lessonDAO = lessonDAO;
-	}
-    
 	/* (non-Javadoc)
 	 * @see org.lamsfoundation.lams.lesson.service.ILessonService#getLessonDetails(java.lang.Long)
 	 */
@@ -156,5 +180,65 @@ public class LessonService implements ILessonService
 		}
 		return dto;
 	}
+
+	/**
+     * If the supplied learner is not already in a group, then perform grouping for 
+     * the learners who have started the lesson, based on the grouping activity.
+     * The grouper decides who goes in which group.
+     * 
+     *  Can only be run on a Random Grouping
+     * 
+     * @param lessonId lesson id (mandatory)
+     * @param groupingActivity the activity that has create grouping. (mandatory)
+     * @param learner the learner to be check before grouping. (mandatory)
+     */
+    public void performGrouping(Long lessonId, GroupingActivity groupingActivity, User learner) throws LessonServiceException
+    {
+		Grouping grouping = groupingActivity.getCreateGrouping();
+		if ( grouping != null && grouping.isRandomGrouping() ) {
+			// get the real objects, not the CGLIB version
+			grouping = groupingDAO.getGroupingById(grouping.getGroupingId());
+        	Grouper grouper = grouping.getGrouper();
+        	if ( grouper != null ) {
+        		grouper.setCommonMessageService(messageService);
+        		if ( grouping.getGroups().size() == 0 ) {
+        			// no grouping done yet - do everyone already in the lesson.
+        			List usersInLesson = getActiveLessonLearners(lessonId);
+        			grouper.doGrouping(grouping, null, usersInLesson);
+        		} else if ( ! grouping.doesLearnerExist(learner) )  {
+        			// done the others, just do the one user
+        			grouper.doGrouping(grouping, null, learner);
+        		}
+        		groupingDAO.update(grouping);
+        	}
+		} else {
+			String error = "The method performGrouping supports only grouping methods where the grouper decides the groups (currently only RandomGrouping). Called with a groupingActivity with the wrong grouper "+groupingActivity.getActivityId();
+			log.error(error);
+			throw new LessonServiceException(error);
+		}
+    }
+
+	/**
+     * Perform the grouping, setting the given list of learners as one group. 
+     * @param groupingActivityId the activity that has create grouping. (mandatory)
+     * @param learners to form one group
+     */
+  public void performChosenGrouping(GroupingActivity groupingActivity, List learners) throws LessonServiceException {
+    	
+        Grouping grouping = groupingActivity.getCreateGrouping();
+		if ( grouping != null && grouping.isChosenGrouping() ) {
+        	Grouper grouper = grouping.getGrouper();
+        	if ( grouper != null ) {
+        		grouper.setCommonMessageService(messageService);
+    			grouper.doGrouping(grouping, null, learners);
+        		groupingDAO.update(grouping);
+        	}
+		} else {
+			String error = "The method performChosenGrouping supports only grouping methods where the supplied list should be used as a single group (currently only ChosenGrouping). Called with a groupingActivity with the wrong grouper "+groupingActivity.getActivityId();
+			log.error(error);
+			throw new LessonServiceException(error);
+		}
+    }
+    
 
 }

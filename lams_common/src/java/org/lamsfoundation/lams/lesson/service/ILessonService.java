@@ -27,6 +27,9 @@ package org.lamsfoundation.lams.lesson.service;
 import java.util.Collection;
 import java.util.List;
 
+import org.lamsfoundation.lams.learningdesign.Grouper;
+import org.lamsfoundation.lams.learningdesign.Grouping;
+import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 import org.lamsfoundation.lams.lesson.dto.LessonDetailsDTO;
@@ -86,5 +89,24 @@ public interface ILessonService {
 	 * @return lesson details
 	 */
 	public abstract LessonDTO getLessonData(Long lessonId);
+
+	/**
+     * If the supplied learner is not already in a group, then perform grouping for 
+     * the learners who have started the lesson, based on the grouping activity. 
+     * This method should be used when we do have an grouping activity and learner that is 
+     * already part of the Hibernate session. (e.g. from the ForceComplete)
+     * 
+     * @param lessonId lesson id (mandatory)
+     * @param groupingActivity the activity that has create grouping. (mandatory)
+     * @param learner the learner to be check before grouping. (mandatory)
+     */
+    public void performGrouping(Long lessonId, GroupingActivity groupingActivity, User learner) throws LessonServiceException;
+
+	/**
+     * Perform grouping for all the learners who have started the lesson, based on the grouping activity. 
+     * @param lessonId lesson id (mandatory)
+     * @param groupingActivityId the activity that has create grouping. (mandatory)
+     */
+    public void performChosenGrouping(GroupingActivity groupingActivity, List learners) throws LessonServiceException;
 
 }

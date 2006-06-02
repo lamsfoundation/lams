@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.usermanagement.User;
 
 
@@ -56,9 +57,12 @@ import org.lamsfoundation.lams.usermanagement.User;
  * @version 1.1
  * 
  */
-public class RandomGrouper implements Grouper , Serializable
+public class RandomGrouper extends Grouper implements Serializable
 {
-	private static final String GROUP_NAME_PREFIX = "Group ";
+	private static final long serialVersionUID = -3696368461795411181L;
+
+	private static Logger log = Logger.getLogger(RandomGrouper.class);
+	
     //---------------------------------------------------------------------
     // Grouping algorithm Implementation Method
     //---------------------------------------------------------------------
@@ -74,7 +78,7 @@ public class RandomGrouper implements Grouper , Serializable
         //delegate to do grouping for a list of learners.
         doGrouping(randomGrouping,groupName,learners);
     }
-    
+
     /**
      * Do the grouping for a list of new learners.
      * @see org.lamsfoundation.lams.learningdesign.Grouper#doGrouping(org.lamsfoundation.lams.learningdesign.Grouping,java.lang.String, java.util.List)
@@ -102,7 +106,7 @@ public class RandomGrouper implements Grouper , Serializable
     /**
      * Compute the number of new groups needs to be created based on passed
      * in grouping. It figures out group by number of groups or group by
-     * learner per group automatically.
+     * learner per group automatically. 
      * 
      * @param randomGrouping the grouping we used to group learner
      * @param learners the list of learners need to be grouped
@@ -112,31 +116,35 @@ public class RandomGrouper implements Grouper , Serializable
                                         List learners,
                                         boolean isInitialization)
     {
-        if(randomGrouping.getNumberOfGroups()!=null)
-            return getNewGroupsByNumberOfGroups(randomGrouping, isInitialization);
-        else if(randomGrouping.getLearnersPerGroup()!=null)
+        if(randomGrouping.getNumberOfGroups()!=null) {
+            return getNewGroupsByNumberOfGroups(randomGrouping, randomGrouping.getNumberOfGroups(), isInitialization);
+        } else if(randomGrouping.getLearnersPerGroup()!=null) {
             return getNewGroupsByLearnerPerGroup(randomGrouping,learners);
-        //TODO need to be changed to customized exception.
-        throw new RuntimeException("At least one random grouping algorithm" +
-        		"needs to be defined.");
+        } else {
+        	log.warn("Random Grouping id="+randomGrouping.getGroupingId()+" is missing both the number of groups and learners per group. Defaulting to two groups.");
+            return getNewGroupsByNumberOfGroups(randomGrouping, 2, isInitialization);
+        }
     }
 
     /**
-     * Create new groups and insert them into the grouping.
+     * Create new groups and insert them into the grouping. Group names
+     * are Group 1, Group 2, etc.
      * @param randomGrouping the requested grouping. 
      * @param numOfGroupsTobeCreated the number new groups need to be created.
      */
     private void createGroups(RandomGrouping randomGrouping, 
                               int numOfGroupsTobeCreated)
     {
+    	String prefix = getPrefix();
     	int size = randomGrouping.getGroups().size();
-        for(int i=0;i<numOfGroupsTobeCreated;i++)
+        for(int i=1;i<=numOfGroupsTobeCreated;i++)
         {
-        	String groupName = GROUP_NAME_PREFIX + new Integer(size + i).toString();  
+        	String groupName = prefix + " " + new Integer(size + i).toString();  
             randomGrouping.getGroups().add(Group.createLearnerGroup(randomGrouping,groupName,
                                                                     new HashSet()));
         }
     }
+
     
     /**
      * Allocate the learner into groups within the specified grouping.
@@ -206,14 +214,13 @@ public class RandomGrouper implements Grouper , Serializable
      * @param isInitialization is this the first we do grouping.
      * @return the number of new groups need to be created.
      */
-    private int getNewGroupsByNumberOfGroups(RandomGrouping randomGrouping, boolean isInitialization)
+    private int getNewGroupsByNumberOfGroups(RandomGrouping randomGrouping, int numberOfGroups, boolean isInitialization)
     {
         if(isInitialization)
-            return randomGrouping.getNumberOfGroups().intValue();
+            return numberOfGroups;
         else 
         {
-            int numberOfNewGroups = randomGrouping.getNumberOfGroups().intValue()-
-            						randomGrouping.getGroups().size();
+            int numberOfNewGroups = numberOfGroups - randomGrouping.getGroups().size();
             
             return numberOfNewGroups>0?numberOfNewGroups:0;
         }

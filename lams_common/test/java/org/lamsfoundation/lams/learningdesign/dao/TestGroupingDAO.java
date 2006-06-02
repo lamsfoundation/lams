@@ -86,7 +86,7 @@ public class TestGroupingDAO extends AbstractCommonTestCase
     
     public void testUpdateGrouping()
     {
-        testGrouping.doGrouping("testgroup",testUser);
+        testGrouping.getGrouper().doGrouping(testGrouping, "testgroup", testUser);
         
         groupingDAO.update(testGrouping);
         

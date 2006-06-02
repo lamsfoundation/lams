@@ -25,6 +25,8 @@
 	
 	<bean id="lessonServiceTarget" class="org.lamsfoundation.lams.lesson.service.LessonService">
 		<property name="lessonDAO"><ref bean="lessonDAO"/></property>
+		<property name="groupingDAO"><ref bean="groupingDAO"/></property>
+		<property name="messageService"><ref bean="commonMessageService"/></property>
 	</bean>
 	
 	<bean id="lessonService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
@@ -35,7 +37,8 @@
 			<props>
 				<prop key="cacheLessonUser">PROPAGATION_REQUIRED</prop>
 				<prop key="removeLessonUserFromCache">PROPAGATION_REQUIRED</prop>
-				<prop key="getActiveLessonLearners">PROPAGATION_REQUIRED</prop>
+				<prop key="get*">PROPAGATION_REQUIRED</prop>
+				<prop key="perform*">PROPAGATION_REQUIRED</prop>
 			</props>
 		</property>
 	</bean>

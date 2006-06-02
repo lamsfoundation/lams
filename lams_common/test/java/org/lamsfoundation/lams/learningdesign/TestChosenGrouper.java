@@ -85,7 +85,7 @@ public class TestChosenGrouper extends TestCase
      */
     public void testDoGroupingLearnerList()
     {
-        chosenGrouping.doGrouping("testgroup",userList);
+        chosenGrouping.getGrouper().doGrouping(chosenGrouping,"testgroup",userList);
         
         List groups = new ArrayList(chosenGrouping.getGroups());
         

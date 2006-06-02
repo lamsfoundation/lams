@@ -37,6 +37,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.dto.GroupingDTO;
 import org.lamsfoundation.lams.lesson.LessonClass;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.util.MessageService;
 
 /**
  * 
@@ -301,45 +302,6 @@ public abstract class Grouping implements Serializable
      */
     public abstract boolean isLearnerGroup(Group group);
 	
-    /**
-     * Create or update groups for this grouping with a list of new learners. Name of group 
-     * will generate automatically.
-     * @param learners the list of learners need to be grouped.
-     */
-    public void doGrouping(List learners)
-    {
-    	doGrouping(null,learners);
-    }
-    
-    /**
-     * Create or updates groups for this grouping with a single new learner.Name of group 
-     * will generate automatically.
-     * @param learner the new learner needs to be grouped.
-     */
-    public void doGrouping(User learner)
-    {
-    	doGrouping(null,learner);
-    }
-    /**
-     * Create or update groups for this grouping with a list of new learners.
-     * @param name of this group.
-     * @param learners the list of learners need to be grouped.
-     */
-	public void doGrouping(String groupName,List learners)
-	{
-	    this.grouper.doGrouping(this,groupName,learners);
-	}
-	
-	/**
-	 * Create or updates groups for this grouping with a single new learner.
-	 * @param name of this group.
-	 * @param learner the new learner needs to be grouped.
-	 */
-	public void doGrouping(String groupName,User learner)
-	{
-	    this.grouper.doGrouping(this,groupName,learner);
-	}
-	
 	/**
 	 * Return whether a learner is a existing learner for this grouping or not.
 	 * @param learner the current leaner
@@ -374,5 +336,13 @@ public abstract class Grouping implements Serializable
 	public boolean isClassGrouping()
 	{
 	    return getGroupingTypeId() == CLASS_GROUPING_TYPE;
+	}
+
+	public Grouper getGrouper() {
+		return grouper;
+	}
+
+	public void setGrouper(Grouper grouper) {
+		this.grouper = grouper;
 	}
 }

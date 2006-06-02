@@ -156,7 +156,7 @@
 			<subclass name="org.lamsfoundation.lams.learningdesign.GroupingActivity" discriminator-value="2">
 				<meta attribute="class-description" inherit="false">@hibernate.class </meta>					
 				
-				<property name="createGroupingUIID" type="java.lang.Integer" column="create_grouping_ui_id" length="11">
+				<property name="createGroupingUIID" type="java.lang.Integer" column="create_grouping_ui_id" length="11" lazy="false">
 				        <meta attribute="field-description">@hibernate.property column="create_grouping_ui_id" length="11" </meta>    
 				</property>
 								
