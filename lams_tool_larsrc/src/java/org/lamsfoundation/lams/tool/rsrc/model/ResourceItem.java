@@ -220,7 +220,7 @@ public class ResourceItem  implements Cloneable{
 		}
 		/**
 	     * @hibernate.many-to-one
-	     *      cascade="none"
+	     *     cascade="save-update"
 	     * 		column="create_by"
 		 * 
 		 * @return

@@ -75,7 +75,7 @@ public class ResourceItemVisitLog {
 	}
 	/**
 	 * @hibernate.many-to-one  column="user_uid"
- 	 * cascade="none"
+ 	 * cascade="save-update"
 	 * @return
 	 */
 	public ResourceUser getUser() {

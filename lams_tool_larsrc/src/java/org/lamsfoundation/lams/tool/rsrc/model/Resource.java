@@ -257,7 +257,7 @@ public class Resource implements Cloneable{
      * @return Returns the userid of the user who created the Share resources.
      *
      * @hibernate.many-to-one
-     *      cascade="none"
+     *      cascade="save-update"
      * 		column="create_by"
      *
      */

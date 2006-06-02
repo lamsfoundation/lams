@@ -44,7 +44,7 @@
         <many-to-one
             name="createdBy"
             class="org.lamsfoundation.lams.tool.rsrc.model.ResourceUser"
-            cascade="none"
+            cascade="save-update"
             outer-join="auto"
             update="true"
             insert="true"
