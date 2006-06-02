@@ -28,6 +28,7 @@ import java.util.Vector;
 
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.OrganisationState;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -37,6 +38,7 @@ import org.lamsfoundation.lams.usermanagement.Workspace;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dao.IAuthenticationMethodDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IOrganisationDAO;
+import org.lamsfoundation.lams.usermanagement.dao.IOrganisationStateDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IOrganisationTypeDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IRoleDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IUserDAO;
@@ -54,6 +56,17 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
  * </p>
  * 
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
+ */
+/**
+ * @version
+ *
+ * <p>
+ * <a href="IUserManagementService.java.html"><i>View Source</i></a>
+ * </p>
+ *
+ * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
+ *
+ * Created at 11:53:53 on 2006-6-2
  */
 public interface IUserManagementService {
 
@@ -85,6 +98,13 @@ public interface IUserManagementService {
      */
 	public void setOrganisationTypeDAO(IOrganisationTypeDAO organisationTypeDao);
 	
+    /**
+     * Set IOrganisationStateDAO
+     *
+     * @param organisationStateDao 
+     */
+	public void setOrganisationStateDAO(IOrganisationStateDAO organisationStateDao);
+
 	
     /**
      * Set IUserOrganisationDAO
@@ -283,6 +303,22 @@ public interface IUserManagementService {
      * @return AuthenticationMethod with the name
      */
     public AuthenticationMethod getAuthenticationMethodByName(String name);
+    
+    
+    /**
+     * Retrieves a list of all the OrganisationState objects
+     * 
+     * @return OrganisationState object list
+     */
+    public List<OrganisationState> getAllOrgnisationStates();
+    
+    /**
+     * Retrieve the OrganisationState by the Id
+     * 
+     * @param oranisationStateId the Id of the organisationState
+     * @return the OrganisationState object specified by the organisationStateId
+     */
+    public OrganisationState getOrganisationStateById(Integer organisationStateId);
    
      /**
       * 

@@ -35,6 +35,7 @@ import org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.OrganisationState;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -44,6 +45,7 @@ import org.lamsfoundation.lams.usermanagement.Workspace;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dao.IAuthenticationMethodDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IOrganisationDAO;
+import org.lamsfoundation.lams.usermanagement.dao.IOrganisationStateDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IOrganisationTypeDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IRoleDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IUserDAO;
@@ -79,6 +81,8 @@ public class UserManagementService implements IUserManagementService {
 	private IOrganisationDAO organisationDAO;
 
 	private IOrganisationTypeDAO organisationTypeDAO;
+	
+	private IOrganisationStateDAO organisationStateDAO;
 
 	private IUserOrganisationDAO userOrganisationDAO;
 
@@ -132,6 +136,13 @@ public class UserManagementService implements IUserManagementService {
 	 */
 	public void setOrganisationTypeDAO(IOrganisationTypeDAO organisationTypeDAO) {
 		this.organisationTypeDAO = organisationTypeDAO;
+	}
+
+	/**
+	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#setOrganisationStateDAO(org.lamsfoundation.lams.usermanagement.dao.IOrganisationStateDAO)
+	 */
+	public void setOrganisationStateDAO(IOrganisationStateDAO organisationStateDAO) {
+		this.organisationStateDAO = organisationStateDAO;
 	}
 
 	/**
@@ -653,5 +664,13 @@ public class UserManagementService implements IUserManagementService {
 	 */
 	public List getLearnerLessonsFromOrganisation(Integer userID, Integer organisationID) {
 		return lessonDAO.getActiveLessonsForLearner(userID, organisationID);
+	}
+
+	public List<OrganisationState> getAllOrgnisationStates() {
+		return organisationStateDAO.getAllOrganisationStates();
+	}
+
+	public OrganisationState getOrganisationStateById(Integer organisationStateId) {
+		return organisationStateDAO.getOrganisationStateById(organisationStateId);
 	}
 }
