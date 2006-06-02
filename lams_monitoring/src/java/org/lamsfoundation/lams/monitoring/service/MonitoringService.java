@@ -56,6 +56,7 @@ import org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO;
 import org.lamsfoundation.lams.learningdesign.dao.ITransitionDAO;
 import org.lamsfoundation.lams.learningdesign.dto.ProgressActivityDTO;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignProcessorException;
+import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.LessonClass;
@@ -63,6 +64,7 @@ import org.lamsfoundation.lams.lesson.dao.ILessonClassDAO;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.lesson.dto.LessonDetailsDTO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.lesson.service.LessonServiceException;
 import org.lamsfoundation.lams.monitoring.MonitoringConstants;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
@@ -133,7 +135,8 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     private Scheduler scheduler;
     private ApplicationContext applicationContext;
     private MessageService messageService;
-
+    private ILearningDesignService learningDesignService;
+    
 	//---------------------------------------------------------------------
     // Inversion of Control Methods - Method injection
     //---------------------------------------------------------------------
@@ -256,11 +259,15 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         this.scheduler = scheduler;
     }
     
+    public void setLearningDesignService(ILearningDesignService learningDesignService) {
+		this.learningDesignService = learningDesignService;
+	}
+
     //---------------------------------------------------------------------
     // Service Methods
     //---------------------------------------------------------------------
 
-    /** Checks whether the user is a staff member for the lesson or the creator of the lesson. 
+	/** Checks whether the user is a staff member for the lesson or the creator of the lesson. 
      * If not, throws a UserAccessDeniedException exception */
     private void checkOwnerOrStaffMember(Integer userId, Lesson lesson, String actionDescription) {
     	User user = userManagementService.getUserById(userId);
@@ -774,9 +781,11 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
             		//group does not exist
             		if(grouping.isRandomGrouping()){
             			//for random grouping, create then complete it. Continue 
-            			learnerService.performGrouping(lessonId, groupActivity);
-//            			grouping = groupActivity.getCreateGrouping();
-//            			myGroup = grouping.getGroupBy(learner);
+            			try {
+							lessonService.performGrouping(lessonId, groupActivity,learner);
+						} catch (LessonServiceException e) {
+		            		stopReason = "Force complete stop at non-grouped grouping activity [" + groupActivity + "] due to exception "+e.getMessage();
+						}
             			learnerService.completeActivity(learner.getUserId(),activity,lessonId);
             			log.debug("Grouping activity [" + activity.getActivityId() + "] is completed.");
             		}else{
@@ -1136,9 +1145,10 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 	    
 	}
 	 /**
-     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#performChosenGrouping(GroupingActivity,java.util.List)
+     * @throws LessonServiceException 
+	 * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#performChosenGrouping(GroupingActivity,java.util.List)
      */
-	public void performChosenGrouping(GroupingActivity groupingActivity, List groups) {
+	public void performChosenGrouping(GroupingActivity groupingActivity, List groups) throws LessonServiceException {
         Grouping grouping = groupingActivity.getCreateGrouping();
         
         if(!grouping.isChosenGrouping()){
@@ -1174,7 +1184,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 	        	
 	        	}
 	        	log.debug("Performing grouping for " + groupName + "...");
-	        	grouping.doGrouping(groupName,learners);
+	        	lessonService.performChosenGrouping(groupingActivity,learners);
 	        	log.debug("Finish grouping for " + groupName);
 	        }
 	        

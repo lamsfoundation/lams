@@ -33,6 +33,7 @@ import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignProcessorException;
 import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.lesson.service.LessonServiceException;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
@@ -389,7 +390,7 @@ public interface IMonitoringService
      * @param groupingActivity
      * @param groups list of group information. 
      */
-    public void performChosenGrouping(GroupingActivity groupingActivity, List groups);
+    public void performChosenGrouping(GroupingActivity groupingActivity, List groups) throws LessonServiceException;
     
 	//---------------------------------------------------------------------
 	// Preview Methods
