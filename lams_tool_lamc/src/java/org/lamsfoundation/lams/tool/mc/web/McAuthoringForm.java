@@ -44,6 +44,9 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
 	protected String editDefaultQuestion;
 	protected String removeOptionContent;
 	
+	protected String activeModule;
+	protected String editOptionsMode;
+	
 	protected String fileItem;
 	protected String uuid;
 	
@@ -822,4 +825,28 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
 		this.submit = submit;
 	}
 
+    /**
+     * @return Returns the activeModule.
+     */
+    public String getActiveModule() {
+        return activeModule;
+    }
+    /**
+     * @param activeModule The activeModule to set.
+     */
+    public void setActiveModule(String activeModule) {
+        this.activeModule = activeModule;
+    }
+    /**
+     * @return Returns the editOptionsMode.
+     */
+    public String getEditOptionsMode() {
+        return editOptionsMode;
+    }
+    /**
+     * @param editOptionsMode The editOptionsMode to set.
+     */
+    public void setEditOptionsMode(String editOptionsMode) {
+        this.editOptionsMode = editOptionsMode;
+    }
 }

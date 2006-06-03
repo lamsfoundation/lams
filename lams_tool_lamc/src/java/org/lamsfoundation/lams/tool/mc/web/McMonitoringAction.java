@@ -312,6 +312,8 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
     	logger.debug("dispatching editActivityQuestions..");
     	request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(false).toString());
 	 	IMcService mcService =McUtils.getToolService(request);
+	 	
+	 	
     	if (mcService == null)
 		{
 			logger.debug("will retrieve mcService");
@@ -325,6 +327,8 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(true));
 		McUtils.setDefineLater(request, true);
 		
+		McMonitoringForm mcMonitoringForm = (McMonitoringForm) form;
+		mcMonitoringForm.setEditOptionsMode(new Integer(0).toString());
 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 		logger.debug("setting  EDIT_OPTIONS_MODE to 0");
 		

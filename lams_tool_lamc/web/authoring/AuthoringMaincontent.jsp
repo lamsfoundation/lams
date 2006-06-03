@@ -102,7 +102,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
             
             initEditor("richTextTitle");
             initEditor("richTextInstructions");
-        }     
+            initEditor("richTextReportTitle");            
+            initEditor("richTextEndLearningMsg");                        
+            initEditor("richTextOfflineInstructions");                                    
+            initEditor("richTextOnlineInstructions");                                                
+            initEditor("richTextIncorrectFeedback");                                                
+            initEditor("richTextCorrectFeedback");                                                            
+	   }     
         
         function doSelectTab(tabId) {
         	// start optional tab controller stuff

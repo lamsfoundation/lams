@@ -179,6 +179,8 @@ public class McStarterAction extends Action implements McAppConstants {
 		McUtils.cleanUpSessionAbsolute(request);
 		logger.debug("init authoring mode. removed attributes...");
 		
+		McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
+		
 		IMcService mcService = (IMcService)request.getSession().getAttribute(TOOL_SERVICE);
 		logger.debug("mcService: " + mcService);
 		if (mcService == null)
@@ -206,7 +208,7 @@ public class McStarterAction extends Action implements McAppConstants {
 			request.getSession().setAttribute(SHOW_AUTHORING_TABS,new Boolean(false).toString());			
 		}
 		 
-		initialiseAttributes(request);
+		initialiseAttributes(request, mcAuthoringForm);
     	/* determine whether the request is from Monitoring url Edit Activity.
 		 * null sourceMcStarter indicates that the request is from authoring url.
 		 * */
@@ -214,8 +216,6 @@ public class McStarterAction extends Action implements McAppConstants {
 		String sourceMcStarter = (String) request.getAttribute(SOURCE_MC_STARTER);
 		logger.debug("sourceMcStarter: " + sourceMcStarter);
 
-		
-		McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 		mcAuthoringForm.resetRadioBoxes();
 		
 		ActionForward validateSignature=readSignature(request,mapping);
@@ -801,9 +801,10 @@ public class McStarterAction extends Action implements McAppConstants {
 	 * 
 	 * @param request
 	 */
-	protected void initialiseAttributes(HttpServletRequest request)
+	protected void initialiseAttributes(HttpServletRequest request, McAuthoringForm mcAuthoringForm)
 	{
 		logger.debug("starting initialiseAttributes...");
+		mcAuthoringForm.setEditOptionsMode(new Integer(0).toString());
 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 		
 		/* needs to run only once per tool*/ 
@@ -853,6 +854,7 @@ public class McStarterAction extends Action implements McAppConstants {
 		Map mapCorrectFeedback= new TreeMap(new McComparator());
 		request.getSession().setAttribute(MAP_CORRECT_FEEDBACK, mapCorrectFeedback);
 		
+		mcAuthoringForm.setEditOptionsMode(new Integer(0).toString());
 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 		logger.debug("resetting  EDIT_OPTIONS_MODE to 0");
 	}

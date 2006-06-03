@@ -299,6 +299,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     	AuthoringUtil.addQuestionMemory(request, mcAuthoringForm, mapQuestionsContent, true);
     	logger.debug("after addQuestionMemory");
     	
+    	mcAuthoringForm.setEditOptionsMode(new Integer(0).toString());
     	request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
     	logger.debug("resetting  EDIT_OPTIONS_MODE to 0");
         mcAuthoringForm.resetUserAction();
@@ -422,6 +423,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
         	request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);	
     	}
     	
+    	mcAuthoringForm.setEditOptionsMode(new Integer(0).toString());
 	 	request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 		logger.debug("resetting  EDIT_OPTIONS_MODE to 0");
 		mcAuthoringForm.resetUserAction();
@@ -488,6 +490,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     	Map mapGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_OPTIONS_CONTENT);
     	logger.debug("initial test: current mapGeneralOptionsContent: " + mapGeneralOptionsContent);
     	
+    	mcAuthoringForm.setEditOptionsMode(new Integer(1).toString());
     	request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
     	logger.debug("setting  EDIT_OPTIONS_MODE to 1");
     		
@@ -544,6 +547,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     		mcAuthoringForm.resetUserAction();
     		logger.debug("return to destination to fix error.");
     		
+    		mcAuthoringForm.setEditOptionsMode(new Integer(0).toString());
     		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
     		logger.debug("setting  EDIT_OPTIONS_MODE to 0");
     		
@@ -564,6 +568,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     		mcAuthoringForm.resetUserAction();
     		logger.debug("return to destination to fix error.");
     		
+    		mcAuthoringForm.setEditOptionsMode(new Integer(0).toString());
     		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
     		logger.debug("setting  EDIT_OPTIONS_MODE to 0");
     		
@@ -793,7 +798,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     		request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapGeneralSelectedOptionsContent);
     	}
     	
-    	
+    	mcAuthoringForm.setEditOptionsMode(new Integer(1).toString());
      	request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
     	logger.debug("resetting  EDIT_OPTIONS_MODE to 1");
     	mcAuthoringForm.resetUserAction();
@@ -853,6 +858,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 
 	 	AuthoringUtil.readData(request, mcAuthoringForm);
 	 	
+	 	mcAuthoringForm.setEditOptionsMode(new Integer(1).toString());
  		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
 		logger.debug("setting  EDIT_OPTIONS_MODE to 1");
  		
@@ -872,6 +878,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 			mcAuthoringForm.resetUserAction();
 			logger.debug("return to destination to fix error.");
 			
+			mcAuthoringForm.setEditOptionsMode(new Integer(1).toString());
 			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
 			logger.debug("setting  EDIT_OPTIONS_MODE to 1");
 			
@@ -891,6 +898,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 			mcAuthoringForm.resetUserAction();
 			logger.debug("return to destination to fix error.");
 			
+			mcAuthoringForm.setEditOptionsMode(new Integer(1).toString());
 			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
 			logger.debug("setting  EDIT_OPTIONS_MODE to 1");
 			
@@ -928,6 +936,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapGeneralSelectedOptionsContent);
 		logger.debug("updated  MAP_GENERAL_SELECTED_OPTIONS_CONTENT after add: " + mapGeneralSelectedOptionsContent);
 		
+		mcAuthoringForm.setEditOptionsMode(new Integer(1).toString());
  		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
 		logger.debug("resetting  EDIT_OPTIONS_MODE to 1");
  		mcAuthoringForm.resetUserAction();
@@ -987,6 +996,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 	 	
 	 	AuthoringUtil.readData(request, mcAuthoringForm);
 	 	
+	 	mcAuthoringForm.setEditOptionsMode(new Integer(1).toString());
 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
 		logger.debug("setting  EDIT_OPTIONS_MODE to 1");
  		
@@ -1007,6 +1017,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 			mcAuthoringForm.resetUserAction();
 			persistError(request,"options.count.zero");
 			
+			mcAuthoringForm.setEditOptionsMode(new Integer(1).toString());
 			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
 	 		logger.debug("setting EDIT_OPTIONS_MODE :" + 1);
 	    	
@@ -1052,6 +1063,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		logger.debug("updated  MAP_GENERAL_SELECTED_OPTIONS_CONTENT after add: " + mapGeneralSelectedOptionsContent);
 		
 		/* update feedback Maps*/
+		mcAuthoringForm.setEditOptionsMode(new Integer(1).toString());
  	 	request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
 		logger.debug("resetting  EDIT_OPTIONS_MODE to 1");
 		mcAuthoringForm.resetUserAction();
@@ -1178,6 +1190,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
      	}
     	
     	mcAuthoringForm.resetUserAction();
+    	mcAuthoringForm.setEditOptionsMode(new Integer(0).toString());
 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
     	logger.debug("resetting  EDIT_OPTIONS_MODE to 0");
         
@@ -1309,6 +1322,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
      	}
 
      	mcAuthoringForm.resetUserAction();
+     	mcAuthoringForm.setEditOptionsMode(new Integer(0).toString());
  		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 		logger.debug("resetting  EDIT_OPTIONS_MODE to 0");
 	    
@@ -1371,6 +1385,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 	 	
 	 	AuthoringUtil.readData(request, mcAuthoringForm);
 
+	 	mcAuthoringForm.setEditOptionsMode(new Integer(0).toString());
 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 		logger.debug("setting  EDIT_OPTIONS_MODE to 0");
 		
@@ -1387,6 +1402,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 			mcAuthoringForm.resetUserAction();
 			logger.debug("return to destination to fix error.");
 			
+			mcAuthoringForm.setEditOptionsMode(new Integer(1).toString());
 			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
 			logger.debug("setting  EDIT_OPTIONS_MODE to 1");
 	    	
@@ -1408,6 +1424,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 			mcAuthoringForm.resetUserAction();
 			logger.debug("return to destination to fix error.");
 			
+			mcAuthoringForm.setEditOptionsMode(new Integer(1).toString());
 			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
 			logger.debug("setting  EDIT_OPTIONS_MODE to 1");
 	    	
@@ -1479,6 +1496,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		request.getSession().setAttribute(MAP_GENERAL_OPTIONS_CONTENT, mapGeneralOptionsContent);
 		logger.debug("updated  MAP_GENERAL_OPTIONS_CONTENT after done: " + mapGeneralOptionsContent);
 		
+		mcAuthoringForm.setEditOptionsMode(new Integer(0).toString());
     	request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 		logger.debug("setting  EDIT_OPTIONS_MODE to 0");
 		mcAuthoringForm.resetUserAction();
@@ -1533,6 +1551,8 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     {
     	McUtils.cleanUpUserExceptions(request);
     	logger.debug("dispatching editActivityQuestions...");
+    	
+    	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
     	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
     	McUtils.debugMaps(request);
     	
@@ -1547,6 +1567,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
      	request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(true));
 		McUtils.setDefineLater(request, true);
 		
+		mcAuthoringForm.setEditOptionsMode(new Integer(0).toString());
 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 		logger.debug("setting  EDIT_OPTIONS_MODE to 0");
     	
@@ -1590,6 +1611,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 
 	 	AuthoringUtil.readData(request, mcAuthoringForm);
 	 	
+	 	mcAuthoringForm.setEditOptionsMode(new Integer(0).toString());
      	request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 		logger.debug("setting  EDIT_OPTIONS_MODE to 0");
 	
@@ -1688,6 +1710,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 			mcAuthoringForm.resetUserAction();
 			persistError(request,"error.weights.total.invalid");
 			
+			mcAuthoringForm.setEditOptionsMode(new Integer(0).toString());
 			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 			logger.debug("setting  EDIT_OPTIONS_MODE to 0");
 
@@ -1770,6 +1793,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 				mcAuthoringForm.resetUserAction();
 				persistError(request,"error.passmark.notInteger");
 				
+				mcAuthoringForm.setEditOptionsMode(new Integer(0).toString());
 				request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 				logger.debug("setting  EDIT_OPTIONS_MODE to 0");
 
@@ -1797,6 +1821,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 			mcAuthoringForm.resetUserAction();
 			logger.debug("return to destination to fix error.");
 			
+			mcAuthoringForm.setEditOptionsMode(new Integer(0).toString());
 			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 			logger.debug("setting  EDIT_OPTIONS_MODE to 0");
 
@@ -1820,6 +1845,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 			mcAuthoringForm.resetUserAction();
 			logger.debug("return to destination to fix error.");
 			
+			mcAuthoringForm.setEditOptionsMode(new Integer(0).toString());
 			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 			logger.debug("setting  EDIT_OPTIONS_MODE to 0");
 
@@ -1861,6 +1887,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		if (errors.size() > 0)  
 		{
 			logger.debug("either title or instructions or both is missing. Returning back to from to fix errors:");
+			mcAuthoringForm.setEditOptionsMode(new Integer(0).toString());
 			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 			logger.debug("setting  EDIT_OPTIONS_MODE to 0");
 
@@ -2006,6 +2033,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(1));
 		logger.debug("set SUBMIT_SUCCESS to 1");
 		
+		mcAuthoringForm.setEditOptionsMode(new Integer(0).toString());
 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 		logger.debug("setting  EDIT_OPTIONS_MODE to 0");
 	
@@ -2206,6 +2234,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
  			mcAuthoringForm.resetUserAction();
  			persistError(request,"error.fileName.empty");
  			
+ 			mcAuthoringForm.setEditOptionsMode(new Integer(0).toString());
  			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
  	 		logger.debug("setting EDIT_OPTIONS_MODE :" + 0);
  	    	
@@ -2221,6 +2250,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
  		request.getSession().setAttribute(LIST_OFFLINEFILES_METADATA, listOfflineFilesMetaData);
 		
  		mcAuthoringForm.resetUserAction();
+ 		mcAuthoringForm.setEditOptionsMode(new Integer(0).toString());
  		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
  		logger.debug("setting EDIT_OPTIONS_MODE :" + 0);
  		
@@ -2278,6 +2308,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
  			mcAuthoringForm.resetUserAction();
  			persistError(request,"error.fileName.empty");
  			
+ 			mcAuthoringForm.setEditOptionsMode(new Integer(0).toString());
  			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
  	 		logger.debug("setting EDIT_OPTIONS_MODE :" + 0);
  	    	McUtils.debugMaps(request);
@@ -2291,8 +2322,9 @@ public class McAction extends LamsDispatchAction implements McAppConstants
  		request.getSession().setAttribute(LIST_ONLINEFILES_METADATA, listOnlineFilesMetaData);
  		
         mcAuthoringForm.resetUserAction();
+        mcAuthoringForm.setEditOptionsMode(new Integer(0).toString());
         request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
- 		logger.debug("setting EDIT_OPTIONS_MODE :" + 0);
+ 		logger.debug("setting ` :" + 0);
     	
  		McUtils.debugMaps(request);
    	    return (mapping.findForward(destination));

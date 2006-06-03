@@ -125,6 +125,8 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 			return (mapping.findForward(ERROR_LIST));
 		
 		request.getSession().setAttribute(CURRENT_MONITORING_TAB, "summary");
+		McMonitoringForm mcMonitoringForm = (McMonitoringForm) form;
+		mcMonitoringForm.setEditOptionsMode(new Integer(0).toString());
 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 		
 		request.getSession().setAttribute(ACTIVE_MODULE, DEFINE_LATER);

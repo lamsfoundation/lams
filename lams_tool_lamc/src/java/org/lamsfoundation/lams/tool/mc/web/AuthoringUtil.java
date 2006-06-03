@@ -75,6 +75,7 @@ public class AuthoringUtil implements McAppConstants {
     public static void readData(HttpServletRequest request, McAuthoringForm mcAuthoringForm)
     {
     	/** define the next tab as Basic tab by default*/
+        mcAuthoringForm.setEditOptionsMode(new Integer(0).toString());
      	request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
      	
      	McUtils.persistRichText(request);
@@ -1093,8 +1094,20 @@ public class AuthoringUtil implements McAppConstants {
     	{
     		McQueContent mcQueContent=(McQueContent)listIterator.next();
     		logger.debug("mcQueContent:" + mcQueContent);
-    		map.put(mapIndex.toString(),mcQueContent.getFeedbackIncorrect().toString());
-    		mapIndex=new Long(mapIndex.longValue()+1);
+
+    		if (mcQueContent != null)
+    		{
+    		    String incorrectFeedback=mcQueContent.getFeedbackIncorrect();
+    		    if (incorrectFeedback != null)
+    		    {
+    		        map.put(mapIndex.toString(),incorrectFeedback.toString());
+    		    }
+    		    else
+    		    {
+    		        map.put(mapIndex.toString(),"");    
+    		    }
+    		    mapIndex=new Long(mapIndex.longValue()+1);    		    
+    		}
     	}
     	
     	logger.debug("refreshed Map:" + map);
@@ -1121,7 +1134,21 @@ public class AuthoringUtil implements McAppConstants {
     	{
     		McQueContent mcQueContent=(McQueContent)listIterator.next();
     		logger.debug("mcQueContent:" + mcQueContent);
-    		map.put(mapIndex.toString(),mcQueContent.getFeedbackCorrect().toString());
+    		
+    		if (mcQueContent != null)
+    		{
+    		    String correctFeedback=mcQueContent.getFeedbackCorrect();
+    		    logger.debug("correctFeedback:" + correctFeedback);
+    		    
+    		    if (correctFeedback != null)
+    		    {
+    		        map.put(mapIndex.toString(),correctFeedback.toString());
+    		    }
+    		    else
+    		    {
+    		        map.put(mapIndex.toString(),"");    
+    		    }
+    		}
     		mapIndex=new Long(mapIndex.longValue()+1);
     	}
     	
