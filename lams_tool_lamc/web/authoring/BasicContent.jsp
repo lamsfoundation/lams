@@ -31,6 +31,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
+
 				<c:if test="${sessionScope.activeModule != 'defineLater'}"> 			
 					<h2><font size=2> <bean:message key="label.authoring.mc.basic"/> </font> </h2>	
 				</c:if> 				

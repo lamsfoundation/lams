@@ -326,6 +326,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapGeneralSelectedOptionsContent);
 		
     	McUtils.debugMaps(request);
+    	logger.debug("final EDIT_OPTIONS_MODE: " + request.getSession().getAttribute(EDIT_OPTIONS_MODE));
     	return (mapping.findForward(destination));	
 	}
     
@@ -449,6 +450,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapGeneralSelectedOptionsContent);
     	
 		McUtils.debugMaps(request);
+		logger.debug("final EDIT_OPTIONS_MODE: " + request.getSession().getAttribute(EDIT_OPTIONS_MODE));
 		return (mapping.findForward(destination));
     }
 
@@ -820,6 +822,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapGeneralSelectedOptionsContent);
     	
 		McUtils.debugMaps(request);
+		logger.debug("final EDIT_OPTIONS_MODE: " + request.getSession().getAttribute(EDIT_OPTIONS_MODE));
     	return (mapping.findForward(destination));
     }
 
@@ -958,6 +961,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapGeneralSelectedOptionsContent);
 		
     	McUtils.debugMaps(request);
+    	logger.debug("final EDIT_OPTIONS_MODE: " + request.getSession().getAttribute(EDIT_OPTIONS_MODE));
 		return (mapping.findForward(destination));
     }
     
@@ -1085,6 +1089,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapGeneralSelectedOptionsContent);
 		
     	McUtils.debugMaps(request);
+    	logger.debug("final EDIT_OPTIONS_MODE: " + request.getSession().getAttribute(EDIT_OPTIONS_MODE));
 		return (mapping.findForward(destination));
     }
     
@@ -1215,6 +1220,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapGeneralSelectedOptionsContent);
 		
     	McUtils.debugMaps(request);
+    	logger.debug("final EDIT_OPTIONS_MODE: " + request.getSession().getAttribute(EDIT_OPTIONS_MODE));
         return (mapping.findForward(destination));	
     }
     
@@ -1347,6 +1353,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapGeneralSelectedOptionsContent);
 		
     	McUtils.debugMaps(request);
+    	logger.debug("final EDIT_OPTIONS_MODE: " + request.getSession().getAttribute(EDIT_OPTIONS_MODE));
 	    return (mapping.findForward(destination));
     }
     
@@ -1518,6 +1525,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapGeneralSelectedOptionsContent);
 		
     	McUtils.debugMaps(request);
+    	logger.debug("final EDIT_OPTIONS_MODE: " + request.getSession().getAttribute(EDIT_OPTIONS_MODE));
 		return (mapping.findForward(destination));
     }
 
@@ -1572,6 +1580,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		logger.debug("setting  EDIT_OPTIONS_MODE to 0");
     	
 		McUtils.debugMaps(request);
+		logger.debug("final EDIT_OPTIONS_MODE: " + request.getSession().getAttribute(EDIT_OPTIONS_MODE));
 		return (mapping.findForward(destination));
     }
     
@@ -2070,6 +2079,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		if (destination.equals(LOAD_MONITORING_CONTENT))
 		{
 			request.getSession().setAttribute(ACTIVE_MODULE, DEFINE_LATER);
+			mcAuthoringForm.setActiveModule(DEFINE_LATER);
 			request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(false));	
 		}
     	
@@ -2078,6 +2088,8 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		//because button (and javascript) will display in LamsTag tab, so put it into session instead of request
 		//it will be remove immediately in clearSessionAction.
         request.getSession().setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG,Boolean.TRUE);
+        
+        logger.debug("final EDIT_OPTIONS_MODE: " + request.getSession().getAttribute(EDIT_OPTIONS_MODE));
 		return (mapping.findForward(destination));
     }
 
@@ -2129,6 +2141,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
         mcAuthoringForm.resetUserAction();
         
     	McUtils.debugMaps(request);
+    	logger.debug("final EDIT_OPTIONS_MODE: " + request.getSession().getAttribute(EDIT_OPTIONS_MODE));
         return (mapping.findForward(destination));
     	
     }
@@ -2181,6 +2194,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
         mcAuthoringForm.resetUserAction();
         
     	McUtils.debugMaps(request);
+    	logger.debug("final EDIT_OPTIONS_MODE: " + request.getSession().getAttribute(EDIT_OPTIONS_MODE));
         return (mapping.findForward(destination));
     }
 
@@ -2255,6 +2269,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
  		logger.debug("setting EDIT_OPTIONS_MODE :" + 0);
  		
     	McUtils.debugMaps(request);
+    	logger.debug("final EDIT_OPTIONS_MODE: " + request.getSession().getAttribute(EDIT_OPTIONS_MODE));
    	    return (mapping.findForward(destination));    
     }
     
@@ -2327,6 +2342,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
  		logger.debug("setting ` :" + 0);
     	
  		McUtils.debugMaps(request);
+ 		logger.debug("final EDIT_OPTIONS_MODE: " + request.getSession().getAttribute(EDIT_OPTIONS_MODE));
    	    return (mapping.findForward(destination));
     }
     
@@ -2368,6 +2384,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
         mcAuthoringForm.resetUserAction();
         
     	McUtils.debugMaps(request);
+    	logger.debug("final EDIT_OPTIONS_MODE: " + request.getSession().getAttribute(EDIT_OPTIONS_MODE));
         return (mapping.findForward(destination));
     }
     
@@ -2409,6 +2426,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		mcAuthoringForm.resetUserAction();
 		
     	McUtils.debugMaps(request);
+    	logger.debug("final EDIT_OPTIONS_MODE: " + request.getSession().getAttribute(EDIT_OPTIONS_MODE));
 	    return (mapping.findForward(destination));
     }
 
@@ -2456,6 +2474,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		
 		/* Check this: find out where to forward to*/
     	McUtils.debugMaps(request);
+    	logger.debug("final EDIT_OPTIONS_MODE: " + request.getSession().getAttribute(EDIT_OPTIONS_MODE));
 	    return (mapping.findForward(AUTHORING_STARTER));
     }
     

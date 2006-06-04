@@ -54,9 +54,76 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 		<lams:headItems/>
 		<title><fmt:message key="activity.title" /></title>
-	
+
+		<c:if test="${sessionScope.activeModule != 'defineLater'}"> 			
+			<script language="JavaScript" type="text/JavaScript">
+		        function init(){
+		            initTabSize(3);
+		            
+		            var tag = document.getElementById("currentTab");
+			    	if(tag.value != "")
+			    		selectTab(tag.value);
+		            else
+		                selectTab(1); //select the default tab;
+		            
+		            initEditor("richTextTitle");
+		            initEditor("richTextInstructions");
+		            initEditor("richTextReportTitle");            
+		            initEditor("richTextEndLearningMsg");                        
+		            initEditor("richTextOfflineInstructions");                                    
+		            initEditor("richTextOnlineInstructions");                                                
+		            initEditor("richTextIncorrectFeedback");                                                
+		            initEditor("richTextCorrectFeedback");                                                            
+			   }     
+			</script>
+		</c:if> 
+
+		<c:if test="${ (sessionScope.activeModule == 'defineLater') &&  
+			   (sessionScope.defineLaterInEditMode == 'true') &&  
+			   (sessionScope.editOptionsMode != 1)   			
+			  }"> 			
+			<script language="JavaScript" type="text/JavaScript">
+		        function init(){
+		        
+		            initTabSize(1);
+		            
+		            var tag = document.getElementById("currentTab");
+			    	if(tag.value != "")
+			    		selectTab(tag.value);
+		            else
+		                selectTab(1); //select the default tab;
+		            
+		            initEditor("richTextTitle");
+		            initEditor("richTextInstructions");
+			   }     
+			</script>
+		</c:if> 
+
+		<c:if test="${ (sessionScope.activeModule == 'defineLater') &&  
+			   (sessionScope.defineLaterInEditMode == 'true') &&  
+			   (sessionScope.editOptionsMode == 1)   			   
+			  }"> 			
+			<script language="JavaScript" type="text/JavaScript">
+			  function init(){
+		        
+		            initTabSize(1);
+		            
+		            var tag = document.getElementById("currentTab");
+			    	if(tag.value != "")
+			    		selectTab(tag.value);
+		            else
+		                selectTab(1); //select the default tab;
+		            
+		            initEditor("richTextIncorrectFeedback");                                                
+		            initEditor("richTextCorrectFeedback");                                                            
+			   }     
+			</script>
+		</c:if> 
+
  	<!-- ******************** FCK Editor related javascript & HTML ********************** -->
 	<script language="JavaScript" type="text/JavaScript">
+    	var imgRoot="${lams}images/";
+	    var themeName="aqua";
 
 		function submitModifyQuestion(questionIndexValue, actionMethod) 
 		{
@@ -87,29 +154,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		  else if (innerWidth!=document.MM_pgW || innerHeight!=document.MM_pgH) location.reload();
 		}
 
-    	var imgRoot="${lams}images/";
-	    var themeName="aqua";
-        
-        function init(){
-        
-            initTabSize(3);
-            
-            var tag = document.getElementById("currentTab");
-	    	if(tag.value != "")
-	    		selectTab(tag.value);
-            else
-                selectTab(1); //select the default tab;
-            
-            initEditor("richTextTitle");
-            initEditor("richTextInstructions");
-            initEditor("richTextReportTitle");            
-            initEditor("richTextEndLearningMsg");                        
-            initEditor("richTextOfflineInstructions");                                    
-            initEditor("richTextOnlineInstructions");                                                
-            initEditor("richTextIncorrectFeedback");                                                
-            initEditor("richTextCorrectFeedback");                                                            
-	   }     
-        
         function doSelectTab(tabId) {
         	// start optional tab controller stuff
         	var tag = document.getElementById("currentTab");

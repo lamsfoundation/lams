@@ -55,11 +55,16 @@ public class McContentDAO extends HibernateDaoSupport implements IMcContentDAO {
 	
 	public McContent findMcContentById(Long mcContentId)
 	{
+	    logger.debug("doing findMcContentById" + mcContentId);
 		String query = "from McContent as mc where mc.mcContentId = ?";
+		logger.debug("query: " + query);
 	    HibernateTemplate templ = this.getHibernateTemplate();
-		List list = getSession().createQuery(query)
-			.setLong(0,mcContentId.longValue())
-			.list();
+
+		List list = getSession().createQuery(FIND_MC_CONTENT)
+		.setLong(0,mcContentId.longValue())
+		.list();
+		
+		logger.debug("list: " + list);
 		
 		if(list != null && list.size() > 0){
 			McContent mc = (McContent) list.get(0);
