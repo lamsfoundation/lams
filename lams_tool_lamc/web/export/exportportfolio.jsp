@@ -78,14 +78,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<c:if test="${(portfolioExportMode == 'learner')}">
 						<tr> 
 							<td NOWRAP valign=top align=center> 
-								<h1> <bean:message key="label.export.learner"/>  </h1>
+								<h1>  </h1>
 							</td> 
 						<tr>
 					</c:if>			
 					<c:if test="${(portfolioExportMode != 'learner')}">
 						<tr> 
 							<td NOWRAP valign=top align=center> 
-								<h1> <bean:message key="label.export.teacher"/>  </h1>
+								<h1>  </h1>
 							</td> 
 						<tr>
 					</c:if>			
