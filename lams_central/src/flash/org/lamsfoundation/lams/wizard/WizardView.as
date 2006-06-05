@@ -868,8 +868,8 @@ class WizardView extends AbstractView {
 		if(valid){
 			var selectedOrgID:Number = Number(snode.attributes.data.organisationID);
 			resultDTO.organisationID = selectedOrgID;
-			
-			if(snode.attributes.isBranch){
+			trace('type id is ' + snode.attributes.data.organisationTypeID);
+			if(snode.attributes.data.organisationTypeId == 2){
 				resultDTO.courseName = snode.attributes.data.name;
 				resultDTO.className = "";
 			} else {
@@ -931,14 +931,7 @@ class WizardView extends AbstractView {
 		_summery_mc.staff_txt.text = String(resultDTO.selectedStaff.length) + '/' + staffList.length;
 		_summery_mc.learners_txt.text = String(resultDTO.selectedLearners.length) + '/' + learnerList.length;
 		//_summery_mc.redraw(true);
-		
-		_summery_mc.design_lbl.text = Dictionary.getValue('summery_design_lbl');
-		_summery_mc.title_lbl.text = Dictionary.getValue('summery_title_lbl');
-		_summery_mc.desc_lbl.text = Dictionary.getValue('summery_desc_lbl');
-		_summery_mc.course_lbl.text = Dictionary.getValue('summery_course_lbl');
-		_summery_mc.class_lbl.text = Dictionary.getValue('summery_class_lbl');
-		_summery_mc.staff_lbl.text = Dictionary.getValue('summery_staff_lbl');
-		_summery_mc.learners_lbl.text = Dictionary.getValue('summery_learners_lbl');
+		//_summery_mc.onEnterFrame = setupSummeryLabels;
 		
 		trace('text height ' + _summery_mc.desc_txt.textHeight);
 		trace(_summery_mc.desc_scr);
@@ -951,6 +944,16 @@ class WizardView extends AbstractView {
 		
 	}
 	
+	private function setupSummeryLabels():Void{
+		delete _summery_mc.onEnterFrame;
+		_summery_mc.design_lbl.text = Dictionary.getValue('summery_design_lbl');
+		_summery_mc.title_lbl.text = Dictionary.getValue('summery_title_lbl');
+		_summery_mc.desc_lbl.text = Dictionary.getValue('summery_desc_lbl');
+		_summery_mc.course_lbl.text = Dictionary.getValue('summery_course_lbl');
+		_summery_mc.class_lbl.text = Dictionary.getValue('summery_class_lbl');
+		_summery_mc.staff_lbl.text = Dictionary.getValue('summery_staff_lbl');
+		_summery_mc.learners_lbl.text = Dictionary.getValue('summery_learners_lbl');
+	}
 	
 	
 	private function clearStep4():Void{
