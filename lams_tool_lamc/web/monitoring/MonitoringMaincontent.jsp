@@ -102,6 +102,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	    		selectTab(tag.value);
             else
                 selectTab(1); //select the default tab;
+
+            initEditor("richTextTitle");
+            initEditor("richTextInstructions");
+
         }     
         
         function doSelectTab(tabId) {
