@@ -93,20 +93,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
     	var imgRoot="${lams}images/";
 	    var themeName="aqua";
         
-        function init(){
-        
-            initTabSize(4);
-            
-            var tag = document.getElementById("currentTab");
-	    	if(tag.value != "")
-	    		selectTab(tag.value);
-            else
-                selectTab(1); //select the default tab;
-
-            initEditor("richTextTitle");
-            initEditor("richTextInstructions");
-
-        }     
         
         function doSelectTab(tabId) {
         	// start optional tab controller stuff
@@ -121,6 +107,43 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
         	document.McMonitoringForm.submit();
         }
 
+	</script>	
+
+	<script language="JavaScript" type="text/JavaScript">
+
+		<c:if test="${sessionScope.editOptionsMode != 1 }"> 		
+		        function init(){
+		        
+		            initTabSize(4);
+		            
+		            var tag = document.getElementById("currentTab");
+			    	if(tag.value != "")
+			    		selectTab(tag.value);
+		            else
+		                selectTab(1); //select the default tab;
+		
+		            initEditor("richTextTitle");
+		            initEditor("richTextInstructions");
+		        }     
+		</c:if> 
+
+		<c:if test="${sessionScope.editOptionsMode == 1 }"> 		
+		        function init(){
+		        
+		            initTabSize(4);
+		            
+		            var tag = document.getElementById("currentTab");
+			    	if(tag.value != "")
+			    		selectTab(tag.value);
+		            else
+		                selectTab(1); //select the default tab;
+		
+		            initEditor("richTextIncorrectFeedback");                                                
+		            initEditor("richTextCorrectFeedback");                                                            		            
+		        }     
+		</c:if> 
+
+	
 	</script>	
 	
 </head>
