@@ -817,4 +817,14 @@ CREATE TABLE lams_role_privilege (
                   REFERENCES lams_role (role_id)
 )TYPE=InnoDB;
 
+CREATE TABLE lams_language (
+	   language_id TINYINT(4) NOT NULL AUTO_INCREMENT
+	 , iso_code VARCHAR(2) NOT NULL UNIQUE
+	 , PRIMARY KEY (language_id)
+)TYPE=InnoDB;
 
+CREATE TABLE lams_country (
+	  country_id TINYINT(4) NOT NULL AUTO_INCREMENT
+	 , iso_code VARCHAR(2) NOT NULL UNIQUE
+	 , PRIMARY KEY (country_id)
+ )TYPE=InnoDB;
