@@ -194,6 +194,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
     	request.getSession().setAttribute(EDIT_RESPONSE, new Boolean(false));
     	
     	request.getSession().setAttribute(CURRENT_MONITORING_TAB, "stats");
+    	logger.debug("final USER_EXCEPTION_NO_TOOL_SESSIONS: " + request.getSession().getAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS));
     	logger.debug("ending  initStatsContent...");
 	}
 
@@ -268,6 +269,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
     	request.getSession().setAttribute(EDIT_RESPONSE, new Boolean(false));
 
     	request.getSession().setAttribute(CURRENT_MONITORING_TAB, "instructions");
+    	logger.debug("final USER_EXCEPTION_NO_TOOL_SESSIONS: " + request.getSession().getAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS));
     	logger.debug("ending  initInstructionsContent...");
 	 	
 	}
@@ -329,7 +331,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		}
 		request.getSession().setAttribute(ACTIVITY_TITLE, qaContent.getTitle());
 	    request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, qaContent.getInstructions());
-		
+	    
 	    return qaStarterAction.executeDefineLater(mapping, form, request, response, qaService);
 	}
 
@@ -411,6 +413,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		}
 
     	request.getSession().setAttribute(CURRENT_MONITORING_TAB, "summary");
+    	logger.debug("final USER_EXCEPTION_NO_TOOL_SESSIONS: " + request.getSession().getAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS));
     	logger.debug("end  initSummaryContent...");
 	}
 
@@ -507,6 +510,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    request.getSession().setAttribute(CURRENT_MONITORED_TOOL_SESSION, currentMonitoredToolSession);
 	    logger.debug("CURRENT_MONITORED_TOOL_SESSION: " + request.getSession().getAttribute(CURRENT_MONITORED_TOOL_SESSION));
 	    
+	    logger.debug("final USER_EXCEPTION_NO_TOOL_SESSIONS: " + request.getSession().getAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS));
     	return (mapping.findForward(LOAD_MONITORING));	
 	}
 

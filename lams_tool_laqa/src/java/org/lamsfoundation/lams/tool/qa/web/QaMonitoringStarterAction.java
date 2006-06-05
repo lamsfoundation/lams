@@ -188,6 +188,7 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 			logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to true");
 		}
 
+		logger.debug("final USER_EXCEPTION_NO_TOOL_SESSIONS: " + request.getSession().getAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS));
 		
 		request.getSession().setAttribute(ACTIVE_MODULE, MONITORING);
 		qaMonitoringForm.setActiveModule(MONITORING);
