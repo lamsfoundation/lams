@@ -37,6 +37,7 @@ import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.Workspace;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dao.IAuthenticationMethodDAO;
+import org.lamsfoundation.lams.usermanagement.dao.ILocaleDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IOrganisationDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IOrganisationStateDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IOrganisationTypeDAO;
@@ -83,6 +84,14 @@ public interface IUserManagementService {
      * @param roleDao
      */
 	public void setRoleDAO(IRoleDAO roleDao);
+	
+    /**
+     * Set ILocaleDAO
+     *
+     * @param localeDao 
+     */
+	public void setLocaleDAO(ILocaleDAO localeDao);
+
 	
     /**
      * Set IOrganisationDAO
@@ -446,5 +455,9 @@ public interface IUserManagementService {
 	 * TODO modify/remove when the index page is implemented properly
 	 */
 	public List getLearnerLessonsFromOrganisation(Integer userID, Integer organisationID);
+	
+	public List getAllCountries();
+	
+	public List getAllLanguages();
 
 }

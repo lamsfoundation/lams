@@ -44,6 +44,7 @@ import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.Workspace;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dao.IAuthenticationMethodDAO;
+import org.lamsfoundation.lams.usermanagement.dao.ILocaleDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IOrganisationDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IOrganisationStateDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IOrganisationTypeDAO;
@@ -77,6 +78,8 @@ public class UserManagementService implements IUserManagementService {
 	private IUserDAO userDAO;
 
 	private IRoleDAO roleDAO;
+	
+	private ILocaleDAO localeDAO;
 
 	private IOrganisationDAO organisationDAO;
 
@@ -675,5 +678,16 @@ public class UserManagementService implements IUserManagementService {
 
 	public OrganisationType getOrganisationTypeById(Integer typeId) {
 		return organisationTypeDAO.getOrganisationTypeById(typeId);
+	}
+
+	public void setLocaleDAO(ILocaleDAO localeDao) {
+	}
+
+	public List getAllCountries() {
+		return localeDAO.getAllCountries();
+	}
+
+	public List getAllLanguages() {
+		return localeDAO.getAllLanguages();
 	}
 }
