@@ -32,6 +32,8 @@
 				<value>org/lamsfoundation/lams/usermanagement/Organisation.hbm.xml</value>
 				<value>org/lamsfoundation/lams/usermanagement/OrganisationState.hbm.xml</value>
 				<value>org/lamsfoundation/lams/usermanagement/OrganisationType.hbm.xml</value>
+				<value>org/lamsfoundation/lams/usermanagement/Country.hbm.xml</value>
+				<value>org/lamsfoundation/lams/usermanagement/Language.hbm.xml</value>
 				<value>org/lamsfoundation/lams/usermanagement/Role.hbm.xml</value>
 				<value>org/lamsfoundation/lams/usermanagement/Privilege.hbm.xml</value>
 				<value>org/lamsfoundation/lams/usermanagement/RolePrivilege.hbm.xml</value>
@@ -81,6 +83,7 @@
 	>
 		<property name="userDAO"><ref local="userDAO"/></property>
 		<property name="roleDAO"><ref local="roleDAO"/></property>
+		<property name="localeDAO"><ref local="localeDAO"/></property>
 		<property name="organisationDAO"><ref local="organisationDAO"/></property>
 		<property name="organisationStateDAO"><ref local="organisationStateDAO"/></property>
 		<property name="organisationTypeDAO"><ref local="organisationTypeDAO"/></property>
@@ -222,6 +225,10 @@
 	</bean>
 
 	<bean id="roleDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.RoleDAO">
+		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+	</bean>
+
+	<bean id="localeDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.LocaleDAO">
 		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
 	</bean>
 	
