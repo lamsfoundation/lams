@@ -110,7 +110,7 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Mc
 
         logger.debug("calling learning mode toolSessionID:" + toolSessionID + " userID: " + userID );
     	McMonitoringAction mcMonitoringAction= new McMonitoringAction();
-    	//voteMonitoringAction.refreshSummaryData(request, content, voteService, true, true, toolSessionID.toString(), userID.toString() , true);
+    	//mcMonitoringAction.refreshSummaryData(request, content, mcService, true, true, toolSessionID.toString(), userID.toString() , true);
     	
     	logger.debug("ending learner mode: ");
     }
@@ -141,7 +141,7 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Mc
 		
         McMonitoringAction mcMonitoringAction= new McMonitoringAction();
         logger.debug("starting refreshSummaryData.");
-        //voteMonitoringAction.refreshSummaryData(request, content, voteService, true, false, null, null, false);
+        //mcMonitoringAction.refreshSummaryData(request, content, mcService, true, false, null, null, false);
         
         logger.debug("ending teacher mode: ");
     }

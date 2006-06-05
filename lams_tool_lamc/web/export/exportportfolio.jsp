@@ -56,7 +56,45 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 	</head>
 	<body>
-		export portfolio content goes here
+	    <html:form  action="/monitoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
+		<html:hidden property="method"/>
+		<html:hidden property="toolContentID"/>
+	
+	
+			<c:if test="${(userExceptionNoToolSessions == 'true')}"> 	
+					<table align="center">
+						<tr> 
+							<td NOWRAP valign=top align=center> 
+								<b> <font size=2> <bean:message key="error.noLearnerActivity"/> </font></b>
+							</td> 
+						<tr>
+					</table>
+			</c:if>			
+	
+	
+			<c:if test="${(userExceptionNoToolSessions != 'true') }"> 	
+			
+				<table align="center">
+					<c:if test="${(portfolioExportMode == 'learner')}">
+						<tr> 
+							<td NOWRAP valign=top align=center> 
+								<h1> <bean:message key="label.export.learner"/>  </h1>
+							</td> 
+						<tr>
+					</c:if>			
+					<c:if test="${(portfolioExportMode != 'learner')}">
+						<tr> 
+							<td NOWRAP valign=top align=center> 
+								<h1> <bean:message key="label.export.teacher"/>  </h1>
+							</td> 
+						<tr>
+					</c:if>			
+				</table>
+			
+				<jsp:include page="/export/ExportContent.jsp" />
+			</c:if>						
+	
+		</html:form>
 	
 	</body>
 </html:html>

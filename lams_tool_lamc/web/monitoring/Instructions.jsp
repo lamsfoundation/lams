@@ -31,15 +31,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
-	<div id="datatablecontainer">
-		<table class="forms">
-			<tr>
-				<td>
-					<table align="center">
-						<tr>
-							<td colspan=2> &nbsp&nbsp&nbsp </td>
-						</tr>
-				
+			<table width="80%" cellspacing="8" align="center" class="forms">
+
 						<tr> 
 							<td NOWRAP valign=top>
 				  				<b> <font size=2> <bean:message key="label.onlineInstructions.col" /> </font></b>
@@ -51,7 +44,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						
 						
 						<tr>
-							<td NOWRAP align="right" valign=top>
+							<td NOWRAP valign=top>
 			          			<font size=2>
 				      				<b> <bean:message key="label.uploadedOnlineFiles" /> </b>
 			      				</font>
@@ -97,7 +90,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						
 
 						<tr> 
-							<td NOWRAP align="right" valign=top>
+							<td NOWRAP valign=top>
 								<font size=2>
 		    	      				<b> <bean:message key="label.uploadedOfflineFiles" /> </b>
 		    	      			</font>
@@ -130,10 +123,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			         			</table>
 							</td> 
 						</tr>
+
+				<html:hidden property="fileItem"/>
+				<html:hidden property="offlineFile"/>				
+				<html:hidden property="uuid"/>				
 						
-					</table>
-				</td>
-			</tr>
-		</table>
-	</div>		
+			</table>
+
 
