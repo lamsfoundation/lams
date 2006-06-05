@@ -69,6 +69,7 @@ public abstract class LamsAuthoringFinishAction extends Action {
 
 	private static final String RE_EDIT_URL = "reEditUrl";
 
+	private static final String PARAM_DEFINE_LATER = "defineLater";
 	
 	/**
 	 * Action method, will handle save/cancel action.
@@ -83,15 +84,26 @@ public abstract class LamsAuthoringFinishAction extends Action {
 			clearSession(request.getSession(),ToolAccessMode.LEARNER);
 		if(StringUtils.equals(ToolAccessMode.TEACHER.toString(),modeStr))
 			clearSession(request.getSession(),ToolAccessMode.TEACHER);
-			
 		if(StringUtils.equals(action,CONFIRM_ACTION)){
 			String nextUrl = getLamsUrl() + "authoringConfirm.jsp";
-			
 			String signature = request.getParameter(TOOL_SIGNATURE);
 			Long toolContentId = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
+
+			//check whether it use on define it later page
 			IToolVO tool = getToolService().getToolBySignature(signature);
-			String reeditUrl = WebUtil.appendParameterToURL(getLamsUrl()+tool.getAuthorUrl(), AttributeNames.PARAM_TOOL_CONTENT_ID,
-					toolContentId.toString());
+			String defineLater = request.getParameter(PARAM_DEFINE_LATER);
+			
+			String reeditUrl;
+			if(StringUtils.equalsIgnoreCase(defineLater,"yes") 
+				|| StringUtils.equalsIgnoreCase(defineLater,"true")){
+				//define it later page
+				reeditUrl = WebUtil.appendParameterToURL(getLamsUrl()+tool.getDefineLaterUrl(), AttributeNames.PARAM_TOOL_CONTENT_ID,
+						toolContentId.toString());
+			}else{
+				//authoring page
+				reeditUrl = WebUtil.appendParameterToURL(getLamsUrl()+tool.getAuthorUrl(), AttributeNames.PARAM_TOOL_CONTENT_ID,
+						toolContentId.toString());
+			}
 			
 			nextUrl = WebUtil.appendParameterToURL(nextUrl,RE_EDIT_URL,URLEncoder.encode(reeditUrl,"UTF-8"));
 			response.sendRedirect(nextUrl);
