@@ -1,5 +1,6 @@
 <%@ include file="/common/taglibs.jsp" %>
 <%@ page import="java.util.HashSet" %>
+<%@ page import="org.lamsfoundation.lams.tool.rsrc.ResourceConstants"%>
 <%@ page import="java.util.Set" %>
     <% 
     	
@@ -83,17 +84,17 @@
 <!-- end of content (Basic) -->
       
 
-<!-- Button Row -->
-		<p align="right">
-			<html:link href="javascript:doSubmit();" property="submit" styleClass="button">
-				<fmt:message key="label.authoring.save.button" />
-			</html:link>
-			<html:link href="javascript:;" property="cancel" onclick="window.close()" styleClass="button">
-				<fmt:message key="label.authoring.cancel.button" />
-			</html:link>
-		</p>
-</div>
+	<!-- Button Row -->
+	<%--  Default value 
+		cancelButtonLabelKey="label.authoring.cancel.button"
+		saveButtonLabelKey="label.authoring.save.button"
+		cancelConfirmMsgKey="authoring.msg.cancel.save"
+		accessMode="author"
+	--%>
+	<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="<%=ResourceConstants.TOOL_SIGNATURE%>" toolContentID="${formBean.toolContentID}" defineLater="yes"/>
+
 <lams:HTMLEditor/>
+</div>
 	
 
 </html:form>
