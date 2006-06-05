@@ -120,3 +120,9 @@ VALUES (4, 5, 'Permission Gate', 'Gate: Opens under teacher or staff control.',
 	'learning/gate.do?method=knockGate', 'learning/gate.do?method=knockGate', null, null, 
 	null, 'monitoring/gate.do?method=viewGate', 'monitoring/gate.do?method=viewGate', now()	);
 
+INSERT INTO lams_country VALUES (1 'AU');
+INSERT INTO lams_country VALUES (2 'US');
+INSERT INTO lams_country VALUES (3 'CN');
+
+INSERT INTO lams_language VALUES (1 'en');
+INSERT INTO lams_language VALUES (2 'zh');
