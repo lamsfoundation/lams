@@ -46,6 +46,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.activity.ActivityCompletedException;
+
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -678,6 +680,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		}
 		ld.setTransitions(transList);
 
+		for(Activity act :actList)
+			act.setLearningDesign(ld);
 		ld.setActivities(actList);
 		
 		ld.setCreateDateTime(new Date());
@@ -724,15 +728,16 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			return trans;
 		
 		trans.setDescription(transDto.getDescription());
-		
-		trans.setFromActivity(activityMapper.get(transDto.getFromActivityID()));
-		trans.setFromUIID(transDto.getFromUIID());
+		Activity fromAct = activityMapper.get(transDto.getFromActivityID());
+		trans.setFromActivity(fromAct);
+		trans.setFromUIID(fromAct.getActivityUIID());
 //		set to null 
 //		trans.setLearningDesign();
 		trans.setTitle(transDto.getTitle());
 		
-		trans.setToActivity(activityMapper.get(transDto.getToActivityID()));
-		trans.setToUIID(transDto.getToUIID());
+		Activity toAct = activityMapper.get(transDto.getToActivityID());
+		trans.setToActivity(toAct);
+		trans.setToUIID(toAct.getActivityUIID());
 		trans.setTransitionId(transDto.getTransitionID());
 		trans.setTransitionUIID(transDto.getTransitionUIID());
 		
@@ -819,6 +824,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		act.setLanguageFile(actDto.getLanguageFile());
 //		act.setLearningDesign();
 		//TODO: be to decided by Fiona
+//		actDto.getLearningDesignID()
 //		act.setLearningLibrary();
 //		actDto.getLibraryActivityID()
 //		act.setLibraryActivity();
