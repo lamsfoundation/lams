@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 2.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
+    
+<hibernate-mapping>
+<!-- 
+    Created by the Middlegen Hibernate plugin 2.1
+
+    http://boss.bekk.no/boss/middlegen/
+    http://www.hibernate.org/
+-->
+
+<class 
+    name="org.lamsfoundation.lams.usermanagement.Language" 
+    table="lams_language"
+>
+    <meta attribute="class-description" inherit="false">
+       @hibernate.class
+        table="lams_language"
+    </meta>
+
+    <id
+        name="languageId"
+        type="java.lang.Byte"
+        column="language_id"
+    >
+        <meta attribute="field-description">
+           @hibernate.id
+            generator-class="native"
+            type="java.lang.Byte"
+            column="language_id"
+
+
+        </meta>
+        <generator class="native" />
+    </id>
+
+    <property
+        name="isoCode"
+        type="java.lang.String"
+        column="iso_code"
+        not-null="true"
+        unique="true"
+        length="2"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="iso_code"
+            unique="true"
+            length="2"
+            not-null="true"
+        </meta>    
+    </property>
+
+    <!-- Associations -->
+  
+
+</class>
+</hibernate-mapping>
