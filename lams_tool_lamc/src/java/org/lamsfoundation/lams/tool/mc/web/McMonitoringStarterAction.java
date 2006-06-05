@@ -261,6 +261,15 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 		}
 		logger.debug("final IS_MONITORED_CONTENT_IN_USE: " + request.getSession().getAttribute(IS_MONITORED_CONTENT_IN_USE));
 		
+    	/*get existing feedback maps*/
+    	mapIncorrectFeedback = AuthoringUtil.rebuildIncorrectFeedbackMapfromDB(request,toolContentId);
+    	logger.debug("existing mapIncorrectFeedback:" + mapIncorrectFeedback);
+    	request.getSession().setAttribute(MAP_INCORRECT_FEEDBACK, mapIncorrectFeedback);
+    	
+    	mapCorrectFeedback = AuthoringUtil.rebuildCorrectFeedbackMapfromDB(request, toolContentId);
+    	logger.debug("existing mapCorrectFeedback:" + mapCorrectFeedback);
+    	request.getSession().setAttribute(MAP_CORRECT_FEEDBACK, mapCorrectFeedback);
+		
 	    return (mapping.findForward(LOAD_MONITORING_CONTENT));	
 	}
 

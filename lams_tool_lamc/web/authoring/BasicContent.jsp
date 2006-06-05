@@ -31,7 +31,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
-
 				<c:if test="${sessionScope.activeModule != 'defineLater'}"> 			
 					<h2><font size=2> <bean:message key="label.authoring.mc.basic"/> </font> </h2>	
 				</c:if> 				
@@ -121,21 +120,22 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								  	</td>
 	
 								  	<td NOWRAP bgcolor="#EEEEEE" class="input"  align=center valign=top>			
-								 		<c:if test="${sessionScope.queIndex == 1}"> 		
-			   								 <font size=2>  <img src="<c:out value="${tool}"/>images/down.gif" align=left onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','moveQuestionDown');"> </font>
-		   								</c:if> 			
-		   								
-		
-						  				<c:if test="${sessionScope.maxQuestionIndex == sessionScope.queIndex}"> 			
-		     								 <font size=2> <img src="<c:out value="${tool}"/>images/up.gif" align=left onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','moveQuestionUp');"> </font>
-		     							</c:if> 	    
-										
-		 				  				<c:if test="${(sessionScope.maxQuestionIndex != sessionScope.queIndex) && (sessionScope.queIndex != 1)}"> 			
-			 				  				<font size=2>
-			   								    <img src="<c:out value="${tool}"/>images/down.gif" align=left onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','moveQuestionDown');">		  	   								 
-			       								<img src="<c:out value="${tool}"/>images/up.gif" align=left onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','moveQuestionUp');">		  	
-			       							</font>
-										</c:if> 	           								 
+									  	<font size=2>
+									 		<c:if test="${sessionScope.queIndex == 1}"> 		
+				   								 <font size=2>  <img src="<c:out value="${tool}"/>images/down.gif" align=left onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','moveQuestionDown');"> </font>
+			   								</c:if> 			
+			   								
+							  				<c:if test="${(sessionScope.maxQuestionIndex == sessionScope.queIndex) && (sessionScope.queIndex != 1)}"> 			
+			     								 <font size=2> <img src="<c:out value="${tool}"/>images/up.gif" align=left onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','moveQuestionUp');"> </font>
+			     							</c:if> 	    
+											
+			 				  				<c:if test="${(sessionScope.maxQuestionIndex != sessionScope.queIndex) && (sessionScope.queIndex != 1)}"> 			
+				 				  				<font size=2>
+				   								    <img src="<c:out value="${tool}"/>images/down.gif" align=left onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','moveQuestionDown');">		  	   								 
+				       								<img src="<c:out value="${tool}"/>images/up.gif" align=left onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','moveQuestionUp');">		  	
+				       							</font>
+											</c:if>
+										</font>										 	           								 
 	                                </td>
 	
 	                                    <td NOWRAP bgcolor="#EEEEEE" class="input" align=left valign=top>										  	
@@ -176,7 +176,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			   								    <img src="<c:out value="${tool}"/>images/down.gif" align=left onclick="javascript:alert('This button is disabled in this [view-only] mode.');" >
 			   								</c:if> 			
 			
-							  				<c:if test="${sessionScope.maxQuestionIndex == sessionScope.queIndex}"> 			
+							  				<c:if test="${(sessionScope.maxQuestionIndex == sessionScope.queIndex) && (sessionScope.queIndex != 1)}"> 										  				
 			     								 <img src="<c:out value="${tool}"/>images/up.gif" align=left onclick="javascript:alert('This button is disabled in this [view-only] mode.');" >
 			     							</c:if> 	    
 											

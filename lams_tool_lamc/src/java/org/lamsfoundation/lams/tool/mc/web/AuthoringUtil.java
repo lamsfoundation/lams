@@ -462,27 +462,31 @@ public class AuthoringUtil implements McAppConstants {
     	String shiftableWeightEntry = getRequiredWeightEntry(mapWeights, new Integer(shiftableIndex).toString());
     	logger.debug("shiftableWeightEntry: " +  shiftableWeightEntry);
     	
-    	if (movableWeightEntry != null)
-    	{
-    		mapTempWeights.put(new Integer(shiftableIndex).toString(), movableWeightEntry);
-    		logger.debug("mapTempWeights has been updated with movableWeightEntry");
-    	}
-    	else
-    	{
-    		mapTempWeights.put(new Integer(shiftableIndex).toString(), "");
-    		logger.debug("mapTempWeights has been updated with a empty string");
-    	}
     	
-    	
-    	if (shiftableWeightEntry != null)
+    	if ((movableWeightEntry != null) && (shiftableWeightEntry != null))
     	{
-    		mapTempWeights.put(questionIndex,shiftableWeightEntry);
-    		logger.debug("mapTempWeights has been updated with shiftableWeightEntry");
-    	}
-    	else
-    	{
-    		mapTempWeights.put(questionIndex, "");
-    		logger.debug("mapTempWeights has been updated with empty string");
+        	if (movableWeightEntry != null)
+        	{
+        		mapTempWeights.put(new Integer(shiftableIndex).toString(), movableWeightEntry);
+        		logger.debug("mapTempWeights has been updated with movableWeightEntry");
+        	}
+        	else
+        	{
+        		mapTempWeights.put(new Integer(shiftableIndex).toString(), "");
+        		logger.debug("mapTempWeights has been updated with a empty string");
+        	}
+        	
+        	
+        	if (shiftableWeightEntry != null)
+        	{
+        		mapTempWeights.put(questionIndex,shiftableWeightEntry);
+        		logger.debug("mapTempWeights has been updated with shiftableWeightEntry");
+        	}
+        	else
+        	{
+        		mapTempWeights.put(questionIndex, "");
+        		logger.debug("mapTempWeights has been updated with empty string");
+        	}
     	}
 		 
     	logger.debug("final shifted mapTempWeights: " +  mapTempWeights);
@@ -500,6 +504,7 @@ public class AuthoringUtil implements McAppConstants {
      */
     public static Map shiftFeedbackMap(Map map, String questionIndex , String direction)
     {
+        logger.debug("doing shiftFeedbackMap: ");
     	/* map to be returned */
     	Map mapTemp= new TreeMap(new McComparator());
     	mapTemp= map;
@@ -522,23 +527,26 @@ public class AuthoringUtil implements McAppConstants {
     	String shiftableEntry = getRequiredFeedbackEntry(map, new Integer(shiftableIndex).toString());
     	logger.debug("shiftableEntry: " +  shiftableEntry);
     	
-    	if (movableEntry != null)
+    	if ((movableEntry != null) && (shiftableEntry != null))
     	{
-    		mapTemp.put(new Integer(shiftableIndex).toString(), movableEntry);
-    	}
-    	else
-    	{
-    		mapTemp.put(new Integer(shiftableIndex).toString(), "");
-    	}
-    	
-    	
-    	if (shiftableEntry != null)
-    	{
-    		mapTemp.put(questionIndex,shiftableEntry);
-    	}
-    	else
-    	{
-    		mapTemp.put(questionIndex, "");
+        	if (movableEntry != null)
+        	{
+        		mapTemp.put(new Integer(shiftableIndex).toString(), movableEntry);
+        	}
+        	else
+        	{
+        		mapTemp.put(new Integer(shiftableIndex).toString(), "");
+        	}
+        	
+        	
+        	if (shiftableEntry != null)
+        	{
+        		mapTemp.put(questionIndex,shiftableEntry);
+        	}
+        	else
+        	{
+        		mapTemp.put(questionIndex, "");
+        	}
     	}
 		 
     	logger.debug("final shifted mapTemp: " +  mapTemp);
@@ -580,6 +588,7 @@ public class AuthoringUtil implements McAppConstants {
     		
     	Map  mapShiftableOptionsEntry = getRequiredOptionsEntry(mapGlobalOptionsContent, new Integer(shiftableIndex).toString());
     	logger.debug("mapShiftableOptionsEntry: " +  mapShiftableOptionsEntry);
+    	
     	
     	if (mapMovableOptionsEntry != null)
     	{
@@ -1085,30 +1094,33 @@ public class AuthoringUtil implements McAppConstants {
 		McContent mcContent=mcService.retrieveMc(toolContentId);
 		logger.debug("mcContent:" + mcContent);
 		
-    	List list=mcService.refreshQuestionContent(mcContent.getUid());
-		logger.debug("refreshed list:" + list);
-		
-		Iterator listIterator=list.iterator();
-    	Long mapIndex=new Long(1);
-    	while (listIterator.hasNext())
-    	{
-    		McQueContent mcQueContent=(McQueContent)listIterator.next();
-    		logger.debug("mcQueContent:" + mcQueContent);
+		if (mcContent != null)
+		{
+	    	List list=mcService.refreshQuestionContent(mcContent.getUid());
+			logger.debug("refreshed list:" + list);
+			
+			Iterator listIterator=list.iterator();
+	    	Long mapIndex=new Long(1);
+	    	while (listIterator.hasNext())
+	    	{
+	    		McQueContent mcQueContent=(McQueContent)listIterator.next();
+	    		logger.debug("mcQueContent:" + mcQueContent);
 
-    		if (mcQueContent != null)
-    		{
-    		    String incorrectFeedback=mcQueContent.getFeedbackIncorrect();
-    		    if (incorrectFeedback != null)
-    		    {
-    		        map.put(mapIndex.toString(),incorrectFeedback.toString());
-    		    }
-    		    else
-    		    {
-    		        map.put(mapIndex.toString(),"");    
-    		    }
-    		    mapIndex=new Long(mapIndex.longValue()+1);    		    
-    		}
-    	}
+	    		if (mcQueContent != null)
+	    		{
+	    		    String incorrectFeedback=mcQueContent.getFeedbackIncorrect();
+	    		    if (incorrectFeedback != null)
+	    		    {
+	    		        map.put(mapIndex.toString(),incorrectFeedback.toString());
+	    		    }
+	    		    else
+	    		    {
+	    		        map.put(mapIndex.toString(),"");    
+	    		    }
+	    		    mapIndex=new Long(mapIndex.longValue()+1);    		    
+	    		}
+	    	}
+		}
     	
     	logger.debug("refreshed Map:" + map);
     	return map;
@@ -1125,32 +1137,35 @@ public class AuthoringUtil implements McAppConstants {
 		McContent mcContent=mcService.retrieveMc(toolContentId);
 		logger.debug("mcContent:" + mcContent);
 		
-    	List list=mcService.refreshQuestionContent(mcContent.getUid());
-		logger.debug("refreshed list:" + list);
-		
-		Iterator listIterator=list.iterator();
-    	Long mapIndex=new Long(1);
-    	while (listIterator.hasNext())
-    	{
-    		McQueContent mcQueContent=(McQueContent)listIterator.next();
-    		logger.debug("mcQueContent:" + mcQueContent);
-    		
-    		if (mcQueContent != null)
-    		{
-    		    String correctFeedback=mcQueContent.getFeedbackCorrect();
-    		    logger.debug("correctFeedback:" + correctFeedback);
-    		    
-    		    if (correctFeedback != null)
-    		    {
-    		        map.put(mapIndex.toString(),correctFeedback.toString());
-    		    }
-    		    else
-    		    {
-    		        map.put(mapIndex.toString(),"");    
-    		    }
-    		}
-    		mapIndex=new Long(mapIndex.longValue()+1);
-    	}
+		if (mcContent != null)
+		{
+	    	List list=mcService.refreshQuestionContent(mcContent.getUid());
+			logger.debug("refreshed list:" + list);
+			
+			Iterator listIterator=list.iterator();
+	    	Long mapIndex=new Long(1);
+	    	while (listIterator.hasNext())
+	    	{
+	    		McQueContent mcQueContent=(McQueContent)listIterator.next();
+	    		logger.debug("mcQueContent:" + mcQueContent);
+	    		
+	    		if (mcQueContent != null)
+	    		{
+	    		    String correctFeedback=mcQueContent.getFeedbackCorrect();
+	    		    logger.debug("correctFeedback:" + correctFeedback);
+	    		    
+	    		    if (correctFeedback != null)
+	    		    {
+	    		        map.put(mapIndex.toString(),correctFeedback.toString());
+	    		    }
+	    		    else
+	    		    {
+	    		        map.put(mapIndex.toString(),"");    
+	    		    }
+	    		}
+	    		mapIndex=new Long(mapIndex.longValue()+1);
+	    	}
+		}
     	
     	logger.debug("refreshed Map:" + map);
     	return map;

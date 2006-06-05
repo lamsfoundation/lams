@@ -343,6 +343,8 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 
 		logger.debug("Title is: " + mcContent.getTitle());
 		logger.debug("Instructions is: " + mcContent.getInstructions());
+		logger.debug("setting passmark to: " + mcContent.getPassMark());
+		mcMonitoringForm.setPassmark(mcContent.getPassMark().toString());
 		
 		logger.debug("fwd ing to : " + LOAD_MONITORING_CONTENT);
 		return (mapping.findForward(LOAD_MONITORING_CONTENT));

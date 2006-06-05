@@ -510,31 +510,68 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     	logger.debug("set SELECTED_QUESTION_INDEX to:" + questionIndex);
     	
     	/*presenting incorrect feedback data*/
-    	Map mapIncorrectFeedback=(Map)request.getSession().getAttribute(MAP_INCORRECT_FEEDBACK);
-    	logger.debug("mapIncorrectFeedback:" + mapIncorrectFeedback);
-    	String incorrectFeedback="";
-    	if (mapIncorrectFeedback.size() > 0)
-    	{
-    		logger.debug("mapIncorrectFeedback size  > 0");
-        	incorrectFeedback=(String)mapIncorrectFeedback.get(questionIndex);
-    	}
-    	logger.debug("incorrectFeedback:" + incorrectFeedback);
-    	request.getSession().setAttribute(RICHTEXT_INCORRECT_FEEDBACK,incorrectFeedback);
- 	
-
-    	/*presenting correct feedback data*/
-    	Map mapCorrectFeedback=(Map)request.getSession().getAttribute(MAP_CORRECT_FEEDBACK);
-    	logger.debug("mapCorrectFeedback:" + mapCorrectFeedback);
-    	String correctFeedback="";
-    	if (mapCorrectFeedback.size() > 0)
-    	{
-    		logger.debug("mapCorrectFeedback size  > 0");
-    		correctFeedback=(String)mapCorrectFeedback.get(questionIndex);
-    	}
-    	logger.debug("correctFeedback:" + correctFeedback);
-    	request.getSession().setAttribute(RICHTEXT_CORRECT_FEEDBACK,correctFeedback);
-
+    	//Map mapIncorrectFeedback=(Map)request.getSession().getAttribute(MAP_INCORRECT_FEEDBACK);
+    	//logger.debug("mapIncorrectFeedback:" + mapIncorrectFeedback);
     	
+    	/*get existing feedback maps*/
+    	
+    	Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
+    	logger.debug("toolContentId:" + toolContentId);
+    	
+		McContent mcContent=mcService.retrieveMc(toolContentId);
+		logger.debug("mcContent:" + mcContent);
+
+		Map mapIncorrectFeedback=new TreeMap(new McComparator());
+		Map mapCorrectFeedback=new TreeMap(new McComparator());
+		 
+		//if (mcContent == null)
+		//{
+	    	logger.debug("getting feedback maps from cache:");
+	    	mapIncorrectFeedback=(Map)request.getSession().getAttribute(MAP_INCORRECT_FEEDBACK);
+	    	logger.debug("mapIncorrectFeedback:" + mapIncorrectFeedback);
+	    	mapCorrectFeedback=(Map)request.getSession().getAttribute(MAP_CORRECT_FEEDBACK);
+	    	logger.debug("mapCorrectFeedback:" + mapCorrectFeedback);
+		//}
+		/*
+		else
+		{
+		    logger.debug("getting feedback maps from db:");
+	    	mapIncorrectFeedback = AuthoringUtil.rebuildIncorrectFeedbackMapfromDB(request, toolContentId);
+	    	logger.debug("existing mapIncorrectFeedback:" + mapIncorrectFeedback);
+	    	request.getSession().setAttribute(MAP_INCORRECT_FEEDBACK, mapIncorrectFeedback);
+
+	    	mapCorrectFeedback = AuthoringUtil.rebuildCorrectFeedbackMapfromDB(request, toolContentId);
+	    	logger.debug("existing mapCorrectFeedback:" + mapCorrectFeedback);
+	    	request.getSession().setAttribute(MAP_CORRECT_FEEDBACK, mapCorrectFeedback);
+		}
+		*/
+
+
+	    if (mapIncorrectFeedback != null)
+	    {
+	    	String incorrectFeedback="";
+	    	if (mapIncorrectFeedback.size() > 0)
+	    	{
+	    		logger.debug("mapIncorrectFeedback size  > 0");
+	        	incorrectFeedback=(String)mapIncorrectFeedback.get(questionIndex);
+	        	logger.debug("incorrectFeedback:" + incorrectFeedback);
+	        	request.getSession().setAttribute(RICHTEXT_INCORRECT_FEEDBACK,incorrectFeedback);
+	    	}
+	    }
+
+	    if (mapCorrectFeedback != null)
+	    {
+	    	String correctFeedback="";
+	    	if (mapCorrectFeedback.size() > 0)
+	    	{
+	    		logger.debug("mapCorrectFeedback size  > 0");
+	    		correctFeedback=(String)mapCorrectFeedback.get(questionIndex);
+	        	logger.debug("correctFeedback:" + correctFeedback);
+	        	request.getSession().setAttribute(RICHTEXT_CORRECT_FEEDBACK,correctFeedback);
+	    	}
+	    }
+
+		    
     	String editableQuestionEntry=(String)mapQuestionsContent.get(questionIndex);
     	logger.debug("editableQuestionEntry:" + editableQuestionEntry);
     	request.getSession().setAttribute(SELECTED_QUESTION, editableQuestionEntry);
@@ -582,9 +619,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     	request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
      	request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);
     	    	
-    	Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
-    	logger.debug("toolContentId:" + toolContentId);
-    	
     	String selectedQuestionIndex=(String) request.getSession().getAttribute(SELECTED_QUESTION_INDEX);
 		logger.debug("SELECTED_QUESTION_INDEX to:" + selectedQuestionIndex);
 		
@@ -650,7 +684,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     	}
     	else
     	{
-    		McContent mcContent=mcService.retrieveMc(toolContentId);
+    		mcContent=mcService.retrieveMc(toolContentId);
         	logger.debug("mcContent:" + mcContent);
         	
         	McQueContent mcQueContent=null;
