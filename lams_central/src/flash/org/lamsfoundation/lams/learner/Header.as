@@ -82,22 +82,13 @@ class Header extends MovieClip {
 		resume_btn.onRelease = function(){
 			trace('on releasing resuming button..');
 			var app:Application = Application.getInstance();
-			var seq:Sequence;
-			if((seq = app.getLibrary().getSelectedSequence()) != null){
-				app.getLibrary().joinSequence(seq);
-			}
+			app.getLesson().joinLesson();
 		}
 		
 		exit_btn.onRelease = function(){
 			trace('on releasing exit button..');
 			var app:Application = Application.getInstance();
-			var seq:Sequence;
-			if((seq = app.getLibrary().getSelectedSequence()) != null){
-				app.getLibrary().exitSequence(seq);
-				//if(!seq.isFinished()) {
-				//	app.getLibrary().getActiveSequences();
-				//}
-			}
+			app.getLesson().exitLesson();
 		}
 		
         dispatchEvent({type:'load',target:this});

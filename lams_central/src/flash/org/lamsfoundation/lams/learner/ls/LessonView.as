@@ -47,16 +47,10 @@ class LessonView extends AbstractView {
 	// Lesson clip
 	private var _lesson_mc:MovieClip;
 	
-	// Lesson labels
-	private var _lessonName:Label;
-	private var _lessonDescription:Label;
-	private var _lessonStateID:Label;
-	
-	
-	// Lesson buttons
-	private var select_btn:Button;
-	
 	private var bkg_pnl:MovieClip;
+	private var _lessonName:Label;
+	private var progress_scp:MovieClip;
+	
 	
 	//These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
@@ -97,13 +91,6 @@ class LessonView extends AbstractView {
 		//Add the button handlers, essentially this is handing on clicked event to controller.
         var controller = getController();
 		
-		select_btn.addEventListener("click",controller);
-		
-		select_btn.onPress = Proxy.create(this,this['select']);
-		select_btn.onRollOver = Proxy.create(this,this['rollOver']);
-		select_btn.onRollOut = Proxy.create(this,this['rollOut']);
-		
-		
         //Now that view is setup dispatch loaded event
        dispatchEvent({type:'load',target:this});
 	   
@@ -127,22 +114,18 @@ class LessonView extends AbstractView {
             case 'SIZE' :
                 setSize(lm);
                 break;
-			case 'NAME' :
-                setLessonName(lm);
-                break;
-			case 'DESCRIPTION' :
-				setLessonDescription(lm);
-				break;
-			case 'STATE' :
-				setLessonStateID(lm);
-				break;
 			case 'STATUS' :
-				setStatus(lm);
 				break;
-			case 'DESIGN' :
+			case 'LESSON' :
+				trace('setting lesson name');
+				_lessonName.text = lm.name;
 				break;
 			case 'DESIGNMODEL' :
 				trace('updating design model for lesson..');
+				break;
+			case 'PROGRESS' :
+				Debugger.log('progress data receieved for user..' + lm.progressData.getUserName(),Debugger.CRITICAL,'update','org.lamsfoundation.lams.LessonView');
+				
 				break;
             default :
                 Debugger.log('unknown update type :' + infoObj.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.LessonView');
@@ -159,7 +142,8 @@ class LessonView extends AbstractView {
         
 		//Size panel
 		trace('lesson view  setting width to '+s.w);
-		bkg_pnl.setSize(s.w,bkg_pnl._width);
+		bkg_pnl.setSize(s.w,s.h);
+		progress_scp.setSize(s.w, s.h-progress_scp._y)
 	}
 	
     /**
@@ -171,61 +155,13 @@ class LessonView extends AbstractView {
         this._x = p.x;
         this._y = p.y;
 	}
-	
-	private function setLessonName(lm:LessonModel):Void {
-		var name:String = lm.getLessonName();
-		this._lessonName.text = name;
-	}
-	
-	private function setLessonDescription(lm:LessonModel):Void {
-		var desc:String = lm.getLessonDescription();
-		this._lessonDescription.text = desc;
-	}
-	
-	private function setLessonStateID(lm:LessonModel):Void {
-		var state:Number = lm.getLessonStateID();
-		this._lessonStateID.text = "State ID: " + String(state);
-	}
-	
-	private function setStatus(lm:LessonModel):Void {
-		var status:Boolean = lm.getStatus();
-		trace('inside setStatus method of View');
-		// do stuff based on status value
-		if(status) {
-			trace('joined lesson... lesson is active');
-			// show active
-		} else {
-			// show inactive
-			trace('exited lesson... lesson is inactive');
-		}
-	}
-	
-	private function select():Void{
-		var l:Lesson = this.getModel().getLesson();
-		var libraryController = l.getLibrary().getController();
-		libraryController.selectLesson(this);			
-	}
-	
-	private function rollOver():Void{
-		// mouse over style
-		//join_btn.setStyle("backgroundColor",0xFFFFFF);
-		//join_btn.setStyle("borderStyle","outset");
-	}
-	
-	private function rollOut():Void{
-		// original style
-		//join_btn.setStyle("styleName",_styleName);
-	}
-	 
-	
+
 	/**
     * Set the styles for the Lesson
     */
     private function setStyles() {
 		// no styles to set 
 	}
-	
-	
 	
 	/**
 	* Gets the LessonModel

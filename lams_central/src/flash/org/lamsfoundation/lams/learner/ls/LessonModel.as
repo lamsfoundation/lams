@@ -24,6 +24,7 @@
 import org.lamsfoundation.lams.common.util.Observable;
 import org.lamsfoundation.lams.learner.ls.*;
 import org.lamsfoundation.lams.common.util.*;
+import org.lamsfoundation.lams.common.Progress;
 import org.lamsfoundation.lams.authoring.DesignDataModel;
 
 
@@ -56,6 +57,8 @@ class LessonModel extends Observable {
 	/* the learningDesignModel gets set when you join a lesson */
 	private var _learningDesignModel:DesignDataModel;
 	
+	private var _progressData:Progress;
+	
 	private var _active:Boolean;
 	
 	
@@ -66,6 +69,7 @@ class LessonModel extends Observable {
 		_lesson = lesson;
 		_active = false;
 		_learningDesignModel = null;
+		_progressData = null;
 	}
 	
 	public function populateFromDTO(dto:Object){
@@ -75,6 +79,14 @@ class LessonModel extends Observable {
 		_lessonDescription = dto.lessonDescription;
 		_lessonStateID = dto.lessonStateID;
 		_learningDesignID = dto.learningDesignID;
+		
+		
+		setChanged();
+		
+		// send update
+		infoObj = {};
+		infoObj.updateType = "LESSON";
+		notifyObservers(infoObj);
 	}
 	
 	
@@ -95,6 +107,10 @@ class LessonModel extends Observable {
 	 */
 	
 	public function getLessonID():Number {
+		return _lessonID;
+	}
+	
+	public function get ID():Number{
 		return _lessonID;
 	}
     
@@ -125,6 +141,10 @@ class LessonModel extends Observable {
 		return _lessonName;
 	}
 	
+	public function get name():String{
+		return _lessonName;
+	}
+	
 	/**
 	 * Set the lesson's description
 	 *
@@ -151,6 +171,10 @@ class LessonModel extends Observable {
 		return _lessonDescription;
 	}
 	
+	public function get description():String{
+		return _lessonDescription;
+	}
+	
 	public function setLessonStateID(lessonStateID:Number) {
 		_lessonStateID = lessonStateID;
 		
@@ -163,6 +187,10 @@ class LessonModel extends Observable {
 	}
 	
 	public function getLessonStateID():Number {
+		return _lessonStateID;
+	}
+	
+	public function get stateID():Number{
 		return _lessonStateID;
 	}
 	
@@ -181,6 +209,10 @@ class LessonModel extends Observable {
 		return _learningDesignID;
 	}
 	
+	public function get learningDesignID():Number{
+		return _learningDesignID;
+	}
+	
 	public function setLearningDesignModel(learningDesignModel:DesignDataModel){
 		_learningDesignModel = learningDesignModel;
 		
@@ -194,6 +226,29 @@ class LessonModel extends Observable {
 	
 	public function getLearningDesignModel():DesignDataModel{
 		return _learningDesignModel;
+	}
+	
+	public function get learningDesignModel():DesignDataModel{
+		return _learningDesignModel;
+	}
+	
+	public function setProgressData(progressData:Progress){
+		_progressData = progressData;
+		
+		setChanged();
+		
+		// send update
+		infoObj = {};
+		infoObj.updateType = "PROGRESS";
+		notifyObservers(infoObj);
+	}
+	
+	public function getProgressData():Progress{
+		return _progressData;
+	}
+	
+	public function get progressData():Progress{
+		return _progressData;
 	}
 	
 	public function setActive() {

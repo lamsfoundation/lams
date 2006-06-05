@@ -25,6 +25,7 @@ import org.lamsfoundation.lams.learner.*;
 import org.lamsfoundation.lams.learner.ls.*;
 import org.lamsfoundation.lams.learner.lb.*;
 import org.lamsfoundation.lams.common.util.*;
+import org.lamsfoundation.lams.common.Progress;
 import org.lamsfoundation.lams.authoring.DesignDataModel;
 
 import mx.managers.*;
@@ -55,7 +56,7 @@ class Lesson {
 	*
 	* @param   target_mc	Target clip for attaching view
 	*/
-	function Lesson(target_mc:MovieClip,x:Number,y:Number,libraryView:LibraryView){
+	function Lesson(target_mc:MovieClip,x:Number,y:Number){
 		mx.events.EventDispatcher.initialize(this);
         
 		//Create the model
@@ -74,7 +75,6 @@ class Lesson {
         //Set the position by setting the model which will call update on the view
         lessonModel.setPosition(x,y);
 		
-		_libraryView = LibraryView(libraryView);
 	}
 	
 	/**
@@ -98,18 +98,29 @@ class Lesson {
         }
     }
      
-	
+	public function getLesson():Boolean {
+		var callback:Function = Proxy.create(this,storeLessonData);
+		
+		// call action
+		var lessonId:Number = _root.lessonID;
+		//var userId:Number = Application.getInstance().getUserID();
+
+		// do request
+		Application.getInstance().getComms().getRequest('learning/learner.do?method=getLesson&lessonID='+String(lessonId), callback, false);
+			
+		return true;
+	}
 	 
 	public function joinLesson():Boolean {
 		
 		var callback:Function = Proxy.create(this,startLesson);
 		
 		// call action
-		var lessonId:Number = lessonModel.getLessonID();
+		var lessonId:Number = lessonModel.ID;
 		//var userId:Number = Application.getInstance().getUserID();
 
 		// do request
-		Application.getInstance().getComms().getRequest('learning/learner.do?method=joinLesson&userID='+_root.userID+'&lessonID='+String(lessonId), callback, false);
+		Application.getInstance().getComms().getRequest('learning/learner.do?method=joinLesson&lessonId='+String(lessonId), callback, false);
 			
 		// get Learning Design for lesson
 		openLearningDesign();
@@ -121,25 +132,44 @@ class Lesson {
 		var callback:Function = Proxy.create(this,closeLesson);
 		
 		// call action
-		var lessonId:Number = lessonModel.getLessonID();
+		var lessonId:Number = lessonModel.ID;
 		
 		// do request
-		Application.getInstance().getComms().getRequest('learning/learner.do?method=exitLesson&lessonID='+String(lessonId), callback, false);
+		Application.getInstance().getComms().getRequest('learning/learner.do?method=exitLesson&lessonId='+String(lessonId), callback, false);
 		
 		return true;
+	}
+	
+	private function storeLessonData(dto:Object){
+		lessonModel.populateFromDTO(dto);
+		joinLesson();
 	}
 	
 	private function startLesson(pkt:Object){
 		trace('received message back from server aftering joining lesson...');
 		
 		// check was successful join
+		getFlashProgress();
 		
 		// set lesson as active
 		lessonModel.setActive();
 		trace('pktobject value: '+String(pkt));
-		getURL('http://localhost:8080/lams/learning'+String(pkt)+'?progressId='+lessonModel.getLessonID(),'_blank');
+		getURL('http://localhost:8080/lams/learning'+String(pkt)+'?progressId='+lessonModel.getLessonID(),'contentFrame');
 		
 	}  
+	
+	private function getFlashProgress():Void{
+		var callback:Function = Proxy.create(this,saveProgressData);
+		var lessonId:Number = lessonModel.ID;
+		Application.getInstance().getComms().getRequest('learning/learner.do?method=getFlashProgressData&progressId='+String(lessonId), callback, false);
+	}
+	
+	private function saveProgressData(progressDTO:Object):Void{
+		var p:Progress = new Progress();
+		p.populateFromDTO(progressDTO);
+		lessonModel.setProgressData(p);
+		Debugger.log('progress data receieved for user..' + progressDTO,Debugger.CRITICAL,'saveProgressData','org.lamsfoundation.lams.Lesson');
+	}
 	
 	private function closeLesson(pkt:Object){
 		trace('receiving message back from server...');
@@ -152,7 +182,7 @@ class Lesson {
 	
 	private function openLearningDesign(){
 		trace('opening learning design...');
-		var designId:Number = lessonModel.getLearningDesignID();
+		var designId:Number = lessonModel.learningDesignID;
 
         var callback:Function = Proxy.create(this,saveDataDesignModel);
            
@@ -169,10 +199,11 @@ class Lesson {
 		lessonModel.setLearningDesignModel(model);
 		
 		// activite Progress movie
+		
 	}
 	
 	public function getLessonID():Number {
-		return lessonModel.getLessonID();
+		return lessonModel.ID;
 	}
 	
 	public function checkState(stateID:Number):Boolean {
@@ -197,10 +228,6 @@ class Lesson {
         //TODO DI 24/05/05 write validation on limits
         lessonModel.setPosition(x,y);
     }
-	
-	public function getLibrary():LibraryView {
-		return _libraryView;
-	}
 
 	//Dimension accessor methods
 	public function get width():Number{

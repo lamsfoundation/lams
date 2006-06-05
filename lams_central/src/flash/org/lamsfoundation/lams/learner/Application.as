@@ -27,7 +27,6 @@ import org.lamsfoundation.lams.common.ui.*;		// ui
 import org.lamsfoundation.lams.common.*;
 import org.lamsfoundation.lams.learner.Header;
 import org.lamsfoundation.lams.learner.ls.*;
-import org.lamsfoundation.lams.learner.lb.*;
 import mx.managers.*
 import mx.utils.*
 /**
@@ -38,18 +37,21 @@ class org.lamsfoundation.lams.learner.Application extends ApplicationParent {
 	
 	// private constants
 	//private var _comms:Communication;
-	private var _seqLib:Library;
+	private var _lesson:Lesson;
 	private var _header_mc:MovieClip;
 	
 	
+	private static var SHOW_DEBUGGER:Boolean = false;
 	private static var MODULE:String = "learner";
+	
+    private static var QUESTION_MARK_KEY:Number = 191;
 	
 	//private var _appRoot_mc:MovieClip;                 //Application root clip
     
 	private static var HEADER_X:Number = -1;
 	private static var HEADER_Y:Number = -13.5;
-	private static var LIBRARY_X:Number = 0;
-	private static var LIBRARY_Y:Number = 40;
+	private static var LESSON_X:Number = 0;
+	private static var LESSON_Y:Number = 40;
     
 	
     private static var APP_ROOT_DEPTH:Number = 10; //depth of the application root
@@ -63,15 +65,16 @@ class org.lamsfoundation.lams.learner.Application extends ApplicationParent {
 	private var _uiLoadCheckCount = 0;				// instance counter for number of times we have checked to see if theme and dict are loaded
 	private var _UILoadCheckIntervalID:Number;         //Interval ID for periodic check on UILoad status
     private var _UILoaded:Boolean;                     //UI Loading status
-    private var _seqLibLoaded:Boolean;                  //Seq Library loaded flag
-    //private var _seqLibEventDispatched:Boolean          //Seq Library loaded flag
-	private var _headerLoaded:Boolean;
-	//private var _headerEventDispatched:Boolean;
+    private var _lessonLoaded:Boolean;                  //Lesson loaded flag
+  	private var _headerLoaded:Boolean;
+
     
 	
 	//Application instance is stored as a static in the application class
     private static var _instance:Application = null;     
 	private var _container_mc:MovieClip;               //Main container
+	
+    private var _debugDialog:MovieClip;                //Reference to the debug dialog
     
 	
 	
@@ -83,7 +86,7 @@ class org.lamsfoundation.lams.learner.Application extends ApplicationParent {
 		super(this);
 		
 		trace('Begin Application...');
-        _seqLibLoaded = false;
+        _lessonLoaded = false;
         //_seqLibEventDispatched = false;
 		_headerLoaded = false;
 		_module = Application.MODULE;
@@ -116,6 +119,9 @@ class org.lamsfoundation.lams.learner.Application extends ApplicationParent {
 		//Comms object - do this before any objects are created that require it for server communication
         //_comms = new Communication();
 		
+		
+		Key.addListener(this);
+		
 		setupUI();
 		checkUILoaded();
     }
@@ -131,9 +137,10 @@ class org.lamsfoundation.lams.learner.Application extends ApplicationParent {
         _header_mc = _container_mc.attachMovie('Header','_header_mc',HEADER_DEPTH, {_x:HEADER_X,_y:HEADER_Y});
 	    _header_mc.addEventListener('load',Proxy.create(this,UIElementLoaded));
 
-		_seqLib = new Library(_appRoot_mc,LIBRARY_X,LIBRARY_Y);
-        _seqLib.addEventListener('load',Proxy.create(this,UIElementLoaded));
+		_lesson = new Lesson(_appRoot_mc,LESSON_X,LESSON_Y);
+        _lesson.addEventListener('load',Proxy.create(this,UIElementLoaded));
 		//_seqLib.addEventListener('init', Proxy.create(this,reload));
+		
 	}
 	
 	/**
@@ -174,9 +181,9 @@ class org.lamsfoundation.lams.learner.Application extends ApplicationParent {
         if(evt.type=='load'){
             //Which item has loaded
             switch (evt.target.className) {
-                case 'Library' :
-					trace('Library loaded...');
-                    _seqLibLoaded = true;
+                case 'Lesson' :
+					trace('Lesson loaded...');
+                    _lessonLoaded = true;
                     break;
 				case 'Header' :
 					trace('Header loaded...');
@@ -186,7 +193,7 @@ class org.lamsfoundation.lams.learner.Application extends ApplicationParent {
             }
             
             //If all of them are loaded set UILoad accordingly
-            if(_seqLibLoaded && _headerLoaded){
+            if(_lessonLoaded && _headerLoaded){
                 _UILoaded=true;                
             } 
             
@@ -203,12 +210,13 @@ class org.lamsfoundation.lams.learner.Application extends ApplicationParent {
         //Fire off a resize to set up sizes
         onResize();
 		
-		// start testing - joining a lesson/seq
-		var seqId:Number = 1;
-		var s:Sequence = Sequence(_seqLib.getSequence(seqId));
-		//_seqLib.select(s);
-		// end testing
-    }
+		if(SHOW_DEBUGGER){
+			showDebugger();
+		}
+		
+		// load lesson
+		_lesson.getLesson();
+	}
     
 	/**
     * Receives events from the Stage resizing
@@ -221,19 +229,14 @@ class org.lamsfoundation.lams.learner.Application extends ApplicationParent {
 		
 		var someListener:Object = new Object();
 		someListener.onMouseUp = function () {
-			_seqLib.setSize(w,h);
+			_lesson.setSize(w,h);
 		}
 		
-		_seqLib.setSize(w,h);
+		_lesson.setSize(w,h);
 		
 	}
      
 	// onKey*** methods - TODO
-	
-	
-	public function getLibrary():Library {
-		return _seqLib;
-	}
 	
 	/**
     * Returns the Application root, use as _root would be used
@@ -253,9 +256,34 @@ class org.lamsfoundation.lams.learner.Application extends ApplicationParent {
         }
     }
 	
-	public function getUserID():Number {
-		// return mmm - test user
-		return 4;
+	public function getLesson():Lesson{
+		return _lesson;
+	}
+	
+	public function showDebugger():Void{
+		_debugDialog = PopUpManager.createPopUp(Application.root, LFWindow, false,{title:'Debug',closeButton:true,scrollContentPath:'debugDialog'});
+	}
+	
+	public function hideDebugger():Void{
+		_debugDialog.deletePopUp();
+	}
+	
+	/**
+    * Handles KEY presses for Application
+    */
+    private function onKeyDown(){
+		
+		//var mouseListener:Object = new Object();
+        //Debugger.log('Key.isDown(Key.CONTROL): ' + Key.isDown(Key.CONTROL),Debugger.GEN,'onKeyDown','Application');
+        //Debugger.log('Key: ' + Key.getCode(),Debugger.GEN,'onKeyDown','Application');
+		//the debug window:
+        if (Key.isDown(Key.CONTROL) && Key.isDown(Key.ALT) && Key.isDown(QUESTION_MARK_KEY)) {
+            if (!_debugDialog.content){
+                showDebugger();
+            }else {
+               hideDebugger();
+            }               
+        }
 	}
 	
 	/**
