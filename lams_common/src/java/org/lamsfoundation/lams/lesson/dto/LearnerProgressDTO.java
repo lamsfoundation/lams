@@ -36,6 +36,8 @@ public class LearnerProgressDTO
     private Long lessonId;
     private String lessonName;
     private String userName;
+    private String lastName;
+    private String firstName;
     private Integer learnerId;
     private Long currentActivityId;
     private Long [] attemptedActivities;
@@ -47,6 +49,8 @@ public class LearnerProgressDTO
     public LearnerProgressDTO(Long lessonId,
                               String lessonName,
                               String userName,
+                              String lastName,
+                              String firstName,
                               Integer learnerId,
                               Long currentActivityId,
                               Long[] attemptedActivities,
@@ -55,6 +59,8 @@ public class LearnerProgressDTO
         this.lessonId = lessonId;
         this.lessonName = lessonName;
         this.userName = userName;
+        this.lastName = lastName;
+        this.firstName = firstName;
         this.learnerId = learnerId;
         this.currentActivityId = currentActivityId;
         this.attemptedActivities = attemptedActivities;
@@ -111,5 +117,22 @@ public class LearnerProgressDTO
     public Long getCurrentActivityId()
     {
         return currentActivityId;
-    }    
+    }
+
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public String getLastName() {
+		return lastName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}    
+    
 }

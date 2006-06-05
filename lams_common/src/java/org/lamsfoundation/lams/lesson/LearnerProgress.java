@@ -432,6 +432,8 @@ public class LearnerProgress implements Serializable
         return new LearnerProgressDTO(this.lesson.getLessonId(),
                                       this.lesson.getLessonName(),
                                       this.user.getLogin(),
+                                      this.user.getLastName(),
+                                      this.user.getFirstName(),
                                       this.user.getUserId(),
                                       this.currentActivity.getActivityId(),
                                       this.createIdArrayFrom(this.attemptedActivities),
