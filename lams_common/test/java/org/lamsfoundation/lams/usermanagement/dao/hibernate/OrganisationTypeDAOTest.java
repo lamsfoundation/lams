@@ -56,7 +56,7 @@ public class OrganisationTypeDAOTest extends AbstractCommonTestCase{
 	
 	public void testSaveOrganisationType(){
 		organisationType = new OrganisationType("TEST","for test purpose only", null);
-		organisationTypeDAO.saveOrganisationType(organisationType);
+		organisationTypeDAO.insert(organisationType);
 		assertNotNull(organisationTypeDAO.getOrganisationTypeByName("TEST"));
 	}
 
@@ -75,7 +75,7 @@ public class OrganisationTypeDAOTest extends AbstractCommonTestCase{
 	public void testDeleteOrganisationType()
 	{
 		organisationType = organisationTypeDAO.getOrganisationTypeByName("TEST");
-		organisationTypeDAO.deleteOrganisationType(organisationType);
+		organisationTypeDAO.delete(organisationType);
 		assertNull(organisationTypeDAO.getOrganisationTypeByName("TEST"));
 	}
 

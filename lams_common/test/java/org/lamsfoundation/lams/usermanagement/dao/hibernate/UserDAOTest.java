@@ -84,22 +84,22 @@ public class UserDAOTest extends AbstractCommonTestCase {
 		user.setDisabledFlag(new Boolean(false));
 		user.setCreateDate(new Date());
 		user.setAuthenticationMethod(authenticationMethodDAO.getAuthenticationMethodById(new Integer(2)));
-		userDAO.saveUser(user);
+		userDAO.insert(user);
 		createUserOrganisation(user);
 	}
 	private Integer createUserOrganisation(User user){
 		UserOrganisation userOrganisation = new UserOrganisation();
 		userOrganisation.setUser(user);		
-		userOrganisationDAO.saveUserOrganisation(userOrganisation);	
+		userOrganisationDAO.insert(userOrganisation);	
 		userOrganisation.addUserOrganisationRole(createUserOrganisationRole(userOrganisation));
-		userOrganisationDAO.saveOrUpdateUserOrganisation(userOrganisation);
+		userOrganisationDAO.insertOrUpdate(userOrganisation);
 		return userOrganisation.getUserOrganisationId();
 	}
 	private UserOrganisationRole createUserOrganisationRole(UserOrganisation userOrganisation){
 		UserOrganisationRole userOrganisationRole = new UserOrganisationRole();
 		userOrganisationRole.setUserOrganisation(userOrganisation);
 		userOrganisationRole.setRole(roleDAO.getRoleByName(Role.STAFF));
-		userOrganisationRoleDAO.saveUserOrganisationRole(userOrganisationRole);
+		userOrganisationRoleDAO.insert(userOrganisationRole);
 		return userOrganisationRole;
 	}	
 }
