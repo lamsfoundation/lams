@@ -309,7 +309,7 @@ public class MonitoringUtil implements QaAppConstants{
                     	if (qaSession != null)
                     	{
                     		List listUsers=qaService.getUserBySessionOnly(qaSession);	
-                    		logger.debug("listMcUsers for session id:"  + qaSession.getQaSessionId() +  " = " + listUsers);
+                    		logger.debug("listQaUsers for session id:"  + qaSession.getQaSessionId() +  " = " + listUsers);
                     		Map sessionUsersAttempts=populateSessionUsersAttempts(request,qaSession.getQaSessionId(), listUsers, questionUid, 
                     				isUserNamesVisible, isLearnerRequest, userId);
                     		listMonitoredAttemptsContainerDTO.add(sessionUsersAttempts);

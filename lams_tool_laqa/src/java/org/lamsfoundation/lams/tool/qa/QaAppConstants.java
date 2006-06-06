@@ -44,7 +44,9 @@ public interface QaAppConstants {
 	public static final String LOAD_LEARNER								="loadLearner";
 	public static final String LEARNING_STARTER							="learningStarter";
 	public static final String MONITORING_STARTER						="monitoringStarter";
-	public static final String EXPORT_PORTFOLIO 						= "exportPortfolio";
+	public static final String EXPORT_PORTFOLIO 						="exportPortfolio";
+	public static final String VIEW_ALL_RESULTS 						="viewAllResults";
+	public static final String INDIVIDUAL_LEARNER_RESULTS				="individualLearnerResults";
 	public static final String LOAD_MONITORING							="refreshMonitoring";
 	public static final String LOAD_VIEW_ONLY							="loadViewOnly";
 	public static final String EDIT_RESPONSE							="editResponse";

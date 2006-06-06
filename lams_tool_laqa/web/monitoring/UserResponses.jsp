@@ -35,7 +35,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<c:if test="${editResponse != 'true'}">	  	 									 			
 			 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.userName}"/> </font>  </td>  
 			 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.attemptTime}"/> </font> </td>
-			 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.timeZone}"/> </font> </td>
 			 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.response}"/> </font> </td>
 	
 			<c:if test="${(requestLearningReport != 'true')}"> 	
@@ -48,7 +47,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<c:if test="${editableResponseId == responseUid}">	  	 									 			
 				 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.userName}"/> </font>  </td>  
 				 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.attemptTime}"/> </font> </td>
-				 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.timeZone}"/> </font> </td>
 				 <td NOWRAP valign=top>  <font size=2> <input type="text" name="updatedResponse" value='<c:out value="${userData.response}"/>'> </font> </td>
 		
 				<c:if test="${(requestLearningReport != 'true')}"> 				 
@@ -60,7 +58,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<c:if test="${editableResponseId != responseUid}">	  	 									 			
 				 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.userName}"/> </font>  </td>  
 				 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.attemptTime}"/> </font> </td>
-				 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.timeZone}"/> </font> </td>
 				 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.response}"/> </font> </td>
 		
 				<c:if test="${(requestLearningReport != 'true')}"> 	

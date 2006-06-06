@@ -41,6 +41,7 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
 	protected String getPreviousQuestion;
 	protected String endLearning;
 	
+	protected String viewAllResults;
 	protected String responseId;
 	
 	
@@ -154,4 +155,17 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
 	public void setMethod(String method) {
 		this.method = method;
 	}
+	
+    /**
+     * @return Returns the viewAllResults.
+     */
+    public String getViewAllResults() {
+        return viewAllResults;
+    }
+    /**
+     * @param viewAllResults The viewAllResults to set.
+     */
+    public void setViewAllResults(String viewAllResults) {
+        this.viewAllResults = viewAllResults;
+    }	
 }

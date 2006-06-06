@@ -37,6 +37,7 @@ import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
+import org.lamsfoundation.lams.tool.qa.QaUtils;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -106,14 +107,16 @@ public class LearningUtil implements QaAppConstants{
 						    	
     	logger.debug("createQaQueUsr - qaQueUsr: " + qaQueUsr);
     	
+    	logger.debug("session uid: " + qaSession.getUid());
     	/*note that it is possible for a user to already exist from another tool session. In this case don't add any more user record*/
-    	QaQueUsr qaQueUsrLocal=qaService.getQaQueUsrById(userId.longValue());
+    	QaQueUsr qaQueUsrLocal=qaService.getQaUserBySession(userId, qaSession.getUid());
     	logger.debug("qaQueUsrLocal: " + qaQueUsrLocal);
     	
     	if ((qaQueUsr != null) && (qaQueUsrLocal == null)) 
         {
-        	qaService.createQaQueUsr(qaQueUsr);
-            logger.debug("createUsers-qaQueUsr created in the db: " + qaQueUsr);	
+        	//qaService.createQaQueUsr(qaQueUsr);
+    	    qaQueUsr=createUser(request);
+            logger.debug("created qaQueUsr: " + qaQueUsr);	
         }
     	else
     	{
@@ -154,6 +157,31 @@ public class LearningUtil implements QaAppConstants{
         }
         logger.debug("both the users and their responses created in the db");
     }
+
+    
+    public static QaQueUsr createUser(HttpServletRequest request)
+	{
+        logger.debug("creating a new user in the tool db");
+		IQaService qaService =QaUtils.getToolService(request);
+	    Long queUsrId=QaUtils.getUserId();
+		String username=QaUtils.getUserName();
+		String fullname=QaUtils.getUserFullName();
+		Long toolSessionId=(Long) request.getSession().getAttribute(TOOL_SESSION_ID);
+		
+		QaSession qaSession=qaService.retrieveQaSessionOrNullById(toolSessionId.longValue());
+		logger.debug("qaSession: " + qaSession);
+		
+		QaQueUsr qaQueUsr= new QaQueUsr(queUsrId,
+		        username,
+		        fullname,
+				null, 
+				qaSession, 
+				new TreeSet());
+
+		qaService.createQaQueUsr(qaQueUsr);
+		logger.debug("created qaQueUsr in the db: " + qaQueUsr);
+		return qaQueUsr;
+	}
 
     
     /**

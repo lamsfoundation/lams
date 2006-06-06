@@ -101,7 +101,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									<tr> 
 										 <td NOWRAP valign=top> <b> <font size=2> <bean:message key="label.user"/> </font> </b> </td>  
 				  						 <td NOWRAP valign=top> <b> <font size=2> <bean:message key="label.attemptTime"/></font> </b></td>
-				  						 <td NOWRAP valign=top> <b> <font size=2> <bean:message key="label.timezone"/> </font>	</b></td>
 				  						 <td NOWRAP valign=top> <b> <font size=2> <bean:message key="label.response"/> </font> 	</b></td>
 						  			</tr>				 
 		  							<c:forEach var="questionAttemptData" items="${currentDto.questionAttempts}">

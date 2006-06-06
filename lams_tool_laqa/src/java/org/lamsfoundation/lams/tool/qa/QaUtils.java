@@ -631,4 +631,41 @@ public abstract class QaUtils implements QaAppConstants {
     	}
     }
 
+    
+	public static UserDTO getToolUser()
+	{
+		/*obtain user object from the session*/
+	    HttpSession ss = SessionManager.getSession();
+	    /* get back login user DTO */
+	    UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
+		logger.debug("retrieving toolUser: " + toolUser);
+		return 	toolUser;
+	}
+	
+	
+	public static Long getUserId()
+	{
+		UserDTO toolUser=getToolUser();
+		long userId=toolUser.getUserID().longValue();
+		logger.debug("userId: " + userId);
+		return new Long(userId);
+	}
+	
+	public static String getUserName()
+	{
+		/* double check if username and login is the same */
+		UserDTO toolUser=getToolUser();
+		String userName=toolUser.getLogin();
+		logger.debug("userName: " + userName);
+		return userName;
+	}
+	
+	public static String getUserFullName()
+	{
+		UserDTO toolUser=getToolUser();
+		String fullName=toolUser.getFirstName() + " " + toolUser.getLastName();  
+		logger.debug("fullName: " + fullName);
+		return fullName;
+	}
+
 }

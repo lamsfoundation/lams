@@ -237,9 +237,66 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
     	qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, isUserNamesVisible, true, currentSessionId, userID);
     	
 		request.getSession().setAttribute(REQUEST_LEARNING_REPORT, new Boolean(true).toString());
-		logger.debug("fwd'ing to." + LEARNER_REPORT);
+		logger.debug("fwd'ing to." + INDIVIDUAL_LEARNER_RESULTS);
+		return (mapping.findForward(INDIVIDUAL_LEARNER_RESULTS));
+	}
+    
+	
+    /**
+	 * returns Learner Report for a session
+	 * ActionForward viewAllResults(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException)
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws IOException
+	 * @throws ServletException
+	 */
+    public ActionForward viewAllResults(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+	{
+    	logger.debug("dispatching viewAllResults...");
+    	QaLearningForm qaLearningForm = (QaLearningForm) form;
+
+    	IQaService qaService = (IQaService)request.getSession().getAttribute(TOOL_SERVICE);
+		logger.debug("qaService: " + qaService);
+		if (qaService == null)
+		{
+			logger.debug("will retrieve qaService");
+			qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
+			logger.debug("retrieving qaService from session: " + qaService);
+		}
+
+	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    logger.debug("toolContentId: " + toolContentId);
+	    
+	    QaContent qaContent=qaService.loadQa(toolContentId.longValue());
+		logger.debug("existing qaContent:" + qaContent);
+
+		Long toolSessionId=(Long)request.getSession().getAttribute(AttributeNames.PARAM_TOOL_SESSION_ID);
+		
+		Boolean isUserNamesVisibleBoolean=(Boolean)request.getSession().getAttribute(IS_USERNAME_VISIBLE);
+    	boolean isUserNamesVisible=isUserNamesVisibleBoolean.booleanValue();
+    	logger.debug("isUserNamesVisible: " + isUserNamesVisible);
+    	
+    	QaMonitoringAction qaMonitoringAction= new QaMonitoringAction();
+    	qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, isUserNamesVisible, true, toolSessionId.toString(), null);
+    	
+		request.getSession().setAttribute(REQUEST_LEARNING_REPORT, new Boolean(true).toString());
+		request.getSession().setAttribute(REQUEST_LEARNING_REPORT_PROGRESS, new Boolean(false).toString());
+		logger.debug("fwd'ing to for learner progress" + LEARNER_REPORT);
 		return (mapping.findForward(LEARNER_REPORT));
 	}
+
     
     
     /**

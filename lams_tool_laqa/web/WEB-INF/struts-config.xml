@@ -280,7 +280,20 @@
 	        path="/monitoring/LearnerRep.jsp"
 		    redirect="false"
 	      />
-	      
+
+	     <forward
+	        name="individualLearnerResults"
+	        path="/learning/IndividualLearnerResults.jsp"
+		    redirect="false"
+	      />
+
+
+	     <forward
+	        name="viewAllResults"
+	        path="/learning/AllResults.jsp"
+		    redirect="false"
+	      />
+
 	      <forward
 		    name="errorListLearner"
 		    path="/QaErrorBox.jsp"

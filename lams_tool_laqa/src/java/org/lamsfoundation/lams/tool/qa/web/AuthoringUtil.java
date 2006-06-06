@@ -286,7 +286,7 @@ public class AuthoringUtil implements QaAppConstants {
         if ((!activeModule.equals(DEFINE_LATER)) && (setCommonContent))
 		{
         	logger.debug("setting other content values...");
-         	qaContent.setUsernameVisible(isUsernameVisible);
+         	//qaContent.setUsernameVisible(isUsernameVisible);
          	qaContent.setQuestionsSequenced(isQuestionsSequenced); /**the default question listing in learner mode will be all in the same page*/
          	qaContent.setSynchInMonitor(isSynchInMonitor);
          	qaContent.setOnlineInstructions(richTextOnlineInstructions);
