@@ -247,7 +247,7 @@ public class HomeAction extends DispatchAction {
 				return mapping.findForward("error");
 			} else { 
 				Integer orgId = classId != null ? classId : courseId;
-				if (isUserInRole(user.getUserID(), orgId, Role.STAFF) || isUserInRole(user.getUserID(), orgId, Role.TEACHER)) {
+				if (isUserInRole(user.getUserID(), orgId, Role.STAFF)) {
 					log.debug("user is staff");
 					String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
 					req.setAttribute("serverUrl", serverUrl);

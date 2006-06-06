@@ -1219,7 +1219,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		while (roleIterator.hasNext()) {
 			UserOrganisationRole userOrganisationRole = (UserOrganisationRole) roleIterator.next();
 			Role role = userOrganisationRole.getRole();
-			if (role.isAuthor() || role.isStaff() || role.isTeacher())
+			if (role.isAuthor() || role.isSysAdmin() || role.isCourseManager())
 				return true;
 		}
 		return false;
