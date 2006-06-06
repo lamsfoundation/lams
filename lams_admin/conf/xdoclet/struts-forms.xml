@@ -1,0 +1,13 @@
+<form-bean name="OrganisationForm" type="org.apache.struts.validator.DynaValidatorForm">
+	<form-property name="orgId" type="java.lang.Integer" />
+	<form-property name="parentOrgId" type="java.lang.Integer" />
+	<form-property name="parentOrgName" type="java.lang.String" />
+	<form-property name="name" type="java.lang.String" />
+	<form-property name="code" type="java.lang.String" />
+	<form-property name="description" type="java.lang.String" />
+	<form-property name="createDate" type="java.util.Date" />
+	<form-property name="localeLanguage" type="java.lang.String" />
+	<form-property name="localeCountry" type="java.lang.String" />
+	<form-property name="orgTypeId" type="java.lang.Integer" />
+	<form-property name="orgStateId" type="java.lang.Integer" />
+</form-bean>
