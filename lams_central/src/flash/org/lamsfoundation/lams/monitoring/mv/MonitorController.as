@@ -35,14 +35,8 @@ import mx.utils.*
 class MonitorController extends AbstractController {
 	private var _monitorModel:MonitorModel;
 	private var _monitorController:MonitorController;
-	
 	private var _isBusy:Boolean;
 	
-	//private var _monitorView:MonitorView;
-	//private var _lessonTabView:LessonTabView;
-	//private var _canvasView:CanvasView;
-	//private var _canvasView:CanvasView;
-	//private var _canvasView:CanvasView;
 	
 	/**
 	* Constructor
@@ -63,21 +57,38 @@ class MonitorController extends AbstractController {
 	public function activityClick(ca:Object):Void{
 		//if (ca.activityTypeID==Activity.PARALLEL_ACTIVITY_TYPE){
 			
-			Debugger.log('activityClick CanvasActivity:'+ca.activity.activityUIID,Debugger.GEN,'activityClick','MonitorController');
+			Debugger.log('activityClick CanvasActivity:'+ca.activity.activityID,Debugger.GEN,'activityClick','MonitorController');
 		//}
    }
    
-	public function activityDoubleClick(ca:Object):Void{
-	   Debugger.log('activityDoubleClick CanvasActivity:'+ca.activity.activityUIID,Debugger.GEN,'activityDoubleClick','MonitorController');
+	public function activityDoubleClick(ca:Object, forTabView:String):Void{
+		setBusy()
+	   Debugger.log('activityDoubleClick CanvasActivity:'+ca.activity.activityID,Debugger.GEN,'activityDoubleClick','MonitorController');
+	   if(ca.activity.activityTypeID == Activity.TOOL_ACTIVITY_TYPE){
+			// _monitorModel.openToolActivityContent(ca.activity);
+			if (forTabView == "MonitorTabView"){
+				//getActivityMonitorURL&activityID=31&lessonID=4
+				var URLToSend:String = _root.serverURL+_root.monitoringURL+'getActivityMonitorURL&activityID='+ca.activity.activityID+'&lessonID='+_root.lessonID;
+			}else {
+				var URLToSend:String = _root.serverURL+_root.monitoringURL+'getLearnerActivityURL&activityID='+ca.activity.activityID+'&userID='+_root.userID+'&lessonID='+_root.lessonID;
+			}
+	
+		//Debugger.log('Opening url:'+URLToSend,Debugger.GEN,'openToolActivityContent','MonitorModel');
+		getURL(URLToSend,"_blank");		
+		//}else{
+			//TODO: Show the property inspector if its a parralel activity or whatever
+		}
+	  
+	   clearBusy()
 	}
    
    public function activityRelease(ca:Object):Void{
-	   Debugger.log('activityRelease CanvasActivity:'+ca.activity.activityUIID,Debugger.GEN,'activityRelease','MonitorController');
+	   Debugger.log('activityRelease CanvasActivity:'+ca.activity.activityID,Debugger.GEN,'activityRelease','MonitorController');
 	    
 	}
 	
    public function activityReleaseOutside(ca:Object):Void{
-	   Debugger.log('activityReleaseOutside CanvasActivity:'+ca.activity.activityUIID,Debugger.GEN,'activityReleaseOutside','MonitorController');
+	   Debugger.log('activityReleaseOutside CanvasActivity:'+ca.activity.activityID,Debugger.GEN,'activityReleaseOutside','MonitorController');
    }
 	// add control methods
 	
