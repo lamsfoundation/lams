@@ -45,7 +45,9 @@ public class Role implements Serializable {
 	
 	public static final String AUTHOR = "AUTHOR";
 	
-	public static final String TEACHER = "TEACHER";
+	public static final String COURSE_MANAGER = "COURSE MANAGER";
+	
+	public static final String COURSE_ADMIN = "COURSE ADMIN";
 	
 	public static final String SYSADMIN = "SYSADMIN";//for future use
 	
@@ -59,11 +61,11 @@ public class Role implements Serializable {
 	 * 
 	 ************************************************************/
 		public static final Integer ROLE_SYSADMIN =new Integer(1);
-		public static final Integer ROLE_ADMIN =new Integer(2);
+		public static final Integer ROLE_COURSE_MANAGER =new Integer(2);
 		public static final Integer ROLE_AUTHOR =new Integer(3);
 		public static final Integer ROLE_STAFF =new Integer(4);
 		public static final Integer ROLE_LEARNER =new Integer(5);
-		public static final Integer ROLE_TEACHER =new Integer(6);
+		public static final Integer ROLE_COURSE_ADMIN =new Integer(6);
 	/***********************************************************/
 	
     /** identifier field */
@@ -205,13 +207,21 @@ public class Role implements Serializable {
             .toHashCode();
     }
     public boolean isAuthor(){
-    	return this.roleId.equals(ROLE_AUTHOR)?true:false;
+    	return this.roleId.equals(ROLE_AUTHOR);
     }
-    public boolean isTeacher(){
-    	return this.roleId.equals(ROLE_TEACHER)?true:false;
+    public boolean isCourseManager(){
+    	return this.roleId.equals(ROLE_COURSE_MANAGER);
     }
+    
+    public boolean isCourseAdmin(){
+    	return this.roleId.equals(ROLE_COURSE_ADMIN);
+    }
+    
     public boolean isStaff(){
-    	return this.roleId.equals(ROLE_STAFF)?true:false ;
+    	return this.roleId.equals(ROLE_STAFF);
     }
 
+    public boolean isSysAdmin(){
+    	return this.roleId.equals(ROLE_SYSADMIN);
+    }
 }
