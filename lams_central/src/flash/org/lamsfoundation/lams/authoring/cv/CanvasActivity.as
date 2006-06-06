@@ -313,13 +313,16 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			var now:Number = new Date().getTime();
 			
 			if((now - _dcStartTime) <= Config.DOUBLE_CLICK_DELAY){
-				//Debugger.log('DoubleClicking: '+_canvasModel.activeTool,Debugger.GEN,'onPress','CanvasActivity');
+				trace("Module passed is: "+_module)
 				if (app.controlKeyPressed != "transition"){
 					_doubleClicking = true;
 					if (_module == "monitoring"){
-						_monitorController.activityDoubleClick(this);
+						Debugger.log('DoubleClicking: '+this.activity.activityID,Debugger.GEN,'onPress','CanvasActivity For Monitoring');
+						_monitorController.activityDoubleClick(this, "MonitorTabView");
+					}else {
+						Debugger.log('DoubleClicking: '+this,Debugger.GEN,'onPress','CanvasActivity');
+						_canvasController.activityDoubleClick(this);
 					}
-					_canvasController.activityDoubleClick(this);
 				}
 				/*
 				if(workspaceRef.inspecting){
@@ -332,15 +335,17 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 				*/
 				
 			}else{
-				Debugger.log('SingleClicking:+'+this,Debugger.GEN,'onPress','CanvasActivity');
+				
 				_doubleClicking = false;
 				
 				//Debugger.log('_canvasController:'+_canvasController,Debugger.GEN,'onPress','CanvasActivity');
 				if (_module == "monitoring"){
+					Debugger.log('SingleClicking:+'+this,Debugger.GEN,'onPress','CanvasActivity for monitoring');
 					_monitorController.activityClick(this);
-				}
-				_canvasController.activityClick(this);
-				
+				}else {
+					Debugger.log('SingleClicking:+'+this,Debugger.GEN,'onPress','CanvasActivity');
+					_canvasController.activityClick(this);
+				}				
 				
 				/*
 				if (userDrawingTransition){
@@ -372,8 +377,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 				trace("Activity ID is: "+this.activity.activityUIID)	
 			if (_module == "monitoring"){
 				_monitorController.activityRelease(this);
+			}else {
+				_canvasController.activityRelease(this);
 			}
-			_canvasController.activityRelease(this);
 		}
 		
 	}
@@ -382,8 +388,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		Debugger.log('ReleasingOutside:'+this,Debugger.GEN,'onReleaseOutside','CanvasActivity');
 		if (_module == "monitoring"){
 			_monitorController.activityReleaseOutside(this);
+		}else {
+			_canvasController.activityReleaseOutside(this);
 		}
-		_canvasController.activityReleaseOutside(this);
 	}
 	
 	
