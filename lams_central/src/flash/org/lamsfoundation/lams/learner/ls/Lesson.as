@@ -168,7 +168,10 @@ class Lesson {
 		var p:Progress = new Progress();
 		p.populateFromDTO(progressDTO);
 		lessonModel.setProgressData(p);
+		
 		Debugger.log('progress data receieved for user..' + progressDTO,Debugger.CRITICAL,'saveProgressData','org.lamsfoundation.lams.Lesson');
+		
+		lessonModel.drawDesign();
 	}
 	
 	private function closeLesson(pkt:Object){
@@ -212,6 +215,30 @@ class Lesson {
 		} else {
 			return false;
 		}
+	}
+	
+	public function getActivityURL(request:String, popup:Boolean){
+		
+		var callback:Function;
+		if(popup){
+			callback = Proxy.create(this,popupActivity);
+		} else {
+			callback = Proxy.create(this,loadActivity);
+		}
+		
+		Application.getInstance().getComms().getRequest(request,callback, false);
+	}
+	
+	private function loadActivity(url:Object){
+		Debugger.log('loading activity : ' + url.activityID + '\npath: ' + url.activityURL,Debugger.CRITICAL,'loadActivity','org.lamsfoundation.lams.Lesson');
+
+		getURL(_root.serverURL + url.activityURL,"contentFrame");
+	}
+	
+	private function popupActivity(url:Object){
+		Debugger.log('loading activity (popup window) : ' + url.activityID + '\npath: ' + url.activityURL,Debugger.CRITICAL,'loadActivity','org.lamsfoundation.lams.Lesson');
+
+		getURL(_root.serverURL + url.activityURL,"_blank");
 	}
 	
 	/**
