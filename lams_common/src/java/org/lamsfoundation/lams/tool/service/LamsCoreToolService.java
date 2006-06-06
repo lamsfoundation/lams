@@ -450,12 +450,12 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
     
     public String setupURLWithActivityLessonID(Activity activity, Long lessonID, String learnerURL) {
         String url = learnerURL;
-        if ( activity != null ) {
+        if ( url!=null && activity != null ) {
         	url = WebUtil.appendParameterToURL(url,
         		AttributeNames.PARAM_ACTIVITY_ID,
 				activity.getActivityId().toString());
         }
-        if ( lessonID != null ) {
+        if ( url!=null && lessonID != null ) {
         	url = WebUtil.appendParameterToURL(url,
                		AttributeNames.PARAM_LESSON_ID,
                		lessonID.toString());

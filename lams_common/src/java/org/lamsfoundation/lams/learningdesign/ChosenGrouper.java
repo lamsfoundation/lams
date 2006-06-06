@@ -132,7 +132,7 @@ public class ChosenGrouper extends Grouper implements Serializable
     public Group createGroup(Grouping grouping, String name) throws GroupingException
     {
     	int currentSize = grouping.getGroups().size(); 
-    	if ( currentSize == grouping.getMaxNumberOfGroups() ) {
+    	if ( grouping.getMaxNumberOfGroups()!=null && currentSize == grouping.getMaxNumberOfGroups() ) {
     		String error = "Tried to add group "+name+" to grouping "+grouping+". Exceeded max number of groups - current size is "+currentSize;
     		log.error(error); 
     		throw new GroupingException(error);

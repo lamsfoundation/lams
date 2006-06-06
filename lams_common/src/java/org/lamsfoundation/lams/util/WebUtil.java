@@ -410,7 +410,9 @@ public class WebUtil
      */
     public static String appendParameterDeliminator(String url)
     {
-        if(StringUtils.containsNone(url,"?"))
+    	if(url==null )
+    		return null;
+    	else if(StringUtils.containsNone(url,"?"))
             return url+"?";
         else
             return url+"&";
