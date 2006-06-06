@@ -27,7 +27,6 @@ import org.lamsfoundation.lams.common.util.ui.*;
 import org.lamsfoundation.lams.monitoring.*;
 import org.lamsfoundation.lams.monitoring.mv.*;
 import org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView;
-import org.lamsfoundation.lams.authoring.cv.*;
 import org.lamsfoundation.lams.authoring.Activity;
 import org.lamsfoundation.lams.common.style.*
 
@@ -40,12 +39,14 @@ import mx.utils.*
 /**  
 * CanvasActivity - 
 */  
-class org.lamsfoundation.lams.monitoring.mv.MonitorLearnerActivity extends MovieClip implements ICanvasActivity{  
+class org.lamsfoundation.lams.monitoring.mv.MonitorLearnerActivity extends MovieClip {  
 //class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip{  
 	public static var GATE_ACTIVITY_HEIGHT:Number =50;
 	public static var GATE_ACTIVITY_WIDTH:Number = 50;
 	public static var TOOL_ACTIVITY_WIDTH:Number = 123.1;
 	public static var TOOL_ACTIVITY_HEIGHT:Number = 50.5;
+	private var xPos:Number;
+	private var yPos:Number;
 	//this is set by the init object
 	private var _monitorController:MonitorController;
 	private var _monitorView:MonitorView;
@@ -53,19 +54,20 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorLearnerActivity extends Movie
 	private var _tm:ThemeManager;
 	//TODO:This should be ToolActivity
 	private var _activity:Activity;
-	private var actStatus:String;
 	private var _isSelected:Boolean;
 	private var app:Application;
 	//locals
+	private var actStatus:String;
 	private var learner:Object = new Object();
 	private var completed_mc:MovieClip;
 	private var current_mc:MovieClip;
 	private var todo_mc:MovieClip;
+	private var attempted_mc:MovieClip;
 	private var canvasActivity_mc:MovieClip;
 	private var title_lbl:MovieClip;
 	private var groupIcon_mc:MovieClip;
 	private var stopSign_mc:MovieClip;	
-	private var clickTarget_mc:MovieClip;
+	private var sentFrom:String;
 	private var canvasActivityGrouped_mc:MovieClip;	private var _dcStartTime:Number = 0;
 	private var _doubleClicking:Boolean;
 	private var _visibleWidth:Number;
@@ -115,16 +117,18 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorLearnerActivity extends Movie
 			//loadIcon();
 		}
 		setStyles();
+		trace("Data for sentFrom: "+sentFrom)
 		MovieClipUtils.doLater(Proxy.create(this,draw));
 
 	}
 	
 	private function showAssets(isVisible:Boolean){
-		completed_mc._visible = isVisible;
-		current_mc._visible = isVisible;
-		canvasActivity_mc._visible = isVisible;
-		clickTarget_mc._visible = isVisible;
-		todo_mc._visible = isVisible;
+		//completed_mc._visible = isVisible;
+		//current_mc._visible = isVisible;
+		//canvasActivity_mc._visible = isVisible;
+		//clickTarget_mc._visible = isVisible;
+		//todo_mc._visible = isVisible;
+		//attempted_mc._visible = isVisible
 		title_lbl._visible = true;
 	}
 	
@@ -144,25 +148,32 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorLearnerActivity extends Movie
 	 * @usage   
 	 * @return  
 	 */
-	private function draw(){		Debugger.log(_activity.title+',_activity.isGateActivity():'+_activity.isGateActivity(),4,'draw','CanvasActivity');
-		actStatus = _learnerTabView.compareProgressData(learner, _activity.activityID);
+	private function draw(){
+			Debugger.log(_activity.title+',_activity.isGateActivity():'+_activity.isGateActivity(),4,'draw','CanvasActivity');
+		if (actStatus == null || actStatus == undefined){
+			actStatus = _learnerTabView.compareProgressData(learner, this.activity.activityID);
+		}
+		trace("Status returned for the learner "+learner.getUserName()+" activityID "+this.activity.activityID+ " is "+actStatus)
+		
 		title_lbl._visible = true;
 		
-		clickTarget_mc._visible = true;
+		//clickTarget_mc._visible = true;
 		
 		switch (actStatus){
 		    case 'completed_mc' :
-				//trace("TabID for Selected tab is: "+infoObj.tabID)
 				completed_mc._visible = true;
-		
-                break;
+				//this.attachMovie("completed_mc", "completed_mc", this.getNextHighestDepth(),{_x:xPos, _y:yPos})
+		        break;
             case 'current_mc' :
+				//this.attachMovie("current_mc", "current_mc", this.getNextHighestDepth(),{_x:xPos, _y:yPos})
 				current_mc._visible = true;
                 break;
-            //case 'toto_mc' :
-			    //todo_mc._visible = true;
-                //break;
+            case 'attempted_mc' :
+				//this.attachMovie("attempted_mc", "attempted_mc", this.getNextHighestDepth(),{_x:xPos, _y:yPos})
+			    attempted_mc._visible = true;
+                break;
 			default :
+				//this.attachMovie("todo_mc", "todo_mc", this.getNextHighestDepth(),{_x:xPos, _y:yPos})
 				todo_mc._visible = true;
                 //Debugger.log('unknown update type :' + infoObj.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.MonitorView');
 		}
@@ -190,8 +201,6 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorLearnerActivity extends Movie
 			}else{
 				Debugger.log('SingleClicking:+'+this,Debugger.GEN,'onPress','MonitorLearnerActivity');
 				_doubleClicking = false;
-				
-					_monitorController.activityClick(this);
 			}
 			
 			_dcStartTime = now;
@@ -201,7 +210,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorLearnerActivity extends Movie
 	private function onRelease():Void{
 		if(!_doubleClicking){
 			Debugger.log('Releasing:'+this,Debugger.GEN,'onRelease','MonitorLearnerActivity');
-				trace("Activity ID is: "+this.activity.activityUIID)	
+				trace("Activity ID is: "+this.activity.activityID)	
 				_monitorController.activityRelease(this);
 		}
 		
