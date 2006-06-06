@@ -127,7 +127,7 @@ public class MonitoringAction extends LamsDispatchAction
 			  response.sendRedirect(response.encodeRedirectURL(fullURL));
 			  return null;
 		  } else {
-			  return mapping.findForward(PREVIEW_DELETED_REPORT_SCREEN);
+			  return mapping.findForward(NOT_SUPPORTED_SCREEN);
 		  }
 	 }
 
