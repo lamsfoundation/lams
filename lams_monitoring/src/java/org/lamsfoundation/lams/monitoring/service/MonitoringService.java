@@ -1566,28 +1566,35 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     			throw new MonitoringServiceException(error);
     		}
 			
-			// get all the active learners
+			// get all the learners in the class, irrespective of whether they have joined the lesson or not.
 			// then go through each group and remove the grouped users from the activeLearners set.
-			List activeLearners = lessonService.getActiveLessonLearners(lessonID);
+    		Lesson lesson = lessonDAO.getLesson(lessonID);
+    		if ( lesson == null ) {
+    			String error = "Lesson missing. LessonID was "+lessonID+" Activity was "+activity; 
+    			log.error(error);
+    			throw new MonitoringServiceException(error);
+    		}
+
+    		Set learners = lesson.getAllLearners(); 
 			if ( log.isDebugEnabled() ) {
-				log.debug("getClassMembersNotGrouped: Lesson "+lessonID+" has "+activeLearners.size()+" learners.");
+				log.debug("getClassMembersNotGrouped: Lesson "+lessonID+" has "+learners.size()+" learners.");
 			}
 			
 			Iterator iter = grouping.getGroups().iterator();
 			while ( iter.hasNext() ) {
 				Group group = (Group) iter.next();
-				activeLearners.removeAll(group.getUsers());
+				learners.removeAll(group.getUsers());
 				if ( log.isDebugEnabled() ) {
 					log.debug("getClassMembersNotGrouped: Group "+group.getGroupId()+" has "+group.getUsers().size()+" members.");
 				}
 			}
 
 			if ( log.isDebugEnabled() ) {
-				log.debug("getClassMembersNotGrouped: Lesson "+lessonID+" has "+activeLearners.size()+" learners.");
+				log.debug("getClassMembersNotGrouped: Lesson "+lessonID+" has "+learners.size()+" learners.");
 			}
 
 			SortedSet sortedUsers = new TreeSet(new LastNameAlphabeticComparator());
-			sortedUsers.addAll(activeLearners);
+			sortedUsers.addAll(learners);
 			return sortedUsers;
        }
        
