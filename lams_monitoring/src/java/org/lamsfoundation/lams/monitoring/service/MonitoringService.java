@@ -609,10 +609,8 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     public void startLesson(long lessonId, Integer userId) 
     {
 //    	System.out.println(messageService.getMessage("NO.SUCH.LESSON",new Object[]{new Long(lessonId)}));
-//    	System.out.println(messageService.getMessage("INVALID.ACTIVITYID.USER", new Object[]{ "activityID","userID" }));
 //    	System.out.println(messageService.getMessage("INVALID.ACTIVITYID.TYPE", new Object[]{  "activityID"}));
 //    	System.out.println(messageService.getMessage("INVALID.ACTIVITYID.LESSONID",new Object[]{ "activityID","lessonID"}));
-//    	System.out.println(messageService.getMessage("INVALID.ACTIVITYID",new Object[]{ "activityID"}));
         if(log.isDebugEnabled())
             log.debug("=============Starting Lesson "+lessonId+"==============");
 
@@ -1004,22 +1002,14 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     public String getLearnerActivityURL(Long lessonID, Long activityID,Integer userID)throws IOException, LamsToolServiceException{    	
     	Activity activity = activityDAO.getActivityByActivityId(activityID);
     	User user = userManagementService.getUserById(userID);
-    	FlashMessage flashMessage=null;
-    	if(activity==null || user==null){
-    		flashMessage = new FlashMessage("getLearnerActivityURL",
-    										messageService.getMessage("INVALID.ACTIVITYID.USER", new Object[]{ activityID,userID }),
-											FlashMessage.ERROR);
-    	} else if ( activity.isToolActivity() || activity.isSystemToolActivity() ){
-        	String toolURL = lamsCoreToolService.getToolLearnerProgressURL(lessonID, activity,user);
-        	flashMessage = new FlashMessage("getLearnerActivityURL",new ProgressActivityDTO(activityID,toolURL));
-        } 
-        if ( flashMessage == null ) {
-        		flashMessage = new FlashMessage("getLearnerActivityURL",
-        										messageService.getMessage("INVALID.ACTIVITYID.TYPE", new Object[]{ activity.getActivityId()}),
-												FlashMessage.ERROR);
-        }    		
     	
-    	return flashMessage.serializeMessage();
+    	if(activity==null || user==null){
+    		log.error("getLearnerActivityURL activity or user missing. Activity ID "+activityID+" activity " +activity+" userID "+userID+" user "+user);
+    		
+    	} else if ( activity.isToolActivity() || activity.isSystemToolActivity() ){
+        	return lamsCoreToolService.getToolLearnerProgressURL(lessonID, activity,user);
+    	}
+    	return null;
     }	
 	/**
 	 * (non-Javadoc)
@@ -1027,21 +1017,15 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 	 */
 	public String getActivityDefineLaterURL(Long lessonID, Long activityID)throws IOException, LamsToolServiceException{
 		Activity activity = activityDAO.getActivityByActivityId(activityID);
-    	FlashMessage flashMessage = null;
-		if(activity!=null){
-			if ( activity.isToolActivity() ) {
-				ToolActivity toolActivity = (ToolActivity) activity;
-				String url = lamsCoreToolService.getToolDefineLaterURL(toolActivity);
-				flashMessage = new FlashMessage("getActivityDefineLaterURL",new ProgressActivityDTO(activityID, url));
-			} else {
-        		flashMessage = new FlashMessage("getLearnerActivityURL",
-						messageService.getMessage("INVALID.ACTIVITYID.TYPE", new Object[]{ activity.getActivityId()}),
-						FlashMessage.ERROR);
-			}
-		}else
-			flashMessage = FlashMessage.getNoSuchActivityExists("getActivityDefineLaterURL",activityID);
-		
-		return flashMessage.serializeMessage();
+    	if(activity==null){
+    		log.error("getActivityMonitorURL activity missing. Activity ID "+activityID+" activity " +activity);
+    		
+    	} else if ( activity.isToolActivity() ){
+			ToolActivity toolActivity = (ToolActivity) activity;
+			return lamsCoreToolService.getToolDefineLaterURL(toolActivity);
+			
+		}
+    	return null;
 	}
 	/**
 	 * (non-Javadoc)
@@ -1049,25 +1033,14 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 	 */
 	public String getActivityMonitorURL(Long lessonID, Long activityID)throws IOException, LamsToolServiceException{
 		Activity activity = activityDAO.getActivityByActivityId(activityID);
-    	FlashMessage flashMessage = null;
     	
-		if(activity!=null){
-			
-        	String toolURL = lamsCoreToolService.getToolMonitoringURL(lessonID, activity);
-        	if ( toolURL != null ) {
-        		flashMessage = new FlashMessage("getActivityMonitorURL",new ProgressActivityDTO(activityID, toolURL));
-        	}
-				
-        	if ( flashMessage == null ) {
-        		flashMessage = new FlashMessage("getActivityMonitorURL",
-    		    										messageService.getMessage("INVALID.ACTIVITYID.TYPE", new Object[]{ activity.getActivityId()}),
-    													FlashMessage.ERROR);
-        	}
-		}else {
-			flashMessage = FlashMessage.getNoSuchActivityExists("getActivityMonitorURL",activityID);
-		}
-		
-		return flashMessage.serializeMessage();	
+    	if(activity==null){
+    		log.error("getActivityMonitorURL activity missing. Activity ID "+activityID+" activity " +activity);
+    		
+    	} else if ( activity.isToolActivity() || activity.isSystemToolActivity() ){
+        	return lamsCoreToolService.getToolMonitoringURL(lessonID, activity);
+    	}
+    	return null;
 	}
 
 	/**

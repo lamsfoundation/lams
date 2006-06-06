@@ -36,12 +36,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
       <meta http-equiv="pragma" content="no-cache">
       <meta http-equiv="cache-control" content="no-cache">
 
+	<c:if test="${empty maxNumberOfGroups}">
+		<c:set var="maxNumberOfGroups" value="99"/>
+	</c:if>
+
 	<script type="text/javascript">
 	<!-- 
 		function init(){
 			getGroupsAndNonmembers();
 		}
-
 
 		function ajustButtonStatus(){
 			// if the maximum number of groups reached, disable the add group fields

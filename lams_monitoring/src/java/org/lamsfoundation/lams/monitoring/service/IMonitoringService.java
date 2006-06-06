@@ -306,12 +306,12 @@ public interface IMonitoringService
     public String getLearnerActivityURL(Long lessonID, Long activityID,Integer userID)throws IOException,LamsToolServiceException;
     
     /**
-     * This method returns the define later url for the given activity
+     * This method returns the define later url for the given activity. 
      * 
      * @param lessonID The lesson_id of the Lesson for which the information has
      * 					to be fetched. 
      * @param activityID The activity_id of the Activity whose URL will be returned
-     * @return String The required information in WDDX format
+     * @return String the url
      * @throws IOException
      */
     public String getActivityDefineLaterURL(Long lessonID, Long activityID)throws IOException, LamsToolServiceException;

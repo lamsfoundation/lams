@@ -92,6 +92,11 @@
         path="/previewdeleted.jsp"
         redirect="false"
       />
+      <forward
+        name="notsupported"
+        path=".notsupported"
+        redirect="false"
+      />
     </action>
     <action
       path="/gate"

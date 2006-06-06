@@ -257,8 +257,8 @@ public class TestMonitoringService extends AbstractLamsTestCase
     	System.out.println(packet);
     }
     public void testGetLearnerActivityURL() throws Exception{
-    	String packet = monitoringService.getLearnerActivityURL(TEST_LESSION_ID, new Long(29),TEST_LEARNER_ID);    	
-    	System.out.println(packet);
+    	String url = monitoringService.getLearnerActivityURL(TEST_LESSION_ID, new Long(29),TEST_LEARNER_ID);    	
+    	System.out.println(url);
     }
     public void  testGellAllContributeActivities()throws IOException, LearningDesignProcessorException{
     	String packet = monitoringService.getAllContributeActivities(TEST_LESSION_ID);    	

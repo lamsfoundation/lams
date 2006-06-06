@@ -69,6 +69,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  *                          path=".systemError"
  * 							handler="org.lamsfoundation.lams.web.util.CustomStrutsExceptionHandler"
  * @struts.action-forward name = "previewdeleted" path = "/previewdeleted.jsp"
+ * @struts.action-forward name = "notsupported" path = ".notsupported"
  * 
  * ----------------XDoclet Tags--------------------
  */
@@ -84,7 +85,8 @@ public class MonitoringAction extends LamsDispatchAction
     // Class level constants - Struts forward
     //---------------------------------------------------------------------
 	private static final String PREVIEW_DELETED_REPORT_SCREEN = "previewdeleted";
-
+	private static final String NOT_SUPPORTED_SCREEN = "notsupported";
+	
 	/** See deleteOldPreviewLessons */
 	public static final String NUM_DELETED = "numDeleted";
 
@@ -96,27 +98,7 @@ public class MonitoringAction extends LamsDispatchAction
 	*/
 	}
 	
-    /**
-	 * @param wddxPacket
-	 * @return
-	 */
-	private String extractURL(String wddxPacket) {
-		String url = null;
-    	String previousString = "<var name='activityURL'><string>";
-    	int index = wddxPacket.indexOf(previousString);
-    	if ( index > -1 && index+previousString.length() < wddxPacket.length() ) {
-    		url = wddxPacket.substring(index+previousString.length());
-    		index = url.indexOf("</string>");
-    		url = url.substring(0,index);
-    	}
-    	// replace any &amp; with &
-    	url = url.replace("&amp;","&");
-    	url = WebUtil.convertToFullURL(url);
-    	
-		return url;
-	}
-
-	  private FlashMessage handleException(Exception e, String methodKey, IMonitoringService monitoringService) {
+ 	  private FlashMessage handleException(Exception e, String methodKey, IMonitoringService monitoringService) {
 			log.error("Exception thrown "+methodKey,e);
 			if ( e instanceof UserAccessDeniedException ) {
 				return new FlashMessage(methodKey,
@@ -139,7 +121,17 @@ public class MonitoringAction extends LamsDispatchAction
 					FlashMessage.CRITICAL_ERROR);
       }
 	 
-    //---------------------------------------------------------------------
+	  private ActionForward redirectToURL(ActionMapping mapping, HttpServletResponse response, String url) throws IOException {
+		  if ( url != null ) {
+			  String fullURL = WebUtil.convertToFullURL(url);
+			  response.sendRedirect(response.encodeRedirectURL(fullURL));
+			  return null;
+		  } else {
+			  return mapping.findForward(PREVIEW_DELETED_REPORT_SCREEN);
+		  }
+	 }
+
+	  //---------------------------------------------------------------------
     // Struts Dispatch Method
     //---------------------------------------------------------------------
     /**
@@ -600,6 +592,7 @@ public class MonitoringAction extends LamsDispatchAction
         return null;
     }
     
+    /** Calls the server to bring up the learner progress page. Assumes destination is a new window */
     public ActionForward getLearnerActivityURL(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
@@ -608,13 +601,35 @@ public class MonitoringAction extends LamsDispatchAction
     	Integer userID = new Integer(WebUtil.readIntParam(request,"userID"));
     	Long activityID = new Long(WebUtil.readLongParam(request,"activityID"));
     	Long lessonID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID));
-    	//Show learner in monitor in a single call: extract URL and redirect it rather than returning the WDDX packet
     	
-    	String wddxPacket = monitoringService.getLearnerActivityURL(lessonID,activityID,userID);
-    	String url = extractURL(wddxPacket);
-    	response.sendRedirect(response.encodeRedirectURL(url));
-    	return null;
+    	String url = monitoringService.getLearnerActivityURL(lessonID,activityID,userID);
+    	return redirectToURL(mapping, response, url);
     }
+    /** Calls the server to bring up the activity's monitoring page. Assumes destination is a new window */
+    public ActionForward getActivityMonitorURL(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response)throws IOException,LamsToolServiceException{
+    	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+    	Long activityID = new Long(WebUtil.readLongParam(request,"activityID"));
+    	Long lessonID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID));
+    	
+    	String url = monitoringService.getActivityMonitorURL(lessonID,activityID);
+    	return redirectToURL(mapping, response, url);
+    }
+    /** Calls the server to bring up the activity's define later page. Assumes destination is a new window */
+    public ActionForward getActivityDefineLaterURL(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response)throws IOException,LamsToolServiceException{
+    	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+    	Long activityID = new Long(WebUtil.readLongParam(request,"activityID"));
+    	Long lessonID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID));
+    	
+    	String url = monitoringService.getActivityDefineLaterURL(lessonID,activityID);
+    	return redirectToURL(mapping, response, url);
+    }
+
     public ActionForward moveLesson(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
