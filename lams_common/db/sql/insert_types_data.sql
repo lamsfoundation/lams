@@ -1,11 +1,47 @@
 -- CVS ID: $Id$
+INSERT INTO lams_privilege VALUES (1,'Z','do anything');
+INSERT INTO lams_privilege VALUES (2,'A','add/remove/modify classes within the course');
+INSERT INTO lams_privilege VALUES (3,'B','create running instances of sequences and assign those to a class');
+INSERT INTO lams_privilege VALUES (4,'C','stop/start running sequences');
+INSERT INTO lams_privilege VALUES (5,'D','monitor the progress of learners');
+INSERT INTO lams_privilege VALUES (6,'E','participates in sequences');
+INSERT INTO lams_privilege VALUES (7,'F','export their progress on each running sequence');
+INSERT INTO lams_privilege VALUES (8,'G','write/create/delete permissions in course content folder');
+INSERT INTO lams_privilege VALUES (9,'H','read course content folder');
+INSERT INTO lams_privilege VALUES (10,'I','create new users');
+INSERT INTO lams_privilege VALUES (11,'J','create guest users');
+INSERT INTO lams_privilege VALUES (12,'K','change status of course');
+INSERT INTO lams_privilege VALUES (13,'L','browse all users in the system');
 
 INSERT INTO lams_role VALUES (1, 'SYSADMIN', 'LAMS System Adminstrator', NOW());
-INSERT INTO lams_role VALUES (2, 'ADMIN', 'Organization Adminstrator', NOW());
+INSERT INTO lams_role VALUES (2, 'COURSE MANAGER', 'Course Manager', NOW());
 INSERT INTO lams_role VALUES (3, 'AUTHOR', 'Authors Learning Designs', NOW());
 INSERT INTO lams_role VALUES (4, 'STAFF', 'Member of Staff', NOW());
 INSERT INTO lams_role VALUES (5, 'LEARNER', 'Student', NOW());
-INSERT INTO lams_role VALUES (6, 'TEACHER', 'Student', NOW());
+INSERT INTO lams_role VALUES (6, 'COURSE ADMIN', 'Course Administrator', NOW());
+
+INSERT INTO lams_role_privilege VALUES (1,1,1);
+INSERT INTO lams_role_privilege VALUES (2,2,2);
+INSERT INTO lams_role_privilege VALUES (3,2,3);
+INSERT INTO lams_role_privilege VALUES (4,2,4);
+INSERT INTO lams_role_privilege VALUES (5,2,5);
+INSERT INTO lams_role_privilege VALUES (6,2,8);
+INSERT INTO lams_role_privilege VALUES (7,2,9);
+INSERT INTO lams_role_privilege VALUES (8,2,10);
+INSERT INTO lams_role_privilege VALUES (9,2,12);
+INSERT INTO lams_role_privilege VALUES (10,2,13);
+INSERT INTO lams_role_privilege VALUES (11,3,8);
+INSERT INTO lams_role_privilege VALUES (12,3,9);
+INSERT INTO lams_role_privilege VALUES (13,4,3);
+INSERT INTO lams_role_privilege VALUES (14,4,4);
+INSERT INTO lams_role_privilege VALUES (15,4,5);
+INSERT INTO lams_role_privilege VALUES (16,5,6);
+INSERT INTO lams_role_privilege VALUES (17,5,7);
+INSERT INTO lams_role_privilege VALUES (18,6,2);
+INSERT INTO lams_role_privilege VALUES (19,6,10);
+INSERT INTO lams_role_privilege VALUES (20,6,12);
+INSERT INTO lams_role_privilege VALUES (21,6,13);
+
 
 INSERT INTO lams_authentication_method_type VALUES(1, 'LAMS');
 INSERT INTO lams_authentication_method_type VALUES(2, 'WEB_AUTH');
