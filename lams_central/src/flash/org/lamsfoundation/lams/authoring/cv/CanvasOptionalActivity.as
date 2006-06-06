@@ -108,23 +108,22 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		
 		for (var i = 0; i < _children.length; i ++)
 		{
-			if (fromModuleTab != "monitorMonitorTab"){
+			if (fromModuleTab == "monitorMonitorTab"){
 				children_mc [i] = childActivities_mc.attachMovie ("CanvasActivity", "CanvasActivity"+i, childActivities_mc.getNextHighestDepth (), {_activity:_children [i] , _monitorController:_monitorController, _monitorView:_monitorView, _module:"monitoring"});
 				//set the positioning co-ords
 				children_mc [i].activity.xCoord = CHILD_OFFSET_X;
 				children_mc [i].activity.yCoord = CHILD_OFFSET_Y + (i * CHILD_INCRE);
-			}else if (fromModuleTab != "monitorLearnerTab"){
-				children_mc [i] = childActivities_mc.attachMovie ("CanvasActivity", "CanvasActivity"+i, childActivities_mc.getNextHighestDepth (), {_activity:_children [i] , _canvasController:_canvasController, _canvasView:_canvasView});
-				//set the positioning co-ords
-				children_mc [i].activity.xCoord = CHILD_OFFSET_X;
-				children_mc [i].activity.yCoord = CHILD_OFFSET_Y + (i * CHILD_INCRE);
-			
-			}else {
+			}else if (fromModuleTab == "monitorLearnerTab"){
 				trace("child's activityID is "+_children [i].activityID)
 				var progStatus:String = _learnerTabView.compareProgressData(learner, _children [i].activityID);
 				children_mc [i] = childHolder_mc.attachMovie ("CanvasActivityLinear_forOptional", "CanvasActivityLinear_forOptional"+i, childHolder_mc.getNextHighestDepth(), {_activity:_children[i], _monitorController:_monitorController, _monitorView:_monitorView, learner:learner, actStatus:progStatus});
 				//set the positioning co-ords
 				children_mc [i]._y = (i*21);
+			}else {
+				children_mc [i] = childActivities_mc.attachMovie ("CanvasActivity", "CanvasActivity"+i, childActivities_mc.getNextHighestDepth (), {_activity:_children [i] , _canvasController:_canvasController, _canvasView:_canvasView});
+				//set the positioning co-ords
+				children_mc [i].activity.xCoord = CHILD_OFFSET_X;
+				children_mc [i].activity.yCoord = CHILD_OFFSET_Y + (i * CHILD_INCRE);
 			}
 			children_mc [i]._visible = true;
 			childHolder_mc._visible = false;
@@ -216,60 +215,58 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		_visible = true;
 		//child1_mc._visible = true;
 	}
-	private function localOnPress () : Void
-	{
+	
+	
+	private function localOnPress ():Void{
+		if (fromModuleTab == "monitorLearnerTab"){
+			this.swapDepths(this._parent.getNextHighestDepth());
+		}
 		// check double-click
 		var now : Number = new Date ().getTime ();
-		if ((now - _dcStartTime) <= Config.DOUBLE_CLICK_DELAY)
-		{
+		if ((now - _dcStartTime) <= Config.DOUBLE_CLICK_DELAY)	{
 			Debugger.log ('DoubleClicking:' + this, Debugger.GEN, 'localOnPress', 'CanvasOptionalActivity');
 			_doubleClicking = true;
 			//if we double click on the glass mask - then open the container to allow the usr to see the activities inside.
-			if (_locked)
-			{
+			if (_locked) {
 				_locked = false;
-			}else
-			{
+			}else {
 				_locked = true;
 			}
 			draw ();
-		}else
-		{
+		}else {
 			Debugger.log ('SingleClicking:+' + this, Debugger.GEN, 'localOnPress', 'CanvasOptionalActivity');
 			_doubleClicking = false;
 			_canvasController.activityClick (this);
 		}
 		_dcStartTime = now;
 	}
-	private function localOnRelease () : Void
-	{
+	
+	
+	private function localOnRelease ():Void{
 		Debugger.log ('_doubleClicking:' + _doubleClicking + ', localOnRelease:' + this, Debugger.GEN, 'localOnRelease', 'CanvasOptionalActivity');
 		if (fromModuleTab != "monitorLearnerTab"){
-			if ( ! _doubleClicking)
-			{
+			if ( ! _doubleClicking)	{
 				_canvasController.activityRelease (this);
 			}
 		}else {
-			if (_locked)
-			{
+			if (_locked){
 				_locked = false;
 				gotoAndStop('collapse')
 				childHolder_mc._visible = false;
 				draw ();
 				
-			}else
-			{
+			}else {
 				_locked = true;
 				childHolder_mc._visible = true;
 				gotoAndStop('expand')
-				draw ();
-				
+				draw ();			
 			}
 			
 		}
 	}
-	private function localOnReleaseOutside () : Void
-	{
+	
+	
+	private function localOnReleaseOutside():Void {
 		Debugger.log ('localOnReleaseOutside:' + this, Debugger.GEN, 'localOnReleaseOutside', 'CanvasOptionalActivity');
 		_canvasController.activityReleaseOutside (this);
 	}
@@ -278,8 +275,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 	* @usage
 	* @return
 	*/
-	public function getVisibleWidth () : Number 
-	{
+	public function getVisibleWidth():Number {
 		return _visibleWidth;
 	}
 	/**
@@ -287,20 +283,16 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 	* @usage
 	* @return
 	*/
-	public function getVisibleHeight () : Number 
-	{
+	public function getVisibleHeight():Number {
 		return _visibleHeight;
 	}
-	public function get locked () : Boolean 
-	{
+	public function get locked():Boolean {
 		return _locked;
 	}
-	public function get getpanelHeight () : Number 
-	{
+	public function get getpanelHeight():Number {
 		return panelHeight;
 	}
-	private function setStyles () : Void
-	{
+	private function setStyles():Void {
 		var styleObj = _tm.getStyleObject ('label');
 		title_lbl.setStyle (styleObj);
 		styleObj = _tm.getStyleObject ('smlLabel');
