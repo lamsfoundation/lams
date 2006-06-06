@@ -18,7 +18,6 @@
 <table width="95%" height="95%" border="0" cellspacing="0" cellpadding="0" align="center">
 	<tr>
 		<td>
-	        <c:set var="pageHeader" scope="session"><tiles:getAsString name="pageHeader"/></c:set>
 			<tiles:insert attribute="header" />
 		</td>
 	</tr>
