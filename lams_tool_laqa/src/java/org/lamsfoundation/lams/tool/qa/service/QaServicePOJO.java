@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
@@ -44,6 +45,9 @@ import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.contentrepository.service.RepositoryProxy;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
+import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
+import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
+import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
@@ -117,7 +121,8 @@ public class QaServicePOJO
     private ILamsToolService toolService;
     private ILearnerService learnerService;
 	private IAuditService auditService;
-
+	private IExportToolContentService exportContentService;
+	
     public void configureContentRepository() throws QaApplicationException {
     	logger.debug("retrieved repService: " + repositoryService);
         cred = new SimpleCredentials(repositoryUser, repositoryId);
@@ -1309,7 +1314,38 @@ public class QaServicePOJO
      * @throws ToolException if any other error occurs
      */
 
-	public void exportToolContent(Long toolContentId, String toPath) throws DataMissingException, ToolException {
+	public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
+		QaContent toolContentObj = qaDAO.getQaById(toolContentId);
+ 		if(toolContentObj == null)
+ 			throw new DataMissingException("Unable to find tool content by given id :" + toolContentId);
+ 		
+		try {
+			//set ResourceToolContentHandler as null to avoid copy file node in repository again.
+			toolContentObj = QaContent.newInstance(qaToolContentHandler,toolContentObj,toolContentId);
+			
+			//don't export following fields value
+			toolContentObj.setQaSessions(null);
+			Set<QaQueContent> questions = toolContentObj.getQaQueContents();
+			for(QaQueContent question : questions){
+				question.setQaQueUsers(null);
+				question.setQaContent(null);
+				question.setQaUsrResps(null);
+				question.setUserResponses(null);
+			}
+			Set<QaUploadedFile> files = toolContentObj.getQaUploadedFiles();
+			for(QaUploadedFile file : files){
+				file.setQaContent(null);
+			}
+			
+			exportContentService.registerFileClassForExport(QaUploadedFile.class.getName(),"uuid",null);
+			exportContentService.exportToolContent( toolContentId, toolContentObj,qaToolContentHandler, rootPath);
+		} catch (ExportToolContentException e) {
+			throw new ToolException(e);
+		} catch (ItemNotFoundException e) {
+			throw new ToolException(e);
+		} catch (RepositoryCheckedException e) {
+			throw new ToolException(e);
+		}
 	}
 
     /**
@@ -1318,7 +1354,31 @@ public class QaServicePOJO
      * @throws ToolException if any other error occurs
      */
 	 public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath) throws ToolException {
-		
+		 try {
+				exportContentService.registerFileClassForImport(QaUploadedFile.class.getName(),"uuid",null,"fileName","fileProperty",null,null);
+				
+				Object toolPOJO =  exportContentService.importToolContent(toolContentPath,qaToolContentHandler);
+				if(!(toolPOJO instanceof QaContent))
+					throw new ImportToolContentException("Import QA tool content failed. Deserialized object is " + toolPOJO);
+				QaContent toolContentObj = (QaContent) toolPOJO;
+				
+//				reset it to new toolContentId
+				toolContentObj.setQaContentId(toolContentId);
+				toolContentObj.setCreatedBy(newUserUid);
+				
+				//set back the tool content
+				Set<QaQueContent> questions = toolContentObj.getQaQueContents();
+				for(QaQueContent question : questions){
+					question.setQaContent(toolContentObj);
+				}
+				Set<QaUploadedFile> files = toolContentObj.getQaUploadedFiles();
+				for(QaUploadedFile file : files){
+					file.setQaContent(toolContentObj);
+				}
+				qaDAO.saveOrUpdateQa(toolContentObj);
+			} catch (ImportToolContentException e) {
+				throw new ToolException(e);
+			}
 	}
 
     /**
@@ -1872,6 +1932,16 @@ public class QaServicePOJO
 
 	public void setAuditService(IAuditService auditService) {
 		this.auditService = auditService;
+	}
+
+
+	public IExportToolContentService getExportContentService() {
+		return exportContentService;
+	}
+
+
+	public void setExportContentService(IExportToolContentService exportContentService) {
+		this.exportContentService = exportContentService;
 	}
 	
 	
