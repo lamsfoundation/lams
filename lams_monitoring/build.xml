@@ -137,6 +137,7 @@
 				<include name="*"/>
 				<include name="css/*"/>
 				<include name="gate/*"/>
+				<include name="grouping/*"/>
 				<include name="images/*"/>
 				<include name="template/*"/>
 			</fileset>

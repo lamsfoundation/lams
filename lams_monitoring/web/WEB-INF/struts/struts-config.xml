@@ -42,6 +42,38 @@
   <!-- ========== Action Mapping Definitions =================================== -->
    <action-mappings>
     <action
+      path="/grouping"
+      type="org.lamsfoundation.lams.monitoring.web.GroupingAJAXAction"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <exception
+        key="error.system.monitor"
+        type="org.lamsfoundation.lams.monitoring.service.MonitoringServiceException"
+        handler="org.lamsfoundation.lams.web.util.CustomStrutsExceptionHandler"
+        path=".systemError"
+        scope="request"
+      />
+      <exception
+        key="error.system.monitor"
+        type="org.lamsfoundation.lams.lesson.service.LessonServiceException"
+        handler="org.lamsfoundation.lams.web.util.CustomStrutsExceptionHandler"
+        path=".systemError"
+        scope="request"
+      />
+      <forward
+        name="chosenGrouping"
+        path="/grouping/chosenGrouping.jsp"
+        redirect="false"
+      />
+      <forward
+        name="viewGroups"
+        path=".viewGroups"
+        redirect="false"
+      />
+    </action>
+    <action
       path="/monitoring"
       type="org.lamsfoundation.lams.monitoring.web.MonitoringAction"
       parameter="method"

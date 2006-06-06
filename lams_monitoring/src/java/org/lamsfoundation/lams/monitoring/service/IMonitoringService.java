@@ -27,8 +27,10 @@ package org.lamsfoundation.lams.monitoring.service;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.SortedSet;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ChosenGrouping;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignProcessorException;
@@ -36,6 +38,7 @@ import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.LessonServiceException;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.util.MessageService;
 
@@ -356,8 +359,15 @@ public interface IMonitoringService
      * @param activityId id of the activity.
      * @return the requested activity object.
      */
-    public Activity getActivityById(long activityId);
+    public Activity getActivityById(Long activityId);
     
+    /**
+     * Return an activity object based on the requested id.
+     * @param activityId id of the activity.
+     * @return the requested activity object.
+     */
+    public GroupingActivity getGroupingActivityById(Long activityID);
+
     /**
      * Returns the status of the gate in WDDX format. 
      * 
@@ -427,8 +437,33 @@ public interface IMonitoringService
 	 */
 	public abstract int deleteAllOldPreviewLessons();
 
+	/* ************ Supports the Chosen Groupings **********************************/
+    public abstract SortedSet<User> getClassMembersNotGrouped(Long lessonID, Long activityID);
+	/** Add a new group to a grouping activity. If name already exists or the name is blank, does not add a new group. 
+	 * 	@param activityID id of the grouping activity
+	 * @param name group name
+	 * @throws LessonServiceException 
+	 */
+	public abstract void addGroup(Long activityID, String name) throws LessonServiceException;
+	
+	/** Remove a group to from a grouping activity. If the group does not exists then nothing happens.
+	 * If the group is already used (e.g. a tool session exists) then it throws a LessonServiceException.
+	 * @param activityID id of the grouping activity
+	 * @param name group name
+	 * @throws LessonServiceException 
+	 **/
+	public abstract void removeGroup(Long activityID, Long groupID) throws LessonServiceException;
+
+	/** Add learners to a group. Doesn't necessarily check if the user is already in another group. */
+	public abstract void addUsersToGroup(Long activityID, Long groupID, String learnerIDs[])  throws LessonServiceException ;
+
+	/** Remove a user to a group. If the user is not in the group, then nothing is changed. 
+	 * @throws LessonServiceException */
+	public abstract void removeUsersFromGroup(Long activityID, Long groupID, String learnerIDs[]) throws LessonServiceException;
+
     /* TODO Dummy methods - to be removed */
     public List getLearningDesigns(Long userId);
 	
+    
 
 }

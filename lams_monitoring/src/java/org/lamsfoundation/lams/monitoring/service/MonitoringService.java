@@ -35,19 +35,23 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ChosenGrouping;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
+import org.lamsfoundation.lams.learningdesign.NullGroup;
 import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
@@ -80,6 +84,7 @@ import org.lamsfoundation.lams.usermanagement.dao.IUserDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IWorkspaceFolderDAO;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.usermanagement.util.LastNameAlphabeticComparator;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.MessageService;
@@ -103,6 +108,8 @@ import org.springframework.context.ApplicationContextAware;
  * <p>It needs to implement <code>ApplicationContextAware<code> interface 
  * because we need to load up tool's service dynamically according to the
  * selected learning design.</p>
+ * 
+ * TODO Analyse the efficiency of the grouping algorithms for adding/removing users. Possible performance issue.
  * 
  * @author Jacky Fang 
  * @author Manpreet Minhas
@@ -945,13 +952,31 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     } 
     
     /**
-     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getActivityById(long)
+     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getActivityById(Long)
      */
-    public Activity getActivityById(long activityId)
+    public Activity getActivityById(Long activityId)
     {
-        return activityDAO.getActivityByActivityId(new Long(activityId));
+        return activityDAO.getActivityByActivityId(activityId);
     }
     
+    /**
+     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getGroupingActivityById(Long)
+     */
+    public GroupingActivity getGroupingActivityById(Long activityID)  {
+		Activity activity = getActivityById(activityID);
+		if ( activity == null  ) {
+			String error = "Activity missing. ActivityID was "+activityID; 
+			log.error(error);
+			throw new MonitoringServiceException(error);
+		} else if ( ! activity.isGroupingActivity() ) {
+			String error = "Activity should have been GroupingActivity but was a different kind of activity. "+activity;
+			log.error(error);
+			throw new MonitoringServiceException(error);
+		}
+		
+		return (GroupingActivity) activity;
+	}
+
     /**
      * (non-Javadoc)
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getAllContributeActivities(java.lang.Long)
@@ -1184,7 +1209,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 	        	
 	        	}
 	        	log.debug("Performing grouping for " + groupName + "...");
-	        	lessonService.performChosenGrouping(groupingActivity,learners);
+	        	lessonService.performGrouping(groupingActivity,groupName,learners);
 	        	log.debug("Finish grouping for " + groupName);
 	        }
 	        
@@ -1548,5 +1573,106 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
    	    
    		return numDeleted;
        }
-  
+       
+       
+       /* ************** Grouping related calls ***************************************/
+       /** Get all the active learners in the lesson who are not in a group. 
+        * 
+        * TODO Optimise the database query. Do a single query rather then large collection access
+        * 
+        * @param activityID
+        * @return Sorted set of Users, sorted by surname
+        */
+       public SortedSet<User> getClassMembersNotGrouped(Long lessonID, Long activityID) {
+
+    	    GroupingActivity activity = getGroupingActivityById(activityID);
+    		Grouping grouping = activity.getCreateGrouping();
+    		if ( grouping == null ) {
+    			String error = "Grouping activity missing grouping. Activity was "+activity+" Grouping was "+grouping; 
+    			log.error(error);
+    			throw new MonitoringServiceException(error);
+    		}
+			
+			// get all the active learners
+			// then go through each group and remove the grouped users from the activeLearners set.
+			List activeLearners = lessonService.getActiveLessonLearners(lessonID);
+			if ( log.isDebugEnabled() ) {
+				log.debug("getClassMembersNotGrouped: Lesson "+lessonID+" has "+activeLearners.size()+" learners.");
+			}
+			
+			Iterator iter = grouping.getGroups().iterator();
+			while ( iter.hasNext() ) {
+				Group group = (Group) iter.next();
+				activeLearners.removeAll(group.getUsers());
+				if ( log.isDebugEnabled() ) {
+					log.debug("getClassMembersNotGrouped: Group "+group.getGroupId()+" has "+group.getUsers().size()+" members.");
+				}
+			}
+
+			if ( log.isDebugEnabled() ) {
+				log.debug("getClassMembersNotGrouped: Lesson "+lessonID+" has "+activeLearners.size()+" learners.");
+			}
+
+			SortedSet sortedUsers = new TreeSet(new LastNameAlphabeticComparator());
+			sortedUsers.addAll(activeLearners);
+			return sortedUsers;
+       }
+       
+
+		/** Add a new group to a grouping activity. If name already exists or the name is blank, does not add a new group. 
+		 * 	@param activityID id of the grouping activity
+		 * @param name group name
+		 * @throws LessonServiceException 
+		 */
+		public void addGroup(Long activityID, String name) throws LessonServiceException {
+			GroupingActivity groupingActivity = getGroupingActivityById(activityID);
+			lessonService.createGroup(groupingActivity, name);
+		}
+		
+		/** Remove a group to from a grouping activity. If the group does not exists then nothing happens.
+		 * If the group is already used (e.g. a tool session exists) then it throws a LessonServiceException.
+		 * @param activityID id of the grouping activity
+		 * @param name group name
+		 * @throws LessonServiceException 
+		 **/
+		public void removeGroup(Long activityID, Long groupId) throws LessonServiceException {
+			GroupingActivity groupingActivity = getGroupingActivityById(activityID);
+			lessonService.removeGroup(groupingActivity, groupId);
+		}
+
+		/** Add learners to a group. Doesn't necessarily check if the user is already in another group. */
+		public void addUsersToGroup(Long activityID, Long groupId, String learnerIDs[])  throws LessonServiceException {
+
+			GroupingActivity groupingActivity = getGroupingActivityById(activityID);
+			ArrayList<User> learners = createUserList(activityID, learnerIDs,"add");
+			lessonService.performGrouping(groupingActivity, groupId, learners);
+		}
+		
+		private ArrayList<User> createUserList(Long activityID, String[] learnerIDs, String addRemoveText) {
+			ArrayList<User> learners = new ArrayList<User>();
+			for ( String strlearnerID: learnerIDs ) {
+				boolean added = false;
+				try {
+					Integer learnerID = new Integer(Integer.parseInt(strlearnerID));
+					User learner = userManagementService.getUserById(learnerID);
+					if ( learner != null ) {
+						learners.add(learner);
+						added = true;
+					}
+				} catch ( NumberFormatException e ) { }
+				if ( ! added ) {
+					log.warn("Unable to "+addRemoveText+" learner "+strlearnerID+" for group in grouping activity "+activityID+" as learner cannot be found.");
+				}
+			}
+			return learners;
+		}
+
+		/** Remove a user to a group. If the user is not in the group, then nothing is changed. 
+		 * @throws LessonServiceException */
+		public void removeUsersFromGroup(Long activityID, Long groupId, String learnerIDs[]) throws LessonServiceException {
+
+			GroupingActivity groupingActivity = getGroupingActivityById(activityID);
+			ArrayList<User> learners = createUserList(activityID, learnerIDs,"remove");
+			lessonService.removeLearnersFromGroup(groupingActivity, groupId, learners);
+		}
 }

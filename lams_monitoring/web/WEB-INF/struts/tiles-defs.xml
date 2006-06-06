@@ -55,4 +55,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<put name="pageHeader" value = "Open Gate"/>
 		<put name="content" value="/gate/openGateContent.jsp" />	
 	</definition>	
+<!-- ============= Grouping Page Definitions ====================== -->	
+	<definition name=".viewGroups" extends=".baseDef" >
+		<put name="title" value="Grouping"/>
+		<put name="pageHeader" value = "Grouping"/>
+		<put name="content" value="/grouping/viewGroups.jsp" />	
+	</definition>
 </tiles-definitions>
