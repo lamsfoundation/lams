@@ -19,6 +19,11 @@ if(StringUtils.isEmpty(mode)){
 	Debugger.log('Mode is not defined, using defualt:'+_root.mode,Debugger.CRITICAL,'main','ROOT');			
 }
 
+if(StringUtils.isEmpty(lessonID)){
+	_root.lessonID = 1;
+	Debugger.log('Lesson ID is not defined, using defualt:'+_root.lessonID,Debugger.CRITICAL,'main','ROOT');			
+}
+
 //Set stage alignment to top left and prent scaling
 Stage.align = "TL";
 Stage.scaleMode = "noScale";
