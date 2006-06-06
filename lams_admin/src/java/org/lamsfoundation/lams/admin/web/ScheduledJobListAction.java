@@ -47,9 +47,9 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @version $Revision$
  * 
  * @struts:action path="/jobList"
- * 				input=".admin.joblist"
+ * 				input=".joblist"
  * 
- * @struts:action-forward name="list" path=".admin.joblist"
+ * @struts:action-forward name="list" path=".joblist"
  */
 public class ScheduledJobListAction extends Action{
 
