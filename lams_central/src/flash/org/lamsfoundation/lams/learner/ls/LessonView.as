@@ -31,6 +31,8 @@ import org.lamsfoundation.lams.common.mvc.*;
 import org.lamsfoundation.lams.common.ui.*
 import org.lamsfoundation.lams.common.util.*;
 
+import org.lamsfoundation.lams.authoring.Activity;
+
 import mx.managers.*;
 import mx.controls.*;
 import mx.events.*
@@ -50,7 +52,10 @@ class LessonView extends AbstractView {
 	private var bkg_pnl:MovieClip;
 	private var _lessonName:Label;
 	private var progress_scp:MovieClip;
+	private var _activityList:Array;
 	
+	private var ACT_X:Number = 0;
+	private var ACT_Y:Number = 0;
 	
 	//These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
@@ -61,7 +66,9 @@ class LessonView extends AbstractView {
 	/**
 	* Constructor
 	*/
-	public function LessonView(){	
+	public function LessonView(){
+		_activityList = new Array();
+		
         //Set up this class to use the Flash event delegation model
         EventDispatcher.initialize(this);     
 	}
@@ -115,6 +122,13 @@ class LessonView extends AbstractView {
                 setSize(lm);
                 break;
 			case 'STATUS' :
+				removeAll(lm);
+				break;
+			case 'DRAW_ACTIVITY' :
+				drawActivity(infoObj.data, lm);
+				break;
+			case 'REMOVE_ACTIVITY' :
+				removeActivity(infoObj.data, lm);
 				break;
 			case 'LESSON' :
 				trace('setting lesson name');
@@ -132,6 +146,120 @@ class LessonView extends AbstractView {
         }
 	}
     
+	
+	/**
+	 * Remove the activityies from screen on selection of new lesson
+	 * 
+	 * @usage   
+	 * @param   activityUIID 
+	 * @return  
+	 */
+	private function removeActivity(a:Activity,lm:LessonModel){
+		//dispatch an event to show the design  has changed
+		trace("in removeActivity")
+		var r = lm.activitiesDisplayed.remove(a.activityUIID);
+		r.removeMovieClip();
+		var s:Boolean = (r==null) ? false : true;
+		
+	}
+	
+	private function removeAll(lm:LessonModel){
+		var keys = lm.activitiesDisplayed.keys();
+		for(var i=0; i<keys.length; i++){
+			var r = lm.activitiesDisplayed.remove(keys[i]);
+			r.removeMovieClip();
+		}
+		ACT_X = 0;
+		ACT_Y = 0;
+	}
+	
+	/**
+	 * Draws new activity to monitor tab view stage.
+	 * @usage   
+	 * @param   a  - Activity to be drawn
+	 * @param   cm - Refernce to the model
+	 * @return  Boolean - successfullit
+	 */
+	private function drawActivity(a:Activity,lm:LessonModel):Boolean{
+		
+		Debugger.log('The activity:'+a.title+','+a.activityTypeID+' is now be drawn',Debugger.CRITICAL,'drawActivity','LessonView');
+		
+		var _activityLayer_mc = progress_scp.content;
+		
+		var s:Boolean = false;
+		var newActivity_mc:MovieClip;
+		var lv:LessonView = LessonView(this);
+		var lc = getController();
+		
+		
+		//take action depending on act type
+		if(a.activityTypeID==Activity.TOOL_ACTIVITY_TYPE || a.isGateActivity() || a.isGroupActivity() ){
+			newActivity_mc = _activityLayer_mc.attachMovie("LearnerActivityVertical", "LearnerActivityVertical" + a.activityID, _activityLayer_mc.getNextHighestDepth(),{_activity:a,_lessonController:lc,_lessonView:lv, _x:ACT_X+25, _y:ACT_Y, actLabel:a.title, learner:lm.progressData});
+			ACT_Y = newActivity_mc._y + newActivity_mc._height;
+			Debugger.log('The activity:'+a.title+','+a.activityTypeID+' is tool/gate/group activity',Debugger.CRITICAL,'drawActivity','LessonView');
+		}else if(a.activityTypeID==Activity.PARALLEL_ACTIVITY_TYPE){
+			//get the children
+			var children:Array = lm.learningDesignModel.getComplexActivityChildren(a.activityUIID);
+			Debugger.log('The activity:'+a.title+','+a.activityTypeID+' is is parellel (complex) activity',Debugger.CRITICAL,'drawActivity','LessonView');
+		
+			//newActivity_mc = _activityLayer_mc.createChildAtDepth("LearnerParallelActivityVertical",DepthManager.kTop,{_activity:a,_children:children,_lessonController:lc,_lessonView:lv, _x:ACT_X+25, _y:ACT_Y, learner:learner});
+			//ACT_Y = newActivity_mc._y + newActivity_mc._height;
+			
+		}else if(a.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE){
+			var children:Array = lm.learningDesignModel.getComplexActivityChildren(a.activityUIID);
+			Debugger.log('The activity:'+a.title+','+a.activityTypeID+' is optional (complex) activity',Debugger.CRITICAL,'drawActivity','LessonView');
+		
+			//newActivity_mc = _activityLayer_mc.createChildAtDepth("LearnerOptionalActivityVertical",DepthManager.kTop,{_activity:a,_children:children,_lessonController:lc,_lessonView:lv, _x:ACT_X+25, _y:ACT_Y, learner:learner});
+			//ACT_Y = newActivity_mc._y + newActivity_mc._height;
+		
+		}else{
+			Debugger.log('The activity:'+a.title+','+a.activityUIID+' is of unknown type, it cannot be drawn',Debugger.CRITICAL,'drawActivity','LessonView');
+		}
+		
+		var actItems:Number = lm.activitiesDisplayed.size()
+		if (actItems < lm.getActivityKeys().length){
+			lm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
+		}
+		
+		_activityList.push(newActivity_mc);
+		
+		return true;
+	}
+	
+	public function compareProgressData(learner:Object, activityID:Number):String{
+		trace ("activity ID passed is: "+activityID)
+		trace("Number of Activities completed in the lesson are: "+learner.getCompletedActivities().length)
+		
+		var arrLearnerProgComp = learner.getCompletedActivities()
+		for (var i=0; i<arrLearnerProgComp.length; i++){
+			if (activityID == arrLearnerProgComp[i]){
+				var clipName:String = "completed_mc";
+				return clipName;
+			}
+		
+		}
+		
+		var arrLearnerProgAttempt = learner.getAttemptedActivities()
+		trace("Attempted activities are: "+arrLearnerProgAttempt.length)
+		for (var j=0; j<arrLearnerProgAttempt.length; j++){
+			trace("Activity Id Passed is "+activityID+" and attempted ID is "+arrLearnerProgAttempt[j])
+			if (activityID == arrLearnerProgAttempt[j]){
+				if (activityID == learner.getCurrentActivityId()){
+					var clipName:String = "current_mc";
+					return clipName;
+				}else {
+					var clipName:String = "attempted_mc";
+					return clipName;
+				}
+			}
+			
+		}
+		//arrLearnerProg = learner.getCurrentActivityId()
+		if (activityID == learner.getCurrentActivityId()){
+			var clipName:String = "current_mc";
+			return clipName;
+		}
+	}
 	
 	 /**
     * Sets the size of the Lesson on stage, called from update
