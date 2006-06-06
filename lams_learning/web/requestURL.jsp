@@ -33,9 +33,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 	</head>
 	
-		<%--c:if test="${empty activityId}">
-			<bean:parameter id="activityId" name="activityId" />
-		</c:if--%>
 		<c:if test="${empty url}">
 			<bean:parameter id="url" name="url" />
 		</c:if>

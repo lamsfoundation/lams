@@ -118,13 +118,18 @@
         scope="request"
       />
       <forward
-        name="viewGrouping"
+        name="viewGroup"
         path="/grouping.do?method=viewGrouping"
         redirect="false"
       />
       <forward
         name="showGroup"
-        path=".grouping"
+        path=".showgroup"
+        redirect="false"
+      />
+      <forward
+        name="waitGroup"
+        path=".waitgroup"
         redirect="false"
       />
     </action>

@@ -30,7 +30,7 @@
 			var form = document.forms[0];
 			var elements = form.elements;
 			for (var i = 0; i < elements.length; i++) {
-				if (elements[i].name == "activityId") {
+				if (elements[i].name == "activityID") {
 					if (elements[i].checked) {
 						validated = true;
 						break;
@@ -109,7 +109,7 @@
 														<%--html:img page="/images/tick.gif" /--%>
 													</c:when>
 													<c:otherwise>
-														<input type="radio" name="activityId"
+														<input type="radio" name="activityID"
 															value="<c:out value="${activityURL.activityId}"/>" />
 													</c:otherwise>
 												</c:choose>
@@ -156,7 +156,7 @@
 	</html:form>
 	<html:form action="/CompleteActivity" method="POST">
 		<input type="hidden" name="lams_token" value="<c:out value='${lams_token}' />" />
-		<input type="hidden" name="activityId" value="<c:out value="${optionsActivityForm.activityId}" />" />
+		<input type="hidden" name="activityID" value="<c:out value="${optionsActivityForm.activityId}" />" />
 	</html:form>
 </div>
 

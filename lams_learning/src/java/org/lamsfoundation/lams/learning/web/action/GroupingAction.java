@@ -46,6 +46,7 @@ import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 
 /**
@@ -158,7 +159,7 @@ public class GroupingAction extends LamsDispatchAction
         	groups.addAll(grouping.getGroups());
         
         request.getSession().setAttribute(GROUPS,groups);
-        request.setAttribute(LearningWebUtil.PARAM_ACTIVITY_ID,	activity.getActivityId());
+        request.setAttribute(AttributeNames.PARAM_ACTIVITY_ID,	activity.getActivityId());
         
         return mapping.findForward(SHOW_GROUP);
     }

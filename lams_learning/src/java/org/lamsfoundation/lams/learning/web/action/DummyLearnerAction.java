@@ -41,6 +41,7 @@ import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 
 /** 
@@ -144,7 +145,7 @@ public class DummyLearnerAction extends LamsDispatchAction
 
         //get user and lesson based on request.
         Integer learner = LearningWebUtil.getUserId();
-        long lessonID = WebUtil.readLongParam(request,LearningWebUtil.PARAM_LESSON_ID);
+        long lessonID = WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID);
 
         
         if(log.isDebugEnabled())

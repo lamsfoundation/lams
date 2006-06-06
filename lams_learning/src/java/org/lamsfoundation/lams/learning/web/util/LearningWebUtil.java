@@ -53,9 +53,7 @@ public class LearningWebUtil
     //---------------------------------------------------------------------
     // Class level constants - session attributes
     //---------------------------------------------------------------------
-	public static final String PARAM_LESSON_ID = "lessonId";
-	public static final String PARAM_ACTIVITY_ID = "activityId";
-	public static final String PARAM_PROGRESS_ID = "progressId";
+	public static final String PARAM_PROGRESS_ID = "progressID";
     
     /**
      * Helper method to retrieve the user data. Gets the id from the user details
@@ -84,12 +82,12 @@ public class LearningWebUtil
     public static Long getLessonId(HttpServletRequest request)
     {
         HttpSession ss = SessionManager.getSession();
-        Long lessonId = (Long)ss.getAttribute(PARAM_LESSON_ID);
+        Long lessonId = (Long)ss.getAttribute(AttributeNames.PARAM_LESSON_ID);
         
         if(lessonId ==null)
         {
             // not in the session - is it in the request?
-            lessonId = WebUtil.readLongParam(request,PARAM_LESSON_ID,true);
+            lessonId = WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID,true);
         }
         return lessonId;
     }
@@ -108,9 +106,9 @@ public class LearningWebUtil
     {
         HttpSession ss = SessionManager.getSession();
         if ( lessonId != null ) {
-        	ss.setAttribute(PARAM_LESSON_ID, lessonId);
+        	ss.setAttribute(AttributeNames.PARAM_LESSON_ID, lessonId);
         } else {
-        	ss.removeAttribute(PARAM_LESSON_ID);
+        	ss.removeAttribute(AttributeNames.PARAM_LESSON_ID);
         }
     }
    
@@ -183,7 +181,7 @@ public class LearningWebUtil
         
         if(activity == null)
         {
-            long activityId = WebUtil.readLongParam(request,PARAM_ACTIVITY_ID);
+            long activityId = WebUtil.readLongParam(request,AttributeNames.PARAM_ACTIVITY_ID);
             
             activity = learnerService.getActivity(new Long(activityId));
             

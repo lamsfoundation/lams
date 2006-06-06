@@ -91,10 +91,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<put name="body" value="/notebook/detail.jsp"/>
 	</definition>
 	<!-- Grouping definitions -->
-	<definition name=".grouping" extends=".activityLayout">
-		<put name="pageTitle" value="Grouping Result" />
+	<definition name=".showgroup" extends=".activityLayout">
+		<put name="pageTitle" value="Grouping" />
 		<put name="title" value="Grouping" />
-		<put name="body" value="/grouping/grouping.jsp"/>
+		<put name="body" value="/grouping/show.jsp"/>
+	</definition>
+	<definition name=".waitgroup" extends=".groupWaitLayout">
+		<put name="pageTitle" value="Grouping" />
+		<put name="title" value="Grouping" />
+		<put name="body" value="/grouping/wait.jsp"/>
 	</definition>
 	<!-- Gate definitions -->
 	<definition name=".synchGate" extends=".gateLayout">

@@ -38,16 +38,15 @@ import org.apache.struts.action.RedirectingActionForward;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
 import org.lamsfoundation.lams.learningdesign.Activity;
-import org.lamsfoundation.lams.learningdesign.ParallelActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
-import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * This class contains the standard struts action mappings for errors as
@@ -321,8 +320,9 @@ public class ActivityMapping implements Serializable
 
         if (activity != null)
         {
-       		url += url.indexOf("?") > -1 ? "&" : "?";
-       		url += "activityId=" + activity.getActivityId();
+            url = WebUtil.appendParameterToURL(url,
+            		AttributeNames.PARAM_ACTIVITY_ID,
+            		activity.getActivityId().toString());
         }
         if (useContext)
         {
