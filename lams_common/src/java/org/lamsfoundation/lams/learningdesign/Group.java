@@ -79,7 +79,8 @@ public class Group implements Serializable,Nullable,Comparable {
 
     /**
      * Creation Constructor for initializing learner group without tool sessions
-     * The order is generated using synchornize method on grouping.
+     * The order is generated using synchornize method on grouping. If a group of
+     * this name already exists, returns null.
      * 
      * @param grouping the grouping this group belongs to.
      * @param users the users in this group.
@@ -87,12 +88,17 @@ public class Group implements Serializable,Nullable,Comparable {
      */
     public static Group createLearnerGroup(Grouping grouping, String groupName, Set users)
     {
-        return new Group(null,groupName,grouping.getNextGroupOrderId(),grouping,users,new HashSet());
+    	int nextOrderId = grouping.getNextGroupOrderIdCheckName(groupName);
+    	if ( nextOrderId > -1 ) {
+    		return new Group(null,groupName,nextOrderId,grouping,users,new HashSet());
+    	}
+    	return null;
     }
   
     /**
      * Creation Constructor for initializing learner group with tool sessions
-     * The order is generated using synchornize method on grouping.
+     * The order is generated using synchornize method on grouping. If a group of
+     * this name already exists, returns null.
      * 
      * @param grouping the grouping this group belongs to.
      * @param name of this group
@@ -102,7 +108,11 @@ public class Group implements Serializable,Nullable,Comparable {
      */
     public static Group createLearnerGroupWithToolSession(Grouping grouping, String groupName, Set users,Set toolSessions)
     {
-        return new Group(null,groupName,grouping.getNextGroupOrderId(),grouping,users,toolSessions);
+    	int nextOrderId = grouping.getNextGroupOrderIdCheckName(groupName);
+    	if ( nextOrderId > -1 ) {
+    		return new Group(null,groupName,nextOrderId,grouping,users,toolSessions);
+    	}
+    	return null;
     }
     
     /**
@@ -283,5 +293,11 @@ public class Group implements Serializable,Nullable,Comparable {
     
     public GroupDTO getGroupDTO(){
     	return new GroupDTO(this);
+    }
+    
+    /** May this group be deleted or a user from this group deleted? It should not be 
+     * deleted if there are tool sessions attached */
+    public boolean mayBeDeleted() {
+    	return getToolSessions().size() == 0;
     }
 }

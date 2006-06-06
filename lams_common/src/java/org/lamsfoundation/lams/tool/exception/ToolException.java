@@ -27,7 +27,7 @@ package org.lamsfoundation.lams.tool.exception;
  * Type of exception thrown by Tool operations and interfaces.
  * @author chris
  */
-public class ToolException extends java.lang.Exception
+public class ToolException extends java.lang.RuntimeException
 {
     
     /**

@@ -27,8 +27,10 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.learningdesign.exception.GroupingException;
 import org.lamsfoundation.lams.usermanagement.User;
 
 
@@ -100,6 +102,16 @@ public class RandomGrouper extends Grouper implements Serializable
         //join the new learners into these groups.
         joinGroups(randomGrouping, learners);
     }
+    
+    /**
+     * @throws GroupingException 
+     * @see org.lamsfoundation.lams.learningdesign.Grouper#doGrouping(org.lamsfoundation.lams.learningdesign.Grouping,java.lang.Long, java.util.List)
+     */
+    public void doGrouping(Grouping randomGrouping,Long groupId, List learners) throws GroupingException
+    {
+    	doGrouping(randomGrouping, (String)null, learners);
+    }
+    
     //---------------------------------------------------------------------
     // Helper Methods - doGrouping
     //---------------------------------------------------------------------

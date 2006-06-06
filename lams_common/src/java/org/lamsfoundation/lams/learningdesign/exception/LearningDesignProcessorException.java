@@ -23,7 +23,7 @@
 /* $Id$ */
 package org.lamsfoundation.lams.learningdesign.exception;
 
-public class LearningDesignProcessorException extends Exception {
+public class LearningDesignProcessorException extends RuntimeException {
 	
 	public LearningDesignProcessorException(){
 		

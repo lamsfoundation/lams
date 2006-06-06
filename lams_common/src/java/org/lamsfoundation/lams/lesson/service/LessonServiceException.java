@@ -23,11 +23,7 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.lesson.service;
 
-/**
- * Type of exception thrown by Tool operations and interfaces.
- * @author chris
- */
-public class LessonServiceException extends java.lang.Exception
+public class LessonServiceException extends java.lang.RuntimeException
 {
     
     /**

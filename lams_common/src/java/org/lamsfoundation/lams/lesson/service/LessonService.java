@@ -27,14 +27,18 @@ package org.lamsfoundation.lams.lesson.service;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouper;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupingDAO;
+import org.lamsfoundation.lams.learningdesign.exception.GroupingException;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
@@ -199,18 +203,24 @@ public class LessonService implements ILessonService
 			// get the real objects, not the CGLIB version
 			grouping = groupingDAO.getGroupingById(grouping.getGroupingId());
         	Grouper grouper = grouping.getGrouper();
+        	
         	if ( grouper != null ) {
         		grouper.setCommonMessageService(messageService);
-        		if ( grouping.getGroups().size() == 0 ) {
-        			// no grouping done yet - do everyone already in the lesson.
-        			List usersInLesson = getActiveLessonLearners(lessonId);
-        			grouper.doGrouping(grouping, null, usersInLesson);
-        		} else if ( ! grouping.doesLearnerExist(learner) )  {
-        			// done the others, just do the one user
-        			grouper.doGrouping(grouping, null, learner);
+        		try {
+	        		if ( grouping.getGroups().size() == 0 ) {
+	        			// no grouping done yet - do everyone already in the lesson.
+	        			List usersInLesson = getActiveLessonLearners(lessonId);
+	        			grouper.doGrouping(grouping, (String)null, usersInLesson);
+	        		} else if ( ! grouping.doesLearnerExist(learner) )  {
+	        			// done the others, just do the one user
+	        			grouper.doGrouping(grouping, null, learner);
+	        		}
+        		} catch ( GroupingException e ) {
+        			throw new LessonServiceException(e);
         		}
         		groupingDAO.update(grouping);
         	}
+        	
 		} else {
 			String error = "The method performGrouping supports only grouping methods where the grouper decides the groups (currently only RandomGrouping). Called with a groupingActivity with the wrong grouper "+groupingActivity.getActivityId();
 			log.error(error);
@@ -219,18 +229,22 @@ public class LessonService implements ILessonService
     }
 
 	/**
-     * Perform the grouping, setting the given list of learners as one group. 
-     * @param groupingActivityId the activity that has create grouping. (mandatory)
+     * Perform the grouping, setting the given list of learners as one group. Not used initially.
+     * @param groupingActivity the activity that has create grouping. (mandatory)
      * @param learners to form one group
      */
-  public void performChosenGrouping(GroupingActivity groupingActivity, List learners) throws LessonServiceException {
+  	public void performGrouping(GroupingActivity groupingActivity, String groupName, List learners) throws LessonServiceException {
     	
         Grouping grouping = groupingActivity.getCreateGrouping();
 		if ( grouping != null && grouping.isChosenGrouping() ) {
         	Grouper grouper = grouping.getGrouper();
         	if ( grouper != null ) {
         		grouper.setCommonMessageService(messageService);
-    			grouper.doGrouping(grouping, null, learners);
+        		try {
+        			grouper.doGrouping(grouping, groupName, learners);
+        		} catch ( GroupingException e ) {
+        			throw new LessonServiceException(e);
+        		}
         		groupingDAO.update(grouping);
         	}
 		} else {
@@ -238,7 +252,104 @@ public class LessonService implements ILessonService
 			log.error(error);
 			throw new LessonServiceException(error);
 		}
-    }
+  	}
     
+	/**
+     * Perform the grouping, setting the given list of learners as one group. Currently used for chosen grouping.
+     * @param groupingActivity the activity that has create grouping. (mandatory)
+     * @param learners to form one group
+     */
+   public void performGrouping(GroupingActivity groupingActivity, Long groupId, List learners) throws LessonServiceException {
+       Grouping grouping = groupingActivity.getCreateGrouping();
+		if ( grouping != null && grouping.isChosenGrouping() ) {
+	       	Grouper grouper = grouping.getGrouper();
+	       	if ( grouper != null ) {
+	       		grouper.setCommonMessageService(messageService);
+	       		try {
+	       			grouper.doGrouping(grouping, groupId, learners);
+	       		} catch ( GroupingException e ) {
+	       			throw new LessonServiceException(e);
+	       		}
+	       		groupingDAO.update(grouping);
+	       	}
+		} else {
+			String error = "The method performChosenGrouping supports only grouping methods where the supplied list should be used as a single group (currently only ChosenGrouping). Called with a groupingActivity with the wrong grouper "+groupingActivity.getActivityId();
+			log.error(error);
+			throw new LessonServiceException(error);
+		}
+   }
 
+	/**
+     * Remove learners from the given group. 
+     * @param groupingActivity the activity that has create grouping. (mandatory)
+     * @param groupID if not null only remove user from this group, if null remove learner from any group.
+     * @param learners the learners to be removed (mandatory)
+     */
+    public void removeLearnersFromGroup(GroupingActivity groupingActivity, Long groupID, List<User> learners) throws LessonServiceException
+    {
+		Grouping grouping = groupingActivity.getCreateGrouping();
+		if ( grouping != null ) {
+			// get the real objects, not the CGLIB version
+			grouping = groupingDAO.getGroupingById(grouping.getGroupingId());
+        	Grouper grouper = grouping.getGrouper();
+        	if ( grouper != null ) {
+        		try {
+        			grouper.removeLearnersFromGroup(grouping, groupID, learners);
+        		} catch ( GroupingException e ) {
+        			throw new LessonServiceException(e);
+        		}
+        	}
+    		groupingDAO.update(grouping);
+		}
+    }
+
+    /** Create an empty group for the given grouping. If the group name is not supplied
+     * or the group name already exists then nothing happens.
+     * 
+     * @param groupingActivity the activity that has create grouping. (mandatory)
+     * @param groupName (mandatory)
+     */
+    public void createGroup(GroupingActivity groupingActivity, String name) throws LessonServiceException 
+    {
+		Grouping grouping = groupingActivity.getCreateGrouping();
+		if ( grouping != null ) {
+			// get the real objects, not the CGLIB version
+			grouping = groupingDAO.getGroupingById(grouping.getGroupingId());
+        	Grouper grouper = grouping.getGrouper();
+        	if ( grouper != null ) {
+        		try {
+        			grouper.createGroup(grouping, name);
+        		} catch ( GroupingException e ) {
+        			throw new LessonServiceException(e);
+        		}
+        	}
+    		groupingDAO.update(grouping);
+		}
+	}
+
+    /** 
+     * Remove a group for the given grouping. If the group is already used (e.g. a tool session exists)
+     * then it throws a GroupingException.
+     *  
+     * @param groupingActivity the activity that has create grouping. (mandatory)
+     * @param groupID (mandatory)
+     */
+    public void removeGroup(GroupingActivity groupingActivity, Long groupID) throws LessonServiceException {
+		Grouping grouping = groupingActivity.getCreateGrouping();
+		if ( grouping != null ) {
+			// get the real objects, not the CGLIB version
+			grouping = groupingDAO.getGroupingById(grouping.getGroupingId());
+        	Grouper grouper = grouping.getGrouper();
+        	if ( grouper != null ) {
+        		try {
+        			grouper.removeGroup(grouping, groupID);
+        		} catch ( GroupingException e ) {
+        			throw new LessonServiceException(e);
+        		}
+        	}
+    		groupingDAO.update(grouping);
+		}
+	}
+    
+    
 }

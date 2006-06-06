@@ -20,25 +20,23 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-/* $$Id$$ */
+
+/* $Id$ */
 package org.lamsfoundation.lams.learningdesign.exception;
 
-/**
- * @author Manpreet Minhas
- */
-public class LearningDesignException extends RuntimeException {
-	
-	public LearningDesignException(){
+public class GroupingException extends LearningDesignException {
+
+	public GroupingException(){
 		
 	}
-	public LearningDesignException(String message){
+	public GroupingException(String message){
 		super(message);
 	}
 	/**
      * Constructor for wrapping the throwable object
      * @param cause
      */
-    public LearningDesignException(Throwable cause)
+    public GroupingException(Throwable cause)
     {
         super(cause);
     }
@@ -49,9 +47,8 @@ public class LearningDesignException extends RuntimeException {
      * @param message
      * @param cause
      */
-    public LearningDesignException(String message, Throwable cause)
+    public GroupingException(String message, Throwable cause)
     {
         super(message, cause);
     }
-
 }

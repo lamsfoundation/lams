@@ -228,18 +228,24 @@ public abstract class Grouping implements Serializable
     // Service methods
     //---------------------------------------------------------------------
     /**
-     * Return the next group order id.
+     * Return the next group order id. Can't do it on size as groups may have been deleted.
+     * Returns -1 if the proposed name is the same as existing name
      * @return the next order id.
      */
-    public synchronized int getNextGroupOrderId()
+    public synchronized int getNextGroupOrderIdCheckName(String proposedName)
     {
-        int order =0;
-        if(this.groups!=null)
-        {
-            order = groups.size();
-            return ++order;
-        }
-        else return ++order;
+		int maxOrderId = 0;
+
+		if ( this.getGroups() != null ) {
+    		Iterator iter = this.getGroups().iterator();
+			while (iter.hasNext()) {
+				Group element = (Group) iter.next();
+				maxOrderId = element.getOrderId() > maxOrderId ? element.getOrderId() : maxOrderId;
+				if ( proposedName.equals(element.getGroupName()) )
+					return -1;
+			}
+    	}
+		return ++maxOrderId;
     }
     
     /**
