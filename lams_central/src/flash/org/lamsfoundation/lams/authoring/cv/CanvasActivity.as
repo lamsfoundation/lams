@@ -107,11 +107,13 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	
 	public function init(initObj):Void{
 		if(initObj){
-			_canvasView = initObj._canvasView;
-			_canvasController = initObj._canvasController;
+			
 			if (_module == "monitoring"){
 				_monitorView = initObj._monitorView;
 				_monitorController = initObj._monitorController;
+			}else {
+				_canvasView = initObj._canvasView;
+				_canvasController = initObj._canvasController;
 			}
 			_activity = initObj.activity;
 		}
