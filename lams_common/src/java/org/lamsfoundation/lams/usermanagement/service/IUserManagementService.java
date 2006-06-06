@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Vector;
 
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
+import org.lamsfoundation.lams.usermanagement.IRolePrivilegeDAO;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationState;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
@@ -92,6 +93,13 @@ public interface IUserManagementService {
      */
 	public void setLocaleDAO(ILocaleDAO localeDao);
 
+    /**
+     * Set IRolePrivilegeDAO
+     *
+     * @param rolePrivilegeDao 
+     */
+	public void setRolePrivilegeDAO(IRolePrivilegeDAO rolePrivilegeDao);
+	
 	
     /**
      * Set IOrganisationDAO
@@ -268,7 +276,7 @@ public interface IUserManagementService {
      */
     public List getUserOrganisationsForUser(User user);
 
-    
+   
 	/**
      * Retrieves roles in which the user 
      * has the specified role 
@@ -459,5 +467,7 @@ public interface IUserManagementService {
 	public List getAllCountries();
 	
 	public List getAllLanguages();
+	
+	public List getRolePrivilegesByRoleId(Integer id);
 
 }

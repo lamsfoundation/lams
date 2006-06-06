@@ -34,6 +34,7 @@ import org.lamsfoundation.lams.cache.ICacheManager;
 import org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
+import org.lamsfoundation.lams.usermanagement.IRolePrivilegeDAO;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationState;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
@@ -80,6 +81,8 @@ public class UserManagementService implements IUserManagementService {
 	private IRoleDAO roleDAO;
 	
 	private ILocaleDAO localeDAO;
+	
+	private IRolePrivilegeDAO rolePrivilegeDAO;
 
 	private IOrganisationDAO organisationDAO;
 
@@ -680,7 +683,8 @@ public class UserManagementService implements IUserManagementService {
 		return organisationTypeDAO.getOrganisationTypeById(typeId);
 	}
 
-	public void setLocaleDAO(ILocaleDAO localeDao) {
+	public void setLocaleDAO(ILocaleDAO localeDAO) {
+		this.localeDAO = localeDAO;
 	}
 
 	public List getAllCountries() {
@@ -689,5 +693,13 @@ public class UserManagementService implements IUserManagementService {
 
 	public List getAllLanguages() {
 		return localeDAO.getAllLanguages();
+	}
+
+	public void setRolePrivilegeDAO(IRolePrivilegeDAO rolePrivilegeDAO) {
+		this.rolePrivilegeDAO = rolePrivilegeDAO;
+	}
+
+	public List getRolePrivilegesByRoleId(Integer id) {
+		return rolePrivilegeDAO.getRolePrivilegesByRoleId(id);
 	}
 }
