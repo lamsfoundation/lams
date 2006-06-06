@@ -55,7 +55,6 @@
 					<%}
 					   roleList.clear();
 					   roleList.add(Role.STAFF);
-					   roleList.add(Role.TEACHER); 
 					   orgDTO = service.getOrganisationsForUserByRole(user,roleList);
 						if(orgDTO!=null){%>
 					   <A HREF="monitoring/dummy.jsp" target="mWindow"/>Dummy Monitoring Screen</A>
@@ -80,7 +79,7 @@
 							<tr><td align="left">Course: <%=course.getName()%>:</td>
 							<td align="right" >
 							<% Vector roleNames	= course.getRoleNames();
-								if ( roleNames.contains(Role.STAFF) || roleNames.contains(Role.TEACHER) ) {%>
+								if ( roleNames.contains(Role.STAFF) ) {%>
 									<input name="addLesson" type="button" id="addLesson" onClick="openAddLesson(<%=course.getOrganisationID()%>,null);" value="Add Lesson"/>
 							</td>
 							</tr>
@@ -111,7 +110,7 @@
 								<tr><td align="left">Class: <%=courseClass.getName()%>:</td>
 								<td align="right" >
 								<% Vector classRoleNames	= course.getRoleNames();
-									if ( classRoleNames.contains(Role.STAFF) || classRoleNames.contains(Role.TEACHER) ) {%>
+									if ( classRoleNames.contains(Role.STAFF)  ) {%>
 									<input name="addLesson" type="button" id="addLesson" onClick="openAddLesson(<%=course.getOrganisationID()%>,<%=courseClass.getOrganisationID()%>);" value="Add Lesson"/>
 								</td>
 								</tr>
