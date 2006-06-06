@@ -767,7 +767,7 @@ public class ResourceServiceImpl implements
 			exportContentService.registerFileClassForImport(ResourceItem.class.getName()
 					,"fileUuid","fileVersionId","fileName","fileType",null,"initialItem");
 			
-			Object toolPOJO =  exportContentService.importToolContent(toolContentPath,newUserUid, resourceToolContentHandler);
+			Object toolPOJO =  exportContentService.importToolContent(toolContentPath,resourceToolContentHandler);
 			if(!(toolPOJO instanceof Resource))
 				throw new ImportToolContentException("Import Share resources tool content failed. Deserialized object is " + toolPOJO);
 			Resource toolContentObj = (Resource) toolPOJO;
