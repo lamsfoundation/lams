@@ -28,6 +28,7 @@ import org.lamsfoundation.lams.authoring.Transition;
 import org.lamsfoundation.lams.common.Sequence;
 import org.lamsfoundation.lams.common.util.Observable;
 import org.lamsfoundation.lams.common.util.*;
+import org.lamsfoundation.lams.common.*;
 import mx.managers.*
 import mx.utils.*
 import mx.events.*;
@@ -564,6 +565,25 @@ class MonitorModel extends Observable{
 			return null;
 		}
 	}
+
+
+	///////////////////////       OPEN ACTIVITY                /////////////////////////////
+	/**
+	 * Called on double clicking an activity
+	 * @usage   
+	 * @return  
+	 */
+	public function openToolActivityContent(ca:Activity):Void{
+		Debugger.log('ta:'+ca.title+'toolContentID:'+ca.activityUIID,Debugger.GEN,'openToolActivityContent','MonitorModel');
+
+		//if we have a good toolID lets open it
+		var cfg = Config.getInstance();
+		var URLToSend:String = cfg.serverUrl+_root.monitoringURL+'getLearnerActivityURL&activityID='+ca.activityID+'&userID='+_root.userID+'&lessonID='+_root.lessonID;
+	
+		Debugger.log('Opening url:'+URLToSend,Debugger.GEN,'openToolActivityContent','CanvasModel');
+		getURL(URLToSend,"_blank");		
+	}
+	
 
 	public function setDirty(){
 		_isDirty = true;
