@@ -64,6 +64,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorLearnerActivity extends Movie
 	private var todo_mc:MovieClip;
 	private var attempted_mc:MovieClip;
 	private var canvasActivity_mc:MovieClip;
+	private var clickTarget_mc:MovieClip;
 	private var title_lbl:MovieClip;
 	private var groupIcon_mc:MovieClip;
 	private var stopSign_mc:MovieClip;	
@@ -123,12 +124,12 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorLearnerActivity extends Movie
 	}
 	
 	private function showAssets(isVisible:Boolean){
-		//completed_mc._visible = isVisible;
-		//current_mc._visible = isVisible;
-		//canvasActivity_mc._visible = isVisible;
-		//clickTarget_mc._visible = isVisible;
-		//todo_mc._visible = isVisible;
-		//attempted_mc._visible = isVisible
+		completed_mc._visible = isVisible;
+		current_mc._visible = isVisible;
+		canvasActivity_mc._visible = isVisible;
+		clickTarget_mc.enabled = isVisible;
+		todo_mc._visible = isVisible;
+		attempted_mc._visible = isVisible
 		title_lbl._visible = true;
 	}
 	
@@ -149,9 +150,12 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorLearnerActivity extends Movie
 	 * @return  
 	 */
 	private function draw(){
-			Debugger.log(_activity.title+',_activity.isGateActivity():'+_activity.isGateActivity(),4,'draw','CanvasActivity');
-		if (actStatus == null || actStatus == undefined){
-			actStatus = _learnerTabView.compareProgressData(learner, this.activity.activityID);
+		clickTarget_mc.onPress = Proxy.create (this, localOnPress);
+		clickTarget_mc.onRelease = Proxy.create (this, localOnRelease);
+		clickTarget_mc.onReleaseOutside = Proxy.create (this, localOnReleaseOutside);		Debugger.log(_activity.title+',_activity.isGateActivity():'+_activity.isGateActivity(),4,'draw','CanvasActivity');
+		trace("Status returned for the learner "+learner.getUserName()+" activityID "+this.activity.activityID+ " is "+actStatus)
+		if (actStatus == undefined){
+			actStatus = _learnerTabView.compareProgressData(learner, _activity.activityID);
 		}
 		trace("Status returned for the learner "+learner.getUserName()+" activityID "+this.activity.activityID+ " is "+actStatus)
 		
@@ -162,18 +166,17 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorLearnerActivity extends Movie
 		switch (actStatus){
 		    case 'completed_mc' :
 				completed_mc._visible = true;
-				//this.attachMovie("completed_mc", "completed_mc", this.getNextHighestDepth(),{_x:xPos, _y:yPos})
-		        break;
+				clickTarget_mc.enabled = true;
+				break;
             case 'current_mc' :
-				//this.attachMovie("current_mc", "current_mc", this.getNextHighestDepth(),{_x:xPos, _y:yPos})
 				current_mc._visible = true;
+				clickTarget_mc.enabled = true;
                 break;
             case 'attempted_mc' :
-				//this.attachMovie("attempted_mc", "attempted_mc", this.getNextHighestDepth(),{_x:xPos, _y:yPos})
-			    attempted_mc._visible = true;
+				attempted_mc._visible = true;
+				clickTarget_mc.enabled = true;
                 break;
 			default :
-				//this.attachMovie("todo_mc", "todo_mc", this.getNextHighestDepth(),{_x:xPos, _y:yPos})
 				todo_mc._visible = true;
                 //Debugger.log('unknown update type :' + infoObj.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.MonitorView');
 		}
@@ -185,7 +188,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorLearnerActivity extends Movie
 	}
 	
 		
-	private function onPress():Void{
+	private function localOnPress():Void{
 		
 			
 			// check double-click
@@ -207,7 +210,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorLearnerActivity extends Movie
 	
 	}
 	
-	private function onRelease():Void{
+	private function localOnRelease():Void{
 		if(!_doubleClicking){
 			Debugger.log('Releasing:'+this,Debugger.GEN,'onRelease','MonitorLearnerActivity');
 				trace("Activity ID is: "+this.activity.activityID)	
@@ -216,7 +219,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorLearnerActivity extends Movie
 		
 	}
 	
-	private function onReleaseOutside():Void{
+	private function localOnReleaseOutside():Void{
 		Debugger.log('ReleasingOutside:'+this,Debugger.GEN,'onReleaseOutside','MonitorLearnerActivity');
 		_monitorController.activityReleaseOutside(this);
 	}
