@@ -118,7 +118,16 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 		}
 		
 		//so now it is placed on in the IDE and we just call init
-		if (fromModuleTab != "monitorLearnerTab"){
+		if (fromModuleTab == "monitorMonitorTab"|| fromModuleTab == "monitorLearnerTab"){
+			
+			child1_mc.init({activity:child1,_monitorController:_monitorController,_monitorView:_monitorView, learner:learner, _module:"monitoring"});
+			child2_mc.init({activity:child2,_monitorController:_monitorController,_monitorView:_monitorView, learner:learner, _module:"monitoring"});
+			
+			//set the visibility to false
+			child1_mc._visible = false;
+			child2_mc._visible = false;
+			
+		} else {
 			//set the positioning co-ords
 			child1.xCoord = CHILD_OFFSET_X;
 			child1.yCoord = CHILD1_OFFSET_Y;
@@ -126,14 +135,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 			child2.yCoord = CHILD2_OFFSET_Y;
 			child1_mc.init({activity:child1,_canvasController:_canvasController,_canvasView:_canvasView});
 			child2_mc.init({activity:child2,_canvasController:_canvasController,_canvasView:_canvasView});
-		} else {
 			
-			child1_mc.init({activity:child1,_monitorController:_monitorController,_monitorView:_monitorView, learner:learner});
-			child2_mc.init({activity:child2,_monitorController:_monitorController,_monitorView:_monitorView, learner:learner});
-			
-			//set the visibility to false
-			child1_mc._visible = false;
-			child2_mc._visible = false;
 		}
 		
 		
