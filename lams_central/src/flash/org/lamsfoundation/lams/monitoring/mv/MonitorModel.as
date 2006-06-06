@@ -169,6 +169,7 @@ class MonitorModel extends Observable{
 	public function setLessonProgressData(learnerProg:Array){
 		//clear the old lot of Learner Progress data
 		_learnersProgress.clear();
+		learnerTabActArr = new Array();
 		trace('adding learning seq for length' + learnerProg.length);
 		learnerTabActArr = learnerProg;
 		for(var i=0; i<learnerProg.length;i++){
@@ -281,7 +282,12 @@ class MonitorModel extends Observable{
 	 * @usage   
 	 * @return  
 	 */
-	public function clearDesign(){
+	public function clearDesign(tabID:Number, learner:Object){
+		
+		if (learner != null || learner != undefined){
+			var drawLearner:Object = new Object();
+			drawLearner = learner;
+		}
 	
 		//porobbably need to get a bit more granular
 		Debugger.log('Running',Debugger.GEN,'refreshDesign','MonitorModel');
