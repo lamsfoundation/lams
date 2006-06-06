@@ -63,10 +63,12 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 	private var activeLearner:Number;
 	private var prevLearner:Number;
 	private var learnersDrawn:Number;
+	private var learnerListArr:Array;
 	
 	private var _tm:ThemeManager;
 	private var mm:MonitorModel;
 	private var _learnerTabView:LearnerTabView;
+
 	
 	//Canvas clip
 	
@@ -182,7 +184,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
     */
 	private function draw(){
 		//activityArr = new Array;
-		bkg_pnl = this.attachMovie("Panel", "bkg_pnl", this.getNextHighestDepth());
+		//bkg_pnl = this.attachMovie("Panel", "bkg_pnl", this.getNextHighestDepth());
 
 		//set up the 
 		//_canvas_mc = this;
@@ -191,6 +193,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		
 		_activityLayerComplex_mc = this.createEmptyMovieClip("_activityLayerComplex_mc", this.getNextHighestDepth());
 		_activityLayer_mc = this.createEmptyMovieClip("_activityLayer_mc", this.getNextHighestDepth());
+		
 			
 		trace("Loaded MonitorTabView Data"+ this)
 		//setSize (mm)
@@ -210,8 +213,22 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		return prevLearner;
 	}
 	
+	/*
+	* Clear Method to clear movies from scrollpane
+	* 
+	*/
+	private function clearLearnersData(array:Array):Array{
+		if(array != null){
+			for (var i=0; i <array.length; i++){
+				array[i].removeMovieClip();
+			}
+		}
+		array = new Array();
+	return array;
+	}
+	
 	private function drawAllLearnersDesign(mm:MonitorModel, tabID:Number){
-		
+		learnerListArr = clearLearnersData(learnerListArr)
 		for (var j=0; j<mm.allLearnersProgress.length; j++){
 			learnersDrawn = j+1
 			mm.drawDesign(tabID, mm.allLearnersProgress[j]);
@@ -225,12 +242,29 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		trace ("activity ID passed is: "+activityID)
 		trace("Number of Activities completed in the lesson are: "+learner.getCompletedActivities().length)
 		
-		var arrLearnerProg = learner.getCompletedActivities()
-		for (var i=0; i<arrLearnerProg.length; i++){
-			if (activityID == arrLearnerProg[i]){
+		var arrLearnerProgComp = learner.getCompletedActivities()
+		for (var i=0; i<arrLearnerProgComp.length; i++){
+			if (activityID == arrLearnerProgComp[i]){
 				var clipName:String = "completed_mc";
 				return clipName;
 			}
+		
+		}
+		
+		var arrLearnerProgAttempt = learner.getAttemptedActivities()
+		trace("Attempted activities are: "+arrLearnerProgAttempt.length)
+		for (var j=0; j<arrLearnerProgAttempt.length; j++){
+			trace("Activity Id Passed is "+activityID+" and attempted ID is "+arrLearnerProgAttempt[j])
+			if (activityID == arrLearnerProgAttempt[j]){
+				if (activityID == learner.getCurrentActivityId()){
+					var clipName:String = "current_mc";
+					return clipName;
+				}else {
+					var clipName:String = "attempted_mc";
+					return clipName;
+				}
+			}
+			
 		}
 		//arrLearnerProg = learner.getCurrentActivityId()
 		if (activityID == learner.getCurrentActivityId()){
@@ -263,7 +297,24 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 	private function drawActivity(a:Activity,mm:MonitorModel, learner:Object):Boolean{
 		
 		Debugger.log('The activity:'+a.title+','+a.activityTypeID+' is now be drawn',Debugger.CRITICAL,'drawActivity','LearnerTabView');
-	
+		if (ACT_X == 0){
+			 var z:Object = mm.getSize();
+		trace("Monitor Tab Grid Width: "+s.w+" Monitor Tab Grid Height: "+s.h);
+			_activityLayer_mc.createTextField("learnerName"+learner.getLearnerId(), _activityLayer_mc.getNextHighestDepth(), ACT_X, ACT_Y-10, z.w, 20);
+			var learnerName_txt = _activityLayer_mc["learnerName"+learner.getLearnerId()];
+			trace("Learnermername field is: "+learnerName_txt)
+			var nameTextFormat = new TextFormat();
+			nameTextFormat.bold = true;
+			nameTextFormat.font = "Verdana";
+			nameTextFormat.size = 11;
+			learnerName_txt.border = true;
+			learnerName_txt.selectable = false;
+			learnerName_txt.background = true;
+			learnerName_txt.backgroundColor = 0xCCCCCC;
+			learnerName_txt.setNewTextFormat(nameTextFormat);
+			learnerName_txt.text = "\t"+learner.getUserName()
+			trace("Ypos for name field is: "+ACT_Y)
+		}
 		var s:Boolean = false;
 		
 		var ltv = LearnerTabView(this);
@@ -272,18 +323,18 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		
 		//take action depending on act type
 		if(a.activityTypeID==Activity.TOOL_ACTIVITY_TYPE || a.isGateActivity() || a.isGroupActivity() ){
-			var newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasActivityLinear", DepthManager.kTop,{_activity:a,_monitorController:mc,_learnerTabView:ltv, _x:ACT_X, _y:ACT_Y, actLabel:a.title, learner:learner});
+			var newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasActivityLinear", DepthManager.kTop,{_activity:a,_monitorController:mc,_learnerTabView:ltv, _x:ACT_X, _y:ACT_Y+25, actLabel:a.title, learner:learner});
 			ACT_X = newActivity_mc._x + newActivity_mc._width;
 		}else if(a.activityTypeID==Activity.PARALLEL_ACTIVITY_TYPE){
 			//get the children
 			var children:Array = mm.getMonitor().ddm.getComplexActivityChildren(a.activityUIID);
 			
-			var newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasParallelActivityLinear",DepthManager.kTop,{_activity:a,_children:children,_monitorController:mc,_learnerTabView:ltv, _x:ACT_X, _y:ACT_Y, fromModuleTab:"monitorLearnerTab", learner:learner});
+			var newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasParallelActivityLinear",DepthManager.kTop,{_activity:a,_children:children,_monitorController:mc,_learnerTabView:ltv, _x:ACT_X, _y:ACT_Y+25, fromModuleTab:"monitorLearnerTab", learner:learner});
 			ACT_X = newActivity_mc._x + newActivity_mc._width;
-		} else if(a.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE){
+		}else if(a.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE){
 			var children:Array = mm.getMonitor().ddm.getComplexActivityChildren(a.activityUIID);
 			trace("X pos is: "+ACT_X)
-			var newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasOptionalActivityLinear",DepthManager.kTop,{_activity:a,_children:children,_monitorController:mc,_learnerTabView:ltv, _x:ACT_X, _y:ACT_Y, fromModuleTab:"monitorLearnerTab", learner:learner});
+			var newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasOptionalActivityLinear",DepthManager.kTop,{_activity:a,_children:children,_monitorController:mc,_learnerTabView:ltv, _x:ACT_X, _y:ACT_Y+25, fromModuleTab:"monitorLearnerTab", learner:learner});
 			ACT_X = newActivity_mc._x + newActivity_mc._width;
 		}else{
 			Debugger.log('The activity:'+a.title+','+a.activityUIID+' is of unknown type, it cannot be drawn',Debugger.CRITICAL,'drawActivity','LearnerTabView');
@@ -309,7 +360,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		bkg_pnl.setSize(s.w,s.h);
 		
 		//Create the grid.  The grid is re-drawn each time the canvas is resized.
-		var grid_mc = Grid.drawGrid(_gridLayer_mc,Math.round(s.w-10),Math.round(s.h-10),V_GAP,H_GAP);
+		//var grid_mc = Grid.drawGrid(_gridLayer_mc,Math.round(s.w-10),Math.round(s.h-10),V_GAP,H_GAP);
 				
 	}
 	
