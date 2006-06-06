@@ -117,7 +117,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	public static final String EXPORT_TOOLCONTNET_FOLDER_SUFFIX = "export_toolcontent";
 	public static final String EXPORT_TOOLCONTNET_ZIP_SUFFIX = ".zip";
 	public static final String LEARNING_DESIGN_FILE_NAME = "learning_design.xml";
-	private static final String TOOL_FILE_NAME = "tool.xml";
+	public static final String TOOL_FILE_NAME = "tool.xml";
+	public static final String TOOL_FAILED_FILE_NAME = "export_failed.xml";
 	
 	
 	private Logger log = Logger.getLogger(ExportToolContentService.class);
@@ -213,7 +214,10 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			    	for(NameInfo name:fileHandleClassList){
 				    	if(args[0] != null && name.className.equals((args[0].getClass().getName()))){
 							Long uuid = NumberUtils.createLong(BeanUtils.getProperty(args[0],name.uuidFieldName));
-							Long version = NumberUtils.createLong(BeanUtils.getProperty(args[0],name.versionFieldName));
+							//version id is optional
+							Long version = null;
+							if(name.versionFieldName != null)
+								version = NumberUtils.createLong(BeanUtils.getProperty(args[0],name.versionFieldName));
 							log.debug("XStream get file node ["+uuid +"," + version +"].");
 							fileNodes.add(ExportToolContentService.this.new ValueInfo(uuid,version));
 				    	}
@@ -245,8 +249,6 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			    }
 	        } catch (InvocationTargetException e) {
 	        	throw e.getTargetException();
-	        } catch (Exception e) {
-	        	throw new RuntimeException("unexpected invocation exception: " + e.getMessage());
 	        }
 		        
 			return result;
@@ -311,7 +313,13 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			for(AuthoringActivityDTO activity : activities){
 				ToolContentManager contentManager = (ToolContentManager) findToolService(toolDAO.getToolByID(activity.getToolID()));
 				log.debug("Tool export content : " + activity.getTitle() +" by contentID :" + activity.getToolContentID());
-				contentManager.exportToolContent(activity.getToolContentID(),contentDir);
+				try{
+					contentManager.exportToolContent(activity.getToolContentID(),contentDir);
+				}catch (Exception e) {
+					String msg = activity.getToolDisplayName() + " export tool content failed:" + e.toString();
+					log.error(msg);
+					writeErrorToToolFile(contentDir,activity.getToolContentID(),msg);
+				} 
 			}
 			
 			log.debug("Create export content target zip file. File name is " + targetZipFileName);
@@ -326,23 +334,18 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		} catch (IOException e) {
 			log.error("IOException:" + e.toString());
 			throw new ExportToolContentException(e);
-		} catch (DataMissingException e) {
-			log.error("DataMissingException:" + e.toString());
-			throw new ExportToolContentException(e);
-		} catch (ToolException e) {
-			log.error("ToolException:" + e.toString());
-			throw new ExportToolContentException(e);
 		}
 	}
+
 	/**
 	 * @throws ExportToolContentException 
 	 * 
 	 */
-	public void exportToolContent(Long toolContentId, Object toolContentObj, IToolContentHandler toolContentHandler, String toPath) 
+	public void exportToolContent(Long toolContentId, Object toolContentObj, IToolContentHandler toolContentHandler, String rootPath) 
 				throws ExportToolContentException {
 		try {
 			//create tool's save path
-			String toolPath = FileUtil.getFullPath(toPath,toolContentId.toString());
+			String toolPath = FileUtil.getFullPath(rootPath,toolContentId.toString());
 			FileUtil.createDirectory(toolPath);
 			
 			//create tool xml file name : tool.xml
@@ -526,7 +529,9 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 					
 					//refresh file node Uuid and Version value to latest.
 					BeanUtils.setProperty(fileNode.instance,fileNode.name.uuidFieldName,key.getUuid());
-					BeanUtils.setProperty(fileNode.instance,fileNode.name.versionFieldName,key.getVersion());
+					//version id is optional
+					if(fileNode.name.versionFieldName != null)
+						BeanUtils.setProperty(fileNode.instance,fileNode.name.versionFieldName,key.getVersion());
 				}
 			}
 		} catch (FileNotFoundException e) {
@@ -562,6 +567,26 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	//******************************************************************
 	// Private methods
 	//******************************************************************
+	/**
+	 * If there are any errors happen during tool exporting content. Writing failed message to file.
+	 */
+	private void writeErrorToToolFile(String rootPath,Long toolContentId, String msg) {
+		//create tool's save path
+		try {
+			String toolPath = FileUtil.getFullPath(rootPath,toolContentId.toString());
+			FileUtil.createDirectory(toolPath);
+		
+			//create tool xml file name : tool.xml
+			String toolFileName = FileUtil.getFullPath(toolPath,TOOL_FAILED_FILE_NAME);
+			Writer toolFile = new FileWriter(new File(toolFileName));
+			toolFile.write(msg);
+			
+		} catch (FileUtilException e) {
+			log.warn("Export error file write error:" + e.toString());
+		} catch (IOException e) {
+			log.warn("Export error file write error:" + e.toString());
+		}
+	}	
 	private ILearningDesignService getLearningDesignService(){
 		return (ILearningDesignService) applicationContext.getBean(LEARNING_DESIGN_SERVICE_BEAN_NAME);		
 	}
