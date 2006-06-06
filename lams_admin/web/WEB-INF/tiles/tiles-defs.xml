@@ -2,84 +2,39 @@
 
 <tiles-definitions>
 
-	<definition name=".admin.error" path="/template.jsp">
-		<put name="title" value="LAMS ::Admin Error"/>
-		<put name="pageHeader" value="Admin Error"/>
-		<put name="header" value="header.jsp"/>
-		<put name="content" value="/admin/errorContent.jsp" />	
-		<put name="footer" value="footer.jsp"/>	
-	</definition>
-
-
-	<definition name=".admin" path="/template.jsp">
-		<put name="title" value="LAMS :: Maintain Organisations/Users"/>
-		<put name="pageHeader" value="Maintain Organisations/Users"/>
+	<definition name=".orglist" path="/template.jsp">
+		<put name="title" value="LAMS :: Organisation Management"/>
 		<put name="header" value="adminHeader.jsp"/>
-		<put name="content" value="/admin/adminContent.jsp" />	
+		<put name="content" value="orglist.jsp" />	
 		<put name="footer" value="footer.jsp"/>	
 	</definition>
 
-	<definition name=".admin.organisation" path="/template.jsp">
+	<definition name=".organisation" path="/template.jsp">
 		<put name="title" value="LAMS :: Organisation Entry"/>
-		<put name="pageHeader" value="Organisation Entry"/>
 		<put name="header" value="adminHeader.jsp"/>
-		<put name="content" value="/admin/organisationContent.jsp" />	
+		<put name="content" value="organisation.jsp" />	
 		<put name="footer" value="footer.jsp"/>	
 	</definition>
 
-	<definition name=".admin.user" path="/template.jsp">
-		<put name="title" value="LAMS :: User Entry"/>
-		<put name="pageHeader" value="User Entry"/>
-		<put name="header" value="adminHeader.jsp"/>
-		<put name="content" value="/admin/userContent.jsp" />	
-		<put name="footer" value="footer.jsp"/>	
-	</definition>
-
-	<definition name=".admin.usersadd" path="/template.jsp">
-		<put name="title" value="LAMS :: Add Users To Organisation"/>
-		<put name="pageHeader" value="Add Users To Organisation"/>
-		<put name="header" value="adminHeader.jsp"/>
-		<put name="content" value="/admin/usersaddContent.jsp" />	
-		<put name="footer" value="footer.jsp"/>	
-	</definition>
-
-	<definition name=".admin.usersremove" path="/template.jsp">
-		<put name="title" value="LAMS :: Remove Users From Organisation"/>
-		<put name="pageHeader" value="Remove Users From Organisation"/>
-		<put name="header" value="adminHeader.jsp"/>
-		<put name="content" value="/admin/usersremoveContent.jsp" />	
-		<put name="footer" value="footer.jsp"/>	
-	</definition>
-	
-	<definition name=".admin.joblist" path="/template.jsp">
+	<definition name=".joblist" path="/template.jsp">
 		<put name="title" value="LAMS :: List scheduled jobs in Quartz queue"/>
-		<put name="pageHeader" value="List scheduled jobs in Quartz queue"/>
 		<put name="header" value="adminHeader.jsp"/>
-		<put name="content" value="/admin/joblist.jsp" />	
+		<put name="content" value="joblist.jsp" />	
 		<put name="footer" value="footer.jsp"/>	
 	</definition>
 
 	<definition name=".sysadmin" path="/template.jsp">
 		<put name="title" value="LAMS :: Maintain LAMS"/>
-		<put name="pageHeader" value="Maintain LAMS"/>
 		<put name="header" value="adminHeader.jsp"/>
-		<put name="content" value="/sysadmin/sysadminContent.jsp" />	
+		<put name="content" value="sysadmin.jsp" />	
 		<put name="footer" value="footer.jsp"/>	
 	</definition>
 
 	<definition name=".cache" path="/template.jsp">
-		<put name="title" value="LAMS :: Maintain LAMS"/>
-		<put name="pageHeader" value="Maintain LAMS"/>
+		<put name="title" value="LAMS :: Maintain LAMS Cache"/>
 		<put name="header" value="adminHeader.jsp"/>
-		<put name="content" value="/sysadmin/cache.jsp" />	
+		<put name="content" value="cache.jsp" />	
 		<put name="footer" value="footer.jsp"/>	
 	</definition>
 	
-	<definition name=".previewdeleted" path="/template.jsp">
-		<put name="title" value="LAMS :: Maintain LAMS"/>
-		<put name="pageHeader" value="Maintain LAMS"/>
-		<put name="header" value="adminHeader.jsp"/>
-		<put name="content" value="/sysadmin/previewdeleted.jsp" />	
-		<put name="footer" value="footer.jsp"/>	
-	</definition>
 </tiles-definitions>
