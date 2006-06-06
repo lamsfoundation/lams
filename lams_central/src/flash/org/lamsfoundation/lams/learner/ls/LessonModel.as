@@ -26,6 +26,8 @@ import org.lamsfoundation.lams.learner.ls.*;
 import org.lamsfoundation.lams.common.util.*;
 import org.lamsfoundation.lams.common.Progress;
 import org.lamsfoundation.lams.authoring.DesignDataModel;
+import org.lamsfoundation.lams.authoring.Activity;
+import org.lamsfoundation.lams.authoring.Transition;
 
 
 /*
@@ -46,6 +48,9 @@ class LessonModel extends Observable {
 	// unique Lesson identifier
 	private var _lessonID:Number;
 	
+	private var ddmActivity_keys:Array;
+	private var ddmTransition_keys:Array;
+	private var _activitiesDisplayed:Hashtable;
 	/**
 	* View state data
 	*/
@@ -70,6 +75,10 @@ class LessonModel extends Observable {
 		_active = false;
 		_learningDesignModel = null;
 		_progressData = null;
+		
+		ddmActivity_keys = new Array();
+		ddmTransition_keys = new Array();
+		_activitiesDisplayed = new Hashtable("_activitiesDisplayed");
 	}
 	
 	public function populateFromDTO(dto:Object){
@@ -279,6 +288,113 @@ class LessonModel extends Observable {
 		return _active;
 	}
 	
+	private function orderDesign(activity:Activity, order:Array):Void{
+		trace("==> "+activity.activityID);
+		order.push(activity);
+		trace("transition keys length: "+ddmTransition_keys.length);
+		for(var i=0;i<ddmTransition_keys.length;i++){
+			var transitionKeyToCheck:Number = ddmTransition_keys[i];
+			var ddmTransition:Transition = learningDesignModel.transitions.get(transitionKeyToCheck);
+			trace("transition value is: "+ ddmTransition.transitionUIID);
+			trace("transition from activity id: "+ ddmTransition.fromActivityID);
+			
+				if (ddmTransition.fromUIID == activity.activityUIID){
+					var ddm_activity:Activity = learningDesignModel.activities.get(ddmTransition.toUIID);
+					orderDesign(ddm_activity, order);
+				}
+				
+		}
+		
+	}
+	
+	private function setDesignOrder(){
+		trace("set Design order called")
+		ddmActivity_keys = learningDesignModel.activities.keys();
+		ddmTransition_keys = learningDesignModel.transitions.keys();
+		
+		var orderedActivityArr:Array = new Array();
+		var trIndexArray:Array;
+		var dataObj:Object;
+		var ddmfirstActivity_key:Number = learningDesignModel.firstActivityID;
+		var learnerFirstActivity:Activity = learningDesignModel.activities.get(ddmfirstActivity_key);
+		trace("first activity in desgn: "+ddmfirstActivity_key);
+		
+		//trace("==> "+learnerFirstActivity.title);
+		// recursive method to order design
+		orderDesign(learnerFirstActivity, orderedActivityArr);
+		
+		for(var i=0; i<orderedActivityArr.length; i++){
+			trace("--> "+orderedActivityArr[i].title);
+			
+		}
+		return orderedActivityArr;
+		trace("New Ordered Activities has length: "+orderedActivityArr.length)
+		
+	}
+	
+	
+	/**
+	 * get the design in the DesignDataModel and update the Monitor Model accordingly.
+	 * NOTE: Design elements are added to the DDM here.
+	 * 
+	 * @usage   
+	 * @return  
+	 */
+	public function drawDesign(){
+		var indexArray:Array = setDesignOrder();
+		
+		//go through the design and get the activities and transitions 
+		
+		var dataObj:Object;
+		ddmActivity_keys = learningDesignModel.activities.keys();
+		
+		//indexArray = ddmActivity_keys;
+		trace("Length of Activities in DDM: "+indexArray.length)
+		
+		//loop through 
+		for(var i=0;i<indexArray.length;i++){
+					
+			var keyToCheck:Number = indexArray[i].activityUIID;
+			
+			var ddm_activity:Activity = learningDesignModel.activities.get(keyToCheck);
+			trace("Activity type ID: "+ddm_activity.activityTypeID)
+			if (ddm_activity.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE){
+				trace("Activity is an optional activity "+ddm_activity.activityUIID)
+			}
+			if(ddm_activity.parentActivityID > 0 || ddm_activity.parentUIID > 0){
+				trace("this is Child")
+			}else {
+				broadcastViewUpdate("DRAW_ACTIVITY",ddm_activity);
+			}
+		}
+		//now check the transitions:
+		ddmTransition_keys = learningDesignModel.transitions.keys();
+				
+		//chose which array we are going to loop over
+		var trIndexArray:Array;
+		trIndexArray = ddmTransition_keys;
+		
+		//loop through 
+		for(var i=0;i<trIndexArray.length;i++){
+			
+			var transitionKeyToCheck:Number = trIndexArray[i];
+
+			var ddmTransition:Transition = learningDesignModel.transitions.get(transitionKeyToCheck);
+			
+			broadcastViewUpdate("DRAW_TRANSITION",ddmTransition);	
+		}		
+	}
+	
+	public function broadcastViewUpdate(updateType, data){
+		setChanged();
+		
+		//send an update
+		infoObj = {};
+		infoObj.updateType = updateType;
+		infoObj.data = data;
+		notifyObservers(infoObj);
+		
+	}
 	
 	/**
     * set the size on the model, this in turn will set a changed flag and notify observers (views)
@@ -335,6 +451,14 @@ class LessonModel extends Observable {
 		return p;
 	}  
     
+	public function get activitiesDisplayed():Hashtable{
+		return _activitiesDisplayed;
+	}
+	
+	public function getActivityKeys():Array{
+		return ddmActivity_keys;
+	}
+	
     //Accessors for x + y coordinates
     public function get x():Number{
         return __x;
