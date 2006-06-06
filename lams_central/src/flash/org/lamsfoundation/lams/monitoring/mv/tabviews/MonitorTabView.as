@@ -55,6 +55,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 	private var GRID_WIDTH:Number;
 	private var H_GAP:Number;
 	private var V_GAP:Number;
+	private var drawDesignCalled:String;
 	
 	private var _tm:ThemeManager;
 	private var mm:MonitorModel;
@@ -99,7 +100,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
         //Set up parameters for the grid
 		H_GAP = 10;
 		V_GAP = 10;
-		
+		//drawDesignCalled = false;
 		MovieClipUtils.doLater(Proxy.create(this,draw)); 
 		
     }    
@@ -126,6 +127,9 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 						trace("TabID for Selected tab is (TABCHANGE): "+infoObj.tabID)
 						if (mm.activitiesDisplayed.isEmpty()){
 							mm.getMonitor().openLearningDesign(mm.getSequence());
+						}else if (drawDesignCalled == undefined){
+							drawDesignCalled = "called";
+							mm.drawDesign(infoObj.tabID);
 						}
 					}else {
 						this._visible = false;
@@ -167,6 +171,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 				
 				case 'DRAW_DESIGN' :
 					if (infoObj.tabID == _tabID){
+						drawDesignCalled = "called";
 						trace("TabID for Selected tab is (MonitorTab): "+infoObj.tabID)
 						mm.drawDesign(infoObj.tabID);
 					}
@@ -235,6 +240,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 	 * @return  Boolean - successfullit
 	 */
 	private function drawActivity(a:Activity,mm:MonitorModel):Boolean{
+		Debugger.log('The activity:'+a.title+','+a.activityUIID+' is of unknown type, it cannot be drawn',Debugger.CRITICAL,'drawActivity','MonitorTabView');
 		var s:Boolean = false;
 		
 		var mtv = MonitorTabView(this);
@@ -243,18 +249,18 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 		
 		//take action depending on act type
 		if(a.activityTypeID==Activity.TOOL_ACTIVITY_TYPE || a.isGateActivity() || a.isGroupActivity() ){
-			var newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasActivity",DepthManager.kTop,{_activity:a,_monitorController:mc,_monitorTabView:mtv});
+			var newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasActivity",DepthManager.kTop,{_activity:a,_monitorController:mc,_monitorTabView:mtv, _module:"monitoring"});
 		}
 		if(a.activityTypeID==Activity.PARALLEL_ACTIVITY_TYPE){
 			//get the children
 			var children:Array = mm.getMonitor().ddm.getComplexActivityChildren(a.activityUIID);
-			var newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasParallelActivity",DepthManager.kTop,{_activity:a,_children:children,_monitorController:mc,_monitorTabView:mtv});
+			var newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasParallelActivity",DepthManager.kTop,{_activity:a,_children:children,_monitorController:mc,_monitorTabView:mtv,fromModuleTab:"monitorMonitorTab"});
 		}
 		if(a.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE){
 			var children:Array = mm.getMonitor().ddm.getComplexActivityChildren(a.activityUIID);
-			var newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasOptionalActivity",DepthManager.kTop,{_activity:a,_children:children,_monitorController:mc,_monitorTabView:mtv});	
+			var newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasOptionalActivity",DepthManager.kTop,{_activity:a,_children:children,_monitorController:mc,_monitorTabView:mtv,fromModuleTab:"monitorMonitorTab"});	
 		}else{
-			Debugger.log('The activity:'+a.title+','+a.activityUIID+' is of unknown type, it cannot be drawn',Debugger.CRITICAL,'drawActivity','MonitorTabView');
+			//Debugger.log('The activity:'+a.title+','+a.activityUIID+' is of unknown type, it cannot be drawn',Debugger.CRITICAL,'drawActivity','MonitorTabView');
 		}
 		
 		var actItems:Number = mm.activitiesDisplayed.size()
