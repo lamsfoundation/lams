@@ -79,8 +79,9 @@ public interface IExportToolContentService {
 	void registerFileClassForImport(String fileNodeClassName, String fileUuidFieldName,
 			String fileVersionFieldName, String fileNameFieldName, String filePropertyFieldName, String mimeTypeFieldName,
 			String initialItemFieldName);
-
+	
 	void importLearningDesign(String learningDesignPath,User importer, Integer workspaceFolderUid) throws ImportToolContentException;
 	
-	Object importToolContent(String toolContentPath,IToolContentHandler toolContentHandler) throws ImportToolContentException;
+	Object importToolContent(String toolContentPath, IToolContentHandler toolContentHandler)
+		throws ImportToolContentException;
 }

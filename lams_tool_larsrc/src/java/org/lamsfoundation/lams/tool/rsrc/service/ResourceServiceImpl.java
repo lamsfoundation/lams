@@ -80,6 +80,8 @@ import org.lamsfoundation.lams.tool.rsrc.model.ResourceSession;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
 import org.lamsfoundation.lams.tool.rsrc.util.ResourceToolContentHandler;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
@@ -109,6 +111,7 @@ public class ResourceServiceImpl implements
 	private ILamsToolService toolService;
 	private ILearnerService learnerService;
 	private IAuditService auditService;
+	private IUserManagementService userManagementService; 
 	private IExportToolContentService exportContentService;
 	
 	public IVersionedNode getFileNode(Long itemUid, String relPathString) throws ResourceApplicationException {
@@ -756,20 +759,37 @@ public class ResourceServiceImpl implements
 	}
 
 
-	public void importToolContent(Long toolContentId, String toolContentPath) throws ToolException {
+	public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath) throws ToolException {
 	
 		try {
-			exportContentService.registerFileClassForImport("org.lamsfoundation.lams.tool.rsrc.model.ResourceAttachment"
+			exportContentService.registerFileClassForImport(ResourceAttachment.class.getName()
 					,"fileUuid","fileVersionId","fileName","fileType",null,null);
-			exportContentService.registerFileClassForImport("org.lamsfoundation.lams.tool.rsrc.model.ResourceItem"
+			exportContentService.registerFileClassForImport(ResourceItem.class.getName()
 					,"fileUuid","fileVersionId","fileName","fileType",null,"initialItem");
-			Object toolPOJO =  exportContentService.importToolContent(toolContentPath,resourceToolContentHandler);
+			
+			Object toolPOJO =  exportContentService.importToolContent(toolContentPath,newUserUid, resourceToolContentHandler);
 			if(!(toolPOJO instanceof Resource))
 				throw new ImportToolContentException("Import Share resources tool content failed. Deserialized object is " + toolPOJO);
 			Resource toolContentObj = (Resource) toolPOJO;
 			
 //			reset it to new toolContentId
 			toolContentObj.setContentId(toolContentId);
+			ResourceUser user = resourceUserDao.getUserByUserID(new Long(newUserUid.longValue()));
+			if(user == null){
+				user = new ResourceUser();
+				UserDTO sysUser = userManagementService.getUserById(newUserUid).getUserDTO();
+				user.setFirstName(sysUser.getFirstName());
+				user.setLastName(sysUser.getLastName());
+				user.setLoginName(sysUser.getLogin());
+				user.setUserId(new Long(newUserUid.longValue()));
+			}
+			toolContentObj.setCreatedBy(user);
+			
+			//reset all resourceItem createBy user
+			Set<ResourceItem> items = toolContentObj.getResourceItems();
+			for(ResourceItem item:items){
+				item.setCreateBy(user);
+			}
 			resourceDao.saveObject(toolContentObj);
 		} catch (ImportToolContentException e) {
 			throw new ToolException(e);
@@ -892,6 +912,16 @@ public class ResourceServiceImpl implements
 
 	public void setExportContentService(IExportToolContentService exportContentService) {
 		this.exportContentService = exportContentService;
+	}
+
+
+	public IUserManagementService getUserManagementService() {
+		return userManagementService;
+	}
+
+
+	public void setUserManagementService(IUserManagementService userManagementService) {
+		this.userManagementService = userManagementService;
 	}
 
 

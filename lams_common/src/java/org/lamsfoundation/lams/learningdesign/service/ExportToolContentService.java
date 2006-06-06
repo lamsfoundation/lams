@@ -46,8 +46,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.activity.ActivityCompletedException;
-
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -92,6 +90,7 @@ import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dao.IWorkspaceFolderDAO;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileUtilException;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
@@ -103,7 +102,6 @@ import org.springframework.context.ApplicationContextAware;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.Converter;
-import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 /**
  * Export tool content service bean.
  * @author Steve.Ni
@@ -112,12 +110,15 @@ import com.thoughtworks.xstream.io.HierarchicalStreamReader;
  */
 public class ExportToolContentService implements IExportToolContentService, ApplicationContextAware {
 	public static final String LEARNING_DESIGN_SERVICE_BEAN_NAME = "learningDesignService";
+	private static final String USER_SERVICE_BEAN_NAME = "userManagementService";
+	
 	//export tool content zip file prefix
 	public static final String EXPORT_TOOLCONTNET_ZIP_PREFIX = "lams_toolcontent_";
 	public static final String EXPORT_TOOLCONTNET_FOLDER_SUFFIX = "export_toolcontent";
 	public static final String EXPORT_TOOLCONTNET_ZIP_SUFFIX = ".zip";
 	public static final String LEARNING_DESIGN_FILE_NAME = "learning_design.xml";
 	private static final String TOOL_FILE_NAME = "tool.xml";
+	
 	
 	private Logger log = Logger.getLogger(ExportToolContentService.class);
 	
@@ -233,11 +234,10 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			    
 			    result = method.invoke(obj, args);
 			    
-			    if(StringUtils.equals(method.getName(),"unmarshal")){
+			    if(StringUtils.equals(method.getName(),"unmarshal") && result != null){
 			    	//During deserialize XML file into object, it will save file node into fileNodes
 			    	for(NameInfo name:fileHandleClassList){
-			    		HierarchicalStreamReader reader = (HierarchicalStreamReader) args[0];
-			    		if(name.className.equals(reader.getNodeName())){
+			    		if(name.className.equals(result.getClass().getName())){
 			    			fileNodes.add(ExportToolContentService.this.new ValueInfo(name,result));
 			    			break;
 			    		}
@@ -351,20 +351,28 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			
 			//serialize tool xml into local file.
 			XStream toolXml = new XStream();
+			//get back Xstream default convert, create proxy then register it to XStream parser.
 			Converter c = toolXml.getConverterLookup().defaultConverter();
-			FileInvocationHandler handler = new FileInvocationHandler(c);
-			handler.setFileHandleClassList(fileHandleClassList);
-			Converter  myc = (Converter) Proxy.newProxyInstance(c.getClass().getClassLoader(),new Class[]{Converter.class},handler);
-			toolXml.registerConverter(myc);
+			FileInvocationHandler handler =null;
+			if(!fileHandleClassList.isEmpty()){
+				handler = new FileInvocationHandler(c);
+				handler.setFileHandleClassList(fileHandleClassList);
+				Converter  myc = (Converter) Proxy.newProxyInstance(c.getClass().getClassLoader(),new Class[]{Converter.class},handler);
+				toolXml.registerConverter(myc);
+			}
+			
+			//XML to Object
 			toolXml.toXML(toolContentObj,toolFile);
 			
 			//get out the fileNodes
-			List<ValueInfo> list = handler.getFileNodes();
-			for(ValueInfo fileNode:list){
-				log.debug("Tool attachement file is going to save : " + fileNode.fileUuid);
-				toolContentHandler.saveFile(fileNode.fileUuid,FileUtil.getFullPath(toolPath,fileNode.fileUuid.toString()));
+			if(handler != null){
+				List<ValueInfo> list = handler.getFileNodes();
+				for(ValueInfo fileNode:list){
+					log.debug("Tool attachement file is going to save : " + fileNode.fileUuid);
+					toolContentHandler.saveFile(fileNode.fileUuid,FileUtil.getFullPath(toolPath,fileNode.fileUuid.toString()));
+				}
+				list.clear();
 			}
-			list.clear();
 		} catch (ItemNotFoundException e) {
 			throw new ExportToolContentException(e);
 		} catch (RepositoryCheckedException e) {
@@ -392,11 +400,13 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		fileHandleClassList.add(this.new NameInfo(fileNodeClassName, fileUuidFieldName, fileVersionFieldName,
 				fileNameFieldName, filePropertyFieldName, mimeTypeFieldName, initialItemFieldName));
 	}
+	
+	
 	/**
 	 * @throws ExportToolContentException 
 	 * @see org.lamsfoundation.lams.authoring.service.IExportToolContentService.importLearningDesign(String)
 	 */
-	public void importLearningDesign(String learningDesignPath,User importer, Integer workspaceFolderUid) throws ImportToolContentException {
+	public void importLearningDesign(String learningDesignPath, User importer, Integer workspaceFolderUid) throws ImportToolContentException {
 		
 		try {
 			//import learning design
@@ -423,7 +433,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 				//Invoke tool's importToolContent() method.
 				ToolContentManager contentManager = (ToolContentManager) findToolService(newTool);
 				log.debug("Tool begin to import content : " + activity.getTitle() +" by contentID :" + activity.getToolContentID());
-				contentManager.importToolContent(newContent.getToolContentId(),toolPath);
+				contentManager.importToolContent(newContent.getToolContentId(),importer.getUserId(),toolPath);
 				log.debug("Tool content import success.");
 			}
 			
@@ -435,84 +445,89 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		}
 		
 	}
-	public Object importToolContent(String toolContentPath,IToolContentHandler toolContentHandler) throws ImportToolContentException{
+	public Object importToolContent(String toolContentPath, IToolContentHandler toolContentHandler) throws ImportToolContentException{
 		Object toolPOJO = null;
 //		change xml to Tool POJO 
 		XStream toolXml = new XStream();
 		
 		Converter c = toolXml.getConverterLookup().defaultConverter();
-		//create proxy class
-		FileInvocationHandler handler = new FileInvocationHandler(c);
-		handler.setFileHandleClassList(fileHandleClassList);
-		Converter  myc = (Converter) Proxy.newProxyInstance(c.getClass().getClassLoader(),new Class[]{Converter.class},handler);
-		//registry to new proxy convert to XStream
-		toolXml.registerConverter(myc);				
-
+		FileInvocationHandler handler = null;
+		if(!fileHandleClassList.isEmpty()){
+			//create proxy class
+			handler = new FileInvocationHandler(c);
+			handler.setFileHandleClassList(fileHandleClassList);
+			Converter  myc = (Converter) Proxy.newProxyInstance(c.getClass().getClassLoader(),new Class[]{Converter.class},handler);
+			//registry to new proxy convert to XStream
+			toolXml.registerConverter(myc);				
+		}
+		
 		List<ValueInfo> valueList = null;
 		try {
 			Reader toolFile = new FileReader(new File(FileUtil.getFullPath(toolContentPath,TOOL_FILE_NAME)));
 			toolPOJO = toolXml.fromXML(toolFile);
 			
 			//upload file node if has
-			valueList = handler.getFileNodes();
-			for(ValueInfo fileNode:valueList){
-				
-				Long uuid = NumberUtils.createLong(BeanUtils.getProperty(fileNode.instance,fileNode.name.uuidFieldName));
-				Long version = null;
-				//optional
-				try{
-					version = NumberUtils.createLong(BeanUtils.getProperty(fileNode.instance,fileNode.name.versionFieldName));
-				} catch (Exception e ) {
-					log.debug("No method for version:" + fileNode.instance);
+			if(handler != null){
+				valueList = handler.getFileNodes();
+				for(ValueInfo fileNode:valueList){
+					
+					Long uuid = NumberUtils.createLong(BeanUtils.getProperty(fileNode.instance,fileNode.name.uuidFieldName));
+					Long version = null;
+					//optional
+					try{
+						version = NumberUtils.createLong(BeanUtils.getProperty(fileNode.instance,fileNode.name.versionFieldName));
+					} catch (Exception e ) {
+						log.debug("No method for version:" + fileNode.instance);
+					}
+					
+					//according to upload rule: the file name will be uuid.
+					String realFileName = uuid.toString();
+					String fullFileName = FileUtil.getFullPath(toolContentPath,realFileName);
+					log.debug("Tool attachement files/packages are going to upload to repository " + fullFileName);
+					
+					//to check if the file is package (with extension name ".zip") or single file (no extension name).
+					File file = new File(fullFileName); 
+					boolean isPackage = false;
+					if(!file.exists()){
+						file = new File(fullFileName+EXPORT_TOOLCONTNET_ZIP_SUFFIX);
+						realFileName = realFileName + EXPORT_TOOLCONTNET_ZIP_SUFFIX;
+						isPackage = true;
+						//if this file is norpackage neither single file, throw exception.
+						if(!file.exists())
+							throw new ImportToolContentException("Content attached file/package can not be found: " + fullFileName + "(.zip)");
+					}
+					
+					//more fields values for Repository upload use
+					String fileName = BeanUtils.getProperty(fileNode.instance,fileNode.name.fileNameFieldName);
+					String fileProperty = BeanUtils.getProperty(fileNode.instance,fileNode.name.filePropertyFieldName);
+					//optional fields
+					String mimeType = null;
+					try {
+						mimeType = BeanUtils.getProperty(fileNode.instance,fileNode.name.mimeTypeFieldName);
+					} catch (Exception e ) {
+						log.debug("No method for mimeType:" + fileNode.instance);
+					}
+					String initalItem = null;
+					try {
+						initalItem = BeanUtils.getProperty(fileNode.instance,fileNode.name.initalItemFieldName);
+					} catch (Exception e ) {
+						log.debug("No method for initial item:" + fileNode.instance);
+					}
+	
+					InputStream is = new FileInputStream(file);
+					//upload to repository: file or pacakge
+					NodeKey key;
+					if(!isPackage)
+						key = toolContentHandler.uploadFile(is,fileName,mimeType,fileProperty);
+					else{
+						String packageDirectory = ZipFileUtil.expandZip(is, realFileName);
+						key = toolContentHandler.uploadPackage(packageDirectory,initalItem);
+					}
+					
+					//refresh file node Uuid and Version value to latest.
+					BeanUtils.setProperty(fileNode.instance,fileNode.name.uuidFieldName,key.getUuid());
+					BeanUtils.setProperty(fileNode.instance,fileNode.name.versionFieldName,key.getVersion());
 				}
-				
-				//according to upload rule: the file name will be uuid.
-				String realFileName = uuid.toString();
-				String fullFileName = FileUtil.getFullPath(toolContentPath,realFileName);
-				log.debug("Tool attachement files/packages are going to upload to repository " + fullFileName);
-				
-				//to check if the file is package (with extension name ".zip") or single file (no extension name).
-				File file = new File(fullFileName); 
-				boolean isPackage = false;
-				if(!file.exists()){
-					file = new File(fullFileName+EXPORT_TOOLCONTNET_ZIP_SUFFIX);
-					realFileName = realFileName + EXPORT_TOOLCONTNET_ZIP_SUFFIX;
-					isPackage = true;
-					//if this file is norpackage neither single file, throw exception.
-					if(!file.exists())
-						throw new ImportToolContentException("Content attached file/package can not be found: " + fullFileName + "(.zip)");
-				}
-				
-				//more fields values for Repository upload use
-				String fileName = BeanUtils.getProperty(fileNode.instance,fileNode.name.fileNameFieldName);
-				String fileProperty = BeanUtils.getProperty(fileNode.instance,fileNode.name.filePropertyFieldName);
-				//optional fields
-				String mimeType = null;
-				try {
-					mimeType = BeanUtils.getProperty(fileNode.instance,fileNode.name.mimeTypeFieldName);
-				} catch (Exception e ) {
-					log.debug("No method for mimeType:" + fileNode.instance);
-				}
-				String initalItem = null;
-				try {
-					initalItem = BeanUtils.getProperty(fileNode.instance,fileNode.name.initalItemFieldName);
-				} catch (Exception e ) {
-					log.debug("No method for initial item:" + fileNode.instance);
-				}
-
-				InputStream is = new FileInputStream(file);
-				//upload to repository: file or pacakge
-				NodeKey key;
-				if(!isPackage)
-					key = toolContentHandler.uploadFile(is,fileName,mimeType,fileProperty);
-				else{
-					String packageDirectory = ZipFileUtil.expandZip(is, realFileName);
-					key = toolContentHandler.uploadPackage(packageDirectory,initalItem);
-				}
-				
-				//refresh file node Uuid and Version value to latest.
-				BeanUtils.setProperty(fileNode.instance,fileNode.name.uuidFieldName,key.getUuid());
-				BeanUtils.setProperty(fileNode.instance,fileNode.name.versionFieldName,key.getVersion());
 			}
 		} catch (FileNotFoundException e) {
 			throw new ImportToolContentException(e);

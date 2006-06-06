@@ -30,9 +30,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -240,12 +242,12 @@ public class SubmitFilesService implements ToolContentManager,
 		}
 	}
  	
- 	public void importToolContent(Long toolContentId, String toolContentPath) throws ToolException {
+ 	public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath) throws ToolException {
  		
 		try {
-			exportContentService.registerFileClassForImport("org.lamsfoundation.lams.tool.sbmt.InstructionFiles",
-					"uuID","versionID","name","type",null,null);
-			Object toolPOJO =  exportContentService.importToolContent(toolContentPath,sbmtToolContentHandler);
+			exportContentService.registerFileClassForImport(InstructionFiles.class.getName(),"uuID","versionID","name","type",null,null);
+			
+			Object toolPOJO =  exportContentService.importToolContent(toolContentPath,newUserUid,sbmtToolContentHandler);
 			if(!(toolPOJO instanceof SubmitFilesContent))
 				throw new ImportToolContentException("Import Submit tool content failed. Deserialized object is " + toolPOJO);
 			SubmitFilesContent toolContentObj = (SubmitFilesContent) toolPOJO;

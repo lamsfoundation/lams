@@ -1561,7 +1561,7 @@ public class VoteServicePOJO implements
      * for the content.
      * @throws ToolException if any other error occurs
      */
-	public void importToolContent(Long toolContentId, String toolContentPath) throws ToolException {
+	public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath) throws ToolException {
 		
 	}
 
