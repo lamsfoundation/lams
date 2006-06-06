@@ -44,6 +44,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<put name="body" value=""/>
 	</definition>
 
+	<!-- Waiting layout for a group page. -->
+	<definition name=".groupWaitLayout" path="/layout/groupWaitLayout.jsp">
+		<put name="pageTitle" value="LAMS"/>
+		<put name="title" value="LAMS"/>
+		<put name="body" value=""/>
+	</definition>
+
 	<definition name=".systemError" extends=".activityLayout" >
 		<put name="title" value="System Error Page"/>
 		<put name="body" value="/error.jsp" />	
