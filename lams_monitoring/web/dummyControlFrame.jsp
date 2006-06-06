@@ -72,6 +72,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<TR><TD><STRONG><c:out value="${lesson.lessonName}"/></STRONG>
 				<BR><c:out value="${lesson.lessonDescription}"/>
 				<BR><A HREF="<lams:WebAppURL/>/dummy.do?method=getLesson&lessonID=<c:out value="${lesson.lessonId}"/>" target="contentFrame">Monitor Lesson</A>
+				<BR><A HREF="<lams:WebAppURL/>/dummy.do?method=unarchiveLesson&lessonID=<c:out value="${lesson.lessonId}"/>">Unarchive Lesson</A>
 				<BR><A HREF="<lams:WebAppURL/>/dummy.do?method=removeLesson&lessonID=<c:out value="${lesson.lessonId}"/>">Remove Lesson</A>
 				</TD></TR>
 			<TR><TD><HR></TD></TR>

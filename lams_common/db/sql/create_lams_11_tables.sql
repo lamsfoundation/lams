@@ -519,6 +519,7 @@ CREATE TABLE lams_lesson (
      , schedule_start_date_time DATETIME
      , end_date_time DATETIME
      , schedule_end_date_time DATETIME
+     , previous_state_id INT(3)
      , PRIMARY KEY (lesson_id)
      , INDEX (learning_design_id)
      , CONSTRAINT FK_lams_lesson_1_1 FOREIGN KEY (learning_design_id)

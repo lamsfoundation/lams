@@ -355,6 +355,46 @@ public class MonitoringAction extends LamsDispatchAction
         return null;
     }
     /**
+     * The Struts dispatch method to "unarchive" a lesson. Returns it back to 
+     * its previous state. A wddx acknowledgement message will be serialized and sent back to the flash
+     * component.
+     * 
+     * @param mapping An ActionMapping class that will be used by the Action class to tell
+     * the ActionServlet where to send the end-user.
+     *
+     * @param form The ActionForm class that will contain any data submitted
+     * by the end-user via a form.
+     * @param request A standard Servlet HttpServletRequest class.
+     * @param response A standard Servlet HttpServletResponse class.
+     * @return An ActionForward class that will be returned to the ActionServlet indicating where
+     *         the user is to go next.
+     * @throws IOException
+     * @throws ServletException
+     */
+    public ActionForward unarchiveLesson(ActionMapping mapping,
+                                     ActionForm form,
+                                     HttpServletRequest request,
+                                     HttpServletResponse response) throws IOException,
+                                                                          ServletException
+    {
+    	FlashMessage flashMessage = null;
+    	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+    	
+    	try {
+        	long lessonId = WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID);
+    		monitoringService.unarchiveLesson(lessonId, getUserId(request));
+    		flashMessage = new FlashMessage("unarchiveLesson",Boolean.TRUE);
+		} catch (Exception e) {
+			flashMessage = handleException(e, "unarchiveLesson", monitoringService);
+		}
+		
+		String message =  flashMessage.serializeMessage();
+		
+        PrintWriter writer = response.getWriter();
+        writer.println(message);
+        return null;
+    }
+    /**
      * The purpose of suspending is to hide the lesson from learners temporarily. 
      * It doesn't make any sense to suspend a created or a not started (ie scheduled) 
      * lesson as they will not be shown on the learner interface anyway! If the teacher 

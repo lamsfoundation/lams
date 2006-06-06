@@ -38,6 +38,9 @@
 		<property name="lessonStateId" type="java.lang.Integer"
 			column="lesson_state_id" length="3">
 		</property>
+		<property name="previousLessonStateId" type="java.lang.Integer"
+			column="previous_state_id" length="3">
+		</property>
 		<!-- Associations -->
 		
 		<!-- bi-directional many-to-one association to User -->

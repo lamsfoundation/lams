@@ -668,25 +668,38 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     		throw new MonitoringServiceException("Lesson for id="+lessonId+" is missing. Unable to set lesson to archived");
     	}
         checkOwnerOrStaffMember(userId, requestedLesson, "archive lesson");
-    	setLessonState(requestedLesson,Lesson.ARCHIVED_STATE);
-
+        if ( ! Lesson.ARCHIVED_STATE.equals(requestedLesson.getLessonStateId()) && 
+        		!Lesson.REMOVED_STATE.equals(requestedLesson.getLessonStateId()) ) {
+        	setLessonState(requestedLesson,Lesson.ARCHIVED_STATE);
+        }
     }
     /**
+     * Unarchive the specified the lesson. Reverts back to its previous state.
+     * @param lessonId the specified the lesson id.
+     */
+    public void unarchiveLesson(long lessonId, Integer userId) {
+       	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
+    	if ( requestedLesson == null ) {
+    		throw new MonitoringServiceException("Lesson for id="+lessonId+" is missing. Unable to set lesson to archived");
+    	}
+        checkOwnerOrStaffMember(userId, requestedLesson, "unarchive lesson");
+		revertLessonState(requestedLesson);
+
+    }
+   /**
      * 
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#suspendLesson(long)
      */
 	public void suspendLesson(long lessonId, Integer userId) {
 		Lesson lesson = lessonDAO.getLesson(new Long(lessonId));
         checkOwnerOrStaffMember(userId, lesson, "suspend lesson");
-		Integer state = lesson.getLessonStateId();
-		//only suspend started lesson
-		if(!Lesson.STARTED_STATE.equals(state)){
-			throw new MonitoringServiceException("Lesson does not started yet. It can not be suspended.");
-		}
     	if ( lesson == null ) {
     		throw new MonitoringServiceException("Lesson for id="+lessonId+" is missing. Unable to suspend lesson.");
     	}
-    	setLessonState(lesson,Lesson.SUSPENDED_STATE);
+        if ( ! Lesson.SUSPENDED_STATE.equals(lesson.getLessonStateId()) && 
+        		!Lesson.REMOVED_STATE.equals(lesson.getLessonStateId()) ) {
+        	setLessonState(lesson,Lesson.SUSPENDED_STATE);
+        }
 	}
 	/**
 	 * 
@@ -703,21 +716,34 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 		if ( lesson == null ) {
 			throw new MonitoringServiceException("Lesson for id="+lessonId+" is missing. Unable to suspend lesson.");
 		}
-		setLessonState(lesson,Lesson.STARTED_STATE);
+		revertLessonState(lesson);
 	}
 
     /**
-     * @see setLessonState(long,Integer)
+     * Set a lesson to a particular state. Copies the current state to the previous lesson state.
      * @param requestedLesson
      * @param status
      */
     private void setLessonState(Lesson requestedLesson,Integer status) {
     	
+    	requestedLesson.setPreviousLessonStateId(requestedLesson.getLessonStateId());
     	requestedLesson.setLessonStateId(status);
     	lessonDAO.updateLesson(requestedLesson);
-    	
     }
+
     /**
+     * Sets a lesson back to its previous state. Used when we "unsuspend" or "unarchive"
+     * @param requestedLesson
+     * @param status
+     */
+    private void revertLessonState(Lesson requestedLesson) {
+    	
+    	Integer currentStatus = requestedLesson.getLessonStateId();
+    	requestedLesson.setLessonStateId(requestedLesson.getPreviousLessonStateId());
+    	requestedLesson.setPreviousLessonStateId(currentStatus);
+    	lessonDAO.updateLesson(requestedLesson);
+    }
+/**
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#removeLesson(long)
      */
     public void removeLesson(long lessonId, Integer userId) {

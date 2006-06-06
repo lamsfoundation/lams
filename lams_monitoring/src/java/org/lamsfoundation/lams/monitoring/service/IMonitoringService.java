@@ -166,16 +166,23 @@ public interface IMonitoringService
      * @param userId checks that the user is a staff member for this lesson
      */
     public void archiveLesson(long lessonId, Integer userId) throws UserAccessDeniedException;
+    
+    /**
+     * Unarchive the specified the lesson. Reverts back to its previous state.
+     * @param lessonId the specified the lesson id.
+     */
+    public void unarchiveLesson(long lessonId, Integer userId);
+ 
     /**
      * A lesson can only be suspended if it is started. The purpose of suspending is 
-     * to hide the lesson from learners temporarily. If the teacher tries to suspend a lesson that 
-     * is not in the STARTED_STATE, then an error should be returned. 
+     * to hide the lesson from learners temporarily.  
      * @param lessonId the lesson ID which will be suspended.
      * @param userId checks that the user is a staff member for this lesson
      */
     public void suspendLesson(long lessonId, Integer userId) throws UserAccessDeniedException;
     /**
-     * Unsuspend a lesson, which state must be Lesson.SUSPEND_STATE. Otherwise an exception will be thrown.
+     * Unsuspend a lesson, which state must be Lesson.SUSPEND_STATE. Returns the lesson 
+     * back to its previous state. Otherwise an exception will be thrown.
      * @param lessonId
      * @param userId checks that the user is a staff member for this lesson
      */

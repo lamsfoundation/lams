@@ -103,6 +103,9 @@ public class Lesson implements Serializable {
     private Integer lessonStateId;
 
     /** persistent field */
+    private Integer previousLessonStateId;
+
+    /** persistent field */
     private LearningDesign learningDesign;
 
     /** persistent field */
@@ -126,9 +129,10 @@ public class Lesson implements Serializable {
      * organization and class information.
      * Cain constructor pattern implementation.
      */
-    public Lesson(String name,String description,Date createDateTime, User user, Integer lessonStateId, LearningDesign learningDesign,Set learnerProgresses) 
+    public Lesson(String name,String description,Date createDateTime, User user, Integer lessonStateId, Integer previousLessonStateId,
+    		LearningDesign learningDesign,Set learnerProgresses) 
     {
-        this(null,name,description,createDateTime,null,null,user,lessonStateId,learningDesign,null,null,learnerProgresses);
+        this(null,name,description,createDateTime,null,null,user,lessonStateId,previousLessonStateId,learningDesign,null,null,learnerProgresses);
     }     
     
     /** 
@@ -136,13 +140,17 @@ public class Lesson implements Serializable {
      * information.
      * Chain construtor pattern implementation. 
      */
-    public Lesson(String name,String description,Date createDateTime, User user, Integer lessonStateId, LearningDesign learningDesign, LessonClass lessonClass, Organisation organisation, Set learnerProgresses) 
+    public Lesson(String name,String description,Date createDateTime, User user, Integer lessonStateId, Integer previousLessonStateId, 
+    		LearningDesign learningDesign, LessonClass lessonClass, Organisation organisation, Set learnerProgresses) 
     {
-        this(null,name,description,createDateTime,null,null,user,lessonStateId,learningDesign,lessonClass,organisation,learnerProgresses);
+        this(null,name,description,createDateTime,null,null,user,lessonStateId,previousLessonStateId,
+        		learningDesign,lessonClass,organisation,learnerProgresses);
     }    
     
     /** full constructor */
-    public Lesson(Long lessonId,String name,String description, Date createDateTime, Date startDateTime, Date endDateTime, User user, Integer lessonStateId, LearningDesign learningDesign, LessonClass lessonClass, Organisation organisation, Set learnerProgresses) 
+    public Lesson(Long lessonId,String name,String description, Date createDateTime, Date startDateTime, Date endDateTime, User user, 
+    		Integer lessonStateId, Integer previousLessonStateId, LearningDesign learningDesign, LessonClass lessonClass, 
+    		Organisation organisation, Set learnerProgresses) 
     {
         this.lessonId = lessonId;
         this.lessonName = name;
@@ -152,6 +160,7 @@ public class Lesson implements Serializable {
         this.endDateTime = endDateTime;
         this.user = user;
         this.lessonStateId = lessonStateId;
+        this.previousLessonStateId = previousLessonStateId;
         this.learningDesign = learningDesign;
         this.lessonClass = lessonClass;
         this.organisation = organisation;
@@ -181,6 +190,7 @@ public class Lesson implements Serializable {
                           new Date(System.currentTimeMillis()),
                           user,
                           Lesson.CREATED,
+                          null,
                           ld,
                           newLessonClass,//lesson class
                           organisation,
@@ -206,6 +216,7 @@ public class Lesson implements Serializable {
                           new Date(System.currentTimeMillis()),
                           user,
                           Lesson.CREATED,
+                          null,
                           ld,
                           new HashSet());
     }
@@ -347,6 +358,18 @@ public class Lesson implements Serializable {
 
     public void setLessonStateId(Integer lessonStateId) {
         this.lessonStateId = lessonStateId;
+    }
+
+    /** 
+     * @hibernate.property type="java.lang.Integer"  column="previous_state_id"
+     *            	       length="3"
+     */
+    public Integer getPreviousLessonStateId() {
+        return this.previousLessonStateId;
+    }
+
+    public void setPreviousLessonStateId(Integer previousLessonStateId) {
+        this.previousLessonStateId = previousLessonStateId;
     }
 
     /** 

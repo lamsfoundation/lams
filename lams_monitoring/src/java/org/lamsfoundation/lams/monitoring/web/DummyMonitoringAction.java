@@ -234,15 +234,24 @@ public class DummyMonitoringAction extends LamsDispatchAction
         this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
 
         long lessonId = WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID);
-//	    Calendar cal = Calendar.getInstance();
-//		cal.setTime(new Date());
-//		cal.add(Calendar.MILLISECOND, 5000);
-//		monitoringService.finishLessonOnSchedule(lessonId,cal.getTime());
-
         monitoringService.archiveLesson(lessonId,getUserId());
 
         return unspecified(mapping, form, request, response);
     }
+
+    public ActionForward unarchiveLesson(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                                 ServletException
+	{
+		this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+		
+		long lessonId = WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID);
+		monitoringService.unarchiveLesson(lessonId,getUserId());
+		
+		return unspecified(mapping, form, request, response);
+	}
 
     /**
      * The Struts dispatch method to remove a lesson (marking the lesson by the given lesson ID
