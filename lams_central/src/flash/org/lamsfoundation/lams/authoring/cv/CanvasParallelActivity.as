@@ -202,7 +202,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 		header_pnl.borderType='outset';
 		container_pnl.setStyle("backgroundColor",0x4289FF);
 		
-		if (fromModuleTab != "monitorLearnerTab"){
+		if (fromModuleTab == "monitorLearnerTab"){
 			
 			containerPanelHeader.title_lbl.text = 'Parallel Activities'
 			
