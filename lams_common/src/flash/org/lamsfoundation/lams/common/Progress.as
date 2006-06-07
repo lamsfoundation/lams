@@ -35,6 +35,8 @@ class Progress {
 	private var _lessonId:Number;
 	private var _lessonName:String;
 	private var _userName:String;
+	private var _learnerLName:String;
+	private var _learnerFName:String;
 	private var _learnerId:Number;
 	private var _currentActivityId:Number;
 	private var _attemptedActivities:Array;
@@ -43,7 +45,7 @@ class Progress {
 	/**
 	* Constructor.
 	*/
-	public function Progess (dto:Object){
+		public function Progess (dto:Object){
 		if(dto != null){
 			populateFromDTO(dto);
 		}
@@ -67,6 +69,8 @@ class Progress {
 		_lessonName = dto.lessonName;
 		_userName = dto.userName;
 		_learnerId = dto.learnerId;
+		_learnerFName = dto.learnerFirstName;
+		_learnerLName = dto.learnerLastName;
 		_currentActivityId = dto.currentActivityId;
 		_attemptedActivities = dto.attemptedActivities;
 		_completedActivities = dto.completedActivities;
@@ -114,7 +118,6 @@ class Progress {
 			return false;
 		}
 	}
-	
 	public function getLessonId():Number{
 		return _lessonId;
 	}
@@ -129,6 +132,14 @@ class Progress {
 	
 	public function getLearnerId():Number{
 		return _learnerId;
+	}
+	
+	public function getLearnerFirstName():String{
+		return _learnerFName;
+	}
+	
+	public function getLearnerLastName():String{
+		return _learnerLName;
 	}
 	
 	public function getCurrentActivityId():Number{
