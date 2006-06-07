@@ -659,7 +659,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 			var uID = Config.getInstance().userID;
 			var serverUrl = Config.getInstance().serverUrl;
 			//Create an instance of JsPopup to access launchPopupWindow method.
-			JsPopup.getInstance().launchPopupWindow(serverUrl+'learning/learner.do?method=joinLesson&userID='+uID+'&lessonID='+r, 'Preview of Lession '+r.startPreviewSession, 570, 796, true, true, true);
+			JsPopup.getInstance().launchPopupWindow(serverUrl+'learning/main.jsp?userID='+uID+'&lessonID='+r, 'Preview of Lession '+r.startPreviewSession, 570, 796, true, true, true);
 			Debugger.log('Recieved Lesson ID: '+r ,Debugger.GEN,'onLaunchPreviewResponse','Canvas');
 			//_global.breakpoint();
 			//Debugger.log('_ddm.learningDesignID:'+_ddm.learningDesignID,Debugger.GEN,'onStoreDesignResponse','Canvas');		
