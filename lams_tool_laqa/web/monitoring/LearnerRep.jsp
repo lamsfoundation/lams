@@ -102,21 +102,30 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 			<jsp:include page="/monitoring/SummaryContent.jsp" />
 
-			<c:if test="${ requestLearningReportViewOnly != 'true'}"> 			
-				<table align=right> 	  
-				<tr> <td> 
-					<c:out value="${sessionScope.endLearningMessage}" escapeXml="false"/>
-				</td> </tr>
-			
-				<tr>
-					 <td> 
-						<html:submit onclick="javascript:submitMethod('endLearning');" styleClass="button">
-							<bean:message key="button.endLearning"/>
-						</html:submit>	 				 		  					
-					</td> 
-				</tr>
-				</table>
-			</c:if> 			
+				<c:if test="${ requestLearningReportViewOnly == 'true'}"> 			
+					<table align=right> 	  
+							<tr> <td align=right> 
+								<font size=2> <bean:message key="label.learning.forceFinish"/> </font> &nbsp&nbsp
+
+								<html:submit onclick="javascript:submitMethod('endLearning');" styleClass="button">
+									<bean:message key="button.endLearning"/>
+								</html:submit>	 				 		  					
+								</td> 
+							</tr>
+					</table>
+				</c:if> 			
+
+				<c:if test="${ requestLearningReportViewOnly != 'true'}"> 			
+					<table align=right> 	  
+							<tr> <td align=right> 
+								<html:submit onclick="javascript:submitMethod('endLearning');" styleClass="button">
+									<bean:message key="button.endLearning"/>
+								</html:submit>	 				 		  					
+								</td> 
+							</tr>
+					</table>
+				</c:if> 			
+
 	</html:form>
 </c:if> 				    
 

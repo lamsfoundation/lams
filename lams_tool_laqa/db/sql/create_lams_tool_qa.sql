@@ -1,5 +1,3 @@
--- $Id$
-
 CREATE TABLE tl_laqa11_content (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
      , qa_content_id BIGINT(20) NOT NULL
@@ -9,7 +7,7 @@ CREATE TABLE tl_laqa11_content (
      , update_date DATETIME
      , questions_sequenced TINYINT(1) NOT NULL DEFAULT 0
      , username_visible TINYINT(1) NOT NULL DEFAULT 0
-     , monitoring_report_title VARCHAR(100) DEFAULT 'Combined Learner Results'
+     , monitoring_report_title VARCHAR(100) DEFAULT 'Learner Results'
      , report_title VARCHAR(100) DEFAULT 'Report'
      , created_by BIGINT(20) NOT NULL DEFAULT 0
      , run_offline TINYINT(1) DEFAULT 0
@@ -40,6 +38,7 @@ CREATE TABLE tl_laqa11_que_usr (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
      , que_usr_id BIGINT(20) NOT NULL
      , username VARCHAR(100)
+     , responseFinalized TINYINT(1) NOT NULL DEFAULT 0
      , qa_session_id BIGINT(20) NOT NULL
      , fullname VARCHAR(100)
      , PRIMARY KEY (uid)
@@ -93,5 +92,5 @@ CREATE TABLE tl_laqa11_uploadedfile (
 INSERT INTO tl_laqa11_content (qa_content_id, 	creation_date)  VALUES (${default_content_id}, NOW());
 
 -- data for content questions table
-INSERT INTO tl_laqa11_que_content (question, display_order, qa_content_id) VALUES ('What is the largest continent in the world?',1,1);
+INSERT INTO tl_laqa11_que_content (question, display_order, qa_content_id) VALUES ('Sample Question 1?',1,1);
 

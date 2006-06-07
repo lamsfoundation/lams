@@ -45,6 +45,8 @@ public interface IQaQueUsrDAO
     
     public void createUsr(QaQueUsr usr);
     
+    public void updateUsr(QaQueUsr usr);
+    
     public void deleteQaQueUsr(QaQueUsr qaQueUsr);
     
     public int countSessionUser(QaSession qaSession);

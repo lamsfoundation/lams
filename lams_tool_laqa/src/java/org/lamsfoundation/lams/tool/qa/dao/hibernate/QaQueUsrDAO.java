@@ -121,6 +121,13 @@ public class QaQueUsrDAO extends HibernateDaoSupport implements IQaQueUsrDAO {
 	    	this.getHibernateTemplate().save(usr);
 	    }
 	 	
+	 	public void updateUsr(QaQueUsr usr) 
+	    {
+	 		this.getSession().setFlushMode(FlushMode.AUTO);
+	    	this.getHibernateTemplate().update(usr);
+	    }
+
+	 	
 	 	public void deleteQaQueUsr(QaQueUsr qaQueUsr) 
 	    {
 	 		this.getSession().setFlushMode(FlushMode.AUTO);

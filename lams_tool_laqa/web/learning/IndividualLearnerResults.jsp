@@ -63,14 +63,37 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							<hr>
 						</td> 
 					</tr>
+
+			
+					<tr> <td align=left>		
+						<table align="left">
+							<c:forEach var="questionEntry" items="${sessionScope.mapQuestionContentLearner}">
+									  <tr>
+									  	<td colspan=2 NOWRAP valign=top> <font size=2> <b> <bean:message key="label.question"/> <c:out value="${questionEntry.key}" escapeXml="false"/>:  </b>  </font> 
+									  		<c:out value="${questionEntry.value}" escapeXml="false"/> 
+									  	 </td>
+									  </tr>
+									  
+				  			  		<c:forEach var="answerEntry" items="${sessionScope.mapAnswers}">
+										<c:if test="${answerEntry.key == questionEntry.key}"> 						  			  		
+										  <tr>
+  										  	<td colspan=2 NOWRAP align=left  valign=top> <font size=2> <b> <bean:message key="label.learning.yourAnswer"/>  </b>  </font> 
+												  <c:out value="${answerEntry.value}" escapeXml="false" />						  																	
+										  	</td>
+										  </tr>
+									  	</c:if> 				    
+									</c:forEach>
+									
+									  <tr>
+									  	<td colspan=2 NOWRAP valign=top> 
+											&nbsp&nbsp
+									  	 </td>
+									  </tr>
+									
+							</c:forEach>
+						</table>
+					</td></tr>
 					
-			  		<c:forEach var="entry" items="${sessionScope.mapAnswers}">
-						  <tr>
-						  	<td NOWRAP align=center valign=top colspan=2> 
-								  <c:out value="${entry.value}" escapeXml="false" />						  																	
-						  	</td>
-						  </tr>
-					</c:forEach>
 			  	   	<tr> 
 				 		<td NOWRAP colspan=2 class="input" valign=top> 
 				 		&nbsp

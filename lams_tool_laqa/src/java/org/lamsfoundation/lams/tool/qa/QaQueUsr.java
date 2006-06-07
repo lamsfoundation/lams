@@ -66,6 +66,8 @@ public class QaQueUsr implements Serializable, Comparable, Nullable
     /** nullable persistent field */
     private String fullname;
     
+    private boolean responseFinalized;
+    
     /** persistent field */
     private QaSession qaSession;
     
@@ -466,4 +468,16 @@ public class QaQueUsr implements Serializable, Comparable, Nullable
 	public void setUid(Long uid) {
 		this.uid = uid;
 	}
+    /**
+     * @return Returns the responseFinalized.
+     */
+    public boolean isResponseFinalized() {
+        return responseFinalized;
+    }
+    /**
+     * @param responseFinalized The responseFinalized to set.
+     */
+    public void setResponseFinalized(boolean responseFinalized) {
+        this.responseFinalized = responseFinalized;
+    }
 }
