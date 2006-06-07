@@ -83,7 +83,7 @@ class LessonController extends AbstractController {
 	   if(ca.activity.activityTypeID == Activity.TOOL_ACTIVITY_TYPE){
 			
 			if(ca.activityStatus != undefined){
-				var URLToSend:String = 'learning/learner.do?method=getLearnerActivityURL&activityId='+ca.activity.activityID+'&userId='+_root.userID+'&lessonId='+_root.lessonID;
+				var URLToSend:String = 'learning/learner.do?method=getLearnerActivityURL&activityID='+ca.activity.activityID+'&userID='+_root.userID+'&lessonID='+_root.lessonID;
 				
 				if(ca.activityStatus == 'completed_mc'){
 					_lessonModel.getLesson().getActivityURL(URLToSend, true);

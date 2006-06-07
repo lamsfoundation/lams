@@ -120,7 +120,7 @@ class Lesson {
 		//var userId:Number = Application.getInstance().getUserID();
 
 		// do request
-		Application.getInstance().getComms().getRequest('learning/learner.do?method=joinLesson&lessonId='+String(lessonId), callback, false);
+		Application.getInstance().getComms().getRequest('learning/learner.do?method=joinLesson&lessonID='+String(lessonId), callback, false);
 			
 		// get Learning Design for lesson
 		openLearningDesign();
@@ -135,7 +135,7 @@ class Lesson {
 		var lessonId:Number = lessonModel.ID;
 		
 		// do request
-		Application.getInstance().getComms().getRequest('learning/learner.do?method=exitLesson&lessonId='+String(lessonId), callback, false);
+		Application.getInstance().getComms().getRequest('learning/learner.do?method=exitLesson&lessonID='+String(lessonId), callback, false);
 		
 		return true;
 	}
@@ -161,7 +161,7 @@ class Lesson {
 	private function getFlashProgress():Void{
 		var callback:Function = Proxy.create(this,saveProgressData);
 		var lessonId:Number = lessonModel.ID;
-		Application.getInstance().getComms().getRequest('learning/learner.do?method=getFlashProgressData&progressId='+String(lessonId), callback, false);
+		Application.getInstance().getComms().getRequest('learning/learner.do?method=getFlashProgressData&progressID='+String(lessonId), callback, false);
 	}
 	
 	private function saveProgressData(progressDTO:Object):Void{
