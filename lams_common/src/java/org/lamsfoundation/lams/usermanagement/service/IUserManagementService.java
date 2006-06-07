@@ -469,5 +469,15 @@ public interface IUserManagementService {
 	public List getAllLanguages();
 	
 	public List getRolePrivilegesByRoleId(Integer id);
+	
+	public List getUserOrganisationsByType(Integer organisationTypeId);
+	
+	public List getOrganisationsByType(Integer organisationTypeId);
+	
+	public boolean isUserSysAdmin(String login);
+	
+	public Organisation getRootOrganisation();
+	
+	public boolean isUserInRoleInOrganisation(String login, Integer roleId, Integer orgId);
 
 }

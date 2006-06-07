@@ -702,4 +702,25 @@ public class UserManagementService implements IUserManagementService {
 	public List getRolePrivilegesByRoleId(Integer id) {
 		return rolePrivilegeDAO.getRolePrivilegesByRoleId(id);
 	}
+
+	public List getUserOrganisationsByType(Integer organisationTypeId) {
+		return userOrganisationDAO.getUserOrganisationsByType(organisationTypeId);
+	}
+
+	public List getOrganisationsByType(Integer organisationTypeId) {
+		return organisationDAO.getOrganisationsByType(organisationTypeId);
+	}
+
+	public boolean isUserSysAdmin(String login) {
+		return isUserInRoleInOrganisation(login,Role.ROLE_SYSADMIN,getRootOrganisation().getOrganisationId());
+	}
+
+	public Organisation getRootOrganisation() {
+		return (Organisation)getOrganisationsByType(OrganisationType.ROOT_TYPE).get(0);
+	}
+
+	public boolean isUserInRoleInOrganisation(String login, Integer roleId, Integer orgId) {
+		return userOrganisationRoleDAO.getUserOrganisationRole(userOrganisationDAO.getUserOrganisation(userDAO.getUserByLogin(login).getUserId(),orgId).getUserOrganisationId(),roleId)!=null;
+	}
+
 }
