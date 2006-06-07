@@ -43,7 +43,10 @@ class Progress {
 	/**
 	* Constructor.
 	*/
-	public function Progess (){
+	public function Progess (dto:Object){
+		if(dto != null){
+			populateFromDTO(dto);
+		}
 	}
 	
 	/**
@@ -58,6 +61,7 @@ class Progress {
 	}
 	
 	public function populateFromDTO(dto:Object){
+		Debugger.log('populating from dto.',Debugger.CRITICAL,'populateFromDTO','org.lamsfoundation.lams.Progress');
 		trace('populating progress obj:' + dto.lessonId);
 		_lessonId = dto.lessonId;
 		_lessonName = dto.lessonName;
@@ -66,6 +70,49 @@ class Progress {
 		_currentActivityId = dto.currentActivityId;
 		_attemptedActivities = dto.attemptedActivities;
 		_completedActivities = dto.completedActivities;
+	}
+	
+	public static function compareProgressData(learner:Object, activityID:Number):String{
+		trace ("activity ID passed is: "+activityID)
+		trace("Number of Activities completed in the lesson are: "+learner.getCompletedActivities().length)
+		
+		var arrLearnerProgComp = learner.getCompletedActivities()
+		for (var i=0; i<arrLearnerProgComp.length; i++){
+			if (activityID == arrLearnerProgComp[i]){
+				var clipName:String = "completed_mc";
+				return clipName;
+			}
+		
+		}
+		
+		var arrLearnerProgAttempt = learner.getAttemptedActivities()
+		trace("Attempted activities are: "+arrLearnerProgAttempt.length)
+		for (var j=0; j<arrLearnerProgAttempt.length; j++){
+			trace("Activity Id Passed is "+activityID+" and attempted ID is "+arrLearnerProgAttempt[j])
+			if (activityID == arrLearnerProgAttempt[j]){
+				if (activityID == learner.getCurrentActivityId()){
+					var clipName:String = "current_mc";
+					return clipName;
+				}else {
+					var clipName:String = "attempted_mc";
+					return clipName;
+				}
+			}
+			
+		}
+		//arrLearnerProg = learner.getCurrentActivityId()
+		if (activityID == learner.getCurrentActivityId()){
+			var clipName:String = "current_mc";
+			return clipName;
+		}
+	}
+	
+	public static function isLearnerCurrentActivity(learner:Object, activityID:Number):Boolean{
+		if (activityID == learner.getCurrentActivityId()){
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 	public function getLessonId():Number{
