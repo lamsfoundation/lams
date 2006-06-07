@@ -36,6 +36,10 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 */
 public class OrganisationType implements Serializable {
 	
+	public static final Integer ROOT_TYPE = 1;
+	public static final Integer COURSE_TYPE = 2;
+	public static final Integer CLASS_TYPE = 3;
+	
 	public static final String ROOT_DESCRIPTION = "ROOT ORGANISATION";
 	public static final String COURSE_DESCRIPTION = "COURSE ORGANISATION";
 	public static final String CLASS_DESCRIPTION = "CLASS ORGANISATION";

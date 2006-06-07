@@ -37,8 +37,6 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 */
 public class Role implements Serializable {
 
-	public static final String ADMIN = "ADMIN";
-
 	public static final String LEARNER = "LEARNER";
 	
 	public static final String STAFF = "STAFF";
