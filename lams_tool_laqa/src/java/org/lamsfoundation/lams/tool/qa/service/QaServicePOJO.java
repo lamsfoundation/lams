@@ -453,6 +453,21 @@ public class QaServicePOJO
         }
     }
     
+    public void updateQaQueUsr(QaQueUsr qaQueUsr) throws QaApplicationException
+    {
+	   try
+        {
+	   		qaQueUsrDAO.updateUsr(qaQueUsr);
+        }
+        catch (DataAccessException e)
+        {
+            throw new QaApplicationException("Exception occured when lams is updating qa QueUsr: "
+                                                         + e.getMessage(),
+														   e);
+        }
+    }
+
+    
     
     public QaUsrResp retrieveQaUsrResp(long responseId) throws QaApplicationException
     {

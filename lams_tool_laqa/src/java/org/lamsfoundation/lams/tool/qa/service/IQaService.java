@@ -74,6 +74,8 @@ public interface IQaService
 	
 	public int countSessionComplete() throws QaApplicationException;
 	
+    public void updateQaQueUsr(QaQueUsr qaQueUsr) throws QaApplicationException;
+	
 	
 	/**
      * Return the question content object according to the requested question content id.
