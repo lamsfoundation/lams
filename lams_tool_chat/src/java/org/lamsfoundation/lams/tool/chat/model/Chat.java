@@ -85,6 +85,7 @@ public class Chat implements java.io.Serializable, Cloneable {
 
 	private Set chatSessions;
 
+	//*********** NON Persisit fields
 	private IToolContentHandler toolContentHandler;
 
 	// Constructors
@@ -401,5 +402,13 @@ public class Chat implements java.io.Serializable, Cloneable {
 			log.error("Repository checked exception " + Chat.class);
 		}
 		return chat;
+	}
+
+	public IToolContentHandler getToolContentHandler() {
+		return toolContentHandler;
+	}
+
+	public void setToolContentHandler(IToolContentHandler toolContentHandler) {
+		this.toolContentHandler = toolContentHandler;
 	}
 }

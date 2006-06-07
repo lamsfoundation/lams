@@ -28,6 +28,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -51,6 +52,9 @@ import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.contentrepository.service.RepositoryProxy;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
+import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
+import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
+import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
@@ -106,6 +110,8 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 
 	private IRepositoryService repositoryService = null;
 
+	private IExportToolContentService exportContentService;
+	
 	public ChatService() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -240,7 +246,25 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
      * @throws ToolException if any other error occurs
      */
 
-	public void exportToolContent(Long toolContentId, String toPath) throws DataMissingException, ToolException {
+	public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
+		Chat toolContentObj = chatDAO.getByContentId(toolContentId);
+ 		if(toolContentObj == null)
+ 			throw new DataMissingException("Unable to find tool content by given id :" + toolContentId);
+ 		
+ 		//set ResourceToolContentHandler as null to avoid copy file node in repository again.
+ 		toolContentObj = Chat.newInstance(toolContentObj,toolContentId,null);
+ 		toolContentObj.setToolContentHandler(null);
+ 		toolContentObj.setChatSessions(null);
+ 		Set<ChatAttachment> atts = toolContentObj.getChatAttachments(); 
+ 		for(ChatAttachment att: atts){
+ 			att.setChat(null);
+ 		}
+		try {
+			exportContentService.registerFileClassForExport(ChatAttachment.class.getName(),"fileUuid","fileVersionId");
+			exportContentService.exportToolContent( toolContentId, toolContentObj,chatToolContentHandler, rootPath);
+		} catch (ExportToolContentException e) {
+			throw new ToolException(e);
+		}
 	}
 
     /**
@@ -249,7 +273,23 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
      * @throws ToolException if any other error occurs
      */
 	public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath) throws ToolException {
-		
+		try {
+			exportContentService.registerFileClassForImport(ChatAttachment.class.getName()
+					,"fileUuid","fileVersionId","fileName","fileType",null,null);
+			
+			Object toolPOJO =  exportContentService.importToolContent(toolContentPath,chatToolContentHandler);
+			if(!(toolPOJO instanceof Chat))
+				throw new ImportToolContentException("Import Chat tool content failed. Deserialized object is " + toolPOJO);
+			Chat toolContentObj = (Chat) toolPOJO;
+			
+//			reset it to new toolContentId
+			toolContentObj.setToolContentId(toolContentId);
+			toolContentObj.setCreateBy(new Long(newUserUid.longValue()));
+			
+			chatDAO.saveOrUpdate(toolContentObj);
+		} catch (ImportToolContentException e) {
+			throw new ToolException(e);
+		}
 	}
 	
 	/* ********** IChatService Methods ************************************** */
@@ -682,6 +722,14 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 
 	public void setLearnerService(ILearnerService learnerService) {
 		this.learnerService = learnerService;
+	}
+
+	public IExportToolContentService getExportContentService() {
+		return exportContentService;
+	}
+
+	public void setExportContentService(IExportToolContentService exportContentService) {
+		this.exportContentService = exportContentService;
 	}
 
 }
