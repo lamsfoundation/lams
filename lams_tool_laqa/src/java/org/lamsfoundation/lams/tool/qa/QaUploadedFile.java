@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.tool.qa;
 
 import java.io.Serializable;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -222,4 +223,19 @@ public class QaUploadedFile implements Serializable, Comparable
 		else
 			return (int) (submissionId.longValue() - file.submissionId.longValue());
     }
+	public String getFileProperty() {
+		   if (isFileOnline())
+	        {
+	            return IToolContentHandler.TYPE_ONLINE;
+	        }
+	        else
+	            return IToolContentHandler.TYPE_OFFLINE;
+	}
+
+	public void setFileProperty(String fileProperty) {
+		if(StringUtils.equals(IToolContentHandler.TYPE_ONLINE,fileProperty))
+			this.fileOnline = true;
+		else
+			this.fileOnline = false;
+	}	
 }
