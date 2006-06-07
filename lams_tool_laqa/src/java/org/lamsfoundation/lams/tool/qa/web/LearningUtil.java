@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.tool.qa.web;
 
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
 
@@ -114,7 +115,6 @@ public class LearningUtil implements QaAppConstants{
     	
     	if ((qaQueUsr != null) && (qaQueUsrLocal == null)) 
         {
-        	//qaService.createQaQueUsr(qaQueUsr);
     	    qaQueUsr=createUser(request);
             logger.debug("created qaQueUsr: " + qaQueUsr);	
         }
@@ -124,11 +124,15 @@ public class LearningUtil implements QaAppConstants{
     		qaQueUsr=qaQueUsrLocal;
     	}
     	
+    	logger.debug("qaQueUsr uid:" + qaQueUsr.getUid());
+    	
         while (contentIterator.hasNext())
     	{
     		QaQueContent qaQueContent=(QaQueContent)contentIterator.next();
     		if (qaQueContent != null)
     		{
+    		    logger.debug("qaQueContent uid:" + qaQueContent.getUid());
+    		    
         		String question=qaQueContent.getQuestion();
         		String displayOrder=new Long(qaQueContent.getDisplayOrder()).toString();
         		String answer=(String)mapAnswers.get(displayOrder);
@@ -139,20 +143,29 @@ public class LearningUtil implements QaAppConstants{
                 String timezoneId=(String)request.getSession().getAttribute(TIMEZONE_ID);
                 if (timezoneId == null) timezoneId="";
                 
+                List attempts=qaService.getAttemptsForUserAndQuestionContent(qaQueUsr.getUid(), qaQueContent.getUid());
+                logger.debug("attempts:" + attempts);
                 
-            	QaUsrResp qaUsrResp= new QaUsrResp(answer,false,
-						new Date(System.currentTimeMillis()),
-						timezoneId,
-						qaQueContent,
-						qaQueUsr); 
+                if ((attempts != null) && (attempts.size() > 0))
+                {
+                    logger.debug("this user already responsed to q/a in this session:");
+                }
+                else
+                {
+                    logger.debug("creating response.");
+                	QaUsrResp qaUsrResp= new QaUsrResp(answer,false,
+    						new Date(System.currentTimeMillis()),
+    						timezoneId,
+    						qaQueContent,
+    						qaQueUsr); 
 
-				logger.debug("iterationg qaUsrResp: " + qaUsrResp);
-				if (qaUsrResp != null)
-				{
-					qaService.createQaUsrResp(qaUsrResp);
-					logger.debug("created qaUsrResp in the db");	
-				}
-                
+    				logger.debug("iterationg qaUsrResp: " + qaUsrResp);
+    				if (qaUsrResp != null)
+    				{
+    					qaService.createQaUsrResp(qaUsrResp);
+    					logger.debug("created qaUsrResp in the db");	
+    				}
+                }
     		}
         }
         logger.debug("both the users and their responses created in the db");

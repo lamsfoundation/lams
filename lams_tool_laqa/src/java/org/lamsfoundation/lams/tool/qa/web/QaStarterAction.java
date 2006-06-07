@@ -341,7 +341,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 			/*fetch default content*/
 			String defaultContentIdStr=(String) request.getSession().getAttribute(DEFAULT_CONTENT_ID_STR);
 			logger.debug("defaultContentIdStr:" + defaultContentIdStr);
-            retrieveContent(request, mapping, qaAuthoringForm, mapQuestionContent, new Long(defaultContentIdStr).longValue());
+            retrieveContent(request, mapping, qaAuthoringForm, mapQuestionContent, new Long(defaultContentIdStr).longValue(), true);
 		}
         else
         {
@@ -358,7 +358,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	    		logger.debug("add error.content.inUse to ActionMessages.");
 				return (mapping.findForward(ERROR_LIST));
     		}
-            retrieveContent(request, mapping, qaAuthoringForm, mapQuestionContent, new Long(strToolContentId).longValue());
+            retrieveContent(request, mapping, qaAuthoringForm, mapQuestionContent, new Long(strToolContentId).longValue(),false);
         }
 		
 		logger.debug("will return to jsp with: " + sourceMcStarter);
@@ -380,9 +380,11 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	 * @param toolContentId
 	 * @return ActionForward
 	 */
-	protected void retrieveContent(HttpServletRequest request, ActionMapping mapping, QaAuthoringForm qaAuthoringForm, Map mapQuestionContent, long toolContentId)
+	protected void retrieveContent(HttpServletRequest request, ActionMapping mapping, QaAuthoringForm qaAuthoringForm, 
+	        Map mapQuestionContent, long toolContentId, boolean isDefaultContent)
 	{
-		logger.debug("starting retrieveExistingContent for toolContentId: " + toolContentId);
+	    logger.debug("contentType: " + toolContentId);
+		logger.debug("isDefaultContent: " + isDefaultContent);
 
 		IQaService qaService = (IQaService)request.getSession().getAttribute(TOOL_SERVICE);
 		logger.debug("qaService: " + qaService);
@@ -409,8 +411,8 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		
 		if (qaContent.getTitle() == null)
 		{
-			request.getSession().setAttribute(ACTIVITY_TITLE, "Questions and Answers");
-			request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, "Please answer the questions.");
+			request.getSession().setAttribute(ACTIVITY_TITLE, "Q&A Title");
+			request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS, "Q&A Instructions");
 		}
 		else
 		{
@@ -462,6 +464,13 @@ public class QaStarterAction extends Action implements QaAppConstants {
 			}
 		}
 		logger.debug("Map initialized with existing contentid to: " + mapQuestionContent);
+		
+		
+		if (isDefaultContent)
+		{
+		    logger.debug("overwriting default question.");
+			request.getSession().setAttribute(DEFAULT_QUESTION_CONTENT, "Sample Question 1?");
+		}
 		
 		logger.debug("callling presentInitialUserInterface for the existing content.");
 		

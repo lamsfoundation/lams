@@ -453,16 +453,22 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	     * 
 	     * if the user's tool session id AND user id exists in the tool tables go to learner's report.
 	     */
+	    /* if the 'All Responses' has been clicked no more user entry is accepted, and isResponseFinalized() returns true*/
+	    logger.debug("userId:" + userId);
+	    Long currentToolSessionId=(Long)request.getSession().getAttribute(TOOL_SESSION_ID);
+	    logger.debug("currentToolSessionId: " + currentToolSessionId);
+	    logger.debug("current session uid: " + qaSession.getUid());
+	    
 	    if (userId != null)
 	    {
-		    QaQueUsr qaQueUsr=qaService.loadQaQueUsr(new Long(userId));
+		    QaQueUsr qaQueUsr=qaService.getQaUserBySession(new Long(userId), qaSession.getUid());
 		    logger.debug("QaQueUsr:" + qaQueUsr);
-		    if (qaQueUsr != null)
+		    
+		    if ((qaQueUsr != null) && (qaQueUsr.isResponseFinalized()))
 		    {
+		        logger.debug("is current user's response finalized: " + qaQueUsr.isResponseFinalized());
 		    		QaSession checkSession=qaQueUsr.getQaSession();
 		    		logger.debug("checkSession:" + checkSession);
-		    		Long currentToolSessionId=(Long)request.getSession().getAttribute(TOOL_SESSION_ID);
-			    	logger.debug("currentToolSessionId: " + currentToolSessionId);
 			    	
 		    		if (checkSession != null)
 		    		{
@@ -511,7 +517,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
     	/*
     	 * present user with the questions.
     	 */
-		logger.debug("forwarding to: " + LOAD_LEARNER);
+        logger.debug("forwarding to: " + LOAD_LEARNER);
 		return (mapping.findForward(LOAD_LEARNER));	
 	}
 	

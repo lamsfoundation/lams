@@ -283,6 +283,9 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 		logger.debug("existing qaContent:" + qaContent);
 
 		Long toolSessionId=(Long)request.getSession().getAttribute(AttributeNames.PARAM_TOOL_SESSION_ID);
+		QaSession qaSession=qaService.retrieveQaSessionOrNullById(toolSessionId.longValue());
+	    logger.debug("retrieving qaSession: " + qaSession);
+
 		
 		Boolean isUserNamesVisibleBoolean=(Boolean)request.getSession().getAttribute(IS_USERNAME_VISIBLE);
     	boolean isUserNamesVisible=isUserNamesVisibleBoolean.booleanValue();
@@ -290,10 +293,18 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
     	
     	QaMonitoringAction qaMonitoringAction= new QaMonitoringAction();
     	qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, isUserNamesVisible, true, toolSessionId.toString(), null);
+
+	    String userID= (String)request.getSession().getAttribute(USER_ID);
+		logger.debug("userID: " + userID);
+		QaQueUsr qaQueUsr=qaService.getQaUserBySession(new Long(userID), qaSession.getUid());
+		logger.debug("current user is: " + qaQueUsr);
+		qaQueUsr.setResponseFinalized(true);
+		logger.debug("finalized user input");
+		qaService.updateQaQueUsr(qaQueUsr);
     	
 		request.getSession().setAttribute(REQUEST_LEARNING_REPORT, new Boolean(true).toString());
 		request.getSession().setAttribute(REQUEST_LEARNING_REPORT_PROGRESS, new Boolean(false).toString());
-		logger.debug("fwd'ing to for learner progress" + LEARNER_REPORT);
+		logger.debug("fwd'ing to: " + LEARNER_REPORT);
 		return (mapping.findForward(LEARNER_REPORT));
 	}
 
