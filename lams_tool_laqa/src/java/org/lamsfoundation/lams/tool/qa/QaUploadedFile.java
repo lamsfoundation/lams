@@ -92,10 +92,14 @@ public class QaUploadedFile implements Serializable, Comparable
 
     	try
 		{
-    		NodeKey copiedNodeKey =  toolContentHandler.copyFile(new Long(qaUploadedFile.getUuid()));
-        	logger.debug("copied NodeKey: " + copiedNodeKey);
-        	logger.debug("copied NodeKey uuid: " + copiedNodeKey.getUuid().toString());
-        	newMcUploadedFile = new QaUploadedFile(copiedNodeKey.getUuid().toString(),
+    		String fileUuid = qaUploadedFile.getUuid(); 
+    		if(toolContentHandler != null){
+	    		NodeKey copiedNodeKey =  toolContentHandler.copyFile(new Long(qaUploadedFile.getUuid()));
+	        	logger.debug("copied NodeKey: " + copiedNodeKey);
+	        	logger.debug("copied NodeKey uuid: " + copiedNodeKey.getUuid().toString());
+	        	fileUuid = copiedNodeKey.getUuid().toString();
+    		}
+        	newMcUploadedFile = new QaUploadedFile(fileUuid,
         			qaUploadedFile.isFileOnline(),
         			qaUploadedFile.getFileName(),
 					newMcContent);
