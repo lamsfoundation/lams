@@ -23,7 +23,7 @@
 		</td>
 	</tr>
 	<tr>
-		<td width="100%" height="100%" align="left" valign="middle" bgcolor="#FFFFFF">	
+		<td width="100%" height="100%" align="center" valign="middle" bgcolor="#FFFFFF">	
 			<tiles:insert attribute="content" />
 		</td>
 	</tr>

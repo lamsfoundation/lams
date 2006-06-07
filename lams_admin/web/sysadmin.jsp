@@ -3,7 +3,7 @@
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
-<H1>System Administration</H1>
+<H1><fmt:message key="sysadmin.headline"/></H1>
 
 <UL>
 <LI><A HREF="cache.do"><fmt:message key="cache.title"/></A></LI>

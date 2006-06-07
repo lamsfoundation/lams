@@ -1,7 +1,11 @@
-<html:form action="/admin/organisation" method="post">
-<html:hidden property="organisationId" />
-<html:hidden name="parentOrganisation" property="organisationId" />
-<html:hidden name="organisationType" property="organisationTypeId">
+<%@ page contentType="text/html; charset=utf-8" language="java" %>
+
+<%@ taglib uri="tags-html" prefix="html" %>
+
+<html:form action="orgsave.do" method="post">
+<html:hidden property="orgId" />
+<html:hidden property="parentId" />
+<html:hidden property="typeId" />
 <table>
 	<tr>
 		<td>Name:</td>
@@ -34,7 +38,7 @@
 	<tr>
 		<td>State</td>
 		<td>
-			<html:select name="organisationState" property="organisationStateId">
+			<html:select property="stateId">
 				<html:option key="organisation.state.active" value="1" />
 				<html:option key="organisation.state.hidden" value="2" />
 				<html:option key="organisation.state.archived" value="3" />
