@@ -46,10 +46,12 @@ class org.lamsfoundation.lams.learner.LearnerActivity extends MovieClip {
 	public static var TOOL_ACTIVITY_HEIGHT:Number = 50.5;
 	private var xPos:Number;
 	private var yPos:Number;
+	
 	//this is set by the init object
 	private var _lessonController:LessonController;
 	private var _lessonView:LessonView;
 	private var _tm:ThemeManager;
+	
 	//TODO:This should be ToolActivity
 	private var _activity:Activity;
 	private var _isSelected:Boolean;
@@ -100,13 +102,13 @@ class org.lamsfoundation.lams.learner.LearnerActivity extends MovieClip {
 	}
 	
 	public function init(initObj):Void{
-		Debugger.log('initialising activity : ' + _activity.activityID ,Debugger.CRITICAL,'init','org.lamsfoundation.lams.LearnerActivity');
-	
+		
 		if(initObj){
 			
 				_lessonView = initObj._lessonView;
 				_lessonController = initObj._lessonController;
 				_activity = initObj.activity;
+				learner = initObj.learner;
 		}
 		
 		showAssets(false);
@@ -114,6 +116,10 @@ class org.lamsfoundation.lams.learner.LearnerActivity extends MovieClip {
 		if(!_activity.isGateActivity() && !_activity.isGroupActivity()){
 			//loadIcon();
 		}
+		
+		Debugger.log('initialising activity : ' + _activity.activityID ,Debugger.CRITICAL,'init','org.lamsfoundation.lams.LearnerActivity');
+	
+		
 		setStyles();
 		trace("Data for sentFrom: "+sentFrom)
 		MovieClipUtils.doLater(Proxy.create(this,draw));
@@ -124,20 +130,18 @@ class org.lamsfoundation.lams.learner.LearnerActivity extends MovieClip {
 		completed_mc._visible = isVisible;
 		current_mc._visible = isVisible;
 		canvasActivity_mc._visible = isVisible;
-		//clickTarget_mc._visible = isVisible;
 		todo_mc._visible = isVisible;
 		attempted_mc._visible = isVisible
 		title_lbl._visible = true;
 	}
 	
 	/**
-	 * Updates the CanvasActivity display fields with the current data
+	 * Updates the LearnerActivity display fields with the current data
 	 * @usage   
 	 * @return  
 	 */
 	public function refresh():Void{
 		draw();
-		//setSelected(_isSelected);
 	}
 	
 	/**
@@ -149,7 +153,7 @@ class org.lamsfoundation.lams.learner.LearnerActivity extends MovieClip {
 	private function draw(){
 			Debugger.log(_activity.title+',_activity.isGateActivity():'+_activity.isGateActivity(),4,'draw','CanvasActivity');
 		if (actStatus == null || actStatus == undefined){
-			actStatus = _lessonView.compareProgressData(learner, _activity.activityID);
+			actStatus = Progress.compareProgressData(learner, _activity.activityID);
 		}
 		
 		title_lbl._visible = true;
