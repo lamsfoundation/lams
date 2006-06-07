@@ -393,9 +393,17 @@ public class NoticeboardContent implements Serializable {
 			while (iter.hasNext()) {
 				NoticeboardAttachment element = (NoticeboardAttachment) iter.next();
 				NoticeboardAttachment newAttachment = new NoticeboardAttachment(newContent, element.getFilename(), element.isOnlineFile());
-				NodeKey keys = toolContentHandler.copyFile(element.getUuid());
-				newAttachment.setUuid(keys.getUuid());
-				newAttachment.setVersionId(keys.getVersion());
+				if(toolContentHandler != null){
+					//if it is not null, copy file node and refresh uuid and version
+					NodeKey keys = toolContentHandler.copyFile(element.getUuid());
+					newAttachment.setUuid(keys.getUuid());
+					newAttachment.setVersionId(keys.getVersion());
+				}else{
+					//keep old value
+					newAttachment.setUuid(element.getUuid());
+					newAttachment.setVersionId(element.getVersionId());
+				}
+				
 				newAttachmentSet.add(newAttachment);
 			} 
 			newContent.setNbAttachments(newAttachmentSet);

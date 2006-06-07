@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.mc.pojos;
 
 import java.io.Serializable;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
@@ -109,10 +110,14 @@ public class McUploadedFile implements Serializable, Comparable
 
     	try
 		{
-    		NodeKey copiedNodeKey =  toolContentHandler.copyFile(new Long(mcUploadedFile.getUuid()));
-        	logger.debug("copied NodeKey: " + copiedNodeKey);
-        	logger.debug("copied NodeKey uuid: " + copiedNodeKey.getUuid().toString());
-        	newMcUploadedFile = new McUploadedFile(copiedNodeKey.getUuid().toString(),
+    		String fileUuid = mcUploadedFile.getUuid();
+    		if(toolContentHandler != null){
+	    		NodeKey copiedNodeKey =  toolContentHandler.copyFile(new Long(mcUploadedFile.getUuid()));
+	    		fileUuid = copiedNodeKey.getUuid().toString();
+	        	logger.debug("copied NodeKey: " + copiedNodeKey);
+	        	logger.debug("copied NodeKey uuid: " + fileUuid);
+    		}
+        	newMcUploadedFile = new McUploadedFile(fileUuid,
 					mcUploadedFile.isFileOnline(),
 					mcUploadedFile.getFilename(),
 					newMcContent);
@@ -228,4 +233,20 @@ public class McUploadedFile implements Serializable, Comparable
 		else
 			return (int) (uid.longValue() - optContent.uid.longValue());
     }
+	public String getFileProperty() {
+		   if (isFileOnline())
+	        {
+	            return IToolContentHandler.TYPE_ONLINE;
+	        }
+	        else
+	            return IToolContentHandler.TYPE_OFFLINE;
+	}
+
+	public void setFileProperty(String fileProperty) {
+		if(StringUtils.equals(IToolContentHandler.TYPE_ONLINE,fileProperty))
+			this.fileOnline = true;
+		else
+			this.fileOnline = false;
+	}	
+
 }

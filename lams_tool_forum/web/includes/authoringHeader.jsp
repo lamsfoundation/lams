@@ -47,10 +47,11 @@
 	}
 
 	function doSubmit(method, tabId) {
+		var authorForm = document.getElementById("authoringForm");
 		if(tabId != null)
-			document.forumMonitoringForm.currentTab.value=tabId;
-		document.forumMonitoringForm.method.value=method;
-		document.forumMonitoringForm.submit();
+			authorForm.currentTab.value=tabId;
+		authorForm.action=method;
+		authorForm.submit();
 	}
 	
 	//]]>        

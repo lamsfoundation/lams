@@ -31,10 +31,14 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
+import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
+import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
+import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
@@ -80,6 +84,7 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	private INoticeboardAttachmentDAO nbAttachmentDAO = null;
 	private IToolContentHandler nbToolContentHandler = null;
 	
+	private IExportToolContentService exportContentService;
 	private static Logger log = Logger.getLogger(NoticeboardServicePOJO.class);
 
 	
@@ -888,7 +893,24 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
      * @throws ToolException if any other error occurs
      */
 
-	public void exportToolContent(Long toolContentId, String toPath) throws DataMissingException, ToolException {
+	public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
+		NoticeboardContent toolContentObj = nbContentDAO.findNbContentById(toolContentId);
+ 		if(toolContentObj == null)
+ 			throw new DataMissingException("Unable to find tool content by given id :" + toolContentId);
+ 		
+		try {
+			//set ResourceToolContentHandler as null to avoid copy file node in repository again.
+			toolContentObj = NoticeboardContent.newInstance(toolContentObj,toolContentId,null);
+			toolContentObj.setNbSessions(null);
+			exportContentService.registerFileClassForExport(NoticeboardAttachment.class.getName(),"uuid","versionId");
+			exportContentService.exportToolContent( toolContentId, toolContentObj,nbToolContentHandler, rootPath);
+		} catch (ExportToolContentException e) {
+			throw new ToolException(e);
+		} catch (ItemNotFoundException e) {
+			throw new ToolException(e);
+		} catch (RepositoryCheckedException e) {
+			throw new ToolException(e);
+		}
 	}
 
     /**
@@ -897,7 +919,21 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
      * @throws ToolException if any other error occurs
      */
 	 public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath) throws ToolException {
-		
+		 try {
+				exportContentService.registerFileClassForImport(NoticeboardAttachment.class.getName()
+						,"uuid","versionId","filename","fileProperty",null,null);
+				
+				Object toolPOJO =  exportContentService.importToolContent(toolContentPath,nbToolContentHandler);
+				if(!(toolPOJO instanceof NoticeboardContent))
+					throw new ImportToolContentException("Import Noteice board tool content failed. Deserialized object is " + toolPOJO);
+				NoticeboardContent toolContentObj = (NoticeboardContent) toolPOJO;
+				
+//				reset it to new toolContentId
+				toolContentObj.setNbContentId(toolContentId);
+				nbContentDAO.saveNbContent(toolContentObj);
+			} catch (ImportToolContentException e) {
+				throw new ToolException(e);
+			}
 	}
 	/* ===============Methods implemented from ToolSessionManager =============== */
 	
@@ -1065,5 +1101,13 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 
 	public void setNbToolContentHandler(IToolContentHandler nbToolContentHandler) {
 		this.nbToolContentHandler = nbToolContentHandler;
+	}
+	public IExportToolContentService getExportContentService() {
+		return exportContentService;
+	}
+
+
+	public void setExportContentService(IExportToolContentService exportContentService) {
+		this.exportContentService = exportContentService;
 	}
 }

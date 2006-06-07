@@ -126,7 +126,7 @@
             table="ATTACHMENT"
             lazy="false"
             inverse="false"
-            cascade="all"
+            cascade="all-delete-orphan"
             sort="unsorted"
         >
 

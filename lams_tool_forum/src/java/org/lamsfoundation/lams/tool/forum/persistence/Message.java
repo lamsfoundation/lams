@@ -390,7 +390,7 @@ public class Message implements Cloneable{
      * @hibernate.set table="ATTACHMENT"
      * inverse="false"
      * lazy="false"
-     * cascade="all"
+     * cascade="all-delete-orphan"
      * @hibernate.collection-key column="message_uid"
      * @hibernate.collection-one-to-many
      * 			class="org.lamsfoundation.lams.tool.forum.persistence.Attachment"
@@ -459,5 +459,11 @@ public class Message implements Cloneable{
 			append("uid",uid).
 			append("subject",subject).
 			append("body",body).toString();
+	}
+	public ForumToolContentHandler getToolContentHandler() {
+		return toolContentHandler;
+	}
+	public void setToolContentHandler(ForumToolContentHandler toolContentHandler) {
+		this.toolContentHandler = toolContentHandler;
 	}
 }

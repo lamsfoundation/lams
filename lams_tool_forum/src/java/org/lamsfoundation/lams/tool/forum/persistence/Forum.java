@@ -71,6 +71,8 @@ public class Forum implements Cloneable{
 	private Set attachments;
 	private int limitedChar;
     private boolean limitedInput;
+    
+    //********* Non Persist fields
 	private ForumToolContentHandler toolContentHandler;
     
 	/**
@@ -373,8 +375,8 @@ public class Forum implements Cloneable{
 	 * 
 	 * 
 	 * @hibernate.set lazy="true"
-	 *                inverse="true"
-	 *                cascade="none"
+	 *                inverse="false"
+	 *                cascade="save-update"
 	 *                order-by="create_date desc"
 	 * @hibernate.collection-key column="forum_uid"
 	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.forum.persistence.Message"
@@ -481,5 +483,11 @@ public class Forum implements Cloneable{
 	}
 	public void setLimitedInput(boolean limitedInput) {
 		this.limitedInput = limitedInput;
+	}
+	public ForumToolContentHandler getToolContentHandler() {
+		return toolContentHandler;
+	}
+	public void setToolContentHandler(ForumToolContentHandler toolContentHandler) {
+		this.toolContentHandler = toolContentHandler;
 	}
 }

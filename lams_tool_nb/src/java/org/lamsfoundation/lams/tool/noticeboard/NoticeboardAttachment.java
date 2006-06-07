@@ -26,9 +26,11 @@ package org.lamsfoundation.lams.tool.noticeboard;
 
 import java.io.Serializable;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 
 
@@ -217,7 +219,7 @@ public class NoticeboardAttachment implements Serializable, Cloneable {
         this.versionId = versionId;
     }
     
-    public String returnFileType()
+    public String getFileProperty()
     {
         if (isOnlineFile())
         {
@@ -227,9 +229,16 @@ public class NoticeboardAttachment implements Serializable, Cloneable {
             return TYPE_OFFLINE;
     }
     
+    public void setFileProperty(String fileProperty) {
+    	if(StringUtils.equals(IToolContentHandler.TYPE_ONLINE,fileProperty))
+			this.onlineFile = true;
+		else
+			this.onlineFile = false;
+    }
+    
     public String returnKeyName()
     {
-        return (getFilename() + "-" + returnFileType());
+        return (getFilename() + "-" + getFileProperty());
     }
     
     /** Are two NoticeboardAttachments equal? Checks attachmentId, filename,

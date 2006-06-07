@@ -58,7 +58,7 @@
 			<c:set var="uploadonline">
 				<html:rewrite page="/authoring/uploadOnline.do" />
 			</c:set>
-			<html:button property="onlineUpload" onclick="submitForm('${uploadonline}')">
+			<html:button property="onlineUpload" onclick="doSubmit('${uploadonline}')">
 				<fmt:message key="label.authoring.upload.online.button" />
 			</html:button>
 		</td>
@@ -115,7 +115,7 @@
 			<c:set var="uploadoffline">
 				<html:rewrite page="/authoring/uploadOffline.do" />
 			</c:set>
-			<html:button property="offlineUpload" onclick="submitForm('${uploadoffline}')">
+			<html:button property="offlineUpload" onclick="doSubmit('${uploadoffline}')">
 				<fmt:message key="label.authoring.upload.offline.button" />
 			</html:button>
 		</td>

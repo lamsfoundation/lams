@@ -226,7 +226,7 @@ public class SubmitFilesService implements ToolContentManager,
 	 * @throws ExportToolContentException 
      */
  	public void exportToolContent(Long toolContentId , String toPath) throws ToolException, DataMissingException{
- 		exportContentService.registerFileClassForExport("org.lamsfoundation.lams.tool.sbmt.InstructionFiles","uuID","versionID");
+ 		exportContentService.registerFileClassForExport(InstructionFiles.class.getName(),"uuID","versionID");
  		SubmitFilesContent toolContentObj = submitFilesContentDAO.getContentByID(toolContentId);
  		if(toolContentObj == null)
  			throw new DataMissingException("Unable to find tool content by given id :" + toolContentId);

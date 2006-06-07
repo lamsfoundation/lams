@@ -28,6 +28,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +52,9 @@ import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
+import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
+import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
+import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
@@ -78,6 +82,8 @@ import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
 import org.lamsfoundation.lams.tool.forum.util.ForumToolContentHandler;
 import org.lamsfoundation.lams.tool.forum.util.TopicComparator;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 
@@ -103,6 +109,8 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	private ILearnerService learnerService;
 	private IAuditService auditService;
     private MessageService messageService;
+    private IExportToolContentService exportContentService;
+    private IUserManagementService userManagementService; 
 	//---------------------------------------------------------------------
     // Inversion of Control Methods - Method injection
     //---------------------------------------------------------------------
@@ -146,8 +154,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
     public Message createRootTopic(Long forumId, Long sessionId, Message message) throws PersistenceException {
     	//get Forum and ForumToolSesion
     	if(message.getForum() == null){
-    		Forum forum = new Forum();
-    		forum.setUid(forumId);
+    		Forum forum = forumDao.getById(forumId);
     		message.setForum(forum);
     	}
     	//if topic created by author, sessionId will be null.
@@ -594,7 +601,34 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
      * @throws ToolException if any other error occurs
      */
 
-	public void exportToolContent(Long toolContentId, String toPath) throws DataMissingException, ToolException {
+	public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
+		Forum toolContentObj = forumDao.getByContentId(toolContentId);
+ 		if(toolContentObj == null)
+ 			throw new DataMissingException("Unable to find tool content by given id :" + toolContentId);
+ 		
+ 		//set ResourceToolContentHandler as null to avoid copy file node in repository again.
+ 		toolContentObj = Forum.newInstance(toolContentObj,toolContentId,null);
+ 		toolContentObj.setToolContentHandler(null);
+ 		Set<Message> items = toolContentObj.getMessages();
+ 		Set<Message> authorItems = new HashSet<Message>();
+		for(Message item:items){
+			if(item.getIsAuthored()){
+				authorItems.add(item);
+				item.setToolSession(null);
+				item.setForum(null);
+				item.setToolContentHandler(null);
+				item.setReport(null);
+				item.setReplyNumber(0);
+				item.setParent(null);
+			}
+		}
+		toolContentObj.setMessages(authorItems);
+		try {
+			exportContentService.registerFileClassForExport(Attachment.class.getName(),"fileUuid","fileVersionId");
+			exportContentService.exportToolContent( toolContentId, toolContentObj,forumToolContentHandler, rootPath);
+		} catch (ExportToolContentException e) {
+			throw new ToolException(e);
+		}	
 	}
 
     /**
@@ -603,7 +637,39 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
      * @throws ToolException if any other error occurs
      */
 	public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath) throws ToolException {
+
+		
+		try {
+			exportContentService.registerFileClassForImport(Attachment.class.getName()
+					,"fileUuid","fileVersionId","fileName","fileType",null,null);
 			
+			Object toolPOJO =  exportContentService.importToolContent(toolContentPath,forumToolContentHandler);
+			if(!(toolPOJO instanceof Forum))
+				throw new ImportToolContentException("Import Forum tool content failed. Deserialized object is " + toolPOJO);
+			Forum toolContentObj = (Forum) toolPOJO;
+			
+//			reset it to new toolContentId
+			toolContentObj.setContentId(toolContentId);
+			ForumUser user = forumUserDao.getByUserId(new Long(newUserUid.longValue()));
+			if(user == null){
+				user = new ForumUser();
+				UserDTO sysUser = userManagementService.getUserById(newUserUid).getUserDTO();
+				user.setFirstName(sysUser.getFirstName());
+				user.setLastName(sysUser.getLastName());
+				user.setLoginName(sysUser.getLogin());
+				user.setUserId(new Long(newUserUid.longValue()));
+			}
+			toolContentObj.setCreatedBy(user);
+			
+			//reset all resourceItem createBy user
+			Set<Message> items = toolContentObj.getMessages();
+			for(Message item:items){
+				item.setCreatedBy(user);
+			}
+			forumDao.saveOrUpdate(toolContentObj);
+		} catch (ImportToolContentException e) {
+			throw new ToolException(e);
+		}
 	}
 
 	/** @see org.lamsfoundation.lams.tool.ToolSessionManager#createToolSession(java.lang.Long, java.lang.String, java.lang.Long) */
@@ -764,6 +830,23 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	public void setLearnerService(ILearnerService learnerService) {
 		this.learnerService = learnerService;
 	}
+
+	public IExportToolContentService getExportContentService() {
+		return exportContentService;
+	}
+
+	public void setExportContentService(IExportToolContentService exportContentService) {
+		this.exportContentService = exportContentService;
+	}
+	public IUserManagementService getUserManagementService() {
+		return userManagementService;
+	}
+
+
+	public void setUserManagementService(IUserManagementService userManagementService) {
+		this.userManagementService = userManagementService;
+	}
+
 
 
 

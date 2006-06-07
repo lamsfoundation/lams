@@ -35,6 +35,7 @@
 				<property name="toolService"><ref bean="lamsToolService"/></property>
 				<property name="learnerService"><ref bean="learnerService"/></property>			
 				<property name="nbToolContentHandler"><ref bean="nbToolContentHandler"/></property>			
+				<property name="exportContentService"><ref bean="exportToolContentService"/></property>
 			</bean>
 		</property>
 		<property name="transactionAttributes">

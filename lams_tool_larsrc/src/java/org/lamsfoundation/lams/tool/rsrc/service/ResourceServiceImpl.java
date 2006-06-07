@@ -750,8 +750,8 @@ public class ResourceServiceImpl implements
  		toolContentObj.setOnlineFileList(null);
  		toolContentObj.setMiniViewNumberStr(null);
 		try {
-			exportContentService.registerFileClassForExport("org.lamsfoundation.lams.tool.rsrc.model.ResourceAttachment","fileUuid","fileVersionId");
-			exportContentService.registerFileClassForExport("org.lamsfoundation.lams.tool.rsrc.model.ResourceItem","fileUuid","fileVersionId");
+			exportContentService.registerFileClassForExport(ResourceAttachment.class.getName(),"fileUuid","fileVersionId");
+			exportContentService.registerFileClassForExport(ResourceItem.class.getName(),"fileUuid","fileVersionId");
 			exportContentService.exportToolContent( toolContentId, toolContentObj,resourceToolContentHandler, rootPath);
 		} catch (ExportToolContentException e) {
 			throw new ToolException(e);

@@ -97,6 +97,12 @@
    		<property name="learnerService">
    			<ref bean="learnerService"/>
    		</property>
+   		<property name="userManagementService">
+   			<ref bean="userManagementService"/>
+   		</property>
+   		<property name="exportContentService">
+   			<ref bean="exportToolContentService"/>
+   		</property>
    		<property name="auditService"><ref bean="auditService"/></property>
    		<property name="messageService"><ref bean="messageService"/></property>
     </bean>

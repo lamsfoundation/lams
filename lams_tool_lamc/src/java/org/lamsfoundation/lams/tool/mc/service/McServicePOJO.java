@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
@@ -44,6 +45,9 @@ import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.contentrepository.service.RepositoryProxy;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
+import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
+import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
+import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.ToolContentManager;
@@ -107,6 +111,7 @@ public class McServicePOJO implements
     private ILearnerService 		learnerService;
     private ILamsToolService 		toolService;
     private IToolContentHandler mcToolContentHandler = null;
+    private IExportToolContentService exportContentService;
     
     public McServicePOJO(){}
     
@@ -1508,7 +1513,28 @@ public class McServicePOJO implements
      * @throws ToolException if any other error occurs
      */
 
-	public void exportToolContent(Long toolContentId, String toPath) throws DataMissingException, ToolException {
+	public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
+		McContent toolContentObj = mcContentDAO.findMcContentById(toolContentId);
+ 		if(toolContentObj == null)
+ 			throw new DataMissingException("Unable to find tool content by given id :" + toolContentId);
+ 		
+		try {
+			//set ToolContentHandler as null to avoid copy file node in repository again.
+			toolContentObj = McContent.newInstance(null,toolContentObj,toolContentId);
+			toolContentObj.setMcSessions(null);
+			Set<McUploadedFile> files = toolContentObj.getMcAttachments();
+			for(McUploadedFile file : files){
+				file.setMcContent(null);
+			}
+			exportContentService.registerFileClassForExport(McUploadedFile.class.getName(),"uuid",null);
+			exportContentService.exportToolContent( toolContentId, toolContentObj,mcToolContentHandler, rootPath);
+		} catch (ExportToolContentException e) {
+			throw new ToolException(e);
+		} catch (ItemNotFoundException e) {
+			throw new ToolException(e);
+		} catch (RepositoryCheckedException e) {
+			throw new ToolException(e);
+		}		
 	}
 
     /**
@@ -1517,7 +1543,27 @@ public class McServicePOJO implements
      * @throws ToolException if any other error occurs
      */
 	public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath) throws ToolException {
-		
+		try {
+			exportContentService.registerFileClassForImport(McUploadedFile.class.getName()
+					,"uuid",null,"filename","fileProperty",null,null);
+			
+			Object toolPOJO =  exportContentService.importToolContent(toolContentPath,mcToolContentHandler);
+			if(!(toolPOJO instanceof McContent))
+				throw new ImportToolContentException("Import MC tool content failed. Deserialized object is " + toolPOJO);
+			McContent toolContentObj = (McContent) toolPOJO;
+			
+//			reset it to new toolContentId
+			toolContentObj.setMcContentId(toolContentId);
+			toolContentObj.setCreatedBy(newUserUid);
+			Set<McUploadedFile> files = toolContentObj.getMcAttachments();
+			for(McUploadedFile file : files){
+				file.setMcContentId(toolContentId);
+				file.setMcContent(toolContentObj);
+			}
+			mcContentDAO.saveMcContent(toolContentObj);
+		} catch (ImportToolContentException e) {
+			throw new ToolException(e);
+		}
 	}
 
 
@@ -2338,6 +2384,14 @@ public class McServicePOJO implements
 	 */
 	public void setLearnerService(ILearnerService learnerService) {
 		this.learnerService = learnerService;
+	}
+
+	public IExportToolContentService getExportContentService() {
+		return exportContentService;
+	}
+
+	public void setExportContentService(IExportToolContentService exportContentService) {
+		this.exportContentService = exportContentService;
 	}
 
 }
