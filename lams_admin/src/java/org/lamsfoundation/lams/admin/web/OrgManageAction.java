@@ -61,6 +61,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * struts doclets
  * 
  * @struts:action path="/orgmanage"
+ *                validate="false"
  *                
  * @struts:action-forward name="orglist"
  *                        path=".orglist"
@@ -76,7 +77,10 @@ public class OrgManageAction extends Action {
             HttpServletRequest request,
             HttpServletResponse response) throws Exception{
 		
-		Integer orgId = WebUtil.readIntParam(request,"org");
+		Integer orgId = WebUtil.readIntParam(request,"org",true);
+		if(orgId==null){
+			orgId = (Integer)request.getAttribute("org");
+		}
 		String username = request.getRemoteUser();
 		OrgListDTO orgManageForm = new OrgListDTO();
 		Organisation org = service.getOrganisationById(orgId);

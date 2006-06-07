@@ -47,7 +47,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @version $Revision$
  * 
  * @struts:action path="/joblist"
- * 				input=".joblist"
+ * 				validate="false"
  * 
  * @struts:action-forward name="list" path=".joblist"
  */

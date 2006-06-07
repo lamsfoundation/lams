@@ -37,7 +37,8 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.validator.DynaValidatorForm;
 import org.lamsfoundation.lams.usermanagement.Organisation;
-import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.HttpSessionManager;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -46,14 +47,15 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @author Fei Yang
  *
  * @struts:action path="/organisation"
- *  			name="OrganisationForm"
- * 				input=".organisation"
- * 				scope="request"  
- * 				validate="true"
+ *              name="OrganisationForm"
+ *              scope="request"
+ *              parameter="method"
+ * 				validate="false"
  * 
- * @struts:action-forward name="orglist" path=".orglist"
+ * @struts:action-forward name="organisation" path=".organisation"
+ * @struts:action-forward name="orglist" path="orgmanage.do"
  */
-public class OrganisationAction extends Action {
+public class OrganisationAction extends LamsDispatchAction {
 
 	private static Logger log = Logger.getLogger(OrganisationAction.class);
 
@@ -61,35 +63,26 @@ public class OrganisationAction extends Action {
 			.getWebApplicationContext(HttpSessionManager.getInstance()
 					.getServletContext());
 
-	private static UserManagementService service = (UserManagementService) ctx
+	private static IUserManagementService service = (IUserManagementService) ctx
 			.getBean("userManagementServiceTarget");
 
-	/**
-	 * Perform is called when the OrganisationActionForm is processed.
-	 * 
-	 * @param mapping The ActionMapping used to select this instance
-	 * @param actionForm The optional ActionForm bean for this request (if any)
-	 * @param request The HTTP request we are processing
-	 * @param response The HTTP response we are creating
-	 *
-	 * @exception IOException if an input/output error occurs
-	 * @exception ServletException if a servlet exception occurs
-	 */
-	public ActionForward execute(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward edit(ActionMapping mapping, ActionForm form,HttpServletRequest request, HttpServletResponse response) throws Exception{
+		if(request.getAttribute("orgId")!=null){
+			Organisation org = service.getOrganisationById((Integer)request.getAttribute("orgId"));
+			DynaValidatorForm orgForm = (DynaValidatorForm)form;
+			orgForm.set("parentId",org.getParentOrganisation().getOrganisationId());
+			//orgForm.set("name",org.getName());
+			//orgForm.set("code",org.getCode());
+			//orgForm.set("description",org.getDescription());
+			BeanUtils.copyProperties(orgForm,org);
+			orgForm.set("typeId",org.getOrganisationType().getOrganisationTypeId());
+		}
+		return mapping.findForward("organisation");
+	}
 
-		log.debug("Form type is " + form.getClass().toString());
-		log.debug("Form is " + form.toString());
-
-		DynaValidatorForm orgForm = (DynaValidatorForm) form;
-		Organisation org = new Organisation();
-
-		BeanUtils.copyProperties(org,orgForm);
-		service.saveOrUpdateOrganisation(org);
-		return mapping.findForward("admin");
-
-	} // end ActionForward
+	public ActionForward remove(ActionMapping mapping, ActionForm form,HttpServletRequest request, HttpServletResponse response){
+		return mapping.findForward("orglist");
+	}
 
 } // end Action
 
