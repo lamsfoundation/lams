@@ -90,7 +90,7 @@ public class OrganisationDAO extends BaseDAO implements
 			childOrganisation.setParentOrganisation(parentOrganisation);
 			iter.remove();
 		}
-		getHibernateTemplate().delete(organisation);
+		delete(organisation);
 	}
 
 	/**
@@ -105,6 +105,11 @@ public class OrganisationDAO extends BaseDAO implements
 			return (Organisation) list.get(0);
 		else
 			return null;
+	}
+
+	public List getOrganisationsByType(Integer organisationTypeId) {
+		String queryString = "from Organisation o where o.organisationType.organisationTypeId=?";
+		return getHibernateTemplate().find(queryString,organisationTypeId);
 	}
 
 }

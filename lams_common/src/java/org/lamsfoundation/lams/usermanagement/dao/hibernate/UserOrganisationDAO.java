@@ -113,4 +113,9 @@ public class UserOrganisationDAO extends BaseDAO implements
 		delete(getUserOrganisationById(userOrganisationId));
 	}
 
+	public List getUserOrganisationsByType(Integer organisationTypeId) {
+		String queryString = "from UserOrganisation uo where uo.organisation.organisationType.organisationTypeId=?";
+		return getHibernateTemplate().find(queryString,organisationTypeId);
+	}
+
 }
