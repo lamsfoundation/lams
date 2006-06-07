@@ -35,11 +35,9 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
-import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
-import org.lamsfoundation.lams.usermanagement.util.AdminPreparer;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -58,7 +56,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * 				  validate="false"
  * 				  parameter="method"
  * @struts:action-forward name="sysadmin" path="/sysadmin.jsp"
- * @struts:action-forward name="admin" path="/admin.jsp"
  * @struts:action-forward name="learner" path="/learner.jsp"
  * @struts:action-forward name="author" path="/author.jsp"
  * @struts:action-forward name="monitorLesson" path="/monitorLesson.jsp"
@@ -87,36 +84,7 @@ public class HomeAction extends DispatchAction {
 	}
 	
 
-	/**
-	 * request for admin environment
-	 */
-	public ActionForward admin(ActionMapping mapping, ActionForm form, 
-			HttpServletRequest req, HttpServletResponse res)
-			throws IOException, ServletException {
 
-		try {
-			log.debug("request admin");
-			int orgId = new Integer(req.getParameter("orgId")).intValue();
-			UserDTO user = getUser();
-			if ( user == null ) {
-				log.error("admin: User missing from session. ");
-				return mapping.findForward("error");
-			} else if ( isUserInRole(getUser().getUserID(),orgId,Role.ADMIN)) {
-				log.debug("user is admin");
-				Organisation org = service.getOrganisationById(new Integer(orgId));
-				AdminPreparer.prepare(org,req,service);
-				return mapping.findForward("admin");
-			} else {
-				log.error("User "+user.getLogin()+" tried to get admin screen but isn't admin in organisation: "+orgId);
-				return mapping.findForward("error");
-			}
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-			return mapping.findForward("error");
-		}
-	}
-	
 	/**
 	 * request for sysadmin environment
 	 */
