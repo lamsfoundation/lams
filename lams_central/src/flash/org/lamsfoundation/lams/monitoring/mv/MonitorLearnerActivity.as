@@ -26,7 +26,7 @@ import org.lamsfoundation.lams.common.util.*;
 import org.lamsfoundation.lams.common.util.ui.*;
 import org.lamsfoundation.lams.monitoring.*;
 import org.lamsfoundation.lams.monitoring.mv.*;
-import org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView;
+import org.lamsfoundation.lams.monitoring.mv.tabviews.*;
 import org.lamsfoundation.lams.authoring.Activity;
 import org.lamsfoundation.lams.common.style.*
 
@@ -49,8 +49,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorLearnerActivity extends Movie
 	private var yPos:Number;
 	//this is set by the init object
 	private var _monitorController:MonitorController;
-	private var _monitorView:MonitorView;
-	private var _learnerTabView:LearnerTabView;
+	private var _monitorView;
 	private var _tm:ThemeManager;
 	//TODO:This should be ToolActivity
 	private var _activity:Activity;
@@ -155,7 +154,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorLearnerActivity extends Movie
 		clickTarget_mc.onReleaseOutside = Proxy.create (this, localOnReleaseOutside);		Debugger.log(_activity.title+',_activity.isGateActivity():'+_activity.isGateActivity(),4,'draw','CanvasActivity');
 		trace("Status returned for the learner "+learner.getUserName()+" activityID "+this.activity.activityID+ " is "+actStatus)
 		if (actStatus == undefined){
-			actStatus = _learnerTabView.compareProgressData(learner, _activity.activityID);
+			actStatus = Progress.compareProgressData(learner, _activity.activityID);
 		}
 		trace("Status returned for the learner "+learner.getUserName()+" activityID "+this.activity.activityID+ " is "+actStatus)
 		
