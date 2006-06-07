@@ -97,4 +97,5 @@ public interface IUserOrganisationDAO extends IBaseDAO{
      */
     public void deleteUserOrganisationById(Integer userOrganisationId);
 
+    public List getUserOrganisationsByType(Integer organisationTypeId);
 }

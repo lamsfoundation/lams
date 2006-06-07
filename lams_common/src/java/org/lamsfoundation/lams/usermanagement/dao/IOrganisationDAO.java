@@ -75,5 +75,6 @@ public interface IOrganisationDAO extends IBaseDAO{
     public void deleteOrganisationById(Integer organisationId);
     
     public Organisation getOrganisationByWorkspaceID(Integer workspaceID);
-
+    
+    public List getOrganisationsByType(Integer organisationTypeId);
 }
