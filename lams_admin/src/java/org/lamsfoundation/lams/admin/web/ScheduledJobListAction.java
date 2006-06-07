@@ -46,7 +46,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @author Steve.Ni
  * @version $Revision$
  * 
- * @struts:action path="/jobList"
+ * @struts:action path="/joblist"
  * 				input=".joblist"
  * 
  * @struts:action-forward name="list" path=".joblist"

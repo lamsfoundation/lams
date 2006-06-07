@@ -1,3 +1,8 @@
+<%@ page contentType="text/html; charset=utf-8" language="java" %>
+
+<%@ taglib uri="tags-fmt" prefix="fmt" %>
+<%@ taglib uri="tags-lams" prefix="lams" %>
+
 <H1>System Administration</H1>
 
 <UL>

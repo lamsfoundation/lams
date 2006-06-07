@@ -36,6 +36,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -60,9 +61,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * struts doclets
  * 
  * @struts:action path="/orgmanage"
- *                name="OrgManageForm"
- *                scope="request"
- *                validate="false"
  *                
  * @struts:action-forward name="orglist"
  *                        path=".orglist"
@@ -80,33 +78,62 @@ public class OrgManageAction extends Action {
 		
 		Integer orgId = WebUtil.readIntParam(request,"org");
 		String username = request.getRemoteUser();
-		List userOrganisations = service.getUserOrganisationsForUser(service.getUserByLogin(username));
-		OrgManageActionForm orgManageForm = new OrgManageActionForm();
-		List<OrgManageActionForm.OrgManageBean> orgManageBeans = new ArrayList<OrgManageActionForm.OrgManageBean>();
-		if(userOrganisations!=null){
-			for(int i=0; i<userOrganisations.size(); i++){
-				OrgManageActionForm.OrgManageBean orgManageBean = new OrgManageActionForm.OrgManageBean();
-				orgManageBean.setEditable(false);
-				UserOrganisation userOrganisation = (UserOrganisation)userOrganisations.get(i);
-				Organisation organisation = userOrganisation.getOrganisation();
-				if(organisation.getParentOrganisation().getOrganisationId().equals(orgId)){
-					BeanUtils.copyProperties(orgManageBean,organisation);
-					orgManageBean.setStatus(organisation.getOrganisationState().getDescription());
-					Iterator iter = userOrganisation.getUserOrganisationRoles().iterator();
-					while(iter.hasNext()){
-						UserOrganisationRole userOrganisationRole = (UserOrganisationRole)iter.next();
-						if(userOrganisationRole.getRole().isSysAdmin()||userOrganisationRole.getRole().isCourseManager()||userOrganisationRole.getRole().isCourseAdmin()){
-							orgManageBean.setEditable(true);
-							break;
+		OrgListDTO orgManageForm = new OrgListDTO();
+		Organisation org = service.getOrganisationById(orgId);
+		log.debug("orgId:"+orgId);
+		orgManageForm.setParentId(orgId);
+		orgManageForm.setParentName(org.getName());
+		orgManageForm.setType(org.getOrganisationType().getOrganisationTypeId());
+		log.debug("orgType:"+orgManageForm.getType());
+		List<OrgManageBean> orgManageBeans = new ArrayList<OrgManageBean>();
+		if(service.isUserSysAdmin(username)){
+			Integer type;
+			if(orgManageForm.getType().equals(OrganisationType.ROOT_TYPE)){
+				type = OrganisationType.COURSE_TYPE;
+			}else{
+				type = OrganisationType.CLASS_TYPE;
+			}
+			List organisations = service.getOrganisationsByType(type);
+			log.debug("user is sysadmin");
+			log.debug("Got "+organisations.size()+" organsiations");
+			log.debug("organisationType is "+type);
+			for(int i=0; i<organisations.size(); i++){
+				Organisation organisation = (Organisation)organisations.get(i);
+				if(type.equals(OrganisationType.CLASS_TYPE)){
+					if (organisation.getParentOrganisation().getOrganisationId() != orgId)
+						continue;
+				}
+				OrgManageBean orgManageBean = new OrgManageBean();
+				BeanUtils.copyProperties(orgManageBean,organisation);
+				orgManageBean.setStatus(organisation.getOrganisationState().getDescription());
+				orgManageBean.setEditable(true);
+				orgManageBeans.add(orgManageBean);
+			}
+		}else{
+			List userOrganisations = service.getUserOrganisationsForUser(service.getUserByLogin(username));
+			if(userOrganisations!=null){
+				for(int i=0; i<userOrganisations.size(); i++){
+					OrgManageBean orgManageBean = new OrgManageBean();
+					UserOrganisation userOrganisation = (UserOrganisation)userOrganisations.get(i);
+					Organisation organisation = userOrganisation.getOrganisation();
+					if(organisation.getParentOrganisation()!=null){
+						orgManageBean.setEditable(false);
+						if(organisation.getParentOrganisation().getOrganisationId().equals(orgId)){
+							BeanUtils.copyProperties(orgManageBean,organisation);
+							orgManageBean.setStatus(organisation.getOrganisationState().getDescription());
+							Iterator iter = userOrganisation.getUserOrganisationRoles().iterator();
+							while(iter.hasNext()){
+								UserOrganisationRole userOrganisationRole = (UserOrganisationRole)iter.next();
+								if(userOrganisationRole.getRole().isSysAdmin()||userOrganisationRole.getRole().isCourseManager()||userOrganisationRole.getRole().isCourseAdmin()){
+									orgManageBean.setEditable(true);
+									break;
+								}
+							}
+							orgManageBeans.add(orgManageBean);
 						}
 					}
-					orgManageBeans.add(orgManageBean);
 				}
 			}
-			UserOrganisation userOrganisation = (UserOrganisation)userOrganisations.get(0);
-			Organisation organisation = userOrganisation.getOrganisation();
-			orgManageForm.setType(organisation.getOrganisationType().getOrganisationTypeId());
-			orgManageForm.setParentOrganisation(organisation.getParentOrganisation());
 		}
 		orgManageForm.setOrgManageBeans(orgManageBeans);
 		request.setAttribute("OrgManageForm",orgManageForm);

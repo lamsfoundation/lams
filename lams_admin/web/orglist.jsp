@@ -1,15 +1,22 @@
-<html:form>
-<logic:equal name="type" value="2">
-	<h4><bean:message key="admin.course.manage" /></h4>
-	<p>Parent Organisation:<bean:write name="parentOrganisaton" property="name"/></p>
-	<p align="right"><html:button titleKey="admin.course.add" onClick="javascript:document.location=/organisation.do?method=add&type=<bean:write name='organisationType' property='name'/>&parent=<bean:write name='parentOrganisation' property='organisationId'>"/></p>
+<%@ page contentType="text/html; charset=utf-8" language="java" %>
+
+<%@ taglib uri="tags-bean" prefix="bean" %>
+<%@ taglib uri="tags-logic" prefix="logic" %>
+<%@ taglib uri="tags-core" prefix="c" %>
+<%@ taglib uri="tags-fmt" prefix="fmt" %>
+
+<form>
+<logic:equal name="OrgManageForm" property="type" value="1">
+	<h4><fmt:message key="admin.course.manage" /></h4>
+	<p>Parent Organisation:<bean:write name="OrgManageForm" property="parentName"/></p>
+	<p align="right"><input type="button" value='<fmt:message key="admin.course.add"/>' onclick=javascript:document.location='/organisation.do?method=add&parent=<bean:write name="OrgManageForm" property="parentId"/>' /></p>
 </logic:equal>
-<logic:equal name="type" value="3">
-	<h4><bean:message key="admin.class.manage" /></h4>
+<logic:equal name="OrgManageForm" property="type" value="2">
+	<h4><fmt:message key="admin.class.manage" /></h4>
 	<p>Parent Organisation:<bean:write name="parentOrganisaton" property="name"/></p>
-	<p align="right"><html:button titleKey="admin.class.add" onClick="javascript:document.location=/organisation.do?method=add&type=<bean:write name='organisationType' property='name'/>&parent=<bean:write name='parentOrganisation' property='organisationId'>"/></p>
+	<p align="right"><input type="button" value='<fmt:message key="admin.class.add"/>' onclick=javascript:document.location='/organisation.do?method=add&parent=<bean:write name="OrgManageForm" property="parentId"/>'/></p>
 </logic:equal>
-<table width=80%>
+<table width=100%>
 <tr>
 	<th>Name</th>
 	<th>Code</th>
@@ -31,13 +38,13 @@
 			<bean:write name="orgManageBean" property="description" />
 		</td>
 		<td>
-			<fmt:message key="locale.language.<bean:write name='orgManageBean' property='localeLanguage'/>"/>
+			<bean:write name='orgManageBean' property='localeLanguage'/>
 		</td>
 		<td>
-			<fmt:message key="locale.country.<bean:write name='orgManageBean' property='localeCountry'/>"/>
+			<bean:write name='orgManageBean' property='localeCountry'/>
 		</td>
 		<td>
-			<fmt:message key="organisation.state.<bean:write name='orgManageBean' property='status'/>"/>
+			<bean:write name='orgManageBean' property='status'/>
 		</td>
 		<td>
 			<logic:equal name='orgManageBean' property='editable' value="true">
@@ -45,13 +52,13 @@
 				&nbsp;
 				<a href="/organisation.do?method=remove&org=<bean:write name='orgManageBean' property='organisationId' />"><fmt:message key="admin.remove"/></a>
 				<br/>
-				<a href="/organisation.do?method=manageUsers?org=<bean:write name='orgManageBean' property='organisationId'/>"><fmt:message key="admin.user.manage"/></a>
-				<logic:equal name="type" value="2">
-					<a href="/orgmanage.do?org=<bean:write name='orgManageBean' property='organisationId'/>"><fmt:message key="admin.class.manage"/></a>
+				<a href="/usermanage.do?org=<bean:write name='orgManageBean' property='organisationId'/>"><fmt:message key="admin.user.manage"/></a>
+				<logic:equal name="OrgManageForm" property="type" value="1">
+					<br/><a href="orgmanage.do?org=<bean:write name='orgManageBean' property='organisationId'/>"><fmt:message key="admin.class.manage"/></a>
 				</logic:equal>
 			</logic:equal>
 		</td>		
 	</tr>
 </logic:iterate>
 </table>
-</html:form>
+</form>

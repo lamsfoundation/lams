@@ -1,3 +1,9 @@
+<%@ page contentType="text/html; charset=utf-8" language="java" %>
+
+<%@ taglib uri="tags-fmt" prefix="fmt" %>
+<%@ taglib uri="tags-logic" prefix="logic" %>
+<%@ taglib uri="tags-core" prefix="c" %>
+
 <H1><fmt:message key="cache.title"/></H1>
 
 <p><fmt:message key="cache.explanation1"/></p>
