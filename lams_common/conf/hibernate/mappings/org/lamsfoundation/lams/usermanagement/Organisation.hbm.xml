@@ -50,6 +50,19 @@
             length="250"
         </meta>    
     </property>
+      <property
+        name="code"
+        type="java.lang.String"
+        column="code"
+        length="250"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="code"
+            length="250"
+        </meta>    
+    </property>
+    
     <property
         name="description"
         type="java.lang.String"
