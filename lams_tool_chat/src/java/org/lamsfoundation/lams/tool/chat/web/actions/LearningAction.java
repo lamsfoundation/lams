@@ -92,8 +92,8 @@ public ActionForward execute(ActionMapping mapping, ActionForm form,
 		}		
 		
 		request.setAttribute("XMPPDOMAIN", ChatConstants.XMPPDOMAIN);
-		request.setAttribute("USERNAME", chatUser.getLoginName());
-		request.setAttribute("PASSWORD", chatUser.getLoginName());
+		request.setAttribute("USERNAME", chatUser.getUserId());
+		request.setAttribute("PASSWORD", chatUser.getUserId());
 		request.setAttribute("CONFERENCEROOM", chatSession.getJabberRoom());
 		request.setAttribute("NICK", chatUser.getLoginName());
 		
