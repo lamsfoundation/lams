@@ -45,7 +45,9 @@ public class AuthoringSessionBean {
 
 	String onlineInstruction;
 	
-	String lockOnFinished;
+	boolean lockOnFinished;
+	
+	boolean filteringEnabled;
 	
 	FormFile onlineFile; 
 
@@ -108,12 +110,20 @@ public class AuthoringSessionBean {
 		this.instructions = instructions;
 	}
 
-	public String getLockOnFinished() {
+	public boolean getLockOnFinished() {
 		return lockOnFinished;
 	}
 
-	public void setLockOnFinished(String lockOnFinished) {
+	public void setLockOnFinished(boolean lockOnFinished) {
 		this.lockOnFinished = lockOnFinished;
+	}
+	
+	public boolean isFilteringEnabled() {
+		return filteringEnabled;
+	}
+
+	public void setFilteringEnabled(boolean filteringEnabled) {
+		this.filteringEnabled = filteringEnabled;
 	}
 
 	public FormFile getOfflineFile() {
