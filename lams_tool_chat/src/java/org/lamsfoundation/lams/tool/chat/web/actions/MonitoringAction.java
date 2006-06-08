@@ -24,6 +24,11 @@
 
 package org.lamsfoundation.lams.tool.chat.web.actions;
 
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -31,15 +36,18 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.tool.ToolAccessMode;
+import org.lamsfoundation.lams.tool.chat.dto.ChatMessageDTO;
+import org.lamsfoundation.lams.tool.chat.dto.ChatSessionDTO;
 import org.lamsfoundation.lams.tool.chat.dto.MonitoringDTO;
 import org.lamsfoundation.lams.tool.chat.model.Chat;
+import org.lamsfoundation.lams.tool.chat.model.ChatMessage;
 import org.lamsfoundation.lams.tool.chat.model.ChatSession;
 import org.lamsfoundation.lams.tool.chat.model.ChatUser;
 import org.lamsfoundation.lams.tool.chat.service.ChatServiceProxy;
 import org.lamsfoundation.lams.tool.chat.service.IChatService;
 import org.lamsfoundation.lams.tool.chat.util.ChatConstants;
 import org.lamsfoundation.lams.tool.chat.util.ChatException;
+import org.lamsfoundation.lams.tool.chat.web.forms.MonitoringForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
@@ -50,11 +58,15 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @author
  * @version
  * 
- * @struts.action path="/monitoring" parameter="dispatch"
+ * @struts.action path="/monitoring" parameter="dispatch" scope="request"
+ *                name="monitoringForm" validate="false"
  * 
  * @struts.action-forward name="success" path="tiles:/monitoring/main"
  * @struts.action-forward name="chat_client"
  *                        path="tiles:/monitoring/chat_client"
+ * @struts.action-forward name="chat_history"
+ *                        path="tiles:/monitoring/chat_history"
+ * 
  */
 public class MonitoringAction extends LamsDispatchAction {
 
@@ -75,40 +87,56 @@ public class MonitoringAction extends LamsDispatchAction {
 					.getServletContext());
 		}
 		Chat chat = chatService.getChatByContentId(toolContentID);
-
-		MonitoringDTO dto = new MonitoringDTO(chat);
-		dto.setChatEditable(this.isChatEditable(chat));
-		request.setAttribute("monitoringDTO", dto);
 		
+		// constructing DTOs
+		Set<ChatSessionDTO> chatSessionDTOs = new TreeSet<ChatSessionDTO>();
+		for (Iterator iter = chat.getChatSessions().iterator(); iter.hasNext();) {
+			ChatSession chatSession = (ChatSession) iter.next();
+			List latestMessages = chatService.getLastestMessages(chatSession, ChatConstants.MONITORING_SUMMARY_MAX_MESSAGES);
+			
+			ChatSessionDTO chatSessionDTO = new ChatSessionDTO(chatSession, latestMessages);
+			chatSessionDTOs.add(chatSessionDTO);
+		}
+		MonitoringDTO dto = new MonitoringDTO(chat);
+		dto.setChatSessions(chatSessionDTOs);
+		dto.setChatEditable(this.isChatEditable(chat));
+
+		request.setAttribute("monitoringDTO", dto);
 		return mapping.findForward("success");
 	}
 
 	public ActionForward openChatClient(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
-		
-		// TODO this method is a copy of LearningAction.unspecified.
-		Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
-		
+
+		// TODO this method is almost a copy of LearningAction.unspecified.
+		Long toolSessionID = WebUtil.readLongParam(request,
+				AttributeNames.PARAM_TOOL_SESSION_ID);
+
 		// set up chatService
 		if (chatService == null) {
 			chatService = ChatServiceProxy.getChatService(this.getServlet()
 					.getServletContext());
 		}
-		
+
 		// Retreive the session
-		ChatSession chatSession = chatService.getSessionBySessionId(toolSessionID);
+		ChatSession chatSession = chatService
+				.getSessionBySessionId(toolSessionID);
 		if (chatSession == null) {
-			throw new ChatException("Cannot retrieve session with toolSessionId" + toolSessionID);
+			throw new ChatException(
+					"Cannot retrieve session with toolSessionId"
+							+ toolSessionID);
 		}
-		
+
 		// Retrieve the current user
 		ChatUser chatUser = getCurrentUser(toolSessionID);
-		
+
 		// Create the room if it doesnt exist
 		if (chatSession.getJabberRoom() == null) {
 			chatService.createJabberRoom(chatSession);
 			chatService.saveOrUpdateChatSession(chatSession);
-		}		
+		}
+		
+		// set the teachers visibility
 		
 		request.setAttribute("XMPPDOMAIN", ChatConstants.XMPPDOMAIN);
 		request.setAttribute("USERNAME", chatUser.getUserId());
@@ -116,12 +144,46 @@ public class MonitoringAction extends LamsDispatchAction {
 		request.setAttribute("CONFERENCEROOM", chatSession.getJabberRoom());
 		request.setAttribute("NICK", chatUser.getLoginName());
 		request.setAttribute("MODE", "teacher");
-		
+
 		return mapping.findForward("chat_client");
 	}
 
-	/* Private Methods */
+	public ActionForward openChatHistory(ActionMapping mapping,
+			ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+		
+		MonitoringForm monitoringForm = (MonitoringForm) form;
+		// TODO check for null from chatService. forward to appropriate page.
+		ChatSession chatSession = chatService.getSessionBySessionId(monitoringForm.getToolSessionID());
+		ChatSessionDTO sessionDTO = new ChatSessionDTO(chatSession);
+		request.setAttribute("sessionDTO", sessionDTO);		
+		return mapping.findForward("chat_history");
+	}
 	
+	public ActionForward editMessage(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+		MonitoringForm monitoringForm = (MonitoringForm) form;
+		ChatMessage chatMessage = chatService.getMessageByUID(monitoringForm.getMessageUID());
+		
+		boolean hasChanged = false;
+		if (chatMessage.getHidden().booleanValue() != monitoringForm.isMessageHidden() ) {
+			hasChanged = true;
+			chatService.auditHideShowMessage(chatMessage, monitoringForm.isMessageHidden());
+		}
+		
+		if (!chatMessage.getBody().equals(monitoringForm.getMessageBody())) {
+			hasChanged = true;
+			chatService.auditEditMessage(chatMessage, monitoringForm.getMessageBody());
+		}
+		
+		if (hasChanged) {
+			chatMessage.setBody(monitoringForm.getMessageBody());
+			chatMessage.setHidden(monitoringForm.isMessageHidden());
+			chatService.saveOrUpdateChatMessage(chatMessage);
+		}
+		return openChatHistory(mapping, form, request, response);
+	}
+	/* Private Methods */
+
 	private ChatUser getCurrentUser(Long toolSessionId) {
 		UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(
 				AttributeNames.USER);
@@ -138,11 +200,12 @@ public class MonitoringAction extends LamsDispatchAction {
 
 		return chatUser;
 	}
-	
+
 	// TODO need to double check this.
 	private boolean isChatEditable(Chat chat) {
 		if ((chat.getDefineLater() == true) && (chat.getContentInUse() == true)) {
-			log.error("An exception has occurred: There is a bug in this tool, conflicting flags are set");
+			log
+					.error("An exception has occurred: There is a bug in this tool, conflicting flags are set");
 			return false;
 		} else if ((chat.getDefineLater() == true)
 				&& (chat.getContentInUse() == false))
