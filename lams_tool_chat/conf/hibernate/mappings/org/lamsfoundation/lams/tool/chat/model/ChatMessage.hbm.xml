@@ -26,6 +26,17 @@
         </id>
 
         <many-to-one
+            name="chatSession"
+            class="org.lamsfoundation.lams.tool.chat.model.ChatSession"
+            cascade="none"
+            outer-join="auto"
+            update="true"
+            insert="true"
+            column="chat_session_uid"
+            not-null="true"
+        />
+
+        <many-to-one
             name="fromUser"
             class="org.lamsfoundation.lams.tool.chat.model.ChatUser"
             cascade="none"
@@ -67,6 +78,22 @@
             insert="true"
             column="body"
             length="255"
+        />
+
+        <property
+            name="sendDate"
+            type="java.util.Date"
+            update="true"
+            insert="true"
+            column="send_date"
+        />
+
+        <property
+            name="hidden"
+            type="java.lang.Boolean"
+            update="true"
+            insert="true"
+            column="hidden"
         />
 
         <!--

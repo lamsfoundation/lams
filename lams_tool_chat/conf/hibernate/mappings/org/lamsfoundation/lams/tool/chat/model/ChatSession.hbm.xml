@@ -90,7 +90,7 @@
         >
 
             <key
-                column="session_id"
+                column="chat_session_uid"
             >
             </key>
 
@@ -108,6 +108,25 @@
             column="jabber_room"
             length="250"
         />
+
+        <set
+            name="chatMessages"
+            lazy="true"
+            inverse="true"
+            cascade="none"
+            sort="unsorted"
+        >
+
+            <key
+                column="chat_session_uid"
+            >
+            </key>
+
+            <one-to-many
+                  class="org.lamsfoundation.lams.tool.chat.model.ChatMessage"
+            />
+
+        </set>
 
         <!--
             To add non XDoclet property mappings, create a file named

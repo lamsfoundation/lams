@@ -79,7 +79,7 @@
             insert="true"
         >
             <column
-                name="session_id" 
+                name="chat_session_uid" 
             />
         </many-to-one>
 

@@ -13,7 +13,14 @@
   <!-- ========== Form Bean Definitions =================================== -->
   <form-beans>
 
-   <form-bean name="authoringForm" type="org.lamsfoundation.lams.tool.chat.web.forms.AuthoringForm" />
+    <form-bean
+      name="monitoringForm"
+      type="org.lamsfoundation.lams.tool.chat.web.forms.MonitoringForm"
+    />
+    <form-bean
+      name="authoringForm"
+      type="org.lamsfoundation.lams.tool.chat.web.forms.AuthoringForm"
+    />
 
   </form-beans>
 
@@ -45,12 +52,25 @@
     <action
       path="/monitoring"
       type="org.lamsfoundation.lams.tool.chat.web.actions.MonitoringAction"
+      name="monitoringForm"
+      scope="request"
+      parameter="dispatch"
       unknown="false"
-      validate="true"
+      validate="false"
     >
       <forward
         name="success"
         path="tiles:/monitoring/main"
+        redirect="false"
+      />
+      <forward
+        name="chat_client"
+        path="tiles:/monitoring/chat_client"
+        redirect="false"
+      />
+      <forward
+        name="chat_history"
+        path="tiles:/monitoring/chat_history"
         redirect="false"
       />
     </action>

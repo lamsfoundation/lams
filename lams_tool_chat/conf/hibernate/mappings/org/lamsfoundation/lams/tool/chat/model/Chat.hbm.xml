@@ -169,6 +169,24 @@
 
         </set>
 
+        <property
+            name="filteringEnabled"
+            type="java.lang.Boolean"
+            update="true"
+            insert="true"
+            column="filtering_enabled"
+            length="1"
+        />
+
+        <property
+            name="filterKeywords"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="filter_keywords"
+            length="65535"
+        />
+
         <!--
             To add non XDoclet property mappings, create a file named
                 hibernate-properties-Chat.xml
