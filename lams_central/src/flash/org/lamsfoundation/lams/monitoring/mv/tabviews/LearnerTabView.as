@@ -358,18 +358,13 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		
 		//take action depending on act type
 		if(a.activityTypeID==Activity.TOOL_ACTIVITY_TYPE || a.isGateActivity() || a.isGroupActivity() ){
-			var newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasActivityLinear", DepthManager.kTop,{_activity:a,_monitorController:mc,_learnerTabView:ltv, _x:ACT_X, _y:ACT_Y+40, actLabel:a.title, learner:learner});
+			var newActivity_mc = _activityLayer_mc.createChildAtDepth("LearnerActivity", DepthManager.kTop,{_activity:a,_controller:mc,_view:ltv, _x:ACT_X, _y:ACT_Y+40, actLabel:a.title, learner:learner});
 			ACT_X = newActivity_mc._x + newActivity_mc._width;
-		}else if(a.activityTypeID==Activity.PARALLEL_ACTIVITY_TYPE){
+		}else if(a.activityTypeID==Activity.PARALLEL_ACTIVITY_TYPE || a.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE){
 			//get the children
 			var children:Array = mm.getMonitor().ddm.getComplexActivityChildren(a.activityUIID);
 			
-			var newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasParallelActivityLinear",DepthManager.kTop,{_activity:a,_children:children,_monitorController:mc,_learnerTabView:ltv, _x:ACT_X, _y:ACT_Y+40, fromModuleTab:"monitorLearnerTab", learner:learner});
-			ACT_X = newActivity_mc._x + newActivity_mc._width;
-		}else if(a.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE){
-			var children:Array = mm.getMonitor().ddm.getComplexActivityChildren(a.activityUIID);
-			trace("X pos is: "+ACT_X)
-			var newActivity_mc = _activityLayer_mc.createChildAtDepth("CanvasOptionalActivityLinear",DepthManager.kTop,{_activity:a,_children:children,_monitorController:mc,_learnerTabView:ltv, _x:ACT_X, _y:ACT_Y+40, fromModuleTab:"monitorLearnerTab", learner:learner});
+			var newActivity_mc = _activityLayer_mc.createChildAtDepth("LearnerComplexActivity",DepthManager.kTop,{_activity:a,_children:children,_controller:mc,_view:ltv, _x:ACT_X, _y:ACT_Y+40, learner:learner});
 			ACT_X = newActivity_mc._x + newActivity_mc._width;
 		}else{
 			Debugger.log('The activity:'+a.title+','+a.activityUIID+' is of unknown type, it cannot be drawn',Debugger.CRITICAL,'drawActivity','LearnerTabView');
