@@ -32,7 +32,7 @@ import org.lamsfoundation.lams.tool.chat.beans.AuthoringSessionBean;
 public class AuthoringForm extends ActionForm {
 
 	/**
-	 * 
+	 * @struts.form name="authoringForm"
 	 */
 	private static final long serialVersionUID = 3950453134542135495L;
 
@@ -48,7 +48,11 @@ public class AuthoringForm extends ActionForm {
 
 	Long toolContentID;
 
-	String lockOnFinished;
+	boolean lockOnFinished;
+	
+	boolean filteringEnabled;
+	
+	String filterKeywords;
 
 	FormFile onlineFile; 
 
@@ -96,11 +100,11 @@ public class AuthoringForm extends ActionForm {
 		this.instructions = instructions;
 	}
 
-	public String getLockOnFinished() {
+	public boolean isLockOnFinished() {
 		return lockOnFinished;
 	}
 
-	public void setLockOnFinished(String lockOnFinished) {
+	public void setLockOnFinished(boolean lockOnFinished) {
 		this.lockOnFinished = lockOnFinished;
 	}
 
@@ -167,5 +171,21 @@ public class AuthoringForm extends ActionForm {
 
 	public void setDeleteFileUuid(Long deleteFile) {
 		this.deleteFileUuid = deleteFile;
+	}
+
+	public boolean isFilteringEnabled() {
+		return filteringEnabled;
+	}
+
+	public void setFilteringEnabled(boolean filteringEnabled) {
+		this.filteringEnabled = filteringEnabled;
+	}
+
+	public String getFilterKeywords() {
+		return filterKeywords;
+	}
+
+	public void setFilterKeywords(String filterKeywords) {
+		this.filterKeywords = filterKeywords;
 	}
 }
