@@ -22,14 +22,25 @@
  */
 package org.lamsfoundation.lams.admin.web;
 
+import java.util.Date;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.validator.DynaValidatorForm;
+import org.apache.struts.action.ActionMessage;
+import org.apache.struts.action.ActionMessages;
+import org.apache.struts.action.DynaActionForm;
+import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.web.util.HttpSessionManager;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @version
@@ -50,21 +61,58 @@ import org.apache.struts.validator.DynaValidatorForm;
  *                name="OrganisationForm"
  *                input=".organisation"
  *                scope="request"
- *                validate="true"
- *                
+ *                validate="false"
+ *
+ * @struts:action-forward name="organisation"
+ *                        path=".organisation"                
  * @struts:action-forward name="orglist"
- *                        path="orgmanage.do"
+ *                        path="/orgmanage.do"
  */
 
 public class OrgSaveAction extends Action {
 	
+	private static Logger log = Logger.getLogger(OrgSaveAction.class);
+	
+	private static WebApplicationContext ctx = WebApplicationContextUtils
+	.getWebApplicationContext(HttpSessionManager.getInstance()
+			.getServletContext());
+
+	private static IUserManagementService service = (IUserManagementService) ctx
+	.getBean("userManagementServiceTarget");
+
 	public ActionForward execute(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception{
-		//TODO save the organisation
-		DynaValidatorForm orgForm = (DynaValidatorForm)form;
-		request.setAttribute("org",orgForm.get("parentId"));
-		return mapping.findForward("orglist");
+		
+		DynaActionForm orgForm = (DynaActionForm)form;
+
+		if(isCancelled(request)){
+			request.setAttribute("org",orgForm.get("parentId"));
+			return mapping.findForward("orglist");
+		}
+		ActionMessages errors = new ActionMessages();
+		if((orgForm.get("name")==null)||(((String)orgForm.getString("name").trim()).length()==0)){
+			errors.add("name",new ActionMessage("error.name.required"));
+		}
+		if(errors.isEmpty()){
+			Organisation org = new Organisation();
+			BeanUtils.copyProperties(org,orgForm);
+			log.debug("orgId in orgForm:"+(Integer)orgForm.get("orgId"));
+			if((Integer)orgForm.get("orgId")!=0){
+				org.setCreateDate(service.getOrganisationById((Integer)orgForm.get("orgId")).getCreateDate());
+			}else{
+				org.setCreateDate(new Date());
+			}
+			org.setParentOrganisation(service.getOrganisationById((Integer)orgForm.get("parentId")));
+			org.setOrganisationState(service.getOrganisationStateById((Integer)orgForm.get("stateId")));
+			org.setOrganisationType(service.getOrganisationTypeById((Integer)orgForm.get("typeId")));
+			service.saveOrganisation(org,service.getUserByLogin(request.getRemoteUser()).getUserId());
+			request.setAttribute("org",orgForm.get("parentId"));
+			return mapping.findForward("orglist");
+		}else{
+			saveErrors(request,errors);
+			return mapping.findForward("organisation");
+		}
 	}
 }

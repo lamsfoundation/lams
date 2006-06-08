@@ -23,21 +23,20 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.admin.web;
 
-import java.io.IOException;
+import java.util.List;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.validator.DynaValidatorForm;
+import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.HttpSessionManager;
 import org.springframework.web.context.WebApplicationContext;
@@ -53,7 +52,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * 				validate="false"
  * 
  * @struts:action-forward name="organisation" path=".organisation"
- * @struts:action-forward name="orglist" path="orgmanage.do"
+ * @struts:action-forward name="orglist" path="/orgmanage.do"
  */
 public class OrganisationAction extends LamsDispatchAction {
 
@@ -66,21 +65,35 @@ public class OrganisationAction extends LamsDispatchAction {
 	private static IUserManagementService service = (IUserManagementService) ctx
 			.getBean("userManagementServiceTarget");
 
+	private static List countries = service.getAllCountries();
+	
+	private static List languages = service.getAllLanguages();
+	
+	private static List status = service.getAllOrgnisationStates();
+
 	public ActionForward edit(ActionMapping mapping, ActionForm form,HttpServletRequest request, HttpServletResponse response) throws Exception{
-		if(request.getAttribute("orgId")!=null){
-			Organisation org = service.getOrganisationById((Integer)request.getAttribute("orgId"));
-			DynaValidatorForm orgForm = (DynaValidatorForm)form;
-			orgForm.set("parentId",org.getParentOrganisation().getOrganisationId());
-			//orgForm.set("name",org.getName());
-			//orgForm.set("code",org.getCode());
-			//orgForm.set("description",org.getDescription());
+		Integer orgId = WebUtil.readIntParam(request,"orgId",true);
+		if(orgId != null){//editing existing organisation
+			Organisation org = service.getOrganisationById(orgId);
+			DynaActionForm orgForm = (DynaActionForm)form;
 			BeanUtils.copyProperties(orgForm,org);
+			log.debug("Struts Pupulated orgId:"+(Integer)orgForm.get("orgId"));
+			orgForm.set("parentId",org.getParentOrganisation().getOrganisationId());
+			orgForm.set("parentName",org.getParentOrganisation().getName());
 			orgForm.set("typeId",org.getOrganisationType().getOrganisationTypeId());
+			orgForm.set("stateId",org.getOrganisationState().getOrganisationStateId());
 		}
+		request.getSession().setAttribute("countries",countries);
+		request.getSession().setAttribute("languages",languages);
+		request.getSession().setAttribute("status",status);
 		return mapping.findForward("organisation");
 	}
 
 	public ActionForward remove(ActionMapping mapping, ActionForm form,HttpServletRequest request, HttpServletResponse response){
+		Integer orgId = WebUtil.readIntParam(request,"orgId");
+		service.deleteOrganisationById(orgId);
+		Integer parentId = WebUtil.readIntParam(request,"parentId");
+		request.setAttribute("org",parentId);
 		return mapping.findForward("orglist");
 	}
 

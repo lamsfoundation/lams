@@ -35,6 +35,7 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
@@ -90,7 +91,8 @@ public class OrgManageAction extends Action {
 		orgManageForm.setType(org.getOrganisationType().getOrganisationTypeId());
 		log.debug("orgType:"+orgManageForm.getType());
 		List<OrgManageBean> orgManageBeans = new ArrayList<OrgManageBean>();
-		if(service.isUserSysAdmin(username)){
+		//if(service.isUserSysAdmin(username)){
+		if(request.isUserInRole(Role.SYSADMIN)){
 			Integer type;
 			if(orgManageForm.getType().equals(OrganisationType.ROOT_TYPE)){
 				type = OrganisationType.COURSE_TYPE;
