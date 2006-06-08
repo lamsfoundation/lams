@@ -169,10 +169,20 @@ public class LearningAction extends Action {
 					+ sessionId);
 			return mapping.findForward("error");
 		}
-		Long forumId = session.getForum().getUid();
-		Boolean allowEdit = new Boolean(session.getForum().isAllowEdit());
-		Boolean allowRichEditor = new Boolean(session.getForum()
-				.isAllowRichEditor());
+		
+		Forum forum = session.getForum();
+		//add define later support
+		if(forum.isDefineLater()){
+			return mapping.findForward("defineLater");
+		}
+		//add run offline support
+		if(forum.getRunOffline()){
+			return mapping.findForward("runOffline");
+		}
+		
+		Long forumId = forum.getUid();
+		Boolean allowEdit = new Boolean(forum.isAllowEdit());
+		Boolean allowRichEditor = new Boolean(forum.isAllowRichEditor());
 		int allowNumber = session.getForum().getLimitedChar();
 		request.getSession().setAttribute(ForumConstants.FORUM_ID, forumId);
 		request.getSession().setAttribute(ForumConstants.ALLOW_EDIT, allowEdit);
@@ -190,6 +200,12 @@ public class LearningAction extends Action {
 		// get all root topic to display on init page
 		List rootTopics = forumService.getRootTopics(sessionId);
 		request.setAttribute(ForumConstants.AUTHORING_TOPICS_LIST, rootTopics);
+		
+		//set contentInUse flag to true!
+		forum.setContentInUse(true);
+		forum.setDefineLater(false);
+		forumService.updateForum(forum);
+		
 		return mapping.findForward("success");
 	}
 

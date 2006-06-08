@@ -568,6 +568,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 			throw new ToolException("No found tool content by given content ID:" + toolContentId);
 		}
 		forum.setDefineLater(true);
+		forum.setContentInUse(false);
 		forumDao.flush();
 	}
 

@@ -9,7 +9,7 @@
 		</action>
    		
 		<!-- ========== BEGIN: Authroing Definitions ============================== -->
-		<action path="/authoring/init"
+		<action path="/authoring"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
 			name="forumForm" 
 			scope="session" 
@@ -67,17 +67,17 @@
 		<action path="/authoring/newTopic"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
 			parameter="newTopic">
-			<forward name="success" path="tiles:/authoring/forum/newTopic" />
+			<forward name="success" path="/jsps/authoring/message/create.jsp" />
 		</action>
 		
 		<action path="/authoring/createTopic"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
 			name="messageForm" 
 			validate="true"
-			input="tiles:/authoring/forum/newTopic" 
+			input="/jsps/authoring/message/create.jsp" 
 			parameter="createTopic"
 			scope="request">
-			<forward name="success" path="tiles:/authoring/forum/newTopic" />
+			<forward name="success" path="/jsps/authoring/message/create.jsp" />
 		</action>
 		
 		<action path="/authoring/deleteTopic"
@@ -92,7 +92,7 @@
 			validate="false"
 			parameter="viewTopic"
 			scope="request">
-			<forward name="success" path="tiles:/authoring/forum/viewTopic" />
+			<forward name="success" path="/jsps/authoring/message/view.jsp" />
 		</action>
 		
 		<action path="/authoring/editTopic"
@@ -101,7 +101,7 @@
 			validate="false"
 			parameter="editTopic"
 			scope="session">
-			<forward name="success" path="tiles:/authoring/forum/editTopic" />
+			<forward name="success" path="/jsps/authoring/message/edit.jsp" />
 			<forward name="forbidden" path="tiles:/authoring/forum/forbiddenEditTopic" />
 		</action>
 		
@@ -111,14 +111,14 @@
 			validate="false"
 			parameter="deleteAttachment"
 			scope="session">
-			<forward name="success" path="tiles:/authoring/forum/editTopic" />
+			<forward name="success" path="/jsps/authoring/message/edit.jsp" />
 		</action>
 		
 		<action path="/authoring/updateTopic"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
 			name="messageForm" 
 			validate="true"
-			input="tiles:/authoring/forum/editTopic" 
+			input="/jsps/authoring/message/edit.jsp" 
 			parameter="updateTopic"
 			scope="session">
 			<forward name="success" path="/authoring/viewTopic.do" />
@@ -148,6 +148,8 @@
 			type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"
 			parameter="viewForum" scope="request" name="emptyForm">
 			<forward name="success" path="tiles:/learning/forum/viewForum" />
+			<forward name="defineLater" path="tiles:/learning/forum/defineLater" />
+			<forward name="runOffline" path="tiles:/learning/forum/runOffline" />
 		</action>
 		<action path="/learning/viewTopic"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"
@@ -285,6 +287,7 @@
 			parameter="viewTopic">
 			<forward name="success" path="tiles:/monitoring/forum/viewTopic" />
 		</action>
+
 		<!-- ========== END: Monitoring  Definitions ============================== -->
 		<!-- System level actions -->
 		<action path="/index" type="org.apache.struts.actions.ForwardAction"

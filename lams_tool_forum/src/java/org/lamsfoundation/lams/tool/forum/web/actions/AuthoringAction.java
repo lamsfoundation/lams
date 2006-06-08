@@ -51,6 +51,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
+import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.forum.dto.MessageDTO;
 import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
 import org.lamsfoundation.lams.tool.forum.persistence.Forum;
@@ -83,13 +84,15 @@ public class AuthoringAction extends Action {
 		String param = mapping.getParameter();
 		//-----------------------Forum Author function ---------------------------
 	  	if (param.equals("initPage")) {
-	  		request.getSession().setAttribute(ForumConstants.MODE,ForumConstants.AUTHOR_MODE);
+	  		request.getSession().setAttribute(AttributeNames.ATTR_MODE,ToolAccessMode.AUTHOR);
        		return initPage(mapping, form, request, response);
         }
-	  	if (param.equals("monitoringInitPage")) {
-	  		request.getSession().setAttribute(ForumConstants.MODE,ForumConstants.MONITOR_MODE);
-	  		return initPage(mapping, form, request, response);
-	  	}
+
+		// ***************** Monitoring define later screen ********************
+		if (param.equals("defineLater")){
+			request.getSession().setAttribute(AttributeNames.ATTR_MODE,ToolAccessMode.TEACHER);
+       		return initPage(mapping, form, request, response);
+		}
         if (param.equals("updateContent")) {
        		return updateContent(mapping, form, request, response);
         }
@@ -138,6 +141,7 @@ public class AuthoringAction extends Action {
 	//******************************************************************************************************************
 	//              Forum Author functions
 	//******************************************************************************************************************
+
 	/**
 	 * This page will display initial submit tool content. Or just a blank page if the toolContentID does not
 	 * exist before. 
@@ -212,6 +216,7 @@ public class AuthoringAction extends Action {
 	public ActionForward updateContent(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
 
+		ToolAccessMode mode = (ToolAccessMode) request.getSession().getAttribute(AttributeNames.ATTR_MODE);
 		ForumForm forumForm = (ForumForm)(form);
 		
 		Forum forum = forumForm.getForum();
@@ -236,10 +241,16 @@ public class AuthoringAction extends Action {
 				forumPO = forum;
 				forumPO.setContentId(forumForm.getToolContentID());
 			}else{
-				Long uid = forumPO.getUid();
-				PropertyUtils.copyProperties(forumPO,forum);
-				//get back UID
-				forumPO.setUid(uid);
+				if(mode.isAuthor()){
+					Long uid = forumPO.getUid();
+					PropertyUtils.copyProperties(forumPO,forum);
+					//get back UID
+					forumPO.setUid(uid);
+				}else{
+//					if it is Teacher, then just update basic tab content (definelater)
+					forumPO.setInstructions(forum.getInstructions());
+					forumPO.setTitle(forum.getTitle());
+				}
 			}
 			forumPO.setCreatedBy(forumUser);
 			
@@ -323,9 +334,9 @@ public class AuthoringAction extends Action {
 			log.error(e);
 		}
 		
-    	String mode = (String) request.getSession().getAttribute(ForumConstants.MODE);
+		
     	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG,Boolean.TRUE);
-    	if(StringUtils.equals(mode,ForumConstants.AUTHOR_MODE))
+    	if(mode.isAuthor())
     		return mapping.findForward("author");
     	else
     		return mapping.findForward("monitor");
@@ -802,8 +813,8 @@ public class AuthoringAction extends Action {
     public ActionForward refreshTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
     		HttpServletResponse response) throws PersistenceException {
 
-    	String mode = (String) request.getSession().getAttribute(ForumConstants.MODE);
-    	if(StringUtils.equals(mode,ForumConstants.AUTHOR_MODE))
+    	ToolAccessMode mode = (ToolAccessMode) request.getSession().getAttribute(AttributeNames.ATTR_MODE);
+    	if(mode.isAuthor())
     		return mapping.findForward("author");
     	else
     		return mapping.findForward("monitor");
@@ -824,8 +835,8 @@ public class AuthoringAction extends Action {
 		}
     	forum.setMessages(msgSet);
     	
-    	String mode = (String) request.getSession().getAttribute(ForumConstants.MODE);
-    	if(StringUtils.equals(mode,ForumConstants.AUTHOR_MODE))
+    	ToolAccessMode mode = (ToolAccessMode) request.getSession().getAttribute(AttributeNames.ATTR_MODE);
+    	if(mode.isAuthor())
     		return mapping.findForward("author");
     	else
     		return mapping.findForward("monitor");
@@ -892,5 +903,4 @@ public class AuthoringAction extends Action {
 		}
 		return list;
 	}
-
 }

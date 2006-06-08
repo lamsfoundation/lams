@@ -51,7 +51,7 @@
 	</tr>
 	<tr>
 		<td colspan="2" align="left">
-			<a href="javascript:showMessage('<html:rewrite page="/authoring/newTopic.do"/>');">
+			<a href="javascript:showMessage('<html:rewrite page="/authoring/newTopic.do"/>');" class="button">
 				<fmt:message key="label.authoring.create.new.topic" />
 			</a>
 		</td>
@@ -63,7 +63,9 @@
 	</tr>
 	<tr>
 		<td colspan="2">
-			<iframe onload="javascript:this.style.height=this.contentWindow.document.body.scrollHeight+'px'" id="messageArea" name="messageArea" style="width:0px;height:0px;border:0px;display:none" frameborder="no" scrolling="no">
+			<iframe onload="javascript:this.style.height=this.contentWindow.document.body.scrollHeight+'px'" 
+			id="messageArea" name="messageArea" 
+			style="width:0px;height:0px;border:0px;display:none" frameborder="no" scrolling="no">
 			</iframe>
 		</td>
 	</tr>

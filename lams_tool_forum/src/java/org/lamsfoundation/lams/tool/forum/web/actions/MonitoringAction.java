@@ -106,12 +106,8 @@ public class MonitoringAction extends Action {
 		return mapping.findForward("error");
 	}
 	
-    /**
-     * Default ActionForward for Monitor
-     *  (non-Javadoc)
-     * @see org.apache.struts.actions.DispatchAction#unspecified(org.apache.struts.action.ActionMapping, org.apache.struts.action.ActionForm, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
-     */
-	
+
+
 	/**
 	 * The initial method for monitoring
 	 */

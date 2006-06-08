@@ -271,6 +271,7 @@
 				<include name="includes/**"/>
 				<include name="images/**"/>
 				<include name="jsps/**"/> 
+				<include name="common/**"/> 
 			</fileset>
 		</war>
 	</target>

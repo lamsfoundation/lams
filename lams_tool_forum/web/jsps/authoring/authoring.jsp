@@ -1,4 +1,5 @@
 <%@ include file="/includes/taglibs.jsp"%>
+<%@ page import="org.lamsfoundation.lams.tool.forum.util.ForumConstants"%>
 
 <html:form action="authoring/update" method="post" styleId="authoringForm" enctype="multipart/form-data">
 	<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
@@ -16,16 +17,7 @@
 		<lams:TabBody id="2" titleKey="authoring.tab.advanced" page="advance.jsp" />
 		<lams:TabBody id="3" titleKey="authoring.tab.instructions" page="instructions.jsp" />
 		<!-- Button Row -->
-		<%--  Default value 
-				cancelButtonLabelKey="label.authoring.cancel.button"
-				saveButtonLabelKey="label.authoring.save.button"
-				cancelConfirmMsgKey="authoring.msg.cancel.save"
-				accessMode="author"
-		--%>
-		<c:set var="toolSignature">
-			<fmt:message key="signature" />
-		</c:set>
-		<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="${toolSignature}" toolContentID="${formBean.toolContentID}" />
+		<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="<%=ForumConstants.TOOL_SIGNATURE%>" toolContentID="${formBean.toolContentID}" />
 		
 	</div>
 
