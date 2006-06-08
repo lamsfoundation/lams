@@ -25,6 +25,10 @@
 
 package org.lamsfoundation.lams.tool.chat.model;
 
+import java.util.Date;
+
+import org.apache.commons.lang.builder.ToStringBuilder;
+
 /**
  * Represents a jabber message sent by a user toUser a groupchat session
  * 
@@ -42,6 +46,8 @@ public class ChatMessage implements java.io.Serializable {
 	// Fields
 	private Long uid;
 
+	private ChatSession chatSession;
+
 	private ChatUser fromUser;
 
 	private ChatUser toUser;
@@ -50,17 +56,12 @@ public class ChatMessage implements java.io.Serializable {
 
 	private String body;
 
+	private Date sendDate;
+
+	private Boolean hidden;
+
 	/** default constructor */
 	public ChatMessage() {
-	}
-
-	/** full constructor */
-	public ChatMessage(Long messageId, ChatUser from, ChatUser to, String type,
-			String body) {
-		this.fromUser = from;
-		this.toUser = to;
-		this.type = type;
-		this.body = body;
 	}
 
 	// Property accessors
@@ -74,6 +75,17 @@ public class ChatMessage implements java.io.Serializable {
 
 	public void setUid(Long uid) {
 		this.uid = uid;
+	}
+
+	/**
+	 * @hibernate.many-to-one column="chat_session_uid" not-null="true"
+	 */
+	public ChatSession getChatSession() {
+		return chatSession;
+	}
+
+	public void setChatSession(ChatSession chatSession) {
+		this.chatSession = chatSession;
 	}
 
 	/**
@@ -124,5 +136,33 @@ public class ChatMessage implements java.io.Serializable {
 
 	public void setBody(String body) {
 		this.body = body;
+	}
+
+	/**
+	 * @hibernate.property column="send_date"
+	 */
+	public Date getSendDate() {
+		return sendDate;
+	}
+
+	public void setSendDate(Date sendDate) {
+		this.sendDate = sendDate;
+	}
+
+	/**
+	 * 
+	 * @hibernate.property column="hidden"
+	 */
+	public Boolean getHidden() {
+		return hidden;
+	}
+
+	public void setHidden(Boolean hidden) {
+		this.hidden = hidden;
+	}
+
+	public String toString() {
+		return new ToStringBuilder(this).append("uid", uid)
+				.append("body", body).toString();
 	}
 }
