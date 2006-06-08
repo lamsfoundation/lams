@@ -29,11 +29,11 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.tool.chat.beans.AuthoringSessionBean;
 
+/**
+ * @struts.form name="authoringForm"
+ */
 public class AuthoringForm extends ActionForm {
 
-	/**
-	 * @struts.form name="authoringForm"
-	 */
 	private static final long serialVersionUID = 3950453134542135495L;
 
 	// Properties
