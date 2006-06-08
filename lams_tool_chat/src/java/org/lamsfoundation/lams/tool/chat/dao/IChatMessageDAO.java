@@ -25,8 +25,12 @@
 
 package org.lamsfoundation.lams.tool.chat.dao;
 
+import java.util.List;
+
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.tool.chat.model.ChatMessage;
+import org.lamsfoundation.lams.tool.chat.model.ChatSession;
+import org.lamsfoundation.lams.tool.chat.model.ChatUser;
 
 /**
  * DAO for accessing the ChatMessage objects - interface defining
@@ -35,4 +39,10 @@ import org.lamsfoundation.lams.tool.chat.model.ChatMessage;
 public interface IChatMessageDAO extends IBaseDAO {
 
 	void saveOrUpdate(ChatMessage chatMessage);
+
+	List getForUser(ChatUser chatUser);
+
+	ChatMessage getByUID(Long uid);
+
+	List getLatest(ChatSession chatSession, int max);
 }
