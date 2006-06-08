@@ -122,6 +122,11 @@
 	<!-- ================================================================ -->
 		<target name="build-jar" depends="compile.java,copyContext" description="creates jar file">
 			<delete file="${build.lib}/${product}.jar"/>
+			<copy overwrite="yes" todir="${build.classes.java}/org/lamsfoundation/lams/admin">
+				<fileset dir="${conf.language.dir}">
+					<include name="**/*.properties"/>
+				</fileset>
+			</copy>
 			<jar jarfile="${build.lib}/${product}.jar" manifest="${conf.dir}/jar/META-INF/MANIFEST.MF">
 				<fileset dir="${build.classes.java}"/>
 				<!--<fileset dir="${conf.hibernate.mapping.dir}"/>-->
