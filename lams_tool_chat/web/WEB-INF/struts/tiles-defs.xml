@@ -96,6 +96,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<put name="header" value="tiles:/header:monitoring/chat_client" />
 		<put name="body" value="/chat_client/chat_ui.jsp" />
 	</definition>
+		
+	<definition name="tiles:/monitoring/chat_history" extends="tiles:/layout:tab">
+		<put name="pageTitleKey" value="pageTitle.monitoring.chatHistory"></put>
+		<put name="header" value="tiles:/header:monitoring/chat_history"></put>
+		<put name="body" value="/pages/monitoring/chatHistory.jsp"></put>
+	</definition>
 	
 	<definition name="tiles:/header:monitoring/main" extends="tiles:/header:default">
 		<put name="headItems" value="/pages/monitoring/headItems.jsp"/>
@@ -107,6 +113,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	-->	
 	<definition name="tiles:/header:monitoring/chat_client" extends="tiles:/header:default">
 		<put name="headItems" value="/pages/learning/headItems.jsp"/>
+	</definition>
+	
+	<definition name="tiles:/header:monitoring/chat_history" extends="tiles:/header:default"> 
+		<put name="headItems" value="/pages/learning/headItems.jsp"/>	 
 	</definition>
 	<!-- End: Monitoring -->
 
