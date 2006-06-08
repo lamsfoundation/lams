@@ -479,5 +479,7 @@ public interface IUserManagementService {
 	public Organisation getRootOrganisation();
 	
 	public boolean isUserInRoleInOrganisation(String login, Integer roleId, Integer orgId);
+	
+	public void deleteOrganisationById(Integer orgId);
 
 }

@@ -529,9 +529,13 @@ public class UserManagementService implements IUserManagementService {
 		WorkspaceFolder workspaceFolder = createWorkspaceFolder(workspace,
 				userID, WorkspaceFolder.NORMAL);
 		workspace.setRootFolder(workspaceFolder);
-		workspaceDAO.update(workspace);
+		workspaceDAO.insertOrUpdate(workspace);
 		organisation.setWorkspace(workspace);
-		organisationDAO.insert(organisation);
+		if(organisation.getOrganisationId()==0){
+			organisationDAO.insert(organisation);
+		}else{
+			organisationDAO.update(organisation);
+		}
 		return organisation.getOrganisationId();
 	}
 
@@ -721,6 +725,10 @@ public class UserManagementService implements IUserManagementService {
 
 	public boolean isUserInRoleInOrganisation(String login, Integer roleId, Integer orgId) {
 		return userOrganisationRoleDAO.getUserOrganisationRole(userOrganisationDAO.getUserOrganisation(userDAO.getUserByLogin(login).getUserId(),orgId).getUserOrganisationId(),roleId)!=null;
+	}
+
+	public void deleteOrganisationById(Integer orgId) {
+		organisationDAO.deleteOrganisationById(orgId);
 	}
 
 }
