@@ -132,7 +132,7 @@ public class NbLearnerAction extends LamsLookupDispatchAction {
 	  ToolSessionManager sessionMgrService = NoticeboardServiceProxy.getNbSessionManager(getServlet().getServletContext());
 		  
       ToolAccessMode mode = WebUtil.getToolAccessMode(learnerForm.getMode());
-      if (mode == ToolAccessMode.LEARNER)
+      if (mode == ToolAccessMode.LEARNER || mode == ToolAccessMode.AUTHOR)
 	  {
 		  NoticeboardSession nbSession = nbService.retrieveNoticeboardSession(toolSessionID);
 		  NoticeboardUser nbUser = nbService.retrieveNoticeboardUser(userID);

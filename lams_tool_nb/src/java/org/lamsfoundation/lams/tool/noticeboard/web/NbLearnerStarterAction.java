@@ -154,7 +154,7 @@ public class NbLearnerStarterAction extends LamsDispatchAction {
         }
         
         ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE,false);
-        if (mode == ToolAccessMode.LEARNER)
+        if (mode == ToolAccessMode.LEARNER || mode == ToolAccessMode.AUTHOR )
         {
             /* Set the ContentInUse flag to true, and defineLater flag to false */
             nbContent.setContentInUse(true);
