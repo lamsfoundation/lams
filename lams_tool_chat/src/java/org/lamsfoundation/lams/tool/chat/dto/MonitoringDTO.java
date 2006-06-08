@@ -47,9 +47,8 @@ public class MonitoringDTO {
 		onlineInstructions = chat.getOnlineInstructions();
 		offlineInstructions = chat.getOfflineInstructions();
 
-		// TODO create comparators for TreeSets.
-		onlineInstructionsFiles = new HashSet<ChatAttachmentDTO>();
-		offlineInstructionsFiles = new HashSet<ChatAttachmentDTO>();
+		onlineInstructionsFiles = new TreeSet<ChatAttachmentDTO>();
+		offlineInstructionsFiles = new TreeSet<ChatAttachmentDTO>();
 
 		for (Iterator i = chat.getChatAttachments().iterator(); i.hasNext();) {
 			ChatAttachment att = (ChatAttachment) i.next();
@@ -65,11 +64,6 @@ public class MonitoringDTO {
 				logger.error("File with uid " + att.getFileUuid()
 						+ " contains invalid fileType: " + att.getFileType());
 			}
-		}
-
-		chatSessions = new TreeSet<ChatSessionDTO>();
-		for (Iterator i = chat.getChatSessions().iterator(); i.hasNext();) {
-			chatSessions.add(new ChatSessionDTO((ChatSession) i.next()));
 		}
 	}
 

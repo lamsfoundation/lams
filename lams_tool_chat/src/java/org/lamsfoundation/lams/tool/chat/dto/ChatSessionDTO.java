@@ -25,24 +25,50 @@
 
 package org.lamsfoundation.lams.tool.chat.dto;
 
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+
+import org.lamsfoundation.lams.tool.chat.model.ChatMessage;
 import org.lamsfoundation.lams.tool.chat.model.ChatSession;
 
-public class ChatSessionDTO {
-	public ChatSessionDTO(ChatSession sess) {
-		this.sessionId = sess.getSessionId();
-		this.sessionName = sess.getSessionName();
+public class ChatSessionDTO implements Comparable {
+	
+	public ChatSessionDTO(ChatSession session) {
+		this.sessionID = session.getSessionId();
+		this.sessionName = session.getSessionName();
+		
+		chatMessages = new TreeSet<ChatMessageDTO>();
+		for (Iterator i = session.getChatMessages().iterator(); i.hasNext();) {
+			chatMessages.add(new ChatMessageDTO((ChatMessage) i.next()));
+		}
 	}
-
-	Long sessionId;
+	
+	public ChatSessionDTO (ChatSession session, List messages) {
+		this.sessionID = session.getSessionId();
+		this.sessionName = session.getSessionName();
+		
+		chatMessages = new TreeSet<ChatMessageDTO>();
+		for (Iterator i = messages.iterator(); i.hasNext();) {
+			chatMessages.add(new ChatMessageDTO((ChatMessage) i.next()));
+		}		
+	}
+	
+	public ChatSessionDTO() {}
+	
+	Long sessionID;
 
 	String sessionName;
-
-	public Long getSessionId() {
-		return sessionId;
+	
+	Set<ChatMessageDTO> chatMessages;
+	
+	public Long getSessionID() {
+		return sessionID;
 	}
 
-	public void setSessionId(Long sessionId) {
-		this.sessionId = sessionId;
+	public void setSessionID(Long sessionID) {
+		this.sessionID = sessionID;
 	}
 
 	public String getSessionName() {
@@ -51,5 +77,23 @@ public class ChatSessionDTO {
 
 	public void setSessionName(String sessionName) {
 		this.sessionName = sessionName;
+	}
+
+	public Set<ChatMessageDTO> getChatMessages() {
+		return chatMessages;
+	}
+
+	public void setChatMessages(Set<ChatMessageDTO> chatMessages) {
+		this.chatMessages = chatMessages;
+	}
+
+	public int compareTo(Object o) {
+		int returnValue;
+		ChatSessionDTO toSession = (ChatSessionDTO)o;
+		returnValue = this.sessionName.compareTo(toSession.sessionName);
+		if (returnValue == 0) {
+			returnValue = this.sessionID.compareTo(toSession.sessionID);			
+		}
+		return returnValue;		
 	}
 }

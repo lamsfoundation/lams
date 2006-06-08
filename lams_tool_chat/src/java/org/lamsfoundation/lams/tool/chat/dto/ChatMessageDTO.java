@@ -27,58 +27,61 @@ package org.lamsfoundation.lams.tool.chat.dto;
 
 import java.util.Date;
 
-import org.lamsfoundation.lams.tool.chat.model.ChatAttachment;
+import org.lamsfoundation.lams.tool.chat.model.ChatMessage;
 
-public class ChatAttachmentDTO implements Comparable {
+public class ChatMessageDTO implements Comparable{
+	
+	public Long uid;
+	
+	public String from;
+	
+	public String body;
+	
+	public String type;
+	
+	public Date sendDate;
+	
+	public Boolean hidden;
 
-	public ChatAttachmentDTO(ChatAttachment att) {
-		this.fileUuid = att.getFileUuid();
-		this.fileName = att.getFileName();
-		this.fileVersionId = att.getFileVersionId();
-		this.createDate = att.getCreateDate();
-		this.uid = att.getUid();
+	public ChatMessageDTO(ChatMessage chatMessage) {
+		this.from = chatMessage.getFromUser().getLoginName();
+		this.body = chatMessage.getBody();
+		this.type = chatMessage.getType();
+		this.sendDate = chatMessage.getSendDate();
+		this.uid = chatMessage.getUid();
+		this.hidden = chatMessage.getHidden();
 	}
 
-	Long uid;
-
-	Long fileUuid;
-
-	Long fileVersionId;
-
-	String fileName;
-
-	Date createDate;
-
-	public String getFileName() {
-		return fileName;
+	public String getBody() {
+		return body;
 	}
 
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
+	public void setBody(String body) {
+		this.body = body;
 	}
 
-	public Long getFileUuid() {
-		return fileUuid;
+	public String getFrom() {
+		return from;
 	}
 
-	public void setFileUuid(Long fileUuid) {
-		this.fileUuid = fileUuid;
+	public void setFrom(String from) {
+		this.from = from;
 	}
 
-	public Long getFileVersionId() {
-		return fileVersionId;
+	public String getType() {
+		return type;
 	}
 
-	public void setFileVersionId(Long fileVersionId) {
-		this.fileVersionId = fileVersionId;
+	public void setType(String type) {
+		this.type = type;
 	}
 
-	public Date getCreateDate() {
-		return createDate;
+	public Date getSendDate() {
+		return sendDate;
 	}
 
-	public void setCreateDate(Date createDate) {
-		this.createDate = createDate;
+	public void setSendDate(Date sendDate) {
+		this.sendDate = sendDate;
 	}
 
 	public Long getUid() {
@@ -90,13 +93,20 @@ public class ChatAttachmentDTO implements Comparable {
 	}
 
 	public int compareTo(Object o) {
-		ChatAttachmentDTO toAttachment = (ChatAttachmentDTO) o;
-		int returnValue = this.createDate.compareTo(((ChatAttachmentDTO) o)
-				.getCreateDate());
-
+		ChatMessageDTO toMessage = (ChatMessageDTO)o;
+		int returnValue = this.sendDate.compareTo(toMessage.sendDate);
+		
 		if (returnValue == 0) {
-			returnValue = this.uid.compareTo(toAttachment.getUid());
+			returnValue = this.uid.compareTo(toMessage.getUid());
 		}
-		return returnValue;
+		return returnValue;		
+	}
+
+	public Boolean getHidden() {
+		return hidden;
+	}
+
+	public void setHidden(Boolean hidden) {
+		this.hidden = hidden;
 	}
 }
