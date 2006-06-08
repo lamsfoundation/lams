@@ -26,6 +26,8 @@ import java.io.PrintWriter;
 import java.net.UnknownHostException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -36,7 +38,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.tool.chat.service.ChatService;
 import org.lamsfoundation.lams.tool.chat.service.ChatServiceProxy;
 import org.lamsfoundation.lams.tool.chat.service.IChatService;
 import org.w3c.dom.Document;
@@ -313,6 +314,7 @@ public final class JHBServlet extends HttpServlet {
 										jresp.addNode(message);
 									}
 								}
+							}
 						} else {
 							/*
 							 * check if polling too frequently only empty polls
