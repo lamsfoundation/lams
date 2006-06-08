@@ -471,4 +471,10 @@ public class Lesson implements Serializable {
     	return new LessonDetailsDTO(this);
     }
     
+    /** Is this lesson a preview lesson? ie is it attached to a preview learning design? */
+    public boolean isPreviewLesson() {
+    	Integer copyTypeID = getLearningDesign().getCopyTypeID(); 
+    	return ( copyTypeID != null && LearningDesign.COPY_TYPE_PREVIEW == copyTypeID.intValue() );
+    }
+    
 }

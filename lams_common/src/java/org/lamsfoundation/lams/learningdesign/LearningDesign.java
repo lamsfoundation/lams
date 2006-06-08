@@ -269,7 +269,6 @@ public class LearningDesign implements Serializable {
 		newDesign.setLicenseText(design.getLicenseText());
 		newDesign.setLastModifiedDateTime(new Date());
 				
-		// is this really right? why are preview set to read only when we will delete them? do we set them to not read only later?
 		if(designCopyType.intValue()!=COPY_TYPE_NONE)
 			newDesign.setReadOnly(new Boolean(true));
 		else

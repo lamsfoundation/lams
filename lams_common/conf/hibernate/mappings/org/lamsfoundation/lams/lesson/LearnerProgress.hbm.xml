@@ -64,7 +64,7 @@
 
 		<!-- bi-directional many-to-one association to Lesson -->
 		<many-to-one name="lesson"
-			class="org.lamsfoundation.lams.lesson.Lesson" not-null="true">
+			class="org.lamsfoundation.lams.lesson.Lesson" not-null="true" lazy="false">
 			<column name="lesson_id" />
 		</many-to-one>
 

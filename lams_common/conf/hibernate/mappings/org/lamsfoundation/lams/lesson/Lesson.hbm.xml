@@ -53,7 +53,8 @@
 		<!-- bi-directional many-to-one association to LearningDesign -->
 		<many-to-one name="learningDesign"
 			class="org.lamsfoundation.lams.learningdesign.LearningDesign"
-			not-null="true">
+			not-null="true"
+			lazy="false">
 			<column name="learning_design_id" />
 		</many-to-one>
 		
