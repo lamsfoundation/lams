@@ -14,30 +14,22 @@
   <form-beans>
 
     <form-bean
-      name="OrganisationActionForm"
-      type="org.lamsfoundation.lams.admin.web.OrganisationActionForm"
-    />
-    <form-bean
       name="CacheActionForm"
-      type="org.lamsfoundation.lams.sysadmin.web.CacheActionForm"
-    />
-    <form-bean
-      name="UsersRemoveActionForm"
-      type="org.lamsfoundation.lams.admin.web.UsersRemoveActionForm"
-    />
-    <form-bean
-      name="UserActionForm"
-      type="org.lamsfoundation.lams.admin.web.UserActionForm"
-    />
-    <form-bean
-      name="UsersAddActionForm"
-      type="org.lamsfoundation.lams.admin.web.UsersAddActionForm"
+      type="org.lamsfoundation.lams.admin.web.CacheActionForm"
     />
 
-    <!--
-         If you have non XDoclet forms, define them in a file called struts-forms.xml and
-         place it in your merge directory.
-    -->
+   <form-bean name="OrganisationForm" type="org.apache.struts.action.DynaActionForm">
+	<form-property name="orgId" type="java.lang.Integer" />
+	<form-property name="parentId" type="java.lang.Integer" />
+	<form-property name="parentName" type="java.lang.String" />
+	<form-property name="name" type="java.lang.String" />
+	<form-property name="code" type="java.lang.String" />
+	<form-property name="description" type="java.lang.String" />
+	<form-property name="localeLanguage" type="java.lang.String" />
+	<form-property name="localeCountry" type="java.lang.String" />
+	<form-property name="typeId" type="java.lang.Integer" />
+	<form-property name="stateId" type="java.lang.Integer" />
+</form-bean>
   </form-beans>
 
   <!-- ========== Global Exceptions Definitions =================================== -->
@@ -54,60 +46,72 @@
   <!-- ========== Action Mapping Definitions =================================== -->
    <action-mappings>
     <action
-      path="usersremove"
-      type="org.lamsfoundation.lams.admin.web.UsersRemoveAction"
-      name="UsersRemoveActionForm"
-      scope="session"
-      input=".admin.usersremove"
+      path="/orgsave"
+      type="org.lamsfoundation.lams.admin.web.OrgSaveAction"
+      name="OrganisationForm"
+      scope="request"
+      input=".organisation"
       unknown="false"
       validate="false"
     >
       <forward
-        name="admin"
-        path=".admin"
+        name="organisation"
+        path=".organisation"
         redirect="false"
       />
       <forward
-        name="error"
-        path=".admin.error"
+        name="orglist"
+        path="/orgmanage.do"
         redirect="false"
       />
     </action>
     <action
-      path="/jobList"
+      path="/joblist"
       type="org.lamsfoundation.lams.admin.web.ScheduledJobListAction"
       unknown="false"
-      validate="true"
+      validate="false"
     >
       <forward
         name="list"
-        path=".admin.joblist"
+        path=".joblist"
         redirect="false"
       />
     </action>
     <action
-      path="/admin/organisation"
-      type="org.lamsfoundation.lams.admin.web.OrganisationAction"
-      name="OrganisationActionForm"
-      scope="session"
-      input=".admin.organisation"
+      path="/orgmanage"
+      type="org.lamsfoundation.lams.admin.web.OrgManageAction"
       unknown="false"
-      validate="true"
+      validate="false"
     >
       <forward
-        name="admin"
-        path=".admin"
-        redirect="false"
-      />
-      <forward
-        name="error"
-        path=".admin.error"
+        name="orglist"
+        path=".orglist"
         redirect="false"
       />
     </action>
     <action
-      path="/sysadmin/cache"
-      type="org.lamsfoundation.lams.sysadmin.web.CacheAction"
+      path="/organisation"
+      type="org.lamsfoundation.lams.admin.web.OrganisationAction"
+      name="OrganisationForm"
+      scope="request"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="organisation"
+        path=".organisation"
+        redirect="false"
+      />
+      <forward
+        name="orglist"
+        path="/orgmanage.do"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/cache"
+      type="org.lamsfoundation.lams.admin.web.CacheAction"
       name="CacheActionForm"
       scope="request"
       parameter="method"
@@ -120,95 +124,8 @@
         redirect="false"
       />
     </action>
-    <action
-      path="/admin"
-      type="org.lamsfoundation.lams.admin.web.AdminAction"
-      parameter="method"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="admin"
-        path=".admin"
-        redirect="false"
-      />
-      <forward
-        name="organisation"
-        path=".admin.organisation"
-        redirect="false"
-      />
-      <forward
-        name="user"
-        path=".admin.user"
-        redirect="false"
-      />
-      <forward
-        name="usersadd"
-        path=".admin.usersadd"
-        redirect="false"
-      />
-      <forward
-        name="usersremove"
-        path=".admin.usersremove"
-        redirect="false"
-      />
-      <forward
-        name="error"
-        path=".admin.error"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/user"
-      type="org.lamsfoundation.lams.admin.web.UserAction"
-      name="UserActionForm"
-      scope="session"
-      input=".admin.user"
-      unknown="false"
-      validate="true"
-    >
-      <forward
-        name="admin"
-        path=".admin"
-        redirect="false"
-      />
-      <forward
-        name="error"
-        path=".admin.error"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/usersadd"
-      type="org.lamsfoundation.lams.admin.web.UsersAddAction"
-      name="UsersAddActionForm"
-      scope="session"
-      input=".admin.usersadd"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="admin"
-        path=".admin"
-        redirect="false"
-      />
-      <forward
-        name="usersadd"
-        path=".admin.usersadd"
-        redirect="false"
-      />
-      <forward
-        name="error"
-        path=".admin.error"
-        redirect="false"
-      />
-    </action>
 
        <action
-      path="/adminstart"
-      forward=".admin"
-    />
-    <action
       path="/sysadminstart"
       forward=".sysadmin"
     />
