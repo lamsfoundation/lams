@@ -29,6 +29,7 @@ import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 
 /**
@@ -84,8 +85,8 @@ public class TestGateAction extends AbstractTestAction
     {
         addRequestParameter("method", "knockGate");
         addRequestParameter(LearningWebUtil.PARAM_PROGRESS_ID,TEST_LERNER_PROGRESS_ID);
-        addRequestParameter(LearningWebUtil.PARAM_ACTIVITY_ID,TEST_GATE_ACTIVITY_ID);
-        addRequestParameter(LearningWebUtil.PARAM_LESSON_ID, TEST_LESSON_ID);
+        addRequestParameter(AttributeNames.PARAM_ACTIVITY_ID,TEST_GATE_ACTIVITY_ID);
+        addRequestParameter(AttributeNames.PARAM_LESSON_ID, TEST_LESSON_ID);
         
         initializeLearnerProgress();
         actionPerform();
@@ -98,8 +99,8 @@ public class TestGateAction extends AbstractTestAction
     {
         addRequestParameter("method", "knockGate");
         addRequestParameter(LearningWebUtil.PARAM_PROGRESS_ID,TEST_LERNER_PROGRESS_ID);
-        addRequestParameter(LearningWebUtil.PARAM_ACTIVITY_ID,TEST_GATE_ACTIVITY_ID);
-        addRequestParameter(LearningWebUtil.PARAM_LESSON_ID, TEST_LESSON_ID);
+        addRequestParameter(AttributeNames.PARAM_ACTIVITY_ID,TEST_GATE_ACTIVITY_ID);
+        addRequestParameter(AttributeNames.PARAM_LESSON_ID, TEST_LESSON_ID);
         
         initializeLearnerProgress();
         actionPerform();

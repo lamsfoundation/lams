@@ -25,8 +25,8 @@
 package org.lamsfoundation.lams.learning.web.action;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 
 /**
@@ -90,7 +90,7 @@ public class TestLearnerAction extends AbstractTestAction
     public void testJoinLesson()
     {
         addRequestParameter("method", "joinLesson");
-        addRequestParameter(LearningWebUtil.PARAM_LESSON_ID, TEST_LESSON_ID);
+        addRequestParameter(AttributeNames.PARAM_LESSON_ID, TEST_LESSON_ID);
         
         actionPerform();
         
@@ -110,7 +110,7 @@ public class TestLearnerAction extends AbstractTestAction
     {
         httpSession.setAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE,testLearnerProgress);
         addRequestParameter("method", "getFlashProgressData");
-        addRequestParameter(LearningWebUtil.PARAM_LESSON_ID, TEST_LESSON_ID);
+        addRequestParameter(AttributeNames.PARAM_LESSON_ID, TEST_LESSON_ID);
         
         actionPerform();
         verifyNoActionErrors();
@@ -119,7 +119,7 @@ public class TestLearnerAction extends AbstractTestAction
     public void testExitLesson()
     {
         addRequestParameter("method", "exitLesson");
-        addRequestParameter(LearningWebUtil.PARAM_LESSON_ID, TEST_LESSON_ID);
+        addRequestParameter(AttributeNames.PARAM_LESSON_ID, TEST_LESSON_ID);
         
         actionPerform();
         
@@ -131,7 +131,7 @@ public class TestLearnerAction extends AbstractTestAction
     public void testGetLearnerActivityURL()
     {
         addRequestParameter("method", "getLearnerActivityURL");
-        addRequestParameter(LearningWebUtil.PARAM_ACTIVITY_ID, TEST_ACTIVITY_ID);
+        addRequestParameter(AttributeNames.PARAM_ACTIVITY_ID, TEST_ACTIVITY_ID);
         
         actionPerform();
         
