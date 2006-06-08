@@ -72,10 +72,15 @@ function updateSendDisplay() {
     var userName;
     if (MODE == "teacher" && !(selectedIndex == -1)) {
         var userName = rosterList.options[rosterList.selectedIndex].value;
+        document.getElementById("sendToUser").innerHTML = userName;
+        
+        document.getElementById("sendToEveryone").style.display="none";
+        document.getElementById("sendToUser").style.display="";
+        
     } else {
-        userName = "*..*Everyone*..*";
+        document.getElementById("sendToUser").style.display="none";
+        document.getElementById("sendToEveryone").style.display="";
     }
-    document.getElementById("sendTo").innerHTML = userName;
 }
 function generateMessageHTML(nick, message, type) {
     return "<div class='" + type + "'><span class='messageFrom'>" + nick + ":</span>" + message + "<div/>";
