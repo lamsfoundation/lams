@@ -35,8 +35,6 @@ import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.chat.service.ChatService;
-import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * @hibernate.class table="tl_lachat11_chat"
@@ -71,6 +69,10 @@ public class Chat implements java.io.Serializable, Cloneable {
 
 	private Boolean lockOnFinished;
 
+	private Boolean filteringEnabled;
+
+	private String filterKeywords;
+
 	private String onlineInstructions;
 
 	private String offlineInstructions;
@@ -97,6 +99,7 @@ public class Chat implements java.io.Serializable, Cloneable {
 	/** full constructor */
 	public Chat(Date createDate, Date updateDate, Long createBy, String title,
 			String instructions, Boolean runOffline, Boolean lockOnFinished,
+			Boolean filteringEnabled, String filterKeywords,
 			String onlineInstructions, String offlineInstructions,
 			Boolean contentInUse, Boolean defineLater, Long toolContentId,
 			Set chatAttachments, Set chatSessions) {
@@ -107,6 +110,8 @@ public class Chat implements java.io.Serializable, Cloneable {
 		this.instructions = instructions;
 		this.runOffline = runOffline;
 		this.lockOnFinished = lockOnFinished;
+		this.filteringEnabled = filteringEnabled;
+		this.filterKeywords = filterKeywords;
 		this.onlineInstructions = onlineInstructions;
 		this.offlineInstructions = offlineInstructions;
 		this.contentInUse = contentInUse;
@@ -317,6 +322,28 @@ public class Chat implements java.io.Serializable, Cloneable {
 	}
 
 	/**
+	 * @hibernate.property column="filtering_enabled" length="1"
+	 */
+	public Boolean getFilteringEnabled() {
+		return filteringEnabled;
+	}
+
+	public void setFilteringEnabled(Boolean filteringEnabled) {
+		this.filteringEnabled = filteringEnabled;
+	}
+
+	/**
+	 * @hibernate.property column="filter_keywords" length="65535"
+	 */
+	public String getFilterKeywords() {
+		return filterKeywords;
+	}
+
+	public void setFilterKeywords(String filterKeywords) {
+		this.filterKeywords = filterKeywords;
+	}
+
+	/**
 	 * toString
 	 * 
 	 * @return String
@@ -380,13 +407,15 @@ public class Chat implements java.io.Serializable, Cloneable {
 				Set set = new HashSet();
 				while (iter.hasNext()) {
 					ChatAttachment originalFile = (ChatAttachment) iter.next();
-					ChatAttachment newFile = (ChatAttachment) originalFile.clone();
-					if(toolContentHandler != null){
-						//duplicate file node in repository
-						NodeKey keys = toolContentHandler.copyFile(originalFile.getFileUuid());
+					ChatAttachment newFile = (ChatAttachment) originalFile
+							.clone();
+					if (toolContentHandler != null) {
+						// duplicate file node in repository
+						NodeKey keys = toolContentHandler.copyFile(originalFile
+								.getFileUuid());
 						newFile.setFileUuid(keys.getUuid());
 						newFile.setFileVersionId(keys.getVersion());
-  					}
+					}
 					set.add(newFile);
 				}
 				chat.chatAttachments = set;
