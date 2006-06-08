@@ -28,10 +28,10 @@
 	function init(){
 		initTabSize(3);
             
-//		var tag = document.getElementById("currentTab");
-//		if(tag.value != "")
-//			selectTab(tag.value);
-//        else
+		var tag = document.getElementById("currentTab");
+		if(tag == null || tag.value != "")
+			selectTab(tag.value);
+        else
 			selectTab(1);
 
 	   initEditor("forum.title");
