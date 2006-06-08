@@ -152,7 +152,7 @@ public class ChatUser implements java.io.Serializable {
 
 	/**
 	 * @hibernate.many-to-one not-null="true"
-	 * @hibernate.column name="session_id"
+	 * @hibernate.column name="chat_session_uid"
 	 * 
 	 */
 	public ChatSession getChatSession() {
