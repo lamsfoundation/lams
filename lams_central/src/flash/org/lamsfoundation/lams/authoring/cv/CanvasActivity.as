@@ -27,6 +27,7 @@ import org.lamsfoundation.lams.common.util.ui.*;
 import org.lamsfoundation.lams.authoring.*;
 import org.lamsfoundation.lams.authoring.cv.*;
 import org.lamsfoundation.lams.monitoring.mv.*;
+import org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView;
 import org.lamsfoundation.lams.common.style.*
 
 import com.polymercode.Draw;
@@ -52,7 +53,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	private var _canvasController:CanvasController;
 	private var _canvasView:CanvasView;
 	private var _monitorController:MonitorController;
-	private var _monitorView:MonitorView;
+	private var _monitorView;
 	private var _tm:ThemeManager;
 	//TODO:This should be ToolActivity
 	private var _activity:Activity;
@@ -229,7 +230,35 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	 * @usage   
 	 * @return  
 	 */
-	private function draw(){		Debugger.log(_activity.title+',_activity.isGateActivity():'+_activity.isGateActivity(),4,'draw','CanvasActivity');
+	private function draw(){
+		
+		//Code for Drawing learner on the activty. 
+		
+		trace("value of _Module in Canvas Activity: "+_module)
+		trace("Monitor Model is: "+_monitorController.getModel())
+		if (_module == "monitoring"){
+			var mm:MonitorModel = MonitorModel(_monitorController.getModel());
+			trace("all learner progress length in Canvas activity: "+mm.allLearnersProgress.length);
+			
+			// get the length of learners from the Monitor Model and run a for loop.
+			for (var j=0; j<mm.allLearnersProgress.length; j++){
+				var learner:Object = new Object();
+				learner = mm.allLearnersProgress[j]
+				
+				//Gets a true if learner's currect activityID matches this activityID else false.
+				
+				var isLearnerCurrentAct:Boolean = Progress.isLearnerCurrentActivity(learner, _activity.activityID);
+				if (isLearnerCurrentAct){
+					trace(_activity.title+": is the learner's current Activity.")
+					this.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), this.getNextHighestDepth(),{name_lbl:learner.getUserName()});
+				}else {
+					trace(_activity.title+": is not the learner's current Activity.")
+				}
+			}
+			
+		}
+			
+				Debugger.log(_activity.title+',_activity.isGateActivity():'+_activity.isGateActivity(),4,'draw','CanvasActivity');
 		setStyles();
 		
 		var theIcon_mc:MovieClip;
