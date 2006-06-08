@@ -86,11 +86,10 @@ import org.lamsfoundation.lams.tool.ToolContent;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.dao.IToolContentDAO;
 import org.lamsfoundation.lams.tool.dao.IToolDAO;
-import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dao.IWorkspaceFolderDAO;
-import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileUtilException;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
@@ -440,7 +439,23 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 				log.debug("Tool content import success.");
 			}
 			
-			saveLearningDesign(ldDto,importer,workspaceFolderUid,toolMapper);
+			// if workspaceFolderUid == null use the user's default folder
+			WorkspaceFolder folder = null;
+			if ( workspaceFolderUid != null ) {
+				folder = workspaceFolderDAO.getWorkspaceFolderByID(workspaceFolderUid);
+			} 				
+			if ( folder == null && importer.getWorkspace() != null) {
+				folder = importer.getWorkspace().getRootFolder();
+			}
+			if ( folder == null ) {
+				String error = "Unable to save design in a folder - folder not found. Input folder uid="+workspaceFolderUid+
+						" user's default folder "+importer.getWorkspace();
+				log.error(error);
+				throw new ImportToolContentException(error);
+			}
+
+			saveLearningDesign(ldDto,importer,folder,toolMapper);
+			
 		}catch (ToolException e) {
 			throw new ImportToolContentException(e);
 		} catch (FileNotFoundException e) {
@@ -596,7 +611,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
         return applicationContext.getBean(tool.getServiceName());
     }
 	
-	private void saveLearningDesign(LearningDesignDTO dto, User importer, Integer workspaceFolderUid, Map<Long,ToolContent> toolMapper)
+	private void saveLearningDesign(LearningDesignDTO dto, User importer, WorkspaceFolder folder, Map<Long,ToolContent> toolMapper)
 			throws ImportToolContentException {
 
 		//grouping object list
@@ -639,7 +654,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		}
 		
 		
-		LearningDesign ld = getLearningDesign(dto,importer,workspaceFolderUid,actList,transList,activityMapper);
+		LearningDesign ld = getLearningDesign(dto,importer,folder,actList,transList,activityMapper);
 //		persist
 		learningDesignDAO.insert(ld);
 	}
@@ -656,7 +671,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	 * @return
 	 * @throws ImportToolContentException 
 	 */
-	private LearningDesign getLearningDesign(LearningDesignDTO dto, User importer, Integer workspaceFolderUid,
+	private LearningDesign getLearningDesign(LearningDesignDTO dto, User importer, WorkspaceFolder folder,
 			Set<Activity> actList, Set<Transition> transList, Map<Long, Activity> activityMapper) throws ImportToolContentException {
 		LearningDesign ld = new LearningDesign();
 	
@@ -691,8 +706,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		ld.setCreateDateTime(dto.getCreateDateTime());
 		ld.setVersion(dto.getVersion());
 		
-		if(workspaceFolderUid != null)
-			ld.setWorkspaceFolder(workspaceFolderDAO.getWorkspaceFolderByID(workspaceFolderUid));
+		if(folder != null)
+			ld.setWorkspaceFolder(folder);
 								 
 		ld.setDuration(dto.getDuration());
 		ld.setLicenseText(dto.getLicenseText());
