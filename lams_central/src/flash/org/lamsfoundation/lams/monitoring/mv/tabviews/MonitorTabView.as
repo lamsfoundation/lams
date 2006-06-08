@@ -232,6 +232,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 		return s;
 	}
 	
+	
 	/**
 	 * Draws new activity to monitor tab view stage.
 	 * @usage   

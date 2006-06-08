@@ -273,7 +273,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		}
 	}
 	
-	public function compareProgressData(learner, activityID):String{
+	/*public function compareProgressData(learner, activityID):String{
 		trace ("activity ID passed is: "+activityID)
 		trace("Number of Activities completed in the lesson are: "+learner.getCompletedActivities().length)
 		
@@ -306,7 +306,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 			var clipName:String = "current_mc";
 			return clipName;
 		}
-	}
+	}*/
 	/**
 	 * Remove the activityies from screen on selection of new lesson
 	 * 
