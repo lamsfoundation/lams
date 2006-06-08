@@ -126,49 +126,65 @@ public class LearningUtil implements QaAppConstants{
     	
     	logger.debug("qaQueUsr uid:" + qaQueUsr.getUid());
     	
-        while (contentIterator.hasNext())
+    	
+    	boolean isResponseFinalized=qaQueUsr.isResponseFinalized();
+    	logger.debug("isResponseFinalized: " + isResponseFinalized);
+    	
+    	if (!isResponseFinalized)
     	{
-    		QaQueContent qaQueContent=(QaQueContent)contentIterator.next();
-    		if (qaQueContent != null)
-    		{
-    		    logger.debug("qaQueContent uid:" + qaQueContent.getUid());
-    		    
-        		String question=qaQueContent.getQuestion();
-        		String displayOrder=new Long(qaQueContent.getDisplayOrder()).toString();
-        		String answer=(String)mapAnswers.get(displayOrder);
-        		
-                logger.debug("iterationg question-answers: displayOrder: " + displayOrder + 
-         													 " question: " + question + " answer: " + answer);
-        		
-                String timezoneId=(String)request.getSession().getAttribute(TIMEZONE_ID);
-                if (timezoneId == null) timezoneId="";
-                
-                List attempts=qaService.getAttemptsForUserAndQuestionContent(qaQueUsr.getUid(), qaQueContent.getUid());
-                logger.debug("attempts:" + attempts);
-                
-                if ((attempts != null) && (attempts.size() > 0))
-                {
-                    logger.debug("this user already responsed to q/a in this session:");
-                }
-                else
-                {
-                    logger.debug("creating response.");
-                	QaUsrResp qaUsrResp= new QaUsrResp(answer,false,
-    						new Date(System.currentTimeMillis()),
-    						timezoneId,
-    						qaQueContent,
-    						qaQueUsr); 
+    	  	logger.debug("isResponseFinalized is false, so creating the responses: ");
+            while (contentIterator.hasNext())
+        	{
+        		QaQueContent qaQueContent=(QaQueContent)contentIterator.next();
+        		if (qaQueContent != null)
+        		{
+        		    logger.debug("qaQueContent uid:" + qaQueContent.getUid());
+        		    
+            		String question=qaQueContent.getQuestion();
+            		String displayOrder=new Long(qaQueContent.getDisplayOrder()).toString();
+            		String answer=(String)mapAnswers.get(displayOrder);
+            		
+                    logger.debug("iterationg question-answers: displayOrder: " + displayOrder + 
+             													 " question: " + question + " answer: " + answer);
+            		
+                    String timezoneId=(String)request.getSession().getAttribute(TIMEZONE_ID);
+                    if (timezoneId == null) timezoneId="";
+                    
+                    List attempts=qaService.getAttemptsForUserAndQuestionContent(qaQueUsr.getUid(), qaQueContent.getUid());
+                    logger.debug("attempts:" + attempts);
+                    
+                    if ((attempts != null) && (attempts.size() > 0))
+                    {
+                        logger.debug("this user already responsed to q/a in this session:");
+                    }
+                    else
+                    {
+                        logger.debug("creating response.");
+                    	QaUsrResp qaUsrResp= new QaUsrResp(answer,false,
+        						new Date(System.currentTimeMillis()),
+        						timezoneId,
+        						qaQueContent,
+        						qaQueUsr); 
 
-    				logger.debug("iterationg qaUsrResp: " + qaUsrResp);
-    				if (qaUsrResp != null)
-    				{
-    					qaService.createQaUsrResp(qaUsrResp);
-    					logger.debug("created qaUsrResp in the db");	
-    				}
-                }
-    		}
-        }
-        logger.debug("both the users and their responses created in the db");
+        				logger.debug("iterationg qaUsrResp: " + qaUsrResp);
+        				if (qaUsrResp != null)
+        				{
+        					qaService.createQaUsrResp(qaUsrResp);
+        					logger.debug("created qaUsrResp in the db");	
+        				}
+                    }
+        		}
+            }
+
+    	}
+    	
+		logger.debug("current user is: " + qaQueUsr);
+		if (qaQueUsr != null)
+		{
+			qaQueUsr.setResponseFinalized(true);
+			logger.debug("finalized user input");
+			qaService.updateQaQueUsr(qaQueUsr);
+		}
     }
 
     

@@ -101,7 +101,6 @@ import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaContent;
-import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
@@ -171,6 +170,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
     	}
     	else
     	{
+    	    logger.debug("the listing mode is sequential");
     		if (totalQuestionCount.equals("1"))
     		{
     			logger.debug("totalQuestionCount is 1: " + qaLearningForm.getAnswer());
@@ -178,65 +178,21 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
     		}
     		else 
     		{
+    		    logger.debug("populating mapAnswers...");
+    		    mapAnswers=populateAnswersMap(mapping, form, request, response);
+    		    logger.debug("mapAnswers: " + mapAnswers);
+    		    /*
     			logger.debug("totalQuestionCount is > 1: " + qaLearningForm.getAnswer());
     			int mapSize=mapAnswers.size();
     			logger.debug("mapSize: " + mapSize);
-    			mapAnswers.put(new Long(mapSize+1).toString() , qaLearningForm.getAnswer());
+    			mapAnswers.put(new Long(mapSize).toString() , qaLearningForm.getAnswer());
+    			*/
     		}
     		
     	}
     	logger.debug(logger + " " + this.getClass().getName() +  "final mapAnswers: " + mapAnswers);
     	request.getSession().setAttribute(MAP_ANSWERS, mapAnswers);
     	
-    	
-    	IQaService qaService = (IQaService)request.getSession().getAttribute(TOOL_SERVICE);
-		logger.debug("qaService: " + qaService);
-		if (qaService == null)
-		{
-			logger.debug("will retrieve qaService");
-			qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-			logger.debug("retrieving qaService from session: " + qaService);
-		}
-
-	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
-	    logger.debug("toolContentId: " + toolContentId);
-	    
-	    QaContent qaContent=qaService.loadQa(toolContentId.longValue());
-		logger.debug("existing qaContent:" + qaContent);
-
-	    /*recreate the users and responses*/
-        LearningUtil learningUtil= new LearningUtil();
-        learningUtil.createUsersAndResponses(mapAnswers, request, qaService);
-        qaLearningForm.resetUserActions();
-        qaLearningForm.setSubmitAnswersContent(null);
-        
-        learningUtil.setContentInUse(toolContentId.longValue(), qaService);
-        logger.debug("content has been set in use");
-        
-        logger.debug("start generating learning report...");
-        Long toolContentID=(Long) request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	    logger.debug("toolContentID: " + toolContentID);
-	    
-	   
-	    String userID= (String)request.getSession().getAttribute(USER_ID);
-		logger.debug("userID: " + userID);
-		QaQueUsr qaQueUsr=qaService.getQaQueUsrById(new Long(userID).longValue());
-		logger.debug("the current user qaQueUsr " + qaQueUsr + " and username: "  + qaQueUsr.getUsername());
-		logger.debug("the current user qaQueUsr's session  " + qaQueUsr.getQaSession());
-		String currentSessionId=qaQueUsr.getQaSession().getQaSessionId().toString();
-		logger.debug("the current user SessionId  " + currentSessionId);
-		    	    
-	    
-	    Boolean isUserNamesVisibleBoolean=(Boolean)request.getSession().getAttribute(IS_USERNAME_VISIBLE);
-    	boolean isUserNamesVisible=isUserNamesVisibleBoolean.booleanValue();
-    	logger.debug("isUserNamesVisible: " + isUserNamesVisible);
-	    
-    	QaMonitoringAction qaMonitoringAction= new QaMonitoringAction();
-    	/*the report should have all the users' entries OR
-    	 * the report should have only the current session's entries*/
-    	qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, isUserNamesVisible, true, currentSessionId, userID);
-    	
-		request.getSession().setAttribute(REQUEST_LEARNING_REPORT, new Boolean(true).toString());
 		logger.debug("fwd'ing to." + INDIVIDUAL_LEARNER_RESULTS);
 		return (mapping.findForward(INDIVIDUAL_LEARNER_RESULTS));
 	}
@@ -290,18 +246,33 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 		Boolean isUserNamesVisibleBoolean=(Boolean)request.getSession().getAttribute(IS_USERNAME_VISIBLE);
     	boolean isUserNamesVisible=isUserNamesVisibleBoolean.booleanValue();
     	logger.debug("isUserNamesVisible: " + isUserNamesVisible);
-    	
+
+		
+		Map mapAnswers=(Map)request.getSession().getAttribute(MAP_ANSWERS);
+		logger.debug("mapAnswers: " + mapAnswers);
+
+	    /*recreate the users and responses*/
+        LearningUtil learningUtil= new LearningUtil();
+        learningUtil.createUsersAndResponses(mapAnswers, request, qaService);
+        qaLearningForm.resetUserActions();
+        qaLearningForm.setSubmitAnswersContent(null);
+        
+        learningUtil.setContentInUse(toolContentId.longValue(), qaService);
+        logger.debug("content has been set in use");
+        
+        logger.debug("start generating learning report...");
+        Long toolContentID=(Long) request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
+	    logger.debug("toolContentID: " + toolContentID);
+	    
+    	/*the report should have all the users' entries OR
+    	 * the report should have only the current session's entries*/
+	    //logger.debug("generating summary data: ");
+    	//qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, isUserNamesVisible, true, toolSessionId.toString(), userID);
+
+	    
     	QaMonitoringAction qaMonitoringAction= new QaMonitoringAction();
     	qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, isUserNamesVisible, true, toolSessionId.toString(), null);
 
-	    String userID= (String)request.getSession().getAttribute(USER_ID);
-		logger.debug("userID: " + userID);
-		QaQueUsr qaQueUsr=qaService.getQaUserBySession(new Long(userID), qaSession.getUid());
-		logger.debug("current user is: " + qaQueUsr);
-		qaQueUsr.setResponseFinalized(true);
-		logger.debug("finalized user input");
-		qaService.updateQaQueUsr(qaQueUsr);
-    	
 		request.getSession().setAttribute(REQUEST_LEARNING_REPORT, new Boolean(true).toString());
 		request.getSession().setAttribute(REQUEST_LEARNING_REPORT_PROGRESS, new Boolean(false).toString());
 		logger.debug("fwd'ing to: " + LEARNER_REPORT);
@@ -328,6 +299,15 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
     	throws IOException, ServletException, ToolException
 	{
     	logger.debug("dispatching getNextQuestion...");
+    	populateAnswersMap(mapping, form, request, response);
+    	
+        return (mapping.findForward(LOAD_LEARNER));
+    }
+    
+    
+    public Map populateAnswersMap(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+    {
+    	logger.debug("doing populateAnswersMap");
     	QaLearningForm qaLearningForm = (QaLearningForm) form;
 
     	Map mapAnswers=(Map)request.getSession().getAttribute(MAP_ANSWERS);
@@ -358,8 +338,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
         
         request.getSession().setAttribute(MAP_ANSWERS, mapAnswers);
         logger.debug("final MAP_ANSWERS: " + mapAnswers);
-        
-        return (mapping.findForward(LOAD_LEARNER));
+        return mapAnswers;
     }
     
     
