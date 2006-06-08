@@ -80,6 +80,7 @@ class LessonController extends AbstractController {
 	public function activityDoubleClick(ca:Object):Void{
 		setBusy()
 	   Debugger.log('activityDoubleClick CanvasActivity:'+ca.activity.activityID + ' status: ' + ca.activityStatus,Debugger.GEN,'activityDoubleClick','LessonController');
+	   
 	   if(ca.activity.activityTypeID == Activity.TOOL_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE){
 			
 			if(ca.activityStatus != undefined){
@@ -96,14 +97,14 @@ class LessonController extends AbstractController {
 	   clearBusy();
 	}
    
-   public function activityRelease(ca:Object):Void{
+    public function activityRelease(ca:Object):Void{
 	   Debugger.log('activityRelease CanvasActivity:'+ca.activity.activityID,Debugger.GEN,'activityRelease','LessonController');
 	    
 	}
 	
-   public function activityReleaseOutside(ca:Object):Void{
+    public function activityReleaseOutside(ca:Object):Void{
 	   Debugger.log('activityReleaseOutside CanvasActivity:'+ca.activity.activityID,Debugger.GEN,'activityReleaseOutside','LessonController');
-   }
+    }
 	
 	public function setBusy(){
 		_isBusy = true;
