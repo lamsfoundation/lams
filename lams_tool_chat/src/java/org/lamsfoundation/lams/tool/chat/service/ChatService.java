@@ -26,9 +26,19 @@ package org.lamsfoundation.lams.tool.chat.service;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -70,15 +80,20 @@ import org.lamsfoundation.lams.tool.chat.model.ChatSession;
 import org.lamsfoundation.lams.tool.chat.model.ChatUser;
 import org.lamsfoundation.lams.tool.chat.util.ChatConstants;
 import org.lamsfoundation.lams.tool.chat.util.ChatException;
+import org.lamsfoundation.lams.tool.chat.util.ChatMessageFilter;
 import org.lamsfoundation.lams.tool.chat.util.ChatToolContentHandler;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.audit.IAuditService;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.Text;
 
 /**
  * An implementation of the NoticeboardService interface.
@@ -109,6 +124,8 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 	private IToolContentHandler chatToolContentHandler = null;
 
 	private IRepositoryService repositoryService = null;
+	
+	private IAuditService auditService = null;
 
 	private IExportToolContentService exportContentService;
 	
@@ -267,6 +284,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 		}
 	}
 
+
     /**
      * Import the XML fragment for the tool's content, along with any files needed
      * for the content.
@@ -370,6 +388,15 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 		return chatUserDAO.getByLoginNameAndSessionId(loginName, toolSessionId);
 	}
 
+	public ChatUser getUserByJabberIDAndJabberRoom(String jabberID,
+			String jabberRoom) {
+		return chatUserDAO.getByJabberIDAndJabberRoom(jabberID, jabberRoom);
+	}
+
+	public List getMessagesForUser(ChatUser chatUser) {
+		return chatMessageDAO.getForUser(chatUser);
+	}
+
 	public ChatAttachment uploadFileToContent(Long toolContentId,
 			FormFile file, String type) {
 		if (file == null || StringUtils.isEmpty(file.getFileName()))
@@ -405,6 +432,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 	}
 
 	public void saveOrUpdateChat(Chat chat) {
+		updateMessageFilters(chat);
 		chatDAO.saveOrUpdate(chat);
 	}
 
@@ -468,6 +496,8 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 			muc.sendConfigurationForm(submitForm);
 
 			chatSession.setJabberRoom(jabberRoom);
+			con.close();
+			
 		} catch (XMPPException e) {
 			logger.error(e);
 		}
@@ -483,19 +513,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 			Node to = nnm.getNamedItem("to");
 			Node type = nnm.getNamedItem("type");
 
-			// handle message children elements
-			NodeList nl = message.getChildNodes();
-			Node body = null;
-			for (int j = 0; j < nl.getLength(); j++) {
-				// We are looking for the <body> element.
-				// More than one may exists, we will take the first one we see
-				// We ignore <subject> and <thread> elements
-				Node msgChild = nl.item(j);
-				if (msgChild.getNodeName() == "body") {
-					body = msgChild;
-					break;
-				}
-			}
+			Node body = getBodyElement(message);
 
 			// save the messages.
 			ChatMessage chatMessage = new ChatMessage();
@@ -529,6 +547,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 			ChatSession chatSession = this.getSessionByJabberRoom(jabberRoom);
 			ChatUser toChatUser = getUserByLoginNameAndSessionId(toNick,
 					chatSession.getSessionId());
+			chatMessage.setChatSession(chatSession);
 			chatMessage.setToUser(toChatUser);
 
 			// setting from field
@@ -554,8 +573,6 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 					.getSessionId());
 			chatMessage.setFromUser(fromUser);
 
-			logger.debug(System.getProperty("java version"));
-
 			chatMessage.setType(type.getNodeValue());
 			Node bodyText = body.getFirstChild();
 			String bodyTextStr = "";
@@ -563,16 +580,217 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 				bodyTextStr = bodyText.getNodeValue();
 			}
 			chatMessage.setBody(bodyTextStr);
+			chatMessage.setSendDate(new Date());
+			chatMessage.setHidden(Boolean.FALSE);
 			saveOrUpdateChatMessage(chatMessage);
 		}
 	}
 
-	public void processIncomingPresence(NodeList presenceElems) {
-		// TODO Auto-generated method stub
+	public List<Node> processIncomingPresence(Node presence) {
+		NamedNodeMap nnm = presence.getAttributes();
 
+		Node from = nnm.getNamedItem("from");
+		Node to = nnm.getNamedItem("to");
+		if (from == null || to == null) {
+			// somethings wrong, return empty list
+			logger.debug("malformed presence xml: no from or to attributes present");
+			return null;
+		}
+		
+		// TODO, do we really need to check this  ??
+		// checking presence packet for correct values
+		Node xElem = presence.getFirstChild();
+		if (xElem == null) {
+			logger.debug("malformed presence xml: no x element present");
+		}
+		nnm = xElem.getAttributes();
+		Node xmlns = nnm.getNamedItem("xmlns");
+		if (xmlns == null || !xmlns.getNodeValue().equals("http://jabber.org/protocol/muc")) {
+			logger.debug("malformed presence xml: xmlns attribute for x element not available or incorrect");
+			return null;
+		}
+
+		// get the Chat User
+		String jabberID = from.getNodeValue().split("/")[0];
+		String jabberRoom = to.getNodeValue().split("/")[0];
+
+		ChatUser chatUser = getUserByJabberIDAndJabberRoom(jabberID, jabberRoom);
+
+		List chatMessageList = getMessagesForUser(chatUser);
+		logger.debug("MESSAGE COUNT" + chatMessageList.size());
+
+		List<Node> xmlMessageList = new ArrayList<Node>();
+		try {
+			DocumentBuilderFactory factory = DocumentBuilderFactory
+					.newInstance();
+			DocumentBuilder builder = factory.newDocumentBuilder();
+			Document document = builder.newDocument();
+			for (Iterator iter = chatMessageList.iterator(); iter.hasNext();) {
+				ChatMessage message = (ChatMessage) iter.next();
+
+				Element messageElement = document.createElement("message");
+				messageElement.setAttribute("from", jabberRoom + "/"
+						+ message.getFromUser().getLoginName());
+				messageElement
+						.setAttribute("to", jabberID + "/lams_chatclient");
+				messageElement.setAttribute("type", message.getType());
+
+				Element bodyElement = document.createElement("body");
+				Text bodyText = document.createTextNode(message.getBody());
+				bodyElement.appendChild(bodyText);
+
+				Element xElement = document.createElement("x");
+				xElement.setAttribute("xmlns", "jabber:x:delay");
+				xElement.setAttribute("stamp", "TODO"); // TODO generate the stamp attribute
+				xElement.setAttribute("from", jabberRoom + "/"
+						+ message.getFromUser().getLoginName());
+
+				messageElement.appendChild(bodyElement);
+				messageElement.appendChild(xElement);
+
+				xmlMessageList.add(messageElement);
+				//printXMLNode(messageElement, "");
+			}
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+			logger.debug("parser configuration exception");
+			return null;
+		}
+		return xmlMessageList;
+	}
+
+	private void printXMLNode(Node node, String tab) {
+		System.out.print(tab + node.getNodeName() + ":");
+		
+		NamedNodeMap nnm = node.getAttributes();
+		for (int j = 0; j < nnm.getLength(); j++) {
+			Node m = nnm.item(j);
+			System.out.print(" " + m.getNodeName() + "=" + m.getNodeValue());
+		}
+		System.out.print(" => " + node.getNodeValue() + "\n");
+		
+		NodeList nl = node.getChildNodes();
+		for (int i = 0; i < nl.getLength(); i++) {
+			Node n = nl.item(i);		
+			printXMLNode(n, tab + "    ");
+		}
+		
+	}
+
+	public void filterMessage(Node message) {
+		NamedNodeMap nnm = message.getAttributes();
+		String from = nnm.getNamedItem("from").getNodeValue();
+
+		// extracting jabber room.
+		int index = from.lastIndexOf("/");
+		String jabberRoom;
+		if (index != -1) {
+			jabberRoom = from.substring(0, index);
+		} else {
+			jabberRoom = from;
+		}
+
+		// get the chat content3
+		Chat chat = getSessionByJabberRoom(jabberRoom).getChat();
+
+		if (!chat.getFilteringEnabled()) {
+			return;
+		}
+
+		// get the filter
+		ChatMessageFilter filter = messageFilters.get(chat.getToolContentId());
+		if (filter == null) {
+			// this is the first message we have see for this toolContentId
+			// update the available filters.
+			filter = updateMessageFilters(chat);
+		}
+
+		// get the pattern
+		Pattern pattern = filter.getPattern();
+		if (pattern == null) {
+			// no pattern available. This occurs when filtering is enabled but
+			// no valid keywords have been defined.
+			return;
+		}
+
+		// get the message body node
+		Node body = getBodyElement(message);
+		if (body == null) {
+			// no body node present
+			return;
+		}
+
+		// get the text node
+		Node bodyText = body.getFirstChild();
+		if (bodyText == null) {
+			// no text present
+			return;
+		}
+
+		// filter the message.
+		Matcher matcher = pattern.matcher(bodyText.getNodeValue());
+		bodyText.setNodeValue(matcher.replaceAll("***"));
+	}
+
+	public ChatMessageFilter updateMessageFilters(Chat chat) {
+		ChatMessageFilter filter = new ChatMessageFilter(chat);
+		messageFilters.put(chat.getToolContentId(), filter);
+		return filter;
+	}
+	
+	public ChatMessage getMessageByUID(Long messageUID) {
+		return chatMessageDAO.getByUID(messageUID);
+	}
+
+		public List getLastestMessages(ChatSession chatSession, int max) {
+		return chatMessageDAO.getLatest(chatSession, max);		
+	}
+
+	public IAuditService getAuditService() {
+		return auditService;
+	}
+
+	public void setAuditService(IAuditService auditService) {
+		this.auditService = auditService;
+	}
+	
+	public void auditEditMessage(ChatMessage chatMessage, String messageBody) {
+		auditService.logChange(ChatConstants.TOOL_SIGNATURE,
+	 			chatMessage.getFromUser().getUserId(), chatMessage.getFromUser().getLoginName(),
+	 			chatMessage.getBody(), messageBody);
+	}
+
+	public void auditHideShowMessage(ChatMessage chatMessage, boolean messageHidden) {
+		if ( messageHidden ) {
+			auditService.logHideEntry(ChatConstants.TOOL_SIGNATURE, chatMessage.getFromUser().getUserId(), 
+					chatMessage.getFromUser().getLoginName(), chatMessage.toString());
+		} else {
+			auditService.logShowEntry(ChatConstants.TOOL_SIGNATURE, chatMessage.getFromUser().getUserId(), 
+					chatMessage.getFromUser().getLoginName(), chatMessage.toString());
+		}
 	}
 
 	/* ********** Private methods ********** */
+	private Map<Long, ChatMessageFilter> messageFilters = new ConcurrentHashMap<Long, ChatMessageFilter>();
+
+	private Node getBodyElement(Node message) {
+		// get the body element
+		NodeList nl = message.getChildNodes();
+		Node body = null;
+		for (int j = 0; j < nl.getLength(); j++) {
+			// We are looking for the <body> element.
+			// More than one may exists, we will take the first one we see
+			// We ignore <subject> and <thread> elements
+			// TODO check that the first one is right. may have problems with
+			// multiple langauges.
+			Node msgChild = nl.item(j);
+			if (msgChild.getNodeName() == "body") {
+				body = msgChild;
+				break;
+			}
+		}
+		return body;
+	}
 
 	/**
 	 * Registers a new Jabber Id on the jabber server using the users login as
@@ -594,8 +812,9 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 
 		} catch (XMPPException e) {
 			logger.error(e);
+			// TODO handle exception
 		}
-		return user.getLogin() + "@" + ChatConstants.XMPPDOMAIN;
+		return user.getUserID() + "@" + ChatConstants.XMPPDOMAIN;
 	}
 
 	private NodeKey processFile(FormFile file, String type) {
