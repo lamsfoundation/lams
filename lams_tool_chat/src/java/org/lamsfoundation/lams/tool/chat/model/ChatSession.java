@@ -63,6 +63,8 @@ public class ChatSession implements java.io.Serializable {
 	private Set chatUsers = new HashSet(0);
 	
 	private String jabberRoom;
+	
+	private Set chatMessages;
 
 	// Constructors
 
@@ -178,7 +180,7 @@ public class ChatSession implements java.io.Serializable {
 
 	/**
 	 * @hibernate.set lazy="true" inverse="true" cascade="none"
-	 * @hibernate.collection-key column="session_id"
+	 * @hibernate.collection-key column="chat_session_uid"
 	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.chat.model.ChatUser"
 	 * 
 	 */
@@ -201,6 +203,21 @@ public class ChatSession implements java.io.Serializable {
 	public void setJabberRoom(String jabberRoom) {
 		this.jabberRoom = jabberRoom;
 	}
+	
+	/**
+	 * @hibernate.set lazy="true" inverse="true" cascade="none"
+	 * @hibernate.collection-key column="chat_session_uid"
+	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.chat.model.ChatMessage"
+	 * 
+	 */
+
+	public Set getChatMessages() {
+		return this.chatMessages;
+	}
+
+	public void setChatMessages(Set chatMessages) {
+		this.chatMessages = chatMessages;
+	}
 
 	/**
 	 * toString
@@ -217,7 +234,7 @@ public class ChatSession implements java.io.Serializable {
 		buffer.append("sessionStartDate").append("='").append(
 				getSessionStartDate()).append("' ");
 		buffer.append("status").append("='").append(getStatus()).append("' ");
-		buffer.append("sessionId").append("='").append(getSessionId()).append(
+		buffer.append("sessionID").append("='").append(getSessionId()).append(
 				"' ");
 		buffer.append("sessionName").append("='").append(getSessionName())
 				.append("' ");
