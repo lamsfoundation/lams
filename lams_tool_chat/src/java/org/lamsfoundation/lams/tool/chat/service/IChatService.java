@@ -24,6 +24,8 @@
 
 package org.lamsfoundation.lams.tool.chat.service;
 
+import java.util.List;
+
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.tool.chat.model.Chat;
 import org.lamsfoundation.lams.tool.chat.model.ChatAttachment;
@@ -31,7 +33,9 @@ import org.lamsfoundation.lams.tool.chat.model.ChatMessage;
 import org.lamsfoundation.lams.tool.chat.model.ChatSession;
 import org.lamsfoundation.lams.tool.chat.model.ChatUser;
 import org.lamsfoundation.lams.tool.chat.util.ChatException;
+import org.lamsfoundation.lams.tool.chat.util.ChatMessageFilter;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
@@ -121,10 +125,18 @@ public interface IChatService {
 	/**
 	 * 
 	 * @param loginName
-	 * @param sessionId
+	 * @param sessionID
 	 * @return
 	 */
 	public ChatUser getUserByLoginNameAndSessionId(String loginName, Long sessionId);
+	
+	/**
+	 * 
+	 * @param jabberID
+	 * @param jabberRoom
+	 * @return
+	 */
+	public ChatUser getUserByJabberIDAndJabberRoom(String jabberID, String jabberRoom);
 	
 	/**
 	 * 
@@ -132,6 +144,17 @@ public interface IChatService {
 	 */
 	public void saveOrUpdateChatUser(ChatUser chatUser);
 	
+	/**
+	 * 
+	 * @param chatUser
+	 * @return
+	 */
+	public List getMessagesForUser(ChatUser chatUser);
+	
+	/**
+	 * 
+	 * @param chatMessage
+	 */
 	public void saveOrUpdateChatMessage(ChatMessage chatMessage);	
 	
 	/**
@@ -158,6 +181,31 @@ public interface IChatService {
 	 * 
 	 * @param presenceElems
 	 */
-	public void processIncomingPresence(NodeList presenceElems);
+	public List<Node> processIncomingPresence(Node presence);
 	
+	/**
+	 * 
+	 * @param toolContentID
+	 * @param pattern
+	 */
+	public ChatMessageFilter updateMessageFilters(Chat chat); 
+		
+	/**
+	 * 
+	 * @param node
+	 */
+	public void filterMessage(Node message);
+	
+	/**
+	 * 
+	 * @param messageUID
+	 * @return
+	 */
+	public ChatMessage getMessageByUID(Long messageUID);
+	
+	public List getLastestMessages(ChatSession chatSession, int max);
+
+	public void auditEditMessage(ChatMessage chatMessage, String messageBody);
+
+	public void auditHideShowMessage(ChatMessage chatMessage, boolean messageHidden );
 }
