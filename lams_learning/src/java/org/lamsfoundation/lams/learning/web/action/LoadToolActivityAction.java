@@ -71,9 +71,8 @@ public class LoadToolActivityAction extends ActivityAction {
 				
 		form.setActivityId(activity.getActivityId());
 		
-		if (activity.isToolActivity() || activity.isSystemToolActivity() ) { 
-			String url = actionMappings.getLearnerToolURL(learnerProgress.getLesson().getLessonId(),
-					activity, learnerProgress.getUser());
+		if (activity.isToolActivity() || activity.isSystemToolActivity() ) {
+			String url = actionMappings.getLearnerToolURL(learnerProgress.getLesson(),activity, learnerProgress.getUser());
 			form.addActivityURL(new ActivityURL(activity.getActivityId(),url));
 		} else {
 		    log.error(className+": activity not ToolActivity");

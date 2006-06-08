@@ -376,7 +376,7 @@ public class LearnerAction extends LamsDispatchAction
 	        //preparing tranfer object for flash
 	        LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgressByUser(request,getServlet().getServletContext());
 	        ProgressActivityDTO activityDTO = new ProgressActivityDTO(new Long(activityId),
-	                 activityMapping.calculateActivityURLForProgressView(learnerProgress.getLesson().getLessonId(),learner,requestedActivity));
+	                 activityMapping.calculateActivityURLForProgressView(learnerProgress.getLesson(),learner,requestedActivity));
 	        //send data back to flash.
 	        message = new FlashMessage("getLearnerActivityURL",activityDTO);
 

@@ -71,8 +71,7 @@ public class DisplayToolActivityAction extends ActivityAction {
 		
 		ToolActivity toolActivity = (ToolActivity)activity;
 
-		String url = actionMappings.getLearnerToolURL(learnerProgress.getLesson().getLessonId(),
-				toolActivity, learnerProgress.getUser());
+		String url = actionMappings.getLearnerToolURL(learnerProgress.getLesson(), toolActivity, learnerProgress.getUser());
 		try 
 		{
 		    response.sendRedirect(url);
