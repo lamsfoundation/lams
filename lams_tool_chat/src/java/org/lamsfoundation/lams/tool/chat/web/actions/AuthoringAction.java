@@ -364,20 +364,13 @@ public class AuthoringAction extends LamsDispatchAction {
 	 * @return
 	 */
 	private void populateChat(Chat chat, AuthoringForm authForm) {
-		// Extract data from AuthoringForm
-		String title = (String) authForm.getTitle();
-		String instructions = (String) authForm.getInstructions();
-		String online_instruction = (String) authForm.getOnlineInstruction();
-		String offline_instruction = (String) authForm.getOfflineInstruction();
-		String value = (String) authForm.getLockOnFinished();
-		boolean lock_on_finished = StringUtils.isEmpty(value) ? false : true;
-
-		// update chat object.
-		chat.setTitle(title);
-		chat.setInstructions(instructions);
-		chat.setOfflineInstructions(offline_instruction);
-		chat.setOnlineInstructions(online_instruction);
-		chat.setLockOnFinished(lock_on_finished);
+		chat.setTitle(authForm.getTitle());
+		chat.setInstructions(authForm.getInstructions());
+		chat.setOfflineInstructions(authForm.getOnlineInstruction());
+		chat.setOnlineInstructions(authForm.getOfflineInstruction());
+		chat.setLockOnFinished(authForm.isLockOnFinished());
+		chat.setFilteringEnabled(authForm.isFilteringEnabled());
+		chat.setFilterKeywords(authForm.getFilterKeywords());
 	}
 
 	/**
@@ -393,6 +386,9 @@ public class AuthoringAction extends LamsDispatchAction {
 		authForm.setInstructions(chat.getInstructions());
 		authForm.setOnlineInstruction(chat.getOnlineInstructions());
 		authForm.setOfflineInstruction(chat.getOfflineInstructions());
+		authForm.setLockOnFinished(chat.getLockOnFinished());
+		authForm.setFilteringEnabled(chat.getFilteringEnabled());
+		authForm.setFilterKeywords(chat.getFilterKeywords());
 		// TODO add the rest.
 	}
 
