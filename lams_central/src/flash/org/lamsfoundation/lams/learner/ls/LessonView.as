@@ -43,6 +43,7 @@ import mx.events.*
 */
 class LessonView extends AbstractView {
 	
+	private static var ACTIVITY_OFFSET = 65;
 	private var _className = "LessonView";
 	private var _depth:Number;
 	
@@ -194,24 +195,17 @@ class LessonView extends AbstractView {
 		
 		//take action depending on act type
 		if(a.activityTypeID==Activity.TOOL_ACTIVITY_TYPE || a.isGateActivity() || a.isGroupActivity() ){
-			newActivity_mc = _activityLayer_mc.attachMovie("LearnerActivityVertical", "LearnerActivityVertical" + a.activityID, _activityLayer_mc.getNextHighestDepth(),{_activity:a,_lessonController:lc,_lessonView:lv, _x:ACT_X+25, _y:ACT_Y, actLabel:a.title, learner:lm.progressData});
-			ACT_Y = newActivity_mc._y + newActivity_mc._height;
+			newActivity_mc = _activityLayer_mc.attachMovie("LearnerActivity", "LearnerActivity" + a.activityID, _activityLayer_mc.getNextHighestDepth(),{_activity:a,_controller:lc,_view:lv, _x:ACT_X+25, _y:ACT_Y, actLabel:a.title, learner:lm.progressData});
+			ACT_Y = newActivity_mc._y + ACTIVITY_OFFSET;
 			Debugger.log('The activity:'+a.title+','+a.activityTypeID+' is tool/gate/group activity',Debugger.CRITICAL,'drawActivity','LessonView');
-		}else if(a.activityTypeID==Activity.PARALLEL_ACTIVITY_TYPE){
+		}else if(a.activityTypeID==Activity.PARALLEL_ACTIVITY_TYPE || a.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE){
 			//get the children
 			var children:Array = lm.learningDesignModel.getComplexActivityChildren(a.activityUIID);
 			Debugger.log('The activity:'+a.title+','+a.activityTypeID+' is is parellel (complex) activity',Debugger.CRITICAL,'drawActivity','LessonView');
 		
-			newActivity_mc = _activityLayer_mc.attachMovie("LearnerParallelActivityVertical", "LearnerParallelActivityVertical" + a.activityID, _activityLayer_mc.getNextHighestDepth(),{_activity:a,_children:children,_lessonController:lc,_lessonView:lv, _x:ACT_X+25, _y:ACT_Y, learner:lm.progressData});
-			ACT_Y = newActivity_mc._y + newActivity_mc._height;
+			newActivity_mc = _activityLayer_mc.attachMovie("LearnerComplexActivity", "LearnerComplexActivity" + a.activityID, _activityLayer_mc.getNextHighestDepth(),{_activity:a,_children:children,_controller:lc,_view:lv, _x:ACT_X+25, _y:ACT_Y, learner:lm.progressData});
+			ACT_Y = newActivity_mc._y + ACTIVITY_OFFSET;
 			
-		}else if(a.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE){
-			var children:Array = lm.learningDesignModel.getComplexActivityChildren(a.activityUIID);
-			Debugger.log('The activity:'+a.title+','+a.activityTypeID+' is optional (complex) activity',Debugger.CRITICAL,'drawActivity','LessonView');
-		
-			newActivity_mc = _activityLayer_mc.attachMovie("LearnerOptionalActivityVertical","LearnerOptionalActivityVertical" + a.activityID, _activityLayer_mc.getNextHighestDepth(),{_activity:a,_children:children,_lessonController:lc,_lessonView:lv, _x:ACT_X+25, _y:ACT_Y, learner:lm.progressData});
-			ACT_Y = newActivity_mc._y + newActivity_mc._height;
-		
 		}else{
 			Debugger.log('The activity:'+a.title+','+a.activityUIID+' is of unknown type, it cannot be drawn',Debugger.CRITICAL,'drawActivity','LessonView');
 		}
