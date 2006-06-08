@@ -56,6 +56,7 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 	private var title_lbl : Label;
 	
 	//locals
+	private var actStatus:String;
 	private var childActivities_mc : MovieClip;
 	private var complexActivity_mc : MovieClip;
 	
@@ -79,11 +80,13 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 	
 	private var _tm : ThemeManager;
 	private var _ddm : DesignDataModel;
+	private var app:ApplicationParent;
 	
 	function LearnerComplexActivity ()
 	{
 		complexActivity_mc = this
 		_ddm = new DesignDataModel ();
+		app = ApplicationParent.getInstance();
 		_visible = false;
 		_tm = ThemeManager.getInstance ();
 		_visibleHeight = container_pnl._height;
@@ -94,6 +97,7 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 	
 	public function init () : Void
 	{
+		
 		clickTarget_mc.onPress = Proxy.create (this, localOnPress);
 		clickTarget_mc.onRelease = Proxy.create (this, localOnRelease);
 		clickTarget_mc.onReleaseOutside = Proxy.create (this, localOnReleaseOutside);
@@ -103,11 +107,22 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		childActivities_mc = this;
 		var children_mc : Array = new Array ();
 		
+		if(_activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
+			if(_children[0].orderID < _children[1].orderID){
+				_children = orderParallelActivities(_children[0],_children[1]);
+			}else{
+				_children = orderParallelActivities(_children[1],_children[0]);
+			}
+		}	
+		
 		for (var i = 0; i < _children.length; i ++)
 		{
 			var progStatus:String = Progress.compareProgressData(learner, _children [i].activityID);
-			children_mc [i] = childHolder_mc.attachMovie("LearnerActivity_forComplex", "LearnerActivityVertical_forOptional"+i, childHolder_mc.getNextHighestDepth(), {_activity:_children[i], _controller:_controller, _view:_view, learner:learner, actStatus:progStatus});
 			
+			//if(_activity.activityTypeID==Activity.TOOL_ACTIVITY_TYPE || _activity.isGateActivity() || a.isGroupActivity() ){
+				children_mc [i] = childHolder_mc.attachMovie("LearnerActivity_forComplex", "LearnerActivityVertical_forOptional"+i, childHolder_mc.getNextHighestDepth(), {_activity:_children[i], _controller:_controller, _view:_view, learner:learner, actStatus:progStatus});
+			//} else if(_activity.activityTypeID==Activity.PARALLEL_ACTIVITY_TYPE || _activity.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE){
+		
 			//set the positioning co-ords
 			children_mc [i]._y = (i*21);
 			
@@ -144,9 +159,12 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 	{
 		_activity = a;
 	}
+	
 	private function draw (){
+		if (actStatus == null || actStatus == undefined){
+			actStatus = Progress.compareProgressData(learner, _activity.activityID);
+		}
 		
-		var actStatus:String = Progress.compareProgressData(learner, _activity.activityID);
 		switch (actStatus){
 		    case 'completed_mc' :
 				completed_mc._visible = true;
@@ -200,6 +218,8 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 			_doubleClicking = true;
 			//if we double click on the glass mask - then open the container to allow the usr to see the activities inside.
 			draw ();
+			controller.activityDoubleClick(this);
+		
 		}else {
 			Debugger.log ('SingleClicking:+' + this, Debugger.GEN, 'localOnPress', 'LearnerOptionalActivity');
 			_doubleClicking = false;
@@ -210,7 +230,7 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 	
 	private function localOnRelease ():Void{
 		Debugger.log ('_doubleClicking:' + _doubleClicking + ', localOnRelease:' + this, Debugger.GEN, 'localOnRelease', 'LearnerOptionalActivity');
-			if (_locked){
+			if (_locked && !_doubleClicking){
 				_locked = false;
 				gotoAndStop('collapse')
 				childHolder_mc._visible = false;
@@ -228,6 +248,40 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 	private function localOnReleaseOutside():Void {
 		Debugger.log ('localOnReleaseOutside:' + this, Debugger.GEN, 'localOnReleaseOutside', 'LearnerOptionalActivity');
 	}
+	
+	/**
+	 * return new children array
+	 * 
+	 * @usage   
+	 * @param   child1 First child
+	 * @param   child2 Second child
+	 * @return  new ordered children array
+	 */
+	
+	private function orderParallelActivities(child1:Activity, child2:Activity):Array{
+		return new Array(child1,child2);
+	}
+	
+	public function get controller(){
+		if(isLearnerModule()){
+			return LessonController(_controller);
+		} else {
+			return MonitorController(_controller);
+		}
+	}
+	
+	public function isLearnerModule():Boolean{
+		if(app.module == 'learner'){
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public function get activityStatus():String{
+		return actStatus;
+	}
+	
 	/**
 	*
 	* @usage
