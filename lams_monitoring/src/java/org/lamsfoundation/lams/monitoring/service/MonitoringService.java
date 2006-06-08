@@ -1506,8 +1506,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 
        private void deletePreviewLesson(Lesson lesson) {
        	if ( lesson != null ) {
-       		if ( lesson.getLearningDesign().getCopyTypeID() != null && 
-       				LearningDesign.COPY_TYPE_PREVIEW == lesson.getLearningDesign().getCopyTypeID().intValue() ) {
+       		if ( lesson.isPreviewLesson() ) {
        			
        	    	// get all the tool sessions for this lesson and remove all the tool session data
        			List toolSessions = lamsCoreToolService.getToolSessionsByLesson(lesson);
