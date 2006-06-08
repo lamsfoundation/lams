@@ -45,8 +45,16 @@ public interface IChatUserDAO extends IBaseDAO{
 	/**
 	 * 
 	 * @param loginName
-	 * @param sessionId
+	 * @param sessionID
 	 * @return
 	 */
 	ChatUser getByLoginNameAndSessionId(String loginName, Long toolSessionId);
+
+	/**
+	 * 
+	 * @param jabberID
+	 * @param jabberRoom
+	 * @return
+	 */
+	ChatUser getByJabberIDAndJabberRoom(String jabberID, String jabberRoom);
 }
