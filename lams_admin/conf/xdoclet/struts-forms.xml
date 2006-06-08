@@ -1,4 +1,4 @@
-<form-bean name="OrganisationForm" type="org.apache.struts.validator.DynaValidatorForm">
+<form-bean name="OrganisationForm" type="org.apache.struts.action.DynaActionForm">
 	<form-property name="orgId" type="java.lang.Integer" />
 	<form-property name="parentId" type="java.lang.Integer" />
 	<form-property name="parentName" type="java.lang.String" />

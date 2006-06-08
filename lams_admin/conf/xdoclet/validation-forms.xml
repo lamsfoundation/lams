@@ -1,5 +1,0 @@
-<form name="OrganisationForm">
-	<field property="name" depends="required">
-		<arg key="error.struts.argument.name" />
-	</field>
-</form>
