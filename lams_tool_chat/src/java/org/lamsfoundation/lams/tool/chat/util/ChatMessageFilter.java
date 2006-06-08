@@ -46,7 +46,7 @@ public class ChatMessageFilter {
 			regex = regex.replaceAll(" ", "|");
 
 			if (regex.length() != 0) {
-				this.pattern = Pattern.compile(regex);
+				this.pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
 			}
 		}
 	}
