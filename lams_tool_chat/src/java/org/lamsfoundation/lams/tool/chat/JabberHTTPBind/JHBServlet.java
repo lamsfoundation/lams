@@ -366,9 +366,18 @@ public final class JHBServlet extends HttpServlet {
 						/* check incoming queue */
 						NodeList nl = sess.checkInQ(rid);
 						// add items to response
-						if (nl != null)
-							for (int i = 0; i < nl.getLength(); i++)
+						if (nl != null) {
+							for (int i = 0; i < nl.getLength(); i++) {
+								// applying message filter.
+								Node node = nl.item(i);
+								if ((node.getNodeType() == Node.ELEMENT_NODE)
+										&& (node.getNodeName() == "message")) {
+									chatService.filterMessage(node);
+									log.debug("filtering message");
+								}
 								jresp.addNode(nl.item(i));
+							}
+						}
 
 						/* check for streamid (digest auth!) */
 						if (!sess.authidSent && sess.getAuthid() != null) {
