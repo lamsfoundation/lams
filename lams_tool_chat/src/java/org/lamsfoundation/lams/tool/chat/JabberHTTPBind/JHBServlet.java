@@ -297,7 +297,22 @@ public final class JHBServlet extends HttpServlet {
 						if (rootNode.hasChildNodes()) {
 							sess.sendNodes(rootNode.getChildNodes());
 							chatService.processIncomingMessages(doc.getElementsByTagName("message"));
-							chatService.processIncomingPresence(doc.getElementsByTagName("presence"));
+							
+							// previous message are return to a client when
+							// a presence packet is received.
+							NodeList presenceList = doc
+									.getElementsByTagName("presence");
+							for (int i = 0; i < presenceList.getLength(); i++) {
+								Node presence = presenceList.item(i);
+								List<Node> messages = chatService
+										.processIncomingPresence(presence);
+								if (messages != null) {
+									for (Iterator iter = messages
+											.iterator(); iter.hasNext();) {
+										Node message = (Node) iter.next();
+										jresp.addNode(message);
+									}
+								}
 						} else {
 							/*
 							 * check if polling too frequently only empty polls
