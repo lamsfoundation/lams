@@ -198,6 +198,13 @@ public interface IChatService {
 	
 	/**
 	 * 
+	 * @param message
+	 * @param chat
+	 */
+	public void filterMessage(Node message, Chat chat);
+	
+	/**
+	 * 
 	 * @param messageUID
 	 * @return
 	 */

@@ -647,7 +647,8 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 
 				messageElement.appendChild(bodyElement);
 				messageElement.appendChild(xElement);
-
+				filterMessage(messageElement, chatUser.getChatSession().getChat());
+								
 				xmlMessageList.add(messageElement);
 				//printXMLNode(messageElement, "");
 			}
@@ -677,22 +678,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 		
 	}
 
-	public void filterMessage(Node message) {
-		NamedNodeMap nnm = message.getAttributes();
-		String from = nnm.getNamedItem("from").getNodeValue();
-
-		// extracting jabber room.
-		int index = from.lastIndexOf("/");
-		String jabberRoom;
-		if (index != -1) {
-			jabberRoom = from.substring(0, index);
-		} else {
-			jabberRoom = from;
-		}
-
-		// get the chat content3
-		Chat chat = getSessionByJabberRoom(jabberRoom).getChat();
-
+	public void filterMessage(Node message, Chat chat) {
 		if (!chat.getFilteringEnabled()) {
 			return;
 		}
@@ -730,6 +716,24 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 		// filter the message.
 		Matcher matcher = pattern.matcher(bodyText.getNodeValue());
 		bodyText.setNodeValue(matcher.replaceAll("***"));
+	}
+	
+	public void filterMessage(Node message) {
+		NamedNodeMap nnm = message.getAttributes();
+		String from = nnm.getNamedItem("from").getNodeValue();
+
+		// extracting jabber room.
+		int index = from.lastIndexOf("/");
+		String jabberRoom;
+		if (index != -1) {
+			jabberRoom = from.substring(0, index);
+		} else {
+			jabberRoom = from;
+		}
+
+		// get the chat content3
+		Chat chat = getSessionByJabberRoom(jabberRoom).getChat();
+		filterMessage(message, chat);
 	}
 
 	public ChatMessageFilter updateMessageFilters(Chat chat) {
