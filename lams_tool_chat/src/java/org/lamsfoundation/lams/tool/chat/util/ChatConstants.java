@@ -38,6 +38,8 @@ public interface ChatConstants {
 	public static final String AUTH_SESSION_ID_COUNTER = "authoringSessionIdCounter";
 	public static final String AUTH_SESSION_ID = "authoringSessionId";
 	
+	public static final int MONITORING_SUMMARY_MAX_MESSAGES = 5;
+	
 	// TODO this is temporary for developement.  this should not remain here.
 	static final String XMPPDOMAIN = "shaun.melcoe.mq.edu.au";
 	static final String XMPPCONFERENCE = "conference.shaun.melcoe.mq.edu.au";
