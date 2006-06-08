@@ -94,10 +94,10 @@ public class LearnerAction extends DispatchAction {
         ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE,MODE_OPTIONAL);
         request.getSession().setAttribute(AttributeNames.ATTR_MODE, mode);
                 
-        if(mode.equals(ToolAccessMode.LEARNER)){
+        if(mode.equals(ToolAccessMode.LEARNER) || mode.equals(ToolAccessMode.AUTHOR) ){
             return listFiles(mapping, form, request, response);
         }
-        else if(mode.equals(ToolAccessMode.AUTHOR) || mode.equals(ToolAccessMode.TEACHER)){
+        else if(mode.equals(ToolAccessMode.TEACHER)){
         	return listFiles(mapping, form, request, response);
         }
         logger.error("Requested mode + '" + mode.toString() + "' not supported");
@@ -219,7 +219,7 @@ public class LearnerAction extends DispatchAction {
 		
 		DynaActionForm authForm = (DynaActionForm) form;
 		ToolAccessMode mode = (ToolAccessMode) request.getSession().getAttribute(AttributeNames.ATTR_MODE);
-		if (mode == ToolAccessMode.LEARNER) {
+		if (mode == ToolAccessMode.LEARNER || mode.equals(ToolAccessMode.AUTHOR) ) {
 			ToolSessionManager sessionMgrService = SubmitFilesServiceProxy.getToolSessionManager(getServlet().getServletContext());
 			submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this.getServlet().getServletContext());
 

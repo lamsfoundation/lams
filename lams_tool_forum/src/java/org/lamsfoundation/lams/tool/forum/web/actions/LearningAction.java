@@ -223,7 +223,7 @@ public class LearningAction extends Action {
 				AttributeNames.PARAM_TOOL_SESSION_ID);
 		ToolAccessMode mode = (ToolAccessMode) request.getSession()
 				.getAttribute(AttributeNames.ATTR_MODE);
-		if (mode == ToolAccessMode.LEARNER) {
+		if (mode == ToolAccessMode.LEARNER || mode==ToolAccessMode.AUTHOR) {
 			// get sessionId from HttpServletRequest
 			forumService = getForumManager();
 			ForumToolSession session = forumService
