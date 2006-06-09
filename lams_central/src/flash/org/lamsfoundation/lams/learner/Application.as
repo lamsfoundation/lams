@@ -235,6 +235,27 @@ class org.lamsfoundation.lams.learner.Application extends ApplicationParent {
 		_lesson.setSize(w,h);
 		
 	}
+	
+	/**
+	 * Updated the progress data in the lesson model with received progress data
+	 * 
+	 * @param   attempted 
+	 * @param   completed 
+	 * @param   current 
+	 */
+	
+	public function refreshProgress(attempted:String, completed:String, current:String, ID:String){
+		Debugger.log('attempted: ' + attempted,Debugger.CRITICAL,'refreshProgress','Application');
+		Debugger.log('completed: ' + completed,Debugger.CRITICAL,'refreshProgress','Application');
+		Debugger.log('current: ' + current,Debugger.CRITICAL,'refreshProgress','Application');
+        
+		if(_root.uniqueID == ID){
+			var attemptedArray:Array = attempted.split("_");
+			var completedArray:Array = completed.split("_");
+			
+			_lesson.updateProgressData(attemptedArray, completedArray, Number(current));
+		}
+	}
      
 	// onKey*** methods - TODO
 	
