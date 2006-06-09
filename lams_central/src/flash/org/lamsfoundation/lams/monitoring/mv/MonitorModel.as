@@ -57,6 +57,7 @@ class MonitorModel extends Observable{
 	
 	private var _staffLoaded:Boolean;
 	private var _learnersLoaded:Boolean;
+	private var _isProgressChanged:Boolean;
 	
 	private var _monitor:Monitor;
 	
@@ -202,6 +203,13 @@ class MonitorModel extends Observable{
 		return _lastSelectedSeq;
 	}
 
+	public function setIsProgressChanged(isChanged:Boolean):Void{
+		_isProgressChanged = isChanged;
+	}
+	
+	public function getIsProgressChanged():Boolean{
+		return _isProgressChanged;
+	}
 	public function setOrganisation(org:Organisation){
 		_org = org;
 		
