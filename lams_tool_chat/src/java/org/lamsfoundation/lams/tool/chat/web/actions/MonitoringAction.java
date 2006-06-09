@@ -144,6 +144,9 @@ public class MonitoringAction extends LamsDispatchAction {
 		request.setAttribute("CONFERENCEROOM", chatSession.getJabberRoom());
 		request.setAttribute("NICK", chatUser.getLoginName());
 		request.setAttribute("MODE", "teacher");
+		
+		request.setAttribute("chatTitle", chatSession.getChat().getTitle());
+		request.setAttribute("chatInstructions", chatSession.getChat().getInstructions());
 
 		return mapping.findForward("chat_client");
 	}

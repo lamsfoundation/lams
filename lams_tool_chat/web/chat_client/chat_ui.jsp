@@ -32,6 +32,10 @@
 </div>
 
 <div id="chat_pane" style="display:none;">
+	<h1> <c:out value="${chatTitle}" /> </h1>
+	
+	<p> <c:out value="${chatInstructions}" /> </p>
+
 	<form name="sendForm" action="" onSubmit="return sendMsg(this);">
 		<div id="presence">
 			<select id="roster_user_selector" size="2" onchange="updateSendDisplay();">

@@ -24,25 +24,29 @@
 
 package org.lamsfoundation.lams.tool.chat.web.actions;
 
+import java.io.IOException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
-import org.lamsfoundation.lams.tool.chat.dao.hibernate.ChatUserDAO;
+import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.chat.model.ChatSession;
 import org.lamsfoundation.lams.tool.chat.model.ChatUser;
 import org.lamsfoundation.lams.tool.chat.service.ChatServiceProxy;
 import org.lamsfoundation.lams.tool.chat.service.IChatService;
 import org.lamsfoundation.lams.tool.chat.util.ChatConstants;
 import org.lamsfoundation.lams.tool.chat.util.ChatException;
+import org.lamsfoundation.lams.tool.exception.DataMissingException;
+import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
@@ -50,10 +54,10 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @author
  * @version
  * 
- * @struts.action path="/learning"
+ * @struts.action path="/learning" parameter="dispatch"
  * @struts.action-forward name="success" path="tiles:/learning/main"
  */
-public class LearningAction extends Action {
+public class LearningAction extends LamsDispatchAction {
 
 	private static Logger log = Logger.getLogger(LearningAction.class);
 
@@ -61,7 +65,7 @@ public class LearningAction extends Action {
 
 	private IChatService chatService;
 
-public ActionForward execute(ActionMapping mapping, ActionForm form,
+public ActionForward unspecified(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		// 'toolSessionID' and 'mode' paramters are expected to be present.
@@ -97,6 +101,9 @@ public ActionForward execute(ActionMapping mapping, ActionForm form,
 		request.setAttribute("CONFERENCEROOM", chatSession.getJabberRoom());
 		request.setAttribute("NICK", chatUser.getLoginName());
 		
+		request.setAttribute("chatTitle", chatSession.getChat().getTitle());
+		request.setAttribute("chatInstructions", chatSession.getChat().getInstructions());
+		
 		return mapping.findForward("success");
 		
 	}	private ChatUser getCurrentUser(Long toolSessionId) {
@@ -114,5 +121,33 @@ public ActionForward execute(ActionMapping mapping, ActionForm form,
 		}
 
 		return chatUser;
+	}
+	
+	public ActionForward finishActivity (ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+		
+		ToolSessionManager sessionMgrService = ChatServiceProxy
+		.getChatSessionManager(getServlet().getServletContext());
+
+		// get back login user DTO
+		// get session from shared session.
+		
+		HttpSession ss = SessionManager.getSession();
+		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+		Long userID = new Long(user.getUserID().longValue());
+
+		String nextActivityUrl;
+		try {
+			nextActivityUrl = sessionMgrService.leaveToolSession(new Long(1),
+					userID);
+			response.sendRedirect(nextActivityUrl);
+		} catch (DataMissingException e) {
+			throw new ChatException(e);
+		} catch (ToolException e) {
+			throw new ChatException(e);
+		} catch (IOException e) {
+			throw new ChatException(e);
+		}
+	
+		return null; // TODO need to return proper page.
 	}
 }

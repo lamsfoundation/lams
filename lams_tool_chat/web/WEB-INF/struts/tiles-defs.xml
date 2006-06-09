@@ -91,13 +91,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<put name="body" value="/pages/monitoring/monitoring.jsp" />
 	</definition>
 	
-	<definition name="tiles:/monitoring/chat_client" extends="tiles:/layout:tab">
+	<definition name="tiles:/monitoring/chat_client" extends="tiles:/layout:default">
 		<put name="pageTitleKey" value="pageTitle.monitoring" />
 		<put name="header" value="tiles:/header:monitoring/chat_client" />
 		<put name="body" value="/chat_client/chat_ui.jsp" />
 	</definition>
 		
-	<definition name="tiles:/monitoring/chat_history" extends="tiles:/layout:tab">
+	<definition name="tiles:/monitoring/chat_history" extends="tiles:/layout:default">
 		<put name="pageTitleKey" value="pageTitle.monitoring.chatHistory"></put>
 		<put name="header" value="tiles:/header:monitoring/chat_history"></put>
 		<put name="body" value="/pages/monitoring/chatHistory.jsp"></put>
