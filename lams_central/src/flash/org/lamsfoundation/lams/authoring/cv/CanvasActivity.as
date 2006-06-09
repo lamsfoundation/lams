@@ -61,6 +61,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	private var _isSelected:Boolean;
 	private var app:Application;
 	//locals
+	private var learnerOffset_X:Number = 4
+	private var learnerOffset_Y:Number = 3
+	private var onActivityLearnerArray:Array;
 	private var _module:String;
 	private var icon_mc:MovieClip;
 	private var icon_mcl:MovieClipLoader;
@@ -107,6 +110,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	}
 	
 	public function init(initObj):Void{
+		
+		clickTarget_mc.onPress = Proxy.create (this, localOnPress);
+		clickTarget_mc.onRelease = Proxy.create (this, localOnRelease);
+		clickTarget_mc.onReleaseOutside = Proxy.create (this, localOnReleaseOutside);
+		
 		if(initObj){
 			
 			if (_module == "monitoring"){
@@ -237,9 +245,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		trace("value of _Module in Canvas Activity: "+_module)
 		trace("Monitor Model is: "+_monitorController.getModel())
 		if (_module == "monitoring"){
+			onActivityLearnerArray = new Array();
 			var mm:MonitorModel = MonitorModel(_monitorController.getModel());
 			trace("all learner progress length in Canvas activity: "+mm.allLearnersProgress.length);
-			
+							
 			// get the length of learners from the Monitor Model and run a for loop.
 			for (var j=0; j<mm.allLearnersProgress.length; j++){
 				var learner:Object = new Object();
@@ -249,13 +258,28 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 				
 				var isLearnerCurrentAct:Boolean = Progress.isLearnerCurrentActivity(learner, _activity.activityID);
 				if (isLearnerCurrentAct){
+					//onActivityLearnerArray.push(learner)
+					
+					if (learnerOffset_X > 112){
+						learnerOffset_X = 4 
+						learnerOffset_Y = 27 
+					}
+					
 					trace(_activity.title+": is the learner's current Activity.")
-					this.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), this.getNextHighestDepth(),{name_lbl:learner.getUserName()});
+					 
+					this.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), this.getNextHighestDepth(),{_activity:_activity, learner:learner, _monitorController:_monitorController, _x:learnerOffset_X, _y:learnerOffset_Y});
+					//var learnerIcon = this["learnerIcon"+learner.getUserName()]
+					//learnerIcon.click_mc.onRollOver = function (){
+					//	trace("I am: "+onActivityLearnerArray[learner.getUserName()])
+					//}
+					learnerOffset_X = learnerOffset_X+10
+					
+					
+					
 				}else {
 					trace(_activity.title+": is not the learner's current Activity.")
 				}
 			}
-			
 		}
 			
 				Debugger.log(_activity.title+',_activity.isGateActivity():'+_activity.isGateActivity(),4,'draw','CanvasActivity');
@@ -337,7 +361,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	}
 	
 	
-	private function onPress():Void{
+	private function localOnPress():Void{
 		
 			
 			// check double-click
@@ -402,7 +426,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	
 	}
 	
-	private function onRelease():Void{
+	private function localOnRelease():Void{
 		if(!_doubleClicking){
 			Debugger.log('Releasing:'+this,Debugger.GEN,'onRelease','CanvasActivity');
 				trace("Activity ID is: "+this.activity.activityUIID)	
@@ -415,7 +439,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		
 	}
 	
-	private function onReleaseOutside():Void{
+	private function localOnReleaseOutside():Void{
 		Debugger.log('ReleasingOutside:'+this,Debugger.GEN,'onReleaseOutside','CanvasActivity');
 		if (_module == "monitoring"){
 			_monitorController.activityReleaseOutside(this);
