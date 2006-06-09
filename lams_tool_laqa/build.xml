@@ -239,6 +239,7 @@
 						<include name="authoring/*"/>
 						<include name="learning/*"/>
 		   				<include name="monitoring/*"/>
+		   				<include name="export/*"/>
 	   					<include name="images/**"/>
 		   				<include name="css/**"/>
 				</fileset>
