@@ -47,7 +47,7 @@ import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 
 public class ExportServlet  extends AbstractExportPortfolioServlet implements QaAppConstants{
 	static Logger logger = Logger.getLogger(ExportServlet.class.getName());
-	private static final long serialVersionUID = -4529093489007108143L;
+	private static final long serialVersionUID = -1529093489007108143L;
 	private final String FILENAME = "qa_main.html";
 	
 	
@@ -56,6 +56,7 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Qa
 	    logger.debug("dispathcing doExport");
 	    request.getSession().setAttribute(IS_PORTFOLIO_EXPORT, new Boolean(true).toString());
 	    String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+request.getContextPath();
+	    logger.debug("basePath:" + basePath);
 
 		if (StringUtils.equals(mode,ToolAccessMode.LEARNER.toString())){
 		    learner(request,response,directoryName,cookies);
@@ -110,8 +111,9 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Qa
 
         logger.debug("calling learning mode toolSessionID:" + toolSessionID + " userID: " + userID );
     	QaMonitoringAction qaMonitoringAction= new QaMonitoringAction();
-    	//voteMonitoringAction.refreshSummaryData(request, content, voteService, true, true, toolSessionID.toString(), userID.toString() , true);
-    	
+    	logger.debug("start refreshSummaryData for learner mode.");
+    	qaMonitoringAction.refreshSummaryData(request, content, qaService, true, true, toolSessionID.toString(), userID.toString());
+    	logger.debug("end refreshSummaryData for learner mode.");
     	logger.debug("ending learner mode: ");
     }
     
@@ -140,9 +142,9 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Qa
         }
 		
         QaMonitoringAction qaMonitoringAction= new QaMonitoringAction();
-        logger.debug("starting refreshSummaryData.");
-        //voteMonitoringAction.refreshSummaryData(request, content, voteService, true, false, null, null, false);
-        
+        logger.debug("start refreshSummaryData for teacher mode.");
+        qaMonitoringAction.refreshSummaryData(request, content, qaService, true, false, null, null);
+        logger.debug("end refreshSummaryData for teacher mode.");
         logger.debug("teacher uses content id: " + content.getQaContentId());
         logger.debug("ending teacher mode: ");
     }
