@@ -41,9 +41,8 @@ public class ActivityMappingStrategy implements Serializable {
 	 * @param progress, LearnerProgress for the activity, used to check activity status
 	 * @return String representing a struts action
 	 */
-	protected String getActivityAction(Activity activity, LearnerProgress progress) {
+	protected String getActivityAction(Activity activity) {
 		String strutsAction = null;
-		
 		if ( activity.isComplexActivity() ) {
 			if ( activity.isParallelActivity() )
 		        strutsAction = "/DisplayParallelActivity.do";

@@ -90,7 +90,7 @@ public class DisplayOptionsActivityAction extends ActivityAction {
 		while (i.hasNext()) {
 			Activity subActivity = (Activity)i.next();
 			ActivityURL activityURL = new ActivityURL();
-			String url = actionMappings.getActivityURL(subActivity, learnerProgress);
+			String url = actionMappings.getActivityURL(subActivity);
 			activityURL.setUrl(url);
 			activityURL.setActivityId(subActivity.getActivityId());
 			activityURL.setTitle(subActivity.getTitle());

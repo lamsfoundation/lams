@@ -86,8 +86,7 @@ public class ActivityMapping implements Serializable
         ActionForward actionForward = null;
 
         //String strutsAction = getActivityAction(activity, progress);
-        String strutsAction = this.activityMappingStrategy.getActivityAction(activity,
-                                                                             progress);
+        String strutsAction = this.activityMappingStrategy.getActivityAction(activity);
         if (activity.isToolActivity())
         {
             // always use redirect false for a ToolActivity as ToolDisplayActivity
@@ -152,8 +151,7 @@ public class ActivityMapping implements Serializable
                     // if previous activity was a parallel activity then we need to
                     // clear frames.
                     String strutsAction = "/requestDisplay.do";
-                    String activityURL = this.getActivityURL(progress.getNextActivity(),
-                                                             progress);
+                    String activityURL = this.getActivityURL(progress.getNextActivity());
                     strutsAction += "?url=" + activityURL;
                     actionForward = strutsActionToForward(strutsAction,
                                                           null,
@@ -225,10 +223,9 @@ public class ActivityMapping implements Serializable
      * @param activity, the Activity to be displayed
      * @param progress, the LearnerProgress associated with the Activity and learner
      */
-    public String getActivityURL(Activity activity, LearnerProgress progress)
+    public String getActivityURL(Activity activity)
     {
-        String strutsAction = this.activityMappingStrategy.getActivityAction(activity,
-                                                                             progress);
+        String strutsAction = this.activityMappingStrategy.getActivityAction(activity);
         return strutsActionToURL(strutsAction, activity, true);
     }
 
@@ -265,8 +262,7 @@ public class ActivityMapping implements Serializable
             else
             {
                 // display next activity
-                activityURL = this.getActivityURL(progress.getNextActivity(),
-                                                  progress);
+                activityURL = this.getActivityURL(progress.getNextActivity());
                 if (progress.getPreviousActivity().isParallelActivity())
                 {
                     // if previous activity was a parallel activity then we need to
@@ -376,16 +372,13 @@ public class ActivityMapping implements Serializable
                                                       Activity activity)
     {
 
-        if (activity.isToolActivity())
+        if (activity.isToolActivity() || activity.isSystemToolActivity())
         {
-            return getLearnerToolURL(lesson, ((ToolActivity) activity), learner);
+            return WebUtil.convertToFullURL(getLearnerToolURL(lesson, ((ToolActivity) activity), learner));
+        } else {
+        	// fall back to the strategy for complex activities
+        	return getActivityURL(activity);
         }
-        else if (activity.isGroupingActivity())
-            //TODO need to be changed when group action servlet is done
-            return getActivityURL(activity, null);
-
-        throw new LearnerServiceException("Fails to get the progress url view"
-                + " for activity[" + activity.getActivityId().longValue() + "]");
     }
 
     public void setToolService(ILamsCoreToolService toolService)

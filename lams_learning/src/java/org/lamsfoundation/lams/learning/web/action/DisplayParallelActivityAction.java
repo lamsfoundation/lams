@@ -70,7 +70,6 @@ public class DisplayParallelActivityAction extends ActivityAction {
 		
 		actionMappings.setActivityMappingStrategy(new ParallelActivityMappingStrategy());
 		
-		LearnerProgress learnerProgress = getLearnerProgress(request);
 		Activity activity = LearningWebUtil.getActivityFromRequest(request, getLearnerService());
 		if (!(activity instanceof ParallelActivity)) {
 		    log.error(className+": activity not ParallelActivity "+activity.getActivityId());
@@ -87,7 +86,7 @@ public class DisplayParallelActivityAction extends ActivityAction {
 		{
 			Activity subActivity = (Activity)i.next();
 			ActivityURL activityURL = new ActivityURL(); 
-			String url = actionMappings.getActivityURL(subActivity, learnerProgress);
+			String url = actionMappings.getActivityURL(subActivity);
 			activityURL.setUrl(url);
 			activityURLs.add(activityURL);
 		}

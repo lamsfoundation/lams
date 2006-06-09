@@ -46,7 +46,7 @@ public class ParallelActivityMappingStrategy extends ActivityMappingStrategy {
 		if (progress.getProgressState(activity) == LearnerProgress.ACTIVITY_COMPLETED) 
 	        strutsAction = "/parallelWait.do";
 		else
-			strutsAction = super.getActivityAction(activity, progress);
+			strutsAction = super.getActivityAction(activity);
 		return strutsAction;
 	}
 	
