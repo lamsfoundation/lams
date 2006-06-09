@@ -1,0 +1,8 @@
+<global-exceptions>
+  <exception
+    handler="org.apache.struts.action.ExceptionHandler"
+    key="error.system"
+    path=".error"
+    scope="request"
+    type="java.lang.Exception"/>
+</global-exceptions>
