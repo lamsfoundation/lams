@@ -23,6 +23,7 @@
 
 import org.lamsfoundation.lams.common.mvc.*;
 import org.lamsfoundation.lams.common.util.*;
+import org.lamsfoundation.lams.common.*;
 import org.lamsfoundation.lams.monitoring.*;
 import org.lamsfoundation.lams.monitoring.mv.*;
 import org.lamsfoundation.lams.monitoring.mv.tabviews.*;
@@ -61,23 +62,36 @@ class MonitorController extends AbstractController {
 		//}
    }
    
-	public function activityDoubleClick(ca:Object, forTabView:String):Void{
+	public function activityDoubleClick(ca:Object, forTabView:String, learnerID:Number):Void{
+		var _learnerID:Number;
+		var URLToSend:String;
 		setBusy()
-	   Debugger.log('activityDoubleClick CanvasActivity:'+ca.activity.activityID,Debugger.GEN,'activityDoubleClick','MonitorController');
-	   if(ca.activity.activityTypeID == Activity.TOOL_ACTIVITY_TYPE){
-			// _monitorModel.openToolActivityContent(ca.activity);
-			if (forTabView == "MonitorTabView"){
-				//getActivityMonitorURL&activityID=31&lessonID=4
-				var URLToSend:String = _root.serverURL+_root.monitoringURL+'getActivityMonitorURL&activityID='+ca.activity.activityID+'&lessonID='+_root.lessonID;
+		
+	   if (forTabView == "MonitorTabView"){
+			//getActivityMonitorURL&activityID=31&lessonID=4
+			Debugger.log('activityDoubleClick CanvasActivity:'+ca.activity.activityID,Debugger.GEN,'activityDoubleClick','MonitorController');
+			URLToSend = _root.serverURL+_root.monitoringURL+'getActivityMonitorURL&activityID='+ca.activity.activityID+'&lessonID='+_root.lessonID;
+		}else {
+			if (learnerID != null){
+				_learnerID = learnerID;
+				trace("learnerId if passed is: "+_learnerID)
 			}else {
-				var URLToSend:String = _root.serverURL+_root.monitoringURL+'getLearnerActivityURL&activityID='+ca.activity.activityID+'&userID='+_root.userID+'&lessonID='+_root.lessonID;
+				trace("learnerId if not passed is: "+ca.learnerID)
+				_learnerID = ca.learnerID;
 			}
-	
+			if (forTabView == "MonitorTabViewLearner"){
+				Debugger.log('activityDoubleClick CanvasActivity:'+ca.activityID,Debugger.GEN,'activityDoubleClick','MonitorController');
+				URLToSend = _root.serverURL+_root.monitoringURL+'getLearnerActivityURL&activityID='+ca.activityID+'&userID='+_learnerID+'&lessonID='+_root.lessonID;
+			}else {
+				URLToSend = _root.serverURL+_root.monitoringURL+'getLearnerActivityURL&activityID='+ca.activity.activityID+'&userID='+_learnerID+'&lessonID='+_root.lessonID;
+			}
+		}
+
 		//Debugger.log('Opening url:'+URLToSend,Debugger.GEN,'openToolActivityContent','MonitorModel');
 		getURL(URLToSend,"_blank");		
 		//}else{
 			//TODO: Show the property inspector if its a parralel activity or whatever
-		}
+		//}
 	  
 	   clearBusy()
 	}
