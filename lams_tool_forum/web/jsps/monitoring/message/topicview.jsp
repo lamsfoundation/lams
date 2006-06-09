@@ -15,13 +15,13 @@
 			</th>
 		</tr>
 		<tr>
-			<td>
+			<td align="left">
 				<br>
 				<c:out value="${topic.message.body}" escapeXml="false" />
 			</td>
 		</tr>
 		<tr>
-			<td>
+			<td align="left">
 				<br>
 				<c:forEach var="file" items="${topic.message.attachments}">
 					<c:set var="downloadURL">

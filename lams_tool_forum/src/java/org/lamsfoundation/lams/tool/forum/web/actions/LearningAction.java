@@ -303,6 +303,7 @@ public class LearningAction extends Action {
 		setAuthorMark(msgDtoList);
 
 		request.setAttribute(ForumConstants.AUTHORING_TOPIC_THREAD, msgDtoList);
+		request.getSession().setAttribute(ForumConstants.ROOT_TOPIC_UID,topicId);
 		return mapping.findForward("success");
 
 	}
@@ -362,7 +363,7 @@ public class LearningAction extends Action {
 	private ActionForward newReplyTopic(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
 		Long parentId = new Long(WebUtil.readLongParam(request, "parentId"));
-
+		
 		// get parent topic, it can decide default subject of reply.
 		MessageDTO topic = getTopic(parentId);
 
@@ -375,6 +376,7 @@ public class LearningAction extends Action {
 
 		// cache this parentId in order to create reply
 		request.getSession().setAttribute("parentId", parentId);
+		
 		return mapping.findForward("success");
 	}
 
@@ -390,6 +392,7 @@ public class LearningAction extends Action {
 	private ActionForward replyTopic(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
 		Long parentId = (Long) request.getSession().getAttribute("parentId");
+		
 		Long sessionId = (Long) request.getSession().getAttribute(
 				AttributeNames.PARAM_TOOL_SESSION_ID);
 		MessageForm messageForm = (MessageForm) form;
@@ -412,8 +415,9 @@ public class LearningAction extends Action {
 		Long rootTopicId = forumService.getRootTopicId(parentId);
 		List msgDtoList = forumService.getTopicThread(rootTopicId);
 		setAuthorMark(msgDtoList);
+		
 		request.setAttribute(ForumConstants.AUTHORING_TOPIC_THREAD, msgDtoList);
-
+		
 		return mapping.findForward("success");
 	}
 
@@ -460,6 +464,7 @@ public class LearningAction extends Action {
 			throws PersistenceException {
 		// get value from HttpSession
 		Long topicId = (Long) request.getSession().getAttribute("topicId");
+		
 		forumService = getForumManager();
 
 		MessageForm messageForm = (MessageForm) form;
@@ -495,7 +500,7 @@ public class LearningAction extends Action {
 		List msgDtoList = forumService.getTopicThread(rootTopicId);
 		setAuthorMark(msgDtoList);
 		request.setAttribute(ForumConstants.AUTHORING_TOPIC_THREAD, msgDtoList);
-
+		
 		return mapping.findForward("success");
 	}
 

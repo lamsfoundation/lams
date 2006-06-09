@@ -25,23 +25,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<!--
 		This is a default layout which has a header and body
 	-->
-	<definition name="tiles:defaultLayout" path="/includes/defaultLayout.jsp">
-    	<put name="body" value=""/>
-    	<put name="header" value="/includes/header.jsp"/>
-	</definition>
-
 	<definition name="tiles:layout" path="/includes/layout.jsp">
     	<put name="pageTitleKey" value=""/>
     	<put name="body" value=""/>
-    	<put name="header" value="/includes/header.jsp"/>
-    	<put name="footer" value="/includes/footer.jsp"/>
 	</definition>
 
 	<definition name="tiles:tab:layout" path="/includes/tablayout.jsp">
     	<put name="pageTitleKey" value=""/>
     	<put name="body" value=""/>
     	<put name="header" value=""/>
-    	<put name="footer" value="/includes/footer.jsp"/>
 	</definition>
 
 	<!-- B: Generic -->
@@ -57,29 +49,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<!-- B: Authoring -->
 	<definition name="tiles:/authoring/forum/main" extends="tiles:tab:layout">
     	<put name="pageTitleKey" value="page.title.authoring.init"/>
-    	<put name="header" value="/includes/authoringHeader.jsp"/>
+    	<put name="header" value="/jsps/authoring/header.jsp"/>
     	<put name="body" value="/jsps/authoring/authoring.jsp"/>
 	</definition>
 	
-	<!-- 
-    <definition name="tiles:/authoring/forum/newTopic" extends="tiles:layout">
-    	<put name="pageTitleKey" value="title.message.add"/>
-    	<put name="body" value="/jsps/authoring/message/create.jsp"/>
-	</definition>
-	<definition name="tiles:/authoring/forum/viewTopic" extends="tiles:layout">
-    	<put name="pageTitleKey" value="title.message.view"/>
-    	<put name="body" value="/jsps/authoring/message/view.jsp"/>
-	</definition>
-	<definition name="tiles:/authoring/forum/editTopic" extends="tiles:layout">
-    	<put name="pageTitleKey" value="title.message.edit"/>
-    	<put name="body" value="/jsps/authoring/message/edit.jsp"/>
-	</definition>
-	<definition name="tiles:/authoring/forum/forbiddenEditTopic" extends="tiles:layout">
-    	<put name="pageTitleKey" value="title.message.edit"/>
-    	<put name="body" value="/jsps/authoring/message/forbiddenedit.jsp"/>
-	</definition>
-	
-	-->
 	<!-- E: Authoring -->
 
 	<!-- B: Learning -->
@@ -119,16 +92,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<!-- E: Learning -->
 	
 	<!-- B: Monitoring -->
-	
 	<definition name="tiles:/monitoring/forum/main" extends="tiles:tab:layout">
     	<put name="pageTitleKey" value="page.title.monitoring.init"/>
-		<put name="header" value="/includes/header.jsp"/>    	
+		<put name="header" value="/jsps/monitoring/header.jsp"/>    	
     	<put name="body" value="/jsps/monitoring/monitoring.jsp"/>
 	</definition>
-	
 	<definition name="tiles:/monitoring/forum/defineLater" extends="tiles:tab:layout">
     	<put name="pageTitleKey" value="page.title.monitoring.definelater"/>
-    	<put name="header" value="/includes/authoringHeader.jsp"/>
+    	<put name="header" value="/jsps/authoring/header.jsp"/>
     	<put name="body" value="/jsps/authoring/definelater.jsp"/>
 	</definition>
 	

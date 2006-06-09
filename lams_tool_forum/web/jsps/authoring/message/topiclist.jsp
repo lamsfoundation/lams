@@ -5,8 +5,7 @@
 	<div id="datatablecontainer">
 	<table width="100%" align="CENTER" 	class="form">
 		<tr>
-			<td valign="MIDDLE"><b><fmt:message key="title.message.view"/></b></td>
-			<td colspan="3" />
+			<td colspan="4"  valign="MIDDLE"><b><fmt:message key="title.message.view"/></b></td>
 		</tr>
 		<tr>
 			<th scope="col" width="50%" colspan="2"><fmt:message key="lable.topic.title.subject"/></th>
@@ -15,7 +14,7 @@
 		</tr>
 		<c:forEach items="${topicList}" var="topic" varStatus="status">
 			<tr>
-				<td valign="MIDDLE" width="48%">
+				<td align="left" width="48%">
 					<c:set var="viewtopic">
 						<html:rewrite page="/authoring/viewTopic.do?topicIndex=${status.index}&create=${topic.message.updated.time}" />
 					</c:set> 

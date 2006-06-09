@@ -36,7 +36,7 @@
 						</html:link>
 					</c:when>
 					<c:otherwise>
-						<fmt:message key="message.monitoring.edit.activity.not.editable" />
+						<div align="center"><B><fmt:message key="message.monitoring.edit.activity.not.editable" /></B></div>
 					</c:otherwise>
 				</c:choose>
 			</td>

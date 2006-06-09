@@ -80,5 +80,7 @@ public interface ForumConstants {
 	public static final String TITLE = "title";
 	public static final String INSTRUCTIONS = "instructions";
 	public static final String PAGE_EDITABLE = "isPageEditable";
+
+	public static final String ROOT_TOPIC_UID = "rootUid";
 	
 }

@@ -1,11 +1,8 @@
-<%@ include file="/includes/taglibs.jsp" %>
+<%@ include file="/common/taglibs.jsp" %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html:html locale="true">
   <head>    
-    <title>Learner Topics Details</title>
-    <html:base/>
-    <c:set var="lams"><lams:LAMSURL/></c:set>
-  	<link href="<c:out value="${lams}"/>css/aqua.css" rel="stylesheet" type="text/css">
+		<%@ include file="/common/header.jsp" %>
   </head>  
   <body>
   

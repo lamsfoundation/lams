@@ -9,7 +9,7 @@
 		<title>
 			<bean:message key="activity.title" />
 	  	</title>
-		<tiles:insert attribute="header" />
+	  	<%@ include file="/common/header.jsp"%>
 	</head>
 	<body>
 	
@@ -22,6 +22,5 @@
 		</logic:notEmpty>
 
 		<tiles:insert attribute="body" />
-		<tiles:insert attribute="footer" />
 	</body>
 </html>

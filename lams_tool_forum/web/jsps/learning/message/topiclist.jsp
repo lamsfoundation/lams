@@ -14,7 +14,7 @@
 		</tr>
 		<c:forEach items="${topicList}" var="topic" >
 			<tr>
-				<td valign="MIDDLE" width="48%">
+				<td valign="MIDDLE" width="48%" align="left">
 					<c:set var="viewtopic">
 						<html:rewrite page="/learning/viewTopic.do?topicId=${topic.message.uid}&create=${topic.message.created.time}" />
 					</c:set> 
