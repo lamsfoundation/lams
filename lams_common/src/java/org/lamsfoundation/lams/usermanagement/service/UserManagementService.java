@@ -531,11 +531,7 @@ public class UserManagementService implements IUserManagementService {
 		workspace.setRootFolder(workspaceFolder);
 		workspaceDAO.insertOrUpdate(workspace);
 		organisation.setWorkspace(workspace);
-		if(organisation.getOrganisationId()==0){
-			organisationDAO.insert(organisation);
-		}else{
-			organisationDAO.update(organisation);
-		}
+		organisationDAO.insertOrUpdate(organisation);
 		return organisation.getOrganisationId();
 	}
 
