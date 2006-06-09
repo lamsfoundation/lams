@@ -3,37 +3,50 @@
 <tiles-definitions>
 
 	<definition name=".orglist" path="/template.jsp">
-		<put name="title" value="LAMS :: Organisation Management"/>
+		<put name="title" value="admin.organisation.management"/>
+		<put name="pageHeader" value="admin.organisation.management"/>
 		<put name="header" value="header.jsp"/>
 		<put name="content" value="orglist.jsp" />	
 		<put name="footer" value="footer.jsp"/>	
 	</definition>
 
 	<definition name=".organisation" path="/template.jsp">
-		<put name="title" value="LAMS :: Organisation Entry"/>
+		<put name="title" value="admin.organisation.entry"/>
+		<put name="pageHeader" value="admin.organisation.entry"/>
 		<put name="header" value="header.jsp"/>
 		<put name="content" value="organisation.jsp" />	
 		<put name="footer" value="footer.jsp"/>	
 	</definition>
 
 	<definition name=".joblist" path="/template.jsp">
-		<put name="title" value="LAMS :: List scheduled jobs in Quartz queue"/>
+		<put name="title" value="admin.list.job"/>
+		<put name="pageHeader" value="admin.job.list"/>
 		<put name="header" value="header.jsp"/>
 		<put name="content" value="joblist.jsp" />	
 		<put name="footer" value="footer.jsp"/>	
 	</definition>
 
 	<definition name=".sysadmin" path="/template.jsp">
-		<put name="title" value="LAMS :: Maintain LAMS"/>
+		<put name="title" value="sysadmin.maintain"/>
+		<put name="pageHeader" value="sysadmin.maintain"/>
 		<put name="header" value="header.jsp"/>
 		<put name="content" value="sysadmin.jsp" />	
 		<put name="footer" value="footer.jsp"/>	
 	</definition>
 
 	<definition name=".cache" path="/template.jsp">
-		<put name="title" value="LAMS :: Maintain LAMS Cache"/>
+		<put name="title" value="cache.maintain"/>
+		<put name="pageHeader" value="cache.maintain"/>
 		<put name="header" value="header.jsp"/>
 		<put name="content" value="cache.jsp" />	
+		<put name="footer" value="footer.jsp"/>	
+	</definition>
+
+	<definition name=".error" path="/template.jsp">
+		<put name="title" value="admin.error"/>
+		<put name="pageHeader" value="admin.error"/>
+		<put name="header" value="header.jsp"/>
+		<put name="content" value="error.jsp" />	
 		<put name="footer" value="footer.jsp"/>	
 	</definition>
 	
