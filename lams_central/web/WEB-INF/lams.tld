@@ -24,6 +24,17 @@
    </tag>
    <tag>
 
+      <description>Output a random number for the learner and passon flash movies to communicate directly.</description>
+      <display-name>generate unique ID</display-name>
+      <icon>    
+      </icon>
+      <name>generateID</name>
+      <tag-class>org.lamsfoundation.lams.web.tag.GenerateIDTag</tag-class>
+      <body-content>empty</body-content>
+
+   </tag>
+   <tag>
+
       <description>Output details from the shared session UserDTO object</description>
       <display-name>user details</display-name>
       <icon>    
@@ -44,17 +55,6 @@
    </tag>
    <tag>
 
-      <description>Output the basic URL for the current webapp. e.g. http://server/lams/tool/nb11/</description>
-      <display-name>Base URL for the current web app</display-name>
-      <icon>    
-      </icon>
-      <name>WebAppURL</name>
-      <tag-class>org.lamsfoundation.lams.web.tag.WebAppURLTag</tag-class>
-      <body-content>empty</body-content>
-
-   </tag>
-   <tag>
-
       <description>Output stylesheet based on the user preferences.</description>
       <display-name>User's chosen stylesheet</display-name>
       <icon>    
@@ -71,6 +71,17 @@
            <rtexprvalue>true</rtexprvalue>
 
       </attribute>
+
+   </tag>
+   <tag>
+
+      <description>Output the basic URL for the current webapp. e.g. http://server/lams/tool/nb11/</description>
+      <display-name>Base URL for the current web app</display-name>
+      <icon>    
+      </icon>
+      <name>WebAppURL</name>
+      <tag-class>org.lamsfoundation.lams.web.tag.WebAppURLTag</tag-class>
+      <body-content>empty</body-content>
 
    </tag>
 
