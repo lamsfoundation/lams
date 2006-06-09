@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <tiles-definitions>
-
+	
+	<definition name=".userlist" path="/template.jsp">
+		<put name="title" value="admin.user.management"/>
+		<put name="pageHeader" value="admin.user.management"/>
+		<put name="header" value="header.jsp"/>
+		<put name="content" value="userlist.jsp" />	
+		<put name="footer" value="footer.jsp"/>	
+	</definition>
+	
 	<definition name=".orglist" path="/template.jsp">
 		<put name="title" value="admin.organisation.management"/>
 		<put name="pageHeader" value="admin.organisation.management"/>
