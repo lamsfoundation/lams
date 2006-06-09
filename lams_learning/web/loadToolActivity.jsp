@@ -38,7 +38,7 @@ String pathToShare = protocol+request.getServerName()+":"+request.getServerPort(
 %>
 <body bgcolor="#9DC5EC">
 	<c:if test="${!empty activityForm.progressSummary}">
-		<c:set var="passonurl">passon.swf?<c:out value="${activityForm.progressSummary}" escapeXml="false"/></c:set>
+		<c:set var="passonurl">passon.swf?<c:out value="${activityForm.progressSummary}" escapeXml="false"/>&uniqueID=<c:out value="<script language='text/javascript'>document.write(parent.frames['controlFrame'].uniqueID);</script>" escapeXml="false"/></c:set>
 		<!-- URL's used in the movie-->
 		<!-- text used in the movie-->
 		<!--Library-->  

@@ -32,17 +32,22 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<lams:css/>
 		<title><fmt:message key="learner.title"/></title>
+		<c:set var="randomID">
+			<lams:generateID/>
+		</c:set>
+		<script language="JavaScript" type="text/javascript">
+			var uniqueID = "<%= pageContext.getAttribute("randomID") %>";
+		</script>
 	</head>
 	<body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
-
+	
 	<% 
 	String clientVersion = Configuration.get(ConfigurationKeys.LEARNER_CLIENT_VERSION);
 	String serverLanguage = Configuration.get(ConfigurationKeys.SERVER_LANGUAGE);
 	String languageDate = Configuration.getDictionaryDateForLanguage(serverLanguage);
 	%>
 
-	<c:set var="learnerurl">lams_learner.swf?userID=<lams:user property="userID"/>&serverURL=<lams:LAMSURL/>&build=<%=clientVersion%>&lang=<lams:user property="localeLanguage"/>&date=<%=languageDate%>&theme=<lams:user property="flashTheme"/>&lessonID=<c:out value="${param.lessonID}"/></c:set>
-
+	<c:set var="learnerurl">lams_learner.swf?userID=<lams:user property="userID"/>&serverURL=<lams:LAMSURL/>&build=<%=clientVersion%>&lang=<lams:user property="localeLanguage"/>&date=<%=languageDate%>&theme=<lams:user property="flashTheme"/>&lessonID=<c:out value="${param.lessonID}"/>&uniqueID=<c:out value="${randomID}"/></c:set>
 	<!-- URL's used in the movie-->
 	<!-- text used in the movie-->
 	<!--Library-->  
