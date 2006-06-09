@@ -372,11 +372,12 @@ public class Forum implements Cloneable{
 	}
 
 	/**
-	 * 
+	 * NOTE: The reason that relation don't use save-update to persist message is MessageSeq table need save 
+	 * a record as well.   
 	 * 
 	 * @hibernate.set lazy="true"
-	 *                inverse="false"
-	 *                cascade="save-update"
+	 *                inverse="true"
+	 *                cascade="none"
 	 *                order-by="create_date desc"
 	 * @hibernate.collection-key column="forum_uid"
 	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.forum.persistence.Message"

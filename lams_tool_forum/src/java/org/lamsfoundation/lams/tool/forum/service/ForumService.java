@@ -661,13 +661,17 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 				user.setUserId(new Long(newUserUid.longValue()));
 			}
 			toolContentObj.setCreatedBy(user);
+			//save forum first
+			forumDao.saveOrUpdate(toolContentObj);
 			
+			//save all authoring message one by one.
 			//reset all resourceItem createBy user
 			Set<Message> items = toolContentObj.getMessages();
 			for(Message item:items){
 				item.setCreatedBy(user);
+				item.setIsAuthored(true);
+				createRootTopic(toolContentObj.getUid(),null,item);
 			}
-			forumDao.saveOrUpdate(toolContentObj);
 		} catch (ImportToolContentException e) {
 			throw new ToolException(e);
 		}

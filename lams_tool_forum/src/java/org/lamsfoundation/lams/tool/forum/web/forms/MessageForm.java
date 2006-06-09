@@ -24,7 +24,9 @@
 /* $$Id$$ */	
 package org.lamsfoundation.lams.tool.forum.web.forms;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.poi.util.StringUtil;
 import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
@@ -64,13 +66,13 @@ public class MessageForm extends ValidatorForm {
      */
     public ActionErrors validate(ActionMapping mapping,
                                  javax.servlet.http.HttpServletRequest request) {
-        ActionErrors errors = super.validate(mapping, request);
+        ActionErrors errors = new ActionErrors(); 
         try{
-            if ("".equals(message.getSubject())) {
+            if (StringUtils.isBlank(message.getSubject())) {
                ActionMessage error = new ActionMessage("error.valueReqd");
                errors.add("message.subject", error);
             }
-            if ("".equals(message.getBody())) {
+            if (StringUtils.isBlank(message.getBody())) {
             	ActionMessage error = new ActionMessage("error.valueReqd");
                errors.add("message.body", error);
             }

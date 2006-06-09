@@ -41,17 +41,17 @@
 				<c:set var="edittopic">
 					<html:rewrite page="/authoring/editTopic.do?topicIndex=${topicIndex}&create=${topic.message.created.time}" />
 				</c:set> 
-				<html:link href="${edittopic}">
+				<html:link href="${edittopic}" styleClass="button">
 					<b><fmt:message key="label.edit" /></b>
-				</html:link>&nbsp;&nbsp;
+				</html:link>
 				
 				<c:set var="deletetopic">
 					<html:rewrite page="/authoring/deleteTopic.do?topicIndex=${topicIndex}" />
 				</c:set> 
-				<html:link href="${deletetopic}">
+				<html:link href="${deletetopic}" styleClass="button">
 					<b><fmt:message key="label.delete" />
-				</html:link> &nbsp;&nbsp;
-				<html:link href="javascript:window.parent.hideMessage()">
+				</html:link> 
+				<html:link href="javascript:window.parent.hideMessage()" styleClass="button">
 					<fmt:message key="button.cancel" />
 				</html:link></b>
 			</td>

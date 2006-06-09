@@ -130,8 +130,8 @@
         <set
             name="messages"
             lazy="true"
-            inverse="false"
-            cascade="save-update"
+            inverse="true"
+            cascade="none"
             sort="unsorted"
             order-by="create_date desc"
         >

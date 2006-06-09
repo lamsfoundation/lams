@@ -116,7 +116,7 @@
 			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
 			name="messageForm" 
 			validate="true"
-			input="tiles:/authoring/forum/newTopic" 
+			input="/jsps/authoring/message/create.jsp" 
 			parameter="createTopic"
 			scope="request">
 			<forward name="success" path="/jsps/authoring/message/create.jsp" />
@@ -141,7 +141,7 @@
 			parameter="editTopic"
 			scope="session">
 			<forward name="success" path="/jsps/authoring/message/edit.jsp" />
-			<forward name="forbidden" path="tiles:/authoring/forum/forbiddenEditTopic" />
+			<forward name="forbidden" path="/jsps/authoring/message/forbiddenedit.jsp" />
 		</action>
 		<action path="/authoring/deleteAttachment"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"

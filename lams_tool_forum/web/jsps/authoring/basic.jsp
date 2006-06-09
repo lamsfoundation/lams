@@ -51,7 +51,7 @@
 	</tr>
 	<tr>
 		<td colspan="2" align="left">
-			<a href="javascript:showMessage('<html:rewrite page="/authoring/newTopic.do"/>');" class="button">
+			<a href="javascript:showMessage('<html:rewrite page="/authoring/newTopic.do"/>');" style="float:left;width:150px"  class="button">
 				<fmt:message key="label.authoring.create.new.topic" />
 			</a>
 		</td>
