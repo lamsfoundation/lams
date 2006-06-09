@@ -56,6 +56,8 @@ public class ChatUser implements java.io.Serializable {
 	private ChatSession chatSession;
 	
 	private String jabberId;
+	
+	private Boolean finishedActivity;
 
 	// Constructors
 
@@ -149,7 +151,18 @@ public class ChatUser implements java.io.Serializable {
 	public void setJabberId(String jabberId) {
 		this.jabberId = jabberId;
 	}
+	
+	/**
+	 * @hibernate.property column="finishedActivity" 
+	 */
+	public Boolean getFinishedActivity() {
+		return finishedActivity;
+	}
 
+	public void setFinishedActivity(Boolean finishedActivity) {
+		this.finishedActivity = finishedActivity;
+	}
+	
 	/**
 	 * @hibernate.many-to-one not-null="true"
 	 * @hibernate.column name="chat_session_uid"
@@ -199,4 +212,5 @@ public class ChatUser implements java.io.Serializable {
 				+ (getUid() == null ? 0 : this.getUid().hashCode());
 		return result;
 	}
+
 }

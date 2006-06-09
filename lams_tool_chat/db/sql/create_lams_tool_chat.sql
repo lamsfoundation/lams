@@ -63,6 +63,7 @@ create table tl_lachat11_user (
    login_name varchar(255),
    first_name varchar(255),
    jabber_id varchar(255),
+   finishedActivity bit,
    chat_session_uid bigint,
    primary key (uid)
 );
