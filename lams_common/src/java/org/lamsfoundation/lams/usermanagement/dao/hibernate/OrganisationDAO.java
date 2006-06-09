@@ -80,20 +80,6 @@ public class OrganisationDAO extends BaseDAO implements
     }
 	
 	/**
-	 * @see org.lamsfoundation.lams.usermanagement.dao.IOrganisationDAO#deleteOrganisation(org.lamsfoundation.lams.usermanagement.Organisation)
-	 */
-	public void delete(Organisation organisation) {
-		Iterator iter = organisation.getChildOrganisations().iterator();
-		Organisation parentOrganisation = organisation.getParentOrganisation();
-		while(iter.hasNext()){
-			Organisation childOrganisation = (Organisation)iter.next();
-			childOrganisation.setParentOrganisation(parentOrganisation);
-			iter.remove();
-		}
-		delete(organisation);
-	}
-
-	/**
 	 * @see org.lamsfoundation.lams.usermanagement.dao.IOrganisationDAO#deleteOrganisationById(java.lang.Integer)
 	 */
 	public void deleteOrganisationById(Integer organisationId) {
