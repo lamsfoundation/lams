@@ -74,7 +74,8 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 	
 	private var _learnerTabViewContainer_mc:MovieClip
 	private var bkg_pnl:MovieClip;
-	private var _helpLayer_mc:MovieClip;
+	private var learnerMenuBar:MovieClip;
+	//private var _helpLayer_mc:MovieClip;
 	private var _gridLayer_mc:MovieClip;
 	private var _learnersLayer_mc:MovieClip;
 	private var _activityLayerComplex_mc:MovieClip;
@@ -146,6 +147,9 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 						if (learnersDrawn != mm.allLearnersProgress.length){
 							drawAllLearnersDesign(mm, infoObj.tabID)
 						}
+						if(mm.getIsProgressChanged()){
+							reloadProgress(false);
+						}
 					}else {
 						this._visible = false;
 					}
@@ -192,7 +196,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		//set up the Movie Clips to load relevant  
 
 		//_helpLayer_mc = this.attachMovie("RefreshBar", "RefreshBar", _helpLayer_mc.getNextHighestDepth()) 
-		var learnerMenuBar = this.attachMovie("RefreshBar", "RefreshBar", _helpLayer_mc.getNextHighestDepth())
+		learnerMenuBar = this.attachMovie("RefreshBar", "RefreshBar", this.getNextHighestDepth())
 		learnerMenuBar = eval(learnerMenuBar)
 		//_helpLayer_mc.createEmptyMovieClip("_helpLayer_mc", this.getNextHighestDepth());
 		
@@ -201,7 +205,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		_gridLayer_mc = this.createEmptyMovieClip("_gridLayer_mc", this.getNextHighestDepth());
 		
 		_activityLayerComplex_mc = this.createEmptyMovieClip("_activityLayerComplex_mc", this.getNextHighestDepth());
-		_activityLayer_mc = this.createEmptyMovieClip("_activityLayer_mc", this.getNextHighestDepth(),{_y:_helpLayer_mc._height});
+		_activityLayer_mc = this.createEmptyMovieClip("_activityLayer_mc", this.getNextHighestDepth(),{_y:learnerMenuBar._height});
 		
 		learnerMenuBar.refresh_btn.onRelease = Proxy.create (this, reloadProgress);
 		trace("Help layer path: "+ learnerMenuBar.refresh_btn.label)
@@ -242,8 +246,13 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 	return array;
 	}
 	
-	
-	private function reloadProgress(){
+	/**
+	 * Reloads the learner Progress and 
+	 * @Param isChanged Boolean Value to pass it to setIsProgressChanged in monitor model so 		that it sets it to true if refresh button is clicked and sets it to fasle as soon as latest data is loaded and design is redrawn.
+	 * @usage   
+	 * @return  nothing
+	 */
+	private function reloadProgress(isChanged:Boolean){
 		
 		//if (learnersDrawn != mm.allLearnersProgress.length){
 			trace("reloading Progress data for Learners")
@@ -252,10 +261,16 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 			ACT_Y = 35;
 			//for(var i=0; i<_activityLayer_mc.children.length;i++){
 				_activityLayer_mc.removeMovieClip();
-				_activityLayer_mc = this.createEmptyMovieClip("_activityLayer_mc", this.getNextHighestDepth(),{_y:_helpLayer_mc._height});
+				_activityLayer_mc = this.createEmptyMovieClip("_activityLayer_mc", this.getNextHighestDepth(),{_y:learnerMenuBar._height});
 			//}
-			
+			if (isChanged == false){
+				mm.setIsProgressChanged(false);
+				
+			}else {
+				mm.setIsProgressChanged(true);
+			}
 			mm.getMonitor().getProgressData(mm.getSequence());
+			
 		//}
 		
 	}
@@ -388,7 +403,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		trace("Monitor Tab Grid Width: "+s.w+" Monitor Tab Grid Height: "+s.h);
 		//monitor_scp.setSize(s.w,s.h);
 		bkg_pnl.setSize(s.w,s.h);
-		
+		learnerMenuBar.help_btn._x = s.w - 80
 		//Create the grid.  The grid is re-drawn each time the canvas is resized.
 		//var grid_mc = Grid.drawGrid(_gridLayer_mc,Math.round(s.w-10),Math.round(s.h-10),V_GAP,H_GAP);
 				
