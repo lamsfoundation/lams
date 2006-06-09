@@ -7,14 +7,24 @@
 
 <form>
 <logic:equal name="OrgManageForm" property="type" value="1">
-	<h4 align="left"><fmt:message key="admin.course.manage" /></h4>
-	<p align="left"><fmt:message key="admin.in"/> <fmt:message key="admin.organisation"/>:<bean:write name="OrgManageForm" property="parentName"/></p>
-	<p align="right"><input type="button" value='<fmt:message key="admin.course.add"/>' onclick=javascript:document.location='organisation.do?method=edit&typeId=2&parentName=<bean:write name="OrgManageForm" property="parentName"/>&parentId=<bean:write name="OrgManageForm" property="parentId"/>' /></p>
+	<h4 align="left"><fmt:message key="admin.course.manage" /> <fmt:message key="admin.in"/> <fmt:message key="admin.organisation"/>: <bean:write name="OrgManageForm" property="parentName"/></h4>
+	<c:url var="editaction" value="organisation.do">
+		<c:param name="method" value="edit" />
+		<c:param name="typeId" value="2" />
+		<c:param name="parentId" value="${OrgManageForm.parentId}" />
+		<c:param name="parentName" value="${OrgManageForm.parentName}" />
+	</c:url>
+	<p align="right"><input type="button" value='<fmt:message key="admin.course.add"/>' onclick=javascript:document.location='<c:out value="${editaction}"/>' /></p>
 </logic:equal>
 <logic:equal name="OrgManageForm" property="type" value="2">
-	<h4 align="left"><fmt:message key="admin.class.manage" /></h4>
-	<p align="left"><fmt:message key="admin.in"/> <fmt:message key="admin.course"/>:<bean:write name="OrgManageForm" property="parentName"/></p>
-	<p align="right"><input type="button" value='<fmt:message key="admin.class.add"/>' onclick=javascript:document.location='organisation.do?method=edit&typeId=3&parentName=<bean:write name="OrgManageForm" property="parentName"/>&parentId=<bean:write name="OrgManageForm" property="parentId"/>' /></p>
+	<h4 align="left"><fmt:message key="admin.class.manage" /> <fmt:message key="admin.in"/> <fmt:message key="admin.course"/>:<bean:write name="OrgManageForm" property="parentName"/></h4>
+	<c:url var="editaction" value="organisation.do">
+		<c:param name="method" value="edit" />
+		<c:param name="typeId" value="3" />
+		<c:param name="parentId" value="${OrgManageForm.parentId}" />
+		<c:param name="parentName" value="${OrgManageForm.parentName}" />
+	</c:url>
+	<p align="right"><input type="button" value='<fmt:message key="admin.class.add"/>' onclick=javascript:document.location='<c:out value="${editaction}"/>' /></p>
 </logic:equal>
 <table width=100%>
 <tr>
