@@ -147,6 +147,14 @@ public interface IChatService {
 	
 	/**
 	 * 
+	 * @param jabberNickname
+	 * @param sessionID
+	 * @return
+	 */
+	public ChatUser getUserByJabberNicknameAndSessionID(String jabberNickname, Long sessionID);
+	
+	/**
+	 * 
 	 * @param chatUser
 	 */
 	public void saveOrUpdateChatUser(ChatUser chatUser);

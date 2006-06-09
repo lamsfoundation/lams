@@ -102,7 +102,7 @@ public ActionForward unspecified(ActionMapping mapping, ActionForm form,
 		request.setAttribute("USERNAME", chatUser.getUserId());
 		request.setAttribute("PASSWORD", chatUser.getUserId());
 		request.setAttribute("CONFERENCEROOM", chatSession.getJabberRoom());
-		request.setAttribute("NICK", chatUser.getLoginName());
+		request.setAttribute("NICK", chatUser.getJabberNickname());
 		request.setAttribute("MODE", "learner");
 		request.setAttribute("USER_UID", chatUser.getUid());
 		request.setAttribute("LEARNER_FINISHED", chatUser.getFinishedActivity());

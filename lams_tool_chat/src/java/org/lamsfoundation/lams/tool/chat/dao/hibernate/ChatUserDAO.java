@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.tool.chat.dao.IChatUserDAO;
+import org.lamsfoundation.lams.tool.chat.model.ChatSession;
 import org.lamsfoundation.lams.tool.chat.model.ChatUser;
 
 /**
@@ -49,6 +50,10 @@ public class ChatUserDAO extends BaseDAO implements IChatUserDAO {
 
 	private static final String SQL_QUERY_FIND_BY_UID = "from "
 			+ ChatUser.class.getName() + " where uid=?";
+
+	private static final String SQL_QUERY_FIND_BY_NICKNAME_AND_SESSION = "from "
+		+ ChatUser.class.getName()
+		+ " as f where jabber_nickname=? and f.chatSession.sessionId=?";
 
 	public ChatUser getByUserIdAndSessionId(Long userId, Long toolSessionId) {
 		List list = this.getHibernateTemplate().find(
@@ -96,6 +101,16 @@ public class ChatUserDAO extends BaseDAO implements IChatUserDAO {
 	public ChatUser getByUID(Long uid) {
 		List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_BY_UID,
 				new Object[] { uid });
+
+		if (list == null || list.isEmpty())
+			return null;
+
+		return (ChatUser) list.get(0);
+	}
+
+	public ChatUser getByJabberNicknameAndSessionID(String jabberNickname, Long sessionID) {
+		List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_BY_NICKNAME_AND_SESSION,
+				new Object[] { jabberNickname, sessionID });
 
 		if (list == null || list.isEmpty())
 			return null;

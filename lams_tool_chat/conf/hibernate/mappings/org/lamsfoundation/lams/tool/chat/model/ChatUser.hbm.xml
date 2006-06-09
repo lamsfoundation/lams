@@ -70,6 +70,22 @@
             length="255"
         />
 
+        <property
+            name="finishedActivity"
+            type="java.lang.Boolean"
+            update="true"
+            insert="true"
+            column="finishedActivity"
+        />
+
+        <property
+            name="jabberNickname"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="jabber_nickname"
+        />
+
         <many-to-one
             name="chatSession"
             class="org.lamsfoundation.lams.tool.chat.model.ChatSession"

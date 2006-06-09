@@ -224,7 +224,9 @@ function sendMsg(aForm) {
   		// apending the private message to the incoming window, 
   		// since the jabber server will not echo sent private messages.
   		// TODO: need to check if this is correct behaviour
-        // updateMessageDisplay(generateMessageHTML(NICK, aForm.msg.value, PRIVATE_MSG));
+        if (!(NICK == toNick)) {
+        	updateMessageDisplay(generateMessageHTML(NICK, aForm.msg.value, PRIVATE_MSG));
+        }
     } else {
         aMsg.setTo(CONFERENCEROOM);
         aMsg.setType("groupchat");

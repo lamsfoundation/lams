@@ -124,11 +124,11 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 	private IToolContentHandler chatToolContentHandler = null;
 
 	private IRepositoryService repositoryService = null;
-	
+
 	private IAuditService auditService = null;
 
 	private IExportToolContentService exportContentService;
-	
+
 	public ChatService() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -256,60 +256,76 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 		// TODO Auto-generated method stub
 
 	}
-	/**
-     * Export the XML fragment for the tool's content, along with any files needed
-     * for the content.
-     * @throws DataMissingException if no tool content matches the toolSessionId 
-     * @throws ToolException if any other error occurs
-     */
 
-	public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
+	/**
+	 * Export the XML fragment for the tool's content, along with any files
+	 * needed for the content.
+	 * 
+	 * @throws DataMissingException
+	 *             if no tool content matches the toolSessionId
+	 * @throws ToolException
+	 *             if any other error occurs
+	 */
+
+	public void exportToolContent(Long toolContentId, String rootPath)
+			throws DataMissingException, ToolException {
 		Chat toolContentObj = chatDAO.getByContentId(toolContentId);
- 		if(toolContentObj == null)
- 			throw new DataMissingException("Unable to find tool content by given id :" + toolContentId);
- 		
- 		//set ResourceToolContentHandler as null to avoid copy file node in repository again.
- 		toolContentObj = Chat.newInstance(toolContentObj,toolContentId,null);
- 		toolContentObj.setToolContentHandler(null);
- 		toolContentObj.setChatSessions(null);
- 		Set<ChatAttachment> atts = toolContentObj.getChatAttachments(); 
- 		for(ChatAttachment att: atts){
- 			att.setChat(null);
- 		}
+		if (toolContentObj == null)
+			throw new DataMissingException(
+					"Unable to find tool content by given id :" + toolContentId);
+
+		// set ResourceToolContentHandler as null to avoid copy file node in
+		// repository again.
+		toolContentObj = Chat.newInstance(toolContentObj, toolContentId, null);
+		toolContentObj.setToolContentHandler(null);
+		toolContentObj.setChatSessions(null);
+		Set<ChatAttachment> atts = toolContentObj.getChatAttachments();
+		for (ChatAttachment att : atts) {
+			att.setChat(null);
+		}
 		try {
-			exportContentService.registerFileClassForExport(ChatAttachment.class.getName(),"fileUuid","fileVersionId");
-			exportContentService.exportToolContent( toolContentId, toolContentObj,chatToolContentHandler, rootPath);
+			exportContentService
+					.registerFileClassForExport(ChatAttachment.class.getName(),
+							"fileUuid", "fileVersionId");
+			exportContentService.exportToolContent(toolContentId,
+					toolContentObj, chatToolContentHandler, rootPath);
 		} catch (ExportToolContentException e) {
 			throw new ToolException(e);
 		}
 	}
 
-
-    /**
-     * Import the XML fragment for the tool's content, along with any files needed
-     * for the content.
-     * @throws ToolException if any other error occurs
-     */
-	public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath) throws ToolException {
+	/**
+	 * Import the XML fragment for the tool's content, along with any files
+	 * needed for the content.
+	 * 
+	 * @throws ToolException
+	 *             if any other error occurs
+	 */
+	public void importToolContent(Long toolContentId, Integer newUserUid,
+			String toolContentPath) throws ToolException {
 		try {
-			exportContentService.registerFileClassForImport(ChatAttachment.class.getName()
-					,"fileUuid","fileVersionId","fileName","fileType",null,null);
-			
-			Object toolPOJO =  exportContentService.importToolContent(toolContentPath,chatToolContentHandler);
-			if(!(toolPOJO instanceof Chat))
-				throw new ImportToolContentException("Import Chat tool content failed. Deserialized object is " + toolPOJO);
+			exportContentService.registerFileClassForImport(
+					ChatAttachment.class.getName(), "fileUuid",
+					"fileVersionId", "fileName", "fileType", null, null);
+
+			Object toolPOJO = exportContentService.importToolContent(
+					toolContentPath, chatToolContentHandler);
+			if (!(toolPOJO instanceof Chat))
+				throw new ImportToolContentException(
+						"Import Chat tool content failed. Deserialized object is "
+								+ toolPOJO);
 			Chat toolContentObj = (Chat) toolPOJO;
-			
-//			reset it to new toolContentId
+
+			// reset it to new toolContentId
 			toolContentObj.setToolContentId(toolContentId);
 			toolContentObj.setCreateBy(new Long(newUserUid.longValue()));
-			
+
 			chatDAO.saveOrUpdate(toolContentObj);
 		} catch (ImportToolContentException e) {
 			throw new ToolException(e);
 		}
 	}
-	
+
 	/* ********** IChatService Methods ************************************** */
 	public Long getDefaultContentIdBySignature(String toolSignature) {
 		Long toolContentId = null;
@@ -392,11 +408,17 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 			String jabberRoom) {
 		return chatUserDAO.getByJabberIDAndJabberRoom(jabberID, jabberRoom);
 	}
-	
+
 	public ChatUser getUserByUID(Long uid) {
 		return chatUserDAO.getByUID(uid);
 	}
-	
+
+	public ChatUser getUserByJabberNicknameAndSessionID(String jabberNickname,
+			Long sessionID) {
+		return chatUserDAO.getByJabberNicknameAndSessionID(jabberNickname,
+				sessionID);
+	}
+
 	public List getMessagesForUser(ChatUser chatUser) {
 		return chatMessageDAO.getForUser(chatUser);
 	}
@@ -452,12 +474,36 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 		chatMessageDAO.saveOrUpdate(chatMessage);
 	}
 
-	public ChatUser createChatUser(UserDTO user, ChatSession chatSession) {
+	public synchronized ChatUser createChatUser(UserDTO user,
+			ChatSession chatSession) {
 		ChatUser chatUser = new ChatUser(user, chatSession);
 		chatUser.setJabberId(createJabberId(user));
-		// persist chatUser to db
+		chatUser.setJabberNickname(createJabberNickname(chatUser));
 		saveOrUpdateChatUser(chatUser);
 		return chatUser;
+	}
+
+	public String createJabberNickname(ChatUser chatUser) {
+		String desiredJabberNickname = chatUser.getFirstName() + " "
+				+ chatUser.getLastName();
+		String jabberNickname = desiredJabberNickname;
+
+		boolean valid = false;
+		int count = 1;
+
+		// TODO may need max tries to prevent possibly entering infinite loop.
+		while (!valid) {
+			if (getUserByJabberNicknameAndSessionID(jabberNickname, chatUser
+					.getChatSession().getSessionId()) == null) {
+				// jabberNickname is available
+				valid = true;
+			} else {
+				jabberNickname = desiredJabberNickname + " " + count;
+				count++;
+			}
+		}
+
+		return jabberNickname;
 	}
 
 	public void createJabberRoom(ChatSession chatSession) {
@@ -501,7 +547,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 
 			chatSession.setJabberRoom(jabberRoom);
 			con.close();
-			
+
 		} catch (XMPPException e) {
 			logger.error(e);
 		}
@@ -549,7 +595,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 			}
 
 			ChatSession chatSession = this.getSessionByJabberRoom(jabberRoom);
-			ChatUser toChatUser = getUserByLoginNameAndSessionId(toNick,
+			ChatUser toChatUser = getUserByJabberNicknameAndSessionID(toNick,
 					chatSession.getSessionId());
 			chatMessage.setChatSession(chatSession);
 			chatMessage.setToUser(toChatUser);
@@ -597,11 +643,12 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 		Node to = nnm.getNamedItem("to");
 		if (from == null || to == null) {
 			// somethings wrong, return empty list
-			logger.debug("malformed presence xml: no from or to attributes present");
+			logger
+					.debug("malformed presence xml: no from or to attributes present");
 			return null;
 		}
-		
-		// TODO, do we really need to check this  ??
+
+		// TODO, do we really need to check this ??
 		// checking presence packet for correct values
 		Node xElem = presence.getFirstChild();
 		if (xElem == null) {
@@ -609,8 +656,11 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 		}
 		nnm = xElem.getAttributes();
 		Node xmlns = nnm.getNamedItem("xmlns");
-		if (xmlns == null || !xmlns.getNodeValue().equals("http://jabber.org/protocol/muc")) {
-			logger.debug("malformed presence xml: xmlns attribute for x element not available or incorrect");
+		if (xmlns == null
+				|| !xmlns.getNodeValue().equals(
+						"http://jabber.org/protocol/muc")) {
+			logger
+					.debug("malformed presence xml: xmlns attribute for x element not available or incorrect");
 			return null;
 		}
 
@@ -634,7 +684,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 
 				Element messageElement = document.createElement("message");
 				messageElement.setAttribute("from", jabberRoom + "/"
-						+ message.getFromUser().getLoginName());
+						+ message.getFromUser().getJabberNickname());
 				messageElement
 						.setAttribute("to", jabberID + "/lams_chatclient");
 				messageElement.setAttribute("type", message.getType());
@@ -645,16 +695,18 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 
 				Element xElement = document.createElement("x");
 				xElement.setAttribute("xmlns", "jabber:x:delay");
-				xElement.setAttribute("stamp", "TODO"); // TODO generate the stamp attribute
+				xElement.setAttribute("stamp", "TODO"); // TODO generate the
+														// stamp attribute
 				xElement.setAttribute("from", jabberRoom + "/"
-						+ message.getFromUser().getLoginName());
+						+ message.getFromUser().getJabberNickname());
 
 				messageElement.appendChild(bodyElement);
 				messageElement.appendChild(xElement);
-				filterMessage(messageElement, chatUser.getChatSession().getChat());
-								
+				filterMessage(messageElement, chatUser.getChatSession()
+						.getChat());
+
 				xmlMessageList.add(messageElement);
-				//printXMLNode(messageElement, "");
+				// printXMLNode(messageElement, "");
 			}
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
@@ -666,20 +718,20 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 
 	private void printXMLNode(Node node, String tab) {
 		System.out.print(tab + node.getNodeName() + ":");
-		
+
 		NamedNodeMap nnm = node.getAttributes();
 		for (int j = 0; j < nnm.getLength(); j++) {
 			Node m = nnm.item(j);
 			System.out.print(" " + m.getNodeName() + "=" + m.getNodeValue());
 		}
 		System.out.print(" => " + node.getNodeValue() + "\n");
-		
+
 		NodeList nl = node.getChildNodes();
 		for (int i = 0; i < nl.getLength(); i++) {
-			Node n = nl.item(i);		
+			Node n = nl.item(i);
 			printXMLNode(n, tab + "    ");
 		}
-		
+
 	}
 
 	public void filterMessage(Node message, Chat chat) {
@@ -721,7 +773,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 		Matcher matcher = pattern.matcher(bodyText.getNodeValue());
 		bodyText.setNodeValue(matcher.replaceAll("***"));
 	}
-	
+
 	public void filterMessage(Node message) {
 		NamedNodeMap nnm = message.getAttributes();
 		String from = nnm.getNamedItem("from").getNodeValue();
@@ -745,13 +797,13 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 		messageFilters.put(chat.getToolContentId(), filter);
 		return filter;
 	}
-	
+
 	public ChatMessage getMessageByUID(Long messageUID) {
 		return chatMessageDAO.getByUID(messageUID);
 	}
 
-		public List getLastestMessages(ChatSession chatSession, int max) {
-		return chatMessageDAO.getLatest(chatSession, max);		
+	public List getLastestMessages(ChatSession chatSession, int max) {
+		return chatMessageDAO.getLatest(chatSession, max);
 	}
 
 	public IAuditService getAuditService() {
@@ -761,20 +813,23 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 	public void setAuditService(IAuditService auditService) {
 		this.auditService = auditService;
 	}
-	
+
 	public void auditEditMessage(ChatMessage chatMessage, String messageBody) {
-		auditService.logChange(ChatConstants.TOOL_SIGNATURE,
-	 			chatMessage.getFromUser().getUserId(), chatMessage.getFromUser().getLoginName(),
-	 			chatMessage.getBody(), messageBody);
+		auditService.logChange(ChatConstants.TOOL_SIGNATURE, chatMessage
+				.getFromUser().getUserId(), chatMessage.getFromUser()
+				.getLoginName(), chatMessage.getBody(), messageBody);
 	}
 
-	public void auditHideShowMessage(ChatMessage chatMessage, boolean messageHidden) {
-		if ( messageHidden ) {
-			auditService.logHideEntry(ChatConstants.TOOL_SIGNATURE, chatMessage.getFromUser().getUserId(), 
-					chatMessage.getFromUser().getLoginName(), chatMessage.toString());
+	public void auditHideShowMessage(ChatMessage chatMessage,
+			boolean messageHidden) {
+		if (messageHidden) {
+			auditService.logHideEntry(ChatConstants.TOOL_SIGNATURE, chatMessage
+					.getFromUser().getUserId(), chatMessage.getFromUser()
+					.getLoginName(), chatMessage.toString());
 		} else {
-			auditService.logShowEntry(ChatConstants.TOOL_SIGNATURE, chatMessage.getFromUser().getUserId(), 
-					chatMessage.getFromUser().getLoginName(), chatMessage.toString());
+			auditService.logShowEntry(ChatConstants.TOOL_SIGNATURE, chatMessage
+					.getFromUser().getUserId(), chatMessage.getFromUser()
+					.getLoginName(), chatMessage.toString());
 		}
 	}
 
@@ -955,7 +1010,8 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 		return exportContentService;
 	}
 
-	public void setExportContentService(IExportToolContentService exportContentService) {
+	public void setExportContentService(
+			IExportToolContentService exportContentService) {
 		this.exportContentService = exportContentService;
 	}
 }

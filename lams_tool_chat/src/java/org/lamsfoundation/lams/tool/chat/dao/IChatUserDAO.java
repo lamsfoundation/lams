@@ -24,7 +24,10 @@
 
 package org.lamsfoundation.lams.tool.chat.dao;
 
+import java.util.List;
+
 import org.lamsfoundation.lams.dao.IBaseDAO;
+import org.lamsfoundation.lams.tool.chat.model.ChatSession;
 import org.lamsfoundation.lams.tool.chat.model.ChatUser;
 
 /**
@@ -64,4 +67,12 @@ public interface IChatUserDAO extends IBaseDAO{
 	 * @return
 	 */
 	ChatUser getByUID(Long uid);
+
+	/**
+	 * 
+	 * @param jabberNickname
+	 * @param chatSession
+	 * @return
+	 */
+	ChatUser getByJabberNicknameAndSessionID(String jabberNickname, Long sessionID);
 }
