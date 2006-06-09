@@ -123,6 +123,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				 		</td>
 			  	   </tr>
 
+
 			 		<c:if test="${sessionScope.isRetries == 'true'}"> 					  	   
 		  	   		  <tr>
 					  	<td NOWRAP colspan=2 align=center valign=top> 
@@ -131,9 +132,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									<bean:message key="label.redo.questions"/>
 								</html:submit>	 		
 			       
-						  	   <html:submit property="learnerFinished" styleClass="button">
-									<bean:message key="label.finished"/>
-							   </html:submit>
+								<c:if test="${((McLearningForm.passMarkApplicable == 'true') && (McLearningForm.userOverPassMark == 'true'))}">
+							  	   <html:submit property="learnerFinished" styleClass="button">
+										<bean:message key="label.finished"/>
+								   </html:submit>
+						  	   </c:if>
 							</font>
 					  	 </td>
 					  </tr>

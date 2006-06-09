@@ -398,9 +398,12 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     	Map mapQuestionWeights =(Map) request.getSession().getAttribute(MAP_QUESTION_WEIGHTS);
     	logger.debug("mapQuestionWeights: " + mapQuestionWeights);
     	
+    	mcLearningForm.setUserOverPassMark(new Boolean(false).toString());
+    	mcLearningForm.setPassMarkApplicable(new Boolean(false).toString());
     	boolean passed=false;
     	if ((passMark != null) && (passMark.intValue() != 0)) 
 		{
+    	    mcLearningForm.setPassMarkApplicable(new Boolean(true).toString());
     		int totalUserWeight=LearningUtil.calculateWeights(mapLeanerAssessmentResults, mapQuestionWeights);
     		logger.debug("totalUserWeight: " + totalUserWeight);
     		
@@ -414,9 +417,15 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     		{
     			logger.debug("USER PASSED");
     			passed=true;
+    			mcLearningForm.setUserOverPassMark(new Boolean(true).toString());
     		}
 		}
 
+    	if (passMark == null)
+    	{
+    	    mcLearningForm.setPassMarkApplicable(new Boolean(false).toString());
+    	}
+    	
     	boolean isUserDefined=LearningUtil.doesUserExists(request);
     	logger.debug("isUserDefined");
     	if (isUserDefined == false)
@@ -449,6 +458,8 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
         logger.debug("learnerMarkAtLeast:" + learnerMarkAtLeast);
         request.getSession().setAttribute(LEARNER_MARK_ATLEAST, new Integer(learnerMarkAtLeast).toString());
 		
+        logger.debug("user over passmark:" + mcLearningForm.getUserOverPassMark());
+        logger.debug("is passmark applicable:" + mcLearningForm.getPassMarkApplicable());
 		mcLearningForm.resetCommands();
 		return (mapping.findForward(INDIVIDUAL_REPORT));
     }

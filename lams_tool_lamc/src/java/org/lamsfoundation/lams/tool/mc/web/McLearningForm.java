@@ -48,7 +48,8 @@ public class McLearningForm extends ActionForm implements McAppConstants {
 	protected String donePreview;
 	protected String doneLearnerProgress;
 	
-	
+	protected String userOverPassMark;
+	protected String passMarkApplicable;
 	
 	
 	public void resetCommands()
@@ -256,4 +257,28 @@ public class McLearningForm extends ActionForm implements McAppConstants {
 	public void setDoneLearnerProgress(String doneLearnerProgress) {
 		this.doneLearnerProgress = doneLearnerProgress;
 	}
+    /**
+     * @return Returns the userOverPassMark.
+     */
+    public String getUserOverPassMark() {
+        return userOverPassMark;
+    }
+    /**
+     * @param userOverPassMark The userOverPassMark to set.
+     */
+    public void setUserOverPassMark(String userOverPassMark) {
+        this.userOverPassMark = userOverPassMark;
+    }
+    /**
+     * @return Returns the passMarkApplicable.
+     */
+    public String getPassMarkApplicable() {
+        return passMarkApplicable;
+    }
+    /**
+     * @param passMarkApplicable The passMarkApplicable to set.
+     */
+    public void setPassMarkApplicable(String passMarkApplicable) {
+        this.passMarkApplicable = passMarkApplicable;
+    }
 }

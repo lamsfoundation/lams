@@ -189,6 +189,9 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 		}
 
 		McLearningForm mcLearningForm = (McLearningForm) form;
+    	mcLearningForm.setPassMarkApplicable(new Boolean(false).toString());
+		mcLearningForm.setUserOverPassMark(new Boolean(false).toString());
+
 		
 		/*
 		 * initialize available question display modes in the session

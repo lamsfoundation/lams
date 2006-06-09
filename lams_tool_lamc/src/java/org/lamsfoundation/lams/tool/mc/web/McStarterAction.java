@@ -738,6 +738,16 @@ public class McStarterAction extends Action implements McAppConstants {
 		request.getSession().setAttribute(PASSMARK, mcContent.getPassMark()); //Integer
 		request.getSession().setAttribute(RICHTEXT_REPORT_TITLE,mcContent.getReportTitle());
 		request.getSession().setAttribute(RICHTEXT_END_LEARNING_MSG,mcContent.getEndLearningMessage());
+		request.getSession().setAttribute(RICHTEXT_INCORRECT_FEEDBACK,"");
+		request.getSession().setAttribute(RICHTEXT_CORRECT_FEEDBACK,"");
+
+		logger.debug("passMark:" +mcContent.getPassMark());
+		if (mcContent.getPassMark() == null)
+			mcContent.setPassMark(new Integer(0));
+
+		mcAuthoringForm.setPassmark(mcContent.getPassMark().toString());
+		request.getSession().setAttribute(PASSMARK, mcContent.getPassMark()); //Integer
+		
 
 		logger.debug("PASSMARK:" + request.getSession().getAttribute(PASSMARK));
 		logger.debug("RICHTEXT_TITLE:" + request.getSession().getAttribute(RICHTEXT_TITLE));
