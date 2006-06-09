@@ -46,7 +46,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 	private var _canvasController:CanvasController;
 	private var _canvasView:CanvasView;
 	private var _monitorController:MonitorController;
-	private var _learnerTabView : LearnerTabView;
 	private var _monitorTabView : MonitorTabView;
 	//Set by the init obj
 	private var _activity:Activity;
@@ -116,33 +115,17 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 			child2 = _children[0];
 		
 		}
-		
+		//set the positioning co-ords
+			child1.xCoord = CHILD_OFFSET_X;
+			child1.yCoord = CHILD1_OFFSET_Y;
+			child2.xCoord = CHILD_OFFSET_X;
+			child2.yCoord = CHILD2_OFFSET_Y;
 		//so now it is placed on in the IDE and we just call init
 		if (fromModuleTab == "monitorMonitorTab"){
-			//set the positioning co-ords
-			child1.xCoord = CHILD_OFFSET_X;
-			child1.yCoord = CHILD1_OFFSET_Y;
-			child2.xCoord = CHILD_OFFSET_X;
-			child2.yCoord = CHILD2_OFFSET_Y;
 			child1_mc.init({activity:child1,_monitorController:_monitorController,_monitorView:_monitorTabView});
 			child2_mc.init({activity:child2,_monitorController:_monitorController,_monitorView:_monitorTabView});
-			
-			
-		}else if (fromModuleTab == "monitorLearnerTab"){
-			//var progStatus:String = Progress.compareProgressData(learner, _children [i].activityID);
-			child1_mc.init({activity:child1,_monitorController:_monitorController,_monitorView:_learnerTabView, learner:learner, _module:"monitoring"});
-			child2_mc.init({activity:child2,_monitorController:_monitorController,_monitorView:_learnerTabView, learner:learner, _module:"monitoring"});
-			
-			//set the visibility to false
-			child1_mc._visible = false;
-			child2_mc._visible = false;
-			
-		} else {
-			//set the positioning co-ords
-			child1.xCoord = CHILD_OFFSET_X;
-			child1.yCoord = CHILD1_OFFSET_Y;
-			child2.xCoord = CHILD_OFFSET_X;
-			child2.yCoord = CHILD2_OFFSET_Y;
+				
+		}else {
 			child1_mc.init({activity:child1,_canvasController:_canvasController,_canvasView:_canvasView});
 			child2_mc.init({activity:child2,_canvasController:_canvasController,_canvasView:_canvasView});
 			
@@ -202,45 +185,41 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 		header_pnl.borderType='outset';
 		container_pnl.setStyle("backgroundColor",0x4289FF);
 		
-		if (fromModuleTab == "monitorLearnerTab"){
-			
-			containerPanelHeader.title_lbl.text = 'Parallel Activities'
-			
-		}else {
-			if(fromModuleTab == "monitorMonitorTab"){
-				var mm:MonitorModel = MonitorModel(_monitorController.getModel());
-			trace("all learner progress length in Canvas activity: "+mm.allLearnersProgress.length);
-			
-			// get the length of learners from the Monitor Model and run a for loop.
-				for (var j=0; j<mm.allLearnersProgress.length; j++){
-					var learner:Object = new Object();
-					learner = mm.allLearnersProgress[j]
-					
-					//Gets a true if learner's currect activityID matches this activityID else false.
-					
-					var isLearnerCurrentAct:Boolean = Progress.isLearnerCurrentActivity(learner, _activity.activityID);
-					if (isLearnerCurrentAct){
-						trace(_activity.title+": is the learner's current Activity.")
-						this.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), this.getNextHighestDepth(),{name_lbl:learner.getUserName()});
-					}else {
-						trace(_activity.title+": is not the learner's current Activity.")
-					}
+		
+		if(fromModuleTab == "monitorMonitorTab"){
+			var mm:MonitorModel = MonitorModel(_monitorController.getModel());
+		trace("all learner progress length in Canvas activity: "+mm.allLearnersProgress.length);
+		
+		// get the length of learners from the Monitor Model and run a for loop.
+			for (var j=0; j<mm.allLearnersProgress.length; j++){
+				var learner:Object = new Object();
+				learner = mm.allLearnersProgress[j]
+				
+				//Gets a true if learner's currect activityID matches this activityID else false.
+				
+				var isLearnerCurrentAct:Boolean = Progress.isLearnerCurrentActivity(learner, _activity.activityID);
+				if (isLearnerCurrentAct){
+					trace(_activity.title+": is the learner's current Activity.")
+					this.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), this.getNextHighestDepth(),{name_lbl:learner.getUserName()});
+				}else {
+					trace(_activity.title+": is not the learner's current Activity.")
 				}
 			}
-			//position the container (this)
-			_x = _activity.xCoord;
-			_y = _activity.yCoord;
-		
-			if(_locked){
-				padlockClosed_mc._visible = true;
-				padlockOpen_mc._visible = false;
-				clickTarget_mc._height = 173;
-			}else{
-				padlockOpen_mc._visible = true;
-				padlockClosed_mc._visible = false;
-				clickTarget_mc._height = 38;
-			}
 		}
+		//position the container (this)
+		_x = _activity.xCoord;
+		_y = _activity.yCoord;
+	
+		if(_locked){
+			padlockClosed_mc._visible = true;
+			padlockOpen_mc._visible = false;
+			clickTarget_mc._height = 173;
+		}else{
+			padlockOpen_mc._visible = true;
+			padlockClosed_mc._visible = false;
+			clickTarget_mc._height = 38;
+		}
+		
 	
 		_visible = true;
 		//child1_mc._visible = true;
@@ -280,32 +259,30 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 	
 	private function localOnRelease():Void{
 		Debugger.log('_doubleClicking:'+_doubleClicking+', localOnRelease:'+this,Debugger.GEN,'localOnRelease','CanvasParallelActivity');
-		if (fromModuleTab != "monitorLearnerTab"){
-			if ( ! _doubleClicking)
-			{
+		if ( ! _doubleClicking)	{
 				_canvasController.activityRelease (this);
-			}
-		}else {
-			if (_locked)
-			{
-				_locked = false;
-				gotoAndStop('collapse')
-				//set the visibility to false
-				child1_mc._visible = false;
-				child2_mc._visible = false;
-				draw ();
-				
-			}else
-			{
-				_locked = true;
-				//set the visibility to true
-				child1_mc._visible = true;
-				child2_mc._visible = true;
-				gotoAndStop('expand')
-				draw ();
-				
-			}
 		}
+		
+		if (_locked)
+		{
+			_locked = false;
+			gotoAndStop('collapse')
+			//set the visibility to false
+			child1_mc._visible = false;
+			child2_mc._visible = false;
+			draw ();
+			
+		}else
+		{
+			_locked = true;
+			//set the visibility to true
+			child1_mc._visible = true;
+			child2_mc._visible = true;
+			gotoAndStop('expand')
+			draw ();
+			
+		}
+		
 	}
 	
 	private function localOnReleaseOutside():Void{
