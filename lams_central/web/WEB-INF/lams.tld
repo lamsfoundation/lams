@@ -293,5 +293,9 @@
        <name>headItems</name>
        <path>/WEB-INF/tags/headItems.tag</path>
    	</tag-file>   	
+   	<tag-file>
+       <name>Passon</name>
+       <path>/WEB-INF/tags/Passon.tag</path>
+   	</tag-file>  
 
 </taglib>
