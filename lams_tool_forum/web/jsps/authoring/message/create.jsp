@@ -12,7 +12,6 @@
 					window.parent.hideMessage();
 				}
 			}
-			success();
 		</script>
 
 	</head>

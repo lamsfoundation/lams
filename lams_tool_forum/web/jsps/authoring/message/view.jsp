@@ -17,8 +17,8 @@
 	</head>
 	<body class="tabpart">
 		<script type="text/javascript">
-	success();
-</script>
+			success();
+		</script>
 		<table class="forms">
 			<!-- Basic Info Form-->
 			<tr>

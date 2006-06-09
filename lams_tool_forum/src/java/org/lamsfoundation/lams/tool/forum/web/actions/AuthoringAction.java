@@ -813,11 +813,7 @@ public class AuthoringAction extends Action {
     public ActionForward refreshTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
     		HttpServletResponse response) throws PersistenceException {
 
-    	ToolAccessMode mode = (ToolAccessMode) request.getSession().getAttribute(AttributeNames.ATTR_MODE);
-    	if(mode.isAuthor())
-    		return mapping.findForward("author");
-    	else
-    		return mapping.findForward("monitor");
+   		return mapping.findForward("success");
     	
     }
     
