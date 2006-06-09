@@ -71,6 +71,7 @@ public class ChatUser implements java.io.Serializable {
 		this.lastName = user.getLastName();
 		this.loginName = user.getLogin();
 		this.chatSession = chatSession;
+		this.finishedActivity = false;
 	}
 
 	/** full constructor */

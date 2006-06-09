@@ -392,7 +392,11 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 			String jabberRoom) {
 		return chatUserDAO.getByJabberIDAndJabberRoom(jabberID, jabberRoom);
 	}
-
+	
+	public ChatUser getUserByUID(Long uid) {
+		return chatUserDAO.getByUID(uid);
+	}
+	
 	public List getMessagesForUser(ChatUser chatUser) {
 		return chatMessageDAO.getForUser(chatUser);
 	}
@@ -954,5 +958,4 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 	public void setExportContentService(IExportToolContentService exportContentService) {
 		this.exportContentService = exportContentService;
 	}
-
 }

@@ -45,9 +45,6 @@ function updateRosterDisplay() {
     for (var i = 0; i < roster.users.length; i++) {
         if (roster.users[i].status != "unavailable") {
             nick = roster.users[i].nick;
-            if ((NICK == nick)) {
-                continue;
-            }
             oOption = new Option(nick, nick);
             oSelect.options[oSelect.options.length] = oOption;
         }
@@ -154,6 +151,19 @@ function handlePresence(presence) {
 function handleConnected() {
     document.getElementById("login_pane").style.display = "none";
     document.getElementById("chat_pane").style.display = "";
+	
+	if (MODE == "learner") {
+	    if ( LEARNER_FINISHED == "true") {
+		    if (LOCK_ON_FINISHED == "true") {
+    			// disable sending messages.
+	    		document.getElementById("msgArea").disabled="disabled";
+    			document.getElementById("sendButton").disabled="disabled";
+    			document.getElementById("clearButton").disabled="disabled";
+    		}       		
+   		} else {
+			document.getElementById("finishButtonDiv").style.display ="";	
+    	}   
+    } 
 
 	// send presence
     var aPresence = new JSJaCPresence();
@@ -214,7 +224,7 @@ function sendMsg(aForm) {
   		// apending the private message to the incoming window, 
   		// since the jabber server will not echo sent private messages.
   		// TODO: need to check if this is correct behaviour
-        updateMessageDisplay(generateMessageHTML(NICK, aForm.msg.value, PRIVATE_MSG));
+        // updateMessageDisplay(generateMessageHTML(NICK, aForm.msg.value, PRIVATE_MSG));
     } else {
         aMsg.setTo(CONFERENCEROOM);
         aMsg.setType("groupchat");

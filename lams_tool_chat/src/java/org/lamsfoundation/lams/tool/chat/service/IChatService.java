@@ -140,6 +140,13 @@ public interface IChatService {
 	
 	/**
 	 * 
+	 * @param uid
+	 * @return
+	 */
+	public ChatUser getUserByUID(Long uid);
+	
+	/**
+	 * 
 	 * @param chatUser
 	 */
 	public void saveOrUpdateChatUser(ChatUser chatUser);

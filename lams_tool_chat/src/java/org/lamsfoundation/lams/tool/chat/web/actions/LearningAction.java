@@ -36,6 +36,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
+import org.lamsfoundation.lams.tool.chat.model.Chat;
 import org.lamsfoundation.lams.tool.chat.model.ChatSession;
 import org.lamsfoundation.lams.tool.chat.model.ChatUser;
 import org.lamsfoundation.lams.tool.chat.service.ChatServiceProxy;
@@ -95,14 +96,20 @@ public ActionForward unspecified(ActionMapping mapping, ActionForm form,
 			chatService.saveOrUpdateChatSession(chatSession);
 		}		
 		
+		Chat chat = chatSession.getChat();
+		
 		request.setAttribute("XMPPDOMAIN", ChatConstants.XMPPDOMAIN);
 		request.setAttribute("USERNAME", chatUser.getUserId());
 		request.setAttribute("PASSWORD", chatUser.getUserId());
 		request.setAttribute("CONFERENCEROOM", chatSession.getJabberRoom());
 		request.setAttribute("NICK", chatUser.getLoginName());
+		request.setAttribute("MODE", "learner");
+		request.setAttribute("USER_UID", chatUser.getUid());
+		request.setAttribute("LEARNER_FINISHED", chatUser.getFinishedActivity());
+		request.setAttribute("LOCK_ON_FINISHED", chat.getLockOnFinished());
 		
-		request.setAttribute("chatTitle", chatSession.getChat().getTitle());
-		request.setAttribute("chatInstructions", chatSession.getChat().getInstructions());
+		request.setAttribute("chatTitle", chat.getTitle());
+		request.setAttribute("chatInstructions", chat.getInstructions());
 		
 		return mapping.findForward("success");
 		
@@ -124,6 +131,17 @@ public ActionForward unspecified(ActionMapping mapping, ActionForm form,
 	}
 	
 	public ActionForward finishActivity (ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+		
+		Long chatUserUID = WebUtil.readLongParam(request, "chatUserUID");
+		
+		// set the finished flag
+		ChatUser chatUser = chatService.getUserByUID(chatUserUID);
+		if (chatUser != null) {
+			chatUser.setFinishedActivity(true);
+			chatService.saveOrUpdateChatUser(chatUser);
+		} else {
+			log.error("finishActivity(): couldn't find ChatUser with uid: " + chatUserUID );
+		}
 		
 		ToolSessionManager sessionMgrService = ChatServiceProxy
 		.getChatSessionManager(getServlet().getServletContext());

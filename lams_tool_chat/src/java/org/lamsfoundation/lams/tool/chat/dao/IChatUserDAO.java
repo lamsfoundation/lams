@@ -57,4 +57,11 @@ public interface IChatUserDAO extends IBaseDAO{
 	 * @return
 	 */
 	ChatUser getByJabberIDAndJabberRoom(String jabberID, String jabberRoom);
+	
+	/**
+	 * 
+	 * @param uid 
+	 * @return
+	 */
+	ChatUser getByUID(Long uid);
 }
