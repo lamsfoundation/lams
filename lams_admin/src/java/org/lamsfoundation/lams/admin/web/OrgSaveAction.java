@@ -96,17 +96,19 @@ public class OrgSaveAction extends Action {
 			errors.add("name",new ActionMessage("error.name.required"));
 		}
 		if(errors.isEmpty()){
-			Organisation org = new Organisation();
-			BeanUtils.copyProperties(org,orgForm);
-			log.debug("orgId in orgForm:"+(Integer)orgForm.get("orgId"));
-			if((Integer)orgForm.get("orgId")!=0){
-				org.setCreateDate(service.getOrganisationById((Integer)orgForm.get("orgId")).getCreateDate());
+			Integer orgId = (Integer)orgForm.get("orgId");
+			Organisation org;
+			if(orgId!=0){
+				org = service.getOrganisationById(orgId);
 			}else{
+				org = new Organisation();
 				org.setCreateDate(new Date());
+				org.setParentOrganisation(service.getOrganisationById((Integer)orgForm.get("parentId")));
+				org.setOrganisationType(service.getOrganisationTypeById((Integer)orgForm.get("typeId")));
 			}
-			org.setParentOrganisation(service.getOrganisationById((Integer)orgForm.get("parentId")));
+			BeanUtils.copyProperties(org,orgForm);
+			log.debug("orgId:"+org.getOrganisationId()+" language:"+org.getLocaleLanguage()+" Country:"+org.getLocaleCountry()+" create date:"+org.getCreateDate());
 			org.setOrganisationState(service.getOrganisationStateById((Integer)orgForm.get("stateId")));
-			org.setOrganisationType(service.getOrganisationTypeById((Integer)orgForm.get("typeId")));
 			service.saveOrganisation(org,service.getUserByLogin(request.getRemoteUser()).getUserId());
 			request.setAttribute("org",orgForm.get("parentId"));
 			return mapping.findForward("orglist");

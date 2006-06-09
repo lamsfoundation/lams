@@ -35,6 +35,8 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionMessage;
+import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
@@ -63,7 +65,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * 
  * @struts:action path="/orgmanage"
  *                validate="false"
- *                
+ *
  * @struts:action-forward name="orglist"
  *                        path=".orglist"
  */
@@ -78,14 +80,29 @@ public class OrgManageAction extends Action {
             HttpServletRequest request,
             HttpServletResponse response) throws Exception{
 		
+		ActionMessages errors = new ActionMessages();
 		Integer orgId = WebUtil.readIntParam(request,"org",true);
 		if(orgId==null){
 			orgId = (Integer)request.getAttribute("org");
+		}
+		if((orgId==null)||(orgId<=0)){
+			errors.add("org",new ActionMessage("error.org.invalid"));
+			saveErrors(request,errors);
+			return mapping.findForward("error");
 		}
 		String username = request.getRemoteUser();
 		OrgListDTO orgManageForm = new OrgListDTO();
 		Organisation org = service.getOrganisationById(orgId);
 		log.debug("orgId:"+orgId);
+		if(org==null){
+			errors.add("org",new ActionMessage("error.org.invalid"));
+		}else if(org.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)){
+			errors.add("org",new ActionMessage("error.orgtype.invalid"));
+		}
+		if(!errors.isEmpty()){
+			saveErrors(request,errors);
+			return mapping.findForward("error");
+		}
 		orgManageForm.setParentId(orgId);
 		orgManageForm.setParentName(org.getName());
 		orgManageForm.setType(org.getOrganisationType().getOrganisationTypeId());
@@ -130,7 +147,7 @@ public class OrgManageAction extends Action {
 							Iterator iter = userOrganisation.getUserOrganisationRoles().iterator();
 							while(iter.hasNext()){
 								UserOrganisationRole userOrganisationRole = (UserOrganisationRole)iter.next();
-								if(userOrganisationRole.getRole().isSysAdmin()||userOrganisationRole.getRole().isCourseManager()||userOrganisationRole.getRole().isCourseAdmin()){
+								if(userOrganisationRole.getRole().isCourseManager()||userOrganisationRole.getRole().isCourseAdmin()){
 									orgManageBean.setEditable(true);
 									break;
 								}
