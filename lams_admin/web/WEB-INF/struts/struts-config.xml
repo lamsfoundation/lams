@@ -33,10 +33,14 @@
   </form-beans>
 
   <!-- ========== Global Exceptions Definitions =================================== -->
-  <!--
-    Define your exceptions in a file called global-exceptions.xml and place
-    it in your merge directory.
-  -->
+  <global-exceptions>
+  <exception
+    handler="org.apache.struts.action.ExceptionHandler"
+    key="error.system"
+    path=".error"
+    scope="request"
+    type="java.lang.Exception"/>
+</global-exceptions>
 
   <!-- ========== Global Forward Definitions =================================== -->
   <global-forwards>

@@ -158,6 +158,23 @@
 		    <taglib-uri>tags-tiles</taglib-uri>
 		    <taglib-location>/WEB-INF/struts/tlds/struts-tiles.tld</taglib-location>
 		</taglib>
+
+		<taglib>
+		    <taglib-uri>tags-bean-el</taglib-uri>
+		    <taglib-location>/WEB-INF/struts/tlds/struts-bean-el.tld</taglib-location>
+		</taglib>
+		<taglib>
+		    <taglib-uri>tags-html-el</taglib-uri>
+		    <taglib-location>/WEB-INF/struts/tlds/struts-html-el.tld</taglib-location>
+		</taglib>
+		<taglib>
+		    <taglib-uri>tags-logic-el</taglib-uri>
+		    <taglib-location>/WEB-INF/struts/tlds/struts-logic-el.tld</taglib-location>
+		</taglib>
+		<taglib>
+		    <taglib-uri>tags-tiles-el</taglib-uri>
+		    <taglib-location>/WEB-INF/struts/tlds/struts-tiles-el.tld</taglib-location>
+		</taglib>
 		<!--  ======================================================== -->	
 		<!--  JSTL 1.2 Tag Library 									   -->
 		<!--  ======================================================== -->	
