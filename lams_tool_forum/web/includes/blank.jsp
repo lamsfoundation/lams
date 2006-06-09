@@ -1,3 +1,3 @@
-<%@ include file="/includes/taglibs.jsp" %>
-<%@ include file="/includes/messages.jsp" %>
+<%@ include file="/common/taglibs.jsp" %>
+<%@ include file="/common/messages.jsp" %>
 

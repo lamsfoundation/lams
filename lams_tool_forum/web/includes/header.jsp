@@ -29,3 +29,9 @@
 	<link href="${tool}css/fckeditor_style.css" rel="stylesheet" type="text/css">
    	<script type="text/javascript" src="${tool}includes/javascript/fckcontroller.js"></script>
     <script type="text/javascript" src="${lams}fckeditor/fckeditor.js"></script>
+	
+
+
+
+</head>
+
