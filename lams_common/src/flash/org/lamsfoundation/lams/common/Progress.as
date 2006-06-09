@@ -154,6 +154,26 @@ class Progress {
 		return _completedActivities;
 	}
 	
+	public function set currentActivityId(a:Number){
+		_currentActivityId = a;
+	}
+	
+	public function set attemptedActivities(a:Array){
+		_attemptedActivities = convertStringArrayToNumberArray(a);
+	}
+	
+	public function set completedActivities(a:Array){
+		_completedActivities = convertStringArrayToNumberArray(a);
+	}
+	
+	private function convertStringArrayToNumberArray(strArray:Array){
+		var tmpArray = new Array();
+		for(var i=0; i<strArray.length;i++){
+			tmpArray.push(Number(strArray[i]));
+		}
+		return tmpArray;
+	}
+
 	function get className():String{
         return _className;
     }
