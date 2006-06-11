@@ -71,10 +71,21 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			*/
 	    }else{
 		   //just select the activity
-		 _canvasModel.selectedItem = ca;
-		 _canvasModel.isDragging = true;
-		 ca.startDrag(false);
-		   
+			
+			var parentActTypeID = _canvasModel.getCanvas().ddm.getActivityByUIID(ca.activity.parentUIID).activityTypeID
+			trace("parent UIID: "+ ca.activity.parentUIID + " and parent's activity type ID: "+parentActTypeID)
+			 if (ca.activity.parentUIID > 0 && parentActTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
+				 _canvasModel.selectedItem = null;
+				 _canvasModel.isDragging = false;
+				 //ca.startDrag(false);
+				var msg:String = Dictionary.getValue('parallel_act_child');
+				LFMessage.showMessageAlert(msg);
+				
+			 }else {
+				 _canvasModel.selectedItem = ca;
+				 _canvasModel.isDragging = true;
+				 ca.startDrag(false);
+			 }
 		}
 	   
    }
