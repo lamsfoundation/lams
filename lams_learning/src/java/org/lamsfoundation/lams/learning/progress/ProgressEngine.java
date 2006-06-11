@@ -24,12 +24,14 @@
 /* $$Id$$ */	
 package org.lamsfoundation.lams.learning.progress;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
+import org.lamsfoundation.lams.learningdesign.ParallelActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
@@ -78,7 +80,8 @@ public class ProgressEngine
         Transition transition = completedActivity.getTransitionFrom();
 
         if (transition != null)
-            return progressCompletedActivity(completedActivity,
+            return progressCompletedActivity(learner,
+            								 completedActivity,
                                              learnerProgress,
                                              transition);
         else
@@ -107,9 +110,21 @@ public class ProgressEngine
         
         progress.setCurrentActivity(ld.getFirstActivity());
         progress.setNextActivity(ld.getFirstActivity());
-        progress.setProgressState(ld.getFirstActivity(),LearnerProgress.ACTIVITY_ATTEMPTED);
+        setActivityAttempted(progress, ld.getFirstActivity());
     }
     
+    /** Set the current activity as attempted. If it is a parallel activity, mark its children as attempted too. */
+    private void setActivityAttempted(LearnerProgress progress, Activity activity) {
+        progress.setProgressState(activity,LearnerProgress.ACTIVITY_ATTEMPTED);
+    	if ( activity.isParallelActivity() ) {
+    		ParallelActivity parallel = (ParallelActivity) activityDAO.getActivityByActivityId(activity.getActivityId(), ParallelActivity.class);
+    		Iterator iter = parallel.getActivities().iterator();
+    		while (iter.hasNext()) {
+				Activity element = (Activity) iter.next();
+				setActivityAttempted(progress,element);
+			}
+    	}
+    }
     /**
      * We setup the progress data for a completed activity. This happens when
      * we find a transition to progress to. It should setup all activity states
@@ -123,32 +138,46 @@ public class ProgressEngine
      * @param learnerProgress the progress we based on.
      * @param transition the transition we progress to.
      * @return the learner progress data we calculated.
+     * @throws ProgressException 
      */
-    private LearnerProgress progressCompletedActivity(Activity completedActivity,
+    private LearnerProgress progressCompletedActivity(User learner, 
+    												  Activity completedActivity,
                                                       LearnerProgress learnerProgress,
-                                                      Transition transition)
+                                                      Transition transition) throws ProgressException
     {
-        learnerProgress.setPreviousActivity(completedActivity);
-        
-        populateCurrentCompletedActivityList(learnerProgress);
-        
-        learnerProgress.setCurrentActivity(transition.getToActivity());
-                
-        //we set the next activity to be the first child activity if it
-        //is a sequence activity.
-        if(transition.getToActivity().isSequenceActivity())
-        {
-            Activity firstActivityInSequence = 
-                ((SequenceActivity)transition.getToActivity()).getFirstActivityInSequenceActivity();
-            learnerProgress.setNextActivity(firstActivityInSequence);
-        }
-        //set next activity as the activity follows the transition.
-        else
-            learnerProgress.setNextActivity(transition.getToActivity());
-        learnerProgress.setProgressState(transition.getToActivity(),
-                                         LearnerProgress.ACTIVITY_ATTEMPTED);
-        learnerProgress.setParallelWaiting(false);
-        return learnerProgress;
+    	Activity nextActivity = transition.getToActivity();
+    	
+    	if ( ! learnerProgress.getCompletedActivities().contains(nextActivity) ) {
+    		// normal case - the next activity is still yet to be done
+    		
+	        learnerProgress.setPreviousActivity(completedActivity);
+	        
+	        populateCurrentCompletedActivityList(learnerProgress);
+	        
+	        learnerProgress.setCurrentActivity(nextActivity);
+	                
+	        //we set the next activity to be the first child activity if it
+	        //is a sequence activity.
+	        if(nextActivity.isSequenceActivity())
+	        {
+	            Activity firstActivityInSequence = 
+	                ((SequenceActivity)nextActivity).getFirstActivityInSequenceActivity();
+	            learnerProgress.setNextActivity(firstActivityInSequence);
+	        }
+	        //set next activity as the activity follows the transition.
+	        else
+	            learnerProgress.setNextActivity(nextActivity);
+	        setActivityAttempted(learnerProgress, nextActivity);
+	        learnerProgress.setParallelWaiting(false);
+	        return learnerProgress;
+	        
+	     } else {
+	    	 // abnormal case: next activity already done. Must have jumped back to an earlier
+	    	 // optional activity, done another activity and then kept going
+	    	 
+	    	 return calculateProgress(learner,nextActivity,learnerProgress);
+	     }
+    	
     }
 
     /**
@@ -183,7 +212,7 @@ public class ProgressEngine
             //move to next activity within parent if not all children are completed.
             
             ComplexActivity complexParent = (ComplexActivity) activityDAO.getActivityByActivityId(parent.getActivityId(),ComplexActivity.class);
-            if (!complexParent.areChildrenCompleted(learnerProgress))
+            if (! learnerProgress.getCompletedActivities().contains(complexParent) && !complexParent.areChildrenCompleted(learnerProgress))
             {
                 Activity nextActivity = complexParent.getNextActivityByParent(completedActivity);
                 
@@ -206,8 +235,7 @@ public class ProgressEngine
                 {
                     learnerProgress.setParallelWaiting(false);
                     learnerProgress.setNextActivity(nextActivity);
-                    learnerProgress.setProgressState(nextActivity,
-                                                     LearnerProgress.ACTIVITY_ATTEMPTED);
+                    setActivityAttempted(learnerProgress, nextActivity);
                     populateCurrentCompletedActivityList(learnerProgress);
                 }
             }

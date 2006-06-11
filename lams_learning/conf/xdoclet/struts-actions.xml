@@ -15,6 +15,3 @@
 <action path="/parallelWait"
 	type="org.apache.struts.actions.ForwardAction"
 	parameter=".parallelWait"/>
-<action path="/lessonComplete"
-	type="org.apache.struts.actions.ForwardAction"
-	parameter=".lessonComplete"/>

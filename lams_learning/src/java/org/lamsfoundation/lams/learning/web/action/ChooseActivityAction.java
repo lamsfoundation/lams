@@ -81,8 +81,12 @@ public class ChooseActivityAction extends ActivityAction {
 		}
 
 		ILearnerService learnerService = getLearnerService();
-		learnerService.chooseActivity(learner, lesson.getLessonId(), activity);
-		
+		progress = learnerService.chooseActivity(learner, lesson.getLessonId(), activity);
+		setLearnerProgress(request,progress);
+
+		// need to do the choose first as the chooseActivity changes the progress details 
+		setupProgressString(actionForm, request);
+
 		ActionForward forward = actionMappings.getActivityForward(activity, progress, true);
 		return forward;
 	}

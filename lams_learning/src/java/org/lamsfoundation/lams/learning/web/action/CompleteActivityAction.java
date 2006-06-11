@@ -92,6 +92,10 @@ public class CompleteActivityAction extends ActivityAction {
 			return mapping.findForward("error");
 		}
 		LearningWebUtil.putActivityInRequest(request, progress.getNextActivity(), learnerService);
+		setLearnerProgress(request,progress);
+		
+		// need to do the calculateProgress first as the chooseActivity changes the progress details 
+		setupProgressString(actionForm, request);
 
 		ActionForward forward = actionMappings.getProgressForward(progress,true,request, learnerService);
 		

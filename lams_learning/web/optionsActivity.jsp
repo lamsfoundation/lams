@@ -4,6 +4,7 @@
 <%@ taglib uri="tags-html" prefix="html"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
+<%@ taglib uri="tags-lams" prefix="lams" %>
 	
 <div align="center">
 	<script language="JavaScript" type="text/JavaScript"><!--
@@ -54,7 +55,10 @@
 		}
 		//-->
 	</script>
-	<html:form action="/ChooseActivity" method="POST">
+	
+	<lams:Passon progress="${optionsActivityForm.progressSummary}" />
+	
+		<html:form action="/ChooseActivity" method="POST">
 		<input type="hidden" name="lams_token" value="<c:out value='${lams_token}' />" />
 		
 		<table width="100%" height="231" border="0" align="center" cellpadding="5" cellspacing="0" bgcolor="#FFFFFF" summary="This table is being used for layout purposes">

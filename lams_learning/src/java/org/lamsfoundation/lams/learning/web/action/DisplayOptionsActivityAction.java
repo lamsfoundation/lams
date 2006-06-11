@@ -111,6 +111,9 @@ public class DisplayOptionsActivityAction extends ActivityAction {
 		
 		this.saveToken(request);
 		
+		// need to do the calculateProgress first as the chooseActivity changes the progress details 
+		setupProgressString(form, request);
+
 		String forward = "displayOptions";
 		return mapping.findForward(forward);
 	}

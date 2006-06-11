@@ -41,7 +41,8 @@ import org.lamsfoundation.lams.lesson.LearnerProgress;
 
 /** 
  * Action class to forward the user to a Tool using an intermediate loading page. Can handle
- * regular tools + grouping and gates (system tools)
+ * regular tools + grouping and gates (system tools). Displays the activity that is in the 
+ * request. This allows it to show any arbitrary activity, not just the current activity.
  * 
  * XDoclet definition:
  * 
@@ -63,6 +64,8 @@ public class LoadToolActivityAction extends ActivityAction {
 	                             HttpServletRequest request,
 	                             HttpServletResponse response) 
 	{
+		setupProgressString(actionForm, request);
+
 		ActivityForm form = (ActivityForm)actionForm;
 		ActivityMapping actionMappings = LearnerServiceProxy.getActivityMapping(this.getServlet().getServletContext());
 		

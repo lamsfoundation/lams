@@ -64,6 +64,8 @@ public class DisplayParallelActivityAction extends ActivityAction {
 	                             HttpServletRequest request,
 	                             HttpServletResponse response) 
 	{
+		setupProgressString(actionForm, request);
+
 		ActivityForm form = (ActivityForm)actionForm;
 		
 		ActivityMapping actionMappings = LearnerServiceProxy.getActivityMapping(this.getServlet().getServletContext());

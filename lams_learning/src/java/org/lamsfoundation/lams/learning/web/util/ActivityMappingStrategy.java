@@ -67,7 +67,7 @@ public class ActivityMappingStrategy implements Serializable {
 	 * Returns the struts action for displaying lesson complete.
 	 */
 	protected String getLessonCompleteAction() {
-		return "/lessonComplete.do";
+		return "/LessonComplete.do";
 	}
 	
 }

@@ -25,26 +25,51 @@
 package org.lamsfoundation.lams.learning.web.action;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
+import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
+import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.web.action.LamsAction;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /** 
- * MyEclipse Struts
- * Creation date: 01-12-2005
- * 
+ * Base class for all activity action classes. Each subclass should call 
+ * super.execute() to set up the progress data in the ActivityForm.
  */
-public class ActivityAction extends LamsAction {
+public abstract class ActivityAction extends LamsAction {
 	
 	public static final String ACTIVITY_REQUEST_ATTRIBUTE = "activity";
 	public static final String LEARNER_PROGRESS_REQUEST_ATTRIBUTE = "learnerprogress";
 	
+	public ActionForward setupProgressString(ActionForm actionForm, HttpServletRequest request)  {
+		
+		LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgressByID(request,
+		                                                                     getServlet().getServletContext());		
+
+		ActivityForm activityForm = (ActivityForm) actionForm;
+		
+		// Calculate the progress summary. On join this method gets called twice, and we
+		// only want to calculate once
+		String progressSummary = activityForm.getProgressSummary();
+		if ( progressSummary == null ) {
+			progressSummary = getProgressSummary(learnerProgress);
+			activityForm.setProgressSummary(progressSummary);
+		} 
+		
+		if(log.isDebugEnabled())
+		    log.debug("Entering activity: progress summary is "+activityForm.getProgressSummary());
+		
+		return null;
+	}
 	/**
 	 * Get the learner service.
 	 */
@@ -77,7 +102,46 @@ public class ActivityAction extends LamsAction {
 	 * have to reload it.
 	 */
 	protected void setLearnerProgress(HttpServletRequest request, LearnerProgress learnerProgress) {
-		request.setAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE, learnerProgress);
+		LearningWebUtil.setLearnerProgress(learnerProgress);
 	}
 	
+	private String getProgressSummary(LearnerProgress learnerProgress) {
+		StringBuffer progressSummary = new StringBuffer(100);
+		if ( learnerProgress == null  ) {
+			progressSummary.append("attempted=&completed=&current=");
+		} else {
+			progressSummary.append("attempted=");
+			boolean first = true;
+			for ( Object obj : learnerProgress.getAttemptedActivities() ) {
+				Activity activity = (Activity ) obj;
+				if ( ! first ) {
+					progressSummary.append("_");
+				} else {
+					first = false;
+				}
+				progressSummary.append(activity.getActivityId());
+			}
+			
+			progressSummary.append("&completed=");
+			first = true;
+			for ( Object obj : learnerProgress.getCompletedActivities() ) {
+				Activity activity = (Activity ) obj;
+				if ( ! first ) {
+					progressSummary.append("_");
+				} else {
+					first = false;
+				}
+				progressSummary.append(activity.getActivityId());
+			}
+
+			progressSummary.append("&current=");
+			Activity currentActivity = learnerProgress.getCurrentActivity();
+			if ( currentActivity != null ) {
+				progressSummary.append(currentActivity.getActivityId());
+			}
+		}
+		return progressSummary.toString();
+	}
+	
+
 }

@@ -24,9 +24,6 @@
 /* $$Id$$ */	
 package org.lamsfoundation.lams.learning.web.action;
 
-import java.util.Iterator;
-import java.util.Set;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -35,16 +32,17 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
-import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
-import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 
 
 
 /** 
- * Action class to display an activity.
+ * Action class to display an activity. This is used when Flash calls the service to the 
+ * learning process. It is needed to put the activity in the request, on which 
+ * LoadToolActivityAction relies. If you try to go straight to LoadToolActivityAction
+ * then the activity won't be the request.
  * 
  * XDoclet definition:
  * 
@@ -78,17 +76,9 @@ public class DisplayActivityAction extends ActivityAction {
 	                             HttpServletResponse response) 
 	{
 		
-		ActivityMapping actionMappings = LearnerServiceProxy.getActivityMapping(this.getServlet().getServletContext());
-		
-		LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgressByID(request,
-		                                                                     getServlet().getServletContext());		
-		String progressSummary = getProgressSummary(learnerProgress);			
-		
-		if(log.isDebugEnabled())
-		    log.debug("Entering display activity: progress summary is "+progressSummary);
-		
-		ActivityForm activityForm = (ActivityForm) actionForm;
-		activityForm.setProgressSummary(progressSummary);
+		setupProgressString(actionForm, request);
+		ActivityMapping actionMappings = LearnerServiceProxy.getActivityMapping(getServlet().getServletContext());
+		LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgressByID(request, getServlet().getServletContext());		
 		ActionForward forward =actionMappings.getProgressForward(learnerProgress,false,request,getLearnerService());
 	
 		if(log.isDebugEnabled())
@@ -96,44 +86,4 @@ public class DisplayActivityAction extends ActivityAction {
 		    
 		return 	forward;
 	}
-
-	private String getProgressSummary(LearnerProgress learnerProgress) {
-		StringBuffer progressSummary = new StringBuffer(100);
-		if ( learnerProgress == null  ) {
-			progressSummary.append("attempted=&completed=&current=");
-		} else {
-			progressSummary.append("attempted=");
-			boolean first = true;
-			for ( Object obj : learnerProgress.getAttemptedActivities() ) {
-				Activity activity = (Activity ) obj;
-				if ( ! first ) {
-					progressSummary.append("_");
-				} else {
-					first = false;
-				}
-				progressSummary.append(activity.getActivityId());
-			}
-			
-			progressSummary.append("&completed=");
-			first = true;
-			for ( Object obj : learnerProgress.getCompletedActivities() ) {
-				Activity activity = (Activity ) obj;
-				if ( ! first ) {
-					progressSummary.append("_");
-				} else {
-					first = false;
-				}
-				progressSummary.append(activity.getActivityId());
-			}
-
-			progressSummary.append("&current=");
-			Activity currentActivity = learnerProgress.getCurrentActivity();
-			if ( currentActivity != null ) {
-				progressSummary.append(currentActivity.getActivityId());
-			}
-		}
-		return progressSummary.toString();
-	}
-	
-
 }

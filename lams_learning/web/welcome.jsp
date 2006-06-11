@@ -26,8 +26,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<tr> 
 		<td valign="middle"> 
 			<div align="center">
-				<p class="heading"><fmt:message key="welcome.heading"/></p>
-            	<p class="body"><fmt:message key="welcome.message"/></p>
+            	<p class="body"><fmt:message key="message.activity.loading"/></p>
           	</div>
         </td>
     </tr>
