@@ -55,7 +55,7 @@ import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 
 public class ExportServlet  extends AbstractExportPortfolioServlet implements VoteAppConstants{
 	static Logger logger = Logger.getLogger(ExportServlet.class.getName());
-	private static final long serialVersionUID = -4529093489007108143L;
+	private static final long serialVersionUID = -1529093489007108143L;
 	private final String FILENAME = "vote_main.html";
 	
 	
