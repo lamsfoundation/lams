@@ -78,7 +78,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				 _canvasModel.selectedItem = null;
 				 _canvasModel.isDragging = false;
 				 //ca.startDrag(false);
-				var msg:String = Dictionary.getValue('parallel_act_child');
+				var msg:String = Dictionary.getValue('al_cannot_move_activity');
 				LFMessage.showMessageAlert(msg);
 				
 			 }else {

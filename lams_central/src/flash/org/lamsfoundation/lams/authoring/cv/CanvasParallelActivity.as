@@ -179,7 +179,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 		}
 		//write text
 		title_lbl.text = _activity.title;
-		actCount_lbl.text = _children.length+ Dictionary.getValue('word_activities'); //" activities";
+		actCount_lbl.text = _children.length+ Dictionary.getValue('lbl_num_activities'); //" activities";
 		
 //			_global.breakpoint();
 		

@@ -169,9 +169,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		panelHeight = CHILD_OFFSET_Y + (numOfChildren * CHILD_INCRE);
 		setStyles ()
 		//write text
-		title_lbl.text = Dictionary.getValue('title_Opt_Activity'); //'Optional Activities'
+		title_lbl.text = Dictionary.getValue('opt_activity_title'); //'Optional Activities'
 		//_activity.title = 'Optional Activities';
-		actCount_lbl.text = _children.length + Dictionary.getValue('word_activities'); //" activities";
+		actCount_lbl.text = _children.length + Dictionary.getValue('lbl_num_activities'); //" activities";
 		header_pnl.borderType = 'outset';
 		act_pnl.borderType = 'inset';
 		container_pnl.setStyle ("backgroundColor", 0x4289FF);
