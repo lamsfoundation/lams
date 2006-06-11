@@ -56,6 +56,8 @@ public class VoteMonitoringForm extends VoteAuthoringForm implements VoteAppCons
 	
 	protected String currentUid;
 	
+	protected String existsOpenVotes;
+	
 	
 	
     /**
@@ -204,5 +206,17 @@ public class VoteMonitoringForm extends VoteAuthoringForm implements VoteAppCons
     public void setCompletedSessionUserPercent(
             String completedSessionUserPercent) {
         this.completedSessionUserPercent = completedSessionUserPercent;
+    }
+    /**
+     * @return Returns the existsOpenVotes.
+     */
+    public String getExistsOpenVotes() {
+        return existsOpenVotes;
+    }
+    /**
+     * @param existsOpenVotes The existsOpenVotes to set.
+     */
+    public void setExistsOpenVotes(String existsOpenVotes) {
+        this.existsOpenVotes = existsOpenVotes;
     }
 }

@@ -249,6 +249,7 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 		voteMonitoringAction.refreshInstructionsData(request, voteContent, voteService);
 		    		
 	    logger.debug("end initializing  monitoring data...");
+	    request.getSession().setAttribute(EXISTS_OPEN_VOTES, new Boolean(false).toString());
 		return true;
 	}
 

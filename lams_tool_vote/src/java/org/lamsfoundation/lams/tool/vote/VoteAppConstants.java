@@ -186,6 +186,7 @@ public interface VoteAppConstants {
     public static final String ACTIVITY_INSTRUCTIONS					= "activityInstructions";
     public static final String MONITORING								="monitoring";
     public static final String REMOVABLE_QUESTION_INDEX					="removableQuestionIndex";
+    public static final String EXISTS_OPEN_VOTES						="existsOpenVotes";
         
     /*
      * user actions
@@ -235,6 +236,7 @@ public interface VoteAppConstants {
     public static final String CURRENT_MONITORED_TOOL_SESSION 			="currentMonitoredToolSession";
     public static final String SELECTION_CASE							="selectionCase";
     public static final String LIST_MONITORED_ANSWERS_CONTAINER_DTO		="listMonitoredAnswersContainerDto";
+    public static final String GROUP_NAME								="groupName";
     public static final String TIMEZONE									="timeZone";
     public static final String PREVIEW_ONLY								="previewOnly";
     

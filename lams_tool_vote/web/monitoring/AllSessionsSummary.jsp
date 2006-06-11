@@ -53,12 +53,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						</c:if> 
 
 						<tr>
-					 		<td NOWRAP colspan=2 > &nbsp&nbsp </td>
+					 		<td NOWRAP colspan=2 > </td>
 						</tr>
 						
-
-						<tr> <td NOWRAP colspan=2> 	
-								<c:forEach var="currentDto" items="${sessionScope.listVoteAllSessionsDTO}">
+						<c:forEach var="currentDto" items="${sessionScope.listVoteAllSessionsDTO}">
+						
+								<tr>
+							 		<td NOWRAP colspan=2 > <b> <font size=2> <bean:message key="label.groupName"/> </b>
+							 		<c:out value="${currentDto.sessionName}"/>  </td>
+								</tr>
+						
+								<tr> <td NOWRAP colspan=2> 									
 						  	 		<c:set var="currentSessionId" scope="request" value="${currentDto.sessionId}"/>
 						  	 		
  							 			<table align=left>
@@ -75,25 +80,25 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 											</tr>
 					
 											<tr>
-										 		<td NOWRAP colspan=2 > &nbsp&nbsp </td>
+										 		<td NOWRAP colspan=2> </td>
 											</tr>
 						  				
 											<tr>
 										 		<td NOWRAP colspan=2> 
-							                            <c:out value="${activityInstructions}" escapeXml="false"/> &nbsp
+							                            <c:out value="${activityInstructions}" escapeXml="false"/> 
 												</td>
 											</tr>
 											
 					
 											<tr>
-										 		<td NOWRAP colspan=2 > &nbsp&nbsp </td>
+										 		<td NOWRAP colspan=2 > </td>
 											</tr>
 											
 
 
 											<tr>
 												<td NOWRAP colspan=2 valign=top align=left>
-												<table align=left>
+												<table align=center>
 													<c:if test="${statsTabActive != 'true'}"> 							
 														<tr> 
 															<td> </td>
@@ -154,88 +159,97 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 							<tr>
-						 		<td NOWRAP colspan=2 > &nbsp&nbsp </td>
+						 		<td NOWRAP colspan=2 > </td>
 							</tr>
 						
-							<tr>
-						 		<td NOWRAP colspan=2 > <HR> </td>
-							</tr>
-
-							<tr>
-						 		<td NOWRAP colspan=2 > &nbsp&nbsp </td>
-							</tr>
 	
-							<tr>
-						 		<td NOWRAP colspan=2>
-					 			<table align=left>
-					 					<tr>
-									 		<td NOWRAP align=center> 
-												<b> <font size=2> <bean:message key="label.openVotes"/> </b>
-											</td>
-										</tr>
-
-											<tr> 
-												 <td NOWRAP valign=top align=left> <b> <font size=2>  <bean:message key="label.vote"/> </font> </b> </td>  														 
-												 <td NOWRAP valign=top align=left> <b> <font size=2>  <bean:message key="label.user"/> </font> </b> </td>  
-						  						 <td NOWRAP valign=top align=left> <b> <font size=2>  <bean:message key="label.attemptTime"/></font> </b></td>
-						 						 <c:if test="${statsTabActive != 'true'}"> 															  						 
-							  						 <td NOWRAP valign=top align=left> <b> <font size=2>  <bean:message key="label.visible"/> </font> </b></td>								  						 
-												 </c:if> 																					  						 
-								  			</tr>				 
-										
-					 			
-										<c:forEach var="dtoEntry" items="${currentDto.listUserEntries}">
-					  							<c:forEach var="questionAttemptData" items="${dtoEntry.questionAttempts}">
-										  	 		<c:set var="userData" scope="request" value="${questionAttemptData.value}"/>
-	  	 									  	 		<c:set var="currentUid" scope="request" value="${userData.uid}"/>
-													<tr> 
-															<td NOWRAP valign=top align=left> 
-																<c:out value="${dtoEntry.question}" escapeXml="false"/> 
-																<c:if test="${userData.visible != 'true' }"> 			
-											                                <font size=2> <i><bean:message key="label.hidden"/> </i> </font>											                                
-																</c:if> 								
-															</td>
-															 
-															 <td NOWRAP valign=top align=left>   <font size=2> <c:out value="${userData.userName}"/> </font>  </td>  
-															 <td NOWRAP valign=top align=left>   <font size=2> <c:out value="${userData.attemptTime}"/> </font> </td>
-															 
-									 						<c:if test="${statsTabActive != 'true'}"> 							
-																 <td NOWRAP valign=top align=left>
-											 						<c:if test="${userData.visible == 'true' }"> 			
-												                                <html:submit property="hideOpenVote" 
-												                                             styleClass="linkbutton" 
-										                                                     onclick="submitOpenVote(${currentUid}, 'hideOpenVote');">						                                             
-												                                    <bean:message key="label.hide"/>
-												                                </html:submit>
-																	</c:if> 													
-						
+							<c:if test="${currentDto.existsOpenVote == 'true' }"> 			
+							
+								<tr>
+							 		<td NOWRAP colspan=2> <bean:message key="label.summary.sessionSeparator"/></td>
+								</tr>
+	
+								<tr>
+							 		<td NOWRAP colspan=2 > </td>
+								</tr>
+							
+								<tr>
+							 		<td NOWRAP colspan=2>
+						 			<table align=left>
+						 					<tr>
+										 		<td NOWRAP align=center> 
+													<b> <font size=2> <bean:message key="label.openVotes"/> </b>
+												</td>
+											</tr>
+	
+												<tr> 
+													 <td NOWRAP valign=top align=left> <b> <font size=2>  <bean:message key="label.vote"/> </font> </b> </td>  														 
+													 <td NOWRAP valign=top align=left> <b> <font size=2>  <bean:message key="label.user"/> </font> </b> </td>  
+							  						 <td NOWRAP valign=top align=left> <b> <font size=2>  <bean:message key="label.attemptTime"/></font> </b></td>
+							 						 <c:if test="${statsTabActive != 'true'}"> 															  						 
+								  						 <td NOWRAP valign=top align=left> <b> <font size=2>  <bean:message key="label.visible"/> </font> </b></td>								  						 
+													 </c:if> 																					  						 
+									  			</tr>				 
+											
+						 			
+											<c:forEach var="dtoEntry" items="${currentDto.listUserEntries}">
+						  							<c:forEach var="questionAttemptData" items="${dtoEntry.questionAttempts}">
+											  	 		<c:set var="userData" scope="request" value="${questionAttemptData.value}"/>
+		  	 									  	 		<c:set var="currentUid" scope="request" value="${userData.uid}"/>
+														<tr> 
+																<td NOWRAP valign=top align=left> 
+																	<c:out value="${dtoEntry.question}" escapeXml="false"/> 
 																	<c:if test="${userData.visible != 'true' }"> 			
-												                                <html:submit property="showOpenVote" 
-												                                             styleClass="linkbutton" 
-										                                                     onclick="submitOpenVote(${currentUid}, 'showOpenVote');">						                                             
-												                                    <bean:message key="label.show"/>
-												                                </html:submit>
-																	</c:if> 						
-																</td>																			
-														</c:if> 	    																	
-															 
-													</tr>		
-												</c:forEach>		  	
-										</c:forEach>		
-								</table> 
-								</td>
+												                                <font size=2> <i><bean:message key="label.hidden"/> </i> </font>											                                
+																	</c:if> 								
+																</td>
+																 
+																 <td NOWRAP valign=top align=left>   <font size=2> <c:out value="${userData.userName}"/> </font>  </td>  
+																 <td NOWRAP valign=top align=left>   <font size=2> <c:out value="${userData.attemptTime}"/> </font> </td>
+																 
+										 						<c:if test="${statsTabActive != 'true'}"> 							
+																	 <td NOWRAP valign=top align=left>
+												 						<c:if test="${userData.visible == 'true' }"> 			
+													                                <html:submit property="hideOpenVote" 
+													                                             styleClass="linkbutton" 
+											                                                     onclick="submitOpenVote(${currentUid}, 'hideOpenVote');">						                                             
+													                                    <bean:message key="label.hide"/>
+													                                </html:submit>
+																		</c:if> 													
+							
+																		<c:if test="${userData.visible != 'true' }"> 			
+													                                <html:submit property="showOpenVote" 
+													                                             styleClass="linkbutton" 
+											                                                     onclick="submitOpenVote(${currentUid}, 'showOpenVote');">						                                             
+													                                    <bean:message key="label.show"/>
+													                                </html:submit>
+																		</c:if> 						
+																	</td>																			
+															</c:if> 	    																	
+																 
+														</tr>		
+													</c:forEach>		  	
+											</c:forEach>		
+									</table> 
+									</td>
+								</tr>
+							 </c:if> 	
+							 
+		 					<tr> <td NOWRAP colspan=2>  </td>
 							</tr>
+		 					<tr> <td NOWRAP colspan=2> <HR> </td>
+							</tr>
+		 					<tr> <td NOWRAP colspan=2>  </td>
+							</tr>
+							 
+						</table>
+						</td> </tr>	
 
-
-
-									</table>
-					
-								</c:forEach>		
-							</td> </tr>	
-					</table>
-					
+					</c:forEach>		
+							
 					<tr>
 				 		<td NOWRAP colspan=2 >  </td>
 					</tr>
-					
+
+					</table>					
 

@@ -188,6 +188,7 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	public void refreshSummaryData(HttpServletRequest request, VoteContent voteContent, IVoteService voteService, 
 			boolean isUserNamesVisible, boolean isLearnerRequest, String currentSessionId, String userId, boolean showUserEntriesBySession)
 	{
+	    logger.debug("doing refreshSummaryData.");
 		if (voteService == null)
 		{
 			logger.debug("will retrieve voteService");
@@ -236,6 +237,14 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	    request.getSession().setAttribute(CURRENT_MONITORED_TOOL_SESSION, "All");
 	    logger.debug("CURRENT_MONITORED_TOOL_SESSION: " + request.getSession().getAttribute(CURRENT_MONITORED_TOOL_SESSION));
 	    
+	    logger.debug("currentSessionId: " + currentSessionId);
+	    
+	    if ((currentSessionId != null) && (!currentSessionId.equals("All")))
+	    {
+		    VoteSession voteSession= voteService.retrieveVoteSession(new Long(currentSessionId));
+		    logger.debug("voteSession:" + voteSession);
+		    request.getSession().setAttribute(GROUP_NAME,voteSession.getSession_name());
+	    }
 	    
 	    logger.debug("using allUsersData to retrieve data: " + isUserNamesVisible);
 	    List listMonitoredAnswersContainerDTO=MonitoringUtil.buildGroupsQuestionData(request, voteContent, 
@@ -248,7 +257,13 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 
 	    List listUserEntries=processUserEnteredNominations(voteService, voteContent, currentSessionId, showUserEntriesBySession, userId, isLearnerRequest);
 	    logger.debug("listUserEntries: " + listUserEntries);
-	    request.getSession().setAttribute(LIST_USER_ENTRIES, listUserEntries);    
+	    request.getSession().setAttribute(LIST_USER_ENTRIES, listUserEntries);
+	    request.getSession().setAttribute(EXISTS_OPEN_VOTES, new Boolean(false).toString());
+	    if (listUserEntries.size() > 0)
+	    {
+	        request.getSession().setAttribute(EXISTS_OPEN_VOTES, new Boolean(true).toString());
+	    }
+	    
 	}
 
 

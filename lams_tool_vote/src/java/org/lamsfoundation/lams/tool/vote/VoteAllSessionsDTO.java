@@ -39,11 +39,13 @@ public class VoteAllSessionsDTO implements Comparable
 	private String completedSessionUserCount;
 	private String completedSessionUserPercent;
 	private String sessionId;
+	private String sessionName;
 	private Map mapStandardNominationsContent;
 	private Map mapStandardNominationsHTMLedContent;
 	private Map mapStandardUserCount;
 	private Map mapStandardRatesContent;
 	private List listUserEntries;
+	private String existsOpenVote;
 	
     /**
      * @return Returns the listUserEntries.
@@ -172,5 +174,29 @@ public class VoteAllSessionsDTO implements Comparable
     public void setMapStandardNominationsHTMLedContent(
             Map mapStandardNominationsHTMLedContent) {
         this.mapStandardNominationsHTMLedContent = mapStandardNominationsHTMLedContent;
+    }
+    /**
+     * @return Returns the existsOpenVote.
+     */
+    public String getExistsOpenVote() {
+        return existsOpenVote;
+    }
+    /**
+     * @param existsOpenVote The existsOpenVote to set.
+     */
+    public void setExistsOpenVote(String existsOpenVote) {
+        this.existsOpenVote = existsOpenVote;
+    }
+    /**
+     * @return Returns the sessionName.
+     */
+    public String getSessionName() {
+        return sessionName;
+    }
+    /**
+     * @param sessionName The sessionName to set.
+     */
+    public void setSessionName(String sessionName) {
+        this.sessionName = sessionName;
     }
 }

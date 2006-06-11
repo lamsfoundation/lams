@@ -695,6 +695,7 @@ public class MonitoringUtil implements VoteAppConstants{
 
 	    	VoteAllSessionsDTO voteAllSessionsDTO= new VoteAllSessionsDTO();
 	    	voteAllSessionsDTO.setSessionId(voteSession.getVoteSessionId().toString());
+	    	voteAllSessionsDTO.setSessionName(voteSession.getSession_name());
 	    	
 		    int entriesCount=voteService.getSessionEntriesCount(voteSession.getUid());
 		    logger.debug("entriesCount: " + entriesCount);
@@ -811,7 +812,12 @@ public class MonitoringUtil implements VoteAppConstants{
 			List listUserEntries=voteMonitoringAction.processUserEnteredNominations(voteService, voteContent, voteSession.getVoteSessionId().toString(), true, null, false);
 		    logger.debug("listUserEntries: " + listUserEntries);
 		    voteAllSessionsDTO.setListUserEntries(listUserEntries);
-	        
+		    
+		    if (listUserEntries.size() > 0)
+		        voteAllSessionsDTO.setExistsOpenVote (new Boolean(true).toString());
+		    else
+		        voteAllSessionsDTO.setExistsOpenVote (new Boolean(false).toString());
+		        
 	        listVoteAllSessionsDTO.add(voteAllSessionsDTO);
 		}
         logger.debug("listVoteAllSessionsDTO: " + listVoteAllSessionsDTO);
