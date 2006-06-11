@@ -793,6 +793,9 @@ public class MonitoringUtil implements VoteAppConstants{
 		    int userEnteredVotesCount=entriesCount - totalStandardVotesCount;
 	        logger.debug("userEnteredVotesCount for this session: " + userEnteredVotesCount);
 		    
+	        if (userEnteredVotesCount == 0) 
+	            share=0;
+	        
 		    mapStandardNominationsContent.put(mapIndex.toString(), "Open Vote");
 		    mapStandardNominationsHTMLedContent.put(mapIndex.toString(), "Open Vote");
 		    mapStandardRatesContent.put(mapIndex.toString(), new Double(share).toString());
@@ -974,6 +977,9 @@ public class MonitoringUtil implements VoteAppConstants{
 	    int userEnteredVotesCount=entriesCount - totalStandardVotesCount;
         logger.debug("userEnteredVotesCount for this session: " + userEnteredVotesCount);
 	    
+        if (userEnteredVotesCount == 0) 
+            share=0;
+        
 	    mapStandardNominationsContent.put(mapIndex.toString(), "Open Vote");
 	    mapStandardNominationsHTMLedContent.put(mapIndex.toString(), "Open Vote");
 	    mapStandardRatesContent.put(mapIndex.toString(), new Double(share).toString());
@@ -1132,6 +1138,10 @@ public class MonitoringUtil implements VoteAppConstants{
 	    logger.debug("totalStandardVotesCount: " + totalStandardVotesCount);
 	    int userEnteredVotesCount=entriesCount - totalStandardVotesCount;
         logger.debug("userEnteredVotesCount for this session: " + userEnteredVotesCount);
+        
+        if (userEnteredVotesCount == 0) 
+            share=0;
+
 	    
 	    logger.debug("start processing userEntries: " + userEntries);
 	    itListQuestions = userEntries.iterator();
@@ -1287,6 +1297,10 @@ public class MonitoringUtil implements VoteAppConstants{
 	    int userEnteredVotesCount=entriesCount - totalStandardVotesCount;
         logger.debug("userEnteredVotesCount for this session: " + userEnteredVotesCount);
 	    
+        if (userEnteredVotesCount == 0) 
+            share=0;
+
+        
 	    mapStandardNominationsContent.put(mapIndex.toString(), "Open Vote");
 	    mapStandardNominationsHTMLedContent.put(mapIndex.toString(), "Open Vote");
 	    mapStandardRatesContent.put(mapIndex.toString(), new Double(share).toString());
