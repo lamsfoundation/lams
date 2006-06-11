@@ -245,17 +245,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		if (! _doubleClicking)	{
 				_canvasController.activityRelease (this);
 		}
-		
-		if (_locked){
-			_locked = false;
-			gotoAndStop('collapse')
-			draw ();
-			
-		}else {
-			_locked = true;
-			gotoAndStop('expand')
-			draw ();			
-		}
 	}
 	
 	
