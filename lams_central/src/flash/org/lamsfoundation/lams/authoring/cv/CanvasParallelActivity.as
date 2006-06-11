@@ -218,7 +218,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 		}else{
 			padlockOpen_mc._visible = true;
 			padlockClosed_mc._visible = false;
-			clickTarget_mc._height = 45;
+			clickTarget_mc._height = 30;
 		}
 		
 	
