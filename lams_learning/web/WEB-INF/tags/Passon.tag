@@ -31,36 +31,50 @@
  
  %>
 <%@ tag body-content="empty" %>
-<%@ attribute name="progress" required="true" rtexprvalue="true" %>
+<%@ attribute name="progress" required="true" rtexprvalue="true" type="java.lang.String" %>
+<%@ attribute name="uniqueID" required="false" rtexprvalue="true" type="java.lang.String" %>
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
-
 <c:if test="${!empty progress}">
-		<c:set var="passonurl">passon.swf?${progress}&uniqueID=<c:out value="<script language='text/javascript'>document.write(parent.frames['controlFrame'].uniqueID);</script>" escapeXml="false"/></c:set>
-		<!-- URL's used in the movie-->
-		<!-- text used in the movie-->
-		<!--Library-->  
-		<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
-		 codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,47,0" name="passon"
-		 width="1" height="1" align="left" id="passon">
-		  <param name="allowScriptAccess" value="sameDomain" />
-	
-		  <param name="movie" value="<c:out value="${passonurl}" escapeXml="false"/>"/>
-		  <param name="quality" value="high">
-		  <param name="scale" value="noscale">
-		  <param name="bgcolor" value="#FFFFFF">
-		  <embed 	
-			  src="<c:out value="${passonurl}" escapeXml="false"/>"
-			  quality="high" 
-			  scale="noscale" 
-			  bgcolor="#FFFFFF"  
-			  width="1" 
-			  height="1" 
-			  swliveconnect=true 
-			  id="passon" 
-			  name="passon" 
-			  align=""
-			  type="application/x-shockwave-flash" 
-			  pluginspage="http://www.macromedia.com/go/getflashplayer" />
-		</object>
+	<c:choose>
+		<c:when test="${!empty uniqueID}">
+			<c:set var="passonurl" value="passon.swf?${progress}&uniqueID=${uniqueID}"/>
+			
+			<!-- URL's used in the movie-->
+			<!-- text used in the movie-->
+			<!--Library-->  
+			<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+			 codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,47,0" name="passon"
+			 width="1" height="1" align="left" id="passon">
+			  <param name="allowScriptAccess" value="sameDomain" />
+		
+			  <param name="movie" value="${passonurl}"/>
+			  <param name="quality" value="high">
+			  <param name="scale" value="noscale">
+			  <param name="bgcolor" value="#FFFFFF">
+			  <embed 	
+				  src="<c:out value="${passonurl}" escapeXml="false"/>"
+				  quality="high" 
+				  scale="noscale" 
+				  bgcolor="#FFFFFF"  
+				  width="1" 
+				  height="1" 
+				  swliveconnect=true 
+				  id="passon" 
+				  name="passon" 
+				  align=""
+				  type="application/x-shockwave-flash" 
+				  pluginspage="http://www.macromedia.com/go/getflashplayer" />
+			</object>
+		</c:when>
+		<c:otherwise>
+				<script language="JavaScript" type="text/JavaScript">
+					<!--
+					var query = (window.location.search!="")?window.location.search + "&uID=":"?uID=";
+					alert(window.location.pathname + query);
+					window.location.href = window.location.pathname + query + parent.frames['controlFrame'].uniqueID;
+					//-->
+				</script>
+		</c:otherwise>
+	</c:choose>
 </c:if>
