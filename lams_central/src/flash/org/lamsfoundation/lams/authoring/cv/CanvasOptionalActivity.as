@@ -22,6 +22,7 @@
 */
 import org.lamsfoundation.lams.common. *;
 import org.lamsfoundation.lams.common.util. *;
+import org.lamsfoundation.lams.common.dict.*
 import org.lamsfoundation.lams.common.ui. *;
 import org.lamsfoundation.lams.authoring. *;
 import org.lamsfoundation.lams.authoring.cv. *;
@@ -79,12 +80,14 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 	private var _visibleWidth : Number;
 	private var _tm : ThemeManager;
 	private var _ddm : DesignDataModel;
+	private var _dictionary:Dictionary;
 	
 	function CanvasOptionalActivity ()	{
 		optionalActivity_mc = this
 		_ddm = new DesignDataModel ();
 		_visible = false;
 		_tm = ThemeManager.getInstance ();
+		_dictionary = Dictionary.getInstance();
 		_visibleHeight = container_pnl._height;
 		_visibleWidth = container_pnl._width;
 		//init();
@@ -166,9 +169,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		panelHeight = CHILD_OFFSET_Y + (numOfChildren * CHILD_INCRE);
 		setStyles ()
 		//write text
-		title_lbl.text = 'Optional Activities'
+		title_lbl.text = Dictionary.getValue('title_Opt_Activity'); //'Optional Activities'
 		//_activity.title = 'Optional Activities';
-		actCount_lbl.text = _children.length + " activities";
+		actCount_lbl.text = _children.length + Dictionary.getValue('word_activities'); //" activities";
 		header_pnl.borderType = 'outset';
 		act_pnl.borderType = 'inset';
 		container_pnl.setStyle ("backgroundColor", 0x4289FF);

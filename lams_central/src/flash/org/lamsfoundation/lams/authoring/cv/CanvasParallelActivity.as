@@ -23,6 +23,7 @@
 
 import org.lamsfoundation.lams.common.*;
 import org.lamsfoundation.lams.common.util.*;
+import org.lamsfoundation.lams.common.dict.*
 import org.lamsfoundation.lams.common.ui.*;
 import org.lamsfoundation.lams.authoring.*;
 import org.lamsfoundation.lams.authoring.cv.*;
@@ -178,7 +179,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 		}
 		//write text
 		title_lbl.text = _activity.title;
-		actCount_lbl.text = _children.length+" activities";
+		actCount_lbl.text = _children.length+ Dictionary.getValue('word_activities'); //" activities";
 		
 //			_global.breakpoint();
 		
@@ -217,7 +218,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 		}else{
 			padlockOpen_mc._visible = true;
 			padlockClosed_mc._visible = false;
-			clickTarget_mc._height = 38;
+			clickTarget_mc._height = 45;
 		}
 		
 	
@@ -261,26 +262,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 		Debugger.log('_doubleClicking:'+_doubleClicking+', localOnRelease:'+this,Debugger.GEN,'localOnRelease','CanvasParallelActivity');
 		if ( ! _doubleClicking)	{
 				_canvasController.activityRelease (this);
-		}
-		
-		if (_locked)
-		{
-			_locked = false;
-			gotoAndStop('collapse')
-			//set the visibility to false
-			child1_mc._visible = false;
-			child2_mc._visible = false;
-			draw ();
-			
-		}else
-		{
-			_locked = true;
-			//set the visibility to true
-			child1_mc._visible = true;
-			child2_mc._visible = true;
-			gotoAndStop('expand')
-			draw ();
-			
 		}
 		
 	}
