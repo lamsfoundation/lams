@@ -323,7 +323,24 @@ class PropertyInspector extends MovieClip{
 				title_txt.text = StringUtils.cleanNull(cca.title);
 				desc_txt.text = StringUtils.cleanNull(cca.description);
 				//PI_sp.refreshPane();
-			
+		}else if(CanvasParallelActivity(cm.selectedItem) != null){
+			var co = CanvasParallelActivity(cm.selectedItem);
+			var cca:ComplexActivity = ComplexActivity(co.activity);
+				//its an parallel activity
+				showOptionalControls(false);
+				showGeneralControls(true);
+				showGroupingControls(false);
+				//showRelevantGroupOptions();
+				showToolActivityControls(false);
+				showGateControls(false);
+				showAppliedGroupingControls(true);
+				//showGeneralProperties(cca)
+				populateGroupingProperties(GroupingActivity(cca));
+				showAppliedGroupingProperties(cca);
+				showParallelActivityProperties(cca);
+				//show the title
+				title_txt.text = StringUtils.cleanNull(cca.title);
+				desc_txt.text = StringUtils.cleanNull(cca.description);*/
 		}else if(CanvasTransition(cm.selectedItem) != null){
 			var ct = CanvasTransition(cm.selectedItem);
 			var t:Transition = ct.transition;
@@ -456,6 +473,20 @@ class PropertyInspector extends MovieClip{
 		
 		
 		toolDisplayName_lbl.text = Dictionary.getValue('pi_optional_title');
+		//title_txt.text = StringUtils.cleanNull(ta.title);
+		//desc_txt.text = StringUtils.cleanNull(ta.description);
+		runOffline_chk.selected = ca.runOffline;
+		defineLater_chk.selected = ca.defineLater;
+					
+		currentGrouping_lbl.text = "GroupingUIID:"+StringUtils.cleanNull(ca.runOffline.groupingUIID);
+			
+
+	}
+	
+	private function showParallelActivityProperties(ca:ComplexActivity){
+		
+		
+		toolDisplayName_lbl.text = Dictionary.getValue('pi_parallel_title');
 		//title_txt.text = StringUtils.cleanNull(ta.title);
 		//desc_txt.text = StringUtils.cleanNull(ta.description);
 		runOffline_chk.selected = ca.runOffline;
