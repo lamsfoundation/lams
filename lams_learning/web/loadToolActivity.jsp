@@ -38,7 +38,8 @@ String pathToShare = protocol+request.getServerName()+":"+request.getServerPort(
 
 %>
 <body bgcolor="#9DC5EC">
-	<lams:Passon progress="${activityForm.progressSummary}" />
+
+	<lams:Passon progress="${activityForm.progressSummary}" uniqueID="${param.uID}"/>
 	
 	<c:if test="${!empty activityForm.activityURLs}">
 		
@@ -57,7 +58,12 @@ String pathToShare = protocol+request.getServerName()+":"+request.getServerPort(
 				}
 				window.location.href = url;
 			}
-			window.onload = redirectPage;
+			
+			var param = "<%= request.getParameter("uID") %>";
+			
+			if(param != "null"){
+				window.onload = redirectPage;
+			}
 			//-->
 		</script>
 		
