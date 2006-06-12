@@ -435,6 +435,9 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
     		voteLearningForm.setRevisitingUser(new Boolean(true).toString());
      		voteLearningForm.setRevisitingPageActive(new Boolean(true).toString());
     		
+     		logger.debug("preparing chart data for readonly mode");
+     		MonitoringUtil.prepareChartData(request, voteService, null, voteContent.getVoteContentId(), toolSessionId);
+     		logger.debug("fwd'ing to: " + ALL_NOMINATIONS);
     		return (mapping.findForward(ALL_NOMINATIONS));
     	}
     }
