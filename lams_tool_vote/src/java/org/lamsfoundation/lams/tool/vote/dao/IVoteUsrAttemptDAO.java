@@ -76,6 +76,8 @@ public interface IVoteUsrAttemptDAO
 	
 	public int getStandardAttemptsForQuestionContentAndSessionUid(final Long voteQueContentId, final Long voteSessionUid);
 	
+	public List getStandardAttemptUsersForQuestionContentAndSessionUid(final Long voteQueContentId, final Long voteSessionUid);
+	
 	public void removeAttemptsForUser(final Long queUsrId);
 	
 	public void removeAttemptsForUserandSession(final Long queUsrId, final Long voteSessionId);

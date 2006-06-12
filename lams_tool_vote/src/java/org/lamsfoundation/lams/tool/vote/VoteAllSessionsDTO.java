@@ -42,6 +42,33 @@ public class VoteAllSessionsDTO implements Comparable
 	private String sessionName;
 	private Map mapStandardNominationsContent;
 	private Map mapStandardNominationsHTMLedContent;
+	
+	private Map mapStandardQuestionUid;
+	private Map mapStandardToolSessionUid;
+    /**
+     * @return Returns the mapStandardQuestionUid.
+     */
+    public Map getMapStandardQuestionUid() {
+        return mapStandardQuestionUid;
+    }
+    /**
+     * @param mapStandardQuestionUid The mapStandardQuestionUid to set.
+     */
+    public void setMapStandardQuestionUid(Map mapStandardQuestionUid) {
+        this.mapStandardQuestionUid = mapStandardQuestionUid;
+    }
+    /**
+     * @return Returns the mapStandardToolSessionUid.
+     */
+    public Map getMapStandardToolSessionUid() {
+        return mapStandardToolSessionUid;
+    }
+    /**
+     * @param mapStandardToolSessionUid The mapStandardToolSessionUid to set.
+     */
+    public void setMapStandardToolSessionUid(Map mapStandardToolSessionUid) {
+        this.mapStandardToolSessionUid = mapStandardToolSessionUid;
+    }
 	private Map mapStandardUserCount;
 	private Map mapStandardRatesContent;
 	private List listUserEntries;

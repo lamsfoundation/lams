@@ -235,7 +235,22 @@ public class VoteServicePOJO implements
 														   e);
         }
     }
+
     
+    public List getStandardAttemptUsersForQuestionContentAndSessionUid(final Long voteQueContentId, final Long voteSessionUid)
+    {
+        try
+        {
+            return voteUsrAttemptDAO.getStandardAttemptUsersForQuestionContentAndSessionUid(voteQueContentId, voteSessionUid);
+        }
+        catch (DataAccessException e)
+        {
+            throw new VoteApplicationException("Exception occured when lams is retrieving usernames for votes: "
+                                                         + e.getMessage(),
+														   e);
+        }
+    }
+
     
     public List getContentEntries(final Long voteContentUid) throws VoteApplicationException 
     {
@@ -919,7 +934,7 @@ public class VoteServicePOJO implements
 														   e);
         }
     }
-    
+   
     
     public VoteSession retrieveVoteSession(Long voteSessionId) throws VoteApplicationException
     {

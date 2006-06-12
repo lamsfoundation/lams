@@ -105,6 +105,8 @@ public interface IVoteService
     
     public int getUserEnteredVotesCountForContent(final Long voteContentUid) throws VoteApplicationException;
     
+    public List getStandardAttemptUsersForQuestionContentAndSessionUid(final Long voteQueContentId, final Long voteSessionUid);
+    
     public int getStandardAttemptsForQuestionContentAndSessionUid(final Long voteQueContentId, final Long voteSessionId) throws VoteApplicationException;
     
 	public int getAllEntriesCount() throws VoteApplicationException;

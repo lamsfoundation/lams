@@ -363,6 +363,30 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 
 	    }
 		
+		public List getStandardAttemptUsersForQuestionContentAndSessionUid(final Long voteQueContentId, final Long voteSessionUid)
+	    {
+	        HibernateTemplate templ = this.getHibernateTemplate();
+	        List list = getSession().createQuery(LOAD_ATTEMPT_FOR_QUESTION_CONTENT)
+			.setLong("voteQueContentId", voteQueContentId.longValue())
+			.list();
+	        
+	        List userEntries= new ArrayList();
+			if(list != null && list.size() > 0){
+				Iterator listIterator=list.iterator();
+		    	while (listIterator.hasNext())
+		    	{
+		    	    VoteUsrAttempt attempt=(VoteUsrAttempt)listIterator.next();
+		    	    if (attempt.getVoteQueUsr().getVoteSession().getUid().toString().equals(voteSessionUid.toString()))
+		    	    {
+		    	            userEntries.add(attempt.getVoteQueUsr().getFullname());    
+		    	    }
+		    	}
+			}
+			return userEntries;
+
+	    }
+
+		
 		
 		public boolean isVoteVisibleForSession(final String userEntry, final Long voteSessionUid)
 		{

@@ -129,11 +129,43 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 												<c:out value="${currentNomination.value}" escapeXml="false"/>
 											 </td>
 			
+			
+			
 											<td NOWRAP valign=top align=left>				  	 		
 									  	 		<c:forEach var="currentUserCount" items="${mapStandardUserCount}">
 										  	 		<c:set var="currentUserKey" scope="request" value="${currentUserCount.key}"/>
 									  				<c:if test="${currentNominationKey == currentUserKey}"> 				
+									  				
+									  					<c:if test="${currentUserCount.value != '0' }"> 	
+												  	 		<c:forEach var="currentQuestionUid" items="${mapStandardQuestionUid}">
+													  	 		<c:set var="currentQuestionUidKey" scope="request" value="${currentQuestionUid.key}"/>
+												  				<c:if test="${currentQuestionUidKey == currentUserKey}"> 				
+
+
+														  	 		<c:forEach var="currentSessionUid" items="${mapStandardToolSessionUid}">
+															  	 		<c:set var="currentSessionUidKey" scope="request" value="${currentSessionUid.key}"/>
+														  				<c:if test="${currentSessionUidKey == currentQuestionUidKey}"> 				
+		
+																			<c:set var="viewURL">
+																				<html:rewrite page="/voteNominationViewer?questionUid=${currentQuestionUid.value}&sessionUid=${currentSessionUid.value}"/>
+																			</c:set>
+														  																					
+																			<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
+																				<font size=2> <c:out value="${currentUserCount.value}"/>  </font>
+																			</a>
+		
+		
+																		</c:if> 	    
+																	</c:forEach>		  
+
+
+																</c:if> 	    
+															</c:forEach>		  
+														</c:if> 	    								
+										  				<c:if test="${currentUserCount.value == 0 }"> 		  				
 																<font size=2> <c:out value="${currentUserCount.value}"/>  </font>
+														</c:if> 	
+														    																								
 													</c:if> 	    
 												</c:forEach>		  
 			

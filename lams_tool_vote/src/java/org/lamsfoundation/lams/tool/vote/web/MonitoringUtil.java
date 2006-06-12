@@ -736,6 +736,9 @@ public class MonitoringUtil implements VoteAppConstants{
 			
 			logger.debug("using entriesCount: " + entriesCount);
 			Map mapStandardNominationsHTMLedContent= new TreeMap(new VoteComparator());
+			Map mapStandardQuestionUid= new TreeMap(new VoteComparator());
+			Map mapStandardToolSessionUid= new TreeMap(new VoteComparator());
+
 			while (queIterator.hasNext())
 			{
 				VoteQueContent voteQueContent=(VoteQueContent) queIterator.next();
@@ -750,6 +753,10 @@ public class MonitoringUtil implements VoteAppConstants{
 					int votesCount=0;
 				    logger.debug("getting votesCount based on session: " + voteSession.getUid());
 					votesCount=voteService.getStandardAttemptsForQuestionContentAndSessionUid(voteQueContent.getUid(), voteSession.getUid());
+					
+					mapStandardQuestionUid.put(mapIndex.toString(),voteQueContent.getUid().toString());
+					mapStandardToolSessionUid.put(mapIndex.toString(),voteSession.getUid());
+					
 					logger.debug("votesCount for questionContent uid: " + votesCount + " for" + voteQueContent.getUid());
 					mapStandardUserCount.put(mapIndex.toString(),new Integer(votesCount).toString());
 					totalStandardVotesCount=totalStandardVotesCount + votesCount;
@@ -810,6 +817,8 @@ public class MonitoringUtil implements VoteAppConstants{
 			voteAllSessionsDTO.setMapStandardNominationsHTMLedContent(mapStandardNominationsHTMLedContent);
 			voteAllSessionsDTO.setMapStandardUserCount(mapStandardUserCount);
 			voteAllSessionsDTO.setMapStandardRatesContent(mapStandardRatesContent);
+			voteAllSessionsDTO.setMapStandardQuestionUid(mapStandardQuestionUid);
+			voteAllSessionsDTO.setMapStandardToolSessionUid(mapStandardToolSessionUid);
 			
 			VoteMonitoringAction voteMonitoringAction= new VoteMonitoringAction();
 			List listUserEntries=voteMonitoringAction.processUserEnteredNominations(voteService, voteContent, voteSession.getVoteSessionId().toString(), true, null, false);
@@ -911,6 +920,8 @@ public class MonitoringUtil implements VoteAppConstants{
 		logger.debug("using entriesCount: " + entriesCount);
 		
 		Map mapStandardNominationsHTMLedContent= new TreeMap(new VoteComparator());
+		Map mapStandardQuestionUid= new TreeMap(new VoteComparator());
+		Map mapStandardToolSessionUid= new TreeMap(new VoteComparator());
 		while (queIterator.hasNext())
 		{
 			VoteQueContent voteQueContent=(VoteQueContent) queIterator.next();
@@ -927,6 +938,10 @@ public class MonitoringUtil implements VoteAppConstants{
 				{
 				    logger.debug("getting votesCount based on session: " + toolSessionUid);
 					votesCount=voteService.getStandardAttemptsForQuestionContentAndSessionUid(voteQueContent.getUid(), toolSessionUid);
+					
+					mapStandardQuestionUid.put(mapIndex.toString(),voteQueContent.getUid().toString());
+					mapStandardToolSessionUid.put(mapIndex.toString(),toolSessionUid.toString());
+					
 					logger.debug("votesCount for questionContent uid: " + votesCount + " for" + voteQueContent.getUid());
 					mapStandardUserCount.put(mapIndex.toString(),new Integer(votesCount).toString());
 					totalStandardVotesCount=totalStandardVotesCount + votesCount;
@@ -996,6 +1011,12 @@ public class MonitoringUtil implements VoteAppConstants{
 		
 		request.getSession().setAttribute(MAP_STANDARD_USER_COUNT, mapStandardUserCount);
 		logger.debug("test2: MAP_STANDARD_USER_COUNT: " + request.getSession().getAttribute(MAP_STANDARD_USER_COUNT));
+		
+		request.getSession().setAttribute("mapStandardQuestionUid", mapStandardQuestionUid);
+		logger.debug("test2: mapStandardQuestionUid: " + request.getSession().getAttribute("mapStandardQuestionUid"));
+
+		request.getSession().setAttribute("mapStandardToolSessionUid", mapStandardToolSessionUid);
+		logger.debug("test2: mapStandardToolSessionUid: " + request.getSession().getAttribute("mapStandardToolSessionUid"));
 	}
 	
 	/**
