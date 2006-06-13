@@ -87,12 +87,9 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
 	
 	/** The check boxes selected on the first voting screen */
 	protected String[] checkedVotes;
-	/** The text of the user's votes, including their free text entry vote */
-	protected String[] votes;
 	
 	public void reset(ActionMapping mapping, HttpServletRequest request) {
 		checkedVotes = new String[0];
-		votes = new String[0];
 	}
 	
 	protected void resetUserActions()
@@ -642,14 +639,6 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
 	/** Set the votes based on the checkboxes */
 	public void setCheckedVotes(String[] checkedVotes) {
 		this.checkedVotes = checkedVotes;
-	}
-
-	public String[] getVotes() {
-		return votes;
-	}
-
-	public void setVotes(String[] votes) {
-		this.votes = votes;
 	}
 
 }
