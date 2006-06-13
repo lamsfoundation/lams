@@ -60,6 +60,7 @@ public interface VoteAppConstants {
     public static final String ERROR_LIST								="errorList";
     public static final String PREVIEW									="preview";
     public static final String LEARNER_PROGRESS							="learnerProgress";
+    public static final String VOTE_NOMINATION_VIEWER					="voteNominationViewer";
     public static final String LEARNER_PROGRESS_USERID					="learnerProgressUserId";
 	
     public static final String AUTHORING								="authoring";
@@ -124,6 +125,7 @@ public interface VoteAppConstants {
     public static final String MAP_STARTUP_GENERAL_OPTIONS_CONTENT		="mapStartupGeneralOptionsContent";
     public static final String MAP_STARTUP_GENERAL_SELECTED_OPTIONS_CONTENT	="mapStartupGeneralSelectedOptionsContent";
     public static final String MAP_STARTUP_GENERAL_OPTIONS_QUEID		="mapStartupGeneralOptionsQueId";
+    public static final String MAP_STUDENTS_VOTED						="mapStudentsVoted";
     public static final String QUESTIONS_WITHNO_OPTIONS					="questionsWithNoOptions";
     
     public static final String MAP_GENERAL_CHECKED_OPTIONS_CONTENT		="mapGeneralCheckedOptionsContent";

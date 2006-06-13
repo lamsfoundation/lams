@@ -50,17 +50,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<html:html locale="true">
 	<head>
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<lams:headItems/>
 	<title> <bean:message key="activity.title"/>  </title>
-	
-	 <lams:css/>
-
- 	<!-- ******************** FCK Editor related javascript & HTML ********************** -->	 
- 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
-    <script type="text/javascript" src="${lams}fckeditor/fckeditor.js"></script>
-   	<script type="text/javascript" src="${lams}includes/javascript/fckcontroller.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>
-
-	<link href="${lams}css/fckeditor_style.css" rel="stylesheet" type="text/css">
+	<lams:css/>
 
 	<script type="text/javascript">
 		var imgRoot="${lams}images/";

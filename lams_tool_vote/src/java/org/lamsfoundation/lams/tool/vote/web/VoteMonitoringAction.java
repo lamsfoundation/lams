@@ -1015,10 +1015,45 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	    request.getSession().setAttribute(CURRENT_MONITORED_TOOL_SESSION, currentMonitoredToolSession);
 	    logger.debug("CURRENT_MONITORED_TOOL_SESSION: " + request.getSession().getAttribute(CURRENT_MONITORED_TOOL_SESSION));
 
-    	//return (mapping.findForward(LOAD_MONITORING));
 	    logger.debug("submitting session to refresh the data from the database: ");
 	    return submitSession(mapping, form,  request, response);	    
      }
+
+    public ActionForward getVoteNomination(ActionMapping mapping, ActionForm form,
+            HttpServletRequest request,HttpServletResponse response) throws IOException,
+            ServletException, ToolException
+    {
+        logger.debug("dispatching getVoteNomination...");
+        String questionUid=request.getParameter("questionUid");
+        String sessionUid=request.getParameter("sessionUid");
+        
+        logger.debug("questionUid: " + questionUid);
+        logger.debug("sessionUid: " + sessionUid);
+        
+    	IVoteService voteService=null;
+	    voteService = (IVoteService)request.getSession().getAttribute(TOOL_SERVICE);
+		logger.debug("voteService: " + voteService);
+
+		List userNames=voteService.getStandardAttemptUsersForQuestionContentAndSessionUid(new Long(questionUid), new Long(sessionUid));
+		logger.debug("userNames: " + userNames);
+		List listVotedLearnersDTO= new LinkedList();
+		
+        Iterator userIterator=userNames.iterator();
+    	while (userIterator.hasNext())
+    	{
+    	    VoteUsrAttempt voteUsrAttempt=(VoteUsrAttempt)userIterator.next();
+    	    VoteMonitoredUserDTO voteMonitoredUserDTO= new VoteMonitoredUserDTO();
+    	    voteMonitoredUserDTO.setUserName(voteUsrAttempt.getVoteQueUsr().getFullname());
+    	    voteMonitoredUserDTO.setAttemptTime(voteUsrAttempt.getAttemptTime().toString());
+    	    listVotedLearnersDTO.add(voteMonitoredUserDTO);
+    	}
+		logger.debug("listVoteAllSessionsDTO: " + listVotedLearnersDTO);
+		
+		request.getSession().setAttribute(MAP_STUDENTS_VOTED,listVotedLearnersDTO);
+		
+		logger.debug("fdwing to: " + VOTE_NOMINATION_VIEWER);
+		return (mapping.findForward(VOTE_NOMINATION_VIEWER));          
+    }
 
     
     

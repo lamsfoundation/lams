@@ -155,7 +155,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					
 																		  				<c:if test="${currentNomination.value != 'Open Vote'}"> 				
 																							<c:set var="viewURL">
-																								<html:rewrite page="/voteNominationViewer?questionUid=${currentQuestionUid.value}&sessionUid=${currentSessionUid.value}"/>
+																								<lams:WebAppURL/>monitoring.do?method=getVoteNomination&questionUid=${currentQuestionUid.value}&sessionUid=${currentSessionUid.value}
 																							</c:set>
 																		  																					
 																							<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">

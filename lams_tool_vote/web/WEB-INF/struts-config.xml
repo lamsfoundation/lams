@@ -449,7 +449,12 @@
 			path="/monitoring/MonitoringMaincontent.jsp"
 			redirect="false"
 	  	/>
-	      
+
+        <forward 
+        	name="voteNominationViewer" 
+        	path="/monitoring/VoteNominationViewer.jsp" 
+        	redirect="false"
+       	/>	      
 
 	  	<forward
 		    name="errorList"
@@ -461,7 +466,6 @@
    <action 	path="/clearsession" 
    			type="org.lamsfoundation.lams.tool.vote.web.ClearSessionAction"> 
 	</action>     			
-	
  </action-mappings>
 	
 	<message-resources parameter="org.lamsfoundation.lams.tool.vote.ApplicationResources"/>

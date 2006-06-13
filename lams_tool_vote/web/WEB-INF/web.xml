@@ -138,12 +138,6 @@ http://www.gnu.org/licenses/gpl.txt
 		<servlet-class>org.lamsfoundation.lams.tool.vote.web.VoteChartGenerator</servlet-class>
 	</servlet>
 
-	<servlet>
-		<servlet-name>voteNominationViewer</servlet-name>
-		<servlet-class>org.lamsfoundation.lams.tool.vote.web.VoteNominationViewer</servlet-class>
-	</servlet>
-
-
 
 <!--  FCKEditor Connector Configuration -->
 	<servlet>
@@ -179,12 +173,6 @@ http://www.gnu.org/licenses/gpl.txt
 		<servlet-name>chartGenerator</servlet-name>
 		<url-pattern>/chartGenerator/*</url-pattern>
   	</servlet-mapping>
-
-  	<servlet-mapping>
-		<servlet-name>voteNominationViewer</servlet-name>
-		<url-pattern>/voteNominationViewer/*</url-pattern>
-  	</servlet-mapping>
-
 
 	<servlet-mapping>
 	    <servlet-name>Connector</servlet-name>
