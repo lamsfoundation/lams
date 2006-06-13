@@ -171,7 +171,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		//write text
 		title_lbl.text = Dictionary.getValue('opt_activity_title'); //'Optional Activities'
 		//_activity.title = 'Optional Activities';
-		actCount_lbl.text = _children.length + Dictionary.getValue('lbl_num_activities'); //" activities";
+		actCount_lbl.text = _children.length +" - "+ Dictionary.getValue('lbl_num_activities'); //" activities";
 		header_pnl.borderType = 'outset';
 		act_pnl.borderType = 'inset';
 		container_pnl.setStyle ("backgroundColor", 0x4289FF);
@@ -271,6 +271,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 	public function get locked():Boolean {
 		return _locked;
 	}
+	
+	public function get actChildren():Array {
+		return _children;
+	} 
 	public function get getpanelHeight():Number {
 		return panelHeight;
 	}
