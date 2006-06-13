@@ -42,6 +42,7 @@ import org.lamsfoundation.lams.tool.rsrc.dto.Summary;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
 import org.lamsfoundation.lams.tool.rsrc.service.IResourceService;
 import org.lamsfoundation.lams.tool.rsrc.service.ResourceApplicationException;
+import org.lamsfoundation.lams.tool.rsrc.util.ResourceWebUtils;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
@@ -50,7 +51,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 import sun.util.logging.resources.logging;
 
 public class MonitoringAction extends Action {
-	private static Logger log = Logger.getLogger(MonitoringAction.class);
+	public static Logger log = Logger.getLogger(MonitoringAction.class);
 	
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) throws IOException, ServletException {
@@ -130,7 +131,7 @@ public class MonitoringAction extends Action {
 		
 		Resource resource = service.getResourceByContentId(contentId);
 		resource.toDTO();
-		request.getSession().setAttribute(ResourceConstants.PAGE_EDITABLE, new Boolean(isResourceEditable(resource)));
+		request.getSession().setAttribute(ResourceConstants.PAGE_EDITABLE, new Boolean(ResourceWebUtils.isResourceEditable(resource)));
 		request.getSession().setAttribute(ResourceConstants.ATTR_RESOURCE, resource);
 		request.getSession().setAttribute(ResourceConstants.ATTR_TOOL_CONTENT_ID, contentId);
 		return mapping.findForward(ResourceConstants.SUCCESS);
@@ -157,20 +158,5 @@ public class MonitoringAction extends Action {
 		WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
 				.getServletContext());
 		return (IResourceService) wac.getBean(ResourceConstants.RESOURCE_SERVICE);
-	}
-	
-	private boolean isResourceEditable(Resource resource) {
-        if ( (resource.isDefineLater() == true) && (resource.isContentInUse()==true) )
-        {
-//            throw new ResourceApplicationException("An exception has occurred: There is a bug in this tool, conflicting flags are set");
-        	 log.error("An exception has occurred: There is a bug in this tool, conflicting flags are set");
-             return false;
-        }
-        else if ( (resource.isDefineLater() == true) && (resource.isContentInUse() == false))
-            return true;
-        else if ( (resource.isDefineLater() == false) && (resource.isContentInUse() == false))
-            return true;
-        else //  (content.isContentInUse()==true && content.isDefineLater() == false)
-            return false;
 	}	
 }

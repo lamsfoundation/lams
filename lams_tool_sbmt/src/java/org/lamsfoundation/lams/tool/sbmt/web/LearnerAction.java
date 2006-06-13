@@ -72,7 +72,9 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * 			validate="false"
  * 
  * @struts.action-forward name="upload" path="/learner/sbmtLearner.jsp"
- * @struts.action-forward name="contentInUse" path="/learner/contentinuse.jsp"
+ * @struts.action-forward name="defineLater" path="/learner/definelater.jsp"
+ * @struts.action-forward name="runOffline" path="/learner/runoffline.jsp"
+
  * 
  */
 public class LearnerAction extends DispatchAction {
@@ -129,15 +131,28 @@ public class LearnerAction extends DispatchAction {
 		submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this.getServlet().getServletContext());
 		SubmitFilesSession session = submitFilesService.getSessionById(sessionID);
 		SubmitFilesContent content = session.getContent();
-		//if content in use, return special page.
-		if(content.isContentInUse())
-			return mapping.findForward("contentInUse");
+
 		
 		List filesUploaded = submitFilesService.getFilesUploadedByUser(userID,sessionID);
 		Learner learner = submitFilesService.getLearner(sessionID,userID);
 		setLearnerDTO(request, sessionID,user,learner, content, filesUploaded);
 		//to avoid user without patience click "upload" button too fast
 		saveToken(request);
+		
+		//if content in use, return special page.
+		if(content.isDefineLater()){
+			return mapping.findForward("defineLater");
+		}
+		//add run offline support
+		if(content.isRunOffline()){
+			return mapping.findForward("runOffline");		
+		}
+		
+		//set contentInUse flag to true!
+		content.setContentInUse(true);
+		content.setDefineLater(false);
+		submitFilesService.saveOrUpdateContent(content);
+		
 		return mapping.getInputForward();
 		
 	}

@@ -165,7 +165,7 @@ public class SubmitFilesService implements ToolContentManager,
 	 */
 	private SubmitFilesContent duplicateDefaultToolContent(Long toolContentId) {
 		long contentId=0;
-		contentId =toolService.getToolDefaultContentIdBySignature(SbmtConstants.TOOLSIGNNATURE);
+		contentId =toolService.getToolDefaultContentIdBySignature(SbmtConstants.TOOL_SIGNATURE);
 		SubmitFilesContent content = new SubmitFilesContent();
 		content.setContentID(new Long(contentId));
 		return content;
@@ -739,7 +739,7 @@ public class SubmitFilesService implements ToolContentManager,
     	    log.error(error);
     	    throw new SubmitFilesException(error);
     	}
-    	Long defaultToolContentId = getToolDefaultContentIdBySignature(SbmtConstants.TOOLSIGNNATURE);
+    	Long defaultToolContentId = getToolDefaultContentIdBySignature(SbmtConstants.TOOL_SIGNATURE);
     	SubmitFilesContent defaultContent = getSubmitFilesContent(defaultToolContentId);
     	if(defaultContent == null)
     	{

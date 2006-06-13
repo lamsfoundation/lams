@@ -13,11 +13,9 @@
 </c:set>
 <%Set tabs = new HashSet();
 			tabs.add("label.authoring.heading.basic");
-			tabs.add("label.authoring.heading.advance");
-			tabs.add("label.authoring.heading.instructions");
 			pageContext.setAttribute("tabs", tabs);
 
-		%>
+			%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html:html locale="true">
 <head>
@@ -33,19 +31,13 @@
         
         function init(){
         
-            initTabSize(3);
+            initTabSize(1);
             
             var tag = document.getElementById("currentTab");
-	    	if(tag.value != "")
-	    		selectTab(tag.value);
-            else
-                selectTab(1); //select the default tab;
+            selectTab(1); //select the default tab;
             
             initEditor("Title");
             initEditor("Instructions");
-            initEditor("OnlineInstruction");
-            initEditor("OfflineInstruction");
-            
         }     
         
         function doSelectTab(tabId) {
@@ -69,6 +61,7 @@
 <body onLoad="init()">
 
 	<html:form action="authoring" method="post" focus="title" styleId="authoringForm" enctype="multipart/form-data">
+		<html:hidden property="mode" value="teacher" />
 		<html:hidden property="toolContentID" />
 		<html:hidden property="currentTab" styleId="currentTab" />
 		<html:hidden property="dispatch" value="updateContent" />
@@ -91,25 +84,8 @@
 
 			<!-- tab content 1 (Basic) -->
 			<lams:TabBody id="1" titleKey="label.authoring.heading.basic.desc" page="basic.jsp" />
-			<!-- end of content (Basic) -->
 
-			<!-- tab content 2 (Advanced) -->
-			<lams:TabBody id="2" titleKey="label.authoring.heading.advance.desc" page="advance.jsp" />
-			<!-- end of content (Advanced) -->
-
-			<!-- tab content 3 (Instructions) -->
-			<lams:TabBody id="3" titleKey="label.authoring.heading.instructions.desc" page="instructions.jsp" />
-			<!-- end of content (Instructions) -->
-
-
-			<!-- Button Row -->
-			<%--  Default value 
-		cancelButtonLabelKey="label.authoring.cancel.button"
-		saveButtonLabelKey="label.authoring.save.button"
-		cancelConfirmMsgKey="authoring.msg.cancel.save"
-		accessMode="author"
-	--%>
-			<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="<%=SbmtConstants.TOOL_SIGNATURE%>" toolContentID="${toolContentID}" />
+			<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="<%=SbmtConstants.TOOL_SIGNATURE%>" toolContentID="${toolContentID}" definelater="yes" />
 
 		</div>
 		<lams:HTMLEditor />

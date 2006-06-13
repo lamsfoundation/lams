@@ -40,7 +40,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionError;
 import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -97,11 +96,13 @@ public class LearningAction extends Action {
 	private ActionForward finish(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		//auto run mode, when use finish the only one resource item, mark it as complete then finish this activity as well.
 		String resourceItemUid = request.getParameter(ResourceConstants.PARAM_RESOURCE_ITEM_UID);
+		String runOffline = request.getParameter(ResourceConstants.PARAM_RUN_OFFLINE);
 		if(resourceItemUid != null){
 			doComplete(request);
 			request.setAttribute(ResourceConstants.ATTR_RUN_AUTO,true);
 		}else
 			request.setAttribute(ResourceConstants.ATTR_RUN_AUTO,false);
+		
 		Long sessionId = (Long) request.getSession().getAttribute(
 				AttributeNames.PARAM_TOOL_SESSION_ID);
 		HttpSession ss = SessionManager.getSession();
@@ -111,7 +112,8 @@ public class LearningAction extends Action {
 		IResourceService service = getResourceService();
 		int miniViewFlag = service.checkMiniView(sessionId,userID);
 		//if current user view less than reqired view count number, then just return error message.
-		if(miniViewFlag > 0){
+		//if it is runOffline content, then need not check minimum view count
+		if(miniViewFlag > 0 && !StringUtils.equalsIgnoreCase(runOffline,"true")){
 			ActionErrors errors = new ActionErrors();
 			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage("lable.learning.minimum.view.number.less",miniViewFlag));
 			this.addErrors(request,errors);
@@ -243,6 +245,16 @@ public class LearningAction extends Action {
 			log.error(e);
 			return mapping.findForward(ResourceConstants.ERROR);
 		}
+		
+		//add define later support
+		if(resource.isDefineLater()){
+			return mapping.findForward("defineLater");
+		}
+		//add run offline support
+		if(resource.getRunOffline()){
+			return mapping.findForward("runOffline");
+		}
+				
 		//init resource item list
 		List<ResourceItem> resourceItemList = getResourceItemList(request);
 		resourceItemList.clear();
@@ -275,6 +287,11 @@ public class LearningAction extends Action {
 			}
 		}
 		request.setAttribute(ResourceConstants.ATTR_RUN_AUTO,new Boolean(runAuto));
+		
+		//set contentInUse flag to true!
+		resource.setContentInUse(true);
+		resource.setDefineLater(false);
+		service.saveOrUpdateResource(resource);
 		
 		return mapping.findForward(ResourceConstants.SUCCESS);
 	}

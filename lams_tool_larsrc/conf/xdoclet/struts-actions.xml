@@ -14,6 +14,7 @@
 			scope="session" 
 			parameter="definelater" 
 			validate="false">
+			<forward name="forbidden" path="/pages/authoring/definelaterforbid.jsp" />
 			<forward name="success" path="/pages/authoring/start.jsp" />
 		</action>
 		<action path="/authoring/init"
@@ -143,6 +144,8 @@
 			type="org.lamsfoundation.lams.tool.rsrc.web.action.LearningAction"
 			parameter="start" >
 			<forward name="success" path="/pages/learning/start.jsp" />
+			<forward name="defineLater" path="/pages/learning/definelater.jsp" />
+			<forward name="runOffline" path="/pages/learning/runoffline.jsp" />			
 		</action>
 		<action path="/learning/completeItem"
 			type="org.lamsfoundation.lams.tool.rsrc.web.action.LearningAction"

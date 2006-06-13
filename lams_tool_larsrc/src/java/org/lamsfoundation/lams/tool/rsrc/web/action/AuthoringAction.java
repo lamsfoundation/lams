@@ -24,7 +24,6 @@
 package org.lamsfoundation.lams.tool.rsrc.web.action;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.sql.Timestamp;
@@ -59,7 +58,6 @@ import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.rsrc.ResourceConstants;
-import org.lamsfoundation.lams.tool.rsrc.dto.InstructionNavDTO;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceAttachment;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
@@ -68,6 +66,7 @@ import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
 import org.lamsfoundation.lams.tool.rsrc.service.IResourceService;
 import org.lamsfoundation.lams.tool.rsrc.service.ResourceApplicationException;
 import org.lamsfoundation.lams.tool.rsrc.service.UploadResourceFileException;
+import org.lamsfoundation.lams.tool.rsrc.util.ResourceWebUtils;
 import org.lamsfoundation.lams.tool.rsrc.web.form.ResourceForm;
 import org.lamsfoundation.lams.tool.rsrc.web.form.ResourceItemForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -100,7 +99,23 @@ public class AuthoringAction extends Action {
 			return start(mapping, form, request, response);
 		}
 		if (param.equals("definelater")) {
+			//update define later flag to true
 			request.getSession().setAttribute(AttributeNames.ATTR_MODE,ToolAccessMode.TEACHER);
+			Long contentId = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
+			IResourceService service = getResourceService();
+			Resource resource = service.getResourceByContentId(contentId);
+			
+			boolean isEditable = ResourceWebUtils.isResourceEditable(resource);
+			if(!isEditable){
+				request.setAttribute(ResourceConstants.PAGE_EDITABLE, new Boolean(isEditable));
+				return mapping.findForward("forbidden");
+			}
+			
+			if(!resource.isContentInUse()){
+				resource.setDefineLater(true);
+				service.saveOrUpdateResource(resource);
+			}
+			
 			return start(mapping, form, request, response);
 		}		
 	  	if (param.equals("initPage")) {
@@ -429,6 +444,7 @@ public class AuthoringAction extends Action {
 				}else{ //if it is Teacher, then just update basic tab content (definelater)
 					resourcePO.setInstructions(resource.getInstructions());
 					resourcePO.setTitle(resource.getTitle());
+					resourcePO.setDefineLater(false);
 				}
 				resourcePO.setUpdated(new Timestamp(new Date().getTime()));
 			}

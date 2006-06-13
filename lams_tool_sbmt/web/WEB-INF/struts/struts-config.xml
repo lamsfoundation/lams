@@ -97,8 +97,13 @@
         redirect="false"
       />
       <forward
-        name="contentInUse"
-        path="/learner/contentinuse.jsp"
+        name="defineLater"
+        path="/learner/definelater.jsp"
+        redirect="false"
+      />
+      <forward
+        name="runOffline"
+        path="/learner/runoffline.jsp"
         redirect="false"
       />
     </action>
@@ -138,11 +143,6 @@
       />
       <forward
         name="showActivity"
-        path="/monitoring/monitoring.jsp"
-        redirect="false"
-      />
-      <forward
-        name="editActivity"
         path="/monitoring/monitoring.jsp"
         redirect="false"
       />
@@ -194,19 +194,19 @@
 
    		<!-- ========== Action Mapping Definitions ============================== -->
 		<action path="/definelater"
-			type="org.lamsfoundation.lams.tool.sbmt.web.MonitoringAction"
+			type="org.lamsfoundation.lams.tool.sbmt.web.AuthoringAction"
 			name="emptyForm" 
 			scope="request" 
 			parameter="method" 
 			validate="false">
 			      <forward
 			        name="definelater"
-			        path="/monitoring/definelater.jsp"
+			        path="/authoring/definelater.jsp"
 			        redirect="false"
 			      />
 			      <forward
-			        name="definelatersuccess"
-			        path="/monitoring/definelater.jsp"
+			        name="forbidden"
+			        path="/authoring/definelaterforbid.jsp"
 			        redirect="false"
 			      />
 		</action>

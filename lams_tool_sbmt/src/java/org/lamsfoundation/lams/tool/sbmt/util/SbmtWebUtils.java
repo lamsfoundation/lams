@@ -22,24 +22,32 @@
  */
 
 /* $$Id$$ */	
-
 package org.lamsfoundation.lams.tool.sbmt.util;
 
-public class SbmtConstants {
+import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
+import org.lamsfoundation.lams.tool.sbmt.exception.SubmitFilesException;
 
-	public static final String TOOL_SIGNATURE = "lasbmt11";
-	public static final String DEFAULT_TITLE = "Submit Files Title";
 
-	public static final String AUTHORING_DTO = "authoring";
+/**
+ * Contains helper methods used by the Action Servlets
+ * 
+ * @author Anthony Sukkar
+ *
+ */
+public class SbmtWebUtils {
 
-//	public static final String TOOL_SESSION_ID = "toolSessionID";
-//	public static final String TOOL_CONTENT_ID = "toolContentID";
-	public static final String USER_ID = "userID";
+	public static boolean isSbmtEditable(SubmitFilesContent submitContent) {
+        if ( (submitContent.isDefineLater() == true) && (submitContent.isContentInUse()==true) )
+        {
+            throw new SubmitFilesException("An exception has occurred: There is a bug in this tool, conflicting flags are set");
+                    //return false;
+        }
+        else if ( (submitContent.isDefineLater() == true) && (submitContent.isContentInUse() == false))
+            return true;
+        else if ( (submitContent.isDefineLater() == false) && (submitContent.isContentInUse() == false))
+            return true;
+        else //  (content.isContentInUse()==true && content.isDefineLater() == false)
+            return false;
+	}
 	
-	//TODO: hard code, need to read from config file/db
-	public static final String TOOL_URL_BASE = "/lams/tool/lasbmt11/";
-	public static final String ATTACHMENT_LIST = "attachmentList";
-	public static final String DELETED_ATTACHMENT_LIST = "deletedAttachmentList";
-	public static final String READ_ONLY_MODE = "readOnlyMode";
-	public static final String PAGE_EDITABLE = "isPageEditable";
 }

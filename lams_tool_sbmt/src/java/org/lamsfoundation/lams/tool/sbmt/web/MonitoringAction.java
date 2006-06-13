@@ -43,24 +43,25 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.Region;
 import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.DynaActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
 import org.lamsfoundation.lams.tool.sbmt.dto.AuthoringDTO;
 import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
-import org.lamsfoundation.lams.tool.sbmt.dto.StatisticDTO;
 import org.lamsfoundation.lams.tool.sbmt.dto.SessionDTO;
+import org.lamsfoundation.lams.tool.sbmt.dto.StatisticDTO;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
 import org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants;
+import org.lamsfoundation.lams.tool.sbmt.util.SbmtWebUtils;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 
 /**
@@ -78,7 +79,6 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
  * 
  * @struts.action-forward name="instructions" path="/monitoring/monitoring.jsp"
  * @struts.action-forward name="showActivity" path="/monitoring/monitoring.jsp"
- * @struts.action-forward name="editActivity" path="/monitoring/monitoring.jsp"
  * @struts.action-forward name="success" path="/monitoring/monitoring.jsp"
  * @struts.action-forward name="load" path="/monitoring/monitoring.jsp"
  * 
@@ -441,66 +441,6 @@ public class MonitoringAction extends LamsDispatchAction {
 		return mapping.findForward("showActivity");
 	}
 	/**
-	 * Provide editable page for activity. The information will be same with "Basic" tab in authoring page.
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return
-	 */
-	public ActionForward editActivity(ActionMapping mapping,
-			   ActionForm form,
-			   HttpServletRequest request,
-			   HttpServletResponse response){
-		Long contentID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
-		getAuthoringActivity(contentID, request);
-		String mode = request.getParameter("mode");
-		
-		setTab(request);
-		
-		// do other tabs
-		doTabs(mapping, form, request, response);
-		
-		if(StringUtils.equals(mode,"definelater"))
-			return mapping.findForward("definelater");
-		else
-			return mapping.findForward("editActivity");
-	}
-	/**
-	 * Update activity to database. The information will be same with "Basic" tab in authoring page.
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return
-	 */
-	public ActionForward updateActivity(ActionMapping mapping,
-			   ActionForm form,
-			   HttpServletRequest request,
-			   HttpServletResponse response){
-		Long contentID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
-		String title = WebUtil.readStrParam(request,"title");
-		String instructions = WebUtil.readStrParam(request,"instructions");
-
-		//get back the upload file list and display them on page
-		submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this
-				.getServlet().getServletContext());
-		SubmitFilesContent content = submitFilesService.getSubmitFilesContent(contentID);
-		content.setTitle(title);
-		content.setInstruction(instructions);
-		submitFilesService.saveOrUpdateContent(content);
-		
-		getAuthoringActivity(contentID, request);
-		setTab(request);
-		doTabs(mapping, form, request, response);
-		
-		String mode = request.getParameter("mode");
-		if(StringUtils.equals(mode,"definelater"))
-			return mapping.findForward("definelatersuccess");
-		else
-			return mapping.findForward("success");
-	}
-	/**
 	 * Provide statistic information. Includes:<br>
 	 * <li>Files not marked</li> 
 	 * <li>Files marked</li> 
@@ -576,6 +516,8 @@ public class MonitoringAction extends LamsDispatchAction {
 		persistContent.setContentID(contentID);
 		AuthoringDTO authorDto = new AuthoringDTO(persistContent);
 		request.setAttribute(SbmtConstants.AUTHORING_DTO,authorDto);
+		
+		request.setAttribute(SbmtConstants.PAGE_EDITABLE, new Boolean(SbmtWebUtils.isSbmtEditable(persistContent)));
 	}
 	private ISubmitFilesService getSubmitFilesService(){
 		return SubmitFilesServiceProxy

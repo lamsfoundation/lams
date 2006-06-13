@@ -20,9 +20,23 @@
 				</td>
 			</tr>
 			<tr><td colspan="2">
-				<html:link href="javascript:doSubmit('editActivity');" property="editActivity" styleClass="button">
-						<bean:message key="label.monitoring.edit.activity.edit" />
-				</html:link>
+				<c:set var="isPageEditable" value="${isPageEditable}" />
+				<c:choose>
+					<c:when test='${isPageEditable == "true"}'>
+						<c:url value="/authoring.do" var="authoringUrl">
+							<c:param name="mode" value="teacher" />
+							<c:param name="toolContentID" value="${sessionScope.toolContentID}" />
+						</c:url>
+						<html:link href="${authoringUrl}" styleClass="button" target="_blank">
+							<fmt:message key="label.monitoring.edit.activity.edit" />
+						</html:link>
+					</c:when>
+					<c:otherwise>
+						<div align="center"><B>
+							<fmt:message key="message.monitoring.edit.activity.not.editable" />
+						</B></div>
+					</c:otherwise>
+				</c:choose>
 			</td></tr>
 		</table>
 	</div>

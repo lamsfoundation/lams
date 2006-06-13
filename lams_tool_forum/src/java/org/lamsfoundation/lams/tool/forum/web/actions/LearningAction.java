@@ -170,6 +170,10 @@ public class LearningAction extends Action {
 			return mapping.findForward("error");
 		}
 		
+		boolean lock = session.getForum().getLockWhenFinished();
+		lock = lock && (session.getStatus() == ForumConstants.SESSION_STATUS_FINISHED ? true : false);
+		request.getSession().setAttribute(ForumConstants.FINISHEDLOCK, new Boolean(lock));
+		
 		Forum forum = session.getForum();
 		//add define later support
 		if(forum.isDefineLater()){
@@ -190,12 +194,7 @@ public class LearningAction extends Action {
 				allowRichEditor);
 		request.getSession().setAttribute(ForumConstants.LIMITED_CHARS,
 				new Integer(allowNumber));
-		boolean lock = session.getForum().getLockWhenFinished();
-		lock = lock
-				&& (session.getStatus() == ForumConstants.SESSION_STATUS_FINISHED ? true
-						: false);
-		request.getSession().setAttribute(ForumConstants.FINISHEDLOCK,
-				new Boolean(lock));
+		
 
 		// get all root topic to display on init page
 		List rootTopics = forumService.getRootTopics(sessionId);

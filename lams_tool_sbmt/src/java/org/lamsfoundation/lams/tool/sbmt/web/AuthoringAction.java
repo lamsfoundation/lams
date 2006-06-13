@@ -46,15 +46,17 @@ import org.apache.struts.action.DynaActionForm;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
+import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.sbmt.InstructionFiles;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 import org.lamsfoundation.lams.tool.sbmt.dto.AuthoringDTO;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
 import org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants;
+import org.lamsfoundation.lams.tool.sbmt.util.SbmtWebUtils;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * @author Manpreet Minhas
@@ -90,6 +92,8 @@ public class AuthoringAction extends LamsDispatchAction {
 	public ActionForward updateContent(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
 
+		ToolAccessMode mode = getAccessMode(request);
+		
 		SubmitFilesContent content = getContent(form);
 		
 		submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this
@@ -144,7 +148,16 @@ public class AuthoringAction extends LamsDispatchAction {
 			content.setInstructionFiles(attPOSet);
 			content.setToolSession(persistContent.getToolSession());
 			//copy web page value into persist content, as above, the "Set" type value kept.
-			PropertyUtils.copyProperties(persistContent,content);
+			if(mode.isAuthor()){
+				Long uid = persistContent.getContentID();
+				PropertyUtils.copyProperties(persistContent,content);
+				persistContent.setContentID(uid);
+			}else{
+//				if it is Teacher, then just update basic tab content (definelater)
+				persistContent.setInstruction(content.getInstruction());
+				persistContent.setTitle(content.getTitle());
+				persistContent.setDefineLater(false);
+			}
 			
 			submitFilesService.saveOrUpdateContent(persistContent);
 			request.setAttribute("sbmtSuccess", new Boolean(true));
@@ -238,8 +251,10 @@ public class AuthoringAction extends LamsDispatchAction {
 
 	/**
 	 * This page will display initial submit tool content. Or just a blank page if the toolContentID does not
-	 * exist before. 
+	 * exist before.
 	 *  
+	 * <BR>
+	 * Define later will use this method to initial page as well. 
 	 * @see org.apache.struts.actions.DispatchAction#unspecified(org.apache.struts.action.ActionMapping,
 	 *      org.apache.struts.action.ActionForm,
 	 *      javax.servlet.http.HttpServletRequest,
@@ -248,6 +263,8 @@ public class AuthoringAction extends LamsDispatchAction {
 	protected ActionForward unspecified(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
 
+		ToolAccessMode mode = getAccessMode(request);
+		
 		Long contentID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
 		request.getSession().setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID,contentID);
 		//get back the upload file list and display them on page
@@ -255,6 +272,20 @@ public class AuthoringAction extends LamsDispatchAction {
 				.getServlet().getServletContext());
 		
 		SubmitFilesContent persistContent = submitFilesService.getSubmitFilesContent(contentID);
+		
+		if(mode.isTeacher()){
+			boolean isForumEditable = SbmtWebUtils.isSbmtEditable(persistContent);
+			if(!isForumEditable){
+				request.setAttribute(SbmtConstants.PAGE_EDITABLE, new Boolean(isForumEditable));
+				return mapping.findForward("forbidden");
+			}
+			
+			if(!persistContent.isContentInUse()){
+				persistContent.setDefineLater(true);
+				submitFilesService.saveOrUpdateContent(persistContent);
+			}
+		}
+		
 		//if this content does not exist(empty without id), create a content by default content record.
 		if(persistContent == null){
 			persistContent = submitFilesService.createDefaultContent(contentID);
@@ -281,7 +312,7 @@ public class AuthoringAction extends LamsDispatchAction {
 		authForm.set("lockOnFinished",persistContent.isLockOnFinished()?"1":null);
 		return mapping.getInputForward();
 	}
-	
+
 	//***********************************************************
 	//  Private/protected methods
 	//***********************************************************
@@ -368,4 +399,19 @@ public class AuthoringAction extends LamsDispatchAction {
 		}
 		return list;
 	}
+	
+	/**
+	 * @param request
+	 * @return
+	 */
+	private ToolAccessMode getAccessMode(HttpServletRequest request) {
+		ToolAccessMode mode;
+		String modeStr = request.getParameter("mode");
+		if(StringUtils.equalsIgnoreCase(modeStr,ToolAccessMode.TEACHER.toString()))
+			mode = ToolAccessMode.TEACHER;
+		else
+			mode = ToolAccessMode.AUTHOR;
+		return mode;
+	}
+	
 }
