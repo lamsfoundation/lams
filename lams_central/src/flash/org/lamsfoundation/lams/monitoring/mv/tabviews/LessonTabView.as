@@ -51,6 +51,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	public static var ACTIVE_CBI:Number = 1;
 	public static var DISABLE_CBI:Number = 2;
 	public static var ARCHIVE_CBI:Number = 3;
+	public static var UNARCHIVE_CBI:Number = 4;
 	
 	private var _className = "LessonTabView";
 	//constants:
@@ -286,7 +287,7 @@ public function update (o:Observable,infoObj:Object):Void{
 				break;
 			case Sequence.ARCHIVED_STATE_ID :
 				changeStatus_cmb.addItem("Select Status", LessonTabView.NULL_CBI);
-				//changeStatus_cmb.addItem("Activate", LessonTabView.ACTIVE_CBI);
+				changeStatus_cmb.addItem("Activate", LessonTabView.UNARCHIVE_CBI);
 				break;
 			case Sequence.ACTIVE_STATE_ID :
 				changeStatus_cmb.addItem("Select Status", LessonTabView.NULL_CBI);

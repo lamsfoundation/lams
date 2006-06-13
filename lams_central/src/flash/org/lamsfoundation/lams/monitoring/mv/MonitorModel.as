@@ -162,6 +162,11 @@ class MonitorModel extends Observable{
 		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=archiveLesson&lessonID=' + String(_activeSeq.ID) + '&userID=' + _root.userID,callback, false);
 	}
 	
+	public function unarchiveSequence():Void{
+		var callback:Function = Proxy.create(_monitor, _monitor.reloadLessonToMonitor);
+		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=unarchiveLesson&lessonID=' + String(_activeSeq.ID) + '&userID=' + _root.userID,callback, false);
+	}
+	
 	public function activateSequence():Void{
 		var callback:Function = Proxy.create(_monitor, _monitor.reloadLessonToMonitor);
 		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=unsuspendLesson&lessonID=' + String(_activeSeq.ID) + '&userID=' + _root.userID,callback, false);

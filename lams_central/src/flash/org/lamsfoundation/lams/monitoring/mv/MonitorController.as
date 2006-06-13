@@ -272,6 +272,9 @@ class MonitorController extends AbstractController {
 					trace('archiving...');
 					_monitorModel.archiveSequence();
 					break;
+				case LessonTabView.UNARCHIVE_CBI :
+					trace('unarchiving...');
+					_monitorModel.unarchiveSequence();
 				default :
 					trace('no such combo box item');
 					
