@@ -38,6 +38,7 @@ public class AttributeNames {
 	public static final String ADMIN_ERR_MSG = "errormsg";
 
 	public static final String USER= "user";
+	public static final String UID="uniqueID";
 
     public static final String PARAM_MODE = "mode";
     public static final String PARAM_SESSION_STATUS = "sessionStatus";
