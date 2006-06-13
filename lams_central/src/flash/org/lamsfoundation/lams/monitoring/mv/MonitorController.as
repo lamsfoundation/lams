@@ -137,6 +137,9 @@ class MonitorController extends AbstractController {
 		} else if(tgt.indexOf("start_btn") != -1){
 			trace('you clicked start class button..');
 			_monitorModel.getMonitor().startLesson(false, _root.lessonID);
+		} else if(tgt.indexOf("refresh_btn") != -1){
+			trace('you clicked refresh button..');
+			_monitorModel.refreshAllData();
 		}
 	}
 
