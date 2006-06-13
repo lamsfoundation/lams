@@ -470,7 +470,7 @@ public class LearningAction extends Action {
 		MessageForm messageForm = (MessageForm) form;
 		Message message = messageForm.getMessage();
 		
-		boolean makeAuditEntry = ToolAccessMode.TEACHER.equals((ToolAccessMode) request.getSession().getAttribute(ForumConstants.MODE));
+		boolean makeAuditEntry = ToolAccessMode.TEACHER.equals((ToolAccessMode) request.getSession().getAttribute(AttributeNames.ATTR_MODE));
 		String oldMessageString = null;
 
 		// get PO from database and sync with Form
@@ -571,7 +571,7 @@ public class LearningAction extends Action {
 		forumService = getForumManager();
 		forumService.deleteFromRepository(uuID, versionID);
 		
-		boolean makeAuditEntry = ToolAccessMode.TEACHER.equals((ToolAccessMode) request.getSession().getAttribute(ForumConstants.MODE));
+		boolean makeAuditEntry = ToolAccessMode.TEACHER.equals((ToolAccessMode) request.getSession().getAttribute(AttributeNames.ATTR_MODE));
 		String oldMessageString = null;
 		
 		// get value from HttpSession

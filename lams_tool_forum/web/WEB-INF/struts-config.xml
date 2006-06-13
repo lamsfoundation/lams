@@ -54,6 +54,7 @@
 			scope="session" 
 			validate="false"
 			parameter="defineLater">
+			<forward name="forbidden" path="tiles:/monitoring/forum/defineLaterForbidden" />
 			<forward name="success" path="tiles:/monitoring/forum/defineLater" />
 		</action>
 		<!-- ========== BEGIN: Authroing Definitions ============================== -->

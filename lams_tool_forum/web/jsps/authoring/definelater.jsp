@@ -1,4 +1,4 @@
-<%@ include file="/includes/taglibs.jsp"%>
+<%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.tool.forum.util.ForumConstants"%>
 <%@ page import="java.util.HashSet"%>
 <%@ page import="java.util.Set"%>

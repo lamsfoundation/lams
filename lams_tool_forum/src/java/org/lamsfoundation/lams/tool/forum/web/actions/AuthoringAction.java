@@ -61,6 +61,7 @@ import org.lamsfoundation.lams.tool.forum.persistence.PersistenceException;
 import org.lamsfoundation.lams.tool.forum.service.IForumService;
 import org.lamsfoundation.lams.tool.forum.util.DateComparator;
 import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
+import org.lamsfoundation.lams.tool.forum.util.ForumWebUtils;
 import org.lamsfoundation.lams.tool.forum.web.forms.ForumForm;
 import org.lamsfoundation.lams.tool.forum.web.forms.MessageForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -90,7 +91,23 @@ public class AuthoringAction extends Action {
 
 		// ***************** Monitoring define later screen ********************
 		if (param.equals("defineLater")){
+			//update define later flag to true
 			request.getSession().setAttribute(AttributeNames.ATTR_MODE,ToolAccessMode.TEACHER);
+			forumService = getForumManager();
+			Long contentId = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
+			Forum forum = forumService.getForumByContentId(contentId);
+			
+			boolean isForumEditable = ForumWebUtils.isForumEditable(forum);
+			if(!isForumEditable){
+				request.setAttribute(ForumConstants.PAGE_EDITABLE, new Boolean(isForumEditable));
+				return mapping.findForward("forbidden");
+			}
+			
+			if(!forum.isContentInUse()){
+				forum.setDefineLater(true);
+				forumService.updateForum(forum);
+			}
+			
        		return initPage(mapping, form, request, response);
 		}
         if (param.equals("updateContent")) {
@@ -154,6 +171,7 @@ public class AuthoringAction extends Action {
 	protected ActionForward initPage(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
 
+		ToolAccessMode mode = (ToolAccessMode) request.getSession().getAttribute(AttributeNames.ATTR_MODE);
 		Long contentId = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
 		ForumForm forumForm = (ForumForm)form;
 		//get back the topic list and display them on page
@@ -177,8 +195,9 @@ public class AuthoringAction extends Action {
 					topics = new ArrayList(map.values());
 				}else
 					topics = null;
-			}else
+			}else{
 				topics = forumService.getAuthoredTopics(forum.getUid());
+			}
 			//initialize attachmentList
 			List attachmentList = getAttachmentList(request);
 			attachmentList.addAll(forum.getAttachments());
@@ -250,6 +269,7 @@ public class AuthoringAction extends Action {
 //					if it is Teacher, then just update basic tab content (definelater)
 					forumPO.setInstructions(forum.getInstructions());
 					forumPO.setTitle(forum.getTitle());
+					forumPO.setDefineLater(false);
 				}
 			}
 			forumPO.setCreatedBy(forumUser);
