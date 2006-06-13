@@ -55,7 +55,7 @@ class LessonView extends AbstractView {
 	private var progress_scp:MovieClip;
 	private var _activityList:Array;
 	
-	private var ACT_X:Number = -32.5;
+	private var ACT_X:Number = -27.5;
 	private var ACT_Y:Number = 32.5;
 	
 	//These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
@@ -123,6 +123,7 @@ class LessonView extends AbstractView {
                 setSize(lm);
                 break;
 			case 'STATUS' :
+				Debugger.log('status updated',Debugger.CRITICAL,'update','org.lamsfoundation.lams.LessonView');
 				removeAll(lm);
 				break;
 			case 'DRAW_ACTIVITY' :
@@ -140,7 +141,11 @@ class LessonView extends AbstractView {
 				break;
 			case 'PROGRESS' :
 				Debugger.log('progress data receieved for user..' + lm.progressData.getUserName(),Debugger.CRITICAL,'update','org.lamsfoundation.lams.LessonView');
-				
+				break;
+			case 'PROGRESS_UPDATE' :
+				Debugger.log('progress data receieved for user..' + lm.progressData.getUserName(),Debugger.CRITICAL,'update','org.lamsfoundation.lams.LessonView');
+				removeAll(lm);
+				lm.drawDesign();
 				break;
             default :
                 Debugger.log('unknown update type :' + infoObj.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.LessonView');
