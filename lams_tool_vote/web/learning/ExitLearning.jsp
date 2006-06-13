@@ -40,7 +40,7 @@
 				  	</td>
 				  </tr>
 				
-			  		<c:forEach var="entry" items="${sessionScope.mapGeneralCheckedOptionsContent}">
+			  		<c:forEach var="entry" items="${requestScope.mapGeneralCheckedOptionsContent}">
 						  <tr>
 						  	<td NOWRAP align=left valign=top colspan=2> 
 								  <c:out value="${entry.value}" escapeXml="false" />						  																	

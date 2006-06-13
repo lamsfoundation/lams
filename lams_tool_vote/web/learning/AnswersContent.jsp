@@ -34,6 +34,55 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 	<jsp:include page="/learning/learningHeader.jsp" />
+
+	<script language="JavaScript" type="text/JavaScript">
+
+	var noSelected = 0;
+	var maxVotes = <c:out value="${VoteLearningForm.maxNominationCount}"/>; 
+	function updateCount(clickedObj){
+		var userEntry = 0;
+		<c:if test="${VoteLearningForm.allowTextEntry == true}">	
+			if(document.forms[0].userEntry.value != ""){
+				userEntry = 1;
+			}
+		</c:if>
+		if(clickedObj.checked){
+			noSelected++;
+		}else{
+			noSelected--;
+		}
+		
+		if((maxVotes != -1) && (noSelected + userEntry) > maxVotes){
+			clickedObj.checked = false;
+			noSelected--;
+			alertTooManyVotes(maxVotes);
+		}
+	
+	}
+
+	function validateSubmit(actionMethod){
+		var error = "";
+		var userEntry = 0;
+		<c:if test="${VoteLearningForm.allowTextEntry == true}">	
+			if(document.forms[0].userEntry.value != ""){
+				userEntry = 1;
+			}
+		</c:if>
+
+		if((maxVotes != -1) && (noSelected + userEntry) > maxVotes){
+			alertTooManyVotes(maxVotes);
+		} else {
+			submitMethod(actionMethod);
+		}
+		 
+	}
+
+	function alertTooManyVotes(maxVotes) {
+		var msg = "<bean:message key="error.maxNominationCount.reached"/> "+maxVotes+" <bean:message key="label.nominations"/>";
+		alert(msg);
+	}
+	</script>
+
 </head>
 <body>
 
@@ -76,74 +125,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							  <tr>						 
 								<td NOWRAP align=left>
 								<table align=left>
-				  		  	 		<c:set var="queIndex" scope="session" value="0"/>
-										  		<c:forEach var="subEntry" items="${sessionScope.mapQuestionContentLearner}">
-											  		<c:set var="queIndex" scope="session" value="${queIndex +1}"/>
-
-									  		  	 		<c:set var="checkedOptionFound" scope="request" value="0"/>
-														<!-- traverse the selected option from here --> 									  		
-																	<c:if test="${subEntry.key == sessionScope.queIndex}"> 		
-																	  		<c:forEach var="selectedSubEntry" items="${sessionScope.mapGeneralCheckedOptionsContent}">
-
-																				<c:if test="${subEntry.value == selectedSubEntry.value}"> 		
-																					<tr> 
-																						<td NOWRAP align=left class="input" valign=top> 
-																							<font size=2>
-																								<input type="checkbox" 
-																								name=optionCheckBox<c:out value="${sessionScope.queIndex}"/>-<c:out value="${subEntry.key}"/>
-																								onclick="javascript:document.forms[0].optionCheckBoxSelected.value=1; 
-																								document.forms[0].questionIndex.value=<c:out value="${sessionScope.queIndex}"/>; 
-																								
-																								if (this.checked == 1)
-																								{
-																									document.forms[0].checked.value=true;
-																								}
-																								else
-																								{
-																									document.forms[0].checked.value=false;
-																								}
-																								
-																								submitMethod('selectOption');" CHECKED> 
-																							</font>
-																						</td> 
-																						<td NOWRAP align=left valign=top> 
-																							<c:out value="${subEntry.value}" escapeXml="false" />														
-								  														</td>
-																					</tr>	
-																  		  	 		<c:set var="checkedOptionFound" scope="request" value="1"/>
-								  												</c:if> 			
-																		</c:forEach>																						
-				  												</c:if> 			
-		
-														<!-- till  here --> 									  					
-		
-																<c:if test="${requestScope.checkedOptionFound == 0}"> 		
-																					<tr> 
-																						<td NOWRAP align=left class="input" valign=top> 
-																							<font size=2>
-																								<input type="checkbox" 
-																								name=optionCheckBox<c:out value="${sessionScope.queIndex}"/>-<c:out value="${subEntry.key}"/>
-																								onclick="javascript:document.forms[0].optionCheckBoxSelected.value=1; 
-																								document.forms[0].questionIndex.value=<c:out value="${sessionScope.queIndex}"/>; 
-					
-
-																													
-																								if (this.checked == 1)
-																								{
-																									document.forms[0].checked.value=true;
-																								}
-																								else
-																								{
-																									document.forms[0].checked.value=false;
-																								}
-																								submitMethod('selectOption');"> 
-																							</font>
-																						</td> 
-																						<td NOWRAP align=left valign=top> 
-																							<c:out value="${subEntry.value}" escapeXml="false" />																									</td>
-																					</tr>	
-				  												</c:if> 			
-												</c:forEach>
+										<c:forEach var="subEntry" varStatus="status" items="${requestScope.mapQuestionContentLearner}">
+											<input type="checkbox" name="checkedVotes" value="${subEntry.key}" onClick="updateCount(this);"><c:out value="${subEntry.value}" escapeXml="false"/><BR>
+										</c:forEach>
 								</table>
 								</td>
 							</tr>
@@ -159,22 +143,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								 		</td>
 								  	</tr>
 							</c:if> 									  	
-				
-					  	   	<html:hidden property="optionCheckBoxSelected"/>
-							<html:hidden property="questionIndex"/>
-							<html:hidden property="optionIndex"/>
-							<html:hidden property="optionValue"/>						
-							<html:hidden property="checked"/>
 				  	   
 				  	<html:hidden property="donePreview"/>						   
 		  	   		  <tr>
 					  	<td NOWRAP align=right class="input" valign=top> 
 						  	<font size=2>
-		                            <html:submit property="continueOptionsCombined" 
+		                            <html:button property="continueOptionsCombined" 
 		                                         styleClass="linkbutton" 
-		                                         onclick="submitMethod('continueOptionsCombined');">
+		                                         onclick="validateSubmit('continueOptionsCombined');">
 										<bean:message key="label.submit.vote"/>
-		                            </html:submit>
+		                            </html:button>
 							</font>
 					  	 </td>
 					  </tr>

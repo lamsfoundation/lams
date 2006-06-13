@@ -22,7 +22,13 @@
 
 package org.lamsfoundation.lams.tool.vote.web;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 
 /**
@@ -44,7 +50,7 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
 	protected String toolContentID;
 	
 	protected String maxNominationCount;
-	protected String allowTextEntry;;
+	protected String allowTextEntry;
 	protected String lockOnFinish;
 	protected String voteChangable;
 	protected String activityRunOffline;
@@ -76,9 +82,18 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
 	
 	protected String nominationsSubmited;
 	protected String revisitingUser;
-	protected String revisitingPageActive;
 	protected String maxNominationCountReached;
 	protected int 	 castVoteCount;
+	
+	/** The check boxes selected on the first voting screen */
+	protected String[] checkedVotes;
+	/** The text of the user's votes, including their free text entry vote */
+	protected String[] votes;
+	
+	public void reset(ActionMapping mapping, HttpServletRequest request) {
+		checkedVotes = new String[0];
+		votes = new String[0];
+	}
 	
 	protected void resetUserActions()
     {
@@ -557,18 +572,6 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
     public void setRevisitingUser(String revisitingUser) {
         this.revisitingUser = revisitingUser;
     }
-    /**
-     * @return Returns the revisitingPageActive.
-     */
-    public String getRevisitingPageActive() {
-        return revisitingPageActive;
-    }
-    /**
-     * @param revisitingPageActive The revisitingPageActive to set.
-     */
-    public void setRevisitingPageActive(String revisitingPageActive) {
-        this.revisitingPageActive = revisitingPageActive;
-    }
 
     /**
      * @return Returns the castVoteCount.
@@ -620,5 +623,33 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
     public void setSbmtSuccess(String sbmtSuccess) {
         this.sbmtSuccess = sbmtSuccess;
     }
+
+
+    /** Get the votes based on the checkboxes */
+	public String[] getCheckedVotes() {
+		return checkedVotes;
+	}
+
+    /** Get the votes based on the checkboxes as a collection */
+	public Collection<String> votesAsCollection() {
+		ArrayList<String> votes = new ArrayList<String>();
+		for ( String vote: checkedVotes) {
+			votes.add(vote);
+		}		
+		return votes;
+	}
+
+	/** Set the votes based on the checkboxes */
+	public void setCheckedVotes(String[] checkedVotes) {
+		this.checkedVotes = checkedVotes;
+	}
+
+	public String[] getVotes() {
+		return votes;
+	}
+
+	public void setVotes(String[] votes) {
+		this.votes = votes;
+	}
 
 }

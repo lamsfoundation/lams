@@ -59,14 +59,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							  <tr>						 
 								<td NOWRAP align=left>
 								<table align=left>
-					  		  	 		<c:set var="queIndex" scope="session" value="0"/>
-											  		<c:forEach var="subEntry" items="${sessionScope.mapQuestionContentLearner}">
-												  		<c:set var="queIndex" scope="session" value="${queIndex +1}"/>
+											  		<c:forEach var="subEntry" varStatus="status" items="${requestScope.mapQuestionContentLearner}">
 															<tr> 
 																<td NOWRAP align=left class="input" valign=top> 
 																	<font size=2>
 																		<input type="checkbox" 
-																		name=optionCheckBox<c:out value="${sessionScope.queIndex}"/>-<c:out value="${subEntry.key}"/>> 
+																		name=optionCheckBox<c:out value="${status.count}"/>-<c:out value="${subEntry.key}"/>> 
 																			  <c:out value="${subEntry.value}" escapeXml="false" />																			
 																	</font>
 																</td> 

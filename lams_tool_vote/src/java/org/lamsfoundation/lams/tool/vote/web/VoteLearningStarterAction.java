@@ -131,7 +131,6 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 
 	VoteLearningForm voteLearningForm = (VoteLearningForm) form;
 	voteLearningForm.setRevisitingUser(new Boolean(false).toString());
-	voteLearningForm.setRevisitingPageActive(new Boolean(false).toString());
 	voteLearningForm.setUserEntry("");
 	voteLearningForm.setCastVoteCount(0);
 	voteLearningForm.setMaxNominationCountReached(new Boolean(false).toString());
@@ -325,12 +324,12 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
     /*
 	 * fetch question content from content
 	 */
-    mapQuestionsContent=LearningUtil.buildQuestionContentMap(request,voteContent);
+    mapQuestionsContent=LearningUtil.buildQuestionContentMap(request,voteContent,null);
     logger.debug("mapQuestionsContent: " + mapQuestionsContent);
 	
-	request.getSession().setAttribute(MAP_QUESTION_CONTENT_LEARNER, mapQuestionsContent);
-	logger.debug("MAP_QUESTION_CONTENT_LEARNER: " +  request.getSession().getAttribute(MAP_QUESTION_CONTENT_LEARNER));
-	request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapQuestionsContent);
+	request.setAttribute(MAP_QUESTION_CONTENT_LEARNER, mapQuestionsContent);
+	logger.debug("MAP_QUESTION_CONTENT_LEARNER: " +  request.getAttribute(MAP_QUESTION_CONTENT_LEARNER));
+	request.setAttribute(MAP_OPTIONS_CONTENT, mapQuestionsContent);
 	
 	
 	/*
@@ -414,7 +413,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	    		    }
 	    		}
 	    	}
-	    	request.getSession().setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, localMapQuestionsContent);
+	    	request.setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, localMapQuestionsContent);
     		logger.debug("end building MAP_GENERAL_CHECKED_OPTIONS_CONTENT: " + localMapQuestionsContent);
     
     	    boolean isSessionCompleted=isSessionCompleted(userSessionId, voteService);
@@ -433,7 +432,6 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
     		logger.debug("the user's session id AND user id exists in the tool tables go to redo questions. " + toolSessionId + " voteQueUsr: " + 
     				voteQueUsr + " user id: " + voteQueUsr.getQueUsrId());
     		voteLearningForm.setRevisitingUser(new Boolean(true).toString());
-     		voteLearningForm.setRevisitingPageActive(new Boolean(true).toString());
     		
      		logger.debug("preparing chart data for readonly mode");
      		MonitoringUtil.prepareChartData(request, voteService, null, voteContent.getVoteContentId(), toolSessionId);
@@ -461,12 +459,11 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	 */
 	protected void commonContentSetup(HttpServletRequest request, VoteContent voteContent)
 	{
-		Map mapQuestionsContent= new TreeMap(new VoteComparator());
-		mapQuestionsContent=LearningUtil.buildQuestionContentMap(request,voteContent);
+		Map mapQuestionsContent=LearningUtil.buildQuestionContentMap(request,voteContent,null);
 	    logger.debug("mapQuestionsContent: " + mapQuestionsContent);
 		
-		request.getSession().setAttribute(MAP_QUESTION_CONTENT_LEARNER, mapQuestionsContent);
-		logger.debug("MAP_QUESTION_CONTENT_LEARNER: " +  request.getSession().getAttribute(MAP_QUESTION_CONTENT_LEARNER));
+		request.setAttribute(MAP_QUESTION_CONTENT_LEARNER, mapQuestionsContent);
+		logger.debug("MAP_QUESTION_CONTENT_LEARNER: " +  request.getAttribute(MAP_QUESTION_CONTENT_LEARNER));
 		logger.debug("voteContent has : " + mapQuestionsContent.size() + " entries.");
 		request.getSession().setAttribute(TOTAL_QUESTION_COUNT, new Long(mapQuestionsContent.size()).toString());
 	}
@@ -485,7 +482,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	    logger.debug("IS_CONTENT_IN_USE: " + voteContent.isContentInUse());
 	    
 	    Map mapGeneralCheckedOptionsContent= new TreeMap(new VoteComparator());
-	    request.getSession().setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, mapGeneralCheckedOptionsContent);
+	    request.setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, mapGeneralCheckedOptionsContent);
 	    /*
 	     * Is the tool activity been checked as Run Offline in the property inspector?
 	     */

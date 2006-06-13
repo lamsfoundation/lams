@@ -21,6 +21,7 @@
  * ***********************************************************************/
 package org.lamsfoundation.lams.tool.vote.web;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
@@ -50,7 +51,15 @@ import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 public class LearningUtil implements VoteAppConstants {
 	static Logger logger = Logger.getLogger(LearningUtil.class.getName());
 	
-    public static Map buildQuestionContentMap(HttpServletRequest request, VoteContent voteContent)
+	/** Build a map of the display ids -> nomination text. If checkedOptions != null then 
+	 * only include the display ids in the checkedOptions list.
+	 * 
+	 * @param request 
+	 * @param voteContent the content of the vote from the database
+	 * @param checkedOptions collection of String display IDs to which to restrict the map (optional)
+	 * @return Map of display id -> nomination text.
+	 */
+    public static Map buildQuestionContentMap(HttpServletRequest request, VoteContent voteContent, Collection<String> checkedOptions)
     {
     	IVoteService voteService =VoteUtils.getToolService(request);
     	Map mapQuestionsContent= new TreeMap(new VoteComparator());
@@ -61,11 +70,11 @@ public class LearningUtil implements VoteAppConstants {
     		VoteQueContent voteQueContent=(VoteQueContent)contentIterator.next();
     		if (voteQueContent != null)
     		{
-    		    int displayOrder=voteQueContent.getDisplayOrder();
-        		if (displayOrder != 0)
+    		    String displayOrder = (new Integer(voteQueContent.getDisplayOrder())).toString();
+        		if ( (checkedOptions==null || checkedOptions.contains(displayOrder)) && ! displayOrder.equals("0"))
         		{
         			/* add the question to the questions Map in the displayOrder*/
-        			mapQuestionsContent.put(new Integer(displayOrder).toString(),voteQueContent.getQuestion());
+        			mapQuestionsContent.put(displayOrder.toString(),voteQueContent.getQuestion());
         		}
     		}
     	}
