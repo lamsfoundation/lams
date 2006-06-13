@@ -105,9 +105,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	    if(_canvasModel.isDragging){
 			ca.stopDrag();
 			//if we are on the bin - trash it
-			if (ca.hitTest(_canvasModel.getCanvas().bin)){
-				_canvasModel.getCanvas().removeActivity(ca.activity.activityUIID);
-			}
 			
 			var optionalOnCanvas:Array  = _canvasModel.findOptionalActivities();
 			if (ca.activity.parentUIID != null){
@@ -119,20 +116,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 							if (ca._x > 142 || ca._x < -129 || ca._y < -55 || ca._y > optionalOnCanvas[i].getpanelHeight){
 								trace (ca.activity.activityUIID+" had a hitTest with canvas.")
 								_canvasModel.removeOptionalCA(ca, optionalOnCanvas[i].activity.activityUIID);
-							//var msg:String = Dictionary.getValue('act_lock_chk');
-							//LFMessage.showMessageAlert(msg);
 							}
 						}
 					}
-					//trace ("Optional ActivityID is: "+optionalOnCanvas[i].activity.activityUIID)
-					
 				}
 			}
-			//if we are on the optional Activity remove this activity from canvas and assign it a parentID of 
-			//optional activity and place it in the optional activity window.
-			
-			
-			//trace ("testing number of Optionals on Canvas = "+optionalOnCanvas.length)
+			//if we are on the optional Activity remove this activity from canvas and assign it a parentID of optional activity and place it in the optional activity window.
 			for (var i=0; i<optionalOnCanvas.length; i++){
 				//trace ("testing Optional on Canvas "+i)
 				if (ca.activity.activityUIID != optionalOnCanvas[i].activity.activityUIID){
@@ -142,24 +131,17 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 							LFMessage.showMessageAlert(msg);
 						}else{
 							_canvasModel.addParentToActivity(optionalOnCanvas[i].activity.activityUIID, ca)
-						}
-						//trace ("Optional ActivityID is: "+optionalOnCanvas[i].activity.activityUIID)
+						}						
 					}
 				}
 			}
-			
-			if (ca.hitTest(_canvasModel.getCanvas().bin)){
-				
-				_canvasModel.getCanvas().removeActivity(ca.activity.activityUIID);
-			}
-			
+						
 			//get a view if ther is not one
 			if(!_canvasView){
 				_canvasView =  CanvasView(getView());
 			}
 			
 			//give it the new co-ords and 'drop' it
-			
 			ca.activity.xCoord = ca._x;
 			ca.activity.yCoord = ca._y;
 			
@@ -173,6 +155,17 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				t.removeMovieClip();
 				
 			}
+			if (ca.hitTest(_canvasModel.getCanvas().bin)){
+				
+				if (ca.activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
+					
+					_canvasModel.removeComplexActivity(ca);
+				}else {
+					_canvasModel.getCanvas().removeActivity(ca.activity.activityUIID);
+				}
+				
+			}
+			
 			_canvasModel.setDirty();
 			
 			Debugger.log('ca.activity.xCoord:'+ca.activity.xCoord,Debugger.GEN,'activityRelease','CanvasController');
@@ -180,7 +173,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			
 		}
 	}
-   
    
    public function activityReleaseOutside(ca:Object):Void{
 	   Debugger.log('activityReleaseOutside CanvasActivity:'+ca.activity.activityUIID,Debugger.GEN,'activityReleaseOutside','CanvasController');
