@@ -79,14 +79,14 @@ class LessonController extends AbstractController {
    
 	public function activityDoubleClick(ca:Object):Void{
 		setBusy()
-	   Debugger.log('activityDoubleClick CanvasActivity:'+ca.activity.activityID + ' status: ' + ca.activityStatus,Debugger.GEN,'activityDoubleClick','LessonController');
+	   Debugger.log('activityDoubleClick CanvasActivity:'+ca.activity.activityID + ' status: ' + ca.activityStatus + 'type id: ' + ca.activity.activityTypeID,Debugger.GEN,'activityDoubleClick','LessonController');
 	   
 	   if(ca.activity.activityTypeID == Activity.TOOL_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE){
 			
 			if(ca.activityStatus != undefined){
 				var URLToSend:String = 'learning/learner.do?method=getLearnerActivityURL&activityID='+ca.activity.activityID+'&userID='+_root.userID+'&lessonID='+_root.lessonID;
 				
-				if(ca.activityStatus == 'completed_mc'){
+				if(ca.activityStatus == 'completed_mc' && ca.activity.activityTypeID != Activity.OPTIONAL_ACTIVITY_TYPE){
 					_lessonModel.getLesson().getActivityURL(URLToSend, true);
 				} else {
 					_lessonModel.getLesson().getActivityURL(URLToSend, false);
