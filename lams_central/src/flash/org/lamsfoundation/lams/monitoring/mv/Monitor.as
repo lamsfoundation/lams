@@ -290,9 +290,9 @@ class Monitor {
 	}
 	
 	public function getProgressData(seq:Object){
-		trace('getting progress data...');
-		var seqId:Number = seq.getSequenceID();
 		
+		var seqId:Number = seq.getSequenceID();
+		trace('getting progress data for Sequence: '+seqId);
 		var callback:Function = Proxy.create(this, saveProgressData);
 		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=getAllLearnersProgress&lessonID=' + seqId, callback, false);
 	}
