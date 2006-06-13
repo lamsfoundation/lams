@@ -128,6 +128,24 @@ class Lesson {
 		return true;
 	}
 	
+	public function resumeLesson():Boolean{
+		var callback:Function = Proxy.create(this,continueLesson);
+		
+		// call action
+		var lessonId:Number = lessonModel.ID;
+		//var userId:Number = Application.getInstance().getUserID();
+
+		// do request
+		Application.getInstance().getComms().getRequest('learning/learner.do?method=joinLesson&lessonID='+String(lessonId), callback, false);
+			
+		return true;
+	}
+	
+	public function continueLesson(pkt:Object){
+		getURL(_root.serverURL + 'learning'+String(pkt)+'?progressId='+lessonModel.getLessonID(),'contentFrame');
+		
+	}
+	
 	public function exitLesson():Boolean {
 		var callback:Function = Proxy.create(this,closeLesson);
 		
@@ -154,7 +172,7 @@ class Lesson {
 		// set lesson as active
 		lessonModel.setActive();
 		trace('pktobject value: '+String(pkt));
-		getURL('http://localhost:8080/lams/learning'+String(pkt)+'?progressId='+lessonModel.getLessonID(),'contentFrame');
+		getURL(_root.serverURL + 'learning'+String(pkt)+'?progressId='+lessonModel.getLessonID(),'contentFrame');
 		
 	}  
 	
@@ -171,7 +189,17 @@ class Lesson {
 		
 		Debugger.log('progress data receieved for user..' + progressDTO,Debugger.CRITICAL,'saveProgressData','org.lamsfoundation.lams.Lesson');
 		
-		lessonModel.drawDesign();
+		lessonModel.broadcastViewUpdate("PROGRESS_UPDATE", null);
+	}
+	
+	public function updateProgressData(attempted:Array, completed:Array, current:Number):Void{
+		var p:Progress = lessonModel.progressData;
+		if(p){
+			p.currentActivityId = current;
+			p.attemptedActivities = attempted;
+			p.completedActivities = completed;
+			lessonModel.broadcastViewUpdate("PROGRESS_UPDATE", null);
+		}
 	}
 	
 	private function closeLesson(pkt:Object){
@@ -232,13 +260,13 @@ class Lesson {
 	private function loadActivity(url:Object){
 		Debugger.log('loading activity : ' + url.activityID + '\npath: ' + url.activityURL,Debugger.CRITICAL,'loadActivity','org.lamsfoundation.lams.Lesson');
 
-		getURL(_root.serverURL + url.activityURL,"contentFrame");
+		getURL(url.activityURL,"contentFrame");
 	}
 	
 	private function popupActivity(url:Object){
 		Debugger.log('loading activity (popup window) : ' + url.activityID + '\npath: ' + url.activityURL,Debugger.CRITICAL,'loadActivity','org.lamsfoundation.lams.Lesson');
 
-		getURL(_root.serverURL + url.activityURL,"_blank");
+		getURL(url.activityURL,"_blank");
 	}
 	
 	/**
