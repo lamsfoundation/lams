@@ -35,9 +35,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<c:set var="randomID">
 			<lams:generateID/>
 		</c:set>
-		<script language="JavaScript" type="text/javascript">
-			var uniqueID = "<%= pageContext.getAttribute("randomID") %>";
-		</script>
 	</head>
 	<body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
 	

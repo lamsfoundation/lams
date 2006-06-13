@@ -56,7 +56,7 @@
 		//-->
 	</script>
 	
-	<lams:Passon progress="${optionsActivityForm.progressSummary}" uniqueID="${param.uID}"/>
+	<lams:Passon progress="${optionsActivityForm.progressSummary}"/>
 	
 		<html:form action="/ChooseActivity" method="POST">
 		<input type="hidden" name="lams_token" value="<c:out value='${lams_token}' />" />

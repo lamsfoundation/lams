@@ -27,7 +27,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
 <div align="center" class="mainHeader"> 
- 	<lams:Passon progress="${activityForm.progressSummary}" uniqueID="${param.uID}"/>
+ 	<lams:Passon progress="${activityForm.progressSummary}"/>
  
     <p class="heading"><fmt:message key="message.lesson.finished" /></p>
     <p class="body"><fmt:message key="message.lesson.finishedCont" /></p>

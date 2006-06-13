@@ -32,13 +32,13 @@
  %>
 <%@ tag body-content="empty" %>
 <%@ attribute name="progress" required="true" rtexprvalue="true" type="java.lang.String" %>
-<%@ attribute name="uniqueID" required="false" rtexprvalue="true" type="java.lang.String" %>
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 <c:if test="${!empty progress}">
-	<c:choose>
-		<c:when test="${!empty uniqueID}">
-			<c:set var="passonurl" value="passon.swf?${progress}&uniqueID=${uniqueID}"/>
+		<c:set var="randomID">
+			<lams:generateID/>
+		</c:set>
+			<c:set var="passonurl" value="passon.swf?${progress}&uniqueID=${randomID}"/>
 			
 			<!-- URL's used in the movie-->
 			<!-- text used in the movie-->
@@ -66,15 +66,4 @@
 				  type="application/x-shockwave-flash" 
 				  pluginspage="http://www.macromedia.com/go/getflashplayer" />
 			</object>
-		</c:when>
-		<c:otherwise>
-				<script language="JavaScript" type="text/JavaScript">
-					<!--
-					var query = (window.location.search!="")?window.location.search + "&uID=":"?uID=";
-					alert(window.location.pathname + query);
-					window.location.href = window.location.pathname + query + parent.frames['controlFrame'].uniqueID;
-					//-->
-				</script>
-		</c:otherwise>
-	</c:choose>
 </c:if>
