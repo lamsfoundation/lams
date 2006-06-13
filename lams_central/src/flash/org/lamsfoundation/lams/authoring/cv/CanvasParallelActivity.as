@@ -290,10 +290,14 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 		return _visibleHeight;
 	}
 	
-	
-	
-	
-
+	/**
+	 * 
+	 * @usage   
+	 * @return  
+	 */
+	public function get actChildren():Array {
+		return _children;
+	} 
 
 
 }
