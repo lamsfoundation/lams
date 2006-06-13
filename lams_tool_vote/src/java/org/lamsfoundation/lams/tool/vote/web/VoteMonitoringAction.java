@@ -322,7 +322,7 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	    	    	    {
 			    			voteMonitoredUserDTO.setAttemptTime(voteUsrAttempt.getAttemptTime().toString());
 			    			voteMonitoredUserDTO.setTimeZone(voteUsrAttempt.getTimeZone());
-			    			voteMonitoredUserDTO.setUserName(voteUsrAttempt.getVoteQueUsr().getUsername());
+			    			voteMonitoredUserDTO.setUserName(voteUsrAttempt.getVoteQueUsr().getFullname());
 			    			voteMonitoredUserDTO.setQueUsrId(voteUsrAttempt.getVoteQueUsr().getUid().toString());
 			    			voteMonitoredUserDTO.setUserEntry(voteUsrAttempt.getUserEntry());
 			    			voteMonitoredUserDTO.setUid(voteUsrAttempt.getUid().toString());
@@ -350,7 +350,7 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 				    	    	        logger.debug("this is requested by user id: "  + userId);
 						    			voteMonitoredUserDTO.setAttemptTime(voteUsrAttempt.getAttemptTime().toString());
 						    			voteMonitoredUserDTO.setTimeZone(voteUsrAttempt.getTimeZone());
-						    			voteMonitoredUserDTO.setUserName(voteUsrAttempt.getVoteQueUsr().getUsername());
+						    			voteMonitoredUserDTO.setUserName(voteUsrAttempt.getVoteQueUsr().getFullname());
 						    			voteMonitoredUserDTO.setQueUsrId(voteUsrAttempt.getVoteQueUsr().getUid().toString());
 						    			voteMonitoredUserDTO.setUserEntry(voteUsrAttempt.getUserEntry());
 						    			listMonitoredUserContainerDTO.add(voteMonitoredUserDTO);
@@ -381,7 +381,7 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 			    	    	        logger.debug("this is requested by session id: "  + currentSessionId);
 					    			voteMonitoredUserDTO.setAttemptTime(voteUsrAttempt.getAttemptTime().toString());
 					    			voteMonitoredUserDTO.setTimeZone(voteUsrAttempt.getTimeZone());
-					    			voteMonitoredUserDTO.setUserName(voteUsrAttempt.getVoteQueUsr().getUsername());
+					    			voteMonitoredUserDTO.setUserName(voteUsrAttempt.getVoteQueUsr().getFullname());
 					    			voteMonitoredUserDTO.setQueUsrId(voteUsrAttempt.getVoteQueUsr().getUid().toString());
 					    			voteMonitoredUserDTO.setUserEntry(voteUsrAttempt.getUserEntry());
 			    	    	        listMonitoredUserContainerDTO.add(voteMonitoredUserDTO);

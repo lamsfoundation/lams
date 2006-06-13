@@ -153,15 +153,19 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 																		  	 		<c:set var="currentSessionUidKey" scope="request" value="${currentSessionUid.key}"/>
 																	  				<c:if test="${currentSessionUidKey == currentQuestionUidKey}"> 				
 					
-																						<c:set var="viewURL">
-																							<html:rewrite page="/voteNominationViewer?questionUid=${currentQuestionUid.value}&sessionUid=${currentSessionUid.value}"/>
-																						</c:set>
-																	  																					
-																						<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
-																							<font size=2> <c:out value="${currentUserCount.value}"/>  </font>
-																						</a>
-					
-					
+																		  				<c:if test="${currentNomination.value != 'Open Vote'}"> 				
+																							<c:set var="viewURL">
+																								<html:rewrite page="/voteNominationViewer?questionUid=${currentQuestionUid.value}&sessionUid=${currentSessionUid.value}"/>
+																							</c:set>
+																		  																					
+																							<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
+																								<font size=2> <c:out value="${currentUserCount.value}"/>  </font>
+																							</a>
+																						</c:if> 	    
+																		  				<c:if test="${currentNomination.value == 'Open Vote'}"> 				
+																								<font size=2> <c:out value="${currentUserCount.value}"/>  </font>
+																						</c:if> 	    
+																						
 																					</c:if> 	    
 																				</c:forEach>		  
 			

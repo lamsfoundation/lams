@@ -34,6 +34,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
+import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 
 /**
@@ -81,16 +82,25 @@ public class VoteNominationViewer extends HttpServlet implements VoteAppConstant
             out.println("</HEAD>");
             out.println("<BODY>");
 	            out.println("<table width='80%' cellspacing='8' align='CENTER' class='forms'>");
-	            out.println("<tr> <th NOWRAP>  Students Voted </th> </tr>");            
-				
+	            out.println("<tr> <th NOWRAP colspan=2>  Students Voted </th> </tr>");
+	            
+				out.println("<tr>");  
+	            out.println("<td NOWRAP align=center valign=top><b> Student Name </b></td>"); 
+	            out.println("<td NOWRAP align=center valign=top><b> Attempt Time </b></td>"); 
+	            out.println("</tr>");
+
 	            Iterator userIterator=userNames.iterator();
 	        	while (userIterator.hasNext())
 	        	{
-	        		String userName=(String)userIterator.next();
+	        	    VoteUsrAttempt voteUsrAttempt=(VoteUsrAttempt)userIterator.next();
 					out.println("<tr>");  
-		            out.println("<td NOWRAP align=center valign=top>"); 
-		            out.println(userName);						
-		            out.println("</td>");
+			            out.println("<td NOWRAP align=center valign=top>"); 
+			            out.println(voteUsrAttempt.getVoteQueUsr().getFullname());						
+			            out.println("</td>");
+	
+			            out.println("<td NOWRAP align=center valign=top>"); 
+			            out.println(voteUsrAttempt.getAttemptTime());						
+			            out.println("</td>");
 					out.println("</tr>");
 	        	}
 	            out.println("</table>");

@@ -378,7 +378,7 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 		    	    VoteUsrAttempt attempt=(VoteUsrAttempt)listIterator.next();
 		    	    if (attempt.getVoteQueUsr().getVoteSession().getUid().toString().equals(voteSessionUid.toString()))
 		    	    {
-		    	            userEntries.add(attempt.getVoteQueUsr().getFullname());    
+		    	            userEntries.add(attempt);    
 		    	    }
 		    	}
 			}

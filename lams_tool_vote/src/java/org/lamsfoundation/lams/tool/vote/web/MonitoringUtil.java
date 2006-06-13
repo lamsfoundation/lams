@@ -278,7 +278,7 @@ public class MonitoringUtil implements VoteAppConstants{
 		    	    			VoteMonitoredUserDTO voteMonitoredUserDTO = new VoteMonitoredUserDTO();
 		    	    			voteMonitoredUserDTO.setAttemptTime(voteUsrResp.getAttemptTime().toString());
 		    	    			voteMonitoredUserDTO.setTimeZone(voteUsrResp.getTimeZone());
-		    	    			voteMonitoredUserDTO.setUserName(voteQueUsr.getUsername());
+		    	    			voteMonitoredUserDTO.setUserName(voteQueUsr.getFullname());
 		    	    			voteMonitoredUserDTO.setQueUsrId(voteQueUsr.getUid().toString());
 		    	    			voteMonitoredUserDTO.setSessionId(sessionId.toString());
 		    	    			voteMonitoredUserDTO.setUserEntry(voteUsrResp.getUserEntry());
@@ -355,7 +355,7 @@ public class MonitoringUtil implements VoteAppConstants{
 			    	    			voteMonitoredUserDTO.setAttemptTime(voteUsrResp.getAttemptTime().toString());
 			    	    			voteMonitoredUserDTO.setTimeZone(voteUsrResp.getTimeZone());
 			    	    			voteMonitoredUserDTO.setUid(voteUsrResp.getUid().toString());
-			    	    			voteMonitoredUserDTO.setUserName(voteQueUsr.getUsername());
+			    	    			voteMonitoredUserDTO.setUserName(voteQueUsr.getFullname());
 			    	    			voteMonitoredUserDTO.setQueUsrId(voteQueUsr.getUid().toString());
 			    	    			voteMonitoredUserDTO.setSessionId(sessionId.toString());
 			    	    			voteMonitoredUserDTO.setUserEntry(voteUsrResp.getUserEntry());
@@ -435,7 +435,7 @@ public class MonitoringUtil implements VoteAppConstants{
 				    	    			if (userID.equals(voteQueUsr.getQueUsrId().toString()))
 										{
 				    	    				logger.debug("this is current user, put his name normally.");
-				    	    				voteMonitoredUserDTO.setUserName(voteQueUsr.getUsername());	
+				    	    				voteMonitoredUserDTO.setUserName(voteQueUsr.getFullname());	
 										}
 				    	    			else
 				    	    			{
@@ -519,7 +519,7 @@ public class MonitoringUtil implements VoteAppConstants{
 			    	    			voteMonitoredUserDTO.setAttemptTime(voteUsrResp.getAttemptTime().toString());
 			    	    			voteMonitoredUserDTO.setTimeZone(voteUsrResp.getTimeZone());
 			    	    			voteMonitoredUserDTO.setUid(voteUsrResp.getUid().toString());
-		    	    				voteMonitoredUserDTO.setUserName(voteQueUsr.getUsername());	
+		    	    				voteMonitoredUserDTO.setUserName(voteQueUsr.getFullname());	
 			    	    			voteMonitoredUserDTO.setQueUsrId(voteQueUsr.getUid().toString());
 			    	    			voteMonitoredUserDTO.setSessionId(sessionId.toString());
 			    	    			voteMonitoredUserDTO.setUserEntry(voteUsrResp.getUserEntry());
@@ -761,11 +761,15 @@ public class MonitoringUtil implements VoteAppConstants{
 					mapStandardUserCount.put(mapIndex.toString(),new Integer(votesCount).toString());
 					totalStandardVotesCount=totalStandardVotesCount + votesCount;
 
-					
 					double voteRate=0d;
+					double doubleVotesCount=votesCount * 1d;
+					logger.debug("doubleVotesCount: " + doubleVotesCount);
+					double doubleEntriesCount=entriesCount * 1d;
+					logger.debug("doubleEntriesCount: " + doubleEntriesCount);
+
 					if (entriesCount != 0)
 					{
-					    voteRate=((votesCount * 100)/ entriesCount);
+					    voteRate=((doubleVotesCount * 100)/ doubleEntriesCount);
 					}
 
 					logger.debug("voteRate" + voteRate);
@@ -799,14 +803,28 @@ public class MonitoringUtil implements VoteAppConstants{
 		    logger.debug("totalStandardVotesCount: " + totalStandardVotesCount);
 		    int userEnteredVotesCount=entriesCount - totalStandardVotesCount;
 	        logger.debug("userEnteredVotesCount for this session: " + userEnteredVotesCount);
-		    
-	        if (userEnteredVotesCount == 0) 
-	            share=0;
+
+	        if (userEnteredVotesCount != 0)
+			{
+			    share=((userEnteredVotesCount * 100)/ entriesCount);
+			    logger.debug("calculated share normally, userEnteredVotesCount: " + userEnteredVotesCount);
+			    logger.debug("calculated share normally, entriesCount: " + entriesCount);
+			}
+			else
+			{
+			    share=0;
+			    logger.debug("reset share");
+			}
+			logger.debug("final share: " + share);
 	        
 		    mapStandardNominationsContent.put(mapIndex.toString(), "Open Vote");
 		    mapStandardNominationsHTMLedContent.put(mapIndex.toString(), "Open Vote");
 		    mapStandardRatesContent.put(mapIndex.toString(), new Double(share).toString());
 		    mapStandardUserCount.put(mapIndex.toString(), new Integer(userEnteredVotesCount).toString());
+		    /**following  are needed just for proper iteration in the summary jsp*/
+			mapStandardQuestionUid.put(mapIndex.toString(),"1");
+			mapStandardToolSessionUid.put(mapIndex.toString(),"1");
+
 
 			logger.debug("processed for prepareChartDTO: mapStandardNominationsContent: " + mapStandardNominationsContent);
 			logger.debug("processed for prepareChartDTO: mapStandardNominationsHTMLedContent: " + mapStandardNominationsHTMLedContent);
@@ -954,9 +972,13 @@ public class MonitoringUtil implements VoteAppConstants{
 				}
 				
 				double voteRate=0d;
+				double doubleVotesCount=votesCount * 1d;
+				logger.debug("doubleVotesCount: " + doubleVotesCount);
+				double doubleEntriesCount=entriesCount * 1d;
+				logger.debug("doubleEntriesCount: " + doubleEntriesCount);
 				if (entriesCount != 0)
 				{
-				    voteRate=((votesCount * 100)/ entriesCount);
+				    voteRate=((doubleVotesCount * 100)/ doubleEntriesCount);
 				}
 
 				logger.debug("voteRate" + voteRate);
@@ -992,13 +1014,28 @@ public class MonitoringUtil implements VoteAppConstants{
 	    int userEnteredVotesCount=entriesCount - totalStandardVotesCount;
         logger.debug("userEnteredVotesCount for this session: " + userEnteredVotesCount);
 	    
-        if (userEnteredVotesCount == 0) 
-            share=0;
         
+		if (userEnteredVotesCount != 0)
+		{
+		    share=((userEnteredVotesCount * 100)/ entriesCount);
+		    logger.debug("calculated share normally, userEnteredVotesCount: " + userEnteredVotesCount);
+		    logger.debug("calculated share normally, entriesCount: " + entriesCount);
+		}
+		else
+		{
+		    share=0;
+		    logger.debug("reset share");
+		}
+		logger.debug("final share: " + share);
+
 	    mapStandardNominationsContent.put(mapIndex.toString(), "Open Vote");
 	    mapStandardNominationsHTMLedContent.put(mapIndex.toString(), "Open Vote");
 	    mapStandardRatesContent.put(mapIndex.toString(), new Double(share).toString());
 	    mapStandardUserCount.put(mapIndex.toString(), new Integer(userEnteredVotesCount).toString());
+	    /**following  are needed just for proper iteration in the summary jsp*/
+		mapStandardQuestionUid.put(mapIndex.toString(),"1");
+		mapStandardToolSessionUid.put(mapIndex.toString(),"1");
+
         
 		request.getSession().setAttribute(MAP_STANDARD_NOMINATIONS_CONTENT, mapStandardNominationsContent);
 		logger.debug("test2: MAP_STANDARD_NOMINATIONS_CONTENT: " + request.getSession().getAttribute(MAP_STANDARD_NOMINATIONS_CONTENT));
@@ -1121,9 +1158,13 @@ public class MonitoringUtil implements VoteAppConstants{
 				}
 				
 				double voteRate=0d;
+				double doubleVotesCount=votesCount * 1d;
+				logger.debug("doubleVotesCount: " + doubleVotesCount);
+				double doubleEntriesCount=entriesCount * 1d;
+				logger.debug("doubleEntriesCount: " + doubleEntriesCount);
 				if (entriesCount != 0)
 				{
-				    voteRate=((votesCount * 100)/ entriesCount);
+				    voteRate=((doubleVotesCount * 100)/ doubleEntriesCount);
 				}
 
 				logger.debug("voteRate" + voteRate);
@@ -1160,8 +1201,18 @@ public class MonitoringUtil implements VoteAppConstants{
 	    int userEnteredVotesCount=entriesCount - totalStandardVotesCount;
         logger.debug("userEnteredVotesCount for this session: " + userEnteredVotesCount);
         
-        if (userEnteredVotesCount == 0) 
-            share=0;
+		if (userEnteredVotesCount != 0)
+		{
+		    share=((userEnteredVotesCount * 100)/ entriesCount);
+		    logger.debug("calculated share normally, userEnteredVotesCount: " + userEnteredVotesCount);
+		    logger.debug("calculated share normally, entriesCount: " + entriesCount);
+		}
+		else
+		{
+		    share=0;
+		    logger.debug("reset share");
+		}
+		logger.debug("final share: " + share);
 
 	    
 	    logger.debug("start processing userEntries: " + userEntries);
@@ -1262,6 +1313,7 @@ public class MonitoringUtil implements VoteAppConstants{
 		logger.debug("entriesCount: " + entriesCount);
 		
 		Map mapStandardNominationsHTMLedContent= new TreeMap(new VoteComparator());
+
 		while (queIterator.hasNext())
 		{
 			VoteQueContent voteQueContent=(VoteQueContent) queIterator.next();
@@ -1281,9 +1333,13 @@ public class MonitoringUtil implements VoteAppConstants{
 
 				
 				double voteRate=0d;
+				double doubleVotesCount=votesCount * 1d;
+				logger.debug("doubleVotesCount: " + doubleVotesCount);
+				double doubleEntriesCount=entriesCount * 1d;
+				logger.debug("doubleEntriesCount: " + doubleEntriesCount);
 				if (entriesCount != 0)
 				{
-				    voteRate=((votesCount * 100)/ entriesCount);
+				    voteRate=((doubleVotesCount * 100)/ doubleEntriesCount);
 				}
 
 				logger.debug("voteRate" + voteRate);
@@ -1318,8 +1374,18 @@ public class MonitoringUtil implements VoteAppConstants{
 	    int userEnteredVotesCount=entriesCount - totalStandardVotesCount;
         logger.debug("userEnteredVotesCount for this session: " + userEnteredVotesCount);
 	    
-        if (userEnteredVotesCount == 0) 
-            share=0;
+		if (userEnteredVotesCount != 0)
+		{
+		    share=((userEnteredVotesCount * 100)/ entriesCount);
+		    logger.debug("calculated share normally, userEnteredVotesCount: " + userEnteredVotesCount);
+		    logger.debug("calculated share normally, entriesCount: " + entriesCount);
+		}
+		else
+		{
+		    share=0;
+		    logger.debug("reset share");
+		}
+		logger.debug("final share: " + share);
 
         
 	    mapStandardNominationsContent.put(mapIndex.toString(), "Open Vote");
