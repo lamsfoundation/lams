@@ -33,7 +33,8 @@ import mx.managers.*
 import mx.containers.*;
 import mx.events.*
 import mx.utils.*
-import mx.controls.TabBar;
+import mx.controls.*;
+//import mx.controls.TabBar;
 
 
 /**
@@ -49,7 +50,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 	private var GRID_WIDTH:Number;
 	private var H_GAP:Number;
 	private var V_GAP:Number;
-	
+	private var Offset_Y_TabLayer_mc:Number;
 	private var _tm:ThemeManager;
 	
 	private var _monitorView_mc:MovieClip;
@@ -58,6 +59,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 	private var _monitor_mc:MovieClip;
 	private var monitor_scp:MovieClip;
 	private var monitorTabs_tb:MovieClip;
+	private var learnerMenuBar:MovieClip;
     private var bkg_pnl:MovieClip;
 	//private var act_pnl:Panel;
 	
@@ -66,6 +68,8 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 	private var _monitorTabLayer_mc:MovieClip;
 	private var _learnerTabLayer_mc:MovieClip;
 	private var _todoTabLayer_mc:MovieClip;
+	private var refresh_btn:Button;
+	private var help_btn:Button;
 	//private var _activityLayerComplex_mc:MovieClip;
 	//private var _activityLayer_mc:MovieClip;
 	
@@ -185,31 +189,36 @@ public function update (o:Observable,infoObj:Object):Void{
     * layout visual elements on the canvas on initialisation
     */
 	private function draw(){
+		
+		var mcontroller = getController();
 		//get the content path for the sp
 		_monitor_mc = monitor_scp.content;
 		//Debugger.log('_canvas_mc'+_canvas_mc,Debugger.GEN,'draw','CanvasView');
 		
-    
-		//bkg_pnl = _monitor_mc.createClassObject(Panel, "bkg_pnl", getNextHighestDepth());
-
-		//set up the 
-		//_canvas_mc = this;
+		trace("Height of learnerMenuBar: "+learnerMenuBar._height)
+		//Offset_Y_TabLayer_mc = learnerMenuBar._height
 		
-		//_gridLayer_mc = _monitor_mc.createEmptyMovieClip("_gridLayer_mc", _monitor_mc.getNextHighestDepth());
-		
+		//_monitor_mc._y = Offset_Y_TabLayer_mc;
 		_lessonTabLayer_mc = _monitor_mc.createEmptyMovieClip("_lessonTabLayer_mc", _monitor_mc.getNextHighestDepth());
 		_monitorTabLayer_mc = _monitor_mc.createEmptyMovieClip("_monitorTabLayer_mc", _monitor_mc.getNextHighestDepth());
 		_todoTabLayer_mc = _monitor_mc.createEmptyMovieClip("_todoTabLayer_mc", _monitor_mc.getNextHighestDepth());
 		_learnerTabLayer_mc = _monitor_mc.createEmptyMovieClip("_learnerTabLayer_mc", _monitor_mc.getNextHighestDepth());
 		//trace('lesson tab view: ' + _tabsLayer_mc);
 		//bkg_pnl.useHandCursor = false;
+	
 		var tab_arr:Array = [{label:"Lesson", data:"lesson"}, {label:"Monitor", data:"monitor"}, {label:"Learners", data:"learners"}, {label:"Todo", data:"todo"}];
 		
 		monitorTabs_tb.dataProvider = tab_arr;
 		monitorTabs_tb.selectedIndex = 0;
 		
-		var mcontroller = getController();
+		//learnerMenuBar = this.attachMovie("RefreshBar", "RefreshBar", this.getNextHighestDepth(), {_x:-30})
+		//learnerMenuBar = eval(learnerMenuBar)
+		
+		//learnerMenuBar.refresh_btn.addEventListener("click",mcontroller);
+		refresh_btn.addEventListener("click",mcontroller);
 		monitorTabs_tb.addEventListener("change",mcontroller);
+		
+		
 		//setStyles();
 		setupTabInit()
 	    dispatchEvent({type:'load',target:this});
@@ -217,6 +226,8 @@ public function update (o:Observable,infoObj:Object):Void{
 	}
 	
 	private function setupTabInit(){
+		
+		
 		
 		var mm:Observable = getModel();
 		// Inititialsation for Lesson Tab View 
@@ -277,6 +288,8 @@ public function update (o:Observable,infoObj:Object):Void{
         var s:Object = mm.getSize();
 		trace("Monitor Tab Widtht: "+s.w+" Monitor Tab Height: "+s.h);
 		monitor_scp.setSize(s.w,s.h);
+		refresh_btn._x = s.w - 180
+		help_btn._x = s.w - 80
 				
 	}
 	
