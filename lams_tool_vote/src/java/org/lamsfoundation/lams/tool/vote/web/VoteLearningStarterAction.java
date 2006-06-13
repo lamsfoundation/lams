@@ -139,7 +139,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
     /*
      * persist time zone information to session scope. 
      */
-    VoteUtils.persistTimeZone(request);
+    VoteUtils.persistInSessionTimeZone(request);
     ActionForward validateParameters=validateParameters(request, mapping);
     logger.debug("validateParameters: " + validateParameters);
     if (validateParameters != null)
@@ -150,55 +150,6 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
     Long toolSessionID=(Long) request.getSession().getAttribute(AttributeNames.PARAM_TOOL_SESSION_ID);
     logger.debug("retrieved toolSessionID: " + toolSessionID);
     
-    /* API test code from here*/
-    String createToolSession=request.getParameter("createToolSession");
-	logger.debug("createToolSession: " + createToolSession);
-	if ((createToolSession != null) && createToolSession.equals("1"))
-	{	try
-		{
-			voteService.createToolSession(toolSessionID, "toolSessionName", new Long(9876));
-			return (mapping.findForward(LEARNING_STARTER));
-		}
-		catch(ToolException e)
-		{
-			VoteUtils.cleanUpSessionAbsolute(request);
-			logger.debug("tool exception"  + e);
-		}
-	}
-	
-	String removeToolSession=request.getParameter("removeToolSession");
-	logger.debug("removeToolSession: " + removeToolSession);
-	if ((removeToolSession != null) && removeToolSession.equals("1"))
-	{	try
-		{
-			voteService.removeToolSession(toolSessionID);
-			return (mapping.findForward(LEARNING_STARTER));
-		}
-		catch(ToolException e)
-		{
-			VoteUtils.cleanUpSessionAbsolute(request);
-			logger.debug("tool exception"  + e);
-		}
-	}
-	
-	String learnerId=request.getParameter("learnerId");
-	logger.debug("learnerId: " + learnerId);
-	if (learnerId != null) 
-	{	try
-		{
-			String nextUrl=voteService.leaveToolSession(toolSessionID, new Long(learnerId));
-			logger.debug("nextUrl: "+ nextUrl);
-			return (mapping.findForward(LEARNING_STARTER));
-		}
-		catch(ToolException e)
-		{
-			VoteUtils.cleanUpSessionAbsolute(request);
-			logger.debug("tool exception"  + e);
-		}
-	}
-	/*till here*/
-    
-	
 	/*
 	 * by now, we made sure that the passed tool session id exists in the db as a new record
 	 * Make sure we can retrieve it and the relavent content
@@ -226,7 +177,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
     {
     	VoteUtils.cleanUpSessionAbsolute(request);
     	logger.debug("error: The tool expects voteContent.");
-    	persistError(request,"error.content.doesNotExist");
+    	persistInRequestError(request,"error.content.doesNotExist");
     	request.getSession().setAttribute(USER_EXCEPTION_CONTENT_DOESNOTEXIST, new Boolean(true).toString());
     	return (mapping.findForward(ERROR_LIST));
     }
@@ -305,7 +256,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
     	logger.debug("warning to learner: the activity is offline.");
     	request.getSession().setAttribute(USER_EXCEPTION_CONTENT_RUNOFFLINE, new Boolean(true).toString());
     	voteLearningForm.setActivityRunOffline(new Boolean(true).toString());
-    	persistError(request,"label.learning.runOffline");
+    	persistInRequestError(request,"label.learning.runOffline");
 		return (mapping.findForward(ERROR_LIST));
     }
 
@@ -317,7 +268,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
     	VoteUtils.cleanUpSessionAbsolute(request);
     	request.getSession().setAttribute(USER_EXCEPTION_CONTENT_DEFINE_LATER, new Boolean(true).toString());
     	logger.debug("warning to learner: the activity is defineLater, we interpret that the content is being modified.");
-    	persistError(request,"error.defineLater");
+    	persistInRequestError(request,"error.defineLater");
     	return (mapping.findForward(ERROR_LIST));
     }
 
@@ -538,7 +489,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	    {
 	    	VoteUtils.cleanUpSessionAbsolute(request);
 	    	request.getSession().setAttribute(USER_EXCEPTION_TOOLSESSIONID_REQUIRED, new Boolean(true).toString());
-	    	persistError(request, "error.toolSessionId.required");
+	    	persistInRequestError(request, "error.toolSessionId.required");
 	    	return (mapping.findForward(ERROR_LIST));
 	    }
 	    else
@@ -553,7 +504,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 			{
 	    		VoteUtils.cleanUpSessionAbsolute(request);
 	    		request.getSession().setAttribute(USER_EXCEPTION_NUMBERFORMAT, new Boolean(true).toString());
-	    		persistError(request, "error.sessionId.numberFormatException");
+	    		persistInRequestError(request, "error.sessionId.numberFormatException");
 	    		logger.debug("add error.sessionId.numberFormatException to ActionMessages.");
 	    		return (mapping.findForward(ERROR_LIST));
 			}
@@ -602,7 +553,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
      * @param request
      * @param message
      */
-	public void persistError(HttpServletRequest request, String message)
+	public void persistInRequestError(HttpServletRequest request, String message)
 	{
 		ActionMessages errors= new ActionMessages();
 		errors.add(Globals.ERROR_KEY, new ActionMessage(message));

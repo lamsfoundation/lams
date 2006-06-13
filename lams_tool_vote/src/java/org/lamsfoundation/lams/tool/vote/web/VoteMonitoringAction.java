@@ -34,12 +34,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.Globals;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
@@ -1055,19 +1052,5 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 		return (mapping.findForward(VOTE_NOMINATION_VIEWER));          
     }
 
-    
-    
-    /**
-     * persists error messages to request scope
-     * @param request
-     * @param message
-     */
-    public void persistError(HttpServletRequest request, String message)
-	{
-		ActionMessages errors= new ActionMessages();
-		errors.add(Globals.ERROR_KEY, new ActionMessage(message));
-		logger.debug("add " + message +"  to ActionMessages:");
-		saveErrors(request,errors);	    	    
-	}
 }
     

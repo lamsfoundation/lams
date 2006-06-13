@@ -144,7 +144,7 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 		request.getSession().setAttribute(REQUEST_LEARNING_REPORT, new Boolean(false).toString());
 		
 		request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
-	    VoteUtils.persistTimeZone(request);
+	    VoteUtils.persistInSessionTimeZone(request);
 		
 		/* we have made sure TOOL_CONTENT_ID is passed  */
 	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
@@ -157,7 +157,7 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 		{
 			VoteUtils.cleanUpSessionAbsolute(request);
 			request.getSession().setAttribute(USER_EXCEPTION_CONTENT_DOESNOTEXIST, new Boolean(true).toString());
-			persistError(request, "error.content.doesNotExist");
+			persistInRequestError(request, "error.content.doesNotExist");
 			return false;
 		}
 		
@@ -170,7 +170,7 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 		if (isContentInUse == true)
 		{
 			logger.debug("monitoring url does not allow editActivity since the content is in use.");
-	    	persistError(request,"error.content.inUse");
+			persistInRequestError(request,"error.content.inUse");
 	    	request.getSession().setAttribute(IS_MONITORED_CONTENT_IN_USE, new Boolean(true).toString());
 		}
 		
@@ -263,7 +263,7 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
     	 
 	    if ((strToolContentId == null) || (strToolContentId.length() == 0)) 
 	    {
-	    	persistError(request, "error.contentId.required");
+	        persistInRequestError(request, "error.contentId.required");
 	    	VoteUtils.cleanUpSessionAbsolute(request);
 			return (mapping.findForward(ERROR_LIST));
 	    }
@@ -277,7 +277,7 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 			}
 	    	catch(NumberFormatException e)
 			{
-	    		persistError(request, "error.numberFormatException");
+	    	    persistInRequestError(request, "error.numberFormatException");
 	    		logger.debug("add error.numberFormatException to ActionMessages.");
 	    		VoteUtils.cleanUpSessionAbsolute(request);
 				return (mapping.findForward(ERROR_LIST));
@@ -292,7 +292,7 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
      * @param request
      * @param message
      */
-	public void persistError(HttpServletRequest request, String message)
+	public void persistInRequestError(HttpServletRequest request, String message)
 	{
 		ActionMessages errors= new ActionMessages();
 		errors.add(Globals.ERROR_KEY, new ActionMessage(message));

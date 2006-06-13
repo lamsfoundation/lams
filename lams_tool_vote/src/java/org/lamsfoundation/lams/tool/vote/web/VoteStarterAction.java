@@ -201,7 +201,7 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 		    {
 		    	VoteUtils.cleanUpSessionAbsolute(request);
 		    	request.getSession().setAttribute(USER_EXCEPTION_CONTENTID_REQUIRED, new Boolean(true).toString());
-		    	persistError(request,"error.contentId.required");
+		    	persistInRequestError(request,"error.contentId.required");
 		    	VoteUtils.cleanUpSessionAbsolute(request);
 				logger.debug("forwarding to: " + ERROR_LIST);
 				return (mapping.findForward(ERROR_LIST));
@@ -220,7 +220,7 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 			{
 		    	VoteUtils.cleanUpSessionAbsolute(request);
 		    	request.getSession().setAttribute(USER_EXCEPTION_NUMBERFORMAT, new Boolean(true).toString());
-		    	persistError(request,"error.numberFormatException");
+		    	persistInRequestError(request,"error.numberFormatException");
 				logger.debug("forwarding to: " + ERROR_LIST);
 				return (mapping.findForward(ERROR_LIST));
 			}
@@ -350,7 +350,7 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 	        		VoteUtils.cleanUpSessionAbsolute(request);
 	    			logger.debug("student activity occurred on this content:" + voteContent);
 	    	    	request.getSession().setAttribute(USER_EXCEPTION_CONTENT_IN_USE, new Boolean(true).toString());    			
-		    		persistError(request, "error.content.inUse");
+	    	    	persistInRequestError(request, "error.content.inUse");
 					return (mapping.findForward(ERROR_LIST));
 	    		}
 	        	
@@ -363,7 +363,7 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 		        		VoteUtils.cleanUpSessionAbsolute(request);
 		    			logger.debug("student activity occurred on this content:" + voteContent);
 		    	    	request.getSession().setAttribute(USER_EXCEPTION_CONTENT_IN_USE, new Boolean(true).toString());    			
-			    		persistError(request, "error.content.inUse");
+		    	    	persistInRequestError(request, "error.content.inUse");
 						return (mapping.findForward(ERROR_LIST));
 		        	    
 		        	}
@@ -442,7 +442,7 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 			{
 				VoteUtils.cleanUpSessionAbsolute(request);
 				logger.debug("default content id has not been setup");
-				persistError(request,"error.defaultContent.notSetup");
+				persistInRequestError(request,"error.defaultContent.notSetup");
 		    	request.getSession().setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true).toString());
 				return (mapping.findForward(ERROR_LIST));	
 			}
@@ -451,7 +451,7 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 		{
 			VoteUtils.cleanUpSessionAbsolute(request);
 			logger.debug("error getting the default content id: " + e.getMessage());
-			persistError(request,"error.defaultContent.notSetup");
+			persistInRequestError(request,"error.defaultContent.notSetup");
 	    	request.getSession().setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true).toString());
 			logger.debug("forwarding to: " + ERROR_LIST);
 			return (mapping.findForward(ERROR_LIST));
@@ -470,7 +470,7 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 			    logger.debug("voteContent is null: " + voteContent);
 				VoteUtils.cleanUpSessionAbsolute(request);
 				logger.debug("Exception occured: No default content");
-	    		persistError(request,"error.defaultContent.notSetup");
+				persistInRequestError(request,"error.defaultContent.notSetup");
 	    		request.getSession().setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true).toString());
 	    		return (mapping.findForward(ERROR_LIST));
 			}
@@ -484,7 +484,7 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 		    logger.debug("other problems: " + e);
 			VoteUtils.cleanUpSessionAbsolute(request);
 			logger.debug("Exception occured: No default question content");
-			persistError(request,"error.defaultContent.notSetup");
+			persistInRequestError(request,"error.defaultContent.notSetup");
     		request.getSession().setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true).toString());
 			logger.debug("forwarding to: " + ERROR_LIST);
 			return (mapping.findForward(ERROR_LIST));
@@ -652,7 +652,7 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
      * @param request
      * @param message
      */
-	public void persistError(HttpServletRequest request, String message)
+	public void persistInRequestError(HttpServletRequest request, String message)
 	{
 		ActionMessages errors= new ActionMessages();
 		errors.add(Globals.ERROR_KEY, new ActionMessage(message));

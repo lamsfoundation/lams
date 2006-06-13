@@ -119,7 +119,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
     	voteLearningForm.setMaxNominationCountReached(new Boolean(false).toString());
     	
 	 	IVoteService voteService =VoteUtils.getToolService(request);
-	 	VoteUtils.persistRichText(request);	 	
+	 	VoteUtils.persistInSessionRichText(request);	 	
 	 	voteAuthoringForm.resetUserAction();
 	 	return null;
     }
@@ -325,7 +325,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
     	if (castVoteCount > intMaxNominationCount )
     	{
     	    voteLearningForm.setMaxNominationCountReached(new Boolean(true).toString());
-    	    persistError(request, "error.maxNominationCount.reached");
+    	    persistInRequestError(request, "error.maxNominationCount.reached");
 	        logger.debug("give warning,  max nom count reached...");
     	    logger.debug("fwd'ing to: " + LOAD_LEARNER);
     	    return (mapping.findForward(LOAD_LEARNER));
@@ -514,7 +514,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
      * @param request
      * @param message
      */
-    public void persistError(HttpServletRequest request, String message)
+    public void persistInRequestError(HttpServletRequest request, String message)
 	{
 		ActionMessages errors= new ActionMessages();
 		errors.add(Globals.ERROR_KEY, new ActionMessage(message));
