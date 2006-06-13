@@ -52,7 +52,6 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	public static var DISABLE_CBI:Number = 2;
 	public static var ARCHIVE_CBI:Number = 3;
 	public static var UNARCHIVE_CBI:Number = 4;
-	
 	private var _className = "LessonTabView";
 	//constants:
 	private var _tm:ThemeManager;
@@ -170,6 +169,12 @@ public function update (o:Observable,infoObj:Object):Void{
 					this._visible = false;
 				}
 				break;
+			case 'RELOADPROGRESS' :	
+					if (infoObj.tabID == _tabID){
+						trace("called Reload progress")
+						//reloadProgress()
+					}
+					break;
 			case 'LM_DIALOG' :
 				_monitorController = getController();
 				showLessonManagerDialog(mm);
