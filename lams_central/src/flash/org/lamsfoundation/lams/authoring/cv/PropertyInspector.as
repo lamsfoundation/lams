@@ -340,7 +340,7 @@ class PropertyInspector extends MovieClip{
 				showParallelActivityProperties(cca);
 				//show the title
 				title_txt.text = StringUtils.cleanNull(cca.title);
-				desc_txt.text = StringUtils.cleanNull(cca.description);*/
+				desc_txt.text = StringUtils.cleanNull(cca.description);
 		}else if(CanvasTransition(cm.selectedItem) != null){
 			var ct = CanvasTransition(cm.selectedItem);
 			var t:Transition = ct.transition;
