@@ -82,7 +82,7 @@ class Header extends MovieClip {
 		resume_btn.onRelease = function(){
 			trace('on releasing resuming button..');
 			var app:Application = Application.getInstance();
-			app.getLesson().joinLesson();
+			app.getLesson().resumeLesson();
 		}
 		
 		exit_btn.onRelease = function(){
