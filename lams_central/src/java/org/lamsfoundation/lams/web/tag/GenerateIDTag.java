@@ -29,10 +29,12 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.TagSupport;
 
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
+
 import org.apache.log4j.Logger;
 
 import java.util.Random;
-import java.util.Date;
 
 /**
  * Output a random number for the learner and passon flash movies to communicate directly.
@@ -60,23 +62,32 @@ public class GenerateIDTag extends TagSupport {
 	}
 	
 	public int doStartTag() throws JspException {
+		String uniqueID;
+		HttpSession ss = SessionManager.getSession();
+		JspWriter writer = pageContext.getOut();
 		try {
-			long seed = System.currentTimeMillis();
-			Random rand = new Random(seed);
-			number = rand.nextInt();
-	
-			if (number != -1) {
-		        JspWriter writer = pageContext.getOut();
-		        writer.print(String.valueOf(number));
-		    } else {
-		    	log.warn("GenerateIDTag could not write out random number because no new integer value was assigned.");
-		    }
-			
-	   	} catch(Exception e) {
+			if(ss != null){
+				if((uniqueID = (String)ss.getAttribute(AttributeNames.UID)) != null){
+					writer.print(uniqueID);
+				} else {
+						long seed = System.currentTimeMillis();
+						Random rand = new Random(seed);
+						number = rand.nextInt();
+				
+						if (number != -1) {
+					        ss.setAttribute(AttributeNames.UID, String.valueOf(number));
+					        writer.print(String.valueOf(number));
+					    } else {
+					    	log.warn("GenerateIDTag could not write out random number because no new integer value was assigned.");
+					    }
+				}
+			} else {
+				log.warn("GenerateTag unable to access shared session as it is missing");
+			}
+		} catch(Exception e) {
 	   		log.error("GenerateIDTag unable to write out random number due to Exception.");
 	   		throw new JspException(e);
 	   	}
-	   	
     	return SKIP_BODY;
 	}
 
