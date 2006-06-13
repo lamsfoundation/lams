@@ -145,6 +145,12 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 						mm.getMonitor().getProgressData(mm.getSequence())
 					}
 					break;
+				case 'RELOADPROGRESS' :	
+					if (infoObj.tabID == _tabID){
+						trace("called Reload progress")
+						reloadProgress()
+					}
+					break;	
 				case 'DRAW_ACTIVITY' :
 					if (infoObj.tabID == _tabID){
 						trace("DRAWING_ACTIVITY")
@@ -198,12 +204,12 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 		//set up the 
 		//_canvas_mc = this;
 		_gridLayer_mc = this.createEmptyMovieClip("_gridLayer_mc", this.getNextHighestDepth());
-		learnerMenuBar = this.attachMovie("RefreshBar", "RefreshBar", this.getNextHighestDepth())
-		learnerMenuBar = eval(learnerMenuBar)
+		//learnerMenuBar = this.attachMovie("RefreshBar", "RefreshBar", this.getNextHighestDepth())
+		//learnerMenuBar = eval(learnerMenuBar)
 		_transitionLayer_mc = this.createEmptyMovieClip("_transitionLayer_mc", this.getNextHighestDepth());
 		_activityLayerComplex_mc = this.createEmptyMovieClip("_activityLayerComplex_mc", this.getNextHighestDepth());
 		_activityLayer_mc = this.createEmptyMovieClip("_activityLayer_mc", this.getNextHighestDepth(),{_y:learnerMenuBar._height});
-		learnerMenuBar.refresh_btn.onRelease = Proxy.create (this, reloadProgress);	
+		//learnerMenuBar.refresh_btn.onRelease = Proxy.create (this, reloadProgress);	
 		trace("Loaded MonitorTabView Data"+ this)
 		//setSize (mm)
 		dispatchEvent({type:'load',target:this});
@@ -344,7 +350,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 		trace("Monitor Tab Grid Width: "+s.w+" Monitor Tab Grid Height: "+s.h);
 		//monitor_scp.setSize(s.w,s.h);
 		bkg_pnl.setSize(s.w,s.h);
-		learnerMenuBar.help_btn._x = s.w - 80;
+		//learnerMenuBar.help_btn._x = s.w - 80;
 		//Create the grid.  The grid is re-drawn each time the canvas is resized.
 		var grid_mc = Grid.drawGrid(_gridLayer_mc,Math.round(s.w-10),Math.round(s.h-10),V_GAP,H_GAP);
 				

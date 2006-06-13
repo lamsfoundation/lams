@@ -158,7 +158,13 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 					if (infoObj.tabID == _tabID){
 						mm.getMonitor().getProgressData(mm.getSequence())
 					}
-					break;				
+					break;	
+					
+				case 'RELOADPROGRESS' :	
+					if (infoObj.tabID == _tabID){
+						reloadProgress()
+					}
+					break;	
 				case 'DRAW_ACTIVITY' :
 					if (infoObj.tabID == _tabID){
 						trace("DRAWING_ACTIVITY")
@@ -196,8 +202,8 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		//set up the Movie Clips to load relevant  
 
 		//_helpLayer_mc = this.attachMovie("RefreshBar", "RefreshBar", _helpLayer_mc.getNextHighestDepth()) 
-		learnerMenuBar = this.attachMovie("RefreshBar", "RefreshBar", this.getNextHighestDepth())
-		learnerMenuBar = eval(learnerMenuBar)
+		//learnerMenuBar = this.attachMovie("RefreshBar", "RefreshBar", this.getNextHighestDepth())
+		//learnerMenuBar = eval(learnerMenuBar)
 		//_helpLayer_mc.createEmptyMovieClip("_helpLayer_mc", this.getNextHighestDepth());
 		
 		//refresh_btn.addEventListener("click", Delegate.create(this, reloadProgress));
@@ -207,7 +213,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		_activityLayerComplex_mc = this.createEmptyMovieClip("_activityLayerComplex_mc", this.getNextHighestDepth());
 		_activityLayer_mc = this.createEmptyMovieClip("_activityLayer_mc", this.getNextHighestDepth(),{_y:learnerMenuBar._height});
 		
-		learnerMenuBar.refresh_btn.onRelease = Proxy.create (this, reloadProgress);
+		//learnerMenuBar.refresh_btn.onRelease = Proxy.create (this, reloadProgress);
 		trace("Help layer path: "+ learnerMenuBar.refresh_btn.label)
 		//setSize (mm)
 		dispatchEvent({type:'load',target:this});
@@ -403,7 +409,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		trace("Monitor Tab Grid Width: "+s.w+" Monitor Tab Grid Height: "+s.h);
 		//monitor_scp.setSize(s.w,s.h);
 		bkg_pnl.setSize(s.w,s.h);
-		learnerMenuBar.help_btn._x = s.w - 80
+		//learnerMenuBar.help_btn._x = s.w - 80
 		//Create the grid.  The grid is re-drawn each time the canvas is resized.
 		//var grid_mc = Grid.drawGrid(_gridLayer_mc,Math.round(s.w-10),Math.round(s.h-10),V_GAP,H_GAP);
 				
