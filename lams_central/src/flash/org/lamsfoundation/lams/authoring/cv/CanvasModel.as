@@ -391,6 +391,33 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		
 	}
 	
+	/**
+	 * Removes the activity from the Canvas Model
+	 * @usage   
+	 * @param   activityUIID 
+	 * @return  
+	 */
+	 
+	 /**
+	*Called by the controller when a complex activity is dropped on bin.
+	*/
+	public function removeComplexActivity(ca:Object){
+		
+		Debugger.log('Removed Child '+ca.activityUIID+ 'from : '+ca.activity.parentUIID,Debugger.GEN,'removeOptionalCA','CanvasModel');
+		trace("Number of Children are: "+ca.actChildren.length)
+		for (var k=0; k<ca.actChildren.length; k++){
+			trace("ca.actChildren[k].activityUIID - Child has UIID : "+ca.actChildren[k].activityUIID)
+			ca.actChildren[k].parentUIID = null;
+						
+			removeActivity(ca.actChildren[k].activityUIID);
+			_cv.ddm.removeActivity(ca.actChildren[k].activityUIID);
+		
+			
+		}
+		_cv.removeActivity(ca.activity.activityUIID);
+	}
+	
+	
 	public function removeActivity(activityUIID):Object{
 		//dispatch an event to show the design  has changed
 				
