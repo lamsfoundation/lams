@@ -115,12 +115,8 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
         voteLearningForm.setNominationsSubmited(new Boolean(false).toString());
     	
         VoteUtils.cleanUpUserExceptions(request);
-    	VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
     	voteLearningForm.setMaxNominationCountReached(new Boolean(false).toString());
-    	
-	 	IVoteService voteService =VoteUtils.getToolService(request);
-	 	VoteUtils.persistInSessionRichText(request);	 	
-	 	voteAuthoringForm.resetUserAction();
+    	VoteUtils.persistInSessionRichText(request);	 	
 	 	return null;
     }
 
