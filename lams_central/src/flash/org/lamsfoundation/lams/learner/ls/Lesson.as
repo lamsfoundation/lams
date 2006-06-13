@@ -158,6 +158,11 @@ class Lesson {
 		return true;
 	}
 	
+	public function exportLesson(){
+		// do export call
+		getURL(_root.serverURL + 'learning/exportWaitingPage.jsp?mode=learner&lessonID='+String(lessonModel.ID), "_blank");
+	}
+	
 	private function storeLessonData(dto:Object){
 		lessonModel.populateFromDTO(dto);
 		joinLesson();

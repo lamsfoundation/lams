@@ -58,16 +58,12 @@ class LessonController extends AbstractController {
 	 */
 	public function click(evt):Void{
 		trace(String(evt.target));
-		trace('onClick event: joining lesson...');
-		_lessonModel = LessonModel(model);
-		_lessonModel.getLesson().joinLesson();
 		
-		/*
-		Debugger.log('click evt.target.label:'+evt.target.label,Debugger.GEN,'click','LessonController');
 		var tgt:String = new String(evt.target);
-		if(tgt.indexOf("join") != -1){
-			_lessonModel.getLesson().joinLesson();
-		}*/
+		if(tgt.indexOf("export_btn") != -1){
+			_lessonModel.getLesson().exportLesson();
+		}
+		
 	}
 	
 	public function activityClick(ca:Object):Void{

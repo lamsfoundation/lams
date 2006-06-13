@@ -52,10 +52,11 @@ class LessonView extends AbstractView {
 	
 	private var bkg_pnl:MovieClip;
 	private var _lessonName:Label;
+	private var export_btn:Button;
 	private var progress_scp:MovieClip;
 	private var _activityList:Array;
 	
-	private var ACT_X:Number = -27.5;
+	private var ACT_X:Number = -20;
 	private var ACT_Y:Number = 32.5;
 	
 	//These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
@@ -98,6 +99,7 @@ class LessonView extends AbstractView {
 		
 		//Add the button handlers, essentially this is handing on clicked event to controller.
         var controller = getController();
+		export_btn.addEventListener("click", controller);
 		
         //Now that view is setup dispatch loaded event
        dispatchEvent({type:'load',target:this});
@@ -175,7 +177,7 @@ class LessonView extends AbstractView {
 			var r = lm.activitiesDisplayed.remove(keys[i]);
 			r.removeMovieClip();
 		}
-		ACT_X = -25;
+		ACT_X = -20;
 		ACT_Y = 32.5;
 	}
 	
