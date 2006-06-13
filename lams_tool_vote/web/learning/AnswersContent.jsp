@@ -60,7 +60,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 	}
 
-	function validateSubmit(actionMethod){
+	function validate(){
 		var error = "";
 		var userEntry = 0;
 		<c:if test="${VoteLearningForm.allowTextEntry == true}">	
@@ -71,8 +71,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 		if((maxVotes != -1) && (noSelected + userEntry) > maxVotes){
 			alertTooManyVotes(maxVotes);
+			return false;
 		} else {
-			submitMethod(actionMethod);
+			return true;
 		}
 		 
 	}
@@ -86,7 +87,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 </head>
 <body>
 
-<html:form  action="/learning?validate=false" enctype="multipart/form-data"method="POST" target="_self">
+<html:form  onsubmit="return validate();" action="/learning?validate=false&dispatch=continueOptionsCombined" method="POST" target="_self">
 	<html:hidden property="dispatch"/>
 	<html:hidden property="toolContentID"/>
 
@@ -148,11 +149,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		  	   		  <tr>
 					  	<td NOWRAP align=right class="input" valign=top> 
 						  	<font size=2>
-		                            <html:button property="continueOptionsCombined" 
-		                                         styleClass="linkbutton" 
-		                                         onclick="validateSubmit('continueOptionsCombined');">
+		                            <html:submit property="continueOptionsCombined" 
+		                                         styleClass="linkbutton">
 										<bean:message key="label.submit.vote"/>
-		                            </html:button>
+		                            </html:submit>
 							</font>
 					  	 </td>
 					  </tr>
