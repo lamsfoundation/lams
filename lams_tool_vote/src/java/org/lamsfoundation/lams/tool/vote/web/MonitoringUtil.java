@@ -774,7 +774,14 @@ public class MonitoringUtil implements VoteAppConstants{
 
 					logger.debug("voteRate" + voteRate);
 					
-					mapVoteRatesContent.put(mapIndex.toString(), new Double(voteRate).toString());
+					String stringVoteRate=new Double(voteRate).toString();
+					int lengthVoteRate=stringVoteRate.length();
+					logger.debug("lengthVoteRate" + lengthVoteRate);
+					if (lengthVoteRate > 5)
+					    stringVoteRate=stringVoteRate.substring(0,6);
+					
+					
+					mapVoteRatesContent.put(mapIndex.toString(), stringVoteRate);
 		    		mapIndex=new Long(mapIndex.longValue()+1);
 				}
 			}
@@ -983,7 +990,13 @@ public class MonitoringUtil implements VoteAppConstants{
 
 				logger.debug("voteRate" + voteRate);
 				
-				mapVoteRatesContent.put(mapIndex.toString(), new Double(voteRate).toString());
+				String stringVoteRate=new Double(voteRate).toString();
+				int lengthVoteRate=stringVoteRate.length();
+				logger.debug("lengthVoteRate" + lengthVoteRate);
+				if (lengthVoteRate > 5)
+				    stringVoteRate=stringVoteRate.substring(0,6);
+				
+				mapVoteRatesContent.put(mapIndex.toString(), stringVoteRate);
 	    		mapIndex=new Long(mapIndex.longValue()+1);
 			}
 		}
@@ -1169,7 +1182,13 @@ public class MonitoringUtil implements VoteAppConstants{
 
 				logger.debug("voteRate" + voteRate);
 				
-				mapVoteRatesContent.put(mapIndex.toString(), new Double(voteRate).toString());
+				String stringVoteRate=new Double(voteRate).toString();
+				int lengthVoteRate=stringVoteRate.length();
+				logger.debug("lengthVoteRate" + lengthVoteRate);
+				if (lengthVoteRate > 5)
+				    stringVoteRate=stringVoteRate.substring(0,6);
+				
+				mapVoteRatesContent.put(mapIndex.toString(), stringVoteRate);
 				mapStandardNominationsVisibility.put(mapIndex.toString(), new Boolean(true).toString());
 	    		mapIndex=new Long(mapIndex.longValue()+1);
 			}
@@ -1343,9 +1362,13 @@ public class MonitoringUtil implements VoteAppConstants{
 				}
 
 				logger.debug("voteRate" + voteRate);
+				String stringVoteRate=new Double(voteRate).toString();
+				int lengthVoteRate=stringVoteRate.length();
+				logger.debug("lengthVoteRate" + lengthVoteRate);
+				if (lengthVoteRate > 5)
+				    stringVoteRate=stringVoteRate.substring(0,6);
 				
-				mapVoteRatesContent.put(mapIndex.toString(), new Double(voteRate).toString());
-
+				mapVoteRatesContent.put(mapIndex.toString(), stringVoteRate);
 	    		mapIndex=new Long(mapIndex.longValue()+1);
 			}
 		}
