@@ -1,7 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <c:set var="dto" value="${requestScope.monitoringDTO}" />
-<c:forEach var="session" items="${dto.chatSessions}">
+<c:forEach var="session" items="${dto.sessionDTOs}">
 	<table class="forms">
 		<tr>
 			<th colspan="2">
@@ -10,41 +10,45 @@
 		</tr>
 
 		<tr>
-			<td class="formlabel">
+			<td>
 				<fmt:message>heading.totalLearners</fmt:message>
 			</td>
-			<td class="formcontrol">
-				<p>
+			<td>
+				<p class="formcontrol">
 					TODO.
 				</p>
 			</td>
 		</tr>
 
 		<tr>
-			<td class="formlabel">
+			<td>
 				<fmt:message>heading.totalMessages</fmt:message>
 			</td>
-			<td class="formcontrol">
-				<p>
-					TODO
+			<td>
+				<p class="formcontrol">
+					<c:out value="${session.postCount}" />
 				</p>
 			</td>
 		</tr>
 
 		<tr>
-			<td class="formlabel">
+			<td>
 				<fmt:message>heading.recentMessages</fmt:message>
 			</td>
-		
 			<td>
+				&nbsp;
+			</td>
+		</tr>
+		<tr>
+			<td class="formcontrol" colspan="2">
 				<div style="background-color: white; padding: 8px;">
 				<c:choose>
-					<c:when test="${empty session.chatMessages}">
+					<c:when test="${empty session.messageDTOs}">
 						<fmt:message>message.noChatMessages</fmt:message>
 					</c:when>
 					<c:otherwise>
 
-						<c:forEach var="message" items="${session.chatMessages}">
+						<c:forEach var="message" items="${session.messageDTOs}">
 							<div>
 								<span style="font-weight: bold"> <c:out value="${message.from}" /></span>
 								<c:out value="${message.body}" />

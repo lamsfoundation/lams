@@ -26,6 +26,7 @@
 package org.lamsfoundation.lams.tool.chat.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.tool.chat.model.ChatMessage;
@@ -45,4 +46,8 @@ public interface IChatMessageDAO extends IBaseDAO {
 	ChatMessage getByUID(Long uid);
 
 	List getLatest(ChatSession chatSession, int max);
+	
+	Map<Long, Integer> getCountBySession(Long chatUID);
+	
+	Map<Long, Integer> getCountByFromUser(Long sessionUID);		
 }

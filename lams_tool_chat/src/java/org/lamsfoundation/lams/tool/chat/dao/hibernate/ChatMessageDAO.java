@@ -25,13 +25,15 @@
 
 package org.lamsfoundation.lams.tool.chat.dao.hibernate;
 
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.tool.chat.dao.IChatMessageDAO;
-import org.lamsfoundation.lams.tool.chat.model.Chat;
 import org.lamsfoundation.lams.tool.chat.model.ChatMessage;
 import org.lamsfoundation.lams.tool.chat.model.ChatSession;
 import org.lamsfoundation.lams.tool.chat.model.ChatUser;
@@ -54,6 +56,14 @@ public class ChatMessageDAO extends BaseDAO implements IChatMessageDAO {
 	public static final String SQL_QUERY_FIND_MESSAGE_BY_SESSION_ORDER_BY_DATE_ASC = "from "
 			+ ChatMessage.class.getName()
 			+ " as f where f.chatSession=? order by f.sendDate desc";
+
+	public static final String SQL_QUERY_FIND_MESSAGE_COUNT_BY_FROM_USER = "select f.fromUser.uid, count(*) from "
+			+ ChatMessage.class.getName()
+			+ " as f where f.chatSession=? group by f.fromUser";
+
+	public static final String SQL_QUERY_FIND_MESSAGE_COUNT_BY_SESSION = "select f.chatSession.uid, count(*) from "
+			+ ChatMessage.class.getName()
+			+ " as f where f.chatSession.chat=? group by f.chatSession";
 
 	public void saveOrUpdate(ChatMessage chatMessage) {
 		this.getHibernateTemplate().saveOrUpdate(chatMessage);
@@ -90,5 +100,31 @@ public class ChatMessageDAO extends BaseDAO implements IChatMessageDAO {
 			logger.error("getLatest: hibernate exception");
 			return null;
 		}
+	}
+
+	public Map<Long, Integer> getCountBySession(Long chatUID) {
+		List list = this.getHibernateTemplate().find(
+				SQL_QUERY_FIND_MESSAGE_COUNT_BY_SESSION,
+				new Object[] { chatUID });
+
+		Map<Long, Integer> resultMap = new HashMap<Long, Integer>();
+		for (Iterator iter = list.iterator(); iter.hasNext();) {
+			Object[] row = (Object[]) iter.next();
+			resultMap.put((Long) row[0], (Integer) row[1]);
+		}
+		return resultMap;
+	}
+	
+	public Map<Long, Integer> getCountByFromUser(Long sessionUID) {
+		List list = this.getHibernateTemplate().find(
+				SQL_QUERY_FIND_MESSAGE_COUNT_BY_FROM_USER,
+				new Object[] { sessionUID });
+
+		Map<Long, Integer> resultMap = new HashMap<Long, Integer>();
+		for (Iterator iter = list.iterator(); iter.hasNext();) {
+			Object[] row = (Object[]) iter.next();
+			resultMap.put((Long) row[0], (Integer) row[1]);
+		}
+		return resultMap;
 	}
 }
