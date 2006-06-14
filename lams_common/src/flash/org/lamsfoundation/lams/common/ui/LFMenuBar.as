@@ -135,7 +135,7 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
         tools_menu.addMenuItem({label:Dictionary.getValue('mnu_tools_trans'), instanceName:"drawTransitionalItem"});
         tools_menu.addMenuItem({label:Dictionary.getValue('mnu_tools_opt'), instanceName:"drawOptionalItem"});
         tools_menu.addMenuItem({type:"separator"});
-        tools_menu.addMenuItem({label:Dictionary.getValue('mnu_tools_prefs'), instanceName:"prefsItem"});
+        tools_menu.addMenuItem({label:Dictionary.getValue('mnu_tools_prefs'), instanceName:"prefsItem", enabled:false});
 
 
         /*=================
