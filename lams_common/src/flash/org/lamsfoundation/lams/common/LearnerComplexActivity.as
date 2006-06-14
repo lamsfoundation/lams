@@ -24,10 +24,11 @@ import org.lamsfoundation.lams.common.*;
 import org.lamsfoundation.lams.common.util.*;
 import org.lamsfoundation.lams.common.ui.*;
 import org.lamsfoundation.lams.common.mvc.*;
-import org.lamsfoundation.lams.authoring.*;
+import org.lamsfoundation.lams.authoring.Activity;
+import org.lamsfoundation.lams.authoring.DesignDataModel;
 import org.lamsfoundation.lams.authoring.cv.ICanvasActivity;
-import org.lamsfoundation.lams.learner.ls.*;
-import org.lamsfoundation.lams.monitoring.mv.*;
+import org.lamsfoundation.lams.learner.ls.LessonController;
+import org.lamsfoundation.lams.monitoring.mv.MonitorController;
 import org.lamsfoundation.lams.common.style. *;
 import mx.controls. *;
 import mx.managers. *
@@ -98,37 +99,42 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 	public function init () : Void
 	{
 		
+		var children_mc : Array = new Array ();
+		var childrenArray:Array;
+		
+		childActivities_mc = this;
+		_locked = false;
+		showStatus(false);
+		
 		clickTarget_mc.onPress = Proxy.create (this, localOnPress);
 		clickTarget_mc.onRelease = Proxy.create (this, localOnRelease);
 		clickTarget_mc.onReleaseOutside = Proxy.create (this, localOnReleaseOutside);
 		
-		_locked = false;
-		showStatus(false);
-		childActivities_mc = this;
-		var children_mc : Array = new Array ();
 		
 		if(_activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
 			if(_children[0].orderID < _children[1].orderID){
-				_children = orderParallelActivities(_children[0],_children[1]);
+				childrenArray = orderParallelActivities(_children[0],_children[1]);
 			}else{
-				_children = orderParallelActivities(_children[1],_children[0]);
+				childrenArray = orderParallelActivities(_children[1],_children[0]);
 			}
-		}	
+		} else {
+			childrenArray = _children;
+		}
 		
-		for (var i = 0; i < _children.length; i ++)
+		for (var i = 0; i < childrenArray.length; i ++)
 		{
-			var progStatus:String = Progress.compareProgressData(learner, _children [i].activityID);
+			var progStatus:String = Progress.compareProgressData(learner, childrenArray[i].activityID);
 			
-			//if(_activity.activityTypeID==Activity.TOOL_ACTIVITY_TYPE || _activity.isGateActivity() || a.isGroupActivity() ){
-				children_mc [i] = childHolder_mc.attachMovie("LearnerActivity_forComplex", "LearnerActivityVertical_forOptional"+i, childHolder_mc.getNextHighestDepth(), {_activity:_children[i], _controller:_controller, _view:_view, learner:learner, actStatus:progStatus});
-			//} else if(_activity.activityTypeID==Activity.PARALLEL_ACTIVITY_TYPE || _activity.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE){
-		
+			children_mc [i] = childHolder_mc.attachMovie("LearnerActivity_forComplex", "LearnerActivity_forComplex"+i, childHolder_mc.getNextHighestDepth(), {_activity:childrenArray[i], _controller:_controller, _view:_view, learner:learner, actStatus:progStatus});
+			Debugger.log('attaching child movieL ' + children_mc[i],Debugger.CRITICAL,'init','LearnerComplexActivity');
+        
 			//set the positioning co-ords
 			children_mc [i]._y = (i*21);
-			
 			children_mc [i]._visible = true;
-			childHolder_mc._visible = false;
+			
 		}
+		
+		childHolder_mc._visible = false;
 		
 		MovieClipUtils.doLater (Proxy.create (this, draw));
 	}
@@ -259,7 +265,11 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 	 */
 	
 	private function orderParallelActivities(child1:Activity, child2:Activity):Array{
-		return new Array(child1,child2);
+		var a:Array = new Array();
+		a.push(child1);
+		a.push(child2);
+		
+		return a;
 	}
 	
 	public function get controller(){
