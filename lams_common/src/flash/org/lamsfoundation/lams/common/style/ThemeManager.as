@@ -124,7 +124,7 @@ class ThemeManager {
         //loadXML(requestURL,handler,isFullURL,deserialize)
         //comms.loadXML('lams_authoring/defaultTheme.xml',callBack,false,true);
         
-        comms.loadXML('flashxml/' + theme + 'Theme.xml',callBack,true,true);
+        comms.loadXML('flashxml/' + theme + 'Theme.xml',callBack,false,true);
         Debugger.log('Loading theme data from server for: ' + theme,Debugger.GEN,'openFromServer','ThemeManager');
     }
     
