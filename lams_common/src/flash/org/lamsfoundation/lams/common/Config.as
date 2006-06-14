@@ -298,10 +298,18 @@ class Config {
         //TODO: make this a real call to get browser lcoale!
 		//return 'en';
         //return 'en';
-        
+        var lang:String;
+		
         if(_root.lang){
-			Debugger.log('Getting language from root: '+String(_root.lang),Debugger.GEN,'getLanguage','Config');
-            return _root.lang;
+			lang = _root.lang;
+			if(_root.country){
+				lang += StringUtils.pad(String(_root.country).toUpperCase(), 3, '_', false);
+				Debugger.log('Appending country from root: '+lang,Debugger.GEN,'getLanguage','Config');
+				return lang;
+			} else {
+				Debugger.log('Getting language from root: '+String(_root.lang),Debugger.GEN,'getLanguage','Config');
+				return lang;
+			}
         } else {
 			return 'en';
 		}
