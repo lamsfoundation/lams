@@ -123,10 +123,13 @@ public interface ILamsCoreToolService
      * Notify a tool to make a copy of its own content. Lams needs to dynamically
      * load tool's service by request and invoke the copy method from tool
      * content manager. 
+     * 
+     * If it is a preview lesson, we don't want to set define later - we will sidestep this in the progress engine.
      * @param toolActivity the requested tool activity.
+     * @param setDefineLater do we tell the tool to set its define later flag?
      * @return new tool content id.
      */
-    public Long notifyToolToCopyContent(ToolActivity toolActivity)
+    public Long notifyToolToCopyContent(ToolActivity toolActivity, boolean setDefineLater)
     	throws DataMissingException, ToolException;
     
     /**

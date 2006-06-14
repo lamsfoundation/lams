@@ -200,12 +200,13 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
     }
     /**
      * Calls the tool to copy the content for an activity. Used when copying a learning design.
+     * If it is a preview lesson, we don't want to set define later - we will sidestep this in the progress engine.
      * 
      * @param toolActivity the tool activity defined in the design.
      * @throws DataMissingException, ToolException
      * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#notifyToolToCopyContent(org.lamsfoundation.lams.learningdesign.ToolActivity)
      */
-    public Long notifyToolToCopyContent(ToolActivity toolActivity) 
+    public Long notifyToolToCopyContent(ToolActivity toolActivity, boolean setDefineLater) 
     		throws DataMissingException, ToolException
     {
         Long newToolcontentID = contentIDGenerator.getNextToolContentIDFor(toolActivity.getTool());
@@ -213,13 +214,14 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
 			ToolContentManager contentManager = (ToolContentManager) findToolService(toolActivity);
             contentManager.copyToolContent(toolActivity.getToolContentId(),
                                            newToolcontentID);
-            if ( toolActivity.getDefineLater() != null &&
+            
+            if ( setDefineLater && toolActivity.getDefineLater() != null &&
                     toolActivity.getDefineLater().booleanValue() ) {
                 contentManager.setAsDefineLater(newToolcontentID);
             }
             if ( toolActivity.getRunOffline() != null &&
                     toolActivity.getRunOffline().booleanValue() ) {
-            contentManager.setAsRunOffline(newToolcontentID);
+            	contentManager.setAsRunOffline(newToolcontentID);
 			}
 		} catch ( NoSuchBeanDefinitionException e ) {
 			String message = "A tool which is defined in the database appears to missing from the classpath. Unable to copy the tool content. ToolActivity "+toolActivity;

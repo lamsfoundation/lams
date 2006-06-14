@@ -66,8 +66,8 @@ public class ChosenGrouper extends Grouper implements Serializable
      */
     public void doGrouping(Grouping chosenGrouping,String groupName, List learners)
     {
-    	String trimmedName = groupName.trim();
-    	if ( trimmedName == null ) {
+    	String trimmedName = groupName != null ? groupName.trim() : null;
+    	if ( trimmedName == null || trimmedName.length() == 0 ) {
     		String prefix = getPrefix();
     		trimmedName = prefix+" "+System.currentTimeMillis();
     		log.warn("Chosen grouper for grouping "+chosenGrouping.toString()+" did not get a group name. Selecting default name of "+trimmedName);

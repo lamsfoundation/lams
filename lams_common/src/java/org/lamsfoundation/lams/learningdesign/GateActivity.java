@@ -199,18 +199,30 @@ public abstract class GateActivity extends SystemToolActivity implements Seriali
 	 * Delegate to strategy class to calculate whether we should open the 
 	 * gate for this learner.
 	 * @param learner the learner who wants to go through the gate.
-	 * @return the gate should be open or closed.
+	 * @return the gate is open or closed.
 	 */
 	public boolean shouldOpenGateFor(User learner, List lessonLearners)
 	{
         //by default, we close the gate
         if(getGateOpen()==null)
-            this.setGateOpen(new Boolean(false));
+            this.setGateOpen(Boolean.FALSE);
         
 	    return ((GateActivityStrategy)simpleActivityStrategy).shouldOpenGateFor(learner,lessonLearners);
 	}
 
-    //---------------------------------------------------------------------
+	/**
+	 * Force the gate to open, irrespective of the strategy. Used for preview.
+	 * Opens the gate and clears any "waiting" list.
+	 * @return the gate is open or closed.
+	 */
+	public boolean forceGateOpen()
+	{
+		setGateOpen(Boolean.TRUE);
+		getWaitingLearners().clear();
+	    return true;
+	}
+
+	//---------------------------------------------------------------------
     // Helper methods
     //---------------------------------------------------------------------
     public String toString()

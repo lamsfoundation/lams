@@ -75,7 +75,7 @@ public class TestLessonClass extends TestCase
         group1.setGroupId(new Long(1));
         group1.setUsers(new HashSet());
         group1.getUsers().add(user1);
-        group1.setOrderId(lessonClass.getNextGroupOrderId());
+        group1.setOrderId(lessonClass.getNextGroupOrderIdCheckName("learners"));
         lessonClass.getGroups().add(group1);
         
         User staff = new User();
@@ -84,7 +84,7 @@ public class TestLessonClass extends TestCase
         staffGroup.setGroupId(new Long(2));
         staffGroup.setUsers(new HashSet());
         staffGroup.getUsers().add(staff);
-        staffGroup.setOrderId(lessonClass.getNextGroupOrderId());
+        staffGroup.setOrderId(lessonClass.getNextGroupOrderIdCheckName("staff"));
         lessonClass.getGroups().add(staffGroup);
         lessonClass.setStaffGroup(staffGroup);
         

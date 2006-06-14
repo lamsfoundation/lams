@@ -222,7 +222,7 @@ public class LessonDataAccessTestCase extends AbstractCommonTestCase
         learnergroups.add(testUser);
         Group learnerClassGroup = new Group(null,//group id
         									TEST_GROUP_NAME_LEARNER,
-                                            testLessonClass.getNextGroupOrderId(),
+                                            testLessonClass.getNextGroupOrderIdCheckName(TEST_GROUP_NAME_LEARNER),
                                             testLessonClass,
                                             learnergroups,
                                             new HashSet());//tool session, should be empty now
@@ -243,6 +243,7 @@ public class LessonDataAccessTestCase extends AbstractCommonTestCase
                                 new Date(System.currentTimeMillis()),
                                 testUser,
                                 Lesson.CREATED,
+                                null,
                                 testLearningDesign,
                                 testLessonClass,//lesson class
                                 testOrg,

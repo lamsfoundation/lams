@@ -99,7 +99,7 @@ public class TestRandomGrouper extends TestCase
      */
     public void testDoGroupingLearnerListByNumOfGroups()
     {
-        this.groupingByNumofGroups.getGrouper().doGrouping(groupingByNumofGroups,null,userList);
+        this.groupingByNumofGroups.getGrouper().doGrouping(groupingByNumofGroups,(String)null,userList);
         Group groupWithLeastMember = groupingByNumofGroups.getGroupWithLeastMember();
         
         for(Iterator i = groupingByNumofGroups.getGroups().iterator();i.hasNext();)
@@ -135,7 +135,7 @@ public class TestRandomGrouper extends TestCase
      */
     public void testDoGroupingLearnerListByLearnerPerGroups()
     {
-        this.groupingByLearnerPerGroups.getGrouper().doGrouping(groupingByLearnerPerGroups, null, userList);
+        this.groupingByLearnerPerGroups.getGrouper().doGrouping(groupingByLearnerPerGroups, (String)null, userList);
         Group groupWithLeastMember = groupingByLearnerPerGroups.getGroupWithLeastMember();
 
         for(Iterator i = groupingByLearnerPerGroups.getGroups().iterator();i.hasNext();)
@@ -185,7 +185,7 @@ public class TestRandomGrouper extends TestCase
      */
     public void testDoGroupingDuplicateLearnerByLearnerPerGroups()
     {
-        this.groupingByLearnerPerGroups.getGrouper().doGrouping(groupingByLearnerPerGroups, null, userList);
+        this.groupingByLearnerPerGroups.getGrouper().doGrouping(groupingByLearnerPerGroups, (String)null, userList);
         Group groupWithLeastMember = groupingByLearnerPerGroups.getGroupWithLeastMember();
 
         for(Iterator i = groupingByLearnerPerGroups.getGroups().iterator();i.hasNext();)
