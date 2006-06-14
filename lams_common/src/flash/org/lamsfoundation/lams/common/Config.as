@@ -311,7 +311,11 @@ class Config {
 				return lang;
 			}
         } else {
-			return 'en';
+			if(!_root.country){
+				return 'en_AU';
+			} else {
+				return 'en';
+			}
 		}
         
     }
