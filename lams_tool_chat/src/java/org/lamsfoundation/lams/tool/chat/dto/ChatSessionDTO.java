@@ -32,36 +32,48 @@ import java.util.TreeSet;
 
 import org.lamsfoundation.lams.tool.chat.model.ChatMessage;
 import org.lamsfoundation.lams.tool.chat.model.ChatSession;
+import org.lamsfoundation.lams.tool.chat.model.ChatUser;
 
 public class ChatSessionDTO implements Comparable {
+	
+	Long sessionID;
+
+	String sessionName;
+	
+	Set<ChatMessageDTO> messageDTOs;
+	
+	Set<ChatUserDTO> userDTOs;
+	
+	int postCount;
 	
 	public ChatSessionDTO(ChatSession session) {
 		this.sessionID = session.getSessionId();
 		this.sessionName = session.getSessionName();
 		
-		chatMessages = new TreeSet<ChatMessageDTO>();
+		messageDTOs = new TreeSet<ChatMessageDTO>();
 		for (Iterator i = session.getChatMessages().iterator(); i.hasNext();) {
-			chatMessages.add(new ChatMessageDTO((ChatMessage) i.next()));
+			messageDTOs.add(new ChatMessageDTO((ChatMessage) i.next()));
 		}
+		
+		userDTOs = new TreeSet<ChatUserDTO>();
 	}
 	
 	public ChatSessionDTO (ChatSession session, List messages) {
 		this.sessionID = session.getSessionId();
 		this.sessionName = session.getSessionName();
 		
-		chatMessages = new TreeSet<ChatMessageDTO>();
+		messageDTOs = new TreeSet<ChatMessageDTO>();
 		for (Iterator i = messages.iterator(); i.hasNext();) {
-			chatMessages.add(new ChatMessageDTO((ChatMessage) i.next()));
-		}		
+			messageDTOs.add(new ChatMessageDTO((ChatMessage) i.next()));
+		}
+		
+		userDTOs = new TreeSet<ChatUserDTO>();
 	}
 	
-	public ChatSessionDTO() {}
-	
-	Long sessionID;
-
-	String sessionName;
-	
-	Set<ChatMessageDTO> chatMessages;
+	public ChatSessionDTO() {
+		userDTOs = new TreeSet<ChatUserDTO>();
+		messageDTOs = new TreeSet<ChatMessageDTO>();
+	}
 	
 	public Long getSessionID() {
 		return sessionID;
@@ -79,12 +91,12 @@ public class ChatSessionDTO implements Comparable {
 		this.sessionName = sessionName;
 	}
 
-	public Set<ChatMessageDTO> getChatMessages() {
-		return chatMessages;
+	public Set<ChatMessageDTO> getMessageDTOs() {
+		return messageDTOs;
 	}
 
-	public void setChatMessages(Set<ChatMessageDTO> chatMessages) {
-		this.chatMessages = chatMessages;
+	public void setMessageDTOs(Set<ChatMessageDTO> chatMessages) {
+		this.messageDTOs = chatMessages;
 	}
 
 	public int compareTo(Object o) {
@@ -95,5 +107,21 @@ public class ChatSessionDTO implements Comparable {
 			returnValue = this.sessionID.compareTo(toSession.sessionID);			
 		}
 		return returnValue;		
+	}
+
+	public Set<ChatUserDTO> getUserDTOs() {
+		return userDTOs;
+	}
+
+	public void setUserDTOs(Set<ChatUserDTO> chatUsers) {
+		this.userDTOs = chatUsers;
+	}
+
+	public int getPostCount() {
+		return postCount;
+	}
+
+	public void setPostCount(int postCount) {
+		this.postCount = postCount;
 	}
 }
