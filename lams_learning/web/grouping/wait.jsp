@@ -28,15 +28,27 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <div align="center">
 
+<c:set var="formAction" value="/grouping.do?method=performGrouping"/>
+
 	<h1><fmt:message key="label.view.groups.title"/></h1>
 	<table border="0" cellpadding="0" cellspacing="0" summary="This table is being used for layout purposes">
 	<tr>
-		<td><fmt:message key="message.view.groups.wait"/></td>
+		<td><fmt:message key="label.view.view.groups.wait.message"/></td>
 	</tr>
+	
+	<c:if test="${GroupingForm.map.previewLesson == true}">
+	<c:set var="formAction"><c:out value="${formAction}"/>&force=true</c:set>
+	<tr><td>&nbsp;</td></tr>
+	<tr>
+		<td><em><fmt:message key="label.grouping.preview.message"/></em></td>
+	</tr>
+	<tr><td>&nbsp;</td></tr>
+	</c:if>
+
 	<tr>
 		<td align="right">
-			<html:form action="/grouping.do?method=performGrouping" target="_self">
-				<html:submit styleClass="button"><fmt:message key="label.gate.next.button"/></html:submit>
+			<html:form action="${formAction}" target="_self">
+				<html:submit styleClass="button"><fmt:message key="label.next.button"/></html:submit>
 			</html:form>
 		</td>
 	</tr>

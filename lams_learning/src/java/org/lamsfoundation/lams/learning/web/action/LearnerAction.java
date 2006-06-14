@@ -310,9 +310,15 @@ public class LearnerAction extends LamsDispatchAction
 	
 	        //SessionBean sessionBean = LearningWebUtil.getSessionBean(request,getServlet().getServletContext());
     		
+	        Integer learnerId = LearningWebUtil.getUserId();
 	        ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
-		    long learnerProgressId = WebUtil.readLongParam(request,LearningWebUtil.PARAM_PROGRESS_ID);
-		    LearnerProgressDTO learnerProgress = learnerService.getProgressDTOById(new Long(learnerProgressId));
+	        
+		    Long lessonId = WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID,true);
+		    if ( lessonId == null ) {
+		        // temporary code until Flash gets updated to send the lessonID parameter
+		    	lessonId = WebUtil.readLongParam(request,LearningWebUtil.PARAM_PROGRESS_ID);
+		    }
+		    LearnerProgressDTO learnerProgress = learnerService.getProgressDTOByLessonId(lessonId, learnerId);
 	        
 	        message = new FlashMessage("getFlashProgressData",learnerProgress);
 

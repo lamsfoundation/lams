@@ -36,6 +36,7 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
@@ -45,6 +46,7 @@ import org.lamsfoundation.lams.learningdesign.GroupComparator;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
@@ -55,6 +57,9 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * (random grouping) and allows the learner to view the result of the grouping.
  * </p>
  * 
+ * <p>Has a special override key - if the parameter force is set and the 
+ * lesson is a preview lesson, any chosen grouping will be overridden. 
+ * </p>
  * @author Jacky Fang
  * @since  2005-3-29
  * @version 1.1
@@ -78,6 +83,9 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 public class GroupingAction extends LamsDispatchAction
 {
 
+    /** Input parameter. Boolean value */
+    public static final String PARAM_FORCE_GROUPING  = "force";
+
     //---------------------------------------------------------------------
     // Instance variables
     //---------------------------------------------------------------------
@@ -99,6 +107,8 @@ public class GroupingAction extends LamsDispatchAction
     //---------------------------------------------------------------------    
     /**
      * Perform the grouping for the users who are currently running the lesson.
+     * If force is set to true, then we should be in preview mode, and we want to 
+     * override the chosen grouping to make it group straight away.
      * 
      * @param mapping
      * @param form
@@ -117,17 +127,21 @@ public class GroupingAction extends LamsDispatchAction
         LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgressByID(request,
                                                                              getServlet().getServletContext());
         validateLearnerProgress(learnerProgress);
-        
+
+        boolean forceGroup = WebUtil.readBooleanParam(request,PARAM_FORCE_GROUPING,false);
+
         //initialize service object
         ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
         
         boolean groupingDone = learnerService.performGrouping(learnerProgress.getLesson().getLessonId(),
         								learnerProgress.getNextActivity().getActivityId(), 
-        								LearningWebUtil.getUserId());
+        								LearningWebUtil.getUserId(),forceGroup);
 
         LearningWebUtil.putActivityInRequest(request, learnerProgress.getNextActivity(), learnerService);
         LearningWebUtil.setLessonId(learnerProgress.getLesson().getLessonId());
         
+        DynaActionForm groupForm = (DynaActionForm)form;
+        groupForm.set("previewLesson",learnerProgress.getLesson().isPreviewLesson());
         return mapping.findForward(groupingDone ? VIEW_GROUP : WAIT_GROUP);
     }
 

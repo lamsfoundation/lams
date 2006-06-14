@@ -83,12 +83,13 @@ public interface ILearnerService
     public LearnerProgress getProgressById(Long progressId);
     
     /**
-     * Return the current progress data against progress id.
+     * Return the current progress data for a user for a lesson
      * Returns a DTO suitable to send to Flash.
-     * @param progressId
+     * @param lesson id
+     * @param learner id
      * @return
      */
-    public LearnerProgressDTO getProgressDTOById(Long progressId);
+    public LearnerProgressDTO getProgressDTOByLessonId(Long lessonId, Integer learnerId);
 
     /**
      * Marks an activity as attempted. Called when a user selects an OptionsActivity.
@@ -197,9 +198,10 @@ public interface ILearnerService
      * @param lessonId lesson id
      * @param groupingActivityId the activity that has create grouping.
      * @param learnerId the learner who triggers the grouping.
+     * @param forceGrouping if forceGrouping==true and the lesson is a preview lesson then the groupings is done irrespective of the grouping type
      * @return true if grouping done, false if waiting for grouping to occur
      */
-    public boolean performGrouping(Long lessonId, Long groupingActivityId, Integer learnerId);
+    public boolean performGrouping(Long lessonId, Long groupingActivityId, Integer learnerId, boolean forceGrouping);
     
 
     /**
@@ -210,8 +212,10 @@ public interface ILearnerService
      * @param gateid the gate that current learner is facing. It could be 
      * 			   synch gate, schedule gate or permission gate.
      * @param knocker the learner who wants to go through the gate.
+     * @param forceGate if forceGate==true and the lesson is a preview lesson then the gate is opened straight away.
+     * @return true if the gate is now open
      */
-    public boolean knockGate(Long lessonId, Long gateActivityId, User knocker);
+    public boolean knockGate(Long lessonId, Long gateActivityId, User knocker, boolean forceGate);
 
     /**
      * Check up the gate status to go through the gate. This also updates the gate.
@@ -223,6 +227,8 @@ public interface ILearnerService
      * 			   Don't supply the actual gate from the cached web version
      * 			   as it might be out of date or not attached to the session
      * @param knocker the learner who wants to go through the gate.
+     * @param forceGate if forceGate==true and the lesson is a preview lesson then the gate is opened straight away.
+     * @return true if the gate is now open
      */
-    public boolean knockGate(Long lessonId, GateActivity gateActivity, User knocker);
+    public boolean knockGate(Long lessonId, GateActivity gateActivity, User knocker, boolean forceGate);
 }

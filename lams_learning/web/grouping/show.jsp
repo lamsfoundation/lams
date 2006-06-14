@@ -52,7 +52,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<tr> 
 				<td align="right" valign="top" class="bodyBold">&nbsp;</td>
 				<td align="right">
-					<html:submit styleClass="button" onmouseover="pviiClassNew(this,'buttonover')" onmouseout="pviiClassNew(this,'button')"><fmt:message key="label.activity.finish"/></html:submit>
+					<html:submit styleClass="button" onmouseover="pviiClassNew(this,'buttonover')" onmouseout="pviiClassNew(this,'button')"><fmt:message key="label.finish.button"/></html:submit>
 				</td>
 			</tr>
 		</table>

@@ -255,7 +255,8 @@ public class LearnerService implements ILearnerService
         }
         
         createToolSessionsIfNecessary(learnerProgress);
-    	return learnerProgress;
+        lessonService.cacheLessonUser(lesson, learner);
+        return learnerProgress;
     }
     
 
@@ -281,11 +282,11 @@ public class LearnerService implements ILearnerService
     }
     
     /**
-     * @see org.lamsfoundation.lams.learning.service.ILearnerService#getProgressDTOById(java.lang.Long)
+     * @see org.lamsfoundation.lams.learning.service.ILearnerService#getProgressDTOByLessonId(java.lang.Long, org.lamsfoundation.lams.usermanagement.User)
      */
-    public LearnerProgressDTO getProgressDTOById(Long progressId)
+    public LearnerProgressDTO getProgressDTOByLessonId(Long lessonId, Integer learnerId)
     {
-        return learnerProgressDAO.getLearnerProgress(progressId).getLearnerProgressData();
+        return learnerProgressDAO.getLearnerProgressByLearner(learnerId, lessonId).getLearnerProgressData();
     }
 
     /**
@@ -410,7 +411,7 @@ public class LearnerService implements ILearnerService
      * @throws LearnerServiceException 
      * @see org.lamsfoundation.lams.learning.service.ILearnerService#performGrouping(java.lang.Long, java.lang.Long, java.lang.Integer)
      */
-    public boolean performGrouping(Long lessonId, Long groupingActivityId, Integer learnerId) throws LearnerServiceException
+    public boolean performGrouping(Long lessonId, Long groupingActivityId, Integer learnerId, boolean forceGrouping) throws LearnerServiceException
     {
     	GroupingActivity groupingActivity = (GroupingActivity) activityDAO.getActivityByActivityId(groupingActivityId, GroupingActivity.class);
     	User learner = userManagementService.getUserById(learnerId);
@@ -419,12 +420,28 @@ public class LearnerService implements ILearnerService
     	try {
 	    	if ( groupingActivity != null && groupingActivity.getCreateGrouping()!=null && learner != null ) {
 	    		Grouping grouping = groupingActivity.getCreateGrouping();
+	    		
 	    		if ( grouping.isRandomGrouping() ) {
+	    			// normal and preview cases for random grouping 
 	    			lessonService.performGrouping(lessonId, groupingActivity, learner);
 	    			groupingDone = true;
-	    		} else {
+	    			
+	    		} else if ( forceGrouping ) {
+	    			// preview case for chosen grouping 
+	            	Lesson lesson = getLesson(lessonId);
+	            	if ( lesson.isPreviewLesson() ) {
+	            		ArrayList learnerList = new ArrayList();
+	            		learnerList.add(learner);
+	            		lessonService.performGrouping(groupingActivity, (String)null, learnerList);
+		    			groupingDone = true;
+	            	}
+	        	} 
+
+	    		if ( ! groupingDone ) {
+	    			// normal case for chosen grouping
 	    			groupingDone = grouping.doesLearnerExist(learner);
 	    		}
+	    		
 	    	} else {
 	    		String error = "Grouping activity "+groupingActivityId+" learner "+learnerId+" does not exist. Cannot perform grouping.";
 	            log.error(error);
@@ -440,10 +457,10 @@ public class LearnerService implements ILearnerService
     /**
      * @see org.lamsfoundation.lams.learning.service.ILearnerService#knockGate(java.lang.Long, java.lang.Long, org.lamsfoundation.lams.usermanagement.User)
      */
-    public boolean knockGate(Long lessonId, Long gateActivityId, User knocker) {
+    public boolean knockGate(Long lessonId, Long gateActivityId, User knocker, boolean forceGate) {
     	GateActivity gate = (GateActivity) activityDAO.getActivityByActivityId(gateActivityId, GateActivity.class);
     	if ( gate != null ) {
-    		return knockGate(lessonId, gate,knocker);
+    		return knockGate(lessonId, gate,knocker, forceGate);
     	} 
     	
 		String error = "Gate activity "+gateActivityId+" does not exist. Cannot knock on gate.";
@@ -453,17 +470,25 @@ public class LearnerService implements ILearnerService
     /**
      * @see org.lamsfoundation.lams.learning.service.ILearnerService#knockGate(java.lang.Long, org.lamsfoundation.lams.learningdesign.GateActivity, org.lamsfoundation.lams.usermanagement.User)
      */
-    public boolean knockGate(Long lessonId, GateActivity gate, User knocker)
+    public boolean knockGate(Long lessonId, GateActivity gate, User knocker, boolean forceGate)
     {
     		//get all learners who have started the lesson
         	List lessonLearners = getActiveLearnersByLesson(lessonId);
-
-	        boolean gateOpen = false;
-	        //knock the gate.
-	        if(gate.shouldOpenGateFor(knocker,lessonLearners))
-	            gateOpen = true;
-	        else
-	            gateOpen = false;
+        	
+        	boolean gateOpen = false;
+        	
+        	if ( forceGate ) {
+            	Lesson lesson = getLesson(lessonId);
+            	if ( lesson.isPreviewLesson() ) {
+            		// special case for preview - if forceGate is true then brute force open the gate
+            		gateOpen = gate.forceGateOpen();
+            	}
+        	} 
+        	
+        	if ( ! gateOpen ) {
+        		// normal case - knock the gate.
+        		gateOpen = gate.shouldOpenGateFor(knocker,lessonLearners);
+        	}
 	        
 	        //update gate including updating the waiting list and gate status in
 	        //the database.

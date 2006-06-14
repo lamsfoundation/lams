@@ -27,6 +27,7 @@
     />
 
    <form-bean name="GroupingForm"  type="org.apache.struts.validator.DynaValidatorForm">
+	<form-property name="previewLesson" type="java.lang.Boolean" />
 </form-bean>
 
 <form-bean name="GateForm"  type="org.apache.struts.action.DynaActionForm">
@@ -36,6 +37,7 @@
 	<form-property name="totalLearners" type="java.lang.Integer" />
 	<form-property name="startingTime" type="java.util.Date" />
 	<form-property name="endingTime" type="java.util.Date" />
+	<form-property name="previewLesson" type="java.lang.Boolean" />
 </form-bean>
 
   </form-beans>
@@ -124,6 +126,11 @@
       unknown="false"
       validate="false"
     >
+      <forward
+        name="previewDefineLater"
+        path=".previewDefineLater"
+        redirect="false"
+      />
     </action>
     <action
       path="/CompleteActivity"

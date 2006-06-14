@@ -149,7 +149,7 @@
               				<td width="31%" align="right" valign="bottom">&nbsp;</td>
               				<td width="41%" align="right" valign="bottom">
               					<c:if test="${optionsActivityForm.finished}">
-									<input name="finishBtn" type="button" class="button" id="finishBtn" onClick="submitFinish()" onmouseover="setClass(this,'buttonover')" onmouseout="setClass(this,'button')" value="<fmt:message key="label.activity.finish" />">
+									<input name="finishBtn" type="button" class="button" id="finishBtn" onClick="submitFinish()" onmouseover="setClass(this,'buttonover')" onmouseout="setClass(this,'button')" value="<fmt:message key="label.finish.button" />">
 								</c:if>
               				</td>
       					</tr>

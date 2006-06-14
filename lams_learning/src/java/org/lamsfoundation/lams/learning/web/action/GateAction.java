@@ -43,6 +43,7 @@ import org.lamsfoundation.lams.learningdesign.PermissionGateActivity;
 import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
 import org.lamsfoundation.lams.learningdesign.SynchGateActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 
 
@@ -55,6 +56,11 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
  * 
  * <p>Learner will progress to the next activity if the gate is open. Otherwise,
  * the learner should see the waiting page.</p>
+ * 
+ * <p>Has a special override key - if the parameter force is set and the 
+ * lesson is a preview lesson, then the gate will be opened straight away. This
+ * allows the author to see gate shut initially but override it and open it 
+ * rather than being held up by the gate. </p>
  * 
  * @author Jacky Fang
  * @since  2005-4-7
@@ -91,6 +97,9 @@ public class GateAction extends LamsDispatchAction
     private static final String VIEW_SCHEDULE_GATE = "scheduleGate";
     private static final String VIEW_SYNCH_GATE = "synchGate";
 	
+    /** Input parameter. Boolean value */
+    public static final String PARAM_FORCE_GATE_OPEN  = "force";
+
     //---------------------------------------------------------------------
     // Struts Dispatch Method
     //---------------------------------------------------------------------    
@@ -115,13 +124,15 @@ public class GateAction extends LamsDispatchAction
         //validate pre-condition.
         validateLearnerProgress(learnerProgress);
         
+        boolean forceGate = WebUtil.readBooleanParam(request,PARAM_FORCE_GATE_OPEN,false);
+        
         //initialize service object
         ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
         Integer totalNumActiveLearners =  learnerService.getCountActiveLearnersByLesson(learnerProgress.getLesson().getLessonId());
         //knock the gate
         boolean gateOpen = learnerService.knockGate(learnerProgress.getLesson().getLessonId(),
         											learnerProgress.getNextActivity().getActivityId(),
-                                                    learnerProgress.getUser());
+                                                    learnerProgress.getUser(),forceGate);
         // if the gate is open, let the learner go to the next activity ( updating the cached learner progress on the way )
         // pass only the ids in to completeActivity, so that the service level looks up the objects.
         // if we reuse our cached entries, hibernate may throw session errors (if the objects are CGLIB entities).
@@ -139,7 +150,7 @@ public class GateAction extends LamsDispatchAction
         else {
         	learnerProgress = learnerService.getProgressById(learnerProgress.getLearnerProgressId());
             LearningWebUtil.setLearnerProgress(learnerProgress);
-            return findViewByGateType(mapping, (DynaActionForm)form, learnerProgress.getCurrentActivity(), totalNumActiveLearners);
+            return findViewByGateType(mapping, (DynaActionForm)form, learnerProgress.getCurrentActivity(), totalNumActiveLearners, learnerProgress.getLesson().isPreviewLesson());
         }
     }
 	
@@ -185,11 +196,13 @@ public class GateAction extends LamsDispatchAction
     private ActionForward findViewByGateType(ActionMapping mapping, 
                                              DynaActionForm gateForm, 
                                              Activity gate,
-                                             Integer totalNumActiveLearners)
+                                             Integer totalNumActiveLearners,
+                                             boolean isPreviewLesson)
     {
         //dispatch the view according to the type of the gate.
        	if ( gate != null ) {
        		gateForm.set("totalLearners",totalNumActiveLearners);
+       		gateForm.set("previewLesson",isPreviewLesson);
 	        if(gate.isSynchGate())
 	            return viewSynchGate(mapping,gateForm,(SynchGateActivity)gate);
 	        else if(gate.isScheduleGate())
