@@ -127,7 +127,7 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Vo
     	VoteMonitoringAction voteMonitoringAction= new VoteMonitoringAction();
     	voteMonitoringAction.refreshSummaryData(request, content, voteService, true, true, toolSessionID.toString(), userID.toString() , true);
     	
-    	MonitoringUtil.prepareChartDataForExportLearner(request, voteService, null, content.getVoteContentId(), voteSession.getUid());
+    	MonitoringUtil.prepareChartDataForExportTeacher(request, voteService, null, content.getVoteContentId(), voteSession.getUid());
     	logger.debug("post prepareChartDataForExport");
     	
     	logger.debug("ending learner mode: ");

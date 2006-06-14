@@ -202,7 +202,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							<c:if test="${currentDto.existsOpenVote == 'true' }"> 			
 							
 								<tr>
-							 		<td NOWRAP colspan=2> <bean:message key="label.summary.sessionSeparator"/></td>
+									
+							 		<td NOWRAP colspan=2> <hr size="1"> </td>
 								</tr>
 	
 								<tr>
@@ -212,11 +213,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								<tr>
 							 		<td NOWRAP colspan=2>
 						 			<table align=left>
-						 					<tr>
-										 		<td NOWRAP align=center> 
-													<b> <font size=2> <bean:message key="label.openVotes"/> </b>
-												</td>
-											</tr>
+												<tr>
+											 		<th NOWRAP colspan=3>  <bean:message key="label.openVotes"/>  </th>
+												</tr>
 	
 												<tr> 
 													 <td NOWRAP valign=top align=left> <b> <font size=2>  <bean:message key="label.vote"/> </font> </b> </td>  														 
@@ -273,7 +272,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							 
 		 					<tr> <td NOWRAP colspan=2>  </td>
 							</tr>
-		 					<tr> <td NOWRAP colspan=2> <HR> </td>
+		 					<tr> <td NOWRAP colspan=2> <hr size="2"></td>
 							</tr>
 		 					<tr> <td NOWRAP colspan=2>  </td>
 							</tr>

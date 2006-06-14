@@ -46,23 +46,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									 		<td NOWRAP> <b> <font size=2> <bean:message key="label.nomination"/> </b> </td>
 											<td NOWRAP> <b> <font size=2> <bean:message key="label.total.votes"/> </b> </td>
 										</tr>
-										
-										
+
 										<c:forEach var="currentNomination" items="${mapStandardNominationsHTMLedContent}">
 								  	 		<c:set var="currentNominationKey" scope="request" value="${currentNomination.key}"/>
 								  	 		 <tr>
 					  	 						<td NOWRAP valign=top align=left>
-								  	 		  		<c:forEach var="currentVoteVisibility" items="${mapStandardNominationsVisibility}">
-												  	 		<c:set var="currentVisibilityKey" scope="request" value="${currentVoteVisibility.key}"/>
-											  				<c:if test="${currentNominationKey == currentVisibilityKey}"> 				
-												  				<c:if test="${currentVoteVisibility.value == 'true'}"> 				
-																	<c:out value="${currentNomination.value}" escapeXml="false"/>		
-																</c:if> 	    
-												  				<c:if test="${currentVoteVisibility.value != 'true'}"> 				
-																	<font size=2> <bean:message key="label.hiddenLearner"/> </font>
-																</c:if> 	    
-															</c:if> 	  
-													</c:forEach>		  
+													<c:out value="${currentNomination.value}" escapeXml="false"/>
 												 </td>
 				
 												<td NOWRAP valign=top align=left>				  	 		
@@ -82,6 +71,36 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 												</td>								
 											</tr>	
 										</c:forEach>	
+
+										
+										<tr>
+									 		<td NOWRAP colspan=2>
+								 			<table align=left>
+														<tr>
+													 		<th NOWRAP colspan=2>  <bean:message key="label.openVotes"/>  </th>
+														</tr>
+			
+														<tr> 
+															 <td NOWRAP valign=top align=left> <b> <font size=2>  <bean:message key="label.vote"/> </font> </b> </td>  														 
+									  						 <td NOWRAP valign=top align=left> <b> <font size=2>  <bean:message key="label.attemptTime"/></font> </b></td>
+											  			</tr>				 
+													
+								 			
+													<c:forEach var="currentDto" items="${sessionScope.listUserEntries}">
+								  							<c:forEach var="questionAttemptData" items="${currentDto.questionAttempts}">
+													  	 		<c:set var="userData" scope="request" value="${questionAttemptData.value}"/>
+																<tr> 
+																		<td NOWRAP valign=top align=left> 
+																				<c:out value="${currentDto.question}" escapeXml="false"/> 
+																		</td>
+																		 <td NOWRAP valign=top align=left>   <font size=2> <c:out value="${userData.attemptTime}"/> </font> </td>
+																</tr>		
+															</c:forEach>		  	
+													</c:forEach>		
+											</table> 
+											</td>
+										</tr>
+										
 									</c:if>											
 
 
@@ -119,6 +138,44 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 												</td>								
 											</tr>	
 										</c:forEach>	
+										
+										
+								<tr>
+							 		<td NOWRAP colspan=2>
+						 			<table align=left>
+												<tr>
+											 		<th NOWRAP colspan=3>  <bean:message key="label.openVotes"/>  </th>
+												</tr>
+	
+												<tr> 
+													 <td NOWRAP valign=top align=left> <b> <font size=2>  <bean:message key="label.vote"/> </font> </b> </td>  														 
+													 <td NOWRAP valign=top align=left> <b> <font size=2>  <bean:message key="label.user"/> </font> </b> </td>  
+							  						 <td NOWRAP valign=top align=left> <b> <font size=2>  <bean:message key="label.attemptTime"/></font> </b></td>
+									  			</tr>				 
+											
+						 			
+											<c:forEach var="currentDto" items="${sessionScope.listUserEntries}">
+						  							<c:forEach var="questionAttemptData" items="${currentDto.questionAttempts}">
+											  	 		<c:set var="userData" scope="request" value="${questionAttemptData.value}"/>
+		  	 									  	 		<c:set var="currentUid" scope="request" value="${userData.uid}"/>
+														<tr> 
+																<td NOWRAP valign=top align=left> 
+																	<c:out value="${currentDto.question}" escapeXml="false"/> 
+																	<c:if test="${userData.visible != 'true' }"> 			
+												                                <font size=2> <i><bean:message key="label.hidden"/> </i> </font>											                                
+																	</c:if> 								
+																</td>
+																 
+																 <td NOWRAP valign=top align=left>   <font size=2> <c:out value="${userData.userName}"/> </font>  </td>  
+																 <td NOWRAP valign=top align=left>   <font size=2> <c:out value="${userData.attemptTime}"/> </font> </td>
+														</tr>		
+													</c:forEach>		  	
+											</c:forEach>		
+									</table> 
+									</td>
+								</tr>
+
+										
 									</c:if>											
 
 								</table>
@@ -164,6 +221,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 										</tr>
 									</c:if>											
 	
+					 			
+					 			
 									<c:if test="${(portfolioExportMode != 'learner')}">
 										<tr>
 									 		<th NOWRAP>  <bean:message key="label.all.learnerVotes"/>  </th>
