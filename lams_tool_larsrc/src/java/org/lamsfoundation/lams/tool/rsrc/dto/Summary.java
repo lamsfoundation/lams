@@ -72,15 +72,18 @@ public class Summary {
 	public Summary(Long sessionId, String sessionName, ResourceItem item){
 		this.sessionId = sessionId;
 		this.sessionName = sessionName;
-		this.itemUid = item.getUid();
-		this.itemType = item.getType();
-		this.itemCreateByAuthor = item.isCreateByAuthor();
-		this.itemHide = item.isHide();
-		this.itemTitle = item.getTitle();
-		this.username = item.getCreateBy() == null?"":item.getCreateBy().getLoginName();
-		this.url = item.getUrl();
-		this.fileUuid = item.getFileUuid();
-		this.fileVersionId = item.getFileVersionId();
+		if(item != null){
+			this.itemUid = item.getUid();
+			this.itemType = item.getType();
+			this.itemCreateByAuthor = item.isCreateByAuthor();
+			this.itemHide = item.isHide();
+			this.itemTitle = item.getTitle();
+			this.username = item.getCreateBy() == null?"":item.getCreateBy().getLoginName();
+			this.url = item.getUrl();
+			this.fileUuid = item.getFileUuid();
+			this.fileVersionId = item.getFileVersionId();
+		}else
+			this.itemUid = new Long(-1);
 	}
 	/**
 	 * Contruction method for export profolio function. 
@@ -92,16 +95,18 @@ public class Summary {
 	 */
 	public Summary(String sessionName, ResourceItem item,boolean isInitGroup){
 		this.sessionName = sessionName;
-		this.itemUid = item.getUid();
-		this.itemType = item.getType();
-		this.itemCreateByAuthor = item.isCreateByAuthor();
-		this.itemHide = item.isHide();
-		this.itemTitle = item.getTitle();
-		this.username = item.getCreateBy() == null?"":item.getCreateBy().getLoginName();
-		this.url = item.getUrl();
-		this.fileUuid = item.getFileUuid();
-		this.fileVersionId = item.getFileVersionId();
-		
+		if(item != null){
+			this.itemUid = item.getUid();
+			this.itemType = item.getType();
+			this.itemCreateByAuthor = item.isCreateByAuthor();
+			this.itemHide = item.isHide();
+			this.itemTitle = item.getTitle();
+			this.username = item.getCreateBy() == null?"":item.getCreateBy().getLoginName();
+			this.url = item.getUrl();
+			this.fileUuid = item.getFileUuid();
+			this.fileVersionId = item.getFileVersionId();
+		}else
+			this.itemUid = new Long(-1);
 		this.isInitGroup = isInitGroup;
 	}
 	public boolean isItemCreateByAuthor() {

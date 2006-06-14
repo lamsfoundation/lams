@@ -87,15 +87,7 @@ public class ExportServlet  extends AbstractExportPortfolioServlet {
             throw new ForumException(error);
         }
         
-       Forum content = forumService.getForumByContentId(toolSessionID);
-        
-        if (content == null)
-        {
-            String error="The content for this activity has not been defined yet.";
-            logger.error(error);
-            throw new ForumException(error);
-        }
-        List topicList = forumService.getAllTopicsFromSession(toolSessionID);
+        List<MessageDTO> topicList = forumService.getAllTopicsFromSession(toolSessionID);
 		Map topicsByUser = getTopicsSortedByAuthor(topicList);	
 		request.getSession().setAttribute("report",topicsByUser);
     }

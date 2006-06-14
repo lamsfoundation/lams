@@ -750,7 +750,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 
 		return content;
 	}
-	public List getAllTopicsFromSession(Long sessionID) {
+	public List<MessageDTO> getAllTopicsFromSession(Long sessionID) {
 		return MessageDTO.getMessageDTO(messageDao.getBySession(sessionID));
 	}
     //***************************************************************************************************************

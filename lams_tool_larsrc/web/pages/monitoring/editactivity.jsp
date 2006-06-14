@@ -13,7 +13,7 @@
 		</tr>
 
 		<tr>
-			<td class="formlabel"> 
+			<td class="formlabel">
 				<fmt:message key="label.authoring.basic.instruction" />
 				:
 			</td>
@@ -21,7 +21,7 @@
 				<c:out value="${resource.instructions}" escapeXml="false" />
 			</td>
 		</tr>
-		
+
 		<tr>
 			<td class="formlabel" colspan="2">
 				<c:set var="isPageEditable" value="${isPageEditable}" />
@@ -35,9 +35,9 @@
 						</html:link>
 					</c:when>
 					<c:otherwise>
-						<SPAN style="font-size: 12px;">
-							<fmt:message key="message.monitoring.edit.activity.not.editable" />
-						</SPAN>
+						<div align="center">
+							<b> <fmt:message key="message.monitoring.edit.activity.not.editable" /> </b>
+						</div>
 					</c:otherwise>
 				</c:choose>
 			</td>

@@ -44,6 +44,7 @@
 <%@ attribute name="cancelButtonLabelKey" required="false" rtexprvalue="true" %>
 <%@ attribute name="saveButtonLabelKey" required="false" rtexprvalue="true" %>
 <%@ attribute name="cancelConfirmMsgKey" required="false" rtexprvalue="true" %>
+<%@ attribute name="defineLater" required="false" rtexprvalue="false" %>
 
 <%-- Default value for message key --%>
 <c:if test="${empty cancelButtonLabelKey}">
@@ -62,22 +63,22 @@
 <!-- begin tab content -->
 <script type="text/javascript">
 	if(<c:choose><c:when test="${LAMS_AUTHORING_SUCCESS_FLAG == true}">true</c:when><c:otherwise>false</c:otherwise></c:choose>){
-        	location.href="<c:url value='${clearSessionActionUrl}?action=confirm&mode=${accessMode}&signature=${toolSignature}&toolContentID=${toolContentID}'/>";
+       	location.href="<c:url value='${clearSessionActionUrl}?action=confirm&mode=${accessMode}&signature=${toolSignature}&toolContentID=${toolContentID}&defineLater=${defineLater}'/>";
+	}
+    function doSubmit_Form_Only() {
+    	document.getElementById("${formID}").submit();
+    }
+    function doCancel() {
+    	if(confirm("<fmt:message key='${cancelConfirmMsgKey}'/>")){
+        	location.href="<c:url value='${clearSessionActionUrl}?action=cancel&mode=${accessMode}'/>";
+        	//just for depress alert window when call window.close()
+        	//only available for IE browser
+        	var userAgent=navigator.userAgent;
+        	if(userAgent.indexOf('MSIE') != -1)
+	        	window.opener = "authoring"
+        	window.close();
 		}
-        function doSubmit_Form_Only() {
-        	document.getElementById("${formID}").submit();
-        }
-        function doCancel() {
-        	if(confirm("<fmt:message key='${cancelConfirmMsgKey}'/>")){
-	        	location.href="<c:url value='${clearSessionActionUrl}?action=cancel&mode=${accessMode}'/>";
-	        	//just for depress alert window when call window.close()
-	        	//only available for IE browser
-	        	var userAgent=navigator.userAgent;
-	        	if(userAgent.indexOf('MSIE') != -1)
-		        	window.opener = "authoring"
-	        	window.close();
-			}
-        }  				
+    }  				
 </script>				
 <p align="right">
 	<html:link href="javascript:doSubmit_Form_Only();" property="submit" styleClass="button">

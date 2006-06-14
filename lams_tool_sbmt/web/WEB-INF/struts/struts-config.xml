@@ -192,29 +192,16 @@
       />
     </action>
 
-   		<!-- ========== Action Mapping Definitions ============================== -->
-		<action path="/definelater"
-			type="org.lamsfoundation.lams.tool.sbmt.web.AuthoringAction"
-			name="emptyForm" 
-			scope="request" 
-			parameter="method" 
-			validate="false">
-			      <forward
-			        name="definelater"
-			        path="/authoring/definelater.jsp"
-			        redirect="false"
-			      />
-			      <forward
-			        name="forbidden"
-			        path="/authoring/definelaterforbid.jsp"
-			        redirect="false"
-			      />
-		</action>
+   <!-- ========== Action Mapping Definitions ============================== -->
+<action path="/definelater" type="org.lamsfoundation.lams.tool.sbmt.web.AuthoringAction" 
+		name="SbmtAuthoringForm" scope="request" parameter="dispatch" validate="false">
+	<forward name="success" path="/authoring/definelater.jsp"/>
+	<forward name="forbidden" path="/authoring/definelaterforbid.jsp"/>
+</action>
 
-		<!-- ========== BEGIN: Common ============================== -->
-		<action path="/clearsession"
-			type="org.lamsfoundation.lams.tool.sbmt.web.ClearSessionAction">
-		</action>
+<!-- ========== BEGIN: Common ============================== -->
+<action path="/clearsession" type="org.lamsfoundation.lams.tool.sbmt.web.ClearSessionAction"></action>
+
   </action-mappings>
 
    <!-- Define your Struts controller in a file called struts-controller.xml and place it in your merge directory. -->

@@ -33,8 +33,7 @@
 									<B><fmt:message key="export.init.resource" /></B>
 								</c:when>
 								<c:otherwise>
-									<B><fmt:message key="monitoring.label.group" />
-									${item.sessionName}</B>
+									<B><fmt:message key="monitoring.label.group" /> ${item.sessionName}</B>
 								</c:otherwise>
 							</c:choose>
 						</td>
@@ -62,59 +61,70 @@
 									</c:if>
 								</tr>
 								</c:if>
-								<tr>
-									<td>
-										<c:choose>
-											<c:when test="${item.itemType == 1}">
-												<fmt:message key="label.authoring.basic.resource.url" />
-											</c:when>
-											<c:when test="${item.itemType == 2}">
-												<fmt:message key="label.authoring.basic.resource.file" />
-											</c:when>
-											<c:when test="${item.itemType == 3}">
-												<fmt:message key="label.authoring.basic.resource.website" />
-											</c:when>
-											<c:when test="${item.itemType == 4}">
-												<fmt:message key="label.authoring.basic.resource.learning.object" />
-											</c:when>
-										</c:choose>
-									</td>
-									<td>
-										${item.itemTitle}
-									</td>
-									<td>
-										${item.username}
-									</td>
-									<td align="center">
-										<c:choose>
-											<c:when test="${item.itemType == 1}">
-												<a href="javascript:;" onclick="launchPopup('${item.url}','openurl');"> <fmt:message key="label.authoring.basic.resource.preview" /> </a>
-											</c:when>
-											<c:when test="${item.itemType == 2}">
-												<c:set var="downloadUrl">
-													<html:rewrite page="/download/?uuid=${item.fileUuid}&versionID=${item.fileVersionId}&preferDownload=false" />
-												</c:set>
-												<a href="${downloadUrl}"> <fmt:message key="label.download" /> </a>
-											</c:when>
-											<c:when test="${item.itemType == 3}">
-												<c:set var="downloadUrl">
-													<html:rewrite page="/download/?uuid=${item.fileUuid}&versionID=${item.fileVersionId}&preferDownload=false" />
-												</c:set>
-												<a href="${downloadUrl}"> <fmt:message key="label.download" /> </a>
-											</c:when>
-											<c:when test="${item.itemType == 4}">
-												<fmt:message key="export.label.no.learning.object" />
-											</c:when>
-										</c:choose>
-									</td>
-									<c:if test="${mode == 'teacher'}">
-										<td align="center">
-											<c:if test="${item.itemHide}">
-												<fmt:message key="monitoring.label.hidden" />
-											</c:if>
+								<c:if test="${item.itemUid == -1}">
+									<tr>
+										<td colspan="4">
+											<div align="left">
+												<b> <fmt:message key="message.monitoring.summary.no.resource.for.group" /> </b>
+											</div>
 										</td>
-									</c:if>
-								</tr>
+									</tr>
+								</c:if>
+								<c:if test="${item.itemUid != -1}">
+									<tr>
+										<td>
+											<c:choose>
+												<c:when test="${item.itemType == 1}">
+													<fmt:message key="label.authoring.basic.resource.url" />
+												</c:when>
+												<c:when test="${item.itemType == 2}">
+													<fmt:message key="label.authoring.basic.resource.file" />
+												</c:when>
+												<c:when test="${item.itemType == 3}">
+													<fmt:message key="label.authoring.basic.resource.website" />
+												</c:when>
+												<c:when test="${item.itemType == 4}">
+													<fmt:message key="label.authoring.basic.resource.learning.object" />
+												</c:when>
+											</c:choose>
+										</td>
+										<td>
+											${item.itemTitle}
+										</td>
+										<td>
+											${item.username}
+										</td>
+										<td align="center">
+											<c:choose>
+												<c:when test="${item.itemType == 1}">
+													<a href="javascript:;" onclick="launchPopup('${item.url}','openurl');"> <fmt:message key="label.authoring.basic.resource.preview" /> </a>
+												</c:when>
+												<c:when test="${item.itemType == 2}">
+													<c:set var="downloadUrl">
+														<html:rewrite page="/download/?uuid=${item.fileUuid}&versionID=${item.fileVersionId}&preferDownload=false" />
+													</c:set>
+													<a href="${downloadUrl}"> <fmt:message key="label.download" /> </a>
+												</c:when>
+												<c:when test="${item.itemType == 3}">
+													<c:set var="downloadUrl">
+														<html:rewrite page="/download/?uuid=${item.fileUuid}&versionID=${item.fileVersionId}&preferDownload=false" />
+													</c:set>
+													<a href="${downloadUrl}"> <fmt:message key="label.download" /> </a>
+												</c:when>
+												<c:when test="${item.itemType == 4}">
+													<fmt:message key="export.label.no.learning.object" />
+												</c:when>
+											</c:choose>
+										</td>
+										<c:if test="${mode == 'teacher'}">
+											<td align="center">
+												<c:if test="${item.itemHide}">
+													<fmt:message key="monitoring.label.hidden" />
+												</c:if>
+											</td>
+										</c:if>
+									</tr>
+								</c:if>
 								<c:if test="${status.count == groupSize}">
 							</table>
 						</td>

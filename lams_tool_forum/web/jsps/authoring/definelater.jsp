@@ -10,6 +10,7 @@
 <html:form action="authoring/update" method="post" styleId="authoringForm">
 	<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 	<html:hidden property="toolContentID" />
+	<html:hidden property="mode" value="teacher"/>
 
 	<!-- start tabs -->
 	<lams:Tabs collection="${tabs}" useKey="true" control="true" />
@@ -20,7 +21,7 @@
 		<!-- end of content (Basic) -->
 
 		<!-- Button Row -->
-		<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="<%=ForumConstants.TOOL_SIGNATURE%>" toolContentID="${formBean.toolContentID}" defineLater="yes"/>
+		<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="<%=ForumConstants.TOOL_SIGNATURE%>" toolContentID="${formBean.toolContentID}" accessMode="teacher" defineLater="yes"/>
 
 		<lams:HTMLEditor />
 	</div>

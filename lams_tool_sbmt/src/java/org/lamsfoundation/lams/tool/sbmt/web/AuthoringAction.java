@@ -310,7 +310,7 @@ public class AuthoringAction extends LamsDispatchAction {
 		authForm.set(AttributeNames.PARAM_TOOL_CONTENT_ID,contentID);
 		authForm.set("title",persistContent.getTitle());
 		authForm.set("lockOnFinished",persistContent.isLockOnFinished()?"1":null);
-		return mapping.getInputForward();
+		return mapping.findForward("success");
 	}
 
 	//***********************************************************
@@ -400,13 +400,15 @@ public class AuthoringAction extends LamsDispatchAction {
 		return list;
 	}
 	
+
 	/**
+	 * Get ToolAccessMode from HttpRequest parameters. Default value is AUTHOR mode.
 	 * @param request
 	 * @return
 	 */
 	private ToolAccessMode getAccessMode(HttpServletRequest request) {
 		ToolAccessMode mode;
-		String modeStr = request.getParameter("mode");
+		String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
 		if(StringUtils.equalsIgnoreCase(modeStr,ToolAccessMode.TEACHER.toString()))
 			mode = ToolAccessMode.TEACHER;
 		else

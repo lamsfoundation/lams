@@ -37,6 +37,7 @@ import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.poi.hpsf.SummaryInformation;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
@@ -315,7 +316,7 @@ public class ResourceServiceImpl implements
 		for(ResourceItem item:resList){
 			if(skipHide && item.isHide())
 				continue;
-			//if item is ha
+			//if item is create by author
 			if(item.isCreateByAuthor()){
 				Summary sum = new Summary(session.getSessionName(),item,false);
 				itemList.add(sum);
@@ -337,9 +338,9 @@ public class ResourceServiceImpl implements
 		
 		return itemList;
 	}
-	public List<List> exportByContentId(Long contentId) {
+	public List<List<Summary>> exportByContentId(Long contentId) {
 		Resource resource = resourceDao.getByContentId(contentId);
-		List<List> groupList = new ArrayList();
+		List<List<Summary>> groupList = new ArrayList();
 		
 		//create init resource items list
 		List<Summary> initList = new ArrayList();
@@ -364,6 +365,9 @@ public class ResourceServiceImpl implements
 					Summary sum = new Summary(session.getSessionName(),item,false);
 					group.add(sum);
 				}
+			}
+			if(group.size() == 0){
+				group.add(new Summary(session.getSessionName(),null,false));
 			}
 			groupList.add(group);
 		}
@@ -465,8 +469,8 @@ public class ResourceServiceImpl implements
 	public ResourceItem getResourceItemByUid(Long itemUid) {
 		return resourceItemDao.getByUid(itemUid);
 	}
-	public List<List> getSummary(Long contentId) {
-		List<List> groupList = new ArrayList<List>();
+	public List<List<Summary>> getSummary(Long contentId) {
+		List<List<Summary>> groupList = new ArrayList<List<Summary>>();
 		List<Summary> group = new ArrayList<Summary>();
 		
 		//get all item which is accessed by user
@@ -501,8 +505,11 @@ public class ResourceServiceImpl implements
 					group.add(sum);
 				}
 			}
+			//so far no any item available, so just put session name info to Summary
+			if(group.size() == 0)
+				group.add(new Summary(session.getSessionId(),session.getSessionName(),null));
 			groupList.add(group);
-		}
+		} 
 		
 		return groupList;
 

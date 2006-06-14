@@ -48,11 +48,6 @@
 	    	selectTab(tabId);
         } 
         
-        function doSubmit(method) {
-        	document.getElementById("authoringForm").dispatch.value=method;
-        	document.getElementById("authoringForm").submit();
-        }
-        
     </script>
 	<!-- ******************** END FCK Editor related javascript & HTML ********************** -->
 
@@ -60,7 +55,7 @@
 </head>
 <body onLoad="init()">
 
-	<html:form action="authoring" method="post" focus="title" styleId="authoringForm" enctype="multipart/form-data">
+	<html:form action="definelater" method="post" focus="title" styleId="authoringForm" enctype="multipart/form-data">
 		<html:hidden property="mode" value="teacher" />
 		<html:hidden property="toolContentID" />
 		<html:hidden property="currentTab" styleId="currentTab" />
@@ -85,7 +80,8 @@
 			<!-- tab content 1 (Basic) -->
 			<lams:TabBody id="1" titleKey="label.authoring.heading.basic.desc" page="basic.jsp" />
 
-			<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="<%=SbmtConstants.TOOL_SIGNATURE%>" toolContentID="${toolContentID}" definelater="yes" />
+			<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" accessMode="teacher"
+					toolSignature="<%=SbmtConstants.TOOL_SIGNATURE%>" toolContentID="${toolContentID}" defineLater="true" />
 
 		</div>
 		<lams:HTMLEditor />

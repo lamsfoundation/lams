@@ -53,6 +53,7 @@ import sun.util.logging.resources.logging;
 public class MonitoringAction extends Action {
 	public static Logger log = Logger.getLogger(MonitoringAction.class);
 	
+	
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) throws IOException, ServletException {
 		String param = mapping.getParameter();
@@ -124,7 +125,7 @@ public class MonitoringAction extends Action {
 			HttpServletResponse response) {
 		Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 		IResourceService service = getResourceService();
-		List<List> groupList = service.getSummary(contentId);
+		List<List<Summary>> groupList = service.getSummary(contentId);
 		
 		//put it into HTTPSession
 		request.getSession().setAttribute(ResourceConstants.ATTR_SUMMARY_LIST, groupList);

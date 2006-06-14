@@ -235,7 +235,8 @@ public class AuthoringAction extends Action {
 	public ActionForward updateContent(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
 
-		ToolAccessMode mode = (ToolAccessMode) request.getSession().getAttribute(AttributeNames.ATTR_MODE);
+		
+		ToolAccessMode mode = getAccessMode(request); 
 		ForumForm forumForm = (ForumForm)(form);
 		
 		Forum forum = forumForm.getForum();
@@ -919,4 +920,19 @@ public class AuthoringAction extends Action {
 		}
 		return list;
 	}
+	/**
+	 * Get ToolAccessMode from HttpRequest parameters. Default value is AUTHOR mode.
+	 * @param request
+	 * @return
+	 */
+	private ToolAccessMode getAccessMode(HttpServletRequest request) {
+		ToolAccessMode mode;
+		String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
+		if(StringUtils.equalsIgnoreCase(modeStr,ToolAccessMode.TEACHER.toString()))
+			mode = ToolAccessMode.TEACHER;
+		else
+			mode = ToolAccessMode.AUTHOR;
+		return mode;
+	}
+	
 }

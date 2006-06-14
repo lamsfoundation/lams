@@ -73,8 +73,8 @@ public class MessageDTO {
 	 * @param msgList
 	 * @return
 	 */
-	public static List getMessageDTO(List msgList){
-		List retSet = new ArrayList();
+	public static List<MessageDTO> getMessageDTO(List msgList){
+		List<MessageDTO> retSet = new ArrayList<MessageDTO>();
 		if(msgList == null || msgList.isEmpty())
 			return retSet;
 		

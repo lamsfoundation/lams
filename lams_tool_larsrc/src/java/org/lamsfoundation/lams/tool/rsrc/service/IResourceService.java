@@ -169,7 +169,12 @@ public interface IResourceService
 
 	ResourceItem getResourceItemByUid(Long itemUid);
 
-	List<List> getSummary(Long contentId);
+	/**
+	 * Return monitoring summary list. The return value is list of resource summaries for each groups.
+	 * @param contentId
+	 * @return
+	 */
+	List<List<Summary>> getSummary(Long contentId);
 
 	List<ResourceUser> getUserListBySessionItem(Long sessionId, Long itemUid);
 
@@ -189,6 +194,6 @@ public interface IResourceService
 	 * @return
 	 */
 	public List<Summary> exportBySessionId(Long sessionId, boolean skipHide);
-	public List<List> exportByContentId(Long contentId); 
+	public List<List<Summary>> exportByContentId(Long contentId); 
 }
 

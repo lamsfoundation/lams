@@ -107,8 +107,10 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			throw new ResourceApplicationException(error);
 		}
 		List<Summary> group = service.exportBySessionId(toolSessionID,true);
+		
 		List<List> groupList = new ArrayList<List>();
-		groupList.add(group);
+		if(group.size() > 0)
+			groupList.add(group);
 		request.getSession().setAttribute(ResourceConstants.ATTR_SUMMARY_LIST, groupList);
 	}
 
@@ -130,7 +132,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			logger.error(error);
 			throw new ResourceApplicationException(error);
 		}
-		List<List> groupList = service.exportByContentId(toolContentID);
+		List<List<Summary>> groupList = service.exportByContentId(toolContentID);
 		
 		// put it into HTTPSession
 		request.getSession().setAttribute(ResourceConstants.ATTR_SUMMARY_LIST, groupList);

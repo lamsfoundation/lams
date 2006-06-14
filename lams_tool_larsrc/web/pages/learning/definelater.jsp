@@ -7,10 +7,23 @@
 </head>
 
 <body>
+	<table border="0" align="center" class="forms" width="95%">
+		<tr>
+			<td>
+				<h1>
+					${resource.title}
+				</h1>
+				<h2>
+					${resource.instructions}
+				</h2>
+			</td>
+		</tr>
+	</table>
+	
 	<div align="center">
-		<h2>
+		<b>
 			<fmt:message key="define.later.message" />
-		</h2>
+		</b>
 	</div>
 
 </body>
