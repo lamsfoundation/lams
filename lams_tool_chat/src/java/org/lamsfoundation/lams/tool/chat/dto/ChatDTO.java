@@ -34,13 +34,12 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.chat.model.Chat;
 import org.lamsfoundation.lams.tool.chat.model.ChatAttachment;
-import org.lamsfoundation.lams.tool.chat.model.ChatSession;
 
-public class MonitoringDTO {
+public class ChatDTO {
 
-	private static Logger logger = Logger.getLogger(MonitoringDTO.class);
+	private static Logger logger = Logger.getLogger(ChatDTO.class);
 
-	public MonitoringDTO(Chat chat) {
+	public ChatDTO(Chat chat) {
 		toolContentId = chat.getToolContentId();
 		title = chat.getTitle();
 		instructions = chat.getInstructions();
@@ -65,6 +64,8 @@ public class MonitoringDTO {
 						+ " contains invalid fileType: " + att.getFileType());
 			}
 		}
+		
+		sessionDTOs = new HashSet<ChatSessionDTO>();
 	}
 
 	public Long toolContentId;
@@ -81,16 +82,16 @@ public class MonitoringDTO {
 
 	public Set<ChatAttachmentDTO> offlineInstructionsFiles;
 
-	public Set<ChatSessionDTO> chatSessions;
+	public Set<ChatSessionDTO> sessionDTOs;
 	
 	public boolean chatEditable;
 
-	public Set<ChatSessionDTO> getChatSessions() {
-		return chatSessions;
+	public Set<ChatSessionDTO> getSessionDTOs() {
+		return sessionDTOs;
 	}
 
-	public void setChatSessions(Set<ChatSessionDTO> chatSessions) {
-		this.chatSessions = chatSessions;
+	public void setSessionDTOs(Set<ChatSessionDTO> sessionDTOs) {
+		this.sessionDTOs = sessionDTOs;
 	}
 
 	public String getInstructions() {
