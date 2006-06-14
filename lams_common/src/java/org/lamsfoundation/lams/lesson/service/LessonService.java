@@ -123,10 +123,10 @@ public class LessonService implements ILessonService
 			HashMap<Integer,User> lessonUsersMap = lessonMaps.get(lesson.getLessonId());
 			if (lessonUsersMap != null) {
 				lessonUsersMap.remove(learner.getUserId());
-			}
-			if (lessonUsersMap.size()==0) {
-				// no one active in lesson? get rid of lesson from cache 
-				lessonMaps.remove(lesson.getLessonId());
+				if (lessonUsersMap.size()==0) {
+					// no one active in lesson? get rid of lesson from cache 
+					lessonMaps.remove(lesson.getLessonId());
+				}
 			}
 		}
     }
