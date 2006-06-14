@@ -168,7 +168,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	 * @param   activityUIID 
 	 * @return  
 	 */
-	public function removeActivity(activityUIID):Object{
+	public function removeActivity(activityUIID:Number):Object{
 		//dispatch an event to show the design  has changed
 		dispatchEvent({type:'ddmBeforeUpdate',target:this});
 	
@@ -286,7 +286,8 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 			Debugger.log('Adding activity dto.activityTypeID:'+dto.activityTypeID,Debugger.GEN,'setDesign','DesignDataModel');	
 			
 			//if(dto.objectType = "ToolActivity"){
-			if(dto.activityTypeID == Activity.TOOL_ACTIVITY_TYPE){
+			if(dto.activityTypeID == Activity.TOOL_ACTIVITY_TYPE || dto.activityTypeID == Activity.SYNCH_GATE_ACTIVITY_TYPE || dto.activityTypeID == Activity.SCHEDULE_GATE_ACTIVITY_TYPE || dto.activityTypeID == Activity.PERMISSION_GATE_ACTIVITY_TYPE){
+				trace("this activity is gateActivity with UIID: "+dto.activityUIID)
 				var newToolActivity:ToolActivity = new ToolActivity(dto.activityUIID);
 				newToolActivity.populateFromDTO(dto);				
 				_activities.put(newToolActivity.activityUIID,newToolActivity);
