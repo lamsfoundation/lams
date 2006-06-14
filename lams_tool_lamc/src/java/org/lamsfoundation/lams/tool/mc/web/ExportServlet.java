@@ -24,6 +24,8 @@
 
 package org.lamsfoundation.lams.tool.mc.web;
 
+import java.util.List;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -47,7 +49,7 @@ import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 
 public class ExportServlet  extends AbstractExportPortfolioServlet implements McAppConstants{
 	static Logger logger = Logger.getLogger(ExportServlet.class.getName());
-	private static final long serialVersionUID = -4529093489007108143L;
+	private static final long serialVersionUID = -4119093489007108143L;
 	private final String FILENAME = "mc_main.html";
 	
 	
@@ -108,12 +110,22 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Mc
             throw new McApplicationException(error);
         }
 
+    	
         logger.debug("calling learning mode toolSessionID:" + toolSessionID + " userID: " + userID );
     	McMonitoringAction mcMonitoringAction= new McMonitoringAction();
-    	//mcMonitoringAction.refreshSummaryData(request, content, mcService, true, true, toolSessionID.toString(), userID.toString() , true);
+    	logger.debug("start refreshSummaryData for learner mode.");
+    	//mcMonitoringAction.refreshSummaryData(request, content, mcService, true, true, toolSessionID.toString(), userID.toString());
+    	/*
+	    List listMonitoredAnswersContainerDTO=MonitoringUtil.buildGroupsQuestionData(request, content);
+	    request.getSession().setAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO, listMonitoredAnswersContainerDTO);
+	    logger.debug("LIST_MONITORED_ANSWERS_CONTAINER_DTO: " + request.getSession().getAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO));
+	    */
+
     	
+    	logger.debug("end refreshSummaryData for learner mode.");
     	logger.debug("ending learner mode: ");
     }
+	
     
     public void teacher(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies)
     {
@@ -139,10 +151,11 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Mc
             throw new McApplicationException(error);
         }
 		
+        logger.debug("starting teacher mode: ");
         McMonitoringAction mcMonitoringAction= new McMonitoringAction();
-        logger.debug("starting refreshSummaryData.");
-        //mcMonitoringAction.refreshSummaryData(request, content, mcService, true, false, null, null, false);
-        
+        List listMonitoredAnswersContainerDTO=MonitoringUtil.buildGroupsQuestionData(request, content);
+	    request.getSession().setAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO, listMonitoredAnswersContainerDTO);
+	    logger.debug("LIST_MONITORED_ANSWERS_CONTAINER_DTO: " + request.getSession().getAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO));
         logger.debug("ending teacher mode: ");
     }
 

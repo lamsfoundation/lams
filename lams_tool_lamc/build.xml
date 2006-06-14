@@ -237,6 +237,7 @@
 	   					<include name="author_page/**"/>
 						<include name="authoring/*"/>
 						<include name="learning/*"/>
+						<include name="export/*"/>
 						<include name="sharing/*"/>	   				
 						<include name="css/*"/>	   					   				
 						<include name="includes/*"/>	   					   				

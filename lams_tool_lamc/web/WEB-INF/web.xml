@@ -110,7 +110,7 @@
 	
 	<servlet>
 		<servlet-name>exportPortfolio</servlet-name>
-		<servlet-class>org.lamsfoundation.lams.tool.mc.web.McExportServlet</servlet-class>
+		<servlet-class>org.lamsfoundation.lams.tool.mc.web.ExportServlet</servlet-class>
 	</servlet>
 
 <!--  FCKEditor Connector Configuration -->
@@ -140,7 +140,7 @@
 
   	<servlet-mapping>
 		<servlet-name>exportPortfolio</servlet-name>
-		<url-pattern>/portfolioExport</url-pattern>
+		<url-pattern>/exportPortfolio/*</url-pattern>
   	</servlet-mapping>
 
 	<servlet-mapping>

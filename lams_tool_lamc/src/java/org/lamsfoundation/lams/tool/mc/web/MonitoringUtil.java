@@ -223,7 +223,6 @@ public class MonitoringUtil implements McAppConstants{
     		if (mcQueUsr != null)
     		{
     			logger.debug("getting listUserAttempts for user id: " + mcQueUsr.getUid() + " and que content id: " + questionUid);
-    			//List listUserAttempts=mcService.getAttemptsForUser(mcQueUsr.getUid());
     			List listUserAttempts=mcService.getAttemptsForUserAndQuestionContent(mcQueUsr.getUid(), new Long(questionUid));
     			logger.debug("listUserAttempts: " + listUserAttempts);
 
