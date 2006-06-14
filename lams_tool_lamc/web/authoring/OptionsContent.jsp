@@ -74,7 +74,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<c:forEach var="optionEntry" items="${sessionScope.mapOptionsContent}">
 							  <c:if test="${optionEntry.key == 1}"> 			
 								  <tr>
-									  	<td bgcolor="#EEEEEE" class="input" valign=top>  <font size=2> <b> <c:out value="Candidate Answer ${optionIndex}"/> :  </b>  </font>
+								  
+									  	<td bgcolor="#EEEEEE" class="input" valign=top>  <font size=2> <b> <bean:message key="label.candidateAnswer"/> ${optionIndex} :  </b>  </font>
 
 										<font size=2>
 								  			<input type="text" name="optionContent<c:out value="${optionIndex}"/>" value="<c:out value="${optionEntry.value}"/>"   
@@ -87,8 +88,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 												  <c:if test="${selectedOptionEntry.value == optionEntry.value}"> 			
 							  					
 														  	<select name="checkBoxSelected<c:out value="${optionIndex}"/>">
-																<option value="Incorrect" > <font size=2> Incorrect </font> </option>
-																<option value="Correct" SELECTED>  <font size=2> Correct </font></option>
+																<option value="Incorrect" > <font size=2> <bean:message key='option.incorrect'/> </font> </option>
+																<option value="Correct" SELECTED>  <font size=2> <bean:message key='option.correct'/> </font></option>
 															</select>
 												
 							  				  	 		<c:set var="selectedOptionFound" scope="request" value="1"/>
@@ -99,8 +100,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									  <c:if test="${selectedOptionFound == 0}"> 			
 										  <font size=2>								  	
 													  	<select name="checkBoxSelected<c:out value="${optionIndex}"/>">
-															<option value="Incorrect" SELECTED> <font size=2> Incorrect </font> </option>
-															<option value="Correct">   <font size=2> Correct  </font> </option>
+															<option value="Incorrect" SELECTED> <font size=2> <bean:message key='option.incorrect'/> </font> </option>
+															<option value="Correct">   <font size=2> <bean:message key='option.correct'/>  </font> </option>
 														</select>
 											</font>													
 					 					</c:if> 			
@@ -116,7 +117,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					  		<c:if test="${optionEntry.key > 1}"> 			
 								<c:set var="optionIndex" scope="session" value="${optionIndex +1}"/>
 								  <tr>
-								  	<td bgcolor="#EEEEEE" class="input" valign=top> <font size=2> <b> <c:out value="Candidate Answer ${optionIndex}"/> : </b></font>
+								  	<td bgcolor="#EEEEEE" class="input" valign=top> <font size=2> <b> <bean:message key="label.candidateAnswer"/> ${optionIndex} : </b></font>
 
 									<font size=2>								  	
 							  			<input type="text" name="optionContent<c:out value="${optionIndex}"/>" value="<c:out value="${optionEntry.value}"/>"
@@ -128,8 +129,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				  							<font size=2>								  	
 											  <c:if test="${selectedOptionEntry.value == optionEntry.value}"> 			
 													  	<select name="checkBoxSelected<c:out value="${optionIndex}"/>">
-															<option value="Incorrect" > <font size=2> Incorrect </font> </option>
-															<option value="Correct" SELECTED> <font size=2>	  Correct  </font> </option>
+															<option value="Incorrect" > <font size=2> <bean:message key='option.incorrect'/> </font> </option>
+															<option value="Correct" SELECTED> <font size=2>	  <bean:message key='option.correct'/>   </font> </option>
 														</select>
 						  				  	 		<c:set var="selectedOptionFound" scope="request" value="1"/>
 							 					</c:if> 			
@@ -139,8 +140,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									  <c:if test="${selectedOptionFound == 0}"> 			
 
 												  	<select name="checkBoxSelected<c:out value="${optionIndex}"/>">
-														<option value="Incorrect" SELECTED> <font size=2> Incorrect  </font> </option>
-														<option value="Correct">   <font size=2> Correct </font>   </option>
+														<option value="Incorrect" SELECTED> <font size=2> <bean:message key='option.incorrect'/>  </font> </option>
+														<option value="Correct">   <font size=2> <bean:message key='option.correct'/> </font>   </option>
 													</select>
 					 					</c:if> 			
 										</td>

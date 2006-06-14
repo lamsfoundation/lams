@@ -112,7 +112,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								  }"> 			
 
 								  <tr>
-								  	<td NOWRAP bgcolor="#EEEEEE" class="input" valign=top>  <font size=2> <b> <c:out value="Question ${queIndex}"/> : </b>  </font> </td>
+								  	<td NOWRAP bgcolor="#EEEEEE" class="input" valign=top>  <font size=2> <b> <bean:message key="label.question.only"/> ${queIndex} : </b>  </font> </td>
 								  	
 							  		<td NOWRAP bgcolor="#EEEEEE" class="input" valign=top width=50> 
 								  		<font size=2> <input type="text" name="questionContent<c:out value="${queIndex}"/>" value="<c:out value="${questionEntry.value}"/>" 
@@ -164,7 +164,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 										  }"> 			
 
 								  <tr>
-								  	<td NOWRAP bgcolor="#EEEEEE" class="input" valign=top>  <font size=2> <b> <c:out value="Question ${queIndex}"/> : </b>  </font> </td>
+								  	<td NOWRAP bgcolor="#EEEEEE" class="input" valign=top>  <font size=2> <b> <bean:message key="label.question.only"/> ${queIndex} : </b>  </font> </td>
 								  	
 							  		<td NOWRAP bgcolor="#EEEEEE" class="input" valign=top> 
 								  		<font size=2> <c:out value="${questionEntry.value}"/> </font>
