@@ -90,7 +90,7 @@ public class ChatMessage implements java.io.Serializable {
 
 	/**
 	 * @hibernate.many-to-one not-null="true"
-	 * @hibernate.column name="from_user_id"
+	 * @hibernate.column name="from_user_uid"
 	 * 
 	 */
 	public ChatUser getFromUser() {
@@ -103,7 +103,7 @@ public class ChatMessage implements java.io.Serializable {
 
 	/**
 	 * @hibernate.many-to-one not-null="false"
-	 * @hibernate.column name="to_user_id"
+	 * @hibernate.column name="to_user_uid"
 	 * 
 	 * The toUser field is null when the type is "groupchat", and non null when
 	 * the type is "chat"
