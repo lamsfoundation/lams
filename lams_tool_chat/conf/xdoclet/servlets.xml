@@ -61,4 +61,8 @@
 	<servlet-class>org.lamsfoundation.lams.tool.chat.JabberHTTPBind.JHBServlet</servlet-class>
 </servlet>
 
+<servlet>
+	<servlet-name>exportPortfolio</servlet-name>
+	<servlet-class>org.lamsfoundation.lams.tool.chat.web.servlets.ExportServlet</servlet-class>
+</servlet>
 
