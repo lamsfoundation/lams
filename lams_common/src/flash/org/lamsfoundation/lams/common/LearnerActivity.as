@@ -59,7 +59,7 @@ class LearnerActivity extends MovieClip {
 	private var app:ApplicationParent;
 	//locals
 	private var actStatus:String;
-	private var learner:Object = new Object();
+	private var learner:Progress;
 	private var completed_mc:MovieClip;
 	private var current_mc:MovieClip;
 	private var todo_mc:MovieClip;
@@ -196,7 +196,7 @@ class LearnerActivity extends MovieClip {
 			if((now - _dcStartTime) <= Config.DOUBLE_CLICK_DELAY){
 				//if (app.controlKeyPressed != "transition"){
 					_doubleClicking = true;
-						controller.activityDoubleClick(this);
+					controller.activityDoubleClick(this);
 					
 				//}
 			}else{
@@ -271,6 +271,10 @@ class LearnerActivity extends MovieClip {
 
 	public function get activityStatus():String{
 		return actStatus;
+	}
+	
+	public function get learnerID():Number{
+		return learner.getLearnerId();
 	}
 
 	/**
