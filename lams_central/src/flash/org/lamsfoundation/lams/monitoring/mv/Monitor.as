@@ -179,7 +179,7 @@ class Monitor {
 		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=getLessonDetails&lessonID=' + String(lessonID),callback, false);
 	}
 	
-	public function reloadLessonToMonitor(lessonID:Number){
+	public function reloadLessonToMonitor(){
 		loadLessonToMonitor(_root.lessonID);
 	}
 	
@@ -290,9 +290,9 @@ class Monitor {
 	}
 	
 	public function getProgressData(seq:Object){
-		
 		var seqId:Number = seq.getSequenceID();
 		trace('getting progress data for Sequence: '+seqId);
+		
 		var callback:Function = Proxy.create(this, saveProgressData);
 		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=getAllLearnersProgress&lessonID=' + seqId, callback, false);
 	}
