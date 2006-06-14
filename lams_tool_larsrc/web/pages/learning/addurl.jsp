@@ -41,6 +41,7 @@
 								<td>
 									<fmt:message key="label.authoring.basic.resource.url.input" />
 									<input type="url" name="url" size="40"  /> 
+									<html:checkbox property="openUrlNewWindow"><fmt:message key="open.in.new.window"/></html:checkbox>									
 								</td>
 								<td align="center" valign="bottom">
 									<input type="submit" name="add" value="<fmt:message key="button.upload"/>" class="buttonStyle">

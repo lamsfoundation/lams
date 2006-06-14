@@ -60,6 +60,7 @@ create table tl_larsrc11_resource_item (
    item_type smallint,
    file_type varchar(255),
    file_name varchar(255),
+   open_url_new_window tinyint,
    resource_uid bigint,
    session_uid bigint,
    primary key (uid)

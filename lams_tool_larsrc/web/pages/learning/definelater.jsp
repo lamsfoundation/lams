@@ -3,7 +3,7 @@
 <html:html locale="true">
 <head>
 	<%@ include file="/common/header.jsp"%>
-
+	<meta http-equiv="refresh" content="60">
 </head>
 
 <body>
@@ -19,11 +19,11 @@
 			</td>
 		</tr>
 	</table>
-	
+
 	<div align="center">
-		<b>
-			<fmt:message key="define.later.message" />
-		</b>
+		<b> <fmt:message key="define.later.message" /> </b>
+		<P>
+			<a href="javascript:location.reload(true);" class="button"><b><fmt:message key="button.try.again" /></b></a>
 	</div>
 
 </body>

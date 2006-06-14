@@ -188,6 +188,7 @@ public class LearningAction extends Action {
 			}
 		}else if(type == ResourceConstants.RESOURCE_TYPE_URL){
 			item.setUrl(itemForm.getUrl());
+			item.setOpenUrlNewWindow(itemForm.isOpenUrlNewWindow());
 		}
 		//save and update session
 		Long sessionId = (Long) request.getSession().getAttribute(ResourceConstants.ATTR_TOOL_SESSION_ID);

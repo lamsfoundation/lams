@@ -25,6 +25,8 @@
 package org.lamsfoundation.lams.tool.rsrc.web.action;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -71,8 +73,25 @@ public class ViewItemAction extends Action {
 	  	if (param.equals("nextInstruction")) {
 	  		return nextInstruction(mapping, form, request, response);
 	  	}
+	  	//for preview top frame html page use:
+	  	if (param.equals("openUrlPopup")) {
+	  		return openUrlPopup(mapping, form, request, response);
+	  	}
 
         return mapping.findForward(ResourceConstants.ERROR);
+	}
+	/**
+	 * Open url in popup window page.
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	private ActionForward openUrlPopup(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+		String url = request.getParameter(ResourceConstants.PARAM_OPEN_URL_POPUP);
+		request.setAttribute(ResourceConstants.PARAM_OPEN_URL_POPUP,url);
+		return mapping.findForward(ResourceConstants.SUCCESS);
 	}
 	/**
 	 * Return next instrucion to page. It need four input parameters, mode, itemIndex or itemUid, and insIdx.
@@ -198,7 +217,14 @@ public class ViewItemAction extends Action {
 		String url = null;
 		switch (type) {
 		case ResourceConstants.RESOURCE_TYPE_URL:
-			url = protocol(item.getUrl());
+			if(item.isOpenUrlNewWindow()){
+				try {
+					url = "/openUrlPopup.do?popupUrl="+URLEncoder.encode(protocol(item.getUrl()),"UTF8");
+				} catch (UnsupportedEncodingException e) {
+					log.error(e);
+				}
+			}else
+				url = protocol(item.getUrl());
 			break;
 		case ResourceConstants.RESOURCE_TYPE_FILE:
 			url = "/download/?uuid="+item.getFileUuid()+"&preferDownload=false";

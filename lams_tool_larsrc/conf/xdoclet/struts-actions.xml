@@ -138,6 +138,11 @@
 			parameter="nextInstruction">
 			<forward name="success" path="/pages/itemreview/instructionsnav.jsp" />
 		</action>
+		<action path="/openUrlPopup"
+			type="org.lamsfoundation.lams.tool.rsrc.web.action.ViewItemAction"
+			parameter="openUrlPopup">
+			<forward name="success" path="/pages/itemreview/openurl.jsp" />
+		</action>
 		
 		<!-- ========== BEGIN: Learning Definitions ============================== -->
 		<action path="/learning/start"

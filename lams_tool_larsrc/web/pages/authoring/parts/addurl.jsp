@@ -34,7 +34,9 @@
 					</tr>						
 					<tr>
 						<td width="130px"><fmt:message key="label.authoring.basic.resource.url.input"/></td>
-						<td><html:text property="url" size="55"/></td>
+						<td><html:text property="url" size="55"/>
+							<html:checkbox property="openUrlNewWindow"><fmt:message key="open.in.new.window"/></html:checkbox>
+						</td>
 					</tr>	
 				</table>
 			</html:form>

@@ -860,6 +860,7 @@ public class AuthoringAction extends Action {
 		form.setDescription(item.getDescription());
 		form.setTitle(item.getTitle());
 		form.setUrl(item.getUrl());
+		form.setOpenUrlNewWindow(item.isOpenUrlNewWindow());
 		if(itemIdx >=0)
 			form.setItemIndex(new Integer(itemIdx).toString());
 		
@@ -969,6 +970,7 @@ public class AuthoringAction extends Action {
 
 		if(type == ResourceConstants.RESOURCE_TYPE_URL){
 			item.setUrl(itemForm.getUrl());
+			item.setOpenUrlNewWindow(itemForm.isOpenUrlNewWindow());
 		}
 //		if(type == ResourceConstants.RESOURCE_TYPE_WEBSITE 
 //				||itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT){

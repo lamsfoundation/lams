@@ -38,18 +38,18 @@ create table tl_larsrc11_resource (
    update_date datetime,
    create_by bigint,
    title varchar(255),
-   run_offline tinyint,
+   run_offline bit,
    lock_on_finished bit,
    instructions text,
    online_instructions text,
    offline_instructions text,
-   content_in_use tinyint,
-   define_later tinyint,
+   content_in_use bit,
+   define_later bit,
    content_id bigint unique,
-   allow_add_files tinyint,
-   allow_add_urls tinyint,
+   allow_add_files bit,
+   allow_add_urls bit,
    mini_view_resource_number integer,
-   allow_auto_run tinyint,
+   allow_auto_run bit,
    primary key (uid)
 );
 create table tl_larsrc11_resource_item (
@@ -64,11 +64,12 @@ create table tl_larsrc11_resource_item (
    url text,
    create_by bigint,
    create_date datetime,
-   create_by_author tinyint,
-   is_hide tinyint,
+   create_by_author bit,
+   is_hide bit,
    item_type smallint,
    file_type varchar(255),
    file_name varchar(255),
+   open_url_new_window bit,
    resource_uid bigint,
    session_uid bigint,
    primary key (uid)
@@ -78,7 +79,7 @@ create table tl_larsrc11_resource_item_visit_log (
    access_date datetime,
    resource_item_uid bigint,
    user_uid bigint,
-   complete tinyint,
+   complete bit,
    session_id bigint,
    primary key (uid)
 );

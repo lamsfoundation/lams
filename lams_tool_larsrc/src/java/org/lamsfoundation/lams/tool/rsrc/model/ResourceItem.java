@@ -50,6 +50,8 @@ public class ResourceItem  implements Cloneable{
 	private String description;
 	
 	private String url;
+	
+	private boolean openUrlNewWindow;
 
 	private String imsSchema;
 
@@ -291,6 +293,16 @@ public class ResourceItem  implements Cloneable{
 
 	    public void setFileName(String name) {
 	        this.fileName = name;
+	    }
+	    /**
+	     * @hibernate.property  column="open_url_new_window" 
+	     * @return
+	     */
+	    public boolean isOpenUrlNewWindow() {
+	    	return openUrlNewWindow;
+	    }
+	    public void setOpenUrlNewWindow(boolean openUrlNewWindow) {
+	    	this.openUrlNewWindow = openUrlNewWindow;
 	    }
 	    
 		public void setComplete(boolean complete) {
