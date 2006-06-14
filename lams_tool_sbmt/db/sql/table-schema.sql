@@ -1,5 +1,3 @@
--- $Id$
-
 alter table tl_lasbmt11_instruction_files drop foreign key FKA75538F9785A173A;
 alter table tl_lasbmt11_session drop foreign key FKEC8C77C9785A173A;
 alter table tl_lasbmt11_session_learners drop foreign key FKC56CD05893C861A;
