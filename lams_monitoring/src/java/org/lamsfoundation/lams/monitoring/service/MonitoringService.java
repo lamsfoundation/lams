@@ -370,7 +370,8 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
             {
                 try {
                 	ToolActivity toolActivity = (ToolActivity) activityDAO.getActivityByActivityId(currentActivity.getActivityId());
-                    Long newContentId = lamsCoreToolService.notifyToolToCopyContent(toolActivity);
+                	// copy the content, but don't set the define later flags if it is preview
+                    Long newContentId = lamsCoreToolService.notifyToolToCopyContent(toolActivity, copyType != LearningDesign.COPY_TYPE_PREVIEW);
                     toolActivity.setToolContentId(newContentId);
                 } catch (DataMissingException e) {
                     String error = "Unable to initialise the lesson. Data is missing for activity "+currentActivity.getActivityUIID()
