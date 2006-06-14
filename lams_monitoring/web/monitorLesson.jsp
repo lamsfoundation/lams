@@ -46,7 +46,7 @@ String languageDate = Configuration.getDictionaryDateForLanguage(serverLanguage)
 %>
 
 <%-- lessonID is passed in as request parameters by addLesson.jsp in lams_central. --%>
-<c:set var="monitoringurl">lams_monitoring.swf?userID=<lams:user property="userID"/>&serverURL=<lams:LAMSURL/>&build=<%=clientVersion%>&lang=<%=serverLanguage%>&date=<%=languageDate%>&theme=<lams:user property="flashTheme"/>&lessonID=<c:out value="${param.lessonID}"/></c:set>
+<c:set var="monitoringurl">lams_monitoring.swf?userID=<lams:user property="userID"/>&serverURL=<lams:LAMSURL/>&build=<%=clientVersion%>&lang=<lams:user property="localeLanguage"/>&country=<lams:user property="localeCountry"/>&theme=<lams:user property="flashTheme"/>&lessonID=<c:out value="${param.lessonID}"/></c:set>
 
 <!-- URL's used in the movie-->
 <!-- text used in the movie-->

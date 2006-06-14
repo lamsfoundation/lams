@@ -44,7 +44,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	String languageDate = Configuration.getDictionaryDateForLanguage(serverLanguage);
 	%>
 
-	<c:set var="learnerurl">lams_learner.swf?userID=<lams:user property="userID"/>&serverURL=<lams:LAMSURL/>&build=<%=clientVersion%>&lang=<lams:user property="localeLanguage"/>&date=<%=languageDate%>&theme=<lams:user property="flashTheme"/>&lessonID=<c:out value="${param.lessonID}"/>&uniqueID=<c:out value="${randomID}"/></c:set>
+	<c:set var="learnerurl">lams_learner.swf?userID=<lams:user property="userID"/>&serverURL=<lams:LAMSURL/>&build=<%=clientVersion%>&lang=<lams:user property="localeLanguage"/>&country=<lams:user property="localeCountry"/>&theme=<lams:user property="flashTheme"/>&lessonID=<c:out value="${param.lessonID}"/>&uniqueID=<c:out value="${randomID}"/></c:set>
 	<!-- URL's used in the movie-->
 	<!-- text used in the movie-->
 	<!--Library-->  
