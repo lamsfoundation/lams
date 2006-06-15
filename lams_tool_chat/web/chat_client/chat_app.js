@@ -2,6 +2,8 @@
 var GROUPCHAT_MSG = "groupchat_message";
 var PRIVATE_MSG = "private_message";
 
+var colors = new Array('maroon','green','olive','navy','purple','teal','red','blue');
+
 // Variables
 var roster = new Roster();
 
@@ -69,7 +71,12 @@ function updateSendDisplay() {
     var userName;
     if (MODE == "teacher" && !(selectedIndex == -1)) {
         var userName = rosterList.options[rosterList.selectedIndex].value;
-        document.getElementById("sendToUser").innerHTML = userName;
+        
+   		var charSum = 0;
+		for (var i=0; i<userName.length; i++)
+    	  charSum += userName.charCodeAt(i); 
+    	  
+        document.getElementById("sendToUser").innerHTML = "<span style='color:" + colors[charSum%(colors.length)] + "'>" + userName +"</span>";
         
         document.getElementById("sendToEveryone").style.display="none";
         document.getElementById("sendToUser").style.display="";
@@ -80,7 +87,11 @@ function updateSendDisplay() {
     }
 }
 function generateMessageHTML(nick, message, type) {
-    return "<div class='" + type + "'><span class='messageFrom'>" + nick + ":</span>" + message + "<div/>";
+	var charSum = 0;
+	for (var i=0; i<nick.length; i++)
+      charSum += nick.charCodeAt(i);
+
+    return "<div style='color:" + colors[charSum%(colors.length)] + "' class='" + type + "'><span class='messageFrom' >" + nick + ":</span>" + message + "<div/>";
 }
 function updateMessageDisplay(htmlMessage) {
     var iRespDiv = document.getElementById("iResp");

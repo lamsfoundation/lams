@@ -36,11 +36,11 @@
 
 <div id="chat_pane" style="display:none;">
 	<h1>
-		<c:out value="${chatTitle}" />
+		<c:out value="${chatTitle}" escapeXml="false" />
 	</h1>
 
 	<p>
-		<c:out value="${chatInstructions}" />
+		<c:out value="${chatInstructions}" escapeXml="false" />
 	</p>
 	<form name="sendForm" action="" onSubmit="return sendMsg(this);">
 		<div id="presence">
