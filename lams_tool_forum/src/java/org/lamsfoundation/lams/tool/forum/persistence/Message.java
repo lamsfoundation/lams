@@ -354,7 +354,7 @@ public class Message implements Cloneable{
     /**
       * Gets the toolSession
       *
-      * @hibernate.many-to-one
+      * @hibernate.many-to-one cascade="none"
       *	class="org.lamsfoundation.lams.tool.forum.persistence.ForumToolSession"
       *	              column="forum_session_uid"
       *

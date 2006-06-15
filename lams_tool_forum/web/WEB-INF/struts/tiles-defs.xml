@@ -58,15 +58,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<!-- B: Learning -->
 	<!-- MAIN PAGE for learner -->	
 	<definition name="tiles:/learning/forum/viewForum" extends="tiles:layout">
-    	<put name="pageTitleKey" value="title.message.view"/>
     	<put name="body" value="/jsps/learning/viewforum.jsp"/>
 	</definition>
 	<definition name="tiles:/learning/forum/runOffline" extends="tiles:layout">
-    	<put name="pageTitleKey" value="title.message.view"/>
     	<put name="body" value="/jsps/learning/runoffline.jsp"/>
 	</definition>
 	<definition name="tiles:/learning/forum/defineLater" extends="tiles:layout">
-    	<put name="pageTitleKey" value="title.message.view"/>
     	<put name="body" value="/jsps/learning/definelater.jsp"/>
 	</definition>
 	

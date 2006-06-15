@@ -1,5 +1,8 @@
 <%@ include file="/includes/taglibs.jsp"%>
 <c:set var="mode" value="${sessionScope.mode}" />
+<h1><c:out value="${title}" escapeXml="false"/></h1>
+<h2><c:out value="${instruction}" escapeXml="false"/></h2>
+<BR>
 <div align="center">
 	<%@ include file="/jsps/learning/message/topiclist.jsp"%>
 

@@ -51,7 +51,6 @@ public class MessageDao extends HibernateDaoSupport {
 	public void saveOrUpdate(Message message) {
 		message.updateModificationData();
 		this.getHibernateTemplate().saveOrUpdate(message);
-		this.getHibernateTemplate().flush();
 	}
 	
 	public void update(Message message) {

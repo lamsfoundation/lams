@@ -659,6 +659,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 				user.setLastName(sysUser.getLastName());
 				user.setLoginName(sysUser.getLogin());
 				user.setUserId(new Long(newUserUid.longValue()));
+				this.createUser(user);
 			}
 			toolContentObj.setCreatedBy(user);
 			//save forum first

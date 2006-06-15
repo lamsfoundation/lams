@@ -1,11 +1,8 @@
+
 <div align="center">
 <div id="topiclist">
 	<div id="datatablecontainer">
 	<table width="100%" align="CENTER" 	class="form">
-		<tr>
-			<td valign="MIDDLE"><b>Topic</b></td>
-			<td colspan="3" />
-		</tr>
 		<tr>
 			<th scope="col" width="50%" colspan="2"><fmt:message key="lable.topic.title.subject"/></th>
 			<th scope="col" width="15%"><fmt:message key="lable.topic.title.startedby"/></th>

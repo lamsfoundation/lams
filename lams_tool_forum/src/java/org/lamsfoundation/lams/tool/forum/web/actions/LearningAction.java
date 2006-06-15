@@ -187,7 +187,8 @@ public class LearningAction extends Action {
 		Long forumId = forum.getUid();
 		Boolean allowEdit = new Boolean(forum.isAllowEdit());
 		Boolean allowRichEditor = new Boolean(forum.isAllowRichEditor());
-		int allowNumber = session.getForum().getLimitedChar();
+		int allowNumber = forum.getLimitedChar();
+		
 		request.getSession().setAttribute(ForumConstants.FORUM_ID, forumId);
 		request.getSession().setAttribute(ForumConstants.ALLOW_EDIT, allowEdit);
 		request.getSession().setAttribute(ForumConstants.ALLOW_RICH_EDITOR,
@@ -197,6 +198,9 @@ public class LearningAction extends Action {
 		
 
 		// get all root topic to display on init page
+		request.setAttribute(ForumConstants.ATTR_FORUM_TITLE,forum.getTitle());
+		request.setAttribute(ForumConstants.ATTR_FORUM_INSTRCUTION,forum.getInstructions());
+		
 		List rootTopics = forumService.getRootTopics(sessionId);
 		request.setAttribute(ForumConstants.AUTHORING_TOPICS_LIST, rootTopics);
 		
