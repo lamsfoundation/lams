@@ -37,9 +37,7 @@ import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 
 /** 
- * Action class to forward the user to a Tool. If it is in preview and the define
- * later flag is set on the activity, then go to the tool page via a special message
- * page.
+ * Action class to forward the user to a Tool.
  * 
  * @author daveg
  * 
@@ -47,13 +45,9 @@ import org.lamsfoundation.lams.lesson.LearnerProgress;
  * 
  * @struts:action path="/DisplayToolActivity" name="activityForm"
  *                validate="false" scope="request"
- * @struts:action-forward name="previewDefineLater" path=".previewDefineLater"
+ * 
  */
 public class DisplayToolActivityAction extends ActivityAction {
-
-	public static final String DEFINE_LATER = "previewDefineLater";
-	public static final String PARAM_ACTIVITY_TITLE = "activityTitle";
-	public static final String PARAM_ACTIVITY_URL = "activityURL";
 
 	/**
 	 * Gets a tool activity from the request (attribute) and uses a redirect
@@ -80,19 +74,13 @@ public class DisplayToolActivityAction extends ActivityAction {
 		ToolActivity toolActivity = (ToolActivity)activity;
 
 		String url = actionMappings.getLearnerToolURL(learnerProgress.getLesson(), toolActivity, learnerProgress.getUser());
-		
-		if ( toolActivity.getDefineLater() && learnerProgress.getLesson().isPreviewLesson() ) {
-			// preview define later
-			request.setAttribute(PARAM_ACTIVITY_TITLE, activity.getTitle());
-			request.setAttribute(PARAM_ACTIVITY_URL, url);
-			return mapping.findForward("previewDefineLater");
-		} else {
-			// normal case
-			try {
-				response.sendRedirect(url);
-			} catch (java.io.IOException e) {
-			    return mapping.findForward(ActivityMapping.ERROR);
-			}
+		try 
+		{
+		    response.sendRedirect(url);
+		}
+		catch (java.io.IOException e) 
+		{
+		    return mapping.findForward(ActivityMapping.ERROR);
 		}
 		return null;
 	}

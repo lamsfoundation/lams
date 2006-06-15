@@ -85,6 +85,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<put name="title" value="Welcome"/>
 		<put name="body" value="/welcome.jsp"/>
 	</definition>
+	<definition name=".previewDefineLater" extends=".layout">
+		<put name="title" value="Define Later"/>
+		<put name="body" value="/previewDefineLater.jsp"/>
+		<put name="includeBodyTag" value="false"/>
+	</definition>
 	<definition name=".exit" extends=".activityLayout">
 		<put name="title" value="Exited"/>
 		<put name="body" value="/exit.jsp"/>

@@ -50,14 +50,18 @@ import org.lamsfoundation.lams.lesson.LearnerProgress;
  *                validate="false" scope="request"
  * 
  * @struts:action-forward name="displayTool" path=".loadToolActivity"
+ * @struts:action-forward name="previewDefineLater" path=".previewDefineLater"
  * 
  */
 public class LoadToolActivityAction extends ActivityAction {
 
+	public static final String DEFINE_LATER = "previewDefineLater";
+	public static final String PARAM_ACTIVITY_TITLE = "activityTitle";
+	public static final String PARAM_ACTIVITY_URL = "activityURL";
+
 	/**
 	 * Gets an activity from the request (attribute) and forwards onto a
 	 * loading page.
-	 * TODO when this is first called after creating a new tool session, ToolActivity isn't a ToolActivity - its a cglib.
 	 */
 	public ActionForward execute(ActionMapping mapping,
 	                             ActionForm actionForm,
@@ -75,8 +79,19 @@ public class LoadToolActivityAction extends ActivityAction {
 		form.setActivityId(activity.getActivityId());
 		
 		if (activity.isToolActivity() || activity.isSystemToolActivity() ) {
+
 			String url = actionMappings.getLearnerToolURL(learnerProgress.getLesson(),activity, learnerProgress.getUser());
-			form.addActivityURL(new ActivityURL(activity.getActivityId(),url));
+
+			if ( activity.getDefineLater() && learnerProgress.getLesson().isPreviewLesson() ) {
+				// preview define later
+				request.setAttribute(PARAM_ACTIVITY_TITLE, activity.getTitle());
+				request.setAttribute(PARAM_ACTIVITY_URL, url);
+				return mapping.findForward("previewDefineLater");
+			} else {
+				// normal case
+				form.addActivityURL(new ActivityURL(activity.getActivityId(),url));
+			}
+			
 		} else {
 		    log.error(className+": activity not ToolActivity");
 			return mapping.findForward(ActivityMapping.ERROR);
@@ -84,5 +99,6 @@ public class LoadToolActivityAction extends ActivityAction {
 		
 		return mapping.findForward("displayTool");
 	}
+
 
 }

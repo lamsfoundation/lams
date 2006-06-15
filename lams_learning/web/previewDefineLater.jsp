@@ -24,6 +24,7 @@
 	<%@ taglib uri="tags-logic" prefix="logic" %>
 	<%@ taglib uri="tags-core" prefix="c" %>		
 	<%@ taglib uri="tags-fmt" prefix="fmt" %>
+	<%@ taglib uri="tags-lams" prefix="lams" %>
 
 	<tr> 
 		<td colspan="3"><H1><fmt:message key="label.preview.definelater.title"/></H1></td> 
@@ -37,7 +38,7 @@
 	</tr> 	
 	<tr> 
 		<td colspan="3">
-			<a href="${requestScope.activityURL}" class="button"><fmt:message key="label.gate.next.button"/></a>
+			<a href="<lams:LAMSURL/>${requestScope.activityURL}" class="button"><fmt:message key="label.next.button"/></a>
 		</td> 
 	</tr> 	
 	
