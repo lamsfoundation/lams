@@ -148,7 +148,7 @@ Ant build file.
 	<!-- ================================================================ -->
 	<!-- Make jar archive for deployment        		    	          -->
 	<!-- ================================================================ -->
-	<target name="build-jar" depends="compile-java" description="creates jar file">
+	<target name="build-jar" depends="generate-hbm-files, compile-java" description="creates jar file">
 		<delete file="${build.lib}/${product}.jar" />
 		<jar jarfile="${build.lib}/${product}.jar" manifest="${conf.dir}/jar/META-INF/MANIFEST.MF">
 			<fileset dir="${build.classes.java}">
