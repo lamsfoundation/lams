@@ -144,10 +144,12 @@ class WizardController extends AbstractController {
 	
 	public function setBusy(){
 		_isBusy = true;
+		getView().disableButtons();
 	}
 	
 	public function clearBusy(){
 		_isBusy = false;
+		getView().enableButtons();
 	}
 	
 }
