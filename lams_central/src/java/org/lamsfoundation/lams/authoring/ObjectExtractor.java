@@ -43,6 +43,7 @@ import org.lamsfoundation.lams.learningdesign.LearningLibrary;
 import org.lamsfoundation.lams.learningdesign.License;
 import org.lamsfoundation.lams.learningdesign.OptionsActivity;
 import org.lamsfoundation.lams.learningdesign.ParallelActivity;
+import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.PermissionGateActivity;
 import org.lamsfoundation.lams.learningdesign.RandomGrouping;
 import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
@@ -518,7 +519,6 @@ public class ObjectExtractor implements IObjectExtractor {
 				
 				Integer activityUUID = WDDXProcessor.convertToInteger(activityDetails,WDDXTAGS.ACTIVITY_UIID);
 				Activity existingActivity = newActivityMap.get(activityUUID); 
-				
 				//match up id to parent based on UIID
 				if (keyExists(activityDetails, WDDXTAGS.PARENT_UIID))
 			    {
@@ -527,6 +527,10 @@ public class ObjectExtractor implements IObjectExtractor {
 						Activity parentActivity = newActivityMap.get(parentUIID);
 						existingActivity.setParentActivity(parentActivity);
 						existingActivity.setParentUIID(parentUIID);
+						if(parentActivity.isComplexActivity()){
+							((ComplexActivity) parentActivity).addActivity(existingActivity);
+							activityDAO.update(parentActivity);
+						}
 					} else {
 						existingActivity.setParentActivity(null);
 						existingActivity.setParentUIID(null);
