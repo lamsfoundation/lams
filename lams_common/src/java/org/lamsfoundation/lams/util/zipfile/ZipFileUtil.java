@@ -175,10 +175,15 @@ public class ZipFileUtil {
 	 * @param destName
 	 */
 	private static void prepareDirectory(String destName) {
+		//It must sort out the directory information to current OS.
+		//e.g, if zip file is zipped under windows, but unzip in linux.  
+		destName = FileUtil.makeCanonicalPath(destName);
 		File destNameFile = new File(destName);
 		String path = destNameFile.getParent();
-		File pathDir = new File(path);
-		pathDir.mkdirs();
+		if(path != null){
+			File pathDir = new File(path);
+			pathDir.mkdirs();
+		}
 	}
 
 	/** Delete a temporary directory.

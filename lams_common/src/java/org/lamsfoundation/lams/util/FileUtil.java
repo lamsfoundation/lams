@@ -344,12 +344,17 @@ public class FileUtil {
 			fullpath = path + file;
 		else
 			fullpath = path + File.separator + file;
+		
+		return makeCanonicalPath(fullpath);
+		
+	}
+	
+	public static String makeCanonicalPath(String pathfile){
 		if(File.separator.indexOf("\\") != -1)
-			fullpath = fullpath.replaceAll("\\/","\\\\");
+			pathfile = pathfile.replaceAll("\\/","\\\\");
 		else
-			fullpath = fullpath.replaceAll("\\\\",File.separator);
+			pathfile = pathfile.replaceAll("\\\\",File.separator);
 		
-		return fullpath;
-		
+		return pathfile;
 	}
 }
