@@ -111,7 +111,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									<tr> 
 										 <td NOWRAP valign=top> <b> <font size=2> <bean:message key="label.user"/> </font> 			</b> </td>  
 				  						 <td NOWRAP valign=top> <b> <font size=2> <bean:message key="label.attemptTime"/> </font> 	</b></td>
-				  						 <td NOWRAP valign=top> <b> <font size=2> <bean:message key="label.timezone"/> </font>		</b></td>
 				  						 <td NOWRAP valign=top> <b> <font size=2> <bean:message key="label.response"/> </font> 		</b></td>
 						  			</tr>				 
 	
@@ -123,7 +122,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 														<tr> 
 															 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.userName}"/> </font>  </td>  
 									  						 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.attemptTime}"/> </font> </td>
-									  						 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.timeZone}"/> </font> </td>
 									  						 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.response}"/> </font> </td>
 											  			</tr>		
 													</c:if>														  					 									  			
@@ -133,7 +131,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 															<tr>  
 																 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.userName}"/> </font>  </td>  
 										  						 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.attemptTime}"/> </font> </td>
-										  						 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.timeZone}"/> </font> </td>
 										  						 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.response}"/> </font> </td>
 												  			</tr>														
 														</c:if>														  					 									  													  			
