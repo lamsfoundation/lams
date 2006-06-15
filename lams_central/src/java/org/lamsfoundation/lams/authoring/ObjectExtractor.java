@@ -570,7 +570,7 @@ public class ObjectExtractor implements IObjectExtractor {
 				}
 			}
 		}
-
+		
 		// clean up the links for any old transitions.
 		Iterator iter = learningDesign.getTransitions().iterator();
 		while (iter.hasNext()) {
@@ -887,10 +887,10 @@ public class ObjectExtractor implements IObjectExtractor {
 	 * but not a too activity. These cases should be picked up by Flash, but just in case.
 	 */
 	private void cleanupTransition(Transition transition) {
-		if ( transition.getFromActivity() != null ) {
+		if(transition.getFromActivity().getTransitionFrom().equals(transition)){
 			transition.getFromActivity().setTransitionFrom(null);
 		}
-		if ( transition.getToActivity() != null ) {
+		if(transition.getToActivity().getTransitionTo().equals(transition)){
 			transition.getToActivity().setTransitionTo(null);
 		}
 	}
