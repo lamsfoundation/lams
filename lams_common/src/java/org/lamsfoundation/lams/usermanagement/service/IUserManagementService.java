@@ -481,5 +481,11 @@ public interface IUserManagementService {
 	public boolean isUserInRoleInOrganisation(String login, Integer roleId, Integer orgId);
 	
 	public void deleteOrganisationById(Integer orgId);
+	
+	public List getOrganisationsByTypeAndStatus(Integer organisationTypeId, Integer organisationStateId);
+	
+	public List getUserOrganisationsForUserByTypeAndStatus(String username,Integer organisationTypeId, Integer organisationStateId);
+	
+	public List getUserOrganisationRoles(Integer organisationId, String username);
 
 }

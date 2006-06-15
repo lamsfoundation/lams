@@ -118,4 +118,10 @@ public class UserOrganisationDAO extends BaseDAO implements
 		return getHibernateTemplate().find(queryString,organisationTypeId);
 	}
 
+	public List getUserOrganisationsForUserByTypeAndStatus(String username, Integer organisationTypeId, Integer organisationStateId) {
+		String queryString = "from UserOrganisation uo where uo.user.login=? and uo.organisation.organisationType.organisationTypeId=? and uo.organisation.organisationState.organisationStateId=?";
+		Object[] params = new Object[]{username,organisationTypeId,organisationStateId};
+		return getHibernateTemplate().find(queryString,params);
+	}
+
 }

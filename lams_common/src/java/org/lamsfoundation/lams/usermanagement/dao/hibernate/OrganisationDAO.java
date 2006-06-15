@@ -24,12 +24,10 @@
 package org.lamsfoundation.lams.usermanagement.dao.hibernate;
 
 import java.util.List;
-import java.util.Iterator;
 
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
-
-import org.lamsfoundation.lams.usermanagement.dao.IOrganisationDAO;
 import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.dao.IOrganisationDAO;
 
 /**
  * This class interacts with Spring's HibernateTemplate to save/delete and
@@ -96,6 +94,12 @@ public class OrganisationDAO extends BaseDAO implements
 	public List getOrganisationsByType(Integer organisationTypeId) {
 		String queryString = "from Organisation o where o.organisationType.organisationTypeId=?";
 		return getHibernateTemplate().find(queryString,organisationTypeId);
+	}
+
+	public List getOrganisationsByTypeAndStatus(Integer organisationTypeId, Integer organisationStateId) {
+		String queryString = "from Organisation o where o.organisationType.organisationTypeId=? and o.organisationState.organisationStateId=?";
+		Integer[] params = new Integer[]{organisationTypeId,organisationStateId};
+		return getHibernateTemplate().find(queryString,params);
 	}
 
 }

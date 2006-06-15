@@ -727,4 +727,16 @@ public class UserManagementService implements IUserManagementService {
 		organisationDAO.deleteOrganisationById(orgId);
 	}
 
+	public List getOrganisationsByTypeAndStatus(Integer organisationTypeId, Integer organisationStateId) {
+		return organisationDAO.getOrganisationsByTypeAndStatus(organisationTypeId,organisationStateId);
+	}
+
+	public List getUserOrganisationsForUserByTypeAndStatus(String username, Integer organisationTypeId, Integer organisationStateId) {
+		return userOrganisationDAO.getUserOrganisationsForUserByTypeAndStatus(username,organisationTypeId,organisationStateId);
+	}
+
+	public List getUserOrganisationRoles(Integer organisationId, String username) {
+		return userOrganisationRoleDAO.getUserOrganisationRoles(organisationId,username);
+	}
+
 }

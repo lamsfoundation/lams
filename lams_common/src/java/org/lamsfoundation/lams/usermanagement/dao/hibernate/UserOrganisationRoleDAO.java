@@ -78,4 +78,9 @@ public class UserOrganisationRoleDAO extends BaseDAO implements
 		delete(getUserOrganisationRoleById(userOrganisationRoleId));
 	}
 
+	public List getUserOrganisationRoles(Integer organisationId, String username) {
+		String queryString = "from UserOrganisationRole uor where uor.userOrganisation.organisation.organisationId=? and uor.userOrganisation.user.login=?";
+		return getHibernateTemplate().find(queryString,new Object[]{organisationId,username});
+	}
+
 }

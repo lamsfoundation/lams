@@ -64,5 +64,7 @@ public interface IUserOrganisationRoleDAO extends IBaseDAO{
      * @param userOrganisationRoleId the userOrganisationRole's userOrganisationRoleId
      */
     public void deleteUserOrganisationRoleById(Integer userOrganisationRoleId);
+
+	public List getUserOrganisationRoles(Integer organisationId, String username);
 	
 }

@@ -77,4 +77,6 @@ public interface IOrganisationDAO extends IBaseDAO{
     public Organisation getOrganisationByWorkspaceID(Integer workspaceID);
     
     public List getOrganisationsByType(Integer organisationTypeId);
+    
+    public List getOrganisationsByTypeAndStatus(Integer organisationTypeId,Integer organisationStateId);
 }
