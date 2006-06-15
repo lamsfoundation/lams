@@ -4,6 +4,7 @@
 <%@ taglib uri="tags-logic" prefix="logic" %>
 <%@ taglib uri="tags-core" prefix="c" %>
 
+<div align="left">
 <H1><fmt:message key="cache.title"/></H1>
 
 <p><fmt:message key="cache.explanation1"/></p>
@@ -25,3 +26,4 @@ Children:
 
 </c:forEach>
 </UL>
+</div>

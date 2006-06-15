@@ -3,6 +3,7 @@
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
+<div align="left">
 <H1><fmt:message key="sysadmin.headline"/></H1>
 
 <UL>
@@ -17,4 +18,4 @@
 <LI><fmt:message key="sysadmin.batch.temp.file.delete"/></LI>
 <LI><A HREF="<lams:LAMSURL/>/monitoring/monitoring.do?method=deleteOldPreviewLessons"><fmt:message key="sysadmin.batch.preview.delete"/></a></LI>
 </UL>
-
+</div>
