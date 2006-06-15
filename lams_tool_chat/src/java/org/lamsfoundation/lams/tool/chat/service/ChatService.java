@@ -73,6 +73,7 @@ import org.lamsfoundation.lams.tool.chat.dao.IChatDAO;
 import org.lamsfoundation.lams.tool.chat.dao.IChatMessageDAO;
 import org.lamsfoundation.lams.tool.chat.dao.IChatSessionDAO;
 import org.lamsfoundation.lams.tool.chat.dao.IChatUserDAO;
+import org.lamsfoundation.lams.tool.chat.dto.ChatMessageDTO;
 import org.lamsfoundation.lams.tool.chat.model.Chat;
 import org.lamsfoundation.lams.tool.chat.model.ChatAttachment;
 import org.lamsfoundation.lams.tool.chat.model.ChatMessage;
@@ -735,26 +736,11 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 	}
 
 	public void filterMessage(Node message, Chat chat) {
-		if (!chat.getFilteringEnabled()) {
-			return;
-		}
-
-		// get the filter
-		ChatMessageFilter filter = messageFilters.get(chat.getToolContentId());
-		if (filter == null) {
-			// this is the first message we have see for this toolContentId
-			// update the available filters.
-			filter = updateMessageFilters(chat);
-		}
-
-		// get the pattern
-		Pattern pattern = filter.getPattern();
+		Pattern pattern = getFilterPattern(chat);
 		if (pattern == null) {
-			// no pattern available. This occurs when filtering is enabled but
-			// no valid keywords have been defined.
-			return;
+			return;			
 		}
-
+		
 		// get the message body node
 		Node body = getBodyElement(message);
 		if (body == null) {
@@ -771,7 +757,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 
 		// filter the message.
 		Matcher matcher = pattern.matcher(bodyText.getNodeValue());
-		bodyText.setNodeValue(matcher.replaceAll("***"));
+		bodyText.setNodeValue(matcher.replaceAll(ChatConstants.FILTER_REPLACE_TEXT));
 	}
 
 	public void filterMessage(Node message) {
@@ -790,6 +776,40 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 		// get the chat content3
 		Chat chat = getSessionByJabberRoom(jabberRoom).getChat();
 		filterMessage(message, chat);
+	}
+	
+	public void filterMessage(ChatMessageDTO messageDTO, Chat chat) {
+		Pattern pattern = getFilterPattern(chat);
+		
+		if (pattern == null) {	
+			return;
+		}
+		
+		Matcher matcher = pattern.matcher(messageDTO.getBody());
+		messageDTO.setBody(matcher.replaceAll(ChatConstants.FILTER_REPLACE_TEXT));
+	}
+	
+	private Pattern getFilterPattern(Chat chat) {
+		if (!chat.getFilteringEnabled()) {
+			return null;
+		}
+		
+		// get the filter
+		ChatMessageFilter filter = messageFilters.get(chat.getToolContentId());
+		if (filter == null) {
+			// this is the first message we have see for this toolContentId
+			// update the available filters.
+			filter = updateMessageFilters(chat);
+		}
+
+		// get the pattern
+		Pattern pattern = filter.getPattern();
+		if (pattern == null) {
+			// no pattern available. This occurs when filtering is enabled but
+			// no valid keywords have been defined.
+			return null;
+		}
+		return pattern;
 	}
 
 	public ChatMessageFilter updateMessageFilters(Chat chat) {
@@ -1013,5 +1033,13 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 	public void setExportContentService(
 			IExportToolContentService exportContentService) {
 		this.exportContentService = exportContentService;
+	}
+
+	public Map<Long, Integer> getMessageCountBySession(Long chatUID) {
+		return chatMessageDAO.getCountBySession(chatUID);
+	}
+	
+	public Map<Long, Integer> getMessageCountByFromUser(Long sessionUID) {
+		return chatMessageDAO.getCountByFromUser(sessionUID);
 	}
 }

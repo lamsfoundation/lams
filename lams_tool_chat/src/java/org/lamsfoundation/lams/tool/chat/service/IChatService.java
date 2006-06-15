@@ -25,8 +25,10 @@
 package org.lamsfoundation.lams.tool.chat.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.struts.upload.FormFile;
+import org.lamsfoundation.lams.tool.chat.dto.ChatMessageDTO;
 import org.lamsfoundation.lams.tool.chat.model.Chat;
 import org.lamsfoundation.lams.tool.chat.model.ChatAttachment;
 import org.lamsfoundation.lams.tool.chat.model.ChatMessage;
@@ -220,6 +222,13 @@ public interface IChatService {
 	
 	/**
 	 * 
+	 * @param messageDTO
+	 * @param chat
+	 */
+	public void filterMessage(ChatMessageDTO messageDTO, Chat chat);
+	
+	/**
+	 * 
 	 * @param messageUID
 	 * @return
 	 */
@@ -230,4 +239,8 @@ public interface IChatService {
 	public void auditEditMessage(ChatMessage chatMessage, String messageBody);
 
 	public void auditHideShowMessage(ChatMessage chatMessage, boolean messageHidden );
+	
+	public Map<Long, Integer> getMessageCountBySession(Long chatUID);
+	
+	public Map<Long, Integer> getMessageCountByFromUser(Long sessionUID);
 }
