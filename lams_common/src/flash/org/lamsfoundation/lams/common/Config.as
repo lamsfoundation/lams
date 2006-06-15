@@ -192,27 +192,23 @@ class Config {
 		var success:Boolean = false;
 		var buildObj:Object = {};
 		Debugger.log('Build param value: '+_root.build,Debugger.GEN,'serverDefaultsLoaded','Config');
+		
 		try {	
 			if (CookieMonster.cookieExists(CONFIG_PREFIX+CONFIG_BUILD)) {
+				
 				buildObj = CookieMonster.open(CONFIG_PREFIX+CONFIG_BUILD,true);
 				Debugger.log('Build cookie exists: '+String(buildObj),Debugger.GEN,'serverDefaultsLoaded','Config');
 				
-				//var buildRt:Number = parseFloat(_root.build);
-				//var buildNo:Number = Number(buildObj);
-				
 				var buildNo:String = String(buildObj);
-				
-				trace('build root no.: ' + _root.build);
-				trace('build no.: ' + buildNo);
-				
+
 				if(buildNo != _root.build) {
 					Debugger.log('Purging cookie data',Debugger.GEN,'serverDefaultsLoaded','Config');
 					if(CookieMonster.deleteCookie(CONFIG_PREFIX + CONFIG_BUILD)) {
 						saveBuild(_root.build);
 					}
-					CookieMonster.deleteCookie(CONFIG_PREFIX + 'theme');
-					CookieMonster.deleteCookie(CONFIG_PREFIX + 'language');
+
 					removeCache=true;
+
 				}
 				
 			} else {
@@ -229,37 +225,33 @@ class Config {
         
 		
 		for (var prop in serverConfigData) {
-            if (CookieMonster.cookieExists(CONFIG_PREFIX+String(prop))){
-                Debugger.log('overwriting with local data :' + prop,Debugger.GEN,'serverDefaultsLoaded','Config');
-                _configData[prop] = CookieMonster.open(CONFIG_PREFIX+String(prop),true);
-            } else {
-                //If language config not in cookie, check browser locale before using server
-                if(prop=='language'){
-                    _configData[prop] = getLanguage();
-					saveItem(prop);
+			
+			// Remove cached data if new build
+			if(removeCache) {
+				CookieMonster.deleteCookie(CONFIG_PREFIX+_configData[prop]);
+			}
+			
+            if(prop=='language'){
+				CookieMonster.deleteCookie(CONFIG_PREFIX+_configData[prop]);
+				_configData[prop] = getLanguage();
+				saveItem(prop);
 					
-					// Remove cached data if new build
-					if(removeCache) {
-						CookieMonster.deleteCookie(DICT_PREFIX+_configData[prop]);
-					}
-					
-                } else if(prop=='theme') {
-                    //Default to 'default' if theme can't be found locally
-                    _configData[prop] = getTheme();
-					saveItem(prop);
-					
-					// Remove cached data if new build
-					if(removeCache) {
-						CookieMonster.deleteCookie(THEME_PREFIX+_configData[prop]);
-					}
-                }
-                //...else if(prop=='...'){
-					
+			} else if(prop=='theme') {
+				CookieMonster.deleteCookie(CONFIG_PREFIX+_configData[prop]);
 				
+				//Default to 'default' if theme can't be found locally
+				_configData[prop] = getTheme();
+				saveItem(prop);
+				
+			} else if (CookieMonster.cookieExists(CONFIG_PREFIX+String(prop))){
+                
+				Debugger.log('overwriting with local data :' + prop,Debugger.GEN,'serverDefaultsLoaded','Config');
+                _configData[prop] = CookieMonster.open(CONFIG_PREFIX+String(prop),true);
+            
+			} else{
+                //...else if(prop=='...'){
             }
         }
-        
-        
 		
         _serverUrl = _root.serverURL;
 		_userID = _root.userID;
