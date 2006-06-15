@@ -581,10 +581,13 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		_global.breakpoint();
 		var k:Array = _activities.keys();
 		var children:Array = new Array();
+		var count = 0;
 		for(var i=0;i<k.length;i++){
 			var a = _activities.get(k[i]);
 			if(a.parentUIID == activityUIID){
 				Debugger.log('Found a child! UIID:'+a.activityUIID,Debugger.GEN,'getComplexActivityChildren','DesignDataModel');
+				count++;
+				a.orderID = count;
 				children.push(a);
 			}
 		}
