@@ -51,7 +51,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	}
    
     public function activityClick(ca:Object):Void{
-	   Debugger.log('activityClick CanvasActivity:'+ca.activity.activityUIID,Debugger.GEN,'activityClick','CanvasController');
+	   Debugger.log('activityClick CanvasActivity:'+ca.activity.activityUIID + ' orderID: ' + ca.activity.orderID,Debugger.GEN,'activityClick','CanvasController');
 	    Debugger.log('Check if transition tool active :'+_canvasModel.isTransitionToolActive(),Debugger.GEN,'activityClick','CanvasController');
 	   //if transition tool active
 	    if(_canvasModel.isTransitionToolActive()){
