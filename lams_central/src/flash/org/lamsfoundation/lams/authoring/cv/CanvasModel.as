@@ -236,7 +236,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		
 		//gateAct.yCoord = (toAct.yCoord + fromAct.yCoord) / 2;
 		//gateAct.xCoord = (toAct.xCoord + fromAct.xCoord) / 2;
-		
+		gateAct.title = Dictionary.getValue('gate_btn');
 		gateAct.yCoord = editedCanvasTrans.midPoint.y - (CanvasActivity.GATE_ACTIVITY_WIDTH / 2);
 		gateAct.xCoord = editedCanvasTrans.midPoint.x - (CanvasActivity.GATE_ACTIVITY_HEIGHT / 2);
 		
