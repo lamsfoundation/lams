@@ -795,7 +795,6 @@ class WizardView extends AbstractView {
 	
 	private function showStep3():Void{
 		trace('showing step 3');
-		
 		setTitle(Dictionary.getValue('wizardTitle_3_lbl'));
 		setDescription(Dictionary.getValue('wizardDesc_3_lbl'));
 		
@@ -922,7 +921,7 @@ class WizardView extends AbstractView {
 			_summery_mc.removeMovieClip();
 		}
 		
-		_summery_mc = this.attachMovie('wizardSummery', 'wizardSummery', 0, {_x:SUMMERY_X+panel._x, _y:SUMMERY_Y+panel._y});
+		_summery_mc = this.attachMovie('wizardSummery', 'wizardSummery', 0, {_x:SUMMERY_X+panel._x, _y:SUMMERY_Y+panel._y, _wizardController:getController, _wizardView:this});
 		_summery_mc.design_txt.text = resultDTO.resourceName;
 		_summery_mc.title_txt.text = resultDTO.resourceTitle;
 		_summery_mc.desc_txt.text = resultDTO.resourceDescription;
@@ -930,8 +929,6 @@ class WizardView extends AbstractView {
 		_summery_mc.classname_txt.text = resultDTO.className;
 		_summery_mc.staff_txt.text = String(resultDTO.selectedStaff.length) + '/' + staffList.length;
 		_summery_mc.learners_txt.text = String(resultDTO.selectedLearners.length) + '/' + learnerList.length;
-		//_summery_mc.redraw(true);
-		//_summery_mc.onEnterFrame = setupSummeryLabels;
 		
 		trace('text height ' + _summery_mc.desc_txt.textHeight);
 		trace(_summery_mc.desc_scr);
@@ -942,17 +939,6 @@ class WizardView extends AbstractView {
 		
 		_summery_mc.redraw(true);
 		
-	}
-	
-	private function setupSummeryLabels():Void{
-		delete _summery_mc.onEnterFrame;
-		_summery_mc.design_lbl.text = Dictionary.getValue('summery_design_lbl');
-		_summery_mc.title_lbl.text = Dictionary.getValue('summery_title_lbl');
-		_summery_mc.desc_lbl.text = Dictionary.getValue('summery_desc_lbl');
-		_summery_mc.course_lbl.text = Dictionary.getValue('summery_course_lbl');
-		_summery_mc.class_lbl.text = Dictionary.getValue('summery_class_lbl');
-		_summery_mc.staff_lbl.text = Dictionary.getValue('summery_staff_lbl');
-		_summery_mc.learners_lbl.text = Dictionary.getValue('summery_learners_lbl');
 	}
 	
 	
@@ -1007,12 +993,20 @@ class WizardView extends AbstractView {
 		}
 	}
 	
-	private function disableButtons():Void{
+	public function disableButtons():Void{
 		next_btn.enabled = false;
 		prev_btn.enabled = false;
 		cancel_btn.enabled = false;
 		finish_btn.enabled = false;
 		start_btn.enabled = false;
+	}
+	
+	public function enableButtons():Void{
+		next_btn.enabled = true;
+		prev_btn.enabled = true;
+		cancel_btn.enabled = true;
+		finish_btn.enabled = true;
+		start_btn.enabled = true;
 	}
 	
 	/**
