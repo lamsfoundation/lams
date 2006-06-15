@@ -31,12 +31,12 @@ function closeEditPane() {
 <c:set var="session" value="${requestScope.sessionDTO}" />
 
 <c:choose>
-	<c:when test="${empty session.chatMessages}">
+	<c:when test="${empty session.messageDTOs}">
 		<fmt:message>No messages available</fmt:message>
 	</c:when>
 	<c:otherwise>
 		<div>
-			<c:forEach var="message" items="${session.chatMessages}">
+			<c:forEach var="message" items="${session.messageDTOs}">
 				<c:set var="hiddenStyle" value="" />
 				<c:if test="${message.hidden}" >
 					<c:set var="hiddenStyle" value="color: graytext" />
