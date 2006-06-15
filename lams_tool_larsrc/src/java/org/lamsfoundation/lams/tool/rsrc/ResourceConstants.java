@@ -50,6 +50,7 @@ public class ResourceConstants {
 	public static final String PARAM_CURRENT_INSTRUCTION_INDEX = "insIdx";
 	public static final String PARAM_RUN_OFFLINE = "runOffline";
 	public static final String PARAM_OPEN_URL_POPUP = "popupUrl";
+	public static final String PARAM_TITLE = "title";
 	
 	//for request attribute name
 	public static final String ATTR_TOOL_CONTENT_ID = "toolContentID";

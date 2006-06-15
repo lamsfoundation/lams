@@ -49,7 +49,6 @@ import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItemInstruction;
 import org.lamsfoundation.lams.tool.rsrc.service.IResourceService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
@@ -90,7 +89,9 @@ public class ViewItemAction extends Action {
 	 */
 	private ActionForward openUrlPopup(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		String url = request.getParameter(ResourceConstants.PARAM_OPEN_URL_POPUP);
+		String title = request.getParameter(ResourceConstants.PARAM_TITLE);
 		request.setAttribute(ResourceConstants.PARAM_OPEN_URL_POPUP,url);
+		request.setAttribute(ResourceConstants.PARAM_TITLE,title);
 		return mapping.findForward(ResourceConstants.SUCCESS);
 	}
 	/**
@@ -219,7 +220,8 @@ public class ViewItemAction extends Action {
 		case ResourceConstants.RESOURCE_TYPE_URL:
 			if(item.isOpenUrlNewWindow()){
 				try {
-					url = "/openUrlPopup.do?popupUrl="+URLEncoder.encode(protocol(item.getUrl()),"UTF8");
+					url = "/openUrlPopup.do?popupUrl=" + URLEncoder.encode(protocol(item.getUrl()), "UTF8") + "&title="
+							+ URLEncoder.encode(item.getTitle(), "UTF8");
 				} catch (UnsupportedEncodingException e) {
 					log.error(e);
 				}
