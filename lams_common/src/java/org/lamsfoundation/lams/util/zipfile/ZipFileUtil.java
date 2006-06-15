@@ -138,10 +138,9 @@ public class ZipFileUtil {
 					entryName = entry.getName();
 					String destName = tempDirName + File.separator + entryName;
 					
-					log.error("Prepare directory for :" + destName);
 					prepareDirectory(destName);
 					
-			        FileOutputStream fos = new FileOutputStream( destName );
+			        FileOutputStream fos = new FileOutputStream( FileUtil.getFileName(destName) );
 			        dest = new BufferedOutputStream( fos, BUFFER_SIZE );
 			        while( (count = zis.read( data, 0, BUFFER_SIZE ) ) != -1 )
 			        {
@@ -179,10 +178,8 @@ public class ZipFileUtil {
 		//It must sort out the directory information to current OS.
 		//e.g, if zip file is zipped under windows, but unzip in linux.  
 		destName = FileUtil.makeCanonicalPath(destName);
-		log.error("Change canonical directory to :" + destName);
 		File destNameFile = new File(destName);
 		String path = destNameFile.getParent();
-		log.error("Making path :" + path);
 		if(path != null){
 			File pathDir = new File(path);
 			pathDir.mkdirs();
