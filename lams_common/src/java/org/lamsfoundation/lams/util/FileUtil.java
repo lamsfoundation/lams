@@ -349,7 +349,7 @@ public class FileUtil {
 		if(File.separator.indexOf("\\") != -1)
 			fullpath = fullpath.replaceAll("\\/","\\\\");
 		else
-			fullpath = fullpath.replaceAll("\\",File.separator);
+			fullpath = fullpath.replaceAll("\\\\",File.separator);
 		
 		return fullpath;
 		
