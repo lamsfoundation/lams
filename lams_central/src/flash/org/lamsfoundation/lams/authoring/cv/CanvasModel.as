@@ -48,6 +48,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	
 	private var _cv:Canvas;
 	private var _ddm:DesignDataModel;
+	private var optionalCA:CanvasOptionalActivity;
 	//UI State variabls	private var _isDirty:Boolean;
 	private var _activeTool:String;
 	private var _selectedItem:Object;  // the currently selected thing - could be activity, transition etc.
@@ -272,7 +273,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		var gateAct = new GateActivity(_cv.ddm.newUIID(),gateTypeID);
 		gateAct.learningDesignID = _cv.ddm.learningDesignID;
 		
-		
+		gateAct.title = Dictionary.getValue('gate_btn');
 		gateAct.yCoord = pos.y;
 		gateAct.xCoord = pos.x;
 		
@@ -386,6 +387,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		ca.activity.parentUIID = null;
 		ca.activity.orderID = null;
 		removeActivity(ca.activity.activityUIID);
+		_cv.ddm.removeActivity(ca.activity.activityUIID);
+		//optionalCA.removeChild();
 		removeActivity(parentID);
 		setDirty();
 		
@@ -415,6 +418,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 			
 		}
 		_cv.removeActivity(ca.activity.activityUIID);
+		setDirty();
 	}
 	
 	
@@ -429,6 +433,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 				//dispatchEvent({type:'ddmUpdate',target:this});
 			
 			r.removeMovieClip();
+			//_cv.ddm.removeActivity(activityUIID);
 		}
 	}
 	
