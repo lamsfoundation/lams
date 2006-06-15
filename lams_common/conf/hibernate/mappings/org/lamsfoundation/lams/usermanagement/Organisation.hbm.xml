@@ -118,7 +118,7 @@
   
     <!-- bi-directional many-to-one association to OrganisationState -->
     <many-to-one
-        name="OrganisationState"
+        name="organisationState"
         class="org.lamsfoundation.lams.usermanagement.OrganisationState"
         not-null="true"
     >
