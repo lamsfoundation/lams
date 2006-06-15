@@ -348,6 +348,10 @@ public class LearningAction extends Action {
 		forumService.createRootTopic(forumId, sessionId, message);
 
 		// echo back current root topic to fourm init page
+		Forum forum = forumService.getForum(forumId);
+		request.setAttribute(ForumConstants.ATTR_FORUM_TITLE,forum.getTitle());
+		request.setAttribute(ForumConstants.ATTR_FORUM_INSTRCUTION,forum.getInstructions());
+	
 		List rootTopics = forumService.getRootTopics(sessionId);
 		request.setAttribute(ForumConstants.AUTHORING_TOPICS_LIST, rootTopics);
 		return mapping.findForward("success");
@@ -502,6 +506,7 @@ public class LearningAction extends Action {
 		Long rootTopicId = forumService.getRootTopicId(topicId);
 		List msgDtoList = forumService.getTopicThread(rootTopicId);
 		setAuthorMark(msgDtoList);
+		
 		request.setAttribute(ForumConstants.AUTHORING_TOPIC_THREAD, msgDtoList);
 		
 		return mapping.findForward("success");
@@ -584,7 +589,9 @@ public class LearningAction extends Action {
 		}
 		messagePO.setUpdated(new Date());
 		messagePO.setModifiedBy(getCurrentUser(request));
-		messagePO.setAttachments(null);
+		Set atts = messagePO.getAttachments();
+		if(atts != null)
+			atts.clear();
 		
 		if ( makeAuditEntry ) {
 			forumService.getAuditService().logChange(ForumConstants.TOOL_SIGNATURE,
@@ -694,8 +701,11 @@ public class LearningAction extends Action {
 			forumService = getForumManager();
 			Attachment att = forumService.uploadAttachment(messageForm
 					.getAttachmentFile());
+			Set attSet = message.getAttachments();
+			if(attSet == null)
+				attSet = new HashSet();
 			// only allow one attachment, so replace whatever
-			Set attSet = attSet = new HashSet();
+			attSet.clear();
 			attSet.add(att);
 			message.setAttachments(attSet);
 		}
