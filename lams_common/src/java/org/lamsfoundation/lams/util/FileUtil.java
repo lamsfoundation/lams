@@ -300,12 +300,11 @@ public class FileUtil {
 			
 		fileName = fileName.trim();
 
-		int dotPos = fileName.lastIndexOf(File.separatorChar);
+		int dotPos = fileName.lastIndexOf("/");
+		int dotPos2 = fileName.lastIndexOf("\\");
+		dotPos = Math.max(dotPos,dotPos2);
 		if (dotPos == -1){
-			//just for window OS: it also can use "/" as file separatorChar.
-			dotPos = fileName.lastIndexOf("/"); 
-			if(dotPos == -1)
-				return fileName;
+			return fileName;
 		}
 		return fileName.substring(dotPos + 1, fileName.length());
 		
@@ -321,12 +320,11 @@ public class FileUtil {
 		
 		fileName = fileName.trim();
 
-		int dotPos = fileName.lastIndexOf(File.separatorChar);
+		int dotPos = fileName.lastIndexOf("/");
+		int dotPos2 = fileName.lastIndexOf("\\");
+		dotPos = Math.max(dotPos,dotPos2);
 		if (dotPos == -1){
-			//just for window OS: it also can use "/" as file separatorChar.
-			dotPos = fileName.lastIndexOf("/"); 
-			if(dotPos == -1)
-				return fileName;
+			return "";
 		}
 		//return the last char is '/'
 		return fileName.substring(0,dotPos+1);
