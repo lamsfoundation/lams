@@ -45,4 +45,6 @@ public interface ChatConstants {
 	static final String XMPPCONFERENCE = "conference.shaun.melcoe.mq.edu.au";
 	static final String XMPP_ADMIN_USERNAME = "admin";
 	static final String XMPP_ADMIN_PASSWORD = "wildfire";
+	
+	static final String FILTER_REPLACE_TEXT = "***";
 }
