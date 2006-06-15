@@ -328,14 +328,14 @@ public class LearningDesignService implements ILearningDesignService{
 	 * This method ensures that the order id of the optional activities
 	 * start from 1, are sequential and do not contain any duplicates.
 	 * It will iterate through the child activities of the OptionalActivity,
-	 * and compare the current activity id with the previous activity id.
-	 * The currentActivityId should be 1 greater than the previous activity id.
+	 * and compare the current activity order id with the previous activity order id.
+	 * The currentActivityId should be 1 greater than the previous activity order id.
 	 * @param parentActivity
 	 */
 	private void validateOptionsActivityOrderId(Activity parentActivity, Vector listOfValidationErrorDTOs)
 	{
-		Long thisActivityId = null;
-		Long previousActivityId = null;
+		Integer thisActivityOrderId = null;
+		Integer previousActivityOrderId = null;
 		boolean validOrderId = true;
 		if(parentActivity.isOptionsActivity())
 		{
@@ -345,21 +345,21 @@ public class LearningDesignService implements ILearningDesignService{
 			while (i.hasNext())
 			{
 				Activity childActivity = (Activity)i.next();
-				thisActivityId= childActivity.getActivityId();
-				if (previousActivityId != null)
+				thisActivityOrderId= childActivity.getOrderId();
+				if (previousActivityOrderId != null)
 				{
 					//compare the two numbers
-					if (thisActivityId.longValue() != (previousActivityId.longValue() + 1))
+					if (thisActivityOrderId.longValue() != (previousActivityOrderId.longValue() + 1))
 						validOrderId = validOrderId && false;
 					
 				}
 				else
 				{
 					//this is the first activity, since the previousActivityId is null
-					if(thisActivityId.longValue()!= 1)
+					if(thisActivityOrderId.longValue()!= 1)
 						validOrderId = validOrderId && false;
 				}
-				previousActivityId = thisActivityId; 
+				previousActivityOrderId = thisActivityOrderId; 
 			}
 			
 			if (!validOrderId)
