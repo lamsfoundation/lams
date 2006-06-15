@@ -109,7 +109,6 @@ import com.thoughtworks.xstream.converters.Converter;
  */
 public class ExportToolContentService implements IExportToolContentService, ApplicationContextAware {
 	public static final String LEARNING_DESIGN_SERVICE_BEAN_NAME = "learningDesignService";
-	private static final String USER_SERVICE_BEAN_NAME = "userManagementService";
 	
 	//export tool content zip file prefix
 	public static final String EXPORT_TOOLCONTNET_ZIP_PREFIX = "lams_toolcontent_";
@@ -310,6 +309,9 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			//The content will contain tool.xml and attachment files of tools from LAMS repository.
 			List<AuthoringActivityDTO> activities = ldDto.getActivities();
 			for(AuthoringActivityDTO activity : activities){
+				//skip non-tool activities
+				if(activity.getActivityTypeID().intValue() != Activity.TOOL_ACTIVITY_TYPE)
+					continue;
 				ToolContentManager contentManager = (ToolContentManager) findToolService(toolDAO.getToolByID(activity.getToolID()));
 				log.debug("Tool export content : " + activity.getTitle() +" by contentID :" + activity.getToolContentID());
 				try{
@@ -421,6 +423,10 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			Map<Long,ToolContent> toolMapper = new HashMap<Long,ToolContent>();
 			List<AuthoringActivityDTO> activities = ldDto.getActivities();
 			for(AuthoringActivityDTO activity : activities){
+				//skip non-tool activities
+				if(activity.getActivityTypeID().intValue() != Activity.TOOL_ACTIVITY_TYPE)
+					continue;
+				
 				String toolPath = FileUtil.getFullPath(learningDesignPath,activity.getToolContentID().toString());
 				
 				//To create a new toolContent according to imported tool signature name.
