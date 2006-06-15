@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.tool.chat.web.actions;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -36,9 +37,9 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.tool.chat.dto.ChatMessageDTO;
 import org.lamsfoundation.lams.tool.chat.dto.ChatSessionDTO;
-import org.lamsfoundation.lams.tool.chat.dto.MonitoringDTO;
+import org.lamsfoundation.lams.tool.chat.dto.ChatUserDTO;
+import org.lamsfoundation.lams.tool.chat.dto.ChatDTO;
 import org.lamsfoundation.lams.tool.chat.model.Chat;
 import org.lamsfoundation.lams.tool.chat.model.ChatMessage;
 import org.lamsfoundation.lams.tool.chat.model.ChatSession;
@@ -87,21 +88,47 @@ public class MonitoringAction extends LamsDispatchAction {
 					.getServletContext());
 		}
 		Chat chat = chatService.getChatByContentId(toolContentID);
+		ChatDTO chatDTO = new ChatDTO(chat);
 		
-		// constructing DTOs
-		Set<ChatSessionDTO> chatSessionDTOs = new TreeSet<ChatSessionDTO>();
-		for (Iterator iter = chat.getChatSessions().iterator(); iter.hasNext();) {
-			ChatSession chatSession = (ChatSession) iter.next();
-			List latestMessages = chatService.getLastestMessages(chatSession, ChatConstants.MONITORING_SUMMARY_MAX_MESSAGES);
-			
-			ChatSessionDTO chatSessionDTO = new ChatSessionDTO(chatSession, latestMessages);
-			chatSessionDTOs.add(chatSessionDTO);
-		}
-		MonitoringDTO dto = new MonitoringDTO(chat);
-		dto.setChatSessions(chatSessionDTOs);
-		dto.setChatEditable(this.isChatEditable(chat));
+		Map<Long, Integer> sessCountMap = chatService
+				.getMessageCountBySession(chat.getUid());
 
-		request.setAttribute("monitoringDTO", dto);
+		for (Iterator sessIter = chat.getChatSessions().iterator(); sessIter
+				.hasNext();) {
+			ChatSession session = (ChatSession) sessIter.next();
+
+			List latestMessages = chatService.getLastestMessages(session,
+					ChatConstants.MONITORING_SUMMARY_MAX_MESSAGES);
+			ChatSessionDTO sessionDTO = new ChatSessionDTO(session,
+					latestMessages);
+
+			Integer count = sessCountMap.get(session.getUid());
+			if (count == null) {
+				count = 0;
+			}
+			sessionDTO.setPostCount(count);
+
+			// constructing userDTOs
+			Map<Long, Integer> userCountMap = chatService
+					.getMessageCountByFromUser(session.getUid());
+			for (Iterator userIter = session.getChatUsers().iterator(); userIter
+					.hasNext();) {
+				ChatUser user = (ChatUser) userIter.next();
+				ChatUserDTO userDTO = new ChatUserDTO(user);
+				count = userCountMap.get(user.getUid());
+				if (count == null) {
+					count = 98;
+				}
+				userDTO.setPostCount(count);
+				sessionDTO.getUserDTOs().add(userDTO);
+			}
+
+			chatDTO.getSessionDTOs().add(sessionDTO);
+		}
+
+		chatDTO.setChatEditable(this.isChatEditable(chat));
+
+		request.setAttribute("monitoringDTO", chatDTO);
 		return mapping.findForward("success");
 	}
 
@@ -135,18 +162,19 @@ public class MonitoringAction extends LamsDispatchAction {
 			chatService.createJabberRoom(chatSession);
 			chatService.saveOrUpdateChatSession(chatSession);
 		}
-		
+
 		// set the teachers visibility
-		
+
 		request.setAttribute("XMPPDOMAIN", ChatConstants.XMPPDOMAIN);
 		request.setAttribute("USERNAME", chatUser.getUserId());
 		request.setAttribute("PASSWORD", chatUser.getUserId());
 		request.setAttribute("CONFERENCEROOM", chatSession.getJabberRoom());
 		request.setAttribute("NICK", chatUser.getJabberNickname());
 		request.setAttribute("MODE", "teacher");
-		
+
 		request.setAttribute("chatTitle", chatSession.getChat().getTitle());
-		request.setAttribute("chatInstructions", chatSession.getChat().getInstructions());
+		request.setAttribute("chatInstructions", chatSession.getChat()
+				.getInstructions());
 
 		return mapping.findForward("chat_client");
 	}
@@ -154,30 +182,36 @@ public class MonitoringAction extends LamsDispatchAction {
 	public ActionForward openChatHistory(ActionMapping mapping,
 			ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
-		
+
 		MonitoringForm monitoringForm = (MonitoringForm) form;
 		// TODO check for null from chatService. forward to appropriate page.
-		ChatSession chatSession = chatService.getSessionBySessionId(monitoringForm.getToolSessionID());
+		ChatSession chatSession = chatService
+				.getSessionBySessionId(monitoringForm.getToolSessionID());
 		ChatSessionDTO sessionDTO = new ChatSessionDTO(chatSession);
-		request.setAttribute("sessionDTO", sessionDTO);		
+		request.setAttribute("sessionDTO", sessionDTO);
 		return mapping.findForward("chat_history");
 	}
-	
-	public ActionForward editMessage(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+
+	public ActionForward editMessage(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response) {
 		MonitoringForm monitoringForm = (MonitoringForm) form;
-		ChatMessage chatMessage = chatService.getMessageByUID(monitoringForm.getMessageUID());
-		
+		ChatMessage chatMessage = chatService.getMessageByUID(monitoringForm
+				.getMessageUID());
+
 		boolean hasChanged = false;
-		if (chatMessage.getHidden().booleanValue() != monitoringForm.isMessageHidden() ) {
+		if (chatMessage.getHidden().booleanValue() != monitoringForm
+				.isMessageHidden()) {
 			hasChanged = true;
-			chatService.auditHideShowMessage(chatMessage, monitoringForm.isMessageHidden());
+			chatService.auditHideShowMessage(chatMessage, monitoringForm
+					.isMessageHidden());
 		}
-		
+
 		if (!chatMessage.getBody().equals(monitoringForm.getMessageBody())) {
 			hasChanged = true;
-			chatService.auditEditMessage(chatMessage, monitoringForm.getMessageBody());
+			chatService.auditEditMessage(chatMessage, monitoringForm
+					.getMessageBody());
 		}
-		
+
 		if (hasChanged) {
 			chatMessage.setBody(monitoringForm.getMessageBody());
 			chatMessage.setHidden(monitoringForm.isMessageHidden());
@@ -185,6 +219,7 @@ public class MonitoringAction extends LamsDispatchAction {
 		}
 		return openChatHistory(mapping, form, request, response);
 	}
+
 	/* Private Methods */
 
 	private ChatUser getCurrentUser(Long toolSessionId) {
