@@ -49,8 +49,8 @@ import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 
 public class ExportServlet  extends AbstractExportPortfolioServlet implements McAppConstants{
 	static Logger logger = Logger.getLogger(ExportServlet.class.getName());
-	private static final long serialVersionUID = -4119093489007108143L;
-	private final String FILENAME = "mc_main.html";
+	private static final long serialVersionUID = -5119093489007108143L;
+	private final String FILENAME = "mcq_main.html";
 	
 	
 	public String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies)
@@ -113,16 +113,10 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Mc
     	
         logger.debug("calling learning mode toolSessionID:" + toolSessionID + " userID: " + userID );
     	McMonitoringAction mcMonitoringAction= new McMonitoringAction();
-    	logger.debug("start refreshSummaryData for learner mode.");
-    	//mcMonitoringAction.refreshSummaryData(request, content, mcService, true, true, toolSessionID.toString(), userID.toString());
-    	/*
-	    List listMonitoredAnswersContainerDTO=MonitoringUtil.buildGroupsQuestionData(request, content);
+        List listMonitoredAnswersContainerDTO=MonitoringUtil.buildSessionQuestionData(request, content, toolSessionID, userID);
 	    request.getSession().setAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO, listMonitoredAnswersContainerDTO);
 	    logger.debug("LIST_MONITORED_ANSWERS_CONTAINER_DTO: " + request.getSession().getAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO));
-	    */
-
-    	
-    	logger.debug("end refreshSummaryData for learner mode.");
+        
     	logger.debug("ending learner mode: ");
     }
 	

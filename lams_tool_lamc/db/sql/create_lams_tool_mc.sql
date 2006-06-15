@@ -1,5 +1,3 @@
--- $Id$
-
 CREATE TABLE tl_lamc11_content (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
      , content_id BIGINT(20) NOT NULL
@@ -74,10 +72,9 @@ CREATE TABLE tl_lamc11_que_usr (
      , mc_session_id BIGINT(20) NOT NULL
      , username VARCHAR(100)
      , fullname VARCHAR(100)
-     , UNIQUE UQ_tl_lamc11_que_usr_1 (que_usr_id)
      , PRIMARY KEY (uid)
      , INDEX (mc_session_id)
-     , CONSTRAINT FK_tl_lamc_tool_usr_1 FOREIGN KEY (mc_session_id)
+     , CONSTRAINT FK_tl_lamc11_que_usr_1 FOREIGN KEY (mc_session_id)
                   REFERENCES tl_lamc11_session (uid)
 )TYPE=InnoDB;
 
@@ -93,15 +90,15 @@ CREATE TABLE tl_lamc11_usr_attempt (
      , passed TINYINT(1) NOT NULL DEFAULT 0
      , attemptOrder INTEGER NOT NULL DEFAULT 1
      , PRIMARY KEY (uid)
-     , INDEX (que_usr_id)
-     , CONSTRAINT FK_tl_lamc11_usr_attempt_1 FOREIGN KEY (que_usr_id)
-                  REFERENCES tl_lamc11_que_usr (uid)
      , INDEX (mc_que_content_id)
      , CONSTRAINT FK_tl_lamc11_usr_attempt_2 FOREIGN KEY (mc_que_content_id)
                   REFERENCES tl_lamc11_que_content (uid)
      , INDEX (mc_que_option_id)
      , CONSTRAINT FK_tl_lamc11_usr_attempt_3 FOREIGN KEY (mc_que_option_id)
                   REFERENCES tl_lamc11_options_content (uid)
+     , INDEX (que_usr_id)
+     , CONSTRAINT FK_tl_lamc11_usr_attempt_4 FOREIGN KEY (que_usr_id)
+                  REFERENCES tl_lamc11_que_usr (uid)
 )TYPE=InnoDB;
 
 CREATE TABLE tl_lamc11_uploadedfile (

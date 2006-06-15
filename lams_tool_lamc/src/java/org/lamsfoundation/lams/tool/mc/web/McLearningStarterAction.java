@@ -357,8 +357,11 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 			McLearningAction mcLearningAction= new McLearningAction();
 			/* pay attention that this userId is the learner's userId passed by the request parameter.
 			 * It is differerent than USER_ID kept in the session of the current system user*/
-			McQueUsr mcQueUsr=mcService.retrieveMcQueUsr(new Long(userId));
-		    logger.debug("mcQueUsr:" + mcQueUsr);
+			//McQueUsr mcQueUsr=mcService.retrieveMcQueUsr(new Long(userId));
+		    //logger.debug("mcQueUsr:" + mcQueUsr);
+		    
+		    McQueUsr mcQueUsr=mcService.getMcUserBySession(new Long(userId), mcSession.getUid());
+		    logger.debug("mcQueUsr: " + mcQueUsr);
 		    if (mcQueUsr == null)
 		    {
 		    	McUtils.cleanUpSessionAbsolute(request);
@@ -440,7 +443,8 @@ public class McLearningStarterAction extends Action implements McAppConstants {
     	String userID=(String) request.getSession().getAttribute(USER_ID);
     	logger.debug("userID:" + userID);
 	    
-    	McQueUsr mcQueUsr=mcService.retrieveMcQueUsr(new Long(userID));
+    	//McQueUsr mcQueUsr=mcService.retrieveMcQueUsr(new Long(userID));
+    	McQueUsr mcQueUsr=mcService.getMcUserBySession(new Long(userID), mcSession.getUid());
 	    logger.debug("mcQueUsr:" + mcQueUsr);
 	    
 	    if (mcQueUsr != null)

@@ -48,6 +48,7 @@ import org.lamsfoundation.lams.tool.mc.McUtils;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
+import org.lamsfoundation.lams.tool.mc.pojos.McSession;
 import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
@@ -426,16 +427,41 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     	    mcLearningForm.setPassMarkApplicable(new Boolean(false).toString());
     	}
     	
-    	boolean isUserDefined=LearningUtil.doesUserExists(request);
-    	logger.debug("isUserDefined");
+    	
+    	Long toolSessionId=(Long)request.getSession().getAttribute(TOOL_SESSION_ID);
+    	logger.debug("toolSessionId: " + toolSessionId);
+    	
+    	McSession mcSession=mcService.retrieveMcSession(toolSessionId);
+        logger.debug("retrieving mcSession: " + mcSession);
+        
+        Long toolSessionUid=mcSession.getUid();
+        logger.debug("toolSessionUid: " + toolSessionUid);
+
+    	
+    	boolean isUserDefined=false;
+    	String userID=(String)request.getSession().getAttribute(USER_ID);
+    	logger.debug("userID: " + userID);
+    	McQueUsr existingMcQueUsr=mcService.getMcUserBySession(new Long(userID), mcSession.getUid());
+    	logger.debug("existingMcQueUsr: " + existingMcQueUsr);
+    	
+    	if (existingMcQueUsr != null)
+    	    isUserDefined=true;
+    	
+    	logger.debug("isUserDefined: " + isUserDefined);
+
+    	McQueUsr mcQueUsr=null;
     	if (isUserDefined == false)
     	{
-    		LearningUtil.createUser(request);
-    		logger.debug("created user in the db");
+    	    mcQueUsr=LearningUtil.createUser(request);
+    		logger.debug("created user in the db: " + mcQueUsr);
     	}
-    	McQueUsr mcQueUsr=LearningUtil.getUser(request);
-    	logger.debug("mcQueUsr: " + mcQueUsr);
-    	
+    	else
+    	{
+    	    mcQueUsr=existingMcQueUsr;
+    	    logger.debug("assign");
+    	}
+
+    	logger.debug("final mcQueUsr: " + mcQueUsr);
     	
     	String highestAttemptOrder=(String)request.getSession().getAttribute(LEARNER_LAST_ATTEMPT_ORDER);
         logger.debug("current highestAttemptOrder:" + highestAttemptOrder);
@@ -538,7 +564,18 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		request.getSession().setAttribute(CURRENT_QUESTION_INDEX, "1");
 		request.getSession().setAttribute(TOTAL_COUNT_REACHED, new Boolean(false).toString());
 		
-		McQueUsr mcQueUsr=LearningUtil.getUser(request);
+    	Long toolSessionId=(Long)request.getSession().getAttribute(TOOL_SESSION_ID);
+    	logger.debug("toolSessionId: " + toolSessionId);
+    	
+    	McSession mcSession=mcService.retrieveMcSession(toolSessionId);
+        logger.debug("retrieving mcSession: " + mcSession);
+        
+        String userID=(String)request.getSession().getAttribute(USER_ID);
+    	logger.debug("userID: " + userID);
+
+    	McQueUsr mcQueUsr=mcService.getMcUserBySession(new Long(userID), mcSession.getUid());
+		logger.debug("mcQueUsr: " + mcQueUsr);
+		
 		Long queUsrId=mcQueUsr.getUid();
 		logger.debug("queUsrId: " + queUsrId);
 		
@@ -609,8 +646,15 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		}
 		else
 		{
-			mcQueUsr=mcService.retrieveMcQueUsr(new Long(learnerProgressUserId));
-			logger.debug("mcQueUsr: " + mcQueUsr);
+			//mcQueUsr=mcService.retrieveMcQueUsr(new Long(learnerProgressUserId));
+			//logger.debug("mcQueUsr: " + mcQueUsr);
+	    	Long toolSessionId=(Long)request.getSession().getAttribute(TOOL_SESSION_ID);
+	    	logger.debug("toolSessionId: " + toolSessionId);
+	    	
+	    	McSession mcSession=mcService.retrieveMcSession(toolSessionId);
+	        logger.debug("retrieving mcSession: " + mcSession);
+
+		    mcQueUsr=mcService.getMcUserBySession(new Long(learnerProgressUserId), mcSession.getUid());
 			
 			queUsrId=mcQueUsr.getUid();
 			logger.debug("queUsrId: " + queUsrId);

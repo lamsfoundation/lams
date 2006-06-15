@@ -51,7 +51,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			  	 			<td> &nbsp&nbsp&nbsp</td>
 			  	 		</tr>
 						<tr>			
-							<td NOWRAP valign=top align=left><b> <font size=2> <bean:message key="label.question"/> : </b> </font>
+							<td NOWRAP valign=top align=left><b> <font size=2> <bean:message key="label.question"/> : </font> </b> 
 								<c:out value="${currentDto.question}" escapeXml="false"/>
 							 </td>
 						</tr>	
@@ -70,23 +70,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								  	 		<c:set var="responseUid" scope="request" value="${userData.uid}"/>
 
 	  	 									<c:if test="${currentQuestionId == userData.questionUid}"> 			
-		  	 									<c:if test="${sessionScope.currentMonitoredToolSession == 'All'}"> 			
-			  	 									<tr>
-														 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.userName}"/> </font>  </td>  
-														 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.attemptTime}"/> </font> </td>
-														 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.response}"/> </font> </td>
-													</tr>
-												</c:if>														  					 									  			
-												
-		  	 									<c:if test="${sessionScope.currentMonitoredToolSession != 'All'}"> 			
-		  	 										<c:if test="${sessionScope.currentMonitoredToolSession == userData.sessionId}"> 			
-		  	 										<tr>
-														 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.userName}"/> </font>  </td>  
-														 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.attemptTime}"/> </font> </td>
-														 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.response}"/> </font> </td>
-													</tr>
-													</c:if>														  					 									  													  			
-												</c:if>														  					 									  													  			
+	  	 										<tr>
+													 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.userName}"/> </font>  </td>  
+													 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.attemptTime}"/> </font> </td>
+													 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.response}"/> </font> </td>
+												</tr>
 											</c:if>														  					 
 	 									</c:forEach>		  	
 									</c:forEach>		  	
@@ -95,4 +83,5 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			  			</tr>
 					</c:forEach>		  	
 			</table>			
-		</c:if>							
+		</c:if>				
+

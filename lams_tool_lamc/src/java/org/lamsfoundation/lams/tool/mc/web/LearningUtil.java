@@ -609,6 +609,21 @@ public class LearningUtil implements McAppConstants {
     	return false;
     }
 	
+    public static McQueUsr getUser(HttpServletRequest request)
+	{
+		IMcService mcService =McUtils.getToolService(request);
+	    Long queUsrId=McUtils.getUserId();
+	    
+    	Long toolSessionId=(Long)request.getSession().getAttribute(TOOL_SESSION_ID);
+    	logger.debug("toolSessionId: " + toolSessionId);
+    	
+    	McSession mcSession=mcService.retrieveMcSession(toolSessionId);
+        logger.debug("retrieving mcSession: " + mcSession);
+        McQueUsr mcQueUsr=mcService.getMcUserBySession(queUsrId, mcSession.getUid());
+		//McQueUsr mcQueUsr=mcService.retrieveMcQueUsr(queUsrId);
+		return mcQueUsr;
+	}
+    
     
     /**
      * creates the user in the db
@@ -616,7 +631,7 @@ public class LearningUtil implements McAppConstants {
      * 
      * @param request
      */
-    public static void createUser(HttpServletRequest request)
+    public static McQueUsr createUser(HttpServletRequest request)
 	{
 		IMcService mcService =McUtils.getToolService(request);
 	    Long queUsrId=McUtils.getUserId();
@@ -632,36 +647,9 @@ public class LearningUtil implements McAppConstants {
 										new TreeSet());		
 		mcService.createMcQueUsr(mcQueUsr);
 		logger.debug("created mcQueUsr in the db: " + mcQueUsr);
-	}
-
-    
-    /**
-     * checks if the user is in the db
-     * doesUserExists(HttpServletRequest request)
-     * 
-     * @param request
-     */
-    public static boolean doesUserExists(HttpServletRequest request)
-	{
-		IMcService mcService =McUtils.getToolService(request);
-	    Long queUsrId=McUtils.getUserId();
-		McQueUsr mcQueUsr=mcService.retrieveMcQueUsr(queUsrId);
-		
-		if (mcQueUsr != null)
-			return true;
-		
-		return false;
-	}
-    
-    
-    public static McQueUsr getUser(HttpServletRequest request)
-	{
-		IMcService mcService =McUtils.getToolService(request);
-	    Long queUsrId=McUtils.getUserId();
-		McQueUsr mcQueUsr=mcService.retrieveMcQueUsr(queUsrId);
 		return mcQueUsr;
 	}
-    
+
     
     /**
      * creates a user attempt in the db
