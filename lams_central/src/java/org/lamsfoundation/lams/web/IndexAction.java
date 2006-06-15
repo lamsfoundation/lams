@@ -94,6 +94,10 @@ public class IndexAction extends Action {
 			log.debug("we got "+organisations.size()+" organisations whose type is "+OrganisationType.COURSE_DESCRIPTION+" and whose state is "+OrganisationState.ACTIVE);
 			roles.add(Role.ROLE_SYSADMIN);
 			for (Organisation org:organisations) {
+				List<UserOrganisationRole> userOrganisationRoles = service.getUserOrganisationRoles(org.getOrganisationId(),request.getRemoteUser());
+				for(UserOrganisationRole userOrganisationRole:userOrganisationRoles){
+					roles.add(userOrganisationRole.getRole().getRoleId());
+				}
 				orgBeans.add(createOrgBean(org, roles, request.getRemoteUser(),true));
 			}
 		} else {
@@ -103,6 +107,9 @@ public class IndexAction extends Action {
 				List<Integer> roles = new ArrayList<Integer>();
 				for(Object userOrganisationRole:userOrganisation.getUserOrganisationRoles()){
 					roles.add(((UserOrganisationRole)userOrganisationRole).getRole().getRoleId());
+				}
+				for(Integer roleId:roles){
+					log.debug("role:"+roleId);
 				}
 				orgBeans.add(createOrgBean(userOrganisation.getOrganisation(),roles,request.getRemoteUser(),false));
 			}
@@ -121,9 +128,9 @@ public class IndexAction extends Action {
 				links.add(new IndexLinkBean("Manage Classes", "admin/orgmanage.do?org=" + org.getOrganisationId()));
 			}
 		}
-		if (contains(roles, Role.ROLE_COURSE_ADMIN) || contains(roles, Role.ROLE_COURSE_MANAGER)) {
+		if (contains(roles, Role.ROLE_COURSE_ADMIN) || contains(roles, Role.ROLE_COURSE_MANAGER) || contains(roles,Role.ROLE_STAFF)) {
 			if (orgBean.getType().equals(OrganisationType.COURSE_TYPE)) {
-				if(!isSysAdmin){
+				if((!isSysAdmin)&&(contains(roles, Role.ROLE_COURSE_ADMIN) || contains(roles, Role.ROLE_COURSE_MANAGER))){
 					links.add(new IndexLinkBean("Manage Classes", "admin/orgmanage.do?org=" + org.getOrganisationId()));
 				}
 				links.add(new IndexLinkBean("Add Lesson", "home.do?method=addLesson&courseID=" + org.getOrganisationId()));
@@ -131,6 +138,7 @@ public class IndexAction extends Action {
 				links.add(new IndexLinkBean("Add Lesson","home.do?method=addLesson&courseID="+org.getParentOrganisation().getOrganisationId()+"&classID="+org.getOrganisationId()));
 			}
 		}
+		
 		orgBean.setLinks(links);
 
 		List<IndexLessonBean> lessonBeans = new ArrayList<IndexLessonBean>();
@@ -139,7 +147,8 @@ public class IndexAction extends Action {
 			List<IndexLinkBean> lessonLinks = new ArrayList<IndexLinkBean>();
 			if(contains(roles,Role.ROLE_COURSE_MANAGER)||contains(roles,Role.ROLE_STAFF)){
 				lessonLinks.add(new IndexLinkBean("Monitor", "home.do/method=monitorLesson&lessonID=" + lesson.getLessonId()));
-			}else if(contains(roles,Role.ROLE_LEARNER)){
+			}
+			if(contains(roles,Role.ROLE_LEARNER)){
 				lessonLinks.add(new IndexLinkBean("Participate","home.do?method=learner&lessonID="+lesson.getLessonId()));
 			}
 			IndexLessonBean lessonBean = new IndexLessonBean(lesson.getLessonName(), lessonLinks);
