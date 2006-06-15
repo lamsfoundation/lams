@@ -48,11 +48,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 		<html:form  action="/learning?method=displayMc&validate=false" method="POST" target="_self">
 				<table width="80%" cellspacing="8" align="CENTER" class="forms">
+					<c:if test="${sessionScope.learnerProgress != 'true'}"> 							  
 					  <tr>
 					  	<th scope="col" valign=top colspan=2> 
 						  	 <bean:message key="label.assessment"/> 
 					  	</th>
 					  </tr>
+					</c:if> 								  					  
 
 					  <tr>
 					  	<td NOWRAP align=center valign=top colspan=2> 
