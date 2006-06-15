@@ -1,169 +1,97 @@
-<%@ page contentType="text/html; charset=iso-8859-1" language="java" %>
-<%@ page import="java.util.*" %>
-<%@ page import="org.springframework.web.context.support.WebApplicationContextUtils" %>
-<%@ page import="org.springframework.web.context.WebApplicationContext" %>
-<%@ page import="org.lamsfoundation.lams.usermanagement.service.UserManagementService" %>
-<%@ page import="org.lamsfoundation.lams.usermanagement.Role" %>
-<%@ page import="org.lamsfoundation.lams.usermanagement.User" %>
-<%@ page import="org.lamsfoundation.lams.lesson.Lesson" %>
-<%@ page import="org.lamsfoundation.lams.usermanagement.dto.OrganisationDTO" %>
-<%@ page import="org.apache.commons.collections.functors.WhileClosure" %>
+<%@ page contentType="text/html; charset=utf-8" language="java" %>
 
-<%@ taglib uri="http://java.sun.com/jstl/core" prefix="c" %>
+<%@ taglib uri="tags-core" prefix="c" %>
 
-<form name="form" method="post">
-<table width="98%" height="100%" border="0" align="center" cellpadding="2" cellspacing="0">
+<table width=100% border=0>
 	<tr>
-		<td align="center" valign="middle"><img height="7" src="images/spacer.gif" width="10" alt="spacer.gif"/></td>
-	</tr>
-	<tr>
-		<td valign="top">
-			<%String login = request.getRemoteUser();
-			WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(request.getSession().getServletContext()); 
-			UserManagementService service = (UserManagementService)ctx.getBean("userManagementServiceTarget");
-			User user = service.getUserByLogin(login);
-			if ( login==null ){%>
-				<P class="error">An error has occured. You have tried to log
-				in but we didn't get the username. Try closing your browser and starting
-				again.</p>
-			<%}%>
+		<td align="right"> 
+			<c:forEach var="headerlink" items="${headerLinks}">
+				[<a href="<c:out value='${headerlink.url}'/>" target="_blank"><c:out value="${headerlink.name}"/></a>]&nbsp;
+			</c:forEach>
 		</td>
 	</tr>
 	<tr>
-		<td valign="top">
-			<table height="100%" border="0" align="center" cellpadding="2" cellspacing="0">
-				<tr>
-					<td align="center" valign="top" colspan="2">
-						<p class="mainHeader">Welcome <%=user.getFirstName()%></p>
-					</td>
-				</tr>
-				<tr>
-				<td align="center" colspan="2">
-					<!-- If we are a sysadmin for any org, then we are sysadmin for everything -->
-					<% ArrayList roleList = new ArrayList();
-					   roleList.add(Role.SYSADMIN);
-					   OrganisationDTO orgDTO = service.getOrganisationsForUserByRole(user,roleList);
-						if(orgDTO!=null){%>
-							<input name="sysadmin" type="button" id="sysadmin" onClick="openSysadmin(1);" value="System Adminstration"/>
-					<%}%>
-					<!-- If we are a author for any org, then we show the authoring button once -->
-					<% roleList.clear();
-					   roleList.add(Role.AUTHOR);
-					   orgDTO = service.getOrganisationsForUserByRole(user,roleList);
-						if(orgDTO!=null){%>
-							 <input name="author" type="button" id="author" onClick="openAuthor(1);" value="Author"/>
-					<%}
-					   roleList.clear();
-					   roleList.add(Role.STAFF);
-					   orgDTO = service.getOrganisationsForUserByRole(user,roleList);
-						if(orgDTO!=null){%>
-					   <A HREF="monitoring/dummy.jsp" target="mWindow"/>Dummy Monitoring Screen</A>
-					<%}
-					   roleList.clear();
-					   roleList.add(Role.LEARNER);
-					   orgDTO = service.getOrganisationsForUserByRole(user,roleList);
-						if(orgDTO!=null){%>
-					   <A HREF="learning/dummymain.jsp" target="lWindow"/>Dummy Learning Screen</A>
-					<%}%>
-				</td>
-				</tr>
-
-				<%orgDTO = service.getOrganisationsForUserByRole(user,null);
-				  if(orgDTO!=null){
-						Vector courses = orgDTO.getNodes();
-						Iterator courseIter = courses.iterator();
-						while ( courseIter.hasNext() ) {
-						
-							OrganisationDTO course = (OrganisationDTO)courseIter.next();%>
-
-							<tr><td align="left">Course: <%=course.getName()%>:</td>
-							<td align="right" >
-							<% Vector roleNames	= course.getRoleNames();
-								if ( roleNames.contains(Role.STAFF) ) {%>
-									<input name="addLesson" type="button" id="addLesson" onClick="openAddLesson(<%=course.getOrganisationID()%>,null);" value="Add Lesson"/>
-							</td>
-							</tr>
-							<%		List lessons = service.getMonitorLessonsFromOrganisation(user.getUserId(),course.getOrganisationID());
-									Iterator lessonIterator = lessons.iterator();
-									while ( lessonIterator.hasNext() ) {
-										Lesson lesson = (Lesson) lessonIterator.next();
-							%>
-										<TR><TD align="left">Lesson: <%=lesson.getLessonName()%></TD>
-										<TD align="right"><input name="monitorLesson" type="button" id="monitorLesson" onClick="openMonitorLesson(<%=lesson.getLessonId()%>);" value="Monitoring"/></TD></TR>
-							<%		}
-								} %> 
-							<%		List lessons = service.getLearnerLessonsFromOrganisation(user.getUserId(),course.getOrganisationID());
-									Iterator lessonIterator = lessons.iterator();
-									while ( lessonIterator.hasNext() ) {
-										Lesson lesson = (Lesson) lessonIterator.next();
-							%>
-										<TR><TD align="left">Lesson: <%=lesson.getLessonName()%></TD>
-										<TD align="right"><input name="learner" type="button" id="learner" onClick="openLearner(<%=lesson.getLessonId()%>);" value="Learner"/></TD></TR>
-							<%		} %>
-							
-							<% 
-							Vector classes = course.getNodes();
-							Iterator classIter = classes.iterator();
-							while ( classIter.hasNext() ) {
-								OrganisationDTO courseClass = (OrganisationDTO)classIter.next(); %>
-												
-								<tr><td align="left">Class: <%=courseClass.getName()%>:</td>
-								<td align="right" >
-								<% Vector classRoleNames	= course.getRoleNames();
-									if ( classRoleNames.contains(Role.STAFF)  ) {%>
-									<input name="addLesson" type="button" id="addLesson" onClick="openAddLesson(<%=course.getOrganisationID()%>,<%=courseClass.getOrganisationID()%>);" value="Add Lesson"/>
-								</td>
-								</tr>
-								<%		lessons = service.getMonitorLessonsFromOrganisation(user.getUserId(),courseClass.getOrganisationID());
-										lessonIterator = lessons.iterator();
-										while ( lessonIterator.hasNext() ) {
-											Lesson lesson = (Lesson) lessonIterator.next();
-								%>
-											<TR><TD align="left">Lesson: <%=lesson.getLessonName()%></TD>
-											<TD align="right"><input name="monitorLesson" type="button" id="monitorLesson" onClick="openMonitorLesson(<%=lesson.getLessonId()%>);" value="Monitoring"/></TD></TR>
-								<%		} 
-								
-								 } %> 
-								<%		lessons = service.getLearnerLessonsFromOrganisation(user.getUserId(),courseClass.getOrganisationID());
-										lessonIterator = lessons.iterator();
-										while ( lessonIterator.hasNext() ) {
-											Lesson lesson = (Lesson) lessonIterator.next();
-								%>
-											<TR><TD align="left">Lesson: <%=lesson.getLessonName()%></TD>
-											<TD align="right"><input name="learner" type="button" id="learner" onClick="openLearner(<%=lesson.getLessonId()%>);" value="Learner"/></TD></TR>
-								<%		} %>
-							<% }%>
-					  <% } %>
-				<%}%>
-			</table>
-		</td>
-	</tr>
-	<tr>
-		<td valign="top">
-			<table height="100%" border="0" align="center" cellpadding="2" cellspacing="0">
-				<tr align="center" valign="bottom">
-					<td colspan="2" ><img height="274" src="images/launch_page_graphic.jpg" width="587" alt="launch_page_graphic.jpg"></td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-	<tr valign="bottom">
-		<td>	
-			<table width="100%" border="0" cellpadding="0" cellspacing="0" class="lightNote">
-				<tr valign="bottom">
-					<td height="12">
-						<a href="javascript:alert('LAMS&#8482; &copy; 2002-2005 LAMS Foundation. 
-							\nAll rights reserved.
-							\n\nLAMS is a trademark of LAMS Foundation.
-							\nDistribution of this software is prohibited.');" 
-							class="lightNoteLink">&copy; 2002-2006 LAMS Foundation.
-						</a>
-					</td>
-					<td align="right">Version 1.1</td>
-				</tr>
+		<td align="left">
+			<table border="0">
+				<c:forEach var="orgBean" items="${orgBeans}">
+					<tr><td>
+						<table border="0">
+							<tr><td>
+								<c:choose>
+								<c:when test="${not empty orgBean.lessons || not empty orgBean.childIndexOrgBeans}">
+									<a onclick="toggle(this)"><img src="images/tree_open.gif"/></a>
+								</c:when>
+								<c:otherwise>
+									<img src="images/tree_white.gif"/>
+								</c:otherwise>
+								</c:choose>&nbsp;
+								<strong><c:out value="${orgBean.name}"/></strong>
+								<img src="images/spacer.gif" height="10" width="200"/>
+								<c:forEach var="link" items="${orgBean.links}">
+									[<a href="<c:out value='${link.url}'/>" target="_blank"><c:out value="${link.name}"/></a>]&nbsp;
+								</c:forEach>
+								<div>
+									<c:forEach var="lesson" items="${orgBean.lessons}">
+										<table border="0">
+											<tr>
+												<td width="10"></td>
+												<td>
+													<img src="images/tree_white.gif"/> <c:out value="${lesson.name}"/>
+													<img src="images/spacer.gif" height="10" width="200"/>
+													<c:forEach var="lessonlink" items="${lesson.links}">
+														[<a href="<c:out value='${lessonlink.url}'/>" target="_blank"><c:out value="${lessonlink.name}"/></a>]&nbsp;
+													</c:forEach>
+													<div></div> 
+												</td>
+											</tr>
+										</table>
+									</c:forEach>
+									<c:forEach var="childOrg" items="${orgBean.childIndexOrgBeans}">
+										<table border="0">
+											<tr>
+												<td width="10"></td>
+												<td>
+													<c:choose>
+													<c:when test="${not empty childOrg.lessons}">
+														<a onclick="toggle(this)"><img src="images/tree_open.gif"/></a>
+													</c:when>
+													<c:otherwise>
+														<img src="images/tree_white.gif"/>
+													</c:otherwise>
+													</c:choose>&nbsp;
+													<strong><c:out value="${childOrg.name}"/></strong>
+													<img src="images/spacer.gif" height="10" width="200"/>
+													<c:forEach var="childlink" items="${childOrg.links}">
+														[<a href="<c:out value='${childlink.url}'/>" target="_blank"><c:out value="${childlink.name}"/></a>]&nbsp;
+													</c:forEach>
+													<div>
+														<c:forEach var="childLesson" items="${childOrg.lessons}">
+															<table border="0">
+																<tr>
+																	<td width="10"></td>
+																	<td>
+																		<img src="images/tree_white.gif"/> <c:out value="${lesson.name}"/>
+																		<img src="images/spacer.gif" height="5" width="200"/>
+																		<c:forEach var="childlessonlink" items="${childLesson.links}">
+																			[<a href="<c:out value='${childlessonlink.url}'/>" target="_blank"><c:out value="${childlessonlink.name}"/></a>]&nbsp;
+																		</c:forEach>
+																		<div></div> 
+																	</td>
+																</tr>
+															</table>
+														</c:forEach>
+													</div>
+												</td>
+											</tr>
+										</table>
+									</c:forEach>
+								</div>
+							</td></tr>
+						</table>
+					</td></tr>
+				</c:forEach>			
 			</table>
 		</td>
 	</tr>
 </table>
-</form>
-</html>
+
