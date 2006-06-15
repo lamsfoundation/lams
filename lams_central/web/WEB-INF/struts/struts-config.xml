@@ -75,11 +75,6 @@
         redirect="false"
       />
       <forward
-        name="admin"
-        path="/admin.jsp"
-        redirect="false"
-      />
-      <forward
         name="learner"
         path="/learner.jsp"
         redirect="false"
@@ -145,6 +140,18 @@
       <forward
         name="success"
         path="/index.jsp"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/index"
+      type="org.lamsfoundation.lams.web.IndexAction"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="index"
+        path="/indexContent.jsp"
         redirect="false"
       />
     </action>
