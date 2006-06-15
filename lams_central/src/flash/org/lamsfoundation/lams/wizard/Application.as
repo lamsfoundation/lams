@@ -429,13 +429,13 @@ class org.lamsfoundation.lams.wizard.Application extends ApplicationParent {
         //Debugger.log('onResize',Debugger.GEN,'main','org.lamsfoundation.lams.Application');
 
         //Get the stage width and height and call onResize for stage based objects
-        var w:Number = Stage.width;
-        var h:Number = Stage.height;
-		var someListener:Object = new Object();
-		someListener.onMouseUp = function () {
-			_wizard.setSize(w,h);
-		}
-		_wizard.setSize(w,h);
+       // var w:Number = Stage.width;
+       // var h:Number = Stage.height;
+		//var someListener:Object = new Object();
+		//someListener.onMouseUp = function () {
+		//	_wizard.setSize(w,h);
+		//}
+		//_wizard.setSize(w,h);
     }
 	
 	/**
