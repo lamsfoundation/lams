@@ -10,6 +10,14 @@
 		<put name="footer" value="footer.jsp"/>	
 	</definition>
 	
+	<definition name=".user" path="/template.jsp">
+		<put name="title" value="admin.user.entry"/>
+		<put name="pageHeader" value="admin.user.management"/>
+		<put name="header" value="header.jsp"/>
+		<put name="content" value="user.jsp" />	
+		<put name="footer" value="footer.jsp"/>	
+	</definition>
+	
 	<definition name=".orglist" path="/template.jsp">
 		<put name="title" value="admin.organisation.management"/>
 		<put name="pageHeader" value="admin.organisation.management"/>
