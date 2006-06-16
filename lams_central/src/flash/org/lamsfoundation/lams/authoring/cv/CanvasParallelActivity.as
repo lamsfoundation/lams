@@ -261,7 +261,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 	private function localOnRelease():Void{
 		Debugger.log('_doubleClicking:'+_doubleClicking+', localOnRelease:'+this,Debugger.GEN,'localOnRelease','CanvasParallelActivity');
 		if ( ! _doubleClicking)	{
-				_canvasController.activityRelease (this);
+				_canvasController.activityRelease(this);
 		}
 		
 	}

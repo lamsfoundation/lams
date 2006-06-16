@@ -234,7 +234,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		}else {
 			Debugger.log ('SingleClicking:+' + this, Debugger.GEN, 'localOnPress', 'CanvasOptionalActivity');
 			_doubleClicking = false;
-			_canvasController.activityClick (this);
+			_canvasController.activityClick(this);
 		}
 		_dcStartTime = now;
 	}
@@ -242,8 +242,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 	
 	private function localOnRelease ():Void{
 		Debugger.log ('_doubleClicking:' + _doubleClicking + ', localOnRelease:' + this, Debugger.GEN, 'localOnRelease', 'CanvasOptionalActivity');
-		if (! _doubleClicking)	{
-				_canvasController.activityRelease (this);
+		if (!_doubleClicking)	{
+			_canvasController.activityRelease(this);
 		}
 	}
 	

@@ -72,7 +72,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	    }else{
 		   //just select the activity
 			
-			//var parentActTypeID = _canvasModel.getCanvas().ddm.getActivityByUIID(ca.activity.parentUIID).activityTypeID
+			var parentActTypeID = _canvasModel.getCanvas().ddm.getActivityByUIID(ca.activity.parentUIID).activityTypeID
 			trace("parent UIID: "+ ca.activity.parentUIID + " and parent's activity type ID: ")
 			 //if (ca.activity.parentUIID > 0 && parentActTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
 			//	 _canvasModel.selectedItem = null;
@@ -82,10 +82,19 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			//	LFMessage.showMessageAlert(msg);
 				
 			 //}else {
+				 //_canvasModel.selectedItem = ca;
+				// _canvasModel.isDragging = true;
+				 //ca.startDrag(false);
+			 //}
+			 
+			 if(ca.activity.parentUIID != null && parentActTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
+				 _canvasModel.selectedItem = ca;
+				 _canvasModel.isDragging = false;
+			 } else {
 				 _canvasModel.selectedItem = ca;
 				 _canvasModel.isDragging = true;
 				 ca.startDrag(false);
-			 //}
+			 }
 		}
 	   
    }
@@ -119,6 +128,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			}
 			
 			var optionalOnCanvas:Array  = _canvasModel.findOptionalActivities();
+			
 			if (ca.activity.parentUIID != null){
 				trace ("testing Optional child on Canvas "+ca.activity.activityUIID)
 				for (var i=0; i<optionalOnCanvas.length; i++){
@@ -127,36 +137,47 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 						if (optionalOnCanvas[i].locked == false){
 							if (ca._x > 142 || ca._x < -129 || ca._y < -55 || ca._y > optionalOnCanvas[i].getpanelHeight){
 								trace (ca.activity.activityUIID+" had a hitTest with canvas.")
-						
+								//give it the new co-ords and 'drop' it
+								ca.activity.xCoord = _xmouse - _canvasModel.getPosition().x;
+								ca.activity.yCoord = _ymouse - _canvasModel.getPosition().y;
 								_canvasModel.removeOptionalCA(ca, optionalOnCanvas[i].activity.activityUIID);
+							} else {
+								ca._x = ca.activity.xCoord;
+								ca._y = ca.activity.yCoord;
 							}
 						}
 					}
 				}
-			}
-			//if we are on the optional Activity remove this activity from canvas and assign it a parentID of optional activity and place it in the optional activity window.
-			for (var i=0; i<optionalOnCanvas.length; i++){
-				//trace ("testing Optional on Canvas "+i)
-				if (ca.activity.activityUIID != optionalOnCanvas[i].activity.activityUIID){
-					if (ca.hitTest(optionalOnCanvas[i])){
-						if (optionalOnCanvas[i].locked == true){
-							var msg:String = Dictionary.getValue('act_lock_chk');
-							LFMessage.showMessageAlert(msg);
-						}else{
-							_canvasModel.addParentToActivity(optionalOnCanvas[i].activity.activityUIID, ca)
-						}						
+			} else {
+			
+				//if we are on the optional Activity remove this activity from canvas and assign it a parentID of optional activity and place it in the optional activity window.
+				for (var i=0; i<optionalOnCanvas.length; i++){
+					//trace ("testing Optional on Canvas "+i)
+					if (ca.activity.activityUIID != optionalOnCanvas[i].activity.activityUIID){
+						if (ca.hitTest(optionalOnCanvas[i])){
+							if (optionalOnCanvas[i].locked == true){
+								var msg:String = Dictionary.getValue('act_lock_chk');
+								LFMessage.showMessageAlert(msg);
+							}else{
+								_canvasModel.addParentToActivity(optionalOnCanvas[i].activity.activityUIID, ca)
+							}						
+						}
 					}
 				}
+				
 			}
-						
+			
+			
 			//get a view if ther is not one
 			if(!_canvasView){
 				_canvasView =  CanvasView(getView());
 			}
 			
+			
 			//give it the new co-ords and 'drop' it
 			ca.activity.xCoord = ca._x;
 			ca.activity.yCoord = ca._y;
+			
 			
 			//refresh the transitions
 			//TODO: refresh the transitions as you drag...
