@@ -244,13 +244,13 @@ class org.lamsfoundation.lams.learner.Application extends ApplicationParent {
 	 * @param   current 
 	 */
 	
-	public function refreshProgress(attempted:String, completed:String, current:String, uniqueID:String){
+	public function refreshProgress(attempted:String, completed:String, current:String, lessonID:String){
 		Debugger.log('attempted: ' + attempted,Debugger.CRITICAL,'refreshProgress','Application');
 		Debugger.log('completed: ' + completed,Debugger.CRITICAL,'refreshProgress','Application');
 		Debugger.log('current: ' + current,Debugger.CRITICAL,'refreshProgress','Application');
-        Debugger.log('_root ID: ' + _root.uniqueID + ' passed in ID: ' + uniqueID,Debugger.CRITICAL,'refreshProgress','Application');
+        Debugger.log('_root lesson ID: ' + _root.lessonID + ' passed in lesson ID: ' + lessonID,Debugger.CRITICAL,'refreshProgress','Application');
         
-		if(_root.uniqueID == uniqueID){
+		if(_root.lessonID == lessonID){
 			var attemptedArray:Array = attempted.split("_");
 			var completedArray:Array = completed.split("_");
 			
