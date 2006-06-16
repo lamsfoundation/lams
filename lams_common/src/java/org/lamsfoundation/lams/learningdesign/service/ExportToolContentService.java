@@ -51,6 +51,7 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
+import org.apache.taglibs.standard.lang.jstl.ComplexValue;
 import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
@@ -805,6 +806,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		Activity fromAct = activityMapper.get(transDto.getFromActivityID());
 		trans.setFromActivity(fromAct);
 		trans.setFromUIID(fromAct.getActivityUIID());
+		//also set transition to activity: It is nonsense for persisit data, but it is help this learning design validated
+		fromAct.setTransitionTo(trans);
 //		set to null 
 //		trans.setLearningDesign();
 		trans.setTitle(transDto.getTitle());
@@ -812,6 +815,9 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		Activity toAct = activityMapper.get(transDto.getToActivityID());
 		trans.setToActivity(toAct);
 		trans.setToUIID(toAct.getActivityUIID());
+		//also set transition to activity: It is nonsense for persisit data, but it is help this learning design validated
+		toAct.setTransitionFrom(trans);
+		
 		trans.setTransitionId(transDto.getTransitionID());
 		trans.setTransitionUIID(transDto.getTransitionUIID());
 		
@@ -911,7 +917,20 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		act.setLibraryActivityUiImage(actDto.getLibraryActivityUIImage());
 		act.setOrderId(actDto.getOrderID());
 		
-		act.setParentActivity(activityMapper.get(actDto.getParentActivityID()));
+		if(actDto.getParentActivityID() != null){
+			Activity parent = activityMapper.get(actDto.getParentActivityID());
+			act.setParentActivity(parent);
+			//also add child as Complex activity: It is useless for persist data, but helpful for validate in learning design!
+			if(isComplexActivity(parent)){
+				Set<Activity> set = ((ComplexActivity)parent).getActivities();
+				if(set == null){
+					set = new TreeSet<Activity>(new ActivityOrderComparator());
+					((ComplexActivity)parent).setActivities(set);
+				}
+				set.add(act);
+			}
+		}else
+			act.setParentActivity(null);
 		
 		act.setParentUIID(actDto.getParentUIID());
 		act.setRunOffline(actDto.getRunOffline());
@@ -983,6 +1002,13 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	}
 	public void setWorkspaceFolderDAO(IWorkspaceFolderDAO workspaceFolderDAO) {
 		this.workspaceFolderDAO = workspaceFolderDAO;
+	}
+
+	private boolean isComplexActivity(Activity act)
+	{
+		return act.getActivityTypeId().intValue() == Activity.SEQUENCE_ACTIVITY_TYPE || 
+		 act.getActivityTypeId().intValue()== Activity.PARALLEL_ACTIVITY_TYPE ||
+		 act.getActivityTypeId().intValue()== Activity.OPTIONS_ACTIVITY_TYPE;
 	}
 
 }
