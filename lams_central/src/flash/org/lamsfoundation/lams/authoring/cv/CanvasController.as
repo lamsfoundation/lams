@@ -72,20 +72,20 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	    }else{
 		   //just select the activity
 			
-			var parentActTypeID = _canvasModel.getCanvas().ddm.getActivityByUIID(ca.activity.parentUIID).activityTypeID
-			trace("parent UIID: "+ ca.activity.parentUIID + " and parent's activity type ID: "+parentActTypeID)
-			 if (ca.activity.parentUIID > 0 && parentActTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
-				 _canvasModel.selectedItem = null;
-				 _canvasModel.isDragging = false;
+			//var parentActTypeID = _canvasModel.getCanvas().ddm.getActivityByUIID(ca.activity.parentUIID).activityTypeID
+			trace("parent UIID: "+ ca.activity.parentUIID + " and parent's activity type ID: ")
+			 //if (ca.activity.parentUIID > 0 && parentActTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
+			//	 _canvasModel.selectedItem = null;
+			//	 _canvasModel.isDragging = false;
 				 //ca.startDrag(false);
-				var msg:String = Dictionary.getValue('al_cannot_move_activity');
-				LFMessage.showMessageAlert(msg);
+			//	var msg:String = Dictionary.getValue('al_cannot_move_activity');
+			//	LFMessage.showMessageAlert(msg);
 				
-			 }else {
+			 //}else {
 				 _canvasModel.selectedItem = ca;
 				 _canvasModel.isDragging = true;
 				 ca.startDrag(false);
-			 }
+			 //}
 		}
 	   
    }
@@ -102,9 +102,21 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
    
     public function activityRelease(ca:Object):Void{
 	   Debugger.log('activityRelease CanvasActivity:'+ca.activity.activityUIID,Debugger.GEN,'activityRelease','CanvasController');
+	   
 	    if(_canvasModel.isDragging){
 			ca.stopDrag();
 			//if we are on the bin - trash it
+			
+			if (ca.hitTest(_canvasModel.getCanvas().bin)){
+				trace("Activity "+ca.activity.title+" has hit the bin")
+				if (ca.activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
+					trace("Complex Activity has hit the bin")
+					_canvasModel.removeComplexActivity(ca);
+				}
+				//_canvasModel.removeActivity(ca.activity.activityUIID);
+				_canvasModel.getCanvas().removeActivity(ca.activity.activityUIID);
+				//_canvasModel.setDirty();
+			}
 			
 			var optionalOnCanvas:Array  = _canvasModel.findOptionalActivities();
 			if (ca.activity.parentUIID != null){
@@ -115,6 +127,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 						if (optionalOnCanvas[i].locked == false){
 							if (ca._x > 142 || ca._x < -129 || ca._y < -55 || ca._y > optionalOnCanvas[i].getpanelHeight){
 								trace (ca.activity.activityUIID+" had a hitTest with canvas.")
+						
 								_canvasModel.removeOptionalCA(ca, optionalOnCanvas[i].activity.activityUIID);
 							}
 						}
@@ -155,17 +168,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				t.removeMovieClip();
 				
 			}
-			if (ca.hitTest(_canvasModel.getCanvas().bin)){
-				
-				if (ca.activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
 					
-					_canvasModel.removeComplexActivity(ca);
-				}else {
-					_canvasModel.getCanvas().removeActivity(ca.activity.activityUIID);
-				}
-				
-			}
-			
 			_canvasModel.setDirty();
 			
 			Debugger.log('ca.activity.xCoord:'+ca.activity.xCoord,Debugger.GEN,'activityRelease','CanvasController');
