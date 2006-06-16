@@ -45,6 +45,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.Vector;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
@@ -420,6 +421,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			Reader ldFile = new FileReader(new File(FileUtil.getFullPath(learningDesignPath,LEARNING_DESIGN_FILE_NAME)));
 			XStream designXml = new XStream();
 			LearningDesignDTO ldDto = (LearningDesignDTO) designXml.fromXML(ldFile);
+			
 			log.debug("Learning design xml deserialize to LearingDesignDTO success.");
 	
 			//begin tool import
@@ -664,6 +666,14 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		
 		
 		LearningDesign ld = getLearningDesign(dto,importer,folder,actList,transList,activityMapper);
+		
+//		validate learning design
+		Vector listOfValidationErrorDTOs = (Vector)getLearningDesignService().validateLearningDesign(ld);
+		if(listOfValidationErrorDTOs.size() > 0 ){
+			log.error(listOfValidationErrorDTOs);
+			throw new ImportToolContentException("Learning design validate error:");
+		}
+			
 //		persist
 		learningDesignDAO.insert(ld);
 	}
