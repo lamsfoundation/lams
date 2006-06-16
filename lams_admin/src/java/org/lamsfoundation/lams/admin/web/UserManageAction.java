@@ -25,7 +25,6 @@
 package org.lamsfoundation.lams.admin.web;
 
 import java.util.ArrayList;
-//import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -39,12 +38,8 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
-//import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.Organisation;
-//import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.User;
-//import org.lamsfoundation.lams.usermanagement.UserOrganisation;
-//import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.HttpSessionManager;
@@ -52,13 +47,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
- * @version
- *
- * <p>
- * <a href="UserManageAction.java.html"><i>View Source</i></a>
- * </p>
- *
- * @author <a href="mailto:jliew@melcoe.mq.edu.au">Jun-Dir Liew</a>
+ * @author Jun-Dir Liew
  *
  * Created at 13:51:51 on 9/06/2006
  */
@@ -74,9 +63,12 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class UserManageAction extends Action {
 	
-	private static final Logger log = Logger.getLogger(OrgManageAction.class);
-	private static WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(HttpSessionManager.getInstance().getServletContext());
-	private static IUserManagementService service = (IUserManagementService)ctx.getBean("userManagementServiceTarget");
+	private static final Logger log = Logger.getLogger(UserManageAction.class);
+	private static WebApplicationContext ctx = WebApplicationContextUtils
+	    .getWebApplicationContext(HttpSessionManager.getInstance()
+	    		.getServletContext());
+	private static IUserManagementService service = (IUserManagementService)ctx
+	    .getBean("userManagementServiceTarget");
 	
 	public ActionForward execute(ActionMapping mapping,
             ActionForm form,

@@ -25,13 +25,7 @@
 package org.lamsfoundation.lams.admin.web;
 
 /**
- * @version
- *
- * <p>
- * <a href="UserManageBean.java.html"><i>View Source</i></a>
- * </p>
- *
- * @author <a href="mailto:jliew@melcoe.mq.edu.au">Jun-Dir Liew</a>
+ * @author Jun-Dir Liew
  *
  * Created at 13:34:33 on 9/06/2006
  */

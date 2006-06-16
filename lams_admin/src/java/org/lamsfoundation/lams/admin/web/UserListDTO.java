@@ -27,13 +27,7 @@ package org.lamsfoundation.lams.admin.web;
 import java.util.List;
 
 /**
- * @version
- *
- * <p>
- * <a href="UserListDTO.java.html"><i>View Source</i></a>
- * </p>
- *
- * @author <a href="mailto:jliew@melcoe.mq.edu.au">Jun-Dir Liew</a>
+ * @author Jun-Dir Liew
  *
  * Created at 13:47:02 on 9/06/2006
  */
