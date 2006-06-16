@@ -51,6 +51,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	}
    
     public function activityClick(ca:Object):Void{
+		_canvasModel.selectedItem = null;
 	   Debugger.log('activityClick CanvasActivity:'+ca.activity.activityUIID + ' orderID: ' + ca.activity.orderID,Debugger.GEN,'activityClick','CanvasController');
 	    Debugger.log('Check if transition tool active :'+_canvasModel.isTransitionToolActive(),Debugger.GEN,'activityClick','CanvasController');
 	   //if transition tool active
@@ -70,31 +71,23 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			}
 			*/
 	    }else{
+			
 		   //just select the activity
 			
-			var parentActTypeID = _canvasModel.getCanvas().ddm.getActivityByUIID(ca.activity.parentUIID).activityTypeID
+			var parentAct = _canvasModel.getCanvas().ddm.getActivityByUIID(ca.activity.parentUIID)
 			trace("parent UIID: "+ ca.activity.parentUIID + " and parent's activity type ID: ")
-			 //if (ca.activity.parentUIID > 0 && parentActTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
-			//	 _canvasModel.selectedItem = null;
-			//	 _canvasModel.isDragging = false;
-				 //ca.startDrag(false);
-			//	var msg:String = Dictionary.getValue('al_cannot_move_activity');
-			//	LFMessage.showMessageAlert(msg);
+			trace("parentAct TypeID: "+ parentAct.activityTypeID + " and parent's activity type ID: ")
+			
+			if(ca.activity.parentUIID != null && parentAct.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
+				trace("Parallel Children are: "+ parentAct.activityTypeID.length)
 				
-			 //}else {
-				 //_canvasModel.selectedItem = ca;
-				// _canvasModel.isDragging = true;
-				 //ca.startDrag(false);
-			 //}
-			 
-			 if(ca.activity.parentUIID != null && parentActTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
 				 _canvasModel.selectedItem = ca;
 				 _canvasModel.isDragging = false;
-			 } else {
-				 _canvasModel.selectedItem = ca;
-				 _canvasModel.isDragging = true;
-				 ca.startDrag(false);
-			 }
+			} else {
+				_canvasModel.selectedItem = ca;
+				_canvasModel.isDragging = true;
+				ca.startDrag(false);
+			}
 		}
 	   
    }
@@ -135,6 +128,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				//trace ("testing Optional on Canvas "+i)
 					if (ca.activity.parentUIID == optionalOnCanvas[i].activity.activityUIID){
 						if (optionalOnCanvas[i].locked == false){
+							trace("parentAct children length: "+ optionalOnCanvas[i].actChildren.length)
+							for(var j=0; j < optionalOnCanvas[i].actChildren.length; j++){
+								optionalOnCanvas[i].actChildren[j].setSelected(false);
+							}
+							_canvasModel.selectedItem = ca;
 							if (ca._x > 142 || ca._x < -129 || ca._y < -55 || ca._y > optionalOnCanvas[i].getpanelHeight){
 								trace (ca.activity.activityUIID+" had a hitTest with canvas.")
 								//give it the new co-ords and 'drop' it
