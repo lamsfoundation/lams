@@ -149,6 +149,10 @@ class LessonView extends AbstractView {
 				removeAll(lm);
 				lm.drawDesign();
 				break;
+			case 'CLOSE_COMPLEX_ACTIVITY' :
+				closeComplexActivity(infoObj.data, lm);
+				Debugger.log('closing complex activity' + infoObj.data.activity.activityUIID,Debugger.CRITICAL,'update','org.lamsfoundation.lams.LessonView');
+				break;
             default :
                 Debugger.log('unknown update type :' + infoObj.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.LessonView');
         }
@@ -181,6 +185,17 @@ class LessonView extends AbstractView {
 		ACT_Y = 32.5;
 	}
 	
+	private function closeComplexActivity(ca:Object, lm:LessonModel):Void{
+		if(lm.activitiesDisplayed.containsKey(ca.activity.activityUIID)){
+			var a:LearnerComplexActivity = LearnerComplexActivity(lm.activitiesDisplayed.get(ca.activity.activityUIID));
+			if(a.locked && !a.doubleClicking){
+				a.collapse();
+			}
+		} else {
+			// no object found in table
+		}
+	}
+	
 	/**
 	 * Draws new activity to monitor tab view stage.
 	 * @usage   
@@ -204,6 +219,7 @@ class LessonView extends AbstractView {
 		if(a.activityTypeID==Activity.TOOL_ACTIVITY_TYPE || a.isGateActivity() || a.isGroupActivity() ){
 			newActivity_mc = _activityLayer_mc.attachMovie("LearnerActivity", "LearnerActivity" + a.activityID, _activityLayer_mc.getNextHighestDepth(),{_activity:a,_controller:lc,_view:lv, _x:ACT_X+25, _y:ACT_Y, actLabel:a.title, learner:lm.progressData});
 			ACT_Y = newActivity_mc._y + ACTIVITY_OFFSET;
+			_activityList.push(newActivity_mc);
 			Debugger.log('The activity:'+a.title+','+a.activityTypeID+' is tool/gate/group activity',Debugger.CRITICAL,'drawActivity','LessonView');
 		}else if(a.activityTypeID==Activity.PARALLEL_ACTIVITY_TYPE || a.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE){
 			//get the children
@@ -212,7 +228,7 @@ class LessonView extends AbstractView {
 		
 			newActivity_mc = _activityLayer_mc.attachMovie("LearnerComplexActivity", "LearnerComplexActivity" + a.activityID, _activityLayer_mc.getNextHighestDepth(),{_activity:a,_children:children,_controller:lc,_view:lv, _x:ACT_X+25, _y:ACT_Y, learner:lm.progressData});
 			ACT_Y = newActivity_mc._y + ACTIVITY_OFFSET;
-			
+			_activityList.push(newActivity_mc);
 		}else{
 			Debugger.log('The activity:'+a.title+','+a.activityUIID+' is of unknown type, it cannot be drawn',Debugger.CRITICAL,'drawActivity','LessonView');
 		}
@@ -221,8 +237,6 @@ class LessonView extends AbstractView {
 		if (actItems < lm.getActivityKeys().length){
 			lm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
 		}
-		
-		_activityList.push(newActivity_mc);
 		
 		return true;
 	}

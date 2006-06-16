@@ -22,11 +22,16 @@
  */
 
 import org.lamsfoundation.lams.learner.ls.*;
+import org.lamsfoundation.lams.common.LearnerComplexActivity;
 import org.lamsfoundation.lams.common.mvc.*
 import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.common.comms.Communication;
 import org.lamsfoundation.lams.learner.*
 import org.lamsfoundation.lams.authoring.Activity;
+
+import mx.managers.*;
+import mx.controls.*;
+import mx.events.*
 
 /*
 * Make changes to Lesson's model data based on user input
@@ -43,12 +48,17 @@ class LessonController extends AbstractController {
 	private var _comms:Communication;
 	private var _isBusy:Boolean;
 	
+	//These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
+    private var dispatchEvent:Function;
+	
 	public function LessonController (cm:Observable) {
 		super (cm);
 		_app = Application.getInstance();
 		_comms = _app.getComms();
 		_lessonModel = LessonModel(model);
 		_isBusy = false;
+		
+		EventDispatcher.initialize(this);     
 	}
 	
 	/**
@@ -94,13 +104,37 @@ class LessonController extends AbstractController {
 	}
    
     public function activityRelease(ca:Object):Void{
-	   Debugger.log('activityRelease CanvasActivity:'+ca.activity.activityID,Debugger.GEN,'activityRelease','LessonController');
+	   Debugger.log('activityRelease LearnerActivity:'+ca.activity.activityID,Debugger.GEN,'activityRelease','LessonController');
 	    
 	}
 	
     public function activityReleaseOutside(ca:Object):Void{
 	   Debugger.log('activityReleaseOutside CanvasActivity:'+ca.activity.activityID,Debugger.GEN,'activityReleaseOutside','LessonController');
     }
+	
+	public function complexActivityRelease(ca:Object):Void{
+		if(ca.locked){
+			_lessonModel.setCurrentActivityOpen(ca);
+		} else {
+			_lessonModel.setCurrentActivityOpen(null);
+		}
+	}
+	
+	public function checkForCurrentChildren(ca:Object, clickTarget:MovieClip):Void{
+		Debugger.log('checking activity:'+ca.activity.activityID,Debugger.GEN,'checkForCurrentChildren','LessonController');
+		for(var i=0; i<ca.activityChildren.length; i++){
+			Debugger.log('checking child activity:'+ca.activityChildren[i].activityID,Debugger.GEN,'checkForCurrentChildren','LessonController');
+			if(_lessonModel.progressData != null){
+				if(ca.activityChildren[i].activityID == _lessonModel.progressData.getCurrentActivityId()){
+					//LearnerComplexActivity(ca).expand();
+					//_lessonModel.setCurrentActivityOpen(ca);
+					Debugger.log('found match:'+ca.activityChildren[i].activityID,Debugger.GEN,'checkForCurrentChildren','LessonController');
+					//dispatchEvent({target:clickTarget, type: 'onRelease'});
+					ca.localOnRelease();
+				}
+			}
+		}
+	}
 	
 	public function setBusy(){
 		_isBusy = true;
