@@ -87,7 +87,10 @@
 			<table bgcolor="#ffffff" width="100%" height="100%" cellspacing="5" cellpadding="5" align="center">
 				<tr>
 					<td align="left" style="font-size:20pt">
-						<fmt:message key="lams.welcome"/>, <lams:user property="firstName"/> <img src="images/laugh.gif"/>
+						<fmt:message key="lams.welcome"/>, <lams:user property="firstName"/> <img src="images/lamb_big.png"/>
+					</td>
+					<td align=left>
+						<a title="<fmt:message key="index.refresh.hint"/>" href="javascript:getContent()"><fmt:message key="index.refresh"/></a>
 					</td>
 				</tr>
 				<tr>
@@ -109,7 +112,7 @@
 								class="lightNoteLink">&copy; 2002-2006 LAMS Foundation.
 						</a>
 					</td>
-					<td align="right">Version 1.1</td>
+					<td align="right">Version 2.0</td>
 				</tr>
 			</table>
 		</td>
