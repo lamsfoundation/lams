@@ -71,7 +71,7 @@
 			This copy of LAMS&#8482; is authorised for use by the registered users only.
 		</td>
 		<td align="right"> 
-			Version 1.1
+			Version 2.0
 		</td>
 	</tr>
 </table>
