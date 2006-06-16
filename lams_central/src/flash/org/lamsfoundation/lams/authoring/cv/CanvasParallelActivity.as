@@ -162,21 +162,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 	}
 	
 	private function draw(){			
-		var actStatus:String = Progress.compareProgressData(learner, _activity.activityID);
-		switch (actStatus){
-			case 'completed_mc' :
-				completed_mc._visible = true;
-				break;
-			case 'current_mc' :
-				current_mc._visible = true;
-				break;
-			 case 'attempted_mc' :
-			    current_mc._visible = true;
-                break;
-			default :
-				todo_mc._visible = true;
-				//Debugger.log('unknown update type :' + infoObj.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.MonitorView');
-		}
 		//write text
 		title_lbl.text = _activity.title;
 		actCount_lbl.text = _children.length+ Dictionary.getValue('lbl_num_activities'); //" activities";
