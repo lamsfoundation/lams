@@ -5,6 +5,7 @@ import org.lamsfoundation.lams.common.util.StringUtils;
 /**/
 if(StringUtils.isEmpty(serverURL)){
 	//_root.serverURL = "http://dolly.uklams.net:8080/lams/";
+	//_root.serverURL = "http://shaun.melcoe.mq.edu.au:8080/lams/";
 	_root.serverURL = "http://localhost:8080/lams/";
 	Debugger.log('serverURL is not defined, using defualt:'+_root.serverURL ,Debugger.CRITICAL,'main','ROOT');			
 }
@@ -15,20 +16,26 @@ if(StringUtils.isEmpty(userID)){
 }
 
 if(StringUtils.isEmpty(mode)){
-	_root.mode = 1;
+	_root.mode = 2;
 	Debugger.log('Mode is not defined, using defualt:'+_root.mode,Debugger.CRITICAL,'main','ROOT');			
 }
 
 if(StringUtils.isEmpty(courseID)){
-	_root.courseID = 2;	// Playpen (test)
+	_root.courseID = undefined;	// Playpen (test)
 	Debugger.log('CourseID is not defined, using defualt:'+_root.courseID,Debugger.CRITICAL,'main','ROOT');			
 }
-/**
+
 if(StringUtils.isEmpty(classID)){
-	_root.classID = 3;	// Everybody (test)
+	_root.classID = undefined;	// Playpen (test)
 	Debugger.log('ClassID is not defined, using defualt:'+_root.classID,Debugger.CRITICAL,'main','ROOT');			
 }
-*/
+
+
+if(StringUtils.isEmpty(build)){
+	_root.build = 2.0;
+	Debugger.log('Build is not defined, using defualt:'+_root.build,Debugger.CRITICAL,'main','ROOT');			
+}
+
 //Set stage alignment to top left and prent scaling
 Stage.align = "TL";
 Stage.scaleMode = "noScale";
