@@ -77,13 +77,13 @@ class org.lamsfoundation.lams.authoring.cv.Bin extends MovieClip{
 	}
 	
 	private function onRollOver():Void{
-		over_mc._visible = true;
-		up_mc._visible = false;
+		//over_mc._visible = true;
+		//up_mc._visible = false;
 	}
 	
 	private function onRollOut():Void{
-		over_mc._visible = false;
-		up_mc._visible = true;
+		//over_mc._visible = false;
+		//sup_mc._visible = true;
 		
 	}
 
