@@ -17,6 +17,7 @@
 	<lams:css/>
 	<link rel="icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
+		<script language="JavaScript" type="text/javascript" src="includes/javascript/getSysInfo.js"></script>
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/openUrls.js"></script>
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/prototype.js"></script>
 	<script type="text/javascript" language="javascript">
