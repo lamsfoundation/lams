@@ -11,14 +11,36 @@
 		var learnWin = null;
 		var monitorLessonWin = null;
 		var addLessonWin = null;
-		var adminWin = null;
+		var dmWin = null;
 		var sysadminWin = null;
+		var omWin = null;
+		var pWin = null
 		
-		function openAuthor( orgId )
+		function openProfile(username)
 		{
 			if(isMac)
 			{
-				authorWin = window.open('home.do?method=author&orgId='+orgId,'aWindow','width=796,height=570,resizable');
+				pWin = window.open('profile.do?user='+username,'pWindow','width=796,height=570,resizable');
+			}
+			else
+			{
+				if(pWin && pWin.open && !pWin.closed)
+				{
+					pWin.focus();
+				}
+				else
+				{
+					pWin = window.open('profile.do?user='+username,'pWindow','width=796,height=570,resizable');
+					pWin.focus();
+				}
+			}
+		}
+
+		function openAuthor()
+		{
+			if(isMac)
+			{
+				authorWin = window.open('home.do?method=author','aWindow','width=796,height=570,resizable');
 			}
 			else
 			{
@@ -28,8 +50,28 @@
 				}
 				else
 				{
-					authorWin = window.open('home.do?method=author&orgId='+orgId,'aWindow','width=796,height=570,resizable');
+					authorWin = window.open('home.do?method=author','aWindow','width=796,height=570,resizable');
 					authorWin.focus();
+				}
+			}
+		}
+
+		function openDummyMonitor()
+		{
+			if(isMac)
+			{
+				dmWin = window.open('monitoring/dummy.jsp','dmWindow','width=796,height=570,resizable');
+			}
+			else
+			{
+				if(dmWin && dmWin.open && !dmWin.closed)
+				{
+					dmWin.focus();
+				}
+				else
+				{
+					dmWin = window.open('monitoring/dummy.jsp','dmWindow','width=796,height=570,resizable');
+					dmWin.focus();
 				}
 			}
 		}
@@ -105,11 +147,11 @@
 			}
 		}
 		
-		function openSysadmin( orgId )
+		function openSysadmin()
 		{
 			if(isMac)
 			{
-				sysadminWin = window.open('home.do?method=sysadmin&orgId='+orgId,'saWindow','width=796,height=570,resizable,location,menubar,scrollbars,dependent,status,toolbar');
+				sysadminWin = window.open('admin/sysadminstart.do','saWindow','width=796,height=570,resizable,location,menubar,scrollbars,dependent,status,toolbar');
 			}
 			else
 			{
@@ -119,12 +161,37 @@
 				}
 				else
 				{
-					sysadminWin = window.open('home.do?method=sysadmin&orgId='+orgId,'saWindow','width=796,height=570,resizable,location,menubar,scrollbars,dependent,status,toolbar');
+					sysadminWin = window.open('admin/sysadminstart.do','saWindow','width=796,height=570,resizable,location,menubar,scrollbars,dependent,status,toolbar');
 					sysadminWin.focus();
 				}
 			}
 		}
-			
+		
+		function openOrgManagement(orgId)
+		{
+			var hight = 768;
+			var width = 1024;
+			if(screen){
+				height = screen.availHeight;
+				width = screen.availWidth;
+			}
+			if(isMac)
+			{
+				omWin = window.open('admin/orgmanage.do?org='+orgId,'omWindow','left=0,top=0,width='+width+',height='+height+',resizable,location,menubar,scrollbars,dependent,status,toolbar');
+			}
+			else
+			{
+				if(omWin && omWin.open && !omWin.closed )
+				{
+					omWin.focus();
+				}
+				else
+				{
+					omWin = window.open('admin/orgmanage.do?org='+orgId,'omWindow','left=0,top=0,width='+width+',height='+height+',resizable,location,menubar,scrollbars,dependent,status,toolbar');
+					omWin.focus();
+				}
+			}
+		}	
 		
 			
 	//-->
