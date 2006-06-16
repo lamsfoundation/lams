@@ -364,8 +364,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	public function addParentToActivity(parentID, ca:Object){
 		ca.activity.parentUIID = parentID;
 		Debugger.log('ParentId of '+ca.activity.activityUIID+ 'Is : '+ca.activity.parentUIID,Debugger.GEN,'addActivityToTransition','CanvasModel');
-		removeActivity(parentID);
 		removeActivity(ca.activity.activityUIID);
+		removeActivity(parentID);
 		setDirty();
 		//var lengthOfChildren:Array = _cv.ddm.getComplexActivityChildren(parentID);
 		//trace("No. of Chlidren in Optional Activity "+parentID+" is: "+lengthOfChildren.length)
@@ -387,8 +387,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		ca.activity.parentUIID = null;
 		ca.activity.orderID = null;
 		removeActivity(ca.activity.activityUIID);
-		_cv.ddm.removeActivity(ca.activity.activityUIID);
-		//optionalCA.removeChild();
+		//_cv.ddm.removeActivity(ca.activity.activityUIID);
 		removeActivity(parentID);
 		setDirty();
 		
