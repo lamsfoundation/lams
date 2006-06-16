@@ -357,8 +357,6 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 			McLearningAction mcLearningAction= new McLearningAction();
 			/* pay attention that this userId is the learner's userId passed by the request parameter.
 			 * It is differerent than USER_ID kept in the session of the current system user*/
-			//McQueUsr mcQueUsr=mcService.retrieveMcQueUsr(new Long(userId));
-		    //logger.debug("mcQueUsr:" + mcQueUsr);
 		    
 		    McQueUsr mcQueUsr=mcService.getMcUserBySession(new Long(userId), mcSession.getUid());
 		    logger.debug("mcQueUsr: " + mcQueUsr);
@@ -490,7 +488,17 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    		logger.debug("the user's session id AND user id exists in the tool tables go to redo questions. " + toolSessionId + " mcQueUsr: " + 
 	    				mcQueUsr + " user id: " + mcQueUsr.getQueUsrId());
 	    		logger.debug("the learner has already responsed to this content, just generate a read-only report. Use redo questions for this.");
-		    	return (mapping.findForward(REDO_QUESTIONS));
+	    		
+	    		boolean isRetries=mcContent.isRetries();
+	    		logger.debug("isRetries: " + isRetries);
+	    		if (isRetries == true)
+	    		    return (mapping.findForward(REDO_QUESTIONS));
+	    		else
+	    		{
+		    		McLearningAction mcLearningAction= new McLearningAction();
+			    	logger.debug("present to learner with previous attempts data");
+			    	return mcLearningAction.viewAnswers(mapping, form, request, response);
+	    		}
 	    	}
 	    }
 	    else if (learningMode.equals("teacher"))

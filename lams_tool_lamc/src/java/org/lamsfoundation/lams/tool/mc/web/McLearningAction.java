@@ -402,7 +402,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     	mcLearningForm.setUserOverPassMark(new Boolean(false).toString());
     	mcLearningForm.setPassMarkApplicable(new Boolean(false).toString());
     	boolean passed=false;
-    	if ((passMark != null) && (passMark.intValue() != 0)) 
+    	if ((passMark != null)) 
 		{
     	    mcLearningForm.setPassMarkApplicable(new Boolean(true).toString());
     		int totalUserWeight=LearningUtil.calculateWeights(mapLeanerAssessmentResults, mapQuestionWeights);
@@ -646,8 +646,6 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		}
 		else
 		{
-			//mcQueUsr=mcService.retrieveMcQueUsr(new Long(learnerProgressUserId));
-			//logger.debug("mcQueUsr: " + mcQueUsr);
 	    	Long toolSessionId=(Long)request.getSession().getAttribute(TOOL_SESSION_ID);
 	    	logger.debug("toolSessionId: " + toolSessionId);
 	    	
