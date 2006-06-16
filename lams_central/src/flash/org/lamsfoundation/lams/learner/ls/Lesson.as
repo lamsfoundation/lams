@@ -184,7 +184,7 @@ class Lesson {
 	private function getFlashProgress():Void{
 		var callback:Function = Proxy.create(this,saveProgressData);
 		var lessonId:Number = lessonModel.ID;
-		Application.getInstance().getComms().getRequest('learning/learner.do?method=getFlashProgressData&progressID='+String(lessonId), callback, false);
+		Application.getInstance().getComms().getRequest('learning/learner.do?method=getFlashProgressData&lessonID='+String(lessonId), callback, false);
 	}
 	
 	private function saveProgressData(progressDTO:Object):Void{
@@ -211,9 +211,12 @@ class Lesson {
 		trace('receiving message back from server...');
 		
 		// set lesson as inactive
-		lessonModel.setInactive();
+		//lessonModel.setInactive();
 		
 		// deactivate Progress movie
+		
+		// load exit jsp
+		getURL(_root.serverURL + 'learning'+String(pkt), 'contentFrame');
 	}
 	
 	private function openLearningDesign(){
