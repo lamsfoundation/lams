@@ -482,6 +482,8 @@ public interface IUserManagementService {
 	
 	public void deleteOrganisationById(Integer orgId);
 	
+	public void deleteUserById(Integer userId);
+	
 	public List getOrganisationsByTypeAndStatus(Integer organisationTypeId, Integer organisationStateId);
 	
 	public List getUserOrganisationsForUserByTypeAndStatus(String username,Integer organisationTypeId, Integer organisationStateId);
