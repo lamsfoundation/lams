@@ -63,7 +63,7 @@ class LessonModel extends Observable {
 	private var _learningDesignModel:DesignDataModel;
 	
 	private var _progressData:Progress;
-	
+	private var _currentActivityOpen:Object;
 	private var _active:Boolean;
 	
 	
@@ -75,6 +75,7 @@ class LessonModel extends Observable {
 		_active = false;
 		_learningDesignModel = null;
 		_progressData = null;
+		_currentActivityOpen = null;
 		
 		ddmActivity_keys = new Array();
 		ddmTransition_keys = new Array();
@@ -332,6 +333,25 @@ class LessonModel extends Observable {
 		
 	}
 	
+	public function setCurrentActivityOpen(ca:Object){
+		
+		if(_currentActivityOpen != null && ca != null){
+			 setChanged();
+		
+			//send an update
+			infoObj = {};
+			infoObj.updateType = "CLOSE_COMPLEX_ACTIVITY";
+			infoObj.data = _currentActivityOpen;
+			notifyObservers(infoObj);
+		}
+		
+		_currentActivityOpen = ca;
+		
+	}
+	
+	public function getCurrentActivityOpen():Object{
+		return _currentActivityOpen;
+	}
 	
 	/**
 	 * get the design in the DesignDataModel and update the Monitor Model accordingly.
