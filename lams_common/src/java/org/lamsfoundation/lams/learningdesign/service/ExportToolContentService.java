@@ -58,6 +58,7 @@ import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
 import org.lamsfoundation.lams.learningdesign.ChosenGrouping;
+import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
@@ -76,6 +77,7 @@ import org.lamsfoundation.lams.learningdesign.dao.IGroupingDAO;
 import org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO;
 import org.lamsfoundation.lams.learningdesign.dao.ILicenseDAO;
 import org.lamsfoundation.lams.learningdesign.dao.ITransitionDAO;
+import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.GroupingDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
@@ -310,6 +312,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			List<AuthoringActivityDTO> activities = ldDto.getActivities();
 			for(AuthoringActivityDTO activity : activities){
 				//skip non-tool activities
+
 				if(activity.getActivityTypeID().intValue() != Activity.TOOL_ACTIVITY_TYPE)
 					continue;
 				ToolContentManager contentManager = (ToolContentManager) findToolService(toolDAO.getToolByID(activity.getToolID()));
@@ -637,7 +640,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		Set<Activity> actList = new TreeSet<Activity> (new ActivityOrderComparator());
 		Map<Long,Activity> activityMapper = new HashMap<Long,Activity>();
 		for(AuthoringActivityDTO actDto: actDtoList){
-			Activity act = getActivity(actDto,groupingMapper,toolMapper);
+			Activity act = getActivity(actDto,activityMapper, groupingMapper,toolMapper);
 			activityMapper.put(act.getActivityId(),act);
 			actList.add(act);
 			
@@ -809,11 +812,12 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	/**
 	 * 
 	 * @param actDto
+	 * @param activityMapper 
 	 * @param groupingList
 	 * @param toolMapper
 	 * @return
 	 */
-	private Activity getActivity(AuthoringActivityDTO actDto, Map<Long, Grouping> groupingList, Map<Long,ToolContent> toolMapper) {
+	private Activity getActivity(AuthoringActivityDTO actDto, Map<Long, Activity> activityMapper, Map<Long, Grouping> groupingList, Map<Long,ToolContent> toolMapper) {
 		Activity act = null;
 		if(actDto == null)
 			return act;
@@ -883,22 +887,27 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		act.setDescription(actDto.getDescription());
 		act.setHelpText(actDto.getHelpText());
 		act.setLanguageFile(actDto.getLanguageFile());
+		//do not need set so far
 //		act.setLearningDesign();
-		//TODO: be to decided by Fiona
+		
+//		the id will be decide in LearningObject 
 //		actDto.getLearningDesignID()
 //		act.setLearningLibrary();
+		
+		//be to decided by Fiona: 08/06/2006: It is ok to left it as null
 //		actDto.getLibraryActivityID()
 //		act.setLibraryActivity();
+		
 		act.setLibraryActivityUiImage(actDto.getLibraryActivityUIImage());
 		act.setOrderId(actDto.getOrderID());
 		
-//		actDto.getParentActivityID()
-//		act.setParentActivity();
+		act.setParentActivity(activityMapper.get(actDto.getParentActivityID()));
 		
 		act.setParentUIID(actDto.getParentUIID());
 		act.setRunOffline(actDto.getRunOffline());
 		act.setTitle(actDto.getTitle());
 		
+		//relation will be decide in Transition object.
 //		act.setTransitionFrom();
 //		act.setTransitionTo();
 		
@@ -965,7 +974,5 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	public void setWorkspaceFolderDAO(IWorkspaceFolderDAO workspaceFolderDAO) {
 		this.workspaceFolderDAO = workspaceFolderDAO;
 	}
-
-
 
 }
