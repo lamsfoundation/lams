@@ -74,15 +74,16 @@ public class IndexAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		log.debug("User:"+request.getRemoteUser());
 		List<IndexLinkBean> headerLinks = new ArrayList<IndexLinkBean>();
-		headerLinks.add(new IndexLinkBean("My Profile", "profile.do?username=" + request.getRemoteUser()));
+		headerLinks.add(new IndexLinkBean("Dummy Monitor Page","javascript:openDummyMonitor()"));
+		headerLinks.add(new IndexLinkBean("My Profile", "javascript:openProfile('" + request.getRemoteUser()+"')"));
 		if (request.isUserInRole(Role.SYSADMIN)) {
 			log.debug("user is sysadmin");
-			headerLinks.add(new IndexLinkBean("System Administration", "admin/sysadminstart.do"));
-			headerLinks.add(new IndexLinkBean("Course Management", "admin/orgmanage.do?org=" + service.getRootOrganisation().getOrganisationId()));
+			headerLinks.add(new IndexLinkBean("System Administration", "javascript:openSysadmin()"));
+			headerLinks.add(new IndexLinkBean("Course Management", "javascript:openOrgManagement(" + service.getRootOrganisation().getOrganisationId()+")"));
 		}
 		if (request.isUserInRole(Role.AUTHOR)) {
 			log.debug("user is author");
-			headerLinks.add(new IndexLinkBean("Author", "home.do?method=author"));
+			headerLinks.add(new IndexLinkBean("Author", "javascript:openAuthor()"));
 		}
 		log.debug("set headerLinks in request");
 		request.setAttribute("headerLinks", headerLinks);
@@ -125,17 +126,17 @@ public class IndexAction extends Action {
 		List<IndexLinkBean> links = new ArrayList<IndexLinkBean>();
 		if(isSysAdmin){
 			if (orgBean.getType().equals(OrganisationType.COURSE_TYPE)) {
-				links.add(new IndexLinkBean("Manage Classes", "admin/orgmanage.do?org=" + org.getOrganisationId()));
+				links.add(new IndexLinkBean("Manage Classes", "javascript:openOrgManagement(" + org.getOrganisationId()+")"));
 			}
 		}
 		if (contains(roles, Role.ROLE_COURSE_ADMIN) || contains(roles, Role.ROLE_COURSE_MANAGER) || contains(roles,Role.ROLE_STAFF)) {
 			if (orgBean.getType().equals(OrganisationType.COURSE_TYPE)) {
 				if((!isSysAdmin)&&(contains(roles, Role.ROLE_COURSE_ADMIN) || contains(roles, Role.ROLE_COURSE_MANAGER))){
-					links.add(new IndexLinkBean("Manage Classes", "admin/orgmanage.do?org=" + org.getOrganisationId()));
+					links.add(new IndexLinkBean("Manage Classes", "javascript:openOrgManagement(" + org.getOrganisationId()+")"));
 				}
-				links.add(new IndexLinkBean("Add Lesson", "home.do?method=addLesson&courseID=" + org.getOrganisationId()));
+				links.add(new IndexLinkBean("Add Lesson", "javascript:openAddLesson(" + org.getOrganisationId()+",'')"));
 			}else{//CLASS_TYPE
-				links.add(new IndexLinkBean("Add Lesson","home.do?method=addLesson&courseID="+org.getParentOrganisation().getOrganisationId()+"&classID="+org.getOrganisationId()));
+				links.add(new IndexLinkBean("Add Lesson","javascript:openAddLesson("+org.getParentOrganisation().getOrganisationId()+","+org.getOrganisationId()+")"));
 			}
 		}
 		
@@ -146,10 +147,10 @@ public class IndexAction extends Action {
 		for(Lesson lesson:lessons) {
 			List<IndexLinkBean> lessonLinks = new ArrayList<IndexLinkBean>();
 			if(contains(roles,Role.ROLE_COURSE_MANAGER)||contains(roles,Role.ROLE_STAFF)){
-				lessonLinks.add(new IndexLinkBean("Monitor", "home.do/method=monitorLesson&lessonID=" + lesson.getLessonId()));
+				lessonLinks.add(new IndexLinkBean("Monitor", "javascript:openMonitorLesson(" + lesson.getLessonId()+")"));
 			}
 			if(contains(roles,Role.ROLE_LEARNER)){
-				lessonLinks.add(new IndexLinkBean("Participate","home.do?method=learner&lessonID="+lesson.getLessonId()));
+				lessonLinks.add(new IndexLinkBean("Participate","javascript:openLearner("+lesson.getLessonId()+")"));
 			}
 			IndexLessonBean lessonBean = new IndexLessonBean(lesson.getLessonName(), lessonLinks);
 			lessonBeans.add(lessonBean);
