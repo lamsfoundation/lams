@@ -41,11 +41,11 @@ app.main(this);
 //------------------------------Local connection to JSPs for progress data ------------------------------
 var recieve_lc = new LocalConnection();
 //-------------------------------------- Functions to setProgress data, called by the LocalConnection object in learner JSPs
-recieve_lc.setProgressData = function(attempted, completed, current, uniqueID) {
-	debug(arguments.toString(), 'learnerProgress_lc.setProgressData');
-	app.refreshProgress(attempted, completed, current, uniqueID);
+recieve_lc.setProgressData = function(attempted, completed, current, lessonID) {
+	Debugger.log(arguments.toString(), 'learnerProgress_lc.setProgressData');
+	app.refreshProgress(attempted, completed, current, lessonID);
 };
-var success = recieve_lc.connect("learnerProgress_lc");
+var success = recieve_lc.connect("learnerProgress_lc_" + uniqueID);
 
 
 //Make app listener for stage resize events
