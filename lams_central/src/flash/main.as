@@ -19,6 +19,17 @@ if(StringUtils.isEmpty(mode)){
 	Debugger.log('Mode is not defined, using defualt:'+_root.mode,Debugger.CRITICAL,'main','ROOT');			
 }
 
+if(StringUtils.isEmpty(lang)){
+	_root.lang = "en";
+}
+
+if(StringUtils.isEmpty(country)){
+	_root.country = undefined;
+}
+
+if(StringUtils.isEmpty(build)){
+	_root.build = "2.0";
+}
 
 //Set stage alignment to top left and prent scaling
 Stage.align = "TL";
