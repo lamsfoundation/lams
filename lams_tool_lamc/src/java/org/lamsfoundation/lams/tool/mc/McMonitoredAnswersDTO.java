@@ -40,7 +40,11 @@ public class McMonitoredAnswersDTO implements Comparable
 	
 	private String question;
 	
+	private String weight;
+	
 	private List candidateAnswers;
+	
+	private List candidateAnswersCorrect;
 	
 	private Map questionAttempts;
 	
@@ -111,4 +115,28 @@ public class McMonitoredAnswersDTO implements Comparable
 			return (int) (new Long(questionUid).longValue() - new Long(mcMonitoredAnswersDTO.questionUid).longValue());
     }
 	
+    /**
+     * @return Returns the weight.
+     */
+    public String getWeight() {
+        return weight;
+    }
+    /**
+     * @param weight The weight to set.
+     */
+    public void setWeight(String weight) {
+        this.weight = weight;
+    }
+    /**
+     * @return Returns the candidateAnswersCorrect.
+     */
+    public List getCandidateAnswersCorrect() {
+        return candidateAnswersCorrect;
+    }
+    /**
+     * @param candidateAnswersCorrect The candidateAnswersCorrect to set.
+     */
+    public void setCandidateAnswersCorrect(List candidateAnswersCorrect) {
+        this.candidateAnswersCorrect = candidateAnswersCorrect;
+    }
 }

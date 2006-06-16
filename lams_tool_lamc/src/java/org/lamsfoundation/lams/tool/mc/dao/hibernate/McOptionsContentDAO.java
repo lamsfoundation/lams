@@ -28,8 +28,9 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.hibernate.FlushMode;
-import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
+import org.lamsfoundation.lams.tool.mc.McCandidateAnswersDTO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcOptionsContentDAO;
+import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
@@ -90,6 +91,58 @@ public class McOptionsContentDAO extends HibernateDaoSupport implements IMcOptio
 			}
 			return listOptionNames;
 	    }
+	 	
+	 	
+	 	public List populateCandidateAnswersDTO(Long mcQueContentId)
+	    {
+	 		List listCandidateAnswersData= new LinkedList();
+	 		
+			HibernateTemplate templ = this.getHibernateTemplate();
+			if ( mcQueContentId != null) {
+				List list = getSession().createQuery(FIND_MC_OPTIONS_CONTENT)
+					.setLong(0,mcQueContentId.longValue())
+					.list();
+				
+				if(list != null && list.size() > 0){
+					Iterator listIterator=list.iterator();
+			    	while (listIterator.hasNext())
+			    	{
+			    	    McOptsContent mcOptsContent=(McOptsContent)listIterator.next();
+			    	    McCandidateAnswersDTO mcCandidateAnswersDTO= new McCandidateAnswersDTO();
+			    	    mcCandidateAnswersDTO.setCandidateAnswer(mcOptsContent.getMcQueOptionText());
+			    	    mcCandidateAnswersDTO.setCorrect(new Boolean(mcOptsContent.isCorrectOption()).toString());
+			    		listCandidateAnswersData.add(mcCandidateAnswersDTO);
+			    	}
+				}
+			}
+			return listCandidateAnswersData;
+	    }
+
+	 	
+	 	public List findMcOptionCorrectByQueId(Long mcQueContentId)
+	    {
+	 		
+	 		List listOptionCorrect= new LinkedList();
+	 		
+			HibernateTemplate templ = this.getHibernateTemplate();
+			if ( mcQueContentId != null) {
+				List list = getSession().createQuery(FIND_MC_OPTIONS_CONTENT)
+					.setLong(0,mcQueContentId.longValue())
+					.list();
+				
+				if(list != null && list.size() > 0){
+					Iterator listIterator=list.iterator();
+			    	while (listIterator.hasNext())
+			    	{
+			    		McOptsContent mcOptsContent=(McOptsContent)listIterator.next();
+			    		listOptionCorrect.add(new Boolean(mcOptsContent.isCorrectOption()).toString());
+			    	}
+				}
+			}
+			return listOptionCorrect;
+	    }
+
+	 	
 	 	
 	 	public McOptsContent getOptionContentByOptionText(final String option, final Long mcQueContentUid)
 	    {

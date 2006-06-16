@@ -166,7 +166,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<!-- end tab buttons -->
 		<div class="tabbody">
 		
-		<lams:TabBody id="1" titleKey="label.summary" page="SummaryContent.jsp"/>
+		<lams:TabBody id="1" titleKey="label.summary" page="Summary.jsp"/>
 
 		<lams:TabBody id="2" titleKey="label.instructions" page="Instructions.jsp" />
 

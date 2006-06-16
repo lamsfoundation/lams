@@ -117,10 +117,16 @@ public class MonitoringUtil implements McAppConstants{
 	    		McMonitoredAnswersDTO mcMonitoredAnswersDTO= new McMonitoredAnswersDTO();
 	    		mcMonitoredAnswersDTO.setQuestionUid(mcQueContent.getUid().toString());
 	    		mcMonitoredAnswersDTO.setQuestion(mcQueContent.getQuestion());
+	    		mcMonitoredAnswersDTO.setWeight(mcQueContent.getWeight().toString());
 	    		
 	    		List listCandidateAnswers=mcService.findMcOptionNamesByQueId(mcQueContent.getUid());
 				logger.debug("listCandidateAnswers:..." + listCandidateAnswers);
 				mcMonitoredAnswersDTO.setCandidateAnswers(listCandidateAnswers);
+				
+	    		List listCandidateAnswersDTO=mcService.populateCandidateAnswersDTO(mcQueContent.getUid());
+				logger.debug("listCandidateAnswersDTO:..." + listCandidateAnswersDTO);
+				mcMonitoredAnswersDTO.setCandidateAnswersCorrect(listCandidateAnswersDTO);
+				
 				
 				Map questionAttemptData= buildGroupsAttemptData(request, mcContent, mcQueContent, mcQueContent.getUid().toString());
 				logger.debug("questionAttemptData:..." + questionAttemptData);

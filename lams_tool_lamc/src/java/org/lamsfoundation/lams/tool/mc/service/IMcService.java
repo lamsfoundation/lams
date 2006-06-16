@@ -121,6 +121,8 @@ public interface IMcService
     
     public List getMcUserBySessionOnly(final McSession mcSession) throws McApplicationException;
     
+    public List populateCandidateAnswersDTO(Long mcQueContentId) throws McApplicationException;
+    
     public McSession getMcSessionByUID(Long uid) throws McApplicationException;
     
     public void deleteMc(McContent mc) throws McApplicationException;
@@ -258,6 +260,8 @@ public interface IMcService
     public List getOfflineFilesMetaData(Long mcContentId) throws McApplicationException;
     
     public List getSessionsFromContent(McContent mcContent) throws McApplicationException;
+    
+    public List findMcOptionCorrectByQueId(Long mcQueContentId) throws McApplicationException;
     
     public List findMcOptionNamesByQueId(Long mcQueContentId) throws McApplicationException;
 }

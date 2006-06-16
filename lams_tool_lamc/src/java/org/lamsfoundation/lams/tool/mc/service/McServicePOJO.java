@@ -614,6 +614,19 @@ public class McServicePOJO implements
                                                  + e.getMessage(),e);
         }
     }
+    
+    public List populateCandidateAnswersDTO(Long mcQueContentId) throws McApplicationException
+    {
+    	try
+        {
+            return mcOptionsContentDAO.populateCandidateAnswersDTO(mcQueContentId);
+        }
+        catch (DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is populating candidate answers dto"
+                                                 + e.getMessage(),e);
+        }
+    }
 
     public List getPersistedSelectedOptions(Long mcQueContentId) throws McApplicationException
 	{
@@ -978,7 +991,21 @@ public class McServicePOJO implements
                                                  + e.getMessage(),e);
         }
 	}
-    
+
+    public List findMcOptionCorrectByQueId(Long mcQueContentId) throws McApplicationException
+    {
+    	try
+        {
+            return mcOptionsContentDAO.findMcOptionCorrectByQueId(mcQueContentId);
+        }
+        catch (DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is getting correct/incorrect options list"
+                                                 + " the mc options content: "
+                                                 + e.getMessage(),e);
+        }
+        
+    }
     
     public void deleteMcOptionsContent(McOptsContent mcOptsContent) throws McApplicationException
 	{

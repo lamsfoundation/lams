@@ -71,6 +71,10 @@ public interface IMcOptionsContentDAO
 	 */
 	public List getPersistedSelectedOptions(Long mcQueContentId);
 	
+	public List findMcOptionCorrectByQueId(Long mcQueContentId);
+	
+	public List populateCandidateAnswersDTO(Long mcQueContentId);
+	
 	public List getCorrectOption(Long mcQueContentId);
 	
 	/**
