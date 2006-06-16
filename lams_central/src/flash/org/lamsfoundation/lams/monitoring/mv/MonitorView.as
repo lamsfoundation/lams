@@ -206,8 +206,8 @@ public function update (o:Observable,infoObj:Object):Void{
 		//trace('lesson tab view: ' + _tabsLayer_mc);
 		//bkg_pnl.useHandCursor = false;
 	
-		var tab_arr:Array = [{label:"Lesson", data:"lesson"}, {label:"Monitor", data:"monitor"}, {label:"Learners", data:"learners"}, {label:"Todo", data:"todo"}];
-		
+		var tab_arr:Array = [{label:"Lesson", data:"lesson"}, {label:"Sequence", data:"monitor"}, {label:"Learners", data:"learners"}, {label:"Todo", data:"todo"}];
+		monitorTabs_tb.setSize(400, 22)
 		monitorTabs_tb.dataProvider = tab_arr;
 		monitorTabs_tb.selectedIndex = 0;
 		
