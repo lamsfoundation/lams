@@ -37,6 +37,7 @@ import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.web.action.LamsAction;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -109,10 +110,15 @@ public abstract class ActivityAction extends LamsAction {
 		StringBuffer progressSummary = new StringBuffer(100);
 		if ( learnerProgress == null  ) {
 			progressSummary.append("attempted=&completed=&current=");
+			progressSummary.append("&lessonID=");
+			Lesson currentLesson = learnerProgress.getLesson();
+			if(currentLesson != null){
+				progressSummary.append(currentLesson.getLessonId());
+			}
 		} else {
 			progressSummary.append("attempted=");
 			boolean first = true;
-			for ( Object obj : learnerProgress.getAttemptedActivities() ) {
+			for (Object obj : learnerProgress.getAttemptedActivities()) {
 				Activity activity = (Activity ) obj;
 				if ( ! first ) {
 					progressSummary.append("_");
@@ -138,6 +144,12 @@ public abstract class ActivityAction extends LamsAction {
 			Activity currentActivity = learnerProgress.getCurrentActivity();
 			if ( currentActivity != null ) {
 				progressSummary.append(currentActivity.getActivityId());
+			}
+			
+			progressSummary.append("&lessonID=");
+			Lesson currentLesson = learnerProgress.getLesson();
+			if(currentLesson != null){
+				progressSummary.append(currentLesson.getLessonId());
 			}
 		}
 		return progressSummary.toString();
