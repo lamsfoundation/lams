@@ -26,6 +26,7 @@
 			{
 				if(pWin && pWin.open && !pWin.closed)
 				{
+					pWin.location='profile.do?user='+username;
 					pWin.focus();
 				}
 				else
@@ -46,6 +47,7 @@
 			{
 				if(authorWin && authorWin.open && !authorWin.closed)
 				{
+					//authorWin.location = 'home.do?method=author';
 					authorWin.focus();
 				}
 				else
@@ -66,6 +68,7 @@
 			{
 				if(dmWin && dmWin.open && !dmWin.closed)
 				{
+					dmWin.location = 'monitoring/dummy.jsp';
 					dmWin.focus();
 				}
 				else
@@ -93,10 +96,9 @@
 			{
 				if(monitorLessonWin && monitorLessonWin.open && !monitorLessonWin.closed)
 				{
-					monitorLessonWin.focus();
-				}
-				else
-				{
+					monitorLessonWin.location = 'home.do?method=monitorLesson&lessonID='+lessonID;
+					monitorLessonWin.close();
+				}else{
 					monitorLessonWin = window.open('home.do?method=monitorLesson&lessonID='+lessonID,'mWindow','width=779,height=575,resizable,resizable,scrollbars');
 				}
 			}
@@ -119,6 +121,7 @@
 			{
 				if(addLessonWin && addLessonWin.open && !addLessonWin.closed)
 				{
+					addLessonWin.location = 'home.do?method=addLesson&courseID='+courseID+'&classID='+classID;
 					addLessonWin.focus();
 				}
 				else
@@ -138,6 +141,7 @@
 			{
 				if(learnWin && learnWin.open && !learnWin.closed )
 				{
+					learnWin.location = 'home.do?method=learner&lessonID='+lessonId;		
 					learnWin.focus();
 				}
 				else
@@ -157,6 +161,7 @@
 			{
 				if(sysadminWin && sysadminWin.open && !sysadminWin.closed )
 				{
+					sysadminWin.location = 'admin/sysadminstart.do';
 					sysadminWin.focus();
 				}
 				else
@@ -183,6 +188,7 @@
 			{
 				if(omWin && omWin.open && !omWin.closed )
 				{
+					omWin.location = 'admin/orgmanage.do?org='+orgId;
 					omWin.focus();
 				}
 				else
