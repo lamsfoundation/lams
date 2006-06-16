@@ -131,6 +131,10 @@ class LessonView extends AbstractView {
 			case 'DRAW_ACTIVITY' :
 				drawActivity(infoObj.data, lm);
 				break;
+			case 'UPDATE_ACTIVITY' :
+				Debugger.log('updating activity: ' + infoObj.data.activityUIID,Debugger.CRITICAL,'update','org.lamsfoundation.lams.LessonView');
+				updateActivity(infoObj.data, lm);
+				break;
 			case 'REMOVE_ACTIVITY' :
 				removeActivity(infoObj.data, lm);
 				break;
@@ -146,8 +150,8 @@ class LessonView extends AbstractView {
 				break;
 			case 'PROGRESS_UPDATE' :
 				Debugger.log('progress data receieved for user..' + lm.progressData.getUserName(),Debugger.CRITICAL,'update','org.lamsfoundation.lams.LessonView');
-				removeAll(lm);
-				lm.drawDesign();
+				//removeAll(lm);
+				lm.updateDesign();
 				break;
 			case 'CLOSE_COMPLEX_ACTIVITY' :
 				closeComplexActivity(infoObj.data, lm);
@@ -188,10 +192,16 @@ class LessonView extends AbstractView {
 	private function closeComplexActivity(ca:Object, lm:LessonModel):Void{
 		if(lm.activitiesDisplayed.containsKey(ca.activity.activityUIID)){
 			var a:LearnerComplexActivity = LearnerComplexActivity(lm.activitiesDisplayed.get(ca.activity.activityUIID));
-			if(a.locked && !a.doubleClicking){
+			if(a.locked){
 				a.collapse();
+				Debugger.log('closed complex activity' + ca.activity.activityUIID,Debugger.CRITICAL,'closeComplexActivity','org.lamsfoundation.lams.LessonView');
+
+			} else {
+				Debugger.log('not closed complex activity' + ca.activity.activityUIID,Debugger.CRITICAL,'closeComplexActivity','org.lamsfoundation.lams.LessonView');
 			}
 		} else {
+			Debugger.log('no entry in table: ' + ca.activity.activityUIID,Debugger.CRITICAL,'closeComplexActivity','org.lamsfoundation.lams.LessonView');
+
 			// no object found in table
 		}
 	}
@@ -236,6 +246,26 @@ class LessonView extends AbstractView {
 		var actItems:Number = lm.activitiesDisplayed.size()
 		if (actItems < lm.getActivityKeys().length){
 			lm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
+		}
+		
+		return true;
+	}
+	
+	
+	/**
+	 * Updates existing activity on learner progress bar.
+	 * @usage   
+	 * @param   a  - Activity to be drawn
+	 * @param   lm - Refernce to the model
+	 * @return  Boolean - successfullit
+	 */
+	private function updateActivity(a:Activity,lm:LessonModel):Boolean{
+		
+		if(lm.activitiesDisplayed.containsKey(a.activityUIID)){
+			var activityMC:Object = lm.activitiesDisplayed.get(a.activityUIID);
+			activityMC.refresh();
+		} else {
+			drawActivity(a, lm);
 		}
 		
 		return true;

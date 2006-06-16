@@ -112,27 +112,17 @@ class LessonController extends AbstractController {
 	   Debugger.log('activityReleaseOutside CanvasActivity:'+ca.activity.activityID,Debugger.GEN,'activityReleaseOutside','LessonController');
     }
 	
-	public function complexActivityRelease(ca:Object):Void{
-		if(ca.locked){
-			_lessonModel.setCurrentActivityOpen(ca);
-		} else {
-			_lessonModel.setCurrentActivityOpen(null);
-		}
-	}
-	
-	public function checkForCurrentChildren(ca:Object, clickTarget:MovieClip):Void{
-		Debugger.log('checking activity:'+ca.activity.activityID,Debugger.GEN,'checkForCurrentChildren','LessonController');
-		for(var i=0; i<ca.activityChildren.length; i++){
-			Debugger.log('checking child activity:'+ca.activityChildren[i].activityID,Debugger.GEN,'checkForCurrentChildren','LessonController');
-			if(_lessonModel.progressData != null){
-				if(ca.activityChildren[i].activityID == _lessonModel.progressData.getCurrentActivityId()){
-					//LearnerComplexActivity(ca).expand();
-					//_lessonModel.setCurrentActivityOpen(ca);
-					Debugger.log('found match:'+ca.activityChildren[i].activityID,Debugger.GEN,'checkForCurrentChildren','LessonController');
-					//dispatchEvent({target:clickTarget, type: 'onRelease'});
-					ca.localOnRelease();
-				}
+	public function complexActivityRelease(ca:Object, dbClick:Boolean):Void{
+		if(!dbClick){
+			if(ca.locked){
+				Debugger.log('***1*** CA dbclick: ' + dbClick + 'CA lock: '+ca.locked,Debugger.GEN,'complexActivityRelease','LessonController');
+				_lessonModel.setCurrentActivityOpen(ca);
+			} else {
+				Debugger.log('***2*** CA dbclick: ' + dbClick + 'CA lock: '+ca.locked,Debugger.GEN,'complexActivityRelease','LessonController');
+				_lessonModel.setCurrentActivityOpen(null);
 			}
+		} else {
+			Debugger.log('***3*** CA dbclick: ' + dbClick + 'CA lock: '+ca.locked,Debugger.GEN,'complexActivityRelease','LessonController');
 		}
 	}
 	

@@ -387,22 +387,36 @@ class LessonModel extends Observable {
 				broadcastViewUpdate("DRAW_ACTIVITY",ddm_activity);
 			}
 		}
-		//now check the transitions:
-		ddmTransition_keys = learningDesignModel.transitions.keys();
-				
-		//chose which array we are going to loop over
-		var trIndexArray:Array;
-		trIndexArray = ddmTransition_keys;
+
+	}
+	
+	public function updateDesign(){
+		var indexArray:Array = setDesignOrder();
+		
+		//go through the design and get the activities and transitions 
+		
+		var dataObj:Object;
+		ddmActivity_keys = learningDesignModel.activities.keys();
+		
+		//indexArray = ddmActivity_keys;
+		trace("Length of Activities in DDM: "+indexArray.length)
 		
 		//loop through 
-		for(var i=0;i<trIndexArray.length;i++){
+		for(var i=0;i<indexArray.length;i++){
+					
+			var keyToCheck:Number = indexArray[i].activityUIID;
 			
-			var transitionKeyToCheck:Number = trIndexArray[i];
-
-			var ddmTransition:Transition = learningDesignModel.transitions.get(transitionKeyToCheck);
-			
-			broadcastViewUpdate("DRAW_TRANSITION",ddmTransition);	
-		}		
+			var ddm_activity:Activity = learningDesignModel.activities.get(keyToCheck);
+			trace("Activity type ID: "+ddm_activity.activityTypeID)
+			if (ddm_activity.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE){
+				trace("Activity is an optional activity "+ddm_activity.activityUIID)
+			}
+			if(ddm_activity.parentActivityID > 0 || ddm_activity.parentUIID > 0){
+				trace("this is Child")
+			}else {
+				broadcastViewUpdate("UPDATE_ACTIVITY",ddm_activity);
+			}
+		}
 	}
 	
 	public function broadcastViewUpdate(updateType, data){
