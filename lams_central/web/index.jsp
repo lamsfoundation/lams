@@ -89,7 +89,7 @@
 					<td align="left" style="font-size:20pt">
 						<fmt:message key="lams.welcome"/>, <lams:user property="firstName"/> <img src="images/lamb_big.png"/>
 					</td>
-					<td align=left>
+					<td align="right">
 						<a title="<fmt:message key="index.refresh.hint"/>" href="javascript:getContent()"><fmt:message key="index.refresh"/></a>
 					</td>
 				</tr>
