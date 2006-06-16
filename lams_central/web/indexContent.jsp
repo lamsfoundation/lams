@@ -6,7 +6,7 @@
 	<tr>
 		<td align="right"> 
 			<c:forEach var="headerlink" items="${headerLinks}">
-				[<a href="<c:out value='${headerlink.url}'/>" target="_blank"><c:out value="${headerlink.name}"/></a>]&nbsp;
+				[<a href="<c:out value='${headerlink.url}'/>"><c:out value="${headerlink.name}"/></a>]&nbsp;
 			</c:forEach>
 		</td>
 	</tr>
@@ -28,7 +28,7 @@
 								<strong><c:out value="${orgBean.name}"/></strong>
 								<img src="images/spacer.gif" height="10" width="200"/>
 								<c:forEach var="link" items="${orgBean.links}">
-									[<a href="<c:out value='${link.url}'/>" target="_blank"><c:out value="${link.name}"/></a>]&nbsp;
+									[<a href="<c:out value='${link.url}'/>"><c:out value="${link.name}"/></a>]&nbsp;
 								</c:forEach>
 								<div>
 									<c:forEach var="lesson" items="${orgBean.lessons}">
@@ -39,7 +39,7 @@
 													<img src="images/tree_white.gif"/> <c:out value="${lesson.name}"/>
 													<img src="images/spacer.gif" height="10" width="200"/>
 													<c:forEach var="lessonlink" items="${lesson.links}">
-														[<a href="<c:out value='${lessonlink.url}'/>" target="_blank"><c:out value="${lessonlink.name}"/></a>]&nbsp;
+														[<a href="<c:out value='${lessonlink.url}'/>"><c:out value="${lessonlink.name}"/></a>]&nbsp;
 													</c:forEach>
 													<div></div> 
 												</td>
@@ -62,7 +62,7 @@
 													<strong><c:out value="${childOrg.name}"/></strong>
 													<img src="images/spacer.gif" height="10" width="200"/>
 													<c:forEach var="childlink" items="${childOrg.links}">
-														[<a href="<c:out value='${childlink.url}'/>" target="_blank"><c:out value="${childlink.name}"/></a>]&nbsp;
+														[<a href="<c:out value='${childlink.url}'/>"><c:out value="${childlink.name}"/></a>]&nbsp;
 													</c:forEach>
 													<div>
 														<c:forEach var="childLesson" items="${childOrg.lessons}">
@@ -70,10 +70,10 @@
 																<tr>
 																	<td width="10"></td>
 																	<td>
-																		<img src="images/tree_white.gif"/> <c:out value="${lesson.name}"/>
+																		<img src="images/tree_white.gif"/> <c:out value="${childLesson.name}"/>
 																		<img src="images/spacer.gif" height="5" width="200"/>
 																		<c:forEach var="childlessonlink" items="${childLesson.links}">
-																			[<a href="<c:out value='${childlessonlink.url}'/>" target="_blank"><c:out value="${childlessonlink.name}"/></a>]&nbsp;
+																			[<a href="<c:out value='${childlessonlink.url}'/>"><c:out value="${childlessonlink.name}"/></a>]&nbsp;
 																		</c:forEach>
 																		<div></div> 
 																	</td>
