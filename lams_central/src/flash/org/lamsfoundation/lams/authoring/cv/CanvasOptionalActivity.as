@@ -46,7 +46,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 	private var _canvasController : CanvasController;
 	private var _canvasView : CanvasView;
 	private var _monitorController : MonitorController;
-	private var _learnerTabView : LearnerTabView;
 	private var _monitorTabView : MonitorTabView;
 	//Set by the init obj
 	private var _activity : Activity;
@@ -145,25 +144,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 	public function setActivity (a : Activity)	{
 		_activity = a;
 	}
+	
 	private function draw (){
 		
-		var actStatus:String = Progress.compareProgressData(learner, _activity.activityID);
-		switch (actStatus){
-		    case 'completed_mc' :
-				//trace("TabID for Selected tab is: "+infoObj.tabID)
-				completed_mc._visible = true;
-		
-                break;
-            case 'current_mc' :
-				current_mc._visible = true;
-                break;
-            case 'attempted_mc' :
-			    current_mc._visible = true;
-                break;
-			default :
-				todo_mc._visible = true;
-                //Debugger.log('unknown update type :' + infoObj.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.MonitorView');
-		}
 		//clickTarget_mc.swapDepths(childActivities_mc.getNextHighestDepth());
 		var numOfChildren = _children.length
 		panelHeight = CHILD_OFFSET_Y + (numOfChildren * CHILD_INCRE);
@@ -230,11 +213,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 			}else {
 				_locked = true;
 			}
-			draw ();
+			draw();
 		}else {
 			Debugger.log ('SingleClicking:+' + this, Debugger.GEN, 'localOnPress', 'CanvasOptionalActivity');
 			_doubleClicking = false;
-			_canvasController.activityClick(this);
+			_canvasController.activityClick (this);
 		}
 		_dcStartTime = now;
 	}
@@ -242,8 +225,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 	
 	private function localOnRelease ():Void{
 		Debugger.log ('_doubleClicking:' + _doubleClicking + ', localOnRelease:' + this, Debugger.GEN, 'localOnRelease', 'CanvasOptionalActivity');
-		if (!_doubleClicking)	{
-			_canvasController.activityRelease(this);
+		if (! _doubleClicking)	{
+				_canvasController.activityRelease (this);
 		}
 	}
 	
