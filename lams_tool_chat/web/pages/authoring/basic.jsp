@@ -3,12 +3,10 @@
 <c:set var="authoringForm" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 
 <!-- ========== Basic Tab ========== -->
-<div id="authoring_basic">
-	<table class="forms">
-		
-		<%-- ========== TITLE FIELD ========== --%>
+<table cellpadding="0">
+	<tbody>
 		<tr>
-			<td class="formlabel">
+			<td class="field-name" width="20%">
 				<fmt:message key="label.authoring.basic.title" />
 			</td>
 			<td>
@@ -16,14 +14,13 @@
 			</td>
 		</tr>
 
-		<%-- ========== INSTRUCTIONS FIELD ========== --%>
 		<tr>
-			<td class="formlabel">
+			<td class="field-name" width="20%">
 				<fmt:message key="label.authoring.basic.instructions" />
 			</td>
 			<td>
 				<lams:SetEditor id="Instructions" text="${authoringForm.instructions}" />
 			</td>
 		</tr>
-	</table>
-</div>
+	</tbody>
+</table>

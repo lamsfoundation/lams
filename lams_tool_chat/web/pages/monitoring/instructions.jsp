@@ -1,15 +1,13 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <c:set var="dto" value="${requestScope.monitoringDTO}" />
-
-<div class="datatablecontainer">
-	<table class="forms">
-
+<table>
+	<tbody>
 		<tr>
-			<td class="formlabel">
+			<td class="field-name" width="30%">
 				<fmt:message key="instructions.onlineInstructions" />
 			</td>
-			<td class="formcontrol">
+			<td>
 				<c:out value="${dto.onlineInstructions}" escapeXml="false" />
 			</td>
 		</tr>
@@ -18,7 +16,7 @@
 			<td>
 				&nbsp;
 			</td>
-			<td class="formcontrol">
+			<td>
 				<div id="onlinefile">
 					<c:if test="${not empty dto.onlineInstructionsFiles}">
 						<ul>
@@ -49,21 +47,18 @@
 				</div>
 			</td>
 		</tr>
+	</tbody>
+</table>
 
-		<tr>
-			<td>
-				&nbsp;
-			</td>
-			<td>
-				&nbsp;
-			</td>
-		</tr>
 
+
+<table>
+	<tbody>
 		<tr>
-			<td class="formlabel">
+			<td class="field-name" width="30%">
 				<fmt:message key="instructions.offlineInstructions" />
 			</td>
-			<td class="formcontrol">
+			<td>
 				<c:out value="${dto.offlineInstructions}" escapeXml="false" />
 			</td>
 		</tr>
@@ -72,7 +67,7 @@
 			<td>
 				&nbsp;
 			</td>
-			<td class="formcontrol">
+			<td>
 				<div id="offlinefile">
 					<c:if test="${not empty dto.offlineInstructionsFiles}">
 						<ul>
@@ -103,6 +98,5 @@
 				</div>
 			</td>
 		</tr>
-
-	</table>
-</div>
+	</tbody>
+</table>

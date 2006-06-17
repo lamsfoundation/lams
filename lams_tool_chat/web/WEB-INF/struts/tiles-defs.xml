@@ -23,13 +23,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <tiles-definitions>
 	<!--  Begin: Layouts -->
 	<definition name="tiles:/layout:default" path="/layouts/defaultLayout.jsp">
-		<put name="pageTitleKey" value="" />
 		<put name="header" value="tiles:/header:default"/> 
 		<put name="body" value="" />
 	</definition>
 	
 	<definition name="tiles:/layout:tab" path="/layouts/tabLayout.jsp">
-		<put name="pageTitleKey" value="" />
 		<put name="header" value="tiles:/header:default"/> 
 		<put name="body" value="" />
 	</definition>

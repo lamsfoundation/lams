@@ -181,6 +181,7 @@ Ant build file.
 				<include name="*" />
 				<include name="common/**" />
 				<include name="images/**" />
+				<include name="images-for-css/**" />
 				<include name="includes/**" />
 				<include name="layouts/**" />
 				<include name="pages/**" />

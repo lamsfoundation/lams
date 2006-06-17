@@ -3,14 +3,15 @@
 <c:set var="authoringForm" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 <html:hidden property="deleteFileUuid" />
 
-<div id="authoring_instructions">
-	<table class="form">
+
+<table cellpadding="0">
+	<tbody>
 		<!-- ==========  Online Instructions ========== -->
 		<tr>
-			<td class="formlabel">
+			<td class="field-name" width="30%">
 				<fmt:message key="instructions.onlineInstructions" />
 			</td>
-			<td NOWRAP width="700">
+			<td>
 				<lams:SetEditor id="OnlineInstruction" text="${authoringForm.onlineInstruction}" />
 			</td>
 		</tr>
@@ -30,18 +31,12 @@
 							<c:set var="viewURL">
 								<html:rewrite page="/download/?uuid=${file.fileUuid}&preferDownload=false" />
 							</c:set>
-							<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
-								<fmt:message key="link.view" />
-							</a>
-							&nbsp;
+							<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')"> <fmt:message key="link.view" /> </a> &nbsp;
 
 							<c:set var="downloadURL">
 								<html:rewrite page="/download/?uuid=${file.fileUuid}&preferDownload=true" />
 							</c:set>
-							<a href="<c:out value='${downloadURL}' escapeXml='false'/>">
-								<fmt:message key="link.download" />
-							</a>
-							&nbsp;
+							<a href="<c:out value='${downloadURL}' escapeXml='false'/>"> <fmt:message key="link.download" /> </a> &nbsp;
 
 							<html:link href="javascript:deleteAttachment('deleteOnline','${file.fileUuid}')">
 								<fmt:message key="link.delete" />
@@ -59,18 +54,12 @@
 							<c:set var="viewURL">
 								<html:rewrite page="/download/?uuid=${file.fileUuid}&preferDownload=false" />
 							</c:set>
-							<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
-								<fmt:message key="link.view" />
-							</a>
-							&nbsp;
+							<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')"> <fmt:message key="link.view" /> </a> &nbsp;
 
 							<c:set var="downloadURL">
 								<html:rewrite page="/download/?uuid=${file.fileUuid}&preferDownload=true" />
 							</c:set>
-							<a href="<c:out value='${downloadURL}' escapeXml='false'/>">
-								<fmt:message key="link.download" />
-							</a>
-							&nbsp;
+							<a href="<c:out value='${downloadURL}' escapeXml='false'/>"> <fmt:message key="link.download" /> </a> &nbsp;
 
 							<html:link href="javascript:deleteAttachment('removeUnsavedOnline','${file.fileUuid}')">
 								<fmt:message key="link.delete" />
@@ -84,10 +73,10 @@
 
 		<!-- ==========  Online Attachments Upload========== -->
 		<tr>
-			<td class="formlabel">
+			<td class="field-name" width="30%">
 				<fmt:message key="instructions.uploadOnlineInstr" />
 			</td>
-			<td class="formcontrol">
+			<td>
 				<html:file property="onlineFile">
 					<!--<fmt:message key="label.authoring.choosefile.button" />  -->
 					choose
@@ -97,23 +86,21 @@
 				</html:link>
 			</td>
 		</tr>
+	</tbody>
+</table>
 
-		<tr>
-			<td>
-				&nbsp;
-			</td>
-			<td>
-				&nbsp;
-			</td>
-		</tr>
 
+<hr />
+
+
+<table>
+	<tbody>
 		<!-- ==========  Offline Instructions ========== -->
 		<tr>
-			<td class="formlabel">
+			<td class="field-name-alternative-color" width="30%">
 				<fmt:message key="instructions.offlineInstructions" />
 			</td>
-			<td NOWRAP width="700">
-				<%-- TODO get rid of the nowrap --%>
+			<td>
 				<lams:SetEditor id="OfflineInstruction" text="${authoringForm.offlineInstruction}" />
 			</td>
 		</tr>
@@ -134,18 +121,12 @@
 							<c:set var="viewURL">
 								<html:rewrite page="/download/?uuid=${file.fileUuid}&preferDownload=false" />
 							</c:set>
-							<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
-								<fmt:message key="link.view" />
-							</a>
-							&nbsp;
+							<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')"> <fmt:message key="link.view" /> </a> &nbsp;
 
 							<c:set var="downloadURL">
 								<html:rewrite page="/download/?uuid=${file.fileUuid}&preferDownload=true" />
 							</c:set>
-							<a href="<c:out value='${downloadURL}' escapeXml='false'/>">
-								<fmt:message key="link.download" />
-							</a>
-							&nbsp;
+							<a href="<c:out value='${downloadURL}' escapeXml='false'/>"> <fmt:message key="link.download" /> </a> &nbsp;
 
 							<html:link href="javascript:deleteAttachment('deleteOffline','${file.fileUuid}')">
 								<fmt:message key="link.delete" />
@@ -161,18 +142,12 @@
 							<c:set var="viewURL">
 								<html:rewrite page="/download/?uuid=${file.fileUuid}&preferDownload=false" />
 							</c:set>
-							<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
-								<fmt:message key="link.view" />
-							</a>
-							&nbsp;
+							<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')"> <fmt:message key="link.view" /> </a> &nbsp;
 
 							<c:set var="downloadURL">
 								<html:rewrite page="/download/?uuid=${file.fileUuid}&preferDownload=true" />
 							</c:set>
-							<a href="<c:out value='${downloadURL}' escapeXml='false'/>">
-								<fmt:message key="link.download" />
-							</a>
-							&nbsp;
+							<a href="<c:out value='${downloadURL}' escapeXml='false'/>"> <fmt:message key="link.download" /> </a> &nbsp;
 
 							<html:link href="javascript:deleteAttachment('removeUnsavedOffline','${file.fileUuid}')">
 								<fmt:message key="link.delete" />
@@ -188,10 +163,10 @@
 		<!-- ==========  Offline Attachments Upload ========== -->
 
 		<tr>
-			<td class="formlabel">
+			<td class="field-name-alternative-color" width="30%">
 				<fmt:message key="instructions.uploadOfflineInstr" />
 			</td>
-			<td class="formcontrol">
+			<td>
 				<html:file property="offlineFile">
 					<!--<fmt:message key="label.authoring.choosefile.button" />  -->
 					choose
@@ -201,7 +176,6 @@
 				</html:link>
 			</td>
 		</tr>
+	</tbody>
+</table>
 
-
-	</table>
-</div>

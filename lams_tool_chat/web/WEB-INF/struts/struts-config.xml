@@ -40,6 +40,7 @@
     <action
       path="/learning"
       type="org.lamsfoundation.lams.tool.chat.web.actions.LearningAction"
+      parameter="dispatch"
       unknown="false"
       validate="true"
     >

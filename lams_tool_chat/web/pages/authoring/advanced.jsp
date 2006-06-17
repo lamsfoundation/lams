@@ -3,26 +3,32 @@
 <c:set var="authoringForm" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 
 <!-- ========== Advanced Tab ========== -->
-<div id="authoring_advanced">
-	<table class="forms">
+<table cellpadding="0">
+	<tbody>
 		<tr>
-			<td class="formcontrol">
-				<html:checkbox property="lockOnFinished" value="1">
-					<fmt:message key="advanced.lockOnFinished" />
-				</html:checkbox>
+			<td align="right">
+				<html:checkbox property="lockOnFinished" value="1" styleClass="noBorder"></html:checkbox>
+			</td>
+			<td>
+				<fmt:message key="advanced.lockOnFinished" />
 			</td>
 		</tr>
 		<tr>
-			<td class="formcontrol">
-				<html:checkbox property="filteringEnabled" value="1">
-					<fmt:message key="advanced.filteringEnabled" />
-				</html:checkbox>
+			<td align="right">
+				<html:checkbox property="filteringEnabled" value="1" styleClass="noBorder"></html:checkbox>
+			</td>
+			<td>
+				<fmt:message key="advanced.filteringEnabled" />
 			</td>
 		</tr>
 		<tr>
-			<td class="formcontrol">
+			<td>
+				&nbsp;
+			</td>
+			<td>
 				<html:textarea property="filterKeywords" cols="30" rows="3" />
 			</td>
 		</tr>
-	</table>
-</div>
+	</tbody>
+</table>
+

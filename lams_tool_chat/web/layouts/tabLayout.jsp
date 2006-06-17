@@ -6,11 +6,13 @@
 <html>
 	<tiles:insert attribute="header" />
 	<body onload="init();">
-		<tiles:useAttribute name="pageTitleKey" />
-		<bean:define name="pageTitleKey" id="pTitleKey" type="String" />
-		<h1>
-			<bean:message key="${pTitleKey}" />
-		</h1>
-		<tiles:insert attribute="body" />
+		<div id="page">
+			<tiles:useAttribute name="pageTitleKey" />
+			<bean:define name="pageTitleKey" id="pTitleKey" type="String" />
+			<h1>
+				<bean:message key="${pTitleKey}" />
+			</h1>
+			<tiles:insert attribute="body" />
+		</div>
 	</body>
 </html>

@@ -130,15 +130,20 @@
 	<servlet-class>org.lamsfoundation.lams.tool.chat.JabberHTTPBind.JHBServlet</servlet-class>
 </servlet>
 
+<servlet>
+	<servlet-name>exportPortfolio</servlet-name>
+	<servlet-class>org.lamsfoundation.lams.tool.chat.web.servlets.ExportServlet</servlet-class>
+</servlet>
+
   <servlet-mapping>
 	<servlet-name>action</servlet-name>
-    <url-pattern>*.do</url-pattern>
+	<url-pattern>*.do</url-pattern>
 </servlet-mapping>
 
 <!--  FCKEditor Connector Configuration -->
 <servlet-mapping>
-    <servlet-name>Connector</servlet-name>
-    <url-pattern>/fckeditor/editor/filemanager/browser/default/connectors/jsp/connector</url-pattern>
+	<servlet-name>Connector</servlet-name>
+	<url-pattern>/fckeditor/editor/filemanager/browser/default/connectors/jsp/connector</url-pattern>
 </servlet-mapping>
 
 <servlet-mapping>
@@ -150,6 +155,11 @@
 <servlet-mapping>
 	<servlet-name>Jabber HTTP Binding Servlet</servlet-name>
 	<url-pattern>/JHB/</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+	<servlet-name>exportPortfolio</servlet-name>
+	<url-pattern>/exportPortfolio</url-pattern>
 </servlet-mapping>
 
    <session-config>

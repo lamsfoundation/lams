@@ -51,7 +51,7 @@
             </div>
             <div style="text-align: center">
                 <a href="#" onClick="saveWYSWYGEdittedText(activeEditorIndex); doPreview(activeEditorIndex)" ><img src="${lams}images/tick.gif" border="0" alt="<bean:message key="label.save"/>"/></a>
-                &nbsp&nbsp&nbsp&nbsp
+                &nbsp;&nbsp;&nbsp;&nbsp;
                 <a href="#" onClick="doPreview(activeEditorIndex)"><img src="${lams}images/cross.gif" border="0" alt="<bean:message key="label.cancel"/>"/></a>
             </div>
         </div>
