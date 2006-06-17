@@ -58,9 +58,6 @@ public class McQueContent implements Serializable, Comparable {
     /** nullable persistent field */
     private Integer weight;
     
-    /** persistent field */
-    private boolean disabled;
-    
     private String feedbackCorrect;
     
     private String feedbackIncorrect;
@@ -96,36 +93,21 @@ public class McQueContent implements Serializable, Comparable {
         this.mcOptionsContents = mcOptionsContents;
     }
     
-    public McQueContent(String question, Integer displayOrder, Integer weight,  boolean disabled, McContent mcContent, Set mcUsrAttempts, Set mcOptionsContents) {
+    public McQueContent(String question, Integer displayOrder, Integer weight,  McContent mcContent, Set mcUsrAttempts, Set mcOptionsContents) {
         this.question = question;
         this.displayOrder = displayOrder;
         this.weight = weight;
-        this.disabled = disabled;
         this.mcContent=mcContent;
         this.mcUsrAttempts = mcUsrAttempts;
         this.mcOptionsContents = mcOptionsContents;
     }
     
-    public McQueContent(String question, Integer displayOrder, Integer weight,  boolean disabled, String feedbackIncorrect, String feedbackCorrect, McContent mcContent, Set mcUsrAttempts, Set mcOptionsContents) {
+    public McQueContent(String question, Integer displayOrder, Integer weight, String feedbackIncorrect, String feedbackCorrect, McContent mcContent, Set mcUsrAttempts, Set mcOptionsContents) {
         this.question = question;
         this.displayOrder = displayOrder;
         this.weight = weight;
-        this.disabled = disabled;
         this.feedbackIncorrect = feedbackIncorrect;
         this.feedbackCorrect = feedbackCorrect;
-        this.mcContent=mcContent;
-        this.mcUsrAttempts = mcUsrAttempts;
-        this.mcOptionsContents = mcOptionsContents;
-    }
-    
-    
-    public McQueContent(String question, Integer displayOrder, Integer weight, String feedbackCorrect, String feedbackIncorrect, boolean disabled, McContent mcContent, Set mcUsrAttempts, Set mcOptionsContents) {
-        this.question = question;
-        this.displayOrder = displayOrder;
-        this.weight = weight;
-        this.disabled = disabled;
-        this.feedbackCorrect=feedbackCorrect;
-        this.feedbackIncorrect=feedbackIncorrect;
         this.mcContent=mcContent;
         this.mcUsrAttempts = mcUsrAttempts;
         this.mcOptionsContents = mcOptionsContents;
@@ -188,7 +170,6 @@ public class McQueContent implements Serializable, Comparable {
     	McQueContent newQueContent = new McQueContent(queContent.getQuestion(),
 													  queContent.getDisplayOrder(),
 													  queContent.getWeight(),
-													  queContent.isDisabled(),
 													  queContent.getFeedbackIncorrect(),
 													  queContent.getFeedbackCorrect(),
 													  newMcContent,
@@ -297,18 +278,7 @@ public class McQueContent implements Serializable, Comparable {
 	public void setMcContentId(Long mcContentId) {
 		this.mcContentId = mcContentId;
 	}
-	/**
-	 * @return Returns the disabled.
-	 */
-	public boolean isDisabled() {
-		return disabled;
-	}
-	/**
-	 * @param disabled The disabled to set.
-	 */
-	public void setDisabled(boolean disabled) {
-		this.disabled = disabled;
-	}
+
 	/**
 	 * @return Returns the weight.
 	 */

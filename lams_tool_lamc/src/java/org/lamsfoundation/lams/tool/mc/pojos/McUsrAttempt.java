@@ -52,6 +52,8 @@ public class McUsrAttempt implements Serializable {
     
     private Integer mark;
     
+    private Integer totalWeight;
+    
     private boolean attemptCorrect;
     
     private boolean passed;
@@ -275,4 +277,18 @@ public class McUsrAttempt implements Serializable {
 	public void setAttemptCorrect(boolean attemptCorrect) {
 		this.attemptCorrect = attemptCorrect;
 	}
+	
+    /**
+     * @return Returns the totalWeight.
+     */
+    public Integer getTotalWeight() {
+        return totalWeight;
+    }
+    /**
+     * @param totalWeight The totalWeight to set.
+     */
+    public void setTotalWeight(Integer totalWeight) {
+        this.totalWeight = totalWeight;
+    }
+
 }

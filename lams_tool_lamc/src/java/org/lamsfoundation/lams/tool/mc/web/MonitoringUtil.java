@@ -105,7 +105,7 @@ public class MonitoringUtil implements McAppConstants{
     	logger.debug("listQuestions:..." + listQuestions);
     	
     	List listMonitoredAnswersContainerDTO= new LinkedList();
-    		
+    	
 		Iterator itListQuestions = listQuestions.iterator();
 	    while (itListQuestions.hasNext())
 	    {
@@ -127,8 +127,7 @@ public class MonitoringUtil implements McAppConstants{
 				logger.debug("listCandidateAnswersDTO:..." + listCandidateAnswersDTO);
 				mcMonitoredAnswersDTO.setCandidateAnswersCorrect(listCandidateAnswersDTO);
 				
-				
-				Map questionAttemptData= buildGroupsAttemptData(request, mcContent, mcQueContent, mcQueContent.getUid().toString());
+				Map questionAttemptData= buildGroupsAttemptData(request, mcContent, mcQueContent, mcQueContent.getUid().toString(), mcService);
 				logger.debug("questionAttemptData:..." + questionAttemptData);
 				mcMonitoredAnswersDTO.setQuestionAttempts(questionAttemptData);
 				listMonitoredAnswersContainerDTO.add(mcMonitoredAnswersDTO);
@@ -138,7 +137,8 @@ public class MonitoringUtil implements McAppConstants{
 		logger.debug("final listMonitoredAnswersContainerDTO:..." + listMonitoredAnswersContainerDTO);
 		return listMonitoredAnswersContainerDTO;
 	}
-
+	
+	
 	
 	public static List buildSessionQuestionData(HttpServletRequest request, McContent mcContent, Long sessionId, Long userID)
 	{
@@ -189,10 +189,9 @@ public class MonitoringUtil implements McAppConstants{
 	 * @param mcQueContent
 	 * @return Map
 	 */
-	public static Map buildGroupsAttemptData(HttpServletRequest request, McContent mcContent, McQueContent mcQueContent, String questionUid)
+	public static Map buildGroupsAttemptData(HttpServletRequest request, McContent mcContent, McQueContent mcQueContent, String questionUid, IMcService mcService)
 	{
 		logger.debug("will be building groups attempt data  for mcQueContent:..." + mcQueContent + " questionUid:" + questionUid);
-    	IMcService mcService =McUtils.getToolService(request);
     	Map mapMonitoredAttemptsContainerDTO= new TreeMap(new McStringComparator());
     	List listMonitoredAttemptsContainerDTO= new LinkedList();
     	
@@ -214,7 +213,9 @@ public class MonitoringUtil implements McAppConstants{
             	{
             		List listMcUsers=mcService.getMcUserBySessionOnly(mcSession);	
             		logger.debug("listMcUsers for session id:"  + mcSession.getMcSessionId() +  " = " + listMcUsers);
-            		Map sessionUsersAttempts=populateSessionUsersAttempts(request,mcSession.getMcSessionId(), listMcUsers, questionUid, null);
+            		Map sessionUsersAttempts=populateSessionUsersAttempts(request,mcSession.getMcSessionId(), listMcUsers, questionUid, null, mcService);
+            		Map sessionUsersMarks=populateSessionUsersMarks(request,mcSession.getMcSessionId(), listMcUsers, questionUid, null, mcService);
+            		
             		
             		listMonitoredAttemptsContainerDTO.add(sessionUsersAttempts);
             	}
@@ -244,7 +245,7 @@ public class MonitoringUtil implements McAppConstants{
     	{
     		List listMcUsers=mcService.getMcUserBySessionOnly(mcSession);	
     		logger.debug("listMcUsers for session id:"  + mcSession.getMcSessionId() +  " = " + listMcUsers);
-    		Map sessionUsersAttempts=populateSessionUsersAttempts(request,mcSession.getMcSessionId(), listMcUsers, questionUid, userID);
+    		Map sessionUsersAttempts=populateSessionUsersAttempts(request,mcSession.getMcSessionId(), listMcUsers, questionUid, userID, mcService);
     		
     		listMonitoredAttemptsContainerDTO.add(sessionUsersAttempts);
 	    	logger.debug("final listMonitoredAttemptsContainerDTO:..." + listMonitoredAttemptsContainerDTO);
@@ -279,18 +280,20 @@ public class MonitoringUtil implements McAppConstants{
 	 * @param listMcUsers
 	 * @return List
 	 */
-	public static Map populateSessionUsersAttempts(HttpServletRequest request,Long sessionId, List listMcUsers, String questionUid, Long userID)
+	public static Map populateSessionUsersAttempts(HttpServletRequest request,Long sessionId, List listMcUsers, String questionUid, Long userID, IMcService mcService)
 	{
 		logger.debug("will be populating users attempt history for session id: " + sessionId);
+		
+		McSession mcSession=mcService.retrieveMcSession(sessionId);
+	    logger.debug("retrieving mcSession: " + mcSession);
+
 		logger.debug("userID: " + userID);
-		
-		IMcService mcService =McUtils.getToolService(request);
-		
 		Map mapMonitoredUserContainerDTO= new TreeMap(new McStringComparator());
 		List listMonitoredUserContainerDTO= new LinkedList();
 		
 		if (userID == null)
 		{
+		    logger.debug("generating standard summary page");
 			Iterator itUsers=listMcUsers.iterator();
 			while (itUsers.hasNext())
 			{
@@ -300,29 +303,80 @@ public class MonitoringUtil implements McAppConstants{
 	    		if (mcQueUsr != null)
 	    		{
 	    			logger.debug("getting listUserAttempts for user id: " + mcQueUsr.getUid() + " and que content id: " + questionUid);
-	    			List listUserAttempts=mcService.getAttemptsForUserAndQuestionContent(mcQueUsr.getUid(), new Long(questionUid));
+	    			List listUserAttempts=mcService.getUserAttemptsForQuestionContentAndSessionUid(mcQueUsr.getUid(), new Long(questionUid), mcSession.getUid());
 	    			logger.debug("listUserAttempts: " + listUserAttempts);
 
 	    			Iterator itAttempts=listUserAttempts.iterator();
-	    			while (itAttempts.hasNext())
+	    			
+	    			if (!mcSession.getMcContent().isRetries())
 	    			{
-	    	    		McUsrAttempt mcUsrAttempt=(McUsrAttempt)itAttempts.next();
-	    	    		logger.debug("mcUsrAttempt: " + mcUsrAttempt);
-	    	    		
-	    	    		if (mcUsrAttempt != null)
-	    	    		{
-	    	    			McMonitoredUserDTO mcMonitoredUserDTO = new McMonitoredUserDTO();
-	    	    			mcMonitoredUserDTO.setAttemptTime(mcUsrAttempt.getAttemptTime().toString());
-	    	    			mcMonitoredUserDTO.setIsCorrect(new Boolean(mcUsrAttempt.isAttemptCorrect()).toString());
-	    	    			mcMonitoredUserDTO.setResponse(mcUsrAttempt.getMcOptionsContent().getMcQueOptionText().toString());
-	    	    			mcMonitoredUserDTO.setTimeZone(mcUsrAttempt.getTimeZone());
-	    	    			mcMonitoredUserDTO.setUid(mcUsrAttempt.getUid().toString());
-	    	    			mcMonitoredUserDTO.setUserName(mcQueUsr.getFullname());
-	    	    			mcMonitoredUserDTO.setQueUsrId(mcQueUsr.getUid().toString());
-	    	    			mcMonitoredUserDTO.setSessionId(sessionId.toString());
-	    	    			mcMonitoredUserDTO.setQuestionUid(questionUid);
-	    	    			listMonitoredUserContainerDTO.add(mcMonitoredUserDTO);
-	    	    		}
+	    			    logger.debug("retries is OFF.");
+	    			    boolean attemptCorrect=false;
+	    			    McUsrAttempt mcUsrAttemptUser=null;
+	    			    
+		    			while (itAttempts.hasNext())
+		    			{
+		    	    		McUsrAttempt mcUsrAttempt=(McUsrAttempt)itAttempts.next();
+		    	    		logger.debug("mcUsrAttempt: " + mcUsrAttempt);
+		    	    		mcUsrAttemptUser=mcUsrAttempt;
+
+		    	    		if (mcUsrAttempt != null)
+		    	    		{
+		    	    		    if (mcUsrAttempt.isAttemptCorrect())
+		    	    		    {
+		    	    		        attemptCorrect=true;
+		    	    		    }
+		    	    		}
+		    			}
+		    			logger.debug("final attemptCorrect: " + attemptCorrect);
+	    			    McMonitoredUserDTO mcMonitoredUserDTO = new McMonitoredUserDTO();
+	    			    int extraWeight=0;
+	    			    if (attemptCorrect)
+	    			    {
+	    			        mcMonitoredUserDTO.setMark(mcUsrAttemptUser.getMcQueContent().getWeight().toString());
+	    			        extraWeight=mcUsrAttemptUser.getMcQueContent().getWeight().intValue();
+	    			    }
+	    			    else
+	    			    {
+	    			        mcMonitoredUserDTO.setMark("0");
+	    			        extraWeight=0;
+	    			    }
+
+	    			    /*
+	    			    logger.debug("start updating user's weight records with extraWeight: " + extraWeight);
+	    			    Iterator itAttemptsLocal=listUserAttempts.iterator();
+		    			while (itAttemptsLocal.hasNext())
+		    			{
+		    	    		McUsrAttempt mcUsrAttempt=(McUsrAttempt)itAttemptsLocal.next();
+		    	    		logger.debug("mcUsrAttempt: " + mcUsrAttempt);
+
+		    			    int currentTotalWeight =mcUsrAttempt.getTotalWeight().intValue();
+		    			    mcUsrAttempt.setTotalWeight(new Integer(currentTotalWeight + extraWeight));
+		    			    logger.debug("updated total user weight to: " + mcUsrAttempt.getTotalWeight());
+		    			    mcService.updateMcUsrAttempt(mcUsrAttempt);
+		    			}
+		    			*/
+
+	    			    mcMonitoredUserDTO.setUid(mcUsrAttemptUser.getUid().toString());
+    	    			mcMonitoredUserDTO.setUserName(mcQueUsr.getFullname());
+    	    			mcMonitoredUserDTO.setSessionId(sessionId.toString());
+    	    			mcMonitoredUserDTO.setQuestionUid(questionUid);
+    	    			
+		    			logger.debug("final constructed mcMonitoredUserDTO: " + mcMonitoredUserDTO);
+    	    			listMonitoredUserContainerDTO.add(mcMonitoredUserDTO);
+	    			}
+	    			else
+	    			{
+	    			    logger.debug("retries is ON. User had to PASS. Print the final attempt's data");
+	    			    McUsrAttempt mcUsrAttempt=getAttemptWithHighestOrder(listUserAttempts);
+	    			    logger.debug("attempt with highest attempt order, mcUsrAttempt: " + mcUsrAttempt);
+	    			    
+	    			    McMonitoredUserDTO mcMonitoredUserDTO = new McMonitoredUserDTO();
+	    			    mcMonitoredUserDTO.setMark(mcUsrAttempt.getMcQueContent().getWeight().toString());
+	    			    mcMonitoredUserDTO.setUserName(mcQueUsr.getFullname());
+	    			    
+	    			    logger.debug("final constructed mcMonitoredUserDTO: " + mcMonitoredUserDTO);
+	    			    listMonitoredUserContainerDTO.add(mcMonitoredUserDTO);
 	    			}
 	    		}
 			}
@@ -345,7 +399,8 @@ public class MonitoringUtil implements McAppConstants{
 	    		{
 		    		logger.debug("the user in question is found: " + mcQueUsr.getQueUsrId());
 	    			logger.debug("getting listUserAttempts for user id: " + mcQueUsr.getUid() + " and que content id: " + questionUid);
-	    			List listUserAttempts=mcService.getAttemptsForUserAndQuestionContent(mcQueUsr.getUid(), new Long(questionUid));
+	    			//List listUserAttempts=mcService.getAttemptsForUserAndQuestionContent(mcQueUsr.getUid(), new Long(questionUid));
+	    			List listUserAttempts=mcService.getUserAttemptsForQuestionContentAndSessionUid(mcQueUsr.getUid(), new Long(questionUid), mcSession.getUid());
 	    			logger.debug("listUserAttempts: " + listUserAttempts);
 
 	    			Iterator itAttempts=listUserAttempts.iterator();
@@ -379,6 +434,187 @@ public class MonitoringUtil implements McAppConstants{
 		}
 
 	}
+
+	
+	public static Map populateSessionUsersMarks(HttpServletRequest request,Long sessionId, List listMcUsers, String questionUid, Long userID, IMcService mcService)
+	{
+		logger.debug("will be populating users marks for session id: " + sessionId);
+		
+		McSession mcSession=mcService.retrieveMcSession(sessionId);
+	    logger.debug("retrieving mcSession: " + mcSession);
+
+		logger.debug("userID: " + userID);
+		Map mapMonitoredUserContainerDTO= new TreeMap(new McStringComparator());
+		List listMonitoredUserContainerDTO= new LinkedList();
+		
+		if (userID == null)
+		{
+		    logger.debug("generating standard summary page");
+			Iterator itUsers=listMcUsers.iterator();
+			while (itUsers.hasNext())
+			{
+	    		McQueUsr mcQueUsr=(McQueUsr)itUsers.next();
+	    		logger.debug("mcQueUsr: " + mcQueUsr);
+	    		
+	    		if (mcQueUsr != null)
+	    		{
+	    			logger.debug("getting listUserAttempts for user id: " + mcQueUsr.getUid() + " and que content id: " + questionUid);
+	    			List listUserAttempts=mcService.getUserAttemptsForQuestionContentAndSessionUid(mcQueUsr.getUid(), new Long(questionUid), mcSession.getUid());
+	    			logger.debug("listUserAttempts: " + listUserAttempts);
+
+	    			Iterator itAttempts=listUserAttempts.iterator();
+	    			
+	    			if (!mcSession.getMcContent().isRetries())
+	    			{
+	    			    logger.debug("retries is OFF.");
+	    			    boolean attemptCorrect=false;
+	    			    McUsrAttempt mcUsrAttemptUser=null;
+	    			    
+		    			while (itAttempts.hasNext())
+		    			{
+		    	    		McUsrAttempt mcUsrAttempt=(McUsrAttempt)itAttempts.next();
+		    	    		logger.debug("mcUsrAttempt: " + mcUsrAttempt);
+		    	    		mcUsrAttemptUser=mcUsrAttempt;
+
+		    	    		if (mcUsrAttempt != null)
+		    	    		{
+		    	    		    if (mcUsrAttempt.isAttemptCorrect())
+		    	    		    {
+		    	    		        attemptCorrect=true;
+		    	    		    }
+		    	    		}
+		    			}
+		    			logger.debug("final attemptCorrect: " + attemptCorrect);
+	    			    McMonitoredUserDTO mcMonitoredUserDTO = new McMonitoredUserDTO();
+	    			    int extraWeight=0;
+	    			    if (attemptCorrect)
+	    			    {
+	    			        mcMonitoredUserDTO.setMark(mcUsrAttemptUser.getMcQueContent().getWeight().toString());
+	    			        extraWeight=mcUsrAttemptUser.getMcQueContent().getWeight().intValue();
+	    			    }
+	    			    else
+	    			    {
+	    			        mcMonitoredUserDTO.setMark("0");
+	    			        extraWeight=0;
+	    			    }
+
+	    			    /*
+	    			    logger.debug("start updating user's weight records with extraWeight: " + extraWeight);
+	    			    Iterator itAttemptsLocal=listUserAttempts.iterator();
+		    			while (itAttemptsLocal.hasNext())
+		    			{
+		    	    		McUsrAttempt mcUsrAttempt=(McUsrAttempt)itAttemptsLocal.next();
+		    	    		logger.debug("mcUsrAttempt: " + mcUsrAttempt);
+
+		    			    int currentTotalWeight =mcUsrAttempt.getTotalWeight().intValue();
+		    			    mcUsrAttempt.setTotalWeight(new Integer(currentTotalWeight + extraWeight));
+		    			    logger.debug("updated total user weight to: " + mcUsrAttempt.getTotalWeight());
+		    			    mcService.updateMcUsrAttempt(mcUsrAttempt);
+		    			}
+		    			*/
+
+	    			    mcMonitoredUserDTO.setUid(mcUsrAttemptUser.getUid().toString());
+    	    			mcMonitoredUserDTO.setUserName(mcQueUsr.getFullname());
+    	    			mcMonitoredUserDTO.setSessionId(sessionId.toString());
+    	    			mcMonitoredUserDTO.setQuestionUid(questionUid);
+    	    			
+		    			logger.debug("final constructed mcMonitoredUserDTO: " + mcMonitoredUserDTO);
+    	    			listMonitoredUserContainerDTO.add(mcMonitoredUserDTO);
+	    			}
+	    			else
+	    			{
+	    			    logger.debug("retries is ON. User had to PASS. Print the final attempt's data");
+	    			    McUsrAttempt mcUsrAttempt=getAttemptWithHighestOrder(listUserAttempts);
+	    			    logger.debug("attempt with highest attempt order, mcUsrAttempt: " + mcUsrAttempt);
+	    			    
+	    			    McMonitoredUserDTO mcMonitoredUserDTO = new McMonitoredUserDTO();
+	    			    mcMonitoredUserDTO.setMark(mcUsrAttempt.getMcQueContent().getWeight().toString());
+	    			    mcMonitoredUserDTO.setUserName(mcQueUsr.getFullname());
+	    			    
+	    			    logger.debug("final constructed mcMonitoredUserDTO: " + mcMonitoredUserDTO);
+	    			    listMonitoredUserContainerDTO.add(mcMonitoredUserDTO);
+	    			}
+	    		}
+			}
+			logger.debug("final listMonitoredUserContainerDTO: " + listMonitoredUserContainerDTO);
+			mapMonitoredUserContainerDTO=convertToMcMonitoredUserDTOMap(listMonitoredUserContainerDTO);
+			logger.debug("final mapMonitoredUserContainerDTO:..." + mapMonitoredUserContainerDTO);
+			return mapMonitoredUserContainerDTO;		    
+		}
+		else
+		{
+		    logger.debug("request is for learner export portfolio: " + userID);
+			Iterator itUsers=listMcUsers.iterator();
+			while (itUsers.hasNext())
+			{
+	    		McQueUsr mcQueUsr=(McQueUsr)itUsers.next();
+	    		logger.debug("mcQueUsr: " + mcQueUsr);
+	    		logger.debug("local mcQueUsr userID: " + mcQueUsr.getQueUsrId()); 
+	    		logger.debug("mcQueUsr.getQueUsrId().toString versus userID.toString(): " + mcQueUsr.getQueUsrId().toString() + " versus "  + userID.toString());
+	    		if ((mcQueUsr != null) && (mcQueUsr.getQueUsrId().toString().equals(userID.toString())))
+	    		{
+		    		logger.debug("the user in question is found: " + mcQueUsr.getQueUsrId());
+	    			logger.debug("getting listUserAttempts for user id: " + mcQueUsr.getUid() + " and que content id: " + questionUid);
+	    			//List listUserAttempts=mcService.getAttemptsForUserAndQuestionContent(mcQueUsr.getUid(), new Long(questionUid));
+	    			List listUserAttempts=mcService.getUserAttemptsForQuestionContentAndSessionUid(mcQueUsr.getUid(), new Long(questionUid), mcSession.getUid());
+	    			logger.debug("listUserAttempts: " + listUserAttempts);
+
+	    			Iterator itAttempts=listUserAttempts.iterator();
+	    			while (itAttempts.hasNext())
+	    			{
+	    	    		McUsrAttempt mcUsrAttempt=(McUsrAttempt)itAttempts.next();
+	    	    		logger.debug("mcUsrAttempt: " + mcUsrAttempt);
+	    	    		
+	    	    		if (mcUsrAttempt != null)
+	    	    		{
+	    	    			McMonitoredUserDTO mcMonitoredUserDTO = new McMonitoredUserDTO();
+	    	    			mcMonitoredUserDTO.setAttemptTime(mcUsrAttempt.getAttemptTime().toString());
+	    	    			mcMonitoredUserDTO.setIsCorrect(new Boolean(mcUsrAttempt.isAttemptCorrect()).toString());
+	    	    			mcMonitoredUserDTO.setResponse(mcUsrAttempt.getMcOptionsContent().getMcQueOptionText().toString());
+	    	    			mcMonitoredUserDTO.setTimeZone(mcUsrAttempt.getTimeZone());
+	    	    			mcMonitoredUserDTO.setUid(mcUsrAttempt.getUid().toString());
+	    	    			mcMonitoredUserDTO.setUserName(mcQueUsr.getFullname());
+	    	    			mcMonitoredUserDTO.setQueUsrId(mcQueUsr.getUid().toString());
+	    	    			mcMonitoredUserDTO.setSessionId(sessionId.toString());
+	    	    			mcMonitoredUserDTO.setQuestionUid(questionUid);
+	    	    			listMonitoredUserContainerDTO.add(mcMonitoredUserDTO);
+	    	    		}
+	    			}
+	    		}
+			}
+			logger.debug("final listMonitoredUserContainerDTO: " + listMonitoredUserContainerDTO);
+			mapMonitoredUserContainerDTO=convertToMcMonitoredUserDTOMap(listMonitoredUserContainerDTO);
+			logger.debug("final mapMonitoredUserContainerDTO:..." + mapMonitoredUserContainerDTO);
+			return mapMonitoredUserContainerDTO;
+		    
+		}
+
+	}
+
+	
+	public static McUsrAttempt getAttemptWithHighestOrder(List listUserAttempts)
+	{
+		logger.debug("starting getAttemptWithHighestOrder: " + listUserAttempts);
+		Iterator itAttempts=listUserAttempts.iterator();
+		int highestOrder=0;
+		McUsrAttempt mcHighestUsrAttempt=null;
+		
+		while (itAttempts.hasNext())
+		{
+    		McUsrAttempt mcUsrAttempt=(McUsrAttempt)itAttempts.next();
+    		logger.debug("mcUsrAttempt: " + mcUsrAttempt);
+    		int currentOrder=mcUsrAttempt.getAttemptOrder().intValue();
+    		
+    		if (currentOrder > highestOrder)
+    		{
+    		    mcHighestUsrAttempt=mcUsrAttempt;
+    		}
+		}
+		
+		logger.debug("returning mcHighestUsrAttempt: " + mcHighestUsrAttempt);
+		return mcHighestUsrAttempt;
+	}
+
 	
 	public static Map populateToolSessionsId(HttpServletRequest request, McContent mcContent, IMcService mcService)
 	{

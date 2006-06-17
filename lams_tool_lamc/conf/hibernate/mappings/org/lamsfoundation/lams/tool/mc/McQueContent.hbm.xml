@@ -47,13 +47,6 @@
     >
     </property>
 
-    <property
-        name="disabled"
-        type="boolean"
-        access="property"
-        column="disabled"
-   />
-    
    <property
         name="feedbackCorrect"
         type="java.lang.String"

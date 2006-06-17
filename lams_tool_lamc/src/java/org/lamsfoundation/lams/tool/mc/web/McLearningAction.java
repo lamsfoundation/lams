@@ -383,16 +383,19 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     	
     	Long toolContentId=(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
     	logger.debug("toolContentId: " + toolContentId);
+    	
+    	McContent mcContent=mcService.retrieveMc(toolContentId);
+    	logger.debug("mcContent: " + mcContent);
     			
     	logger.debug("will assess");
     	Integer passMark=(Integer) request.getSession().getAttribute(PASSMARK);
     	logger.debug("passMark: " + passMark);
     	
-    	Map mapLeanerAssessmentResults=LearningUtil.assess(request, mapGeneralCheckedOptionsContent, toolContentId);
-    	logger.debug("mapLeanerAssessmentResults: " + mapLeanerAssessmentResults);
+    	Map mapLearnerAssessmentResults=LearningUtil.assess(request, mapGeneralCheckedOptionsContent, toolContentId);
+    	logger.debug("mapLearnerAssessmentResults: " + mapLearnerAssessmentResults);
     	logger.debug("assesment complete");
     	
-    	int mark=LearningUtil.getMark(mapLeanerAssessmentResults);
+    	int mark=LearningUtil.getMark(mapLearnerAssessmentResults);
     	logger.debug("mark: " + mark);
     	request.getSession().setAttribute(LEARNER_MARK, new Integer(mark).toString());
     	    	
@@ -405,7 +408,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     	if ((passMark != null)) 
 		{
     	    mcLearningForm.setPassMarkApplicable(new Boolean(true).toString());
-    		int totalUserWeight=LearningUtil.calculateWeights(mapLeanerAssessmentResults, mapQuestionWeights);
+    		int totalUserWeight=LearningUtil.calculateWeights(mapLearnerAssessmentResults, mapQuestionWeights);
     		logger.debug("totalUserWeight: " + totalUserWeight);
     		
     		if (totalUserWeight < passMark.intValue())
@@ -421,12 +424,20 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     			mcLearningForm.setUserOverPassMark(new Boolean(true).toString());
     		}
 		}
+    	
 
     	if (passMark == null)
     	{
     	    mcLearningForm.setPassMarkApplicable(new Boolean(false).toString());
     	}
     	
+    	/*
+    	if (!mcContent.isRetries())
+    	{
+    		logger.debug("content is not isRetries. set passed to true");
+    		passed=true;
+    	}
+    	*/
     	
     	Long toolSessionId=(Long)request.getSession().getAttribute(TOOL_SESSION_ID);
     	logger.debug("toolSessionId: " + toolSessionId);
@@ -470,7 +481,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     		highestAttemptOrder="0";
         
         logger.debug("passed: " + passed);
-    	LearningUtil.createAttempt(request, mcQueUsr, mapGeneralCheckedOptionsContent, mark, passed, new Integer(highestAttemptOrder).intValue(), mapLeanerAssessmentResults);
+    	LearningUtil.createAttempt(request, mcQueUsr, mapGeneralCheckedOptionsContent, mark, passed, new Integer(highestAttemptOrder).intValue(), mapLearnerAssessmentResults);
     	logger.debug("created user attempt in the db");
     	
     	int intHighestAttemptOrder=new Integer(highestAttemptOrder).intValue()+ 1 ;

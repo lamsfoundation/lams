@@ -1755,7 +1755,6 @@ public class AuthoringUtil implements McAppConstants {
     	
     	IMcService mcService =McUtils.getToolService(request);
     	mcQueContent.setDisplayOrder(new Integer(displayOrder));
-    	mcQueContent.setDisabled(false);
     	mcQueContent.setWeight(new Integer(weight));
     	
     	if ((incorrectFeedback != null) && !(incorrectFeedback.equals("")))  
@@ -2212,7 +2211,6 @@ public class AuthoringUtil implements McAppConstants {
         	McQueContent mcQueContent=  new McQueContent(question,
           	 		new Integer(displayOrder),
           	 		new Integer(weight),
-    				false,
     				incorrectFeedback,
     				correctFeedback,
     				mcContent,

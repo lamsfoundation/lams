@@ -47,6 +47,8 @@ public class McMonitoredUserDTO implements Comparable
 	
 	private String isCorrect;
 	
+	private String mark;
+	
 	private String response;
 	
 	private String sessionId;
@@ -191,4 +193,16 @@ public class McMonitoredUserDTO implements Comparable
 	public void setQuestionUid(String questionUid) {
 		this.questionUid = questionUid;
 	}
+    /**
+     * @return Returns the mark.
+     */
+    public String getMark() {
+        return mark;
+    }
+    /**
+     * @param mark The mark to set.
+     */
+    public void setMark(String mark) {
+        this.mark = mark;
+    }
 }

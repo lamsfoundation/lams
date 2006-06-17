@@ -153,7 +153,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
-import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McApplicationException;
 import org.lamsfoundation.lams.tool.mc.McComparator;
@@ -283,99 +282,6 @@ public class McStarterAction extends Action implements McAppConstants {
 				return (mapping.findForward(ERROR_LIST));
 			}
 
-	    	
-	    	/* 	note: copyToolContent and removeToolContent code is redundant for production.
-	    	 *  test whether the authoring level tool contract:
-	    	 	public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException;
-	    	 * 	is working or not
-	    	 *  
-	    	 * test code starts from here... 
-	    	 */	
-	    	String copyToolContent= (String) request.getParameter(COPY_TOOL_CONTENT);
-	    	logger.debug("copyToolContent: " + copyToolContent);
-	    	
-	    	if ((copyToolContent != null) && (copyToolContent.equals("1")))
-			{
-		    	logger.debug("user request to copy the content");
-		    	Long fromContentId=new Long(strToolContentId);
-		    	logger.debug("fromContentId: " + fromContentId);
-		    	
-		    	Long toContentId=new Long(9876);
-		    	logger.debug("toContentId: " + toContentId);
-		    	
-		    	try
-				{
-		    		mcService.copyToolContent(fromContentId, toContentId);	
-				}
-		    	catch(ToolException e)
-				{
-		    		McUtils.cleanUpSessionAbsolute(request);
-		    		logger.debug("error copying the content: " + e);
-				}
-			}
-	    	
-	    	String removeToolContent= (String) request.getParameter(REMOVE_TOOL_CONTENT);
-	    	logger.debug("removeToolContent: " + removeToolContent);
-	    	
-	    	if ((removeToolContent != null) && (removeToolContent.equals("1")))
-			{
-		    	logger.debug("user request to remove the content");
-		    	Long fromContentId=new Long(strToolContentId);
-		    	logger.debug("fromContentId: " + fromContentId);
-
-		    	try
-				{
-		    		mcService.removeToolContent(fromContentId, true);
-				}
-		    	catch(ToolException e)
-				{
-		    		McUtils.cleanUpSessionAbsolute(request);
-		    		logger.debug("error removing the content: " + e);
-				}
-			}
-	    	
-	    	String setDefineLater= (String) request.getParameter("setDefineLater");
-	    	logger.debug("setDefineLater: " + setDefineLater);
-	    	
-	    	if ((setDefineLater != null) && (setDefineLater.equals("1")))
-			{
-		    	logger.debug("user request to set content as define later");
-		    	Long fromContentId=new Long(strToolContentId);
-		    	logger.debug("fromContentId: " + fromContentId);
-
-		    	try
-				{
-		    		mcService.setAsDefineLater(fromContentId);
-				}
-		    	catch(ToolException e)
-				{
-		    		McUtils.cleanUpSessionAbsolute(request);
-		    		logger.debug("error setting the define later on the content: " + e);
-				}
-			}
-
-	    	
-	    	String strSetRunoffline= (String) request.getParameter("strSetRunoffline");
-	    	logger.debug("strSetRunoffline: " + strSetRunoffline);
-	    	
-	    	if ((setDefineLater != null) && (setDefineLater.equals("1")))
-			{
-		    	logger.debug("user request to set content as run offline");
-		    	Long fromContentId=new Long(strToolContentId);
-		    	logger.debug("fromContentId: " + fromContentId);
-
-		    	try
-				{
-		    		mcService.setAsRunOffline(fromContentId);
-				}
-		    	catch(ToolException e)
-				{
-		    		McUtils.cleanUpSessionAbsolute(request);
-		    		logger.debug("error setting the run offline on the content: " + e);
-				}
-			}
-	    	/* ...testing code ends here*/
-	    	
 	    	/*
 			 * find out if the passed tool content id exists in the db 
 			 * present user either a first timer screen with default content data or fetch the existing content.
@@ -389,6 +295,11 @@ public class McStarterAction extends Action implements McAppConstants {
 			{
 				logger.debug("retrieving default content");
 				retrieveDefaultContent(request, mcAuthoringForm);
+				McAction mcAction= new McAction();
+				boolean performEditOptions=mcAction.performEditOptions(mapping, form, request, response, true);
+				logger.debug("performEditOptions: " + performEditOptions);
+				boolean performDoneOptions=mcAction.performDoneOptions(mapping, form, request, response, true);
+				logger.debug("performDoneOptions: " + performDoneOptions);
 			}
 			else
 			{
@@ -793,13 +704,8 @@ public class McStarterAction extends Action implements McAppConstants {
 		logger.debug("starter initialized the Default Options Map: " + request.getSession().getAttribute(MAP_DEFAULTOPTIONS_CONTENT));
 		
 		Map mapWeights= new TreeMap(new McComparator());
-		/* reset all the weights to 0*/
-		long mapCounter=0;
-		for (long i=1; i <= MAX_QUESTION_COUNT ; i++)
-		{
-			mapCounter++;
-			mapWeights.put(new Long(mapCounter).toString(), new Integer(0));
-		}	
+		long mapCounter=1;
+		mapWeights.put(new Long(mapCounter).toString(), new Integer(100).toString());
 		request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);
 		logger.debug("MAP_WEIGHTS:" + request.getSession().getAttribute(MAP_WEIGHTS));	
 	}
@@ -856,6 +762,7 @@ public class McStarterAction extends Action implements McAppConstants {
 		request.getSession().setAttribute(MAP_CHECKBOX_STATES, mapCheckBoxStates);
 
 		Map mapSelectedOptions= new TreeMap(new McComparator());
+		mapSelectedOptions.put("1",DEFAULT_SELECTED_OPTION);
 		request.getSession().setAttribute(MAP_SELECTED_OPTIONS, mapSelectedOptions);
 		
 		Map mapIncorrectFeedback= new TreeMap(new McComparator());

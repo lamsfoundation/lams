@@ -120,6 +120,7 @@ public interface McAppConstants {
     public static final String MAP_WEIGHTS								="mapWeights";
     public static final String MAP_CHECKBOX_STATES						="mapCheckBoxStates";
     public static final String MAP_SELECTED_OPTIONS						="mapSelectedOptions";
+    public static final String DEFAULT_SELECTED_OPTION					="Candidate Answer 2";
     public static final String MAP_FEEDBACK_INCORRECT					="mapFeedbackIncorrect";
     public static final String MAP_INCORRECT_FEEDBACK					="mapIncorrectFeedback";
     
@@ -134,6 +135,9 @@ public interface McAppConstants {
     public static final String SELECTED_QUESTION						="selectedQuestion";
     public static final String SELECTED_QUESTION_INDEX					="selectedQuestionIndex";
     public static final String DEFAULT_QUESTION_UID						="defaultQuestionUid";
+    
+    public static final String DEFAULT_FEEDBACK_INCORRECT				="Your answer is incorrect";
+    public static final String DEFAULT_FEEDBACK_CORRECT					="Correct";    
     
     public static final String TITLE									="title";
     public static final String INSTRUCTIONS								="instructions";
@@ -246,6 +250,7 @@ public interface McAppConstants {
     public static final String CURRENT_MONITORED_TOOL_SESSION 			="currentMonitoredToolSession";
     public static final String SELECTION_CASE							="selectionCase";
     public static final String LIST_MONITORED_ANSWERS_CONTAINER_DTO		="listMonitoredAnswersContainerDto";
+    public static final String LIST_MONITORED_MARKS_CONTAINER_DTO		="listMonitoredMarksContainerDto";
     public static final String TIMEZONE									="timeZone";
     
     public static final String QUESTION_LISTING_MODE					="questionListingMode";

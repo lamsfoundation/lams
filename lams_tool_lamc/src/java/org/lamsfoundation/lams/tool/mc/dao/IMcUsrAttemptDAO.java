@@ -35,7 +35,8 @@ import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
  */
 public interface IMcUsrAttemptDAO
 {
-	/**
+    
+    /**
 	 *  * <p>Return the persistent instance of a McUsrAttempt  
 	 * with the given identifier <code>uid</code>, returns null if not found. </p>
 	 * 
@@ -128,6 +129,8 @@ public interface IMcUsrAttemptDAO
 	public List getAttemptsForUser(final Long queUsrId);
 	
 	public List getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long mcQueContentId);
+	
+	public List getUserAttemptsForQuestionContentAndSessionUid(final Long queUsrUid,  final Long mcQueContentId, final Long mcSessionUid);
 	
 	public List getMarks();
 }

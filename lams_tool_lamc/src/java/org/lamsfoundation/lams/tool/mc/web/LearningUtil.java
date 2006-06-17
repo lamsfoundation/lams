@@ -682,6 +682,7 @@ public class LearningUtil implements McAppConstants {
 	            
 	            McQueContent mcQueContent=mcService.getQuestionContentByDisplayOrder(questionDisplayOrder, toolContentUID);
 	            logger.debug("mcQueContent: " + mcQueContent);
+	            
 	            if (mcQueContent != null)
 	            {
 	                createIndividualOptions(request, mapCheckedOptions, mcQueContent, mcQueUsr, attempTime, timeZone, mark, passed, new Integer(highestAttemptOrder), isAttemptCorrect);    
@@ -700,6 +701,7 @@ public class LearningUtil implements McAppConstants {
     	logger.debug("mcQueContent: " + mcQueContent);
     	logger.debug("mapCheckedOptions: " + mapCheckedOptions);
     	
+    	
     	if (mcQueContent != null)
     	{
     	    if (mapCheckedOptions != null)
@@ -713,8 +715,8 @@ public class LearningUtil implements McAppConstants {
                 	if (mcOptsContent != null)
                 	{
                 	    McUsrAttempt mcUsrAttempt=new McUsrAttempt(attempTime, timeZone, mcQueContent, mcQueUsr, mcOptsContent, IntegerMark, passed, highestAttemptOrder, new Boolean(isAttemptCorrect).booleanValue());
-                    	mcService.createMcUsrAttempt(mcUsrAttempt);
-                    	logger.debug("created mcUsrAttempt in the db :" + mcUsrAttempt);    
+	    			    mcService.createMcUsrAttempt(mcUsrAttempt);
+                    	logger.debug("created mcUsrAttempt in the db :" + mcUsrAttempt);
                 	}
                 }    
         	}    

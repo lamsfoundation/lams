@@ -89,6 +89,7 @@ CREATE TABLE tl_lamc11_usr_attempt (
      , mark VARCHAR(255)
      , passed TINYINT(1) NOT NULL DEFAULT 0
      , attemptOrder INTEGER NOT NULL DEFAULT 1
+     , totalWeight INTEGER DEFAULT 0
      , PRIMARY KEY (uid)
      , INDEX (mc_que_content_id)
      , CONSTRAINT FK_tl_lamc11_usr_attempt_2 FOREIGN KEY (mc_que_content_id)
@@ -113,9 +114,11 @@ CREATE TABLE tl_lamc11_uploadedfile (
                   REFERENCES tl_lamc11_content (uid)
 )TYPE=InnoDB;
 
-INSERT INTO tl_lamc11_content(uid, content_id , title , instructions , creation_date , questions_sequenced , username_visible , created_by , monitoring_report_title , report_title , run_offline , define_later, synch_in_monitor, offline_instructions, online_instructions, end_learning_message, content_in_use, retries, show_feedback, show_report) VALUES (1, ${default_content_id} ,'Mc Title','Mc Instructions', NOW(), 0, 0,1,'Monitoring Report','Report', 0, 0, 0,'offline instructions','online instructions','Finished Activity...', 0, 0, 0, 0);
+INSERT INTO tl_lamc11_content(uid, content_id , title , instructions , creation_date , questions_sequenced , username_visible , created_by , monitoring_report_title , report_title , run_offline , define_later, synch_in_monitor, offline_instructions, online_instructions, end_learning_message, content_in_use, retries, show_feedback, show_report, pass_mark) VALUES (1, ${default_content_id} ,'MCQ Title','MCQ Instructions', NOW(), 0, 0,1,'Monitoring Report','Report', 0, 0, 0,'offline instructions','online instructions','Finished Activity...', 0, 0, 0, 0, 50);
 
-INSERT INTO tl_lamc11_que_content  (uid,question, weight, disabled, display_order,  mc_content_id) VALUES (1, 'a sample question', 0, 1, 1,	1);
+INSERT INTO tl_lamc11_que_content  (uid,question, weight, disabled, display_order,  mc_content_id, feedbackIncorrect, feedbackCorrect) VALUES (1, 'A Sample question?', 100, 0, 1,1, 'Your answer is incorrect', 'Correct');
 	
-INSERT INTO tl_lamc11_options_content (uid,  correct_option,  mc_que_content_id,  mc_que_option_text) VALUES (1, 0, 1,'sample answer 1');
+INSERT INTO tl_lamc11_options_content (uid,  correct_option,  mc_que_content_id,  mc_que_option_text) VALUES (1, 0, 1,'Candidate Answer 1');
+INSERT INTO tl_lamc11_options_content (uid,  correct_option,  mc_que_content_id,  mc_que_option_text) VALUES (2, 1, 1,'Candidate Answer 2');
+
 

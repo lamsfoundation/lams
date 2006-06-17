@@ -159,6 +159,8 @@ public interface IMcService
     
 	public boolean studentActivityOccurredGlobal(McContent mcContent) throws McApplicationException;
 	
+	public List getUserAttemptsForQuestionContentAndSessionUid(final Long queUsrUid,  final Long mcQueContentId, final Long mcSessionUid) throws McApplicationException;
+	
 	public int countIncompleteSession(McContent mc) throws McApplicationException;
 	
 	public boolean studentActivityOccurred(McContent mc) throws McApplicationException;

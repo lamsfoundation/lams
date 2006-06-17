@@ -246,6 +246,10 @@ public abstract class McUtils implements McAppConstants {
 		{
 			request.getSession().setAttribute(RICHTEXT_INCORRECT_FEEDBACK,richTextIncorrectFeedback);
 		}
+		else
+		{
+		    request.getSession().setAttribute(RICHTEXT_INCORRECT_FEEDBACK,DEFAULT_FEEDBACK_INCORRECT);
+		}
 		
 
 		String richTextCorrectFeedback=request.getParameter(RICHTEXT_CORRECT_FEEDBACK);
@@ -254,6 +258,10 @@ public abstract class McUtils implements McAppConstants {
 		if ((richTextCorrectFeedback != null) && (richTextCorrectFeedback.length() > 0))
 		{
 			request.getSession().setAttribute(RICHTEXT_CORRECT_FEEDBACK,richTextCorrectFeedback);
+		}
+		else
+		{
+		    request.getSession().setAttribute(RICHTEXT_CORRECT_FEEDBACK,DEFAULT_FEEDBACK_CORRECT);
 		}
 
 		

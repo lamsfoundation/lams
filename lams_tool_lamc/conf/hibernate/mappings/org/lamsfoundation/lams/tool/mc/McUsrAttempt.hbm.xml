@@ -41,6 +41,13 @@
         access="property"        
         column="mark"
     />
+    
+    <property
+        name="totalWeight"
+        type="java.lang.Integer"
+        access="property"        
+        column="totalWeight"
+    />
 
     <property
         name="passed"

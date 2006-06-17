@@ -22,6 +22,8 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.mc.dao.hibernate;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -49,6 +51,8 @@ public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemp
 	 	private static final String LOAD_ATTEMPT_FOR_USER_AND_QUESTION_CONTENT	 = "from mcUsrAttempt in class McUsrAttempt where mcUsrAttempt.queUsrId=:queUsrId and mcUsrAttempt.mcQueContentId=:mcQueContentId";
 	 	
 	 	private static final String LOAD_ATTEMPT_BY_ATTEMPT_ORDER = "from mcUsrAttempt in class McUsrAttempt where mcUsrAttempt.queUsrId=:queUsrId and mcUsrAttempt.mcQueContentId=:mcQueContentId and attemptOrder=:attemptOrder";
+	 	
+	 	private static final String LOAD_ATTEMPT_FOR_QUESTION_CONTENT	 = "from mcUsrAttempt in class McUsrAttempt where mcUsrAttempt.mcQueContentId=:mcQueContentId";
 	 	
 	 	private static final String LOAD_MARK = "from mcUsrAttempt in class McUsrAttempt";
 	 	
@@ -115,6 +119,43 @@ public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemp
 			return list;
 	    }
 		
+		public List getUserAttemptsForQuestionContentAndSessionUid(final Long queUsrUid,  final Long mcQueContentId, final Long mcSessionUid)
+	    {
+		    logger.debug("doing getUserAttemptsForQuestionContentAndSessionUid:");
+		    logger.debug("queUsrUid:"  + queUsrUid);
+		    logger.debug("mcQueContentId:"  + mcQueContentId);
+		    logger.debug("mcSessionUid:"  + mcSessionUid);
+		    
+	        HibernateTemplate templ = this.getHibernateTemplate();
+	        List list = getSession().createQuery(LOAD_ATTEMPT_FOR_QUESTION_CONTENT)
+			.setLong("mcQueContentId", mcQueContentId.longValue())
+			.list();
+	        
+	        List userEntries= new ArrayList();
+			if(list != null && list.size() > 0){
+				Iterator listIterator=list.iterator();
+		    	while (listIterator.hasNext())
+		    	{
+		    	    McUsrAttempt attempt=(McUsrAttempt)listIterator.next();
+		    	    logger.debug("attempt:"  + attempt);
+		    	    
+		    	    if (attempt.getMcQueUsr().getUid().toString().equals(queUsrUid.toString()))
+		    	    {
+		    	        logger.debug("queUsrUid equal:"  + queUsrUid);
+			    	    if (attempt.getMcQueUsr().getMcSession().getUid().toString().equals(mcSessionUid.toString()))
+			    	    {
+			    	        logger.debug("user belong to this session:"  + mcSessionUid);
+			    	        userEntries.add(attempt);    
+			    	    }
+		    	        
+		    	    }
+		    	}
+			}
+			logger.debug("userEntries:"  + userEntries);
+			return userEntries;
+	    }
+
+		
 		
 		public List getAttemptForQueContent(final Long queUsrId, final Long mcQueContentId)
 	    {
@@ -140,6 +181,7 @@ public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemp
 		
 		public void updateMcUsrAttempt(McUsrAttempt mcUsrAttempt)
 	    {
+		    this.getSession().setFlushMode(FlushMode.AUTO);
 	    	this.getHibernateTemplate().update(mcUsrAttempt);
 	    }
 		

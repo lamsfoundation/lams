@@ -861,6 +861,19 @@ public class McServicePOJO implements
         }
 	}
     
+    public List getUserAttemptsForQuestionContentAndSessionUid(final Long queUsrUid,  final Long mcQueContentId, final Long mcSessionUid)
+    {
+    	try
+        {
+    		return mcUsrAttemptDAO.getUserAttemptsForQuestionContentAndSessionUid(queUsrUid, mcQueContentId, mcSessionUid);
+        }
+        catch(DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is getting marks based on userid, sessionid and que content id "
+                                                 + e.getMessage(),e);
+        }
+    }
+    
     public void deleteMcQueUsr(McQueUsr mcQueUsr) throws McApplicationException
     {
     	try

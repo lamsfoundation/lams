@@ -454,6 +454,24 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		return (mapping.findForward(destination));
     }
 
+
+    public ActionForward editOptions(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+    {
+		/* determine whether the request is from Monitoring url Edit Activity*/
+		String sourceMcStarter = (String) request.getAttribute(SOURCE_MC_STARTER);
+		logger.debug("sourceMcStarter: " + sourceMcStarter);
+		String destination=McUtils.getDestination(sourceMcStarter);
+		logger.debug("destination: " + destination);
+
+        boolean performEditOptions=performEditOptions(mapping, form, request, response, false);
+        logger.debug("performEditOptions: " + performEditOptions);
+        
+        return (mapping.findForward(destination));
+    }
     
     /**
      * prepares the UI so that candidate answers for a question can be edited
@@ -467,14 +485,15 @@ public class McAction extends LamsDispatchAction implements McAppConstants
      * @param mapping
      * @return ActionForward
      */
-    public ActionForward editOptions(ActionMapping mapping,
+    public boolean performEditOptions(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
-            HttpServletResponse response) throws IOException,
+            HttpServletResponse response, boolean defaultStarter) throws IOException,
                                          ServletException
     {
     	McUtils.cleanUpUserExceptions(request);
-    	logger.debug("dispatching editOptions...");
+    	logger.debug("starting performEditOptions...");
+    	logger.debug("defaultStarter:" + defaultStarter);
     	McUtils.debugMaps(request);
     	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
     	
@@ -495,25 +514,37 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     	mcAuthoringForm.setEditOptionsMode(new Integer(1).toString());
     	request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
     	logger.debug("setting  EDIT_OPTIONS_MODE to 1");
-    		
-    	Map mapQuestionsContent=AuthoringUtil.repopulateMap(request, "questionContent");
+
+    	Map mapQuestionsContent= new TreeMap(new McComparator());
+    	Map mapWeights= new TreeMap(new McComparator());
+    	if (!defaultStarter)
+    	{
+        	mapQuestionsContent=AuthoringUtil.repopulateMap(request, "questionContent");
+         	mapWeights= AuthoringUtil.repopulateMap(request, "questionWeight");
+    	}
+    	else
+    	{
+    	    mapQuestionsContent= (Map)request.getSession().getAttribute(MAP_QUESTIONS_CONTENT);
+    	    mapWeights=(Map)request.getSession().getAttribute(MAP_WEIGHTS);
+    	}
+    	logger.debug("mapWeights: " + mapWeights);
      	logger.debug("mapQuestionsContent after shrinking: " + mapQuestionsContent);
      	logger.debug("mapQuestionsContent size after shrinking: " + mapQuestionsContent.size());
      	
-     	
-     	Map mapWeights= AuthoringUtil.repopulateMap(request, "questionWeight");
+
      	logger.debug("MAP_WEIGHTS:" + request.getSession().getAttribute(MAP_WEIGHTS));
      	
     	String questionIndex =mcAuthoringForm.getQuestionIndex();
     	logger.debug("questionIndex:" + questionIndex);
+    	
+    	if (defaultStarter)
+    	{
+    	    logger.debug("since the request is from default content set question index to 1:");
+    	    questionIndex="1";   
+    	}
+    	    
     	request.getSession().setAttribute(SELECTED_QUESTION_INDEX, questionIndex);
     	logger.debug("set SELECTED_QUESTION_INDEX to:" + questionIndex);
-    	
-    	/*presenting incorrect feedback data*/
-    	//Map mapIncorrectFeedback=(Map)request.getSession().getAttribute(MAP_INCORRECT_FEEDBACK);
-    	//logger.debug("mapIncorrectFeedback:" + mapIncorrectFeedback);
-    	
-    	/*get existing feedback maps*/
     	
     	Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
     	logger.debug("toolContentId:" + toolContentId);
@@ -524,27 +555,11 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		Map mapIncorrectFeedback=new TreeMap(new McComparator());
 		Map mapCorrectFeedback=new TreeMap(new McComparator());
 		 
-		//if (mcContent == null)
-		//{
-	    	logger.debug("getting feedback maps from cache:");
-	    	mapIncorrectFeedback=(Map)request.getSession().getAttribute(MAP_INCORRECT_FEEDBACK);
-	    	logger.debug("mapIncorrectFeedback:" + mapIncorrectFeedback);
-	    	mapCorrectFeedback=(Map)request.getSession().getAttribute(MAP_CORRECT_FEEDBACK);
-	    	logger.debug("mapCorrectFeedback:" + mapCorrectFeedback);
-		//}
-		/*
-		else
-		{
-		    logger.debug("getting feedback maps from db:");
-	    	mapIncorrectFeedback = AuthoringUtil.rebuildIncorrectFeedbackMapfromDB(request, toolContentId);
-	    	logger.debug("existing mapIncorrectFeedback:" + mapIncorrectFeedback);
-	    	request.getSession().setAttribute(MAP_INCORRECT_FEEDBACK, mapIncorrectFeedback);
-
-	    	mapCorrectFeedback = AuthoringUtil.rebuildCorrectFeedbackMapfromDB(request, toolContentId);
-	    	logger.debug("existing mapCorrectFeedback:" + mapCorrectFeedback);
-	    	request.getSession().setAttribute(MAP_CORRECT_FEEDBACK, mapCorrectFeedback);
-		}
-		*/
+    	logger.debug("getting feedback maps from cache:");
+    	mapIncorrectFeedback=(Map)request.getSession().getAttribute(MAP_INCORRECT_FEEDBACK);
+    	logger.debug("mapIncorrectFeedback:" + mapIncorrectFeedback);
+    	mapCorrectFeedback=(Map)request.getSession().getAttribute(MAP_CORRECT_FEEDBACK);
+    	logger.debug("mapCorrectFeedback:" + mapCorrectFeedback);
 
 
 	    if (mapIncorrectFeedback != null)
@@ -575,44 +590,48 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     	String editableQuestionEntry=(String)mapQuestionsContent.get(questionIndex);
     	logger.debug("editableQuestionEntry:" + editableQuestionEntry);
     	request.getSession().setAttribute(SELECTED_QUESTION, editableQuestionEntry);
-    	
-    	if ((editableQuestionEntry == null) || (editableQuestionEntry.equals("")))
-    	{
-    		ActionMessages errors= new ActionMessages();
-    		errors.add(Globals.ERROR_KEY,new ActionMessage("error.emptyQuestion"));
-    		request.getSession().setAttribute(USER_EXCEPTION_QUESTION_EMPTY, new Boolean(true).toString());
-    		logger.debug("add error.emptyQuestion to ActionMessages");
-    		saveErrors(request,errors);
-    		mcAuthoringForm.resetUserAction();
-    		logger.debug("return to destination to fix error.");
-    		
-    		mcAuthoringForm.setEditOptionsMode(new Integer(0).toString());
-    		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
-    		logger.debug("setting  EDIT_OPTIONS_MODE to 0");
-    		
-        	McUtils.debugMaps(request);
-    		return (mapping.findForward(destination));
-    	}
-    	
+
     	String editableQuestionWeight=(String)mapWeights.get(questionIndex);
     	logger.debug("editableQuestionWeight:" + editableQuestionWeight);
-    	
-    	if ((editableQuestionWeight == null) || (editableQuestionWeight.equals("")))
+
+    	if (!defaultStarter)
     	{
-    		ActionMessages errors= new ActionMessages();
-    		errors.add(Globals.ERROR_KEY,new ActionMessage("error.emptyWeight"));
-    		request.getSession().setAttribute(USER_EXCEPTION_WEIGHT_EMPTY, new Boolean(true).toString());
-    		logger.debug("add error.emptyWeight to ActionMessages");
-    		saveErrors(request,errors);
-    		mcAuthoringForm.resetUserAction();
-    		logger.debug("return to destination to fix error.");
-    		
-    		mcAuthoringForm.setEditOptionsMode(new Integer(0).toString());
-    		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
-    		logger.debug("setting  EDIT_OPTIONS_MODE to 0");
-    		
-        	McUtils.debugMaps(request);
-    		return (mapping.findForward(destination));
+    	    logger.debug("since the request is from within the class do the check:");
+        	if ((editableQuestionEntry == null) || (editableQuestionEntry.equals("")))
+        	{
+        		ActionMessages errors= new ActionMessages();
+        		errors.add(Globals.ERROR_KEY,new ActionMessage("error.emptyQuestion"));
+        		request.getSession().setAttribute(USER_EXCEPTION_QUESTION_EMPTY, new Boolean(true).toString());
+        		logger.debug("add error.emptyQuestion to ActionMessages");
+        		saveErrors(request,errors);
+        		mcAuthoringForm.resetUserAction();
+        		logger.debug("return to destination to fix error.");
+        		
+        		mcAuthoringForm.setEditOptionsMode(new Integer(0).toString());
+        		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
+        		logger.debug("setting  EDIT_OPTIONS_MODE to 0");
+        		
+            	McUtils.debugMaps(request);
+            	return false;
+        	}
+    	
+	    	if ((editableQuestionWeight == null) || (editableQuestionWeight.equals("")))
+	    	{
+	    		ActionMessages errors= new ActionMessages();
+	    		errors.add(Globals.ERROR_KEY,new ActionMessage("error.emptyWeight"));
+	    		request.getSession().setAttribute(USER_EXCEPTION_WEIGHT_EMPTY, new Boolean(true).toString());
+	    		logger.debug("add error.emptyWeight to ActionMessages");
+	    		saveErrors(request,errors);
+	    		mcAuthoringForm.resetUserAction();
+	    		logger.debug("return to destination to fix error.");
+	    		
+	    		mcAuthoringForm.setEditOptionsMode(new Integer(0).toString());
+	    		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
+	    		logger.debug("setting  EDIT_OPTIONS_MODE to 0");
+	    		
+	        	McUtils.debugMaps(request);
+	        	return false;
+	    	}
     	}
     	
     	/*persist valid question and weights maps into session*/
@@ -721,7 +740,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
         			logger.debug("MAP_OPTIONS_CONTENT reconstructed from db" );
         			
         			
-        			/* we have to assume that some of the optons are selected as this is forced in the ui.
+        			/* we have to assume that some of the options are selected as this is forced in the ui.
         			 * retrieve and present the selected options from the db
         			 * */
         			List listSelectedOptions=mcService.getPersistedSelectedOptions(mcQueContent.getUid());
@@ -811,6 +830,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     	    	request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
     			logger.debug("MAP_OPTIONS_CONTENT reconstructed from default option content" );
     			
+    			mapSelectedOptions.put("1",DEFAULT_SELECTED_OPTION);
     			request.getSession().setAttribute(MAP_SELECTED_OPTIONS, mapSelectedOptions);
     	    	logger.debug("MAP_SELECTED_OPTIONS set as empty list :" + mapSelectedOptions);
         	}
@@ -857,7 +877,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     	
 		McUtils.debugMaps(request);
 		logger.debug("final EDIT_OPTIONS_MODE: " + request.getSession().getAttribute(EDIT_OPTIONS_MODE));
-    	return (mapping.findForward(destination));
+    	return true;
     }
 
     
@@ -1391,6 +1411,24 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 	    return (mapping.findForward(destination));
     }
     
+    public ActionForward doneOptions(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+    {
+        logger.debug("dispatching doneOptions...");
+		/* determine whether the request is from Monitoring url Edit Activity*/
+		String sourceMcStarter = (String) request.getAttribute(SOURCE_MC_STARTER);
+		logger.debug("sourceMcStarter: " + sourceMcStarter);
+		String destination=McUtils.getDestination(sourceMcStarter);
+		logger.debug("destination: " + destination);
+        
+        boolean performDoneOptions=performDoneOptions(mapping, form, request, response, false);
+        logger.debug("performDoneOptions: " + performDoneOptions);
+        
+        return (mapping.findForward(destination));
+    }
 
     /**
      * completes the candidate options screen
@@ -1404,14 +1442,15 @@ public class McAction extends LamsDispatchAction implements McAppConstants
      * @param mapping
      * @return ActionForward
      */
-    public ActionForward doneOptions(ActionMapping mapping,
+    public boolean performDoneOptions(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
-            HttpServletResponse response) throws IOException,
+            HttpServletResponse response, boolean defaultStarter) throws IOException,
                                          ServletException
     {
+    	logger.debug("starting doneOptions...");
+    	logger.debug("using defaultStarter: " + defaultStarter);
     	McUtils.cleanUpUserExceptions(request);
-    	logger.debug("dispatching doneOptions...");
     	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
     	McUtils.debugMaps(request);
     	
@@ -1429,50 +1468,61 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 	 	mcAuthoringForm.setEditOptionsMode(new Integer(0).toString());
 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 		logger.debug("setting  EDIT_OPTIONS_MODE to 0");
-		
- 		boolean validateOptions=AuthoringUtil.validateOptions(request);
- 		logger.debug("validateOptions:" + validateOptions);
- 		
- 		if (validateOptions == false)
- 		{
- 			ActionMessages errors= new ActionMessages();
- 			request.getSession().setAttribute(USER_EXCEPTION_CHKBOXES_EMPTY, new Boolean(true).toString());
-			errors.add(Globals.ERROR_KEY,new ActionMessage("error.checkBoxes.empty"));
-			logger.debug("add error.checkBoxes.empty to ActionMessages");
-			saveErrors(request,errors);
-			mcAuthoringForm.resetUserAction();
-			logger.debug("return to destination to fix error.");
-			
-			mcAuthoringForm.setEditOptionsMode(new Integer(1).toString());
-			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
-			logger.debug("setting  EDIT_OPTIONS_MODE to 1");
-	    	
-			McUtils.debugMaps(request);
-			return (mapping.findForward(destination));	
- 		}
-		
- 		Map mapOptionsContent=AuthoringUtil.repopulateMap(request, "optionContent");
-	 	logger.debug("mapOptionsContent after shrinking: " + mapOptionsContent);
-	 	
-	 	if (mapOptionsContent.size() == 1)
-	 	{
-	 		logger.debug("mapOptionsContent size is 1)");
- 			ActionMessages errors= new ActionMessages();
- 			request.getSession().setAttribute(USER_EXCEPTION_SINGLE_OPTION, new Boolean(true).toString());
-			errors.add(Globals.ERROR_KEY,new ActionMessage("error.singleOption"));
-			logger.debug("add error.singleOption to ActionMessages");
-			saveErrors(request,errors);
-			mcAuthoringForm.resetUserAction();
-			logger.debug("return to destination to fix error.");
-			
-			mcAuthoringForm.setEditOptionsMode(new Integer(1).toString());
-			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
-			logger.debug("setting  EDIT_OPTIONS_MODE to 1");
-	    	
-			McUtils.debugMaps(request);
-			return (mapping.findForward(destination));
-	 	}
-	 	
+
+		Map mapOptionsContent= new TreeMap(new McStringComparator());
+		if (!defaultStarter)
+		{
+	 		mapOptionsContent=AuthoringUtil.repopulateMap(request, "optionContent");
+		 	logger.debug("mapOptionsContent after shrinking: " + mapOptionsContent);
+
+		    logger.debug("since defaultStarter is false the call is from within the class, do the checks");
+	 		boolean validateOptions=AuthoringUtil.validateOptions(request);
+	 		logger.debug("validateOptions:" + validateOptions);
+	 		
+	 		if (validateOptions == false)
+	 		{
+	 			ActionMessages errors= new ActionMessages();
+	 			request.getSession().setAttribute(USER_EXCEPTION_CHKBOXES_EMPTY, new Boolean(true).toString());
+				errors.add(Globals.ERROR_KEY,new ActionMessage("error.checkBoxes.empty"));
+				logger.debug("add error.checkBoxes.empty to ActionMessages");
+				saveErrors(request,errors);
+				mcAuthoringForm.resetUserAction();
+				logger.debug("return to destination to fix error.");
+				
+				mcAuthoringForm.setEditOptionsMode(new Integer(1).toString());
+				request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
+				logger.debug("setting  EDIT_OPTIONS_MODE to 1");
+		    	
+				McUtils.debugMaps(request);
+				return false;
+	 		}
+
+		    
+		 	if (mapOptionsContent.size() == 1)
+		 	{
+		 		logger.debug("mapOptionsContent size is 1)");
+	 			ActionMessages errors= new ActionMessages();
+	 			request.getSession().setAttribute(USER_EXCEPTION_SINGLE_OPTION, new Boolean(true).toString());
+				errors.add(Globals.ERROR_KEY,new ActionMessage("error.singleOption"));
+				logger.debug("add error.singleOption to ActionMessages");
+				saveErrors(request,errors);
+				mcAuthoringForm.resetUserAction();
+				logger.debug("return to destination to fix error.");
+				
+				mcAuthoringForm.setEditOptionsMode(new Integer(1).toString());
+				request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
+				logger.debug("setting  EDIT_OPTIONS_MODE to 1");
+		    	
+				McUtils.debugMaps(request);
+				return false;
+		 	}
+		}//end of checks
+		else
+		{
+	 		mapOptionsContent=(Map)request.getSession().getAttribute(MAP_OPTIONS_CONTENT);
+	 		logger.debug("mapOptionsContent: " + mapOptionsContent);
+
+		}
 	 	
 	 	request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
 		logger.debug("final done  MAP_OPTIONS_CONTENT: " + mapOptionsContent);
@@ -1480,6 +1530,13 @@ public class McAction extends LamsDispatchAction implements McAppConstants
  		
  		String selectedQuestionIndex=(String) request.getSession().getAttribute(SELECTED_QUESTION_INDEX);
 		logger.debug("retrieved SELECTED_QUESTION_INDEX to:" + selectedQuestionIndex);
+		
+    	if (defaultStarter)
+    	{
+    	    logger.debug("since the request is from default content set question index to 1:");
+    	    selectedQuestionIndex="1";   
+    	}
+
 		
 		/** update the questions Map with the new question*/
 		Map mapQuestionsContent=(Map) request.getSession().getAttribute(MAP_QUESTIONS_CONTENT);
@@ -1491,11 +1548,17 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
 		logger.debug("updated MAP_QUESTIONS_CONTENT:" +  mapQuestionsContent);
 		
-		
-		Map mapSelectedOptions= (Map) request.getSession().getAttribute(MAP_SELECTED_OPTIONS);
- 		mapSelectedOptions.clear();
- 		mapSelectedOptions = AuthoringUtil.repopulateCurrentCheckBoxStatesMap(request);
- 		logger.debug("after add mapSelectedOptions: " + mapSelectedOptions);
+		Map mapSelectedOptions= new TreeMap(new McComparator());		
+    	if (defaultStarter)
+    	{
+    	    logger.debug("defaultStarter is on, getting MAP_SELECTED_OPTIONS from session: ");
+    		mapSelectedOptions= (Map) request.getSession().getAttribute(MAP_SELECTED_OPTIONS);
+    	}
+    	else
+    	{
+     		mapSelectedOptions = AuthoringUtil.repopulateCurrentCheckBoxStatesMap(request);
+     		logger.debug("after add mapSelectedOptions: " + mapSelectedOptions);
+    	}
  		request.getSession().setAttribute(MAP_SELECTED_OPTIONS, mapSelectedOptions);
  		
 		Map mapGeneralSelectedOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT);
@@ -1505,8 +1568,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		logger.debug("updated  MAP_GENERAL_SELECTED_OPTIONS_CONTENT after add: " + mapGeneralSelectedOptionsContent);
 		
 		
-		
-		/*new code*/
 		Map mapIncorrectFeedback=(Map)request.getSession().getAttribute(MAP_INCORRECT_FEEDBACK);
 		logger.debug("mapIncorrectFeedback:" +  mapIncorrectFeedback);
 		
@@ -1560,7 +1621,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		
     	McUtils.debugMaps(request);
     	logger.debug("final EDIT_OPTIONS_MODE: " + request.getSession().getAttribute(EDIT_OPTIONS_MODE));
-		return (mapping.findForward(destination));
+    	return true;
     }
 
    
@@ -2119,8 +2180,8 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     	
 		McUtils.debugMaps(request);
 		
-		//because button (and javascript) will display in LamsTag tab, so put it into session instead of request
-		//it will be remove immediately in clearSessionAction.
+		/*because button (and javascript) will display in LamsTag tab, so put it into session instead of request
+		it will be remove immediately in clearSessionAction.*/
         request.getSession().setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG,Boolean.TRUE);
         
         logger.debug("final EDIT_OPTIONS_MODE: " + request.getSession().getAttribute(EDIT_OPTIONS_MODE));
