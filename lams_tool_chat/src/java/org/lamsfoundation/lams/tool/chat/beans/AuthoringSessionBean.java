@@ -28,36 +28,10 @@ package org.lamsfoundation.lams.tool.chat.beans;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.tool.chat.model.ChatAttachment;
 
 public class AuthoringSessionBean {
 	String authSessionId;
-	
-	Long toolContentID;
-	
-	// properties updated every request/response
-	String title;
-
-	String instructions;
-
-	String offlineInstruction;
-
-	String onlineInstruction;
-	
-	boolean lockOnFinished;
-	
-	boolean filteringEnabled;
-	
-	FormFile onlineFile; 
-
-	FormFile offlineFile;
-
-	String currentTab;
-
-	String dispatch;
-
-	// properties maintained over multiple requests. 
 		
 	List<ChatAttachment> onlineFilesList  = new LinkedList<ChatAttachment>();
 	
@@ -68,22 +42,13 @@ public class AuthoringSessionBean {
 	List<ChatAttachment> unsavedOfflineFilesList = new LinkedList<ChatAttachment>();
 	
 	List<ChatAttachment> deletedFilesList = new LinkedList<ChatAttachment>();
-	
-	// getters / setters
+
 	public String getAuthSessionId() {
 		return authSessionId;
 	}
 
 	public void setAuthSessionId(String authSessionId) {
 		this.authSessionId = authSessionId;
-	}
-
-	public String getCurrentTab() {
-		return currentTab;
-	}
-
-	public void setCurrentTab(String currentTab) {
-		this.currentTab = currentTab;
 	}
 
 	public List<ChatAttachment> getDeletedFilesList() {
@@ -94,68 +59,12 @@ public class AuthoringSessionBean {
 		this.deletedFilesList = deletedFilesList;
 	}
 
-	public String getDispatch() {
-		return dispatch;
-	}
-
-	public void setDispatch(String dispatch) {
-		this.dispatch = dispatch;
-	}
-
-	public String getInstructions() {
-		return instructions;
-	}
-
-	public void setInstructions(String instructions) {
-		this.instructions = instructions;
-	}
-
-	public boolean getLockOnFinished() {
-		return lockOnFinished;
-	}
-
-	public void setLockOnFinished(boolean lockOnFinished) {
-		this.lockOnFinished = lockOnFinished;
-	}
-	
-	public boolean isFilteringEnabled() {
-		return filteringEnabled;
-	}
-
-	public void setFilteringEnabled(boolean filteringEnabled) {
-		this.filteringEnabled = filteringEnabled;
-	}
-
-	public FormFile getOfflineFile() {
-		return offlineFile;
-	}
-
-	public void setOfflineFile(FormFile offlineFile) {
-		this.offlineFile = offlineFile;
-	}
-
 	public List<ChatAttachment> getOfflineFilesList() {
 		return offlineFilesList;
 	}
 
 	public void setOfflineFilesList(List<ChatAttachment> offlineFilesList) {
 		this.offlineFilesList = offlineFilesList;
-	}
-
-	public String getOfflineInstruction() {
-		return offlineInstruction;
-	}
-
-	public void setOfflineInstruction(String offlineInstruction) {
-		this.offlineInstruction = offlineInstruction;
-	}
-
-	public FormFile getOnlineFile() {
-		return onlineFile;
-	}
-
-	public void setOnlineFile(FormFile onlineFile) {
-		this.onlineFile = onlineFile;
 	}
 
 	public List<ChatAttachment> getOnlineFilesList() {
@@ -166,35 +75,12 @@ public class AuthoringSessionBean {
 		this.onlineFilesList = onlineFilesList;
 	}
 
-	public String getOnlineInstruction() {
-		return onlineInstruction;
-	}
-
-	public void setOnlineInstruction(String onlineInstruction) {
-		this.onlineInstruction = onlineInstruction;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
-	public Long getToolContentID() {
-		return toolContentID;
-	}
-
-	public void setToolContentID(Long toolContentID) {
-		this.toolContentID = toolContentID;
-	}
-
 	public List<ChatAttachment> getUnsavedOfflineFilesList() {
 		return unsavedOfflineFilesList;
 	}
 
-	public void setUnsavedOfflineFilesList(List<ChatAttachment> unsavedOfflineFilesList) {
+	public void setUnsavedOfflineFilesList(
+			List<ChatAttachment> unsavedOfflineFilesList) {
 		this.unsavedOfflineFilesList = unsavedOfflineFilesList;
 	}
 
@@ -202,7 +88,8 @@ public class AuthoringSessionBean {
 		return unsavedOnlineFilesList;
 	}
 
-	public void setUnsavedOnlineFilesList(List<ChatAttachment> unsavedOnlineFilesList) {
+	public void setUnsavedOnlineFilesList(
+			List<ChatAttachment> unsavedOnlineFilesList) {
 		this.unsavedOnlineFilesList = unsavedOnlineFilesList;
 	}
 }
