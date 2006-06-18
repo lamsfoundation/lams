@@ -57,9 +57,13 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
  */
 public class ExcelUserImportFileParser implements IUserImportFileParser{
 
-	/*
+	public String parseUsersInOrganisation(FileItem fileItem, Organisation org, String adminLogin, boolean existingUsersOnly) throws IOException {
+		return null;
+	}
+
+/*	
 	 * start of definition of property keys used in the excel file
-	 */
+	 
 	private static final short LOGIN = 0;
 	private static final short PASSWORD = 1;
 	private static final short AUTH_METHOD = 2;
@@ -94,9 +98,9 @@ public class ExcelUserImportFileParser implements IUserImportFileParser{
 		this.service = service;
 	}
 
-	/** 
+	*//** 
 	 * @see org.lamsfoundation.lams.admin.util.IUserImportFileParser#parseUsersInOrganisation(FileItem fileItem, Organisation org, String adminLogin, boolean existingUsersOnly)
-	 */
+	 *//*
 	public String parseUsersInOrganisation(FileItem fileItem, Organisation org, String adminLogin, boolean existingUsersOnly) throws IOException{
 		String errorMessage = "";
 		POIFSFileSystem fs = new POIFSFileSystem(fileItem.getInputStream());
@@ -332,4 +336,4 @@ public class ExcelUserImportFileParser implements IUserImportFileParser{
 		String status = parseStringCell(cell,row,-1);
 		return new Boolean(STATUS_DISABLED.equals(status));
 	}
-}
+*/}

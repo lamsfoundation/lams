@@ -57,6 +57,7 @@ import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
+import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
 import org.lamsfoundation.lams.learningdesign.ChosenGrouping;
@@ -93,7 +94,6 @@ import org.lamsfoundation.lams.tool.dao.IToolDAO;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
-import org.lamsfoundation.lams.usermanagement.dao.IWorkspaceFolderDAO;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileUtilException;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
@@ -135,7 +135,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	private IActivityDAO activityDAO;
 	private IToolDAO toolDAO;
 	private IToolContentDAO toolContentDAO;
-	private IWorkspaceFolderDAO workspaceFolderDAO;
+	private IBaseDAO baseDAO;
 	private ILicenseDAO licenseDAO;
 	private IGroupingDAO groupingDAO;
 	private ITransitionDAO  transitionDAO;
@@ -454,7 +454,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			// if workspaceFolderUid == null use the user's default folder
 			WorkspaceFolder folder = null;
 			if ( workspaceFolderUid != null ) {
-				folder = workspaceFolderDAO.getWorkspaceFolderByID(workspaceFolderUid);
+				folder = (WorkspaceFolder)baseDAO.find(WorkspaceFolder.class,workspaceFolderUid);
 			} 				
 			if ( folder == null && importer.getWorkspace() != null) {
 				folder = importer.getWorkspace().getRootFolder();
@@ -976,6 +976,9 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	public ILicenseDAO getLicenseDAO() {
 		return licenseDAO;
 	}
+	public void setBaseDAO(IBaseDAO baseDAO) {
+		this.baseDAO = baseDAO;
+	}
 	public void setLicenseDAO(ILicenseDAO licenseDAO) {
 		this.licenseDAO = licenseDAO;
 	}
@@ -997,13 +1000,6 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	public void setTransitionDAO(ITransitionDAO transitionDAO) {
 		this.transitionDAO = transitionDAO;
 	}
-	public IWorkspaceFolderDAO getWorkspaceFolderDAO() {
-		return workspaceFolderDAO;
-	}
-	public void setWorkspaceFolderDAO(IWorkspaceFolderDAO workspaceFolderDAO) {
-		this.workspaceFolderDAO = workspaceFolderDAO;
-	}
-
 	private boolean isComplexActivity(Activity act)
 	{
 		return act.getActivityTypeId().intValue() == Activity.SEQUENCE_ACTIVITY_TYPE || 

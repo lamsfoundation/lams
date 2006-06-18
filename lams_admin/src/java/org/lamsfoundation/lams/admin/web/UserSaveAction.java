@@ -39,6 +39,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.DynaActionForm;
+import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
@@ -102,49 +103,49 @@ public class UserSaveAction extends Action {
 			User user;
 			if(userId!=0){    // edit user
 				log.debug("editing userId: "+userId);
-				user = service.getUserById(userId);
+				user = (User)service.findById(User.class,userId);
 				BeanUtils.copyProperties(user,userForm);
-				service.updateUser(user);
+				service.save(user);
 				UserOrganisation userOrganisation = service.getUserOrganisation(userId, orgId);
 				List<Role> roles = service.getRolesForUserByOrganisation(user, orgId);
                 
-				Role currentRole = service.getRoleByName("LEARNER");
+				Role currentRole = (Role)service.findByProperty(Role.class,"name","LEARNER").get(0);
 				if(userForm.get("learner").equals("on") && roles.indexOf(currentRole)<0) {
 					UserOrganisationRole userOrganisationRole = new UserOrganisationRole(userOrganisation, 
 							currentRole);
-					service.saveOrUpdateUserOrganisationRole(userOrganisationRole);
+					service.save(userOrganisationRole);
 				} else if(userForm.get("learner").equals("off")){
 					//service.deleteUserOrganisationRole();
 				}
-				currentRole = service.getRoleByName("AUTHOR");
+				currentRole = (Role)service.findByProperty(Role.class,"name","AUTHOR").get(0);
 				if(userForm.get("author").equals("on") && roles.indexOf(currentRole)<0) {
 					UserOrganisationRole userOrganisationRole = new UserOrganisationRole(userOrganisation, 
 							currentRole);
-					service.saveOrUpdateUserOrganisationRole(userOrganisationRole);
+					service.save(userOrganisationRole);
 				} else if(userForm.get("learner").equals("off")) {
 					//service.deleteUserOrganisationRole();
 				}
-				currentRole = service.getRoleByName("STAFF");
+				currentRole = (Role)service.findByProperty(Role.class,"name","STAFF").get(0);
 				if(userForm.get("staff").equals("on") && roles.indexOf(currentRole)<0) {
 					UserOrganisationRole userOrganisationRole = new UserOrganisationRole(userOrganisation, 
 							currentRole);
-					service.saveOrUpdateUserOrganisationRole(userOrganisationRole);
+					service.save(userOrganisationRole);
 				} else if(userForm.get("learner").equals("off")) {
 					//service.deleteUserOrganisationRole();
 				}
-				currentRole = service.getRoleByName("COURSE ADMIN");
+				currentRole = (Role)service.findByProperty(Role.class,"name","COURSE ADMIN").get(0);
 				if(userForm.get("admin").equals("on") && roles.indexOf(currentRole)<0) {
 					UserOrganisationRole userOrganisationRole = new UserOrganisationRole(userOrganisation, 
 							currentRole);
-					service.saveOrUpdateUserOrganisationRole(userOrganisationRole);
+					service.save(userOrganisationRole);
 				} else if(userForm.get("learner").equals("off")) {
 					//service.deleteUserOrganisationRole();
 				}
-				currentRole = service.getRoleByName("COURSE MANAGER");
+				currentRole = (Role)service.findByProperty(Role.class,"name","COURSE MANAGER").get(0);
 				if(userForm.get("manager").equals("on") && roles.indexOf(currentRole)<0) {
 					UserOrganisationRole userOrganisationRole = new UserOrganisationRole(userOrganisation, 
 							currentRole);
-					service.saveOrUpdateUserOrganisationRole(userOrganisationRole);
+					service.save(userOrganisationRole);
 				} else if(userForm.get("learner").equals("off")) {
 					//service.deleteUserOrganisationRole();
 				}
@@ -157,16 +158,16 @@ public class UserSaveAction extends Action {
 				}
 				user.setDisabledFlag(false);
 				user.setCreateDate(new Date());
-				user.setAuthenticationMethod(service.getAuthenticationMethodByName("LAMS-Database"));
+				user.setAuthenticationMethod((AuthenticationMethod)service.findByProperty(AuthenticationMethod.class,"name","LAMS-Database").get(0));
 				log.debug(user.toString());
-				service.createUser(user);
+				service.save(user);
 				user = service.getUserByLogin((String)userForm.get("login"));
 				UserOrganisation userOrganisation = new UserOrganisation(user, service.getOrganisationById(orgId));
-				service.saveOrUpdateUserOrganisation(userOrganisation);
+				service.save(userOrganisation);
 				// set default role to learner
-				Role role = service.getRoleByName("LEARNER");
+				Role role = (Role)service.findByProperty(Role.class,"name","LEARNER").get(0);
 				UserOrganisationRole userOrganisationRole = new UserOrganisationRole(userOrganisation, role);
-				service.saveOrUpdateUserOrganisationRole(userOrganisationRole);
+				service.save(userOrganisationRole);
 			}
 			request.setAttribute("org",orgId);
 			log.debug("orgId: "+orgId);

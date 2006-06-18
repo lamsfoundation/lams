@@ -35,6 +35,8 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.DynaActionForm;
+import org.lamsfoundation.lams.usermanagement.Country;
+import org.lamsfoundation.lams.usermanagement.Language;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -69,8 +71,8 @@ public class UserAction extends LamsDispatchAction {
 					.getServletContext());
 	private static IUserManagementService service = (IUserManagementService) ctx
 			.getBean("userManagementServiceTarget");
-    private static List countries = service.getAllCountries();
-	private static List languages = service.getAllLanguages();
+    private static List countries = service.findAll(Country.class);
+	private static List languages = service.findAll(Language.class);
 	
 	public ActionForward add(ActionMapping mapping,
             ActionForm form,
@@ -100,7 +102,7 @@ public class UserAction extends LamsDispatchAction {
 		Integer userId = WebUtil.readIntParam(request,"userId",true);
 		if(userId != null) {
 			log.debug("got userid to edit: "+userId);
-			User user = service.getUserById(userId);
+			User user = (User)service.findById(User.class,userId);
 			DynaActionForm userForm = (DynaActionForm)form;
 			BeanUtils.copyProperties(userForm, user);
 			List<Role> roles = service.getRolesForUserByOrganisation(user, orgId);
@@ -133,7 +135,7 @@ public class UserAction extends LamsDispatchAction {
             HttpServletResponse response) throws Exception {
 		Integer userId = WebUtil.readIntParam(request,"userId",true);
 		log.debug("removing userid: "+userId);
-		service.deleteUserById(userId);
+		service.deleteById(User.class,userId);
 		Integer orgId = WebUtil.readIntParam(request,"orgId");
 		request.setAttribute("org",orgId);
 		return mapping.findForward("userlist");

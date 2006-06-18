@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.admin.web;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -133,20 +134,21 @@ public class OrgManageAction extends Action {
 				orgManageBeans.add(orgManageBean);
 			}
 		}else{
-			List userOrganisations = service.getUserOrganisationsForUser(service.getUserByLogin(username));
+			Set userOrganisations = service.getUserByLogin(username).getUserOrganisations();
 			if(userOrganisations!=null){
-				for(int i=0; i<userOrganisations.size(); i++){
+				Iterator iter = userOrganisations.iterator();
+				while(iter.hasNext()){
 					OrgManageBean orgManageBean = new OrgManageBean();
-					UserOrganisation userOrganisation = (UserOrganisation)userOrganisations.get(i);
+					UserOrganisation userOrganisation = (UserOrganisation)iter.next();
 					Organisation organisation = userOrganisation.getOrganisation();
 					if(organisation.getParentOrganisation()!=null){
 						orgManageBean.setEditable(false);
 						if(organisation.getParentOrganisation().getOrganisationId().equals(orgId)){
 							BeanUtils.copyProperties(orgManageBean,organisation);
 							orgManageBean.setStatus(organisation.getOrganisationState().getDescription());
-							Iterator iter = userOrganisation.getUserOrganisationRoles().iterator();
-							while(iter.hasNext()){
-								UserOrganisationRole userOrganisationRole = (UserOrganisationRole)iter.next();
+							Iterator iter2 = userOrganisation.getUserOrganisationRoles().iterator();
+							while(iter2.hasNext()){
+								UserOrganisationRole userOrganisationRole = (UserOrganisationRole)iter2.next();
 								if(userOrganisationRole.getRole().isCourseManager()||userOrganisationRole.getRole().isCourseAdmin()){
 									orgManageBean.setEditable(true);
 									break;

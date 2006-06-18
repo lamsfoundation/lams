@@ -34,7 +34,10 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.DynaActionForm;
+import org.lamsfoundation.lams.usermanagement.Country;
+import org.lamsfoundation.lams.usermanagement.Language;
 import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.OrganisationState;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
@@ -65,11 +68,11 @@ public class OrganisationAction extends LamsDispatchAction {
 	private static IUserManagementService service = (IUserManagementService) ctx
 			.getBean("userManagementServiceTarget");
 
-	private static List countries = service.getAllCountries();
+	private static List countries = service.findAll(Country.class);
 	
-	private static List languages = service.getAllLanguages();
+	private static List languages = service.findAll(Language.class);
 	
-	private static List status = service.getAllOrgnisationStates();
+	private static List status = service.findAll(OrganisationState.class);
 
 	public ActionForward edit(ActionMapping mapping, ActionForm form,HttpServletRequest request, HttpServletResponse response) throws Exception{
 		Integer orgId = WebUtil.readIntParam(request,"orgId",true);
@@ -91,7 +94,7 @@ public class OrganisationAction extends LamsDispatchAction {
 
 	public ActionForward remove(ActionMapping mapping, ActionForm form,HttpServletRequest request, HttpServletResponse response){
 		Integer orgId = WebUtil.readIntParam(request,"orgId");
-		service.deleteOrganisationById(orgId);
+		service.deleteById(Organisation.class,orgId);
 		Integer parentId = WebUtil.readIntParam(request,"parentId");
 		request.setAttribute("org",parentId);
 		return mapping.findForward("orglist");

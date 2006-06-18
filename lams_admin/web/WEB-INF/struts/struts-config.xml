@@ -62,8 +62,7 @@
   </form-beans>
 
   <!-- ========== Global Exceptions Definitions =================================== -->
-  <!-- 
-<global-exceptions>
+  <global-exceptions>
   <exception
     handler="org.apache.struts.action.ExceptionHandler"
     key="error.system"
@@ -71,7 +70,6 @@
     scope="request"
     type="java.lang.Exception"/>
 </global-exceptions>
--->
 
   <!-- ========== Global Forward Definitions =================================== -->
   <global-forwards>

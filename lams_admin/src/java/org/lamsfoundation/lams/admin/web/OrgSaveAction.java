@@ -37,6 +37,8 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.OrganisationState;
+import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.web.util.HttpSessionManager;
 import org.springframework.web.context.WebApplicationContext;
@@ -104,12 +106,12 @@ public class OrgSaveAction extends Action {
 				org = new Organisation();
 				org.setCreateDate(new Date());
 				org.setParentOrganisation(service.getOrganisationById((Integer)orgForm.get("parentId")));
-				org.setOrganisationType(service.getOrganisationTypeById((Integer)orgForm.get("typeId")));
+				org.setOrganisationType((OrganisationType)service.findById(OrganisationType.class,(Integer)orgForm.get("typeId")));
 			}
 			BeanUtils.copyProperties(org,orgForm);
 			log.debug("orgId:"+org.getOrganisationId()+" language:"+org.getLocaleLanguage()+" Country:"+org.getLocaleCountry()+" create date:"+org.getCreateDate());
-			org.setOrganisationState(service.getOrganisationStateById((Integer)orgForm.get("stateId")));
-			service.saveOrganisation(org,service.getUserByLogin(request.getRemoteUser()).getUserId());
+			org.setOrganisationState((OrganisationState)service.findById(OrganisationState.class,(Integer)orgForm.get("stateId")));
+			service.save(org);
 			request.setAttribute("org",orgForm.get("parentId"));
 			return mapping.findForward("orglist");
 		}else{
