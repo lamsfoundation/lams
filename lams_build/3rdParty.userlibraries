@@ -35,19 +35,7 @@
 <archive path="/lams_build/lib/mysql/mysql-connector-java-3.1.12-bin.jar"/>
 <archive path="/lams_build/lib/odmg/odmg-3.0.jar"/>
 <archive path="/lams_build/lib/quartz/quartz.jar"/>
-<archive path="/lams_build/lib/spring/spring-aop.jar"/>
-<archive path="/lams_build/lib/spring/spring-beans.jar"/>
-<archive path="/lams_build/lib/spring/spring-context.jar"/>
-<archive path="/lams_build/lib/spring/spring-core.jar"/>
-<archive path="/lams_build/lib/spring/spring-dao.jar"/>
-<archive path="/lams_build/lib/spring/spring-hibernate.jar"/>
-<archive path="/lams_build/lib/spring/spring-jdbc.jar"/>
-<archive path="/lams_build/lib/spring/spring-mock.jar"/>
-<archive path="/lams_build/lib/spring/spring-orm.jar"/>
-<archive path="/lams_build/lib/spring/spring-remoting.jar"/>
-<archive path="/lams_build/lib/spring/spring-support.jar"/>
-<archive path="/lams_build/lib/spring/spring-web.jar"/>
-<archive path="/lams_build/lib/spring/spring-webmvc.jar"/>
+<archive path="/lams_build/lib/quartz/spring.jar"/>
 <archive path="/lams_build/lib/struts/struts-el.jar"/>
 <archive path="/lams_build/lib/struts/struts.jar" source="/lams_build/lib/struts/src/jakarta-struts-1.2.4-src.zip"/>
 <archive path="/lams_build/lib/struts/antlr.jar"/>
