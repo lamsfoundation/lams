@@ -84,7 +84,7 @@ import org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants;
 import org.lamsfoundation.lams.tool.sbmt.util.SbmtToolContentHandler;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.usermanagement.dao.IUserDAO;
+import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.util.LastNameAlphabeticComparator;
 import org.lamsfoundation.lams.util.DateUtil;
@@ -103,7 +103,7 @@ public class SubmitFilesService implements ToolContentManager,
 	private ISubmitFilesSessionDAO submitFilesSessionDAO;
 	private ISubmissionDetailsDAO submissionDetailsDAO;
 	private ILearnerDAO learnerDAO;
-	private IUserDAO userDAO;
+	private IBaseDAO baseDAO;
 	
 	private IToolContentHandler sbmtToolContentHandler;
 	private ILamsToolService toolService;
@@ -647,7 +647,7 @@ public class SubmitFilesService implements ToolContentManager,
 		Iterator iterator = users.iterator();
 		while(iterator.hasNext()){
 			Long userID = (Long)iterator.next();			
-			User user = userDAO.getUserById(new Integer(userID.intValue()));
+			User user = (User)baseDAO.find(User.class,userID.intValue());
 			table.add(user.getUserDTO());
 		}
 		return table;
@@ -662,7 +662,7 @@ public class SubmitFilesService implements ToolContentManager,
 		}
 	}
 	public UserDTO getUserDetails(Long userID){
-		User user = userDAO.getUserById(new Integer(userID.intValue()));
+		User user = (User)baseDAO.find(User.class,userID.intValue());
 		if(user == null)
 			return null;
 		
@@ -820,10 +820,10 @@ public class SubmitFilesService implements ToolContentManager,
 	}
 	
 	/**
-	 * @param userDAO The userDAO to set.
+	 * @param baseDAO The baseDAO to set.
 	 */
-	public void setUserDAO(IUserDAO userDAO) {
-		this.userDAO = userDAO;
+	public void setBaseDAO(IBaseDAO baseDAO) {
+		this.baseDAO = baseDAO;
 	}
 
 	/**
