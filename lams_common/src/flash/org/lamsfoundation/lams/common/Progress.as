@@ -76,7 +76,7 @@ class Progress {
 		_completedActivities = dto.completedActivities;
 	}
 	
-	public static function compareProgressData(learner:Object, activityID:Number):String{
+	public static function compareProgressData(learner:Progress, activityID:Number):String{
 		trace ("activity ID passed is: "+activityID)
 		trace("Number of Activities completed in the lesson are: "+learner.getCompletedActivities().length)
 		
