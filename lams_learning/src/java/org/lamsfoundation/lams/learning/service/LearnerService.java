@@ -492,7 +492,7 @@ public class LearnerService implements ILearnerService
      * @see org.lamsfoundation.lams.learning.service.ILearnerService#getLearnerActivityURL(java.lang.Integer, java.lang.Long)
      */
    public String getLearnerActivityURL(Integer learnerId, Long activityId) {    
-    	User learner = userManagementService.getUserById(learnerId);
+    	User learner = (User)userManagementService.findById(User.class,learnerId);
     	Activity requestedActivity = getActivity(activityId);
     	Lesson lesson = getLessonByActivity(requestedActivity);
     	return activityMapping.calculateActivityURLForProgressView(lesson,learner,requestedActivity);

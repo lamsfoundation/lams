@@ -76,7 +76,7 @@ public class LearningWebUtil
     {
         HttpSession ss = SessionManager.getSession();
         UserDTO learner = (UserDTO) ss.getAttribute(AttributeNames.USER);
-        return learner != null ? learnerService.getUserManagementService().getUserById(learner.getUserID()) : null;
+        return learner != null ? (User)learnerService.getUserManagementService().findById(User.class,learner.getUserID()) : null;
     }
     
 	/** 
