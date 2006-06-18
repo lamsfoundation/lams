@@ -24,6 +24,8 @@
 package org.lamsfoundation.lams.web;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -70,14 +72,6 @@ public class HomeAction extends DispatchAction {
 	private static WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(HttpSessionManager.getInstance().getServletContext());
 	private static UserManagementService service = (UserManagementService) ctx.getBean("userManagementServiceTarget");
 	
-	
-	private boolean isUserInRole(Integer userId,int orgId, String roleName)
-	{
-		if (service.getUserOrganisationRole(userId, new Integer(orgId),roleName)==null)
-			return false;
-		return true;
-	}
-	
 	private UserDTO getUser() {
 		HttpSession ss = SessionManager.getSession();
 		return (UserDTO) ss.getAttribute(AttributeNames.USER);
@@ -99,7 +93,7 @@ public class HomeAction extends DispatchAction {
 			if ( user == null ) {
 				log.error("admin: User missing from session. ");
 				return mapping.findForward("error");
-			} else if ( isUserInRole(user.getUserID(),orgId,Role.SYSADMIN)) {
+			} else if ( service.isUserInRole(user.getUserID(),orgId,Role.SYSADMIN)) {
 				log.debug("user is sysadmin");
 				return mapping.findForward("sysadmin");
 			} else {
@@ -215,7 +209,7 @@ public class HomeAction extends DispatchAction {
 				return mapping.findForward("error");
 			} else { 
 				Integer orgId = classId != null ? classId : courseId;
-				if (isUserInRole(user.getUserID(), orgId, Role.STAFF)) {
+				if (service.isUserInRole(user.getUserID(), orgId, Role.STAFF)) {
 					log.debug("user is staff");
 					String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
 					req.setAttribute("serverUrl", serverUrl);

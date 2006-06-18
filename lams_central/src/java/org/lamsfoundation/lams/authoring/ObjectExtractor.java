@@ -63,8 +63,7 @@ import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.dao.hibernate.ToolDAO;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
-import org.lamsfoundation.lams.usermanagement.dao.hibernate.UserDAO;
-import org.lamsfoundation.lams.usermanagement.dao.hibernate.WorkspaceFolderDAO;
+import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
 import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
@@ -90,11 +89,10 @@ import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
  */
 public class ObjectExtractor implements IObjectExtractor {
 	
-	protected UserDAO userDAO = null;
+	protected BaseDAO baseDAO = null;
 	protected LearningDesignDAO learningDesignDAO = null;
 	protected ActivityDAO activityDAO =null;
 	protected TransitionDAO transitionDAO =null;
-	protected WorkspaceFolderDAO workspaceFolderDAO = null;
 	protected LearningLibraryDAO learningLibraryDAO = null;
 	protected LicenseDAO licenseDAO = null;
 	protected GroupingDAO groupingDAO = null;
@@ -121,16 +119,14 @@ public class ObjectExtractor implements IObjectExtractor {
 	}
 
 	/** Constructor to be used if Spring method injection is not used */
-	public ObjectExtractor(UserDAO userDAO,
+	public ObjectExtractor(BaseDAO baseDAO,
 			LearningDesignDAO learningDesignDAO, ActivityDAO activityDAO,
-			WorkspaceFolderDAO workspaceFolderDAO,
 			LearningLibraryDAO learningLibraryDAO, LicenseDAO licenseDAO,
 			GroupingDAO groupingDAO, ToolDAO toolDAO,
 			GroupDAO groupDAO,TransitionDAO transitionDAO) {		
-		this.userDAO = userDAO;
+		this.baseDAO = baseDAO;
 		this.learningDesignDAO = learningDesignDAO;
 		this.activityDAO = activityDAO;
-		this.workspaceFolderDAO = workspaceFolderDAO;
 		this.learningLibraryDAO = learningLibraryDAO;
 		this.licenseDAO = licenseDAO;
 		this.groupingDAO = groupingDAO;
@@ -212,20 +208,12 @@ public class ObjectExtractor implements IObjectExtractor {
 		this.transitionDAO = transitionDAO;
 	}
 
-	public UserDAO getUserDAO() {
-		return userDAO;
+	public BaseDAO getBaseDAO() {
+		return baseDAO;
 	}
 
-	public void setUserDAO(UserDAO userDAO) {
-		this.userDAO = userDAO;
-	}
-
-	public WorkspaceFolderDAO getWorkspaceFolderDAO() {
-		return workspaceFolderDAO;
-	}
-
-	public void setWorkspaceFolderDAO(WorkspaceFolderDAO workspaceFolderDAO) {
-		this.workspaceFolderDAO = workspaceFolderDAO;
+	public void setBaseDAO(BaseDAO baseDAO) {
+		this.baseDAO = baseDAO;
 	}
 
 	/* (non-Javadoc)
@@ -294,7 +282,7 @@ public class ObjectExtractor implements IObjectExtractor {
 		{
 		    Integer userId = WDDXProcessor.convertToInteger(table,WDDXTAGS.USER_ID);
 		    if( userId != null ) {
-				User user = userDAO.getUserById(userId);
+				User user = (User)baseDAO.find(User.class,userId);
 				if(user!=null) {
 					learningDesign.setUser(user);
 				} else {
@@ -321,7 +309,7 @@ public class ObjectExtractor implements IObjectExtractor {
 		{
 			Integer workspaceFolderID = WDDXProcessor.convertToInteger(table, WDDXTAGS.WORKSPACE_FOLDER_ID);
 			if( workspaceFolderID!=null ){
-				WorkspaceFolder workspaceFolder = workspaceFolderDAO.getWorkspaceFolderByID(workspaceFolderID);
+				WorkspaceFolder workspaceFolder = (WorkspaceFolder)baseDAO.find(WorkspaceFolder.class,workspaceFolderID);
 				learningDesign.setWorkspaceFolder(workspaceFolder);			
 			}
 			else

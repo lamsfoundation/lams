@@ -130,7 +130,7 @@ public class UniversalLoginModule extends UsernamePasswordLoginModule {
 
 				AuthenticationMethod method = null;
 				try {
-					method = service.getAuthenticationMethodForUser(user);
+					method = user.getAuthenticationMethod();
 					AuthenticationMethodConfigurer.configure(method);
 
 					this.dsJndiName = method.getParameterByName("dsJndiName").getValue();

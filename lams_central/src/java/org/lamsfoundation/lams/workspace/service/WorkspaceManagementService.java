@@ -50,6 +50,7 @@ import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.contentrepository.service.RepositoryProxy;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
+import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO;
 import org.lamsfoundation.lams.usermanagement.Role;
@@ -58,11 +59,6 @@ import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.Workspace;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
-import org.lamsfoundation.lams.usermanagement.dao.IOrganisationDAO;
-import org.lamsfoundation.lams.usermanagement.dao.IUserDAO;
-import org.lamsfoundation.lams.usermanagement.dao.IUserOrganisationDAO;
-import org.lamsfoundation.lams.usermanagement.dao.IWorkspaceDAO;
-import org.lamsfoundation.lams.usermanagement.dao.IWorkspaceFolderDAO;
 import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
@@ -89,15 +85,9 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	public static final Integer AUTHORING = new Integer(1);
 	public static final Integer MONITORING = new Integer(2);
 	
-	protected IUserDAO userDAO;	
+	protected IBaseDAO baseDAO;	
 	protected ILearningDesignDAO learningDesignDAO;
-	protected IWorkspaceFolderDAO workspaceFolderDAO;
-	protected IWorkspaceDAO workspaceDAO;
-	protected IOrganisationDAO organisationDAO;
-	protected IUserOrganisationDAO userOrganisationDAO;
 	
-	protected IWorkspaceFolderContentDAO workspaceFolderContentDAO;	
-		
 	protected IAuthoringService authoringService;
 	protected IRepositoryService repositoryService;
 	protected IUserManagementService userMgmtService;
@@ -121,9 +111,9 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	/**
 	 * @param workspaceFolderContentDAO The workspaceFolderContentDAO to set.
 	 */
-	public void setWorkspaceFolderContentDAO(
-			IWorkspaceFolderContentDAO workspaceFolderContentDAO) {
-		this.workspaceFolderContentDAO = workspaceFolderContentDAO;
+	public void setBaseDAO(
+			IBaseDAO baseDAO) {
+		this.baseDAO = baseDAO;
 	}
 	/**
 	 * @param authoringService The authoringService to set.
@@ -132,41 +122,10 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		this.authoringService = authoringService;
 	}	
 	/**
-	 * @param organisationDAO The organisationDAO to set.
-	 */
-	public void setOrganisationDAO(IOrganisationDAO organisationDAO) {
-		this.organisationDAO = organisationDAO;
-	}
-	/**
-	 * @param workspaceDAO The workspaceDAO to set.
-	 */
-	public void setWorkspaceDAO(IWorkspaceDAO workspaceDAO) {
-		this.workspaceDAO = workspaceDAO;
-	}
-	/**
-	 * @param workspaceFolderDAO The workspaceFolderDAO to set.
-	 */
-	public void setWorkspaceFolderDAO(IWorkspaceFolderDAO workspaceFolderDAO) {
-		this.workspaceFolderDAO = workspaceFolderDAO;
-	}
-	/**
 	 * @param learningDesignDAO The learningDesignDAO to set.
 	 */
 	public void setLearningDesignDAO(ILearningDesignDAO learningDesignDAO) {
 		this.learningDesignDAO = learningDesignDAO;
-	}
-	/**
-	 * @param userDAO The userDAO to set.
-	 */
-	public void setUserDAO(IUserDAO userDAO) {
-		this.userDAO = userDAO;
-	}
-	
-	/**
-	 * @param userOrganisationDAO The userOrganisationDAO to set.
-	 */
-	public void setUserOrganisationDAO(IUserOrganisationDAO userOrganisationDAO) {
-		this.userOrganisationDAO = userOrganisationDAO;
 	}
 	
 	public void setUserMgmtService(IUserManagementService userMgmtService) {
@@ -222,8 +181,8 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	 * @throws IOException
 	 */
 	public String deleteFolder(Integer folderID, Integer userID)throws IOException{		
-		WorkspaceFolder workspaceFolder = workspaceFolderDAO.getWorkspaceFolderByID(folderID);
-		User user = userDAO.getUserById(userID);
+		WorkspaceFolder workspaceFolder = (WorkspaceFolder)baseDAO.find(WorkspaceFolder.class,folderID);
+		User user = (User)baseDAO.find(User.class,userID);
 		if(user!=null){
 			if(!getPermissions(workspaceFolder,user).equals(WorkspaceFolder.OWNER_ACCESS)){
 				flashMessage = FlashMessage.getUserNotAuthorized(MSG_KEY_DELETE,userID);
@@ -315,14 +274,14 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 					}
 				}
 				
-				workspaceFolderDAO.update(folder); //this call will delete the files and learningdesigns which were removed from the collection above.
+				baseDAO.update(folder); //this call will delete the files and learningdesigns which were removed from the collection above.
 				
 			}
 			
 		}
 		if(isDeleteSuccessful) //it will only delete this folder if all the files/folder/learningDesigns are all deleted
 		{
-			workspaceFolderDAO.delete(folder);
+			baseDAO.delete(folder);
 			flashMessage = new FlashMessage(MSG_KEY_DELETE,messageService.getMessage("folder.delete", new Object[]{folderID}));
 		}
 				
@@ -341,7 +300,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	 */
 	private boolean isRootFolder(WorkspaceFolder workspaceFolder){
 		try{
-			Workspace workspace = workspaceDAO.getWorkspaceByRootFolderID(workspaceFolder.getWorkspaceFolderId());
+			Workspace workspace = (Workspace)baseDAO.findByProperty(Workspace.class,"rootFolder.workspaceFolderId",workspaceFolder.getWorkspaceFolderId()).get(0);
 			if(workspace!=null)
 				return true;
 			else
@@ -356,7 +315,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	 * anything from the folder.
 	 */
 	public WorkspaceFolder getWorkspaceFolder(Integer workspaceFolderID) {
-		return workspaceFolderDAO.getWorkspaceFolderByID(workspaceFolderID);
+		return (WorkspaceFolder)baseDAO.find(WorkspaceFolder.class,workspaceFolderID);
 	}
 	
 	/**
@@ -364,7 +323,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#getFolderContentsExcludeHome(java.lang.Integer, java.lang.Integer, java.lang.Integer)
 	 */
 	public Vector<FolderContentDTO> getFolderContentsExcludeHome(Integer userID, WorkspaceFolder folder, Integer mode)throws UserAccessDeniedException, RepositoryCheckedException {
-		User user = userDAO.getUserById(userID);
+		User user = (User)baseDAO.find(User.class,userID);
 		return getFolderContentsInternal(user, folder, mode, "getFolderContentsExcludeHome", user.getWorkspace().getRootFolder());
 	}
 	 
@@ -374,7 +333,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#getFolderContents(java.lang.Integer, java.lang.Integer, java.lang.Integer)
 	 */
 	public Vector<FolderContentDTO> getFolderContents(Integer userID, WorkspaceFolder folder, Integer mode)throws UserAccessDeniedException, RepositoryCheckedException {
-		User user = userDAO.getUserById(userID);
+		User user = (User)baseDAO.find(User.class,userID);
 		return getFolderContentsInternal(user, folder, mode, "getFolderContents", null);
 	}
 	
@@ -539,7 +498,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	public String copyFolder(Integer folderID,Integer targetFolderID,Integer userID)throws IOException{
 		try{
 			if(isUserAuthorized(targetFolderID,userID)){
-				WorkspaceFolder workspaceFolder = workspaceFolderDAO.getWorkspaceFolderByID(folderID);
+				WorkspaceFolder workspaceFolder = (WorkspaceFolder)baseDAO.find(WorkspaceFolder.class,folderID);
 				if(workspaceFolder!=null){
 					WorkspaceFolder newFolder = createFolder(targetFolderID,workspaceFolder.getName(),userID);
 					copyRootContent(workspaceFolder,newFolder,userID);				
@@ -604,9 +563,9 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	 */
 	private boolean isUserAuthorized(Integer folderID, Integer userID)throws UserException, WorkspaceFolderException{
 		boolean authorized = false;
-		User user = userDAO.getUserById(userID);
+		User user = (User)baseDAO.find(User.class,userID);
 		if(user!=null){
-			WorkspaceFolder targetParent = workspaceFolderDAO.getWorkspaceFolderByID(folderID);
+			WorkspaceFolder targetParent = (WorkspaceFolder)baseDAO.find(WorkspaceFolder.class,folderID);
 			if(targetParent!=null){
 				Integer permissions = getPermissions(targetParent,user);
 				if(!permissions.equals(WorkspaceFolder.NO_ACCESS)&&
@@ -621,7 +580,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	}
 
 	public void copyRootContent(WorkspaceFolder workspaceFolder,WorkspaceFolder targetWorkspaceFolder, Integer userID)throws UserException{
-		User user = userDAO.getUserById(userID);
+		User user = (User)baseDAO.find(User.class,userID);
 		if(user==null)
 			throw new UserException(messageService.getMessage("no.such.user",new Object[]{userID}));
 		
@@ -637,7 +596,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		}
 	}
 	public WorkspaceFolder createFolder(Integer parentFolderID, String name, Integer userID) throws UserException,WorkspaceFolderException{
-		WorkspaceFolder parentFolder = workspaceFolderDAO.getWorkspaceFolderByID(parentFolderID);		
+		WorkspaceFolder parentFolder = (WorkspaceFolder)baseDAO.find(WorkspaceFolder.class,parentFolderID);		
 		User user =null;
 		Workspace workspace =null;		
 		
@@ -652,7 +611,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 					break;
 			}
 			
-			user =  userDAO.getUserById(userID);
+			user =  (User)baseDAO.find(User.class,userID);
 			if(user!=null){
 				workspace = user.getWorkspace();
 				WorkspaceFolder workspaceFolder = new WorkspaceFolder(name,
@@ -662,7 +621,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 																	  new Date(),
 																	  new Date(),
 																	  WorkspaceFolder.NORMAL);
-				workspaceFolderDAO.insert(workspaceFolder);
+				baseDAO.insert(workspaceFolder);
 				return workspaceFolder;	
 			}else
 				throw new UserException(messageService.getMessage("no.such.user",new Object[]{userID}));
@@ -692,7 +651,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		return flashMessage.serializeMessage();
 	}
 	private boolean ifNameExists(WorkspaceFolder targetFolder,String folderName){
-		List folders = workspaceFolderDAO.getWorkspaceFolderByParentFolder(targetFolder.getWorkspaceFolderId());
+		List folders = baseDAO.findByProperty(WorkspaceFolder.class,"parentWorkspaceFolder.workspaceFolderId",targetFolder.getWorkspaceFolderId());
 		if(folders!=null && folders.size()!=0){
 			Iterator iterator = folders.iterator();
 			while(iterator.hasNext()){
@@ -738,7 +697,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	 * @throws IOException
 	 */
 	public String deleteLearningDesign(Long learningDesignID, Integer userID)throws IOException{
-		User user = userDAO.getUserById(userID);
+		User user = (User)baseDAO.find(User.class,userID);
 		if(user!=null){
 			LearningDesign learningDesign = learningDesignDAO.getLearningDesignById(learningDesignID);
 		
@@ -808,11 +767,11 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	public String moveFolder(Integer currentFolderID,Integer targetFolderID,Integer userID)throws IOException{
 		try{
 			if(isUserAuthorized(targetFolderID,userID)){
-				WorkspaceFolder currentFolder = workspaceFolderDAO.getWorkspaceFolderByID(currentFolderID);
+				WorkspaceFolder currentFolder = (WorkspaceFolder)baseDAO.find(WorkspaceFolder.class,currentFolderID);
 				if(currentFolder!=null){
-					WorkspaceFolder targetFolder = workspaceFolderDAO.getWorkspaceFolderByID(targetFolderID);
+					WorkspaceFolder targetFolder = (WorkspaceFolder)baseDAO.find(WorkspaceFolder.class,targetFolderID);
 					currentFolder.setParentWorkspaceFolder(targetFolder);
-					workspaceFolderDAO.update(currentFolder);
+					baseDAO.update(currentFolder);
 					flashMessage = new FlashMessage(MSG_KEY_MOVE, targetFolderID);
 				}else
 					throw new WorkspaceFolderException();
@@ -885,12 +844,12 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		// TODO add some validation so that a non-unique name doesn't result in an index violation 
 		// bit hard for the user to understand.
 		
-		WorkspaceFolder workspaceFolder = workspaceFolderDAO.getWorkspaceFolderByID(workspaceFolderID);
+		WorkspaceFolder workspaceFolder = (WorkspaceFolder)baseDAO.find(WorkspaceFolder.class,workspaceFolderID);
 		if(workspaceFolder!=null){
 			if (!contentAlreadyExists(workspaceFolder, name, mimeType))
 			{
 				WorkspaceFolderContent workspaceFolderContent = new WorkspaceFolderContent(contentTypeID,name,description,new Date(),new Date(),mimeType,workspaceFolder);
-				workspaceFolderContentDAO.insert(workspaceFolderContent);
+				baseDAO.insert(workspaceFolderContent);
 			
 		
 	
@@ -899,7 +858,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 				NodeKey nodeKey = addFileToRepository(stream,name,mimeType);
 				workspaceFolderContent.setUuid(nodeKey.getUuid());
 				workspaceFolderContent.setVersionID(nodeKey.getVersion());
-				workspaceFolderContentDAO.update(workspaceFolderContent);
+				baseDAO.update(workspaceFolderContent);
 				
 				UpdateContentDTO contentDTO = new UpdateContentDTO(nodeKey.getUuid(), nodeKey.getVersion(),workspaceFolderContent.getFolderContentID());
 				flashMessage = new FlashMessage(MSG_KEY_CREATE_WKF_CONTENT,contentDTO);
@@ -963,7 +922,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	 */
 	public String updateWorkspaceFolderContent(Long folderContentID,String path)throws Exception{
 		InputStream stream = new FileInputStream(path);
-		WorkspaceFolderContent workspaceFolderContent = workspaceFolderContentDAO.getWorkspaceFolderContentByID(folderContentID);
+		WorkspaceFolderContent workspaceFolderContent = (WorkspaceFolderContent)baseDAO.find(WorkspaceFolderContent.class,folderContentID);
 		if(workspaceFolderContent!=null){
 			NodeKey nodeKey = updateFileInRepository(workspaceFolderContent,stream);
 			UpdateContentDTO contentDTO = new UpdateContentDTO(nodeKey.getUuid(), nodeKey.getVersion(),folderContentID);
@@ -1014,7 +973,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 														   stream,workspaceFolderContent.getMimeType(),null);
 		workspaceFolderContent.setUuid(nodeKey.getUuid());
 		workspaceFolderContent.setVersionID(nodeKey.getVersion());
-		workspaceFolderContentDAO.update(workspaceFolderContent);
+		baseDAO.update(workspaceFolderContent);
 		return nodeKey;
 	}
 	/**
@@ -1022,7 +981,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#deleteContentWithVersion(java.lang.Long, java.lang.Long, java.lang.Long)
 	 */
 	public String deleteContentWithVersion(Long uuid, Long versionToBeDeleted,Long folderContentID)throws Exception{
-		WorkspaceFolderContent workspaceFolderContent = workspaceFolderContentDAO.getWorkspaceFolderContentByID(folderContentID);
+		WorkspaceFolderContent workspaceFolderContent = (WorkspaceFolderContent)baseDAO.find(WorkspaceFolderContent.class,folderContentID);
 		if (workspaceFolderContent != null)
 		{
 			Long databaseVersion = workspaceFolderContent.getVersionID();
@@ -1065,11 +1024,11 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 				Long latestAvailableVersion = latestAvailableNode.getVersion();
 				if(databaseVersion.equals(versionToBeDeleted)){
 					workspaceFolderContent.setVersionID(latestAvailableVersion);
-					workspaceFolderContentDAO.update(workspaceFolderContent);
+					baseDAO.update(workspaceFolderContent);
 				}
 				flashMessage = new FlashMessage(MSG_KEY_DELETE_VERSION,messageService.getMessage("content.delete.success"));			
 			}catch(ItemNotFoundException ie){
-				workspaceFolderContentDAO.delete(workspaceFolderContent);
+				baseDAO.delete(workspaceFolderContent);
 				flashMessage = new FlashMessage(MSG_KEY_DELETE_VERSION,messageService.getMessage("content.delete.success"));
 			}
 		}
@@ -1089,9 +1048,9 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	 * @throws Exception
 	 */
 	public String deleteWorkspaceFolderContent(Long folderContentID) throws IOException {
-		WorkspaceFolderContent workspaceFolderContent = workspaceFolderContentDAO.getWorkspaceFolderContentByID(folderContentID);
+		WorkspaceFolderContent workspaceFolderContent = (WorkspaceFolderContent)baseDAO.find(WorkspaceFolderContent.class,folderContentID);
 		if(workspaceFolderContent!=null){
-			workspaceFolderContentDAO.delete(workspaceFolderContent);
+			baseDAO.delete(workspaceFolderContent);
 			flashMessage = new FlashMessage(MSG_KEY_DELETE,"Content deleted");
 		}else
 			flashMessage = FlashMessage.getNoSuchWorkspaceFolderContentExsists(MSG_KEY_DELETE,folderContentID);
@@ -1139,12 +1098,12 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#getAccessibleOrganisationWorkspaceFolders(java.lang.Integer)
 	 */
 	public Vector getAccessibleOrganisationWorkspaceFolders(Integer userID)	throws IOException {
-		User user = userDAO.getUserById(userID);
+		User user = (User)baseDAO.find(User.class,userID);
 		Vector<FolderContentDTO> folders = new Vector<FolderContentDTO>();
 		
 		if (user != null) {
 			// Get a list of organisations of which the given user is a member
-			List userMemberships = userOrganisationDAO.getUserOrganisationsByUser(user);
+			Set userMemberships = user.getUserOrganisations();
 			if (userMemberships != null) {
 				Iterator memberships = userMemberships.iterator();
 				while (memberships.hasNext()) {
@@ -1185,7 +1144,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#getUserWorkspaceFolder(java.lang.Integer)
 	 */
 	public FolderContentDTO getUserWorkspaceFolder(Integer userID)	throws IOException {
-		User user = userDAO.getUserById(userID);
+		User user = (User)baseDAO.find(User.class,userID);
 		
 		if (user != null) {
 			//add the user's own folder to the list
@@ -1249,7 +1208,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 			if(isUserAuthorized(targetWorkspaceFolderID,userID)){
 				LearningDesign learningDesign = learningDesignDAO.getLearningDesignById(learningDesignID);
 				if (learningDesign != null) {
-					WorkspaceFolder workspaceFolder = workspaceFolderDAO.getWorkspaceFolderByID(targetWorkspaceFolderID);
+					WorkspaceFolder workspaceFolder = (WorkspaceFolder)baseDAO.find(WorkspaceFolder.class,targetWorkspaceFolderID);
 					if(workspaceFolder != null){
 						learningDesign.setWorkspaceFolder(workspaceFolder);
 						learningDesignDAO.update(learningDesign);
@@ -1307,14 +1266,14 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	 */
 	public String renameWorkspaceFolder(Integer workspaceFolderID,String newName,Integer userID)throws IOException{
 		try{
-			WorkspaceFolder folder = workspaceFolderDAO.getWorkspaceFolderByID(workspaceFolderID);
+			WorkspaceFolder folder = (WorkspaceFolder)baseDAO.find(WorkspaceFolder.class,workspaceFolderID);
 			if(folder!=null){
 				WorkspaceFolder parent = folder.getParentWorkspaceFolder();
 				if(parent!=null){
 					if(isUserAuthorized(workspaceFolderID,userID)){
 						if(!ifNameExists(parent,newName)){
 							folder.setName(newName);
-							workspaceFolderDAO.update(folder);
+							baseDAO.update(folder);
 							flashMessage = new FlashMessage(MSG_KEY_RENAME,newName);
 						}else
 							flashMessage = new FlashMessage(MSG_KEY_RENAME,
@@ -1373,7 +1332,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#getWorkspace(java.lang.Integer)
 	 */
 	public String getWorkspace(Integer userID) throws IOException {
-		User user = userDAO.getUserById(userID);
+		User user = (User)baseDAO.find(User.class,userID);
 		if (user != null) {
 			Workspace workspace = user.getWorkspace();
 			flashMessage = new FlashMessage("getWorkspace", workspace.getWorkspaceDTO());
@@ -1387,7 +1346,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	 */
 	public String getOrganisationsByUserRole(Integer userID, List<String> roleNames, Integer courseId, List<Integer> restrictToClassIds) throws IOException
 	{
-		User user = userDAO.getUserById(userID);
+		User user = (User)baseDAO.find(User.class,userID);
 		
 		if (user!=null) {
 			if ( courseId == null ) {
@@ -1410,7 +1369,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	 */
 	public String getUserOrganisation(Integer userID, Integer organisationId) throws IOException
 	{
-		User user = userDAO.getUserById(userID);
+		User user = (User)baseDAO.find(User.class,userID);
 		
 		if (user!=null) {
 			OrganisationDTO orgDTO = userMgmtService.getOrganisationForUserWithRole(user, organisationId);

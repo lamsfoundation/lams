@@ -32,7 +32,6 @@ import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.contentrepository.service.RepositoryProxy;
 import org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO;
 import org.lamsfoundation.lams.test.AbstractLamsTestCase;
-import org.lamsfoundation.lams.usermanagement.dao.IWorkspaceFolderDAO;
 import org.lamsfoundation.lams.workspace.dao.IWorkspaceFolderContentDAO;
 
 /**
@@ -47,7 +46,6 @@ public class BaseWorkspaceTest extends AbstractLamsTestCase {
     protected String testFileString = null; 
 
 	protected WorkspaceManagementService workspaceManagementService;
-	protected IWorkspaceFolderDAO workspaceFolderDAO;
 	protected IWorkspaceFolderContentDAO workspaceFolderContentDAO;
 	protected ILearningDesignDAO learningDesignDAO;
 	protected IRepositoryService repositoryService;	
@@ -58,7 +56,6 @@ public class BaseWorkspaceTest extends AbstractLamsTestCase {
 	public void setUp() throws Exception {
 		super.setUp();		
 		workspaceManagementService =(WorkspaceManagementService)context.getBean("workspaceManagementService");
-		workspaceFolderDAO = (IWorkspaceFolderDAO)context.getBean("workspaceFolderDAO");
 		workspaceFolderContentDAO =(IWorkspaceFolderContentDAO)context.getBean("workspaceFolderContentDAO");
 		learningDesignDAO =(ILearningDesignDAO)context.getBean("learningDesignDAO");
 		repositoryService = RepositoryProxy.getLocalRepositoryService();

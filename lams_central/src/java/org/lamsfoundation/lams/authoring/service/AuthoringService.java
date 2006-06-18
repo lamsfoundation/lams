@@ -41,6 +41,7 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.authoring.IObjectExtractor;
 import org.lamsfoundation.lams.authoring.ObjectExtractorException;
 import org.lamsfoundation.lams.authoring.dto.StoreLearningDesignResultsDTO;
+import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
 import org.lamsfoundation.lams.learningdesign.Grouping;
@@ -70,8 +71,6 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
-import org.lamsfoundation.lams.usermanagement.dao.hibernate.UserDAO;
-import org.lamsfoundation.lams.usermanagement.dao.hibernate.WorkspaceFolderDAO;
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.usermanagement.exception.WorkspaceFolderException;
 import org.lamsfoundation.lams.util.Configuration;
@@ -97,8 +96,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	protected LearningDesignDAO learningDesignDAO;
 	protected LearningLibraryDAO learningLibraryDAO;
 	protected ActivityDAO activityDAO;
-	protected UserDAO userDAO;
-	protected WorkspaceFolderDAO workspaceFolderDAO;
+	protected BaseDAO baseDAO;
 	protected TransitionDAO transitionDAO;
 	protected ToolDAO toolDAO;
 	protected LicenseDAO licenseDAO;
@@ -159,10 +157,10 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 		this.learningLibraryDAO = learningLibraryDAO;
 	}
 	/**
-	 * @param userDAO The userDAO to set.
+	 * @param baseDAO The baseDAO to set.
 	 */
-	public void setUserDAO(UserDAO userDAO) {
-		this.userDAO = userDAO;
+	public void setBaseDAO(BaseDAO baseDAO) {
+		this.baseDAO = baseDAO;
 	}
 	/**
 	 * @param activityDAO The activityDAO to set.
@@ -170,12 +168,6 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	public void setActivityDAO(ActivityDAO activityDAO) {
 		this.activityDAO = activityDAO;
 	}	
-	/**
-	 * @param workspaceFolderDAO The workspaceFolderDAO to set.
-	 */
-	public void setWorkspaceFolderDAO(WorkspaceFolderDAO workspaceFolderDAO) {
-		this.workspaceFolderDAO = workspaceFolderDAO;
-	}
 	/**
 	 * @param toolDAO The toolDAO to set 
 	 */
@@ -290,11 +282,11 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 		if(originalDesign==null)
 			throw new LearningDesignException(messageService.getMessage("no.such.learningdesign.exist",new Object[]{originalDesignID}));
 		
-		User user = userDAO.getUserById(userID);
+		User user = (User)baseDAO.find(User.class,userID);
 		if(user==null)
 			throw new UserException(messageService.getMessage("no.such.user.exist",new Object[]{userID}));
 		
-		WorkspaceFolder workspaceFolder = workspaceFolderDAO.getWorkspaceFolderByID(workspaceFolderID);
+		WorkspaceFolder workspaceFolder = (WorkspaceFolder)baseDAO.find(WorkspaceFolder.class,workspaceFolderID);
 		if(workspaceFolder==null)
 			throw new WorkspaceFolderException(messageService.getMessage("no.such.workspace.exist",new Object[]{workspaceFolderID}));
 		

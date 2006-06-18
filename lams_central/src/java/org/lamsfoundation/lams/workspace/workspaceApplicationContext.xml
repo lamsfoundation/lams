@@ -15,13 +15,8 @@
 	<!-- ========================= BUSINESS OBJECT DEFINITIONS ========================= -->	
 	<bean id="workspaceServiceTarget" class="org.lamsfoundation.lams.workspace.service.WorkspaceManagementService">
 		<property name="learningDesignDAO"><ref bean="learningDesignDAO"/></property>
-		<property name="userDAO"><ref bean="userDAO"/></property>
-		<property name="workspaceFolderDAO"><ref bean="workspaceFolderDAO"/></property>
-		<property name="workspaceDAO"><ref bean="userManagementWorkspaceDAO"/></property>
-		<property name="organisationDAO"><ref bean="organisationDAO"/></property>
+		<property name="baseDAO"><ref bean="baseDAO"/></property>
 		<property name="authoringService"><ref bean="authoringService"/></property>
-		<property name="userOrganisationDAO"><ref bean="userOrganisationDAO"/></property>
-		<property name="workspaceFolderContentDAO"><ref bean="workspaceFolderContentDAO"/></property>
 		<property name="userMgmtService"><ref bean="userManagementService"/></property>
 		<property name="messageService"><ref bean="workspaceMessageService"/></property>
 	</bean>

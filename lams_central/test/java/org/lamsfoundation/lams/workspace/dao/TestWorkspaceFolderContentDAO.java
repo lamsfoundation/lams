@@ -39,7 +39,10 @@ import org.lamsfoundation.lams.workspace.service.BaseWorkspaceTest;
  */
 public class TestWorkspaceFolderContentDAO extends BaseWorkspaceTest {
 	
-	protected WorkspaceFolder workspaceFolder;
+	public TestWorkspaceFolderContentDAO(String name){
+		super(name);
+	}
+/*	protected WorkspaceFolder workspaceFolder;
 	
 	protected String workspaceUser = "workspaceManager";
 	protected String password = "flashClient";
@@ -91,4 +94,4 @@ public class TestWorkspaceFolderContentDAO extends BaseWorkspaceTest {
 		workspaceFolderContentDAO.update(workspaceFolderContent);
 		System.out.println(nodeKey.getVersion() + ": " + workspaceFolderContent.getVersionID());
 	}	
-}
+*/}

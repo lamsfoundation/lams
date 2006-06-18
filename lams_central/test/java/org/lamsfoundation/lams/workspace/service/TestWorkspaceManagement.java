@@ -40,7 +40,10 @@ import org.springframework.orm.hibernate3.HibernateObjectRetrievalFailureExcepti
  */
 public class TestWorkspaceManagement extends BaseWorkspaceTest {
 	
-	private static final Integer MACQ_UNI_WORKSPACE_FOLDER = new Integer(2);
+	public TestWorkspaceManagement(String name){
+		super(name);
+	}
+/*	private static final Integer MACQ_UNI_WORKSPACE_FOLDER = new Integer(2);
 	private static final Integer MELCOE_WORKSPACE_FOLDER = new Integer(3);
 	private static final Integer LAMS_WORKSPACE_FOLDER = new Integer(4);
 	private static final Integer MANPREETS_WORKSPACE_FOLDER = new Integer(6);
@@ -135,8 +138,8 @@ public class TestWorkspaceManagement extends BaseWorkspaceTest {
 		assertNotNull("New content is uuid is populated", nk.getUuid());
 		assertTrue("New content is version 1", nk.getVersion() != null && nk.getVersion().longValue() == 1);
 	}
-	/**This method just creates different versions of the given file. Checks the version in both 
-	 * the wddx packet and the database object. */
+	*//**This method just creates different versions of the given file. Checks the version in both 
+	 * the wddx packet and the database object. *//*
 	public void testUpdateWorkspaceFolderContent() throws Exception{
 
 		// create some content to play with. name must be unique or it will throw a key error.
@@ -221,11 +224,11 @@ public class TestWorkspaceManagement extends BaseWorkspaceTest {
 		assertNull("Deleted content can't be found via getContentByWorkspaceFolder()", getMatchingContent(nk, LONG_DOCUMENTS_WORKSPACE_FOLDER));
 	}		
 
-	/**
+	*//**
 	 * @param nk
 	 * @param content
 	 * @return
-	 */
+	 *//*
 	private WorkspaceFolderContent getMatchingContent(NodeKey nk, Integer folderId) {
 		assertNotNull(nk);
 		assertNotNull(folderId);
@@ -241,7 +244,7 @@ public class TestWorkspaceManagement extends BaseWorkspaceTest {
 		}
 		return null;
 	}
-/*
+
 	public void testMoveRenameLearningdesign()throws IOException{
 
 		LearningDesign originalDesign = learningDesignDAO.getLearningDesignById(LD_ID);
@@ -308,15 +311,15 @@ public class TestWorkspaceManagement extends BaseWorkspaceTest {
 		assertEquals(packetFolderName, folder.getName());
 		
 	}
-	*/
-	/**
+	
+	*//**
 	 * Given a WDDX packet in our normal format, return the NodeKey object in the 
 	 * messageValue parameter. This is needed for createWorkspaceFolderContent,
 	 * updateWorkspaceFolderContent
 	 * 
      * @param wddxPacket
      * @return NodeKey
-     */
+     *//*
     public NodeKey extractNodeKeyFromWDDXPacket(String wddxPacket) {
     	
     	Map map = extractIdMapFromWDDXPacket(wddxPacket);
@@ -329,7 +332,7 @@ public class TestWorkspaceManagement extends BaseWorkspaceTest {
     	return new NodeKey(new Long(uuid.longValue()), new Long(version.longValue()));
 	}
 
-	/** Test the getOrganisationsByUserRoleOneTree call for the mmm user, who has all their orgs in one hierarchy */ 
+	*//** Test the getOrganisationsByUserRoleOneTree call for the mmm user, who has all their orgs in one hierarchy *//* 
 	public void testGetOrganisationsByUserRoleOneTree() {
 		try {
 			ArrayList<String> list = new ArrayList<String>();
@@ -354,7 +357,7 @@ public class TestWorkspaceManagement extends BaseWorkspaceTest {
 		assertTrue("Packet contains "+name+" exactly once.", firstIndexOf>-1 && firstIndexOf==lastIndexOf);
 	}
 	
-	/** Test the getOrganisationsByUserRoleOneTree call for the test1 user, whose orgs are spread over two hierarchies */ 
+	*//** Test the getOrganisationsByUserRoleOneTree call for the test1 user, whose orgs are spread over two hierarchies *//* 
 	public void testGetOrganisationsByUserRoleTwoTrees() {
 		try {
 			ArrayList<String> list = new ArrayList<String>();
@@ -372,4 +375,4 @@ public class TestWorkspaceManagement extends BaseWorkspaceTest {
 		}
 
 	}	
-}
+*/}

@@ -82,7 +82,7 @@ public class ImportToolContentServlet extends HttpServlet {
 			HttpSession ss = SessionManager.getSession();
 			//get back login user DTO
 			UserDTO userDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
-			User user = getUserService().getUserById(userDto.getUserID());
+			User user = (User)getUserService().findById(User.class,userDto.getUserID());
 			
         	FileItem file = null;
         	Map params = new HashMap();
