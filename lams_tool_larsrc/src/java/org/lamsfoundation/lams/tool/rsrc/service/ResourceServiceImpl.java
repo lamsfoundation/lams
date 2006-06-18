@@ -81,6 +81,7 @@ import org.lamsfoundation.lams.tool.rsrc.model.ResourceSession;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
 import org.lamsfoundation.lams.tool.rsrc.util.ResourceToolContentHandler;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
@@ -784,7 +785,7 @@ public class ResourceServiceImpl implements
 			ResourceUser user = resourceUserDao.getUserByUserID(new Long(newUserUid.longValue()));
 			if(user == null){
 				user = new ResourceUser();
-				UserDTO sysUser = userManagementService.getUserById(newUserUid).getUserDTO();
+				UserDTO sysUser = ((User)userManagementService.findById(User.class,newUserUid)).getUserDTO();
 				user.setFirstName(sysUser.getFirstName());
 				user.setLastName(sysUser.getLastName());
 				user.setLoginName(sysUser.getLogin());

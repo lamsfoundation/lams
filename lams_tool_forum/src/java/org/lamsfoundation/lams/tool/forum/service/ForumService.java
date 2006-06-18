@@ -82,6 +82,7 @@ import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
 import org.lamsfoundation.lams.tool.forum.util.ForumToolContentHandler;
 import org.lamsfoundation.lams.tool.forum.util.TopicComparator;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
@@ -654,7 +655,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 			ForumUser user = forumUserDao.getByUserId(new Long(newUserUid.longValue()));
 			if(user == null){
 				user = new ForumUser();
-				UserDTO sysUser = userManagementService.getUserById(newUserUid).getUserDTO();
+				UserDTO sysUser = ((User)userManagementService.findById(User.class,newUserUid)).getUserDTO();
 				user.setFirstName(sysUser.getFirstName());
 				user.setLastName(sysUser.getLastName());
 				user.setLoginName(sysUser.getLogin());
