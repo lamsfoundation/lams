@@ -27,7 +27,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-lams" prefix="lams" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html:html locale="true" xhtml="true">
 
 	<tiles:useAttribute name="pageTitle" ignore="false" />
@@ -37,7 +37,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<title><c:out value="${pageTitle}" /></title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<lams:css/>
-		<META HTTP-EQUIV="Refresh" CONTENT="60;URL=<lams:WebAppURL/>/gate.do?method=knockGate">
+		<META HTTP-EQUIV="Refresh" CONTENT="60;URL=<lams:WebAppURL/>/gate.do?method=knockGate&activityID=${GateForm.map.activityId}">
 	  </head>
 
 	<body>

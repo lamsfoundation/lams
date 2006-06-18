@@ -28,7 +28,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <div align="center">
 
-<c:set var="formAction" value="/grouping.do?method=performGrouping"/>
+<c:set var="formAction">/grouping.do?method=performGrouping&activityID=${activity.activityId}</c:set>
 
 	<h1><fmt:message key="label.view.groups.title"/></h1>
 	<table border="0" cellpadding="0" cellspacing="0" summary="This table is being used for layout purposes">
@@ -37,12 +37,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</tr>
 	
 	<c:if test="${GroupingForm.map.previewLesson == true}">
-	<c:set var="formAction"><c:out value="${formAction}"/>&force=true</c:set>
-	<tr><td>&nbsp;</td></tr>
-	<tr>
-		<td><em><fmt:message key="label.grouping.preview.message"/></em></td>
-	</tr>
-	<tr><td>&nbsp;</td></tr>
+		<c:set var="formAction"><c:out value="${formAction}"/>&force=true</c:set>
+		<tr><td>&nbsp;</td></tr>
+		<tr>
+			<td><em><fmt:message key="label.grouping.preview.message"/></em></td>
+		</tr>
+		<tr><td>&nbsp;</td></tr>
 	</c:if>
 
 	<tr>

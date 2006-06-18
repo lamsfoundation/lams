@@ -36,7 +36,6 @@ import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
-import org.lamsfoundation.lams.lesson.Lesson;
 
 /**
  * @author daveg
@@ -72,27 +71,26 @@ public class CompleteActivityAction extends ActivityAction {
 			return mapping.findForward(ActivityMapping.DOUBLE_SUBMIT_ERROR);
 		}
 		
+		ILearnerService learnerService = getLearnerService();
+
 		Integer learnerId = LearningWebUtil.getUserId();
-		LearnerProgress progress = getLearnerProgress(request);
-		Lesson lesson = progress.getLesson();
-		Activity activity = LearningWebUtil.getActivityFromRequest(request, getLearnerService());
+		LearnerProgress progress = LearningWebUtil.getLearnerProgress(request, learnerService);
+		Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
 		
 		if (activity == null) {
 		    log.error(className+": No activity in request or session");
 			return mapping.findForward(ActivityMapping.ERROR);
 		}
 
-		ILearnerService learnerService = getLearnerService();
-		
 		// Set activity as complete
 		try {
-			progress = learnerService.calculateProgress(activity, learnerId, lesson.getLessonId());
+			progress = learnerService.calculateProgress(activity, learnerId);
 		}
 		catch (LearnerServiceException e) {
 			return mapping.findForward("error");
 		}
 		LearningWebUtil.putActivityInRequest(request, progress.getNextActivity(), learnerService);
-		setLearnerProgress(request,progress);
+		LearningWebUtil.putLearnerProgressInRequest(request,progress);
 		
 		// need to do the calculateProgress first as the chooseActivity changes the progress details 
 		setupProgressString(actionForm, request);

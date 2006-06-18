@@ -122,9 +122,6 @@ public class TestLearnerAction extends AbstractTestAction
         addRequestParameter(AttributeNames.PARAM_LESSON_ID, TEST_LESSON_ID);
         
         actionPerform();
-        
-        verifyForward("welcome");
-        verifyTilesForward("welcome",".welcome");
         verifyNoActionErrors();
     }
 

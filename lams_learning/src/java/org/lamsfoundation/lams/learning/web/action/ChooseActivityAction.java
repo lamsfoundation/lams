@@ -68,21 +68,22 @@ public class ChooseActivityAction extends ActivityAction {
 			return mapping.findForward(ActivityMapping.DOUBLE_SUBMIT_ERROR);
 		}
 		
+		ILearnerService learnerService = getLearnerService();
+
 		// Get learner and lesson details.
 		Integer learner = LearningWebUtil.getUserId();
-		LearnerProgress progress = getLearnerProgress(request);
+		LearnerProgress progress = LearningWebUtil.getLearnerProgress(request,learnerService);
 		Lesson lesson = progress.getLesson();
 		
-		Activity activity = LearningWebUtil.getActivityFromRequest(request, getLearnerService());
+		Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
 		
 		if (activity == null) {
 		    log.error(className+": No activity in request or session");
 			return mapping.findForward(ActivityMapping.ERROR);
 		}
 
-		ILearnerService learnerService = getLearnerService();
 		progress = learnerService.chooseActivity(learner, lesson.getLessonId(), activity);
-		setLearnerProgress(request,progress);
+		LearningWebUtil.putLearnerProgressInRequest(request,progress);
 
 		// need to do the choose first as the chooseActivity changes the progress details 
 		setupProgressString(actionForm, request);

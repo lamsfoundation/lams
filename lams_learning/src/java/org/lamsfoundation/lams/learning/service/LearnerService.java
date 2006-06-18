@@ -35,7 +35,6 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learning.progress.ProgressEngine;
 import org.lamsfoundation.lams.learning.progress.ProgressException;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
-import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Grouping;
@@ -308,16 +307,14 @@ public class LearnerService implements ILearnerService
      * to the learner.
      * @param completedActivityID identifies the activity just completed
      * @param learner the Learner
-     * @param lessonId the Lesson in progress.
      * @return the bean containing the display data for the Learner
      * @throws LamsToolServiceException
      * @throws LearnerServiceException in case of problems.
      */
-    public LearnerProgress calculateProgress(Activity completedActivity, 
-                                             Integer learnerId, 
-                                             Long lessonId) 
+    public LearnerProgress calculateProgress(Activity completedActivity,Integer learnerId) 
     {
-        LearnerProgress learnerProgress = learnerProgressDAO.getLearnerProgressByLearner(learnerId,lessonId);
+    	Lesson lesson = getLessonByActivity(completedActivity);
+        LearnerProgress learnerProgress = learnerProgressDAO.getLearnerProgressByLearner(learnerId,lesson.getLessonId());
 
         try
         {
@@ -346,32 +343,25 @@ public class LearnerService implements ILearnerService
         
         lamsCoreToolService.updateToolSession(toolSession);
         
-        return completeActivity(new Integer(learnerId.intValue()), toolSession.getToolActivity(), toolSession.getLesson().getLessonId());
+        return completeActivity(new Integer(learnerId.intValue()), toolSession.getToolActivity());
     }
     
     /**
-     * @see org.lamsfoundation.lams.learning.service.ILearnerService#completeActivity(java.lang.Integer, java.lang.Long, java.lang.Long)
+     * @see org.lamsfoundation.lams.learning.service.ILearnerService#completeActivity(java.lang.Integer, java.lang.Long)
      */
-    public String completeActivity(Integer learnerId,Long activityId,Long lessonId) {
+    public String completeActivity(Integer learnerId,Long activityId) {
     	Activity activity = getActivity(activityId);
-    	return completeActivity(learnerId, activity,lessonId);
+    	return completeActivity(learnerId, activity);
     }
 
     /**
      * @see org.lamsfoundation.lams.learning.service.ILearnerService#completeActivity(java.lang.Integer, org.lamsfoundation.lams.learningdesign.Activity, java.lang.Long )
      */
-    public String completeActivity(Integer learnerId,Activity activity,Long lessonId)
+    public String completeActivity(Integer learnerId,Activity activity)
     {
-        //build up the url for next activity.
-    	
-    	// need to update the learner progress in the special user's session or the Flash 
-    	// side won't be notified of the correct progress (via the display activity screen).
-    	// this isn't nice as the service layer is calling the web layer, but as this
-    	// is triggered from a tool calling completeToolSession, its a bit hard to avoid.
     	try 
     	{
-	    	LearnerProgress nextLearnerProgress = calculateProgress(activity, learnerId, lessonId);
-	    	LearningWebUtil.setLearnerProgress(nextLearnerProgress);
+	    	LearnerProgress nextLearnerProgress = calculateProgress(activity, learnerId);
 	    	return activityMapping.getProgressURL(nextLearnerProgress);
     	}
         catch (UnsupportedEncodingException e)
@@ -443,7 +433,7 @@ public class LearnerService implements ILearnerService
 	    		}
 	    		
 	    	} else {
-	    		String error = "Grouping activity "+groupingActivityId+" learner "+learnerId+" does not exist. Cannot perform grouping.";
+	    		String error = "Grouping activity "+groupingActivity.getActivityId()+" learner "+learnerId+" does not exist. Cannot perform grouping.";
 	            log.error(error);
 	            throw new LearnerServiceException(error);
 	    	}
@@ -455,12 +445,12 @@ public class LearnerService implements ILearnerService
     	
 
     /**
-     * @see org.lamsfoundation.lams.learning.service.ILearnerService#knockGate(java.lang.Long, java.lang.Long, org.lamsfoundation.lams.usermanagement.User)
+     * @see org.lamsfoundation.lams.learning.service.ILearnerService#knockGate(java.lang.Long, org.lamsfoundation.lams.usermanagement.User)
      */
-    public boolean knockGate(Long lessonId, Long gateActivityId, User knocker, boolean forceGate) {
+    public boolean knockGate(Long gateActivityId, User knocker, boolean forceGate) {
     	GateActivity gate = (GateActivity) activityDAO.getActivityByActivityId(gateActivityId, GateActivity.class);
     	if ( gate != null ) {
-    		return knockGate(lessonId, gate,knocker, forceGate);
+    		return knockGate(gate,knocker, forceGate);
     	} 
     	
 		String error = "Gate activity "+gateActivityId+" does not exist. Cannot knock on gate.";
@@ -468,17 +458,18 @@ public class LearnerService implements ILearnerService
 		throw new LearnerServiceException(error);
     }
     /**
-     * @see org.lamsfoundation.lams.learning.service.ILearnerService#knockGate(java.lang.Long, org.lamsfoundation.lams.learningdesign.GateActivity, org.lamsfoundation.lams.usermanagement.User)
+     * @see org.lamsfoundation.lams.learning.service.ILearnerService#knockGate(org.lamsfoundation.lams.learningdesign.GateActivity, org.lamsfoundation.lams.usermanagement.User)
      */
-    public boolean knockGate(Long lessonId, GateActivity gate, User knocker, boolean forceGate)
+    public boolean knockGate(GateActivity gate, User knocker, boolean forceGate)
     {
+    		Lesson lesson = getLessonByActivity(gate);
+    		
     		//get all learners who have started the lesson
-        	List lessonLearners = getActiveLearnersByLesson(lessonId);
+        	List lessonLearners = getActiveLearnersByLesson(lesson.getLessonId());
         	
         	boolean gateOpen = false;
         	
         	if ( forceGate ) {
-            	Lesson lesson = getLesson(lessonId);
             	if ( lesson.isPreviewLesson() ) {
             		// special case for preview - if forceGate is true then brute force open the gate
             		gateOpen = gate.forceGateOpen();
@@ -497,6 +488,43 @@ public class LearnerService implements ILearnerService
 	        
     }
     
+    /**
+     * @see org.lamsfoundation.lams.learning.service.ILearnerService#getLearnerActivityURL(java.lang.Integer, java.lang.Long)
+     */
+   public String getLearnerActivityURL(Integer learnerId, Long activityId) {    
+    	User learner = userManagementService.getUserById(learnerId);
+    	Activity requestedActivity = getActivity(activityId);
+    	Lesson lesson = getLessonByActivity(requestedActivity);
+    	return activityMapping.calculateActivityURLForProgressView(lesson,learner,requestedActivity);
+    }
+    
+   /**
+    * @see org.lamsfoundation.lams.learning.service.ILearnerService#getActiveLearnersByLesson(long)
+    */
+   public List getActiveLearnersByLesson(long lessonId)
+   {
+   	return lessonService.getActiveLessonLearners(lessonId);
+   }
+   
+   /**
+    * @see org.lamsfoundation.lams.learning.service.ILearnerService#getCountActiveLessonLearners(long)
+    */
+   public Integer getCountActiveLearnersByLesson(long lessonId)
+   {
+   	return lessonService.getCountActiveLessonLearners(lessonId);
+   }
+   
+   /** 
+    * Get the lesson for this activity. If the activity is not part of a lesson (ie is from an authoring 
+    * design then it will return null.
+    */
+   public Lesson getLessonByActivity(Activity activity) {
+	   Lesson lesson = lessonDAO.getLessonForActivity(activity.getActivityId());
+		if ( lesson == null ) {
+			log.warn("Tried to get lesson id for a non-lesson based activity. An error is likely to be thrown soon. Activity was "+activity);
+		}
+		return lesson;
+   }
     //---------------------------------------------------------------------
     // Helper Methods
     //---------------------------------------------------------------------
@@ -580,20 +608,5 @@ public class LearnerService implements ILearnerService
         return (LessonDTO[])lessonDTOList.toArray(new LessonDTO[lessonDTOList.size()]);   
     }
     
-    /**
-     * @see org.lamsfoundation.lams.learning.service.ILearnerService#getActiveLearnersByLesson(long)
-     */
-    public List getActiveLearnersByLesson(long lessonId)
-    {
-    	return lessonService.getActiveLessonLearners(lessonId);
-    }
-    
-    /**
-     * @see org.lamsfoundation.lams.learning.service.ILearnerService#getCountActiveLessonLearners(long)
-     */
-    public Integer getCountActiveLearnersByLesson(long lessonId)
-    {
-    	return lessonService.getCountActiveLessonLearners(lessonId);
-    }
 
 }

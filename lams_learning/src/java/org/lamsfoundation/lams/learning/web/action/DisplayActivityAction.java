@@ -31,18 +31,21 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 
 
 /** 
- * Action class to display an activity. This is used when Flash calls the service to the 
- * learning process. It is needed to put the activity in the request, on which 
- * LoadToolActivityAction relies. If you try to go straight to LoadToolActivityAction
- * then the activity won't be the request.
+ * Action class to display an activity. This is used when Flash calls starts of the 
+ * learning process. It is needed to put the learner progress and the activity in the request, 
+ * on which LoadToolActivityAction relies. If you try to go straight to LoadToolActivityAction
+ * then the data won't be in the request.
  * 
  * XDoclet definition:
  * 
@@ -75,11 +78,22 @@ public class DisplayActivityAction extends ActivityAction {
 	                             HttpServletRequest request,
 	                             HttpServletResponse response) 
 	{
+		ILearnerService learnerService = getLearnerService();
+
+		// Flash can only send the lessonID as that is all it has...
+        Integer learnerId = LearningWebUtil.getUserId();
+	    Long lessonId = WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID, true );
+	    // hack until Flash changes its url - current sending progressId
+	    if ( lessonId == null ) {
+	    	lessonId = WebUtil.readLongParam(request,"progressId");
+	    }
+	    LearnerProgress learnerProgress = learnerService.getProgress(learnerId, lessonId);
+	    
+	    LearningWebUtil.putLearnerProgressInRequest(request, learnerProgress);
 		
-		setupProgressString(actionForm, request);
 		ActivityMapping actionMappings = LearnerServiceProxy.getActivityMapping(getServlet().getServletContext());
-		LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgressByID(request, getServlet().getServletContext());		
-		ActionForward forward =actionMappings.getProgressForward(learnerProgress,false,request,getLearnerService());
+		ActionForward forward =actionMappings.getProgressForward(learnerProgress,false,request,learnerService);
+		setupProgressString(actionForm, request);
 	
 		if(log.isDebugEnabled())
 		    log.debug(forward.toString());

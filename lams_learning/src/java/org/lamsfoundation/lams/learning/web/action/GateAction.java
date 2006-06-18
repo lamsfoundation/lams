@@ -42,9 +42,11 @@ import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.PermissionGateActivity;
 import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
 import org.lamsfoundation.lams.learningdesign.SynchGateActivity;
-import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 
 /**
@@ -119,68 +121,37 @@ public class GateAction extends LamsDispatchAction
                                    HttpServletResponse response) throws IOException,
                                                                           ServletException
     {
-        LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgressByID(request,
-                                                                                 getServlet().getServletContext());
-        //validate pre-condition.
-        validateLearnerProgress(learnerProgress);
-        
         boolean forceGate = WebUtil.readBooleanParam(request,PARAM_FORCE_GATE_OPEN,false);
+        Long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
         
         //initialize service object
         ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
-        Integer totalNumActiveLearners =  learnerService.getCountActiveLearnersByLesson(learnerProgress.getLesson().getLessonId());
+        Activity activity = learnerService.getActivity(activityId);
+        Lesson lesson = learnerService.getLessonByActivity(activity);
+        User learner = LearningWebUtil.getUser(learnerService);
+        
+        Integer totalNumActiveLearners =  learnerService.getCountActiveLearnersByLesson(lesson.getLessonId());
         //knock the gate
-        boolean gateOpen = learnerService.knockGate(learnerProgress.getLesson().getLessonId(),
-        											learnerProgress.getNextActivity().getActivityId(),
-                                                    learnerProgress.getUser(),forceGate);
+        boolean gateOpen = learnerService.knockGate(activityId,learner,forceGate);
+        
         // if the gate is open, let the learner go to the next activity ( updating the cached learner progress on the way )
         // pass only the ids in to completeActivity, so that the service level looks up the objects.
         // if we reuse our cached entries, hibernate may throw session errors (if the objects are CGLIB entities).
         if(gateOpen)
         {
-            String nextActivityUrl = learnerService.completeActivity(learnerProgress.getUser().getUserId(),
-                                                                     learnerProgress.getNextActivity().getActivityId(),
-                                                                     learnerProgress.getLesson().getLessonId());
-            // get the update
-            LearningWebUtil.setLearnerProgress(learnerService.getProgressById(learnerProgress.getLearnerProgressId()));
+            String nextActivityUrl = learnerService.completeActivity(learner.getUserId(),activityId);
             response.sendRedirect(nextActivityUrl);
             return null;
         }
         //if the gate is closed, ask the learner to wait ( updating the cached learner progress on the way )
         else {
-        	learnerProgress = learnerService.getProgressById(learnerProgress.getLearnerProgressId());
-            LearningWebUtil.setLearnerProgress(learnerProgress);
-            return findViewByGateType(mapping, (DynaActionForm)form, learnerProgress.getCurrentActivity(), totalNumActiveLearners, learnerProgress.getLesson().isPreviewLesson());
+            return findViewByGateType(mapping, (DynaActionForm)form, activity, totalNumActiveLearners, lesson.isPreviewLesson());
         }
     }
 	
     //---------------------------------------------------------------------
     // Helper methods
     //---------------------------------------------------------------------
-    /**
-     * @param learnerProgress
-     */
-    private void validateLearnerProgress(LearnerProgress learnerProgress)
-    {
-        if(learnerProgress ==null)
-            throw new LearnerServiceException("Can't perform grouping without knowing" +
-            		" the learner progress.");
-        
-        if(!isNextActivityValid(learnerProgress))
-            throw new LearnerServiceException("Error in progress engine. Getting "
-                                              +learnerProgress.getNextActivity().toString()
-                                              +" where it should be gate activity");
-    }
-
-    /**
-     * @param learnerProgress
-     * @return
-     */
-    private boolean isNextActivityValid(LearnerProgress learnerProgress)
-    {
-        return learnerProgress.getNextActivity()!=null&&(learnerProgress.getNextActivity().isGateActivity());
-    }
-    
     /**
      * Dispatch view the according to the gate type.
      * 
@@ -203,6 +174,7 @@ public class GateAction extends LamsDispatchAction
        	if ( gate != null ) {
        		gateForm.set("totalLearners",totalNumActiveLearners);
        		gateForm.set("previewLesson",isPreviewLesson);
+       		gateForm.set("activityId",gate.getActivityId());
 	        if(gate.isSynchGate())
 	            return viewSynchGate(mapping,gateForm,(SynchGateActivity)gate);
 	        else if(gate.isScheduleGate())

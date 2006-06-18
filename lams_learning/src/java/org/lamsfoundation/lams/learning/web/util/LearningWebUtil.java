@@ -24,15 +24,16 @@
 /* $$Id$$ */	
 package org.lamsfoundation.lams.learning.web.util;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
-import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.web.action.ActivityAction;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -49,7 +50,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 public class LearningWebUtil
 {
     
-//	private static Logger log = Logger.getLogger(LearningWebUtil.class);
+	private static Logger log = Logger.getLogger(LearningWebUtil.class);
     //---------------------------------------------------------------------
     // Class level constants - session attributes
     //---------------------------------------------------------------------
@@ -57,12 +58,8 @@ public class LearningWebUtil
     
     /**
      * Helper method to retrieve the user data. Gets the id from the user details
-     * in the session then retrieves the real user object.
-     * 
-     * @param request A standard Servlet HttpServletRequest class.
-     * @param servletContext the servlet container that has all resources
-     * @param surveyService the service facade of survey tool
-     * @return the user data value object
+     * in the shared session
+     * @return the user id
      */
     public static Integer getUserId()
     {
@@ -72,101 +69,77 @@ public class LearningWebUtil
     }
     
     /**
-     * Helper method to get lesson id. 
-     * 
-     * @param request A standard Servlet HttpServletRequest class.
-     * @param learnerService leaner service facade.
-     * @param servletContext the servlet container that has all resources
-     * @return The requested lesson.
+     * Helper method to retrieve the user data. Gets the id from the user details
+     * in the shared session then retrieves the real user object.
      */
-    public static Long getLessonId(HttpServletRequest request)
+    public static User getUser(ILearnerService learnerService)
     {
         HttpSession ss = SessionManager.getSession();
-        Long lessonId = (Long)ss.getAttribute(AttributeNames.PARAM_LESSON_ID);
-        
-        if(lessonId ==null)
-        {
-            // not in the session - is it in the request?
-            lessonId = WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID,true);
-        }
-        return lessonId;
+        UserDTO learner = (UserDTO) ss.getAttribute(AttributeNames.USER);
+        return learner != null ? learnerService.getUserManagementService().getUserById(learner.getUserID()) : null;
     }
     
- 
-    /**
-     * Put the lesson id in the user's special session object, so that
-     * it can be retrieved by getLessonId() 
-     * 
-     * @param request A standard Servlet HttpServletRequest class.
-     * @param learnerService leaner service facade.
-     * @param servletContext the servlet container that has all resources
-     * @return The requested lesson.
-     */
-    public static void setLessonId(Long lessonId)
-    {
-        HttpSession ss = SessionManager.getSession();
-        if ( lessonId != null ) {
-        	ss.setAttribute(AttributeNames.PARAM_LESSON_ID, lessonId);
-        } else {
-        	ss.removeAttribute(AttributeNames.PARAM_LESSON_ID);
-        }
-    }
-   
 	/** 
-	 * Put the learner progress in the user's special session object.
+	 * Put the learner progress in the request. This allows some optimisation between the 
+	 * code that updates the progress and the next action which will access the progress.
 	 */
-	public static void setLearnerProgress(LearnerProgress progress) {
-		HttpSession ss = SessionManager.getSession();
+	public static void putLearnerProgressInRequest(HttpServletRequest request, LearnerProgress progress) {
 		if ( progress != null ) {
-			ss.setAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE, progress);
+			request.setAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE, progress);
 		} else {
-			ss.removeAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE);
+			request.removeAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE);
 		}
 	}
 	
 	/** 
-	 * Get the current learner progress. The http session attributes are checked
-	 * first, if not in request then a new LearnerProgress is loaded by id using
-	 * the LearnerService. The LearnerProgress is also stored in the
-	 * session so that the Flash requests don't have to reload it.
+	 * Get the current learner progress. Check the request - in some cases it may be there.
+	 * 
+	 * If not, the learner progress id might be in the request (if we've just come from complete activity). 
+	 * If so, get it from the db using the learner progress.
+	 * 
+	 * If the learner progress id isn't available, then we have to look it up using activity 
+	 * based on the activity / activity id in the request. 
 	 */
-	public static LearnerProgress getLearnerProgressByID(HttpServletRequest request,ServletContext servletContext) {
-        HttpSession ss = SessionManager.getSession();
-        LearnerProgress learnerProgress = (LearnerProgress)ss.getAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE);
+	public static LearnerProgress getLearnerProgress(HttpServletRequest request, ILearnerService learnerService) {
+		LearnerProgress learnerProgress = (LearnerProgress)request.getAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE);
+		if ( learnerProgress != null ) {
+			if ( log.isDebugEnabled() ) {
+				log.debug("getLearnerProgress: found progress in the request");
+			}
+			return learnerProgress;
+		}
 		
 		if (learnerProgress == null) 
 		{
-            //initialize service object
-            ILearnerService learnerService = LearnerServiceProxy.getLearnerService(servletContext);
-		    long learnerProgressId = WebUtil.readLongParam(request,LearningWebUtil.PARAM_PROGRESS_ID);
-		    learnerProgress = learnerService.getProgressById(new Long(learnerProgressId));
-		    setLearnerProgress(learnerProgress);
+		    Long learnerProgressId = WebUtil.readLongParam(request,LearningWebUtil.PARAM_PROGRESS_ID, true);
+		    // temp hack until Flash side updates it call.
+		    if ( learnerProgressId == null ) {
+		    	learnerProgressId = WebUtil.readLongParam(request,"progressId", true);
+		    }
+		    
+		    if ( learnerProgressId != null ) {		    	
+			    learnerProgress = learnerService.getProgressById(new Long(learnerProgressId));
+				if ( learnerProgress != null && log.isDebugEnabled() ) {
+					log.debug("getLearnerProgress: found progress via progress id");
+				}
+		    }
 		}
-		return learnerProgress;
-	}
-	/** 
-	 * Get the current learner progress. The http session attributes are checked
-	 * first, if not in request then a new LearnerProgress is loaded by user
-	 * and lesson using the LearnerService. The LearnerProgress is also stored 
-	 * in the session so that the Flash requests don't have to reload it.
-	 */
-	public static LearnerProgress getLearnerProgressByUser(HttpServletRequest request,ServletContext servletContext) {
-		
-        HttpSession ss = SessionManager.getSession();
-        LearnerProgress learnerProgress = (LearnerProgress)ss.getAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE);
 		
 		if (learnerProgress == null) 
 		{
-            //initialize service object
-            ILearnerService learnerService = LearnerServiceProxy.getLearnerService(servletContext);
-            Integer currentLearner = getUserId();
-            Long lessonId = getLessonId(request);
-            learnerProgress = learnerService.getProgress(currentLearner,lessonId);
-		    setLearnerProgress(learnerProgress);
+			Integer learnerId = getUserId();
+			Activity act = getActivityFromRequest(request, learnerService);
+			Lesson lesson = learnerService.getLessonByActivity(act);
+		    learnerProgress = learnerService.getProgress(learnerId, lesson.getLessonId());
+			if ( learnerProgress != null && log.isDebugEnabled() ) {
+				log.debug("getLearnerProgress: found progress via learner id and activity");
+			}
 		}
+		
+	    putLearnerProgressInRequest(request, learnerProgress);
 		return learnerProgress;
 	}
-
+	
     /**
      * Get the activity from request. We assume there is a parameter coming in
      * if there is no activity can be found in the http request. Then the 

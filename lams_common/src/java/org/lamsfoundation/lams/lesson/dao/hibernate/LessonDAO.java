@@ -31,6 +31,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Expression;
+import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -58,6 +59,9 @@ public class LessonDAO extends HibernateDaoSupport implements ILessonDAO
 	private final static String COUNT_ACTIVE_LEARNERS = "select count(distinct progress.user.id)"
 					+ " from "+LearnerProgress.class.getName()+" progress"
 					+ " where progress.lesson.id = :lessonId";
+	private final static String FIND_LESSON_FOR_ACTIVITY =	"select lesson from "
+		+ Lesson.class.getName()+" lesson, "+ Activity.class.getName() + " activity "
+		+ " where activity.activityId=:activityId and activity.learningDesign=lesson.learningDesign";
 
     /**
      * Retrieves the Lesson
@@ -278,6 +282,21 @@ public class LessonDAO extends HibernateDaoSupport implements ILessonDAO
    public List getPreviewLessonsBeforeDate(final Date startDate){
    	List lessons = this.getHibernateTemplate().find(FIND_PREVIEW_BEFORE_START_DATE,startDate);
 	return lessons;
+   }
+   /**
+    * Get the lesson that applies to this activity. Not all activities have an attached lesson.
+    */
+   public Lesson getLessonForActivity(final long activityId)
+   {
+       HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
+       return (Lesson) hibernateTemplate.execute(new HibernateCallback() {
+           public Object doInHibernate(Session session)
+                   throws HibernateException {
+   	    	Query query = session.createQuery(FIND_LESSON_FOR_ACTIVITY);
+   	    	query.setLong("activityId", activityId);
+            return query.uniqueResult();
+           }
+       });
    }
 
 }

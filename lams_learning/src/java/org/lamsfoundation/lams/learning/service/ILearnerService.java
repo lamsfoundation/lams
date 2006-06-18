@@ -28,12 +28,12 @@ import java.util.List;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
-import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dto.LearnerProgressDTO;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 /**
  *
@@ -45,6 +45,9 @@ public interface ILearnerService
 	/** Get the I18N service. Used by actions for internationalising errors that go back to Flash */
    public MessageService getMessageService();
 
+	/** Get the user service. Used when the action needs the real user object, not just the userId */
+   public IUserManagementService getUserManagementService();
+   
     /**
      * Gets the lesson object for the given key.
      *
@@ -105,11 +108,10 @@ public interface ILearnerService
      * Calculates learner progress and returns the data required to be displayed to the learner (including URL(s)).
      * @param completedActivityID identifies the activity just completed
      * @param learner the Learner
-     * @param lessonId the Lesson in progress.
      * @return the bean containing the display data for the Learner
      * @throws LearnerServiceException in case of problems.
      */
-    public LearnerProgress calculateProgress(Activity completedActivity, Integer learnerId, Long lessonId); 
+    public LearnerProgress calculateProgress(Activity completedActivity, Integer learnerId); 
 
     
     /**
@@ -136,10 +138,9 @@ public interface ILearnerService
      * 
      * @param learnerId the learner who are running this activity in the design.
      * @param activity the activity is being run.
-     * @param lesson id the lesson this learner is currently in.
      * @return the url for next activity.
      */
-    public String completeActivity(Integer learnerId,Long activityId,Long lessonId);
+    public String completeActivity(Integer learnerId,Long activityId);
   
     /**
      * Complete the activity in the progress engine and delegate to the progress 
@@ -149,10 +150,9 @@ public interface ILearnerService
      * 
      * @param learnerId the learner who are running this activity in the design.
      * @param activity the activity is being run.
-     * @param lessonId the lesson this learner is currently in.
      * @return the url for next activity.
      */
-    public String completeActivity(Integer learnerId,Activity activity,Long lessonId);
+    public String completeActivity(Integer learnerId,Activity activity);
 
     /**
      * Retrieve all lessons that has been started, suspended or finished. All
@@ -167,7 +167,8 @@ public interface ILearnerService
      * Mark the learner progress as restarting to indicate the current learner
      * has exit the lesson. Doesn't use the cached progress object in case it 
      * 
-     * @param progressId the current learner progress.
+     * @param userId
+     * @param lessonId
      */
     public void exitLesson(Long progressId);
     
@@ -208,20 +209,18 @@ public interface ILearnerService
      * Check up the gate status to go through the gate. This also updates the gate.
      * This method should be used when we do not have an grouping activity
      * that is already part of the Hibernate session. 
-     * @param lessonId lesson id
      * @param gateid the gate that current learner is facing. It could be 
      * 			   synch gate, schedule gate or permission gate.
      * @param knocker the learner who wants to go through the gate.
      * @param forceGate if forceGate==true and the lesson is a preview lesson then the gate is opened straight away.
      * @return true if the gate is now open
      */
-    public boolean knockGate(Long lessonId, Long gateActivityId, User knocker, boolean forceGate);
+    public boolean knockGate(Long gateActivityId, User knocker, boolean forceGate);
 
     /**
      * Check up the gate status to go through the gate. This also updates the gate.
      * This method should be used when we do have an grouping activity
      * that is already part of the Hibernate session. 
-     * @param lessonId lesson id
      * @param gate the gate that current learner is facing. It could be 
      * 			   synch gate, schedule gate or permission gate.
      * 			   Don't supply the actual gate from the cached web version
@@ -230,5 +229,20 @@ public interface ILearnerService
      * @param forceGate if forceGate==true and the lesson is a preview lesson then the gate is opened straight away.
      * @return true if the gate is now open
      */
-    public boolean knockGate(Long lessonId, GateActivity gateActivity, User knocker, boolean forceGate);
+    public boolean knockGate(GateActivity gateActivity, User knocker, boolean forceGate);
+    
+    /** 
+     * Get the learner url for a particular activity.
+     * 
+     * @param learnerId
+     * @param activityId 
+     */
+    public String getLearnerActivityURL(Integer learnerId, Long activityId);
+    
+    /** 
+     * Get the lesson for this activity. If the activity is not part of a lesson (ie is from an authoring 
+     * design then it will return null.
+     */
+    public Lesson getLessonByActivity(Activity activity);
+
 }

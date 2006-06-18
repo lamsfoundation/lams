@@ -159,7 +159,7 @@ public class LearnerAction extends LamsDispatchAction
 	            log.debug("The learner ["+learner+"] joined lesson. The"
 	                      +"porgress data is:"+learnerProgress.toString());
 	        
-	        LearningWebUtil.setLearnerProgress(learnerProgress);
+			LearningWebUtil.putLearnerProgressInRequest(request,learnerProgress);
 	
 	        //serialize a acknowledgement flash message with the path of display next
 	        //activity
@@ -209,7 +209,7 @@ public class LearnerAction extends LamsDispatchAction
         FlashMessage message = null;
     	try {
 	
-	        LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgressByUser(request,getServlet().getServletContext());
+	        LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request,learnerService);
 	        
 	        if(log.isDebugEnabled())
 	            log.debug("Exiting lesson, lesson id is: "+learnerProgress.getLesson().getLessonId());
@@ -313,11 +313,7 @@ public class LearnerAction extends LamsDispatchAction
 	        Integer learnerId = LearningWebUtil.getUserId();
 	        ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 	        
-		    Long lessonId = WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID,true);
-		    if ( lessonId == null ) {
-		        // temporary code until Flash gets updated to send the lessonID parameter
-		    	lessonId = WebUtil.readLongParam(request,LearningWebUtil.PARAM_PROGRESS_ID);
-		    }
+		    Long lessonId = WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID );
 		    LearnerProgressDTO learnerProgress = learnerService.getProgressDTOByLessonId(lessonId, learnerId);
 	        
 	        message = new FlashMessage("getFlashProgressData",learnerProgress);
@@ -380,7 +376,7 @@ public class LearnerAction extends LamsDispatchAction
 	        Activity requestedActivity = learnerService.getActivity(new Long(activityId));
 	        
 	        //preparing tranfer object for flash
-	        LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgressByUser(request,getServlet().getServletContext());
+	        LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request,learnerService);
 	        ProgressActivityDTO activityDTO = new ProgressActivityDTO(new Long(activityId),
 	                 activityMapping.calculateActivityURLForProgressView(learnerProgress.getLesson(),learner,requestedActivity));
 	        //send data back to flash.

@@ -158,7 +158,7 @@ public class DummyLearnerAction extends LamsDispatchAction
             log.debug("The learner ["+learner+"] joined lesson. The"
                       +"progress data is:"+learnerProgress.toString());
         
-        LearningWebUtil.setLearnerProgress(learnerProgress);
+        LearningWebUtil.putLearnerProgressInRequest(request, learnerProgress);
         return mapping.findForward(DISPLAY_ACTIVITY);
     }
     

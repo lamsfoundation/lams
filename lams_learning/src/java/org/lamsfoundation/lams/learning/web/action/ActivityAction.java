@@ -50,11 +50,18 @@ public abstract class ActivityAction extends LamsAction {
 	
 	public static final String ACTIVITY_REQUEST_ATTRIBUTE = "activity";
 	public static final String LEARNER_PROGRESS_REQUEST_ATTRIBUTE = "learnerprogress";
+
+	private ILearnerService learnerService = null;
+	
+	protected ILearnerService getLearnerService() {
+		if (learnerService == null) 
+			learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+		return learnerService;
+	}
 	
 	public ActionForward setupProgressString(ActionForm actionForm, HttpServletRequest request)  {
 		
-		LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgressByID(request,
-		                                                                     getServlet().getServletContext());		
+		LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request,getLearnerService());		
 
 		ActivityForm activityForm = (ActivityForm) actionForm;
 		
@@ -71,13 +78,6 @@ public abstract class ActivityAction extends LamsAction {
 		
 		return null;
 	}
-	/**
-	 * Get the learner service.
-	 */
-	protected ILearnerService getLearnerService() {
-		ILearnerService learnerService = LearnerServiceProxy.getLearnerService(this.getServlet().getServletContext());
-		return learnerService;
-	}
 	
 	/**
 	 * Get the ActionMappings.
@@ -85,25 +85,6 @@ public abstract class ActivityAction extends LamsAction {
 	protected ActivityMapping getActivityMapping() {
         WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(this.getServlet().getServletContext());
         return (ActivityMapping)wac.getBean("activityMapping");
-	}
-	
-	/** 
-	 * Get the current learner progress. The request attributes are checked
-	 * first, if not in request then a new LearnerProgress is loaded using
-	 * the LearnerService. The LearnerProgress is also stored in the
-	 * session so that the Flash requests don't have to reload it.
-	 */
-	protected LearnerProgress getLearnerProgress(HttpServletRequest request) {
-		
-	    return LearningWebUtil.getLearnerProgressByID(request,this.getServlet().getServletContext());
-	}
-	
-	/**
-	 * Sets the LearnerProgress in session so that the Flash requests don't
-	 * have to reload it.
-	 */
-	protected void setLearnerProgress(HttpServletRequest request, LearnerProgress learnerProgress) {
-		LearningWebUtil.setLearnerProgress(learnerProgress);
 	}
 	
 	private String getProgressSummary(LearnerProgress learnerProgress) {

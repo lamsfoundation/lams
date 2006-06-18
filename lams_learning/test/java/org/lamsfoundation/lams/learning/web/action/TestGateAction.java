@@ -88,7 +88,6 @@ public class TestGateAction extends AbstractTestAction
         addRequestParameter(AttributeNames.PARAM_ACTIVITY_ID,TEST_GATE_ACTIVITY_ID);
         addRequestParameter(AttributeNames.PARAM_LESSON_ID, TEST_LESSON_ID);
         
-        initializeLearnerProgress();
         actionPerform();
         
         verifyNoActionErrors();
@@ -102,21 +101,9 @@ public class TestGateAction extends AbstractTestAction
         addRequestParameter(AttributeNames.PARAM_ACTIVITY_ID,TEST_GATE_ACTIVITY_ID);
         addRequestParameter(AttributeNames.PARAM_LESSON_ID, TEST_LESSON_ID);
         
-        initializeLearnerProgress();
         actionPerform();
         
         verifyNoActionErrors();
         
-    }
-    /**
-     * 
-     */
-    private void initializeLearnerProgress()
-    {
-        Activity activity = LearningWebUtil.getActivityFromRequest(request,learnerService);
-        LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgressByID(request,context);
-        learnerProgress.setNextActivity(activity);
-        httpSession.setAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE,
-                                 learnerProgress);
     }
 }

@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -63,8 +64,9 @@ public class DisplayToolActivityAction extends ActivityAction {
 		//ActivityForm form = (ActivityForm)actionForm;
 		ActivityMapping actionMappings = getActivityMapping();
 		
-		LearnerProgress learnerProgress = getLearnerProgress(request);
-		Activity activity = LearningWebUtil.getActivityFromRequest(request, getLearnerService());
+		ILearnerService learnerService = getLearnerService();
+		LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
+		Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
 		if (!(activity instanceof ToolActivity)) 
 		{
 		    log.error(className+": activity not ToolActivity");

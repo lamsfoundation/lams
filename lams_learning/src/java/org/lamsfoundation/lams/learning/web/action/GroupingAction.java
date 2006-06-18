@@ -124,21 +124,19 @@ public class GroupingAction extends LamsDispatchAction
                                          HttpServletResponse response) throws IOException,
                                                                           ServletException
     {
-        LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgressByID(request,
-                                                                             getServlet().getServletContext());
-        validateLearnerProgress(learnerProgress);
 
         boolean forceGroup = WebUtil.readBooleanParam(request,PARAM_FORCE_GROUPING,false);
 
         //initialize service object
         ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+        LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
+        validateLearnerProgress(learnerProgress);
         
         boolean groupingDone = learnerService.performGrouping(learnerProgress.getLesson().getLessonId(),
         								learnerProgress.getNextActivity().getActivityId(), 
         								LearningWebUtil.getUserId(),forceGroup);
 
         LearningWebUtil.putActivityInRequest(request, learnerProgress.getNextActivity(), learnerService);
-        LearningWebUtil.setLessonId(learnerProgress.getLesson().getLessonId());
         
         DynaActionForm groupForm = (DynaActionForm)form;
         groupForm.set("previewLesson",learnerProgress.getLesson().isPreviewLesson());
@@ -196,19 +194,14 @@ public class GroupingAction extends LamsDispatchAction
                                           HttpServletResponse response) throws IOException,
                                                                           ServletException
     {
-        LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgressByUser(request,
-                                                                                 getServlet().getServletContext());
         //initialize service object
         ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+        LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request,learnerService);
         Activity groupingActivity = LearningWebUtil.getActivityFromRequest(request,learnerService);
 
-        
         String nextActivityUrl = learnerService.completeActivity(learnerProgress.getUser().getUserId(),
-                                                                  groupingActivity,
-                                                                  learnerProgress.getLesson().getLessonId());
-        
+                                                                  groupingActivity);
 		response.sendRedirect(nextActivityUrl);
-		
         return null;
     }
     //---------------------------------------------------------------------

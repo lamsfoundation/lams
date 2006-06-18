@@ -86,7 +86,6 @@ public class TestGroupingAction extends AbstractTestAction
         addRequestParameter(AttributeNames.PARAM_ACTIVITY_ID,TEST_RGRP_ACTIVITY_ID);
         addRequestParameter(AttributeNames.PARAM_LESSON_ID, TEST_LESSON_ID);
         
-        initializeLearnerProgress();
         actionPerform();
 
         verifyNoActionErrors();
@@ -125,16 +124,4 @@ public class TestGroupingAction extends AbstractTestAction
         
         verifyNoActionErrors();
     }
-    /**
-     * 
-     */
-    private void initializeLearnerProgress()
-    {
-        Activity activity = LearningWebUtil.getActivityFromRequest(request,learnerService);
-        LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgressByID(request,context);
-        learnerProgress.setNextActivity(activity);
-        httpSession.setAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE,
-                                 learnerProgress);
-    }
-    
 }

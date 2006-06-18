@@ -35,6 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 import org.lamsfoundation.lams.learning.web.form.OptionsActivityForm;
 
@@ -72,8 +73,9 @@ public class DisplayOptionsActivityAction extends ActivityAction {
 		OptionsActivityForm form = (OptionsActivityForm)actionForm;
 		ActivityMapping actionMappings = getActivityMapping();
 		
-		LearnerProgress learnerProgress = getLearnerProgress(request);
-		Activity activity = LearningWebUtil.getActivityFromRequest(request, getLearnerService());
+		ILearnerService learnerService = getLearnerService();
+		LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
+		Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
 		if (!(activity instanceof OptionsActivity)) {
 		    log.error(className+": activity not OptionsActivity "+activity.getActivityId());
 			return mapping.findForward(ActivityMapping.ERROR);
@@ -111,7 +113,6 @@ public class DisplayOptionsActivityAction extends ActivityAction {
 		
 		this.saveToken(request);
 		
-		// need to do the calculateProgress first as the chooseActivity changes the progress details 
 		setupProgressString(form, request);
 
 		String forward = "displayOptions";

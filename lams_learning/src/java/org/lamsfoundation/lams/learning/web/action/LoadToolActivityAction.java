@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 import org.lamsfoundation.lams.learning.web.form.ActivityForm;
@@ -73,8 +74,9 @@ public class LoadToolActivityAction extends ActivityAction {
 		ActivityForm form = (ActivityForm)actionForm;
 		ActivityMapping actionMappings = LearnerServiceProxy.getActivityMapping(this.getServlet().getServletContext());
 		
-		LearnerProgress learnerProgress = getLearnerProgress(request);
-		Activity activity = LearningWebUtil.getActivityFromRequest(request, getLearnerService());
+		ILearnerService learnerService = getLearnerService();
+		LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request,learnerService);
+		Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
 				
 		form.setActivityId(activity.getActivityId());
 		

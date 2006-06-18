@@ -1,4 +1,4 @@
-<c:set var="formAction" value="/gate?method=knockGate"/>
+<c:set var="formAction" value="/gate?method=knockGate&activityID=${GateForm.map.activityId}"/>
 
 
 <tr>

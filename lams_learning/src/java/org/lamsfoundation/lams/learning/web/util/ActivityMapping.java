@@ -27,8 +27,6 @@ package org.lamsfoundation.lams.learning.web.util;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.Iterator;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -121,9 +119,13 @@ public class ActivityMapping implements Serializable
         if (progress.isLessonComplete())
         {
             // If lesson complete forward to lesson complete action. This action will
-            // cause a client request to clear ALL frames.
+            // cause a client request to clear ALL frames. Need to append the progress
+        	// id as getting to the end from an activity can't have the progress in the request
+        	// and there isn't an activity from which we can determine the lesson and hence
+        	// the progress.
             String strutsAction = this.getActivityMappingStrategy()
                                       .getLessonCompleteAction();
+            strutsAction = WebUtil.appendParameterToURL(strutsAction, LearningWebUtil.PARAM_PROGRESS_ID, progress.getLearnerProgressId().toString());
             actionForward = this.strutsActionToForward(strutsAction,
                                                        null,
                                                        redirect);
@@ -198,9 +200,13 @@ public class ActivityMapping implements Serializable
         if (progress.isLessonComplete())
         {
             // If lesson complete forward to lesson complete action. This action will
-            // cause a client request to clear ALL frames.
+            // cause a client request to clear ALL frames. Need to append the progress
+        	// id as getting to the end from an activity can't have the progress in the request
+        	// and there isn't an activity from which we can determine the lesson and hence
+        	// the progress.
             String strutsAction = this.getActivityMappingStrategy()
                                       .getLessonCompleteAction();
+            strutsAction = WebUtil.appendParameterToURL(strutsAction, LearningWebUtil.PARAM_PROGRESS_ID, progress.getLearnerProgressId().toString());
             return activityURL = strutsActionToURL(strutsAction, null, true);
         }
         else

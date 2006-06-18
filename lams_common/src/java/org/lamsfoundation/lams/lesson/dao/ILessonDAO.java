@@ -129,4 +129,10 @@ public interface ILessonDAO
      * @return the list of Lessons
      */
     public List getPreviewLessonsBeforeDate(final Date startDate);
+    
+    /**
+     * Get the lesson that applies to this activity. Not all activities have an attached lesson.
+     */
+    public Lesson getLessonForActivity(final long activityId);
+
 }
