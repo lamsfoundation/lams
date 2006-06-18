@@ -79,9 +79,7 @@ import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.Workspace;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
-import org.lamsfoundation.lams.usermanagement.dao.IOrganisationDAO;
-import org.lamsfoundation.lams.usermanagement.dao.IUserDAO;
-import org.lamsfoundation.lams.usermanagement.dao.IWorkspaceFolderDAO;
+import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.usermanagement.util.LastNameAlphabeticComparator;
@@ -129,10 +127,8 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     private ILessonClassDAO lessonClassDAO;        
     private ITransitionDAO transitionDAO;
     private IActivityDAO activityDAO;
-    private IWorkspaceFolderDAO workspaceFolderDAO;
+    private IBaseDAO baseDAO;
     private ILearningDesignDAO learningDesignDAO;
-    private IOrganisationDAO organisationDAO;
-    private IUserDAO userDAO;
     private IGroupingDAO groupingDAO;
     private IAuthoringService authoringService;
     private ILearnerService learnerService;
@@ -168,12 +164,6 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 	 */
 	public void setLearningDesignDAO(ILearningDesignDAO learningDesignDAO) {
 		this.learningDesignDAO = learningDesignDAO;
-	}
-	/**
-	 * @param workspaceFolderDAO The workspaceFolderDAO to set.
-	 */
-	public void setWorkspaceFolderDAO(IWorkspaceFolderDAO workspaceFolderDAO) {
-		this.workspaceFolderDAO = workspaceFolderDAO;
 	}
 
 	/**
@@ -222,8 +212,8 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     /**
      * @param userDAO
      */
-	public void setUserDAO(IUserDAO userDAO) {
-		this.userDAO = userDAO;
+	public void setBaseDAO(IBaseDAO baseDAO) {
+		this.baseDAO = baseDAO;
 	}
 	/**
 	 * @param groupingDAO
@@ -247,10 +237,8 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     {
         this.activityDAO = activityDAO;
     }
-	public void setOrganisationDAO(IOrganisationDAO organisationDAO) {
-		this.organisationDAO = organisationDAO;
-	}
-      /**
+
+    /**
      * @see org.springframework.context.ApplicationContextAware#setApplicationContext(org.springframework.context.ApplicationContext)
      */
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException
@@ -277,7 +265,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 	/** Checks whether the user is a staff member for the lesson or the creator of the lesson. 
      * If not, throws a UserAccessDeniedException exception */
     private void checkOwnerOrStaffMember(Integer userId, Lesson lesson, String actionDescription) {
-    	User user = userManagementService.getUserById(userId);
+    	User user = (User)baseDAO.find(User.class,userId);
     	
         if ( lesson.getUser() != null && lesson.getUser().getUserId().equals(userId) ) {
         	return;
@@ -314,7 +302,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         // The duplicated sequence should go in the run sequences folder under the given organisation
         WorkspaceFolder runSeqFolder = null;
         if ( organisationId != null ) {
-        	Organisation org = organisationDAO.getOrganisationById(organisationId);
+        	Organisation org = (Organisation)baseDAO.find(Organisation.class,organisationId);
         	if ( org!=null ) {
         		Workspace workspace = org.getWorkspace();
         		if ( workspace != null ) {
@@ -323,7 +311,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         		
         	}
         }
-    	User user = (userID != null ? userManagementService.getUserById(userID) : null);
+    	User user = (userID != null ? (User)baseDAO.find(User.class,userID) : null);
         return initializeLesson(lessonName, lessonDescription, originalLearningDesign, user, runSeqFolder, LearningDesign.COPY_TYPE_LESSON);
         
     }
@@ -342,7 +330,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         if ( originalLearningDesign == null) {
         	throw new MonitoringServiceException("Learning design for id="+learningDesignId+" is missing. Unable to initialize lesson.");
         }
-    	User user = (userID != null ? userManagementService.getUserById(userID) : null);
+    	User user = (userID != null ? (User)baseDAO.find(User.class,userID) : null);
 
         return initializeLesson(lessonName, lessonDescription, originalLearningDesign, user, null, LearningDesign.COPY_TYPE_PREVIEW);
     }
@@ -425,8 +413,8 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 	    	if(staffs == null)
 	    		staffs = new LinkedList();
 	    	
-	    	Organisation organisation = organisationDAO.getOrganisationById(orgId);
-	    	User creator = userDAO.getUserById(creatorUserId);
+	    	Organisation organisation = (Organisation)baseDAO.find(Organisation.class,orgId);
+	    	User creator = (User)baseDAO.find(User.class,creatorUserId);
 	    	
 	        // create the lesson class - add all the users in this organisation to the lesson class
 	        // add user as staff
@@ -436,7 +424,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 	        while (iter.hasNext()) {
 	        	try {
 	        		int id = ((Double) iter.next()).intValue();
-	        		learnerList.add(userDAO.getUserById(new Integer(id)));
+	        		learnerList.add((User)baseDAO.find(User.class,id));
 				} catch (Exception e) {
 					log.error("Error parsing learner ID from " + lessonPacket);
 					continue;
@@ -449,7 +437,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 	        while (iter.hasNext()) {
 	        	try {
 	        		int id = ((Double) iter.next()).intValue();
-	        		staffList.add(userDAO.getUserById(new Integer(id)));
+	        		staffList.add((User)baseDAO.find(User.class,id));
 				} catch (Exception e) {
 					log.error("Error parsing staff ID from " + lessonPacket);
 					continue;
@@ -786,7 +774,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     public String forceCompleteLessonByUser(Integer learnerId,long lessonId,Long activityId) 
     {
 
-    	User learner = userDAO.getUserById(learnerId);
+    	User learner = (User)baseDAO.find(User.class,learnerId);
         Lesson newLesson = lessonDAO.getLesson(new Long(lessonId));
         Set activities = newLesson.getLearningDesign().getActivities();
         /*
@@ -1028,7 +1016,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
      */
     public String getLearnerActivityURL(Long lessonID, Long activityID,Integer userID)throws IOException, LamsToolServiceException{    	
     	Activity activity = activityDAO.getActivityByActivityId(activityID);
-    	User user = userManagementService.getUserById(userID);
+    	User user = (User)baseDAO.find(User.class,userID);
     	
     	if(activity==null || user==null){
     		log.error("getLearnerActivityURL activity or user missing. Activity ID "+activityID+" activity " +activity+" userID "+userID+" user "+user);
@@ -1079,7 +1067,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     	FlashMessage flashMessage;
 		if(lesson!=null){
 			if(lesson.getUser().getUserId().equals(userID)){
-				WorkspaceFolder workspaceFolder = workspaceFolderDAO.getWorkspaceFolderByID(targetWorkspaceFolderID);
+				WorkspaceFolder workspaceFolder = (WorkspaceFolder)baseDAO.find(WorkspaceFolder.class,targetWorkspaceFolderID);
 				if(workspaceFolder!=null){
 					LearningDesign learningDesign = lesson.getLearningDesign();
 					learningDesign.setWorkspaceFolder(workspaceFolder);
@@ -1204,7 +1192,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 	        	List learners = new ArrayList();
 	        	//? Seem too low efficient, is there a easy way?
 	        	for(int idx=0;idx<learnerIdList.size();idx++){
-	        		User user = userDAO.getUserById(new Integer(((Double)learnerIdList.get(idx)).intValue()));
+	        		User user = (User)baseDAO.find(User.class,((Double)learnerIdList.get(idx)).intValue());
 	        		learners.add(user);
 	        	
 	        	}
@@ -1472,7 +1460,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
    	 */
        public Lesson createPreviewClassForLesson(int userID, long lessonID) throws UserAccessDeniedException {
 
-           User user = userManagementService.getUserById(new Integer(userID));
+           User user = (User)baseDAO.find(User.class,userID);
            if ( user == null ) {
            	throw new UserAccessDeniedException("User "+userID+" not found");
            }
@@ -1660,7 +1648,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 				boolean added = false;
 				try {
 					Integer learnerID = new Integer(Integer.parseInt(strlearnerID));
-					User learner = userManagementService.getUserById(learnerID);
+					User learner = (User)baseDAO.find(User.class,learnerID);
 					if ( learner != null ) {
 						learners.add(learner);
 						added = true;

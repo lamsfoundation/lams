@@ -161,7 +161,7 @@ public class DummyMonitoringAction extends LamsDispatchAction
 
     	// Must have User, rather than UserDTO as the createLessonClassForLesson must have 
     	// a proper user objcet in the staffs list.
-        User user = usermanageService.getUserById(getUserId());
+        User user = (User)usermanageService.findById(User.class,getUserId());
 
         Long ldId = dummyForm.getLearningDesignId();
     	if ( ldId == null )
