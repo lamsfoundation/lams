@@ -95,7 +95,7 @@ String downloadServlet = learning_root + "exportDownload?fileLocation=";
 						alert(msg);
 						break;
 					case 500: //status 500 Internal Server Error
-						msg = "<fmt:message key='error.system.export' />";
+						msg = "<fmt:message key='error.system.learner'><fmt:param>Status 500</fmt:param></fmt:message>";
 						document.getElementById("message").innerHTML = msg;
 						break;
 				}

@@ -24,16 +24,20 @@
 /* $$Id$$ */	
 package org.lamsfoundation.lams.learning.export;
 
+import java.util.List;
+
 /**
- * @author mtruong
+ * Models the portfolio for any type of activity, including tools, groupings, gates, optional and parallel activities
+ * @author mtruong, fmalikoff
  *
  */
-public class ToolPortfolio {
+public class ActivityPortfolio {
 	
 	private Long activityId;
 	private String activityDescription;
 	private String activityName;
 	private String exportUrl;
+	private List childPortfolios;
 	/* The link to the tool page from the main export page */
 	private String toolLink;
 		
@@ -50,13 +54,14 @@ public class ToolPortfolio {
 		this.toolLink = toolLink;
 	}
 
-	public ToolPortfolio()
+	public ActivityPortfolio()
 	{
 		this.activityId = null;	
 		this.activityDescription = null;
 		this.activityName = null;
 		this.exportUrl = null;
 		this.toolLink = null;
+		this.childPortfolios = null;
 	}
 	
 	
@@ -111,6 +116,13 @@ public class ToolPortfolio {
 	 */
 	public void setActivityDescription(String activityDescription) {
 		this.activityDescription = activityDescription;
+	}
+	/** Get the portfolios for any sub activities. Will return null for tool portfolios */
+	public List getChildPortfolios() {
+		return childPortfolios;
+	}
+	public void setChildPortfolios(List childPortfolios) {
+		this.childPortfolios = childPortfolios;
 	}
 	
 	

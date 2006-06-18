@@ -39,6 +39,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learning.export.ExportPortfolioConstants;
+import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 
 /**
@@ -97,7 +98,7 @@ public class ExportDownloadServlet extends HttpServlet {
 	
 	private String constructAbsolutePath(String relativePath)
 	{
-	    return ExportPortfolioConstants.TEMP_DIRECTORY + File.separator + relativePath;
+	    return FileUtil.TEMP_DIR + File.separator + relativePath;
 	}
 	
 }

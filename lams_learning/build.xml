@@ -240,6 +240,7 @@
 			<fileset dir="${conf.web.dir}">
 				<include name="*"/>
 				<include name="css/*"/>
+				<include name="exportPortfolio/*"/>
 				<include name="gate/*"/>
 				<include name="grouping/*"/>
 				<include name="images/*"/>

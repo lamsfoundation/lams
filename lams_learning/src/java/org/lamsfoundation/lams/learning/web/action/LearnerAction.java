@@ -111,7 +111,7 @@ public class LearnerAction extends LamsDispatchAction
 		String[] msg = new String[1];
 		msg[0] = e.getMessage();
 		return new FlashMessage(methodKey,
-				learnerService.getMessageService().getMessage("error.system.error", msg),
+				learnerService.getMessageService().getMessage("error.system.learner", msg),
 				FlashMessage.CRITICAL_ERROR);
 	}
 

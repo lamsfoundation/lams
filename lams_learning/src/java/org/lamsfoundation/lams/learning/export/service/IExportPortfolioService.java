@@ -24,19 +24,10 @@
 /* $$Id$$ */	
 package org.lamsfoundation.lams.learning.export.service;
 
-import java.util.Map;
-import java.util.Vector;
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 
-import org.lamsfoundation.lams.learning.export.ToolPortfolio;
 import org.lamsfoundation.lams.learning.export.Portfolio;
-import org.lamsfoundation.lams.learningdesign.LearningDesign;
-import org.lamsfoundation.lams.learningdesign.ToolActivity;
-import org.lamsfoundation.lams.lesson.Lesson;
-import org.lamsfoundation.lams.lesson.LearnerProgress;
-import org.lamsfoundation.lams.tool.ToolAccessMode;
-import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
-import org.lamsfoundation.lams.usermanagement.User;
 /**
  * @author mtruong
  *
@@ -101,30 +92,6 @@ public interface IExportPortfolioService {
 	public Portfolio exportPortfolioForStudent(Integer userId, Long lessonID, boolean anonymity, Cookie[] cookies);
 	
 	/**
-	 * Returns the ordered activity list (ordered by the ActivityOrderComparator)
-	 * containing all activities present in the learning design. The list will
-	 * only contain Tool Activities. If it comes across a Complex Activity, it
-	 * will only add its child activities in the ordered list.
-	 * @param learningDesign The learning design in which the export is being done.
-	 * @return Vector the ordered list of activities.
-	 */
-	public Vector getOrderedActivityList(LearningDesign learningDesign);
-
-	
-	/** 
-	 * Returns the ordered activity list (ordered by the ActivityOrderComparator)
-	 * containing the list of activities completed by the learner. The list will
-	 * only contain Tool Activities. If it comes across a Complex Activity, it
-	 * will only add its child activities in the ordered list.
-	 * 
-	 * If the learner has not yet completed any activities, then it will return null.
-	 * 
-	 * @param learnerProgressId
-	 * @return
-	 */
-	public Vector getOrderedActivityList(LearnerProgress learnerProgress);
-	
-	/**
 	 * Zips up the directory specified by <code>directoryToZip</code> and
 	 * saves it in the filename given by <code>filename</code>.
 	 * 
@@ -134,34 +101,8 @@ public interface IExportPortfolioService {
 	 */
 	public String zipPortfolio(String filename, String directoryToZip);
 	
-	/**
-	 * Creates the temporary root directory for the export and then 
-	 * iterates through the list of portfolios, creates a subdirectory for each of the tools
-	 * and appends the temporary export directory to the export url. It will then call each 
-	 * tool to write its files in the subdirectory.
-	 * The tool returns the name of the main html file written, the portfolio property
-	 * mainFileName is set to this value.
-	 * @param portfolios The portfolios to iterate through.
-	 * @param cookies The cookies that are to be passed along 
-	 * @return An array of portfolios that can be used to generate the main export page.
-	 */
-	public Portfolio doExport(Vector portfolios, Cookie[] cookies);
-	/**
-	 * This method is responsible for the call to the tool to export their portfolio via the export url.
-	 * It uses a HttpURLConnection to connect to the export url of each tool and returns the filename
-	 * of the main export page of the tool. 
-	 * 
-	 * @param tool The portfolio object, which contains the exportUrl in which to connect to.
-	 * @return The main file name of the tool's page.
-	 */
-	public String connectToToolViaExportURL(String exportURL, Cookie[] cookies, String directoryToStoreErrorFile);
-	
-//	public String getExportDir();
-	
-	/*	public Portfolio[] exportPortfolioForStudent(LearnerProgress learnerProgress, User user, boolean anonymity);
-	
-	public Portfolio[] exportPortfolioForStudent(Lesson lesson, User user, boolean anonymity); 
-	
-	public Vector getOrderedActivityList(Long learnerProgressId); */
+	/** Generate the main page, given this portfolio */
+	public void generateMainPage(HttpServletRequest request, Portfolio portfolio, Cookie[] cookies);
+
 	
 }

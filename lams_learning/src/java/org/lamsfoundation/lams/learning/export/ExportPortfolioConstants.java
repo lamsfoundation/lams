@@ -44,19 +44,10 @@ public class ExportPortfolioConstants {
 	public static final String HOST = getServerURL();
 	public static final String SUBDIRECTORY_BASENAME = "Activity"; //subdirectory for each activity is ActivityXX where XX is the activity Id
 	public static final String PARAM_FILE_LOCATION = "fileLocation";
-	public static final String TEMP_DIRECTORY = FileUtil.TEMP_DIR;
-	public static final String URL_FOR_UNSUPPORTED_EXPORT = "learning/exportNotSupported";
+	public static final String URL_FOR_UNSUPPORTED_EXPORT = "learning/exportPortfolio/notSupported.jsp";
 	public static final String EXPORT_ERROR_FILENAME = "export_error.html";
-	
-	public static final String EXPORT_CSS_STYLESHEET = "default.css";
-	public static final String LAMS_CSS_STYLESHEET = "/lams/css/default.css";
-	
-	//Struts Message Resource
-	public static final String MESSAGE_RESOURCE_CONFIG_PARAM = "org.lamsfoundation.lams.learning.ApplicationResources";
-	public static final String EXPORT_FAILED_KEY="export.html.exportFailed";
-	public static final String EXPORT_MAINPAGE_KEY = "export.html.mainPage";
-	public static final String EXPORT_NOT_SUPPORTED_KEY = "export.html.exportNotSupported";
-	
+	public static final String EXPORT_ACTIVITY_ERROR_KEY = "error.export.portfolio.not.supported";
+    
 	private static String getServerURL()
 	{
 	    return Configuration.get(ConfigurationKeys.SERVER_URL);

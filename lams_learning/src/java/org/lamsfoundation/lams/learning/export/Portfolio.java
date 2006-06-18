@@ -27,19 +27,20 @@ package org.lamsfoundation.lams.learning.export;
 
 /**
  * @author mtruong
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
- */
+  */
 public class Portfolio {
     
+	private String exportID; 
     private String exportTmpDir;
-    private ToolPortfolio[] toolPortfolios;
+    private String lessonName;
+    private String lessonDescription;
+    private ActivityPortfolio[] activityPortfolios;
     
-    public Portfolio()
+    public Portfolio(String exportID)
     {
         this.exportTmpDir = null;
-        this.toolPortfolios = null;
+        this.activityPortfolios = null;
+        this.exportID = exportID;
     }
 
     /**
@@ -57,13 +58,38 @@ public class Portfolio {
     /**
      * @return Returns the toolPortfolios.
      */
-    public ToolPortfolio[] getToolPortfolios() {
-        return toolPortfolios;
+    public ActivityPortfolio[] getActivityPortfolios() {
+        return activityPortfolios;
     }
     /**
      * @param toolPortfolios The toolPortfolios to set.
      */
-    public void setToolPortfolios(ToolPortfolio[] toolPortfolios) {
-        this.toolPortfolios = toolPortfolios;
+    public void setActivityPortfolios(ActivityPortfolio[] activityPortfolios) {
+        this.activityPortfolios = activityPortfolios;
     }
+
+	public String getLessonName() {
+		return lessonName;
+	}
+
+	public void setLessonName(String lessonName) {
+		this.lessonName = lessonName;
+	}
+
+	public String getLessonDescription() {
+		return lessonDescription;
+	}
+
+	public void setLessonDescription(String lessonDescription) {
+		this.lessonDescription = lessonDescription;
+	}
+
+	/** Get the internal id generated to keep this unique. Used in the directory name */
+	public String getExportID() {
+		return exportID;
+	}
+
+	public void setExportID(String exportID) {
+		this.exportID = exportID;
+	}
 }
