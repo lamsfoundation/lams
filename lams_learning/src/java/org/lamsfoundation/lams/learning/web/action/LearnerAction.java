@@ -371,7 +371,7 @@ public class LearnerAction extends LamsDispatchAction
 	
 	        //getting requested object according to coming parameters
 	        Integer learnerId = LearningWebUtil.getUserId();
-	        User learner = LearnerServiceProxy.getUserManagementService(getServlet().getServletContext()).getUserById(learnerId);
+	        User learner = (User)LearnerServiceProxy.getUserManagementService(getServlet().getServletContext()).findById(User.class,learnerId);
 
 	        Activity requestedActivity = learnerService.getActivity(new Long(activityId));
 	        

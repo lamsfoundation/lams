@@ -181,7 +181,7 @@ public class LearnerService implements ILearnerService
      */
     public LessonDTO[] getActiveLessonsFor(Integer learnerId)
     {
-    	User learner = userManagementService.getUserById(learnerId);
+    	User learner = (User)userManagementService.findById(User.class,learnerId);
         List activeLessons = this.lessonDAO.getActiveLessonsForLearner(learner);
         return getLessonDataFor(activeLessons);
     }
@@ -221,7 +221,7 @@ public class LearnerService implements ILearnerService
      */
     public LearnerProgress joinLesson(Integer learnerId, Long lessonID)  
     {
-    	User learner = userManagementService.getUserById(learnerId);
+    	User learner = (User)userManagementService.findById(User.class,learnerId);
     	
     	Lesson lesson = getLesson(lessonID);
         LearnerProgress learnerProgress = learnerProgressDAO.getLearnerProgressByLearner(learner.getUserId(),lessonID);
@@ -404,7 +404,7 @@ public class LearnerService implements ILearnerService
     public boolean performGrouping(Long lessonId, Long groupingActivityId, Integer learnerId, boolean forceGrouping) throws LearnerServiceException
     {
     	GroupingActivity groupingActivity = (GroupingActivity) activityDAO.getActivityByActivityId(groupingActivityId, GroupingActivity.class);
-    	User learner = userManagementService.getUserById(learnerId);
+    	User learner = (User)userManagementService.findById(User.class,learnerId);
     	
     	boolean groupingDone = false;
     	try {
