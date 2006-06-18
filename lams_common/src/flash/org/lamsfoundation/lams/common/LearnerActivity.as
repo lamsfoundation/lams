@@ -142,6 +142,9 @@ class LearnerActivity extends MovieClip {
 	 * @return  
 	 */
 	public function refresh():Void{
+		showAssets(false);
+		learner = controller.getModel().progressData;
+		actStatus = null;
 		draw();
 	}
 	
@@ -220,6 +223,10 @@ class LearnerActivity extends MovieClip {
 	private function onReleaseOutside():Void{
 		Debugger.log('ReleasingOutside:'+this,Debugger.GEN,'onReleaseOutside','LearnerActivity');
 		controller.activityReleaseOutside(this);
+	}
+	
+	public function set progressData(a:Progress){
+		learner = a;
 	}
 	
 	public function get controller(){

@@ -67,12 +67,13 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 	private var _locked:Boolean;
 	
 	// Only for Learner Optional Container children
-	private var learner:Object = new Object();
+	private var learner:Progress;
 	private var containerPanelHeader:MovieClip;
 	private var completed_mc:MovieClip;
 	private var current_mc:MovieClip;
 	private var todo_mc:MovieClip;
 	private var childHolder_mc:MovieClip;
+	var children_mc:Array
 	//---------------------------//
 	
 	private var child_mc : MovieClip;
@@ -99,16 +100,16 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 	public function init () : Void
 	{
 		
-		var children_mc : Array = new Array ();
+		children_mc = new Array();
 		var childrenArray:Array;
 		
 		childActivities_mc = this;
 		_locked = false;
 		showStatus(false);
 		
-		clickTarget_mc.onPress = Proxy.create (this, localOnPress);
-		clickTarget_mc.onRelease = Proxy.create (this, localOnRelease);
-		clickTarget_mc.onReleaseOutside = Proxy.create (this, localOnReleaseOutside);
+		clickTarget_mc.onPress = Proxy.create(this, localOnPress);
+		clickTarget_mc.onRelease = Proxy.create(this, localOnRelease);
+		clickTarget_mc.onReleaseOutside = Proxy.create(this, localOnReleaseOutside);
 		
 		
 		if(_activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
@@ -166,6 +167,18 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		_activity = a;
 	}
 	
+	public function refresh(){
+		showStatus(false);
+		learner = controller.getModel().progressData;
+		actStatus = null;
+		
+		for(var i=0; i<children_mc.length;i++){
+			children_mc[i].refresh();
+		}
+		
+		draw();
+	}
+	
 	private function draw (){
 		if (actStatus == null || actStatus == undefined){
 			actStatus = Progress.compareProgressData(learner, _activity.activityID);
@@ -211,10 +224,10 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		
 		Debugger.log ("I am in Draw :" + _activity.title + 'uiID:' + _activity.activityUIID + ' children:' + _children.length, Debugger.GEN, 'Draw', 'LearnerOptionalActivity');
 		_visible = true;
+		
 	}
-	
-	
-	private function localOnPress ():Void{
+
+	private function localOnPress():Void{
 		this.swapDepths(this._parent.getNextHighestDepth());
 		
 		// check double-click
@@ -234,25 +247,36 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 	}
 	
 	
-	private function localOnRelease ():Void{
+	private function localOnRelease():Void{
 		Debugger.log ('_doubleClicking:' + _doubleClicking + ', localOnRelease:' + this, Debugger.GEN, 'localOnRelease', 'LearnerOptionalActivity');
 			if (_locked && !_doubleClicking){
-				_locked = false;
-				gotoAndStop('collapse')
-				childHolder_mc._visible = false;
-				draw ();
+				collapse();
+				controller.complexActivityRelease(this, _doubleClicking);
 				
-			}else {
-				_locked = true;
-				childHolder_mc._visible = true;
-				gotoAndStop('expand')
-				draw ();			
+			} else {
+				expand();
+				controller.complexActivityRelease(this,_doubleClicking);
+				
 			}
 	}
 	
 	
 	private function localOnReleaseOutside():Void {
 		Debugger.log ('localOnReleaseOutside:' + this, Debugger.GEN, 'localOnReleaseOutside', 'LearnerOptionalActivity');
+	}
+	
+	public function collapse():Void{
+		_locked = false;
+		gotoAndStop('collapse');
+		childHolder_mc._visible = false;
+		draw();
+	}
+	
+	public function expand():Void{
+		_locked = true;
+		childHolder_mc._visible = true;
+		gotoAndStop('expand')
+		draw();
 	}
 	
 	/**
@@ -292,6 +316,10 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		return actStatus;
 	}
 	
+	public function set progressData(a:Progress){
+		learner = a;
+	}
+	
 	/**
 	*
 	* @usage
@@ -310,6 +338,12 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 	}
 	public function get locked():Boolean {
 		return _locked;
+	}
+	public function get activityChildren():Array {
+		return _children;
+	}
+	public function get doubleClicking():Boolean {
+		return _doubleClicking;
 	}
 	public function get panelHeight():Number {
 		return _panelHeight;
