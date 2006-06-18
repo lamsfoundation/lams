@@ -36,9 +36,9 @@ import java.util.Vector;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learning.export.ActivityPortfolio;
 import org.lamsfoundation.lams.learning.export.ExportPortfolioConstants;
 import org.lamsfoundation.lams.learning.export.ExportPortfolioException;
@@ -52,8 +52,6 @@ import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.usermanagement.dao.IUserDAO;
-import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileUtilException;
 import org.lamsfoundation.lams.util.HttpUrlConnectionUtil;
@@ -61,7 +59,6 @@ import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
-import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 
@@ -83,8 +80,8 @@ public class ExportPortfolioService implements IExportPortfolioService {
     
 	private ILamsCoreToolService lamsCoreToolService;
 	private IActivityDAO activityDAO;
-	private IUserDAO userDAO;
     private ILearnerService learnerService;
+    private IBaseDAO baseDAO;
     private ILessonDAO lessonDAO;
     protected MessageService messageService;
     
@@ -110,6 +107,10 @@ public class ExportPortfolioService implements IExportPortfolioService {
         this.lessonDAO = lessonDAO;
     }
     
+	public void setBaseDAO(IBaseDAO baseDAO) {
+		this.baseDAO = baseDAO;
+	}
+
 	/**
 	 * @param lamsCoreToolService The lamsCoreToolService to set.
 	 */
@@ -117,13 +118,6 @@ public class ExportPortfolioService implements IExportPortfolioService {
 		this.lamsCoreToolService = lamsCoreToolService;
 	}
 
-	/**
-     * @param userDAO The userDAO to set.
-     */
-    public void setUserDAO(IUserDAO userDAO) {
-        this.userDAO = userDAO;
-    }
-		
 	public void setMessageService(MessageService messageService) {
 		this.messageService = messageService;
 	}
@@ -178,7 +172,7 @@ public class ExportPortfolioService implements IExportPortfolioService {
 		ArrayList<ActivityPortfolio> portfolios = null;
 	    Portfolio exports = null;
 		
-	    User learner = userDAO.getUserById(userId);
+	    User learner = (User)baseDAO.find(User.class,userId);
 	    Lesson lesson = lessonDAO.getLesson(lessonID);
 	
 	    if (learner != null && lesson != null)
