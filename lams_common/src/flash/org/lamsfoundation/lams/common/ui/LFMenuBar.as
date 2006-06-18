@@ -42,6 +42,8 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
     // variables in this script
     private var file_menu:Menu;
     private var edit_menu:Menu;
+    private var view_menu:Menu;
+	private var go_menu:Menu;
     private var tools_menu:Menu;
     private var help_menu:Menu;
     private var env:String;
@@ -137,7 +139,6 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
         tools_menu.addMenuItem({type:"separator"});
         tools_menu.addMenuItem({label:Dictionary.getValue('mnu_tools_prefs'), instanceName:"prefsItem", enabled:false});
 
-
         /*=================
             HELP MENU
         =================*/
@@ -154,18 +155,22 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
 		this._visible = true;
 		Debugger.log('Finished setting up set visible to:'+this._visible,Debugger.GEN,'setupMenuItems','LFMenuBar');
 		
-		}else{
+		} else {
 		
+			
 		/*=================
-            LESSON MENU
+            FILE MENU
         =================*/
-		//_global.breakpoint();
-        tools_menu = _mb.addMenu(Dictionary.getValue('mnu_tools'));
-		
-        tools_menu.addMenuItem({label:Dictionary.getValue('mnu_lesson_create'), instanceName:"createLesson"});
-        tools_menu.addMenuItem({label:Dictionary.getValue('mnu_lesson_disable'), instanceName:"disableLesson"});
-        tools_menu.addMenuItem({type:"separator"});
-        tools_menu.addMenuItem({label:Dictionary.getValue('mnu_lesson_archive'), instanceName:"archiveLesson"});
+        file_menu = _mb.addMenu(Dictionary.getValue('mnu_file'));
+        
+        file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_refresh'), instanceName:"refreshItem"});
+        file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_editclass'), instanceName:"editClassItem", enabled:false});
+		file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_start'), instanceName:"startItem"});
+        file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_schedule'), instanceName:"scheduleItem"});
+        
+		file_menu.addMenuItem({type:"separator"});
+		file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_exit'), instanceName:"exitItem"});
+        
 		
 		/*=================
             EDIT MENU
@@ -173,22 +178,54 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
         edit_menu = _mb.addMenu(Dictionary.getValue("mnu_edit"));
         
         // "new" is the linkage id of the movie clip to be used as the icon for the "New" menu item.
-		edit_menu.addMenuItem({label:Dictionary.getValue('mnu_edit_cut'), instanceName:"cutItem"});
-        edit_menu.addMenuItem({label:Dictionary.getValue('mnu_edit_copy'), instanceName:"copyItem"});
-        edit_menu.addMenuItem({label:Dictionary.getValue('mnu_edit_paste'), instanceName:"pasteItem"});
+		edit_menu.addMenuItem({label:Dictionary.getValue('mnu_edit_cut'), instanceName:"cutItem", enabled:false});
+        edit_menu.addMenuItem({label:Dictionary.getValue('mnu_edit_copy'), instanceName:"copyItem", enabled:false});
+        edit_menu.addMenuItem({label:Dictionary.getValue('mnu_edit_paste'), instanceName:"pasteItem", enabled:false});
 		
+		/*=================
+            VIEW MENU
+        =================*/
+		//_global.breakpoint();
+        view_menu = _mb.addMenu(Dictionary.getValue('mnu_view'));
+		
+        view_menu.addMenuItem({label:Dictionary.getValue('mnu_view_learners'), instanceName:"viewLearners"});
+		
+		/*=================
+            GO MENU
+        =================*/
+		//_global.breakpoint();
+        go_menu = _mb.addMenu(Dictionary.getValue('mnu_go'));
+		
+        go_menu.addMenuItem({label:Dictionary.getValue('mnu_go_lesson'), instanceName:"goLessonTab"});
+        go_menu.addMenuItem({label:Dictionary.getValue('mnu_go_schedule'), instanceName:"goScheduleTab"});
+        go_menu.addMenuItem({label:Dictionary.getValue('mnu_go_learners'), instanceName:"goLearnerTab"});
+		go_menu.addMenuItem({label:Dictionary.getValue('mnu_go_todo'), instanceName:"goTodoTab"});
+
+		/*=================
+            TOOLS MENU
+        =================*/
+		//_global.breakpoint();
+        tools_menu = _mb.addMenu(Dictionary.getValue('mnu_tools'));
+		tools_menu.addMenuItem({label:Dictionary.getValue('mnu_tools_enable'), instanceName:"enableItem", enabled:false});
+        tools_menu.addMenuItem({label:Dictionary.getValue('mnu_tools_disable'), instanceName:"disableItem", enabled:false});
+        tools_menu.addMenuItem({type:"separator"});
+        tools_menu.addMenuItem({label:Dictionary.getValue('mnu_tools_archive'), instanceName:"archiveItem"});
+        
+
 		/*=================
             HELP MENU
         =================*/
         help_menu = _mb.addMenu(Dictionary.getValue('mnu_help'));
-        help_menu.addMenuItem({label:Dictionary.getValue('mnu_help_abt'), instanceName:"aboutItem"});
+        help_menu.addMenuItem({label:Dictionary.getValue('mnu_help_help'), instanceName:"helpItem"});
+		help_menu.addMenuItem({label:Dictionary.getValue('mnu_help_abt'), instanceName:"aboutItem"});
         
         //set up listeners
         // register the listeners with the separate menus
         file_menu.addEventListener("change", Delegate.create(this,fileMenuClicked));
         edit_menu.addEventListener("change", Delegate.create(this,editMenuClicked));
-        tools_menu.addEventListener("change", Delegate.create(this,toolsMenuClicked));
-		
+        view_menu.addEventListener("change", Delegate.create(this,viewMenuClicked));
+		go_menu.addEventListener("change", Delegate.create(this,goMenuClicked));
+		help_menu.addEventListener("change", Delegate.create(this, helpMenuClicked));
 		//Now that menu items have been set up make the menu bar visible
 		this._visible = true;
 		Debugger.log('Finished setting up set visible to:'+this._visible,Debugger.GEN,'setupMenuItems','LFMenuBar');
@@ -226,8 +263,16 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
 				Debugger.log('Clicked Flie > Save As',Debugger.GEN,'fileMenuClicked','LFMenuBar');
                 org.lamsfoundation.lams.authoring.Application(app).getCanvas().saveDesignToServerAs();
                 break;
-				
-		
+			case eventObj.menu.editClassItem:
+				break;
+			case eventObj.menu.refreshItem:
+				break;
+			case eventObj.menu.startItem:
+				break;
+			case eventObj.menu.scheduleItem:
+				break;
+			case eventObj.menu.exitItem:
+				break;
         }        
     }
 
@@ -253,29 +298,68 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
 			 case eventObj.menu.pasteItem :
                 org.lamsfoundation.lams.authoring.Application(app).paste();
                 break;
-			
-		
         }        
     }
+	
+	
+    /**
+    * event handler for go menu click
+    */
+    private function goMenuClicked(eventObj:Object):Void{
+		switch(eventObj.menuItem) {
+			case eventObj.menu.goLessonTab : 
+				break;
+			case eventObj.menu.goScheduleTab : 
+				break;
+			case eventObj.menu.goLearnerTab : 
+				break;
+			case eventObj.menu.goTodoTab : 
+				break;
+		}
+	}
     
+	 /**
+    * event handler for view menu click
+    */
+    private function viewMenuClicked(eventObj:Object):Void{
+		switch(eventObj.menuItem) {
+			case eventObj.menu.viewLearners : 
+				break;
+		}
+	}
+	
     /**
     * event handler for tool menu click
     */
     private function toolsMenuClicked(eventObj:Object):Void{
         //Which item was clicked ?
         switch (eventObj.menuItem) {
-			case eventObj.menu.createLesson :
-				org.lamsfoundation.lams.monitoring.Application(app).getMonitor().openDesignBySelection();
-				break;
-            case eventObj.menu.prefsItem : 
+			case eventObj.menu.prefsItem : 
                 org.lamsfoundation.lams.authoring.Application(app).showPrefsDialog();
                 break;
-				
 			case eventObj.menu.drawTransitionalItem :
 				org.lamsfoundation.lams.authoring.Application(app).getCanvas().toggleTransitionTool();
 				break;
+			case eventObj.menu.archiveItem:
+				break;
+			case eventObj.menu.enableItem:
+				break;
+			case eventObj.menu.disableItem:
+				break;
         }        
     }    
+	
+	 /**
+    * event handler for help menu click
+    */
+    private function helpMenuClicked(eventObj:Object):Void{
+		switch (eventObj.menuItem) {
+			case eventObj.menu.helpItem :
+				break;
+			case eventObj.menu.aboutItem :
+				break;
+		}
+	}
     
     /**
     * Event fired by StyleManager class to notify listeners that Theme has changed
