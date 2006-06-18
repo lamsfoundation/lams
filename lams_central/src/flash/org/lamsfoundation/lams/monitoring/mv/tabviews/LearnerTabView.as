@@ -381,8 +381,13 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		var mc = getController();
 		
 		//take action depending on act type
-		if(a.activityTypeID==Activity.TOOL_ACTIVITY_TYPE || a.isGateActivity() || a.isGroupActivity() ){
-			var newActivity_mc = _activityLayer_mc.createChildAtDepth("LearnerActivity", DepthManager.kTop,{_activity:a,_controller:mc,_view:ltv, _x:ACT_X, _y:ACT_Y+40, actLabel:a.title, learner:learner});
+		if(a.activityTypeID==Activity.TOOL_ACTIVITY_TYPE || a.isGroupActivity()){
+			var newActivity_mc = _activityLayer_mc.createChildAtDepth("LearnerActivity", DepthManager.kTop,{_activity:a,_controller:mc,_view:ltv, _x:ACT_X, _y:ACT_Y+40, learner:learner});
+			ACT_X = newActivity_mc._x + newActivity_mc._width;
+		}else if(a.isGateActivity()){
+			var actLabel:String = gateTitle(a);
+			trace("Title to pass for Gate Activity: "+actLabel)
+			var newActivity_mc = _activityLayer_mc.createChildAtDepth("LearnerGateActivity", DepthManager.kTop,{_activity:a,_controller:mc,_view:ltv, _x:ACT_X, _y:ACT_Y+40, actLabel:actLabel, learner:learner});
 			ACT_X = newActivity_mc._x + newActivity_mc._width;
 		}else if(a.activityTypeID==Activity.PARALLEL_ACTIVITY_TYPE || a.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE){
 			//get the children
@@ -403,7 +408,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		//mm.getMonitor().getMV().getMonitorScp().redraw(true);
 		return s;
 	}
-	
+
 	/**
 	 * Get the CSSStyleDeclaration objects for each component and apply them
 	 * directly to the instance
@@ -412,7 +417,26 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		var styleObj = _tm.getStyleObject('BGPanel');
 		bkg_pnl.setStyle('styleName',styleObj);
 	}
-	
+
+	private function gateTitle(a:Activity):String{
+		var titleToReturn:String
+		switch(String(a.activityTypeID)){
+			case '3' :
+				titleToReturn = "Synchronise Gate"
+				return titleToReturn;
+				break;
+			case '4' :
+				titleToReturn = "Schedule Gate"
+				return titleToReturn;
+				break;
+			case '5' :
+				titleToReturn = "Permission Gate"
+				return titleToReturn;
+				break;
+			default:
+			Debugger.log('not defined yet',Debugger.GEN,'drawActivity','LearnerTabView');
+		}
+	}
 	/**
     * Sets the size of the canvas on stage, called from update
     */
