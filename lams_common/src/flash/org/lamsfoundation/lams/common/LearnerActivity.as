@@ -59,6 +59,7 @@ class LearnerActivity extends MovieClip {
 	private var app:ApplicationParent;
 	//locals
 	private var actStatus:String;
+	private var actLabel:String;
 	private var learner:Progress;
 	private var completed_mc:MovieClip;
 	private var current_mc:MovieClip;
@@ -185,7 +186,12 @@ class LearnerActivity extends MovieClip {
 		}
 			
 		//write text
-		title_lbl.text = _activity.title;
+		trace("Title passed for Gate Activity: "+actLabel)
+		if (actLabel == undefined){
+			title_lbl.text = _activity.title;
+		}else {
+			title_lbl.text = actLabel;
+		}
 									//Debugger.log('canvasActivity_mc._visible'+canvasActivity_mc._visible,4,'draw','CanvasActivity');
 		//_visible = true;
 	}
