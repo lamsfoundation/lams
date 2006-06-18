@@ -65,7 +65,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 	//private var _monitor_mc:MovieClip;
 	private var learnerMenuBar:MovieClip;
 	private var monitorTabs_tb:MovieClip;
-	private var _monitorTabViewContainer_mc:MovieClip
+	private var _monitorTabViewContainer_mc:MovieClip;
 	private var bkg_pnl:MovieClip;
 	private var _gridLayer_mc:MovieClip;
 	private var _transitionLayer_mc:MovieClip;
@@ -212,6 +212,9 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 		//learnerMenuBar.refresh_btn.onRelease = Proxy.create (this, reloadProgress);	
 		trace("Loaded MonitorTabView Data"+ this)
 		//setSize (mm)
+		
+		setStyles();
+		
 		dispatchEvent({type:'load',target:this});
 	}
 	
@@ -342,6 +345,16 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Abst
 		return s;
 		
 	}
+	
+	/**
+	 * Get the CSSStyleDeclaration objects for each component and apply them
+	 * directly to the instance
+	 */
+	private function setStyles():Void{
+		var styleObj = _tm.getStyleObject('CanvasPanel');
+		bkg_pnl.setStyle('styleName',styleObj);
+	}
+	
 	/**
     * Sets the size of the canvas on stage, called from update
     */

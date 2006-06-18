@@ -54,6 +54,9 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.TodoTabView extends Abstrac
 	private var todoTaskList:Array = new Array();
 	private var _monitorTodoTask_mc:MovieClip;
 		
+	// Background
+	private var bkg_pnl:MovieClip;
+		
 	//Text Items
  	private var genralInfo_txt:TextField;
 
@@ -146,6 +149,8 @@ public function update (o:Observable,infoObj:Object):Void{
 			mm.getMonitor().getContributeActivities(mm.getSequence().getSequenceID());
 		}
 		
+		setStyles();
+		
 		dispatchEvent({type:'load',target:this});
 	}
 	
@@ -153,10 +158,10 @@ public function update (o:Observable,infoObj:Object):Void{
 	 * Populate the lesson details from HashTable Sequence in MOnitorModel
 	*/
 	private function populateLessonDetails():Void{
-		//var mm:Observable = getModel();
+		
 		var s:Object = mm.getSequence();
-		var desc:String = "<b>Advanced Controls:</b> Use of this Todo Tab is not required to complete the sequence. See the help page for more information. <br><br>This feature is now fully functional."
-		genralInfo_txt.htmlText = desc
+		var desc:String = "<b>" + Dictionary.getValue('td_desc_heading') + "</b>" + Dictionary.getValue('td_desc_text');
+		genralInfo_txt.htmlText = desc;
 		
 		  
 	}
@@ -223,6 +228,7 @@ public function update (o:Observable,infoObj:Object):Void{
 			todoTaskList[listCount] = _monitorTodoTask_mc.attachMovie("contributeActivityRow", "contributeActivityRow"+listCount, _monitorTodoTask_mc.getNextHighestDepth(), {_x:x, _y:YPOS+(19*listCount)})
 			todoTaskList[listCount].contributeActivity.background = true;
 			todoTaskList[listCount].contributeActivity._width=_monitorTodoTask_mc._width-20
+			
 			if (ca._parentActivityID == null){
 				todoTaskList[listCount].contributeActivity.text = "  "+ca.title
 				todoTaskList[listCount].contributeActivity.backgroundColor = 0xD5E6FF;
@@ -242,7 +248,8 @@ public function update (o:Observable,infoObj:Object):Void{
 				trace('write out entry with GO link'+o.taskURL);
 				todoTaskList[listCount] =_monitorTodoTask_mc.attachMovie("contributeEntryRow", "contributeEntryRow"+listCount, this._monitorTodoTask_mc.getNextHighestDepth(), {_x:x, _y:YPOS+(19*listCount)})
 				todoTaskList[listCount].contributeEntry.text = "\t\t"+mm.getMonitor().getCELiteral(o._contributionType);
-				todoTaskList[listCount].goContribute._x = this._width-50
+				todoTaskList[listCount].goContribute._x = this._width-50;
+				todoTaskList[listCount].goContribute.text = Dictionary.getValue('todo_goContribute_btn');
 				todoTaskList[listCount].goContribute.onRelease = function (){
 					trace("Contrybute Type is: "+o.taskURL);
 					getURL(String(o.taskURL), "_blank");
@@ -263,10 +270,20 @@ public function update (o:Observable,infoObj:Object):Void{
 	}
 	
 	/**
+	 * Get the CSSStyleDeclaration objects for each component and apply them
+	 * directly to the instance
+	 */
+	private function setStyles():Void{
+		var styleObj = _tm.getStyleObject('BGPanel');
+		bkg_pnl.setStyle('styleName',styleObj);
+	}
+	
+	/**
     * Sets the size of the canvas on stage, called from update
     */
 	private function setSize(mm:MonitorModel):Void{
         var s:Object = mm.getSize();
+		bkg_pnl.setSize(s.w,s.h);
 		genralInfo_txt._width = s.w-20
 		for (var i=0; i<todoTaskList.length; i++){
 			todoTaskList[i].contributeActivity._width = s.w-20

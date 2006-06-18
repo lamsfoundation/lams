@@ -50,7 +50,7 @@ class LearnersDialog extends MovieClip implements Dialog{
     private var _container:MovieClip;  //The container window that holds the dialog
 	
     private var close_btn:Button;         // Close window button
-    private var learners_txt:TextField;
+    private var learners_lbl:Label;
 	private var panel:MovieClip;       //The underlaying panel base
 	
 	private var learner_scp:MovieClip;		// learners container
@@ -100,7 +100,7 @@ class LearnersDialog extends MovieClip implements Dialog{
         setStyles();
 		
         //Set the text for buttons
-		close_btn.label = "Close";
+		close_btn.label = Dictionary.getValue('ls_win_learners_close_btn');
 		
         //Set the labels
 		
@@ -135,7 +135,7 @@ class LearnersDialog extends MovieClip implements Dialog{
 		_monitorController = _monitorView.getController();
 		_monitorModel = MonitorModel(_monitorView.getModel());
 		
-		learners_txt.text = "Learners in class: " + _monitorModel.getSequence().organisationName;
+		learners_lbl.text = Dictionary.getValue('ls_win_learners_heading_lbl') + " " + _monitorModel.getSequence().organisationName;
 		
 		 //Add event listeners for ok, cancel and close buttons
         close_btn.addEventListener('onPress',Delegate.create(this, close));
@@ -152,6 +152,14 @@ class LearnersDialog extends MovieClip implements Dialog{
         //LFWindow, goes first to prevent being overwritten with inherited styles.
         var styleObj = themeManager.getStyleObject('LFWindow');
         _container.setStyle('styleName',styleObj);
+		
+		//Apply panel style
+		styleObj = themeManager.getStyleObject('BGPanel');
+		panel.setStyle('styleName', styleObj);
+
+		//Apply scrollpane style
+		styleObj = themeManager.getStyleObject('scrollpane');
+		learner_scp.setStyle('styleName', styleObj);
 
         //Get the button style from the style manager and apply to both buttons
         styleObj = themeManager.getStyleObject('button');
@@ -159,6 +167,7 @@ class LearnersDialog extends MovieClip implements Dialog{
         
         //Apply label style 
         styleObj = themeManager.getStyleObject('label');
+		learners_lbl.setStyle('styleName', styleObj);
         
     }
 

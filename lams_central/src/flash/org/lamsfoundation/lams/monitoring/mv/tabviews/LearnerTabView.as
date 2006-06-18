@@ -197,7 +197,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
     */
 	private function draw(){
 		//activityArr = new Array;
-		//bkg_pnl = this.attachMovie("Panel", "bkg_pnl", this.getNextHighestDepth());
+		bkg_pnl = this.attachMovie("Panel", "bkg_pnl", this.getNextHighestDepth());
 
 		//set up the Movie Clips to load relevant  
 
@@ -216,6 +216,9 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		//learnerMenuBar.refresh_btn.onRelease = Proxy.create (this, reloadProgress);
 		trace("Help layer path: "+ learnerMenuBar.refresh_btn.label)
 		//setSize (mm)
+		
+		setStyles();
+		
 		dispatchEvent({type:'load',target:this});
 	}
 	
@@ -399,6 +402,15 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		//actLenght++;
 		//mm.getMonitor().getMV().getMonitorScp().redraw(true);
 		return s;
+	}
+	
+	/**
+	 * Get the CSSStyleDeclaration objects for each component and apply them
+	 * directly to the instance
+	 */
+	private function setStyles():Void{
+		var styleObj = _tm.getStyleObject('BGPanel');
+		bkg_pnl.setStyle('styleName',styleObj);
 	}
 	
 	/**

@@ -25,16 +25,15 @@ import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.common.ui.*
 import org.lamsfoundation.lams.common.style.*
 import org.lamsfoundation.lams.monitoring.mv.*
-import org.lamsfoundation.lams.monitoring.mv.tabviews.*;
+import org.lamsfoundation.lams.monitoring.mv.tabviews.*
 import org.lamsfoundation.lams.monitoring.*;
 import org.lamsfoundation.lams.common.dict.*
 import org.lamsfoundation.lams.common.mvc.*
 import mx.managers.*
-import mx.containers.*;
+import mx.containers.*
 import mx.events.*
 import mx.utils.*
-import mx.controls.*;
-//import mx.controls.TabBar;
+import mx.controls.*
 
 
 /**
@@ -45,6 +44,7 @@ import mx.controls.*;
 class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 	
 	private var _className = "MonitorView";
+	
 	//constants:
 	private var GRID_HEIGHT:Number;
 	private var GRID_WIDTH:Number;
@@ -61,7 +61,6 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 	private var monitorTabs_tb:MovieClip;
 	private var learnerMenuBar:MovieClip;
     private var bkg_pnl:MovieClip;
-	//private var act_pnl:Panel;
 	
     private var _gridLayer_mc:MovieClip;
     private var _lessonTabLayer_mc:MovieClip;
@@ -77,6 +76,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
     private var _monitorView:MonitorView;
 	
 	//Tab Views Initialisers
+	
 	//LessonTabView
 	private var lessonTabView:LessonTabView;
 	private var lessonTabView_mc:MovieClip;
@@ -96,8 +96,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
     private var dispatchEvent:Function;     
     public var addEventListener:Function;
     public var removeEventListener:Function;
-	//public var menu:ContextMenu;
-
+	
 	
 	/**
 	* Constructor
@@ -105,6 +104,10 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 	function MonitorView(){
 		_monitorView = this;
 		_tm = ThemeManager.getInstance();
+		
+		//_dictionary = Dictionary.getInstance();
+		//_dictionary.addEventListener('init',Proxy.create(this,setLabels));
+		
         //Init for event delegation
         mx.events.EventDispatcher.initialize(this);
 	}
@@ -113,21 +116,13 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 	* Called to initialise Canvas  . CAlled by the Canvas container
 	*/
 	public function init(m:Observable,c:Controller,x:Number,y:Number,w:Number,h:Number){
-		//Invoke superconstructor, which sets up MVC relationships.
-		//if(c==undefined){
-		//	c==defaultController();
-		//}
+
 		super (m, c);
         //Set up parameters for the grid
 		H_GAP = 10;
 		V_GAP = 10;
 		
 		MovieClipUtils.doLater(Proxy.create(this,draw)); 
-		
-        //setupTabInit(m, c);
-	   //register to recive updates form the model
-		//MonitorModel(m).addEventListener('update',this);
-        
 		
     }    
 	
@@ -142,11 +137,11 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
     }
 	
 	/**
- * Recieved update events from the CanvasModel. Dispatches to relevent handler depending on update.Type
- * @usage   
- * @param   event
- */
-public function update (o:Observable,infoObj:Object):Void{
+	 * Recieved update events from the CanvasModel. Dispatches to relevent handler depending on update.Type
+	 * @usage   
+	 * @param   event
+	 */
+	public function update (o:Observable,infoObj:Object):Void{
 		
        var mm:MonitorModel = MonitorModel(o);
 	   _monitorController = getController();
@@ -177,12 +172,8 @@ public function update (o:Observable,infoObj:Object):Void{
     */
 	private function showData(mm:MonitorModel):Void{
         var s:Object = mm.getSequence();
-		//for (var i in s){
-			trace("Item Description is : "+s._learningDesignID);
-			
-		//}
-		//monitor_scp.contentPath = lessonTabView;
-					
+		trace("Item Description is : "+s._learningDesignID);
+		
 	}
 	
 	/**
@@ -191,35 +182,28 @@ public function update (o:Observable,infoObj:Object):Void{
 	private function draw(){
 		
 		var mcontroller = getController();
+		
 		//get the content path for the sp
 		_monitor_mc = monitor_scp.content;
-		//Debugger.log('_canvas_mc'+_canvas_mc,Debugger.GEN,'draw','CanvasView');
 		
 		trace("Height of learnerMenuBar: "+learnerMenuBar._height)
-		//Offset_Y_TabLayer_mc = learnerMenuBar._height
 		
-		//_monitor_mc._y = Offset_Y_TabLayer_mc;
 		_lessonTabLayer_mc = _monitor_mc.createEmptyMovieClip("_lessonTabLayer_mc", _monitor_mc.getNextHighestDepth());
 		_monitorTabLayer_mc = _monitor_mc.createEmptyMovieClip("_monitorTabLayer_mc", _monitor_mc.getNextHighestDepth());
 		_todoTabLayer_mc = _monitor_mc.createEmptyMovieClip("_todoTabLayer_mc", _monitor_mc.getNextHighestDepth());
 		_learnerTabLayer_mc = _monitor_mc.createEmptyMovieClip("_learnerTabLayer_mc", _monitor_mc.getNextHighestDepth());
-		//trace('lesson tab view: ' + _tabsLayer_mc);
-		//bkg_pnl.useHandCursor = false;
-	
-		var tab_arr:Array = [{label:"Lesson", data:"lesson"}, {label:"Sequence", data:"monitor"}, {label:"Learners", data:"learners"}, {label:"Todo", data:"todo"}];
-		monitorTabs_tb.setSize(400, 22)
+		
+		var tab_arr:Array = [{label:Dictionary.getValue('mtab_lesson'), data:"lesson"}, {label:Dictionary.getValue('mtab_seq'), data:"monitor"}, {label:Dictionary.getValue('mtab_learners'), data:"learners"}, {label:Dictionary.getValue('mtab_todo'), data:"todo"}];
+		
 		monitorTabs_tb.dataProvider = tab_arr;
 		monitorTabs_tb.selectedIndex = 0;
 		
-		//learnerMenuBar = this.attachMovie("RefreshBar", "RefreshBar", this.getNextHighestDepth(), {_x:-30})
-		//learnerMenuBar = eval(learnerMenuBar)
-		
-		//learnerMenuBar.refresh_btn.addEventListener("click",mcontroller);
 		refresh_btn.addEventListener("click",mcontroller);
+		help_btn.addEventListener("click",mcontroller);
 		monitorTabs_tb.addEventListener("change",mcontroller);
 		
-		
-		//setStyles();
+		setLabels();
+		setStyles();
 		setupTabInit()
 	    dispatchEvent({type:'load',target:this});
 		
@@ -266,28 +250,36 @@ public function update (o:Observable,infoObj:Object):Void{
 		mm.addObserver(todoTabView);
 		
 	}
-	
 
-	
 	/**
-	 * Event listener for when when tab is clicked
-	 * 
-	 * @usage   
-	 * @param   evt 
-	 * @return  
+	 * Get the CSSStyleDeclaration objects for each component and apply them
+	 * directly to the instance  
 	 */
-	//private function clickEvt(evt):Void{
-		  // trace(evt.target);
-		  // trace("test: "+ String(evt.target.selectedIndex))
-					//forClick.text="label is: " + evt.itemIndex.label + " index is: " + evt.index + " capital is: " +               targetComp.dataProvider[evt.index].data;
-		//}
+	private function setStyles():Void{
+		var styleObj = _tm.getStyleObject('CanvasPanel');
+		bkg_pnl.setStyle('styleName',styleObj);
+		styleObj = _tm.getStyleObject('scrollpane');
+		monitor_scp.setStyle('styleName',styleObj);
+		styleObj = _tm.getStyleObject('button');
+		monitorTabs_tb.setStyle('styleName', styleObj);
+		refresh_btn.setStyle('styleName',styleObj);
+		help_btn.setStyle('styleName',styleObj);
+		
+	}
+	
+	private function setLabels():Void{
+		refresh_btn.label = Dictionary.getValue('refresh_btn');
+		help_btn.label = Dictionary.getValue('help_btn');
+	}
+		
 	/**
     * Sets the size of the canvas on stage, called from update
     */
 	private function setSize(mm:MonitorModel):Void{
         var s:Object = mm.getSize();
 		trace("Monitor Tab Widtht: "+s.w+" Monitor Tab Height: "+s.h);
-		monitor_scp.setSize(s.w,s.h);
+		bkg_pnl.setSize(s.w,s.h);
+		monitor_scp.setSize(s.w-monitor_scp._x,s.h-monitor_scp._y);
 		refresh_btn._x = s.w - 180
 		help_btn._x = s.w - 80
 				

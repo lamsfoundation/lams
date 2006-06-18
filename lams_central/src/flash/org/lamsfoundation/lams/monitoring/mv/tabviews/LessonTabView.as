@@ -52,7 +52,13 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	public static var DISABLE_CBI:Number = 2;
 	public static var ARCHIVE_CBI:Number = 3;
 	public static var UNARCHIVE_CBI:Number = 4;
+	
+	public static var STARTED_STATUS:Number = 3;
+	public static var SUSPENDED_STATUS:Number = 4;
+	public static var ARCHIVED_STATUS:Number = 6;
+	
 	private var _className = "LessonTabView";
+	
 	//constants:
 	private var _tm:ThemeManager;
 	private var mm:MonitorModel;
@@ -65,6 +71,8 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	private var reqTasks_scp:MovieClip;
 	private var monitorTabs_tb:MovieClip;
 	private var _lessonStateArr:Array;
+	private var bkg_pnl:MovieClip;
+	
 	//Labels
 	private var status_lbl:Label;
 	private var learner_lbl:Label;
@@ -83,9 +91,10 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	private var numLearners_txt:TextField;
 	private var class_txt:TextField;
 	private var duration_txt:TextField;
+	private var startMsg_txt:TextField;
+	
 	private var lessonManager:TextField;
 	private var taskManager:TextField;
-	private var startMsg_txt:TextField;
 	
 	//Button
 	private var viewLearners_btn:Button;
@@ -172,7 +181,7 @@ public function update (o:Observable,infoObj:Object):Void{
 			case 'RELOADPROGRESS' :	
 					if (infoObj.tabID == _tabID){
 						trace("called Reload progress")
-						//reloadProgress()
+						mm.getMonitor().reloadLessonToMonitor();
 					}
 					break;
 			case 'LM_DIALOG' :
@@ -205,15 +214,17 @@ public function update (o:Observable,infoObj:Object):Void{
 		start_btn.addEventListener("click", _monitorController);
 		statusApply_btn.addEventListener("click", Delegate.create(this, changeStatus))
 		this.addEventListener("apply", Delegate.create(_monitorController, _monitorController.changeStatus));
-		
+
 	}
 	
 	/**
     * layout visual elements on the canvas on initialisation
     */
 	private function draw(){
+		
 		listCount = 0; 
 		this.onEnterFrame = setupLabels;
+		
 		//get the content path for the sp
 		_monitorReqTask_mc = reqTasks_scp.content;
 		_monitorController = getController();
@@ -227,28 +238,6 @@ public function update (o:Observable,infoObj:Object):Void{
 		populateStatusList(seq.state);
 		populateLessonDetails();
 		enableEditClass(seq.state);
-		
-		if(seq.state != Sequence.ACTIVE_STATE_ID){
-		// hide start buttons etc
-			scheduleTime._visible = false;
-			scheduleDate_dt.visible = false;
-			start_btn.visible = false;
-			schedule_btn.visible = false;
-			manageDate_lbl.visible = false;
-			//manageStart_lbl.visible = false;
-			
-		/**	
-			if(seq.isStarted()){
-				startMsg_txt.text = "Currently Started."
-			} else {
-				startMsg_txt.text = "Scheduled to start at "
-			}
-			
-			startMsg_txt.visible = true;
-			*/
-		}
-		
-		//setStyles();
 		
 		var requestLessonID:Number = seq.ID;
 		
@@ -264,6 +253,9 @@ public function update (o:Observable,infoObj:Object):Void{
 			mm.getMonitor().getContributeActivities(mm.getSequence().ID);
 		}
 		
+		
+		setStyles();
+		
 		dispatchEvent({type:'load',target:this});
 	}
 	
@@ -277,7 +269,7 @@ public function update (o:Observable,infoObj:Object):Void{
 		LSTitle_txt.text = s.name;
 		LSDescription_txt.text = s.description;
 		sessionStatus_txt.text = showStatus(s.state);
-		numLearners_txt.text = String(s.noStartedLearners) + " of "+String(s.noPossibleLearners);
+		numLearners_txt.text = String(s.noStartedLearners) + " "  + Dictionary.getValue('ls_of_text')+" "+String(s.noPossibleLearners);
 		class_txt.text = s.organisationName;
 	}
 	
@@ -286,61 +278,84 @@ public function update (o:Observable,infoObj:Object):Void{
 		
 		switch(stateID){
 			case Sequence.SUSPENDED_STATE_ID :
-				changeStatus_cmb.addItem("Select Status", LessonTabView.NULL_CBI);
-				changeStatus_cmb.addItem("Active", LessonTabView.ACTIVE_CBI);
-				changeStatus_cmb.addItem("Archive", LessonTabView.ARCHIVE_CBI);
+				changeStatus_cmb.addItem(Dictionary.getValue('ls_manage_status_cmb'), LessonTabView.NULL_CBI);
+				changeStatus_cmb.addItem(Dictionary.getValue('ls_status_cmb_enable'), LessonTabView.ACTIVE_CBI);
+				changeStatus_cmb.addItem(Dictionary.getValue('ls_status_cmb_archive'), LessonTabView.ARCHIVE_CBI);
 				break;
 			case Sequence.ARCHIVED_STATE_ID :
-				changeStatus_cmb.addItem("Select Status", LessonTabView.NULL_CBI);
-				changeStatus_cmb.addItem("Activate", LessonTabView.UNARCHIVE_CBI);
+				changeStatus_cmb.addItem(Dictionary.getValue('ls_manage_status_cmb'), LessonTabView.NULL_CBI);
+				changeStatus_cmb.addItem(Dictionary.getValue('ls_status_cmb_activate'), LessonTabView.UNARCHIVE_CBI);
 				break;
 			case Sequence.ACTIVE_STATE_ID :
-				changeStatus_cmb.addItem("Select Status", LessonTabView.NULL_CBI);
-				changeStatus_cmb.addItem("Archive", LessonTabView.ARCHIVE_CBI);
+				changeStatus_cmb.addItem(Dictionary.getValue('ls_manage_status_cmb'), LessonTabView.NULL_CBI);
+				changeStatus_cmb.addItem(Dictionary.getValue('ls_status_cmb_archive'), LessonTabView.ARCHIVE_CBI);
 				break;
 			case Sequence.NOTSTARTED_STATE_ID :
-				changeStatus_cmb.addItem("Select Status", LessonTabView.NULL_CBI);
-				changeStatus_cmb.addItem("Archive", LessonTabView.ARCHIVE_CBI);
+				changeStatus_cmb.addItem(Dictionary.getValue('ls_manage_status_cmb'), LessonTabView.NULL_CBI);
+				changeStatus_cmb.addItem(Dictionary.getValue('ls_status_cmb_archive'), LessonTabView.ARCHIVE_CBI);
 				break;
 			default :
-				changeStatus_cmb.addItem("Select Status", LessonTabView.NULL_CBI);
-				changeStatus_cmb.addItem("Disable", LessonTabView.DISABLE_CBI);
-				changeStatus_cmb.addItem("Archive", LessonTabView.ARCHIVE_CBI);
+				changeStatus_cmb.addItem(Dictionary.getValue('ls_manage_status_cmb'), LessonTabView.NULL_CBI);
+				changeStatus_cmb.addItem(Dictionary.getValue('ls_status_cmb_disable'), LessonTabView.DISABLE_CBI);
+				changeStatus_cmb.addItem(Dictionary.getValue('ls_status_cmb_archive'), LessonTabView.ARCHIVE_CBI);
 				
 		}
+	
 	}
-
 	private function enableEditClass(stateID:Number):Void{
 		
 		switch(stateID){
 			case Sequence.ACTIVE_STATE_ID :
+				showStartFields(true);
 				editClass_btn.enabled = true;
 				break;
 			case Sequence.NOTSTARTED_STATE_ID :
+				showStartFields(true);
 				editClass_btn.enabled = true;
 				break;
 			default :
+				showStartFields(false);
 				editClass_btn.enabled = false;
 			
 		}
 	}
+	
+	private function showStartFields(b:Boolean){
+		scheduleTime._visible = b;
+		scheduleDate_dt.visible = b;
+		start_btn.visible = b;
+		schedule_btn.visible = b;
+		manageDate_lbl.visible = b;
+		
+		/**	
+			if(seq.isStarted()){
+				startMsg_txt.text = "Currently Started."
+			} else {
+				startMsg_txt.text = "Scheduled to start at "
+			}
+			
+			startMsg_txt.visible = true;
+			*/
+	}
 
 	private function showStatus(seqStatus:Number):String{
 		var seqStat:String;
-		switch(String(seqStatus)){
-			case '6' :
-				seqStat = "Archived"
+		
+		switch(seqStatus){
+			case LessonTabView.ARCHIVED_STATUS :
+				seqStat = Dictionary.getValue('ls_status_archived_lbl');
 				break;
-			case '3' :
-				seqStat = "Started"
+			case LessonTabView.STARTED_STATUS :
+				seqStat = Dictionary.getValue('ls_status_started_lbl');
 				break;
-			case '4' :
-				seqStat = "Suspended"
+			case LessonTabView.SUSPENDED_STATUS :
+				seqStat = Dictionary.getValue('ls_status_disabled_lbl');
 				break;
 			default:
-				seqStat = "Active"
+				seqStat = Dictionary.getValue('ls_status_active_lbl');
 		}
-		return seqStat
+		
+		return seqStat;
 	}
 	
 	/**
@@ -439,6 +454,7 @@ public function update (o:Observable,infoObj:Object):Void{
 				reqTasks_scp.redraw(true);
 				requiredTaskList[listCount].contributeEntry.text = "\t\t"+mm.getMonitor().getCELiteral(o._contributionType);
 				requiredTaskList[listCount].goContribute._x = reqTasks_scp._width-50
+				requiredTaskList[listCount].goContribute.text = Dictionary.getValue('todo_goContribute_btn');
 				requiredTaskList[listCount].goContribute.onRelease = function (){
 					trace("Contrybute Type is: "+o.taskURL);
 					getURL(String(o.taskURL), "_blank");
@@ -468,7 +484,7 @@ public function update (o:Observable,infoObj:Object):Void{
 		trace('doing Lesson Manager popup...');
 		trace('app root: ' + mm.getMonitor().root);
 		trace('lfwindow: ' + LFWindow);
-        var dialog:MovieClip = PopUpManager.createPopUp(mm.getMonitor().root, LFWindow, true,{title:"Edit Class",closeButton:true,scrollContentPath:'selectClass'});
+        var dialog:MovieClip = PopUpManager.createPopUp(mm.getMonitor().root, LFWindow, true,{title:Dictionary.getValue('ls_win_editclass_title'),closeButton:true,scrollContentPath:'selectClass'});
 		dialog.addEventListener('contentLoaded',Delegate.create(_monitorController,_monitorController.openDialogLoaded));
 		
     }
@@ -480,7 +496,7 @@ public function update (o:Observable,infoObj:Object):Void{
 		trace('doing Learners popup...');
 		trace('app root: ' + mm.getMonitor().root);
 		trace('lfwindow: ' + LFWindow);
-        var opendialog:MovieClip = PopUpManager.createPopUp(mm.getMonitor().root, LFWindow, true,{title:"View Learners",closeButton:true,scrollContentPath:'learnersDialog'});
+        var opendialog:MovieClip = PopUpManager.createPopUp(mm.getMonitor().root, LFWindow, true,{title:Dictionary.getValue('ls_win_learners_title'),closeButton:true,scrollContentPath:'learnersDialog'});
 		opendialog.addEventListener('contentLoaded',Delegate.create(_monitorController,_monitorController.openDialogLoaded));
 		
     }
@@ -508,34 +524,40 @@ public function update (o:Observable,infoObj:Object):Void{
 		//max_lbl.text = Dictionary.getValue('pi_max_act');
 		
 		//populate the synch type combo:
-		status_lbl.text = "Status:"
-		learner_lbl.text = "Learners:"
-		class_lbl.text = "Class:"
-		elapsed_lbl.text = "Elapsed duration:"
-		manageClass_lbl.text = "Class:"
-		manageStatus_lbl.text = "Status:"
-		manageStart_lbl.text = "Start:"
-		manageDate_lbl.text = "Date"
+		status_lbl.text = Dictionary.getValue('ls_status_lbl');
+		learner_lbl.text = Dictionary.getValue('ls_learners_lbl');
+		class_lbl.text = Dictionary.getValue('ls_class_lbl');
+		elapsed_lbl.text = Dictionary.getValue('ls_duration_lbl');
+		manageClass_lbl.text = Dictionary.getValue('ls_manage_class_lbl');
+		manageStatus_lbl.text = Dictionary.getValue('ls_manage_status_lbl');
+		manageStart_lbl.text = Dictionary.getValue('ls_manage_start_lbl');
+		manageDate_lbl.text = Dictionary.getValue('ls_manage_date_lbl');
 			
 		//Button
-		viewLearners_btn.label = "View Learners"
-		editClass_btn.label = "Edit Class"
-		statusApply_btn.label = "Apply"
-		schedule_btn.label = "Schedule"
-		start_btn.label = "Start Now"
+		viewLearners_btn.label = Dictionary.getValue('ls_manage_learners_btn');
+		editClass_btn.label = Dictionary.getValue('ls_manage_editclass_btn');
+		statusApply_btn.label = Dictionary.getValue('ls_manage_apply_btn');
+		schedule_btn.label = Dictionary.getValue('ls_manage_schedule_btn');
+		start_btn.label = Dictionary.getValue('ls_manage_start_btn');
 		
-		_lessonStateArr = ["CREATED", "NOT_STARTED", "STARTED", "SUSPENDED", "FINISHED", "ARCHIVED", "DISABLED"];
+		//_lessonStateArr = ["CREATED", "NOT_STARTED", "STARTED", "SUSPENDED", "FINISHED", "ARCHIVED", "DISABLED"];
 		
 		taskManager.border = true
 		taskManager.borderColor = 0x003366;
+		taskManager.text = Dictionary.getValue('ls_tasks_txt');
+		
 		lessonManager.border = true
 		lessonManager.borderColor = 0x003366;
+		lessonManager.text = Dictionary.getValue('ls_manage_txt');
+		
 		taskManager.background = true
 		taskManager.backgroundColor = 0xEAEAEA;
 		lessonManager.background = true
 		lessonManager.backgroundColor = 0xEAEAEA;
-		//Call to apply style to all the labels and input fields
+		
 		delete this.onEnterFrame; 
+		
+		//Call to apply style to all the labels and input fields
 		setStyles();
 			
 	}
@@ -543,8 +565,6 @@ public function update (o:Observable,infoObj:Object):Void{
 	/**
 	 * Get the CSSStyleDeclaration objects for each component and apply them
 	 * directly to the instance
-	 * @usage   
-	 * @return  
 	 */
 	private function setStyles() {
         
@@ -571,12 +591,18 @@ public function update (o:Observable,infoObj:Object):Void{
 		changeStatus_cmb.setStyle('styleName',styleObj);
 		scheduleDate_dt.setStyle('styleName',styleObj);
 		
+		//BG PANEL
+		styleObj = _tm.getStyleObject('BGPanel');
+		bkg_pnl.setStyle('styleName',styleObj);
+		
 		//STEPPER
-		styleObj = _tm.getStyleObject('numericstepper');
+		//styleObj = _tm.getStyleObject('numericstepper');
 		//startHour_stp.setStyle('styleName',styleObj);
 		//startMin_stp.setStyle('styleName',styleObj);
 		
 		//SCROLLPANE
+		styleObj = _tm.getStyleObject('scrollpane');
+		reqTasks_scp.setStyle('styleName', styleObj);
 		reqTasks_scp.border_mc.setStyle('_visible',false);
 		
     }
@@ -612,6 +638,7 @@ public function update (o:Observable,infoObj:Object):Void{
 	private function setSize(mm:MonitorModel):Void{
         var s:Object = mm.getSize();
 		trace("Monitor Tab Widtht: "+s.w+" Monitor Tab Height: "+s.h);
+		bkg_pnl.setSize(s.w,s.h);
 		lessonManager.setSize(s.w-20,lessonManager._height);
 		taskManager.setSize(s.w-20,lessonManager._height);
 		//qTasks_scp.setSize(s.w._width,reqTasks_scp._height);

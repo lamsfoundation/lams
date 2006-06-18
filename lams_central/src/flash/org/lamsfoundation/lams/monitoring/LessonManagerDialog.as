@@ -46,6 +46,8 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 	public var RT_ORG:String = "Organisation";
 	public static var USERS_X:Number = 10;
 	public static var USER_OFFSET:Number = 20;
+	private static var USERS_LOAD_CHECK_INTERVAL:Number = 50;
+	private static var USERS_LOAD_CHECK_TIMEOUT_COUNT:Number = 200;
 	
 	//References to components + clips 
     private var _container:MovieClip;  //The container window that holds the dialog
@@ -53,6 +55,11 @@ class LessonManagerDialog extends MovieClip implements Dialog{
     private var ok_btn:Button;         //OK+Cancel buttons
     private var cancel_btn:Button;
     
+	// headings (labels)
+	private var organisation_lbl:Label;
+	private var staff_lbl:Label;
+	private var learners_lbl:Label;
+	
 	private var panel:MovieClip;       //The underlaying panel base
 	
 	private var treeview:Tree;              //Treeview for navigation through workspace folder structure
@@ -84,6 +91,11 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 	private var _resultDTO:Object;
 	private var _selectedOrgId:Number;	// selected organisation
 	
+	private var _usersLoadCheckCount = 0;				// instance counter for number of times we have checked to see if users are loaded
+	private var _UsersLoadCheckIntervalID:Number;         //Interval ID for periodic check on UILoad status
+    private var _learnersLoaded:Boolean;                     //UI Loading status
+	private var _staffLoaded:Boolean;
+	
 	//These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
     public var addEventListener:Function;
@@ -97,7 +109,8 @@ class LessonManagerDialog extends MovieClip implements Dialog{
         //Set up this class to use the Flash event delegation model
         EventDispatcher.initialize(this);
 		_resultDTO = new Object();
-        
+        _learnersLoaded = false;
+		_staffLoaded = false;
         //Create a clip that will wait a frame before dispatching init to give components time to setup
         MovieClipUtils.doLater(Proxy.create(this,init));
 	}
@@ -108,18 +121,20 @@ class LessonManagerDialog extends MovieClip implements Dialog{
     private function init():Void{
         
         trace('now initialising ...');
-        //set the reference to the StyleManager
-        //themeManager = ThemeManager.getInstance();
+        
+		//set the reference to the StyleManager
+        themeManager = ThemeManager.getInstance();
         
 		// Set the styles
-        //setStyles();
-		
+        setStyles();
+		setLabels();
         //Set the text for buttons
         //ok_btn.label = Dictionary.getValue('lesson_dlg_ok');
         //cancel_btn.label = Dictionary.getValue('lesson_dlg_cancel');
-		ok_btn.label = "save";
-		cancel_btn.label = "cancel";
 		
+		
+		// disable on startup until learners/staff loaded
+		enableButtons(false);
 		
         //Set the labels
         
@@ -176,24 +191,6 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 		
 		//itemSelected(treeview.selectedNode);
 	}
-	
-    /**
-    * Called on initialisation
-    */
-    private function setStyles(){
-        //LFWindow, goes first to prevent being overwritten with inherited styles.
-        var styleObj = themeManager.getStyleObject('LFWindow');
-        _container.setStyle('styleName',styleObj);
-
-        //Get the button style from the style manager and apply to both buttons
-        styleObj = themeManager.getStyleObject('button');
-        ok_btn.setStyle('styleName',styleObj);
-        cancel_btn.setStyle('styleName',styleObj);
-
-        //Apply label style 
-        styleObj = themeManager.getStyleObject('label');
-        
-    }
 
 	/**
     * Event fired by StyleManager class to notify listeners that Theme has changed
@@ -413,6 +410,9 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 		
 		_monitorModel.setOrganisation(new Organisation(treeview.selectedNode.attributes.data));
 		
+		// run polling method
+		checkUsersLoaded();
+		
 		var callback:Function = Proxy.create(this,loadStaff);
 		_monitorModel.requestStaff(treeview.selectedNode.attributes.data, callback);
 		
@@ -421,6 +421,31 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 		_monitorModel.requestLearners(treeview.selectedNode.attributes.data, callback);
 			
 		
+    }
+	
+	 /**
+    * Runs periodically and dispatches events as they are ready
+    */
+    private function checkUsersLoaded() {
+        //If it's the first time through then set up the interval to keep polling this method
+        if(!_UsersLoadCheckIntervalID) {
+            _UsersLoadCheckIntervalID = setInterval(Proxy.create(this,checkUsersLoaded),USERS_LOAD_CHECK_INTERVAL);
+        } else {
+			_usersLoadCheckCount++;
+            //If all events dispatched clear interval and call start()
+            if(_learnersLoaded && _staffLoaded){
+				//Debugger.log('Clearing Interval and calling start :',Debugger.CRITICAL,'checkUILoaded','Application');	
+                clearInterval(_UsersLoadCheckIntervalID);
+				enableButtons(true);
+            }else {
+				//Debugger.log('ALL UI LOADED, waiting for all true to dispatch init events: _dictionaryLoaded:'+_dictionaryLoaded+'_themeLoaded:'+_themeLoaded ,Debugger.GEN,'checkUILoaded','Application');
+				if(_usersLoadCheckCount >= USERS_LOAD_CHECK_TIMEOUT_COUNT){
+					//if we havent loaded the dict or theme by the timeout count then give up
+					Debugger.log('raeached time out waiting to load dict and themes, giving up.',Debugger.CRITICAL,'checkUILoaded','Application');
+					clearInterval(_UsersLoadCheckIntervalID);
+				}
+            }
+        }
     }
 	
 	public function getOrganisations(courseID:Number, classID:Number):Void{
@@ -532,7 +557,9 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 		trace('loading: user ' + user.getFirstName() + ' ' + user.getLastName());
 
 		}
+		
 		learner_scp.redraw(true);
+		
 		
 		var callback:Function = Proxy.create(_monitorModel,_monitorModel.saveLearners);
 		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=getLessonLearners&lessonID='+_monitorModel.getSequence().ID,callback, false);
@@ -549,6 +576,7 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 		}
 		
 		learner_scp.redraw(true);
+		_learnersLoaded = true;
 	}
  
 	/**
@@ -575,6 +603,7 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 		trace('loading: user ' + user.getFirstName() + ' ' + user.getLastName());
 
 		}
+		
 		staff_scp.redraw(true);
 		
 		var callback:Function = Proxy.create(_monitorModel,_monitorModel.saveStaff);
@@ -593,6 +622,53 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 		}
 		
 		staff_scp.redraw(true);
+		_staffLoaded = true;
+	}
+	
+	private function enableButtons(b:Boolean){
+		ok_btn.enabled = b;
+		cancel_btn.enabled = b;
+	}
+	
+	/**
+    * Called on initialisation
+    */
+    private function setStyles(){
+        //LFWindow, goes first to prevent being overwritten with inherited styles.
+        var styleObj = themeManager.getStyleObject('LFWindow');
+        _container.setStyle('styleName',styleObj);
+		
+		//Apply panel style
+		styleObj = themeManager.getStyleObject('BGPanel');
+		panel.setStyle('styleName', styleObj);
+
+		//Apply scrollpane style
+		styleObj = themeManager.getStyleObject('scrollpane');
+		learner_scp.setStyle('styleName', styleObj);
+		staff_scp.setStyle('styleName', styleObj);
+		
+		//Apply tree style
+		styleObj = themeManager.getStyleObject('treeview');
+		treeview.setStyle('styleName', styleObj);
+		
+        //Get the button style from the style manager and apply to both buttons
+        styleObj = themeManager.getStyleObject('button');
+        ok_btn.setStyle('styleName',styleObj);
+        cancel_btn.setStyle('styleName',styleObj);
+        
+        //Apply label style 
+        styleObj = themeManager.getStyleObject('label');
+		organisation_lbl.setStyle('styleName', styleObj);
+		staff_lbl.setStyle('styleName', styleObj);
+		learners_lbl.setStyle('styleName', styleObj);
+    }
+	
+	private function setLabels(){
+		ok_btn.label = Dictionary.getValue('ls_win_editclass_save_btn');
+		cancel_btn.label = Dictionary.getValue('ls_win_editclass_cancel_btn');
+		organisation_lbl.text = Dictionary.getValue('ls_win_editclass_organisation_lbl');
+		staff_lbl.text = Dictionary.getValue('ls_win_editclass_staff_lbl');
+		learners_lbl.text = Dictionary.getValue('ls_win_editclass_learners_lbl');
 	}
 	
     /**
