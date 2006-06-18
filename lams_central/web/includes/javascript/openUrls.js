@@ -97,7 +97,7 @@
 				if(monitorLessonWin && monitorLessonWin.open && !monitorLessonWin.closed)
 				{
 					monitorLessonWin.location = 'home.do?method=monitorLesson&lessonID='+lessonID;
-					monitorLessonWin.close();
+					monitorLessonWin.focus();
 				}else{
 					monitorLessonWin = window.open('home.do?method=monitorLesson&lessonID='+lessonID,'mWindow','width=779,height=575,resizable,resizable,scrollbars');
 				}
