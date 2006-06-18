@@ -818,7 +818,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 						} catch (LessonServiceException e) {
 		            		stopReason = "Force complete stop at non-grouped grouping activity [" + groupActivity + "] due to exception "+e.getMessage();
 						}
-            			learnerService.completeActivity(learner.getUserId(),activity,lessonId);
+            			learnerService.completeActivity(learner.getUserId(),activity);
             			log.debug("Grouping activity [" + activity.getActivityId() + "] is completed.");
             		}else{
 	            		//except random grouping, stop here
@@ -827,14 +827,14 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
             		}
             	}else{
             		//if group already exist
-            		learnerService.completeActivity(learner.getUserId(),activity,lessonId);
+            		learnerService.completeActivity(learner.getUserId(),activity);
             		log.debug("Grouping activity [" + activity.getActivityId() + "] is completed.");
             	}
             }else if ( activity.isGateActivity() ) {
             	GateActivity gate = (GateActivity) activity;
-            	if(learnerService.knockGate(lessonId,gate,learner)){
+            	if(learnerService.knockGate(gate,learner,false)){
             		//the gate is opened, continue to next activity to complete
-            		learnerService.completeActivity(learner.getUserId(),activity,lessonId);
+            		learnerService.completeActivity(learner.getUserId(),activity);
             		log.debug("Gate activity [" + gate.getActivityId() + "] is completed.");
             	}else{
             		//the gate is closed, stop here
