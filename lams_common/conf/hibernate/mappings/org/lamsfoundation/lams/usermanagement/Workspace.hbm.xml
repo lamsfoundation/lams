@@ -102,12 +102,14 @@
         name="rootFolder"
         class="org.lamsfoundation.lams.usermanagement.WorkspaceFolder"
         not-null="true"
+        cascade="all"
         lazy="false"
     >
         <meta attribute="field-description">
            @hibernate.many-to-one
             not-null="true"
 	        lazy="false"
+	        cascade="all"
            @hibernate.column name="root_folder_id"         
         </meta>
         <column name="root_folder_id" />

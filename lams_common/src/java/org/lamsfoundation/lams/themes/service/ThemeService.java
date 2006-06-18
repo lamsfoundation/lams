@@ -195,7 +195,7 @@ public class ThemeService implements IThemeService {
 	 * @throws IOException
 	 */
 	private FlashMessage setTheme(Integer userId, Long themeId, String type) throws IOException, ThemeException, UserException {
-		User user = userManagementService.getUserById(userId);
+		User user = (User)userManagementService.findById(User.class,userId);
 		CSSThemeVisualElement theme = themeDAO.getThemeById(themeId);
 		
 		if(theme==null)
@@ -213,7 +213,7 @@ public class ThemeService implements IThemeService {
 			else if(type.equals(IThemeService.HTML_KEY))
 				user.setHtmlTheme(theme);
 			
-			userManagementService.updateUser(user);
+			userManagementService.save(user);
 			flashMessage = new FlashMessage("setTheme", messageService.getMessage(IThemeService.SET_THEME_SAVED_MESSAGE_KEY));
 		}
 		

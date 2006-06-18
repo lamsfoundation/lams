@@ -28,8 +28,8 @@ import java.util.Set;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
 import org.lamsfoundation.lams.test.AbstractCommonTestCase;
 import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.usermanagement.dao.IUserDAO;
-import org.lamsfoundation.lams.usermanagement.dao.hibernate.UserDAO;
+import org.lamsfoundation.lams.dao.IBaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 
 
 /**
@@ -40,7 +40,7 @@ import org.lamsfoundation.lams.usermanagement.dao.hibernate.UserDAO;
 public class TestActivity extends AbstractCommonTestCase
 {
 	protected ActivityDAO activityDAO;
-	protected IUserDAO userDAO; 
+	protected IBaseDAO baseDAO; 
 	protected User testUser;
 	
 	
@@ -54,8 +54,8 @@ public class TestActivity extends AbstractCommonTestCase
     {
         super.setUp();
 		activityDAO =(ActivityDAO) context.getBean("activityDAO");
-		userDAO = (UserDAO)context.getBean("userDAO");
-		testUser = userDAO.getUserById(TEST_USER_ID);
+		baseDAO = (BaseDAO)context.getBean("userDAO");
+		testUser = (User)baseDAO.find(User.class,TEST_USER_ID);
 		
     }
 

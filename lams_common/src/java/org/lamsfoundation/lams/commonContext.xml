@@ -81,18 +81,7 @@
 	<bean id="userManagementServiceTarget" class="org.lamsfoundation.lams.usermanagement.service.UserManagementService"
 		singleton="false"
 	>
-		<property name="userDAO"><ref local="userDAO"/></property>
-		<property name="roleDAO"><ref local="roleDAO"/></property>
-		<property name="localeDAO"><ref local="localeDAO"/></property>
-		<property name="rolePrivilegeDAO"><ref local="rolePrivilegeDAO"/></property>
-		<property name="organisationDAO"><ref local="organisationDAO"/></property>
-		<property name="organisationStateDAO"><ref local="organisationStateDAO"/></property>
-		<property name="organisationTypeDAO"><ref local="organisationTypeDAO"/></property>
-		<property name="userOrganisationDAO"><ref local="userOrganisationDAO"/></property>
-		<property name="userOrganisationRoleDAO"><ref local="userOrganisationRoleDAO"/></property>
-		<property name="authenticationMethodDAO"><ref local="authenticationMethodDAO"/></property>
-		<property name="workspaceFolderDAO"><ref bean="workspaceFolderDAO"/></property>
-		<property name="userManagementWorkspaceDAO"><ref bean="userManagementWorkspaceDAO"/></property>
+		<property name="baseDAO"><ref bean="baseDAO"/></property>
 		<property name="learningDesignDAO"><ref bean="learningDesignDAO"/></property>
 		<property name="lessonDAO"><ref bean="lessonDAO"/></property>
 		<property name="cacheManager"><ref local="cacheManager"/></property>
@@ -155,7 +144,7 @@
 		<property name="activityDAO"><ref bean="activityDAO"/></property>
 		<property name="toolDAO"><ref bean="toolDAO"/></property>
 		<property name="toolContentDAO"><ref bean="toolContentDAO"/></property>
-		<property name="workspaceFolderDAO"><ref bean="workspaceFolderDAO"/></property>
+		<property name="baseDAO"><ref bean="baseDAO"/></property>
 		<property name="licenseDAO"><ref bean="licenseDAO"/></property>
 		<property name="groupingDAO"><ref bean="groupingDAO"/></property>
 		<property name="transitionDAO"><ref bean="transitionDAO"/></property>
@@ -221,58 +210,9 @@
 	
 	<!--User management related beans -->
 	
-	<bean id="userDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.UserDAO">
+	<bean id="baseDAO" class="org.lamsfoundation.lams.dao.hibernate.BaseDAO">
 		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
 	</bean>
-
-	<bean id="roleDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.RoleDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
-	</bean>
-
-	<bean id="localeDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.LocaleDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
-	</bean>
-	
-	<bean id="organisationDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.OrganisationDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
-	</bean>
-
-	<bean id="organisationStateDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.OrganisationStateDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
-	</bean>
-
-	<bean id="organisationTypeDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.OrganisationTypeDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
-	</bean>
-
-	<bean id="authenticationMethodDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.AuthenticationMethodDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
-	</bean>
-
-	<bean id="userOrganisationDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.UserOrganisationDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
-	</bean>
-
-	<bean id="userOrganisationRoleDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.UserOrganisationRoleDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
-	</bean>	
-
-	<bean id="rolePrivilegeDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.RolePrivilegeDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
-	</bean>	
-	
-	<bean id="userManagementWorkspaceDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.WorkspaceDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
-	</bean>
-	
-	<bean id="workspaceFolderDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.WorkspaceFolderDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
-	</bean>	
-	
-	<bean id="workspaceFolderContentDAO" class="org.lamsfoundation.lams.workspace.dao.hibernate.WorkspaceFolderContentDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
-	</bean>
-	
 	<!--  Theme beans -->
 	<bean id="themeDAO" class="org.lamsfoundation.lams.themes.dao.hibernate.CSSThemeDAO">
 		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>

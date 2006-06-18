@@ -55,6 +55,6 @@ public interface IUserImportFileParser {
 	public static final String AUTH_METHOD_REQUIRED = "Authentication method is required.";
 	public static final String ROLE_REQUIRED = "Role is required.";
 	
-	public String parseUsersInOrganisation(FileItem fileItem, Organisation org, String adminLogin, boolean existingUsersOnly) throws IOException;
+	//public String parseUsersInOrganisation(FileItem fileItem, Organisation org, String adminLogin, boolean existingUsersOnly) throws IOException;
 	
 }

@@ -44,10 +44,8 @@ import org.lamsfoundation.lams.lesson.dao.hibernate.LessonDAO;
 import org.lamsfoundation.lams.test.AbstractCommonTestCase;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.usermanagement.dao.IOrganisationDAO;
-import org.lamsfoundation.lams.usermanagement.dao.IUserDAO;
-import org.lamsfoundation.lams.usermanagement.dao.hibernate.OrganisationDAO;
-import org.lamsfoundation.lams.usermanagement.dao.hibernate.UserDAO;
+import org.lamsfoundation.lams.dao.IBaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 
 
 /**
@@ -64,9 +62,8 @@ public class LessonDataAccessTestCase extends AbstractCommonTestCase
     //---------------------------------------------------------------------
     // DAO instances for initializing data
     //---------------------------------------------------------------------
-    protected IUserDAO userDao;
+    protected IBaseDAO baseDao;
     protected ILearningDesignDAO learningDesignDao;
-    protected IOrganisationDAO orgDao;
     protected ILessonDAO lessonDao;
     protected ILessonClassDAO lessonClassDao;
     protected ILearnerProgressDAO learnerProgressDao;
@@ -110,14 +107,13 @@ public class LessonDataAccessTestCase extends AbstractCommonTestCase
     {
         super.setUp();
 
-        userDao = (UserDAO) this.context.getBean("userDAO");
+        baseDao = (BaseDAO) this.context.getBean("userDAO");
         learningDesignDao = (LearningDesignDAO) this.context.getBean("learningDesignDAO");
-        orgDao = (OrganisationDAO) this.context.getBean("organisationDAO");
-
+ 
         //retrieve test domain data
-        testUser = userDao.getUserById(TEST_USER_ID);
+        testUser = (User)baseDao.find(User.class,TEST_USER_ID);
         testLearningDesign = learningDesignDao.getLearningDesignById(TEST_LEARNING_DESIGN_ID);
-        testOrg = orgDao.getOrganisationById(TEST_ORGANIZATION_ID);
+        testOrg = (Organisation)baseDao.find(Organisation.class,TEST_ORGANIZATION_ID);
    
         //get lesson related daos
         lessonDao = (LessonDAO)this.context.getBean("lessonDAO");

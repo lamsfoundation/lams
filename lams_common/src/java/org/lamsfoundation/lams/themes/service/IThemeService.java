@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.themes.service;
 
 import java.io.IOException;
 
-import org.lamsfoundation.lams.usermanagement.dao.IUserDAO;
 import org.lamsfoundation.lams.themes.dao.ICSSThemeDAO;
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.themes.exception.ThemeException;

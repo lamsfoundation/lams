@@ -55,9 +55,9 @@ import org.lamsfoundation.lams.usermanagement.Organisation;
  */
 public class ExcelUserImportFileParser implements IUserImportFileParser{
 
-	/*
+/*	
 	 * start of definition of property keys used in the excel file
-	 */
+	 
 	private static final short LOGIN = 0;
 	private static final short PASSWORD = 1;
 	private static final short AUTH_METHOD = 2;
@@ -94,7 +94,7 @@ public class ExcelUserImportFileParser implements IUserImportFileParser{
 
 	/** 
 	 * @see org.lamsfoundation.lams.usermanagement.util.IUserImportFileParser#parseUsersInOrganisation(FileItem fileItem, Organisation org, String adminLogin, boolean existingUsersOnly)
-	 */
+	 
 	public String parseUsersInOrganisation(FileItem fileItem, Organisation org, String adminLogin, boolean existingUsersOnly) throws IOException{
 		String errorMessage = "";
 		POIFSFileSystem fs = new POIFSFileSystem(fileItem.getInputStream());
@@ -310,7 +310,7 @@ public class ExcelUserImportFileParser implements IUserImportFileParser{
 		int index = roleDescription.indexOf(SEPERATOR, fromIndex);
 		while (index != -1)
 		{
-			Role role = service.getRoleByName(roleDescription.substring(fromIndex, index));
+			Role role = (Role)service.findByProperty(Role.class,"name",roleDescription.substring(fromIndex, index)).get(0);
 			if(role!=null)//ignore wrong spelled role
 			{
 				roles.add(role);
@@ -330,4 +330,4 @@ public class ExcelUserImportFileParser implements IUserImportFileParser{
 		String status = parseStringCell(cell,row,-1);
 		return new Boolean(STATUS_DISABLED.equals(status));
 	}
-}
+*/}

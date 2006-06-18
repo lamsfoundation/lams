@@ -473,6 +473,7 @@ public class User implements Serializable {
      *            @hibernate.many-to-one
      *             not-null="true"
      *			   lazy="false"
+     *             cascade="all"
      *            @hibernate.column name="workspace_id"         
      *         
      */
@@ -487,6 +488,7 @@ public class User implements Serializable {
     /** 
      *            @hibernate.many-to-one
      *             not-null="true"
+     *             lazy="false"
      *            @hibernate.column name="authentication_method_id"         
      *         
      */

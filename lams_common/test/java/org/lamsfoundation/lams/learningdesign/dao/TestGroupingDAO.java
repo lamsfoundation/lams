@@ -26,8 +26,8 @@ import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupingDAO;
 import org.lamsfoundation.lams.test.AbstractCommonTestCase;
 import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.usermanagement.dao.IUserDAO;
-import org.lamsfoundation.lams.usermanagement.dao.hibernate.UserDAO;
+import org.lamsfoundation.lams.dao.IBaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 
 /**
  * 
@@ -39,7 +39,7 @@ import org.lamsfoundation.lams.usermanagement.dao.hibernate.UserDAO;
 public class TestGroupingDAO extends AbstractCommonTestCase
 {
 	protected IGroupingDAO groupingDAO;
-	protected IUserDAO userDAO = null;
+	protected IBaseDAO baseDAO = null;
 	private static Grouping testGrouping =null;	
 	private static User testUser = null;
 	private final Integer TEST_USER_ID = new Integer(2);
@@ -52,9 +52,9 @@ public class TestGroupingDAO extends AbstractCommonTestCase
     {
         super.setUp();
 		groupingDAO = (GroupingDAO)context.getBean("groupingDAO");
-		userDAO = (UserDAO)context.getBean("userDAO");
+		baseDAO = (BaseDAO)context.getBean("userDAO");
 		
-		testUser = userDAO.getUserById(TEST_USER_ID);
+		testUser = (User)baseDAO.find(User.class,TEST_USER_ID);
 		
     }
 

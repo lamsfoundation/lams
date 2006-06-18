@@ -309,11 +309,13 @@
     <many-to-one
         name="workspace"
         lazy="false"
+        cascade="all"
         class="org.lamsfoundation.lams.usermanagement.Workspace"     
     >
         <meta attribute="field-description">
            @hibernate.many-to-one
 	         lazy="false"
+	         cascade="all"
            @hibernate.column name="workspace_id"         
         </meta>
         <column name="workspace_id" />
@@ -348,11 +350,13 @@
     <many-to-one
         name="authenticationMethod"
         class="org.lamsfoundation.lams.usermanagement.AuthenticationMethod"
+        lazy="false"
         not-null="true"
     >
         <meta attribute="field-description">
            @hibernate.many-to-one
             not-null="true"
+            lazy="false"
            @hibernate.column name="authentication_method_id"         
         </meta>
         <column name="authentication_method_id" />

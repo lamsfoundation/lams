@@ -42,8 +42,8 @@ import org.lamsfoundation.lams.tool.dao.hibernate.ToolContentDAO;
 import org.lamsfoundation.lams.tool.dao.hibernate.ToolDAO;
 import org.lamsfoundation.lams.tool.dao.hibernate.ToolSessionDAO;
 import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.usermanagement.dao.IUserDAO;
-import org.lamsfoundation.lams.usermanagement.dao.hibernate.UserDAO;
+import org.lamsfoundation.lams.dao.IBaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 
 
 /**
@@ -57,7 +57,7 @@ public class ToolDataAccessTestCase extends AbstractCommonTestCase
     protected IToolContentDAO toolContentDao;
     protected IToolDAO toolDao;
     protected IToolSessionDAO toolSessionDao;
-    protected IUserDAO userDao;
+    protected IBaseDAO baseDao;
 	protected IActivityDAO activityDAO;
     protected IGroupDAO groupDao;
 	protected ILessonDAO lessonDao;
@@ -99,12 +99,12 @@ public class ToolDataAccessTestCase extends AbstractCommonTestCase
         toolSessionDao = (ToolSessionDAO)this.context.getBean("toolSessionDAO");
         activityDAO =(ActivityDAO) context.getBean("activityDAO");
         
-        userDao = (UserDAO) this.context.getBean("userDAO");
+        baseDao = (BaseDAO) this.context.getBean("userDAO");
         groupDao = (GroupDAO)this.context.getBean("groupDAO");
         lessonDao = (LessonDAO)this.context.getBean("lessonDAO");
         
         //retrieve test domain data
-        testUser = userDao.getUserById(TEST_USER_ID);
+        testUser = (User)baseDao.find(User.class,TEST_USER_ID);
         testNonGroupedActivity = (ToolActivity) activityDAO.getActivityByActivityId(TEST_NON_GROUP_ACTIVITY_ID);
         testGroupedActivity = (ToolActivity) activityDAO.getActivityByActivityId(TEST_GROUPED_ACTIVITY_ID);
         testGroup = (Group)groupDao.getGroupById(TEST_GROUP_ID);

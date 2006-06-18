@@ -43,8 +43,6 @@ import java.util.Set;
 import java.util.Vector;
 
 import org.lamsfoundation.lams.tool.dao.hibernate.ToolDAO;
-import org.lamsfoundation.lams.usermanagement.dao.hibernate.UserDAO;
-import org.lamsfoundation.lams.usermanagement.dao.hibernate.WorkspaceFolderDAO;
 import org.lamsfoundation.lams.util.MessageService;
 
 /**

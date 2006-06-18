@@ -23,20 +23,23 @@
 /* $Id$ */
 package org.lamsfoundation.lams.usermanagement.service;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.cache.ICacheManager;
+import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
-import org.lamsfoundation.lams.usermanagement.IRolePrivilegeDAO;
 import org.lamsfoundation.lams.usermanagement.Organisation;
-import org.lamsfoundation.lams.usermanagement.OrganisationState;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -44,17 +47,6 @@ import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.Workspace;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
-import org.lamsfoundation.lams.usermanagement.dao.IAuthenticationMethodDAO;
-import org.lamsfoundation.lams.usermanagement.dao.ILocaleDAO;
-import org.lamsfoundation.lams.usermanagement.dao.IOrganisationDAO;
-import org.lamsfoundation.lams.usermanagement.dao.IOrganisationStateDAO;
-import org.lamsfoundation.lams.usermanagement.dao.IOrganisationTypeDAO;
-import org.lamsfoundation.lams.usermanagement.dao.IRoleDAO;
-import org.lamsfoundation.lams.usermanagement.dao.IUserDAO;
-import org.lamsfoundation.lams.usermanagement.dao.IUserOrganisationDAO;
-import org.lamsfoundation.lams.usermanagement.dao.IUserOrganisationRoleDAO;
-import org.lamsfoundation.lams.usermanagement.dao.IWorkspaceDAO;
-import org.lamsfoundation.lams.usermanagement.dao.IWorkspaceFolderDAO;
 import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTO;
 import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTOFactory;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -74,31 +66,9 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
  */
 public class UserManagementService implements IUserManagementService {
 
-	protected Logger log = Logger.getLogger(UserManagementService.class);	
+	private Logger log = Logger.getLogger(UserManagementService.class);	
 
-	private IUserDAO userDAO;
-
-	private IRoleDAO roleDAO;
-	
-	private ILocaleDAO localeDAO;
-	
-	private IRolePrivilegeDAO rolePrivilegeDAO;
-
-	private IOrganisationDAO organisationDAO;
-
-	private IOrganisationTypeDAO organisationTypeDAO;
-	
-	private IOrganisationStateDAO organisationStateDAO;
-
-	private IUserOrganisationDAO userOrganisationDAO;
-
-	private IUserOrganisationRoleDAO userOrganisationRoleDAO;
-
-	private IAuthenticationMethodDAO authenticationMethodDAO;
-
-	protected IWorkspaceDAO workspaceDAO;
-
-	protected IWorkspaceFolderDAO workspaceFolderDAO;
+	private IBaseDAO baseDAO;
 
 	protected ILearningDesignDAO learningDesignDAO;
 
@@ -106,73 +76,19 @@ public class UserManagementService implements IUserManagementService {
 
 	protected ICacheManager cacheManager;
 
-	private String[] userClassParts = null;
+	
+	public void setBaseDAO(IBaseDAO baseDAO){
+		this.baseDAO = baseDAO;
+	}
 	
 	/**
-	 * @param workspaceFolderDAO
-	 *            The workspaceFolderDAO to set.
+	 * @param learningDesignDAO
+	 *            The learningDesignDAO to set.
 	 */
-	public void setWorkspaceFolderDAO(IWorkspaceFolderDAO workspaceFolderDAO) {
-		this.workspaceFolderDAO = workspaceFolderDAO;
+	public void setLearningDesignDAO(ILearningDesignDAO learningDesignDAO) {
+		this.learningDesignDAO = learningDesignDAO;
 	}
 
-	/**
-	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#setUserDAO(org.lamsfoundation.lams.usermanagement.dao.IUserDAO)
-	 */
-	public void setUserDAO(IUserDAO userDAO) {
-		this.userDAO = userDAO;
-	}
-
-	/**
-	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#setRoleDAO(org.lamsfoundation.lams.usermanagement.dao.IRoleDAO)
-	 */
-	public void setRoleDAO(IRoleDAO roleDAO) {
-		this.roleDAO = roleDAO;
-	}
-
-	/**
-	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#setOrganisationDAO(org.lamsfoundation.lams.usermanagement.dao.IOrganisationDAO)
-	 */
-	public void setOrganisationDAO(IOrganisationDAO organisationDAO) {
-		this.organisationDAO = organisationDAO;
-	}
-
-	/**
-	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#setOrganisationTypeDAO(org.lamsfoundation.lams.usermanagement.dao.IOrganisationTypeDAO)
-	 */
-	public void setOrganisationTypeDAO(IOrganisationTypeDAO organisationTypeDAO) {
-		this.organisationTypeDAO = organisationTypeDAO;
-	}
-
-	/**
-	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#setOrganisationStateDAO(org.lamsfoundation.lams.usermanagement.dao.IOrganisationStateDAO)
-	 */
-	public void setOrganisationStateDAO(IOrganisationStateDAO organisationStateDAO) {
-		this.organisationStateDAO = organisationStateDAO;
-	}
-
-	/**
-	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#setUserOrganisationDAO(org.lamsfoundation.lams.usermanagement.dao.IUserOrganisationDAO)
-	 */
-	public void setUserOrganisationDAO(IUserOrganisationDAO userOrganisationDAO) {
-		this.userOrganisationDAO = userOrganisationDAO;
-	}
-
-	/**
-	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#setUserOrganisationRoleDAO(org.lamsfoundation.lams.usermanagement.dao.IUserOrganisationRoleDAO)
-	 */
-	public void setUserOrganisationRoleDAO(
-			IUserOrganisationRoleDAO userOrganisationRoleDAO) {
-		this.userOrganisationRoleDAO = userOrganisationRoleDAO;
-	}
-
-	/**
-	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#setOrganisationDAO(org.lamsfoundation.lams.usermanagement.dao.IAuthenticationMethodDAO)
-	 */
-	public void setAuthenticationMethodDAO(
-			IAuthenticationMethodDAO authenticationMethodDAO) {
-		this.authenticationMethodDAO = authenticationMethodDAO;
-	}
 
 	/**
 	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#setLessonDAO(org.lamsfoundation.lams.lesson.dao.ILessonDAO)
@@ -185,142 +101,13 @@ public class UserManagementService implements IUserManagementService {
 		this.cacheManager = cacheManager;
 	}	
 
-	/**
-	 * Tries to get the user from the cache and if that fails then reads it from the database and puts it in the cache.
-	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getUserById(java.lang.Integer)
-	 */
-	public User getUserById(Integer userId) {
-		if ( userClassParts == null ) { 
-			userClassParts = cacheManager.getPartsFromClass(User.class);
-		}
-
-		User user = (User) cacheManager.getItem(this.userClassParts, userId);
-		if ( user == null ) {
-			user = userDAO.getUserById(userId);
-			if ( user != null ) {
-				cacheManager.addItem(userClassParts,user.getUserId(),user);
-				if ( log.isDebugEnabled() ){
-					log.debug("getUserById retrieved user from database "+user.getUserId());
-				}
-			}
-		} else if ( log.isDebugEnabled() ){
-			log.debug("getUserById retrieved user from cache "+userId);
-		}
-		return user;
-	}
-
-	/**
-	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getUserByLogin(java.lang.String)
-	 */
-	public User getUserByLogin(String login) {
-		User user = userDAO.getUserByLogin(login);
-		if ( user != null ) {
-			if ( userClassParts == null ) { 
-				userClassParts = cacheManager.getPartsFromClass(User.class);
-			}
-			cacheManager.addItem(userClassParts,user.getUserId(),user);
-		}
-		return user;
-	}
-
-	/** 
-	 * Clear the user from the cache - presumably the user has been updated. 
-	 */
-	private void clearUserFromCache(User user) {
-		cacheManager.removeItem(this.userClassParts,user.getUserId());
-		cacheManager.removeItem(this.userClassParts,user.getLogin());
-
-	}
-
-	/**
-	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getOrganisationById(java.lang.Integer)
-	 */
-	public Organisation getOrganisationById(Integer organisationId) {
-		return organisationDAO.getOrganisationById(organisationId);
-	}
-
-	/**
-	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getOrganisationTypeByName(java.lang.String)
-	 */
-	public OrganisationType getOrganisationTypeByName(String name) {
-		return organisationTypeDAO.getOrganisationTypeByName(name);
-	}
-
-	/**
-	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getRoleByName(java.lang.String)
-	 */
-	public Role getRoleByName(String roleName) {
-		return roleDAO.getRoleByName(roleName);
-	}
-
-	/**
-	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getUserOrganisationRole(java.lang.String,java.lang.Integer,java.lang.String)
-	 */
-	public UserOrganisationRole getUserOrganisationRole(Integer userID, Integer organisationId, String roleName) {
-		User user = this.getUserById(userID);
-		if (user == null)
-			return null;
-		UserOrganisation userOrganisation = userOrganisationDAO
-				.getUserOrganisation(user.getUserId(), organisationId);
-		if (userOrganisation == null)
-			return null;
-		Role role = roleDAO.getRoleByName(roleName);
-		if (role == null)
-			return null;
-		return userOrganisationRoleDAO.getUserOrganisationRole(userOrganisation
-				.getUserOrganisationId(), role.getRoleId());
-	}
-
-	/**
-	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getUserOrganisationRole(java.lang.String,java.lang.Integer,java.lang.String)
-	 */
-	public UserOrganisation getUserOrganisation(Integer userId,
-			Integer organisationId) {
-		return userOrganisationDAO.getUserOrganisation(userId, organisationId);
-	}
-
-	/**
-	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getAllAuthenticationMethods()
-	 */
-	public List getAllAuthenticationMethods() {
-		return authenticationMethodDAO.getAllAuthenticationMethods();
-	}
-
-	/**
-	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getAuthenticationMethodForUser(java.lang.String)
-	 */
-	public AuthenticationMethod getAuthenticationMethodForUser(String login) {
-		return authenticationMethodDAO.getAuthenticationMethodByUser(this.getUserByLogin(login));
-	}
-
-	/**
-	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getAuthenticationMethodForUser(org.lamsfoundation.lams.usermanagement.User)
-	 */
-	public AuthenticationMethod getAuthenticationMethodForUser(User user) {
-		return authenticationMethodDAO.getAuthenticationMethodByUser(user);
-	}
-
-	/**
-	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getAuthenticationMethodByName(java.lang.String)
-	 */
-	public AuthenticationMethod getAuthenticationMethodByName(String name) {
-		return authenticationMethodDAO.getAuthenticationMethodByName(name);
-	}
-
-	/**
-	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getUserOrganisationsForUser(org.lamsfoundation.lams.usermanagement.User)
-	 */
-	public List getUserOrganisationsForUser(User user) {
-		return userOrganisationDAO.getUserOrganisationsByUser(user);
-	}
 
 	/**
 	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getOrganisationRolesForUser(org.lamsfoundation.lams.usermanagement.User, java.util.List<String>)
 	 */
 	public OrganisationDTO getOrganisationsForUserByRole(User user, List<String> restrictToRoleNames) {
-		// TODO optimise db access
 		List<OrganisationDTO> list = new ArrayList<OrganisationDTO>();
-		Iterator i = userOrganisationDAO.getUserOrganisationsByUser(user).iterator();
+		Iterator i = user.getUserOrganisations().iterator();
 		
 		while (i.hasNext()) {
 			UserOrganisation userOrganisation = (UserOrganisation) i.next();
@@ -337,9 +124,8 @@ public class UserManagementService implements IUserManagementService {
 	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getOrganisationRolesForUser(org.lamsfoundation.lams.usermanagement.User, java.util.List<String>, java.util.Integer)
 	 */
 	public OrganisationDTO getOrganisationsForUserByRole(User user, List<String> restrictToRoleNames, Integer courseId, List<Integer> restrictToClassIds) {
-		// TODO optimise db access
 		List<OrganisationDTO> dtolist = new ArrayList<OrganisationDTO>();
-		Organisation org = organisationDAO.getOrganisationById(courseId);
+		Organisation org = (Organisation)baseDAO.find(Organisation.class,courseId);
 		dtolist.add(org.getOrganisationDTO());
 		getChildOrganisations(user, org, restrictToRoleNames, restrictToClassIds, dtolist);
 		OrganisationDTO dtoTree = OrganisationDTOFactory.createTree(dtolist);
@@ -353,7 +139,10 @@ public class UserManagementService implements IUserManagementService {
 	private void getChildOrganisations(User user, Organisation org, List<String> restrictToRoleNames, List<Integer> restrictToClassIds, List<OrganisationDTO> dtolist) {
 		if ( org != null ) {
 			boolean notCheckClassId = restrictToClassIds == null || restrictToClassIds.size() == 0;
-			List<UserOrganisation> childOrgs = userOrganisationDAO.getChildUserOrganisationsByUser(user, org);
+			Map<String,Object> map = new HashMap<String,Object>();
+			map.put("user.userId",user.getUserId());
+			map.put("organisation.parentOrganisation.organisationId",org.getOrganisationId());
+			List<UserOrganisation> childOrgs = baseDAO.findByProperties(UserOrganisation.class, map);
 			for ( UserOrganisation userOrganisation : childOrgs) {
 				OrganisationDTO dto = userOrganisation.getOrganisation().getOrganisationDTO();
 				if ( notCheckClassId || restrictToClassIds.contains(dto.getOrganisationID()) ) {
@@ -401,7 +190,10 @@ public class UserManagementService implements IUserManagementService {
 	 */
 	public OrganisationDTO getOrganisationForUserWithRole(User user, Integer organisationId) {
 		if ( user != null && organisationId !=null ) {
-			UserOrganisation userOrganisation = getUserOrganisation(user.getUserId(), organisationId);
+			Map<String,Object> map = new HashMap<String,Object>();
+			map.put("user.userId",user.getUserId());
+			map.put("organisation.organisationId",organisationId);
+			UserOrganisation userOrganisation = (UserOrganisation)baseDAO.findByProperties(UserOrganisation.class,map).get(0);
 			OrganisationDTO dto = userOrganisation.getOrganisation().getOrganisationDTO();
 			addRolesToDTO(null, userOrganisation, dto);
 			return dto;
@@ -410,24 +202,18 @@ public class UserManagementService implements IUserManagementService {
 	}
 
 	/**
-	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getChildOrganisations(org.lamsfoundation.lams.usermanagement.Organisation)
-	 */
-	public List getChildOrganisations(Organisation parentOrg) {
-		return organisationDAO.getChildOrganisations(parentOrg);
-	}
-
-	/**
 	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getRolesForUserByOrganisation(org.lamsfoundation.lams.usermanagement.User,
 	 *      java.lang.Integer)
 	 */
 	public List<Role> getRolesForUserByOrganisation(User user, Integer orgId) {
 		List<Role> list = new ArrayList<Role>();
-		UserOrganisation userOrg = userOrganisationDAO.getUserOrganisation(user
-				.getUserId(), orgId);
+		Map<String,Object> map = new HashMap<String,Object>();
+		map.put("user.userId",user.getUserId());
+		map.put("organisation.organisationId",orgId);
+		UserOrganisation userOrg = (UserOrganisation)baseDAO.findByProperties(UserOrganisation.class,map).get(0);
 		if (userOrg == null)
 			return null;
-		Iterator i = userOrganisationRoleDAO.getUserOrganisationRoles(
-				userOrg.getUserOrganisationId()).iterator();
+		Iterator i = userOrg.getUserOrganisationRoles().iterator();
 		while (i.hasNext()) {
 			UserOrganisationRole userOrgRole = (UserOrganisationRole) i.next();
 			list.add(userOrgRole.getRole());
@@ -440,8 +226,7 @@ public class UserManagementService implements IUserManagementService {
 	 */
 	public List<User> getUsersFromOrganisation(Integer orgId) {
 		List<User> list = new ArrayList<User>();
-		Iterator i = userOrganisationDAO.getUserOrganisationsByOrganisationId(
-				orgId).iterator();
+		Iterator i = baseDAO.findByProperty(UserOrganisation.class,"organisation.organisationId",orgId).iterator();
 		while (i.hasNext()) {
 			UserOrganisation userOrganisation = (UserOrganisation) i.next();
 			list.add(userOrganisation.getUser());
@@ -449,72 +234,6 @@ public class UserManagementService implements IUserManagementService {
 		return list;
 	}
 
-	/**
-	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#createUser(org.lamsfoundation.lams.usermanagement.User)
-	 */
-	public void createUser(User user) {
-		userDAO.insert(user);
-	}
-
-	/**
-	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#updateUser(org.lamsfoundation.lams.usermanagement.User)
-	 */
-	public void updateUser(User user) {
-		userDAO.update(user);
-		clearUserFromCache(user);
-	}
-
-	/**
-	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#saveOrupdate(org.lamsfoundation.lams.usermanagement.User)
-	 */
-	public void saveOrUpdateUser(User user) {
-		userDAO.insertOrUpdate(user);
-		clearUserFromCache(user);
-	}
-
-	/**
-	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#updatePassword(java.lang.String,java.lang.String)
-	 */
-	public void updatePassword(String login, String newPassword) {
-		userDAO.updatePassword(login, newPassword);
-	}
-
-	/**
-	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#removeUserOrganisation(org.lamsfoundation.lams.usermanagement.UserOrganisation)
-	 */
-	public void removeUserOrganisation(UserOrganisation userOrganisation) {
-		userOrganisationDAO.delete(userOrganisation);
-	}
-
-	/**
-	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#saveOrUpdateOrganisation(org.lamsfoundation.lams.usermanagement.Organisation)
-	 */
-	public void saveOrUpdateOrganisation(Organisation organisation) {
-		organisationDAO.insertOrUpdate(organisation);
-	}
-
-	/**
-	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#saveOrUpdateOrganisation(org.lamsfoundation.lams.usermanagement.UserOrganisation)
-	 */
-	public void saveOrUpdateUserOrganisation(UserOrganisation userOrganisation) {
-		userOrganisationDAO.insertOrUpdate(userOrganisation);
-	}
-
-	/**
-	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#saveOrUpdateOrganisationRole(org.lamsfoundation.lams.usermanagement.UserOrganisationRole)
-	 */
-	public void saveOrUpdateUserOrganisationRole(
-			UserOrganisationRole userOrganisationRole) {
-		userOrganisationRoleDAO.insertOrUpdate(userOrganisationRole);
-	}
-
-	/**
-	 * @param workspaceDAO
-	 *            The workspaceDAO to set.
-	 */
-	public void setUserManagementWorkspaceDAO(IWorkspaceDAO workspaceDAO) {
-		this.workspaceDAO = workspaceDAO;
-	}
 	
 	/*********************************************
 	 * Utility Methods added by Manpreet Minhas
@@ -525,114 +244,29 @@ public class UserManagementService implements IUserManagementService {
 	 *      java.lang.Integer)
 	 */
 	public Integer saveOrganisation(Organisation organisation, Integer userID) {
-		Workspace workspace = createWorkspace(organisation.getName());
-		WorkspaceFolder workspaceFolder = createWorkspaceFolder(workspace,
-				userID, WorkspaceFolder.NORMAL);
+		Workspace workspace =  new Workspace(organisation.getName());
+		WorkspaceFolder workspaceFolder = new WorkspaceFolder(workspace.getName(),workspace.getWorkspaceId(),
+				userID, new Date(), new Date(), WorkspaceFolder.NORMAL);
 		workspace.setRootFolder(workspaceFolder);
-		workspaceDAO.insertOrUpdate(workspace);
+		baseDAO.insertOrUpdate(workspace);
 		organisation.setWorkspace(workspace);
-		organisationDAO.insertOrUpdate(organisation);
+		baseDAO.insertOrUpdate(organisation);
 		return organisation.getOrganisationId();
-	}
-
-	/**
-	 * This method creates a new Workspace with a given name
-	 * 
-	 * @param name
-	 *            The name with which workspace should be created
-	 * @return Workspace The new Workspace object
-	 */
-	public Workspace createWorkspace(String name) {
-		Workspace workspace = new Workspace(name);
-		workspaceDAO.insert(workspace);
-		return workspace;
-
-	}
-
-	/**
-	 * This method creates a WorkspaceFolder for a given workspace and user.
-	 * 
-	 * @param workspace
-	 *            The Workspace in which this WorkspaceFolder will be contained
-	 * @param userID
-	 *            The user_id of the user who creates the above organisation
-	 * @param workspaceFolderType
-	 *            The type of folder to be created.
-	 * @return WorkspaceFolder The new WorkspaceFolder object
-	 */
-	public WorkspaceFolder createWorkspaceFolder(Workspace workspace,
-			Integer userID, Integer workspaceFolderType) {
-		WorkspaceFolder workspaceFolder = new WorkspaceFolder(workspace
-				.getName(), workspace.getWorkspaceId(), userID, new Date(),
-				new Date(), workspaceFolderType);
-		workspaceFolderDAO.insert(workspaceFolder);
-		return workspaceFolder;
-
 	}
 
 	/**
 	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#save(org.lamsfoundation.lams.usermanagement.User)
 	 */
-	public Integer saveUser(User user, Integer roleID) {
-		userDAO.insert(user);
-		createUserOrganisation(user, roleID);
-		Workspace workspace = createWorkspace(user.getLogin());
-		WorkspaceFolder workspaceFolder = createWorkspaceFolder(workspace, user
-				.getUserId(), WorkspaceFolder.NORMAL);
-		createWorkspaceFolder(workspace, user.getUserId(), WorkspaceFolder.RUN_SEQUENCES);
-		workspace.setRootFolder(workspaceFolder);
-		workspaceDAO.update(workspace);
-		user.setWorkspace(workspace);
-		userDAO.update(user);
+	public Integer saveUser(User user) {
+		if(user.getUserId()==null){//new User
+			Workspace workspace = new Workspace(user.getFullName());
+			workspace.setRootFolder(new WorkspaceFolder(workspace.getName(),workspace.getWorkspaceId(),user.getUserId(),new Date(),new Date(),WorkspaceFolder.NORMAL));
+			user.setWorkspace(workspace);
+		}
+		baseDAO.insertOrUpdate(user);
 		return user.getUserId();
 	}
-
-	/**
-	 * This is a utility method required by the above method
-	 * <code>save</code>. It adds a new record to the  
-	 * underlying database table indicating the organisation
-	 * to which this user belongs 
-	 * 
-	 * @param user 
-	 * @param roleID
-	 * @return Integer 
-	 */
-	private Integer createUserOrganisation(User user, Integer roleID) {
-		UserOrganisation userOrganisation = new UserOrganisation();
-		userOrganisation.setUser(user);
-		userOrganisationDAO.insert(userOrganisation);
-		userOrganisation.addUserOrganisationRole(createUserOrganisationRole(
-				userOrganisation, roleID));
-		userOrganisationDAO.insertOrUpdate(userOrganisation);
-		return userOrganisation.getUserOrganisationId();
-	}
-
-	/**
-	 * This is a utility method required by the above method
-	 * <code>createUserOrganisation</code>. It adds a new record 
-	 * to the underlying database table indicating the Role that
-	 * the given user has in the Organisation.
-	 *  
-	 * @param userOrganisation
-	 * @param roleID
-	 * @return UserOrganisationRole
-	 */
-	private UserOrganisationRole createUserOrganisationRole(
-			UserOrganisation userOrganisation, Integer roleID) {
-		UserOrganisationRole userOrganisationRole = new UserOrganisationRole();
-		userOrganisationRole.setUserOrganisation(userOrganisation);
-		userOrganisationRole.setRole(roleDAO.getRoleById(roleID));
-		userOrganisationRoleDAO.insert(userOrganisationRole);
-		return userOrganisationRole;
-	}
-	/**
-	 * @param learningDesignDAO
-	 *            The learningDesignDAO to set.
-	 */
-	public void setLearningDesignDAO(ILearningDesignDAO learningDesignDAO) {
-		this.learningDesignDAO = learningDesignDAO;
-	}
-
+	
 	/**
 	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getUsersFromOrganisationByRole(java.lang.Integer,
 	 *      java.lang.String)
@@ -640,7 +274,7 @@ public class UserManagementService implements IUserManagementService {
 	public Vector<UserDTO> getUsersFromOrganisationByRole(Integer organisationID, String roleName) {
 		
 		Vector<UserDTO> users = new Vector<UserDTO>();
-		Organisation organisation = organisationDAO.getOrganisationById(organisationID);
+		Organisation organisation = (Organisation)baseDAO.find(Organisation.class,organisationID);
 		if (organisation != null) {
 			Iterator iterator = organisation.getUserOrganisations().iterator();
 			while (iterator.hasNext()) {
@@ -671,76 +305,123 @@ public class UserManagementService implements IUserManagementService {
 		return lessonDAO.getActiveLessonsForLearner(userID, organisationID);
 	}
 
-	public List<OrganisationState> getAllOrgnisationStates() {
-		return organisationStateDAO.getAllOrganisationStates();
-	}
-
-	public OrganisationState getOrganisationStateById(Integer organisationStateId) {
-		return organisationStateDAO.getOrganisationStateById(organisationStateId);
-	}
-
-	public OrganisationType getOrganisationTypeById(Integer typeId) {
-		return organisationTypeDAO.getOrganisationTypeById(typeId);
-	}
-
-	public void setLocaleDAO(ILocaleDAO localeDAO) {
-		this.localeDAO = localeDAO;
-	}
-
-	public List getAllCountries() {
-		return localeDAO.getAllCountries();
-	}
-
-	public List getAllLanguages() {
-		return localeDAO.getAllLanguages();
-	}
-
-	public void setRolePrivilegeDAO(IRolePrivilegeDAO rolePrivilegeDAO) {
-		this.rolePrivilegeDAO = rolePrivilegeDAO;
-	}
-
-	public List getRolePrivilegesByRoleId(Integer id) {
-		return rolePrivilegeDAO.getRolePrivilegesByRoleId(id);
-	}
-
-	public List getUserOrganisationsByType(Integer organisationTypeId) {
-		return userOrganisationDAO.getUserOrganisationsByType(organisationTypeId);
-	}
-
-	public List getOrganisationsByType(Integer organisationTypeId) {
-		return organisationDAO.getOrganisationsByType(organisationTypeId);
-	}
-
-	public boolean isUserSysAdmin(String login) {
-		return isUserInRoleInOrganisation(login,Role.ROLE_SYSADMIN,getRootOrganisation().getOrganisationId());
-	}
 
 	public Organisation getRootOrganisation() {
-		return (Organisation)getOrganisationsByType(OrganisationType.ROOT_TYPE).get(0);
+		return (Organisation)baseDAO.findByProperty(Organisation.class,"organisationType.organisationTypeId",OrganisationType.ROOT_TYPE).get(0);
 	}
 
-	public boolean isUserInRoleInOrganisation(String login, Integer roleId, Integer orgId) {
-		return userOrganisationRoleDAO.getUserOrganisationRole(userOrganisationDAO.getUserOrganisation(userDAO.getUserByLogin(login).getUserId(),orgId).getUserOrganisationId(),roleId)!=null;
+	public void save(Object object) {
+		baseDAO.insertOrUpdate(object);
 	}
 
-	public void deleteOrganisationById(Integer orgId) {
-		organisationDAO.deleteOrganisationById(orgId);
-	}
-	
-	public void deleteUserById(Integer userId) {
-		userDAO.deleteUserById(userId);
+	public void saveAll(Collection objects) {
+		baseDAO.insertOrUpdateAll(objects);
 	}
 
-	public List getOrganisationsByTypeAndStatus(Integer organisationTypeId, Integer organisationStateId) {
-		return organisationDAO.getOrganisationsByTypeAndStatus(organisationTypeId,organisationStateId);
+	public void delete(Object object) {
+		baseDAO.delete(object);
 	}
 
-	public List getUserOrganisationsForUserByTypeAndStatus(String username, Integer organisationTypeId, Integer organisationStateId) {
-		return userOrganisationDAO.getUserOrganisationsForUserByTypeAndStatus(username,organisationTypeId,organisationStateId);
+	public void deleteAll(Class clazz) {
+		baseDAO.deleteAll(clazz);
 	}
 
-	public List getUserOrganisationRoles(Integer organisationId, String username) {
-		return userOrganisationRoleDAO.getUserOrganisationRoles(organisationId,username);
+	public void deleteAll(Collection objects) {
+		baseDAO.deleteAll(objects);
 	}
+
+	public void deleteById(Class clazz, Serializable id) {
+		baseDAO.deleteById(clazz,id);
+	}
+
+	public void deleteByProperty(Class clazz, String name, Object value) {
+		baseDAO.deleteByProperty(clazz,name,value);
+	}
+
+	public void deleteByProperties(Class clazz, Map<String, Object> properties) {
+		baseDAO.deleteByProperties(clazz,properties);
+	}
+
+	public void deleteAnythingLike(Object object) {
+		baseDAO.deleteAnythingLike(object);
+	}
+
+	public Object findById(Class clazz, Serializable id) {
+		return baseDAO.find(clazz,id);
+	}
+
+	public List findAll(Class clazz) {
+		return baseDAO.findAll(clazz);
+	}
+
+	public List findByProperty(Class clazz, String name, Object value) {
+		return baseDAO.findByProperty(clazz,name,value);
+	}
+
+	public List findByProperties(Class clazz, Map<String, Object> properties) {
+		return baseDAO.findByProperties(clazz,properties);
+	}
+
+	public List findAnythingLike(Object object) {
+		return baseDAO.findAnythingLike(object);
+	}
+
+	public boolean isUserInRole(Integer userId, Integer orgId, String roleName) {
+		Map<String,Object> properties = new HashMap<String,Object>();
+		properties.put("userOrganisation.user.userId",userId);
+		properties.put("userOrganisation.organisation.organisationId",orgId);
+		properties.put("role.name",roleName);
+		if (baseDAO.findByProperties(UserOrganisationRole.class,properties).size()==0)
+			return false;
+		return true;
+	}
+
+	public List getOrganisationsByTypeAndStatus(Integer typeId, Integer stateId) {
+		Map<String,Object> properties = new HashMap<String,Object>();
+		properties.put("organisationType.organisationTypeId",typeId);
+		properties.put("organisationState.organisationStateId",stateId);
+		return baseDAO.findByProperties(Organisation.class,properties);
+	}
+
+	public List getUserOrganisationRoles(Integer orgId, String login) {
+		Map<String,Object> properties = new HashMap<String,Object>();
+		properties.put("userOrganisation.organisation.organisationId",orgId);
+		properties.put("userOrganisation.user.login",login);
+		return baseDAO.findByProperties(UserOrganisationRole.class,properties);
+	}
+
+	public List getUserOrganisationsForUserByTypeAndStatus(String login, Integer typeId, Integer stateId) {
+		Map<String,Object> properties = new HashMap<String,Object>();
+		properties.put("user.login",login);
+		properties.put("organisation.organisationType.organisationTypeId",typeId);
+		properties.put("organisation.organisationState.organisationStateId",stateId);
+		return baseDAO.findByProperties(UserOrganisation.class,properties);
+	}
+
+	public User getUserByLogin(String login) {
+		return (User)baseDAO.findByProperty(User.class,"login",login).get(0);
+	}
+
+	public void updatePassword(String login, String password) {
+		User user = getUserByLogin(login);
+		user.setPassword(password);
+		baseDAO.update(user);
+	}
+
+	public Organisation getOrganisationById(Integer orgId) {
+		return (Organisation)baseDAO.find(Organisation.class,orgId);
+	}
+
+	public List getOrganisationsByType(Integer typeId) {
+		return baseDAO.findByProperty(Organisation.class,"organisationType.organisationTypeId",typeId);
+	}
+
+	public UserOrganisation getUserOrganisation(Integer userId, Integer orgId) {
+		Map<String,Object> properties = new HashMap<String,Object>();
+		properties.put("user.userId",userId);
+		properties.put("organisation.organisationId",orgId);
+		return (UserOrganisation)baseDAO.findByProperties(UserOrganisation.class,properties).get(0);
+	}
+
 
 }

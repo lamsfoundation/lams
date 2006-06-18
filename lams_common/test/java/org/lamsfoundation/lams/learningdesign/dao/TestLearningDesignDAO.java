@@ -32,7 +32,6 @@ import org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningDesignDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.TransitionDAO;
 import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
 import org.lamsfoundation.lams.test.AbstractCommonTestCase;
-import org.lamsfoundation.lams.usermanagement.dao.hibernate.WorkspaceFolderDAO;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 
 /**
@@ -43,9 +42,6 @@ public class TestLearningDesignDAO extends AbstractCommonTestCase {
 	protected ActivityDAO activityDAO;
 	private LearningDesignDAO learningDesignDAO;
 	protected TransitionDAO transitionDAO;
-	protected WorkspaceFolderDAO workspaceFolderDAO;
-	//private UserDAO userDAO;
-	//private User user;
 	private LearningDesign learningDesign;
 	
 	public TestLearningDesignDAO(String name) {
