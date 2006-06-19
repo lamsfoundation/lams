@@ -214,8 +214,6 @@ public class MonitoringUtil implements McAppConstants{
             		List listMcUsers=mcService.getMcUserBySessionOnly(mcSession);	
             		logger.debug("listMcUsers for session id:"  + mcSession.getMcSessionId() +  " = " + listMcUsers);
             		Map sessionUsersAttempts=populateSessionUsersAttempts(request,mcSession.getMcSessionId(), listMcUsers, questionUid, null, mcService);
-            		Map sessionUsersMarks=populateSessionUsersMarks(request,mcSession.getMcSessionId(), listMcUsers, questionUid, null, mcService);
-            		
             		
             		listMonitoredAttemptsContainerDTO.add(sessionUsersAttempts);
             	}
@@ -282,162 +280,7 @@ public class MonitoringUtil implements McAppConstants{
 	 */
 	public static Map populateSessionUsersAttempts(HttpServletRequest request,Long sessionId, List listMcUsers, String questionUid, Long userID, IMcService mcService)
 	{
-		logger.debug("will be populating users attempt history for session id: " + sessionId);
-		
-		McSession mcSession=mcService.retrieveMcSession(sessionId);
-	    logger.debug("retrieving mcSession: " + mcSession);
-
-		logger.debug("userID: " + userID);
-		Map mapMonitoredUserContainerDTO= new TreeMap(new McStringComparator());
-		List listMonitoredUserContainerDTO= new LinkedList();
-		
-		if (userID == null)
-		{
-		    logger.debug("generating standard summary page");
-			Iterator itUsers=listMcUsers.iterator();
-			while (itUsers.hasNext())
-			{
-	    		McQueUsr mcQueUsr=(McQueUsr)itUsers.next();
-	    		logger.debug("mcQueUsr: " + mcQueUsr);
-	    		
-	    		if (mcQueUsr != null)
-	    		{
-	    			logger.debug("getting listUserAttempts for user id: " + mcQueUsr.getUid() + " and que content id: " + questionUid);
-	    			List listUserAttempts=mcService.getUserAttemptsForQuestionContentAndSessionUid(mcQueUsr.getUid(), new Long(questionUid), mcSession.getUid());
-	    			logger.debug("listUserAttempts: " + listUserAttempts);
-
-	    			Iterator itAttempts=listUserAttempts.iterator();
-	    			
-	    			if (!mcSession.getMcContent().isRetries())
-	    			{
-	    			    logger.debug("retries is OFF.");
-	    			    boolean attemptCorrect=false;
-	    			    McUsrAttempt mcUsrAttemptUser=null;
-	    			    
-		    			while (itAttempts.hasNext())
-		    			{
-		    	    		McUsrAttempt mcUsrAttempt=(McUsrAttempt)itAttempts.next();
-		    	    		logger.debug("mcUsrAttempt: " + mcUsrAttempt);
-		    	    		mcUsrAttemptUser=mcUsrAttempt;
-
-		    	    		if (mcUsrAttempt != null)
-		    	    		{
-		    	    		    if (mcUsrAttempt.isAttemptCorrect())
-		    	    		    {
-		    	    		        attemptCorrect=true;
-		    	    		    }
-		    	    		}
-		    			}
-		    			logger.debug("final attemptCorrect: " + attemptCorrect);
-	    			    McMonitoredUserDTO mcMonitoredUserDTO = new McMonitoredUserDTO();
-	    			    int extraWeight=0;
-	    			    if (attemptCorrect)
-	    			    {
-	    			        mcMonitoredUserDTO.setMark(mcUsrAttemptUser.getMcQueContent().getWeight().toString());
-	    			        extraWeight=mcUsrAttemptUser.getMcQueContent().getWeight().intValue();
-	    			    }
-	    			    else
-	    			    {
-	    			        mcMonitoredUserDTO.setMark("0");
-	    			        extraWeight=0;
-	    			    }
-
-	    			    /*
-	    			    logger.debug("start updating user's weight records with extraWeight: " + extraWeight);
-	    			    Iterator itAttemptsLocal=listUserAttempts.iterator();
-		    			while (itAttemptsLocal.hasNext())
-		    			{
-		    	    		McUsrAttempt mcUsrAttempt=(McUsrAttempt)itAttemptsLocal.next();
-		    	    		logger.debug("mcUsrAttempt: " + mcUsrAttempt);
-
-		    			    int currentTotalWeight =mcUsrAttempt.getTotalWeight().intValue();
-		    			    mcUsrAttempt.setTotalWeight(new Integer(currentTotalWeight + extraWeight));
-		    			    logger.debug("updated total user weight to: " + mcUsrAttempt.getTotalWeight());
-		    			    mcService.updateMcUsrAttempt(mcUsrAttempt);
-		    			}
-		    			*/
-
-	    			    mcMonitoredUserDTO.setUid(mcUsrAttemptUser.getUid().toString());
-    	    			mcMonitoredUserDTO.setUserName(mcQueUsr.getFullname());
-    	    			mcMonitoredUserDTO.setSessionId(sessionId.toString());
-    	    			mcMonitoredUserDTO.setQuestionUid(questionUid);
-    	    			
-		    			logger.debug("final constructed mcMonitoredUserDTO: " + mcMonitoredUserDTO);
-    	    			listMonitoredUserContainerDTO.add(mcMonitoredUserDTO);
-	    			}
-	    			else
-	    			{
-	    			    logger.debug("retries is ON. User had to PASS. Print the final attempt's data");
-	    			    McUsrAttempt mcUsrAttempt=getAttemptWithHighestOrder(listUserAttempts);
-	    			    logger.debug("attempt with highest attempt order, mcUsrAttempt: " + mcUsrAttempt);
-	    			    
-	    			    McMonitoredUserDTO mcMonitoredUserDTO = new McMonitoredUserDTO();
-	    			    mcMonitoredUserDTO.setMark(mcUsrAttempt.getMcQueContent().getWeight().toString());
-	    			    mcMonitoredUserDTO.setUserName(mcQueUsr.getFullname());
-	    			    
-	    			    logger.debug("final constructed mcMonitoredUserDTO: " + mcMonitoredUserDTO);
-	    			    listMonitoredUserContainerDTO.add(mcMonitoredUserDTO);
-	    			}
-	    		}
-			}
-			logger.debug("final listMonitoredUserContainerDTO: " + listMonitoredUserContainerDTO);
-			mapMonitoredUserContainerDTO=convertToMcMonitoredUserDTOMap(listMonitoredUserContainerDTO);
-			logger.debug("final mapMonitoredUserContainerDTO:..." + mapMonitoredUserContainerDTO);
-			return mapMonitoredUserContainerDTO;		    
-		}
-		else
-		{
-		    logger.debug("request is for learner export portfolio: " + userID);
-			Iterator itUsers=listMcUsers.iterator();
-			while (itUsers.hasNext())
-			{
-	    		McQueUsr mcQueUsr=(McQueUsr)itUsers.next();
-	    		logger.debug("mcQueUsr: " + mcQueUsr);
-	    		logger.debug("local mcQueUsr userID: " + mcQueUsr.getQueUsrId()); 
-	    		logger.debug("mcQueUsr.getQueUsrId().toString versus userID.toString(): " + mcQueUsr.getQueUsrId().toString() + " versus "  + userID.toString());
-	    		if ((mcQueUsr != null) && (mcQueUsr.getQueUsrId().toString().equals(userID.toString())))
-	    		{
-		    		logger.debug("the user in question is found: " + mcQueUsr.getQueUsrId());
-	    			logger.debug("getting listUserAttempts for user id: " + mcQueUsr.getUid() + " and que content id: " + questionUid);
-	    			//List listUserAttempts=mcService.getAttemptsForUserAndQuestionContent(mcQueUsr.getUid(), new Long(questionUid));
-	    			List listUserAttempts=mcService.getUserAttemptsForQuestionContentAndSessionUid(mcQueUsr.getUid(), new Long(questionUid), mcSession.getUid());
-	    			logger.debug("listUserAttempts: " + listUserAttempts);
-
-	    			Iterator itAttempts=listUserAttempts.iterator();
-	    			while (itAttempts.hasNext())
-	    			{
-	    	    		McUsrAttempt mcUsrAttempt=(McUsrAttempt)itAttempts.next();
-	    	    		logger.debug("mcUsrAttempt: " + mcUsrAttempt);
-	    	    		
-	    	    		if (mcUsrAttempt != null)
-	    	    		{
-	    	    			McMonitoredUserDTO mcMonitoredUserDTO = new McMonitoredUserDTO();
-	    	    			mcMonitoredUserDTO.setAttemptTime(mcUsrAttempt.getAttemptTime().toString());
-	    	    			mcMonitoredUserDTO.setIsCorrect(new Boolean(mcUsrAttempt.isAttemptCorrect()).toString());
-	    	    			mcMonitoredUserDTO.setResponse(mcUsrAttempt.getMcOptionsContent().getMcQueOptionText().toString());
-	    	    			mcMonitoredUserDTO.setTimeZone(mcUsrAttempt.getTimeZone());
-	    	    			mcMonitoredUserDTO.setUid(mcUsrAttempt.getUid().toString());
-	    	    			mcMonitoredUserDTO.setUserName(mcQueUsr.getFullname());
-	    	    			mcMonitoredUserDTO.setQueUsrId(mcQueUsr.getUid().toString());
-	    	    			mcMonitoredUserDTO.setSessionId(sessionId.toString());
-	    	    			mcMonitoredUserDTO.setQuestionUid(questionUid);
-	    	    			listMonitoredUserContainerDTO.add(mcMonitoredUserDTO);
-	    	    		}
-	    			}
-	    		}
-			}
-			logger.debug("final listMonitoredUserContainerDTO: " + listMonitoredUserContainerDTO);
-			mapMonitoredUserContainerDTO=convertToMcMonitoredUserDTOMap(listMonitoredUserContainerDTO);
-			logger.debug("final mapMonitoredUserContainerDTO:..." + mapMonitoredUserContainerDTO);
-			return mapMonitoredUserContainerDTO;
-		    
-		}
-
-	}
-
-	
-	public static Map populateSessionUsersMarks(HttpServletRequest request,Long sessionId, List listMcUsers, String questionUid, Long userID, IMcService mcService)
-	{
+	    logger.debug("starting populateSessionUsersAttempts");
 		logger.debug("will be populating users marks for session id: " + sessionId);
 		
 		McSession mcSession=mcService.retrieveMcSession(sessionId);
@@ -459,7 +302,17 @@ public class MonitoringUtil implements McAppConstants{
 	    		if (mcQueUsr != null)
 	    		{
 	    			logger.debug("getting listUserAttempts for user id: " + mcQueUsr.getUid() + " and que content id: " + questionUid);
-	    			List listUserAttempts=mcService.getUserAttemptsForQuestionContentAndSessionUid(mcQueUsr.getUid(), new Long(questionUid), mcSession.getUid());
+	    			
+	        	    McUsrAttempt mcUsrAttempt = mcService.getAttemptWithLastAttemptOrderForUserInSession(mcQueUsr.getUid(), mcSession.getUid());
+	            	logger.debug("mcUsrAttempt with highest attempt order: " + mcUsrAttempt);
+	            	String highestAttemptOrder="";
+	            	if (mcUsrAttempt != null)
+	            	{
+	                	highestAttemptOrder=mcUsrAttempt.getAttemptOrder().toString();
+	            	}
+	            	logger.debug("highestAttemptOrder: " + highestAttemptOrder);
+
+	    			List listUserAttempts=mcService.getAttemptsOnHighestAttemptOrder(mcQueUsr.getUid(), new Long(questionUid), mcSession.getUid(), new Integer(highestAttemptOrder));
 	    			logger.debug("listUserAttempts: " + listUserAttempts);
 
 	    			Iterator itAttempts=listUserAttempts.iterator();
@@ -472,7 +325,7 @@ public class MonitoringUtil implements McAppConstants{
 	    			    
 		    			while (itAttempts.hasNext())
 		    			{
-		    	    		McUsrAttempt mcUsrAttempt=(McUsrAttempt)itAttempts.next();
+		    	    		mcUsrAttempt=(McUsrAttempt)itAttempts.next();
 		    	    		logger.debug("mcUsrAttempt: " + mcUsrAttempt);
 		    	    		mcUsrAttemptUser=mcUsrAttempt;
 
@@ -486,33 +339,6 @@ public class MonitoringUtil implements McAppConstants{
 		    			}
 		    			logger.debug("final attemptCorrect: " + attemptCorrect);
 	    			    McMonitoredUserDTO mcMonitoredUserDTO = new McMonitoredUserDTO();
-	    			    int extraWeight=0;
-	    			    if (attemptCorrect)
-	    			    {
-	    			        mcMonitoredUserDTO.setMark(mcUsrAttemptUser.getMcQueContent().getWeight().toString());
-	    			        extraWeight=mcUsrAttemptUser.getMcQueContent().getWeight().intValue();
-	    			    }
-	    			    else
-	    			    {
-	    			        mcMonitoredUserDTO.setMark("0");
-	    			        extraWeight=0;
-	    			    }
-
-	    			    /*
-	    			    logger.debug("start updating user's weight records with extraWeight: " + extraWeight);
-	    			    Iterator itAttemptsLocal=listUserAttempts.iterator();
-		    			while (itAttemptsLocal.hasNext())
-		    			{
-		    	    		McUsrAttempt mcUsrAttempt=(McUsrAttempt)itAttemptsLocal.next();
-		    	    		logger.debug("mcUsrAttempt: " + mcUsrAttempt);
-
-		    			    int currentTotalWeight =mcUsrAttempt.getTotalWeight().intValue();
-		    			    mcUsrAttempt.setTotalWeight(new Integer(currentTotalWeight + extraWeight));
-		    			    logger.debug("updated total user weight to: " + mcUsrAttempt.getTotalWeight());
-		    			    mcService.updateMcUsrAttempt(mcUsrAttempt);
-		    			}
-		    			*/
-
 	    			    mcMonitoredUserDTO.setUid(mcUsrAttemptUser.getUid().toString());
     	    			mcMonitoredUserDTO.setUserName(mcQueUsr.getFullname());
     	    			mcMonitoredUserDTO.setSessionId(sessionId.toString());
@@ -524,15 +350,98 @@ public class MonitoringUtil implements McAppConstants{
 	    			else
 	    			{
 	    			    logger.debug("retries is ON. User had to PASS. Print the final attempt's data");
-	    			    McUsrAttempt mcUsrAttempt=getAttemptWithHighestOrder(listUserAttempts);
-	    			    logger.debug("attempt with highest attempt order, mcUsrAttempt: " + mcUsrAttempt);
-	    			    
 	    			    McMonitoredUserDTO mcMonitoredUserDTO = new McMonitoredUserDTO();
-	    			    mcMonitoredUserDTO.setMark(mcUsrAttempt.getMcQueContent().getWeight().toString());
+	    			    boolean isAttemptCorrect=false;
+	    			    McUsrAttempt mcUsrAttemptGeneral=null;
+	    				while (itAttempts.hasNext())
+	    				{
+	    		    		mcUsrAttempt=(McUsrAttempt)itAttempts.next();
+	    		    		logger.debug("mcUsrAttempt: " + mcUsrAttempt);
+	    		    		mcUsrAttemptGeneral=mcUsrAttempt;
+
+	    		    		if (mcUsrAttempt != null)
+	    		    		{
+		    		    		if (mcUsrAttempt.isFinished() && mcUsrAttempt.isPassed()) 
+		    		    		{
+		    		    		    logger.debug("this is a individual question attempt that is finished and passed: " + mcUsrAttempt);
+		    		    		    isAttemptCorrect=mcService.getUserAttemptCorrectForQuestionContentAndSessionUid(mcQueUsr.getUid(), new Long(questionUid), mcSession.getUid(), new Integer(highestAttemptOrder));
+		    		    		    logger.debug("isAttemptCorrect: " + isAttemptCorrect);
+		    		    		    break;	
+		    		    		}
+	    		    		}
+	    				}
+
+	    				logger.debug("final isAttemptCorrect: " + isAttemptCorrect);
+	    				if (isAttemptCorrect)
+	    				{
+		    			    mcMonitoredUserDTO.setMark(mcUsrAttemptGeneral.getMcQueContent().getWeight().toString());
+	    				}
+	    				else
+	    				{
+	    				    mcMonitoredUserDTO.setMark("0");
+	    				}
+
 	    			    mcMonitoredUserDTO.setUserName(mcQueUsr.getFullname());
+	    			    mcMonitoredUserDTO.setSessionId(sessionId.toString());
+	    			    mcMonitoredUserDTO.setQuestionUid(questionUid);
 	    			    
 	    			    logger.debug("final constructed mcMonitoredUserDTO: " + mcMonitoredUserDTO);
 	    			    listMonitoredUserContainerDTO.add(mcMonitoredUserDTO);
+
+	    			    
+	    			    /*
+	    			    McUsrAttempt mcUsrAttempt=getAttemptWithHighestOrder(listUserAttempts);
+	    			    logger.debug("attempt with highest attempt order, mcUsrAttempt: " + mcUsrAttempt);
+	    			    if (mcUsrAttempt != null)
+	    			    {
+	    			        Integer IntegerPassmark=mcUsrAttempt.getMcOptionsContent().getMcQueContent().getMcContent().getPassMark();
+	    			        logger.debug("IntegerPassmark: " + IntegerPassmark);
+	    			        if ((IntegerPassmark != null) && (IntegerPassmark.intValue() >= 0))
+	    			        {
+	    			            logger.debug("pasmark is defined: ");
+		    			        if (mcUsrAttempt.isPassed())
+		    			        {
+		    			            logger.debug("user has passed the activity");
+				    			    McMonitoredUserDTO mcMonitoredUserDTO = new McMonitoredUserDTO();
+				    			    mcMonitoredUserDTO.setMark(mcUsrAttempt.getMcQueContent().getWeight().toString());
+				    			    mcMonitoredUserDTO.setUserName(mcQueUsr.getFullname());
+				    			    mcMonitoredUserDTO.setUid(mcUsrAttempt.getUid().toString());
+				    			    mcMonitoredUserDTO.setSessionId(sessionId.toString());
+				    			    mcMonitoredUserDTO.setQuestionUid(questionUid);
+				    			    
+				    			    logger.debug("final constructed mcMonitoredUserDTO: " + mcMonitoredUserDTO);
+				    			    listMonitoredUserContainerDTO.add(mcMonitoredUserDTO);
+		    			        }
+		    			        else 
+		    			        {
+		    			            logger.debug("user did not finish the the activity yet");
+				    			    McMonitoredUserDTO mcMonitoredUserDTO = new McMonitoredUserDTO();
+				    			    mcMonitoredUserDTO.setMark("Learner still responding...");
+				    			    mcMonitoredUserDTO.setUserName(mcQueUsr.getFullname());
+				    			    mcMonitoredUserDTO.setUid(mcUsrAttempt.getUid().toString());
+				    			    mcMonitoredUserDTO.setSessionId(sessionId.toString());
+				    			    mcMonitoredUserDTO.setQuestionUid(questionUid);
+				    			    
+				    			    logger.debug("final constructed mcMonitoredUserDTO: " + mcMonitoredUserDTO);
+				    			    listMonitoredUserContainerDTO.add(mcMonitoredUserDTO);
+		    			        }
+	    			        }
+	    			        else
+	    			        {
+	    			            logger.debug("pasmark is Undefined: ");
+	    			            logger.debug("pupulate user marks as if user has passed");
+			    			    McMonitoredUserDTO mcMonitoredUserDTO = new McMonitoredUserDTO();
+			    			    mcMonitoredUserDTO.setMark(mcUsrAttempt.getMcQueContent().getWeight().toString());
+			    			    mcMonitoredUserDTO.setUserName(mcQueUsr.getFullname());
+			    			    mcMonitoredUserDTO.setUid(mcUsrAttempt.getUid().toString());
+			    			    mcMonitoredUserDTO.setSessionId(sessionId.toString());
+			    			    mcMonitoredUserDTO.setQuestionUid(questionUid);
+			    			    
+			    			    logger.debug("final constructed mcMonitoredUserDTO: " + mcMonitoredUserDTO);
+			    			    listMonitoredUserContainerDTO.add(mcMonitoredUserDTO);
+	    			        }
+	    			    }
+	    			    */	    			    
 	    			}
 	    		}
 			}
@@ -588,10 +497,9 @@ public class MonitoringUtil implements McAppConstants{
 			return mapMonitoredUserContainerDTO;
 		    
 		}
-
 	}
 
-	
+
 	public static McUsrAttempt getAttemptWithHighestOrder(List listUserAttempts)
 	{
 		logger.debug("starting getAttemptWithHighestOrder: " + listUserAttempts);
@@ -604,14 +512,18 @@ public class MonitoringUtil implements McAppConstants{
     		McUsrAttempt mcUsrAttempt=(McUsrAttempt)itAttempts.next();
     		logger.debug("mcUsrAttempt: " + mcUsrAttempt);
     		int currentOrder=mcUsrAttempt.getAttemptOrder().intValue();
+    		logger.debug("currentOrder: " + currentOrder);
     		
     		if (currentOrder > highestOrder)
     		{
     		    mcHighestUsrAttempt=mcUsrAttempt;
+    		    highestOrder=currentOrder;
+    		    logger.debug("highestOrder is updated to: " + highestOrder);
     		}
 		}
 		
 		logger.debug("returning mcHighestUsrAttempt: " + mcHighestUsrAttempt);
+		logger.debug("highestOrder has become: " + highestOrder);
 		return mcHighestUsrAttempt;
 	}
 

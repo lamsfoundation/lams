@@ -42,12 +42,15 @@
         column="mark"
     />
     
-    <property
-        name="totalWeight"
-        type="java.lang.Integer"
-        access="property"        
-        column="totalWeight"
-    />
+    
+       <property
+        name="finished"
+        type="boolean"
+        access="property"
+        column="finished"
+        length="1"        
+   />
+    
 
     <property
         name="passed"

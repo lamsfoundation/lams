@@ -626,17 +626,17 @@
 <variant type-name-pattern="INTEGER ZEROFILL"/>
 </data-type>
 </column>
-<column alias="" auto-increment="false" column-size="0" decimal-digits="0" default-value="0" mandatory="false" name="totalWeight" remarks="">
+<column alias="" auto-increment="false" column-size="1" decimal-digits="0" default-value="0" mandatory="false" name="finished" remarks="">
 <column-description></column-description>
-<data-type jdbc-type="4" name="INTEGER" selected-variant-pattern="INTEGER">
-<variant type-name-pattern="INTEGER"/>
-<variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INTEGER(%n)"/>
-<variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INTEGER(%n) UNSIGNED"/>
-<variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INTEGER(%n) UNSIGNED ZEROFILL"/>
-<variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INTEGER(%n) ZEROFILL"/>
-<variant type-name-pattern="INTEGER UNSIGNED"/>
-<variant type-name-pattern="INTEGER UNSIGNED ZEROFILL"/>
-<variant type-name-pattern="INTEGER ZEROFILL"/>
+<data-type jdbc-type="-6" name="TINYINT" selected-variant-pattern="TINYINT(%n)">
+<variant type-name-pattern="TINYINT"/>
+<variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n)"/>
+<variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n) UNSIGNED"/>
+<variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n) ZEROFILL"/>
+<variant type-name-pattern="TINYINT UNSIGNED"/>
+<variant type-name-pattern="TINYINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="TINYINT ZEROFILL"/>
 </data-type>
 </column>
 </column-list>

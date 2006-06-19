@@ -328,6 +328,35 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     		logger.debug("success getting nextUrl: "+ nextUrl);
     		mcLearningForm.resetCommands();
     		
+    		McSession mcSession=mcService.retrieveMcSession(toolSessionId);
+    	    logger.debug("retrieving mcSession: " + mcSession);
+    	    
+    	    McQueUsr mcQueUsr=mcService.getMcUserBySession(new Long(userID), mcSession.getUid());
+    	    logger.debug("mcQueUsr:" + mcQueUsr);
+    	    
+    	    McUsrAttempt mcUsrAttempt = mcService.getAttemptWithLastAttemptOrderForUserInSession(mcQueUsr.getUid(), mcSession.getUid());
+        	logger.debug("mcUsrAttempt with highest attempt order: " + mcUsrAttempt);
+        	String highestAttemptOrder="";
+        	if (mcUsrAttempt != null)
+        	{
+            	highestAttemptOrder=mcUsrAttempt.getAttemptOrder().toString();
+        	}
+        	logger.debug("highestAttemptOrder: " + highestAttemptOrder);
+
+    	    
+    	    List userAttempts=mcService.getAttemptsForUserOnHighestAttemptOrderInSession(mcQueUsr.getUid(), mcSession.getUid(), new Integer(highestAttemptOrder));
+    	    logger.debug("userAttempts:" + userAttempts);
+    	    
+			Iterator itAttempts=userAttempts.iterator();
+			while (itAttempts.hasNext())
+			{
+	    		mcUsrAttempt=(McUsrAttempt)itAttempts.next();
+	    		logger.debug("mcUsrAttempt: " + mcUsrAttempt);
+	    		mcUsrAttempt.setFinished(true);
+	    		mcService.updateMcUsrAttempt(mcUsrAttempt);
+			}
+			logger.debug("updated user records to finished");
+    		
     		/* pay attention here*/
     		logger.debug("redirecting to the nextUrl: "+ nextUrl);
     		response.sendRedirect(nextUrl);
@@ -471,22 +500,37 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     	    mcQueUsr=existingMcQueUsr;
     	    logger.debug("assign");
     	}
-
+    	
     	logger.debug("final mcQueUsr: " + mcQueUsr);
     	
-    	String highestAttemptOrder=(String)request.getSession().getAttribute(LEARNER_LAST_ATTEMPT_ORDER);
-        logger.debug("current highestAttemptOrder:" + highestAttemptOrder);
-        
-        if (highestAttemptOrder == null)
-    		highestAttemptOrder="0";
+    	//String highestAttemptOrder=(String)request.getSession().getAttribute(LEARNER_LAST_ATTEMPT_ORDER);
+        //logger.debug("current highestAttemptOrder:" + highestAttemptOrder);
+    	
+    	String highestAttemptOrder="0";
+    	McUsrAttempt mcUsrAttempt = mcService.getAttemptWithLastAttemptOrderForUserInSession(mcQueUsr.getUid(), toolSessionUid);
+    	logger.debug("mcUsrAttempt with highest attempt order: " + mcUsrAttempt);
+    	if (mcUsrAttempt != null)
+    	{
+        	highestAttemptOrder=mcUsrAttempt.getAttemptOrder().toString();
+    	}
+    	logger.debug("highestAttemptOrder: " + highestAttemptOrder);
+    	
+    	int intHighestAttemptOrder=0;
+    	intHighestAttemptOrder=new Integer(highestAttemptOrder).intValue();
+    	logger.debug("intHighestAttemptOrder: " + intHighestAttemptOrder);
+    	logger.debug("new intHighestAttemptOrder: " + ++intHighestAttemptOrder);
+    	
+    	highestAttemptOrder = new Integer(intHighestAttemptOrder).toString();
+    	logger.debug("new highestAttemptOrder: " + highestAttemptOrder);
+    	
         
         logger.debug("passed: " + passed);
     	LearningUtil.createAttempt(request, mcQueUsr, mapGeneralCheckedOptionsContent, mark, passed, new Integer(highestAttemptOrder).intValue(), mapLearnerAssessmentResults);
     	logger.debug("created user attempt in the db");
     	
-    	int intHighestAttemptOrder=new Integer(highestAttemptOrder).intValue()+ 1 ;
-        logger.debug("updated highestAttemptOrder:" + intHighestAttemptOrder);
-        request.getSession().setAttribute(LEARNER_LAST_ATTEMPT_ORDER, new Integer(intHighestAttemptOrder).toString());
+    	//int intHighestAttemptOrder=new Integer(highestAttemptOrder).intValue()+ 1 ;
+        //logger.debug("updated highestAttemptOrder:" + intHighestAttemptOrder);
+        //request.getSession().setAttribute(LEARNER_LAST_ATTEMPT_ORDER, new Integer(intHighestAttemptOrder).toString());
         
         logger.debug("before getLearnerMarkAtLeast: passMark" + passMark);
         logger.debug("before getLearnerMarkAtLeast: mapQuestionWeights" + mapQuestionWeights);

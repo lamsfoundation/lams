@@ -700,6 +700,7 @@ public class LearningUtil implements McAppConstants {
     	logger.debug("createIndividualOptions-> isAttemptCorrect: " + isAttemptCorrect);
     	logger.debug("mcQueContent: " + mcQueContent);
     	logger.debug("mapCheckedOptions: " + mapCheckedOptions);
+    	logger.debug("highestAttemptOrder used : " + highestAttemptOrder);
     	
     	
     	if (mcQueContent != null)

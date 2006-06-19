@@ -161,6 +161,16 @@ public interface IMcService
 	
 	public List getUserAttemptsForQuestionContentAndSessionUid(final Long queUsrUid,  final Long mcQueContentId, final Long mcSessionUid) throws McApplicationException;
 	
+	public boolean getUserAttemptCorrectForQuestionContentAndSessionUid(final Long queUsrUid,  final Long mcQueContentId, final Long mcSessionUid, final Integer attemptOrder) throws McApplicationException;
+	
+	public List getAttemptsForUserInSession(final Long queUsrUid, final Long mcSessionUid) throws McApplicationException;
+	
+	public List getAttemptsForUserOnHighestAttemptOrderInSession(final Long queUsrUid, final Long mcSessionUid, final Integer attemptOrder) throws McApplicationException;
+	
+	public List getAttemptsOnHighestAttemptOrder(final Long queUsrUid,  final Long mcQueContentId, final Long mcSessionUid, final Integer attemptOrder) throws McApplicationException;
+	
+	public McUsrAttempt getAttemptWithLastAttemptOrderForUserInSession(Long queUsrUid, final Long mcSessionUid) throws McApplicationException;
+	
 	public int countIncompleteSession(McContent mc) throws McApplicationException;
 	
 	public boolean studentActivityOccurred(McContent mc) throws McApplicationException;

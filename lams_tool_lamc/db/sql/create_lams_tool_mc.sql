@@ -89,7 +89,7 @@ CREATE TABLE tl_lamc11_usr_attempt (
      , mark VARCHAR(255)
      , passed TINYINT(1) NOT NULL DEFAULT 0
      , attemptOrder INTEGER NOT NULL DEFAULT 1
-     , totalWeight INTEGER DEFAULT 0
+     , finished TINYINT(1) DEFAULT 0
      , PRIMARY KEY (uid)
      , INDEX (mc_que_content_id)
      , CONSTRAINT FK_tl_lamc11_usr_attempt_2 FOREIGN KEY (mc_que_content_id)
@@ -113,6 +113,7 @@ CREATE TABLE tl_lamc11_uploadedfile (
      , CONSTRAINT FK_tl_lamc11_uploadedFile FOREIGN KEY (mc_content_id)
                   REFERENCES tl_lamc11_content (uid)
 )TYPE=InnoDB;
+
 
 INSERT INTO tl_lamc11_content(uid, content_id , title , instructions , creation_date , questions_sequenced , username_visible , created_by , monitoring_report_title , report_title , run_offline , define_later, synch_in_monitor, offline_instructions, online_instructions, end_learning_message, content_in_use, retries, show_feedback, show_report, pass_mark) VALUES (1, ${default_content_id} ,'MCQ Title','MCQ Instructions', NOW(), 0, 0,1,'Monitoring Report','Report', 0, 0, 0,'offline instructions','online instructions','Finished Activity...', 0, 0, 0, 0, 50);
 
