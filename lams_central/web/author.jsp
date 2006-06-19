@@ -231,6 +231,7 @@ function checkSaved(){
 <TITLE>Author :: LAMS</TITLE>
 </HEAD>
 <BODY bgcolor="#FFFFFF" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<c:set var="authorurl">lams_authoring.swf?userID=<lams:user property="userID"/>&serverURL=<%=pathToRoot%>&build=<%=authoringClientVersion%>&lang=<lams:user property="localeLanguage"/>&country=<lams:user property="localeCountry"/>&theme=<lams:user property="flashTheme"/></c:set>
 
 <!-- URL's used in the movie-->
 <!-- text used in the movie-->
@@ -240,12 +241,12 @@ function checkSaved(){
  width="100%" height="100%" align="" id="authoring">
   <param name="allowScriptAccess" value="sameDomain" />
 
-  <param name="movie" value="lams_authoring.swf?userID=<lams:user property="userID"/>&serverURL=<%=pathToRoot%>&build=<%=authoringClientVersion%>&lang=<%=serverLanguage%>&date=<%=languageDate%>&theme=<lams:user property="flashTheme"/>">
+  <param name="movie" value="${authorurl}">
   <param name="quality" value="high">
   <param name="scale" value="noscale">
   <param name="bgcolor" value="#B3B7C8">
   <embed 	
-   	  src="lams_authoring.swf?userID=<lams:user property="userID"/>&serverURL=<%=pathToRoot%>&build=<%=authoringClientVersion%>&lang=<%=serverLanguage%>&date=<%=languageDate%>&theme=<lams:user property="flashTheme"/>"
+   	  src="${authorurl}"
 	  quality="high" 
 	  scale="noscale" 
 	  bgcolor="#B3B7C8"  
