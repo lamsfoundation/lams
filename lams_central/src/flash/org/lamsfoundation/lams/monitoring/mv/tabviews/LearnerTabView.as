@@ -359,7 +359,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		if (ACT_X == 0){
 			 var z:Object = mm.getSize();
 		trace("Monitor Tab Grid Width: "+s.w+" Monitor Tab Grid Height: "+s.h);
-			_activityLayer_mc.createTextField("learnerName"+learner.getLearnerId(), _activityLayer_mc.getNextHighestDepth(), ACT_X, ACT_Y, z.w, 20);
+			_activityLayer_mc.createTextField("learnerName"+learner.getLearnerId(), _activityLayer_mc.getNextHighestDepth(), ACT_X, ACT_Y, z.w-20, 20);
 			var learnerName_txt = _activityLayer_mc["learnerName"+learner.getLearnerId()];
 			trace("Learnermername field is: "+learnerName_txt)
 			var nameTextFormat = new TextFormat();
@@ -371,7 +371,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 			learnerName_txt.background = true;
 			learnerName_txt.backgroundColor = 0xCCCCCC;
 			learnerName_txt.setNewTextFormat(nameTextFormat);
-			learnerName_txt.text = "\t"+learner.getUserName()
+			learnerName_txt.text = "\t"+learner.getLearnerFirstName() + " "+learner.getLearnerLastName()
 			trace("Ypos for name field is: "+ACT_Y)
 		}
 		var s:Boolean = false;
