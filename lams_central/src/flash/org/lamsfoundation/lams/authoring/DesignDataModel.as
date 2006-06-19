@@ -205,7 +205,21 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		}
 	}
 	
+	/**
+	 * Removes the transitions from the DDM which are connected to the Activity 
+	 *  
+	 * @param   connectUIID connected Activity UIID
+	 */
 	
+	public function removeTransitionByConnection(connectUIID):Void{
+		var keyArray:Array = _transitions.keys();
+		for(var i=0; i<keyArray.length; i++){
+			var transition:Transition = Transition(_transitions.get(keyArray[i]));
+			if(transition.fromUIID == connectUIID || transition.toUIID == connectUIID){
+				removeTransition(transition.transitionUIID);
+			}
+		}
+	}
 	
 	/**
 	 * Adds a transition to the DDM
