@@ -166,43 +166,7 @@
 		<java>smackx.jar</java>
 	</module>
 	<module>
-		<java>spring-aop.jar</java>
-	</module>
-	<module>
-		<java>spring-beans.jar</java>
-	</module>
-	<module>
-		<java>spring-context.jar</java>
-	</module>
-	<module>
-		<java>spring-core.jar</java>
-	</module>
-	<module>
-		<java>spring-dao.jar</java>
-	</module>
-	<module>
-		<java>spring-hibernate.jar</java>
-	</module>
-	<module>
-		<java>spring-jdbc.jar</java>
-	</module>
-	<module>
-		<java>spring-mock.jar</java>
-	</module>
-	<module>
-		<java>spring-orm.jar</java>
-	</module>
-	<module>
-		<java>spring-remoting.jar</java>
-	</module>
-	<module>
-		<java>spring-support.jar</java>
-	</module>
-	<module>
-		<java>spring-web.jar</java>
-	</module>
-	<module>
-		<java>spring-webmvc.jar</java>
+		<java>spring.jar</java>
 	</module>
 	<module>
 		<java>concurrent-1.3.4.jar</java>
