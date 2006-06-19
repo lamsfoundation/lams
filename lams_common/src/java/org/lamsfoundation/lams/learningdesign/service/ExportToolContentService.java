@@ -638,20 +638,40 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			groupingDAO.insert(grouping);
 		}
 		
+		//================== Start handle activities ======================
 		//activity object list
 		List<AuthoringActivityDTO> actDtoList = dto.getActivities();
 		Set<Activity> actList = new TreeSet<Activity> (new ActivityOrderComparator());
 		Map<Long,Activity> activityMapper = new HashMap<Long,Activity>();
 		for(AuthoringActivityDTO actDto: actDtoList){
-			Activity act = getActivity(actDto,activityMapper, groupingMapper,toolMapper);
+			Activity act = getActivity(actDto,groupingMapper,toolMapper);
+			//so far, the activitiy ID is still old one, so setup the mapping relation between old ID and new activity.
 			activityMapper.put(act.getActivityId(),act);
 			actList.add(act);
 			
+		}
+		//rescan the activity list and refresh their parent activity.
+		for(AuthoringActivityDTO actDto: actDtoList){
+			Activity act = activityMapper.get(actDto.getActivityID());
+			if(actDto.getParentActivityID() != null){
+				Activity parent = activityMapper.get(actDto.getParentActivityID());
+				act.setParentActivity(parent);
+				//also add child as Complex activity: It is useless for persist data, but helpful for validate in learning design!
+				if(isComplexActivity(parent)){
+					Set<Activity> set = ((ComplexActivity)parent).getActivities();
+					if(set == null){
+						set = new TreeSet<Activity>(new ActivityOrderComparator());
+						((ComplexActivity)parent).setActivities(set);
+					}
+					set.add(act);
+				}
+			}
 			//persist
 			act.setActivityId(null);
 			activityDAO.insert(act);
 		}
-
+		//================== END handle activities ======================
+		
 		//transition object list
 		List<TransitionDTO> transDtoList = dto.getTransitions();
 		Set<Transition> transList = new HashSet<Transition>();
@@ -833,7 +853,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	 * @param toolMapper
 	 * @return
 	 */
-	private Activity getActivity(AuthoringActivityDTO actDto, Map<Long, Activity> activityMapper, Map<Long, Grouping> groupingList, Map<Long,ToolContent> toolMapper) {
+	private Activity getActivity(AuthoringActivityDTO actDto, Map<Long, Grouping> groupingList, Map<Long,ToolContent> toolMapper) {
 		Activity act = null;
 		if(actDto == null)
 			return act;
@@ -916,21 +936,9 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		
 		act.setLibraryActivityUiImage(actDto.getLibraryActivityUIImage());
 		act.setOrderId(actDto.getOrderID());
-		
-		if(actDto.getParentActivityID() != null){
-			Activity parent = activityMapper.get(actDto.getParentActivityID());
-			act.setParentActivity(parent);
-			//also add child as Complex activity: It is useless for persist data, but helpful for validate in learning design!
-			if(isComplexActivity(parent)){
-				Set<Activity> set = ((ComplexActivity)parent).getActivities();
-				if(set == null){
-					set = new TreeSet<Activity>(new ActivityOrderComparator());
-					((ComplexActivity)parent).setActivities(set);
-				}
-				set.add(act);
-			}
-		}else
-			act.setParentActivity(null);
+
+		//temporarily set as to null, after scan all activities, then set it to valid value.
+		act.setParentActivity(null);
 		
 		act.setParentUIID(actDto.getParentUIID());
 		act.setRunOffline(actDto.getRunOffline());
