@@ -177,7 +177,7 @@ class Lesson {
 		// set lesson as active
 		lessonModel.setActive();
 		trace('pktobject value: '+String(pkt));
-		getURL(_root.serverURL + 'learning'+String(pkt)+'?progressId='+lessonModel.getLessonID(),'contentFrame');
+		getURL(_root.serverURL + 'learning'+String(pkt)+'?lessonID='+lessonModel.getLessonID(),'contentFrame');
 		
 	}  
 	
