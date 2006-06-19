@@ -80,7 +80,7 @@ public class DisplayParallelActivityAction extends ActivityAction {
 
 		ParallelActivity parallelActivity = (ParallelActivity)activity;
 
-		form.setActivityId(activity.getActivityId());
+		form.setActivityID(activity.getActivityId());
 
 		List activityURLs = new ArrayList();
 

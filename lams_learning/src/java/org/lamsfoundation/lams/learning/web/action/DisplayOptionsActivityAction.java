@@ -83,7 +83,7 @@ public class DisplayOptionsActivityAction extends ActivityAction {
 
 		OptionsActivity optionsActivity = (OptionsActivity)activity;
 
-		form.setActivityId(activity.getActivityId());
+		form.setActivityID(activity.getActivityId());
 
 		List<ActivityURL> activityURLs = new ArrayList<ActivityURL>();
 		Set subActivities = optionsActivity.getActivities();

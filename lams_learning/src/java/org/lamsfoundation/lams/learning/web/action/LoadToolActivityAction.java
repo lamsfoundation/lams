@@ -78,7 +78,7 @@ public class LoadToolActivityAction extends ActivityAction {
 		LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request,learnerService);
 		Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
 				
-		form.setActivityId(activity.getActivityId());
+		form.setActivityID(activity.getActivityId());
 		
 		if (activity.isToolActivity() || activity.isSystemToolActivity() ) {
 

@@ -59,11 +59,12 @@ public abstract class ActivityAction extends LamsAction {
 		return learnerService;
 	}
 	
+	/** Setup the progress string and the lesson id in the actionForm */
 	public ActionForward setupProgressString(ActionForm actionForm, HttpServletRequest request)  {
 		
 		LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request,getLearnerService());		
 
-		ActivityForm activityForm = (ActivityForm) actionForm;
+		ActivityForm activityForm = (ActivityForm) actionForm; 
 		
 		// Calculate the progress summary. On join this method gets called twice, and we
 		// only want to calculate once
@@ -72,6 +73,11 @@ public abstract class ActivityAction extends LamsAction {
 			progressSummary = getProgressSummary(learnerProgress);
 			activityForm.setProgressSummary(progressSummary);
 		} 
+		
+		Lesson currentLesson = learnerProgress.getLesson();
+		if(currentLesson != null){
+			activityForm.setLessonID(currentLesson.getLessonId());
+		}
 		
 		if(log.isDebugEnabled())
 		    log.debug("Entering activity: progress summary is "+activityForm.getProgressSummary());
@@ -127,11 +133,6 @@ public abstract class ActivityAction extends LamsAction {
 				progressSummary.append(currentActivity.getActivityId());
 			}
 			
-			progressSummary.append("&lessonID=");
-			Lesson currentLesson = learnerProgress.getLesson();
-			if(currentLesson != null){
-				progressSummary.append(currentLesson.getLessonId());
-			}
 		}
 		return progressSummary.toString();
 	}

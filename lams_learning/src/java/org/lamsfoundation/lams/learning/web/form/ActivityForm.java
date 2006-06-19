@@ -45,7 +45,7 @@ public class ActivityForm extends ActionForm {
 	 * LearnerProgress (or Learner) and Activity. Note that the activity may already
 	 * be complete.
 	 */
-	private Long activityId;
+	private Long activityID;
 		
 	/** List of ActivityURL, will only contain one if a simple activity */
 	private List activityURLs;
@@ -53,6 +53,9 @@ public class ActivityForm extends ActionForm {
 	/** Progress summary suitable for Flash. In the form attempted=13_14&completed=10_11&current=12.*/
 	private String progressSummary;
 
+	/** Lesson to which this activity belongs. Id comes from the learner progress */
+	private Long lessonID;
+	
 	/** 
 	 * Method reset
 	 * @param mapping
@@ -68,11 +71,11 @@ public class ActivityForm extends ActionForm {
 	public void setActivityURLs(List activityURLs) {
 		this.activityURLs = activityURLs;
 	}
-	public Long getActivityId() {
-		return activityId;
+	public Long getActivityID() {
+		return activityID;
 	}
-	public void setActivityId(Long activityId) {
-		this.activityId = activityId;
+	public void setActivityID(Long activityID) {
+		this.activityID = activityID;
 	}
 	
 	public void addActivityURL(ActivityURL activityUrl)
@@ -88,5 +91,13 @@ public class ActivityForm extends ActionForm {
 
 	public void setProgressSummary(String progressSummary) {
 		this.progressSummary = progressSummary;
+	}
+
+	public Long getLessonID() {
+		return lessonID;
+	}
+
+	public void setLessonID(Long lessonID) {
+		this.lessonID = lessonID;
 	}
 }
