@@ -164,7 +164,11 @@ public function update (o:Observable,infoObj:Object):Void{
 				trace("TabID for Selected tab is (LessonTab TABCHANGE): "+infoObj.tabID)
 					this._visible = true;
 					//mm.setDirty();
-					MovieClipUtils.doLater(Proxy.create(this,draw));
+					//MovieClipUtils.doLater(Proxy.create(this,draw));
+					if(mm.getIsProgressChanged()){
+						trace("I am calling reloadProgress now")
+						reloadProgress(false);
+					}
 				}else {
 					this._visible = false;
 				}
@@ -174,6 +178,7 @@ public function update (o:Observable,infoObj:Object):Void{
 				trace("TabID for Selected tab is (LessonTab): "+infoObj.tabID)
 					this._visible = true;
 					MovieClipUtils.doLater(Proxy.create(this,draw));
+					
 				}else {
 					this._visible = false;
 				}
@@ -181,7 +186,7 @@ public function update (o:Observable,infoObj:Object):Void{
 			case 'RELOADPROGRESS' :	
 					if (infoObj.tabID == _tabID){
 						trace("called Reload progress")
-						mm.getMonitor().reloadLessonToMonitor();
+						reloadProgress();
 					}
 					break;
 			case 'LM_DIALOG' :
@@ -197,6 +202,14 @@ public function update (o:Observable,infoObj:Object):Void{
 				break;
 			case 'STAFF_LOADED' :
 				_dialog.checkStaff(mm.organisation);
+				break;
+			case 'DRAW_DESIGN' :
+				if (infoObj.tabID == _tabID){
+					//drawDesignCalled = "called";
+					trace("TabID for Selected tab is (LessonTab): "+infoObj.tabID)
+					populateLessonDetails();
+					//mm.setIsProgressChanged(false);
+				}
 				break;
             default :
                 Debugger.log('unknown update type :' + infoObj.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.LessonTabView');
@@ -215,6 +228,29 @@ public function update (o:Observable,infoObj:Object):Void{
 		statusApply_btn.addEventListener("click", Delegate.create(this, changeStatus))
 		this.addEventListener("apply", Delegate.create(_monitorController, _monitorController.changeStatus));
 
+	}
+	
+	/**
+	 * Reloads the learner Progress and 
+	 * @Param isChanged Boolean Value to pass it to setIsProgressChanged in monitor model so 		that it sets it to true if refresh button is clicked and sets it to fasle as soon as latest data is loaded and design is redrawn.
+	 * @usage   
+	 * @return  nothing
+	 */
+	private function reloadProgress(isChanged:Boolean){
+		
+			trace("reloading Progress data for Learners")
+			//mm.getMonitor().reloadLessonToMonitor();
+			
+		
+			
+			
+			if (isChanged == false){
+				mm.setIsProgressChanged(false);
+				
+			}else {
+				mm.setIsProgressChanged(true);
+			}
+			mm.getMonitor().getProgressData(mm.getSequence());
 	}
 	
 	/**
@@ -270,6 +306,8 @@ public function update (o:Observable,infoObj:Object):Void{
 		LSDescription_txt.text = s.description;
 		sessionStatus_txt.text = showStatus(s.state);
 		numLearners_txt.text = String(s.noStartedLearners) + " "  + Dictionary.getValue('ls_of_text')+" "+String(s.noPossibleLearners);
+		trace("current logged in learners are: "+mm.allLearnersProgress.length)
+		//numLearners_txt.text = mm.allLearnersProgress.length + " "  + Dictionary.getValue('ls_of_text')+" "+String(s.noPossibleLearners);
 		class_txt.text = s.organisationName;
 	}
 	
@@ -638,7 +676,7 @@ public function update (o:Observable,infoObj:Object):Void{
 	private function setSize(mm:MonitorModel):Void{
         var s:Object = mm.getSize();
 		trace("Monitor Tab Widtht: "+s.w+" Monitor Tab Height: "+s.h);
-		bkg_pnl.setSize(s.w,s.h);
+		bkg_pnl.setSize(s.w-20,s.h);
 		lessonManager.setSize(s.w-20,lessonManager._height);
 		taskManager.setSize(s.w-20,lessonManager._height);
 		//qTasks_scp.setSize(s.w._width,reqTasks_scp._height);
