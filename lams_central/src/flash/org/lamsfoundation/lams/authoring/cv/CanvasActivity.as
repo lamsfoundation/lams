@@ -44,8 +44,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
   
 	public static var TOOL_ACTIVITY_WIDTH:Number = 123.1;
 	public static var TOOL_ACTIVITY_HEIGHT:Number = 50.5;
-	public static var GATE_ACTIVITY_HEIGHT:Number =50;
-	public static var GATE_ACTIVITY_WIDTH:Number = 50;
+	public static var GATE_ACTIVITY_HEIGHT:Number =30;
+	public static var GATE_ACTIVITY_WIDTH:Number = 30;
 	public static var ICON_WIDTH:Number = 30;
 	public static var ICON_HEIGHT:Number = 30;
 	
@@ -302,9 +302,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			stopSign_mc._x = 0;
 			stopSign_mc._y = 0;
 			
-			
-			
-		}else{
+			}else{
 			//chose the icon:
 			if(_activity.isGroupActivity()){
 				groupIcon_mc._visible = true;
