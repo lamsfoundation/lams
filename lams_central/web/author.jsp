@@ -112,15 +112,16 @@ function doConfirm(arg){
 		alert ("Why not?")
 }
 
-function openPopUp(args, title, h, w, resize, status, scrollbar){
+function openPopUp(args, title, h, w, resize, status, scrollbar, menubar){
 	if(thePopUp && thePopUp.open && !thePopUp.closed){
 			thePopUp.focus();
 			
 	}else{
 		//mozilla seems to want a full url
 		
-		var args = getHostURL()+args;
-		thePopUp = window.open(args,title,"HEIGHT="+h+",WIDTH="+w+",resizable="+resize+",scrollbars="+scrollbar+",status="+status+"");
+		//var args = getHostURL()+args;
+		alert('Opening Preview url')
+		thePopUp = window.open(args,title,"HEIGHT="+h+",WIDTH="+w+",resizable="+resize+",scrollbars="+scrollbar+",status="+status+",menubar="+menubar+"");
 		//thePopUp = window.open(args,"learnerPop","HEIGHT=450,WIDTH=550,resizable,scrollbars");
 	}
 }
@@ -134,6 +135,12 @@ function closeWindow(win){
 
 }
 
+function openPreview(args, title){
+var thePopup = null;
+	//alert('Opening Preview url')
+	thePopup = window.open(args,title,"height=600, width=800, resizable, scrollbar=yes, menubar=no, status=yes, toolbar=no");
+	
+}
 var learnWin = null;
 /*function openPreview(sessionId)	{
 	//debug: To check we are gettin a session Id to open
@@ -224,7 +231,6 @@ function checkSaved(){
 <TITLE>Author :: LAMS</TITLE>
 </HEAD>
 <BODY bgcolor="#FFFFFF" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
-<c:set var="authorurl">lams_authoring.swf?userID=<lams:user property="userID"/>&serverURL=<%=pathToRoot%>&build=<%=authoringClientVersion%>&lang=<lams:user property="localeLanguage"/>&country=<lams:user property="localeCountry"/>&theme=<lams:user property="flashTheme"/></c:set>
 
 <!-- URL's used in the movie-->
 <!-- text used in the movie-->
@@ -234,12 +240,12 @@ function checkSaved(){
  width="100%" height="100%" align="" id="authoring">
   <param name="allowScriptAccess" value="sameDomain" />
 
-  <param name="movie" value="${authorurl}">
+  <param name="movie" value="lams_authoring.swf?userID=<lams:user property="userID"/>&serverURL=<%=pathToRoot%>&build=<%=authoringClientVersion%>&lang=<%=serverLanguage%>&date=<%=languageDate%>&theme=<lams:user property="flashTheme"/>">
   <param name="quality" value="high">
   <param name="scale" value="noscale">
   <param name="bgcolor" value="#B3B7C8">
   <embed 	
-   	  src="${authorurl}"
+   	  src="lams_authoring.swf?userID=<lams:user property="userID"/>&serverURL=<%=pathToRoot%>&build=<%=authoringClientVersion%>&lang=<%=serverLanguage%>&date=<%=languageDate%>&theme=<lams:user property="flashTheme"/>"
 	  quality="high" 
 	  scale="noscale" 
 	  bgcolor="#B3B7C8"  
