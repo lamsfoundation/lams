@@ -32,13 +32,14 @@
  %>
 <%@ tag body-content="empty" %>
 <%@ attribute name="progress" required="true" rtexprvalue="true" type="java.lang.String" %>
+<%@ attribute name="id" required="true" rtexprvalue="true" %>
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 <c:if test="${!empty progress}">
 		<c:set var="randomID">
-			<lams:generateID/>
+			<lams:generateID id="${id}"/>
 		</c:set>
-			<c:set var="passonurl" value="passon.swf?${progress}&uniqueID=${randomID}"/>
+			<c:set var="passonurl" value="passon.swf?${progress}&lessonID=${id}&uniqueID=${randomID}"/>
 			
 			<!-- URL's used in the movie-->
 			<!-- text used in the movie-->

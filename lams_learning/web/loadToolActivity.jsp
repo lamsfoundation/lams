@@ -39,7 +39,7 @@ String pathToShare = protocol+request.getServerName()+":"+request.getServerPort(
 %>
 <body bgcolor="#9DC5EC">
 
-	<lams:Passon progress="${activityForm.progressSummary}"/>
+	<lams:Passon id="${activityForm.lessonID}" progress="${activityForm.progressSummary}"/>
 	
 	<c:if test="${!empty activityForm.activityURLs}">
 		

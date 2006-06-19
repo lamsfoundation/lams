@@ -56,7 +56,7 @@
 		//-->
 	</script>
 	
-	<lams:Passon progress="${optionsActivityForm.progressSummary}"/>
+	<lams:Passon id="${optionsActivityForm.lessonID}" progress="${optionsActivityForm.progressSummary}"/>
 	
 		<html:form action="/ChooseActivity" method="POST">
 		<input type="hidden" name="lams_token" value="<c:out value='${lams_token}' />" />
@@ -160,7 +160,7 @@
 	</html:form>
 	<html:form action="/CompleteActivity" method="POST">
 		<input type="hidden" name="lams_token" value="<c:out value='${lams_token}' />" />
-		<input type="hidden" name="activityID" value="<c:out value="${optionsActivityForm.activityID}" />" />
+		<input type="hidden" name="activityID" value="<c:out value="${optionsActivityForm.activityId}" />" />
 	</html:form>
 </div>
 

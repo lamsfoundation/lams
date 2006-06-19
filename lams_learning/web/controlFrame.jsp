@@ -33,7 +33,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<lams:css/>
 		<title><fmt:message key="learner.title"/></title>
 		<c:set var="randomID">
-			<lams:generateID/>
+			<lams:generateID id="${param.lessonID}"/>
 		</c:set>
 	</head>
 	<body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
