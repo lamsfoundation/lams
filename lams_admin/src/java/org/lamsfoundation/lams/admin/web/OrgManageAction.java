@@ -93,7 +93,7 @@ public class OrgManageAction extends Action {
 		}
 		String username = request.getRemoteUser();
 		OrgListDTO orgManageForm = new OrgListDTO();
-		Organisation org = service.getOrganisationById(orgId);
+		Organisation org = (Organisation)service.findById(Organisation.class,orgId);
 		log.debug("orgId:"+orgId);
 		if(org==null){
 			errors.add("org",new ActionMessage("error.org.invalid"));
@@ -117,7 +117,7 @@ public class OrgManageAction extends Action {
 			}else{
 				type = OrganisationType.CLASS_TYPE;
 			}
-			List organisations = service.getOrganisationsByType(type);
+			List organisations = service.findByProperty(Organisation.class,"organisationType.organisationTypeId",type);
 			log.debug("user is sysadmin");
 			log.debug("Got "+organisations.size()+" organsiations");
 			log.debug("organisationType is "+type);

@@ -92,7 +92,7 @@ public class UserManageAction extends Action {
 		//String username = request.getRemoteUser();
 		
 		// get org name
-		Organisation organisation = service.getOrganisationById(orgId);
+		Organisation organisation = (Organisation)service.findById(Organisation.class,orgId);
 		if(organisation==null) {
 			errors.add("org",new ActionMessage("error.org.invalid"));
 			saveErrors(request,errors);

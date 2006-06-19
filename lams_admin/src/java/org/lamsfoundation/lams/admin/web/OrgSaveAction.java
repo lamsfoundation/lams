@@ -101,11 +101,11 @@ public class OrgSaveAction extends Action {
 			Integer orgId = (Integer)orgForm.get("orgId");
 			Organisation org;
 			if(orgId!=0){
-				org = service.getOrganisationById(orgId);
+				org = (Organisation)service.findById(Organisation.class,orgId);
 			}else{
 				org = new Organisation();
 				org.setCreateDate(new Date());
-				org.setParentOrganisation(service.getOrganisationById((Integer)orgForm.get("parentId")));
+				org.setParentOrganisation((Organisation)service.findById(Organisation.class,(Integer)orgForm.get("parentId")));
 				org.setOrganisationType((OrganisationType)service.findById(OrganisationType.class,(Integer)orgForm.get("typeId")));
 			}
 			BeanUtils.copyProperties(org,orgForm);

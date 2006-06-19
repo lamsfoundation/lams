@@ -168,7 +168,7 @@ public class DummyMonitoringAction extends LamsDispatchAction
     		throw new IOException("Learning design id must be set");
     	
     	// hardcode to use the Playpen:Everybody class as the class, Playpen as the course
-        Organisation classOrganisation = usermanageService.getOrganisationById(everybodyClass);
+        Organisation classOrganisation = (Organisation)usermanageService.findById(Organisation.class,everybodyClass);
     	if ( classOrganisation == null )
     		throw new IOException("Organisation cannot be found. Id was "+everybodyClass);
 

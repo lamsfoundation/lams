@@ -77,7 +77,7 @@ public class OrganisationAction extends LamsDispatchAction {
 	public ActionForward edit(ActionMapping mapping, ActionForm form,HttpServletRequest request, HttpServletResponse response) throws Exception{
 		Integer orgId = WebUtil.readIntParam(request,"orgId",true);
 		if(orgId != null){//editing existing organisation
-			Organisation org = service.getOrganisationById(orgId);
+			Organisation org = (Organisation)service.findById(Organisation.class,orgId);
 			DynaActionForm orgForm = (DynaActionForm)form;
 			BeanUtils.copyProperties(orgForm,org);
 			log.debug("Struts Pupulated orgId:"+(Integer)orgForm.get("orgId"));

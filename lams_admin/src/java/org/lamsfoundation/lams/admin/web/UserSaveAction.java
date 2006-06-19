@@ -40,6 +40,7 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
+import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
@@ -162,7 +163,7 @@ public class UserSaveAction extends Action {
 				log.debug(user.toString());
 				service.save(user);
 				user = service.getUserByLogin((String)userForm.get("login"));
-				UserOrganisation userOrganisation = new UserOrganisation(user, service.getOrganisationById(orgId));
+				UserOrganisation userOrganisation = new UserOrganisation(user, (Organisation)service.findById(Organisation.class,orgId));
 				service.save(userOrganisation);
 				// set default role to learner
 				Role role = (Role)service.findByProperty(Role.class,"name","LEARNER").get(0);

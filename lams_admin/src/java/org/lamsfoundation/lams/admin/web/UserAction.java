@@ -80,7 +80,7 @@ public class UserAction extends LamsDispatchAction {
             HttpServletResponse response) throws Exception {
         // retain orgId to return to userlist
 		Integer orgId = WebUtil.readIntParam(request,"orgId");
-		Organisation organisation = service.getOrganisationById(orgId);
+		Organisation organisation = (Organisation)service.findById(Organisation.class,orgId);
 		Integer parentId = organisation.getParentOrganisation().getOrganisationId();
 
 		request.setAttribute("org",orgId);
