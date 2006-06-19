@@ -58,6 +58,7 @@ class MonitorModel extends Observable{
 	private var _staffLoaded:Boolean;
 	private var _learnersLoaded:Boolean;
 	private var _isProgressChanged:Boolean;
+	private var _isSequenceSet:Boolean = false;
 	
 	private var _monitor:Monitor;
 	
@@ -129,7 +130,9 @@ class MonitorModel extends Observable{
 		}
 
 		_activeSeq = activeSeq;
-		_monitor.openLearningDesign(_activeSeq)
+		if (!getIsSequenceSet){
+			_monitor.openLearningDesign(_activeSeq)
+		}
 		//_monitor.getContributeActivities(_activeSeq.getSequenceID());
 		setChanged();
 		
@@ -144,6 +147,13 @@ class MonitorModel extends Observable{
 		return _activeSeq;
 	}
 	
+	public function setIsSequenceSet(setSeq:Boolean){
+		_isSequenceSet = setSeq;
+	}
+	
+	private function getIsSequenceSet():Boolean{
+		return _isSequenceSet;
+	}
 	public function loadSequence(seqDTO:Object):Boolean{
 		// create new Sequence from DTO
 		var seq:Sequence = new Sequence(seqDTO);
