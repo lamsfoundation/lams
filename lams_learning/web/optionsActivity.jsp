@@ -160,7 +160,7 @@
 	</html:form>
 	<html:form action="/CompleteActivity" method="POST">
 		<input type="hidden" name="lams_token" value="<c:out value='${lams_token}' />" />
-		<input type="hidden" name="activityID" value="<c:out value="${optionsActivityForm.activityId}" />" />
+		<input type="hidden" name="activityID" value="<c:out value="${optionsActivityForm.activityID}" />" />
 	</html:form>
 </div>
 
