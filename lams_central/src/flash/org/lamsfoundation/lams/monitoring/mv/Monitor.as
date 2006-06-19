@@ -277,7 +277,7 @@ class Monitor {
 			
 		_ddm.setDesign(learningDesignDTO);
 		seq.setLearningDesignModel(_ddm);
-		
+		monitorModel.setIsSequenceSet (true)
 		monitorModel.broadcastViewUpdate('PROGRESS', null, monitorModel.getSelectedTab());
 	}
 
