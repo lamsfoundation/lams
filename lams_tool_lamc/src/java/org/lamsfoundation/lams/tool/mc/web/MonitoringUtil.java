@@ -320,7 +320,7 @@ public class MonitoringUtil implements McAppConstants{
 	    			if (!mcSession.getMcContent().isRetries())
 	    			{
 	    			    logger.debug("retries is OFF.");
-	    			    boolean attemptCorrect=false;
+	    			    boolean isAttemptCorrect=false;
 	    			    McUsrAttempt mcUsrAttemptUser=null;
 	    			    
 		    			while (itAttempts.hasNext())
@@ -333,17 +333,27 @@ public class MonitoringUtil implements McAppConstants{
 		    	    		{
 		    	    		    if (mcUsrAttempt.isAttemptCorrect())
 		    	    		    {
-		    	    		        attemptCorrect=true;
+		    	    		        isAttemptCorrect=true;
 		    	    		    }
 		    	    		}
 		    			}
-		    			logger.debug("final attemptCorrect: " + attemptCorrect);
+		    			logger.debug("final isAttemptCorrect: " + isAttemptCorrect);
+		    			logger.debug("mcUsrAttemptUser: " + mcUsrAttemptUser);
+		    			
 	    			    McMonitoredUserDTO mcMonitoredUserDTO = new McMonitoredUserDTO();
-	    			    mcMonitoredUserDTO.setUid(mcUsrAttemptUser.getUid().toString());
     	    			mcMonitoredUserDTO.setUserName(mcQueUsr.getFullname());
     	    			mcMonitoredUserDTO.setSessionId(sessionId.toString());
     	    			mcMonitoredUserDTO.setQuestionUid(questionUid);
     	    			
+	    				if (isAttemptCorrect)
+	    				{
+		    			    mcMonitoredUserDTO.setMark(mcUsrAttemptUser.getMcQueContent().getWeight().toString());
+	    				}
+	    				else
+	    				{
+	    				    mcMonitoredUserDTO.setMark("0");
+	    				}
+		    			
 		    			logger.debug("final constructed mcMonitoredUserDTO: " + mcMonitoredUserDTO);
     	    			listMonitoredUserContainerDTO.add(mcMonitoredUserDTO);
 	    			}
@@ -387,61 +397,7 @@ public class MonitoringUtil implements McAppConstants{
 	    			    
 	    			    logger.debug("final constructed mcMonitoredUserDTO: " + mcMonitoredUserDTO);
 	    			    listMonitoredUserContainerDTO.add(mcMonitoredUserDTO);
-
 	    			    
-	    			    /*
-	    			    McUsrAttempt mcUsrAttempt=getAttemptWithHighestOrder(listUserAttempts);
-	    			    logger.debug("attempt with highest attempt order, mcUsrAttempt: " + mcUsrAttempt);
-	    			    if (mcUsrAttempt != null)
-	    			    {
-	    			        Integer IntegerPassmark=mcUsrAttempt.getMcOptionsContent().getMcQueContent().getMcContent().getPassMark();
-	    			        logger.debug("IntegerPassmark: " + IntegerPassmark);
-	    			        if ((IntegerPassmark != null) && (IntegerPassmark.intValue() >= 0))
-	    			        {
-	    			            logger.debug("pasmark is defined: ");
-		    			        if (mcUsrAttempt.isPassed())
-		    			        {
-		    			            logger.debug("user has passed the activity");
-				    			    McMonitoredUserDTO mcMonitoredUserDTO = new McMonitoredUserDTO();
-				    			    mcMonitoredUserDTO.setMark(mcUsrAttempt.getMcQueContent().getWeight().toString());
-				    			    mcMonitoredUserDTO.setUserName(mcQueUsr.getFullname());
-				    			    mcMonitoredUserDTO.setUid(mcUsrAttempt.getUid().toString());
-				    			    mcMonitoredUserDTO.setSessionId(sessionId.toString());
-				    			    mcMonitoredUserDTO.setQuestionUid(questionUid);
-				    			    
-				    			    logger.debug("final constructed mcMonitoredUserDTO: " + mcMonitoredUserDTO);
-				    			    listMonitoredUserContainerDTO.add(mcMonitoredUserDTO);
-		    			        }
-		    			        else 
-		    			        {
-		    			            logger.debug("user did not finish the the activity yet");
-				    			    McMonitoredUserDTO mcMonitoredUserDTO = new McMonitoredUserDTO();
-				    			    mcMonitoredUserDTO.setMark("Learner still responding...");
-				    			    mcMonitoredUserDTO.setUserName(mcQueUsr.getFullname());
-				    			    mcMonitoredUserDTO.setUid(mcUsrAttempt.getUid().toString());
-				    			    mcMonitoredUserDTO.setSessionId(sessionId.toString());
-				    			    mcMonitoredUserDTO.setQuestionUid(questionUid);
-				    			    
-				    			    logger.debug("final constructed mcMonitoredUserDTO: " + mcMonitoredUserDTO);
-				    			    listMonitoredUserContainerDTO.add(mcMonitoredUserDTO);
-		    			        }
-	    			        }
-	    			        else
-	    			        {
-	    			            logger.debug("pasmark is Undefined: ");
-	    			            logger.debug("pupulate user marks as if user has passed");
-			    			    McMonitoredUserDTO mcMonitoredUserDTO = new McMonitoredUserDTO();
-			    			    mcMonitoredUserDTO.setMark(mcUsrAttempt.getMcQueContent().getWeight().toString());
-			    			    mcMonitoredUserDTO.setUserName(mcQueUsr.getFullname());
-			    			    mcMonitoredUserDTO.setUid(mcUsrAttempt.getUid().toString());
-			    			    mcMonitoredUserDTO.setSessionId(sessionId.toString());
-			    			    mcMonitoredUserDTO.setQuestionUid(questionUid);
-			    			    
-			    			    logger.debug("final constructed mcMonitoredUserDTO: " + mcMonitoredUserDTO);
-			    			    listMonitoredUserContainerDTO.add(mcMonitoredUserDTO);
-	    			        }
-	    			    }
-	    			    */	    			    
 	    			}
 	    		}
 			}

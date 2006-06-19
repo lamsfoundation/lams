@@ -42,7 +42,8 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 public class McOptionsContentDAO extends HibernateDaoSupport implements IMcOptionsContentDAO {
 	 	static Logger logger = Logger.getLogger(McOptionsContentDAO.class.getName());
 	 	
-	 	private static final String FIND_MC_OPTIONS_CONTENT = "from " + McOptsContent.class.getName() + " as mco where mc_que_content_id=?";
+	 	//private static final String FIND_MC_OPTIONS_CONTENT = "from " + McOptsContent.class.getName() + " as mco where mc_que_content_id=?";
+	 	private static final String FIND_MC_OPTIONS_CONTENT = "from mcOptsContent in class McOptsContent where mcOptsContent.mcQueContentId=:mcQueContentUid order by mcOptsContent.uid";
 	 	
 	 	private static final String LOAD_OPTION_CONTENT_BY_OPTION_TEXT = "from mcOptsContent in class McOptsContent where mcOptsContent.mcQueOptionText=:option and mcOptsContent.mcQueContentId=:mcQueContentUid";
 	 	
@@ -62,7 +63,7 @@ public class McOptionsContentDAO extends HibernateDaoSupport implements IMcOptio
 			HibernateTemplate templ = this.getHibernateTemplate();
 			if ( mcQueContentId != null) {
 				List list = getSession().createQuery(FIND_MC_OPTIONS_CONTENT)
-					.setLong(0,mcQueContentId.longValue())
+					.setLong("mcQueContentUid",mcQueContentId.longValue())
 					.list();
 				return list;
 			}
@@ -77,7 +78,7 @@ public class McOptionsContentDAO extends HibernateDaoSupport implements IMcOptio
 			HibernateTemplate templ = this.getHibernateTemplate();
 			if ( mcQueContentId != null) {
 				List list = getSession().createQuery(FIND_MC_OPTIONS_CONTENT)
-					.setLong(0,mcQueContentId.longValue())
+					.setLong("mcQueContentUid",mcQueContentId.longValue())					
 					.list();
 				
 				if(list != null && list.size() > 0){
@@ -100,7 +101,7 @@ public class McOptionsContentDAO extends HibernateDaoSupport implements IMcOptio
 			HibernateTemplate templ = this.getHibernateTemplate();
 			if ( mcQueContentId != null) {
 				List list = getSession().createQuery(FIND_MC_OPTIONS_CONTENT)
-					.setLong(0,mcQueContentId.longValue())
+					.setLong("mcQueContentUid",mcQueContentId.longValue())
 					.list();
 				
 				if(list != null && list.size() > 0){
@@ -127,7 +128,7 @@ public class McOptionsContentDAO extends HibernateDaoSupport implements IMcOptio
 			HibernateTemplate templ = this.getHibernateTemplate();
 			if ( mcQueContentId != null) {
 				List list = getSession().createQuery(FIND_MC_OPTIONS_CONTENT)
-					.setLong(0,mcQueContentId.longValue())
+					.setLong("mcQueContentUid",mcQueContentId.longValue())
 					.list();
 				
 				if(list != null && list.size() > 0){
@@ -202,7 +203,7 @@ public class McOptionsContentDAO extends HibernateDaoSupport implements IMcOptio
 	    {
 			HibernateTemplate templ = this.getHibernateTemplate();
 			List list = getSession().createQuery(FIND_MC_OPTIONS_CONTENT)
-				.setLong(0,mcQueContentId.longValue())
+				.setLong("mcQueContentUid",mcQueContentId.longValue())
 				.list();
 
 			if(list != null && list.size() > 0){

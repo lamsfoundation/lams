@@ -101,8 +101,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<tr>			
 							<td NOWRAP valign=top align=left><b> <font size=2> <bean:message key="label.question.col"/> </b>
 							<font size=2>
-								<c:out value="${currentDto.question}"/> &nbsp <bean:message key="label.openPar"/> <bean:message key="label.weight"/> 
-								<c:out value="${currentDto.weight}"/>  <bean:message key="label.percent"/><bean:message key="label.closePar"/>
+								<c:out value="${currentDto.question}"/> &nbsp ( <bean:message key="label.weight"/> 
+								<c:out value="${currentDto.weight}"/>  <bean:message key="label.percent"/> )
 							</font> </td>
 						</tr>	
 						<tr>					
@@ -115,9 +115,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 												<c:out value="${answersData.candidateAnswer}"/> 
 												
 												<c:if test="${answersData.correct == 'true'}"> 		
-													&nbsp <bean:message key="label.openPar"/>
-													<bean:message key="label.correct"/>
-													<bean:message key="label.closePar"/>
+													&nbsp ( <bean:message key="label.correct"/> )
 												</c:if>																		
 												</font>
 											</td>	
@@ -153,8 +151,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<tr>			
 							<td NOWRAP valign=top align=left><b> <font size=2> <bean:message key="label.question.col"/> </b>
 							<font size=2>
-								<c:out value="${currentDto.question}"/> &nbsp <bean:message key="label.openPar"/> <bean:message key="label.weight"/> 
-								<c:out value="${currentDto.weight}"/>  <bean:message key="label.percent"/><bean:message key="label.closePar"/>
+								<c:out value="${currentDto.question}"/> &nbsp ( <bean:message key="label.weight"/> 
+								<c:out value="${currentDto.weight}"/>  <bean:message key="label.percent"/> )
 							</font> </td>
 						</tr>	
 
@@ -211,8 +209,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 					<tr>			
 						<td NOWRAP valign=top align=left><b> <font size=2> <bean:message key="label.total"/> 
-									<bean:message key="label.openPar"/> <bean:message key="label.percent"/> 
-									<bean:message key="label.closePar"/>
+										( <bean:message key="label.percent"/> )
 									</b>
 						</font> </td>
 					</tr>	
