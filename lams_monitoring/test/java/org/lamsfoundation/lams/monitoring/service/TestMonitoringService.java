@@ -281,10 +281,10 @@ public class TestMonitoringService extends AbstractLamsTestCase
      */
    private void initializeTestingData()
     {
-        testUser = usermanageService.getUserById(TEST_USER_ID);
-        testStaff = usermanageService.getUserById(TEST_STAFF_ID);
-        testLearner = usermanageService.getUserById(TEST_LEARNER_ID);        
-        testOrganisation = usermanageService.getOrganisationById(TEST_ORGANIZATION_ID);
+        testUser = (User)usermanageService.findById(User.class,TEST_USER_ID);
+        testStaff = (User)usermanageService.findById(User.class,TEST_STAFF_ID);
+        testLearner = (User)usermanageService.findById(User.class,TEST_LEARNER_ID);        
+        testOrganisation = (Organisation)usermanageService.findById(Organisation.class,TEST_ORGANIZATION_ID);
     }
    
     public void testCheckGateStatus() throws IOException

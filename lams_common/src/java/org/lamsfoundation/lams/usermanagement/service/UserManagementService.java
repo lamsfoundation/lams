@@ -34,11 +34,7 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.cache.ICacheManager;
 import org.lamsfoundation.lams.dao.IBaseDAO;
-import org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO;
-import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
-import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
@@ -70,37 +66,65 @@ public class UserManagementService implements IUserManagementService {
 
 	private IBaseDAO baseDAO;
 
-	protected ILearningDesignDAO learningDesignDAO;
-
-	protected ILessonDAO lessonDAO;
-
-	protected ICacheManager cacheManager;
-
-	
 	public void setBaseDAO(IBaseDAO baseDAO){
 		this.baseDAO = baseDAO;
 	}
 	
-	/**
-	 * @param learningDesignDAO
-	 *            The learningDesignDAO to set.
-	 */
-	public void setLearningDesignDAO(ILearningDesignDAO learningDesignDAO) {
-		this.learningDesignDAO = learningDesignDAO;
+	public void save(Object object) {
+		baseDAO.insertOrUpdate(object);
 	}
 
-
-	/**
-	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#setLessonDAO(org.lamsfoundation.lams.lesson.dao.ILessonDAO)
-	 */
-	public void setLessonDAO(ILessonDAO lessonDAO) {
-		this.lessonDAO = lessonDAO;
+	public void saveAll(Collection objects) {
+		baseDAO.insertOrUpdateAll(objects);
 	}
 
-	public void setCacheManager(ICacheManager cacheManager) {
-		this.cacheManager = cacheManager;
-	}	
+	public void delete(Object object) {
+		baseDAO.delete(object);
+	}
 
+	public void deleteAll(Class clazz) {
+		baseDAO.deleteAll(clazz);
+	}
+
+	public void deleteAll(Collection objects) {
+		baseDAO.deleteAll(objects);
+	}
+
+	public void deleteById(Class clazz, Serializable id) {
+		baseDAO.deleteById(clazz,id);
+	}
+
+	public void deleteByProperty(Class clazz, String name, Object value) {
+		baseDAO.deleteByProperty(clazz,name,value);
+	}
+
+	public void deleteByProperties(Class clazz, Map<String, Object> properties) {
+		baseDAO.deleteByProperties(clazz,properties);
+	}
+
+	public void deleteAnythingLike(Object object) {
+		baseDAO.deleteAnythingLike(object);
+	}
+
+	public Object findById(Class clazz, Serializable id) {
+		return baseDAO.find(clazz,id);
+	}
+
+	public List findAll(Class clazz) {
+		return baseDAO.findAll(clazz);
+	}
+
+	public List findByProperty(Class clazz, String name, Object value) {
+		return baseDAO.findByProperty(clazz,name,value);
+	}
+
+	public List findByProperties(Class clazz, Map<String, Object> properties) {
+		return baseDAO.findByProperties(clazz,properties);
+	}
+
+	public List findAnythingLike(Object object) {
+		return baseDAO.findAnythingLike(object);
+	}
 
 	/**
 	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getOrganisationRolesForUser(org.lamsfoundation.lams.usermanagement.User, java.util.List<String>)
@@ -290,80 +314,9 @@ public class UserManagementService implements IUserManagementService {
 		return users;
 	}
 
-	/** Get all the lessons in an organisation that this user can monitor.
-	 * This is a temporary method to support the dummy index page. 
-	 * TODO modify/remove when the index page is implemented properly
-	 */
-	public List getMonitorLessonsFromOrganisation(Integer userID, Integer organisationID) {
-		return lessonDAO.getLessonsForMonitoring(userID, organisationID);
-	}
-	/** Get all the lessons in an organisation for which this user is a learner.
-	 * This is a temporary method to support the dummy index page. 
-	 * TODO modify/remove when the index page is implemented properly
-	 */
-	public List getLearnerLessonsFromOrganisation(Integer userID, Integer organisationID) {
-		return lessonDAO.getActiveLessonsForLearner(userID, organisationID);
-	}
-
 
 	public Organisation getRootOrganisation() {
 		return (Organisation)baseDAO.findByProperty(Organisation.class,"organisationType.organisationTypeId",OrganisationType.ROOT_TYPE).get(0);
-	}
-
-	public void save(Object object) {
-		baseDAO.insertOrUpdate(object);
-	}
-
-	public void saveAll(Collection objects) {
-		baseDAO.insertOrUpdateAll(objects);
-	}
-
-	public void delete(Object object) {
-		baseDAO.delete(object);
-	}
-
-	public void deleteAll(Class clazz) {
-		baseDAO.deleteAll(clazz);
-	}
-
-	public void deleteAll(Collection objects) {
-		baseDAO.deleteAll(objects);
-	}
-
-	public void deleteById(Class clazz, Serializable id) {
-		baseDAO.deleteById(clazz,id);
-	}
-
-	public void deleteByProperty(Class clazz, String name, Object value) {
-		baseDAO.deleteByProperty(clazz,name,value);
-	}
-
-	public void deleteByProperties(Class clazz, Map<String, Object> properties) {
-		baseDAO.deleteByProperties(clazz,properties);
-	}
-
-	public void deleteAnythingLike(Object object) {
-		baseDAO.deleteAnythingLike(object);
-	}
-
-	public Object findById(Class clazz, Serializable id) {
-		return baseDAO.find(clazz,id);
-	}
-
-	public List findAll(Class clazz) {
-		return baseDAO.findAll(clazz);
-	}
-
-	public List findByProperty(Class clazz, String name, Object value) {
-		return baseDAO.findByProperty(clazz,name,value);
-	}
-
-	public List findByProperties(Class clazz, Map<String, Object> properties) {
-		return baseDAO.findByProperties(clazz,properties);
-	}
-
-	public List findAnythingLike(Object object) {
-		return baseDAO.findAnythingLike(object);
 	}
 
 	public boolean isUserInRole(Integer userId, Integer orgId, String roleName) {
@@ -406,14 +359,6 @@ public class UserManagementService implements IUserManagementService {
 		User user = getUserByLogin(login);
 		user.setPassword(password);
 		baseDAO.update(user);
-	}
-
-	public Organisation getOrganisationById(Integer orgId) {
-		return (Organisation)baseDAO.find(Organisation.class,orgId);
-	}
-
-	public List getOrganisationsByType(Integer typeId) {
-		return baseDAO.findByProperty(Organisation.class,"organisationType.organisationTypeId",typeId);
 	}
 
 	public UserOrganisation getUserOrganisation(Integer userId, Integer orgId) {

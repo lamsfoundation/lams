@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -51,83 +50,6 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 public interface IUserManagementService {
 
 
-    /**
-     * Retrieves a tree of organisations for a user. The top of the tree is a "dummy" root
-     * organisation, just so that we have a real tree. This makes life easier for Flash.
-     * 
-     * If restrictToRoleNames contains any role names (ie not null and size > 0 )
-     * then it will restrict the organisations to those in which the user has one of the
-     * given roles. If restrictToRoleNames is null/empty then till return all organisations
-     * to which the user belongs. 
-     * 
-	 * @param user mandatory
-     * @param restrictToRoleNames role names to which to restrict the user
-     * @return List of organisationDTOs
-     */
-    public OrganisationDTO getOrganisationsForUserByRole(User user, List<String> restrictToRoleNames);
-    
-	/**
-	 * Retrieves a tree of child of organisations in which the user has the specified role.
-	 * If courseID only is set, then return course organisationDTO and its children as its nodes 
-	 * If courseID && restrictToClassIds are set, then course organisationDTO and its the nominated class 
-	 * organisationDTOs - most cases will have only single classID
-	 * 
-     * If restrictToRoleNames contains any role names (ie not null and size > 0 )
-     * then it will restrict the organisations to those in which the user has one of the
-     * given roles.  
-     * 
-	 * @param user mandatory
-	 * @param roles optional
-	 * @param courseID mandatory
-	 * @param restrictToClassIds optional
-	 * @return organisationDTO hierarchy, in WDDX format. 
-	 */
-	public OrganisationDTO getOrganisationsForUserByRole(User user, List<String> restrictToRoleNames, Integer courseId, List<Integer> restrictToClassIds);
-
-	/**
-     * Gets an organisation for a user, with the user's roles. Doesn't not return a tree of organisations 
-	 */
-	public OrganisationDTO getOrganisationForUserWithRole(User user, Integer organisationId);
-
-	/**
-     * Retrieves roles in which the user 
-     * has the specified role 
-     * 
-     * @param user the user
-     * @param orgId organisation's id
-     * @return List of roles
-     */
-    public List<Role> getRolesForUserByOrganisation(User user, Integer orgId);
-
-	/**
-     * Retrieves users from the specified organisation
-     * 
-     * @param orgId organisation's id
-     * @return List of users
-     */
-    public List<User> getUsersFromOrganisation(Integer orgId);
-    
-	/**
-	 * This method returns the users in the Organisation with
-	 * given <code> organisationID</code> and <code>roleName</code>
-	 * 
-	 * @param organisationID
-	 * @param roleName
-	 * @return UserDTO objects (in a Vector to suit WDDX)
-	 */
-	public Vector<UserDTO> getUsersFromOrganisationByRole(Integer organisationID, String roleName);	
-
-	/** Get all the lessons in an organisation that this user can monitor.
-	 * This is a temporary method to support the dummy index page. 
-	 * TODO modify/remove when the index page is implemented properly
-	 */
-	public List getMonitorLessonsFromOrganisation(Integer userID, Integer organisationID);
-	/** Get all the lessons in an organisation for which this user is a learner.
-	 * This is a temporary method to support the dummy index page. 
-	 * TODO modify/remove when the index page is implemented properly
-	 */
-	public List getLearnerLessonsFromOrganisation(Integer userID, Integer organisationID);
-	
 	/**
 	 * save(insert or update)
 	 * @param object The object to be inserted
@@ -223,6 +145,74 @@ public interface IUserManagementService {
 	 */
 	public List findAnythingLike(Object object);
 	
+    /**
+     * Retrieves a tree of organisations for a user. The top of the tree is a "dummy" root
+     * organisation, just so that we have a real tree. This makes life easier for Flash.
+     * 
+     * If restrictToRoleNames contains any role names (ie not null and size > 0 )
+     * then it will restrict the organisations to those in which the user has one of the
+     * given roles. If restrictToRoleNames is null/empty then till return all organisations
+     * to which the user belongs. 
+     * 
+	 * @param user mandatory
+     * @param restrictToRoleNames role names to which to restrict the user
+     * @return List of organisationDTOs
+     */
+    public OrganisationDTO getOrganisationsForUserByRole(User user, List<String> restrictToRoleNames);
+    
+	/**
+	 * Retrieves a tree of child of organisations in which the user has the specified role.
+	 * If courseID only is set, then return course organisationDTO and its children as its nodes 
+	 * If courseID && restrictToClassIds are set, then course organisationDTO and its the nominated class 
+	 * organisationDTOs - most cases will have only single classID
+	 * 
+     * If restrictToRoleNames contains any role names (ie not null and size > 0 )
+     * then it will restrict the organisations to those in which the user has one of the
+     * given roles.  
+     * 
+	 * @param user mandatory
+	 * @param roles optional
+	 * @param courseID mandatory
+	 * @param restrictToClassIds optional
+	 * @return organisationDTO hierarchy, in WDDX format. 
+	 */
+	public OrganisationDTO getOrganisationsForUserByRole(User user, List<String> restrictToRoleNames, Integer courseId, List<Integer> restrictToClassIds);
+
+	/**
+     * Gets an organisation for a user, with the user's roles. Doesn't not return a tree of organisations 
+	 */
+	public OrganisationDTO getOrganisationForUserWithRole(User user, Integer organisationId);
+
+	/**
+     * Retrieves roles in which the user 
+     * has the specified role 
+     * 
+     * @param user the user
+     * @param orgId organisation's id
+     * @return List of roles
+     */
+    public List<Role> getRolesForUserByOrganisation(User user, Integer orgId);
+
+	/**
+     * Retrieves users from the specified organisation
+     * 
+     * @param orgId organisation's id
+     * @return List of users
+     */
+    public List<User> getUsersFromOrganisation(Integer orgId);
+    
+	/**
+	 * This method returns the users in the Organisation with
+	 * given <code> organisationID</code> and <code>roleName</code>
+	 * 
+	 * @param organisationID
+	 * @param roleName
+	 * @return UserDTO objects (in a Vector to suit WDDX)
+	 */
+	public Vector<UserDTO> getUsersFromOrganisationByRole(Integer organisationID, String roleName);	
+
+	public Organisation getRootOrganisation();
+	
 	/**
 	 * @param userId
 	 * @param orgId
@@ -231,20 +221,46 @@ public interface IUserManagementService {
 	 */
 	public boolean isUserInRole(Integer userId,Integer orgId, String roleName);
 	
+	/**
+	 * @param typeId
+	 * @param stateId
+	 * @return a list of organisations
+	 */
 	public List getOrganisationsByTypeAndStatus(Integer typeId, Integer stateId);
 	
+	/**
+	 * @param orgId
+	 * @param login user's login
+	 * @return a list of UserOrganisationRoles
+	 */
 	public List getUserOrganisationRoles(Integer orgId, String login);
 	
+	/**
+	 * @param login
+	 * @param typeId
+	 * @param stateId
+	 * @return a list of UserOrganisations
+	 */
 	public List getUserOrganisationsForUserByTypeAndStatus(String login, Integer typeId, Integer stateId);
 	
+	/**
+	 * @param login
+	 * @return the User
+	 */
 	public User getUserByLogin(String login);
 	
+	/**
+	 * @param login user's login
+	 * @param password new password
+	 * @return void
+	 */
 	public void updatePassword(String login, String password);
 	
-	public Organisation getOrganisationById(Integer orgId);
-	
-	public List getOrganisationsByType(Integer typeId);
-	
+	/**
+	 * @param userId
+	 * @param orgId
+	 * @return UserOrganisation
+	 */
 	public UserOrganisation getUserOrganisation(Integer userId, Integer orgId);
 	
 }
