@@ -25,7 +25,13 @@
  
 package org.lamsfoundation.lams.tool.chat.web.forms;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionMessage;
+import org.apache.struts.action.ActionMessages;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.tool.chat.beans.AuthoringSessionBean;
 
@@ -68,6 +74,14 @@ public class AuthoringForm extends ActionForm {
 
 	AuthoringSessionBean authSession;
 
+	@Override
+	public ActionErrors validate(ActionMapping arg0, HttpServletRequest arg1) {
+		ActionErrors ac = new ActionErrors();
+		ac.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("this is an error"));
+		
+		return ac;
+	}
+	
 	public String getAuthSessionId() {
 		return authSessionId;
 	}

@@ -24,56 +24,59 @@
 	var LOCK_ON_FINISHED = "${LOCK_ON_FINISHED}";	
 </script>
 
-<!--  Chat Client -->
+<!--  Chat Client -->	
 <script src="${tool}chat_client/chat_app.js" type="text/javascript"></script>
 
-<div id="login_pane">
-	<div id="login_err"></div>
-	<p>
-		<fmt:message>message.loading</fmt:message>
-	</p>
-</div>
+<div id="chat_content">
 
-<div id="chat_pane" style="display:none;">
-	<h1>
-		<c:out value="${chatTitle}" escapeXml="false" />
-	</h1>
+	<div id="login_pane">
+		<div id="login_err"></div>
+		<p>
+			<fmt:message>message.loading</fmt:message>
+		</p>
+	</div>
 
-	<p>
-		<c:out value="${chatInstructions}" escapeXml="false" />
-	</p>
-	<form name="sendForm" action="" onSubmit="return sendMsg(this);">
-		<div id="presence">
-			<select id="roster_user_selector" size="2" onchange="updateSendDisplay();">
-				<%--  options dynamically updated as users join/leave --%>
-				<option>
-					loading
-				</option>
-			</select>
-		</div>
-		<div id="iResp"></div>
+	<div id="chat_pane" style="display:none;">
+		<h1>
+			<c:out value="${chatTitle}" escapeXml="false" />
+		</h1>
 
-		<h3>
-			<fmt:message>label.sendMessageTo</fmt:message>
-			<span id="sendToEveryone"><fmt:message>label.everyone</fmt:message></span><span id="sendToUser" style="display: none"></span>
-		</h3>
+		<p>
+			<c:out value="${chatInstructions}" escapeXml="false" />
+		</p>
+		<form name="sendForm" action="" onSubmit="return sendMsg(this);">
+			<div id="presence">
+				<select id="roster_user_selector" size="2" onchange="updateSendDisplay();">
+					<%--  options dynamically updated as users join/leave --%>
+					<option>
+						loading
+					</option>
+				</select>
+			</div>
+			<div id="iResp"></div>
 
-		<div id="msgAreaDiv">
-			<textarea name="msg" id='msgArea' rows="3" cols="80"></textarea>
-			<input id="sendButton" type="submit" value='<fmt:message>button.send</fmt:message>' />
-			<input id="clearButton" type="button" onclick="resetInputs();" value='<fmt:message>button.clear</fmt:message>' />
-			
-		</div>
-	</form>
+			<h3>
+				<fmt:message>label.sendMessageTo</fmt:message>
+				<span id="sendToEveryone"><fmt:message>label.everyone</fmt:message></span><span id="sendToUser" style="display: none"></span>
+			</h3>
 
-</div>
+			<div id="msgAreaDiv">
+				<textarea name="msg" id='msgArea' rows="3" cols="80"></textarea>
+				<input id="sendButton" type="submit" value='<fmt:message>button.send</fmt:message>' />
+				<input id="clearButton" type="button" onclick="resetInputs();" value='<fmt:message>button.clear</fmt:message>' />
 
-<div id="finishButtonDiv" style="display:none;">
-	<form name="finishActivity" action="${tool}learning.do" method="post">
-		<div>
-			<input type="hidden" name="dispatch" value="finishActivity" />
-			<input type="hidden" name="chatUserUID" value="${USER_UID}" />
-			<input type="submit" value='<fmt:message>button.finish</fmt:message>' />
-		</div>
-	</form>
+			</div>
+		</form>
+
+	</div>
+	
+	<div id="finishButton_pane" style="display:none;">
+		<form name="finishActivity" action="${tool}learning.do" method="post">
+			<div>
+				<input type="hidden" name="dispatch" value="finishActivity" />
+				<input type="hidden" name="chatUserUID" value="${USER_UID}" />
+				<input type="submit" value='<fmt:message>button.finish</fmt:message>' />
+			</div>
+		</form>
+	</div>
 </div>

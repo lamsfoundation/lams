@@ -1,5 +1,11 @@
-#chat_pane {
+#chat_content {
+	width: 100%;
 	height: 600px;
+	padding: 12px;
+}
+
+#chat_pane {
+
 }
 
 #iResp {
@@ -8,15 +14,16 @@
 	overflow: scroll;
 	padding: 4px;
 	background-color: white;
+	border: thin solid black;
 }
 
-.groupchat_message {
-		
+.message {
+	padding-bottom: 4px;	
 }
 
 .private_message {
 	font-style: italic;
-	background-color: #E6E6FA;
+	background-color: #e6e6fa;
 }
 
 .messageFrom {
@@ -38,13 +45,13 @@
 #msgArea {
 	width: 100%;
 	height: 100%;
-	margin: 0;
 }
 
 #msgAreaDiv {
 	height: 45px;
 }
 
-#finishButtonDiv {
-	float: right;	
+#finishButton_pane {
+	width: 100%;
+	text-align: right;
 }

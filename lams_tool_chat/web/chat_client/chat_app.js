@@ -20,6 +20,14 @@ function htmlEnc(str) {
     return str;
 }
 
+function getColor(nick) {
+	var charSum = 0;
+	for (var i=0; i<nick.length; i++)
+    	  charSum += nick.charCodeAt(i);
+    	  
+	return colors[charSum%(colors.length)];
+}
+
 // Roster 
 function RosterUser(nick) {
     this.nick = nick;
@@ -71,12 +79,8 @@ function updateSendDisplay() {
     var userName;
     if (MODE == "teacher" && !(selectedIndex == -1)) {
         var userName = rosterList.options[rosterList.selectedIndex].value;
-        
-   		var charSum = 0;
-		for (var i=0; i<userName.length; i++)
-    	  charSum += userName.charCodeAt(i); 
-    	  
-        document.getElementById("sendToUser").innerHTML = "<span style='color:" + colors[charSum%(colors.length)] + "'>" + userName +"</span>";
+
+        document.getElementById("sendToUser").innerHTML = "<span style='color:" + getColor(userName) + "'>" + userName +"</span>";
         
         document.getElementById("sendToEveryone").style.display="none";
         document.getElementById("sendToUser").style.display="";
@@ -87,11 +91,8 @@ function updateSendDisplay() {
     }
 }
 function generateMessageHTML(nick, message, type) {
-	var charSum = 0;
-	for (var i=0; i<nick.length; i++)
-      charSum += nick.charCodeAt(i);
-
-    return "<div style='color:" + colors[charSum%(colors.length)] + "' class='" + type + "'><span class='messageFrom' >" + nick + ":</span>" + message + "<div/>";
+	
+	return "<div style='color:" + getColor(nick) + "' class='message " + type + "'><span style='color:" + getColor(nick) + "' class='messageFrom' >" + nick + "</span><br/>" + message + "<div/>";
 }
 function updateMessageDisplay(htmlMessage) {
     var iRespDiv = document.getElementById("iResp");
@@ -172,9 +173,9 @@ function handleConnected() {
     			document.getElementById("clearButton").disabled="disabled";
     		}       		
    		} else {
-			document.getElementById("finishButtonDiv").style.display ="";	
+			document.getElementById("finishButton_pane").style.display ="";	
     	}   
-    } 
+    }
 
 	// send presence
     var aPresence = new JSJaCPresence();
