@@ -64,13 +64,13 @@ class Progress {
 	
 	public function populateFromDTO(dto:Object){
 		Debugger.log('populating from dto.',Debugger.CRITICAL,'populateFromDTO','org.lamsfoundation.lams.Progress');
-		trace('populating progress obj:' + dto.lessonId);
+		trace('populating progress obj:' + dto.learnerFirstName);
 		_lessonId = dto.lessonId;
 		_lessonName = dto.lessonName;
 		_userName = dto.userName;
 		_learnerId = dto.learnerId;
-		_learnerFName = dto.learnerFirstName;
-		_learnerLName = dto.learnerLastName;
+		_learnerFName = dto.firstName;
+		_learnerLName = dto.lastName;
 		_currentActivityId = dto.currentActivityId;
 		_attemptedActivities = dto.attemptedActivities;
 		_completedActivities = dto.completedActivities;
