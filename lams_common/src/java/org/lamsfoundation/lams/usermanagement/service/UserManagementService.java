@@ -71,10 +71,18 @@ public class UserManagementService implements IUserManagementService {
 	}
 	
 	public void save(Object object) {
+		if(object instanceof User){
+			object = createWorkspaceForUser((User)object);
+		}
 		baseDAO.insertOrUpdate(object);
 	}
 
 	public void saveAll(Collection objects) {
+		for(Object o:objects){
+			if(o instanceof User){
+				o = createWorkspaceForUser((User)o);
+			}
+		}
 		baseDAO.insertOrUpdateAll(objects);
 	}
 
@@ -259,38 +267,6 @@ public class UserManagementService implements IUserManagementService {
 	}
 
 	
-	/*********************************************
-	 * Utility Methods added by Manpreet Minhas
-	 *********************************************/
-
-	/**
-	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#saveOrganisation(org.lamsfoundation.lams.usermanagement.Organisation,
-	 *      java.lang.Integer)
-	 */
-	public Integer saveOrganisation(Organisation organisation, Integer userID) {
-		Workspace workspace =  new Workspace(organisation.getName());
-		WorkspaceFolder workspaceFolder = new WorkspaceFolder(workspace.getName(),workspace.getWorkspaceId(),
-				userID, new Date(), new Date(), WorkspaceFolder.NORMAL);
-		workspace.setRootFolder(workspaceFolder);
-		baseDAO.insertOrUpdate(workspace);
-		organisation.setWorkspace(workspace);
-		baseDAO.insertOrUpdate(organisation);
-		return organisation.getOrganisationId();
-	}
-
-	/**
-	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#save(org.lamsfoundation.lams.usermanagement.User)
-	 */
-	public Integer saveUser(User user) {
-		if(user.getUserId()==null){//new User
-			Workspace workspace = new Workspace(user.getFullName());
-			workspace.setRootFolder(new WorkspaceFolder(workspace.getName(),workspace.getWorkspaceId(),user.getUserId(),new Date(),new Date(),WorkspaceFolder.NORMAL));
-			user.setWorkspace(workspace);
-		}
-		baseDAO.insertOrUpdate(user);
-		return user.getUserId();
-	}
-	
 	/**
 	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getUsersFromOrganisationByRole(java.lang.Integer,
 	 *      java.lang.String)
@@ -368,5 +344,16 @@ public class UserManagementService implements IUserManagementService {
 		return (UserOrganisation)baseDAO.findByProperties(UserOrganisation.class,properties).get(0);
 	}
 
+	private User createWorkspaceForUser(User user) {
+		if(user.getUserId()==null){//new User
+			Workspace workspace = new Workspace(user.getFullName());
+			save(workspace);
+			WorkspaceFolder folder = new WorkspaceFolder(workspace.getName(),workspace.getWorkspaceId(),user.getUserId(),new Date(),new Date(),WorkspaceFolder.NORMAL);
+			save(folder);
+			workspace.setRootFolder(folder);
+			user.setWorkspace(workspace);
+		}
+		return user;
+	}
 
 }
