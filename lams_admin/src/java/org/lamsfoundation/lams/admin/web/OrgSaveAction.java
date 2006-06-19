@@ -26,6 +26,7 @@ import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.log4j.Logger;
@@ -39,7 +40,12 @@ import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationState;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
+import org.lamsfoundation.lams.usermanagement.Workspace;
+import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.HttpSessionManager;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -102,13 +108,32 @@ public class OrgSaveAction extends Action {
 			Organisation org;
 			if(orgId!=0){
 				org = (Organisation)service.findById(Organisation.class,orgId);
+				BeanUtils.copyProperties(org,orgForm);
 			}else{
 				org = new Organisation();
+				BeanUtils.copyProperties(org,orgForm);
 				org.setCreateDate(new Date());
 				org.setParentOrganisation((Organisation)service.findById(Organisation.class,(Integer)orgForm.get("parentId")));
 				org.setOrganisationType((OrganisationType)service.findById(OrganisationType.class,(Integer)orgForm.get("typeId")));
+				if(org.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.COURSE_TYPE)){
+					HttpSession ss = SessionManager.getSession();
+					UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+					Workspace workspace =  new Workspace(org.getName());
+					service.save(workspace);
+					WorkspaceFolder workspaceFolder = new WorkspaceFolder(workspace.getName(),workspace.getWorkspaceId(),
+							user.getUserID(), new Date(), new Date(), WorkspaceFolder.NORMAL);
+					service.save(workspaceFolder);
+					log.debug("Root Folder Id:"+workspaceFolder.getWorkspaceFolderId());
+					workspace.setRootFolder(workspaceFolder);
+					WorkspaceFolder workspaceFolder2 = new WorkspaceFolder(workspace.getName()+"_Sequences",workspace.getWorkspaceId(),
+							user.getUserID(),new Date(), new Date(), WorkspaceFolder.RUN_SEQUENCES);
+					service.save(workspaceFolder2);
+					log.debug("Run Sequence Folder Id:"+workspaceFolder2.getWorkspaceFolderId());
+					workspace.setDefaultRunSequencesFolder(workspaceFolder2);
+					service.save(workspace);
+					org.setWorkspace(workspace);
+				}
 			}
-			BeanUtils.copyProperties(org,orgForm);
 			log.debug("orgId:"+org.getOrganisationId()+" language:"+org.getLocaleLanguage()+" Country:"+org.getLocaleCountry()+" create date:"+org.getCreateDate());
 			org.setOrganisationState((OrganisationState)service.findById(OrganisationState.class,(Integer)orgForm.get("stateId")));
 			service.save(org);
