@@ -84,7 +84,7 @@
   
     <!-- bi-directional one-to-many association to Workspace -->
     <set
-        name="workspaces"
+        name="workspacesByRootFolder"
         lazy="true"
         inverse="true"
 		cascade="none"
@@ -103,6 +103,32 @@
         </meta>
         <key>
             <column name="root_folder_id" />
+        </key>
+        <one-to-many 
+            class="org.lamsfoundation.lams.usermanagement.Workspace"
+        />
+    </set>
+    <!-- bi-directional one-to-many association to Workspace -->
+    <set
+        name="workspacesBySequenceFolder"
+        lazy="true"
+        inverse="true"
+		cascade="none"
+    >
+        <meta attribute="field-description">
+           @hibernate.set
+            lazy="true"
+            inverse="true"
+            cascade="none"
+
+           @hibernate.collection-key
+            column="def_run_seq_fld_id"
+
+           @hibernate.collection-one-to-many
+            class="org.lamsfoundation.lams.usermanagement.Workspace"
+        </meta>
+        <key>
+            <column name="def_run_seq_fld_id" />
         </key>
         <one-to-many 
             class="org.lamsfoundation.lams.usermanagement.Workspace"

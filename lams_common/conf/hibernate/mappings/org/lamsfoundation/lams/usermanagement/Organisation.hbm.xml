@@ -134,11 +134,13 @@
     <many-to-one
         name="workspace"
         class="org.lamsfoundation.lams.usermanagement.Workspace"
-        not-null="true"
+        cascade="all"
+        not-null="false"
     >
         <meta attribute="field-description">
            @hibernate.many-to-one
-            not-null="true"
+			cascade="all"
+            not-null="false"
            @hibernate.column name="workspace_id"         
         </meta>
         <column name="workspace_id" />

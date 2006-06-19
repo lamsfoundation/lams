@@ -68,7 +68,10 @@ public class WorkspaceFolder implements Serializable {
     private WorkspaceFolder parentWorkspaceFolder;
 
     /** persistent field */
-    private Set workspaces;
+    private Set workspacesByRootFolder;
+
+    /** persistent field */
+    private Set workspacesBySequenceFolder;
 
     /** persistent field */
     private Set childWorkspaceFolders;
@@ -143,10 +146,10 @@ public class WorkspaceFolder implements Serializable {
 		this.learningDesigns = learningDesigns;
 	}
     /** full constructor */
-    public WorkspaceFolder(String name, WorkspaceFolder parentWorkspaceFolder, Set workspaces, Set childWorkspaceFolders) {
+    public WorkspaceFolder(String name, WorkspaceFolder parentWorkspaceFolder, Set workspacesByRootFolder, Set childWorkspaceFolders) {
         this.name = name;    
         this.parentWorkspaceFolder = parentWorkspaceFolder;
-        this.workspaces = workspaces;
+        this.workspacesByRootFolder = workspacesByRootFolder;
         this.childWorkspaceFolders = childWorkspaceFolders;
     }
 
@@ -207,15 +210,34 @@ public class WorkspaceFolder implements Serializable {
      *             class="org.lamsfoundation.lams.usermanagement.Workspace"
      *         
      */
-    public Set getWorkspaces() {
-        return this.workspaces;
+    public Set getWorkspacesByRootFolder() {
+        return this.workspacesByRootFolder;
     }
 
-    public void setWorkspaces(Set workspaces) {
-        this.workspaces = workspaces;
+    public void setWorkspacesByRootFolder(Set workspacesByRootFolder) {
+        this.workspacesByRootFolder = workspacesByRootFolder;
     }
 
     /** 
+     *            @hibernate.set
+     *             lazy="true"
+     *             inverse="true"
+     *             cascade="none"
+     *            @hibernate.collection-key
+     *             column="def_run_seq_fld_id"
+     *            @hibernate.collection-one-to-many
+     *             class="org.lamsfoundation.lams.usermanagement.Workspace"
+     *         
+     */
+    public Set getWorkspacesBySequenceFolder() {
+		return workspacesBySequenceFolder;
+	}
+
+	public void setWorkspacesBySequenceFolder(Set workspacesBySequenceFolder) {
+		this.workspacesBySequenceFolder = workspacesBySequenceFolder;
+	}
+
+	/** 
      *            @hibernate.set
      *             lazy="true"
      *             inverse="true"

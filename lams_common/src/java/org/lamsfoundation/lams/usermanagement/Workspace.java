@@ -91,7 +91,6 @@ public class Workspace implements Serializable {
      *            @hibernate.many-to-one
      *             not-null="true"
      *			   lazy="false"
-     *             cascade="all"
      *            @hibernate.column name="root_folder_id"         
      *         
      */

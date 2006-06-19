@@ -201,7 +201,8 @@ public class Organisation implements Serializable {
 
     /** 
      *            @hibernate.many-to-one
-     *             not-null="true"
+     *             cascade="all"
+     *             not-null="false"
      *            @hibernate.column name="workspace_id"         
      *         
      */
@@ -216,7 +217,6 @@ public class Organisation implements Serializable {
     /** 
      *            @hibernate.many-to-one
      *             not-null="true"
-     *            @hibernate.column name="organisation_type_id"         
      *         
      */
     public OrganisationType getOrganisationType() {
