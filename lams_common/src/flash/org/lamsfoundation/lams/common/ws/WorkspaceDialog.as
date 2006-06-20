@@ -568,28 +568,37 @@ class WorkspaceDialog extends MovieClip{
 			input_txt.text = snode.attributes.data.resourceID;
 			
 		}
-		_selectedDesignId = Number(input_txt.text);
 		
+		_selectedDesignId = Number(input_txt.text);
 		
 		//TODO: Validate you are allowed to use the name etc... Are you overwriting - NOTE Same names are nto allowed in this version
 		
 		var snode = treeview.selectedNode;
-		 Debugger.log('_workspaceModel.currentMode: ' + _workspaceModel.currentMode,Debugger.GEN,'ok','org.lamsfoundation.lams.WorkspaceDialog');
+		
+		Debugger.log('_workspaceModel.currentMode: ' + _workspaceModel.currentMode,Debugger.GEN,'ok','org.lamsfoundation.lams.WorkspaceDialog');
 		if(_workspaceModel.currentMode=="SAVE" || _workspaceModel.currentMode=="SAVEAS"){
-			//var rid:Number = Number(snode.attributes.data.resourceID);
-			if(snode.attributes.data.resourceType==_workspaceModel.RT_LD){
+			if(snode == treeview.dataProvider.firstChild){
+				LFMessage.showMessageAlert(Dictionary.getValue('ws_save_folder_invalid'),null);
+			}else if(snode.attributes.data.resourceType==_workspaceModel.RT_LD){
 				//run a confirm dialogue as user is about to overwrite a design!
 				LFMessage.showMessageConfirm(Dictionary.getValue('ws_chk_overwrite_resource'), Proxy.create(this,doWorkspaceDispatch,true), Proxy.create(this,closeThisDialogue));
-	
-			}else if (snode.attributes.data.resourceType==_workspaceModel.RT_FOLDER){
-				doWorkspaceDispatch(false);
-			}else{
+			} else if (snode.attributes.data.resourceType==_workspaceModel.RT_FOLDER){
+				if(snode.attributes.data.resourceID == -2 || snode.attributes.data.resourceID == -1){	
+					LFMessage.showMessageAlert(Dictionary.getValue('ws_save_folder_invalid'),null);
+				} else {
+					doWorkspaceDispatch(false);
+				}
+			
+			} else{
 				LFMessage.showMessageAlert(Dictionary.getValue('ws_click_folder_file'),null);
 			}
-		}else{
-			doWorkspaceDispatch(true);
+		} else{
+			if (snode.attributes.data.resourceType==_workspaceModel.RT_FOLDER){
+				LFMessage.showMessageAlert(Dictionary.getValue('ws_click_file_open'),null);
+			} else {
+				doWorkspaceDispatch(true);
+			}
 		}
-		
     }
 	
 	
