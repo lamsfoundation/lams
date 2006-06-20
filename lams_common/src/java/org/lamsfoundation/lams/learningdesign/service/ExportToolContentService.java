@@ -288,7 +288,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	/**
 	 * @see org.lamsfoundation.lams.authoring.service.IExportToolContentService.exportLearningDesign(Long)
 	 */
-	public String exportLearningDesign(Long learningDesignId) throws ExportToolContentException{
+	public String exportLearningDesign(Long learningDesignId, List<String> toolsErrorMsgs) throws ExportToolContentException{
 		try {
 			//root temp directory, put target zip file
 			String rootDir = FileUtil.createTempDirectory(EXPORT_TOOLCONTNET_FOLDER_SUFFIX);
@@ -325,6 +325,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 					String msg = activity.getToolDisplayName() + " export tool content failed:" + e.toString();
 					log.error(msg);
 					writeErrorToToolFile(contentDir,activity.getToolContentID(),msg);
+					toolsErrorMsgs.add(msg);
 				} 
 			}
 			
@@ -412,10 +413,12 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	
 	
 	/**
+	 * @return learningDesingID
 	 * @throws ExportToolContentException 
 	 * @see org.lamsfoundation.lams.authoring.service.IExportToolContentService.importLearningDesign(String)
 	 */
-	public void importLearningDesign(String learningDesignPath, User importer, Integer workspaceFolderUid) throws ImportToolContentException {
+	public Long importLearningDesign(String learningDesignPath, User importer, Integer workspaceFolderUid
+			, List<String> toolsErrorMsgs) throws ImportToolContentException {
 		
 		try {
 			//import learning design
@@ -445,10 +448,17 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 				toolMapper.put(activity.getToolContentID(),newContent);
 				
 				//Invoke tool's importToolContent() method.
-				ToolContentManager contentManager = (ToolContentManager) findToolService(newTool);
-				log.debug("Tool begin to import content : " + activity.getTitle() +" by contentID :" + activity.getToolContentID());
-				contentManager.importToolContent(newContent.getToolContentId(),importer.getUserId(),toolPath);
-				log.debug("Tool content import success.");
+				try{
+					ToolContentManager contentManager = (ToolContentManager) findToolService(newTool);
+					log.debug("Tool begin to import content : " + activity.getTitle() +" by contentID :" + activity.getToolContentID());
+					contentManager.importToolContent(newContent.getToolContentId(),importer.getUserId(),toolPath);
+					log.debug("Tool content import success.");
+				}catch (Exception e) {
+					String error = "Unable to import tool content for tool "+newTool.getToolDisplayName() +". Cause by " 
+					+ e.toString();
+					log.error(error);
+					toolsErrorMsgs.add(error);
+				}
 			}
 			
 			// if workspaceFolderUid == null use the user's default folder
@@ -466,13 +476,15 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 				throw new ImportToolContentException(error);
 			}
 
-			saveLearningDesign(ldDto,importer,folder,toolMapper);
+			return saveLearningDesign(ldDto,importer,folder,toolMapper);
 			
 		}catch (ToolException e) {
 			throw new ImportToolContentException(e);
 		} catch (FileNotFoundException e) {
 			throw new ImportToolContentException(e);
 		}
+		
+		return -1;
 		
 	}
 	public Object importToolContent(String toolContentPath, IToolContentHandler toolContentHandler) throws ImportToolContentException{
@@ -607,7 +619,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			String toolFileName = FileUtil.getFullPath(toolPath,TOOL_FAILED_FILE_NAME);
 			Writer toolFile = new FileWriter(new File(toolFileName));
 			toolFile.write(msg);
-			
+			toolFile.flush();
+			toolFile.close();
 		} catch (FileUtilException e) {
 			log.warn("Export error file write error:" + e.toString());
 		} catch (IOException e) {
@@ -623,7 +636,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
         return applicationContext.getBean(tool.getServiceName());
     }
 	
-	private void saveLearningDesign(LearningDesignDTO dto, User importer, WorkspaceFolder folder, Map<Long,ToolContent> toolMapper)
+	private Long saveLearningDesign(LearningDesignDTO dto, User importer, WorkspaceFolder folder, Map<Long,ToolContent> toolMapper)
 			throws ImportToolContentException {
 
 		//grouping object list
@@ -697,6 +710,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			
 //		persist
 		learningDesignDAO.insert(ld);
+		
+		return ld.getLearningDesignId();
 	}
 	/**
 	 * Get learning design object from this Learning design DTO object. It also following our
