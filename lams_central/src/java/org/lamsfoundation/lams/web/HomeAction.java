@@ -24,8 +24,6 @@
 package org.lamsfoundation.lams.web;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -64,6 +62,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @struts:action-forward name="addLesson" path="/addLesson.jsp"
  * @struts:action-forward name="error" path=".error"
  * @struts:action-forward name="passwordChange" path=".passwordChange"
+ * @struts:action-forward name="index" path="/login.jsp"
  *
  */
 public class HomeAction extends DispatchAction {
@@ -228,4 +227,10 @@ public class HomeAction extends DispatchAction {
 		}
 	}
 	
+	public ActionForward logout(ActionMapping mapping, ActionForm form, 
+			HttpServletRequest req, HttpServletResponse res)
+			throws IOException, ServletException {
+		req.getSession().invalidate();
+		return mapping.findForward("index");
+	}
 }

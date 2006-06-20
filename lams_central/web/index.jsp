@@ -10,7 +10,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
 <head>
-	<title>LAMS::<fmt:message key="lams.welcome"/></title>
+	<title>LAMS::<fmt:message key="index.welcome"/></title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta http-equiv="pragma" content="no-cache">
 	<meta http-equiv="cache-control" content="no-cache">
@@ -87,10 +87,11 @@
 			<table bgcolor="#ffffff" width="100%" height="100%" cellspacing="5" cellpadding="5" align="center">
 				<tr>
 					<td align="left" style="font-size:20pt">
-						<fmt:message key="lams.welcome"/>, <lams:user property="firstName"/> <img src="images/lamb_big.png"/>
+						<fmt:message key="index.welcome"/>, <lams:user property="firstName"/> <img src="images/lamb_big.png"/>
 					</td>
 					<td align="right">
 						<a title="<fmt:message key="index.refresh.hint"/>" href="javascript:getContent()"><fmt:message key="index.refresh"/></a>
+						<a href="home.do?method=logout"><fmt:message key="index.logout"/></a>
 					</td>
 				</tr>
 				<tr>
