@@ -202,17 +202,6 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
 		go_menu.addMenuItem({label:Dictionary.getValue('mnu_go_todo'), instanceName:"goTodoTab"});
 
 		/*=================
-            TOOLS MENU
-        =================*/
-		//_global.breakpoint();
-        tools_menu = _mb.addMenu(Dictionary.getValue('mnu_tools'));
-		tools_menu.addMenuItem({label:Dictionary.getValue('mnu_tools_enable'), instanceName:"enableItem", enabled:false});
-        tools_menu.addMenuItem({label:Dictionary.getValue('mnu_tools_disable'), instanceName:"disableItem", enabled:false});
-        tools_menu.addMenuItem({type:"separator"});
-        tools_menu.addMenuItem({label:Dictionary.getValue('mnu_tools_archive'), instanceName:"archiveItem"});
-        
-
-		/*=================
             HELP MENU
         =================*/
         help_menu = _mb.addMenu(Dictionary.getValue('mnu_help'));
