@@ -75,6 +75,8 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 	private var _folderIDPendingRefresh:Number; // The ID of the folder an operation has just been done on, will be refreshed...
 	private var _folderIDPendingRefreshList:Array; // The List of ID of the folder an operation has just been done on, will be refreshed...
 
+	// if true folder is being forced to open
+	private var _forced:Boolean;
 	
 	//These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
@@ -205,12 +207,13 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 	 * @param   resourceToOpen ID:Number of resource to open
 	 * @return  
 	 */
-	public function openFolderInTree(resourceToOpen:Number):Void{
+	public function openFolderInTree(resourceToOpen:Number, forced:Boolean):Void{
 		Debugger.log('resourceToOpen :'+resourceToOpen ,Debugger.GEN,'openFolderInTree','org.lamsfoundation.lams.WorkspaceModel');
 		//lets see if its in the hash table already (prob not)
 		//if(_workspaceResources.get(resourceToOpen).attributes.data.contents == undefined){
 			Debugger.log('Requesting...',Debugger.GEN,'openFolderInTree','org.lamsfoundation.lams.WorkspaceModel');
 			//get that resource
+			_forced = forced;
 			_workspace.requestFolderContents(resourceToOpen);
 			
 	
@@ -264,6 +267,9 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 		}else{
 			Debugger.log('Did not find:'+dto.resourceType+'_'+dto.workspaceFolderID+' Something bad has happened',Debugger.CRITICAL,'setFolderContents','org.lamsfoundation.lams.WorkspaceModel');
 		}
+		
+		// sort contents
+		dto.contents.sortOn("name", Array.CASEINSENSITIVE);
 		
 		
 		// go throught the contents of DTO and add it aas children to the node to update.
@@ -389,8 +395,8 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 	public function setFolderOpen(folderID){
 		var nodeToOpen:XMLNode = getWorkspaceResource('Folder_'+folderID);
 		Debugger.log('Basic open folder call:'+nodeToOpen,Debugger.GEN,'setFolderOpen','org.lamsfoundation.lams.WorkspaceModel');
-		
 		broadcastViewUpdate('OPEN_FOLDER',nodeToOpen);
+		
 		
 	}
 	
@@ -656,5 +662,24 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 	 */
 	public function getAvailableLicenses ():Array {
 		return _availableLicenses;
+	}
+	
+	/**
+	 * Setter method for forced
+	 * 
+	 * @param   a 
+	 */
+	
+	public function set forced(a:Boolean){
+		_forced = a;
+	}
+	
+	/**
+	 * 
+	 * @return true if folder forced to open 
+	 */
+	
+	public function isForced():Boolean{
+		return _forced;
 	}
 }

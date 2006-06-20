@@ -134,7 +134,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
 			// DC24-01-06 this resource ID must refer to a folder as its been marked as a branch
 			var resourceToOpen = nodeToOpen.attributes.data.resourceID;
 			//must be a folder ID, depoends if this event is fired for an "open" reousrce click
-			_workspaceModel.openFolderInTree(resourceToOpen);
+			_workspaceModel.openFolderInTree(resourceToOpen, false);
 		}else{
 			Debugger.log('nodeToOpen already has children in cache',Debugger.GEN,'onTreeNodeOpen','org.lamsfoundation.lams.WorkspaceController');
 			
@@ -146,10 +146,11 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
 			// DC24-01-06 this resource ID must refer to a folder as its been marked as a branch
 			var resourceToOpen = nodeToOpen.attributes.data.resourceID;
 			//must be a folder ID, depoends if this event is fired for an "open" reousrce click
-			_workspaceModel.openFolderInTree(resourceToOpen);
+			_workspaceModel.openFolderInTree(resourceToOpen, true);
 		}else{
 			Debugger.log('nodeToOpen already has children in cache',Debugger.GEN,'forceNodeOpen','org.lamsfoundation.lams.WorkspaceController');
-			
+			_workspaceModel.forced = true;
+			_workspaceModel.broadcastViewUpdate('OPEN_FOLDER',nodeToOpen);
 		}
 	}
 	

@@ -245,7 +245,7 @@ class WorkspaceDialog extends MovieClip{
 				itemSelected(event.data,wm);
 				break;
 			case 'OPEN_FOLDER' :
-				openFolder(event.data, wm);
+				openFolder(event.data, wm, false);
 				break;
 			case 'REFRESH_FOLDER' :
 				refreshFolder(event.data, wm);
@@ -287,7 +287,7 @@ class WorkspaceDialog extends MovieClip{
 			}
 		}
 		
-		 openFolder(changedNode);
+		openFolder(changedNode, wm);
 	}
 	
 	private function refreshTree(){
@@ -309,13 +309,23 @@ class WorkspaceDialog extends MovieClip{
 	 * Just opens the fodler node - DOES NOT FIRE EVENT - so is used after updatting the child folder
 	 * @usage   
 	 * @param   nodeToOpen 
-	 * @param   wm         
+	 * @param   wm       
+	 * @param 	isForced
 	 * @return  
 	 */
 	private function openFolder(nodeToOpen:XMLNode, wm:WorkspaceModel){
 		Debugger.log('openFolder:'+nodeToOpen ,Debugger.GEN,'openFolder','org.lamsfoundation.lams.ws.WorkspaceDialog');
 		//open the node
 		treeview.setIsOpen(nodeToOpen,true);
+		
+		Debugger.log('openFolder forced:'+wm.isForced() ,Debugger.GEN,'openFolder','org.lamsfoundation.lams.ws.WorkspaceDialog');
+		
+		if(wm.isForced()){
+			// select users root workspace folder
+			treeview.selectedNode = nodeToOpen.firstChild;
+			dispatchEvent({type:'change', target:this.treeview});
+		}
+		
 		refreshTree();
 	
 	}
@@ -729,8 +739,10 @@ class WorkspaceDialog extends MovieClip{
 		//use the above event, on comlete the drop, send the request to do the move to the server (evt.targetNode);
 		//then immediatly invlaidate the cache.  then server may return error if therrte is a problem, else new details willbe shown
 		
-		
-		
+		// open My Workspace virtual folder
+		var wsNode:XMLNode = treeview.firstVisibleNode;
+		//treeview.setIsOpen(wsNode, true);
+		_workspaceController.forceNodeOpen(wsNode);
 		
     }
     
