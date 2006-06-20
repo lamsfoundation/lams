@@ -52,7 +52,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
    
     public function activityClick(ca:Object):Void{
 		_canvasModel.selectedItem = null;
-	   Debugger.log('activityClick CanvasActivity:'+ca.activity.activityUIID + ' orderID: ' + ca.activity.orderID,Debugger.GEN,'activityClick','CanvasController');
+	    Debugger.log('activityClick CanvasActivity:'+ca.activity.activityUIID + ' orderID: ' + ca.activity.orderID,Debugger.GEN,'activityClick','CanvasController');
 	    Debugger.log('Check if transition tool active :'+_canvasModel.isTransitionToolActive(),Debugger.GEN,'activityClick','CanvasController');
 	   //if transition tool active
 	    if(_canvasModel.isTransitionToolActive()){
@@ -94,7 +94,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
    
 	public function activityDoubleClick(ca:Object):Void{
 	   Debugger.log('activityDoubleClick CanvasActivity:'+ca.activity.activityUIID,Debugger.GEN,'activityDoubleClick','CanvasController');
-	    _canvasModel.selectedItem = ca;
+	    _canvasModel.getCanvas().stopActiveTool();
+		_canvasModel.selectedItem = ca;
 		if(ca.activity.activityTypeID == Activity.TOOL_ACTIVITY_TYPE){
 			_canvasModel.openToolActivityContent(ca.activity);
 		}else{
@@ -104,7 +105,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
    
     public function activityRelease(ca:Object):Void{
 	   Debugger.log('activityRelease CanvasActivity:'+ca.activity.activityUIID,Debugger.GEN,'activityRelease','CanvasController');
-	   
+	    _canvasModel.getCanvas().stopActiveTool();
+		 
 	    if(_canvasModel.isDragging){
 			ca.stopDrag();
 			//if we are on the bin - trash it
@@ -264,11 +266,14 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
    public function transitionDoubleClick(ct:CanvasTransition):Void{
 	   Debugger.log('transitionDoubleClick CanvasTransition:'+ct.transition.transitionUIID,Debugger.GEN,'transitionDoubleClick','CanvasController');
 	   
+	   _canvasModel.getCanvas().stopActiveTool();
+	   
 	   //TODO: fix this, its null
 	   _canvasView =  CanvasView(getView());
 	   Debugger.log('_canvasView:'+_canvasView,Debugger.GEN,'transitionDoubleClick','CanvasController');
 	   _canvasView.createTransitionPropertiesDialog("centre",Delegate.create(this, transitionPropertiesOK));
-	   
+	  
+		
 	    _canvasModel.selectedItem = ct;
    }
    
