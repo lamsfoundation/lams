@@ -34,7 +34,7 @@ class Grid {
 	//constants
 	private static var LINE_THICKNESS:Number = 1;				//lines
 	private static var LINE_ALPHA:Number = 30;
-	private static var LINE_COLOR:Number = 0x919191;
+	private static var LINE_COLOR:Number = 0x000000;
 
 	public static var SMALL_GRID_H_SPACING:Number = 21;				           //Small grid dimensions
 	public static var SMALL_GRID_V_SPACING:Number = 28;
@@ -135,18 +135,18 @@ class Grid {
 			
 		}
 		//draw vertical lines
-		var vLines:Number = Math.floor(gridHeight/vGap);
+		/*var vLines:Number = Math.floor(gridHeight/vGap);
 		for (i=0; i<= vLines;i++){
 			var y = i*vGap;
 			
 			if(GRID_STYLE == 'dots'){
-				Draw.dashTo(_mc,0,y,gridWidth,y,1,vGap,1,0xCCCCCC);
+				Draw.dashTo(_mc,0,y,gridWidth,y,1,vGap,1,0x000000);
 			}else{
 				_mc.moveTo(0,y);
 				_mc.lineTo(gridWidth,y);
 			}
 			
-		}
+		}*/
 		
 		
 		return _mc;
