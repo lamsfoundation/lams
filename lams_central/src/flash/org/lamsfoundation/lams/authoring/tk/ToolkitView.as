@@ -41,7 +41,7 @@ class ToolkitView extends AbstractView {
 		private var toolkitLibraries_sp:MovieClip;
 	private var libraryActivityDesc_txa:TextArea;
 	private var title_lbl:Label;
-		private var _className = "ToolkitView";
+	private var toolTip:MovieClip;	private var _className = "ToolkitView";
 	private var _depth:Number;
 	
 	private var dragIcon_mc:MovieClip;
@@ -136,12 +136,9 @@ class ToolkitView extends AbstractView {
         //dispatch load event
         dispatchEvent({type:'load',target:this});
 		//Debugger.log('_toolkit_mc.desc_panel:'+this.desc_panel,4,'createToolkit','ToolkitView');
-		layoutToolkit();
+		//layoutToolkit();
 	}
-        	public function layoutToolkit():Void{
-		
-	}
-	
+        	
 	/**
 	* Updates state of the tookit, called by the model
 	*
@@ -192,8 +189,7 @@ class ToolkitView extends AbstractView {
         if(spWidth > 0 && spHeight>0) {
             toolkitLibraries_sp.setSize(spWidth,spHeight);
         }
-        //toolkitLibraries_sp.setSize(s.w-_scrollPanelWidthDiff,s.h-(libraryActivityDesc_txa._y+libraryActivityDesc_txa.height));
-        //Debugger.log('SetSize, x,y:'+s.w + ',' + s.h,Debugger.GEN,'setSize','ToolkitView');
+        
     }
     
     /**
@@ -246,6 +242,19 @@ class ToolkitView extends AbstractView {
 			
 		}		//toolkitLibraries_sp.refreshPane();		
 		
+	}
+	
+	public function showToolTip(toolName:String):Void{
+		//trace("ToolName is: "+toolName)
+		//toolTip = this.createEmptyMovieClip ("toolTip", DepthManager.kTop)
+		//toolTip.attachMovie("wizard-wand", "toolTip_mc", this.getNextHighestDepth(), {_x:_xmouse+5 ,_y:_ymouse-10});
+		Application.tooltip.attachMovie("toolTip_mc", "toolTip_mc", Application.root.getNextHighestDepth(), {_x:_xmouse+5 ,_y:_ymouse-30, toolTipName:"Hello worl how are you doing?"});
+		//Application.tooltip.toolTip_mc.toolTipName = "Hello world how are you?"
+		//toolTip.toolTip_cmp.text = "test"
+	}
+	
+	public function hideToolTip():Void{
+		toolTip.removeMovieClip();
 	}	/**
 	*The currently selected Template Activity
 	* 

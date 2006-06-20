@@ -59,10 +59,29 @@ class ToolkitController extends AbstractController {
 		//lets do a test to see if we got the canvas
 		var cv:Canvas = Application.getInstance().getCanvas();
 		var canvasView:MovieClip = cv.getCanvasView().getViewMc();
-	
+		
+		var optionalOnCanvas:Array  = cv.getCanvasModel().findOptionalActivities();
 		//SEE IF ITS HIT the canvas
 		var isCanvasDrop:Boolean = canvasView.hitTest(dragIcon_mc);
 		Debugger.log('isCanvasDrop:'+isCanvasDrop,4,'dropIcon','TemplateActivity');
+		/*for (var i=0; i<optionalOnCanvas.length; i++){
+			trace ("testing Optional on Canvas "+i)
+			//var optionalContainer:MovieClip = 
+			if (dragIcon_mc.hitTest(optionalOnCanvas[i])){
+				
+				if (optionalOnCanvas[i].locked == true){
+					//var msg:String = "Test"   //Dictionary.getValue('act_lock_chk');
+					//LFMessage.showMessageAlert(msg);
+					trace("Container is locked")
+				}else{
+					trace("hit with optional")
+					var ta:TemplateActivity;
+					ta = _toolkitModel.getSelectedTemplateActivity();
+					cv.getCanvasModel().addParentToActivity(optionalOnCanvas[i].activity.activityUIID, ta)
+				}						
+			}
+			
+		}*/
 		if(isCanvasDrop){			//remove the drag icon
 			dragIcon_mc.removeMovieClip();
 			
