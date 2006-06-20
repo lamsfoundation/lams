@@ -46,6 +46,7 @@ import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTO;
 import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTOFactory;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.HashUtil;
 
 /**
  * <p>
@@ -332,9 +333,13 @@ public class UserManagementService implements IUserManagementService {
 	}
 
 	public void updatePassword(String login, String password) {
-		User user = getUserByLogin(login);
-		user.setPassword(password);
-		baseDAO.update(user);
+		try{
+			User user = getUserByLogin(login);
+			user.setPassword(HashUtil.sha1(password));
+			baseDAO.update(user);
+		}catch(Exception e){
+			log.debug(e);
+		}
 	}
 
 	public UserOrganisation getUserOrganisation(Integer userId, Integer orgId) {
