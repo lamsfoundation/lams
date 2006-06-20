@@ -151,15 +151,23 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				//if we are on the optional Activity remove this activity from canvas and assign it a parentID of optional activity and place it in the optional activity window.
 				for (var i=0; i<optionalOnCanvas.length; i++){
 					//trace ("testing Optional on Canvas "+i)
-					if (ca.activity.activityUIID != optionalOnCanvas[i].activity.activityUIID){
+					if (ca.activity.activityUIID != optionalOnCanvas[i].activity.activityUIID ){
 						if (ca.hitTest(optionalOnCanvas[i])){
 							if (optionalOnCanvas[i].locked == true){
 								var msg:String = Dictionary.getValue('act_lock_chk');
 								LFMessage.showMessageAlert(msg);
 							}else{
-								_canvasModel.addParentToActivity(optionalOnCanvas[i].activity.activityUIID, ca)
+								if (ca.activity.isGateActivity()){
+									ca._x = ca.activity.xCoord;
+									ca._y = ca.activity.yCoord;
+									var msg:String = Dictionary.getValue('cv_gateoptional_hit_chk');
+									LFMessage.showMessageAlert(msg);
+								}else {
+									_canvasModel.addParentToActivity(optionalOnCanvas[i].activity.activityUIID, ca)
+								}
 							}						
 						}
+						
 					}
 				}
 				
