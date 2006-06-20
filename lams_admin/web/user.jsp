@@ -107,7 +107,7 @@
 	</tr>
 	<logic:notEmpty name="UserForm" property="userId">
 	    <tr>
-	        <td><fmt:message key="admin.user.roles"/> (removing a role not supported yet):</td>
+	        <td><fmt:message key="admin.user.roles"/>:</td>
 	        <td>
                 <input type="checkbox" name="learner" <c:if test="${userRoles.learner}">checked</c:if> /><fmt:message key="admin.user.learner" /><br />
                 <input type="checkbox" name="author" <c:if test="${userRoles.author}">checked</c:if> /><fmt:message key="admin.user.author" /><br />
