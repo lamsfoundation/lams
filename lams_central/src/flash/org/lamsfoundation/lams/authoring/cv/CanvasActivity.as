@@ -292,17 +292,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		
 		if(_activity.isGateActivity()){
 			stopSign_mc._visible = true;
-			canvasActivity_mc._visible=false;
-			title_lbl._visible=false;
-			act_pnl._visible = false;
-			clickTarget_mc._width = CanvasActivity.GATE_ACTIVITY_WIDTH;
-			clickTarget_mc._height= CanvasActivity.GATE_ACTIVITY_HEIGHT;
-			stopSign_mc._height= CanvasActivity.GATE_ACTIVITY_HEIGHT;
-			stopSign_mc._width= CanvasActivity.GATE_ACTIVITY_WIDTH;
 			stopSign_mc._x = 0;
 			stopSign_mc._y = 0;
 			
-			}else{
+			
+		}else{
 			//chose the icon:
 			if(_activity.isGroupActivity()){
 				groupIcon_mc._visible = true;
