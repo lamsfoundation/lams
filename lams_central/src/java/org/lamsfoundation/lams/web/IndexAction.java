@@ -23,6 +23,7 @@
 package org.lamsfoundation.lams.web;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -145,16 +146,23 @@ public class IndexAction extends Action {
 		List<IndexLessonBean> lessonBeans = new ArrayList<IndexLessonBean>();
 		Set<Lesson> lessons = org.getLessons();
 		for(Lesson lesson:lessons) {
-			List<IndexLinkBean> lessonLinks = new ArrayList<IndexLinkBean>();
-			if(contains(roles,Role.ROLE_COURSE_MANAGER)||contains(roles,Role.ROLE_STAFF)){
-				lessonLinks.add(new IndexLinkBean("Monitor", "javascript:openMonitorLesson(" + lesson.getLessonId()+")"));
+			if(!lesson.isPreviewLesson()){
+				List<IndexLinkBean> lessonLinks = new ArrayList<IndexLinkBean>();
+				if(contains(roles,Role.ROLE_COURSE_MANAGER)||contains(roles,Role.ROLE_STAFF)){
+					if(lesson.getLessonStateId()!=lesson.REMOVED_STATE){
+						lessonLinks.add(new IndexLinkBean("Monitor", "javascript:openMonitorLesson(" + lesson.getLessonId()+")"));
+					}
+				}
+				if(contains(roles,Role.ROLE_LEARNER)){
+					if((lesson.getLessonStateId()==lesson.STARTED_STATE)||(lesson.getLessonStateId()==lesson.FINISHED_STATE)){
+						lessonLinks.add(new IndexLinkBean("Participate","javascript:openLearner("+lesson.getLessonId()+")"));
+					}
+				}
+				IndexLessonBean lessonBean = new IndexLessonBean(lesson.getLessonName(), lessonLinks);
+				lessonBeans.add(lessonBean);
 			}
-			if(contains(roles,Role.ROLE_LEARNER)){
-				lessonLinks.add(new IndexLinkBean("Participate","javascript:openLearner("+lesson.getLessonId()+")"));
-			}
-			IndexLessonBean lessonBean = new IndexLessonBean(lesson.getLessonName(), lessonLinks);
-			lessonBeans.add(lessonBean);
 		}
+		Collections.sort(lessonBeans);
 		orgBean.setLessons(lessonBeans);
 
 		if(orgBean.getType().equals(OrganisationType.COURSE_TYPE)){
@@ -184,5 +192,5 @@ public class IndexAction extends Action {
 		}
 		return false;
 	}
-
+	
 }

@@ -35,7 +35,7 @@ import java.util.List;
  *
  * Created at 10:13:43 on 14/06/2006
  */
-public class IndexLessonBean {
+public class IndexLessonBean implements Comparable{
 	private String name;
 	private List<IndexLinkBean> links;
 
@@ -66,5 +66,8 @@ public class IndexLessonBean {
 	 */
 	public void setName(String name) {
 		this.name = name;
+	}
+	public int compareTo(Object o) {
+		return name.compareTo(((IndexLessonBean)o).getName());
 	}
 }
