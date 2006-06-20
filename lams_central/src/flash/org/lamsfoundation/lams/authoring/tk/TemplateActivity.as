@@ -45,8 +45,6 @@ class org.lamsfoundation.lams.authoring.tk.TemplateActivity extends MovieClip{
 	 private var title_lbl:Label;
 	 private var select_btn:Button;	 private var icon_mc:MovieClip;		 private var _instance:TemplateActivity;	 private var icon_mcl:MovieClipLoader;
 	 private var _taPanelStyle:Object;
-	 
-
 	 //this is set by the init object
 	 //contains refs to the classInstances of the activities in this TemplateActivity
 	 private var _activities:Array;
@@ -183,12 +181,18 @@ class org.lamsfoundation.lams.authoring.tk.TemplateActivity extends MovieClip{
 	* Does the visual rendering work of this TemplateActivity
 	*/
 	private function draw():Void{
-		title_lbl.text=_mainActivity.title;
+		var toolTitle:String = _mainActivity.title
+		if (toolTitle.length > 15){
+			toolTitle = toolTitle.substr(0, 15)+"..."
+		}
+		title_lbl.text= toolTitle;
 		//attach the icon now...
-		var ICON_OFFSET = 2;		icon_mc._width = 20;
+		var ICON_OFFSETX = 3;
+		var ICON_OFFSETY = 6;		icon_mc._width = 20;
 		icon_mc._height = 20;
-		icon_mc._x = ICON_OFFSET;
-		icon_mc._y = ICON_OFFSET;
+		icon_mc._x = ICON_OFFSETX;
+		icon_mc._y = ICON_OFFSETY;
+		//toolTip.text = _mainActivity.title;
 		//Debugger.log('icon_mc._width:'+icon_mc._width,4,'draw','TemplateActivity');
 		//Debugger.log('icon_mc._height:'+icon_mc._height,4,'draw','TemplateActivity');
 	}
@@ -264,10 +268,15 @@ class org.lamsfoundation.lams.authoring.tk.TemplateActivity extends MovieClip{
 	private function rollOver():Void{
 		bkg_pnl.setStyle("backgroundColor",0xFFFFFF);
 		bkg_pnl.setStyle("borderStyle","outset");
+		_toolkitView.showToolTip("test");
+		
 	}
 	
 	private function rollOut():Void{
 		bkg_pnl.setStyle("styleName",_taPanelStyle);
+		_toolkitView.hideToolTip();
+		//toolTip._visible = false;
+		//removeMovieClip(toolTip);
 	}
 	
 	
