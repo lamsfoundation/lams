@@ -26,52 +26,76 @@ package org.lamsfoundation.lams.authoring.web;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.action.LamsAction;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
- * Export tool content servlet. It needs learingDesignID as input parameter.
- * @author Steve.Ni
  * 
+ * @struts.action name = "ExportAction"
+ * 				  parameter = "method"
+ * 				  validate = "false"
+ * @struts.action-forward name = "loading" path = "/toolcontent/exportloading.jsp"
+ * @struts.action-forward name = "result" path = "/toolcontent/exportresult.jsp"
+ *  
+ * Export tool content action. It needs learingDesignID as input parameter.
+ * @author Steve.Ni
  * @version $Revision$
  */
-public class ExportToolContentServlet extends HttpServlet {
+public class ExportToolContentAction extends LamsAction {
 
 	private static final long serialVersionUID = 1L;
 	public static final String EXPORT_TOOLCONTENT_SERVICE_BEAN_NAME = "exportToolContentService";
 	public static final String PARAM_LEARING_DESIGN_ID = "learningDesignID";
-	
+	public static final String ATTR_TOOLS_ERROR_MESSAGE = "toolsErrorMessages";
+	public static final String ATTR_LD_ERROR_MESSAGE = "ldErrorMessages";
 
-	private Logger log = Logger.getLogger(ExportToolContentServlet.class);
+	private Logger log = Logger.getLogger(ExportToolContentAction.class);
 	
-	/*
-	 * @see javax.servlet.http.HttpServlet.service(HttpServletRequest, HttpServletResponse)
-	 */
-	public void service(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+	@Override
+	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		String param = mapping.getParameter();
+		//-----------------------Resource Author function ---------------------------
+		if(param.equals("export")){
+			return exportLD(mapping,request,response);
+		}else{
+			Long learningDesignId = WebUtil.readLongParam(request,PARAM_LEARING_DESIGN_ID);
+			request.setAttribute(PARAM_LEARING_DESIGN_ID,learningDesignId);
+			//display initial page for upload
+			return mapping.findForward("loading");
+		}
+	}
+	private ActionForward exportLD(ActionMapping mapping, HttpServletRequest request,HttpServletResponse response){
 		Long learningDesignId = WebUtil.readLongParam(request,PARAM_LEARING_DESIGN_ID);
 		IExportToolContentService service = getExportService();
+		List<String> ldErrorMsgs = new ArrayList<String>();
 		try {
-			String zipFilename = service.exportLearningDesign(learningDesignId);
-			
+			List<String> toolsErrorMsgs = new ArrayList<String>();
+			String zipFilename = service.exportLearningDesign(learningDesignId,toolsErrorMsgs);
+			request.setAttribute(ATTR_TOOLS_ERROR_MESSAGE,toolsErrorMsgs);
 			//write zip file as response stream. 
 			response.setContentType("application/zip");
 			response.setHeader("Content-Disposition","attachment;filename="+FileUtil.getFileName(zipFilename));
-			InputStream in = new BufferedInputStream(new FileInputStream(zipFilename)); 
-			OutputStream out = response.getOutputStream();
+			InputStream in = null;
+			OutputStream out = null;
 			try {
+				in = new BufferedInputStream(new FileInputStream(zipFilename)); 
+				out = response.getOutputStream();
 				int count = 0;
 					
 				int ch;
@@ -83,9 +107,10 @@ public class ExportToolContentServlet extends HttpServlet {
 				log.debug("Wrote out " + count + " bytes");
 				response.setContentLength(count);
 				out.flush();
-			} catch (IOException e) {
+				return null;
+			} catch (Exception e) {
 			    log.error( "Exception occured writing out file:" + e.getMessage());		
-			    throw e;
+			    throw new ExportToolContentException(e);
 			} finally {
 			    try	{
 					if (in != null) in.close(); // very important
@@ -97,14 +122,17 @@ public class ExportToolContentServlet extends HttpServlet {
 			}
 		} catch (ExportToolContentException e1) {
 			log.error("Unable to export tool content: " + e1.toString());
-		} 
+			request.setAttribute(ATTR_LD_ERROR_MESSAGE,ldErrorMsgs);
+		}
+		//display initial page for upload
+		return mapping.findForward("result");
 	}
 	
 	//***************************************************************************************
 	// Private method
 	//***************************************************************************************
 	private IExportToolContentService getExportService(){
-		WebApplicationContext webContext = WebApplicationContextUtils.getRequiredWebApplicationContext(this.getServletContext());
+		WebApplicationContext webContext = WebApplicationContextUtils.getRequiredWebApplicationContext(this.getServlet().getServletContext());
 		return (IExportToolContentService) webContext.getBean(EXPORT_TOOLCONTENT_SERVICE_BEAN_NAME);		
 	}
 }

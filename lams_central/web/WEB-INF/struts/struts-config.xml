@@ -63,6 +63,26 @@
       />
     </action>
     <action
+      path=""
+      type="org.lamsfoundation.lams.authoring.web.ImportToolContentAction"
+      name="ImportAction"
+      scope="request"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="upload"
+        path="/toolcontent/import.jsp"
+        redirect="false"
+      />
+      <forward
+        name="success"
+        path="/toolcontent/importresult.jsp"
+        redirect="false"
+      />
+    </action>
+    <action
       path="/home"
       type="org.lamsfoundation.lams.web.HomeAction"
       parameter="method"
@@ -102,6 +122,26 @@
       <forward
         name="passwordChange"
         path=".passwordChange"
+        redirect="false"
+      />
+    </action>
+    <action
+      path=""
+      type="org.lamsfoundation.lams.authoring.web.ExportToolContentAction"
+      name="ExportAction"
+      scope="request"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="loading"
+        path="/toolcontent/exportloading.jsp"
+        redirect="false"
+      />
+      <forward
+        name="result"
+        path="/toolcontent/exportresult.jsp"
         redirect="false"
       />
     </action>

@@ -24,57 +24,80 @@
 /* $Id$ */
 package org.lamsfoundation.lams.authoring.web;
 
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.fileupload.DiskFileUpload;
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
-import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.FileUtil;
-import org.lamsfoundation.lams.util.FileUtilException;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
-import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
+import org.lamsfoundation.lams.web.action.LamsAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
- * Export tool content servlet. It needs learingDesignID as input parameter.
+ *  * @struts.action name = "ImportAction"
+ * 				  parameter = "method"
+ * 				  validate = "false"
+ * @struts.action-forward name = "upload" path = "/toolcontent/import.jsp"
+ * @struts.action-forward name = "success" path = "/toolcontent/importresult.jsp"
+ * 
+ * Import tool content servlet. It needs an uploaded learning design zip file. 
  * @author Steve.Ni
  * 
  * @version $Revision$
  */
-public class ImportToolContentServlet extends HttpServlet {
+public class ImportToolContentAction extends LamsAction {
 
 	private static final long serialVersionUID = 1L;
 	public static final String EXPORT_TOOLCONTENT_SERVICE_BEAN_NAME = "exportToolContentService";
 	public static final String USER_SERVICE_BEAN_NAME = "userManagementService";
 	public static final String PARAM_LEARING_DESIGN_ID = "learningDesignID";
+	public static final String ATTR_TOOLS_ERROR_MESSAGE = "toolsErrorMessages";
+	public static final String ATTR_LD_ERROR_MESSAGE = "ldErrorMessages";
+	public static final String ATTR_LD_ID = "learningDesignID";
 	
 
-	private Logger log = Logger.getLogger(ImportToolContentServlet.class);
+	private Logger log = Logger.getLogger(ImportToolContentAction.class);
 	
-	/*
-	 * @see javax.servlet.http.HttpServlet.service(HttpServletRequest, HttpServletResponse)
+
+	@Override
+	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		String param = mapping.getParameter();
+		//-----------------------Resource Author function ---------------------------
+		if(param.equals("import")){
+			importLD(request);
+			return mapping.findForward("success");
+		}else{
+			//display initial page for upload
+			return mapping.findForward("upload");
+		}
+	}
+
+
+	/**
+	 * @param request
 	 */
-	public void service(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        
+	private void importLD(HttpServletRequest request) {
+		List<String> ldErrorMsgs = new ArrayList<String>();
         try {
         	Integer workspaceFolderUid = null;
         	
@@ -111,37 +134,39 @@ public class ImportToolContentServlet extends HttpServlet {
                 workspaceFolderUid = NumberUtils.createInteger((String) params.get("WORKSPACE_FOLDER_UID"));
             }
             if (file == null) {
-            	log.error("Upload file is empty, import tool content failed.");
-            	return;
+            	String msg = "Can not find the upload file.";
+            	log.error(msg);
+            	throw new ExportToolContentException(msg);
             }
             // write the file
             String ldPath = ZipFileUtil.expandZip(file.getInputStream(),filename);
             IExportToolContentService service = getExportService();
-            service.importLearningDesign(ldPath,user,workspaceFolderUid);
-        } catch (ImportToolContentException e) {
-        	log.error("Unable to import tool content: " + e.toString());
-        } catch (FileUtilException e) {
-        	log.error("Unable to import tool content: " + e.toString());
-		} catch (FileUploadException e) {
-			log.error("Unable to import tool content: " + e.toString());
-		} catch (ZipFileUtilException e) {
-			log.error("Unable to import tool content: " + e.toString());
-		} catch (IOException e) {
-			log.error("Unable to import tool content: " + e.toString());
+            List<String> toolsErrorMsgs = new ArrayList<String>();
+            Long ldId = service.importLearningDesign(ldPath,user,workspaceFolderUid,toolsErrorMsgs);
+            if(ldId == -1){
+            	String msg = "Learning design saved failed.";
+            	throw new ExportToolContentException(msg);
+        	}
+            request.setAttribute(ATTR_TOOLS_ERROR_MESSAGE,toolsErrorMsgs);
+            request.setAttribute(ATTR_LD_ID,ldId);
+        } catch (Exception e) {
+        	String msg = e.toString();
+        	log.error(msg);
+        	ldErrorMsgs.add(msg);
+         	request.setAttribute(ATTR_LD_ERROR_MESSAGE,ldErrorMsgs);
 		}
-
-	            
 	}
 	
 	//***************************************************************************************
 	// Private method
 	//***************************************************************************************
 	private IUserManagementService getUserService(){
-		WebApplicationContext webContext = WebApplicationContextUtils.getRequiredWebApplicationContext(this.getServletContext());
+		WebApplicationContext webContext = WebApplicationContextUtils.getRequiredWebApplicationContext(this.getServlet().getServletContext());
 		return (IUserManagementService) webContext.getBean(USER_SERVICE_BEAN_NAME);		
 	}
 	private IExportToolContentService getExportService(){
-		WebApplicationContext webContext = WebApplicationContextUtils.getRequiredWebApplicationContext(this.getServletContext());
+		WebApplicationContext webContext = WebApplicationContextUtils.getRequiredWebApplicationContext(this.getServlet().getServletContext());
 		return (IExportToolContentService) webContext.getBean(EXPORT_TOOLCONTENT_SERVICE_BEAN_NAME);		
 	}
+
 }
