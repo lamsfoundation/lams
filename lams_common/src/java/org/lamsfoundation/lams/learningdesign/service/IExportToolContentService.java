@@ -24,6 +24,8 @@
 /* $Id$ */
 package org.lamsfoundation.lams.learningdesign.service;
 
+import java.util.List;
+
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.usermanagement.User;
 /**
@@ -38,10 +40,10 @@ public interface IExportToolContentService {
 	 * in this learning design.
 	 * 
 	 * @param learningDesignId
-	 * @return
+	 * @return the full file path of exported learning design zip file.
 	 * @throws ExportToolContentException
 	 */
-	String exportLearningDesign(Long learningDesignId) throws ExportToolContentException;
+	String exportLearningDesign(Long learningDesignId, List<String> toolsErrorMsgs) throws ExportToolContentException;
 	/**
 	 * Export tool content. 
 	 * 
@@ -86,9 +88,10 @@ public interface IExportToolContentService {
 	 * @param learningDesignPath
 	 * @param importer
 	 * @param workspaceFolderUid
+	 * @return learningDesignID
 	 * @throws ImportToolContentException
 	 */
-	void importLearningDesign(String learningDesignPath,User importer, Integer workspaceFolderUid) throws ImportToolContentException;
+	Long importLearningDesign(String learningDesignPath,User importer, Integer workspaceFolderUid, List<String> toolsErrorMsgs) throws ImportToolContentException;
 	
 	Object importToolContent(String toolContentPath, IToolContentHandler toolContentHandler)
 		throws ImportToolContentException;
