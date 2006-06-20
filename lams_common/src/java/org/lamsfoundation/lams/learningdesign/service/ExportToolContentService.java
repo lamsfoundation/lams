@@ -484,8 +484,6 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			throw new ImportToolContentException(e);
 		}
 		
-		return null;
-		
 	}
 	public Object importToolContent(String toolContentPath, IToolContentHandler toolContentHandler) throws ImportToolContentException{
 		Object toolPOJO = null;
