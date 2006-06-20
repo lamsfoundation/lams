@@ -12,6 +12,7 @@
 	<meta http-equiv="pragma" content="no-cache">
 	<meta http-equiv="cache-control" content="no-cache">
 	<lams:css/>
+	<script language="JavaScript" type="text/JavaScript" src="<html:rewrite page='/includes/javascript/sha1.js'/>"></script>
 	<script language="JavaScript" type="text/JavaScript" src="<html:rewrite page='/includes/javascript/changeStyle.js'/>"></script>
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/getSysInfo.js"></script>
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/openUrls.js"></script>
