@@ -513,21 +513,36 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	 * @return  
 	 */
 	public function setPastedItem(o:Object):Object{
-		trace("called on right click");
-		if (o instanceof CanvasActivity){
-			//clone the activity
-			var newToolActivity:ToolActivity = o.activity.clone();
-			newToolActivity.title = Dictionary.getValue('prefix_copyof')+newToolActivity.title;
-			newToolActivity.activityUIID = _ddm.newUIID();
-			
-			_ddm.addActivity(newToolActivity);
-			canvasModel.setDirty();
-			return newToolActivity;
-		}else{
+		if (o.data instanceof CanvasActivity){
+			Debugger.log('instance is CA',Debugger.GEN,'setPastedItem','Canvas');
+			return pasteItem(o.data.activity, o);
+		} else if(o.data instanceof ToolActivity){
+			Debugger.log('instance is Tool',Debugger.GEN,'setPastedItem','Canvas');
+			return pasteItem(o.data, o);
+		} else{
 			Debugger.log('Cant paste this item!',Debugger.GEN,'setPastedItem','Canvas');
 		}
 	}
 	
+	
+	private function pasteItem(toolToCopy:ToolActivity, o:Object):Object{
+		//clone the activity
+		var newToolActivity:ToolActivity = toolToCopy.clone();
+		newToolActivity.activityUIID = _ddm.newUIID();
+			
+		if(o.type == Application.CUT_TYPE){ 
+			Application.getInstance().setClipboardData(newToolActivity, Application.COPY_TYPE);
+			removeActivity(o.data.activity.activityUIID); 
+		} else {
+			if(o.count <= 1) { newToolActivity.title = Dictionary.getValue('prefix_copyof')+newToolActivity.title; }
+			else { newToolActivity.title = Dictionary.getValue('prefix_copyof_count', [o.count])+newToolActivity.title; }
+		}
+		
+		_ddm.addActivity(newToolActivity);
+		canvasModel.setDirty();
+		
+		return newToolActivity;
+	}
 		
 	/**
 	 * Called from the toolbar usually - starts or stops the gate tool
@@ -570,6 +585,26 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		}
 	}
 	
+	public function stopActiveTool(){
+		switch(canvasModel.activeTool){
+			case CanvasModel.GATE_TOOL :
+				stopGateTool();
+				break;
+			case CanvasModel.OPTIONAL_TOOL :
+				stopOptionalActivity();
+				break;
+			case CanvasModel.GROUP_TOOL :
+				stopGroupTool();
+				break;
+			case CanvasModel.TRANSITION_TOOL :
+				stopTransitionTool();
+				break;
+			default :
+				Cursor.showCursor(Application.C_DEFAULT);
+				canvasModel.activeTool = null;
+
+		}
+	}
 	
 	public function startGateTool(){
 		Debugger.log('Starting gate tool',Debugger.GEN,'startGateTool','Canvas');

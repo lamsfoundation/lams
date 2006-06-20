@@ -83,7 +83,8 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
     private static var Z_KEY:Number = 90; 
     private static var Y_KEY:Number = 89;
 	
-	
+	public static var CUT_TYPE:Number = 0;
+	public static var COPY_TYPE:Number = 1;
 
 	private var _uiLoadCheckCount = 0;				// instance counter for number of times we have checked to see if theme and dict are loaded
 	private var _dataLoadCheckCount = 0;			
@@ -116,6 +117,8 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 	
 	//clipboard
 	private var _clipboardData:Object;
+	private var _clipboardPasteCount:Number;
+	
 	// set up Key Listener
 	//private var keyListener:Object;
     
@@ -570,8 +573,13 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 	 * @param   obj 
 	 * @return  
 	 */
-	public function setClipboardData(obj:Object):Void{
-		_clipboardData = obj;
+	public function setClipboardData(obj:Object, type:Number):Void{
+		// initialise new clipboard object
+		_clipboardData = new Object();
+		_clipboardData.data = obj;
+		_clipboardData.type = type;
+		_clipboardData.count = 0;
+		
 		trace("clipBoard data id"+_clipboardData);
 	}
 	
@@ -587,16 +595,19 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 	
 	
 	public function cut():Void{
-		 setClipboardData(_canvas.model.selectedItem);
+		trace("testing cut");
+		setClipboardData(_canvas.model.selectedItem, CUT_TYPE);
+		//_canvas.removeActivity(_canvas.model.selectedItem.activity.activityUIID);
 	}
 	
 	public function copy():Void{
 		trace("testing copy");
-		 setClipboardData(_canvas.model.selectedItem);
+		setClipboardData(_canvas.model.selectedItem, COPY_TYPE);
 	}
 	
 	public function paste():Void{
 		trace("testing paste");
+		_clipboardData.count++;
 		_canvas.setPastedItem(getClipboardData());
 	}
 	
