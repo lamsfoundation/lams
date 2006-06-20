@@ -1,4 +1,11 @@
 <%@ page contentType="text/html; charset=iso-8859-1" language="java" %>
+<script>
+	function encryptPassword(){
+		  var password=document.loginForm.j_password.value;	 
+		  document.loginForm.j_password.value=hex_sha1(password);
+		  return true;
+	}
+</script>
 <table width="100%" height="100%" border="0" align="center" cellpadding="2" cellspacing="0">
 	<tr>
 		<td colspan="3" align="center" valign="middle">
@@ -13,7 +20,7 @@
 			&nbsp;
 		</td>
 		<td width="200" style="{border-left: solid #CCCCCC 1px;}">
-			<form action="<%= response.encodeURL("j_security_check") %>" method="post" name="loginForm" id="loginForm">
+			<form action="<%= response.encodeURL("j_security_check") %>" method="post" name="loginForm" id="loginForm" onsubmit="encryptPassword()">
 				<%String failed = request.getParameter("failed");
 				if ( failed != null ){%>
 					<span class="error">
@@ -48,12 +55,13 @@
 						</td>
 					</tr>
 					<!-- TODO: show "webauth login" only if webauth is enabled -->
+					<!--
 					<tr>
 						<td colspan="3" align="left" class="smallText">
 							<a href="https://array00.melcoe.mq.edu.au/lams/webauth">WebAuth Users: click here</a> 
 						</td>
 					</tr>
-							
+					-->		
 				</table>
 			</form>
 			<img height="1" src="images/spacer.gif" width="200" alt="spacer.gif"/>
