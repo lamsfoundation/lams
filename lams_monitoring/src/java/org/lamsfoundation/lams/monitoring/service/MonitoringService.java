@@ -1358,7 +1358,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         openScheduleGateJob.setName("openGate:" + scheduleGate.getActivityId());
         openScheduleGateJob.setDescription(scheduleGate.getTitle()+":"+lessonName);
         openScheduleGateJob.getJobDataMap().put("gateId",scheduleGate.getActivityId());
-        closeScheduleGateJob.setName("closeGate");
+        closeScheduleGateJob.setName("closeGate:" + scheduleGate.getActivityId());
         closeScheduleGateJob.getJobDataMap().put("gateId",scheduleGate.getActivityId());
         closeScheduleGateJob.setDescription(scheduleGate.getTitle()+":"+lessonName);
 
