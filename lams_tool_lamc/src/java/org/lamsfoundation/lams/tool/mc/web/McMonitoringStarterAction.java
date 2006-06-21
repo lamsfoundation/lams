@@ -348,6 +348,9 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 	    request.getSession().setAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO, listMonitoredAnswersContainerDTO);
 	    logger.debug("LIST_MONITORED_ANSWERS_CONTAINER_DTO: " + request.getSession().getAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO));
 	    
+	    List listMonitoredMarksContainerDTO=MonitoringUtil.buildGroupsMarkData(request, mcContent, mcService);
+	    request.getSession().setAttribute(LIST_MONITORED_MARKS_CONTAINER_DTO, listMonitoredMarksContainerDTO);
+	    logger.debug("LIST_MONITORED_MARKS_CONTAINER_DTO: " + request.getSession().getAttribute(LIST_MONITORED_MARKS_CONTAINER_DTO));
 	    /* ends here*/
 	    
 	    /* this section is related to instructions tab. Starts here. */

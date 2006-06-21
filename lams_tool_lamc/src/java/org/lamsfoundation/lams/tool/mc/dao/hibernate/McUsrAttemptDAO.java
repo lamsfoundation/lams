@@ -184,7 +184,7 @@ public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemp
 		    	        logger.debug("queUsrUid equal:"  + queUsrUid);
 			    	    if (attempt.getMcQueUsr().getMcSession().getUid().toString().equals(mcSessionUid.toString()))
 			    	    {
-			    	        logger.debug("user belong to this session:"  + mcSessionUid);
+			    	        logger.debug("user belongs to this session:"  + mcSessionUid);
 			    	        
 			    	        if (attempt.getAttemptOrder().intValue() == attemptOrder.intValue()) 
 			    	            userEntries.add(attempt);    

@@ -337,25 +337,26 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     	    McUsrAttempt mcUsrAttempt = mcService.getAttemptWithLastAttemptOrderForUserInSession(mcQueUsr.getUid(), mcSession.getUid());
         	logger.debug("mcUsrAttempt with highest attempt order: " + mcUsrAttempt);
         	String highestAttemptOrder="";
+
         	if (mcUsrAttempt != null)
         	{
             	highestAttemptOrder=mcUsrAttempt.getAttemptOrder().toString();
+            	logger.debug("highestAttemptOrder: " + highestAttemptOrder);
+        	    List userAttempts=mcService.getAttemptsForUserOnHighestAttemptOrderInSession(mcQueUsr.getUid(), mcSession.getUid(), new Integer(highestAttemptOrder));
+        	    logger.debug("userAttempts:" + userAttempts);
+        	    
+    			Iterator itAttempts=userAttempts.iterator();
+    			while (itAttempts.hasNext())
+    			{
+    	    		mcUsrAttempt=(McUsrAttempt)itAttempts.next();
+    	    		logger.debug("mcUsrAttempt: " + mcUsrAttempt);
+    	    		mcUsrAttempt.setFinished(true);
+    	    		mcService.updateMcUsrAttempt(mcUsrAttempt);
+    			}
+    			logger.debug("updated user records to finished");
         	}
-        	logger.debug("highestAttemptOrder: " + highestAttemptOrder);
 
     	    
-    	    List userAttempts=mcService.getAttemptsForUserOnHighestAttemptOrderInSession(mcQueUsr.getUid(), mcSession.getUid(), new Integer(highestAttemptOrder));
-    	    logger.debug("userAttempts:" + userAttempts);
-    	    
-			Iterator itAttempts=userAttempts.iterator();
-			while (itAttempts.hasNext())
-			{
-	    		mcUsrAttempt=(McUsrAttempt)itAttempts.next();
-	    		logger.debug("mcUsrAttempt: " + mcUsrAttempt);
-	    		mcUsrAttempt.setFinished(true);
-	    		mcService.updateMcUsrAttempt(mcUsrAttempt);
-			}
-			logger.debug("updated user records to finished");
     		
     		/* pay attention here*/
     		logger.debug("redirecting to the nextUrl: "+ nextUrl);
