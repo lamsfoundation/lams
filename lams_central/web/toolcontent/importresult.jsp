@@ -27,7 +27,6 @@
 						<h1>
 							<fmt:message key="msg.import.success" />
 						</h1>
-						<a href="javascript:;" onclick="openDesign(${learningDesignID});" class="button" style="float:none;width:200"><fmt:message key="button.open.design" /></a>
 					</c:when>
 					<c:otherwise>
 						<h1>
@@ -41,8 +40,9 @@
 								${toolError}
 							</li>
 						</c:forEach>
-						<a href="javascript:;" onclick="openDesign(${learningDesignID});" class="button" style="float:none;width:200"><fmt:message key="button.open.design" /></a>
 					</c:otherwise>
+					<%-- display new learing desing in Flash side even some tool import failed --%>
+					<%@include file="import_passon.jsp"%>
 				</c:choose>
 			</c:when>
 			<c:otherwise>
@@ -50,11 +50,10 @@
 					<fmt:message key="msg.import.failed" />
 				</h1>
 				<b><fmt:message key="msg.reason.is" /> ${ldErrorMessages}</b>
-				<P>
-				<div align="center">
-					<a href="javascript:;" onclick="closeWin();" class="button" style="float:none"><fmt:message key="button.close" /></a>
-				</div>
 			</c:otherwise>
 		</c:choose>
+		<div align="center">
+			<a href="javascript:;" onclick="closeWin();" class="button"><fmt:message key="button.close" /></a>
+		</div>
 	</BODY>
 </HTML>
