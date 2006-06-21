@@ -41,7 +41,7 @@
 							Password
 						</td>
 						<td colspan="2" align="right">
-							<input name="j_password" type="password" class="textField" size="15" />
+							<input name="j_password" type="password" class="textField" size="15" AUTOCOMPLETE="off"/>
 						</td>
 					</tr>
 					<tr>
