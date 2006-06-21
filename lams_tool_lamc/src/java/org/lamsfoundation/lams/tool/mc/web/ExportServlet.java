@@ -117,9 +117,12 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Mc
 	    request.getSession().setAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO, listMonitoredAnswersContainerDTO);
 	    logger.debug("LIST_MONITORED_ANSWERS_CONTAINER_DTO: " + request.getSession().getAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO));
 	    
-	    List listMonitoredMarksContainerDTO=MonitoringUtil.buildGroupsMarkData(request, content, mcService);
+	    
+	    List listMonitoredMarksContainerDTO=MonitoringUtil.buildGroupsMarkDataForExportLearner(request, content, mcService, mcSession, learner.getUid() );
 	    request.getSession().setAttribute(LIST_MONITORED_MARKS_CONTAINER_DTO, listMonitoredMarksContainerDTO);
 	    logger.debug("LIST_MONITORED_MARKS_CONTAINER_DTO: " + request.getSession().getAttribute(LIST_MONITORED_MARKS_CONTAINER_DTO));
+	    
+	    request.getSession().setAttribute(LEARNER_NAME,learner.getFullname() );
 
         
     	logger.debug("ending learner mode: ");

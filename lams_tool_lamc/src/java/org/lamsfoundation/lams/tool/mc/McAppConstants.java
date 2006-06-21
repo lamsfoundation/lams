@@ -250,6 +250,7 @@ public interface McAppConstants {
     public static final String CURRENT_MONITORED_TOOL_SESSION 			="currentMonitoredToolSession";
     public static final String SELECTION_CASE							="selectionCase";
     public static final String LIST_MONITORED_ANSWERS_CONTAINER_DTO		="listMonitoredAnswersContainerDto";
+    public static final String LEARNER_NAME								="learnerName";
     public static final String LIST_MONITORED_MARKS_CONTAINER_DTO		="listMonitoredMarksContainerDto";
     public static final String TIMEZONE									="timeZone";
     
