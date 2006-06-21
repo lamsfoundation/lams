@@ -1,8 +1,7 @@
 // Constants
 var GROUPCHAT_MSG = "groupchat_message";
 var PRIVATE_MSG = "private_message";
-
-var colors = new Array('maroon','green','olive','navy','purple','teal','red','blue');
+var colors = new Array("0000FF", "006699", "0066FF", "6633FF", "00CCFF", "009900", "00CC33", "339900", "008080", "66FF66", "CC6600", "FF6600", "FF9900", "CC6633", "FF9933", "990000", "A50021", "990033", "CC3300", "FF6666", "330033", "663399", "6633CC", "660099", "FF00FF", "999900", "808000", "FFFF00", "666633", "CCFF00", "292929", "666666");
 
 // Variables
 var roster = new Roster();
@@ -19,13 +18,12 @@ function htmlEnc(str) {
     str = str.replace(/\n/g, "<br />");
     return str;
 }
-
 function getColor(nick) {
-	var charSum = 0;
-	for (var i=0; i<nick.length; i++)
-    	  charSum += nick.charCodeAt(i);
-    	  
-	return colors[charSum%(colors.length)];
+    var charSum = 0;
+    for (var i = 0; i < nick.length; i++) {
+        charSum += nick.charCodeAt(i);
+    }
+    return colors[charSum % (colors.length)];
 }
 
 // Roster 
@@ -79,20 +77,16 @@ function updateSendDisplay() {
     var userName;
     if (MODE == "teacher" && !(selectedIndex == -1)) {
         var userName = rosterList.options[rosterList.selectedIndex].value;
-
-        document.getElementById("sendToUser").innerHTML = "<span style='color:" + getColor(userName) + "'>" + userName +"</span>";
-        
-        document.getElementById("sendToEveryone").style.display="none";
-        document.getElementById("sendToUser").style.display="";
-        
+        document.getElementById("sendToUser").innerHTML = "<span style='color:" + getColor(userName) + "'>" + userName + "</span>";
+        document.getElementById("sendToEveryone").style.display = "none";
+        document.getElementById("sendToUser").style.display = "";
     } else {
-        document.getElementById("sendToUser").style.display="none";
-        document.getElementById("sendToEveryone").style.display="";
+        document.getElementById("sendToUser").style.display = "none";
+        document.getElementById("sendToEveryone").style.display = "";
     }
 }
 function generateMessageHTML(nick, message, type) {
-	
-	return "<div style='color:" + getColor(nick) + "' class='message " + type + "'><span style='color:" + getColor(nick) + "' class='messageFrom' >" + nick + "</span><br/>" + message + "<div/>";
+    return "<div style='color:" + getColor(nick) + "' class='message " + type + "'><span style='color:" + getColor(nick) + "' class='messageFrom' >" + nick + "</span><br/>" + message + "<div/>";
 }
 function updateMessageDisplay(htmlMessage) {
     var iRespDiv = document.getElementById("iResp");
@@ -163,18 +157,17 @@ function handlePresence(presence) {
 function handleConnected() {
     document.getElementById("login_pane").style.display = "none";
     document.getElementById("chat_pane").style.display = "";
-	
-	if (MODE == "learner") {
-	    if ( LEARNER_FINISHED == "true") {
-		    if (LOCK_ON_FINISHED == "true") {
+    if (MODE == "learner") {
+        if (LEARNER_FINISHED == "true") {
+            if (LOCK_ON_FINISHED == "true") {
     			// disable sending messages.
-	    		document.getElementById("msgArea").disabled="disabled";
-    			document.getElementById("sendButton").disabled="disabled";
-    			document.getElementById("clearButton").disabled="disabled";
-    		}       		
-   		} else {
-			document.getElementById("finishButton_pane").style.display ="";	
-    	}   
+                document.getElementById("msgArea").disabled = "disabled";
+                document.getElementById("sendButton").disabled = "disabled";
+                document.getElementById("clearButton").disabled = "disabled";
+            }
+        } else {
+            document.getElementById("finishButton_pane").style.display = "";
+        }
     }
 
 	// send presence
@@ -233,11 +226,11 @@ function sendMsg(aForm) {
         var toNick = rosterList.options[selectedIndex].value;
         aMsg.setTo(CONFERENCEROOM + "/" + toNick);
         aMsg.setType("chat");
-  		// apending the private message to the incoming window, 
+  		// apending the private message to the incoming window,
   		// since the jabber server will not echo sent private messages.
   		// TODO: need to check if this is correct behaviour
         if (!(NICK == toNick)) {
-        	updateMessageDisplay(generateMessageHTML(NICK, aForm.msg.value, PRIVATE_MSG));
+            updateMessageDisplay(generateMessageHTML(NICK, aForm.msg.value, PRIVATE_MSG));
         }
     } else {
         aMsg.setTo(CONFERENCEROOM);
