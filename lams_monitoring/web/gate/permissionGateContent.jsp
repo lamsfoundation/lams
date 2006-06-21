@@ -39,10 +39,13 @@
 				<tr> 
 					<td class="body" valign="middle"><fmt:message key="label.gate.you.open.message"/>
 
+					<%-- set to read only if in export portfolio --%>
+					<c:if test="${not GateForm.map.readOnly}"> 
 					<c:if test="${not GateForm.map.gate.gateOpen}" >
 						<html:form action="/gate?method=openGate" target="_self">
 							<html:submit styleClass="button"><fmt:message key="label.gate.open"/></html:submit> 
 						</html:form>
+					</c:if>
 					</c:if>
 				</td>
 				</tr>

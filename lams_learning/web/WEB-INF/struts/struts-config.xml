@@ -126,11 +126,6 @@
       unknown="false"
       validate="false"
     >
-      <forward
-        name="previewDefineLater"
-        path=".previewDefineLater"
-        redirect="false"
-      />
     </action>
     <action
       path="/CompleteActivity"
@@ -261,6 +256,11 @@
       <forward
         name="displayTool"
         path=".loadToolActivity"
+        redirect="false"
+      />
+      <forward
+        name="previewDefineLater"
+        path=".previewDefineLater"
         redirect="false"
       />
     </action>

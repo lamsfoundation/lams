@@ -148,32 +148,9 @@ public class ToolActivity extends SimpleActivity implements Serializable
      */
     public Activity createCopy(){    	
     	ToolActivity newToolActivity = new ToolActivity();
-    	 
+    	copyToNewActivity(newToolActivity);
 		newToolActivity.setTool(this.getTool());
 		newToolActivity.setToolContentId(this.getToolContentId());    	
-		newToolActivity.setActivityUIID(this.getActivityUIID());
-    	newToolActivity.setDescription(this.getDescription());
-    	newToolActivity.setTitle(this.getTitle());
-    	newToolActivity.setHelpText(this.getHelpText());
-    	newToolActivity.setXcoord(this.getXcoord());
-    	newToolActivity.setYcoord(this.getYcoord());
-    	newToolActivity.setActivityTypeId(this.getActivityTypeId());
-    	
-    	newToolActivity.setGroupingSupportType(this.getGroupingSupportType());
-    	newToolActivity.setApplyGrouping(this.getApplyGrouping());
-    	newToolActivity.setGrouping(this.getGrouping());
-    	
-    	newToolActivity.setGroupingUIID(this.getGroupingUIID());
-    	newToolActivity.setOrderId(this.getOrderId());
-    	newToolActivity.setDefineLater(this.getDefineLater());
-    	newToolActivity.setLearningLibrary(this.getLearningLibrary());
-    	newToolActivity.setCreateDateTime(new Date());
-    	newToolActivity.setRunOffline(this.getRunOffline());
-    	newToolActivity.setActivityCategoryID(this.getActivityCategoryID());
-    	newToolActivity.setLibraryActivityUiImage(this.getLibraryActivityUiImage());
-    	newToolActivity.setLibraryActivity(this.getLibraryActivity());
-    	newToolActivity.setLanguageFile(this.getLanguageFile());
-    	
     	return newToolActivity;
     }    
     

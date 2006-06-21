@@ -30,6 +30,7 @@ import java.util.Set;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.strategy.GateActivityStrategy;
+import org.lamsfoundation.lams.tool.SystemTool;
 import org.lamsfoundation.lams.usermanagement.User;
 
 
@@ -77,7 +78,8 @@ public abstract class GateActivity extends SystemToolActivity implements Seriali
             Transition transitionFrom,
             String languageFile,
             Integer gateActivityLevelId,
-            Set waitingLearners)
+            Set waitingLearners,
+            SystemTool sysTool)
     {
         super(activityId,
                 id,
@@ -97,7 +99,8 @@ public abstract class GateActivity extends SystemToolActivity implements Seriali
                 activityTypeId,
                 transitionTo,
 				transitionFrom,
-				languageFile);
+				languageFile,
+				sysTool);
         this.gateActivityLevelId = gateActivityLevelId;
         this.waitingLearners = waitingLearners;
     }

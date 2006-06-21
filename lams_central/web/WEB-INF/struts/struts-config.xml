@@ -63,11 +63,10 @@
       />
     </action>
     <action
-      path=""
+      path="/authoring/importToolContent"
       type="org.lamsfoundation.lams.authoring.web.ImportToolContentAction"
       name="ImportAction"
       scope="request"
-      parameter="method"
       unknown="false"
       validate="false"
     >
@@ -124,13 +123,17 @@
         path=".passwordChange"
         redirect="false"
       />
+      <forward
+        name="index"
+        path="/login.jsp"
+        redirect="false"
+      />
     </action>
     <action
-      path=""
+      path="/authoring/exportToolContent"
       type="org.lamsfoundation.lams.authoring.web.ExportToolContentAction"
       name="ExportAction"
       scope="request"
-      parameter="method"
       unknown="false"
       validate="false"
     >

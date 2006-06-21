@@ -40,6 +40,12 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  */
 public class SystemTool implements Serializable {
 
+	/* System Tool IDs */
+	public static final Long GROUPING = new Long(1);
+	public static final Long SYNC_GATE = new Long(2);
+	public static final Long SCHEDULE_GATE = new Long(3);
+	public static final Long PERMISSION_GATE = new Long(4);
+	
     /** identifier field */
     private Long systemToolId;
 

@@ -32,8 +32,10 @@ import java.util.Set;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ChosenGrouping;
+import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
@@ -43,7 +45,6 @@ import org.lamsfoundation.lams.learningdesign.LearningLibrary;
 import org.lamsfoundation.lams.learningdesign.License;
 import org.lamsfoundation.lams.learningdesign.OptionsActivity;
 import org.lamsfoundation.lams.learningdesign.ParallelActivity;
-import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.PermissionGateActivity;
 import org.lamsfoundation.lams.learningdesign.RandomGrouping;
 import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
@@ -59,11 +60,12 @@ import org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningLibraryDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.LicenseDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.TransitionDAO;
 import org.lamsfoundation.lams.lesson.LessonClass;
+import org.lamsfoundation.lams.tool.SystemTool;
 import org.lamsfoundation.lams.tool.Tool;
+import org.lamsfoundation.lams.tool.dao.hibernate.SystemToolDAO;
 import org.lamsfoundation.lams.tool.dao.hibernate.ToolDAO;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
-import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
 import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
@@ -97,6 +99,7 @@ public class ObjectExtractor implements IObjectExtractor {
 	protected LicenseDAO licenseDAO = null;
 	protected GroupingDAO groupingDAO = null;
 	protected ToolDAO toolDAO = null;
+	protected SystemToolDAO systemToolDAO = null;
 	protected GroupDAO groupDAO = null;
 
 	/** The newActivityMap is a local copy of all the current activities. This will include
@@ -122,7 +125,7 @@ public class ObjectExtractor implements IObjectExtractor {
 	public ObjectExtractor(BaseDAO baseDAO,
 			LearningDesignDAO learningDesignDAO, ActivityDAO activityDAO,
 			LearningLibraryDAO learningLibraryDAO, LicenseDAO licenseDAO,
-			GroupingDAO groupingDAO, ToolDAO toolDAO,
+			GroupingDAO groupingDAO, ToolDAO toolDAO, SystemToolDAO systemToolDAO,
 			GroupDAO groupDAO,TransitionDAO transitionDAO) {		
 		this.baseDAO = baseDAO;
 		this.learningDesignDAO = learningDesignDAO;
@@ -131,6 +134,7 @@ public class ObjectExtractor implements IObjectExtractor {
 		this.licenseDAO = licenseDAO;
 		this.groupingDAO = groupingDAO;
 		this.toolDAO = toolDAO;
+		this.systemToolDAO = systemToolDAO;
 		this.groupDAO = groupDAO;
 		this.transitionDAO = transitionDAO;
 	}
@@ -198,6 +202,15 @@ public class ObjectExtractor implements IObjectExtractor {
 
 	public void setToolDAO(ToolDAO toolDAO) {
 		this.toolDAO = toolDAO;
+	}
+
+	
+	public SystemToolDAO getSystemToolDAO() {
+		return systemToolDAO;
+	}
+
+	public void setSystemToolDAO(SystemToolDAO systemToolDAO) {
+		this.systemToolDAO = systemToolDAO;
 	}
 
 	public TransitionDAO getTransitionDAO() {
@@ -715,6 +728,10 @@ public class ObjectExtractor implements IObjectExtractor {
 		    groupingActivity.setCreateGrouping(grouping);
 		    groupingActivity.setCreateGroupingUIID(createGroupingUIID);
 	    }
+	    
+		SystemTool systemTool = systemToolDAO.getSystemToolByID(SystemTool.GROUPING);
+		groupingActivity.setSystemTool(systemTool);
+		
 	    /*Hashtable groupingDetails = (Hashtable) activityDetails.get(WDDXTAGS.GROUPING_DTO); 
 		if( groupingDetails != null ){
 			Grouping grouping = extractGroupingObject(groupingDetails);		
@@ -761,14 +778,20 @@ public class ObjectExtractor implements IObjectExtractor {
 				
 	}
 	private void buildSynchGateActivity(SynchGateActivity activity,Hashtable activityDetails) throws WDDXProcessorConversionException{	
+		SystemTool systemTool = systemToolDAO.getSystemToolByID(SystemTool.SYNC_GATE);
+		activity.setSystemTool(systemTool);
 	}
 	private void buildPermissionGateActivity(PermissionGateActivity activity,Hashtable activityDetails) throws WDDXProcessorConversionException{		
+		SystemTool systemTool = systemToolDAO.getSystemToolByID(SystemTool.PERMISSION_GATE);
+		activity.setSystemTool(systemTool);
 	}
-	private static void buildScheduleGateActivity(ScheduleGateActivity activity,Hashtable activityDetails) throws WDDXProcessorConversionException{
+	private void buildScheduleGateActivity(ScheduleGateActivity activity,Hashtable activityDetails) throws WDDXProcessorConversionException{
 	    //activity.setGateStartDateTime(WDDXProcessor.convertToDate(activityDetails,WDDXTAGS.GATE_START_DATE));
 		//activity.setGateEndDateTime(WDDXProcessor.convertToDate(activityDetails,WDDXTAGS.GATE_END_DATE));
 		activity.setGateStartTimeOffset(WDDXProcessor.convertToLong(activityDetails,WDDXTAGS.GATE_START_OFFSET));
 		activity.setGateEndTimeOffset(WDDXProcessor.convertToLong(activityDetails,WDDXTAGS.GATE_END_OFFSET));		
+		SystemTool systemTool = systemToolDAO.getSystemToolByID(SystemTool.SCHEDULE_GATE);
+		activity.setSystemTool(systemTool);
 	}
 	
 

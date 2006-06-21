@@ -29,6 +29,7 @@ import java.util.Set;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.strategy.SynchGateActivityStrategy;
+import org.lamsfoundation.lams.tool.SystemTool;
 
 
 /** 
@@ -58,7 +59,8 @@ public class SynchGateActivity extends GateActivity implements Serializable {
             Transition transitionFrom,
             String languageFile,
             Integer gateActivityLevelId,
-            Set waitingLearners) {
+            Set waitingLearners,
+            SystemTool sysTool) {
         super(activityId, 
                 id, 
                 description, 
@@ -79,7 +81,8 @@ public class SynchGateActivity extends GateActivity implements Serializable {
 				transitionFrom,
 				languageFile,
                 gateActivityLevelId,
-                waitingLearners);
+                waitingLearners,
+                sysTool);
         super.simpleActivityStrategy = new SynchGateActivityStrategy(this);
     }
 
@@ -123,32 +126,9 @@ public class SynchGateActivity extends GateActivity implements Serializable {
      */    
     public Activity createCopy() {
     	SynchGateActivity newSynchGateActivity = new SynchGateActivity();
-    	
+    	copyToNewActivity(newSynchGateActivity);
     	newSynchGateActivity.setGateActivityLevelId(this.getGateActivityLevelId());
     	newSynchGateActivity.setGateOpen(new Boolean(false));
-    	
-    	newSynchGateActivity.setActivityUIID(this.getActivityUIID());
-    	newSynchGateActivity.setDescription(this.getDescription());
-    	newSynchGateActivity.setTitle(this.getTitle());
-    	newSynchGateActivity.setHelpText(this.getHelpText());    	
-    	newSynchGateActivity.setXcoord(this.getXcoord());
-    	newSynchGateActivity.setYcoord(this.getYcoord());
-    	newSynchGateActivity.setActivityTypeId(this.getActivityTypeId());
-    	
-    	newSynchGateActivity.setGroupingSupportType(this.getGroupingSupportType());
-    	newSynchGateActivity.setApplyGrouping(this.getApplyGrouping());
-    	newSynchGateActivity.setActivityCategoryID(this.getActivityCategoryID());
-    	
-    	newSynchGateActivity.setGrouping(this.getGrouping());
-    	newSynchGateActivity.setGroupingUIID(this.getGroupingUIID());
-    	newSynchGateActivity.setLearningLibrary(this.getLearningLibrary());
-    	newSynchGateActivity.setDefineLater(this.getDefineLater());
-    	newSynchGateActivity.setCreateDateTime(new Date());
-    	newSynchGateActivity.setRunOffline(this.getRunOffline());
-    	newSynchGateActivity.setLibraryActivity(this.getLibraryActivity());
-    	newSynchGateActivity.setLibraryActivityUiImage(this.getLibraryActivityUiImage());
-    	newSynchGateActivity.setLanguageFile(this.getLanguageFile());
-    	
     	return newSynchGateActivity;    	
     }
 

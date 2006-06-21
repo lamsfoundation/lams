@@ -37,7 +37,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<title><fmt:message key="label.view.groups.title"/></title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<lams:css/>
-		<META HTTP-EQUIV="Refresh" CONTENT="300;URL=<lams:WebAppURL/>/grouping.do?method=performGrouping">
+		<META HTTP-EQUIV="Refresh" CONTENT="300;URL=<lams:WebAppURL/>/grouping.do?method=performGrouping&activityID=${activity.activityId}">
 	  </head>
 
       <tiles:insert attribute="body" />

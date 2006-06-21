@@ -28,14 +28,13 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Set;
-import java.util.Vector;
 import java.util.TimeZone;
+import java.util.Vector;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
-//import org.lamsfoundation.lams.learningdesign.exception.ActivityBehaviorException;
 import org.lamsfoundation.lams.learningdesign.strategy.ScheduleGateActivityStrategy;
-
+import org.lamsfoundation.lams.tool.SystemTool;
 import org.lamsfoundation.lams.util.MessageService;
 
 /**
@@ -109,7 +108,8 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
             Integer gateActivityLevelId,
             Long gateStartTimeOffset, 
             Long gateEndTimeOffset,
-            Set waitingLearners) {
+            Set waitingLearners,
+            SystemTool sysTool) {
         super(activityId, 
                 id,
                 description,
@@ -130,7 +130,8 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
 				transitionFrom,
 				languageFile,
                 gateActivityLevelId,
-                waitingLearners);
+                waitingLearners,
+                sysTool);
         //validate pre-condition.
         if(gateStartTimeOffset != null && gateEndTimeOffset != null && (gateStartTimeOffset.intValue()>gateEndTimeOffset.intValue()))
             throw new IllegalStateException("End time offset must be larger" +
@@ -187,7 +188,7 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
      */
     public Activity createCopy(){
     	ScheduleGateActivity newScheduleGateActivity = new ScheduleGateActivity();
-    	
+    	copyToNewActivity(newScheduleGateActivity);
     	newScheduleGateActivity.setGateActivityLevelId(this.getGateActivityLevelId());
     	newScheduleGateActivity.setGateOpen(new Boolean(false));
     	
@@ -195,28 +196,6 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
     	newScheduleGateActivity.setGateStartTimeOffset(this.getGateStartTimeOffset());
     	newScheduleGateActivity.setGateEndDateTime(this.getGateEndDateTime());
 		newScheduleGateActivity.setGateStartDateTime(this.getGateStartDateTime());
-		
-    	newScheduleGateActivity.setActivityUIID(this.getActivityUIID());
-    	newScheduleGateActivity.setDescription(this.getDescription());
-    	newScheduleGateActivity.setTitle(this.getTitle());
-    	newScheduleGateActivity.setHelpText(this.getHelpText());
-    	newScheduleGateActivity.setXcoord(this.getXcoord());
-    	newScheduleGateActivity.setYcoord(this.getYcoord());
-    	newScheduleGateActivity.setActivityTypeId(this.getActivityTypeId());
-    	
-    	newScheduleGateActivity.setGroupingSupportType(this.getGroupingSupportType());
-    	newScheduleGateActivity.setApplyGrouping(this.getApplyGrouping());
-    	newScheduleGateActivity.setActivityCategoryID(this.getActivityCategoryID());
-    	
-    	newScheduleGateActivity.setGrouping(this.getGrouping());
-    	newScheduleGateActivity.setGroupingUIID(this.getGroupingUIID());
-    	newScheduleGateActivity.setLearningLibrary(this.getLearningLibrary());    	
-    	newScheduleGateActivity.setDefineLater(this.getDefineLater());
-    	newScheduleGateActivity.setCreateDateTime(new Date());
-    	newScheduleGateActivity.setRunOffline(this.getRunOffline());
-    	newScheduleGateActivity.setLibraryActivity(this.getLibraryActivity());
-    	newScheduleGateActivity.setLibraryActivityUiImage(this.getLibraryActivityUiImage());
-    	newScheduleGateActivity.setLanguageFile(this.getLanguageFile());
     	return newScheduleGateActivity;
     }
 

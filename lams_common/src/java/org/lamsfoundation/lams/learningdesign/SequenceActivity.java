@@ -119,29 +119,7 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
      */
     public Activity createCopy(){
     	SequenceActivity newSequenceActivity = new SequenceActivity();
-    	
-    	newSequenceActivity.setActivityUIID(this.getActivityUIID());
-    	newSequenceActivity.setDescription(this.getDescription());
-    	newSequenceActivity.setTitle(this.getTitle());
-    	newSequenceActivity.setHelpText(this.getHelpText());
-    	newSequenceActivity.setXcoord(this.getXcoord());
-    	newSequenceActivity.setYcoord(this.getYcoord());
-    	newSequenceActivity.setActivityTypeId(this.getActivityTypeId());
-    	
-    	newSequenceActivity.setGroupingSupportType(this.getGroupingSupportType());
-    	newSequenceActivity.setApplyGrouping(this.getApplyGrouping());
-    	newSequenceActivity.setActivityCategoryID(this.getActivityCategoryID());
-    	
-    	newSequenceActivity.setGrouping(this.getGrouping());
-    	newSequenceActivity.setGroupingUIID(this.getGroupingUIID());
-    	newSequenceActivity.setLearningLibrary(this.getLearningLibrary());
-    	newSequenceActivity.setDefineLater(this.getDefineLater());
-    	newSequenceActivity.setCreateDateTime(new Date());
-    	newSequenceActivity.setRunOffline(this.getRunOffline());
-    	
-    	newSequenceActivity.setLibraryActivity(this.getLibraryActivity());
-		newSequenceActivity.setLibraryActivityUiImage(this.getLibraryActivityUiImage());    	
-    	newSequenceActivity.setLanguageFile(this.getLanguageFile());
+    	copyToNewActivity(newSequenceActivity);
 		return newSequenceActivity;
     }
 

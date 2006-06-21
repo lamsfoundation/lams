@@ -29,6 +29,7 @@ import java.util.Set;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.strategy.PermissionGateActivityStrategy;
+import org.lamsfoundation.lams.tool.SystemTool;
 
 
 /**
@@ -59,7 +60,8 @@ public class PermissionGateActivity extends GateActivity implements Serializable
             Transition transitionFrom,
             String languageFile,
             Integer gateActivityLevelId,
-            Set waitingLearners)
+            Set waitingLearners,
+            SystemTool sysTool)
     {
         super(activityId,
                 id,
@@ -81,7 +83,8 @@ public class PermissionGateActivity extends GateActivity implements Serializable
 				transitionFrom,
 				languageFile,
                 gateActivityLevelId,
-                waitingLearners);
+                waitingLearners,
+                sysTool);
         super.simpleActivityStrategy = new PermissionGateActivityStrategy(this);
     }
     
@@ -125,31 +128,9 @@ public class PermissionGateActivity extends GateActivity implements Serializable
      */
     public Activity createCopy(){
     	PermissionGateActivity newPermissionGateActivity = new PermissionGateActivity();
-    	
+    	copyToNewActivity(newPermissionGateActivity);
     	newPermissionGateActivity.setGateOpen(new Boolean(false));
     	newPermissionGateActivity.setGateActivityLevelId(this.getGateActivityLevelId());
-    	
-    	newPermissionGateActivity.setActivityUIID(this.getActivityUIID());
-    	newPermissionGateActivity.setDescription(this.getDescription());
-    	newPermissionGateActivity.setTitle(this.getTitle());
-    	newPermissionGateActivity.setHelpText(this.getHelpText());
-    	newPermissionGateActivity.setXcoord(this.getXcoord());
-    	newPermissionGateActivity.setYcoord(this.getYcoord());
-    	newPermissionGateActivity.setActivityTypeId(this.getActivityTypeId());
-    	
-    	newPermissionGateActivity.setGroupingSupportType(this.getGroupingSupportType());
-    	newPermissionGateActivity.setApplyGrouping(this.getApplyGrouping());
-    	newPermissionGateActivity.setActivityCategoryID(this.getActivityCategoryID());
-    	
-    	newPermissionGateActivity.setGrouping(this.getGrouping());
-    	newPermissionGateActivity.setGroupingUIID(this.getGroupingUIID());
-    	newPermissionGateActivity.setLearningLibrary(this.getLearningLibrary());    	
-    	newPermissionGateActivity.setDefineLater(this.getDefineLater());
-    	newPermissionGateActivity.setCreateDateTime(new Date());
-    	newPermissionGateActivity.setRunOffline(this.getRunOffline());
-    	newPermissionGateActivity.setLibraryActivity(this.getLibraryActivity());
-    	newPermissionGateActivity.setLibraryActivityUiImage(this.getLibraryActivityUiImage());
-    	newPermissionGateActivity.setLanguageFile(this.getLanguageFile());
     	return newPermissionGateActivity;
     	
     }

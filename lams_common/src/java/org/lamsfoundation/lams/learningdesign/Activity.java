@@ -813,12 +813,41 @@ public abstract class Activity implements Serializable,Nullable {
 	}
 	
 	/** Create a deep copy of the this activity. It should return the same
-	 * subclass as the activity being copied 
+	 * subclass as the activity being copied. Generally doesn't copy the "link" type
+	 * fields like transitions, learning design, etc
 	 * @return deep copy of this object
 	 */
    public abstract Activity createCopy();
 
-   
+   protected void copyToNewActivity(Activity newActivity ) {
+
+	   	newActivity.setActivityUIID(this.getActivityUIID());
+	   	newActivity.setDescription(this.getDescription());
+	   	newActivity.setTitle(this.getTitle());
+	   	newActivity.setHelpText(this.getHelpText());
+	   	newActivity.setXcoord(this.getXcoord());
+	   	newActivity.setYcoord(this.getYcoord());    	    
+	   	newActivity.setActivityTypeId(this.getActivityTypeId());
+			
+	   	newActivity.setGroupingSupportType(this.getGroupingSupportType());
+	   	newActivity.setApplyGrouping(this.getApplyGrouping());
+	   	newActivity.setActivityCategoryID(this.getActivityCategoryID());
+			
+	   	newActivity.setGrouping(this.getGrouping());
+	   	newActivity.setGroupingUIID(this.getGroupingUIID());
+	
+	   	newActivity.setDefineLater(this.getDefineLater());    	
+	   	newActivity.setCreateDateTime(new Date()); 
+	   	newActivity.setRunOffline(this.getRunOffline());
+	   	newActivity.setLearningLibrary(this.getLearningLibrary());    	
+	   	newActivity.setLibraryActivity(this.getLibraryActivity());
+	   	newActivity.setLibraryActivityUiImage(this.getLibraryActivityUiImage());
+	   	newActivity.setLanguageFile(this.getLanguageFile());
+			
+	   	newActivity.setOrderId(this.getOrderId());
+   }
+	
+	
    // ---------------------------------------------------------------------
    // Data Validation methods
    //---------------------------------------------------------------------

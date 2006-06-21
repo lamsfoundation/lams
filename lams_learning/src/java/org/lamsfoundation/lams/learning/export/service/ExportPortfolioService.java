@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Vector;
 
 import javax.servlet.http.Cookie;
@@ -134,7 +135,7 @@ public class ExportPortfolioService implements IExportPortfolioService {
 		{
 			try
 			{
-		   		PortfolioBuilder builder = new PortfolioBuilder(lesson.getLearningDesign(), activityDAO, lamsCoreToolService, ToolAccessMode.TEACHER, null, null);
+		   		PortfolioBuilder builder = new PortfolioBuilder(lesson.getLearningDesign(), activityDAO, lamsCoreToolService, ToolAccessMode.TEACHER, lesson, null, null);
 		   		builder.parseLearningDesign();
 	    		portfolios = builder.getPortfolioList();
 
@@ -175,16 +176,16 @@ public class ExportPortfolioService implements IExportPortfolioService {
 	    User learner = (User)baseDAO.find(User.class,userId);
 	    Lesson lesson = lessonDAO.getLesson(lessonID);
 	
-	    if (learner != null && lesson != null)
+	    if (learner != null)
 	    {
-	        LearnerProgress learnerProgress = learnerService.getProgress(learner.getUserId(), lesson.getLessonId());
+	        LearnerProgress learnerProgress = learnerService.getProgress(learner.getUserId(), lessonID);
 	        
 		    if (learnerProgress != null)
 		    {
 
 				try
 				{
-			   		PortfolioBuilder builder = new PortfolioBuilder(lesson.getLearningDesign(), activityDAO, lamsCoreToolService, ToolAccessMode.LEARNER, learnerProgress, learner);
+			   		PortfolioBuilder builder = new PortfolioBuilder(lesson.getLearningDesign(), activityDAO, lamsCoreToolService, ToolAccessMode.LEARNER, lesson, learnerProgress, learner);
 			   		builder.parseLearningDesign();
 		    		portfolios = builder.getPortfolioList();
 		    		
@@ -258,10 +259,6 @@ public class ExportPortfolioService implements IExportPortfolioService {
 	/** @see org.lamsfoundation.lams.learning.export.service.IExportPortfolioService#doExport(Vector, Cookie[]) */
 	public Portfolio doExport(ArrayList<ActivityPortfolio> portfolios, Cookie[] cookies, Lesson lesson)
 	{		
-		String activitySubDirectory;
-		String exportURL;
-		String toolLink;		
-		String mainFileName = null;
 		String tempDirectoryName;
 		
 		//create the root directory for the export
@@ -274,6 +271,15 @@ public class ExportPortfolioService implements IExportPortfolioService {
 		portfolio.setLessonName(lesson.getLessonName());
 		portfolio.setLessonDescription(lesson.getLessonDescription());
 		
+		processPortfolios(portfolios, cookies, tempDirectoryName);
+		portfolio.setActivityPortfolios((ActivityPortfolio[])portfolios.toArray(new ActivityPortfolio[portfolios.size()]));
+		return portfolio;
+		
+
+	}
+	
+	private void processPortfolios(List portfolios, Cookie[] cookies, String tempDirectoryName) {
+
 		Iterator i = portfolios.iterator();
 		//iterate through the list of portfolios, create subdirectory, 
 		while(i.hasNext())
@@ -288,28 +294,28 @@ public class ExportPortfolioService implements IExportPortfolioService {
 			}
 			
 			// The directory in which the activity must place its files 
-			activitySubDirectory = tempDirectoryName + File.separator + subDirectoryName; 
+			String activitySubDirectory = tempDirectoryName + File.separator + subDirectoryName; 
 		
 			//for security reasons, append the relative directory name to the end of the export url instead of the whole path
 			String relativePath = activitySubDirectory.substring(FileUtil.TEMP_DIR.length()+1, activitySubDirectory.length());
-			exportURL = WebUtil.appendParameterToURL(activityPortfolio.getExportUrl(), AttributeNames.PARAM_DIRECTORY_NAME, relativePath);
 			
-			String absoluteExportURL = ExportPortfolioConstants.HOST + exportURL;		
-					
-			activityPortfolio.setExportUrl(absoluteExportURL);
-				
-			//get tool to export its files, mainFileName is the name of the main HTML page that the tool exported.
-			mainFileName = connectToToolViaExportURL(absoluteExportURL, cookies, activitySubDirectory);
-						
-			//toolLink is used in main page, so that it can link with the tools export pages.
-			toolLink = subDirectoryName + "/" + mainFileName;	
-			activityPortfolio.setToolLink(toolLink);
+			// Complex activities don't have export urls.
+			if ( activityPortfolio.getExportUrl() != null ) {
+				activityPortfolio.setExportUrl( ExportPortfolioConstants.HOST + activityPortfolio.getExportUrl() );
+				activityPortfolio.setExportUrl( WebUtil.appendParameterToURL(activityPortfolio.getExportUrl(), AttributeNames.PARAM_DIRECTORY_NAME, relativePath) );
+
+				//get tool to export its files, mainFileName is the name of the main HTML page that the tool exported.
+				String mainFileName = connectToToolViaExportURL(activityPortfolio.getActivityName(), activityPortfolio.getExportUrl(), cookies, activitySubDirectory);
+							
+				//toolLink is used in main page, so that it can link with the tools export pages.
+				String toolLink = subDirectoryName + "/" + mainFileName;	
+				activityPortfolio.setToolLink(toolLink);
+			}
 			
-			
+			if ( activityPortfolio.getChildPortfolios() != null &&  activityPortfolio.getChildPortfolios().size() > 0 ) {
+				processPortfolios(activityPortfolio.getChildPortfolios(), cookies, tempDirectoryName); 
+			}
 		}
-		
-		portfolio.setActivityPortfolios((ActivityPortfolio[])portfolios.toArray(new ActivityPortfolio[portfolios.size()]));
-		return portfolio;
 		
 		
 	}
@@ -363,7 +369,7 @@ public class ExportPortfolioService implements IExportPortfolioService {
 	
 
 	/** @see org.lamsfoundation.lams.learning.export.service.IExportPortfolioService#exportToolPortfolio(org.lamsfoundation.lams.learning.export.Portfolio) */
-	public String connectToToolViaExportURL(String exportURL, Cookie[] cookies, String directoryToStoreErrorFile)
+	public String connectToToolViaExportURL(String activityName, String exportURL, Cookie[] cookies, String directoryToStoreErrorFile)
 	{
 	    String filename = null;
 	    try
@@ -373,24 +379,24 @@ public class ExportPortfolioService implements IExportPortfolioService {
 	        {
 	           filename = ExportPortfolioConstants.EXPORT_ERROR_FILENAME;
 	           log.error("A problem has occurred while connecting to the tool's export url. The export url may be invalid or may not exist");
-	           writeErrorMessageToFile(directoryToStoreErrorFile);	           
+	           writeErrorMessageToFile(directoryToStoreErrorFile, activityName);	           
 	        }      
 	          
 	    }	    
 		catch(MalformedURLException e)
 		{
 		    log.error("The URL "+exportURL+" given is invalid.",e);
-	        writeErrorMessageToFile(directoryToStoreErrorFile);	
+	        writeErrorMessageToFile(directoryToStoreErrorFile, activityName);	
 		}
 		catch(FileNotFoundException e)
 		{
 		    log.error("The directory "+directoryToStoreErrorFile+" may not exist.",e);
-	        writeErrorMessageToFile(directoryToStoreErrorFile);	
+	        writeErrorMessageToFile(directoryToStoreErrorFile, activityName);	
 		}
 		catch(IOException e)
 		{
 		    log.error("A problem has occurred while writing the contents of " + exportURL + " to file.", e);
-	        writeErrorMessageToFile(directoryToStoreErrorFile);	
+	        writeErrorMessageToFile(directoryToStoreErrorFile, activityName);	
 			
 		}
 		
@@ -413,26 +419,22 @@ public class ExportPortfolioService implements IExportPortfolioService {
 		catch(MalformedURLException e)
 		{
 		    log.error("The URL given is invalid. Exception Message was: " +e);
-	        writeErrorMessageToFile(portfolio.getExportTmpDir());	
 		}
 		catch(FileNotFoundException e)
 		{
 		    log.error("The directory or file may not exist. Exception Message was: " +e);
-	        writeErrorMessageToFile(portfolio.getExportTmpDir());	
 		}
 		catch(IOException e)
 		{
 		    log.error("A problem has occurred while writing the contents of " + url + " to file. Exception Message was: " +e);
-	        writeErrorMessageToFile(portfolio.getExportTmpDir());	
-			
 		}
 	}
 	
-	 private void writeErrorMessageToFile(String directoryToStoreFile)
+	 private void writeErrorMessageToFile(String directoryToStoreFile, String activityTitle)
 	 {
 	     try
 		 {	
-	    	 String errorMessage = messageService.getMessage(ExportPortfolioConstants.EXPORT_ACTIVITY_ERROR_KEY);
+	    	 String errorMessage = messageService.getMessage(ExportPortfolioConstants.EXPORT_ACTIVITY_ERROR_KEY, new Object[]{activityTitle});
 	         String filepath = directoryToStoreFile + File.separator +  ExportPortfolioConstants.EXPORT_ERROR_FILENAME;
 			 BufferedWriter fileout = new BufferedWriter(new FileWriter(filepath));
 			 fileout.write(errorMessage);

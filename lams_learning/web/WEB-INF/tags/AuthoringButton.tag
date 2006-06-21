@@ -44,7 +44,7 @@
 <%@ attribute name="cancelButtonLabelKey" required="false" rtexprvalue="true" %>
 <%@ attribute name="saveButtonLabelKey" required="false" rtexprvalue="true" %>
 <%@ attribute name="cancelConfirmMsgKey" required="false" rtexprvalue="true" %>
-<%@ attribute name="defineLater" required="false" rtexprvalue="false" %>
+<%@ attribute name="defineLater" required="false" rtexprvalue="true" %>
 
 <%-- Default value for message key --%>
 <c:if test="${empty cancelButtonLabelKey}">

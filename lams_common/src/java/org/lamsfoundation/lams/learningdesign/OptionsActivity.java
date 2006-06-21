@@ -128,34 +128,12 @@ public class OptionsActivity extends ComplexActivity implements Serializable {
     }
     public Activity createCopy(){
     	OptionsActivity newOptionsActivity = new OptionsActivity();
-    	
+    	copyToNewActivity(newOptionsActivity);
+
     	/** OptionsActivity Specific Attributes */
     	newOptionsActivity.setMaxNumberOfOptions(this.getMaxNumberOfOptions());
     	newOptionsActivity.setMinNumberOfOptions(this.getMinNumberOfOptions());
     	newOptionsActivity.setOptionsInstructions(this.getOptionsInstructions());
-    	
-    	/** Generic Activity Attributes */
-    	newOptionsActivity.setActivityUIID(this.getActivityUIID());
-    	newOptionsActivity.setDescription(this.getDescription());
-    	newOptionsActivity.setTitle(this.getTitle());
-    	newOptionsActivity.setHelpText(this.getHelpText());
-    	newOptionsActivity.setXcoord(this.getXcoord());
-    	newOptionsActivity.setYcoord(this.getYcoord());
-    	newOptionsActivity.setActivityTypeId(this.getActivityTypeId());
-    	
-    	newOptionsActivity.setGroupingSupportType(this.getGroupingSupportType());
-    	newOptionsActivity.setApplyGrouping(this.getApplyGrouping());
-    	newOptionsActivity.setActivityCategoryID(this.getActivityCategoryID());    	
-    	
-    	newOptionsActivity.setGrouping(this.getGrouping());
-    	newOptionsActivity.setGroupingUIID(this.getGroupingUIID());
-    	newOptionsActivity.setDefineLater(this.getDefineLater());
-    	newOptionsActivity.setLearningLibrary(this.getLearningLibrary());
-    	newOptionsActivity.setCreateDateTime(new Date());
-    	newOptionsActivity.setRunOffline(this.getRunOffline());
-    	newOptionsActivity.setLibraryActivityUiImage(this.getLibraryActivityUiImage());
-    	newOptionsActivity.setLibraryActivity(this.getLibraryActivity());
-    	newOptionsActivity.setLanguageFile(this.getLanguageFile());
 
     	return newOptionsActivity;
     }

@@ -117,31 +117,7 @@ public class ParallelActivity extends ComplexActivity implements Serializable {
     public Activity createCopy(){
     	
     	ParallelActivity newParallelActivity = new ParallelActivity();
-    	
-    	newParallelActivity.setActivityUIID(this.getActivityUIID());
-    	newParallelActivity.setDescription(this.getDescription());
-    	newParallelActivity.setTitle(this.getTitle());
-    	newParallelActivity.setHelpText(this.getHelpText());
-    	newParallelActivity.setXcoord(this.getXcoord());
-    	newParallelActivity.setYcoord(this.getYcoord());
-    	newParallelActivity.setActivityTypeId(this.getActivityTypeId());
-    	
-    	newParallelActivity.setGroupingSupportType(this.getGroupingSupportType());
-    	newParallelActivity.setApplyGrouping(this.getApplyGrouping());
-    	newParallelActivity.setActivityCategoryID(this.getActivityCategoryID());
-    	
-    	newParallelActivity.setGrouping(this.getGrouping());
-    	newParallelActivity.setLearningLibrary(this.getLearningLibrary());
-    	newParallelActivity.setGroupingUIID(this.getGroupingUIID());
-    	
-    	newParallelActivity.setDefineLater(this.getDefineLater());
-    	newParallelActivity.setCreateDateTime(new Date());
-    	newParallelActivity.setRunOffline(this.getRunOffline());
-    	
-    	newParallelActivity.setLibraryActivityUiImage(this.getLibraryActivityUiImage());    	
-    	newParallelActivity.setLibraryActivity(this.getLibraryActivity());	
-    	newParallelActivity.setLanguageFile(this.getLanguageFile());
-    	
+    	copyToNewActivity(newParallelActivity);
     	return newParallelActivity;
     }
 

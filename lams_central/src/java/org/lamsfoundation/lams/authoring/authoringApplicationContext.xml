@@ -28,6 +28,7 @@
 		<property name="activityDAO"><ref bean="activityDAO"/></property>
 		<property name="transitionDAO"><ref bean="transitionDAO"/></property>
 		<property name="toolDAO"><ref bean="toolDAO"/></property>
+		<property name="systemToolDAO"><ref bean="systemToolDAO"/></property>
 		<property name="groupingDAO"><ref bean="groupingDAO"/></property>
 		<property name="groupDAO"><ref bean="groupDAO"/></property>
 		<property name="licenseDAO"><ref bean="licenseDAO"/></property>

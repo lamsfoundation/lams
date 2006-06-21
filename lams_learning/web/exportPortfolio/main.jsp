@@ -41,18 +41,19 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<H1><c:out value="${portfolio.lessonName}"/></H1>
 	
 	<p><c:out value="${portfolio.lessonDescription}"/></p>
-	
+
+	<c:if test="${empty portfolio.activityPortfolios}">
+		<fmt:message key="export.portfolio.noneAttempted.message"/>
+	</c:if>
+
 	<c:forEach var="actport" items="${portfolio.activityPortfolios}" varStatus="status">
 		<c:if test="${status.first}">
-			<OL>
+			<UL>
 		</c:if>
 
-		<LI>
-			<a href="<c:out value="${actport.toolLink}"/>"/><c:out value="${actport.activityName}"/></a>: 
-				<c:out value="${actport.activityDescription}"/>
-		</LI>						
+		<lams:ExportPortOutput actport="${actport}"/>
 		<c:if test="${status.last}">
-			</OL>
+			</UL>
 		</c:if>
 	</c:forEach>
 </body>

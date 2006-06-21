@@ -77,6 +77,11 @@
       <servlet-class>org.lamsfoundation.lams.monitoring.web.CreateLessonServlet</servlet-class>
 
    </servlet>
+   <servlet>
+      <servlet-name>gateExportPortfolio</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.monitoring.web.GateExportPortfolioServlet</servlet-class>
+
+   </servlet>
 
  <servlet>
     <servlet-name>action</servlet-name>
@@ -112,6 +117,10 @@
    <servlet-mapping>
       <servlet-name>createLessonClass</servlet-name>
       <url-pattern>/createLessonClass</url-pattern>
+   </servlet-mapping>
+   <servlet-mapping>
+      <servlet-name>gateExportPortfolio</servlet-name>
+      <url-pattern>/gateExportPortfolio</url-pattern>
    </servlet-mapping>
 
    <session-config>

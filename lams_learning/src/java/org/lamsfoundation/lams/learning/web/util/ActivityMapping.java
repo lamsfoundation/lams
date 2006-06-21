@@ -270,7 +270,7 @@ public class ActivityMapping implements Serializable
      * @param activity, the activity the action is for.
      * @param useContext, if true prepends the server and context to the URL.
      */
-    protected String strutsActionToURL(String strutsAction,
+    public static String strutsActionToURL(String strutsAction,
                                        Activity activity,
                                        boolean useContext)
     {

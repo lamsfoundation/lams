@@ -24,6 +24,9 @@
 package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
+import java.util.Date;
+
+import org.lamsfoundation.lams.tool.SystemTool;
 
 
 /**
@@ -33,6 +36,8 @@ import java.io.Serializable;
 public abstract class SystemToolActivity extends SimpleActivity implements Serializable
 {
     
+	private SystemTool systemTool; 
+	
     /** full constructor */
     public SystemToolActivity(Long activityId,
             Integer id,
@@ -52,7 +57,8 @@ public abstract class SystemToolActivity extends SimpleActivity implements Seria
             Integer activityTypeId,
             Transition transitionTo,
             Transition transitionFrom,
-            String languageFile)
+            String languageFile, 
+            SystemTool systemTool)
     {
         super(activityId,
                 id,
@@ -73,6 +79,7 @@ public abstract class SystemToolActivity extends SimpleActivity implements Seria
                 transitionTo,
 				transitionFrom,
 				languageFile);
+        this.systemTool = systemTool;
     }
     
     /** default constructor */
@@ -103,5 +110,19 @@ public abstract class SystemToolActivity extends SimpleActivity implements Seria
                 transitionTo,
 				transitionFrom);
     }
+
+    protected void copyToNewActivity(SystemToolActivity newActivity ) {
+
+    	super.copyToNewActivity(newActivity);
+    	newActivity.setSystemTool(this.getSystemTool());
+    }
+
+	public SystemTool getSystemTool() {
+		return systemTool;
+	}
+
+	public void setSystemTool(SystemTool systemTool) {
+		this.systemTool = systemTool;
+	}
     
 }

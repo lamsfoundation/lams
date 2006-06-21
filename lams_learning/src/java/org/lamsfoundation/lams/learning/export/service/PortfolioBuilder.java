@@ -36,10 +36,13 @@ import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.LearningDesignProcessor;
 import org.lamsfoundation.lams.learningdesign.SimpleActivity;
+import org.lamsfoundation.lams.learningdesign.SystemToolActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignProcessorException;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.tool.SystemTool;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSession;
@@ -59,32 +62,36 @@ public class PortfolioBuilder extends LearningDesignProcessor {
 	ILamsCoreToolService lamsCoreToolService;
 	User user;
 	LearnerProgress progress;
+	Lesson lesson;
 
 	/** Create the builder. Supply all the data that will be needed to parse the design and build the portfolio entries. 
 	 * 
 	 * If accessMode == LEARNER then progress and user must not be null. This will create a list of portfolio objects for 
 	 * all activities that the LEARNER has completed or attempted.
 	 * 
-	 * If accessMode == TEACHER then progress and user will be ignored and all activities will be included.
+	 * If accessMode == TEACHER then progress and user will be null and all activities will be included. Note: Because 
+	 * the progress is null we can't rely on getting the lesson from the progress.
 	 * 
 	 * @param design
 	 * @param activityDAO
 	 * @param lamsCoreToolService
 	 * @param accessMode
-	 * @param progress 
+	 * @param lesson 
+	 * @param progress
 	 * @param user
 	 */
 	public PortfolioBuilder(LearningDesign design, IActivityDAO activityDAO, 
 			ILamsCoreToolService lamsCoreToolService, ToolAccessMode accessMode, 
-			LearnerProgress progress, User user) {
+			Lesson lesson, LearnerProgress progress, User user) {
 		super(design, activityDAO);
 		this.mainPortfolioList = new ArrayList<ActivityPortfolio>();
 		this.currentPortfolioList = mainPortfolioList;
 		this.activityListStack = new ArrayStack(5);
 		this.accessMode = accessMode;
 		this.lamsCoreToolService = lamsCoreToolService;
+		
 		this.user = user;
-
+		this.lesson = lesson;
 		this.progress = progress;
 	}
 
@@ -144,30 +151,52 @@ public class PortfolioBuilder extends LearningDesignProcessor {
 			 * If the export is done by teacher: mode, toolContentId is appended
 			 * If the export is done by learner: mode, userId, toolSessionId is appended
 			 */
-			if (accessMode == ToolAccessMode.LEARNER)
-			{
-				exportUrlForTool = WebUtil.appendParameterToURL(exportUrlForTool, AttributeNames.PARAM_USER_ID, user.getUserId().toString());
-				ToolSession toolSession = lamsCoreToolService.getToolSessionByActivity(user, toolActivity);
-				if (toolSession != null) {
-					exportUrlForTool = WebUtil.appendParameterToURL(exportUrlForTool, AttributeNames.PARAM_TOOL_SESSION_ID, toolSession.getToolSessionId().toString());
+			if ( exportUrlForTool != null ) {
+				if (accessMode == ToolAccessMode.LEARNER)
+				{
+					exportUrlForTool = WebUtil.appendParameterToURL(exportUrlForTool, AttributeNames.PARAM_USER_ID, user.getUserId().toString());
+					ToolSession toolSession = lamsCoreToolService.getToolSessionByActivity(user, toolActivity);
+					if (toolSession != null) {
+						exportUrlForTool = WebUtil.appendParameterToURL(exportUrlForTool, AttributeNames.PARAM_TOOL_SESSION_ID, toolSession.getToolSessionId().toString());
+					}
+				}
+				else if (accessMode == ToolAccessMode.TEACHER)
+				{
+					exportUrlForTool = WebUtil.appendParameterToURL(exportUrlForTool, AttributeNames.PARAM_TOOL_CONTENT_ID, toolActivity.getToolContentId().toString());
 				}
 			}
-			else if (accessMode == ToolAccessMode.TEACHER)
-			{
-				exportUrlForTool = WebUtil.appendParameterToURL(exportUrlForTool, AttributeNames.PARAM_TOOL_CONTENT_ID, toolActivity.getToolContentId().toString());
-			}
 			
-		} else if ( activity.isGateActivity()  ) {
-			// only include the gates in the teacher version 
-
-		} else if ( activity.isGroupingActivity() ) {
-
-		}
+		} else if ( activity.isSystemToolActivity() ) {
+			// only include the gates in the teacher version - learner gate has been avoided at the beginning of this method
+			// always include grouping
+			// system tools don't use the modes or the tool session id but need to add them or the validation fails in 
+			// AbstractExportPortfolio servlet. So why leave the validation there - because system tools are the exception
+			// rather than the rule. In the future, they may need these parameters.
+			SystemToolActivity sysToolActivity = (SystemToolActivity) activity;
+			SystemTool tool = sysToolActivity.getSystemTool();
+			if ( tool != null ) {
+				if (accessMode == ToolAccessMode.LEARNER) {
+					exportUrlForTool = tool.getExportPortfolioLearnerUrl();
+				} else { 
+					exportUrlForTool = tool.getExportPortfolioClassUrl();
+				}
+			}
+			if ( exportUrlForTool != null ) {
+				if (accessMode == ToolAccessMode.LEARNER) {
+					exportUrlForTool = WebUtil.appendParameterToURL(exportUrlForTool, AttributeNames.PARAM_USER_ID, user.getUserId().toString());
+					exportUrlForTool = WebUtil.appendParameterToURL(exportUrlForTool, AttributeNames.PARAM_TOOL_SESSION_ID, "0");
+				} else { 
+					exportUrlForTool = WebUtil.appendParameterToURL(exportUrlForTool, AttributeNames.PARAM_TOOL_CONTENT_ID, "0");
+				}
+				exportUrlForTool = WebUtil.appendParameterToURL(exportUrlForTool, AttributeNames.PARAM_ACTIVITY_ID, activity.getActivityId().toString());
+				exportUrlForTool = WebUtil.appendParameterToURL(exportUrlForTool, AttributeNames.PARAM_LESSON_ID, lesson.getLessonId().toString());
+			}
+		} 
 		
 		if ( exportUrlForTool == null ) {
 			exportUrlForTool = ExportPortfolioConstants.URL_FOR_UNSUPPORTED_EXPORT;
 			exportUrlForTool = WebUtil.appendParameterToURL(exportUrlForTool, "activityTitle", activity.getTitle());
-			exportUrlForTool = WebUtil.appendParameterToURL(exportUrlForTool, "lessonName", progress.getLesson().getLessonName());
+			exportUrlForTool = WebUtil.appendParameterToURL(exportUrlForTool, "lessonName", lesson.getLessonName());
 		}
 		p.setExportUrl(exportUrlForTool);
 		

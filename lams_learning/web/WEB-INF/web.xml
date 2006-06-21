@@ -31,7 +31,7 @@
 	</init-param>
 	<init-param>
 		<param-name>singleSession</param-name>
-		<param-value>false</param-value>
+		<param-value>true</param-value>
 	</init-param>
 </filter>
 
@@ -51,11 +51,7 @@
 
 <filter-mapping>
 	<filter-name>HibernateFilter</filter-name>
-	<url-pattern>*.do</url-pattern>
-</filter-mapping>
-<filter-mapping>
-	<filter-name>HibernateFilter</filter-name>
-	<url-pattern>*.jsp</url-pattern>
+	<url-pattern>/*</url-pattern>
 </filter-mapping>
 
 <filter-mapping>
@@ -73,6 +69,12 @@
     contains the additional listeners and place it in your
     project's merge dir.
     -->
+
+   <servlet>
+      <servlet-name>groupingExportPortfolio</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.learning.web.action.GroupingExportPortfolioServlet</servlet-class>
+
+   </servlet>
 
  <servlet>
 	<servlet-name>context</servlet-name>
@@ -139,6 +141,11 @@
 	<servlet-name>exportNotSupported</servlet-name>
 	<url-pattern>/exportNotSupported</url-pattern>
 </servlet-mapping>
+
+   <servlet-mapping>
+      <servlet-name>groupingExportPortfolio</servlet-name>
+      <url-pattern>/groupingExportPortfolio</url-pattern>
+   </servlet-mapping>
 
    <session-config>
       <session-timeout>120</session-timeout>

@@ -469,6 +469,7 @@ CREATE TABLE lams_learning_activity (
      , create_grouping_ui_id INT(11)
      , library_activity_id BIGINT(20)
      , language_file VARCHAR(255)
+     , system_tool_id BIGINT(20)
      , PRIMARY KEY (activity_id)
      , INDEX (learning_library_id)
      , CONSTRAINT FK_lams_learning_activity_7 FOREIGN KEY (learning_library_id)
@@ -503,6 +504,9 @@ CREATE TABLE lams_learning_activity (
      , INDEX (grouping_support_type_id)
      , CONSTRAINT FK_lams_learning_activity_13 FOREIGN KEY (grouping_support_type_id)
                   REFERENCES lams_grouping_support_type (grouping_support_type_id)
+     , INDEX (system_tool_id)
+     , CONSTRAINT FK_lams_learning_activity_14 FOREIGN KEY (system_tool_id)
+                  REFERENCES lams_system_tool (system_tool_id)
 )TYPE=InnoDB;
 
 CREATE TABLE lams_lesson (

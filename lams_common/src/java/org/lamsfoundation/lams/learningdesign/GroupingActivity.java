@@ -28,6 +28,7 @@ import java.util.Date;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.strategy.GroupingActivityStrategy;
+import org.lamsfoundation.lams.tool.SystemTool;
 
 
 /**
@@ -66,7 +67,8 @@ public class GroupingActivity extends SystemToolActivity implements Serializable
             Grouping createGrouping,
 			Integer grouping_ui_id,
 			Integer create_grouping_ui_id,
-			String languageFile)
+			String languageFile,
+            SystemTool sysTool)
     {
         super(activityId, 
                 id, 
@@ -86,7 +88,8 @@ public class GroupingActivity extends SystemToolActivity implements Serializable
                 activityTypeId, 
                 transitionTo,
 				transitionFrom,
-				languageFile);
+				languageFile,
+	            sysTool);
         this.createGrouping = createGrouping;        
         this.createGroupingUIID = create_grouping_ui_id;
         super.simpleActivityStrategy = new GroupingActivityStrategy(this);
@@ -142,29 +145,11 @@ public class GroupingActivity extends SystemToolActivity implements Serializable
      */
     public Activity createCopy(){
     	GroupingActivity groupingActivity = new GroupingActivity();
-    	
-    	groupingActivity.setActivityUIID(this.getActivityUIID());
-    	groupingActivity.setDescription(this.getDescription());
-    	groupingActivity.setTitle(this.getTitle());
-    	groupingActivity.setHelpText(this.getHelpText());
-    	groupingActivity.setXcoord(this.getXcoord());
-    	groupingActivity.setYcoord(this.getYcoord());    	    
-    	groupingActivity.setActivityTypeId(this.getActivityTypeId());
-    	
-    	groupingActivity.setGroupingSupportType(this.getGroupingSupportType());
-    	groupingActivity.setApplyGrouping(this.getApplyGrouping());
-    	groupingActivity.setActivityCategoryID(this.getActivityCategoryID());
-    	
-    	groupingActivity.setDefineLater(this.getDefineLater());    	
-    	groupingActivity.setCreateDateTime(new Date()); 
-    	groupingActivity.setRunOffline(this.getRunOffline());
-    	groupingActivity.setLibraryActivityUiImage(this.getLibraryActivityUiImage());
-    	groupingActivity.setLanguageFile(this.getLanguageFile());
-
+    	copyToNewActivity(groupingActivity);
+    	groupingActivity.setCreateGroupingUIID(this.createGroupingUIID);
     	Grouping currentGrouping = this.getCreateGrouping();
     	Grouping newGrouping = currentGrouping.createCopy();
     	groupingActivity.setCreateGrouping(newGrouping);
-
     	return groupingActivity;    	
     }
     

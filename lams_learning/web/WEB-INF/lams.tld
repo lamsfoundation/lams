@@ -35,7 +35,7 @@
       <attribute>
          <description>Output a random number for the learner and passon flash movies to communicate directly.</description>
          <name>id</name>
-         <required>false</required>
+         <required>true</required>
 
            <rtexprvalue>true</rtexprvalue>
 
@@ -302,9 +302,15 @@
        <name>headItems</name>
        <path>/WEB-INF/tags/headItems.tag</path>
    	</tag-file>   	
+   	
+   	 	<!--  used by learner -->
    	<tag-file>
-       <name>Passon</name>
-       <path>/WEB-INF/tags/Passon.tag</path>
+	       <name>Passon</name>
+		<path>/WEB-INF/tags/Passon.tag</path>
+   	</tag-file>  
+   	<tag-file>
+	    <name>ExportPortOutput</name>
+	       <path>/WEB-INF/tags/ExportPortOutput.tag</path>
    	</tag-file>  
 
 </taglib>

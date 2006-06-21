@@ -100,8 +100,11 @@ public class GateAction extends LamsDispatchAction
     private static final String VIEW_SYNCH_GATE = "viewSynchGate";
     private static final String VIEW_PERMISSION_GATE = "viewPermissionGate";
     private static final String VIEW_SCHEDULE_GATE="viewScheduleGate";
+    
+    // Gate Form fields
 	private static final String ACTIVITY_FORM_FIELD = "activityId";
 	private static final String TOTAL_LEARNERS_FORM_FIELD = "totalLearners";
+	public static final String READ_ONLY= "readOnly";
 
     //---------------------------------------------------------------------
     // Struts Dispatch Method
@@ -193,10 +196,26 @@ public class GateAction extends LamsDispatchAction
             
         return findViewByGateType(mapping, gateForm, gate);
     }
+    
+    /**
+     * Export Portfolio Page
+     */
+    public ActionForward exportPortfolio(ActionMapping mapping,
+                                  ActionForm form,
+                                  HttpServletRequest request,
+                                  HttpServletResponse response) throws IOException,
+                                                                          ServletException
+    {
+    	DynaActionForm gateForm = (DynaActionForm)form;
+    	ActionForward forward = viewGate(mapping, form, request, response);
+    	gateForm.set(READ_ONLY, Boolean.TRUE);
+    	return forward;
+    }
+    
 
     //---------------------------------------------------------------------
     // Helper Methods
-    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------    
     /**
      * Dispatch view the according to the gate type.
      * 

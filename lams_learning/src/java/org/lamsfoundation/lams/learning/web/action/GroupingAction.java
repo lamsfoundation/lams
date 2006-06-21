@@ -93,14 +93,15 @@ public class GroupingAction extends LamsDispatchAction
     //---------------------------------------------------------------------
     // Class level constants - Session Attributes
     //---------------------------------------------------------------------
-	private static final String GROUPS = "groups";
+	public static final String GROUPS = "groups";
+	public static final String FINISHED_BUTTON = "finishedButton";
 	
     //---------------------------------------------------------------------
     // Class level constants - Struts forward
     //---------------------------------------------------------------------
-    private static final String VIEW_GROUP = "viewGroup";
-    private static final String WAIT_GROUP = "waitGroup";
-    private static final String SHOW_GROUP = "showGroup";
+	public static final String VIEW_GROUP = "viewGroup";
+	public static final String WAIT_GROUP = "waitGroup";
+	public static final String SHOW_GROUP = "showGroup";
     
     //---------------------------------------------------------------------
     // Struts Dispatch Method
@@ -140,7 +141,12 @@ public class GroupingAction extends LamsDispatchAction
         
         DynaActionForm groupForm = (DynaActionForm)form;
         groupForm.set("previewLesson",learnerProgress.getLesson().isPreviewLesson());
-        return mapping.findForward(groupingDone ? VIEW_GROUP : WAIT_GROUP);
+        
+        if ( groupingDone ) {
+        	request.setAttribute(FINISHED_BUTTON, Boolean.TRUE);
+        	return mapping.findForward(VIEW_GROUP); 
+        }
+        return mapping.findForward(WAIT_GROUP);
     }
 
     /**
@@ -170,7 +176,45 @@ public class GroupingAction extends LamsDispatchAction
         if ( grouping != null)
         	groups.addAll(grouping.getGroups());
         
-        request.getSession().setAttribute(GROUPS,groups);
+        request.setAttribute(GROUPS,groups);
+        request.setAttribute(FINISHED_BUTTON,Boolean.TRUE);
+        request.setAttribute(AttributeNames.PARAM_ACTIVITY_ID,	activity.getActivityId());
+        
+        return mapping.findForward(SHOW_GROUP);
+    }
+
+    /**
+     * Do the export portfolio. Take the parameters from the standard String request parameters, don't expect
+     * attributes to be in the request 
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     */
+    public ActionForward exportPortfolio(ActionMapping mapping,
+                                      ActionForm form,
+                                      HttpServletRequest request,
+                                      HttpServletResponse response) throws IOException,
+                                                                          ServletException
+    {
+        //initialize service object
+        ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+     
+        SortedSet groups = new TreeSet(new GroupComparator());
+
+        Long activityId = WebUtil.readLongParam(request,AttributeNames.PARAM_ACTIVITY_ID);
+        Activity activity = learnerService.getActivity(activityId);
+
+        Grouping grouping = ((GroupingActivity)activity).getCreateGrouping();
+        if ( grouping != null)
+        	groups.addAll(grouping.getGroups());
+        
+        request.setAttribute(GROUPS,groups);
+        request.setAttribute(FINISHED_BUTTON,Boolean.FALSE);
         request.setAttribute(AttributeNames.PARAM_ACTIVITY_ID,	activity.getActivityId());
         
         return mapping.findForward(SHOW_GROUP);
