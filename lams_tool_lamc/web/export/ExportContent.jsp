@@ -46,13 +46,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		
 			<table class="forms">
 				<c:if test="${(portfolioExportMode != 'learner')}">
-
-				<tr>
-			 		<td NOWRAP colspan=2>  &nbsp  </td>
-				</tr>
-			
-			
-			
 		  	 		<tr>
 					  	<th scope="col" valign=top> 
 						    <bean:message key="label.mcqSummary"/> 
@@ -60,11 +53,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 		  	 		</tr>
 					
-					<c:if test="${sessionScope.currentMonitoredToolSession != 'All'}"> 			
-						<tr>
-					 		<td NOWRAP colspan=2 > <b> <font size=2> <bean:message key="label.groupName"/> </b><c:out value="${currentMonitoredToolSession}"/>  </td>
-						</tr>
-					</c:if>						
 					
 		  	 		<c:set var="queIndex" scope="request" value="0"/>
 					<c:forEach var="currentDto" items="${sessionScope.listMonitoredAnswersContainerDto}">
@@ -191,13 +179,54 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 										</c:if>																								
 										</c:forEach>		  	
 						</c:forEach>		  	
+
 				</c:if>										
 				
-				
+
+
 				<c:if test="${(portfolioExportMode == 'learner')}">
-					learner mode				
-				</c:if>										
-				
-			</table>		  	 		
+					
+					<b> <bean:message key="label.learner"/>: </b><c:out value="${learnerName}"/>
+					
+		  	 		<c:set var="queIndex" scope="request" value="0"/>
+					<c:forEach var="currentDto" items="${sessionScope.listMonitoredAnswersContainerDto}">
+					<c:set var="queIndex" scope="request" value="${queIndex +1}"/>
+			  	 		<c:set var="currentQuestionId" scope="request" value="${currentDto.questionUid}"/>
+			  	 		<tr>
+			  	 			<td> &nbsp&nbsp&nbsp</td>
+			  	 		</tr>
+						<tr>			
+							<td NOWRAP valign=top align=left><b> <font size=2> <bean:message key="label.question.only"/> <c:out value="${queIndex}"/>:</b>
+							<font size=2>
+								<c:out value="${currentDto.question}"/> &nbsp (<bean:message key="label.weight"/> 
+								<c:out value="${currentDto.weight}"/>  <bean:message key="label.percent"/>)
+							</font> </td>
+						</tr>	
+						<tr>					
+							<td NOWRAP valign=top align=left> <font size=2> <b> <bean:message key="label.mc.options.col"/> </font> </b> 
+								<table align=left>
+									<c:forEach var="answersData" items="${currentDto.candidateAnswersCorrect}">
+										<tr>			
+											<td NOWRAP valign=top align=left>
+												<font size=2>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+												<c:out value="${answersData.candidateAnswer}"/> 
+												</font>
+											</td>	
+										</tr>
+									</c:forEach>		  	
+								</table>
+							</td>  
+						</tr>			
+	
+					</c:forEach>		  	
+	
+		  	 		<tr>
+		  	 			<td NOWRAP valign=top align=left><font size=2> <b> 
+		  	 				<bean:message key="label.passingMark"/> </b> <c:out value="${passMark}"/> <bean:message key="label.percent"/>  </font>
+		  	 			</td>
+		  	 		</tr>
+				</table>
+			</c:if>								 
+	
 		</c:if>				
 
