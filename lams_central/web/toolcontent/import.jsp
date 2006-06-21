@@ -1,5 +1,7 @@
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-core" prefix="c"%>
+<%@ taglib uri="tags-fmt" prefix="fmt"%>
+
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 	<head>
@@ -17,11 +19,11 @@
 			<fmt:message key="title.import.instruction" />
 		</h2>
 
-		<form action="<c:url value="/ImportToolContent"/>" method="post" enctype="multipart/form-data">
+		<form action="<c:url value="/authoring/importToolContent.do"/>" method="post" enctype="multipart/form-data">
 			<fmt:message key="label.ld.zip.file" />
 			:
 			<input type="file" name="UPLOAD_FILE" />
-			<input type="submit" name="<fmt:message key="button.import" />" />
+			<input type="submit" name="<fmt:message key="button.import" />" class="buttonStyle"/>
 		</form>
 
 	</BODY>

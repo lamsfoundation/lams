@@ -34,6 +34,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -48,7 +49,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
  * 
  * @struts.action name = "ExportAction"
- * 				  parameter = "method"
+ *   			  path = "/authoring/exportToolContent"
  * 				  validate = "false"
  * @struts.action-forward name = "loading" path = "/toolcontent/exportloading.jsp"
  * @struts.action-forward name = "result" path = "/toolcontent/exportresult.jsp"
@@ -69,9 +70,9 @@ public class ExportToolContentAction extends LamsAction {
 	
 	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		String param = mapping.getParameter();
+		String param = request.getParameter("method");
 		//-----------------------Resource Author function ---------------------------
-		if(param.equals("export")){
+		if(StringUtils.equals(param,"export")){
 			return exportLD(mapping,request,response);
 		}else{
 			Long learningDesignId = WebUtil.readLongParam(request,PARAM_LEARING_DESIGN_ID);
@@ -107,7 +108,6 @@ public class ExportToolContentAction extends LamsAction {
 				log.debug("Wrote out " + count + " bytes");
 				response.setContentLength(count);
 				out.flush();
-				return null;
 			} catch (Exception e) {
 			    log.error( "Exception occured writing out file:" + e.getMessage());		
 			    throw new ExportToolContentException(e);
@@ -120,7 +120,7 @@ public class ExportToolContentAction extends LamsAction {
 				    log.error("Error Closing file. File already written out - no exception being thrown.",e);
 				}
 			}
-		} catch (ExportToolContentException e1) {
+		} catch (Exception e1) {
 			log.error("Unable to export tool content: " + e1.toString());
 			request.setAttribute(ATTR_LD_ERROR_MESSAGE,ldErrorMsgs);
 		}

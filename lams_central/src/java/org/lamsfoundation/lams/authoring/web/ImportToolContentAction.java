@@ -36,6 +36,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.fileupload.DiskFileUpload;
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
@@ -55,7 +56,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
  *  * @struts.action name = "ImportAction"
- * 				  parameter = "method"
+ *  			  path = "/authoring/importToolContent"
  * 				  validate = "false"
  * @struts.action-forward name = "upload" path = "/toolcontent/import.jsp"
  * @struts.action-forward name = "success" path = "/toolcontent/importresult.jsp"
@@ -81,14 +82,14 @@ public class ImportToolContentAction extends LamsAction {
 
 	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		String param = mapping.getParameter();
+		String param = request.getParameter("method");
 		//-----------------------Resource Author function ---------------------------
-		if(param.equals("import")){
-			importLD(request);
-			return mapping.findForward("success");
-		}else{
+		if(StringUtils.equals(param,"import")){
 			//display initial page for upload
 			return mapping.findForward("upload");
+		}else{
+			importLD(request);
+			return mapping.findForward("success");
 		}
 	}
 

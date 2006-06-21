@@ -39,6 +39,8 @@
 				<h1>
 					<fmt:message key="msg.export.failed" />
 				</h1>
+				<b><fmt:message key="msg.reason.is"/> ${ldErrorMessages}</b>
+				<br>
 			</c:otherwise>
 		</c:choose>
 		<a href="javascript:;" onclick="closeWin();"  class="button"><fmt:message key="button.close" /></a>
