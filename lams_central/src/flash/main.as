@@ -40,6 +40,16 @@ Stage.scaleMode = "noScale";
 var app:Application = Application.getInstance();
 app.main(this);
 
+//------------------------------Local connection to JSPs for progress data ------------------------------
+var receive_lc = new LocalConnection();
+//-------------------------------------- Functions to setProgress data, called by the LocalConnection object in learner JSPs
+receive_lc.setImportDesign = function(learningDesignID) {
+	Debugger.log(arguments.toString(), 'importUpdate_lc.setImportDesign');
+	app.getCanvas().openDesignByImport(learningDesignID);
+};
+var success = receive_lc.connect("importUpdate_lc_" + uniqueID);
+
+
 //Make app listener for stage resize events
 Stage.addListener(app);
 
