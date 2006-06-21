@@ -78,7 +78,7 @@ public class AuthoringUtil implements McAppConstants {
         mcAuthoringForm.setEditOptionsMode(new Integer(0).toString());
      	request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
      	
-     	McUtils.persistRichText(request);
+     	McUtils.persistInSessionRichText(request);
      	AuthoringUtil.populateParameters(request, mcAuthoringForm);
     }
  	
@@ -1597,21 +1597,161 @@ public class AuthoringUtil implements McAppConstants {
             }
     		logger.debug("questionFound: " +  questionFound);
     		
-    		if (questionFound == true)
-    		{
-    		    logger.debug("will add this question to the the questionsMap:" + pairs.getKey().toString());
-    		    mapUpdatedQuestionsContent.put(pairs.getKey().toString(), pairs.getValue().toString());
-    		}
-    		else
+
+		    logger.debug("will add this question to the the questionsMap:" + pairs.getKey().toString());
+		    mapUpdatedQuestionsContent.put(pairs.getKey().toString(), pairs.getValue().toString());
+        	
+    		if (questionFound == false)
     		{
     		    request.getSession().setAttribute(QUESTIONS_WITHNO_OPTIONS, new Boolean(true));
-    		    logger.debug("setting QUESTIONS_WITHNO_OPTIONS to true.");
+    		    logger.debug("setting QUESTIONS_WITHNO_OPTIONS to true. using key: " + pairs.getKey().toString());
+    		    addDefaultOptionsContentToQuestion(request, mapGeneralOptionsContent,pairs.getKey().toString());
     		}
     		logger.debug("final mapUpdatedQuestionsContent:" + mapUpdatedQuestionsContent);
         }
         return mapUpdatedQuestionsContent;
     }
     
+    
+    public static void addDefaultOptionsContentToQuestion(HttpServletRequest request, Map mapGeneralOptionsContent,String newKey)
+    {
+        logger.debug("doing addDefaultOptionsContentToQuestion with newKey:" + newKey);
+        logger.debug("mapGeneralOptionsContent:" + mapGeneralOptionsContent);
+        Map mapDefaultOptionsContent=(Map)request.getSession().getAttribute(MAP_DEFAULTOPTIONS_CONTENT);
+        logger.debug("mapDefaultOptionsContent:" + mapDefaultOptionsContent);
+        mapGeneralOptionsContent.put(newKey, mapDefaultOptionsContent);
+        logger.debug("mapGeneralOptionsContent after put:" + mapGeneralOptionsContent);
+    }
+
+    
+    public static Map addDefaultOptionsContentToMap(HttpServletRequest request, Map mapGO, Map mapQuestionsContent)
+    {
+        logger.debug("starting  addDefaultOptionsContentToMap with map:" + mapGO);
+        
+        Map newMap= new TreeMap(new McComparator());
+        Map mapDefaultOptionsContent=(Map)request.getSession().getAttribute(MAP_DEFAULTOPTIONS_CONTENT);
+        logger.debug("mapDefaultOptionsContent:" + mapDefaultOptionsContent);
+        
+        boolean found=false;
+    	Iterator itMap = mapQuestionsContent.entrySet().iterator();
+        while (itMap.hasNext()) 
+        {
+        	Map.Entry pairs = (Map.Entry)itMap.next();
+            logger.debug("using the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
+            String localKey=(String)pairs.getKey();
+            logger.debug("localKey: " +  localKey);
+            
+            String question=(String)pairs.getValue();
+            logger.debug("question: " +  question);
+            
+        	Iterator itGOMap = mapGO.entrySet().iterator();
+        	found=false;
+        	Map generalMap=null;
+            while (itGOMap.hasNext()) 
+            {
+            	Map.Entry pairsGo = (Map.Entry)itGOMap.next();
+                logger.debug("using the  pairsGo: " +  pairsGo.getKey() + " = " + pairsGo.getValue());
+                String localGOKey=(String)pairsGo.getKey();
+                logger.debug("localGOKey: " +  localGOKey);
+                
+                if (localGOKey.equals(localKey))
+                {
+                    Map localMap=(Map)pairsGo.getValue();
+                    logger.debug("localMap: " +  localMap);
+                    generalMap=localMap;
+
+                    found=true;
+                    break;
+                }
+                
+            }
+            
+            logger.debug("found: " +  found);
+            logger.debug("generalMap: " +  generalMap);
+            logger.debug("localKey: " +  localKey);
+            
+            if (found == false)
+            {
+                newMap.put(localKey, mapDefaultOptionsContent);
+            }
+            else if (generalMap == null)
+            {
+                newMap.put(localKey, mapDefaultOptionsContent);
+            }
+            else
+            {
+                newMap.put(localKey, generalMap);
+            }
+        }
+        logger.debug("returning newMap: " +  newMap);
+        return newMap;
+    }
+
+    
+    
+    public static Map addDefaultSelectedOptionsContentToMap(HttpServletRequest request, Map mapGSO, Map mapQuestionsContent)
+    {
+        logger.debug("starting  addDefaultSelectedOptionsContentToMap with map:" + mapGSO);
+        
+        Map newMap= new TreeMap(new McComparator());
+        Map mapDefaultSelectedOptionsContent=(Map)request.getSession().getAttribute(MAP_DEFAULTSELECTEDOPTIONS_CONTENT);
+        logger.debug("mapDefaultSelectedOptionsContent:" + mapDefaultSelectedOptionsContent);
+        
+        boolean found=false;
+    	Iterator itMap = mapQuestionsContent.entrySet().iterator();
+        while (itMap.hasNext()) 
+        {
+        	Map.Entry pairs = (Map.Entry)itMap.next();
+            logger.debug("using the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
+            String localKey=(String)pairs.getKey();
+            logger.debug("localKey: " +  localKey);
+            
+            String question=(String)pairs.getValue();
+            logger.debug("question: " +  question);
+            
+        	Iterator itGSOMap = mapGSO.entrySet().iterator();
+        	found=false;
+        	Map generalMap=null;
+            while (itGSOMap.hasNext()) 
+            {
+            	Map.Entry pairsGSo = (Map.Entry)itGSOMap.next();
+                logger.debug("using the  pairsGSo: " +  pairsGSo.getKey() + " = " + pairsGSo.getValue());
+                String localGOKey=(String)pairsGSo.getKey();
+                logger.debug("localGOKey: " +  localGOKey);
+                
+                if (localGOKey.equals(localKey))
+                {
+                    Map localMap=(Map)pairsGSo.getValue();
+                    logger.debug("localMap: " +  localMap);
+                    generalMap=localMap;
+
+                    found=true;
+                    break;
+                }
+                
+            }
+            
+            logger.debug("found: " +  found);
+            logger.debug("generalMap: " +  generalMap);
+            logger.debug("localKey: " +  localKey);
+            
+            if (found == false) 
+            {
+                newMap.put(localKey, mapDefaultSelectedOptionsContent);
+            }
+            else if (generalMap == null)
+            {
+                newMap.put(localKey, mapDefaultSelectedOptionsContent);
+            }
+            else
+            {
+                newMap.put(localKey, generalMap);
+            }
+        }
+        logger.debug("returning newMap: " +  newMap);
+        return newMap;
+    }
+
     
     /**
      * 
@@ -1931,35 +2071,38 @@ public class AuthoringUtil implements McAppConstants {
     public static void updateOrCreateOptions(HttpServletRequest request, Map mapSGO, Map mapGO, Map options, String questionIndex, Map mapGeneralSelectedOptionsContent)
     {
     	logger.debug("doing updateOrCreateOptions...");
-    	Iterator itOptionsGoMap = mapGO.entrySet().iterator();
-		boolean optionContentFound=false;
-        while (itOptionsGoMap.hasNext()) 
-        {
-            Map.Entry pairs = (Map.Entry)itOptionsGoMap.next();
-            logger.debug("using the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
-            
-            optionContentFound = false;
-            Iterator itOptionsSGO = mapSGO.entrySet().iterator();
-            while (itOptionsSGO.hasNext()) 
+    	if (mapGO != null)
+    	{
+        	Iterator itOptionsGoMap = mapGO.entrySet().iterator();
+    		boolean optionContentFound=false;
+            while (itOptionsGoMap.hasNext()) 
             {
-            	Map.Entry pairsSGO = (Map.Entry)itOptionsSGO.next();
-            	if (pairsSGO.getValue().equals(pairs.getValue()))
-				{
-				    optionContentFound = true;
-                	break;
-				}
-            }
+                Map.Entry pairs = (Map.Entry)itOptionsGoMap.next();
+                logger.debug("using the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
+                
+                optionContentFound = false;
+                Iterator itOptionsSGO = mapSGO.entrySet().iterator();
+                while (itOptionsSGO.hasNext()) 
+                {
+                	Map.Entry pairsSGO = (Map.Entry)itOptionsSGO.next();
+                	if (pairsSGO.getValue().equals(pairs.getValue()))
+    				{
+    				    optionContentFound = true;
+                    	break;
+    				}
+                }
 
-            if (optionContentFound == false)
-            {
-            	String optionText=pairs.getValue().toString();
-            	logger.debug("optionContentFound is false and option is: " + optionText);
-            	if ((optionText != null) && (!optionText.equals("")))
-            	{
-            		createOptionContent(request, options, optionText,  questionIndex, mapGeneralSelectedOptionsContent);            		
-            	}
-            }
-        }
+                if (optionContentFound == false)
+                {
+                	String optionText=pairs.getValue().toString();
+                	logger.debug("optionContentFound is false and option is: " + optionText);
+                	if ((optionText != null) && (!optionText.equals("")))
+                	{
+                		createOptionContent(request, options, optionText,  questionIndex, mapGeneralSelectedOptionsContent);            		
+                	}
+                }
+            }    	
+    	}
     }
 
 
@@ -2204,9 +2347,15 @@ public class AuthoringUtil implements McAppConstants {
         	
         	String incorrectFeedback=(String)mapFeedbackIncorrect.get(new Integer(displayOrder).toString());
         	logger.debug("new  incorrectFeedback will be :" + incorrectFeedback);
+        	
+        	if ((incorrectFeedback == null) || (incorrectFeedback.equals("")))
+        	    incorrectFeedback=DEFAULT_FEEDBACK_INCORRECT;
 
         	String correctFeedback=(String)mapFeedbackCorrect.get(new Integer(displayOrder).toString());
         	logger.debug("new correctFeedback will be :" + correctFeedback);
+        	
+        	if ((correctFeedback == null) || (correctFeedback.equals("")))
+        	    correctFeedback=DEFAULT_FEEDBACK_CORRECT;
         	
         	McQueContent mcQueContent=  new McQueContent(question,
           	 		new Integer(displayOrder),

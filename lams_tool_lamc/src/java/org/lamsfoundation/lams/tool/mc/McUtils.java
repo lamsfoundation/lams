@@ -205,7 +205,7 @@ public abstract class McUtils implements McAppConstants {
 	}
 
 	
-	public static void persistRichText(HttpServletRequest request)
+	public static void persistInSessionRichText(HttpServletRequest request)
 	{
 		String richTextOfflineInstructions=request.getParameter(RICHTEXT_OFFLINEINSTRUCTIONS);
 		logger.debug("read parameter richTextOfflineInstructions: " + richTextOfflineInstructions);

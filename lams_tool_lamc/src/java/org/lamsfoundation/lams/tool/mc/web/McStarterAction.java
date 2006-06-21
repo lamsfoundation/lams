@@ -687,6 +687,7 @@ public class McStarterAction extends Action implements McAppConstants {
 		List list=mcService.findMcOptionsContentByQueId(mcQueContent.getUid());
 		logger.debug("options list:" + list);
 
+
 		Map mapOptionsContent= new TreeMap(new McStringComparator());
 		Iterator listIterator=list.iterator();
 		Long mapIndex=new Long(1);
@@ -700,8 +701,9 @@ public class McStarterAction extends Action implements McAppConstants {
 		request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
 		Map mapDefaultOptionsContent=mapOptionsContent;
 		request.getSession().setAttribute(MAP_DEFAULTOPTIONS_CONTENT, mapDefaultOptionsContent);
+
+		
 		logger.debug("starter initialized the Options Map: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT));
-		logger.debug("starter initialized the Default Options Map: " + request.getSession().getAttribute(MAP_DEFAULTOPTIONS_CONTENT));
 		
 		Map mapWeights= new TreeMap(new McComparator());
 		long mapCounter=1;
@@ -760,6 +762,17 @@ public class McStarterAction extends Action implements McAppConstants {
 		mapCheckBoxStates.put("1" ,"INCORRECT");
 		mapCheckBoxStates.put("2" ,"CORRECT");
 		request.getSession().setAttribute(MAP_CHECKBOX_STATES, mapCheckBoxStates);
+
+		
+		Map mapDefaultOptions= new TreeMap(new McComparator());
+		mapDefaultOptions.put("2" ,DEFAULT_FIRST_OPTION);
+		mapDefaultOptions.put("2" ,DEFAULT_SELECTED_OPTION);
+		request.getSession().setAttribute(MAP_DEFAULTOPTIONS_CONTENT, mapDefaultOptions);
+
+		
+		Map mapDefaultSelectedOptions= new TreeMap(new McComparator());
+		mapDefaultSelectedOptions.put("1" ,DEFAULT_SELECTED_OPTION);
+		request.getSession().setAttribute(MAP_DEFAULTSELECTEDOPTIONS_CONTENT, mapDefaultSelectedOptions);
 
 		Map mapSelectedOptions= new TreeMap(new McComparator());
 		mapSelectedOptions.put("1",DEFAULT_SELECTED_OPTION);

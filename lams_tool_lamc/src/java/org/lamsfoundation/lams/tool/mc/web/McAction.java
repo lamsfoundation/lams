@@ -555,7 +555,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		Map mapIncorrectFeedback=new TreeMap(new McComparator());
 		Map mapCorrectFeedback=new TreeMap(new McComparator());
 		 
-    	logger.debug("getting feedback maps from cache:");
+    	logger.debug("getting feedback maps from cache, start using: feedback maps. ");
     	mapIncorrectFeedback=(Map)request.getSession().getAttribute(MAP_INCORRECT_FEEDBACK);
     	logger.debug("mapIncorrectFeedback:" + mapIncorrectFeedback);
     	mapCorrectFeedback=(Map)request.getSession().getAttribute(MAP_CORRECT_FEEDBACK);
@@ -564,6 +564,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 
 	    if (mapIncorrectFeedback != null)
 	    {
+	        logger.debug("mapIncorrectFeedback, condition1 ");
 	    	String incorrectFeedback="";
 	    	if (mapIncorrectFeedback.size() > 0)
 	    	{
@@ -576,6 +577,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 
 	    if (mapCorrectFeedback != null)
 	    {
+	        logger.debug("mapCorrectFeedback, condition2 ");
 	    	String correctFeedback="";
 	    	if (mapCorrectFeedback.size() > 0)
 	    	{
@@ -792,6 +794,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
         		}
 
         		/* present the feedback content the same way for the conditions above*/
+        		logger.debug("present the feedback content the same way for the conditions above..");
         		String richTextFeedbackInCorrect=mcQueContent.getFeedbackIncorrect();
         		logger.debug("richTextFeedbackInCorrect: " + richTextFeedbackInCorrect);
         		if (richTextFeedbackInCorrect == null) richTextFeedbackInCorrect="";
@@ -877,6 +880,22 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     	
 		McUtils.debugMaps(request);
 		logger.debug("final EDIT_OPTIONS_MODE: " + request.getSession().getAttribute(EDIT_OPTIONS_MODE));
+		
+		String richTextFeedbackInCorrect=(String) request.getSession().getAttribute(RICHTEXT_FEEDBACK_INCORRECT);
+		logger.debug("before forward2 richTextFeedbackInCorrect: " + richTextFeedbackInCorrect);
+		if ((richTextFeedbackInCorrect == null) || (richTextFeedbackInCorrect==""))
+		{
+		    request.getSession().setAttribute(RICHTEXT_INCORRECT_FEEDBACK,DEFAULT_FEEDBACK_INCORRECT);
+		}
+		
+
+		String richTextFeedbackCorrect=(String) request.getSession().getAttribute(RICHTEXT_FEEDBACK_CORRECT);
+		logger.debug("before forward2 richTextFeedbackCorrect: " + richTextFeedbackCorrect);
+		if ((richTextFeedbackCorrect == null) || (richTextFeedbackCorrect==""))
+		{
+		    request.getSession().setAttribute(RICHTEXT_CORRECT_FEEDBACK,DEFAULT_FEEDBACK_CORRECT);
+		}
+		
     	return true;
     }
 
@@ -1448,7 +1467,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
             HttpServletResponse response, boolean defaultStarter) throws IOException,
                                          ServletException
     {
-    	logger.debug("starting doneOptions...");
+    	logger.debug("starting performDoneOptions...");
     	logger.debug("using defaultStarter: " + defaultStarter);
     	McUtils.cleanUpUserExceptions(request);
     	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
@@ -1570,6 +1589,8 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		
 		Map mapIncorrectFeedback=(Map)request.getSession().getAttribute(MAP_INCORRECT_FEEDBACK);
 		logger.debug("mapIncorrectFeedback:" +  mapIncorrectFeedback);
+		
+		logger.debug("using feedback maps, condition 3");
 		
 		String richTextIncorrectFeedback=(String)request.getSession().getAttribute(RICHTEXT_INCORRECT_FEEDBACK);
 		logger.debug("richTextIncorrectFeedback:" +  richTextIncorrectFeedback);
@@ -1736,6 +1757,15 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		Map mapGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_OPTIONS_CONTENT);
 		logger.debug("mapGeneralOptionsContent: " + mapGeneralOptionsContent);
 		
+		mapGeneralOptionsContent=AuthoringUtil.addDefaultOptionsContentToMap(request, mapGeneralOptionsContent, mapQuestionsContent);
+		logger.debug("mapGeneralOptionsContent after adding default options: " + mapGeneralOptionsContent);
+		
+		Map mapGeneralSelectedOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT);
+		mapGeneralSelectedOptionsContent=AuthoringUtil.addDefaultSelectedOptionsContentToMap(request, mapGeneralSelectedOptionsContent, mapQuestionsContent);
+		logger.debug("mapGeneralSelectedOptionsContent after adding default options: " + mapGeneralSelectedOptionsContent);
+		request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT,mapGeneralSelectedOptionsContent);
+		
+		
 		Boolean isRevisitingUser= (Boolean) request.getSession().getAttribute(IS_REVISITING_USER);
 		logger.debug("isRevisitingUser: " + isRevisitingUser);
 		
@@ -1755,8 +1785,12 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		
 		logger.debug("remove from mapQuestionsContent the questions with no options");
 		/* remove from mapQuestionsContent the questions with no options */
-		mapQuestionsContent=AuthoringUtil.updateQuestionsMapForNoOptions(request, mapQuestionsContent, mapTestableOptionsContent);
+		//mapQuestionsContent=AuthoringUtil.updateQuestionsMapForNoOptions(request, mapQuestionsContent, mapTestableOptionsContent);
 		logger.debug("returned mapQuestionsContent: " + mapQuestionsContent);
+		logger.debug("assign mapGeneralOptionsContent post test: " + mapTestableOptionsContent);
+		mapGeneralOptionsContent=mapTestableOptionsContent;
+		logger.debug("using  mapGeneralOptionsContent post test: " + mapGeneralOptionsContent);
+		
 		request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
 		logger.debug("persisted MAP_QUESTIONS_CONTENT: " + mapQuestionsContent);
 		
@@ -1803,6 +1837,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		}
 		
 		
+		logger.debug("mapWeights: " + mapWeights);
 		boolean isTotalWeightsValid=AuthoringUtil.validateTotalWeight(mapWeights);
 		logger.debug("isTotalWeightsValid:" + isTotalWeightsValid);
 		if (isTotalWeightsValid == false)
@@ -2097,7 +2132,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		
 		logger.debug("start processing options content...");
 		logger.debug("mapGeneralOptionsContent: " + mapGeneralOptionsContent);
-		Map mapGeneralSelectedOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT);
+		mapGeneralSelectedOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT);
 		logger.debug("mapGeneralSelectedOptionsContent: " + mapGeneralSelectedOptionsContent);
 		
 		logger.debug("will refresh maps...");
