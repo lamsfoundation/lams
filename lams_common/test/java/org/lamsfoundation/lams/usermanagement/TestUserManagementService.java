@@ -23,13 +23,18 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.usermanagement;
 
-import java.io.IOException;
 import java.util.Date;
 
+import javax.servlet.http.HttpSession;
+
+import org.lamsfoundation.lams.contentrepository.dao.IWorkspaceDAO;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.test.AbstractCommonTestCase;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * @author Manpreet Minhas
@@ -37,6 +42,8 @@ import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
 public class TestUserManagementService extends AbstractCommonTestCase {
 	
 	protected UserManagementService userManagementService;
+	protected static final String WORKSPACE_NAME = "Test Workspace";
+	protected static final Integer MMM_USER_ID = new Integer(4);
 	
 	private IBaseDAO baseDAO;
 	
@@ -47,6 +54,36 @@ public class TestUserManagementService extends AbstractCommonTestCase {
 		super.setUp();
 		baseDAO =(BaseDAO)context.getBean("baseDAO");
 		userManagementService = (UserManagementService)context.getBean("userManagementService");
+	}
+
+	public void testCreateWorkspace(){
+		
+		Workspace workspace =  new Workspace(WORKSPACE_NAME);
+		userManagementService.save(workspace);
+		Integer workspaceId = workspace.getWorkspaceId();
+
+		// set up the root folder
+		WorkspaceFolder rootWorkspaceFolder = new WorkspaceFolder(workspace.getName(),workspace.getWorkspaceId(),
+				MMM_USER_ID, new Date(), new Date(), WorkspaceFolder.NORMAL);
+		userManagementService.save(rootWorkspaceFolder);
+		workspace.setRootFolder(rootWorkspaceFolder);
+		
+		// set up the default workspace folder, under the root folder
+		String sequenceFolderName = workspace.getName()+"_Sequences";
+		WorkspaceFolder defRunSequencesFolder = new WorkspaceFolder(sequenceFolderName,workspace.getWorkspaceId(),
+				MMM_USER_ID,new Date(), new Date(), WorkspaceFolder.RUN_SEQUENCES);
+		userManagementService.save(defRunSequencesFolder);
+		workspace.setDefaultRunSequencesFolder(defRunSequencesFolder);
+		userManagementService.save(workspace);
+
+		// is it all okay in the db? Not 100% test as this just checks what Hibernate has, not what the db has.
+		Workspace retrievedWorkspace = (Workspace) baseDAO.find(Workspace.class, workspaceId);
+		assertNotNull("Retrieved saved workspace id="+workspaceId, retrievedWorkspace);
+		assertEquals("Workspace name as expected "+WORKSPACE_NAME, WORKSPACE_NAME, retrievedWorkspace.getName());
+		assertNotNull("Root folder exists",retrievedWorkspace.getRootFolder());
+		assertEquals("Root folder has expected id "+rootWorkspaceFolder.getWorkspaceFolderId(), rootWorkspaceFolder.getWorkspaceFolderId(), retrievedWorkspace.getRootFolder().getWorkspaceFolderId());
+		assertNotNull("Default run sequences folder exists", retrievedWorkspace.getDefaultRunSequencesFolder());
+		assertEquals("Default run sequences folder has expected id "+defRunSequencesFolder.getWorkspaceFolderId(), defRunSequencesFolder.getWorkspaceFolderId(), retrievedWorkspace.getDefaultRunSequencesFolder().getWorkspaceFolderId());
 	}
 
 /*	public void testSaveOrganisation(){
