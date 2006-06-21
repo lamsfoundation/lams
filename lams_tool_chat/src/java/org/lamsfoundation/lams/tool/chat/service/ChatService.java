@@ -242,20 +242,27 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 
 	public void setAsDefineLater(Long toolContentId)
 			throws DataMissingException, ToolException {
-		// TODO Auto-generated method stub
-
+		Chat chat = chatDAO.getByContentId(toolContentId);
+		if(chat == null){
+			throw new ToolException("Could not find tool with toolContentID: " + toolContentId);
+		}
+		chat.setDefineLater(true);
+		chatDAO.saveOrUpdate(chat);
 	}
 
 	public void setAsRunOffline(Long toolContentId)
 			throws DataMissingException, ToolException {
-		// TODO Auto-generated method stub
-
+		Chat chat = chatDAO.getByContentId(toolContentId);
+		if(chat == null){
+			throw new ToolException("Could not find tool with toolContentID: " + toolContentId);
+		}
+		chat.setRunOffline(true);
+		chatDAO.saveOrUpdate(chat);
 	}
 
 	public void removeToolContent(Long toolContentId, boolean removeSessionData)
 			throws SessionDataExistsException, ToolException {
 		// TODO Auto-generated method stub
-
 	}
 
 	/**

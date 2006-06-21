@@ -45,6 +45,7 @@ public class ChatDTO {
 		instructions = chat.getInstructions();
 		onlineInstructions = chat.getOnlineInstructions();
 		offlineInstructions = chat.getOfflineInstructions();
+		contentInUse = chat.getContentInUse();
 
 		onlineInstructionsFiles = new TreeSet<ChatAttachmentDTO>();
 		offlineInstructionsFiles = new TreeSet<ChatAttachmentDTO>();
@@ -77,14 +78,16 @@ public class ChatDTO {
 	public String onlineInstructions;
 
 	public String offlineInstructions;
-
+	
+	public boolean defineLater;
+	
+	public boolean contentInUse;
+	
 	public Set<ChatAttachmentDTO> onlineInstructionsFiles;
 
 	public Set<ChatAttachmentDTO> offlineInstructionsFiles;
 
 	public Set<ChatSessionDTO> sessionDTOs;
-	
-	public boolean chatEditable;
 
 	public Set<ChatSessionDTO> getSessionDTOs() {
 		return sessionDTOs;
@@ -152,11 +155,11 @@ public class ChatDTO {
 		this.toolContentId = toolContentID;
 	}
 
-	public boolean isChatEditable() {
-		return chatEditable;
+	public Boolean getContentInUse() {
+		return contentInUse;
 	}
 
-	public void setChatEditable(boolean chatEditable) {
-		this.chatEditable = chatEditable;
+	public void setContentInUse(Boolean contentInUse) {
+		this.contentInUse = contentInUse;
 	}
 }

@@ -25,16 +25,19 @@
 
 <p align="right">
 	<c:choose>
-		<c:when test='${dto.chatEditable == "true"}'>
+		<c:when test="${not dto.contentInUse}">
 			<c:url value="/authoring.do" var="authoringUrl">
 				<c:param name="toolContentID" value="${dto.toolContentId}" />
+				<c:param name="mode" value="teacher" />
 			</c:url>
 			<html:link href="${authoringUrl}" styleClass="button" target="_blank">
 				<fmt:message key="button.editActivity" />
 			</html:link>
 		</c:when>
 		<c:otherwise>
-			<fmt:message key="message.contentInUseSet" />
+			<p>
+				<fmt:message key="message.contentInUseSet" />
+			</p>
 		</c:otherwise>
 	</c:choose>
 </p>

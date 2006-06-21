@@ -56,7 +56,8 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @version
  * 
  * @struts.action path="/learning" parameter="dispatch"
- * @struts.action-forward name="success" path="tiles:/learning/main"
+ * @struts.action-forward name="chat_client" path="tiles:/learning/main"
+ * @struts.action-forward name="message_page" path="tiles:/generic/message"
  */
 public class LearningAction extends LamsDispatchAction {
 
@@ -66,38 +67,57 @@ public class LearningAction extends LamsDispatchAction {
 
 	private IChatService chatService;
 
-public ActionForward unspecified(ActionMapping mapping, ActionForm form,
+	public ActionForward unspecified(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		// 'toolSessionID' and 'mode' paramters are expected to be present.
 		// TODO need to catch exceptions and handle errors.
-		ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE,
-				MODE_OPTIONAL);		
-		Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
-		
+		ToolAccessMode mode = WebUtil.readToolAccessModeParam(request,
+				AttributeNames.PARAM_MODE, MODE_OPTIONAL);
+
+		Long toolSessionID = WebUtil.readLongParam(request,
+				AttributeNames.PARAM_TOOL_SESSION_ID);
+
 		// set up chatService
 		if (chatService == null) {
 			chatService = ChatServiceProxy.getChatService(this.getServlet()
 					.getServletContext());
 		}
-		
-		// Retreive the session
-		ChatSession chatSession = chatService.getSessionBySessionId(toolSessionID);
+
+		// Retrieve the session and content.
+		ChatSession chatSession = chatService
+				.getSessionBySessionId(toolSessionID);
 		if (chatSession == null) {
-			throw new ChatException("Cannot retreive session with toolSessionId" + toolSessionID);
+			throw new ChatException(
+					"Cannot retreive session with toolSessionID"
+							+ toolSessionID);
 		}
-		
+
+		Chat chat = chatSession.getChat();
+
+		// check defineLater
+		if (chat.getDefineLater()) {
+			request.setAttribute(ChatConstants.ATTR_MESSAGE, getResources(request).getMessage(
+					"message.defineLaterSet"));
+			return mapping.findForward("message_page");
+		}
+
+		// check runOffline
+		if (chat.getRunOffline()) {
+			request.setAttribute(ChatConstants.ATTR_MESSAGE, getResources(request).getMessage(
+					"message.runOfflineSet"));
+			return mapping.findForward("message_page");
+		}
+
 		// Retrieve the current user
 		ChatUser chatUser = getCurrentUser(toolSessionID);
-		
+
 		// Create the room if it doesnt exist
 		if (chatSession.getJabberRoom() == null) {
 			chatService.createJabberRoom(chatSession);
 			chatService.saveOrUpdateChatSession(chatSession);
-		}		
-		
-		Chat chat = chatSession.getChat();
-		
+		}
+
 		request.setAttribute("XMPPDOMAIN", ChatConstants.XMPPDOMAIN);
 		request.setAttribute("USERNAME", chatUser.getUserId());
 		request.setAttribute("PASSWORD", chatUser.getUserId());
@@ -105,15 +125,24 @@ public ActionForward unspecified(ActionMapping mapping, ActionForm form,
 		request.setAttribute("NICK", chatUser.getJabberNickname());
 		request.setAttribute("MODE", "learner");
 		request.setAttribute("USER_UID", chatUser.getUid());
-		request.setAttribute("LEARNER_FINISHED", chatUser.getFinishedActivity());
+		request
+				.setAttribute("LEARNER_FINISHED", chatUser
+						.getFinishedActivity());
 		request.setAttribute("LOCK_ON_FINISHED", chat.getLockOnFinished());
-		
+
 		request.setAttribute("chatTitle", chat.getTitle());
 		request.setAttribute("chatInstructions", chat.getInstructions());
-		
-		return mapping.findForward("success");
-		
-	}	private ChatUser getCurrentUser(Long toolSessionId) {
+
+		// Ensure that the content is use flag is set.
+		if (!chat.getContentInUse()) {
+			chat.setContentInUse(new Boolean(true));
+			chatService.saveOrUpdateChat(chat);
+		}
+
+		return mapping.findForward("chat_client");
+	}
+
+	private ChatUser getCurrentUser(Long toolSessionId) {
 		UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(
 				AttributeNames.USER);
 
@@ -129,26 +158,28 @@ public ActionForward unspecified(ActionMapping mapping, ActionForm form,
 
 		return chatUser;
 	}
-	
-	public ActionForward finishActivity (ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-		
+
+	public ActionForward finishActivity(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response) {
+
 		Long chatUserUID = WebUtil.readLongParam(request, "chatUserUID");
-		
+
 		// set the finished flag
 		ChatUser chatUser = chatService.getUserByUID(chatUserUID);
 		if (chatUser != null) {
 			chatUser.setFinishedActivity(true);
 			chatService.saveOrUpdateChatUser(chatUser);
 		} else {
-			log.error("finishActivity(): couldn't find ChatUser with uid: " + chatUserUID );
+			log.error("finishActivity(): couldn't find ChatUser with uid: "
+					+ chatUserUID);
 		}
-		
+
 		ToolSessionManager sessionMgrService = ChatServiceProxy
-		.getChatSessionManager(getServlet().getServletContext());
+				.getChatSessionManager(getServlet().getServletContext());
 
 		// get back login user DTO
 		// get session from shared session.
-		
+
 		HttpSession ss = SessionManager.getSession();
 		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 		Long userID = new Long(user.getUserID().longValue());
@@ -165,7 +196,7 @@ public ActionForward unspecified(ActionMapping mapping, ActionForm form,
 		} catch (IOException e) {
 			throw new ChatException(e);
 		}
-	
+
 		return null; // TODO need to return proper page.
 	}
 }

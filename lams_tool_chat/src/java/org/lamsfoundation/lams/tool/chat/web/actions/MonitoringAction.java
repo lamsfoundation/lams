@@ -89,7 +89,7 @@ public class MonitoringAction extends LamsDispatchAction {
 		}
 		Chat chat = chatService.getChatByContentId(toolContentID);
 		ChatDTO chatDTO = new ChatDTO(chat);
-		
+
 		Map<Long, Integer> sessCountMap = chatService
 				.getMessageCountBySession(chat.getUid());
 
@@ -125,9 +125,6 @@ public class MonitoringAction extends LamsDispatchAction {
 
 			chatDTO.getSessionDTOs().add(sessionDTO);
 		}
-
-		chatDTO.setChatEditable(this.isChatEditable(chat));
-
 		request.setAttribute("monitoringDTO", chatDTO);
 		return mapping.findForward("success");
 	}
@@ -237,23 +234,5 @@ public class MonitoringAction extends LamsDispatchAction {
 		}
 
 		return chatUser;
-	}
-
-	// TODO need to double check this.
-	private boolean isChatEditable(Chat chat) {
-		if ((chat.getDefineLater() == true) && (chat.getContentInUse() == true)) {
-			log
-					.error("An exception has occurred: There is a bug in this tool, conflicting flags are set");
-			return false;
-		} else if ((chat.getDefineLater() == true)
-				&& (chat.getContentInUse() == false))
-			return true;
-		else if ((chat.getDefineLater() == false)
-				&& (chat.getContentInUse() == false))
-			return true;
-		else
-			// (content.isContentInUse()==true && content.isDefineLater() ==
-			// false)
-			return false;
 	}
 }

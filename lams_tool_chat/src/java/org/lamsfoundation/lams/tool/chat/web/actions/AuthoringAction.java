@@ -42,6 +42,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
+import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.chat.beans.AuthoringSessionBean;
 import org.lamsfoundation.lams.tool.chat.model.Chat;
 import org.lamsfoundation.lams.tool.chat.model.ChatAttachment;
@@ -61,6 +62,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  *                scope="request" validate="false"
  * 
  * @struts.action-forward name="success" path="tiles:/authoring/main"
+ * @struts.action-forward name="message_page" path="tiles:/generic/message"
  */
 public class AuthoringAction extends LamsDispatchAction {
 
@@ -77,9 +79,6 @@ public class AuthoringAction extends LamsDispatchAction {
 	protected ActionForward unspecified(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
 
-		// set up the form.
-		AuthoringForm authForm = (AuthoringForm) form;
-
 		// Extract toolContentID from parameters.
 		Long toolContentID = new Long(WebUtil.readLongParam(request,
 				AttributeNames.PARAM_TOOL_CONTENT_ID));
@@ -87,13 +86,6 @@ public class AuthoringAction extends LamsDispatchAction {
 			logger.debug("entering method unspecified: toolContentID = "
 					+ toolContentID);
 		}
-
-		// create a new authoringSessionBean and add to session
-		AuthoringSessionBean authSession = new AuthoringSessionBean();
-		String id = ChatConstants.AUTH_SESSION_ID
-				+ createAuthSessionId(request.getSession());
-		authSession.setAuthSessionId(id);
-		request.getSession().setAttribute(id, authSession);
 
 		// set up chatService
 		if (chatService == null) {
@@ -110,11 +102,42 @@ public class AuthoringAction extends LamsDispatchAction {
 			// TODO NOTE: this causes DB orphans when LD not saved.
 		}
 
+		// check if content in use is set
+		if (chat.getContentInUse()) {
+			// Cannot edit while content is in use.
+			request.setAttribute(ChatConstants.ATTR_MESSAGE, getResources(request).getMessage(
+			"error.content.locked"));
+			return mapping.findForward("message_page");
+		}
+
+		// set the defineLater flag so that learners cannot use content while we
+		// are editing.
+		// This flag is released when updateContent is called.
+		chat.setDefineLater(true);
+		chatService.saveOrUpdateChat(chat);
+
+		// set the access mode.
+		ToolAccessMode mode = getAccessMode(request);
+		request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
+
+		// create a new authoringSessionBean and add to session
+		AuthoringSessionBean authSession = new AuthoringSessionBean();
+		String id = ChatConstants.AUTH_SESSION_ID
+				+ createAuthSessionId(request.getSession());
+		authSession.setAuthSessionId(id);
+		authSession.setMode(mode);
+		request.getSession().setAttribute(id, authSession);
+
+		// set up the form.
+		AuthoringForm authForm = (AuthoringForm) form;
+
 		// populating the AuthoringForm using Chat content
-		populateAuthForm((AuthoringForm) form, chat);
+		populateAuthForm(authForm, chat);
 		resetAuthSession(authSession, chat);
+
 		authForm.setAuthSession(authSession);
 		authForm.setAuthSessionId(authSession.getAuthSessionId());
+
 		return mapping.findForward("success");
 	}
 
@@ -133,7 +156,9 @@ public class AuthoringAction extends LamsDispatchAction {
 
 	public ActionForward updateContent(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
-		// Local History 10:29, started change.
+
+		setAccessMode(request, form);
+
 		// TODO need error checking.
 		AuthoringForm authForm = (AuthoringForm) form;
 
@@ -146,14 +171,13 @@ public class AuthoringAction extends LamsDispatchAction {
 			chatService = ChatServiceProxy.getChatService(this.getServlet()
 					.getServletContext());
 		}
-		Chat content = chatService.getChatByContentId(authForm
-				.getToolContentID());
+		Chat chat = chatService.getChatByContentId(authForm.getToolContentID());
 
 		// copy form inputs to content
-		populateChat(content, authForm);
+		populateChat(chat, authForm);
 
 		// adding unsaved uploaded files.
-		Set attachments = content.getChatAttachments();
+		Set attachments = chat.getChatAttachments();
 		if (attachments == null) {
 			attachments = new HashSet();
 		}
@@ -161,12 +185,13 @@ public class AuthoringAction extends LamsDispatchAction {
 		attachments.addAll(authSession.getUnsavedOfflineFilesList());
 
 		// Removing attachments marked for deletion.
-		List<ChatAttachment> deletedAttachments = authSession.getDeletedFilesList();
-		for(ChatAttachment delAtt:deletedAttachments) {
+		List<ChatAttachment> deletedAttachments = authSession
+				.getDeletedFilesList();
+		for (ChatAttachment delAtt : deletedAttachments) {
 			// remove from repository
 			chatService.deleteFromRepository(delAtt.getFileUuid(), delAtt
 					.getFileVersionId());
-			
+
 			// remove from ChatAttachments
 			Iterator attIter = attachments.iterator();
 			while (attIter.hasNext()) {
@@ -179,70 +204,85 @@ public class AuthoringAction extends LamsDispatchAction {
 		}
 
 		// set attachments in case it didnt exist
-		content.setChatAttachments(attachments);
+		chat.setChatAttachments(attachments);
 
-		// saving changes.
-		content.setUpdateDate(new Date());
-		chatService.saveOrUpdateChat(content);
+		// set the update date
+		chat.setUpdateDate(new Date());
 
-		request.setAttribute("updateContentSuccess", new Boolean(true));
+		// releasing defineLater flag so that learner can start using the tool.
+		chat.setDefineLater(false);
 
-		// update form and return to page.
-		resetAuthSession(authSession, content);
-		authForm.setAuthSession(authSession);
-		
-        request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG,Boolean.TRUE);
+		// persist changes.
+		chatService.saveOrUpdateChat(chat);
+
+		request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG,
+				Boolean.TRUE);
+
 		return mapping.findForward("success");
 	}
 
 	public ActionForward uploadOnline(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
+
+		setAccessMode(request, form);
+
 		return uploadFile(mapping, form, IToolContentHandler.TYPE_ONLINE,
 				request);
 	}
 
 	public ActionForward uploadOffline(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
+
+		setAccessMode(request, form);
+
 		return uploadFile(mapping, form, IToolContentHandler.TYPE_OFFLINE,
 				request);
 	}
 
 	public ActionForward deleteOnline(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
-		
-		AuthoringForm au = (AuthoringForm)form;
-		
-		Long myLong = au.getDeleteFileUuid();
-		
-		return deleteFile(mapping, form, IToolContentHandler.TYPE_ONLINE, request);
+
+		setAccessMode(request, form);
+
+		return deleteFile(mapping, form, IToolContentHandler.TYPE_ONLINE,
+				request);
 	}
 
 	public ActionForward deleteOffline(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
 
-		return deleteFile(mapping, form, IToolContentHandler.TYPE_OFFLINE, request);
+		setAccessMode(request, form);
+
+		return deleteFile(mapping, form, IToolContentHandler.TYPE_OFFLINE,
+				request);
 	}
 
 	public ActionForward removeUnsavedOnline(ActionMapping mapping,
 			ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
 
-		return removeUnsaved(mapping, form, IToolContentHandler.TYPE_ONLINE, request);
+		setAccessMode(request, form);
+
+		return removeUnsaved(mapping, form, IToolContentHandler.TYPE_ONLINE,
+				request);
 	}
-
-
 
 	public ActionForward removeUnsavedOffline(ActionMapping mapping,
 			ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
 
-		return removeUnsaved(mapping, form, IToolContentHandler.TYPE_OFFLINE, request);
+		setAccessMode(request, form);
+
+		return removeUnsaved(mapping, form, IToolContentHandler.TYPE_OFFLINE,
+				request);
 	}
 
 	/* ========== Private Methods ********** */
-	
+
 	private ActionForward uploadFile(ActionMapping mapping, ActionForm form,
 			String type, HttpServletRequest request) {
+
+		setAccessMode(request, form);
 
 		AuthoringForm authForm = (AuthoringForm) form;
 
@@ -286,77 +326,84 @@ public class AuthoringAction extends LamsDispatchAction {
 
 		authForm.setAuthSession(authSession);
 		request.setAttribute("unsavedChanges", new Boolean(true));
+
 		return mapping.findForward("success");
 	}
 
-	private ActionForward deleteFile(ActionMapping mapping, ActionForm form, String type, HttpServletRequest request) {
+	private ActionForward deleteFile(ActionMapping mapping, ActionForm form,
+			String type, HttpServletRequest request) {
 		AuthoringForm authForm = (AuthoringForm) form;
 
 		// retrieving authoring session bean
 		AuthoringSessionBean authSession = (AuthoringSessionBean) request
 				.getSession().getAttribute(authForm.getAuthSessionId());
-		
+
 		List fileList;
 		if (StringUtils.equals(IToolContentHandler.TYPE_OFFLINE, type)) {
 			fileList = authSession.getOfflineFilesList();
 		} else {
 			fileList = authSession.getOnlineFilesList();
 		}
-		
+
 		Iterator iter = fileList.iterator();
-		
-		while(iter.hasNext()) {
+
+		while (iter.hasNext()) {
 			ChatAttachment att = (ChatAttachment) iter.next();
-			
+
 			if (att.getFileUuid().equals(authForm.getDeleteFileUuid())) {
-				// move to delete file list, at next updateContent it will be deleted
+				// move to delete file list, at next updateContent it will be
+				// deleted
 				authSession.getDeletedFilesList().add(att);
-				
+
 				// remove from this list
 				iter.remove();
 				break;
 			}
 		}
-		
+
 		authForm.setAuthSession(authSession);
 		request.setAttribute("unsavedChanges", new Boolean(true));
+
 		return mapping.findForward("success");
 	}
-	private ActionForward removeUnsaved(ActionMapping mapping, ActionForm form, String type, HttpServletRequest request) {
+
+	private ActionForward removeUnsaved(ActionMapping mapping, ActionForm form,
+			String type, HttpServletRequest request) {
 		AuthoringForm authForm = (AuthoringForm) form;
 
 		// retrieving authoring session bean
 		AuthoringSessionBean authSession = (AuthoringSessionBean) request
 				.getSession().getAttribute(authForm.getAuthSessionId());
-		
+
 		List unsavedAttachments;
-		
+
 		if (StringUtils.equals(IToolContentHandler.TYPE_OFFLINE, type)) {
 			unsavedAttachments = authSession.getUnsavedOfflineFilesList();
 		} else {
 			unsavedAttachments = authSession.getUnsavedOnlineFilesList();
 		}
-		
+
 		Iterator iter = unsavedAttachments.iterator();
-		while(iter.hasNext()) {
+		while (iter.hasNext()) {
 			ChatAttachment remAtt = (ChatAttachment) iter.next();
-			
+
 			if (remAtt.getFileUuid().equals(authForm.getDeleteFileUuid())) {
 				// delete from repository
 				chatService.deleteFromRepository(remAtt.getFileUuid(), remAtt
 						.getFileVersionId());
-				
-				// remove from session list 
+
+				// remove from session list
 				iter.remove();
 				break;
-			}			
-		}	
-		
+			}
+		}
+
 		authForm.setAuthSession(authSession);
 		request.setAttribute("unsavedChanges", new Boolean(true));
+
 		return mapping.findForward("success");
 	}
-	
+
 	/**
 	 * Populates a Chat using inputs in AuthoringForm.
 	 * 
@@ -411,5 +458,38 @@ public class AuthoringAction extends LamsDispatchAction {
 				authSession.getOnlineFilesList().add(attachment);
 			}
 		}
+	}
+
+	/**
+	 * Get ToolAccessMode from HttpRequest parameters. Default value is AUTHOR
+	 * mode.
+	 * 
+	 * @param request
+	 * @return
+	 */
+	private ToolAccessMode getAccessMode(HttpServletRequest request) {
+		ToolAccessMode mode;
+		String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
+		if (StringUtils.equalsIgnoreCase(modeStr, ToolAccessMode.TEACHER
+				.toString()))
+			mode = ToolAccessMode.TEACHER;
+		else
+			mode = ToolAccessMode.AUTHOR;
+		return mode;
+	}
+
+	/**
+	 * Set the request attribute 'mode'using value stored in
+	 * AuthoringSessionBean.
+	 * 
+	 * @param request
+	 * @param form
+	 */
+	private void setAccessMode(HttpServletRequest request, ActionForm form) {
+		AuthoringForm authForm = (AuthoringForm) form;
+		AuthoringSessionBean authSession = (AuthoringSessionBean) request
+				.getSession().getAttribute(authForm.getAuthSessionId());
+		request.setAttribute(AttributeNames.ATTR_MODE, authSession.getMode()
+				.toString());
 	}
 }

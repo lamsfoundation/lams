@@ -28,6 +28,7 @@ package org.lamsfoundation.lams.tool.chat.beans;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.chat.model.ChatAttachment;
 
 public class AuthoringSessionBean {
@@ -42,7 +43,9 @@ public class AuthoringSessionBean {
 	List<ChatAttachment> unsavedOfflineFilesList = new LinkedList<ChatAttachment>();
 	
 	List<ChatAttachment> deletedFilesList = new LinkedList<ChatAttachment>();
-
+	
+	ToolAccessMode mode;
+	
 	public String getAuthSessionId() {
 		return authSessionId;
 	}
@@ -91,5 +94,13 @@ public class AuthoringSessionBean {
 	public void setUnsavedOnlineFilesList(
 			List<ChatAttachment> unsavedOnlineFilesList) {
 		this.unsavedOnlineFilesList = unsavedOnlineFilesList;
+	}
+
+	public ToolAccessMode getMode() {
+		return mode;
+	}
+
+	public void setMode(ToolAccessMode mode) {
+		this.mode = mode;
 	}
 }
