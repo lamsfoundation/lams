@@ -159,8 +159,10 @@ public class IndexAction extends Action {
 						lessonLinks.add(new IndexLinkBean("index.participate","javascript:openLearner("+lesson.getLessonId()+")"));
 					}
 				}
-				IndexLessonBean lessonBean = new IndexLessonBean(lesson.getLessonName(), lessonLinks);
-				lessonBeans.add(lessonBean);
+				if(lessonLinks.size()>0){
+					IndexLessonBean lessonBean = new IndexLessonBean(lesson.getLessonName(), lessonLinks);
+					lessonBeans.add(lessonBean);
+				}
 			}
 		}
 		Collections.sort(lessonBeans);
