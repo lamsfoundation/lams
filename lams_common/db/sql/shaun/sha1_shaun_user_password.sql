@@ -1,0 +1,1 @@
+update lams_user set password=SHA1(password) where user_id>8;
