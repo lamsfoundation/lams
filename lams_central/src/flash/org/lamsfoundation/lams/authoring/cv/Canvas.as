@@ -180,6 +180,20 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
         
     }
 	
+	/**
+	 * Request imported design from server
+	 * 
+	 * @usage   
+	 * @param   learningDesignID 
+	 * @return  
+	 */
+	
+	public function openDesignByImport(learningDesignID:Number){
+		var callback:Function = Proxy.create(this,setDesign);
+        Application.getInstance().getComms().getRequest('authoring/author.do?method=getLearningDesignDetails&learningDesignID='+learningDesignID,callback, false);
+		
+	}
+	
 	public function saveDesign(){
 		if(_ddm.learningDesignID == undefined){
 			saveDesignToServerAs();
