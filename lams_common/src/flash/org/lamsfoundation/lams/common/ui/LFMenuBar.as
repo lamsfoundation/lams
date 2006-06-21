@@ -110,8 +110,11 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
         file_menu.addMenuItem({type:"separator"});
         file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_save'), instanceName:"saveItem"});
         file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_saveas'), instanceName:"saveItemAs"});
-
-
+		file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_import'), instanceName:"importItem"});
+        file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_export'), instanceName:"exportItem"});
+		file_menu.addMenuItem({type:"separator"});
+		file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_exit'), instanceName:"exitItem"});
+		
 		/*=================
             EDIT MENU
         =================*/
@@ -249,9 +252,15 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
 				
 			case eventObj.menu.saveItemAs:
 			//TODO: go through workspace to save design in location
-				Debugger.log('Clicked Flie > Save As',Debugger.GEN,'fileMenuClicked','LFMenuBar');
+				Debugger.log('Clicked File > Save As',Debugger.GEN,'fileMenuClicked','LFMenuBar');
                 org.lamsfoundation.lams.authoring.Application(app).getCanvas().saveDesignToServerAs();
                 break;
+			case eventObj.menu.importItem:
+				Debugger.log('Clicked File > Import',Debugger.GEN,'fileMenuClicked','LFMenuBar');
+				break;
+			case eventObj.menu.exportItem:
+			Debugger.log('Clicked File > Export',Debugger.GEN,'fileMenuClicked','LFMenuBar');
+				break;
 			case eventObj.menu.editClassItem:
 				break;
 			case eventObj.menu.refreshItem:
