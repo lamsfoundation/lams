@@ -116,6 +116,11 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Mc
         List listMonitoredAnswersContainerDTO=MonitoringUtil.buildSessionQuestionData(request, content, toolSessionID, userID);
 	    request.getSession().setAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO, listMonitoredAnswersContainerDTO);
 	    logger.debug("LIST_MONITORED_ANSWERS_CONTAINER_DTO: " + request.getSession().getAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO));
+	    
+	    List listMonitoredMarksContainerDTO=MonitoringUtil.buildGroupsMarkData(request, content, mcService);
+	    request.getSession().setAttribute(LIST_MONITORED_MARKS_CONTAINER_DTO, listMonitoredMarksContainerDTO);
+	    logger.debug("LIST_MONITORED_MARKS_CONTAINER_DTO: " + request.getSession().getAttribute(LIST_MONITORED_MARKS_CONTAINER_DTO));
+
         
     	logger.debug("ending learner mode: ");
     }
@@ -150,6 +155,12 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Mc
         List listMonitoredAnswersContainerDTO=MonitoringUtil.buildGroupsQuestionData(request, content);
 	    request.getSession().setAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO, listMonitoredAnswersContainerDTO);
 	    logger.debug("LIST_MONITORED_ANSWERS_CONTAINER_DTO: " + request.getSession().getAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO));
+	    
+	    
+	    List listMonitoredMarksContainerDTO=MonitoringUtil.buildGroupsMarkData(request, content, mcService);
+	    request.getSession().setAttribute(LIST_MONITORED_MARKS_CONTAINER_DTO, listMonitoredMarksContainerDTO);
+	    logger.debug("LIST_MONITORED_MARKS_CONTAINER_DTO: " + request.getSession().getAttribute(LIST_MONITORED_MARKS_CONTAINER_DTO));
+
         logger.debug("ending teacher mode: ");
     }
 
