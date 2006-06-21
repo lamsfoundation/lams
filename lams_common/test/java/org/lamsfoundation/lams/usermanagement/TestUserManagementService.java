@@ -20,21 +20,15 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-/* $$Id$$ */
+/* $Id$ */
 package org.lamsfoundation.lams.usermanagement;
 
 import java.util.Date;
 
-import javax.servlet.http.HttpSession;
-
-import org.lamsfoundation.lams.contentrepository.dao.IWorkspaceDAO;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.test.AbstractCommonTestCase;
-import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
-import org.lamsfoundation.lams.web.session.SessionManager;
-import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * @author Manpreet Minhas
