@@ -1205,6 +1205,16 @@ public class McAction extends LamsDispatchAction implements McAppConstants
      	logger.debug("mapQuestionsContent before move down: " + mapQuestionsContent);
      	logger.debug("mapQuestionsContent size move down: " + mapQuestionsContent.size());
 
+		Map mapDefaultOptions= new TreeMap(new McComparator());
+		mapDefaultOptions.put("1" ,DEFAULT_FIRST_OPTION);
+		mapDefaultOptions.put("2" ,DEFAULT_SELECTED_OPTION);
+		request.getSession().setAttribute(MAP_DEFAULTOPTIONS_CONTENT, mapDefaultOptions);
+
+		
+		Map mapDefaultSelectedOptions= new TreeMap(new McComparator());
+		mapDefaultSelectedOptions.put("1" ,DEFAULT_SELECTED_OPTION);
+		request.getSession().setAttribute(MAP_DEFAULTSELECTEDOPTIONS_CONTENT, mapDefaultSelectedOptions);
+		
      	//perform a move down if there are at least 2 questions
      	if (mapQuestionsContent.size() > 1)
      	{
@@ -1220,8 +1230,12 @@ public class McAction extends LamsDispatchAction implements McAppConstants
             	request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
             	logger.debug("updated Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
             	
-            	Map mapGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_OPTIONS_CONTENT);
-            	if (mapGeneralOptionsContent.size() > 0)
+        		Map mapGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_OPTIONS_CONTENT);
+        		logger.debug("mapGeneralOptionsContent: " + mapGeneralOptionsContent);
+        		mapGeneralOptionsContent=AuthoringUtil.addDefaultOptionsContentToMap(request, mapGeneralOptionsContent, mapQuestionsContent);
+        		logger.debug("mapGeneralOptionsContent after adding default options: " + mapGeneralOptionsContent);
+
+        		if (mapGeneralOptionsContent.size() > 1)
             	{
             		logger.debug("initial test: current mapGeneralOptionsContent: " + mapGeneralOptionsContent);
                 	mapGeneralOptionsContent= AuthoringUtil.shiftOptionsMap(mapGeneralOptionsContent, questionIndex, "down");
@@ -1229,8 +1243,12 @@ public class McAction extends LamsDispatchAction implements McAppConstants
                 	request.getSession().setAttribute(MAP_GENERAL_OPTIONS_CONTENT, mapGeneralOptionsContent);	
             	}
             	
-            	Map mapGeneralSelectedOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT);
-            	if (mapGeneralSelectedOptionsContent.size() > 0)
+        		Map mapGeneralSelectedOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT);
+        		logger.debug("mapGeneralSelectedOptionsContent: " + mapGeneralSelectedOptionsContent);
+        		mapGeneralSelectedOptionsContent=AuthoringUtil.addDefaultSelectedOptionsContentToMap(request, mapGeneralSelectedOptionsContent, mapQuestionsContent);
+        		logger.debug("mapGeneralSelectedOptionsContent after adding default options: " + mapGeneralOptionsContent);
+            	
+            	if (mapGeneralSelectedOptionsContent.size() > 1)
             	{
             		logger.debug("initial test: current mapGeneralSelectedOptionsContent: " + mapGeneralSelectedOptionsContent);
             		mapGeneralSelectedOptionsContent= AuthoringUtil.shiftOptionsMap(mapGeneralSelectedOptionsContent, questionIndex, "down");
@@ -1239,7 +1257,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
             	}
             	
             	Map mapWeights= AuthoringUtil.repopulateCurrentWeightsMap(request, "questionWeight");
-            	if (mapWeights.size() > 0)
+            	if (mapWeights.size() > 1)
             	{
             		logger.debug("initial test: current mapWeights: " + mapWeights);
             		mapWeights= AuthoringUtil.shiftWeightsMap(mapWeights, questionIndex, "down");
@@ -1249,7 +1267,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
             	
             	Map mapIncorrectFeedback=(Map)request.getSession().getAttribute(MAP_INCORRECT_FEEDBACK);
             	logger.debug("mapIncorrectFeedback: " + mapIncorrectFeedback);
-            	if (mapIncorrectFeedback.size() > 0)
+            	if (mapIncorrectFeedback.size() > 1)
             	{
             		mapIncorrectFeedback= AuthoringUtil.shiftFeedbackMap(mapIncorrectFeedback, questionIndex, "down");
                 	logger.debug("mapIncorrectFeedback: " + mapIncorrectFeedback);
@@ -1258,7 +1276,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
             	
             	Map mapCorrectFeedback=(Map)request.getSession().getAttribute(MAP_CORRECT_FEEDBACK);
             	logger.debug("mapCorrectFeedback: " + mapCorrectFeedback);
-            	if (mapCorrectFeedback.size() > 0)
+            	if (mapCorrectFeedback.size() > 1)
             	{
             		mapCorrectFeedback= AuthoringUtil.shiftFeedbackMap(mapCorrectFeedback, questionIndex, "down");
                 	logger.debug("mapCorrectFeedback: " + mapCorrectFeedback);
@@ -1335,6 +1353,16 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		Map mapQuestionsContent=AuthoringUtil.repopulateMap(request, "questionContent");
 	 	logger.debug("mapQuestionsContent before move down: " + mapQuestionsContent);
 	 	
+		Map mapDefaultOptions= new TreeMap(new McComparator());
+		mapDefaultOptions.put("1" ,DEFAULT_FIRST_OPTION);
+		mapDefaultOptions.put("2" ,DEFAULT_SELECTED_OPTION);
+		request.getSession().setAttribute(MAP_DEFAULTOPTIONS_CONTENT, mapDefaultOptions);
+
+		
+		Map mapDefaultSelectedOptions= new TreeMap(new McComparator());
+		mapDefaultSelectedOptions.put("1" ,DEFAULT_SELECTED_OPTION);
+		request.getSession().setAttribute(MAP_DEFAULTSELECTEDOPTIONS_CONTENT, mapDefaultSelectedOptions);
+	 	
      	/* perform a move up if there are at least 2 questions */
      	if (mapQuestionsContent.size() > 1)
      	{
@@ -1351,7 +1379,11 @@ public class McAction extends LamsDispatchAction implements McAppConstants
         		logger.debug("updated Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
         		
         		Map mapGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_OPTIONS_CONTENT);
-        		if (mapGeneralOptionsContent.size() > 0)
+        		logger.debug("mapGeneralOptionsContent: " + mapGeneralOptionsContent);
+        		mapGeneralOptionsContent=AuthoringUtil.addDefaultOptionsContentToMap(request, mapGeneralOptionsContent, mapQuestionsContent);
+        		logger.debug("mapGeneralOptionsContent after adding default options: " + mapGeneralOptionsContent);
+        		
+        		if (mapGeneralOptionsContent.size() > 1)
             	{
         			logger.debug("initial test: current mapGeneralOptionsContent: " + mapGeneralOptionsContent);
         	    	mapGeneralOptionsContent= AuthoringUtil.shiftOptionsMap(mapGeneralOptionsContent, questionIndex, "up");
@@ -1360,7 +1392,11 @@ public class McAction extends LamsDispatchAction implements McAppConstants
             	}
         		
         		Map mapGeneralSelectedOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT);
-            	if (mapGeneralSelectedOptionsContent.size() > 0)
+        		logger.debug("mapGeneralSelectedOptionsContent: " + mapGeneralSelectedOptionsContent);
+        		mapGeneralSelectedOptionsContent=AuthoringUtil.addDefaultSelectedOptionsContentToMap(request, mapGeneralSelectedOptionsContent, mapQuestionsContent);
+        		logger.debug("mapGeneralSelectedOptionsContent after adding default options: " + mapGeneralOptionsContent);
+        		
+            	if (mapGeneralSelectedOptionsContent.size() > 1)
             	{
             		logger.debug("initial test: current mapGeneralSelectedOptionsContent: " + mapGeneralSelectedOptionsContent);
             		mapGeneralSelectedOptionsContent= AuthoringUtil.shiftOptionsMap(mapGeneralSelectedOptionsContent, questionIndex, "up");
@@ -1369,7 +1405,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
             	}
             	
             	Map mapWeights= AuthoringUtil.repopulateCurrentWeightsMap(request, "questionWeight");
-            	if (mapWeights.size() > 0)
+            	if (mapWeights.size() > 1)
             	{
             		logger.debug("initial test: current mapWeights: " + mapWeights);
             		mapWeights= AuthoringUtil.shiftWeightsMap(mapWeights, questionIndex, "up");
@@ -1380,7 +1416,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
             	
             	Map mapIncorrectFeedback=(Map)request.getSession().getAttribute(MAP_INCORRECT_FEEDBACK);
             	logger.debug("mapIncorrectFeedback: " + mapIncorrectFeedback);
-            	if (mapIncorrectFeedback.size() > 0)
+            	if (mapIncorrectFeedback.size() > 1)
             	{
             		mapIncorrectFeedback= AuthoringUtil.shiftFeedbackMap(mapIncorrectFeedback, questionIndex, "up");
                 	logger.debug("mapIncorrectFeedback: " + mapIncorrectFeedback);
@@ -1390,7 +1426,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
             	
             	Map mapCorrectFeedback=(Map)request.getSession().getAttribute(MAP_CORRECT_FEEDBACK);
             	logger.debug("mapCorrectFeedback: " + mapCorrectFeedback);
-            	if (mapCorrectFeedback.size() > 0)
+            	if (mapCorrectFeedback.size() > 1)
             	{
             		mapCorrectFeedback= AuthoringUtil.shiftFeedbackMap(mapCorrectFeedback, questionIndex, "up");
                 	logger.debug("mapCorrectFeedback: " + mapCorrectFeedback);

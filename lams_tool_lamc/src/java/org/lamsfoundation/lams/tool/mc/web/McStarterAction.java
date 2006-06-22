@@ -765,7 +765,7 @@ public class McStarterAction extends Action implements McAppConstants {
 
 		
 		Map mapDefaultOptions= new TreeMap(new McComparator());
-		mapDefaultOptions.put("2" ,DEFAULT_FIRST_OPTION);
+		mapDefaultOptions.put("1" ,DEFAULT_FIRST_OPTION);
 		mapDefaultOptions.put("2" ,DEFAULT_SELECTED_OPTION);
 		request.getSession().setAttribute(MAP_DEFAULTOPTIONS_CONTENT, mapDefaultOptions);
 

@@ -298,8 +298,10 @@ public class MonitoringUtil implements McAppConstants{
     	{
     	    return "0";
     	}
-
-		
+    	
+    	if (listUserAttempts.size() == 0)
+    	    return "0";
+    	    
 		Iterator itAttempts=listUserAttempts.iterator();
 		
 		if (!mcSession.getMcContent().isRetries())
@@ -308,7 +310,6 @@ public class MonitoringUtil implements McAppConstants{
 		    boolean isAttemptCorrect=false;
 		    McUsrAttempt mcUsrAttemptUser=null;
 		    
-			while (itAttempts.hasNext())
 			{
 	    		mcUsrAttempt=(McUsrAttempt)itAttempts.next();
 	    		logger.debug("mcUsrAttempt: " + mcUsrAttempt);
