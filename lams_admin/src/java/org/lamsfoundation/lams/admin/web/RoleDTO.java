@@ -24,56 +24,40 @@
 /* $Id$ */
 package org.lamsfoundation.lams.admin.web;
 
+import org.lamsfoundation.lams.usermanagement.Role;
+
 /**
  * @author Jun-Dir Liew
  *
  * Created at 12:10:10 on 16/06/2006
  */
-public class UserOrgRolesDTO {
+public class RoleDTO implements Comparable<RoleDTO> {
 
-	private Boolean learner = false;
-	private Boolean author = false;
-	private Boolean staff = false;
-	private Boolean admin = false;
-	private Boolean manager = false;
+	private Integer roleId;
+	private String name;
 	
-	public Boolean getLearner() {
-		return learner;
+	public Integer getRoleId(){
+		return this.roleId;
 	}
 	
-	public void setLearner(Boolean learner) {
-		this.learner = learner;
+	public void setRoleId(Integer roleId){
+		this.roleId = roleId;
 	}
 	
-	public Boolean getAuthor() {
-		return author;
+	public String getName(){
+		return this.name;
 	}
 	
-	public void setAuthor(Boolean author) {
-		this.author = author;
+	public void setName(String name){
+		this.name = name;
 	}
 	
-	public Boolean getStaff() {
-		return staff;
-	}
+	public RoleDTO(Role r){
+		roleId = r.getRoleId();
+		name = r.getName();
+    }
 	
-	public void setStaff(Boolean staff) {
-		this.staff = staff;
-	}
-	
-	public Boolean getAdmin() {
-		return admin;
-	}
-	
-	public void setAdmin(Boolean admin) {
-		this.admin = admin;
-	}
-	
-	public Boolean getManager() {
-		return manager;
-	}
-	
-	public void setManager(Boolean manager) {
-		this.manager = manager;
-	}
+	public int compareTo(RoleDTO roleDTO){
+	    return name.compareTo(roleDTO.getName());
+    }
 }
