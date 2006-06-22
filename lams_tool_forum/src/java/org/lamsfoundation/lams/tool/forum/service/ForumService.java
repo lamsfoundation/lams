@@ -611,11 +611,13 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
  		//set ResourceToolContentHandler as null to avoid copy file node in repository again.
  		toolContentObj = Forum.newInstance(toolContentObj,toolContentId,null);
  		toolContentObj.setToolContentHandler(null);
+ 		toolContentObj.setCreatedBy(null);
  		Set<Message> items = toolContentObj.getMessages();
  		Set<Message> authorItems = new HashSet<Message>();
 		for(Message item:items){
 			if(item.getIsAuthored()){
 				authorItems.add(item);
+				item.setCreatedBy(null);
 				item.setToolSession(null);
 				item.setForum(null);
 				item.setToolContentHandler(null);
