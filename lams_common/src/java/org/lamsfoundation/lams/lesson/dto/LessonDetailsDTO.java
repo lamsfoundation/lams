@@ -40,7 +40,9 @@ public class LessonDetailsDTO {
 	private Integer lessonStateID;
 	private Date createDateTime;
 	private Date startDateTime;
-	private Long duration;	
+    private Date scheduleStartDate;
+    private Date scheduleEndDate;
+ 	private Long duration;	
 	private Integer organisationID;
 	private String organisationName;
 	private String organisationDescription;	
@@ -60,6 +62,8 @@ public class LessonDetailsDTO {
 		this.lessonStateID = lesson.getLessonStateId();
 		this.createDateTime = lesson.getCreateDateTime();
 		this.startDateTime = lesson.getStartDateTime();
+		this.scheduleStartDate = lesson.getScheduleStartDate();
+		this.scheduleEndDate = lesson.getScheduleEndDate();
 		
 		this.duration = lesson.getLearningDesign().getDuration();
 		
@@ -93,6 +97,12 @@ public class LessonDetailsDTO {
 		this.numberPossibleLearners = new Integer(allLearners !=null ? allLearners.size() : 0);
 		this.numberStartedLearners = new Integer(0);
 	}	
+	public Date getScheduleEndDate() {
+		return scheduleEndDate;
+	}
+	public Date getScheduleStartDate() {
+		return scheduleStartDate;
+	}
 	/**
 	 * @return Returns the createDateTime.
 	 */
