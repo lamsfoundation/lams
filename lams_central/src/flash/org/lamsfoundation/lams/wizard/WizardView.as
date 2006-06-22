@@ -231,6 +231,10 @@ class WizardView extends AbstractView {
                 break;
 			case 'UPDATE_CHILD_FOLDER' :
 				updateChildFolderBranches(event.data,wm);
+				openFolder(event.data, wm);
+			case 'UPDATE_CHILD_FOLDER_NOOPEN' :
+				updateChildFolderBranches(event.data,wm);
+				break;
 			case 'ITEM_SELECTED' :
 				itemSelected(event.data,wm);
 				break;
@@ -447,8 +451,13 @@ class WizardView extends AbstractView {
 		location_treeview.addEventListener("change", Delegate.create(_workspaceController, _workspaceController.onTreeNodeChange));
 		
 		var wsNode:XMLNode = location_treeview.firstVisibleNode;
+		
 		location_treeview.setIsOpen(wsNode, true);
 		_workspaceController.forceNodeOpen(wsNode);
+		
+		//location_treeview.selectedNode = wsNode.firstChild;
+		//dispatchEvent({type:'change', target: location_treeview});
+		
     }
 	
 	/**
@@ -495,8 +504,6 @@ class WizardView extends AbstractView {
 				}
 			}
 		}
-		
-		 openFolder(changedNode);
 	}
 	
 	private function refreshTree(){
@@ -509,13 +516,26 @@ class WizardView extends AbstractView {
 	 * Just opens the fodler node - DOES NOT FIRE EVENT - so is used after updatting the child folder
 	 * @usage   
 	 * @param   nodeToOpen 
-	 * @param   wm         
+	 * @param   wm  
+	 * @param 	isForced
 	 * @return  
 	 */
 	private function openFolder(nodeToOpen:XMLNode, wm:WorkspaceModel){
 		Debugger.log('openFolder:'+nodeToOpen ,Debugger.GEN,'openFolder','org.lamsfoundation.lams.ws.WorkspaceDialog');
 		//open the node
 		location_treeview.setIsOpen(nodeToOpen,true);
+		
+		if(wm.isForced() && nodeToOpen.attributes.data.resourceID == WorkspaceModel.ROOT_VFOLDER){
+			// select users root workspace folder
+			location_treeview.selectedNode = nodeToOpen.firstChild;
+			dispatchEvent({type:'change', target:this.location_treeview});
+			
+			var virNode:XMLNode = nodeToOpen.firstChild.nextSibling;
+			if(virNode.attributes.data.resourceID == WorkspaceModel.ORG_VFOLDER && !location_treeview.getIsOpen(virNode)){
+				openFolder(virNode, wm);
+			}
+		}
+		
 		refreshTree();
 	
 	}
