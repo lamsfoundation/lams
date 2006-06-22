@@ -109,11 +109,10 @@
 	    <tr>
 	        <td><fmt:message key="admin.user.roles"/>:</td>
 	        <td>
-                <input type="checkbox" name="learner" <c:if test="${userRoles.learner}">checked</c:if> /><fmt:message key="admin.user.learner" /><br />
-                <input type="checkbox" name="author" <c:if test="${userRoles.author}">checked</c:if> /><fmt:message key="admin.user.author" /><br />
-                <input type="checkbox" name="staff" <c:if test="${userRoles.staff}">checked</c:if> /><fmt:message key="admin.user.staff" /><br />
-                <input type="checkbox" name="admin" <c:if test="${userRoles.admin}">checked</c:if> /><fmt:message key="admin.user.admin" /><br />
-                <input type="checkbox" name="manager" <c:if test="${userRoles.manager}">checked</c:if> /><fmt:message key="admin.user.manager" />
+                <logic:iterate id="role" name="rolelist">
+                    <html-el:multibox property="roles" value="${role.roleId}"/>
+                    <c:out value="${role.name}"/><br/>
+                </logic:iterate>
 	        </td>
 	    </tr>
 	</logic:notEmpty>

@@ -32,9 +32,5 @@
 	<form-property name="email" type="java.lang.String" />
 	<form-property name="localeLanguage" type="java.lang.String" />
 	<form-property name="localeCountry" type="java.lang.String" />
-	<form-property name="learner" type="java.lang.String" />
-	<form-property name="author" type="java.lang.String" />
-	<form-property name="staff" type="java.lang.String" />
-	<form-property name="admin" type="java.lang.String" />
-	<form-property name="manager" type="java.lang.String" />
+    <form-property name="roles" type="java.lang.String[]" />
 </form-bean>

@@ -26,6 +26,9 @@ package org.lamsfoundation.lams.admin.web;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Arrays;
+import java.util.Set;
+import java.util.Iterator;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -107,49 +110,67 @@ public class UserSaveAction extends Action {
 				user = (User)service.findById(User.class,userId);
 				BeanUtils.copyProperties(user,userForm);
 				service.save(user);
-				UserOrganisation userOrganisation = service.getUserOrganisation(userId, orgId);
-				List<Role> roles = service.getRolesForUserByOrganisation(user, orgId);
-                
-				Role currentRole = (Role)service.findByProperty(Role.class,"name","LEARNER").get(0);
-				if(userForm.get("learner").equals("on") && roles.indexOf(currentRole)<0) {
-					UserOrganisationRole userOrganisationRole = new UserOrganisationRole(userOrganisation, 
-							currentRole);
-					service.save(userOrganisationRole);
-				} else if(userForm.get("learner").equals("off")){
-					//service.deleteUserOrganisationRole();
+				
+				String[] roles = (String[])userForm.get("roles");
+				List rolesList = Arrays.asList(roles);
+				log.debug("rolesList.size: "+rolesList.size());
+				Set uos = user.getUserOrganisations();
+				Iterator iter = uos.iterator();
+				while(iter.hasNext()){
+				    UserOrganisation uo = (UserOrganisation)iter.next();
+				    if(uo.getOrganisation().getOrganisationId().equals(orgId)){
+				    	// simply clearing the uors and setting new ones specified by user doesn't seem to work
+				        /*uo.getUserOrganisationRoles().clear();
+				        service.save(user);
+				        log.debug("num roles: "+uo.getUserOrganisationRoles().size());
+				        for(int i=0; i<roles.length; i++){    // add new roles set by user
+				        	Integer roleId = Integer.valueOf(roles[i]);
+				        	Role currentRole = (Role)service.findById(Role.class,roleId);
+				        	log.debug("setting role: "+currentRole);
+				        	uo.getUserOrganisationRoles().add(new UserOrganisationRole(uo,currentRole));
+				        	log.debug("num roles: "+uo.getUserOrganisationRoles().size());
+				        }*/
+                        // so we do two double loops to add/remove roles :(
+				    	Set uors = uo.getUserOrganisationRoles();
+				        for(int i=0; i<roles.length; i++){    // add new roles set by user
+				        	Integer roleId = Integer.valueOf(roles[i]);
+				        	Boolean alreadyHasRole = false;
+				        	Iterator iter2 = uors.iterator();
+				        	while(iter2.hasNext()){
+				        		UserOrganisationRole uor = (UserOrganisationRole)iter2.next();
+				        		if(uor.getRole().getRoleId().equals(roleId)){
+				        			alreadyHasRole = true;
+				        			break;  // already found uor that matches this role
+				        		}
+				        	}
+				        	if(!alreadyHasRole){    // add new role
+				        		Role currentRole = (Role)service.findById(Role.class,roleId);
+					            log.debug("setting role: "+currentRole);
+					            uors.add(new UserOrganisationRole(uo,currentRole));
+					            //log.debug("num roles: "+uo.getUserOrganisationRoles().size());
+				        	}
+				        }
+				        Iterator iter3 = uors.iterator();
+				        while(iter3.hasNext()){
+				        	UserOrganisationRole uor = (UserOrganisationRole)iter3.next();
+				        	Integer currentRoleId = uor.getRole().getRoleId();
+				        	//log.debug("currentRoleId: "+currentRoleId.toString());
+				        	//log.debug("rolesList: "+rolesList);
+				        	if(rolesList.indexOf(currentRoleId.toString())<0){    // remove roles not set by user
+				        		log.debug("removing role: "+currentRoleId);
+				        		uors.remove(uor);
+				        		//log.debug("num roles: "+uors.size());
+				        		uo.setUserOrganisationRoles(uors);
+				        		uos.add(uo);
+				        		user.setUserOrganisations(uos);
+				        		break;
+				        	}
+				        }
+				        break;  // already found uo that matches this org
+				    }
 				}
-				currentRole = (Role)service.findByProperty(Role.class,"name","AUTHOR").get(0);
-				if(userForm.get("author").equals("on") && roles.indexOf(currentRole)<0) {
-					UserOrganisationRole userOrganisationRole = new UserOrganisationRole(userOrganisation, 
-							currentRole);
-					service.save(userOrganisationRole);
-				} else if(userForm.get("learner").equals("off")) {
-					//service.deleteUserOrganisationRole();
-				}
-				currentRole = (Role)service.findByProperty(Role.class,"name","STAFF").get(0);
-				if(userForm.get("staff").equals("on") && roles.indexOf(currentRole)<0) {
-					UserOrganisationRole userOrganisationRole = new UserOrganisationRole(userOrganisation, 
-							currentRole);
-					service.save(userOrganisationRole);
-				} else if(userForm.get("learner").equals("off")) {
-					//service.deleteUserOrganisationRole();
-				}
-				currentRole = (Role)service.findByProperty(Role.class,"name","COURSE ADMIN").get(0);
-				if(userForm.get("admin").equals("on") && roles.indexOf(currentRole)<0) {
-					UserOrganisationRole userOrganisationRole = new UserOrganisationRole(userOrganisation, 
-							currentRole);
-					service.save(userOrganisationRole);
-				} else if(userForm.get("learner").equals("off")) {
-					//service.deleteUserOrganisationRole();
-				}
-				currentRole = (Role)service.findByProperty(Role.class,"name","COURSE MANAGER").get(0);
-				if(userForm.get("manager").equals("on") && roles.indexOf(currentRole)<0) {
-					UserOrganisationRole userOrganisationRole = new UserOrganisationRole(userOrganisation, 
-							currentRole);
-					service.save(userOrganisationRole);
-				} else if(userForm.get("learner").equals("off")) {
-					//service.deleteUserOrganisationRole();
-				}
+				service.save(user);
+
 			}else{    // create user
 				log.debug("creating user...");
 				user = new User();

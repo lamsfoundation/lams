@@ -24,6 +24,9 @@
 /* $Id$ */
 package org.lamsfoundation.lams.admin.web;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -37,9 +40,10 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.usermanagement.Country;
 import org.lamsfoundation.lams.usermanagement.Language;
-import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.UserOrganisation;
+import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
@@ -74,20 +78,6 @@ public class UserAction extends LamsDispatchAction {
     private static List countries = service.findAll(Country.class);
 	private static List languages = service.findAll(Language.class);
 	
-	public ActionForward add(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
-        // retain orgId to return to userlist
-		Integer orgId = WebUtil.readIntParam(request,"orgId");
-		Organisation organisation = (Organisation)service.findById(Organisation.class,orgId);
-		Integer parentId = organisation.getParentOrganisation().getOrganisationId();
-
-		request.setAttribute("org",orgId);
-		request.setAttribute("parent",parentId);
-		return mapping.findForward("userlist");
-	}
-	
 	public ActionForward edit(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
@@ -105,23 +95,36 @@ public class UserAction extends LamsDispatchAction {
 			User user = (User)service.findById(User.class,userId);
 			DynaActionForm userForm = (DynaActionForm)form;
 			BeanUtils.copyProperties(userForm, user);
-			List<Role> roles = service.getRolesForUserByOrganisation(user, orgId);
-			UserOrgRolesDTO userRoles = new UserOrgRolesDTO();
-			for(int i=0; i<roles.size(); i++) {
-				log.debug("role: "+roles.get(i).getName());
-				if(roles.get(i).getName().equals("LEARNER")) {
-					userRoles.setLearner(true);
-				} else if(roles.get(i).getName().equals("AUTHOR")) {
-					userRoles.setAuthor(true);
-				} else if(roles.get(i).getName().equals("STAFF")) {
-					userRoles.setStaff(true);
-				} else if(roles.get(i).getName().equals("COURSE ADMIN")) {
-					userRoles.setAdmin(true);
-				} else if(roles.get(i).getName().equals("COURSE MANAGER")) {
-					userRoles.setManager(true);
-				}
+			
+			// get system's roles
+			List allRoles = service.findAll(Role.class);
+			ArrayList<RoleDTO> rolelist = new ArrayList<RoleDTO>();
+			for(int i=0; i<allRoles.size(); i++){
+				Role r = (Role)allRoles.get(i);
+			    rolelist.add(new RoleDTO(r));
 			}
-			request.setAttribute("userRoles",userRoles);
+			Collections.sort(rolelist);
+			request.setAttribute("rolelist",rolelist);
+			
+			// get user's roles
+			Iterator iter = user.getUserOrganisations().iterator();
+			while(iter.hasNext()){
+			    UserOrganisation uo = (UserOrganisation)iter.next();
+			    if(uo.getOrganisation().getOrganisationId().equals(orgId)){
+			        Iterator iter2 = uo.getUserOrganisationRoles().iterator();
+			        String[] roles = new String[uo.getUserOrganisationRoles().size()];
+			        int i=0;
+			        while(iter2.hasNext()){
+			            UserOrganisationRole uor = (UserOrganisationRole)iter2.next();
+			            roles[i]=uor.getRole().getRoleId().toString();
+			            log.debug("got roleid: "+roles[i]);
+			            i++;
+			        }
+			        userForm.set("roles",roles);
+			        break;
+			    }
+			}
+			
 		}
 		
 		request.setAttribute("countries",countries);
