@@ -42,7 +42,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	private var __height:Number;
 	private var __x:Number;
 	private var __y:Number;
-	
+	private var _piHeight:Number;
 	private var infoObj:Object;
 	
 	
@@ -150,8 +150,17 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		p.y = __y;
 		return p;
 	}
-
-	public function setDirty(){
+	
+	public function setPIHeight(h:Number){
+		trace ("height is set to: "+h)
+		_piHeight = h
+		Application.getInstance().onResize();
+	}
+	
+	public function getPIHeight(){
+		trace ("returning pi height: "+_piHeight)
+		return _piHeight;
+	}	public function setDirty(){
 		_isDirty = true;
 		/*
 		//work out what we need to redraw.
