@@ -127,20 +127,19 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	}
 	
 	
-	
 	/**
 	 * Method used to open a Property Inspector on popup window. Not used any more
 	 * 
 	 * @usage   
 	 * @return  
-	 
+
     public function setupPI(){
 		if(USE_PROPERTY_INSPECTOR){
 			initPropertyInspector();
 		}
 	}
 	*/
-	
+
     /**
     * Event dispatched from the view once it's loaded
     */
@@ -718,7 +717,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 			var uID = Config.getInstance().userID;
 			var serverUrl = Config.getInstance().serverUrl;
 			//Create an instance of JsPopup to access launchPopupWindow method.
-			JsPopup.getInstance().launchPopupWindow(serverUrl+'learning/main.jsp?userID='+uID+'&lessonID='+r, 'Preview of Lession '+r.startPreviewSession, 570, 796, true, true, true);
+			JsPopup.getInstance().launchPopupWindow(serverUrl+'learning/main.jsp?userID='+uID+'&lessonID='+r, 'Preview of Lession '+r.startPreviewSession, 570, 796, true, true, false, false, false);
 			Debugger.log('Recieved Lesson ID: '+r ,Debugger.GEN,'onLaunchPreviewResponse','Canvas');
 			//_global.breakpoint();
 			//Debugger.log('_ddm.learningDesignID:'+_ddm.learningDesignID,Debugger.GEN,'onStoreDesignResponse','Canvas');		
@@ -726,6 +725,27 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 			//var msg:String = "Congratulations! - Your design is valid has been saved with ID:"+r.learningDesignID;
 		}
 	}
+	
+	/**
+	* Method to open Import popup window
+	*/
+	public function launchImportWindow():Void{
+		Debugger.log('Launching Import Window',Debugger.GEN,'launchImportWindow','Canvas');
+		var serverUrl = Config.getInstance().serverUrl;
+		JsPopup.getInstance().launchPopupWindow(serverUrl+'authoring/importToolContent.do?method=import', 'Import - Learning Design', 300, 400, true, true, false, false, false);
+			
+	}
+	
+	/**
+	* Method to open Export popup window
+	*/
+	public function launchExportWindow():Void{
+		Debugger.log('Launching Export Window',Debugger.GEN,'launchExportWindow','Canvas');
+		var serverUrl = Config.getInstance().serverUrl;
+		var learningDesignID = _ddm.learningDesignID;
+		JsPopup.getInstance().launchPopupWindow(serverUrl+'authoring/exportToolContent.do?learningDesignID=' + learningDesignID, 'Export - Learning Design', 570, 796, true, true, false, false, false);
+	}
+	
 	/*
 	public function cut():Void{
 		Debugger.log('Cut',Debugger.GEN,'cut','Canvas');
@@ -755,7 +775,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	}
 	
 	/**
-	 * Initialises the property inspector not in use any more
+	 * Initialises the property inspector
 	 * @usage   
 	 
 	public function initPropertyInspector():Void{
@@ -768,7 +788,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
         //okClickedCallback = callBack;
     }
 	*/
-	
+
 	/**
 	 * Sts up the bin
 	 * @usage   
@@ -783,7 +803,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	}
 	
 	/**
-	 * Fired whern property inspector's contentLoaded is fired not in use anymore
+	 * Fired whern property inspector's contentLoaded is fired
 	 * Positions the PI
 	 * @usage   
 	 * @param   evt 
@@ -943,7 +963,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	}
 	
 	/*
-	* public function getPropertyInspector():MovieClip{
+	public function getPropertyInspector():MovieClip{
 		return _pi;
 	}
 	*/
