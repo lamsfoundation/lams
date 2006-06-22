@@ -252,7 +252,8 @@ public function update (o:Observable,infoObj:Object):Void{
 				todoTaskList[listCount].goContribute.label = Dictionary.getValue('td_goContribute_btn');
 				todoTaskList[listCount].goContribute.onRelease = function (){
 					trace("Contrybute Type is: "+o.taskURL);
-					getURL(String(o.taskURL), "_blank");
+					JsPopup.getInstance().launchPopupWindow(o.taskURL, 'ContributeActivity', 398, 570, true, true, false, false, false);
+					//getURL(String(o.taskURL), "_blank");
 				}
 				todoTaskList[listCount].goContribute.setStyle("fontSize", "9"); 
 				listCount++

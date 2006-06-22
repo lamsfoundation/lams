@@ -494,8 +494,10 @@ public function update (o:Observable,infoObj:Object):Void{
 				requiredTaskList[listCount].goContribute._x = reqTasks_scp._width-50
 				requiredTaskList[listCount].goContribute.label = Dictionary.getValue('td_goContribute_btn');
 				requiredTaskList[listCount].goContribute.onRelease = function (){
-					trace("Contrybute Type is: "+o.taskURL);
-					getURL(String(o.taskURL), "_blank");
+					trace("Contribute Type is: "+o.taskURL);
+					JsPopup.getInstance().launchPopupWindow(o.taskURL, 'ContributeActivity', 398, 570, true, true, false, false, false);
+					
+					//getURL(String(o.taskURL), "_blank");
 					//getURL("http://localhost:8080/lams/monitoring/monitoring.do?method=getAllContributeActivities&lessonID=4", "_blank");
 				}
 				requiredTaskList[listCount].goContribute.setStyle("fontSize", "9"); 
