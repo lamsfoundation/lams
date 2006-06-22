@@ -36,6 +36,9 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 	public var RT_LESSON:String = "Lesson";
 	public var RT_FILE:String = "File";
 	
+	// resource ID's for Virtual Folders
+	public static var ROOT_VFOLDER:Number = -1;
+	public static var ORG_VFOLDER:Number = -2;
 	
 	public var READ_ACCESS:Number = 1;
 	public var MEMBERSHIP_ACCESS:Number = 2;
@@ -255,10 +258,12 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 	 * @param   dto 
 	 * @return  
 	 */
-	public function setFolderContents(dto:Object){
+	public function setFolderContents(dto:Object, openFolder:Boolean){
 		var nodeToUpdate:XMLNode;
 		Debugger.log('looking for:Folder_'+dto.workspaceFolderID+', parentWorkspaceFolderID:'+dto.parentWorkspaceFolderID,Debugger.GEN,'setFolderContents','org.lamsfoundation.lams.WorkspaceModel');
 		_global.breakpoint();
+		
+		
 		//if(_workspaceResources.containsKey(dto.workspaceFolderID)){
 		if(getWorkspaceResource('Folder_'+dto.workspaceFolderID)!=null){
 			nodeToUpdate = getWorkspaceResource('Folder_'+dto.workspaceFolderID);
@@ -268,9 +273,18 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 			Debugger.log('Did not find:'+dto.resourceType+'_'+dto.workspaceFolderID+' Something bad has happened',Debugger.CRITICAL,'setFolderContents','org.lamsfoundation.lams.WorkspaceModel');
 		}
 		
-		// sort contents
-		dto.contents.sortOn("name", Array.CASEINSENSITIVE);
+		// sort contents for content folders
+		if(nodeToUpdate.attributes.data.resourceID >= 0) { 
+			dto.contents.sortOn("name", Array.CASEINSENSITIVE); 
+			nodeToUpdate.attributes.isBranch = true;
+		}
 		
+		// set empty flag for folders
+		if(dto.contents.length <= 0){
+			nodeToUpdate.attributes.isEmpty = true;
+		} else {
+			nodeToUpdate.attributes.isEmpty = false;
+		}
 		
 		// go throught the contents of DTO and add it aas children to the node to update.
 		for(var i=0; i<dto.contents.length; i++){
@@ -284,6 +298,10 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 			//check if its a folder
 			if(dto.contents[i].resourceType==RT_FOLDER){
 				cNode.attributes.isBranch=true;	
+				
+				// force open the Organisation virtual folder when opening My Workspace (root) virtual folder
+				if(cNode.attributes.data.resourceID == ORG_VFOLDER && !cNode.hasChildNodes()){ openFolderInTree(cNode.attributes.data.resourceID, forced); }
+			
 			}else{
 				
 			}
@@ -292,7 +310,8 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 		}
 		
 		//dispatch an update to the view
-		broadcastViewUpdate('UPDATE_CHILD_FOLDER',nodeToUpdate);
+		if(openFolder) { broadcastViewUpdate('UPDATE_CHILD_FOLDER',nodeToUpdate); } 
+		else { broadcastViewUpdate('UPDATE_CHILD_FOLDER_NOOPEN',nodeToUpdate);  }
 		
 	}
 	
@@ -330,6 +349,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 
 				  
 				}else{
+					nodeToUpdate.attributes.isEmpty = null;
 					Debugger.log('No Child nodes to delete',Debugger.GEN,'clearWorkspaceCache','org.lamsfoundation.lams.WorkspaceModel');
 				}
 				_folderIDPendingRefresh = null;
@@ -672,6 +692,10 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 	
 	public function set forced(a:Boolean){
 		_forced = a;
+	}
+	
+	public function get forced():Boolean{
+		return _forced;
 	}
 	
 	/**

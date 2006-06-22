@@ -94,10 +94,12 @@ class org.lamsfoundation.lams.common.ws.Workspace {
 	 * either becasue never opened beofre or becasuse the cache was cleared for that folder
 	 * @usage   
 	 * @param   folderID 
+	 * @param 	funcToCall 
 	 * @return  
 	 */
-	public function requestFolderContents(folderID:Number):Void{
+	public function requestFolderContents(folderID:Number, funcToCall:Function):Void{
 		var callback:Function = Proxy.create(this,recievedFolderContents);
+		if(funcToCall != undefined || funcToCall != null){ callback = funcToCall; }
         var uid:Number = Config.getInstance().userID;
 		ApplicationParent.getInstance().getComms().getRequest('workspace.do?method=getFolderContents&folderID='+folderID+'&mode='+Config.getInstance().mode+'&userID='+uid,callback, false);
 		//ApplicationParent.getInstance().getComms().getRequest('workspace.do?method=getFolderContentsExcludeHome&folderID='+folderID+'&mode='+Config.getInstance().mode+'&userID='+uid,callback, false);
@@ -111,7 +113,7 @@ class org.lamsfoundation.lams.common.ws.Workspace {
 	 * @return  
 	 */
 	public function recievedFolderContents(dto:Object):Void{
-		workspaceModel.setFolderContents(dto);
+		workspaceModel.setFolderContents(dto, true);
 		
 	}
 	

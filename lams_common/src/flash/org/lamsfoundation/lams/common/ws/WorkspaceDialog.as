@@ -241,6 +241,11 @@ class WorkspaceDialog extends MovieClip{
                 break;
 			case 'UPDATE_CHILD_FOLDER' :
 				updateChildFolderBranches(event.data,wm);
+				openFolder(event.data, wm);
+				break;
+			case 'UPDATE_CHILD_FOLDER_NOOPEN' :
+				updateChildFolderBranches(event.data,wm);
+				break;
 			case 'ITEM_SELECTED' :
 				itemSelected(event.data,wm);
 				break;
@@ -286,8 +291,6 @@ class WorkspaceDialog extends MovieClip{
 				}
 			}
 		}
-		
-		openFolder(changedNode, wm);
 	}
 	
 	private function refreshTree(){
@@ -320,16 +323,21 @@ class WorkspaceDialog extends MovieClip{
 		
 		Debugger.log('openFolder forced:'+wm.isForced() ,Debugger.GEN,'openFolder','org.lamsfoundation.lams.ws.WorkspaceDialog');
 		
-		if(wm.isForced()){
+		if(wm.isForced() && nodeToOpen.attributes.data.resourceID == WorkspaceModel.ROOT_VFOLDER){
 			// select users root workspace folder
 			treeview.selectedNode = nodeToOpen.firstChild;
 			dispatchEvent({type:'change', target:this.treeview});
+			
+			var virNode:XMLNode = nodeToOpen.firstChild.nextSibling;
+			if(virNode.attributes.data.resourceID == WorkspaceModel.ORG_VFOLDER && !treeview.getIsOpen(virNode)){
+				openFolder(virNode, wm);
+			}
 		}
 		
 		refreshTree();
-	
+
 	}
-	/**
+		/**
 	 * Closes folder, then sends openEvent to controller
 	 * @usage   
 	 * @param   nodeToOpen 
@@ -544,7 +552,7 @@ class WorkspaceDialog extends MovieClip{
         _container.deletePopUp();
     }
     
-    /**
+   /**
     * Called by the OK button
 	* Dispatches the okClicked event and passes a result DTO containing:
 	* <code>
@@ -558,50 +566,149 @@ class WorkspaceDialog extends MovieClip{
     private function ok(){
         trace('OK');
 		_global.breakpoint();
-		
-		//TODO: Rmeove this code as its been here only for deflopment
-		//set the selectedDesignId
-		/**/
-		if(StringUtils.isNull(input_txt.text)){
-			//get the selected value off the tree
-			var snode = treeview.selectedNode;
-			input_txt.text = snode.attributes.data.resourceID;
-			
-		}
-		
-		_selectedDesignId = Number(input_txt.text);
-		
+	
 		//TODO: Validate you are allowed to use the name etc... Are you overwriting - NOTE Same names are nto allowed in this version
 		
 		var snode = treeview.selectedNode;
 		
+		if(isVirtualFolder(snode)){
+			LFMessage.showMessageAlert(Dictionary.getValue('ws_click_virtual_folder'),null);
+			return;
+		}
+		
 		Debugger.log('_workspaceModel.currentMode: ' + _workspaceModel.currentMode,Debugger.GEN,'ok','org.lamsfoundation.lams.WorkspaceDialog');
 		if(_workspaceModel.currentMode=="SAVE" || _workspaceModel.currentMode=="SAVEAS"){
-			if(snode == treeview.dataProvider.firstChild){
-				LFMessage.showMessageAlert(Dictionary.getValue('ws_save_folder_invalid'),null);
-			}else if(snode.attributes.data.resourceType==_workspaceModel.RT_LD){
-				//run a confirm dialogue as user is about to overwrite a design!
-				LFMessage.showMessageConfirm(Dictionary.getValue('ws_chk_overwrite_resource'), Proxy.create(this,doWorkspaceDispatch,true), Proxy.create(this,closeThisDialogue));
-			} else if (snode.attributes.data.resourceType==_workspaceModel.RT_FOLDER){
-				if(snode.attributes.data.resourceID == -2 || snode.attributes.data.resourceID == -1){	
-					LFMessage.showMessageAlert(Dictionary.getValue('ws_save_folder_invalid'),null);
-				} else {
-					doWorkspaceDispatch(false);
-				}
-			
-			} else{
-				LFMessage.showMessageAlert(Dictionary.getValue('ws_click_folder_file'),null);
-			}
-		} else{
-			if (snode.attributes.data.resourceType==_workspaceModel.RT_FOLDER){
-				LFMessage.showMessageAlert(Dictionary.getValue('ws_click_file_open'),null);
-			} else {
-				doWorkspaceDispatch(true);
-			}
+			saveFile(snode);
+		} else {
+			openFile(snode);
 		}
+			
     }
 	
+	/**
+	 * Open file from Workspace
+	 * 
+	 * @param   snode file to open or folder to open from
+	 */
 	
+	private function openFile(snode:XMLNode):Void{
+		Debugger.log('Opening a file.',Debugger.GEN,'openFile','org.lamsfoundation.lams.WorkspaceDialog');
+		if (snode.attributes.data.resourceType==_workspaceModel.RT_FOLDER){
+			if(resourceTitle_txi.text == null){
+				LFMessage.showMessageAlert(Dictionary.getValue('ws_click_file_open'),null);
+			} else {
+				if(!searchForFile(snode, resourceTitle_txi.text)){
+					LFMessage.showMessageAlert(Dictionary.getValue('ws_no_file_open'),null);
+				}
+			}
+		} else {
+				doWorkspaceDispatch(true);
+		}
+	}
+	
+	/**
+	 * Save file to Workspace
+	 *   
+	 * @param   snode folder to save to
+	 */
+	
+	private function saveFile(snode:XMLNode):Void{
+		Debugger.log('Saving a file.',Debugger.GEN,'saveFile','org.lamsfoundation.lams.WorkspaceDialog');
+		if(snode == treeview.dataProvider.firstChild){
+			LFMessage.showMessageAlert(Dictionary.getValue('ws_save_folder_invalid'),null);
+		} else if(snode.attributes.data.resourceType==_workspaceModel.RT_LD){
+			//run a confirm dialogue as user is about to overwrite a design!
+			LFMessage.showMessageConfirm(Dictionary.getValue('ws_chk_overwrite_resource'), Proxy.create(this,doWorkspaceDispatch,true), Proxy.create(this,closeThisDialogue));
+		} else if(snode.attributes.data.resourceType==_workspaceModel.RT_FOLDER){
+			if(snode.attributes.data.resourceID < 0){	
+				LFMessage.showMessageAlert(Dictionary.getValue('ws_save_folder_invalid'),null);
+			} else if(searchForFile(snode, resourceTitle_txi.text)){
+				//run a alert dialogue as user is using the same name as an existing design!
+				LFMessage.showMessageAlert(Dictionary.getValue('ws_chk_overwrite_existing', [resourceTitle_txi.text]), null);
+			}
+		} else {
+			LFMessage.showMessageAlert(Dictionary.getValue('ws_click_folder_file'),null);
+		}
+	}
+	
+	private function searchForFile(snode:XMLNode, filename:String){
+		Debugger.log('Searching for file (' + snode.childNodes.length + '): ' + filename,Debugger.GEN,'openFile','org.lamsfoundation.lams.WorkspaceDialog');
+		var cnode:XMLNode;
+		
+		if(snode.hasChildNodes() || snode.attributes.isEmpty){
+		
+			cnode = snode.firstChild;
+			do {
+				Debugger.log('matching file: ' + cnode.attributes.data.name + ' to: ' + filename,Debugger.GEN,'openFile','org.lamsfoundation.lams.WorkspaceDialog');
+				
+				// look for matching Learning Design file in the folder 
+				var _filename:String = cnode.attributes.data.name;
+				var _filetype:String = cnode.attributes.data.resourceType;
+				if(_filename == filename && _filetype == _workspaceModel.RT_LD){
+					if(_workspaceModel.currentMode=='OPEN'){
+						treeview.selectedNode = null;
+						_resultDTO.file = cnode;
+						doWorkspaceDispatch(true);
+					}
+					
+					return true;
+				}
+				
+				cnode = cnode.nextSibling;
+			
+			} while(cnode != null);
+			
+			if(_workspaceModel.currentMode == 'SAVE' || _workspaceModel.currentMode == 'SAVEAS'){
+				doWorkspaceDispatch(false);
+			}
+			return false;
+			
+		} else {
+			// save filename value
+			_resultDTO.resourceName = filename;
+			
+			// get folder contents
+			var callback:Function = Proxy.create(this,receivedFolderContents);
+			_workspaceModel.getWorkspace().requestFolderContents(snode.attributes.data.resourceID, callback);
+			
+			if(_workspaceModel.currentMode == 'SAVE' || _workspaceModel.currentMode == 'SAVEAS'){
+				return false;
+			} else {
+				return true;
+			}
+		}
+	}
+	
+	
+	public function receivedFolderContents(dto:Object){
+		_workspaceModel.setFolderContents(dto, false);
+		
+		if(_workspaceModel.getWorkspaceResource('Folder_'+dto.workspaceFolderID)!=null){
+			if(_workspaceModel.currentMode == 'SAVE' || _workspaceModel.currentMode == 'SAVEAS'){
+				if(searchForFile(_workspaceModel.getWorkspaceResource('Folder_'+dto.workspaceFolderID), _resultDTO.resourceName)){
+					//run a alert dialogue as user is using the same name as an existing design!
+					LFMessage.showMessageAlert(Dictionary.getValue('ws_chk_overwrite_existing', [_resultDTO.resourceName]), null);
+				}
+			} else {
+				if(!searchForFile(_workspaceModel.getWorkspaceResource('Folder_'+dto.workspaceFolderID), _resultDTO.resourceName)){
+					LFMessage.showMessageAlert(Dictionary.getValue('ws_no_file_open'),null);
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Check if the folder node against a resource ID
+	 * 
+	 * @usage   
+	 * @param   snode      
+	 * @param   resourceID  
+	 * @return  
+	 */
+	
+	private function isVirtualFolder(folder:XMLNode){
+		return folder.attributes.data.resourceID < 0;
+	}
 	
 	/**
 	 * Dispatches an event - picked up by the canvas in authoring
@@ -618,7 +725,13 @@ class WorkspaceDialog extends MovieClip{
 	 */
 	public function doWorkspaceDispatch(useResourceID:Boolean){
 		//ObjectUtils.printObject();
-		var snode = treeview.selectedNode;
+		
+		var snode = treeview.selectedNode;		// item selected in tree
+		
+		if(snode == null){
+			// set to file item found in search
+			snode = _resultDTO.file;
+		}
 		
 		if(useResourceID){
 			//its an LD
@@ -635,7 +748,6 @@ class WorkspaceDialog extends MovieClip{
 		_resultDTO.resourceDescription = resourceDesc_txa.text;
 		_resultDTO.resourceLicenseText = license_txa.text;
 		_resultDTO.resourceLicenseID = licenseID_cmb.value.licenseID;
-		
 
         dispatchEvent({type:'okClicked',target:this});
 	   
