@@ -31,6 +31,11 @@ if(StringUtils.isEmpty(build)){
 	_root.build = "2.0";
 }
 
+if(StringUtils.isEmpty(uniqueID)){
+	_root.uniqueID = 0;
+	Debugger.log('Unique ID is not defined.',Debugger.CRITICAL,'main','ROOT');
+}
+
 //Set stage alignment to top left and prent scaling
 Stage.align = "TL";
 Stage.scaleMode = "noScale";
