@@ -348,13 +348,14 @@ class PropertyInspectorNew extends MovieClip{
 			var cca:ComplexActivity = ComplexActivity(co.activity);
 				//its an optional activity
 				delimitLine._visible = true;
-				showOptionalControls(true);
+				
 				showGeneralControls(true);
 				showGroupingControls(false);
 				//showRelevantGroupOptions();
 				showToolActivityControls(false);
 				showGateControls(false);
 				showAppliedGroupingControls(true);
+				showOptionalControls(true);
 				//showGeneralProperties(cca)
 				populateGroupingProperties(GroupingActivity(cca));
 				showAppliedGroupingProperties(cca);
@@ -442,6 +443,7 @@ class PropertyInspectorNew extends MovieClip{
 		desc_txt.visible = v;
 		grouping_opt_lbl.visible = v; 
 		appliedGroupingActivity_opt_cmb.visible = v;
+		grouping_lbl.visible = false;
 		
 		
 	}
@@ -816,8 +818,17 @@ class PropertyInspectorNew extends MovieClip{
 		grouping_opt_lbl.setStyle('styleName',styleObj);
 		title_txt.setStyle('styleName',styleObj);
 		desc_txt.setStyle('styleName',styleObj);
+		runOffline_chk.setStyle('styleName',styleObj);
+		defineLater_chk.setStyle('styleName',styleObj);
+		hours_stp.setStyle('styleName',styleObj);
+		mins_stp.setStyle('styleName',styleObj);
+		endHours_stp.setStyle('styleName',styleObj);
+		endMins_stp.setStyle('styleName',styleObj);
+		min_act.setStyle('styleName',styleObj);
+		max_act.setStyle('styleName',styleObj);
 		
-		styleObj = _tm.getStyleObject('combo');
+		
+		styleObj = _tm.getStyleObject('picombo');
 		gateType_cmb.setStyle('styleName',styleObj);
 		groupType_cmb.setStyle('styleName',styleObj);
 		appliedGroupingActivity_cmb.setStyle('styleName',styleObj);
@@ -826,9 +837,9 @@ class PropertyInspectorNew extends MovieClip{
 		//title_txt.setStyle('styleName',styleObj);
 		//desc_txt.setStyle('styleName',styleObj);
 		
-		styleObj = _tm.getStyleObject('checkbox');
-		runOffline_chk.setStyle('styleName',styleObj);
-		defineLater_chk.setStyle('styleName',styleObj);
+		//styleObj = _tm.getStyleObject('checkbox');
+		//runOffline_chk.setStyle('styleName',styleObj);
+		//defineLater_chk.setStyle('styleName',styleObj);
 		
 		styleObj = _tm.getStyleObject('numericstepper');
 		hours_stp.setStyle('styleName',styleObj);
