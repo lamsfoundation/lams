@@ -162,6 +162,13 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		return _piHeight;
 	}	public function setDirty(){
 		_isDirty = true;
+		
+		if(getCanvas().ddm.learningDesignID == undefined){
+			LFMenuBar.getInstance().enableExport(false);
+		} else {
+			LFMenuBar.getInstance().enableExport(true);
+		}
+		
 		/*
 		//work out what we need to redraw.
 		//for now lets just do a full re-draw

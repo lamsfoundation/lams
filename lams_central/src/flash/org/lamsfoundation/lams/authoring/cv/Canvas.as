@@ -160,11 +160,19 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	*/
 	public function openDesignBySelection(){
         //Work space opens dialog and user will select view
-        var callback:Function = Proxy.create(this, openDesignById);
+		if(_ddm.modified){
+			LFMessage.showMessageConfirm(Dictionary.getValue('cv_design_unsaved'), Proxy.create(this,doOpenDesignBySelection), null);
+		} else {
+			doOpenDesignBySelection();
+		}
+	}
+    
+	public function doOpenDesignBySelection():Void{
+		var callback:Function = Proxy.create(this, openDesignById);
 		var ws = Application.getInstance().getWorkspace();
         ws.userSelectItem(callback);
 	}
-    
+	
 	/**
 	 * Request design from server using supplied ID.
 	 * @usage   
@@ -282,8 +290,8 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 
 			_ddm.learningDesignID = r.learningDesignID;
 			_ddm.validDesign = r.valid;
-			
-			
+			_ddm.modified = false;
+			LFMenuBar.getInstance().enableExport(true);
 			Debugger.log('_ddm.learningDesignID:'+_ddm.learningDesignID,Debugger.GEN,'onStoreDesignResponse','Canvas');		
 			
 			
@@ -461,6 +469,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 			_ddm.setDesign(designData);
 			checkValidDesign();
 			canvasModel.setDirty();
+			LFMenuBar.getInstance().enableExport(true);
 		}else{
 			Debugger.log('Set design failed as old design could not be cleared',Debugger.CRITICAL,"setDesign",'Canvas');		
 		}
@@ -479,11 +488,13 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		Debugger.log('noWarn:'+noWarn,4,'clearCanvas','Canvas');
 		if(noWarn){
 			_ddm = new DesignDataModel();
+			
 			//as its a new instance of the ddm,need to add the listener again
 			_ddm.addEventListener('ddmUpdate',Proxy.create(this,onDDMUpdated));
 			_ddm.addEventListener('ddmBeforeUpdate',Proxy.create(this,onDDMBeforeUpdate));
 			checkValidDesign();
 			canvasModel.setDirty();
+			
 			return true;
 		}else{
 			var fn:Function = Proxy.create(ref,confirmedClearDesign, ref);
@@ -717,7 +728,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 			var uID = Config.getInstance().userID;
 			var serverUrl = Config.getInstance().serverUrl;
 			//Create an instance of JsPopup to access launchPopupWindow method.
-			JsPopup.getInstance().launchPopupWindow(serverUrl+'learning/main.jsp?userID='+uID+'&lessonID='+r, 'Preview of Lession '+r.startPreviewSession, 570, 796, true, true, false, false, false);
+			JsPopup.getInstance().launchPopupWindow(serverUrl+'learning/main.jsp?userID='+uID+'&lessonID='+r, 'Preview', 570, 796, true, true, false, false, false);
 			Debugger.log('Recieved Lesson ID: '+r ,Debugger.GEN,'onLaunchPreviewResponse','Canvas');
 			//_global.breakpoint();
 			//Debugger.log('_ddm.learningDesignID:'+_ddm.learningDesignID,Debugger.GEN,'onStoreDesignResponse','Canvas');		
@@ -731,9 +742,16 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	*/
 	public function launchImportWindow():Void{
 		Debugger.log('Launching Import Window',Debugger.GEN,'launchImportWindow','Canvas');
+		if(_ddm.modified){
+			LFMessage.showMessageConfirm(Dictionary.getValue('cv_design_unsaved'), Proxy.create(this,doImportLaunch), null);
+		} else {
+			doImportLaunch();
+		}
+	}
+	
+	public function doImportLaunch():Void{
 		var serverUrl = Config.getInstance().serverUrl;
-		JsPopup.getInstance().launchPopupWindow(serverUrl+'authoring/importToolContent.do?method=import', 'Import - Learning Design', 300, 400, true, true, false, false, false);
-			
+		JsPopup.getInstance().launchPopupWindow(serverUrl+'authoring/importToolContent.do?method=import', 'Import', 398, 570, true, true, false, false, false);
 	}
 	
 	/**
@@ -741,11 +759,22 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	*/
 	public function launchExportWindow():Void{
 		Debugger.log('Launching Export Window',Debugger.GEN,'launchExportWindow','Canvas');
-		var serverUrl = Config.getInstance().serverUrl;
-		var learningDesignID = _ddm.learningDesignID;
-		JsPopup.getInstance().launchPopupWindow(serverUrl+'authoring/exportToolContent.do?learningDesignID=' + learningDesignID, 'Export - Learning Design', 570, 796, true, true, false, false, false);
+		
+		if(_ddm.learningDesignID == null) {
+			LFMessage.showMessageAlert(Dictionary.getValue('cv_design_export_unsaved'), null);
+		}else if(_ddm.modified){
+			LFMessage.showMessageConfirm(Dictionary.getValue('cv_design_unsaved'), Proxy.create(this,doExportLaunch), null);
+		} else {
+			doExportLaunch();
+		}
+		
 	}
 	
+	public function doExportLaunch():Void{
+		var serverUrl = Config.getInstance().serverUrl;
+		var learningDesignID = _ddm.learningDesignID;
+		JsPopup.getInstance().launchPopupWindow(serverUrl+'authoring/exportToolContent.do?learningDesignID=' + learningDesignID, 'Export', 398, 570, true, true, false, false, false);
+	}
 	/*
 	public function cut():Void{
 		Debugger.log('Cut',Debugger.GEN,'cut','Canvas');
@@ -837,6 +866,8 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 			_ddm.validDesign = false;
 			checkValidDesign();
 		}
+		
+		_ddm.modified = true;
 	}
 	
 	
