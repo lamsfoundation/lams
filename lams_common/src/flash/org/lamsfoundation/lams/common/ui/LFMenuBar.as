@@ -53,6 +53,8 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
     private var tm:ThemeManager;
 	private var _dictionary:Dictionary;
     
+	private static var _instance:LFMenuBar = null; 
+	
     //These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
     public var addEventListener:Function;
@@ -64,7 +66,7 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
         //Set up init for next frame and make invisible this frame
         this.onEnterFrame = init;
         this._visible = false;
-       
+		_instance = this;
 		
         //Get a reference to the application, ThemeManager and Dictionary
         app = ApplicationParent.getInstance();
@@ -72,6 +74,16 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
 	
 		_dictionary = Dictionary.getInstance();
 		_dictionary.addEventListener('init',Delegate.create(this,setupMenuItems));
+    }
+	
+	 /**
+    * Retrieves an instance of the LFMenuBar singleton
+    */ 
+    public static function getInstance():LFMenuBar{
+        if(LFMenuBar._instance == null){
+            LFMenuBar._instance = new LFMenuBar();
+        }
+        return LFMenuBar._instance;
     }
 
     public function init() {
@@ -106,12 +118,12 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
         file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_new'), instanceName:"newItem"});
         file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_open'), instanceName:"openItem"});
         file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_revert'), instanceName:"revertItem", enabled:false});
-        file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_new'), instanceName:"closeItem"});
+        //file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_close'), instanceName:"closeItem"});
         file_menu.addMenuItem({type:"separator"});
         file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_save'), instanceName:"saveItem"});
         file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_saveas'), instanceName:"saveItemAs"});
 		file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_import'), instanceName:"importItem"});
-        file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_export'), instanceName:"exportItem"});
+        file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_export'), instanceName:"exportItem", enabled:false});
 		file_menu.addMenuItem({type:"separator"});
 		file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_exit'), instanceName:"exitItem"});
 		
@@ -240,7 +252,7 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
         //Which item was clicked ?      
         switch (eventObj.menuItem) {
             case eventObj.menu.newItem : 
-                trace('new selected');
+                org.lamsfoundation.lams.authoring.Application(app).getCanvas().clearCanvas(false);
                 break;
             case eventObj.menu.openItem :
                 app.getWorkspace().userSelectItem();
@@ -272,6 +284,7 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
 			case eventObj.menu.scheduleItem:
 				break;
 			case eventObj.menu.exitItem:
+				getURL('javascript: window.close();');
 				break;
         }        
     }
@@ -375,6 +388,10 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
         }
     }
     
+	public function enableExport(enable:Boolean){
+		file_menu.setMenuItemEnabled(file_menu.getMenuItemAt(7), enable);
+	}
+	
     /**
     * Set the styles for the menu called from init. and themeChanged event handler
     */
