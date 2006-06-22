@@ -44,13 +44,12 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 	private static var SHOW_DEBUGGER:Boolean = false;
 	
 	private static var MODULE:String = "authoring";
-	/*
-    private static var TOOLBAR_X:Number = 10;
-    private static var TOOLBAR_Y:Number = 35;	*/
+
 	private static var _controlKeyPressed:String;
 	private static var TOOLBAR_X:Number = 0;
     private static var TOOLBAR_Y:Number = 21;
-    private static var TOOLKIT_X:Number = 0;
+
+    private static var TOOLKIT_X:Number = 0;
     private static var TOOLKIT_Y:Number = 55;
     
     private static var CANVAS_X:Number = 180;
@@ -58,6 +57,10 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
     private static var CANVAS_W:Number = 1000;
     private static var CANVAS_H:Number = 200;
     
+	private static var PI_X:Number = 180;
+	private static var PI_Y:Number = 551;
+	private static var PI_W:Number = 616;
+	
     private static var WORKSPACE_X:Number = 200;
     private static var WORKSPACE_Y:Number = 200;
     private static var WORKSPACE_W:Number = 300;
@@ -68,6 +71,7 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
     private static var TOOLTIP_DEPTH:Number = 30;	//depth of the cursors
     private static var CURSOR_DEPTH:Number = 40;   //depth of the cursors
     private static var MENU_DEPTH:Number = 25;   //depth of the menu
+	private static var PI_DEPTH:Number = 35;   //depth of the menu
     
     private static var UI_LOAD_CHECK_INTERVAL:Number = 50;
 	private static var UI_LOAD_CHECK_TIMEOUT_COUNT:Number = 200;
@@ -82,6 +86,7 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
     private static var V_KEY:Number = 86;
     private static var Z_KEY:Number = 90; 
     private static var Y_KEY:Number = 89;
+	private static var F12_KEY:Number = 123;
 	
 	public static var CUT_TYPE:Number = 0;
 	public static var COPY_TYPE:Number = 1;
@@ -94,14 +99,16 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
     private var _toolkit:Toolkit;
     private var _canvas:Canvas;
     private var _workspace:Workspace;
-    private var _debugDialog:MovieClip;                //Reference to the debug dialog
+	private var _PI:PropertyInspectorNew;
+	private var _debugDialog:MovieClip;                //Reference to the debug dialog
     
     
     private var _dialogueContainer_mc:MovieClip;       //Dialog container
     private var _tooltipContainer_mc:MovieClip;        //Tooltip container
     private var _cursorContainer_mc:MovieClip;         //Cursor container
     private var _menu_mc:MovieClip;                    //Menu bar clip
-    private var _container_mc:MovieClip;               //Main container
+    private var _container_mc:MovieClip;              //Main container
+	private var _pi_mc:MovieClip;
     
     private var _UILoadCheckIntervalID:Number;         //Interval ID for periodic check on UILoad status
     private var _UILoaded:Boolean;                     //UI Loading status
@@ -114,7 +121,7 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
     private var _toolkitLoaded:Boolean;
     private var _menuLoaded:Boolean;
 	private var _showCMItem:Boolean;
-	
+	private var _piLoaded:Boolean;
 	//clipboard
 	private var _clipboardData:Object;
 	private var _clipboardPasteCount:Number;
@@ -130,11 +137,11 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
     */
     private function Application(){
 		super(this);
-		
-        _toolkitLoaded = false;
+		_toolkitLoaded = false;
         _canvasLoaded  = false;
         _menuLoaded = false;
         _toolbarLoaded = false;  
+		_piLoaded = false;
 		_module = Application.MODULE;
 		//Mouse.addListener(someListener);
     }
@@ -311,6 +318,9 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
                 case 'Toolbar' :
                     _toolbarLoaded = true;
                     break;
+				case 'PropertyInspectorNew' :
+                    _piLoaded = true;
+                    break;
                 default:
             }
             
@@ -380,7 +390,7 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
         _dialogueContainer_mc = _container_mc.createEmptyMovieClip('_dialogueContainer_mc',DIALOGUE_DEPTH);
         _tooltipContainer_mc = _container_mc.createEmptyMovieClip('_tooltipContainer_mc',TOOLTIP_DEPTH);
         _cursorContainer_mc = _container_mc.createEmptyMovieClip('_cursorContainer_mc',CURSOR_DEPTH);
-		
+		_pi_mc = _container_mc.createEmptyMovieClip('_pi_mc',PI_DEPTH);
 		
 
         //MENU
@@ -393,7 +403,7 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
         _toolbar.addEventListener('load',Proxy.create(this,UIElementLoaded));
 
         //CANVAS
-        _canvas = new Canvas(_appRoot_mc,depth++,CANVAS_X,CANVAS_Y,CANVAS_W,CANVAS_H);
+        _canvas = new Canvas(_appRoot_mc,depth++,CANVAS_X,CANVAS_Y,CANVAS_W,495);
         _canvas.addEventListener('load',Proxy.create(this,UIElementLoaded));
         
         //WORKSPACE
@@ -403,6 +413,9 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 		//TOOLKIT  
 		_toolkit = new Toolkit(_appRoot_mc,depth++,TOOLKIT_X,TOOLKIT_Y);
         _toolkit.addEventListener('load',Proxy.create(this,UIElementLoaded));
+		
+		_pi_mc = _pi_mc.attachMovie('PropertyInspectorNew','_pi_mc',PI_DEPTH, {_x:PI_X,_y:PI_Y, _canvasModel:_canvas.model, _canvasController:_canvas.view.getController()});
+		_pi_mc.addEventListener('load',Proxy.create(this,UIElementLoaded));
     }
     
     /**
@@ -438,22 +451,27 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
         var h:Number = Stage.height;
 		
 		var someListener:Object = new Object();
+		trace("onResize called")
 		someListener.onMouseUp = function () {
 			
-		//Menu - only need to worry about width
-        _menu_mc.setSize(w,_menu_mc._height);
+			//Menu - only need to worry about width
+			_menu_mc.setSize(w,_menu_mc._height);
 
-        //Canvas
-        _canvas.setSize(w-_toolkit.width,h-CANVAS_Y);
-        _toolkit.setSize(_toolkit.width,h-TOOLKIT_Y);
-
-        //Toolbar
-        _toolbar.setSize(w,_toolbar.height);
-		//Property Inspector
-		var pi = _canvas.getPropertyInspector();
-		//pi._y = h;//- pi._height;
-		pi._y = h - 210;
-		
+			//Canvas
+			_canvas.setSize(w-_toolkit.width,h-(CANVAS_Y+_canvas.model.getPIHeight()));
+			_toolkit.setSize(_toolkit.width,h-TOOLKIT_Y);
+			
+			//Toolbar
+			_toolbar.setSize(w,_toolbar.height);
+			
+			//Property Inspector
+			_pi_mc.setSize(w-_toolkit.width,_pi_mc._height)
+			_pi_mc._y = h - _canvas.model.getPIHeight();
+			
+			//var pi = _canvas.getPropertyInspector();
+			//pi._y = h;//- pi._height;
+			//pi._y = h - 210;
+			
 		}
 		//Mouse.addListener(someListener);
 
@@ -463,15 +481,17 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
         _menu_mc.setSize(w,_menu_mc._height);
 
         //Canvas
-        _canvas.setSize(w-_toolkit.width,h-CANVAS_Y);
         _toolkit.setSize(_toolkit.width,h-TOOLKIT_Y);
-
+		_canvas.setSize(w-_toolkit.width,h-(CANVAS_Y+_canvas.model.getPIHeight()));
         //Toolbar
         _toolbar.setSize(w,_toolbar.height);
 		//Property Inspector
-		var pi = _canvas.getPropertyInspector();
+		_pi_mc.setSize(w-_toolkit.width,_pi_mc._height)
+		_pi_mc._y = h - _canvas.model.getPIHeight();
+		
+		//var pi = _canvas.getPropertyInspector();
 		//pi._y = h;//- pi._height;
-		pi._y = h - 210;
+		//pi._y = h - 210;
 		
 		
 		
@@ -507,36 +527,27 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
             }else {
                hideDebugger();
             }               
-        }
-		
-		//for copy and paste
-		//assuming that we are in the canvas...
-		if (Key.isDown(Key.CONTROL) && Key.isDown(X_KEY)) {
+        }else if (Key.isDown(Key.CONTROL) && Key.isDown(X_KEY)) {
+			//for copy and paste
+			//assuming that we are in the canvas...
              cut();
-        }
-		
-		if (Key.isDown(Key.CONTROL) && Key.isDown(C_KEY)) {
+        }else if (Key.isDown(Key.CONTROL) && Key.isDown(C_KEY)) {
            copy();
-        }
-		
-		if (Key.isDown(Key.CONTROL) && Key.isDown(V_KEY)) {
+        }else if (Key.isDown(F12_KEY)) {
+			trace("P Pressed")
+			PropertyInspectorNew(_pi_mc).localOnRelease();
+			
+        }else if (Key.isDown(Key.CONTROL) && Key.isDown(V_KEY)) {
 			paste();
 			
-        }
-		
-		
-		//undo
-		if (Key.isDown(Key.CONTROL) && Key.isDown(Z_KEY)) {
+        }else if (Key.isDown(Key.CONTROL) && Key.isDown(Z_KEY)) {
+			//undo
 			_canvas.undo();
 			
-        }
-		
-		if (Key.isDown(Key.CONTROL) && Key.isDown(Y_KEY)) {
+        }else if (Key.isDown(Key.CONTROL) && Key.isDown(Y_KEY)) {
 			
 			
-        }		
-		
-		if (Key.isDown(Key.CONTROL)) {
+        }else if(Key.isDown(Key.CONTROL)) {
 			//_canvas.toggleTransitionTool()
 			var c:String = Cursor.getCurrentCursor();
 			if(c != C_TRANSITION){	
@@ -667,7 +678,9 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
             //TODO DI 11/05/05 Raise error if mc hasn't been created
 			
         }
-    }	 /**
+    }
+
+	 /**
     * Returns the tooltip conatiner mc
     * 
     * @usage    Import authoring package and then use
@@ -682,7 +695,8 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 			
         }
     }
-    	 /**
+    
+	 /**
     * Returns the Cursor conatiner mc
     * 
     * @usage    Import authoring package and then use
