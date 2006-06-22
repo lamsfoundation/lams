@@ -62,6 +62,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	private var _duration:Number;
 	private var _readOnly:Boolean;
 	private var _validDesign:Boolean;
+	private var _modified:Boolean;
 	private var _maxID:Number;
 	private var _firstActivityID:Number;
 	private var _firstActivityUIID:Number;
@@ -809,6 +810,14 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	 */
 	public function get duration ():Number {
 		return _duration;
+	}
+	
+	public function set modified(a:Boolean) {
+		_modified = a;
+	}
+	
+	public function get modified():Boolean {
+		return _modified;
 	}
 	
 	/**
