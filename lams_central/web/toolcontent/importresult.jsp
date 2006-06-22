@@ -41,9 +41,9 @@
 							</li>
 						</c:forEach>
 					</c:otherwise>
-					<%-- display new learing desing in Flash side even some tool import failed --%>
-					<%@include file="import_passon.jsp"%>
 				</c:choose>
+				<%-- display new learing desing in Flash side even some tool import failed --%>
+				<%@include file="import_passon.jsp"%>
 			</c:when>
 			<c:otherwise>
 				<h1>
