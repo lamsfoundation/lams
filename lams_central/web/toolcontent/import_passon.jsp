@@ -1,7 +1,7 @@
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
-<c:set var="passonurl" value="import_passon.swf?learningDesingID=${learningDesignID}" />
+<c:set var="passonurl" value="import_passon.swf?learningDesignID=${learningDesignID}" />
 
 <!-- URL's used in the movie-->
 <!-- text used in the movie-->
