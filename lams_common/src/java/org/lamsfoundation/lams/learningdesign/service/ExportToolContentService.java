@@ -27,17 +27,21 @@ package org.lamsfoundation.lams.learningdesign.service;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -51,7 +55,6 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
-import org.apache.taglibs.standard.lang.jstl.ComplexValue;
 import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
@@ -80,7 +83,6 @@ import org.lamsfoundation.lams.learningdesign.dao.IGroupingDAO;
 import org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO;
 import org.lamsfoundation.lams.learningdesign.dao.ILicenseDAO;
 import org.lamsfoundation.lams.learningdesign.dao.ITransitionDAO;
-import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.GroupingDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
@@ -300,7 +302,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			
 			//learing design file name with full path
 			String ldFileName = FileUtil.getFullPath(contentDir,LEARNING_DESIGN_FILE_NAME);
-			Writer ldFile = new FileWriter(new File(ldFileName));
+			Writer ldFile = new OutputStreamWriter(new FileOutputStream(ldFileName),"UTF-8"); 
 			
 			//get learning desing and serialize it to XML file.
 			ILearningDesignService service =  getLearningDesignService();
@@ -357,7 +359,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			
 			//create tool xml file name : tool.xml
 			String toolFileName = FileUtil.getFullPath(toolPath,TOOL_FILE_NAME);
-			Writer toolFile = new FileWriter(new File(toolFileName));
+			Writer toolFile = new OutputStreamWriter(new FileOutputStream(toolFileName),"UTF-8");
 			
 			//serialize tool xml into local file.
 			XStream toolXml = new XStream();
@@ -422,7 +424,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		
 		try {
 			//import learning design
-			Reader ldFile = new FileReader(new File(FileUtil.getFullPath(learningDesignPath,LEARNING_DESIGN_FILE_NAME)));
+			Reader ldFile = new InputStreamReader(new FileInputStream(FileUtil.getFullPath(learningDesignPath,LEARNING_DESIGN_FILE_NAME)),"UTF-8"); 
 			XStream designXml = new XStream();
 			LearningDesignDTO ldDto = (LearningDesignDTO) designXml.fromXML(ldFile);
 			
@@ -482,6 +484,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			throw new ImportToolContentException(e);
 		} catch (FileNotFoundException e) {
 			throw new ImportToolContentException(e);
+		} catch (UnsupportedEncodingException e) {
+			throw new ImportToolContentException(e);
 		}
 		
 	}
@@ -503,7 +507,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		
 		List<ValueInfo> valueList = null;
 		try {
-			Reader toolFile = new FileReader(new File(FileUtil.getFullPath(toolContentPath,TOOL_FILE_NAME)));
+			
+			Reader toolFile = new InputStreamReader(new FileInputStream(FileUtil.getFullPath(toolContentPath,TOOL_FILE_NAME)),"UTF-8");
 			toolPOJO = toolXml.fromXML(toolFile);
 			
 			//upload file node if has
@@ -584,6 +589,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		} catch (InvocationTargetException e) {
 			throw new ImportToolContentException(e);
 		} catch (NoSuchMethodException e) {
+			throw new ImportToolContentException(e);
+		} catch (UnsupportedEncodingException e) {
 			throw new ImportToolContentException(e);
 		}finally{
 			if(fileHandleClassList != null)
@@ -702,10 +709,35 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 //		validate learning design
 		Vector listOfValidationErrorDTOs = (Vector)getLearningDesignService().validateLearningDesign(ld);
 		if(listOfValidationErrorDTOs.size() > 0 ){
+			ld.setValidDesign(false);
 			log.error(listOfValidationErrorDTOs);
-			throw new ImportToolContentException("Learning design validate error:");
+//			throw new ImportToolContentException("Learning design validate error.");
+		}else
+			ld.setValidDesign(true);
+		
+//		if the learning design has duplicated name in same folder, then rename it with timestamp.
+		// the new name format will be oldname_ddMMYYYY_idx. The idx will be auto incremental index number, start from 1.  
+		if(folder != null){
+			boolean dupName;
+			List<LearningDesign> ldList = learningDesignDAO.getAllLearningDesignsInFolder(folder.getWorkspaceFolderId());
+			String newName = ld.getTitle();
+			int idx = 1;
+			Calendar calendar = Calendar.getInstance();
+			while(true){
+				dupName = false;
+				for(LearningDesign eld :ldList){
+					if(StringUtils.equals(eld.getTitle(),newName)){
+						dupName = true;
+						break;
+					}
+				}
+				if(!dupName)
+					break;
+				newName = ld.getTitle() + "_" + calendar.get(Calendar.DAY_OF_MONTH)+calendar.get(Calendar.MONTH) + calendar.get(Calendar.YEAR) + "_" + idx;
+				idx++;
+			}
+			ld.setTitle(newName);
 		}
-			
 //		persist
 		learningDesignDAO.insert(ld);
 		
