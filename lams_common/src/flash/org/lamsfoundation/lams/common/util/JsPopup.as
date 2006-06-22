@@ -77,12 +77,23 @@ class JsPopup{
 	 * @param   scrollbar   	true or false, treu for having a scroll bar and false for not having onw.
 	 * @return  				returns nothing.
 	 */
-	public function launchPopupWindow(url:String, windowTitle:String, height:Number, width:Number, resize:Boolean, status:Boolean, scrollbar:Boolean, menubar:Boolean):Void{
+	public function launchPopupWindow(url:String, windowTitle:String, height:Number, width:Number, resize:Boolean, status:Boolean, scrollbar:Boolean, menubar:Boolean, toolbar:Boolean):Void{
 			//(args, title, h, w, resize, status, scrollbar)
 			//getURL(url,"_blank");
-			//getURL("javascript:openPopUp('"+url+"', Learner Preview, 600, 800, true, true, false, false);");
-			getURL("javascript:openPreview('"+url+"', '"+windowTitle+"');");
+			
+			// open popup window using javascript method in hosting jsp
+			getURL("javascript:openPopUp('"+url+"', '" + windowTitle + "', '" + height + "', '" + width + "', '" + getValue(resize) + "', '" + getValue(status) + "', '" + getValue(scrollbar) + "', '" + getValue(menubar) + "', '" + getValue(toolbar) + "');");
+			
+			//getURL("javascript:openPreview('"+url+"', '"+windowTitle+"');");
 			//openPreview
+	}
+	
+	private function getValue(option:Boolean):String{
+		if(option){
+			return "yes";
+		} else {
+			return "no";
+		}
 	}
 	
 }
