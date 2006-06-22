@@ -120,6 +120,8 @@ public class ExportToolContentAction extends LamsAction {
 				    log.error("Error Closing file. File already written out - no exception being thrown.",e);
 				}
 			}
+			
+			return null;
 		} catch (Exception e1) {
 			log.error("Unable to export tool content: " + e1.toString());
 			request.setAttribute(ATTR_LD_ERROR_MESSAGE,ldErrorMsgs);

@@ -9,10 +9,6 @@
 		<!-- ********************  CSS ********************** -->
 		<lams:css />
 		<script type="text/javascript">
-			function openDesign(ldID){
-			
-				window.close();
-			}
 			function closeWin(){
 				window.close();
 			}

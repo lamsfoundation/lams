@@ -9,6 +9,11 @@
 		<title><fmt:message key="title.import" /></title>
 		<!-- ********************  CSS ********************** -->
 		<lams:css />
+		<script type="text/javascript">
+			function closeWin(){
+				window.close();
+			}
+		</script>
 	</head>
 
 	<BODY>
@@ -23,7 +28,7 @@
 			<fmt:message key="label.ld.zip.file" />
 			:
 			<input type="file" name="UPLOAD_FILE" />
-			<input type="submit" name="<fmt:message key="button.import" />" class="buttonStyle"/>
+			<input type="submit" name="import" value="<fmt:message key="button.import" />" class="buttonStyle"/>
 		</form>
 
 	</BODY>
