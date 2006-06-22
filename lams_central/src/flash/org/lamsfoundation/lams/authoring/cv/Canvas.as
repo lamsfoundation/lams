@@ -40,7 +40,7 @@ import mx.utils.*
 class org.lamsfoundation.lams.authoring.cv.Canvas {
 	
 	//Constants
-	public static var USE_PROPERTY_INSPECTOR = true;
+	//public static var USE_PROPERTY_INSPECTOR = true;
 	
 	//Model
 	private var canvasModel:CanvasModel;
@@ -57,7 +57,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	private var _redoStack:Array;	
 	
 	
-    private var _pi:MovieClip; //Property inspector
+    //private var _pi:MovieClip; //Property inspector
     private var _bin:MovieClip;//bin
 	
     //Defined so compiler can 'see' events added at runtime by EventDispatcher
@@ -118,9 +118,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
         canvasModel.setSize(w,h);
 		
 		//muist comne after the canvasView as we use the defaultController method to get a controller ref.
-		_dictionary.addEventListener('init',Proxy.create(this,setupPI));
-		
-		
+		//_dictionary.addEventListener('init',Proxy.create(this,setupPI));
 		
 		//if in monitor, dont do it!
 		initBin();
@@ -130,11 +128,19 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	
 	
 	
+	/**
+	 * Method used to open a Property Inspector on popup window. Not used any more
+	 * 
+	 * @usage   
+	 * @return  
+	 
     public function setupPI(){
 		if(USE_PROPERTY_INSPECTOR){
 			initPropertyInspector();
 		}
 	}
+	*/
+	
     /**
     * Event dispatched from the view once it's loaded
     */
@@ -749,9 +755,9 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	}
 	
 	/**
-	 * Initialises the property inspector
+	 * Initialises the property inspector not in use any more
 	 * @usage   
-	 */
+	 
 	public function initPropertyInspector():Void{
 		//note the init obnject parameters are passed into the _container object in the embeded class (*in this case PropertyInspector)
 		//we are setting up a vew so we need to pass the model and controller to it
@@ -761,6 +767,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
         _pi.addEventListener('contentLoaded',Delegate.create(this,piLoaded));
         //okClickedCallback = callBack;
     }
+	*/
 	
 	/**
 	 * Sts up the bin
@@ -776,12 +783,12 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 	}
 	
 	/**
-	 * Fired whern property inspector's contentLoaded is fired
+	 * Fired whern property inspector's contentLoaded is fired not in use anymore
 	 * Positions the PI
 	 * @usage   
 	 * @param   evt 
 	 * @return  
-	 */
+	 
 	public function piLoaded(evt:Object) {
         if(evt.type == 'contentLoaded'){
 			//call a resize to line up the PI
@@ -793,7 +800,7 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
         }
 		
 	}
-	
+	*/
 	
 	/**
 	 * recieves event fired after update to the DDM
@@ -935,9 +942,11 @@ class org.lamsfoundation.lams.authoring.cv.Canvas {
 		return _ddm;
 	}
 	
-	public function getPropertyInspector():MovieClip{
+	/*
+	* public function getPropertyInspector():MovieClip{
 		return _pi;
 	}
+	*/
 
 	/**
 	 * 
