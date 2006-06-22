@@ -1910,51 +1910,56 @@ public class AuthoringUtil implements McAppConstants {
 
 	public static void removeRedundantOptionEntry(HttpServletRequest request, Map mapSGO, Map mapGO, Map options)
 	{
-		logger.debug("doing removeRedundantOptionEntry...");
-		IMcService mcService =McUtils.getToolService(request);
-		Iterator itSGOMap = mapSGO.entrySet().iterator();
-    	boolean optionFound=false;
-        while (itSGOMap.hasNext()) 
-        {
-            Map.Entry pairsSGO = (Map.Entry)itSGOMap.next();
-            optionFound=false;
-            Iterator itGOMap = mapGO.entrySet().iterator();
-	    	while (itGOMap.hasNext()) 
+		logger.debug("starting removeRedundantOptionEntry..." + mapGO);
+		logger.debug("using mapSGO..." + mapSGO);
+		
+		if ((mapSGO != null)  && (mapGO != null))
+		{
+			IMcService mcService =McUtils.getToolService(request);
+			Iterator itSGOMap = mapSGO.entrySet().iterator();
+	    	boolean optionFound=false;
+	        while (itSGOMap.hasNext()) 
 	        {
-	        	Map.Entry pairsGO = (Map.Entry)itGOMap.next();
-	        	if (pairsSGO.getValue().equals(pairsGO.getValue()))
+	            Map.Entry pairsSGO = (Map.Entry)itSGOMap.next();
+	            optionFound=false;
+	            Iterator itGOMap = mapGO.entrySet().iterator();
+		    	while (itGOMap.hasNext()) 
+		        {
+		        	Map.Entry pairsGO = (Map.Entry)itGOMap.next();
+		        	if (pairsSGO.getValue().equals(pairsGO.getValue()))
+		        	{
+		        		logger.debug("equal option found: " + pairsGO.getValue());
+		        		optionFound=true;
+		        		break;
+		        	}
+		        }
+		    	
+		    	if (optionFound == false)
 	        	{
-	        		logger.debug("equal option found: " + pairsGO.getValue());
-	        		optionFound=true;
-	        		break;
+	        		logger.debug("options optionFound is false: remove this option");
+	        		int optionSize=options.size();
+	        		logger.debug("optionSize:" + optionSize);
+	        		String mcQueContentUid=(String)options.get(new Integer(optionSize).toString()); 
+	        		
+	        		logger.debug("mcQueContentUid: " + mcQueContentUid);
+	        		
+	        		String deletableOptionText=pairsSGO.getValue().toString();
+	        		logger.debug("deletableOptionText: " + deletableOptionText);
+		        	
+	        		if (deletableOptionText != null && (!deletableOptionText.equals("")))
+	        		{
+	        			McOptsContent mcOptsContent = mcService.getOptionContentByOptionText(deletableOptionText, new Long(mcQueContentUid));
+			        	logger.debug("mcOptsContent: " + mcOptsContent);
+	            		mcService.removeMcOptionsContent(mcOptsContent);
+	            		logger.debug("removed mcOptsContent from db: " + mcOptsContent);	
+	        		}
+	        		else
+	        		{
+	        			logger.debug("This should not happen: deletableOptionText is null..");
+	        		}
 	        	}
 	        }
-	    	
-	    	if (optionFound == false)
-        	{
-        		logger.debug("options optionFound is false: remove this option");
-        		int optionSize=options.size();
-        		logger.debug("optionSize:" + optionSize);
-        		String mcQueContentUid=(String)options.get(new Integer(optionSize).toString()); 
-        		
-        		logger.debug("mcQueContentUid: " + mcQueContentUid);
-        		
-        		String deletableOptionText=pairsSGO.getValue().toString();
-        		logger.debug("deletableOptionText: " + deletableOptionText);
-	        	
-        		if (deletableOptionText != null && (!deletableOptionText.equals("")))
-        		{
-        			McOptsContent mcOptsContent = mcService.getOptionContentByOptionText(deletableOptionText, new Long(mcQueContentUid));
-		        	logger.debug("mcOptsContent: " + mcOptsContent);
-            		mcService.removeMcOptionsContent(mcOptsContent);
-            		logger.debug("removed mcOptsContent from db: " + mcOptsContent);	
-        		}
-        		else
-        		{
-        			logger.debug("This should not happen: deletableOptionText is null..");
-        		}
-        	}
-        }
+		}
 	}
 
 	
