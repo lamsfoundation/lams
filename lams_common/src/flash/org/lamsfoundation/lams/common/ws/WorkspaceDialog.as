@@ -375,6 +375,7 @@ class WorkspaceDialog extends MovieClip{
 						licenseID_cmb.selectedIndex = i;
 					}
 				}
+				license_txa.text = nodeData.licenseText;
 			}else{
 				licenseID_cmb.selectedIndex = 0;
 			}
