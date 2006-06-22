@@ -82,7 +82,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	private var manageStatus_lbl:Label;
 	private var manageStart_lbl:Label;
 	private var manageDate_lbl:Label;
-	
+	private var btnLabel:String;
 		
 	//Text Items
     private var LSTitle_txt:TextField;
@@ -136,7 +136,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	*/
 	public function init(m:Observable,c:Controller){
 		super (m, c);
-		
+		btnLabel = Dictionary.getValue('td_goContribute_btn');
 		MovieClipUtils.doLater(Proxy.create(this,setupTab));
 	}    
 	
@@ -488,11 +488,11 @@ public function update (o:Observable,infoObj:Object):Void{
 			if(o instanceof ContributeActivity){
 				// normal CA entries
 				trace('write out entry with GO link'+o.taskURL);
-				requiredTaskList[listCount] =_monitorReqTask_mc.attachMovie("contributeEntryRow", "contributeEntryRow"+listCount, this._monitorReqTask_mc.getNextHighestDepth(), {_x:x, _y:19*listCount})
+				requiredTaskList[listCount] =_monitorReqTask_mc.attachMovie("contributeEntryRow", "contributeEntryRow"+listCount, this._monitorReqTask_mc.getNextHighestDepth(), {_x:x, _y:19*listCount, buttonLabel:btnLabel})
 				reqTasks_scp.redraw(true);
 				requiredTaskList[listCount].contributeEntry.text = "\t\t"+mm.getMonitor().getCELiteral(o._contributionType);
 				requiredTaskList[listCount].goContribute._x = reqTasks_scp._width-50
-				requiredTaskList[listCount].goContribute.label = Dictionary.getValue('td_goContribute_btn');
+				//requiredTaskList[listCount].goContribute.label = Dictionary.getValue('td_goContribute_btn');
 				requiredTaskList[listCount].goContribute.onRelease = function (){
 					trace("Contribute Type is: "+o.taskURL);
 					JsPopup.getInstance().launchPopupWindow(o.taskURL, 'ContributeActivity', 398, 570, true, true, false, false, false);

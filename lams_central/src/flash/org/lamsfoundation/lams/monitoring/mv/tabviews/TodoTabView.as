@@ -47,13 +47,15 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.TodoTabView extends Abstrac
 	//constants:
 	private var _tm:ThemeManager;
 	private var mm:MonitorModel;
+	private var _dictionary:Dictionary;
 	
 	//TabView clips
 	private var YPOS:Number = 70; 
 	private var listCount:Number = 0; 
 	private var todoTaskList:Array = new Array();
 	private var _monitorTodoTask_mc:MovieClip;
-		
+	private var goContribute:Button;	
+	private var btnLabel:String;
 	// Background
 	private var bkg_pnl:MovieClip;
 		
@@ -79,6 +81,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.TodoTabView extends Abstrac
 		this._visible = false;
 		_tm = ThemeManager.getInstance();
         //Init for event delegation
+		_dictionary = Dictionary.getInstance();
         mx.events.EventDispatcher.initialize(this);
 	}
 	
@@ -87,6 +90,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.TodoTabView extends Abstrac
 	*/
 	public function init(m:Observable,c:Controller){
 		super (m, c);
+		btnLabel = Dictionary.getValue('td_goContribute_btn');
 	}    
 	
 	/**
@@ -246,10 +250,11 @@ public function update (o:Observable,infoObj:Object):Void{
 			if(o instanceof ContributeActivity){
 				// normal CA entries
 				trace('write out entry with GO link'+o.taskURL);
-				todoTaskList[listCount] =_monitorTodoTask_mc.attachMovie("contributeEntryRow", "contributeEntryRow"+listCount, this._monitorTodoTask_mc.getNextHighestDepth(), {_x:x, _y:YPOS+(19*listCount)})
+				trace('button label is: '+btnLabel);
+				todoTaskList[listCount] =_monitorTodoTask_mc.attachMovie("contributeEntryRow", "contributeEntryRow"+listCount, this._monitorTodoTask_mc.getNextHighestDepth(), {_x:x, _y:YPOS+(19*listCount), buttonLabel:btnLabel})
 				todoTaskList[listCount].contributeEntry.text = "\t\t"+mm.getMonitor().getCELiteral(o._contributionType);
 				todoTaskList[listCount].goContribute._x = this._width-50;
-				todoTaskList[listCount].goContribute.label = Dictionary.getValue('td_goContribute_btn');
+				//todoTaskList[listCount].goContribute.label = 
 				todoTaskList[listCount].goContribute.onRelease = function (){
 					trace("Contrybute Type is: "+o.taskURL);
 					JsPopup.getInstance().launchPopupWindow(o.taskURL, 'ContributeActivity', 398, 570, true, true, false, false, false);
