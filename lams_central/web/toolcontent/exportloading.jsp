@@ -16,6 +16,9 @@
 			function download(){
 				location.href="<c:url value='/authoring/exportToolContent.do?method=export&learningDesignID=${learningDesignID}'/>";
 			}
+			function closeWin(){
+				window.close();
+			}
 		</script>
 	</head>
 
