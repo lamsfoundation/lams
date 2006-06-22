@@ -82,6 +82,7 @@
 		singleton="false"
 	>
 		<property name="baseDAO"><ref bean="baseDAO"/></property>
+		<property name="messageService"><ref bean="commonMessageService"/></property>
 	</bean>	
 	
 	<!-- Transactional proxy for the user management primary business object -->

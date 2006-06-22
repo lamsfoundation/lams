@@ -106,37 +106,24 @@ public class OrgSaveAction extends Action {
 		if(errors.isEmpty()){
 			Integer orgId = (Integer)orgForm.get("orgId");
 			Organisation org;
+
+			HttpSession ss = SessionManager.getSession();
+			UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+
 			if(orgId!=0){
 				org = (Organisation)service.findById(Organisation.class,orgId);
 				BeanUtils.copyProperties(org,orgForm);
 			}else{
 				org = new Organisation();
 				BeanUtils.copyProperties(org,orgForm);
-				org.setCreateDate(new Date());
 				org.setParentOrganisation((Organisation)service.findById(Organisation.class,(Integer)orgForm.get("parentId")));
 				org.setOrganisationType((OrganisationType)service.findById(OrganisationType.class,(Integer)orgForm.get("typeId")));
-				if(org.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.COURSE_TYPE)){
-					HttpSession ss = SessionManager.getSession();
-					UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-					Workspace workspace =  new Workspace(org.getName());
-					service.save(workspace);
-					WorkspaceFolder workspaceFolder = new WorkspaceFolder(workspace.getName(),workspace.getWorkspaceId(),
-							user.getUserID(), new Date(), new Date(), WorkspaceFolder.NORMAL);
-					service.save(workspaceFolder);
-					log.debug("Root Folder Id:"+workspaceFolder.getWorkspaceFolderId());
-					workspace.setRootFolder(workspaceFolder);
-					WorkspaceFolder workspaceFolder2 = new WorkspaceFolder(workspace.getName()+"_Sequences",workspace.getWorkspaceId(),
-							user.getUserID(),new Date(), new Date(), WorkspaceFolder.RUN_SEQUENCES);
-					service.save(workspaceFolder2);
-					log.debug("Run Sequence Folder Id:"+workspaceFolder2.getWorkspaceFolderId());
-					workspace.setDefaultRunSequencesFolder(workspaceFolder2);
-					service.save(workspace);
-					org.setWorkspace(workspace);
-				}
 			}
+			
 			log.debug("orgId:"+org.getOrganisationId()+" language:"+org.getLocaleLanguage()+" Country:"+org.getLocaleCountry()+" create date:"+org.getCreateDate());
 			org.setOrganisationState((OrganisationState)service.findById(OrganisationState.class,(Integer)orgForm.get("stateId")));
-			service.save(org);
+			org = service.saveOrganisation(org, user.getUserID());
+			
 			request.setAttribute("org",orgForm.get("parentId"));
 			return mapping.findForward("orglist");
 		}else{

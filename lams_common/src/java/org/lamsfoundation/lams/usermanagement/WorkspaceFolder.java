@@ -60,18 +60,11 @@ public class WorkspaceFolder implements Serializable {
     /** persistent field */
     private String name;
     
-    /** non-nullable persistent field indicating the
-     * workspace which contains this folder*/
-    private Integer workspaceID;
-
     /** persistent field */
     private WorkspaceFolder parentWorkspaceFolder;
 
     /** persistent field */
-    private Set workspacesByRootFolder;
-
-    /** persistent field */
-    private Set workspacesBySequenceFolder;
+    private Set workspaces;
 
     /** persistent field */
     private Set childWorkspaceFolders;
@@ -104,13 +97,11 @@ public class WorkspaceFolder implements Serializable {
     private Set folderContent;
 
 	public WorkspaceFolder(String name,
-						   Integer workspaceID,
 						   Integer userID,
 						   Date creationDate,
 						   Date lastModifiedDate,
 						   Integer workspaceFolderType) {	
 		this.name = name;	
-		this.workspaceID = workspaceID;
 		this.userID = userID;
 		this.creationDate = creationDate;
 		this.lastModifiedDate = lastModifiedDate;
@@ -126,7 +117,6 @@ public class WorkspaceFolder implements Serializable {
 						  Integer workspaceFolderType) {
 		super();
 		this.name = name;
-		this.workspaceID = workspaceID;
 		this.parentWorkspaceFolder = parentWorkspaceFolder;
 		this.userID = userID;
 		this.creationDate = creationDate;
@@ -146,10 +136,10 @@ public class WorkspaceFolder implements Serializable {
 		this.learningDesigns = learningDesigns;
 	}
     /** full constructor */
-    public WorkspaceFolder(String name, WorkspaceFolder parentWorkspaceFolder, Set workspacesByRootFolder, Set childWorkspaceFolders) {
+    public WorkspaceFolder(String name, WorkspaceFolder parentWorkspaceFolder, Set workspaces, Set childWorkspaceFolders) {
         this.name = name;    
         this.parentWorkspaceFolder = parentWorkspaceFolder;
-        this.workspacesByRootFolder = workspacesByRootFolder;
+        this.workspaces = workspaces;
         this.childWorkspaceFolders = childWorkspaceFolders;
     }
 
@@ -200,42 +190,18 @@ public class WorkspaceFolder implements Serializable {
     }
 
     /** 
-     *            @hibernate.set
-     *             lazy="true"
-     *             inverse="true"
-     *             cascade="none"
-     *            @hibernate.collection-key
-     *             column="root_folder_id"
-     *            @hibernate.collection-one-to-many
-     *             class="org.lamsfoundation.lams.usermanagement.Workspace"
-     *         
+     * @hibernate.set role="workspaces" table="lams_workspace_workspace_folder" cascase="all-delete-orphan"
+     * @hibernate.collection-key column="workspace_folder_id"
+     * @hibernate.collection-many-to-manyclass="org.lamsfoundation.lams.usermanagement.Workspace" 
+     *   column="workspace_id"
      */
-    public Set getWorkspacesByRootFolder() {
-        return this.workspacesByRootFolder;
+    public Set getWorkspaces() {
+        return workspaces;	
     }
 
-    public void setWorkspacesByRootFolder(Set workspacesByRootFolder) {
-        this.workspacesByRootFolder = workspacesByRootFolder;
+    public void setWorkspaces(Set workspaces) {
+        this.workspaces = workspaces;	
     }
-
-    /** 
-     *            @hibernate.set
-     *             lazy="true"
-     *             inverse="true"
-     *             cascade="none"
-     *            @hibernate.collection-key
-     *             column="def_run_seq_fld_id"
-     *            @hibernate.collection-one-to-many
-     *             class="org.lamsfoundation.lams.usermanagement.Workspace"
-     *         
-     */
-    public Set getWorkspacesBySequenceFolder() {
-		return workspacesBySequenceFolder;
-	}
-
-	public void setWorkspacesBySequenceFolder(Set workspacesBySequenceFolder) {
-		this.workspacesBySequenceFolder = workspacesBySequenceFolder;
-	}
 
 	/** 
      *            @hibernate.set
@@ -323,18 +289,6 @@ public class WorkspaceFolder implements Serializable {
 	 */
 	public void setWorkspaceFolderType(Integer workspaceFolderType) {
 		this.workspaceFolderType = workspaceFolderType;
-	}
-	/**
-	 * @return Returns the workspaceID.
-	 */
-	public Integer getWorkspaceID() {
-		return workspaceID;
-	}
-	/**
-	 * @param workspaceID The workspaceID to set.
-	 */
-	public void setWorkspaceID(Integer workspaceID) {
-		this.workspaceID = workspaceID;
 	}
 	/**
 	 * This is a utility function which checks if the given 

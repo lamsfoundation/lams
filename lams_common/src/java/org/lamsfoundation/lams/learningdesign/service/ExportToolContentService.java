@@ -469,7 +469,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 				folder = (WorkspaceFolder)baseDAO.find(WorkspaceFolder.class,workspaceFolderUid);
 			} 				
 			if ( folder == null && importer.getWorkspace() != null) {
-				folder = importer.getWorkspace().getRootFolder();
+				folder = importer.getWorkspace().getDefaultFolder();
 			}
 			if ( folder == null ) {
 				String error = "Unable to save design in a folder - folder not found. Input folder uid="+workspaceFolderUid+

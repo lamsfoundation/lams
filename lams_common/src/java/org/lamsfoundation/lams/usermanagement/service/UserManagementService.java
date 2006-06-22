@@ -28,14 +28,19 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import javax.servlet.http.HttpSession;
+
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.OrganisationState;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -47,6 +52,9 @@ import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTO;
 import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTOFactory;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.HashUtil;
+import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * <p>
@@ -63,9 +71,25 @@ import org.lamsfoundation.lams.util.HashUtil;
  */
 public class UserManagementService implements IUserManagementService {
 
-	private Logger log = Logger.getLogger(UserManagementService.class);	
+	private Logger log = Logger.getLogger(UserManagementService.class);
+	private static final String SEQUENCES_FOLDER_NAME_KEY = "runsequences.folder.name";
 
 	private IBaseDAO baseDAO;
+	protected MessageService messageService;
+
+	/**
+	 * Set i18n MessageService
+	 */
+	public void setMessageService(MessageService messageService) {
+		this.messageService = messageService;
+	}
+
+	/**
+	 * Get i18n MessageService
+	 */
+	public MessageService getMessageService() {
+		return this.messageService;
+	}
 
 	public void setBaseDAO(IBaseDAO baseDAO){
 		this.baseDAO = baseDAO;
@@ -353,12 +377,62 @@ public class UserManagementService implements IUserManagementService {
 		if(user.getUserId()==null){//new User
 			Workspace workspace = new Workspace(user.getFullName());
 			save(workspace);
-			WorkspaceFolder folder = new WorkspaceFolder(workspace.getName(),workspace.getWorkspaceId(),user.getUserId(),new Date(),new Date(),WorkspaceFolder.NORMAL);
+			WorkspaceFolder folder = new WorkspaceFolder(workspace.getName(),user.getUserId(),new Date(),new Date(),WorkspaceFolder.NORMAL);
 			save(folder);
-			workspace.setRootFolder(folder);
+			if ( workspace.getFolders() == null )
+				workspace.setFolders(new HashSet());
+			workspace.getFolders().add(folder);
 			user.setWorkspace(workspace);
 		}
 		return user;
 	}
 
+	public Organisation saveOrganisation( Organisation organisation, Integer userID ) 
+	{
+
+		if ( organisation.getOrganisationId() == null ) {
+			Date createDateTime = new Date();
+			organisation.setCreateDate(createDateTime);
+
+			if(organisation.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.COURSE_TYPE)){
+				Workspace workspace = createWorkspaceForOrganisation(organisation.getName(), userID, createDateTime);
+				organisation.setWorkspace(workspace);
+			}
+		}
+		
+		save(organisation);
+		return organisation;
+	}
+
+	public Workspace createWorkspaceForOrganisation(String workspaceName, Integer userID, Date createDateTime ) {
+		
+		// this method is public so it can be accessed from the junit test
+
+		WorkspaceFolder workspaceFolder = new WorkspaceFolder(workspaceName,userID, createDateTime, createDateTime, WorkspaceFolder.NORMAL);
+		save(workspaceFolder);
+
+		String description = messageService.getMessage(SEQUENCES_FOLDER_NAME_KEY, new Object[] {workspaceName});
+		if ( description != null && description.startsWith("???") ) {
+			log.warn("Problem in the language file - can't find an entry for "+SEQUENCES_FOLDER_NAME_KEY+
+					". Creating folder as \"run sequences\" ");
+			description = "run sequences";
+		}
+		WorkspaceFolder workspaceFolder2 = new WorkspaceFolder(description,userID, createDateTime, createDateTime, WorkspaceFolder.RUN_SEQUENCES);
+		workspaceFolder2.setParentWorkspaceFolder(workspaceFolder);
+		save(workspaceFolder2);
+
+		Workspace workspace =  new Workspace(workspaceName);
+		if ( workspace.getFolders() == null )
+			workspace.setFolders(new HashSet());
+
+		workspace.getFolders().add(workspaceFolder);
+		workspace.setDefaultFolder(workspaceFolder);
+		workspace.getFolders().add(workspaceFolder2);
+		workspace.setDefaultRunSequencesFolder(workspaceFolder2);
+
+		save(workspace);
+
+		return workspace;
+	}
+	
 }

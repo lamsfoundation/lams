@@ -41,7 +41,10 @@ public class Workspace implements Serializable {
     private Integer workspaceId;
 
     /** persistent field */
-    private WorkspaceFolder rootFolder;
+    private Set folders;
+
+    /** persistent field */
+    private WorkspaceFolder defaultFolder;
 
     /** persistent field */
     private WorkspaceFolder defaultRunSequencesFolder;
@@ -63,7 +66,6 @@ public class Workspace implements Serializable {
 	}
     /** full constructor */
     public Workspace(WorkspaceFolder workspaceFolder, Set users, Set organisations) {
-        this.rootFolder = workspaceFolder;
         this.users = users;
         this.organisations = organisations;
     }
@@ -91,18 +93,31 @@ public class Workspace implements Serializable {
      *            @hibernate.many-to-one
      *             not-null="true"
      *			   lazy="false"
-     *            @hibernate.column name="root_folder_id"         
+     *            @hibernate.column name="default_fld_id"         
      *         
      */
-    public WorkspaceFolder getRootFolder() {
-        return this.rootFolder;
+    public WorkspaceFolder getDefaultFolder() {
+        return this.defaultFolder;
     }
 
-    public void setRootFolder(WorkspaceFolder workspaceFolder) {
-        this.rootFolder = workspaceFolder;
+    public void setDefaultFolder(WorkspaceFolder defaultFolder) {
+        this.defaultFolder = defaultFolder;
     }
 
-    
+    /** 
+     * @hibernate.set role="folders" table="lams_workspace_workspace_folder" cascade="all-delete-orphan" 
+     * @hibernate.collection-key column="workspace_id"
+     * @hibernate.collection-many-to-manyclass="org.lamsfoundation.lams.usermanagement.WorkspaceFolder" 
+     *   column="workspace_folder_id"
+     */
+    public Set getFolders() {
+        return folders;	
+    }
+
+    public void setFolders(Set folders) {
+        this.folders = folders;	
+    }
+
     /** 
      *            @hibernate.many-to-one
      *             not-null="true"
@@ -190,7 +205,6 @@ public class Workspace implements Serializable {
 		this.name = name;
 	}
 	public WorkspaceDTO getWorkspaceDTO(){
-		return new WorkspaceDTO(workspaceId,
-								rootFolder.getWorkspaceFolderId()); 
-	}
+		return new WorkspaceDTO(workspaceId,defaultFolder.getWorkspaceFolderId()); 
+	} 
 }

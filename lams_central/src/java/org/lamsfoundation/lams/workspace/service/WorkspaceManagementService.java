@@ -188,13 +188,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 				flashMessage = FlashMessage.getUserNotAuthorized(MSG_KEY_DELETE,userID);
 			}else{
 				if(workspaceFolder!=null){
-					if(isRootFolder(workspaceFolder))
-						flashMessage = new FlashMessage(MSG_KEY_DELETE,
-														messageService.getMessage("delete.folder.error"),
-														FlashMessage.ERROR);
-					else{
-						flashMessage = deleteFolderContents(workspaceFolder, userID);
-					}
+					flashMessage = deleteFolderContents(workspaceFolder, userID);
 				}else
 					flashMessage = FlashMessage.getNoSuchWorkspaceFolderExsists(MSG_KEY_DELETE,folderID);
 			}
@@ -289,27 +283,6 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	
 	}
 	
-	
-	/**
-	 * This method checks if the given <code>workspaceFolder</code> is the
-	 * root folder of any <code>Organisation</code> or <code>User</code>
-	 * 
-	 * @param workspaceFolder The <code>workspaceFolder</code> to be checked
-	 * @return boolean The boolean value indicating whether it is a 
-	 * 		  root folder or not. 
-	 */
-	private boolean isRootFolder(WorkspaceFolder workspaceFolder){
-		try{
-			Workspace workspace = (Workspace)baseDAO.findByProperty(Workspace.class,"rootFolder.workspaceFolderId",workspaceFolder.getWorkspaceFolderId()).get(0);
-			if(workspace!=null)
-				return true;
-			else
-				return false;
-		}catch(Exception e){
-			return false;
-		}
-	}
-	
 	/**
 	 * Get the workspace folder for a particular id. Does not check the user permissions - that will be checked if you try to get
 	 * anything from the folder.
@@ -324,7 +297,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	 */
 	public Vector<FolderContentDTO> getFolderContentsExcludeHome(Integer userID, WorkspaceFolder folder, Integer mode)throws UserAccessDeniedException, RepositoryCheckedException {
 		User user = (User)baseDAO.find(User.class,userID);
-		return getFolderContentsInternal(user, folder, mode, "getFolderContentsExcludeHome", user.getWorkspace().getRootFolder());
+		return getFolderContentsInternal(user, folder, mode, "getFolderContentsExcludeHome", user.getWorkspace().getDefaultFolder());
 	}
 	 
 	
@@ -402,13 +375,11 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	public Integer getPermissions(WorkspaceFolder workspaceFolder, User user){
 		Integer permission = null;
 
-		WorkspaceFolder userRootFolder = user.getWorkspace().getRootFolder();
+		WorkspaceFolder userDefaultFolder = user.getWorkspace().getDefaultFolder();
 
 		if  ( workspaceFolder==null || user==null ) {
 			permission = WorkspaceFolder.NO_ACCESS;
 		} else if (workspaceFolder.getUserID().equals(user.getUserId())) {
-			permission = WorkspaceFolder.OWNER_ACCESS;
-		} else if (isSubFolder(workspaceFolder,userRootFolder)) {			
 			permission = WorkspaceFolder.OWNER_ACCESS;
 		} else if(user.hasMemberAccess(workspaceFolder)) {
 			permission = WorkspaceFolder.MEMBERSHIP_ACCESS;
@@ -1113,7 +1084,9 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 					Workspace workspace = member.getOrganisation().getWorkspace();
 					
 					if ( workspace != null ) {
-						WorkspaceFolder orgFolder = workspace.getRootFolder();
+						// TODO  get all the folders for the workspace but only return those that are at the "top" of the hierarchy
+						// for this user. Not needed at present but will be needed when we have multiple folders in a user's workspace (ie shared folders)
+						WorkspaceFolder orgFolder = workspace.getDefaultFolder();
 						if ( orgFolder != null ) {
 						
 							// Check if the user has write access, which is available
@@ -1147,8 +1120,9 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		User user = (User)baseDAO.find(User.class,userID);
 		
 		if (user != null) {
-			//add the user's own folder to the list
-			WorkspaceFolder privateFolder = user.getWorkspace().getRootFolder();
+			// TODO  get all the folders for the workspace but only return those that are at the "top" of the hierarchy
+			// for this user. Not needed at present but will be needed when we have multiple folders in a user's workspace (ie shared folders)
+			WorkspaceFolder privateFolder = user.getWorkspace().getDefaultFolder();
 			if ( privateFolder != null ) {
 				Integer permissions = getPermissions(privateFolder,user);
 				return new FolderContentDTO(privateFolder, permissions);

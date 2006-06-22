@@ -263,4 +263,13 @@ public interface IUserManagementService {
 	 */
 	public UserOrganisation getUserOrganisation(Integer userId, Integer orgId);
 	
+	/** 
+	 * Save an organisation. If it is a new course organisation then it will create a workspace and 
+	 * its workspace folders.
+	 * 
+	 * @param organisation
+	 * @param userID
+	 * @return
+	 */
+	public Organisation saveOrganisation( Organisation organisation, Integer userID ); 
 }

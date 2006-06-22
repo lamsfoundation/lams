@@ -17,44 +17,55 @@ INSERT INTO lams_css_theme_ve (theme_ve_id, name, description, parent_id, theme_
 INSERT INTO lams_css_theme_ve (theme_ve_id, name, description, parent_id, theme_flag) VALUES (3, "aqua", "JSP theme", null, 1);
 
 
-insert into lams_workspace (workspace_id, root_folder_id, name) values(1,1,'ROOT');
-insert into lams_workspace (workspace_id, root_folder_id, name, def_run_seq_fld_id) values(2,2,'Developers Playpen',22);
-insert into lams_workspace (workspace_id, root_folder_id, name, def_run_seq_fld_id) values(3,3,'MATH111',23);
-insert into lams_workspace (workspace_id, root_folder_id, name) values(4,4,'Mary Morgan');
-insert into lams_workspace (workspace_id, root_folder_id, name) values(5,5,'One Test');
-insert into lams_workspace (workspace_id, root_folder_id, name) values(6,6,'Two Test');
-insert into lams_workspace (workspace_id, root_folder_id, name) values(7,7,'Three Test');
-insert into lams_workspace (workspace_id, root_folder_id, name) values(8,8,'Four Test');
+insert into lams_workspace (workspace_id, name, default_fld_id) values(1,'ROOT',1);
+insert into lams_workspace (workspace_id, name, default_fld_id, def_run_seq_fld_id) values(2,'Developers Playpen',2,22);
+insert into lams_workspace (workspace_id, name, default_fld_id, def_run_seq_fld_id) values(3,'MATH111',3,23);
+insert into lams_workspace (workspace_id, name, default_fld_id) values(4,'Mary Morgan',4);
+insert into lams_workspace (workspace_id, name, default_fld_id) values(5,'One Test',5);
+insert into lams_workspace (workspace_id, name, default_fld_id) values(6,'Two Test',6);
+insert into lams_workspace (workspace_id, name, default_fld_id) values(7,'Three Test',7);
+insert into lams_workspace (workspace_id, name, default_fld_id) values(8,'Four Test',8);
 
-insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,workspace_id,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
-values(1,null,'ROOT',1,1,'20041223','20041223',1);
+insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
+values(1,null,'ROOT',1,'20041223','20041223',1);
 
-insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,workspace_id,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
-values(2,1,'Developers Playpen',2,1,'20041223','20041223',1);
+insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
+values(2,1,'Developers Playpen',1,'20041223','20041223',1);
 
-insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,workspace_id,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
-values(22,2,'Lesson Sequence Folder',2,1,'20041223','20041223',2);
+insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
+values(22,2,'Lesson Sequence Folder',1,'20041223','20041223',2);
 
-insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,workspace_id,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
-values(3,1,'MATH111',3,1,'20041223','20041223',1);
+insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
+values(3,1,'MATH111',1,'20041223','20041223',1);
 
-insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,workspace_id,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
-values(23,3,'Lesson Sequence Folder',3,1,'20041223','20041223',2);
+insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
+values(23,3,'Lesson Sequence Folder',1,'20041223','20041223',2);
 
-insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,workspace_id,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
-values(4,null,'Mary Morgan Folder',4,4,'20041223','20041223',1);
+insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
+values(4,null,'Mary Morgan Folder',4,'20041223','20041223',1);
 
-insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,workspace_id,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
-values(5,null,'One Test Workspace',5,5,'20041223','20041223',1);
+insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
+values(5,null,'One Test Workspace',5,'20041223','20041223',1);
 
-insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,workspace_id,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
-values(6,null,'Two Test Workspace',6,6,'20041223','20041223',1);
+insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
+values(6,null,'Two Test Workspace',6,'20041223','20041223',1);
 
-insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,workspace_id,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
-values(7,null,'Three Test Workspace',7,7,'20041223','20041223',1);
+insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
+values(7,null,'Three Test Workspace',7,'20041223','20041223',1);
 
-insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,workspace_id,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
-values(8,null,'Four Test Workspace',8,8,'20041223','20041223',1);
+insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
+values(8,null,'Four Test Workspace',8,'20041223','20041223',1);
+
+insert into lams_workspace_workspace_folder (workspace_id, workspace_folder_id) values (1,1);
+insert into lams_workspace_workspace_folder (workspace_id, workspace_folder_id) values (2,2);
+insert into lams_workspace_workspace_folder (workspace_id, workspace_folder_id) values (2,22);
+insert into lams_workspace_workspace_folder (workspace_id, workspace_folder_id) values (3,3);
+insert into lams_workspace_workspace_folder (workspace_id, workspace_folder_id) values (3,23);
+insert into lams_workspace_workspace_folder (workspace_id, workspace_folder_id) values (4,4);
+insert into lams_workspace_workspace_folder (workspace_id, workspace_folder_id) values (5,5);
+insert into lams_workspace_workspace_folder (workspace_id, workspace_folder_id) values (6,6);
+insert into lams_workspace_workspace_folder (workspace_id, workspace_folder_id) values (7,7);
+insert into lams_workspace_workspace_folder (workspace_id, workspace_folder_id) values (8,8);
 
 INSERT INTO lams_organisation (organisation_id, name, code, description, parent_organisation_id, organisation_type_id, create_date, workspace_id, locale_language, locale_country, organisation_state_id)
 	VALUES (1, 'Root', null, 'Root Organisation',null,1,NOW(),1,'en','AU',1);

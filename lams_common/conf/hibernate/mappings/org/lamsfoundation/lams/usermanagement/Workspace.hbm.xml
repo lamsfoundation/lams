@@ -99,7 +99,7 @@
     </set>
     <!-- bi-directional many-to-one association to WorkspaceFolder -->
     <many-to-one
-        name="rootFolder"
+        name="defaultFolder"
         class="org.lamsfoundation.lams.usermanagement.WorkspaceFolder"
         not-null="true"
         lazy="false"
@@ -108,11 +108,18 @@
            @hibernate.many-to-one
             not-null="true"
 	        lazy="false"
-           @hibernate.column name="root_folder_id"         
+           @hibernate.column name="default_fld_id"         
         </meta>
-        <column name="root_folder_id" />
+        <column name="default_fld_id" />
     </many-to-one>
 
+	<!-- bi-directional many-to-many assocation to a WorkspaceFolder -->
+	<set name="folders" table="lams_workspace_workspace_folder" cascade="all-delete-orphan" >
+        <key column="workspace_id"/>
+        <many-to-many column="workspace_folder_id"
+            class="org.lamsfoundation.lams.usermanagement.WorkspaceFolder"/>
+    </set>
+    
     <!-- bi-directional many-to-one association to WorkspaceFolder -->
      <many-to-one
             name="defaultRunSequencesFolder"

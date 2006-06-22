@@ -724,31 +724,28 @@ public class User implements Serializable {
 				UserOrganisation userOrganisation = (UserOrganisation)iterator.next();
 				// not all orgs have a folder
 				Workspace workspace = userOrganisation.getOrganisation().getWorkspace();
-				if ( workspace != null ) {
-					foundMemberFolder = checkFolders(workspace.getRootFolder(),workspaceFolderID); 
+				if ( workspace != null && workspace.getFolders() != null ) {
+					foundMemberFolder = checkFolders(workspace.getFolders(),workspaceFolderID); 
 				}
 			}		
 		}
 		return foundMemberFolder;
 	}
 
-	private boolean checkFolders(WorkspaceFolder folder, Integer desiredWorkspaceFolderId) {
+	private boolean checkFolders(Set folders, Integer desiredWorkspaceFolderId) {
 		boolean foundMemberFolder = false;
-		if ( folder != null ) {
+		Iterator folderIter = folders.iterator();
+		while ( folderIter.hasNext() && !foundMemberFolder) {
+			WorkspaceFolder folder = (WorkspaceFolder) folderIter.next();
 			Integer folderID = folder.getWorkspaceFolderId();
 			if ( folderID.equals(desiredWorkspaceFolderId) ) {
 				foundMemberFolder = true;
 			} else {
 				Set childFolders = folder.getChildWorkspaceFolders();
 				if ( childFolders != null ) {
-					Iterator iter = childFolders.iterator();
-					while (iter.hasNext() && !foundMemberFolder) {
-						WorkspaceFolder child = (WorkspaceFolder) iter.next();
-						foundMemberFolder = checkFolders(child, desiredWorkspaceFolderId);
-					}
+					foundMemberFolder = checkFolders(childFolders, desiredWorkspaceFolderId);
 				}
 			}
-			
 		}
 		return foundMemberFolder;
 	}
