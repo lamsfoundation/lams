@@ -249,7 +249,7 @@ public function update (o:Observable,infoObj:Object):Void{
 				todoTaskList[listCount] =_monitorTodoTask_mc.attachMovie("contributeEntryRow", "contributeEntryRow"+listCount, this._monitorTodoTask_mc.getNextHighestDepth(), {_x:x, _y:YPOS+(19*listCount)})
 				todoTaskList[listCount].contributeEntry.text = "\t\t"+mm.getMonitor().getCELiteral(o._contributionType);
 				todoTaskList[listCount].goContribute._x = this._width-50;
-				todoTaskList[listCount].goContribute.text = Dictionary.getValue('todo_goContribute_btn');
+				todoTaskList[listCount].goContribute.label = Dictionary.getValue('td_goContribute_btn');
 				todoTaskList[listCount].goContribute.onRelease = function (){
 					trace("Contrybute Type is: "+o.taskURL);
 					getURL(String(o.taskURL), "_blank");

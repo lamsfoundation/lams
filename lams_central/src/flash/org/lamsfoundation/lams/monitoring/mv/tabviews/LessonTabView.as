@@ -492,7 +492,7 @@ public function update (o:Observable,infoObj:Object):Void{
 				reqTasks_scp.redraw(true);
 				requiredTaskList[listCount].contributeEntry.text = "\t\t"+mm.getMonitor().getCELiteral(o._contributionType);
 				requiredTaskList[listCount].goContribute._x = reqTasks_scp._width-50
-				requiredTaskList[listCount].goContribute.text = Dictionary.getValue('todo_goContribute_btn');
+				requiredTaskList[listCount].goContribute.label = Dictionary.getValue('td_goContribute_btn');
 				requiredTaskList[listCount].goContribute.onRelease = function (){
 					trace("Contrybute Type is: "+o.taskURL);
 					getURL(String(o.taskURL), "_blank");
