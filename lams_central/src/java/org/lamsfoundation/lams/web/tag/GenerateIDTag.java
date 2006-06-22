@@ -33,6 +33,7 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 import org.apache.log4j.Logger;
+import org.apache.taglibs.standard.lang.support.ExpressionEvaluatorManager;
 
 import java.util.Random;
 
@@ -56,10 +57,29 @@ public class GenerateIDTag extends TagSupport {
 
 	/** The random number to be output */
 	private int number = -1;
+	private Integer lessonID;
 	
 	public GenerateIDTag() {
 		super();
 	}
+	
+	/**
+	 * @param id Lesson ID
+	 */
+	public void setId(String id) {
+		this.id = id;
+	}
+	/**
+	 * @return Lesson ID
+	 * 
+	 * @jsp.attribute required="false"
+	 * 				  rtexprvalue="true"
+	 * 				  description="Lesson Identifier"
+	 */
+	public String getId() {
+		return this.id;
+	}
+	
 	
 	public int doStartTag() throws JspException {
 		String uniqueID;
@@ -67,8 +87,14 @@ public class GenerateIDTag extends TagSupport {
 		JspWriter writer = pageContext.getOut();
 		try {
 			if(ss != null){
+				if(getId() != null && getId().startsWith("$"))
+					ExpressionEvaluatorManager.evaluate("id", getId(), String.class, this, pageContext);
+				
 				if((uniqueID = (String)ss.getAttribute(AttributeNames.UID)) != null){
-					writer.print(uniqueID);
+					if(getId() != null)
+						writer.print(uniqueID + "%" + getId());
+					else
+						writer.print(uniqueID);
 				} else {
 						long seed = System.currentTimeMillis();
 						Random rand = new Random(seed);
@@ -76,7 +102,10 @@ public class GenerateIDTag extends TagSupport {
 				
 						if (number != -1) {
 					        ss.setAttribute(AttributeNames.UID, String.valueOf(number));
-					        writer.print(String.valueOf(number));
+					        if(getId() != null)
+					        	writer.print(ss.getAttribute(AttributeNames.UID) + "%" + getId());
+					        else
+					        	writer.print(ss.getAttribute(AttributeNames.UID));
 					    } else {
 					    	log.warn("GenerateIDTag could not write out random number because no new integer value was assigned.");
 					    }
