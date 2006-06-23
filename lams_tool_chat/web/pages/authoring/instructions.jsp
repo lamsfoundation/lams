@@ -1,8 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<c:set var="authoringForm" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
+<c:set var="authForm" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 <html:hidden property="deleteFileUuid" />
-
 
 <table cellpadding="0">
 	<tbody>
@@ -12,7 +11,7 @@
 				<fmt:message key="instructions.onlineInstructions" />
 			</td>
 			<td>
-				<lams:SetEditor id="OnlineInstruction" text="${authoringForm.onlineInstruction}" />
+				<lams:SetEditor id="OnlineInstruction" text="${authForm.onlineInstruction}" />
 			</td>
 		</tr>
 
@@ -25,7 +24,7 @@
 			<td>
 				<div id="onlinefile">
 					<br />
-					<c:forEach var="file" items="${authoringForm.authSession.onlineFilesList}">
+					<c:forEach var="file" items="${requestScope.sessionMap.onlineFiles}">
 						<li>
 							<c:out value="${file.fileName}" />
 							<c:set var="viewURL">
@@ -41,13 +40,11 @@
 							<html:link href="javascript:deleteAttachment('deleteOnline','${file.fileUuid}')">
 								<fmt:message key="link.delete" />
 							</html:link>
-
-
 						</li>
 					</c:forEach>
 
 					<%-- Displaying unsaved Files --%>
-					<c:forEach var="file" items="${authoringForm.authSession.unsavedOnlineFilesList}">
+					<c:forEach var="file" items="${requestScope.sessionMap.unsavedOnlineFiles}">
 						<li>
 							<c:out value="${file.fileName}" />
 							*
@@ -101,7 +98,7 @@
 				<fmt:message key="instructions.offlineInstructions" />
 			</td>
 			<td>
-				<lams:SetEditor id="OfflineInstruction" text="${authoringForm.offlineInstruction}" />
+				<lams:SetEditor id="OfflineInstruction" text="${authForm.offlineInstruction}" />
 			</td>
 		</tr>
 
@@ -115,7 +112,7 @@
 				<div id="offlinefile">
 					<br />
 					<!-- Saved attachments -->
-					<c:forEach var="file" items="${authoringForm.authSession.offlineFilesList}">
+					<c:forEach var="file" items="${requestScope.sessionMap.offlineFiles}">
 						<li>
 							<c:out value="${file.fileName}" />
 							<c:set var="viewURL">
@@ -135,7 +132,7 @@
 					</c:forEach>
 
 					<!-- Unsaved attachments -->
-					<c:forEach var="file" items="${authoringForm.authSession.unsavedOfflineFilesList}">
+					<c:forEach var="file" items="${requestScope.sessionMap.unsavedOfflineFiles}">
 						<li>
 							<c:out value="${file.fileName}" />
 							*

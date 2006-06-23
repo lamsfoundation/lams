@@ -33,7 +33,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.upload.FormFile;
-import org.lamsfoundation.lams.tool.chat.beans.AuthoringSessionBean;
+import org.lamsfoundation.lams.tool.chat.util.SessionMap;
 
 /**
  * @struts.form name="authoringForm"
@@ -68,11 +68,11 @@ public class AuthoringForm extends ActionForm {
 
 	String dispatch;
 	
-	String authSessionId;
+	String sessionMapID;
 	
 	Long deleteFileUuid;
 
-	AuthoringSessionBean authSession;
+	SessionMap sessionMap;
 
 	@Override
 	public ActionErrors validate(ActionMapping arg0, HttpServletRequest arg1) {
@@ -82,12 +82,12 @@ public class AuthoringForm extends ActionForm {
 		return ac;
 	}
 	
-	public String getAuthSessionId() {
-		return authSessionId;
+	public String getSessionMapID() {
+		return sessionMapID;
 	}
 
-	public void setAuthSessionId(String authSessionId) {
-		this.authSessionId = authSessionId;
+	public void setSessionMapID(String sessionMapID) {
+		this.sessionMapID = sessionMapID;
 	}
 
 	public String getCurrentTab() {
@@ -170,13 +170,13 @@ public class AuthoringForm extends ActionForm {
 		this.toolContentID = toolContentID;
 	}
 
-	public void setAuthSession(AuthoringSessionBean authSession) {
-		this.authSession = authSession;
+	public void setSessionMap(SessionMap sessionMap) {
+		this.sessionMap = sessionMap;
 		
 	}
 
-	public AuthoringSessionBean getAuthSession() {
-		return authSession;
+	public SessionMap getSessionMap() {
+		return sessionMap;
 	}
 
 	public Long getDeleteFileUuid() {

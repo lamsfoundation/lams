@@ -17,7 +17,7 @@
 		<html:hidden property="toolContentID" />
 		<html:hidden property="currentTab" styleId="currentTab" />
 		<html:hidden property="dispatch" value="updateContent" />
-		<html:hidden property="authSessionId" />
+		<html:hidden property="sessionMapID" />
 
 		<div id="message" align="center">
 			<c:if test="${unsavedChanges}">
@@ -32,22 +32,20 @@
 		<lams:TabBody id="3" titleKey="button.instructions" page="instructions.jsp" />
 
 		<c:set var="defineLater" value="no" />
-		<c:if test="${requestScope.mode == 'teacher'}">
+		<c:if test="${requestScope.sessionMap.mode == 'teacher'}">
 			<c:set var="defineLater" value="yes" />
 		</c:if>
 
 		<%-- Form Controls --%>
 		<!-- Button Row -->
+
 		<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 		<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="lachat11" cancelButtonLabelKey="button.cancel" saveButtonLabelKey="button.save" toolContentID="${formBean.toolContentID}"
-			accessMode="${requestScope.mode}" defineLater="${defineLater}" />
+			accessMode="${requestScope.sessionMap.mode}" defineLater="${defineLater}" />
+
 	</html:form>
 </div>
 
 <div id="footer"></div>
 
 <lams:HTMLEditor />
-
-
-
-

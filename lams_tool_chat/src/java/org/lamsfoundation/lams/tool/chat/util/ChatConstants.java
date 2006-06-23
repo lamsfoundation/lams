@@ -24,6 +24,10 @@
 
 package org.lamsfoundation.lams.tool.chat.util;
 
+import java.util.LinkedList;
+
+import org.lamsfoundation.lams.tool.chat.model.ChatAttachment;
+
 public interface ChatConstants {
 	public static final String TOOL_SIGNATURE = "lachat11";
 	
@@ -40,9 +44,9 @@ public interface ChatConstants {
 	
 	public static final int MONITORING_SUMMARY_MAX_MESSAGES = 5;
 	
-	
 	// Attribute names
 	public static final String ATTR_MESSAGE = "message";
+	public static final String ATTR_SESSION_MAP = "sessionMap";
 	
 	// Parameter names
 	public static final String PARAM_PARENT_PAGE = "parentPage";
