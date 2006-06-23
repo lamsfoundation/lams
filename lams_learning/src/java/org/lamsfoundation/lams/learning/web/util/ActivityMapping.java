@@ -222,7 +222,7 @@ public class ActivityMapping implements Serializable
             {
                 // display next activity
                 activityURL = this.getActivityURL(progress.getNextActivity());
-                if (progress.getPreviousActivity().isParallelActivity())
+                if (progress.getPreviousActivity() != null && progress.getPreviousActivity().isParallelActivity())
                 {
                     // if previous activity was a parallel activity then we need to
                     // clear frames.
