@@ -46,7 +46,6 @@ receive_lc.setProgressData = function(attempted, completed, current, lessonID) {
 	app.refreshProgress(attempted, completed, current, lessonID);
 };
 var success = receive_lc.connect("learnerProgress_lc_" + uniqueID);
-receivin_lc.close();
 
 //Make app listener for stage resize events
 Stage.addListener(app);
