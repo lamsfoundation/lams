@@ -478,14 +478,14 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		
 		if(_transitionActivities.length == 2){
 			//check we have 2 valid acts to create the transition.
-			if(_transitionActivities[0].activityUIID == _transitionActivities[1].activityUIID){
-				return new LFError("You cannot create a Transition between the same Activities","addActivityToTransition",this);
+			/*if(_transitionActivities[0].activityUIID == _transitionActivities[1].activityUIID){
+				return new LFError("You cannot create a Transition between the same Activities.");
 			}
 			if(!_cv.ddm.activities.containsKey(_transitionActivities[0].activityUIID)){
-				return new LFError("First activity of the Transition is missing, UIID:"+_transitionActivities[0].activityUIID,"addActivityToTransition",this);
-			}
+				return new LFError("First activity of the Transition is missing.");
+			}*/
 			if(!_cv.ddm.activities.containsKey(_transitionActivities[1].activityUIID)){
-				return new LFError("Second activity of the Transition is missing, UIID:"+_transitionActivities[1].activityUIID,"addActivityToTransition",this);
+				return new LFError(Dictionary.getValue('cv_trans_target_act_missing'));
 			}
 			
 			//check there is not already a transition to or from this activity:
@@ -493,12 +493,14 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 			/**/
 			for(var i=0;i<transitionsArray.length;i++){
 				
-				if(transitionsArray[i].toUIID == _transitionActivities[1].activity.activityUIID){
-					return new LFError("A Transition to Activity '"+_transitionActivities[1].activity.title+"' already exists","addActivityToTransition",this,'activityUIID:'+_transitionActivities[1].activity.activityUIID);
+				if(transitionsArray[i].toUIID == _transitionActivities[1].activityUIID){
+					//trace("transition allready exist of this activity 'TO UIID'")
+					return new LFError(Dictionary.getValue('cv_invalid_trans_target_toactivtiy', [_transitionActivities[1].title]));
 				}
 				
-				if(transitionsArray[i].fromUIID == _transitionActivities[0].activity.activityUIID){
-					return new LFError("A Transition from Activity '"+_transitionActivities[0].activity.title+"' already exists","addActivityToTransition",this,'activityUIID:'+_transitionActivities[1].activity.activityUIID);
+				if(transitionsArray[i].fromUIID == _transitionActivities[0].activityUIID){
+					//trace("transition allready exist of this activity 'FROM UIID'")
+					return new LFError(Dictionary.getValue('cv_invalid_trans_target_fromactivtiy', [_transitionActivities[0].title]));
 				}
 			}
 			
