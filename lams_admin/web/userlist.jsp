@@ -17,6 +17,7 @@
 	<th><fmt:message key="admin.user.title"/></th>
 	<th><fmt:message key="admin.user.first_name"/></th>
 	<th><fmt:message key="admin.user.last_name"/></th>
+	<th>Roles</th>
 	<th></th>
 </tr>
 <logic:iterate id="userManageBean" name="UserManageForm" property="userManageBeans">
@@ -35,6 +36,13 @@
 		</td>
 		<td>
 			<bean:write name="userManageBean" property="lastName" />
+		</td>
+		<td>
+		    <small>
+		    <logic:iterate id="role" name="userManageBean" property="roles">
+		        <c:out value="${role.name}" />&nbsp;
+		    </logic:iterate>
+		    </small>
 		</td>
 		<td>
 				<a href="user.do?method=edit&userId=<bean:write name='userManageBean' property='userId' />&orgId=<bean:write name='UserManageForm' property='orgId'/>"><fmt:message key="admin.edit"/></a>

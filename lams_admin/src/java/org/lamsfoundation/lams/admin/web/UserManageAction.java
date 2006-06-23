@@ -120,6 +120,7 @@ public class UserManageAction extends Action {
 			User user = (User)users.get(i);
 			UserManageBean userManageBean = new UserManageBean();
 			BeanUtils.copyProperties(userManageBean, user);
+			userManageBean.setRoles(service.getRolesForUserByOrganisation(user, orgId));
 			userManageBeans.add(userManageBean);
 		}
 		

@@ -24,6 +24,8 @@
 /* $Id$ */
 package org.lamsfoundation.lams.admin.web;
 
+import java.util.List;
+
 /**
  * @author Jun-Dir Liew
  *
@@ -45,6 +47,7 @@ public class UserManageBean {
     private String title;
     private String firstName;
     private String lastName;
+    private List roles;
     
     public Integer getUserId() {
     	return this.userId;
@@ -84,5 +87,13 @@ public class UserManageBean {
     
     public void setLastName(String lastName) {
     	this.lastName = lastName;
+    }
+    
+    public List getRoles(){
+    	return this.roles;
+    }
+    
+    public void setRoles(List roles){
+    	this.roles = roles;
     }
 }
