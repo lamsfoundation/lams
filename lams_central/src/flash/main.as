@@ -1,6 +1,8 @@
 ﻿import org.lamsfoundation.lams.authoring.Application;
 import org.lamsfoundation.lams.common.util.StringUtils;
 
+_global.myRoot = this;
+
 //Temp values to be removed / repplaced at deployment
 /**/
 if(StringUtils.isEmpty(serverURL)){
@@ -48,9 +50,10 @@ app.main(this);
 //------------------------------Local connection to JSPs for progress data ------------------------------
 var receive_lc = new LocalConnection();
 //-------------------------------------- Functions to setProgress data, called by the LocalConnection object in learner JSPs
-receive_lc.setImportDesign = function(learningDesignID) {
+receive_lc.setImportDesign = function(learningDesignID, refresh) {
 	Debugger.log(arguments.toString(), 'importUpdate_lc.setImportDesign');
 	app.getCanvas().openDesignByImport(learningDesignID);
+	myRoot.refresh;
 };
 var success = receive_lc.connect("importUpdate_lc_" + uniqueID);
 
