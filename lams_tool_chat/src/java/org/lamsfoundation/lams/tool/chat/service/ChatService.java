@@ -97,7 +97,7 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
 /**
- * An implementation of the NoticeboardService interface.
+ * An implementation of the IChatService interface.
  * 
  * As a requirement, all LAMS tool's service bean must implement
  * ToolContentManager and ToolSessionManager.
