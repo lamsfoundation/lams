@@ -110,6 +110,8 @@ public class DisplayOptionsActivityAction extends ActivityAction {
 		}
 		form.setMinimum(optionsActivity.getMinNumberOfOptionsNotNull().intValue());
 		form.setMaximum(optionsActivity.getMaxNumberOfOptionsNotNull().intValue());
+		form.setDescription(optionsActivity.getDescription());
+		form.setTitle(optionsActivity.getTitle());
 		
 		this.saveToken(request);
 		
