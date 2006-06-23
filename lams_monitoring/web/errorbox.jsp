@@ -13,7 +13,7 @@ String rootPath = cprotocol+request.getServerName()+":"+request.getServerPort()+
 <logic:present name="<%=Globals.ERROR_KEY%>">
 <tr>
 	<td width="10%"  align="right" >
-		<img src="<%=rootPath%>/images/error.jpg" alt="Error occured"/>
+		<img src="<%=rootPath%>/images/error.jpg" alt='<fmt:message key="error.title"/>'/>
 	</td>
 	<td width="90%" valign="center" class="body" colspan="2">
 		<html:errors/>
