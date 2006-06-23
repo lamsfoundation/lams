@@ -147,6 +147,9 @@ public class UserSaveAction extends Action {
 				        		Role currentRole = (Role)service.findById(Role.class,roleId);
 					            log.debug("setting role: "+currentRole);
 					            uors.add(new UserOrganisationRole(uo,currentRole));
+					            uo.setUserOrganisationRoles(uors);
+					            user.setUserOrganisations(uos);
+					            service.save(user);
 					            //log.debug("num roles: "+uo.getUserOrganisationRoles().size());
 				        	}
 				        }
@@ -158,12 +161,11 @@ public class UserSaveAction extends Action {
 				        	//log.debug("rolesList: "+rolesList);
 				        	if(rolesList.indexOf(currentRoleId.toString())<0){    // remove roles not set by user
 				        		log.debug("removing role: "+currentRoleId);
-				        		uors.remove(uor);
+				        		iter3.remove();
 				        		//log.debug("num roles: "+uors.size());
 				        		uo.setUserOrganisationRoles(uors);
 				        		uos.add(uo);
 				        		user.setUserOrganisations(uos);
-				        		break;
 				        	}
 				        }
 				        break;  // already found uo that matches this org
