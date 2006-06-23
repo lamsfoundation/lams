@@ -65,6 +65,7 @@ class WorkspaceDialog extends MovieClip{
 	//properties
 	private var description_lbl:Label;
 	private var license_lbl:Label;
+	private var license_comment_lbl:Label;
     private var resourceDesc_txa:TextArea;
     private var license_txa:TextArea;
     private var licenseID_cmb:ComboBox;
@@ -450,6 +451,7 @@ class WorkspaceDialog extends MovieClip{
 		Debugger.log('v:'+v,Debugger.GEN,'setPropertiesContentVisible','org.lamsfoundation.lams.ws.WorkspaceDialog');
 		description_lbl.visible = v;
 		license_lbl.visible = v;
+		license_comment_lbl.visible = v;
 		resourceDesc_txa.visible = v;
 		license_txa.visible = v;
 		licenseImg_pnl.visible = v;
