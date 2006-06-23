@@ -61,10 +61,10 @@ class PropertyInspectorNew extends MovieClip{
     private var piHeightHide:Number = 23;
 	private var piHeightFull:Number = 120;
 	private var grouping_lbl:Label;
-	private var grouping_opt_lbl:Label;
+	//private var grouping_opt_lbl:Label;
 	private var currentGrouping_lbl:Label;
 	private var appliedGroupingActivity_cmb:ComboBox;
-	private var appliedGroupingActivity_opt_cmb:ComboBox;
+	//private var appliedGroupingActivity_opt_cmb:ComboBox;
 	
 	private var editGrouping_btn:Button;
     private var runOffline_chk:CheckBox;
@@ -158,7 +158,6 @@ class PropertyInspectorNew extends MovieClip{
 		groupType_cmb.addEventListener("change",Delegate.create(this,onGroupTypeChange));
 		gateType_cmb.addEventListener("change",Delegate.create(this,onGateTypeChange));
 		appliedGroupingActivity_cmb.addEventListener("change",Delegate.create(this,onAppliedGroupingChange));
-		appliedGroupingActivity_opt_cmb.addEventListener("change",Delegate.create(this,onAppliedGroupingChange));
 		hours_stp.addEventListener("change",Delegate.create(this,onScheduleOffsetChange));
 		mins_stp.addEventListener("change",Delegate.create(this,onScheduleOffsetChange));
 		hours_stp.addEventListener("focusOut",Delegate.create(this,onScheduleOffsetChange));
@@ -171,6 +170,7 @@ class PropertyInspectorNew extends MovieClip{
 		numLearners_stp.addEventListener("change",Delegate.create(this,updateGroupingMethodData));
 		numLearners_stp.addEventListener("focusOut",Delegate.create(this,updateGroupingMethodData));
 		numGroups_stp.addEventListener("focusOut",Delegate.create(this,updateGroupingMethodData));
+		numRandomGroups_stp.addEventListener("change",Delegate.create(this,updateGroupingMethodData));
 		numRandomGroups_stp.addEventListener("focusOut",Delegate.create(this,updateGroupingMethodData));
 		
 		dispatchEvent({type:'load',target:this});
@@ -199,7 +199,7 @@ class PropertyInspectorNew extends MovieClip{
 		title_lbl.text = Dictionary.getValue('pi_lbl_title');
 		desc_lbl.text = Dictionary.getValue('pi_lbl_desc');
 		grouping_lbl.text = Dictionary.getValue('pi_lbl_group');
-		grouping_opt_lbl.text = Dictionary.getValue('pi_lbl_group');
+		//grouping_opt_lbl.text = Dictionary.getValue('pi_lbl_group');
 		currentGrouping_lbl.text = Dictionary.getValue('pi_lbl_currentgroup');
 		defineLater_chk.label = Dictionary.getValue('pi_definelater');
 		runOffline_chk.label = Dictionary.getValue('pi_runoffline');
@@ -298,8 +298,9 @@ class PropertyInspectorNew extends MovieClip{
 				showGateControls(true);
 				showAppliedGroupingControls(true);
 				//showGeneralProperties(a)
-				showGateActivityProperties(GateActivity(a));
 				checkEnableGateControls();
+				showGateActivityProperties(GateActivity(a));
+				
 				showAppliedGroupingProperties(a);
 				//show the title
 				title_txt.text = StringUtils.cleanNull(a.title);
@@ -441,8 +442,8 @@ class PropertyInspectorNew extends MovieClip{
 		max_act.visible = v;
 		desc_lbl.visible = v;
 		desc_txt.visible = v;
-		grouping_opt_lbl.visible = v; 
-		appliedGroupingActivity_opt_cmb.visible = v;
+		//grouping_opt_lbl.visible = v; 
+		//appliedGroupingActivity_opt_cmb.visible = v;
 		grouping_lbl.visible = false;
 		
 		
@@ -687,7 +688,7 @@ class PropertyInspectorNew extends MovieClip{
 			mins_stp.enabled = true;
 			endHours_stp.enabled = true;
 			endMins_stp.enabled = true;
-			
+					
 		}
 		/**/
 		else{
@@ -815,7 +816,7 @@ class PropertyInspectorNew extends MovieClip{
 		numGroups_lbl.setStyle('styleName',styleObj);
 		numLearners_lbl.setStyle('styleName',styleObj);
 		groupType_lbl.setStyle('styleName',styleObj);
-		grouping_opt_lbl.setStyle('styleName',styleObj);
+		//grouping_opt_lbl.setStyle('styleName',styleObj);
 		title_txt.setStyle('styleName',styleObj);
 		desc_txt.setStyle('styleName',styleObj);
 		runOffline_chk.setStyle('styleName',styleObj);
