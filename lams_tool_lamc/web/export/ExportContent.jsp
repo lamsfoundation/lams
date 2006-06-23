@@ -182,21 +182,18 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 				</c:if>										
 				
-
-
 				<c:if test="${(portfolioExportMode == 'learner')}">
-					
-					<b> <bean:message key="label.learner"/>: </b><c:out value="${learnerName}"/>
-					
-		  	 		<c:set var="queIndex" scope="request" value="0"/>
+				
+
+		  	 		<c:set var="mainQueIndex" scope="request" value="0"/>
 					<c:forEach var="currentDto" items="${sessionScope.listMonitoredAnswersContainerDto}">
-					<c:set var="queIndex" scope="request" value="${queIndex +1}"/>
+					<c:set var="mainQueIndex" scope="request" value="${mainQueIndex +1}"/>
 			  	 		<c:set var="currentQuestionId" scope="request" value="${currentDto.questionUid}"/>
 			  	 		<tr>
 			  	 			<td> &nbsp&nbsp&nbsp</td>
 			  	 		</tr>
 						<tr>			
-							<td NOWRAP valign=top align=left><b> <font size=2> <bean:message key="label.question.only"/> <c:out value="${queIndex}"/>:</b>
+							<td NOWRAP valign=top align=left><b> <font size=2> <bean:message key="label.question.only"/> <c:out value="${mainQueIndex}"/>:</b>
 							<font size=2>
 								<c:out value="${currentDto.question}"/> &nbsp (<bean:message key="label.weight"/> 
 								<c:out value="${currentDto.weight}"/>  <bean:message key="label.percent"/>)
@@ -210,6 +207,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 											<td NOWRAP valign=top align=left>
 												<font size=2>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
 												<c:out value="${answersData.candidateAnswer}"/> 
+												
+												<c:if test="${answersData.correct == 'true'}"> 		
+													&nbsp (<bean:message key="label.correct"/>)
+												</c:if>																		
 												</font>
 											</td>	
 										</tr>
@@ -217,16 +218,68 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								</table>
 							</td>  
 						</tr>			
-	
-					</c:forEach>		  	
-	
+								
+						<tr>
+							<td  NOWRAP align=left valign=top> 											
+							<table align=left>
+								<c:forEach var="attemptEntry" items="${sessionScope.mapQueAttempts}">
+									<c:if test="${sessionScope.mainQueIndex == attemptEntry.key}"> 		
+							  		  	 		<c:set var="aIndex" scope="session" value="1"/>
+								  		  	 		<tr>
+														<td NOWRAP align=left valign=top> 
+																<font size=2>
+																	<b> <bean:message key="label.yourAnswers"/>  </b>
+																</font>
+														</td>
+													 </tr>
+							  		  	 		
+												 <c:forEach var="i" begin="1" end="30" step="1">
+					 								<c:forEach var="distinctAttemptEntry" items="${attemptEntry.value}">
+														<c:if test="${distinctAttemptEntry.key == i}"> 	
+															<tr>
+																<c:set var="aIndex" scope="session" value="${sessionScope.aIndex +1}"/>
+		 														<td align=left valign=top> 																					
+			 														<table align=left>
+					 													<c:forEach var="singleAttemptEntry" items="${distinctAttemptEntry.value}">
+																			<tr>
+																				<td NOWRAP align=left valign=top>
+																					<font size=2>
+							 															&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+							 															<c:out value="${singleAttemptEntry.value}"/> 
+							 														</font>
+						 														</td>
+																			</tr>	
+																		</c:forEach>
+																	</table>	
+		 														</td>
+															</tr>		
+														</c:if> 																																						
+												</c:forEach>
+												
+										</c:forEach>
+									</c:if> 																		
+								</c:forEach>
+							</table>
+							</td>
+					  </tr>								
+									  								  
+
+					</c:forEach>
+
 		  	 		<tr>
 		  	 			<td NOWRAP valign=top align=left><font size=2> <b> 
 		  	 				<bean:message key="label.passingMark"/> </b> <c:out value="${passMark}"/> <bean:message key="label.percent"/>  </font>
 		  	 			</td>
 		  	 		</tr>
-				</table>
-			</c:if>								 
+
+
+		  	 		<tr>
+		  	 			<td NOWRAP valign=top align=left><font size=2> <b> 
+		  	 				<bean:message key="label.yourMark"/> </b> <c:out value="${learnerMark}"/> <bean:message key="label.percent"/>  </font>
+		  	 			</td>
+		  	 		</tr>
+					
+				</c:if>								 
 	
 		</c:if>				
 

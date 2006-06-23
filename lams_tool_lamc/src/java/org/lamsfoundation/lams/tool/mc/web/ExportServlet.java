@@ -24,7 +24,10 @@
 
 package org.lamsfoundation.lams.tool.mc.web;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -35,9 +38,12 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McApplicationException;
+import org.lamsfoundation.lams.tool.mc.McComparator;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
+import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
 import org.lamsfoundation.lams.tool.mc.pojos.McSession;
+import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.tool.mc.service.McServiceProxy;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
@@ -76,6 +82,7 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Mc
 	    request.getSession().setAttribute(PORTFOLIO_EXPORT_MODE, "learner");
         
     	IMcService mcService = McServiceProxy.getMcService(getServletContext());
+    	logger.debug("mcService:" + mcService);
         
     	logger.debug("userID:" + userID);
     	logger.debug("toolSessionID:" + toolSessionID);
@@ -109,26 +116,192 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Mc
             logger.error(error);
             throw new McApplicationException(error);
         }
-
-    	
-        logger.debug("calling learning mode toolSessionID:" + toolSessionID + " userID: " + userID );
-    	McMonitoringAction mcMonitoringAction= new McMonitoringAction();
-        List listMonitoredAnswersContainerDTO=MonitoringUtil.buildSessionQuestionData(request, content, toolSessionID, userID);
+        
+        McMonitoringAction mcMonitoringAction= new McMonitoringAction();
+        List listMonitoredAnswersContainerDTO=MonitoringUtil.buildGroupsQuestionDataForExportLearner(request, content, mcService, mcSession, learner );
 	    request.getSession().setAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO, listMonitoredAnswersContainerDTO);
 	    logger.debug("LIST_MONITORED_ANSWERS_CONTAINER_DTO: " + request.getSession().getAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO));
-	    
-	    
-	    List listMonitoredMarksContainerDTO=MonitoringUtil.buildGroupsMarkDataForExportLearner(request, content, mcService, mcSession, learner.getUid() );
-	    request.getSession().setAttribute(LIST_MONITORED_MARKS_CONTAINER_DTO, listMonitoredMarksContainerDTO);
-	    logger.debug("LIST_MONITORED_MARKS_CONTAINER_DTO: " + request.getSession().getAttribute(LIST_MONITORED_MARKS_CONTAINER_DTO));
-	    
-	    request.getSession().setAttribute(LEARNER_NAME,learner.getFullname() );
 
+	    String intTotalMark=viewAnswers(request, content, learner, mcSession,  mcService);
+	    logger.debug("intTotalMark: " + intTotalMark);
+	    
+	    request.getSession().setAttribute(LEARNER_MARK,intTotalMark);
+	    request.getSession().setAttribute(LEARNER_NAME,learner.getFullname() );
+	    request.getSession().setAttribute(PASSMARK,content.getPassMark().toString());
         
     	logger.debug("ending learner mode: ");
     }
+
 	
-    
+	
+	 public String viewAnswers(HttpServletRequest request, McContent content, McQueUsr mcQueUsr, McSession mcSession, IMcService mcService)
+	 {
+			logger.debug("starting viewAnswers...");
+			int  intTotalMark=0;
+			
+		    McUsrAttempt mcUsrAttempt = mcService.getAttemptWithLastAttemptOrderForUserInSession(mcQueUsr.getUid(), mcSession.getUid());
+	    	logger.debug("mcUsrAttempt with highest attempt order: " + mcUsrAttempt);
+			
+			int totalQuestionCount=content.getMcQueContents().size();
+			logger.debug("totalQuestionCount: " + totalQuestionCount);
+			
+			Long toolContentUID=content.getUid();
+			logger.debug("toolContentUID: " + toolContentUID);
+			logger.debug("mcQueUsr: " + mcQueUsr);
+			
+			Long queUsrId=mcQueUsr.getUid();
+			logger.debug("queUsrId: " + queUsrId);
+			
+			Map mapQueAttempts= new TreeMap(new McComparator());
+			
+			for (int i=1; i<=  new Integer(totalQuestionCount).intValue(); i++)
+			{
+				logger.debug("doing question with display order: " + i);
+				McQueContent mcQueContent=mcService.getQuestionContentByDisplayOrder(new Long(i), toolContentUID);
+				logger.debug("mcQueContent uid: " + mcQueContent.getUid());
+				
+				int intCurrentMark=0;
+				
+
+				/**calculating learner's mark*/
+		    	if (mcUsrAttempt != null)
+		    	{
+		        	String highestAttemptOrder=mcUsrAttempt.getAttemptOrder().toString();
+		        	logger.debug("highestAttemptOrder: " + highestAttemptOrder);
+
+					List listUserAttempts=mcService.getAttemptsOnHighestAttemptOrder(mcQueUsr.getUid(), mcQueContent.getUid(), mcSession.getUid(), new Integer(highestAttemptOrder));
+					logger.debug("listUserAttempts: " + listUserAttempts);
+					
+					Iterator itAttempts=listUserAttempts.iterator();
+					
+					if (!mcSession.getMcContent().isRetries())
+					{
+					    logger.debug("retries is OFF.");
+					    boolean isAttemptCorrect=false;
+					    McUsrAttempt mcUsrAttemptUser=null;
+					    
+		    			while (itAttempts.hasNext())
+		    			{
+		    	    		mcUsrAttempt=(McUsrAttempt)itAttempts.next();
+		    	    		logger.debug("mcUsrAttempt: " + mcUsrAttempt);
+		    	    		mcUsrAttemptUser=mcUsrAttempt;
+
+		    	    		if (mcUsrAttempt != null)
+		    	    		{
+		    	    		    if (mcUsrAttempt.isAttemptCorrect())
+		    	    		    {
+		    	    		        isAttemptCorrect=true;
+		    	    		    }
+		    	    		}
+		    			}
+		    			logger.debug("final isAttemptCorrect: " + isAttemptCorrect);
+		    			logger.debug("mcUsrAttemptUser: " + mcUsrAttemptUser);
+		    			
+		    			String currentMark="";
+						if (isAttemptCorrect)
+						{
+						    currentMark= mcUsrAttemptUser.getMcQueContent().getWeight().toString();
+						}
+						else
+						{
+						    currentMark= "0";
+						}
+						intCurrentMark=new Integer(currentMark).intValue();
+						logger.debug("intCurrentMark: " + intCurrentMark);
+		    			
+					}
+					else
+					{
+					    logger.debug("retries is ON. User had to PASS. Print the final attempt's data");
+					    boolean isAttemptCorrect=false;
+					    McUsrAttempt mcUsrAttemptGeneral=null;
+						while (itAttempts.hasNext())
+						{
+				    		mcUsrAttempt=(McUsrAttempt)itAttempts.next();
+				    		logger.debug("mcUsrAttempt: " + mcUsrAttempt);
+				    		mcUsrAttemptGeneral=mcUsrAttempt;
+
+				    		if (mcUsrAttempt != null)
+				    		{
+		    		    		if (mcUsrAttempt.isFinished() && mcUsrAttempt.isPassed()) 
+		    		    		{
+		    		    		    logger.debug("this is a individual question attempt that is finished and passed: " + mcUsrAttempt);
+		    		    		    isAttemptCorrect=mcService.getUserAttemptCorrectForQuestionContentAndSessionUid(mcQueUsr.getUid(), 
+		    		    		            mcQueContent.getUid(), mcSession.getUid(), new Integer(highestAttemptOrder));
+		    		    		    logger.debug("isAttemptCorrect: " + isAttemptCorrect);
+		    		    		    break;	
+		    		    		}
+				    		}
+						}
+
+						logger.debug("final isAttemptCorrect: " + isAttemptCorrect);
+
+						String currentMark="";
+						if (isAttemptCorrect)
+						{
+						    currentMark= mcUsrAttempt.getMcQueContent().getWeight().toString();
+						}
+						else
+						{
+						    currentMark= "0";
+						}
+						
+						intCurrentMark=new Integer(currentMark).intValue();
+						logger.debug("intCurrentMark: " + intCurrentMark);
+					}
+		    	}
+		    	else
+		    	{
+		    	    intCurrentMark=0;
+		    	}
+				
+				intTotalMark=intTotalMark + intCurrentMark;
+				logger.debug("intTotalMark: " + intTotalMark);
+
+
+				Map mapAttemptOrderAttempts= new TreeMap(new McComparator());
+				for (int j=1; j <= MAX_ATTEMPT_HISTORY ; j++ )
+	    		{
+					logger.debug("getting list for queUsrId: " + queUsrId);
+	    			List attemptsByAttemptOrder=mcService.getAttemptByAttemptOrder(queUsrId, mcQueContent.getUid(), new Integer(j));
+		    		logger.debug("attemptsByAttemptOrder: " + j + " is: " + attemptsByAttemptOrder);
+		    	
+		    		Map mapAttempts= new TreeMap(new McComparator());
+		    		Iterator attemptIterator=attemptsByAttemptOrder.iterator();
+		    		Long mapIndex=new Long(1);
+	    	    	while (attemptIterator.hasNext())
+	    	    	{
+	    	    		McUsrAttempt localMcUsrAttempt=(McUsrAttempt)attemptIterator.next();
+	    	    		logger.debug("localMcUsrAttempt: " + localMcUsrAttempt);
+	    	    		
+        	    		mapAttempts.put(mapIndex.toString(), localMcUsrAttempt.getMcOptionsContent().getMcQueOptionText());
+    	    			logger.debug("added attempt with order: " + localMcUsrAttempt.getAttemptOrder() + " , option text is: " + localMcUsrAttempt.getMcOptionsContent().getMcQueOptionText());
+    	    			mapIndex=new Long(mapIndex.longValue()+1);
+	    	    	}    	    		
+
+	    	    	logger.debug("final mapAttempts is: " + mapAttempts);
+	    	    	if (mapAttempts.size() > 0)
+	    	    	{
+	    	    		mapAttemptOrderAttempts.put(new Integer(j).toString(), mapAttempts);	
+	    	    	}
+	    		}
+				
+				logger.debug("final mapAttemptOrderAttempts is: " + mapAttemptOrderAttempts);
+				if (mapAttemptOrderAttempts.size() > 0)
+		    	{
+					mapQueAttempts.put(new Integer(i).toString(), mapAttemptOrderAttempts);	
+		    	}
+			}
+			request.getSession().setAttribute(MAP_QUE_ATTEMPTS, mapQueAttempts);
+			logger.debug("final mapQueAttempts is: " + mapQueAttempts);
+			
+
+			
+			logger.debug("final intTotalMark is: " + intTotalMark);
+			return new Integer(intTotalMark).toString();
+	}
+	 
+
     public void teacher(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies)
     {
         logger.debug("starting teacher mode...");
@@ -155,7 +328,8 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Mc
 		
         logger.debug("starting teacher mode: ");
         McMonitoringAction mcMonitoringAction= new McMonitoringAction();
-        List listMonitoredAnswersContainerDTO=MonitoringUtil.buildGroupsQuestionData(request, content);
+
+        List listMonitoredAnswersContainerDTO=MonitoringUtil.buildGroupsQuestionData(request, content, mcService);
 	    request.getSession().setAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO, listMonitoredAnswersContainerDTO);
 	    logger.debug("LIST_MONITORED_ANSWERS_CONTAINER_DTO: " + request.getSession().getAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO));
 	    
