@@ -2,6 +2,14 @@
 
 <tiles-definitions>
 	
+	<definition name=".userorg" path="/template.jsp">
+		<put name="title" value="admin.user.management"/>
+		<put name="pageHeader" value="admin.user.management"/>
+		<put name="header" value="header.jsp"/>
+		<put name="content" value="userorg.jsp" />	
+		<put name="footer" value="footer.jsp"/>	
+	</definition>
+	
 	<definition name=".userlist" path="/template.jsp">
 		<put name="title" value="admin.user.management"/>
 		<put name="pageHeader" value="admin.user.management"/>

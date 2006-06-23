@@ -9,7 +9,7 @@
 <h4 align="left"><fmt:message key="admin.user.manage" /> <fmt:message key="admin.in"/> <fmt:message key="admin.organisation"/>: <bean:write name="UserManageForm" property="orgName"/></h4>
 <p align="right">
 <input type="button" value='<fmt:message key="admin.user.create"/>' onclick=javascript:document.location='user.do?method=edit&orgId=1' />
-<input type="button" value='<fmt:message key="admin.user.add"/>' onclick=javascript:document.location='user.do?method=add&orgId=<bean:write name="UserManageForm" property="orgId"/>' /></p>
+<input type="button" value='<fmt:message key="admin.user.add"/>' onclick=javascript:document.location='userorg.do?orgId=<bean:write name="UserManageForm" property="orgId"/>' /></p>
 <table width=100%>
 <tr>
 	<th></th>
