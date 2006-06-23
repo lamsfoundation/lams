@@ -56,13 +56,15 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	    Debugger.log('Check if transition tool active :'+_canvasModel.isTransitionToolActive(),Debugger.GEN,'activityClick','CanvasController');
 	   //if transition tool active
 	    if(_canvasModel.isTransitionToolActive()){
-		   var transitionTarget = createValidTransitionTarget(ca);
+						
+		    var transitionTarget = createValidTransitionTarget(ca);
 		    if(transitionTarget instanceof LFError){
 				transitionTarget.showErrorAlert(null); 
 				//transitionTarget.showMessageConfirm()
 				//TODO: transitionTarget.showErrorAlertCrashDump(null); 
 		   }else{
 				_canvasModel.addActivityToTransition(transitionTarget);
+				//_canvasModel.resetTransitionTool();
 			}
 			/*
 			_canvasModel.resetTransitionTool();
@@ -142,8 +144,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 								ca.activity.yCoord = _ymouse - _canvasModel.getPosition().y;
 								_canvasModel.removeOptionalCA(ca, optionalOnCanvas[i].activity.activityUIID);
 							} else {
-								ca._x = ca.activity.xCoord;
-								ca._y = ca.activity.yCoord;
+								activitySnapBack(ca);
 							}
 						}
 					}
@@ -160,12 +161,25 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 								LFMessage.showMessageAlert(msg);
 							}else{
 								if (ca.activity.isGateActivity()){
-									ca._x = ca.activity.xCoord;
-									ca._y = ca.activity.yCoord;
+									activitySnapBack(ca);
 									var msg:String = Dictionary.getValue('cv_gateoptional_hit_chk');
 									LFMessage.showMessageAlert(msg);
 								}else {
-									_canvasModel.addParentToActivity(optionalOnCanvas[i].activity.activityUIID, ca)
+									var transitionsArray:Array = _canvasModel.getCanvas().ddm.transitions.values();
+									var transExist:Boolean = false;
+									for(var i=0;i<transitionsArray.length;i++){
+													
+										if(transitionsArray[i].toUIID == ca.activity.activityUIID || transitionsArray[i].fromUIID == ca.activity.activityUIID){
+											transExist = true;
+										}
+									}
+									if (transExist){
+										activitySnapBack(ca);
+										var msg:String = Dictionary.getValue('cv_invalid_optional_activity', [ca.activity.title]);
+										LFMessage.showMessageAlert(msg);
+									}else {
+										_canvasModel.addParentToActivity(optionalOnCanvas[i].activity.activityUIID, ca)
+									}
 								}
 							}						
 						}
@@ -206,6 +220,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		}
 	}
    
+   private function activitySnapBack(ca:Object){
+		ca._x = ca.activity.xCoord;
+		ca._y = ca.activity.yCoord;
+   }
+   
+
    public function activityReleaseOutside(ca:Object):Void{
 	   Debugger.log('activityReleaseOutside CanvasActivity:'+ca.activity.activityUIID,Debugger.GEN,'activityReleaseOutside','CanvasController');
 	   Debugger.log('activityReleaseOutside Check if Transition tool active:'+_canvasModel.isTransitionToolActive(),Debugger.GEN,'activityReleaseOutside','CanvasController');
@@ -227,15 +247,18 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			
 			var transitionTarget = createValidTransitionTarget(transitionTarget_mc);
 			if(transitionTarget instanceof LFError){
-			//_canvasModel.resetTransitionTool();
+				_canvasModel.resetTransitionTool();
 				_canvasModel.getCanvas().stopTransitionTool();
-			//if(transitionTarget instanceof LFMessage){
-				//transitionTarget.showErrorAlert(null);
-				transitionTarget.showMessageConfirm();
+				LFMessage.showMessageAlert(transitionTarget);
 			}else{
-				_canvasModel.addActivityToTransition(transitionTarget);
-				//_canvasModel.resetTransitionTool();
+				var td = _canvasModel.addActivityToTransition(transitionTarget);
+				_canvasModel.resetTransitionTool();
 				_canvasModel.getCanvas().stopTransitionTool();
+				if(td instanceof LFError){
+					_canvasModel.resetTransitionTool();
+					//_canvasModel.getCanvas().stopTransitionTool();
+					LFMessage.showMessageAlert(td);
+				}
 			}
 			
 		
@@ -365,11 +388,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				Debugger.log("Casting to CanvasOptionalActivity", Debugger.GEN,'createValidTransitionTarget','CanvasController');
 				targetCA = CanvasOptionalActivity(transitionTargetObj);
 				return targetCA;
-			}else{
-				var e = new LFError(Dictionary.getValue('cv_invalid_trans_target'),"createValidTransitionTarget",this,String(transitionTargetObj));
-				//bail
-				return e;
 			}
+			//else{
+			//	var e = new LFError(Dictionary.getValue('cv_invalid_trans_target'),"createValidTransitionTarget",this,String(transitionTargetObj));
+				//bail
+			//	return e;
+			//}
 			
 			/*
 			//if(ca instanceof CanvasActivity){
