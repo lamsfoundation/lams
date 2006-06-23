@@ -1,4 +1,6 @@
-<%@ page contentType="text/html; charset=iso-8859-1" language="java" %>
+<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
+<%@ taglib uri="tags-fmt" prefix="fmt" %>
+
 <script>
 	function encryptPassword(){
 		  var password=document.loginForm.j_password.value;	 
@@ -24,21 +26,21 @@
 				<%String failed = request.getParameter("failed");
 				if ( failed != null ){%>
 					<span class="error">
-						Sorry, that username or password is not known. Please try again.
+						<fmt:message key="error.login"/>
 					</span>
 				<%}%>
 				<table width="150" height="87" border="0" align="center" cellpadding="0" cellspacing="0">
 					<tr>
 						<td align="left" class="smallText">
-							Username
+							<fmt:message key="label.username"/>
 						</td>
 						<td colspan="2" align="right">
 							<input name="j_username" type="text" class="textField" size="15" />
 						</td>
 					</tr>
-					<tr>
+					<tr>	
 						<td align="left" class="smallText">
-							Password
+							<fmt:message key="label.password"/>
 						</td>
 						<td colspan="2" align="right">
 							<input name="j_password" type="password" class="textField" size="15" AUTOCOMPLETE="off"/>
@@ -46,7 +48,7 @@
 					</tr>
 					<tr>
 						<td colspan="3" align="right">
-							<input type="submit" value="Login" class="button" onmouseover="changeStyle(this,'buttonover')" onmouseout="changeStyle(this,'button')" />
+							<input type="submit" value="<fmt:message key="button.login"/>" class="button" onmouseover="changeStyle(this,'buttonover')" onmouseout="changeStyle(this,'button')" />
 						</td>
 					</tr>
 					<tr>
@@ -69,17 +71,11 @@
 	</tr>
 	<tr valign="bottom" class="lightNote">
 		<td>
-			<a href="javascript:alert('LAMS&#8482; &copy; 2002-2005 LAMS Foundation. 
-				\nAll rights reserved.
-				\n\nLAMS is a trademark of LAMS Foundation.
-				\nDistribution of this software is prohibited.');" class="lightNoteLink">&copy; 2002-2005 LAMS Foundation.
+			<a href="javascript:alert('<fmt:message key="msg.LAMS.copyright.long"/>');" class="lightNoteLink">&copy; <fmt:message key="msg.LAMS.copyright.short"/>
 			</a>
 		</td>
-		<td align="center">
-			This copy of LAMS&#8482; is authorised for use by the registered users only.
-		</td>
 		<td align="right"> 
-			Version 2.0
+			<fmt:message key="msg.LAMS.version"/>
 		</td>
 	</tr>
 </table>

@@ -1,5 +1,6 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <%@ taglib uri="tags-tiles" prefix="tiles" %>
+<%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ page import="org.lamsfoundation.lams.security.JspRedirectStrategy" %>
 <%	
 	if (JspRedirectStrategy.loginPageRedirected(request,response))
@@ -20,8 +21,7 @@ flash is searching for this string, so leave it!:
 j_security_login_page
 -->
 <tiles:insert page="template.jsp" flush="true">
-	<tiles:put name="title" value="Login - LAMS :: Learning Activity Management System"/>
-	<tiles:put name="pageHeader" value="Welcome"/>
+	<tiles:put name="titleKey" value="title.login.window"/>
 	<tiles:put name="header" value="loginHeader.jsp"/>
 	<tiles:put name="content" value="loginContent.jsp" />	
 	<tiles:put name="footer" value="footer.jsp"/>	

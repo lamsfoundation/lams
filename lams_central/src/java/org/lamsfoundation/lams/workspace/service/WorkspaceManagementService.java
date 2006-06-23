@@ -1255,10 +1255,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 															FlashMessage.ERROR);
 					}else
 						flashMessage = FlashMessage.getUserNotAuthorized(MSG_KEY_RENAME,userID);
-				}else
-					flashMessage = new FlashMessage(MSG_KEY_RENAME,
-											messageService.getMessage("can.not.rename.root.folder"),
-													FlashMessage.ERROR);
+				}
 			}else
 				flashMessage = FlashMessage.getNoSuchWorkspaceFolderExsists(MSG_KEY_RENAME,workspaceFolderID);
 		}catch(UserException ue){

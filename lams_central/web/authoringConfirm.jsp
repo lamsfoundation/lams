@@ -1,8 +1,10 @@
+<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-html" prefix="html"%>
 <html>
 	<head>
+		<META http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<lams:css />
 		<script type="text/javascript">
 			  function closeWindow() {

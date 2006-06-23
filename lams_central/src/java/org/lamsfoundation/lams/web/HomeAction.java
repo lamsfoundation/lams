@@ -101,7 +101,7 @@ public class HomeAction extends DispatchAction {
 			}
 			
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("Failed to load sysadmin",e);
 			return mapping.findForward("error");
 		}
 	}
@@ -130,7 +130,7 @@ public class HomeAction extends DispatchAction {
 			}
 			
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("Failed to load learner",e);
 			return mapping.findForward("error");
 		}
 	}
@@ -157,7 +157,7 @@ public class HomeAction extends DispatchAction {
 			}
 			
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("Failed to load author",e);
 			return mapping.findForward("error");
 		}
 	}
@@ -186,7 +186,7 @@ public class HomeAction extends DispatchAction {
 				return mapping.findForward("monitorLesson");
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("Failed to load monitor lesson",e);
 			return mapping.findForward("error");
 		}
 	}
@@ -222,7 +222,7 @@ public class HomeAction extends DispatchAction {
 			}
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("Failed to load add lesson",e);
 			return mapping.findForward("error");
 		}
 	}

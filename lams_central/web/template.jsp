@@ -1,14 +1,16 @@
+<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
 
 <%@ taglib uri="tags-tiles" prefix="tiles" %>
 <%@ taglib uri="tags-html" prefix="html" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
+<%@ taglib uri="tags-fmt" prefix="fmt" %>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html:html locale = "true">
 <head>
 	<html:base/>
-	<title><tiles:getAsString name="title"/></title>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<title><fmt:message><tiles:getAsString name="titleKey"/></fmt:message></title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta http-equiv="pragma" content="no-cache">
 	<meta http-equiv="cache-control" content="no-cache">
 	<lams:css/>
@@ -24,7 +26,6 @@
 <table width="95%" height="95%" border="0" cellspacing="0" cellpadding="0" align="center">
 	<tr>
 		<td>
-	        <c:set var="pageHeader" scope="session"><tiles:getAsString name="pageHeader"/></c:set>
 			<tiles:insert attribute="header" />
 		</td>
 	</tr>

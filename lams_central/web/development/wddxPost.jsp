@@ -1,3 +1,5 @@
+<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
+
 <%@ taglib uri="/WEB-INF/struts/tlds/struts-html.tld" prefix="html" %>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
@@ -5,7 +7,7 @@
 <html>
 <head>
 
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<META http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Send WDDX Packet To Server</title>
 </head>
 

@@ -96,7 +96,7 @@
 				</tr>
 				<tr>
 					<td colspan=2 id="content" width="100%" align="center">
-						<img src="images/loading.gif" /> <font color="gray" size="4">Loading... </font>
+						<img src="images/loading.gif" /> <font color="gray" size="4"><fmt:message key="msg.loading"/></font>
 					</td>
 				</tr>
 				<tr valign="bottom">
@@ -106,14 +106,11 @@
 				</tr>
 				<tr valign="bottom">
 					<td align="left">	
-						<a href="javascript:alert('LAMS&#8482; &copy; 2002-2006 LAMS Foundation. 
-								\nAll rights reserved.
-								\n\nLAMS is a trademark of LAMS Foundation.
-								\nDistribution of this software is prohibited.');" 
-								class="lightNoteLink">&copy; 2002-2006 LAMS Foundation.
+						<a href="javascript:alert('<fmt:message key="msg.LAMS.copyright.long"/>');" 
+								class="lightNoteLink">&copy; <fmt:message key="msg.LAMS.copyright.short"/>
 						</a>
 					</td>
-					<td align="right">Version 2.0</td>
+					<td align="right"><fmt:message key="msg.LAMS.version"/></td>
 				</tr>
 			</table>
 		</td>

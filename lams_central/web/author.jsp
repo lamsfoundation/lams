@@ -1,10 +1,12 @@
+<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
+
 <%@ taglib uri="tags-lams" prefix="lams" %>
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ page import="org.lamsfoundation.lams.util.Configuration" import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
 <%@ page import="org.lamsfoundation.lams.themes.dto.CSSThemeBriefDTO" %>
 <HTML>
 <HEAD>
-<meta http-equiv=Content-Type content="text/html; charset=iso-8859-1">
+	<META http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
 <%
 String protocol = request.getProtocol();
