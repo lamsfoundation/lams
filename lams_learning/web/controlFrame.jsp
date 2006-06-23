@@ -35,6 +35,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<c:set var="randomID">
 			<lams:generateID id="${param.lessonID}"/>
 		</c:set>
+		<script src="<lams:LAMSURL/>includes/javascript/AC_RunActiveContent.js" type="text/javascript"></script>
 	</head>
 	<body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
 	
@@ -44,33 +45,41 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	String languageDate = Configuration.getDictionaryDateForLanguage(serverLanguage);
 	%>
 
-	<c:set var="learnerurl">lams_learner.swf?userID=<lams:user property="userID"/>&serverURL=<lams:LAMSURL/>&build=<%=clientVersion%>&lang=<lams:user property="localeLanguage"/>&country=<lams:user property="localeCountry"/>&theme=<lams:user property="flashTheme"/>&lessonID=<c:out value="${param.lessonID}"/>&uniqueID=<c:out value="${randomID}"/></c:set>
-	<!-- URL's used in the movie-->
-	<!-- text used in the movie-->
-	<!--Library-->  
-	<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
-	 codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,47,0" name="learning"
-	 width="100%" height="100%" align="left" id="learning">
-	  <param name="allowScriptAccess" value="sameDomain" />
-
-	  <param name="movie" value="<c:out value="${learnerurl}" escapeXml="false"/>"/>
-	  <param name="quality" value="high">
-	  <param name="scale" value="noscale">
-	  <param name="bgcolor" value="#B3B7C8">
-	  <embed 	
-		  src="<c:out value="${learnerurl}" escapeXml="false"/>"
-		  quality="high" 
-		  scale="noscale" 
-		  bgcolor="#B3B7C8"  
-		  width="100%" 
-		  height="100%" 
-		  swliveconnect=true 
-		  id="authoring" 
-		  name="authoring" 
-		  align=""
-		  type="application/x-shockwave-flash" 
-		  pluginspage="http://www.macromedia.com/go/getflashplayer" />
-	</object>
-
+	<c:set var="learnerurl_params">?userID=<lams:user property="userID"/>&serverURL=<lams:LAMSURL/>&build=<%=clientVersion%>&lang=<lams:user property="localeLanguage"/>&country=<lams:user property="localeCountry"/>&theme=<lams:user property="flashTheme"/>&lessonID=<c:out value="${param.lessonID}"/>&uniqueID=<c:out value="${randomID}"/></c:set>
+	<c:set var="learnerurl_js">lams_learner<c:out value="${learnerurl_params}"/></c:set>
+	<c:set var="learnerurl_nojs">lams_learner.swf<c:out value="${learnerurl_params}"/></c:set>
+	
+	<script type="text/javascript">
+		AC_FL_RunContent('classid', 'clsid:D27CDB6E-AE6D-11cf-96B8-444553540000', 'codebase','http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,47,0','width','100%','height','100%','align','left','src','<c:out value="${learnerurl_js}" escapeXml="false"/>','quality','high','scale','noscale','bgcolor','#B3B7C8','name','learning', 'id', 'learning', 'allowscriptaccess','sameDomain', 'swliveconnect', true, 'type', 'application/x-shockwave-flash', 'pluginspage','http://www.macromedia.com/go/getflashplayer','movie', '<c:out value="${learnerurl_js}" escapeXml="false"/>' );
+	</script> 
+	
+	<noscript>
+		<!-- URL's used in the movie-->
+		<!-- text used in the movie-->
+		<!--Library-->
+		<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+		 codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,47,0" name="learning"
+		 width="100%" height="100%" align="left" id="learning">
+		  <param name="allowScriptAccess" value="sameDomain" />
+	
+		  <param name="movie" value="<c:out value="${learnerurl}" escapeXml="false"/>"/>
+		  <param name="quality" value="high">
+		  <param name="scale" value="noscale">
+		  <param name="bgcolor" value="#B3B7C8">
+		  <embed 	
+			  src="<c:out value="${learnerurl}" escapeXml="false"/>"
+			  quality="high" 
+			  scale="noscale" 
+			  bgcolor="#B3B7C8"  
+			  width="100%" 
+			  height="100%" 
+			  swliveconnect=true 
+			  id="learning" 
+			  name="learning" 
+			  align=""
+			  type="application/x-shockwave-flash" 
+			  pluginspage="http://www.macromedia.com/go/getflashplayer" />
+		</object>
+	</noscript>
 	</body>
 </html:html>

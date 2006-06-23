@@ -6,8 +6,7 @@
 <%@ page import="org.lamsfoundation.lams.themes.dto.CSSThemeBriefDTO" %>
 <HTML>
 <HEAD>
-	<META http-equiv="Content-Type" content="text/html; charset=utf-8" />
-
+<META http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <%
 String protocol = request.getProtocol();
 if(protocol.startsWith("HTTPS")){
@@ -23,7 +22,7 @@ String serverLanguage = Configuration.get(ConfigurationKeys.SERVER_LANGUAGE);
 String languageDate = Configuration.getDictionaryDateForLanguage(serverLanguage);
 
 %>
-
+<script src="<lams:LAMSURL/>includes/javascript/AC_RunActiveContent.js" type="text/javascript"></script>
 <script language="JavaScript" type="text/JavaScript">
 <!--
 
@@ -235,34 +234,41 @@ function checkSaved(){
 </HEAD>
 <BODY bgcolor="#FFFFFF" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
 
-<c:set var="authorurl">lams_authoring.swf?userID=<lams:user property="userID"/>&serverURL=<%=pathToRoot%>&build=<%=authoringClientVersion%>&lang=<lams:user property="localeLanguage"/>&country=<lams:user property="localeCountry"/>&theme=<lams:user property="flashTheme"/>&uniqueID=<lams:generateID/></c:set>
+<c:set var="authorurl_params">?userID=<lams:user property="userID"/>&serverURL=<%=pathToRoot%>&build=<%=authoringClientVersion%>&lang=<lams:user property="localeLanguage"/>&country=<lams:user property="localeCountry"/>&theme=<lams:user property="flashTheme"/>&uniqueID=<lams:generateID/></c:set>
+<c:set var="authorurl_nojs">lams_authoring.swf<c:out value="${authorurl_params}"/></c:set>
+<c:set var="authorurl_js">lams_authoring<c:out value="${authorurl_params}"/></c:set>
 
-<!-- URL's used in the movie-->
-<!-- text used in the movie-->
-<!--Library-->
-<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
- codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,47,0" name="authoring"
- width="100%" height="100%" align="" id="authoring">
-  <param name="allowScriptAccess" value="sameDomain" />
-
-  <param name="movie" value="${authorurl}">
-  <param name="quality" value="high">
-  <param name="scale" value="noscale">
-  <param name="bgcolor" value="#B3B7C8">
-  <embed 	
-   	  src="${authorurl}"
-	  quality="high" 
-	  scale="noscale" 
-	  bgcolor="#B3B7C8"  
-	  width="100%" 
-	  height="100%" 
-	  swliveconnect=true 
-	  id="authoring" 
-	  name="authoring" 
-	  align=""
-	  type="application/x-shockwave-flash" 
-	  pluginspage="http://www.macromedia.com/go/getflashplayer" />
-</object>
-
+	<script type="text/javascript">
+		AC_FL_RunContent('classid', 'clsid:D27CDB6E-AE6D-11cf-96B8-444553540000', 'codebase','http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,47,0','width','100%','height','100%','align','left','src','<c:out value="${authorurl_js}" escapeXml="false"/>','quality','high','scale','noscale','bgcolor','#B3B7C8','name','authoring', 'id', 'authoring', 'allowscriptaccess','sameDomain', 'swliveconnect', true, 'type', 'application/x-shockwave-flash', 'pluginspage','http://www.macromedia.com/go/getflashplayer','movie', '<c:out value="${authorurl_js}" escapeXml="false"/>' );
+	</script>
+	
+	<noscript>
+		<!-- URL's used in the movie-->
+		<!-- text used in the movie-->
+		<!--Library-->
+		<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+		 codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,47,0" name="authoring"
+		 width="100%" height="100%" align="" id="authoring">
+		  <param name="allowScriptAccess" value="sameDomain" />
+		
+		  <param name="movie" value="${authorurl_nojs}">
+		  <param name="quality" value="high">
+		  <param name="scale" value="noscale">
+		  <param name="bgcolor" value="#B3B7C8">
+		  <embed 	
+		   	  src="${authorurl_nojs}"
+			  quality="high" 
+			  scale="noscale" 
+			  bgcolor="#B3B7C8"  
+			  width="100%" 
+			  height="100%" 
+			  swliveconnect=true 
+			  id="authoring" 
+			  name="authoring" 
+			  align=""
+			  type="application/x-shockwave-flash" 
+			  pluginspage="http://www.macromedia.com/go/getflashplayer" />
+		</object>
+	</noscript>
 </BODY>
 </HTML>

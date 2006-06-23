@@ -36,7 +36,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<title><c:out value="${pageTitle}" /></title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<lams:css/>
-	  <script language="JavaScript" type="text/JavaScript">
+		<script src="<lams:LAMSURL/>includes/javascript/AC_RunActiveContent.js" type="text/javascript"></script>
+	  	<script language="JavaScript" type="text/JavaScript">
 	        <!--
 	        function pviiClassNew(obj, new_style) { //v2.7 by PVII
 	            obj.className=new_style;

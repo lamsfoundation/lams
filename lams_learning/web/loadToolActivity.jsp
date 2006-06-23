@@ -37,7 +37,6 @@ String pathToRoot = protocol+request.getServerName()+":"+request.getServerPort()
 String pathToShare = protocol+request.getServerName()+":"+request.getServerPort()+request.getContextPath()+"/../..";
 
 %>
-<body bgcolor="#9DC5EC">
 
 	<lams:Passon id="${activityForm.lessonID}" progress="${activityForm.progressSummary}"/>
 	
@@ -75,4 +74,3 @@ String pathToShare = protocol+request.getServerName()+":"+request.getServerPort(
 		</div>
 			
 	</c:if>
-</body>
