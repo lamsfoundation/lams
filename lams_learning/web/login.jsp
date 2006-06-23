@@ -20,6 +20,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 --%>
 
 <%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
+<%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%
 String path = request.getContextPath();
 String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
@@ -28,17 +29,10 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
   <head>
-    <base href="<%=basePath%>">
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-    <title>System logon required</title>
-
-    <!--
-    <link rel="stylesheet" type="text/css" href="styles.css">
-    -->
   </head>
   
   <body>
-	You need login <a href="/lams/index.jsp">here</a>.
-
+  	<fmt:message key="error.message.login"/>
   </body>
 </html>

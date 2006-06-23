@@ -22,6 +22,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-html" prefix="html" %>
 <%@ taglib uri="tags-logic" prefix="logic" %>
 <%@ taglib uri="tags-core" prefix="c" %>
+<%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ page import="org.apache.struts.action.Action" %>
 <%
 String cprotocol = request.getProtocol();
@@ -37,7 +38,7 @@ String pathToShare = cprotocol+request.getServerName()+":"+request.getServerPort
 <table border="0" cellspacing="2" cellpadding="2" summary="This table is being used for layout purposes only">
 <tr>
 	<td width="10%"  align="right" >
-		<img src="<%=pathToShare%>/images/error.jpg" alt="Error occured"/>
+		<img src="<%=pathToShare%>/images/error.jpg" alt='<fmt:message key="error.title"/>'/>
 	</td>
 	<td width="90%" valign="middle" class="body" colspan="2">
 		 <html:messages id="error" message="false"> 

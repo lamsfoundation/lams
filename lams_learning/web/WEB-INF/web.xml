@@ -158,11 +158,6 @@
    <!ELEMENT mime-mapping (extension, mime-type)>
    -->
 
-  <error-page>
-	<error-code>403</error-code>
-	<location>/403.html</location>
-</error-page>  
-
   	<jsp-config>
 		<!--  ======================================================== -->	
 		<!-- Struts Tag Library Descriptors -->
