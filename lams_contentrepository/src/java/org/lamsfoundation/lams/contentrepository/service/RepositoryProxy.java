@@ -51,8 +51,7 @@ public class RepositoryProxy {
 	
 	public static IRepositoryService getRepositoryService()  {
     	
-		String[] contextPaths = new String[] {IRepositoryService.CORE_CONTEXT_PATH,
-			IRepositoryService.REPOSITORY_CONTEXT_PATH};
+		String[] contextPaths = IRepositoryService.REPOSITORY_CONTEXT_PATH;
 		
 		ApplicationContext context = new ClassPathXmlApplicationContext(contextPaths);
 		if ( context == null ) 
@@ -70,8 +69,7 @@ public class RepositoryProxy {
 	 */
 	public static IRepositoryService getLocalRepositoryService()  {
     	
-		String[] contextPaths = new String[] {IRepositoryService.CORE_LOCAL_CONTEXT_PATH,
-				IRepositoryService.REPOSITORY_CONTEXT_PATH};
+		String[] contextPaths = IRepositoryService.REPOSITORY_LOCAL_CONTEXT_PATH;
 
 		ApplicationContext context = new ClassPathXmlApplicationContext(contextPaths);
 		if ( context == null ) 
