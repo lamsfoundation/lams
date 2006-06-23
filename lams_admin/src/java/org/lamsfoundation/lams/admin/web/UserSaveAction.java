@@ -119,18 +119,6 @@ public class UserSaveAction extends Action {
 				while(iter.hasNext()){
 				    UserOrganisation uo = (UserOrganisation)iter.next();
 				    if(uo.getOrganisation().getOrganisationId().equals(orgId)){
-				    	// simply clearing the uors and setting new ones specified by user doesn't seem to work
-				        /*uo.getUserOrganisationRoles().clear();
-				        service.save(user);
-				        log.debug("num roles: "+uo.getUserOrganisationRoles().size());
-				        for(int i=0; i<roles.length; i++){    // add new roles set by user
-				        	Integer roleId = Integer.valueOf(roles[i]);
-				        	Role currentRole = (Role)service.findById(Role.class,roleId);
-				        	log.debug("setting role: "+currentRole);
-				        	uo.getUserOrganisationRoles().add(new UserOrganisationRole(uo,currentRole));
-				        	log.debug("num roles: "+uo.getUserOrganisationRoles().size());
-				        }*/
-                        // so we do two double loops to add/remove roles :(
 				    	Set uors = uo.getUserOrganisationRoles();
 				        for(int i=0; i<roles.length; i++){    // add new roles set by user
 				        	Integer roleId = Integer.valueOf(roles[i]);
@@ -146,10 +134,12 @@ public class UserSaveAction extends Action {
 				        	if(!alreadyHasRole){    // add new role
 				        		Role currentRole = (Role)service.findById(Role.class,roleId);
 					            log.debug("setting role: "+currentRole);
-					            uors.add(new UserOrganisationRole(uo,currentRole));
+					            UserOrganisationRole newUor = new UserOrganisationRole(uo,currentRole);
+					            service.save(newUor);  // weird spring?/hibernate? bug where only first row is added
+					            /*uors.add(newUor);
 					            uo.setUserOrganisationRoles(uors);
 					            user.setUserOrganisations(uos);
-					            service.save(user);
+					            service.save(user);*/
 					            //log.debug("num roles: "+uo.getUserOrganisationRoles().size());
 				        	}
 				        }

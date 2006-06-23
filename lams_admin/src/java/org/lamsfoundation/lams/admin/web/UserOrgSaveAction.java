@@ -90,26 +90,6 @@ public class UserOrgSaveAction extends Action{
 		Organisation organisation = (Organisation)service.findById(Organisation.class, orgId);
 		Set uos = organisation.getUserOrganisations();
 		
-		/* clear and repopulate set of userorganisations;
-		 * adding new rows work, but old ones are not removed:
-		 * ObjectDeletedException, object would be re-saved by cascade
-		uos.clear();
-		organisation.setUserOrganisations(uos);
-		service.save(organisation);
-		
-		String[] userIds = (String[])userOrgForm.get("userIds");
-		List userIdList = Arrays.asList(userIds);
-		for(int i=0; i<userIdList.size(); i++){
-			Integer userId = new Integer((String)userIdList.get(i));
-			User user = (User)service.findById(User.class,userId);
-			UserOrganisation uo = new UserOrganisation(user,organisation);
-			uos.add(uo);
-			log.debug("adding userId: "+userId);
-		}
-		organisation.setUserOrganisations(uos);
-		service.save(organisation);
-		*/
-		
 		String[] userIds = (String[])userOrgForm.get("userIds");
 		List<String> userIdList = Arrays.asList(userIds);
 		log.debug("userIdList: "+userIdList);
@@ -139,6 +119,7 @@ public class UserOrgSaveAction extends Action{
 			if(!alreadyInOrg){
 				User user = (User)service.findById(User.class,userId);
 				UserOrganisation uo = new UserOrganisation(user,organisation);
+				service.save(uo);  // weird spring?/hibernate? bug where only first row is added
 				uos.add(uo);
 				log.debug("added: "+userId);
 			}
