@@ -1766,6 +1766,10 @@ public class AuthoringUtil implements McAppConstants {
     public static void cleanupRedundantQuestions(HttpServletRequest request, List existingQuestions, Map mapQuestionsContent, McContent mcContent)
     {
     	logger.debug("doing cleanupRedundantQuestions...");
+    	logger.debug("using  existingQuestions: " + existingQuestions);
+    	logger.debug("using  mapQuestionsContent: " + mapQuestionsContent);
+    	logger.debug("using  mcContent: " + mcContent);
+    	
     	IMcService mcService =McUtils.getToolService(request);
     	
         /*remove ununsed question entries from the db */
@@ -1797,9 +1801,14 @@ public class AuthoringUtil implements McAppConstants {
     			String deletableQuestion=mcQueContent.getQuestion();
     			logger.debug("found is false, delete this question " + deletableQuestion);
     			mcQueContent=mcService.getQuestionContentByQuestionText(deletableQuestion, mcContent.getUid());
+    			
     			logger.debug("found is false, delete this question " + mcQueContent);
     			if (mcQueContent != null)
     			{
+    			    logger.debug("first removing from collection " + mcQueContent);
+    			    mcContent.getMcQueContents().remove(mcQueContent);
+    			    logger.debug("removed from collection ");
+    			    
     				mcService.removeMcQueContent(mcQueContent);
         			logger.debug("removed mcQueContent from the db: " + mcQueContent);	
     			}
@@ -2161,38 +2170,41 @@ public class AuthoringUtil implements McAppConstants {
 		{
 			Long mcQueContentUid=mcQueContent.getUid();
 			logger.debug("mcQueContentUid:" + mcQueContentUid);
-			
-			Iterator itPQ = pendingOptions.entrySet().iterator();
-			boolean isOptionSelected=false;
-	        while (itPQ.hasNext())
-	        {
-	        	Map.Entry pairsPQ = (Map.Entry)itPQ.next();
-	        	String optionText=pairsPQ.getValue().toString() ;
-	        	logger.debug("optionText: " + optionText);
-	        	
-	        	if ((optionText != null) && (!optionText.equals("")))
-	        	{
-	        		isOptionSelected=false;
-		        	isOptionSelected=isOptionSelected(mapGeneralSelectedOptionsContent, optionText, questionIndex);
-		    		logger.debug("isOptionSelected: " + isOptionSelected);
-		    		
-		    		McOptsContent mcOptsContent = mcService.getOptionContentByOptionText(optionText, mcQueContentUid);
-		    		logger.debug("mcOptsContent: " + mcOptsContent);
-		    		
-		    		if (mcOptsContent == null)
-		    		{
-		    			mcOptsContent = new McOptsContent(isOptionSelected, pairsPQ.getValue().toString(),mcQueContent , new TreeSet());
-		    			logger.debug("created new mcOptsContent:" + mcOptsContent);
-		    		}
-		        	else
+
+			if (pendingOptions != null)
+			{
+				Iterator itPQ = pendingOptions.entrySet().iterator();
+				boolean isOptionSelected=false;
+		        while (itPQ.hasNext())
+		        {
+		        	Map.Entry pairsPQ = (Map.Entry)itPQ.next();
+		        	String optionText=pairsPQ.getValue().toString() ;
+		        	logger.debug("optionText: " + optionText);
+		        	
+		        	if ((optionText != null) && (!optionText.equals("")))
 		        	{
-		        		logger.debug("this option is already persisted mcQueContent, just look after isOptionSelected:" + mcQueContent);
-		        		mcOptsContent.setCorrectOption(isOptionSelected);
+		        		isOptionSelected=false;
+			        	isOptionSelected=isOptionSelected(mapGeneralSelectedOptionsContent, optionText, questionIndex);
+			    		logger.debug("isOptionSelected: " + isOptionSelected);
+			    		
+			    		McOptsContent mcOptsContent = mcService.getOptionContentByOptionText(optionText, mcQueContentUid);
+			    		logger.debug("mcOptsContent: " + mcOptsContent);
+			    		
+			    		if (mcOptsContent == null)
+			    		{
+			    			mcOptsContent = new McOptsContent(isOptionSelected, pairsPQ.getValue().toString(),mcQueContent , new TreeSet());
+			    			logger.debug("created new mcOptsContent:" + mcOptsContent);
+			    		}
+			        	else
+			        	{
+			        		logger.debug("this option is already persisted mcQueContent, just look after isOptionSelected:" + mcQueContent);
+			        		mcOptsContent.setCorrectOption(isOptionSelected);
+			        	}
+			    		mcService.saveMcOptionsContent(mcOptsContent);
+						logger.debug("persisted mcQueContent: " + mcQueContent);	        		
 		        	}
-		    		mcService.saveMcOptionsContent(mcOptsContent);
-					logger.debug("persisted mcQueContent: " + mcQueContent);	        		
-	        	}
-	        }
+		        }
+			}
 		}
 	}
 	

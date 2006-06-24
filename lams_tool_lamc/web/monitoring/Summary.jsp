@@ -30,7 +30,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
-		<c:if test="${sessionScope.userExceptionNoStudentActivity == 'true'}"> 	
+		<c:if test="${userExceptionNoToolSessions == 'true'}"> 	
 				<table class="forms" align="center">
 					<tr> 
 						<td NOWRAP valign=top align=center> 
@@ -40,7 +40,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</table>
 		</c:if>						
 		
-		<c:if test="${sessionScope.userExceptionNoStudentActivity != 'true'}"> 	
+		<c:if test="${userExceptionNoToolSessions != 'true'}"> 	
 			<html:hidden property="selectedToolSessionId"/>							
 			<input type="hidden" name="isToolSessionChanged"/>
 				<table class="forms">

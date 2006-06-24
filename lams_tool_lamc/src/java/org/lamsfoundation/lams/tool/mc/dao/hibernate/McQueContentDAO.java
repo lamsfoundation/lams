@@ -246,8 +246,12 @@ public class McQueContentDAO extends HibernateDaoSupport implements IMcQueConten
 		
 		public void removeMcQueContent(McQueContent mcQueContent)
 	    {
-			this.getSession().setFlushMode(FlushMode.AUTO);
-	        this.getHibernateTemplate().delete(mcQueContent);
+		    if ((mcQueContent != null) && (mcQueContent.getUid() != null))
+		    {
+				this.getSession().setFlushMode(FlushMode.AUTO);
+		        this.getHibernateTemplate().delete(mcQueContent);
+		        
+		    }
 	    }
 		
 		 public void flush()

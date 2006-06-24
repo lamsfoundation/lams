@@ -352,6 +352,15 @@ public class McStarterAction extends Action implements McAppConstants {
 			}
 		}
 		mcAuthoringForm.resetUserAction();
+
+		Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    logger.debug("toolContentId: " + toolContentId);
+	    
+	    McContent mcContent=mcService.retrieveMc(toolContentId);
+		logger.debug("mcContent:" + mcContent);
+
+		
+		MonitoringUtil.setAttributeNoToolSessions(request, mcService, mcContent);
 		
 		logger.debug("will return to jsp with: " + sourceMcStarter);
 		String destination=McUtils.getDestination(sourceMcStarter);

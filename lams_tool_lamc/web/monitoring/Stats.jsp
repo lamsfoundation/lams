@@ -31,8 +31,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
-	<div id="datatablecontainer">
-		<table class="forms">
+			<table width="80%" cellspacing="8" align="center" class="forms">
 			<tr>
 				<td>
 				<table align="center">
@@ -85,6 +84,5 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</td>
 			</tr>
 		</table>
-	</div>
 
 

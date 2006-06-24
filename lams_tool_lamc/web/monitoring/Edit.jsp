@@ -30,7 +30,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
-		<c:if test="${isMonitoredContentInUse != 'true'}"> 			
+		<c:if test="${userExceptionNoToolSessions == 'true'}"> 			
 			<c:if test="${sessionScope.editOptionsMode == 0}"> 			
 				<jsp:include page="/authoring/BasicContent.jsp" />
 			</c:if> 				
@@ -38,7 +38,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<jsp:include page="/authoring/OptionsContent.jsp" />
 			</c:if> 				
 		</c:if> 											
-		<c:if test="${isMonitoredContentInUse == 'true'}"> 			
+		<c:if test="${userExceptionNoToolSessions != 'true'}"> 			
 					<table border="0" cellspacing="2" cellpadding="2">									
 						<tr> <td NOWRAP valign=top>
 								<font size=2> <bean:message key="error.content.inUse"/> </font>

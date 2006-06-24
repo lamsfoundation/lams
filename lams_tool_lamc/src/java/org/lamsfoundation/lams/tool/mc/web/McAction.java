@@ -1,5 +1,4 @@
-/***************************************************************************
- * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+/* Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
  * 
@@ -52,6 +51,7 @@ import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
+import org.lamsfoundation.lams.tool.mc.service.McServiceProxy;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 
 /**
@@ -187,7 +187,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 	 	IMcService mcService =McUtils.getToolService(request);
 	 	AuthoringUtil.readData(request, mcAuthoringForm);	 	
 	 	mcAuthoringForm.resetUserAction();
-	 	
 	 	
 	 	request.getSession().setAttribute(SUBMIT_SUCCESS, new Integer(0));
 	 	return null;
@@ -325,8 +324,17 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		logger.debug("sequenced mapGeneralSelectedOptionsContent:"+ mapGeneralSelectedOptionsContent);
 		request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapGeneralSelectedOptionsContent);
 		
+	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    logger.debug("toolContentId: " + toolContentId);
+
+    	McContent mcContent=mcService.retrieveMc(toolContentId);
+    	logger.debug("mcContent: " + mcContent);
+
+    	MonitoringUtil.setAttributeNoToolSessions(request, mcService, mcContent);
+
     	McUtils.debugMaps(request);
     	logger.debug("final EDIT_OPTIONS_MODE: " + request.getSession().getAttribute(EDIT_OPTIONS_MODE));
+    	
     	return (mapping.findForward(destination));	
 	}
     
@@ -449,8 +457,19 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		logger.debug("sequenced mapGeneralSelectedOptionsContent:"+ mapGeneralSelectedOptionsContent);
 		request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapGeneralSelectedOptionsContent);
     	
+	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    logger.debug("toolContentId: " + toolContentId);
+
+    	McContent mcContent=mcService.retrieveMc(toolContentId);
+    	logger.debug("mcContent: " + mcContent);
+    	
+    	MonitoringUtil.setAttributeNoToolSessions(request, mcService, mcContent);
+    	
 		McUtils.debugMaps(request);
 		logger.debug("final EDIT_OPTIONS_MODE: " + request.getSession().getAttribute(EDIT_OPTIONS_MODE));
+		
+		MonitoringUtil.setAttributeNoToolSessions(request, mcService, mcContent);
+		
 		return (mapping.findForward(destination));
     }
 
@@ -467,8 +486,27 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		String destination=McUtils.getDestination(sourceMcStarter);
 		logger.debug("destination: " + destination);
 
+	    IMcService mcService =McUtils.getToolService(request);
+    	if (mcService == null)
+		{
+			logger.debug("will retrieve mcService");
+			mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+		    logger.debug("retrieving mcService from cache: " + mcService);
+		}
+	    request.getSession().setAttribute(TOOL_SERVICE, mcService);
+	    logger.debug("mcService : " + mcService);
+
+		
         boolean performEditOptions=performEditOptions(mapping, form, request, response, false);
         logger.debug("performEditOptions: " + performEditOptions);
+
+	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    logger.debug("toolContentId: " + toolContentId);
+	    
+	    McContent mcContent=mcService.retrieveMc(toolContentId);
+		logger.debug("mcContent:" + mcContent);
+		
+		MonitoringUtil.setAttributeNoToolSessions(request, mcService, mcContent);		
         
         return (mapping.findForward(destination));
     }
@@ -895,6 +933,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		{
 		    request.getSession().setAttribute(RICHTEXT_CORRECT_FEEDBACK,DEFAULT_FEEDBACK_CORRECT);
 		}
+
 		
     	return true;
     }
@@ -1035,6 +1074,15 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		
     	McUtils.debugMaps(request);
     	logger.debug("final EDIT_OPTIONS_MODE: " + request.getSession().getAttribute(EDIT_OPTIONS_MODE));
+    	
+	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    logger.debug("toolContentId: " + toolContentId);
+	    
+	    McContent mcContent=mcService.retrieveMc(toolContentId);
+		logger.debug("mcContent:" + mcContent);
+
+		MonitoringUtil.setAttributeNoToolSessions(request, mcService, mcContent);
+    	
 		return (mapping.findForward(destination));
     }
     
@@ -1163,6 +1211,15 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		
     	McUtils.debugMaps(request);
     	logger.debug("final EDIT_OPTIONS_MODE: " + request.getSession().getAttribute(EDIT_OPTIONS_MODE));
+    	
+	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    logger.debug("toolContentId: " + toolContentId);
+	    
+	    McContent mcContent=mcService.retrieveMc(toolContentId);
+		logger.debug("mcContent:" + mcContent);
+
+    	MonitoringUtil.setAttributeNoToolSessions(request, mcService, mcContent);
+    	
 		return (mapping.findForward(destination));
     }
     
@@ -1309,9 +1366,19 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		mapGeneralSelectedOptionsContent=AuthoringUtil.sequenceMap(mapGeneralSelectedOptionsContent);
 		logger.debug("sequenced mapGeneralSelectedOptionsContent:"+ mapGeneralSelectedOptionsContent);
 		request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapGeneralSelectedOptionsContent);
+
+		Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    logger.debug("toolContentId: " + toolContentId);
+	    
+	    McContent mcContent=mcService.retrieveMc(toolContentId);
+		logger.debug("mcContent:" + mcContent);
+		
 		
     	McUtils.debugMaps(request);
     	logger.debug("final EDIT_OPTIONS_MODE: " + request.getSession().getAttribute(EDIT_OPTIONS_MODE));
+    	
+    	MonitoringUtil.setAttributeNoToolSessions(request, mcService, mcContent);
+    	
         return (mapping.findForward(destination));	
     }
     
@@ -1461,8 +1528,17 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		logger.debug("sequenced mapGeneralSelectedOptionsContent:"+ mapGeneralSelectedOptionsContent);
 		request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapGeneralSelectedOptionsContent);
 		
+		Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    logger.debug("toolContentId: " + toolContentId);
+	    
+	    McContent mcContent=mcService.retrieveMc(toolContentId);
+		logger.debug("mcContent:" + mcContent);
+		
+		MonitoringUtil.setAttributeNoToolSessions(request, mcService, mcContent);
+		
     	McUtils.debugMaps(request);
     	logger.debug("final EDIT_OPTIONS_MODE: " + request.getSession().getAttribute(EDIT_OPTIONS_MODE));
+    	
 	    return (mapping.findForward(destination));
     }
     
@@ -1478,9 +1554,28 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		logger.debug("sourceMcStarter: " + sourceMcStarter);
 		String destination=McUtils.getDestination(sourceMcStarter);
 		logger.debug("destination: " + destination);
+
+		IMcService mcService =McUtils.getToolService(request);
+    	if (mcService == null)
+		{
+			logger.debug("will retrieve mcService");
+			mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+		    logger.debug("retrieving mcService from cache: " + mcService);
+		}
+	    request.getSession().setAttribute(TOOL_SERVICE, mcService);
+	    logger.debug("mcService : " + mcService);
         
+		
         boolean performDoneOptions=performDoneOptions(mapping, form, request, response, false);
         logger.debug("performDoneOptions: " + performDoneOptions);
+
+	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    logger.debug("toolContentId: " + toolContentId);
+	    
+	    McContent mcContent=mcService.retrieveMc(toolContentId);
+		logger.debug("mcContent:" + mcContent);
+
+		MonitoringUtil.setAttributeNoToolSessions(request, mcService, mcContent);    	
         
         return (mapping.findForward(destination));
     }
@@ -1733,6 +1828,16 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     	
 		McUtils.debugMaps(request);
 		logger.debug("final EDIT_OPTIONS_MODE: " + request.getSession().getAttribute(EDIT_OPTIONS_MODE));
+		
+	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    logger.debug("toolContentId: " + toolContentId);
+	    
+	    McContent mcContent=mcService.retrieveMc(toolContentId);
+		logger.debug("mcContent:" + mcContent);
+
+    	
+		MonitoringUtil.setAttributeNoToolSessions(request, mcService, mcContent);
+		
 		return (mapping.findForward(destination));
     }
     
@@ -1784,7 +1889,11 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 	 	
 	 	Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
 	 	logger.debug("toolContentId:" + toolContentId);
-	 	AuthoringUtil.refreshMaps(request, toolContentId.longValue());
+	 	
+    	McContent mcContent=mcService.retrieveMc(toolContentId);
+    	logger.debug("mcContent: " + mcContent);
+
+    	AuthoringUtil.refreshMaps(request, toolContentId.longValue());
 		logger.debug("refreshed maps...");
 	 	
 		Map mapStartupGeneralOptionsContent= (Map) request.getSession().getAttribute(MAP_STARTUP_GENERAL_OPTIONS_CONTENT);
@@ -2089,7 +2198,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		String richTextEndLearningMessage=(String)request.getSession().getAttribute(RICHTEXT_END_LEARNING_MSG);
 		logger.debug("richTextEndLearningMessage: " + richTextEndLearningMessage);
 		
-		McContent mcContent=mcService.retrieveMc(toolContentId);
 		logger.debug("existing mcContent:" + mcContent);
 		
 		String activeModule=(String)request.getSession().getAttribute(ACTIVE_MODULE);
@@ -2254,6 +2362,8 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		/*because button (and javascript) will display in LamsTag tab, so put it into session instead of request
 		it will be remove immediately in clearSessionAction.*/
         request.getSession().setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG,Boolean.TRUE);
+
+        MonitoringUtil.setAttributeNoToolSessions(request, mcService, mcContent);
         
         logger.debug("final EDIT_OPTIONS_MODE: " + request.getSession().getAttribute(EDIT_OPTIONS_MODE));
 		return (mapping.findForward(destination));
@@ -2308,6 +2418,15 @@ public class McAction extends LamsDispatchAction implements McAppConstants
         
     	McUtils.debugMaps(request);
     	logger.debug("final EDIT_OPTIONS_MODE: " + request.getSession().getAttribute(EDIT_OPTIONS_MODE));
+    	
+	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    logger.debug("toolContentId: " + toolContentId);
+	    
+	    McContent mcContent=mcService.retrieveMc(toolContentId);
+		logger.debug("mcContent:" + mcContent);
+
+    	MonitoringUtil.setAttributeNoToolSessions(request, mcService, mcContent);
+    	
         return (mapping.findForward(destination));
     	
     }
@@ -2361,6 +2480,15 @@ public class McAction extends LamsDispatchAction implements McAppConstants
         
     	McUtils.debugMaps(request);
     	logger.debug("final EDIT_OPTIONS_MODE: " + request.getSession().getAttribute(EDIT_OPTIONS_MODE));
+    	
+	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    logger.debug("toolContentId: " + toolContentId);
+	    
+	    McContent mcContent=mcService.retrieveMc(toolContentId);
+		logger.debug("mcContent:" + mcContent);
+
+    	MonitoringUtil.setAttributeNoToolSessions(request, mcService, mcContent);
+    	
         return (mapping.findForward(destination));
     }
 
@@ -2436,6 +2564,15 @@ public class McAction extends LamsDispatchAction implements McAppConstants
  		
     	McUtils.debugMaps(request);
     	logger.debug("final EDIT_OPTIONS_MODE: " + request.getSession().getAttribute(EDIT_OPTIONS_MODE));
+    	
+	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    logger.debug("toolContentId: " + toolContentId);
+	    
+	    McContent mcContent=mcService.retrieveMc(toolContentId);
+		logger.debug("mcContent:" + mcContent);
+
+		MonitoringUtil.setAttributeNoToolSessions(request, mcService, mcContent);    	
+    	
    	    return (mapping.findForward(destination));    
     }
     
@@ -2509,6 +2646,15 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     	
  		McUtils.debugMaps(request);
  		logger.debug("final EDIT_OPTIONS_MODE: " + request.getSession().getAttribute(EDIT_OPTIONS_MODE));
+ 		
+	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    logger.debug("toolContentId: " + toolContentId);
+	    
+	    McContent mcContent=mcService.retrieveMc(toolContentId);
+		logger.debug("mcContent:" + mcContent);
+
+    	MonitoringUtil.setAttributeNoToolSessions(request, mcService, mcContent);
+    	
    	    return (mapping.findForward(destination));
     }
     
@@ -2551,6 +2697,15 @@ public class McAction extends LamsDispatchAction implements McAppConstants
         
     	McUtils.debugMaps(request);
     	logger.debug("final EDIT_OPTIONS_MODE: " + request.getSession().getAttribute(EDIT_OPTIONS_MODE));
+    	
+	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    logger.debug("toolContentId: " + toolContentId);
+	    
+	    McContent mcContent=mcService.retrieveMc(toolContentId);
+		logger.debug("mcContent:" + mcContent);
+
+		MonitoringUtil.setAttributeNoToolSessions(request, mcService, mcContent);    	
+    	
         return (mapping.findForward(destination));
     }
     
@@ -2593,6 +2748,15 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		
     	McUtils.debugMaps(request);
     	logger.debug("final EDIT_OPTIONS_MODE: " + request.getSession().getAttribute(EDIT_OPTIONS_MODE));
+    	
+	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    logger.debug("toolContentId: " + toolContentId);
+	    
+	    McContent mcContent=mcService.retrieveMc(toolContentId);
+		logger.debug("mcContent:" + mcContent);
+
+		MonitoringUtil.setAttributeNoToolSessions(request, mcService, mcContent);    	
+    	
 	    return (mapping.findForward(destination));
     }
 
@@ -2641,6 +2805,26 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		/* Check this: find out where to forward to*/
     	McUtils.debugMaps(request);
     	logger.debug("final EDIT_OPTIONS_MODE: " + request.getSession().getAttribute(EDIT_OPTIONS_MODE));
+    	
+	    IMcService mcService =McUtils.getToolService(request);
+    	if (mcService == null)
+		{
+			logger.debug("will retrieve mcService");
+			mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+		    logger.debug("retrieving mcService from cache: " + mcService);
+		}
+	    request.getSession().setAttribute(TOOL_SERVICE, mcService);
+	    logger.debug("mcService : " + mcService);
+
+    	
+	    Long toolContentId =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    logger.debug("toolContentId: " + toolContentId);
+	    
+	    McContent mcContent=mcService.retrieveMc(toolContentId);
+		logger.debug("mcContent:" + mcContent);
+
+		MonitoringUtil.setAttributeNoToolSessions(request, mcService, mcContent);    	
+    	
 	    return (mapping.findForward(AUTHORING_STARTER));
     }
     

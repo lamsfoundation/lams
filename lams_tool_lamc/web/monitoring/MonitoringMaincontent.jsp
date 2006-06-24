@@ -151,7 +151,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%-- chooses which tab to highlight --%>
 
 <body onLoad="init();">
-
 	<b> <font size=2> <bean:message key="label.monitoring"/> </font></b>
 	
 		<c:set var="monitoringURL">

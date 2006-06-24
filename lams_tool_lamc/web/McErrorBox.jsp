@@ -105,12 +105,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</td> </tr>
 		</c:if> 				    
 
-		<c:if test="${userExceptionNoToolSessions == 'true'}"> 			
-			<tr> <td NOWRAP valign=top>
-						<font size=2> <bean:message key="error.toolSession.doesNoExist"/> </font>
-			</td> </tr>
-		</c:if> 				
-		
 
 		<c:if test="${userExceptionWeightMustEqual100 == 'true'}"> 			
 			<tr> <td NOWRAP valign=top>

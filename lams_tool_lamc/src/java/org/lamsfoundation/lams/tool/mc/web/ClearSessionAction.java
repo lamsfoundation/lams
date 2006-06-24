@@ -60,6 +60,7 @@ public class ClearSessionAction extends LamsAuthoringFinishAction {
 			session.removeAttribute(McAction.DEFAULT_QUESTION_UID);
 			session.removeAttribute(McAction.USER_EXCEPTION_ANSWERS_DUPLICATE);
 			session.removeAttribute(McAction.USER_EXCEPTION_ANSWER_EMPTY);
+			session.removeAttribute(McAction.USER_EXCEPTION_NO_TOOL_SESSIONS);
 			session.removeAttribute(McAction.LIST_UPLOADED_OFFLINE_FILENAMES);
 			session.removeAttribute(McAction.LIST_UPLOADED_ONLINE_FILENAMES);
 			session.removeAttribute(McAction.CREATION_DATE);

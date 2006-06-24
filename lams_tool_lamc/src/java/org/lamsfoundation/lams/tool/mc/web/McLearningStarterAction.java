@@ -276,8 +276,6 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    {
 	    	McUtils.cleanUpSessionAbsolute(request);
 	    	logger.debug("error: The tool expects mcSession.");
-	    	request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
-	    	persistError(request,"error.toolSession.notAvailable");
 			return (mapping.findForward(ERROR_LIST));
 	    }
 

@@ -128,6 +128,7 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 		McMonitoringForm mcMonitoringForm = (McMonitoringForm) form;
 		mcMonitoringForm.setEditOptionsMode(new Integer(0).toString());
 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
+		request.getSession().setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true).toString());
 		
 		request.getSession().setAttribute(ACTIVE_MODULE, DEFINE_LATER);
 		request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(false));
@@ -272,6 +273,8 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
     	mapCorrectFeedback = AuthoringUtil.rebuildCorrectFeedbackMapfromDB(request, toolContentId);
     	logger.debug("existing mapCorrectFeedback:" + mapCorrectFeedback);
     	request.getSession().setAttribute(MAP_CORRECT_FEEDBACK, mapCorrectFeedback);
+
+    	MonitoringUtil.setAttributeNoToolSessions(request, mcService, mcContent);
 		
 	    return (mapping.findForward(LOAD_MONITORING_CONTENT));	
 	}
@@ -302,6 +305,8 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 
 	    request.getSession().setAttribute(TOOL_SERVICE, mcService);		
 		McMonitoringForm mcMonitoringForm = (McMonitoringForm) form;
+		/* setting active tab to summary*/
+		mcMonitoringForm.setCurrentTab("1");
 	    
 	    /*
 	     * persist time zone information to session scope. 
@@ -325,11 +330,7 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 	    
 		Map summaryToolSessions=MonitoringUtil.populateToolSessions(request, mcContent, mcService);
 		logger.debug("summaryToolSessions: " + summaryToolSessions);
-		if (summaryToolSessions.isEmpty())
-		{
-			/* inform in the Summary tab that the tool has no active sessions */
-			request.setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true));
-		}
+		
 		
 		Map summaryToolSessionsId=MonitoringUtil.populateToolSessionsId(request, mcContent, mcService);
 		logger.debug("summaryToolSessionsId: " + summaryToolSessionsId);
@@ -410,6 +411,7 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 		logger.debug("SUMMARY_TOOL_SESSIONS: " + request.getSession().getAttribute(SUMMARY_TOOL_SESSIONS));
 		logger.debug("SELECTION_CASE: " + request.getSession().getAttribute(SELECTION_CASE));
 		logger.debug("LIST_MONITORED_ANSWERS_CONTAINER_DTO: " + request.getSession().getAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO));
+		
 		return true;
 	}
 
