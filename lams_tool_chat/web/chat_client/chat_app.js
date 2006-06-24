@@ -1,7 +1,7 @@
 // Constants
 var GROUPCHAT_MSG = "groupchat_message";
 var PRIVATE_MSG = "private_message";
-var colors = new Array("0000FF", "006699", "0066FF", "6633FF", "00CCFF", "009900", "00CC33", "339900", "008080", "66FF66", "CC6600", "FF6600", "FF9900", "CC6633", "FF9933", "990000", "A50021", "990033", "CC3300", "FF6666", "330033", "663399", "6633CC", "660099", "FF00FF", "999900", "808000", "FFFF00", "666633", "CCFF00", "292929", "666666");
+var colours = ["#0000FF", "#006699", "#0066FF", "#6633FF", "#00CCFF", "#009900", "#00CC33", "#339900", "#008080", "#66FF66", "#CC6600", "#FF6600", "#FF9900", "#CC6633", "#FF9933", "#990000", "#A50021", "#990033", "#CC3300", "#FF6666", "#330033", "#663399", "#6633CC", "#660099", "#FF00FF", "#999900", "#808000", "#FFFF00", "#666633", "#CCFF00", "#292929", "#666666"];
 
 // Variables
 var roster = new Roster();
@@ -18,12 +18,39 @@ function htmlEnc(str) {
     str = str.replace(/\n/g, "<br />");
     return str;
 }
-function getColor(nick) {
+function getColour(nick) {
     var charSum = 0;
     for (var i = 0; i < nick.length; i++) {
         charSum += nick.charCodeAt(i);
     }
-    return colors[charSum % (colors.length)];
+    return colours[charSum % (colours.length)];
+}
+
+// creates a new element.
+function createElem(name, attrs, style, text) {
+    var e = document.createElement(name);
+    if (attrs) {
+        for (key in attrs) {
+            if (key == "class") {
+                e.className = attrs[key];
+            } else {
+                if (key == "id") {
+                    e.id = attrs[key];
+                } else {
+                    e.setAttribute(key, attrs[key]);
+                }
+            }
+        }
+    }
+    if (style) {
+        for (key in style) {
+            e.style[key] = style[key];
+        }
+    }
+    if (text) {
+        e.appendChild(document.createTextNode(text));
+    }
+    return e;
 }
 
 // Roster 
@@ -59,7 +86,7 @@ function updateRosterDisplay() {
     }
 }
 function Roster() {
-    this.users = new Array();
+    this.users = [];
     // objects methods 
     this.getUserByNick = getRosterUserByNick;
     this.addUser = AddRosterUser;
@@ -74,10 +101,9 @@ function resetInputs() {
 function updateSendDisplay() {
     var rosterList = document.getElementById("roster_user_selector");
     var selectedIndex = rosterList.selectedIndex;
-    var userName;
     if (MODE == "teacher" && !(selectedIndex == -1)) {
         var userName = rosterList.options[rosterList.selectedIndex].value;
-        document.getElementById("sendToUser").innerHTML = "<span style='color:" + getColor(userName) + "'>" + userName + "</span>";
+        document.getElementById("sendToUser").innerHTML = "<span style='color:" + getColour(userName) + "'>" + userName + "</span>";
         document.getElementById("sendToEveryone").style.display = "none";
         document.getElementById("sendToUser").style.display = "";
     } else {
@@ -86,11 +112,18 @@ function updateSendDisplay() {
     }
 }
 function generateMessageHTML(nick, message, type) {
-    return "<div style='color:" + getColor(nick) + "' class='message " + type + "'><span style='color:" + getColor(nick) + "' class='messageFrom' >" + nick + "</span><br/>" + message + "<div/>";
+	var colour = getColour(nick);
+    var fromElem = createElem("span", {class: "messageFrom"}, {color: colour}, nick)
+    var msgElem = createElem("div", {class: 'message ' + type}, {color: colour}, null);
+    msgElem.innerHTML = message;
+    msgElem.insertBefore(document.createElement("br"), msgElem.firstChild);
+	msgElem.insertBefore(fromElem, msgElem.firstChild);
+
+    return msgElem;
 }
 function updateMessageDisplay(htmlMessage) {
     var iRespDiv = document.getElementById("iResp");
-    iRespDiv.innerHTML += htmlMessage;
+    iRespDiv.appendChild(htmlMessage);
     iRespDiv.scrollTop = iRespDiv.scrollHeight;
 }
 // Event handlers
@@ -105,7 +138,7 @@ function handleMessage(aJSJaCPacket) {
     if (type == "chat") {
         htmlMessage = generateMessageHTML(nick, message, PRIVATE_MSG);
     } else {
-        if (type = "groupchat") {
+        if (type == "groupchat") {
             htmlMessage = generateMessageHTML(nick, message, GROUPCHAT_MSG);
         } else {
             /* somethings wrong, dont add anything.*/
