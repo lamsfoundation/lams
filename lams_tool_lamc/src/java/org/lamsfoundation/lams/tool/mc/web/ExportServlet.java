@@ -152,8 +152,11 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Mc
 			Long queUsrId=mcQueUsr.getUid();
 			logger.debug("queUsrId: " + queUsrId);
 			
+			Map mapResponses= new TreeMap(new McComparator());
 			Map mapQueAttempts= new TreeMap(new McComparator());
-			
+			Map mapQueCorrectAttempts= new TreeMap(new McComparator());
+			Map mapQueIncorrectAttempts= new TreeMap(new McComparator());
+
 			for (int i=1; i<=  new Integer(totalQuestionCount).intValue(); i++)
 			{
 				logger.debug("doing question with display order: " + i);
@@ -206,6 +209,7 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Mc
 						{
 						    currentMark= "0";
 						}
+						mapResponses.put(new Integer(i).toString(), currentMark);
 						intCurrentMark=new Integer(currentMark).intValue();
 						logger.debug("intCurrentMark: " + intCurrentMark);
 		    			
@@ -245,7 +249,7 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Mc
 						{
 						    currentMark= "0";
 						}
-						
+						mapResponses.put(new Integer(i).toString(), currentMark);
 						intCurrentMark=new Integer(currentMark).intValue();
 						logger.debug("intCurrentMark: " + intCurrentMark);
 					}
@@ -253,12 +257,14 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Mc
 		    	else
 		    	{
 		    	    intCurrentMark=0;
+		    	    mapResponses.put(new Integer(i).toString(), "0");
 		    	}
 				
 				intTotalMark=intTotalMark + intCurrentMark;
 				logger.debug("intTotalMark: " + intTotalMark);
 
-
+				Map mapAttemptOrderCorrectAttempts= new TreeMap(new McComparator());
+				Map mapAttemptOrderIncorrectAttempts= new TreeMap(new McComparator());
 				Map mapAttemptOrderAttempts= new TreeMap(new McComparator());
 				for (int j=1; j <= MAX_ATTEMPT_HISTORY ; j++ )
 	    		{
@@ -267,6 +273,9 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Mc
 		    		logger.debug("attemptsByAttemptOrder: " + j + " is: " + attemptsByAttemptOrder);
 		    	
 		    		Map mapAttempts= new TreeMap(new McComparator());
+		    		Map mapAttemptsIncorrect= new TreeMap(new McComparator());
+		    		Map mapAttemptsCorrect= new TreeMap(new McComparator());
+
 		    		Iterator attemptIterator=attemptsByAttemptOrder.iterator();
 		    		Long mapIndex=new Long(1);
 	    	    	while (attemptIterator.hasNext())
@@ -284,6 +293,15 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Mc
 	    	    	{
 	    	    		mapAttemptOrderAttempts.put(new Integer(j).toString(), mapAttempts);	
 	    	    	}
+	    	    	if (mapAttemptsCorrect.size() > 0)
+	    	    	{
+	    	    		mapAttemptOrderCorrectAttempts.put(new Integer(j).toString(), mapAttemptsCorrect);	
+	    	    	}
+	    	    	if (mapAttemptsIncorrect.size() > 0)
+	    	    	{
+	    	    		mapAttemptOrderIncorrectAttempts.put(new Integer(j).toString(), mapAttemptsIncorrect);	
+	    	    	}
+	    	    	
 	    		}
 				
 				logger.debug("final mapAttemptOrderAttempts is: " + mapAttemptOrderAttempts);
@@ -291,12 +309,23 @@ public class ExportServlet  extends AbstractExportPortfolioServlet implements Mc
 		    	{
 					mapQueAttempts.put(new Integer(i).toString(), mapAttemptOrderAttempts);	
 		    	}
+				if (mapAttemptOrderCorrectAttempts.size() > 0)
+		    	{
+					mapQueCorrectAttempts.put(new Integer(i).toString(), mapAttemptOrderCorrectAttempts);	
+		    	}    			
+				if (mapAttemptOrderIncorrectAttempts.size() > 0)
+		    	{
+	    			mapQueIncorrectAttempts.put(new Integer(i).toString(), mapAttemptOrderIncorrectAttempts);	
+		    	}    			
+				
 			}
 			request.getSession().setAttribute(MAP_QUE_ATTEMPTS, mapQueAttempts);
 			logger.debug("final mapQueAttempts is: " + mapQueAttempts);
+			request.getSession().setAttribute(MAP_QUE_CORRECT_ATTEMPTS, mapQueCorrectAttempts);
+			request.getSession().setAttribute(MAP_QUE_INCORRECT_ATTEMPTS, mapQueIncorrectAttempts);
+			request.getSession().setAttribute(MAP_RESPONSES, mapResponses);
 			
-
-			
+			logger.debug("final MAP_RESPONSES is: " + mapResponses);
 			logger.debug("final intTotalMark is: " + intTotalMark);
 			return new Integer(intTotalMark).toString();
 	}

@@ -36,6 +36,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 public class McUserMarkDTO implements Comparable
 {
     private String sessionId;
+    private String sessionName;
     private String queUsrId;
     private String userName;
     private LinkedList marks; 
@@ -124,5 +125,17 @@ public class McUserMarkDTO implements Comparable
      */
     public void setTotalMark(String totalMark) {
         this.totalMark = totalMark;
+    }
+    /**
+     * @return Returns the sessionName.
+     */
+    public String getSessionName() {
+        return sessionName;
+    }
+    /**
+     * @param sessionName The sessionName to set.
+     */
+    public void setSessionName(String sessionName) {
+        this.sessionName = sessionName;
     }
 }

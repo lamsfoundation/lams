@@ -41,6 +41,7 @@ import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McApplicationException;
 import org.lamsfoundation.lams.tool.mc.McUtils;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
+import org.lamsfoundation.lams.tool.mc.pojos.McSession;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.tool.mc.service.McServiceProxy;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
@@ -205,12 +206,16 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	    {
 	    	/* SELECTION_CASE == 1 indicates a selected group other than "All" */
 		    request.getSession().setAttribute(SELECTION_CASE, new Long(1));
+		    McSession mcSession=mcService.retrieveMcSession(new Long(currentMonitoredToolSession));
+		    request.getSession().setAttribute(CURRENT_MONITORED_TOOL_SESSION_NAME, mcSession.getSession_name());
 	    }
 	    logger.debug("SELECTION_CASE: " + request.getSession().getAttribute(SELECTION_CASE));
 	    
 	    
 	    request.getSession().setAttribute(CURRENT_MONITORED_TOOL_SESSION, currentMonitoredToolSession);
 	    logger.debug("CURRENT_MONITORED_TOOL_SESSION: " + request.getSession().getAttribute(CURRENT_MONITORED_TOOL_SESSION));
+	    logger.debug("CURRENT_MONITORED_TOOL_SESSION_NAME: " + request.getSession().getAttribute(CURRENT_MONITORED_TOOL_SESSION_NAME));
+	    
 	    
     	return (mapping.findForward(LOAD_MONITORING_CONTENT));	
 	}

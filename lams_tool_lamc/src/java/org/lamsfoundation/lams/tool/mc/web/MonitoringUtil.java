@@ -91,7 +91,6 @@ public class MonitoringUtil implements McAppConstants{
 	
 	
 	
-	
 	/**
 	 * ends up populating the attempt history for all the users of all the tool sessions for a content
 	 * buildGroupsQuestionData(HttpServletRequest request, McContent mcContent)
@@ -248,11 +247,86 @@ public class MonitoringUtil implements McAppConstants{
 		logger.debug("final listMonitoredMarksContainerDTO:..." + listMonitoredMarksContainerDTO);
 		return listMonitoredMarksContainerDTO;
 	}
-
+	
 	
 	public static List buildGroupsMarkData(HttpServletRequest request, McContent mcContent, IMcService mcService)
 	{
 		logger.debug("will be building groups mark data  for content:..." + mcContent);
+    	List listMonitoredMarksContainerDTO= new LinkedList();
+    	Set sessions=mcContent.getMcSessions();
+    	Iterator sessionsIterator=sessions.iterator();
+
+    	while (sessionsIterator.hasNext())
+    	{
+    	    McSession mcSession=(McSession) sessionsIterator.next(); 
+    	    logger.debug("iterating mcSession:..." + mcSession);
+    	    
+    	    McSessionMarkDTO mcSessionMarkDTO= new McSessionMarkDTO();
+    	    mcSessionMarkDTO.setSessionId(mcSession.getMcSessionId().toString());
+    	    mcSessionMarkDTO.setSessionName(mcSession.getSession_name().toString());
+    	    
+    	    Set sessionUsers=mcSession.getMcQueUsers();
+    	    Iterator usersIterator=sessionUsers.iterator();
+    	    
+    	    LinkedList sessionUsersData= new LinkedList();
+    	    Map mapSessionUsersData= new TreeMap(new McStringComparator());
+        	while (usersIterator.hasNext())
+        	{
+        	    McQueUsr mcQueUsr=(McQueUsr) usersIterator.next();
+        	    logger.debug("iterating mcQueUsr:..." + mcQueUsr);
+        	    
+        	    McUserMarkDTO mcUserMarkDTO= new McUserMarkDTO();
+        	    mcUserMarkDTO.setSessionId(mcSession.getMcSessionId().toString());
+        	    mcUserMarkDTO.setSessionName(mcSession.getSession_name().toString());
+        	    mcUserMarkDTO.setUserName(mcQueUsr.getFullname());
+        	    mcUserMarkDTO.setQueUsrId(mcQueUsr.getQueUsrId().toString());
+        	    
+        	    
+        	    List listQuestions=mcService.getAllQuestionEntries(mcContent.getUid());
+            	logger.debug("listQuestions:..." + listQuestions);
+            	
+            	Iterator itListQuestions = listQuestions.iterator();
+        	    LinkedList userMarks= new LinkedList();
+        	    
+            	while (itListQuestions.hasNext())
+        	    {
+        	    	McQueContent mcQueContent =(McQueContent)itListQuestions.next();
+        	    	logger.debug("mcQueContent:..." + mcQueContent);
+        	    	if (mcQueContent != null)
+        	    	{
+        	    	    String learnerMark=getLearnerMarkForQuestionInSession(mcQueContent.getUid(), mcSession.getUid(), mcQueUsr.getUid(), mcSession, mcService);
+        	    	    logger.debug("learnerMark for queContent uid, mcSession uid, mcUser uid:..." + mcQueContent.getUid() + "--" + mcSession.getUid() 
+        	    	            + "--"  + mcQueUsr.getUid() + "is: " + learnerMark);
+        	    	    
+        	    	    userMarks.add(learnerMark);
+        	    	}
+        	    }
+
+            	logger.debug("final userMarks:..." + userMarks);
+            	mcUserMarkDTO.setMarks(userMarks);
+            	
+    	    	String totalMark=getTotalUserMarkForQuestions(userMarks);
+    	    	logger.debug("totalMark: " + totalMark);
+    	    	mcUserMarkDTO.setTotalMark(totalMark);
+    	    	
+            	logger.debug("final mcUserMarkDTO:..." + mcUserMarkDTO);
+            	sessionUsersData.add(mcUserMarkDTO);
+        	}
+        	logger.debug("final sessionUsersData: " + sessionUsersData);
+        	mapSessionUsersData=convertToMcUserMarkDTOMap(sessionUsersData);
+        	logger.debug("final mapSessionUsersData: " + mapSessionUsersData);
+        	mcSessionMarkDTO.setUserMarks(mapSessionUsersData);
+        	listMonitoredMarksContainerDTO.add(mcSessionMarkDTO);
+    	}
+    	
+		logger.debug("final listMonitoredMarksContainerDTO:..." + listMonitoredMarksContainerDTO);
+		return listMonitoredMarksContainerDTO;
+	}
+
+	
+	public static List buildGroupingBasedResponsesData(HttpServletRequest request, McContent mcContent, IMcService mcService)
+	{
+		logger.debug("will be building grouping data  for content:..." + mcContent);
     	List listMonitoredMarksContainerDTO= new LinkedList();
     	Set sessions=mcContent.getMcSessions();
     	Iterator sessionsIterator=sessions.iterator();

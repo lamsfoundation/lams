@@ -147,13 +147,16 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 
 		McContent mcContent=mcService.retrieveMc(toolContentId);
 		logger.debug("mcContent:" + mcContent);
-
+		
+		logger.debug("TOTAL QUESTION COUNT: " + mcContent.getMcQueContents().size());
+		request.getSession().setAttribute(TOTAL_QUESTION_COUNT, new Integer(mcContent.getMcQueContents().size()).toString());
+		request.getSession().setAttribute(HR_COLUMN_COUNT, new Integer(mcContent.getMcQueContents().size()+2).toString());
+		
 		
 	    /* it is possible that no users has ever logged in for the activity yet*/ 
 	    int countAllUsers=mcService.getTotalNumberOfUsers();
 		logger.debug("countAllUsers: " + countAllUsers);
-		
-		
+				
 		request.getSession().setAttribute(USER_EXCEPTION_NO_STUDENT_ACTIVITY, new Boolean(false));
 		if (countAllUsers == 0)
 		{
@@ -343,7 +346,7 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 	    /* Default to All for tool Sessions so that all tool sessions' summary information gets displayed when the module starts up */
 	    request.getSession().setAttribute(CURRENT_MONITORED_TOOL_SESSION, "All");
 	    logger.debug("CURRENT_MONITORED_TOOL_SESSION: " + request.getSession().getAttribute(CURRENT_MONITORED_TOOL_SESSION));
-	    
+
 	    List listMonitoredAnswersContainerDTO=MonitoringUtil.buildGroupsQuestionData(request, mcContent, mcService);
 	    request.getSession().setAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO, listMonitoredAnswersContainerDTO);
 	    logger.debug("LIST_MONITORED_ANSWERS_CONTAINER_DTO: " + request.getSession().getAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO));

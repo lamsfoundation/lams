@@ -116,6 +116,7 @@ public interface McAppConstants {
     public static final String MAP_QUE_ATTEMPTS							="mapQueAttempts";
     public static final String MAP_QUE_CORRECT_ATTEMPTS					="mapQueCorrectAttempts";
     public static final String MAP_QUE_INCORRECT_ATTEMPTS				="mapQueIncorrectAttempts";
+    public static final String MAP_RESPONSES							="mapResponses";
         
     
     public static final String MAP_WEIGHTS								="mapWeights";
@@ -209,6 +210,7 @@ public interface McAppConstants {
     public static final String MAP_QUESTION_CONTENT_LEARNER				="mapQuestionContentLearner";
     public static final String CURRENT_QUESTION_INDEX					="currentQuestionIndex";
     public static final String TOTAL_QUESTION_COUNT						="totalQuestionCount";
+    public static final String HR_COLUMN_COUNT							="hrColumnCount";
     public static final String LEARNER_MARK								="learnerMark";
     public static final String LEARNER_BEST_MARK						="learnerBestMark";
     public static final String LEARNER_LAST_ATTEMPT_ORDER				="learnerLastAttemptOrder";
@@ -246,13 +248,16 @@ public interface McAppConstants {
     public static final String MONITORING_ERROR							="monitoringError";
     public static final String MAP_MONITORING_QUESTIONS					="mapMonitoringQuestions";
     public static final String SUMMARY_TOOL_SESSIONS					="summaryToolSessions";
+    public static final String CURRENT_SESSION_NAME						="currentSessionName";
     public static final String SUMMARY_TOOL_SESSIONS_ID					="summaryToolSessionsId";
     public static final String MONITORED_CONTENT_ID				   		="monitoredContentId";
     public static final String EDITACTIVITY_EDITMODE	   		   		="editActivityEditMode";
     public static final String FORM_INDEX	   		   			   		="formIndex";
     public static final String CURRENT_MONITORED_TOOL_SESSION 			="currentMonitoredToolSession";
+    public static final String CURRENT_MONITORED_TOOL_SESSION_NAME		="currentMonitoredToolSessionName";
     public static final String SELECTION_CASE							="selectionCase";
     public static final String LIST_MONITORED_ANSWERS_CONTAINER_DTO		="listMonitoredAnswersContainerDto";
+    public static final String LIST_GROUPING_DATA						="listGroupingData";
     public static final String LEARNER_NAME								="learnerName";
     public static final String LIST_MONITORED_MARKS_CONTAINER_DTO		="listMonitoredMarksContainerDto";
     public static final String TIMEZONE									="timeZone";

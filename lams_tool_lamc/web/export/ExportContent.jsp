@@ -99,187 +99,110 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 	
 				 <h2>    <bean:message key="label.studentMarks"/>  </h2>
-				 
-	
-				<table width="80%" cellspacing="8" align="center" class="forms">
-			  	 		<tr>
-							 <td NOWRAP valign=top align=left> <b> <font size=2> <bean:message key="label.user"/> </font> </b> </td>  
-							 
-			  	 		<c:set var="queIndex" scope="request" value="0"/>
-						<c:forEach var="currentDto" items="${sessionScope.listMonitoredAnswersContainerDto}">
-						<c:set var="queIndex" scope="request" value="${queIndex +1}"/>
-							<td NOWRAP valign=top align=left> <b> <font size=2> <bean:message key="label.question.only"/> <c:out value="${queIndex}"/></b>
-								 &nbsp (<bean:message key="label.weight"/> 
-								<c:out value="${currentDto.weight}"/>  <bean:message key="label.percent"/>)
-							</font> 
-							</td>
-						</c:forEach>		  	
-							 
-							 <td NOWRAP valign=top align=left> <b> <font size=2> <bean:message key="label.total"/> </font> </b> </td>  
-			  	 		</tr>						 
-			  	 		
-						<c:forEach var="sessionMarksDto" items="${sessionScope.listMonitoredMarksContainerDto}">
-				  	 		<c:set var="currentSessionId" scope="request" value="${sessionMarksDto.sessionId}"/>
-				  	 		<c:set var="mapUserMarksDto" scope="request" value="${sessionMarksDto.userMarks}"/>
-	
-	
-										<c:forEach var="markData" items="${mapUserMarksDto}">						
-							  	 		<c:set var="data" scope="request" value="${markData.value}"/>
-							  	 		<c:set var="currentUserSessionId" scope="request" value="${data.sessionId}"/>
-	
-										<c:if test="${sessionScope.currentMonitoredToolSession == 'All'}"> 			
-											<c:if test="${currentUserSessionId == currentSessionId}"> 	
-												<tr>									  	 		
-								  	 				<td NOWRAP valign=top align=left> <font size=2>
-															<c:out value="${data.userName}"/> 
-														</font>
-													</td>	
-				
-													<c:forEach var="mark" items="${data.marks}">
-														<td NOWRAP valign=top align=left> <font size=2>
-																<c:out value="${mark}"/> 								
-														</td>
-													</c:forEach>		  										
-				
-													<td NOWRAP valign=top align=left> <font size=2>
-																<c:out value="${data.totalMark}"/> 																
-														</font>
-													</td>							
-												</tr>													
-											</c:if>																
-										</c:if>																		
-										</c:forEach>		  	
-				
-	
-										<c:forEach var="markData" items="${mapUserMarksDto}">						
-							  	 		<c:set var="data" scope="request" value="${markData.value}"/>
-							  	 		<c:set var="currentUserSessionId" scope="request" value="${data.sessionId}"/>							  	 		
-										<c:if test="${sessionScope.currentMonitoredToolSession !='All'}"> 			
-											<c:if test="${sessionScope.currentMonitoredToolSession == currentUserSessionId}"> 										
-												<c:if test="${currentUserSessionId == currentSessionId}"> 									
-												<tr>			
-													<td NOWRAP valign=top align=left> <font size=2>
-															<c:out value="${data.userName}"/> 
-														</font>
-													</td>	
-				
-													<c:forEach var="mark" items="${data.marks}">
-														<td NOWRAP valign=top align=left> <font size=2>
-																<c:out value="${mark}"/> 								
-														</td>
-													</c:forEach>		  										
-				
-													<td NOWRAP valign=top align=left> <font size=2>
-																<c:out value="${data.totalMark}"/> 																
-														</font>
-													</td>							
-												</tr>														
-												</c:if>																
-											</c:if>																			
-										</c:if>																								
-										</c:forEach>		  	
-						</c:forEach>		  	
-
+						<jsp:include page="/monitoring/SummaryAllSessions.jsp" />			  	 		
 				</c:if>										
 				
 				<c:if test="${(portfolioExportMode == 'learner')}">
-				
-
-		  	 		<c:set var="mainQueIndex" scope="request" value="0"/>
-					<c:forEach var="currentDto" items="${sessionScope.listMonitoredAnswersContainerDto}">
-					<c:set var="mainQueIndex" scope="request" value="${mainQueIndex +1}"/>
-			  	 		<c:set var="currentQuestionId" scope="request" value="${currentDto.questionUid}"/>
-			  	 		<tr>
-			  	 			<td> &nbsp&nbsp&nbsp</td>
-			  	 		</tr>
-						<tr>			
-							<td NOWRAP valign=top align=left><b> <font size=2> <bean:message key="label.question.only"/> <c:out value="${mainQueIndex}"/>:</b>
-							<font size=2>
-								<c:out value="${currentDto.question}"/> &nbsp (<bean:message key="label.weight"/> 
-								<c:out value="${currentDto.weight}"/>  <bean:message key="label.percent"/>)
-							</font> </td>
-						</tr>	
-						<tr>					
-							<td NOWRAP valign=top align=left> <font size=2> <b> <bean:message key="label.mc.options.col"/> </font> </b> 
+					<table width="80%" cellspacing="8" align="center" class="forms">
+			  	 		<c:set var="mainQueIndex" scope="request" value="0"/>
+						<c:forEach var="currentDto" items="${sessionScope.listMonitoredAnswersContainerDto}">
+						<c:set var="mainQueIndex" scope="request" value="${mainQueIndex +1}"/>
+				  	 		<c:set var="currentQuestionId" scope="request" value="${currentDto.questionUid}"/>
+				  	 		<tr>
+				  	 			<td> &nbsp&nbsp&nbsp</td>
+				  	 		</tr>
+							<tr>			
+								<td NOWRAP valign=top align=left><b> <font size=2> <bean:message key="label.question.only"/> <c:out value="${mainQueIndex}"/>:</b>
+								<font size=2>
+									<c:out value="${currentDto.question}"/> &nbsp (<bean:message key="label.weight"/> 
+									<c:out value="${currentDto.weight}"/>  <bean:message key="label.percent"/>)
+								</font> </td>
+							</tr>	
+							<tr>					
+								<td NOWRAP valign=top align=left> <font size=2> <b> <bean:message key="label.mc.options.col"/> </font> </b> 
+									<table align=left>
+										<c:forEach var="answersData" items="${currentDto.candidateAnswersCorrect}">
+											<tr>			
+												<td NOWRAP valign=top align=left>
+													<font size=2>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+													<c:out value="${answersData.candidateAnswer}"/> 
+													
+													<c:if test="${answersData.correct == 'true'}"> 		
+														&nbsp (<bean:message key="label.correct"/>)
+													</c:if>																		
+													</font>
+												</td>	
+											</tr>
+										</c:forEach>		  	
+									</table>
+								</td>  
+							</tr>			
+									
+							<tr>
+								<td  NOWRAP align=left valign=top> 											
 								<table align=left>
-									<c:forEach var="answersData" items="${currentDto.candidateAnswersCorrect}">
-										<tr>			
-											<td NOWRAP valign=top align=left>
-												<font size=2>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-												<c:out value="${answersData.candidateAnswer}"/> 
-												
-												<c:if test="${answersData.correct == 'true'}"> 		
-													&nbsp (<bean:message key="label.correct"/>)
-												</c:if>																		
-												</font>
-											</td>	
-										</tr>
-									</c:forEach>		  	
+									<c:forEach var="attemptEntry" items="${sessionScope.mapQueAttempts}">
+										<c:if test="${mainQueIndex == attemptEntry.key}"> 		
+								  		  	 		<c:set var="aIndex" scope="session" value="1"/>
+									  		  	 		<tr>
+															<td NOWRAP align=left valign=top> 
+																	<font size=2>
+																		<b> <bean:message key="label.yourAnswers"/>  </b>
+																	</font>
+															</td>
+														 </tr>
+								  		  	 		
+													 <c:forEach var="i" begin="1" end="30" step="1">
+						 								<c:forEach var="distinctAttemptEntry" items="${attemptEntry.value}">
+															<c:if test="${distinctAttemptEntry.key == i}"> 	
+																<tr>
+																	<c:set var="aIndex" scope="session" value="${sessionScope.aIndex +1}"/>
+			 														<td align=left valign=top> 																					
+				 														<table align=left>
+						 													<c:forEach var="singleAttemptEntry" items="${distinctAttemptEntry.value}">
+																				<tr>
+																					<td NOWRAP align=left valign=top>
+																						<font size=2>
+								 															&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+								 															<c:out value="${singleAttemptEntry.value}"/> 
+								 														</font>
+							 														</td>
+																				</tr>	
+																			</c:forEach>
+																		</table>	
+			 														</td>
+																</tr>		
+															</c:if> 																																						
+														</c:forEach>
+													</c:forEach>
+										</c:if> 																		
+										
+									</c:forEach>
 								</table>
-							</td>  
-						</tr>			
-								
-						<tr>
-							<td  NOWRAP align=left valign=top> 											
-							<table align=left>
-								<c:forEach var="attemptEntry" items="${sessionScope.mapQueAttempts}">
-									<c:if test="${sessionScope.mainQueIndex == attemptEntry.key}"> 		
-							  		  	 		<c:set var="aIndex" scope="session" value="1"/>
-								  		  	 		<tr>
-														<td NOWRAP align=left valign=top> 
-																<font size=2>
-																	<b> <bean:message key="label.yourAnswers"/>  </b>
-																</font>
-														</td>
-													 </tr>
-							  		  	 		
-												 <c:forEach var="i" begin="1" end="30" step="1">
-					 								<c:forEach var="distinctAttemptEntry" items="${attemptEntry.value}">
-														<c:if test="${distinctAttemptEntry.key == i}"> 	
-															<tr>
-																<c:set var="aIndex" scope="session" value="${sessionScope.aIndex +1}"/>
-		 														<td align=left valign=top> 																					
-			 														<table align=left>
-					 													<c:forEach var="singleAttemptEntry" items="${distinctAttemptEntry.value}">
-																			<tr>
-																				<td NOWRAP align=left valign=top>
-																					<font size=2>
-							 															&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-							 															<c:out value="${singleAttemptEntry.value}"/> 
-							 														</font>
-						 														</td>
-																			</tr>	
-																		</c:forEach>
-																	</table>	
-		 														</td>
-															</tr>		
-														</c:if> 																																						
-												</c:forEach>
-												
-										</c:forEach>
-									</c:if> 																		
-								</c:forEach>
-							</table>
-							</td>
-					  </tr>								
-									  								  
 
-					</c:forEach>
-
-		  	 		<tr>
-		  	 			<td NOWRAP valign=top align=left><font size=2> <b> 
-		  	 				<bean:message key="label.passingMark"/> </b> <c:out value="${passMark}"/> <bean:message key="label.percent"/>  </font>
-		  	 			</td>
-		  	 		</tr>
-
-
-		  	 		<tr>
-		  	 			<td NOWRAP valign=top align=left><font size=2> <b> 
-		  	 				<bean:message key="label.yourMark"/> </b> <c:out value="${learnerMark}"/> <bean:message key="label.percent"/>  </font>
-		  	 			</td>
-		  	 		</tr>
-					
-				</c:if>								 
+									<c:forEach var="responseEntry" items="${mapResponses}">
+											<c:if test="${mainQueIndex == responseEntry.key}"> 		
+												(<c:out value="${responseEntry.value}"/> <bean:message key="label.percent"/>)
+											</c:if> 																													
+									</c:forEach>
+								</td>
+						  </tr>								
 	
+						</c:forEach>
+	
+			  	 		<tr>
+			  	 			<td NOWRAP valign=top align=left><font size=2> <b> 
+			  	 				<bean:message key="label.passingMark"/> </b> <c:out value="${passMark}"/> <bean:message key="label.percent"/>  </font>
+			  	 			</td>
+			  	 		</tr>
+	
+	
+			  	 		<tr>
+			  	 			<td NOWRAP valign=top align=left><font size=2> <b> 
+			  	 				<bean:message key="label.yourMark"/> </b> <c:out value="${learnerMark}"/> <bean:message key="label.percent"/>  </font>
+			  	 			</td>
+			  	 		</tr>
+					</table>					
+				</c:if>								 
 		</c:if>				
 
