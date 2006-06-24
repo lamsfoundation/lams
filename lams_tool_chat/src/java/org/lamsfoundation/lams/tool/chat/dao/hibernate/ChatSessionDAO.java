@@ -27,8 +27,8 @@ package org.lamsfoundation.lams.tool.chat.dao.hibernate;
 import java.util.List;
 
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
-import org.lamsfoundation.lams.tool.chat.model.ChatSession;
 import org.lamsfoundation.lams.tool.chat.dao.IChatSessionDAO;
+import org.lamsfoundation.lams.tool.chat.model.ChatSession;
 
 /**
  * DAO for accessing the ChatSession objects - Hibernate specific code.
@@ -37,7 +37,8 @@ public class ChatSessionDAO extends BaseDAO implements IChatSessionDAO {
 
 	public static final String SQL_QUERY_FIND_BY_SESSION_ID = "from "
 			+ ChatSession.class.getName() + " where session_id=?";
-	public static final String SQL_QUERY_FIND_BY_JABBER_ROOM = "from " 
+
+	public static final String SQL_QUERY_FIND_BY_JABBER_ROOM = "from "
 			+ ChatSession.class.getName() + " where jabber_room=?";
 
 	public void saveOrUpdate(ChatSession session) {
@@ -59,5 +60,13 @@ public class ChatSessionDAO extends BaseDAO implements IChatSessionDAO {
 		if (list == null || list.isEmpty())
 			return null;
 		return (ChatSession) list.get(0);
+	}
+
+	public void deleteBySessionID(Long toolSessionID) {
+		ChatSession session = getBySessionId(toolSessionID);
+		if(session != null){
+			this.getHibernateTemplate().delete(session);
+			this.getHibernateTemplate().flush();
+		}
 	}
 }

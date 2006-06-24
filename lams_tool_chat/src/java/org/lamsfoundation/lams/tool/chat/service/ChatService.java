@@ -210,8 +210,9 @@ public class ChatService implements ToolSessionManager, ToolContentManager,
 
 	public void removeToolSession(Long toolSessionId)
 			throws DataMissingException, ToolException {
-		// TODO Auto-generated method stub
-
+		chatSessionDAO.deleteBySessionID(toolSessionId);
+		//TODO check if cascade worked
+		// do we need to remove room on jabber server ?
 	}
 
 	/* ************ Methods from ToolContentManager ************************* */
