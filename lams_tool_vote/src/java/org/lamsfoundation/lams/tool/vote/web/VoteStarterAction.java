@@ -91,7 +91,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
-import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
 import org.lamsfoundation.lams.tool.vote.VoteComparator;
@@ -155,8 +154,6 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 		String sourceVoteStarter = (String) request.getAttribute(SOURCE_VOTE_STARTER);
 		logger.debug("sourceVoteStarter: " + sourceVoteStarter);
 
-		
-		
 		voteAuthoringForm.resetRadioBoxes();
 		voteAuthoringForm.setExceptionMaxNominationInvalid(new Boolean(false).toString());
 		
@@ -224,100 +221,6 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 				logger.debug("forwarding to: " + ERROR_LIST);
 				return (mapping.findForward(ERROR_LIST));
 			}
-
-	    	
-	    	/* 	note: copyToolContent and removeToolContent code is redundant for production.
-	    	 *  test whether the authoring level tool contract:
-	    	 	public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException;
-	    	 * 	is working or not
-	    	 *  
-	    	 * test code starts from here... 
-	    	 */	
-	    	String copyToolContent= (String) request.getParameter(COPY_TOOL_CONTENT);
-	    	logger.debug("copyToolContent: " + copyToolContent);
-	    	
-	    	if ((copyToolContent != null) && (copyToolContent.equals("1")))
-			{
-		    	logger.debug("user request to copy the content");
-		    	Long fromContentId=new Long(strToolContentId);
-		    	logger.debug("fromContentId: " + fromContentId);
-		    	
-		    	Long toContentId=new Long(9876);
-		    	logger.debug("toContentId: " + toContentId);
-		    	
-		    	try
-				{
-		    		voteService.copyToolContent(fromContentId, toContentId);	
-				}
-		    	catch(ToolException e)
-				{
-		    		VoteUtils.cleanUpSessionAbsolute(request);
-		    		logger.debug("error copying the content: " + e);
-				}
-			}
-	    	
-	    	String removeToolContent= (String) request.getParameter(REMOVE_TOOL_CONTENT);
-	    	logger.debug("removeToolContent: " + removeToolContent);
-	    	
-	    	if ((removeToolContent != null) && (removeToolContent.equals("1")))
-			{
-		    	logger.debug("user request to remove the content");
-		    	Long fromContentId=new Long(strToolContentId);
-		    	logger.debug("fromContentId: " + fromContentId);
-
-		    	try
-				{
-		    		voteService.removeToolContent(fromContentId, true);
-				}
-		    	catch(ToolException e)
-				{
-		    		VoteUtils.cleanUpSessionAbsolute(request);
-		    		logger.debug("error removing the content: " + e);
-				}
-			}
-	    	
-	    	String setDefineLater= (String) request.getParameter("setDefineLater");
-	    	logger.debug("setDefineLater: " + setDefineLater);
-	    	
-	    	if ((setDefineLater != null) && (setDefineLater.equals("1")))
-			{
-		    	logger.debug("user request to set content as define later");
-		    	Long fromContentId=new Long(strToolContentId);
-		    	logger.debug("fromContentId: " + fromContentId);
-
-		    	try
-				{
-		    		voteService.setAsDefineLater(fromContentId);
-				}
-		    	catch(ToolException e)
-				{
-		    		VoteUtils.cleanUpSessionAbsolute(request);
-		    		logger.debug("error setting the define later on the content: " + e);
-				}
-			}
-
-	    	
-	    	String strSetRunoffline= (String) request.getParameter("strSetRunoffline");
-	    	logger.debug("strSetRunoffline: " + strSetRunoffline);
-	    	
-	    	if ((setDefineLater != null) && (setDefineLater.equals("1")))
-			{
-		    	logger.debug("user request to set content as run offline");
-		    	Long fromContentId=new Long(strToolContentId);
-		    	logger.debug("fromContentId: " + fromContentId);
-
-		    	try
-				{
-		    		voteService.setAsRunOffline(fromContentId);
-				}
-		    	catch(ToolException e)
-				{
-		    		VoteUtils.cleanUpSessionAbsolute(request);
-		    		logger.debug("error setting the run offline on the content: " + e);
-				}
-			}
-	    	/* ...testing code ends here*/
-	    	
 
 	    	/*
 			 * find out if the passed tool content id exists in the db 
@@ -390,7 +293,7 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 	{
 		logger.debug("starting initialiseAttributes...");
 		
-		/* needs to run only once per tool*/ 
+		/* for development: needs to run only once per tool*/ 
 		/* VoteUtils.configureContentRepository(request, voteService); */
 		
 		/* these two are for Instructions jsp */
