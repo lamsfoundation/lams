@@ -39,7 +39,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
-import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McApplicationException;
 import org.lamsfoundation.lams.tool.mc.McComparator;
@@ -215,55 +214,6 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    Long toolSessionID=(Long) request.getSession().getAttribute(AttributeNames.PARAM_TOOL_SESSION_ID);
 	    logger.debug("retrieved toolSessionID: " + toolSessionID);
 	    
-	    /* API test code from here*/
-	    String createToolSession=request.getParameter("createToolSession");
-		logger.debug("createToolSession: " + createToolSession);
-		if ((createToolSession != null) && createToolSession.equals("1"))
-		{	try
-			{
-				mcService.createToolSession(toolSessionID, "toolSessionName", new Long(9876));
-				return (mapping.findForward(LEARNING_STARTER));
-			}
-			catch(ToolException e)
-			{
-				McUtils.cleanUpSessionAbsolute(request);
-				logger.debug("tool exception"  + e);
-			}
-		}
-		
-		String removeToolSession=request.getParameter("removeToolSession");
-		logger.debug("removeToolSession: " + removeToolSession);
-		if ((removeToolSession != null) && removeToolSession.equals("1"))
-		{	try
-			{
-				mcService.removeToolSession(toolSessionID);
-				return (mapping.findForward(LEARNING_STARTER));
-			}
-			catch(ToolException e)
-			{
-				McUtils.cleanUpSessionAbsolute(request);
-				logger.debug("tool exception"  + e);
-			}
-		}
-		
-		String learnerId=request.getParameter("learnerId");
-		logger.debug("learnerId: " + learnerId);
-		if (learnerId != null) 
-		{	try
-			{
-				String nextUrl=mcService.leaveToolSession(toolSessionID, new Long(learnerId));
-				logger.debug("nextUrl: "+ nextUrl);
-				return (mapping.findForward(LEARNING_STARTER));
-			}
-			catch(ToolException e)
-			{
-				McUtils.cleanUpSessionAbsolute(request);
-				logger.debug("tool exception"  + e);
-			}
-		}
-		/*till here*/
-	    
-		
 		/*
 		 * by now, we made sure that the passed tool session id exists in the db as a new record
 		 * Make sure we can retrieve it and the relavent content
@@ -332,11 +282,13 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    	/*only allowing combined view in the preview mode. Might be improved to support sequential view as well. */
 	    	request.getSession().setAttribute(QUESTION_LISTING_MODE, QUESTION_LISTING_MODE_COMBINED);
 	    	/* PREVIEW_ONLY for jsp*/
-	    	request.getSession().setAttribute(PREVIEW_ONLY, new Boolean(true).toString());
+	    	//request.getSession().setAttribute(PREVIEW_ONLY, new Boolean(true).toString());
 	    	
 	    	request.getSession().setAttribute(CURRENT_QUESTION_INDEX, "1");
     		McLearningAction mcLearningAction= new McLearningAction();
-	    	return mcLearningAction.redoQuestions(request, mcLearningForm, mapping);
+	    	//return mcLearningAction.redoQuestions(request, mcLearningForm, mapping);
+    		/*presenting the teacher with a view of how students normally take the activity*/
+    		return (mapping.findForward(LOAD_LEARNER));
     	}
 	    
     	/* by now, we know that the mode is either teacher or learner
@@ -505,6 +457,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    	logger.debug("present to teacher learners progress...");
 	    	return mcLearningAction.viewAnswers(mapping, form, request, response);	
 	    }
+	    logger.debug("just presenting standard learner screen");
 	    return (mapping.findForward(LOAD_LEARNER));	
 	}
 	

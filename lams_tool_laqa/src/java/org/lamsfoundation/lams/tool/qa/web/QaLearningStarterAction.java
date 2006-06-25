@@ -39,7 +39,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
-import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaApplicationException;
 import org.lamsfoundation.lams.tool.qa.QaComparator;
@@ -214,55 +213,6 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 		Long toolSessionId=(Long)request.getSession().getAttribute(TOOL_SESSION_ID);
 		logger.debug("toolSessionId: " + toolSessionId);
 		
-	    /* API test code , from  here*/
-	    String createToolSession=request.getParameter("createToolSession");
-		logger.debug("createToolSession: " + createToolSession);
-		if ((createToolSession != null) && createToolSession.equals("1"))
-		{	try
-			{
-				logger.debug("creating test session with toolSessionId:" + toolSessionId);
-				qaService.createToolSession(toolSessionId, "toolSessionName", new Long(9876));
-				return (mapping.findForward(LEARNING_STARTER));
-			}
-			catch(ToolException e)
-			{
-				QaUtils.cleanUpSessionAbsolute(request);
-				logger.debug("tool exception: "  + e);
-			}
-		}
-
-		String removeToolSession=request.getParameter("removeToolSession");
-		logger.debug("removeToolSession: " + removeToolSession);
-		if ((removeToolSession != null) && removeToolSession.equals("1"))
-		{	try
-			{
-				qaService.removeToolSession(toolSessionId);
-				return (mapping.findForward(LEARNING_STARTER));
-			}
-			catch(ToolException e)
-			{
-				QaUtils.cleanUpSessionAbsolute(request);
-				logger.debug("tool exception"  + e);
-			}
-		}
-
-		String learnerId=request.getParameter("learnerId");
-		logger.debug("learnerId: " + learnerId);
-		if (learnerId != null) 
-		{	try
-			{
-				String nextUrl=qaService.leaveToolSession(toolSessionId, new Long(learnerId));
-				logger.debug("nextUrl: "+ nextUrl);
-				return (mapping.findForward(LEARNING_STARTER));
-			}
-			catch(ToolException e)
-			{
-				QaUtils.cleanUpSessionAbsolute(request);
-				logger.debug("tool exception"  + e);
-			}
-		}
-		/* API test code , till here*/
-		
 
 	    /*
 	     * By now, the passed tool session id MUST exist in the db by calling:
@@ -405,7 +355,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 			logger.debug("existing qaContent:" + qaContent);
 			
 			/* overwrite questionListing mode for preview*/
-			request.getSession().setAttribute(QUESTION_LISTING_MODE, QUESTION_LISTING_MODE_PREVIEW);
+			//request.getSession().setAttribute(QUESTION_LISTING_MODE, QUESTION_LISTING_MODE_PREVIEW);
 			logger.debug("forwarding to for preview: " + LOAD_LEARNER);
 			return (mapping.findForward(LOAD_LEARNER));	
     	}
