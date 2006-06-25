@@ -45,6 +45,9 @@ import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.contentrepository.service.RepositoryProxy;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
+import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
+import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
+import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.ToolContentManager;
@@ -107,6 +110,8 @@ public class VoteServicePOJO implements
     private ILearnerService 		learnerService;
     private IAuditService 			auditService;
     private ILamsToolService 		toolService;
+	private IExportToolContentService exportContentService;
+	
     private IToolContentHandler voteToolContentHandler = null;
     
     public VoteServicePOJO(){}
@@ -1568,7 +1573,30 @@ public class VoteServicePOJO implements
      * @throws ToolException if any other error occurs
      */
 
-	public void exportToolContent(Long toolContentId, String toPath) throws DataMissingException, ToolException {
+	public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
+		VoteContent toolContentObj = voteContentDAO.findVoteContentById(toolContentId);
+ 		if(toolContentObj == null)
+ 			throw new DataMissingException("Unable to find tool content by given id :" + toolContentId);
+ 		
+		try {
+			//set ToolContentHandler as null to avoid copy file node in repository again.
+			toolContentObj = VoteContent.newInstance(null,toolContentObj,toolContentId);
+			
+			//clear unnecessary information attach
+			toolContentObj.setVoteSessions(null);
+			Set<VoteQueContent> ques = toolContentObj.getVoteQueContents();
+			for(VoteQueContent que : ques){
+				que.setMcUsrAttempts(null);
+			}
+			exportContentService.registerFileClassForExport(VoteUploadedFile.class.getName(),"uuid",null);
+			exportContentService.exportToolContent( toolContentId, toolContentObj,voteToolContentHandler, rootPath);
+		} catch (ExportToolContentException e) {
+			throw new ToolException(e);
+		} catch (ItemNotFoundException e) {
+			throw new ToolException(e);
+		} catch (RepositoryCheckedException e) {
+			throw new ToolException(e);
+		}
 	}
 
     /**
@@ -1577,7 +1605,23 @@ public class VoteServicePOJO implements
      * @throws ToolException if any other error occurs
      */
 	public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath) throws ToolException {
-		
+		try {
+			exportContentService.registerFileClassForImport(VoteUploadedFile.class.getName()
+					,"uuid",null,"filename","fileProperty",null,null);
+			
+			Object toolPOJO =  exportContentService.importToolContent(toolContentPath,voteToolContentHandler);
+			if(!(toolPOJO instanceof VoteContent))
+				throw new ImportToolContentException("Import Vote tool content failed. Deserialized object is " + toolPOJO);
+			VoteContent toolContentObj = (VoteContent) toolPOJO;
+			
+//			reset it to new toolContentId
+			toolContentObj.setVoteContentId(toolContentId);
+			toolContentObj.setCreatedBy(newUserUid);
+			
+			voteContentDAO.saveVoteContent(toolContentObj);
+		} catch (ImportToolContentException e) {
+			throw new ToolException(e);
+		}
 	}
 
     /**
@@ -2517,4 +2561,14 @@ public class VoteServicePOJO implements
     public void setAuditService(IAuditService auditService) {
         this.auditService = auditService;
     }
+    
+	public IExportToolContentService getExportContentService() {
+		return exportContentService;
+	}
+
+
+	public void setExportContentService(IExportToolContentService exportContentService) {
+		this.exportContentService = exportContentService;
+	}
+
 }

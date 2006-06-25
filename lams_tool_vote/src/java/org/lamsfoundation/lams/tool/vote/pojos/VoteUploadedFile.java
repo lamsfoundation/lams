@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.tool.vote.pojos;
 
 import java.io.Serializable;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
@@ -108,10 +109,14 @@ public class VoteUploadedFile implements Serializable, Comparable
 
     	try
 		{
-    		NodeKey copiedNodeKey =  toolContentHandler.copyFile(new Long(mcUploadedFile.getUuid()));
-        	logger.debug("copied NodeKey: " + copiedNodeKey);
-        	logger.debug("copied NodeKey uuid: " + copiedNodeKey.getUuid().toString());
-        	newMcUploadedFile = new VoteUploadedFile(copiedNodeKey.getUuid().toString(),
+    		String fileUuid = mcUploadedFile.getUuid(); 
+    		if(toolContentHandler != null){
+	    		NodeKey copiedNodeKey =  toolContentHandler.copyFile(new Long(mcUploadedFile.getUuid()));
+	        	logger.debug("copied NodeKey: " + copiedNodeKey);
+	        	logger.debug("copied NodeKey uuid: " + copiedNodeKey.getUuid().toString());
+	        	fileUuid = copiedNodeKey.getUuid().toString();
+    		}
+        	newMcUploadedFile = new VoteUploadedFile(fileUuid,
 					mcUploadedFile.isFileOnline(),
 					mcUploadedFile.getFilename(),
 					newMcContent);
@@ -227,4 +232,20 @@ public class VoteUploadedFile implements Serializable, Comparable
     public void setVoteContent(VoteContent voteContent) {
         this.voteContent = voteContent;
     }
+    
+	public String getFileProperty() {
+		   if (isFileOnline())
+	        {
+	            return IToolContentHandler.TYPE_ONLINE;
+	        }
+	        else
+	            return IToolContentHandler.TYPE_OFFLINE;
+	}
+
+	public void setFileProperty(String fileProperty) {
+		if(StringUtils.equals(IToolContentHandler.TYPE_ONLINE,fileProperty))
+			this.fileOnline = true;
+		else
+			this.fileOnline = false;
+	}	
 }
