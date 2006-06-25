@@ -53,33 +53,22 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	  <html:form  action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
   		<html:hidden property="method"/>	 
 			<table width="80%" cellspacing="8" align="CENTER" class="forms">
-		
-			<c:if test="${questionListingMode != 'questionListingModePreview'}"> 						
-				<tr><td NOWRAP valign=top>
-					 <c:out value="${sessionScope.activityTitle}" escapeXml="false"/> 
-				</td></tr>
-			</c:if> 		
-			
-			<c:if test="${questionListingMode == 'questionListingModePreview'}"> 						
-				<tr><th scope="col" NOWRAP valign=top>
-					<font size=2> <b> <bean:message key="label.preview"/> </b> </font>
-				</th></tr>
-				<tr><td NOWRAP valign=top>
-					&nbsp&nbsp&nbsp&nbsp&nbsp
-				</td></tr>
-			</c:if> 		
-			
-			<c:if test="${questionListingMode != 'questionListingModePreview'}"> 						
-				<tr> <td>
-					<html:errors/>
-				</td></tr>
 
-				<c:if test="${sessionScope.isDefineLater == 'true'}"> 			
-					<tr> <td>
-						<bean:message key="error.defineLater"/>
-					</td></tr>
-				</c:if> 		
-			</c:if>														  					 									  													  			
+			<tr><td NOWRAP valign=top>
+				 <c:out value="${sessionScope.activityTitle}" escapeXml="false"/> 
+			</td></tr>
+
+
+			<tr> <td>
+				<html:errors/>
+			</td></tr>
+
+			<c:if test="${sessionScope.isDefineLater == 'true'}"> 			
+				<tr> <td>
+					<bean:message key="error.defineLater"/>
+				</td></tr>
+			</c:if> 		
+
 			
 			<c:if test="${sessionScope.isDefineLater == 'false'}"> 			
 				<c:if test="${sessionScope.isToolActivityOffline == 'true'}"> 			
@@ -102,10 +91,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							<jsp:include page="/learning/SequentialAnswersContent.jsp" /> 
 					  </c:when> 
 
-  					  <c:when test="${sessionScope.questionListingMode == sessionScope.questionListingModePreview}" > 
-							<jsp:include page="/learning/Preview.jsp" /> 
-					  </c:when> 
-					  
 					  <c:otherwise>
 						  	<jsp:include page="/learning/CombinedAnswersContent.jsp" /> 
 					  </c:otherwise>
