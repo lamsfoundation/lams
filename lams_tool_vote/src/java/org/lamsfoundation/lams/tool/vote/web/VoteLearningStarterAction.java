@@ -217,7 +217,9 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 		/* PREVIEW_ONLY for jsp*/
     	request.getSession().setAttribute(PREVIEW_ONLY, new Boolean(true).toString());
     	VoteLearningAction voteLearningAction= new VoteLearningAction();
-    	return voteLearningAction.redoQuestions(mapping, form, request, response);
+    	//return voteLearningAction.redoQuestions(mapping, form, request, response);
+    	logger.debug("presenting standard learner screen forpreview mode...");
+        return (mapping.findForward(LOAD_LEARNER));	
 	}
     
 	/* by now, we know that the mode is either teacher or learner
@@ -395,6 +397,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
     	logger.debug("present to teacher learners progress...");
     	return null;
     }
+    logger.debug("presenting standard learner screen..");
     return (mapping.findForward(LOAD_LEARNER));	
 }
 
