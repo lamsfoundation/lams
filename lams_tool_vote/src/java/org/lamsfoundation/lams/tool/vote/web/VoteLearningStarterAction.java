@@ -40,7 +40,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
-import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
 import org.lamsfoundation.lams.tool.vote.VoteComparator;
@@ -394,7 +393,6 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
     {
     	VoteLearningAction voteLearningAction= new VoteLearningAction();
     	logger.debug("present to teacher learners progress...");
-    	//return voteLearningAction.viewAnswers(mapping, form, request, response);
     	return null;
     }
     return (mapping.findForward(LOAD_LEARNER));	

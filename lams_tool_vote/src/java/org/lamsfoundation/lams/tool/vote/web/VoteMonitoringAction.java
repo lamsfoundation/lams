@@ -309,13 +309,13 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
     	    	    VoteSession localUserSession=voteUsrAttempt.getVoteQueUsr().getVoteSession();
     	    	    logger.debug("localUserSession: " + localUserSession);
     	    	    logger.debug("localUserSession's content id: " + localUserSession.getVoteContentId()); 
-    	    	    logger.debug("incoming content id versus localUserSession's content id: " + voteContent.getVoteContentId() + " versus " +  localUserSession.getVoteContentId());
+    	    	    logger.debug("incoming content uid versus localUserSession's content id: " + voteContent.getUid() + " versus " +  localUserSession.getVoteContentId());
 
 	    	    	if (showUserEntriesBySession == false)
 	    	    	{
 	    	    	    logger.debug("showUserEntriesBySession is false");	    	    	    
 	    	    	    logger.debug("show user  entries  by same content only");
-	    	    	    if (voteContent.getVoteContentId().toString().equals(localUserSession.getVoteContentId().toString()))
+	    	    	    if (voteContent.getUid().toString().equals(localUserSession.getVoteContentId().toString()))
 	    	    	    {
 			    			voteMonitoredUserDTO.setAttemptTime(voteUsrAttempt.getAttemptTime().toString());
 			    			voteMonitoredUserDTO.setTimeZone(voteUsrAttempt.getTimeZone());
@@ -336,7 +336,7 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	    	    	    
 	    	    	    if (showUserEntriesByUserId == true)
 	    	    	    {
-	    	    	        if (voteContent.getVoteContentId().toString().equals(localUserSession.getVoteContentId().toString()))
+	    	    	        if (voteContent.getUid().toString().equals(localUserSession.getVoteContentId().toString()))
 		    	    	    {
 			    	    	    logger.debug("showUserEntriesByUserId is true");
 			    	    	    if (userSessionId.equals(currentSessionId))
