@@ -106,7 +106,7 @@
 				</tr>
 				<tr valign="bottom">
 					<td align="left">
-						<A HREF="copyright.jsp" onClick="window.open('copyright.jsp','copyright','resizable,width=570,height=250,scrollbars');return false;">
+						<A HREF="copyright.jsp" target='copyright' onClick="window.open('copyright.jsp','copyright','resizable,width=570,height=250,scrollbars');return false;">
 							&copy; <fmt:message key="msg.LAMS.copyright.short"/>
 						</a>
 					</td>

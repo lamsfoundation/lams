@@ -36,9 +36,9 @@
 				</tr>
 				<tr>
 					<td align="left">
-						<A HREF="<fmt:message key="msg.LAMS.copyright.statement.url"/>" 
+						<A HREF="<fmt:message key="msg.LAMS.copyright.statement.url"/>"  target='copyright2'
 						onClick="window.open('<fmt:message key="msg.LAMS.copyright.statement.url"/>','copyright2','resizable,width=650,height=650,scrollbars');return false;">
-							&copy; <fmt:message key="msg.LAMS.copyright.statement.url"/>
+							<fmt:message key="msg.LAMS.copyright.statement.url"/>
 						</a>
 					</td>
 				</tr>
