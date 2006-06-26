@@ -69,13 +69,10 @@
 			<img height="1" src="images/spacer.gif" width="200" alt="spacer.gif"/>
 		</td>
 	</tr>
-	<tr valign="bottom" class="lightNote">
-		<td>
-			<a href="javascript:alert('<fmt:message key="msg.LAMS.copyright.long"/>');" class="lightNoteLink">&copy; <fmt:message key="msg.LAMS.copyright.short"/>
-			</a>
+	<tr valign="bottom">
+		<td align="left" colspan="2">	
+			&copy; <fmt:message key="msg.LAMS.copyright.short"/>
 		</td>
-		<td align="right"> 
-			<fmt:message key="msg.LAMS.version"/>
-		</td>
+		<td align="right"><fmt:message key="msg.LAMS.version"/></td>
 	</tr>
 </table>

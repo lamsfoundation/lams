@@ -105,9 +105,9 @@
 					</td>
 				</tr>
 				<tr valign="bottom">
-					<td align="left">	
-						<a href="javascript:alert('<fmt:message key="msg.LAMS.copyright.long"/>');" 
-								class="lightNoteLink">&copy; <fmt:message key="msg.LAMS.copyright.short"/>
+					<td align="left">
+						<A HREF="copyright.jsp" onClick="window.open('copyright.jsp','copyright','resizable,width=570,height=250,scrollbars');return false;">
+							&copy; <fmt:message key="msg.LAMS.copyright.short"/>
 						</a>
 					</td>
 					<td align="right"><fmt:message key="msg.LAMS.version"/></td>
