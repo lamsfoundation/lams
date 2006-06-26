@@ -49,7 +49,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	private var _cv:Canvas;
 	private var _ddm:DesignDataModel;
 	private var optionalCA:CanvasOptionalActivity;
-	//UI State variabls	private var _isDirty:Boolean;
+	//UI State variabls
+	private var _isDirty:Boolean;
 	private var _activeTool:String;
 	private var _selectedItem:Object;  // the currently selected thing - could be activity, transition etc.
 	private var _isDrawingTransition:Boolean;
@@ -61,7 +62,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	//these are hashtables of mc refs MOVIECLIPS (like CanvasActivity or CanvasTransition)
 	//each on contains a reference to the emelment in the ddm (activity or transition)
 	private var _activitiesDisplayed:Hashtable;
-	private var _transitionsDisplayed:Hashtable;
+	private var _transitionsDisplayed:Hashtable;
+
 	//These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
     public var addEventListener:Function;
@@ -160,7 +162,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	public function getPIHeight(){
 		trace ("returning pi height: "+_piHeight)
 		return _piHeight;
-	}	public function setDirty(){
+	}
+	public function setDirty(){
 		_isDirty = true;
 		
 		if(getCanvas().ddm.learningDesignID == undefined){
@@ -260,16 +263,16 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		Debugger.log('gateAct.xCoord:'+gateAct.xCoord,Debugger.GEN,'createGateTransition','CanvasModel');
 
 		_cv.ddm.addActivity(gateAct);
-		
+		_cv.ddm.removeTransition(transitionUIID);
 		//create the from trans
 		addActivityToTransition(fromAct);
 		addActivityToTransition(gateAct);
-		
+		resetTransitionTool()
 		//create the to trans
 		addActivityToTransition(gateAct);
 		addActivityToTransition(toAct);
+		resetTransitionTool()
 		
-		_cv.ddm.removeTransition(transitionUIID);
 		
 		//flag the model as dirty and trigger a refresh
 		setDirty();	
@@ -478,55 +481,42 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 		
 		if(_transitionActivities.length == 2){
 			//check we have 2 valid acts to create the transition.
-			/*if(_transitionActivities[0].activityUIID == _transitionActivities[1].activityUIID){
-				return new LFError("You cannot create a Transition between the same Activities.");
+			if(_transitionActivities[0].activityUIID == _transitionActivities[1].activityUIID){
+				return new LFError("You cannot create a Transition between the same Activities","addActivityToTransition",this);
 			}
 			if(!_cv.ddm.activities.containsKey(_transitionActivities[0].activityUIID)){
-				return new LFError("First activity of the Transition is missing.");
-			}*/
-			if(!_cv.ddm.activities.containsKey(_transitionActivities[1].activityUIID)){
-				return new LFError(Dictionary.getValue('cv_trans_target_act_missing'));
+				return new LFError("First activity of the Transition is missing, UIID:"+_transitionActivities[0].activityUIID,"addActivityToTransition",this);
 			}
-			
+			if(!_cv.ddm.activities.containsKey(_transitionActivities[1].activityUIID)){
+				return new LFError(Dictionary.getValue('cv_trans_target_act_missing'),"addActivityToTransition",this);
+			}
 			//check there is not already a transition to or from this activity:
 			var transitionsArray:Array = _cv.ddm.transitions.values();
 			/**/
 			for(var i=0;i<transitionsArray.length;i++){
+				//if (transitionsArray[i].fromUIID != null && transitionsArray[i].toUIID == null){
+				//	trace("first activtiy in design is "+transitionsArray[i].fromUIID)
+				//}
 				
 				if(transitionsArray[i].toUIID == _transitionActivities[1].activityUIID){
-					//trace("transition allready exist of this activity 'TO UIID'")
-					return new LFError(Dictionary.getValue('cv_invalid_trans_target_toactivtiy', [_transitionActivities[1].title]));
+					return new LFError(Dictionary.getValue('cv_invalid_trans_target_toactivtiy',[_transitionActivities[1].title]));
 				}
-				
 				if(transitionsArray[i].fromUIID == _transitionActivities[0].activityUIID){
-					//trace("transition allready exist of this activity 'FROM UIID'")
-					return new LFError(Dictionary.getValue('cv_invalid_trans_target_fromactivtiy', [_transitionActivities[0].title]));
+					return new LFError(Dictionary.getValue('cv_invalid_trans_target_fromactivtiy',[_transitionActivities[0].title]));
 				}
 			}
-			
-			//TODO: Check for loop
-			//TODO: Check for activity inside optional
-			
 			
 			Debugger.log('No validation errors, creating transition.......',Debugger.GEN,'addActivityToTransition','CanvasModel');
 			//lets make the transition
 			var t:Transition = createTransition(_transitionActivities);
-			
-			
 			//add it to the DDM
 			var success:Object = _cv.ddm.addTransition(t);
 			//flag the model as dirty and trigger a refresh
 			setDirty();
-			
 			setSelectedItem(_transitionsDisplayed.get(t.transitionUIID));
-			
 			_cv.stopTransitionTool();
 			
 		}
-		
-		
-		
-		
 		return true;
 	}
 	
@@ -644,7 +634,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 	 */
 	private function refreshDesign(){
 	
-		//porobbably need to get a bit more granular		Debugger.log('Running',Debugger.GEN,'refreshDesign','CanvasModel');
+		//porobbably need to get a bit more granular
+		Debugger.log('Running',Debugger.GEN,'refreshDesign','CanvasModel');
 		//go through the design and see what has changed, compare DDM to canvasModel
 		var ddmActivity_keys:Array = _cv.ddm.activities.keys();
 		Debugger.log('ddmActivity_keys.length:'+ddmActivity_keys.length,Debugger.GEN,'refreshDesign','CanvasModel');
@@ -682,7 +673,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends Observable {
 			
 			
 			var ddm_activity:Activity = _cv.ddm.activities.get(keyToCheck);
-			var cm_activity:Activity = _activitiesDisplayed.get(keyToCheck).activity;			//if they are the same (ref should point to same act) then nothing to do.
+			var cm_activity:Activity = _activitiesDisplayed.get(keyToCheck).activity;
+			//if they are the same (ref should point to same act) then nothing to do.
 			//if the ddm does not have an act displayed then we need to remove it from the cm
 			//if the ddm has an act that cm does not ref, then we need to add it.
 			
