@@ -128,7 +128,7 @@ public class ChatMessage implements java.io.Serializable {
 	}
 
 	/**
-	 * @hibernate.property column="body" length="255"
+	 * @hibernate.property column="body" type="text"
 	 */
 	public String getBody() {
 		return body;
