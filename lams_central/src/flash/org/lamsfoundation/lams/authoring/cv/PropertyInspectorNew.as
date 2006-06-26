@@ -59,8 +59,9 @@ class PropertyInspectorNew extends MovieClip{
     private var desc_lbl:Label;
     private var desc_txt:TextInput;
     private var piHeightHide:Number = 23;
-	private var piHeightFull:Number = 120;
+	private var piHeightFull:Number = 106;
 	private var grouping_lbl:Label;
+	private var applied_grouping_lbl:Label;
 	//private var grouping_opt_lbl:Label;
 	private var currentGrouping_lbl:Label;
 	private var appliedGroupingActivity_cmb:ComboBox;
@@ -316,7 +317,7 @@ class PropertyInspectorNew extends MovieClip{
 				showRelevantGroupOptions();
 				showToolActivityControls(false);
 				showGateControls(false);
-				showAppliedGroupingControls(true);
+				showAppliedGroupingControls(false);
 				//showGeneralProperties(a)
 				populateGroupingProperties(GroupingActivity(a));
 				showAppliedGroupingProperties(a);
@@ -331,9 +332,10 @@ class PropertyInspectorNew extends MovieClip{
 				showOptionalControls(false);
 				showGeneralControls(true);
 				showGroupingControls(false);
+				showAppliedGroupingControls(true);
 				showToolActivityControls(true);
 				showGateControls(false);
-				showAppliedGroupingControls(true);
+				//showAppliedGroupingControls(true);
 				showToolActivityProperties(ToolActivity(a));
 				//showGeneralProperties(a)
 				showAppliedGroupingProperties(a);
@@ -355,7 +357,7 @@ class PropertyInspectorNew extends MovieClip{
 				//showRelevantGroupOptions();
 				showToolActivityControls(false);
 				showGateControls(false);
-				showAppliedGroupingControls(true);
+				showAppliedGroupingControls(false);
 				showOptionalControls(true);
 				//showGeneralProperties(cca)
 				populateGroupingProperties(GroupingActivity(cca));
@@ -420,6 +422,18 @@ class PropertyInspectorNew extends MovieClip{
 			
 		//desc_lbl.visible = v;
 		//desc_txt.visible = v;
+		var a = _canvasModel.selectedItem.activity;
+		var parentAct = _canvasModel.getCanvas().ddm.getActivityByUIID(a.parentUIID)
+		if (a.parentUIID != null && parentAct.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE) {
+			applied_grouping_lbl.visible = v
+			appliedGroupingActivity_cmb.visible = false;
+			
+		}else {
+			applied_grouping_lbl.visible = false
+			appliedGroupingActivity_cmb.visible = v;
+		}
+		
+		
 		grouping_lbl.visible = v;
 		currentGrouping_lbl.visible = v;
 		runOffline_chk.visible = v;
@@ -477,9 +491,18 @@ class PropertyInspectorNew extends MovieClip{
 		//trace('show grp controls.....'+v);
 		grouping_lbl.visible = v;
 		appliedGroupingActivity_cmb.visible = v;
-		
-		
-		
+		//checkEnabledGroupControl()
+	
+	}
+	
+	private function checkEnabledGroupControl(){
+		var ca = _canvasModel.selectedItem;
+		var parentAct = _canvasModel.getCanvas().ddm.getActivityByUIID(ca.activity.parentUIID)
+		if (ca.activity.parentUIID != null && parentAct.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE) {
+			appliedGroupingActivity_cmb.enabled = false;
+		}else {
+			appliedGroupingActivity_cmb.enabled = false;
+		}
 	}
 	
 	private function showGroupingControls(v:Boolean){
@@ -622,12 +645,9 @@ class PropertyInspectorNew extends MovieClip{
 			Debugger.log('dp[i].data.createGroupingID:'+dp[i].data.createGroupingID,Debugger.GEN,'showAppliedGroupingProperties','PropertyInspector');
 			if(appliedGroupingAct.activityUIID == dp[i].data.activityUIID){
 				appliedGroupingActivity_cmb.selectedIndex = i;
+				applied_grouping_lbl.text = dp[i].label
 			}
-			
-		}
-		
-		
-		
+		}	
 	}
 
 		
@@ -677,7 +697,6 @@ class PropertyInspectorNew extends MovieClip{
 		numRandomGroups_stp.visible = true;
 		
 	}
-	
 	
 	private function checkEnableGateControls(){
 		//Debugger.log('Activity.SCHEDULE_GATE_ACTIVITY_TYPE:'+Activity.SCHEDULE_GATE_ACTIVITY_TYPE,Debugger.GEN,'checkEnableGateControls','PropertyInspector');
@@ -816,6 +835,7 @@ class PropertyInspectorNew extends MovieClip{
 		numGroups_lbl.setStyle('styleName',styleObj);
 		numLearners_lbl.setStyle('styleName',styleObj);
 		groupType_lbl.setStyle('styleName',styleObj);
+		applied_grouping_lbl.setStyle('styleName',styleObj);
 		//grouping_opt_lbl.setStyle('styleName',styleObj);
 		title_txt.setStyle('styleName',styleObj);
 		desc_txt.setStyle('styleName',styleObj);
@@ -890,13 +910,25 @@ class PropertyInspectorNew extends MovieClip{
 	}
 	
 	private function onAppliedGroupingChange(evt:Object){
-		var a = _canvasModel.selectedItem.activity;
+		var a = _canvasModel.selectedItem;
 		//get the groupingUIID of the grouping Actviity we have selected.
 		var newGroupingUIID = evt.target.value.createGroupingUIID;
-		a.groupingUIID = newGroupingUIID;
+		a.activity.groupingUIID = newGroupingUIID;
+		trace("activity Type is for "+a.activity.title+ " is: "+a.activity.activityTypeID)
+		if (a.activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE){
+			trace("Number of Children are: "+a.actChildren.length)
+			for (var k=0; k<a.actChildren.length; k++){
+				trace("Child has title : "+a.actChildren[k].title)
+				a.actChildren[k].groupingUIID = newGroupingUIID;
+				//var ca = CanvasActivity(a.actChildren[k])
+				//ca.refresh();
+			}
+			a.init();
+		}
 		
-		Debugger.log('Set grouping UIID to: '+a.groupingUIID ,Debugger.GEN,'onAppliedGroupingChange','PropertyInspector');
-		_canvasModel.selectedItem.refresh();
+		Debugger.log('Set grouping UIID to: '+a.activity.groupingUIID ,Debugger.GEN,'onAppliedGroupingChange','PropertyInspector');
+		//_canvasModel.selectedItem.refresh();
+		a.refresh()
 	}
 	
 	/**
