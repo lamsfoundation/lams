@@ -20,7 +20,6 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ************************************************************************
  */
-
 import org.lamsfoundation.lams.common.ws.*;
 import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.common.dict.*
@@ -69,6 +68,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 	private var _treeDP:XML;
 
 	private var _selectedTreeNode:XMLNode;
+	private var _currentOpenNode:Object;	// node of the current file which is open on the canvas
 	
 	private var _currentTab:String; //tells us which tab should be displayed - LOCATION or PROPERTIES
 	private var _defaultTab:String;
@@ -158,6 +158,20 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 		
 	}
 	
+	/**
+	 * Populates title, descript and license details in workspace.
+	 * @usage   
+	 * @param   currentDTO
+	 * @return  
+	 */
+	public function showCurrentDetails(currentDTO:Object){
+		if(currentDTO != null){
+			Debugger.log('issuing broadcast for prop details',Debugger.CRITICAL,'showCurrentDetails','org.lamsfoundation.lams.WorkspaceModel');
+			broadcastViewUpdate('UPDATED_PROP_DETAILS', currentDTO);
+		} else {
+			Debugger.log('DTO is null',Debugger.CRITICAL,'showCurrentDetails','org.lamsfoundation.lams.WorkspaceModel');
+		}
+	}
 	
 	/**
     * Notify registered listeners that a data model change has happened.
@@ -579,6 +593,23 @@ class org.lamsfoundation.lams.common.ws.WorkspaceModel extends Observable {
 	 */
 	public function getSelectedTreeNode ():XMLNode {
 		return _selectedTreeNode;
+	}
+
+	/**
+	 * Sets the currently open design
+	 * @param   currentOpenNode 
+	 */
+	public function set currentOpenNode(currentOpenNode:Object):Void {
+		_currentOpenNode = currentOpenNode;
+	}
+	
+	/**
+	 * Returns current open/saved tree node in workspace
+	 * 
+	 */
+	
+	public function get currentOpenNode():Object {
+		return _currentOpenNode;
 	}
 
 	/**

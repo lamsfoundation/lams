@@ -221,6 +221,7 @@ class WorkspaceDialog extends MovieClip{
         setUpTreeview();
 		
 		itemSelected(treeview.selectedNode);
+		
 	}
 	
 	/**
@@ -239,6 +240,7 @@ class WorkspaceDialog extends MovieClip{
 	   switch (event.updateType){
 			case 'POPULATE_LICENSE_DETAILS' :
 				populateAvailableLicenses(event.data, wm);
+				break;
 			case 'REFRESH_TREE' :
                 refreshTree(wm);
                 break;
@@ -260,6 +262,9 @@ class WorkspaceDialog extends MovieClip{
 				break;
 			case 'SHOW_TAB' :
 				showTab(event.data,wm);
+				break;
+			case 'UPDATED_PROP_DETAILS' :
+				populatePropDetails(event.data, wm);
 				break;
 			case 'SET_UP_BRANCHES_INIT' :
 				setUpBranchesInit();
@@ -360,15 +365,29 @@ class WorkspaceDialog extends MovieClip{
 	private function itemSelected(newSelectedNode:XMLNode,wm:WorkspaceModel){
 		//update the UI with the new info:
 		//_global.breakpoint();
+
 		//Only update the details if the node if its a resource:a
 		var nodeData = newSelectedNode.attributes.data;
+		
 		if(nodeData.resourceType == _workspaceModel.RT_FOLDER){
+			
 			resourceTitle_txi.text = "";
-			resourceDesc_txa.text = "";
-				
+			
+			if(wm.currentMode != 'SAVEAS'){	
+				resourceDesc_txa.text = "";
+				license_txa.text = "";
+				licenseID_cmb.selectedIndex = 0;
+			}
+			
 		}else{
+			
 			resourceTitle_txi.text = nodeData.name;
-			resourceDesc_txa.text = nodeData.description;
+			if(StringUtils.isNull(nodeData.description)){
+				resourceDesc_txa.text = "";
+			} else {
+				resourceDesc_txa.text = nodeData.description;
+			}
+			
 			Debugger.log('nodeData.licenseID:'+nodeData.licenseID,Debugger.GEN,'itemSelected','org.lamsfoundation.lams.ws.WorkspaceDialog');
 			//find the SI of the license we need:
 			//check if a license ID has been selected:
@@ -378,19 +397,49 @@ class WorkspaceDialog extends MovieClip{
 						licenseID_cmb.selectedIndex = i;
 					}
 				}
-				license_txa.text = nodeData.licenseText;
+				onLicenseComboSelect();
+				
 			}else{
 				licenseID_cmb.selectedIndex = 0;
 			}
 			
-			
-			
-			//TODO These Items must also be in the FolderContentsDTO
-			/*
-			license_txa.text = ;
-			licenseID_cmb.value = ;
-			*/
+			if(StringUtils.isNull(nodeData.licenseText)){
+				license_txa.text = "";
+			} else {
+				license_txa.text = nodeData.licenseText;
+			}
 		
+		}
+		
+	}
+	
+	private function populatePropDetails(details:Object){
+		Debugger.log('Populating properties details:'+details,Debugger.GEN,'populatePropDetails','org.lamsfoundation.lams.ws.WorkspaceDialog');
+		
+		if(details == null){
+			Debugger.log('Error - empty details:'+details,Debugger.GEN,'populatePropDetails','org.lamsfoundation.lams.ws.WorkspaceDialog');
+		
+		}
+		
+		resourceDesc_txa.text = details.description;
+			
+		if(details.licenseID > 0){
+			
+			for(var i=0; i<licenseID_cmb.dataProvider.length; i++){
+				if(licenseID_cmb.dataProvider[i].data.licenseID == details.licenseID){
+					licenseID_cmb.selectedIndex = i;
+				}
+			}
+			onLicenseComboSelect();
+		
+		}else{
+			licenseID_cmb.selectedIndex = 0;
+		}
+			
+		if(details.licenseText == undefined){
+			license_txa.text = "";
+		} else {
+			license_txa.text = details.licenseText;
 		}
 		
 	}
@@ -582,6 +631,7 @@ class WorkspaceDialog extends MovieClip{
 		}
 		
 		Debugger.log('_workspaceModel.currentMode: ' + _workspaceModel.currentMode,Debugger.GEN,'ok','org.lamsfoundation.lams.WorkspaceDialog');
+		
 		if(_workspaceModel.currentMode=="SAVE" || _workspaceModel.currentMode=="SAVEAS"){
 			saveFile(snode);
 		} else {

@@ -21,6 +21,7 @@
  * ************************************************************************
  */
 
+import org.lamsfoundation.lams.authoring.Application;
 import org.lamsfoundation.lams.common.ws.*
 import org.lamsfoundation.lams.common.mvc.*
 import org.lamsfoundation.lams.common.util.*
@@ -75,8 +76,16 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
 			evt.target.scrollContent.setUpContent();		
 			//populate the licenses drop down
 			_workspaceModel.populateLicenseDetails();			
+			
 			//select the right tab, dont pass anything to show the default tab
 			_workspaceModel.showTab(_workspaceModel.currentTab);
+			
+			// show details of current saved LD - Authoring only
+			if(_workspaceModel.currentMode == 'SAVEAS'){
+				_workspaceModel.currentOpenNode = Application.getInstance().getCanvas().ddm.getDesignForWorkspace();
+				trace('current open node (ltext): '  + _workspaceModel.currentOpenNode);
+				_workspaceModel.showCurrentDetails(_workspaceModel.currentOpenNode);
+			}
         }else {
             //TODO DI 25/05/05 raise wrong event type error 
         }
