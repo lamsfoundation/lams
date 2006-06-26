@@ -6,8 +6,13 @@
 <html>
 	<tiles:insert attribute="header" />
 	<body>
-		<div id="page">
-			<div id="header"></div>
+		<div id="page">	
+			<tiles:useAttribute name="pageTitleKey" />
+			<bean:define name="pageTitleKey" id="pTitleKey" type="String" />
+			<h1 class="no-tabs-below">
+				<bean:message key="${pTitleKey}" />
+			</h1>
+			<div id="header-no-tabs"></div>
 			<div id="content">
 				<tiles:insert attribute="body" />
 			</div>
