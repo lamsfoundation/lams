@@ -34,13 +34,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-import javax.servlet.http.HttpSession;
-
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.usermanagement.Organisation;
-import org.lamsfoundation.lams.usermanagement.OrganisationState;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -53,8 +49,6 @@ import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTOFactory;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.web.session.SessionManager;
-import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * <p>
@@ -96,10 +90,18 @@ public class UserManagementService implements IUserManagementService {
 	}
 	
 	public void save(Object object) {
-		if(object instanceof User){
-			object = createWorkspaceForUser((User)object);
+		try{
+			if(object instanceof User){
+				User user = (User)object;
+				object = createWorkspaceForUser(user);
+				if(user.getUserId()==null){
+					user.setPassword(HashUtil.sha1(user.getPassword()));
+				}
+			}
+			baseDAO.insertOrUpdate(object);
+		}catch(Exception e){
+			log.debug(e);
 		}
-		baseDAO.insertOrUpdate(object);
 	}
 
 	public void saveAll(Collection objects) {
@@ -385,23 +387,6 @@ public class UserManagementService implements IUserManagementService {
 			user.setWorkspace(workspace);
 		}
 		return user;
-	}
-
-	public Organisation saveOrganisation( Organisation organisation, Integer userID ) 
-	{
-
-		if ( organisation.getOrganisationId() == null ) {
-			Date createDateTime = new Date();
-			organisation.setCreateDate(createDateTime);
-
-			if(organisation.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.COURSE_TYPE)){
-				Workspace workspace = createWorkspaceForOrganisation(organisation.getName(), userID, createDateTime);
-				organisation.setWorkspace(workspace);
-			}
-		}
-		
-		save(organisation);
-		return organisation;
 	}
 
 	public Workspace createWorkspaceForOrganisation(String workspaceName, Integer userID, Date createDateTime ) {
