@@ -34,7 +34,9 @@
 			<props>
 				<prop key="save*">PROPAGATION_REQUIRED</prop>
 				<prop key="store*">PROPAGATION_REQUIRED</prop>
-				<prop key="copy*">PROPAGATION_REQUIRED</prop>				
+				<prop key="copy*">PROPAGATION_REQUIRED</prop>
+				<prop key="rename*">PROPAGATION_REQUIRED</prop>
+				<prop key="delete*">PROPAGATION_REQUIRED</prop>				
 			</props>
 		</property>
 	</bean>
