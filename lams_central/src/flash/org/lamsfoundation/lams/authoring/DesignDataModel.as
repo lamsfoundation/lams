@@ -290,6 +290,9 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		_maxID = design.maxID;
 		_firstActivityID = design.firstActivityUIID;
 		
+		_licenseID = design.licenseID;
+		_licenseText = design.licenseText;
+		
 		//set the activities in the hash table
 		for(var i=0; i<design.activities.length;i++){
 			//note if the design is being opened - then it must have ui_ids already
@@ -384,6 +387,23 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	public function getDesignForSaving():Object{
 		prepareDesignForSaving();
 		return toData();
+	}
+	
+	/**
+	 * Get details of currently saved design for use in workspace 
+	 *  
+	 * @return Design details used in Workspace
+	 */
+	
+	public function getDesignForWorkspace():Object{
+		var design:Object = new Object();
+			if(_title){				design.title			= _title;				}
+			if(_description){		design.description		= _description;			}
+			if(_licenseID){			design.licenseID		= _licenseID;			}
+			if(_licenseText){		design.licenseText		= _licenseText;			}
+			if(_workspaceFolderID){	design.workspaceFolderID= _workspaceFolderID;	}
+			design.readOnly = (_readOnly==null) ? false : _readOnly;
+			return design;
 	}
 	
 	/**
