@@ -177,7 +177,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			  	   </tr>
 
 
-			 		<c:if test="${sessionScope.learningMode == 'learner'}"> 					  	   
+
 				 		<c:if test="${sessionScope.isRetries == 'true'}"> 					  	   
 			  	   		  <tr>
 						  	<td NOWRAP colspan=2 align=center valign=top> 
@@ -215,7 +215,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						  	 </td>
 						  </tr>
 						</c:if> 																		
-					</c:if> 																		
 					
 				  	<html:hidden property="doneLearnerProgress"/>						   
 				</table>

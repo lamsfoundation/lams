@@ -504,9 +504,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     	
     	logger.debug("final mcQueUsr: " + mcQueUsr);
     	
-    	//String highestAttemptOrder=(String)request.getSession().getAttribute(LEARNER_LAST_ATTEMPT_ORDER);
-        //logger.debug("current highestAttemptOrder:" + highestAttemptOrder);
-    	
+   	
     	String highestAttemptOrder="0";
     	McUsrAttempt mcUsrAttempt = mcService.getAttemptWithLastAttemptOrderForUserInSession(mcQueUsr.getUid(), toolSessionUid);
     	logger.debug("mcUsrAttempt with highest attempt order: " + mcUsrAttempt);
@@ -529,10 +527,6 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     	LearningUtil.createAttempt(request, mcQueUsr, mapGeneralCheckedOptionsContent, mark, passed, new Integer(highestAttemptOrder).intValue(), mapLearnerAssessmentResults);
     	logger.debug("created user attempt in the db");
     	
-    	//int intHighestAttemptOrder=new Integer(highestAttemptOrder).intValue()+ 1 ;
-        //logger.debug("updated highestAttemptOrder:" + intHighestAttemptOrder);
-        //request.getSession().setAttribute(LEARNER_LAST_ATTEMPT_ORDER, new Integer(intHighestAttemptOrder).toString());
-        
         logger.debug("before getLearnerMarkAtLeast: passMark" + passMark);
         logger.debug("before getLearnerMarkAtLeast: mapQuestionWeights" + mapQuestionWeights);
         
@@ -912,11 +906,8 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		
 		String previewOnly=(String)request.getSession().getAttribute(PREVIEW_ONLY);
 		logger.debug("previewOnly: " + previewOnly);
-		if ((previewOnly != null) && (previewOnly.equalsIgnoreCase("true")))
-		{
-	    	logger.debug("request for preview.");
-			return (mapping.findForward(PREVIEW));
-		}
+
+		logger.debug("fwding to LOAD_LEARNER: " + LOAD_LEARNER);
     	return (mapping.findForward(LOAD_LEARNER));
     }
 
