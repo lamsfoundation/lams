@@ -75,7 +75,23 @@ public class MainExportServlet extends HttpServlet {
 	throws ServletException, IOException {
 		doGet(request, response);
 	}
-	
+
+	/** If it is running from the learner interface then can use the userID from the user object
+	 * If running from the monitoring interface, the learner's userID is supplied by the request parameters.
+	 * 
+	 * @return userID
+	 */
+	protected Integer getLearnerUserID(HttpServletRequest request) {
+		Integer userId = WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID, true);
+		if ( userId == null ) {
+			HttpSession session = SessionManager.getSession();
+			UserDTO userDto = (UserDTO)session.getAttribute(AttributeNames.USER);
+			userId = userDto.getUserID();
+		}
+		return userId;
+	}
+		
+    
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 	throws ServletException, IOException, ExportPortfolioException{
 	    
@@ -92,9 +108,8 @@ public class MainExportServlet extends HttpServlet {
 		
 		if (mode.equals(ToolAccessMode.LEARNER.toString()))
 		{
-			HttpSession session = SessionManager.getSession();
-		    UserDTO userDto = (UserDTO)session.getAttribute(AttributeNames.USER);
-		    Integer userId = userDto.getUserID();
+			// TODO check if the user id is coming from the request then the current user should have monitoring privilege
+		    Integer userId = getLearnerUserID(request);
 		    lessonID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID));
 		    portfolios = exportService.exportPortfolioForStudent(userId, lessonID, true, cookies);
 		}
