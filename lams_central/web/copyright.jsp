@@ -36,9 +36,9 @@
 				</tr>
 				<tr>
 					<td align="left">
-						<A HREF="<fmt:message key="msg.LAMS.copyright.statement.url"/>"  target='copyright2'
-						onClick="window.open('<fmt:message key="msg.LAMS.copyright.statement.url"/>','copyright2','resizable,width=650,height=650,scrollbars');return false;">
-							<fmt:message key="msg.LAMS.copyright.statement.url"/>
+						<A HREF="http://www.gnu.org/licenses/gpl.txt"  target='copyright2'
+						onClick="window.open('http://www.gnu.org/licenses/gpl.txt','copyright2','resizable,width=650,height=650,scrollbars');return false;">
+							http://www.gnu.org/licenses/gpl.txt
 						</a>
 					</td>
 				</tr>
