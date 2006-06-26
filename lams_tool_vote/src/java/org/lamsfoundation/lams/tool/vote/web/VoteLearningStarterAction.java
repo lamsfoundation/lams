@@ -136,7 +136,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	voteLearningForm.setActivityRunOffline(new Boolean(false).toString());
 	
     /*
-     * persist time zone information to session scope. 
+     * save time zone information to session scope. 
      */
     VoteUtils.persistInSessionTimeZone(request);
     ActionForward validateParameters=validateParameters(request, mapping);
@@ -217,8 +217,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 		/* PREVIEW_ONLY for jsp*/
     	request.getSession().setAttribute(PREVIEW_ONLY, new Boolean(true).toString());
     	VoteLearningAction voteLearningAction= new VoteLearningAction();
-    	//return voteLearningAction.redoQuestions(mapping, form, request, response);
-    	logger.debug("presenting standard learner screen forpreview mode...");
+    	logger.debug("presenting standard learner screen for preview mode...");
         return (mapping.findForward(LOAD_LEARNER));	
 	}
     

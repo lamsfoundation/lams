@@ -136,6 +136,19 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 		setContentInUse(request);
 		IVoteService voteService =VoteUtils.getToolService(request);
 	 	
+		Collection<String> voteDisplayOrderIds = voteLearningForm.votesAsCollection();
+		logger.debug("Checkbox votes "+voteDisplayOrderIds);
+		
+    	Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
+    	logger.debug("toolContentId:" + toolContentId);
+    	
+    	VoteContent voteContent=voteService.retrieveVote(toolContentId);
+    	logger.debug("voteContent:" + voteContent);
+
+		Map mapGeneralCheckedOptionsContent = LearningUtil.buildQuestionContentMap(request, voteContent, voteDisplayOrderIds);
+		logger.debug("mapGeneralCheckedOptionsContent: "+ mapGeneralCheckedOptionsContent);
+		request.setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, mapGeneralCheckedOptionsContent);
+
     	voteLearningForm.resetCommands();
 	    return (mapping.findForward(ALL_NOMINATIONS));
     }
@@ -439,6 +452,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
     	logger.debug("calling  prepareChartData: " + toolContentId);
     	MonitoringUtil.prepareChartData(request, voteService, null, toolContentId, toolSessionUid);
     	
+    	logger.debug("fwding to INDIVIDUAL_REPORT: " + INDIVIDUAL_REPORT);
     	return (mapping.findForward(INDIVIDUAL_REPORT));
     }
 
@@ -477,14 +491,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 	    
 	    String previewOnly=(String)request.getSession().getAttribute(PREVIEW_ONLY);
 	    logger.debug("previewOnly : " + previewOnly);
-	    if (previewOnly != null)
-	    {
-		    if (previewOnly.equals("true"))
-		    {
-		        logger.debug("request is for previewOnly : " + previewOnly);
-		        return (mapping.findForward(PREVIEW));
-		    }
-	    }
+	    logger.debug("fwd'ing to LOAD_LEARNER : " + LOAD_LEARNER);
 	    return (mapping.findForward(LOAD_LEARNER));
    }
 
