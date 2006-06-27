@@ -69,6 +69,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 	private var _todoTabLayer_mc:MovieClip;
 	private var refresh_btn:Button;
 	private var help_btn:Button;
+	private var exportPortfolio_btn:Button;
 	//private var _activityLayerComplex_mc:MovieClip;
 	//private var _activityLayer_mc:MovieClip;
 	
@@ -161,6 +162,9 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 			case 'TABCHANGE' :
 				showData(mm);
 				break;
+			case 'EXPORTSHOWHIDE' :
+				exportShowHide(infoObj.data);
+				break;
             default :
                 Debugger.log('unknown update type :' + infoObj.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.MonitorView');
 		}
@@ -174,6 +178,10 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
         var s:Object = mm.getSequence();
 		trace("Item Description is : "+s._learningDesignID);
 		
+	}
+	
+	private function exportShowHide(v:Boolean):Void{
+		exportPortfolio_btn.visible = v;
 	}
 	
 	/**
@@ -200,6 +208,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 		
 		refresh_btn.addEventListener("click",mcontroller);
 		help_btn.addEventListener("click",mcontroller);
+		exportPortfolio_btn.addEventListener("click", mcontroller);
 		monitorTabs_tb.addEventListener("change",mcontroller);
 		
 		setLabels();
@@ -263,6 +272,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 		styleObj = _tm.getStyleObject('button');
 		monitorTabs_tb.setStyle('styleName', styleObj);
 		refresh_btn.setStyle('styleName',styleObj);
+		exportPortfolio_btn.setStyle('styleName',styleObj);
 		help_btn.setStyle('styleName',styleObj);
 		
 	}
@@ -270,6 +280,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 	private function setLabels():Void{
 		refresh_btn.label = Dictionary.getValue('refresh_btn');
 		help_btn.label = Dictionary.getValue('help_btn');
+		exportPortfolio_btn.label = Dictionary.getValue('learner_exportPortfolio_btn');
 	}
 		
 	/**
@@ -280,7 +291,8 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 		trace("Monitor Tab Widtht: "+s.w+" Monitor Tab Height: "+s.h);
 		bkg_pnl.setSize(s.w,s.h);
 		monitor_scp.setSize(s.w-monitor_scp._x,s.h-monitor_scp._y);
-		refresh_btn._x = s.w - 180
+		exportPortfolio_btn._x = s.w - 260;
+		refresh_btn._x = s.w - 160
 		help_btn._x = s.w - 80
 				
 	}
