@@ -52,7 +52,7 @@ import org.lamsfoundation.lams.util.ConfigurationKeys;
 public class CssTag extends TagSupport {
 
 	private static final Logger log = Logger.getLogger(CssTag.class);
-	
+	private static final String IE_STYLESHEET_NAME = "ie-styles";
 	private boolean generateLocalLink = false; 
 	
 	/**
@@ -68,34 +68,44 @@ public class CssTag extends TagSupport {
 		String serverURL = Configuration.get(ConfigurationKeys.SERVER_URL);
 		serverURL = ( serverURL != null ? serverURL.trim() : null);
 
-		if ( serverURL != null ) {
-			List themeList = CSSThemeUtil.getAllUserThemes();
-			
-			Iterator i = themeList.iterator();
-			
-			while (i.hasNext())
-			{
-				String theme = (String)i.next();
-				if ( theme != null) {
-					if (generateLocalLink)
-						customStylesheetLink = generateLocalLink(theme,serverURL);
-					else	
-						customStylesheetLink = generateLink(theme,serverURL);
-				}
-		
-				try {
-		        	JspWriter writer = pageContext.getOut();
+		try {
+
+        	JspWriter writer = pageContext.getOut();
+			if ( serverURL != null ) {
+				List themeList = CSSThemeUtil.getAllUserThemes();
+				
+				Iterator i = themeList.iterator();
+				
+				while (i.hasNext())
+				{
+					String theme = (String)i.next();
+					if ( theme != null) {
+						if (generateLocalLink)
+							customStylesheetLink = generateLocalLink(theme,serverURL);
+						else	
+							customStylesheetLink = generateLink(theme,serverURL);
+					}
+					
 		    	   	if ( customStylesheetLink != null ) {
-		    	   		writer.print(customStylesheetLink);
+		    	   		writer.println(customStylesheetLink);
 		    	   	}
-			   		//writer.print(generateLink("default",serverURL));
-				} catch ( IOException e ) {
-					log.error("CssTag unable to write out CSS details due to IOException.", e);
-					// don't throw a JSPException as we want the system to still function.
 				}
+	
+			} else {
+		   		log.warn("CSSTag unable to write out CSS entries as the server url is missing from the configuration file.");
 			}
-		} else {
-	   		log.warn("CSSTag unable to write out CSS entries as the server url is missing from the configuration file.");
+			
+			// Special IE stylesheet for all those IE related formatting issues
+			String ieLink = generateLocalLink ? generateLocalLink(IE_STYLESHEET_NAME,serverURL) : generateLink(IE_STYLESHEET_NAME,serverURL);
+			writer.println("<!--[if IE]>");
+			writer.println("<style type=\"text/css\">");
+			writer.println("@import url("+ieLink+");");
+			writer.println("</style>");
+			writer.println("<![endif]-->");
+
+		} catch ( IOException e ) {
+			log.error("CssTag unable to write out CSS details due to IOException.", e);
+			// don't throw a JSPException as we want the system to still function.
 		}
     	return SKIP_BODY;
 	}
