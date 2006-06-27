@@ -99,9 +99,12 @@ public class GenerateIDTag extends TagSupport {
 						long seed = System.currentTimeMillis();
 						Random rand = new Random(seed);
 						number = rand.nextInt();
-				
+						
+						// ensure positive value
+						int pos = Math.abs(number);
+						
 						if (number != -1) {
-					        ss.setAttribute(AttributeNames.UID, String.valueOf(number));
+					        ss.setAttribute(AttributeNames.UID, Integer.toString(pos));
 					        if(getId() != null)
 					        	writer.print(ss.getAttribute(AttributeNames.UID) + "%" + getId());
 					        else
