@@ -1,5 +1,5 @@
 .previewPanel {
-	width: 500px;
+	width: 665px;
 	height: 220px;
 	border-style: none;
 	border-width: 1px;
@@ -8,12 +8,12 @@
 }
 
 .textareaPanel {
-	width: 500px;
+	width: 665px;
 	height: 220px;
 }
 
 .smallPreviewPanel {
-	width: 500px;
+	width: 665px;
 	height: 120px;
 	border-style: none;
 	border-width: 1px;
@@ -21,8 +21,17 @@
 }
 
 .smallTextareaPanel {
-	width: 500px;
+	width: 665px;
 	height: 120px;
+}
+
+
+#wyswygEditorScreen {
+	position: absolute;
+	width: 665px;
+	height: 220px;
+	padding: 0px;
+	margin: 0px;
 }
 
 #wyswygEditor { /*position the wyswygEditor in the centre*/
@@ -35,12 +44,4 @@
 	height: 100%;
 	/*border-style: solid; 
 	border-width: 3px;*/
-}
-
-#wyswygEditorScreen {
-	position: absolute;
-	width: 500px;
-	height: 220px;
-	padding: 0px;
-	margin: 0px;
 }

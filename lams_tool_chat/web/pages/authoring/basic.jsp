@@ -6,20 +6,13 @@
 <table cellpadding="0">
 	<tbody>
 		<tr>
-			<td class="field-name" width="20%">
-				<fmt:message key="label.authoring.basic.title" />
-			</td>
 			<td>
-				<lams:SetEditor id="Title" text="${authoringForm.title}" small="true" />
+				<lams:SetEditor id="Title" text="${authoringForm.title}" small="true" key="label.authoring.basic.title" />
 			</td>
 		</tr>
-
 		<tr>
-			<td class="field-name" width="20%">
-				<fmt:message key="label.authoring.basic.instructions" />
-			</td>
 			<td>
-				<lams:SetEditor id="Instructions" text="${authoringForm.instructions}" />
+				<lams:SetEditor id="Instructions" text="${authoringForm.instructions}" key="label.authoring.basic.instructions" />
 			</td>
 		</tr>
 	</tbody>
