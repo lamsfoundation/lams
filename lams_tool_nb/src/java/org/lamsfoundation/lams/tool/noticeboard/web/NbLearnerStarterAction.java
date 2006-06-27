@@ -186,35 +186,8 @@ public class NbLearnerStarterAction extends LamsDispatchAction {
     
     public ActionForward author(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws NbApplicationException {
         
-        /* will show a different screen if defineLater flag is set and running in preview mode */
-    	NoticeboardContent nbContent = null;
-        NbWebUtil.cleanLearnerSession(request);
-        saveMessages(request, null);
-        
-        NbLearnerForm learnerForm = (NbLearnerForm)form;
-      
-        ActionMessages message = new ActionMessages();
-        INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
-        
-        Long toolSessionId = WebUtil.readLongParam(request, NoticeboardConstants.TOOL_SESSION_ID,false);
+    	return learner(mapping, form, request, response);
 
-        nbContent = nbService.retrieveNoticeboardBySessionID(toolSessionId);
-	      
-	    if(nbContent == null)
-		{
-			String error = "An Internal error has occurred. Please exit and retry this sequence";
-			logger.error(error);				
-			throw new NbApplicationException(error);
-		}   
-	    
-        if (displayMessageToAuthor(nbContent, message))
-        {
-            saveMessages(request, message);
-            return mapping.findForward(NoticeboardConstants.DISPLAY_MESSAGE);
-        }
-                
-        learnerForm.copyValuesIntoForm(nbContent);       
-        return mapping.findForward(NoticeboardConstants.DISPLAY_LEARNER_CONTENT);
     }
     
     

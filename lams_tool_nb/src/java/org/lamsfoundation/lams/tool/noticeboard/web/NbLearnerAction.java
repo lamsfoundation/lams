@@ -135,20 +135,11 @@ public class NbLearnerAction extends LamsLookupDispatchAction {
       if (mode == ToolAccessMode.LEARNER || mode == ToolAccessMode.AUTHOR)
 	  {
 		  NoticeboardSession nbSession = nbService.retrieveNoticeboardSession(toolSessionID);
-		  NoticeboardUser nbUser = nbService.retrieveNoticeboardUser(userID);
+		  NoticeboardUser nbUser = nbService.retrieveNbUserBySession(userID,toolSessionID);
 		  
 		  nbUser.setUserStatus(NoticeboardUser.COMPLETED);
 		  nbService.updateNoticeboardSession(nbSession);
 		  nbService.updateNoticeboardUser(nbUser);
-		  
-		 /**
-		  * TODO: when this method is called, it throws a NullPointerException.
-		  * This is an error due to the learner service method completeToolSession(). 
-		  * It is not tested yet, however it is left in the code, to indicate that a learner has completed an activity.
-		  * 
-		  * get the url that is returned from leavetoolsession and redirect to this url
-		  */
-		  
 		  
 		  String nextActivityUrl;
 			try
@@ -157,12 +148,12 @@ public class NbLearnerAction extends LamsLookupDispatchAction {
 			}
 			catch (DataMissingException e)
 			{
-				// TODO Auto-generated catch block
+				log.error(e);
 				throw new ServletException(e);
 			}
 			catch (ToolException e)
 			{
-				// TODO Auto-generated catch block
+				log.error(e);
 				throw new ServletException(e);
 			}
 	        
