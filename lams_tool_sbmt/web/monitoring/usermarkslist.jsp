@@ -1,14 +1,15 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="filesUploaded" value="${userReport}" />
 <c:set var="user" value="${user}" />
-<b>Following files have been submitted by <c:out value="${user.login}" /> , <c:out value="${user.firstName}" /> <c:out value="${user.lastName}" /> </b>
+<b><c:out value="${user.login}" /> , <c:out value="${user.firstName}" /> <c:out value="${user.lastName}" />, <fmt:message key="label.submit.file.suffix" />: </b>
 </p>
 <table width="100%" border="0" cellspacing="0" cellpadding="0">
 	<c:forEach var="details" items="${filesUploaded}">
 		<span><p>
 		<tr>
 			<td>
-				File Path:
+				<fmt:message key="label.learner.filePath" />
+				:
 			</td>
 			<td>
 				<c:out value="${details.filePath}" />
@@ -24,7 +25,8 @@
 		</tr>
 		<tr>
 			<td>
-				File Description:
+				<fmt:message key="label.learner.fileDescription" />
+				:
 			</td>
 			<td>
 				<c:out value="${details.fileDescription}" escapeXml="false" />
@@ -32,7 +34,8 @@
 		</tr>
 		<tr>
 			<td>
-				Date of Submission:
+				<fmt:message key="label.learner.dateOfSubmission" />
+				:
 			</td>
 			<td>
 				<c:out value="${details.dateOfSubmission}" />
@@ -40,12 +43,13 @@
 		</tr>
 		<tr>
 			<td>
-				Marks:
+				<fmt:message key="label.learner.marks" />
+				:
 			</td>
 			<td>
 				<c:choose>
 					<c:when test="${empty details.marks}">
-						<c:out value="Not Available" />
+						<fmt:message key="label.learner.notAvailable" />
 					</c:when>
 					<c:otherwise>
 						<c:out value="${details.marks}" escapeXml="false" />
@@ -55,12 +59,13 @@
 		</tr>
 		<tr>
 			<td>
-				Comments:
+				<fmt:message key="label.learner.comments" />
+				:
 			</td>
 			<td>
 				<c:choose>
 					<c:when test="${empty details.comments}">
-						<c:out value="Not Available" />
+						<fmt:message key="label.learner.notAvailable" />
 					</c:when>
 					<c:otherwise>
 						<c:out value="${details.comments}" escapeXml="false" />

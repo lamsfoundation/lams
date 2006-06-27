@@ -7,24 +7,20 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html:html locale="true">
 <head>
-	<title>
-		Submission Export
-	</title>
+	<title>Submission Export</title>
 	<lams:css localLink="true" />
 </head>
 <body>
-	<h1>
-		Export Portfolio
-	</h1>
 	<h2>
-		Submit
+		<fmt:message key="activity.title" />
 	</h2>
 	<br>
 	<div id="datatablecontainer">
 		<c:choose>
 			<c:when test="${empty report}">
 				<h3>
-					No files have been submitted
+					<fmt:message key="label.learner.noUpload" />
+					:
 				</h3>
 			</c:when>
 			<c:otherwise>
@@ -42,24 +38,25 @@
 										<c:out value="${user.lastName}" />
 										(
 										<c:out value="${user.login}" />
-										) , submitted the following:
+										) , 
+										<fmt:message key="label.submit.file.suffix"/>:
 									</td>
 								</tr>
 							</c:if>
 							<tr>
 								<td>
-									File Path:
+									<fmt:message key="label.learner.filePath" />
+									:
 								</td>
 								<td>
-									<a href='<c:out value="${submission.exportedURL}"/>'>
-										<c:out value="${submission.filePath}" />
-									</a>
+									<a href='<c:out value="${submission.exportedURL}"/>'> <c:out value="${submission.filePath}" /> </a>
 								</td>
 
 							</tr>
 							<tr>
 								<td>
-									File Description:
+									<fmt:message key="label.learner.fileDescription" />
+									:
 								</td>
 								<td>
 									<c:out value="${submission.fileDescription}" escapeXml="false" />
@@ -67,7 +64,8 @@
 							</tr>
 							<tr>
 								<td>
-									Date of Submission:
+									<fmt:message key="label.learner.dateOfSubmission" />
+									:
 								</td>
 								<td>
 									<c:out value="${submission.dateOfSubmission}" />
@@ -75,12 +73,13 @@
 							</tr>
 							<tr>
 								<td>
-									Marks:
+									<fmt:message key="label.learner.marks" />
+									:
 								</td>
 								<td>
 									<c:choose>
 										<c:when test="${empty submission.marks}">
-											<c:out value="Not Available" />
+											<fmt:message key="label.learner.notAvailable" />
 										</c:when>
 										<c:otherwise>
 											<c:out value="${submission.marks}" escapeXml="false" />
@@ -90,12 +89,13 @@
 							</tr>
 							<tr>
 								<td>
-									Comments:
+									<fmt:message key="label.learner.comments" />
+									:
 								</td>
 								<td>
 									<c:choose>
 										<c:when test="${empty submission.comments}">
-											<c:out value="Not Available" />
+											<fmt:message key="label.learner.notAvailable" />
 										</c:when>
 										<c:otherwise>
 											<c:out value="${submission.comments}" escapeXml="false" />

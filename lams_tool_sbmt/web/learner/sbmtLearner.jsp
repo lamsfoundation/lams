@@ -37,9 +37,9 @@
 		<c:choose>
 			<c:when test="${empty learner.filesUploaded}">
 				<center>
-					<b>No files have been uploaded yet.</b>
+					<b><fmt:message key="label.learner.noUpload"/></b>
 					<p>
-						Only one file can be uploaded at a time - Maximum file size is 1.0 MB.
+						<fmt:message key="label.learner.uploadMessage"/>
 					</p>
 				</center>
 			</c:when>

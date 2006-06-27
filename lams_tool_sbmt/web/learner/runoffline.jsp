@@ -19,7 +19,7 @@
 		</h2>
  	<p>
 		<html:button property="finished" onclick="finish()" disabled="${learner.locked}" styleClass="buttonStyle">
-			<fmt:message key="label.learner.finished" />
+			<fmt:message key="button.finish" />
 		</html:button>
 
 	</div>

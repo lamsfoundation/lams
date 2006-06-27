@@ -8,7 +8,7 @@
 				<bean:define id="userlist" name="element" property="value"/>
 		  		<table class="forms">
 				    <tr>
-				        <td style="border-bottom:1px #000 solid;" colspan="4"><b>SESSION NAME: <c:out value="${sessionDto.sessionName}" /></td>
+				        <td style="border-bottom:1px #000 solid;" colspan="4"><b><fmt:message key="label.session.name"/>: <c:out value="${sessionDto.sessionName}" /></td>
 				    </tr>
 			  		<logic:notEmpty name="userlist">
 						<logic:iterate id="user" name="userlist">
@@ -27,7 +27,7 @@
 						</logic:iterate>
 			  		</logic:notEmpty>
 			  		<logic:empty name="userlist">
-			  			<tr><td colspan="3">NO USERS AVAILABLE</td></tr>
+			  			<tr><td colspan="3"><fmt:message key="label.no.user.available"/></td></tr>
 			  		</logic:empty>
 				    
 	  				<tr>
