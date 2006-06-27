@@ -106,6 +106,7 @@
 			</tr>
 		</c:if>
 	</table>
+	<p>&nbsp;</p>
 	<c:if test="${resource.allowAddFiles || resource.allowAddUrls}">
 		<table border="0" align="center" class="forms" width="95%">
 			<tr>
